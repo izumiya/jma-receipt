@@ -555,6 +555,11 @@
                GO      TO      100112-SYOEN-CHK-EXT
            END-IF
       *
+      *    診療行為のみ
+           IF       LNK-ORCSC-PG       =   "J04"
+               GO      TO      100112-SYOEN-CHK-EXT
+           END-IF
+      *
       *
            SET     TBL-IDX              TO  1
            SEARCH  TBL-SYOCHI-OCC       VARYING   TBL-IDX
@@ -601,7 +606,8 @@
            END-IF
       *
       *    労災でマッサージ等、器具等の時、日に３部位とする
-           IF     (SPA-HKNKBN          =   1   )  AND
+           IF     (LNK-ORCSC-PG       =   "K02" ) AND
+                  (SPA-HKNKBN          =   1   )  AND
                   (WRK-SYOCHI-KBN      =   "01" OR  "02"
       *        介達牽引
                                        OR  "04"   )
