@@ -76,6 +76,7 @@
       *  01.00.29    NACL-Æ£¸¶    04/03/18  ²èÁü¿ÇÃÇ¤Î½ÐÎÏ½ç¤Î½¤Àµ
       *  01.00.30    NACL-Æ£¸¶    04/03/19  £µ£±¸øÈñ¤Î¤È¤­¼Â»Üµ¡´ØÈÖ¹æ¡Ö£¶£°£²¡×
       *                                     ¤Î¤È¤­¤Î¤ß¸øÈñÉéÃ´³Û¤òµ­Ï¿¤¹¤ë
+      *  01.00.31    NACL-Æ£¸¶    04/04/05  ÉÂÌ¾¥³¡¼¥É£¹£¹£¹£¹£¹£¹£¹ÆÉ¤ßÈô¤Ð¤¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1529,6 +1530,9 @@
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       21
                        OR      RECE031-BYOMEICD(IDX)   =   SPACE
+                 IF      RECE031-BYOMEICD(IDX) =   ALL "9"
+                     CONTINUE
+                 ELSE  
                    IF      RECE031-BYOMEICD(IDX)(1:3)  NOT =   "ZZZ"
                        IF      WRK-BYOMEICD                =   SPACE
       *                    ÇÑ»ßÇ¯·îÆü¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¤È¤­¿ÇÎÅ³«»ÏÆü°ÊÁ°
@@ -1560,7 +1564,8 @@
                        ADD     1           TO  IDY
                        MOVE    RECE031-BYOMEICD(IDX)(4:)
                                            TO  WRK-RECECD(IDY)
-                   END-IF    
+                   END-IF
+                 END-IF       
                END-PERFORM
            END-IF    
       *
