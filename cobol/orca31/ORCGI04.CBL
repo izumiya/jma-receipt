@@ -2686,7 +2686,7 @@
       *    ＤＢ更新処理
            PERFORM 452-TOUROKU-SYORI-SEC
            IF    ( SPA-ERRCD       NOT =   SPACE )
-               GO  TO  452-TOUROKU-SEC
+               GO  TO  452-TOUROKU-EXT
            END-IF
       *
       *    帳票出力処理
