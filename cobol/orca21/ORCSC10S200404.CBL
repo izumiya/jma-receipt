@@ -4169,7 +4169,7 @@
                  IF     (HZN-COM-SRYKBN(IDX)     =   "11"  OR  "12"
                                                  OR  "13"  OR  "14" ) OR
       *                療養担当手当
-                     ( HZN-COM-INPUTCD(IDX)     =   "199000610" ) 
+                     ( HZN-COM-INPUTCD(IDX)     =   "199000610" )
                    MOVE    HZN-COM-INPUTCD(IDX) TO  WRK-SRYCD
                    IF      HZN-COM-INPUTCD(IDX) NOT =   SPACE
                        PERFORM 10101-SINSATU-CHK-SEC
@@ -4310,10 +4310,7 @@
                PERFORM VARYING     IDXS    FROM    1   BY  1
                        UNTIL      (IDXS    >   SPA-GMN-IDX )  OR
                                   (FLG-ARI2    =   1           )
-                   IF     (SPA-COM-SRYSYUKBN(IDXS)(1:1)
-                                                   =   "0" ) AND
-                          (SPA-COM-SRYKBN (IDXS)   =   HZN-COM-SRYKBN
-                                                            (IDX)) AND
+                   IF     (WRK-SRYCD(1:1)          =   "1"  )  AND
                           (WRK-SRYCD               =   SPA-COM-INPUTCD
                                                             (IDXS))
                        MOVE    1               TO  FLG-ARI2
@@ -4321,20 +4318,15 @@
                END-PERFORM
            END-IF
       *
-           IF      FLG-ARI             =   1
-               GO      TO      10101-SINSATU-CHK-EXT
-           END-IF
       *    その他の自動発生分
            IF     WRK-SRYCD            =   "830000020"   OR
                                            "830000021"
                MOVE    1               TO  FLG-ARI
-               GO      TO      10101-SINSATU-CHK-EXT
            END-IF
-      *    その他の自動発生分
+      *    継続管理加算自動発生分
            IF     WRK-SRYCD            =   "112007170"   OR
                                            "112702270"
                MOVE    1               TO  FLG-ARI
-               GO      TO      10101-SINSATU-CHK-EXT
            END-IF
       *
       *    寝たきり老人在宅総合診療科
@@ -4380,10 +4372,7 @@
            PERFORM VARYING     IDXS    FROM    1   BY  1
                    UNTIL      (IDXS    >   SPA-GMN-IDX )  OR
                               (FLG-ARI =   1           )
-               IF     (SPA-COM-SRYSYUKBN(IDXS)(1:1)
-                                               =   "0" ) AND
-                      (SPA-COM-SRYKBN (IDXS)   =   HZN-COM-SRYKBN
-                                                            (IDX)) AND
+               IF     (WRK-SRYCD(1:1)          =   "1"   ) AND
                       (WRK-SRYCD               =   SPA-COM-INPUTCD
                                                             (IDXS))
                    MOVE    1               TO  FLG-ARI
