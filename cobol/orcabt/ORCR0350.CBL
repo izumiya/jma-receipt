@@ -39,6 +39,12 @@
       *  01.00.04    NACL-藤原    04/11/16  特定器材レコードのフィルムと
       *                                     器材の点数・回数を別々に記載
       *  01.00.05    NACL-藤原    04/12/20  職務上の事由の編集方法の修正
+      *  01.00.07    NACL-藤原    05/01/17  愛知県対応
+      *                                     地方公費のとき、法別番号を判
+      *                                     定して受給者番号にゼロを編集
+      *                                     する
+      *  01.00.08    NACL-藤原    05/01/18  特定器材レコードの点数の編集
+      *                                     方法を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1881,16 +1887,26 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    受給者番号                             
-           IF      RECE62-KOHJKYSNUM  (IDY)
-                                       NOT =   SPACE
-               INITIALIZE              ORCSKANACHKAREA
-               MOVE    "1"             TO  KANACHK-SYORI 
-               MOVE    RECE62-KOHJKYSNUM  (IDY)
-                                       TO  KANACHK-MAE-INPUT
-               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
-               IF      KANACHK-SYUBETU =   "1"
+           IF    ( SYS-1001-PREFNUM    =   "23"                    )
+           AND   ( RECE62-TEISYUTUSAKI =   "2"                     )
+           AND   ( RECE62-KOHNUM (IDY) (1:1)
+                                       >=  "1" AND <= "8"          )
+           AND   ( RECE62-KOHHBTNUM (IDY)
+                                       =   "81" OR  "82"  OR 
+                                           "83" OR  "84"  OR  "85" )
+               MOVE    "0000000"           TO  WRK-DATA
+           ELSE                          
+               IF      RECE62-KOHJKYSNUM  (IDY)
+                                           NOT =   SPACE
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
                    MOVE    RECE62-KOHJKYSNUM  (IDY)
-                                           TO  WRK-DATA
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       MOVE    RECE62-KOHJKYSNUM  (IDY)
+                                               TO  WRK-DATA
+                   END-IF
                END-IF
            END-IF
            MOVE    7                   TO  WRK-NAGASA
@@ -2982,8 +2998,9 @@
                MOVE    RECE65-NAMEINF   (IDX)  TO
                                    TBL-ZAIW-NAMEINF    (2 WRK-TBLMAX7)
       *
-               IF      RECE65-DATAKBN (IDX)
-                                          =   "3"
+               IF    ( RECE65-DATAKBN (IDX)
+                                           =   "3"  )
+               AND   ( RECE641-SRYKBN      =   "70" )
                    MOVE    1                  TO
                                    TBL-ZAIW-DATSKB     (2 WRK-TBLMAX7)
                    MOVE    WRK-TBLMAX7        TO  WRK-SRYCD71-MAX 
@@ -3584,6 +3601,7 @@
       *********END-IF
            IF    ( IDXX                =   1               )
            AND   ( IDX                 =   WRK-SRYCD71-MAX )
+           AND   ( RECE641-SRYKBN      =   "70"            )
                MOVE    RECE641-SYUTEN2     TO  WRK-TENSU
                IF      WRK-TENSU       >   ZERO
                    MOVE    WRK-TENSU           TO  WRK-NUM
@@ -3592,12 +3610,13 @@
            END-IF
            IF    ( IDXX                =   2               )
            AND   ( IDX                 =   WRK-SRYCD72-MAX )
-               IF      RECE641-SRYKBN      =   "70"
-                   MOVE    RECE641-KIZAITEN    TO  WRK-TENSU
-               ELSE
-                   COMPUTE WRK-TENSU   =   RECE641-KIZAITEN    -
-                                           RECE641-SYUTEN2
-               END-IF
+      *********IF      RECE641-SRYKBN      =   "70"
+      *********    MOVE    RECE641-KIZAITEN    TO  WRK-TENSU
+      *********ELSE
+      *********    COMPUTE WRK-TENSU   =   RECE641-KIZAITEN    -
+      *********                            RECE641-SYUTEN2
+      *********END-IF
+               MOVE    RECE641-KIZAITEN    TO  WRK-TENSU
                IF      WRK-TENSU       >   ZERO
                    MOVE    WRK-TENSU           TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
@@ -3608,6 +3627,7 @@
       *****IF      IDX                     =   WRK-TBLMAX7
            IF    ( IDXX                =   1               )
            AND   ( IDX                 =   WRK-SRYCD71-MAX )
+           AND   ( RECE641-SRYKBN      =   "70"            )
                IF      RECE641-ZAIKAISU    >   ZERO
                    MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
