@@ -427,26 +427,33 @@
       *    手技の時、適合チェック
            IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   2  OR  3
                PERFORM 1001111-SSTKIJUN-CHK-SEC
-      ******   施設基準適応
-      *        IF      FLG-ERR             =   ZERO
-      *            MOVE    1               TO  FLG-KIJUNN
-      *            GO      TO      100111-KIJUNN-CHK-EXT
-      *******  END-IF
       *        施設基準不適応
                IF     (WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   2 )  OR
                      ((WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   3   ) AND
                       (LNK-ORCSC-NENREI-YY             =   ZERO))
-      *            施設基準適応加算
                    IF      FLG-ERR             =   ZERO
+      *                施設基準適応加算
                        MOVE    1                   TO  FLG-KIJUNN
                        MOVE    "150304190"         TO  WRK-SRYCD
                        MOVE    "150302090"         TO  WRK-SRYCD2
                    ELSE
-      *            施設基準不適合（手術）
-                       MOVE    2                   TO  FLG-KIJUNN
-                       MOVE    "150302090"         TO  WRK-SRYCD
-                       MOVE    "150304190"         TO  WRK-SRYCD2
+      *                施設基準不適合
+                       IF      WRK-COM-KIJUNCHK-FLG (IDX-Z)
+                                                   =   1
+      *                    施設基準でない時、３０％の逓減
+                           MOVE    2                   TO  FLG-KIJUNN
+                           MOVE    "150302090"         TO  WRK-SRYCD
+                           MOVE    "150304190"         TO  WRK-SRYCD2
+                       ELSE
+      *                    施設基準の時、そのまま
+                           MOVE    SPACE               TO  WRK-SRYCD
+                           MOVE    SPACE               TO  WRK-SRYCD2
+                       END-IF
                    END-IF
+                   IF      WRK-SRYCD           =   SPACE
+                       GO      TO      100111-KIJUNN-CHK-EXT
+                   END-IF
+      *
                    MOVE    IDX-Z               TO  IDX-S
       *            自動発生位置決定
                    MOVE    ZERO                TO  FLG-ARI

@@ -82,6 +82,8 @@
       *
            03  FLG-SANTEI-OK       PIC 9(01).
            03  FLG-SANTEI-OK2      PIC 9(01).
+      *    手術施設基準不適合
+           03  FLG-SSTKIJUNCD-ERR      PIC  9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -814,6 +816,18 @@
            END-PERFORM
            IF      FLG-SST             =   ZERO
                MOVE    "0024"          TO  LNK-SC92-ERRCD4
+           END-IF
+      *
+      *平成１６年４月から
+      *    手術の基準不適合逓減判定
+           MOVE    ZERO                TO  FLG-SSTKIJUNCD-ERR
+           IF     (SPA-SRYYMD          >=  "20040401" )  AND
+                  (TNS-SRYKBN          =   "50"       )  AND
+                  (TNS-KIJUNTEIGENKBN  =   "2"  OR  "3" )
+               IF      FLG-SST             =   ZERO
+                   MOVE    SPACE           TO  LNK-SC92-ERRCD4
+                   MOVE    1               TO  FLG-SSTKIJUNCD-ERR
+               END-IF
            END-IF
       *
            .
@@ -1962,6 +1976,9 @@
       *    基準不適合逓減対象施設基準
            MOVE    TNS-KIJUNTEIGENCD    TO  SPA-COM-KIJUNTEIGENCD
                                                                (IDX-T)
+      *Ｈ１６年４月から
+      *    手術施設基準不適合
+           MOVE    FLG-SSTKIJUNCD-ERR  TO  SPA-COM-KIJUNCHK-FLG (IDX-T)
       *
       *    点数マスタ付加情報より編集
            PERFORM 3006-TENSUPLUS-HEN-SEC
