@@ -292,7 +292,7 @@
            03  FILLER              PIC X(09)  VALUE   "170002010".
       *
        01  TBL-DOUJI-HEISI-R       REDEFINES  TBL-DOUJI-HEISI-AREA.
-           03  TBL-DOUJI-OCC       OCCURS   14  INDEXED  TBL-IDX.
+           03  TBL-DOUJI-OCC       OCCURS   16  INDEXED  TBL-IDX.
                05  TBL-DOUJI-1     PIC X(09).
                05  TBL-DOUJI-2     PIC X(09).
       *
