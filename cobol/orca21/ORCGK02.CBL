@@ -4059,7 +4059,24 @@
       *****************************************************************
        31013-ZENKAICHK-SEC                  SECTION.
       *
-           PERFORM 31012-AUTOCHK-SEC
+      *
+      *    算定履歴チェック処理
+           INITIALIZE                  ORCSC91AREA
+           MOVE    WRK-SYORIFLG        TO  LNK-SC91-SYORIFLG
+           MOVE    LNK-WKSRY-SRYCD  (IDX IDY)
+                                       TO  LNK-SC91-SRYCD
+           MOVE    "2"                 TO  LNK-SC91-KBN
+           MOVE    ZERO                TO  LNK-SC91-GMN-IDX
+           MOVE    SPA-K02-TEISEI-AREA TO  LNK-SC91-TEISEI-AREA
+      *
+           CALL    "ORCSC91"           USING    MCPAREA
+                                                ORCSC91AREA
+                                                SPA-SCR-REC
+                                                SPA-AREA
+                                                TNS-TENSU-REC
+           IF      LNK-SC91-ERRCD      =   "K004" 
+               MOVE    SPACE           TO  LNK-SC91-ERRCD
+           END-IF
            IF      LNK-SC91-ERRCD  NOT =   SPACE
                MOVE    1               TO  FLG-HEN-CHK
            END-IF
