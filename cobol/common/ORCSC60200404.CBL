@@ -1350,7 +1350,7 @@
            ELSE
                EVALUATE    WRK-COM-HOUKNSKBN(IDX-Z)
       *?                               ALSO  WRK-COM-SRYSYUKBN (IDX-Z)
-                   WHEN    01   THRU   08
+                   WHEN    01   THRU   07
       *?                               ALSO  SPACE
       *?           WHEN    01   THRU   08
       *?                               ALSO  "600"
@@ -1512,10 +1512,10 @@
                        ELSE
                            PERFORM 10041-HOUKNS-ADD-SEC
                        END-IF
-                   WHEN    8
+      **********   WHEN    8
       *                ∆‚…Ù»Á…È≤ŸªÓ∏≥§Œ Ò≥Á
-                       ADD     WRK-HOUKNS-TENSU (IDX)
-                                                   TO  WRK-TENSUKEI
+      *                ADD     WRK-HOUKNS-TENSU (IDX)
+      *********                                    TO  WRK-TENSUKEI
                END-EVALUATE
            END-PERFORM
       *
