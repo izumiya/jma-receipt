@@ -485,6 +485,19 @@
                MOVE    SPACE           TO  LNK-SC92-ERRAREA
                MOVE    SPACE           TO  SPA-COM-KZMFLG (SPA-GMN-IDX)
            END-IF
+      *    画像診断のＣＴ．ＭＲＩは２回目のコードが違うので
+      *    算定回数のチェックなし
+           IF     (SPA-COM-TNSSRYSYUKBN (SPA-GMN-IDX)
+                                               =   "723"
+                                               OR  "724"  )  AND
+                  (SPA-COM-HOUKATUTEIGENKBN(SPA-GMN-IDX)
+                                               =   "201"
+                                               OR  "202"
+                                               OR  "203"  )  AND
+                   (SPA-COM-KAISU (SPA-GMN-IDX)
+                                               =   1      )
+               MOVE    SPACE           TO  LNK-SC92-ERRCD(3)
+           END-IF
       *
       *    エラー時、追加しない
            IF     (SPA-ERRCD           NOT =   SPACE )  OR
