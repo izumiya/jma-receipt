@@ -554,7 +554,7 @@
        01  WRK-KOUI-AREA.
            03  WRK-KOUI-TABLE                   OCCURS  4.
                05  WRK-KOUI-TBLMAX              PIC 9(03).
-               05  WRK-KOUI-REC                     OCCURS  20.
+               05  WRK-KOUI-REC                     OCCURS  100.
                    07  WRK-KOUI-SRYACTINF.
       *            ¿ÇÎÅ¥³¡¼¥É
                        09  WRK-KOUI-SRYCD           PIC  X(09).
@@ -2234,7 +2234,6 @@
                MOVE    HKNCOMBI-REC   TO  MCPDATA-REC
                PERFORM 910-HKNCOMBI-INV-SEC
                IF      FLG-HKNCOMBI   =   1
-                   DISPLAY "HKNCONBI INV"
                    GO  TO  20070-FTNKBN-HENSYU-EXT
                END-IF
            END-IF
@@ -3011,12 +3010,17 @@
                EVALUATE    WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
                    WHEN    "0"
                    WHEN    "8"
+                       IF    ( WRK-KOUI-TBLMAX (1) >  ZERO )
+                       OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
+                       OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
+                       OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+                           PERFORM 200741-KASAN-HENSYU-SEC
+                       END-IF
                        ADD     1           TO  WRK-TBLMAX1   
                        MOVE    WRK-KOUI-TAIHI-REC (IDX)
                                            TO  TBL-KOUI-REC(WRK-TBLMAX1)
                        COMPUTE IDX     =   IDX     +   1
                    WHEN    OTHER
-                       INITIALIZE               WRK-KOUI-AREA
       *                ´ðËÜ¹àÌÜ¡¦²Ã»»¹àÌÜ¡¦ÄÌÂ§²Ã»»¹àÌÜ¤ËÊ¬¤±¤ë
                        PERFORM UNTIL   IDX >=      100
                                OR      WRK-KOUI-TAIHI-SRYCD (IDX)
@@ -3027,6 +3031,12 @@
                                WHEN    "1"
                                WHEN    "3" 
                                WHEN    "5"
+                                   IF    ( WRK-KOUI-TBLMAX (1) >  ZERO )
+                                   OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
+                                   OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
+                                   OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+                                       PERFORM 200741-KASAN-HENSYU-SEC
+                                   END-IF
                                    MOVE    1               TO  IDZ  
                                WHEN    "7"
                                    IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
@@ -3052,44 +3062,60 @@
                                                WRK-KOUI-REC (IDZ IDY)
                            COMPUTE IDX     =   IDX     +   1
                        END-PERFORM
-      *
-      *                ²Ã»»¹àÌÜ¤Îµ­Ï¿½ç
-                       IF      WRK-KOUI-TBLMAX (2)         >   ZERO
-                           COMPUTE IDY     =   WRK-KOUI-TBLMAX (2) -   1
-                           PERFORM VARYING IDX1    FROM    1   BY  1
-                                   UNTIL   IDX1    >       IDY     
-                               COMPUTE IDZ     =   IDX1    +   1
-                               PERFORM VARYING IDX2    FROM   IDZ  BY  1
-                                       UNTIL   IDX2
-                                               >   WRK-KOUI-TBLMAX (2)
-                                   IF      WRK-KOUI-CHUKSNINF (2 IDX1)
-                                           > WRK-KOUI-CHUKSNINF (2 IDX2)
-                                       MOVE    WRK-KOUI-REC (2 IDX1)  TO
-                                                         TBL-KOUI-SORT
-                                       MOVE    WRK-KOUI-REC (2 IDX2)  TO
-                                                 WRK-KOUI-REC (2 IDX1)
-                                       MOVE    TBL-KOUI-SORT         TO
-                                                 WRK-KOUI-REC (2 IDX2)
-                                   END-IF
-                               END-PERFORM                              
-                           END-PERFORM
-                       END-IF    
-      *
-      *                ´ðËÜ¹àÌÜ¡¦²Ã»»¹àÌÜ¡¦ÄÌÂ§²Ã»»¹àÌÜ¤Î½ç¤ËÊÔ½¸
-                       PERFORM VARYING IDX1    FROM    1   BY  1
-                               UNTIL   IDX1    >       4
-                           MOVE    WRK-KOUI-TBLMAX (IDX1)  TO  IDY
-                           PERFORM VARYING IDX2    FROM    1   BY  1
-                                   UNTIL   IDX2    >       IDY
-                               ADD     1               TO  WRK-TBLMAX1
-                               MOVE    WRK-KOUI-REC (IDX1 IDX2)
-                                           TO  TBL-KOUI-REC(WRK-TBLMAX1)
-                           END-PERFORM
-                       END-PERFORM
-                   END-EVALUATE
-               END-PERFORM          
+               END-EVALUATE
+           END-PERFORM
+      *               
+           IF    ( WRK-KOUI-TBLMAX (1) >  ZERO )
+           OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
+           OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
+           OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+               PERFORM 200741-KASAN-HENSYU-SEC
+           END-IF
            .
        20074-ZAI-KOUI-SORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Å¦Í×¥Ç¡¼¥¿ÊÔ½¸½èÍý
+      *****************************************************************
+       200741-KASAN-HENSYU-SEC          SECTION.
+      *
+      *    ²Ã»»¹àÌÜ¤Îµ­Ï¿½ç
+           IF      WRK-KOUI-TBLMAX (2)         >   ZERO
+               COMPUTE IDY     =   WRK-KOUI-TBLMAX (2) -   1
+               PERFORM VARYING IDY1    FROM    1   BY  1
+                       UNTIL   IDY1    >       IDY     
+                   COMPUTE IDZ     =   IDY1    +   1
+                   PERFORM VARYING IDY2    FROM   IDZ  BY  1
+                           UNTIL   IDY2    >   WRK-KOUI-TBLMAX (2)
+                       IF      WRK-KOUI-CHUKSNINF (2 IDY1)
+                                       > WRK-KOUI-CHUKSNINF (2 IDY2)
+                           MOVE    WRK-KOUI-REC (2 IDY1)  TO
+                                                 TBL-KOUI-SORT
+                           MOVE    WRK-KOUI-REC (2 IDY2)  TO
+                                                 WRK-KOUI-REC (2 IDY1)
+                           MOVE    TBL-KOUI-SORT         TO
+                                                 WRK-KOUI-REC (2 IDY2)
+                       END-IF
+                   END-PERFORM                              
+               END-PERFORM
+           END-IF    
+      *
+      *    ´ðËÜ¹àÌÜ¡¦²Ã»»¹àÌÜ¡¦ÄÌÂ§²Ã»»¹àÌÜ¤Î½ç¤ËÊÔ½¸
+           PERFORM VARYING IDY1    FROM    1   BY  1
+                   UNTIL   IDY1    >       4
+               MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDY
+               PERFORM VARYING IDY2    FROM    1   BY  1
+                       UNTIL   IDY2    >       IDY
+                   ADD     1               TO  WRK-TBLMAX1
+                   MOVE    WRK-KOUI-REC (IDY1 IDY2)
+                                           TO  TBL-KOUI-REC(WRK-TBLMAX1)
+               END-PERFORM
+           END-PERFORM
+      *
+           INITIALIZE                   WRK-KOUI-AREA
+           .
+       200741-KASAN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3114,8 +3140,8 @@
                IF      IDX             =   WRK-SRYCD1-MAX
                    CONTINUE
                ELSE
-                   COMPUTE IDX1    =   IDX     +   1
-                   IF      TBL-KOUI-SRYCD (IDX1) (1:1)
+                   COMPUTE IDY1    =   IDX     +   1
+                   IF      TBL-KOUI-SRYCD (IDY1) (1:1)
                                            =   "0" OR  "8"
                        MOVE    1               TO  FLG-TBLMAX
                    END-IF
@@ -4465,10 +4491,10 @@
                                         ORCMCPAREA
                                         MCPDATA-REC
       *????
-      *     IF      FLG-HKNCOMBI        =   1
-      *         DISPLAY "HKNCOMBI INV " COMB-HOSPID " " COMB-PTID " "
-      *                                 COMB-HKNCOMBINUM " "    
-      *     END-IF
+           IF      FLG-HKNCOMBI        =   1
+               DISPLAY "HKNCOMBI INV " COMB-HOSPID " " COMB-PTID " "
+                                       COMB-HKNCOMBINUM " "    
+           END-IF
       *???? 
       *
            .
