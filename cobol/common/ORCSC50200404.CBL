@@ -605,7 +605,8 @@
       *****************************************************************
        100113-RSIHKN-SYORI-SEC        SECTION.
       *
-           IF      WRK-COM-INPUTCD (IDX-ZS)(1:3)   =   "101"
+           IF     (IDX-ZS              =   ZERO    )  OR
+                  (WRK-COM-INPUTCD (IDX-ZS)(1:3)   =   "101" )
       *        Ï«ºÒ¤Î¥³¡¼¥É¤Ï²Ã»»¤Ê¤·
                GO      TO      100113-RSIHKN-SYORI-EXT
            END-IF
@@ -1100,6 +1101,7 @@
            MOVE    ZERO                TO  WRK-SANKEI
            MOVE    ZERO                TO  WRK-SANTEN
            MOVE    ZERO                TO  WRK-SANSOKIN-SUM
+           MOVE    ZERO                TO  WRK-GRSI-TENSUKEI
       *
            INITIALIZE                  WRK-AREA
            INITIALIZE                  ORCSC90AREA
@@ -1117,7 +1119,7 @@
       *
       *
                IF      WRK-GMN-INPUTCD(IDX-Z)(1:1)     =   "."
-                                                                OR "*"
+                                                       OR "*"
                    MOVE    WRK-GMN-INPUTCD(IDX-Z)(1:1) TO  WRK-MOJI
                ELSE
                    MOVE    WRK-COM-INPUTCD(IDX-Z)(1:1) TO  WRK-MOJI
@@ -1344,7 +1346,6 @@
            ADD     LNK-SC90-TENGAKEI   TO  WRK-GOK-TENGAKEI
            ADD     WRK-RSI-TENSUKEI    TO  WRK-GRSI-TENSUKEI
       *
-      *
            MOVE    ZERO                TO  LNK-SC90-TENSUKEI
            MOVE    ZERO                TO  LNK-SC90-TENGAKEI
            MOVE    ZERO                TO  WRK-SUM-TENSUKEI
@@ -1421,7 +1422,7 @@
       *            ¡ó¸º»»
                   IF      (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                           (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
-                          (WRK-COM-SANFLG     (IDX)    =   ZERO)
+                          (WRK-COM-SANFLG     (IDX)    =   ZERO) 
                        COMPUTE WRK-TENSUKEI    =   WRK-COM-KISOTEN
                                                                (IDX-ZS)
                                                *   WRK-COM-KISOTEN(IDX)
@@ -1436,12 +1437,18 @@
                    END-IF
                END-IF
            END-PERFORM
-           COMPUTE LNK-SC90-TENSUKEI   =   LNK-SC90-TENSUKEI
-                                       +   WRK-TENSUKEI-K
-                                       -   WRK-TENSUKEI-G
-           COMPUTE LNK-SC90-TENGAKEI   =   LNK-SC90-TENGAKEI
-                                       +   WRK-TENGAKEI-K
-                                       -   WRK-TENGAKEI-G
+           IF      WRK-COM-INPUTCD(IDX-ZS)(1:3)    =   "101"
+      *        Ï«ºÒ¥³¡¼¥É¤Î»þ¡¢²Ã»»¤Î¤ß»»Äê
+               COMPUTE WRK-RSI-TENSUKEI    =   WRK-RSI-TENSUKEI
+                                           +   WRK-TENSUKEI-K
+           ELSE
+               COMPUTE LNK-SC90-TENSUKEI   =   LNK-SC90-TENSUKEI
+                                           +   WRK-TENSUKEI-K
+                                           -   WRK-TENSUKEI-G
+               COMPUTE LNK-SC90-TENGAKEI   =   LNK-SC90-TENGAKEI
+                                           +   WRK-TENGAKEI-K
+                                           -   WRK-TENGAKEI-G
+           END-IF
       *    ¼«Æ°²Ã»»¤Î²Ã»»¡Ê»ÜÀß´ð½à¡Ë
            MOVE    ZERO                TO  WRK-TENSUKEI-K
            MOVE    ZERO                TO  WRK-TENSUKEI-G
@@ -1510,6 +1517,26 @@
                                        +   WRK-TENSUKEI-K
                                        -   WRK-TENSUKEI-G
       *
+           MOVE    ZERO                TO  WRK-TENSUKEI-G
+      *
+           IF      WRK-RSI-TENSUKEI    >   ZERO
+               PERFORM VARYING     IDX     FROM    IDX-ZS    BY  1
+                       UNTIL       IDX     >=  HZN-IDX
+                   IF     (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
+                          (WRK-COM-SANFLG     (IDX)    =   5   )
+                       MOVE    ZERO            TO  WRK-TENSUKEI
+                       COMPUTE WRK-TENSUKEI    =   WRK-RSI-TENSUKEI
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                       MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                       ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   END-IF
+               END-PERFORM
+               COMPUTE WRK-RSI-TENSUKEI    =   WRK-RSI-TENSUKEI
+                                           -   WRK-TENSUKEI-G
+           END-IF
+      *
            .
        1008-HEIYOU-KEI-EXT.
            EXIT.
@@ -1564,10 +1591,44 @@
            ELSE
                GO      TO      1007-KASAN-SET-ALL-EXT
            END-IF
-      *
+      *    Ï«ºÒ¥³¡¼¥É¤Î²Ã»»¡Ê»þ´Ö³°¡¢Ç¯Îð¡Ë
            MOVE    ZERO                TO  WRK-TENSUKEI-K
+           MOVE    ZERO                TO  WRK-TENSUKEI-G
       *
-            PERFORM VARYING     IDX     FROM    1       BY  1
+           PERFORM VARYING     IDX     FROM    1       BY  1
+                   UNTIL       IDX         >=  HZN-IDX
+               IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
+                      (WRK-COM-INPUTCD(IDX)(1:3)   NOT =   "101" )  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   1   )
+                   MOVE    ZERO                TO  WRK-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   WRK-GRSI-TENSUKEI
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
+               END-IF
+               IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
+                      (WRK-COM-INPUTCD(IDX)(1:3)   NOT =   "101" )  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   1   )
+                   MOVE    ZERO                TO  WRK-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   WRK-GRSI-TENSUKEI
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+               END-IF
+           END-PERFORM
+           COMPUTE WRK-GRSI-TENSUKEI   =   WRK-GRSI-TENSUKEI
+                                       +   WRK-TENSUKEI-K
+                                       -   WRK-TENSUKEI-G
+      *
+      *    Ï«ºÒ²Ã»»
+           MOVE    ZERO                TO  WRK-TENSUKEI-K
+           PERFORM VARYING     IDX     FROM    1       BY  1
                    UNTIL       IDX         >=  HZN-IDX
                IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101" )  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5     )
