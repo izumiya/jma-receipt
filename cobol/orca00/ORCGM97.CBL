@@ -109,6 +109,7 @@
                05  WRK-SMM         PIC 9(02).
                05  WRK-SDD         PIC 9(02).
            03  WRK-HENYMDG         PIC X(09).
+           03  WRK-MIDMSG          PIC X(80).
       *
        01  SHELL-AREA.
            03  SHELL-NAME1         PIC X(41)  VALUE
@@ -247,6 +248,9 @@
       *        戻る
                WHEN    "CLICKED"   ALSO    "B01"
                    PERFORM 210-BACK
+      *        情報削除
+               WHEN    "CLICKED"   ALSO    "B02"
+                   PERFORM 410-JOBDEL-SEC
       *        情報
                WHEN    "CLICKED"   ALSO    "B09"
                    PERFORM 400-JYOUHOU-SEC
@@ -295,11 +299,8 @@
            PERFORM 820-JOBKANRI-READ2-SEC
       *
            IF      SKBN-RUN   =   "RUN"
-               MOVE    SPACE           TO  MID1
-               MOVE    "0301"          TO  MID1-ID1CODE
-               MOVE    "プログラム更新中です。よろしいですか？"
-                                       TO  MID1-ID1MSG
-               PERFORM 830-GAMENN-SET5-SEC
+               MOVE    "0301"          TO  SPA-MIDCD
+               PERFORM 520-MIDSET-SEC
            ELSE
                PERFORM 830-GAMENN-SET6-SEC
            END-IF
@@ -354,10 +355,12 @@
       *
            MOVE    1               TO  SPA-GMN-CUR
       *
-           MOVE    SPACE           TO  SPA-GMN-MSG
-           MOVE    SPACE           TO  SPA-GMN-MSG-STYLE
-      *
            PERFORM 400-JYOKYO-SET-SEC
+      *
+           IF      SPA-GMN-NAIYOLIST-MAX   =  ZERO
+               MOVE    SPACE           TO  SPA-GMN-MSG
+               MOVE    SPACE           TO  SPA-GMN-MSG-STYLE
+           END-IF
       *
            .
        310-SPASET-EXT.
@@ -368,12 +371,25 @@
       *****************************************************************
        320-MID1-SET-SEC            SECTION.
       *
-           IF      SPA-MID1-FLG    =   "OK"
-      *        更新処理
-               PERFORM 420-KOUSHIN-SEC
-           ELSE
-               MOVE    1               TO  SPA-GMN-CUR
-           END-IF
+           EVALUATE    SPA-MIDCD
+               WHEN    "0202"
+                   IF      SPA-MID1-FLG    =   "OK"
+      *            更新処理
+                       PERFORM 420-KOUSHIN-SEC
+                   END-IF
+               WHEN    "0204"
+                   IF      SPA-MID1-FLG    =   "OK"
+      *                削除処理
+                       PERFORM 820-JOBKANRI-DEL-SEC
+                   END-IF
+               WHEN    "0301"
+                   IF      SPA-MID1-FLG    =   "OK"
+      *                戻る処理
+                       PERFORM 830-GAMENN-SET6-SEC
+                   END-IF
+           END-EVALUATE
+      *
+           MOVE    1               TO  SPA-GMN-CUR
       *
            MOVE    SPACE           TO  SPA-MID1-FLG
            MOVE    SPACE           TO  SPA-MIDCD
@@ -386,9 +402,6 @@
       *    情報入手
       *****************************************************************
        400-JYOUHOU-SEC             SECTION.
-      *
-      *    ジョブ管理削除
-           PERFORM 820-JOBKANRI-DEL-SEC
       *
       *    プログラム更新処理
            MOVE    SPACE           TO  SHELLTBL
@@ -462,6 +475,14 @@
       *
            PERFORM 900-PGKANRI-CLOSE-SEC
       *
+           IF      SPA-GMN-NAIYOLIST-MAX   =  ZERO
+               MOVE    SPACE         TO  SKBN-RUN
+               MOVE    "更新データはありません。"
+                                     TO  SPA-GMN-MSG
+               MOVE    "blue"        TO  SPA-GMN-MSG-STYLE
+               GO  TO  400-JYOKYO-SET-EXT
+           END-IF
+      *
       *    メッセージ編集
            PERFORM 820-JOBKANRI-READ1-SEC
       *
@@ -493,6 +514,7 @@
                END-IF
            ELSE
                MOVE    SPACE           TO  SPA-GMN-MSG
+               MOVE    SPACE           TO  SPA-GMN-MSG-STYLE
            END-IF
            .
        400-JYOKYO-SET-EXT.
@@ -527,6 +549,29 @@
            EXIT.
       *
       *****************************************************************
+      *       削除処理
+      *****************************************************************
+       410-JOBDEL-SEC              SECTION.
+      *
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  410-JOBDEL-EXT
+           END-IF
+      *
+           PERFORM 820-JOBKANRI-READ2-SEC
+      *
+           IF      SKBN-RUN        =   "RUN"
+               MOVE    "0203"          TO  SPA-ERRCD
+               PERFORM 510-ERRSET-SEC
+           ELSE
+               MOVE    "0204"          TO  SPA-MIDCD
+               PERFORM 520-MIDSET-SEC
+           END-IF
+           .
+      *
+       410-JOBDEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *       登録処理
       *****************************************************************
        410-KAKUNIN-SEC             SECTION.
@@ -538,17 +583,11 @@
            PERFORM 820-JOBKANRI-READ2-SEC
       *
            IF      SKBN-RUN        =   "RUN"
-               MOVE    SPACE           TO  MERR
-               MOVE    "0203"          TO  MERR-ERRCODE
-               MOVE    "プログラム更新は実行中です。"
-                                       TO  MERR-ERRMSG
-               PERFORM 830-GAMENN-SET4-SEC
+               MOVE    "0203"          TO  SPA-ERRCD
+               PERFORM 510-ERRSET-SEC
            ELSE
-               MOVE    SPACE           TO  MID1
-               MOVE    "0202"          TO  MID1-ID1CODE
-               MOVE    "プログラム更新を実行します。よろしいですか？"
-                                       TO  MID1-ID1MSG
-               PERFORM 830-GAMENN-SET5-SEC
+               MOVE    "0202"          TO  SPA-MIDCD
+               PERFORM 520-MIDSET-SEC
            END-IF
            .
       *
@@ -571,6 +610,7 @@
            INITIALIZE                  ORCSMKPASSAREA
       *
       *    オンライン
+           DISPLAY "SPA-GMN-ONKBN=" SPA-GMN-ONKBN
            IF      SPA-GMN-ONKBN       =   "T"
                MOVE    SHELL-NAME1     TO  MKPASS-IN-01
                MOVE    "2"             TO  SHELLTBL-ARG1
@@ -601,6 +641,7 @@
            CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
+           DISPLAY "420-KOUSHIN-END"
            .
       *
        420-KOUSHIN-EXT.
@@ -635,13 +676,19 @@
       *
            IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
-           ELSE
-               PERFORM 500-GMNHEN-SEC
-               MOVE    SPACE           TO  LINKAREA
-               MOVE    "CURRENT"       TO  MCP-PUTTYPE
-               MOVE    "M97"           TO  MCP-WINDOW
-               PERFORM 900-PUT-WINDOW
+               GO  TO  500-SET-SCREEN-EXT
            END-IF
+      *
+           IF      SPA-MIDCD       NOT =   SPACE
+               PERFORM 520-MIDSET-SEC
+               GO  TO  500-SET-SCREEN-EXT
+           END-IF
+      *
+           PERFORM 500-GMNHEN-SEC
+           MOVE    SPACE           TO  LINKAREA
+           MOVE    "CURRENT"       TO  MCP-PUTTYPE
+           MOVE    "M97"           TO  MCP-WINDOW
+           PERFORM 900-PUT-WINDOW
            .
       *
        500-SET-SCREEN-EXT.
@@ -727,6 +774,9 @@
                WHEN    "0004"
                    MOVE    "更新処理が実行中の為、削除できません"
                                             TO  SPA-ERRMSG
+               WHEN    "0203"
+                   MOVE    "プログラム更新は実行中です。"
+                                            TO  SPA-ERRMSG
                WHEN    OTHER
                    MOVE    SPACE            TO  SPA-ERRMSG
            END-EVALUATE
@@ -739,6 +789,35 @@
            .
       *
        510-ERRSET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    確認メッセージ表示理
+      *****************************************************************
+       520-MIDSET-SEC              SECTION.
+      *
+           EVALUATE    SPA-MIDCD
+               WHEN    "0202"
+               MOVE    "プログラム更新を実行します。よろしいですか？"
+                                           TO  WRK-MIDMSG
+               WHEN    "0204"
+                   MOVE    "ジョブ管理を削除します。よろしいですか？"
+                                           TO  WRK-MIDMSG
+               WHEN    "0301"
+                   MOVE    "プログラム更新中です。よろしいですか？"
+                                           TO  WRK-MIDMSG
+               WHEN    OTHER
+                   MOVE    SPA-MIDCD       TO  WRK-MIDMSG
+           END-EVALUATE
+      *
+           MOVE    SPACE               TO  MID1
+           MOVE    SPA-MIDCD           TO  MID1-ID1CODE
+           MOVE    WRK-MIDMSG          TO  MID1-ID1MSG
+      *
+           PERFORM 830-GAMENN-SET5-SEC
+      *
+           .
+       520-MIDSET-EXT.
            EXIT.
       *
       *****************************************************************
