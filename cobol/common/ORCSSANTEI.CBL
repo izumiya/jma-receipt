@@ -695,6 +695,9 @@
       *         GO      TO      200-SINKI-SYORI-EXT
       ***** END-IF
       *    ∑Ú ›∞ ≥∞§«£√£‘°¶£Õ£“£…§Œ∫Ó¿Æ§ §∑
+           IF      SSANTEI-HKNKBN      =   SPACE
+               MOVE    SPA-HKNKBN      TO  SSANTEI-HKNKBN
+           END-IF
            IF     (SSANTEI-HKNKBN  NOT =   ZERO   )  AND
                   (SSANTEI-SRYCD       =   "099700101"  OR
                                            "099700102"  OR
