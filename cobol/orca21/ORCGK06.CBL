@@ -113,6 +113,9 @@
       *----(01.00.01) LINE ADD START ----------------------------------
       *            変更確認フラグ
                07  SPA-UPDFLG              PIC X(01).
+      *            警告フラグ
+               07  SPA-KEIFLG1             PIC 9(01).
+               07  SPA-KEIFLG2             PIC 9(01).
       *----(01.00.01) LINE ADD END   ----------------------------------
       *
       *    フラグ領域
@@ -583,6 +586,12 @@
                MOVE    1               TO  FLG-HKNCOMBI
                INITIALIZE                  HKNCOMBI-REC
            END-IF
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "HKNCOMBI-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *
            MOVE    SPACE               TO  WRK-HKNCOMBIMEI
            STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
@@ -630,6 +639,12 @@
                    INITIALIZE                      PTRSIINF-REC
                    MOVE    1                   TO  FLG-PTRSIINF
                END-IF
+               MOVE    "DBCLOSE"           TO  MCP-FUNC
+               MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
                MOVE    SPACE               TO  WRK-HKNKBN-MEI
                EVALUATE    PTRSI-HKNKBN
                    WHEN    "1"
@@ -1135,8 +1150,11 @@
       *
            IF      SPA-NAI-JGNCNT1D        >   ZERO
                IF      SPA-GMN-DAY (IDY)       >   SPA-NAI-JGNCNT1D
-                   MOVE    "0019"                  TO  SPA-ERRCD
-                   GO  TO  41013-DAY-CHK-EXT
+                   IF      SPA-KEIFLG1         =   ZERO
+                       MOVE    "0019"                  TO  SPA-ERRCD
+                       MOVE    1                       TO  SPA-KEIFLG1
+                       GO  TO  41013-DAY-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *
@@ -1144,12 +1162,15 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       31
                ADD     SPA-GMN-DAY (IDX)       TO  SPA-GMN-MSANTEICNT
-           END-PERFORM 
+           END-PERFORM
       *
            IF      SPA-NAI-JGNCNT          >   ZERO
                IF      SPA-GMN-MSANTEICNT      >   SPA-NAI-JGNCNT
-                   MOVE    "0020"                  TO  SPA-ERRCD
-                   GO  TO  41013-DAY-CHK-EXT
+                   IF      SPA-KEIFLG2         =   ZERO
+                       MOVE    "0020"                  TO  SPA-ERRCD
+                       MOVE    1                       TO  SPA-KEIFLG2
+                       GO  TO  41013-DAY-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *
@@ -2055,10 +2076,10 @@
                    MOVE    "算定日を入力して下さい。"
                                                    TO  SPA-ERRMSG
                WHEN    "0019"
-                   MOVE    "１日の算定回数を超えています。"
+                   MOVE    "警告！１日の算定回数を超えています。"
                                                    TO  SPA-ERRMSG
                WHEN    "0020"
-                   MOVE    "１月の算定回数を超えています。"
+                   MOVE    "警告！１月の算定回数を超えています。"
                                                    TO  SPA-ERRMSG
                WHEN    "0021"
                    MOVE    "保険組合せは入力できません。"
