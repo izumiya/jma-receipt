@@ -1229,18 +1229,18 @@
        100212-FIRTEN-KEI-SEC             SECTION.
       *
       *    上限点数判定
-           IF      WRK-COM-JGNTEN (IDX-Z)  =   ZERO
-               ADD     LNK-SC90-FIRTEN     TO  WRK-FIRTEN-ADD
-           ELSE
-               COMPUTE WRK-TENSUKEIS       =   LNK-SC90-FIRTEN
-                                           /   10
-                                           +   0.5
-               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-               IF      WRK-FIRTEN          >   WRK-COM-JGNTEN (IDX-Z)
-                   MOVE    WRK-COM-JGNTEN(IDX-Z)   TO  WRK-FIRTEN
-               END-IF
-               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
-           END-IF
+      *    IF      WRK-COM-JGNTEN (IDX-Z)  =   ZERO
+      **       ADD     LNK-SC90-FIRTEN     TO  WRK-FIRTEN-ADD
+      *    ELSE
+      *        COMPUTE WRK-TENSUKEIS       =   LNK-SC90-FIRTEN
+      *                                    /   10
+      *                                    +   0.5
+      *        MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
+      *        IF      WRK-FIRTEN          >   WRK-COM-JGNTEN (IDX-Z)
+      *            MOVE    WRK-COM-JGNTEN(IDX-Z)   TO  WRK-FIRTEN
+      *        END-IF
+      *        ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
+      *****END-IF
       *
            .
        100212-FIRTEN-KEI-EXT.
@@ -1471,14 +1471,14 @@
            END-IF
       *
       *    フィルム料合計計算
-           IF      WRK-FIRTEN-ADD      >   ZERO
-               COMPUTE WRK-TENSUKEIS   =   WRK-FIRTEN-ADD
-                                           /   10
-                                           +   0.5
-               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
-           END-IF
-           ADD     WRK-FIRTEN-KEI      TO  LNK-SC90-KIZTEN
+      *    IF      WRK-FIRTEN-ADD      >   ZERO
+      *        COMPUTE WRK-TENSUKEIS   =   WRK-FIRTEN-ADD
+      *                                    /   10
+      *                                    +   0.5
+      *        MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
+      *        ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
+      *    END-IF
+      *****ADD     WRK-FIRTEN-KEI      TO  LNK-SC90-KIZTEN
       *
            .
        1007-KIZAI-TEN-EXT.

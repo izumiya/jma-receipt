@@ -88,6 +88,8 @@
            03  WRK-SYOKEIS2        PIC 9(08)V9999.
            03  WRK-SYOKEIS3        PIC 9(08)V9999.
            03  WRK-SYOKEI          PIC 9(08).
+           03  WRK-TENSUKEIS       PIC 9(08)V9999.
+           03  WRK-FIRTEN          PIC 9(08).
       *
       *    注射液計算用
            03  WRK-SURYO-CHU9      PIC 9(05).
@@ -383,14 +385,45 @@
                                        *   LNK-COM-SURYO   (IDX)
            MOVE    WRK-SYOKEIS         TO  WRK-SYOKEI
       *
-      *    フィルム点数加算
-           MOVE    WRK-SYOKEI          TO  LNK-SC90-FIRTEN
+      *    画像診断以外の計算
+           IF      LNK-COM-SRYKBN (IDX)    =   "70"
+      *        フィルム点数加算
+               MOVE    WRK-SYOKEI          TO  LNK-SC90-FIRTEN
+           ELSE
+               PERFORM 10051-FIRUMU-ETC-SEC
+           END-IF
       *
       *    回数
            MOVE    LNK-SC90-KAISU      TO  LNK-COM-KAISU (IDX)
       *
            .
        1005-FIRUMU-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画像診断以外の計算処理
+      *****************************************************************
+       10051-FIRUMU-ETC-SEC           SECTION.
+      *    上限点数判定
+           IF      LNK-COM-JGNTEN (IDX) =   ZERO
+      *        フィルム点数加算
+               ADD     WRK-SYOKEI          TO  LNK-SC90-FIRTEN
+           ELSE
+               COMPUTE WRK-TENSUKEIS       =   WRK-SYOKEI
+                                           /   10
+                                           +   0.5
+               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
+               IF      WRK-FIRTEN          >   LNK-COM-JGNTEN (IDX)
+                   MOVE    LNK-COM-JGNTEN(IDX) TO  WRK-FIRTEN
+      *            器材点数に上限点数を集計
+                   ADD     WRK-FIRTEN          TO  LNK-SC90-KIZTEN
+               ELSE
+                   ADD     WRK-SYOKEI          TO  LNK-SC90-FIRTEN
+               END-IF
+           END-IF
+      *
+           .
+       10051-FIRUMU-ETC-EXT.
            EXIT.
       *
       *****************************************************************
@@ -415,11 +448,11 @@
            PERFORM 2001-KEIZAITENU-SET-SEC
       *
       *    器材点数計算処理
-           IF      LNK-SC90-KIZKEI     =   ZERO
-               MOVE      ZERO              TO  LNK-SC90-KIZTEN
-           ELSE
+      *    IF      LNK-SC90-KIZKEI     =   ZERO
+      *        MOVE      ZERO              TO  LNK-SC90-KIZTEN
+      *    ELSE
                PERFORM 2003-KIZTEN-SET-SEC
-           END-IF
+      *****END-IF
       *
       *    器材（窒素）点数計算処理
            IF      LNK-SC90-CHIKEI     =   ZERO
@@ -553,11 +586,21 @@
       *****************************************************************
        2003-KIZTEN-SET-SEC             SECTION.
       *
+      *    画像診断以外のフィルム計算
+           IF      LNK-COM-SRYKBN (01) =   "70"
+               MOVE    LNK-SC90-KIZKEI     TO  WRK-SYOKEIS3
+           ELSE
+               COMPUTE WRK-SYOKEIS3    =   LNK-SC90-KIZKEI
+                                       +   LNK-SC90-FIRTEN
+           END-IF
+      *
+           IF      WRK-SYOKEIS3        >   ZERO
       *    金額計÷１０　四捨五入
-           COMPUTE WRK-SYOKEIS2        =  (LNK-SC90-KIZKEI
-                                       /   10  )
-                                       +   0.5
-           MOVE    WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
+               COMPUTE WRK-SYOKEIS2        =  (WRK-SYOKEIS3
+                                           /   10  )
+                                           +   0.5
+               ADD     WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
+           END-IF
       *
            .
        2003-KIZTEN-SET-EXT.

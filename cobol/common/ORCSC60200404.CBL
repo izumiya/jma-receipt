@@ -1203,15 +1203,6 @@
       *    特定器材点数計算
            PERFORM 1005-KIZAI-TENSU-SEC
       *
-      *    フィルム料合計計算
-           IF      WRK-FIRTEN-ADD      >   ZERO
-               COMPUTE WRK-TENSUKEIS   =   WRK-FIRTEN-ADD
-                                           /   10
-                                           +   0.5
-               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
-           END-IF
-      *
       *    各点数編集
            MOVE    LNK-SC90-TENSUKEI   TO  WRK-COM-SYUTEN1 (IDX-MAX)
            COMPUTE WRK-COM-YKZTEN (IDX-MAX)
@@ -1257,24 +1248,7 @@
                    PERFORM 1003-HOUKNS-HEN-SEC
       *        器材
                WHEN    "7"
-      *            フィルムの時、点数計算
-                   IF      WRK-COM-DATAKBN (IDX-Z) =   "3"
-      *                上限点数判定
-                       IF      WRK-COM-JGNTEN (IDX-Z)  =   ZERO
-                           ADD     LNK-SC90-FIRTEN   TO  WRK-FIRTEN-ADD
-                       ELSE
-                           COMPUTE WRK-TENSUKEIS   =   LNK-SC90-FIRTEN
-                                                   /   10
-                                                   +   0.5
-                           MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-                           IF      WRK-FIRTEN      >   WRK-COM-JGNTEN
-                                                             (IDX-Z)
-                               MOVE    WRK-COM-JGNTEN(IDX-Z)
-                                                       TO  WRK-FIRTEN
-                           END-IF
-                           ADD     WRK-FIRTEN      TO  WRK-FIRTEN-KEI
-                       END-IF
-                   END-IF
+                   CONTINUE
            END-EVALUATE
       *
            .
@@ -1538,10 +1512,10 @@
        1005-KIZAI-TENSU-SEC         SECTION.
       *
       *    金額計÷１０　四捨五入
-           COMPUTE WRK-SYOKEIS2        =   LNK-SC90-KIZKEI
-                                       /   10
-                                       +   0.5
-           MOVE    WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
+      *    COMPUTE WRK-SYOKEIS2        =   LNK-SC90-KIZKEI
+      *                                /   10
+      *                                +   0.5
+      *    MOVE    WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
       *
       *
            .
