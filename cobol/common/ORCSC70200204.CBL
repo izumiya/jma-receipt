@@ -690,8 +690,9 @@
                                        MOVE    "1"     TO  WRK-COM-CUR
                                                                 (IDX-Z)
       *********************************GO      TO      10011-CHK-EXT
+                                       GO      TO      10011-CHK-EXT
                                    END-IF
-                                   GO      TO      10011-CHK-EXT
+      **************************   GO      TO      10011-CHK-EXT
                                END-IF
                                MOVE    4               TO  FLG-SINDAN
                                MOVE    IDX-Z           TO  IDX-SAT
@@ -1051,6 +1052,12 @@
                    MOVE    IDX-Z           TO  IDX1
                END-IF
            END-PERFORM
+      *
+      *    ²èÁü¿ÇÃÇ¤Î²Ã»»¤Î¤ß
+           IF     (WRK-COM-SRYSYUKBN(IDX-Z)    =   "704" )  AND
+                  (WRK-COM-SRYKBN (IDX-Z)      =   "70"  )
+               MOVE    1                   TO  FLG-ARI
+           END-IF
       *
            IF      FLG-ARI             =   ZERO
                MOVE    "0013"          TO  WRK-ERRCD
@@ -2644,6 +2651,10 @@
                    MOVE    ZERO                TO  FLG-NENREI
                    PERFORM 1003-JIDOU-CHK-SEC
                    PERFORM 1002-JIDOUSET-SEC
+                   IF      FLG-ADD             =   1
+                       MOVE    "1"             TO  WRK-COM-IN  (IDX-S)
+                       MOVE    "2"             TO  WRK-COM-IN2 (IDX-S)
+                   END-IF
                END-IF
            END-IF
       *
