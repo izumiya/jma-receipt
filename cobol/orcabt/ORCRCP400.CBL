@@ -3400,31 +3400,34 @@
                MOVE    "乳・障・母"        TO  HC06-KYUFUGAI2
                MOVE    "給付外点数"        TO  HC06-KYUFUGAI3
                MOVE    "点"                TO  HC06-KYUFUGAI4
-           END-IF
-           IF    ( RECE02-TOTALTEN (IDX2) >   ZERO                 )
-           AND   ((RECE02-TOTALTEN (IDX2)
+           ELSE
+               IF    ( RECE02-TOTALTEN (IDX2) >   ZERO             )
+               AND   ((RECE02-TOTALTEN (IDX2)
                                   NOT =   RECE02-TOTALTEN (IDX1)) OR
-                 (RECE02-FTNMONEY (IDX2)
+                     (RECE02-FTNMONEY (IDX2)
                                   NOT =   RECE02-FTNMONEY (IDX1))  )
-               IF    RECE02-FTNMONEY (IDX2)   >   ZERO
-                   MOVE    RECE02-FTNMONEY (IDX2)
-                                              TO  WRK-KGK7
-                   MOVE    WRK-KGK7           TO  HC06-FTNMONEY(2)
+                   IF    RECE02-FTNMONEY (IDX2)   >   ZERO
+                       MOVE    RECE02-FTNMONEY (IDX2)
+                                                  TO  WRK-KGK7
+                       MOVE    WRK-KGK7           TO  HC06-FTNMONEY(2)
+                   END-IF
                END-IF
-           END-IF
-           IF  (RECE02-SRYYM        >=  "200404")
-           AND (RECE02-ZAITAKU   NOT =    SPACE )
-               IF ( RECE02-KOHNUM(1) =  "012" OR "015"
-                                     OR "016" OR "051" )
-               OR ((SYS-1001-PREFNUM =   13           ) AND
-                   (RECE02-KOHNUM(1) =  "151" OR "451"))
-                 IF  ( RECE02-TOTALTEN (IDX2) > ZERO                  )
-                 AND ( RECE02-FTNMONEY (IDX2) = RECE02-FTNMONEY (IDX1))
-                      IF    RECE02-FTNMONEY (IDX2)   >   ZERO
-                          MOVE    RECE02-FTNMONEY (IDX2) TO  WRK-KGK7
-                          MOVE    WRK-KGK7       TO  HC06-FTNMONEY(2)
-                      END-IF
-                 END-IF
+               IF  (RECE02-SRYYM        >=  "200404")
+               AND (RECE02-ZAITAKU   NOT =    SPACE )
+                   IF ( RECE02-KOHNUM(1) =  "012" OR "015"
+                                         OR "016" OR "051" )
+                   OR ((SYS-1001-PREFNUM =   13           ) AND
+                       (RECE02-KOHNUM(1) =  "151" OR "451"))
+                     IF  ( RECE02-TOTALTEN (IDX2) > ZERO          )
+                     AND ( RECE02-FTNMONEY (IDX2) =
+                                            RECE02-FTNMONEY (IDX1))
+                          IF    RECE02-FTNMONEY (IDX2)   >   ZERO
+                              MOVE    RECE02-FTNMONEY (IDX2)
+                                                 TO  WRK-KGK7
+                              MOVE    WRK-KGK7   TO  HC06-FTNMONEY(2)
+                          END-IF
+                     END-IF
+                   END-IF
                END-IF
            END-IF
            IF      RECE02-TOTALTEN (IDX2) >   ZERO                     
@@ -3440,34 +3443,37 @@
                MOVE    "乳・障・母"        TO  HC06-KYUFUGAI2
                MOVE    "給付外点数"        TO  HC06-KYUFUGAI3
                MOVE    "点"                TO  HC06-KYUFUGAI4
-           END-IF
-           IF    (RECE02-TOTALTEN (IDX3) >   ZERO                  )
-           AND   ((RECE02-TOTALTEN (IDX3)
+           ELSE
+               IF    (RECE02-TOTALTEN (IDX3) >   ZERO              )
+               AND   ((RECE02-TOTALTEN (IDX3)
                                   NOT =   RECE02-TOTALTEN (IDX1)) OR
-                  (RECE02-FTNMONEY (IDX3)
+                      (RECE02-FTNMONEY (IDX3)
                                   NOT =   RECE02-FTNMONEY (IDX1))  )
-             IF    RECE02-FTNMONEY (IDX3)
+                 IF    RECE02-FTNMONEY (IDX3)
                                   NOT =   RECE02-FTNMONEY (IDX2)
-               IF    RECE02-FTNMONEY (IDX3)   >   ZERO
-                   MOVE    RECE02-FTNMONEY (IDX3)
+                   IF    RECE02-FTNMONEY (IDX3)   >   ZERO
+                       MOVE    RECE02-FTNMONEY (IDX3)
                                               TO  WRK-KGK7
-                   MOVE    WRK-KGK7           TO  HC06-FTNMONEY(3)
-               END-IF
-             END-IF
-           END-IF
-           IF  (RECE02-SRYYM        >=  "200404")
-           AND (RECE02-ZAITAKU   NOT =    SPACE )
-               IF ( RECE02-KOHNUM(2) =  "012" OR "015"
-                                     OR "016" OR "051" )
-               OR ((SYS-1001-PREFNUM =   13           ) AND
-                   (RECE02-KOHNUM(2) =  "151" OR "451"))
-                 IF  ( RECE02-TOTALTEN (IDX3) > ZERO                  )
-                 AND ( RECE02-FTNMONEY (IDX3) = RECE02-FTNMONEY (IDX2))
-                      IF    RECE02-FTNMONEY (IDX3)   >   ZERO
-                          MOVE    RECE02-FTNMONEY (IDX3) TO  WRK-KGK7
-                          MOVE    WRK-KGK7       TO  HC06-FTNMONEY(3)
-                      END-IF
+                       MOVE    WRK-KGK7       TO  HC06-FTNMONEY(3)
+                   END-IF
                  END-IF
+               END-IF
+               IF  (RECE02-SRYYM        >=  "200404")
+               AND (RECE02-ZAITAKU   NOT =    SPACE )
+                   IF ( RECE02-KOHNUM(2) =  "012" OR "015"
+                                         OR "016" OR "051" )
+                   OR ((SYS-1001-PREFNUM =   13           ) AND
+                       (RECE02-KOHNUM(2) =  "151" OR "451"))
+                     IF  ( RECE02-TOTALTEN (IDX3) > ZERO           )
+                     AND ( RECE02-FTNMONEY (IDX3) =
+                                             RECE02-FTNMONEY (IDX2))
+                          IF    RECE02-FTNMONEY (IDX3)   >   ZERO
+                              MOVE    RECE02-FTNMONEY (IDX3)
+                                                 TO  WRK-KGK7
+                              MOVE    WRK-KGK7   TO  HC06-FTNMONEY(3)
+                          END-IF
+                     END-IF
+                   END-IF
                END-IF
            END-IF
            IF      RECE02-TOTALTEN (IDX3) >   ZERO                      
