@@ -168,6 +168,8 @@
                05  SPA-NENREI-HEN          PIC X(10).
       *         老人区分
                05  SPA-NAI-ROUJIN            PIC 9(01).
+      *         老人公費有無
+               05  SPA-NAI-ROUJIN2           PIC 9(01).
       *
       *外来管理料算定有無（Ｋ０２で使用）
                05  SPA-NAI-GAIFLG          PIC 9(01).

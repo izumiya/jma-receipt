@@ -37,6 +37,8 @@
                05  WKSRY-ZAINUM         PIC  9(08).
       *連番号
                05  WKSRY-RENNUM         PIC  9(02).
+      *ドクターコード
+           03  WKSRY-DRCD               PIC  X(05).
       *診療種別区分
            03  WKSRY-SRYSYUKBN          PIC  X(03).
       *診療区分
@@ -81,6 +83,12 @@
            03  WKSRY-DOUJI-RENNUM       PIC  9(01).
       *継続区分
            03  WKSRY-CONTKBN            PIC  X(01).
+      *更新中フラグ
+           03  WKSRY-MOD-FLG            PIC  9(01).
+      *電子カルテフラグ
+           03  WKSRY-KARTE-FLG          PIC  9(01).
+      *電子カルテキー
+           03  WKSRY-KARTE-KEY          PIC  X(36).
       *端末ＩＤ
            03  WKSRY-TERMID             PIC  X(16).
       *オペレータＩＤ

@@ -395,10 +395,10 @@
                05  SPA-K99-PED.
                    07  SPA-K99-PEDX        PIC X(02)  OCCURS  10.
       *
-      *
       *    £Ë£±£°²èÌÌÍÑ
            03  SPA-K10GMN-AREA.
                05  SPA-K10GMN-CUR          PIC 9(02).
+               05  SPA-K10-SYORI           PIC 9(01).
                05  SPA-K10-MAX             PIC 9(04).
                05  SPA-K10-LIST.
                    07  SPA-K10-LIST-OCC    OCCURS   50.
@@ -407,11 +407,15 @@
                        09  SPA-K10-SRYKA       PIC X(02).
                        09  SPA-K10-SRYYMD      PIC X(08).
                        09  SPA-K10-HKNCOMBI    PIC X(04).
+                       09  SPA-K10-HKNKBN      PIC X(01).
                        09  SPA-K10-GMN-NAME    PIC X(50).
                        09  SPA-K10-GMN-SRYYMD  PIC X(09).
                        09  SPA-K10-GMN-SRYKA   PIC X(10).
                        09  SPA-K10-GMN-HKNCOMBI
                                                PIC X(50).
+                       09  SPA-K10-GMN-DRCD-NAME
+                                               PIC X(50).
+                       09  SPA-K10-SYORIKBN    PIC X(04).
                05  SPA-K10-GMN-SELNUM      PIC X(03).
                05  SPA-K10-SELNUM          PIC 9(03).
       *

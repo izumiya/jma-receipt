@@ -341,6 +341,7 @@
       *  01.01.151   NACL-森脇    04/09/08  ADRS-KEY6,KEY7追加
       *  01.01.152   NACL-門脇    04/09/08  SYUNOU-KEY29,KEY30追加
       *  01.01.153   NACL-藤原    04/09/10  SYSKANRI-KEY12追加
+      *  01.01.154   NACL-多々納  04/10/12  WKSRYACT-KEY6,KEY7追加
       *****************************************************************
       *
        PROCEDURE                   DIVISION
@@ -2358,6 +2359,12 @@
                                        TO  WRK-PATH
                WHEN    ANY             ALSO   "WKSRYACT-KEY5"
                    MOVE    PATH-TBL-WKSRYACT-KEY5
+                                       TO  WRK-PATH
+               WHEN    ANY             ALSO   "WKSRYACT-KEY6"
+                   MOVE    PATH-TBL-WKSRYACT-KEY6
+                                       TO  WRK-PATH
+               WHEN    ANY             ALSO   "WKSRYACT-KEY7"
+                   MOVE    PATH-TBL-WKSRYACT-KEY7
                                        TO  WRK-PATH
                WHEN    ANY             ALSO   "WKSRYACT-ALL"
                    MOVE    PATH-TBL-WKSRYACT-ALL

@@ -30,4 +30,6 @@
                     06  K10-SRYYMD  PIC X(10).
                     06  K10-SRYKA   PIC X(10).
                     06  K10-HKNCOMBI    PIC X(50).
+                    06  K10-DRCD-NAME    PIC X(50).
+                    06  K10-SYORIKBN     PIC X(4).
                   05  K10-SELECT  PIC X       OCCURS  50 TIMES.
