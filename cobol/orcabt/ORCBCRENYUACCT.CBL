@@ -507,28 +507,27 @@
            CALL    "ORCSDAY"            USING   STS-AREA-DAY
                                                 LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI      TO      PTNYUINRRK-NYUINYMD
-           MOVE    "PTNYUINRRK-KEY27"   TO      ORC-DBPATH
+           MOVE    "99999999"           TO      PTNYUINRRK-TAIINYMD
+           MOVE    "PTNYUINRRK-KEY11"   TO      ORC-DBPATH
            PERFORM   910-PTNYUINRRK-SELECT-SEC
            IF      FLG-PTNYUINRRK       =       ZERO
-               MOVE    "PTNYUINRRK-KEY27"    TO      ORC-DBPATH
+               MOVE    "PTNYUINRRK-KEY11"    TO      ORC-DBPATH
                PERFORM  910-PTNYUINRRK-READ-SEC
-               PERFORM  UNTIL  FLG-PTNYUINRRK    =    1
-                       MOVE    PTNYUINRRK-PTID   TO  WRK-PTID
-      *                入院会計存在チェック
-                       PERFORM    2001-NYUINACCT-CHK-SEC
-                       IF         FLG-NYUINACCTARI   =    ZERO
-      *                     前月分入院会計の存在チェック
-      *                     （併せて保険組合せと食事の情報を退避）
-                            PERFORM     2001-NYUINACCT-MAECHK-SEC
-      *                     入院会計作成処理
-                            PERFORM     2001-NYUINACCT-INS-SEC
-                       END-IF
-                   MOVE    "PTNYUINRRK-KEY27"    TO      ORC-DBPATH
-                   PERFORM  910-PTNYUINRRK-READ-SEC
-               END-PERFORM
+               IF   FLG-PTNYUINRRK       =       ZERO
+                   MOVE    PTNYUINRRK-PTID   TO  WRK-PTID
+      *            入院会計存在チェック
+                   PERFORM    2001-NYUINACCT-CHK-SEC
+                   IF         FLG-NYUINACCTARI   =    ZERO
+      *                 前月分入院会計の存在チェック
+      *                 （併せて保険組合せと食事の情報を退避）
+                        PERFORM     2001-NYUINACCT-MAECHK-SEC
+      *                 入院会計作成処理
+                        PERFORM     2001-NYUINACCT-INS-SEC
+                   END-IF
+               END-IF
            END-IF
       *
-           MOVE     "PTNYUINRRK-KEY27"       TO  ORC-DBPATH
+           MOVE     "PTNYUINRRK-KEY11"       TO  ORC-DBPATH
            PERFORM   900-TBL-CLOSE-SEC
       *
            IF    ( CNT-LINE            >   ZERO )
