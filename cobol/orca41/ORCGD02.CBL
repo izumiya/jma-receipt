@@ -5905,7 +5905,7 @@
       *
            READ    DID3-FILE
            AT   END
-                   CONTINUE
+                   MOVE    SPACE               TO  DID4-REC
            NOT  AT  END
                    OPEN    OUTPUT              DID4-FILE
                    MOVE    "½èÍýÃæ»ß"          TO  DID4-REC
