@@ -65,6 +65,7 @@
       *                                     種別・給付割合の編集を変更
       *  01.00.23    NACL-藤原    04/10/04  特例退職者＋老人のとき本人の
       *                                     み不明分とする
+      *  01.00.24    NACL-藤原    04/11/16  病棟区分の編集方法を変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2491,16 +2492,23 @@
                IF      SYS-5001-RECEDSPKBN =  SPACE
                    CONTINUE
                ELSE
-                   PERFORM VARYING IDX3    FROM    1   BY  1
-                           UNTIL   IDX3    >       4
-                           OR      WRK-BYOTOKBN (IDX3)
+                   IF    ( PTNYUINRRK-TENSTUYMD (1:6)
+                                               <   RECE62-SRYYM )
+                   OR    ( PTNYUINRRK-TENNYUYMD (1:6)
+                                               >   RECE62-SRYYM )
+                       CONTINUE
+                   ELSE 
+                       PERFORM VARYING IDX3    FROM    1   BY  1
+                               UNTIL   IDX3    >       4
+                               OR      WRK-BYOTOKBN (IDX3)
                                            =   SYS-5001-RECEDSPKBN
-                       IF      WRK-BYOTOKBN (IDX3) =   SPACE
-                           MOVE    SYS-5001-RECEDSPKBN
+                           IF      WRK-BYOTOKBN (IDX3) =   SPACE
+                               MOVE    SYS-5001-RECEDSPKBN
                                                TO   WRK-BYOTOKBN (IDX3)
-                           MOVE    4           TO  IDX3
-                       END-IF
-                   END-PERFORM
+                               MOVE    4           TO  IDX3
+                           END-IF
+                       END-PERFORM
+                   END-IF 
                END-IF                                           
       *        病棟番号・種別
                MOVE    RECE62-SRYYM        TO  WRK-SRYYYMM
