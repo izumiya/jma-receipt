@@ -51,6 +51,8 @@
       *                                     Ê¿À®£±£¶Ç¯£´·î¤è¤ê£³£°¡ó
       *  01.00.15    NACL-ÌçÏÆ    04/04/23  ÁªÄêÆþ±¡»þ¤ÎÂ¾°åÎÅµ¡´Ø¼õ¿Ç¤Î
       *                                     »»Äê½¤Àµ
+      *  01.00.16    NACL-ÌçÏÆ    04/12/17  ¶»Éô¸ÇÄêÂÓ²Ã»»¡¢ÁÏ³°¸ÇÄê´ï
+      *                                     »ÈÍÑ²Ã»»¤òÌôºÞÅù¤Ø
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -81,10 +83,20 @@
            03  WRK-RSISHOSHIN              PIC 9(09).
            03  WRK-RSISDO                  PIC 9(09).
            03  WRK-RSIETC                  PIC 9(09).
+           03  WRK-RSIETC2                 PIC 9(09).
            03  WRK-SINDAN                  PIC 9(09).
            03  WRK-MEISAI                  PIC 9(09).
            03  WRK-YOUBUKASAN              PIC 9(09).
+           03  WRK-KYOBUKASAN              PIC 9(09).
+           03  WRK-SOGAIKASAN              PIC 9(09).
            03  WRK-RYOYOTEATE              PIC 9(09).
+      *
+       01  WRK-JIBAI-TABLE.
+           02  WRK-JIBAI-TBL     OCCURS   10.
+              03 WRK-JIBAI-SYUTEN          PIC 9(09).
+              03 WRK-JIBAI-SINDAN          PIC 9(09).
+              03 WRK-JIBAI-MEISAI          PIC 9(09).
+              03 WRK-JIBAI-RYOYO           PIC 9(09).
       *
        01  WRK-SKYYM-TABLE.
            02  WRK-SKYYM-TBL     OCCURS    2.
@@ -123,7 +135,7 @@
               03 WRK-HANBETU2-HKNCOMBINUM  PIC 9(04).
               03 WRK-HANBETU2-DAY          PIC X(01)   OCCURS   31.
       *
-       01  WRK-HANBETU-DATA                PIC X(68).                   
+       01  WRK-HANBETU-DATA                PIC X(70).
       *
        01  WRK-KOSEI-TABLE.
            03  WRK-KOSEI-TBL    OCCURS    2.
@@ -396,6 +408,7 @@
                          WRK-HANBETU2-TABLE
                          WRK-KOSEI-TABLE
                          WRK-IKUSEI-TABLE
+                         WRK-JIBAI-TABLE
                          FLG-AREA.
       *
       *    Ä´ºÞÎÁ°ì³çÊÑ¹¹½èÍý
@@ -436,6 +449,14 @@
       *
                 MOVE     WRK-HANBETU-SENINFLG2(IDX)                     
                                               TO  LNK-S02-SENINFLG      
+      *
+                MOVE     WRK-JIBAI-SYUTEN(IDX)
+                                              TO  LNK-S02-SYUTEN
+                MOVE     WRK-JIBAI-SINDAN(IDX)
+                                              TO  LNK-S02-SINDAN
+                MOVE     WRK-JIBAI-MEISAI(IDX)
+                                              TO  LNK-S02-MEISAI
+                MOVE     WRK-JIBAI-RYOYO(IDX) TO  LNK-S02-RYOYO
       *
                 MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
@@ -3000,6 +3021,8 @@
                                              "101910100"
                            COMPUTE WRK-RSIETC = WRK-RSIETC +
                                   (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
                       END-IF
       *
                       IF     SYU-SYUHKNNUM   =   "971"
@@ -3008,6 +3031,8 @@
                                                     OR    "09594"
                            COMPUTE WRK-RSIETC = WRK-RSIETC +
                                   (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
                          END-IF
       *
                       END-IF
@@ -3020,6 +3045,8 @@
                                                     OR    "09594"
                            COMPUTE WRK-RSIETC = WRK-RSIETC +
                                   (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
                          END-IF
                          IF    SRY-SRYCD (IDZ)(1:5)   =   "09591"
                            COMPUTE WRK-SINDAN = WRK-SINDAN +
@@ -3032,6 +3059,14 @@
       *
                          IF    SRY-SRYCD (IDZ)  =   "140037490"
                            COMPUTE WRK-YOUBUKASAN = WRK-YOUBUKASAN +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                         END-IF
+                         IF    SRY-SRYCD (IDZ)  =   "140040110"
+                           COMPUTE WRK-KYOBUKASAN = WRK-KYOBUKASAN +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                         END-IF
+                         IF    SRY-SRYCD (IDZ)  =   "150266970"
+                           COMPUTE WRK-SOGAIKASAN = WRK-SOGAIKASAN +
                                   (TNS-TEN  *   SINRYO-COUNT)
                          END-IF
       *
@@ -3080,25 +3115,29 @@
            IF      WRK-RSIETC         NOT =    ZERO
                    COMPUTE SYU-HKNTEN (10)  =  SYU-HKNTEN (10)
                                             -  WRK-RSIETC
-                   COMPUTE SYU-RSIETC-MONEY      =  WRK-RSIETC
-                                                 *  10
+      ****         COMPUTE SYU-RSIETC-MONEY      =  WRK-RSIETC
+      ****                                       *  10
            END-IF
+           MOVE    WRK-RSIETC2    TO   SYU-RSIETC-MONEY
       *
            IF  SYU-SYUHKNNUM       =   "973"
       *
-             COMPUTE   LNK-S02-SYUTEN   =    WRK-SYUTEN
+             COMPUTE   WRK-JIBAI-SYUTEN(IDX)
+                                        =    WRK-SYUTEN
                                         -    WRK-RSISHOSHIN
                                         -    WRK-RSISDO
                                         -    WRK-RSIETC
                                         -    WRK-YOUBUKASAN
+                                        -    WRK-KYOBUKASAN
+                                        -    WRK-SOGAIKASAN
                                         -    WRK-RYOYOTEATE
       *
-             ADD    SYU-HKNTEN(11)     TO    LNK-S02-SYUTEN
+             ADD    SYU-HKNTEN(11)     TO    WRK-JIBAI-SYUTEN(IDX)
       *
-             MOVE      WRK-SINDAN      TO    LNK-S02-SINDAN
-             MOVE      WRK-MEISAI      TO    LNK-S02-MEISAI
+             MOVE      WRK-SINDAN      TO    WRK-JIBAI-SINDAN(IDX)
+             MOVE      WRK-MEISAI      TO    WRK-JIBAI-MEISAI(IDX)
       *
-             MOVE      WRK-RYOYOTEATE  TO    LNK-S02-RYOYO
+             MOVE      WRK-RYOYOTEATE  TO    WRK-JIBAI-RYOYO(IDX)
       *
            END-IF
       *
