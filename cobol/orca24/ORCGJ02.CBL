@@ -6326,7 +6326,8 @@
                        ADD     1                   TO  IDR
                    END-PERFORM
                END-PERFORM
-               IF      IDX2                =   ZERO
+               IF     (IDX2                =   ZERO ) AND
+                      (JYURRK-EDANUM       >   1    )
                    PERFORM 490112-JYURRK-DEL-SEC
                ELSE
                    PERFORM 490113-JYURRK-UPD-SEC
@@ -6591,21 +6592,21 @@
            END-IF
       *
            IF      FLG-SYUNOU          =   ZERO
-      *        受診履歴が無い時、削除
-               IF      FLG-JYURRK-ARI      =   ZERO
-                   MOVE    SYUNOU-REC          TO  MCPDATA-REC
-                   MOVE    "DBDELETE"          TO  MCP-FUNC
-                   MOVE    "SYUNOU-KEY"        TO  ORC-DBPATH
-                   CALL    "ORCMCPSUB"         USING
-                                               MCPAREA
-                                               ORCMCPAREA
-                                               MCPDATA-REC
-                   IF      MCP-RC         NOT  =   ZERO
-                       MOVE    "2001"              TO  SPA-ERRCD
-                       DISPLAY "J02 SYUNOU DEL ERR:" MCP-RC
-                              ",KEY:" SYU-KEY
-                   END-IF
-               ELSE
+      *********受診履歴が無い時、削除
+      *        IF      FLG-JYURRK-ARI      =   ZERO
+      *            MOVE    SYUNOU-REC          TO  MCPDATA-REC
+      *            MOVE    "DBDELETE"          TO  MCP-FUNC
+      *            MOVE    "SYUNOU-KEY"        TO  ORC-DBPATH
+      *            CALL    "ORCMCPSUB"         USING
+      *                                        MCPAREA
+      *                                        ORCMCPAREA
+      *                                        MCPDATA-REC
+      *            IF      MCP-RC         NOT  =   ZERO
+      *                MOVE    "2001"              TO  SPA-ERRCD
+      *                DISPLAY "J02 SYUNOU DEL ERR:" MCP-RC
+      *                       ",KEY:" SYU-KEY
+      *            END-IF
+      *******  ELSE
       *            会計変更区分
                    MOVE    "1"                 TO  SYU-ACCT-UPDKBN
                    MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
@@ -6623,7 +6624,7 @@
                        DISPLAY "J02 SYUNOU UPDATE:" MCP-RC
                               ",KEY:" SYU-KEY
                    END-IF
-               END-IF
+      *********END-IF
            END-IF
       *
            .
