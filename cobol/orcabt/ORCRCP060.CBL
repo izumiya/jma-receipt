@@ -2779,7 +2779,7 @@
                        MOVE    WRK-KGK2        TO  HC06-JINISSU1
                    END-IF
                    IF      RECE11-JNISSU (IDX3) >   ZERO
-                       IF      RECE11-JNISSU (IDX2) =   99
+                       IF      RECE11-JNISSU (IDX3) =   99
                            MOVE    ZERO            TO  WRK-KGK2
                        ELSE  
                            MOVE    RECE11-JNISSU (IDX3)
