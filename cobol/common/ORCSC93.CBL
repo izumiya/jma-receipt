@@ -1023,7 +1023,9 @@
       *    ㄠ管ㄠ抸稱及戊□玉及凜反﹜管蔽弇午允月
            IF      FLG-ZAI             =   1
                IF     (IDX             >   1   )  AND
-                      (SPA-GMN-INPUTCD(IDX - 1)(1:1)   NOT =   ".")
+                     ((SPA-GMN-INPUTCD(IDX - 1)(1:1)   NOT =   ".") OR
+                      (SPA-GMN-SRYKBN (IDX - 1)
+                                       NOT =   SPA-GMN-SRYKBN(IDX)))
                    MOVE    2               TO  FLG-SYORI
                ELSE
                    MOVE    1               TO  FLG-SYORI
@@ -1359,6 +1361,11 @@
                    END-IF
                END-IF
       *
+      *        脰颶褲蠅及笛遙及心
+               IF     (WRK-SRYSYUKBN           =   "704" )  AND
+                      (SPA-COM-SRYKBN (IDX)    =   "70"  )
+                   MOVE    1               TO  FLG-ARI
+               END-IF
            END-IF
       *
            IF      FLG-ARI             =   ZERO
