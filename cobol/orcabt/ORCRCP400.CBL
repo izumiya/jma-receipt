@@ -3396,25 +3396,24 @@
                MOVE    "∆˝°¶æ„°¶ Ï"        TO  HC06-KYUFUGAI2
                MOVE    "µÎ…’≥∞≈¿øÙ"        TO  HC06-KYUFUGAI3
                MOVE    "≈¿"                TO  HC06-KYUFUGAI4
-           ELSE
-               IF    ( RECE02-TOTALTEN (IDX2) >   ZERO                 )
-               AND   ((RECE02-TOTALTEN (IDX2)
-                                      NOT =   RECE02-TOTALTEN (IDX1)) OR
-                     (RECE02-FTNMONEY (IDX2)
-                                      NOT =   RECE02-FTNMONEY (IDX1))  )
-                   IF    RECE02-FTNMONEY (IDX2)   >   ZERO
-                       MOVE    RECE02-FTNMONEY (IDX2)
-                                                  TO  WRK-KGK7
-                       MOVE    WRK-KGK7           TO  HC06-FTNMONEY(2)
-                   END-IF
+           END-IF
+           IF    ( RECE02-TOTALTEN (IDX2) >   ZERO                 )
+           AND   ((RECE02-TOTALTEN (IDX2)
+                                  NOT =   RECE02-TOTALTEN (IDX1)) OR
+                 (RECE02-FTNMONEY (IDX2)
+                                  NOT =   RECE02-FTNMONEY (IDX1))  )
+               IF    RECE02-FTNMONEY (IDX2)   >   ZERO
+                   MOVE    RECE02-FTNMONEY (IDX2)
+                                              TO  WRK-KGK7
+                   MOVE    WRK-KGK7           TO  HC06-FTNMONEY(2)
                END-IF
-               IF      RECE02-TOTALTEN (IDX2) >   ZERO                     
-               AND     RECE02-TOTALTEN (IDX2)
-                                          NOT =   RECE02-TOTALTEN (IDX1)   
-                   MOVE    RECE02-TOTALTEN (IDX2) TO  WRK-KGK6
-                   MOVE    WRK-KGK6               TO  HC06-TOTALTEN(2)
-               END-IF
-           END-IF  
+           END-IF
+           IF      RECE02-TOTALTEN (IDX2) >   ZERO                     
+           AND     RECE02-TOTALTEN (IDX2)
+                                      NOT =   RECE02-TOTALTEN (IDX1)   
+               MOVE    RECE02-TOTALTEN (IDX2) TO  WRK-KGK6
+               MOVE    WRK-KGK6               TO  HC06-TOTALTEN(2)
+           END-IF
       *    ∏¯»Ò£≤
            IF      IDX3                =   KOHIDX1
                MOVE    WRK-KYUFUGAITEN     TO  WRK-KGK5
@@ -3422,29 +3421,26 @@
                MOVE    "∆˝°¶æ„°¶ Ï"        TO  HC06-KYUFUGAI2
                MOVE    "µÎ…’≥∞≈¿øÙ"        TO  HC06-KYUFUGAI3
                MOVE    "≈¿"                TO  HC06-KYUFUGAI4
-           ELSE
-               IF    (RECE02-TOTALTEN (IDX3) >   ZERO                  )
-               AND   ((RECE02-TOTALTEN (IDX3)
-                                      NOT =   RECE02-TOTALTEN (IDX1)) OR
-                      (RECE02-FTNMONEY (IDX3)
-                                      NOT =   RECE02-FTNMONEY (IDX1))  )
-      *
-                 IF    RECE02-FTNMONEY (IDX3)
-                                      NOT =   RECE02-FTNMONEY (IDX2)
-      *
-                   IF    RECE02-FTNMONEY (IDX3)   >   ZERO
-                       MOVE    RECE02-FTNMONEY (IDX3)
-                                                  TO  WRK-KGK7
-                       MOVE    WRK-KGK7           TO  HC06-FTNMONEY(3)
-                   END-IF
-                 END-IF
+           END-IF
+           IF    (RECE02-TOTALTEN (IDX3) >   ZERO                  )
+           AND   ((RECE02-TOTALTEN (IDX3)
+                                  NOT =   RECE02-TOTALTEN (IDX1)) OR
+                  (RECE02-FTNMONEY (IDX3)
+                                  NOT =   RECE02-FTNMONEY (IDX1))  )
+             IF    RECE02-FTNMONEY (IDX3)
+                                  NOT =   RECE02-FTNMONEY (IDX2)
+               IF    RECE02-FTNMONEY (IDX3)   >   ZERO
+                   MOVE    RECE02-FTNMONEY (IDX3)
+                                              TO  WRK-KGK7
+                   MOVE    WRK-KGK7           TO  HC06-FTNMONEY(3)
                END-IF
-               IF      RECE02-TOTALTEN (IDX3) >   ZERO                      
-               AND     RECE02-TOTALTEN (IDX3)
-                                      NOT =   RECE02-TOTALTEN (IDX1)
-                   MOVE    RECE02-TOTALTEN (IDX3) TO  WRK-KGK6
-                   MOVE    WRK-KGK6               TO  HC06-TOTALTEN(3)
-               END-IF
+             END-IF
+           END-IF
+           IF      RECE02-TOTALTEN (IDX3) >   ZERO                      
+           AND     RECE02-TOTALTEN (IDX3)
+                                  NOT =   RECE02-TOTALTEN (IDX1)
+               MOVE    RECE02-TOTALTEN (IDX3) TO  WRK-KGK6
+               MOVE    WRK-KGK6               TO  HC06-TOTALTEN(3)
            END-IF
       *
       *    ∏©√±Õ—π‡Ã‹
