@@ -3327,9 +3327,9 @@
                 END-EVALUATE
              END-IF
       *
-             IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR  
-                                                  "6" OR  "7" OR
-                                                  "8"
+      ***>   IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR  
+      ***>                                        "6" OR  "7" OR
+      ***>                                        "8"
       *
               IF  (  SRY-SRYSYUKBN            = "330" OR "331"      
                                                       OR "350"     )
@@ -3485,7 +3485,7 @@
                    END-IF
                END-IF
               END-IF
-             END-IF  
+      ***>   END-IF  
            END-PERFORM
       *
            IF    IDX4   =   ZERO
@@ -4578,7 +4578,7 @@
                    END-IF
       *    ≈ÍÃÙ§Œ•Ï•ª≈¿øÙÕÛ§Œ ‘Ω∏
                WHEN    "21"
-                   IF     SRY-SRYCD(IDX3) (1:1)   =    "6"  OR  "S"
+                   IF     SRY-SRYCD(IDX3) (1:1)   =  "6" OR "S" OR "8"
                      IF   SRY-SRYCD(IDX3)         =    CONS-YAKTEIGEN
                        IF    BUN-IDX        =   1
                            COMPUTE   RECE62-TENSU(4 BUN-IDX)  =
@@ -4624,30 +4624,7 @@
                        END-IF
                      END-IF
                    ELSE
-                     IF      SRY-SRYCD(IDX3)     =   "820000047"
-                       ADD    WK-ZAIKAISU       TO   RECE62-KAISU(4)
-                       IF    BUN-IDX        =   1
-                           COMPUTE   RECE62-TENSU(4 BUN-IDX)  =
-                                     RECE62-TENSU(4 BUN-IDX)  +
-                                    (WK-ZAITEN   *   WK-ZAIKAISU)
-                       END-IF
-                       IF    BUN-IDX2       =   2
-                           COMPUTE   RECE62-TENSU(4 BUN-IDX2)  =
-                                     RECE62-TENSU(4 BUN-IDX2)  +
-                                    (WK-ZAITEN   *   WK-ZAIKAISU)
-                       END-IF
-                       IF    BUN-IDX3       =   3
-                           COMPUTE   RECE62-TENSU(4 BUN-IDX3)  =
-                                     RECE62-TENSU(4 BUN-IDX3)  +
-                                    (WK-ZAITEN   *   WK-ZAIKAISU)
-                       END-IF
-                       IF    BUN-IDX4       =   4
-                           COMPUTE   RECE62-TENSU(4 BUN-IDX4)  =
-                                     RECE62-TENSU(4 BUN-IDX4)  +
-                                    (WK-ZAITEN   *   WK-ZAIKAISU)
-                       END-IF
-                     ELSE
-                      IF   SRY-SRYCD(IDX3)     =    CONS-FUNSAI-COMMENT
+                     IF   SRY-SRYCD(IDX3)     =    CONS-FUNSAI-COMMENT
                         ADD   WK-ZAIKAISU       TO   RECE62-KAISU(4)
                         IF    BUN-IDX        =   1
                             COMPUTE   RECE62-TENSU(4 BUN-IDX)  =
@@ -4669,8 +4646,7 @@
                                       RECE62-TENSU(4 BUN-IDX4)  +
                                      (WK-ZAITEN   *   WK-ZAIKAISU)
                         END-IF
-                      END-IF   
-                     END-IF
+                     END-IF   
                    END-IF
                WHEN    "22"
                    ADD    WK-ZAIKAISU    TO   RECE62-KAISU(5)
@@ -5142,6 +5118,7 @@
                    DISPLAY   "TENSU FETCH ERR"  
                END-IF
            ELSE
+               INITIALIZE       TNS-TENSU-REC
                MOVE    1   TO   FLG-TENSU
                DISPLAY   "TENSU SELECT ERR" 
            END-IF
