@@ -2252,6 +2252,10 @@
                      MOVE  "190805710"      TO   WRK-GAIHAKU-SRYCD
            END-EVALUATE
       *
+           IF    WRK-GAIHAKU-SRYCD   NOT =   SPACE
+               MOVE   WRK-GAIHAKU-SRYCD   TO   WRK-SO-SRYCD(IDX1 IDX2)
+           END-IF
+      *
            .
        2101-GAIHAKU-NYUINKHN-SET-EXT.
            EXIT.
