@@ -28,6 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-門脇    05/01/08  同月に継続なしで２回入院した
+      *                                     場合の入院年月日の記載方法
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -145,6 +147,8 @@
                05  WRK-BYOTOKBN          PIC X(02).                     
       *                                                                 
        01  WRK-BYOTOKBN-DATA             PIC X(02).                     
+      *    初回番号(最新の入院歴分)
+       01  WRK-SHONUM                    PIC 9(03).                     
       *
       *    ワーク入退院履歴
        01  WRK-RECE88-REC. 
@@ -305,6 +309,7 @@
        2101-RECE88-HENSYU-SEC                   SECTION.
       *                                                                
            INITIALIZE                      WRK-BYOTOKBN-TABLE          
+                                           WRK-SHONUM
            MOVE         SPACE       TO     WRK-RYOSTYMD
                                            WRK-RYOEDYMD
       *
@@ -409,7 +414,10 @@
            END-PERFORM
       *
       *    入院年月日
-           MOVE    PTNYUINRRK-NYUINYMD TO  RECE82-NYUINYMD
+           IF      RECE82-NYUINYMD    =   SPACE
+               MOVE    PTNYUINRRK-NYUINYMD TO  RECE82-NYUINYMD
+               MOVE    PTNYUINRRK-SHONUM   TO  WRK-SHONUM
+           END-IF
       *
       *    入退院履歴情報
            PERFORM 210111-RECE88-WRITE-SEC
@@ -437,8 +445,9 @@
                END-IF
       *
       *        入院年月日
-               IF      PTNYUINRRK-NYUINYMD <    RECE82-NYUINYMD
-                   MOVE    PTNYUINRRK-NYUINYMD TO  RECE82-NYUINYMD
+               IF    ( PTNYUINRRK-NYUINYMD <    RECE82-NYUINYMD )
+               AND   ( PTNYUINRRK-SHONUM   =    WRK-SHONUM      )
+                   MOVE    PTNYUINRRK-NYUINYMD  TO  RECE82-NYUINYMD
                END-IF
       *
                PERFORM             UNTIL   FLG-PTNYUINRRK22 =  1
