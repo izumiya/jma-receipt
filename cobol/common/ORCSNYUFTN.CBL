@@ -57,6 +57,8 @@
       *  01.00.18    NACL-ÌçÏÆ    04/09/07  ½é¿ÇÎÁ»»Äê¥Õ¥é¥°¡ÊÃÏÊý¸øÈñÍÑ¡Ë
       *                                     ¤Î¥»¥Ã¥È
       *  01.00.19    NACL-ÌçÏÆ    04/11/25  Ê¡Åç¸©ÆýÍÄ»ùÆÃ¼ì·×»»ÂÐ±þ
+      *  01.00.20    NACL-ÌçÏÆ    04/12/17  ¶»Éô¸ÇÄêÂÓ²Ã»»¡¢ÁÏ³°¸ÇÄê´ï
+      *                                     »ÈÍÑ²Ã»»¤òÌôºÞÅù¤Ø
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -84,6 +86,8 @@
            03  WRK-SINDAN                  PIC 9(09).
            03  WRK-MEISAI                  PIC 9(09).
            03  WRK-YOUBUKASAN              PIC 9(09).
+           03  WRK-KYOBUKASAN              PIC 9(09).
+           03  WRK-SOGAIKASAN              PIC 9(09).
            03  WRK-RYOYOTEATE              PIC 9(09).
       *
        01  WRK-JIBAI-TABLE.
@@ -3241,6 +3245,14 @@
                            COMPUTE WRK-YOUBUKASAN = WRK-YOUBUKASAN +
                                   (TNS-TEN  *   SINRYO-COUNT)
                          END-IF
+                         IF    SRY-SRYCD (IDZ)  =   "140040110"
+                           COMPUTE WRK-KYOBUKASAN = WRK-KYOBUKASAN +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                         END-IF
+                         IF    SRY-SRYCD (IDZ)  =   "150266970"
+                           COMPUTE WRK-SOGAIKASAN = WRK-SOGAIKASAN +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                         END-IF
       *
                          IF    SRY-SRYCD (IDZ)  =   "199000510"
                            COMPUTE WRK-RYOYOTEATE = WRK-RYOYOTEATE +
@@ -3350,6 +3362,8 @@
                                         -    WRK-RSISDO
                                         -    WRK-RSIETC
                                         -    WRK-YOUBUKASAN
+                                        -    WRK-KYOBUKASAN
+                                        -    WRK-SOGAIKASAN
                                         -    WRK-RYOYOTEATE
       *
              ADD    SYU-HKNTEN(11)     TO    WRK-JIBAI-SYUTEN(IDX)

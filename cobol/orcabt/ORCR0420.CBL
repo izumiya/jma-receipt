@@ -75,6 +75,8 @@
       *  01.01.08    NACL-ÌçÏÆ    04.07.28  ÅêÌôÎÁ¤Î´ïºàÅÀ¤Î½¸·×½¤Àµ
       *  01.01.09    NACL-ÌçÏÆ    04.07.28  µÙ¶È¾ÚÌÀ¥Õ¥é¥°¡¢µÙ¶È´ü´Ö½ªÎ»Ç¯
       *                                     ·î¤ÎÊÔ½¸
+      *  01.01.10    NACL-ÌçÏÆ    04.12.17  ¶»Éô¸ÇÄêÂÓ²Ã»»¡¢ÁÏ³°¸ÇÄê´ï
+      *                                     »ÈÍÑ²Ã»»¤òÌôºÞÅù¤Ø
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -330,6 +332,8 @@
            03  WRK-KSNRATE                             PIC 9V99.    
            03  WRK-SRYCD                               PIC 9(09).   
            03  WRK-YOUBUKASAN                          PIC 9(07).
+           03  WRK-KYOBUKASAN                          PIC 9(07).
+           03  WRK-SOGAIKASAN                          PIC 9(07).
            03  WRK-RYOYOTEATE                          PIC 9(07).
            03  WRK-RYOYOTEATE2                         PIC 9(07).
       *
@@ -469,6 +473,10 @@
       *
       *    ¹øÉô¸ÇÄêÂÓ²Ã»»
            03  CONS-YOUBUKASAN PIC X(09)   VALUE   "140037490".
+      *    ¶»Éô¸ÇÄêÂÓ²Ã»»
+           03  CONS-KYOBUKASAN PIC X(09)   VALUE   "140040110".
+      *    ÁÏ³°¸ÇÄê´ï»ÈÍÑ²Ã»»
+           03  CONS-SOGAIKASAN PIC X(09)   VALUE   "150266970".
       *    ÎÅÍÜÃ´Åö¼êÅö¤Æ
            03  CONS-RYOYOTEATE PIC X(09)   VALUE   "199000610".
       *
@@ -853,6 +861,8 @@
                                                        WRK-SRYCDTOTAL
                                                        WRK-SURYOUTOTAL
                                                        WRK-YOUBUKASAN
+                                                       WRK-KYOBUKASAN
+                                                       WRK-SOGAIKASAN
                                                        WRK-RYOYOTEATE
       *
                                MOVE    ZERO    TO      WRK-SRYSURYO
@@ -891,6 +901,8 @@
                                                       WRK-SRYCDTOTAL
                                                       WRK-SURYOUTOTAL
                                                       WRK-YOUBUKASAN
+                                                      WRK-KYOBUKASAN
+                                                      WRK-SOGAIKASAN
                                                       WRK-RYOYOTEATE
       *
                                       MOVE  ZERO  TO  WRK-SRYSURYO
@@ -965,6 +977,8 @@
                                                      WRK-SRYCDTOTAL
                                                      WRK-SURYOUTOTAL
                                                      WRK-YOUBUKASAN
+                                                     WRK-KYOBUKASAN
+                                                     WRK-SOGAIKASAN
                                                      WRK-RYOYOTEATE
       *
                                MOVE    ZERO    TO    WRK-SRYSURYO
@@ -1005,6 +1019,8 @@
                                                       WRK-SRYCDTOTAL
                                                       WRK-SURYOUTOTAL
                                                       WRK-YOUBUKASAN
+                                                      WRK-KYOBUKASAN
+                                                      WRK-SOGAIKASAN
                                                       WRK-RYOYOTEATE
       *
                                       MOVE  ZERO  TO  WRK-SRYSURYO
@@ -1276,6 +1292,22 @@
                ELSE                                                     
                   IF      SRY-SRYCD(IDX2)    =     CONS-YOUBUKASAN
                     COMPUTE  WRK-YOUBUKASAN   =  WRK-YOUBUKASAN
+                                              +  TNS-TEN
+                    COMPUTE  RECE44-SYUTEN1   =  RECE44-SYUTEN1
+                                              -  TNS-TEN
+                    COMPUTE  RECE44-KIZAITEN  =  RECE44-KIZAITEN
+                                              +  TNS-TEN
+                  END-IF
+                  IF      SRY-SRYCD(IDX2)    =     CONS-KYOBUKASAN
+                    COMPUTE  WRK-KYOBUKASAN   =  WRK-KYOBUKASAN
+                                              +  TNS-TEN
+                    COMPUTE  RECE44-SYUTEN1   =  RECE44-SYUTEN1
+                                              -  TNS-TEN
+                    COMPUTE  RECE44-KIZAITEN  =  RECE44-KIZAITEN
+                                              +  TNS-TEN
+                  END-IF
+                  IF      SRY-SRYCD(IDX2)    =     CONS-SOGAIKASAN
+                    COMPUTE  WRK-SOGAIKASAN   =  WRK-SOGAIKASAN
                                               +  TNS-TEN
                     COMPUTE  RECE44-SYUTEN1   =  RECE44-SYUTEN1
                                               -  TNS-TEN
@@ -1936,6 +1968,18 @@
                                    COMPUTE  WK-YKZTEN  = WK-YKZTEN
                                                        + WRK-YOUBUKASAN
                                   END-IF
+                                  IF  WRK-KYOBUKASAN  NOT =  ZERO
+                                   COMPUTE  WK-SYUTEN  = WK-SYUTEN
+                                                       - WRK-KYOBUKASAN
+                                   COMPUTE  WK-YKZTEN  = WK-YKZTEN
+                                                       + WRK-KYOBUKASAN
+                                  END-IF
+                                  IF  WRK-SOGAIKASAN  NOT =  ZERO
+                                   COMPUTE  WK-SYUTEN  = WK-SYUTEN
+                                                       - WRK-SOGAIKASAN
+                                   COMPUTE  WK-YKZTEN  = WK-YKZTEN
+                                                       + WRK-SOGAIKASAN
+                                  END-IF
                              END-IF
                            END-IF                                       
                          END-IF
@@ -1950,6 +1994,18 @@
                                                      -  WRK-YOUBUKASAN
                                 COMPUTE  WK-KIZAITEN =  WK-KIZAITEN
                                                      +  WRK-YOUBUKASAN
+                             END-IF
+                             IF  WRK-KYOBUKASAN  NOT =  ZERO
+                                COMPUTE  WK-SYUTEN   =  WK-SYUTEN
+                                                     -  WRK-KYOBUKASAN
+                                COMPUTE  WK-KIZAITEN =  WK-KIZAITEN
+                                                     +  WRK-KYOBUKASAN
+                             END-IF
+                             IF  WRK-SOGAIKASAN  NOT =  ZERO
+                                COMPUTE  WK-SYUTEN   =  WK-SYUTEN
+                                                     -  WRK-SOGAIKASAN
+                                COMPUTE  WK-KIZAITEN =  WK-KIZAITEN
+                                                     +  WRK-SOGAIKASAN
                              END-IF
                            END-IF
                        END-IF
