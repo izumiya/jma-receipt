@@ -266,6 +266,7 @@
            03  FLG-FUKU-END          PIC 9(01).
            03  FLG-FUKU              PIC 9(01).
            03  FLG-HKN-ARI           PIC 9(01).
+           03  FLG-MOD-FLG           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -2314,6 +2315,9 @@
                    ELSE
       *                診察料の変更のみ
                        PERFORM 410131-SINSATUHEN-SEC
+      *                ワーク診療行為クリア
+                       MOVE    2                   TO  FLG-MOD-FLG
+                       PERFORM 4900-WKSRYACT-CLEAR-SEC
                    END-IF
       *
       *        科変更時、中途終了あり
@@ -2327,6 +2331,9 @@
       *                診察料の変更のみ
                        MOVE    2                  TO  SPA-TAHOKEN-FLG
                        PERFORM 410131-SINSATUHEN-SEC
+      *                ワーク診療行為クリア
+                       MOVE    2                   TO  FLG-MOD-FLG
+                       PERFORM 4900-WKSRYACT-CLEAR-SEC
                    END-IF
       *
       *        診療科変更確認
@@ -5658,6 +5665,9 @@
       *****************************************************************
        410132-SAIHENSYU-SEC         SECTION.
       *
+      *    ワーク診療行為クリア
+           MOVE    1                   TO  FLG-MOD-FLG
+           PERFORM 4900-WKSRYACT-CLEAR-SEC
       *    スパ共通編集処理
            PERFORM                     310-SPA-SET-SEC
       *
@@ -5767,6 +5777,13 @@
            IF      SPA-SYORIFLG        =   ZERO
                MOVE    SPACE               TO  SPA-HKNCOMBINUM
                MOVE    SPACE               TO  SPA-DRCD
+      *        診療内容を残さない時、展開中のクリア
+               IF      SPA-KID1-FLG        =   "OK"
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-MOD-FLG
+                   PERFORM 4900-WKSRYACT-CLEAR-SEC
+               END-IF
            END-IF
       *
            MOVE    SPA-SCR-REC         TO  WRK-SCR-REC
@@ -10403,7 +10420,6 @@
            .
        220-CLEAR-SYORI-EXT.
            EXIT.
-      *
       *****************************************************************
       *    ワーク診療行為クリア処理
       *****************************************************************
@@ -10430,7 +10446,24 @@
            END-IF
            PERFORM
                UNTIL   FLG-WKSRYACT    =   1
-               MOVE    ZERO                TO  WKSRY-MOD-FLG
+               EVALUATE    FLG-MOD-FLG
+                   WHEN    1
+      *                展開中止
+                       IF      WKSRY-MOD-FLG       =   9
+                           MOVE    ZERO                TO  WKSRY-MOD-FLG
+                       END-IF
+                   WHEN    2
+      *                前の展開
+                       IF      WKSRY-MOD-FLG       =   9
+                           MOVE    1                   TO  WKSRY-MOD-FLG
+                       ELSE
+                           IF      WKSRY-MOD-FLG       =   1
+                               MOVE    ZERO            TO  WKSRY-MOD-FLG
+                           END-IF
+                       END-IF
+                   WHEN    0
+                       MOVE    ZERO                TO  WKSRY-MOD-FLG
+               END-EVALUATE
       *
                MOVE    WKSRYACT-REC        TO  MCPDATA-REC
                MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -12506,23 +12539,8 @@
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
-      *    現在の内容をクリア
-           MOVE    SPACE               TO  WKSRYACT-REC
-           INITIALIZE                      WKSRYACT-REC
-           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
-           MOVE    SPA-PTID            TO  WKSRY-PTID
-           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
-           MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
-           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
-           MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
-      *
-           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
-           MOVE    "DBDELETE"          TO  MCP-FUNC
-           MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+      *    ワーク診療行為の削除
+           PERFORM 45109-WKSRYACT-DEL-SEC
       *
            MOVE    "1"                 TO  FLG-SYORI
            PERFORM 45101-SNRYO-SYORI-SEC
@@ -12649,6 +12667,73 @@
            .
        4510-SNRYO-NYU-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ワーク診療行為展開中の削除処理
+      *****************************************************************
+       45109-WKSRYACT-DEL-SEC             SECTION.
+      *
+      *    現在の内容をクリア
+           MOVE    SPACE               TO  WKSRYACT-REC
+           INITIALIZE                      WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
+           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+           MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      *
+      *    中途追加分の削除
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+               PERFORM 970-WKSRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           PERFORM
+               UNTIL   FLG-WKSRYACT    =   1
+               IF      WKSRY-MOD-FLG       NOT =   ZERO
+      *
+                   MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+                   CALL    "ORCMCPSUB"         USING
+                                               MCPAREA
+                                               ORCMCPAREA
+                                               MCPDATA-REC
+               END-IF
+      *
+               MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+               PERFORM 970-WKSRYACT-READ-SEC
+           END-PERFORM
+      *
+           .
+       45109-WKSRYACT-DEL-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    薬剤情報発行処理
