@@ -3973,6 +3973,9 @@
                              END-IF
                            END-IF
                        WHEN    OTHER
+                            MOVE    "0044"      TO  SPA-ERRCD
+                            MOVE    "1"         TO  SPA-COM-CUR
+                                                          (IDX)
       *                    開放型病院共同指導料（１）であること
                            PERFORM 50192-SYONIKASRYCD-CHK-SEC
                            IF      FLG-SYONIKA-CHK     =   1
