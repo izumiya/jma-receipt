@@ -72,6 +72,7 @@
       *                                     ¾ì¹ç¡¢£±£°£°£°£°±ß¾å¸Â¤È¤¹¤ë
       *  01.00.32    NACL-ÌçÏÆ    04/11/25  Ê¡Åç¸©ÆýÍÄ»ùÆÃ¼ì·×»»ÂÐ±þ
       *  01.00.33    NACL-ÌçÏÆ    04/11/25  ÂçºåÉÜ£´£±Ï·¿Í¾å¸Â³ÛÊÔ½¸
+      *  01.00.34    NACL-ÌçÏÆ    05/01/25  ËÌ³¤Æ»ÃÏÊý¸øÈñ½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -6007,8 +6008,17 @@
            END-IF.
       *
            IF  (WK-1001-PREFNUM         =  01                    ) AND
-               (COMB-KOHHKNNUM(KOH-IDX) = "142" OR "143" OR "144"
-                                       OR "342" OR "443" OR "444") AND
+               (COMB-KOHHKNNUM(KOH-IDX) = "142" OR "143" OR "144") AND
+               (LNK-SYU-SRYYMD(1:6)    >= "200410"               )
+               IF    LNK-S02-SYOSINFLG  =  SPACE
+                    MOVE    SPACE   TO   COMB-KOH-NYUJGNKBN(KOH-IDX)
+                    MOVE    ZERO    TO   WK-NYUKFTNRATE
+               END-IF
+           END-IF.
+      *
+           IF  (WK-1001-PREFNUM         =  01                    ) AND
+               (COMB-KOHHKNNUM(KOH-IDX) = "342" OR "443" OR "444") AND
+               (WK-NYUKFTNRATE          =  ZERO                  ) AND
                (LNK-SYU-SRYYMD(1:6)    >= "200410"               )
                IF    LNK-S02-SYOSINFLG  =  SPACE
                     MOVE    SPACE   TO   COMB-KOH-NYUJGNKBN(KOH-IDX)
