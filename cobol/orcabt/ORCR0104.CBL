@@ -77,6 +77,8 @@
       *  01.01.12    NACL-Æ£¸¶    04/09/17  £Ï£Ã£Ò¶èÊ¬¤ÎÀßÄê¤ËÄÉ²Ã
       *  01.01.13    NACL-Æ£¸¶    04/10/25  ÉéÃ´¶â³ÛÅù¤Î¥«¥¹¥¿¥Þ¥¤¥º¹àÌÜ
       *                                     ¤ÎÊÔ½¸ÊýË¡¤òÊÑ¹¹
+      *  01.01.14    NACL-ÌçÏÆ    04/12/15  ÆÃÄê¼À´µÅù¤Î°ìÉôÉéÃ´¶â³Ûµ­ºÜ
+      *                                     È½ÄêÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3464,6 +3466,23 @@
                    MOVE    WRK-KGK7               TO  HC06-FTNMONEY(2)
                END-IF
            END-IF
+           IF  (RECE02-SRYYM        >=  "200404")
+           AND (RECE02-ZAITAKU   NOT =    SPACE )
+               IF ( RECE02-KOHNUM(1) =  "012" OR "015"
+                                     OR "016" OR "051" )
+               OR ((SYS-1001-PREFNUM =   13           ) AND
+                   (RECE02-KOHNUM(1) =  "151" OR "451"))
+               OR ((SYS-1001-PREFNUM =   28           ) AND
+                   (RECE02-KOHNUM(1) =  "186"         ))
+                 IF  ( RECE02-TOTALTEN (IDX2) > ZERO                  )
+                 AND ( RECE02-FTNMONEY (IDX2) = RECE02-FTNMONEY (IDX1))
+                      IF    RECE02-FTNMONEY (IDX2)   >   ZERO
+                          MOVE    RECE02-FTNMONEY (IDX2) TO  WRK-KGK7
+                          MOVE    WRK-KGK7       TO  HC06-FTNMONEY(2)
+                      END-IF
+                 END-IF
+               END-IF
+           END-IF
            IF      RECE02-TOTALTEN (IDX2) >   ZERO                     
            AND     RECE02-TOTALTEN (IDX2)
                                       NOT =   RECE02-TOTALTEN (IDX1)   
@@ -3485,6 +3504,23 @@
                    MOVE    WRK-KGK7               TO  HC06-FTNMONEY(3)
                END-IF
              END-IF
+           END-IF
+           IF  (RECE02-SRYYM        >=  "200404")
+           AND (RECE02-ZAITAKU   NOT =    SPACE )
+               IF ( RECE02-KOHNUM(2) =  "012" OR "015"
+                                     OR "016" OR "051" )
+               OR ((SYS-1001-PREFNUM =   13           ) AND
+                   (RECE02-KOHNUM(2) =  "151" OR "451"))
+               OR ((SYS-1001-PREFNUM =   28           ) AND
+                   (RECE02-KOHNUM(2) =  "186"         ))
+                 IF  ( RECE02-TOTALTEN (IDX3) > ZERO                  )
+                 AND ( RECE02-FTNMONEY (IDX3) = RECE02-FTNMONEY (IDX2))
+                      IF    RECE02-FTNMONEY (IDX3)   >   ZERO
+                          MOVE    RECE02-FTNMONEY (IDX3) TO  WRK-KGK7
+                          MOVE    WRK-KGK7       TO  HC06-FTNMONEY(3)
+                      END-IF
+                 END-IF
+               END-IF
            END-IF
            IF      RECE02-TOTALTEN (IDX3) >   ZERO                      
            AND     RECE02-TOTALTEN (IDX3)
