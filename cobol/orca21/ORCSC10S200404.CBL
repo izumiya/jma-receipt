@@ -167,6 +167,8 @@
       *
            03  IDX-T               PIC 9(04).
       *
+           03  IDX-INT-MAX          PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
       *
@@ -4131,6 +4133,7 @@
            MOVE    ZERO                TO  IDX3
            MOVE    ZERO                TO  FLG-CHK-ALL
            MOVE    ZERO                TO  FLG-ARI2
+           MOVE    IDX2                TO  IDX-INT-MAX
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   200  )  OR
                              ((HZN-COM-INPUTCD (IDX)   =   SPACE ) AND
@@ -4342,7 +4345,7 @@
       *
       *    その他同じコードがある時
            PERFORM VARYING     IDXS    FROM    1   BY  1
-                   UNTIL      (IDXS    >   SPA-GMN-IDX )  OR
+                   UNTIL      (IDXS    >   IDX-INT-MAX )  OR
                               (FLG-ARI =   1           )
                IF     (WRK-SRYCD(1:1)          =   "1"   ) AND
                       (WRK-SRYCD               =   SPA-COM-INPUTCD
