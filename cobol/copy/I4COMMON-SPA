@@ -76,11 +76,6 @@
                        09  SPA-NAI-NENREI-MM   PIC 9(02).
                        09  SPA-NAI-NENREI-DD   PIC 9(02).
       *
-      *Ï«ºÒÍÑ
-               05  SPA-NAI-RSI-ARAE.
-      *Ï«ºÒÍÑÏ«ºÒ¶èÊ¬
-                   07  SPA-NAI-RSI-HKNKBN      PIC X(01).
-      *
       *ÂÐ¾Ý¼õ¿ÇÍúÎò¾ðÊó
            03  SPA-NAI-RRKAREA.
                05  SPA-SEL-RRKYMD              PIC X(08).
