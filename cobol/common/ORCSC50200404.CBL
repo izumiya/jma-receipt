@@ -1337,6 +1337,8 @@
       *    ¿Í¹©¿´ÇÙÉÔ»ÈÍÑ²Ã»»¤òÄÌÂ§Ê¬¤Ë²Ã»»¤¹¤ë
            COMPUTE LNK-SC90-TENSUKEI   =   LNK-SC90-TENSUKEI
                                        +   WRK-JIN-TENSUKEI
+      *    £²°Ê¾å¤Î¼ê½Ñ¤ÎÄþ¸º·×»»
+           PERFORM 1008-HEIYOU-KEI-SEC
       *
            ADD     LNK-SC90-TENSUKEI   TO  WRK-GOK-TENSUKEI
            ADD     LNK-SC90-TENGAKEI   TO  WRK-GOK-TENGAKEI
@@ -1380,7 +1382,7 @@
       *        £µ£°¡ó¸º»»¤ÏºÇ¸å¤Ë¤¹¤ë
                IF     (WRK-COM-DATAKBN    (IDX)    =   "2"  )  AND
                       (WRK-COM-INPUTCD    (IDX)    =   "150268970")
-                   MOVE    1               TO  WRK-COM-SANFLG (IDX)
+                   MOVE    5               TO  WRK-COM-SANFLG (IDX)
                END-IF
       *        ¿Ç»¡ÎÁ¡¢²Ã»»¡¢Ï«ºÒ¡¢»þ´Ö³°¡¦ÆýÍÄ»ù°Ê³°¤òÂÐ¾Ý¤È¤¹¤ë
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   NOT =   "1"  )  OR
@@ -1480,6 +1482,36 @@
       *
            .
        1006-KASAN-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £²°Ê¾å¤Î¼ê½Ñ¤ÎÄþ¸º·×»»½èÍý
+      *****************************************************************
+       1008-HEIYOU-KEI-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  WRK-TENSUKEI-K
+           MOVE    ZERO                TO  WRK-TENSUKEI-G
+      *
+           PERFORM VARYING     IDX     FROM    IDX-ZS    BY  1
+                   UNTIL       IDX     >=  HZN-IDX
+               IF     (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   5   )
+                   MOVE    ZERO                TO  WRK-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   LNK-SC90-TENSUKEI
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+               END-IF
+           END-PERFORM
+      *
+           COMPUTE LNK-SC90-TENSUKEI   =   LNK-SC90-TENSUKEI
+                                       +   WRK-TENSUKEI-K
+                                       -   WRK-TENSUKEI-G
+      *
+           .
+       1008-HEIYOU-KEI-EXT.
            EXIT.
       *
       *****************************************************************
