@@ -283,15 +283,19 @@
                PERFORM 300-SCREEN-SEC
       *
       *        画面編集
-               PERFORM 500-GMNHEN-SEC
+               IF      FLG-END         =   ZERO
+                   PERFORM 500-GMNHEN-SEC
+               END-IF
            END-IF
       *
-           MOVE   "NEW"                TO  MCP-PUTTYPE.
-           MOVE   "K10"                TO  MCP-WINDOW.
+           IF      FLG-END             =   ZERO
+               MOVE   "NEW"                TO  MCP-PUTTYPE
+               MOVE   "K10"                TO  MCP-WINDOW
       *
-           PERFORM 900-PUT-WINDOW.
+               PERFORM 900-PUT-WINDOW
       *
-           MOVE    1                   TO  FLG-END
+               MOVE    1                   TO  FLG-END
+           END-IF
            .
       *
        100-INIT-EXT.
@@ -308,13 +312,12 @@
       *            確認画面より
                    PERFORM 30010-KID1-SET-SEC
                    MOVE    SPACE               TO  SPA-KIDCD
-                   GO      TO      300-SCREEN-EXT
+               WHEN    OTHER
+      *
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   INITIALIZE                  SPA-K10GMN-AREA
+                   PERFORM                     310-SPA-SET-SEC
            END-EVALUATE
-      *
-           MOVE    SPACE               TO  SPA-KIDCD
-           INITIALIZE                  SPA-K10GMN-AREA
-      *
-           PERFORM                     310-SPA-SET-SEC
       *
            .
        300-SCREEN-EXT.
@@ -334,6 +337,17 @@
                    ELSE
                        MOVE    SPACE           TO  SPA-K10-GMN-SELNUM
                        MOVE    ZERO            TO  SPA-K10-SELNUM
+                       MOVE    1               TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "0102"
+                   IF      SPA-KID1-FLG        =   "OK"
+      *                確定処理
+                       PERFORM 4510-KAKUTEI-SYORI-SEC
+                       IF      SPA-ERRCD           =   SPACE
+                            MOVE    ZERO            TO  SPA-K10-SYORI
+                            PERFORM 4502-BACK-SYORI-SEC
+                       END-IF
+                   ELSE
                        MOVE    1               TO  SPA-GMN-CUR
                    END-IF
            END-EVALUATE
@@ -708,10 +722,15 @@
                MOVE    "0001"              TO  SPA-ERRCD
            ELSE
                IF      SPA-K10-SELNUM      >   ZERO
-                   PERFORM 4510-KAKUTEI-SYORI-SEC
+                   PERFORM 4512-KAKUTEI-CHK-SEC
+                   IF     (SPA-ERRCD           =   SPACE )  AND
+                          (SPA-KIDCD           =   SPACE )
+                       PERFORM 4510-KAKUTEI-SYORI-SEC
+                   END-IF
                END-IF
            END-IF
-           IF      SPA-ERRCD           =   SPACE
+           IF     (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-KIDCD           =   SPACE )
                MOVE    ZERO            TO  SPA-K10-SYORI
                PERFORM 4502-BACK-SYORI-SEC
            END-IF
@@ -739,6 +758,28 @@
            MOVE    1                   TO  FLG-END
            .
        4502-BACK-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    確定チェック処理
+      *****************************************************************
+       4512-KAKUTEI-CHK-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL     (IDX      >   SPA-K10-MAX )  OR
+                             (FLG-OK   =   1       )
+               IF      SPA-K10-SYORIKBN (IDX)  NOT =   SPACE
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           IF      SPA-PTID        NOT =   ZERO
+               IF      FLG-OK              =   1
+                   MOVE    "0102"          TO  SPA-KIDCD
+               END-IF
+           END-IF
+           .
+       4512-KAKUTEI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    確定　処理
@@ -867,7 +908,14 @@
                MOVE    "0001"              TO  SPA-ERRCD
            ELSE
                IF      SPA-K10-SELNUM      >   ZERO
-                   MOVE    "0101"          TO  SPA-KIDCD
+      *            選択中でないこと
+                   IF     (SPA-K10-SYORIKBN(SPA-K10-SELNUM)
+                                           NOT =   SPACE ) AND
+                          (SPA-PTID            =   ZERO  )
+                       MOVE    "0008"          TO  SPA-ERRCD
+                   ELSE
+                       MOVE    "0101"          TO  SPA-KIDCD
+                   END-IF
                END-IF
            END-IF
       *
@@ -920,6 +968,7 @@
                PERFORM 940-WKSINKOUI-READ-SEC
            END-PERFORM
       *
+      *    
            MOVE    SPA-K10-SELNUM      TO  IDY
            PERFORM VARYING    IDX      FROM    SPA-K10-SELNUM   BY  1
                    UNTIL      IDX      >   SPA-K10-MAX
@@ -1081,7 +1130,12 @@
                    MOVE    "既に展開中です。"
                                                TO  SPA-ERRMSG
                    MOVE    "追加はできません。"
-                                               TO  SPA-ERRMSG(27:)
+                                               TO  SPA-ERRMSG(15:)
+               WHEN    "0008"
+                   MOVE    "現在、他で展開中です。"
+                                               TO  SPA-ERRMSG
+                   MOVE    "削除はできません。"
+                                               TO  SPA-ERRMSG(23:)
                WHEN    "0006"
                    MOVE    "労災・自賠責、包括分入力の"
                                                TO  SPA-ERRMSG
@@ -1133,6 +1187,12 @@
                    MOVE
                    "対象のデータを削除します。よろしいですか？"
                                        TO  WRK-KIDMSG
+               WHEN    "0102"
+                   MOVE    "既に診療内容が展開中です。"
+                                       TO  WRK-KIDMSG
+                   MOVE
+                   "現在の内容はクリアされます。よろしいですか？"
+                                       TO  WRK-KIDMSG(29:)
                WHEN    OTHER
                    MOVE    SPA-KIDCD
                                        TO  WRK-KIDMSG
