@@ -31,6 +31,7 @@
       *  01.00.01    NACL-∆£∏∂    03/08/06  ø«Œ≈∂Ë ¨£π£π§œ£±£±§À —ππ
       *  01.00.02    NACL-∆£∏∂    04/05/19  ø«Œ≈∂Ë ¨°·£π£µ§»£π£∂(º´»Ò)§Œ
       *                                     §œ¬–æ›§»§∑§ §§
+      *  01.00.03    NACL-ÃÁœ∆    04/09/03   ›∏±¡»§ﬂπÁ§Ô§ª ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -254,15 +255,24 @@
            MOVE    RECE04-TEKSTYMD     TO  RECE041-TEKSTYMD
            MOVE    RECE04-ZAINUM       TO  RECE041-ZAINUM
            MOVE    RECE04-KOHBUNRI     TO  RECE041-KOHBUNRI
+      ***  IF      RECE04-KEY(1:65)    NOT =   OLD-KEY
+      ***       MOVE  9                TO  WRK-KOHBUNRI
+      ***       MOVE  ZERO             TO  WRK-HKNCOMBI
+      ***       MOVE  RECE04-KEY(1:65) TO  OLD-KEY
+      ***  ELSE
+      ***      IF      RECE04-KOHBUNRI     <   WRK-KOHBUNRI
+      ***           MOVE   RECE04-KOHBUNRI TO  WRK-KOHBUNRI
+      ***           MOVE   RECE04-HKNCOMBI TO  WRK-HKNCOMBI
+      ***      END-IF
+      ***  END-IF
            IF      RECE04-KEY(1:65)    NOT =   OLD-KEY
                 MOVE  9                TO  WRK-KOHBUNRI
                 MOVE  ZERO             TO  WRK-HKNCOMBI
                 MOVE  RECE04-KEY(1:65) TO  OLD-KEY
-           ELSE
-               IF      RECE04-KOHBUNRI     <   WRK-KOHBUNRI
-                    MOVE   RECE04-KOHBUNRI TO  WRK-KOHBUNRI
-                    MOVE   RECE04-HKNCOMBI TO  WRK-HKNCOMBI
-               END-IF
+           END-IF
+           IF      RECE04-KOHBUNRI     <   WRK-KOHBUNRI
+                MOVE   RECE04-KOHBUNRI TO  WRK-KOHBUNRI
+                MOVE   RECE04-HKNCOMBI TO  WRK-HKNCOMBI
            END-IF
            IF      RECE04-SRYKBN   =   "99"
                MOVE    "11"            TO  RECE041-SRYKBN
@@ -420,5 +430,5 @@
                                         MCPDATA-REC.
       *
            .
-       900-DBCLOSE-EXT.
+       900-DBDISCONNECT-EXT.
            EXIT.
