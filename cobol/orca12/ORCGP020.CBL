@@ -1631,7 +1631,7 @@
                           (SPA-P02-UKEID   NOT =   UKE-UKEID)
                        CONTINUE
                    ELSE
-                       MOVE    "99999"         TO  UKE-UPYMD
+                       MOVE    "99999999"         TO  UKE-UPYMD
                        PERFORM 5002-UKE-PARA-SEC
                    END-IF
                END-IF
