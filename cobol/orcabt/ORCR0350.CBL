@@ -36,6 +36,8 @@
       *                                     記載をしないようにする
       *  01.00.03    NACL-藤原    04/10/27  注加算による加算項目の記載
       *                                     （手術・麻酔・検査）
+      *  01.00.04    NACL-藤原    04/11/16  特定器材レコードのフィルムと
+      *                                     器材の点数をまとめて記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3509,26 +3511,32 @@
            PERFORM 5005-NUM-HENSYU-SEC  
       *    点数 
            IF      IDX                     =   WRK-TBLMAX7
-               IF     ( RECE641-SRYKBN    =   "70" )
-               AND    ( TBL-ZAIW-DATAKBN (2 IDX)
-                                          =   "3"  )
-                   MOVE    RECE641-SYUTEN2     TO  WRK-TENSU
+      *********IF     ( RECE641-SRYKBN    =   "70" )
+      *********AND    ( TBL-ZAIW-DATAKBN (2 IDX)
+      *********                           =   "3"  )
+      *********    MOVE    RECE641-SYUTEN2     TO  WRK-TENSU
+      *********    MOVE    WRK-TENSU           TO  WRK-NUM
+      *********    MOVE    7                   TO  WRK-NAGASA
+      *********ELSE
+      *********    IF     ( RECE641-SRYKBN    =   "70" )
+      *********    AND    ( TBL-ZAIW-SRYCD (2 IDX)
+      *********                               =   "799990070"  )
+      *********        MOVE    RECE641-SYUTEN2     TO  WRK-TENSU
+      *********        MOVE    WRK-TENSU           TO  WRK-NUM
+      *********        MOVE    7                   TO  WRK-NAGASA
+      *********    ELSE
+      *********        IF      RECE641-KIZAITEN    >   ZERO
+      *********            MOVE    RECE641-KIZAITEN    TO  WRK-TENSU
+      *********            MOVE    WRK-TENSU           TO  WRK-NUM
+      *********            MOVE    7                   TO  WRK-NAGASA
+      *********        END-IF
+      *********    END-IF
+      *********END-IF
+               COMPUTE WRK-TENSU   =   RECE641-SYUTEN2 +   
+                                       RECE641-KIZAITEN
+               IF      WRK-TENSU       >   ZERO
                    MOVE    WRK-TENSU           TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
-               ELSE
-                   IF     ( RECE641-SRYKBN    =   "70" )
-                   AND    ( TBL-ZAIW-SRYCD (2 IDX)
-                                              =   "799990070"  )
-                       MOVE    RECE641-SYUTEN2     TO  WRK-TENSU
-                       MOVE    WRK-TENSU           TO  WRK-NUM
-                       MOVE    7                   TO  WRK-NAGASA
-                   ELSE
-                       IF      RECE641-KIZAITEN    >   ZERO
-                           MOVE    RECE641-KIZAITEN    TO  WRK-TENSU
-                           MOVE    WRK-TENSU           TO  WRK-NUM
-                           MOVE    7                   TO  WRK-NAGASA
-                       END-IF
-                   END-IF
                END-IF
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
