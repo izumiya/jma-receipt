@@ -37,6 +37,8 @@
       *  01.00.02    ひさなが     02/06/26  印刷管理・印刷ＤＢ追加
       *  01.00.05    ひさなが     02/09/13  ディレクトリをサブプロへ
       *  01.00.06    ひさなが     03/03/03  出力範囲の桁誤り変更
+      *  01.00.07    太田         03/03/31  SHELL引数の受け渡しを
+      *                                     コピー句を用いて行うよう修正
       *
       *****************************************************************
       *
@@ -215,6 +217,8 @@
       *    フィアルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
       *
+      *    帳票ＤＢ印刷サブコピー句
+           COPY    "CPORCSPRTLNK.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -787,24 +791,44 @@
                                        TO  MKPASS-IN-01.
            CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA.
            MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME.
-           MOVE    1                   TO  SHELLTBL-ARG1.
-           MOVE    "ORCBSD1"           TO  SHELLTBL-ARG2.
-           MOVE    WRK-PARA-SYSYMD     TO  SHELLTBL-ARG3(1:8).
-           MOVE    SYS-TIME            TO  SHELLTBL-ARG3(9:8).
-           MOVE    1                   TO  SHELLTBL-ARG4.
-           MOVE    WRK-PARA-SRYYM      TO  SHELLTBL-ARG5.
-           MOVE    WRK-PARA-SYSYMD     TO  SHELLTBL-ARG6.
-           MOVE    "orcbsd01"          TO  SHELLTBL-ARG7.
-           MOVE    ZERO                TO  SHELLTBL-ARG8.
-           MOVE    WRK-PARA-TERMID     TO  SHELLTBL-ARG9.
-           MOVE    WRK-PARA-OPID       TO  SHELLTBL-ARG10.
-           MOVE    SYS-1031-PRTNM (5)  TO  SHELLTBL-ARG11.
+      *
+           MOVE    SPACE               TO  LNK-PRTKANRI-AREA
+           INITIALIZE                      LNK-PRTKANRI-AREA
+           MOVE    1                   TO  LNK-PRTKANRI-RENNUM
+           MOVE    "ORCBSD1"           TO  LNK-PRTKANRI-TBL-KEY  
+           MOVE    WRK-PARA-SYSYMD     TO  LNK-PRTKANRI-TBL-GROUP (1:8)
+           MOVE    SYS-TIME            TO  LNK-PRTKANRI-TBL-GROUP (9: )
+           MOVE    1                   TO  LNK-PRTKANRI-SHORI-RENNUM
+           MOVE    WRK-PARA-SRYYM      TO  LNK-PRTKANRI-SRYYM
+           MOVE    WRK-PARA-SYSYMD     TO  LNK-PRTKANRI-SKYYMD
+           MOVE    "orcbsd01"          TO  LNK-PRTKANRI-SHELLID
+           MOVE    ZERO                TO  LNK-PRTKANRI-PRIORITY
+           MOVE    WRK-PARA-TERMID     TO  LNK-PRTKANRI-TERMID
+           MOVE    WRK-PARA-OPID       TO  LNK-PRTKANRI-OPID
+           MOVE    SYS-1031-PRTNM (5)  TO  LNK-PRTKANRI-PRTNM
+      *
+           MOVE    LNK-PRTKANRI-RENNUM TO  SHELLTBL-ARG1
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                       TO  SHELLTBL-ARG2
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                       TO  SHELLTBL-ARG3
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  SHELLTBL-ARG4
+           MOVE    LNK-PRTKANRI-SRYYM  TO  SHELLTBL-ARG5
+           MOVE    LNK-PRTKANRI-SKYYMD TO  SHELLTBL-ARG6
+           MOVE    LNK-PRTKANRI-SHELLID
+                                       TO  SHELLTBL-ARG7
+           MOVE    LNK-PRTKANRI-PRIORITY
+                                       TO  SHELLTBL-ARG8
+           MOVE    LNK-PRTKANRI-TERMID TO  SHELLTBL-ARG9
+           MOVE    LNK-PRTKANRI-OPID   TO  SHELLTBL-ARG10
+           MOVE    LNK-PRTKANRI-PRTNM  TO  SHELLTBL-ARG11
       *
            MOVE    "/var/tmp/ERR.dat"  TO  SHELLTBL-ARG12.
            MOVE    "0000002"           TO  SHELLTBL-ARG13.
            MOVE    "ORCBSD1"           TO  SHELLTBL-ARG14.
-           MOVE    0                   TO  SHELLTBL-ARG15.
-           MOVE    99999               TO  SHELLTBL-ARG16.
+           MOVE    "00000"             TO  SHELLTBL-ARG15.
+           MOVE    "99999"             TO  SHELLTBL-ARG16.
            MOVE    SHELLTBL            TO  MCPDATA-REC.
            MOVE    "SHELL"             TO  MCP-FUNC.
            MOVE    PATH-SHELL-SHELL    TO  MCP-PATH.
