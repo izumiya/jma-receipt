@@ -515,6 +515,7 @@
            MOVE       ZERO              TO   KH-IDX
            PERFORM    VARYING   IDX2    FROM   1   BY   1
              UNTIL   (IDX2      >       4)
+               MOVE   ZERO               TO        KH-IDX
                IF     RECE02-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
                  IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(1)
                       MOVE    2          TO        KH-IDX
