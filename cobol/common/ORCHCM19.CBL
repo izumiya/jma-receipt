@@ -966,6 +966,10 @@
       *
       *    ³Æ£Ä£Â¸¡º÷
            PERFORM 4001-DB-KENSAKU-SEC
+      *    ËãÌôÊÔ½¸
+           IF      FLG-MAYAKU          =   1
+               PERFORM 2003-MAYAKU-HEN-SEC
+           END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   WRK-PAGE-MAX
