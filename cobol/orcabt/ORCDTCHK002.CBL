@@ -170,6 +170,7 @@
            03  FLG-RJN                                 PIC 9(01).
            03  FLG-PROC                                PIC 9(01).
            03  FLG-PTBYO-HKN                           PIC 9(01).
+           03  FLG-RECEDEN-CHK                         PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -1158,6 +1159,8 @@
       *****************************************************************
        1001-SYS2005-GET-SEC            SECTION.
       *
+           MOVE    ZERO                TO  FLG-RECEDEN-CHK
+      *
            MOVE    ZERO                TO  FLG-SYSKANRI
            INITIALIZE                      SYS-2005-REC
            MOVE    "2005"              TO  SYS-2005-KANRICD
@@ -1175,6 +1178,24 @@
       *
            MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
            PERFORM 910-DBCLOSE-SEC
+      *
+           IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
+               EVALUATE   TRUE
+               WHEN  ( SYS-2005-KKHRECEKBN =   "2" )
+               WHEN  ( SYS-2005-KKHRECEKBN =   "3" )
+               WHEN  ( SYS-2005-SYARECEKBN =   "2" )
+               WHEN  ( SYS-2005-SYARECEKBN =   "3" )
+                   MOVE    1           TO  FLG-RECEDEN-CHK
+               END-EVALUATE
+           ELSE
+               EVALUATE   TRUE
+               WHEN  ( SYS-2005-KKHRECEKBN =   "1" )
+               WHEN  ( SYS-2005-KKHRECEKBN =   "3" )
+               WHEN  ( SYS-2005-SYARECEKBN =   "1" )
+               WHEN  ( SYS-2005-SYARECEKBN =   "3" )
+                   MOVE    1           TO  FLG-RECEDEN-CHK
+               END-EVALUATE
+           END-IF
       *
            .
        1001-SYS2005-GET-EXT.
@@ -2884,8 +2905,7 @@
            END-IF
       *
       *    レセ電の場合、文字列長チェック
-           IF    ( SYS-2005-KKHRECEKBN =   "1" )
-            OR   ( SYS-2005-SYARECEKBN =   "1" )
+           IF    ( FLG-RECEDEN-CHK     =   1 )
       *
                MOVE    SPACE               TO  WRK-KIGONUM-STR
                STRING  PTHKN-KIGO              DELIMITED   BY  SPACE
@@ -3514,8 +3534,7 @@
                END-IF
            END-IF
       *
-           IF    ( SYS-2005-KKHRECEKBN =   "1" )
-            OR   ( SYS-2005-SYARECEKBN =   "1" )
+           IF    ( FLG-RECEDEN-CHK     =   1 )
       *
                MOVE    ZERO            TO  FLG-PTBYO-LEN-ERR
       *
