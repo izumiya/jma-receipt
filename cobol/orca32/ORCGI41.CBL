@@ -41,6 +41,8 @@
       *  01.00.08    NACL-小豆沢  04.03.15  亜急性期入院医療管理料の算定対応追加
       *  01.00.51    NACL-小豆沢  04.03.16  １５歳未満の患者は選定入院対象外
       *  02.00.00    NACL-多々納  04.05.06  仕様統一による改造
+      *  02.00.01    NACL-太田    04.09.09  入院会計検索時にフリーズする
+      *                                     不具合の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -293,6 +295,7 @@
            03  WRK-DAY2-9               PIC 9(02).
            03  WRK-IKKATUDAY            PIC 9(02).
            03  WRK-IKKATUKAI            PIC 9(03).
+           03  WRK-CHK-SRYYM            PIC 9(06).
       *
       *    診療行為テーブル
        01  TBL-SRYCD-HEN-AREA.
@@ -3955,11 +3958,9 @@
            MOVE    ZERO                TO  FLG-SET
            MOVE    SPA-NAI-SRYYM       TO  WRK-SRYYM
       *
-           PERFORM UNTIL  (FLG-SET         =   1   )  OR
-                          (WRK-SRYYM       <   SPA-SRYYM-SML)
-      *        入院会計マスターより対象の判定
-               PERFORM 41018-ZENGETU-COMPUTE-SEC
-           END-PERFORM
+      *    入院会計マスターより対象の判定
+           PERFORM 41018-ZENGETU-COMPUTE-SEC
+      *
       *    対象なし
            IF      FLG-SET             =   ZERO
                MOVE    "0027"              TO  SPA-ERRCD
@@ -4004,39 +4005,51 @@
       *****************************************************************
        41018-ZENGETU-COMPUTE-SEC       SECTION.
       *
-           COMPUTE WRK-SRYYM-MM        =   WRK-SRYYM-MM    -   1
-           IF      WRK-SRYYM-MM         =   ZERO
-               MOVE    12              TO  WRK-SRYYM-MM
-               COMPUTE WRK-SRYYM-YY    =   WRK-SRYYM-YY   -   1
-           END-IF.
-      *
       *    入院会計マスター判定
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPID          TO  NACCT-HOSPID
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
            MOVE    SPA-GMN-PTID        TO  NACCT-PTID
-           MOVE    "00"                TO  NACCT-SRYKA
-           MOVE    WRK-SRYYM           TO  NACCT-SRYYM
+           MOVE    SPA-NAI-SRYYM       TO  NACCT-SRYYM
+           MOVE    "5"                 TO  NACCT-ZAISKBKBN
       *
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC.
            MOVE    "DBSELECT"          TO  MCP-FUNC.
-           MOVE    "NYUINACCT-KEY16"   TO  ORC-DBPATH.
+           MOVE    "NYUINACCT-KEY19"   TO  ORC-DBPATH.
            CALL    "ORCMCPSUB"         USING
                                        MCPAREA
                                        ORCMCPAREA
                                        MCPDATA-REC.
            IF      MCP-RC              =   ZERO
-               MOVE    "NYUINACCT-KEY16"   TO  ORC-DBPATH
+               MOVE    "NYUINACCT-KEY19"   TO  ORC-DBPATH
                PERFORM 900-NYUINACCT-READ-SEC
            ELSE
                INITIALIZE                  NYUINACCT-REC
                MOVE    1               TO  FLG-NYUINACCT
            END-IF
       *
-           IF      FLG-NYUINACCT       =   ZERO
-      *        対象あり
-               MOVE    1                   TO  FLG-SET
+           MOVE    ALL "0"             TO  WRK-CHK-SRYYM
+      *
+           PERFORM UNTIL ( FLG-NYUINACCT   =   1 )
+      *
+               IF    ( SPA-NAI-SRYYM   >   NACCT-SRYYM )
+                   IF    ( WRK-CHK-SRYYM
+                                       <   NACCT-SRYYM )
+                       MOVE    NACCT-SRYYM
+                                       TO  WRK-CHK-SRYYM
+                   END-IF
+               END-IF
+      *
+               MOVE    "NYUINACCT-KEY19"   TO  ORC-DBPATH
+               PERFORM 900-NYUINACCT-READ-SEC
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CHK-SRYYM   NOT =   ALL "0" )
+               MOVE    1               TO  FLG-SET
+               MOVE    WRK-CHK-SRYYM   TO  WRK-SRYYM
            END-IF
+      *
            .
       *
        41018-ZENGETU-COMPUTE-EXT.
@@ -4092,11 +4105,9 @@
            MOVE    ZERO                TO  FLG-SET
            MOVE    SPA-NAI-SRYYM       TO  WRK-SRYYM
       *
-           PERFORM UNTIL  (FLG-SET         =   1   )  OR
-                          (WRK-SRYYM       >   SPA-SRYYM-BIG)
-      *        入院会計マスターより対象の判定
-               PERFORM 41019-JIGETU-COMPUTE-SEC
-           END-PERFORM
+      *    入院会計マスターより対象の判定
+           PERFORM 41019-JIGETU-COMPUTE-SEC
+      *
       *    対象なし
            IF      FLG-SET             =   ZERO
                IF      SPA-NAI-SRYYM       =   SPA-NAI-TAINBI(1:6)
@@ -4154,41 +4165,51 @@
       *****************************************************************
        41019-JIGETU-COMPUTE-SEC        SECTION.
       *
-      *
-           COMPUTE WRK-SRYYM-MM        =   WRK-SRYYM-MM   +   1
-           IF      WRK-SRYYM-MM        >   12
-               MOVE    01              TO  WRK-SRYYM-MM
-               COMPUTE WRK-SRYYM-YY    =   WRK-SRYYM-YY   +   1
-           END-IF.
-      *
       *    入院会計マスター判定
-           INITIALIZE                      NYUINACCT-REC.
+           INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPID          TO  NACCT-HOSPID
-           MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN.
+           MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
            MOVE    SPA-GMN-PTID        TO  NACCT-PTID
-           MOVE    "00"                TO  NACCT-SRYKA
-           MOVE    WRK-SRYYM           TO  NACCT-SRYYM
+           MOVE    "999999"            TO  NACCT-SRYYM
+           MOVE    "1"                 TO  NACCT-ZAISKBKBN
       *
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC.
            MOVE    "DBSELECT"          TO  MCP-FUNC.
-           MOVE    "NYUINACCT-KEY16"   TO  ORC-DBPATH.
+           MOVE    "NYUINACCT-KEY19"   TO  ORC-DBPATH.
            CALL    "ORCMCPSUB"         USING
                                        MCPAREA
                                        ORCMCPAREA
                                        MCPDATA-REC.
            IF      MCP-RC              =   ZERO
-               MOVE    "NYUINACCT-KEY16"   TO  ORC-DBPATH
+               MOVE    "NYUINACCT-KEY19"   TO  ORC-DBPATH
                PERFORM 900-NYUINACCT-READ-SEC
            ELSE
                INITIALIZE                  NYUINACCT-REC
                MOVE    1               TO  FLG-NYUINACCT
            END-IF
       *
-           IF      (FLG-NYUINACCT       =   ZERO)   AND
-                   (NACCT-ZAISKBKBN     =   "1")
-      *        対象あり
-               MOVE    1                   TO  FLG-SET
+           MOVE    ALL "9"             TO  WRK-CHK-SRYYM
+      *
+           PERFORM UNTIL ( FLG-NYUINACCT   =   1 )
+      *
+               IF    ( SPA-NAI-SRYYM   <   NACCT-SRYYM )
+                   IF    ( WRK-CHK-SRYYM
+                                       >   NACCT-SRYYM )
+                       MOVE    NACCT-SRYYM
+                                       TO  WRK-CHK-SRYYM
+                   END-IF
+               END-IF
+      *
+               MOVE    "NYUINACCT-KEY19"   TO  ORC-DBPATH
+               PERFORM 900-NYUINACCT-READ-SEC
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CHK-SRYYM   NOT =   ALL "9" )
+               MOVE    1               TO  FLG-SET
+               MOVE    WRK-CHK-SRYYM   TO  WRK-SRYYM
            END-IF
+      *
            .
       *
        41019-JIGETU-COMPUTE-EXT.
