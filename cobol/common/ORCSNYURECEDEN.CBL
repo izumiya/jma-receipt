@@ -47,6 +47,7 @@
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-NYUINACT                PIC 9(01).
            03  FLG-SRYACCT                 PIC 9(01).
+           03  FLG-SRYACT                  PIC 9(01).
            03  FLG-TENSU                   PIC 9(01).
            03  FLG-PTINF                   PIC 9(01).
            03  FLG-SYSKANRI                PIC 9(01).
@@ -922,13 +923,39 @@
                        END-PERFORM
                      ELSE
       *                ¤½¤ÎÂ¾Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+      *                ¿ÇÎÅ²ñ·×¤«¤é¿ÇÎÅ¹Ô°Ù¤ò¸¡º÷¤·¡¢Æþ±¡ÎÁ²Ã»»¤Î¿ÇÎÅ
+      *                ¥³¡¼¥É¤òÆÃÄê¤¹¤ë
+                       IF         ACCT-MEISAISU    =      1
+                             CONTINUE
+                       ELSE
+                          INITIALIZE      SRYACT-REC
+                          MOVE    ACCT-HOSPID    TO   SRY-HOSPID
+                          MOVE    ACCT-NYUGAIKBN TO   SRY-NYUGAIKBN
+                          MOVE    ACCT-PTID      TO   SRY-PTID
+                          MOVE    ACCT-SRYKA     TO   SRY-SRYKA
+                          MOVE    ACCT-SRYYM     TO   SRY-SRYYM
+                          MOVE    ACCT-ZAINUM    TO   SRY-ZAINUM
+                          MOVE    1              TO   SRY-RENNUM
+                          MOVE    "SRYACT-KEY"   TO   ORC-DBPATH
+                          PERFORM 910-SRYACT-SELECT-SEC
+                          IF      FLG-SRYACT     =    ZERO
+                              MOVE     "SRYACT-KEY"   TO   ORC-DBPATH
+                              PERFORM   910-SRYACT-READ-SEC
+                              IF  FLG-SRYACT    =    ZERO
+                                  MOVE  SRY-SRYCD(1)   TO  
+                                                  ACCT-SRYCDTOTAL(6:9)   
+                              END-IF
+                          END-IF
+      *                   ¿ÇÎÅ¹Ô°Ù¥¯¥í¡¼¥º
+                          MOVE    "SRYACT-KEY"   TO  ORC-DBPATH
+                          PERFORM   910-DB-CLOSE-SEC
+                       END-IF
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
                            IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
                            AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
-      *                         Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
                                 WHEN  CONS-ETCNYUIN-KSN(1)
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-ETCNYUIN-KSN(1 IDX1)
@@ -2713,6 +2740,49 @@
       *
            .
        910-SRYACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼¸¡º÷
+      *****************************************************************
+       910-SRYACT-SELECT-SEC        SECTION.
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-SRYACT
+           ELSE
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       910-SRYACT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼ÆÉ¹þ
+      *****************************************************************
+       910-SRYACT-READ-SEC        SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACT-REC
+               MOVE    ZERO            TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       910-SRYACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
