@@ -37,7 +37,7 @@
       *  01.00.03    NACL-藤原    04/10/27  注加算による加算項目の記載
       *                                     （手術・麻酔・検査）
       *  01.00.04    NACL-藤原    04/11/16  特定器材レコードのフィルムと
-      *                                     器材の点数をまとめて記載
+      *                                     器材の点数・回数を別々に記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -358,6 +358,8 @@
                                            OCCURS  3.
                05  WRK-SEHFLG          PIC 9(01).
            03  WRK-SRYCD1-MAX          PIC 9(03).           
+           03  WRK-SRYCD71-MAX         PIC 9(03).           
+           03  WRK-SRYCD72-MAX         PIC 9(03).           
            03  WRK-KOKUJISKBKBN1-KOUI-TEN
                                        PIC 9(09)V9(02).     
       *    日付変換用
@@ -469,6 +471,8 @@
                        09  TBL-ZAIW-YUKOKETA        PIC  9(02).
       *                漢字名称
                        09  TBL-ZAIW-NAME            PIC  X(200).
+      *            データ識別(１：フィルム ２：特定機材)
+                   07  TBL-ZAIW-DATSKB              PIC 9(01).
       *
       *    診療行為・コメント用テーブル
        01  TBL-KOUI-AREA.
@@ -2523,6 +2527,8 @@
                                            FLG-KENSA-KASAN
                                            FLG-KENSA-TEIGEN
                                            WRK-SRYCD1-MAX
+                                           WRK-SRYCD71-MAX
+                                           WRK-SRYCD72-MAX
                                            WRK-KOKUJISKBKBN1-KOUI-TEN
       *                                     
            MOVE    RECE641-SRYKBN      TO  WRK-SRYKBN
@@ -2956,6 +2962,24 @@
                MOVE    RECE65-NAMEINF   (IDX)  TO
                                    TBL-ZAIW-NAMEINF    (2 WRK-TBLMAX7)
       *
+               IF      RECE65-DATAKBN (IDX)
+                                          =   "3"
+                   MOVE    1                  TO
+                                   TBL-ZAIW-DATSKB     (2 WRK-TBLMAX7)
+                   MOVE    WRK-TBLMAX7        TO  WRK-SRYCD71-MAX 
+               ELSE
+                   IF      RECE65-SRYCD (IDX)
+                                              =   "799990070"
+                       MOVE    1                  TO
+                                   TBL-ZAIW-DATSKB     (2 WRK-TBLMAX7)
+                       MOVE    WRK-TBLMAX7        TO  WRK-SRYCD71-MAX 
+                   ELSE
+                       MOVE    2                  TO
+                                   TBL-ZAIW-DATSKB     (2 WRK-TBLMAX7)
+                       MOVE    WRK-TBLMAX7        TO  WRK-SRYCD72-MAX 
+                   END-IF
+               END-IF
+      *
                INITIALIZE                  TNS-TENSU-REC
                IF      RECE65-SRYCD (IDX)  =   "777770000"
                    MOVE    WRK-KIZAI-SRYCD     TO  TNS-SRYCD
@@ -3357,10 +3381,15 @@
            END-PERFORM            
       *
       *    特定器材データの編集                 
-           PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       WRK-TBLMAX7
-               PERFORM 200723-KIZAI-HENSYU-SEC
-           END-PERFORM            
+           PERFORM VARYING IDXX    FROM    1   BY  1
+                   UNTIL   IDXX    >       2
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       WRK-TBLMAX7
+                   IF      IDXX        =   TBL-ZAIW-DATSKB (2 IDX)
+                       PERFORM 200723-KIZAI-HENSYU-SEC
+                   END-IF
+               END-PERFORM
+           END-PERFORM
            .
        20072-ZAI-HENSYU-EXT.
            EXIT.
@@ -3485,8 +3514,9 @@
            MOVE    "TO,"               TO  WRK-REC
            MOVE    3                   TO  WRK-REC-LENGTH
       *    診療識別
-           IF      IDX                 =   1
-           AND     WRK-SRYKBN      NOT =   SPACE     
+      *****IF      IDX                 =   1
+      *****AND     WRK-SRYKBN      NOT =   SPACE     
+           IF      WRK-SRYKBN      NOT =   SPACE     
                MOVE    WRK-SRYKBN          TO  WRK-DATA
                MOVE    2                   TO  WRK-NAGASA
                MOVE    SPACE               TO  WRK-SRYKBN
@@ -3510,7 +3540,7 @@
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
       *    点数 
-           IF      IDX                     =   WRK-TBLMAX7
+      *****IF      IDX                     =   WRK-TBLMAX7
       *********IF     ( RECE641-SRYKBN    =   "70" )
       *********AND    ( TBL-ZAIW-DATAKBN (2 IDX)
       *********                           =   "3"  )
@@ -3532,8 +3562,22 @@
       *********        END-IF
       *********    END-IF
       *********END-IF
-               COMPUTE WRK-TENSU   =   RECE641-SYUTEN2 +   
-                                       RECE641-KIZAITEN
+           IF    ( IDXX                =   1               )
+           AND   ( IDX                 =   WRK-SRYCD71-MAX )
+               MOVE    RECE641-SYUTEN2     TO  WRK-TENSU
+               IF      WRK-TENSU       >   ZERO
+                   MOVE    WRK-TENSU           TO  WRK-NUM
+                   MOVE    7                   TO  WRK-NAGASA
+               END-IF
+           END-IF
+           IF    ( IDXX                =   2               )
+           AND   ( IDX                 =   WRK-SRYCD72-MAX )
+               IF      RECE641-SRYKBN      =   "70"
+                   MOVE    RECE641-KIZAITEN    TO  WRK-TENSU
+               ELSE
+                   COMPUTE WRK-TENSU   =   RECE641-KIZAITEN    -
+                                           RECE641-SYUTEN2
+               END-IF
                IF      WRK-TENSU       >   ZERO
                    MOVE    WRK-TENSU           TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
@@ -3541,7 +3585,16 @@
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF      IDX                     =   WRK-TBLMAX7
+      *****IF      IDX                     =   WRK-TBLMAX7
+           IF    ( IDXX                =   1               )
+           AND   ( IDX                 =   WRK-SRYCD71-MAX )
+               IF      RECE641-ZAIKAISU    >   ZERO
+                   MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
+                   MOVE    3                   TO  WRK-NAGASA
+               END-IF
+           END-IF        
+           IF    ( IDXX                =   2               )
+           AND   ( IDX                 =   WRK-SRYCD72-MAX )
                IF      RECE641-ZAIKAISU    >   ZERO
                    MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
