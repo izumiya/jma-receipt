@@ -173,6 +173,8 @@
            03  FLG-DAY                 PIC 9(01).
            03  WRK-H-DAY               PIC 9(02).
            03  WRK-H-SEL               PIC X(01).
+      *    末日
+           03  WRK-MATU                    PIC 9(02).
       *
       *    継続の時、自動発生のチェック
        01  WRK-CONTCHK-TBL.
@@ -223,6 +225,9 @@
       *    サブプロ用　領域
       *****************************************************************
       *
+      *   日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
       *    診療行為算定編集パラメタ
            COPY    "CPORCSC90.INC".
@@ -1013,7 +1018,8 @@
                IF      WRK-COM-NYUINDAY (IDX IDN1) >   ZERO
                    MOVE    IDN1                TO  IDN4
                    PERFORM VARYING     IDN3    FROM    1   BY  1
-                           UNTIL       IDN3    >   WRK-KAISU
+                           UNTIL      (IDN3    >   WRK-KAISU )  OR
+                                      (IDN4    >   31        )
                        IF      FLG-MADOKU-ARI      =   1
                            MOVE    2               TO  TBL-NYUINDAY
                                                               (IDN4)
@@ -1519,6 +1525,16 @@
       *****************************************************************
        30021-NYUIN-INNAI-SYORI-SEC         SECTION.
       *
+      *    診療年月の末日算定
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SPA-SRYYMD(1:6)     TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING
+                                           STS-AREA-DAY
+                                           LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI(7:2)    TO  WRK-MATU
+      *
       *    調剤料（入院）加算
            IF     (FLG-NAIYAK          =   1    )  OR
                   (FLG-TONPUK          =   1    )  OR
@@ -1595,6 +1611,7 @@
            PERFORM VARYING     IDN1    FROM    1   BY  1
                    UNTIL       IDN1    >   32
                IF     (IDN1                =   32  )  OR
+                      (IDN1                >   WRK-MATU)  OR
                       (TBL-NYUINDAY(IDN1)  =   ZERO)
                    IF      WRK-H-DAY       NOT =   ZERO
                        IF      WRK-H-SEL   NOT =   SPACE
@@ -1697,7 +1714,12 @@
                                                   (02 IDXS IDN2)(IDN3:3)
                ADD     3                   TO  IDN3
            END-PERFORM
-      *
+      * 
+      *TEST
+           DISPLAY "C20 SRYCD:" LNK-ORCSC-SRYCD  (02 IDXS)
+           DISPLAY "C20 LNK-ORCSC-INPUTCD:" LNK-ORCSC-INPUTCD
+                                        (02 IDXS IDN2)
+      *TEST
            .
        300212-NISUU-SET-EXT.
            EXIT.
