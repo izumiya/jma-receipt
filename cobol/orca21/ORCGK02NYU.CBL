@@ -9806,6 +9806,7 @@
            WRITE                       PARA-REC
       *
       *    £Ë£°£²£Ó£Ð£Á¤ò¥Ñ¥é¥á¥¿¤Ø½ÐÎÏ
+           MOVE    SPACE               TO  SPA-K021GMN-AREA
            MOVE    SPACE               TO  PARA-REC
            MOVE    "K02SPA"            TO  PARA-FILEMEI
            MOVE    1                   TO  PARA-EDANUM
