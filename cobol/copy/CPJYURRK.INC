@@ -23,9 +23,6 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    MCC-多々納   02/04/10  労災追加
       *  01.00.02    NACL-多々納  02/10/21  入外区分追加
-      *  01.00.03    NACL-小豆沢  04/07/01  最終区分削除
-      *                                     まとめ入力伝票番号追加
-      *                                     まとめ入力連番追加
       ************************************************************
       *01  JYURRK-REC.
       *受診履歴
@@ -48,6 +45,8 @@
                05  JYURRK-KAIKEI-RENNUM    PIC  9(03).
       *  枝番（１診療１５剤以上の時に１からの連番）
                05  JYURRK-EDANUM           PIC  9(01).
+      *  最終区分
+           03  JYURRK-LASTKBN              PIC X(01).
       *ドクター
            03  JYURRK-DRCD                 PIC X(05).
       *保険組合番号
@@ -56,10 +55,6 @@
            03  JYURRK-HKNKBN               PIC X(01).
       *伝票番号
            03  JYURRK-DENPNUM              PIC 9(07).
-      *まとめ入力伝票番号
-           03  JYURRK-GRP-DENPNUM          PIC 9(07).
-      *まとめ入力連番
-           03  JYURRK-GRP-RENNUM           PIC 9(02).
       *診療区分
            03  JYURRK-SRYKBN-G.
       *  診療区分１
