@@ -457,11 +457,18 @@
            END-PERFORM
       *
       *TEST
+      *    前回の選択番号は反映させない
+           MOVE    ZERO                TO  SPA-MAE24-FTNSELNUM
+           INITIALIZE                  SPA-GMN24-FTN-AREA
+           INITIALIZE                  SPA-GMN24-FTN-AREA2
       *    公費負担の最初を選択とする
            IF      (SPA-GMN24-FTNSELNUM    =   ZERO )  AND
                    (SPA-MAE24-FTNSELNUM    =   ZERO )  AND
                    (SPA-FTN1-MAX           >   ZERO )
                PERFORM 3102-KOHFTN-HEN-SEC
+           END-IF
+           IF       SPA-GMN24-FTNSELNUM    =   ZERO
+               INITIALIZE                  SPA-GMN24-KOHFTNTBL2
            END-IF
       *TEST
            .
