@@ -1700,6 +1700,7 @@
            IF   ( RECE44-SRYKBN               = "31"  )
            AND  ( TBL-ZAIW-NAME (3 1)         = SPACE )
            AND  ( TBL-ZAIW-NAME (3 WRK-WIDX2) = SPACE )
+           AND  ( WRK-WIDX1                   = 3     )
            AND  ( WRK-WIDX2               NOT = 1     )
                    MOVE    1                 TO  FLG-NOPRT
            END-IF
