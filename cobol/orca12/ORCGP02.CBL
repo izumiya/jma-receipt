@@ -51,6 +51,7 @@
       *  02.00.08    NACL-多々納  03/03/24  公費負担額追加
       *  02.00.07    NACL-多々納  03/04/22  保険組合変更時メッセージ追加
       *  02.00.08    NACL-多々納  03/07/08  保険者異動日チェック追加
+      *  02.00.09    NACL-多々納  04/04/01  患者削除のＤＢ追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -347,6 +348,17 @@
       *    公費負担額
        01  PTKOHFTN-REC.
            COPY    "CPPTKOHFTN.INC".
+      *
+      *    日別収納マスタ
+       01  SYUDAY-REC.
+           COPY    "CPSYUDAY.INC".
+      *
+      *    レセプト電算マスター 
+           COPY    "CPRECEDEN.INC".
+      *
+      *    手術歴レセプトコメントマスター
+       01  OPECOM-REC.
+           COPY    "CPOPECOM.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1937,25 +1949,52 @@
                                         ORCMCPAREA
                                         MCPDATA-REC
       *
-      *    診療会計
+      *    診療会計（外来）
            INITIALIZE                      SRYACCT-REC
            MOVE    SPA-HOSPID          TO  ACCT-HOSPID
-           MOVE    SPA-GMN-PTID            TO  ACCT-PTID
+           MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+           MOVE    "2"                 TO  ACCT-NYUGAIKBN
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
-           MOVE    "SRYACCT-DEL1"      TO  ORC-DBPATH
+           MOVE    "SRYACCT-DEL2"      TO  ORC-DBPATH
            CALL    "ORCMCPSUB"          USING
                                         MCPAREA
                                         ORCMCPAREA
                                         MCPDATA-REC
       *
-      *    診療行為
+      *    診療会計（入院）
+           INITIALIZE                      SRYACCT-REC
+           MOVE    SPA-HOSPID          TO  ACCT-HOSPID
+           MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+           MOVE    "1"                 TO  ACCT-NYUGAIKBN
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "SRYACCT-DEL2"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      *
+      *    診療行為（入院）
            INITIALIZE                      SRYACT-REC
            MOVE    SPA-HOSPID          TO  SRY-HOSPID
            MOVE    SPA-GMN-PTID        TO  SRY-PTID
+           MOVE    "1"                 TO  SRY-NYUGAIKBN
            MOVE    SRYACT-REC          TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
-           MOVE    "SRYACT-DEL1"       TO  ORC-DBPATH
+           MOVE    "SRYACT-DEL3"       TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      *    診療行為（外来）
+           INITIALIZE                      SRYACT-REC
+           MOVE    SPA-HOSPID          TO  SRY-HOSPID
+           MOVE    SPA-GMN-PTID        TO  SRY-PTID
+           MOVE    "2"                 TO  SRY-NYUGAIKBN
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "SRYACT-DEL3"       TO  ORC-DBPATH
            CALL    "ORCMCPSUB"          USING
                                         MCPAREA
                                         ORCMCPAREA
@@ -1973,7 +2012,7 @@
                                         ORCMCPAREA
                                         MCPDATA-REC
       *
-      *    収納
+      *    収納明細
            INITIALIZE                      SYUMEI-REC
            MOVE    SPA-HOSPID          TO  SMEI-HOSPID
            MOVE    SPA-GMN-PTID        TO  SMEI-PTID
@@ -2244,6 +2283,55 @@
            MOVE    PTKOHFTN-REC        TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "PTKOHFTN-DEL1"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+      *
+      *    日別収納マスタ（入院）
+           INITIALIZE                      SYUDAY-REC
+           MOVE    SPA-HOSPID          TO  SDAY-HOSPID
+           MOVE    SPA-GMN-PTID        TO  SDAY-PTID
+           MOVE    "1"                 TO  SDAY-NYUGAIKBN
+           MOVE    SYUDAY-REC          TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "SYUDAY-DEL2"       TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+      *    日別収納マスタ（外来）
+           INITIALIZE                      SYUDAY-REC
+           MOVE    SPA-HOSPID          TO  SDAY-HOSPID
+           MOVE    SPA-GMN-PTID        TO  SDAY-PTID
+           MOVE    "2"                 TO  SDAY-NYUGAIKBN
+           MOVE    SYUDAY-REC          TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "SYUDAY-DEL2"       TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+      *
+      *    手術歴レセプトコメントマスタ
+           INITIALIZE                      OPECOM-REC
+           MOVE    SPA-HOSPID          TO  OPECOM-HOSPID
+           MOVE    SPA-GMN-PTID        TO  OPECOM-PTID
+           MOVE    OPECOM-REC          TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "OPECOM-DEL2"       TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+      *
+      *    レセプト電算マスタ
+           INITIALIZE                      RECEDEN-REC
+           MOVE    SPA-HOSPID          TO  RECEDEN-HOSPID
+           MOVE    SPA-GMN-PTID        TO  RECEDEN-PTID
+           MOVE    RECEDEN-REC         TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "RECEDEN-DEL3"      TO  ORC-DBPATH
            CALL    "ORCMCPSUB"         USING
                                        MCPAREA
                                        ORCMCPAREA
@@ -3204,6 +3292,11 @@
                WHEN    "0083"
                    MOVE    "負担者番号検証番号エラーです。"
                                                TO  SPA-ERRMSG
+               WHEN    "K083"
+                   MOVE    "警告！特定疾患の負担者番号検証番号エラー"
+                                               TO  SPA-ERRMSG
+                   MOVE    "です。"
+                                               TO  SPA-ERRMSG(41:)
                WHEN    "0084"
                    MOVE    "受給者番号検証番号エラーです。"
                                                TO  SPA-ERRMSG

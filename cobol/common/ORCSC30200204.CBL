@@ -424,6 +424,7 @@
                            END-IF
                        END-IF
                        IF      WRK-GMN-INPUTCD(IDX-Z)  =   ".312"
+                                                       OR  ".334"
                            IF     SPA-NYUGAIKBN        =   "1"
                                MOVE    "9028"          TO  WRK-ERRCD
                                MOVE    "1"             TO  WRK-COM-CUR

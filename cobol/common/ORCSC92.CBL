@@ -946,87 +946,6 @@
                    END-IF
            END-EVALUATE
       *
-      *     医療機関情報
-      ***  MOVE    SPACE               TO  SYS-1001-REC
-      *    INITIALIZE                  SYS-1001-REC
-      *    MOVE    "1001"              TO  SYS-1001-KANRICD
-      ***  MOVE    "1"                 TO  SYS-1001-KBNCD
-      *    MOVE    "*"                 TO  SYS-1001-KBNCD
-      *    MOVE    ZERO                TO  SYS-1001-STYUKYMD
-      *    MOVE    ALL "9"             TO  SYS-1001-EDYUKYMD
-      *    システム管理検索
-      *    MOVE    SYS-1001-REC        TO  MCPDATA-REC
-      *    MOVE    "DBSELECT"          TO  MCP-FUNC
-      *    MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
-      *    MOVE    SPA-SRYYMD          TO  ORC-DBYMD
-      *    CALL    "ORCMCPSUB"          USING
-      *                                 MCPAREA
-      *                                 ORCMCPAREA
-      *                                 MCPDATA-REC
-      *    IF      MCP-RC              =   ZERO
-      *        MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
-      *        PERFORM 900-KANRIMST-READ-SEC
-      *    ELSE
-      *        MOVE    1               TO  FLG-SYSKANRI
-      *    END-IF
-      *    IF      FLG-SYSKANRI        =   ZERO
-      *        MOVE    MCPDATA-REC         TO  SYS-1001-REC
-      *    ELSE
-      *        INITIALIZE                  SYS-1001-REC
-      *    END-IF
-      *
-      *    カーソルクロース
-      *    MOVE    "DBCLOSE"           TO  MCP-FUNC
-      *    MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
-      *    CALL    "MCPDBSUB"          USING
-      *                                MCPAREA
-      *                                MCPDATA-REC
-      *
-      *    病床数チェック
-      *    EVALUATE    TNS-BYOSYOKBN
-      *        WHEN    1
-      *            IF      SYS-1001-BEDSU      >=  1  AND  <=  99
-      *                CONTINUE
-      *            ELSE
-      *****************MOVE    "0025"          TO  LNK-SC92-ERRCD6
-      *                MOVE    "0075"          TO  LNK-SC92-ERRCD6
-      *            END-IF
-      *        WHEN    2
-      *            IF      SYS-1001-BEDSU      >=  100 AND  <=  199
-      *                CONTINUE
-      *            ELSE
-      *****************MOVE    "0025"          TO  LNK-SC92-ERRCD6
-      *                MOVE    "0075"          TO  LNK-SC92-ERRCD6
-      *            END-IF
-      *        WHEN    3
-      *            IF      SYS-1001-BEDSU      <   200
-      *                CONTINUE
-      *            ELSE
-      *****************MOVE    "0025"          TO  LNK-SC92-ERRCD6
-      *                MOVE    "0075"          TO  LNK-SC92-ERRCD6
-      *            END-IF
-      *        WHEN    4
-      *            IF      SYS-1001-BEDSU      >=  200
-      *                CONTINUE
-      *            ELSE
-      *****************MOVE    "0025"          TO  LNK-SC92-ERRCD6
-      *                MOVE    "0075"          TO  LNK-SC92-ERRCD6
-      *            END-IF
-      *        一般病床数判定
-      *        WHEN    5
-      *            IF      SYS-1001-BEDSUIPN   >=  0  AND  <=  199
-      *                CONTINUE
-      *            ELSE
-      *                MOVE    "0075"          TO  LNK-SC92-ERRCD6
-      *            END-IF
-      *        WHEN    6
-      *            IF      SYS-1001-BEDSUIPN   >=  200
-      *                CONTINUE
-      *            ELSE
-      *                MOVE    "0075"          TO  LNK-SC92-ERRCD6
-      *            END-IF
-      **** END-EVALUATE
-      *
            .
        2004-BYOSYOKBN-CHK-EXT.
            EXIT.
@@ -1163,70 +1082,6 @@
       *
            MOVE    HZN-SANTEI-REC      TO  SANTEI-REC
       *
-      *
-      *
-      *    算定履歴検索
-      *    INITIALIZE                  SANTEI-REC
-      *    MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
-      *    MOVE    SPA-PTID            TO  SANTEI-PTID
-      *    MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
-      *    MOVE    CHK-CD (IDX-C)      TO  SANTEI-SRYCD
-      *    EVALUATE    TNS-SANTEIRRKKBN
-      *        WHEN    1
-      *            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-      *            MOVE    ZERO                TO  SANTEI-SRYKA
-      *        WHEN    2
-      *            MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
-      *            MOVE    ZERO                TO  SANTEI-SRYKA
-      *        WHEN    3
-      *            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-      *            MOVE    SPA-SRYKA           TO  SANTEI-SRYKA
-      *        WHEN    4
-      *            MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
-      *            MOVE    SPA-SRYKA           TO  SANTEI-SRYKA
-      *    END-EVALUATE
-      *
-      *    IF     (FLG-HKNSAN          =   1   )  AND
-      *           (SPA-HKNKBN      NOT =   ZERO)
-      *        MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
-      *    ELSE
-      *        MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
-      *    END-IF
-      *
-      *    IF      WRK-RSI-KBN         =   SPACE
-      *        主キー
-      *        MOVE    "SANTEI-KEY"        TO  WRK-PATH
-      *    ELSE
-      *        労災毎の算定
-      *        MOVE    "SANTEI-KEY3"       TO  WRK-PATH
-      *    END-IF
-      *
-      *
-      *    MOVE    SANTEI-REC          TO  MCPDATA-REC
-      *    MOVE    "DBSELECT"          TO  MCP-FUNC
-      *****MOVE    "SANTEI-KEY"        TO  ORC-DBPATH
-      *    MOVE    WRK-PATH            TO  ORC-DBPATH
-      *    CALL    "ORCMCPSUB"          USING
-      *                                 MCPAREA
-      *                                 ORCMCPAREA
-      *                                 MCPDATA-REC
-      *    IF      MCP-RC              =   ZERO
-      *********MOVE    "SANTEI-KEY"        TO  ORC-DBPATH
-      *        MOVE    WRK-PATH            TO  ORC-DBPATH
-      *        PERFORM 920-SANTEI-READ-SEC
-      *    ELSE
-      *        MOVE    1                   TO  FLG-SANTEI
-      *    END-IF
-      *
-      *    MOVE    "DBCLOSE"           TO  MCP-FUNC
-      *    MOVE    "SANTEI-KEY"        TO  ORC-DBPATH
-      *    CALL    "MCPDBSUB"          USING
-      *                                MCPAREA
-      *                                MCPDATA-REC
-      *
-      *    IF      FLG-SANTEI          =   1
-      *        INITIALIZE              SANTEI-REC
-      *****END-IF
       *
       *    算定歴の回数をチェックする
            MOVE    SANTEI-MSANTEICNT   TO  WRK-SANTEI-CNT
@@ -1369,7 +1224,9 @@
                                        OR  "140029610"
                                        OR  "140040310"
                                        OR  "140002210"
-                                       OR  "140002310")  OR
+                                       OR  "140002310"
+      *            介達牽引
+                                       OR  "140048010")  OR
                   (WRK-CHK-CD          =   "180707410"
                                        OR  "180022710"
                                        OR  "180022810"
@@ -1377,7 +1234,9 @@
                                        OR  "140029610"
                                        OR  "140040310"
                                        OR  "140002210"
-                                       OR  "140002310" )
+                                       OR  "140002310" 
+      *            介達牽引
+                                       OR  "140048010") 
                CONTINUE
            ELSE
                GO      TO      20053-MANSEI-CHK-EXT
@@ -1441,7 +1300,7 @@
                                        OR  "140040310"
                                        OR  "140002210"
                                        OR  "140002310"
-                                       OR  "114005810")
+                                       OR  "114005810") 
                CONTINUE
            ELSE
                GO      TO      20054-NETAKIRI-CHK-EXT
@@ -1458,7 +1317,7 @@
            IF     (CHK-CD (IDX-C)      =   "140029610"
                                        OR  "140040310"
                                        OR  "140002210"
-                                       OR  "140002310" )
+                                       OR  "140002310")
                CONTINUE
            ELSE
                GO      TO      20054-NETAKIRI-CHK-EXT
