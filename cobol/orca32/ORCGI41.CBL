@@ -92,6 +92,7 @@
            03  FLG-DBRC            PIC 9(01).
            03  FLG-NYUKSN          PIC 9(01).
            03  FLG-SST             PIC 9(01).
+           03  FLG-NYUINKHNRYO     PIC 9(01).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -114,6 +115,8 @@
            03  IDY                 PIC 9(04).
            03  IDG                 PIC 9(04).
            03  IDH                 PIC 9(04).
+           03  IDH2                PIC 9(04).
+           03  IDH3                PIC 9(04).
            03  IDK                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  IDZ2                PIC 9(04).
@@ -130,6 +133,9 @@
            03  IDW8                PIC 9(04).
            03  IDW9                PIC 9(04).
            03  IDV                 PIC 9(04).
+      *    ÅÀ¿ô¥Þ¥¹¥¿Í½Ìó¥³¡¼¥ÉÎÎ°è
+       01  WRK-YOYAKU.
+           03  W-YOYAKU            PIC X(09)   VALUE   "099999916".
       *    °ì»þÎÎ°è
        01  WRK-AREA.
            03  WRK-SRYYMD.
@@ -247,11 +253,6 @@
            03  WRK-JIDMSG.
                05  WRK-JIDMSG1     PIC X(40).
                05  WRK-JIDMSG2     PIC X(40).
-      *    È¯À¸Ç¯·îÆü
-           03  WRK-HASSYOYMD.
-               05  WRK-HAS-YY      PIC 9(04).
-               05  WRK-HAS-MM      PIC 9(02).
-               05  WRK-HAS-DD      PIC 9(02).
       *
       *    ´µ¼ÔÇ¯Îð»»½ÐÍÑ¥¨¥ê¥¢
        01  WRK-NENREI-AREA.
@@ -1861,10 +1862,16 @@
                                                         (SPA-I41-MAX-41)
                MOVE    COMB-TEKEDYMD       TO  SPA-I41-TTEKEDYMD-41
                                                         (SPA-I41-MAX-41)
+               MOVE    COMB-HKNNUM         TO  SPA-I41-HKNNUM-41
+                                                        (SPA-I41-MAX-41)
       *        ÊÝ¸±ÁÈ¹ç¤»Ì¾¾Î
                MOVE    COMB-HKNCOMBINUM    TO  WRK-HKNCOMBI
                PERFORM 5101-HKNCOMBI-SET-SEC
                MOVE    WRK-HKNCOMBIMEI     TO  SPA-I41-TKUMI-41
+                                                        (SPA-I41-MAX-41)
+               MOVE    PTRSI-SISIKBN       TO  SPA-I41-SISIKBN-41
+                                                        (SPA-I41-MAX-41)
+               MOVE    PTRSI-HKNKBN        TO  SPA-I41-HKNKBN-41
                                                         (SPA-I41-MAX-41)
              END-IF
       *
@@ -1948,10 +1955,11 @@
                            (SPA-WRK-CHK-KBN (IDY)   NOT =  ALL SPACE)
                            MOVE    SPA-GMN-TDAY-41 (IDX IDY)(1:2)
                                                  TO  I41-TDAY (IDX IDY)
-                           IF (SPA-GMN-TZAISKBKBN-41 (IDX)
-                                                            = "1")  AND
+                           IF (SPA-GMN-TZAISKBKBN-41 (IDX)  = "1")  AND
+                              (SPA-GMN-TSRYCD-41 (IDX)
+                                                   NOT = W-YOYAKU)  AND
                               (SPA-GMN-TDAY-41 (IDX IDY)
-                                                        NOT = SPACE)
+                                                   NOT = SPACE)
                                MOVE    SPA-GMN-TDAY-41 (IDX IDY)
                                                  TO  WRK-CHK-DAY (IDY)
                            END-IF
@@ -2667,9 +2675,8 @@
                MOVE    "0024"          TO  SPA-ERRCD
                PERFORM VARYING     IDY     FROM    1   BY  1
                        UNTIL       IDY             >   SPA-SAGAKU-MAX-41
-                   IF   (SPA-WRK-CHK-SIKIBETU (IDX)   =  SPACE)  AND
-                        (SPA-GMN-DAY-41 (IDX)(2:2)
-                                      =  SPA-GMN-SAGAKUNO-41 (IDY)(1:2))
+                   IF    SPA-GMN-DAY-41 (IDX)(2:2)
+                                      =  SPA-GMN-SAGAKUNO-41 (IDY)(1:2)
                        MOVE    SPACE           TO  SPA-ERRCD
                        MOVE    99              TO  IDY
                    END-IF
@@ -2727,10 +2734,19 @@
                MOVE    WRK-GMN-DAY-G   TO  SPA-GMN-DAY-G-41
                GO      TO      41012-DAY-CHK-EXT
            END-IF.
-           IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)      =  "1")  AND
-                 (SPA-GMN-DAY-41 (IDX)          NOT = ZERO)  AND
-                 (WRK-GMN-DAY (IDX)                 = ZERO)  AND
+           IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)      =  "1")      AND
+                 (SPA-GMN-TSRYCD-41 (IDX2)      NOT = W-YOYAKU)  AND
+                 (SPA-GMN-DAY-41 (IDX)          NOT = ZERO)      AND
+                 (WRK-GMN-DAY (IDX)                 = ZERO)      AND
                  (WRK-CHK-DAY (IDX)             NOT = ZERO)
+               MOVE    "0024"          TO  SPA-ERRCD
+               MOVE    WRK-GMN-DAY-G   TO  SPA-GMN-DAY-G-41
+               GO      TO      41012-DAY-CHK-EXT
+           END-IF.
+           IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)      =  "1")      AND
+                 (SPA-GMN-TSRYCD-41 (IDX2)          = W-YOYAKU)  AND
+                 (SPA-GMN-DAY-41 (IDX)          NOT = ZERO)      AND
+                 (WRK-CHK-DAY (IDX)                 = ZERO)
                MOVE    "0024"          TO  SPA-ERRCD
                MOVE    WRK-GMN-DAY-G   TO  SPA-GMN-DAY-G-41
                GO      TO      41012-DAY-CHK-EXT
@@ -2905,6 +2921,22 @@
                MOVE    "0024"              TO  SPA-ERRCD
                GO      TO      41017-KOMENTO-CHK-EXT
            END-IF.
+           INITIALIZE                      ORCSNUMAREA.
+           MOVE    I41-NUM             TO  SNUM-INX.
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA.
+           IF      SNUM-RC         NOT =   ZERO
+               MOVE    03                  TO  SPA-GMN-CUR-41
+               MOVE    "0022"              TO  SPA-ERRCD
+               GO      TO      41017-KOMENTO-CHK-EXT
+           END-IF.
+           MOVE    SNUM-OUTNUM         TO  IDX3.
+           IF      IDX3         =   ZERO
+               MOVE    03                  TO  SPA-GMN-CUR-41
+               MOVE    "0013"              TO  SPA-ERRCD
+               GO      TO      41017-KOMENTO-CHK-EXT
+           END-IF.
+           MOVE    SPA-NAI-TBANGO-41 (SPA-GMN-NUM-41)   TO  IDX2.
            IF     SPA-WRK-CHK-KBN (SPA-WRK-KOMENTO-S)   NOT =  "1"
                MOVE    03                  TO  SPA-GMN-CUR-41
                MOVE    "0024"              TO  SPA-ERRCD
@@ -2923,22 +2955,6 @@
                    GO      TO      41017-KOMENTO-CHK-EXT
                END-IF
            END-IF.
-           INITIALIZE                      ORCSNUMAREA.
-           MOVE    I41-NUM             TO  SNUM-INX.
-           CALL    "ORCSNUM"           USING
-                                       ORCSNUMAREA.
-           IF      SNUM-RC         NOT =   ZERO
-               MOVE    03                  TO  SPA-GMN-CUR-41
-               MOVE    "0022"              TO  SPA-ERRCD
-               GO      TO      41017-KOMENTO-CHK-EXT
-           END-IF.
-           MOVE    SNUM-OUTNUM         TO  IDX3.
-           IF      IDX3         =   ZERO
-               MOVE    03                  TO  SPA-GMN-CUR-41
-               MOVE    "0013"              TO  SPA-ERRCD
-               GO      TO      41017-KOMENTO-CHK-EXT
-           END-IF.
-           MOVE    SPA-NAI-TBANGO-41 (SPA-GMN-NUM-41)   TO  IDX2.
            IF     (SPA-WRK-KOMENTO-E              =   99)   AND
                   (SPA-GMN-TZAISKBKBN-41 (IDX2)   =  "1"  OR  "2")
                MOVE    03                  TO  SPA-GMN-CUR-41
@@ -3027,9 +3043,16 @@
            IF     SPA-WRK-KOMENTO-E   NOT =  99
                PERFORM   VARYING  IDX  FROM  SPA-WRK-KOMENTO-S  BY  1
                          UNTIL    IDX       >    SPA-WRK-KOMENTO-E
-                  IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)    =  "1")  AND
-                        (WRK-GMN-DAY (IDX)               = ZERO)  AND
+                  IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)    =  "1")     AND
+                        (SPA-GMN-TSRYCD-41 (IDX2)    NOT = W-YOYAKU) AND
+                        (WRK-GMN-DAY (IDX)               = ZERO)     AND
                         (WRK-CHK-DAY (IDX)           NOT = ZERO)
+                      MOVE    03           TO  SPA-GMN-CUR-41
+                      MOVE    "0024"       TO  SPA-ERRCD
+                  END-IF
+                  IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)    =  "1")     AND
+                        (SPA-GMN-TSRYCD-41 (IDX2)        = W-YOYAKU) AND
+                        (WRK-CHK-DAY (IDX)               = ZERO)
                       MOVE    03           TO  SPA-GMN-CUR-41
                       MOVE    "0024"       TO  SPA-ERRCD
                   END-IF
@@ -3038,8 +3061,7 @@
                      MOVE    03            TO  SPA-GMN-CUR-41
                      MOVE    "0026"        TO  SPA-ERRCD
                   END-IF
-                  IF   (SPA-NAI-TZAISKBKBN-41 (IDX3)  =  "3" OR "4" OR
-                                                         "6")  AND
+                  IF   (SPA-NAI-TZAISKBKBN-41 (IDX3)  =  "4" OR "6") AND
                        (SPA-WRK-CHK-SIKIBETU (IDX)    =  "1")
                      MOVE    03            TO  SPA-GMN-CUR-41
                      MOVE    "0024"        TO  SPA-ERRCD
@@ -3054,9 +3076,16 @@
            ELSE
                PERFORM   VARYING  IDX  FROM  SPA-WRK-KOMENTO-S  BY  1
                          UNTIL    IDX      >    IDV
-                  IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)    =  "1")  AND
-                        (WRK-GMN-DAY (IDX)               = ZERO)  AND
+                  IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)    =  "1")     AND
+                        (SPA-GMN-TSRYCD-41 (IDX2)    NOT = W-YOYAKU) AND
+                        (WRK-GMN-DAY (IDX)               = ZERO)     AND
                         (WRK-CHK-DAY (IDX)           NOT = ZERO)
+                      MOVE    03           TO  SPA-GMN-CUR-41
+                      MOVE    "0024"       TO  SPA-ERRCD
+                  END-IF
+                  IF    (SPA-NAI-TZAISKBKBN-41 (IDX3)    =  "1")     AND
+                        (SPA-GMN-TSRYCD-41 (IDX2)        = W-YOYAKU) AND
+                        (WRK-CHK-DAY (IDX)               = ZERO)
                       MOVE    03           TO  SPA-GMN-CUR-41
                       MOVE    "0024"       TO  SPA-ERRCD
                   END-IF
@@ -3065,8 +3094,7 @@
                      MOVE    03            TO  SPA-GMN-CUR-41
                      MOVE    "0026"        TO  SPA-ERRCD
                   END-IF
-                  IF   (SPA-NAI-TZAISKBKBN-41 (IDX3)  =  "3" OR "4" OR
-                                                         "6")  AND
+                  IF   (SPA-NAI-TZAISKBKBN-41 (IDX3)  =  "4" OR "6") AND
                        (SPA-WRK-CHK-SIKIBETU (IDX)    =  "1")
                      MOVE    03            TO  SPA-GMN-CUR-41
                      MOVE    "0024"        TO  SPA-ERRCD
@@ -3375,8 +3403,44 @@
                GO      TO      420-ZAIHENKOU-EXT
            END-IF.
       *
+           PERFORM VARYING    IDH2     FROM    1   BY  1
+                   UNTIL      IDH2     >   31
+               IF    SPA-NAI-DAY-41  (SPA-GMN-NUM-41 IDH2)  NOT =  ZERO
+                   MOVE  IDH2      TO  IDH3
+                   MOVE  32        TO  IDH2
+               END-IF
+           END-PERFORM.
+      *
+           PERFORM   VARYING  IDH  FROM  1  BY 1
+                     UNTIL    IDH    >   SPA-GENSAN-ST4-41
+               IF      SPA-NAI-TZAISKBKBN-41 (IDH)   =  "5"
+                   PERFORM VARYING     IDH2    FROM    1   BY  1
+                           UNTIL       IDH2    >   SPA-I41-MAX-41
+                       IF      SPA-NAI-DAY-41 (IDH IDH3)
+                                        =   SPA-I41-THKNCOMBI-41 (IDH2)
+                           MOVE    SPA-I41-TKUMI-41  (IDH2)
+                                                TO  SPA-I40-HKNCOMBIMEI
+                           MOVE    SPA-I41-TFTNWARI-41  (IDH2)
+                                                TO  SPA-I40-FTNRATEMEI
+      *    Ï«ºÒ¡¢¼«ÇåÀÕ ¤È·òÊÝ¤ÎÊÝ¸±¶èÊ¬ÀßÄê
+                           IF      SPA-I41-HKNNUM-41 (IDH2)
+                                                   =   "971"  OR  "973"
+                               MOVE    1            TO  SPA-HKNKBN
+                               MOVE    SPA-I41-SISIKBN-41 (IDH2)
+                                                    TO  SPA-RSI-SISIKBN
+                               MOVE    SPA-I41-HKNKBN-41 (IDH2)
+                                                    TO  SPA-RSI-HKNKBN
+                           ELSE
+                               MOVE    ZERO         TO  SPA-HKNKBN
+                           END-IF
+                           MOVE    SPA-I41-MAX-41  TO  IDH2
+                       END-IF
+                   END-PERFORM
+               END-IF
+           END-PERFORM.
+      *
       *    Ï«ºÒ¤Î»þ¡¢ºÞÅÀ¿ô¤¬³°Íè´ÉÍý²Ã»»ÎÁ¤Ë¿¶¤êÂØ¤¨¤¿»þ¡¢¥¨¥é¡¼
-           IF      SPA-NAI-HKNKBN-41      =   1
+           IF      SPA-HKNKBN   =   1
                PERFORM 4201-RIS-ZAIHENKOU-SEC
                IF      SPA-ERRCD       NOT =   SPACE
                    MOVE    1                   TO  SPA-GMN-CUR-41
@@ -3424,18 +3488,6 @@
            MOVE    SPA-NAI-ROUJIN-41 (IDX)   TO  SPA-ROUJIN.
       *    ºÞÅÀ¿ô
            MOVE    SPA-NAI-ZAITEN-41 (IDX)   TO  SPA-ZAITEN.
-      *
-           PERFORM VARYING     IDH     FROM    1   BY  1
-                   UNTIL       IDH     >   SPA-I41-MAX-41
-               IF      SPA-NAI-HKNCOMBI-41 (IDX)
-                                       =   SPA-I41-THKNCOMBI-41 (IDH)
-                   MOVE    SPA-I41-TKUMI-41  (IDH)
-                                           TO  SPA-I40-HKNCOMBIMEI
-                   MOVE    SPA-I41-TFTNWARI-41  (IDH)
-                                           TO  SPA-I40-FTNRATEMEI
-                   MOVE    SPA-I41-MAX-41  TO  IDH
-               END-IF
-           END-PERFORM.
       *    ²ó¿ô¥Æ¡¼¥Ö¥ë
            MOVE    SPA-GMN-DAY-G-41    TO  SPA-SEL-DAY-G.
       *
@@ -3456,16 +3508,10 @@
                END-IF
            END-PERFORM.
       *
-           MOVE    SPA-SRYYMD          TO  SPA-MAE-SRYYMD.
-           MOVE    SPA-PTID            TO  SPA-MAE-PTID.
-           MOVE    SPA-I40-SRYYMD      TO  SPA-SRYYMD.
-           MOVE    SPA-GMN-PTID        TO  SPA-PTID.
-      *
-      *    Ï«ºÒ
-           MOVE    SPA-NAI-HKNKBN-41   TO  SPA-HKNKBN.
-           MOVE    SPA-NAI-SISIKBN-41  TO  SPA-RSI-SISIKBN.
-      *    Ï«ºÒ¶èÊ¬
-           MOVE    SPA-NAI-RSI-HKNKBN  TO  SPA-RSI-HKNKBN.
+           MOVE    SPA-SRYYMD              TO  SPA-MAE-SRYYMD.
+           MOVE    SPA-PTID                TO  SPA-MAE-PTID.
+           MOVE    SPA-I40-SRYYMD          TO  SPA-SRYYMD.
+           MOVE    SPA-GMN-PTID            TO  SPA-PTID.
       *
            MOVE    SPA-GMN-SRYKA-I-41      TO  SPA-I40-SRYKA.
            MOVE    SPA-GMN-SRYKAMEI-I-41   TO  SPA-I40-SRYKAMEI.
@@ -3477,8 +3523,8 @@
                GO      TO       420-ZAIHENKOU-SYORI-EXT
            END-IF.
       *
-           MOVE    SPACE                  TO  SPA-IIDCD.
-           INITIALIZE                     SPA-GMN-INPUT-41.
+           MOVE    SPACE               TO  SPA-IIDCD.
+           INITIALIZE                  SPA-GMN-INPUT-41.
       *
            MOVE    "I41"               TO  SPA-MOTOPG.
            MOVE    "I44"               TO  SPA-SAKIPG.
@@ -3821,6 +3867,7 @@
       *****************************************************************
        410181-NYUINACCT-HEN-SEC           SECTION.
       *
+           MOVE    ZERO                TO  FLG-NYUINKHNRYO.
            MOVE    SPA-NAI-SRYYM-41    TO  WRK-SYMD(1:6).
            MOVE    "01"                TO  WRK-SYMD(7:2).
            PERFORM 41012-SEIWA-HEN-SEC.
@@ -3886,6 +3933,9 @@
       *
                    ADD     1                   TO  IDX
                    PERFORM 3101-NYUINACCT-SPA-SEC
+                   IF      NACCT-ZAISKBKBN     =   "1"
+                       MOVE   1                TO   FLG-NYUINKHNRYO
+                   END-IF
       *
                    MOVE    "NYUINACCT-KEY16"   TO  ORC-DBPATH
                    PERFORM 900-NYUINACCT-READ-SEC
@@ -4128,7 +4178,9 @@
                END-IF
            END-PERFORM.
       *
-           IF      SPA-ERRCD          NOT =   SPACE
+           IF     (SPA-ERRCD          NOT =   SPACE)   OR
+                 ((SPA-ERRCD          =       SPACE)  AND
+                  (FLG-NYUINKHNRYO    =       ZERO))
                MOVE    ZERO           TO      FLG-KAIKEI-SAKUSEI
                MOVE    SPACE          TO      SPA-ERRCD
                PERFORM   410191-KAIKEI-SAKUSEI-SEC
@@ -5250,7 +5302,8 @@
            MOVE   ALL SPACE            TO  SPA-WRK-CHK-KBN-TBL.
            PERFORM   VARYING  IDX  FROM  1  BY 1
                      UNTIL    IDX    >   SPA-GMN-MAX-41
-               IF      SPA-GMN-TZAISKBKBN-41 (IDX)   =  "1"
+               IF     (SPA-GMN-TZAISKBKBN-41 (IDX)    =  "1")  AND
+                      (SPA-GMN-TSRYCD-41 (IDX)    NOT =  W-YOYAKU)
                    PERFORM VARYING    IDK      FROM    1   BY  1
                            UNTIL      IDK      >   31
                        IF    SPA-GMN-TDAY-41   (IDX IDK)   NOT =  
@@ -5864,18 +5917,6 @@
                          INTO              WRK-HKNCOMBIMEI
                END-STRING
            END-IF.
-           MOVE    ZERO                TO  SPA-NAI-SISIKBN-41.
-      *    ÊÝ¸±¶èÊ¬ÊÔ½¸
-           EVALUATE    COMB-HKNNUM
-      *        Ï«ºÒ
-               WHEN    "971"
-      *        ¼«ÇåÀÕ
-               WHEN    "973"
-                   MOVE    1                   TO  SPA-NAI-HKNKBN-41
-               WHEN    OTHER
-      *        ·òÊÝ
-                   MOVE    ZERO                TO  SPA-NAI-HKNKBN-41
-           END-EVALUATE.
       *
       *    Ï«ºÒ¤Î»þ¡¢¥³¥á¥ó¥È¤ÎÄÉ²Ã
            IF      COMB-HKNNUM         =   "971"  OR  "973"
@@ -5925,34 +5966,6 @@
                            INTO              WRK-HKNCOMBIMEI
                    END-STRING
                END-IF
-      *
-      *        »Í»è¶èÊ¬
-               MOVE    PTRSI-SISIKBN       TO  SPA-NAI-SISIKBN-41
-      *        Ï«ºÒ¶èÊ¬
-               MOVE    PTRSI-HKNKBN        TO  SPA-NAI-RSI-HKNKBN
-      *        ½ýÉÂÇ¯·îÆü
-               IF      PTRSI-HKNKBN        =   "1"  OR  "2"  OR  "4"
-                   MOVE    PTRSI-SHOBYOYMD     TO  SPA-RSI-SHOBYOYMD-41
-               ELSE
-                   MOVE    PTRSI-SINSATUYMD    TO  SPA-RSI-SHOBYOYMD-41
-               END-IF
-      *        È¯À¸Ç¯·îÆü¡Ü£³·î
-      *        È¯À¸Æü¤òµá¤á¤ë
-      *        µßµÞ°åÎÅ´ÉÍý²Ã»»¤Î¥Á¥§¥Ã¥¯
-               MOVE    SPACE               TO  WRK-HASSYOYMD
-               MOVE    "101110030"         TO  WRK-SRYCD
-               IF      WRK-HASSYOYMD       =   SPACE
-                  MOVE    SPA-RSI-SHOBYOYMD-41 TO  WRK-HASSYOYMD
-               END-IF
-      *        È¯À¸Æü¤«¤é£³¥ö·î¤Î·×»»
-               IF      WRK-HASSYOYMD       NOT =   SPACE
-                   COMPUTE WRK-HAS-MM          =   WRK-HAS-MM    +   3
-                   IF      WRK-HAS-MM          >   12
-                       COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
-                       COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
-                   END-IF
-               END-IF
-               MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD3
            END-IF.
       *
        5101-HKNCOMBI-SET-EXT.
