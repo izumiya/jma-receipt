@@ -117,6 +117,9 @@
       *                                     √œ ˝∏¯»Ò§Œ§»§≠°¢£¥£±œ∑øÕ∞ ≥∞
       *                                     §œ•Ï•ª≈≈•«°º•ø§Ú∫Ó¿Æ§∑§ §§
       *  01.02.06    NACL-∆£∏∂    04/10/18  ª·ÃæÕÛ ‘Ω∏ ˝À°§Œ —ππ
+      *                                     ø¶Ã≥æÂ§ŒªˆÕ≥§Œ ‘Ω∏æÚ∑Ô§À
+      *                                     ∂¶∫—¡»πÁ§Œ≤º¡•£≥•ˆ∑Ó§Úƒ…≤√
+      *                                     ∞ÂŒ≈ ›∏±∞Ï…Ù…È√¥∂‚≥€§Œ ‘Ω∏ƒ…≤√ 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1350,6 +1353,11 @@
                MOVE    RECE02-HOJOKBN        TO  WRK-DATA
                MOVE    1                     TO  WRK-NAGASA
            END-IF    
+           IF    ( RECE02-HKNNUM (1:2) =   "03"  )
+           AND   ( RECE02-HOJOKBN      =   "2"   )
+               MOVE    RECE02-HOJOKBN        TO  WRK-DATA
+               MOVE    1                     TO  WRK-NAGASA
+           END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    æ⁄Ã¿ΩÒ»÷πÊ° πÒ ›OR¬‡ø¶º‘§Œ§ﬂ°À
            IF    ( RECE02-TEISYUTUSAKI =   "2"     AND
@@ -1364,8 +1372,16 @@
                MOVE    3                   TO  WRK-NAGASA
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
-      *    ∞ÂŒ≈ ›∏±    
-           PERFORM 5004-MOJI-HENSYU-SEC     
+      *    ∞ÂŒ≈ ›∏±∞Ï…Ù…È√¥∂‚≥€
+           IF      RECE02-FTNMONEY(IDX1)
+                                       >   ZERO
+               IF    ( RECE02-HKNNUM       =   "002" )
+               AND   ( RECE02-HOJOKBN      =   "3"   )
+                   MOVE    RECE02-FTNMONEY(IDX1) TO  WRK-NUM
+                   MOVE    9                     TO  WRK-NAGASA
+               END-IF
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
       *    πÒ ›∏∫Ã»∂Ë ¨                                 
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    πÒ ›∏∫≥€≥‰πÁ 

@@ -28,6 +28,10 @@
       *  •◊•Ì•∞•È•‡Ω§¿µÕ˙ŒÚ
       * Maj/Min/Rev  Ω§¿µº‘       ∆¸…’      ∆‚Õ∆
       *  01.00.01    NACL-∆£∏∂    04/10/18  ª·ÃæÕÛ ‘Ω∏ ˝À°§Œ —ππ
+      *                                     ∆˛¬‡±°∆¸§Œ ‘Ω∏§ŒΩ§¿µ
+      *                                     ø¶Ã≥æÂ§ŒªˆÕ≥§Œ ‘Ω∏æÚ∑Ô§À
+      *                                     ∂¶∫—¡»πÁ§Œ≤º¡•£≥•ˆ∑Ó§Úƒ…≤√
+      *                                     ∞ÂŒ≈ ›∏±∞Ï…Ù…È√¥∂‚≥€§Œ ‘Ω∏ƒ…≤√ 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1544,6 +1548,11 @@
                MOVE    RECE62-HOJOKBN        TO  WRK-DATA
                MOVE    1                     TO  WRK-NAGASA
            END-IF    
+           IF    ( RECE62-HKNNUM (1:2) =   "03"  )
+           AND   ( RECE62-HOJOKBN      =   "2"   )
+               MOVE    RECE62-HOJOKBN        TO  WRK-DATA
+               MOVE    1                     TO  WRK-NAGASA
+           END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    æ⁄Ã¿ΩÒ»÷πÊ° πÒ ›OR¬‡ø¶º‘§Œ§ﬂ°À
            IF    ( RECE62-TEISYUTUSAKI =   "2"     AND
@@ -1558,8 +1567,22 @@
                MOVE    3                   TO  WRK-NAGASA
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
-      *    ∞ÂŒ≈ ›∏±    
-           PERFORM 5004-MOJI-HENSYU-SEC     
+      *    ∞ÂŒ≈ ›∏±∞Ï…Ù…È√¥∂‚≥€
+           IF      RECE62-FTNMONEY(IDX1)
+                                       >   ZERO
+               IF    ( RECE62-RECESYUBETU (4:1)
+                                           =   "7" OR  "9" )
+               AND   ( RECE62-RJNHKNNUM    =   SPACE       )
+                   MOVE    RECE62-FTNMONEY(IDX1) TO  WRK-NUM
+                   MOVE    9                     TO  WRK-NAGASA
+               END-IF
+               IF    ( RECE62-HKNNUM       =   "002" )
+               AND   ( RECE62-HOJOKBN      =   "3"   )
+                   MOVE    RECE62-FTNMONEY(IDX1) TO  WRK-NUM
+                   MOVE    9                     TO  WRK-NAGASA
+               END-IF
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
       *    πÒ ›∏∫Ã»∂Ë ¨                                 
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    πÒ ›∏∫≥€≥‰πÁ 
@@ -2308,7 +2331,7 @@
                    PERFORM 5002-HIZUKE-HEN-SEC
                    INITIALIZE                  ORCSKANACHKAREA
                    MOVE    "2"                 TO  KANACHK-SYORI 
-                   MOVE    WRK-HENYMD          TO  KANACHK-MAE-INPUT
+                   MOVE    WRK-HENYMD (2:)     TO  KANACHK-MAE-INPUT
                    CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
                    IF      KANACHK-RC          =   ZERO
                        MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
@@ -2352,7 +2375,7 @@
                    PERFORM 5002-HIZUKE-HEN-SEC
                    INITIALIZE                  ORCSKANACHKAREA
                    MOVE    "2"                 TO  KANACHK-SYORI 
-                   MOVE    WRK-HENYMD          TO  KANACHK-MAE-INPUT
+                   MOVE    WRK-HENYMD (2:)     TO  KANACHK-MAE-INPUT
                    CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
                    IF      KANACHK-RC          =   ZERO
                        MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
