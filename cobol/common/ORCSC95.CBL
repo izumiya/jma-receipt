@@ -4052,7 +4052,8 @@
       *
       *        訂正の時、診療コードと回数をセット
                IF     (LNK-SC95-KBN        =   "4" )  AND
-                      (SRY-SRYCD (IDX)(1:1)    =   "1" )
+                     ((SRY-SRYCD (IDX)(1:1)    =   "1"  )  OR
+                      (SRY-SRYCD (IDX)(1:3)    =   "099"))
       *!           MOVE    SPACE               TO  TNS-TENSU-REC
       *            MOVE    SRY-SRYCD (IDX)     TO  TNS-SRYCD
       *            PERFORM 910-TENSU-READ-SEC
