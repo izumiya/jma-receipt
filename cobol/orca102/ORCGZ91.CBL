@@ -39,6 +39,7 @@
       *  01.01.04    NACL-¬¿≈ƒ    03/07/11  º´»Òƒ…≤√
       *  01.01.05    NACL-øπœ∆    03/08/22   ¨Œ‡∂Ë ¨ƒ…≤√
       *  02.00.01    NACL-øπœ∆    03/12/24  §Ω§Œ¬æ∫‡Œ¡ƒ…≤√
+      *  02.00.03    NACL-øπœ∆    04/10/26  ø«Œ≈π‘∞Ÿ√ÌºÕ»œ∞œΩ§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1153,16 +1154,21 @@
                        MOVE  SPA-Z91-SRYENDL   TO  SHELL-SRYSTR
                        MOVE  SPA-Z91-SRYSTRL   TO  SHELL-SRYEND
                    END-IF
-      *----(01.01.01)--ADD-START---
-                   IF      SHELL-SRYEND    =  "90"
-                       MOVE  "97"          TO  SHELL-SRYEND
-                   END-IF
-      *----(01.01.01)--ADD-END-----
+      *----(02.00.03)--UPD-START---
+                   EVALUATE    SHELL-SRYEND
+                     WHEN      "20"
+                       MOVE    "29"        TO  SHELL-SRYEND
+                     WHEN      "30"
+                       MOVE    "34"        TO  SHELL-SRYEND
+                     WHEN      "90"
+                       MOVE    "97"        TO  SHELL-SRYEND
+                   END-EVALUATE
                ELSE
                    MOVE  1                 TO  SHELL-SRYKBN
-                   MOVE  ZERO              TO  SHELL-SRYSTR
-                   MOVE  99                TO  SHELL-SRYEND
+                   MOVE  "11"              TO  SHELL-SRYSTR
+                   MOVE  "97"              TO  SHELL-SRYEND
                END-IF
+      *----(02.00.03)--UPD-END-----
            END-IF
       *     
       *    ∞ÂÃÙ… •¡•ß•√•Ø•ª•√•»
