@@ -4666,6 +4666,10 @@
                   COMPUTE  RECE64-MEISAISU    =  RECE64-MEISAISU
                                               +  1
       *
+                  COMPUTE  RECE64-RUIKEITOTAL =
+                           RECE64-RUIKEITOTAL +
+                          (WRK-SRYCD  *  WRK-ORCSTEN-SURYO(IDX2))
+      *
       *           ∆√ƒÍ¥Ô∫‡§Œ√±≤¡ ‘Ω∏
                   IF      WRK-ORCSTEN-SRYCD(IDX2)(1:1)  =   "7"
                     IF  WRK-ORCSTEN-SRYCD(IDX2)       =
