@@ -1279,15 +1279,15 @@
                                        ORCSC90AREA
                                        WRK-SCR-REC
       *    各チェック処理
-           EVALUATE    WRK-MOJI
+      *DD  EVALUATE    WRK-MOJI
       *        薬剤
-               WHEN    "6"
+      *        WHEN    "6"
       *            廃棄が有った時、破棄コメントを追加する
-                   IF      LNK-SC90-HAIKI          =   1
-                       MOVE    IDX-Z               TO  IDX-HAI
-                       PERFORM 10011-HAIKI-ADD-SEC
-                   END-IF
-           END-EVALUATE
+      *            IF      LNK-SC90-HAIKI          =   1
+      *                MOVE    IDX-Z               TO  IDX-HAI
+      *                PERFORM 10011-HAIKI-ADD-SEC
+      *            END-IF
+      *DD  END-EVALUATE
       *
       *
       *    酸素計算
