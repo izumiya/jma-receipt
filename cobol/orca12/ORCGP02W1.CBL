@@ -4784,6 +4784,9 @@
                END-IF
            END-PERFORM
       *
+           IF      SPA-FTN1-MAX    >   10
+               MOVE    10          TO  SPA-FTN1-MAX
+           END-IF
            .
        4504-PTKOHFTN-HEN-EXT.
            EXIT.
