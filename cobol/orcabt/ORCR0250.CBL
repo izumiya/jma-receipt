@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-藤原    05/01/07  差し込みコメントを対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -270,6 +271,11 @@
                END-IF
            ELSE
                MOVE    RECE64-SRYKBN       TO  RECE641-SRYKBN
+               IF      RECE64-SRYKBN   >=  "90"
+                   IF  RECE64-HKNCOMBI     =   ZERO
+                       MOVE    WRK-HKNCOMBI    TO  RECE64-HKNCOMBI
+                   END-IF
+               END-IF
            END-IF
            MOVE    RECE64-PTNUM        TO  RECE641-PTNUM
            MOVE    RECE64-SRYKA        TO  RECE641-SRYKA
@@ -383,9 +389,16 @@
                            ELSE 
                                IF    ( RECE64-RECESYUBETU
                                                    =   ZERO   OR  8888 )
-                               OR    ( RECE64-SRYKBN
-                                                   >=  "90"   AND 
-                                                   <   "99"       )
+      ****                     OR    ( RECE64-SRYKBN
+      ****                                         >=  "90"   AND 
+      ****                                         <   "99"            )
+                               OR  ( RECE64-SRYKBN
+                                                   >=  "95"   AND 
+                                                   <   "99"            )
+                               OR  ( ( RECE64-SRYKBN
+                                                   = "90" OR "92" ) AND 
+                                     ( RECE64-ZAITEN
+                                               NOT =  ZERO        )    )
                                    CONTINUE
                                ELSE
                                    MOVE    1           TO  FLG-READ
