@@ -50,6 +50,8 @@
            03  FILLER              PIC X(11)   VALUE   "4 113005570".
       *    ³«Êü·¿ÉÂ±¡¶¦Æ±»ØÆ³ÎÁ¡Ê£±¡Ë
            03  FILLER              PIC X(11)   VALUE   "  180010510".
+      *    ÃÏ°èÏ¢·È¾®»ùÌë´Ö¡¦µÙÆü¿ÇÎÅÎÁ
+           03  FILLER              PIC X(11)   VALUE   "  113006710".
       *    £È£±£¶¡¥£´¤«¤éÄÉ²Ã
            03  FILLER              PIC X(11)   VALUE   "3 113007070".
            03  FILLER              PIC X(11)   VALUE   "3 113007170".
@@ -62,7 +64,7 @@
            03  FILLER              PIC X(11)   VALUE   "4 113007870".
       *
        01  TBL-SYONIKA-AREA-R      REDEFINES   TBL-SYONIKA-AREA.
-           03  TBL-SYONIKA-OCC     OCCURS  33  INDEXED   TBL-SYO.
+           03  TBL-SYONIKA-OCC     OCCURS  34  INDEXED   TBL-SYO.
       *        1:½é¿Ç¡¢2:ºÆ¿Ç¡¢3:½é¿Ç»þ´Ö³°¡¢4:ºÆ¿Ç»þ´Ö³°
                05  TBL-SYONIKA-KBN         PIC X(01).
                05  TBL-YOBI1               PIC X(01).
