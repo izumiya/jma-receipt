@@ -636,7 +636,8 @@
                END-IF
       *        ±¡³°
                IF    ( WRK-INGAIKBN    =   "2" ) AND
-                     ( WRK-PARA-INGAIKBN       =   1 )
+                     ( WRK-PARA-INGAIKBN NOT =   0 ) AND
+                     ( WRK-PARA-INGAIKBN NOT =   SPACE )
                    PERFORM 240-MAIN-HEN-SEC
                END-IF
       *----(02.01.02)--UPD-END-----
