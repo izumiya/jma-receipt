@@ -370,22 +370,13 @@
        01  TBL-RSI-SINSATU-AREA.
       *    初診料
            03  FILLER              PIC X(13)   VALUE   "0 F 101110010".
-      *    再診料（３月以内）
+      *    再診料
            03  FILLER              PIC X(13)   VALUE   "0 S 101120040".
-      *    再診料（３月超）５回以内
-           03  FILLER              PIC X(13)   VALUE   "1 S 101120050".
-      *    再診料（３月超）５回以内
-           03  FILLER              PIC X(13)   VALUE   "5 S 101120060".
-      *
-      *    外来管理加算（３月以内）
+      *    外来管理加算
            03  FILLER              PIC X(13)   VALUE   "0 G 101120070".
-      *    外来管理加算（３月超）５回以内
-           03  FILLER              PIC X(13)   VALUE   "1 G 101120080".
-      *    外来管理加算（３月超）５回以内
-           03  FILLER              PIC X(13)   VALUE   "5 G 101120090".
       *
        01  TBL-RSI-SINSATU-AREAR   REDEFINES   TBL-RSI-SINSATU-AREA.
-           03  TBL-RSI-SINSATU-OCC     OCCURS  7    INDEXED  TBL-RSI.
+           03  TBL-RSI-SINSATU-OCC     OCCURS  3    INDEXED  TBL-RSI.
       *        回数
                05  TBLR-KAISU           PIC 9(01).
                05  FILLER               PIC X(01).
@@ -1883,7 +1874,7 @@
       *********END-IF
            END-IF
       *
-      *    発生日から３ヶ月の計算
+      *    発生日から３ヶ月の計算（現在使用なし）
            MOVE    SPA-RSI-HASSYOYMD   TO  WRK-HASSYOYMD
            COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
                                        +   3
@@ -1893,51 +1884,54 @@
            END-IF
            MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD3
       *
-      *    傷病日から３ヶ月の計算
+      *    傷病日から６ヶ月の計算
            MOVE    SPA-RSI-SHOBYOYMD   TO  WRK-HASSYOYMD
            COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
-                                       +   3
+                                       +   6
            IF      WRK-HAS-MM          >   12
                COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
                COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
            END-IF
            MOVE    WRK-HASSYOYMD       TO  SPA-RSI-SHOBYOYMD3
+      *TEST
+           DISPLAY "C10S SPA-RSI-SHOBYOYMD3:" SPA-RSI-SHOBYOYMD3
+      *TEST
       *
       *    平成１５年２月より
       *    自賠責時、６ヶ月とする（診療日がＨ１５．２以降）
-           IF      (SPA-HKNKBN         =   1    )  AND
-                   (SPA-RSI-HKNKBN     =   "4"  )  AND
-                   (SPA-SRYYMD         >=  "20030201")
+      *    IF      (SPA-HKNKBN         =   1    )  AND
+      *            (SPA-RSI-HKNKBN     =   "4"  )  AND
+      *            (SPA-SRYYMD         >=  "20030201")
       *         傷病日判定
-               IF      SPA-RSI-SHOBYOYMD  <   "20030201"
-                   MOVE    "20030201"          TO  WRK-HASSYOYMD
-               ELSE
-                   MOVE    SPA-RSI-SHOBYOYMD   TO  WRK-HASSYOYMD
-               END-IF
+      *        IF      SPA-RSI-SHOBYOYMD  <   "20030201"
+      *            MOVE    "20030201"          TO  WRK-HASSYOYMD
+      *        ELSE
+      *            MOVE    SPA-RSI-SHOBYOYMD   TO  WRK-HASSYOYMD
+      *        END-IF
       *        傷病日から６ヶ月の計算
-               COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
-                                           +   6
-               IF      WRK-HAS-MM          >   12
-                   COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
-                   COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
-               END-IF
-               MOVE    WRK-HASSYOYMD       TO  SPA-RSI-SHOBYOYMD3
+      *        COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
+      *                                    +   6
+      *        IF      WRK-HAS-MM          >   12
+      *            COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
+      *            COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
+      *        END-IF
+      *        MOVE    WRK-HASSYOYMD       TO  SPA-RSI-SHOBYOYMD3
       *
       *        発生日判定
-               IF      SPA-RSI-HASSYOYMD   <   "20030201"
-                   MOVE    "20030201"          TO  WRK-HASSYOYMD
-               ELSE
-                   MOVE    SPA-RSI-HASSYOYMD   TO  WRK-HASSYOYMD
-               END-IF
+      *        IF      SPA-RSI-HASSYOYMD   <   "20030201"
+      *            MOVE    "20030201"          TO  WRK-HASSYOYMD
+      *        ELSE
+      *            MOVE    SPA-RSI-HASSYOYMD   TO  WRK-HASSYOYMD
+      *        END-IF
       *        発生日から６ヶ月の計算
-               COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
-                                           +   6
-               IF      WRK-HAS-MM          >   12
-                   COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
-                   COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
-               END-IF
-               MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD3
-           END-IF
+      *        COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
+      *                                    +   6
+      *        IF      WRK-HAS-MM          >   12
+      *            COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
+      *            COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
+      *        END-IF
+      *        MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD3
+      *    END-IF
       *
       *    療養の給付請求書取扱料のチェック
       *****MOVE    SPACE               TO  WRK-HASSYOYMD
@@ -3234,26 +3228,9 @@
       *            同日再診・他科受診あり
                    PERFORM 3301-DOUSAISIN-SEC
                ELSE
-                   IF      SPA-SRYYMD      <   SPA-RSI-HASSYOYMD3
-      *                ３月以内
-                       MOVE    ZERO                TO  WRK-KAISU
-                       MOVE    "S"                 TO  WRK-KBN
-                   ELSE
-                       IF      SPA-SINSATU-CNT     >=  5
-      *                ３月以降の同月５回目以降
-                           MOVE    5                   TO  WRK-KAISU
-                           MOVE    "S"                 TO  WRK-KBN
-                       ELSE
-                           MOVE    1                   TO  WRK-KAISU
-                           MOVE    "S"                 TO  WRK-KBN
-                       END-IF
-                   END-IF
-      *
       *            平成１５年９月１日から逓減廃止とする
-                   IF      SPA-SRYYMD          >=  "20030901"
-                       MOVE    ZERO                TO  WRK-KAISU
+                   MOVE    ZERO                TO  WRK-KAISU
                        MOVE    "S"                 TO  WRK-KBN
-                   END-IF
       *
                    PERFORM 20091-RSI-SINSATU-SEC
                END-IF
@@ -3972,9 +3949,6 @@
                              END-IF
                            END-IF
                        WHEN    OTHER
-                            MOVE    "0044"      TO  SPA-ERRCD
-                            MOVE    "1"         TO  SPA-COM-CUR
-                                                          (IDX)
       *                    開放型病院共同指導料（１）であること
                            PERFORM 50192-SYONIKASRYCD-CHK-SEC
                            IF      FLG-SYONIKA-CHK     =   1

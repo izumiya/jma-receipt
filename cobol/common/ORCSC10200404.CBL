@@ -414,22 +414,14 @@
        01  TBL-RSI-SINSATU-AREA.
       *    ½é¿ÇÎÁ
            03  FILLER              PIC X(13)   VALUE   "0 F 101110010".
-      *    ºÆ¿ÇÎÁ¡Ê£³·î°ÊÆâ¡Ë
+      *    ºÆ¿ÇÎÁ
            03  FILLER              PIC X(13)   VALUE   "0 S 101120040".
-      *    ºÆ¿ÇÎÁ¡Ê£³·îÄ¶¡Ë£µ²ó°ÊÆâ
-           03  FILLER              PIC X(13)   VALUE   "1 S 101120050".
-      *    ºÆ¿ÇÎÁ¡Ê£³·îÄ¶¡Ë£µ²óÄ¶
-           03  FILLER              PIC X(13)   VALUE   "5 S 101120060".
       *
-      *    ³°Íè´ÉÍý²Ã»»¡Ê£³·î°ÊÆâ¡Ë
+      *    ³°Íè´ÉÍý²Ã»»
            03  FILLER              PIC X(13)   VALUE   "0 G 101120070".
-      *    ³°Íè´ÉÍý²Ã»»¡Ê£³·îÄ¶¡Ë£µ²ó°ÊÆâ
-           03  FILLER              PIC X(13)   VALUE   "1 G 101120080".
-      *    ³°Íè´ÉÍý²Ã»»¡Ê£³·îÄ¶¡Ë£µ²óÄ¶
-           03  FILLER              PIC X(13)   VALUE   "5 G 101120090".
       *
        01  TBL-RSI-SINSATU-AREAR   REDEFINES   TBL-RSI-SINSATU-AREA.
-           03  TBL-RSI-SINSATU-OCC     OCCURS  7    INDEXED  TBL-RSI.
+           03  TBL-RSI-SINSATU-OCC     OCCURS  3    INDEXED  TBL-RSI.
       *        ²ó¿ô
                05  TBLR-KAISU           PIC 9(01).
                05  FILLER               PIC X(01).
@@ -3387,29 +3379,6 @@
                MOVE    WRK-KBN         TO  WRK-SINSATU-KBN
                MOVE    WRK-KAISU       TO  WRK-SINSATU-KAISU
                MOVE    IDX-Z           TO  IDX-SINSATU
-      *
-      *        Ê¿À®£±£µÇ¯£¹·î£±Æü¤«¤éÄþ¸ºÇÑ»ß¤È¤¹¤ë
-               IF      SPA-SRYYMD          >=  "20030901"
-                   CONTINUE
-               ELSE
-      *
-      *        È¯À¸Æü£³·î°Ê¹ß¤Î²ó¿ô¥Á¥§¥Ã¥¯
-               IF      SPA-SRYYMD      >=  SPA-RSI-HASSYOYMD3
-                   IF      LNK-ORCSC-SINSATU-CNT   >=  5
-                       IF      WRK-KAISU       NOT =   5
-                           MOVE    "K020"          TO  WRK-KEICD
-                           MOVE    IDX-Z           TO  WRK-KEICD-IDX
-                       END-IF
-                   ELSE
-                       IF      WRK-KAISU           =   5
-                           MOVE    "K020"          TO  WRK-KEICD
-                           MOVE    IDX-Z           TO  WRK-KEICD-IDX
-                       END-IF
-                   END-IF
-               END-IF
-      *
-               END-IF
-      *
            END-IF
       *
            .
@@ -3481,27 +3450,9 @@
       *****************************************************************
        200111-RSI-GAIKASAN-SEC            SECTION.
       *
-      *    ³°Íè´ÉÍý²Ã»»¥³¡¼¥ÉÄÉ²Ã
-           IF      SPA-SRYYMD          <   SPA-RSI-HASSYOYMD3
-      *        £³·î°ÊÆâ
-               MOVE    ZERO                TO  WRK-KAISU
-               MOVE    "G"                 TO  WRK-KBN
-           ELSE
-               IF      LNK-ORCSC-SINSATU-CNT     >=  5
-      *            £³·î°Ê¹ß¤ÎÆ±·î£µ²óÌÜ°Ê¹ß
-                   MOVE    5                   TO  WRK-KAISU
-                   MOVE    "G"                 TO  WRK-KBN
-               ELSE
-                   MOVE    1                   TO  WRK-KAISU
-                   MOVE    "G"                 TO  WRK-KBN
-               END-IF
-           END-IF
-      *
-      *    Ê¿À®£±£µÇ¯£¹·î£±Æü¤«¤éÄþ¸ºÇÑ»ß¤È¤¹¤ë
-           IF      SPA-SRYYMD          >=  "20030901"
-               MOVE    ZERO                TO  WRK-KAISU
-               MOVE    "G"                 TO  WRK-KBN
-           END-IF
+      *    Ê¿À®£±£µÇ¯£¹·î£±Æü¤«¤éÄþ¸ºÇÑ»ß
+           MOVE    ZERO                TO  WRK-KAISU
+           MOVE    "G"                 TO  WRK-KBN
       *
       *
       *    ¿Ç»¡ÎÁ¸¡º÷

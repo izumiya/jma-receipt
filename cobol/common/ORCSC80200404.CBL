@@ -1278,7 +1278,7 @@
                GO      TO      2002-GAIRAI-ALL-CHK-EXT
            END-IF
       *
-      *    労災の時、理学療法の逓減は傷病発生３月以降とする
+      *    労災の時、理学療法の逓減は傷病発生６月以降とする
            IF     (SPA-HKNKBN          =   1        )  AND
                   (SPA-SRYYMD          <   SPA-RSI-SHOBYOYMD3)
       *        今回分集計
@@ -1569,12 +1569,6 @@
                IF      IDX-KSN             =   ZERO
                    MOVE    IDX-Z           TO  IDX-KSN
                END-IF
-      *TEST
-              DISPLAY "C80 IDX-KSN:" IDX-KSN
-                     ",KZMFLG:" WRK-COM-KZMFLG (IDX-KSN)
-                     ",LNK-ORCSC-KEI-IDX:" LNK-ORCSC-KEI-IDX
-                     ",SRYCD:"  WRK-COM-INPUTCD (IDX-KSN)
-      *TEST
                IF     (WRK-COM-KZMFLG (IDX-KSN) =   SPACE) AND
                       (LNK-ORCSC-KEI-IDX        =   ZERO )
                    MOVE    "K097"          TO  SPA-ERRCD
@@ -1735,7 +1729,7 @@
                MOVE    1                   TO  FLG-SOUKI-ARI
            END-IF
       *
-      *    労災の時、理学療法の逓減は傷病発生３月以降とする
+      *    労災の時、理学療法の逓減は傷病発生６月以降とする
            IF     (SPA-HKNKBN          =   1        )  AND
                   (WRK-SRYYMD          <   SPA-RSI-SHOBYOYMD3)
       *        今回分集計

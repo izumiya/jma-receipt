@@ -397,6 +397,9 @@
       *            ´ï¶ñ
                    WHEN    "K"
                        MOVE    3               TO  LNK-SC91-DAYMAXCNT
+      *            ²ðÃ£¸£°ú
+                   WHEN    "T"
+                       MOVE    3               TO  LNK-SC91-DAYMAXCNT
       *            ¼¾ÉÛ
                    WHEN    "P"
                        MOVE    ZERO            TO  LNK-SC91-DAYMAXCNT
@@ -845,6 +848,9 @@
                    WHEN    "M"
       *            ´ï¶ñ
                    WHEN    "K"
+                       MOVE    3               TO  WRK-DAYMAXCNT
+      *            ²ðÃ£¸£°ú
+                   WHEN    "T"
                        MOVE    3               TO  WRK-DAYMAXCNT
       *           ¼¾ÉÛ
                    WHEN    "P"

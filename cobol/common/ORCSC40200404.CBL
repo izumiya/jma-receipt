@@ -36,6 +36,7 @@
       * 01.00.06     NACL-Â¿¡¹Ç¼  02/10/03  Ï«ºÒ²Ã»»¤Ê¤·¤ÎÄÉ²Ã
       * 01.00.07     NACL-Â¿¡¹Ç¼  03/05/21  Ãí¼Í±Õ»ÄÎÌÇÑ´þÄÉ²Ã
       * 01.00.08     NACL-Â¿¡¹Ç¼  04/03/15  £È£±£¶Ç¯£´·î²þÀµÄÉ²Ã
+      * 01.00.09     NACL-Â¿¡¹Ç¼  04/03/29  £È£±£¶Ç¯£´·î²þÀµÏ«ºÒÄÉ²Ã
       *****************************************************************
       *
       *
@@ -590,7 +591,9 @@
       *
       *    Ï«ºÒ¤Ç¥Þ¥Ã¥µ¡¼¥¸Åù¡¢´ï¶ñÅù¤Î»þ¡¢Æü¤Ë£³Éô°Ì¤È¤¹¤ë
            IF     (SPA-HKNKBN          =   1   )  AND
-                  (WRK-SYOCHI-KBN      =   "01" OR  "02")
+                  (WRK-SYOCHI-KBN      =   "01" OR  "02"
+      *        ²ðÃ£¸£°ú
+                                       OR  "04"   )
                PERFORM 1001121-RSI-SYOEN-CHK-SEC
                IF      WRK-ERRCD       NOT =   SPACE
                    GO      TO      100112-SYOEN-CHK-EXT
@@ -614,11 +617,6 @@
            ELSE
                MOVE    4                   TO  WRK-MAX-CNT
            END-IF
-      *TEST
-           DISPLAY "C40 WRK-MAX-CNT:" WRK-MAX-CNT
-                 ",LNK-ORCSC-SYOEN-CNT:" LNK-ORCSC-SYOEN-CNT
-                 ",LNK-ORCSC-KYUSEI-180:" LNK-ORCSC-KYUSEI-180
-      *TEST
       *
            IF     (SPA-NYUGAIKBN       =   "2"  )  AND
                   (LNK-ORCSC-SYOEN-CNT <   WRK-MAX-CNT )
@@ -892,6 +890,17 @@
                            END-EVALUATE
                            MOVE    1                    TO  FLG-ROUSAI
                        END-IF
+      *            ²ðÃ£¸£°ú
+                   WHEN    "118"
+                       EVALUATE    SPA-RSI-SISIKBN
+                           WHEN    1
+      *                        £±¡¥£µÇÜ
+                                MOVE    "101400020"      TO  WRK-SRYCD
+                           WHEN    2
+      *                        ¼ê¤Î¾ì¹ç¤â¡¢£±¡¥£µÇÜ¤¹¤ë
+                               MOVE    "101400020"       TO  WRK-SRYCD
+                       END-EVALUATE
+                       MOVE    2                    TO  FLG-ROUSAI
                END-EVALUATE
            END-IF
       *
