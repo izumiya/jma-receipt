@@ -563,6 +563,7 @@
            MOVE    ZERO                TO  IDX-MAX
            MOVE    ZERO                TO  IDX-SYU
            INITIALIZE                  WRK-AREA
+           MOVE    SPACE               TO  WRK-NYU-SRYCD
       *
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   200     )   OR
@@ -768,7 +769,6 @@
            END-IF
       *
       *    年齢加算算定チェック
-           MOVE    SPACE               TO  WRK-NYU-SRYCD
            PERFORM 1007-NENREI-SYORI-SEC
       *
       *    時間加算チェック

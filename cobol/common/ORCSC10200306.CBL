@@ -765,7 +765,6 @@
            END-IF
       *
       *    年齢加算算定チェック
-           MOVE    SPACE               TO  WRK-NYU-SRYCD
            PERFORM 1007-NENREI-SYORI-SEC
       *
       *    時間加算チェック
