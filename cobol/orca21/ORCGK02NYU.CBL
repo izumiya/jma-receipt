@@ -152,6 +152,7 @@
            03  FLG-SST             PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-OK2             PIC 9(01).
+           03  FLG-OK3             PIC 9(01).
            03  FLG-ADD             PIC 9(01).
       *    初期画面かの判定
            03  FLG-SYOKI           PIC 9(01).
@@ -220,8 +221,8 @@
       *
            03  FLG-RIHTEI           PIC 9(01).
       *
-      *
            03  FLG-TEISEI           PIC 9(01).
+           03  FLG-MOD-FLG           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1823,7 +1824,13 @@
                        PERFORM                 3002-PARA-SET-SEC
       *                画面用スパ編集処理
                        PERFORM                     310-SPA-GMNSET-SEC
+      *                ワーク診療行為クリア
+                       MOVE    1                   TO  FLG-MOD-FLG
+                       PERFORM 4900-WKSRYACT-CLEAR-SEC
                    ELSE
+      *                ワーク診療行為クリア
+                       MOVE    2                   TO  FLG-MOD-FLG
+                       PERFORM 4900-WKSRYACT-CLEAR-SEC
                        MOVE    1               TO  SPA-GMN-CUR
                    END-IF
       *
@@ -1876,6 +1883,10 @@
                    IF      SPA-KID1-FLG        =   "OK"
       *                内容置換え
                        PERFORM 410132-SAIHENSYU-SEC
+                   ELSE
+      *                ワーク診療行為クリア
+                       MOVE    2                   TO  FLG-MOD-FLG
+                       PERFORM 4900-WKSRYACT-CLEAR-SEC
                    END-IF
       *        中途終了時刷確認
                WHEN    "0117"
@@ -2513,6 +2524,7 @@
        3103-SAIHEN-HEN-SEC                  SECTION.
       *
            MOVE    ZERO               TO  FLG-SET
+           MOVE    ZERO               TO  WRK-SYORIFLG
       *
       *    診療室入力あり編集
            PERFORM     VARYING   IDX   FROM    1   BY  1
@@ -3514,33 +3526,50 @@
       *****************************************************************
        330-SYOSIN-SET-SEC                  SECTION.
       *
+           MOVE    ZERO                TO  FLG-OK3
       *    初診料が算定できる時
            IF       SPA-SYOSIN         =   1
                CONTINUE
            ELSE
-               GO      TO      330-SYOSIN-SET-EXT
+               MOVE    1                   TO  FLG-OK3
            END-IF
       *
       *    入院年月であること
            IF      SPA-K02N-NYUINYMD(1:6)  NOT =   SPA-SRYYMD(1:6)
-               GO      TO      330-SYOSIN-SET-EXT
+               MOVE    1                   TO  FLG-OK3
            END-IF
       *
-           MOVE    SPA-K01KYOUTU       TO  SPA-WORK
-           INITIALIZE                      ORCSC10SAREA
-           MOVE    "1"                 TO  LNK-SC10S-SYORI
-           CALL    "ORCSC10S"          USING
-                                       ORCSC10SAREA
-                                       SPA-AREA
-                                       SPA-SCR-REC
-                                       SPA-K02
-           MOVE    SPA-WORK            TO  SPA-K01KYOUTU
-           MOVE    LNK-SC10S-IDX2      TO  IDX2
+      *    初診料がないこと
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-MAX ) OR
+                              (FLG-OK3     =   1       )
+               IF      SPA-COM-SRYKBN (IDX)    =   "11"
+                   MOVE    1               TO  FLG-OK3
+               END-IF
+           END-PERFORM
+           IF      FLG-OK3             =   1
+               MOVE    ZERO                TO  IDX2
+           ELSE
+      *        初診料自動発生
+               MOVE    SPA-K01KYOUTU       TO  SPA-WORK
+               INITIALIZE                      ORCSC10SAREA
+               MOVE    "1"                 TO  LNK-SC10S-SYORI
+               CALL    "ORCSC10S"          USING
+                                           ORCSC10SAREA
+                                           SPA-AREA
+                                           SPA-SCR-REC
+                                           SPA-K02
+               MOVE    SPA-WORK            TO  SPA-K01KYOUTU
+               MOVE    LNK-SC10S-IDX2      TO  IDX2
+           END-IF
       *
       *    入院日であること
            IF     (SPA-K02N-NYUINYMD   NOT =   SPA-SRYYMD )  AND
                   (IDX2                >   ZERO           )
                ADD     1                   TO  IDX2
+               MOVE    IDX2                TO  SPA-GMN-IDX
+      *        行挿入処理
+               PERFORM 41014-GYOINSN-SEC
                MOVE    SPA-K02N-NYUINYMD(7:2)  TO  WRK-SDD
                MOVE    "*/"                TO  SPA-GMN-INPUTCD (IDX2)
                MOVE    WRK-SDD             TO  SPA-GMN-INPUTCD (IDX2)
@@ -3751,6 +3780,10 @@
       *****************************************************************
        41010-PTNUM-SYORI-SEC           SECTION.
       *
+           IF      SPA-PTID        NOT =   ZERO
+      *        ワーク診療行為クリア
+               PERFORM 4900-WKSRYACT-CLEAR-SEC
+           END-IF
            MOVE    ZERO                TO  SPA-GMN-CUR
            MOVE    1                   TO  FLG-GMN-INIT
       *    ＳＰＡクリア処理
@@ -4354,6 +4387,10 @@
       *****************************************************************
        410132-SAIHENSYU-SEC         SECTION.
       *
+      *    ワーク診療行為クリア
+           MOVE    1                   TO  FLG-MOD-FLG
+           PERFORM 4900-WKSRYACT-CLEAR-SEC
+      *
       *    スパ共通編集処理
            PERFORM                     310-SPA-SET-SEC
       *
@@ -4445,6 +4482,13 @@
            IF      SPA-SYORIFLG        =   ZERO
                MOVE    SPACE               TO  SPA-HKNCOMBINUM
                MOVE    SPACE               TO  SPA-DRCD
+      *        診療内容を残さない時、展開中のクリア
+               IF      SPA-KID1-FLG        =   "OK"
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-MOD-FLG
+                   PERFORM 4900-WKSRYACT-CLEAR-SEC
+               END-IF
            END-IF
       *
            MOVE    SPA-SCR-REC         TO  HZN-SCR-REC
@@ -4628,10 +4672,8 @@
                    END-IF
                END-IF
       *
-               IF      K02N-INPUTCD (WRK-IDX2)  NOT =   SPACE
-                   IF      WRK-STR             =   ZERO
-                       MOVE    SPA-GMN-IDX         TO  WRK-STR
-                   END-IF
+               IF      WRK-STR             =   ZERO
+                   MOVE    SPA-GMN-IDX         TO  WRK-STR
                END-IF
            END-PERFORM
       *
@@ -4816,9 +4858,9 @@
                END-IF
            END-IF
       *
-      *    削除時
-           IF      LNK-SC97-INPUTCD(1:1)   =   SPACE
-      *
+           EVALUATE    LNK-SC97-INPUTCD(1:1)
+           WHEN    SPACE
+      *        削除時
       *        セットが削除の時セット内容を削除する
                IF     (SPA-MAE-INPUTCD(SPA-GMN-IDX)(1:1)   =   "S") OR
                        ((SPA-GMN-IDX           <   WRK-GYO-MAX  ) AND
@@ -4829,17 +4871,14 @@
                END-IF
                MOVE    SPACE           TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
                MOVE    1               TO  FLG-INS
-               GO  TO                  41011-KOUI-HENDEL-EXT
-           END-IF
       *
       *    剤削除時
-           IF      LNK-SC97-INPUTCD(1:1)   =   "-"
+           WHEN    "-"
                MOVE    LNK-SC97-INPUTCD
                                        TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
                PERFORM 41015-ZAIDEL-SEC
                MOVE    1               TO  FLG-INS
-               GO  TO                  41011-KOUI-HENDEL-EXT
-           END-IF
+           END-EVALUATE
       *
            .
        41011-KOUI-HENDEL-EXT.
@@ -4975,7 +5014,6 @@
                MOVE    SPA-ERRCD           TO  WRK-ERRCD2
                MOVE    SPACE               TO  SPA-ERRCD
            END-IF
-      *
       *
            .
        41011-KOUI-HEN2-EXT.
@@ -8364,6 +8402,10 @@
       *****************************************************************
        220-CLEAR-SYORI-SEC            SECTION.
       *
+           IF      SPA-GMN-PTID    NOT =   ZERO
+      *        ワーク診療行為クリア
+               PERFORM 4900-WKSRYACT-CLEAR-SEC
+           END-IF
       *
            INITIALIZE              SPA-SCR-REC
       *
@@ -8372,6 +8414,66 @@
       *
            .
        220-CLEAR-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ワーク診療行為クリア処理
+      *****************************************************************
+       4900-WKSRYACT-CLEAR-SEC             SECTION.
+      *
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY6"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "WKSRYACT-KEY6"     TO  ORC-DBPATH
+               PERFORM 970-WKSRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           PERFORM
+               UNTIL   FLG-WKSRYACT    =   1
+               EVALUATE    FLG-MOD-FLG
+                   WHEN    1
+      *                展開中止
+                       IF      WKSRY-MOD-FLG       =   9
+                           MOVE    ZERO                TO  WKSRY-MOD-FLG
+                       END-IF
+                   WHEN    2
+      *                前の展開
+                       IF      WKSRY-MOD-FLG       =   9
+                           MOVE    1                   TO  WKSRY-MOD-FLG
+                       ELSE
+                           IF      WKSRY-MOD-FLG       =   1
+                               MOVE    ZERO            TO  WKSRY-MOD-FLG
+                           END-IF
+                       END-IF
+                   WHEN    0
+                       MOVE    ZERO                TO  WKSRY-MOD-FLG
+               END-EVALUATE
+      *
+               MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+               MOVE    "DBUPDATE"          TO  MCP-FUNC
+               MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
+      *
+               MOVE    "WKSRYACT-KEY6"     TO  ORC-DBPATH
+               PERFORM 970-WKSRYACT-READ-SEC
+           END-PERFORM
+      *
+           .
+       4900-WKSRYACT-CLEAR-EXT.
            EXIT.
       *
       *****************************************************************
@@ -12654,6 +12756,9 @@
       *    排他制御解除処理
       *****************************************************************
        990-LOCK-OUT-SEC         SECTION.
+      *
+      *    ワーク診療行為クリア
+           PERFORM 4900-WKSRYACT-CLEAR-SEC
       *
       *    排他制御解除処理
            MOVE    2                   TO  SLOCK-MODE
