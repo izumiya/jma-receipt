@@ -5282,6 +5282,10 @@
       *****************************************************************
        4101129-KAISUU-CHK-SEC           SECTION.
       *
+      *    クリア
+           MOVE    SPACE           TO  SPA-COM-INPUTCD(SPA-GMN-IDX)
+           INITIALIZE                  SPA-COM-TBLREC (SPA-GMN-IDX)
+      *
       *    回数（未入力時、１回）
            IF      WRK-ACCT-MCNT       =   ZERO
                MOVE    1               TO  SPA-COM-KAISU (SPA-GMN-IDX)
@@ -6332,6 +6336,16 @@
                                            TO  WRK-COM-TBLREC(IDX-Z)
                    MOVE    SPA-GMN-TBLREC (IDX)
                                            TO  WRK-GMN-TBLREC(IDX-Z)
+      *
+      *            自費以外の計をクリアする
+                   IF      WRK-COM-SRYKBN (IDX-Z)   =   "95"  OR "96"
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO            TO  WRK-COM-KEI(IDX-Z)
+                       MOVE    ZERO            TO  WRK-COM-JIHIMONEY
+                                                               (IDX-Z)
+                    END-IF
+      *
                END-IF
       *        回数編集
                IF      SPA-GMN-INPUTCD(IDX)(1:1)   =   "."
