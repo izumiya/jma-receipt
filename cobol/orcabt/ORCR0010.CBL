@@ -86,6 +86,10 @@
       *                                     SRYACCT-KEY29 -> SRYACCT-KEY36
       *                                     SRYACCT-KEY30 -> SRYACCT-KEY37
       *  01.02.11    NACL-Æ£¸¶    04/06/15  °õºþ½ç¤ÎÄÉ²Ã¡Ê¸ÄÊÌºîÀ®»þ¤Î¤ß¡Ë
+      *  01.02.12    NACL-Æ£¸¶    05/03/03  Ï·¿ÍËô¤ÏÁ°´ü¹âÎð¼Ô¤Î¤È¤­¡¢
+      *                                     ·îÅÓÃæ¤ËÊÝ¸±¼Ô¤ÏÊÑ¤ï¤é¤º¤Ë
+      *                                     ÊÝ¸±¤¬ÊÑ¹¹¤Ë¤Ê¤Ã¤¿¾ì¹ç¤Ï£±Ëç
+      *                                     ¤Ë¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -273,6 +277,8 @@
                05  WRK-SYY         PIC 9(04).
                05  WRK-SMM         PIC 9(02).
                05  WRK-SDD         PIC 9(02).
+      * 
+           03  WRK-NENREI                PIC 9(03).
       *
            03  WRK-1033-TABLE.
                05  WRK-1033-TBL    OCCURS  5.
@@ -981,6 +987,10 @@
                MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
+      *
+      *            ´µ¼ÔÇ¯Îð·×»»
+                   PERFORM 500-AGECHK-SEC
+      *
       *            ÊÝ¸±ÁÈ¹ç¤»ÆÉ¹þ¤ß
                    INITIALIZE                  HKNCOMBI-REC
                    MOVE    SYS-1001-HOSPID     TO  COMB-HOSPID
@@ -1466,20 +1476,67 @@
       *****MOVE    COMB-HKNID          TO  WRK-RECE01-HKNID
       *****IF      COMB-HKNID          =   ZERO
            MOVE    COMB-HKNNUM         TO  WRK-RECE01-HKNNUM
+           MOVE    PTHKN-HONKZKKBN     TO  WRK-RECE01-HONKZKKBN
            IF      COMB-HKNNUM         =   SPACE
                MOVE    ZERO                TO  WRK-RECE01-KOHID
            ELSE
                IF      COMB-KOH1HKNNUM     =   "027"
                    MOVE    COMB-KOH1ID         TO  WRK-RECE01-KOHID
+                   MOVE    "0"                 TO  WRK-RECE01-HONKZKKBN
                ELSE
                    MOVE    ZERO                TO  WRK-RECE01-KOHID
+                   EVALUATE    PTHKN-HKNNUM
+                       WHEN    "002" 
+                           EVALUATE   PTHKN-HOJOKBN
+                               WHEN   "A"
+                               WHEN   "B"
+                               WHEN   "C"
+                               WHEN   "9"
+                                   MOVE    "0" TO  WRK-RECE01-HONKZKKBN
+                               WHEN   "D"
+                               WHEN   "E"
+                               WHEN   "F"
+                               WHEN   "8"
+                                   MOVE    "0" TO  WRK-RECE01-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "031"  THRU    "034"  
+                           EVALUATE   PTHKN-HOJOKBN
+                               WHEN   "B"
+                               WHEN   "9"   
+                                   MOVE    "0" TO  WRK-RECE01-HONKZKKBN
+                               WHEN   "E"
+                               WHEN   "8"
+                                   MOVE    "0" TO  WRK-RECE01-HONKZKKBN
+                             END-EVALUATE
+                       WHEN    "060" 
+                           IF     (WRK-NENREI  >=   70)  AND
+                                  (WRK-NENREI  <=   74)
+                               EVALUATE   PTHKN-HOJOKBN
+                                   WHEN   "1"
+                                   WHEN   "4"
+                                       MOVE    "0" 
+                                               TO  WRK-RECE01-HONKZKKBN
+                                   WHEN   "2"
+                                   WHEN   "5"
+                                       MOVE    "0"
+                                               TO  WRK-RECE01-HONKZKKBN
+                              END-EVALUATE
+                          END-IF     
+                      WHEN    OTHER
+                          EVALUATE   PTHKN-HOJOKBN
+                             WHEN   "9"
+                                 MOVE    "0" TO  WRK-RECE01-HONKZKKBN
+                             WHEN   "8"
+                                 MOVE    "0" TO  WRK-RECE01-HONKZKKBN
+                         END-EVALUATE
+                   END-EVALUATE
                END-IF 
            END-IF
       *
            MOVE    PTHKN-HKNJANUM      TO  WRK-RECE01-HKNJANUM
       *****MOVE    PTHKN-TEKSTYMD      TO  WRK-RECE01-TEKSTYMD
            MOVE    ZERO                TO  WRK-RECE01-TEKSTYMD 
-           MOVE    PTHKN-HONKZKKBN     TO  WRK-RECE01-HONKZKKBN 
+      *****MOVE    PTHKN-HONKZKKBN     TO  WRK-RECE01-HONKZKKBN 
            EVALUATE    PTHKN-HKNNUM
                WHEN    "002"
                WHEN    "031"   THRU    "034"
@@ -1574,18 +1631,8 @@
            MOVE   PTINF-BIRTHDAY       TO  WRK-RECE01-BIRTHDAY
            MOVE   PTINF-DEATHKBN       TO  WRK-RECE01-DEATHKBN
            MOVE   PTINF-TSTPTNUMKBN    TO  WRK-RECE01-TSTPTNUMKBN
-      *    ´µ¼ÔÇ¯Îð·×»»
-           INITIALIZE                      ORCSAGECHKAREA
-           MOVE    WRK-RECE01-HOSPID   TO  AGECHK-HOSPID
-           MOVE    WRK-RECE01-PTID     TO  AGECHK-PTID
-           MOVE    WRK-RECE01-SRYYM    TO  AGECHK-SRYYMD(1:6)
-           MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
-           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
-           CALL    "ORCSAGECHK"            USING
-                                           ORCSAGECHKAREA
-           IF      AGECHK-RC           =   ZERO
-               MOVE  AGECHK-NENREI         TO  WRK-RECE01-AGE
-           END-IF
+      *    ´µ¼ÔÇ¯Îð
+           MOVE    WRK-NENREI          TO  WRK-RECE01-AGE
       *    µìÀ«ÍúÎò¤Î¼èÆÀ
            INITIALIZE                      KYUSEIRRK-REC
            MOVE    WRK-RECE01-HOSPID       TO  KYUSEI-HOSPID
@@ -1962,6 +2009,9 @@
                                                LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD 
       *
+      *    ´µ¼ÔÇ¯Îð·×»»
+           PERFORM 500-AGECHK-SEC
+      *
       *    ¿ÇÎÅÇ¯·î¤ÎÀÁµá´ÉÍýºï½ü½èÍý
            INITIALIZE                  RECE10-REC
            MOVE    SYS-1001-HOSPID     TO  RECE10-HOSPID
@@ -2208,6 +2258,29 @@
            DISPLAY "*** ORCR0010 END ***"
            .
        300-TERM-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *        ´µ¼ÔÇ¯Îð·×»»½èÍý
+      *****************************************************************
+       500-AGECHK-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  WRK-NENREI
+      *
+           INITIALIZE                      ORCSAGECHKAREA
+           MOVE    SYS-1001-HOSPID     TO  AGECHK-HOSPID
+           MOVE    PTINF-PTID          TO  AGECHK-PTID
+           MOVE    WRK-STYMD (1:6)     TO  AGECHK-SRYYMD(1:6)
+           MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
+           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
+           CALL    "ORCSAGECHK"            USING
+                                           ORCSAGECHKAREA
+           IF      AGECHK-RC           =   ZERO
+               MOVE  AGECHK-NENREI         TO  WRK-NENREI
+           END-IF
+      *
+           .
+       500-AGECHK-EXT.
            EXIT.
       *
       *****************************************************************
