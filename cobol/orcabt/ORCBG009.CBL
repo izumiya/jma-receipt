@@ -31,6 +31,7 @@
       * 01.01.02     NACL-¿¹ÏÆ     03/08/26  »ÈÍÑÎÌ¥«¥¦¥ó¥È¹½À®ÊÑ¹¹
       * 01.01.03     NACL-¿¹ÏÆ     03/08/27  ´µ¼Ô»ØÄê»þ½¤Àµ
       * 01.02.01     NACL-¿¹ÏÆ     04/01/23  Êñ³çÊ¬ÆÉ¤ßÈô¤Ð¤·
+      * 01.02.02     NACL-¿¹ÏÆ     04/08/31  ¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -619,7 +620,13 @@
       *
       *        ÀÁµá´ÉÍý¾ðÊó¥»¥Ã¥È
                PERFORM UNTIL   FLG-SEIKYU      =   1
-                   IF          RECE10-TOTALTEN(1)  >=  WRK-NAIYO
+      *----(01.02.02)--UPD-START---
+                   IF    ( RECE10-TOTALTEN(1)  >=  WRK-NAIYO ) OR
+                         ( RECE10-TOTALTEN(2)  >=  WRK-NAIYO ) OR
+                         ( RECE10-TOTALTEN(3)  >=  WRK-NAIYO ) OR
+                         ( RECE10-TOTALTEN(4)  >=  WRK-NAIYO ) OR
+                         ( RECE10-TOTALTEN(5)  >=  WRK-NAIYO )
+      *----(01.02.02)--UPD-END-----
                        INITIALIZE                  SRYACCT-REC
                        MOVE    RECE10-HOSPID       TO  ACCT-HOSPID
                        MOVE    RECE10-NYUGAIKBN    TO  ACCT-NYUGAIKBN
@@ -943,7 +950,8 @@
                                        TO  SPRT-TBL-KEY
            MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  SPRT-TBL-GROUP
-           MOVE    LNK-PRTKANRI-SRYYM  TO  SPRT-SRYYM
+      *     MOVE    LNK-PRTKANRI-SRYYM  TO  SPRT-SRYYM
+           MOVE    PARA-DENPPRTYM      TO  SPRT-SRYYM
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPRT-SKYYMD
            MOVE    LNK-PRTKANRI-SHELLID 
                                        TO  SPRT-SHELLID
@@ -1526,19 +1534,19 @@
       *****************************************************************
       *    £Ä£Â¡¡¥ª¡¼¥×¥ó½èÍý
       *****************************************************************
-       100-DBOPEN-SEC              SECTION.
+       100-DBOPEN-SEC                SECTION.
       *
            MOVE    "DBOPEN"            TO  MCP-FUNC.
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
       *
            MOVE    "DBSTART"           TO  MCP-FUNC.
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
            .
        100-DBOPEN-EXT.
            EXIT.
@@ -1546,19 +1554,19 @@
       *****************************************************************
       *    £Ä£Â¡¡¥¯¥í¡¼¥º½èÍý
       *****************************************************************
-       900-DBDISCONNECT-SEC        SECTION.
+       900-DBDISCONNECT-SEC            SECTION.
       *
            MOVE    "DBCOMMIT"          TO  MCP-FUNC.
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
       *
            MOVE    "DBDISCONNECT"      TO  MCP-FUNC.
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
            .
-       900-DBCLOSE-EXT.
+       900-DBDISCONNECT-EXT.
            EXIT.
