@@ -1330,7 +1330,8 @@
                          MOVE     ZERO    TO   IDX6
                          PERFORM  VARYING  IDX5   FROM  1  BY  1
                            UNTIL  IDX5   >  31
-                               IF   WRK-SO-GAIHAKU-KBN(IDX1 IDX5)  =  1
+                               IF   WRK-SO-GAIHAKU-KBN(IDX1 IDX5)  =
+                                                         1   OR  2
                                  IF  IDX5   =   1
                                     ADD   1    TO   IDX6
                                     MOVE  IDX5   TO  
@@ -1339,7 +1340,8 @@
                                                WRK-GAIHAKU-DAY-ED(IDX6)
                                  ELSE
                                    COMPUTE   IDX7  =   IDX5  -  1
-                                   IF WRK-SO-GAIHAKU-KBN(IDX1 IDX7) = 1
+                                   IF WRK-SO-GAIHAKU-KBN(IDX1 IDX7) =
+                                                         1   OR  2
                                         MOVE  IDX5  TO
                                               WRK-GAIHAKU-DAY-ED(IDX6)
                                    ELSE
@@ -1423,7 +1425,8 @@
                          MOVE     ZERO    TO   IDX6
                          PERFORM  VARYING  IDX5   FROM  1  BY  1
                            UNTIL  IDX5   >  31
-                               IF   WRK-SO-GAIHAKU-KBN(IDX1 IDX5)  =  1
+                               IF   WRK-SO-GAIHAKU-KBN(IDX1 IDX5)  =
+                                                         1   OR  2
                                  IF  IDX5   =   1
                                     ADD   1    TO   IDX6
                                     MOVE  IDX5   TO  
@@ -1432,7 +1435,8 @@
                                                WRK-GAIHAKU-DAY-ED(IDX6)
                                  ELSE
                                    COMPUTE   IDX7  =   IDX5  -  1
-                                   IF WRK-SO-GAIHAKU-KBN(IDX1 IDX7) = 1
+                                   IF WRK-SO-GAIHAKU-KBN(IDX1 IDX7) =
+                                                         1   OR  2
                                         MOVE  IDX5  TO
                                               WRK-GAIHAKU-DAY-ED(IDX6)
                                    ELSE
