@@ -129,6 +129,7 @@
       *  01.08.03    NACL-藤原    04/03/08  コラムリストの行制御
       *  01.08.04    NACL-藤原    04/03/09  手術歴の追加
       *  01.08.05    NACL-藤原    04/03/29  主病名の確認画面後の更新の修正
+      *  01.08.06    NACL-藤原    04/03/30  開始日と保険組合せのチェックの修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3407,10 +3408,8 @@
                                                TO  WRK-KBN
                    PERFORM 5001-HKNCOMBI-HENSYU-SEC
                    IF      WRK-KBNMEI      NOT =   SPACE
-                       IF    ( SPA-NAI-C02-SRYYMD
-                                           <=   WRK-TEKEDYMD )
-                       AND   ( SPA-NAI-C02-SRYYMD
-                                           >=   WRK-TEKSTYMD )
+                       IF      SPA-NAI-C02-SRYYMD
+                                           <=   WRK-TEKEDYMD
                            CONTINUE
                        ELSE    
                            MOVE    "0011"     TO  SPA-ERRCD
@@ -4327,10 +4326,8 @@
                IF      WRK-KBNMEI      =   SPACE
                    MOVE    "0009"               TO  SPA-ERRCD
                ELSE
-                   IF    ( SPA-NAI-C02-SRYYMD
-                                       <=   WRK-TEKEDYMD )
-                   AND   ( SPA-NAI-C02-SRYYMD
-                                       >=   WRK-TEKSTYMD )
+                   IF      SPA-NAI-C02-SRYYMD
+                                       <=   WRK-TEKEDYMD
                        MOVE    WRK-KBNMEI  TO  SPA-GMN-C02-HKNCOMBIMEI
                    ELSE    
                        MOVE    "0011"     TO  SPA-ERRCD
@@ -5004,10 +5001,8 @@
                    UNTIL   IDY >      SPA-GMN-C02-HKNCOMBI-MAX
                IF      SPA-GMN-C02-TNUM (WRK-SELNO) 
                                       =   SPA-GMN-C02-HKNCOMBIL (IDY)
-                   IF    ( SPA-NAI-C02-SRYYMD
-                                  <= SPA-NAI-C02-TEKEDYMD (IDY) )
-                   AND   ( SPA-NAI-C02-SRYYMD
-                                  >= SPA-NAI-C02-TEKSTYMD (IDY) )
+                   IF      SPA-NAI-C02-SRYYMD
+                                  <= SPA-NAI-C02-TEKEDYMD (IDY)
                        MOVE    SPA-GMN-C02-HKNCOMBILST (IDY)
                                           TO  SPA-GMN-C02-HKNCOMBI-G
                    ELSE    
