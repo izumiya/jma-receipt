@@ -271,7 +271,7 @@
            COPY  "CPSYUNOU.INC"    REPLACING  //SYU-// BY //LNK-SYU-//.
       /
        PROCEDURE           DIVISION  USING
-                                     MCPAREA
+                                     SPA-AREA
                                      LNK-ORCS02-REC
                                      LNK-SYUNOU-REC-T.
       ******************************************************************
