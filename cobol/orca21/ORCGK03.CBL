@@ -3201,7 +3201,7 @@
            IF     (SPA-NAI-NYUKINFLG   =   1 ) AND
                  ((WRK-HKNCOMBI        =   ZERO ) OR
                   (WRK-SRYKA           =   ZERO ))  AND
-                 ( SPA-GMN-NYUKIN      >   ZERO )  AND
+      ********** ( SPA-GMN-NYUKIN      >   ZERO )  AND
                  ( SPA-SYORIFLG        =   ZERO )
       *        入金合計を各明細に振り分ける
                MOVE    SPA-GMN-NYUKIN      TO  WRK-NYUKIN
@@ -4206,6 +4206,7 @@
            MOVE    ZERO                TO  WRK-HKNCOMBI
            MOVE    SPA-GMN-NYUKIN      TO  WRK-HZN-NYUKIN
            MOVE    WRK-NYUKIN          TO  SPA-GMN-NYUKIN
+           MOVE    1                   TO  SPA-NAI-NYUKINFLG
       *    入金額振替編集処理
            PERFORM 40011-NYUKIN-SET-SEC
            MOVE    WRK-HZN-NYUKIN      TO  SPA-GMN-NYUKIN
