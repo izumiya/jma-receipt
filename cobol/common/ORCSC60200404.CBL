@@ -411,19 +411,19 @@
       *    イオン化カルシウム
            03  FILLER          PIC X(14)  VALUE    "03 1 160021610".
       *どれか１つ
-      *    蛋白分画
-           03  FILLER          PIC X(14)  VALUE    "04 1 160022810".
+      *!!! 蛋白分画
+      *    03  FILLER          PIC X(14)  VALUE    "04 1 160022810".
       *    Ａ／Ｇ
-           03  FILLER          PIC X(14)  VALUE    "04 11160022350".
+      *!!! 03  FILLER          PIC X(14)  VALUE    "04 11160022350".
       *
        01  TBL-KENSA-JYU-AREA-R    REDEFINES   TBL-KENSA-JYU-AREA.
-           03  TBL-KENSA-JYU-OCC       OCCURS  10  INDEXED  JYU-IDX.
+           03  TBL-KENSA-JYU-OCC       OCCURS  08  INDEXED  JYU-IDX.
                05  TBL-JYU-KBN         PIC X(02).
                05  TBL-FILLER1         PIC X(01).
                05  TBL-JYU-KEN         PIC X(01).
                05  TBL-FILLER2         PIC X(01).
                05  TBL-JYU-SRYCD       PIC X(09).
-       01  KEN-JYU-MAX                 PIC 9(04)   VALUE   10.
+       01  KEN-JYU-MAX                 PIC 9(04)   VALUE   08.
       *
       *    重複算定不可テーブル（２）
        01  TBL-KENSA-JYU2-AREA.
