@@ -36,6 +36,8 @@
       *  01.00.05    NACL-藤原    04/04/05  病名コード９９９９９９９読み飛ばす
       *  01.00.06    NACL-藤原    04/04/06  編集病名のとき疑いフラグからの
       *                                     病名コード追加をやめる
+      *  01.00.07    NACL-小豆沢  05/04/06  病名データにセットするレセ電診療科
+      *                                     を患者病名テーブルの診療科に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2230,7 +2232,7 @@
            IF      PTBYO-SRYKA     NOT =   SPACE    
                INITIALIZE                      SYS-1005-REC
                MOVE    "1005"              TO  SYS-1005-KANRICD
-               MOVE    ACCT-SRYKA          TO  SYS-1005-KBNCD
+               MOVE    PTBYO-SRYKA         TO  SYS-1005-KBNCD
                MOVE    WRK-PARA-SRYYM      TO  ORC-DBYMD(1:6)
                MOVE    "01"                TO  ORC-DBYMD(7:2)
                MOVE    SYS-1005-REC        TO  MCPDATA-REC
