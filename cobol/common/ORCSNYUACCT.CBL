@@ -1583,6 +1583,7 @@
       *            退院月の時は削除しない
       *            （転出以外の時）
                    IF     (NACCT-SRYYM(1:6)    =   WRK-RRK-YMD(1:6))
+                     AND  (WRK-RRK-YMD(7:2)        NOT =   "01" )
                      AND  (LNK-SCNYUACCT-SYORI-KBN NOT =   "8" )
       *                 診療会計更新
                        PERFORM 20013-NYUINACCT-UPDATE-SEC
