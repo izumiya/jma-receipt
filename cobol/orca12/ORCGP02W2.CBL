@@ -166,7 +166,8 @@
        01  WRK-IDXSRT-AREA.
            03  WRK-SRT-STYMD       PIC X(08).
            03  WRK-SRT-EDYMD       PIC X(08).
-           03  WRK-SRT-RJN-IDX OCCURS 5 PIC 9(04).
+    *****  03  WRK-SRT-RJN-IDX OCCURS 5 PIC 9(04).
+           03  WRK-SRT-RJN-IDX OCCURS 99 PIC 9(04).
            03  WRK-SRT-RJN-CNT     PIC 9(04).
            03  WRK-SRT-RJN-CNT2    PIC 9(04).
      ***** 03  WRK-SRT-HKN-IDX OCCURS 5 PIC 9(04).
@@ -424,16 +425,17 @@
            END-IF
       *
            PERFORM
-               UNTIL  (FLG-PARA    NOT =   ZERO      )
+               UNTIL  (FLG-PARA    NOT =   ZERO      )  OR
+                      (SPA-ERRCD   NOT =   SPACE     )
       *
                MOVE    PARA-DATA-REC       TO  PTHKNINF-REC
                IF      PTHKN-SAKJOKBN      =   SPACE
                    ADD     1               TO  CNT-HKN
                    IF  CNT-HKN             >   100
                        MOVE    "0015"      TO  SPA-ERRCD
-                       GO      TO          320-PARAFILE-KENSAKU-EXT
+                   ELSE
+                       PERFORM 330-HKNINF-SET-SEC
                    END-IF
-                   PERFORM 330-HKNINF-SET-SEC
                END-IF
                MOVE    "PARA-KEY2"         TO  ORC-DBPATH
                PERFORM 990-PARA-READ-SEC
@@ -467,16 +469,17 @@
            END-IF
       *
            PERFORM
-               UNTIL  (FLG-PARA    NOT =   ZERO      )
+               UNTIL  (FLG-PARA    NOT =   ZERO      )  OR
+                      (SPA-ERRCD   NOT =   SPACE     )
       *
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF      PTKOH-SAKJOKBN      =   SPACE
                    ADD     1               TO  CNT-KOH
                    IF  CNT-KOH             >   100
                        MOVE    "0015"      TO  SPA-ERRCD
-                       GO      TO          320-PARAFILE-KENSAKU-EXT
+                   ELSE
+                       PERFORM 330-KOHINF-SET-SEC
                    END-IF
-                   PERFORM 330-KOHINF-SET-SEC
                END-IF
                MOVE    "PARA-KEY2"         TO  ORC-DBPATH
                PERFORM 990-PARA-READ-SEC
@@ -516,12 +519,11 @@
                MOVE    PTHKN-TEKSTYMD   TO  WRK-KEN-TEKSTYMD
                MOVE    PTHKN-TEKEDYMD   TO  WRK-KEN-TEKEDYMD
       *----(01.00.01) LINE MOD END   ---------------------------------
-      *        保険番号マスタより制度名取得
-               PERFORM 4410-HKNKOH-KAKUNIN-SEC
-               IF  WRK-KEN-ERFLG    NOT =   SPACE
-                   MOVE    "0065"       TO  SPA-ERRCD
-                   GO  TO               330-HKNINF-SET-EXT
-               END-IF
+      *    保険番号マスタより制度名取得
+           PERFORM 4410-HKNKOH-KAKUNIN-SEC
+           IF  WRK-KEN-ERFLG    NOT =   SPACE
+               MOVE    "0065"       TO  SPA-ERRCD
+           ELSE
                MOVE    HKN-HKNKOHSBTKBN
                                            TO  WRK-HKN-SBT   (CNT-HKN)
                MOVE    PTHKN-HOJOKBN       TO  WRK-KEN-HOJOKBN
@@ -532,6 +534,7 @@
       *        制度名などセットしてＲＥＷＲＩＴＥする
                MOVE    HKN-HKNKOHSBTKBN    TO  PTHKN-SBT
                MOVE    WRK-KEN-SEIDO       TO  PTHKN-SEIDO
+           END-IF
       *
       ******   MOVE    PTHKNINF-REC        TO  PARA-DATA-REC
       *        MOVE    PARA-REC            TO  MCPDATA-REC
@@ -579,12 +582,11 @@
                MOVE    PTKOH-TEKSTYMD   TO  WRK-KEN-TEKSTYMD
                MOVE    PTKOH-TEKEDYMD   TO  WRK-KEN-TEKEDYMD
       *----(01.00.01) LINE MOD END   ---------------------------------
-      *        保険番号マスタより制度名取得
-               PERFORM 4410-HKNKOH-KAKUNIN-SEC
-               IF  WRK-KEN-ERFLG    NOT =   SPACE
-                   MOVE    "0065"       TO  SPA-ERRCD
-                   GO  TO               330-KOHINF-SET-EXT
-               END-IF
+      *    保険番号マスタより制度名取得
+           PERFORM 4410-HKNKOH-KAKUNIN-SEC
+           IF  WRK-KEN-ERFLG    NOT =   SPACE
+               MOVE    "0065"       TO  SPA-ERRCD
+           ELSE
                MOVE    HKN-HKNKOHSBTKBN TO  WRK-KOH-SBT       (CNT-KOH)
                MOVE    HKN-HKNKOHKBN    TO  WRK-KOH-HKNKOHKBN (CNT-KOH)
                MOVE    HKN-GENHKNNUM1   TO  WRK-KOH-GENHKNNUM1(CNT-KOH)
@@ -598,6 +600,7 @@
                MOVE    HKN-GENHKNNUM2   TO  PTKOH-GENHKNNUM2
                MOVE    HKN-GENHKNNUM3   TO  PTKOH-GENHKNNUM3
                MOVE    HKN-TANSEIDONAME TO  PTKOH-SEIDO
+           END-IF
       *
       ****     MOVE    PTKOHINF-REC        TO  PARA-DATA-REC
       *        MOVE    PARA-REC            TO  MCPDATA-REC
@@ -702,32 +705,25 @@
       *
       *   主保険中心　組合せ作成処理
            PERFORM     57011-SYUHKN-HEN-SEC
-           IF  SPA-ERRCD         NOT =   SPACE
-               GO  TO                5701-COMB-HEN-EXT
-           END-IF
       *
       *   生活保護単独　組合せ作成処理
-           PERFORM     57013-SEIHO-HEN-SEC
-           IF  SPA-ERRCD         NOT =   SPACE
-               GO  TO                5701-COMB-HEN-EXT
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM     57013-SEIHO-HEN-SEC
            END-IF
       *
-      *   公費単独　　組合せ作成処理
-           PERFORM     57013-KOHTANDOKU-HEN-SEC
-           IF  SPA-ERRCD         NOT =   SPACE
-               GO  TO                5701-COMB-HEN-EXT
+      *    公費単独　　組合せ作成処理
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM     57013-KOHTANDOKU-HEN-SEC
            END-IF
       *
       *   主公費中心　組合せ作成処理
-           PERFORM     57014-SYUKOH-HEN-SEC
-           IF  SPA-ERRCD         NOT =   SPACE
-               GO  TO                5701-COMB-HEN-EXT
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM     57014-SYUKOH-HEN-SEC
            END-IF
       *
       *   自費・治験・労災　組合せ作成処理
-           PERFORM     57015-JIHCHIROU-HEN-SEC
-           IF  SPA-ERRCD         NOT =   SPACE
-               GO  TO                5701-COMB-HEN-EXT
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM     57015-JIHCHIROU-HEN-SEC
            END-IF
       *
            .
@@ -3940,8 +3936,12 @@
                        END-PERFORM
                        ADD     1           TO  WRK-SRT-RJN-CNT
                        IF  WRK-SRT-RJN-CNT2  =   ZERO
-                           MOVE    IDZ     TO  WRK-SRT-RJN-IDX
+                           IF      WRK-SRT-RJN-CNT   >   99
+                               MOVE    "0015"            TO  SPA-ERRCD
+                           ELSE
+                               MOVE    IDZ     TO  WRK-SRT-RJN-IDX
                                                    (WRK-SRT-RJN-CNT)
+                           END-IF
                        END-IF
                      END-IF
                    END-IF
@@ -3992,8 +3992,12 @@
                        END-PERFORM
                        ADD     1           TO  WRK-SRT-RJN-CNT
                        IF  WRK-SRT-RJN-CNT2  =   ZERO
-                           MOVE    IDZ     TO  WRK-SRT-RJN-IDX
+                           IF      WRK-SRT-RJN-CNT   >   99
+                               MOVE    "0015"            TO  SPA-ERRCD
+                           ELSE
+                               MOVE    IDZ     TO  WRK-SRT-RJN-IDX
                                                    (WRK-SRT-RJN-CNT)
+                           END-IF
                        END-IF
                      END-IF
                    END-IF
