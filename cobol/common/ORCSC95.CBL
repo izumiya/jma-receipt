@@ -1046,6 +1046,7 @@
       *    中途終了からの場合、ドクターを受付から決定する
            IF     (LNK-SC95-PG         =   "K10" )  AND
                   (SPA-DRCD            =   SPACE )
+               MOVE    ZERO                TO  FLG-UKETUKE-ARI
                PERFORM 10014-UKETUKE-CHK-SEC
            END-IF
       *    受診履歴情報セット
