@@ -47,6 +47,11 @@
       *                                     ÊýË¡¤ò½¤Àµ
       *  01.00.09    NACL-Æ£¸¶    05/01/20  ¿ÇÎÅ¶èÊ¬£¹£°¡¦£¹£²¤Î¥³¥á¥ó¥È
       *                                     ¤ÎÊÔ½¸
+      *  01.00.10    NACL-Æ£¸¶    05/02/23  Ãí²Ã»»¤Ë¤è¤ë²Ã»»¹àÌÜ¤Îµ­ºÜ
+      *                                     ¡Ê½èÃÖ¡¦¤½¤ÎÂ¾¡Ë
+      *                                     ²Ã»»¹àÌÜ¤Ç¤¢¤ë¤¬´ðËÜ¹àÌÜ¤È¤Ê¤Ã¤Æ
+      *                                     ¤¤¤ë¹àÌÜ¤¬¤¢¤ë¾ì¹ç¤Îµ­ºÜ½ç
+      *                                     Ä¶²»ÇÈÆâ»ë¶À²Ã»»¤òÄþ¸º¤Î¸å¤Ëµ­ºÜ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -231,6 +236,7 @@
            03  FLG-HIT                 PIC 9(01).
            03  FLG-COMMENT             PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
+           03  FLG-KOUI                PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -337,6 +343,8 @@
            03  WRK-COM-RENNUM          PIC 9(04).
       *
            03  WRK-COM-FTNKBN          PIC X(01).
+      *
+           03  WRK-CHUKSNCD            PIC X(04).
       *
       *    1·åÌÜ:À¸ÊÝ 2·åÌÜ:·ë³Ë 3·åÌÜ:Àº¿À
            03  WRK-3SYU-KBN.
@@ -792,6 +800,10 @@
       *    ´ÖÀÜ»£±Æ¤Î£µ£°¡óÄþ¸º
            03  WRK-CONS-SRYKBN70-TEIGEN
                                       PIC X(09)   VALUE   "170020570".
+      *
+      *    Ä¶²»ÇÈÆâ»ë¶À²Ã»»
+           03  WRK-CONS-CHOONPA-KASAN
+                                      PIC X(09)   VALUE   "160148670".
       *
       *    ½ÐÎÏÂÐ¾Ý¤Î¥³¥á¥ó¥È
            03  WRK-CONS-COMMENT-G.
@@ -3051,7 +3063,8 @@
                                         WRK-KOUI-TAIHI-AREA
       *
            IF      RECE641-SRYKBN       =   "50"    OR  "54"    OR
-                                            "60"
+                                            "60"    OR  "40"    OR
+                                            "80"
                CONTINUE
            ELSE
                GO  TO  20074-ZAI-KOUI-SORT-EXT
@@ -3061,18 +3074,74 @@
                GO  TO  20074-ZAI-KOUI-SORT-EXT
            END-IF
       *
-           PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       WRK-TBLMAX1
-               MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC          (IDX)
-               MOVE    TBL-KOUI-SRYCD        (IDX) TO
-                                       WRK-KOUI-TAIHI-SRYCD        (IDX)
-               MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
-                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDX)
-               MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
-                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDX)
-               MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
-                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
+           MOVE    ZERO                TO  IDY
+           MOVE    1                   TO  IDX
+           PERFORM UNTIL   IDX >   WRK-TBLMAX1
+               MOVE    SPACE               TO  WRK-CHUKSNCD
+               MOVE    ZERO                TO  FLG-KOUI
+      *
+               PERFORM UNTIL   IDX >   WRK-TBLMAX1
+                 EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
+                           ALSO    TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                   WHEN    SPACE   ALSO    ANY
+                       CONTINUE
+                   WHEN    "0"     ALSO    ANY
+                   WHEN    "8"     ALSO    ANY
+                       ADD     1                           TO  IDY
+                       MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDY)
+                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                       INITIALIZE      TBL-KOUI-REC (IDX)
+                       MOVE    SPACE               TO  WRK-CHUKSNCD
+                   WHEN    ANY    ALSO    "1"
+                   WHEN    ANY    ALSO    "3"
+                   WHEN    ANY    ALSO    "5"
+                       IF      WRK-CHUKSNCD        =   SPACE
+                           MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-CHUKSNCD
+                           ADD     1                           TO  IDY
+                           MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDY)
+                           MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                           MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                           MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                           MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                           INITIALIZE      TBL-KOUI-REC (IDX)
+                       ELSE
+                           MOVE    1               TO  FLG-KOUI
+                       END-IF    
+                   WHEN    OTHER
+                       ADD     1                           TO  IDY
+                       MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDY)
+                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                       INITIALIZE      TBL-KOUI-REC (IDX)
+                 END-EVALUATE    
+                 COMPUTE IDX     =   IDX     +   1
+               END-PERFORM
+      *
+      *        ½ÐÎÏÂÐ¾Ý¤È¤Ê¤Ã¤Æ¤¤¤Ê¤¤¥Ç¡¼¥¿¤¬¤¢¤ë 
+               IF      FLG-KOUI            =   1
+                   MOVE    1                   TO  IDX
+               END-IF
            END-PERFORM
       *
            INITIALIZE                      TBL-KOUI-AREA
@@ -3113,17 +3182,23 @@
                                    END-IF
                                    MOVE    1               TO  IDZ  
                                WHEN    "7"
-                                   IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
-                                                               (IDX)
-                                                       =   5   OR  6 )
-                                   AND   ( WRK-KOUI-TAIHI-CHUKSNCD
-                                                               (IDX)
-                                                       =   "0000"    )
-                                   AND   ( RECE641-SRYKBN
-                                                   NOT =   "54"      ) 
-                                       MOVE    3               TO  IDZ
+                                   IF      WRK-KOUI-TAIHI-SRYCD (IDX)
+                                                           =
+                                                 WRK-CONS-CHOONPA-KASAN
+                                     MOVE    4               TO  IDZ  
                                    ELSE
+                                     IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
+                                                               (IDX)
+                                                         =   5   OR  6 )
+                                     AND   ( WRK-KOUI-TAIHI-CHUKSNCD
+                                                                 (IDX)
+                                                         =   "0000"    )
+                                     AND   ( RECE641-SRYKBN
+                                                     NOT =   "54"      ) 
+                                       MOVE    3               TO  IDZ
+                                     ELSE
                                        MOVE    2               TO  IDZ
+                                     END-IF
                                    END-IF   
                                WHEN    "9" 
                                    MOVE    4               TO  IDZ  
