@@ -7,6 +7,7 @@ tbl_wksryact {
 	HKNCOMBI			number(4,0);
 	ZAINUM			        number(8,0);
 	RENNUM                          number(2,0);
+	DRCD				char(5);
 	SRYSYUKBN			char(3);
 	SRYKBN			        char(2);
 	JIHIMONEYTOTAL			number(7,0);
@@ -84,6 +85,9 @@ tbl_wksryact {
 	DOUJI_DENPNUM			number(7,0);
 	DOUJI_RENNUM			number(1,0);
 	CONTKBN  			char(1);
+	MOD_FLG				number(1,0);
+	KARTE_FLG			number(1,0);
+	KARTE_KEY			varchar(36);
 	TERMID   			varchar(16);
 	OPID     			varchar(16);
 	CREYMD   			char(8);
@@ -183,8 +187,9 @@ path	key4 	{
 			WHERE   HOSPID    =   :HOSPID
 			AND   NYUGAIKBN   =   :NYUGAIKBN
 			AND   PTID        =   :PTID
-			ORDER   BY        SRYKA,
-		                          SRYYMD,
+			ORDER   BY        SRYYMD,
+                                          SRYKA,
+                                          HKNCOMBI,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -198,8 +203,9 @@ path	key5 	{
 			WHERE   HOSPID    =   :HOSPID
 			AND   NYUGAIKBN   =   :NYUGAIKBN
 			ORDER   BY        PTID,
-                                          SRYKA,
 		                          SRYYMD,
+                                          SRYKA,
+                                          HKNCOMBI,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -211,6 +217,40 @@ path	all2	{
 		SELECT *
 		FROM tbl_wksryact
 			WHERE   SRYYMD    LIKE   :SRYYMD
+		;
+	};
+};
+path	key6 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key6_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPID    =   :HOSPID
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+                        AND   MOD_FLG     =   '1'
+			ORDER   BY        SRYYMD,
+                                          SRYKA,
+                                          HKNCOMBI,
+                                          ZAINUM,
+                                          RENNUM
+		;
+	};
+};
+path	key7	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key7_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPID    =   :HOSPID
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      =   :SRYYMD
+                        AND   MOD_FLG     <>  '0'
+			ORDER   BY        SRYKA,
+                                          HKNCOMBI,
+                                          ZAINUM,
+                                          RENNUM
 		;
 	};
 };
