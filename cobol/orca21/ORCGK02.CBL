@@ -3329,6 +3329,17 @@
       *    ワーク診療行為からの時、剤毎に剤点数を編集し直す
            IF      LNK-WKSRY-TERMID (1)    =   "WKSRYACT"
                PERFORM 31031-WKSRY-ZAITENHEN-SEC
+           ELSE
+      *        前回処方展開時の、療養担当手当（北海道）判定
+               IF      FLG-SYOSIN          =   1
+                   IF     (IDX2            >   ZERO ) AND
+                          (SPA-GMN-INPUTCD(IDX2)   =   "199000610" )
+                       MOVE    "1"             TO  SPA-COM-KAIFLG
+                                                               (IDX2)
+                       MOVE    "1"             TO  SPA-COM-ZAIEND
+                                                               (IDX2)
+                   END-IF
+               END-IF
            END-IF
       *
            MOVE    ZERO                TO  FLG-INGAIKBN
@@ -3382,10 +3393,16 @@
                        MOVE    1               TO  FLG-HEN-CHK
                    END-IF
       *            前回編集時、自動作成分は編集しない
-                   IF     (FLG-SYOSIN                    =   1 )  AND
-                          (LNK-WKSRY-AUTOKBN(IDX IDY)    =   "2" OR
-                                                             "3" )
-                       MOVE    1               TO  FLG-HEN-CHK
+                   IF      FLG-SYOSIN              =   1
+                       IF      LNK-WKSRY-AUTOKBN(IDX IDY)    =   "2" OR
+                                                                 "3"
+                           MOVE    1               TO  FLG-HEN-CHK
+                       ELSE
+                           IF      LNK-WKSRY-SRYCD(IDX IDY)(1:1)
+                                                   =   "1"
+                               PERFORM 31013-ZENKAICHK-SEC
+                            END-IF
+                       END-IF
                    END-IF
       *            登録時自動発生分は編集しない
                    IF      LNK-WKSRY-AUTOKBN(IDX IDY)    =   "3"
@@ -3418,10 +3435,12 @@
                            (LNK-WKSRY-ZAINUM (IDX + 1)
                                            NOT =   LNK-WKSRY-ZAINUM
                                                                 (IDX)))
-                       MOVE    "1"             TO  SPA-COM-KAIFLG
+                       IF      IDX2            <=  200
+                           MOVE    "1"             TO  SPA-COM-KAIFLG
                                                                (IDX2)
-                       MOVE    "1"             TO  SPA-COM-ZAIEND
+                           MOVE    "1"             TO  SPA-COM-ZAIEND
                                                                (IDX2)
+                       END-IF
                        MOVE    ZERO                TO  FLG-SET
       *                院内・院外処方を点数より変更
       *                院外
@@ -3532,7 +3551,8 @@
                    IF     (SPA-COM-INPUTCD(IDX)    =   "114701210" OR
                                                        "114701710" )
       *                次行が自動発生の２４時間加算の時、自動としない
-                       IF      (SPA-COM-AUTOKBN (IDX + 1)  =   "2")
+                       IF      (IDX                <   200   )  AND
+                               (SPA-COM-AUTOKBN (IDX + 1)  =   "2")
                            MOVE    SPACE           TO  SPA-COM-AUTOKBN
                                                            (IDX + 1)
                        END-IF
@@ -4032,6 +4052,59 @@
       *
            .
        31012-AUTOCHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   自動算定分編集処理
+      *****************************************************************
+       31013-ZENKAICHK-SEC                  SECTION.
+      *
+           PERFORM 31012-AUTOCHK-SEC
+           IF      LNK-SC91-ERRCD  NOT =   SPACE
+               MOVE    1               TO  FLG-HEN-CHK
+           END-IF
+      *    併用算定チェック
+           INITIALIZE                  ORCSC92AREA
+           MOVE    "4"                 TO  LNK-SC92-KBN
+           MOVE    SPA-SYORIFLG        TO  LNK-SC92-SYORIFLG
+           MOVE    "K02"               TO  LNK-SC92-PG
+           COMPUTE LNK-SC92-GMN-IDX    =   IDX2    +   1
+           MOVE    LNK-WKSRY-SRYCD(IDX IDY)
+                                       TO  LNK-SC92-SRYCD
+           MOVE    SPA-NENREI          TO  LNK-SC92-NENREI
+           MOVE    SPA-15MIMAN-ARI     TO  LNK-SC92-15MIMAN-ARI
+           MOVE    SPA-NAI-ROUJIN      TO  LNK-SC92-ROUJIN
+           MOVE    SPA-LSTSRYKA        TO  LNK-SC92-LSTSRYKA
+           MOVE    SPA-LSTSRYKAMEI     TO  LNK-SC92-LSTSRYKAMEI
+           MOVE    SPA-K02-TEISEI-AREA TO  LNK-SC92-TEISEI-AREA
+      *    当月入院有無
+           MOVE    SPA-K02N-NYUINFLG   TO  LNK-SC92-NYUINFLG
+           CALL    "ORCSC92"           USING
+                                       MCPAREA
+                                       ORCSC92AREA
+                                       SPA-SCR-REC
+                                       SPA-AREA
+           IF      LNK-SC92-ERRCD6 NOT =   SPACE
+               MOVE    1               TO  FLG-HEN-CHK
+           END-IF
+      *
+      *    処方料・処方せん料は対象外とする
+           IF      LNK-WKSRY-SRYSYUKBN (IDX)  =   "250"  OR
+                                                  "820"
+               EVALUATE    LNK-WKSRY-SRYCD(IDX IDY)
+      *            長期投与加算（処方せん）
+                   WHEN    "120003270"
+      *            特定疾患処方箋
+                   WHEN    "120002570"
+      *            特定疾患処方料
+                   WHEN    "120002270"
+      *            長期投与加算（処方）
+                   WHEN    "120003170"
+                       MOVE    1               TO  FLG-HEN-CHK
+               END-EVALUATE
+           END-IF
+           .
+       31013-ZENKAICHK-EXT.
            EXIT.
       *
       *****************************************************************
