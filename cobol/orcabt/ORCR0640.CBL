@@ -91,6 +91,7 @@
       *  01.01.09    NACL-¾®Æ¦Âô  04/06/08  £Ã£Ô¡¦£Í£Ò£É¡Ê£²²óÌÜ°Ê¹ß¡Ë¤Î
       *                                     Å¦Í×Íóµ­ºÜ½ç½¤Àµ
       *  01.01.10    NACL-ÌçÏÆ    04/06/21  À¸³èÊÝ¸î¤ÎÉéÃ´¶â³Ûµ­ºÜ½¤Àµ
+      *  01.01.11    NACL-ÌçÏÆ    04/07/27  ¸¶Çú¿©»öÎÅÍÜµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5880,11 +5881,11 @@
                                          RECE62-FUKUSHIFLG-SKJ(1)
                          END-IF
                       ELSE
-                        IF     SYU-SYUHKNNUM           =   SPACE
-                        AND    SYU-KOH1HKNNUM          =   "012"
-                        AND    SYU-KOH2HKNNUM          =   SPACE
-                        AND    SYU-KOH3HKNNUM          =   SPACE
-                        AND    SYU-KOH4HKNNUM          =   SPACE
+                        IF    (SYU-SYUHKNNUM       =   SPACE         )
+                        AND   (SYU-KOH1HKNNUM      =   "012" OR "019")
+                        AND   (SYU-KOH2HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH3HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH4HKNNUM      =   SPACE         )
                            ADD   SYU-SKJ-NISSU(IDX3)    TO
                                          RECE62-SHOKUJINISSU(KH-IDX)
                            ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
@@ -5951,11 +5952,11 @@
                                          RECE62-FUKUSHIFLG-SKJ(2)
                          END-IF
                       ELSE
-                        IF     SYU-SYUHKNNUM           =   SPACE
-                        AND    SYU-KOH1HKNNUM          =   "012"
-                        AND    SYU-KOH2HKNNUM          =   SPACE
-                        AND    SYU-KOH3HKNNUM          =   SPACE
-                        AND    SYU-KOH4HKNNUM          =   SPACE
+                        IF    (SYU-SYUHKNNUM       =   SPACE         )
+                        AND   (SYU-KOH1HKNNUM      =   "012" OR "019")
+                        AND   (SYU-KOH2HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH3HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH4HKNNUM      =   SPACE         )
                            ADD   SYU-SKJ-NISSU(IDX3)    TO
                                          RECE62-SHOKUJINISSU(KH-IDX)
                            ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
@@ -6022,11 +6023,11 @@
                                          RECE62-FUKUSHIFLG-SKJ(3)
                          END-IF
                       ELSE
-                        IF     SYU-SYUHKNNUM           =   SPACE
-                        AND    SYU-KOH1HKNNUM          =   "012"
-                        AND    SYU-KOH2HKNNUM          =   SPACE
-                        AND    SYU-KOH3HKNNUM          =   SPACE
-                        AND    SYU-KOH4HKNNUM          =   SPACE
+                        IF    (SYU-SYUHKNNUM       =   SPACE         )
+                        AND   (SYU-KOH1HKNNUM      =   "012" OR "019")
+                        AND   (SYU-KOH2HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH3HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH4HKNNUM      =   SPACE         )
                            ADD   SYU-SKJ-NISSU(IDX3)    TO
                                          RECE62-SHOKUJINISSU(KH-IDX)
                            ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
@@ -6093,11 +6094,11 @@
                                          RECE62-FUKUSHIFLG-SKJ(4)
                          END-IF
                       ELSE
-                        IF     SYU-SYUHKNNUM           =   SPACE
-                        AND    SYU-KOH1HKNNUM          =   "012"
-                        AND    SYU-KOH2HKNNUM          =   SPACE
-                        AND    SYU-KOH3HKNNUM          =   SPACE
-                        AND    SYU-KOH4HKNNUM          =   SPACE
+                        IF    (SYU-SYUHKNNUM       =   SPACE         )
+                        AND   (SYU-KOH1HKNNUM      =   "012" OR "019")
+                        AND   (SYU-KOH2HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH3HKNNUM      =   SPACE         )
+                        AND   (SYU-KOH4HKNNUM      =   SPACE         )
                            ADD   SYU-SKJ-NISSU(IDX3)    TO
                                          RECE62-SHOKUJINISSU(KH-IDX)
                            ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
@@ -7151,9 +7152,9 @@
       *
            MOVE    "DBSTART"           TO  MCP-FUNC.
            CALL    "ORCMCPSUB"          USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
            .
        100-DBOPEN-EXT.
            EXIT.
@@ -7176,9 +7177,8 @@
                                         MCPDATA-REC.
       *
            .
-       900-DBCLOSE-EXT.
+       900-DBDISCONNECT-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    ¥«¡¼¥½¥ë¥¯¥í¡¼¥º½èÍý
