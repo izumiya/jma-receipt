@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  01.00.01    NACL-Æ£¸¶    04/10/19  ¥³¥á¥ó¥ÈËä¤á¹þ¤ßÊ¸»ú¤ÎÊÑ¹¹
       *****************************************************************
       *
       *
@@ -258,15 +259,15 @@
       *
       *    ÆüÉÕÁ´³ÑÊÑ´¹ÎÎ°è
        01  TBL-DAY-AREA.
-           03  FILLER              PIC X(04)  VALUE "¡¡£±".
-           03  FILLER              PIC X(04)  VALUE "¡¡£²".
-           03  FILLER              PIC X(04)  VALUE "¡¡£³".
-           03  FILLER              PIC X(04)  VALUE "¡¡£´".
-           03  FILLER              PIC X(04)  VALUE "¡¡£µ".
-           03  FILLER              PIC X(04)  VALUE "¡¡£¶".
-           03  FILLER              PIC X(04)  VALUE "¡¡£·".
-           03  FILLER              PIC X(04)  VALUE "¡¡£¸".
-           03  FILLER              PIC X(04)  VALUE "¡¡£¹".
+           03  FILLER              PIC X(04)  VALUE "£°£±".
+           03  FILLER              PIC X(04)  VALUE "£°£²".
+           03  FILLER              PIC X(04)  VALUE "£°£³".
+           03  FILLER              PIC X(04)  VALUE "£°£´".
+           03  FILLER              PIC X(04)  VALUE "£°£µ".
+           03  FILLER              PIC X(04)  VALUE "£°£¶".
+           03  FILLER              PIC X(04)  VALUE "£°£·".
+           03  FILLER              PIC X(04)  VALUE "£°£¸".
+           03  FILLER              PIC X(04)  VALUE "£°£¹".
            03  FILLER              PIC X(04)  VALUE "£±£°".
            03  FILLER              PIC X(04)  VALUE "£±£±".
            03  FILLER              PIC X(04)  VALUE "£±£²".
