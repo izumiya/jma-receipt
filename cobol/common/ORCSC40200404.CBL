@@ -38,6 +38,7 @@
       * 01.00.08     NACL-多々納  04/03/15  Ｈ１６年４月改正追加
       * 01.00.09     NACL-多々納  04/03/29  Ｈ１６年４月改正労災追加
       * 01.00.10     NACL-多々納  04/07/26  処置加算料追加(403)
+      * 01.00.11     NACL-多々納  04/11/25  処置フィルム追加
       *****************************************************************
       *
       *
@@ -128,6 +129,11 @@
            03  WRK-SYOKEIS         PIC 9(08)V9999.
            03  WRK-SYOKEIS2        PIC 9(08)V99.
            03  WRK-SYOKEI          PIC 9(08).
+      *    フィルム点数計
+           03  WRK-FIRTEN          PIC 9(08).
+           03  WRK-FIRTEN-KEI      PIC 9(08).
+           03  WRK-FIRTEN-ADD      PIC 9(08).
+           03  WRK-TENSUKEIS       PIC 9(08)V99.
       *
            03  WRK-ERRCD           PIC X(04).
            03  WRK-ERRCD2          PIC X(04).
@@ -395,11 +401,11 @@
                    END-IF
       *        器材
                WHEN    "7"
-                   IF      WRK-COM-DATAKBN (IDX-Z) =   "3"
+      *************IF      WRK-COM-DATAKBN (IDX-Z) =   "3"
       *                フィルムの時エラー
-                       MOVE    "0047"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR(IDX-Z)
-                   END-IF
+      *                MOVE    "0047"          TO  WRK-ERRCD
+      *                MOVE    "1"             TO  WRK-COM-CUR(IDX-Z)
+      *************END-IF
       *
       *            酸素区分判定
                    IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
@@ -1427,11 +1433,33 @@
       *            END-IF
       *DD  END-EVALUATE
       *
-      *
-      *    酸素計算
-           IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
-               PERFORM 100211-SANSO-KEI-SEC
-           END-IF
+      *    各チェック処理
+           EVALUATE    WRK-MOJI
+      *        器材
+               WHEN    "7"
+      *            酸素計算
+                   IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
+                       PERFORM 100211-SANSO-KEI-SEC
+                   END-IF
+      *            フィルムの時、点数計算
+                   IF      WRK-COM-DATAKBN (IDX-Z) =   "3"
+      *                上限点数判定
+                       IF      WRK-COM-JGNTEN (IDX-Z)  =   ZERO
+                           ADD     LNK-SC90-FIRTEN   TO  WRK-FIRTEN-ADD
+                       ELSE
+                           COMPUTE WRK-TENSUKEIS   =   LNK-SC90-FIRTEN
+                                                   /   10
+                                                   +   0.5
+                           MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
+                           IF      WRK-FIRTEN      >   WRK-COM-JGNTEN
+                                                             (IDX-Z)
+                               MOVE    WRK-COM-JGNTEN(IDX-Z)
+                                                       TO  WRK-FIRTEN
+                           END-IF
+                           ADD     WRK-FIRTEN      TO  WRK-FIRTEN-KEI
+                       END-IF
+                   END-IF
+           END-EVALUATE
       *
            .
        10021-KEISAN-EXT.
@@ -1607,6 +1635,18 @@
            IF      WRK-SANSOKIN-SUM    NOT =   ZERO
                PERFORM 10071-SANSO-KEISAN-SEC
            END-IF
+      *
+      *    フィルム料合計計算
+           IF      WRK-FIRTEN-ADD      >   ZERO
+               COMPUTE WRK-TENSUKEIS   =   WRK-FIRTEN-ADD
+                                           /   10
+                                           +   0.5
+               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
+               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
+           END-IF
+      *    器材点数
+           COMPUTE LNK-SC90-KIZTEN     =   LNK-SC90-KIZTEN
+                                       +   WRK-FIRTEN-KEI
       *
            .
        1007-KIZAI-TEN-EXT.
