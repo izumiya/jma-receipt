@@ -5808,7 +5808,7 @@
                INITIALIZE                      STS-AREA-DAY
                INITIALIZE                      LNK-DAY7-AREA
                MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE    SPA-SYSYMD (1 : 6)  TO  LNK-DAY7-YM
+               MOVE    NACCT-SRYYM         TO  LNK-DAY7-YM
                CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                                LNK-DAY7-AREA
                MOVE    LNK-DAY7-KOYOMI(7:2)
@@ -5831,8 +5831,8 @@
                        IF    ( SPA-NAI-I01-NYUINYMD (1:6)
                                            =   NACCT-SRYYM )
                         AND  ( SPA-NAI-I01-NYUINYMD (7:2)
-                                          >=   IDX16(4 : 2))
-                           MOVE    ZERO    TO  IDX16
+                                           >   IDX16(4 : 2))
+                           MOVE    1       TO  IDX16
                        ELSE
                            IF    ( NACCT-DAY (IDX16)   NOT =   ZERO )
                                MOVE    NACCT-DAY (IDX16)
@@ -5842,9 +5842,20 @@
                        END-IF
                    END-IF
       *
+                   MOVE    "NYUINACCT-KEY19"   TO  WRK-DBPATH
+                   PERFORM 900-TBL-READ-SEC
+                   IF    ( FLG-DBRC        NOT =   ZERO )
+                       MOVE    1           TO  FLG-NYUINACCT
+                   ELSE
+                       MOVE    MCPDATA-REC TO  NYUINACCT-REC
+                   END-IF
+      *
                END-PERFORM
       *
            END-PERFORM
+      *
+           MOVE    "NYUINACCT-KEY19"   TO  WRK-DBPATH
+           PERFORM 900-TBL-CLOSE-SEC
       *
            .
        4801-NYUACCT-HKNCOMBI-GET-EXT.
