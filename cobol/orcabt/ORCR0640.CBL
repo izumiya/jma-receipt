@@ -110,6 +110,7 @@
       *                                     ¡Ê¿Ç¶è£´£°¡¢£µ£°¡¢£µ£´¡¢£¶£°¡Ë
       *  01.01.22    NACL-¾®Æ¦Âô  04/12/08  ÅÀ¿ô¥Õ¥é¥°¤Î½é´ü²½ÄÉ²Ã
       *  01.02.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
+      *  01.02.02    NACL-¾®Æ¦Âô  05/03/28  Ï·¿ÍÍý³ØÎÅË¡Å¦Í×ÍóÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -687,6 +688,16 @@
            03  CONS-KAKURI-COMMENT   PIC X(09)  VALUE  "190107070".
       *    ºßÂð·ì±ÕÆ©ÀÏÉÑ²ó»ØÆ³´ÉÍýÎÁ
            03  CONS-HINKAI-COMMENT   PIC X(09)  VALUE  "114009410".
+      *
+      *    Ï·¿ÍÍý³ØÎÅË¡¤ÎÅ¦Í×Íóµ­ºÜÈ½ÄêÍÑ¡ÊÌ¾¾Î¤ËÏ·¿Í¤òÄÉ²Ã¡Ë
+           03  CONS-RJNRIGAKU1     PIC X(09) VALUE "180706810".
+           03  CONS-RJNRIGAKU2     PIC X(09) VALUE "180706910".
+           03  CONS-RJNRIGAKU3     PIC X(09) VALUE "180707010".
+           03  CONS-RJNRIGAKU4     PIC X(09) VALUE "180707110".
+           03  CONS-RJNRIGAKU5     PIC X(09) VALUE "180707210".
+           03  CONS-RJNRIGAKU6     PIC X(09) VALUE "180707310".
+           03  CONS-RJNRIGAKU7     PIC X(09) VALUE "180707410".
+           03  CONS-RJNRIGAKU8     PIC X(09) VALUE "180707510".
       *
       *****»ÀÁÇ 
       *****COPY    "CMSANSOTBL.INC".
@@ -4042,6 +4053,19 @@
                                                      RECE65-INPUTCOMENT
                                                                 (IDX4)
                    MOVE    TNS-YUKOKETA    TO    RECE65-YUKOKETA(IDX4)
+                   IF      TNS-SRYCD       =     CONS-RJNRIGAKU1  OR
+                                                 CONS-RJNRIGAKU2  OR
+                                                 CONS-RJNRIGAKU3  OR
+                                                 CONS-RJNRIGAKU4  OR
+                                                 CONS-RJNRIGAKU5  OR
+                                                 CONS-RJNRIGAKU6  OR
+                                                 CONS-RJNRIGAKU7  OR
+                                                 CONS-RJNRIGAKU8
+                         MOVE  "Ï·¿Í"    TO   RECE65-NAME(IDX4)(1:4)
+                         MOVE  TNS-NAME  TO   RECE65-NAME(IDX4)(5:) 
+                         COMPUTE  RECE65-YUKOKETA(IDX4) =
+                                  RECE65-YUKOKETA(IDX4) + 2
+                   END-IF
                END-IF
       *
                IF  RECE65-YUKOKETA(IDX4)  =  ZERO
