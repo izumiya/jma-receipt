@@ -102,6 +102,8 @@
       *  01.01.11    NACL-藤原    04/06/17  症状詳記をデータにも編集する
       *                                     01:保険履歴、手術歴
       *                                     99:レセコメント
+      *  01.02.04    NACL-藤原    04/08/27  一部負担金・食事療養費標準負
+      *                                     担額区分の編集を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1103,6 +1105,13 @@
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    一部負担金・食事療養費標準負担額区分
+           EVALUATE    RECE02-TEISYOTOKU
+               WHEN    "1"
+                   MOVE    "3"             TO  WRK-DATA
+               WHEN    "2"
+                   MOVE    "1"             TO  WRK-DATA
+           END-EVALUATE
+           MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    特記事項
            IF      FLG-RECE11          =   ZERO
