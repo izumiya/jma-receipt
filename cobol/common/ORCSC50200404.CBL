@@ -475,13 +475,14 @@
            END-IF
       *
       *    ²Ã»»¤Î»þ¡¢ÂÐ¾Ý¤Î¼êµ»¤¬Í­¤ë¤³¤È
-             IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   1
-                                                     OR  4
-                 IF      FLG-KIJUNN          =   ZERO
-                     MOVE    "0173"          TO  SPA-ERRCD
-                     MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                 END-IF
-             END-IF
+           IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   1
+                                                   OR  4
+               MOVE    2               TO  WRK-COM-SANFLG (IDX-Z)
+               IF      FLG-KIJUNN          =   ZERO
+                   MOVE    "0173"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+               END-IF
+           END-IF
            .
        100111-KIJUNN-CHK-EXT.
            EXIT.
@@ -1376,6 +1377,11 @@
                       (WRK-COM-TENSIKIBETU(IDX)        =   5    )
                    MOVE    1               TO  WRK-COM-SANFLG (IDX)
                END-IF
+      *        £µ£°¡ó¸º»»¤ÏºÇ¸å¤Ë¤¹¤ë
+               IF     (WRK-COM-DATAKBN    (IDX)    =   "2"  )  AND
+                      (WRK-COM-INPUTCD    (IDX)    =   "150268970")
+                   MOVE    1               TO  WRK-COM-SANFLG (IDX)
+               END-IF
       *        ¿Ç»¡ÎÁ¡¢²Ã»»¡¢Ï«ºÒ¡¢»þ´Ö³°¡¦ÆýÍÄ»ù°Ê³°¤òÂÐ¾Ý¤È¤¹¤ë
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   NOT =   "1"  )  OR
                       (WRK-COM-DATAKBN    (IDX)        =   "1"  )  OR
@@ -1486,6 +1492,7 @@
       *
       *    ¼«Æ°²Ã»»¤Î²Ã»»¡Ê»þ´Ö³°¡¢Ç¯Îð¡Ë
            MOVE    ZERO                TO  WRK-TENSUKEI-K
+           MOVE    ZERO                TO  WRK-TENSUKEI-G
       *
            PERFORM VARYING     IDX     FROM    1       BY  1
                    UNTIL       IDX         >=  HZN-IDX
@@ -1501,10 +1508,23 @@
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
                END-IF
+               IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
+                      (WRK-COM-INPUTCD(IDX)(1:3)   NOT =   "101" )  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   1   )
+                   MOVE    ZERO                TO  WRK-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   LNK-SC90-TENSUKEI
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+               END-IF
            END-PERFORM
       *
            COMPUTE LNK-SC90-TENSUKEI   =   LNK-SC90-TENSUKEI
                                        +   WRK-TENSUKEI-K
+                                       -   WRK-TENSUKEI-G
       *
       *    Ï«ºÒ¤Î²Ã»»
            IF      SPA-HKNKBN          =   1
