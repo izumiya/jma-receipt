@@ -166,6 +166,7 @@
       *  01.03.10   NACL-¾®Æ¦Âô   04/06/11  Èé²¼¶ÚÆùÃí¼Í¤Ç¡¢ÌôºÞÅÀ¡¦´ïºàÅÀ
       *                                     ¤¬Ìµ¤¤¤Î¾ì¹ç¤ÎÅ¦Í×Íóµ­ºÜÂÐ±þ
       *  01.03.11   NACL-ÌçÏÆ     04/06/21  À¸³èÊÝ¸î¤ÎÉéÃ´¶â³Ûµ­ºÜ½¤Àµ
+      *  01.03.12   NACL-ÌçÏÆ     04/10/14  ³°Íè´ÉÍý²Ã»»¤ÎºÞÈÖ¹æÃÖ¤­´¹¤¨
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1032,6 +1033,7 @@
            INITIALIZE                   CNT-SAISIN-AREA
       *
            MOVE      ZERO       TO      FLG-FUKUSHI
+           MOVE    88888880     TO      WRK-ZAINUM
       *
            PERFORM    VARYING    IDX    FROM   1   BY   1
                       UNTIL     (IDX      >   20)  OR
@@ -1115,7 +1117,6 @@
       *****************************************************************
        RECE04-HENSYU-SEC                SECTION.
       *
-           MOVE    88888880             TO      WRK-ZAINUM
            INITIALIZE                           SRYACCT-REC
            MOVE    RECE02-HOSPID        TO      ACCT-HOSPID
            MOVE    RECE02-NYUGAIKBN     TO      ACCT-NYUGAIKBN
