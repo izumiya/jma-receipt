@@ -407,6 +407,7 @@
                    GO      TO      300-SCREEN-EXT
                ELSE
                    MOVE    1               TO  SPA-GMN-CUR
+                   MOVE    SPACE           TO  SPA-KIDCD
                    GO      TO      300-SCREEN-EXT
                END-IF
            END-IF
