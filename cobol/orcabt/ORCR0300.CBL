@@ -123,6 +123,7 @@
       *  01.02.07    NACL-藤原    04/11/16  特定器材レコードのフィルムと
       *                                     器材の点数・回数を別々に記載
       *  01.02.08    NACL-太田    04/12/08  点数フラグの初期化追加
+      *  01.02.09    NACL-藤原    04/12/20  職務上の事由の編集方法の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1357,13 +1358,32 @@
            PERFORM 5005-NUM-HENSYU-SEC     
       *    職務上の事由
            IF      RECE02-HKNNUM       =   "002"
-               MOVE    RECE02-HOJOKBN        TO  WRK-DATA
-               MOVE    1                     TO  WRK-NAGASA
+               EVALUATE    RECE02-HOJOKBN
+                   WHEN    "1"
+                   WHEN    "A"
+                   WHEN    "D"
+                       MOVE    "1"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+                   WHEN    "2"
+                   WHEN    "B"
+                   WHEN    "E"
+                       MOVE    "2"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+                   WHEN    "3" 
+                   WHEN    "C"
+                   WHEN    "F"
+                       MOVE    "3"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+               END-EVALUATE
            END-IF    
-           IF    ( RECE02-HKNNUM (1:2) =   "03"  )
-           AND   ( RECE02-HOJOKBN      =   "2"   )
-               MOVE    RECE02-HOJOKBN        TO  WRK-DATA
-               MOVE    1                     TO  WRK-NAGASA
+           IF      RECE02-HKNNUM (1:2) =   "03"
+               EVALUATE    RECE02-HOJOKBN
+                   WHEN    "2"
+                   WHEN    "B"
+                   WHEN    "E"
+                       MOVE    "2"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+               END-EVALUATE
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    証明書番号（国保OR退職者のみ）
