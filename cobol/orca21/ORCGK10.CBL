@@ -435,7 +435,9 @@
                MOVE    "◎"            TO  SPA-K10-SYORIKBN (IDX)
            END-IF
       *    ドクター
-           IF      WKSRY-DRCD          =   ZERO  OR  SPACE
+           IF     (WKSRY-DRCD          =   ZERO  OR  SPACE )
+      *        入院は表示しない
+             OR   (WKSRY-NYUGAIKBN     =   "1"             )
                CONTINUE
            ELSE
                PERFORM 31012-DRCD-NAME-SEC

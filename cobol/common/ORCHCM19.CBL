@@ -344,7 +344,7 @@
            02  LNK-WKSRYACT-REC      OCCURS   100.
            COPY    "CPWKSRYACT.INC"  REPLACING
                                      //WKSRY-// BY //LNK-WKSRY-//.
-           03  LNK-WKSRY-DRCD          PIC X(05).
+      *****03  LNK-WKSRY-DRCD          PIC X(05).
            03  LNK-WKSRY-SYORI         PIC X(01).
       *
        01  LNK-WKSRYACT-MAX           PIC 9(04).

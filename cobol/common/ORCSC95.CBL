@@ -4261,7 +4261,8 @@
                        MOVE    WKSRY-CONTKBN   TO  SPA-CONTKBN
                    END-IF
       *            ドクター
-                   IF      WKSRY-DRCD          =   SPACE  OR  ZERO
+                   IF     (WKSRY-DRCD          =   SPACE  OR  ZERO)
+                       OR (WKSRY-NYUGAIKBN     =   "1"            )
                        CONTINUE
                    ELSE
                        IF      WKSRY-DRCD      NOT =   SPA-DRCD
