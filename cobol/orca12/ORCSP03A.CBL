@@ -1664,15 +1664,15 @@
                    MOVE    "0066"          TO  SPA-ERRCD
                    MOVE    10              TO  SPA-GMN-CUR
                END-IF
-           ELSE
+      *****ELSE
       *
       *        １５歳未満の時、家族とする
-               IF      SPA-NAI-NENREI-YY   <=  15
-                   IF      SPA-GMN-HONKZKKBN   =   "1"
-                       MOVE    "0067"          TO  SPA-ERRCD
-                       MOVE    10              TO  SPA-GMN-CUR
-                   END-IF
-               END-IF
+      *        IF      SPA-NAI-NENREI-YY   <=  15
+      *            IF      SPA-GMN-HONKZKKBN   =   "1"
+      *                MOVE    "0067"          TO  SPA-ERRCD
+      *                MOVE    10              TO  SPA-GMN-CUR
+      *            END-IF
+      ******** END-IF
            END-IF
       *
       *    船員入力可能チェック
