@@ -44,6 +44,7 @@
       *  01.00.11    NACL-太田    03.03.14  転科・転棟・転室時、入院料
       *                                     のみの変更も可とする
       *  01.00.12    NACL-太田    03.03.18  入院カスタマイズ帳票対応
+      *  01.00.13    NACL-太田    03.04.02  負担金計算サブ引数修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8958,7 +8959,7 @@
            DISPLAY "LNK-S02-SKYSTYMD           = " LNK-S02-SKYSTYMD
            DISPLAY "LNK-S02-SKYEDYMD           = " LNK-S02-SKYEDYMD
            CALL    "ORCSNYUFTN"    USING
-                                   MCPAREA
+                                   SPA-AREA
                                    LNK-ORCS02-REC
                                    LNK-SYUNOU-REC-T
            DISPLAY "LNK-S02-RC = " LNK-S02-RC

@@ -33,6 +33,7 @@
       *  01.00.04    NACL-太田    03.02.05  自院歴作成データを考慮する
       *  01.00.05    NACL-太田    03.03.25  算定開始日も入力可とする
       *                                     入院の保険適用外金額欄追加
+      *  01.00.06    NACL-太田    03.04.02  負担金計算サブ引数修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1803,7 +1804,7 @@
            DISPLAY "LNK-S02-SKYSTYMD           = " LNK-S02-SKYSTYMD
            DISPLAY "LNK-S02-SKYEDYMD           = " LNK-S02-SKYEDYMD
            CALL    "ORCSNYUFTN"    USING
-                                   MCPAREA
+                                   SPA-AREA
                                    LNK-ORCS02-REC
                                    LNK-SYUNOU-REC-T
            DISPLAY "LNK-S02-RC = " LNK-S02-RC

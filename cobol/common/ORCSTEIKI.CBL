@@ -33,6 +33,7 @@
       *  00.00.02    NACL-小豆沢  03/02/10  入院調剤料の一括更新を処理追加
       *  00.00.03    NACL-門脇    03/02/17  公費優先での負担計算
       *  00.00.04    NACL-小豆沢  03/03/06  点滴薬剤のまとめ計算
+      *  00.00.05    NACL-太田    03/04/02  入力引数修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -192,8 +193,6 @@
                05  WRK-SYSMM               PIC 9(02).
                05  WRK-SYSDD               PIC 9(02).
       *
-           COPY  "COMMON-SPA".
-      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -257,6 +256,7 @@
            COPY    "CPORCSCHOZAI.INC".
       *
       *    ＤＢ検索
+           COPY    "MCPAREA". 
            COPY    "MCPDATA.INC".
            COPY    "CPORCMCP.INC".
       *
@@ -266,7 +266,7 @@
       /
       ***
        LINKAGE             SECTION.
-           COPY  "MCPAREA". 
+           COPY  "COMMON-SPA".
        01  LNK-ORCS02-REC.
            COPY  "CPORCS02.INC".
        01  LNK-SYUNOU-REC-T.

@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-太田    03.04.02  負担金計算サブ引数修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -731,7 +732,7 @@
            MOVE    "A"             TO  LNK-S02-TEIKI-KBN
            MOVE    WRK-PARA-SYSYMD TO  LNK-S02-SYSYMD
            CALL    "ORCSTEIKI"     USING
-                                   MCPAREA
+                                   SPA-AREA
                                    LNK-ORCS02-REC
                                    LNK-SYUNOU-REC-T
            IF    ( LNK-S02-RC      NOT = ZERO )

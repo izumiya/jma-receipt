@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-太田    03.04.02  負担金計算サブ引数修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -135,6 +136,7 @@
            03  WRK-SYOKBN                              PIC X(01).
       *
            COPY    "MCPAREA".
+           COPY    "COMMON-SPA".
       *
        01  WRK-CONS-AREA.
       *    労災保険番号 
@@ -760,7 +762,7 @@
            MOVE    WRK-PARA-SYSYMD TO  LNK-S02-SYSYMD
       *
            CALL    "ORCSTEIKI"     USING
-                                   MCPAREA
+                                   SPA-AREA
                                    LNK-ORCS02-REC
                                    LNK-SYUNOU-REC-T
       *
