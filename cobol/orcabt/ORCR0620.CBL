@@ -66,6 +66,8 @@
       *  01.00.23    NACL-藤原    04/10/04  特例退職者＋老人のとき本人の
       *                                     み不明分とする
       *  01.00.24    NACL-藤原    04/11/16  病棟区分の編集方法を変更
+      *  01.00.25    NACL-藤原    05/01/08  同月に継続なしで２回入院した
+      *                                     場合の入院年月日の記載方法
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -305,6 +307,8 @@
                05  WRK-BYOTOKBN          PIC X(02).                     
       *                                                                 
        01  WRK-BYOTOKBN-DATA             PIC X(02).                     
+      *    初回番号(最新の入院歴分)
+       01  WRK-SHONUM                    PIC 9(03).                     
       *
            COPY    "MCPAREA".
       *
@@ -2292,6 +2296,7 @@
        240-PTNYUINRRK-SYORI-SEC                   SECTION.
       *
            INITIALIZE                      WRK-BYOTOKBN-TABLE
+                                           WRK-SHONUM
       *
       *    診療月内の入退院情報
            INITIALIZE                      PTNYUINRRK-REC
@@ -2426,6 +2431,7 @@
            IF      RECE62-LASTSRYKA    =   SPACE
                MOVE    PTNYUINRRK-NYUINYMD TO  RECE62-NYUINYMD
                MOVE    PTNYUINRRK-NYUINKA  TO  RECE62-LASTSRYKA
+               MOVE    PTNYUINRRK-SHONUM   TO  WRK-SHONUM
            END-IF
       *
       *    入退院履歴情報
@@ -2454,8 +2460,9 @@
                END-IF
       *
       *        入院年月日
-               IF      PTNYUINRRK-NYUINYMD <    RECE62-NYUINYMD
-                   MOVE    PTNYUINRRK-NYUINYMD TO  RECE62-NYUINYMD
+               IF    ( PTNYUINRRK-NYUINYMD <    RECE62-NYUINYMD )
+               AND   ( PTNYUINRRK-SHONUM   =    WRK-SHONUM      )
+                   MOVE    PTNYUINRRK-NYUINYMD  TO  RECE62-NYUINYMD
                END-IF
       *
                PERFORM             UNTIL   FLG-PTNYUINRRK22 =  1
