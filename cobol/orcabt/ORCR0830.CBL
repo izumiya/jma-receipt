@@ -30,8 +30,6 @@
       *  01.00.01    NACL-門脇    04.01.21  労災の特定器材(09593)対応
       *  01.00.02    NACL-門脇    04.01.21  労災・自賠責の入院室料加算
       *                                     (09594)対応
-      *  01.00.03    NACL-門脇    04.12.17  胸部固定帯加算、創外固定器
-      *                                     使用加算を薬剤等へ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -228,10 +226,6 @@
       *
       *    腰部固定帯加算
            03  CONS-YOUBUKASAN PIC X(09)   VALUE   "140037490".
-      *    胸部固定帯加算
-           03  CONS-KYOBUKASAN PIC X(09)   VALUE   "140040110".
-      *    創外固定器使用加算
-           03  CONS-SOGAIKASAN PIC X(09)   VALUE   "150266970".
       *    療養担当手当（入院）
            03  CONS-RYOYOTEATE PIC X(09)   VALUE   "199000510".
       *---------------------------------------------------------------
@@ -1733,8 +1727,6 @@
                        END-IF
       *
                        IF   SRY-SRYCD(SRYACT-IDX) =  CONS-YOUBUKASAN
-                                                 OR  CONS-KYOBUKASAN
-                                                 OR  CONS-SOGAIKASAN
                             COMPUTE  TBL-SYUTEN-JI(IDY)  =
                                      TBL-SYUTEN-JI(IDY)  -
                                     ( WRK-ZAIKAISU-JI * TNS-TEN )
