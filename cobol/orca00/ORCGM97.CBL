@@ -24,6 +24,7 @@
       *  管理者            : 
       *  作成日付    作業者        記述
       *  04/01/16    NACL-森脇     新規作成
+      *  04/12/ 2    NACL-伊藤     画面表示明細数を超えた場合の処置
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
@@ -92,6 +93,7 @@
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
+           03  IDY                 PIC 9(04).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -469,6 +471,18 @@
       *
                COMPUTE CNT-PGKANRI     =   CNT-PGKANRI +   1
                PERFORM 900-PGKANRI-FETCH-SEC
+      *    ９９件を超えた場合
+               IF      (IDX                =   99)    AND
+                       (FLG-PGKANRI        =   0 )
+                   PERFORM VARYING IDY     FROM    10  BY  1
+                           UNTIL   IDY     >   99
+                       MOVE    SPA-GMN-NAIYOLIST(IDY)    TO
+                               SPA-GMN-NAIYOLIST(IDY - 9)
+                       MOVE    SPACE       TO  SPA-GMN-NAIYOLIST(IDY)
+                   END-PERFORM
+                   MOVE    90              TO  IDX
+                   MOVE    90              TO  CNT-PGKANRI
+               END-IF
            END-PERFORM
       *
            MOVE    CNT-PGKANRI         TO  SPA-GMN-NAIYOLIST-MAX
