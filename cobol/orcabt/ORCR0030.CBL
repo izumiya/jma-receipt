@@ -182,6 +182,7 @@
       *  01.04.12   NACL-ÌçÏÆ     04/11/22  ¥Õ¥£¥ë¥àÅÀ¿ô·×»»
       *                                     ¡Ê¿Ç¶è£´£°¡¢£µ£°¡¢£µ£´¡¢£¶£°¡Ë
       *  01.04.13   NACL-¾®Æ¦Âô   04/12/08  ÅÀ¿ô¥Õ¥é¥°¤Î½é´ü²½ÄÉ²Ã
+      *  01.04.14   NACL-¾®Æ¦Âô   05/03/28  Ï·¿ÍÍý³ØÎÅË¡Å¦Í×ÍóÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -744,6 +745,16 @@
            03  CONS-GAIKAN1          PIC X(09)  VALUE  "112011010".
            03  CONS-GAIKAN2          PIC X(09)  VALUE  "112705110".
            03  CONS-GAIKAN3          PIC X(09)  VALUE  "112705310".
+      *
+      *    Ï·¿ÍÍý³ØÎÅË¡¤ÎÅ¦Í×Íóµ­ºÜÈ½ÄêÍÑ¡ÊÌ¾¾Î¤ËÏ·¿Í¤òÄÉ²Ã¡Ë
+           03  CONS-RJNRIGAKU1     PIC X(09) VALUE "180706810".
+           03  CONS-RJNRIGAKU2     PIC X(09) VALUE "180706910".
+           03  CONS-RJNRIGAKU3     PIC X(09) VALUE "180707010".
+           03  CONS-RJNRIGAKU4     PIC X(09) VALUE "180707110".
+           03  CONS-RJNRIGAKU5     PIC X(09) VALUE "180707210".
+           03  CONS-RJNRIGAKU6     PIC X(09) VALUE "180707310".
+           03  CONS-RJNRIGAKU7     PIC X(09) VALUE "180707410".
+           03  CONS-RJNRIGAKU8     PIC X(09) VALUE "180707510".
       *
       *    »ÀÁÇ 
       *****COPY    "CMSANSOTBL.INC".
@@ -1978,6 +1989,19 @@
                                                  RECE05-INPUTCOMENT
                                                                 (IDX4)
                    MOVE    TNS-YUKOKETA    TO    RECE05-YUKOKETA(IDX4)
+                   IF      TNS-SRYCD       =     CONS-RJNRIGAKU1  OR
+                                                 CONS-RJNRIGAKU2  OR
+                                                 CONS-RJNRIGAKU3  OR
+                                                 CONS-RJNRIGAKU4  OR
+                                                 CONS-RJNRIGAKU5  OR
+                                                 CONS-RJNRIGAKU6  OR
+                                                 CONS-RJNRIGAKU7  OR
+                                                 CONS-RJNRIGAKU8
+                         MOVE  "Ï·¿Í"    TO   RECE05-NAME(IDX4)(1:4)
+                         MOVE  TNS-NAME  TO   RECE05-NAME(IDX4)(5:) 
+                         COMPUTE  RECE05-YUKOKETA(IDX4) =
+                                  RECE05-YUKOKETA(IDX4) + 2
+                   END-IF
                END-IF
       *
                IF          SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
