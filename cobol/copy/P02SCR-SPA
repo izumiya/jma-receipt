@@ -741,7 +741,7 @@
                    07  SPA-TNK-MAX                      PIC 9(03).
       *            ∏¯»Ò…È√¥
                    07  SPA-GMN24-KOHFTNTBL.
-                       09  SPA-GMN24-FTNTBLO            OCCURS  10.
+                       09  SPA-GMN24-FTNTBLO            OCCURS  40.
                            11  SPA-GMN24-TGMNNUM         PIC 9(03).
                            11  SPA-GMN24-TFTNKOHMEI      PIC X(10).
                            11  SPA-GMN24-TKOHSTYMD       PIC X(10).
@@ -891,6 +891,7 @@
       *
       *    ¥µº‘»÷πÊ»Øπ‘° £–£∞£±£¥°À
            03  SPA-P014-AREA.
+               05  SPA-GMN014-SYORI                 PIC 9(01).
                05  SPA-GMN014-CUR                   PIC 9(02).
       *
                05  SPA-GMN014-PTNUM                 PIC X(20).
