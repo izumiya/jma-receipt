@@ -7439,6 +7439,7 @@
            IF    WK-KOH-COMPFTN(1)  =  ALL"9"                           
       ****             CONTINUE                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(1) = SPACE
+                AND  COMB-KOH1HKNNUM       NOT = "027"
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
                                     LNK-SYU-KOH1COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -7456,6 +7457,7 @@
            IF    WK-DAY-KOH-COMPFTN(1)  =  ALL"9"
       ****             CONTINUE                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(1) = SPACE
+                AND  COMB-KOH1HKNNUM       NOT = "027"
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
                                     LNK-SYU-KOH1COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
