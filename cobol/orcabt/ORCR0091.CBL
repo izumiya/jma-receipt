@@ -52,6 +52,7 @@
       *  01.00.14    NACL-門脇    03.03.06  初再診のコメント編集対応
       *  01.00.15    NACL-門脇    03.11.26  自費レセプトの自費分
       *                                     摘要欄記載対応
+      *  01.00.16    NACL-門脇    05.01.06  自費レセプトの出力条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -352,6 +353,10 @@
            IF     RECE06-RECESYUBETU  =  8888
               IF     RECE06-ZAITEN  NOT =  ZERO
                   PERFORM     RECE061-WRITE-SEC
+              ELSE
+                IF   RECE06-SRYKBN  =  "11" OR "12" OR "99"
+                     PERFORM  RECE061-WRITE-SEC
+                END-IF
               END-IF
            ELSE
               IF     RECE06-SRYKBN  NOT =  "95" AND "96"
