@@ -308,6 +308,9 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
+           MOVE    ZERO                TO  SPA-NAI27-GMN
+           INITIALIZE                      SPA-GMN27-HKN-AREA
+      *
       *    保険表示
            INITIALIZE                  SPA-GMN27-HKN2-AREA
            MOVE    1                   TO  WRK-PAGE
@@ -317,7 +320,7 @@
                IF      SPA-PTHKN-SAKJOKBN (IDX)   =   SPACE
                    IF      IDY             >=  5
                        ADD     1               TO  WRK-PAGE
-                       MOVE    1               TO  IDY
+                       MOVE    ZERO            TO  IDY
                    END-IF
                    ADD     1               TO  IDY
                    MOVE    IDX             TO  SPA-GMN27-HKNRENNUM
@@ -334,7 +337,7 @@
                IF      SPA-PTKOH-SAKJOKBN (IDX)   =   SPACE
                    IF      IDY             >=  5
                        ADD     1               TO  WRK-PAGE
-                       MOVE    1               TO  IDY
+                       MOVE    ZERO            TO  IDY
                    END-IF
                    ADD     1               TO  IDY
                    MOVE    IDX             TO  SPA-GMN27-KOHRENNUM
@@ -379,6 +382,7 @@
                MOVE    1               TO  FLG-PARA
            END-IF
       *
+           MOVE    ZERO            TO  IDY
            PERFORM
                UNTIL   FLG-PARA            =   1
       *
@@ -388,10 +392,9 @@
                    ADD     1               TO  IDX
                    IF     (IDX             >=  WRK-ST )   AND
                           (IDX             <=  WRK-ED )
-                       ADD     1               TO  SPA-GMN27-MAX
                        ADD     1               TO  IDY
                        MOVE    PARA-EDANUM     TO  SPA-NAI27-EDANUM
-                                                      (SPA-GMN27-MAX)
+                                                           (IDY)
                        MOVE    PARA-DATA-REC   TO  LNK-HKNCOMB-REC(IDY)
                    END-IF
                END-IF
@@ -400,8 +403,11 @@
                PERFORM 990-PARA-READ-SEC
            END-PERFORM
       *
-      *    初期画面編集
-           PERFORM 320-HONCOMBI-SET-SEC
+           IF      IDY                 >   ZERO
+               MOVE    IDY             TO  SPA-GMN27-MAX
+      *        初期画面編集
+               PERFORM 320-HONCOMBI-SET-SEC
+           END-IF
       *
       *
            .
@@ -419,7 +425,6 @@
            END-IF
            MOVE    ZERO            TO  IDX
            MOVE    ZERO            TO  IDY
-           MOVE    ZERO            TO  SPA-GMN27-MAX
       *    画面表示するデータが何番目から何番目までかを求める
            COMPUTE   WRK-ST        =   ( SPA-P027-PG - 1 )  *  50  +  1
            COMPUTE   WRK-ED        =   WRK-ST   +   49
@@ -714,15 +719,15 @@
        450-TUGI-GMNHYOUJI-SEC          SECTION.
       *
       *    組合せ情報
-           IF  SPA-P027-PG             <   SPA-P027-PGMAX
+      *    IF  SPA-P027-PG             <   SPA-P027-PGMAX
                ADD     1               TO  SPA-P027-PG
-           END-IF
+      *    END-IF
       *
       *    パラメタより編集
            PERFORM 320-PARAFILE-KENSAKU-SEC
       *
       *    保険
-           IF      SPA-GMN27-HKN-PCNT  <   4
+           IF      SPA-GMN27-HKN-PCNT  <   8
                COMPUTE IDX             =   SPA-GMN27-HKN-PCNT  +  1
                IF      SPA-GMN27-HKNRENNUM (IDX 1)  NOT =   ZERO
                    MOVE    IDX             TO  SPA-GMN27-HKN-PCNT
@@ -730,7 +735,7 @@
            END-IF
       *
       *    公費
-           IF      SPA-GMN27-KOH-PCNT  <   4
+           IF      SPA-GMN27-KOH-PCNT  <   8
                COMPUTE IDX             =   SPA-GMN27-KOH-PCNT  +  1
                IF      SPA-GMN27-KOHRENNUM (IDX 1)  NOT =   ZERO
                    MOVE    IDX             TO  SPA-GMN27-KOH-PCNT
