@@ -3708,75 +3708,75 @@
                        MOVE   ZERO      TO      OCR3-JKYSNUM
                    END-IF
                END-IF
+           END-IF    
       *  
-      *        ¿ÇÎÅ¼ÂÆü¿ô
-               IF      RECE11-JNISSU (IDX1) >   ZERO
-                   IF      RECE11-JNISSU   (IDX1)  =   99
-                       MOVE    ZERO                    TO  OCR1-JNISSU
-                   ELSE
-                       MOVE    RECE11-JNISSU(IDX1)     TO  OCR1-JNISSU
-                   END-IF
+      *    ¿ÇÎÅ¼ÂÆü¿ô
+           IF      RECE11-JNISSU (IDX1) >   ZERO
+               IF      RECE11-JNISSU   (IDX1)  =   99
+                   MOVE    ZERO                    TO  OCR1-JNISSU
+               ELSE
+                   MOVE    RECE11-JNISSU(IDX1)     TO  OCR1-JNISSU
                END-IF
-      *        ¸øÈñ£±¿ÇÎÅ¼ÂÆü¿ô
-               IF      RECE11-JNISSU (IDX2) >   ZERO
-                   IF      RECE11-JNISSU   (IDX2)  =   99
-                       MOVE    ZERO                    TO  OCR2-JNISSU
-                   ELSE
-                       MOVE    RECE11-JNISSU  (IDX2)   TO  OCR2-JNISSU
-                   END-IF
+           END-IF
+      *    ¸øÈñ£±¿ÇÎÅ¼ÂÆü¿ô
+           IF      RECE11-JNISSU (IDX2) >   ZERO
+               IF      RECE11-JNISSU   (IDX2)  =   99
+                   MOVE    ZERO                    TO  OCR2-JNISSU
+               ELSE
+                   MOVE    RECE11-JNISSU  (IDX2)   TO  OCR2-JNISSU
                END-IF
-      *        ¸øÈñ£²¿ÇÎÅ¼ÂÆü¿ô
-               IF      RECE11-JNISSU (IDX3) >   ZERO
-                   IF      RECE11-JNISSU   (IDX3)  =   99
-                       MOVE    ZERO                    TO  OCR3-JNISSU
-                   ELSE
-                       MOVE    RECE11-JNISSU  (IDX3)   TO  OCR3-JNISSU
-                   END-IF
+           END-IF
+      *    ¸øÈñ£²¿ÇÎÅ¼ÂÆü¿ô
+           IF      RECE11-JNISSU (IDX3) >   ZERO
+               IF      RECE11-JNISSU   (IDX3)  =   99
+                   MOVE    ZERO                    TO  OCR3-JNISSU
+               ELSE
+                   MOVE    RECE11-JNISSU  (IDX3)   TO  OCR3-JNISSU
                END-IF
-      *        ÀÁµáÅÀ¿ô
-               IF      RECE11-TOTALTEN (IDX1)  >   ZERO
-                   IF      RECE11-TOTALTEN (IDX1)  =   99999999
-                       MOVE    ZERO                    TO  OCR1-SKYTENSU
-                   ELSE
-                       MOVE    RECE11-TOTALTEN(IDX1)   TO  OCR1-SKYTENSU
-                   END-IF
+           END-IF
+      *    ÀÁµáÅÀ¿ô
+           IF      RECE11-TOTALTEN (IDX1)  >   ZERO
+               IF      RECE11-TOTALTEN (IDX1)  =   99999999
+                   MOVE    ZERO                    TO  OCR1-SKYTENSU
+               ELSE
+                   MOVE    RECE11-TOTALTEN(IDX1)   TO  OCR1-SKYTENSU
                END-IF
-               IF      RECE11-FTNMONEY (IDX1)  >   ZERO
-                   IF      RECE11-FTNMONEY (IDX1)  =   999999999
-                       MOVE    ZERO                    TO  OCR1-FTNMONEY
-                   ELSE
-                       MOVE    RECE11-FTNMONEY(IDX1)   TO  OCR1-FTNMONEY
-                   END-IF
+           END-IF
+           IF      RECE11-FTNMONEY (IDX1)  >   ZERO
+               IF      RECE11-FTNMONEY (IDX1)  =   999999999
+                   MOVE    ZERO                    TO  OCR1-FTNMONEY
+               ELSE
+                   MOVE    RECE11-FTNMONEY(IDX1)   TO  OCR1-FTNMONEY
                END-IF
-      *        ¸øÈñ¡¦ÀÁµáÅÀ¿ô£±
-               IF      RECE11-TOTALTEN (IDX2)  >   ZERO                     
-                   IF      RECE11-TOTALTEN (IDX2)  =   99999999
-                       MOVE    ZERO                    TO  OCR2-TENSU
-                   ELSE
-                       MOVE    RECE11-TOTALTEN(IDX2)   TO  OCR2-TENSU
-                   END-IF 
+           END-IF
+      *    ¸øÈñ¡¦ÀÁµáÅÀ¿ô£±
+           IF      RECE11-TOTALTEN (IDX2)  >   ZERO                     
+               IF      RECE11-TOTALTEN (IDX2)  =   99999999
+                   MOVE    ZERO                    TO  OCR2-TENSU
+               ELSE
+                   MOVE    RECE11-TOTALTEN(IDX2)   TO  OCR2-TENSU
+               END-IF 
+           END-IF
+           IF    RECE11-FTNMONEY (IDX2)    >   ZERO
+               IF      RECE11-FTNMONEY (IDX2)  =   999999999
+                   MOVE    ZERO                    TO  OCR2-FTNMONEY
+               ELSE
+                   MOVE    RECE11-FTNMONEY(IDX2)   TO  OCR2-FTNMONEY
                END-IF
-               IF    RECE11-FTNMONEY (IDX2)    >   ZERO
-                   IF      RECE11-FTNMONEY (IDX2)  =   999999999
-                       MOVE    ZERO                    TO  OCR2-FTNMONEY
-                   ELSE
-                       MOVE    RECE11-FTNMONEY(IDX2)   TO  OCR2-FTNMONEY
-                   END-IF
+           END-IF
+      *    ¸øÈñ¡¦ÀÁµáÅÀ¿ô£²
+           IF      RECE11-TOTALTEN (IDX3)  >   ZERO                      
+               IF      RECE11-TOTALTEN (IDX3)  =   99999999
+                   MOVE    ZERO                    TO  OCR3-TENSU
+               ELSE
+                   MOVE    RECE11-TOTALTEN(IDX3)   TO  OCR3-TENSU
                END-IF
-      *        ¸øÈñ¡¦ÀÁµáÅÀ¿ô£²
-               IF      RECE11-TOTALTEN (IDX3)  >   ZERO                      
-                   IF      RECE11-TOTALTEN (IDX3)  =   99999999
-                       MOVE    ZERO                    TO  OCR3-TENSU
-                   ELSE
-                       MOVE    RECE11-TOTALTEN(IDX3)   TO  OCR3-TENSU
-                   END-IF
-               END-IF
-               IF      RECE11-FTNMONEY (IDX3)  >   ZERO
-                   IF      RECE11-FTNMONEY (IDX3)  =   999999999
-                       MOVE    ZERO                    TO  OCR3-FTNMONEY
-                   ELSE
-                       MOVE    RECE11-FTNMONEY(IDX3)   TO  OCR3-FTNMONEY
-                   END-IF
+           END-IF
+           IF      RECE11-FTNMONEY (IDX3)  >   ZERO
+               IF      RECE11-FTNMONEY (IDX3)  =   999999999
+                   MOVE    ZERO                    TO  OCR3-FTNMONEY
+               ELSE
+                   MOVE    RECE11-FTNMONEY(IDX3)   TO  OCR3-FTNMONEY
                END-IF
            END-IF
       *
