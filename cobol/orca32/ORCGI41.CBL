@@ -4102,9 +4102,11 @@
                IF      SPA-NAI-SRYYM       =   SPA-NAI-TAINBI(1:6)
                    MOVE    "0027"              TO  SPA-ERRCD
                    MOVE    07                  TO  SPA-GMN-CUR-41
-                   GO      TO       41018-ZENGETU-SYORI-EXT
+                   GO      TO       41019-JIGETU-SYORI-EXT
                ELSE
-                   IF      SPA-NAI-TAINBI      =   ALL "9"
+                   IF     (SPA-NAI-TAINBI      =   ALL "9") AND
+                          (SPA-NAI-TBANGO(1)   NOT = ZERO ) AND
+                          (SPA-NAI-TZAISKBKBN-41(1) = "1" ) 
       *                翌月の会計を作成する
                        MOVE    SPA-NAI-SRYYM       TO  WRK-SRYYM
                        PERFORM 410191-KAIKEI-SAKUSEI-SEC
@@ -4788,11 +4790,11 @@
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
                        MOVE    "2006"          TO  SPA-ERRCD
-                       GO  TO  410191-NYUACCT-SAKUSEI-EXT
+                       GO  TO  410191-IPNNYUACCT-SAKUSEI-EXT
                    END-IF
                ELSE
                    MOVE    "2006"          TO  SPA-ERRCD
-                   GO  TO  410191-NYUACCT-SAKUSEI-EXT
+                   GO  TO  410191-IPNNYUACCT-SAKUSEI-EXT
                END-IF
            END-IF
       *
