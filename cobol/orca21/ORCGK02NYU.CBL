@@ -2603,6 +2603,8 @@
                                                               (IDX2)
                        MOVE    LNK-WKSRY-SRYKBN (IDX)
                                                TO  SPA-COM-SRYKBN(IDX2)
+                       MOVE    LNK-WKSRY-SRYKBN (IDX)
+                                               TO  SPA-GMN-SRYKBN(IDX2)
                    END-IF
                END-IF
            END-IF
@@ -2615,6 +2617,8 @@
            END-IF
            MOVE    LNK-WKSRY-SRYKBN(IDX)
                                        TO  SPA-COM-SRYKBN  (IDX2)
+           MOVE    LNK-WKSRY-SRYKBN(IDX)
+                                       TO  SPA-GMN-SRYKBN  (IDX2)
            MOVE    LNK-WKSRY-SRYSYUKBN(IDX)
                                        TO  SPA-COM-SRYSYUKBN  (IDX2)
            MOVE    LNK-WKSRY-SRYCD (IDX IDY)
@@ -4547,6 +4551,12 @@
                                                TO  WRK-SRYSYUKBN
       *        診療種別区分名称チェック
                PERFORM 510-SRYKBN-MEI-SEC
+               MOVE    WRK-SRYSYUKBNMEI    TO  SPA-GMN-MEISYO
+                                                    (SPA-GMN-IDX)
+               MOVE    "*"                 TO  SPA-GMN-MEIH
+                                                    (SPA-GMN-IDX)
+               MOVE    WRK-SRYKBN          TO  SPA-GMN-SRYKBN
+                                                    (SPA-GMN-IDX)
            ELSE
       *        文字変換・編集処理
                PERFORM 410112-INPUTCD-HENKAN-SEC
@@ -7508,6 +7518,11 @@
                           (WRK-COM-DATAKBN(IDX)        =   "1"  OR
                            WRK-COM-INPUTCD(IDX)        =   SPACE)
                        MOVE    1               TO  FLG-ZAIEND
+                   END-IF
+      *            前も空白の時対象行のみ
+                   IF     (WRK-COM-INPUTCD(IDX)        =   SPACE )  AND
+                          (WRK-MAE-INPUTCD(IDX)        =   SPACE )
+                       MOVE    ZERO            TO  FLG-ZAIEND
                    END-IF
                ELSE
                    IF      FLG-ZAIEND          =   1
