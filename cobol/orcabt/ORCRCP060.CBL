@@ -64,6 +64,8 @@
       *  01.01.10    NACL-Æ£¸¶    04/09/13  Ä¢É¼ÊÌ»ØÄêÊÔ½¸¾ðÊó¤«¤é¤ÎÊÔ½¸
       *  01.01.11    NACL-ÌçÏÆ    04/09/16  ¸øÈñ£²¤Î¼ÂÆü¿ô¤ÎÊÔ½¸¾ò·ï¤ò½¤Àµ
       *  01.01.11    NACL-Æ£¸¶    04/09/17  £Ï£Ã£Ò¶èÊ¬¤ÎÀßÄê¤ËÄÉ²Ã
+      *  01.01.12    NACL-Æ£¸¶    04/10/25  ÉéÃ´¶â³ÛÅù¤Î¥«¥¹¥¿¥Þ¥¤¥º¹àÌÜ
+      *                                     ¤ÎÊÔ½¸ÊýË¡¤òÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2759,19 +2761,31 @@
       *        ¸©Ã±ÍÑ¹àÌÜ
                IF      FLG-RECE11           =   ZERO
                    IF      RECE11-JNISSU (IDX1) >   ZERO
-                       MOVE    RECE11-JNISSU (IDX1)
-                                               TO  WRK-JINISSUZ
-                       MOVE    WRK-JINISSU     TO  HC06-JINISSU
+                       IF      RECE11-JNISSU (IDX1) =   99
+                           MOVE    ZERO            TO  WRK-KGK2
+                       ELSE  
+                           MOVE    RECE11-JNISSU (IDX1)
+                                                   TO  WRK-KGK2
+                       END-IF
+                       MOVE    WRK-KGK2        TO  HC06-JINISSU
                    END-IF
                    IF      RECE11-JNISSU (IDX2) >   ZERO
-                       MOVE    RECE11-JNISSU (IDX2)
-                                               TO  WRK-JINISSUZ
-                       MOVE    WRK-JINISSU     TO  HC06-JINISSU1
+                       IF      RECE11-JNISSU (IDX2) =   99
+                           MOVE    ZERO            TO  WRK-KGK2
+                       ELSE  
+                           MOVE    RECE11-JNISSU (IDX2)
+                                                   TO  WRK-KGK2
+                       END-IF
+                       MOVE    WRK-KGK2        TO  HC06-JINISSU1
                    END-IF
                    IF      RECE11-JNISSU (IDX3) >   ZERO
-                       MOVE    RECE11-JNISSU (IDX3)
-                                               TO  WRK-JINISSUZ
-                       MOVE    WRK-JINISSU     TO  HC06-JINISSU2
+                       IF      RECE11-JNISSU (IDX2) =   99
+                           MOVE    ZERO            TO  WRK-KGK2
+                       ELSE  
+                           MOVE    RECE11-JNISSU (IDX3)
+                                                   TO  WRK-KGK2
+                       END-IF
+                       MOVE    WRK-KGK2        TO  HC06-JINISSU2
                    END-IF
                END-IF
            END-IF
@@ -2808,8 +2822,8 @@
            END-IF
       *
       *    ¸©Ã±ÍÑ¹àÌÜ
-           IF      FLG-RECE11          =   ZERO
-           AND     RECE11-KYURATE      >   ZERO
+           IF    ( FLG-RECE11          =   ZERO )
+           AND   ( RECE11-KYURATE      >   ZERO )
                IF      RECE11-KYURATE      =   999
                    MOVE    10                  TO  WRK-KYURATE-9
                ELSE
@@ -3553,29 +3567,53 @@
            IF      FLG-RECE11          =   ZERO
       *        ÊÝ¸±
                IF      RECE11-TOTALTEN (IDX1)  >   ZERO
-                   MOVE    RECE11-TOTALTEN (IDX1)  TO  WRK-KGK6
+                   IF      RECE11-TOTALTEN (IDX1)  =   99999999
+                       MOVE    ZERO                    TO  WRK-KGK6
+                   ELSE
+                       MOVE    RECE11-TOTALTEN (IDX1)  TO  WRK-KGK6
+                   END-IF
                    MOVE    WRK-KGK6                TO  HC06-TOTALTEN(1)
                END-IF
                IF      RECE11-FTNMONEY (IDX1)  >   ZERO
-                   MOVE    RECE11-FTNMONEY (IDX1)  TO  WRK-KGK7
+                   IF      RECE11-FTNMONEY (IDX1)  =   999999999
+                       MOVE    ZERO                    TO  WRK-KGK7
+                   ELSE
+                       MOVE    RECE11-FTNMONEY (IDX1)  TO  WRK-KGK7
+                   END-IF
                    MOVE    WRK-KGK7                TO  HC06-FTNMONEY(1)
                END-IF
       *        ¸øÈñ£±
                IF      RECE11-TOTALTEN (IDX2)  >   ZERO                     
-                   MOVE    RECE11-TOTALTEN (IDX2)  TO  WRK-KGK6
+                   IF      RECE11-TOTALTEN (IDX2)  =   99999999
+                       MOVE    ZERO                    TO  WRK-KGK6
+                   ELSE
+                       MOVE    RECE11-TOTALTEN (IDX2)  TO  WRK-KGK6
+                   END-IF
                    MOVE    WRK-KGK6                TO  HC06-TOTALTEN(2)
                END-IF
                IF    RECE11-FTNMONEY (IDX2)    >   ZERO
-                   MOVE    RECE11-FTNMONEY (IDX2)  TO  WRK-KGK7
+                   IF      RECE11-FTNMONEY (IDX2)  =   999999999
+                       MOVE    ZERO                    TO  WRK-KGK7
+                   ELSE
+                       MOVE    RECE11-FTNMONEY (IDX2)  TO  WRK-KGK7
+                   END-IF
                    MOVE    WRK-KGK7                TO  HC06-FTNMONEY(2)
                END-IF
       *        ¸øÈñ£²
                IF      RECE11-TOTALTEN (IDX3)  >   ZERO                      
-                   MOVE    RECE11-TOTALTEN (IDX3)  TO  WRK-KGK6
+                   IF      RECE11-TOTALTEN (IDX3)  =   99999999
+                       MOVE    ZERO                    TO  WRK-KGK6
+                   ELSE
+                       MOVE    RECE11-TOTALTEN (IDX3)  TO  WRK-KGK6
+                   END-IF
                    MOVE    WRK-KGK6                TO  HC06-TOTALTEN(3)
                END-IF
                IF      RECE11-FTNMONEY (IDX3)  >   ZERO
-                   MOVE    RECE11-FTNMONEY (IDX3)  TO  WRK-KGK7
+                   IF      RECE11-FTNMONEY (IDX3)  =   999999999
+                       MOVE    ZERO                    TO  WRK-KGK7
+                   ELSE
+                       MOVE    RECE11-FTNMONEY (IDX3)  TO  WRK-KGK7
+                   END-IF
                    MOVE    WRK-KGK7                TO  HC06-FTNMONEY(3)
                END-IF
            END-IF
@@ -3656,36 +3694,72 @@
       *  
       *        ¿ÇÎÅ¼ÂÆü¿ô
                IF      RECE11-JNISSU (IDX1) >   ZERO
-                   MOVE    RECE11-JNISSU(IDX1)     TO  OCR1-JNISSU
+                   IF      RECE11-JNISSU   (IDX1)  =   99
+                       MOVE    ZERO                    TO  OCR1-JNISSU
+                   ELSE
+                       MOVE    RECE11-JNISSU(IDX1)     TO  OCR1-JNISSU
+                   END-IF
                END-IF
       *        ¸øÈñ£±¿ÇÎÅ¼ÂÆü¿ô
                IF      RECE11-JNISSU (IDX2) >   ZERO
-                   MOVE    RECE11-JNISSU  (IDX2)   TO  OCR2-JNISSU
+                   IF      RECE11-JNISSU   (IDX2)  =   99
+                       MOVE    ZERO                    TO  OCR2-JNISSU
+                   ELSE
+                       MOVE    RECE11-JNISSU  (IDX2)   TO  OCR2-JNISSU
+                   END-IF
                END-IF
       *        ¸øÈñ£²¿ÇÎÅ¼ÂÆü¿ô
                IF      RECE11-JNISSU (IDX3) >   ZERO
-                   MOVE    RECE11-JNISSU  (IDX3)   TO  OCR3-JNISSU
+                   IF      RECE11-JNISSU   (IDX3)  =   99
+                       MOVE    ZERO                    TO  OCR3-JNISSU
+                   ELSE
+                       MOVE    RECE11-JNISSU  (IDX3)   TO  OCR3-JNISSU
+                   END-IF
                END-IF
       *        ÀÁµáÅÀ¿ô
                IF      RECE11-TOTALTEN (IDX1)  >   ZERO
-                   MOVE    RECE11-TOTALTEN(IDX1)   TO  OCR1-SKYTENSU
+                   IF      RECE11-TOTALTEN (IDX1)  =   99999999
+                       MOVE    ZERO                    TO  OCR1-SKYTENSU
+                   ELSE
+                       MOVE    RECE11-TOTALTEN(IDX1)   TO  OCR1-SKYTENSU
+                   END-IF
                END-IF
                IF      RECE11-FTNMONEY (IDX1)  >   ZERO
-                   MOVE    RECE11-FTNMONEY(IDX1)   TO  OCR1-FTNMONEY
+                   IF      RECE11-FTNMONEY (IDX1)  =   999999999
+                       MOVE    ZERO                    TO  OCR1-FTNMONEY
+                   ELSE
+                       MOVE    RECE11-FTNMONEY(IDX1)   TO  OCR1-FTNMONEY
+                   END-IF
                END-IF
       *        ¸øÈñ¡¦ÀÁµáÅÀ¿ô£±
                IF      RECE11-TOTALTEN (IDX2)  >   ZERO                     
-                   MOVE    RECE11-TOTALTEN(IDX2)   TO  OCR2-TENSU
+                   IF      RECE11-TOTALTEN (IDX2)  =   99999999
+                       MOVE    ZERO                    TO  OCR2-TENSU
+                   ELSE
+                       MOVE    RECE11-TOTALTEN(IDX2)   TO  OCR2-TENSU
+                   END-IF 
                END-IF
                IF    RECE11-FTNMONEY (IDX2)    >   ZERO
-                   MOVE    RECE11-FTNMONEY(IDX2)   TO  OCR2-FTNMONEY
+                   IF      RECE11-FTNMONEY (IDX2)  =   999999999
+                       MOVE    ZERO                    TO  OCR2-FTNMONEY
+                   ELSE
+                       MOVE    RECE11-FTNMONEY(IDX2)   TO  OCR2-FTNMONEY
+                   END-IF
                END-IF
       *        ¸øÈñ¡¦ÀÁµáÅÀ¿ô£²
                IF      RECE11-TOTALTEN (IDX3)  >   ZERO                      
-                   MOVE    RECE11-TOTALTEN(IDX3)   TO  OCR3-TENSU
+                   IF      RECE11-TOTALTEN (IDX3)  =   99999999
+                       MOVE    ZERO                    TO  OCR3-TENSU
+                   ELSE
+                       MOVE    RECE11-TOTALTEN(IDX3)   TO  OCR3-TENSU
+                   END-IF
                END-IF
                IF      RECE11-FTNMONEY (IDX3)  >   ZERO
-                   MOVE    RECE11-FTNMONEY(IDX3)   TO  OCR3-FTNMONEY
+                   IF      RECE11-FTNMONEY (IDX3)  =   999999999
+                       MOVE    ZERO                    TO  OCR3-FTNMONEY
+                   ELSE
+                       MOVE    RECE11-FTNMONEY(IDX3)   TO  OCR3-FTNMONEY
+                   END-IF
                END-IF
            END-IF
       *
