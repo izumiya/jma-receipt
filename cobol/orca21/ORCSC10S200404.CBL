@@ -1454,8 +1454,20 @@
                    INTO                SPA-GMN-KYUSEI
            END-STRING
       *
+      *    急性発生日が傷病日より後の場合、急性発生日から６ヶ月後とする
+           IF     (SPA-HKNKBN          =   1        )  AND
+                  (SPA-RSI-SHOBYOYMD   NOT =   SPACE ) AND
+                  (SPA-RSI-SHOBYOYMD   <   SPA-KYUSEI-YMD )
+               MOVE    SPA-KYUSEI-YMD      TO  WRK-HASSYOYMD
+               COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
+                                           +   6
+               IF      WRK-HAS-MM          >   12
+                   COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
+                   COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
+               END-IF
+               MOVE    WRK-HASSYOYMD       TO  SPA-RSI-SHOBYOYMD3
+           END-IF
       *
-             
            .
        10019-KYUSEI-CHK-EXT.
            EXIT.
@@ -1895,6 +1907,19 @@
                COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
            END-IF
            MOVE    WRK-HASSYOYMD       TO  SPA-RSI-SHOBYOYMD3
+      *
+      *    急性発生日が傷病日より後の場合、急性発生日から６ヶ月後とする
+           IF     (SPA-HKNKBN          =   1        )  AND
+                  (SPA-RSI-SHOBYOYMD   <   SPA-KYUSEI-YMD )
+               MOVE    SPA-KYUSEI-YMD      TO  WRK-HASSYOYMD
+               COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
+                                           +   6
+               IF      WRK-HAS-MM          >   12
+                   COMPUTE WRK-HAS-MM      =   WRK-HAS-MM    -   12
+                   COMPUTE WRK-HAS-YY      =   WRK-HAS-YY    +   1
+               END-IF
+               MOVE    WRK-HASSYOYMD       TO  SPA-RSI-SHOBYOYMD3
+           END-IF
       *
       *    平成１５年２月より
       *    自賠責時、６ヶ月とする（診療日がＨ１５．２以降）
