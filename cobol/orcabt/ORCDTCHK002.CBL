@@ -334,7 +334,9 @@
                05  TNACCT-HKNCOMBI-EDYMD               PIC X(08).
                05  TNACCT-HKNCOMBI-HKNCOMBI-DAY        PIC 9(03)
                                                        OCCURS 31.
-
+       01  TNACCT-KHNRYO-AREA.
+           03  TNACCT-KHNRYO-DAY                       PIC 9(03)
+                                                       OCCURS 31.
       *
       *    診療科退避ワーク
        01  TSRYKA-AREA.
@@ -1133,6 +1135,8 @@
       *    入院会計保険組み合わせ退避処理
            IF    ( ORCBSD01-NYUGAIKBN      =   "1" )
       *
+               PERFORM 200111-NACCT-KHNRYO-TAIHI-SEC
+      *
                PERFORM 200111-NACCT-COMBI-TAIHI-SEC
       *
                PERFORM VARYING IDX18   FROM    1   BY  1
@@ -1177,6 +1181,7 @@
                                        TKOHID-AREA
                                        THKNCOMBI-AREA
                                        TNACCT-HKNCOMBI-AREA
+                                       TNACCT-KHNRYO-AREA
                                        TSRYKA-AREA
                                        TSRYCD-AREA
                                        TJNISSU-AREA
@@ -1555,11 +1560,9 @@
       *                診療行為コード退避ワーク編集処理
                        PERFORM 200111-TSRYCD-HEN-SEC
       *
-                       IF    ( ORCBSD01-NYUGAIKBN  =   "2" )
-      *                    実日数退避ワーク編集処理（外来）
-                           IF    ( FLG-SHOSAISIN   =   ZERO )
-                               PERFORM 200111-TJNISSU-GAI-HEN-SEC
-                           END-IF
+      *                実日数退避ワーク編集処理
+                       IF    ( FLG-SHOSAISIN   =   ZERO )
+                           PERFORM 200111-TJNISSU-HEN-SEC
                        END-IF
       *
       *                算定回数退避ワーク編集処理
@@ -1759,16 +1762,16 @@
        200111-TSRYCD-HEN-EXT.
            EXIT.
       *****************************************************************
-      *    実日数退避ワーク編集処理（外来）
+      *    実日数退避ワーク編集処理
       *****************************************************************
-       200111-TJNISSU-GAI-HEN-SEC      SECTION.
+       200111-TJNISSU-HEN-SEC          SECTION.
       *
            MOVE    ZERO            TO  IDXA
       *
       *    実日数算定チェック
            PERFORM 200111-JNISSU-HEN-SEC
            IF    ( FLG-SHOSAISIN       =   ZERO )
-               GO  TO  200111-TJNISSU-GAI-HEN-EXT
+               GO  TO  200111-TJNISSU-HEN-EXT
            END-IF
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
@@ -1808,7 +1811,7 @@
            END-IF
       *
            .
-       200111-TJNISSU-GAI-HEN-EXT.
+       200111-TJNISSU-HEN-EXT.
            EXIT.
       *****************************************************************
       *    実日数算定チェック
@@ -1926,8 +1929,10 @@
            IF    ( IDXA            >   ZERO )
                PERFORM VARYING IDX2    FROM    1   BY  1
                        UNTIL ( IDX2    >   31 )
-                   IF    ( WRK-HKNCOMBI-DAY (IDX2)   >   ZERO )
-                       MOVE    1   TO  TJNISSU-DAY (IDXA IDX2)
+                   IF    ( WRK-HKNCOMBI-DAY (IDX2)       >   ZERO )
+                       IF    ( TNACCT-KHNRYO-DAY (IDX2)  >   ZERO )
+                           MOVE    1   TO  TJNISSU-DAY (IDXA IDX2)
+                       END-IF
                    END-IF
                END-PERFORM
            END-IF
@@ -2201,6 +2206,58 @@
       *
            .
        200112-SRYACT-TAIHI-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院基本料退避処理
+      *****************************************************************
+       200111-NACCT-KHNRYO-TAIHI-SEC   SECTION.
+      *
+           MOVE    ZERO                    TO  FLG-NYUINACCT
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    DTCHK003-HOSPID         TO  NACCT-HOSPID
+           MOVE    DTCHK003-PTID           TO  NACCT-PTID
+           MOVE    ORCBSD01-SRYYM          TO  NACCT-SRYYM
+           MOVE    "1"                     TO  NACCT-ZAISKBKBN
+           MOVE    NYUINACCT-REC           TO  MCPDATA-REC
+           MOVE    "NYUINACCT-KEY17"       TO  ORC-DBPATH
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC                  =   ZERO )
+               MOVE    MCPDATA-REC         TO  NYUINACCT-REC
+           ELSE
+               MOVE    1                   TO  FLG-NYUINACCT
+           END-IF
+      *
+           PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
+      *
+               IF    ( NACCT-SRYCDTOTAL    NOT =    099999916 )
+      *
+      *            入院料を算定している日にちを退避
+                   PERFORM VARYING     IDX-DAY FROM    1   BY  1
+                           UNTIL     ( IDX-DAY >   31 )
+      *
+                       IF   ( NACCT-DAY(IDX-DAY)   >   ZERO )
+                           MOVE    1   TO  TNACCT-KHNRYO-DAY (IDX-DAY)
+                       END-IF
+      *
+                   END-PERFORM
+      *
+               END-IF
+      *
+               MOVE    "NYUINACCT-KEY17"   TO  ORC-DBPATH
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  NYUINACCT-REC
+               ELSE
+                  MOVE    1                TO  FLG-NYUINACCT
+               END-IF
+      *
+           END-PERFORM
+      *
+           MOVE    "NYUINACCT-KEY17"       TO  ORC-DBPATH
+           PERFORM 910-DBCLOSE-SEC
+      *
+           .
+       200111-NACCT-KHNRYO-TAIHI-EXT.
            EXIT.
       *****************************************************************
       *    入院保険組合せ退避処理
