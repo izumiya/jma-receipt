@@ -252,8 +252,8 @@
                WHEN    "CLICKED"   ALSO    "B02"
                    PERFORM 410-JOBDEL-SEC
       *        情報
-               WHEN    "CLICKED"   ALSO    "B09"
-                   PERFORM 400-JYOUHOU-SEC
+      *         WHEN    "CLICKED"   ALSO    "B09"
+      *             PERFORM 400-JYOUHOU-SEC
       *        状況
                WHEN    "CLICKED"   ALSO    "B11"
                    PERFORM 400-JYOKYO-SET-SEC
@@ -553,18 +553,14 @@
       *****************************************************************
        410-JOBDEL-SEC              SECTION.
       *
-           IF      SPA-ERRCD       NOT =   SPACE
-               GO  TO  410-JOBDEL-EXT
-           END-IF
+           PERFORM 820-JOBKANRI-READ1-SEC
       *
-           PERFORM 820-JOBKANRI-READ2-SEC
-      *
-           IF      SKBN-RUN        =   "RUN"
-               MOVE    "0203"          TO  SPA-ERRCD
-               PERFORM 510-ERRSET-SEC
-           ELSE
+           IF  SJOBKANRI-RETURN    =   ZERO
                MOVE    "0204"          TO  SPA-MIDCD
                PERFORM 520-MIDSET-SEC
+           ELSE
+               MOVE    "0005"          TO  SPA-ERRCD
+               PERFORM 510-ERRSET-SEC
            END-IF
            .
       *
@@ -773,6 +769,9 @@
                                             TO  SPA-ERRMSG
                WHEN    "0004"
                    MOVE    "更新処理が実行中の為、削除できません"
+                                            TO  SPA-ERRMSG
+               WHEN    "0005"
+                    MOVE    "ＪＯＢ管理情報は、ありません"
                                             TO  SPA-ERRMSG
                WHEN    "0203"
                    MOVE    "プログラム更新は実行中です。"
