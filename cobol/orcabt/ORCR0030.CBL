@@ -179,6 +179,8 @@
       *  01.04.09   NACL-ÃÁœ∆     04/09/17  £œ£√£“∏¯»Ò£≤§Œ ‘Ω∏Ω§¿µ
       *  01.04.10   NACL-∆£∏∂     04/09/17  £œ£√£“∂Ë ¨§Œ¿ﬂƒÍ§Àƒ…≤√
       *  01.04.11   NACL-ÃÁœ∆     04/10/14  ≥∞ÕË¥…Õ˝≤√ªª§Œ∫ﬁ»÷πÊ√÷§≠¥π§®
+      *  01.04.12   NACL-ÃÁœ∆     04/11/22  •’•£•Î•‡≈¿øÙ∑◊ªª
+      *                                     ° ø«∂Ë£¥£∞°¢£µ£∞°¢£µ£¥°¢£∂£∞°À
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -523,6 +525,8 @@
            03  WRK-SRYCD                               PIC 9(09).
       *
            03  WRK-JYOGEN41                            PIC 9(09).
+      *
+           03  WRK-FILMTEN                             PIC 9(07)V9(02).
       *
       *    1∑ÂÃ‹:¿∏ › 2∑ÂÃ‹:∑Î≥À 3∑ÂÃ‹:¿∫ø¿
            03  WRK-3SYU-KBN.
@@ -1249,6 +1253,8 @@
                                MOVE  ZERO  TO   FLG-HOUSIJI-COM
                                                 FLG-HOUTEN-COM
       *
+                               MOVE  ZERO  TO   WRK-FILMTEN
+      *
                                PERFORM 21012-RECE02-TOTALTEN-HENSYU-SEC     
                                PERFORM 21013-RECE04-TENSOU-SEC
                                PERFORM 21014-RECE05-HENSYU-SEC
@@ -1280,6 +1286,8 @@
                                       MOVE  SPACE TO   WRK-TANINAME
                                       MOVE  ZERO  TO   FLG-HOUSIJI-COM
                                                        FLG-HOUTEN-COM
+      *
+                                      MOVE  ZERO  TO   WRK-FILMTEN
       *
                                       PERFORM   21013-RECE04-TENSOU-SEC
                                       PERFORM   21014-RECE05-HENSYU-SEC
@@ -1582,6 +1590,10 @@
            MOVE   "SRYACT-KEY2"      TO  WK-PATH
            PERFORM   900-CSR-CLOSE-SEC
       *
+           IF     WRK-FILMTEN  NOT =  ZERO
+                COMPUTE    RECE04-SYUTEN2  =  WRK-FILMTEN + 0.5
+           END-IF
+      *
            .
        21014-RECE05-HENSYU-EXT.
            EXIT.
@@ -1705,6 +1717,15 @@
                             RECE04-RUIKEITOTAL  +
                            (WRK-SRYCD  *  SRY-SRYSURYO(IDX2))
                  END-IF
+               END-IF
+      *
+               IF      SRY-SRYKBN    =   "40" OR "50" OR "54" OR "60"
+                  IF   SRY-SRYCD(IDX2)(1:1)  =  "7"
+                  AND  TNS-DATAKBN           =  "3"
+                         COMPUTE  WRK-FILMTEN  =
+                                  WRK-FILMTEN  +
+                                 (TNS-TEN  * SRY-SRYSURYO(IDX2) / 10)
+                  END-IF
                END-IF
       *
                MOVE    SRY-SRYSURYO(IDX2) TO    RECE05-SRYSURYO(IDX4)
