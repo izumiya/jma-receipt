@@ -1105,12 +1105,17 @@
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    ∞Ï…Ù…È√¥∂‚°¶ø©ªˆŒ≈Õ‹»Ò…∏Ω‡…È√¥≥€∂Ë ¨
-           EVALUATE    RECE02-TEISYOTOKU
-               WHEN    "1"
-                   MOVE    "3"             TO  WRK-DATA
-               WHEN    "2"
-                   MOVE    "1"             TO  WRK-DATA
-           END-EVALUATE
+           IF    ( RECE02-TEISYOTOKU   =   SPACE )
+           OR    ( RECE02-ZAITAKU      =   SPACE )
+               CONTINUE
+           ELSE
+               EVALUATE    RECE02-TEISYOTOKU
+                   WHEN    "1"
+                       MOVE    "3"             TO  WRK-DATA
+                   WHEN    "2"
+                       MOVE    "1"             TO  WRK-DATA
+               END-EVALUATE
+           END-IF
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    ∆√µ≠ªˆπ‡
