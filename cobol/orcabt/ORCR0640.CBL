@@ -5613,6 +5613,7 @@
       *****************************************************************
        TENSU-TBL-SEC               SECTION.
       *
+           MOVE    ZERO                 TO      FLG-TENSU
            INITIALIZE                           TNS-TENSU-REC
            MOVE    WRK-SRYCD            TO      TNS-SRYCD
            MOVE    TNS-TENSU-REC        TO      MCPDATA-REC
