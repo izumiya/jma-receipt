@@ -28,6 +28,7 @@
       ****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  01.00.01    NACL-ÌçÏÆ    04/11/25  Ê¡Åç¸©ÆýÍÄ»ùÆÃ¼ì·×»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -97,6 +98,9 @@
                  05  WRK-RSI-TOTAL               PIC 9(07).
                  05  WRK-RSIJIBAI-SKYMONEY       PIC 9(07).
                  05  WRK-SKYMONEY-TAX-SAI        PIC 9(07).
+                 05  WRK-TOKUSYU-FTNMONEY        PIC 9(07).
+                 05  WRK-TOKUSYU-COMPFTN         PIC 9(07).
+                 05  WRK-TOKUSYU-ENTANI          PIC 9(07)V9(01).
       *
                  05  WRK-GRP-SGKMONEY            PIC S9(07).
                  05  WRK-GRP-SYUHKNFTNMONEY      PIC S9(07).
@@ -134,6 +138,9 @@
                  05  WRK-GRP-RSI-TOTAL           PIC S9(07).
                  05  WRK-GRP-RSIJIBAI-SKYMONEY   PIC S9(07).
                  05  WRK-GRP-SKYMONEY-TAX-SAI    PIC S9(07).
+                 05  WRK-GRP-TOKUSYU-FTNMONEY    PIC S9(07).
+                 05  WRK-GRP-TOKUSYU-COMPFTN     PIC S9(07).
+                 05  WRK-GRP-TOKUSYU-ENTANI      PIC S9(07)V9(01).
       *
            03  WRK-RUI.
               04  WRK-RUI-SKYMONEY               PIC 9(07).
@@ -172,6 +179,9 @@
               04  WRK-RUI-RSI-TOTAL              PIC 9(07).
               04  WRK-RUI-RSIJIBAI-SKYMONEY      PIC 9(07).
               04  WRK-RUI-SKYMONEY-TAX-SAI       PIC 9(07).
+              04  WRK-RUI-TOKUSYU-FTNMONEY       PIC 9(07).
+              04  WRK-RUI-TOKUSYU-COMPFTN        PIC 9(07).
+              04  WRK-RUI-TOKUSYU-ENTANI         PIC 9(07)V9(01).
       *
            03  WRK-KEISAN                  PIC S9(07).
            03  WRK-KEISAN2                 PIC S9(07)V9(01).
@@ -582,6 +592,21 @@
                  ADD     LNK-SYU-SKYMONEY-TAX-SAI(IDX)
                                        TO   WRK-RUI-SKYMONEY-TAX-SAI
       *
+                 MOVE    LNK-SYU-SHOKUJI5(IDX)
+                                       TO   WRK-TOKUSYU-FTNMONEY(IDX)
+                 ADD     LNK-SYU-SHOKUJI5(IDX)
+                                       TO   WRK-RUI-TOKUSYU-FTNMONEY
+      *
+                 MOVE    LNK-SYU-SHOKUJI6(IDX)
+                                       TO   WRK-TOKUSYU-COMPFTN(IDX)
+                 ADD     LNK-SYU-SHOKUJI6(IDX)
+                                       TO   WRK-RUI-TOKUSYU-COMPFTN
+      *
+                 MOVE    LNK-SYU-SHOKUJI7(IDX)
+                                       TO   WRK-TOKUSYU-ENTANI(IDX)
+                 ADD     LNK-SYU-SHOKUJI7(IDX)
+                                       TO   WRK-RUI-TOKUSYU-ENTANI
+      *
       *
                  MOVE    LNK-SYU-HKNCOMBINUM(IDX)
                                        TO    WRK-TAIHI-HKNCOMBINUM
@@ -794,6 +819,24 @@
                    COMPUTE  WRK-GRP-SKYMONEY-TAX-SAI(IDX)  =
                             WRK-SKYMONEY-TAX-SAI(IDX)      -
                             WRK-RUI-SKYMONEY-TAX-SAI
+      *
+                   MOVE     LNK-SYU-SHOKUJI5(IDX)
+                                       TO   WRK-TOKUSYU-FTNMONEY(IDX)
+                   COMPUTE  WRK-GRP-TOKUSYU-FTNMONEY(IDX)  =
+                            WRK-TOKUSYU-FTNMONEY(IDX)      -
+                            WRK-RUI-TOKUSYU-FTNMONEY
+      *
+                   MOVE     LNK-SYU-SHOKUJI6(IDX)
+                                       TO   WRK-TOKUSYU-COMPFTN(IDX)
+                   COMPUTE  WRK-GRP-TOKUSYU-COMPFTN(IDX)  =
+                            WRK-TOKUSYU-COMPFTN(IDX)      -
+                            WRK-RUI-TOKUSYU-COMPFTN
+      *
+                   MOVE     LNK-SYU-SHOKUJI7(IDX)
+                                       TO   WRK-TOKUSYU-ENTANI(IDX)
+                   COMPUTE  WRK-GRP-TOKUSYU-ENTANI(IDX)  =
+                            WRK-TOKUSYU-ENTANI(IDX)      -
+                            WRK-RUI-TOKUSYU-ENTANI
       *
       *
                    MOVE      ZERO      TO      FLG-OK
@@ -1090,6 +1133,30 @@
                                     TO   WRK-SKYMONEY-TAX-SAI(IDZ)
                            END-IF
       *
+                           COMPUTE  WRK-KEISAN  =
+                                    WRK-TOKUSYU-FTNMONEY(IDZ)  +
+                                    WRK-GRP-TOKUSYU-FTNMONEY(IDX)
+                           IF       WRK-KEISAN  >=   0
+                              MOVE    WRK-KEISAN
+                                    TO   WRK-TOKUSYU-FTNMONEY(IDZ)
+                           END-IF
+      *
+                           COMPUTE  WRK-KEISAN  =
+                                    WRK-TOKUSYU-COMPFTN(IDZ)  +
+                                    WRK-GRP-TOKUSYU-COMPFTN(IDX)
+                           IF       WRK-KEISAN  >=   0
+                              MOVE    WRK-KEISAN
+                                    TO   WRK-TOKUSYU-COMPFTN(IDZ)
+                           END-IF
+      *
+                           COMPUTE  WRK-KEISAN  =
+                                    WRK-TOKUSYU-ENTANI(IDZ)  +
+                                    WRK-GRP-TOKUSYU-ENTANI(IDX)
+                           IF       WRK-KEISAN  >=   0
+                              MOVE    WRK-KEISAN
+                                    TO   WRK-TOKUSYU-ENTANI(IDZ)
+                           END-IF
+      *
       *
                            MOVE     1         TO   FLG-OK
                        END-IF
@@ -1185,6 +1252,12 @@
                                     TO   LNK-SYU-RSIJIBAI-SKYMONEY(IDX)
                 MOVE   WRK-SKYMONEY-TAX-SAI(IDX)
                                     TO   LNK-SYU-SKYMONEY-TAX-SAI(IDX)
+                MOVE   WRK-TOKUSYU-FTNMONEY(IDX)
+                                    TO   LNK-SYU-SHOKUJI5(IDX)
+                MOVE   WRK-TOKUSYU-COMPFTN(IDX)
+                                    TO   LNK-SYU-SHOKUJI6(IDX)
+                MOVE   WRK-TOKUSYU-ENTANI(IDX)
+                                    TO   LNK-SYU-SHOKUJI7(IDX)
       *
       ****** ELSE
       *
