@@ -194,7 +194,6 @@
                05  WRK-YKZTEN              PIC  9(07).
                05  WRK-KIZAITEN            PIC  9(07).
       *
-           03  WRK-MOJI            PIC X(01).
            03  WRK-MKBN            PIC X(01).
       *    警告済フラグ保存
            03  WRK-TIMEFLG         PIC X(01).
@@ -2390,28 +2389,8 @@
       *
            MOVE    SPACE               TO  SPA-COM-IN3 (SPA-GMN-IDX4).
       *
-      *    薬剤と数量入力必須の診療行為、薬剤コメント
-           IF      SPA-COM-INPUTCD(SPA-GMN-IDX4)(1:3)   =   "059"
-               MOVE    "7"                     TO  WRK-MOJI
-           ELSE
-               MOVE    SPA-COM-INPUTCD(SPA-GMN-IDX4)(1:1)
-                                               TO  WRK-MOJI
-           END-IF.
-      *
-           IF     (WRK-MOJI                     =   "6" OR
-                                                    "7" )  OR
-                  ((WRK-MOJI                     =   "1") AND
-                   (TNS-SRYSYUKBN(1:1)       NOT =   "7") AND
-                   (TNS-KZMCOMPSIKIBETU      NOT =   0  ))  OR
-                  (SPA-COM-INPUTCD(SPA-GMN-IDX4)(1:3)
-                                                 =   "001") OR
-                  ((SPA-COM-INPUTCD(SPA-GMN-IDX4)(1:2)
-                                                 =   "84")  AND
-                   (TNS-SSTKIJUNCDTBL(1)     NOT =   ZERO))  OR
-                  ((SPA-COM-INPUTCD(SPA-GMN-IDX4)(1:5)
-                                                 =   "09500" OR
-                                                     "09600") AND
-                  (TNS-TEN                      =   ZERO))
+           IF     (SPA-COM-INPUTCD(SPA-GMN-IDX4)(1:2)   =   "84")  AND
+                  (TNS-SSTKIJUNCDTBL(1)             NOT =   ZERO)
                MOVE    "2"            TO  SPA-COM-IN2 (SPA-GMN-IDX4)
                MOVE    "1"            TO  SPA-COM-IN3 (SPA-GMN-IDX4)
            END-IF.
@@ -5145,8 +5124,6 @@
                            END-IF
                        END-IF
       *                フリーコメントで未入力の行
-      **                 IF     (SPA-COM-IN2 (IDX)   =   "3") AND
-      **                        (SPA-COM-IN  (IDX)   =   "1")
                        IF     SPA-COM-IN2 (IDX)   =   "3"
                            MOVE    IDX             TO  WRK-MAP-CUR3
                            MOVE    WRK-PAGE        TO  WRK-MAP-PAGE3
