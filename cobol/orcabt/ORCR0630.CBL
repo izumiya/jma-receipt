@@ -1120,6 +1120,7 @@
            MOVE       ZERO              TO   KH-IDX
            PERFORM    VARYING   IDX2    FROM   1   BY   1
                                 UNTIL   (IDX2      >       4)
+               MOVE       ZERO           TO   KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
       *
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
@@ -1168,6 +1169,7 @@
            MOVE       ZERO              TO   KH-IDX
            PERFORM    VARYING   IDX2    FROM   1   BY   1
                                 UNTIL   (IDX2      >       4)
+               MOVE       ZERO           TO   KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
       *
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
@@ -1735,6 +1737,7 @@
            MOVE       ZERO              TO   KH-IDX
            PERFORM    VARYING   IDX2    FROM   1   BY   1
                                 UNTIL   (IDX2      >       4)
+               MOVE       ZERO           TO   KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
       *
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
@@ -2379,6 +2382,7 @@
            MOVE       ZERO              TO   KH-IDX
            PERFORM    VARYING   IDX2    FROM   1   BY   1
              UNTIL   (IDX2      >       4)
+               MOVE       ZERO           TO   KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                       MOVE    2          TO        KH-IDX
