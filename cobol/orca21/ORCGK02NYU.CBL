@@ -32,6 +32,7 @@
       * 01.00.03     NACL-多々納  02/12/17  算定チェック修正
       * 01.00.04     NACL-多々納  03/02/19  約束セット名称編集修正
       * 01.00.05     NACL-多々納  03/03/05  排他制御処理追加
+      * 01.00.06     NACL-多々納  03/03/18  中途終了時修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2494,6 +2495,25 @@
                    PERFORM 3101-INPUTCD-HEN-SEC
                    MOVE    SPACE               TO  SPA-MAE-INPUTCD (IDX)
                END-IF
+      *        回数入力の画面用再編集
+               IF     (SPA-GMN-INPUTCD(IDX-1)(1:1)     =   "*"  ) AND
+                      (SPA-GMN-INPUTCD(IDX-1)(2:)  NOT =   SPACE)
+                   MOVE    IDX-1               TO  SPA-GMN-IDX
+                   INITIALIZE                  WRK-MOJI-AREA
+                   INITIALIZE                  ORCSC97AREA
+                   MOVE    "K02N"              TO  LNK-SC97-PG
+                   MOVE    SPA-GMN-IDX         TO  LNK-SC97-GMN-IDX
+                   MOVE    SPA-GMN-INPUTCD (SPA-GMN-IDX)
+                                               TO  LNK-SC97-INPUTCD
+                  CALL    "ORCSC97"           USING
+                                               SPA-AREA
+                                               ORCSC97AREA
+                                               SPA-SCR-REC
+      *
+      *            変換文字列編集
+                   PERFORM 4101121-MOJI-SET-SEC
+                   PERFORM 4101129-KAISUU-CHK-SEC
+               END-IF
            END-PERFORM
       *
       *    約束コードの画面用再編集
@@ -2529,6 +2549,7 @@
                    INITIALIZE                      WRK-MOJI-AREA
       *
                    INITIALIZE                  ORCSC97AREA
+                   MOVE    "K02N"              TO  LNK-SC97-PG
                    MOVE    SPA-GMN-IDX         TO  LNK-SC97-GMN-IDX
                    MOVE    SPA-GMN-INPUTCD (SPA-GMN-IDX)
                                                TO  LNK-SC97-INPUTCD
@@ -10402,35 +10423,35 @@
       *****************************************************************
        45101-WKSRYACT-OUT-SEC              SECTION.
       *
-      ******ADD     1                   TO  WRK-ZAINUM
-            ADD     1                   TO  WRK-RENNUM
-            MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
-            MOVE    SPA-PTID            TO  WKSRY-PTID
-            MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
-            MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
-            MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
-            MOVE    WRK-ZAINUM          TO  WKSRY-ZAINUM 
-            MOVE    WRK-RENNUM          TO  WKSRY-RENNUM 
-            MOVE    WRK-SRYSYUKBN       TO  WKSRY-SRYSYUKBN
-            MOVE    WRK-SRYKBN          TO  WKSRY-SRYKBN
-      ******MOVE    WRK-KINGAK          TO  WKSRY-JIHIMONEY
-            MOVE    WRK-KINGAK          TO  WKSRY-JIHIMONEYTOTAL
+      *****ADD     1                   TO  WRK-ZAINUM
+           ADD     1                   TO  WRK-RENNUM
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
+           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+           MOVE    WRK-ZAINUM          TO  WKSRY-ZAINUM 
+           MOVE    WRK-RENNUM          TO  WKSRY-RENNUM 
+           MOVE    WRK-SRYSYUKBN       TO  WKSRY-SRYSYUKBN
+           MOVE    WRK-SRYKBN          TO  WKSRY-SRYKBN
+      *****MOVE    WRK-KINGAK          TO  WKSRY-JIHIMONEY
+           MOVE    WRK-KINGAK          TO  WKSRY-JIHIMONEYTOTAL
       *
-            MOVE    WRK-TENSUKEI        TO  WKSRY-ZAITENKEI
-            MOVE    WRK-KAISUKEI        TO  WKSRY-ZAIKAIKEI
-      *     各計
-            MOVE    WRK-SYUTEN1         TO  WKSRY-SYUTEN1
-            MOVE    WRK-SYUTEN2         TO  WKSRY-SYUTEN2
-            MOVE    WRK-YKZTEN          TO  WKSRY-YKZTEN
-            MOVE    WRK-KIZAITEN        TO  WKSRY-KIZAITEN
+           MOVE    WRK-TENSUKEI        TO  WKSRY-ZAITENKEI
+           MOVE    WRK-KAISUKEI        TO  WKSRY-ZAIKAIKEI
+      *    各計
+           MOVE    WRK-SYUTEN1         TO  WKSRY-SYUTEN1
+           MOVE    WRK-SYUTEN2         TO  WKSRY-SYUTEN2
+           MOVE    WRK-YKZTEN          TO  WKSRY-YKZTEN
+           MOVE    WRK-KIZAITEN        TO  WKSRY-KIZAITEN
       *
-            MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
-      *     同時診療伝票番号
-            MOVE    SPA-DOUJI-DENPNUM   TO  WKSRY-DOUJI-DENPNUM
-      *     同時診療連番
-            MOVE    SPA-DOUJI-RENNUM    TO  WKSRY-DOUJI-RENNUM
-      *     継続区分
-            MOVE    SPA-CONTKBN         TO  WKSRY-CONTKBN
+           MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
+      *    同時診療伝票番号
+           MOVE    SPA-DOUJI-DENPNUM   TO  WKSRY-DOUJI-DENPNUM
+      *    同時診療連番
+           MOVE    SPA-DOUJI-RENNUM    TO  WKSRY-DOUJI-RENNUM
+      *    継続区分
+           MOVE    SPA-CONTKBN         TO  WKSRY-CONTKBN
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
