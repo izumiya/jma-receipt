@@ -32,6 +32,7 @@
       *                                     ¡Ê°å»ÕÇÛÃÖÅ¬¹ç¡Ë¤ÎÂÐ±þ
       *  01.00.03    NACL-ÌçÏÆ    04/03/17  Â¾°åÎÅµ¡´Ø¼õ¿Ç¤ÎÈ½ÄêÍÑ¥³¡¼¥É
       *                                     ¡ÊÆþ±¡´ðËÜÎÁ²Ã»»¶èÊ¬¡ËÄÉ²Ã
+      *  01.00.04    NACL-ÌçÏÆ    04/03/29  êóáì´µ¼Ô´ÉÍý²Ã»»¤ÎÂÐ±þ
       *****************************************************************
       *
       *
@@ -94,6 +95,9 @@
       *    ÃÔÊò²Ã»»
            03  CONS-CHIHOU-KSN1            PIC X(09) VALUE "190109270".
            03  CONS-CHIHOU-KSN2            PIC X(09) VALUE "190808670".
+      *    êóáì´µ¼Ô´ÉÍý²Ã»»
+           03  CONS-JYOKU-KSN1             PIC X(09) VALUE "190116990".
+           03  CONS-JYOKU-KSN2             PIC X(09) VALUE "190813390".
       *
       *    Ï«ºÒ¼£ÎÅ·×²è²Ã»»
            03  CONS-ROSAICHIRYO            PIC X(09) VALUE "101910050".
@@ -168,6 +172,10 @@
       *    ÃÔÊò²Ã»»ÂàÈò
            03  WRK-CHIHOU-KSN1             PIC 9(03) OCCURS 31.
            03  WRK-CHIHOU-KSN2             PIC 9(03) OCCURS 31.
+      *
+      *    êóáì´µ¼Ô´ÉÍý²Ã»»
+           03  WRK-JYOKU-KSN1              PIC 9(03) OCCURS 31.
+           03  WRK-JYOKU-KSN2              PIC 9(03) OCCURS 31.
       *
       *    ¿ÇÎÅ¥³¡¼¥É·×½¸·×ÍÑ
            03  WRK-SRYCD-X                 PIC X(09).
@@ -613,6 +621,8 @@
                                         OR  CONS-NICHIJOU-KSN2
                                         OR  CONS-CHIHOU-KSN1
                                         OR  CONS-CHIHOU-KSN2
+                                        OR  CONS-JYOKU-KSN1
+                                        OR  CONS-JYOKU-KSN2
       *                Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -663,6 +673,13 @@
                                 WHEN  CONS-CHIHOU-KSN2
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-CHIHOU-KSN2(IDX1)
+      *                         êóáì´µ¼Ô´ÉÍý²Ã»»
+                                WHEN  CONS-JYOKU-KSN1
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-JYOKU-KSN1(IDX1)
+                                WHEN  CONS-JYOKU-KSN2
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-JYOKU-KSN2(IDX1)
                               END-EVALUATE
       *
                               IF   FLG-RYAKU   =   ZERO
@@ -769,6 +786,17 @@
                IF         WRK-CHIHOU-KSN2(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-CHIHOU-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        êóáì´µ¼Ô´ÉÍý²Ã»»
+               IF         WRK-JYOKU-KSN1(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-JYOKU-KSN1      TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-JYOKU-KSN2(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-JYOKU-KSN2      TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
