@@ -50,6 +50,7 @@
       *                                     のある方の高齢者フラグ編集修正
       *  01.00.16    NACL-門脇    04/06/02  月途中に老保の変更があった場合
       *                                     のＫＥＹの編集の修正
+      *  01.00.17    NACL-門脇    04/11/19  病棟区分の編集方法を変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2386,16 +2387,23 @@
                IF      SYS-5001-RECEDSPKBN =  SPACE
                    CONTINUE
                ELSE
-                   PERFORM VARYING IDX3    FROM    1   BY  1
-                           UNTIL   IDX3    >       4
-                           OR      WRK-BYOTOKBN (IDX3)
-                                           =   SYS-5001-RECEDSPKBN
-                       IF      WRK-BYOTOKBN (IDX3) =   SPACE
-                           MOVE    SYS-5001-RECEDSPKBN
+                   IF    ( PTNYUINRRK-TENSTUYMD (1:6)
+                                               <   RECE62-SRYYM )
+                   OR    ( PTNYUINRRK-TENNYUYMD (1:6)
+                                               >   RECE62-SRYYM )
+                       CONTINUE
+                   ELSE 
+                       PERFORM VARYING IDX3    FROM    1   BY  1
+                               UNTIL   IDX3    >       4
+                               OR      WRK-BYOTOKBN (IDX3)
+                                               =   SYS-5001-RECEDSPKBN
+                           IF      WRK-BYOTOKBN (IDX3) =   SPACE
+                               MOVE    SYS-5001-RECEDSPKBN
                                                TO   WRK-BYOTOKBN (IDX3)
-                           MOVE    4           TO  IDX3
-                       END-IF
-                   END-PERFORM
+                               MOVE    4           TO  IDX3
+                           END-IF
+                       END-PERFORM
+                   END-IF
                END-IF                                           
       *        病棟番号・種別
                MOVE    RECE62-SRYYM        TO  WRK-SRYYYMM
