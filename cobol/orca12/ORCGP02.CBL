@@ -3371,6 +3371,9 @@
                WHEN    "0095"
                    MOVE    "老人公費の場合、全角での入力はできません。"
                                                TO  SPA-ERRMSG
+               WHEN    "0097"
+                   MOVE    "公費負担額対象が４０件を超えました。"
+                                               TO  SPA-ERRMSG
                WHEN    "0099"
                    MOVE    "日付変換エラーです。"
                                                TO  SPA-ERRMSG
