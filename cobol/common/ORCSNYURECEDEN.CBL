@@ -1388,6 +1388,7 @@
                 END-IF
            END-PERFORM
       *    レセ電サブ返却エリアへのセット（特定入院料　診療区分９２）
+           MOVE      ZERO     TO   IDX2
            PERFORM    VARYING   IDX1   FROM  1  BY  1
                       UNTIL     (IDX1   >     31)
                IF   (WRK-SO-MEISAISU(IDX1)  NOT =   ZERO)   AND
@@ -1395,27 +1396,27 @@
                     (WRK-SO-SRYKBN(IDX1)    =       "92")
                      ADD    1      TO    IDX2
                      MOVE  WRK-SO-HKNCOMBI-DAY(IDX1) TO
-                                     LNK-NYURECEDEN-HKNCOMBI(1 IDX2)
+                                     LNK-NYURECEDEN-HKNCOMBI(2 IDX2)
                      MOVE  WRK-SO-MEISAISU(IDX1)   TO
-                                     LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                                     LNK-NYURECEDEN-MEISAISU(2 IDX2)
                      PERFORM   VARYING   IDX3   FROM   1   BY  1
                                UNTIL (WRK-SO-SRYCD(IDX1 IDX3) = SPACE)
                                   OR (IDX3   >   20)
                          MOVE   "SI"   TO   
-                                    LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-RECSKB(2 IDX2 IDX3)
                          IF    IDX3   =    1
                                MOVE   WRK-SO-SRYKBN(IDX1)  TO   
-                                    LNK-NYURECEDEN-SRYSKB(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-SRYSKB(2 IDX2 IDX3)
                          END-IF
                          MOVE  WRK-SO-SRYCD(IDX1 IDX3) TO
-                                    LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-SRYCD(2 IDX2 IDX3)
                          MOVE  ZERO     TO    IDX4
                          COMPUTE   IDX4 =    IDX3   +   1
                          IF    WRK-SO-SRYCD(IDX1 IDX4)    =    SPACE
                                MOVE   WRK-SO-TEN(IDX1)   TO
-                                      LNK-NYURECEDEN-TEN(1 IDX2 IDX3)
+                                      LNK-NYURECEDEN-TEN(2 IDX2 IDX3)
                                MOVE   WRK-SO-KAISU(IDX1)   TO
-                                     LNK-NYURECEDEN-KAISU(1 IDX2 IDX3)
+                                     LNK-NYURECEDEN-KAISU(2 IDX2 IDX3)
                          END-IF
                      END-PERFORM
       *              外泊コメントセット処理
@@ -1453,28 +1454,28 @@
                        UNTIL   (IDX5  >  31)   OR
                                (WRK-GAIHAKU-DAY-ST(IDX5) =  ZERO)
                            ADD    1     TO
-                                       LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                                       LNK-NYURECEDEN-MEISAISU(2 IDX2)
                            IF   WRK-GAIHAKU-DAY-ST(IDX5) = 
                                                WRK-GAIHAKU-DAY-ED(IDX5)
                                 MOVE   "CO"   TO   
-                                    LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-RECSKB(2 IDX2 IDX3)
                                 MOVE  "840000015"  TO
-                                      LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                      LNK-NYURECEDEN-SRYCD(2 IDX2 IDX3)
                                 MOVE   WRK-GAIHAKU-DAY-ST(IDX5) TO IDX6
                                 MOVE   TBL-DAY(IDX6)  TO
-                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-COMMENT(2 IDX2 IDX3)
                            ELSE
                                 MOVE   "CO"   TO   
-                                    LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-RECSKB(2 IDX2 IDX3)
                                 MOVE  "840000016"  TO
-                                      LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                      LNK-NYURECEDEN-SRYCD(2 IDX2 IDX3)
                                 MOVE   WRK-GAIHAKU-DAY-ST(IDX5) TO IDX6
                                 MOVE   TBL-DAY(IDX6)  TO
-                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-COMMENT(2 IDX2 IDX3)
                                                           (1:4)
                                 MOVE   WRK-GAIHAKU-DAY-ED(IDX5) TO IDX6
                                 MOVE   TBL-DAY(IDX6)  TO
-                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                    LNK-NYURECEDEN-COMMENT(2 IDX2 IDX3)
                                                           (5:4)
                            END-IF
                            ADD    1     TO   IDX3
@@ -1770,27 +1771,27 @@
                 IF    WRK-SKJ-SRYCD(IDX1 1)   NOT =  SPACE
                     ADD    1     TO    IDX2
                     MOVE  WRK-SKJ-HKNCOMBI-DAY(IDX1) TO
-                                    LNK-NYURECEDEN-HKNCOMBI(2 IDX2)
+                                    LNK-NYURECEDEN-HKNCOMBI(3 IDX2)
                     MOVE   ZERO     TO    IDX4
                     PERFORM    VARYING    IDX3   FROM  1   BY  1
                                UNTIL      IDX3   >    3
                         IF   WRK-SKJ-SRYCD(IDX1 IDX3)  NOT =  SPACE
                             ADD     1     TO    IDX4
                             MOVE   "SI"   TO
-                                  LNK-NYURECEDEN-RECSKB(2 IDX2 IDX4)
+                                  LNK-NYURECEDEN-RECSKB(3 IDX2 IDX4)
                             IF     IDX4    =   1
                                 MOVE   "97"   TO
-                                  LNK-NYURECEDEN-SRYSKB(2 IDX2 IDX4)
+                                  LNK-NYURECEDEN-SRYSKB(3 IDX2 IDX4)
                             END-IF
                             MOVE   WRK-SKJ-SRYCD(IDX1 IDX3)  TO
-                                  LNK-NYURECEDEN-SRYCD(2 IDX2 IDX4)
+                                  LNK-NYURECEDEN-SRYCD(3 IDX2 IDX4)
                         END-IF
                     END-PERFORM
                     MOVE  WRK-SKJ-MONEY(IDX1)  TO
-                                LNK-NYURECEDEN-TEN(2 IDX2 IDX4)
+                                LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
                     MOVE  WRK-SKJ-KAISU(IDX1)  TO
-                                LNK-NYURECEDEN-KAISU(2 IDX2 IDX4)
-                    MOVE  IDX4  TO  LNK-NYURECEDEN-MEISAISU(2 IDX2)
+                                LNK-NYURECEDEN-KAISU(3 IDX2 IDX4)
+                    MOVE  IDX4  TO  LNK-NYURECEDEN-MEISAISU(3 IDX2)
                 END-IF
            END-PERFORM
       *    レセ電サブ返却エリアへの食事セット（特別食加算）
@@ -1799,18 +1800,18 @@
                 IF    WRK-SKJ3-TOKU-SHOKU(IDX1)   NOT =  SPACE
                     ADD    1     TO    IDX2
                     MOVE  WRK-SKJ3-HKNCOMBI-DAY(IDX1) TO
-                                    LNK-NYURECEDEN-HKNCOMBI(2 IDX2)
+                                    LNK-NYURECEDEN-HKNCOMBI(3 IDX2)
                     MOVE   "SI"   TO
-                                  LNK-NYURECEDEN-RECSKB(2 IDX2 1)
+                                  LNK-NYURECEDEN-RECSKB(3 IDX2 1)
                     MOVE   SPACE   TO
-                                  LNK-NYURECEDEN-SRYSKB(2 IDX2 1)
+                                  LNK-NYURECEDEN-SRYSKB(3 IDX2 1)
                     MOVE   WRK-SKJ3-TOKU-SHOKU(IDX1)  TO
-                                  LNK-NYURECEDEN-SRYCD(2 IDX2 1)
+                                  LNK-NYURECEDEN-SRYCD(3 IDX2 1)
                     MOVE  350  TO
-                                LNK-NYURECEDEN-TEN(2 IDX2 1)
+                                LNK-NYURECEDEN-TEN(3 IDX2 1)
                     MOVE  WRK-SKJ3-KAISU(IDX1)  TO
-                                  LNK-NYURECEDEN-KAISU(2 IDX2 1)
-                    MOVE  1   TO  LNK-NYURECEDEN-MEISAISU(2 IDX2)
+                                  LNK-NYURECEDEN-KAISU(3 IDX2 1)
+                    MOVE  1   TO  LNK-NYURECEDEN-MEISAISU(3 IDX2)
                 END-IF
            END-PERFORM
       *    レセ電サブ返却エリアへの食事セット（複数献立加算）
@@ -1819,18 +1820,18 @@
                 IF    WRK-SKJ2-FUKUSU(IDX1)   NOT =  SPACE
                     ADD    1     TO    IDX2
                     MOVE  WRK-SKJ2-HKNCOMBI-DAY(IDX1) TO
-                                    LNK-NYURECEDEN-HKNCOMBI(2 IDX2)
+                                    LNK-NYURECEDEN-HKNCOMBI(3 IDX2)
                     MOVE   "SI"   TO
-                                  LNK-NYURECEDEN-RECSKB(2 IDX2 1)
+                                  LNK-NYURECEDEN-RECSKB(3 IDX2 1)
                     MOVE   SPACE   TO
-                                  LNK-NYURECEDEN-SRYSKB(2 IDX2 1)
+                                  LNK-NYURECEDEN-SRYSKB(3 IDX2 1)
                     MOVE   WRK-SKJ2-FUKUSU(IDX1)  TO
-                                  LNK-NYURECEDEN-SRYCD(2 IDX2 1)
+                                  LNK-NYURECEDEN-SRYCD(3 IDX2 1)
                     MOVE   50  TO
-                                LNK-NYURECEDEN-TEN(2 IDX2 1)
+                                LNK-NYURECEDEN-TEN(3 IDX2 1)
                     MOVE  WRK-SKJ2-KAISU(IDX1)  TO
-                                  LNK-NYURECEDEN-KAISU(2 IDX2 1)
-                    MOVE  1   TO  LNK-NYURECEDEN-MEISAISU(2 IDX2)
+                                  LNK-NYURECEDEN-KAISU(3 IDX2 1)
+                    MOVE  1   TO  LNK-NYURECEDEN-MEISAISU(3 IDX2)
                 END-IF
            END-PERFORM
       *    レセ電サブ返却エリアへの食事セット（食事負担）
@@ -1839,30 +1840,30 @@
                 IF    WRK-SKJFTN-SRYCD(IDX1)   NOT =  SPACE
                     ADD    1     TO    IDX2
                     MOVE  WRK-SKJFTN-HKNCOMBI-DAY(IDX1) TO
-                                    LNK-NYURECEDEN-HKNCOMBI(2 IDX2)
+                                    LNK-NYURECEDEN-HKNCOMBI(3 IDX2)
                     MOVE   "SI"   TO
-                                  LNK-NYURECEDEN-RECSKB(2 IDX2 1)
+                                  LNK-NYURECEDEN-RECSKB(3 IDX2 1)
                     MOVE   "97"   TO
-                                  LNK-NYURECEDEN-SRYSKB(2 IDX2 1)
+                                  LNK-NYURECEDEN-SRYSKB(3 IDX2 1)
                     MOVE   WRK-SKJFTN-SRYCD(IDX1)  TO
-                                  LNK-NYURECEDEN-SRYCD(2 IDX2 1)
+                                  LNK-NYURECEDEN-SRYCD(3 IDX2 1)
                     EVALUATE   WRK-SKJFTN-SRYCD(IDX1)
                         WHEN   "197000810"
                             MOVE  780  TO 
-                                        LNK-NYURECEDEN-TEN(2 IDX2 1)
+                                        LNK-NYURECEDEN-TEN(3 IDX2 1)
                         WHEN   "197000910"
                             MOVE  650  TO 
-                                        LNK-NYURECEDEN-TEN(2 IDX2 1)
+                                        LNK-NYURECEDEN-TEN(3 IDX2 1)
                         WHEN   "197001010"
                             MOVE  500  TO 
-                                        LNK-NYURECEDEN-TEN(2 IDX2 1)
+                                        LNK-NYURECEDEN-TEN(3 IDX2 1)
                         WHEN   "197001110"
                             MOVE  300  TO 
-                                        LNK-NYURECEDEN-TEN(2 IDX2 1)
+                                        LNK-NYURECEDEN-TEN(3 IDX2 1)
                     END-EVALUATE
                     MOVE  WRK-SKJFTN-KAISU(IDX1)  TO
-                                  LNK-NYURECEDEN-KAISU(2 IDX2 1)
-                    MOVE  1   TO  LNK-NYURECEDEN-MEISAISU(2 IDX2)
+                                  LNK-NYURECEDEN-KAISU(3 IDX2 1)
+                    MOVE  1   TO  LNK-NYURECEDEN-MEISAISU(3 IDX2)
                 END-IF
            END-PERFORM
       *

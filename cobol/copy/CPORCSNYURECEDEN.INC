@@ -41,7 +41,7 @@
       *返却項目
            03  LNK-NYURECEDEN-HENKYAKU-AREA.
       *入院返却テーブル
-             04  LNK-NYURECEDEN-HENKYAKU-TABLE       OCCURS  2.
+             04  LNK-NYURECEDEN-HENKYAKU-TABLE       OCCURS  3.
       *入院料返却テーブル
                05  LNK-NYURECEDEN-HENKYAKU-TBL       OCCURS  31.
       *保険組合せ
