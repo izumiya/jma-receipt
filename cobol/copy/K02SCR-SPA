@@ -129,6 +129,7 @@
                        09  SPA-MAE-HKNCOMBY1       PIC X(01).
                        09  SPA-MAE-HKNCOMBIMEI     PIC X(50).
                    07  SPA-MAE-HKNKBN              PIC 9(01).
+                   07  SPA-MAE-ROUJIN              PIC 9(01).
       *            ÊÝÂ¸¿ÇÎÅ²Ê
                    07  SPA-MAE-SRYKA-G.
                        09  SPA-MAE-SRYKA       PIC X(02).

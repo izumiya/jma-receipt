@@ -4902,6 +4902,7 @@
       *
                MOVE    SPA-GMN-HKNCOMBI-G  TO  SPA-MAE-HKNCOMBI-G
                MOVE    SPA-HKNKBN          TO  SPA-MAE-HKNKBN
+               MOVE    SPA-NAI-ROUJIN      TO  SPA-MAE-ROUJIN
                MOVE    K02-HKNCOMBI        TO  SPA-GMN-HKNCOMBI-G
       *        包括まとめの変更不可
                IF      (SPA-GMN-HKNCOMBINUM     =   "9999" )  OR
@@ -4922,6 +4923,7 @@
                MOVE    SPA-GMN-HKNCOMBI-G  TO  SPA-MAE-HKNCOMBI-G
                MOVE    K02-HKNCOMBI        TO  SPA-GMN-HKNCOMBI-G
                MOVE    SPA-HKNKBN          TO  SPA-MAE-HKNKBN
+               MOVE    SPA-NAI-ROUJIN      TO  SPA-MAE-ROUJIN
                MOVE    ZERO                TO  FLG-CHK2
                PERFORM 41012-HKNCOMBI-CHANGE-SEC
            END-IF
@@ -4951,7 +4953,8 @@
            END-IF
       *    保険区分が変更された時、再編集を行う
            IF     (SPA-SYORIFLG        =   1   )  AND
-                  (SPA-HKNKBN          =   SPA-MAE-HKNKBN)
+                  (SPA-HKNKBN          =   SPA-MAE-HKNKBN)  AND
+                  (SPA-NAI-ROUJIN      =   SPA-MAE-ROUJIN)
       *            労災の時、初回算定日を再編集する
              AND  (SPA-HKNKBN          =   ZERO)
                CONTINUE
@@ -5042,7 +5045,8 @@
       *
       *    保険区分が変更された時、再編集を行う
            IF     (SPA-HKNKBN          =   SPA-MAE-HKNKBN  )  AND
-                  (SPA-HKNKBN          =   ZERO            )
+                  (SPA-HKNKBN          =   ZERO            )  AND
+                  (SPA-NAI-ROUJIN      =   SPA-MAE-ROUJIN)
              AND  (SPA-MAE-HKNCOMBINUM NOT =   "9999"  )
                CONTINUE
            ELSE
