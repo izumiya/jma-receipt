@@ -33,6 +33,7 @@
       *  01.00.03    NACL-藤原    04/02/09  患者自己負担額が公費の上限額
       *                                     に到達しない場合のレセ種別
       *  01.00.04    NACL-藤原    04/03/08  シス管による生保受給者番号の編集
+      *  01.00.05    NACL-藤原    04/04/05  病名コード９９９９９９９読み飛ばす
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -262,6 +263,12 @@
            02  WRK-TOUKEI01-OCC    OCCURS  100.
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
                                    BY         //WRK-TOUKEI01//.
+      *
+      *    ワーク患者病名
+       01  WRK-PTBYOMEI-REC.
+           COPY    "CPPTBYOMEI.INC"
+                                   REPLACING  //PTBYO//
+                                   BY         //WRK-PTBYO//.
 
       *
            COPY    "MCPAREA".
@@ -2087,6 +2094,26 @@
                    GO  TO  200221-BYOMEI-WRITE-EXT
                END-IF
            END-IF
+      *
+      *    "999999"のコードを読み飛ばす
+           INITIALIZE                  WRK-PTBYOMEI-REC
+           MOVE    ZERO                TO  IDY
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       21
+                   OR      PTBYO-BYOMEICD (IDX)    =   SPACE
+               IF      PTBYO-BYOMEICD (IDX)    =   ALL "9"
+                   CONTINUE
+               ELSE
+                   ADD     1               TO  WRK-PTBYO-BYOMEICDSU
+                                               IDY
+                   MOVE    PTBYO-BYOMEICD (IDX)
+                                           TO  WRK-PTBYO-BYOMEICD (IDY)
+               END-IF
+           END-PERFORM
+           MOVE    WRK-PTBYO-BYOMEICD-G
+                                       TO  PTBYO-BYOMEICD-G
+           MOVE    WRK-PTBYO-BYOMEICDSU
+                                       TO  PTBYO-BYOMEICDSU    
       *
       *    疑いフラグより病名を編集
            MOVE    SPACE               TO  WRK-HENFLG1
