@@ -1474,12 +1474,12 @@
       *
       *        ºßÂð¤ÇÌôºÞ¡¦´ïºà¤¬¤¢¤ë»þ¡¢
                MOVE    ZERO                TO  FLG-ZAITAKU
-               IF     (SRY-SRYKBN          =   "14" )  AND
-                      (FLG-ZAITAKU-ARI     =   1    )
+               IF     (SRY-SRYKBN          =   "14" ) 
                    IF      ORCHC19-KBN         =   "3"
       *                ±¡Æâ
                        IF     (SRY-SRYSYUKBN       =   "148"  OR
-                                                       "149" )
+                                                       "149" )  OR
+                              (FLG-ZAITAKU-ARI     =   ZERO )
                            MOVE    1               TO  FLG-TAIGAI
                        ELSE
                            MOVE    1               TO  FLG-ZAITAKU
@@ -1516,6 +1516,8 @@
       *
       *        ºßÂðÌôºÞ¤¬¤Ê¤¤¤È¤­ÂÐ¾Ý³°
                IF     (SRY-SRYKBN          =   "14" )  AND
+                      (SRY-SRYSYUKBN   NOT =   "148"  AND
+                                               "149" ) AND
                       (FLG-ZAITAKU-ARI     =   ZERO)
                    MOVE    1               TO  FLG-TAIGAI
                END-IF
