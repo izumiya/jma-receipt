@@ -4434,7 +4434,11 @@
                MOVE    PTNYUINRRK-TENNYUYMD
                                            TO  LNK-DAY6-KIJUN
                MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE    89                  TO  LNK-DAY6-ZOGEN
+               IF      PTNYUINRRK-SHOKAIKBN  = "1"
+                   MOVE    89              TO  LNK-DAY6-ZOGEN
+               ELSE
+                   COMPUTE  LNK-DAY6-ZOGEN = 89  -  STUSAN-NISSU03
+               END-IF
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
                MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
@@ -4552,7 +4556,11 @@
                MOVE   PTNYUINRRK-TENNYUYMD
                                        TO  LNK-DAY6-KIJUN
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    89              TO  LNK-DAY6-ZOGEN
+               IF      PTNYUINRRK-SHOKAIKBN  = "1"
+                   MOVE    89              TO  LNK-DAY6-ZOGEN
+               ELSE
+                   COMPUTE  LNK-DAY6-ZOGEN = 89  -  STUSAN-NISSU03
+               END-IF
                CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
                MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
