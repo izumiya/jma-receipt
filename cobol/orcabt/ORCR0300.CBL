@@ -2607,16 +2607,14 @@
                MOVE    RECE05-NAMEINF   (IDX)  TO
                                    TBL-ZAIW-NAMEINF    (2 WRK-TBLMAX7)
       *
-               IF     ( RECE041-SRYKBN    =   "70" )
-               AND    ( RECE05-DATAKBN (IDX)
-                                          =   "3"  )
+               IF       RECE05-DATAKBN (IDX)
+                                          =   "3"
                    MOVE    1                  TO
                                    TBL-ZAIW-DATSKB     (2 WRK-TBLMAX7)
                    MOVE    WRK-TBLMAX7        TO  WRK-SRYCD71-MAX 
                ELSE
-                   IF     ( RECE041-SRYKBN    =   "70" )
-                   AND    ( RECE05-SRYCD (IDX)
-                                              =   "799990070"  )
+                   IF       RECE05-SRYCD (IDX)
+                                              =   "799990070"
                        MOVE    1                  TO
                                    TBL-ZAIW-DATSKB     (2 WRK-TBLMAX7)
                        MOVE    WRK-TBLMAX7        TO  WRK-SRYCD71-MAX 
