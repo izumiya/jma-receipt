@@ -9,11 +9,13 @@ K10	{
 				row	int;
 				rowattr	int;
 				item	{
-					value1	varchar(4);
-					value2	varchar(50);
+					value0	varchar(4);
+					value1	varchar(50);
+					value2	varchar(10);
 					value3	varchar(10);
-					value4	varchar(10);
+					value4	varchar(50);
 					value5	varchar(50);
+					value6	varchar(4);
 				}	[50];
 				select	bool[50];
 			};
