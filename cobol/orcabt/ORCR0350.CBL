@@ -4852,6 +4852,8 @@
                                                    TO  KEY-N-NYUGAIKBN
                            MOVE    RECE62-PTID     TO  KEY-N-PTID
                            MOVE    RECE62-RECEKA   TO  KEY-N-RECEKA
+                           MOVE    RECE62-TEISYUTUSAKI
+                                                   TO KEY-N-TEISYUTUSAKI
       *
                            DISPLAY "RECE62  PTNUM=" RECE62-PTNUM     
                        END-IF
