@@ -518,6 +518,11 @@
                05  WRK-TANKA-Z2                PIC X(01).
                05  WRK-TANKA-Z3                PIC ZZ.
       *
+           03  WRK-SRYCDTOTAL9                 PIC 9(14).
+           03  WRK-SRYCDTOTALX   REDEFINES     WRK-SRYCDTOTAL9
+                                               PIC X(14).
+           03  WRK-ZAINUM                      PIC 9(08).
+      *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
       *
@@ -699,6 +704,11 @@
            03  CONS-SEIBUTU          PIC X(09)  VALUE  "130000110".
       *    ËãÌôÃí¼Í
            03  CONS-MAYAKU           PIC X(09)  VALUE  "130000310".
+      *
+      *    ³°Íè´ÉÍý²Ã»»
+           03  CONS-GAIKAN1          PIC X(09)  VALUE  "112011010".
+           03  CONS-GAIKAN2          PIC X(09)  VALUE  "112705110".
+           03  CONS-GAIKAN3          PIC X(09)  VALUE  "112705310".
       *
       *    »ÀÁÇ 
       *****COPY    "CMSANSOTBL.INC".
@@ -1105,6 +1115,7 @@
       *****************************************************************
        RECE04-HENSYU-SEC                SECTION.
       *
+           MOVE    88888880             TO      WRK-ZAINUM
            INITIALIZE                           SRYACCT-REC
            MOVE    RECE02-HOSPID        TO      ACCT-HOSPID
            MOVE    RECE02-NYUGAIKBN     TO      ACCT-NYUGAIKBN
@@ -1389,6 +1400,13 @@
            MOVE    ZERO                 TO      RECE04-KOHBUNRI
            MOVE    ACCT-SRYKBN          TO      RECE04-SRYKBN
            MOVE    ACCT-ZAINUM          TO      RECE04-ZAINUM
+           MOVE    ACCT-SRYCDTOTAL      TO      WRK-SRYCDTOTAL9
+           IF      WRK-SRYCDTOTALX(6:9) =       CONS-GAIKAN1   OR
+                                                CONS-GAIKAN2   OR
+                                                CONS-GAIKAN3
+               ADD     1                TO      WRK-ZAINUM
+               MOVE    WRK-ZAINUM       TO      RECE04-ZAINUM
+           END-IF
            MOVE    RECE02-PTNUM         TO      RECE04-PTNUM
       *
            MOVE    ACCT-SRYKA           TO      RECE04-SRYKA
@@ -1492,6 +1510,9 @@
            MOVE    RECE02-TEKSTYMD      TO      RECE05-TEKSTYMD
            MOVE    ZERO                 TO      RECE05-KOHBUNRI
            MOVE    SRY-ZAINUM           TO      RECE05-ZAINUM
+           IF      RECE04-ZAINUM        >       88888880
+               MOVE   RECE04-ZAINUM     TO      RECE05-ZAINUM
+           END-IF
            MOVE    SRY-RENNUM           TO      RECE05-RENNUM
            MOVE    RECE02-PTNUM         TO      RECE05-PTNUM
       *
