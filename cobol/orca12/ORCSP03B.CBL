@@ -35,6 +35,7 @@
       * 01.00.06     NACL-多々納  03/07/08  保険者異動日チェック追加
       * 01.00.07     NACL-多々納  03/08/07  公費負担者番号チェック修正
       * 01.00.08     NACL-多々納  03/09/02  公費自動切替え追加
+      * 01.00.09     NACL-多々納  03/12/16  ”５１”チェックに”７０１”追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -449,6 +450,8 @@
                                MOVE    "091"      TO  WRK-MAE-KOHNUM
                            WHEN    "602"
                                MOVE    "051"      TO  WRK-MAE-KOHNUM
+                           WHEN    "701"
+                               MOVE    "091"      TO  WRK-MAE-KOHNUM
                            WHEN    OTHER
                                MOVE    "0083"     TO  SPA-ERRCD
                                MOVE    20         TO  SPA-GMN-CUR
