@@ -128,6 +128,8 @@
            03  WRK-FIRTEN          PIC 9(08).
            03  WRK-FIRTEN-KEI      PIC 9(08).
            03  WRK-FIRTEN-ADD      PIC 9(08).
+           03  WRK-KIZKEI          PIC 9(08).
+           03  WRK-KIZKEI-ADD      PIC 9(08).
            03  WRK-TENSUKEIS       PIC 9(08)V99.
       *
            03  WRK-ERRCD           PIC X(04).
@@ -996,7 +998,6 @@
                MOVE    IDX-Z               TO  IDX-ZS
            END-IF
       *
-      *
            MOVE    LNK-ORCSC-KAISU     TO  LNK-SC90-KAISU
            MOVE    "1"                 TO  LNK-SC90-KBN
            MOVE    IDX-Z               TO  LNK-SC90-IDX
@@ -1009,16 +1010,11 @@
                PERFORM 100212-SYUGI-KEI-SEC
            END-IF
       *
-      *    »ÀÁÇ·×»»
-           IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
-               PERFORM 100211-SANSO-KEI-SEC
-           END-IF
-      *
            EVALUATE    WRK-MOJI
                WHEN    "7"
-                   IF      WRK-COM-DATAKBN (IDX-Z) =   "3"
-      *                ¥Õ¥£¥ë¥à·×»»
-                       PERFORM 100212-FIRTEN-KEI-SEC
+      *            »ÀÁÇ·×»»
+                   IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
+                      PERFORM 100211-SANSO-KEI-SEC
                    END-IF
            END-EVALUATE
       *
@@ -1064,29 +1060,6 @@
       *
            .
        100211-SANSO-KEI-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ¥Õ¥£¥ë¥à·×»»·×»»½èÍý
-      *****************************************************************
-       100212-FIRTEN-KEI-SEC             SECTION.
-      *
-      *    ¾å¸ÂÅÀ¿ôÈ½Äê
-           IF      WRK-COM-JGNTEN (IDX-Z)  =   ZERO
-               ADD     LNK-SC90-FIRTEN     TO  WRK-FIRTEN-ADD
-           ELSE
-               COMPUTE WRK-TENSUKEIS       =   LNK-SC90-FIRTEN
-                                           /   10
-                                           +   0.5
-               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-               IF      WRK-FIRTEN          >   WRK-COM-JGNTEN (IDX-Z)
-                   MOVE    WRK-COM-JGNTEN(IDX-Z)   TO  WRK-FIRTEN
-               END-IF
-               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
-           END-IF
-      *
-           .
-       100212-FIRTEN-KEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1237,7 +1210,6 @@
        1007-KASAN-SET-ALL-EXT.
            EXIT.
       *
-      *
       *****************************************************************
       *    ºàÎÁºÆ·×»»ÊÔ½¸½èÍý
       *****************************************************************
@@ -1247,16 +1219,6 @@
            IF      WRK-SANSOKIN-SUM    NOT =   ZERO
                PERFORM 10071-SANSO-KEISAN-SEC
            END-IF
-      *
-      *    ¥Õ¥£¥ë¥àÎÁ¹ç·×·×»»
-           IF      WRK-FIRTEN-ADD      >   ZERO
-               COMPUTE WRK-TENSUKEIS   =   WRK-FIRTEN-ADD
-                                           /   10
-                                           +   0.5
-               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
-           END-IF
-           ADD     WRK-FIRTEN-KEI      TO  LNK-SC90-KIZTEN
       *
            .
        1007-KIZAI-TEN-EXT.

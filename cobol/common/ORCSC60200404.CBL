@@ -178,6 +178,7 @@
       *    フィルム点数計
            03  WRK-FIRTEN-KEI      PIC 9(08).
            03  WRK-FIRTEN-ADD      PIC 9(08).
+           03  WRK-KIZKEI-ADD      PIC 9(08).
            03  WRK-TENSUKEIS       PIC 9(08)V99.
       *    年齢判定用
            03  WRK-KGNAGE          PIC 9(03).
@@ -1333,31 +1334,19 @@
       *    特定器材点数計算
            PERFORM 1005-KIZAI-TENSU-SEC
       *
-      *    フィルム料合計計算
-           IF      WRK-FIRTEN-ADD      >   ZERO
-               COMPUTE WRK-TENSUKEIS   =   WRK-FIRTEN-ADD
-                                           /   10
-                                           +   0.5
-               MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-               ADD     WRK-FIRTEN          TO  WRK-FIRTEN-KEI
-           END-IF
-      *
       *    各点数編集
            MOVE    LNK-SC90-TENSUKEI   TO  WRK-COM-SYUTEN1 (IDX-MAX)
            COMPUTE WRK-COM-YKZTEN (IDX-MAX)
                                        =   LNK-SC90-ZAITEN
                                        +   LNK-SC90-GAITEN
       *    器材点数
-           COMPUTE WRK-COM-KIZAITEN(IDX-MAX)
-                                       =   LNK-SC90-KIZTEN
-                                       +   WRK-FIRTEN-KEI
+           MOVE    LNK-SC90-KIZTEN     TO  WRK-COM-KIZAITEN (IDX-MAX)
       *
       *    点数計　計算
            COMPUTE WRK-COM-TENSU (IDX-MAX) =   LNK-SC90-TENSUKEI
                                            +   LNK-SC90-ZAITEN
                                            +   LNK-SC90-GAITEN
                                            +   LNK-SC90-KIZTEN
-                                           +   WRK-FIRTEN-KEI
       *    計
            COMPUTE WRK-COM-KEI (IDX-MAX)   =   WRK-COM-TENSU  (IDX-MAX)
                                            *   LNK-ORCSC-KAISU
@@ -1374,6 +1363,9 @@
       *****************************************************************
        10021-KEISAN-SEC                  SECTION.
       *
+      *    器材は別に集計する
+           MOVE    ZERO                TO  LNK-SC90-KIZTEN
+      *
            MOVE    LNK-ORCSC-KAISU     TO  LNK-SC90-KAISU
            MOVE    "1"                 TO  LNK-SC90-KBN
            MOVE    IDX-Z               TO  LNK-SC90-IDX
@@ -1387,24 +1379,7 @@
                    PERFORM 1003-HOUKNS-HEN-SEC
       *        器材
                WHEN    "7"
-      *            フィルムの時、点数計算
-                   IF      WRK-COM-DATAKBN (IDX-Z) =   "3"
-      *                上限点数判定
-                       IF      WRK-COM-JGNTEN (IDX-Z)  =   ZERO
-                           ADD     LNK-SC90-FIRTEN   TO  WRK-FIRTEN-ADD
-                       ELSE
-                           COMPUTE WRK-TENSUKEIS   =   LNK-SC90-FIRTEN
-                                                   /   10
-                                                   +   0.5
-                           MOVE    WRK-TENSUKEIS       TO  WRK-FIRTEN
-                           IF      WRK-FIRTEN      >   WRK-COM-JGNTEN
-                                                             (IDX-Z)
-                               MOVE    WRK-COM-JGNTEN(IDX-Z)
-                                                       TO  WRK-FIRTEN
-                           END-IF
-                           ADD     WRK-FIRTEN      TO  WRK-FIRTEN-KEI
-                       END-IF
-                   END-IF
+                   CONTINUE
            END-EVALUATE
       *
            .
@@ -1666,12 +1641,6 @@
       *    特定器材点数計算
       *****************************************************************
        1005-KIZAI-TENSU-SEC         SECTION.
-      *
-      *    金額計÷１０　四捨五入
-           COMPUTE WRK-SYOKEIS2        =   LNK-SC90-KIZKEI
-                                       /   10
-                                       +   0.5
-           MOVE    WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
       *
       *
            .
