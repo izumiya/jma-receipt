@@ -32,6 +32,10 @@
       *                                     ¿¦Ì³¾å¤Î»öÍ³¤ÎÊÔ½¸¾ò·ï¤Ë
       *                                     ¶¦ºÑÁÈ¹ç¤Î²¼Á¥£³¥ö·î¤òÄÉ²Ã
       *                                     °åÎÅÊÝ¸±°ìÉôÉéÃ´¶â³Û¤ÎÊÔ½¸ÄÉ²Ã 
+      *  01.00.02    NACL-Æ£¸¶    04/10/25  ¸øÈñÃ±ÆÈ¤Î¾ì¹ç¤ÎÉ¸½àÉéÃ´³Û¤Î
+      *                                     µ­ºÜ¤ò¤·¤Ê¤¤¤è¤¦¤Ë¤¹¤ë
+      *  01.00.03    NACL-Æ£¸¶    04/10/27  Ãí²Ã»»¤Ë¤è¤ë²Ã»»¹àÌÜ¤Îµ­ºÜ
+      *                                     ¡Ê¼ê½Ñ¡¦Ëã¿ì¡¦¸¡ºº¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -534,8 +538,86 @@
                05  TBL-COMMENT-SRYCD            PIC  X(09).
                05  TBL-COMMENT-NAME             PIC  X(200).
       *
+      *    ¿ÇÎÅ¹Ô°Ù¥Ç¡¼¥¿ÍÑ¥Æ¡¼¥Ö¥ë¡Ê¹ð¼¨Åù¼±ÊÌ¶èÊ¬¤Ë¤è¤ëµ­Ï¿½ç¡Ë
+       01  WRK-KOUI-TAIHI-AREA.
+           03  WRK-KOUI-TAIHI-TABLE             OCCURS  100.
+               05  WRK-KOUI-TAIHI-REC           PIC X(500).
+      *        ¿ÇÎÅ¥³¡¼¥É
+               05  WRK-KOUI-TAIHI-SRYCD         PIC  X(09).
+      *        ¹ð¼¨Åù¼±ÊÌ¶èÊ¬£±
+               05  WRK-KOUI-TAIHI-KOKUJISKBKBN1 PIC  9(01).
+      *        Ãí²Ã»»¥³¡¼¥É
+               05  WRK-KOUI-TAIHI-CHUKSNCD      PIC  X(04).
+      *        ÅÀ¿ô¼±ÊÌ¶èÊ¬
+               05  WRK-KOUI-TAIHI-TENSIKIBETU   PIC  9(01).
+      *
+       01  WRK-KOUI-AREA.
+           03  WRK-KOUI-TABLE                   OCCURS  4.
+               05  WRK-KOUI-TBLMAX              PIC 9(03).
+               05  WRK-KOUI-REC                     OCCURS  20.
+                   07  WRK-KOUI-SRYACTINF.
+      *            ¿ÇÎÅ¥³¡¼¥É
+                       09  WRK-KOUI-SRYCD           PIC  X(09).
+      *            ¿ÇÎÅ¼ïÊÌ¶èÊ¬
+                       09  WRK-KOUI-SRYSYUKBN       PIC  X(03).
+      *            ¿ôÎÌ
+                       09  WRK-KOUI-SRYSURYO        PIC  9(05)V9(03).
+      *            ²ó¿ô
+                       09  WRK-KOUI-SRYKAISU        PIC  9(03).
+      *            Ã±°Ì¥³¡¼¥É
+                       09  WRK-KOUI-TANICD          PIC  9(03).
+      *            Ã±°ÌÌ¾¾ÎÍ­¸ú·å¿ô
+                       09  WRK-KOUI-TANIMOJISU      PIC  9(01).
+      *            Ã±°ÌÌ¾¾Î
+                       09  WRK-KOUI-TANINAME        PIC  X(24).
+      *            ÅÀ¿ô¼±ÊÌ¶èÊ¬
+                       09  WRK-KOUI-TENSIKIBETU     PIC  9(01).
+      *            ÅÀ¿ô
+                       09  WRK-KOUI-TEN             PIC  9(09)V9(02).
+      *            ÌÀºÙÀÁµá¥Õ¥é¥°
+                       09  WRK-KOUI-MEISKYFLG       PIC  X(01).
+      *            ¼«Æ°»»Äê¶èÊ¬
+                       09  WRK-KOUI-AUTOKBN         PIC  X(01).
+      *            Ì¾¾ÎÆþÎÏÈÖ¹æ
+                       09  WRK-KOUI-INPUTNUM        PIC  9(03).
+      *            ÅÀ¿ôÍó½¸·×Àè¼±ÊÌ
+                       09  WRK-KOUI-TENTTLKBN       PIC  9(03).
+      *            ¥Ç¡¼¥¿¶èÊ¬
+                       09  WRK-KOUI-DATAKBN         PIC  9(01).
+      *            Êñ³çÂÐ¾Ý¸¡ºº
+                       09  WRK-KOUI-HOUKNSKBN       PIC  9(02).
+      *            ¸¡ººÅù¼Â»ÜÈ½ÃÇ
+                       09  WRK-KOUI-KNSJISKBN       PIC  9(01).
+      *            ³Æ¼ïÈÖ¹æÅù
+                       09  WRK-KOUI-CDKBNINF.
+                           11  WRK-KOUI-CDKBN-KBN   PIC  X(01).
+                           11  WRK-KOUI-CDKBN-SYO   PIC  9(01).
+                           11  WRK-KOUI-CDKBN-BU    PIC  9(02).
+                           11  WRK-KOUI-CDKBN-KBNNUM     PIC  9(03).
+                           11  WRK-KOUI-CDKBN-KBNNUM-EDA PIC  9(02).
+                           11  WRK-KOUI-CDKBN-KOUBAN     PIC  9(02).
+                           11  WRK-KOUI-KOUHYOJYUNNUM    PIC  9(09).
+      *            ¹ð¼¨Åù¼±ÊÌ¶èÊ¬£±
+                       09  WRK-KOUI-KOKUJISKBKBN1   PIC  9(01).
+      *            ¤­¤¶¤ßÃÍ·×»»¼±ÊÌ
+                       09  WRK-KOUI-KZMCOMPSIKIBETU PIC  9(01).
+      *            Ãí²Ã»»¥³¡¼¥É
+                       09  WRK-KOUI-CHUKSNINF.
+      *                ¥³¡¼¥É
+                           11  WRK-KOUI-CHUKSNCD    PIC  X(04).
+      *                ÄÌÈÖ
+                           11  WRK-KOUI-CHUKSNTUBAN PIC  X(01).
+      *            ÆþÎÏ¥³¥á¥ó¥È
+                       09  WRK-KOUI-INPUTCOMENT     PIC  X(80). 
+      *        Ì¾¾Î¾ðÊó
+                   07  WRK-KOUI-NAMEINF.
+      *            ´Á»úÍ­¸ú·å¿ô
+                       09  WRK-KOUI-YUKOKETA        PIC  9(02).
+      *            ´Á»úÌ¾¾Î
+                       09  WRK-KOUI-NAME            PIC  X(200).
+      *
       *    ÊÂ¤ÓÂØ¤¨ÍÑ¥ï¡¼¥¯
-       01  TBL-KOUI-SORT                        PIC X(200).
+       01  TBL-KOUI-SORT                        PIC X(500).
       *
       *    ¿ÇÎÅ¹Ô°Ù¥Ç¡¼¥¿ÍÑ¥Æ¡¼¥Ö¥ë¡ÊºÆ¿Ç »þ´Ö³°¡Ë
        01  TBL-KOUI-SRYKBN12-AREA.
@@ -704,6 +786,21 @@
            03  WRK-CONS-NYUIN-SRYCD   PIC X(09)   VALUE   "840000014".
       *    Âà±¡Ç¯·îÆü
            03  WRK-CONS-TAIIN-SRYCD   PIC X(09)   VALUE   "840000013".
+      *
+      *    É¸½àÉéÃ´³Û
+           03  WRK-CONS-HYOJYUN-FUTAN-G.
+      *        É¸½àÉéÃ´³Û¡Ê°ìÈÌ¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN1
+                                      PIC X(09)   VALUE   "197000810".
+      *        É¸½àÉéÃ´³Û¡ÊÄã½êÆÀ£±¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN2
+                                      PIC X(09)   VALUE   "197001110".
+      *        É¸½àÉéÃ´³Û¡ÊÄã½êÆÀ£²¡¦£¹£°Æü°Ê²¼¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN3
+                                      PIC X(09)   VALUE   "197000910".
+      *        É¸½àÉéÃ´³Û¡ÊÄã½êÆÀ£²¡¦£¹£°ÆüÄ¶¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN4
+                                      PIC X(09)   VALUE   "197001010".
       *
       *    ²þ¹Ô¥³¡¼¥É
        01  WRK-CONS-RETURN          PIC X(01)   VALUE   X"0A".
@@ -2087,7 +2184,7 @@
                PERFORM 20071-ZAI-TAIHI-SEC
       *       Å¦Í×¥Ç¡¼¥¿ÊÔ½¸½èÍý
                IF      FLG-END           =   ZERO
-      *****        PERFORM 20074-ZAI-KOUI-SORT-SEC
+                   PERFORM 20074-ZAI-KOUI-SORT-SEC
                    PERFORM 20072-ZAI-HENSYU-SEC
       * 
                    PERFORM 990-RECE641-NEXT-SEC
@@ -2653,7 +2750,7 @@
            EXIT.
       *
       *****************************************************************
-      *    Å¦Í×¥Ç¡¼¥¿¡Ê¿ÇÎÅ¹Ô°Ù¡¿¹ð¼¨Åù¼±ÊÌ¶èÊ¬¤Ë¤è¤ëÊÂ¤Ó¤«¤¨¡ËÂàÈò½èÍý
+      *    Å¦Í×¥Ç¡¼¥¿ÂàÈò½èÍý
       *****************************************************************
        200711-KOUI-TAIHI-SEC          SECTION.
       *
@@ -2717,21 +2814,21 @@
                        MOVE    RECE65-REC      TO WRK-700-RECE65-REC
                                                (WRK-SRYSYUKBN700-MAX) 
                    ELSE
-                       IF    ( RECE65-SRYCD (IDX)
-                                           =   WRK-CONS-KENSA-KASAN1
-                                           OR  WRK-CONS-KENSA-KASAN2 )
-                           MOVE    IDX         TO  FLG-KENSA-KASAN
-                           MOVE    RECE65-REC  TO  WRK-KASAN-RECE65-REC
-                       ELSE
-                           IF      RECE65-SRYCD (IDX)
-                                               =   WRK-CONS-KENSA-TEIGEN
-                               MOVE    IDX         TO  FLG-KENSA-TEIGEN
-                               MOVE    RECE65-REC  TO
-                                                   WRK-TEIGEN-RECE65-REC
-                           ELSE
+      *****************IF    ( RECE65-SRYCD (IDX)
+      *****************                    =   WRK-CONS-KENSA-KASAN1
+      *****************                    OR  WRK-CONS-KENSA-KASAN2 )
+      *****************    MOVE    IDX         TO  FLG-KENSA-KASAN
+      *****************    MOVE    RECE65-REC  TO  WRK-KASAN-RECE65-REC
+      *****************ELSE
+      *****************    IF      RECE65-SRYCD (IDX)
+      *****************                        =   WRK-CONS-KENSA-TEIGEN
+      *****************        MOVE    IDX         TO  FLG-KENSA-TEIGEN
+      *****************        MOVE    RECE65-REC  TO
+      *****************                            WRK-TEIGEN-RECE65-REC
+      *****************    ELSE
                                PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
-                           END-IF
-                       END-IF
+      *****************    END-IF
+      *****************END-IF
                    END-IF    
                END-IF     
            END-IF
@@ -2877,27 +2974,120 @@
       *****************************************************************
        20074-ZAI-KOUI-SORT-SEC          SECTION.
       *
+           INITIALIZE                   WRK-KOUI-AREA
+                                        WRK-KOUI-TAIHI-AREA
+      *
+           IF      RECE641-SRYKBN       =   "50"    OR  "54"    OR
+                                            "60"
+               CONTINUE
+           ELSE
+               GO  TO  20074-ZAI-KOUI-SORT-EXT
+           END-IF
+      *
            IF      WRK-TBLMAX1          =   1
                GO  TO  20074-ZAI-KOUI-SORT-EXT
            END-IF
-      *              
-      *    ¿ÇÎÅ¹Ô°Ù¥Ç¡¼¥¿¤ÎÊÔ½¸
-           COMPUTE IDY     =   WRK-TBLMAX1   -   1
+      *
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       IDY     
-               COMPUTE IDZ     =   IDX     +   1
-               PERFORM VARYING IDW FROM    IDZ   BY  1
-                       UNTIL   IDW >       WRK-TBLMAX1     
-      *************IF      TBL-KOUI-KEY (IDX)    >   TBL-KOUI-KEY (IDW)
-                       MOVE    TBL-KOUI-REC (IDX)    TO
-                                             TBL-KOUI-SORT
-                       MOVE    TBL-KOUI-REC (IDW)    TO
-                                             TBL-KOUI-REC (IDX)
-                       MOVE    TBL-KOUI-SORT         TO
-                                             TBL-KOUI-REC (IDW)
-      *************END-IF
-               END-PERFORM                              
+                   UNTIL   IDX >       WRK-TBLMAX1
+               MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDX)
+               MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDX)
+               MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDX)
+               MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDX)
+               MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
            END-PERFORM
+      *
+           INITIALIZE                      TBL-KOUI-AREA
+           MOVE    ZERO                TO  WRK-TBLMAX1
+      * 
+           MOVE    1                   TO  IDX
+           PERFORM UNTIL   IDX >=      100
+                   OR      WRK-KOUI-TAIHI-SRYCD (IDX)  =   SPACE
+               EVALUATE    WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
+                   WHEN    "0"
+                   WHEN    "8"
+                       ADD     1           TO  WRK-TBLMAX1   
+                       MOVE    WRK-KOUI-TAIHI-REC (IDX)
+                                           TO  TBL-KOUI-REC(WRK-TBLMAX1)
+                       COMPUTE IDX     =   IDX     +   1
+                   WHEN    OTHER
+                       INITIALIZE               WRK-KOUI-AREA
+      *                ´ðËÜ¹àÌÜ¡¦²Ã»»¹àÌÜ¡¦ÄÌÂ§²Ã»»¹àÌÜ¤ËÊ¬¤±¤ë
+                       PERFORM UNTIL   IDX >=      100
+                               OR      WRK-KOUI-TAIHI-SRYCD (IDX)
+                                                       =   SPACE
+                               OR      WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
+                                                   NOT =   "1"
+                           EVALUATE    WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
+                               WHEN    "1"
+                               WHEN    "3" 
+                               WHEN    "5"
+                                   MOVE    1               TO  IDZ  
+                               WHEN    "7"
+                                   IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
+                                                               (IDX)
+                                                       =   5   OR  6 )
+                                   AND   ( WRK-KOUI-TAIHI-CHUKSNCD
+                                                               (IDX)
+                                                       =   "0000"    )
+                                   AND   ( RECE641-SRYKBN
+                                                   NOT =   "54"      ) 
+                                       MOVE    3               TO  IDZ
+                                   ELSE
+                                       MOVE    2               TO  IDZ
+                                   END-IF   
+                               WHEN    "9" 
+                                   MOVE    4               TO  IDZ  
+                           END-EVALUATE
+                           ADD     1           TO  WRK-KOUI-TBLMAX (IDZ)
+                           MOVE    WRK-KOUI-TBLMAX (IDZ)
+                                               TO  IDY
+                           MOVE    WRK-KOUI-TAIHI-REC (IDX)
+                                               TO
+                                               WRK-KOUI-REC (IDZ IDY)
+                           COMPUTE IDX     =   IDX     +   1
+                       END-PERFORM
+      *
+      *                ²Ã»»¹àÌÜ¤Îµ­Ï¿½ç
+                       IF      WRK-KOUI-TBLMAX (2)         >   ZERO
+                           COMPUTE IDY     =   WRK-KOUI-TBLMAX (2) -   1
+                           PERFORM VARYING IDX1    FROM    1   BY  1
+                                   UNTIL   IDX1    >       IDY     
+                               COMPUTE IDZ     =   IDX1    +   1
+                               PERFORM VARYING IDX2    FROM   IDZ  BY  1
+                                       UNTIL   IDX2
+                                               >   WRK-KOUI-TBLMAX (2)
+                                   IF      WRK-KOUI-CHUKSNINF (2 IDX1)
+                                           > WRK-KOUI-CHUKSNINF (2 IDX2)
+                                       MOVE    WRK-KOUI-REC (2 IDX1)  TO
+                                                         TBL-KOUI-SORT
+                                       MOVE    WRK-KOUI-REC (2 IDX2)  TO
+                                                 WRK-KOUI-REC (2 IDX1)
+                                       MOVE    TBL-KOUI-SORT         TO
+                                                 WRK-KOUI-REC (2 IDX2)
+                                   END-IF
+                               END-PERFORM                              
+                           END-PERFORM
+                       END-IF    
+      *
+      *                ´ðËÜ¹àÌÜ¡¦²Ã»»¹àÌÜ¡¦ÄÌÂ§²Ã»»¹àÌÜ¤Î½ç¤ËÊÔ½¸
+                       PERFORM VARYING IDX1    FROM    1   BY  1
+                               UNTIL   IDX1    >       4
+                           MOVE    WRK-KOUI-TBLMAX (IDX1)  TO  IDY
+                           PERFORM VARYING IDX2    FROM    1   BY  1
+                                   UNTIL   IDX2    >       IDY
+                               ADD     1               TO  WRK-TBLMAX1
+                               MOVE    WRK-KOUI-REC (IDX1 IDX2)
+                                           TO  TBL-KOUI-REC(WRK-TBLMAX1)
+                           END-PERFORM
+                       END-PERFORM
+                   END-EVALUATE
+               END-PERFORM          
            .
        20074-ZAI-KOUI-SORT-EXT.
            EXIT.
@@ -3440,53 +3630,69 @@
                                MOVE    76              TO  WRK-NAGASA
                                MOVE    1               TO  WRK-END 
                                PERFORM 5004-MOJI-HENSYU-SEC  
-                           WHEN    OTHER     
-                               MOVE    "SI,"           TO  WRK-REC
-                               MOVE    3               TO
+                           WHEN    OTHER
+                               IF    ( RECE62-RECESYUBETU
+                                           =   "1211"  OR  "1221"  OR
+                                               "1231"                  )
+                               AND   (  LNK-NYURECEDEN-SRYCD
+                                                       (IDXX IDXY IDXZ)
+                                           =   WRK-CONS-HYOJYUN-FUTAN1
+                                           OR  WRK-CONS-HYOJYUN-FUTAN2
+                                           OR  WRK-CONS-HYOJYUN-FUTAN3
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                   CONTINUE
+                               ELSE     
+                                   MOVE    "SI,"           TO  WRK-REC
+                                   MOVE    3               TO
                                                        WRK-REC-LENGTH
-      *                        ¿ÇÎÅ¼±ÊÌ
-                               MOVE    LNK-NYURECEDEN-SRYSKB
+      *                            ¿ÇÎÅ¼±ÊÌ
+                                   MOVE    LNK-NYURECEDEN-SRYSKB
                                                        (IDXX IDXY IDXZ)
                                                        TO  WRK-DATA
-                               MOVE    2               TO  WRK-NAGASA
-                               PERFORM 5004-MOJI-HENSYU-SEC  
-      *                        ÉéÃ´¶èÊ¬
-                               MOVE    WRK-FTNKBN      TO  WRK-DATA
-                               MOVE    1               TO  WRK-NAGASA
-                               PERFORM 5004-MOJI-HENSYU-SEC  
-      *                        ¿ÇÎÅ¹Ô°Ù¥³¡¼¥É
-                               MOVE    LNK-NYURECEDEN-SRYCD
+                                   MOVE    2           TO  WRK-NAGASA
+                                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *                            ÉéÃ´¶èÊ¬
+                                   MOVE    WRK-FTNKBN  TO  WRK-DATA
+                                   MOVE    1           TO  WRK-NAGASA
+                                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *                            ¿ÇÎÅ¹Ô°Ù¥³¡¼¥É
+                                   MOVE    LNK-NYURECEDEN-SRYCD
                                                        (IDXX IDXY IDXZ)
                                                        TO  WRK-DATA
-                               MOVE    9               TO  WRK-NAGASA
-                               PERFORM 5004-MOJI-HENSYU-SEC  
-      *                        ¿ôÎÌ
-                               PERFORM 5005-NUM-HENSYU-SEC  
-      *                        ÅÀ¿ô
-                               IF      LNK-NYURECEDEN-TEN
+                                   MOVE    9           TO  WRK-NAGASA
+                                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *                            ¿ôÎÌ
+                                   PERFORM 5005-NUM-HENSYU-SEC  
+      *                            ÅÀ¿ô
+                                   IF      LNK-NYURECEDEN-TEN
                                                     (IDXX IDXY IDXZ)
                                                         >   ZERO
-                                   MOVE    LNK-NYURECEDEN-TEN
+                                       MOVE    LNK-NYURECEDEN-TEN
                                                        (IDXX IDXY IDXZ)
                                                        TO  WRK-TENSU
-                                   MOVE    WRK-TENSU   TO  WRK-NUM
-                                   MOVE    7           TO  WRK-NAGASA
-                               END-IF
-                               PERFORM 5005-NUM-HENSYU-SEC  
-      *                        ²ó¿ô
-                               IF      LNK-NYURECEDEN-KAISU
+                                       MOVE    WRK-TENSU
+                                                       TO  WRK-NUM
+                                       MOVE    7       TO  WRK-NAGASA
+                                   END-IF
+                                   PERFORM 5005-NUM-HENSYU-SEC  
+      *                            ²ó¿ô
+                                   IF      LNK-NYURECEDEN-KAISU
                                                    (IDXX IDXY IDXZ)
                                                        >   ZERO 
-                                   MOVE    LNK-NYURECEDEN-KAISU
+                                       MOVE    LNK-NYURECEDEN-KAISU
                                                        (IDXX IDXY IDXZ)
                                                        TO  WRK-KAISU
-                                   MOVE    WRK-KAISU   TO  WRK-NUM
-                                   MOVE    3           TO  WRK-NAGASA
-                               END-IF
-                               MOVE    1               TO  WRK-END 
-                               PERFORM 5005-NUM-HENSYU-SEC
-                       END-EVALUATE 
-                       PERFORM 5001-FILE-WRITE-SEC
+                                       MOVE    WRK-KAISU
+                                                       TO  WRK-NUM
+                                       MOVE    3       TO  WRK-NAGASA
+                                   END-IF
+                                   MOVE    1               TO  WRK-END 
+                                   PERFORM 5005-NUM-HENSYU-SEC
+                           END-IF
+                       END-EVALUATE
+                       IF      WRK-REC-LENGTH      >   ZERO 
+                           PERFORM 5001-FILE-WRITE-SEC
+                       END-IF
                    END-PERFORM
                END-PERFORM
            END-PERFORM
