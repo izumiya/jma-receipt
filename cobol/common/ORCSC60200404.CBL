@@ -2886,6 +2886,7 @@
       *
       *    £Ó£Ð£Á¤òÊÝÂ¸¤¹¤ë
            MOVE    WRK-SCR-REC         TO  HZN-SCR-REC
+           MOVE    ZERO                TO  IDXS-KENTAI
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX             >   20    )  OR
@@ -2936,7 +2937,9 @@
       *                ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»ÍÑ
                        IF      IDX                 >=  1  AND  <=  6
                            MOVE    1               TO  FLG-KENTAI
-                           MOVE    IDXS            TO  IDXS-KENTAI
+                           IF      IDXS-KENTAI     =   ZERO
+                               MOVE    IDXS            TO  IDXS-KENTAI
+                           END-IF
                        END-IF
       *                Æþ±¡²ó¿ô
                        IF      WRK-KEN-DAY (IDX)   NOT =   ZERO
