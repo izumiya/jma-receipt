@@ -3263,7 +3263,7 @@
                                                TO  P02-P024-TKOHEDYMD
                                                                   (IDY)
                    MOVE    IDY                 TO  SPA-GMN24-TGMNNUM
-                                                                  (IDY)
+                                                                  (IDX)
                    IF      IDY                 =   SPA-GMN24-FTNSELNUM
                        MOVE    "T"         TO  P02-P024-HFTNLST-SELECT
                                                                  (IDY)
@@ -3299,7 +3299,7 @@
                    MOVE    WRK-Z7              TO  P02-P024-TNYUJGNGAK
                                                                   (IDY)
                    MOVE    IDY                 TO  SPA-GMN24-TGMNNUM2
-                                                                  (IDY)
+                                                                  (IDX)
                    IF      IDY                 =   SPA-GMN24-FTNSELNUM2
                        MOVE    "T"         TO  P02-P024-HFTNLST2-SELECT
                                                                  (IDY)
