@@ -118,7 +118,7 @@
                        09  SPA-NAI-EDTAIINYMD      PIC X(08).
                        09  SPA-NAI-STAGE           PIC 9(03).
                        09  SPA-NAI-EDAGE           PIC 9(03).
-                       09  SPA-NAI-PTID            PIC 9(05).
+                       09  SPA-NAI-PTID            PIC 9(10).
                        09  SPA-NAI-SELNUM          PIC 9(03).
                        09  SPA-NAI-TOTAL           PIC 9(05).
                        09  SPA-NAI-SQL             PIC X(15000).
