@@ -105,6 +105,7 @@
       *  01.02.04    NACL-藤原    04/08/27  一部負担金・食事療養費標準負
       *                                     担額区分の編集を追加
       *  01.02.05    NACL-太田    04/12/08  点数フラグの初期化追加
+      *  01.02.09    NACL-藤原    04/12/20  職務上の事由の編集方法の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1258,8 +1259,32 @@
            PERFORM 5005-NUM-HENSYU-SEC     
       *    職務上の事由
            IF      RECE02-HKNNUM       =   "002"
-               MOVE    RECE02-HOJOKBN        TO  WRK-DATA
-               MOVE    1                     TO  WRK-NAGASA
+               EVALUATE    RECE02-HOJOKBN
+                   WHEN    "1"
+                   WHEN    "A"
+                   WHEN    "D"
+                       MOVE    "1"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+                   WHEN    "2"
+                   WHEN    "B"
+                   WHEN    "E"
+                       MOVE    "2"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+                   WHEN    "3" 
+                   WHEN    "C"
+                   WHEN    "F"
+                       MOVE    "3"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+               END-EVALUATE
+           END-IF    
+           IF      RECE02-HKNNUM (1:2) =   "03"
+               EVALUATE    RECE02-HOJOKBN
+                   WHEN    "2"
+                   WHEN    "B"
+                   WHEN    "E"
+                       MOVE    "2"                   TO  WRK-DATA
+                       MOVE    1                     TO  WRK-NAGASA
+               END-EVALUATE
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    証明書番号（国保OR退職者のみ）
