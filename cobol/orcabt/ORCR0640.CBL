@@ -105,6 +105,7 @@
       *  01.01.17    NACL-ÌçÏÆ    04/08/20  Ê¼¸Ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  01.01.18    NACL-Æ£¸¶    04/09/17  £Ï£Ã£Òµ­ºÜÂÐ±þ
       *  01.01.19    NACL-ÌçÏÆ    04/10/04  ÅÀÅ©¤Î¿ÇÎÅ¥³¡¼¥É¡ö¿ôÎÌ¤ÎÎß·×ÊÔ½¸
+      *  01.01.20    NACL-Æ£¸¶    04/10/29  ÅÀ¿ô¼±ÊÌ¶èÊ¬¤ÎÊÔ½¸¾ò·ï¤ò½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3912,8 +3913,8 @@
                   MOVE    TNS-TANINAME    TO    RECE65-TANINAME(IDX4)
                                                 WRK-TANINAME            
                END-IF                                                   
+               MOVE  TNS-TENSIKIBETU      TO   RECE65-TENSIKIBETU(IDX4)
                IF      TNS-TENSIKIBETU    =     1   OR   3   OR  8
-                   MOVE  TNS-TENSIKIBETU  TO   RECE65-TENSIKIBETU(IDX4)
                    MOVE  TNS-TEN          TO    RECE65-TEN(IDX4)
                END-IF
                MOVE    TNS-NYUTENTTLKBN   TO    RECE65-TENTTLKBN(IDX4)
@@ -4327,8 +4328,8 @@
                MOVE    TNS-TANICD          TO  RECE65-TANICD(IDX4)
                MOVE    TNS-TANIMOJISU      TO  RECE65-TANIMOJISU(IDX4)
                MOVE    TNS-TANINAME        TO  RECE65-TANINAME(IDX4)
+               MOVE  TNS-TENSIKIBETU       TO  RECE65-TENSIKIBETU(IDX4)
                IF      TNS-TENSIKIBETU    =     1   OR   3  OR  8
-                   MOVE  TNS-TENSIKIBETU   TO  RECE65-TENSIKIBETU(IDX4)
                    MOVE  TNS-TEN           TO  RECE65-TEN(IDX4)
                END-IF
                MOVE    TNS-NYUTENTTLKBN    TO  RECE65-TENTTLKBN(IDX4)
@@ -4444,8 +4445,8 @@
                MOVE    TNS-TANICD          TO  RECE65-TANICD(IDX4)
                MOVE    TNS-TANIMOJISU      TO  RECE65-TANIMOJISU(IDX4)
                MOVE    TNS-TANINAME        TO  RECE65-TANINAME(IDX4)
+               MOVE  TNS-TENSIKIBETU       TO  RECE65-TENSIKIBETU(IDX4)
                IF      TNS-TENSIKIBETU    =     1   OR   3  OR  8
-                   MOVE  TNS-TENSIKIBETU   TO  RECE65-TENSIKIBETU(IDX4)
                    MOVE  TNS-TEN           TO  RECE65-TEN(IDX4)
                END-IF
                MOVE    TNS-NYUTENTTLKBN    TO  RECE65-TENTTLKBN(IDX4)
@@ -4557,8 +4558,8 @@
            MOVE    TNS-TANICD          TO  RECE65-TANICD(1)
            MOVE    TNS-TANIMOJISU      TO  RECE65-TANIMOJISU(1)
            MOVE    TNS-TANINAME        TO  RECE65-TANINAME(1)
+           MOVE  TNS-TENSIKIBETU       TO  RECE65-TENSIKIBETU(1)
            IF      TNS-TENSIKIBETU    =     1   OR   3  OR  8
-               MOVE  TNS-TENSIKIBETU   TO  RECE65-TENSIKIBETU(1)
                MOVE  TNS-TEN           TO  RECE65-TEN(1)
            END-IF
            MOVE    TNS-NYUTENTTLKBN    TO  RECE65-TENTTLKBN(1)
@@ -4634,8 +4635,8 @@
                 MOVE    TNS-TANICD          TO  RECE65-TANICD(IDX4)
                 MOVE    TNS-TANIMOJISU      TO  RECE65-TANIMOJISU(IDX4)
                 MOVE    TNS-TANINAME        TO  RECE65-TANINAME(IDX4)
+                MOVE  TNS-TENSIKIBETU       TO  RECE65-TENSIKIBETU(IDX4)
                 IF      TNS-TENSIKIBETU    =     1   OR   3  OR  8
-                    MOVE  TNS-TENSIKIBETU   TO  RECE65-TENSIKIBETU(IDX4)
                     MOVE  TNS-TEN           TO  RECE65-TEN(IDX4)
                 END-IF
                 MOVE    TNS-NYUTENTTLKBN    TO  RECE65-TENTTLKBN(IDX4)
@@ -4738,8 +4739,8 @@
            MOVE    TNS-TANICD          TO  RECE65-TANICD(1)
            MOVE    TNS-TANIMOJISU      TO  RECE65-TANIMOJISU(1)
            MOVE    TNS-TANINAME        TO  RECE65-TANINAME(1)
+           MOVE    TNS-TENSIKIBETU     TO  RECE65-TENSIKIBETU(1)
            IF      TNS-TENSIKIBETU    =     1   OR   3  OR  8
-               MOVE  TNS-TENSIKIBETU   TO  RECE65-TENSIKIBETU(1)
                MOVE  TNS-TEN           TO  RECE65-TEN(1)
            END-IF
            MOVE    TNS-NYUTENTTLKBN    TO  RECE65-TENTTLKBN(1)
@@ -4844,8 +4845,8 @@
                       MOVE  TNS-TANINAME    TO  RECE65-TANINAME(IDX4)
                                                 WRK-TANINAME
                   END-IF
+                  MOVE  TNS-TENSIKIBETU     TO  RECE65-TENSIKIBETU(IDX4)
                   IF    TNS-TENSIKIBETU    =    1   OR   3   OR  8
-                    MOVE  TNS-TENSIKIBETU   TO  RECE65-TENSIKIBETU(IDX4)
                     MOVE  TNS-TEN           TO  RECE65-TEN(IDX4)
                   END-IF
                   MOVE  TNS-NYUTENTTLKBN    TO  RECE65-TENTTLKBN(IDX4)
