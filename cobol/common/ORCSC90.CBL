@@ -599,10 +599,11 @@
                MOVE    LNK-SC90-FIRTEN     TO  WRK-SYOKEIS3
                IF      WRK-SYOKEIS3        >   ZERO
       *        ¶â³Û·×¡à£±£°¡¡»Í¼Î¸ÞÆþ
-               COMPUTE WRK-SYOKEIS2        =  (WRK-SYOKEIS3
-                                           /   10  )
-                                           +   0.5
-               ADD     WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
+                   COMPUTE WRK-SYOKEIS2        =  (WRK-SYOKEIS3
+                                               /   10  )
+                                               +   0.5
+                   ADD     WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
+               END-IF
            END-IF
       *    ´ïºà
            MOVE    LNK-SC90-KIZKEI     TO  WRK-SYOKEIS3
