@@ -228,7 +228,7 @@ path	key6 	{
 			WHERE   HOSPID    =   :HOSPID
 			AND   NYUGAIKBN   =   :NYUGAIKBN
 			AND   PTID        =   :PTID
-                        AND   MOD_FLG     =   '1'
+                        AND   MOD_FLG     <>   '0'
 			ORDER   BY        SRYYMD,
                                           SRYKA,
                                           HKNCOMBI,
