@@ -472,7 +472,7 @@
       *    収納マスタを更新する
            PERFORM 1002-SYUNOU-OUT-SEC
            IF      SPA-ERRCD       NOT =   SPACE
-               GO  TO      100-SAKUSEI-SYORI-EXT
+               GO  TO      1001-DBKOUSIN-SYORI-EXT
            END-IF
       *
       *    剤番号テーブル
@@ -480,7 +480,7 @@
       *    受診履歴初期処理
            PERFORM 1003-JYURRK-SYORI1-SEC
            IF      SPA-ERRCD       NOT =   SPACE
-               GO  TO      100-SAKUSEI-SYORI-EXT
+               GO  TO      1001-DBKOUSIN-SYORI-EXT
            END-IF
            MOVE    SPACE               TO  WRK-SRYYMD
       *
