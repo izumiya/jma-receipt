@@ -32,6 +32,7 @@
       *                                     落ちていたのを修正
       *  01.00.03    NACL-太田    03.07.01  出力先プリンタサブ追加
       *  01.00.04    NACL-太田    03.08.26  労災自賠責編集修正
+      *  01.00.05    NACL-太田    03.10.10  食事負担編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -151,6 +152,7 @@
            03  WRK-SKYMISYUPRTKBN      PIC X(01).
            03  WRK-GAI-MISYU           PIC S9(09).
            03  WRK-NYU-MISYU           PIC S9(09).
+           03  WRK-SKYMONEY-SKJ        PIC S9(09).
       *
       *   日本語数字
        01  TBL-SUJI-AREA.
@@ -702,7 +704,10 @@
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-ZHENSYU18       TO  HCN03-JIHI(8)
       *    食事負担額
-           MOVE    SYU-SKYMONEY-SKJ    TO  WRK-Z7
+           COMPUTE WRK-SKYMONEY-SKJ
+               =   SYU-SKYMONEY-SKJ-KEI
+               +   SYU-SKYMONEY-SKJ-JIHI-KEI
+           MOVE    WRK-SKYMONEY-SKJ    TO  WRK-Z7
            MOVE    WRK-Z7              TO  WRK-ZHENSYU9
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-ZHENSYU18       TO  HCN03-SYOKUJI
