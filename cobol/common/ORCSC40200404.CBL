@@ -1615,17 +1615,11 @@
       *****************************************************************
        1007-KIZAI-TEN-SEC                SECTION.
       *
-      *TEST
-           DISPLAY "C40 LNK-SC90-KIZTEN:" LNK-SC90-KIZTEN
-      *TEST
       *    »ÀÁÇ¤ÎÅÀ¿ô¿ô·×»»
            IF      WRK-SANSOKIN-SUM    NOT =   ZERO
                PERFORM 10071-SANSO-KEISAN-SEC
            END-IF
       *
-      *TEST
-           DISPLAY "C40 SANSO LNK-SC90-KIZTEN:" LNK-SC90-KIZTEN
-      *TEST
            .
        1007-KIZAI-TEN-EXT.
            EXIT.
