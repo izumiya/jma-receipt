@@ -1324,6 +1324,7 @@
                          END-IF
                      END-PERFORM
       *              外泊コメントセット処理
+                     INITIALIZE    WRK-GAIHAKU-DAY-TABLE
                      IF   WRK-SO-GAIHAKU-TBL(IDX1)   =  ALL"0"
                          CONTINUE
                      ELSE
@@ -1420,6 +1421,7 @@
                          END-IF
                      END-PERFORM
       *              外泊コメントセット処理
+                     INITIALIZE    WRK-GAIHAKU-DAY-TABLE
                      IF   WRK-SO-GAIHAKU-TBL(IDX1)   =  ALL"0"
                          CONTINUE
                      ELSE
