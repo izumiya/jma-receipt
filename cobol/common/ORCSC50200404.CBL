@@ -477,12 +477,12 @@
            END-IF
       *
       *    加算の時、対象の手技が有ること
-           IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   1
-               IF      FLG-KIJUNN          =   ZERO
-                   MOVE    "0073"          TO  SPA-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-               END-IF
-           END-IF
+      *#     IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   1
+      *#         IF      FLG-KIJUNN          =   ZERO
+      *#             MOVE    "0073"          TO  SPA-ERRCD
+      *#             MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+      *#         END-IF
+      *#     END-IF
            .
        100111-KIJUNN-CHK-EXT.
            EXIT.
