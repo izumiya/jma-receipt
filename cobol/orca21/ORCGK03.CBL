@@ -1049,6 +1049,11 @@
            END-IF
       *    入金金額
            MOVE    SYU-NYUKIN-TOTAL    TO  SPA-GMN-NYUKIN
+           IF     (SPA-GMN-SRYKA       =   SPA-GOK-SRYKA  )  AND
+                  (SPA-GMN-HKNCOMBI    =   SPA-GOK-HKNCOMBI)
+               COMPUTE SPA-GMN-NYUKIN  =   SPA-GMN-NYUKIN
+                                       +   SPA-NYU-ZENMISYU 
+           END-IF
       *
       *    合計請求額計算処理
            PERFORM 3101-SEIKYU-KEI-SEC
@@ -2077,6 +2082,25 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+      *    初期表示の時、未収額の編集へ
+           IF     (SPA-GMN-SRYKA       =   SPA-GOK-SRYKA  )  AND
+                  (SPA-GMN-HKNCOMBI    =   SPA-GOK-HKNCOMBI)
+               MOVE    ZERO                TO  SPA-NYU-ZENMISYU
+               IF     (SPA-GMN-NYUKIN      >   SPA-GOK-NYUKIN ) AND
+                      (SPA-GMN-ZENMISYU    >   ZERO           )
+                   IF      SPA-GMN-NYUKINKBN   =   "1"
+                       CONTINUE
+                   ELSE
+                       COMPUTE SPA-NYU-ZENMISYU    =   SPA-GMN-NYUKIN
+                                                   -   SPA-GOK-NYUKIN
+                   END-IF
+               END-IF
+           END-IF
+      *
+           COMPUTE SPA-GOK-NYUKIN      =   SPA-GOK-NYUKIN
+                                       +   SPA-NYU-ZENMISYU
+      *
       *    合計請求額
            IF      SPA-OLD-SKYMONEY    NOT =   ZERO
                COMPUTE SPA-GMN-SEIGOK  =  (SPA-GOK-SKYMONEY
@@ -4196,6 +4220,10 @@
                MOVE    WRK-SEIKYU                  TO  WRK-NYUKIN
            ELSE
                MOVE    LNK-SCNYUKIN-FURIWAKEZAN    TO  WRK-NYUKIN
+           END-IF
+           IF      WRK-NYUKIN          <=  SPA-GOK-NYUKIN
+               COMPUTE SPA-NYU-ZENMISYU    =   SPA-GOK-NYUKIN
+                                           -   WRK-NYUKIN
            END-IF
       *    合計入金額に変更があった時、振り分けへ
            IF      SPA-GOK-NYUKIN      =   WRK-NYUKIN
