@@ -4439,20 +4439,22 @@
       *****************************************************************
        3001-SRYKA-HKNCOMBI-SEC             SECTION.
       *
-      *!   IF      WKSRY-SRYKA     NOT =   SPA-SRYKA
-               MOVE    SPACE           TO  WRK-INPUTCD
-               MOVE    "$"             TO  WRK-INPUTCD
-               MOVE    WKSRY-SRYKA     TO  WRK-INPUTCD(2:2)
-               MOVE    WKSRY-DRCD(2:4) TO  WRK-INPUTCD(5:4)
-               PERFORM 30011-WKSRYACT-INS-SEC
-      *!   END-IF
+           MOVE    SPACE           TO  WRK-INPUTCD
+           MOVE    "$"             TO  WRK-INPUTCD
+           MOVE    WKSRY-SRYKA     TO  WRK-INPUTCD(2:2)
+           MOVE    WKSRY-DRCD(2:4) TO  WRK-INPUTCD(5:4)
+           PERFORM 30011-WKSRYACT-INS-SEC
       *
-      *!   IF      WKSRY-HKNCOMBI  NOT =   SPA-HKNCOMBINUM
+           IF     (SPA-HKNKBN          =   1   )  OR
+                 ((SPA-NAI-ROUJIN2     =   1  )  AND
+                  (SPA-HKNCOMBINUM     =   LNK-SC95-HKNCOMBI ))
+               CONTINUE
+           ELSE
                MOVE    SPACE           TO  WRK-INPUTCD
                MOVE    "#"             TO  WRK-INPUTCD
                MOVE    WKSRY-HKNCOMBI  TO  WRK-INPUTCD(2:)
                PERFORM 30011-WKSRYACT-INS-SEC
-      *!   END-IF
+           END-IF
            .
        3001-SRYKA-HKNCOMBI-EXT.
            EXIT.
@@ -4727,7 +4729,6 @@
       *    診療会計マスター読込（主キー）
       *****************************************************************
        940-SRYACCT-READ-SEC           SECTION.
-      *
       *
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
