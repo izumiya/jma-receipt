@@ -93,6 +93,7 @@
       *  01.01.10    NACL-ÌçÏÆ    04/06/21  À¸³èÊÝ¸î¤ÎÉéÃ´¶â³Ûµ­ºÜ½¤Àµ
       *  01.01.11    NACL-ÌçÏÆ    04/07/27  ¸¶Çú¿©»öÎÅÍÜµ­ºÜ½¤Àµ
       *  01.01.12    NACL-¾®Æ¦Âô  04/12/08  ÅÀ¿ô¥Õ¥é¥°¤Î½é´ü²½ÄÉ²Ã
+      *  01.02.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -298,6 +299,7 @@
            03  WRK-FTNKEI                              PIC 9(09).
            03  WRK-FTNKEI2                             PIC 9(09).
            03  WRK-FTNKEI3                             PIC 9(09).
+           03  WRK-FTNKEI4                             PIC 9(09).
            03  WRK-KINGAKU                             PIC 9(09).
            03  WRK-KINGAKU2                            PIC 9(09).
       *
@@ -6379,12 +6381,16 @@
              OR  ((WRK-PREFNUM               =  "13"          )   AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "151" OR "451")   AND
                   (RECE62-SRYYM             >=  "200310"      ))
+             OR  ((RECE62-KOHNUM(KOHFTN-IDX) =  "052"         )   AND
+                  (RECE62-SRYYM             >=  "200504"      ))
       *
                 COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(KOHFTN-IDX + 1)
                                      + WRK-SKJ-FTN(KOHFTN-IDX + 1)
-                COMPUTE  WRK-FTNKEI2 = WRK-FTNKEI2 +  5
-                COMPUTE  WRK-FTNKEI2 = WRK-FTNKEI2 / 10
-                COMPUTE  WRK-FTNKEI2 = WRK-FTNKEI2 * 10
+      *
+                COMPUTE  WRK-FTNKEI4 = WRK-FTNKEI2 +  5
+                COMPUTE  WRK-FTNKEI4 = WRK-FTNKEI4 / 10
+                COMPUTE  WRK-FTNKEI4 = WRK-FTNKEI4 * 10
+      *
                 MOVE     RECE62-FTNMONEY(KOHFTN-IDX + 1)  
                                    TO  WRK-FTNKEI3
                 COMPUTE  WRK-FTNKEI3 = WRK-FTNKEI3 +  5
@@ -6405,8 +6411,13 @@
                                    TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
                     END-IF
                     IF  WRK-FTNKEI3  <  WRK-NYUJGNGAK
-                    AND WRK-FTNKEI2  =  WRK-NYUJGNGAK
-                      MOVE  WRK-FTNKEI2  
+                    AND WRK-FTNKEI4  =  WRK-NYUJGNGAK
+                      MOVE  WRK-FTNKEI4
+                                   TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                    END-IF
+                    IF  WRK-FTNKEI3  <  WRK-NYUJGNGAK
+                    AND WRK-FTNKEI4  <  WRK-NYUJGNGAK
+                      MOVE  WRK-FTNKEI2
                                    TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
                     END-IF
                   END-IF

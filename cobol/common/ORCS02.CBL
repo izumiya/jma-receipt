@@ -62,6 +62,7 @@
       *  01.00.23    NACL-ÌçÏÆ    04/11/24  ºë¶Ì¸©£´£±Ï·¿Í¤¬Ä¹´ü¤ÈÊ»ÍÑ¤Î
       *                                     ¾ì¹ç¡¢£±£°£°£°£°±ß¾å¸Â¤È¤¹¤ë
       *  01.00.24    NACL-ÌçÏÆ    04/11/25  ÂçºåÉÜ£´£±Ï·¿Í¾å¸Â³ÛÊÔ½¸
+      *  01.01.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2199,6 +2200,9 @@
              OR ((WK-1001-PREFNUM              =  13            )  AND
                  (COMB-KOHHKNNUM(KOH-IDX)      = "151" OR "451" )  AND
                  (LNK-SYU-SRYYMD(1:6)         >= "200310")           )
+      *
+             OR ((COMB-KOHHKNNUM(KOH-IDX)      = "052"   )  AND
+                 (LNK-SYU-SRYYMD(1:6)         >= "200504")           )
       *
       ***    OR ( COMB-KOHHKNNUM(KOH-IDX)(1:1) = "1" OR "2" OR "3" OR 
       ***                                        "4" OR "5" OR "6" OR
@@ -7367,6 +7371,29 @@
                                                 LNK-SYU-SKYMONEY-SKJ-TAX
                                                 LNK-SYU-SKYMONEY-SKJ-KEI
                 END-IF
+               END-IF
+             END-IF
+           END-IF.
+      *
+           IF    LNK-SYU-SRYYMD(1:6)   <   "200504"
+               CONTINUE
+           ELSE
+      *      ¾®»ùÆÃÄê¤¬¤¢¤ëÊý¤ÎÆÃÎã½èÍý
+             IF ((LNK-SYU-KOH1HKNNUM    =  "052") AND (FLG-HIKAKU = 1))
+             OR ((LNK-SYU-KOH2HKNNUM    =  "052") AND (FLG-HIKAKU = 2))
+             OR ((LNK-SYU-KOH3HKNNUM    =  "052") AND (FLG-HIKAKU = 3))
+             OR ((LNK-SYU-KOH4HKNNUM    =  "052") AND (FLG-HIKAKU = 4))
+               COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
+                                  +   LNK-SYU-SKYMONEY-SKJ-KEI
+               COMPUTE   WK-FTN   =   WK-FTN     +   5
+               COMPUTE   WK-FTN   =   WK-FTN     /  10
+               COMPUTE   WK-FTN   =   WK-FTN     *  10
+               IF        WK-FTN    >=  WK-NYUJGNGAK
+                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
+                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
+                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
+                                               LNK-SYU-SKYMONEY-SKJ-TAX
+                                               LNK-SYU-SKYMONEY-SKJ-KEI
                END-IF
              END-IF
            END-IF.
