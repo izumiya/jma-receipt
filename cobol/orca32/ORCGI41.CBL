@@ -6119,14 +6119,16 @@
            EVALUATE    NACCT-ZAISKBKBN
       *        最終日の食事を退避（次月会計の作成用）
                WHEN    "4"
-                   MOVE    ZERO            TO  SPA-TAIHI-SHOKUJI
-                   PERFORM VARYING IDX-HKN     FROM   1   BY  1
-                           UNTIL   IDX-HKN     >   31
-                       IF      NACCT-DAY (IDX-HKN)  NOT =   ZERO
-                           MOVE   NACCT-DAY(IDX-HKN)
+                   IF    NACCT-ZAITEN   =   ZERO
+                       MOVE    ZERO            TO  SPA-TAIHI-SHOKUJI
+                       PERFORM VARYING IDX-HKN     FROM   1   BY  1
+                               UNTIL   IDX-HKN     >   31
+                           IF      NACCT-DAY (IDX-HKN)  NOT =   ZERO
+                               MOVE   NACCT-DAY(IDX-HKN)
                                                TO  SPA-TAIHI-SHOKUJI
-                       END-IF
-                   END-PERFORM
+                           END-IF
+                       END-PERFORM
+                   END-IF
       *        最終日の保険組合せを退避（次月会計の作成用）
                WHEN    "5"
                    MOVE    ZERO            TO  SPA-TAIHI-HKN
