@@ -56,6 +56,7 @@
       *                                     È½Äê½¤Àµ¡Ê¥·¥¹¥Æ¥à´ÉÍý¤è¤ê)
       *  01.00.18    NACL-ÌçÏÆ    04/09/07  ½é¿ÇÎÁ»»Äê¥Õ¥é¥°¡ÊÃÏÊý¸øÈñÍÑ¡Ë
       *                                     ¤Î¥»¥Ã¥È
+      *  01.00.19    NACL-ÌçÏÆ    04/11/25  Ê¡Åç¸©ÆýÍÄ»ùÆÃ¼ì·×»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -101,6 +102,8 @@
               03   WRK-SKYYM               PIC X(06).
               03   WRK-HI-ST               PIC 9(02).
               03   WRK-HI-ED               PIC 9(02).
+      *       ¸©ÈÖ¹æ
+              03   WRK-PREFNUM             PIC 9(02).
       *
        01  WRK-DAY-TABLE.
            02  WRK-DAY-TBL       OCCURS    2.
@@ -171,6 +174,7 @@
            03  FLG-NYUKHN                  PIC 9(01).
            03  FLG-KAIKEI-SAKUSEI          PIC 9(01).
            03  FLG-SENTEICDCHG             PIC 9(01).
+           03  FLG-TOKUSYU                 PIC 9(01).
       *
       * ¼¼ÎÁº¹³ÛÂàÈòÍÑ¥Æ¡¼¥Ö¥ë     
        01  TABLE-RMSAGAKU.
@@ -244,6 +248,7 @@
        01  IDX-AREA.
            03  IDX                         PIC 9(02).
            03  IDY                         PIC 9(02).
+           03  IDY2                        PIC 9(02).
            03  IDZ                         PIC 9(02).
            03  IDX1                        PIC 9(02).
            03  IDX2                        PIC 9(02).
@@ -513,9 +518,87 @@
       *
            END-PERFORM.
       *
+      *    ÆÃ¼ì·×»»¡ÊºÆ·×»»¡Ë
+           IF      FLG-TOKUSYU   =   1
+                PERFORM     TOKUSYU-SANTEI-SEC
+           END-IF.
+      *
        MAIN-EXT.
            EXIT PROGRAM
            STOP RUN.
+      *
+      ******************************************************************
+      *    ÆÃ¼ì·×»»¡ÊºÆ·×»»¡Ë
+      ******************************************************************
+       TOKUSYU-SANTEI-SEC                     SECTION.
+      *
+           MOVE       ZERO      TO     IDY2
+      *
+           PERFORM    VARYING   IDX    FROM   1   BY   1
+                              UNTIL  (IDX            >    10)
+                                OR   (LNK-SYU-SRYYMD(IDX) =  SPACE)
+                                OR   (LNK-S02-RC        NOT =  ZERO )
+      *
+                MOVE     WRK-HANBETU-SENINFLG2(IDX)                     
+                                              TO  LNK-S02-SENINFLG      
+      *
+                MOVE     WRK-JIBAI-SYUTEN(IDX)
+                                              TO  LNK-S02-SYUTEN
+                MOVE     WRK-JIBAI-SINDAN(IDX)
+                                              TO  LNK-S02-SINDAN
+                MOVE     WRK-JIBAI-MEISAI(IDX)
+                                              TO  LNK-S02-MEISAI
+                MOVE     WRK-JIBAI-RYOYO(IDX) TO  LNK-S02-RYOYO
+      *
+                MOVE     WRK-SYOSIN(IDX)      TO  LNK-S02-SYOSINFLG
+      *
+                MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
+                MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
+                MOVE     LNK-SYUDAY-REC(IDX)  TO  SYUDAY-REC           
+      *
+                PERFORM    VARYING   IDY    FROM   1   BY   1
+                            UNTIL   (IDY                 >    10 )
+                              OR    (LNK-SYU-SRYYMD(IDY) =  SPACE)
+                  IF     IDY  =  IDX
+                     CONTINUE
+                  ELSE
+                     ADD    1                  TO IDY2
+                     MOVE  LNK-SYUNOU-REC(IDY) TO WRK-SYUNOU-REC(IDY2)
+                     MOVE  LNK-SYUDAY-REC(IDY) TO WRK-SYUDAY-REC(IDY2)
+                  END-IF
+                END-PERFORM
+      *
+                CALL     "ORCS02"     USING    MCPAREA
+                                               WRK-ORCS02-REC
+                                               SYUNOU-REC
+                                               WRK-SYUNOU-REC-T
+                                               SYUDAY-REC              
+                                               WRK-SYUDAY-REC-T        
+      *
+                EVALUATE    WRK-S02-SYORI-KBN
+                   WHEN    " "
+                   WHEN    "1"
+                      MOVE     "1"            TO  SYU-CREATEKBN
+                                                  SDAY-CREATEKBN
+                   WHEN    "2"
+      *               MOVE     "2"            TO  SYU-DENPJTIKBN
+                      IF       WRK-S02-TEIKI-KBN    =   "X"
+                          MOVE     "3"        TO  SYU-CREATEKBN
+                                                  SDAY-CREATEKBN
+                      ELSE
+                          MOVE     "2"        TO  SYU-CREATEKBN
+                                                  SDAY-CREATEKBN
+                      END-IF
+                END-EVALUATE
+      *
+                MOVE     SYUNOU-REC           TO  LNK-SYUNOU-REC(IDX)
+                MOVE     SYUDAY-REC           TO  LNK-SYUDAY-REC(IDX)  
+                MOVE     WRK-ORCS02-REC       TO  LNK-ORCS02-REC 
+      *
+           END-PERFORM.
+      *
+       TOKUSYU-SANTEI-EXT.
+           EXIT.
       *
       *****************************************************************
       *    Ä´ºÞÎÁ°ì³çÊÑ¹¹½èÍý
@@ -588,6 +671,35 @@
               MOVE       1                      TO  WRK-HI-ST(2)
               MOVE       LNK-S02-SKYEDYMD(7:2)  TO  WRK-HI-ED(2)
            END-IF.
+      *
+      *    ¸©ÈÖ¹æ¤Î¼èÆÀ
+           PERFORM    VARYING   IDX    FROM   1   BY   1
+                              UNTIL    (IDX            >     2)
+                                OR     (WRK-SKYYM(IDX) =  SPACE)
+      *
+              INITIALIZE                         SYS-1001-REC
+              MOVE    "1001"               TO    SYS-1001-KANRICD
+              MOVE    "*"                  TO    SYS-1001-KBNCD
+              MOVE    WRK-SKYYM(IDX)       TO    ORC-DBYMD(1:6)
+              MOVE    "01"                 TO    ORC-DBYMD(7:2)
+              MOVE    SYS-1001-REC         TO    MCPDATA-REC
+              MOVE    "DBSELECT"           TO    MCP-FUNC
+              MOVE    "SYSKANRI-KEY"       TO    ORC-DBPATH
+              CALL    "ORCMCPSUB"                USING
+                                                 MCPAREA
+                                                 ORCMCPAREA
+                                                 MCPDATA-REC
+              IF      MCP-RC               =     ZERO
+                  MOVE     "SYSKANRI-KEY"  TO    ORC-DBPATH
+                  PERFORM   SYSKANRI-READ-SEC
+                  MOVE      SYS-1001-PREFNUM
+                                           TO    WRK-PREFNUM(IDX)
+              END-IF
+      *
+              MOVE     "SYSKANRI-KEY"      TO    WK-PATH
+              PERFORM   CSR-CLOSE-SEC
+      *
+           END-PERFORM.
       *
        SKYYM-TABLE-SET-EXT.
            EXIT.
@@ -955,6 +1067,28 @@
               MOVE COMB-KOH3HKNNUM    TO WRK-HANBETU-KOH3HKNNUM(IDX)
               MOVE COMB-KOH4HKNNUM    TO WRK-HANBETU-KOH4HKNNUM(IDX)
               MOVE COMB-NYU-KFTNRATE  TO WRK-HANBETU-PTFTNRATE(IDX)
+      *
+      *       ÆÃ¼ì·×»»¥Õ¥é¥°¥»¥Ã¥È
+              IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(1)
+                IF  ( WRK-PREFNUM(1)                =    07      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200412" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =   "245"   ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =   "245"   ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =   "245"   ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =   "245"   ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
+              END-IF
+              IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(2)
+                IF  ( WRK-PREFNUM(2)                =    07      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200412" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =   "245"   ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =   "245"   ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =   "245"   ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =   "245"   ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
+              END-IF
       *
               IF   COMB-HKNNUM        =    "002"                        
                  EVALUATE   COMB-HOJOKBN                                
