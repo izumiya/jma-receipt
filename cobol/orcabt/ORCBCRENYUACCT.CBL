@@ -163,7 +163,8 @@
       **** 03  WRK-TAIHI-SRYYM-41  PIC X(06).
       *    医療機関設定の入院料加算チェック用
       *****03  WRK-NYUKHNKSN-SRYCD PIC X(09)  OCCURS 20.
-           03  WRK-NYUKHNKSN-SRYCD PIC X(09)  OCCURS 60.
+           03  WRK-NYUKHNKSN-AREA.
+               05  WRK-NYUKHNKSN-SRYCD PIC X(09)  OCCURS 60.
            03  WRK-NYUKSNKBN       PIC X(03).
            03  WRK-BTU-NYUKSNKBN   PIC X(03).
            03  WRK-KSN-NYUKSNKBN   PIC X(03).
@@ -507,14 +508,12 @@
            CALL    "ORCSDAY"            USING   STS-AREA-DAY
                                                 LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI      TO      PTNYUINRRK-NYUINYMD
-           MOVE    "99999999"           TO      PTNYUINRRK-TAIINYMD
-           MOVE    "PTNYUINRRK-KEY11"   TO      ORC-DBPATH
+           MOVE    "PTNYUINRRK-KEY27"   TO      ORC-DBPATH
            PERFORM   910-PTNYUINRRK-SELECT-SEC
            IF      FLG-PTNYUINRRK       =       ZERO
-               MOVE    "PTNYUINRRK-KEY11"    TO      ORC-DBPATH
+               MOVE    "PTNYUINRRK-KEY27"    TO      ORC-DBPATH
                PERFORM  910-PTNYUINRRK-READ-SEC
-               PERFORM  UNTIL     FLG-PTNYUINRRK   =      1
-                   IF    PTNYUINRRK-PTID   NOT =  WRK-PTID
+               PERFORM  UNTIL  FLG-PTNYUINRRK    =    1
                        MOVE    PTNYUINRRK-PTID   TO  WRK-PTID
       *                入院会計存在チェック
                        PERFORM    2001-NYUINACCT-CHK-SEC
@@ -525,13 +524,12 @@
       *                     入院会計作成処理
                             PERFORM     2001-NYUINACCT-INS-SEC
                        END-IF
-                   END-IF
-               MOVE    "PTNYUINRRK-KEY11"    TO      ORC-DBPATH
-               PERFORM  910-PTNYUINRRK-READ-SEC
+                   MOVE    "PTNYUINRRK-KEY27"    TO      ORC-DBPATH
+                   PERFORM  910-PTNYUINRRK-READ-SEC
                END-PERFORM
            END-IF
       *
-           MOVE     "PTNYUINRRK-KEY11"       TO  ORC-DBPATH
+           MOVE     "PTNYUINRRK-KEY27"       TO  ORC-DBPATH
            PERFORM   900-TBL-CLOSE-SEC
       *
            IF    ( CNT-LINE            >   ZERO )
@@ -2125,6 +2123,7 @@
       *****************************************************************
        410191-NYUKSN-GET-SEC         SECTION.
       *
+           INITIALIZE                       WRK-NYUKHNKSN-AREA
            MOVE    ZERO                TO   IDX8
       *
       *医療機関加算（減算）情報
