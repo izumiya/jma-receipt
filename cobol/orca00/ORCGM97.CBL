@@ -878,11 +878,11 @@
       *****************************************************************
        820-JOBKANRI-DEL-SEC        SECTION.
       *
-           PERFORM 820-JOBKANRI-READ1-SEC
+      *     PERFORM 820-JOBKANRI-READ1-SEC
       *
-           IF      SJOBKANRI-RETURN    =   ZERO
-               IF     (JOB-ENDTIME     NOT =   SPACE)  AND
-                      (JOB-ENDYMD      NOT =   SPACE)
+      *     IF      SJOBKANRI-RETURN    =   ZERO
+      *         IF     (JOB-ENDTIME     NOT =   SPACE)  AND
+      *                (JOB-ENDYMD      NOT =   SPACE)
       *            ジョブ管理削除
                    MOVE    "DEL"           TO  SJOBKANRI-MODE
                    INITIALIZE                  JOBKANRI-REC
@@ -891,10 +891,10 @@
                    CALL    "ORCSJOB"           USING
                                                ORCSJOBKANRIAREA
                                                JOBKANRI-REC
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-               END-IF
-           END-IF
+      *         ELSE
+      *             MOVE    "0004"          TO  SPA-ERRCD
+      *         END-IF
+      *     END-IF
            .
       *
        820-JOBKANRI-DEL-EXT.
