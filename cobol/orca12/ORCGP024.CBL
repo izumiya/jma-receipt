@@ -519,6 +519,7 @@
            MOVE    ZERO                TO  IDX
            MOVE    ZERO                TO  WRK-PARA-EDANUM
            MOVE    SPACE               TO  LNK-PTKOHFTN-AREA
+           INITIALIZE                  SPA-GMN24-KOHFTNTBL2
            PERFORM
                UNTIL   FLG-PARA            =   1
                MOVE    PARA-DATA-REC           TO  PTKOHFTN-REC
