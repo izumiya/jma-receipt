@@ -54,6 +54,8 @@
       *                                     外泊チェックの追加
       *  01.00.17    ひさなが     03/05/09  病名に対応する病名コードの
       *                                     未入力チェックの追加
+      *  01.00.18    ひさなが     03/06/03  診療行為と病名チェック
+      *                                     薬剤と病名チェックの修正
       *
       *****************************************************************
       *
@@ -297,17 +299,13 @@
                    07  W-SRYCD-81      PIC X(09).
                    07  W-SRYCD-82      PIC X(01).
            03  W-TABLE-S4.
-               05  W-SRYCD-S4-KBN      PIC X(01).
                05  W-SRYCD-S4-TABLE    OCCURS  1000.
                    07  W-SRYCD-91      PIC X(09).
-                   07  W-SRYCD-92      PIC X(01).
-                   07  W-SRYCD-93      PIC 9(01).
-                   07  W-SRYCD-94      PIC 9(01).
+                   07  W-SRYCD-92      PIC X(09).
            03  W-CHK-KUBUN.
                05  W-CHK-ST1-KBN       PIC X(01).
                05  W-CHK-ST2-KBN       PIC X(01).
                05  W-CHK-ST3-KBN       PIC X(01).
-      *修正/*開始*03.04.17*********************************************
       *    入院会計の区分作業
            03  WK-ZAISKBKBN        PIC X(01).
            03  WK-NYUGAIKBN        PIC X(01).
@@ -324,7 +322,6 @@
            03  W-NACCT-DAY-D       PIC 9(03).
            03  W-NACCT-DAY-H       PIC 9(01).
            03  W-NACCT-DAY-K-ERR   PIC 9(01).
-      *修正/*終了*03.04.17*********************************************
       *
       *    メッセージ領域
        01  T-MESSAGE-AREA.
@@ -572,7 +569,6 @@
       *    相互作用情報
        01  INTERACT-REC.
            COPY    "CPINTERACT.INC".
-      *修正/*開始*03.04.17*********************************************
       *
       *    患者入院履歴
        01  PTNYUINRRK-REC.
@@ -585,7 +581,6 @@
       *    入院行為マスタ−
        01  NYUINACT-REC.
            COPY    "CPNYUINACT.INC".
-      *修正/*終了*03.04.17*********************************************
       *
       *    連絡
            COPY    "MCPDATA.INC".
@@ -628,7 +623,6 @@
            IF  SPA-GMN-HOSPID    NOT =   SPACE
                PERFORM T-000-RECECHEK-SEC
            END-IF.
-      *修正/*開始*03.04.17*********************************************
            IF  (SPA-GMN-HOSPID    NOT =   SPACE)  AND
                (T-NYUGAIKBN-AREA      =   "1")    AND
                ((SPA-GMN-CNV (12)      =   "1")    OR
@@ -640,7 +634,6 @@
                MOVE    ALL SPACE         TO  WK-JITUDAY2
                PERFORM T-540-RECECHEK-CHK4-SEC
            END-IF.
-      *修正/*終了*03.04.17*********************************************
       *    終了処理
            PERFORM T-000-CHEKTERM-SEC.
       *
@@ -1116,14 +1109,12 @@
                MOVE    SPACE             TO  T-ERR-13
                MOVE    SPACE             TO  T-ERR-13-2
                MOVE    SPACE             TO  T-ERR-14
-      *修正/*開始*03.04.17*********************************************
                IF  (T-NYUGAIKBN-AREA       =  "1")   AND
                    (SPA-GMN-CNV (12)       =  "1")   AND
                    (PTINF-TSTPTNUMKBN  NOT =  "1")
                    PERFORM T-540-RECECHEK-CHK3-SEC
                    PERFORM T-540-RECECHEK-CHK7-SEC
                END-IF
-      *修正/*終了*03.04.17*********************************************
            END-IF.
            IF  PTINF-TSTPTNUMKBN  NOT =  "1"
                IF  (ACCT-HOSPID     NOT =   COMB-HOSPID)  OR
@@ -1151,6 +1142,7 @@
                    MOVE    SPACE             TO  T-ERR-13-3
                    PERFORM T-510-RECECHEK-SEC
                END-IF
+      *
                IF  (SPA-GMN-CNV (5)   =   "1")    AND
                    (T-ERR-05          =  SPACE)   AND
                    (T-HANNTEI6        =   "CH")   AND
@@ -1165,7 +1157,7 @@
                    WRITE   DID2-REC
                    MOVE    "*"               TO  T-ERR-05
                END-IF
-      *修正/*開始*03.04.17*********************************************
+      *
                IF  (SPA-GMN-CNV (12)    =  "1")    AND
                    (W-NACCT-DAY-K-ERR   =   ZERO)  AND
                    (T-NYUGAIKBN-AREA    =   "1")
@@ -1199,7 +1191,6 @@
                        END-IF
                    END-PERFORM
                END-IF
-      *修正/*終了*03.04.17*********************************************
            END-IF.
       *
            MOVE    ACCT-HOSPID  TO  W1-SRY-HOSPID.
@@ -1252,12 +1243,10 @@
                ELSE
                    MOVE    MCPDATA-REC            TO  HKNCOMBI-REC
                    MOVE    "*"                    TO  T-HANNTEI5
-      *修正/*開始*03.04.17*********************************************
                    IF  (SPA-GMN-CNV (14)   =  "1")    AND
                        (T-ERR-14           =  SPACE)
                        PERFORM T-200-RECECHEK-CHK2-SEC
                    END-IF
-      *修正/*終了*03.04.17*********************************************
                END-IF
            END-IF.
       *
@@ -1332,7 +1321,6 @@
       *
        T-200-RECECHEK-CHK1-EXT.
            EXIT.
-      *修正/*開始*03.04.17*********************************************
       *
       *******************
       *
@@ -1363,8 +1351,6 @@
       *
        T-200-RECECHEK-CHK2-EXT.
            EXIT.
-      *
-      *修正/*終了*03.04.17*********************************************
       *
       *****************************************************************
       *    患者保険情報テーブル 参照処理
@@ -2016,8 +2002,6 @@
        T-500-RECECHEK2-EXT.
            EXIT.
       *
-      *修正/*開始*03.04.17*********************************************
-      *
       *******************
       *
        T-500-RECECHEK3-SEC               SECTION.
@@ -2067,8 +2051,6 @@
       *
        T-500-RECECHEK3-EXT.
            EXIT.
-      *
-      *修正/*終了*03.04.17*********************************************
       *
       *****************************************************************
       *    患者病名情報テーブル 参照処理
@@ -2405,9 +2387,7 @@
                    MOVE    MCPDATA-REC          TO  SRYACT-REC
                    IF  (SPA-GMN-CNV (12)   =  "1")    AND
                        (T-ERR-12           =  SPACE)  AND
-      *修正/*開始*03.04.17*********************************************
                        (T-NYUGAIKBN-AREA   =  "2")    AND
-      *修正/*終了*03.04.17*********************************************
                        (ACCT-SRYKBN    NOT <  "10")   AND
                        (ACCT-SRYKBN    NOT >  "80")   AND
                        ((SRY-SRYKBN         =  "11")   OR
@@ -2634,11 +2614,9 @@
                    IF  T-HANNTEI6   =   SPACE
                        MOVE    ZERO                    TO  FLG-END
                    END-IF
-      *修正/*開始*03.04.17*********************************************
                    IF  SRY-SRYSYUKBN       =   W-SRYSYUKBN1
                        MOVE    "1"                     TO  WK-SRYSYUKBN
                    END-IF
-      *修正/*終了*03.04.17*********************************************
                    PERFORM T-530-RECECHEK-READ1-SEC
                END-PERFORM
            END-IF.
@@ -3052,25 +3030,21 @@
                                        ORCMCPAREA
                                        MCPDATA-REC.
       *
-           MOVE    CHK-CD (IDY2)       TO  W-SRYCD-91 (IDY5).
-           MOVE    "*"                 TO  W-SRYCD-92 (IDY5).
            IF  MCP-RC   NOT =   ZERO
-               MOVE    1                    TO  W-SRYCD-93 (IDY5)
-               MOVE   20                    TO  IDY2
+               MOVE    1                    TO  FLG-TBL
            ELSE
                PERFORM T-530-RECECHEK-READ5-SEC
                IF  MCP-RC   NOT =   ZERO
-                   MOVE    1                    TO  W-SRYCD-93 (IDY5)
-                   MOVE   20                    TO  IDY2
+                   MOVE    1                    TO  FLG-TBL
                ELSE
-                   MOVE    2                    TO  W-SRYCD-93 (IDY5)
-                   MOVE    2                    TO  W-SRYCD-94 (IDY5)
+                   MOVE    2                    TO  FLG-TBL
+                   MOVE    2                    TO  FLG-TENKIYMD-ER
+                   MOVE    20                   TO  IDY2
                    MOVE    MCPDATA-REC          TO  PTBYOMEI-REC
                    IF  (PTBYO-TENKIYMD   NOT  =   SPACE)      AND
                        (PTBYO-TENKIYMD   NOT  =   ZERO)       AND
                        (PTBYO-TENKIYMD(1:6)   <   T-SINRYOU-AREA)
-                       MOVE    1                  TO  W-SRYCD-94 (IDY5)
-                       MOVE   20                  TO  IDY2
+                       MOVE    1                  TO  FLG-TENKIYMD-ER
                    END-IF
                END-IF
            END-IF.
@@ -3146,38 +3120,25 @@
                    MOVE    MCPDATA-REC         TO  CHK-REC
                    PERFORM VARYING IDY2  FROM  1  BY 1
                            UNTIL   IDY2  >    10
-                       MOVE    SPACE             TO  W-SRYCD-S4-KBN
                        PERFORM VARYING IDY1  FROM  1  BY 1
                                UNTIL   IDY1  >  1000
                            IF  W-SRYCD-91 (IDY1)   =   SPACE
-                               MOVE    IDY1               TO  IDY5
+                               MOVE    CHK-CD (IDY2)      TO  W-SRYCD-91
+                                                                  (IDY1)
                                MOVE    2000               TO  IDY1
                                IF  (CHK-CD (IDY2)   NOT =   SPACE) AND
-                                   (CHK-CD (IDY2)   NOT =   ZERO)  AND
-                                   (W-SRYCD-S4-KBN      =   SPACE)
+                                   (CHK-CD (IDY2)   NOT =   ZERO)
                                    PERFORM T-530-RECECHEK-CHK5-SEC
-                                   MOVE    W-SRYCD-93 (IDY5)
-                                                  TO  FLG-TBL
-                                   MOVE    W-SRYCD-94 (IDY5)
-                                                  TO  FLG-TENKIYMD-ER
                                END-IF
                            ELSE
                                IF  W-SRYCD-91 (IDY1)  =  CHK-CD (IDY2)
-                                   MOVE    W-SRYCD-92 (IDY1)
-                                                  TO  W-SRYCD-S4-KBN
-                                   MOVE    W-SRYCD-93 (IDY1)
-                                                  TO  FLG-TBL
-                                   MOVE    W-SRYCD-94 (IDY1)
-                                                  TO  FLG-TENKIYMD-ER
-                                   MOVE    2000   TO  IDY1
+                                   MOVE    2000               TO  IDY1
                                END-IF
                            END-IF
                        END-PERFORM
                        IF  (CHK-CD (IDY2)       =   SPACE) OR
                            (CHK-CD (IDY2)       =   ZERO)  OR
-                           (IDY2                =   20)    OR
-                           (FLG-TBL             =   1)     OR
-                           (FLG-TENKIYMD-ER     =   1)
+                           (FLG-TBL             =   2)
                            MOVE    1                    TO  FLG-END
                        END-IF
                    END-PERFORM
@@ -3244,38 +3205,25 @@
                    MOVE    MCPDATA-REC         TO  CHK-REC
                    PERFORM VARYING IDY2  FROM  1  BY 1
                            UNTIL   IDY2  >    10
-                       MOVE    SPACE             TO  W-SRYCD-S4-KBN
                        PERFORM VARYING IDY1  FROM  1  BY 1
                                UNTIL   IDY1  >  1000
-                           IF  W-SRYCD-91 (IDY1)   =   SPACE
-                               MOVE    IDY1               TO  IDY5
+                           IF  W-SRYCD-92 (IDY1)   =   SPACE
+                               MOVE    CHK-CD (IDY2)      TO  W-SRYCD-92
+                                                                  (IDY1)
                                MOVE    2000               TO  IDY1
                                IF  (CHK-CD (IDY2)   NOT =   SPACE) AND
-                                   (CHK-CD (IDY2)   NOT =   ZERO)  AND
-                                   (W-SRYCD-S4-KBN      =   SPACE)
+                                   (CHK-CD (IDY2)   NOT =   ZERO)
                                    PERFORM T-530-RECECHEK-CHK5-SEC
-                                   MOVE    W-SRYCD-93 (IDY5)
-                                                  TO  FLG-TBL
-                                   MOVE    W-SRYCD-94 (IDY5)
-                                                  TO  FLG-TENKIYMD-ER
                                END-IF
                            ELSE
-                               IF  W-SRYCD-91 (IDY1)  =  CHK-CD (IDY2)
-                                   MOVE    W-SRYCD-92 (IDY1)
-                                                  TO  W-SRYCD-S4-KBN
-                                   MOVE    W-SRYCD-93 (IDY1)
-                                                  TO  FLG-TBL
-                                   MOVE    W-SRYCD-94 (IDY1)
-                                                  TO  FLG-TENKIYMD-ER
-                                   MOVE    2000   TO  IDY1
+                               IF  W-SRYCD-92 (IDY1)  =  CHK-CD (IDY2)
+                                   MOVE    2000               TO  IDY1
                                END-IF
                            END-IF
                        END-PERFORM
                        IF  (CHK-CD (IDY2)       =   SPACE) OR
                            (CHK-CD (IDY2)       =   ZERO)  OR
-                           (IDY2                =   20)    OR
-                           (FLG-TBL             =   1)     OR
-                           (FLG-TENKIYMD-ER     =   1)
+                           (FLG-TBL             =   2)
                            MOVE    1                    TO  FLG-END
                        END-IF
                    END-PERFORM
@@ -3488,7 +3436,6 @@
       *
        T-540-RECECHEK-COMP-EXT.
            EXIT.
-      *修正/*開始*03.04.17*********************************************
       *
       *****************************************************************
       *    患者入院履歴情報テーブル 参照処理
@@ -4113,7 +4060,6 @@
       *
        T-540-RECECHEK-READ7-EXT.
            EXIT.
-      *修正/*終了*03.04.17*********************************************
       *
       *****************************************************************
       *    エラー出力処理
