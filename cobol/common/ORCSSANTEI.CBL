@@ -178,6 +178,10 @@
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
+      *    ∑Ú ›∞ ≥∞§«£√£‘°¶£Õ£“£…§Œ∫Ó¿Æ§ §∑
+           IF      SSANTEI-HKNKBN      =   SPACE
+               MOVE    SPA-HKNKBN      TO  SSANTEI-HKNKBN
+           END-IF
       *
            EVALUATE    SSANTEI-SYORI
       *        ø∑µ¨°¢ —ππ
