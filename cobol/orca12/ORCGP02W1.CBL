@@ -4770,11 +4770,17 @@
                    END-PERFORM
                    IF      IDY             =   ZERO
                        COMPUTE IDY         =   SPA-FTN1-MAX     +  1
-                       MOVE    IDY         TO  SPA-FTN1-MAX
-                       INITIALIZE              SPA-GMN24-FTNTBLO (IDY)
+                       IF      IDY         >   40
+                           MOVE    "0097"          TO  SPA-ERRCD
+                       ELSE
+                           MOVE    IDY         TO  SPA-FTN1-MAX
+                           INITIALIZE          SPA-GMN24-FTNTBLO (IDY)
+                       END-IF
                    END-IF
       *
-                   PERFORM 45041-PTKOHFTN-TBLHEN-SEC
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 45041-PTKOHFTN-TBLHEN-SEC
+                   END-IF
                END-IF
            END-PERFORM
       *

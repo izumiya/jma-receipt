@@ -169,18 +169,22 @@
            03  WRK-SRT-RJN-IDX OCCURS 5 PIC 9(04).
            03  WRK-SRT-RJN-CNT     PIC 9(04).
            03  WRK-SRT-RJN-CNT2    PIC 9(04).
-           03  WRK-SRT-HKN-IDX OCCURS 5 PIC 9(04).
+     ***** 03  WRK-SRT-HKN-IDX OCCURS 5 PIC 9(04).
+           03  WRK-SRT-HKN-IDX OCCURS 99 PIC 9(04).
            03  WRK-SRT-HKN-CNT     PIC 9(04).
            03  WRK-SRT-HKN-CNT2    PIC 9(04).
            03  WRK-SRT-IDX         PIC 9(04).
-           03  WRK-SRT-SEH-IDX OCCURS 5 PIC 9(04).
+      *****03  WRK-SRT-SEH-IDX OCCURS 5 PIC 9(04).
+           03  WRK-SRT-SEH-IDX OCCURS 99  PIC 9(04).
            03  WRK-SRT-SEH-CNT     PIC 9(04).
            03  WRK-SRT-SEH-CNT2    PIC 9(04).
-           03  WRK-SRT-HJO-IDX OCCURS 5 PIC 9(04).
+      *****03  WRK-SRT-HJO-IDX OCCURS 5 PIC 9(04).
+           03  WRK-SRT-HJO-IDX OCCURS 99 PIC 9(04).
            03  WRK-SRT-HJO-CNT     PIC 9(04).
            03  WRK-SRT-HJO-CNT2    PIC 9(04).
            03  WRK-SRT-HJO-KOHNO   PIC X(03).
-           03  WRK-SRT-CHO-IDX OCCURS 5 PIC 9(04).
+      *****03  WRK-SRT-CHO-IDX OCCURS 5 PIC 9(04).
+           03  WRK-SRT-CHO-IDX OCCURS 99 PIC 9(04).
            03  WRK-SRT-CHO-CNT     PIC 9(04).
            03  WRK-SRT-CHO-CNT2    PIC 9(04).
       *    1:瘦副山面から戏客を浮瑚 / 2:给锐山面から戏客を浮瑚
@@ -1219,8 +1223,12 @@
                      END-PERFORM
                      ADD     1             TO  WRK-SRT-HJO-CNT
                      IF  WRK-SRT-HJO-CNT2  =   ZERO
-                         MOVE    IDZ       TO  WRK-SRT-HJO-IDX
+                         IF      WRK-SRT-HJO-CNT    >   99
+                             MOVE    "0015"         TO  SPA-ERRCD
+                         ELSE
+                             MOVE    IDZ       TO  WRK-SRT-HJO-IDX
                                                    (WRK-SRT-HJO-CNT)
+                         END-IF
                      END-IF
                    END-IF
                  END-IF
@@ -1275,8 +1283,12 @@
                    END-PERFORM
                    ADD     1               TO  WRK-SRT-SEH-CNT
                    IF  WRK-SRT-SEH-CNT2    =   ZERO
-                       MOVE    IDZ         TO  WRK-SRT-SEH-IDX
+                       IF      WRK-SRT-SEH-CNT    >   99
+                           MOVE    "0015"            TO  SPA-ERRCD
+                       ELSE
+                           MOVE    IDZ         TO  WRK-SRT-SEH-IDX
                                                    (WRK-SRT-SEH-CNT)
+                       END-IF
                    END-IF
                  END-IF
                END-IF
@@ -1330,8 +1342,12 @@
                    END-PERFORM
                    ADD     1               TO  WRK-SRT-CHO-CNT
                    IF  WRK-SRT-CHO-CNT2    =   ZERO
-                       MOVE    IDZ         TO  WRK-SRT-CHO-IDX
+                       IF      WRK-SRT-CHO-CNT    >   99
+                           MOVE    "0015"         TO  SPA-ERRCD
+                       ELSE
+                           MOVE    IDZ         TO  WRK-SRT-CHO-IDX
                                                    (WRK-SRT-CHO-CNT)
+                       END-IF
                    END-IF
                  END-IF
                END-IF
@@ -4055,8 +4071,12 @@
                    END-PERFORM
                    ADD     1             TO  WRK-SRT-HKN-CNT
                    IF  WRK-SRT-HKN-CNT2  =   ZERO
-                       MOVE    IDZ     TO  WRK-SRT-HKN-IDX
+                       IF      WRK-SRT-HKN-CNT   >   99
+                           MOVE    "0015"            TO  SPA-ERRCD
+                       ELSE
+                           MOVE    IDZ     TO  WRK-SRT-HKN-IDX
                                                    (WRK-SRT-HKN-CNT)
+                       END-IF
                    END-IF
                  END-IF
                END-IF
