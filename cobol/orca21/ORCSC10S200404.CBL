@@ -1569,8 +1569,8 @@
                IF      FLG-TOUG-SANTEI     >=  1
                    MOVE    2                   TO  SPA-NETAKIRI-ARI2
                END-IF
-               MOVE    WRK-SANTEI-YM       TO  WRK-SANTEI-NASI
            END-IF
+           MOVE    WRK-SANTEI-YM       TO  WRK-SANTEI-NASI
       *
       *    当月算定回数
            MOVE    WRK-SANTEI-CNT      TO  WRK-NETAKIRI-CNT
@@ -1619,7 +1619,6 @@
                        WHEN    "114701870"
                        WHEN    "114703970"
                        WHEN    "114703770"
-                       WHEN    "114701870"
                            MOVE     SANTEI-SRYCD   TO  WRK-24KSAN-SRYCD
                            MOVE    1               TO  FLG-SANTEI
                    END-EVALUATE
@@ -3820,6 +3819,10 @@
            END-IF
            IF      SPA-SYONIKA-ARI     =   ZERO
                MOVE    SPA-SYONIKA-ARI3    TO  SPA-SYONIKA-ARI
+           END-IF
+      *    寝たきりが削除された時、２４時間加算の自動発生をする
+           IF      SPA-NETAKIRI-ARI    =   ZERO
+               MOVE    ZERO                TO  SPA-NETAKIRI-ARI3
            END-IF
            .
        600-SANTEI-CNT-EXT.
