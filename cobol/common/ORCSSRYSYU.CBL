@@ -66,6 +66,7 @@
       *
       *    ファイル名
        01  DATA-FILE.
+           03  FILLER              PIC X(10)   VALUE   "patch-lib/".
            03  FILLER              PIC X(05)   VALUE   "data/".
            03  FILLER              PIC X(15)   VALUE   "SRYKBNNAME.TXT".
       *
@@ -133,8 +134,8 @@
                    AT  END
                        MOVE    1           TO  FLG-SRYKBN
                    NOT AT  END
-                      ADD     1           TO  IDX
-                      IF      IDX         >   100
+                       ADD     1           TO  IDX
+                       IF      IDX         >   100
                            DISPLAY "SRYSYU 100 OVER !!! TBL ERR"
                            MOVE    1           TO  FLG-SRYKBN
                        ELSE
