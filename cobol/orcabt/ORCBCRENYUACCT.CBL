@@ -513,18 +513,22 @@
            IF      FLG-PTNYUINRRK       =       ZERO
                MOVE    "PTNYUINRRK-KEY11"    TO      ORC-DBPATH
                PERFORM  910-PTNYUINRRK-READ-SEC
-               IF   FLG-PTNYUINRRK       =       ZERO
-                   MOVE    PTNYUINRRK-PTID   TO  WRK-PTID
-      *            入院会計存在チェック
-                   PERFORM    2001-NYUINACCT-CHK-SEC
-                   IF         FLG-NYUINACCTARI   =    ZERO
-      *                 前月分入院会計の存在チェック
-      *                 （併せて保険組合せと食事の情報を退避）
-                        PERFORM     2001-NYUINACCT-MAECHK-SEC
-      *                 入院会計作成処理
-                        PERFORM     2001-NYUINACCT-INS-SEC
+               PERFORM  UNTIL     FLG-PTNYUINRRK   =      1
+                   IF    PTNYUINRRK-PTID   NOT =  WRK-PTID
+                       MOVE    PTNYUINRRK-PTID   TO  WRK-PTID
+      *                入院会計存在チェック
+                       PERFORM    2001-NYUINACCT-CHK-SEC
+                       IF         FLG-NYUINACCTARI   =    ZERO
+      *                     前月分入院会計の存在チェック
+      *                     （併せて保険組合せと食事の情報を退避）
+                            PERFORM     2001-NYUINACCT-MAECHK-SEC
+      *                     入院会計作成処理
+                            PERFORM     2001-NYUINACCT-INS-SEC
+                       END-IF
                    END-IF
-               END-IF
+               MOVE    "PTNYUINRRK-KEY11"    TO      ORC-DBPATH
+               PERFORM  910-PTNYUINRRK-READ-SEC
+               END-PERFORM
            END-IF
       *
            MOVE     "PTNYUINRRK-KEY11"       TO  ORC-DBPATH
