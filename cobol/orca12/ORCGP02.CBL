@@ -1210,6 +1210,7 @@
            MOVE    ZERO                TO  SPA-P02-SYORI
            MOVE    P02-PTNUM           TO  SPA-GMN-PTNUM
            IF      SPA-GMN-PTNUM(1:1)      =   "*"
+               MOVE    ZERO                TO  SPA-GMN-PTID
       *        新規自動採番
                IF      SPA-1009-PTNUMKSIKBN    =   "1"
       *            自由構成
