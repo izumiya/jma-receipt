@@ -2887,6 +2887,12 @@
                INITIALIZE              SPA-COM-TBLREC (SPA-GMN-IDX)
                COMPUTE SPA-GMN-IDX     =   SPA-GMN-IDX
                                        -   1
+           ELSE
+               MOVE    "1"                 TO  SPA-COM-KAIFLG
+                                                      (SPA-GMN-IDX)
+      *        再編集処理
+               MOVE    SPA-GMN-IDX         TO  IDX
+               PERFORM 3101-INPUTCD-HEN-SEC
            END-IF
            MOVE    SPA-GMN-IDX         TO  IDX2
       *
