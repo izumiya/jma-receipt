@@ -6529,6 +6529,8 @@
            MOVE    SPA-OLD-HKNCOMBI    TO  LNK-ORCSC-OLD-HKNCOMBI
       *    時間外特例区分
            MOVE    SPA-JIKANTOKU       TO  LNK-ORCSC-JIKANTOKU
+      *    時間外加算特例乳幼児
+           MOVE    SPA-JIKANTOKU-NYU   TO  LNK-ORCSC-JIKANTOKU-NYU
       *
       *    電話再診の有無
            MOVE    SPA-TELSAI-ARI      TO  LNK-ORCSC-TELSAI-ARI
@@ -7626,6 +7628,8 @@
            MOVE    SPA-TOKUTEIFLG      TO  LNK-ORCSC-TOKUTEIFLG
       *    時間外特例区分
            MOVE    SPA-JIKANTOKU       TO  LNK-ORCSC-JIKANTOKU
+      *    時間外加算特例乳幼児
+           MOVE    SPA-JIKANTOKU-NYU   TO  LNK-ORCSC-JIKANTOKU-NYU
       *    診察回数
            MOVE    SPA-SINSATU-CNT     TO  LNK-ORCSC-SINSATU-CNT
       *   １５歳未満再診科算定有り
