@@ -100,6 +100,8 @@
       *    êóáì´µ¼Ô´ÉÍý²Ã»»
            03  CONS-JYOKU-KSN1             PIC X(09) VALUE "190116990".
            03  CONS-JYOKU-KSN2             PIC X(09) VALUE "190813390".
+      *    ÆÃÄê¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»
+           03  CONS-TOKUSEIYAKU-KSN        PIC X(09) VALUE "190117570".
       *    ÅÀ¿ô¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß¥ï¡¼¥¯ÍÑ
            03  TTNS-CONST-MAX              PIC 9(03) VALUE 200.
       *
@@ -196,6 +198,9 @@
       *    êóáì´µ¼Ô´ÉÍý²Ã»»
            03  WRK-JYOKU-KSN1              PIC 9(03) OCCURS 31.
            03  WRK-JYOKU-KSN2              PIC 9(03) OCCURS 31.
+      *
+      *    ÆÃÄê¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»
+           03  WRK-TOKUSEIYAKU-KSN         PIC 9(03) OCCURS 31.
       *
       *    ¿ÇÎÅ¥³¡¼¥É·×½¸·×ÍÑ
            03  WRK-SRYCD-X                 PIC X(09).
@@ -841,6 +846,7 @@
                                         OR  CONS-CHIHOU-KSN2
                                         OR  CONS-JYOKU-KSN1
                                         OR  CONS-JYOKU-KSN2
+                                        OR  CONS-TOKUSEIYAKU-KSN
       *                Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -897,6 +903,10 @@
                                 WHEN  CONS-JYOKU-KSN2
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-JYOKU-KSN2(IDX1)
+      *                         ÆÃÄê¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»
+                                WHEN  CONS-TOKUSEIYAKU-KSN
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-TOKUSEIYAKU-KSN(IDX1)
                               END-EVALUATE
       *
                            END-IF
@@ -1011,6 +1021,12 @@
                IF         WRK-JYOKU-KSN2(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-JYOKU-KSN2      TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        ÆÃÄê¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»
+               IF         WRK-TOKUSEIYAKU-KSN(IDX1) NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-TOKUSEIYAKU-KSN TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
