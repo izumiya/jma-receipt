@@ -473,10 +473,12 @@
       *
            PERFORM UNTIL ( FLG-PTNYUINRRK  NOT =   ZERO )
       *
-               IF    ( PTNYUINRRK-JTIKBN   =   "6" )
-                   PERFORM 2110-JIINRRK-NISSU-HEN-SEC
-               ELSE
-                   PERFORM 2110-NISSU-HEN-SEC
+               IF    ( PTNYUINRRK-RRKEDANUM    =   1 )
+                   IF    ( PTNYUINRRK-JTIKBN   =   "6" )
+                       PERFORM 2110-JIINRRK-NISSU-HEN-SEC
+                   ELSE
+                       PERFORM 2110-NISSU-HEN-SEC
+                   END-IF
                END-IF
       *
                MOVE    PATH-TBL-PTNYUINRRK-KEY13
