@@ -40,6 +40,7 @@
       *  01.01.01    NACL-藤原    02/10/10  サイト区分追加
       *  01.01.02    NACL-藤原    02/10/17  自費の集計方法修正
       *  02.00.01    NACL-森脇    04/01/06  マイナスを考慮
+      *  02.00.02    NACL-門脇    05/01/12  自費欄集計修正（端数処理）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -496,33 +497,6 @@
                                          +   BD002-JIHI-TAX
                                          +   BD002-RMSAGAKU
                                          + BD002-SKYMONEY-SKJ-JIHI-KEI
-      ***              IF    IDX  =  8  OR  9
-      ***                  CONTINUE
-      ***              ELSE
-      ***                IF   BD002-DISCOUNT-TEIRITU  NOT =  SPACE
-      ***                AND  BD002-DISCOUNT-RATE     NOT =  ZERO
-      ***                  CONTINUE
-      ***                ELSE
-      ***                  IF   WRK-JIHI  NOT =  ZERO
-      ***                    EVALUATE   WRK-DISCOUNT-HASU-KBN2
-      ***                      WHEN  "1"
-      ***                        COMPUTE  WRK-JIHI  = WRK-JIHI  +   5
-      ***                        COMPUTE  WRK-JIHI2 = WRK-JIHI  /  10
-      ***                        COMPUTE  WRK-JIHI  = WRK-JIHI2 *  10
-      ***                      WHEN  "2"
-      ***                        COMPUTE  WRK-JIHI2 = WRK-JIHI  /  10
-      ***                        COMPUTE  WRK-JIHI  = WRK-JIHI2 *  10
-      ***                      WHEN  "3"
-      ***                        COMPUTE  WRK-JIHI  = WRK-JIHI  +   9
-      ***                        COMPUTE  WRK-JIHI2 = WRK-JIHI  /  10
-      ***                        COMPUTE  WRK-JIHI  = WRK-JIHI2 *  10
-      ***                      WHEN  " "
-      ***                      WHEN  "4"
-      ***                        CONTINUE
-      ***                    END-EVALUATE
-      ***                  END-IF
-      ***                END-IF
-      ***              END-IF
                    END-IF
                    IF    IDX  =  8  OR  9
                        COMPUTE WRK-MONEY   =   BD002-RSIJIBAI-SKYMONEY
@@ -530,6 +504,21 @@
                    ELSE
                        COMPUTE WRK-MONEY   =   BD002-SKYMONEY
                                            -   WRK-JIHI                  
+                       IF   WRK-JIHI  NOT =  ZERO
+                         IF  ((BD002-DISCOUNT-TEIRITU  NOT =  SPACE) AND
+                              (BD002-DISCOUNT-RATE     NOT =  ZERO ))
+                         OR  ( BD002-CHOSEI            NOT =  ZERO  )
+                            CONTINUE
+                         ELSE
+                            COMPUTE WRK-MONEY  =  BD002-HKNTEKMONEY
+                                               +  BD002-RJN-FTN
+                                               +  BD002-KOH-FTN
+                                               +  BD002-YKZ-FTN
+                                               +  BD002-SKYMONEY-SKJ-KEI
+                            COMPUTE WRK-JIHI   =  BD002-SKYMONEY
+                                               -  WRK-MONEY
+                         END-IF
+                       END-IF
                    END-IF
       *              
       *----(02.00.01)--UPD-START---
