@@ -170,6 +170,7 @@
            03  WRK-JYURRK-EDANUM           PIC 9(01).
            03  WRK-JYURRK-DOUJI-RENNUM     PIC 9(01).
            03  WRK-KAIKEI-RENNUM           PIC  9(03).
+           03  WRK-MAE-RENNUM              PIC 9(01).
       *請求金額
            03  WRK-KON-SKYMONEY        PIC  9(07).
       *請求金額
@@ -1454,6 +1455,8 @@
                    UNTIL       FLG-JYURRK      =   1
       *
                MOVE    JYURRK-KEY          TO  JYURRK-UPKEY
+               MOVE    JYURRK-RENNUM       TO  WRK-MAE-RENNUM
+      *
                IF     (JYURRK-EDANUM       =   1 )  AND
                      ((JYURRK-DOUJI-RENNUM     =   ZERO )  OR
                       (JYURRK-DOUJI-RENNUM NOT =
@@ -1466,6 +1469,10 @@
                IF     (WRK-KAIKEI-RENNUM   =   JYURRK-KAIKEI-RENNUM) AND
                       (WRK-DEL-RENNUM      =   JYURRK-EDANUM  )
                    ADD     1               TO  JYURRK-KAIKEI-RENNUM
+               END-IF
+      *        会計照会の更新
+               IF      WRK-MAE-RENNUM  NOT =   JYURRK-RENNUM
+                   PERFORM 45001112-TEISEI-ACCT-SEC
                END-IF
       *
                MOVE    SMCNDATE-YMD        TO  JYURRK-UPYMD
@@ -1497,6 +1504,94 @@
       *
            .
        4500111-TEISEI-JYURRK-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療会計マスタの診療回数クリア処理
+      *****************************************************************
+       45001112-TEISEI-ACCT-SEC          SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX         >   15  )  OR
+                              (JYURRK-ZAINUM (IDX) =   ZERO )
+      *
+               INITIALIZE                      SRYACCT-REC
+               MOVE    JYURRK-HOSPID       TO  ACCT-HOSPID
+               MOVE    JYURRK-NYUGAIKBN    TO  ACCT-NYUGAIKBN
+               MOVE    JYURRK-PTID         TO  ACCT-PTID
+               MOVE    JYURRK-SRYKA        TO  ACCT-SRYKA
+               MOVE    JYURRK-SRYYMD(1:6)  TO  ACCT-SRYYM
+               MOVE    JYURRK-ZAINUM (IDX) TO  ACCT-ZAINUM
+      *
+               MOVE    SRYACCT-REC         TO  MCPDATA-REC
+               MOVE    "DBSELECT"          TO  MCP-FUNC
+               MOVE    "SRYACCT-KEY5"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "SRYACCT-KEY5"      TO  ORC-DBPATH
+                   PERFORM 930-SRYACCT-NEXT-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-SRYACCT
+               END-IF
+               PERFORM
+                   UNTIL   (FLG-SRYACCT        =   1    ) OR
+                           (FLG-OK             =   1    )
+      *
+                   MOVE    JYURRK-SRYYMD(7:2)      TO  IDX-2
+                   EVALUATE    JYURRK-RENNUM
+                       WHEN    1
+                           MOVE    2               TO  IDX-1
+                       WHEN    2
+                           MOVE    3               TO  IDX-1
+                       WHEN    OTHER
+                           MOVE    4               TO  IDX-1
+                   END-EVALUATE
+                   EVALUATE    WRK-MAE-RENNUM
+                       WHEN    1
+                           MOVE    2               TO  IDX-3
+                       WHEN    2
+                           MOVE    3               TO  IDX-3
+                       WHEN    OTHER
+                           MOVE    4               TO  IDX-3
+                   END-EVALUATE
+      *
+      *            剤回数　変更
+                   ADD     ACCT-DAY (IDX-3 IDX-2)
+                                               TO  ACCT-DAY
+                                                       (IDX-1 IDX-2)
+                   MOVE    ZERO                TO  ACCT-DAY
+                                                       (IDX-3 IDX-2)
+      *
+                   MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+      *
+                   MOVE    SRYACCT-REC         TO  MCPDATA-REC
+                   MOVE    "DBUPDATE"          TO  MCP-FUNC
+                   MOVE    "SRYACCT-KEY"       TO  ORC-DBPATH
+                   CALL    "ORCMCPSUB"          USING
+                                                MCPAREA
+                                                ORCMCPAREA
+                                                MCPDATA-REC
+                   IF      MCP-RC          NOT =   ZERO
+                        DISPLAY "K03 SRYACCT UPD ERR:" MCP-RC
+                        MOVE    "0005"              TO  SPA-ERRCD
+                   END-IF
+      *
+                   MOVE    "SRYACCT-KEY5"      TO  ORC-DBPATH
+                   PERFORM 930-SRYACCT-NEXT-SEC
+               END-PERFORM
+               MOVE    "DBCLOSE"           TO  MCP-FUNC
+               MOVE    "SRYACCT-KEY5"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"          USING
+                                            MCPAREA
+                                            ORCMCPAREA
+                                            MCPDATA-REC
+           END-PERFORM
+      *
+           .
+       45001112-TEISEI-ACCT-EXT.
            EXIT.
       *****************************************************************
       *    診療会計マスタの診療回数クリア処理
