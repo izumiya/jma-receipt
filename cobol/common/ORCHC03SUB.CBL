@@ -625,6 +625,8 @@
            ADD     WRK-SYU-KOH-FTN          TO  SYU-KOH-FTN
            ADD     WRK-SYU-KOH-FTN-ENTANI   TO  SYU-KOH-FTN-ENTANI
            ADD     WRK-SYU-YKZ-FTN          TO  SYU-YKZ-FTN
+      * ›∏±≈¨Õ—≥∞∂‚≥€°›æ√»Ò¿«° ∫∆∑«°À
+           ADD     WRK-SYU-TGMONEY-TAX-SAI  TO  SYU-TGMONEY-TAX-SAI
       *ƒ¥¿∞∂‚
            ADD     WRK-SYU-CHOSEI           TO  SYU-CHOSEI
       *¿¡µ·∂‚≥€°›æ√»Ò¿«° ∫∆∑«°À
