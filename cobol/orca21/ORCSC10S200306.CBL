@@ -249,6 +249,8 @@
       *
       *    £²£´»þ´ÖÏ¢ÂÓ²Ã»»
            03  WRK-24KSAN-SRYCD        PIC X(09).
+      *    ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
+           03  WRK-SYONIKA-KBN        PIC X(01).
       *
       *    ¿Ç»¡ÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-SINSATU-AREA.
@@ -3823,8 +3825,8 @@
       *            ÆÃÄê¤Î¿ÇÎÅ¹Ô°Ù¤Ç¤¢¤ë¤³¤È
                    PERFORM 50192-SYONIKASRYCD-CHK-SEC
                    IF     (FLG-SYONIKA-CHK         =   ZERO)  OR
-      *                   ³«Êü·¿ÉÂ±¡¶¦Æ±»ØÆ³ÎÁ¡Ê£±¡Ë
-                          (SPA-COM-INPUTCD (IDX)   =   "180010510")
+      *                   ³«Êü·¿ÉÂ±¡¶¦Æ±»ØÆ³ÎÁ¡¢ÃÏ°èÏ¢ÂÓ²Ã»»
+                          (WRK-SYONIKA-KBN         =   "9" )
                        CONTINUE
                    ELSE
                        MOVE    "0045"          TO  SPA-ERRCD
@@ -3871,9 +3873,12 @@
            SEARCH  TBL-SYONIKA-OCC     VARYING   TBL-SYO
                AT   END
                     MOVE    ZERO           TO  FLG-SYONIKA-CHK
+                    MOVE   SPACE           TO  WRK-SYONIKA-KBN
                 WHEN   SPA-COM-INPUTCD (IDX)
                                            =   TBL-SYONIKA-SRYCD
                                                       (TBL-SYO)
+                    MOVE    TBL-SYONIKA-KBN (TBL-SYO)
+                                           TO  WRK-SYONIKA-KBN
                     MOVE    1              TO  FLG-SYONIKA-CHK
            END-SEARCH
            .
