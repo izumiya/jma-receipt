@@ -1790,9 +1790,11 @@
                            (SPA-NAI-RRK-HKNKBN (IDX)
                                                =   ZERO ))
                        ADD     1               TO  IDX-SRY
-                       MOVE    SPA-NAI-RRK-SRYKA(IDX)
+                       IF      IDX-SRY         <=  10
+                           MOVE    SPA-NAI-RRK-SRYKA(IDX)
                                                TO  WRK-TAKA-SRYKA
                                                               (IDX-SRY)
+                       END-IF
                    END-IF
                END-IF
       *        保険組合せ編集
@@ -1917,9 +1919,11 @@
                                               TO  LNK-SC95-DOUJI-RENNUM
       *
                    ADD     1                  TO  IDX-JYU
-                   MOVE    SPA-NAI-RRK-HKNCOMBI(IDX)
+                   IF      IDX-JYU            <=  3
+                       MOVE    SPA-NAI-RRK-HKNCOMBI(IDX)
                                               TO  LNK-SC95-DOUJI-HKNNUM
                                                              (IDX-JYU)
+                   END-IF
                END-IF
            END-IF
       *
@@ -4052,18 +4056,26 @@
       *
       *        訂正の時、診療コードと回数をセット
                IF     (LNK-SC95-KBN        =   "4" )  AND
-                     ((SRY-SRYCD (IDX)(1:1)    =   "1"  )  OR
-                      (SRY-SRYCD (IDX)(1:3)    =   "099"))
-      *!           MOVE    SPACE               TO  TNS-TENSU-REC
-      *            MOVE    SRY-SRYCD (IDX)     TO  TNS-SRYCD
-      *            PERFORM 910-TENSU-READ-SEC
-      *!           IF      TNS-SANTEIRRKKBN    NOT=   ZERO
+                      (SRY-SRYCD (IDX)(1:1)    =   "1"
+                                               OR  "0" )
+                   MOVE    SPACE               TO  TNS-TENSU-REC
+                   MOVE    SRY-SRYCD (IDX)     TO  TNS-SRYCD
+                   PERFORM 910-TENSU-READ-SEC
+                   IF     (TNS-SANTEIRRKKBN    NOT=   ZERO ) OR
+      *                   処方せん料
+                          (SRY-SRYSYUKBN       =   "820"   ) OR
+      *                   検査
+                          (SRY-SRYKBN          =   "60"    ) OR
+      *                   自動発生分
+                          (SRY-AUTOKBN(IDX)    =   "3"     )
                        ADD     1               TO  IDX-TEI
-                       MOVE    SRY-SRYCD (IDX) TO  SPA-K02-TEI-SRYCD
+                       IF      IDX-TEI         <=  100
+                           MOVE    SRY-SRYCD (IDX) TO  SPA-K02-TEI-SRYCD
                                                              (IDX-TEI)
-                       MOVE    WRK-ZAIKAISU    TO  SPA-K02-TEI-KAISU
+                           MOVE    WRK-ZAIKAISU    TO  SPA-K02-TEI-KAISU
                                                              (IDX-TEI)
-      *!           END-IF
+                       END-IF
+                   END-IF
       *            ＣＴ・ＭＲＩの時、コード変更
                    IF      TNS-SRYSYUKBN   =   "723"  OR  "724"
                                            OR  "713"  OR  "714"
@@ -4104,10 +4116,12 @@
                IF      TNS-SANTEIRRKKBN        =   ZERO
                    ADD     1                   TO  IDX-TEI
                END-IF
-               MOVE    WRK-HEN-SRYCD       TO  SPA-K02-TEI-SRYCD
+               IF      IDX-TEI             <=  100
+                  MOVE    WRK-HEN-SRYCD       TO  SPA-K02-TEI-SRYCD
                                                             (IDX-TEI)
-               MOVE    WRK-ZAIKAISU        TO  SPA-K02-TEI-KAISU
+                   MOVE    WRK-ZAIKAISU        TO  SPA-K02-TEI-KAISU
                                                             (IDX-TEI)
+               END-IF
            END-IF
       *
            .

@@ -709,7 +709,7 @@
       *
       *    自動加算テーブル
        01  WRK-KASAN-AREA.
-           03  WRK-KASAN-TBL                       OCCURS   30.
+           03  WRK-KASAN-TBL                       OCCURS   60.
                05  WRK-KSN-HKNCOMBI        PIC X(04).
                05  WRK-KSN-SRYKA           PIC X(02).
                05  WRK-KSN-SRYSYUKBN       PIC X(03).
@@ -3337,6 +3337,10 @@
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    SPACE               TO  SPA-KIDCD
       *
+           IF      WRK-ERRCD1      NOT =   SPACE
+               MOVE    WRK-ERRCD1          TO  SPA-ERRCD
+           END-IF
+      *
            .
        310-SPA-GMNSET-EXT.
            EXIT.
@@ -3510,6 +3514,10 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+           IF      IDX2                 >   200
+               MOVE    200              TO  IDX2
+           END-IF
       *
            MOVE    ZERO                 TO  IDX-TEI
       *    約束コード以外の画面再編集
@@ -8962,12 +8970,20 @@
                                            SPA-AREA
       *
                ADD     1                   TO  WRK-HOZ-IDX
-               MOVE    WRK-COM-TBLREC (IDX-Z)
+               IF      WRK-HOZ-IDX         >   200
+                   IF      SPA-SYORIFLG        =   1
+                       MOVE    "9100"          TO  SPA-ERRCD
+                   ELSE
+                       MOVE    "0007"          TO  SPA-ERRCD
+                   END-IF
+               ELSE
+                   MOVE    WRK-COM-TBLREC (IDX-Z)
                                            TO  WRK-HZN-COM-TBLREC
                                                        (WRK-HOZ-IDX)
-               MOVE    WRK-GMN-TBLREC (IDX-Z)
+                   MOVE    WRK-GMN-TBLREC (IDX-Z)
                                            TO  WRK-HZN-GMN-TBLREC
                                                        (WRK-HOZ-IDX)
+               END-IF
       *
            END-PERFORM
            .
@@ -12053,9 +12069,11 @@
            MOVE    ZERO                TO  WRK-ZAINUM
            MOVE    ZERO                TO  IDX-S
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   10
+                   UNTIL      (IDX     >   10 )  OR
+                              (IDX-S   >=  60 )
                PERFORM VARYING     IDY     FROM    1   BY  1
-                       UNTIL      (IDY     >   30      )
+                       UNTIL      (IDY     >   30      )  OR
+                                  (IDX-S   >=  60 )
                IF      LNK-ORCSC-SRYCD (IDX IDY)
                                        NOT = SPACE
                    ADD     1               TO  IDX-S
