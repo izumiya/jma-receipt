@@ -1844,6 +1844,7 @@
                END-IF
            END-PERFORM
       * 
+           MOVE    ZERO                TO  FLG-HKNCOMBI
            IF    ( FLG-HIT         =  ZERO )
       *        保険組合せ読込み
                INITIALIZE                 HKNCOMBI-REC
@@ -4329,6 +4330,8 @@
       *    点数マスタ検索処理
       *****************************************************************
        900-TENSU-READ-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
       *
            MOVE    RECE02-SRYYM        TO  ORC-DBYMD (1:6)
            MOVE    "01"                TO  ORC-DBYMD (7:2)
