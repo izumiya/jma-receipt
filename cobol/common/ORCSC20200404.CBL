@@ -216,6 +216,13 @@
       *
            03  WRK-SRYKA               PIC X(02).
            03  WRK-HKNCOMBI            PIC X(04).
+      *    薬剤毎の保険
+           03  WRK-NAI-HKNCOMBI        PIC X(04).
+           03  WRK-GAI-HKNCOMBI        PIC X(04).
+           03  WRK-MADO1-HKNCOMBI      PIC X(04).
+           03  WRK-MADO2-HKNCOMBI      PIC X(04).
+           03  WRK-CHOU-HKNCOMBI       PIC X(04).
+           03  WRK-SYO-HKNCOMBI        PIC X(04).
       *
       *    継続の時、自動発生のチェック
        01  WRK-CONTCHK-TBL.
@@ -913,6 +920,13 @@
            MOVE    ZERO                TO  FLG-ZAIEND
            MOVE    ZERO                TO  IDX-CHOKI
       *
+           MOVE    SPACE               TO  WRK-NAI-HKNCOMBI
+           MOVE    SPACE               TO  WRK-GAI-HKNCOMBI
+           MOVE    SPACE               TO  WRK-MADO1-HKNCOMBI
+           MOVE    SPACE               TO  WRK-MADO2-HKNCOMBI
+           MOVE    SPACE               TO  WRK-CHOU-HKNCOMBI
+           MOVE    SPACE               TO  WRK-SYO-HKNCOMBI
+      *
            INITIALIZE                  WRK-ZAIKEI-AREA
            INITIALIZE                  TBL-NYUINDAY-AREA
            MOVE    SPACE               TO  WRK-HENSYU-MEISYO
@@ -974,15 +988,27 @@
                    WHEN    "211"
                    WHEN    "291"
                        MOVE     1              TO  FLG-NAIYAK
+                       IF      WRK-NAI-HKNCOMBI    =   SPACE
+                           MOVE    WRK-COM-HKNCOMBI (IDX)
+                                                   TO  WRK-NAI-HKNCOMBI
+                       END-IF
                    WHEN    "212"
                    WHEN    "292"
                        MOVE     1              TO  FLG-NAIYAK2
                    WHEN    "221"
                        MOVE     1              TO  FLG-TONPUK
+                       IF      WRK-NAI-HKNCOMBI    =   SPACE
+                           MOVE    WRK-COM-HKNCOMBI (IDX)
+                                                   TO  WRK-NAI-HKNCOMBI
+                       END-IF
                    WHEN    "222"
                        MOVE     1              TO  FLG-TONPUK2
                    WHEN    "231"
                        MOVE     1              TO  FLG-GAIYAK
+                       IF      WRK-GAI-HKNCOMBI    =   SPACE
+                           MOVE    WRK-COM-HKNCOMBI (IDX)
+                                                   TO  WRK-GAI-HKNCOMBI
+                       END-IF
                    WHEN    "232"
                        MOVE     1              TO  FLG-GAIYAK2
                END-EVALUATE
@@ -1013,6 +1039,8 @@
                            MOVE    "1"             TO  WRK-COM-CUR (IDX)
                        ELSE
                            MOVE    IDX             TO  IDX-SYOHOU
+                           MOVE    WRK-COM-HKNCOMBI (IDX)
+                                                   TO  WRK-SYO-HKNCOMBI
                        END-IF
                END-EVALUATE
       *
@@ -1070,7 +1098,13 @@
       *    院外分
            PERFORM 3001-INGAI-SYORI-SEC
       *    院内分
-           PERFORM 3002-INNAI-SYORI-SEC
+           IF      SPA-NYUGAIKBN       =   "1"
+      *        入院
+               PERFORM 30021-NYUIN-INNAI-SYORI-SEC
+           ELSE
+      *        外来
+               PERFORM 3002-INNAI-SYORI-SEC
+           END-IF
       *
            IF     (LNK-ORCSC-KIDCD     NOT =   SPACE )  OR
                   (SPA-ERRCD           NOT =   SPACE )
@@ -1216,6 +1250,17 @@
       *----(01.00.01) LINE UPD END   ----------------------------------
                            MOVE    1           TO  FLG-MADOKU
                            MOVE    1           TO  FLG-MADOKU-ARI
+                           IF      WRK-CHK-SRYSYUKBN   =   "231"
+                               IF      WRK-MADO2-HKNCOMBI  =   SPACE
+                                   MOVE    WRK-COM-HKNCOMBI (IDX)
+                                               TO  WRK-MADO2-HKNCOMBI
+                               END-IF
+                           ELSE
+                               IF      WRK-MADO1-HKNCOMBI  =   SPACE
+                                   MOVE    WRK-COM-HKNCOMBI (IDX)
+                                               TO  WRK-MADO1-HKNCOMBI
+                               END-IF
+                           END-IF
                        END-IF
                    END-IF
            END-EVALUATE
@@ -1311,12 +1356,20 @@
                    (WRK-CHK-SRYSYUKBN (1:1)   =   "2"  )  AND
                    (WRK-COM-KAISU (IDX)       >=  28   )
                MOVE    1                   TO  FLG-CHOUKI
+               IF      WRK-CHOU-HKNCOMBI   =   SPACE
+                   MOVE    WRK-COM-HKNCOMBI (IDX)
+                                               TO  WRK-CHOU-HKNCOMBI
+               END-IF
            END-IF
       *    外用の場合
            IF      (WRK-COM-INPUTCD(IDX)(1:1) =   "6"  )  AND
                    (WRK-CHK-SRYSYUKBN (1:2)   =   "23" )  AND
                    (WRK-COM-KAISU2(IDX)       >=  28   )
                MOVE    1                   TO  FLG-CHOUKI
+               IF      WRK-CHOU-HKNCOMBI   =   SPACE
+                   MOVE    WRK-COM-HKNCOMBI (IDX)
+                                               TO  WRK-CHOU-HKNCOMBI
+               END-IF
            END-IF
       *
            .
@@ -1392,6 +1445,17 @@
            MOVE    ZERO                TO  FLG-SYOHOSENN
            MOVE    ZERO                TO  FLG-SYOHO-CHK
            MOVE    ZERO                TO  FLG-SYOHO-CHK2
+      *
+      *    長期投薬加算算定時、保険の変更
+           IF      SPA-CHOKITOFLG          =   2
+               IF     (WRK-CHOU-HKNCOMBI   NOT =   WRK-HKNCOMBI) AND
+                      (WRK-CHOU-HKNCOMBI   NOT =   SPACE       )
+                   MOVE    WRK-CHOU-HKNCOMBI   TO  WRK-HKNCOMBI
+               END-IF
+           END-IF
+           IF      WRK-SYO-HKNCOMBI    NOT =   SPACE
+               MOVE    WRK-SYO-HKNCOMBI    TO  WRK-HKNCOMBI
+           END-IF
       *
       *    処方箋を交付する診察料を算定している場合、算定なし
            IF      (LNK-ORCSC-ROUMANSEI-ARI    =   1  )  OR
@@ -1642,7 +1706,6 @@
                ELSE
       *            算定可能
                    MOVE    "0113"          TO  LNK-ORCSC-KIDCD
-                   GO      TO      30011-INGAITOKUTEIKSN-CHK-EXT
                END-IF
            END-IF
       *
@@ -1654,12 +1717,6 @@
       *    院内 算定処理
       *****************************************************************
        3002-INNAI-SYORI-SEC            SECTION.
-      *
-      *    入院
-           IF      SPA-NYUGAIKBN       =   "1"
-               PERFORM 30021-NYUIN-INNAI-SYORI-SEC
-               GO      TO      3002-INNAI-SYORI-EXT
-           END-IF
       *
            MOVE    ZERO                TO  FLG-SYOHORYO
       *
@@ -1685,6 +1742,29 @@
                END-IF
            END-IF
       *
+      *    麻毒の算定されている保険で作成する
+           IF      WRK-MADO1-HKNCOMBI  NOT =   SPACE
+      *        内服
+               MOVE    WRK-MADO1-HKNCOMBI  TO  WRK-NAI-HKNCOMBI
+               MOVE    WRK-MADO1-HKNCOMBI  TO  WRK-HKNCOMBI
+           ELSE
+      *        外用
+               IF      WRK-MADO2-HKNCOMBI  NOT =   SPACE
+                   MOVE    WRK-MADO2-HKNCOMBI  TO  WRK-GAI-HKNCOMBI
+                   MOVE    WRK-MADO2-HKNCOMBI  TO  WRK-HKNCOMBI
+               END-IF
+           END-IF
+      *    長期投薬加算算定時、保険の変更
+           IF      SPA-CHOKITOFLG          =   2
+               IF     (WRK-CHOU-HKNCOMBI   NOT =   WRK-HKNCOMBI) AND
+                      (WRK-CHOU-HKNCOMBI   NOT =   SPACE       )
+                   IF     (WRK-MADO1-HKNCOMBI      =   SPACE )  AND
+                          (WRK-MADO2-HKNCOMBI      =   SPACE )
+                       MOVE    WRK-CHOU-HKNCOMBI   TO  WRK-HKNCOMBI
+                   END-IF
+               END-IF
+           END-IF
+      *
       *    薬剤料逓減
            IF      WRK-ZAICNT          >=  7
                MOVE    "630010002"         TO  WRK-SRYCD
@@ -1694,6 +1774,8 @@
                    MOVE    "210"           TO  LNK-ORCSC-SRYSYUKBN
                                                          (02 IDXS)
                    MOVE    "21"            TO  LNK-ORCSC-SRYKBN
+                                                         (02 IDXS)
+                   MOVE    WRK-NAI-HKNCOMBI    TO  LNK-ORCSC-HKNCOMBI
                                                          (02 IDXS)
                END-IF
            END-IF
@@ -1717,6 +1799,8 @@
                                                          (02 IDXS)
                    MOVE    "21"            TO  LNK-ORCSC-SRYKBN
                                                          (02 IDXS)
+                   MOVE    WRK-NAI-HKNCOMBI    TO  LNK-ORCSC-HKNCOMBI
+                                                         (02 IDXS)
                END-IF
            END-IF
       *    外用調剤料加算
@@ -1728,6 +1812,8 @@
                    MOVE    "242"           TO  LNK-ORCSC-SRYSYUKBN
                                                          (02 IDXS)
                    MOVE    "23"            TO  LNK-ORCSC-SRYKBN
+                                                         (02 IDXS)
+                   MOVE    WRK-GAI-HKNCOMBI    TO  LNK-ORCSC-HKNCOMBI
                                                          (02 IDXS)
                END-IF
            END-IF
@@ -1781,7 +1867,7 @@
                   (FLG-GAIYAK          =   1    )
       *----(01.00.02) LINE ADD START ----------------------------------
       *           調基が１であること
-             IF      LNK-ORCSC-CHOKI-FLG   =   1
+             IF     (LNK-ORCSC-CHOKI-FLG   =   1    )
                AND  (FLG-CHOKI             =   ZERO )
       *----(01.00.02) LINE ADD END   ----------------------------------
                MOVE    "120001810"         TO  WRK-SRYCD
@@ -1869,6 +1955,9 @@
                        MOVE    "250"           TO  LNK-ORCSC-SRYSYUKBN
                                                          (02 IDXS)
                        MOVE    "25"            TO  LNK-ORCSC-SRYKBN
+                                                         (02 IDXS)
+                       MOVE    WRK-CHOU-HKNCOMBI
+                                               TO  LNK-ORCSC-HKNCOMBI
                                                          (02 IDXS)
       *                自動発生分としない
                        MOVE    "1"             TO  LNK-ORCSC-AUTOKBN
