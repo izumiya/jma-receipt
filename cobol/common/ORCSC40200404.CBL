@@ -558,6 +558,10 @@
            IF      WRK-SYOCHI-KBN      =   SPACE
                GO      TO      100112-SYOEN-CHK-EXT
            END-IF
+      *    消炎鎮痛処置なし
+           IF       LNK-ORCSC-PG       =   "J04"
+               GO      TO      100112-SYOEN-CHK-EXT
+           END-IF
       *
       *    １日に１回数のみチェック（Ｋ０２のみのチェック）
            IF      (LNK-ORCSC-PG       =   "K02" )
@@ -590,7 +594,8 @@
            END-IF
       *
       *    労災でマッサージ等、器具等の時、日に３部位とする
-           IF     (SPA-HKNKBN          =   1   )  AND
+           IF     (LNK-ORCSC-PG        =   "K02" ) AND
+                  (SPA-HKNKBN          =   1   )  AND
                   (WRK-SYOCHI-KBN      =   "01" OR  "02"
       *        介達牽引
                                        OR  "04"   )

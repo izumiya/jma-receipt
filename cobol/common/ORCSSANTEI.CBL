@@ -760,7 +760,8 @@
                MOVE    SANTEI-SRYYM        TO  WRK-MAE-YMD(1:6)
                MOVE    SANTEI-MSANTEID     TO  WRK-MAE-DD
                MOVE    WRK-SRYYMD(7:2)     TO  IDX-Y2
-               IF      IDX-Y2              <   WRK-MAE-DD
+               IF     (IDX-Y2              <   WRK-MAE-DD ) OR
+                      ( SANTEI-MSANTEID    =   ZERO       )
                    MOVE    IDX-Y2          TO  SANTEI-MSANTEID
                END-IF
            END-IF
