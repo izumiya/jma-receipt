@@ -3103,6 +3103,46 @@
       *D       DISPLAY "K03 WKSRYACT DEL ERR:" MCP-RC
       *D       MOVE    "0003"          TO  SPA-ERRCD
       *    END-IF
+      *    中途追加分の削除
+      *
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+               PERFORM 940-WKSRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           PERFORM
+               UNTIL   FLG-WKSRYACT    =   1
+               IF      WKSRY-MOD-FLG       NOT =   ZERO
+      *
+                   MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+                   CALL    "ORCMCPSUB"         USING
+                                               MCPAREA
+                                               ORCMCPAREA
+                                               MCPDATA-REC
+               END-IF
+      *
+               MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+               PERFORM 940-WKSRYACT-READ-SEC
+           END-PERFORM
+      *
       *
            .
        45002-WKSRYACT-DEL-EXT.
@@ -4233,6 +4273,28 @@
       *    .
       *920-SANTEI-READ-EXT.
       *    EXIT.
+      *
+      *****************************************************************
+      *    ワーク診療行為データ読込
+      *****************************************************************
+       940-WKSRYACT-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  WKSRYACT-REC
+               MOVE    ZERO            TO  FLG-WKSRYACT
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+      *
+           .
+       940-WKSRYACT-READ-EXT.
+           EXIT.
       *
       *****************************************************************
       *    受診内容データ読み込み

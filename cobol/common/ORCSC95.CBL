@@ -36,6 +36,7 @@
       *  01.00.07    NACL-多々納  03/04/09  保険編集サブプロ追加
       *  01.00.08    NACL-多々納  03/07/17  検索変更他
       *  01.00.09    NACL-多々納  03/10/27  育児栄養加算、カーソル移動追加
+      *  01.00.10    NACL-多々納  04/10/08  ワーク診療行為にドクター追加
       *****************************************************************
       *
       *
@@ -110,6 +111,7 @@
       *
            03  FLG-UKETUKE-ARI     PIC 9(01).
            03  FLG-HEN             PIC 9(01).
+           03  FLG-CHK             PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -126,6 +128,7 @@
            03  IDX-SRY             PIC 9(04).
            03  IDX-TEI             PIC 9(04).
            03  IDX-HKN             PIC 9(04).
+           03  IDXF                PIC 9(04).
       *
            03  IDX-J1              PIC 9(04).
            03  IDX-J2              PIC 9(04).
@@ -225,6 +228,8 @@
            03  WRK-KEY-DRCD            PIC X(05).
            03  WRK-KEY-HKNCOMBI        PIC X(04).
            03  WRK-FUKU-ZAINUM         PIC 9(08).
+      *    ワーク診療行為内容追加
+           03  WRK-INPUTCD             PIC X(22).
       *
       *他科受診科有り
        01  WRK-TAKA-SRYKA-AREA.
@@ -294,6 +299,11 @@
        01  HZN-JYURRK-REC.
            COPY    "CPJYURRK.INC"    REPLACING
                                      //JYURRK-// BY //HZN-JYURRK-//.
+      *
+      *    ワーク診療行為マスタ−
+       01  HZN-WKSRYACT-REC.
+           COPY    "CPWKSRYACT.INC"   REPLACING
+                                     //WKSRY-// BY //HZN-WKSRY-//.
       *
       *    診療会計マスタ−
        01  SRYACCT-REC.
@@ -422,6 +432,9 @@
                    PERFORM 11011-TOKUTEI-SYORI-SEC
       *            中途終了分編集
                    PERFORM 200-WKSRYACT-SYORI-SEC
+      *        中途終了分追加
+               WHEN    "A"
+                   PERFORM 300-WKSRYACT-INSERT-SEC
            END-EVALUATE
       *
            .
@@ -4189,6 +4202,9 @@
       *****************************************************************
        4902-WKBUNSAN-SEC               SECTION.
       *
+      *    ワーク診療行為クリア
+           PERFORM 4900-WKSRYACT-CLEAR-SEC
+      *
            MOVE    ZERO               TO  FLG-WKSYORI
       *    対象の保険組合せの保存
            MOVE    ZERO                TO  SPA-WKSRY-HKNCOMBI
@@ -4218,6 +4234,7 @@
                MOVE    1               TO  FLG-WKSRYACT
            END-IF
            MOVE    ZERO                TO  WRK-EDABAN
+           MOVE    ZERO                TO  FLG-DRCDCHK
            PERFORM
                UNTIL   FLG-WKSRYACT   =   1
                IF      WKSRY-HKNCOMBI      =   SPA-HKNCOMBINUM
@@ -4243,10 +4260,34 @@
                                                TO  SPA-DOUJI-RENNUM
                        MOVE    WKSRY-CONTKBN   TO  SPA-CONTKBN
                    END-IF
+      *            ドクター
+                   IF      WKSRY-DRCD          =   SPACE  OR  ZERO
+                       CONTINUE
+                   ELSE
+                       IF      WKSRY-DRCD      NOT =   SPA-DRCD
+                           MOVE    1               TO  FLG-DRCDCHK
+                       END-IF
+                       MOVE    WKSRY-DRCD          TO  SPA-DRCD
+                   END-IF
       *
-                   MOVE    1               TO  FLG-WKSYORI
+                   MOVE    1                   TO  FLG-WKSYORI
       *            対象の保険組合せの保存
                    MOVE    WKSRY-HKNCOMBI      TO  SPA-WKSRY-HKNCOMBI
+      *
+      *            更新中フラグ
+                   MOVE    1                   TO  WKSRY-MOD-FLG
+      *
+                   MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+                   MOVE    "DBUPDATE"          TO  MCP-FUNC
+                   MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+                   CALL    "ORCMCPSUB"         USING
+                                               MCPAREA
+                                               ORCMCPAREA
+                                               MCPDATA-REC
+                   IF      MCP-RC          NOT =   ZERO
+                       DISPLAY "C95 WKSRYACT UPD ERR:" MCP-RC
+                              ",KEY:" WKSRY-KEY
+                   END-IF
                END-IF
       *
                MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
@@ -4260,9 +4301,255 @@
       *                                MCPAREA
       *                                MCPDATA-REC
       *
-          .
+           IF      FLG-DRCDCHK         =   1
+      *        職員情報（ドクター）
+               MOVE    SPACE               TO  SYS-1010-REC
+               INITIALIZE                  SYS-1010-REC
+               MOVE    "1010"              TO  SYS-1010-KANRICD
+               MOVE    SPA-DRCD            TO  SYS-1010-KBNCD
+      *        システム管理検索
+               MOVE    SYS-1010-REC        TO  MCPDATA-REC
+               MOVE    "DBSELECT"          TO  MCP-FUNC
+               MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+               MOVE    SPA-SRYYMD          TO  ORC-DBYMD
+               CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+                   PERFORM 900-KANRIMST-READ-SEC
+               ELSE
+                   INITIALIZE                  SYS-1010-REC
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-1010-REC
+                   MOVE    SPA-DRCD(2:4)       TO  SPA-DRCD-NAME
+                   MOVE    SYS-1010-NAME       TO  SPA-DRCD-NAME (6:)
+               END-IF
+           END-IF
+      *
+           .
        4902-WKBUNSAN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ワーク診療行為内容追加処理
+      *****************************************************************
+       300-WKSRYACT-INSERT-SEC              SECTION.
+      *
+           MOVE    SPA-TERMID          TO  FILE-TERMID2
+      *
+           OPEN    OUTPUT              PARA-FILE
+      *
+      *    対象の保険組合せの保存
+           MOVE    SPACE               TO  WKSRYACT-REC
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    LNK-SC95-SRYKA      TO  WKSRY-SRYKA
+           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+           MOVE    LNK-SC95-HKNCOMBI   TO  WKSRY-HKNCOMBI
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "WKSRYACT-KEY2"   TO  ORC-DBPATH
+               PERFORM 940-WKSINKOUI-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           MOVE    ZERO                TO  WRK-EDABAN
+           MOVE    ZERO                TO  FLG-CHK
+           MOVE    ZERO                TO  WRK-ZAINUM
+           PERFORM
+               UNTIL   FLG-WKSRYACT   =   1
+      *        診療科・保険の追加
+               IF      WRK-EDABAN          =   ZERO
+                   PERFORM 3001-SRYKA-HKNCOMBI-SEC
+               END-IF
+      *
+               IF      WKSRY-RENNUM        =   1
+                   MOVE    ZERO                TO  FLG-CHK
+      *            剤番号
+                   ADD     1                   TO  WRK-ZAINUM
+               END-IF
+      *        診察料の削除
+               IF      WKSRY-SRYKBN        =   "11"  OR
+                                               "12"  OR
+                                               "13"
+                   PERFORM 3002-SRYKBN-CHK-SEC
+               END-IF
+               IF      FLG-CHK             =   ZERO
+                   MOVE    SPACE               TO  PARA-REC
+                   MOVE    "WKSRYACT"          TO  PARA-FILEMEI
+                   ADD     1                   TO  WRK-EDABAN
+                   MOVE    WRK-EDABAN          TO  PARA-EDABAN
+      *            剤番号
+                   MOVE    WKSRYACT-REC        TO  HZN-WKSRYACT-REC
+                   MOVE    WRK-ZAINUM          TO  HZN-WKSRY-ZAINUM
+      *            ワーク診療行為マスタからの作成判定とする
+                   MOVE    "WKSRYACT"          TO  HZN-WKSRY-TERMID
+      *
+                   MOVE    HZN-WKSRYACT-REC    TO  PARA-DATA-REC
+                   WRITE                       PARA-REC
+               END-IF
+      *        ワーク診療行為作成有無
+               MOVE    1                   TO  LNK-SC95-WKSRYACT
+      *        更新中フラグ
+               MOVE    1                   TO  WKSRY-MOD-FLG
+      *
+               MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+               MOVE    "DBUPDATE"          TO  MCP-FUNC
+               MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
+               IF      MCP-RC          NOT =   ZERO
+                   DISPLAY "C95 WKSRYACT UPD ERR:" MCP-RC
+                              ",KEY:" WKSRY-KEY
+               END-IF
+      *
+               MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
+               PERFORM 940-WKSINKOUI-READ-SEC
+           END-PERFORM
+      *
+      *    MOVE    "DBCLOSE"           TO  MCP-FUNC
+      *    MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
+      *    CALL    "MCPDBSUB"          USING
+      *                                MCPAREA
+      *                                MCPDATA-REC
+      *
+           CLOSE                       PARA-FILE
+      *
+          .
+       300-WKSRYACT-INSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療科保険追加処理
+      *****************************************************************
+       3001-SRYKA-HKNCOMBI-SEC             SECTION.
+      *
+      *!   IF      WKSRY-SRYKA     NOT =   SPA-SRYKA
+               MOVE    SPACE           TO  WRK-INPUTCD
+               MOVE    "$"             TO  WRK-INPUTCD
+               MOVE    WKSRY-SRYKA     TO  WRK-INPUTCD(2:2)
+               MOVE    WKSRY-DRCD(2:4) TO  WRK-INPUTCD(5:4)
+               PERFORM 30011-WKSRYACT-INS-SEC
+      *!   END-IF
+      *
+      *!   IF      WKSRY-HKNCOMBI  NOT =   SPA-HKNCOMBINUM
+               MOVE    SPACE           TO  WRK-INPUTCD
+               MOVE    "#"             TO  WRK-INPUTCD
+               MOVE    WKSRY-HKNCOMBI  TO  WRK-INPUTCD(2:)
+               PERFORM 30011-WKSRYACT-INS-SEC
+      *!   END-IF
+           .
+       3001-SRYKA-HKNCOMBI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ワーク診療行為追加処理
+      *****************************************************************
+       30011-WKSRYACT-INS-SEC             SECTION.
+      *
+           MOVE    WKSRYACT-REC        TO  HZN-WKSRYACT-REC
+           MOVE    1                   TO  HZN-WKSRY-RENNUM
+           ADD     1                   TO  WRK-ZAINUM
+           MOVE    WRK-ZAINUM          TO  HZN-WKSRY-ZAINUM
+           MOVE    SPACE               TO  HZN-WKSRY-SRYSYUKBN
+           MOVE    SPACE               TO  HZN-WKSRY-SRYKBN
+           INITIALIZE                      HZN-WKSRY-SINRYO-TBL-G
+           MOVE    WRK-INPUTCD         TO  HZN-WKSRY-INPUTCD (1)
+      *
+           MOVE    SPACE               TO  PARA-REC
+           MOVE    "WKSRYACT"          TO  PARA-FILEMEI
+           ADD     1                   TO  WRK-EDABAN
+           MOVE    WRK-EDABAN          TO  PARA-EDABAN
+      *
+      *    ワーク診療行為マスタからの作成判定とする
+           MOVE    "WKSRYACT"          TO  HZN-WKSRY-TERMID
+      *
+           MOVE    HZN-WKSRYACT-REC    TO  PARA-DATA-REC
+           WRITE                       PARA-REC
+           .
+       30011-WKSRYACT-INS-EXT.
+           EXIT.
+      *****************************************************************
+      *    診察料の判定処理
+      *****************************************************************
+       3002-SRYKBN-CHK-SEC             SECTION.
+      *
+           IF      WKSRY-SRYKBN        =   "11"  OR  "12"
+               MOVE    1               TO  FLG-CHK
+           END-IF
+      *
+      *    小児科外来診察料の判定
+           PERFORM VARYING     IDXF    FROM    1   BY  1
+                   UNTIL      (IDXF        >   5   )  OR
+                              (FLG-CHK     =   1   )
+               IF      WKSRY-SRYCD(IDXF)       =   "113003510"
+                                               OR  "113003610"
+                                               OR  "113003710"
+                                               OR  "113003810"
+                   MOVE    1               TO  FLG-CHK
+               END-IF
+           END-PERFORM
+           .
+       3002-SRYKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ワーク診療行為クリア処理
+      *****************************************************************
+       4900-WKSRYACT-CLEAR-SEC             SECTION.
+      *
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY6"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "WKSRYACT-KEY6"     TO  ORC-DBPATH
+               PERFORM 940-WKSINKOUI-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           PERFORM
+               UNTIL   FLG-WKSRYACT    =   1
+               MOVE    ZERO                TO  WKSRY-MOD-FLG
+      *
+               MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+               MOVE    "DBUPDATE"          TO  MCP-FUNC
+               MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
+      *
+               MOVE    "WKSRYACT-KEY6"     TO  ORC-DBPATH
+               PERFORM 940-WKSINKOUI-READ-SEC
+           END-PERFORM
+      *
+           .
+       4900-WKSRYACT-CLEAR-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    西暦和暦編集処理
       *****************************************************************

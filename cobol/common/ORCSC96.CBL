@@ -1043,7 +1043,7 @@
                    MOVE    "主保険と老人・一般の判定が違います。"
                                        TO  SPA-ERRMSG
                    MOVE    "複数保険入力はできません。"
-                                       TO  SPA-ERRMSG(27:)
+                                       TO  SPA-ERRMSG(37:)
                WHEN    "1053"
                    MOVE    "診療科がありません。"
                                        TO  SPA-ERRMSG
