@@ -431,9 +431,9 @@
                IF     (WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   2 )  OR
                      ((WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   3   ) AND
                       (LNK-ORCSC-NENREI-YY             =   ZERO))
+                   MOVE    1                   TO  FLG-KIJUNN
                    IF      FLG-ERR             =   ZERO
       *                施設基準適応加算
-                       MOVE    1                   TO  FLG-KIJUNN
                        MOVE    "150304190"         TO  WRK-SRYCD
                        MOVE    "150302090"         TO  WRK-SRYCD2
                    ELSE
@@ -441,7 +441,6 @@
                        IF      WRK-COM-KIJUNCHK-FLG (IDX-Z)
                                                    =   1
       *                    施設基準でない時、３０％の逓減
-                           MOVE    2                   TO  FLG-KIJUNN
                            MOVE    "150302090"         TO  WRK-SRYCD
                            MOVE    "150304190"         TO  WRK-SRYCD2
                        ELSE
@@ -458,10 +457,6 @@
       *            自動発生位置決定
                    MOVE    ZERO                TO  FLG-ARI
                    PERFORM 1001112-KIJUNN-ICHI-SEC
-      **********   IF      WRK-COM-INPUTCD (IDX-Z + 1) =   WRK-SRYCD
-      *                MOVE    2               TO  WRK-COM-SANFLG
-      *                                              (IDX-Z + 1)
-      **********   ELSE
                    IF      FLG-ARI         =   1
                        MOVE    IDX-TUS         TO  IDX-T
                    ELSE
@@ -477,12 +472,13 @@
            END-IF
       *
       *    加算の時、対象の手技が有ること
-      *#     IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   1
-      *#         IF      FLG-KIJUNN          =   ZERO
-      *#             MOVE    "0073"          TO  SPA-ERRCD
-      *#             MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-      *#         END-IF
-      *#     END-IF
+             IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   1
+                                                     OR  4
+                 IF      FLG-KIJUNN          =   ZERO
+                     MOVE    "0173"          TO  SPA-ERRCD
+                     MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                 END-IF
+             END-IF
            .
        100111-KIJUNN-CHK-EXT.
            EXIT.
