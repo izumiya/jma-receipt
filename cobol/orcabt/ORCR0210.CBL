@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-門脇    04.07.12  ファイルクリア追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -47,6 +48,12 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE039-KEY
                                    FILE    STATUS  IS  STS-RECE039.
+      *
+           SELECT  RECE039W-FILE   ASSIGN  RECE039PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE039W-KEY
+                                   FILE    STATUS  IS  STS-RECE039.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -64,6 +71,12 @@
            COPY    "CPRCF0031.INC"  REPLACING  //RECE031//
                                    BY          //RECE039//.
            03  RECE039-SYUBYOFLG-X PIC X(01).
+      *
+       FD  RECE039W-FILE.
+       01  RECE039W-REC. 
+           COPY    "CPRCF0031.INC"  REPLACING  //RECE031//
+                                   BY          //RECE039W//.
+           03  RECE039W-SYUBYOFLG-X PIC X(01).
       *    エラーファイル
        FD  RECEERR-FILE.
        01  RECEERR-REC             PIC X(200). 
@@ -197,6 +210,9 @@
       *
            MOVE    "RECEERR"           TO  RECEERR-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECEERR-TERMID
+      *
+           OPEN    OUTPUT              RECE039W-FILE
+           CLOSE                       RECE039W-FILE
       *
            OPEN    INPUT               RECE03-FILE
            OPEN    OUTPUT              RECE039-FILE
@@ -348,5 +364,5 @@
                                         MCPDATA-REC.
       *
            .
-       900-DBCLOSE-EXT.
+       900-DBDISCONNECT-EXT.
            EXIT.

@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-門脇    03.03.12  剤点数をキーに追加対応
       *  01.00.02    NACL-門脇    04.02.05  診療コード＊数量の累計編集
+      *  01.00.03    NACL-門脇    04.07.12  ファイルクリア追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -50,10 +51,20 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE642-KEY
                                    FILE    STATUS  IS  STS-RECE642.
+           SELECT  RECE642X-FILE   ASSIGN  RECE642PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE642X-KEY
+                                   FILE    STATUS  IS  STS-RECE642.
            SELECT  RECE64W-FILE    ASSIGN  RECE64WPARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE64W-KEY
+                                   FILE    STATUS  IS  STS-RECE64W.
+           SELECT  RECE64WX-FILE   ASSIGN  RECE64WPARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE64WX-KEY
                                    FILE    STATUS  IS  STS-RECE64W.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -74,10 +85,20 @@
        01  RECE642-REC. 
            COPY    "CPRCF0642.INC".
       *
+       FD  RECE642X-FILE.
+       01  RECE642X-REC. 
+           COPY    "CPRCF0642.INC" REPLACING  //RECE642//
+                                   BY         //RECE642X//.
+      *
        FD  RECE64W-FILE.
        01  RECE64W-REC. 
            COPY    "CPRCF064.INC"  REPLACING  //RECE64//
                                    BY         //RECE64W//.
+      *
+       FD  RECE64WX-FILE.
+       01  RECE64WX-REC. 
+           COPY    "CPRCF064.INC"  REPLACING  //RECE64//
+                                   BY         //RECE64WX//.
       * 
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -236,6 +257,12 @@
       *
            MOVE    "RECEERR"           TO  RECEERR-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECEERR-TERMID
+      *
+           OPEN    OUTPUT              RECE642X-FILE
+           CLOSE                       RECE642X-FILE
+      *
+           OPEN    OUTPUT              RECE64WX-FILE
+           CLOSE                       RECE64WX-FILE
       *
           .
        100-INIT-EXT.
@@ -602,5 +629,5 @@
                                         MCPDATA-REC.
       *
            .
-       900-DBCLOSE-EXT.
+       900-DBDISCONNECT-EXT.
            EXIT.

@@ -33,6 +33,7 @@
       *  ２００４年４月改正対応
       *  01.01.01    NACL-門脇    04.04.10  在宅患者訪問点滴注射管理指導料
       *                                     算定時の点滴注射のコメント対応
+      *  01.01.02    NACL-門脇    04.07.12  ファイルクリア追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -54,10 +55,20 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE042-KEY
                                    FILE    STATUS  IS  STS-RECE042.
+           SELECT  RECE042X-FILE   ASSIGN  RECE042PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE042X-KEY
+                                   FILE    STATUS  IS  STS-RECE042.
            SELECT  RECE04W-FILE    ASSIGN  RECE04WPARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE04W-KEY
+                                   FILE    STATUS  IS  STS-RECE04W.
+           SELECT  RECE04WX-FILE   ASSIGN  RECE04WPARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE04WX-KEY
                                    FILE    STATUS  IS  STS-RECE04W.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -78,10 +89,20 @@
        01  RECE042-REC. 
            COPY    "CPRCF0042.INC".
       *
+       FD  RECE042X-FILE.
+       01  RECE042X-REC. 
+           COPY    "CPRCF0042.INC" REPLACING  //RECE042//
+                                   BY         //RECE042X//.
+      *
        FD  RECE04W-FILE.
        01  RECE04W-REC. 
            COPY    "CPRCF004.INC"  REPLACING  //RECE04//
                                    BY         //RECE04W//.
+      *
+       FD  RECE04WX-FILE.
+       01  RECE04WX-REC. 
+           COPY    "CPRCF004.INC"  REPLACING  //RECE04//
+                                   BY         //RECE04WX//.
       * 
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -240,6 +261,12 @@
       *
            MOVE    "RECEERR"           TO  RECEERR-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECEERR-TERMID
+      *
+           OPEN    OUTPUT              RECE042X-FILE
+           CLOSE                       RECE042X-FILE
+      *
+           OPEN    OUTPUT              RECE04WX-FILE
+           CLOSE                       RECE04WX-FILE
       *
           .
        100-INIT-EXT.
@@ -607,5 +634,5 @@
                                         MCPDATA-REC.
       *
            .
-       900-DBCLOSE-EXT.
+       900-DBDISCONNECT-EXT.
            EXIT.

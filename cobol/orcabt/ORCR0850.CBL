@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-門脇    04.02.05  診療コード＊数量の累計編集
+      *  01.00.02    NACL-門脇    04.07.12  ファイルクリア追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -49,10 +50,20 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE842-KEY
                                    FILE    STATUS  IS  STS-RECE842.
+           SELECT  RECE842X-FILE   ASSIGN  RECE842PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE842X-KEY
+                                   FILE    STATUS  IS  STS-RECE842.
            SELECT  RECE84W-FILE    ASSIGN  RECE84WPARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE84W-KEY
+                                   FILE    STATUS  IS  STS-RECE84W.
+           SELECT  RECE84WX-FILE   ASSIGN  RECE84WPARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   RECORD  KEY     IS  RECE84WX-KEY
                                    FILE    STATUS  IS  STS-RECE84W.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -73,10 +84,20 @@
        01  RECE842-REC. 
            COPY    "CPRCF0842.INC".
       *
+       FD  RECE842X-FILE.
+       01  RECE842X-REC. 
+           COPY    "CPRCF0842.INC" REPLACING  //RECE842//
+                                   BY         //RECE842X//.
+      *
        FD  RECE84W-FILE.
        01  RECE84W-REC. 
            COPY    "CPRCF084.INC"  REPLACING  //RECE84//
                                    BY         //RECE84W//.
+      *
+       FD  RECE84WX-FILE.
+       01  RECE84WX-REC. 
+           COPY    "CPRCF084.INC"  REPLACING  //RECE84//
+                                   BY         //RECE84WX//.
       * 
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -233,6 +254,12 @@
       *
            MOVE    "RECEERR"           TO  RECEERR-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECEERR-TERMID
+      *
+           OPEN    OUTPUT              RECE842X-FILE
+           CLOSE                       RECE842X-FILE
+      *
+           OPEN    OUTPUT              RECE84WX-FILE
+           CLOSE                       RECE84WX-FILE
       *
           .
        100-INIT-EXT.
