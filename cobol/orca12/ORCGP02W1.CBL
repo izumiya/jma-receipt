@@ -1542,6 +1542,12 @@
                INITIALIZE                  HKNJAINF-REC
                MOVE    1               TO  FLG-HKNJAINF
            END-IF
+           IF      FLG-HKNJAINF        =   ZERO
+      *        保険者番号の公費種別が違う時
+               IF      HKNJA-HKNNUM    NOT =   SPA-GMN-KOHNUM (IDY)
+                   MOVE    1               TO  FLG-HKNJAINF
+               END-IF
+           END-IF
       *
       *    保険者番号あり
            IF      FLG-HKNJAINF        =   ZERO
@@ -1550,7 +1556,7 @@
                                            TO  SPA-NAI-PTKOH-KEIFLG(IDY)
            ELSE
                MOVE    SPACE               TO  SPA-PTKOH-IDOYMD(IDY)
-               MOVE    SPACE               TO  SPA-NAI-PTKOH-KEIFLG(IDY)
+               MOVE    "1"                 TO  SPA-NAI-PTKOH-KEIFLG(IDY)
            END-IF
       *
       *

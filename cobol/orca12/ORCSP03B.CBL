@@ -66,6 +66,8 @@
       *
            03  FLG-AUTO            PIC 9(01).
       *
+           03  FLG-HKNNUM-CHK      PIC 9(01).
+      *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-ERR             PIC 9(06).
@@ -391,12 +393,27 @@
                MOVE    20                  TO  SPA-GMN-CUR
                GO      TO      1001-FTNJANUM-CHK-EXT
            END-IF
-           IF     (KANACHK-MAX         <=  1   )  OR
+           IF     (KANACHK-MAX         <   1   )  OR
                   (KANACHK-MAX         >   8   )
                MOVE    "0071"              TO  SPA-ERRCD
                MOVE    20                  TO  SPA-GMN-CUR
                GO      TO      1001-FTNJANUM-CHK-EXT
            END-IF
+      *
+           IF     (SPA-GMN-FTNJANUM (IDX-K)  NOT =   SPACE ) AND
+                  (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-NAI-PTKOH-KEIFLG(IDX-K)   =   SPACE  )
+               PERFORM 10011-FTNJANUM-DB-CHK-SEC
+           END-IF
+      *
+           .
+       1001-FTNJANUM-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    法別番号チェック区分編集処理
+      *****************************************************************
+       10011-FTNJANUM-DB-CHK-SEC           SECTION.
       *
       *    保険者番号　検索チェック
            INITIALIZE                    HKNJAINF-REC
@@ -425,13 +442,25 @@
                                         ORCMCPAREA
                                         MCPDATA-REC
       *
+           IF      FLG-HKNJAINF        =   ZERO
+      *        保険判定
+               IF     (HKNJA-HKNNUM            =   "027"  )  OR
+                      (SPA-MAE-KOHNUM (IDX-K)  =   HKNJA-HKNNUM)
+                   CONTINUE
+               ELSE
+                   PERFORM 101100-HKNNUM-CHK-SEC
+                   IF      FLG-HKNNUM-CHK      =   1
+                       MOVE    1               TO  FLG-HKNJAINF
+                   END-IF
+               END-IF
+           END-IF
       *    保険者番号あり
            IF      FLG-HKNJAINF        =   ZERO
                MOVE    HKNJA-HKNNUM        TO  WRK-MAE-KOHNUM
       *
                MOVE    HKNJA-IDOYMD        TO  SPA-PTKOH-IDOYMD (IDX-K)
            ELSE
-               MOVE    SPACE               TO  SPA-NAI-PTKOH-KEIFLG
+               MOVE    "1"                 TO  SPA-NAI-PTKOH-KEIFLG
                                                                (IDX-K)
                PERFORM 10110-KOHHBTNUMKBN-SEC
                IF      WRK-KOHHBTNUMKBN    =   ZERO
@@ -480,39 +509,75 @@
                END-IF
            END-IF
       *
-           IF      WRK-MAE-KOHNUM      =   SPACE
-               GO      TO      1001-FTNJANUM-CHK-EXT
-           END-IF
-      *    更新の時、保険区分変更時、エラーとする
-           MOVE    SPA-NAI-PTKOH-EDANUM (IDX-K)    TO  IDX-K2
-           IF     (IDX-K2                  >   ZERO      ) AND
-                  (SPA-PTKOH-SINKIKBN (IDX-K2)
-                                           =   SPACE    )  AND
-                  (SPA-MAE-KOHNUM (IDX-K)
-                                       NOT =   SPACE    )
-               IF      WRK-MAE-KOHNUM  NOT =   SPA-MAE-KOHNUM(IDX-K)
-                   PERFORM 10011-HKNNUM-HENCHK-SEC
-      *********    IF      SPA-GMN-FTNJANUM (IDX-K)
-      *                                NOT =   SPA-MAE-FTNJANUM(IDX-K)
-      *                MOVE    "0074"          TO  SPA-ERRCD
-      *                MOVE    20              TO  SPA-GMN-CUR
-      ************ END-IF
-               END-IF
+           IF     (WRK-MAE-KOHNUM      =   SPACE )  OR
+                  (SPA-ERRCD       NOT =   SPACE )
+               CONTINUE
            ELSE
-               IF      SPA-GMN-KOHNUM(IDX-K)   =   SPACE
-                   MOVE    WRK-MAE-KOHNUM      TO  SPA-GMN-KOHNUM(IDX-K)
-                   MOVE    SPACE               TO  SPA-GMN-KOHKBN(IDX-K)
+      *    更新の時、保険区分変更時、エラーとする
+               MOVE    SPA-NAI-PTKOH-EDANUM (IDX-K)    TO  IDX-K2
+               IF     (IDX-K2              >   ZERO  ) AND
+                      (SPA-PTKOH-SINKIKBN (IDX-K2)
+                                           =   SPACE  )  AND
+                      (SPA-MAE-KOHNUM (IDX-K)
+                                       NOT =   SPACE    )
+                   IF      WRK-MAE-KOHNUM  NOT =   SPA-MAE-KOHNUM(IDX-K)
+                       PERFORM 10011-HKNNUM-HENCHK-SEC
+                   END-IF
+               ELSE
+                   IF      SPA-GMN-KOHNUM(IDX-K)   =   SPACE
+                       MOVE    WRK-MAE-KOHNUM  TO  SPA-GMN-KOHNUM(IDX-K)
+                       MOVE    SPACE           TO  SPA-GMN-KOHKBN(IDX-K)
       *            Ｈ１４．１０以降、老人の初期値は０１とする
-                   IF      (SPA-SYSYMD         >=  "20021001" )  AND
-                           (WRK-MAE-KOHNUM     =   "027"      )
-                       MOVE    "1"             TO  SPA-GMN-KOHKBN(IDX-K)
+                       IF      (SPA-SYSYMD         >=  "20021001" ) AND
+                               (WRK-MAE-KOHNUM     =   "027"      )
+                           MOVE    "1"         TO  SPA-GMN-KOHKBN(IDX-K)
+                       END-IF
                    END-IF
                END-IF
            END-IF
       *
            .
-       1001-FTNJANUM-CHK-EXT.
+       10011-FTNJANUM-DB-CHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    法別番号チェック区分編集処理
+      *****************************************************************
+       101100-HKNNUM-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HKNNUM-CHK
+           MOVE    SPACE               TO  HKNNUM-REC
+           MOVE    HKNJA-HOSPID        TO  HKN-HOSPID
+           MOVE    HKNJA-HKNNUM        TO  HKN-HKNNUM
+           MOVE    ZERO                TO  HKN-PAYKBN
+      *
+           MOVE    HKNNUM-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "HKNNUM-KEY7"       TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "HKNNUM-KEY7"   TO  ORC-DBPATH
+               PERFORM 921-HKNMST-NEXT-SEC
+           ELSE
+               INITIALIZE              HKNNUM-REC
+               MOVE    1               TO  FLG-HKNNUM
+           END-IF
+      *
+           IF      FLG-HKNNUM          =   ZERO
+      *        保険公費種別区分
+               IF      HKN-HKNKOHSBTKBN    =   "1"  OR  "4"
+                                           OR  "8"  OR  "9"
+                   MOVE    1               TO  FLG-HKNNUM-CHK
+               END-IF
+           END-IF
+      *
+           .
+       101100-HKNNUM-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    法別番号チェック区分編集処理
@@ -581,6 +646,11 @@
            END-IF
            MOVE    ZERO                TO  FLG-OK
            PERFORM UNTIL     FLG-HKNNUM    =   1
+             IF      HKN-HKNKOHSBTKBN    =   "1"  OR  "4"
+                                         OR  "8"  OR  "9"
+                 CONTINUE
+             ELSE
+      *
                IF      SPA-MAE-KOHNUM (IDX-K)  NOT =   SPACE
                    IF      HKN-HKNNUM      =   SPA-MAE-KOHNUM (IDX-K)
                        MOVE    1               TO  FLG-OK
@@ -592,6 +662,7 @@
                    MOVE    HKN-HKNNUM      TO  WRK-MAE-KOHNUM
                    MOVE    1               TO  FLG-HKNNUM
                END-IF
+             END-IF
       *
                IF      FLG-HKNNUM          =   ZERO
                    MOVE    "HKNNUM-KEY4"       TO  ORC-DBPATH
@@ -857,6 +928,9 @@
                                        TO  KANACHK-MAE-INPUT
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
+           IF      KANACHK-RC2         =   7
+               MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-JKYSNUM (IDX-K)
+           END-IF
            IF      KANACHK-RC      NOT =   ZERO
       *        半角・全角混在エラー
                MOVE    "0075"              TO  SPA-ERRCD
@@ -869,10 +943,10 @@
                MOVE    22                  TO  SPA-GMN-CUR
                GO  TO                 1001-JKYSNUM-CHK-EXT
            END-IF
-           IF      KANACHK-MAX         <=  1
-               MOVE    "0076"              TO  SPA-ERRCD
-               MOVE    22                  TO  SPA-GMN-CUR
-           END-IF
+      *****IF      KANACHK-MAX         <=  1
+      *        MOVE    "0076"              TO  SPA-ERRCD
+      *        MOVE    22                  TO  SPA-GMN-CUR
+      *****END-IF
       *    全角の時、すべてのチェックをはずす
            IF     (KANACHK-RC          =   ZERO  )  AND
                   (KANACHK-SYUBETU     =   2     )
@@ -1092,9 +1166,6 @@
                CONTINUE
            ELSE
                PERFORM 2005-IDOYMD-CHECK-SEC
-               IF      SPA-ERRCD       NOT =   SPACE
-                   GO      TO      200-KANREN-CHK-EXT
-               END-IF
            END-IF
       *
            .
