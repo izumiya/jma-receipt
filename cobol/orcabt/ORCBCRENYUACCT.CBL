@@ -620,7 +620,8 @@
                        MOVE    1           TO  FLG-NYUINACCT-MAE-CHK
                    END-IF
       *            ¿©»ö
-                   IF    ( NACCT-ZAISKBKBN     =    "4"    )
+                   IF    ( NACCT-ZAISKBKBN     =    "4"    )   AND
+                         ( NACCT-ZAITEN        =    ZERO   )
                        MOVE    ZERO      TO   IDX-SHOKUJI
                        PERFORM VARYING IDX-SHOKUJI FROM IDX-DAY BY -1
                           UNTIL (IDX-SHOKUJI  < 1)
