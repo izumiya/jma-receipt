@@ -130,6 +130,8 @@
       *  01.08.04    NACL-藤原    04/03/09  手術歴の追加
       *  01.08.05    NACL-藤原    04/03/29  主病名の確認画面後の更新の修正
       *  01.08.06    NACL-藤原    04/03/30  開始日と保険組合せのチェックの修正
+      *  01.08.07    NACL-藤原    04/04/05  ＣＤ検索からの病名コードの
+      *                                     編集の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1634,6 +1636,8 @@
                                UNTIL   IDX3    >       21
                                OR      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
                                                        =   SPACE
+                               OR      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
+                                                       =   ALL "9"
                            MOVE    SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
                                        TO  SPA-NAI-C02-BYOMEICD-O
                                                           (IDZ IDX3)
