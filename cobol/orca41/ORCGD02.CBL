@@ -211,6 +211,7 @@
            03  FLG-KYUSEI          PIC 9(01).
            03  FLG-ERR             PIC 9(01).
            03  FLG-ENTRYCHK        PIC 9(01).
+           03  FLG-RECEDEN         PIC 9(01).
       *
        01  COUNT-AREA.
            03  CNT-BYOMEIMOJI      PIC 9(05).
@@ -3117,15 +3118,18 @@
                                ((W-TENKIYM           = SPACE)  OR
                                 (W-TENKIYM           = ZERO)   OR
                                 (W-TENKIYM       NOT < ACCT-SRYYM))
-                               IF    ( PTBYO-BYOMEICD (1)  = "0000999" )
-                                 OR  ( PTBYO-BYOMEIHENFLG  = "1" )
+                               PERFORM 2001-RECEDEN-CHK-SEC
+                               IF    ( FLG-RECEDEN   = 1 )
+                                 IF  ( PTBYO-BYOMEICD (1)  = "0000999" )
+                                  OR ( PTBYO-BYOMEIHENFLG  = "1" )
       *
                                    PERFORM 2001-PTBYO-STRLEN-CHK-SEC
-                               ELSE
+                                 ELSE
                                    PERFORM 2001-MICODKASYOBYOMEI-CHK-SEC
                                    IF ( FLG-MICODSYOBYO   =  1 )
                                        PERFORM 2001-PTBYO-STRLEN-CHK-SEC
                                    END-IF
+                                 END-IF
                                END-IF
       *
                            END-IF
@@ -6016,6 +6020,32 @@
        910-DBCLOSE-EXT.
            EXIT.
       *****************************************************************
+      *    レセ電処理チェック処理
+      *****************************************************************
+       2001-RECEDEN-CHK-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-RECEDEN
+      *
+           INITIALIZE                      SYS-2005-REC
+           MOVE    "2005"              TO  SYS-2005-KANRICD
+           MOVE    "*"                 TO  SYS-2005-KBNCD
+           MOVE    SYS-2005-REC        TO  MCPDATA-REC
+           MOVE    T-SINRYOU-AREA      TO  ORC-DBYMD (1:6)
+           MOVE    "01"                TO  ORC-DBYMD (7:2)
+           PERFORM 900-SYSKANRI-KEY-SEL-SEC
+           MOVE    MCPDATA-REC         TO  SYS-2005-REC
+           IF    ( SYS-2005-KKHRECEKBN =   "1" )
+            OR   ( SYS-2005-SYARECEKBN =   "1" )
+      *
+               MOVE    1               TO  FLG-RECEDEN
+      *
+           END-IF
+      *
+           .
+      *
+       2001-RECEDEN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    病名文字列長チェック処理
       *****************************************************************
        2001-PTBYO-STRLEN-CHK-SEC       SECTION.
@@ -6029,6 +6059,8 @@
            MOVE    "2005"              TO  SYS-2005-KANRICD
            MOVE    "*"                 TO  SYS-2005-KBNCD
            MOVE    SYS-2005-REC        TO  MCPDATA-REC
+           MOVE    T-SINRYOU-AREA      TO  ORC-DBYMD (1:6)
+           MOVE    "01"                TO  ORC-DBYMD (7:2)
            PERFORM 900-SYSKANRI-KEY-SEL-SEC
            MOVE    MCPDATA-REC         TO  SYS-2005-REC
            IF    ( SYS-2005-SYUBYOHENFLG   =   "0" )
