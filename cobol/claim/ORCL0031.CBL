@@ -40,6 +40,7 @@
       *  01.00.05    NACL-多々納  04/02/27  保険修正
       *  01.00.06    NACL-藤原    04/03/19  病名検索にサブパラメタ追加
       *  01.00.07    NACL-藤原    04/03/22  更新エラー時の処理終了
+      *  01.00.08    NACL-多々納  04/03/29  外用回数編集修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1521,23 +1522,23 @@
                PERFORM 200321-INPUTCHI-HEN-SEC
            ELSE
       *
-      *    数量
-           MOVE    ZERO                TO  WRK-SURYO
-           INITIALIZE                      ORCSNUMAREA
-           MOVE    LF04-SURYO (IDX1 IDX2)
-                                       TO  SNUM-INX
-           CALL    "ORCSNUM"           USING
-                                       ORCSNUMAREA
-           IF     (SNUM-RC         NOT =   ZERO  )   OR
-                  (SNUM-MINKBN         =   "1"   )   OR
-                  (SNUM-SEISUU         >   7     )   OR
-                  (SNUM-SYOSUU         >   3     )
-      *        MOVE    "0012"              TO  SPA-ERRCD
-               MOVE    SNUM-OUTNUM         TO  WRK-SURYO
-           ELSE
-               MOVE    SNUM-OUTNUM         TO  WRK-SURYO
-           END-IF
-           MOVE    WRK-SURYO           TO  TBL-WKSRY-SRYSURYO
+      *        数量
+               MOVE    ZERO                TO  WRK-SURYO
+               INITIALIZE                      ORCSNUMAREA
+               MOVE    LF04-SURYO (IDX1 IDX2)
+                                           TO  SNUM-INX
+               CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+               IF     (SNUM-RC         NOT =   ZERO  )   OR
+                      (SNUM-MINKBN         =   "1"   )   OR
+                      (SNUM-SEISUU         >   7     )   OR
+                      (SNUM-SYOSUU         >   3     )
+      *            MOVE    "0012"              TO  SPA-ERRCD
+                   MOVE    SNUM-OUTNUM         TO  WRK-SURYO
+               ELSE
+                   MOVE    SNUM-OUTNUM         TO  WRK-SURYO
+               END-IF
+               MOVE    WRK-SURYO           TO  TBL-WKSRY-SRYSURYO
                                                      (TBL-MAX IDX-S)
       *
            END-IF
@@ -1561,6 +1562,35 @@
                                                        (TBL-MAX IDX-S)
                END-IF
            END-IF
+      *
+      *    外用薬で薬剤の時、回数を編集
+           IF      (TBL-WKSRY-SRYKBN (TBL-MAX)     =   "23" )  AND
+                   (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1) =   "6" )
+      *        回数
+               MOVE    ZERO                TO  WRK-KAISU
+               INITIALIZE                      ORCSNUMAREA
+               MOVE    LF04-KAISU (IDX1)   TO  SNUM-INX
+               CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+               IF     (SNUM-RC         NOT =   ZERO  )   OR
+                      (SNUM-MINKBN         =   "1"   )   OR
+                      (SNUM-SEISUU         >   7     )   OR
+                      (SNUM-SYOSUU         >   3     )
+                   MOVE    1                   TO  WRK-KAISU
+               ELSE
+                   MOVE    SNUM-OUTNUM         TO  WRK-KAISU
+               END-IF
+      *        総量へ変更
+               IF      TBL-WKSRY-SRYSURYO (TBL-MAX IDX-S)  >   ZERO
+                   COMPUTE WRK-SURYO       =   TBL-WKSRY-SRYSURYO
+                                                     (TBL-MAX IDX-S)
+                                           *   WRK-KAISU
+                   MOVE    WRK-SURYO       TO  TBL-WKSRY-SRYSURYO
+                                                     (TBL-MAX IDX-S)
+               END-IF
+               MOVE    WRK-KAISU       TO  TBL-WKSRY-SRYKAISU
+                                                       (TBL-MAX IDX-S)
+            END-IF
       *
            .
        20032-ZAITBLSET-EXT.
@@ -1667,8 +1697,16 @@
            ELSE
                MOVE    SNUM-OUTNUM         TO  WRK-KAISU
            END-IF
-           MOVE    WRK-KAISU           TO  TBL-WKSRY-ZAIKAIKEI 
+      *    剤回数計
+           IF      TBL-WKSRY-SRYKBN(01)    =   "23" 
+      *        外用薬
+               MOVE    1                   TO  TBL-WKSRY-ZAIKAIKEI 
                                                      (TBL-MAX)
+           ELSE
+      *        外用薬以外
+               MOVE    WRK-KAISU           TO  TBL-WKSRY-ZAIKAIKEI 
+                                                     (TBL-MAX)
+           END-IF
       *
       *    ワーク診療行為作成
            PERFORM 20042-WKSRYCD-INS-SEC
