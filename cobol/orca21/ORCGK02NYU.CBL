@@ -8124,6 +8124,9 @@
                                        TO  SPA-DOUJI-RENNUM
            MOVE    SPA-SRYYMD          TO  SPA-NAI-SRYYMD
            MOVE    SPA-SRYYMDW         TO  SPA-GMN-SRYYMD
+      *
+      *    入院が存在するかのチェック
+           PERFORM 410101-NYUINRRK-CHK-SEC
       *    診療科
            MOVE    SPA-NAI-RRK-SRYKA(SPA-NAI-DOSELNUM)
                                        TO  SPA-SRYKA
@@ -8137,9 +8140,6 @@
       *
       *    訂正処理
            MOVE    1                   TO  SPA-SYORIFLG
-      *
-      *    入院が存在するかのチェック
-           PERFORM 410101-NYUINRRK-CHK-SEC
       *
       *    ＳＰＡ編集処理
            INITIALIZE                  SPA-SCR-REC
