@@ -146,9 +146,9 @@
            03  IDX-DOJI1           PIC 9(04).
            03  IDX-DOJI2           PIC 9(04).
       *
-           03  IDX-XSEN             PIC 9(01).
-           03  IDX-KAKUI            PIC 9(01).
-           03  IDX-CTMRI            PIC 9(01).
+           03  IDX-XSEN             PIC 9(04).
+           03  IDX-KAKUI            PIC 9(04).
+           03  IDX-CTMRI            PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -3176,6 +3176,8 @@
                MOVE    TNS-TEN         TO  LNK-ORCSC-TENSU
                                                        (08 IDXS)
                MOVE    WRK-HKNCOMBI    TO  LNK-ORCSC-HKNCOMBI
+                                                       (08 IDXS)
+               MOVE    WRK-SRYKA       TO  LNK-ORCSC-SRYKA
                                                        (08 IDXS)
                MOVE    WRK-SRYCD       TO  LNK-ORCSC-SRYCD
                                                        (08 IDXS)
