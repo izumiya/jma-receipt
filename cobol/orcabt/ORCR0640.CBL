@@ -109,6 +109,7 @@
       *  01.01.21    NACL-ÌçÏÆ    04/11/22  ¥Õ¥£¥ë¥àÅÀ¿ô·×»»
       *                                     ¡Ê¿Ç¶è£´£°¡¢£µ£°¡¢£µ£´¡¢£¶£°¡Ë
       *  01.01.22    NACL-¾®Æ¦Âô  04/12/08  ÅÀ¿ô¥Õ¥é¥°¤Î½é´ü²½ÄÉ²Ã
+      *  01.02.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6648,6 +6649,8 @@
              OR  ((WRK-PREFNUM               =  "28"          )   AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "186"         )   AND
                   (RECE62-SRYYM             >=  "200310"      ))
+             OR  ((RECE62-KOHNUM(KOHFTN-IDX) =  "052"         )   AND
+                  (RECE62-SRYYM             >=  "200504"      ))
       *
                 COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(KOHFTN-IDX + 1)
                                      + WRK-SKJ-FTN(KOHFTN-IDX + 1)
