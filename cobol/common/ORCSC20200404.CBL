@@ -1401,8 +1401,6 @@
                    (LNK-ORCSC-SYONIKA-ARI  NOT =   ZERO) OR
                    (LNK-ORCSC-SEIKATU-ARI2     >   ZERO) OR
                    (LNK-ORCSC-SEIKATU-ARI      >   ZERO)
-      *             ºßÂðËö´ü°åÎÅÁí¹ç¿Ç»¡ÎÁ¤¢¤ê
-               OR  (SPA-ZAIMATU-ARI            >   ZERO )
                CONTINUE
            ELSE
                MOVE    1                   TO  FLG-SYOHO-CHK
