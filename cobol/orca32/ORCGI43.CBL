@@ -70,6 +70,10 @@
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
+           03  IDX1                PIC 9(04).
+           03  IDX2                PIC 9(04).
+           03  IDX3                PIC 9(04).
+           03  IDX4                PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
       *
@@ -562,12 +566,6 @@
       *****************************************************************
        314-SYOKI-SEC             SECTION.
       *
-      *    ½é´üÊÔ½¸
-           IF      SPA-MOTOPG(1:3)     =   "I41"
-               MOVE    SPA-GMN-SRYKA-IG-41     TO  SPA-I43-SRYKA-G
-               MOVE    SPA-I43-HKN-LIST(01)    TO  SPA-I43-HKNCOMBI-G
-           END-IF.
-      *
       *    ÊÝ¸±ÁÈ¹ç¤»¤ÎºÆÊÔ½¸
            INITIALIZE                  WRK-I43-HKNCOMB-COMB.
            INITIALIZE                  WRK-I43-NSRYKA-AREA.
@@ -614,13 +612,24 @@
            END-IF.
       *
            MOVE    ZERO                TO  WRK-HKNCOMBI.
+           MOVE    ZERO                TO  IDX3.
            MOVE    SPACE               TO  WRK-NSRYKA.
            PERFORM UNTIL    FLG-NYUINACCT     =   1
                PERFORM VARYING     IDX     FROM    1   BY  1
                        UNTIL       IDX     >   WRK-I43-HKNMAX
-                   IF      NACCT-HKNCOMBI
-                                       =   WRK-I43-THKNCOMBINUM (IDX)
-                       MOVE    "1"             TO  WRK-I43-FLG (IDX)
+                   IF      NACCT-ZAISKBKBN   =   "5"
+                       PERFORM VARYING     IDX1    FROM    1   BY  1
+                               UNTIL       IDX1    >   31
+                           IF     (NACCT-DAY (IDX1) >= 1)   AND
+                                  (NACCT-DAY (IDX1) <= 10)
+                               MOVE    NACCT-DAY (IDX1)   TO  IDX2
+                               MOVE    "1"                TO
+                                                     WRK-I43-FLG (IDX2)
+                               IF     IDX3   =   ZERO
+                                   MOVE    NACCT-DAY (IDX1)   TO  IDX3
+                               END-IF
+                           END-IF
+                       END-PERFORM
                    END-IF
                END-PERFORM
       *
@@ -641,8 +650,20 @@
                    MOVE    WRK-I43-THKNCOMBIMEI (IDX)
                                       TO  SPA-I43-THKNCOMBIMEI
                                                 (SPA-I43-HKNMAX)
+                  IF     IDX   =   IDX3
+                      MOVE    SPA-I43-HKNMAX   TO  IDX4
+                  END-IF
                END-IF
            END-PERFORM.
+      *
+      *    ½é´üÊÔ½¸
+           IF      SPA-MOTOPG(1:3)     =   "I41"
+               MOVE    SPA-GMN-SRYKA-IG-41     TO  SPA-I43-SRYKA-G
+               IF     IDX4   =   ZERO
+                   MOVE    01                TO  IDX4
+               END-IF
+               MOVE    SPA-I43-HKN-LIST(IDX4)  TO  SPA-I43-HKNCOMBI-G
+           END-IF.
       *
        314-SYOKI-EXT.
            EXIT.
