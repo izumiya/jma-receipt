@@ -1329,30 +1329,6 @@
                GO      TO      1001-SYONIKA-CHK-EXT
            END-IF
       *
-      **** 当月算定チェック
-      *    MOVE    ZERO                TO  WRK-NYUYOJI
-      *    MOVE    ZERO                TO  WRK-DAYCNT-SUM
-      *    院外処方   初診
-      *    MOVE    "113003510"         TO  WRK-SRYCD
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    ADD     SANTEI-MSANTEICNT   TO  WRK-NYUYOJI
-      *    ADD     WRK-DAYCNT          TO  WRK-DAYCNT-SUM
-      *    院外処方   再診
-      *    MOVE    "113003610"         TO  WRK-SRYCD
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    ADD     SANTEI-MSANTEICNT   TO  WRK-NYUYOJI
-      *    ADD     WRK-DAYCNT          TO  WRK-DAYCNT-SUM
-      *    院内処方   初診
-      *    MOVE    "113003710"         TO  WRK-SRYCD
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    ADD     SANTEI-MSANTEICNT   TO  WRK-NYUYOJI
-      *    ADD     WRK-DAYCNT          TO  WRK-DAYCNT-SUM
-      *    院内処方   再診
-      *    MOVE    "113003810"         TO  WRK-SRYCD
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    ADD     SANTEI-MSANTEICNT   TO  WRK-NYUYOJI
-      **** ADD     WRK-DAYCNT          TO  WRK-DAYCNT-SUM
-      *
       *    ３歳の当月時、当月算定がなければ対象外
            IF     (SPA-NENREI-YY   =   3               )  AND
                   (WRK-BIRTHDAY(1:6)   =   SPA-SRYYMD (1:6))
@@ -1385,10 +1361,6 @@
                GO      TO      1002-NETAKIRI-CHK-EXT
            END-IF
       *
-      *    MOVE    ZERO                TO  FLG-TOUG-SANTEI
-      *    MOVE    ZERO                TO  SPA-NETAKIRI-ARI
-      *    MOVE    ZERO                TO  SPA-NETAKIRI-ARI2
-      *
            MOVE    ZERO                TO  WRK-SANTEI-CNT
       *    院外処方あり
            MOVE    "114701210"         TO  WRK-SRYCD
@@ -1413,7 +1385,8 @@
       *
       *    ２４時間連帯加算
            MOVE    SPACE               TO  WRK-24KSAN-SRYCD
-           IF      WRK-SANTEI-NASI     NOT =   SPACE
+           IF     (WRK-SANTEI-NASI     NOT =   SPACE )  OR
+                  (WRK-SANTEI-ARI      NOT =   SPACE )
                PERFORM 10021-24KASAN-SET-SEC
            END-IF
       *
@@ -1430,7 +1403,14 @@
            INITIALIZE                  SANTEI-REC
            MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
            MOVE    SPA-PTID            TO  SANTEI-PTID
-           MOVE     WRK-SANTEI-NASI    TO  SANTEI-SRYYM
+      *
+           IF     (WRK-SANTEI-NASI     NOT =   SPACE )  AND
+                  (WRK-SANTEI-NASI         >   WRK-SANTEI-ARI)
+               MOVE    WRK-SANTEI-NASI     TO  SANTEI-SRYYM
+           ELSE
+               MOVE    WRK-SANTEI-ARI      TO  SANTEI-SRYYM
+           END-IF
+      **** MOVE    WRK-SANTEI-NASI     TO  SANTEI-SRYYM
       *
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
@@ -1469,153 +1449,6 @@
            .
        1002-NETAKIRI-CHK-EXT.
            EXIT.
-      *****************************************************************
-      *    老人慢性疾患外来総合診療科算定回数処理
-      *****************************************************************
-      *1003-ROUMANSEI-CHK-SEC          SECTION.
-      *
-      *    MOVE    ZERO                TO  FLG-ROUMANSEI
-      *    MOVE    ZERO                TO  SPA-ROUMANSEI-ARI
-      *    MOVE    ZERO                TO  SPA-ROUMANSEI-ARI2
-      *
-      *    MOVE    ZERO                TO  WRK-SANTEI-CNT
-      *    MOVE    ZERO                TO  WRK-ROUMANSEI-CNT
-      *
-      *    MOVE    SPACE               TO  WRK-SRYCD
-      *    老人慢性疾病外来診療科の算定チェック
-      *    MOVE    ZERO                TO  WRK-ROUMANSEI
-      *    MOVE    ZERO                TO  WRK-ROUMANSEI2
-      *
-      *    院外処方
-      *    MOVE    "113701010"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-ROUMANSEI
-      *    END-IF
-      *    院内処方１回目
-      *    MOVE    "113701110"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-ROUMANSEI
-      *        ADD     1                   TO  WRK-ROUMANSEI2
-      *    END-IF
-      *    院内処方２回目
-      *    MOVE    "113701510"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-ROUMANSEI
-      *    END-IF
-      *
-      *    算定回数
-      *    MOVE    WRK-SANTEI-CNT      TO  WRK-ROUMANSEI-CNT
-      *
-      *    当月に算定時、フラグをセットする
-      *    IF      WRK-ROUMANSEI       >   ZERO
-      *        MOVE    1                   TO  SPA-ROUMANSEI-ARI
-      *        IF      WRK-ROUMANSEI2      >   ZERO
-      *            MOVE    2                   TO  SPA-ROUMANSEI-ARI
-      *        END-IF
-      *    END-IF
-      *
-      *    算定回数セット
-      *    MOVE    WRK-ROUMANSEI       TO  SPA-ROUMANSEI-ARI2
-      *    .
-      *1003-ROUMANSEI-CHK-EXT.
-      *****EXIT.
-      *
-      *****************************************************************
-      *    在宅末期医療総合診察料チェック処理
-      *****************************************************************
-      *1008-ZAIMATU-CHK-SEC            SECTION.
-      *
-      *    MOVE    ZERO                TO  SPA-ZAIMATU-ARI
-      *    MOVE    ZERO                TO  SPA-ZAIMATU-ARI2
-      *
-      *    在宅末期医療総合診察料（院外処方）
-      *    MOVE    "114007610"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        MOVE    1                   TO  SPA-ZAIMATU-ARI2
-      *    END-IF
-      *    在宅末期医療総合診察料（院内処方）
-      *    MOVE    "114007710"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        MOVE    1                   TO  SPA-ZAIMATU-ARI2
-      *    END-IF
-      *    .
-      *1008-ZAIMATU-CHK-EXT.
-      *    EXIT.
-      *
-      *****************************************************************
-      *    生活習慣病指導管理料算定チェック処理
-      *****************************************************************
-      *1007-SEIKATU-CHK-SEC              SECTION.
-      *
-      *    MOVE    ZERO                TO  SPA-SEIKATU-ARI
-      *    MOVE    ZERO                TO  SPA-SEIKATU-ARI2
-      *
-      *    MOVE    ZERO                TO  WRK-SANTEI-CNT
-      *    MOVE    ZERO                TO  WRK-SEIKATU-CNT
-      *
-      *    高血圧症（院外処方）
-      *    MOVE    "113003910"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-SEIKATU-CNT
-      *    END-IF
-      *    高血圧症（院内処方）
-      *    MOVE    "113004010"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-SEIKATU-CNT
-      *    END-IF
-      *
-      *    高脂血症（院外処方）
-      *    MOVE    "113005810"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-SEIKATU-CNT
-      *    END-IF
-      *    高脂血症（院内処方）
-      *    MOVE    "113006010"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-SEIKATU-CNT
-      *    END-IF
-      *
-      *    糖尿病（院外処方）
-      *    MOVE    "113005910"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-SEIKATU-CNT
-      *    END-IF
-      *    糖尿病（院内処方）
-      *    MOVE    "113006110"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        ADD     FLG-TOUG-SANTEI     TO  WRK-SEIKATU-CNT
-      *    END-IF
-      *
-      *    IF      WRK-SEIKATU-CNT      >   ZERO
-      *        MOVE    1               TO  SPA-SEIKATU-ARI
-      *        MOVE    1               TO  SPA-SEIKATU-ARI2
-      *    END-IF
-      *
-      *    .
-      *1007-SEIKATU-CHK-EXT.
-      *****EXIT.
       *
       *****************************************************************
       *    慢性疼痛疾病管理料算定チェック処理
@@ -1644,61 +1477,6 @@
            .
        1004-TOUTUU-CHK-EXT.
            EXIT.
-      *
-      *****************************************************************
-      *    消炎鎮痛処置算定チェック処理
-      *****************************************************************
-      *1005-SYOUEN-CHK-SEC              SECTION.
-      *
-      *    MOVE    ZERO                TO  SPA-SYOEN-CNT
-      *
-      *    器具等による療法
-      *    MOVE    "140040310"         TO  WRK-SRYCD
-      *    MOVE    ZERO                TO  WRK-SYOEN-CNT
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    IF      WRK-SYOEN-CNT       >   ZERO
-      *        ADD     WRK-SYOEN-CNT       TO  SPA-SYOEN-CNT
-      *    END-IF
-      *
-      *    湿布処置１
-      *    MOVE    "140002210"         TO  WRK-SRYCD
-      *    MOVE    ZERO                TO  WRK-SYOEN-CNT
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    IF      WRK-SYOEN-CNT       >   ZERO
-      *        ADD     WRK-SYOEN-CNT       TO  SPA-SYOEN-CNT
-      *    END-IF
-      *
-      *    湿布処置２
-      *    MOVE    "140002310"         TO  WRK-SRYCD
-      *    MOVE    ZERO                TO  WRK-SYOEN-CNT
-      *    PERFORM 33031-JYURRK-CHK-SEC
-      *    IF      WRK-SYOEN-CNT       >   ZERO
-      *        ADD     WRK-SYOEN-CNT       TO  SPA-SYOEN-CNT
-      *    END-IF
-      *
-      *    .
-      *1005-SYOUEN-CHK-EXT.
-      **** EXIT.
-      *
-      *****************************************************************
-      *    外来管理加算算定付加チェック処理
-      *****************************************************************
-      *1006-GAIRAI-CHK-SEC              SECTION.
-      *
-      *    痴呆患者在宅指導管理料
-      *    MOVE    "113700310"         TO  WRK-SRYCD
-      *    PERFORM 33051-JYURRK-MAECHK-SEC
-      *    当月算定あり
-      *    IF      FLG-TOUG-SANTEI     >   ZERO
-      *        MOVE    1               TO  SPA-GAIRAI-NASI
-      *    ELSE
-      *        MOVE    ZERO            TO  SPA-GAIRAI-NASI
-      *    END-IF
-      *
-      *
-      *    .
-      *1006-GAIRAI-CHK-EXT.
-      *****EXIT.
       *
       *****************************************************************
       *    労災の時の処理
@@ -1778,36 +1556,6 @@
                END-IF
                MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD3
            END-IF
-      *
-      *    療養の給付請求書取扱料のチェック
-      *****MOVE    SPACE               TO  WRK-HASSYOYMD
-      *    MOVE    "101130020"         TO  WRK-SRYCD
-      *    PERFORM 10001-RSI-JYURRK-CHK-SEC
-      *    IF      WRK-HASSYOYMD       =   SPACE
-      *        MOVE    ZERO                TO  SPA-RSI-KYUFU
-      *    ELSE
-      *        MOVE    1                   TO  SPA-RSI-KYUFU
-      *        IF      SPA-SYORIFLG        =   1
-      *            IF      WRK-HASSYOYMD       =   SPA-SRYYMD
-      *                MOVE    ZERO                TO  SPA-RSI-KYUFU
-      *            END-IF
-      *        END-IF
-      *    END-IF
-      *
-      *    手指の創傷に係る機能回復始動加算
-      *    MOVE    SPACE               TO  WRK-HASSYOYMD
-      *    MOVE    "101500080"         TO  WRK-SRYCD
-      *    PERFORM 10001-RSI-JYURRK-CHK-SEC
-      *    IF      WRK-HASSYOYMD       =   SPACE
-      *        MOVE    ZERO                TO  SPA-RSI-KAIFUKU
-      *    ELSE
-      *        MOVE    1                   TO  SPA-RSI-KAIFUKU
-      *        IF      SPA-SYORIFLG        =   1
-      *            IF      WRK-HASSYOYMD       =   SPA-SRYYMD
-      *                MOVE    ZERO                TO  SPA-RSI-KAIFUKU
-      *            END-IF
-      *        END-IF
-      *****END-IF
       *
       *    受診履歴より診察回数を求める
            PERFORM 1000-SINSATU-KAISU-SEC
@@ -4204,190 +3952,6 @@
        900-SYOSIN-CHK-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    中途終了選択時編集処理
-      *****************************************************************
-      *1000-WKSRYACT-HEN-SEC           SECTION.
-      *
-      *    MOVE    ZERO                TO  FLG-JIKAN
-      *
-      *    MOVE    SPA-TERMID          TO  FILE-TERMID2
-      *    OPEN    INPUT              PARA-FILE
-      *
-      *    IF      STS-PARA           =  ZERO
-      *        PERFORM 980-PARA-READ-SEC
-      *    ELSE
-      *        MOVE    1               TO  FLG-PARA 
-      *    END-IF
-      *    MOVE    ZERO                TO  FLG-SINSATU-OK
-      *    MOVE    ZERO                TO  LNK-SC10S-ZAINUM-AREA
-      *    MOVE    ZERO                TO  IDX-WK
-      *    PERFORM
-      *        UNTIL   FLG-PARA            =   1
-      *        IF      PARA-FILEMEI        =   "WKSRYACT"
-      *            MOVE    PARA-DATA-REC       TO  WKSRYACT-REC
-      *            PERFORM 10001-SRYCD-CHK-SEC
-      *        END-IF
-      *
-      *        PERFORM 980-PARA-READ-SEC
-      *    END-PERFORM
-      *
-      *    CLOSE                       PARA-FILE
-      *
-      *    PERFORM 100-SANTEI-CHK-SEC
-      *    診察料自動発生あり
-      *    IF      FLG-SINSATU-OK      =   1
-      *        PERFORM 200-SYOSIN-SET-SEC
-      *        IF      FLG-JIKAN       NOT =   ZERO
-      *            MOVE    SPA-GMN-INPUTCD(01) TO  WRK-INPUTCD
-      *            MOVE    SPACE               TO  SPA-GMN-INPUTCD(01)
-      *            MOVE    FLG-JIKAN           TO  SPA-GMN-INPUTCD(01)
-      *                                                         (1:1)
-      *            MOVE    WRK-INPUTCD         TO  SPA-GMN-INPUTCD(01)
-      *                                                         (3:1)
-      *        END-IF
-      *        診察料算定済み
-      *        MOVE    1               TO  LNK-SC10S-SINSATU
-      *    END-IF
-      *
-      *    .
-      *1000-WKSRYACT-HEN-EXT.
-      *    EXIT.
-      *****************************************************************
-      *    診療コードチェック処理
-      *****************************************************************
-      *10001-SRYCD-CHK-SEC             SECTION.
-      *
-      *    MOVE    ZERO                TO  FLG-CHK
-      *    MOVE    ZERO                TO  FLG-ARI
-      *    MOVE    ZERO                TO  FLG-DUMMY
-      *    診療区分
-      *    IF      WKSRY-SRYKBN        =   "11"  OR  "12"  OR
-      *                                    "13"  OR  "14"
-      *        CONTINUE
-      *    ELSE
-      *        GO      TO      10001-SRYCD-CHK-EXT
-      *    END-IF
-      *
-      *    PERFORM VARYING     IDY     FROM    1   BY  1
-      *            UNTIL      (IDY         >   5   )   OR
-      *                       (FLG-ARI     =   1   )   OR
-      *                       (WKSRY-SRYCD (IDY)   =   SPACE )
-      *
-      *        診察料検索
-      *        SET     TBL-IDX             TO  1
-      *        SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
-      *            AT   END
-      *                MOVE    ZERO                TO  FLG-ARI
-      *                MOVE    SPACE               TO  WRK-KBN
-      *                MOVE    SPACE               TO  WRK-KBN2
-      *            WHEN   WKSRY-SRYCD (IDY)    =   TBL-SRYCD (TBL-IDX)
-      *                MOVE    1                   TO  FLG-ARI
-      *                MOVE    TBL-KBN  (TBL-IDX)  TO  WRK-KBN
-      *                MOVE    TBL-KBN2 (TBL-IDX)  TO  WRK-KBN2
-      *        END-SEARCH
-      *
-      *        IF      FLG-ARI         =   ZERO
-      *            労災コードチェック（初診）
-      *            SET     TBL-RSI              TO  1
-      *            SEARCH  TBL-RSI-SINSATU-OCC  VARYING   TBL-RSI
-      *                AT  END
-      *                    MOVE    ZERO               TO  FLG-ARI
-      *                    MOVE    SPACE              TO  WRK-KBN
-      *                WHEN    WKSRY-SRYCD (IDY)
-      *                                       =   TBLR-SRYCD (TBL-RSI)
-      *                    MOVE    1                  TO  FLG-ARI
-      *                    MOVE    TBLR-KBN (TBL-RSI) TO  WRK-KBN
-      *            END-SEARCH
-      *            IF      WRK-KBN             =   "S"  OR  "F"
-      *                MOVE    1               TO  FLG-ARI
-      *            ELSE
-      *                MOVE    ZERO            TO  FLG-ARI
-      *            END-IF
-      *        END-IF
-      *        その他の自動発生分
-      *        IF      FLG-ARI         =   ZERO
-      *            IF     WKSRY-SRYCD (IDY)    =   "830000020"   OR
-      *                                            "830000021"   OR
-      *                                            "112007170"   OR
-      *                                            "112702270"   OR
-      *                                            "113701010"   OR
-      *                                            "113701110"   OR
-      *                                            "113701510"   OR
-      *                                            "114701210"   OR
-      *                                            "114701710"
-      *                MOVE    1               TO  FLG-ARI
-      *                MOVE    SPACE           TO  WRK-KBN
-      *            END-IF
-      *
-      *        END-IF
-      *        特定の診療行為判定
-      *        EVALUATE    WKSRY-SRYCD (IDY)
-      *            寝たきり老人在宅総合診療科（院外処方箋あり）
-      *            WHEN    "114701210"
-      *                MOVE    "1"             TO  SPA-INGAIKBN
-      *            寝たきり老人在宅総合診療科（院外処方箋なし）
-      *            WHEN    "114701710"
-      *                MOVE    "0"             TO  SPA-INGAIKBN
-      *            老人慢性疾病外来総合診療科（院外処方あり）
-      *            WHEN    "113701010"
-      *                MOVE    "1"             TO  SPA-INGAIKBN
-      *            老人慢性疾病外来総合診療科（院外処方なし）
-      *            WHEN    "113701110"
-      *            WHEN    "113701510"
-      *                MOVE    "0"             TO  SPA-INGAIKBN
-      *
-      *            小児科外来診療科算定
-      *            WHEN    "113003510"
-      *            WHEN    "113003610"
-      *                MOVE    "1"             TO  SPA-INGAIKBN
-      *            WHEN    "113003710"
-      *            WHEN    "113003810"
-      *                MOVE    "0"             TO  SPA-INGAIKBN
-      *            ＤＵＭＭＹ診療科
-      *            WHEN    "099110001"
-      *            WHEN    "099120001"
-      *                MOVE    1               TO  FLG-DUMMY
-      *        END-EVALUATE
-      *
-      *        IF      FLG-ARI         =   1
-      *             初診料以外の時、自動発生あり
-      *             初診料算定で、既に当日受診がある時は対象
-      *            IF    ((WRK-KBN             =   "F"   )  AND
-      *                   (SPA-SRYYMD          =   SPA-LSTYMD))  OR
-      *                  ( WRK-KBN         NOT =   "F"  )
-      *                MOVE    1           TO  FLG-CHK
-      *                MOVE    1           TO  FLG-SINSATU-OK
-      *                IF     (WKSRY-INPUTCD(IDY)(1:1) NUMERIC  )  AND
-      *                       (WKSRY-INPUTCD(IDY)(2:1) =   SPACE)
-      *                    MOVE    WKSRY-INPUTCD(IDY)(1:1) TO  FLG-JIKAN
-      *                END-IF
-      *            END-IF
-      *        END-IF
-      *    END-PERFORM
-      *
-      *    IF      FLG-SINSATU-OK      =   1
-      *        IF     (WKSRY-SRYKBN    NOT =   "11" )  OR
-      *               (FLG-CHK             =   1    )
-      *            IF       (WKSRY-SRYKBN        =   "14" OR "13")  AND
-      *                     (FLG-ARI             =   ZERO )
-      *                CONTINUE
-      *            ELSE
-      *                ADD     1               TO  IDX-WK
-      *                MOVE    WKSRY-ZAINUM    TO  LNK-SC10S-ZAINUM
-      *                                                   (IDX-WK)
-      *            END-IF
-      *        END-IF
-      *    END-IF
-      *
-      *    DUMMY診察料がある時自動発生はしない
-      *    IF      FLG-DUMMY           =   1
-      *        MOVE    ZERO            TO  FLG-SINSATU-OK
-      *    END-IF
-      *
-      *    .
-      *10001-SRYCD-CHK-EXT.
-      *    EXIT.
       *****************************************************************
       *    診察料のみの変更処理
       *****************************************************************
