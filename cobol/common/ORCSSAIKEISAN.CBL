@@ -27,8 +27,6 @@
       ****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
-      *  01.00.01    NACL-ÌçÏÆ    04/12/17  ¶»Éô¸ÇÄêÂÓ²Ã»»¡¢ÁÏ³°¸ÇÄê´ï
-      *                                     »ÈÍÑ²Ã»»¤òÌôºÞÅù¤Ø
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -133,8 +131,6 @@
            03  WK-MEISAI                   PIC  9(08).
       *
            03  WK-YOUBUKASAN               PIC  9(08).
-           03  WK-KYOBUKASAN               PIC  9(08).
-           03  WK-SOGAIKASAN               PIC  9(08).
            03  WK-RYOYOTEATE               PIC  9(08).
       *
            03  WK-SYUTEN-KEI               PIC  9(08).
@@ -1317,8 +1313,6 @@
                                             -   WK-RSISDO
                                             -   WK-RSIETC
                                             -   WK-YOUBUKASAN
-                                            -   WK-KYOBUKASAN
-                                            -   WK-SOGAIKASAN
                                             -   WK-RYOYOTEATE
       *
       ***    COMPUTE   LNK-S01-SINDAN(IDY)  =  WK-SINDAN  *  10
@@ -1847,14 +1841,6 @@
       *
                          IF    SRY-SRYCD (IDX3)  =   "140037490"
                            COMPUTE WK-YOUBUKASAN = WK-YOUBUKASAN +
-                                  (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
-                         END-IF
-                         IF    SRY-SRYCD (IDX3)  =   "140040110"
-                           COMPUTE WK-KYOBUKASAN = WK-KYOBUKASAN +
-                                  (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
-                         END-IF
-                         IF    SRY-SRYCD (IDX3)  =   "150266970"
-                           COMPUTE WK-SOGAIKASAN = WK-SOGAIKASAN +
                                   (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
                          END-IF
       *
