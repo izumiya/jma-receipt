@@ -128,6 +128,7 @@
       *                                     病名文字数のエラー時の表示
       *  01.08.03    NACL-藤原    04/03/08  コラムリストの行制御
       *  01.08.04    NACL-藤原    04/03/09  手術歴の追加
+      *  01.08.05    NACL-藤原    04/03/29  主病名の確認画面後の更新の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -168,6 +169,10 @@
            COPY    "CPPTBYOMEI.INC"
                                    REPLACING  //PTBYO-//
                                    BY         //SPA-PTBYO-//.
+           02  WRK-PTBYOMEI-REC    OCCURS  6.
+           COPY    "CPPTBYOMEI.INC"
+                                   REPLACING   //PTBYO-//
+                                   BY          //WRK-PTBYO-//.
            COPY    "CPC02SPASCR.INC".
       *
       *    スパ領域
@@ -353,13 +358,6 @@
                05  WRK-HMM         PIC 9(02).
                05  FILLER          PIC X(01)   VALUE   ".".
                05  WRK-HDD         PIC 9(02).
-      *
-      *    患者病名マスタ−（ワーク）
-       01  WRK-PTBYOMEI-AREA.
-           02  WRK-PTBYOMEI-REC    OCCURS  6.
-           COPY    "CPPTBYOMEI.INC"
-                                   REPLACING   //PTBYO-//
-                                   BY          //WRK-PTBYO-//.
       *
       *    スパ領域（ワーク）
            COPY    "COMMON-SPA"    REPLACING   //SPA-//
@@ -5405,8 +5403,18 @@
                MOVE    SPA-NAI-C02-SYSYMD   TO  SPA-NAI-C02-SRYYMD
            END-IF
       *
-           MOVE    SPACE           TO  WRK-PTBYOMEI-AREA
-           INITIALIZE                  WRK-PTBYOMEI-AREA
+           MOVE    SPACE           TO  WRK-PTBYOMEI-REC (1)
+                                       WRK-PTBYOMEI-REC (2)
+                                       WRK-PTBYOMEI-REC (3)
+                                       WRK-PTBYOMEI-REC (4)
+                                       WRK-PTBYOMEI-REC (5)
+                                       WRK-PTBYOMEI-REC (6)
+           INITIALIZE                  WRK-PTBYOMEI-REC (1)
+                                       WRK-PTBYOMEI-REC (2)
+                                       WRK-PTBYOMEI-REC (3)
+                                       WRK-PTBYOMEI-REC (4)
+                                       WRK-PTBYOMEI-REC (5)
+                                       WRK-PTBYOMEI-REC (6)
            MOVE    ZERO            TO  IDXX
            MOVE    ZERO            TO  IDY
       *
