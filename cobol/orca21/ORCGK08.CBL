@@ -237,10 +237,10 @@
       *    ＳＰＡ内番号
            03  IDX-NAI             PIC 9(04).
       *
-           03  IDX-S1              PIC 9(04).
       *    福岡県対応用
            03  IDX-SYU             PIC 9(04).
            03  IDX-SYU2            PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-SYSYMD.
@@ -2973,7 +2973,6 @@
            END-PERFORM
       *
            ADD     1                   TO  LNK-SYUNOU2-MAX
-           MOVE    ZERO                TO  IDX-S1
       *
       *    薬剤一部負担金計算処理
            PERFORM 4505-YAKFTN-KEI-SEC
@@ -3393,24 +3392,6 @@
                            ADD     WRK-SINDAN      TO  LNK-S01-MEISAI
                                                       (LNK-SYUNOU2-MAX)
                        END-IF
-      *                自賠責その他のコード編集
-                       IF      LNK-WKSRY-SRYCD (IDX IDS)(1:5)
-                                                       =   "09591"
-                                                       OR  "09592"
-                                                       OR  "09593"
-                           ADD     1               TO  IDX-S1
-                           IF      IDX-S1          <=  20
-                               MOVE    LNK-WKSRY-SRYCD (IDX IDS)
-                                           TO   LNK-S01-SONOTA-SRYCD
-                                                (LNK-SYUNOU2-MAX IDX-S1)
-                               MOVE    LNK-WKSRY-ZAIKAIKEI (IDX)
-                                           TO   LNK-S01-SONOTA-ZAIKAISU
-                                                (LNK-SYUNOU2-MAX IDX-S1)
-                               MOVE    TNS-TEN
-                                           TO   LNK-S01-SONOTA-TANKA
-                                                (LNK-SYUNOU2-MAX IDX-S1)
-                           END-IF
-                       END-IF
                    END-IF
       *            療養担当手当の点数をゼロとする
                    IF     (LNK-WKSRY-SRYKBN(IDX)       =   "80")  AND
@@ -3444,6 +3425,8 @@
                                   (LNK-WKSRY-SRYCD(IDX IDS)
                                               =   SPACE )
                    IF     LNK-WKSRY-SRYCD(IDX IDS)     =   "140037490"
+                                                       OR  "140040110"
+                                                       OR  "150266970"
                        MOVE    LNK-WKSRY-SRYCD (IDX IDS)   TO  TNS-SRYCD
                        PERFORM 910-TENSU-READ-SEC
                        ADD     TNS-TEN         TO  WRK-SYUTEN1
