@@ -2563,12 +2563,12 @@
                                MOVE    ZERO            TO  FLG-HEN-CHK
                            END-IF
                        END-IF
-      *                訂正自動作成で時間外の時、時間外区分とする
-                       IF      (WRK-SYORIFLG             =   1  )  AND
-                               (SPA-NAI-TIMEFLG          =   ZERO) AND
-                               (LNK-WKSRY-AUTOKBN(IDX IDY)   =   "2")
-                           PERFORM 31013-JIKANCHK-SEC
-                       END-IF
+      *!!!!!!!         訂正自動作成で時間外の時、時間外区分とする
+      *                IF      (WRK-SYORIFLG             =   1  )  AND
+      *                        (SPA-NAI-TIMEFLG          =   ZERO) AND
+      *                        (LNK-WKSRY-AUTOKBN(IDX IDY)   =   "2")
+      *                    PERFORM 31013-JIKANCHK-SEC
+      *!!!!!!          END-IF
                        IF      FLG-HEN-CHK         =   ZERO
                            PERFORM 31011-SPA-HEN-SEC
                        END-IF
@@ -5746,8 +5746,9 @@
       *                                            =   ZERO    )
       *                MOVE    "9030"              TO  SPA-ERRCD
       ************ ELSE
-                       MOVE    LNK-SC97-JIKAN      TO  SPA-COM-TIMEFLG
-                                                          (SPA-GMN-IDX)
+                       PERFORM 41011211-JIKANGAI-CHK-SEC
+      *!!              MOVE    LNK-SC97-JIKAN      TO  SPA-COM-TIMEFLG
+      *!!                                                 (SPA-GMN-IDX)
       *************END-IF
                ELSE
                    MOVE    "0030"          TO  SPA-ERRCD
@@ -5764,6 +5765,32 @@
        4101121-INPUTCD-CHECK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    時間外区分チェック処理
+      *****************************************************************
+       41011211-JIKANGAI-CHK-SEC      SECTION.
+      *
+           IF      LNK-SC97-NYURYOKU   =   ZERO
+               MOVE    SPA-COM-SRYKBN (SPA-GMN-IDX)
+                                           TO  TNS-SRYKBN
+               MOVE    SPA-COM-TIMEKSNKBN(SPA-GMN-IDX)
+                                           TO  TNS-TIMEKSNKBN
+           END-IF
+           IF       TNS-SRYKBN         =   "11"
+               CONTINUE
+           ELSE
+      *        診察料以外は時間外加算が算定できること
+               IF      TNS-TIMEKSNKBN      =   ZERO
+                   MOVE    "0030"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    LNK-SC97-JIKAN      TO  SPA-COM-TIMEFLG
+                                                          (SPA-GMN-IDX)
+           END-IF
+           .
+       41011211-JIKANGAI-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    入力項目編集処理
       *****************************************************************
@@ -10642,7 +10669,9 @@
                END-EVALUATE
       *
            ELSE
-               IF      SPA-COM-DATAKBN (IDX)   =   "1"
+               IF     (SPA-COM-DATAKBN (IDX)   =   "1"   )  AND
+      *               時間加算区分
+                      (SPA-COM-TIMEKSNKBN(IDX) NOT =   SPACE )
                    EVALUATE    SPA-COM-TIMEFLG (IDX)
                        WHEN    1
                            MOVE    "A"      TO  WKSRY-AUTOKBN  (IDY)
