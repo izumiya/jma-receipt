@@ -44,6 +44,7 @@
       * 01.00.15     NACL-Â¿¡¹Ç¼  03/09/26  £Ã£Ô¡¢£Í£Ò£ÉÆ±»þÆþÎÏÄÉ²Ã
       * 01.00.16     NACL-Â¿¡¹Ç¼  03/12/03  Æ±»þÊ»»Ü¤ÎÃ±ÆÈÆþÎÏ·Ù¹ð¤Ø
       * 01.00.17     NACL-Â¿¡¹Ç¼  04/12/17  £Ã£Ô¡¢£Í£Ò£É¤ÎÂ¤±ÆºÞÈ½Äê½¤Àµ
+      * 01.00.18     NACL-Â¿¡¹Ç¼  05/01/27  »ÀÁÇÄÉ²Ã
       *****************************************************************
       *
       *
@@ -245,6 +246,14 @@
       *
            03  WRK-SRYKA           PIC X(02).
            03  WRK-HKNCOMBI        PIC X(04).
+      *!
+      *    »ÀÁÇ·×»»ÍÑ
+           03  WRK-SANSO               PIC 9(08).
+           03  WRK-SANSOKIN            PIC 9(08)V99.
+           03  WRK-SANKEI              PIC 9(08).
+           03  WRK-SANTEN              PIC 9(08).
+           03  WRK-SANSOKIN-SUM        PIC 9(08)V99.
+           03  IDX-SANSO               PIC 9(04).
       *
       *    Æþ±¡Æü
        01  WRK-NYUINDAY-AREA.
@@ -395,6 +404,9 @@
                05  TBL-NEN-SRYCD1      PIC X(09).
       *        ÆýÍÄ»ù
                05  TBL-NEN-SRYCD2      PIC X(09).
+      *
+      *    »ÀÁÇ¥³¡¼¥É¥Æ¡¼¥Ö¥ë
+           COPY     "CMSANSOTBL.INC".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -557,6 +569,11 @@
            IF      IDX-SAT             >   ZERO
       *        ¼«Æ°²Ã»»¤òÄÉ²Ã¤¹¤ë
                PERFORM 1002-JIDO-KASAN-SEC
+           END-IF
+      *    »ÀÁÇ¤ÎÊäÀµÎ¨¤ò¼«Æ°È¯À¸¤¹¤ë
+           IF     (WRK-ERRCD           =   SPACE)   AND
+                  (IDX-SANSO           >   ZERO )
+               PERFORM 10011-SANSO-ADD-SEC
            END-IF
       *
            IF      WRK-ERRCD           =   SPACE
@@ -780,17 +797,87 @@
                                                *   WRK-COM-BUNGSU
                                                                (IDX-Z))
                    END-IF
-      *
-      *            »ÀÁÇ¡¦ÃâÁÇ¤Ï¥¨¥é¡¼
-                   IF      WRK-COM-TOKUKIZAISBT1 (IDX-Z) =   2
-                       MOVE    "0039"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+      **********   »ÀÁÇ¡¦ÃâÁÇ¤Ï¥¨¥é¡¼
+      *            IF      WRK-COM-TOKUKIZAISBT1 (IDX-Z) =   2
+      *                MOVE    "0039"          TO  WRK-ERRCD
+      *                MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+      ***********  END-IF
+      *            »ÀÁÇ¶èÊ¬È½Äê
+                   IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
+      *                »ÀÁÇ¤Î»þ¡¢»ÀÁÇÊäÀµÎ¨¤ò¼«Æ°²Ã»»
+                       MOVE    WRK-COM-INPUTCD (IDX-Z) TO  WRK-SRYCD
+                       PERFORM 100115-SANSO-CHK-SEC
+                       IF      FLG-SANSO-OK        =   1
+                           MOVE    IDX-Z       TO  IDX-SANSO
+                       ELSE
+                           IF      IDX-SANSO        =   ZERO
+                               MOVE    "0038"       TO  WRK-ERRCD
+                               MOVE    "1"          TO  WRK-COM-CUR
+                                                              (IDX-Z)
+                           END-IF
+                       END-IF
                    END-IF
            END-EVALUATE
       *
            .
        10011-CHK-EXT.
            EXIT.
+      *****************************************************************
+      *    »ÀÁÇÈ½Äê½èÍý
+      *****************************************************************
+       100115-SANSO-CHK-SEC           SECTION.
+      *
+      *
+           SET     TBL-SANSO           TO  1
+           SEARCH      TBL-SANSO-OCC   VARYING   TBL-SANSO
+                   AT  END
+                       MOVE    ZERO            TO  FLG-SANSO-OK
+                   WHEN    WRK-SRYCD       =   TBL-SANSO-SRYCD
+                                                           (TBL-SANSO)
+                       MOVE    1               TO  FLG-SANSO-OK
+           END-SEARCH 
+      *
+           .
+       100115-SANSO-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    »ÀÁÇÊäÀµÎ¨¼«Æ°²Ã»»½èÍý
+      *****************************************************************
+       10011-SANSO-ADD-SEC                  SECTION.
+      *
+           MOVE    "770020070"         TO  WRK-SRYCD
+           MOVE    ZERO                TO  FLG-ARI
+           PERFORM VARYING     IDX1    FROM    1   BY  1
+                   UNTIL      (IDX1    >   200  )  OR
+                              (WRK-COM-INPUTCD(IDX1)   =   SPACE AND
+                               WRK-GMN-INPUTCD(IDX1)   =   SPACE )
+               IF     (WRK-COM-INPUTCD (IDX1)(1:1) =   "7" ) AND
+                      (WRK-COM-SANSOKBN (IDX1) =   1           )
+                   IF       WRK-COM-INPUTCD (IDX1) =   WRK-SRYCD OR
+                                                       "770030070"
+                       CONTINUE
+                   ELSE
+                       IF      IDX-SANSO       NOT =   IDX1
+                           MOVE    IDX1                TO  IDX-SANSO
+                       END-IF
+                   END-IF
+               END-IF
+               IF      WRK-COM-INPUTCD (IDX1)  =   WRK-SRYCD
+                   MOVE    IDX1                TO  IDX-T
+                   MOVE    1                   TO  FLG-ARI
+               END-IF
+           END-PERFORM
+           IF      FLG-ARI             =   ZERO
+               MOVE    IDX-SANSO           TO  IDX-S
+           END-IF
+      *    »ÀÁÇÊäÀµÎ¨¼«Æ°²Ã»»
+           MOVE    ZERO                TO  FLG-NENREI
+           PERFORM 1002-JIDOUSET-SEC
+      *
+           .
+       10011-SANSO-ADD-EXT.
+           EXIT.
+      *!
       *
       *****************************************************************
       *    »ÜÀß´ð½àÉÔÅ¬¹ç¥Á¥§¥Ã¥¯²Ã»»½èÍý
@@ -1455,9 +1542,32 @@
                            ADD     LNK-SC90-FIRTEN     TO  WRK-FIRTEN
                        END-IF
                    END-IF
+      *            »ÀÁÇ·×»»
+                   IF      WRK-COM-SANSOKBN (IDX-Z)    =   1
+                       PERFORM 100211-SANSO-KEI-SEC
+                   END-IF
            END-EVALUATE
            .
        100013-XSEN-KEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    »ÀÁÇ·×»»½èÍý
+      *****************************************************************
+       100211-SANSO-KEI-SEC            SECTION.
+      *
+      *    »ÀÁÇÈ½Äê
+           MOVE    WRK-COM-INPUTCD (IDX-Z) TO  WRK-SRYCD
+           PERFORM 100115-SANSO-CHK-SEC
+           IF      FLG-SANSO-OK        =   1
+      *        »ÀÁÇ¶â³Û·×»»
+               COMPUTE WRK-SANSOKIN    =   WRK-COM-KISOTEN (IDX-Z)
+                                       *   WRK-COM-SURYO (IDX-Z)
+               ADD     WRK-SANSOKIN    TO  WRK-SANSOKIN-SUM
+           END-IF
+      *
+           .
+       100211-SANSO-KEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2480,10 +2590,71 @@
                                        +   0.5
            MOVE    WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
       *
+      *    ´ïºàÅÀ¿ô·×»»½èÍý¡ÊÃâÁÇ¡Ë
+      *    ¶â³Û·×¡à£±£°¡¡»Í¼Î¸ÞÆþ
+           COMPUTE WRK-SYOKEIS2        =  (LNK-SC90-CHIKEI
+                                       /   10  )
+                                       +   0.5
+           MOVE    WRK-SYOKEIS2        TO  LNK-SC90-CHITEN
+           COMPUTE LNK-SC90-KIZTEN     =   LNK-SC90-KIZTEN
+                                       +   LNK-SC90-CHITEN
       *
+      *    »ÀÁÇ¤ÎÅÀ¿ô¿ô·×»»
+           IF      WRK-SANSOKIN-SUM    NOT =   ZERO
+               PERFORM 10071-SANSO-KEISAN-SEC
+           END-IF
            .
        1005-KIZAI-TENSU-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *     »ÀÁÇ¤ÎÅÀ¿ô¿ô·×»»½èÍý
+      *****************************************************************
+       10071-SANSO-KEISAN-SEC                SECTION.
+      *
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   IDX-MAX
+               EVALUATE    WRK-COM-INPUTCD (IDX)
+      *            »ÀÁÇÊäÀµÎ¨¼«Æ°²Ã»»
+                   WHEN    "770020070"
+      *                »ÀÁÇ¶â³Û¡Ü¡Ê»ÀÁÇ¶â³Û¡ßÊäÀµÎ¨¡¿£±£°£°¡Ë¡¡»Í¼Î¸ÞÆþ
+                       COMPUTE WRK-SYOKEIS     =   WRK-SANSOKIN-SUM
+                                               *   WRK-COM-KISOTEN (IDX)
+                                               /   100
+                       COMPUTE WRK-SANSOKIN    =   WRK-SANSOKIN-SUM
+                                               +   WRK-SYOKEIS
+               END-EVALUATE
+           END-PERFORM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   IDX-MAX
+               EVALUATE    WRK-COM-INPUTCD (IDX)
+      *            ¹âµ¤°µ»ÀÁÇ·×»»
+                   WHEN    "770030070"
+      *                »ÀÁÇ¶â³Û¡Ü¡Ê»ÀÁÇ¶â³Û¡ßÊäÀµÎ¨¡¿£±£°£°¡Ë
+      *                                           ¡ßµ¤°µ¿ô¡¡»Í¼Î¸ÞÆþ
+                       COMPUTE WRK-SYOKEIS     =   WRK-SANSOKIN
+                                               *   WRK-COM-SURYO (IDX)
+                       MOVE    WRK-SYOKEIS     TO  WRK-SANSOKIN
+               END-EVALUATE
+           END-PERFORM
+      *    »ÀÁÇ¤ÎÅÀ¿ô¿ô·×»»
+      *    ¶â³Û·×¡¡»Í¼Î¸ÞÆþ
+           COMPUTE WRK-SYOKEI          =   WRK-SANSOKIN
+                                       +   0.5
+      *    ¶â³Û·×¡à£±£°¡¡»Í¼Î¸ÞÆþ
+           COMPUTE WRK-SYOKEIS2        =   WRK-SYOKEI
+                                       /   10
+                                       +   0.5
+           MOVE    WRK-SYOKEIS2        TO  WRK-SANTEN
+      *    »ÀÁÇ¤ÎÅÀ¿ô¤ò´ïºàÅÀ¿ô¤Ë²Ã»»
+           ADD     WRK-SANTEN          TO  LNK-SC90-KIZTEN
+      *
+           .
+       10071-SANSO-KEISAN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ¥Õ¥£¥ë¥àÅÀ¿ô·×»»½èÍý
