@@ -41,6 +41,8 @@
       *  01.04.01    NACL-藤原    03/06/05  労災・自賠責の入院処理追加
       *  01.04.02    NACL-藤原    03/08/05  ヴで始まるカナ氏名のレセプト
       *                                     を対象とするように修正
+      *  01.04.03    NACL-藤原    05/01/21  空白で始まるカナ氏名のレセプト
+      *                                     を対象とするように修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1475,7 +1477,8 @@
                                        TO  WRK-RECE09-EDDATA 
            IF      WRK-RECE09-STDATA   =   SPACE
                IF      SPA-GMN-PRTJYUN =   "03"
-                   MOVE    "Ａ"        TO  WRK-RECE09-STDATA (1:2)
+      *************MOVE    "Ａ"        TO  WRK-RECE09-STDATA (1:2)
+                   MOVE    SPACE       TO  WRK-RECE09-STDATA
                ELSE
                    MOVE    "0"         TO  WRK-RECE09-STDATA (1:1)
                END-IF

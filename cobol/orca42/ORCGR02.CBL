@@ -69,6 +69,8 @@
       *  01.04.11    NACL-小豆沢  04/04/15  入院レセ出力先プリンタの指定追加
       *　プレビュー機能追加
       *  01.05.01    NACL-藤原    03/07/07  プレビュー機能追加
+      *  01.05.02    NACL-藤原    05/01/21  空白で始まるカナ氏名のレセプト
+      *                                     を対象とするように修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2112,7 +2114,8 @@
                                        TO  WRK-RECE09-EDDATA 
            IF      WRK-RECE09-STDATA   =   SPACE
                IF      SPA-GMN-PRTJYUN =   "01"  OR  "03"
-                   MOVE    "Ａ"        TO  WRK-RECE09-STDATA (1:2)
+      *************MOVE    "Ａ"        TO  WRK-RECE09-STDATA (1:2)
+                   MOVE    SPACE       TO  WRK-RECE09-STDATA
                ELSE
                    MOVE    "0"         TO  WRK-RECE09-STDATA (1:1)
                END-IF
