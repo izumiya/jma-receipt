@@ -1181,16 +1181,16 @@
       *----(02.00.03)--UPD-START---
                    EVALUATE    SHELL-SRYEND
                      WHEN      "20"
-                       MOVE    "29"        TO  SHELL-SRYEND
+                       MOVE    29          TO  SHELL-SRYEND
                      WHEN      "30"
-                       MOVE    "34"        TO  SHELL-SRYEND
+                       MOVE    34          TO  SHELL-SRYEND
                      WHEN      "90"
-                       MOVE    "97"        TO  SHELL-SRYEND
+                       MOVE    97          TO  SHELL-SRYEND
                    END-EVALUATE
                ELSE
-                   MOVE  1                 TO  SHELL-SRYKBN
-                   MOVE  "11"              TO  SHELL-SRYSTR
-                   MOVE  "97"              TO  SHELL-SRYEND
+                   MOVE    1               TO  SHELL-SRYKBN
+                   MOVE    11              TO  SHELL-SRYSTR
+                   MOVE    97              TO  SHELL-SRYEND
                END-IF
       *----(02.00.03)--UPD-END-----
            END-IF
