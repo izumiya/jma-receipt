@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-竹田     04.03.31 シェル起動追加他
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -93,7 +94,12 @@
        01  SHELL-AREA.
            03  SHELL-NAME          PIC X(39)  VALUE
                "scripts/allways/program_upgrade_copy.sh".
+           03  SHELL-NAME1         PIC X(42)  VALUE
+               "scripts/allways/program_upgrade_restart.sh".
       *
+       01  PARA-AREA.
+           03  PARA-RSFILE           PIC X(32).
+           03  PARA-DELHOME          PIC X(100).
       *****************************************************************
       *    ファイル定義
       *****************************************************************
@@ -113,7 +119,7 @@
       *****************************************************************
        LINKAGE                     SECTION.
        01  PARA-REC.
-           03  PARA-RSFILE           PIC X(32).
+           03  PARA-RSAREA          PIC X(255).
       *
        PROCEDURE                   DIVISION
            USING
@@ -123,6 +129,7 @@
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
+           DISPLAY "PARA-RSAREA = [" PARA-RSAREA "]"
            PERFORM 100-INIT-SEC
       *
            PERFORM 200-MAIN-SEC
@@ -143,6 +150,10 @@
            MOVE    ZERO            TO  CNT-AREA
            INITIALIZE                  WRK-AREA
       *
+           UNSTRING    PARA-REC    DELIMITED  BY  ","
+                                   INTO  PARA-RSFILE
+                                         PARA-DELHOME
+           END-UNSTRING                                  
       *    DB OPEN
            PERFORM 100-DBOPEN-SEC
            IF      MCP-RC          NOT =   ZERO
@@ -262,6 +273,7 @@
                MOVE    SPACE       TO  OUT-REC
                MOVE    "RESTART"   TO  OUT-RESTART
                WRITE                   OUT-REC
+      *
            END-IF
       *
       *    出力ファイル　クローズ
@@ -276,6 +288,23 @@
       *****************************************************************
        300-END-SEC                 SECTION.
       *
+      * オンラインリスタート用シェル起動
+           IF      CNT-ERR         =  ZERO
+               MOVE    SPACE           TO  SHELLTBL
+               INITIALIZE              ORCSMKPASSAREA
+               MOVE    SHELL-NAME1     TO  MKPASS-IN-01
+               CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
+               MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+      *
+               MOVE    PARA-DELHOME    TO  SHELLTBL-ARG1
+               MOVE    SHELLTBL        TO  MCPDATA-REC
+               MOVE    "SHELL"         TO  MCP-FUNC
+               MOVE    PATH-SHELL-SHELL
+                                       TO  MCP-PATH
+               CALL    "MCPSUB"        USING
+                                           MCPAREA
+                                           MCPDATA-REC
+           END-IF
       *    DB DISCONNECT
            PERFORM 900-DBDISCONNECT-SEC
       *

@@ -107,7 +107,7 @@ do
 done
 
 #プログラム更新処理
-	$DBSTUB  -noredirect -dir "$LDDEFDIR"/directory -bd orcabt ORCXPMNT3 -parameter $RSTFILE
+	$DBSTUB  -noredirect -dir "$LDDEFDIR"/directory -bd orcabt ORCXPMNT3 -parameter $RSTFILE,$HOME/$PRGDIR
 	if [ $? -ne 0 ]	;	then 
 		$DBSTUB -dir "$LDDEFDIR"/directory -bd orcabt ORCBJOB -parameter JBE0000001PRGMNT99
 		exit 99
@@ -115,12 +115,12 @@ done
 
 sleep 3
 
-#システム再起動
-if test -f "$RSTFILE"; then
-	sh $SCRIPTSDIR/allways/program_upgrade_restart.sh
-fi
+#システム再起動(コボルからの起動に変更)
+#if test -f "$RSTFILE"; then
+#	sh $SCRIPTSDIR/allways/program_upgrade_restart.sh
+#fi
 
 echo  "全ての処理が完了しました"
 
-rm -r $HOME/$PRGDIR
+#rm -r $HOME/$PRGDIR
 	$DBSTUB -dir "$LDDEFDIR"/directory -bd orcabt ORCBJOB -parameter JBE0000001PRGMNT00

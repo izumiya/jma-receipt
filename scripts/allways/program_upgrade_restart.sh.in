@@ -12,5 +12,7 @@ fi
 #monitor再起動（ＳＩＧＨＵＰ）
 echo `cat /var/run/jma-receipt/monitor.pid`
 	kill -HUP `cat /var/run/jma-receipt/monitor.pid`
-#
+#更新元ファイル削除追加
+	rm -fr $1
 exit
+
