@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.00.01    NACL-藤原    04/10/18  氏名欄編集方法の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1352,7 +1353,19 @@
            PERFORM 5004-MOJI-HENSYU-SEC
       *    氏名
            IF      RECE62-NAME (1:2)   =   "　"
-               MOVE    RECE62-KANANAME     TO  WRK-DATA
+               IF      RECE62-KANANAME (1:2)   =   "　"
+                   PERFORM VARYING IDX FROM    1   BY  2
+                           UNTIL   IDX >       49
+                       IF  RECE62-KANANAME (IDX:2)   =   "　"
+                           CONTINUE
+                       ELSE     
+                           MOVE    RECE62-KANANAME (IDX:) TO  WRK-DATA
+                           MOVE    49                     TO  IDX
+                       END-IF
+                   END-PERFORM 
+               ELSE
+                   MOVE    RECE62-KANANAME     TO  WRK-DATA
+               END-IF
            ELSE
                MOVE    RECE62-NAME         TO  WRK-DATA
            END-IF

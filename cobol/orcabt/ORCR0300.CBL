@@ -116,6 +116,7 @@
       *  01.02.05    NACL-藤原    04/09/29  福岡対応
       *                                     地方公費のとき、４１老人以外
       *                                     はレセ電データを作成しない
+      *  01.02.06    NACL-藤原    04/10/18  氏名欄編集方法の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1145,7 +1146,19 @@
            PERFORM 5004-MOJI-HENSYU-SEC
       *    氏名
            IF      RECE02-NAME (1:2)   =   "　"
-               MOVE    RECE02-KANANAME     TO  WRK-DATA
+               IF      RECE02-KANANAME (1:2)   =   "　"
+                   PERFORM VARYING IDX FROM    1   BY  2
+                           UNTIL   IDX >       49
+                       IF  RECE02-KANANAME (IDX:2)   =   "　"
+                           CONTINUE
+                       ELSE     
+                           MOVE    RECE02-KANANAME (IDX:) TO  WRK-DATA
+                           MOVE    49                     TO  IDX
+                       END-IF
+                   END-PERFORM 
+               ELSE
+                   MOVE    RECE02-KANANAME     TO  WRK-DATA
+               END-IF
            ELSE
                MOVE    RECE02-NAME         TO  WRK-DATA
            END-IF
