@@ -3449,6 +3449,7 @@
       *            変換文字列編集
                    PERFORM 4101121-MOJI-SET-SEC
                    PERFORM 4101191-INPUTSET-SYORI-SEC
+                   MOVE    SPACE               TO  SPA-MAE-INPUTCD (IDX)
                END-IF
            END-PERFORM
       *
