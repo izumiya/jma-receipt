@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  01.00.01    MCC-Â¿¡¹Ç¼   01.05.25  ÅêÌôÅÀ¿ô·×»»¤ÎÃæ´Ö·å¿ô¤ÎÊÑ¹¹
+      *  01.00.02    NACL-Â¿¡¹Ç¼  04.11.18  ¥Õ¥£¥ë¥àÎÁ·×»»ÊÑ¹¹
       *****************************************************************
       *
       *
@@ -586,14 +587,25 @@
       *****************************************************************
        2003-KIZTEN-SET-SEC             SECTION.
       *
+      *?   ²èÁü¿ÇÃÇ°Ê³°¤Î¥Õ¥£¥ë¥à·×»»
+      *    IF      LNK-COM-SRYKBN (01) =   "70"
+      *        MOVE    LNK-SC90-KIZKEI     TO  WRK-SYOKEIS3
+      *    ELSE
+      *        COMPUTE WRK-SYOKEIS3    =   LNK-SC90-KIZKEI
+      *                                +   LNK-SC90-FIRTEN
+      *?   END-IF
       *    ²èÁü¿ÇÃÇ°Ê³°¤Î¥Õ¥£¥ë¥à·×»»
-           IF      LNK-COM-SRYKBN (01) =   "70"
-               MOVE    LNK-SC90-KIZKEI     TO  WRK-SYOKEIS3
-           ELSE
-               COMPUTE WRK-SYOKEIS3    =   LNK-SC90-KIZKEI
-                                       +   LNK-SC90-FIRTEN
+           IF      LNK-COM-SRYKBN (01) NOT =   "70"
+               MOVE    LNK-SC90-FIRTEN     TO  WRK-SYOKEIS3
+               IF      WRK-SYOKEIS3        >   ZERO
+      *        ¶â³Û·×¡à£±£°¡¡»Í¼Î¸ÞÆþ
+               COMPUTE WRK-SYOKEIS2        =  (WRK-SYOKEIS3
+                                           /   10  )
+                                           +   0.5
+               ADD     WRK-SYOKEIS2        TO  LNK-SC90-KIZTEN
            END-IF
-      *
+      *    ´ïºà
+           MOVE    LNK-SC90-KIZKEI     TO  WRK-SYOKEIS3
            IF      WRK-SYOKEIS3        >   ZERO
       *    ¶â³Û·×¡à£±£°¡¡»Í¼Î¸ÞÆþ
                COMPUTE WRK-SYOKEIS2        =  (WRK-SYOKEIS3
