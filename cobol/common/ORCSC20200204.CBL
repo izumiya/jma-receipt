@@ -984,6 +984,7 @@
       *****************************************************************
        3009-NYUINKAISU-SEC              SECTION.
       *
+           MOVE    1                   TO  WRK-KAISU
       *    内服は日数分作成する
            IF      WRK-COM-SRYKBN (IDX)    =   "21"
                IF      WRK-COM-KAISU (IDX)     >   WRK-KAISU
@@ -994,27 +995,36 @@
       *    入院回数以外
            IF       WRK-GMN-INPUTCD(IDX)(1:1)  NOT =   "*"
                MOVE    SPA-SRYYMD (7:2)    TO  IDN1
-               IF      FLG-MADOKU-ARI      =   1
-                   MOVE    2               TO  TBL-NYUINDAY (IDN1)
-               ELSE
-                   IF      TBL-NYUINDAY (IDN1) =   ZERO
-                       MOVE    1           TO  TBL-NYUINDAY (IDN1)
-                   END-IF
-               END-IF
-               GO      TO      3009-NYUINKAISU-EXT
+               MOVE    1                   TO  WRK-COM-NYUINDAY
+                                                      (IDX IDN1)
+      ******** IF      FLG-MADOKU-ARI      =   1
+      *            MOVE    2               TO  TBL-NYUINDAY (IDN1)
+      *        ELSE
+      *            IF      TBL-NYUINDAY (IDN1) =   ZERO
+      *                MOVE    1           TO  TBL-NYUINDAY (IDN1)
+      *            END-IF
+      *        END-IF
+      *******  GO      TO      3009-NYUINKAISU-EXT
            END-IF
       *
       *    投薬で入院回数の時、回数集計
            PERFORM VARYING     IDN1    FROM    1   BY  1
                    UNTIL       IDN1    >   31
                IF      WRK-COM-NYUINDAY (IDX IDN1) >   ZERO
-                   IF      FLG-MADOKU-ARI      =   1
-                       MOVE    2               TO  TBL-NYUINDAY (IDN1)
-                   ELSE
-                       IF      TBL-NYUINDAY (IDN1) =   ZERO
-                           MOVE    1           TO  TBL-NYUINDAY (IDN1)
+                   MOVE    IDN1                TO  IDN4
+                   PERFORM VARYING     IDN3    FROM    1   BY  1
+                           UNTIL       IDN3    >   WRK-KAISU
+                       IF      FLG-MADOKU-ARI      =   1
+                           MOVE    2               TO  TBL-NYUINDAY
+                                                              (IDN4)
+                       ELSE
+                           IF      TBL-NYUINDAY (IDN4) =   ZERO
+                               MOVE    1           TO  TBL-NYUINDAY
+                                                             (IDN4)
+                           END-IF
                        END-IF
-                   END-IF
+                       ADD     1                   TO  IDN4
+                   END-PERFORM
                END-IF
            END-PERFORM
       *
@@ -1641,6 +1651,7 @@
            INITIALIZE                      LNK-ORCSC-INPUTCD-G (02 IDXS)
       *
       *    日数なしか調基は最初の日とする
+           MOVE    1                   TO  WRK-KAISU
            IF    ( WRK-KAISU           =   1  OR  ZERO ) OR
                  ( FLG-DAY             =   3    )
                MOVE    SPACE           TO  WRK-KAISU-H
