@@ -3901,6 +3901,8 @@
            IF      TNS-SANTEIRRKKBN    NOT =   ZERO
                MOVE    ZERO            TO  FLG-TOKTEI
                MOVE    1               TO  WRK-KAISU
+               MOVE    SPA-SRYKA       TO  WRK-SRYKA
+               MOVE    SPA-HKNCOMBINUM TO  WRK-HKNCOMBI
       *        »»ÄêÍúÎòºîÀ®
                PERFORM 45021-SANTEI-UPD-SEC
       *        ¿ÇÎÅ²ÊÍúÎò½èÍý
