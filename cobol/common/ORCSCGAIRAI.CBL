@@ -3082,29 +3082,29 @@
        45002-WKSRYACT-DEL-SEC              SECTION.
       *
       *    作成済みのワーク診療行為マスタ−を削除する
-           MOVE    SPACE               TO  WKSRYACT-REC
-           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
-           MOVE    SPA-PTID            TO  WKSRY-PTID
-           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
-           MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
-           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+      *    MOVE    SPACE               TO  WKSRYACT-REC
+      *    MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+      *    MOVE    SPA-PTID            TO  WKSRY-PTID
+      *    MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+      *    MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
+      *    MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
       *****MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
-           MOVE    SPA-WKSRY-HKNCOMBI  TO  WKSRY-HKNCOMBI
+      *    MOVE    SPA-WKSRY-HKNCOMBI  TO  WKSRY-HKNCOMBI
       *
-           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
-           MOVE    "DBDELETE"          TO  MCP-FUNC
-           MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+      *    MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+      *    MOVE    "DBDELETE"          TO  MCP-FUNC
+      *    MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
+      *    CALL    "ORCMCPSUB"          USING
+      *                                 MCPAREA
+      *                                 ORCMCPAREA
+      *                                 MCPDATA-REC
       *
       *    IF      MCP-RC          NOT =   ZERO
       *D       DISPLAY "K03 WKSRYACT DEL ERR:" MCP-RC
       *D       MOVE    "0003"          TO  SPA-ERRCD
       *    END-IF
-      *    中途追加分の削除
       *
+      *    展開中の削除
            INITIALIZE                  WKSRYACT-REC
            MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
            MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
@@ -3129,7 +3129,6 @@
            PERFORM
                UNTIL   FLG-WKSRYACT    =   1
                IF      WKSRY-MOD-FLG       NOT =   ZERO
-      *
                    MOVE    WKSRYACT-REC        TO  MCPDATA-REC
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH

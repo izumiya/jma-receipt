@@ -2220,27 +2220,66 @@
        400-WKSRYACT-DEL-SEC              SECTION.
       *
       *    作成済みのワーク診療行為マスタ−を削除する
-           MOVE    SPACE               TO  WKSRYACT-REC
-           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
-           MOVE    SPA-PTID            TO  WKSRY-PTID
-           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
-           MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
-           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+      *    MOVE    SPACE               TO  WKSRYACT-REC
+      *    MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+      *    MOVE    SPA-PTID            TO  WKSRY-PTID
+      *    MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+      *    MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
+      *    MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
       *****MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
-           MOVE    SPA-WKSRY-HKNCOMBI  TO  WKSRY-HKNCOMBI
+      *    MOVE    SPA-WKSRY-HKNCOMBI  TO  WKSRY-HKNCOMBI
       *
-           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
-           MOVE    "DBDELETE"          TO  MCP-FUNC
-           MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+      *    MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+      *    MOVE    "DBDELETE"          TO  MCP-FUNC
+      *    MOVE    "WKSRYACT-KEY2"     TO  ORC-DBPATH
+      *    CALL    "ORCMCPSUB"          USING
+      *                                 MCPAREA
+      *                                 ORCMCPAREA
+      *                                 MCPDATA-REC
       *
       *    IF      MCP-RC          NOT =   ZERO
       *D       DISPLAY "K03 WKSRYACT DEL ERR:" MCP-RC
       *D       MOVE    "0003"          TO  SPA-ERRCD
       *    END-IF
+      *
+      *    展開中の削除
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPID          TO  WKSRY-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+               PERFORM 940-WKSRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           PERFORM
+               UNTIL   FLG-WKSRYACT    =   1
+               IF      WKSRY-MOD-FLG       NOT =   ZERO
+                   MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "WKSRYACT-KEY"      TO  ORC-DBPATH
+                   CALL    "ORCMCPSUB"         USING
+                                               MCPAREA
+                                               ORCMCPAREA
+                                               MCPDATA-REC
+               END-IF
+      *
+               MOVE    "WKSRYACT-KEY7"     TO  ORC-DBPATH
+               PERFORM 940-WKSRYACT-READ-SEC
+           END-PERFORM
+      *
       *
            .
        400-WKSRYACT-DEL-EXT.
@@ -2693,6 +2732,28 @@
       *
            .
        976-UKETUKE-NEXT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ワーク診療行為データ読込
+      *****************************************************************
+       940-WKSRYACT-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  WKSRYACT-REC
+               MOVE    ZERO            TO  FLG-WKSRYACT
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+      *
+           .
+       940-WKSRYACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
