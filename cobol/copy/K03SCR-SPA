@@ -201,6 +201,8 @@
                    07  SPA-GOK-CHOSEI            PIC S9(07).
                    07  SPA-OLD-SKYMONEY          PIC S9(07).
                    07  SPA-OLD-SEIKYU            PIC S9(07).
+      *            Á°²óÌ¤¼ý³ÛÆþ¶â³Û
+                   07  SPA-NYU-ZENMISYU          PIC S9(07).
       *
                    07  SPA-GOK-SRYKA             PIC X(02).
                    07  SPA-GOK-HKNCOMBI          PIC X(04).

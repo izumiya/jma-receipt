@@ -43,6 +43,7 @@
       *                                     氏名３０文字対応
       *  01.00.13    NACL-太田    04/03/17  （再）の文字の編集を削除
       *  01.00.14    NACL-多々納  04/07/15  複数科・保険組合せ対応
+      *  01.00.15    NACL-多々納  05/01/11  前回未収額の複数科・保険対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -173,6 +174,9 @@
            03  WRK-HKNTEN-KIN              PIC 9(07).
            03  WRK-HKNTEN-KEI              PIC 9(07)V99.
            03  WRK-NYUKIN                  PIC S9(07).
+      *
+           03  WRK-NYUKIN-TOTAL            PIC S9(07).
+           03  WRK-ZENMISYU                PIC S9(07).
       *
            03  WRK-SRYKA-MEI               PIC X(30).
            03  WRK-PAGE                    PIC 9(03).
@@ -428,6 +432,7 @@
            MOVE    ORCHC03-DENPNUM     TO  WRK-DENPNUM
            MOVE    ORCHC03-SEIKYU      TO  WRK-SKYMONEY
            MOVE    ORCHC03-NYUKIN      TO  WRK-NYUKIN
+           MOVE    ORCHC03-ZENMISYU    TO  WRK-MISYUMONEY
       *
       *    帳票印刷開始処理
            PERFORM 400-SYOKI-PRINT-SEC
@@ -987,7 +992,7 @@
            MOVE    WRK-Z72-G           TO  HC03-KONNYUKIN
       *    前回未収額計算
       *!!! PERFORM 3101-MISYU-HEN-SEC
-           MOVE    ORCHC03-ZENMISYU    TO  WRK-MISYUMONEY
+      *****MOVE    ORCHC03-ZENMISYU    TO  WRK-MISYUMONEY
            MOVE    WRK-MISYUMONEY      TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HC03-ZENMISYU
@@ -1021,6 +1026,20 @@
                                        SPA-AREA
                                        ORCHC03AREA
                                        ORCHC03SUBAREA
+      *    入金合計
+           MOVE    ZERO                TO  WRK-NYUKIN-TOTAL
+           PERFORM VARYING IDX-SYU     FROM    1   BY  1
+                   UNTIL   IDX-SYU     >   ORCHC03SUB-MAX
+               ADD     ORCHC03SUB-NYUKIN-TOTAL(IDX-SYU)
+                                           TO  WRK-NYUKIN-TOTAL
+           END-PERFORM
+      *    入金合計から前回未収額の入金額を求める
+           IF      ORCHC03-NYUKIN      >   WRK-NYUKIN-TOTAL
+               COMPUTE WRK-ZENMISYU    =   ORCHC03-NYUKIN
+                                       -   WRK-NYUKIN-TOTAL
+           ELSE
+               MOVE    ZERO            TO  WRK-ZENMISYU
+           END-IF
       *
            PERFORM VARYING IDX-SYU     FROM    1   BY  1
                    UNTIL   IDX-SYU     >   ORCHC03SUB-MAX
@@ -1048,6 +1067,15 @@
                                            TO  WRK-SKYMONEY
                MOVE    ORCHC03SUB-NYUKIN-TOTAL(IDX-SYU)
                                            TO  WRK-NYUKIN
+      *
+      *        １枚目に前回未収額を表示する
+               IF      IDX-SYU             =   1
+                   MOVE    ORCHC03-ZENMISYU    TO  WRK-MISYUMONEY
+                   COMPUTE WRK-NYUKIN          =   WRK-NYUKIN
+                                               +   WRK-ZENMISYU
+               ELSE
+                   MOVE    ZERO                TO  WRK-MISYUMONEY
+               END-IF
       *
       *        帳票印刷開始処理
                PERFORM 400-SYOKI-PRINT-SEC
