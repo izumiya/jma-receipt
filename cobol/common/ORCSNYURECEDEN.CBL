@@ -76,6 +76,7 @@
            03  GENSAN-IDX2                 PIC 9(04).
            03  IDV                         PIC 9(02).
            03  TSY90-IDX                   PIC 9(02).
+           03  ETC-IDX                     PIC 9(02).
       *
       *    ¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
        01  CONSTANT-AREA.
@@ -102,6 +103,9 @@
            03  CONS-JYOKU-KSN2             PIC X(09) VALUE "190813390".
       *    ÆÃÄê¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»
            03  CONS-TOKUSEIYAKU-KSN        PIC X(09) VALUE "190117570".
+      *    ¤½¤ÎÂ¾¿ÇÎÅ¹Ô°Ù¤ÇÆþÎÏ¤·¤¿Æþ±¡ÎÁ²Ã»»
+           03  CONS-ETCNYUIN-TBL.
+             05  CONS-ETCNYUIN-KSN         PIC X(09)  OCCURS 10.
       *    ÅÀ¿ô¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß¥ï¡¼¥¯ÍÑ
            03  TTNS-CONST-MAX              PIC 9(03) VALUE 200.
       *
@@ -201,6 +205,10 @@
       *
       *    ÆÃÄê¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»
            03  WRK-TOKUSEIYAKU-KSN         PIC 9(03) OCCURS 31.
+      *
+      *    ¤½¤ÎÂ¾¿ÇÎÅ¹Ô°Ù¤ÇÆþÎÏ¤·¤¿Æþ±¡ÎÁ²Ã»»
+           03  WRK-ETCNYUIN-TBL            OCCURS  10.
+             05  WRK-ETCNYUIN-KSN          PIC 9(03) OCCURS 31.
       *
       *    ¿ÇÎÅ¥³¡¼¥É·×½¸·×ÍÑ
            03  WRK-SRYCD-X                 PIC X(09).
@@ -387,6 +395,7 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  LNK-NYURECEDEN-HENKYAKU-AREA
+           INITIALIZE                  CONS-ETCNYUIN-TBL
            MOVE    ZERO                TO  LNK-NYURECEDEN-RC
       *
       *    ¥Ñ¥é¥á¡¼¥¿¥Á¥§¥Ã¥¯
@@ -851,7 +860,7 @@
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
                            IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
-                           AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO)
+                           AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
       *                         Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
@@ -907,6 +916,56 @@
                                 WHEN  CONS-TOKUSEIYAKU-KSN
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-TOKUSEIYAKU-KSN(IDX1)
+                              END-EVALUATE
+      *
+                           END-IF
+                       END-PERFORM
+                     ELSE
+      *                ¤½¤ÎÂ¾Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+                       PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                  UNTIL     IDX1   >   31
+                           IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
+                           AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4)
+                           AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
+                              EVALUATE   ACCT-SRYCDTOTAL(6:9)
+      *                         Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
+                                WHEN  CONS-ETCNYUIN-KSN(1)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(1 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(2)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(2 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(3)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(3 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(4)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(4 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(5)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(5 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(6)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(6 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(7)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(7 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(8)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(8 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(9)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(9 IDX1)
+                                WHEN  CONS-ETCNYUIN-KSN(10)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(10 IDX1)
+                                WHEN  OTHER
+                                  ADD     1     TO   ETC-IDX
+                                  MOVE    ACCT-SRYCDTOTAL(6:9) TO  
+                                           CONS-ETCNYUIN-KSN(ETC-IDX)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-ETCNYUIN-KSN(ETC-IDX
+                                                                 IDX1)
                               END-EVALUATE
       *
                            END-IF
@@ -1029,6 +1088,17 @@
                    MOVE   CONS-TOKUSEIYAKU-KSN TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
+      *        ¤½¤ÎÂ¾Æþ±¡ÎÁ²Ã»»
+               PERFORM    VARYING   ETC-IDX   FROM  1  BY  1
+                          UNTIL     ETC-IDX  >  10
+                   IF  CONS-ETCNYUIN-KSN(ETC-IDX)  NOT =  SPACE
+                     IF   WRK-ETCNYUIN-KSN(ETC-IDX IDX1) NOT =   ZERO
+                       ADD      1                  TO  WRK-MEISAISU
+                       MOVE   CONS-ETCNYUIN-KSN(ETC-IDX)
+                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                     END-IF
+                   END-IF
+               END-PERFORM
       *        Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
                IF         WRK-KEIKAKU-GENSAN1(IDX1) NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
