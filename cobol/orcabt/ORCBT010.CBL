@@ -43,6 +43,7 @@
       *                                     種別の編集を変更
       *  01.00.09    NACL-小豆沢  05/04/06  病名データにセットするレセ電診療科
       *                                     を患者病名テーブルの診療科に変更
+      *                                     生保受給者番号の編集を変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1128,26 +1129,24 @@
                MOVE   PTKOH-FTNJANUM   TO  TOUKEI01-TKOHFTNJANUM (IDY)
                MOVE   PTKOH-TEKSTYMD   TO  TOUKEI01-TKOHTEKSTYMD (IDY)
                MOVE   PTKOH-TEKEDYMD   TO  TOUKEI01-TKOHTEKEDYMD (IDY)
+               MOVE   PTKOH-JKYSNUM
+                                       TO  TOUKEI01-TKOHJKYSNUM  (IDY)
       *             
       *        生保のとき月代わり受給者番号マスタより受給者番号をセット 
                IF    ( PTKOH-KOHNUM    =   WRK-CONS-SEIHO-HKNNUM )
-               AND   ( SYS-1017-SEIHO-JKYSNUM
-                                       =   ZERO                  )
                    MOVE    WRK-PARA-HOSPID TO  MONTHLYNUM-HOSPID
                    MOVE    TOUKEI01-PTID   TO  MONTHLYNUM-PTID
                    MOVE    WRK-CONS-SEIHO-HKNNUM
                                            TO  MONTHLYNUM-KOHNUM
                    MOVE    WRK-PARA-SRYYM  TO  MONTHLYNUM-SRYYM
-                   MOVE    "2"             TO  MONTHLYNUM-NYUGAIKBN
+                   MOVE    WRK-PARA-NYUGAIKBN
+                                           TO  MONTHLYNUM-NYUGAIKBN
                    MOVE    MONTHLYNUM-REC  TO  MCPDATA-REC
                    PERFORM 910-MONTHLYNUM-READ-SEC
                    IF      FLG-MONTHLYNUM  =   ZERO
                        MOVE    MONTHLYNUM-JKYSNUM 
                                        TO  TOUKEI01-TKOHJKYSNUM  (IDY)
                    END-IF
-               ELSE                       
-                   MOVE   PTKOH-JKYSNUM
-                                       TO  TOUKEI01-TKOHJKYSNUM  (IDY)
                END-IF
       *    
       *        法別番号のセット
