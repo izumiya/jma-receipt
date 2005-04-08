@@ -464,7 +464,7 @@
            MOVE    ERR-PTID            TO  WRK-PTID
            PERFORM 900-PTNUM-KEY-SEL-SEC
            IF    ( FLG-PTNUM           =   ZERO )
-               MOVE    SPTID-PTNUM     TO  ERR-PTNUM
+               MOVE    PTNUM-PTNUM     TO  ERR-PTNUM
            ELSE
                STRING "?(ID:"          DELIMITED   BY  SIZE
                       ERR-PTID         DELIMITED   BY  SIZE
