@@ -635,6 +635,10 @@
            IF     (SPA-SYONIKA         =   1   )  AND
                   (SPA-NYUGAIKBN       =   "2" )
                PERFORM 1001-SYONIKA-CHK-SEC
+           ELSE
+               MOVE    ZERO                TO  SPA-SYONIKA-ARI
+               MOVE    ZERO                TO  SPA-SYONIKA-ARI2
+               MOVE    ZERO                TO  SPA-SYONIKA-ARI3
            END-IF
       *
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½èÍý
