@@ -260,8 +260,8 @@
       *
            END-IF
       *
-           IF    ( QDTCHK-CD               NOT =   CONST-MICODE )
-            AND  ( QDTCHK-BYOMEICD (1)     NOT =   CONST-MICODE )
+           IF    ( QDTCHK-CD                   =   CONST-MICODE )
+            AND  ( QDTCHK-BYOMEICD (1)         =   CONST-MICODE )
       *
                 IF   ( SDTCHK01-CHKPTN (5)     =   1 )
                     IF   ( FLG-MATCH           =   ZERO )
