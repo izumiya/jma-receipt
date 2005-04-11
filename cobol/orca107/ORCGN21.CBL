@@ -841,7 +841,7 @@
                                            ORCSKANACHKAREA
       *
                MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-MARK
-               IF    ( KANACHK-SYUBETU     NOT =   2    )  OR
+               IF    ( KANACHK-SYUBETU         =   ZERO )  OR
                      ( KANACHK-RC          NOT =   ZERO )  OR
                      ( KANACHK-RC2             =   7    )
                    MOVE    "0005"      TO  SPA-ERRCD
