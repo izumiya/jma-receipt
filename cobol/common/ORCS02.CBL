@@ -185,6 +185,10 @@
            03  WK-TAIHI-NYUJGNGAK-OCC.
                05  WK-TAIHI-NYUJGNGAK  PIC 9(7)    OCCURS   4.
       *
+           03  WK-TAIHI-SDAY-COMPFTN   PIC 9(7).
+           03  WK-TAIHI-SDAY-COMPFTNWK PIC 9(7).
+           03  WK-TAIHI-SDAY-FTNMONEY  PIC 9(7).
+      *
       *****Ï«ºÒ¡¦¼«ÇåÀÕ
       *    ¼«ÇåÀÕ¡Ê²Ã»»Î¨¡Ë
            03  WK-4001-KSNRATE         PIC 9(2).
@@ -7970,21 +7974,25 @@
       *
                  MOVE      1     TO    LNK-SDAY-SANTEIFLG(IDX2 KOH-IDX)
       *
+                 MOVE   ZERO     TO    WK-TAIHI-SDAY-COMPFTN
+                                       WK-TAIHI-SDAY-COMPFTNWK
+                                       WK-TAIHI-SDAY-FTNMONEY
+      *
                  IF     WK-DAY-NYUKFTNRATE    NOT =    ZERO
-                    COMPUTE   LNK-SDAY-COMPFTN(IDX2 KOH-IDX)    =
+                    COMPUTE   WK-TAIHI-SDAY-COMPFTN =
                               LNK-SDAY-HKNTEN(IDX2) *
                               10                    *
                               WK-FUTANWARI
-                    COMPUTE   LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)  =
-                             (LNK-SDAY-HKNTEN(IDX2) *
-                              10                    *
-                              WK-FUTANWARI           )  + 0.9
+                    COMPUTE   WK-TAIHI-SDAY-COMPFTNWK =
+                             (LNK-SDAY-HKNTEN(IDX2)   *
+                              10                      *
+                              WK-FUTANWARI         )  + 0.9
                  ELSE
-                    COMPUTE   LNK-SDAY-COMPFTN(IDX2 KOH-IDX)    =
+                    COMPUTE   WK-TAIHI-SDAY-COMPFTN =
                               LNK-SDAY-HKNTEN(IDX2) *
                               10                     
-                    COMPUTE   LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)  =
-                              LNK-SDAY-HKNTEN(IDX2) *
+                    COMPUTE   WK-TAIHI-SDAY-COMPFTNWK  =
+                              LNK-SDAY-HKNTEN(IDX2)    *
                               10                     
                  END-IF
                  IF   ((KOH-IDX                =   1    ) AND
@@ -8000,8 +8008,8 @@
                        (LNK-SYU-KOH-HKNNUM(1)
                                            NOT =   "027") AND
                        (LNK-SYU-SYUCOMPFTN     =   ZERO ))
-                    MOVE   ZERO   TO  LNK-SDAY-COMPFTN  (IDX2 KOH-IDX)
-                                      LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)
+                       MOVE   ZERO   TO  WK-TAIHI-SDAY-COMPFTN
+                                         WK-TAIHI-SDAY-COMPFTNWK
                  END-IF
       *
                  IF ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "051"       ) OR
@@ -8022,18 +8030,18 @@
                      END-IF
       ***********    CONTINUE
                  ELSE
-                     COMPUTE   LNK-SDAY-COMPFTN(IDX2 KOH-IDX)  =
-                               LNK-SDAY-COMPFTN(IDX2 KOH-IDX)  +  5
+                     COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                               WK-TAIHI-SDAY-COMPFTN  +  5
                      COMPUTE   WK-FTN      =
-                               LNK-SDAY-COMPFTN(IDX2 KOH-IDX)  / 10
-                     COMPUTE   LNK-SDAY-COMPFTN(IDX2 KOH-IDX)  =
+                               WK-TAIHI-SDAY-COMPFTN  / 10
+                     COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
                                WK-FTN   *  10
                  END-IF
       *
-                 IF      LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)
+                 IF      WK-TAIHI-SDAY-COMPFTNWK
                                           >   ZAN-KOHI-D3(IDX2 KOH-IDX)
                        MOVE   ZAN-KOHI-D3(IDX2 KOH-IDX)  TO
-                                       LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)
+                                       WK-TAIHI-SDAY-COMPFTNWK
                  END-IF
       *
                  IF ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "051"       ) OR
@@ -8041,7 +8049,7 @@
                     ( (LNK-SYU-SRYYMD(1:6)        >=  "200404"    ) AND
                       (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  
                                                   "015" OR "016"  ) )
-                   IF    LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                   IF    WK-TAIHI-SDAY-COMPFTN
                                           >   ZAN-KOHI-D2(IDX2 KOH-IDX)
                        MOVE   ZAN-KOHI-D2(IDX2 KOH-IDX)  TO
                                      WK-DAY-COMPFTN
@@ -8050,15 +8058,15 @@
       *
                  MOVE    ZAN-KOHI-D(IDX2 KOH-IDX)   TO   WK-ZAN-KOHI-D
       *
-                 IF      LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                 IF      WK-TAIHI-SDAY-COMPFTN
                                           >   ZAN-KOHI-D(IDX2 KOH-IDX)
                        MOVE   ZAN-KOHI-D(IDX2 KOH-IDX)   TO
-                                 LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                                    WK-TAIHI-SDAY-COMPFTN
                        MOVE   ZERO        TO  ZAN-KOHI-D(IDX2 KOH-IDX)
                  ELSE
                        COMPUTE  ZAN-KOHI-D(IDX2 KOH-IDX)    =
                                 ZAN-KOHI-D(IDX2 KOH-IDX)    -
-                                LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                                WK-TAIHI-SDAY-COMPFTN
                  END-IF
       *
                  IF    ZAN-KOHI-D(IDX2 KOH-IDX)   NOT =   ZERO
@@ -8070,32 +8078,39 @@
                                WK-FTN   *  10
                  END-IF
       *
-                 IF   ( FLG-HIKOTEI                     NOT =  ZERO )
-                 AND  ( LNK-SDAY-COMPFTN(IDX2 KOH-IDX)  NOT =  ZERO )
+                 IF   ( FLG-HIKOTEI            NOT =  ZERO )
+                 AND  ( WK-TAIHI-SDAY-COMPFTN  NOT =  ZERO )
                     MOVE   ZAN-KOHI-D3(IDX2 KOH-IDX)  TO
-                              LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)
+                                 WK-TAIHI-SDAY-COMPFTNWK
                     MOVE   ZAN-KOHI-D2(IDX2 KOH-IDX)  TO
-                              LNK-SDAY-COMPFTN  (IDX2 KOH-IDX)
+                                 WK-TAIHI-SDAY-COMPFTN
                     MOVE   WK-ZAN-KOHI-D              TO
-                              LNK-SDAY-FTNMONEY (IDX2 KOH-IDX)
+                                 WK-TAIHI-SDAY-FTNMONEY
                     MOVE   ZERO        TO   ZAN-KOHI-D(IDX2 KOH-IDX)
                  ELSE
-                    MOVE      LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
-                                   TO   LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)
-                    COMPUTE   LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)  =
-                              LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)  +  5
+                    MOVE      WK-TAIHI-SDAY-COMPFTN
+                                  TO   WK-TAIHI-SDAY-FTNMONEY
+                    COMPUTE   WK-TAIHI-SDAY-FTNMONEY  =
+                              WK-TAIHI-SDAY-FTNMONEY  +  5
                     COMPUTE   WK-FTN      =
-                              LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)  / 10
-                    COMPUTE   LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)  =
+                              WK-TAIHI-SDAY-FTNMONEY  / 10
+                    COMPUTE   WK-TAIHI-SDAY-FTNMONEY  =
                               WK-FTN   *  10
       *
                     IF    WK-DAY-COMPFTN    =  ALL"9"
                           CONTINUE
                     ELSE
                           MOVE  WK-DAY-COMPFTN     TO   
-                                    LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                                     WK-TAIHI-SDAY-COMPFTN
                     END-IF
                  END-IF
+      *
+                 MOVE  WK-TAIHI-SDAY-COMPFTN  
+                                   TO  LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                 MOVE  WK-TAIHI-SDAY-FTNMONEY
+                                   TO  LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)
+                 MOVE  WK-TAIHI-SDAY-COMPFTNWK
+                                   TO  LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)
       *
                  ADD   LNK-SDAY-COMPFTN(IDX2 KOH-IDX)  TO
                                  WK-DAY-KOH-COMPFTN(KOH-IDX)
