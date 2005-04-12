@@ -532,8 +532,6 @@
       ******************************************************************
        TOKUSYU-SANTEI-SEC                     SECTION.
       *
-           MOVE       ZERO      TO     IDY2
-      *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                               UNTIL  (IDX            >    10)
                                 OR   (LNK-SYU-SRYYMD(IDX) =  SPACE)
@@ -555,6 +553,10 @@
                 MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
                 MOVE     LNK-SYUDAY-REC(IDX)  TO  SYUDAY-REC           
+      *
+                INITIALIZE    WRK-SYUNOU-REC-T
+                INITIALIZE    WRK-SYUDAY-REC-T
+                MOVE     ZERO      TO     IDY2
       *
                 PERFORM    VARYING   IDY    FROM   1   BY   1
                             UNTIL   (IDY                 >    10 )
