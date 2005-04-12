@@ -117,6 +117,7 @@
                    07  SPA-NAI-YYKID           PIC 9(02).
                    07  SPA-NAI-KYYKTIME        PIC 9(04).
                    07  SPA-NAI-YYKTIME         PIC 9(04).
+                   07  SPA-OLD-YYKYMD          PIC X(08).
       *
       *
       *        表示リスト等
@@ -2123,6 +2124,8 @@
       *
            INITIALIZE                  SPA-GMN-TBL
            INITIALIZE                  SPA-NAI-TBL
+           INITIALIZE                  SPA-GMN-SELBAN
+           INITIALIZE                  SPA-NAI-SELBAN
            MOVE    ZERO                TO  SPA-GMN-MAX
       *
       *
@@ -2510,6 +2513,7 @@
            MOVE    SPA-NAI-YYKYMD      TO  SPA-Y01-YYKYMDS
            MOVE    SPA-NAI-KYYKTIME    TO  SPA-Y01-YYKTIME
            MOVE    SPA-NAI-YYKID       TO  SPA-Y01-YYKID
+           MOVE    SPA-NAI-YYKYMD      TO  SPA-OLD-YYKYMD
       *
            .
        410181-YYKSET-EXT.
@@ -2878,7 +2882,6 @@
       *****************************************************************
        490-TOROKU-SEC             SECTION.
       *
-      *
       *    登録チェック処理
            PERFORM 4901-TOROKU-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
@@ -2896,7 +2899,7 @@
            ELSE
                IF      (SPA-GMN-SRYNAIYOCD =   SPA-Y01-SRYNAIYO) AND
                        (SPA-NAI-DRCD(2:4)  =   SPA-Y01-DRCD(2:4)) AND
-                       (SPA-NAI-YYKYMD     =   SPA-Y01-YYKYMDS)   AND
+                       (SPA-NAI-YYKYMD     =   SPA-OLD-YYKYMD )   AND
                        (SPA-NAI-KYYKTIME   =   SPA-Y01-YYKTIME)
       *            予約修正処理
                    PERFORM 4902-YYKUPD-SEC
@@ -3175,7 +3178,6 @@
                IF      MCP-RC          NOT  =  ZERO
                    MOVE    "1012"  TO  SPA-ERRCD
                    DISPLAY "Y01 YYK MEI UPD ERR:" MCP-RC "."
-                   GO              TO  4902-YYKUPD-EXT
                END-IF
            ELSE
       *        予約追加処理
@@ -3195,7 +3197,7 @@
            MOVE    SPA-Y01-SRYNAIYO    TO  YYK-SRYNAIYO
            MOVE    "1"                 TO  YYK-DRCD(1:1)
            MOVE    SPA-Y01-DRCD(2:4)   TO  YYK-DRCD(2:4)
-           MOVE    SPA-Y01-YYKYMDS     TO  YYK-YYKYMD
+           MOVE    SPA-OLD-YYKYMD      TO  YYK-YYKYMD
            MOVE    SPA-Y01-YYKTIME     TO  YYK-KEYYYKTIME
            MOVE    ZERO                TO  YYK-YYKID
            PERFORM 910-YOYAKU-INV-SEC
@@ -3227,7 +3229,7 @@
            MOVE    SPA-Y01-SRYNAIYO    TO  YYK-SRYNAIYO
            MOVE    "1"                 TO  YYK-DRCD(1:1)
            MOVE    SPA-Y01-DRCD(2:4)   TO  YYK-DRCD(2:4)
-           MOVE    SPA-Y01-YYKYMDS     TO  YYK-YYKYMD
+           MOVE    SPA-OLD-YYKYMD      TO  YYK-YYKYMD
            MOVE    SPA-Y01-YYKTIME     TO  YYK-KEYYYKTIME
            MOVE    SPA-Y01-YYKID       TO  YYK-YYKID
            PERFORM 910-YOYAKU-INV-SEC
