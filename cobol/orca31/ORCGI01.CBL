@@ -10029,6 +10029,16 @@
                     MOVE   NACCT-DAY(IDX-SKJ)
                                        TO  WRK-TENROOM-SKJ(1 IDX-SKJ)
                END-PERFORM
+           ELSE
+               MOVE    SPA-NAI-I01-IDOYMD(1:6)
+                                       TO  WRK-TENROOM-SKJ-SRYYM(1)
+               MOVE    SPA-NAI-I01-IDOYMD(7:2)
+                                       TO  IDX-SHOKUJIX
+               PERFORM   VARYING   IDX-SKJ FROM  IDX-SHOKUJI9  BY  1
+                         UNTIL     IDX-SKJ   >   31
+                    MOVE   NACCT-DAY(IDX-SKJ)
+                                       TO  WRK-TENROOM-SKJ(1 IDX-SKJ)
+               END-PERFORM
            END-IF
       *    入院会計マスタクローズ
            MOVE    "NYUINACCT-KEY23"      TO  ORC-DBPATH
@@ -10057,6 +10067,13 @@
                          UNTIL     IDX-SKJ   >   31
                     MOVE   NACCT-DAY(IDX-SKJ)
                                        TO  WRK-TENROOM-SKJ(2 IDX-SKJ)
+               END-PERFORM
+           ELSE
+               MOVE    WRK-TENROOM-SKJ-SRYYMX
+                                       TO  WRK-TENROOM-SKJ-SRYYM(2)
+               PERFORM   VARYING   IDX-SKJ FROM  1  BY  1
+                         UNTIL     IDX-SKJ   >   31
+                    MOVE   ZERO        TO  WRK-TENROOM-SKJ(2 IDX-SKJ)
                END-PERFORM
            END-IF
       *    入院会計マスタクローズ
