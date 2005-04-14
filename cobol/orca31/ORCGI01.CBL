@@ -10036,8 +10036,7 @@
                                        TO  IDX-SHOKUJIX
                PERFORM   VARYING   IDX-SKJ FROM  IDX-SHOKUJI9  BY  1
                          UNTIL     IDX-SKJ   >   31
-                    MOVE   NACCT-DAY(IDX-SKJ)
-                                       TO  WRK-TENROOM-SKJ(1 IDX-SKJ)
+                    MOVE   ZERO        TO  WRK-TENROOM-SKJ(1 IDX-SKJ)
                END-PERFORM
            END-IF
       *    入院会計マスタクローズ
