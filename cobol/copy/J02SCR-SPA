@@ -248,6 +248,7 @@
       *
                    07  SPA-J021-STDAY                PIC 9(02).
                    07  SPA-J021-ENDAY                PIC 9(02).
+                   07  SPA-J021-NAI-ACCT             PIC 9(01).
       *
       *    回数入力画面用
            03  SPA-J022-AREA.

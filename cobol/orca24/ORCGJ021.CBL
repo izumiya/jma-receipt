@@ -113,6 +113,7 @@
            03  WRK-DAY-G.
                05  WRK-DAY         PIC 9(03)   OCCURS  4.
       *
+           03  WRK-SRYKBN          PIC X(02).
       *
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-ZZ              PIC ZZ.
@@ -529,12 +530,8 @@
                PERFORM 910-HKNCOMBI-READ-SEC
            END-PERFORM
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "HKNCOMBI-KEY2"     TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        3101-HKNCOMBI-HEN-EXT.
@@ -946,12 +943,13 @@
                MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
                PERFORM 970-JYURRK-READ-SEC
            END-PERFORM
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
+      *    入院の時、診療会計から判定
+           MOVE    ZERO                TO  SPA-J021-NAI-ACCT
+           IF      SPA-NYUGAIKBN       =   "1"
+               PERFORM 40013-SRYACCT-CHK-SEC
+           END-IF
       *
            MOVE    WRK-STDAY           TO  SPA-J021-STDAY
            MOVE    WRK-ENDAY           TO  SPA-J021-ENDAY
@@ -1004,12 +1002,8 @@
                MOVE    1               TO  FLG-HKNCOMBI
                INITIALIZE                  HKNCOMBI-REC
            END-IF
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "HKNCOMBI-KEY"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
            IF      FLG-HKNCOMBI        =   1
                MOVE    "0001"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-J021-CUR
@@ -1049,12 +1043,8 @@
                    MOVE    1               TO  FLG-SYUNOU
                END-IF
       *
-               MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
                MOVE    "SYUNOU-KEY"        TO  ORC-DBPATH
-               CALL    "ORCMCPSUB"         USING
-                                           MCPAREA
-                                           ORCMCPAREA
-                                           MCPDATA-REC
+               PERFORM 990-DBCLOSE-SEC
       *
                IF      FLG-SYUNOU          =   ZERO
                    MOVE    SYU-PTFTNRATE       TO  COMB-GAI-KFTNRATE
@@ -1078,6 +1068,82 @@
            .
        40012-MAE-HKNCHK-EXT.
            EXIT.
+      *****************************************************************
+      *    診療会計判定処理
+      *****************************************************************
+       40013-SRYACCT-CHK-SEC           SECTION.
+      *
+      *    調剤料
+           MOVE    "24"                TO  WRK-SRYKBN
+           PERFORM 400131-SRYACCT-CHK-SYORI-SEC
+      *    麻毒加算
+           MOVE    "26"                TO  WRK-SRYKBN
+           PERFORM 400131-SRYACCT-CHK-SYORI-SEC
+      *
+           .
+       40013-SRYACCT-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療会計判定処理
+      *****************************************************************
+       400131-SRYACCT-CHK-SYORI-SEC     SECTION.
+      *
+      *    診療会計
+           INITIALIZE                  SRYACCT-REC
+           MOVE    SPA-HOSPID          TO  ACCT-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+           MOVE    SPA-J01-SRYKA       TO  ACCT-SRYKA
+           MOVE    SPA-NAI-SRYYM       TO  ACCT-SRYYM
+           MOVE    WRK-SRYKBN          TO  ACCT-SRYKBN
+           MOVE    SPA-J021-MAE-HKNCOMBI
+                                       TO  ACCT-HKNCOMBI
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "SRYACCT-KEY3"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "SRYACCT-KEY3"     TO  ORC-DBPATH
+               PERFORM 980-SRYACCT-READ-SEC
+           ELSE
+               INITIALIZE                  SRYACCT-REC
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           PERFORM
+               UNTIL   FLG-SRYACCT     =   1
+             IF      SPA-J021-MAE-HKNCOMBI
+                                       =   ACCT-HKNCOMBI
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL       IDX2    >   31
+                   IF      ACCT-DAY (1 IDX2)   >   ZERO
+                       IF     (WRK-STDAY       =   ZERO )  OR
+                              (WRK-STDAY       >   IDX2 )
+                           MOVE    IDX2            TO  WRK-STDAY
+                           MOVE    1               TO  SPA-J021-NAI-ACCT
+                       END-IF
+                       IF     (WRK-ENDAY       =   ZERO )  OR
+                              (WRK-ENDAY       <   IDX2 )
+                           MOVE    IDX2            TO  WRK-ENDAY
+                       END-IF
+                   END-IF
+               END-PERFORM
+             END-IF
+      *
+               MOVE    "SRYACCT-KEY3"         TO  ORC-DBPATH
+               PERFORM 980-SRYACCT-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "SRYACCT-KEY3"     TO  ORC-DBPATH
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       400131-SRYACCT-CHK-SYORI-EXT.
+           EXIT.
       *
       *****************************************************************
       *    後保険組合せチェック処理
@@ -1088,8 +1154,17 @@
            IF      SPA-J021-ATO-HKNCOMBI   =   SPACE
                MOVE    SPACE               TO  SPA-J021-ATO-HKNCOMBIMEI
                MOVE    SPACE               TO  SPA-J021-ATO-FTNRATE
-               GO      TO      4002-ATO-HKNCOMBI-EXT
+           ELSE
+               PERFORM 40021-ATO-HKNCOMBI-CHK-SEC
            END-IF
+           .
+       4002-ATO-HKNCOMBI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    後保険組合せチェック処理
+      *****************************************************************
+       40021-ATO-HKNCOMBI-CHK-SEC               SECTION.
       *
            INITIALIZE                      ORCSNUMAREA
            MOVE    SPA-J021-ATO-HKNCOMBI
@@ -1195,7 +1270,7 @@
            END-IF
       *
            .
-       4002-ATO-HKNCOMBI-EXT.
+       40021-ATO-HKNCOMBI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1349,12 +1424,8 @@
                INITIALIZE                  JYURRK-REC
                MOVE    1               TO  FLG-JYURRK
            END-IF
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
            IF      FLG-JYURRK          =   ZERO
                MOVE    "0018"              TO  SPA-ERRCD
                MOVE    3                   TO  SPA-J021-CUR
@@ -1428,12 +1499,8 @@
                MOVE    1               TO  FLG-HKNCOMBI
                INITIALIZE                  HKNCOMBI-REC
            END-IF
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "HKNCOMBI-KEY"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
            IF      FLG-HKNCOMBI        =   1
                MOVE    "0003"              TO  SPA-ERRCD
            END-IF
@@ -1515,12 +1582,8 @@
                INITIALIZE                  JYURRK-REC
                MOVE    1               TO  FLG-JYURRK
            END-IF
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
            IF      FLG-JYURRK          =   ZERO
                MOVE    1                   TO  FLG-JYURRK-ATO
            ELSE
@@ -1529,6 +1592,13 @@
       *
       *    受診履歴
            PERFORM 300311-JYURRK-UPD-SEC
+      *
+           IF     (SPA-ERRCD           =   SPACE ) AND
+                  (SPA-NYUGAIKBN       =   "1"   )  AND
+                  (SPA-J021-NAI-ACCT   =   1     )
+      *        入院調剤料のみの診療会計（受診履歴なし）
+               PERFORM 300315-SRYACCT-UPD-SEC
+           END-IF
       *
            IF      SPA-ERRCD           =   SPACE
       *        算定履歴
@@ -1625,12 +1695,8 @@
                PERFORM 970-JYURRK-READ-SEC
            END-PERFORM
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        300311-JYURRK-UPD-EXT.
@@ -1686,12 +1752,8 @@
                MOVE    WRK-ZAINUM          TO  JYURRK-ZAINUM(IDJ)
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SRYACCT-KEY5"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        300321-SRYACCT-CHK-EXT.
@@ -1967,12 +2029,8 @@
                MOVE    "SRYACT-KEY2"       TO  ORC-DBPATH
                PERFORM 910-SRYACT-READ-SEC
            END-PERFORM
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SRYACT-KEY2"       TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        300321111-SRYACT-HEN-EXT.
@@ -1989,9 +2047,23 @@
            MOVE    WRK-ZAINUM          TO  ACCT-ZAINUM
       *
            MOVE    ZERO                TO  ACCT-ZAIKAISU
-           MOVE    JYURRK-SRYYMD(7:2)  TO  IDX2
-           PERFORM VARYING     IDX3    FROM    1   BY  1
-                   UNTIL       IDX3    >   31
+           IF      JYURRK-SRYYMD       =   SPACE
+             PERFORM VARYING     IDX3    FROM    1   BY  1
+                     UNTIL       IDX3    >   31
+               IF     (IDX3            >=  SPA-J021-DAY1 ) AND
+                      (IDX3            <=  SPA-J021-DAY2 )
+                   ADD     ACCT-DAY (1 IDX3)   TO  ACCT-ZAIKAISU
+               ELSE
+                   MOVE    ZERO        TO  ACCT-DAY (1 IDX3)
+                   MOVE    ZERO        TO  ACCT-DAY (2 IDX3)
+                   MOVE    ZERO        TO  ACCT-DAY (3 IDX3)
+                   MOVE    ZERO        TO  ACCT-DAY (4 IDX3)
+               END-IF
+             END-PERFORM
+           ELSE
+             MOVE    JYURRK-SRYYMD(7:2)  TO  IDX2
+             PERFORM VARYING     IDX3    FROM    1   BY  1
+                     UNTIL       IDX3    >   31
                IF      IDX3            =   IDX2
                    ADD     ACCT-DAY (1 IDX2)   TO  ACCT-ZAIKAISU
                ELSE
@@ -2000,7 +2072,8 @@
                    MOVE    ZERO        TO  ACCT-DAY (3 IDX3)
                    MOVE    ZERO        TO  ACCT-DAY (4 IDX3)
                END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *    保険組合せの変更
            MOVE    SPA-J021-ATO-HKNCOMBI  TO  ACCT-HKNCOMBI
       *
@@ -2101,12 +2174,8 @@
                MOVE    "SRYACT-KEY2"       TO  ORC-DBPATH
                PERFORM 910-SRYACT-READ-SEC
            END-PERFORM
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SRYACT-KEY2"       TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        30032112-SRYACCT-INS-EXT.
@@ -2125,8 +2194,7 @@
            IF      FLG-PTINF           =   1
                MOVE    "0019"          TO  SPA-ERRCD
                DISPLAY "J021 ZAINUM-SET ERR:" SPA-ERRCD
-               GO      TO      30032112-ZAINUM-SET-EXT
-           END-IF
+           ELSE
       *
       *    最大剤番号
            IF      PTINF-MAXZAINUM     =   ALL "9"
@@ -2149,6 +2217,8 @@
                DISPLAY "J021 PTINF UPD ERR:"   MCP-RC
                MOVE    "1028"              TO  SPA-ERRCD
            END-IF 
+      *
+           END-IF
       *
            .
        30032112-ZAINUM-SET-EXT.
@@ -2194,12 +2264,8 @@
                    PERFORM 980-SRYACCT-READ-SEC
                END-IF
            END-PERFORM
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SRYACCT-KEY5"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        30032113-SRYACCT-UPD-EXT.
@@ -2210,12 +2276,31 @@
       *****************************************************************
        300321131-SRYACCT-HENUPD-SEC          SECTION.
       *
-           MOVE    JYURRK-SRYYMD(7:2)  TO  IDX2
-           ADD     HZN-ACCT-DAY (1 IDX2)   TO  ACCT-DAY (1 IDX2)
-           ADD     HZN-ACCT-DAY (2 IDX2)   TO  ACCT-DAY (2 IDX2)
-           ADD     HZN-ACCT-DAY (3 IDX2)   TO  ACCT-DAY (3 IDX2)
-           ADD     HZN-ACCT-DAY (4 IDX2)   TO  ACCT-DAY (4 IDX2)
-           ADD     HZN-ACCT-DAY (1 IDX2)   TO  ACCT-ZAIKAISU
+           IF      JYURRK-SRYYMD       =   SPACE
+               PERFORM VARYING     IDX3    FROM    1   BY  1
+                       UNTIL       IDX3    >   31
+                   IF     (IDX3            >=  SPA-J021-DAY1 ) AND
+                          (IDX3            <=  SPA-J021-DAY2 )
+                       ADD     HZN-ACCT-DAY (1 IDX3)
+                                               TO  ACCT-DAY (1 IDX3)
+                       ADD     HZN-ACCT-DAY (2 IDX3)
+                                               TO  ACCT-DAY (2 IDX3)
+                       ADD     HZN-ACCT-DAY (3 IDX3)
+                                               TO  ACCT-DAY (3 IDX3)
+                       ADD     HZN-ACCT-DAY (4 IDX3)
+                                               TO  ACCT-DAY (4 IDX3)
+                       ADD     HZN-ACCT-DAY (1 IDX3)
+                                               TO  ACCT-ZAIKAISU
+                   END-IF
+               END-PERFORM
+           ELSE
+               MOVE    JYURRK-SRYYMD(7:2)  TO  IDX2
+               ADD     HZN-ACCT-DAY (1 IDX2)   TO  ACCT-DAY (1 IDX2)
+               ADD     HZN-ACCT-DAY (2 IDX2)   TO  ACCT-DAY (2 IDX2)
+               ADD     HZN-ACCT-DAY (3 IDX2)   TO  ACCT-DAY (3 IDX2)
+               ADD     HZN-ACCT-DAY (4 IDX2)   TO  ACCT-DAY (4 IDX2)
+               ADD     HZN-ACCT-DAY (1 IDX2)   TO  ACCT-ZAIKAISU
+           END-IF
       *
            MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
            MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
@@ -2265,12 +2350,8 @@
                MOVE    1               TO  FLG-SYUNOU
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SYUNOU-KEY"        TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                            MCPAREA
-                                            ORCMCPAREA
-                                            MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            IF     (FLG-SYUNOU          =   ZERO  )  AND
                   (SYU-HKNCOMBINUM     =   SPA-J021-MAE-HKNCOMBI)
@@ -2321,6 +2402,148 @@
       *
            .
        3003131-SYUNOU-UPDATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院調剤料のみの診療会計（受診履歴なし）処理
+      *****************************************************************
+       300315-SRYACCT-UPD-SEC          SECTION.
+      *
+      *    診療会計
+           INITIALIZE                  SRYACCT-REC
+           MOVE    SPA-HOSPID          TO  ACCT-HOSPID
+           MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+           MOVE    SPA-J01-SRYKA       TO  ACCT-SRYKA
+           MOVE    SPA-NAI-SRYYM       TO  ACCT-SRYYM
+           MOVE    SPA-J021-MAE-HKNCOMBI
+                                       TO  ACCT-HKNCOMBI
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "SRYACCT-KEY11"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "SRYACCT-KEY11"     TO  ORC-DBPATH
+               PERFORM 980-SRYACCT-READ-SEC
+           ELSE
+               INITIALIZE                  SRYACCT-REC
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           PERFORM
+               UNTIL  (FLG-SRYACCT     =   1   )  OR
+                      (SPA-ERRCD   NOT =   SPACE)
+               PERFORM 3003151-SRYACCT-ONLY-SEC
+      *
+               MOVE    "SRYACCT-KEY11"         TO  ORC-DBPATH
+               PERFORM 980-SRYACCT-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "SRYACCT-KEY11"     TO  ORC-DBPATH
+           PERFORM 990-DBCLOSE-SEC
+           .
+       300315-SRYACCT-UPD-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計変更処理
+      *****************************************************************
+       3003151-SRYACCT-ONLY-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHK
+           MOVE    ZERO                TO  FLG-CHK2
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL       IDX2    >   31
+               IF      ACCT-DAY (1 IDX2)   >   ZERO
+                   IF     (IDX2            >=  SPA-J021-DAY1 ) AND
+                          (IDX2            <=  SPA-J021-DAY2 )
+                       MOVE    1           TO  FLG-CHK2
+                   ELSE
+                       MOVE    1           TO  FLG-CHK
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *    対象の期間にあること
+           MOVE    SRYACCT-REC         TO  HZN-SRYACCT-REC
+      *    変更期間のみ算定
+           MOVE    ZERO                TO  FLG-ACCT-END
+           MOVE    ZERO                TO  WRK-ZAINUM
+           IF     (FLG-CHK             =   ZERO )  AND
+                  (FLG-CHK2            =   1    )
+               IF      FLG-JYURRK-ATO      =   1
+      *            同一剤の有無判定
+                   PERFORM 30032111-ZAICHK-SEC
+                   IF      WRK-ZAINUM          =   ZERO
+      *                保険組合せのみの変更
+                       PERFORM 30032110-HKNCOMBI-HEN-SEC
+                       MOVE    ACCT-ZAINUM         TO  WRK-ZAINUM
+                       MOVE    1                   TO  FLG-ACCT-END
+                   END-IF
+               ELSE
+      *            保険組合せのみの変更
+                   PERFORM 30032110-HKNCOMBI-HEN-SEC
+                   MOVE    ACCT-ZAINUM         TO  WRK-ZAINUM
+                   MOVE    1                   TO  FLG-ACCT-END
+               END-IF
+           END-IF
+           IF     (FLG-CHK2            =   1    )  AND
+                  (FLG-ACCT-END        =   ZERO )
+      *        算定日削除
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL       IDX2    >   31
+                   IF      ACCT-DAY (1 IDX2)   >   ZERO
+                      IF     (IDX2            >=  SPA-J021-DAY1 ) AND
+                             (IDX2            <=  SPA-J021-DAY2 )
+                           COMPUTE ACCT-ZAIKAISU   =   ACCT-ZAIKAISU
+                                                   -   ACCT-DAY (1 IDX2)
+                           MOVE    ZERO            TO  ACCT-DAY (1 IDX2)
+                           MOVE    ZERO            TO  ACCT-DAY (2 IDX2)
+                           MOVE    ZERO            TO  ACCT-DAY (3 IDX2)
+                           MOVE    ZERO            TO  ACCT-DAY (4 IDX2)
+                       END-IF
+                   END-IF
+               END-PERFORM
+               IF      ACCT-ZAIKAISU       =   ZERO
+                   PERFORM 30032114-SRYACCT-DELETE-SEC
+               ELSE
+                   MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+      *
+                   MOVE    SRYACCT-REC         TO  MCPDATA-REC
+                   MOVE    "DBUPDATE"          TO  MCP-FUNC
+                   MOVE    "SRYACCT-KEY"       TO  ORC-DBPATH
+                   CALL    "ORCMCPSUB"         USING
+                                               MCPAREA
+                                               ORCMCPAREA
+                                               MCPDATA-REC
+                   IF      MCP-RC          NOT =   ZERO
+                       DISPLAY "J021 SRYACCT UPD ERR:"   MCP-RC
+                               ",KEY:" ACCT-KEY
+                       MOVE    "0011"              TO  SPA-ERRCD
+                   END-IF
+               END-IF
+      *        変更期間のみ算定
+               IF      WRK-ZAINUM          =   ZERO
+      *            同一剤の有無判定
+                   PERFORM 30032111-ZAICHK-SEC
+               END-IF
+               MOVE    SPACE               TO  JYURRK-SRYYMD
+               IF      WRK-ZAINUM          =   ZERO
+      *            同一剤なし
+                   PERFORM 30032112-SRYACCT-INS-SEC
+               ELSE
+      *            同一剤あり
+                   PERFORM 30032113-SRYACCT-UPD-SEC
+               END-IF
+           END-IF
+      *
+           .
+       3003211-SRYACCT-UPD-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2412,12 +2635,8 @@
                PERFORM 920-SANTEI-READ-SEC
            END-PERFORM
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SANTEI-KEY6"       TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                            MCPAREA
-                                            ORCMCPAREA
-                                            MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        300314-SANTEI-UPD-EXT.
@@ -2472,12 +2691,8 @@
                MOVE    1               TO  FLG-SANTEI
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "SANTEI-KEY"        TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
            IF      FLG-SANTEI          =   1
                MOVE    HZN-SANTEI-REC      TO  SANTEI-REC
                MOVE    SPA-J021-ATO-HKNCOMBI
@@ -2578,12 +2793,8 @@
                PERFORM 920-RECECOM-READ-SEC
            END-PERFORM
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "RECECOM-KEY4"      TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            IF     (IDX-R               >   1  )  AND
                   (SPA-ERRCD           =   SPACE )
@@ -2630,12 +2841,8 @@
                MOVE    1               TO  FLG-RECECOM
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "RECECOM-KEY"       TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"         USING
-                                       MCPAREA
-                                       ORCMCPAREA
-                                       MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            IF      FLG-RECECOM         =   ZERO
       *        削除
@@ -3012,12 +3219,8 @@
                MOVE    1              TO  FLG-PTINF
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "PTINF-KEY"         TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
       *
            .
        940-PTINF-READ-EXT.
@@ -3053,12 +3256,8 @@
                MOVE    1              TO  FLG-PTCOM
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "PTCOM-KEY"         TO  ORC-DBPATH
-           CALL    "ORCMCPSUB"          USING
-                                        MCPAREA
-                                        ORCMCPAREA
-                                        MCPDATA-REC
+           PERFORM 990-DBCLOSE-SEC
            .
        950-PTCOM-READ-EXT.
            EXIT.
@@ -3105,6 +3304,21 @@
       *
            .
        920-RECECOM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢクローズ処理
+      *****************************************************************
+       990-DBCLOSE-SEC         SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+      *
+           .
+       990-DBCLOSE-EXT.
            EXIT.
       *
       *****************************************************************
