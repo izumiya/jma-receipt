@@ -74,6 +74,8 @@
       *  01.02.05    NACL-ÌçÏÆ    05/03/02  ÌôºÞ¤ÇÃ±°Ì¤Î¤Ê¤¤¥Ç¡¼¥¿¤Î¿ôÎÌÊÔ½¸
       *                                     ½¤Àµ
       *  01.02.06    NACL-Æ£¸¶    05/03/07  Êñ³çÂÐ¾Ý¸¡ºº¤Î¤Þ¤È¤á¤Î½¤Àµ
+      *  01.02.07    NACL-Æ£¸¶    05/04/18  Êñ³çÂÐ¾Ý¸¡ºº¤¬¤Þ¤È¤Þ¤é¤Ê¤¤
+      *                                     ¾ì¹ç¤ÎÊÔ½¸¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1869,19 +1871,22 @@
        2007-SRYKBN60-HENSYU-SEC         SECTION.
       *
            INITIALIZE                   WRK-RECE44-MATOME-TABLE
+                                        WRK-RECE44-FLG-TABLE
       *
            MOVE    1                    TO  IDXX 
            PERFORM              UNTIL   IDXX >       31
-               INITIALIZE                  WRK-RECE44-FLG-TABLE
-                                           WRK-KAISU-G
+      *********INITIALIZE                  WRK-RECE44-FLG-TABLE
+               INITIALIZE                  WRK-KAISU-G
                                            WRK-HOUKNSKBN
                                            WRK-KENSA-SU
       *
                IF      WRK-SUM-KAISU (IDXX)   >   ZERO
                    PERFORM VARYING IDY FROM    1   BY  1
                            UNTIL   IDY >       WRK-RECE44-MAX
-                       IF      WRK-RECE44-KAISU (IDY 1 IDXX)    
-                                               >   ZERO
+                       IF    ( WRK-RECE44-KAISU (IDY 1 IDXX)    
+                                               >   ZERO )
+                       AND   ( WRK-RECE44-FLG (IDY)
+                                               =   ZERO )     
                            IF      WRK-KAISU (1)   =   ZERO
                                MOVE    WRK-RECE44-KAISU (IDY 1 IDXX)
                                                    TO  WRK-KAISU (1)
@@ -1909,6 +1914,8 @@
                                                WRK-SUM-KAISU (IDXX) -
                                                WRK-KAISU   (1)
                                MOVE    1           TO  WRK-RECE44-MATOME 
+                                                             (IDY)
+                               MOVE    2           TO  WRK-RECE44-FLG 
                                                              (IDY)
                            END-IF                                       
                        END-PERFORM
@@ -2016,6 +2023,7 @@
       *
                IF      WRK-SUM-KAISU (IDXX)   =   ZERO
                    ADD     1                  TO  IDXX
+                   INITIALIZE                  WRK-RECE44-FLG-TABLE
                END-IF
            END-PERFORM
       *

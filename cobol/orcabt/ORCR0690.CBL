@@ -68,6 +68,8 @@
       *  01.02.04    NACL-藤原    05/03/07  包括対象検査のまとめの修正
       *  01.02.05    NACL-藤原    05/03/18  レセプト特記事項編集情報によ
       *                                     るレセプト編集対応
+      *  01.02.06    NACL-藤原    05/04/18  包括対象検査がまとまらない
+      *                                     場合の編集の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1934,11 +1936,12 @@
        2007-SRYKBN60-HENSYU-SEC         SECTION.
       * 
            INITIALIZE                   WRK-RECE64-MATOME-TABLE
+                                        WRK-RECE64-FLG-TABLE
       *     
            MOVE    1                    TO  IDXX 
            PERFORM              UNTIL   IDXX >       31
-               INITIALIZE                  WRK-RECE64-FLG-TABLE
-                                           WRK-KAISU-G
+      *********INITIALIZE                  WRK-RECE64-FLG-TABLE
+               INITIALIZE                  WRK-KAISU-G
                                            WRK-HOUKNSKBN
                                            WRK-KOHBUNRI
                                            WRK-KENSA-SU
@@ -1946,8 +1949,10 @@
                IF      WRK-SUM-KAISU (IDXX)   >   ZERO
                    PERFORM VARYING IDY FROM    1   BY  1
                            UNTIL   IDY >       WRK-RECE64-MAX
-                       IF      WRK-RECE64-KAISU (IDY 1 IDXX)    
-                                               >   ZERO
+                       IF    ( WRK-RECE64-KAISU (IDY 1 IDXX)    
+                                               >   ZERO )
+                       AND   ( WRK-RECE64-FLG (IDY)
+                                               =   ZERO )     
                            IF      WRK-KAISU (1)   =   ZERO
                                MOVE    WRK-RECE64-KAISU (IDY 1 IDXX)
                                                    TO  WRK-KAISU (1)
@@ -1979,6 +1984,8 @@
                                                WRK-SUM-KAISU (IDXX) -
                                                WRK-KAISU   (1)
                                MOVE    1           TO  WRK-RECE64-MATOME 
+                                                             (IDY)
+                               MOVE    2           TO  WRK-RECE64-FLG 
                                                              (IDY)
                            END-IF                                       
                        END-PERFORM
@@ -2089,6 +2096,7 @@
       *
                IF      WRK-SUM-KAISU (IDXX)   =   ZERO
                    ADD     1                  TO  IDXX
+                   INITIALIZE                  WRK-RECE64-FLG-TABLE
                END-IF
            END-PERFORM
       *
