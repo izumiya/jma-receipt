@@ -304,7 +304,7 @@
            03  WRK-SUM-KAISU               PIC 9(04)
                                                   OCCURS  31.
        01  WRK-RECE84-FLG-TABLE.
-           03  WRK-RECE84-FLG              PIC X(01)
+           03  WRK-RECE84-FLG              PIC 9(01)
                                                   OCCURS  100.
        01  WRK-RECE84-MATOME-TABLE.
            03  WRK-RECE84-MATOME           PIC 9(01)
@@ -1700,7 +1700,7 @@
                                                    =   WRK-KAISU (1)
                            AND     WRK-RECE84-HOUKNSKBN (IDY)
                                                    =   WRK-HOUKNSKBN
-                               MOVE    "1"         TO  WRK-RECE84-FLG 
+                               MOVE    1           TO  WRK-RECE84-FLG 
                                                        (IDY)
                                ADD     1           TO  WRK-KENSA-SU
                            END-IF
