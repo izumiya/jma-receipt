@@ -52,6 +52,8 @@
       *                                     加算項目であるが基本項目となって
       *                                     いる項目がある場合の記載順
       *                                     超音波内視鏡加算を逓減の後に記載
+      *  01.00.11    NACL-小豆沢  05/04/20  手術の５０％併施加算を告示識別
+      *                                     区分を手技の扱いに置き換え
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3114,6 +3116,10 @@
                                                        =   SPACE
                                OR      WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
                                                    NOT =   "1"
+                           IF  WRK-KOUI-TAIHI-SRYCD (IDX) = "150268970"
+                              MOVE    1      TO  
+                                      WRK-KOUI-TAIHI-KOKUJISKBKBN1 (IDX)
+                           END-IF
                            EVALUATE    WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
                                WHEN    "1"
                                WHEN    "3" 
