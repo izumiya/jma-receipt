@@ -149,6 +149,8 @@
       *  01.02.18    NACL-Æ£¸¶    05/04/04   01.02.03¤Î¿ÀÆàÀîÂÐ±þ
       *                                     ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊóÂÐ±þ
       *                                     ¤Ë¤è¤êÃæ»ß¤¹¤ë
+      *  01.02.19    NACL-¾®Æ¦Âô  05/04/20  ¼ê½Ñ¤Î£µ£°¡óÊ»»Ü²Ã»»¤ò¹ð¼¨¼±ÊÌ
+      *                                     ¶èÊ¬¤ò¼êµ»¤Î°·¤¤¤ËÃÖ¤­´¹¤¨
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2668,7 +2670,7 @@
       *
                MOVE    RECE05-SRYACTINF (IDX)  TO
                                      TBL-KOUI-SRYACTINF (WRK-TBLMAX1)
-               MOVE    RECE05-NAMEiNF (IDX)    TO
+               MOVE    RECE05-NAMEINF (IDX)    TO
                                      TBL-KOUI-NAMEINF   (WRK-TBLMAX1)
       *********MOVE    RECE05-SRYCD    (IDX)   TO
       *********                        TBL-KOUI-SRYCD   (WRK-TBLMAX1)
@@ -2882,6 +2884,10 @@
                MOVE    ZERO                TO  FLG-KOUI
       *
                PERFORM UNTIL   IDX >   WRK-TBLMAX1
+                 IF      TBL-KOUI-SRYCD (IDX) = "150268970"
+                      MOVE    1      TO  
+                                  TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                 END-IF
                  EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
                            ALSO    TBL-KOUI-KOKUJISKBKBN1 (IDX)
                    WHEN    SPACE   ALSO    ANY
