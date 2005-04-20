@@ -1066,6 +1066,10 @@
                                                TO  SPA-COM-JIHIMONEY
                                                                  (IDX2)
                END-IF
+      *        剤点数の設定（訂正前）
+               MOVE    SPA-COM-JIHIMONEY(IDX2)
+                                       TO  SPA-COM-MAE-TENSU (IDX2)
+      *
       *        自費の時、金額編集
            ELSE
                IF      SPA-COM-SRYKBN (IDX2)   =   "95"  OR  "96"
@@ -1077,6 +1081,9 @@
                    MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
                                                TO  SPA-COM-JIHIMONEY
                                                                  (IDX2)
+      *            剤点数の設定（訂正前）
+                   MOVE    SPA-COM-JIHIMONEY(IDX2)
+                                           TO  SPA-COM-MAE-TENSU (IDX2)
                ELSE
                    MOVE    SPACE               TO  SPA-COM-KEIFLG(IDX2)
                END-IF
