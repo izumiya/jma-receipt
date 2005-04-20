@@ -2613,12 +2613,21 @@
                    IF      FLG-MAE-TENSU   =   ZERO
                        IF     (SPA-COM-MAE-TENSU(IDX)  >   ZERO  )  OR
                               (SPA-COM-INPUTCD (IDX)   NOT =   SPACE)
-                           MOVE    SPA-COM-MAE-TENSU(IDX)
-                                               TO  WRK-MAE-TENSU
-                           MOVE    1           TO  FLG-MAE-TENSU
+                           IF     (SPA-COM-MAE-TENSU(IDX)  =   ZERO) AND
+                                  (SPA-COM-INPUTCD (IDX)(1:1)  =  "8"
+                                                               OR "0")
+                               CONTINUE
+                           ELSE
+                               MOVE    SPA-COM-MAE-TENSU(IDX)
+                                                   TO  WRK-MAE-TENSU
+                               MOVE    1           TO  FLG-MAE-TENSU
+                           END-IF
                        END-IF
                    END-IF
-                   IF      SPA-COM-ZAIEND(IDX)     =   "1"
+                   IF     (SPA-COM-ZAIEND(IDX)     =   "1" )  OR
+                         ((SPA-COM-SRYKBN(IDX)     =   "95"
+                                                   OR  "96" ) AND
+                          (SPA-COM-JIHIMONEY(IDX)  >   ZERO ))
                        IF      SPA-COM-SRYKBN(IDX)     =   "95"
                                                        OR  "96"
                            MOVE    SPA-COM-JIHIMONEY(IDX)
@@ -2631,6 +2640,8 @@
                            MOVE    1               TO  SPA-TEISEI-ERR
                            MOVE    "1"             TO  SPA-COM-CUR (IDX)
                        END-IF
+                       MOVE    ZERO            TO  WRK-MAE-TENSU
+                       MOVE    ZERO            TO  FLG-MAE-TENSU
                    END-IF
                    IF      SPA-COM-ZAIEND(IDX)     =   "1"
                        MOVE    ZERO                TO  WRK-MAE-TENSU
