@@ -137,6 +137,8 @@
       *                                     Ä¶²»ÇÈÆâ»ë¶À²Ã»»¤òÄþ¸º¤Î¸å¤Ëµ­ºÜ
       *  01.02.15    NACL-Æ£¸¶    05/02/28  ¥³¥á¥ó¥Èµ­ºÜ½ç¤ÎÊÑ¹¹
       *  01.02.16    NACL-Æ£¸¶    05/02/28  ¥³¥á¥ó¥Èµ­ºÜ½ç¤ÎÊÑ¹¹¤Ë¤è¤ëÅÀ¿ô¤ÎÊÔ½¸
+      *  01.02.17    NACL-¾®Æ¦Âô  05/04/20  ¼ê½Ñ¤Î£µ£°¡óÊ»»Ü²Ã»»¤ò¹ð¼¨¼±ÊÌ
+      *                                     ¶èÊ¬¤ò¼êµ»¤Î°·¤¤¤ËÃÖ¤­´¹¤¨
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2826,6 +2828,10 @@
                MOVE    ZERO                TO  FLG-KOUI
       *
                PERFORM UNTIL   IDX >   WRK-TBLMAX1
+                 IF      TBL-KOUI-SRYCD (IDX) = "150268970"
+                      MOVE    1      TO  
+                                  TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                 END-IF
                  EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
                            ALSO    TBL-KOUI-KOKUJISKBKBN1 (IDX)
                    WHEN    SPACE   ALSO    ANY
