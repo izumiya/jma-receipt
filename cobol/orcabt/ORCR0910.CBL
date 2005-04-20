@@ -1694,7 +1694,7 @@
                                MOVE    WRK-RECE84-KAISU (IDY 1 IDXX)
                                                    TO  WRK-KAISU (1)
                                MOVE    WRK-RECE84-HOUKNSKBN (IDY)
-                                                   TO  WRK-HOUKNSKBN
+                                                   TO  WRK-HOUKNSKBN                    
                            END-IF
                            IF      WRK-RECE84-KAISU (IDY 1 IDXX)
                                                    =   WRK-KAISU (1)
@@ -1711,7 +1711,10 @@
                    IF      WRK-KENSA-SU       =   1
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-RECE84-MAX
-                           IF      WRK-RECE84-FLG (IDY)    =   1
+                           IF    ( WRK-RECE84-FLG (IDY)    =   1     )
+                           AND   ( WRK-RECE84-KAISU (IDY 1 IDXX)
+                                                           =
+                                                       WRK-KAISU (1) )
                                COMPUTE WRK-SUM-KAISU (IDXX) 
                                                =
                                                WRK-SUM-KAISU (IDXX) -
@@ -1725,7 +1728,10 @@
                    ELSE
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-RECE84-MAX
-                           IF      WRK-RECE84-FLG (IDY)    =   1
+                           IF    ( WRK-RECE84-FLG (IDY)    =   1     )
+                           AND   ( WRK-RECE84-KAISU (IDY 1 IDXX)
+                                                           =
+                                                       WRK-KAISU (1) )
                                MOVE    ZERO        TO
                                            WRK-RECE84-KAISU (IDY 1 IDXX)
                                            WRK-RECE84-KAISU (IDY 2 IDXX)
@@ -1735,6 +1741,8 @@
                                                =
                                                WRK-SUM-KAISU (IDXX) -
                                                WRK-KAISU   (1)
+                               MOVE    3           TO  WRK-RECE84-FLG 
+                                                             (IDY)
                            END-IF                                       
                        END-PERFORM
                        ADD     1                  TO  WRK-KAISU1
@@ -1748,7 +1756,7 @@
                            PERFORM VARYING IDW FROM    1   BY  1
                                    UNTIL   IDW >       WRK-RECE84-MAX
                                    OR      FLG-OK      =   1
-                               IF      WRK-RECE84-FLG   (IDW)  =   1
+                               IF      WRK-RECE84-FLG   (IDW)  =   3
                                    IF      WRK-RECE84-KAISU (IDW 1 IDZ)
                                                    =   WRK-KAISU (1)
                                        MOVE    2           TO  FLG-OK                                    
@@ -1761,7 +1769,7 @@
                            IF      FLG-OK          =   2
                                PERFORM VARYING IDW FROM    1   BY  1
                                        UNTIL   IDW >   WRK-RECE84-MAX
-                                   IF      WRK-RECE84-FLG   (IDW)  =   1
+                                   IF      WRK-RECE84-FLG   (IDW)  =   3
                                        MOVE    ZERO    TO
                                                        WRK-RECE84-KAISU
                                                       (IDW 1 IDZ)
@@ -1803,7 +1811,9 @@
                        MOVE    ZERO                TO  WRK-RECE84-ZAITEN
                        PERFORM VARYING IDW FROM    1   BY  1
                                UNTIL   IDW >       WRK-RECE84-MAX
-                           IF      WRK-RECE84-FLG   (IDW)  =   1
+                           IF      WRK-RECE84-FLG   (IDW)  =   3
+                               MOVE    ZERO   TO  WRK-RECE84-FLG
+                                                             (IDW)
                                MOVE    WRK-RECE84-REC    (IDW) 
                                                    TO  RECE84-REC
                                ADD     RECE84-ZAITEN 

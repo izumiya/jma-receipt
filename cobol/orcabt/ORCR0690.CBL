@@ -1978,7 +1978,10 @@
                    IF      WRK-KENSA-SU       =   1
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-RECE64-MAX
-                           IF      WRK-RECE64-FLG (IDY)    =   1
+                           IF    ( WRK-RECE64-FLG (IDY)    =   1     )
+                           AND   ( WRK-RECE64-KAISU (IDY 1 IDXX)
+                                                           =
+                                                       WRK-KAISU (1) )
                                COMPUTE WRK-SUM-KAISU (IDXX) 
                                                =
                                                WRK-SUM-KAISU (IDXX) -
@@ -1992,7 +1995,10 @@
                    ELSE
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-RECE64-MAX
-                           IF      WRK-RECE64-FLG (IDY)    =   1
+                           IF    ( WRK-RECE64-FLG (IDY)    =   1     )
+                           AND   ( WRK-RECE64-KAISU (IDY 1 IDXX)
+                                                           =
+                                                       WRK-KAISU (1) )
                                MOVE    ZERO        TO
                                            WRK-RECE64-KAISU (IDY 1 IDXX)
                                            WRK-RECE64-KAISU (IDY 2 IDXX)
@@ -2002,6 +2008,8 @@
                                                =
                                                WRK-SUM-KAISU (IDXX) -
                                                WRK-KAISU   (1)
+                               MOVE    3           TO  WRK-RECE64-FLG 
+                                                             (IDY)
                            END-IF                                       
                        END-PERFORM
                        ADD     1                  TO  WRK-KAISU1
@@ -2015,7 +2023,7 @@
                            PERFORM VARYING IDW FROM    1   BY  1
                                    UNTIL   IDW >       WRK-RECE64-MAX
                                    OR      FLG-OK      =   1
-                               IF      WRK-RECE64-FLG   (IDW)  =   1
+                               IF      WRK-RECE64-FLG   (IDW)  =   3
                                    IF      WRK-RECE64-KAISU (IDW 1 IDZ)
                                                    =   WRK-KAISU (1)
                                        MOVE    2           TO  FLG-OK                                    
@@ -2028,7 +2036,7 @@
                            IF      FLG-OK          =   2
                                PERFORM VARYING IDW FROM    1   BY  1
                                        UNTIL   IDW >   WRK-RECE64-MAX
-                                   IF      WRK-RECE64-FLG   (IDW)  =   1
+                                   IF      WRK-RECE64-FLG   (IDW)  =   3
                                        MOVE    ZERO    TO
                                                        WRK-RECE64-KAISU
                                                       (IDW 1 IDZ)
@@ -2070,7 +2078,9 @@
                        MOVE    ZERO                TO  WRK-RECE64-ZAITEN
                        PERFORM VARYING IDW FROM    1   BY  1
                                UNTIL   IDW >       WRK-RECE64-MAX
-                           IF      WRK-RECE64-FLG   (IDW)  =   1
+                           IF      WRK-RECE64-FLG   (IDW)  =   3
+                               MOVE    ZERO   TO  WRK-RECE64-FLG
+                                                             (IDW)
                                MOVE    WRK-RECE64-REC    (IDW) 
                                                    TO  RECE64-REC
                                ADD     RECE64-ZAITEN 
@@ -2894,7 +2904,7 @@
                MOVE    RECE64-KOHBUNRI   TO  RECE66-KOHBUNRI
                MOVE    RECE64-ZAINUM     TO  RECE66-ZAINUM
                MOVE    WRK-LINENUM       TO  RECE66-LINENUM
-               MOVE    WRK-TBLMAX       TO  RECE66-ZAIMEISAISU
+               MOVE    WRK-TBLMAX        TO  RECE66-ZAIMEISAISU
                MOVE    RECE64-PTNUM      TO  RECE66-PTNUM
                MOVE    RECE64-SRYKA      TO  RECE66-SRYKA
                MOVE    RECE64-SRYKBN     TO  RECE66-SRYKBN

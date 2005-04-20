@@ -2389,7 +2389,7 @@
       * 
            INITIALIZE                   WRK-RECE04-MATOME-TABLE
                                         WRK-RECE04-FLG-TABLE
-      *    
+      *     
            MOVE    1                    TO  IDXX 
            PERFORM              UNTIL   IDXX >       31
       *********INITIALIZE                  WRK-RECE04-FLG-TABLE
@@ -2430,7 +2430,10 @@
                    IF      WRK-KENSA-SU       =   1
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-RECE04-MAX
-                           IF      WRK-RECE04-FLG (IDY)    =   1
+                           IF    ( WRK-RECE04-FLG (IDY)    =   1     )
+                           AND   ( WRK-RECE04-KAISU (IDY 1 IDXX)
+                                                           =
+                                                       WRK-KAISU (1) )
                                COMPUTE WRK-SUM-KAISU (IDXX) 
                                                =
                                                WRK-SUM-KAISU (IDXX) -
@@ -2444,7 +2447,10 @@
                    ELSE
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-RECE04-MAX
-                           IF      WRK-RECE04-FLG (IDY)    =   1
+                           IF    ( WRK-RECE04-FLG (IDY)    =   1     )
+                           AND   ( WRK-RECE04-KAISU (IDY 1 IDXX)
+                                                           =
+                                                       WRK-KAISU (1) )
                                MOVE    ZERO        TO
                                            WRK-RECE04-KAISU (IDY 1 IDXX)
                                            WRK-RECE04-KAISU (IDY 2 IDXX)
@@ -2454,6 +2460,8 @@
                                                =
                                                WRK-SUM-KAISU (IDXX) -
                                                WRK-KAISU   (1)
+                               MOVE    3           TO  WRK-RECE04-FLG 
+                                                             (IDY)
                            END-IF                                       
                        END-PERFORM
                        ADD     1                  TO  WRK-KAISU1
@@ -2467,7 +2475,7 @@
                            PERFORM VARYING IDW FROM    1   BY  1
                                    UNTIL   IDW >       WRK-RECE04-MAX
                                    OR      FLG-OK      =   1
-                               IF      WRK-RECE04-FLG   (IDW)  =   1
+                               IF      WRK-RECE04-FLG   (IDW)  =   3
                                    IF      WRK-RECE04-KAISU (IDW 1 IDZ)
                                                    =   WRK-KAISU (1)
                                        MOVE    2           TO  FLG-OK                                    
@@ -2480,7 +2488,7 @@
                            IF      FLG-OK          =   2
                                PERFORM VARYING IDW FROM    1   BY  1
                                        UNTIL   IDW >   WRK-RECE04-MAX
-                                   IF      WRK-RECE04-FLG   (IDW)  =   1
+                                   IF      WRK-RECE04-FLG   (IDW)  =   3
                                        MOVE    ZERO    TO
                                                        WRK-RECE04-KAISU
                                                       (IDW 1 IDZ)
@@ -2502,7 +2510,7 @@
                        END-PERFORM
       *
       *                同じ検査をまとめて出力する
-                       MOVE    ZERO                  TO  FLG-SRYCD1
+                       MOVE    ZERO                TO  FLG-SRYCD1
       *
                        INITIALIZE                      WRK-ZAIW-AREA
                        MOVE    ZERO                TO  WRK-ZAIWMAX-G
@@ -2510,7 +2518,7 @@
                        MOVE    ZERO                TO  FLG-TEIGEN
                                                        FLG-COMMENT
                                                        FLG-COMMENT2
-                                                       FLG-COMMENT3         
+                                                       FLG-COMMENT3
                                                        FLG-HIKAKIN 
                        MOVE    ZERO                TO  WRK-RECE05
                                                        IDY
@@ -2520,7 +2528,9 @@
                        MOVE    ZERO                TO  WRK-RECE04-ZAITEN
                        PERFORM VARYING IDW FROM    1   BY  1
                                UNTIL   IDW >       WRK-RECE04-MAX
-                           IF      WRK-RECE04-FLG   (IDW)  =   1
+                           IF      WRK-RECE04-FLG   (IDW)  =   3
+                               MOVE    ZERO   TO  WRK-RECE04-FLG
+                                                             (IDW)
                                MOVE    WRK-RECE04-REC    (IDW) 
                                                    TO  RECE04-REC
                                ADD     RECE04-ZAITEN 
