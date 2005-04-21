@@ -431,11 +431,11 @@
       *----(01.02.06)----END-------------------
       * ヘルプマスタ
                WHEN    "109"
-                   IF      SYS-1010-GSRAUTH(69:1)    =  "0"
-                       MOVE    "0002"          TO  SPA-ERRCD
-                   ELSE
+      *!!          IF      SYS-1010-GSRAUTH(69:1)    =  "0"
+      *!!              MOVE    "0002"          TO  SPA-ERRCD
+      *!!          ELSE
                        MOVE    "N41"           TO  SPA-SAKIPG
-                   END-IF
+      *!!          END-IF
               WHEN    OTHER
                    MOVE    "0001"          TO  SPA-ERRCD
            END-EVALUATE.
@@ -569,9 +569,9 @@
                    MOVE    WIDGET-NORMAL      TO  M02-G108-STATE
                END-IF
       *----(01.02.06)----END-------------------
-               IF      SYS-1010-GSRAUTH(69:1)   =  "1"
+      *!!      IF      SYS-1010-GSRAUTH(69:1)   =  "1"
                    MOVE    WIDGET-NORMAL      TO  M02-G109-STATE
-               END-IF
+      *!!      END-IF
            END-IF
            .
        51O-GSRAUTH-EXT.
