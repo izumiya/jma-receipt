@@ -112,6 +112,7 @@
            03  FLG-IN-NAME             PIC 9(01).
            03  FLG-CLAIM               PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
+           03  FLG-HKNOK               PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1996,9 +1997,20 @@
            MOVE    ZERO                TO  IDX
            PERFORM UNTIL       (IDX            =   15  )  OR
                                (FLG-HKNCOMBI   =   1    )
+               MOVE    ZERO                TO  FLG-HKNOK
                IF     (SPA-SYSYMD          >=  COMB-TEKSTYMD) AND
                       (SPA-SYSYMD          <=  COMB-TEKEDYMD) AND
                       (COMB-DELKBN         =   SPACE        )
+                   MOVE    1               TO  FLG-HKNOK
+      *            Ï«ºÒÊÝ¸±¾ðÊó¤ÎÈ½Äê
+                   IF      COMB-HKNNUM         =   "971"  OR  "973"
+                       PERFORM 410114-RSIINF-CHK-SEC
+                       IF      FLG-PTRSIINF    =   1
+                           MOVE    ZERO            TO  FLG-HKNOK
+                       END-IF
+                   END-IF
+               END-IF
+               IF      FLG-HKNOK           =   1
       *---- (01.00.02) LINE MOD END   ---------------------------------
                    ADD     1                   TO  IDX
                    MOVE    IDX                 TO  SPA-COMBI-MAX
@@ -2034,6 +2046,33 @@
        410114-KUMIHYOJI-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    Ï«ºÒÊÝ¸±¾ðÊó¤ÎÈ½Äê½èÍý
+      *****************************************************************
+       410114-RSIINF-CHK-SEC           SECTION.
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    SPA-HOSPID          TO  PTRSI-HOSPID
+           MOVE    SPA-GMN-PTID        TO  PTRSI-PTID
+           MOVE    COMB-HKNID          TO  PTRSI-HKNID
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                           MCPAREA
+                                           ORCMCPAREA
+                                           MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "PTRSIINF-KEY"     TO  ORC-DBPATH
+               PERFORM 993-PTRSIINF-NEXT-SEC
+           ELSE
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    1                   TO  FLG-PTRSIINF
+           END-IF
+           MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+           PERFORM 990-DBCLOSE-SEC
+           .
+       410114-RSIINF-CHK-EXT.
+           EXIT.
       *
       *****************************************************************
       *    Ì¤³ÎÇ§ÊÝ¸±¸øÈñÉ½¼¨½èÍý
