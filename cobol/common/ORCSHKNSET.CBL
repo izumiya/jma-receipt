@@ -294,6 +294,14 @@
                        END-IF
                    END-IF
                END-IF
+      *        Ï«ºÒ¡¦¼«ÇåÀÕÊÝ¸±¸¡º÷
+               IF     (FLG-HKNCOMBICHK     =    1    )  AND
+                      (COMB-HKNNUM         =   "971"  OR  "973")
+                   PERFORM 1100-PTRSIINF-CHK-SEC
+                   IF      FLG-PTRSIINF        =   1
+                       MOVE    ZERO            TO  FLG-HKNCOMBICHK
+                   END-IF
+               END-IF
       *
                IF      FLG-HKNCOMBICHK     =    1
                    PERFORM 110-HKNCOMBI-HEN-SEC
@@ -305,15 +313,49 @@
       *    ºÇÂç·ï¿ô
            MOVE    IDX                 TO  ORCSHKN-HKN-MAX
       *
-      *    MOVE    "DBCLOSE"           TO  MCP-FUNC
-      *    MOVE    "HKNCOMBI-KEY2"     TO  ORC-DBPATH
-      *    CALL    "MCPDBSUB"          USING
-      *                                MCPAREA
-      *                                MCPDATA-REC
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "HKNCOMBI-KEY2"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *
            .
        100-HKNCOMBI-HENSYU-EXT.
       *
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«ºÒÊÝ¸±¾ðÊó¸¡º÷
+      *****************************************************************
+       1100-PTRSIINF-CHK-SEC             SECTION.
+      *
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    SPA-HOSPID          TO  PTRSI-HOSPID
+           MOVE    SPA-PTID            TO  PTRSI-PTID
+           MOVE    COMB-HKNID          TO  PTRSI-HKNID
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "PTRSIINF-KEY"     TO  ORC-DBPATH
+               PERFORM 993-PTRSIINF-NEXT-SEC
+           ELSE
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    1                   TO  FLG-PTRSIINF
+           END-IF
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           .
+       1100-PTRSIINF-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -459,25 +501,6 @@
       *        ÊÝ¸±¶èÊ¬
                MOVE    1                   TO  ORCSHKN-NAI-HKNKBN(IDX)
       *
-      *        ´µ¼ÔÊÝ¸±¾ðÊó¸¡º÷
-               INITIALIZE                      PTRSIINF-REC
-               MOVE    SPA-HOSPID          TO  PTRSI-HOSPID
-               MOVE    SPA-PTID            TO  PTRSI-PTID
-               MOVE    COMB-HKNID          TO  PTRSI-HKNID
-               MOVE    PTRSIINF-REC        TO  MCPDATA-REC
-               MOVE    "DBSELECT"          TO  MCP-FUNC
-               MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
-               CALL    "ORCMCPSUB"         USING
-                                           MCPAREA
-                                           ORCMCPAREA
-                                           MCPDATA-REC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "PTRSIINF-KEY"     TO  ORC-DBPATH
-                   PERFORM 993-PTRSIINF-NEXT-SEC
-               ELSE
-                   INITIALIZE                      PTRSIINF-REC
-                   MOVE    1                   TO  FLG-PTRSIINF
-               END-IF
                MOVE    SPACE               TO  WRK-HKNKBN-MEI
                EVALUATE    PTRSI-HKNKBN
                    WHEN    "1"
@@ -665,6 +688,12 @@
                    PERFORM 970-JYURRK-READ-SEC
                END-IF
            END-PERFORM
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "JYURRK-KEY11"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *
            .
        2001-JYURRK-CHK-EXT.
@@ -697,6 +726,12 @@
                INITIALIZE                  HKNNUM-REC
                MOVE    1               TO  FLG-HKNNUM
            END-IF
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "HKNNUM-KEY"        TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *
            .
        3001-HKNNUM-CHK-EXT.
@@ -735,6 +770,12 @@
                INITIALIZE                  SYS-4001-REC
            END-IF
       *
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *
            .
        1002-RSI-SYSKANRI-EXT.
@@ -773,6 +814,12 @@
                MOVE    SPACE               TO  SYS-1008-REC
                INITIALIZE                  SYS-1008-REC
            END-IF
+           MOVE    "DBCLOSE"           TO  MCP-FUNC
+           MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *    Áê¸ßºîÍÑ¥Á¥§¥Ã¥¯´ü´Ö
            IF      SYS-1008-HOUKATU-FLG    =   "1"
                CONTINUE
