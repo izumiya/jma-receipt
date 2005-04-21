@@ -294,6 +294,14 @@
                        END-IF
                    END-IF
                END-IF
+      *        Ï«ºÒ¡¦¼«ÇåÀÕÊÝ¸±¸¡º÷
+               IF     (FLG-HKNCOMBICHK     =    1    )  AND
+                      (COMB-HKNNUM         =   "971"  OR  "973")
+                   PERFORM 1100-PTRSIINF-CHK-SEC
+                   IF      FLG-PTRSIINF        =   1
+                       MOVE    ZERO            TO  FLG-HKNCOMBICHK
+                   END-IF
+               END-IF
       *
                IF      FLG-HKNCOMBICHK     =    1
                    PERFORM 110-HKNCOMBI-HEN-SEC
@@ -315,6 +323,39 @@
            .
        100-HKNCOMBI-HENSYU-EXT.
       *
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«ºÒÊÝ¸±¾ðÊó¸¡º÷
+      *****************************************************************
+       1100-PTRSIINF-CHK-SEC             SECTION.
+      *
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    SPA-HOSPID          TO  PTRSI-HOSPID
+           MOVE    SPA-PTID            TO  PTRSI-PTID
+           MOVE    COMB-HKNID          TO  PTRSI-HKNID
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "PTRSIINF-KEY"     TO  ORC-DBPATH
+               PERFORM 993-PTRSIINF-NEXT-SEC
+           ELSE
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    1                   TO  FLG-PTRSIINF
+           END-IF
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           .
+       1100-PTRSIINF-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -460,31 +501,6 @@
       *        ÊÝ¸±¶èÊ¬
                MOVE    1                   TO  ORCSHKN-NAI-HKNKBN(IDX)
       *
-      *        ´µ¼ÔÊÝ¸±¾ðÊó¸¡º÷
-               INITIALIZE                      PTRSIINF-REC
-               MOVE    SPA-HOSPID          TO  PTRSI-HOSPID
-               MOVE    SPA-PTID            TO  PTRSI-PTID
-               MOVE    COMB-HKNID          TO  PTRSI-HKNID
-               MOVE    PTRSIINF-REC        TO  MCPDATA-REC
-               MOVE    "DBSELECT"          TO  MCP-FUNC
-               MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
-               CALL    "ORCMCPSUB"         USING
-                                           MCPAREA
-                                           ORCMCPAREA
-                                           MCPDATA-REC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "PTRSIINF-KEY"     TO  ORC-DBPATH
-                   PERFORM 993-PTRSIINF-NEXT-SEC
-               ELSE
-                   INITIALIZE                      PTRSIINF-REC
-                   MOVE    1                   TO  FLG-PTRSIINF
-               END-IF
-               MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-               MOVE    "PTRSIINF-KEY"      TO  ORC-DBPATH
-               CALL    "ORCMCPSUB"         USING
-                                           MCPAREA
-                                           ORCMCPAREA
-                                           MCPDATA-REC
                MOVE    SPACE               TO  WRK-HKNKBN-MEI
                EVALUATE    PTRSI-HKNKBN
                    WHEN    "1"
