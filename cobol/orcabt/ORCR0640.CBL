@@ -128,6 +128,8 @@
       *                                     ÉéÃ´³Û¶èÊ¬¤ÎÊÔ½¸
       *  01.03.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
       *  01.03.02    NACL-¾®Æ¦Âô  05/03/24  Ï·¿ÍÍý³ØÎÅË¡Å¦Í×ÍóÂÐ±þ
+      *  01.03.03    NACL-ÌçÏÆ    05/04/08  ÉéÃ´¶â³Û¡Ê°ìÉôÉéÃ´³Û¡ËÊÔ½¸
+      *                                     ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6546,6 +6548,7 @@
                       IF   RECE62-KOHNUM(1) =  "010"  OR  "021" 
                             MOVE     2   TO   FLG-KOH
                       END-IF 
+                      PERFORM   210444-FTNMONEY-FTN-HENSYU-SEC
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -6622,6 +6625,7 @@
                       IF   RECE62-KOHNUM(2) =  "010"  OR  "021" 
                             MOVE     2   TO   FLG-KOH
                       END-IF 
+                      PERFORM   210444-FTNMONEY-FTN-HENSYU-SEC
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(3)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(3)
@@ -6698,6 +6702,7 @@
                       IF   RECE62-KOHNUM(3) =  "010"  OR  "021" 
                             MOVE     2   TO   FLG-KOH
                       END-IF 
+                      PERFORM   210444-FTNMONEY-FTN-HENSYU-SEC
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(4)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(4)
@@ -6774,6 +6779,7 @@
                       IF   RECE62-KOHNUM(4) =  "010"  OR  "021" 
                             MOVE     2   TO   FLG-KOH
                       END-IF 
+                      PERFORM   210444-FTNMONEY-FTN-HENSYU-SEC
                  END-IF
               END-IF
            END-PERFORM
@@ -7019,6 +7025,41 @@
            EXIT.
       *
       *****************************************************************
+      *    ÉéÃ´¶â³Û¡Ê°ìÉôÉéÃ´³Û¡Ë¹àÌÜ¤ÎÊÔ½¸
+      *****************************************************************
+       210444-FTNMONEY-FTN-HENSYU-SEC               SECTION.
+      *
+      *    Ï·¿ÍÊÝ¸±¡ÜÁ´¹ñ¸øÈñ
+           IF      RECE62-SRYYM      >=  "200404"
+              IF  (( RECE62-RJNHKNNUM      NOT =    SPACE )  AND
+                   ( SYU-KOH-HKNNUM(IDX3)(1:1) =    "0"   ))
+      *
+                    EVALUATE   IDX3
+                      WHEN      2
+                           ADD   SYU-KOH-COMPFTN(IDX3 - 1)  TO
+                                         RECE62-FTNMONEY-FTN(KH-IDX)
+                      WHEN      3
+                      WHEN      4
+                        IF    (RECE62-KOUREI    NOT =    SPACE )
+                        AND   (SYU-KOH-HKNNUM(IDX3 - 1)
+                                                    =  "015" OR "016"
+                                                             OR "051")
+                           ADD   SYU-KOH-HKNFTNMONEY(IDX3 - 1)  TO
+                                         RECE62-FTNMONEY-FTN(KH-IDX)
+                        ELSE
+                           ADD   SYU-KOH-COMPFTN(IDX3 - 1)  TO
+                                         RECE62-FTNMONEY-FTN(KH-IDX)
+                        END-IF
+                    END-EVALUATE
+      *
+              END-IF
+           END-IF
+      *
+           .
+       210444-FTNMONEY-FTN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¿©»öÉéÃ´´Þ¤à¾å¸Â³Û¤Î¤¢¤ë¸øÈñ¤Î°ìÉôÉéÃ´¶â³ÛÊÔ½¸Åù
       *****************************************************************
        21045-KOH-FUTAN-SET-SEC               SECTION.
@@ -7222,22 +7263,6 @@
                    WHEN    "3"
                        MOVE    "2"   TO   RECE62-SHOKUJIFTNKBN
            END-EVALUATE
-      *
-      *    Ï·¿ÍÊÝ¸±¡ÜÁ´¹ñ¸øÈñ
-           IF      RECE62-SRYYM      >=  "200210"
-      *
-             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                         UNTIL    KOHFTN-IDX     >    4
-      *
-               IF  ( RECE62-RJNHKNNUM            NOT =    SPACE )  AND
-                   ( RECE62-KOHNUM(KOHFTN-IDX)(1:1)  =    "0"   )
-                  MOVE   FTN-KOH-XXX  TO
-                                  RECE62-FTNMONEY-FTN(KOHFTN-IDX + 1)
-               END-IF
-      *
-             END-PERFORM
-      *
-           END-IF
       *
            .
        21045-KOH-FUTAN-SET-EXT.

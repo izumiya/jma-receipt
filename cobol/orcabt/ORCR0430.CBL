@@ -57,6 +57,7 @@
       *  01.02.01    NACL-Æ£¸¶    04/10/13  Ãæ»ß½èÍý¤ÎÄÉ²Ã
       *  01.02.02    NACL-ÌçÏÆ    04/12/09  Ç¾·ì´É¼À´µµÞÀ­È¯¾É½ªÎ»ÆüÂÐ±þ
       *  01.02.03    NACL-ÌçÏÆ    05/01/18  »ÀÁÇ·×»»¼°¥³¥á¥ó¥ÈÂÐ±þ
+      *  01.02.04    NACL-ÌçÏÆ    05/04/20  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -252,6 +253,7 @@
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-FIRST           PIC 9(01).
+           03  FLG-YAKUTEI         PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -275,6 +277,12 @@
            03  IDX3                PIC 9(02).
            03  IDX4                PIC 9(04).
            03  IDX5                PIC 9(04).
+           03  IDX6                PIC 9(04).
+           03  IDX7                PIC 9(04).
+           03  IDX8                PIC 9(04).
+           03  IDX9                PIC 9(04).
+           03  IDX10               PIC 9(04).
+           03  IDX11               PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  DAY-IDX             PIC 9(04).
@@ -298,6 +306,7 @@
            03  WRK-KETA            PIC 9(04).
            03  WRK-KETA-TAIHI      PIC 9(04).
            03  WRK-KETA2           PIC 9(04).
+           03  WRK-ZAINUM          PIC 9(08).
            03  WRK-RECEERR         PIC X(200).
       *
            03  WRK-FSANTEIYMD      PIC 9(08).
@@ -506,6 +515,83 @@
            03  TBL-SANSO-INF3.
                05  TBL-KASAN-SRYSURYO     PIC 9(05)V9(03).
       *
+      *    ÌôºÞÄþ¸º¾ðÊó
+       01  TBL-YAKUTEI-INF.
+           03  TBL-YT1-OCC                      OCCURS 100.
+             05  TBL-YT1-KEY.
+               07  TBL-YT1-SRYKA                PIC X(02).
+             05  TBL-YT1-RECE44-REC             PIC X(250).
+             05  TBL-YT1-HIKAKU.
+               07  TBL-YT1-ZAITEN               PIC 9(08).
+               07  TBL-YT1-SRYCDTOTAL           PIC 9(14).
+               07  TBL-YT1-SURYOUTOTAL          PIC 9(07)V9(03).
+               07  TBL-YT1-RUIKEITOTAL          PIC 9(15)V9(03).
+               07  TBL-YT1-MEISAISU             PIC 9(04).
+             05  TBL-YT1-RECE44-DAY-AREA.
+               07  TBL-YT1-OCC2                 OCCURS  31.
+                 09  TBL-YT1-OCC3               OCCURS   3.
+                   11  TBL-YT1-KAISU            PIC 9(03).
+             05  TBL-YT1-FLG                    PIC 9(01).
+      *
+      *    ÊÂ¤ÓÂØ¤¨ÍÑ
+       01  WRK-YAKUTEI-DATA                     PIC X(586).
+      *
+       01  WRK-TAIHI-YT1-KEY                    PIC X(02).
+       01  WRK-YAKUTEI-ZAINUM                   PIC 9(08).
+       01  WRK-YAKUTEI-ZAINUM2                  PIC 9(08).
+      *
+      *    ÌôºÞÄþ¸º¾ðÊó¡Ê¥­¡¼Ã±°Ì¤ÎÊÔ½¸¥Æ¡¼¥Ö¥ë¡Ë
+       01  TBL-YAKUTEI-INF2.
+           03  TBL-YT2-DAY                    OCCURS      31.
+             05  TBL-YT2X-KAIT                  OCCURS     3.
+               06  TBL-YT2X1-OCC                  OCCURS  25.
+                 07  TBL-YT2X1-RECE44-REC         PIC X(250).
+                 07  TBL-YT2X1-KAISU              PIC 9(03).
+               06  TBL-YT2X2-OCC                  OCCURS   3.
+                 07  TBL-YT2X2-RECE44-REC         PIC X(250).
+                 07  TBL-YT2X2-KAISU              PIC 9(03).
+             05  TBL-YT2Y-KAIT                  OCCURS     3.
+               06  TBL-YT2Y1-OCC                  OCCURS  26.
+                 07  TBL-YT2Y1-HIKAKU.
+                   09  TBL-YT2Y1-ZAITEN           PIC 9(08).
+                   09  TBL-YT2Y1-SRYCDTOTAL       PIC 9(14).
+                   09  TBL-YT2Y1-SURYOUTOTAL      PIC 9(07)V9(03).
+                   09  TBL-YT2Y1-RUIKEITOTAL      PIC 9(15)V9(03).
+                   09  TBL-YT2Y1-MEISAISU         PIC 9(04).
+               06  TBL-YT2Y2-OCC                  OCCURS   4.
+                 07  TBL-YT2Y2-HIKAKU.
+                   09  TBL-YT2Y2-ZAITEN           PIC 9(08).
+                   09  TBL-YT2Y2-SRYCDTOTAL       PIC 9(14).
+                   09  TBL-YT2Y2-SURYOUTOTAL      PIC 9(07)V9(03).
+                   09  TBL-YT2Y2-RUIKEITOTAL      PIC 9(15)V9(03).
+                   09  TBL-YT2Y2-MEISAISU         PIC 9(04).
+      *
+      *    ÌôºÞÄþ¸º¾ðÊó¡Ê¤Þ¤È¤áÍÑ¤ÎÊÔ½¸¥Æ¡¼¥Ö¥ë¡Ë
+       01  TBL-YAKUTEI-INF3.
+           03  TBL-YT3-XXX                    OCCURS     100.
+             05  TBL-YT3X-KAIT.
+               06  TBL-YT3X1-OCC                  OCCURS  25.
+                 07  TBL-YT3X1-RECE44-REC         PIC X(250).
+                 07  TBL-YT3X1-KAISU              PIC 9(03).
+               06  TBL-YT3X2-OCC                  OCCURS   3.
+                 07  TBL-YT3X2-RECE44-REC         PIC X(250).
+                 07  TBL-YT3X2-KAISU              PIC 9(03).
+             05  TBL-YT3Y-KAIT.
+               06  TBL-YT3Y1-OCC                  OCCURS  26.
+                 07  TBL-YT3Y1-HIKAKU.
+                   09  TBL-YT3Y1-ZAITEN           PIC 9(08).
+                   09  TBL-YT3Y1-SRYCDTOTAL       PIC 9(14).
+                   09  TBL-YT3Y1-SURYOUTOTAL      PIC 9(07)V9(03).
+                   09  TBL-YT3Y1-RUIKEITOTAL      PIC 9(15)V9(03).
+                   09  TBL-YT3Y1-MEISAISU         PIC 9(04).
+               06  TBL-YT3Y2-OCC                  OCCURS   4.
+                 07  TBL-YT3Y2-HIKAKU.
+                   09  TBL-YT3Y2-ZAITEN           PIC 9(08).
+                   09  TBL-YT3Y2-SRYCDTOTAL       PIC 9(14).
+                   09  TBL-YT3Y2-SURYOUTOTAL      PIC 9(07)V9(03).
+                   09  TBL-YT3Y2-RUIKEITOTAL      PIC 9(15)V9(03).
+                   09  TBL-YT3Y2-MEISAISU         PIC 9(04).
+      *
       *    ¥Ñ¥¹Ì¾ÎÎ°è
        01  WRK-PATH                        PIC X(64).
       *
@@ -690,6 +776,10 @@
                                            CNT-DOUJITU
            INITIALIZE                      WRK-RIGAKU-AREA
            INITIALIZE                      WRK-TAIHI-ZAINUM
+      *
+           INITIALIZE                      TBL-YAKUTEI-INF
+      *
+           MOVE       ZERO             TO  IDX6
       *
            IF   RECE41-COMCNTFLG   =   "1"
       *
@@ -904,6 +994,12 @@
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
+                   WHEN      "21"
+                      IF   RECE44-COMCDFLG   =   "3"
+                        PERFORM    2001-YAKUTEI-HENSYU-SEC
+                      ELSE
+                        PERFORM    2099-RECE44-TENSOU-SEC
+                      END-IF
                    WHEN      "33"
       *            ¡ÊºßÂð´µ¼ÔË¬ÌäÅÀÅ©Ãí¼Í´ÉÍý»ØÆ³ÎÁ»»Äê»þ¤ÎÅÀÅ©Ãí¼Í¤Î
       *              ¥³¥á¥ó¥È¤Î¥»¥Ã¥È¡Ë
@@ -965,6 +1061,12 @@
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
+                   WHEN      "21"
+                      IF   RECE44-COMCDFLG   =   "3"
+                        PERFORM    2001-YAKUTEI-HENSYU-SEC
+                      ELSE
+                        PERFORM    2099-RECE44-TENSOU-SEC
+                      END-IF
                    WHEN      "33"
       *            ¡ÊºßÂð´µ¼ÔË¬ÌäÅÀÅ©Ãí¼Í´ÉÍý»ØÆ³ÎÁ»»Äê»þ¤ÎÅÀÅ©Ãí¼Í¤Î
       *              ¥³¥á¥ó¥È¤Î¥»¥Ã¥È¡Ë
@@ -1004,9 +1106,11 @@
       *
            END-PERFORM
       *
+      *****ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ëÊÔ½¸£²****
+           PERFORM     240-YAKUTEI-HENSYU2-SEC
+      *
       *****º¹¹þÊÔ½¸£²********************
            PERFORM     250-SASHIKOMI2-SEC
-      ***********************************
       *
            PERFORM 990-RECE41-READ-SEC
       *
@@ -2497,6 +2601,53 @@
            EXIT.
       *
       *****************************************************************
+      *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ëÊÔ½¸
+      *****************************************************************
+       2001-YAKUTEI-HENSYU-SEC          SECTION.
+      *
+           ADD       1        TO         IDX6
+      *
+           IF    IDX6    <=    100
+             MOVE    RECE44-SRYKA        TO   TBL-YT1-SRYKA(IDX6)
+      *
+             MOVE    RECE44-REC          TO   TBL-YT1-RECE44-REC(IDX6)
+      *
+             MOVE    RECE44-ZAITEN       TO   TBL-YT1-ZAITEN(IDX6)
+             MOVE    RECE44-SRYCDTOTAL   TO   TBL-YT1-SRYCDTOTAL(IDX6)
+             MOVE    RECE44-SURYOUTOTAL  TO   TBL-YT1-SURYOUTOTAL(IDX6)
+             MOVE    RECE44-RUIKEITOTAL  TO   TBL-YT1-RUIKEITOTAL(IDX6)
+             MOVE    RECE44-MEISAISU     TO   TBL-YT1-MEISAISU(IDX6)
+      *
+             PERFORM   VARYING   IDX7    FROM   2   BY   1
+                        UNTIL   (IDX7      >    4)
+      *
+               COMPUTE   IDX9    =   IDX7  -   1
+               PERFORM   VARYING   IDX8    FROM   1   BY   1
+                          UNTIL   (IDX8      >    31)
+      *
+                  MOVE    RECE44-KAISU(IDX7 IDX8)
+                            TO    TBL-YT1-KAISU(IDX6 IDX8 IDX9)
+      *
+               END-PERFORM
+      *
+             END-PERFORM
+      *
+             IF      RECE44-SRYCDTOTAL  =   630010002
+                  MOVE      2      TO     TBL-YT1-FLG(IDX6)
+             ELSE
+                  MOVE      1      TO     TBL-YT1-FLG(IDX6)
+             END-IF
+           ELSE
+      *
+             DISPLAY "TABLE OVER1"
+      *
+           END-IF
+      *
+           .
+       2001-YAKUTEI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¥ì¥»¥×¥È£°£´Å¾Á÷½èÍý
       *****************************************************************
        2099-RECE44-TENSOU-SEC     SECTION.
@@ -2656,6 +2807,321 @@
       *
            .
        200111-SRYACTINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ëÊÔ½¸£²
+      *****************************************************************
+       240-YAKUTEI-HENSYU2-SEC          SECTION.
+      *
+      *    ÊÂ¤ÓÂØ¤¨
+           PERFORM    VARYING   IDX6    FROM   1   BY   1
+                       UNTIL   (IDX6                     >   100 )
+                         OR    (TBL-YT1-RECE44-REC(IDX6) =  SPACE)
+      *
+              COMPUTE    IDX7  =  IDX6  +  1
+      *
+              PERFORM    VARYING   IDX8   FROM   IDX7   BY   1
+                          UNTIL   (IDX8                     >   100 )
+                            OR    (TBL-YT1-RECE44-REC(IDX8) =  SPACE)
+      *
+                IF       TBL-YT1-KEY(IDX6)  >   TBL-YT1-KEY(IDX8)
+                   MOVE  TBL-YT1-OCC(IDX6)  TO  WRK-YAKUTEI-DATA
+                   MOVE  TBL-YT1-OCC(IDX8)  TO  TBL-YT1-OCC(IDX6)
+                   MOVE  WRK-YAKUTEI-DATA   TO  TBL-YT1-OCC(IDX8)
+                END-IF
+      *
+              END-PERFORM
+      *
+           END-PERFORM
+      *
+      *    ½ÐÎÏ½èÍý
+           INITIALIZE                   TBL-YAKUTEI-INF2
+           INITIALIZE                   TBL-YAKUTEI-INF3
+           MOVE       SPACE     TO      WRK-TAIHI-YT1-KEY
+      *
+           MOVE       ZERO      TO      IDX11
+      *
+           PERFORM    VARYING   IDX6    FROM   1   BY   1
+                       UNTIL   (IDX6                     >   100 )
+                         OR    (TBL-YT1-RECE44-REC(IDX6) =  SPACE)
+      *
+              IF     TBL-YT1-KEY(IDX6)   NOT =  WRK-TAIHI-YT1-KEY
+      *
+                 IF   WRK-TAIHI-YT1-KEY  NOT =  SPACE
+                      PERFORM   2401-YAKUTEI-MATOME-SEC
+                 END-IF
+      *
+                 INITIALIZE                        TBL-YAKUTEI-INF2
+                 MOVE   TBL-YT1-KEY(IDX6)      TO  WRK-TAIHI-YT1-KEY
+      *
+              END-IF
+      *
+              IF     TBL-YT1-FLG(IDX6)   =    1
+      *
+                   PERFORM   VARYING   IDX7    FROM   1   BY   1
+                              UNTIL   (IDX7      >    31)
+      *
+                     PERFORM   VARYING   IDX8    FROM   1   BY   1
+                                UNTIL   (IDX8      >    3)
+      *
+                        IF   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                                                        NOT =  ZERO
+                           PERFORM   VARYING   IDX9    FROM   1   BY   1
+                            UNTIL (IDX9      >    25)
+                              OR  (TBL-YT2X1-RECE44-REC(IDX7 IDX8 IDX9)
+                                                              =  SPACE)
+                                 CONTINUE
+                           END-PERFORM
+                           IF    IDX9   >   25
+                             DISPLAY "TABLE OVER2"
+                           ELSE
+                             MOVE   TBL-YT1-RECE44-REC(IDX6)
+                                TO  TBL-YT2X1-RECE44-REC(IDX7 IDX8 IDX9)
+                             MOVE   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                                TO  TBL-YT2X1-KAISU(IDX7 IDX8 IDX9)
+                             MOVE   TBL-YT1-HIKAKU(IDX6)
+                                TO  TBL-YT2Y1-HIKAKU(IDX7 IDX8 IDX9)
+      *
+                             ADD    TBL-YT1-ZAITEN(IDX6)
+                                TO  TBL-YT2Y1-ZAITEN(IDX7 IDX8 26)
+                             ADD    TBL-YT1-SRYCDTOTAL(IDX6)
+                                TO  TBL-YT2Y1-SRYCDTOTAL(IDX7 IDX8 26)
+                             ADD    TBL-YT1-SURYOUTOTAL(IDX6)
+                                TO  TBL-YT2Y1-SURYOUTOTAL(IDX7 IDX8 26)
+                             ADD    TBL-YT1-RUIKEITOTAL(IDX6)
+                                TO  TBL-YT2Y1-RUIKEITOTAL(IDX7 IDX8 26)
+                             ADD    TBL-YT1-MEISAISU(IDX6)
+                                TO  TBL-YT2Y1-MEISAISU(IDX7 IDX8 26)
+      *
+                           END-IF
+                        END-IF
+      *
+                     END-PERFORM
+      *
+                   END-PERFORM
+      *
+              ELSE
+      *
+                   PERFORM   VARYING   IDX7    FROM   1   BY   1
+                              UNTIL   (IDX7      >    31)
+      *
+                     PERFORM   VARYING   IDX8    FROM   1   BY   1
+                                UNTIL   (IDX8      >    3)
+      *
+                        IF   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                                                        NOT =  ZERO
+                           PERFORM   VARYING   IDX9    FROM   1   BY   1
+                            UNTIL (IDX9      >    3)
+                              OR  (TBL-YT2X2-RECE44-REC(IDX7 IDX8 IDX9)
+                                                              =  SPACE)
+                                 CONTINUE
+                           END-PERFORM
+                           IF    IDX9   >   3
+                             DISPLAY "TABLE OVER3"
+                           ELSE
+                             MOVE   TBL-YT1-RECE44-REC(IDX6)
+                                TO  TBL-YT2X2-RECE44-REC(IDX7 IDX8 IDX9)
+                             MOVE   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                                TO  TBL-YT2X2-KAISU(IDX7 IDX8 IDX9)
+                             MOVE   TBL-YT1-HIKAKU(IDX6)
+                                TO  TBL-YT2Y2-HIKAKU(IDX7 IDX8 IDX9)
+      *
+                             ADD    TBL-YT1-ZAITEN(IDX6)
+                                TO  TBL-YT2Y2-ZAITEN(IDX7 IDX8 4)
+                             ADD    TBL-YT1-SRYCDTOTAL(IDX6)
+                                TO  TBL-YT2Y2-SRYCDTOTAL(IDX7 IDX8 4)
+                             ADD    TBL-YT1-SURYOUTOTAL(IDX6)
+                                TO  TBL-YT2Y2-SURYOUTOTAL(IDX7 IDX8 4)
+                             ADD    TBL-YT1-RUIKEITOTAL(IDX6)
+                                TO  TBL-YT2Y2-RUIKEITOTAL(IDX7 IDX8 4)
+                             ADD    TBL-YT1-MEISAISU(IDX6)
+                                TO  TBL-YT2Y2-MEISAISU(IDX7 IDX8 4)
+      *
+                           END-IF
+                        END-IF
+      *
+                     END-PERFORM
+      *
+                   END-PERFORM
+      *
+              END-IF
+      *
+           END-PERFORM
+      *
+           IF   WRK-TAIHI-YT1-KEY  NOT =  SPACE
+              PERFORM   2401-YAKUTEI-MATOME-SEC
+              PERFORM   2402-YAKUTEI-WRITE-SEC
+           END-IF
+      *
+           .
+       240-YAKUTEI-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ë¥Õ¥¡¥¤¥ë¤Þ¤È¤á½èÍý
+      *****************************************************************
+       2401-YAKUTEI-MATOME-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX7    FROM   1   BY   1
+                      UNTIL   (IDX7      >    31)
+      *
+              PERFORM   VARYING   IDX8    FROM   1   BY   1
+                         UNTIL   (IDX8      >    3)
+      *
+                 MOVE     ZERO     TO    FLG-YAKUTEI
+                 PERFORM    VARYING   IDX9    FROM   1   BY   1
+                       UNTIL   (IDX9                          >   100 )
+                         OR    (TBL-YT3X1-RECE44-REC(IDX9 1)  =  SPACE)
+                         OR    (FLG-YAKUTEI                   =   1   )
+      *
+                    IF   (TBL-YT2Y1-HIKAKU(IDX7 IDX8 26) =
+                                              TBL-YT3Y1-HIKAKU(IDX9 26))
+                    AND  (TBL-YT2Y2-HIKAKU(IDX7 IDX8  4) =
+                                              TBL-YT3Y2-HIKAKU(IDX9  4))
+      *
+                       PERFORM    VARYING   IDX10  FROM   1   BY   1
+                         UNTIL (IDX10                         >    25 )
+                           OR  (TBL-YT2X1-RECE44-REC(IDX7 IDX8 IDX10)
+                                                              =  SPACE)
+                         ADD    TBL-YT2X1-KAISU(IDX7 IDX8 IDX10)
+                                    TO  TBL-YT3X1-KAISU(IDX9 IDX10)
+                       END-PERFORM
+                       PERFORM    VARYING   IDX10  FROM   1   BY   1
+                         UNTIL (IDX10                         >     3 )
+                           OR  (TBL-YT2X2-RECE44-REC(IDX7 IDX8 IDX10)
+                                                              =  SPACE)
+                         ADD    TBL-YT2X2-KAISU(IDX7 IDX8 IDX10)
+                                    TO  TBL-YT3X2-KAISU(IDX9 IDX10)
+                       END-PERFORM
+      *
+                       MOVE    1    TO    FLG-YAKUTEI
+                    END-IF
+      *
+                 END-PERFORM
+                 IF  FLG-YAKUTEI  =  ZERO
+                    IF   IDX9    >    100
+                       DISPLAY   "TABLE OVER4"
+                    ELSE
+                       MOVE   TBL-YT2X-KAIT(IDX7 IDX8)
+                                      TO  TBL-YT3X-KAIT(IDX9)
+                       MOVE   TBL-YT2Y-KAIT(IDX7 IDX8)
+                                      TO  TBL-YT3Y-KAIT(IDX9)
+                    END-IF
+                 END-IF
+      *
+              END-PERFORM
+      *
+           END-PERFORM
+      *
+           .
+       2401-YAKUTEI-MATOME-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ë¥Õ¥¡¥¤¥ë½ÐÎÏ
+      *****************************************************************
+       2402-YAKUTEI-WRITE-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX7    FROM   1   BY   1
+                      UNTIL   (IDX7                          >   100 )
+                        OR    (TBL-YT3X1-RECE44-REC(IDX7 1)  =  SPACE)
+      *
+                 PERFORM    VARYING   IDX8    FROM   1   BY   1
+                             UNTIL   (IDX8                     >   25  )
+                               OR    (TBL-YT3X1-RECE44-REC(IDX7 IDX8)
+                                                               =  SPACE)
+      *
+                      INITIALIZE       RECE449-REC
+                      MOVE   TBL-YT3X1-RECE44-REC(IDX7 IDX8)
+                                  TO   RECE449-REC
+                      MOVE   RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM
+                      INITIALIZE       RECE449-DAY-AREA
+                      MOVE   TBL-YT3X1-KAISU(IDX7 IDX8)
+                                  TO   RECE449-ZAIKAISU
+                      ADD       1             TO  IDX11
+                      COMPUTE   WRK-ZAINUM    =  99990000  +  IDX11
+                      MOVE      WRK-ZAINUM    TO  RECE449-ZAINUM
+                      MOVE      RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM2
+      *
+                      WRITE     RECE449-REC
+                      ADD       1            TO  CNT-RECE449
+                      PERFORM   24021-YAKUTEI-RECE45-TENSOU-SEC
+      *
+                 END-PERFORM
+      *
+                 PERFORM    VARYING   IDX8    FROM   1   BY   1
+                              UNTIL  (IDX8                     >    3  )
+                                OR   (TBL-YT3X2-RECE44-REC(IDX7 IDX8)
+                                                               =  SPACE)
+      *
+                      INITIALIZE       RECE449-REC
+                      MOVE   TBL-YT3X2-RECE44-REC(IDX7 IDX8)
+                                  TO   RECE449-REC
+                      MOVE   RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM
+                      INITIALIZE       RECE449-DAY-AREA
+                      MOVE   TBL-YT3X2-KAISU(IDX7 IDX8)
+                                  TO   RECE449-ZAIKAISU
+                      ADD       1             TO  IDX11
+                      COMPUTE   WRK-ZAINUM    =  99990000  +  IDX11
+                      MOVE      WRK-ZAINUM    TO  RECE449-ZAINUM
+                      MOVE      RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM2
+      *
+                      WRITE     RECE449-REC
+                      ADD       1            TO  CNT-RECE449
+                      PERFORM   24021-YAKUTEI-RECE45-TENSOU-SEC
+      *
+                 END-PERFORM
+      *
+           END-PERFORM
+      *
+           .
+       2402-YAKUTEI-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ë¥Õ¥¡¥¤¥ë½ÐÎÏ¡Ê£´£µ¥Õ¥¡¥¤¥ë¡Ë
+      *****************************************************************
+       24021-YAKUTEI-RECE45-TENSOU-SEC          SECTION.
+      *
+           INITIALIZE                       RECE45-REC
+           MOVE    RECE449-HOSPID       TO  RECE45-HOSPID
+           MOVE    RECE449-SRYYM        TO  RECE45-SRYYM
+           MOVE    RECE449-NYUGAIKBN    TO  RECE45-NYUGAIKBN
+           MOVE    RECE449-PTID         TO  RECE45-PTID
+           MOVE    RECE449-RECEKA       TO  RECE45-RECEKA
+           MOVE    RECE449-HKNID        TO  RECE45-HKNID
+           MOVE    RECE449-TEKSTYMD     TO  RECE45-TEKSTYMD
+           MOVE    WRK-YAKUTEI-ZAINUM   TO  RECE45-ZAINUM
+           START   RECE45-FILE
+               KEY IS    >=   RECE45-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE45
+               NOT INVALID
+                   PERFORM 990-RECE45-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( FLG-RECE45             =   1                  )
+               OR     ( RECE449-HOSPID     NOT =   RECE45-HOSPID      )
+               OR     ( RECE449-SRYYM      NOT =   RECE45-SRYYM       )
+               OR     ( RECE449-NYUGAIKBN  NOT =   RECE45-NYUGAIKBN   )
+               OR     ( RECE449-PTID       NOT =   RECE45-PTID        )
+               OR     ( RECE449-RECEKA     NOT =   RECE45-RECEKA      )
+               OR     ( RECE449-HKNID      NOT =   RECE45-HKNID       )
+               OR     ( RECE449-TEKSTYMD   NOT =   RECE45-TEKSTYMD    )
+               OR     ( WRK-YAKUTEI-ZAINUM NOT =   RECE45-ZAINUM      )
+      *
+               MOVE     RECE45-REC            TO      RECE459-REC
+               MOVE     WRK-YAKUTEI-ZAINUM2   TO      RECE459-ZAINUM
+               WRITE    RECE459-REC
+               ADD      1                     TO      CNT-RECE459
+      *
+               PERFORM 990-RECE45-NEXT-SEC
+      *
+           END-PERFORM
+      *
+           .
+       24021-YAKUTEI-RECE45-TENSOU-EXT.
            EXIT.
       *
       *****************************************************************

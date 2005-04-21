@@ -62,6 +62,7 @@
            03  WRK-MEISAI                  PIC 9(07).
            03  WRK-RYOYO                   PIC 9(07).
            03  WRK-SENINFLG                PIC X(01).
+           03  WRK-ZAITAKU-KBN             PIC X(01).
            03  WRK-SONOTA-TBL.
               04  WRK-SONOTA-OCC           OCCURS  20.
                  05  WRK-SONOTA-SRYCD      PIC  X(09).
@@ -109,7 +110,6 @@
                  05  WRK-TOKUSYU-FTNMONEY        PIC 9(07).
                  05  WRK-TOKUSYU-COMPFTN         PIC 9(07).
                  05  WRK-TOKUSYU-ENTANI          PIC 9(07)V9(01).
-                 05  WRK-FTN-SAGAKU              PIC 9(07).
       *
                  05  WRK-GRP-SGKMONEY            PIC S9(07).
                  05  WRK-GRP-SYUHKNFTNMONEY      PIC S9(07).
@@ -150,7 +150,6 @@
                  05  WRK-GRP-TOKUSYU-FTNMONEY    PIC S9(07).
                  05  WRK-GRP-TOKUSYU-COMPFTN     PIC S9(07).
                  05  WRK-GRP-TOKUSYU-ENTANI      PIC S9(07)V9(01).
-                 05  WRK-GRP-FTN-SAGAKU          PIC S9(07).
       *
            03  WRK-RUI.
               04  WRK-RUI-SKYMONEY               PIC 9(07).
@@ -192,7 +191,6 @@
               04  WRK-RUI-TOKUSYU-FTNMONEY       PIC 9(07).
               04  WRK-RUI-TOKUSYU-COMPFTN        PIC 9(07).
               04  WRK-RUI-TOKUSYU-ENTANI         PIC 9(07)V9(01).
-              04  WRK-RUI-FTN-SAGAKU             PIC 9(07).
       *
            03  WRK-KEISAN                  PIC S9(07).
            03  WRK-KEISAN2                 PIC S9(07)V9(01).
@@ -344,10 +342,16 @@
       *
       *    ÉéÃ´¶â·×»»
       *
+           MOVE     LNK-S01-KOUREI-ZAITAKU-KBN
+                                           TO  WRK-ZAITAKU-KBN.
+      *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                               UNTIL  (IDX                 >    15 )
                                 OR   (LNK-SYU-SRYYMD(IDX) =  SPACE)
                                 OR   (LNK-S01-RC      NOT =  ZERO )
+      *
+                MOVE     WRK-ZAITAKU-KBN      TO
+                                      LNK-S01-KOUREI-ZAITAKU-KBN
       *
                 MOVE     LNK-ORCS01-REC       TO  WRK-ORCS01-REC
                 MOVE     IDX                  TO  WRK-S01-IDX
@@ -639,11 +643,6 @@
                  ADD     LNK-SYU-SHOKUJI7(IDX)
                                        TO   WRK-RUI-TOKUSYU-ENTANI
       *
-                 MOVE    LNK-SYU-SKJ-FTNGAKU(IDX 1)
-                                       TO   WRK-FTN-SAGAKU(IDX)
-                 ADD     LNK-SYU-SKJ-FTNGAKU(IDX 1)
-                                       TO   WRK-RUI-FTN-SAGAKU
-      *
       *
                  MOVE    LNK-SYU-HKNCOMBINUM(IDX)
                                        TO    WRK-TAIHI-HKNCOMBINUM
@@ -874,12 +873,6 @@
                    COMPUTE  WRK-GRP-TOKUSYU-ENTANI(IDX)  =
                             WRK-TOKUSYU-ENTANI(IDX)      -
                             WRK-RUI-TOKUSYU-ENTANI
-      *
-                   MOVE     LNK-SYU-SKJ-FTNGAKU(IDX 1)
-                                       TO   WRK-FTN-SAGAKU(IDX)
-                   COMPUTE  WRK-GRP-FTN-SAGAKU(IDX)      =
-                            WRK-FTN-SAGAKU(IDX)          -
-                            WRK-RUI-FTN-SAGAKU
       *
       *
                    MOVE      ZERO      TO      FLG-OK
@@ -1200,14 +1193,6 @@
                                     TO   WRK-TOKUSYU-ENTANI(IDZ)
                            END-IF
       *
-                           COMPUTE  WRK-KEISAN  =
-                                    WRK-FTN-SAGAKU(IDZ)  +
-                                    WRK-GRP-FTN-SAGAKU(IDX)
-                           IF       WRK-KEISAN  >=   0
-                              MOVE    WRK-KEISAN
-                                    TO   WRK-FTN-SAGAKU(IDZ)
-                           END-IF
-      *
       *
                            MOVE     1         TO   FLG-OK
                        END-IF
@@ -1309,8 +1294,6 @@
                                     TO   LNK-SYU-SHOKUJI6(IDX)
                 MOVE   WRK-TOKUSYU-ENTANI(IDX)
                                     TO   LNK-SYU-SHOKUJI7(IDX)
-                MOVE   WRK-FTN-SAGAKU(IDX)
-                                    TO   LNK-SYU-SKJ-FTNGAKU(IDX 1)
       *
       ****** ELSE
       *

@@ -38,6 +38,7 @@
       *  01.00.06    NACL-門脇    04.08.04  同一保険番号対応
       *  中止処理追加
       *  01.01.01    NACL-藤原    04/09/28  中止処理の追加
+      *  01.01.02    NACL-門脇    05/04/20  内服薬剤逓減編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -370,7 +371,7 @@
       **     DISPLAY   "RECE04-HKNCOMNI : " RECE04-HKNCOMBI
       **     DISPLAY   "KH-IDX          : " KH-IDX
       *
-           IF    RECE04-KOHBUNRI     =      ZERO
+           IF    KH-IDX      NOT =   ZERO
                MOVE    KH-IDX          TO        RECE04-KOHBUNRI
            END-IF
            .
@@ -427,7 +428,7 @@
                   (RECE02-TEKSTYMD      NOT =  RECE05-TEKSTYMD)  OR
                   (WK-ZAINUM            NOT =  RECE05-ZAINUM)    OR
                   (FLG-RECE05           =      1)
-                   IF    RECE05-KOHBUNRI     =      ZERO
+                   IF    KH-IDX      NOT =   ZERO
                      MOVE   KH-IDX        TO     RECE05-KOHBUNRI
                      PERFORM      2001131-RECE05-REWRITE-SEC
                    END-IF

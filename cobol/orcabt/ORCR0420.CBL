@@ -87,6 +87,7 @@
       *  01.02.06    NACL-門脇    05/01/28  文書料のコメント対応
       *  01.02.07    NACL-門脇    05/02/28  （サ）記載対応
       *  01.02.08    NACL-門脇    05/03/03  特記事項の編集修正
+      *  01.02.09    NACL-門脇    05/04/20  内服薬剤逓減編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1457,7 +1458,9 @@
                    PERFORM 800-PTCOM-READ-SEC
                    MOVE    PTCOM-INPUTCOMENT   TO    RECE45-NAME(IDX4)
       *
-                   MOVE   "1"                  TO    RECE44-COMCDFLG
+                   IF    RECE44-COMCDFLG   NOT =   "3"
+                      MOVE   "1"           TO    RECE44-COMCDFLG
+                   END-IF
       *
                    IF      WRK-KYUGYOFLG   =   "1"
                    AND     SRY-SRYCD(IDX2) = CONS-ROUCOM1
@@ -1485,6 +1488,13 @@
       *                 END-IF
       *            END-IF
       *
+               END-IF
+      *
+               IF          SRY-SRYKBN       =  "21"
+                    IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
+                                             "630010002"
+                        MOVE     "3"       TO    RECE44-COMCDFLG
+                    END-IF
                END-IF
       *
                IF          SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
