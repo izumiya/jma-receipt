@@ -183,6 +183,7 @@
       *                                     ¡Ê¿Ç¶è£´£°¡¢£µ£°¡¢£µ£´¡¢£¶£°¡Ë
       *  01.04.13   NACL-¾®Æ¦Âô   04/12/08  ÅÀ¿ô¥Õ¥é¥°¤Î½é´ü²½ÄÉ²Ã
       *  01.04.14   NACL-¾®Æ¦Âô   05/03/28  Ï·¿ÍÍý³ØÎÅË¡Å¦Í×ÍóÂÐ±þ
+      *  01.04.15   NACL-ÌçÏÆ     05/04/20  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1983,7 +1984,9 @@
                        END-IF
                    END-IF
       *
-                   MOVE   "1"              TO    RECE04-COMCDFLG
+                   IF    RECE04-COMCDFLG   NOT =   "2"
+                      MOVE   "1"           TO    RECE04-COMCDFLG
+                   END-IF
                ELSE
                    MOVE    TNS-NAME        TO    RECE05-NAME    (IDX4)
                                                  RECE05-INPUTCOMENT
@@ -2002,6 +2005,13 @@
                          COMPUTE  RECE05-YUKOKETA(IDX4) =
                                   RECE05-YUKOKETA(IDX4) + 2
                    END-IF
+               END-IF
+      *
+               IF          SRY-SRYKBN       =  "21"
+                    IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
+                                             "630010002"
+                        MOVE     "2"       TO    RECE04-COMCDFLG
+                    END-IF
                END-IF
       *
                IF          SRY-SRYCD(IDX2)  =    CONS-HIKAKIN

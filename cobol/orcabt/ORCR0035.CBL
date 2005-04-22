@@ -36,6 +36,7 @@
       *                                     合計点数情報（ぶん点・公費分離
       *                                     区分編集用）を使用するよう修正
       *  01.00.06    NACL-門脇    04.08.04  同一保険番号対応
+      *  01.00.07    NACL-門脇    05.04.20  内服薬剤逓減編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -357,7 +358,7 @@
       **     DISPLAY   "RECE04-HKNCOMNI : " RECE04-HKNCOMBI
       **     DISPLAY   "KH-IDX          : " KH-IDX
       *
-           IF    RECE04-KOHBUNRI     =      ZERO
+           IF    KH-IDX      NOT =   ZERO
                MOVE    KH-IDX          TO        RECE04-KOHBUNRI
            END-IF
       *     ACCEPT  WRK-IN FROM CONSOLE 
@@ -402,7 +403,7 @@
                   (RECE02-TEKSTYMD      NOT =  RECE05-TEKSTYMD)  OR
                   (WK-ZAINUM            NOT =  RECE05-ZAINUM)    OR
                   (FLG-RECE05           =      1)
-                   IF    RECE05-KOHBUNRI     =      ZERO
+                   IF    KH-IDX      NOT =   ZERO
                      MOVE   KH-IDX        TO     RECE05-KOHBUNRI
                      PERFORM      RECE05-REWRITE-SEC
                    END-IF

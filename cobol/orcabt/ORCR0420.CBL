@@ -75,6 +75,7 @@
       *  01.01.08    NACL-ÌçÏÆ    04.07.28  ÅêÌôÎÁ¤Î´ïºàÅÀ¤Î½¸·×½¤Àµ
       *  01.01.09    NACL-ÌçÏÆ    04.07.28  µÙ¶È¾ÚÌÀ¥Õ¥é¥°¡¢µÙ¶È´ü´Ö½ªÎ»Ç¯
       *                                     ·î¤ÎÊÔ½¸
+      *  01.01.10    NACL-ÌçÏÆ    05.04.20  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1415,7 +1416,9 @@
                    PERFORM 950-PTCOM-READ-SEC
                    MOVE    PTCOM-INPUTCOMENT   TO    RECE45-NAME(IDX4)
       *
-                   MOVE   "1"                  TO    RECE44-COMCDFLG
+                   IF    RECE44-COMCDFLG   NOT =   "3"
+                      MOVE   "1"           TO    RECE44-COMCDFLG
+                   END-IF
       *
                    IF      WRK-KYUGYOFLG   =   "1"
                    AND     SRY-SRYCD(IDX2) = CONS-ROUCOM1
@@ -1443,6 +1446,13 @@
       *                 END-IF
       *            END-IF
       *
+               END-IF
+      *
+               IF          SRY-SRYKBN       =  "21"
+                    IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
+                                             "630010002"
+                        MOVE     "3"       TO    RECE44-COMCDFLG
+                    END-IF
                END-IF
       *
                IF          SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
