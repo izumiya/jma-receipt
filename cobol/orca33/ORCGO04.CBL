@@ -360,7 +360,7 @@
                MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
                IF    ( WRK-MOTOPG          =   "P97" )
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
-                   MOVE    LNK-SCRSPA      TO  SPA-O04-AREA
+                   MOVE    LNK-SCRSPA      TO  SPA-O01FREE
                    MOVE    SPA-WORK        TO  SPA-O01KYOUTU
                    PERFORM 320-P97-SET-SEC
                    GO  TO  300-SCREEN-EXT
