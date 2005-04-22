@@ -34,6 +34,7 @@
       *                                     算定時の点滴注射のコメント対応
       *  01.01.02    NACL-門脇    04.07.12  ファイルクリア追加
       *  01.01.03    NACL-門脇    04.08.17  レセプト科の編集
+      *  01.01.04    NACL-門脇    05.04.20  内服薬剤逓減編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -340,7 +341,7 @@
       *        複数診療科受診でないとき
       ***      IF      RECE41-SRYKA (2)    =   SPACE
       ***      OR      RECE44-COMCDFLG     =   "1"
-               IF      RECE44-COMCDFLG     =   "1"
+               IF      RECE44-COMCDFLG     =   "1" OR "3"
                    MOVE    SPACE               TO  RECE442-REC
                    INITIALIZE                      RECE442-REC
                    MOVE    RECE44-HOSPID       TO  RECE442-HOSPID
@@ -356,7 +357,7 @@
                    MOVE    RECE44-SURYOUTOTAL  TO  RECE442-SURYOUTOTAL
                    MOVE    RECE44-RUIKEITOTAL  TO  RECE442-RUIKEITOTAL
                    MOVE    RECE44-MEISAISU     TO  RECE442-MEISAISU 
-                   IF   RECE44-COMCDFLG     =   "1"
+                   IF   RECE44-COMCDFLG     =   "1" OR "3"
                         ADD       1            TO  WRK-COMRENNUM
                         MOVE    WRK-COMRENNUM  TO  RECE442-COMRENNUM
                    END-IF
