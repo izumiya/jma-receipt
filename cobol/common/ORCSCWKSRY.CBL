@@ -1003,8 +1003,14 @@
                    (SPA-GMN-INPUTCD (IDX2)(3:1)  NOT =   SPACE)
                MOVE    SPA-GMN-INPUTCD (IDX2)(1:1)
                                            TO  SPA-COM-TIMEFLG(IDX2)
-               MOVE    SPA-COM-TIMEFLG (IDX2)
+      *        入院で訂正の時、設定なし
+               IF     (SPA-NYUGAIKBN       =   "1"   )  AND
+                      (ORCSCWKSRY-SYORIFLG =   ZERO  )
+                   CONTINUE
+               ELSE
+                   MOVE    SPA-COM-TIMEFLG (IDX2)
                                            TO  SPA-NAI-TIMEFLG
+               END-IF
            END-IF
       *
       *    コメントの時、コメント内容編集
@@ -1138,6 +1144,14 @@
                        MOVE    1                   TO  FLG-SYUBETU
                    END-IF
                END-IF
+      *    最初が手技料以外の時
+           IF     (LNK-WKSRY-SRYKBN(IDX)   =   "11"
+                                           OR  "12"
+                                           OR  "13"  ) AND
+                  (LNK-WKSRY-SRYCD (IDX IDY)(1:1)
+                                       NOT =   "1" )
+               MOVE    1                   TO  FLG-SYUBETU
+           END-IF
       *
             IF      FLG-SYUBETU         =   1
                ADD     1                   TO  IDX2
@@ -1858,7 +1872,7 @@
                IF     (SPA-NYUGAIKBN           =   "1" ) AND
                       (SPA-COM-DATAKBN (IDX)   =   "1" ) AND
       *               時間加算区分
-                      (SPA-COM-TIMEKSNKBN(IDX) NOT =   SPACE )
+                      (SPA-COM-TIMEKSNKBN(IDX) NOT =   ZERO  )
                    EVALUATE    SPA-COM-TIMEFLG (IDX)
                        WHEN    1
                            MOVE    "A"      TO  WKSRY-AUTOKBN  (IDY)
