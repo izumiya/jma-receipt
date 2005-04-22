@@ -3856,6 +3856,14 @@
                        MOVE    1                   TO  FLG-SYUBETU
                    END-IF
                END-IF
+      *        最初が手技料以外の時
+               IF     (LNK-WKSRY-SRYKBN(IDX)   =   "11"
+                                               OR  "12"
+                                               OR  "13"  ) AND
+                      (LNK-WKSRY-SRYCD (IDX IDY)(1:1)
+                                           NOT =   "1" )
+                   MOVE    1                   TO  FLG-SYUBETU
+               END-IF
       *
                IF      FLG-SYUBETU         =   1
                    ADD     1                   TO  IDX2
