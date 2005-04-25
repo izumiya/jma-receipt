@@ -506,6 +506,14 @@
                   (COMB-KOH4HKNNUM     =   "019" ))
                MOVE    1               TO  FLG-OK2
            END-IF
+      *    ·ë£³£µ¤Î¤ß¤Î»þ
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "011" )  OR
+                  (COMB-KOH2HKNNUM     =   "011" )  OR
+                  (COMB-KOH3HKNNUM     =   "011" )  OR
+                  (COMB-KOH4HKNNUM     =   "011" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
       *    Ï·¿Í¸øÈñ¤Ç¡¢»ÙÊ§¶èÊ¬¤¬¤¢¤ë»þ
            IF    ((COMB-KOH1HKNNUM     =   "027" )  AND
                   (COMB-KOH1PAYKBN     =   "01" OR "02" ))  OR
