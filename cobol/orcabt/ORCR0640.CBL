@@ -2398,8 +2398,8 @@
                   (RECE62-HENTOTALTEN(1)   NOT =  RECE62-HENTOTALTEN(2))
                    MOVE       IDX1              TO   HC-IDX
                    PERFORM    VARYING   IDX2    FROM   1   BY   1
-                      UNTIL   (IDX2      >       4)     OR
-                              (RECE62-KOHNUMHC(HC-IDX IDX2)  =  SPACE)
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
                       IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
                                                    RECE62-KOHNUM(1)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
@@ -2408,6 +2408,7 @@
                                MOVE      2       TO     BUN-IDX2
                            END-IF
                       END-IF
+                    END-IF
                    END-PERFORM
                END-IF
            END-IF
@@ -2420,8 +2421,8 @@
                   (RECE62-HENTOTALTEN(1)   NOT =  RECE62-HENTOTALTEN(3))
                    MOVE       IDX1              TO   HC-IDX
                    PERFORM    VARYING   IDX2    FROM   1   BY   1
-                      UNTIL   (IDX2      >       4)     OR
-                              (RECE62-KOHNUMHC(HC-IDX IDX2)  =  SPACE)
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
                       IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
                                                    RECE62-KOHNUM(2)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
@@ -2430,6 +2431,7 @@
                                MOVE      3       TO     BUN-IDX3
                            END-IF
                       END-IF
+                    END-IF
                    END-PERFORM
                END-IF
            END-IF
@@ -2442,8 +2444,8 @@
                   (RECE62-HENTOTALTEN(1)   NOT =  RECE62-HENTOTALTEN(4))
                    MOVE       IDX1              TO   HC-IDX
                    PERFORM    VARYING   IDX2    FROM   1   BY   1
-                      UNTIL   (IDX2      >       4)     OR
-                              (RECE62-KOHNUMHC(HC-IDX IDX2)  =  SPACE)
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
                       IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
                                                    RECE62-KOHNUM(3)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
@@ -2452,6 +2454,7 @@
                                MOVE      4       TO     BUN-IDX4
                            END-IF
                       END-IF
+                    END-IF
                    END-PERFORM
                END-IF
            END-IF
@@ -5795,14 +5798,15 @@
                   (RECE62-HENTOTALTEN(1)   NOT =  RECE62-HENTOTALTEN(2))
                    MOVE       IDX1              TO   HC-IDX
                    PERFORM    VARYING   IDX2    FROM   1   BY   1
-                      UNTIL   (IDX2      >       4)     OR
-                              (RECE62-KOHNUMHC(HC-IDX IDX2)  =  SPACE)
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
                       IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
                                                    RECE62-KOHNUM(1)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(1)
                            MOVE      2       TO     BUN-IDX2
                       END-IF
+                    END-IF
                    END-PERFORM
                END-IF
            END-IF
@@ -5815,14 +5819,15 @@
                   (RECE62-HENTOTALTEN(1)   NOT =  RECE62-HENTOTALTEN(3))
                    MOVE       IDX1              TO   HC-IDX
                    PERFORM    VARYING   IDX2    FROM   1   BY   1
-                      UNTIL   (IDX2      >       4)     OR
-                              (RECE62-KOHNUMHC(HC-IDX IDX2)  =  SPACE)
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
                       IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
                                                    RECE62-KOHNUM(2)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(2)
                            MOVE      3       TO     BUN-IDX3
                       END-IF
+                    END-IF
                    END-PERFORM
                END-IF
            END-IF
@@ -5835,14 +5840,15 @@
                   (RECE62-HENTOTALTEN(1)   NOT =  RECE62-HENTOTALTEN(4))
                    MOVE       IDX1              TO   HC-IDX
                    PERFORM    VARYING   IDX2    FROM   1   BY   1
-                      UNTIL   (IDX2      >       4)     OR
-                              (RECE62-KOHNUMHC(HC-IDX IDX2)  =  SPACE)
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
                       IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
                                                    RECE62-KOHNUM(3)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(3)
                            MOVE      4       TO     BUN-IDX4
                       END-IF
+                    END-IF
                    END-PERFORM
                END-IF
            END-IF
