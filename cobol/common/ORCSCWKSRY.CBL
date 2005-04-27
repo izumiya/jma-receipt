@@ -1910,7 +1910,11 @@
       *    ＳＰＡ保存パラメタを作成
            PERFORM 3001-PARA-SYORI-SEC
       *    負担金算定・収納マスタ処理 
-           PERFORM 3002-SYUNOU-SYORI-SEC
+           IF      SPA-NYUGAIKBN       =   "1"
+               PERFORM 30021-SYUNOU-NYU-SYORI-SEC
+           ELSE
+               PERFORM 30022-SYUNOU-GAI-SYORI-SEC
+           END-IF
       *    診療行為マスタのパラメタを作成する
            MOVE    ZERO                TO  WRK-PARAEDABAN
            MOVE    2                   TO  FLG-SYORI
@@ -2114,9 +2118,40 @@
            EXIT.
       *
       *****************************************************************
-      *   負担金算定・収納マスタ処理
+      *   入院負担金算定・収納マスタ処理
       *****************************************************************
-       3002-SYUNOU-SYORI-SEC          SECTION.
+       30021-SYUNOU-NYU-SYORI-SEC          SECTION.
+      *
+           MOVE    SPA-HKNCOMBINUM     TO  WRK-HKNCOMBI
+           MOVE    SPA-SRYKA           TO  WRK-SRYKA
+           MOVE    SPA-DRCD            TO  WRK-DRCD
+      *    保険情報
+           MOVE    SPA-FTNRATE         TO  WRK-FTNRATE
+           MOVE    SPA-HKNNUM          TO  WRK-HKNNUM
+           MOVE    SPA-KOH1HKNNUM      TO  WRK-KOH1HKNNUM
+           MOVE    SPA-KOH2HKNNUM      TO  WRK-KOH2HKNNUM
+           MOVE    SPA-KOH3HKNNUM      TO  WRK-KOH3HKNNUM
+           MOVE    SPA-KOH4HKNNUM      TO  WRK-KOH4HKNNUM
+      *
+           MOVE    ZERO                TO  IDX-F
+      *
+           MOVE    ZERO                TO  WRK-PARAEDABAN
+      *
+      *    診療行為より、収納マスタのパラメタを作成する 
+           MOVE    SPACE               TO  PARA-REC
+           MOVE    "SYUNOU"            TO  PARA-FILEMEI
+           MOVE    01                  TO  PARA-EDANUM
+      *
+           PERFORM 4520101-SYUNOU-HENSYU-SEC
+      *
+           .
+       30021-SYUNOU-NYU-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   外来負担金算定・収納マスタ処理
+      *****************************************************************
+       30022-SYUNOU-GAI-SYORI-SEC          SECTION.
       *
       *    保険毎の科をテーブルへ
            PERFORM 45021-HKNCOMBI-SRYKA-SEC
@@ -2143,7 +2178,7 @@
            END-PERFORM
       *
            .
-       3002-SYUNOU-SYORI-EXT.
+       30022-SYUNOU-GAI-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2401,9 +2436,10 @@
                                                    OR  "$" 
                    CONTINUE
                ELSE
-                   IF     (SPA-COM-HKNCOMBI (IDX)  =   WRK-HKNCOMBI) AND
+                   IF   ( SPA-NYUGAIKBN            =   "1"    )   OR
+                        ((SPA-COM-HKNCOMBI (IDX)   =   WRK-HKNCOMBI) AND
                          ((WRK-SRYKA               =   ZERO   )   OR
-                          (SPA-COM-SRYKA    (IDX)  =   WRK-SRYKA  ))
+                          (SPA-COM-SRYKA    (IDX)  =   WRK-SRYKA  )))
                        PERFORM 4501-SEIKYU-KEI-SEC
                    END-IF
                END-IF
