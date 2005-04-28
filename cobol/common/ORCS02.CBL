@@ -2857,16 +2857,18 @@
       *                                 WK-SYU-SYUCOMPFTN  *  10        
       ***
                       IF   FLG-SYUHEN   =   "1"
-                        IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH3HKNNUM     NOT = SPACE)
-                        OR  (SYU-KOH4HKNNUM     NOT = SPACE)
+                        IF  ((SYU-KOH2HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH3HKNNUM     NOT = SPACE)
+                        OR   (SYU-KOH4HKNNUM     NOT = SPACE))
+                        AND ( SYU-KOH1HKNNUM         = "027" )
                           ADD   SYU-KOH1COMPFTN   TO   FTN-KOHI1-M-HEN  
                         END-IF
                       END-IF
       ***
-                      IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
-                      OR  (SYU-KOH3HKNNUM     NOT = SPACE)
-                      OR  (SYU-KOH4HKNNUM     NOT = SPACE)
+                      IF    SYU-KOH1HKNNUM         = "027"
+                       IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
+                       OR  (SYU-KOH3HKNNUM     NOT = SPACE)
+                       OR  (SYU-KOH4HKNNUM     NOT = SPACE)
                         MOVE     SYU-KOH-FTN  TO  WK-SYU-SYUCOMPFTN   
       *
                         IF  FTN-KOH-XXX  <  40200                       
@@ -2884,7 +2886,7 @@
                                MOVE   40200   TO   FTN-KOH-XXX-ENTANI
                             END-IF
                         END-IF
-                      ELSE
+                       ELSE
                         IF  (SYU-KOH2HKNNUM     =  SPACE)              
                         AND (SYU-KOH3HKNNUM     =  SPACE)
                         AND (SYU-KOH4HKNNUM     =  SPACE)
@@ -2902,11 +2904,12 @@
                           COMPUTE WK-ENTANI =
                                  SYU-KOH1COMPFTN-ENTANI + 0.5
                         END-IF
-                      END-IF
-                      ADD   WK-SYU-SYUCOMPFTN     TO   FTN-KOHI1-M      
-                      ADD   WK-ENTANI       TO   FTN-KOHI1-M-ENTANI
+                       END-IF
+                       ADD   WK-SYU-SYUCOMPFTN     TO   FTN-KOHI1-M      
+                       ADD   WK-ENTANI       TO   FTN-KOHI1-M-ENTANI
       *
-                      MOVE  1                     TO   FLG-KOUREI       
+                       MOVE  1                     TO   FLG-KOUREI       
+                      END-IF
                  ELSE                                                   
       *               COMPUTE  WK-SYU-SYUCOMPFTN  =                     
       *                                 SYU-SYUCOMPFTN     +   5        
@@ -2916,18 +2919,21 @@
       *                                 WK-SYU-SYUCOMPFTN  *  10        
       ***
                       IF   FLG-SYUHEN   =   "1"
-                        IF  (SYU-KOH1HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH2HKNNUM     NOT = SPACE)
-                        OR  (SYU-KOH3HKNNUM     NOT = SPACE)
-                        OR  (SYU-KOH4HKNNUM     NOT = SPACE)
+                        IF  ((SYU-KOH1HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH2HKNNUM     NOT = SPACE)
+                        OR   (SYU-KOH3HKNNUM     NOT = SPACE)
+                        OR   (SYU-KOH4HKNNUM     NOT = SPACE))
+                        AND ( SYU-SYUHKNNUM      NOT = SPACE )
                           ADD   SYU-SYUCOMPFTN    TO   FTN-SYU-M-HEN  
                         END-IF
                       END-IF
       ***
-                      IF  (SYU-KOH1HKNNUM     NOT = SPACE)              
-                      OR  (SYU-KOH2HKNNUM     NOT = SPACE)
-                      OR  (SYU-KOH3HKNNUM     NOT = SPACE)
-                      OR  (SYU-KOH4HKNNUM     NOT = SPACE)
+                      IF   (SYU-SYUHKNNUM      NOT = SPACE)
+                      AND  (COMB-HKNNUM        NOT = SPACE)
+                       IF  (SYU-KOH1HKNNUM     NOT = SPACE)              
+                       OR  (SYU-KOH2HKNNUM     NOT = SPACE)
+                       OR  (SYU-KOH3HKNNUM     NOT = SPACE)
+                       OR  (SYU-KOH4HKNNUM     NOT = SPACE)
                         MOVE     SYU-KOH-FTN  TO  WK-SYU-SYUCOMPFTN 
       *
                         IF  FTN-KOH-XXX    <  40200                      
@@ -2945,7 +2951,7 @@
                                MOVE   40200   TO   FTN-KOH-XXX-ENTANI
                             END-IF
                         END-IF
-                      ELSE
+                       ELSE
                         IF  (SYU-KOH1HKNNUM     =  SPACE)              
                         AND (SYU-KOH2HKNNUM     =  SPACE)
                         AND (SYU-KOH3HKNNUM     =  SPACE)
@@ -2965,9 +2971,10 @@
                           COMPUTE WK-ENTANI =
                                  SYU-SYUCOMPFTN-ENTANI + 0.5
                         END-IF
+                       END-IF
+                       ADD   WK-SYU-SYUCOMPFTN     TO   FTN-SYU-M        
+                       ADD   WK-ENTANI       TO   FTN-SYU-M-ENTANI
                       END-IF
-                      ADD   WK-SYU-SYUCOMPFTN     TO   FTN-SYU-M        
-                      ADD   WK-ENTANI       TO   FTN-SYU-M-ENTANI
                  END-IF                                                 
       *
                END-IF
