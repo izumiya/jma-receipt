@@ -4148,9 +4148,10 @@
                                         WK-SYU-SYUCOMPFTN  *  10        
       ***
                       IF   FLG-SYUHEN   =   "1"
-                        IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH3HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH4HKNNUM     NOT = SPACE)              
+                        IF  ((SYU-KOH2HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH3HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH4HKNNUM     NOT = SPACE))
+                        AND ( SYU-KOH1HKNNUM         = "027" )             
                           IF   LNK-SYU-SRYYMD(7:2)   =  SYU-SRYYMD(7:2)
                             ADD   WK-SYU-SYUCOMPFTN TO  FTN-KOHI1-D-HEN  
                           END-IF                                          
@@ -4158,7 +4159,8 @@
                         END-IF
                       END-IF
       ***
-                      IF   LNK-S01-KOUREI-ZAITAKU-KBN   =   "1"
+                      IF    SYU-KOH1HKNNUM               =  "027"
+                       IF   LNK-S01-KOUREI-ZAITAKU-KBN   =   "1"
                         IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
                         OR  (SYU-KOH3HKNNUM     NOT = SPACE)              
                         OR  (SYU-KOH4HKNNUM     NOT = SPACE)              
@@ -4179,9 +4181,9 @@
                           ADD   WK-ENTANI     TO   FTN-KOHI1-D-ENTANI
                         END-IF
                         ADD   WK-ENTANI       TO   FTN-KOHI1-M-ENTANI
+                       END-IF
+                       MOVE  1                     TO   FLG-ZAITAKU      
                       END-IF
-      *
-                      MOVE  1                     TO   FLG-ZAITAKU      
                  ELSE                                                   
                       COMPUTE  WK-SYU-SYUCOMPFTN  =                     
                                         SYU-SYUCOMPFTN     +   5        
@@ -4191,15 +4193,18 @@
                                         WK-SYU-SYUCOMPFTN  *  10        
       ***
                       IF   FLG-SYUHEN   =   "1"
-                        IF  (SYU-KOH1HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH2HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH3HKNNUM     NOT = SPACE)              
-                        OR  (SYU-KOH4HKNNUM     NOT = SPACE)  
+                        IF  ((SYU-KOH1HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH2HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH3HKNNUM     NOT = SPACE)              
+                        OR   (SYU-KOH4HKNNUM     NOT = SPACE))
+                        AND ( SYU-SYUHKNNUM      NOT = SPACE )
                           ADD   WK-SYU-SYUCOMPFTN   TO   FTN-SYU-M-HEN  
                         END-IF
                       END-IF
       ***
-                      IF   LNK-S01-KOUREI-ZAITAKU-KBN   =   "1"
+                      IF   (SYU-SYUHKNNUM      NOT = SPACE)
+                      AND  (COMB-HKNNUM        NOT = SPACE)
+                       IF   LNK-S01-KOUREI-ZAITAKU-KBN   =   "1"
                         IF  (SYU-KOH1HKNNUM     NOT = SPACE)              
                         OR  (SYU-KOH2HKNNUM     NOT = SPACE)              
                         OR  (SYU-KOH3HKNNUM     NOT = SPACE)              
@@ -4216,6 +4221,7 @@
                           COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
                         END-IF
                         ADD   WK-ENTANI        TO  FTN-SYU-M-ENTANI
+                       END-IF
                       END-IF
                  END-IF                                                 
       *
@@ -4233,6 +4239,7 @@
                ELSE
       *
                  IF COMB-KOH1HKNNUM      =    "027"
+                     IF    SYU-KOH1HKNNUM         =  "027"
                       IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
                       OR  (SYU-KOH3HKNNUM     NOT = SPACE)              
                       OR  (SYU-KOH4HKNNUM     NOT = SPACE)              
@@ -4250,7 +4257,10 @@
                             END-IF
                         END-IF
                       END-IF                                            
+                     END-IF
                  ELSE                                                   
+                     IF   (SYU-SYUHKNNUM      NOT = SPACE)
+                     AND  (COMB-HKNNUM        NOT = SPACE)
                       IF  (SYU-KOH1HKNNUM     NOT = SPACE)              
                       OR  (SYU-KOH2HKNNUM     NOT = SPACE)              
                       OR  (SYU-KOH3HKNNUM     NOT = SPACE)              
@@ -4269,6 +4279,7 @@
                             END-IF
                         END-IF
                       END-IF
+                     END-IF
                  END-IF
       *
                END-IF
