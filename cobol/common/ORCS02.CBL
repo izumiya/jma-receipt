@@ -8614,7 +8614,11 @@
               OR ((FLG-IRYOHI2 = 2) AND (FLG-HIKAKU = 2))
               OR ((FLG-IRYOHI2 = 3) AND (FLG-HIKAKU = 3))
               OR ((FLG-IRYOHI2 = 4) AND (FLG-HIKAKU = 4))
+                IF   LNK-SYU-SKYMONEY   >   72300
                   CONTINUE
+                ELSE
+                  MOVE    ZERO     TO    FLG-KOUGAKUCYO2
+                END-IF
               ELSE
                   MOVE    ZERO     TO    FLG-KOUGAKUCYO2
               END-IF
