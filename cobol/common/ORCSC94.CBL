@@ -254,6 +254,11 @@
                            MOVE    WRK-KEI-X           TO  WRK-SURYO-X
                        END-IF
                    END-IF
+                   IF     (SPA-COM-KEIFLG(IDX)     =   "2"  ) AND
+                          (SPA-COM-SURYO  (IDX)    >   1    )
+                       MOVE    SPA-COM-SURYO  (IDX)    TO  WRK-SURYO
+                       PERFORM 2001-SURYO-HEN-SEC
+                   END-IF
       *
       *            コメント
                WHEN    "8"

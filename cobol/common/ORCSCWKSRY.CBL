@@ -1064,11 +1064,14 @@
                                                                  (IDX2)
                ELSE
                    MOVE    "2"                 TO  SPA-COM-KEIFLG(IDX2)
-                   MOVE    TNS-TEN
+                   MOVE    TNS-TEN             TO  SPA-COM-KISOTEN(IDX2)
+                   COMPUTE WRK-KINGAK          =   SPA-COM-KISOTEN(IDX2)
+                                               *   SPA-COM-SURYO(IDX2)
+                   MOVE    WRK-KINGAK
                                                TO  SPA-COM-KEI   (IDX2)
-                   MOVE    TNS-TEN
+                   MOVE    WRK-KINGAK
                                                TO  SPA-GMN-KEI   (IDX2)
-                   MOVE    TNS-TEN
+                   MOVE    WRK-KINGAK
                                                TO  SPA-COM-JIHIMONEY
                                                                  (IDX2)
                END-IF
