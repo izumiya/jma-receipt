@@ -146,6 +146,7 @@
       *  01.01.12    NACL-ÌçÏÆ    04/11/25  Ê¡Åç¸©ÆýÍÄ»ùÆÃ¼ì·×»»ÂÐ±þ
       *  01.02.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
       *  01.02.02    NACL-ÌçÏÆ    05/04/13  ÀÅ²¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  01.02.03    NACL-ÌçÏÆ    05/05/06  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3414,6 +3415,67 @@
            CALL    "ORCMCPSUB"           USING   MCPAREA
                                                  ORCMCPAREA
                                                  MCPDATA-REC.
+      *
+      *    °ñ¾ë¸©¡Ê£±£´£³¡¢£±£´£µ¡Ë
+      *
+           IF   WK-1001-PREFNUM          =  08
+              IF     SYU-KOH1HKNNUM  =  "143" OR "145"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "143" OR "145"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM  =  "143" OR "145"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH3ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH3ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM  =  "143" OR "145"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH4ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH4ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH4ID
+                END-IF
+              END-IF
+           END-IF.
       *
       *----(01.00.23) LINE ADD START --------------------------
       *Ê¿À®£±£´Ç¯£±£°·î²þÀµÂÐ±þ
