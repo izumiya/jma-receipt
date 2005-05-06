@@ -1634,6 +1634,10 @@
                MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD
            END-IF
       *
+      *TEST
+           DISPLAY " SPA-RSI-HASSYOYMD :"  SPA-RSI-HASSYOYMD 
+                  ",SPA-RSI-SHOBYOYMD:" SPA-RSI-SHOBYOYMD
+      *TEST
       *    発生日から３ヶ月の計算（現在使用なし）
            MOVE    SPA-RSI-HASSYOYMD   TO  WRK-HASSYOYMD
            COMPUTE WRK-HAS-MM          =   WRK-HAS-MM
