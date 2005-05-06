@@ -2240,8 +2240,13 @@
                    END-IF
                END-PERFORM
                IF      FLG-CHK             =   ZERO
-                   MOVE    WRK-JRK-DRCD(2:4)
-                                              TO  SPA-GMN-DRCD
+                   IF      WRK-JRK-DRCD        =   SPACE
+                       MOVE    SPA-GMN-DRCDLST(1)
+                                               TO  SPA-GMN-DRCD-G
+                   ELSE
+                       MOVE    WRK-JRK-DRCD(2:4)
+                                               TO  SPA-GMN-DRCD
+                   END-IF
       *           ドクター
                    PERFORM 4105-DRCD-CHK-SEC
                    IF      SPA-ERRCD       NOT =   SPACE
