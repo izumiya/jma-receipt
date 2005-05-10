@@ -36,6 +36,9 @@
       *  01.01.02    NACL-藤原    04/08/10  入院レセ電の追加
       *  01.01.03    NACL-藤原    04/09/17  入外区分によって処理対象を
       *                                     限定する
+      *  01.01.04    NACL-藤原    05/05/09  改定通信医１６０３９号
+      *                                     「主」の記録についてより
+      *                                    「0000998」を「0000999」に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -565,6 +568,12 @@
                            END-STRING
                            MOVE    WRK-REC         TO  RECEDEN-RECEDATA
                        END-IF     
+                   WHEN    "SY"
+                       IF      RECEDEN-RECEDATA (4:7)
+                                                   =   "0000998"
+                           MOVE    "0000999"   TO
+                                               RECEDEN-RECEDATA (4:7)
+                       END-IF
                END-EVALUATE
       *****END-IF
       *          
