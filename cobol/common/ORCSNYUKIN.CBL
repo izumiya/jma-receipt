@@ -302,6 +302,9 @@
                    MOVE   "1"          TO  SYU-DENPJTIKBN
            END-IF
       *
+           MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
+           MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
+      *
       *    ¼ýÇ¼¹¹¿·
            MOVE    SYUNOU-REC          TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
