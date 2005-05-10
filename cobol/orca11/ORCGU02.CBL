@@ -1610,7 +1610,24 @@
                MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN-DRCDLST-G
                MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
       *        受診履歴よりドクター、保険組合せを決定する
-               PERFORM 41031-JYURRK-SRYKA-SEC
+      *TEST    PERFORM 41031-JYURRK-SRYKA-SEC
+      *TEST
+               MOVE    ZERO                TO  FLG-CHK
+               PERFORM VARYING   IDX       FROM    1   BY  1
+                       UNTIL     IDX           >   SPA-DRCD-MAX 
+                   IF      SPA-GMN-DRCD        =   SPA-GMN-DRCDLST(IDX)
+                                                                 (1:4)
+                       MOVE    SPA-GMN-DRCDLST(IDX)
+                                               TO  SPA-GMN-DRCD-G
+                       MOVE    1               TO  FLG-CHK
+                       MOVE    SPA-DRCD-MAX    TO  IDX
+                   END-IF
+               END-PERFORM
+               IF      FLG-CHK             =   ZERO
+                   MOVE    SPA-GMN-DRCDLST(1)
+                                           TO  SPA-GMN-DRCD-G
+               END-IF
+      *TEST
            END-IF
       *
            MOVE    SPA-GMN-SRYKA       TO  SPA-MAE-SRYKA
@@ -2389,8 +2406,8 @@
                    MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN-DRCDLST-G
                    MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
                END-IF
-               MOVE    SPA-GMN-SRYKA       TO  SPA-MAE-SRYKA
            END-IF
+           MOVE    SPA-GMN-SRYKA       TO  SPA-MAE-SRYKA
       *    ドクター、保険組合せ編集
            PERFORM 4101161-DRCD-HKNCOMBI-SEC
            .
