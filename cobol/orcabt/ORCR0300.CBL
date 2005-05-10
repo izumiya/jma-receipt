@@ -151,6 +151,9 @@
       *                                     により中止する
       *  01.02.19    NACL-小豆沢  05/04/20  手術の５０％併施加算を告示識別
       *                                     区分を手技の扱いに置き換え
+      *  01.02.20    NACL-藤原    05/05/09  改定通信医１６０３９号
+      *                                     「主」の記録についてより
+      *                                    「0000998」を「0000999」に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1943,12 +1946,13 @@
       *     
            IF      RECE031-BYOMEIHENFLG =   "1"
       *        編集病名のとき未傷病名コードにする
-               IF      RECE031-SYUBYOFLG-X          =   "1" 
-               AND     SYS-2005-SYUBYOHENFLG    NOT =   ZERO
-                   MOVE    "0000998"            TO  WRK-BYOMEICD
-               ELSE
-                   MOVE    "0000999"            TO  WRK-BYOMEICD
-               END-IF
+      *********IF      RECE031-SYUBYOFLG-X          =   "1" 
+      *********AND     SYS-2005-SYUBYOHENFLG    NOT =   ZERO
+      *********    MOVE    "0000998"            TO  WRK-BYOMEICD
+      *********ELSE
+      *********    MOVE    "0000999"            TO  WRK-BYOMEICD
+      *********END-IF
+               MOVE    "0000999"           TO  WRK-BYOMEICD
            ELSE    
                MOVE    ZERO                TO  IDY
                PERFORM VARYING IDX FROM    1   BY  1
@@ -1967,15 +1971,16 @@
                            IF      BYO-HAISIYMD    NOT =   SPACE
                                IF      BYO-HAISIYMD    <
                                                        RECE031-SRYYMD
-                                   IF      RECE031-SYUBYOFLG-X  =   "1" 
-                                   AND     SYS-2005-SYUBYOHENFLG
-                                                            NOT =   ZERO
-                                       MOVE    "0000998"
-                                                       TO  WRK-BYOMEICD
-                                   ELSE
-                                       MOVE    "0000999"
-                                                       TO  WRK-BYOMEICD
-                                   END-IF
+      *****************************IF      RECE031-SYUBYOFLG-X  =   "1" 
+      *****************************AND     SYS-2005-SYUBYOHENFLG
+      *****************************                         NOT =   ZERO
+      *****************************    MOVE    "0000998"
+      *****************************                    TO  WRK-BYOMEICD
+      *****************************ELSE
+      *****************************    MOVE    "0000999"
+      *****************************                    TO  WRK-BYOMEICD
+      *****************************END-IF
+                                   MOVE    "0000999"   TO  WRK-BYOMEICD
                                ELSE
                                    MOVE    RECE031-BYOMEICD(IDX)
                                                        TO  WRK-BYOMEICD
