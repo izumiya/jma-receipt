@@ -115,6 +115,9 @@
       *  01.01.01    NACL-藤原    04/09/28  中止処理の追加
       *  01.03.02    NACL-藤原    04/11/01  記載なしの公費の処理
       *  01.03.03    NACL-門脇    05/02/25  特記事項”老保”編集修正
+      *  01.03.04    NACL-藤原    05/05/11  沖縄県対応
+      *                                     精神障害者特別措置(121)の場合
+      *                                     主保険なしでも不明分としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1124,8 +1127,15 @@
       *    地方公費データのとき主保険が無かったら不明分とする
            IF      IDZ                  =   2
            AND     RECE02-HKNNUM        =   SPACE
-               MOVE    6                    TO  RECE02-ERR-ERRKBN
-               GO  TO  RECESYUBETU-SET-EXT
+      *
+      *        沖縄県で精神障害者特別措置(121)の場合は不明分としない
+               IF    ( RECE02-PREFNUM       =   "47"  )
+               AND   ( RECE02-KOHNUM (1)    =   "121" )
+                   CONTINUE
+               ELSE
+                   MOVE    6                    TO  RECE02-ERR-ERRKBN
+                   GO  TO  RECESYUBETU-SET-EXT
+               END-IF
            END-IF
       *     
       *    自費のときのレセプト種別を編集
