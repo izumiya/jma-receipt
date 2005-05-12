@@ -3311,6 +3311,7 @@
                                END-IF
                            WHEN    04
                                IF      PTBYO-MANSEIKBN     =   03
+                                                           OR  05
                                    MOVE    PTBYO-MANSEIKBN
                                                    TO  SPA-TOKU-FLG(IDX)
                                END-IF
