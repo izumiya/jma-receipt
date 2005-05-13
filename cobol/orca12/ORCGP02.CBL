@@ -2437,9 +2437,10 @@
       **** IF      SPA-MACHIPG         =   "U02"  OR  "K02" OR "Q02"
            IF      SPA-HZN-MOTOPG(1:3) =   "U02"  OR  "K02" OR "Q02"
                                                   OR  "I01"
-               IF     (SPA-HZN-PTNUM       =   SPACE  )  AND
-                      (SPA-P02-UKEID       =   ZERO   )
-                   CONTINUE
+               IF     (SPA-HZN-PTNUM       =   SPACE  )
+      *!!!       AND  (SPA-P02-UKEID       =   ZERO   )
+                   MOVE    SPACE               TO  SPA-PTNUM
+                   MOVE    ZERO                TO  SPA-PTID
                ELSE
       *
                    MOVE    SPA-GMN-PTNUM       TO  SPA-PTNUM
