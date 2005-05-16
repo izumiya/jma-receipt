@@ -509,6 +509,7 @@
                MOVE    SYS-1001-SYOHOKBN       TO  SPA-SYOHOKBN
       ******** 病床数
       *********MOVE    SYS-1001-BEDSU          TO  SPA-BEDSU
+      *
       *        薬剤情報発行フラグ
                MOVE    SYS-1001-YAKUJYOPRTFLG  TO  SPA-YAKJYOPRTFLG
                IF      SYS-1001-YAKUJYOPRTFLG  =   SPACE
@@ -1193,6 +1194,7 @@
                   (SPA-SYSYMD          =   SPA-SRYYMD ) AND
                   (SPA-SYORIFLG        =   ZERO       )
              AND  (LNK-SC95-PG    NOT  =   "K01"    )
+             AND  (FLG-UKETUKE-ARI     =   ZERO     )
                PERFORM 10014-UKETUKE-CHK-SEC
            END-IF
       *
@@ -1557,6 +1559,13 @@
                    END-IF
                END-IF
                IF      FLG-UKETUKE-ARI     =   1
+                 IF      LNK-SC95-PG         =   "K10"
+      *            中途終了からはドクターのみ
+                   IF       SPA-GMN-SRYKA       =   UKE-SRYKA
+                       MOVE    UKE-DRCD            TO  SPA-DRCD
+                       MOVE    1                   TO  FLG-UKETUKE
+                   END-IF
+                 ELSE
                    IF     (SPA-GMN-SRYKA   NOT =   SPACE  )  AND
                           (SPA-GMN-SRYKA       =   UKE-SRYKA )
                        MOVE    UKE-SRYKA           TO  SPA-SRYKA
@@ -1579,6 +1588,7 @@
                        END-IF
                        MOVE    1                   TO  FLG-UKETUKE
                    END-IF
+                END-IF
                END-IF
                IF      FLG-UKETUKE         =   ZERO
                    MOVE    "UKETUKE-KEY2"      TO  ORC-DBPATH
