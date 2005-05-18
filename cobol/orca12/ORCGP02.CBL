@@ -1614,6 +1614,10 @@
       *
            IF      SPA-HZN-MOTOPG(1:3) =   "U02"  OR  "K02" OR "Q02"
                                                   OR  "I01"
+               IF      SPA-HZN-PTNUM       =   SPACE
+                   MOVE    SPACE               TO  SPA-PTNUM
+                   MOVE    ZERO                TO  SPA-PTID
+               END-IF
                MOVE    "P02"               TO  SPA-MOTOPG
                MOVE    SPACE               TO  SPA-MOTOPG2
                MOVE    SPA-HZN-MOTOPG      TO  SPA-SAKIPG
