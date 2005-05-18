@@ -563,7 +563,17 @@
                MOVE    SYS-2006-RJNKBN     TO  SPA-NAI-TRJNKBN   (IDX)
                                                WRK-KBN
                PERFORM 5001-RJNKBN-HENSYU-SEC
-               MOVE    WRK-KBNMEI (1:8)    TO  SPA-GMN-TRJNKBN   (IDX)
+      *********MOVE    WRK-KBNMEI (1:8)    TO  SPA-GMN-TRJNKBN   (IDX)
+               EVALUATE    SYS-2006-RJNKBN
+                   WHEN    "1"
+                       MOVE    "受給がある"
+                                           TO  SPA-GMN-TRJNKBN   (IDX)
+                   WHEN    "2"
+                       MOVE    "受給がない"
+                                           TO  SPA-GMN-TRJNKBN   (IDX)
+                   WHEN    OTHER
+                       MOVE    SPACE       TO  SPA-GMN-TRJNKBN   (IDX)
+               END-EVALUATE
       *
                MOVE    SYS-2006-ZAITAKU    TO  SPA-NAI-TZAITAKU  (IDX)
                                                WRK-KBN
