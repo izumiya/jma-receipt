@@ -27,6 +27,9 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  00.00.01    NACL-藤原    05/05/17  レセプト特記事項編集情報に
+      *                                     「2 老人医療受給がない場合」
+      *                                      を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -473,9 +476,13 @@
            MOVE    2               TO  SPA-GMN-JKYSNUMKBN-MAX
       *
            MOVE    "1"             TO  SPA-GMN-RJNKBNL           (1)
-           MOVE    "老人医療（法別番号２７）を受給している場合のみ対象"
+           MOVE    "老人医療（法別番号２７）の受給がある場合のみ対象"
                                    TO  SPA-GMN-RJNKBNMEIL        (1)
-           MOVE    1               TO  SPA-GMN-RJNKBN-MAX 
+           MOVE    "2"             TO  SPA-GMN-RJNKBNL           (2)
+           MOVE
+                   "老人医療（法別番号２７）の受給がない場合のみ対象"
+                                   TO  SPA-GMN-RJNKBNMEIL        (2)
+           MOVE    2               TO  SPA-GMN-RJNKBN-MAX 
       *
            MOVE    "1"             TO  SPA-GMN-RECEDEN-KORECKBNL (1)
            MOVE    "記録しない"    TO  SPA-GMN-RECEDEN-KORECKBNMEIL

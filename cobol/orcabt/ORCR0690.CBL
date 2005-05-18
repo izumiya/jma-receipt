@@ -70,6 +70,9 @@
       *                                     るレセプト編集対応
       *  01.02.06    NACL-藤原    05/04/18  包括対象検査がまとまらない
       *                                     場合の編集の修正
+      *  01.02.07    NACL-藤原    05/05/17  レセプト特記事項編集情報に
+      *                                     「2 老人医療受給がない場合」
+      *                                      を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2373,6 +2376,13 @@
       *
            IF      WRK-2006-RJNKBN    =   "1"
                IF      RECE62-RJNHKNID     >   ZERO
+                   CONTINUE
+               ELSE
+                   GO  TO  200811-SYS2006-CHECK-EXT
+               END-IF
+           END-IF
+           IF      WRK-2006-RJNKBN    =   "2"
+               IF      RECE62-RJNHKNID     =   ZERO
                    CONTINUE
                ELSE
                    GO  TO  200811-SYS2006-CHECK-EXT
