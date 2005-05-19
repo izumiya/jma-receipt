@@ -46,6 +46,8 @@
       *  01.01.05    NACL-門脇    04/05/20  点滴の器材単価編集
       *  01.01.06    NACL-小豆沢  04/06/08  ＣＴ・ＭＲＩ（２回目以降）の
       *                                     摘要欄記載順修正
+      *  01.01.07    NACL-門脇    05/05/19  点数マスタの単位文字数がゼロ
+      *                                     の場合の編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2426,6 +2428,15 @@
                     END-IF
                   END-IF                                                
                ELSE                                                     
+                  IF      TNS-TANIMOJISU  =  ZERO
+                     PERFORM   VARYING   IDW   FROM   24   BY  -1
+                                UNTIL    IDW    <      1
+                        IF   TNS-TANINAME(IDW:1)  NOT =   SPACE
+                            COMPUTE  TNS-TANIMOJISU   =   IDW   /   2
+                            MOVE    1     TO    IDW
+                        END-IF
+                     END-PERFORM
+                  END-IF
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
                   MOVE    TNS-TANICD      TO    RECE85-TANICD(IDX4)
@@ -3074,6 +3085,15 @@
                       MOVE   WRK-TANIMOJISU TO  RECE85-TANIMOJISU(IDX4)
                       MOVE   WRK-TANINAME   TO  RECE85-TANINAME(IDX4)
                   ELSE
+                      IF      TNS-TANIMOJISU  =  ZERO
+                         PERFORM   VARYING   IDW   FROM   24   BY  -1
+                                    UNTIL    IDW    <      1
+                          IF   TNS-TANINAME(IDW:1)  NOT =   SPACE
+                              COMPUTE  TNS-TANIMOJISU   =   IDW   /   2
+                              MOVE    1     TO    IDW
+                          END-IF
+                         END-PERFORM
+                      END-IF
                       MOVE  TNS-TANICD      TO  RECE85-TANICD(IDX4)
                                                 WRK-TANICD
                       MOVE  TNS-TANIMOJISU  TO  RECE85-TANIMOJISU(IDX4)

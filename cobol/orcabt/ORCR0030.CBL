@@ -169,6 +169,8 @@
       *  01.03.12   NACL-門脇     04/10/14  外来管理加算の剤番号置き換え
       *  01.03.13   NACL-小豆沢   04/12/08  点数フラグの初期化追加
       *  01.03.14   NACL-小豆沢   05/03/28  老人理学療法摘要欄対応
+      *  01.03.15   NACL-門脇     05/05/19  点数マスタの単位文字数がゼロ
+      *                                     の場合の編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1749,6 +1751,15 @@
                     END-IF
                   END-IF                                                
                ELSE                                                     
+                  IF      TNS-TANIMOJISU  =  ZERO
+                     PERFORM   VARYING   IDW   FROM   24   BY  -1
+                                UNTIL    IDW    <      1
+                        IF   TNS-TANINAME(IDW:1)  NOT =   SPACE
+                            COMPUTE  TNS-TANIMOJISU   =   IDW   /   2
+                            MOVE    1     TO    IDW
+                        END-IF
+                     END-PERFORM
+                  END-IF
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
                   MOVE    TNS-TANICD      TO    RECE05-TANICD(IDX4)
