@@ -203,6 +203,8 @@
       *  01.06.03    NACL-門脇    05/04/08  負担金額（一部負担額）編集
       *                                     修正
       *  01.06.04    NACL-門脇    05/04/20  内服薬剤逓減編集対応
+      *  01.06.05    NACL-門脇    05/05/19  点数マスタの単位文字数がゼロ
+      *                                     の場合の編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2166,6 +2168,15 @@
                     END-IF
                   END-IF                                                
                ELSE                                                     
+                  IF      TNS-TANIMOJISU  =  ZERO
+                     PERFORM   VARYING   IDW   FROM   24   BY  -1
+                                UNTIL    IDW    <      1
+                        IF   TNS-TANINAME(IDW:1)  NOT =   SPACE
+                            COMPUTE  TNS-TANIMOJISU   =   IDW   /   2
+                            MOVE    1     TO    IDW
+                        END-IF
+                     END-PERFORM
+                  END-IF
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
                   MOVE    TNS-TANICD      TO    RECE05-TANICD(IDX4)
