@@ -1858,6 +1858,10 @@
            MOVE  SPA-GMN-OLDTENSKB         TO  TNS-OLDTENSKB
            MOVE  SPA-GMN-TANICD            TO  TNS-TANICD
            MOVE  SPA-GMN-TANINAME          TO  TNS-TANINAME
+           MOVE  SPA-GMN-TANINAME          TO  WRK-STRINGTBL
+           MOVE  12                        TO  CNT-STRING
+           PERFORM  891-STRCOUNT-SEC
+           MOVE  CNT-STRING                TO  TNS-TANIMOJISU
            MOVE  SPA-GMN-TOKUKIZAIAGEKSNKBN
                                            TO  TNS-TOKUKIZAIAGEKSNKBN
            MOVE  SPA-GMN-KGNAGE            TO  TNS-KGNAGE
