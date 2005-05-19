@@ -3207,8 +3207,12 @@
                    MOVE    SPA-GMN-CHOSEI  TO  SYU-CHOSEI
                END-IF
                IF      WRK-SRYKA           =   SYU-SRYKA
-                   MOVE    "1"             TO  SYU-DRCD-SIK
-                   MOVE    SPA-GMN-DRCD    TO  SYU-DRCD
+                   IF      SPA-GMN-DRCD        =   SPACE
+                       MOVE    SPACE           TO  SYU-DRCD-G
+                   ELSE
+                       MOVE    "1"             TO  SYU-DRCD-SIK
+                       MOVE    SPA-GMN-DRCD    TO  SYU-DRCD
+                   END-IF
                END-IF
                IF     (WRK-SRYKA       NOT =   ZERO ) AND
                       (WRK-HKNCOMBI    NOT =   ZERO )
