@@ -3762,7 +3762,8 @@
                     END-IF
                   END-IF                                                
                ELSE                                                     
-                  IF      TNS-TANIMOJISU  =  ZERO
+                  IF      TNS-TANIMOJISU    =   ZERO
+                  AND     TNS-TANINAME  NOT =   SPACE
                      PERFORM   VARYING   IDW   FROM   24   BY  -1
                                 UNTIL    IDW    <      1
                         IF   TNS-TANINAME(IDW:1)  NOT =   SPACE
@@ -4667,7 +4668,8 @@
                       MOVE   WRK-TANIMOJISU TO  RECE65-TANIMOJISU(IDX4)
                       MOVE   WRK-TANINAME   TO  RECE65-TANINAME(IDX4)
                   ELSE
-                      IF      TNS-TANIMOJISU  =  ZERO
+                      IF      TNS-TANIMOJISU    =   ZERO
+                      AND     TNS-TANINAME  NOT =   SPACE
                          PERFORM   VARYING   IDW   FROM   24   BY  -1
                                     UNTIL    IDW    <      1
                           IF   TNS-TANINAME(IDW:1)  NOT =   SPACE
