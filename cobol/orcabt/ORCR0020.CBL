@@ -118,6 +118,9 @@
       *  01.03.04    NACL-藤原    05/05/11  沖縄県対応
       *                                     精神障害者特別措置(121)の場合
       *                                     主保険なしでも不明分としない
+      *  01.03.05    NACL-藤原    05/05/17  神奈川県の障害(180､280)は
+      *                                     国保で負担者番号が空白の場合
+      *                                     公費カウントしない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -847,7 +850,7 @@
                        MOVE   "4"             TO  WRK-RECESKYKBN
                    ELSE
                        MOVE   RECE01-RECESKYKBN-O (IDX)
-                                             TO  WRK-RECESKYKBN
+                                              TO  WRK-RECESKYKBN
                    END-IF
                    PERFORM   KOHI-SET-SEC
                END-IF
@@ -1108,6 +1111,17 @@
            PERFORM   CSR-CLOSE-SEC
            MOVE   "HKNNUM-KEY2"       TO  WK-PATH
            PERFORM   CSR-CLOSE-SEC
+      *
+      *    神奈川地方公費対応
+           IF    ( RECE02-PREFNUM  =   "14"           )
+           AND   ( RECE02-TEISYUTUSAKI
+                                   =   "2"            )
+           AND   ( RECE02-KOHNUM      (IDX2)
+                                   =   "180" OR "280" )
+           AND   ( RECE02-KOHFTNJANUM (IDX2)
+                                   =   SPACE          )
+               MOVE   "4"          TO  RECE02-RECESKYKBN(IDX2)
+           END-IF
       *
            .
        KOHI-SET-EXT.

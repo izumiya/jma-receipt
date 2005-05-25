@@ -138,6 +138,9 @@
       *  01.06.07    NACL-藤原    05/05/17  レセプト特記事項編集情報に
       *                                     「2 老人医療受給がない場合」
       *                                      を追加
+      *  01.06.08    NACL-藤原    05/05/20  レセプト特記事項編集情報によ
+      *                                     る記載外公費の給付割合、特記
+      *                                     事項の編集を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2766,11 +2769,9 @@
                GO  TO  20081-SYS2006-HENSYU-EXT
            END-IF
       *
-      *    割合が設定されなかったとき又は 
       *    原爆（０１９）より優先順位が低い公費で検索した場合
       *    レセプト記載外公費情報の原爆を検索
-           IF    ( FLG-2006-CHK     =   ZERO                     )
-           OR    ( SYS-2006-HKNNUM =   "023"    OR  "051"    OR
+           IF    ( SYS-2006-HKNNUM =   "023"    OR  "051"    OR
                                        "091"    OR  "052"    OR
                                        "053"    OR  "012"        )
            OR    ( SYS-2006-HKNNUM >   "100"                     )
@@ -2793,6 +2794,27 @@
       *
                        MOVE    4               TO  IDW1
                    END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    割合が設定されなかったときレセプト記載外公費情報を検索
+           IF      FLG-2006-CHK     =   ZERO
+               PERFORM VARYING IDW1    FROM    1   BY  1
+                       UNTIL ( IDW1    >       4                 )
+                       OR    ( RECE02-ETC-KOHNUM(IDW1) =   SPACE )
+                   PERFORM VARYING IDW2    FROM     1   BY  1
+                           UNTIL   IDW2             >   SYSKAN-IDY
+                       MOVE    TBL-SYS2006 (IDW2)  TO  WRK-2006-REC
+      *
+                       IF    ( WRK-2006-KYURATE
+                                                   >   ZERO            )
+                       AND   ( RECE02-ETC-KOHNUM (IDW1)
+                                                   =   WRK-2006-HKNNUM )
+                           PERFORM 200811-SYS2006-CHECK-SEC
+                       END-IF
+                   END-PERFORM
+      *
+                   MOVE    4               TO  IDW1
                END-PERFORM
            END-IF
            .
@@ -2871,9 +2893,11 @@
                        MOVE    1                   TO  FLG-HKNNUM-OK
                    END-IF
                END-PERFORM
-      *        原爆のときはレセプト記載外公費情報も検索
-               IF    ( WRK-2006-HKNNUM         =   "019" )
-               AND   ( FLG-HKNNUM-OK           =   ZERO  )
+      ******** 原爆のときはレセプト記載外公費情報も検索
+      ******** IF    ( WRK-2006-HKNNUM         =   "019" )
+      ******** AND   ( FLG-HKNNUM-OK           =   ZERO  )
+      *        レセプト記載外公費情報も検索
+               IF      FLG-HKNNUM-OK           =   ZERO
                    PERFORM VARYING IDW2    FROM    1   BY  1
                            UNTIL ( IDW2    >       4                 )
                            OR    ( RECE02-ETC-KOHNUM(IDW2) =   SPACE )

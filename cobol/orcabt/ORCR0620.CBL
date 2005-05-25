@@ -77,6 +77,9 @@
       *  01.01.05    NACL-門脇    05/02/14  高齢者一部負担額記載修正
       *  01.01.06    NACL-門脇    05/02/25  特記事項”老保”編集修正
       *  01.01.07    NACL-門脇    05/03/16  高齢者フラグ編集修正
+      *  01.01.08    NACL-藤原    05/05/17  神奈川県の障害(180､280)は
+      *                                     国保で負担者番号が空白の場合
+      *                                     公費カウントしない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1243,6 +1246,17 @@
            END-IF
            MOVE   "PTKOHINF-KEY"      TO  WK-PATH
            PERFORM   CSR-CLOSE-SEC
+      *
+      *    神奈川地方公費対応
+           IF    ( RECE62-PREFNUM  =   "14"           )
+           AND   ( RECE62-TEISYUTUSAKI
+                                   =   "2"            )
+           AND   ( RECE62-KOHNUM      (IDX2)
+                                   =   "180" OR "280" )
+           AND   ( RECE62-KOHFTNJANUM (IDX2)
+                                   =   SPACE          )
+               MOVE   "4"          TO  RECE62-RECESKYKBN(IDX2)
+           END-IF
       *
            .
        KOHI-SET-EXT.
