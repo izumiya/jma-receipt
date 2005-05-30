@@ -476,7 +476,10 @@
                                    ELSE
                                        MOVE  PTNYUINRRK-TENSTUYMD(7:2)
                                                      TO   IDX-ED
-                                       COMPUTE   IDX-ED = IDX-ED - 1
+                                       IF  PTNYUINRRK-TENSTUYMD NOT =
+                                           PTNYUINRRK-TAIINYMD 
+                                         COMPUTE   IDX-ED = IDX-ED - 1
+                                       END-IF
                                    END-IF
                                    PERFORM  VARYING  IDX1  
                                             FROM IDX-ST   BY  1
