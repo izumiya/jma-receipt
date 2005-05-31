@@ -50,6 +50,7 @@
       *                                     Ê¿À®£±£¶Ç¯£´·î¤è¤ê£³£°¡ó
       *  01.00.15    NACL-ÌçÏÆ    04/04/23  ÁªÄêÆþ±¡»þ¤ÎÂ¾°åÎÅµ¡´Ø¼õ¿Ç¤Î
       *                                     »»Äê½¤Àµ
+      *  01.00.16    NACL-ÌçÏÆ    05/05/31  ¼¼ÎÁº¹³Û¤Î·×»»½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -73,6 +74,8 @@
                05  WRK-KOYOMI2-DD          PIC 9(02).
            03  WRK-NYUINYMD                PIC X(08).
            03  WRK-SHONUM                  PIC 9(03).
+           03  WRK-KBNCD                   PIC X(02).
+           03  WRK-KBNCD2                  PIC X(06).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -172,7 +175,7 @@
       *
       * ¼¼ÎÁº¹³ÛÂàÈòÍÑ¥Æ¡¼¥Ö¥ë     
        01  TABLE-RMSAGAKU.
-           03  TBL-RMSAGAKU                PIC 9(05)   OCCURS  50.
+           03  TBL-RMSAGAKU                PIC 9(05)   OCCURS  99.
       *
       * Æþ±¡ÎÁ¥Õ¥é¥°ÂàÈòÍÑ¥Æ¡¼¥Ö¥ë
        01  TABLE-NYUIN.                                                 
@@ -1250,6 +1253,7 @@
       *
            MOVE    ZERO                TO  NYUIN-COUNT
            INITIALIZE                      TABLE-NYUIN
+           INITIALIZE                      TABLE-RMSAGAKU
            MOVE    SPACE               TO  HKNTEKGAI-NYUIN
            INITIALIZE                      HKNTEKGAI-NYUIN
       *
@@ -1419,6 +1423,7 @@
       *
       *Æþ±¡ÎÁ´Ø·¸¤Î¼èÆÀ
       *
+           INITIALIZE                      TABLE-RMSAGAKU
            MOVE    SPACE               TO  HKNTEKGAI-NYUIN
            INITIALIZE                      HKNTEKGAI-NYUIN
       *
@@ -1731,12 +1736,16 @@
                    IF      MCP-RC              =    ZERO
                         MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
                         PERFORM  SYSKANRI-READ-SEC
-                        PERFORM   VARYING  SYU-IDX   FROM   1   BY   1
-                          UNTIL  (SYU-IDX      >     50)    OR
-                                 (FLG-SYSKANRI    =  1)
+                        PERFORM   UNTIL   FLG-SYSKANRI   =   1
                             MOVE   SYSKANRI-REC   TO  SYS-5113-REC
-                            MOVE   SYS-5113-BRM-SAGAKU-NM
-                                           TO  TBL-RMSAGAKU(SYU-IDX)
+                            MOVE   SYS-5113-KBNCD(1:2)  TO  WRK-KBNCD
+                            MOVE   SYS-5113-KBNCD(3:6)  TO  WRK-KBNCD2
+                            IF     WRK-KBNCD  IS  NUMERIC
+                            AND    WRK-KBNCD  NOT = "00"
+                            AND    WRK-KBNCD2     =  SPACE
+                                MOVE   SYS-5113-BRM-SAGAKU-NM
+                                      TO  TBL-RMSAGAKU(WRK-KBNCD)
+                            END-IF
                             MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
                             PERFORM  SYSKANRI-READ-SEC
                         END-PERFORM
