@@ -680,14 +680,14 @@
       *****************************************************************
        10010-SRYKBN-CHK-SEC             SECTION.
       *
-           EVALUATE    WRK-GMN-INPUTCD(IDX-Z)(2:3)
-               WHEN    "610"
-                   IF      SPA-NYUGAIKBN   =   "1"
-                       MOVE    "9028"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR
-                                                             (IDX-Z)
-                   END-IF
-           END-EVALUATE
+      *??  EVALUATE    WRK-GMN-INPUTCD(IDX-Z)(2:3)
+      *        WHEN    "610"
+      *            IF      SPA-NYUGAIKBN   =   "1"
+      *                MOVE    "9028"          TO  WRK-ERRCD
+      *                MOVE    "1"             TO  WRK-COM-CUR
+      *                                                      (IDX-Z)
+      *            END-IF
+      *??  END-EVALUATE
            .
        10010-SRYKBN-CHK-EXT.
            EXIT.
@@ -1365,9 +1365,12 @@
        100114-JYUFUKUCHEK-SEC                  SECTION.
       *
       *    Æþ±¡¤«Êñ³ç³°¤Î»þ
-           IF     (SPA-NYUGAIKBN       =   "1"   )  OR
+      *!   IF     (SPA-NYUGAIKBN       =   "1"   )  OR
+      *           (WRK-COM-SRYSYUKBN (IDX-Z)
+      *!                               =   "610" )
+           IF     (SPA-NYUGAIKBN       =   "1"   )  AND
                   (WRK-COM-SRYSYUKBN (IDX-Z)
-                                       =   "610" )
+                                   NOT =   "610" )
                PERFORM VARYING     IDX1    FROM    1   BY  1
                        UNTIL       IDX1    >=  IDX-Z
                    IF      WRK-COM-INPUTCD(IDX1)

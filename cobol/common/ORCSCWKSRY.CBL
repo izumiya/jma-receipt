@@ -1219,7 +1219,8 @@
                   (LNK-WKSRY-SRYSYUKBN (IDX)(1:1)  =   "9"  OR
                                                        "3"  OR
                                                        "2"   )  OR
-                  (LNK-WKSRY-SRYSYUKBN (IDX)(3:1)  NOT =   "0"))
+                  (LNK-WKSRY-SRYSYUKBN (IDX)(3:1)  NOT =   "0") OR
+                  (LNK-WKSRY-SRYSYUKBN (IDX)       =   "610"  ))
                ADD     1                       TO  IDX2
                MOVE    "."                     TO  SPA-GMN-INPUTCD
                                                             (IDX2)(1:1)
