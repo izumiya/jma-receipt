@@ -132,6 +132,8 @@
       *                                     修正
       *  01.03.04    NACL-門脇    05/05/19  点数マスタの単位文字数がゼロ
       *                                     の場合の編集
+      *  01.03.05    NACL-門脇    05/05/31  レセ記載フラグ、０円記載フラグ
+      *                                     の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7181,7 +7183,7 @@
              PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
                          UNTIL    KOHFTN-IDX     >    4
       *
-               IF   RECE62-KOUREI    NOT =    SPACE
+      ****     IF   RECE62-KOUREI    NOT =    SPACE
                    IF ( RECE62-KOHNUM(KOHFTN-IDX) =  "012" OR "015"
                                                   OR "016" OR "051" )
                    OR ((WRK-PREFNUM      =   13           ) AND
@@ -7191,18 +7193,18 @@
                          MOVE  "1"   TO
                                  RECE62-KISAIFLG(KOHFTN-IDX + 1)
                    END-IF
-               END-IF
+      ****     END-IF
       *
                IF ( RECE62-KOHNUM(KOHFTN-IDX) =  "015" OR "016"
                                                        OR "051" )
                OR ((WRK-PREFNUM      =   13           ) AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "151" OR "451"))
-               OR ((WRK-PREFNUM      =   28           ) AND
-                   (RECE62-KOHNUM(KOHFTN-IDX) =  "186"         ))
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                ELSE
-                 IF   RECE62-KOHNUM(KOHFTN-IDX) =  "012"
+                 IF ( RECE62-KOHNUM(KOHFTN-IDX) =  "012"  )
+                 OR ((WRK-PREFNUM               =   28   ) AND
+                     (RECE62-KOHNUM(KOHFTN-IDX) =  "186" ))
                    CONTINUE
                  ELSE
       *            保険番号テーブルの検索
@@ -7253,6 +7255,8 @@
                          UNTIL    KOHFTN-IDX     >    4
       *
                IF   RECE62-KOHNUM(KOHFTN-IDX) =  "052"
+                     MOVE  "1"   TO
+                                 RECE62-KISAIFLG(KOHFTN-IDX + 1)
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
       *
