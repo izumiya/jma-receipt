@@ -74,7 +74,8 @@
            03  WRK-EDYMD                   PIC X(08).
            03  WRK-ZAIKAISU                PIC 9(04).
            03  WRK-TAX1001-KBN             PIC X(01).
-           03  WRK-KBNCD                   PIC X(02).
+           03  WRK-KBNCD.
+               05  WRK-KBNCD-X             PIC 9(02).
            03  WRK-KBNCD2                  PIC X(06).
       *
        01  WRK-ROSAI-AREA.
@@ -1948,7 +1949,7 @@
                             AND    WRK-KBNCD  NOT = "00"
                             AND    WRK-KBNCD2     =  SPACE
                                 MOVE   SYS-5113-BRM-SAGAKU-NM
-                                      TO  TBL-RMSAGAKU(WRK-KBNCD)
+                                      TO  TBL-RMSAGAKU(WRK-KBNCD-X)
                             END-IF
                             MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
                             PERFORM  SYSKANRI-READ-SEC
