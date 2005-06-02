@@ -37,6 +37,7 @@
       *                                     ¶èÊ¬ÊÔ½¸ÍÑ¡Ë¤ò»ÈÍÑ¤¹¤ë¤è¤¦½¤Àµ
       *  01.00.06    NACL-ÌçÏÆ    04.08.04  Æ±°ìÊÝ¸±ÈÖ¹æÂÐ±þ
       *  01.00.07    NACL-ÌçÏÆ    05.04.20  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
+      *  01.00.08    NACL-ÌçÏÆ    05/06/02  ¸øÈñÊ¬Î¥¶èÊ¬ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -358,8 +359,20 @@
       **     DISPLAY   "RECE04-HKNCOMNI : " RECE04-HKNCOMBI
       **     DISPLAY   "KH-IDX          : " KH-IDX
       *
-           IF    KH-IDX      NOT =   ZERO
-               MOVE    KH-IDX          TO        RECE04-KOHBUNRI
+           IF    RECE02-HENTOTALTEN(1)   NOT  =  ZERO
+              IF    KH-IDX      NOT =   ZERO
+                     MOVE    KH-IDX      TO     RECE04-KOHBUNRI
+              END-IF
+           ELSE
+              IF    KH-IDX      NOT =   ZERO
+                IF    RECE04-KOHBUNRI     =      ZERO
+                     MOVE    KH-IDX      TO     RECE04-KOHBUNRI
+                ELSE
+                  IF  RECE02-HENTOTALTEN(2)  >  RECE02-HENTOTALTEN(3)
+                     MOVE    KH-IDX      TO     RECE04-KOHBUNRI
+                  END-IF
+                END-IF
+              END-IF
            END-IF
       *     ACCEPT  WRK-IN FROM CONSOLE 
            .
@@ -403,10 +416,27 @@
                   (RECE02-TEKSTYMD      NOT =  RECE05-TEKSTYMD)  OR
                   (WK-ZAINUM            NOT =  RECE05-ZAINUM)    OR
                   (FLG-RECE05           =      1)
-                   IF    KH-IDX      NOT =   ZERO
-                     MOVE   KH-IDX        TO     RECE05-KOHBUNRI
-                     PERFORM      RECE05-REWRITE-SEC
+      *
+                   IF    RECE02-HENTOTALTEN(1)   NOT  =  ZERO
+                     IF    KH-IDX      NOT =   ZERO
+                            MOVE   KH-IDX        TO     RECE05-KOHBUNRI
+                            PERFORM      RECE05-REWRITE-SEC
+                     END-IF
+                   ELSE
+                     IF    KH-IDX      NOT =   ZERO
+                       IF    RECE05-KOHBUNRI     =      ZERO
+                            MOVE   KH-IDX        TO     RECE05-KOHBUNRI
+                            PERFORM      RECE05-REWRITE-SEC
+                       ELSE
+                         IF  RECE02-HENTOTALTEN(2)  >
+                                                  RECE02-HENTOTALTEN(3)
+                            MOVE   KH-IDX        TO     RECE05-KOHBUNRI
+                            PERFORM      RECE05-REWRITE-SEC
+                         END-IF
+                       END-IF
+                     END-IF
                    END-IF
+      *
                    PERFORM      RECE05-NEXT-SEC
            END-PERFORM
       *
