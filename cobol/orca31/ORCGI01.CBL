@@ -3452,6 +3452,9 @@
                MOVE    SPA-NAI-I01-IDOYMD
                                        TO  WRK-KJNYMD
                PERFORM 4101-JYURRK-SEL-SEC
+      *
+               PERFORM 410-INPUT-CHK-SEC
+      *
       *    照会
            WHEN    "10"
                PERFORM 4201-WIDGET-INSENSITIVE-SEC
@@ -3656,7 +3659,8 @@
                MOVE    WRK-SYMD        TO  SPA-NAI-I01-IDOYMD
            END-IF
       *
-           IF    (  SPA-NAI-I01-IDOYMD NOT =   SPA-NAI-I01-IDOYMD-MAE )
+           IF    ( SPA-NAI-I01-IDOYMD  NOT =   SPA-NAI-I01-IDOYMD-MAE )
+            OR   ( WRK-MCP-WIDGET          =   "SYORIKBN" )
                MOVE    SPA-NAI-I01-IDOYMD  TO  SPA-NAI-I01-IDOYMD-MAE
       *        コンボ初期処理
                MOVE    SPA-NAI-I01-IDOYMD
@@ -3677,6 +3681,7 @@
       *        病室番号チェック
                MOVE    SPA-NAI-I01-IDOYMD
                                    TO  WRK-KIHON-KJNYMD
+      *
                PERFORM 4101-BRMNUM-CHK-SEC
                MOVE    SPA-GMN-I01-BRMNUM
                                        TO  SPA-NAI-I01-BRMNUM-MAE
