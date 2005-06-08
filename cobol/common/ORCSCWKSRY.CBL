@@ -1559,7 +1559,7 @@
            MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
-           MOVE    PATH-TBL-WKSRYACT-KEY2
+           MOVE    PATH-TBL-WKSRYACT-DEL11
                                        TO  MCP-PATH
            MOVE    "DBDELETE"          TO  MCP-FUNC
            CALL    "MCPSUB"            USING
