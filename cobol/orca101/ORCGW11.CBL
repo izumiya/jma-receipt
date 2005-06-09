@@ -869,11 +869,11 @@
            MOVE    "T"                 TO  SPA-GMN-TORGPGCHK-N(5)
            MOVE    "F"                 TO  SPA-GMN-TCSTPGCHK-N(5)
       *    注射処方箋
-           MOVE    "ORCHC510"          TO  SPA-GMN-TORGPGNM-N (6)
+           MOVE    "ORCHC502"          TO  SPA-GMN-TORGPGNM-N (6)
            MOVE    "T"                 TO  SPA-GMN-TORGPGCHK-N(6)
            MOVE    "F"                 TO  SPA-GMN-TCSTPGCHK-N(6)
       *    指示箋
-           MOVE    "ORCHC520"          TO  SPA-GMN-TORGPGNM-N (7)
+           MOVE    "ORCHC503"          TO  SPA-GMN-TORGPGNM-N (7)
            MOVE    "T"                 TO  SPA-GMN-TORGPGCHK-N(7)
            MOVE    "F"                 TO  SPA-GMN-TCSTPGCHK-N(7)
       *    入院帳票
@@ -1000,6 +1000,15 @@
                                        TO  SPA-GMN-TCSTPGNM-N  (IDZ2)
                    MOVE    SYS-1035-ORCACSTCHK
                                        TO  SPA-GMN-TCSTPGCHK-N (IDZ2)
+                   IF      IDZ2        =   5
+                       MOVE    "ORCHC501"      TO  SPA-GMN-TORGPGNM-N(5)
+                   END-IF
+                   IF      IDZ2        =   6
+                       MOVE    "ORCHC502"      TO  SPA-GMN-TORGPGNM-N(6)
+                   END-IF
+                   IF      IDZ2        =   7
+                       MOVE    "ORCHC503"      TO  SPA-GMN-TORGPGNM-N(7)
+                   END-IF
       *
       *            システム管理マスタ読込
                    PERFORM 900-SYSKANRI-READ-SEC

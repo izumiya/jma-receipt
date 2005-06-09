@@ -516,9 +516,6 @@
            03  FLG-KYUJITU         PIC 9(01).
            03  WRK-KEIYMD          PIC X(08).
       *
-      *    処方せんＰＧ名
-           03  WRK-SYOHOU-PG           PIC X(20).
-      *
       *    入力名称
            03  WRK-MEISYO-G.
                05  WRK-MEIH                PIC X(02).
@@ -565,6 +562,11 @@
       *    コラムリスト位置
            03  WRK-K02-ROW             PIC S9(09).
            03  FLG-GMN-INIT            PIC  9(01).
+      *
+      *    処方せんＰＧ名
+           03  WRK-SYOHOU-PG           PIC X(20).
+           03  WRK-CHUSYA-PG           PIC X(20).
+           03  WRK-SIJISEN-PG          PIC X(20).
       *
       *   年齢表示
        01  WRK-NENREI-G.
@@ -734,6 +736,8 @@
       *    COPY    "CPSK1010.INC".
       *    帳票ＰＧ
            COPY    "CPSK1032.INC".
+      *    帳票ＰＧ
+           COPY    "CPSK1034.INC".
       *
       *    入院指示せん設定情報
            COPY  "CPSK5007.INC".
@@ -887,6 +891,9 @@
       *
       *    ワーク診療行為展開・作成
            COPY    "CPORCSCWKSRY.INC".
+      *
+      *    オンライン帳票名・出力先プリンタ名取得パラ
+           COPY    "CPORCSPRTNM.INC".
       *
       *    入院指示せんオーダ作成サブ
            COPY    "CPORCSORDERPRT.INC".
@@ -9982,6 +9989,9 @@
                MOVE    "1200"              TO  SPA-ERRCD
            END-IF
       *
+      *    帳票プログラム取得
+           PERFORM 459001-PRTNUM-HEN-SEC
+      *
       *    入院処方箋印刷
            IF     (SPA-ERRCD           =   SPACE  )  AND
                   (SPA-K081GMN-SYOHOU  =   "1"    )
@@ -9999,7 +10009,7 @@
                        MOVE    1               TO  ORCHC501-CHKPRT(IDX)
                    END-IF
                END-PERFORM
-               CALL    "ORCHC501"          USING
+               CALL    WRK-SYOHOU-PG       USING
                                            SPA-AREA
                                            ORCHC501AREA
                IF      ORCHC501-RC         NOT =   ZERO
@@ -10023,7 +10033,7 @@
                        MOVE    1               TO  ORCHC502-CHKPRT(IDX)
                    END-IF
                END-PERFORM
-               CALL    "ORCHC502"          USING
+               CALL    WRK-CHUSYA-PG       USING
                                            SPA-AREA
                                            ORCHC502AREA
                IF      ORCHC502-RC         NOT =   ZERO
@@ -10047,7 +10057,7 @@
                        MOVE    1               TO  ORCHC503-CHKPRT(IDX)
                    END-IF
                END-PERFORM
-               CALL    "ORCHC503"          USING
+               CALL    WRK-SIJISEN-PG      USING
                                            SPA-AREA
                                            ORCHC503AREA
                IF      ORCHC503-RC         NOT =   ZERO
@@ -10056,6 +10066,60 @@
            END-IF
            .
        45900-SIJISEN-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    帳票プログラム取得処理
+      *****************************************************************
+       459001-PRTNUM-HEN-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  WRK-SYOHOU-PG
+           MOVE    SPACE               TO  WRK-CHUSYA-PG
+           MOVE    SPACE               TO  WRK-SIJISEN-PG
+      *    入院処方せん
+           INITIALIZE                      ORCSPRTNMAREA
+           MOVE    "1"                 TO  ORCSPRTNM-KBN
+           MOVE    "00000005"          TO  ORCSPRTNM-KBNCD
+           MOVE    SPA-SRYYMD          TO  ORCSPRTNM-SRYYMD
+           CALL    "ORCSPRTNM"         USING
+                                       ORCSPRTNMAREA
+                                       SPA-AREA
+                                       SYS-1034-REC
+           IF      ORCSPRTNM-RC    NOT =   ZERO
+               MOVE    "1202"              TO  SPA-ERRCD
+           ELSE
+               MOVE    ORCSPRTNM-PRTPG     TO  WRK-SYOHOU-PG
+           END-IF
+      *    注射処方せん
+           INITIALIZE                      ORCSPRTNMAREA
+           MOVE    "1"                 TO  ORCSPRTNM-KBN
+           MOVE    "00000006"          TO  ORCSPRTNM-KBNCD
+           MOVE    SPA-SRYYMD          TO  ORCSPRTNM-SRYYMD
+           CALL    "ORCSPRTNM"         USING
+                                       ORCSPRTNMAREA
+                                       SPA-AREA
+                                       SYS-1034-REC
+           IF      ORCSPRTNM-RC    NOT =   ZERO
+               MOVE    "1203"              TO  SPA-ERRCD
+           ELSE
+               MOVE    ORCSPRTNM-PRTPG     TO  WRK-CHUSYA-PG
+           END-IF
+      *    指示せん
+           INITIALIZE                      ORCSPRTNMAREA
+           MOVE    "1"                 TO  ORCSPRTNM-KBN
+           MOVE    "00000007"          TO  ORCSPRTNM-KBNCD
+           MOVE    SPA-SRYYMD          TO  ORCSPRTNM-SRYYMD
+           CALL    "ORCSPRTNM"         USING
+                                       ORCSPRTNMAREA
+                                       SPA-AREA
+                                       SYS-1034-REC
+           IF      ORCSPRTNM-RC    NOT =   ZERO
+               MOVE    "1204"              TO  SPA-ERRCD
+           ELSE
+               MOVE    ORCSPRTNM-PRTPG     TO  WRK-SIJISEN-PG
+           END-IF
+           .
+       459001-PRTNUM-HEN-EXT.
            EXIT.
       *
       *****************************************************************

@@ -205,6 +205,15 @@
       *            カルテ（３号紙）
                    WHEN    "00000004"
                        MOVE    "ORCHCN33"      TO  ORCSPRTNM-PRTPG
+      *            入院処方箋
+                   WHEN    "00000005"
+                       MOVE    "ORCHC501"      TO  ORCSPRTNM-PRTPG
+      *            注射箋
+                   WHEN    "00000006"
+                       MOVE    "ORCHC502"      TO  ORCSPRTNM-PRTPG
+      *            指示箋
+                   WHEN    "00000007"
+                       MOVE    "ORCHC503"      TO  ORCSPRTNM-PRTPG
                END-EVALUATE
            ELSE
       *        外来
