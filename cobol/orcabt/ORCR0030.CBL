@@ -207,6 +207,8 @@
       *                                     ¤Î¾ì¹ç¤ÎÊÔ½¸
       *  01.06.06    NACL-ÌçÏÆ    05/05/31  ¥ì¥»µ­ºÜ¥Õ¥é¥°¡¢£°±ßµ­ºÜ¥Õ¥é¥°
       *                                     ¤ÎÊÔ½¸½¤Àµ
+      *  01.06.07    NACL-ÌçÏÆ    05/06/10  ÉéÃ´¶â³Û¡Ê°ìÉôÉéÃ´³Û¡ËÊÔ½¸
+      *                                     ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4887,8 +4889,17 @@
                                          RECE02-FTNMONEY-FTN(KH-IDX)
                     END-EVALUATE
       *
-                    IF    RECE02-FTNMONEY-FTN(KH-IDX)   >   12000
-                       MOVE   12000  TO  RECE02-FTNMONEY-FTN(KH-IDX)
+                    IF   ( SYU-KOH-HKNNUM(1) =   "972" )  OR
+                         ( SYU-KOH-HKNNUM(2) =   "972" )  OR
+                         ( SYU-KOH-HKNNUM(3) =   "972" )  OR
+                         ( SYU-KOH-HKNNUM(4) =   "972" )
+                       IF    RECE02-FTNMONEY-FTN(KH-IDX)   >   10000
+                          MOVE   10000  TO  RECE02-FTNMONEY-FTN(KH-IDX)
+                       END-IF
+                    ELSE
+                       IF    RECE02-FTNMONEY-FTN(KH-IDX)   >   12000
+                          MOVE   12000  TO  RECE02-FTNMONEY-FTN(KH-IDX)
+                       END-IF
                     END-IF
       *
               END-IF
