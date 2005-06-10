@@ -39,6 +39,8 @@
       *  02.00.05    NACL-小豆沢  05/03/16  一般療養、特別療養（旧日雇保険）
       *                                     の場合は原爆１９の単独を作成可能
       *                                     に変更
+      *  02.00.06    NACL-小豆沢  05/06/10  原爆一般＋長期の組合せを作成可能
+      *                                     に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3441,16 +3443,20 @@
                    CONTINUE
                ELSE
       *          更生医療・小児特定・マル福がある場合、長期をつける
-                 IF ((WRK-KCOMB-KOH1HKNNUM(IDX2)  =  "015" OR "052") OR
+                 IF ((WRK-KCOMB-KOH1HKNNUM(IDX2)  = 
+                                            "015" OR "052" OR "019") OR
                     ((WRK-KCOMB-KOH1HKNNUM(IDX2) >=  "100")  AND
                      (WRK-KCOMB-KOH1HKNNUM(IDX2) <=  "899"))       ) OR
-                    ((WRK-KCOMB-KOH2HKNNUM(IDX2)  =  "015" OR "052") OR
+                    ((WRK-KCOMB-KOH2HKNNUM(IDX2)  =
+                                            "015" OR "052" OR "019") OR
                     ((WRK-KCOMB-KOH2HKNNUM(IDX2) >=  "100")  AND
                      (WRK-KCOMB-KOH2HKNNUM(IDX2) <=  "899"))       ) OR
-                    ((WRK-KCOMB-KOH3HKNNUM(IDX2)  =  "015" OR "052") OR
+                    ((WRK-KCOMB-KOH3HKNNUM(IDX2)  =
+                                            "015" OR "052" OR "019") OR
                     ((WRK-KCOMB-KOH3HKNNUM(IDX2) >=  "100")  AND
                      (WRK-KCOMB-KOH3HKNNUM(IDX2) <=  "899"))       ) OR
-                    ((WRK-KCOMB-KOH4HKNNUM(IDX2)  =  "015" OR "052") OR
+                    ((WRK-KCOMB-KOH4HKNNUM(IDX2)  =
+                                            "015" OR "052" OR "019") OR
                     ((WRK-KCOMB-KOH4HKNNUM(IDX2) >=  "100")  AND
                      (WRK-KCOMB-KOH4HKNNUM(IDX2) <=  "899"))       )
       *              公費表中より長期高額を検索し、
