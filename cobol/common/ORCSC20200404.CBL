@@ -1126,7 +1126,7 @@
            IF      (FLG-NAIFUKU            =   1  )  AND
                    (WRK-COM-ZAIEND (IDX)   =   "1")
                MOVE    WRK-ZAITEN-G        TO  WRK-ZAITEN
-               IF      WRK-ZAITEN          <   205
+               IF      WRK-ZAITEN-G        <=  205
                    IF      WRK-ZAITEN-G        =   ZERO
                        CONTINUE
                    ELSE
