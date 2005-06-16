@@ -2353,7 +2353,8 @@
       *            ∆‚Õ∆ ‘Ω∏
                    PERFORM 3103-SRYACT-HEN-SEC
       *
-                   IF     (WKSRY-SRYCD (IDXA)(1:1) =    "8") AND
+                   IF    ((WKSRY-SRYCD (IDXA)(1:1) =    "8")   OR
+                          (WKSRY-SRYCD (IDXA)(1:3) =    "008")) AND
                           (WKSRY-INPUTCOMENT (IDXA)
                                                NOT =   SPACE)
                        MOVE    WKSRY-INPUTCOMENT (IDXA)
