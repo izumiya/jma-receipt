@@ -10073,12 +10073,7 @@
                                        TO  WRK-TENROOM-SKJ(2 IDX-SKJ)
                END-PERFORM
            ELSE
-               MOVE    WRK-TENROOM-SKJ-SRYYMX
-                                       TO  WRK-TENROOM-SKJ-SRYYM(2)
-               PERFORM   VARYING   IDX-SKJ FROM  1  BY  1
-                         UNTIL     IDX-SKJ   >   31
-                    MOVE   ZERO        TO  WRK-TENROOM-SKJ(2 IDX-SKJ)
-               END-PERFORM
+               MOVE    SPACE           TO  WRK-TENROOM-SKJ-SRYYM(2)
            END-IF
       *    入院会計マスタクローズ
            MOVE    "NYUINACCT-KEY23"      TO  ORC-DBPATH
