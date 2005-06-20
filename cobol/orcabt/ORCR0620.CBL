@@ -68,6 +68,8 @@
       *  01.00.24    NACL-藤原    04/11/16  病棟区分の編集方法を変更
       *  01.00.25    NACL-藤原    05/01/08  同月に継続なしで２回入院した
       *                                     場合の入院年月日の記載方法
+      *  01.00.26    NACL-小豆沢  05/06/20  転室時の入院レセ病棟区分の表示
+      *                                     修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -286,6 +288,7 @@
            03  WRK-SRYYMD.
                05  WRK-SRYYYMM                         PIC  9(06).
                05  WRK-SRYDD                           PIC  9(02).
+           03  WRK-PTNYUINRRK-TENSTUYMD                PIC  X(08).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -2485,6 +2488,22 @@
       *****************************************************************
        24011-BYOTOKBN-SET-SEC                SECTION.
       *
+      *    異動による転室等の場合は転出日を前日に置き換える
+           MOVE    SPACE               TO  WRK-PTNYUINRRK-TENSTUYMD
+           IF      PTNYUINRRK-TENSTUYMD  =  PTNYUINRRK-TAIINYMD
+              MOVE  PTNYUINRRK-TENSTUYMD  TO  WRK-PTNYUINRRK-TENSTUYMD
+           ELSE
+              INITIALIZE                STS-AREA-DAY
+              INITIALIZE                LNK-DAY6-AREA
+              MOVE    "61"              TO  LNK-DAY6-IRAI
+              MOVE   PTNYUINRRK-TENSTUYMD
+                                        TO  LNK-DAY6-KIJUN
+              MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+              MOVE    -1                TO  LNK-DAY6-ZOGEN
+              CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                LNK-DAY6-AREA
+              MOVE    LNK-DAY6-KEISAN TO WRK-PTNYUINRRK-TENSTUYMD
+           END-IF
       *    病棟情報                                           
            MOVE    SPACE               TO  SYSKANRI-REC     
            INITIALIZE                      SYSKANRI-REC     
@@ -2499,7 +2518,7 @@
                IF      SYS-5001-RECEDSPKBN =  SPACE
                    CONTINUE
                ELSE
-                   IF    ( PTNYUINRRK-TENSTUYMD (1:6)
+                   IF    ( WRK-PTNYUINRRK-TENSTUYMD (1:6)
                                                <   RECE62-SRYYM )
                    OR    ( PTNYUINRRK-TENNYUYMD (1:6)
                                                >   RECE62-SRYYM )
