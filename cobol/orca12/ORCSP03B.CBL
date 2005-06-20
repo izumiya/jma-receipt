@@ -1499,12 +1499,13 @@
        2003-NENREI-CHECK-SEC          SECTION.
       *    年齢チェックなし
            IF     ((WRK-STYEAR         =   ZERO    )  AND
-                   (WRK-EDYEAR         =   ALL "9" ))  OR
+                   (WRK-EDYEAR         =   999     ))  OR
                   ((WRK-STYEAR         =   ZERO    )  AND
                    (WRK-EDYEAR         =   ZERO    ))
                GO      TO      2003-NENREI-CHECK-EXT
            END-IF
-           IF      SPA-NAI-KTEKEDYMD (IDX-K)   =   ALL "9"
+           IF     (SPA-NAI-KTEKEDYMD (IDX-K)   =   ALL "9" )
+              AND (WRK-EDYEAR      NOT =   999  )
                MOVE    "0085"          TO  SPA-ERRCD
                MOVE    24              TO  SPA-GMN-CUR
                GO      TO      2003-NENREI-CHECK-EXT
