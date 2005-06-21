@@ -301,7 +301,7 @@
            03  WRK-SRYYMD.
                05  WRK-SRYYYMM                         PIC  9(06).
                05  WRK-SRYDD                           PIC  9(02).
-           03  WRK-PTNYUINRRK-TENSTUYMD                PIC  X(08).
+           03  WK-PTNYUINRRK-TENSTUYMD                 PIC  X(08).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -2417,9 +2417,9 @@
        24011-BYOTOKBN-SET-SEC                SECTION.
       *
       *    異動による転室等の場合は転出日を前日に置き換える
-           MOVE    SPACE               TO  WRK-PTNYUINRRK-TENSTUYMD
+           MOVE    SPACE               TO  WK-PTNYUINRRK-TENSTUYMD
            IF      PTNYUINRRK-TENSTUYMD  =  PTNYUINRRK-TAIINYMD
-              MOVE  PTNYUINRRK-TENSTUYMD  TO  WRK-PTNYUINRRK-TENSTUYMD
+              MOVE  PTNYUINRRK-TENSTUYMD  TO  WK-PTNYUINRRK-TENSTUYMD
            ELSE
               INITIALIZE                STS-AREA-DAY
               INITIALIZE                LNK-DAY6-AREA
@@ -2430,7 +2430,7 @@
               MOVE    -1                TO  LNK-DAY6-ZOGEN
               CALL  "ORCSDAY"           USING   STS-AREA-DAY
                                                 LNK-DAY6-AREA
-              MOVE    LNK-DAY6-KEISAN TO WRK-PTNYUINRRK-TENSTUYMD
+              MOVE    LNK-DAY6-KEISAN TO WK-PTNYUINRRK-TENSTUYMD
            END-IF
       *    病棟情報                                           
            MOVE    SPACE               TO  SYSKANRI-REC     
@@ -2446,7 +2446,7 @@
                IF      SYS-5001-RECEDSPKBN =  SPACE
                    CONTINUE
                ELSE
-                   IF    ( WRK-PTNYUINRRK-TENSTUYMD (1:6)
+                   IF    ( WK-PTNYUINRRK-TENSTUYMD (1:6)
                                                <   RECE62-SRYYM )
                    OR    ( PTNYUINRRK-TENNYUYMD (1:6)
                                                >   RECE62-SRYYM )
