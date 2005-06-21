@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-藤原    04/10/19  コメント埋め込み文字の変更
+      *  01.00.02    NACL-小豆沢  05/06/14  低所得患者の食事標準負担額の
+      *                                     判定方法を変更（１日有効で判定）
       *****************************************************************
       *
       *
@@ -1618,6 +1620,10 @@
                END-PERFORM
            END-IF
            IF      FLG-TSYRRK              =   ZERO
+              IF  (LNK-NYURECEDEN-SANTEIYM   =  TSYRRK-NINSTYMD(1:6))
+              AND (TSYRRK-NINSTYMD(7:2)      NOT =  "01")
+                CONTINUE
+              ELSE
                 PERFORM   VARYING   IDX1   FROM   1  BY  1
                           UNTIL     IDX1   >    31
                     IF    WRK-SKJ-RYOYO(IDX1)  NOT =  SPACE
@@ -1625,6 +1631,7 @@
                                         TO  WRK-SKJFTN-SRYCD(IDX1)
                     END-IF
                 END-PERFORM
+              END-IF
            END-IF
       *
            MOVE     "TSYRRK-KEY3"       TO  ORC-DBPATH
@@ -1633,6 +1640,10 @@
       *９０日越え（低所得情報）
            IF  (TSYRRK-SKJGNSTYMD(1:6)  <= LNK-NYURECEDEN-SANTEIYM) AND
                (TSYRRK-SKJGNSTYMD       NOT = SPACE)
+             IF (LNK-NYURECEDEN-SANTEIYM  = TSYRRK-SKJGNSTYMD(1:6)) AND
+                (TSYRRK-SKJGNSTYMD(7:2)   NOT = "01")
+               CONTINUE
+             ELSE
                IF  TSYRRK-SKJGNSTYMD(1:6)  <  LNK-NYURECEDEN-SANTEIYM
                    MOVE   1             TO   TSY90-IDX
                ELSE
@@ -1645,6 +1656,7 @@
                                         TO  WRK-SKJFTN-SRYCD(IDX1)
                     END-IF
                END-PERFORM
+             END-IF
            END-IF
       *
       *低年金情報の取得
@@ -1667,6 +1679,10 @@
                END-PERFORM
            END-IF
            IF      FLG-TNKRRK              =   ZERO
+              IF  (LNK-NYURECEDEN-SANTEIYM   =  TNKRRK-STYMD(1:6))
+              AND (TNKRRK-STYMD(7:2)     NOT =  "01")
+                CONTINUE
+              ELSE
                 PERFORM   VARYING   IDX1   FROM   1  BY  1
                           UNTIL     IDX1   >    31
                     IF    WRK-SKJ-RYOYO(IDX1)  NOT =  SPACE
@@ -1674,6 +1690,7 @@
                                         TO  WRK-SKJFTN-SRYCD(IDX1)
                     END-IF
                 END-PERFORM
+              END-IF
            END-IF
       *
            MOVE     "TNKRRK-KEY3"       TO  ORC-DBPATH
