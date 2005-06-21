@@ -67,6 +67,7 @@
       *  01.01.03    NACL-門脇    05/05/06  公費一部負担金と食事負担を
       *                                     別々に比較し、それぞれ値の小さ
       *                                     いものを患者負担とする
+      *  01.01.04    NACL-門脇    05/06/16  更生＋長期の編集修正
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5864,17 +5865,15 @@
                                             ZAN-KOHI-T(KOH-IDX)
                      MOVE   ZAN-KOHI-T(KOH-IDX)   TO
                                           LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                     MOVE   ZERO        TO  ZAN-KOHI-T(KOH-IDX)
                      IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =      "027"     
                           MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)           
                                             TO WK-TOKUTEI-COMPFTN3      
                      END-IF         
-               ELSE
-                     COMPUTE  ZAN-KOHI-T(KOH-IDX)    =
-                              ZAN-KOHI-T(KOH-IDX)    -
-                              LNK-SYU-KOH-COMPFTN(KOH-IDX)
                END-IF
-               PERFORM    KOHHI-HIKAKU-SEC                              
+               PERFORM   KOHHI-HIKAKU-SEC
+               COMPUTE   ZAN-KOHI-T(KOH-IDX)    =
+                         ZAN-KOHI-T(KOH-IDX)    -
+                         LNK-SYU-KOH-COMPFTN(KOH-IDX)
                COMPUTE   LNK-SYU-KOH-COMPTOTAL(KOH-IDX)   =
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)     
                IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
@@ -6196,32 +6195,20 @@
                            MOVE  ZAN-KOHI-T(KOH-IDX)                    
                                             TO  LNK-SYU-KOH-COMPFTN     
                                                          (KOH-IDX)      
-                           MOVE   ZERO      TO  ZAN-KOHI-T(KOH-IDX)     
-                           PERFORM    KOHHI-HIKAKU-SEC                  
                        ELSE                                             
                            MOVE  FTN-KOH-ZZZ                            
                                             TO  LNK-SYU-KOH-COMPFTN     
                                                          (KOH-IDX)      
-                           COMPUTE    ZAN-KOHI-T(KOH-IDX)  =            
-                                      ZAN-KOHI-T(KOH-IDX)  -            
-                                      LNK-SYU-KOH-COMPFTN(KOH-IDX)      
-                           PERFORM    KOHHI-HIKAKU-SEC                  
                        END-IF                                           
                    ELSE                                   
                        IF   LNK-SYU-SYUCOMPFTN   >  ZAN-KOHI-T(KOH-IDX)
                            MOVE   ZAN-KOHI-T(KOH-IDX)
                                             TO  LNK-SYU-KOH-COMPFTN
                                                          (KOH-IDX)
-                           MOVE   ZERO      TO  ZAN-KOHI-T(KOH-IDX)
-                           PERFORM    KOHHI-HIKAKU-SEC
                        ELSE
                            MOVE  LNK-SYU-SYUCOMPFTN
                                             TO  LNK-SYU-KOH-COMPFTN
                                                          (KOH-IDX)
-                           COMPUTE    ZAN-KOHI-T(KOH-IDX)  =
-                                      ZAN-KOHI-T(KOH-IDX)  -
-                                      LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                           PERFORM    KOHHI-HIKAKU-SEC
                        END-IF
                    END-IF
                ELSE
@@ -6241,31 +6228,19 @@
                        IF FTN-KOH-ZZZ   >    ZAN-KOHI-T(KOH-IDX)        
                           MOVE   ZAN-KOHI-T(KOH-IDX)                    
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX) 
-                          MOVE   ZERO  TO  ZAN-KOHI-T(KOH-IDX)          
-                          PERFORM    KOHHI-HIKAKU-SEC                   
                        ELSE                                             
                           MOVE   FTN-KOH-ZZZ  TO  LNK-SYU-KOH-COMPFTN   
                                                             (KOH-IDX)   
-                          PERFORM    KOHHI-HIKAKU-SEC                   
-                          COMPUTE   ZAN-KOHI-T(KOH-IDX)  =              
-                                    ZAN-KOHI-T(KOH-IDX)  -              
-                                    LNK-SYU-KOH-COMPFTN(KOH-IDX)        
                        END-IF                                           
                    ELSE                                                 
                        IF    LNK-SYU-KOH-COMPFTN(1)
                                      >    ZAN-KOHI-T(KOH-IDX)
                           MOVE   ZAN-KOHI-T(KOH-IDX)
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                          MOVE   ZERO  TO  ZAN-KOHI-T(KOH-IDX)
-                          PERFORM    KOHHI-HIKAKU-SEC
                        ELSE
                           MOVE   LNK-SYU-KOH-COMPFTN(1)
                                               TO  LNK-SYU-KOH-COMPFTN
                                                             (KOH-IDX)
-                          PERFORM    KOHHI-HIKAKU-SEC
-                          COMPUTE   ZAN-KOHI-T(KOH-IDX)  =
-                                    ZAN-KOHI-T(KOH-IDX)  -
-                                    LNK-SYU-KOH-COMPFTN(KOH-IDX)
                        END-IF
                    END-IF
                  ELSE
@@ -6285,33 +6260,25 @@
                        IF FTN-KOH-ZZZ   >    ZAN-KOHI-T(KOH-IDX)        
                           MOVE   ZAN-KOHI-T(KOH-IDX)                    
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX) 
-                          MOVE   ZERO  TO  ZAN-KOHI-T(KOH-IDX)          
-                          PERFORM    KOHHI-HIKAKU-SEC                   
                        ELSE                                             
                           MOVE   FTN-KOH-ZZZ  TO  LNK-SYU-KOH-COMPFTN   
                                                             (KOH-IDX)   
-                          PERFORM    KOHHI-HIKAKU-SEC                   
-                          COMPUTE   ZAN-KOHI-T(KOH-IDX)  =              
-                                    ZAN-KOHI-T(KOH-IDX)  -              
-                                    LNK-SYU-KOH-COMPFTN(KOH-IDX)        
                        END-IF                                           
                    ELSE                                                 
                        IF    WK-ZENGAKU   >    ZAN-KOHI-T(KOH-IDX)
                           MOVE   ZAN-KOHI-T(KOH-IDX)
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                          MOVE   ZERO  TO  ZAN-KOHI-T(KOH-IDX)
-                          PERFORM    KOHHI-HIKAKU-SEC
                        ELSE
                           MOVE   WK-ZENGAKU   TO  LNK-SYU-KOH-COMPFTN
                                                             (KOH-IDX)
-                          PERFORM    KOHHI-HIKAKU-SEC
-                          COMPUTE   ZAN-KOHI-T(KOH-IDX)  =
-                                    ZAN-KOHI-T(KOH-IDX)  -
-                                    LNK-SYU-KOH-COMPFTN(KOH-IDX)
                        END-IF
                    END-IF
                  END-IF
                END-IF
+               PERFORM   KOHHI-HIKAKU-SEC
+               COMPUTE   ZAN-KOHI-T(KOH-IDX)  =
+                         ZAN-KOHI-T(KOH-IDX)  -
+                         LNK-SYU-KOH-COMPFTN(KOH-IDX)
                COMPUTE   LNK-SYU-KOH-COMPTOTAL(KOH-IDX)   =
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)     
                IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
@@ -6552,6 +6519,16 @@
                    END-IF
            END-EVALUATE.
       *
+           IF   ( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016")
+           AND  ((LNK-SYU-KOH-HKNNUM(1)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(2)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(3)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(4)       =  "972"  ))
+               IF    LNK-SYU-KOH-COMPFTN(KOH-IDX)   >   10000
+                   MOVE    10000    TO    LNK-SYU-KOH-COMPFTN(KOH-IDX)
+               END-IF
+           END-IF.
+      *
        KOHHI-HIKAKU-EXT.
            EXIT.
       *
@@ -6601,6 +6578,16 @@
                    END-IF
                  END-IF
            END-EVALUATE.
+      *
+           IF   ( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016")
+           AND  ((LNK-SYU-KOH-HKNNUM(1)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(2)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(3)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(4)       =  "972"  ))
+               IF    WK-KOH-COMPFTN(KOH-IDX)   >   10000
+                   MOVE    10000    TO    WK-KOH-COMPFTN(KOH-IDX)
+               END-IF
+           END-IF.
       *
        KOHHI-HIKAKU2-EXT.
            EXIT.                                                        
@@ -6734,6 +6721,17 @@
                                      TO  LNK-SYU-KOH-COMPFTN-ENTANI(4)
                    END-IF
            END-EVALUATE.
+      *
+           IF   ( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016")
+           AND  ((LNK-SYU-KOH-HKNNUM(1)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(2)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(3)       =  "972"  ) OR
+                 (LNK-SYU-KOH-HKNNUM(4)       =  "972"  ))
+               IF    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)   >   10000
+                   MOVE    10000    TO
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+               END-IF
+           END-IF.
       *
        KOHHI-HIKAKU4-EXT.
            EXIT.                                                        
@@ -7415,24 +7413,6 @@
            IF    LNK-SYU-SRYYMD(1:6)   <   "200304"
                CONTINUE
            ELSE
-      *      生活保護がある方の特例処理
-      ***    IF ((LNK-SYU-KOH1HKNNUM    =  "012") AND (FLG-HIKAKU = 1))
-      ***    OR ((LNK-SYU-KOH2HKNNUM    =  "012") AND (FLG-HIKAKU = 2))
-      ***    OR ((LNK-SYU-KOH3HKNNUM    =  "012") AND (FLG-HIKAKU = 3))
-      ***    OR ((LNK-SYU-KOH4HKNNUM    =  "012") AND (FLG-HIKAKU = 4))
-      ***      COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-      ***                         +   LNK-SYU-SKYMONEY-SKJ-KEI
-      ***      COMPUTE   WK-FTN   =   WK-FTN     +   5
-      ***      COMPUTE   WK-FTN   =   WK-FTN     /  10
-      ***      COMPUTE   WK-FTN   =   WK-FTN     *  10
-      ***      IF        WK-FTN    >=  WK-NYUJGNGAK
-      ***        COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-      ***                                   +  LNK-SYU-SKYMONEY-SKJ-KEI
-      ***        MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-      ***                                      LNK-SYU-SKYMONEY-SKJ-TAX
-      ***                                      LNK-SYU-SKYMONEY-SKJ-KEI
-      ***      END-IF
-      ***    END-IF
       *      更正がある方の特例処理
              IF ((LNK-SYU-KOH1HKNNUM    =  "015") AND (FLG-HIKAKU = 1))
              OR ((LNK-SYU-KOH2HKNNUM    =  "015") AND (FLG-HIKAKU = 2))
