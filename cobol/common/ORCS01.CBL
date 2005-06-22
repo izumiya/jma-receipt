@@ -132,6 +132,7 @@
       *                                     ¾ì¹ç¡¢£±£°£°£°£°±ß¾å¸Â¤È¤¹¤ë
       *  01.01.01    NACL-ÌçÏÆ    05/03/24  ¾®»ùÆÃÄê¾å¸ÂÂÐ±þ
       *  01.01.02    NACL-ÌçÏÆ    05/04/13  ÀÅ²¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  01.01.03    NACL-ÌçÏÆ    05/06/21  Äã½êÆÀ¾ðÊóÊÔ½¸½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -217,6 +218,10 @@
            03  WK-UERR                 PIC 9(01).
            03  WK-PAYKBN               PIC X(02).
            03  WK-HOSPID               PIC X(24).
+      *
+           03  WK-TEISYOTOKU-YMD.
+               05  WK-TEISYOTOKU-YM    PIC 9(06).
+               05  WK-TEISYOTOKU-DD    PIC 9(02).
       *
       *    ÊÝ¸±¶èÊ¬¡Ê¶õÇò¡§°åÊÝ¡¡£±¡§Ï«ºÒ¡¡£²¡§¼«ÇåÀÕ¡Ë
            03  WK-HKNKBN               PIC X(01).
@@ -1391,6 +1396,9 @@
            MOVE    SPACE                TO      FLG-SANSHOU2.
            MOVE    SPACE                TO      FLG-SANSHOU3.     
       *
+           MOVE    LNK-SYU-SRYYMD       TO      WK-TEISYOTOKU-YMD.
+           MOVE    01                   TO      WK-TEISYOTOKU-DD.
+      *
            INITIALIZE                           TNKRRK-REC.
            MOVE    LNK-SYU-HOSPID       TO      TNKRRK-HOSPID.
            MOVE    LNK-SYU-PTID         TO      TNKRRK-PTID.
@@ -1404,9 +1412,9 @@
                MOVE    "TNKRRK-KEY2"    TO      ORC-DBPATH
                PERFORM  TNKRRK-READ-SEC
                PERFORM  UNTIL
-                          (FLG-TNKRRK     =    1)    OR
-                         ((TNKRRK-STYMD   <=   LNK-SYU-SRYYMD)  AND
-                          (LNK-SYU-SRYYMD <=   TNKRRK-EDYMD))
+                          (FLG-TNKRRK         =                   1) OR
+                         ((TNKRRK-STYMD      <=   WK-TEISYOTOKU-YMD) AND
+                          (WK-TEISYOTOKU-YMD <=   TNKRRK-EDYMD     ))
                    PERFORM   TNKRRK-READ-SEC
                END-PERFORM
            ELSE
@@ -1433,9 +1441,9 @@
                MOVE    "TSYRRK-KEY2"    TO      ORC-DBPATH
                PERFORM  TSYRRK-READ-SEC
                PERFORM  UNTIL
-                       (FLG-TSYRRK      =    1)    OR
-                      ((TSYRRK-NINSTYMD <=   LNK-SYU-SRYYMD)  AND
-                       (LNK-SYU-SRYYMD  <=   TSYRRK-NINEDYMD))
+                       (FLG-TSYRRK          =                   1) OR
+                      ((TSYRRK-NINSTYMD    <=   WK-TEISYOTOKU-YMD) AND
+                       (WK-TEISYOTOKU-YMD  <=   TSYRRK-NINEDYMD  ))
                    PERFORM   TSYRRK-READ-SEC
                END-PERFORM
            ELSE

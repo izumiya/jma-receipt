@@ -97,6 +97,7 @@
       *  01.00.37    NACL-∆£∏∂    04/03/08  •∑•π¥…§À§Ë§Î¿∏ ›ºıµÎº‘»÷πÊ§Œ ‘Ω∏
       *  01.00.38    NACL-ÃÁœ∆    04/04/06  ∏¯»Ò√±∆»£∑£∞∫–Ã§À˛§«œ∑øÕ ›∏±∆˛Œœ
       *                                     §Œ§¢§Î ˝§Œ∫ﬂ¡Ìø«•’•È•∞ ‘Ω∏Ω§¿µ
+      *  01.00.39    NACL-ÃÁœ∆    05/06/21  ƒ„ΩÍ∆¿•’•È•∞ ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -298,6 +299,10 @@
            03  WRK-ZAITAKU               PIC X(01).
       *
            03  RJN-RATE-KBN              PIC X(01).
+      *
+           03  WRK-TEISYOTOKU-YMD.
+               05  WRK-TEISYOTOKU-YM     PIC 9(06).
+               05  WRK-TEISYOTOKU-DD     PIC 9(02).
       *
            COPY    "MCPAREA".
       *
@@ -976,6 +981,9 @@
       *
            IF   RECE01-SRYYM    >=  "200210"
       *
+             MOVE    RECE01-SRYYM        TO  WRK-TEISYOTOKU-YM
+             MOVE    01                  TO  WRK-TEISYOTOKU-DD
+      *
       *      «Ø∂‚Õ˙ŒÚ§Ë§Í
              INITIALIZE                      TNKRRK-REC
              MOVE    RECE01-HOSPID       TO  TNKRRK-HOSPID
@@ -991,8 +999,8 @@
                  PERFORM TNKRRK-READ-SEC
                  PERFORM  UNTIL  
                        ( FLG-TNKRRK          =   1                ) OR
-                      (( TNKRRK-STYMD(1:6)  <=  RECE01-SRYYM   AND
-                         RECE01-SRYYM       <=  TNKRRK-EDYMD(1:6) ))  
+                      (( TNKRRK-STYMD       <=  WRK-TEISYOTOKU-YMD  AND
+                         WRK-TEISYOTOKU-YMD <=  TNKRRK-EDYMD      ))  
       *
                         MOVE    "TNKRRK-KEY3"      TO  ORC-DBPATH
                         PERFORM TNKRRK-READ-SEC
@@ -1017,9 +1025,9 @@
                  MOVE    "TSYRRK-KEY3"      TO  ORC-DBPATH
                  PERFORM TSYRRK-READ-SEC
                  PERFORM  UNTIL  
-                     ( FLG-TSYRRK          =   1                ) OR
-                    (( TSYRRK-NINSTYMD(1:6) <= RECE01-SRYYM   AND
-                       RECE01-SRYYM         <= TSYRRK-NINEDYMD(1:6) ))  
+                     ( FLG-TSYRRK            =   1                ) OR
+                    (( TSYRRK-NINSTYMD      <= WRK-TEISYOTOKU-YMD   AND
+                       WRK-TEISYOTOKU-YMD   <= TSYRRK-NINEDYMD    ))  
       *
                         MOVE    "TSYRRK-KEY3"      TO  ORC-DBPATH
                         PERFORM TSYRRK-READ-SEC
