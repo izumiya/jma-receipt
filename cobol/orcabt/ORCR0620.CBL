@@ -70,6 +70,7 @@
       *                                     場合の入院年月日の記載方法
       *  01.00.26    NACL-小豆沢  05/06/20  転室時の入院レセ病棟区分の表示
       *                                     修正
+      *  01.00.27    NACL-門脇    05/06/21  低所得フラグ編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -303,6 +304,10 @@
            03  WRK-CHOKI                 PIC X(03).
       *
            03  RJN-RATE-KBN              PIC X(01).
+      *
+           03  WRK-TEISYOTOKU-YMD.
+               05  WRK-TEISYOTOKU-YM     PIC 9(06).
+               05  WRK-TEISYOTOKU-DD     PIC 9(02).
       *
       *    病棟区分テーブル                                             
        01  WRK-BYOTOKBN-TABLE.                                          
@@ -1140,6 +1145,9 @@
                END-IF
            END-IF              
       *
+           MOVE    RECE61-SRYYM        TO  WRK-TEISYOTOKU-YM
+           MOVE    01                  TO  WRK-TEISYOTOKU-DD
+      *
       *    年金履歴より
            INITIALIZE                      TNKRRK-REC
            MOVE    RECE61-HOSPID       TO  TNKRRK-HOSPID
@@ -1155,8 +1163,8 @@
                PERFORM TNKRRK-READ-SEC
                PERFORM  UNTIL  
                      ( FLG-TNKRRK          =   1                ) OR
-                    (( TNKRRK-STYMD(1:6)  <=  RECE61-SRYYM   AND
-                       RECE61-SRYYM       <=  TNKRRK-EDYMD(1:6) ))  
+                    (( TNKRRK-STYMD       <=  WRK-TEISYOTOKU-YMD  AND
+                       WRK-TEISYOTOKU-YMD <=  TNKRRK-EDYMD      ))  
       *
                       MOVE    "TNKRRK-KEY3"      TO  ORC-DBPATH
                       PERFORM TNKRRK-READ-SEC
@@ -1181,9 +1189,9 @@
                MOVE    "TSYRRK-KEY3"      TO  ORC-DBPATH
                PERFORM TSYRRK-READ-SEC
                PERFORM  UNTIL  
-                   ( FLG-TSYRRK          =   1                ) OR
-                  (( TSYRRK-NINSTYMD(1:6) <= RECE61-SRYYM   AND
-                     RECE61-SRYYM         <= TSYRRK-NINEDYMD(1:6) ))  
+                   ( FLG-TSYRRK           =   1                ) OR
+                  (( TSYRRK-NINSTYMD     <= WRK-TEISYOTOKU-YMD   AND
+                     WRK-TEISYOTOKU-YMD  <= TSYRRK-NINEDYMD    ))  
       *
                       MOVE    "TSYRRK-KEY3"      TO  ORC-DBPATH
                       PERFORM TSYRRK-READ-SEC
@@ -1199,11 +1207,11 @@
                    MOVE     SPACE   TO       RECE62-TEISYOTOKU
                WHEN    0             ALSO     1
                    MOVE     "2"     TO       RECE62-TEISYOTOKU
-                   IF  (TSYRRK-SKJGNSTYMD     NOT =  SPACE       )
-                   AND (TSYRRK-SKJGNSTYMD(1:6)   <=  RECE61-SRYYM)
-                   AND (TSYRRK-NINEDYMD  (1:6)   >=  RECE61-SRYYM)
+                   IF  (TSYRRK-SKJGNSTYMD     NOT =  SPACE        )
+                   AND (TSYRRK-SKJGNSTYMD   <=  WRK-TEISYOTOKU-YMD)
+                   AND (TSYRRK-NINEDYMD     >=  WRK-TEISYOTOKU-YMD)
                       MOVE  "3"     TO       RECE62-TEISYOTOKU
-                   END-IF                                     
+                   END-IF    
                WHEN    0             ALSO     0
                WHEN    1             ALSO     0
                    MOVE     "1"     TO       RECE62-TEISYOTOKU
