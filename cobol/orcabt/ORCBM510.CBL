@@ -34,6 +34,7 @@
       *  01.01.03     NACL-藤原    04/09/17  入外区分によって処理対象を
       *                                      限定する
       *  01.01.05     NACL-森脇    05/01/24  記号・番号を追加
+      *  01.01.06     NACL-森脇    05/05/12  公費単独の場合条件変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -73,6 +74,9 @@
            03  FLG-PTINF               PIC 9(01).
            03  FLG-PTKOH               PIC 9(01).
            03  FLG-MONTHLYNUM          PIC 9(01).
+      *----(01.01.06)--ADD-START---
+           03  FLG-OK                  PIC 9(01).
+      *----(01.01.06)--ADD-END-----
       *
       *    カウント領域
        01  CNT-AREA.
@@ -484,31 +488,35 @@
            END-IF
       *
       *----(01.01.02)--UPD-START---
+      *----(01.01.06)--UPD-START---
       *    保険公費
            PERFORM VARYING   IDX    FROM    1   BY   1
                    UNTIL    (IDX    >       4)
                    OR       (RECE10-KOHNUM(IDX) =   SPACE)
                MOVE    RECE10-KOHNUM(IDX)   TO  WRK-KOHNUM
-               PERFORM 900-PTKOH-READ-SEC
+               IF      RECE10-TEKSTYMD      NOT = ZERO
+                   PERFORM 900-PTKOH-READ-SEC
+               ELSE
+                   PERFORM 900-PTKOH-READ-KOH-SEC
+               END-IF
                IF      FLG-PTKOH           =   ZERO
-      *            生保のとき月代わり受給者番号マスタより受給者番号をセット 
+      *        生保のとき月代わり受給者番号マスタより受給者番号をセット 
                    IF    ( PTKOH-KOHNUM    =   "012" )
                        PERFORM 910-MONTHLYNUM-READ-SEC
                        IF      FLG-MONTHLYNUM  =   ZERO
                            MOVE    MONTHLYNUM-JKYSNUM
                                                    TO  HCM37-KOHJKYSNUM
-      *----(01.01.03)--ADD-START---
                        ELSE
                            MOVE    PTKOH-JKYSNUM   TO  HCM37-KOHJKYSNUM
-      *----(01.01.03)--ADD-END-----
                        END-IF
                    ELSE
                        MOVE    PTKOH-JKYSNUM   TO  HCM37-KOHJKYSNUM
                    END-IF    
                    MOVE    PTKOH-FTNJANUM  TO  HCM37-KOHFTNJANUM
-      *            MOVE    4               TO  IDX
+                   MOVE    4               TO  IDX
                END-IF
            END-PERFORM
+      *----(01.01.06)--UPD-END-----
       *----(01.01.02)--UPD-END-----
       *
       *    カルテ番号
@@ -907,19 +915,10 @@
                                        ORCMCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "DBFETCH"           TO  MCP-FUNC
+      *----(01.01.06)--UPD-START---
                MOVE    "PTKOHINF-KEY6"     TO  ORC-DBPATH
-               CALL    "ORCMCPSUB"         USING
-                                           MCPAREA
-                                           ORCMCPAREA
-                                           MCPDATA-REC
-               IF      MCP-RC              =   ZERO
-                   MOVE    MCPDATA-REC     TO  PTKOH-REC
-                   MOVE    ZERO            TO  FLG-PTKOH
-               ELSE
-                   INITIALIZE                  PTKOH-REC
-                   MOVE    1               TO  FLG-PTKOH
-               END-IF
+               PERFORM 900-PTKOH-FETCH-SEC
+      *----(01.01.06)--UPD-END-----
            ELSE
                INITIALIZE                  PTKOH-REC
                MOVE    1               TO  FLG-PTKOH
@@ -936,6 +935,77 @@
        900-PTKOH-READ-EXT.
            EXIT.
       *
+      *----(01.01.06)--ADD-START---
+      *****************************************************************
+      *    患者公費情報マスター読込（公費単独）
+      *****************************************************************
+       900-PTKOH-READ-KOH-SEC          SECTION.
+      *
+           INITIALIZE                  PTKOH-REC
+           MOVE    SYS-1001-HOSPID     TO  PTKOH-HOSPID
+           MOVE    RECE10-PTID         TO  PTKOH-PTID
+           MOVE    WRK-KOHNUM          TO  PTKOH-KOHNUM
+           MOVE    PTKOH-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "PTKOHINF-KEY4"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "PTKOHINF-KEY4"     TO  ORC-DBPATH
+               PERFORM 900-PTKOH-FETCH-SEC
+           ELSE
+               INITIALIZE                  PTKOH-REC
+               MOVE    1               TO  FLG-PTKOH
+           END-IF
+      *
+           MOVE    ZERO            TO  FLG-OK
+           PERFORM UNTIL   ( FLG-PTKOH     =   1 )
+                   OR      ( FLG-OK        =   1 )
+               IF       PTKOH-TEKSTYMD(1:6)    <=  RECE10-SRYYM 
+                    AND    RECE10-SRYYM        <=  PTKOH-TEKEDYMD(1:6) 
+                    AND    PTKOH-SAKJOKBN  NOT =   "1" 
+                    MOVE    1              TO  FLG-OK 
+               ELSE
+                    MOVE    "PTKOHINF-KEY4"     TO  ORC-DBPATH
+                    PERFORM 900-PTKOH-FETCH-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           MOVE    "PTKOHINF-KEY4"     TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+      *
+           .
+       900-PTKOH-READ-KOH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報マスター読込
+      *****************************************************************
+       900-PTKOH-FETCH-SEC             SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTKOH-REC
+               MOVE    ZERO            TO  FLG-PTKOH
+           ELSE
+               INITIALIZE                  PTKOH-REC
+               MOVE    1               TO  FLG-PTKOH
+           END-IF
+           .
+       900-PTKOH-FETCH-EXT.
+           EXIT.
+      *
+      *----(01.01.06)--ADD-END---
       *----(01.01.02)--UPD-END-----
       *----(01.01.02)--ADD-START---
       *****************************************************************
