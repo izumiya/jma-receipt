@@ -1638,6 +1638,13 @@
       *
            MOVE    SPA-GMN-SRYKA       TO  SPA-SRYKA
       *
+      *    ドクター
+           IF     (SPA-DRCD-NAME       NOT =   SPACE )  AND
+                  (SPA-DRCD-NAME(1:4)  NOT =   SPA-DRCD(2:4))
+               MOVE    "1"                 TO  SPA-DRCD(1:1)
+               MOVE    SPA-DRCD-NAME(1:4)  TO  SPA-DRCD(2:4)
+           END-IF
+      *
       *    排他制御処理
            PERFORM 990-LOCK-IN-SEC
            IF      SPA-ERRCD       NOT =   SPACE
