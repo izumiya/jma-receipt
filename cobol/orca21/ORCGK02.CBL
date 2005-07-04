@@ -1619,6 +1619,13 @@
       *
            MOVE    SPA-GMN-SRYKA       TO  SPA-SRYKA
       *
+      *    ドクター
+           IF     (SPA-DRCD-NAME       NOT =   SPACE )  AND
+                  (SPA-DRCD-NAME(1:4)  NOT =   SPA-DRCD(2:4))
+               MOVE    "1"                 TO  SPA-DRCD(1:1)
+               MOVE    SPA-DRCD-NAME(1:4)  TO  SPA-DRCD(2:4)
+           END-IF
+      *
       *    排他制御処理
            PERFORM 990-LOCK-IN-SEC
            IF      SPA-ERRCD       NOT =   SPACE
@@ -5241,9 +5248,6 @@
       ***  IF      SPA-ERRCD       NOT =   SPACE
       *         GO      TO      41010-PTNUM-SYORI-EXT
       **** END-IF
-      *TEST
-           DISPLAY "K02 ORCSC95 SPA-DRCD:" SPA-DRCD
-      *TEST
       *
       *    スパ共通編集処理
            PERFORM                 310-SPA-SET-SEC
@@ -6720,9 +6724,6 @@
            MOVE    ZERO                TO  IDX-KA
            MOVE    ZERO                TO  FLG-CHK3
            COMPUTE IDX4                =   SPA-GMN-IDX +  1
-      *TEST
-           DISPLAY "IDX4:" IDX4 ",SPA-GMN-IDX:" SPA-GMN-IDX
-      *TEST
            PERFORM VARYING     IDX     FROM    IDX4    BY  1
                    UNTIL     ( IDX         >   200     )  OR
                              ((SPA-GMN-INPUTCD(IDX)    =   SPACE ) AND
