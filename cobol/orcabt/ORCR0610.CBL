@@ -1662,14 +1662,15 @@
                            WHEN   "5"
                                MOVE    PTHKN-HOJOKBN   TO
                                                WRK-RECE61-HOJOKBN
-                      END-EVALUATE
-                  END-IF     
-              WHEN    OTHER 
-                  EVALUATE   PTHKN-HOJOKBN
-                     WHEN   "9"
-                     WHEN   "8"
-                               MOVE    PTHKN-HOJOKBN   TO
+                       END-EVALUATE
+                   END-IF     
+               WHEN    OTHER 
+                   EVALUATE   PTHKN-HOJOKBN
+                       WHEN   "9"
+                       WHEN   "8"
+                           MOVE    PTHKN-HOJOKBN   TO
                                                WRK-RECE61-HOJOKBN
+                   END-EVALUATE             
            END-EVALUATE             
            MOVE    SPACE               TO WRK-RECE61-RECEKA
       *
