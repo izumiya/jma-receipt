@@ -1621,11 +1621,11 @@
                                   (WRK-NENREI  <=   74)
                                EVALUATE   PTHKN-HOJOKBN
                                    WHEN   "1"
-                                   WHEN   "4"
+                                   WHEN   "5"
                                        MOVE    "0" 
                                                TO  WRK-RECE61-HONKZKKBN
                                    WHEN   "2"
-                                   WHEN   "5"
+                                   WHEN   "6"
                                        MOVE    "0"
                                                TO  WRK-RECE61-HONKZKKBN
                               END-EVALUATE
@@ -1656,11 +1656,17 @@
                    IF     (WRK-NENREI  >=   70)  AND
                           (WRK-NENREI  <=   74)
                        EVALUATE   PTHKN-HOJOKBN
-                           WHEN   "1"
+                           WHEN   "0"
                            WHEN   "4"
-                           WHEN   "2"
+                               MOVE    "0"             TO
+                                               WRK-RECE61-HOJOKBN
+                           WHEN   "1"
                            WHEN   "5"
-                               MOVE    PTHKN-HOJOKBN   TO
+                               MOVE    "1"             TO
+                                               WRK-RECE61-HOJOKBN
+                           WHEN   "2"
+                           WHEN   "6"
+                               MOVE    "2"             TO
                                                WRK-RECE61-HOJOKBN
                        END-EVALUATE
                    END-IF     

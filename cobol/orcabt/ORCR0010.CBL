@@ -1347,9 +1347,15 @@
                        EVALUATE   PTHKN-HOJOKBN
                            WHEN   "1"
                            WHEN   "4"
+                               MOVE    "1"             TO
+                                               WRK-RECE01-HOJOKBN
                            WHEN   "2"
                            WHEN   "5"
-                               MOVE    PTHKN-HOJOKBN   TO
+                               MOVE    "2"             TO
+                                               WRK-RECE01-HOJOKBN
+                           WHEN   "3"
+                           WHEN   "6"
+                               MOVE    "3"             TO
                                                WRK-RECE01-HOJOKBN
                       END-EVALUATE
                   END-IF     
