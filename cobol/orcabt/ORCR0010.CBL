@@ -90,6 +90,9 @@
       *                                     月途中に保険者は変わらずに
       *                                     保険が変更になった場合は１枚
       *                                     にする
+      *  01.03.06    NACL-藤原    05/07/05  前期高齢者のとき、月途中に
+      *                                     給付割合が変更になった場合は
+      *                                     それぞれにレセプトを作成する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1545,6 +1548,31 @@
                    ELSE    
                        MOVE    PTHKN-HOJOKBN   TO  WRK-RECE01-HOJOKBN
                    END-IF
+               WHEN    "060" 
+                   IF     (WRK-NENREI  >=   70)  AND
+                          (WRK-NENREI  <=   74)
+                       EVALUATE   PTHKN-HOJOKBN
+                           WHEN   "1"
+                           WHEN   "4"
+                               MOVE    "1"             TO
+                                               WRK-RECE01-HOJOKBN
+                           WHEN   "2"
+                           WHEN   "5"
+                               MOVE    "2"             TO
+                                               WRK-RECE01-HOJOKBN
+                           WHEN   "3"
+                           WHEN   "6"
+                               MOVE    "3"             TO
+                                               WRK-RECE01-HOJOKBN
+                      END-EVALUATE
+                  END-IF     
+              WHEN    OTHER 
+                  EVALUATE   PTHKN-HOJOKBN
+                     WHEN   "9"
+                     WHEN   "8"
+                               MOVE    PTHKN-HOJOKBN   TO
+                                               WRK-RECE01-HOJOKBN
+                  END-EVALUATE
            END-EVALUATE             
       *
       *    レセのとき地方公費のみの場合は出力しない

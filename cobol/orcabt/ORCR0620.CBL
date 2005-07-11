@@ -71,6 +71,8 @@
       *  01.00.26    NACL-小豆沢  05/06/20  転室時の入院レセ病棟区分の表示
       *                                     修正
       *  01.00.27    NACL-門脇    05/06/21  低所得フラグ編集修正
+      *  01.01.11    NACL-藤原    05/07/05  補助区分からの給付割合の編集
+      *                                     を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1475,10 +1477,10 @@
                                    (WRK-NENREI  <=   74)
                                  EVALUATE   COMB-HOJOKBN
                                      WHEN   "1"
-                                     WHEN   "4"
+                                     WHEN   "5"
                                        MOVE   "9"   TO   WK-HONKZKKBN
                                      WHEN   "2"
-                                     WHEN   "5"
+                                     WHEN   "6"
                                        MOVE   "8"   TO   WK-HONKZKKBN
                                  END-EVALUATE
                                END-IF     
