@@ -31,6 +31,7 @@
       *  01.00.02    NACL-門脇    04.02.05  診療コード＊数量の累計編集
       *  01.00.03    NACL-門脇    04.07.12  ファイルクリア追加
       *  01.00.04    NACL-門脇    04.08.17  レセプト科の編集
+      *  01.00.05    NACL-門脇    05.07.05  検査は診療種別区分毎でまとめる
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -47,6 +48,11 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE64-KEY
                                    FILE    STATUS  IS  STS-RECE64.
+           SELECT  RECE65-FILE     ASSIGN  RECE65PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  RECE65-KEY
+                                   FILE    STATUS  IS  STS-RECE65.
            SELECT  RECE642-FILE    ASSIGN  RECE642PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
@@ -81,6 +87,10 @@
        FD  RECE64-FILE.
        01  RECE64-REC. 
            COPY    "CPRCF064.INC".
+      *
+       FD  RECE65-FILE.
+       01  RECE65-REC. 
+           COPY    "CPRCF065.INC".
       *
        FD  RECE642-FILE.
        01  RECE642-REC. 
@@ -117,6 +127,10 @@
       *
            COPY    "CPCOMMONDAT2.INC"
                                    REPLACING  //RECE01//
+                                   BY         //RECE65//.
+      *
+           COPY    "CPCOMMONDAT2.INC"
+                                   REPLACING  //RECE01//
                                    BY         //RECE642//.
       *
            COPY    "CPCOMMONDAT2.INC"
@@ -133,6 +147,7 @@
        01  STS-AREA.
            03  STS-RECE62                              PIC X(02).
            03  STS-RECE64                              PIC X(02).
+           03  STS-RECE65                              PIC X(02).
            03  STS-RECE642                             PIC X(02).
            03  STS-RECE64W                             PIC X(02).
            03  STS-RECEERR                             PIC X(02).
@@ -141,6 +156,7 @@
            03  FLG-END                                 PIC 9(01).
            03  FLG-RECE62                              PIC 9(01).
            03  FLG-RECE64                              PIC 9(01).
+           03  FLG-RECE65                              PIC 9(01).
            03  FLG-RECE642                             PIC 9(01).
       *
       *    カウント領域
@@ -166,6 +182,10 @@
            03  WRK-COMRENNUM           PIC 9(05).
       *
            03  WRK-KOHBUNRI-MIN        PIC 9(01).
+      *    剤番号の退避
+           03  WRK-ZAINUM              PIC 9(08).
+      *    剤番号の退避
+           03  WRK-SRYSYUKBN           PIC X(03).
       *
            03  WRK-RECEERR             PIC X(200). 
       *
@@ -250,6 +270,9 @@
            MOVE    "RECE640"           TO  RECE64PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE64PARA-TERMID
       *
+           MOVE    "RECE650"           TO  RECE65PARA-FILE-ID
+           MOVE    WRK-PARA-TERMID     TO  RECE65PARA-TERMID
+      *
            MOVE    "RECE642"           TO  RECE642PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE642PARA-TERMID
       *
@@ -276,6 +299,7 @@
       *
       *    同一剤のまとめ処理
            OPEN    INPUT               RECE64-FILE
+                                       RECE65-FILE
            OPEN    I-O                 RECE62-FILE
                                        RECE642-FILE
            PERFORM 900-RECE62-READ-SEC
@@ -284,6 +308,7 @@
                                    UNTIL   FLG-RECE62  =   1
            CLOSE   RECE642-FILE
                    RECE64-FILE
+                   RECE65-FILE
                    RECE62-FILE
       *
       *    元のレイアウトに出力処理
@@ -348,6 +373,12 @@
                                          NOT =   RECE64-HOJOKBN      )
                OR     ( RECE62-TEKSTYMD  NOT =   RECE64-TEKSTYMD     )
       *
+               MOVE    RECE64-ZAINUM     TO      WRK-ZAINUM
+               MOVE    SPACE             TO      WRK-SRYSYUKBN
+               IF       RECE64-SRYKBN  =  "60"
+                   PERFORM   2101-RECE65-SRYSYUKBN-HENSYU-SEC
+               END-IF
+      *
       *        複数診療科受診でないとき
       *****    IF      RECE62-SRYKA (2)    =   SPACE
       *****    OR      RECE64-COMCDFLG     =   "1"  
@@ -366,6 +397,7 @@
                    MOVE    RECE64-TEKSTYMD     TO  RECE642-TEKSTYMD
                    MOVE    RECE64-KOHBUNRI     TO  RECE642-KOHBUNRI
                    MOVE    RECE64-SRYKBN       TO  RECE642-SRYKBN
+                   MOVE    SPACE               TO  RECE642-SRYSYUKBN
                    MOVE    RECE64-ZAITEN       TO  RECE642-ZAITEN
                    MOVE    RECE64-SRYCDTOTAL   TO  RECE642-SRYCDTOTAL
                    MOVE    RECE64-SURYOUTOTAL  TO  RECE642-SURYOUTOTAL
@@ -405,6 +437,7 @@
                    MOVE    RECE64-TEKSTYMD     TO  RECE642-TEKSTYMD
                    MOVE    RECE64-KOHBUNRI     TO  RECE642-KOHBUNRI
                    MOVE    RECE64-SRYKBN       TO  RECE642-SRYKBN
+                   MOVE    WRK-SRYSYUKBN       TO  RECE642-SRYSYUKBN
                    MOVE    RECE64-ZAITEN       TO  RECE642-ZAITEN
                    MOVE    RECE64-SRYCDTOTAL   TO  RECE642-SRYCDTOTAL
                    MOVE    RECE64-SURYOUTOTAL  TO  RECE642-SURYOUTOTAL
@@ -451,7 +484,54 @@
        210-RECE642-WRITE-EXT.
            EXIT.
       *
-      * 
+      *****************************************************************
+      *    診療種別区分取得
+      *****************************************************************
+       2101-RECE65-SRYSYUKBN-HENSYU-SEC         SECTION.
+      *
+           INITIALIZE                           RECE65-REC
+           MOVE    RECE62-HOSPID        TO      RECE65-HOSPID
+           MOVE    RECE62-SRYYM         TO      RECE65-SRYYM
+           MOVE    RECE62-NYUGAIKBN     TO      RECE65-NYUGAIKBN
+           MOVE    RECE62-PTID          TO      RECE65-PTID
+           MOVE    RECE62-RECEKA        TO      RECE65-RECEKA
+           MOVE    RECE62-TEISYUTUSAKI  TO      RECE65-TEISYUTUSAKI
+           MOVE    RECE62-RECESYUBETU   TO      RECE65-RECESYUBETU
+           MOVE    RECE62-HKNJANUM-KEY  TO      RECE65-HKNJANUM
+           MOVE    RECE62-HOJOKBN-KEY   TO      RECE65-HOJOKBN
+           MOVE    RECE62-TEKSTYMD      TO      RECE65-TEKSTYMD
+           MOVE    WRK-ZAINUM           TO      RECE65-ZAINUM
+           START   RECE65-FILE
+               KEY IS    >=   RECE65-KEY
+               INVALID
+                   MOVE    1            TO      FLG-RECE65
+               NOT INVALID
+                   PERFORM  900-RECE65-READ-SEC
+           END-START
+           PERFORM   UNTIL
+                  (RECE62-HOSPID        NOT =  RECE65-HOSPID)    OR
+                  (RECE62-SRYYM         NOT =  RECE65-SRYYM)     OR
+                  (RECE62-NYUGAIKBN     NOT =  RECE65-NYUGAIKBN) OR
+                  (RECE62-PTID          NOT =  RECE65-PTID)      OR
+                  (RECE62-RECEKA        NOT =  RECE65-RECEKA)    OR
+                  (RECE62-TEISYUTUSAKI  NOT =  RECE65-TEISYUTUSAKI) OR
+                  (RECE62-RECESYUBETU   NOT =  RECE65-RECESYUBETU)  OR
+                  (RECE62-HKNJANUM-KEY  NOT =  RECE65-HKNJANUM)  OR
+                  (RECE62-HOJOKBN-KEY   NOT =  RECE65-HOJOKBN )  OR
+                  (RECE62-TEKSTYMD      NOT =  RECE65-TEKSTYMD)  OR
+                  (WRK-ZAINUM           NOT =  RECE65-ZAINUM)    OR
+                  (FLG-RECE65               =      1        )
+      *
+                   MOVE   RECE65-SRYSYUKBN   TO   WRK-SRYSYUKBN
+      *
+                   MOVE   1                  TO   FLG-RECE65
+      *
+           END-PERFORM
+      *
+           .
+       2101-RECE65-SRYSYUKBN-HENSYU-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    主処理
       *****************************************************************
@@ -562,6 +642,21 @@
            END-READ
            .
        900-RECE64-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト０５データ読込処理
+      *****************************************************************
+       900-RECE65-READ-SEC            SECTION.
+      *
+           READ    RECE65-FILE   NEXT
+               AT  END
+                   MOVE    1      TO    FLG-RECE65
+               NOT AT  END
+                   MOVE    ZERO   TO    FLG-RECE65
+           END-READ
+           .
+       900-RECE65-READ-EXT.
            EXIT.
       *
       *****************************************************************
