@@ -139,6 +139,7 @@
       *                                     種別が部位の自院コード入力のとき
       *                                     の病名編集フラグの設定を修正
       *  01.08.10    NACL-藤原    04/05/06  アフターケア日の表示修正
+      *  01.08.19    NACL-藤原    05/05/14  同一病名のチェックを修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -307,6 +308,8 @@
       *
            03  WRK-TEKSTYMD        PIC 9(08).
            03  WRK-TEKEDYMD        PIC 9(08).
+      *
+           03  WRK-TENKIYMD        PIC X(08).
       *
            03  WRK-ERR-BYOMEI      PIC X(80).
            03  WRK-ERR-SRYYMD      PIC X(22).
@@ -2548,6 +2551,7 @@
       *
       *    転帰・保険適用と開始日のチェック
            IF    ( WRK-HENSYU-DATA-O (1)   NOT =   SPACE         )
+           OR    ( WRK-HENSYU-DATA-O (6)   NOT =   SPACE         )
            OR    ( WRK-HENSYU-DATA-O (7)   NOT =   SPACE AND "-" )
                PERFORM VARYING IDXX    FROM    1   BY  1
                        UNTIL   IDXX    >       5
@@ -2620,6 +2624,21 @@
       *****************************************************************
        4101132-KANTAN-SYUSEI-DABURI-CHK-SEC         SECTION.
       *
+      *    転記日のセット
+           MOVE    SPA-NAI-C02-TTENKIYMD (IDX)
+                                   TO  WRK-TENKIYMD
+           IF      WRK-HENSYU-DATA-O (1)
+                                   =   SPACE
+               CONTINUE
+           ELSE
+               IF      WRK-HENSYU-DATA-O (1)
+                                       =   "-"
+                   MOVE    SPACE                   TO  WRK-TENKIYMD
+               ELSE
+                   MOVE    WRK-HENSYU-DATA-O (2)   TO  WRK-TENKIYMD
+               END-IF
+           END-IF
+      *
       *    転帰と開始日のチェック
            IF      WRK-HENSYU-DATA-O (1)
                                NOT =   "-" AND SPACE  
@@ -2659,11 +2678,14 @@
                                        TO  PTBYO-BYOMEI
            MOVE    SPA-NAI-C02-TNYUGAIKBN (IDX)
                                        TO  PTBYO-NYUGAIKBN
-           IF      WRK-HENSYU-DATA-O (6)   NOT =   SPACE 
+           IF      WRK-HENSYU-DATA-O (6)   =   SPACE
+               CONTINUE
+           ELSE 
                IF      WRK-HENSYU-DATA-O (6)   =   "-"
-                   MOVE    SPACE                   TO  PTBYO-NYUGAIKBN
+                   MOVE    SPACE               TO  PTBYO-NYUGAIKBN
                ELSE
-                   MOVE    WRK-HENSYU-DATA-O (6)   TO  PTBYO-NYUGAIKBN
+                   MOVE    WRK-HENSYU-DATA-O (6)
+                                               TO  PTBYO-NYUGAIKBN
                END-IF
            END-IF     
            IF      PTBYO-NYUGAIKBN     =   SPACE 
@@ -2693,19 +2715,35 @@
                AND     SPA-NAI-C02-TRENNUM (IDX)   =   PTBYO-RENNUM
                    CONTINUE
                ELSE
-                   IF      WRK-HENSYU-DATA-O (2)   NOT =   SPACE
-                       IF      SPA-NAI-C02-TSRYYMD (IDX)
-                                               <   PTBYO-SRYYMD
-                           IF      WRK-HENSYU-DATA-O (2)   =   "-"
+                   EVALUATE    TRUE
+                       WHEN    SPA-NAI-C02-TSRYYMD (IDX)
+                                           <   PTBYO-SRYYMD
+                           IF      WRK-TENKIYMD    =   SPACE
                                MOVE    "0038"          TO  SPA-ERRCD
                            ELSE
-                               IF     WRK-HENSYU-DATA-O (2)
-                                                   >   PTBYO-SRYYMD
-                                   MOVE    "0038"          TO  SPA-ERRCD
+                               IF     WRK-TENKIYMD >   PTBYO-SRYYMD
+                                   MOVE    "0038"      TO  SPA-ERRCD
                                END-IF
                            END-IF
-                       END-IF
-                   END-IF    
+                       WHEN    SPA-NAI-C02-TSRYYMD (IDX)
+                                           >   PTBYO-SRYYMD
+                           IF      PTBYO-TENKIYMD  =   SPACE
+                               MOVE    "0038"      TO  SPA-ERRCD
+                           ELSE
+                               IF      SPA-NAI-C02-TSRYYMD (IDX)
+                                               <   PTBYO-TENKIYMD
+                                   MOVE    "0038"      TO  SPA-ERRCD
+                               END-IF
+                           END-IF
+                   END-EVALUATE
+               END-IF
+      *
+               IF      SPA-ERRCD           =   "0038"
+                   MOVE    PTBYO-SRYYMD        TO  WRK-SYMD
+                   PERFORM 5002-HIZUKE-HEN-SEC
+                   MOVE    LNK-DAY2-EDTYMD3    TO  WRK-ERR-SRYYMD
+                   MOVE    SPA-GMN-C02-TBYOMEI (IDX)
+                                               TO  WRK-ERR-BYOMEI
                END-IF
       *
                MOVE    WRK-DBPATH          TO  ORC-DBPATH
@@ -2718,14 +2756,6 @@
                                        MCPAREA
                                        ORCMCPAREA
                                        MCPDATA-REC
-      *
-           IF      SPA-ERRCD           =   "0038"
-               MOVE    PTBYO-SRYYMD        TO  WRK-SYMD
-               PERFORM 5002-HIZUKE-HEN-SEC
-               MOVE    LNK-DAY2-EDTYMD3    TO  WRK-ERR-SRYYMD
-               MOVE    SPA-GMN-C02-TBYOMEI (IDX)
-                                           TO  WRK-ERR-BYOMEI
-           END-IF
            .
        4101132-KANTAN-SYUSEI-DABURI-CHK-EXT.
            EXIT.
@@ -5882,18 +5912,16 @@
                                MOVE    "0038"          TO  SPA-ERRCD
                            ELSE
                                IF     SPA-NAI-C02-TENKIYMD
-                                                   >   PTBYO-TENKIYMD
+                                                   >   PTBYO-SRYYMD
                                    MOVE    "0038"          TO  SPA-ERRCD
                                END-IF
                            END-IF
                        WHEN    SPA-NAI-C02-SRYYMD  >   PTBYO-SRYYMD
                            IF      PTBYO-TENKIYMD  =   SPACE
-                               IF    ( SPA-NAI-C02-TENKIYMD
-                                               NOT =   SPACE          )
-                               AND   ( SPA-NAI-C02-TENKIYMD
-                                                   <=  PTBYO-TENKIYMD )
-                                   CONTINUE
-                               ELSE
+                               MOVE    "0038"      TO  SPA-ERRCD
+                           ELSE
+                               IF      SPA-NAI-C02-SRYYMD
+                                                   <   PTBYO-TENKIYMD
                                    MOVE    "0038"      TO  SPA-ERRCD
                                END-IF
                            END-IF
