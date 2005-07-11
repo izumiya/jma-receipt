@@ -54,6 +54,8 @@
       *  01.00.18    NACL-藤原    05/01/08  同月に継続なしで２回入院した
       *                                     場合の入院年月日の記載方法
       *  01.00.19    NACL-門脇    05/06/21  低所得フラグ編集修正
+      *  01.01.11    NACL-藤原    05/07/05  補助区分からの給付割合の編集
+      *                                     を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1421,8 +1423,10 @@
                                    (WRK-NENREI  <=   74)
                                  EVALUATE   COMB-HOJOKBN
                                      WHEN   "1"
+                                     WHEN   "5"
                                        MOVE   "9"   TO   WK-HONKZKKBN
                                      WHEN   "2"
+                                     WHEN   "6"
                                        MOVE   "8"   TO   WK-HONKZKKBN
                                  END-EVALUATE
                                END-IF     

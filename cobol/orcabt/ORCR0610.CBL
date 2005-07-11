@@ -45,6 +45,9 @@
       *                                     月途中に保険者は変わらずに
       *                                     保険が変更になった場合は１枚
       *                                     にする
+      *  01.03.05    NACL-藤原    05/07/05  前期高齢者のとき、月途中に
+      *                                     給付割合が変更になった場合は
+      *                                     それぞれにレセプトを作成する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1534,11 +1537,11 @@
                                   (WRK-NENREI  <=   74)
                                EVALUATE   PTHKN-HOJOKBN
                                    WHEN   "1"
-                                   WHEN   "4"
+                                   WHEN   "5"
                                        MOVE    "0" 
                                                TO  WRK-RECE61-HONKZKKBN
                                    WHEN   "2"
-                                   WHEN   "5"
+                                   WHEN   "6"
                                        MOVE    "0"
                                                TO  WRK-RECE61-HONKZKKBN
                               END-EVALUATE
@@ -1565,6 +1568,31 @@
                    ELSE    
                        MOVE    PTHKN-HOJOKBN   TO  WRK-RECE61-HOJOKBN
                    END-IF
+               WHEN    "060" 
+                   IF     (WRK-NENREI  >=   70)  AND
+                          (WRK-NENREI  <=   74)
+                       EVALUATE   PTHKN-HOJOKBN
+                           WHEN   "0"
+                           WHEN   "4"
+                               MOVE    "0"             TO
+                                               WRK-RECE61-HOJOKBN
+                           WHEN   "1"
+                           WHEN   "5"
+                               MOVE    "1"             TO
+                                               WRK-RECE61-HOJOKBN
+                           WHEN   "2"
+                           WHEN   "6"
+                               MOVE    "2"             TO
+                                               WRK-RECE61-HOJOKBN
+                       END-EVALUATE
+                   END-IF     
+               WHEN    OTHER 
+                   EVALUATE   PTHKN-HOJOKBN
+                       WHEN   "9"
+                       WHEN   "8"
+                           MOVE    PTHKN-HOJOKBN   TO
+                                               WRK-RECE61-HOJOKBN
+                   END-EVALUATE             
            END-EVALUATE             
            MOVE    SPACE               TO WRK-RECE61-RECEKA
       *
