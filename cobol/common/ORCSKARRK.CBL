@@ -219,9 +219,9 @@
            MOVE    SPACE               TO  WRK-SYOSINYMD1
            MOVE    SPACE               TO  WRK-SYOSINYMD2
       *
-           EVALUATE    SPA-HOSPSBT
+      **** EVALUATE    SPA-HOSPSBT
       *        ÉÂ±¡
-               WHEN    1
+      *******  WHEN    1
       *            Ï·¿Í
                    MOVE    "111700110"         TO  WRK-SRYCD
                    PERFORM 2001-SANTEI-CHK-SEC
@@ -229,14 +229,14 @@
                    MOVE    "111000110"         TO  WRK-SRYCD
                    PERFORM 2001-SANTEI-CHK-SEC
       *        ¿ÇÎÅ½ê
-               WHEN    2
+      ******   WHEN    2
       *            Ï·¿Í
                    MOVE    "111700210"         TO  WRK-SRYCD
                    PERFORM 2001-SANTEI-CHK-SEC
       *            Ï·¿Í³°
                    MOVE    "111003610"         TO  WRK-SRYCD
                    PERFORM 2001-SANTEI-CHK-SEC
-           END-EVALUATE
+      *****END-EVALUATE
       *    ¾®»ù²Ê¿Ç»¡ÎÁ
       *    ¡¡¡¡±¡³°½èÊý   ½é¿Ç
            MOVE    "113003510"         TO  WRK-SRYCD
@@ -380,7 +380,7 @@
                          ((WRK-LST-SRYYMD  NOT =   SPACE  ) AND
                           (WRK-LST-SRYYMD2 NOT =   SPACE  ) AND
                           (FLG-JYURRK-CHK  NOT =   ZERO   ))
-      *        Êñ³ç¤ÏÂÐ¾Ý³°
+      *      Êñ³ç¤ÏÂÐ¾Ý³°
              IF      JYURRK-HKNCOMBINUM    NOT =   "9999"
       *
       *        ¿ÇÎÅ²ÊÍúÎò¤Ï³°Íè¤Î¤ß¤ÇºîÀ®¤¹¤ë
@@ -414,7 +414,7 @@
                            PERFORM 3001-SYOSIN-SENTEI-SEC
                            MOVE    1               TO  FLG-JYURRK-CHK
                        END-IF
-                    ELSE
+                   ELSE
                        IF      WRK-NYULST-SRYYMD2  =   SPACE
                            MOVE    JYURRK-SRYYMD   TO
                                                    WRK-NYULST-SRYYMD2
@@ -448,6 +448,12 @@
                ELSE
                    MOVE    WRK-NYULST-SRYYMD   TO  WRK-LST-SRYYMD
                    MOVE    WRK-NYULST-SRYYMD2  TO  WRK-LST-SRYYMD2
+               END-IF
+           ELSE
+      *        Æþ±¡¤ÎºÇ½ªÍúÎòÆü¤òÊÔ½¸¤¹¤ë
+               IF     (WRK-NYULST-SRYYMD   NOT =   SPACE ) AND
+                      (WRK-LST-SRYYMD      <   WRK-NYULST-SRYYMD)
+                   MOVE    WRK-NYULST-SRYYMD   TO  WRK-LST-SRYYMD
                END-IF
            END-IF
       *

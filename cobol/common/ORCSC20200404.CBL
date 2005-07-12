@@ -427,6 +427,11 @@
       *****************************************************************
        10010-SRYKBN-CHK-SEC             SECTION.
       *
+           IF      LNK-ORCSC-PG        =   "K05"
+      *        セット登録のチェックなし
+               CONTINUE
+           ELSE
+      *
            EVALUATE    WRK-GMN-INPUTCD(IDX-Z)(2:3)
                WHEN    "213"
                WHEN    "223"
@@ -462,6 +467,8 @@
                                                              (IDX-Z)
                    END-IF
            END-EVALUATE
+      *
+           END-IF
            .
        10010-SRYKBN-CHK-EXT.
            EXIT.

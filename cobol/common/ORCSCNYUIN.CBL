@@ -83,6 +83,7 @@
            03  FLG-TENSU           PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-UKETUKE         PIC 9(01).
+           03  FLG-PTNYUINRRK        PIC 9(01).
       *
            03  FLG-SINKI           PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
@@ -180,6 +181,8 @@
       *    保険組合せ保存
            03  WRK-HZN-HKNCOMBINUM     PIC X(04).
            03  WRK-HZN-HKNKBN          PIC X(01).
+      *
+           03  WRK-SRYKA              PIC X(02).
       *
       *    診療行為内容比較用テーブル
        01  TBL-AREA.
@@ -280,6 +283,10 @@
       *    点数マスタ−
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
+      *
+      *    患者入院履歴
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
       *
       *    診療行為マスタワーク
        01  LNK-WKSRYACT-AREA.
@@ -2280,6 +2287,15 @@
        500-SRYKARRK-UPD-SEC              SECTION.
       *
       *    退院日がある時、最終受診日を編集する
+      *    INITIALIZE                  ORCSKARRKAREA
+      *    MOVE    ORCSCNYUIN-YMD(1:6) TO  SKARRK-SRYYM
+      *    MOVE    ORCSCNYUIN-TAIINYMD TO  SKARRK-LASTYMD
+      *    CALL    "ORCSKARRK"         USING
+      *                                ORCSKARRKAREA
+      *                                SPA-AREA
+      *パッチ提供できないので、仮の診療科履歴の作成とする
+      *初診算定日が未設定となる可能性がある
+      *    退院日がある時、最終受診日を編集する
            MOVE    SPACE               TO  SRYKARRK-REC
            INITIALIZE                      SRYKARRK-REC
            MOVE    SPA-HOSPID          TO  KARRK-HOSPID
@@ -2325,7 +2341,32 @@
                                ",KEY:" KARRK-KEY  ";"
                    END-IF
                END-IF
+           ELSE
+      *        新規作成
+               MOVE    SPACE               TO  SRYKARRK-REC
+               INITIALIZE                      SRYKARRK-REC
+               MOVE    SPA-HOSPID          TO  KARRK-HOSPID
+               MOVE    SPA-PTID            TO  KARRK-PTID
+               MOVE    SPA-SRYKA           TO  KARRK-SRYKA
+               MOVE    ORCSCNYUIN-TAIINYMD TO  KARRK-LASTYMD
+      *
+               MOVE    SMCNDATE-YMD        TO  KARRK-CREYMD
+               MOVE    SMCNDATE-YMD        TO  KARRK-UPYMD
+               MOVE    SMCNDATE-HMS        TO  KARRK-UPHMS
+      *
+               MOVE    SRYKARRK-REC        TO  MCPDATA-REC
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               MOVE    "SRYKARRK-KEY"      TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"          USING
+                                            MCPAREA
+                                            ORCMCPAREA
+                                            MCPDATA-REC
+               IF      MCP-RC          NOT =   ZERO
+                   DISPLAY "ORCSCNYUIN SRYKARRK INS ERR:"  MCP-RC  "."
+                   MOVE    "3000"          TO  SPA-ERRCD
+               END-IF
            END-IF
+      *
            .
        500-SRYKARRK-UPD-EXT.
            EXIT.
@@ -2465,6 +2506,43 @@
       *****************************************************************
        200-TAIIN-SYORI-SEC             SECTION.
       *
+      *    入院履歴判定
+           MOVE    SPACE               TO  PTNYUINRRK-REC
+           INITIALIZE                  PTNYUINRRK-REC
+           MOVE    SPA-HOSPID          TO  PTNYUINRRK-HOSPID
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+      *
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    PATH-TBL-PTNYUINRRK-KEY33
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    PATH-TBL-PTNYUINRRK-KEY33  TO  MCP-PATH
+               PERFORM 910-PTNYUINRRK-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+               INITIALIZE                  PTNYUINRRK-REC
+           END-IF
+           MOVE    SPACE               TO  WRK-SRYKA
+           PERFORM
+                   UNTIL      (FLG-PTNYUINRRK      =   1 )  OR
+                              (WRK-SRYKA       NOT =   SPACE)
+      *        退院対象処理
+               IF     (ORCSCNYUIN-TAIINYMD NOT =   SPACE 
+                                           AND     "99999999" ) AND
+                      (PTNYUINRRK-TAIINYMD     =   ORCSCNYUIN-TAIINYMD)
+                   MOVE    PTNYUINRRK-NYUINKA  TO  WRK-SRYKA
+               END-IF
+      *
+               MOVE    PATH-TBL-PTNYUINRRK-KEY33  TO  MCP-PATH
+               PERFORM 910-PTNYUINRRK-READ-SEC
+           END-PERFORM
+           MOVE    PATH-TBL-PTNYUINRRK-KEY33  TO  MCP-PATH
+           PERFORM 990-DBCLOSE-SEC
+      *
            MOVE    SPACE               TO  JYURRK-REC
            INITIALIZE                      JYURRK-REC
            MOVE    SPA-HOSPID          TO  JYURRK-HOSPID
@@ -2515,6 +2593,8 @@
                                         ORCMCPAREA
                                         MCPDATA-REC
       *
+           MOVE    WRK-SRYKA           TO  SPA-SRYKA
+      *
            IF      ORCSCNYUIN-TAIINYMD =   SPACE OR  ALL "9"
       *        入院取消の時、診療科履歴の修正
                INITIALIZE                  ORCSKARRKAREA
@@ -2549,6 +2629,8 @@
            CALL    "ORCSCHOZAI"        USING
                                        SPA-AREA
                                        ORCSCHOZAIAREA
+      *
+           MOVE    ZERO                TO  SPA-SRYKA
       *
            .
        200-TAIIN-SYORI-EXT.
@@ -2867,6 +2949,26 @@
       *
            .
        940-WKSRYACT-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴マスター読込
+      *****************************************************************
+       910-PTNYUINRRK-READ-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "MCPSUB"            USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+               MOVE    ZERO            TO  FLG-PTNYUINRRK
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       910-PTNYUINRRK-READ-EXT.
            EXIT.
       *
       *****************************************************************
