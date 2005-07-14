@@ -319,7 +319,8 @@
            END-IF
            MOVE    ZERO                TO  IDX
            PERFORM
-                   UNTIL       FLG-EXAMPLE        =   1
+                   UNTIL      (FLG-EXAMPLE        =   1 ) OR
+                              (IDX                >=  100)
                ADD     1                   TO  IDX
                MOVE    IDX                 TO  SPA-C08-BUNREIMAX
                MOVE    EXAMPLE-RENNUM      TO  SPA-C08-TRENNUM  (IDX)
