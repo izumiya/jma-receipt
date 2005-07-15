@@ -3350,7 +3350,7 @@
                       UNTIL   IDXX    >    ( SYSKAN-IDY - 1 )
                   PERFORM VARYING IDXZ    FROM    IDXX     BY  1
                           UNTIL   IDXZ    >       SYSKAN-IDY
-                      IF    ( IDXY    >   IDXX                   )
+                      IF    ( IDXZ    >   IDXX                   )
                       AND   ( TBL-SYS2006-KEY (IDXX)
                                       >   TBL-SYS2006-KEY (IDXZ) )
                           MOVE    TBL-SYS2006-OCC (IDXX)
