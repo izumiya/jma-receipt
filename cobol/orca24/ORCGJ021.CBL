@@ -945,11 +945,11 @@
            END-PERFORM
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
            PERFORM 990-DBCLOSE-SEC
-      *    入院の時、診療会計から判定
-           MOVE    ZERO                TO  SPA-J021-NAI-ACCT
-           IF      SPA-NYUGAIKBN       =   "1"
-               PERFORM 40013-SRYACCT-CHK-SEC
-           END-IF
+      *D   入院の時、診療会計から判定
+      *    MOVE    ZERO                TO  SPA-J021-NAI-ACCT
+      *    IF      SPA-NYUGAIKBN       =   "1"
+      *        PERFORM 40013-SRYACCT-CHK-SEC
+      *D   END-IF
       *
            MOVE    WRK-STDAY           TO  SPA-J021-STDAY
            MOVE    WRK-ENDAY           TO  SPA-J021-ENDAY
@@ -1594,8 +1594,8 @@
            PERFORM 300311-JYURRK-UPD-SEC
       *
            IF     (SPA-ERRCD           =   SPACE ) AND
-                  (SPA-NYUGAIKBN       =   "1"   )  AND
-                  (SPA-J021-NAI-ACCT   =   1     )
+                  (SPA-NYUGAIKBN       =   "1"   )
+      *****  AND  (SPA-J021-NAI-ACCT   =   1     )
       *        入院調剤料のみの診療会計（受診履歴なし）
                PERFORM 300315-SRYACCT-UPD-SEC
            END-IF
