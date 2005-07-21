@@ -78,6 +78,8 @@
            03  FLG-MAE-HEN         PIC 9(01).
            03  FLG-ACCT-END        PIC 9(01).
       *
+           03  FLG-JYURRK-NASI     PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -945,11 +947,22 @@
            END-PERFORM
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
            PERFORM 990-DBCLOSE-SEC
-      *D   Æþ±¡¤Î»þ¡¢¿ÇÎÅ²ñ·×¤«¤éÈ½Äê
-      *    MOVE    ZERO                TO  SPA-J021-NAI-ACCT
-      *    IF      SPA-NYUGAIKBN       =   "1"
-      *        PERFORM 40013-SRYACCT-CHK-SEC
-      *D   END-IF
+           IF     (WRK-STDAY           =   ZERO )  AND
+                  (WRK-ENDAY           =   ZERO )
+              MOVE    1                TO  FLG-JYURRK-NASI
+           ELSE
+              MOVE    ZERO             TO  FLG-JYURRK-NASI
+           END-IF
+      *    Æþ±¡¤Î»þ¡¢¿ÇÎÅ²ñ·×¤«¤éÈ½Äê
+           MOVE    ZERO                TO  SPA-J021-NAI-ACCT
+           IF      SPA-NYUGAIKBN       =   "1"
+               PERFORM 40013-SRYACCT-CHK-SEC
+               IF      FLG-JYURRK-NASI     =   1
+                   IF      SPA-J021-NAI-ACCT   =   1
+                       MOVE    2               TO  SPA-J021-NAI-ACCT
+                   END-IF
+               END-IF
+           END-IF
       *
            MOVE    WRK-STDAY           TO  SPA-J021-STDAY
            MOVE    WRK-ENDAY           TO  SPA-J021-ENDAY
@@ -1129,6 +1142,7 @@
                        IF     (WRK-ENDAY       =   ZERO )  OR
                               (WRK-ENDAY       <   IDX2 )
                            MOVE    IDX2            TO  WRK-ENDAY
+                           MOVE    1               TO  SPA-J021-NAI-ACCT
                        END-IF
                    END-IF
                END-PERFORM
@@ -1427,8 +1441,12 @@
            MOVE    "JYURRK-KEY18"      TO  ORC-DBPATH
            PERFORM 990-DBCLOSE-SEC
            IF      FLG-JYURRK          =   ZERO
-               MOVE    "0018"              TO  SPA-ERRCD
-               MOVE    3                   TO  SPA-J021-CUR
+               IF      SPA-J021-NAI-ACCT   =   2
+                   CONTINUE
+               ELSE
+                   MOVE    "0018"              TO  SPA-ERRCD
+                   MOVE    3                   TO  SPA-J021-CUR
+               END-IF
            END-IF
           .
        400311-JYURRK-CHK-EXT.
