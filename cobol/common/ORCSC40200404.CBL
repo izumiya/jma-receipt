@@ -39,6 +39,7 @@
       * 01.00.09     NACL-多々納  04/03/29  Ｈ１６年４月改正労災追加
       * 01.00.10     NACL-多々納  04/07/26  処置加算料追加(403)
       * 01.00.11     NACL-多々納  04/11/25  処置フィルム追加
+      * 01.00.12     NACL-多々納  05/07/20  労災時間外計算修正
       *****************************************************************
       *
       *
@@ -1085,6 +1086,19 @@
                PERFORM 10012-JIKANKASAN-SET-SEC
            END-IF
       *
+           COMPUTE IDX-Z2              =   IDX-ZS2     +   1
+           PERFORM VARYING     IDX1    FROM    IDX-Z2  BY  1
+                   UNTIL      (IDX1        >   200     )   OR
+                             ((WRK-GMN-INPUTCD (IDX1)  =   SPACE ) AND
+                              (WRK-COM-INPUTCD (IDX1)  =   SPACE ))
+      *        手技料
+               IF     (WRK-COM-INPUTCD (IDX1)(1:1) =   "1" ) AND
+                      (WRK-COM-DATAKBN (IDX1)      =   "1" )
+                   MOVE    IDX1            TO  IDX-Z
+                   MOVE    200             TO  IDX1
+               END-IF
+           END-PERFORM
+      *
       *    年齢加算処理
       **** PERFORM 10013-NENREI-SET-SEC
            .
@@ -1320,7 +1334,6 @@
       *****************************************************************
        1009-SYUGI-CHEK-SEC                  SECTION.
       *
-           MOVE    ZERO                TO  FLG-FUKU
            MOVE    ZERO                TO  IDX-FUKU
            MOVE    ZERO                TO  IDX-F
            PERFORM VARYING     IDXF    FROM    1   BY  1
@@ -1342,15 +1355,12 @@
                           (WRK-COM-INPUTCD(IDXF)(1:3)
                                                    NOT =   "101")) AND
                           (WRK-COM-DATAKBN(IDXF)       =   "2")  AND
-      *******************((WRK-COM-AUTOKBN(IDXF)       =   "2") OR
+                          (WRK-COM-TENSIKIBETU (IDXF)
+                                                       =   5
+                                                       OR  6  )  AND
                           (WRK-COM-TIMEKSNKBN (IDXF)
                                                   NOT =   ZERO )
                        MOVE    1               TO  FLG-KASAN-ARI
-                   END-IF
-      *            労災の加算がある時、エラーとしない
-                   IF     (WRK-COM-INPUTCD(IDXF)(1:3)  =   "101") AND
-                          (WRK-COM-DATAKBN(IDXF)       =   "2")
-                       MOVE    ZERO            TO  IDX-FUKU
                    END-IF
                END-IF
            END-PERFORM
@@ -1370,9 +1380,14 @@
       **********   END-IF
                    CONTINUE
                ELSE
-      *            時間外・乳幼児加算のある時は１剤１手技とする
-                   MOVE    "0401"              TO  WRK-ERRCD
-                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-F)
+      *            時間外加算のある時は１剤１手技とする
+                   IF      SPA-HKNKBN          =   1
+      *                労災の時、エラーとしない
+                       CONTINUE
+                   ELSE
+                       MOVE    "0401"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-F)
+                   END-IF
                END-IF
            END-IF
       *
