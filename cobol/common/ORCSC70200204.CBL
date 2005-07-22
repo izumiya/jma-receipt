@@ -2717,23 +2717,36 @@
                    UNTIL      (IDX1        >   200     )   OR
                               (WRK-GMN-INPUTCD (IDX1)  =   SPACE )
       *            •’•£•Î•‡»ΩƒÍ
-               IF     (WRK-COM-INPUTCD (IDX1)(1:1) =   "7"  OR
-                       WRK-COM-INPUTCD(IDX-Z)(1:3) =   "059")  AND
-                      (WRK-COM-DATAKBN (IDX1)      =   "3" )
-                   MOVE    IDX1                TO  IDX-S
-               END-IF
-               IF      WRK-COM-INPUTCD (IDX1)  =   WRK-SRYCD
-                   MOVE    IDX1                TO  IDX-T
-                   MOVE    1                   TO  FLG-ARI
+               IF    ((WRK-COM-INPUTCD (IDX1)(1:1) =   "7" ) OR
+                      (WRK-COM-INPUTCD (IDX1)(1:3) =   "059"))  AND
+                      (WRK-COM-DATAKBN (IDX1)      =   "3" )   AND
+                      (WRK-COM-INPUTCD (IDX1)  NOT =   WRK-SRYCD )
+      *            ∆√ƒÍ¥Ô∫‡«ØŒ≤√ªª∂Ë ¨§Œ»ΩƒÍ
+                   IF      WRK-COM-TOKUKIZAIAGEKSNKBN (IDX1)
+                                               =   1
+                       IF      WRK-COM-INPUTCD (IDX1 + 1)
+                                               =   WRK-SRYCD
+                           CONTINUE
+                       ELSE
+                           MOVE    IDX1                TO  IDX-S
+                           MOVE    1                   TO  FLG-NENREI
+                           PERFORM 1002-JIDOUSET-SEC
+                           IF      FLG-ADD             =   1
+                               MOVE    IDX-S           TO  WRK-NYU-IDX
+                               ADD     1               TO  IDX-MAX
+                               ADD     1               TO  IDX1
+                           END-IF
+                       END-IF
+                   END-IF
                END-IF
            END-PERFORM
       *
-           MOVE    WRK-NYU-IDX         TO  IDX-S
-           MOVE    1                   TO  FLG-NENREI
-           PERFORM 1002-JIDOUSET-SEC
-           IF      FLG-ADD             =   1
-               ADD     1                   TO  IDX-MAX
-           END-IF
+      **** MOVE    WRK-NYU-IDX         TO  IDX-S
+      *    MOVE    1                   TO  FLG-NENREI
+      *    PERFORM 1002-JIDOUSET-SEC
+      *    IF      FLG-ADD             =   1
+      *        ADD     1                   TO  IDX-MAX
+      **** END-IF
       *
       *    ≤√ªªŒ¡ ‘Ω∏
            IF      WRK-COM-TENSIKIBETU(IDX-S)  =   5
