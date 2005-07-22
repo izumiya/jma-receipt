@@ -42,6 +42,7 @@
       *  02.01.01    NACL-¿¹ÏÆ    03/11/19  ´µ¼Ô»áÌ¾£²ÄÉ²Ã
       *  02.01.02    NACL-¿¹ÏÆ    04/01/26  ´µ¼Ô»áÌ¾·É¾ÎÊÔ½¸
       *  02.01.03    NACL-Â¿¡¹Ç¼  04.03.04  ÍÑË¡Ê£¿ôÊÔ½¸Â¾
+      *  02.01.04    NACL-¿¹ÏÆ    05/07/22  µ­¹æÈ¾³Ñ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -601,9 +602,16 @@
                                                        (IDX-KET:2)
                        ADD     2                   TO  IDX-STR
                        ADD     2                   TO  IDX-KET
+      *----(02.01.04)--UPD-START---
                    ELSE
+                       MOVE    WRK-HENKEIJYO(IDX-STR:1)
+                                               TO  WRK-YKJ-KEIJYO
+                                                       (CNT-LINE IDX)
+                                                       (IDX-KET:1)
                        ADD     1                   TO  IDX-STR
+                       ADD     1                   TO  IDX-KET
                    END-IF
+      *----(02.01.04)--UPD-END-----
                END-IF
       *
       *        ²þ¹Ô¡¢ºÇÂçÊ¸»ú¤Ç²þ¹Ô
