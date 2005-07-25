@@ -95,6 +95,7 @@
       *  01.01.08    NACL-ÌçÏÆ    05/06/22  Ê¼¸Ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  01.01.09    NACL-ÌçÏÆ    05/07/08  Ê¡°æ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  01.01.10    NACL-ÌçÏÆ    05/07/12  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  01.01.11    NACL-ÌçÏÆ    05/07/22  Æü¾å¸Â¡¢·î¾å¸Â¤¬¤¢¤ë¾ì¹ç¤ÎÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -148,6 +149,7 @@
            03  FLG-KUMAMOTO            PIC X(01).
            03  FLG-TAIGAI              PIC X(01).
            03  FLG-HIKOTEI             PIC 9(01).
+           03  FLG-TUKIHIKAKU          PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -3819,8 +3821,10 @@
                       END-IF
                  END-IF
       *
-                 IF       MAX-KIN-KOHI1-D       NOT = ZERO
-                 AND      MAX-KIN-KOHI1-M           = ZERO
+                 IF     ((MAX-KIN-KOHI1-D       NOT = ZERO) AND
+                         (MAX-KIN-KOHI1-M           = ZERO))
+                 OR     ((MAX-KIN-KOHI1-D       NOT = ZERO) AND
+                         (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
                      IF   SYU-DAY(IDX2)  =  "1" OR "2"
@@ -4097,8 +4101,10 @@
                       END-IF
                  END-IF
       *
-                 IF       MAX-KIN-KOHI2-D       NOT = ZERO
-                 AND      MAX-KIN-KOHI2-M           = ZERO
+                 IF     ((MAX-KIN-KOHI2-D       NOT = ZERO) AND
+                         (MAX-KIN-KOHI2-M           = ZERO))
+                 OR     ((MAX-KIN-KOHI2-D       NOT = ZERO) AND
+                         (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
                      IF   SYU-DAY(IDX2)  =  "1" OR "2"
@@ -4375,8 +4381,10 @@
                       END-IF
                  END-IF
       *
-                 IF       MAX-KIN-KOHI3-D       NOT = ZERO
-                 AND      MAX-KIN-KOHI3-M           = ZERO
+                 IF     ((MAX-KIN-KOHI3-D       NOT = ZERO) AND
+                         (MAX-KIN-KOHI3-M           = ZERO))
+                 OR     ((MAX-KIN-KOHI3-D       NOT = ZERO) AND
+                         (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
                      IF   SYU-DAY(IDX2)  =  "1" OR "2"
@@ -4653,8 +4661,10 @@
                       END-IF
                  END-IF
       *
-                 IF       MAX-KIN-KOHI4-D       NOT = ZERO
-                 AND      MAX-KIN-KOHI4-M           = ZERO
+                 IF     ((MAX-KIN-KOHI4-D       NOT = ZERO) AND
+                         (MAX-KIN-KOHI4-M           = ZERO))
+                 OR     ((MAX-KIN-KOHI4-D       NOT = ZERO) AND
+                         (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
                      IF   SYU-DAY(IDX2)  =  "1" OR "2"
@@ -5124,8 +5134,10 @@
       *
            IF (COMB-KOH1HKNNUM           NOT = SPACE)    AND
               (COMB-KOH1-NYUJGNKBN       =     "1")
-               IF       MAX-KIN-KOHI1-D       NOT = ZERO
-               AND      MAX-KIN-KOHI1-M           = ZERO
+               IF     ((MAX-KIN-KOHI1-D       NOT = ZERO) AND
+                       (MAX-KIN-KOHI1-M           = ZERO))
+               OR     ((MAX-KIN-KOHI1-D       NOT = ZERO) AND
+                       (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -5178,8 +5190,10 @@
       *
            IF (COMB-KOH2HKNNUM           NOT = SPACE)    AND
               (COMB-KOH2-NYUJGNKBN       =     "1")
-               IF       MAX-KIN-KOHI2-D       NOT = ZERO
-               AND      MAX-KIN-KOHI2-M           = ZERO
+               IF     ((MAX-KIN-KOHI2-D       NOT = ZERO) AND
+                       (MAX-KIN-KOHI2-M           = ZERO))
+               OR     ((MAX-KIN-KOHI2-D       NOT = ZERO) AND
+                       (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -5232,8 +5246,10 @@
       *
            IF (COMB-KOH3HKNNUM           NOT = SPACE)    AND
               (COMB-KOH3-NYUJGNKBN       =     "1")
-               IF       MAX-KIN-KOHI3-D       NOT = ZERO
-               AND      MAX-KIN-KOHI3-M           = ZERO
+               IF     ((MAX-KIN-KOHI3-D       NOT = ZERO) AND
+                       (MAX-KIN-KOHI3-M           = ZERO))
+               OR     ((MAX-KIN-KOHI3-D       NOT = ZERO) AND
+                       (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -5286,8 +5302,10 @@
       *
            IF (COMB-KOH4HKNNUM           NOT = SPACE)    AND
               (COMB-KOH4-NYUJGNKBN       =     "1")
-               IF       MAX-KIN-KOHI4-D       NOT = ZERO
-               AND      MAX-KIN-KOHI4-M           = ZERO
+               IF     ((MAX-KIN-KOHI4-D       NOT = ZERO) AND
+                       (MAX-KIN-KOHI4-M           = ZERO))
+               OR     ((MAX-KIN-KOHI4-D       NOT = ZERO) AND
+                       (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -8056,15 +8074,28 @@
                       "190" OR "290" OR
                       "164" OR "264" OR "364" OR "464" OR "564"
                  MOVE         1      TO      FLG-HIKOTEI
-                 IF ((LNK-SYU-KOH-HKNNUM(1)  =  "027"     ) AND
-                     (KOH-IDX                =   2        ))
-                 OR ( KOH-IDX                =   1         )
-      *
-                    MOVE      2      TO      FLG-HIKOTEI
-      *
-                 END-IF
               END-IF
            END-IF.
+      *
+           MOVE       ZERO        TO       FLG-TUKIHIKAKU.
+           EVALUATE     KOH-IDX
+              WHEN        1
+                  IF    MAX-KIN-KOHI1-M     NOT  = ZERO
+                      MOVE     1     TO     FLG-TUKIHIKAKU
+                  END-IF
+              WHEN        2
+                  IF    MAX-KIN-KOHI2-M     NOT  = ZERO
+                      MOVE     1     TO     FLG-TUKIHIKAKU
+                  END-IF
+              WHEN        3
+                  IF    MAX-KIN-KOHI3-M     NOT  = ZERO
+                      MOVE     1     TO     FLG-TUKIHIKAKU
+                  END-IF
+              WHEN        4
+                  IF    MAX-KIN-KOHI4-M     NOT  = ZERO
+                      MOVE     1     TO     FLG-TUKIHIKAKU
+                  END-IF
+           END-EVALUATE.
       *
            MOVE    "1"    TO   LNK-SDAY-DAYINFFLG.
       *
@@ -8260,18 +8291,18 @@
                                          LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
                             END-IF
                          END-IF
-                         IF   WK-NYUSKJRYYKBN  =  "2"
-                           IF    LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
-                                         >   ZAN-KOHI-D(IDX2 KOH-IDX)
-                              MOVE   ZAN-KOHI-D(IDX2 KOH-IDX)   TO
-                                       LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
-                              MOVE   ZERO   TO  ZAN-KOHI-D(IDX2 KOH-IDX)
-                           ELSE
-                              COMPUTE  ZAN-KOHI-D(IDX2 KOH-IDX)   =
-                                       ZAN-KOHI-D(IDX2 KOH-IDX)   -
-                                       LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
-                           END-IF
-                         END-IF
+      ****               IF   WK-NYUSKJRYYKBN  =  "2"
+      ****                 IF    LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
+      ****                               >   ZAN-KOHI-D(IDX2 KOH-IDX)
+      ****                    MOVE   ZAN-KOHI-D(IDX2 KOH-IDX)   TO
+      ****                             LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
+      ****                    MOVE   ZERO   TO  ZAN-KOHI-D(IDX2 KOH-IDX)
+      ****                 ELSE
+      ****                    COMPUTE  ZAN-KOHI-D(IDX2 KOH-IDX)   =
+      ****                             ZAN-KOHI-D(IDX2 KOH-IDX)   -
+      ****                             LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
+      ****                 END-IF
+      ****               END-IF
       *                  ¼ýÇ¼¹àÌÜ
                          ADD   LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
                                   TO   LNK-SYU-SKJ-FTN(KOH-IDX)
@@ -8318,35 +8349,23 @@
                 END-IF
            END-IF.
       *
-      ***     IF     FLG-HIKOTEI    =      2
-      ***         IF  (LNK-SYU-KOH-HKNNUM(1)  =  "027"     ) AND
-      ***             (KOH-IDX                =   2        )
-      ***             IF  WK-DAY-KOH-COMPFTN(2) > LNK-SYU-KOH-COMPFTN(1)
-      ***                 MOVE   WK-DAY-KOH-COMPFTN(2)
-      ***                            TO  LNK-SYU-KOH-COMPFTN(1)
-      ***                                LNK-SYU-KOH-COMPTOTAL(1)
-      ***             END-IF
-      ***             IF  LNK-SYU-KOH-COMPFTN-ENTANI(2)
-      ***                                > LNK-SYU-KOH-COMPFTN-ENTANI(1)
-      ***                 MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(2)
-      ***                            TO  LNK-SYU-KOH-COMPFTN-ENTANI(1)
-      ***             END-IF
-      ***         END-IF
-      ***         IF   KOH-IDX                =   1
-      ***             IF    LNK-SYU-SYUHKNNUM  NOT =   SPACE
-      ***               IF  WK-DAY-KOH-COMPFTN(1)  >  LNK-SYU-SYUCOMPFTN
-      ***                 MOVE   WK-DAY-KOH-COMPFTN(1)
-      ***                            TO  LNK-SYU-SYUCOMPFTN
-      ***                                LNK-SYU-SYUCOMPTOTAL
-      ***               END-IF
-      ***               IF  LNK-SYU-KOH-COMPFTN-ENTANI(1)
-      ***                                > LNK-SYU-SYUCOMPFTN-ENTANI
-      ***                 MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(1)
-      ***                            TO  LNK-SYU-SYUCOMPFTN-ENTANI
-      ***               END-IF
-      ***             END-IF
-      ***         END-IF
-      ***     END-IF.
+           IF      FLG-TUKIHIKAKU     NOT =    ZERO
+                IF  ZAN-KOHI-T(KOH-IDX)   <
+                                        LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                    MOVE  ZAN-KOHI-T(KOH-IDX)
+                                 TO     LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                END-IF
+                IF  ZAN-KOHI-T2(KOH-IDX)  <
+                                         WK-DAY-KOH-COMPFTN(KOH-IDX)
+                    MOVE  ZAN-KOHI-T2(KOH-IDX)
+                                 TO      WK-DAY-KOH-COMPFTN(KOH-IDX)
+                END-IF
+                IF  ZAN-KOHI-T3(KOH-IDX)  <
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                    MOVE  ZAN-KOHI-T3(KOH-IDX)
+                             TO  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                END-IF
+           END-IF.
       *
            PERFORM    23072-KOHHI-HIKAKU-SEC.
            PERFORM    23074-KOHHI-HIKAKU3-SEC.
