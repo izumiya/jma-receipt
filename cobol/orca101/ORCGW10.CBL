@@ -2045,11 +2045,12 @@
                     MOVE  "B12"            TO   MCP-WIDGET
             END-EVALUATE
       *
-           EVALUATE    SPA-GMN-W10-CUR
-               WHEN    1   THRU    100
-                   MOVE    0               TO  W10-PAGENO
-               WHEN    101  THRU   200
-                   MOVE    1               TO  W10-PAGENO
+      *
+           EVALUATE    SPA-W01-KANRICD
+           WHEN    "3001"
+               MOVE    0               TO  W10-PAGENO
+           WHEN    "3002"
+               MOVE    1               TO  W10-PAGENO
            END-EVALUATE                       
            .
        5001-MAPCUR-EXT.
