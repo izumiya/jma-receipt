@@ -2613,6 +2613,7 @@
                ELSE
                    EVALUATE   COMB-HOJOKBN
                        WHEN   "1"
+                       WHEN   "4"
                        WHEN   "9"
                            IF  FLG-SANSHOU3      =   SPACE              
                                MOVE   12000   TO   MAX-KIN-SYU-M
@@ -2620,6 +2621,7 @@
                                MOVE    8000   TO   MAX-KIN-SYU-M
                            END-IF
                        WHEN   "2"
+                       WHEN   "5"
                        WHEN   "8"
                            MOVE   40200       TO   MAX-KIN-SYU-M
                    END-EVALUATE
