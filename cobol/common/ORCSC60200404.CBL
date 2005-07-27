@@ -3209,7 +3209,7 @@
                END-IF
       *        £”£–£¡§Ú∏µ§ÿÃ·§π
                MOVE    HZN-SCR-REC         TO  WRK-SCR-REC
-               GO      TO      300-AUTO-SYORI-EXT
+      *!!!!!!! GO      TO      300-AUTO-SYORI-EXT
            END-IF
            IF      FLG-BV              =   1
                MOVE    WRK-COM-SRYKA (IDX-BV)
