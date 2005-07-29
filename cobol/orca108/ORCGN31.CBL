@@ -725,9 +725,9 @@
       *****************************************************************
        4100-CITYKANA-CHK-SEC       SECTION.
       *
+           MOVE    5               TO  SPA-GMN-CUR
+      *
            IF    ( SPA-GMN-CITYKANA    =   SPACE )
-               MOVE    "0004"          TO  SPA-ERRCD
-               MOVE    4               TO  SPA-GMN-CUR
                GO  TO  4100-CITYKANA-CHK-EXT
            END-IF
       *
@@ -746,8 +746,6 @@
                GO  TO  4100-CITYKANA-CHK-EXT
            END-IF
       *
-           MOVE    5               TO  SPA-GMN-CUR
-      *
            .
       *
        4100-CITYKANA-CHK-EXT.
@@ -758,9 +756,9 @@
       *****************************************************************
        4100-TOWNKANA-CHK-SEC       SECTION.
       *
+           MOVE    6               TO  SPA-GMN-CUR
+      *
            IF    ( SPA-GMN-TOWNKANA    =   SPACE )
-               MOVE    "0005"          TO  SPA-ERRCD
-               MOVE    5               TO  SPA-GMN-CUR
                GO  TO  4100-TOWNKANA-CHK-EXT
            END-IF
       *
@@ -779,8 +777,6 @@
                GO  TO  4100-TOWNKANA-CHK-EXT
            END-IF
       *
-           MOVE    6               TO  SPA-GMN-CUR
-      *
            .
       *
        4100-TOWNKANA-CHK-EXT.
@@ -791,9 +787,9 @@
       *****************************************************************
        4100-CITYNAME-CHK-SEC       SECTION.
       *
+           MOVE    7               TO  SPA-GMN-CUR
+      *
            IF    ( SPA-GMN-CITYNAME    =   SPACE )
-               MOVE    "0006"          TO  SPA-ERRCD
-               MOVE    6               TO  SPA-GMN-CUR
                GO  TO  4100-CITYNAME-CHK-EXT
            END-IF
       *
@@ -812,8 +808,6 @@
                GO  TO  4100-CITYNAME-CHK-EXT
            END-IF
       *
-           MOVE    7               TO  SPA-GMN-CUR
-      *
            .
       *
        4100-CITYNAME-CHK-EXT.
@@ -824,9 +818,9 @@
       *****************************************************************
        4100-TOWNNAME-CHK-SEC       SECTION.
       *
+           MOVE    99              TO  SPA-GMN-CUR
+      *
            IF    ( SPA-GMN-TOWNNAME    =   SPACE )
-               MOVE    "0007"          TO  SPA-ERRCD
-               MOVE    7               TO  SPA-GMN-CUR
                GO  TO  4100-TOWNNAME-CHK-EXT
            END-IF
       *
@@ -844,8 +838,6 @@
                MOVE    7               TO  SPA-GMN-CUR
                GO  TO  4100-TOWNNAME-CHK-EXT
            END-IF
-      *
-           MOVE    99              TO  SPA-GMN-CUR
            .
       *
        4100-TOWNNAME-CHK-EXT.
