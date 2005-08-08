@@ -2293,6 +2293,9 @@
                IF      LNK-SC95-PG         =   "K10"
                    MOVE    SPACE               TO  SPA-GMN-HKNCOMBI-G
                    MOVE    SPA-HKNCOMBINUM     TO  SPA-GMN-HKNCOMBINUM
+                   MOVE    ZERO                TO  SPA-HKNKBN
+                   MOVE    ZERO                TO  SPA-HKNID
+                   MOVE    SPACE               TO  SPA-RSI-HKNKBN
                    GO      TO      100131-HKNCOMBI-CHK-EXT
                END-IF
       *
