@@ -1314,7 +1314,7 @@
                 MOVE    ZERO   TO   WRK-TENTEK-ZAIKAISU
                 PERFORM  VARYING  IDX2    FROM    1   BY  1
                       UNTIL   IDX2     >       31
-                  ADD    ORCSTEN-KIZ-DAY(IDX1 IDX2)  
+                  MOVE     ORCSTEN-KIZ-DAY(IDX1 IDX2)  
                                      TO  WRK-TENTEK-ZAIKAISU
                   COMPUTE  WRK-TENTEK-KIZAITEN2(IDX2)  =
                            WRK-TENTEK-KIZAITEN2(IDX2)  +
