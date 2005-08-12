@@ -9075,6 +9075,30 @@
                    END-IF
                END-PERFORM
            END-IF
+      *TEST
+           IF       SPA-ERRCD      NOT =   SPACE
+               MOVE    SPA-SCR-REC         TO  MAE-SCR-REC
+               INITIALIZE                  SPA-SCR-REC
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX         >   200   )   OR
+                                 ((MAE-GMN-INPUTCD (IDX) =   SPACE )
+                              AND (MAE-COM-INPUTCD (IDX) =   SPACE ))
+      *            ¡Ê¸º¡Ëºï½ü
+                   IF     (MAE-COM-SRYKBN (IDX)    =   "21" )  AND
+                          (MAE-COM-AUTOKBN(IDX)    =   "3" )
+                       CONTINUE
+                   ELSE
+                       ADD     1                   TO  SPA-GMN-MAX
+                       MOVE    MAE-GMN-TBL (IDX)   TO  SPA-GMN-TBL
+                                                          (SPA-GMN-MAX)
+                       IF     (SPA-COM-KZMFLG (IDX)     =   "1"  ) AND
+                              (LNK-ORCSC-KEI-IDX        =   IDX  )
+                           MOVE    SPA-GMN-MAX     TO  LNK-ORCSC-KEI-IDX
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *TEST
       *
            .
        5201-SYOHOU-HKN-EXT.
