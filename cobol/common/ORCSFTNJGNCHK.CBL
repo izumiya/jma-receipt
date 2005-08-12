@@ -28,6 +28,7 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  01.00.01    NACL-ÌçÏÆ    04/11/15  ¸øÈñ·î¾å¸Â³Û¼èÆÀ½¤Àµ
       *  01.00.02    NACL-ÌçÏÆ    04/11/30  Æþ±¡ÂÐ±þ
+      *  01.00.03    NACL-ÌçÏÆ    05/08/12  ¼¢²ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -225,6 +226,13 @@
            IF   FLG-HKNNUM     =    ZERO
              IF    LNK-FTNJGNCHK-NYUGAIKBN     =   "1"
                    MOVE   HKN-HON-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
+                   IF  (WRK-PREFNUM           =  25            ) AND
+                       (LNK-FTNJGNCHK-KOHNUM  = "140" OR "241" OR
+                                                "243" OR "244" OR
+                                                "245"          ) AND
+                       (LNK-FTNJGNCHK-SRYYM  >= "200508"       )
+                      MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
              ELSE
                IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
                    MOVE   HKN-HON-GAIMNAIJGNGAK  TO  WRK-HKNMST-JGNGAK
