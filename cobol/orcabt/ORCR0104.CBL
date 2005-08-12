@@ -94,6 +94,7 @@
       *                                     ¤ë¥ì¥»¥×¥ÈÊÔ½¸
       *  01.02.12    NACL-ÌçÏÆ    05/04/05  ¥ì¥»¥×¥ÈÆÃµ­»ö¹à"12´ï¼£"ÂÐ±þ
       *                                     ¡ÊÊ¿À®£±£·Ç¯£´·î°Ê¹ß¡Ë
+      *  01.02.13    NACL-ÌçÏÆ    05/08/12  ¸øÈñÃ±ÆÈ¼ÂÆü¿ô£°µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2878,8 +2879,9 @@
                   MOVE    WRK-JINISSU2    TO  HC06-JINISSU
                END-IF
                IF      RECE02-TOTALTEN (IDX2)     >   ZERO
-                  IF  RECE02-JNISSU (IDX1)
-                                      NOT  =   RECE02-JNISSU (IDX2)
+                  IF  (RECE02-JNISSU (IDX1)
+                                      NOT  =   RECE02-JNISSU (IDX2))
+                  OR  (RECE02-TOTALTEN (IDX1)     =   ZERO)
                       MOVE    RECE02-JNISSU (IDX2)
                                               TO  WRK-JINISSU2Z
                       MOVE    WRK-JINISSU2    TO  HC06-JINISSU1
