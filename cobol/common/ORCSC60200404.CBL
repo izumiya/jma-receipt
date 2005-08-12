@@ -43,6 +43,7 @@
       *  01.00.12    NACL-多々納  04/06/XX  入院初回算定日重複算定チェック追加他
       *                                     複数保険・科追加
       *  01.00.13    NACL-多々納  04/12/09  重複チェック修正
+      *  01.00.14    NACL-多々納  05/08/12  包括検査 ０９，１０の追加
       *****************************************************************
       *
       *
@@ -1528,6 +1529,7 @@
       *?                               ALSO  SPACE
       *?           WHEN    01   THRU   08
       *?                               ALSO  "600"
+                   WHEN    09   THRU   10
                        MOVE    WRK-COM-HOUKNSKBN(IDX-Z)    TO  IDX
                        ADD     1               TO  WRK-HOUKNS-CNT (IDX)
                        ADD     WRK-COM-KISOTEN(IDX-Z)
@@ -1679,6 +1681,32 @@
                                MOVE    "099600701"     TO  WRK-SRYCD
                            WHEN    3   THRU  9999
                                MOVE    "099600702"     TO  WRK-SRYCD
+                       END-EVALUATE
+                       IF      WRK-SRYCD           =   SPACE
+                           ADD     WRK-HOUKNS-TENSU (IDX)
+                                                   TO  WRK-TENSUKEI
+                       ELSE
+                           PERFORM 10041-HOUKNS-ADD-SEC
+                       END-IF
+                   WHEN    9
+      *            ウイルス抗体価
+                       MOVE    SPACE           TO  WRK-SRYCD
+                       EVALUATE    WRK-HOUKNS-CNT(IDX)
+                           WHEN    8   THRU  9999
+                               MOVE    "099600901"     TO  WRK-SRYCD
+                       END-EVALUATE
+                       IF      WRK-SRYCD           =   SPACE
+                           ADD     WRK-HOUKNS-TENSU (IDX)
+                                                   TO  WRK-TENSUKEI
+                       ELSE
+                           PERFORM 10041-HOUKNS-ADD-SEC
+                       END-IF
+                   WHEN    10
+      *            グロブリンクラス別ウイルス抗体価
+                       MOVE    SPACE           TO  WRK-SRYCD
+                       EVALUATE    WRK-HOUKNS-CNT(IDX)
+                           WHEN    2   THRU  9999
+                               MOVE    "099601001"     TO  WRK-SRYCD
                        END-EVALUATE
                        IF      WRK-SRYCD           =   SPACE
                            ADD     WRK-HOUKNS-TENSU (IDX)
