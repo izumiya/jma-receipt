@@ -1125,6 +1125,13 @@
             END-IF
            END-PERFORM
       *
+      *    入力分のチェック
+           PERFORM 3003-CHEK-SYORI-SEC
+           IF     (LNK-ORCSC-KIDCD     NOT =   SPACE )  OR
+                  (SPA-ERRCD           NOT =   SPACE )
+               MOVE    SPA-K01KYOUTU       TO  SPA-WORK
+           ELSE
+      *
       *    院外分
            PERFORM 3001-INGAI-SYORI-SEC
       *    院内分
@@ -1136,11 +1143,6 @@
                PERFORM 3002-INNAI-SYORI-SEC
            END-IF
       *
-           IF     (LNK-ORCSC-KIDCD     NOT =   SPACE )  OR
-                  (SPA-ERRCD           NOT =   SPACE )
-               MOVE    SPA-K01KYOUTU       TO  SPA-WORK
-           ELSE
-               PERFORM 3003-CHEK-SYORI-SEC
            END-IF
       *
            IF      LNK-ORCSC-PG        =   "K02"
@@ -1156,6 +1158,30 @@
       *   入力内容のチェック処理
       *****************************************************************
        3003-CHEK-SYORI-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYOHOSENN
+      *    処方箋算定
+           IF    ((FLG-NAIYAK2         =   1    )  OR
+                  (FLG-TONPUK2         =   1    )  OR
+                  (FLG-GAIYAK2         =   1    ))   AND
+                  (IDX-SYOHOU      NOT =   ZERO )
+               MOVE    1               TO  FLG-SYOHOSENN
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-SYOHORYO
+      *    処方箋算定
+           IF    ((FLG-NAIYAK2         =   1    )  OR
+                  (FLG-TONPUK2         =   1    )  OR
+                  (FLG-GAIYAK2         =   1    ))   AND
+                  (IDX-SYOHOU      NOT =   ZERO )
+               MOVE    ZERO                TO  FLG-SYOHORYO
+           ELSE
+               IF     (FLG-NAIYAK          =   1    )  OR
+                      (FLG-TONPUK          =   1    )  OR
+                      (FLG-GAIYAK          =   1    )
+                   MOVE    1               TO  FLG-SYOHORYO
+               END-IF
+           END-IF
       *
       *    特定疾患処方管理加算処方箋料がある時、処方箋料があること
            IF      FLG-TOKUSYO1        =   1
