@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  02.06.01    NACL-藤原    05/08/22  区分コードの更新前チェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -97,8 +98,10 @@
                05  SPA-NAIB-AREA.
                    07  SPA-NAI-STYUKYMD       PIC 9(08).
                    07  SPA-NAI-EDYUKYMD       PIC 9(08).
-                   07  SPA-NAI-HOSPNAME1MOJI  PIC 9(02).
-                   07  SPA-NAI-ADRS1MOJI      PIC 9(02).
+                   07  SPA-NAI-KOUMOKU.
+                       09  SPA-NAI-HOSPNAME1MOJI  PIC 9(02).
+                       09  SPA-NAI-ADRS1MOJI      PIC 9(02).
+                       09  SPA-NAI-KBNCD          PIC 9(02).
       *
            COPY    "ENUM-VALUE".
       *
@@ -535,6 +538,7 @@
       *
            INITIALIZE                  SPA-GMN-KOUMOKU1
                                        SPA-GMN-KBNCD-G
+                                       SPA-NAI-KOUMOKU
       *
            MOVE    W18-KBNCD       TO  SPA-GMN-KBNCD-G
       *         
@@ -554,6 +558,7 @@
                    MOVE    SPACE           TO  SPA-GMN-KBNCD-G
                    MOVE    SNUM-OUTEDT(14:2)
                                            TO  SPA-GMN-KBNCD
+                                               SPA-NAI-KBNCD
                END-IF
       *
                MOVE    SPA-GMN-KBNCD       TO  WRK-KBNCD
@@ -907,9 +912,15 @@
            IF    ( SPA-GMN-KBNCD       =   SPACE )
            AND   ( SPA-GMN-KOUMOKU1
                                    NOT =   SPACE )
-               MOVE    "0100"                  TO  SPA-ERRCD
-           END-IF         
+               MOVE    "0100"              TO  SPA-ERRCD
+           END-IF           
       *
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-NAI-KBNCD       =   ZERO
+                   MOVE    "0001"              TO  SPA-ERRCD
+                   MOVE    1                   TO  SPA-GMN-CUR 
+               END-IF           
+           END-IF 
            .
        4103-KAKUTEI-CHK-EXT.
            EXIT.
@@ -1000,6 +1011,7 @@
       *
            INITIALIZE                  SPA-GMN-KOUMOKU1
                                        SPA-GMN-KBNCD-G
+                                       SPA-NAI-KOUMOKU
       *
            MOVE    1                   TO  SPA-GMN-CUR
       *
