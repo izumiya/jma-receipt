@@ -2179,7 +2179,7 @@
       *    ø«Œ≈≤ 
            MOVE    SRY-SRYKA           TO  SSANTEI-SRYKA
       *     ›∏±∂Ë ¨§œ∆±§∏
-           MOVE    SPA-HKNKBN          TO  SSANTEI-HKNKBN
+      **** MOVE    SPA-HKNKBN          TO  SSANTEI-HKNKBN
            CALL    "ORCSSANTEI"        USING
                                        ORCSSANTEIAREA
                                        SPA-AREA
