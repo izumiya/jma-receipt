@@ -96,6 +96,7 @@
       *  01.01.09    NACL-ÌçÏÆ    05/07/08  Ê¡°æ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  01.01.10    NACL-ÌçÏÆ    05/07/12  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  01.01.11    NACL-ÌçÏÆ    05/07/22  Æü¾å¸Â¡¢·î¾å¸Â¤¬¤¢¤ë¾ì¹ç¤ÎÂÐ±þ
+      *  01.01.12    NACL-ÌçÏÆ    05/08/23  ºë¶Ì¸©¤µ¤¤¤¿¤Þ»ÔÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2710,6 +2711,15 @@
                       MOVE   1       TO   FLG-SKJ
                  ELSE
                       MOVE   2       TO   FLG-SKJ
+                      IF    WRK-SKJGNSTYMD-S   NOT  =   SPACE
+                         MOVE   LNK-SYU-SRYYMD(1:6)
+                                           TO  WRK-SKJGNSTYYMM2
+                         MOVE   01         TO  WRK-SKJGNSTDD2
+                         IF   WRK-SKJGNSTYMD-S  <=  WRK-SKJGNSTYMD2
+                         AND  WRK-SKJGNSTYMD-E  >=  WRK-SKJGNSTYMD2
+                             MOVE    3     TO  FLG-SKJ
+                         END-IF
+                      END-IF
                  END-IF
            END-IF.
       *
@@ -6095,21 +6105,14 @@
                              MOVE    TNS-TEN   TO   WK-DAY-SKJFTN(IDY)
                           END-IF
                   WHEN  2
-      *             COMPUTE   WK-TSUSAN-NISSU  =  
-      *                                 LNK-S02-NYUIN-TSUSAN-NISSU  +
-      *                                 WK-SEIKYUKIKAN-NISSU
-      *             IF        WK-TSUSAN-NISSU  <=  90
-      *                   ADD     650    TO   WK-SHOKUJI-FTN
-      *             ELSE
-      *                   ADD     500    TO   WK-SHOKUJI-FTN
-      *             END-IF
-                    IF    WRK-SKJGNSTYMD-S   NOT  =   SPACE
-                       MOVE   LNK-SYU-SRYYMD(1:6) 
-                                         TO  WRK-SKJGNSTYYMM2
-      *****************MOVE   IDY        TO  WRK-SKJGNSTDD2
-                       MOVE   01         TO  WRK-SKJGNSTDD2
-                       IF   WRK-SKJGNSTYMD-S  <=  WRK-SKJGNSTYMD2
-                       AND  WRK-SKJGNSTYMD-E  >=  WRK-SKJGNSTYMD2 
+      *                   É¸½àÉéÃ´³Û¡ÊÄã£²¡¦£¹£°Æü°Ê²¼¡Ë
+                          MOVE  "197000910"    TO   WK-SRYCD
+                          PERFORM    TENSU-TBL-SEC
+                          IF       FLG-TENSU      =    ZERO
+                             ADD     TNS-TEN   TO   WK-SHOKUJI-FTN
+                             MOVE    TNS-TEN   TO   WK-DAY-SKJFTN(IDY)
+                          END-IF
+                  WHEN  3
       *                   É¸½àÉéÃ´³Û¡ÊÄã£²¡¦£¹£°ÆüÄ¶¡Ë
                           MOVE  "197001010"    TO   WK-SRYCD
                           PERFORM    TENSU-TBL-SEC
@@ -6117,24 +6120,6 @@
                              ADD     TNS-TEN   TO   WK-SHOKUJI-FTN
                              MOVE    TNS-TEN   TO   WK-DAY-SKJFTN(IDY)
                           END-IF
-                       ELSE
-      *                   É¸½àÉéÃ´³Û¡ÊÄã£²¡¦£¹£°Æü°Ê²¼¡Ë
-                          MOVE  "197000910"    TO   WK-SRYCD
-                          PERFORM    TENSU-TBL-SEC
-                          IF       FLG-TENSU      =    ZERO
-                             ADD     TNS-TEN   TO   WK-SHOKUJI-FTN
-                             MOVE    TNS-TEN   TO   WK-DAY-SKJFTN(IDY)
-                          END-IF
-                       END-IF
-                    ELSE
-      *                   É¸½àÉéÃ´³Û¡ÊÄã£²¡¦£¹£°Æü°Ê²¼¡Ë
-                          MOVE  "197000910"    TO   WK-SRYCD
-                          PERFORM    TENSU-TBL-SEC
-                          IF       FLG-TENSU      =    ZERO
-                             ADD     TNS-TEN   TO   WK-SHOKUJI-FTN
-                             MOVE    TNS-TEN   TO   WK-DAY-SKJFTN(IDY)
-                          END-IF
-                    END-IF    
                 END-EVALUATE
               END-IF
       *
@@ -6786,6 +6771,21 @@
       *
                    MOVE    HKN-HON-NYUKFTNRATE  TO   WK-KOH-FTNRATE
                    MOVE    "1"                  TO   HKN-RECEFTNDSPKBN
+           END-IF.
+      *
+      *    ºë¶Ì¸©¤µ¤¤¤¿¤Þ»Ô
+           IF  (WK-1001-PREFNUM          =   11                    )
+           AND (COMB-KOHHKNNUM(KOH-IDX)  =  "342" OR "343" OR "344")
+               EVALUATE   FLG-SKJ
+                   WHEN      0
+                     MOVE    390    TO   WK-NYUSKJJYOGAK
+                   WHEN      1
+                     MOVE    150    TO   WK-NYUSKJJYOGAK
+                   WHEN      2
+                     MOVE    325    TO   WK-NYUSKJJYOGAK
+                   WHEN      3
+                     MOVE    250    TO   WK-NYUSKJJYOGAK
+               END-EVALUATE
            END-IF.
       *
       *    Ê¡²¬¸©¤ÎÃÏÊý¸øÈñÂÐ±þ¡Ê¸øÈñÉÕ²Ã¾ðÊó¤Î¼èÆÀ¡Ë
