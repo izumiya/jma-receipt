@@ -639,7 +639,7 @@
            END-IF
       *
       *    更新前チェック処理
-           IF      FLG-TOUROKU         =   1
+           IF      FLG-TOUROKU         =   1   OR  2
                PERFORM 4103-KAKUTEI-CHK-SEC
            END-IF
       *
@@ -916,7 +916,8 @@
            END-IF           
       *
            IF      SPA-ERRCD           =   SPACE
-               IF      SPA-NAI-KBNCD       =   ZERO
+               IF    ( SPA-GMN-KBNCD   NOT =   SPACE )
+               AND   ( SPA-NAI-KBNCD       =   ZERO  )
                    MOVE    "0001"              TO  SPA-ERRCD
                    MOVE    1                   TO  SPA-GMN-CUR 
                END-IF           
@@ -943,7 +944,7 @@
                MOVE    ZERO                TO  SPA-GMN-CUR
       *
       *        入力チェック処理
-               MOVE    1                   TO  FLG-TOUROKU
+               MOVE    2                   TO  FLG-TOUROKU
                PERFORM 410-INPUT-CHK-SEC
                IF      SPA-ERRCD            =   SPACE
                    EVALUATE    WRK-MCP-WIDGET
@@ -1027,7 +1028,7 @@
       *    入力チェック処理
            MOVE    ZERO                TO  SPA-GMN-CUR
       *
-           MOVE    1                   TO  FLG-TOUROKU
+           MOVE    2                   TO  FLG-TOUROKU
            PERFORM 410-INPUT-CHK-SEC
            IF      SPA-ERRCD            =   SPACE
                EVALUATE    W18-PAGENO
