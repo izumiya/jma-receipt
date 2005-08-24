@@ -6782,19 +6782,19 @@
            END-IF.
       *
       *    ºë¶Ì¸©¤µ¤¤¤¿¤Þ»Ô
-           IF  (WK-1001-PREFNUM          =   11                    )
-           AND (COMB-KOHHKNNUM(KOH-IDX)  =  "342" OR "343" OR "344")
-               EVALUATE   FLG-SKJ
-                   WHEN      0
-                     MOVE    390    TO   WK-NYUSKJJYOGAK
-                   WHEN      1
-                     MOVE    150    TO   WK-NYUSKJJYOGAK
-                   WHEN      2
-                     MOVE    325    TO   WK-NYUSKJJYOGAK
-                   WHEN      3
-                     MOVE    250    TO   WK-NYUSKJJYOGAK
-               END-EVALUATE
-           END-IF.
+      **** IF  (WK-1001-PREFNUM          =   11                    )
+      **** AND (COMB-KOHHKNNUM(KOH-IDX)  =  "342" OR "343" OR "344")
+      ****     EVALUATE   FLG-SKJ
+      ****         WHEN      0
+      ****           MOVE    390    TO   WK-NYUSKJJYOGAK
+      ****         WHEN      1
+      ****           MOVE    150    TO   WK-NYUSKJJYOGAK
+      ****         WHEN      2
+      ****           MOVE    325    TO   WK-NYUSKJJYOGAK
+      ****         WHEN      3
+      ****           MOVE    250    TO   WK-NYUSKJJYOGAK
+      ****     END-EVALUATE
+      **** END-IF.
       *
       *    Ê¡²¬¸©¤ÎÃÏÊý¸øÈñÂÐ±þ¡Ê¸øÈñÉÕ²Ã¾ðÊó¤Î¼èÆÀ¡Ë
            MOVE     SPACE     TO     WK-KOH-FTNKBN.
