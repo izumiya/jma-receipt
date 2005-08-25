@@ -3578,7 +3578,6 @@
                PERFORM 4201-WIDGET-INSENSITIVE-SEC
       *    転科　転棟　転室
            WHEN    "08"
-               PERFORM 4101-WIDGET-TENKA-STT-SEC
       *
       *        異動日にシステム日付か前回異動日で日付の新しい方を表示
                IF    ( SPA-SYSYMD      >   SPA-NAI-I01-MAEIDOYMD )
@@ -3611,6 +3610,8 @@
                PERFORM 4101-JYURRK-SEL-SEC
       *
                PERFORM 410-INPUT-CHK-SEC
+      *
+               PERFORM 4101-WIDGET-TENKA-STT-SEC
       *
       *    照会
            WHEN    "10"
