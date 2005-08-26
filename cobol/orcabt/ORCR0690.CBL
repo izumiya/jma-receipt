@@ -394,10 +394,10 @@
                05  WRK-KENSA-SU            PIC 9(03).
                05  WRK-RECE64-IDX-G.
                    07  WRK-RECE64-IDX      PIC 9(03)
-                                                  OCCURS  4.
+                                                  OCCURS  30.
                05  WRK-KENSA-SRYCD-G.
                    07  WRK-KENSA-SRYCD     PIC 9(09)
-                                                  OCCURS  4.
+                                                  OCCURS  30.
       *
        01  WRK-RECE64-ZAITEN               PIC 9(08).
       *         
