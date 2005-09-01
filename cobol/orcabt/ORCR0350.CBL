@@ -69,6 +69,8 @@
       *  01.00.18    NACL-藤原    05/05/09  改定通信医１６０３９号
       *                                     「主」の記録についてより
       *                                    「0000998」を「0000999」に変更
+      *  01.00.19    NACL-藤原    05/08/31  愛媛県の地方公費の場合に９７
+      *                                     の負担区分を変更する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3840,6 +3842,35 @@
                        PERFORM 20070-FTNKBN-HENSYU-SEC
                        IF      WRK-FTNKBN          =   SPACE
                            MOVE    ZERO                TO  FLG-CHK
+                       ELSE
+      *
+      *                    食事療養で食事愛媛県の地方公費がある場合は 
+      *                    該当の地方公費をはずした負担区分とする
+                           IF    ( IDZ1                =   3     )
+                           AND   ( SYS-1001-PREFNUM    =   "38"  )
+                           AND   ( RECE62-FUKUSHIFLG-SKJINF-AREA
+                                                   NOT =   SPACE )
+                               EVALUATE    WRK-FTNKBN
+                                   WHEN    "2"
+                                   WHEN    "3"
+                                   WHEN    "8"
+                                       MOVE    "1"     TO  WRK-FTNKBN
+                                   WHEN    "4"
+                                       IF      RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1"
+                                           MOVE    "3" TO  WRK-FTNKBN
+                                       ELSE
+                                           MOVE    "2" TO  WRK-FTNKBN
+                                       END-IF
+                                   WHEN    "A"
+                                       IF      RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1"
+                                           MOVE    "8" TO  WRK-FTNKBN
+                                       ELSE
+                                           MOVE    "3" TO  WRK-FTNKBN
+                                       END-IF
+                               END-EVALUATE
+                           END-IF
                        END-IF
                    END-IF
       *
