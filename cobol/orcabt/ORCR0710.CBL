@@ -103,6 +103,7 @@
       *  01.02.12    NACL-ÌçÏÆ    05/04/05  ¥ì¥»¥×¥ÈÆÃµ­»ö¹à"12´ï¼£"ÂÐ±þ
       *                                     ¡ÊÊ¿À®£±£·Ç¯£´·î°Ê¹ß¡Ë
       *  01.02.13    NACL-ÌçÏÆ    05/08/12  ¸øÈñÃ±ÆÈ¼ÂÆü¿ô£°µ­ºÜ½¤Àµ
+      *  01.02.14    NACL-Æ£¸¶    05/08/03  ÉéÃ´¼ÔÈÖ¹æ¤Î¾ò·ï¤òÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2828,7 +2829,7 @@
                WHEN    "01"
                    MOVE    SPACE           TO  HC06-KOHFTNJANUM1
                                                HC06-KOHFTNJANUM1N
-               WHEN    OTHER
+               WHEN    "02"
                    INITIALIZE              ORCSKANACHKAREA
                    MOVE    "1"             TO  KANACHK-SYORI 
                    MOVE    RECE62-2006-FTNJANUM (IDA)
@@ -2838,6 +2839,23 @@
                        MOVE    RECE62-2006-FTNJANUM (IDA)
                                                TO  HC06-KOHFTNJANUM1 
                        MOVE    SPACE           TO  HC06-KOHFTNJANUM1N
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE62-KOHFTNJANUM (IDA)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE62-KOHFTNJANUM (IDA) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  HC06-KOHFTNJANUM1 
+                           MOVE    SPACE       TO  HC06-KOHFTNJANUM1N
+                       END-IF
                    END-IF
            END-EVALUATE
       *    ¸ø¼õ£±
@@ -2866,7 +2884,7 @@
                WHEN    "01"
                    MOVE    SPACE           TO  HC06-KOHFTNJANUM2
                                                HC06-KOHFTNJANUM2N
-               WHEN    OTHER
+               WHEN    "02"
                    INITIALIZE              ORCSKANACHKAREA
                    MOVE    "1"             TO  KANACHK-SYORI 
                    MOVE    RECE62-2006-FTNJANUM (IDB)
@@ -2876,6 +2894,23 @@
                        MOVE    RECE62-2006-FTNJANUM (IDB)
                                                TO  HC06-KOHFTNJANUM2
                        MOVE    SPACE           TO  HC06-KOHFTNJANUM2N
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE62-KOHFTNJANUM (IDB)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE62-KOHFTNJANUM (IDB) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  HC06-KOHFTNJANUM2
+                           MOVE    SPACE       TO  HC06-KOHFTNJANUM2N
+                       END-IF
                    END-IF
            END-EVALUATE
       *    ¸ø¼õ£²
@@ -3567,16 +3602,35 @@
                    CONTINUE
                WHEN    "01"
                    MOVE  ZERO               TO  OCR2-FTNJANUM
-               WHEN    OTHER
+               WHEN    "02"
                    INITIALIZE                   ORCSNUMAREA
                    MOVE    RECE62-2006-FTNJANUM (IDA)
                                             TO  SNUM-INX
                    CALL    "ORCSNUM"        USING   ORCSNUMAREA
                    IF      SNUM-RC          =   ZERO
-                       MOVE   SNUM-OUTNUM
-                                            TO  OCR2-FTNJANUM
+                       MOVE   SNUM-OUTNUM   TO  OCR2-FTNJANUM
                    ELSE
                        MOVE   ZERO          TO  OCR2-FTNJANUM
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE62-KOHFTNJANUM (IDA)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE62-KOHFTNJANUM (IDA) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  OCR2-FTNJANUM
+                       ELSE
+                           MOVE   ZERO         TO  OCR2-FTNJANUM
+                       END-IF
+                   ELSE
+                       MOVE   ZERO         TO  OCR2-FTNJANUM
                    END-IF
            END-EVALUATE
       *
@@ -3605,7 +3659,7 @@
                    CONTINUE
                WHEN    "01"
                    MOVE  ZERO               TO      OCR3-FTNJANUM
-               WHEN    OTHER
+               WHEN    "02"
                    INITIALIZE                       ORCSNUMAREA
                    MOVE    RECE62-2006-FTNJANUM (IDB)
                                             TO      SNUM-INX
@@ -3615,6 +3669,26 @@
                                         TO      OCR3-FTNJANUM
                    ELSE
                        MOVE   ZERO      TO      OCR3-FTNJANUM
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE62-KOHFTNJANUM (IDB)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE62-KOHFTNJANUM (IDB) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  OCR3-FTNJANUM
+                       ELSE
+                           MOVE   ZERO         TO  OCR3-FTNJANUM
+                       END-IF
+                   ELSE
+                       MOVE   ZERO         TO  OCR3-FTNJANUM
                    END-IF
            END-EVALUATE
       *    ¸øÈñ£²¼õµë¼ÔÈÖ¹æ

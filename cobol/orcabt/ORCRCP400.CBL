@@ -74,6 +74,7 @@
       *                                     ¤ë¥ì¥»¥×¥ÈÊÔ½¸
       *  01.01.23    NACL-ÌçÏÆ    05/04/05  ¥ì¥»¥×¥ÈÆÃµ­»ö¹à"12´ï¼£"ÂÐ±þ
       *                                     ¡ÊÊ¿À®£±£·Ç¯£´·î°Ê¹ß¡Ë
+      *  01.01.24    NACL-Æ£¸¶    05/08/03  ÉéÃ´¼ÔÈÖ¹æ¤Î¾ò·ï¤òÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2695,6 +2696,118 @@
                    END-IF
                END-IF                    
            END-IF    
+      *
+      *    ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊó
+      *    ¸øÉé£±
+           EVALUATE    RECE02-2006-FTNJANUMKBN  (IDA)
+               WHEN    SPACE
+                   CONTINUE
+               WHEN    "01"
+                   MOVE    SPACE           TO  HC06-KOHFTNJANUM1
+                                               HC06-KOHFTNJANUM1N
+               WHEN    "02"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-2006-FTNJANUM (IDA)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       MOVE    RECE02-2006-FTNJANUM (IDA)
+                                               TO  HC06-KOHFTNJANUM1 
+                       MOVE    SPACE           TO  HC06-KOHFTNJANUM1N
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-KOHFTNJANUM (IDA)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE02-KOHFTNJANUM (IDA) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  HC06-KOHFTNJANUM1 
+                           MOVE    SPACE       TO  HC06-KOHFTNJANUM1N
+                       END-IF
+                   END-IF
+           END-EVALUATE
+      *    ¸ø¼õ£±
+           EVALUATE    RECE02-2006-JKYSNUMKBN  (IDA)
+               WHEN    SPACE
+                   CONTINUE
+               WHEN    "01"
+                   MOVE    SPACE           TO  HC06-KOHJKYSNUM1
+                                               HC06-KOHJKYSNUM1N
+               WHEN    OTHER
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-2006-JKYSNUM (IDA)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       MOVE    RECE02-2006-JKYSNUM (IDA)
+                                               TO  HC06-KOHJKYSNUM1
+                       MOVE    SPACE           TO  HC06-KOHJKYSNUM1N
+                   END-IF
+           END-EVALUATE
+      *    ¸øÉé£²
+           EVALUATE    RECE02-2006-FTNJANUMKBN  (IDB)
+               WHEN    SPACE
+                   CONTINUE
+               WHEN    "01"
+                   MOVE    SPACE           TO  HC06-KOHFTNJANUM2
+                                               HC06-KOHFTNJANUM2N
+               WHEN    "02"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-2006-FTNJANUM (IDB)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       MOVE    RECE02-2006-FTNJANUM (IDB)
+                                               TO  HC06-KOHFTNJANUM2
+                       MOVE    SPACE           TO  HC06-KOHFTNJANUM2N
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-KOHFTNJANUM (IDB)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE02-KOHFTNJANUM (IDB) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  HC06-KOHFTNJANUM2
+                           MOVE    SPACE       TO  HC06-KOHFTNJANUM2N
+                       END-IF
+                   END-IF
+           END-EVALUATE
+      *    ¸ø¼õ£²
+           EVALUATE    RECE02-2006-JKYSNUMKBN  (IDB)
+               WHEN    SPACE
+                   CONTINUE
+               WHEN    "01"
+                   MOVE    SPACE           TO  HC06-KOHJKYSNUM2
+                                               HC06-KOHJKYSNUM2N
+               WHEN    OTHER
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-2006-JKYSNUM (IDB)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       MOVE    RECE02-2006-JKYSNUM (IDB)
+                                               TO  HC06-KOHJKYSNUM2
+                       MOVE    SPACE           TO  HC06-KOHJKYSNUM2N
+                   END-IF
+           END-EVALUATE
       *        ¸©Ã±ÍÑ¹àÌÜ
            IF      FLG-RECE11              =   ZERO
                IF      RECE11-KOHINF (IDA) NOT =   SPACE

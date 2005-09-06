@@ -30,6 +30,7 @@
       *  00.00.01    NACL-藤原    05/05/17  レセプト特記事項編集情報に
       *                                     「2 老人医療受給がない場合」
       *                                      を追加
+      *  02.06.01    NACL-藤原    05/08/03  負担者番号の条件を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -466,7 +467,10 @@
            MOVE    "02"            TO  SPA-GMN-FTNJANUMKBNL      (2)
            MOVE    "固定の文字列を記載する"
                                    TO  SPA-GMN-FTNJANUMKBNMEIL   (2)
-           MOVE    2               TO  SPA-GMN-FTNJANUMKBN-MAX
+           MOVE    "03"            TO  SPA-GMN-FTNJANUMKBNL      (3)
+           MOVE    "前にゼロづめにして記載"
+                                   TO  SPA-GMN-FTNJANUMKBNMEIL   (3)
+           MOVE    3               TO  SPA-GMN-FTNJANUMKBN-MAX
       *
            MOVE    "01"            TO  SPA-GMN-JKYSNUMKBNL       (1)
            MOVE    "記録しない"    TO  SPA-GMN-JKYSNUMKBNMEIL    (1)
@@ -1383,7 +1387,7 @@
                ELSE
                    MOVE    WRK-KBNMEI          TO
                                                SPA-GMN-FTNJANUMKBNMEI
-                   IF      SPA-GMN-FTNJANUMKBN =   "01"
+                   IF      SPA-GMN-FTNJANUMKBN =   "01"    OR  "03"
                        MOVE    SPACE               TO  SPA-GMN-FTNJANUM
                    END-IF
                    IF      SPA-GMN-HKNNUM      =   SPACE
@@ -1393,8 +1397,9 @@
            END-IF 
       *
            IF      SPA-ERRCD           =   SPACE
-               IF    ( WRK-MCP-WIDGET      =   "FTNJANUMKBN"    )
-               AND   ( SPA-GMN-FTNJANUMKBN =   SPACE   OR  "01" )
+               IF    ( WRK-MCP-WIDGET      =   "FTNJANUMKBN"          )
+               AND   ( SPA-GMN-FTNJANUMKBN =   SPACE   OR  "01"    OR
+                                               "03"                   )
                    MOVE    13                  TO  SPA-GMN-CUR
                END-IF
            ELSE
@@ -1593,7 +1598,8 @@
                ELSE
                    MOVE    WRK-KBNMEI      TO
                                        SPA-GMN-RECEDEN-FTNJANUMKBNMEI
-                   IF      SPA-GMN-RECEDEN-FTNJANUMKBN =   "01"
+                   IF      SPA-GMN-RECEDEN-FTNJANUMKBN =   "01"    OR
+                                                           "03"
                        MOVE    SPACE       TO  SPA-GMN-RECEDEN-FTNJANUM
                    END-IF
                    IF      SPA-GMN-HKNNUM  =   SPACE
@@ -1603,9 +1609,10 @@
            END-IF 
       *
            IF      SPA-ERRCD           =   SPACE
-               IF    ( WRK-MCP-WIDGET      =   "RECEDEN_FTNJANUMKBN" )
+               IF    ( WRK-MCP-WIDGET      =   "RECEDEN_FTNJANUMKBN"  )
                AND   ( SPA-GMN-RECEDEN-FTNJANUMKBN
-                                           =   SPACE   OR  "01"      )
+                                           =   SPACE   OR  "01"    OR
+                                               "03"                   )
                    MOVE    105                 TO  SPA-GMN-CUR
                END-IF
            ELSE

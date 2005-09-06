@@ -72,6 +72,7 @@
       *  01.00.19    NACL-∆£∏∂    05/08/31  ∞¶…≤∏©§Œ√œ ˝∏¯»Ò§ŒæÏπÁ§À£π£∑
       *                                     §Œ…È√¥∂Ë ¨§Ú —ππ§π§Î
       *  01.00.20    NACL-æÆ∆¶¬Ù  05/09/05   °≤¨œ∑øÕ∏¯»Ò£≤≥‰§Œ ›∏±»÷πÊ —ππ
+      *  01.00.21    NACL-∆£∏∂    05/08/03  …È√¥º‘»÷πÊ§ŒæÚ∑Ô§Úƒ…≤√
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1963,7 +1964,7 @@
                    CONTINUE
                WHEN    "01"
                    MOVE    SPACE           TO  WRK-DATA
-               WHEN    OTHER
+               WHEN    "02"
                    INITIALIZE              ORCSKANACHKAREA
                    MOVE    "1"             TO  KANACHK-SYORI 
                    MOVE    RECE62-2006-RECEDEN-FTNJANUM (IDY)
@@ -1972,6 +1973,22 @@
                    IF      KANACHK-SYUBETU =   "1"
                        MOVE    RECE62-2006-RECEDEN-FTNJANUM (IDY)
                                                TO  WRK-DATA
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE62-KOHFTNJANUM (IDY)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE62-KOHFTNJANUM (IDY) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  WRK-DATA
+                       END-IF
                    END-IF
            END-EVALUATE
            MOVE    8                   TO  WRK-NAGASA

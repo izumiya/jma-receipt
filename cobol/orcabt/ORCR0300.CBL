@@ -155,6 +155,7 @@
       *                                     「主」の記録についてより
       *                                    「0000998」を「0000999」に変更
       *  01.02.21    NACL-小豆沢  05/09/05  福岡老人公費２割の保険番号変更
+      *  01.02.22    NACL-藤原    05/08/03  負担者番号の条件を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1746,7 +1747,7 @@
                    CONTINUE
                WHEN    "01"
                    MOVE    SPACE           TO  WRK-DATA
-               WHEN    OTHER
+               WHEN    "02"
                    INITIALIZE              ORCSKANACHKAREA
                    MOVE    "1"             TO  KANACHK-SYORI 
                    MOVE    RECE02-2006-RECEDEN-FTNJANUM (IDY)
@@ -1755,6 +1756,22 @@
                    IF      KANACHK-SYUBETU =   "1"
                        MOVE    RECE02-2006-RECEDEN-FTNJANUM (IDY)
                                                TO  WRK-DATA
+                   END-IF
+               WHEN    "03"
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "1"             TO  KANACHK-SYORI 
+                   MOVE    RECE02-KOHFTNJANUM (IDY)
+                                           TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF      KANACHK-SYUBETU =   "1"
+                       INITIALIZE                   ORCSNUMAREA
+                       MOVE    RECE02-KOHFTNJANUM (IDY) (1:KANACHK-MAX)
+                                                TO  SNUM-INX
+                       CALL    "ORCSNUM"        USING   ORCSNUMAREA
+                       IF      SNUM-RC          =   ZERO
+                           MOVE   SNUM-OUTEDT (8:8)
+                                               TO  WRK-DATA
+                       END-IF
                    END-IF
            END-EVALUATE
            MOVE    8                   TO  WRK-NAGASA
