@@ -1408,8 +1408,8 @@
                IF      FLG-HKNCOMBI        =   ZERO
                    MOVE    ZERO                TO  WRK-ST-SRYYMD
                    MOVE    ZERO                TO  WRK-ED-SRYYMD
-                   MOVE    SPA-SRYYMD(1:6)     TO  WRK-ST-SRYYMD
-                   MOVE    SPA-SRYYMD(1:6)     TO  WRK-ED-SRYYMD
+                   MOVE    SPA-SRYYMD(1:6)     TO  WRK-ST-SRYYMD(1:6)
+                   MOVE    SPA-SRYYMD(1:6)     TO  WRK-ED-SRYYMD(1:6)
                    PERFORM VARYING IDXS    FROM    1   BY  1
                            UNTIL   IDXS    >       31
                        IF      SPA-GMN-DAY (IDXS)  >   ZERO
