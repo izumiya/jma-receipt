@@ -136,6 +136,10 @@
       *                                     の編集修正
       *  01.03.06    NACL-門脇    05/07/07  更生・育成の日割計算時の
       *                                     一部負担額記載修正
+      *  01.03.07    NACL-小豆沢  05/09/16  以下の特定入院料の外泊計算を修正
+      *                                     診療所老人医療管理料
+      *                                     老人性認知症疾患治療病棟入院料１
+      *                                     老人性認知症疾患治療病棟入院料２
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3956,6 +3960,15 @@
                      MOVE  "190097010"      TO   WRK-GAIHAKU-SRYCD
                WHEN  "190813870"
                      MOVE  "190805710"      TO   WRK-GAIHAKU-SRYCD
+      *        診療所老人医療管理料
+               WHEN  "190774210"
+                     MOVE  "190774110"      TO   WRK-GAIHAKU-SRYCD
+      *        老人性認知症疾患治療病棟入院料１
+               WHEN  "190740010"
+                     MOVE  "190739910"      TO   WRK-GAIHAKU-SRYCD
+      *        老人性認知症疾患治療病棟入院料２
+               WHEN  "190813510"
+                     MOVE  "190813410"      TO   WRK-GAIHAKU-SRYCD
            END-EVALUATE
       *
            IF    WRK-GAIHAKU-SRYCD    NOT =   SPACE
