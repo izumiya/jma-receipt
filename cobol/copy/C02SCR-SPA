@@ -50,6 +50,8 @@
       *  01.05.02    NACL-藤原    04/02/24  入外区分の表示切替の機能追加
       *  01.05.03    NACL-藤原    04/03/08  手術歴登録画面の追加
       *  01.05.04    NACL-藤原    04/06/10  簡単修正画面の保険組合せ数を変更
+      *
+      *  02.06.01    NACL-藤原    05/08/26  労災・自賠責存在フラグを追加
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -244,6 +246,7 @@
                        09  SPA-NAI-C02-HEAD.
                            11  SPA-NAI-C02-PTID            PIC 9(10).
                            11  SPA-NAI-C02-BIRTHDAY        PIC X(08).
+                           11  SPA-NAI-C02-HKNCOMBI-ROUSAI PIC 9(01).
                        09  SPA-NAI-C02-KOUMOKU.
                            11  SPA-NAI-C02-SRYYMD          PIC X(08).
                            11  SPA-NAI-C02-RENNUM          PIC 9(02).
