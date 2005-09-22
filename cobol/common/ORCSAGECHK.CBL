@@ -41,6 +41,7 @@
       * 01.00.10     NACL-Â¿¡¹Ç¼  04/01/06  Êñ³ç¤Þ¤È¤áÆþÎÏÄÉ²Ã
       * 01.00.11     NACL-Â¿¡¹Ç¼  04/04/21  Ï·¿Í¶èÊ¬£²¡¢ÊÝ¸±¶èÊ¬ÄÉ²Ã
       *                                     ¼ÂÇ¯ÎðÄÉ²Ã
+      * 01.00.12     NACL-Â¿¡¹Ç¼  05/09/22  Ä¹ºê¸©ÈïÇú¼Ô°åÎÅ¡Ê£±£¸£¶¡ËÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -70,6 +71,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-OK2             PIC 9(01).
            03  FLG-HKN-ERR         PIC 9(01).
+           03  FLG-KOH186          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -111,6 +113,9 @@
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
+      *
+      *    ´ðËÜ¾ðÊó
+           COPY    "CPSK1001.INC".
       *
       *    Ï«ºÒ°åÎÅµ¡´Ø¾ðÊó
            COPY    "CPSK4001.INC".
@@ -389,6 +394,16 @@
       *    Ï·¿ÍÈ½Äê
            PERFORM 2009-ROUJIN-HANTEI-SEC
       *
+      *    Ä¹ºê¸©¤ÎÈïÇú¼Ô°åÎÅ¡Ê£±£¸£¶¡Ë¤ÏÃ±ÆÈ²ÄÇ½
+           MOVE    ZERO                TO  FLG-KOH186
+           IF      (COMB-HKNNUM         =   SPACE )  AND
+                   (COMB-KOH1HKNNUM     =   "186" )  AND
+                   (COMB-KOH2HKNNUM     =   SPACE )  AND
+                   (COMB-KOH3HKNNUM     =   SPACE )  AND
+                   (COMB-KOH4HKNNUM     =   SPACE )
+               PERFORM 20101-KOH186-CHK-SEC
+           END-IF
+      *
       *    £È£±£´¡¥£±£°²þÀµ¸å°Ê²¼¤Î¥Á¥§¥Ã¥¯¤ò¹Ô¤¦
            IF      AGECHK-SRYYMD       >=  "20021001"
                CONTINUE
@@ -412,6 +427,11 @@
       *
       *    £·£°ºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í¤Ç¤¢¤ë¤³¤È
            IF      AGECHK-NENREI       <   70
+               GO      TO      200-FTNRATE-EXT
+           END-IF
+      *
+      *    Ä¹ºê¸©¤ÎÈïÇú¼Ô°åÎÅ¡Ê£±£¸£¶¡ËÃ±ÆÈ¤Ï¥Á¥§¥¯¤Ê¤·
+           IF      FLG-KOH186          =   1
                GO      TO      200-FTNRATE-EXT
            END-IF
       *
@@ -824,7 +844,49 @@
        20010-ROUJIN-CHK2-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    Ä¹ºê¸©¤ÎÈïÇú¼Ô°åÎÅ¡Ê£±£¸£¶¡Ë½èÍý
+      *****************************************************************
+       20101-KOH186-CHK-SEC         SECTION.
       *
+      *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷¡Ê´ðËÜ¾ðÊó¡Ë
+           MOVE    SPACE               TO  SYS-1001-REC
+           INITIALIZE                  SYS-1001-REC
+           MOVE    "1001"              TO  SYS-1001-KANRICD
+           MOVE    "*"                 TO  SYS-1001-KBNCD
+           MOVE    SYS-1001-REC        TO  MCPDATA-REC
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+           MOVE    AGECHK-SRYYMD       TO  ORC-DBYMD
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  SYS-1001-REC
+               INITIALIZE                  SYS-1001-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1001-REC
+      *        ¸©ÈÖ¹æ
+               IF      SYS-1001-PREFNUM    =   "42"
+                   MOVE    1                TO  FLG-KOH186
+               END-IF
+           END-IF
+           MOVE    "SYSKANRI-KEY"      TO  ORC-DBPATH
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           .
+       20101-KOH186-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    ÊÝ¸±¾ðÊó½èÍý
       *****************************************************************
