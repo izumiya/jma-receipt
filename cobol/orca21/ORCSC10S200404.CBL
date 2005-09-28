@@ -46,6 +46,8 @@
       *                                     ¡Ê¥ì¥»ÅÅ¥³¡¼¥É¤ÎÊÑ¹¹¤Ê¤·¡Ë
       * 02.00.02     NACL-Â¿¡¹Ç¼  03/10/27  °é»ù±ÉÍÜ²Ã»»¼«Æ°»»ÄêÄÉ²Ã
       * 02.00.02     NACL-Â¿¡¹Ç¼  04/03/11  ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯½¤Àµ
+      * 02.00.03     NACL-Â¿¡¹Ç¼  05/09/28  ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤È
+      *                                     ºßÂðÎÅÍÜ»ØÆ³´ÉÍýÎÁ¤Î»»Äê½¤Àµ
       *****************************************************************
       *
       *
@@ -289,6 +291,8 @@
                05  WRK-DRCD1               PIC X(01).
                05  WRK-DRCD2               PIC X(04).
            03  WRK-DRCD-MEI                PIC X(80).
+      *    ºßÂðÎÅÍÜ»ØÆ³ÎÁ»»Äê
+           03  WRK-ZAITAKU-CNT         PIC 9(04).
       *
       *    ¿Ç»¡ÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-SINSATU-AREA.
@@ -676,6 +680,7 @@
       *    ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
            IF     (SPA-SYONIKA         =   1   )  AND
                   (SPA-NYUGAIKBN       =   "2" )
+             AND  (WRK-ZAITAKU-CNT     =   ZERO)
                PERFORM 1001-SYONIKA-CHK-SEC
            ELSE
                MOVE    ZERO                TO  SPA-SYONIKA-ARI3
@@ -1119,6 +1124,8 @@
       *    ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ²ó¿ô¥Á¥§¥Ã¥¯
            MOVE    ZERO                TO  WRK-NYUYOJI
            MOVE    ZERO                TO  WRK-DAYCNT-SUM
+      *    ºßÂðÎÅÍÜ»ØÆ³ÎÁ»»Äê
+           MOVE    ZERO                TO  WRK-ZAITAKU-CNT
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê
            MOVE    ZERO                TO  SPA-NETAKIRI-ARI
            MOVE    ZERO                TO  SPA-NETAKIRI-ARI2
@@ -1337,6 +1344,19 @@
       *        ²ðÃ£¸£°ú
                WHEN    "140048010"
                    ADD     WRK-SYOEN-CNT       TO  SPA-SYOEN-CNT
+      *        ºßÂðÎÅÍÜ»ØÆ³ÎÁ¤ÎÈ½Äê
+               WHEN    OTHER
+                   IF      SANTEI-SRYCD(1:3)   =   "114"
+                       MOVE    SANTEI-SRYCD        TO  TNS-SRYCD
+                       PERFORM 9101-TENSU-READ2-SEC
+                       IF      (FLG-TENSU          =   ZERO ) AND
+                               (TNS-CDKBN-KBN      =   "C"  ) AND
+                               (TNS-CDKBN-KBNNUM   >=  "100" AND
+                                                   <=  "112")
+                           ADD     SANTEI-MSANTEICNT
+                                               TO  WRK-ZAITAKU-CNT
+                       END-IF
+                   END-IF
            END-EVALUATE
       *
            .
@@ -3596,6 +3616,8 @@
       *
            MOVE    ZERO                TO  SPA-SEIKATU-ARI
            MOVE    ZERO                TO  SPA-KYUSEI-FLG
+      *    ºßÂðÎÅÍÜ»ØÆ³ÎÁ»»Äê
+           MOVE    ZERO                TO  WRK-ZAITAKU-CNT
       *
       *    Êñ³ç¤Þ¤È¤áÆþÎÏÂÐ¾Ý³°
            IF      SPA-HKNCOMBINUM     =   "9999"
@@ -3670,6 +3692,16 @@
                    WHEN    "099800101"
                        MOVE    1               TO  SPA-KYUSEI-FLG
                END-EVALUATE
+      *        ºßÂðÎÅÍÜ»ØÆ³ÎÁ¤ÎÈ½Äê
+               IF     (SPA-COM-INPUTCD (IDX)(1:3)  =   "114") AND
+                      (SPA-COM-DATAKBN (IDX)       =   "1"  )
+                   IF     (SPA-COM-CDKBN-KBN(IDX)  =   "C"  ) AND
+                          (SPA-COM-CDKBN-KBNNUM (IDX)
+                                                   >=  "100" AND
+                                                   <=  "112")
+                       MOVE    1               TO  WRK-ZAITAKU-CNT
+                   END-IF
+               END-IF
       *
       *        ¿Ç»¡ÎÁ¸¡º÷
                SET     TBL-IDX             TO  1
@@ -3701,7 +3733,9 @@
                MOVE    SPA-SYONIKA-ARI2    TO  SPA-SYONIKA-ARI
            END-IF
            IF      SPA-SYONIKA-ARI     =   ZERO
-               MOVE    SPA-SYONIKA-ARI3    TO  SPA-SYONIKA-ARI
+               IF      WRK-ZAITAKU-CNT     =   ZERO
+                   MOVE    SPA-SYONIKA-ARI3    TO  SPA-SYONIKA-ARI
+               END-IF
            END-IF
       *    ¿²¤¿¤­¤ê¤¬ºï½ü¤µ¤ì¤¿»þ¡¢£²£´»þ´Ö²Ã»»¤Î¼«Æ°È¯À¸¤ò¤¹¤ë
            IF      SPA-NETAKIRI-ARI    =   ZERO
@@ -5337,7 +5371,51 @@
            .
        910-TENSU-READ-EXT.
            EXIT.
+      *****************************************************************
+      *    ÅÀ¿ô¥Þ¥¹¥¿¡¼ÆÉ¹þ
+      *****************************************************************
+       9101-TENSU-READ2-SEC              SECTION.
       *
+           MOVE    ZERO                TO  TNS-YUKOSTYMD
+           MOVE    ALL "9"             TO  TNS-YUKOEDYMD
+      *
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "TENSU-KEY"         TO  ORC-DBPATH
+           MOVE    SPA-SRYYMD          TO  ORC-DBYMD
+           CALL    "ORCMCPSUB"         USING
+                                       MCPAREA
+                                       ORCMCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "DBFETCH"           TO  MCP-FUNC
+               MOVE    "TENSU-KEY"         TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"          USING
+                                            MCPAREA
+                                            ORCMCPAREA
+                                            MCPDATA-REC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+                   MOVE    ZERO                TO  FLG-TENSU
+               ELSE
+                   INITIALIZE                  TNS-TENSU-REC
+                   MOVE    1                   TO  FLG-TENSU
+               END-IF
+           ELSE
+               INITIALIZE                  TNS-TENSU-REC
+               MOVE    1                   TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           MOVE    "TENSU-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      *
+           .
+       9101-TENSU-READ2-EXT.
+           EXIT.
       *
       *****************************************************************
       *    »»ÄêÎò¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
