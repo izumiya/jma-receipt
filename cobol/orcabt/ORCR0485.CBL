@@ -47,6 +47,7 @@
       *
       *  01.01.01    NACL-藤原    05/01/21  受診日指定対応
       *  01.01.02    NACL-藤原    05/02/10  訂正日指定対応
+      *  01.01.03    NACL-小豆沢  05/10/04  療養期間の再セット編集修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1001,7 +1002,8 @@
       *    療養開始年月日再セット
            PERFORM   VARYING   IDX4   FROM   IDX5   BY  1
                      UNTIL     IDX4    >     IDX6
-                 IF   RECE41-NYUINBITBL(IDX4)  =  SPACE
+                 IF  (RECE41-NYUINBITBL(IDX4)  =  SPACE)  OR
+                     (RECE41-JNISSUTBL(IDX4) =  1)
                      MOVE    IDX4                TO  WRK-ZZ
                      MOVE    WRK-ZZ              TO  HC23-STRDD
                      MOVE    IDX6                TO  IDX4
@@ -1010,7 +1012,8 @@
       *    療養終了年月日再セット
            PERFORM   VARYING   IDX4   FROM   IDX6   BY  -1
                      UNTIL     IDX4    <     IDX5
-                 IF   RECE41-NYUINBITBL(IDX4)  =  SPACE
+                 IF  (RECE41-NYUINBITBL(IDX4)   =  SPACE) OR
+                     (RECE41-JNISSUTBL(IDX4) =  1)
                      MOVE    IDX4                TO  WRK-ZZ
                      MOVE    WRK-ZZ              TO  HC23-ENDDD
                      MOVE    IDX5                TO  IDX4
