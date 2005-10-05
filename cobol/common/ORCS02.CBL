@@ -100,6 +100,7 @@
       *  01.01.13    NACL-ÌçÏÆ    05/08/24  ÀéÍÕ£´£±Ï·¿ÍÂÐ±þ
       *  01.01.14    NACL-ÌçÏÆ    05/08/25  Ê¡Åç¡¢²¬»³ÆÃ¼ì·×»»½¤Àµ
       *  01.01.15    NACL-ÌçÏÆ    05/09/15  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  01.01.16    NACL-ÌçÏÆ    05/09/30  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -154,6 +155,7 @@
            03  FLG-TAIGAI              PIC X(01).
            03  FLG-HIKOTEI             PIC 9(01).
            03  FLG-TUKIHIKAKU          PIC 9(01).
+           03  FLG-MIYAGI              PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -6803,9 +6805,62 @@
                    MOVE    "1"                  TO   HKN-RECEFTNDSPKBN
            END-IF.
       *
+           MOVE      ZERO      TO        FLG-MIYAGI.
+           IF     (WK-1001-PREFNUM         =  04           ) AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "183" OR "383" 
+                                                   OR "483") AND
+                  (LNK-SYU-SRYYMD(1:6)    >= "200510"      )
+      *
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPID       TO  PTKOH-HOSPID
+                MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+                MOVE    COMB-KOHHKNNUM(KOH-IDX)
+                                             TO  PTKOH-KOHNUM
+                MOVE    LNK-SYU-SRYYMD       TO  PTKOH-TEKSTYMD
+                MOVE    LNK-SYU-SRYYMD       TO  PTKOH-TEKEDYMD
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "DBSELECT"           TO  MCP-FUNC
+                MOVE    "PTKOHINF-KEY6"      TO  ORC-DBPATH
+                CALL    "ORCMCPSUB"          USING   MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+                IF      MCP-RC               =       ZERO
+                    MOVE    "PTKOHINF-KEY6"  TO  ORC-DBPATH
+                    PERFORM  PTKOHINF-READ-SEC
+                    PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                        IF   PTKOH-KOHID  =  COMB-KOHID(KOH-IDX)
+                           EVALUATE  PTKOH-FTNJANUM
+                             WHEN    "83040048"
+                             WHEN    "83040097"
+                             WHEN    "83040170"
+                             WHEN    "83040238"
+                             WHEN    "83040261"
+                             WHEN    "83040287"
+                             WHEN    "83040360"
+                             WHEN    "83040410"
+                               MOVE    1    TO  FLG-MIYAGI
+                           END-EVALUATE
+                           MOVE    1        TO  FLG-PTKOHINF
+                        ELSE
+                           MOVE    "PTKOHINF-KEY6"  TO  ORC-DBPATH
+                           PERFORM  PTKOHINF-READ-SEC
+                        END-IF
+                    END-PERFORM
+                END-IF
+                MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+                MOVE    "PTKOHINF-KEY6"     TO  ORC-DBPATH
+                CALL    "ORCMCPSUB"         USING
+                                            MCPAREA
+                                            ORCMCPAREA
+                                            MCPDATA-REC
+      *
+           END-IF.
+      *
       *    ºë¶Ì¸©¤µ¤¤¤¿¤Þ»Ô
-           IF  (WK-1001-PREFNUM          =   11                    )
-           AND (COMB-KOHHKNNUM(KOH-IDX)  =  "352" OR "353" OR "354")
+      *    µÜ¾ë¸©
+           IF ((WK-1001-PREFNUM          =   11                    ) AND
+               (COMB-KOHHKNNUM(KOH-IDX)  =  "352" OR "353" OR "354"))
+           OR ( FLG-MIYAGI          NOT  =   ZERO                   )
                EVALUATE   FLG-SKJ
                    WHEN      0
                      MOVE    390    TO   WK-NYUSKJJYOGAK
