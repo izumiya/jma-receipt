@@ -209,6 +209,7 @@
       *                                     ¤ÎÊÔ½¸½¤Àµ
       *  01.06.07    NACL-ÌçÏÆ    05/06/10  ÉéÃ´¶â³Û¡Ê°ìÉôÉéÃ´³Û¡ËÊÔ½¸
       *                                     ½¤Àµ
+      *  01.06.08    NACL-ÌçÏÆ    05/10/05  ÉÔÍ×¾ò·ïºï½ü
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5532,7 +5533,6 @@
                                            NOT =   SPACE
                            PERFORM VARYING IDXX    FROM    1   BY  1
                                    UNTIL   IDXX    >       4
-                                   OR      RECE02-KOHNUM (IDXX)
                                IF      WRK-RECE02-KOHNUMHC (IDX IDY)   =
                                                    RECE02-KOHNUM (IDXX)
                                    MOVE    WRK-RECE02-KOHNUMHCINF

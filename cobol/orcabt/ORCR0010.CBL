@@ -98,6 +98,8 @@
       *  01.03.06    NACL-藤原    05/07/05  前期高齢者のとき、月途中に
       *                                     給付割合が変更になった場合は
       *                                     それぞれにレセプトを作成する
+      *  01.03.07    NACL-門脇    05/10/05  （福岡県）公費請求テーブルに
+      *                                     書き出す対象を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1066,6 +1068,8 @@
                        AND   ( SYS-1001-PREFNUM
                                                =   "40"              )
                        AND   ( HKN-HBTNUM  NOT =   "41"              )    
+                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
+                                              >=  "1" AND <=  "8"    )
                            ADD     1                      TO  IDZ    
                            MOVE    COMB-KOHHKNNUM (IDX)   TO 
                                           WRK-SEIKYU-KOHHKNNUM(2 IDZ)

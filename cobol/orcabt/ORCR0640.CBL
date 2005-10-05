@@ -140,6 +140,7 @@
       *                                     ¿ÇÎÅ½êÏ·¿Í°åÎÅ´ÉÍýÎÁ
       *                                     Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
       *                                     Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
+      *  01.03.08    NACL-ÌçÏÆ    05/10/05  ÉÔÍ×¾ò·ïºï½ü
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7558,7 +7559,6 @@
                                            NOT =   SPACE
                            PERFORM VARYING IDXX    FROM    1   BY  1
                                    UNTIL   IDXX    >       4
-                                   OR      RECE62-KOHNUM (IDXX)
                                IF      WRK-RECE62-KOHNUMHC (IDX IDY)   =
                                                    RECE62-KOHNUM (IDXX)
                                    MOVE    WRK-RECE62-KOHNUMHCINF
