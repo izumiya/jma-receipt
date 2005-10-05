@@ -141,6 +141,7 @@
       *                                     œ∑øÕ¿≠«ß√Œæ…º¿¥µº£Œ≈…¬≈Ô∆˛±°Œ¡£±
       *                                     œ∑øÕ¿≠«ß√Œæ…º¿¥µº£Œ≈…¬≈Ô∆˛±°Œ¡£≤
       *  01.03.08    NACL-ÃÁœ∆    05/10/05  …‘Õ◊æÚ∑Ô∫ÔΩ¸
+      *  01.03.09    NACL-ÃÁœ∆    05/10/05  ¿∫ø¿ø©ªˆŒ≈Õ‹µ≠∫‹Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6550,7 +6551,7 @@
                       ELSE
                         IF    (SYU-SYUHKNNUM       =   SPACE         )
                         AND   (SYU-KOH1HKNNUM      =   "012" OR "019" 
-                                                             OR "053")
+                                                    OR "020" OR "053")
                         AND   (SYU-KOH2HKNNUM      =   SPACE         )
                         AND   (SYU-KOH3HKNNUM      =   SPACE         )
                         AND   (SYU-KOH4HKNNUM      =   SPACE         )
@@ -6627,7 +6628,7 @@
                       ELSE
                         IF    (SYU-SYUHKNNUM       =   SPACE         )
                         AND   (SYU-KOH1HKNNUM      =   "012" OR "019" 
-                                                             OR "053")
+                                                    OR "020" OR "053")
                         AND   (SYU-KOH2HKNNUM      =   SPACE         )
                         AND   (SYU-KOH3HKNNUM      =   SPACE         )
                         AND   (SYU-KOH4HKNNUM      =   SPACE         )
@@ -6704,7 +6705,7 @@
                       ELSE
                         IF    (SYU-SYUHKNNUM       =   SPACE         )
                         AND   (SYU-KOH1HKNNUM      =   "012" OR "019" 
-                                                             OR "053")
+                                                    OR "020" OR "053")
                         AND   (SYU-KOH2HKNNUM      =   SPACE         )
                         AND   (SYU-KOH3HKNNUM      =   SPACE         )
                         AND   (SYU-KOH4HKNNUM      =   SPACE         )
@@ -6781,7 +6782,7 @@
                       ELSE
                         IF    (SYU-SYUHKNNUM       =   SPACE         )
                         AND   (SYU-KOH1HKNNUM      =   "012" OR "019" 
-                                                             OR "053")
+                                                    OR "020" OR "053")
                         AND   (SYU-KOH2HKNNUM      =   SPACE         )
                         AND   (SYU-KOH3HKNNUM      =   SPACE         )
                         AND   (SYU-KOH4HKNNUM      =   SPACE         )
