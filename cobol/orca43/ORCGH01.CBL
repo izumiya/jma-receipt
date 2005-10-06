@@ -46,6 +46,7 @@
       *                                     ²Ê¥³¡¼¥É¤ÎÆþÎÏ¤Î½¤Àµ
       *  01.02.04    NACL-Æ£¸¶    03/07/05  ´µ¼Ô»áÌ¾¤Ç¤Î¸¡º÷¤òÄÉ²Ã
       *  01.02.05    NACL-Æ£¸¶    04/01/26  ÇÓÂ¾À©¸æ½èÍýÄÉ²Ã
+      *  01.02.06    NACL-Æ£¸¶    05/09/29  Êä½õ¶èÊ¬¤«¤é¤ÎÊÔ½¸¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1055,19 +1056,23 @@
                                    INTO    SPA-H01GMN-HKIGO
            END-STRING
       *
-           EVALUATE    RECE10-HOJOKBN-KEY
-               WHEN    "1"
-               WHEN    "A"
-               WHEN    "D"
-                   MOVE    "¿¦Ì³¾å"    TO  SPA-H01GMN-HHOJOKBN
-               WHEN    "2"
-               WHEN    "B"
-               WHEN    "E"
-                   MOVE    "²¼Á¥£³·î"  TO  SPA-H01GMN-HHOJOKBN
-               WHEN    "3"
-               WHEN    "C"
-               WHEN    "F"
-                   MOVE    "ÄÌ¶ÐºÒ³²"  TO  SPA-H01GMN-HHOJOKBN
+           EVALUATE    RECE10-HKNNUM
+               WHEN    "002"
+               WHEN    "031"  THRU  "034"
+                   EVALUATE    RECE10-HOJOKBN-KEY
+                       WHEN    "1"
+                       WHEN    "A"
+                       WHEN    "D"
+                           MOVE    "¿¦Ì³¾å"    TO  SPA-H01GMN-HHOJOKBN
+                       WHEN    "2"
+                       WHEN    "B"
+                       WHEN    "E"
+                           MOVE    "²¼Á¥£³·î"  TO  SPA-H01GMN-HHOJOKBN
+                       WHEN    "3"
+                       WHEN    "C"
+                       WHEN    "F"
+                           MOVE    "ÄÌ¶ÐºÒ³²"  TO  SPA-H01GMN-HHOJOKBN
+                   END-EVALUATE
            END-EVALUATE
       *
            MOVE    RECE10-SKYYM        TO  SPA-H01NAI-SKYYM

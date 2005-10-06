@@ -37,6 +37,7 @@
       *  01.02.03    NACL-Æ£¸¶    03/02/17  Êä½õ¶èÊ¬¤ÎÄÉ²Ã
       *  01.02.04    NACL-Æ£¸¶    03/05/28  Êä½õ¶èÊ¬¤ÎÈ½Äê¤Î½¤Àµ
       *  01.02.05    NACL-Æ£¸¶    04/01/26  ÇÓÂ¾À©¸æ½èÍýÄÉ²Ã
+      *  01.02.06    NACL-Æ£¸¶    05/09/29  Êä½õ¶èÊ¬¤«¤é¤ÎÊÔ½¸¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -633,19 +634,26 @@
                                        SPA-H99GMN-TRECESYUBETU (IDX)
                MOVE    RECE10-HKNJANUM     TO
                                        SPA-H99GMN-THKNJANUM    (IDX)
-               EVALUATE    RECE10-HOJOKBN-KEY
-                   WHEN    "1"
-                   WHEN    "A"
-                   WHEN    "D"
-                       MOVE    "¿¦Ì³¾å"    TO  SPA-H99GMN-THOJOKBN(IDX)
-                   WHEN    "2"
-                   WHEN    "B"
-                   WHEN    "E"
-                       MOVE    "²¼Á¥£³·î"  TO  SPA-H99GMN-THOJOKBN(IDX)
-                   WHEN    "3"
-                   WHEN    "C"
-                   WHEN    "F"
-                       MOVE    "ÄÌ¶ÐºÒ³²"  TO  SPA-H99GMN-THOJOKBN(IDX)
+               EVALUATE    RECE10-HKNNUM
+                   WHEN    "002"
+                   WHEN    "031"  THRU  "034"
+                       EVALUATE    RECE10-HOJOKBN-KEY
+                           WHEN    "1"
+                           WHEN    "A"
+                           WHEN    "D"
+                               MOVE    "¿¦Ì³¾å"    TO
+                                               SPA-H99GMN-THOJOKBN(IDX)
+                           WHEN    "2"
+                           WHEN    "B"
+                           WHEN    "E"
+                               MOVE    "²¼Á¥£³·î"  TO
+                                               SPA-H99GMN-THOJOKBN(IDX)
+                           WHEN    "3"
+                           WHEN    "C"
+                           WHEN    "F"
+                               MOVE    "ÄÌ¶ÐºÒ³²"  TO
+                                               SPA-H99GMN-THOJOKBN(IDX)
+                       END-EVALUATE
                END-EVALUATE
                STRING  RECE10-KIGO     DELIMITED   BY  SPACE
                        "¡¡"            DELIMITED   BY  SIZE
