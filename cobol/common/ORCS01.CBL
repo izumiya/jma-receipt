@@ -11671,6 +11671,14 @@
       *    ÀÁµá³ÛÈæ³Ó
            MOVE    ZERO               TO    WK-KNJFTNKIN-ENTANI
       *
+      *    ¸øÈñ£±¤Î¤ß
+      ***  IF (COMB-KOH1HKNNUM              NOT = SPACE)   AND
+      ***     (COMB-KOH2HKNNUM              =     SPACE)   AND
+      ***     (COMB-KOH3HKNNUM              =     SPACE)   AND
+      ***     (COMB-KOH4HKNNUM              =     SPACE)
+      ***      MOVE   LNK-SYU-SYUCOMPFTN-ENTANI
+      ***                             TO    WK-KNJFTNKIN-ENTANI
+      ***  END-IF
       *    ¸øÈñ£±¤È¸øÈñ£²
            IF (COMB-KOH1HKNNUM              NOT = SPACE)   AND
               (COMB-KOH2HKNNUM              NOT = SPACE)   AND
@@ -11728,6 +11736,15 @@
       *
       *    ÀÁµá³ÛÈæ³Ó
            MOVE    ZERO               TO    WK-KNJFTNKIN
+      *
+      *    ¸øÈñ£±¤Î¤ß
+      ***  IF (COMB-KOH1HKNNUM              NOT = SPACE)   AND
+      ***     (COMB-KOH2HKNNUM              =     SPACE)   AND
+      ***     (COMB-KOH3HKNNUM              =     SPACE)   AND
+      ***     (COMB-KOH4HKNNUM              =     SPACE)
+      ***      MOVE   LNK-SYU-SYUCOMPFTN    TO    WK-KNJFTNKIN
+      ***      MOVE   WK-KOH1-YAKFTN        TO    LNK-SYU-YKZ-FTN
+      ***  END-IF
       *    ¸øÈñ£±¤È¸øÈñ£²
            IF (COMB-KOH1HKNNUM              NOT = SPACE)   AND
               (COMB-KOH2HKNNUM              NOT = SPACE)   AND
