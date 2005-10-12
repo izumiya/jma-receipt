@@ -2848,19 +2848,22 @@
            INITIALIZE                  ORCSHKNSETAREA
            INITIALIZE                  SPA-AREA
       *
-           MOVE    PTINF-HOSPID    TO  SPA-HOSPID
-           MOVE    PTINF-PTID      TO  SPA-PTID
-           MOVE    PTINF-BIRTHDAY  TO  SPA-BIRTHDAY
-           MOVE    WRK-KJNYMD      TO  SPA-SRYYMD
+           IF    ( FLG-PTINF       =   ZERO )
       *
-           MOVE    ORCBSD01-NYUGAIKBN
-                                   TO  SPA-NYUGAIKBN
-           MOVE    "2"             TO  ORCSHKN-KBN
+               MOVE    PTINF-HOSPID    TO  SPA-HOSPID
+               MOVE    PTINF-PTID      TO  SPA-PTID
+               MOVE    PTINF-BIRTHDAY  TO  SPA-BIRTHDAY
+               MOVE    WRK-KJNYMD      TO  SPA-SRYYMD
       *
-           CALL    "ORCSHKNSET"    USING   SPA-AREA
-                                           ORCSHKNSETAREA
-           IF    ( ORCSHKN-ERRCD   NOT =   ZERO )
-               INITIALIZE              ORCSHKNSETAREA
+               MOVE    ORCBSD01-NYUGAIKBN
+                                       TO  SPA-NYUGAIKBN
+               MOVE    "2"             TO  ORCSHKN-KBN
+      *
+               CALL    "ORCSHKNSET"    USING   SPA-AREA
+                                               ORCSHKNSETAREA
+               IF    ( ORCSHKN-ERRCD   NOT =   ZERO )
+                   INITIALIZE              ORCSHKNSETAREA
+               END-IF
            END-IF
       *
            .
@@ -2874,7 +2877,7 @@
            IF    ( FLG-PTINF       NOT =   ZERO )
                MOVE    "000001"    TO  WRK-ERRCD
                PERFORM 210-ERRMES-HEN-SEC
-               MOVE    1           TO  FLG-CHKEND (13)
+               MOVE    ALL "1"     TO  FLG-CHKEND-G
            END-IF
       *
            .
@@ -6153,7 +6156,7 @@
            COMPUTE CNT-CHKERR  =   CNT-CHKERR  +   1
            MOVE    CNT-CHKERR          TO  DTCHK004-ERRCD-SEQ
       *
-           MOVE    PTINF-PTID          TO  DTCHK004-PTID
+           MOVE    DTCHK003-PTID       TO  DTCHK004-PTID
            MOVE    PTINF-NAME          TO  DTCHK004-NAME
            MOVE    PTINF-BIRTHDAY      TO  DTCHK004-BIRTHDAY
       *
@@ -6161,11 +6164,13 @@
                MOVE    DTCHK004-PTNUM      TO  DTCHK004-R1-PTNUM
                MOVE    DTCHK004-ERRCD      TO  DTCHK004-R1-ERRCD
                MOVE    DTCHK004-ERRCD-SEQ  TO  DTCHK004-R1-ERRCD-SEQ
+               MOVE    DTCHK003-PTID       TO  DTCHK004-R1-DUMMY
            ELSE
                MOVE    PTINF-KANANAME      TO  DTCHK004-R2-KANANAME
                MOVE    DTCHK004-PTNUM      TO  DTCHK004-R2-PTNUM
                MOVE    DTCHK004-ERRCD      TO  DTCHK004-R2-ERRCD
                MOVE    DTCHK004-ERRCD-SEQ  TO  DTCHK004-R2-ERRCD-SEQ
+               MOVE    DTCHK003-PTID       TO  DTCHK004-R2-DUMMY
            END-IF
       *
            .

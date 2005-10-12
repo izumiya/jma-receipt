@@ -356,7 +356,11 @@
            MOVE    WRK-OUT-INPUT       TO  HCM401-RENBAN(CNT-LINE)
       *
       *    患者番号
-           MOVE    DTCHK004-PTNUM      TO  WRK-MAE-INPUT
+           IF    ( DTCHK004-PTNUM  NOT =   SPACE )
+               MOVE    DTCHK004-PTNUM  TO  WRK-MAE-INPUT
+           ELSE
+               MOVE    DTCHK004-PTID   TO  WRK-MAE-INPUT
+           END-IF
            PERFORM 800-ZENKAKU-HEN-SEC
            IF    ( WRK-OUT-INPUT (21:) =   SPACE )
                MOVE    WRK-OUT-INPUT   TO  HCM401-PTNUM (CNT-LINE)
@@ -372,11 +376,13 @@
            END-IF
       *
       *    年齢
-           PERFORM 2201-NENREI-HEN-SEC
-           MOVE    WRK-NENREI          TO  WRK-ZZ9
-           MOVE    WRK-ZZ9             TO  WRK-MAE-INPUT
-           PERFORM 800-ZENKAKU-HEN-SEC
-           MOVE    WRK-OUT-INPUT       TO  HCM401-NENREI(CNT-LINE)
+           IF    ( DTCHK004-BIRTHDAY   NOT =   SPACE )
+               PERFORM 2201-NENREI-HEN-SEC
+               MOVE    WRK-NENREI          TO  WRK-ZZ9
+               MOVE    WRK-ZZ9             TO  WRK-MAE-INPUT
+               PERFORM 800-ZENKAKU-HEN-SEC
+               MOVE    WRK-OUT-INPUT       TO  HCM401-NENREI(CNT-LINE)
+           END-IF
       *
       *    データチェック内容
            IF    ( DTCHK004-ERRMSG (111:)  =   SPACE )
