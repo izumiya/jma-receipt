@@ -1444,7 +1444,7 @@
            MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
       *
            INITIALIZE                  ORCSC95AREA
-           MOVE    "2"                 TO  LNK-SC95-KBN
+           MOVE    "5"                 TO  LNK-SC95-KBN
            MOVE    SPA-SRYYMD          TO  LNK-SC95-SRYYMD
            MOVE    SPA-SRYYMDW         TO  LNK-SC95-SRYYMDG
            MOVE    "K10"               TO  LNK-SC95-PG

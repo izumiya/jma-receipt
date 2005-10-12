@@ -2164,6 +2164,9 @@
       *    更新処理
            MOVE    1                   TO  FLG-CLAIM-OK
            PERFORM 4500-TOROKU-SYORI-SEC
+           IF      SPA-ERRCD (1:1)     =   "K"
+               PERFORM 510-ERRSET-SEC
+           END-IF
       *
           .
        3009-CLAIM-SYORI-EXT.
