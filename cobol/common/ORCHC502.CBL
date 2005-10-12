@@ -886,14 +886,16 @@
       *****************************************************************
        22092-LAST-LINE-SEC          SECTION.
       *
-           IF     (WRK-NAIYOU (IDX-PAGE IDX-LINE)
-                                       =   SPACE ) AND
-                  (IDX-LINE            =   WRK-IDX-MAX  )
-               MOVE    "　　　　　　以下余白"
+           IF      IDX-LINE            <=  WRK-IDX-MAX
+               IF     (WRK-NAIYOU (IDX-PAGE IDX-LINE)
+                                           =   SPACE ) AND
+                      (IDX-LINE            =   WRK-IDX-MAX  )
+                   MOVE    "　　　　　　以下余白"
                                            TO  WRK-NAIYOU
                                                (IDX-PAGE IDX-LINE)
+               END-IF
+               ADD     1                   TO  IDX-LINE
            END-IF
-           ADD     1                   TO  IDX-LINE
            IF      IDX-LINE            <=  WRK-IDX-MAX
                MOVE    "　　　　　　以下余白"
                                            TO  WRK-NAIYOU
