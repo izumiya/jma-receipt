@@ -7816,7 +7816,12 @@
        23072-KOHHI-HIKAKU-SEC           SECTION.
       *
            IF    LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "972"
-             CONTINUE
+             IF  LNK-SYU-KOH-HKNNUM(1)       =  "027"
+               IF  LNK-SYU-KOH-COMPFTN(1) < LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                   MOVE  LNK-SYU-KOH-COMPFTN(1)
+                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+               END-IF
+             END-IF
            ELSE
              EVALUATE    KOH-IDX
                WHEN    2
@@ -7858,7 +7863,19 @@
        23073-KOHHI-HIKAKU2-SEC           SECTION.                             
       *
            IF    LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "972"
-             CONTINUE
+             IF  LNK-SYU-KOH-HKNNUM(1)       =  "027"
+               IF  WK-KOH-COMPFTN(1)  =  ALL"9"
+                 IF  LNK-SYU-KOH-COMPFTN(1) < WK-KOH-COMPFTN(KOH-IDX)
+                     MOVE  LNK-SYU-KOH-COMPFTN(1)
+                                          TO  WK-KOH-COMPFTN(KOH-IDX)
+                 END-IF
+               ELSE
+                 IF  WK-KOH-COMPFTN(1)      < WK-KOH-COMPFTN(KOH-IDX)
+                     MOVE  WK-KOH-COMPFTN(1)
+                                          TO  WK-KOH-COMPFTN(KOH-IDX)
+                 END-IF
+               END-IF
+             END-IF
            ELSE
              EVALUATE    KOH-IDX
                WHEN    2
@@ -8024,7 +8041,13 @@
        23075-KOHHI-HIKAKU4-SEC           SECTION.                             
       *
            IF    LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "972"
-             CONTINUE
+             IF  LNK-SYU-KOH-HKNNUM(1)       =  "027"
+               IF  LNK-SYU-KOH-COMPFTN-ENTANI(1) 
+                               <     LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                   MOVE  LNK-SYU-KOH-COMPFTN-ENTANI(1) 
+                                 TO  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+               END-IF
+             END-IF
            ELSE
              EVALUATE    KOH-IDX
                WHEN    2
