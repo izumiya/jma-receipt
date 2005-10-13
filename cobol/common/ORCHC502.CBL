@@ -869,7 +869,7 @@
       *
            IF     (IDX-S   +   IDX-LINE)   >   WRK-IDX-MAX
                MOVE    "次ページへ続く"    TO  WRK-NAIYOU
-                                     (IDX-PAGE WRK-IDX-MAX)(50:)
+                                     (IDX-PAGE WRK-IDX-MAX)(51:)
                IF      IDX-LINE         >   ZERO
       *            改ページ
                    ADD     1                   TO  IDX-PAGE
