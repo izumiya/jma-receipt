@@ -9050,8 +9050,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-SYUCOMPFTN-ENTANI
                                                  >  ZAN-KOHI-T3(KOH-IDX)
                            MOVE   ZAN-KOHI-T3(KOH-IDX)
@@ -9099,8 +9100,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)
                                                  >  ZAN-KOHI-T3(KOH-IDX)
                            MOVE   ZAN-KOHI-T3(KOH-IDX)
@@ -9147,8 +9149,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    WK-ZENGAKU   >  ZAN-KOHI-T3(KOH-IDX)
                            MOVE   ZAN-KOHI-T3(KOH-IDX)
                                  TO  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
@@ -9199,8 +9202,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-SYUCOMPFTN  >  ZAN-KOHI-T2(KOH-IDX)
                            MOVE   ZAN-KOHI-T2(KOH-IDX)
                                             TO  WK-KOH-COMPFTN(KOH-IDX)
@@ -9249,8 +9253,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF LNK-SYU-KOH-COMPFTN(1) >  ZAN-KOHI-T2(KOH-IDX)
                           MOVE   ZAN-KOHI-T2(KOH-IDX)
                                        TO  WK-KOH-COMPFTN(KOH-IDX)
@@ -9298,8 +9303,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF WK-ZENGAKU    >    ZAN-KOHI-T2(KOH-IDX)
                           MOVE   ZAN-KOHI-T2(KOH-IDX)
                                        TO  WK-KOH-COMPFTN(KOH-IDX)
@@ -9351,8 +9357,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-SYUCOMPFTN  >  ZAN-KOHI-T(KOH-IDX)  
                            MOVE   ZAN-KOHI-T(KOH-IDX)
                                             TO  LNK-SYU-KOH-COMPFTN
@@ -9419,8 +9426,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF LNK-SYU-KOH-COMPFTN(1) >  ZAN-KOHI-T(KOH-IDX)
                           MOVE   ZAN-KOHI-T(KOH-IDX)
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
@@ -9482,8 +9490,9 @@
                                           20 OR  15 OR  22 OR  18 ) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF WK-ZENGAKU    >    ZAN-KOHI-T(KOH-IDX)
                           MOVE   ZAN-KOHI-T(KOH-IDX)
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)

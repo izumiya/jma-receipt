@@ -278,8 +278,6 @@
            03  WK-KEISAN3-ENTANI       PIC 9(08)V9(01).
            03  WK-KEISAN4-ENTANI       PIC 9(08)V9(01).
            03  WK-KEISAN9-ENTANI       PIC 9(08)V9(01).
-      *    03  WK-NISSU1               PIC 9(05).
-      *    03  WK-NISSU2               PIC 9(05).
       *
       *    ÆÃ¼ì·×»»ÍÑ
            03  WK-TOKUSYU-COMPFTN      PIC 9(07).
@@ -535,8 +533,6 @@
            03  WK-KNJFTNKIN-SKJ        PIC 9(07).
            03  WK-RYOYOHI-SKJ          PIC 9(07).
            03  WK-SRYCD                PIC X(09).
-      *    03  WK-TSUSAN-NISSU         PIC 9(04).
-      *    03  WK-SEIKYUKIKAN-NISSU    PIC 9(04).
       *    ¿©Æ²²Ã»»ÂàÈò¥Æ¡¼¥Ö¥ë
        01  WK-SHOKUDOKASAN-TABLE.
            03  WK-SHOKUDOKASAN-T       OCCURS   31.
@@ -2513,10 +2509,8 @@
                            ELSE
                              IF  FLG-SANSHOU3     =   "1"
                                MOVE   15000   TO   MAX-KIN-KOHI1-M
-      *                        MOVE   1       TO   FLG-SKJ
                              ELSE
                                MOVE   24600   TO   MAX-KIN-KOHI1-M
-      *                        MOVE   2       TO   FLG-SKJ
                              END-IF
                            END-IF
                        WHEN   "02"
@@ -2539,10 +2533,8 @@
                            ELSE
                              IF  FLG-SANSHOU3     =   "1"
                                MOVE   15000   TO   MAX-KIN-SYU-M
-      *                        MOVE   1       TO   FLG-SKJ
                              ELSE
                                MOVE   24600   TO   MAX-KIN-SYU-M
-      *                        MOVE   2       TO   FLG-SKJ
                              END-IF
                            END-IF
                        WHEN   "2"
@@ -5533,23 +5525,6 @@
                                         ORCMCPAREA
                                         MCPDATA-REC.
       *
-      *
-      *    MOVE     ZERO                TO  WK-NISSU1
-      *                                     WK-NISSU2.
-      *
-      *    INITIALIZE                   STS-AREA-DAY.
-      *    INITIALIZE                   LNK-DAY5-AREA.
-      *    MOVE    "51"                 TO  LNK-DAY5-IRAI.
-      *    MOVE    LNK-S02-SKYSTYMD     TO  LNK-DAY5-START.
-      *    MOVE    LNK-SYU-SRYYMD       TO  LNK-DAY5-END.
-      *    CALL    "ORCSDAY"            USING   STS-AREA-DAY
-      *                                         LNK-DAY5-AREA.
-      *    IF      ( STS-DAY-RC1    =   ZERO )
-      *        MOVE    LNK-DAY5-NISSU1  TO  WK-NISSU1
-      *        MOVE    LNK-DAY5-NISSU2  TO  WK-NISSU2
-      *    END-IF.
-      *
-      *
            INITIALIZE                            NYUINACCT-REC.
            MOVE    LNK-SYU-HOSPID        TO      NACCT-HOSPID.
            MOVE    LNK-SYU-NYUGAIKBN     TO      NACCT-NYUGAIKBN.
@@ -5749,16 +5724,11 @@
       ******************************************************************
        23044-SHOKUJI-COUNT-SEC         SECTION.
       *
-      *    ADD        WK-NISSU1   TO    WK-SEIKYUKIKAN-NISSU. 
-      *
            MOVE       LNK-SYU-SKYSTYMD(7:2)  TO   IDX-ST.
            MOVE       LNK-SYU-SKYEDYMD(7:2)  TO   IDX-ED.
       *
            PERFORM    VARYING   IDY   FROM   IDX-ST   BY   1
                                     UNTIL    IDY     >    IDX-ED
-      *
-      *      COMPUTE  WK-SEIKYUKIKAN-NISSU  =  WK-SEIKYUKIKAN-NISSU 
-      *                                     +  1
       *
              MOVE     ZERO     TO      WK-SHOKUJI-JIHI
       *
@@ -7171,8 +7141,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-SYUCOMPFTN-ENTANI
                                                  >  ZAN-KOHI-T3(KOH-IDX)
                            MOVE   ZAN-KOHI-T3(KOH-IDX)
@@ -7219,8 +7190,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)
                                                  >  ZAN-KOHI-T3(KOH-IDX)
                            MOVE   ZAN-KOHI-T3(KOH-IDX)
@@ -7266,8 +7238,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    WK-ZENGAKU   >  ZAN-KOHI-T3(KOH-IDX)
                            MOVE   ZAN-KOHI-T3(KOH-IDX)
                                  TO  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
@@ -7317,8 +7290,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF   LNK-SYU-SYUCOMPFTN   >  ZAN-KOHI-T2(KOH-IDX)
                            MOVE   ZAN-KOHI-T2(KOH-IDX)
                                             TO  WK-KOH-COMPFTN(KOH-IDX)
@@ -7366,8 +7340,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-KOH-COMPFTN(1)
                                      >    ZAN-KOHI-T2(KOH-IDX)
                           MOVE   ZAN-KOHI-T2(KOH-IDX)
@@ -7416,8 +7391,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    WK-ZENGAKU   >    ZAN-KOHI-T2(KOH-IDX)
                           MOVE   ZAN-KOHI-T2(KOH-IDX)
                                        TO  WK-KOH-COMPFTN(KOH-IDX)
@@ -7468,8 +7444,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF   LNK-SYU-SYUCOMPFTN   >  ZAN-KOHI-T(KOH-IDX)
                            MOVE   ZAN-KOHI-T(KOH-IDX)
                                             TO  LNK-SYU-KOH-COMPFTN
@@ -7517,8 +7494,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    LNK-SYU-KOH-COMPFTN(1)
                                      >    ZAN-KOHI-T(KOH-IDX)
                           MOVE   ZAN-KOHI-T(KOH-IDX)
@@ -7564,8 +7542,9 @@
                                            20 OR  15 OR  22 OR  18) AND
                          ( LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1) 
                                                      = "0" OR "9" )))
-                     IF  ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  )
-                     AND ( LNK-SYU-SYUHKNNUM            =  SPACE  )
+                     IF (( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "012"  ) AND
+                         ( LNK-SYU-SYUHKNNUM            =  SPACE  ))
+                     OR (  LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "972"   )
                        IF    WK-ZENGAKU   >    ZAN-KOHI-T(KOH-IDX)
                           MOVE   ZAN-KOHI-T(KOH-IDX)
                                        TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
