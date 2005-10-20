@@ -67,8 +67,7 @@
       *  02.00.15    NACL-多々納  05/03/23  平成１７年４月改正対応
       *                                     （公費負担額に'025'追加）
       *  02.00.16    NACL-多々納  05/10/07  ユーザプログラム起動追加
-      *  02.00.17    NACL-多々納  05/10/19  特別療養費追加
-      *  02.00.18    NACL-多々納  05/10/20  公費削除修正
+      *  02.00.17    NACL-多々納  05/09/29  特別療養費追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -971,7 +970,6 @@
                    END-PERFORM
       *        国保
                WHEN    "060"
-               WHEN    "068"
                    PERFORM VARYING     IDT     FROM    1  BY  1
                            UNTIL       IDT     >   7
                        IF      WRK-HJO-REC2 (IDT)(1:1)
@@ -1331,9 +1329,7 @@
       *
       *    継続区分
            IF    ( SPA-NAI-PTHKN-SBTKBN    =   "1"  ) AND
-                 ( SPA-GMN-HKNNUM      NOT =   "060"  AND "067"
-      *        特別療養費追加
-                                           AND "068"  AND "069" )
+                 ( SPA-GMN-HKNNUM      NOT =   "060"  AND "067" )
                IF      SPA-GMN-HKNNUM      =   "002"
                    MOVE    3               TO  WRK-CONT-MAX
                ELSE
@@ -1377,7 +1373,6 @@
                    END-PERFORM
       *        国保
                WHEN    "060"
-               WHEN    "068"
                    PERFORM VARYING   IDT     FROM    1  BY  1
                          UNTIL       IDT     >   7
                        MOVE    WRK-HJO-REC2 (IDT)
@@ -2428,8 +2423,7 @@
                                                    SPA-P02SCRAREA
                                                    SPA-P02KYOUTU
       *            タグ切り替えの時、期間重複はクリアする
-                   IF     (SPA-TAGU-FLG        =   1 )
-                       OR (FLG-ERRCHK          =   1 )
+                   IF      SPA-TAGU-FLG        =   1
                        IF      SPA-ERRCD       =   "0064"  OR
                                                    "0089"
                            MOVE   SPACE            TO  SPA-ERRCD
@@ -2456,7 +2450,6 @@
                                                SPA-P02KYOUTU
       *    タグ切り替えの時、期間重複はクリアする
            IF      SPA-TAGU-FLG        =   1
-               OR (FLG-ERRCHK          =   1 )
                IF      SPA-ERRCD       =   "0088"  OR
                                            "0089"
                    MOVE   SPACE            TO  SPA-ERRCD
@@ -3996,10 +3989,7 @@
                    UNTIL      (IDX     >   SPA-PTHKN-MAX )  OR
                               (SPA-ERRCD   NOT =   SPACE )
                IF     (SPA-PTHKN-SAKJOKBN(IDX) =   SPACE    )  AND
-                      (SPA-PTHKN-HKNNUM  (IDX) =   "060" OR "067"
-      *              特別療養費追加
-                                               OR  "068"
-                                               OR  "069" )
+                      (SPA-PTHKN-HKNNUM  (IDX) =   "060" OR "067" )
                    PERFORM VARYING  IDY     FROM    1   BY  1
                            UNTIL   (IDY     >   SPA-PTKOH-MAX )  OR
                                    (SPA-ERRCD   NOT =   SPACE )
@@ -4010,9 +4000,6 @@
                END-IF
            END-PERFORM
            IF      SPA-GMN-HKNNUM      =   "060" OR "067"
-      *        特別療養費追加
-                                       OR  "068"
-                                       OR  "069"
                MOVE    16              TO  SPA-GMN-CUR
            ELSE
                PERFORM VARYING     IDY     FROM    1   BY  1
@@ -4050,15 +4037,13 @@
                       (SPA-PTHKN-TEKEDYMD (IDX)    >=  SPA-SYSYMD ) AND
                       (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
       *            国保
-                   IF     (SPA-PTHKN-HKNNUM  (IDX) =   "060"
-                                                   OR  "068" )  AND
+                   IF     (SPA-PTHKN-HKNNUM  (IDX) =   "060" )  AND
                           (SPA-PTHKN-HOJOKBN (IDX) =   "1"  OR  "2"
                                                    OR  "4"  OR  "5")
                        MOVE    1                   TO  FLG-RJNCHK
                    END-IF
       *            国保以外
-                   IF     (SPA-PTHKN-HKNNUM(IDX)       =   "060"
-                                                       OR  "068" )  OR
+                   IF     (SPA-PTHKN-HKNNUM(IDX)       =   "060" )  OR
                           (SPA-PTHKN-HKNNUM(IDX)(1:1)  =   "9"   )
                        CONTINUE
                    ELSE
@@ -4126,18 +4111,12 @@
                    MOVE    20                  TO  SPA-GMN-CUR
                ELSE
       *        高齢者保険を自動変換へ
-      *            開始日が７０歳以上
-                   IF      SPA-PTHKN-TEKSTYMD(SPA-HKN-IDX1)
-                                               >=  SPA-BYMD-70
-                       MOVE    "1066"              TO  SPA-ERRCD
-                       MOVE    11                  TO  SPA-GMN-CUR
-                   ELSE
-                       MOVE    SPA-PTHKN-HKNNUM-MEI(SPA-HKN-IDX1)
-                                                   TO  SPA-PIDMSG
-                       MOVE    "0104"              TO  SPA-PIDCD
-                       MOVE    8                   TO  SPA-GMN-CUR
-                  END-IF
+                   MOVE    SPA-PTHKN-HKNNUM-MEI(SPA-HKN-IDX1)
+                                               TO  SPA-PIDMSG
+                   MOVE    "0104"              TO  SPA-PIDCD
+                   MOVE    8                   TO  SPA-GMN-CUR
                END-IF
+               GO      TO      410331-RJN-HKNCHK-EXT
            END-IF
       *
            .
@@ -5299,6 +5278,7 @@
       *
            MOVE    1                   TO  SPA-HKNKOH-FLG
            MOVE    ZERO                TO  FLG-TOUROKU
+           MOVE    ZERO                TO  FLG-ERRCHK
       *    入力チェック処理
            PERFORM 410-INPUT-CHK-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
