@@ -2581,9 +2581,11 @@
       *    画面の空白行をつめる
            PERFORM 41022-PTKOH-TBL-SET-SEC
       *    次のデータを編集する
-           IF      FLG-KOH-DEL         =   1
+      **** IF      FLG-KOH-DEL         =   1
+           IF      SPA-KOH-MAX         <   3
                PERFORM 41023-PTKOH-SAI-SET-SEC
            END-IF
+      **** END-IF
            .
       *
        4102-KOH-CHKALL-EXT.
@@ -2677,26 +2679,27 @@
       *
       *    空いた行へ次ぎのデータを編集する
            MOVE    SPA-KOH-MAX         TO  IDX-K
-           IF      IDX-K               <   3
-               IF     (IDX-K               >   ZERO )  AND
-                      (SPA-NAI-PTKOH-EDANUM(IDX-K) NOT =   ZERO)
+           IF      IDX-K               =   ZERO
+               MOVE    1                   TO  IDX-K2
+           ELSE
+               IF      (SPA-NAI-PTKOH-EDANUM(IDX-K) NOT =   ZERO)
                    MOVE    SPA-NAI-PTKOH-EDANUM(IDX-K) TO  IDX-K2
                    ADD     1                   TO  IDX-K2
                ELSE
-                   MOVE    1                   TO  IDX-K2
+                   MOVE    4                   TO  IDX-K2
                END-IF
-               MOVE    IDX-K               TO  IDY
-               PERFORM VARYING     IDX     FROM    IDX-K2 BY  1
-                       UNTIL      (IDX     >   SPA-PTKOH-MAX )  OR
-                                  (IDY     >=  3    )
-                   IF     (SPA-PTKOH-SAKJOKBN (IDX)    =   SPACE) AND
-                          (SPA-PTKOH-KOHNUM (IDX)  NOT =   SPACE )
-                       ADD     1                   TO  IDY
-                       MOVE    IDY                 TO  SPA-KOH-MAX
-                       PERFORM 3102-KOUHI-HEN-SEC
-                   END-IF
-               END-PERFORM
            END-IF
+           MOVE    IDX-K               TO  IDY
+           PERFORM VARYING     IDX     FROM    IDX-K2 BY  1
+                   UNTIL      (IDX     >   SPA-PTKOH-MAX )  OR
+                              (IDY     >=  3    )
+               IF     (SPA-PTKOH-SAKJOKBN (IDX)    =   SPACE) AND
+                      (SPA-PTKOH-KOHNUM (IDX)  NOT =   SPACE )
+                   ADD     1                   TO  IDY
+                   MOVE    IDY                 TO  SPA-KOH-MAX
+                   PERFORM 3102-KOUHI-HEN-SEC
+               END-IF
+           END-PERFORM
       *
            .
       *
