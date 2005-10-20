@@ -35,6 +35,8 @@
       *  02.06.02    NACL-藤原    05/08/25  労災・自賠責の保険限定の場合の
       *                                     同一診療科の同一病名を登録可能
       *                                     とする
+      *  02.06.03    NACL-藤原    05/10/20  警告表示後の登録処理ができない
+      *                                     ので修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -391,6 +393,9 @@
            ELSE
       *        初期画面セット
                PERFORM 300-SCREEN-SEC
+               IF      FLG-END             =   1
+                   GO      TO      100-INIT-EXT
+               END-IF
       *        画面編集
                PERFORM 500-GMNHEN-SEC
            END-IF
@@ -417,12 +422,14 @@
                IF      SPA-CIDCD       =   "0103"
                    IF      SPA-CID1-FLG    =   "OK"
                        PERFORM 4501-TOUROKU-SYORI-SEC
+                       GO  TO  300-SCREEN-EXT
                    ELSE
                        MOVE    1               TO  SPA-GMN-C10-CUR
                    END-IF
                    MOVE    SPACE           TO  SPA-CIDCD
                                                SPA-CID1-FLG
                    INITIALIZE              SPA-C02-KEIKOKU-FLG-AREA
+                                           SPA-C01-HENSYU-DATA-G
                    GO  TO  300-SCREEN-EXT
                END-IF
            END-IF              
@@ -1765,8 +1772,7 @@
                                    END-IF
                                WHEN    WRK-CHK-SRYYMD
                                                    >   PTBYO-SRYYMD
-                                   IF      WRK-CHK-TENKIYMD
-                                                          =   SPACE
+                                   IF      PTBYO-TENKIYMD =   SPACE
                                        MOVE    1          TO
                                                    SPA-C02-KEIKOKU-FLG1
                                    ELSE
@@ -1880,6 +1886,15 @@
            PERFORM 410-INPUT-CHK-SEC
       *
            IF    ( SPA-ERRCD            =   SPACE )
+      *        修正項目をパラメタに設定     
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       8
+                   MOVE    WRK-HENSYU-DATA-O (IDX)
+                                       TO  SPA-C01-HENSYU-DATA-O (IDX)
+               END-PERFORM
+           END-IF
+      *
+           IF    ( SPA-ERRCD            =   SPACE )
            AND   ( SPA-CIDCD            =   SPACE )
                PERFORM 4501-TOUROKU-SYORI-SEC
            END-IF
@@ -1892,12 +1907,6 @@
       *****************************************************************
        4501-TOUROKU-SYORI-SEC             SECTION.
       *
-      *    修正項目をパラメタに設定     
-           PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       8
-               MOVE    WRK-HENSYU-DATA-O (IDX)
-                                       TO  SPA-C01-HENSYU-DATA-O (IDX)
-           END-PERFORM
            MOVE    "OK"            TO  SPA-CID1-FLG
       *
            MOVE    SPA-C01KYOUTU   TO  SPA-WORK
