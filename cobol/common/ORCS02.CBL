@@ -7010,15 +7010,15 @@
                     PERFORM  PTKOHINF-READ-SEC
                     PERFORM  UNTIL   FLG-PTKOHINF    =   1
                         IF   PTKOH-KOHID  =  COMB-KOHID(KOH-IDX)
-                           EVALUATE  PTKOH-FTNJANUM
-                             WHEN    "83040048"
-                             WHEN    "83040097"
-                             WHEN    "83040170"
-                             WHEN    "83040238"
-                             WHEN    "83040261"
-                             WHEN    "83040287"
-                             WHEN    "83040360"
-                             WHEN    "83040410"
+                           EVALUATE  PTKOH-FTNJANUM(1:7)
+                             WHEN    "8304004"
+                             WHEN    "8304009"
+                             WHEN    "8304017"
+                             WHEN    "8304023"
+                             WHEN    "8304026"
+                             WHEN    "8304028"
+                             WHEN    "8304036"
+                             WHEN    "8304041"
                                MOVE    1    TO  FLG-MIYAGI
                            END-EVALUATE
                            MOVE    1        TO  FLG-PTKOHINF
@@ -7261,6 +7261,10 @@
                      MOVE   ZAN-KOHI-T2(KOH-IDX)   TO                   
                                           WK-KOH-COMPFTN(KOH-IDX)       
                      PERFORM    23073-KOHHI-HIKAKU2-SEC                       
+                 ELSE
+                     MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  TO
+                                          WK-KOH-COMPFTN(KOH-IDX)       
+                     PERFORM    23073-KOHHI-HIKAKU2-SEC
                  END-IF                                                 
                END-IF                                                   
                IF    LNK-SYU-KOH-COMPFTN(KOH-IDX)   >
@@ -9928,13 +9932,17 @@
            END-IF
       *
       *
-           IF      LNK-SYU-SYUCOMPFTN       NOT =   ZERO
+      ***  IF      LNK-SYU-SYUCOMPFTN       NOT =   ZERO
+           IF      WK-TOKUTEI-COMPFTN       NOT =   ZERO
                    COMPUTE   WK-HANGAKU-COMPFTN   =
-                             LNK-SYU-SYUCOMPFTN      *  0.5
+      ***                    LNK-SYU-SYUCOMPFTN      *  0.5
+                             WK-TOKUTEI-COMPFTN      *  0.5
            ELSE
-             IF    LNK-SYU-KOH-COMPFTN(1)   NOT =   ZERO
+      ***    IF    LNK-SYU-KOH-COMPFTN(1)   NOT =   ZERO
+             IF    WK-TOKUTEI-COMPFTN3      NOT =   ZERO
                    COMPUTE   WK-HANGAKU-COMPFTN   =
-                             LNK-SYU-KOH-COMPFTN(1)  *  0.5
+      ***                    LNK-SYU-KOH-COMPFTN(1)  *  0.5
+                             WK-TOKUTEI-COMPFTN3     *  0.5
              ELSE
                    COMPUTE   WK-HANGAKU-COMPFTN   =
                              WK-ZENGAKU  *  0.5
