@@ -338,7 +338,7 @@
            03  WRK-ZI-SAISIN-RRKEDANUM     PIC 9(03).
            03  WRK-KANRICD                 PIC X(04).
            03  WRK-KBNCD                   PIC X(08).
-           03  WRK-TOKNYUIN-NM             PIC X(40).
+           03  WRK-TOKNYUIN-NM             PIC X(48).
            03  WRK-TOKNYUIN-KBN            PIC X(01).
            03  WRK-TOKNYUIN-CD             PIC X(02).
            03  WRK-TAIHI-SRYKA             PIC X(02).
@@ -4379,6 +4379,13 @@
                                            TO  WRK-TOKNYUIN-CD
                    PERFORM 4101-CMB-TOKNYUIN-DAT-SET-SEC
                END-IF
+      *
+               MOVE   "老人一般病棟特定入院基本料（老人特別入院基本料算"
+                                           TO  WRK-TOKNYUIN-NM
+               MOVE    "3"                 TO  WRK-TOKNYUIN-KBN
+               MOVE    "24"                TO  WRK-TOKNYUIN-CD
+               PERFORM 4101-CMB-TOKNYUIN-DAT-SET-SEC
+      *
            END-IF
       *
       *    短期滞在手術基本料をコンボに設定
