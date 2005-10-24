@@ -8629,6 +8629,8 @@
       *****************************************************************
        520-CIDSET-SEC              SECTION.
       *
+           MOVE    SPACE           TO  WRK-CIDMSG
+      *
            EVALUATE    SPA-CIDCD
                WHEN    "0101"
                    MOVE    "内容が修正されています。"
