@@ -211,6 +211,7 @@
            03  WK-TOKUTEI-COMPFTN3     PIC 9(08).
            03  WK-HANGAKU-COMPFTN      PIC 9(07).
            03  WK-HANGAKU-ENTANI       PIC 9(07)V9(01).
+           03  WK-MIYAGI-COMPFTN       PIC 9(07).
            03  WK-JYOSEIGAKU           PIC 9(07).
            03  WK-KEISU                PIC 9V99.
        01  SHOHOUSEN-AREA.
@@ -7745,6 +7746,8 @@
            MOVE    9999999   TO     WK-TOKUSYU-COMPFTN2.
            MOVE    ZERO      TO     WK-TOKUSYU-ENTANI.
       *
+           MOVE    9999999   TO     WK-MIYAGI-COMPFTN.
+      *
            MOVE    ZERO      TO     WK-CYOKI-ZAN.
            MOVE    ZERO      TO     WK-CYOKI-ZAN-ENTANI.
            IF   (COMB-KOH1HKNNUM     = "972") OR
@@ -9350,6 +9353,14 @@
                  END-IF
                 END-IF
                END-IF                                                   
+      *
+               IF    LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0"
+                 MOVE   ZERO   TO   WK-MIYAGI-COMPFTN
+                 IF  LNK-SYU-KOH-HKNNUM(KOH-IDX)  = "015" OR "016" OR
+                                                    "051" OR "052"
+                    MOVE  WK-KOH-COMPFTN(KOH-IDX) TO  WK-MIYAGI-COMPFTN
+                 END-IF
+               END-IF
       **
                IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
                    IF  (( LNK-S01-KOUREI-ZAITAKU-KBN   =   "1"     ) 
@@ -9644,6 +9655,15 @@
                  COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
                            WK-ZENGAKU   *  WK-FUTANWARI
                END-IF
+      *
+               IF    LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0"
+                 MOVE   ZERO   TO   WK-MIYAGI-COMPFTN
+                 IF  LNK-SYU-KOH-HKNNUM(KOH-IDX)  = "010" OR "021"
+                    MOVE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                            TO  WK-MIYAGI-COMPFTN
+                 END-IF
+               END-IF
+      *
                IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =      "027"           
                     MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)                 
                                             TO WK-TOKUTEI-COMPFTN3      
@@ -11306,12 +11326,23 @@
                 WHEN         2
                     MOVE      0.50    TO     WK-KEISU
               END-EVALUATE
-              COMPUTE   WK-JYOSEIGAKU       =
-                        WK-TOKUTEI-COMPFTN  *  WK-KEISU
-              COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
-                        WK-TOKUTEI-COMPFTN  -  WK-JYOSEIGAKU
-              COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
-                        WK-TOKUTEI-COMPFTN  -  WK-JYOSEIGAKU
+      *
+              IF    WK-MIYAGI-COMPFTN  NOT =  9999999
+              AND   WK-TOKUTEI-COMPFTN  >  WK-MIYAGI-COMPFTN
+                COMPUTE   WK-JYOSEIGAKU       =
+                          WK-MIYAGI-COMPFTN   *  WK-KEISU
+                COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                          WK-MIYAGI-COMPFTN   -  WK-JYOSEIGAKU
+                COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
+                          WK-MIYAGI-COMPFTN   -  WK-JYOSEIGAKU
+              ELSE
+                COMPUTE   WK-JYOSEIGAKU       =
+                          WK-TOKUTEI-COMPFTN  *  WK-KEISU
+                COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                          WK-TOKUTEI-COMPFTN  -  WK-JYOSEIGAKU
+                COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
+                          WK-TOKUTEI-COMPFTN  -  WK-JYOSEIGAKU
+              END-IF
            ELSE
               MOVE     ZERO    TO   LNK-SYU-KOH-COMPFTN(KOH-IDX)
               MOVE     ZERO    TO   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
