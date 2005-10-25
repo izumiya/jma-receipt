@@ -29,6 +29,7 @@
       *  01.00.01    NACL-門脇    04/11/15  公費月上限額取得修正
       *  01.00.02    NACL-門脇    04/11/30  入院対応
       *  01.00.03    NACL-門脇    05/08/12  滋賀県地方公費対応
+      *  01.00.04    NACL-門脇    05/10/25  島根県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -50,6 +51,10 @@
            03  FLG-HKNNUM          PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-SYUNOU          PIC 9(01).
+           03  FLG-TSYRRK          PIC 9(01).
+           03  FLG-TNKRRK          PIC 9(01).
+           03  FLG-CHECK           PIC 9(01).
+           03  FLG-OK              PIC 9(01).
            03  FLG-ARI             PIC 9(01).
       *
       *    添字領域
@@ -63,8 +68,16 @@
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-PREFNUM        PIC 9(02).
       *
+           03  WRK-TEISYOTOKU-YMD.
+               05  WRK-TEISYOTOKU-YM PIC 9(06).
+               05  WRK-TEISYOTOKU-DD PIC 9(02).
+      *
+           03  WRK-TEISYOTOKU     PIC X(01).
+           03  WRK-RECEJGNDSPKBN  PIC X(01).
+      *
            03  WRK-HKNCOMBINUM-TBL.
                05  WRK-HKNCOMBINUM   PIC 9(04)  OCCURS 50.
+      *
       *    共通領域
            COPY    "MCPAREA".
       *
@@ -84,6 +97,14 @@
        01  SYUNOU-REC.
            COPY    "CPSYUNOU.INC".
       *
+      *    低所得
+       01  TSYRRK-REC.
+           COPY    "CPTSYRRK.INC".
+      *
+      *    年金
+       01  TNKRRK-REC.
+           COPY    "CPTNKRRK.INC".
+      *
       *    システム管理
            COPY    "CPSK1001.INC".
       *
@@ -93,6 +114,9 @@
       *
       *    公費月上限額取得サブ
            COPY    "CPORCSJGNGET.INC".
+      *
+      *    保険算定用年齢・割合計算サブ
+           COPY    "CPORCSAGECHK.INC".
       *
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
@@ -190,11 +214,14 @@
       *    保険番号マスタからレセプト表示区分と負担上限額の取得
            PERFORM    210-HKNNUM-GET-SEC
       *
-           IF    HKN-RECEJGNDSPKBN    =   "1"
+           IF   FLG-HKNNUM     =    ZERO
+             IF    HKN-RECEJGNDSPKBN    =   "1"
+             OR    WRK-RECEJGNDSPKBN    =   "1"
       *        患者公費負担マスタから負担上限額の取得
                PERFORM    210-PTKOHFTN-GET-SEC
       *        保険の上限額と収納の負担額を比較判定
                PERFORM    210-HANTEI-SEC
+             END-IF
            END-IF
            .
        200-MAIN-EXT.
@@ -204,6 +231,23 @@
       *    保険番号マスタからレセプト表示区分と負担上限額の取得
       *****************************************************************
        210-HKNNUM-GET-SEC       SECTION.
+      *
+           MOVE        ZERO      TO     FLG-CHECK
+           MOVE        ZERO      TO     FLG-OK
+           MOVE        SPACE     TO     WRK-TEISYOTOKU
+           MOVE        SPACE     TO     WRK-RECEJGNDSPKBN
+      *
+           IF  (WRK-PREFNUM           =  32            ) AND
+               (LNK-FTNJGNCHK-KOHNUM  = "191" OR "291"
+                                     OR "190" OR "290" ) AND
+               (LNK-FTNJGNCHK-SRYYM  >= "200510"       )
+      *
+               IF   LNK-FTNJGNCHK-KOHNUM  =  "191"
+                     PERFORM    2101-SYOTOKU-HENSYU-SEC
+               END-IF
+               MOVE     "1"      TO     WRK-RECEJGNDSPKBN
+      *
+           END-IF
       *
            INITIALIZE                           HKNNUM-REC
            MOVE    LNK-FTNJGNCHK-HOSPID TO      HKN-HOSPID
@@ -225,6 +269,8 @@
       *
            IF   FLG-HKNNUM     =    ZERO
              IF    LNK-FTNJGNCHK-NYUGAIKBN     =   "1"
+               EVALUATE   WRK-TEISYOTOKU
+                 WHEN     SPACE
                    MOVE   HKN-HON-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
                    IF  (WRK-PREFNUM           =  25            ) AND
                        (LNK-FTNJGNCHK-KOHNUM  = "140" OR "241" OR
@@ -233,13 +279,35 @@
                        (LNK-FTNJGNCHK-SRYYM  >= "200508"       )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
+                 WHEN     "1"
+                   MOVE   HKN-TNK-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
+                 WHEN     "2"
+                   MOVE   HKN-TSY-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
+               END-EVALUATE
              ELSE
-               IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
-                   MOVE   HKN-HON-GAIMNAIJGNGAK  TO  WRK-HKNMST-JGNGAK
-               END-IF
-               IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
-                   MOVE   HKN-HON-GAIMGAIJGNGAK  TO  WRK-HKNMST-JGNGAK
-               END-IF
+               EVALUATE   WRK-TEISYOTOKU
+                 WHEN     SPACE
+                   IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-HON-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-HON-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+                 WHEN     "1"
+                   IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TNK-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF    HKN-TNK-GAIMGAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TNK-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+                 WHEN     "2"
+                   IF    HKN-TSY-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TSY-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF    HKN-TSY-GAIMGAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TSY-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+               END-EVALUATE
              END-IF
            END-IF
       *
@@ -249,6 +317,82 @@
       *
            .
        210-HKNNUM-GET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    低所得・低年金情報編集
+      *****************************************************************
+       2101-SYOTOKU-HENSYU-SEC       SECTION.
+      *
+           MOVE    LNK-FTNJGNCHK-SRYYM   TO  WRK-TEISYOTOKU-YM
+           MOVE    01                    TO  WRK-TEISYOTOKU-DD
+      *
+      *    年金履歴より
+           INITIALIZE                        TNKRRK-REC
+           MOVE    LNK-FTNJGNCHK-HOSPID  TO  TNKRRK-HOSPID
+           MOVE    LNK-FTNJGNCHK-PTID    TO  TNKRRK-PTID
+           MOVE    TNKRRK-REC            TO  MCPDATA-REC
+           MOVE    "DBSELECT"            TO  MCP-FUNC
+           MOVE    "TNKRRK-KEY3"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"           USING     MCPAREA
+                                                   ORCMCPAREA
+                                                   MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+              MOVE    "TNKRRK-KEY3"      TO  ORC-DBPATH
+              PERFORM 910-TNKRRK-READ-SEC
+              PERFORM  UNTIL
+                   ( FLG-TNKRRK          =   1                 ) OR
+                   ( TNKRRK-STYMD       <=  WRK-TEISYOTOKU-YMD AND
+                     WRK-TEISYOTOKU-YMD <=  TNKRRK-EDYMD       )
+      *
+                 MOVE    "TNKRRK-KEY3"   TO  ORC-DBPATH
+                 PERFORM 910-TNKRRK-READ-SEC
+      *
+              END-PERFORM
+           END-IF
+      *
+           MOVE      "TNKRRK-KEY3"       TO  ORC-DBPATH
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *    低所得より
+           INITIALIZE                        TSYRRK-REC
+           MOVE    LNK-FTNJGNCHK-HOSPID  TO  TSYRRK-HOSPID
+           MOVE    LNK-FTNJGNCHK-PTID    TO  TSYRRK-PTID
+           MOVE    TSYRRK-REC            TO  MCPDATA-REC
+           MOVE    "DBSELECT"            TO  MCP-FUNC
+           MOVE    "TSYRRK-KEY3"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"           USING     MCPAREA
+                                                   ORCMCPAREA
+                                                   MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+              MOVE    "TSYRRK-KEY3"      TO  ORC-DBPATH
+              PERFORM 910-TSYRRK-READ-SEC
+              PERFORM  UNTIL
+                  (  FLG-TSYRRK          =   1                 ) OR
+                  (  TSYRRK-NINSTYMD    <=  WRK-TEISYOTOKU-YMD AND
+                     WRK-TEISYOTOKU-YMD <=  TSYRRK-NINEDYMD    )
+      *
+                 MOVE    "TSYRRK-KEY3"   TO  ORC-DBPATH
+                 PERFORM 910-TSYRRK-READ-SEC
+      *
+              END-PERFORM
+           END-IF
+      *
+           MOVE      "TSYRRK-KEY3"       TO  ORC-DBPATH
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           EVALUATE    FLG-TSYRRK    ALSO     FLG-TNKRRK
+               WHEN    1             ALSO     1
+                     MOVE     SPACE   TO       WRK-TEISYOTOKU
+               WHEN    0             ALSO     1
+                     MOVE     "2"     TO       WRK-TEISYOTOKU
+               WHEN    0             ALSO     0
+               WHEN    1             ALSO     0
+                     MOVE     "1"     TO       WRK-TEISYOTOKU
+           END-EVALUATE
+      *
+           .
+       2101-SYOTOKU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -315,21 +459,93 @@
            ELSE
                MOVE    "HKNCOMBI-KEY4"      TO  ORC-DBPATH
                PERFORM 910-HKNCOMBI-READ-SEC
-               PERFORM   VARYING   IDX1   FROM  1  BY  1
-                 UNTIL   (IDX1              >    50 )   OR
-                         (FLG-HKNCOMBI  NOT =   ZERO)
+      *
+               MOVE      ZERO      TO      IDX
+               PERFORM
+                 UNTIL   (IDX              >=    50 )
+                   OR    (FLG-HKNCOMBI  NOT =   ZERO)
+      *
+                 IF    COMB-DELKBN          =   SPACE
+      *
+                   ADD     1       TO      IDX
                    MOVE    COMB-HKNCOMBINUM  TO
-                                        WRK-HKNCOMBINUM(IDX1)
-                   MOVE    "HKNCOMBI-KEY4"      TO  ORC-DBPATH
-                   PERFORM 910-HKNCOMBI-READ-SEC
+                                        WRK-HKNCOMBINUM(IDX)
+      *
+                   IF    WRK-RECEJGNDSPKBN    =   "1"
+                   AND   FLG-CHECK            =   ZERO
+      *
+                     IF   COMB-HKNNUM     NOT =  SPACE
+                       IF   COMB-KOH1HKNNUM   =  "027"
+                          IF  COMB-KOH1PAYKBN  =  "01"
+                             CONTINUE
+                          ELSE
+                             MOVE    1    TO   FLG-CHECK
+                          END-IF
+                       ELSE
+                          EVALUATE  LNK-FTNJGNCHK-NYUGAIKBN
+                            WHEN       "1"
+                              IF  COMB-HOJOKBN  =  "1" OR "5" OR "9"
+                                 CONTINUE
+                              ELSE
+                                 MOVE    1    TO   FLG-CHECK
+                              END-IF
+                            WHEN       "2"
+                              IF  COMB-HOJOKBN  =  "1" OR "4" OR "9"
+                                 CONTINUE
+                              ELSE
+                                 MOVE    1    TO   FLG-CHECK
+                              END-IF
+                          END-EVALUATE
+                       END-IF
+      *
+                       IF    FLG-CHECK                =   ZERO
+                       AND   LNK-FTNJGNCHK-KOHNUM     =  "191"
+                       AND   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+                       AND   WRK-TEISYOTOKU           =   SPACE
+                       AND   FLG-OK                   =   ZERO
+      *
+                         MOVE    1           TO  FLG-OK
+      *
+                         INITIALIZE              ORCSAGECHKAREA
+                         MOVE    LNK-FTNJGNCHK-HOSPID
+                                             TO  AGECHK-HOSPID
+                         MOVE    LNK-FTNJGNCHK-PTID
+                                             TO  AGECHK-PTID
+                         MOVE    LNK-FTNJGNCHK-SRYYM
+                                             TO  AGECHK-SRYYMD(1:6)
+                         MOVE    "01"        TO  AGECHK-SRYYMD(7:2)
+                         MOVE    PTINF-BIRTHDAY
+                                             TO  AGECHK-BIRTHDAY
+                         CALL    "ORCSAGECHK"    USING
+                                                 ORCSAGECHKAREA
+                         IF      AGECHK-RC       =   ZERO
+                           IF  ( AGECHK-NENREI   >=  70      )
+                           OR  ( AGECHK-NENREI   >=  65  AND
+                                 COMB-KOH1HKNNUM  = "027"    )
+                              MOVE    01      TO  LNK-FTNJGNCHK-RC
+                              MOVE     1      TO  FLG-CHECK
+                           END-IF
+                         END-IF
+                       END-IF
+                     END-IF
+      *
+                   END-IF
+      *
+                 END-IF
+      *
+                 MOVE    "HKNCOMBI-KEY4"      TO  ORC-DBPATH
+                 PERFORM 910-HKNCOMBI-READ-SEC
+      *
                END-PERFORM
            END-IF
       *    保険組合せクローズ
            MOVE    "HKNCOMBI-KEY4"    TO  ORC-DBPATH
            PERFORM   910-DB-CLOSE-SEC
       *
-      *収納マスタから該当公費の患者負担額チェック
-           PERFORM      2101-SYUKEI-SEC
+      *    収納マスタから該当公費の患者負担額チェック
+           IF   FLG-CHECK  =  ZERO
+              PERFORM      2101-SYUKEI-SEC
+           END-IF
       *
            .
        210-HANTEI-EXT.
@@ -478,6 +694,50 @@
            EXIT.
       *
       *****************************************************************
+      *    低所得マスタ読み込み
+      *****************************************************************
+       910-TSYRRK-READ-SEC        SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  TSYRRK-REC
+               MOVE    ZERO            TO  FLG-TSYRRK
+           ELSE
+               INITIALIZE                  TSYRRK-REC
+               MOVE    1               TO  FLG-TSYRRK
+           END-IF
+      *
+           .
+       910-TSYRRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    年金マスタ読み込み
+      *****************************************************************
+       910-TNKRRK-READ-SEC        SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  TNKRRK-REC
+               MOVE    ZERO            TO  FLG-TNKRRK
+           ELSE
+               INITIALIZE                  TNKRRK-REC
+               MOVE    1               TO  FLG-TNKRRK
+           END-IF
+      *
+           .
+       910-TNKRRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    保険組合せマスター検索
       *****************************************************************
        910-HKNCOMBI-SELECT-SEC        SECTION.
@@ -519,7 +779,6 @@
            .
        910-HKNCOMBI-READ-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    収納マスター検索
