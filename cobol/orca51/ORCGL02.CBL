@@ -695,6 +695,11 @@
       *****************************************************************
        4101-KAKUTEI-CHK-SEC        SECTION.
       *
+           IF      SPA-GMN-FILENM1         =   SPACE
+               MOVE    4                   TO  SPA-GMN-CUR
+               MOVE    "0003"              TO  SPA-ERRCD
+               GO  TO  4101-KAKUTEI-CHK-EXT
+           END-IF
       *
            .
        4101-KAKUTEI-CHK-EXT.
