@@ -48,6 +48,7 @@
       * 02.00.02     NACL-Â¿¡¹Ç¼  04/03/11  ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯½¤Àµ
       * 02.00.03     NACL-Â¿¡¹Ç¼  05/09/28  ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤È
       *                                     ºßÂðÎÅÍÜ»ØÆ³´ÉÍýÎÁ¤Î»»Äê½¤Àµ
+      * 02.00.04     NACL-Â¿¡¹Ç¼  05/10/26  ¾Ã±êÄÃÄËÅù½èÃÖÈ½Äê½¤Àµ
       *****************************************************************
       *
       *
@@ -187,6 +188,8 @@
            03  IDX-A-HZN           PIC 9(04).
       *
            03  IDX-INT-MAX          PIC 9(04).
+      *
+           03  IDX-STR              PIC 9(02).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -1275,16 +1278,24 @@
       *
       *    ¾Ã±êÄÃÄË½èÃÖ¤Î»þ¡¢ÄûÀµÆü¤Þ¤Ç¤Î²ó¿ô¤È¤¹¤ë
            MOVE    ZERO                TO  WRK-SYOEN-CNT
+      *    µÞÀ­È¯À¸Æü°ÊÁ°¤ÏÂÐ¾Ý³°
+           IF     (SPA-KYUSEI-YMD  NOT =   SPACE )  AND
+                  (SPA-KYUSEI-YMD(1:6) =   SPA-SRYYMD(1:6))
+               MOVE    SPA-KYUSEI-YMD(7:2)     TO  IDX-STR
+           ELSE
+               MOVE    1                       TO  IDX-STR
+           END-IF
+      *
            IF      SPA-SYORIFLG        =   1
                MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
-               PERFORM VARYING     IDX-Y3  FROM  1  BY  1
-                       UNTIL       IDX-Y3  >=   IDX-Y2
-                   ADD     SANTEI-DAY (IDX-Y3)
-                                               TO  WRK-SYOEN-CNT
-               END-PERFORM
            ELSE
-               MOVE    SANTEI-MSANTEICNT   TO  WRK-SYOEN-CNT
+               MOVE    32                  TO  IDX-Y2
            END-IF
+           PERFORM VARYING     IDX-Y3  FROM  IDX-STR  BY  1
+                   UNTIL       IDX-Y3  >=    IDX-Y2
+               ADD     SANTEI-DAY (IDX-Y3)
+                                           TO  WRK-SYOEN-CNT
+           END-PERFORM
       *
            EVALUATE    SANTEI-SRYCD
       *        ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
