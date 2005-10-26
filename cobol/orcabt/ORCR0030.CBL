@@ -221,8 +221,7 @@
       *  02.06.12    NACL-ÃÁœ∆    05/09/22  ¡¥πÒ≈⁄Ã⁄∑˙√€°¢¡¥πÒ»ƒ∂‚∂»°‹
       *                                     ¿∫ø¿°¢∑Î≥À¬–±˛
       *  02.06.13    NACL-ÃÁœ∆    05/09/28  ≈Á∫¨∏©√œ ˝∏¯»Ò£±£∞∑Ó≤˛¿µ¬–±˛
-      *
-      *  02.07.01    NACL-∆£∏∂    05/08/20  ∆√ ÃŒ≈Õ‹»Ò¬–±˛
+      *  02.06.14    NACL-ÃÁœ∆    05/10/26  µ‹æÎ∏©√œ ˝∏¯»Ò£±£∞∑Ó≤˛¿µ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -355,6 +354,7 @@
            03  FLG-RECE09                              PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
            03  FLG-TOKKI                               PIC 9(01).
+           03  FLG-MIYAGI                              PIC 9(01).
       *
       *    ¥À‹≈¿øÙ§Œ»Û…Ωº®»ΩƒÍÕ—•’•È•∞
        01  FLG-KHNTEN-AREA.
@@ -540,6 +540,11 @@
            03  TBL-SYS1001-OCC                         OCCURS  10.
                05  TBL-SYS1001                         PIC X(610).
       *
+       01  TBL-TOKUSYU-KEISAN.
+           03  TBL-TOKUSYU-KEISAN-OCC                  OCCURS  5.
+               05  TBL-KEISAN-FLG                      PIC 9(01).
+               05  TBL-KEISAN-ENTANI                   PIC 9(07)V9(01).
+      *
       *    ∞Ïª˛ŒŒ∞Ë
        01  WRK-AREA.
            03  WRK-IN                                  PIC X(01).
@@ -615,6 +620,10 @@
            03  WRK-SRYCDTOTALX   REDEFINES     WRK-SRYCDTOTAL9
                                                PIC X(14).
            03  WRK-ZAINUM                      PIC 9(08).
+      *
+           03  WRK-KEISAN-COMPFTN              PIC 9(07).
+           03  WRK-JYOSEIGAKU                  PIC 9(07).
+           03  WRK-KEISU                       PIC 9V99.
       *
       *---------------------------------------------------------------
       *  ≤ÛøÙ∏∫ªªÕ—¬‡»ÚŒŒ∞Ë
@@ -1176,6 +1185,8 @@
       *
            MOVE      ZERO       TO      FLG-FUKUSHI
            MOVE    88888880     TO      WRK-ZAINUM
+      *
+           INITIALIZE                   TBL-TOKUSYU-KEISAN
       *
            IF    RECE02-ZAITAKU      NOT =    SPACE
                PERFORM     2101-KOREISYA-KOHI-SEC
@@ -4791,6 +4802,48 @@
               END-IF
            END-IF
       *
+      *    µ‹æÎ∏©∆˝Õƒª˘
+      *
+           MOVE     ZERO     TO    FLG-MIYAGI
+      *
+           EVALUATE   SYS-1001-PREFNUM
+      *
+             WHEN    "04"
+      *
+               IF    RECE02-SRYYM         >=   "200510"
+      *
+                 IF  SYU-KOH-HKNNUM(IDX3)  =  "183" OR "383" OR "483"
+      *
+                     IF  RECE02-KOHFTNJANUM(KH-IDX - 1)(1:7) = "8304102"
+                           MOVE     1    TO     FLG-MIYAGI
+                     END-IF
+                     IF  RECE02-KOHFTNJANUM(KH-IDX - 1)(1:7) = "8304125"
+                           MOVE     2    TO     FLG-MIYAGI
+                     END-IF
+      *
+                     IF    FLG-MIYAGI    NOT  =    ZERO
+      *
+                        MOVE   FLG-MIYAGI  TO  TBL-KEISAN-FLG(KH-IDX)
+      *
+                        EVALUATE   IDX3
+                          WHEN      1
+                            ADD   SYU-SYUCOMPFTN-ENTANI
+                                         TO  TBL-KEISAN-ENTANI(KH-IDX)
+                          WHEN      2
+                          WHEN      3
+                          WHEN      4
+                            ADD   SYU-KOH-COMPFTN-ENTANI(IDX3 - 1)
+                                         TO  TBL-KEISAN-ENTANI(KH-IDX)
+                        END-EVALUATE
+      *
+                     END-IF
+      *
+                 END-IF
+      *
+               END-IF
+      *
+           END-EVALUATE
+      *
            .
        210523-FTNMONEY-FTN-HENSYU-EXT.
            EXIT.
@@ -5283,6 +5336,57 @@
       *
            END-EVALUATE
       *
+      *    µ‹æÎ∏©∆˝Õƒª˘
+      *
+           EVALUATE   SYS-1001-PREFNUM
+      *
+             WHEN    "04"
+      *
+               IF   RECE02-SRYYM    >=   "200510"
+      *
+                 PERFORM    VARYING   KOHFTN-IDX   FROM   2   BY   1
+                             UNTIL    KOHFTN-IDX     >    5
+      *
+                   IF   TBL-KEISAN-FLG(KOHFTN-IDX)   NOT =  ZERO
+      *
+                      EVALUATE   TBL-KEISAN-FLG(KOHFTN-IDX)
+                        WHEN         1
+                            IF   RECE02-SRYYM   <=    "200603"
+                               MOVE   0.25    TO     WRK-KEISU
+                            END-IF
+                            IF ( RECE02-SRYYM    >=   "200604" ) AND
+                               ( RECE02-SRYYM    <=   "200703" )
+                               MOVE   0.50    TO     WRK-KEISU
+                            END-IF
+                            IF ( RECE02-SRYYM    >=   "200704" ) AND
+                               ( RECE02-SRYYM    <=   "200803" )
+                               MOVE   0.75    TO     WRK-KEISU
+                            END-IF
+                            IF   RECE02-SRYYM    >=   "200804"
+                               MOVE   1.00    TO     WRK-KEISU
+                            END-IF
+                        WHEN         2
+                            MOVE      0.50    TO     WRK-KEISU
+                      END-EVALUATE
+      *
+                      MOVE      TBL-KEISAN-ENTANI(KOHFTN-IDX)
+                                              TO     WRK-KEISAN-COMPFTN
+      *
+                      COMPUTE   WRK-JYOSEIGAKU      =
+                                WRK-KEISAN-COMPFTN  *  WRK-KEISU
+                      COMPUTE   RECE02-FTNMONEY(KOHFTN-IDX)     =
+                                WRK-KEISAN-COMPFTN  -  WRK-JYOSEIGAKU
+                      COMPUTE   RECE02-FTNMONEY-KOJ(KOHFTN-IDX) =
+                                WRK-KEISAN-COMPFTN  -  WRK-JYOSEIGAKU
+      *
+                   END-IF
+      *
+                 END-PERFORM
+      *
+               END-IF
+      *
+           END-EVALUATE
+      *
            .
        2111-ICHIBUFUTAN-OKIKAE-EXT.
            EXIT.
@@ -5617,37 +5721,17 @@
       *≈‘∆ª…‹∏©»÷πÊ
            MOVE    SYS-1001-PREFNUM     TO      OCR1-PREFNUM
       *≈¿øÙ…Ω
-           IF      RECE02-RECESYUBETU   =    6666
-               MOVE    RECE02-RECESYUBETU-X(1:1)
+           MOVE    RECE02-RECESYUBETU(1:1)
                                         TO      OCR1-TENSUHYO
-           ELSE
-               MOVE    RECE02-RECESYUBETU(1:1)
-                                        TO      OCR1-TENSUHYO
-           END-IF
       * ›∏±ºÔ Ã£±
-           IF      RECE02-RECESYUBETU   =    6666
-               MOVE    RECE02-RECESYUBETU-X(2:1)
+           MOVE    RECE02-RECESYUBETU(2:1)
                                         TO      OCR1-HKNSYUBETU1
-           ELSE
-               MOVE    RECE02-RECESYUBETU(2:1)
-                                        TO      OCR1-HKNSYUBETU1
-           END-IF
       * ›∏±ºÔ Ã£≤
-           IF      RECE02-RECESYUBETU   =    6666
-               MOVE    RECE02-RECESYUBETU-X(3:1)
+           MOVE    RECE02-RECESYUBETU(3:1)
                                         TO      OCR1-HKNSYUBETU2
-           ELSE
-               MOVE    RECE02-RECESYUBETU(3:1)
-                                        TO      OCR1-HKNSYUBETU2
-           END-IF
       *À‹øÕ°¶≤»¬≤°¶∆˛≥∞
-           IF      RECE02-RECESYUBETU   =    6666
-               MOVE    RECE02-RECESYUBETU-X(4:1)
+           MOVE    RECE02-RECESYUBETU(4:1)
                                         TO      OCR1-HONKZKKBN
-           ELSE
-               MOVE    RECE02-RECESYUBETU(4:1)
-                                        TO      OCR1-HONKZKKBN
-           END-IF
       *¿∞Õ˝»÷πÊ
            MOVE    1                    TO      OCR1-SEIRINO
       *•¡•ß•√•Ø•«•£•∏•√•»£∑
