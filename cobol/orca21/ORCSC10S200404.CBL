@@ -46,6 +46,9 @@
       *                                     ° •Ï•ª≈≈•≥°º•…§Œ —ππ§ §∑°À
       * 02.00.02     NACL-¬ø°π«º  03/10/27  ∞Èª˘±…Õ‹≤√ªªº´∆∞ªªƒÍƒ…≤√
       * 02.00.02     NACL-¬ø°π«º  04/03/11  æÆª˘≤ ≥∞ÕËø«ª°Œ¡•¡•ß•√•ØΩ§¿µ
+      * 02.00.03     NACL-¬ø°π«º  05/09/28  æÆª˘≤ ≥∞ÕËø«ª°Œ¡§»
+      *                                     ∫ﬂ¬Œ≈Õ‹ªÿ∆≥¥…Õ˝Œ¡§ŒªªƒÍΩ§¿µ
+      * 02.00.04     NACL-¬ø°π«º  05/10/24  æ√±Íƒ√ƒÀ≈˘ΩË√÷»ΩƒÍΩ§¿µ
       *****************************************************************
       *
       *
@@ -189,6 +192,8 @@
            03  IDX-A-HZN           PIC 9(04).
       *
            03  IDX-INT-MAX          PIC 9(04).
+      *
+           03  IDX-STR              PIC 9(02).
       *
       *    ∞Ïª˛ŒŒ∞Ë
        01  WRK-AREA.
@@ -1300,16 +1305,24 @@
       *
       *    æ√±Íƒ√ƒÀΩË√÷§Œª˛°¢ƒ˚¿µ∆¸§ﬁ§«§Œ≤ÛøÙ§»§π§Î
            MOVE    ZERO                TO  WRK-SYOEN-CNT
+      *    µﬁ¿≠»Ø¿∏∆¸∞ ¡∞§œ¬–æ›≥∞
+           IF     (SPA-KYUSEI-YMD  NOT =   SPACE )  AND
+                  (SPA-KYUSEI-YMD(1:6) =   SPA-SRYYMD(1:6))
+               MOVE    SPA-KYUSEI-YMD(7:2)     TO  IDX-STR
+           ELSE
+               MOVE    1                       TO  IDX-STR
+           END-IF
+      *
            IF      SPA-SYORIFLG        =   1
                MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
-               PERFORM VARYING     IDX-Y3  FROM  1  BY  1
-                       UNTIL       IDX-Y3  >=   IDX-Y2
-                   ADD     SANTEI-DAY (IDX-Y3)
-                                               TO  WRK-SYOEN-CNT
-               END-PERFORM
            ELSE
-               MOVE    SANTEI-MSANTEICNT   TO  WRK-SYOEN-CNT
+               MOVE    32                  TO  IDX-Y2
            END-IF
+           PERFORM VARYING     IDX-Y3  FROM  IDX-STR  BY  1
+                   UNTIL       IDX-Y3  >=    IDX-Y2
+               ADD     SANTEI-DAY (IDX-Y3)
+                                           TO  WRK-SYOEN-CNT
+           END-PERFORM
       *
            EVALUATE    SANTEI-SRYCD
       *        æÆª˘≤ ≥∞ÕËø«Œ≈≤ 
@@ -3792,7 +3805,8 @@
                        MOVE    1               TO  SPA-KYUSEI-FLG
                END-EVALUATE
       *        ∫ﬂ¬Œ≈Õ‹ªÿ∆≥Œ¡§Œ»ΩƒÍ
-               IF      SPA-COM-INPUTCD (IDX)(1:3)  =   "114"
+               IF     (SPA-COM-INPUTCD (IDX)(1:3)  =   "114") AND
+                      (SPA-COM-DATAKBN (IDX)       =   "1"  )
                    IF     (SPA-COM-CDKBN-KBN(IDX)  =   "C"  ) AND
                           (SPA-COM-CDKBN-KBNNUM (IDX)
                                                    >=  "100" AND
@@ -3914,7 +3928,7 @@
       *                    ≈≈œ√∫∆ø«§Œ≤√ªª§œ£œ£À
                            IF     (FLG-KBN             =   1  ) AND
                                   (SPA-COM-SRYKBN(IDX) =   "12") AND
-                                   (SPA-COM-DATAKBN(IDX)
+                                  (SPA-COM-DATAKBN(IDX)
                                                        =   "2" )
                                MOVE    1           TO  FLG-OK
                            END-IF
