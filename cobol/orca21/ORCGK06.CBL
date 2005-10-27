@@ -1408,8 +1408,8 @@
                IF      FLG-HKNCOMBI        =   ZERO
                    MOVE    ZERO                TO  WRK-ST-SRYYMD
                    MOVE    ZERO                TO  WRK-ED-SRYYMD
-                   MOVE    SPA-SRYYMD(1:6)     TO  WRK-ST-SRYYMD(1:6)
-                   MOVE    SPA-SRYYMD(1:6)     TO  WRK-ED-SRYYMD(1:6)
+                   MOVE    SPA-NAI-SRYYM       TO  WRK-ST-SRYYMD(1:6)
+                   MOVE    SPA-NAI-SRYYM       TO  WRK-ED-SRYYMD(1:6)
                    PERFORM VARYING IDXS    FROM    1   BY  1
                            UNTIL   IDXS    >       31
                        IF      SPA-GMN-DAY (IDXS)  >   ZERO
@@ -1426,8 +1426,12 @@
                            (WRK-ED-SRYYMD      <=  COMB-TEKEDYMD ))
                          CONTINUE
                      ELSE
-                         MOVE    "0024"              TO  SPA-ERRCD
-                         GO      TO      4202-INTBL-CHK-EXT
+      *                  急性発生日はチェックなしとする
+                         IF      SPA-GMN-SRYCD       =   "099800101"
+                            CONTINUE
+                         ELSE
+                             MOVE    "0024"              TO  SPA-ERRCD
+                         END-IF
                      END-IF
                    END-IF
                END-IF
