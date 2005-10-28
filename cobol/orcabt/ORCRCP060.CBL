@@ -90,8 +90,7 @@
       *  02.06.04    NACL-Æ£¸¶    05/07/28  ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊó¤Î
       *                                     ÉéÃ´¼ÔÈÖ¹æ¤Ë¾ò·ï¤òÄÉ²Ã
       *  02.06.05    NACL-Æ£¸¶    05/09/05  Ê£¿ôËç¥ì¥»¤ÎÏ¢ÈÖµ­ºÜ
-      *
-      *  02.07.01    NACL-Æ£¸¶    05/08/20  ÆÃÊÌÎÅÍÜÈñÂÐ±þ
+      *  02.06.06    NACL-¾®Æ¦Âô  05/10/28  ÆÃµ­»ö¹à¡¡Àè¿Ê¡¢À©Ä¶¡¡ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -220,17 +219,14 @@
                                    BY         //HC06//.
       ***  COPY    "HCN061.INC"    REPLACING  //HCN061//
       ***  COPY    "HCN061V01.INC" REPLACING  //HCN061V01//
-      ***  COPY    "HCN061V02.INC" REPLACING  //HCN061V02//
-           COPY    "HCN061V03.INC" REPLACING  //HCN061V03//
+           COPY    "HCN061V02.INC" REPLACING  //HCN061V02//
                                    BY         //HC061//.
       ***  COPY    "HCN062.INC"   REPLACING   //HCN062//
       ***  COPY    "HCN062V01.INC" REPLACING  //HCN062V01//
-      ***  COPY    "HCN062V02.INC" REPLACING  //HCN062V02//
-           COPY    "HCN062V03.INC" REPLACING  //HCN062V03//
+           COPY    "HCN062V02.INC" REPLACING  //HCN062V02//
                                    BY         //HC062//.
       ***  COPY    "HCN063.INC"    REPLACING   //HCN063//
-      ***  COPY    "HCN063V01.INC" REPLACING   //HCN063V01//
-           COPY    "HCN063V02.INC" REPLACING   //HCN063V02//
+           COPY    "HCN063V01.INC" REPLACING   //HCN063V01//
                                    BY         //HC063//.
       *
       *    ¥¹¥ÑÎÎ°è
@@ -592,8 +588,12 @@
            03  FILLER          PIC X(10)   VALUE   "£±£±Ìô¼£".
            03  FILLER          PIC X(02)   VALUE   "12".
            03  FILLER          PIC X(10)   VALUE   "£±£²ºà¼£".
+           03  FILLER          PIC X(02)   VALUE   "13".
+           03  FILLER          PIC X(10)   VALUE   "£±£³Àè¿Ê".
+           03  FILLER          PIC X(02)   VALUE   "14".
+           03  FILLER          PIC X(10)   VALUE   "£±£´À©Ä¶".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   11.
+           03  TBL-TOKKI       OCCURS   13.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
       *
@@ -3088,7 +3088,7 @@
                    OR    ( IDZ                 =   4     ) 
       *
                PERFORM VARYING IDY     FROM    1   BY  1
-                       UNTIL ( IDY             >   11    )
+                       UNTIL ( IDY             >   13    )
                    IF      RECE02-TOKKI(IDX)   =   TBL-TOKKICD(IDY)
                        ADD     1                TO  IDZ
                        MOVE    TBL-TOKKINAME(IDY)
@@ -3097,7 +3097,7 @@
                        AND  RECE02-SRYYM      >=  "200504"
                           MOVE   "£±£²´ï¼£"     TO  HC06-TOKKI (IDZ)
                        END-IF
-                       MOVE    11               TO  IDY
+                       MOVE    13               TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
@@ -5175,20 +5175,17 @@
                        MOVE    HC06            TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
                    WHEN    "1"   
-      *********        MOVE    "HCN061V02.red" TO
-                       MOVE    "HCN061V03.red" TO
+                       MOVE    "HCN061V02.red" TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC061           TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
                    WHEN    "2"   
-      *********        MOVE    "HCN062V02.red" TO
-                       MOVE    "HCN062V03.red" TO
+                       MOVE    "HCN062V02.red" TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC062           TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
                    WHEN    "3"   
-      *********        MOVE    "HCN063V01.red" TO
-                       MOVE    "HCN063V02.red" TO
+                       MOVE    "HCN063V01.red" TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC063           TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -5376,20 +5373,17 @@
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE
                            MOVE    HC06            TO RECE08-PRTDATA
-      *********        WHEN    "HCN061V02.red"                  
-                       WHEN    "HCN061V03.red"                  
+                       WHEN    "HCN061V02.red"                  
                            MOVE    RECE08-PRTDATA  TO HC061
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC061-PAGE
                            MOVE    HC061           TO RECE08-PRTDATA
-      *********        WHEN    "HCN062V02.red"                 
-                       WHEN    "HCN062V03.red"                  
+                       WHEN    "HCN062V02.red"                  
                            MOVE    RECE08-PRTDATA  TO HC062
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC062-PAGE
                            MOVE    HC062           TO RECE08-PRTDATA
-      *********        WHEN    "HCN063V01.red"                   
-                       WHEN    "HCN063V02.red"                  
+                       WHEN    "HCN063V01.red"                  
                            MOVE    RECE08-PRTDATA  TO HC063
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC063-PAGE
@@ -5824,9 +5818,6 @@
                            GO  TO  990-RECE02-READ-SEC
                          ELSE
                            IF      RECE02-PREFNUM  NOT =   "06"
-                               GO  TO  990-RECE02-READ-SEC
-                           END-IF
-                           IF      RECE02-RECESYUBETU  =   "6666"
                                GO  TO  990-RECE02-READ-SEC
                            END-IF
       *

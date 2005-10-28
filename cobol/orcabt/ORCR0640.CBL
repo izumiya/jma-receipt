@@ -157,8 +157,7 @@
       *                                     精神、結核対応
       *  02.06.17    NACL-門脇    05/09/28  島根県地方公費１０月改正対応
       *  02.06.18    NACL-門脇    05/10/04  精神食事療養記載修正
-      *
-      *  02.07.01    NACL-藤原    05/08/20  特別療養費対応
+      *  02.06.19    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -688,6 +687,8 @@
            03  CONS-TOKKI10        PIC X(14) VALUE "00000099990110".
            03  CONS-TOKKI11        PIC X(14) VALUE "00000099990111".
            03  CONS-TOKKI12        PIC X(14) VALUE "00000099990112".
+           03  CONS-TOKKI13        PIC X(14) VALUE "00000099990113".
+           03  CONS-TOKKI14        PIC X(14) VALUE "00000099990114".
       *
       *    病床数編集フラグ編集の為のコード（特定疾患療養指導料等）
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -1576,7 +1577,9 @@
                                                        CONS-TOKKI9 OR
                                                        CONS-TOKKI10 OR
                                                        CONS-TOKKI11 OR
-                                                       CONS-TOKKI12
+                                                       CONS-TOKKI12 OR
+                                                       CONS-TOKKI13 OR
+                                                       CONS-TOKKI14
                                       MOVE    1    TO      FLG-TOKKI
                                       PERFORM   21013-TOKKI-HENSYU-SEC
                                  ELSE
@@ -1913,7 +1916,9 @@
                                      OR  CONS-TOKKI9(6:9)
                                      OR  CONS-TOKKI10(6:9)
                                      OR  CONS-TOKKI11(6:9)
-                                     OR  CONS-TOKKI12(6:9) )
+                                     OR  CONS-TOKKI12(6:9)
+                                     OR  CONS-TOKKI13(6:9)
+                                     OR  CONS-TOKKI14(6:9) )
                   COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -1951,7 +1956,9 @@
                                        OR  CONS-TOKKI9(6:9)
                                        OR  CONS-TOKKI10(6:9)
                                        OR  CONS-TOKKI11(6:9)
-                                       OR  CONS-TOKKI12(6:9) )
+                                       OR  CONS-TOKKI12(6:9)
+                                       OR  CONS-TOKKI13(6:9)
+                                       OR  CONS-TOKKI14(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
@@ -3306,6 +3313,10 @@
                        MOVE    "11"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI12
                        MOVE    "12"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI13
+                       MOVE    "13"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI14
+                       MOVE    "14"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        2
                EVALUATE    SRY-SRYCD(IDX2)
@@ -3331,6 +3342,10 @@
                        MOVE    "11"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI12(6:9)
                        MOVE    "12"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI13(6:9)
+                       MOVE    "13"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI14(6:9)
+                       MOVE    "14"      TO      WRK-TOKKI
                END-EVALUATE
            END-EVALUATE
       *
@@ -8021,37 +8036,17 @@
       *都道府県番号
            MOVE    SYS-1001-PREFNUM     TO      OCR1-PREFNUM
       *点数表
-           IF      RECE62-RECESYUBETU   =    6666
-               MOVE    RECE62-RECESYUBETU-X(1:1)
+           MOVE    RECE62-RECESYUBETU(1:1)
                                         TO      OCR1-TENSUHYO
-           ELSE
-               MOVE    RECE62-RECESYUBETU(1:1)
-                                        TO      OCR1-TENSUHYO
-           END-IF
       *保険種別１
-           IF      RECE62-RECESYUBETU   =    6666
-               MOVE    RECE62-RECESYUBETU-X(2:1)
+           MOVE    RECE62-RECESYUBETU(2:1)
                                         TO      OCR1-HKNSYUBETU1
-           ELSE
-               MOVE    RECE62-RECESYUBETU(2:1)
-                                        TO      OCR1-HKNSYUBETU1
-           END-IF
       *保険種別２
-           IF      RECE62-RECESYUBETU   =    6666
-               MOVE    RECE62-RECESYUBETU-X(3:1)
+           MOVE    RECE62-RECESYUBETU(3:1)
                                         TO      OCR1-HKNSYUBETU2
-           ELSE
-               MOVE    RECE62-RECESYUBETU(3:1)
-                                        TO      OCR1-HKNSYUBETU2
-           END-IF
       *本人・家族・入外
-           IF      RECE62-RECESYUBETU   =    6666
-               MOVE    RECE62-RECESYUBETU-X(4:1)
+           MOVE    RECE62-RECESYUBETU(4:1)
                                         TO      OCR1-HONKZKKBN
-           ELSE
-               MOVE    RECE62-RECESYUBETU(4:1)
-                                        TO      OCR1-HONKZKKBN
-           END-IF
       *整理番号
            MOVE    1                    TO      OCR1-SEIRINO
       *チェックディジット７
