@@ -1985,6 +1985,29 @@
       *****************************************************************
        4900-KANRENCHK-SEC           SECTION.
       *
+      *    職員コード
+           IF     (SPA-GMN-SYOKUCOD    =   SPACE )  OR
+                  (SPA-GMN-SYOKUCOD    NOT NUMERIC)
+               MOVE    "0002"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-GMN-CUR
+           ELSE
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-SYOKUCOD-MAX) OR
+                                  (FLG-OK      =   1    )
+                   IF      SPA-GMN-SYOKUCOD    =   SPA-GMN-TSYOKUCOD
+                                                         (IDX)
+                       MOVE    1                   TO  FLG-OK
+                   END-IF
+               END-PERFORM
+      *        入力済みの時、選択があること
+               IF      FLG-OK          =   1
+                   IF      SPA-GMN-TBL-MAX =   ZERO
+                       MOVE    "0021"              TO  SPA-ERRCD
+                       MOVE    2                   TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
       *    オペレータＩＤ
            IF      SPA-GMN-USERID      =   SPACE
                MOVE    "0008"              TO  SPA-ERRCD
@@ -2619,6 +2642,9 @@
                                                TO  SPA-ERRMSG
                WHEN    "0020"
                    MOVE    "期間が重複しています。"
+                                               TO  SPA-ERRMSG
+               WHEN    "0021"
+                   MOVE    "職員の履歴が表示してありません。"
                                                TO  SPA-ERRMSG
                WHEN    "0100"
                    MOVE
