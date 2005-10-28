@@ -2644,7 +2644,7 @@
                    MOVE    "期間が重複しています。"
                                                TO  SPA-ERRMSG
                WHEN    "0021"
-                   MOVE    "職員の履歴が表示してありません。"
+                   MOVE    "職員の選択がしてありません。"
                                                TO  SPA-ERRMSG
                WHEN    "0100"
                    MOVE
