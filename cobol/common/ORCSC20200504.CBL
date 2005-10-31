@@ -2957,18 +2957,18 @@
            END-IF
       *
       *
-      *    MOVE    WRK-SRYCD           TO  TNS-SRYCD
-      *    PERFORM 910-TENSU-READ-SEC
-      *    IF      FLG-TENSU       NOT =   ZERO
-      *        MOVE    "0001"              TO  SPA-ERRCD
-      *        MOVE    1                   TO  FLG-ERR
-      *        GO      TO      300211-NYUKASAN-SYORI-EXT
-      *    END-IF
+           MOVE    WRK-SRYCD           TO  TNS-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+           IF      FLG-TENSU       NOT =   ZERO
+               MOVE    "0001"              TO  SPA-ERRCD
+               MOVE    1                   TO  FLG-ERR
+               GO      TO      300211-NYUKASAN-SYORI-EXT
+           END-IF
       *
       *        算定履歴チェック処理
-      **** IF      TNS-SANTEIRRKKBN    NOT =   ZERO
+           IF      TNS-SANTEIRRKKBN    NOT =   ZERO
                PERFORM 3001-SANTEI-CHK-SEC
-      **** END-IF
+           END-IF
            IF      FLG-ERR             =   ZERO
                ADD     1               TO  IDXS
                MOVE    WRK-SRYCD       TO  LNK-ORCSC-SRYCD
@@ -3072,18 +3072,18 @@
                GO      TO      3002-KASAN-SYORI-EXT
            END-IF
       *
-      ***  MOVE    WRK-SRYCD           TO  TNS-SRYCD
-      *    PERFORM 910-TENSU-READ-SEC
-      *    IF      FLG-TENSU       NOT =   ZERO
-      *        MOVE    "0001"              TO  SPA-ERRCD
-      *        MOVE    1                   TO  FLG-ERR
-      *        GO      TO      3002-KASAN-SYORI-EXT
-      **** END-IF
+           MOVE    WRK-SRYCD           TO  TNS-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+           IF      FLG-TENSU       NOT =   ZERO
+               MOVE    "0001"              TO  SPA-ERRCD
+               MOVE    1                   TO  FLG-ERR
+               GO      TO      3002-KASAN-SYORI-EXT
+           END-IF
       *
       *    算定履歴チェック処理
-      **** IF      TNS-SANTEIRRKKBN    NOT =   ZERO
+           IF      TNS-SANTEIRRKKBN    NOT =   ZERO
                PERFORM 3001-SANTEI-CHK-SEC
-     ***** END-IF
+           END-IF
            IF      FLG-ERR             =   ZERO
                ADD     1               TO  IDXS
                MOVE    WRK-SRYCD       TO  LNK-ORCSC-SRYCD
@@ -3268,17 +3268,17 @@
                GO      TO      3003-YAKJYO-CHK-EXT
            END-IF
       *
-      *    MOVE    WRK-SRYCD           TO  TNS-SRYCD
-      *    PERFORM 910-TENSU-READ-SEC
-      *    IF      FLG-TENSU       NOT =   ZERO
-      *        MOVE    1                   TO  FLG-YAKJYO
-      *        GO      TO      3003-YAKJYO-CHK-EXT
-      *    END-IF
+           MOVE    WRK-SRYCD           TO  TNS-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+           IF      FLG-TENSU       NOT =   ZERO
+     **********MOVE    1                   TO  FLG-YAKJYO
+               GO      TO      3003-YAKJYO-CHK-EXT
+           END-IF
       *
       *        算定履歴チェック処理
-      **** IF      TNS-SANTEIRRKKBN    NOT =   ZERO
+           IF      TNS-SANTEIRRKKBN    NOT =   ZERO
                PERFORM 3001-SANTEI-CHK-SEC
-      *****END-IF
+           END-IF
            MOVE    ZERO            TO  FLG-ERR
            IF     (LNK-SC91-ERRCD      =   SPACE )  AND
                   (LNK-SC91-ERRCD2     =   SPACE )
