@@ -14,7 +14,7 @@ if File.exist?(save_dir+package_file.gsub(/\.gz$/, ""))
 end
 
 # ftp.orca.med.or.jp よりダウンロード
-`wget -q -P #{save_dir} #{package_url+package_file}`
+`wget -q --passive-ftp -P #{save_dir} #{package_url+package_file}`
 `gunzip -f #{save_dir+package_file}`
 
 tmp = open(save_dir+package_file.gsub(/\.gz$/, "")).read
@@ -26,9 +26,9 @@ tmp.each do |data|
    if File.exist?(save_dir+file)
       if md5sum != Digest::MD5.hexdigest(File.open(save_dir+file).read).to_s
          File.delete(save_dir+file)
-         `wget -q -P #{save_dir} #{package_url+file}`
+         `wget -q --passive-ftp -P #{save_dir} #{package_url+file}`
       end
    else
-      `wget -q -P #{save_dir} #{package_url+file}`
+      `wget -q --passive-ftp -P #{save_dir} #{package_url+file}`
    end
 end
