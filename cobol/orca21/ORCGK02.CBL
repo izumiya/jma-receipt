@@ -4721,7 +4721,8 @@
        41012-HKNCOMBI-CHANGE-SEC         SECTION.
       *
            IF    ((SPA-RJN-ERR         =   ZERO )  AND
-                  (SPA-HKN-ERR         =   ZERO ))
+                  (SPA-HKN-ERR         =   ZERO
+                                       OR  4   ))
                OR (SPA-MAE-HKNCOMBINUM =   ZERO )
                MOVE    ZERO                TO  FLG-HKNCHK
            ELSE
