@@ -1559,7 +1559,7 @@
                                                TO  SYU-TGMONEY-TAX(IDS1)
            END-PERFORM
            PERFORM VARYING     IDS1    FROM    1   BY  1
-                   UNTIL       IDS1    >   5
+                   UNTIL       IDS1    >   10
                ADD    WRK-SYU-JIHI-TAXNASI (IDS1)
                                            TO  SYU-JIHI-TAXNASI(IDS1)
                ADD    WRK-SYU-JIHI-TAXARI (IDS1)
