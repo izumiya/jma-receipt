@@ -1395,7 +1395,10 @@
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
                       (WRK-COM-SANFLG     (IDX)    =   2   )
                    MOVE    ZERO                TO  WRK-TENSUKEI
-                   COMPUTE WRK-TENSUKEI        =   LNK-SC90-TENSU
+      *****        COMPUTE WRK-TENSUKEI        =   LNK-SC90-TENSU
+                   COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
+                                                             (IDX-SYU)
+                                               -   WRK-TENSUKEI-G )
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
                                                +   0.5
