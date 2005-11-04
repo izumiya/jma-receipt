@@ -57,6 +57,7 @@
       *  01.02.12    NACL-門脇    05/08/18  自賠責従来様式対応
       *  01.02.13    NACL-伊藤    05/09/01  検体検査コメントのついた包括
       *                                     対象検査の剤まとめに対応
+      *  01.02.14    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -995,7 +996,7 @@
                             END-IF
                            WHEN    "8"
                                IF (     IDY            =   ZERO      )
-                               OR ( RECE85-SRYCD (IDX) = CONS-RINYAK )
+      *****                    OR ( RECE85-SRYCD (IDX) = CONS-RINYAK )
                                    MOVE    2             TO  IDY
                                END-IF    
                            WHEN    "1"
@@ -2485,12 +2486,17 @@
                IF      IDY               =   1
                  IF       (TBL-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
                  OR       (TBL-ZAIW-SRYCD1(1:3)  =   "059"       )
+                 OR       (RECE84-SAFLG          =   "1"         )
                      MOVE    ALL "9"            TO
                                             TBL-ZAIW-CDKBN-AREA
-                     IF    TBL-ZAIW-SRYCD1(1:1)  =   "6"
-                       MOVE    999999998   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                     IF    RECE84-SAFLG          =   "1"
+                         MOVE    999999999   TO  TBL-ZAIW-KOUHYOJYUNNUM
                      ELSE
-                       MOVE    999999999   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       IF    TBL-ZAIW-SRYCD1(1:1)  =   "6"
+                         MOVE    999999997   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       ELSE
+                         MOVE    999999998   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       END-IF
                      END-IF
                  END-IF
                END-IF
@@ -2536,6 +2542,8 @@
                    MOVE   SPACE          TO  RECE86-SRYSYUKBN
                    MOVE   ZERO           TO  RECE86-DAY
                END-IF
+      *
+               MOVE    RECE84-SAFLG      TO  RECE86-SAFLG
       *
                WRITE   RECE86-REC
       *         

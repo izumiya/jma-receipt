@@ -74,3 +74,5 @@
            03  RECE46-SRYSYUKBN           PIC  X(03).
       *診療日
            03  RECE46-DAY                 PIC  9(02).
+      *（サ）フラグ
+           03  RECE46-SAFLG               PIC  X(01).

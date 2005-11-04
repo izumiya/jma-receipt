@@ -38,6 +38,7 @@
       *  01.01.02    NACL-門脇    05/05/26  手術・麻酔の記載順変更対応
       *  01.01.03    NACL-門脇    05/08/31  剤番号編集修正
       *  01.01.04    NACL-門脇    05.09.06  自賠責従来様式対応
+      *  01.01.05    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -276,6 +277,9 @@
                   IF   RECE46-CDKBN-KBN      =      "9"
                           MOVE   4      TO      RECE47-KNSJISKBN
                   END-IF
+              END-IF
+              IF    RECE46-SAFLG   =   "1"
+                   MOVE    9            TO      RECE47-KNSJISKBN
               END-IF
            END-IF     
       ***  MOVE    RECE46-KNSJISKBN     TO      RECE47-KNSJISKBN

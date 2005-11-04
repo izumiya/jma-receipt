@@ -82,6 +82,7 @@
       *  01.02.11    NACL-門脇    05/08/18  自賠責従来様式対応
       *  01.02.12    NACL-伊藤    05/09/01  検体検査コメントのついた包括
       *                                     対象検査の剤まとめに対応
+      *  01.02.13    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1056,7 +1057,7 @@
                                    MOVE    5         TO  IDY
                                ELSE
                                  IF (     IDY            =   ZERO      )
-                                 OR ( RECE45-SRYCD (IDX) = CONS-RINYAK )
+      *****                      OR ( RECE45-SRYCD (IDX) = CONS-RINYAK )
                                    MOVE    2         TO  IDY
                                  END-IF
                                END-IF
@@ -2597,12 +2598,17 @@
                IF      IDY               =   1
                  IF       (TBL-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
                  OR       (TBL-ZAIW-SRYCD1(1:3)  =   "059"       )
+                 OR       (RECE44-SAFLG          =   "1"         )
                      MOVE    ALL "9"            TO
                                             TBL-ZAIW-CDKBN-AREA
-                     IF    TBL-ZAIW-SRYCD1(1:1)  =   "6"
-                       MOVE    999999998   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                     IF    RECE44-SAFLG          =   "1"
+                         MOVE    999999999   TO  TBL-ZAIW-KOUHYOJYUNNUM
                      ELSE
-                       MOVE    999999999   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       IF    TBL-ZAIW-SRYCD1(1:1)  =   "6"
+                         MOVE    999999997   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       ELSE
+                         MOVE    999999998   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       END-IF
                      END-IF
                  END-IF
                END-IF
@@ -2648,6 +2654,8 @@
                    MOVE   SPACE          TO  RECE46-SRYSYUKBN
                    MOVE   ZERO           TO  RECE46-DAY
                END-IF
+      *
+               MOVE    RECE44-SAFLG      TO  RECE46-SAFLG
       *
                WRITE   RECE46-REC
                IF  STS-RECE46          NOT =   ZERO

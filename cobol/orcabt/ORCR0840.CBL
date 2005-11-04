@@ -72,6 +72,7 @@
       *  01.02.17    NACL-ÌçÏÆ    05/08/29  £°£¹£µ£¹£³¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  01.02.18    NACL-ÌçÏÆ    05/10/06  ¿Ç¶è£¹£µ£¹£¶ÂÐ±þ
       *  01.02.19    NACL-¾®Æ¦Âô  05/10/28  ÆÃµ­»ö¹à¡¡Àè¿Ê¡¢À©Ä¶¡¡ÂÐ±þ
+      *  01.02.20    NACL-ÌçÏÆ    05/11/01  ¡Ê¸¡Áª¡ËÅù¥³¥á¥ó¥ÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -276,6 +277,7 @@
            03  ID1                                     PIC 9(03).
            03  ID2                                     PIC 9(03).
            03  ID3                                     PIC 9(03).
+           03  IDU                                     PIC 9(03).
            03  NUM-IDX                                 PIC 9(01).
            03  SYUKEI-IDX                              PIC 9(03).
            03  SYUKEI-IDX2                             PIC 9(03).
@@ -591,8 +593,22 @@
            03  CONS-BYOITAIYO        PIC X(09)  VALUE  "101910060".
       *    ºßÂð·ì±ÕÆ©ÀÏÉÑ²ó»ØÆ³´ÉÍýÎÁ
            03  CONS-HINKAI-COMMENT   PIC X(09)  VALUE  "114009410".
+      *
+      *    ºÞ¤Î¿ÇÎÅÆâÍÆ¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ë
+       01  TBL-ZAICHECK-AREA.
       *    ¡Ê¥µ¡Ë
-           03  CONS-RINYAK           PIC X(09)  VALUE  "820000046".
+           03  FILLER          PIC X(09)   VALUE    "820000046".
+      *    ¡Ê¸¡Áª¡Ë
+           03  FILLER          PIC X(09)   VALUE    "820000053".
+      *    ¡Ê¥ê¥ÏÁª¡Ë
+           03  FILLER          PIC X(09)   VALUE    "820000054".
+      *    ¡ÊÀºÁª¡Ë
+           03  FILLER          PIC X(09)   VALUE    "820000055".
+      *
+       01  TBL-ZAICHECK-R      REDEFINES   TBL-ZAICHECK-AREA.
+           03  TBL-ZAICHECK    PIC X(09)   OCCURS    4.
+      *
+       01  TBL-ZAICHECK-MAX    PIC 9(02)   VALUE     4.
       *
       *    »ÀÁÇ 
            COPY    "CMSANSOTBL.INC".
@@ -1132,32 +1148,7 @@
                                  END-IF
                                END-IF
                             ELSE
-                               INITIALIZE                SRYACT-REC
-                               MOVE RECE82-HOSPID    TO  SRY-HOSPID
-                               MOVE RECE82-NYUGAIKBN TO  SRY-NYUGAIKBN
-                               MOVE RECE82-PTID      TO  SRY-PTID
-                               MOVE RECE82-SRYYM     TO  SRY-SRYYM
-                               MOVE ACCT-ZAINUM      TO  SRY-ZAINUM
-                               MOVE CONS-RINYAK      TO  SRY-SRYCD(1)
-                               MOVE CONS-RINYAK      TO  SRY-SRYCD(2)
-                               MOVE CONS-RINYAK      TO  SRY-SRYCD(3)
-                               MOVE CONS-RINYAK      TO  SRY-SRYCD(4)
-                               MOVE CONS-RINYAK      TO  SRY-SRYCD(5)
-                               MOVE SRYACT-REC       TO  MCPDATA-REC
-                               MOVE "DBSELECT"       TO  MCP-FUNC
-                               MOVE "SRYACT-KEY8"    TO  ORC-DBPATH
-                               CALL "ORCMCPSUB"   USING  MCPAREA
-                                                         ORCMCPAREA
-                                                         MCPDATA-REC
-                               IF      MCP-RC        =  ZERO
-                                 MOVE  "SRYACT-KEY8" TO  ORC-DBPATH 
-                                 PERFORM   900-SRYACT-READ-SEC
-                                 IF     FLG-SRYACT   =  ZERO
-                                     MOVE    1       TO  FLG-RINYAK
-                                 END-IF
-                               END-IF
-                               MOVE    "SRYACT-KEY8" TO  WK-PATH
-                               PERFORM   CSR-CLOSE-SEC
+                               PERFORM   2203-SINRYO-CHECK-SEC
                                IF   FLG-RINYAK  =  1
                                  MOVE   ZERO   TO   WRK-TEN
                                                     WRK-MEISAI-CNT
@@ -1610,6 +1601,13 @@
                      END-IF
                    END-IF                                               
                   END-IF                                                
+      *
+                  IF  ( ACCT-SRYKBN   =  "80" )
+                  AND ( RECE84-SAFLG  =  "1"  )
+                            MOVE   "40"   TO  RECE84-SRYKBN
+                                              RECE85-SRYKBN
+                  END-IF
+      *
                END-IF                                                   
       *
                PERFORM  220211-RECE85-TENSOU-COMCNT-HEN-SEC
@@ -1722,6 +1720,10 @@
                    MOVE   "1"                  TO    RECE84-COMCDFLG
                ELSE
                    MOVE    TNS-NAME            TO    RECE85-NAME(IDX4)
+               END-IF
+      *
+               IF   RECE84-SAFLG  =  "1"
+                        MOVE     "1"           TO    RECE84-COMCDFLG
                END-IF
       *
                IF  RECE85-YUKOKETA(IDX4)  =  ZERO
@@ -3342,6 +3344,55 @@
            .
       *
        220223-RECE-LEFT-SET3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÞ¤Î¿ÇÎÅÆâÍÆ¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2203-SINRYO-CHECK-SEC                 SECTION.
+      *
+           PERFORM   VARYING   IDU   FROM   1   BY   1
+                      UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
+                       OR    ( FLG-RINYAK  =  1           )
+      *
+              IF  ( IDU  =  1                          )
+              OR  ((IDU  =  2) AND (ACCT-SRYKBN = "60"))
+              OR  ((IDU  =  3) AND (ACCT-SRYKBN = "80"))
+              OR  ((IDU  =  4) AND (ACCT-SRYKBN = "80"))
+      *
+                 INITIALIZE                  SRYACT-REC
+                 MOVE RECE82-HOSPID      TO  SRY-HOSPID
+                 MOVE RECE82-NYUGAIKBN   TO  SRY-NYUGAIKBN
+                 MOVE RECE82-PTID        TO  SRY-PTID
+                 MOVE RECE82-SRYYM       TO  SRY-SRYYM
+                 MOVE ACCT-ZAINUM        TO  SRY-ZAINUM
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(1)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(2)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(3)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(4)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(5)
+                 MOVE SRYACT-REC         TO  MCPDATA-REC
+                 MOVE "DBSELECT"         TO  MCP-FUNC
+                 MOVE "SRYACT-KEY8"      TO  ORC-DBPATH
+                 CALL "ORCMCPSUB"        USING  MCPAREA
+                                                ORCMCPAREA
+                                                MCPDATA-REC
+                 IF      MCP-RC  =  ZERO
+                     MOVE  "SRYACT-KEY8" TO  ORC-DBPATH
+                     PERFORM   900-SRYACT-READ-SEC
+                     IF     FLG-SRYACT   =  ZERO
+                         MOVE    1       TO  FLG-RINYAK
+                     END-IF
+                 END-IF
+                 MOVE    "SRYACT-KEY8" TO  WK-PATH
+                 PERFORM   CSR-CLOSE-SEC
+      *
+              END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2203-SINRYO-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

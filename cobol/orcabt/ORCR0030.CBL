@@ -223,6 +223,7 @@
       *  02.06.13    NACL-門脇    05/09/28  島根県地方公費１０月改正対応
       *  02.06.14    NACL-門脇    05/10/26  宮城県地方公費１０月改正対応
       *  02.06.15    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
+      *  02.06.16    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -406,6 +407,7 @@
            03  IDW                                     PIC 9(03).
            03  IDW2                                    PIC 9(03).
            03  IDV                                     PIC 9(03).
+           03  IDU                                     PIC 9(03).
            03  NUM-IDX                                 PIC 9(01).
            03  HC-IDX                                  PIC 9(03).
            03  KH-IDX                                  PIC 9(03).
@@ -814,8 +816,6 @@
            03  CONS-GAIKAN1          PIC X(09)  VALUE  "112011010".
            03  CONS-GAIKAN2          PIC X(09)  VALUE  "112705110".
            03  CONS-GAIKAN3          PIC X(09)  VALUE  "112705310".
-      *    （サ）
-           03  CONS-RINYAK           PIC X(09)  VALUE  "820000046".
       *
       *    老人理学療法の摘要欄記載判定用（名称に老人を追加）
            03  CONS-RJNRIGAKU1     PIC X(09) VALUE "180706810".
@@ -826,6 +826,22 @@
            03  CONS-RJNRIGAKU6     PIC X(09) VALUE "180707310".
            03  CONS-RJNRIGAKU7     PIC X(09) VALUE "180707410".
            03  CONS-RJNRIGAKU8     PIC X(09) VALUE "180707510".
+      *
+      *    剤の診療内容チェックテーブル
+       01  TBL-ZAICHECK-AREA.
+      *    （サ）
+           03  FILLER          PIC X(09)   VALUE    "820000046".
+      *    （検選）
+           03  FILLER          PIC X(09)   VALUE    "820000053".
+      *    （リハ選）
+           03  FILLER          PIC X(09)   VALUE    "820000054".
+      *    （精選）
+           03  FILLER          PIC X(09)   VALUE    "820000055".
+      *
+       01  TBL-ZAICHECK-R      REDEFINES   TBL-ZAICHECK-AREA.
+           03  TBL-ZAICHECK    PIC X(09)   OCCURS    4.
+      *
+       01  TBL-ZAICHECK-MAX    PIC 9(02)   VALUE     4.
       *
       *    酸素 
            COPY    "CMSANSOTBL.INC".
@@ -1532,32 +1548,7 @@
                                       PERFORM   RECE04-WRITE-SEC
                                  END-IF
                                ELSE
-                                 INITIALIZE                SRYACT-REC
-                                 MOVE RECE02-HOSPID    TO  SRY-HOSPID
-                                 MOVE RECE02-NYUGAIKBN TO  SRY-NYUGAIKBN
-                                 MOVE RECE02-PTID      TO  SRY-PTID
-                                 MOVE RECE02-SRYYM     TO  SRY-SRYYM
-                                 MOVE ACCT-ZAINUM      TO  SRY-ZAINUM
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(1)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(2)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(3)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(4)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(5)
-                                 MOVE SRYACT-REC       TO  MCPDATA-REC
-                                 MOVE "DBSELECT"       TO  MCP-FUNC
-                                 MOVE "SRYACT-KEY8"    TO  ORC-DBPATH
-                                 CALL "ORCMCPSUB"   USING  MCPAREA
-                                                           ORCMCPAREA
-                                                           MCPDATA-REC
-                                 IF      MCP-RC        =  ZERO
-                                   MOVE  "SRYACT-KEY8" TO  ORC-DBPATH 
-                                   PERFORM   900-SRYACT-READ-SEC
-                                   IF     FLG-SRYACT   =  ZERO
-                                       MOVE    1       TO  FLG-RINYAK
-                                   END-IF
-                                 END-IF
-                                 MOVE    "SRYACT-KEY8" TO  WK-PATH
-                                 PERFORM   900-CSR-CLOSE-SEC
+                                 PERFORM   21046-SINRYO-CHECK-SEC
                                  IF   FLG-RINYAK  =  1
                                     MOVE  ZERO  TO   FLG-SHOSAISIN
                                     MOVE  ZERO  TO   WRK-SRYSURYO
@@ -2285,6 +2276,12 @@
                     IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
                                              "630010002"
                         MOVE     "2"       TO    RECE04-COMCDFLG
+                    END-IF
+               END-IF
+      *
+               IF   RECE04-SAFLG  =  "1"
+                    IF    RECE04-COMCDFLG   NOT =   "2"
+                        MOVE     "1"       TO    RECE04-COMCDFLG
                     END-IF
                END-IF
       *
@@ -4340,6 +4337,55 @@
            END-PERFORM
            .
        21045-TOKKI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    剤の診療内容チェック
+      *****************************************************************
+       21046-SINRYO-CHECK-SEC                 SECTION.
+      *
+           PERFORM   VARYING   IDU   FROM   1   BY   1
+                      UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
+                       OR    ( FLG-RINYAK  =  1           )
+      *
+              IF  ( IDU  =  1                          )
+              OR  ((IDU  =  2) AND (ACCT-SRYKBN = "60"))
+              OR  ((IDU  =  3) AND (ACCT-SRYKBN = "80"))
+              OR  ((IDU  =  4) AND (ACCT-SRYKBN = "80"))
+      *
+                 INITIALIZE                   SRYACT-REC
+                 MOVE  RECE02-HOSPID      TO  SRY-HOSPID
+                 MOVE  RECE02-NYUGAIKBN   TO  SRY-NYUGAIKBN
+                 MOVE  RECE02-PTID        TO  SRY-PTID
+                 MOVE  RECE02-SRYYM       TO  SRY-SRYYM
+                 MOVE  ACCT-ZAINUM        TO  SRY-ZAINUM
+                 MOVE  TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(1)
+                 MOVE  TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(2)
+                 MOVE  TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(3)
+                 MOVE  TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(4)
+                 MOVE  TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(5)
+                 MOVE  SRYACT-REC         TO  MCPDATA-REC
+                 MOVE  "DBSELECT"         TO  MCP-FUNC
+                 MOVE  "SRYACT-KEY8"      TO  ORC-DBPATH
+                 CALL  "ORCMCPSUB"        USING  MCPAREA
+                                                 ORCMCPAREA
+                                                 MCPDATA-REC
+                 IF      MCP-RC         =  ZERO
+                     MOVE  "SRYACT-KEY8"  TO  ORC-DBPATH
+                     PERFORM   900-SRYACT-READ-SEC
+                     IF     FLG-SRYACT   =  ZERO
+                         MOVE    1        TO  FLG-RINYAK
+                     END-IF
+                 END-IF
+                 MOVE    "SRYACT-KEY8" TO  WK-PATH
+                 PERFORM   900-CSR-CLOSE-SEC
+      *
+              END-IF
+      *
+           END-PERFORM
+      *
+           .
+       21046-SINRYO-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

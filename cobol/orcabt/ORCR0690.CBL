@@ -88,6 +88,7 @@
       *  02.06.09    NACL-藤原    05/08/17  包括対象検査フラグの新設に対応
       *  02.06.10    NACL-伊藤    05/09/01  検体検査コメントのついた包括
       *                                     対象検査の剤まとめに対応
+      *  02.06.11    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1271,7 +1272,7 @@
                              END-IF
                            WHEN    "8"
                                IF (    IDY             =   ZERO      )
-                               OR ( RECE65-SRYCD (IDX) = CONS-RINYAK )
+      *****                    OR ( RECE65-SRYCD (IDX) = CONS-RINYAK )
                                    MOVE    2             TO  IDY
                                END-IF    
                            WHEN    "1"
@@ -3172,12 +3173,17 @@
                IF      IDY               =   1
                  IF       (WRK-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
                  OR       (WRK-ZAIW-SRYCD1(1:3)  =   "059"       )
+                 OR       (RECE64-SAFLG          =   "1"         )
                      MOVE    ALL "9"            TO
                                             WRK-ZAIW-CDKBN-AREA
-                     IF    WRK-ZAIW-SRYCD1(1:1)  =   "6"
-                       MOVE    999999998   TO  WRK-ZAIW-KOUHYOJYUNNUM
+                     IF    RECE64-SAFLG          =   "1"
+                         MOVE    999999999   TO  WRK-ZAIW-KOUHYOJYUNNUM
                      ELSE
-                       MOVE    999999999   TO  WRK-ZAIW-KOUHYOJYUNNUM
+                       IF    WRK-ZAIW-SRYCD1(1:1)  =   "6"
+                         MOVE    999999997   TO  WRK-ZAIW-KOUHYOJYUNNUM
+                       ELSE
+                         MOVE    999999998   TO  WRK-ZAIW-KOUHYOJYUNNUM
+                       END-IF
                      END-IF
                  END-IF
                END-IF

@@ -81,3 +81,5 @@
            03  RECE86-SRYSYUKBN           PIC  X(03).
       *診療日
            03  RECE86-DAY                 PIC  9(02).
+      *（サ）フラグ
+           03  RECE86-SAFLG               PIC  X(01).

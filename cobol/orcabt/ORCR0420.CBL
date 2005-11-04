@@ -96,6 +96,7 @@
       *  01.02.14    NACL-門脇    05/08/29  ０９５９３のコメント対応
       *  01.02.15    NACL-門脇    05/10/06  診区９５９６対応
       *  01.02.16    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
+      *  01.02.17    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -301,6 +302,7 @@
            03  IDY                                     PIC 9(03).
            03  IDW                                     PIC 9(03).
            03  IDV                                     PIC 9(03).
+           03  IDU                                     PIC 9(03).
            03  NUM-IDX                                 PIC 9(01).
            03  SYSKAN-IDX                              PIC 9(03).
       *
@@ -594,8 +596,22 @@
            03  CONS-SEIBUTU          PIC X(09)  VALUE  "130000110".
       *    麻薬注射
            03  CONS-MAYAKU           PIC X(09)  VALUE  "130000310".
+      *
+      *    剤の診療内容チェックテーブル
+       01  TBL-ZAICHECK-AREA.
       *    （サ）
-           03  CONS-RINYAK           PIC X(09)  VALUE  "820000046".
+           03  FILLER          PIC X(09)   VALUE    "820000046".
+      *    （検選）
+           03  FILLER          PIC X(09)   VALUE    "820000053".
+      *    （リハ選）
+           03  FILLER          PIC X(09)   VALUE    "820000054".
+      *    （精選）
+           03  FILLER          PIC X(09)   VALUE    "820000055".
+      *
+       01  TBL-ZAICHECK-R      REDEFINES   TBL-ZAICHECK-AREA.
+           03  TBL-ZAICHECK    PIC X(09)   OCCURS    4.
+      *
+       01  TBL-ZAICHECK-MAX    PIC 9(02)   VALUE     4.
       *
       *    酸素 
            COPY    "CMSANSOTBL.INC".
@@ -983,32 +999,7 @@
                                       PERFORM   21013-RECE44-WRITE-SEC
                                  END-IF
                                ELSE
-                                 INITIALIZE                SRYACT-REC
-                                 MOVE RECE41-HOSPID    TO  SRY-HOSPID
-                                 MOVE RECE41-NYUGAIKBN TO  SRY-NYUGAIKBN
-                                 MOVE RECE41-PTID      TO  SRY-PTID
-                                 MOVE RECE41-SRYYM     TO  SRY-SRYYM
-                                 MOVE ACCT-ZAINUM      TO  SRY-ZAINUM
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(1)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(2)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(3)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(4)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(5)
-                                 MOVE SRYACT-REC       TO  MCPDATA-REC
-                                 MOVE "DBSELECT"       TO  MCP-FUNC
-                                 MOVE "SRYACT-KEY8"    TO  ORC-DBPATH
-                                 CALL "ORCMCPSUB"   USING  MCPAREA
-                                                           ORCMCPAREA
-                                                           MCPDATA-REC
-                                 IF      MCP-RC        =  ZERO
-                                   MOVE  "SRYACT-KEY8" TO  ORC-DBPATH 
-                                   PERFORM   800-SRYACT-READ-SEC
-                                   IF     FLG-SRYACT   =  ZERO
-                                       MOVE    1       TO  FLG-RINYAK
-                                   END-IF
-                                 END-IF
-                                 MOVE    "SRYACT-KEY8" TO  WK-PATH
-                                 PERFORM   CSR-CLOSE-SEC
+                                 PERFORM   21014-SINRYO-CHECK-SEC
                                  IF   FLG-RINYAK  =  1
                                       MOVE  ZERO  TO  WRK-TEN
                                                       WRK-MEISAI-CNT
@@ -1426,6 +1417,13 @@
                      END-IF
                    END-IF                                               
                   END-IF                                                
+      *
+                  IF  ( ACCT-SRYKBN   =  "80" )
+                  AND ( RECE44-SAFLG  =  "1"  )
+                            MOVE   "40"   TO  RECE44-SRYKBN
+                                              RECE45-SRYKBN
+                  END-IF
+      *
                END-IF                                                   
       *
                PERFORM  2101211-RECE45-TENSOU-COMCNT-HEN-SEC
@@ -1566,6 +1564,12 @@
                     IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
                                              "630010002"
                         MOVE     "3"       TO    RECE44-COMCDFLG
+                    END-IF
+               END-IF
+      *
+               IF   RECE44-SAFLG  =  "1"
+                    IF    RECE44-COMCDFLG   NOT =   "3"
+                        MOVE     "1"       TO    RECE44-COMCDFLG
                     END-IF
                END-IF
       *
@@ -4176,6 +4180,55 @@
            EXIT.
       *
       *****************************************************************
+      *    剤の診療内容チェック
+      *****************************************************************
+       21014-SINRYO-CHECK-SEC                 SECTION.
+      *
+           PERFORM   VARYING   IDU   FROM   1   BY   1
+                      UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
+                       OR    ( FLG-RINYAK  =  1           )
+      *
+              IF  ( IDU  =  1                          )
+              OR  ((IDU  =  2) AND (ACCT-SRYKBN = "60"))
+              OR  ((IDU  =  3) AND (ACCT-SRYKBN = "80"))
+              OR  ((IDU  =  4) AND (ACCT-SRYKBN = "80"))
+      *
+                 INITIALIZE                  SRYACT-REC
+                 MOVE RECE41-HOSPID      TO  SRY-HOSPID
+                 MOVE RECE41-NYUGAIKBN   TO  SRY-NYUGAIKBN
+                 MOVE RECE41-PTID        TO  SRY-PTID
+                 MOVE RECE41-SRYYM       TO  SRY-SRYYM
+                 MOVE ACCT-ZAINUM        TO  SRY-ZAINUM
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(1)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(2)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(3)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(4)
+                 MOVE TBL-ZAICHECK(IDU)  TO  SRY-SRYCD(5)
+                 MOVE SRYACT-REC         TO  MCPDATA-REC
+                 MOVE "DBSELECT"         TO  MCP-FUNC
+                 MOVE "SRYACT-KEY8"      TO  ORC-DBPATH
+                 CALL "ORCMCPSUB"        USING  MCPAREA
+                                                ORCMCPAREA
+                                                MCPDATA-REC
+                 IF      MCP-RC        =  ZERO
+                     MOVE  "SRYACT-KEY8" TO  ORC-DBPATH 
+                     PERFORM   800-SRYACT-READ-SEC
+                     IF     FLG-SRYACT   =  ZERO
+                         MOVE    1       TO  FLG-RINYAK
+                     END-IF
+                 END-IF
+                 MOVE    "SRYACT-KEY8" TO  WK-PATH
+                 PERFORM   CSR-CLOSE-SEC
+      *
+              END-IF
+      *
+           END-PERFORM
+      *
+           .
+       21014-SINRYO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    レセプト中間ファイルの基本点数部分のクリア処理
       *****************************************************************
        2102-KHNTEN-CLEAR-SEC               SECTION.
@@ -4351,32 +4404,7 @@
                                       PERFORM   21013-RECE44-WRITE-SEC
                                  END-IF
                                ELSE
-                                 INITIALIZE                SRYACT-REC
-                                 MOVE RECE41-HOSPID    TO  SRY-HOSPID
-                                 MOVE RECE41-NYUGAIKBN TO  SRY-NYUGAIKBN
-                                 MOVE RECE41-PTID      TO  SRY-PTID
-                                 MOVE RECE41-SRYYM     TO  SRY-SRYYM
-                                 MOVE ACCT-ZAINUM      TO  SRY-ZAINUM
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(1)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(2)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(3)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(4)
-                                 MOVE CONS-RINYAK      TO  SRY-SRYCD(5)
-                                 MOVE SRYACT-REC       TO  MCPDATA-REC
-                                 MOVE "DBSELECT"       TO  MCP-FUNC
-                                 MOVE "SRYACT-KEY8"    TO  ORC-DBPATH
-                                 CALL "ORCMCPSUB"   USING  MCPAREA
-                                                           ORCMCPAREA
-                                                           MCPDATA-REC
-                                 IF      MCP-RC        =  ZERO
-                                   MOVE  "SRYACT-KEY8" TO  ORC-DBPATH 
-                                   PERFORM   800-SRYACT-READ-SEC
-                                   IF     FLG-SRYACT   =  ZERO
-                                       MOVE    1       TO  FLG-RINYAK
-                                   END-IF
-                                 END-IF
-                                 MOVE    "SRYACT-KEY8" TO  WK-PATH
-                                 PERFORM   CSR-CLOSE-SEC
+                                 PERFORM   21014-SINRYO-CHECK-SEC
                                  IF   FLG-RINYAK  =  1
                                       MOVE  ACCT-DAY(1 WRK-DAY)  
                                                   TO  WRK-ZAIKAISU-XXX
