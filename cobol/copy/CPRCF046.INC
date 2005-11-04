@@ -69,3 +69,5 @@
            03  RECE46-CDKBN-KBNNUM-EDA    PIC  9(02).
            03  RECE46-CDKBN-KOUBAN        PIC  9(02).
            03  RECE46-KOUHYOJUNNUM        PIC  9(09).
+      *（サ）フラグ
+           03  RECE46-SAFLG               PIC  X(01).

@@ -34,6 +34,7 @@
       *  01.01.01    NACL-藤原    04/10/07  中止処理の追加
       *  01.01.02    NACL-門脇    05/01/06  自費レセプトの出力条件修正
       *  01.01.03    NACL-門脇    05/02/28  （サ）記載対応
+      *  01.01.04    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -278,6 +279,9 @@
                           MOVE   4      TO      RECE661-KNSJISKBN
                   END-IF
               END-IF
+              IF    RECE66-SAFLG   =   "1"
+                   MOVE    9            TO      RECE661-KNSJISKBN
+              END-IF
            END-IF     
       ***     MOVE    RECE66-KNSJISKBN     TO      RECE661-KNSJISKBN
            MOVE    RECE66-LINENUM       TO      RECE661-LINENUM
@@ -313,8 +317,8 @@
                   PERFORM     RECE661-WRITE-SEC
               ELSE
                 IF  ( RECE66-SRYKBN  =  "11" OR "33" OR "99"
-                                             OR "90" OR "92" )
-                OR  ( RECE66-SAFLG   =  "1"                  )
+                                     OR "90" OR "92" OR SPACE )
+                OR  ( RECE66-SAFLG   =  "1"                   )
                      PERFORM  RECE661-WRITE-SEC
                 END-IF
               END-IF

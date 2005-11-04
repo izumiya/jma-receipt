@@ -76,3 +76,5 @@
            03  RECE86-CDKBN-KBNNUM-EDA    PIC  9(02).
            03  RECE86-CDKBN-KOUBAN        PIC  9(02).
            03  RECE86-KOUHYOJUNNUM        PIC  9(09).
+      *（サ）フラグ
+           03  RECE86-SAFLG               PIC  X(01).

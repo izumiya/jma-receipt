@@ -35,6 +35,7 @@
       *  01.00.04    NACL-門脇    03.03.06  初再診のコメント編集対応
       *  中止処理追加
       *  01.01.01    NACL-藤原    04/10/13  中止処理の追加
+      *  01.01.02    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -276,6 +277,9 @@
                   IF   RECE46-CDKBN-KBN      =      "9"
                           MOVE   4      TO      RECE47-KNSJISKBN
                   END-IF
+              END-IF
+              IF    RECE46-SAFLG   =   "1"
+                   MOVE    9            TO      RECE47-KNSJISKBN
               END-IF
            END-IF     
       ***  MOVE    RECE46-KNSJISKBN     TO      RECE47-KNSJISKBN
