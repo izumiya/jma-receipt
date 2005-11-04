@@ -3471,7 +3471,7 @@
                   (WRK-TENSUGOKEI     =   ZERO)                         
                GO  TO  440-TNSKAI-SET-EXT                               
            END-IF                                                       
-           IF      RECE04-SAFLG       =   "1"
+           IF      RECE04-SAFLG   NOT =   SPACE
                GO  TO  440-TNSKAI-SET-EXT                              
            END-IF  
       *---- (01.00.05) LINE ADD END   --------------------------------
@@ -3540,10 +3540,10 @@
                IF      IDY               =   1
                  IF       (WRK-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
                  OR       (WRK-ZAIW-SRYCD1(1:3)  =   "059"       )
-                 OR       (RECE04-SAFLG          =   "1"         )
+                 OR       (RECE04-SAFLG     NOT  =   SPACE       )
                      MOVE    ALL "9"            TO
                                             WRK-ZAIW-CDKBN-AREA
-                     IF    RECE04-SAFLG          =   "1"
+                     IF    RECE04-SAFLG     NOT  =   SPACE
                          MOVE    999999999   TO  WRK-ZAIW-KOUHYOJYUNNUM
                      ELSE
                        IF    WRK-ZAIW-SRYCD1(1:1)  =   "6"

@@ -276,7 +276,7 @@
                           MOVE   4      TO      RECE87-KNSJISKBN
                   END-IF
               END-IF
-              IF    RECE86-SAFLG   =   "1"
+              IF    RECE86-SAFLG   NOT =   SPACE
                    MOVE    9            TO      RECE87-KNSJISKBN
               END-IF
            END-IF     

@@ -1618,7 +1618,7 @@
                                  END-IF
                                ELSE
                                  PERFORM   21014-SINRYO-CHECK-SEC
-                                 IF   FLG-RINYAK  =  1
+                                 IF   FLG-RINYAK  NOT =  ZERO
                                       MOVE   ZERO   TO   WRK-SRYSURYO
                                       MOVE   ZERO   TO   WRK-SRYSURYO2
                                       MOVE   ZERO   TO   WRK-SRYSURYO3
@@ -1730,8 +1730,8 @@
                END-PERFORM
            END-IF
       *
-           IF    FLG-RINYAK    =    1
-                MOVE    "1"     TO     RECE64-SAFLG
+           IF    FLG-RINYAK    NOT =    ZERO
+                MOVE    FLG-RINYAK    TO     RECE64-SAFLG
            END-IF
       *
            .
@@ -2182,10 +2182,6 @@
                          COMPUTE  RECE65-YUKOKETA(IDX4) =
                                   RECE65-YUKOKETA(IDX4) + 2
                    END-IF
-               END-IF
-      *
-               IF   RECE64-SAFLG  =  "1"
-                      MOVE     "1"       TO   RECE64-COMCDFLG
                END-IF
       *
                IF  RECE65-YUKOKETA(IDX4)  =  ZERO
@@ -3367,7 +3363,7 @@
       *
            PERFORM   VARYING   IDU   FROM   1   BY   1
                       UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
-                       OR    ( FLG-RINYAK  =  1           )
+                       OR    ( FLG-RINYAK  NOT =  ZERO    )
       *
               IF  ( IDU  =  1                          )
               OR  ((IDU  =  2) AND (ACCT-SRYKBN = "60"))
@@ -3395,7 +3391,14 @@
                      MOVE  "SRYACT-KEY8" TO  ORC-DBPATH
                      PERFORM   900-SRYACT-READ-SEC
                      IF     FLG-SRYACT   =  ZERO
-                         MOVE    1       TO  FLG-RINYAK
+                         EVALUATE   IDU
+                           WHEN      1
+                             MOVE   1   TO  FLG-RINYAK
+                           WHEN      2
+                           WHEN      3
+                           WHEN      4
+                             MOVE   2   TO  FLG-RINYAK
+                         END-EVALUATE
                      END-IF
                  END-IF
                  MOVE    "SRYACT-KEY8"   TO  WK-PATH

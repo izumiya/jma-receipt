@@ -1149,7 +1149,7 @@
                                END-IF
                             ELSE
                                PERFORM   2203-SINRYO-CHECK-SEC
-                               IF   FLG-RINYAK  =  1
+                               IF   FLG-RINYAK  NOT =  ZERO
                                  MOVE   ZERO   TO   WRK-TEN
                                                     WRK-MEISAI-CNT
                                                     WRK-SRYCDTOTAL
@@ -1267,8 +1267,8 @@
                END-PERFORM
            END-IF
       *
-           IF    FLG-RINYAK    =    1
-                MOVE    "1"            TO    RECE84-SAFLG
+           IF    FLG-RINYAK    NOT =    ZERO
+                MOVE    FLG-RINYAK   TO    RECE84-SAFLG
            END-IF
       *
            .
@@ -1602,8 +1602,8 @@
                    END-IF                                               
                   END-IF                                                
       *
-                  IF  ( ACCT-SRYKBN   =  "80" )
-                  AND ( RECE84-SAFLG  =  "1"  )
+                  IF  ( ACCT-SRYKBN       =  "80"  )
+                  AND ( RECE84-SAFLG  NOT =  SPACE )
                             MOVE   "40"   TO  RECE84-SRYKBN
                                               RECE85-SRYKBN
                   END-IF
@@ -1720,10 +1720,6 @@
                    MOVE   "1"                  TO    RECE84-COMCDFLG
                ELSE
                    MOVE    TNS-NAME            TO    RECE85-NAME(IDX4)
-               END-IF
-      *
-               IF   RECE84-SAFLG  =  "1"
-                        MOVE     "1"           TO    RECE84-COMCDFLG
                END-IF
       *
                IF  RECE85-YUKOKETA(IDX4)  =  ZERO
@@ -3353,7 +3349,7 @@
       *
            PERFORM   VARYING   IDU   FROM   1   BY   1
                       UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
-                       OR    ( FLG-RINYAK  =  1           )
+                       OR    ( FLG-RINYAK  NOT =  ZERO    )
       *
               IF  ( IDU  =  1                          )
               OR  ((IDU  =  2) AND (ACCT-SRYKBN = "60"))
@@ -3381,7 +3377,14 @@
                      MOVE  "SRYACT-KEY8" TO  ORC-DBPATH
                      PERFORM   900-SRYACT-READ-SEC
                      IF     FLG-SRYACT   =  ZERO
-                         MOVE    1       TO  FLG-RINYAK
+                         EVALUATE   IDU
+                           WHEN      1
+                             MOVE   1   TO  FLG-RINYAK
+                           WHEN      2
+                           WHEN      3
+                           WHEN      4
+                             MOVE   2   TO  FLG-RINYAK
+                         END-EVALUATE
                      END-IF
                  END-IF
                  MOVE    "SRYACT-KEY8" TO  WK-PATH
