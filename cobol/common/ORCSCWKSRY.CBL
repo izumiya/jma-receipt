@@ -2031,8 +2031,8 @@
                               (FLG-TIME    =   1       )
       *        自動発生の時間外加算
                IF     (SPA-COM-DATAKBN(IDT)    =   "2" )  AND
-                      (SPA-COM-AUTOKBN(IDT)    =   "2" )  AND
-                      (SPA-COM-TIMEKSNKBN(IDT) NOT =   ZERO )
+                      (SPA-COM-AUTOKBN(IDT)    =   "2" )
+      *********  AND  (SPA-COM-TIMEKSNKBN(IDT) NOT =   ZERO )
                    MOVE    1               TO  FLG-TIME
                END-IF
                IF      SPA-COM-ZAIEND (IDT)    =   "1"
