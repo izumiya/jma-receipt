@@ -2453,7 +2453,7 @@
                   (RECE44-SRYKBN      =   "11" OR "12" OR "99")         
                GO  TO  440-TNSKAI-SET-EXT                               
            END-IF                                                       
-           IF      RECE44-SAFLG       =   "1"
+           IF      RECE44-SAFLG   NOT =   SPACE
                GO  TO  440-TNSKAI-SET-EXT                              
            END-IF  
       *---- (01.00.05) LINE ADD END   --------------------------------
@@ -2517,10 +2517,10 @@
                IF      IDY               =   1
                  IF       (TBL-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
                  OR       (TBL-ZAIW-SRYCD1(1:3)  =   "059"       )
-                 OR       (RECE44-SAFLG          =   "1"         )
+                 OR       (RECE44-SAFLG     NOT  =   SPACE       )
                      MOVE    ALL "9"            TO
                                             TBL-ZAIW-CDKBN-AREA
-                     IF    RECE44-SAFLG          =   "1"
+                     IF    RECE44-SAFLG     NOT  =   SPACE
                          MOVE    999999999   TO  TBL-ZAIW-KOUHYOJYUNNUM
                      ELSE
                        IF    TBL-ZAIW-SRYCD1(1:1)  =   "6"

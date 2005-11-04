@@ -279,7 +279,7 @@
                           MOVE   4      TO      RECE661-KNSJISKBN
                   END-IF
               END-IF
-              IF    RECE66-SAFLG   =   "1"
+              IF    RECE66-SAFLG   NOT =   SPACE
                    MOVE    9            TO      RECE661-KNSJISKBN
               END-IF
            END-IF     
@@ -318,7 +318,7 @@
               ELSE
                 IF  ( RECE66-SRYKBN  =  "11" OR "33" OR "99"
                                      OR "90" OR "92" OR SPACE )
-                OR  ( RECE66-SAFLG   =  "1"                   )
+                OR  ( RECE66-SAFLG   NOT =  SPACE             )
                      PERFORM  RECE661-WRITE-SEC
                 END-IF
               END-IF

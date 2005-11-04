@@ -305,7 +305,7 @@
                           MOVE   4      TO      RECE061-KNSJISKBN
                   END-IF
               END-IF
-              IF    RECE06-SAFLG   =   "1"
+              IF    RECE06-SAFLG   NOT =   SPACE
                    MOVE    9            TO      RECE061-KNSJISKBN
               END-IF
            END-IF     
@@ -370,7 +370,7 @@
                   PERFORM     2101-RECE061-WRITE-SEC
               ELSE
                 IF  ( RECE06-SRYKBN  =  "11" OR "12" OR "99" OR SPACE )
-                OR  ( RECE06-SAFLG   =  "1"                           )
+                OR  ( RECE06-SAFLG   NOT =  SPACE                     )
                      PERFORM  2101-RECE061-WRITE-SEC
                 END-IF
               END-IF

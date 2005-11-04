@@ -970,7 +970,7 @@
                                  END-IF
                                ELSE
                                  PERFORM   21014-SINRYO-CHECK-SEC
-                                 IF   FLG-RINYAK  =  1
+                                 IF   FLG-RINYAK  NOT =  ZERO
                                       MOVE  ZERO  TO  WRK-TEN
                                                       WRK-MEISAI-CNT
                                                       WRK-SRYCDTOTAL
@@ -1081,8 +1081,8 @@
               MOVE    WRK-DAY          TO    WK-TAIHI-DAY
            END-IF
       *
-           IF    FLG-RINYAK    =    1
-                MOVE    "1"            TO    RECE44-SAFLG
+           IF    FLG-RINYAK   NOT =    ZERO
+                MOVE    FLG-RINYAK     TO    RECE44-SAFLG
            END-IF
       *
            .
@@ -1369,8 +1369,8 @@
                    END-IF                                               
                   END-IF                                                
       *
-                  IF  ( ACCT-SRYKBN   =  "80" )
-                  AND ( RECE44-SAFLG  =  "1"  )
+                  IF  ( ACCT-SRYKBN       =  "80"  )
+                  AND ( RECE44-SAFLG  NOT =  SPACE )
                             MOVE   "40"   TO  RECE44-SRYKBN
                                               RECE45-SRYKBN
                   END-IF
@@ -1513,12 +1513,6 @@
                     IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
                                              "630010002"
                         MOVE     "3"       TO    RECE44-COMCDFLG
-                    END-IF
-               END-IF
-      *
-               IF   RECE44-SAFLG  =  "1"
-                    IF    RECE44-COMCDFLG   NOT =   "3"
-                        MOVE     "1"       TO    RECE44-COMCDFLG
                     END-IF
                END-IF
       *
@@ -3561,7 +3555,7 @@
       *
            PERFORM   VARYING   IDU   FROM   1   BY   1
                       UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
-                       OR    ( FLG-RINYAK  =  1           )
+                       OR    ( FLG-RINYAK  NOT =  ZERO    )
       *
               IF  ( IDU  =  1                          )
               OR  ((IDU  =  2) AND (ACCT-SRYKBN = "60"))
@@ -3589,7 +3583,14 @@
                      MOVE  "SRYACT-KEY8" TO  ORC-DBPATH 
                      PERFORM   800-SRYACT-READ-SEC
                      IF     FLG-SRYACT   =  ZERO
-                         MOVE    1       TO  FLG-RINYAK
+                         EVALUATE   IDU
+                           WHEN      1
+                             MOVE   1   TO  FLG-RINYAK
+                           WHEN      2
+                           WHEN      3
+                           WHEN      4
+                             MOVE   2   TO  FLG-RINYAK
+                         END-EVALUATE
                      END-IF
                  END-IF
                  MOVE    "SRYACT-KEY8" TO  WK-PATH
@@ -3762,7 +3763,7 @@
                                  END-IF
                                ELSE
                                  PERFORM   21014-SINRYO-CHECK-SEC
-                                 IF   FLG-RINYAK  =  1
+                                 IF   FLG-RINYAK  NOT =  ZERO
                                       MOVE  ACCT-DAY(1 WRK-DAY)  
                                                   TO  WRK-ZAIKAISU-XXX
                                       MOVE  ZERO  TO  WRK-TEN
