@@ -2575,6 +2575,11 @@
       *
            MOVE    1                   TO  FLG-SYONIKA
            MOVE    1                   TO  SPA-SYONIKA-ARI
+      *
+           IF      SPA-GMN-IDX         >   ZERO
+      *        療養担当手当（北海道）
+               PERFORM 330123-RYOYOU-TEATE-SEC
+           END-IF
            .
        3303-SYONIKA-SET-EXT.
            EXIT.
@@ -3907,6 +3912,12 @@
                                MOVE    SPACE       TO  SPA-COM-CUR
                                                                 (IDX)
                            END-IF
+      *                    その他の診療種別
+                           IF      SPA-GMN-INPUTCD(IDX)    =   ".800"
+                               MOVE    SPACE       TO  SPA-ERRCD
+                               MOVE    SPACE       TO  SPA-COM-CUR
+                                                                (IDX)
+                           END-IF
                    END-EVALUATE
                ELSE
       *        小児科外来診療科以外の時、小児科外来診療科でないこと
@@ -3969,6 +3980,14 @@
                                            TO  WRK-SYONIKA-KBN
                     MOVE    1              TO  FLG-SYONIKA-CHK
            END-SEARCH
+      *
+      *    療養担当手当（北海道）判定（暫定処理）
+           IF      FLG-SYONIKA-CHK         =   ZERO
+               IF      SPA-COM-INPUTCD (IDX)   =   "199000610"
+                   MOVE    "9"                 TO  WRK-SYONIKA-KBN
+                   MOVE    1                   TO  FLG-SYONIKA-CHK
+               END-IF
+           END-IF
            .
        50192-SYONIKASRYCD-CHK-EXT.
            EXIT.
