@@ -58,6 +58,7 @@
       *  01.02.02    NACL-門脇    04/12/09  脳血管疾患急性発症終了日対応
       *  01.02.03    NACL-門脇    05/01/18  酸素計算式コメント対応
       *  01.02.04    NACL-門脇    05/04/20  内服薬剤逓減編集対応
+      *  01.02.05    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1007,23 +1008,35 @@
                    WHEN      "50"
       *            （手術日のセット）
                       PERFORM    2001-SHUJUTSU-HANTEI-SEC
+                   WHEN      "60"
+      *            （（検選）日のセット）
+                      PERFORM    2001-KENSEN-HANTEI-SEC
                    WHEN      "70"
       *            （ＣＴ・ＭＲＩ実施日のセット）
                       PERFORM    2001-CTMRI-HANTEI-SEC
                    WHEN      "80"
+                      MOVE      ZERO     TO    FLG-COMMENT
       *            （リハビリのセット）
-                      MOVE    ZERO     TO    FLG-ARI
-                      PERFORM   VARYING   IDX    FROM   1   BY   1
-                            UNTIL   (IDX             >      18)         
-                             OR     (FLG-ARI         =       1)
-                          IF  RECE44-ZAINUM  =  WRK-RIHA-ZAINUM(IDX)
-                              MOVE    1    TO   FLG-ARI 
-                          END-IF
-                      END-PERFORM
-                      IF  FLG-ARI  =  1
-                          PERFORM   2001-RIHA-COMMENT-SEC
-                      ELSE
-                          PERFORM   2099-RECE44-TENSOU-SEC
+                      IF   FLG-COMMENT  =  ZERO
+                        MOVE    ZERO     TO    FLG-ARI
+                        PERFORM   VARYING   IDX    FROM   1   BY   1
+                              UNTIL   (IDX             >      18)         
+                               OR     (FLG-ARI         =       1)
+                            IF  RECE44-ZAINUM  =  WRK-RIHA-ZAINUM(IDX)
+                                MOVE    1    TO   FLG-ARI 
+                            END-IF
+                        END-PERFORM
+                        IF  FLG-ARI  =  1
+                            MOVE      99   TO   FLG-COMMENT
+                            PERFORM   2001-RIHA-COMMENT-SEC
+                        END-IF
+                      END-IF
+      *            （（リハ選）日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-RIHASEN-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                            PERFORM   2099-RECE44-TENSOU-SEC
                       END-IF
                    WHEN   OTHER
                       PERFORM       2099-RECE44-TENSOU-SEC
@@ -1074,6 +1087,9 @@
                    WHEN      "50"                                       
       *            （手術日のセット）                                   
                       PERFORM    2001-SHUJUTSU-HANTEI-SEC
+                   WHEN      "60"
+      *            （（検選）日のセット）
+                      PERFORM    2001-KENSEN-HANTEI-SEC
                    WHEN      "70"
       *            （ＣＴ・ＭＲＩ実施日のセット）
                       PERFORM    2001-CTMRI-HANTEI-SEC
@@ -1094,8 +1110,12 @@
                             PERFORM   2001-RIHA-COMMENT-SEC
                         END-IF
                       END-IF
+      *            （（リハ選）日のセット）
                       IF   FLG-COMMENT  =  ZERO
-                        PERFORM    2099-RECE44-TENSOU-SEC
+                        PERFORM       2001-RIHASEN-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2099-RECE44-TENSOU-SEC
                       END-IF
                    WHEN   OTHER                                         
                       PERFORM       2099-RECE44-TENSOU-SEC
@@ -2138,6 +2158,22 @@
            EXIT.
       *
       *****************************************************************
+      *    （検選）のコメントがあるか判定
+      *****************************************************************
+       2001-KENSEN-HANTEI-SEC          SECTION.
+      *
+           IF     RECE44-SAFLG   =    "2"
+               MOVE       2       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           ELSE
+               PERFORM    2099-RECE44-TENSOU-SEC
+           END-IF
+      *
+           .
+       2001-KENSEN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ＣＴ・ＭＲＩがあるか判定
       *****************************************************************
        2001-CTMRI-HANTEI-SEC          SECTION.
@@ -2598,6 +2634,20 @@
       *
            .
        2001-RIHA-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （リハ選）のコメントがあるか判定
+      *****************************************************************
+       2001-RIHASEN-HANTEI-SEC          SECTION.
+      *
+           IF     RECE44-SAFLG   =    "2"
+               MOVE       2       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-RIHASEN-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************

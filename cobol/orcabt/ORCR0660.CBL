@@ -57,6 +57,7 @@
       *  01.02.01    NACL-藤原    04/10/07  中止処理の追加
       *  01.02.02    NACL-門脇    04/12/09  脳血管疾患急性発症終了日対応
       *  01.02.03    NACL-門脇    05/01/18  酸素計算式コメント対応
+      *  01.02.04    NACL-門脇    05/11/01  （検選）等コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -852,6 +853,9 @@
                    WHEN      "50"
       *            （手術日のセット）
                       PERFORM    2001-SHUJUTSU-HANTEI-SEC
+                   WHEN      "60"
+      *            （（検選）日のセット）
+                      PERFORM    2001-KENSEN-HANTEI-SEC
                    WHEN      "70"
       *            （ＣＴ・ＭＲＩ実施日のセット）
                       PERFORM    2001-CTMRI-HANTEI-SEC
@@ -878,6 +882,10 @@
                              MOVE      99   TO   FLG-COMMENT
                              PERFORM   2001-RIHA-COMMENT-SEC
                          END-IF
+                      END-IF
+      *            （（リハ選）日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM        2001-RIHASEN-HANTEI-SEC
                       END-IF
                       IF   FLG-COMMENT  =  ZERO
                              PERFORM   2099-RECE64-TENSOU-SEC
@@ -1834,6 +1842,22 @@
            EXIT.
       *
       *****************************************************************
+      *    （検選）のコメントがあるか判定
+      *****************************************************************
+       2001-KENSEN-HANTEI-SEC          SECTION.
+      *
+           IF     RECE64-SAFLG   =    "2"
+               MOVE       2       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           ELSE
+               PERFORM    2099-RECE64-TENSOU-SEC
+           END-IF
+      *
+           .
+       2001-KENSEN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ＣＴ・ＭＲＩがあるか判定
       *****************************************************************
        2001-CTMRI-HANTEI-SEC          SECTION.
@@ -2571,6 +2595,20 @@
       *
            .
        2001-RIHA-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （リハ選）のコメントがあるか判定
+      *****************************************************************
+       2001-RIHASEN-HANTEI-SEC          SECTION.
+      *
+           IF     RECE64-SAFLG   =    "2"
+               MOVE       2       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-RIHASEN-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
