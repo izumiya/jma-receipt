@@ -888,6 +888,11 @@
                GO      TO      100113-RSIHKN-SYORI-EXT
            END-IF
       *
+      *    リハビリテーション総合計画評価料は対象外
+           IF      WRK-COM-INPUTCD (IDX-Z) =   "180024710"
+               GO      TO      100113-RSIHKN-SYORI-EXT
+           END-IF
+      *
       *    労災の時、加算なし
            IF      WRK-COM-INPUTCD(IDX-Z)(1:3) =   "101"
       *        四肢加算チェック
