@@ -263,6 +263,7 @@
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDX-RECE85          PIC 9(04).
+           03  IDV                 PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -290,6 +291,9 @@
            03  WRK-KYUSEIYMD       PIC 9(08).
            03  WRK-HINKAIYMD       PIC 9(08).
            03  WRK-DAY             PIC 9(02).
+      *
+           03  WRK-HENSYU-KAISU    PIC X(02).
+           03  WRK-HENSYU-KAISU2   PIC X(04).
       *
            03  WRK-TUKI-YAKUKAN    PIC 9(02).
            03  WRK-DAY-YAKUKAN     PIC 9(02).
@@ -1669,14 +1673,151 @@
        2001-KENSEN-HANTEI-SEC          SECTION.
       *
            IF     RECE84-SAFLG   =    "2"
-               MOVE       2       TO     FLG-COMMENT
-               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+               PERFORM    20011-KENSENTOU-COMMENT-SEC
            ELSE
                PERFORM    2099-RECE84-WRITE-SEC
            END-IF
       *
            .
        2001-KENSEN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （検選）等のコメント編集
+      *****************************************************************
+       20011-KENSENTOU-COMMENT-SEC          SECTION.
+      *
+           PERFORM   200111-RECE85-TAIHI-SEC
+      *
+           MOVE    ZERO                 TO  IDX-RECE85
+           MOVE    SPACE                TO  WRK-RECE85XX-REC
+           INITIALIZE                       WRK-RECE85XX-REC
+      *
+           PERFORM
+             UNTIL  ( FLG-RECE85           =   1                   )
+             OR     ( RECE84-HOSPID    NOT =   RECE85-HOSPID       )
+             OR     ( RECE84-SRYYM     NOT =   RECE85-SRYYM        )
+             OR     ( RECE84-NYUGAIKBN NOT =   RECE85-NYUGAIKBN    )
+             OR     ( RECE84-PTID      NOT =   RECE85-PTID         )
+             OR     ( RECE84-RECEKA    NOT =   RECE85-RECEKA       )
+             OR     ( RECE84-HKNID     NOT =   RECE85-HKNID        )
+             OR     ( RECE84-TEKSTYMD  NOT =   RECE85-TEKSTYMD     )
+             OR     ( RECE84-ZAINUM    NOT =   RECE85-ZAINUM       )
+      *
+             PERFORM   VARYING   IDX   FROM    1   BY  1
+                       UNTIL   ( IDX               >   5     )
+                       OR      ( RECE85-SRYCD(IDX) =   SPACE )
+                  ADD    1             TO      IDX-RECE85
+                  MOVE   RECE85-SRYACT-TBL(IDX)
+                             TO   WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
+      *++++++
+                  IF    IDX-RECE85  =  RECE84-MEISAISU
+      *
+                    IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = "810000001"
+                    OR  WRK-RECE85XX-SRYCD(IDX-RECE85 1)(1:3)  = "008"
+      *
+                        COMPUTE   IDV  =
+                         (WRK-RECE85XX-YUKOKETA(IDX-RECE85 1) * 2) + 1
+      *
+                        IF   WRK-RECE85XX-YUKOKETA(IDX-RECE85 1) <=  96
+                          MOVE    "　×"   TO
+                           WRK-RECE85XX-NAME(IDX-RECE85 1)(IDV:4)
+                        END-IF
+      *
+                        COMPUTE   IDV  =  IDV  +  4
+      *
+                        MOVE    RECE84-ZAIKAISU   TO   DAY-IDX2
+                        PERFORM 20011-KAISU-HENSYU-SEC
+                        IF   WRK-RECE85XX-YUKOKETA(IDX-RECE85 1) <=  96
+                          MOVE    WRK-HENSYU-KAISU2  TO
+                           WRK-RECE85XX-NAME(IDX-RECE85 1)(IDV:4)
+                          COMPUTE WRK-RECE85XX-YUKOKETA(IDX-RECE85 1) =
+                                  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1) +
+                                  4
+                        END-IF
+      *
+                    END-IF
+      *
+                  END-IF
+      *++++++
+             END-PERFORM 
+      *
+             PERFORM 990-RECE85-NEXT-SEC
+      *
+           END-PERFORM
+      *
+      *    手術日コメントを含んだ内容で中間ファイルの再作成
+           MOVE       ZERO             TO      FLG-WRKRECE85
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE85
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE85  =    1
+      *
+                  INITIALIZE                        RECE859-REC
+                  MOVE    WRK-RECE85-KEY       TO   RECE859-KEY
+                  ADD     1                    TO   WRK-RENNUM
+                  MOVE    WRK-RENNUM           TO   RECE859-RENNUM
+                  MOVE    WRK-RECE85-PTNUM     TO   RECE859-PTNUM
+                  MOVE    WRK-RECE85-SRYKA     TO   RECE859-SRYKA
+                  MOVE    WRK-RECE85-SRYKBN    TO   RECE859-SRYKBN
+                  MOVE    WRK-RECE85-SRYSYUKBN TO   RECE859-SRYSYUKBN
+                  MOVE    WRK-RECE85-JIHIMONEY TO   RECE859-JIHIMONEY
+                  PERFORM  VARYING   IDX   FROM   1   BY   1
+                           UNTIL   (IDX       >    5)   OR
+                                   (FLG-WRKRECE85   =   1)
+                     ADD         1             TO    IDX-RECE85
+                     IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                         MOVE    1             TO    FLG-WRKRECE85
+                     ELSE
+                         MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
+                                          TO   RECE859-SRYACT-TBL(IDX)
+      *
+                         IF    WRK-RECE85XX-SIKFLG(IDX-RECE85 1)  =  "1"
+                              ADD    1    TO   WRK-CNT-MEISAI
+                         END-IF    
+      *
+                     END-IF  
+                  END-PERFORM
+                  IF   RECE859-SRYCD(1)  NOT =  SPACE
+                     WRITE   RECE859-REC
+                     ADD     1            TO   CNT-RECE859
+                  END-IF
+           END-PERFORM
+      *
+           MOVE    RECE84-REC        TO      RECE849-REC
+           MOVE    WRK-CNT-MEISAI    TO      RECE849-MEISAISU
+           WRITE   RECE849-REC
+           ADD     1                 TO      CNT-RECE849
+      *
+           .
+       20011-KENSENTOU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    回数編集
+      *****************************************************************
+       20011-KAISU-HENSYU-SEC          SECTION.
+      *
+           MOVE    SPACE                TO  WRK-HENSYU-KAISU
+           MOVE    SPACE                TO  WRK-HENSYU-KAISU2
+      *
+           MOVE    DAY-IDX2             TO  WRK-HENSYU-KAISU
+           IF      WRK-HENSYU-KAISU(1:1) =  "0"
+               MOVE      SPACE          TO  WRK-HENSYU-KAISU(1:1)
+           END-IF
+      *
+           INITIALIZE                       ORCSKANACHKAREA
+           MOVE    "2"                  TO  KANACHK-SYORI
+           MOVE    WRK-HENSYU-KAISU     TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+           IF      KANACHK-RC      =   ZERO
+                MOVE    KANACHK-OUT-INPUT(1:4)
+                                        TO  WRK-HENSYU-KAISU2
+           END-IF
+      *
+           .
+       20011-KAISU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2214,8 +2355,8 @@
        2001-RIHASEN-HANTEI-SEC          SECTION.
       *
            IF     RECE84-SAFLG   =    "2"
-               MOVE       2       TO     FLG-COMMENT
-               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM    20011-KENSENTOU-COMMENT-SEC
            END-IF
       *
            .
