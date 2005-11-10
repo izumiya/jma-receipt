@@ -6077,15 +6077,15 @@
                        END-IF
                    END-IF
       *
-                   MOVE    "NYUINACCT-KEY19"   TO  WRK-DBPATH
-                   PERFORM 900-TBL-READ-SEC
-                   IF    ( FLG-DBRC        NOT =   ZERO )
-                       MOVE    1           TO  FLG-NYUINACCT
-                   ELSE
-                       MOVE    MCPDATA-REC TO  NYUINACCT-REC
-                   END-IF
-      *
                END-PERFORM
+      *
+               MOVE    "NYUINACCT-KEY19"   TO  WRK-DBPATH
+               PERFORM 900-TBL-READ-SEC
+               IF    ( FLG-DBRC        NOT =   ZERO )
+                   MOVE    1           TO  FLG-NYUINACCT
+               ELSE
+                   MOVE    MCPDATA-REC TO  NYUINACCT-REC
+               END-IF
       *
            END-PERFORM
       *
