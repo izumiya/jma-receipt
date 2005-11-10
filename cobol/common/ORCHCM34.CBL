@@ -102,6 +102,7 @@
            03  FLG-ZAIMATOME                       PIC 9(01).
            03  FLG-EDIT                            PIC 9(01).
            03  FLG-JBI-KZI-OUT                     PIC 9(01).
+           03  FLG-SRYSTATUS                      PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -153,6 +154,7 @@
            03  IDX20                               PIC 9(05).
            03  IDX21                               PIC 9(05).
            03  IDX22                               PIC 9(05).
+           03  IDX23                               PIC 9(05).
            03  IDXA                                PIC 9(05).
            03  IDXB                                PIC 9(05).
            03  IDXC                                PIC 9(05).
@@ -381,6 +383,7 @@
                    07  SRT-SRYACCT-KEY.
                        09 SRT-SRYACCT-HKNCOMBI     PIC X(04).
                        09 SRT-SRYACCT-SRYKBN       PIC X(02).
+                       09 SRT-SRYACCT-PRYORITY     PIC 9(01).
                        09 SRT-SRYACCT-YKZHKTKBN    PIC 9(01).
                        09 SRT-SRYACCT-YKZINGAIKBN  PIC 9(01).
                        09 SRT-SRYACCT-KNSJISKBN    PIC 9(01).
@@ -548,6 +551,7 @@
                03 WKACCT-RUIKEITOTAL      PIC 9(15)V9(03).
                03 WKACCT-SRT-SRYCD        PIC X(09).
                03 WKACCT-SRT-SRYSYUKBN    PIC X(03).
+               03 WKACCT-SRT-SRYSTATUS    PIC 9(01).
       *
       *    点数マスタ退避ワーク
            COPY    "CPTTNS.INC".
@@ -2375,6 +2379,8 @@
                                                      (WKSRYACCT-MAX)
                MOVE    WRK-SRYSYUKBN   TO  WKACCT-SRT-SRYSYUKBN
                                                      (WKSRYACCT-MAX)
+               MOVE    FLG-SRYSTATUS   TO  WKACCT-SRT-SRYSTATUS
+                                                     (WKSRYACCT-MAX)
            END-IF
       *
            .
@@ -2474,6 +2480,8 @@
                                        TO  WRK-SRYCD
                MOVE    WKACCT-SRT-SRYSYUKBN (SRT-IDX1)
                                        TO  WRK-SRYSYUKBN
+               MOVE    WKACCT-SRT-SRYSTATUS (SRT-IDX1)
+                                       TO  FLG-SRYSTATUS
       *
                MOVE    WKSRYACCT-OCC (SRT-IDX1)
                                        TO  SRYACCT-REC
@@ -2545,6 +2553,11 @@
       *
                END-IF
       *
+               IF    ( FLG-SRYSTATUS  =  2 OR 3 )
+                   MOVE    1               TO  SRT-SRYACCT-PRYORITY
+                                                          (SRT-IDX1)
+               END-IF
+      *
                IF    ( WRK-SRYSYUKBN   =  "213" OR "223" OR "233" )
                            MOVE    1       TO  SRT-SRYACCT-YKZHKTKBN
                                                           (SRT-IDX1)
@@ -2610,6 +2623,7 @@
        200111-SRYACT-SEL-SEC           SECTION.
       *
            MOVE    ZERO                TO  FLG-YAKUSOKU
+                                           FLG-SRYSTATUS
       *
            MOVE    SPACE               TO  WRK-SRYCD
                                            WRK-SRYSYUKBN
@@ -2639,8 +2653,11 @@
                    MOVE    SRY-SRYSYUKBN   TO  WRK-SRYSYUKBN
                END-IF
       *
+               PERFORM 2001111-SET-SRYSTATUS-SEC
+      *
                PERFORM VARYING IDX20   FROM    1   BY  1
                        UNTIL ( IDX20           >   5 )
+      *
                    IF    ( SRY-SRYCD (IDX20) (1:1)  =   "S" )
                        MOVE    1           TO  FLG-YAKUSOKU
                    END-IF
@@ -2679,6 +2696,43 @@
       *
            .
        200111-SRYACT-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為状態フラグ設定処理処理
+      *****************************************************************
+       2001111-SET-SRYSTATUS-SEC      SECTION.
+      *
+           PERFORM VARYING IDX23   FROM    1   BY  1
+                   UNTIL ( IDX23   >   5 )
+      *
+               EVALUATE    TRUE
+               WHEN  ( SRY-SRYCD (IDX23) (1:1) =   "6" )
+                   MOVE    1       TO  FLG-SRYSTATUS
+      *
+               WHEN  ( SRY-SRYKBN        =   "60" )
+                AND  ( SRY-SRYCD (IDX23)  =   "820000053" )
+      *
+                   MOVE    2       TO  FLG-SRYSTATUS
+      *
+               WHEN  ( SRY-SRYKBN        =   "80" )
+                AND  ( SRY-SRYCD (IDX23)  =   "820000054" )
+      *
+                   MOVE    2       TO  FLG-SRYSTATUS
+      *
+               WHEN  ( SRY-SRYKBN        =   "80" )
+                AND  ( SRY-SRYCD (IDX23)  =   "820000055" )
+      *
+                   MOVE    2       TO  FLG-SRYSTATUS
+               WHEN  ( SRY-SRYCD (IDX23)  =   "820000046" )
+      *
+                   MOVE    3       TO  FLG-SRYSTATUS
+      *
+               END-EVALUATE
+      *
+           END-PERFORM
+      *
+           .
+       2001111-SET-SRYSTATUS-EXT.
            EXIT.
       *****************************************************************
       *    点数マスタ検索処理
@@ -2744,10 +2798,12 @@
                                        TO  SRYACCT-REC
       *
            MOVE    1                   TO  FLG-EDIT
+           MOVE    ZERO                TO  FLG-SRYSTATUS
       *
            IF    ( ACCT-ZAIKAISU       =   ZERO )
                MOVE    ZERO            TO  FLG-EDIT
            END-IF
+      *
       *
            IF    ( ACCT-ZAITEN         =   ZERO )
       *
@@ -2755,8 +2811,8 @@
                    MOVE    ZERO        TO  FLG-EDIT
                ELSE
       *
-                   PERFORM 200111-YKZ-USE-CHK-SEC
-                   IF    ( FLG-SRYACT  NOT =   ZERO )
+                   PERFORM 200111-SRYACT-CHK-SEC
+                   IF    ( FLG-SRYSTATUS  =   ZERO )
                        MOVE    ZERO    TO  FLG-EDIT
                    END-IF
                END-IF
@@ -2937,7 +2993,18 @@
       *        点数回数編集処理
                MOVE    ACCT-ZAITEN         TO  WRK-ZAITEN
                MOVE    ACCT-ZAIKAISU       TO  WRK-ZAIKAISU
-               PERFORM 205-TENSUKAISU-HEN-SEC
+               IF    ( WRK-ZAITEN         >   ZERO )
+                   PERFORM 205-TENSUKAISU-HEN-SEC
+               ELSE
+                   EVALUATE    FLG-SRYSTATUS
+                   WHEN    2
+                       PERFORM 205-KAISU-HEN-SEC
+                   WHEN    3
+                       PERFORM 206-KAISU-HEN-SEC
+                   WHEN    OTHER
+                       PERFORM 205-TENSUKAISU-HEN-SEC
+                   END-EVALUATE
+               END-IF
            END-EVALUATE
       *
            MOVE    "5"                     TO  WRK-ITEM-KBN
@@ -2948,9 +3015,9 @@
        20011-SRYACT-HEN-EXT.
            EXIT.
       *****************************************************************
-      *   薬剤使用チェック処理
+      *   診療行為チェック処理
       *****************************************************************
-       200111-YKZ-USE-CHK-SEC          SECTION.
+       200111-SRYACT-CHK-SEC           SECTION.
       *
       *    診療行為マスター読み込み
            MOVE    ZERO                TO  FLG-SRYACT
@@ -2963,7 +3030,7 @@
            MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   5 )
-               MOVE    "6%"            TO  SRY-SRYCD (IDX0)
+               MOVE    "%"             TO  SRY-SRYCD (IDX0)
            END-PERFORM
       *
            MOVE    SRYACT-REC          TO  MCPDATA-REC
@@ -2976,12 +3043,29 @@
                MOVE    MCPDATA-REC     TO  SRYACT-REC
            END-IF
       *
+      *
+           PERFORM UNTIL ( FLG-SRYACT      NOT =   ZERO )
+                    OR   ( FLG-SRYSTATUS  NOT =   ZERO )
+      *
+               PERFORM 2001111-SET-SRYSTATUS-SEC
+      *
+               MOVE    PATH-TBL-SRYACT-KEY10
+                                       TO  MCP-PATH
+               PERFORM 920-DBFETCH-SEC
+               IF    ( MCP-RC        NOT =   ZERO )
+                   MOVE    1               TO  FLG-SRYACT
+               ELSE
+                   MOVE    MCPDATA-REC     TO  SRYACT-REC
+               END-IF
+      *
+           END-PERFORM
+      *
            MOVE    PATH-TBL-SRYACT-KEY10
                                        TO  MCP-PATH
            PERFORM 920-DBCLOSE-SEC
       *
            .
-       200111-YKZ-USE-CHK-EXT.
+       200111-SRYACT-CHK-EXT.
            EXIT.
       *****************************************************************
       *   保険組合せキーブレイクチェック処理
@@ -3061,6 +3145,7 @@
       *
       *    診療区分
            IF    ( ACCT-ZAITEN         =   ZERO )
+            AND  ( FLG-SRYSTATUS       =   1 )
                IF    ( SRY-SRYSYUKBN       =   "213" OR "223" OR "233" )
                         MOVE    "○"   TO  WRK-SRYACT-MARK
                         COMPUTE CNT-YKZHKT
@@ -3240,7 +3325,19 @@
                                                =   CNT-RSIJBI-TEN )
                            MOVE    RSIJBI-TEN      TO  WRK-ZAITEN
                            MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
-                           PERFORM 205-TENSUKAISU-HEN-SEC
+      *
+                           IF    ( WRK-ZAITEN          >   ZERO )
+                               PERFORM 205-TENSUKAISU-HEN-SEC
+                           ELSE
+                               EVALUATE    FLG-SRYSTATUS
+                               WHEN    2
+                                   PERFORM 205-KAISU-HEN-SEC
+                               WHEN    3
+                                   PERFORM 206-KAISU-HEN-SEC
+                               WHEN    OTHER
+                                   PERFORM 205-TENSUKAISU-HEN-SEC
+                               END-EVALUATE
+                           END-IF
                        END-IF
                    END-IF
                END-IF
@@ -4705,6 +4802,65 @@
        2010-KARAGYO-HEN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *   回数  編集処理
+      *****************************************************************
+       205-KAISU-HEN-SEC              SECTION.
+      *
+           IF    ( WRK-ZAIKAISU   NOT =   ZERO )
+               CONTINUE
+           ELSE
+               GO  TO  205-KAISU-HEN-EXT
+           END-IF
+      *
+           MOVE    1               TO  WRK-PNT
+           MOVE    SPACE           TO  WRK-TENSUKAISU
+      *
+           MOVE    WRK-ZAIKAISU    TO  WRK-ZZ9
+           STRING  "　"                DELIMITED   BY  SIZE
+                   "×"                DELIMITED   BY  SIZE
+                   WRK-ZZ9             DELIMITED   BY  SIZE
+           INTO    WRK-TENSUKAISU
+           WITH    POINTER WRK-PNT
+           END-STRING
+      *
+           MOVE    WRK-TENSUKAISU  TO  WRK-MAE-INPUT
+           PERFORM 800-ZENKAKU-HEN-SEC
+           MOVE    WRK-OUT-INPUT   TO  WRK-SRYACT-STR
+           PERFORM 210-WRK-SRYACT-TBL-HEN2-SEC
+      *
+           .
+       205-KAISU-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *   回数  編集処理
+      *****************************************************************
+       206-KAISU-HEN-SEC              SECTION.
+      *
+           IF    ( WRK-ZAIKAISU   NOT =   ZERO )
+               CONTINUE
+           ELSE
+               GO  TO  206-KAISU-HEN-EXT
+           END-IF
+      *
+           MOVE    1               TO  WRK-PNT
+           MOVE    SPACE           TO  WRK-TENSUKAISU
+      *
+           MOVE    WRK-ZAIKAISU    TO  WRK-ZZ9
+           STRING  "×"                DELIMITED   BY  SIZE
+                   WRK-ZZ9             DELIMITED   BY  SIZE
+           INTO    WRK-TENSUKAISU
+           WITH    POINTER WRK-PNT
+           END-STRING
+      *
+           MOVE    WRK-TENSUKAISU  TO  WRK-MAE-INPUT
+           PERFORM 800-ZENKAKU-HEN-SEC
+           MOVE    WRK-OUT-INPUT   TO  WRK-SRYACT-STR
+           PERFORM 210-WRK-SRYACT-TBL-HEN3-SEC
+      *
+           .
+       206-KAISU-HEN-EXT.
+           EXIT.
       *****************************************************************
       *   点数回数  編集処理
       *****************************************************************
