@@ -395,12 +395,8 @@
       *
       *    本人・家族
            EVALUATE    RECE10-RECESYUBETU (4:1)
-           WHEN    "0"
-               MOVE    "０高入８"      TO  HCM37-HONKZK
-           WHEN    "9"
-               MOVE    "９高外８"      TO  HCM37-HONKZK
            WHEN    "1"
-              MOVE    "１本入"        TO  HCM37-HONKZK
+              MOVE     "１本入"        TO  HCM37-HONKZK
            WHEN    "2"
                MOVE    "２本外"        TO  HCM37-HONKZK
            WHEN    "3"
@@ -415,6 +411,10 @@
                MOVE    "７高入９"      TO  HCM37-HONKZK
            WHEN    "8"
                MOVE    "８高外９"      TO  HCM37-HONKZK
+           WHEN    "9"
+               MOVE    "９高入８"      TO  HCM37-HONKZK
+           WHEN    "0"
+               MOVE    "０高外８"      TO  HCM37-HONKZK
            END-EVALUATE
       *
       *    診療年月
@@ -480,7 +480,8 @@
       *    老人保険
            IF      RECE10-RJNHKNNUM    NOT =   SPACE
                MOVE    RECE10-RJNHKNNUM    TO  WRK-KOHNUM
-               PERFORM 900-PTKOH-READ-SEC
+      *         PERFORM 900-PTKOH-READ-SEC
+               PERFORM 900-PTKOH-READ-KOH-SEC
                IF      FLG-PTKOH           =   ZERO
                    MOVE    PTKOH-FTNJANUM      TO  HCM37-RJNFTNJANUM
                    MOVE    PTKOH-JKYSNUM       TO  HCM37-RJNJKYSNUM
@@ -494,11 +495,11 @@
                    UNTIL    (IDX    >       4)
                    OR       (RECE10-KOHNUM(IDX) =   SPACE)
                MOVE    RECE10-KOHNUM(IDX)   TO  WRK-KOHNUM
-               IF      RECE10-TEKSTYMD      NOT = ZERO
-                   PERFORM 900-PTKOH-READ-SEC
-               ELSE
+      *         IF      RECE10-TEKSTYMD      NOT = ZERO
+      *             PERFORM 900-PTKOH-READ-SEC
+      *         ELSE
                    PERFORM 900-PTKOH-READ-KOH-SEC
-               END-IF
+      *         END-IF
                IF      FLG-PTKOH           =   ZERO
       *        生保のとき月代わり受給者番号マスタより受給者番号をセット 
                    IF    ( PTKOH-KOHNUM    =   "012" )
