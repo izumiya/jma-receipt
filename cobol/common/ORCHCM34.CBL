@@ -66,6 +66,7 @@
            COPY    "CPSRYACCT.INC"         REPLACING   //ACCT-//
                                            BY          //HCM34ACCT-//.
            03  HCM34ACCT-RUIKEITOTAL               PIC 9(15)V9(03).
+           03  HCM34ACCT-RUIKEITOTAL2              PIC 9(15)V9(03).
            03  HCM34ACCT-SRT-SRYCD                 PIC X(09).
            03  HCM34ACCT-SRT-SRYSYUKBN             PIC X(03).
            03  HCM34ACCT-SRT-SRYCOMMENT            PIC 9(01).
@@ -370,6 +371,7 @@
                05  WRK-RSI-SONOTA-TEN              PIC 9(08).
            03  WRK-JBI-RYOYO-TEATE-KBN             PIC X(01).
            03  WRK-RUIKEITOTAL                     PIC 9(15)V9(03).
+           03  WRK-RUIKEITOTAL2                    PIC 9(15)V9(03).
            03  WRK-ZAINUM                          PIC 9(08).
            03  WRK-HBTSRYKA-G.
                05  WRK-HBTSRYKA-HBTKA              PIC X(02) OCCURS  31.
@@ -382,6 +384,9 @@
            03  WRK-DAY-G.
                05  WRK-DAY                         PIC 9(03) OCCURS  31.
            03  WRK-ZAISKBKBN                       PIC X(01).
+           03  WRK-CALCSRYCD-G.
+               05  WRK-CALCSRYCD                   PIC 9(01) OCCURS  9.
+           03  WRK-NUM                             PIC 9(01).
       *
        01  COMMENT-CHK-AREA.
            03  COMMENT-IDX                         PIC 9(03).
@@ -590,6 +595,11 @@
            03  CONST-HBTSRYKA-MAX          PIC 9(05) VALUE  100.
            03  CONST-SRYCD-MAX             PIC 9(05) VALUE 20.
            03  CONST-TCOMBI-MAX            PIC 9(05) VALUE 50.
+           03  CONST-RUIKEI2-G.
+               05  CONST-RUIKEI2-VAL       PIC X(20) VALUE
+               "01030507091113151719".
+               05  CONST-RUIKEI2-R  REDEFINES   CONST-RUIKEI2-VAL.
+                   07  CONST-RUIKEI2       PIC 9(02) OCCURS    10.
       *
       *
       *    スパ領域 ワーク
@@ -642,6 +652,7 @@
            COPY    "CPSRYACCT.INC"
                    REPLACING   //ACCT-//  BY //WKACCT-//.
                03 WKACCT-RUIKEITOTAL      PIC 9(15)V9(03).
+               03 WKACCT-RUIKEITOTAL2     PIC 9(15)V9(03).
                03 WKACCT-SRT-SRYCD        PIC X(09).
                03 WKACCT-SRT-SRYSYUKBN    PIC X(03).
                03 WKACCT-SRT-SRYCOMMENT   PIC 9(01).
@@ -2462,6 +2473,7 @@
                MOVE    SRYACCT-REC     TO  HCM34ACCT-DAT
       *
                MOVE    WRK-RUIKEITOTAL TO  HCM34ACCT-RUIKEITOTAL
+               MOVE    WRK-RUIKEITOTAL2 TO  HCM34ACCT-RUIKEITOTAL2
                MOVE    WRK-SRYCD       TO  HCM34ACCT-SRT-SRYCD
                MOVE    WRK-SRYSYUKBN   TO  HCM34ACCT-SRT-SRYSYUKBN
                IF    ( FLG-SRYSTATUS   =   2 OR 3 )
@@ -2543,6 +2555,9 @@
             AND    HCM34ACCT-RUIKEITOTAL
                                        =   WKACCT-RUIKEITOTAL
                                                        (WKSRYACCT-IDX)
+            AND    HCM34ACCT-RUIKEITOTAL2
+                                       =   WKACCT-RUIKEITOTAL2
+                                                       (WKSRYACCT-IDX)
                INITIALIZE  COMMENT-CHK-AREA
                MOVE    ACCT-ZAINUM     TO  COMMENT-ZAINUM (1)
                MOVE    WKACCT-ZAINUM (WKSRYACCT-IDX)
@@ -2574,6 +2589,9 @@
                MOVE    SRYACCT-REC     TO  WKSRYACCT-OCC (WKSRYACCT-MAX)
                MOVE    HCM34ACCT-RUIKEITOTAL
                                            TO  WKACCT-RUIKEITOTAL
+                                                     (WKSRYACCT-MAX)
+               MOVE    HCM34ACCT-RUIKEITOTAL2
+                                           TO  WKACCT-RUIKEITOTAL2
                                                      (WKSRYACCT-MAX)
                MOVE    HCM34ACCT-SRT-SRYCD TO  WKACCT-SRT-SRYCD
                                                      (WKSRYACCT-MAX)
@@ -2869,6 +2887,7 @@
                                            WRK-SRYSYUKBN
       *
            MOVE    ZERO                TO  WRK-RUIKEITOTAL
+                                           WRK-RUIKEITOTAL2
       *
            OPEN    INPUT   HCM34SRY-FILE
       *
@@ -2896,6 +2915,22 @@
                       COMPUTE  WRK-RUIKEITOTAL =
                                WRK-RUIKEITOTAL +
                              ( WRK-SRYCD-9     *    SRY-SRYSURYO(IDX20))
+      *
+                       MOVE     SRY-SRYCD(IDX20) TO  WRK-CALCSRYCD-G
+      *
+                       PERFORM VARYING IDX0    FROM 1  BY  1
+                               UNTIL ( IDX0    >    9 )
+      *
+                           MOVE    WRK-CALCSRYCD (IDX0)
+                                               TO    WRK-NUM
+      *
+                           COMPUTE WRK-RUIKEITOTAL2
+                               =   WRK-RUIKEITOTAL2
+                               + ((WRK-NUM + 1 )
+                               *   CONST-RUIKEI2(WRK-NUM))
+                               *  (10 ** ( 9 - IDX0 ))
+      *
+                       END-PERFORM
       *
                        IF    ( WRK-SRYCD       =   SPACE )
                            IF    ( SRY-SRYCD (IDX20) (1:1)
