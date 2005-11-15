@@ -1922,6 +1922,12 @@
                   PERFORM   21013-TOKKI-HENSYU-SEC
             END-IF
       *
+            IF      SRY-SRYCD(IDX2)  =  "820000053" OR "820000054"
+                                                    OR "820000055"
+                  MOVE    3    TO      FLG-TOKKI
+                  PERFORM   21013-TOKKI-HENSYU-SEC
+            END-IF
+      *
             IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR
                                                  "6" OR  "7" OR
                                                  "8"
@@ -3344,6 +3350,8 @@
                    WHEN    CONS-TOKKI14(6:9)
                        MOVE    "14"      TO      WRK-TOKKI
                END-EVALUATE
+             WHEN        3
+                       MOVE    "14"      TO      WRK-TOKKI
            END-EVALUATE
       *
       *    既に同じ特記事項コードが編集済みのときはセットしない
