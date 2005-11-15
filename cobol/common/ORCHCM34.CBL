@@ -310,6 +310,10 @@
                05  WRK-RSI-SONOTA-TEN              PIC 9(08).
            03  WRK-JBI-RYOYO-TEATE-KBN             PIC X(01).
            03  WRK-RUIKEITOTAL                     PIC 9(15)V9(03).
+           03  WRK-RUIKEITOTAL2                    PIC 9(15)V9(03).
+           03  WRK-CALCSRYCD-G.
+               05  WRK-CALCSRYCD                   PIC 9(01) OCCURS  9.
+           03  WRK-NUM                             PIC 9(01).
       *
        01  COMMENT-CHK-AREA.
            03  COMMENT-IDX                         PIC 9(03).
@@ -497,6 +501,11 @@
                "199000610".
            03  CONST-RYOYO-TEATE-NYU       PIC X(09)   VALUE
                "199000510".
+           03  CONST-RUIKEI2-G.
+               05  CONST-RUIKEI2-VAL       PIC X(20) VALUE
+               "01030507091113151719".
+               05  CONST-RUIKEI2-R  REDEFINES   CONST-RUIKEI2-VAL.
+                   07  CONST-RUIKEI2       PIC 9(02) OCCURS    10.
       *
       *
       *    スパ領域 ワーク
@@ -549,6 +558,7 @@
            COPY    "CPSRYACCT.INC"
                    REPLACING   //ACCT-//  BY //WKACCT-//.
                03 WKACCT-RUIKEITOTAL      PIC 9(15)V9(03).
+               03 WKACCT-RUIKEITOTAL2     PIC 9(15)V9(03).
                03 WKACCT-SRT-SRYCD        PIC X(09).
                03 WKACCT-SRT-SRYSYUKBN    PIC X(03).
                03 WKACCT-SRT-SRYSTATUS    PIC 9(01).
@@ -2348,6 +2358,8 @@
                                                        (WKSRYACCT-IDX)
             AND    WRK-RUIKEITOTAL     =   WKACCT-RUIKEITOTAL
                                                        (WKSRYACCT-IDX)
+            AND    WRK-RUIKEITOTAL2    =   WKACCT-RUIKEITOTAL2
+                                                       (WKSRYACCT-IDX)
                INITIALIZE  COMMENT-CHK-AREA
                MOVE    ACCT-ZAINUM     TO  COMMENT-ZAINUM (1)
                MOVE    WKACCT-ZAINUM (WKSRYACCT-IDX)
@@ -2374,6 +2386,9 @@
                COMPUTE WKSRYACCT-MAX   =   WKSRYACCT-MAX   +   1
                MOVE    SRYACCT-REC     TO  WKSRYACCT-OCC (WKSRYACCT-MAX)
                MOVE    WRK-RUIKEITOTAL TO  WKACCT-RUIKEITOTAL
+                                                     (WKSRYACCT-MAX)
+               MOVE    WRK-RUIKEITOTAL2
+                                       TO  WKACCT-RUIKEITOTAL2
                                                      (WKSRYACCT-MAX)
                MOVE    WRK-SRYCD       TO  WKACCT-SRT-SRYCD
                                                      (WKSRYACCT-MAX)
@@ -2629,6 +2644,7 @@
                                            WRK-SRYSYUKBN
       *
            MOVE    ZERO                TO  WRK-RUIKEITOTAL
+                                           WRK-RUIKEITOTAL2
       *
            MOVE    ZERO                TO  FLG-SRYACT
            INITIALIZE                      SRYACT-REC
@@ -2665,9 +2681,24 @@
                    IF    ( SRY-SRYCD(IDX20)    IS  NUMERIC )
       *
                       MOVE     SRY-SRYCD(IDX20) TO  WRK-SRYCD-9
+                                                    WRK-CALCSRYCD-G
                       COMPUTE  WRK-RUIKEITOTAL =
                                WRK-RUIKEITOTAL +
                              ( WRK-SRYCD-9     *    SRY-SRYSURYO(IDX20))
+      *
+                       PERFORM VARYING IDX0    FROM 1  BY  1
+                               UNTIL ( IDX0    >    9 )
+      *
+                           MOVE    WRK-CALCSRYCD (IDX0)
+                                               TO    WRK-NUM
+      *
+                           COMPUTE WRK-RUIKEITOTAL2
+                               =   WRK-RUIKEITOTAL2
+                               + ((WRK-NUM + 1 )
+                               *   CONST-RUIKEI2(WRK-NUM))
+                               *  (10 ** ( 9 - IDX0 ))
+      *
+                       END-PERFORM
       *
                        IF    ( WRK-SRYCD       =   SPACE )
                            IF    ( SRY-SRYCD (IDX20) (1:1)
