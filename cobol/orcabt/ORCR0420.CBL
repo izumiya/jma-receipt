@@ -97,6 +97,7 @@
       *  01.02.15    NACL-門脇    05/10/06  診区９５９６対応
       *  01.02.16    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
       *  01.02.17    NACL-門脇    05/11/01  （検選）等コメント対応
+      *  01.02.18    NACL-門脇    05/11/11  コメントがある場合の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1528,9 +1529,9 @@
                    PERFORM 800-PTCOM-READ-SEC
                    MOVE    PTCOM-INPUTCOMENT   TO    RECE45-NAME(IDX4)
       *
-                   IF    RECE44-COMCDFLG   NOT =   "3"
-                      MOVE   "1"           TO    RECE44-COMCDFLG
-                   END-IF
+      ***          IF    RECE44-COMCDFLG   NOT =   "3"
+      ***             MOVE   "1"           TO    RECE44-COMCDFLG
+      ***          END-IF
       *
                    IF      WRK-KYUGYOFLG   =   "1"
                    AND     SRY-SRYCD(IDX2) = CONS-ROUCOM1
@@ -1564,6 +1565,12 @@
                     IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
                                              "630010002"
                         MOVE     "3"       TO    RECE44-COMCDFLG
+                    END-IF
+               END-IF
+               IF    (SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
+                     (SRY-SRYCD    (IDX2)(1:3)     =   "008")
+                    IF    RECE44-COMCDFLG   NOT =   "3"
+                        MOVE     "1"       TO    RECE44-COMCDFLG
                     END-IF
                END-IF
       *

@@ -76,3 +76,6 @@
                        09  RECE642-KAISU   PIC  9(03).
       *データ
            03  RECE642-REC1                PIC  X(600).
+      *コメントデータ
+           03  RECE642-COM-AREA.
+               05  RECE642-COM             PIC  X(200)    OCCURS  10.

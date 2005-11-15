@@ -37,6 +37,7 @@
       *  中止処理追加
       *  01.02.01    NACL-藤原    04/10/13  中止処理の追加
       *  01.02.02    NACL-門脇    05.09.06  自賠責従来様式対応
+      *  01.02.03    NACL-門脇    05/11/11  コメントを含む場合の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -53,6 +54,11 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE44-KEY
                                    FILE    STATUS  IS  STS-RECE44.
+           SELECT  RECE45-FILE     ASSIGN  RECE45PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  RECE45-KEY
+                                   FILE    STATUS  IS  STS-RECE45.
            SELECT  RECE443-FILE    ASSIGN  RECE443PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
@@ -87,6 +93,10 @@
        FD  RECE44-FILE.
        01  RECE44-REC. 
            COPY    "CPRCF044.INC".
+      *
+       FD  RECE45-FILE.
+       01  RECE45-REC. 
+           COPY    "CPRCF045.INC".
       *
        FD  RECE443-FILE.
        01  RECE443-REC. 
@@ -124,6 +134,10 @@
       *
            COPY    "CPCOMMONDAT2.INC"
                                    REPLACING  //RECE01//
+                                   BY         //RECE45//.
+      *
+           COPY    "CPCOMMONDAT2.INC"
+                                   REPLACING  //RECE01//
                                    BY         //RECE443//.
       *
            COPY    "CPCOMMONDAT2.INC"
@@ -140,6 +154,7 @@
        01  STS-AREA.
            03  STS-RECE41                              PIC X(02).
            03  STS-RECE44                              PIC X(02).
+           03  STS-RECE45                              PIC X(02).
            03  STS-RECE443                             PIC X(02).
            03  STS-RECE44X                             PIC X(02).
            03  STS-RECEERR                             PIC X(02).
@@ -148,7 +163,12 @@
            03  FLG-END                                 PIC 9(01).
            03  FLG-RECE41                              PIC 9(01).
            03  FLG-RECE44                              PIC 9(01).
+           03  FLG-RECE45                              PIC 9(01).
            03  FLG-RECE443                             PIC 9(01).
+           03  FLG-NASHI                               PIC 9(01).
+           03  FLG-ARI                                 PIC 9(01).
+           03  FLG-MATOME                              PIC 9(01).
+           03  FLG-NG                                  PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -161,6 +181,10 @@
        01  IDX-AREA.
            03  IDX                                     PIC 9(03).
            03  IDY                                     PIC 9(03).
+           03  IDZ                                     PIC 9(03).
+           03  IDZ2                                    PIC 9(03).
+           03  IDZ3                                    PIC 9(03).
+           03  IDZ4                                    PIC 9(03).
       *
       *    一時領域
        01  WRK-AREA.
@@ -173,6 +197,14 @@
                05  WRK-PARA-SHELLID                    PIC  X(08).
       *
            03  WRK-COMRENNUM           PIC 9(05).
+      *    剤番号の退避
+           03  WRK-ZAINUM              PIC 9(08).
+      *    コメント退避
+           03  WRK-COM-AREA.
+               05  WRK-COM             PIC X(200)    OCCURS  10.
+      *    インデックス退避
+           03  WRK-INDEX-AREA.
+               05  WRK-INDEX           PIC 9(003)    OCCURS  10.
       *
            03  WRK-RECEERR             PIC X(200). 
       *
@@ -240,6 +272,9 @@
            MOVE    "RECE441"           TO  RECE44PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE44PARA-TERMID
       *
+           MOVE    "RECE451"           TO  RECE45PARA-FILE-ID
+           MOVE    WRK-PARA-TERMID     TO  RECE45PARA-TERMID
+      *
            MOVE    "RECE443"           TO  RECE443PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE443PARA-TERMID
       *
@@ -284,6 +319,7 @@
       *    同一剤のまとめ処理
            OPEN    INPUT               RECE41-FILE
                                        RECE44-FILE
+                                       RECE45-FILE
            OPEN    I-O                 RECE443-FILE
            PERFORM 900-RECE41-READ-SEC
       *
@@ -292,6 +328,7 @@
                                    OR      FLG-END     =   1
            CLOSE   RECE443-FILE
                    RECE44-FILE
+                   RECE45-FILE
                    RECE41-FILE
       *
       *    元のレイアウトに出力処理
@@ -345,87 +382,81 @@
                OR     ( RECE41-HKNID     NOT =   RECE44-HKNID        )
                OR     ( RECE41-TEKSTYMD  NOT =   RECE44-TEKSTYMD     )
       *
-      *        複数診療科受診でないとき
-      ***      IF      RECE41-SRYKA (2)    =   SPACE
-      ***      OR      RECE44-COMCDFLG     =   "1"
-               IF      RECE44-COMCDFLG     =   "2"
-                   MOVE    SPACE               TO  RECE443-REC
-                   INITIALIZE                      RECE443-REC
-                   MOVE    RECE44-HOSPID       TO  RECE443-HOSPID
-                   MOVE    RECE44-SRYYM        TO  RECE443-SRYYM
-                   MOVE    RECE44-NYUGAIKBN    TO  RECE443-NYUGAIKBN
-                   MOVE    RECE44-PTID         TO  RECE443-PTID
-                   MOVE    RECE44-RECEKA       TO  RECE443-RECEKA
-                   MOVE    RECE44-HKNID        TO  RECE443-HKNID
-                   MOVE    RECE44-TEKSTYMD     TO  RECE443-TEKSTYMD
-                   MOVE    RECE44-SRYKBN       TO  RECE443-SRYKBN
-                   MOVE    RECE44-ZAITEN       TO  RECE443-ZAITEN
-                   MOVE    RECE44-SRYCDTOTAL   TO  RECE443-SRYCDTOTAL
-                   MOVE    RECE44-SURYOUTOTAL  TO  RECE443-SURYOUTOTAL
-                   MOVE    RECE44-RUIKEITOTAL  TO  RECE443-RUIKEITOTAL
-                   MOVE    RECE44-MEISAISU     TO  RECE443-MEISAISU 
-                   IF   RECE44-COMCDFLG     =   "2"
-                        ADD       1            TO  WRK-COMRENNUM
-                        MOVE    WRK-COMRENNUM  TO  RECE443-COMRENNUM
-                   END-IF
-                   MOVE    RECE44-FLG-HOUTEN-COMMENT
-                                      TO  RECE443-FLG-HOUTEN-COMMENT
-                   MOVE    RECE44-ZAIKAISU     TO  RECE443-ZAIKAISU
-                   PERFORM VARYING IDX FROM    1   BY  1
-                           UNTIL   IDX >       4
-                       PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY >       31
-                           MOVE    RECE44-KAISU (IDX IDY)
-                                           TO   RECE443-KAISU (IDX IDY)
-                       END-PERFORM
-                   END-PERFORM
-                   MOVE    RECE44-REC          TO  RECE443-REC1
-                   WRITE   RECE443-REC
-                   ADD     1                   TO  CNT-RECE443
-               ELSE
+               MOVE    RECE44-ZAINUM     TO      WRK-ZAINUM
       *
-      *        複数診療科受診のとき
-      *            既に同一剤があるか
-                   MOVE    SPACE               TO  RECE443-REC
-                   INITIALIZE                      RECE443-REC
-                   MOVE    RECE44-HOSPID       TO  RECE443-HOSPID
-                   MOVE    RECE44-SRYYM        TO  RECE443-SRYYM
-                   MOVE    RECE44-NYUGAIKBN    TO  RECE443-NYUGAIKBN
-                   MOVE    RECE44-PTID         TO  RECE443-PTID
-                   MOVE    RECE44-RECEKA       TO  RECE443-RECEKA
-                   MOVE    RECE44-HKNID        TO  RECE443-HKNID
-                   MOVE    RECE44-TEKSTYMD     TO  RECE443-TEKSTYMD
-                   MOVE    RECE44-SRYKBN       TO  RECE443-SRYKBN
-                   MOVE    RECE44-ZAITEN       TO  RECE443-ZAITEN
-                   MOVE    RECE44-SRYCDTOTAL   TO  RECE443-SRYCDTOTAL
-                   MOVE    RECE44-SURYOUTOTAL  TO  RECE443-SURYOUTOTAL
-                   MOVE    RECE44-RUIKEITOTAL  TO  RECE443-RUIKEITOTAL
-                   MOVE    RECE44-MEISAISU     TO  RECE443-MEISAISU 
-                   MOVE    RECE44-FLG-HOUTEN-COMMENT
-                                      TO  RECE443-FLG-HOUTEN-COMMENT
-                   MOVE    RECE443-REC         TO  WRK-RECE443-REC
-                   PERFORM 900-RECE443-INV-SEC
-                   IF      FLG-RECE443         =   1
-                       MOVE    WRK-RECE443-REC     TO  RECE443-REC
-                       MOVE    RECE44-REC          TO  RECE443-REC1
-                   END-IF
-      *            剤回数・日数回数テーブルの加算
-                   ADD     RECE44-ZAIKAISU     TO  RECE443-ZAIKAISU
-                   PERFORM VARYING IDX FROM    1   BY  1
-                           UNTIL   IDX >       4
-                       PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY >       31
-                           ADD     RECE44-KAISU (IDX IDY)
-                                           TO   RECE443-KAISU (IDX IDY)
-                       END-PERFORM
-                   END-PERFORM
-      *     
-                   IF      FLG-RECE443         =   1
-                       WRITE   RECE443-REC
-                       ADD     1                   TO  CNT-RECE443
-                   ELSE
-                       REWRITE RECE443-REC
-                   END-IF
+               INITIALIZE          WRK-COM-AREA
+               IF       RECE44-COMCDFLG   =   "2"
+                   PERFORM   2101-RECE45-COM-HENSYU-SEC
+               END-IF
+      *
+               MOVE    SPACE               TO  RECE443-REC
+               INITIALIZE                      RECE443-REC
+               MOVE    RECE44-HOSPID       TO  RECE443-HOSPID
+               MOVE    RECE44-SRYYM        TO  RECE443-SRYYM
+               MOVE    RECE44-NYUGAIKBN    TO  RECE443-NYUGAIKBN
+               MOVE    RECE44-PTID         TO  RECE443-PTID
+               MOVE    RECE44-RECEKA       TO  RECE443-RECEKA
+               MOVE    RECE44-HKNID        TO  RECE443-HKNID
+               MOVE    RECE44-TEKSTYMD     TO  RECE443-TEKSTYMD
+               MOVE    RECE44-SRYKBN       TO  RECE443-SRYKBN
+               MOVE    SPACE               TO  RECE443-SRYSYUKBN
+               MOVE    RECE44-ZAITEN       TO  RECE443-ZAITEN
+               MOVE    RECE44-SRYCDTOTAL   TO  RECE443-SRYCDTOTAL
+               MOVE    RECE44-SURYOUTOTAL  TO  RECE443-SURYOUTOTAL
+               MOVE    RECE44-RUIKEITOTAL  TO  RECE443-RUIKEITOTAL
+               MOVE    RECE44-MEISAISU     TO  RECE443-MEISAISU 
+               MOVE    RECE44-FLG-HOUTEN-COMMENT
+                                  TO  RECE443-FLG-HOUTEN-COMMENT
+               IF      RECE44-COMCDFLG   =   "2"
+                 ADD     1                 TO  WRK-COMRENNUM
+                 MOVE    WRK-COMRENNUM     TO  RECE443-COMRENNUM
+      *
+                 MOVE    RECE443-REC         TO  WRK-RECE443-REC
+                 PERFORM 900-RECE443-INV2-SEC
+                 IF      FLG-MATOME    =   ZERO
+                     MOVE    WRK-RECE443-REC     TO  RECE443-REC
+                     MOVE    RECE44-REC          TO  RECE443-REC1
+                     MOVE    WRK-COM-AREA        TO  RECE443-COM-AREA
+                 END-IF
+      *          剤回数・日数回数テーブルの加算
+                 ADD     RECE44-ZAIKAISU     TO  RECE443-ZAIKAISU
+                 PERFORM VARYING IDX FROM    1   BY  1
+                         UNTIL   IDX >       4
+                     PERFORM VARYING IDY FROM    1   BY  1
+                             UNTIL   IDY >       31
+                         ADD     RECE44-KAISU (IDX IDY)
+                                         TO   RECE443-KAISU (IDX IDY)
+                     END-PERFORM
+                 END-PERFORM
+                 IF      FLG-MATOME    =   ZERO
+                     WRITE   RECE443-REC
+                     ADD     1                   TO  CNT-RECE443
+                 ELSE
+                     REWRITE RECE443-REC
+                 END-IF
+               ELSE
+                 MOVE    RECE443-REC         TO  WRK-RECE443-REC
+                 PERFORM 900-RECE443-INV-SEC
+                 IF      FLG-RECE443         =   1
+                     MOVE    WRK-RECE443-REC     TO  RECE443-REC
+                     MOVE    RECE44-REC          TO  RECE443-REC1
+                 END-IF
+      *          剤回数・日数回数テーブルの加算
+                 ADD     RECE44-ZAIKAISU     TO  RECE443-ZAIKAISU
+                 PERFORM VARYING IDX FROM    1   BY  1
+                         UNTIL   IDX >       4
+                     PERFORM VARYING IDY FROM    1   BY  1
+                             UNTIL   IDY >       31
+                         ADD     RECE44-KAISU (IDX IDY)
+                                         TO   RECE443-KAISU (IDX IDY)
+                     END-PERFORM
+                 END-PERFORM
+                 IF      FLG-RECE443         =   1
+                     WRITE   RECE443-REC
+                     ADD     1                   TO  CNT-RECE443
+                 ELSE
+                     REWRITE RECE443-REC
+                 END-IF
                END-IF
       *
                PERFORM     900-RECE44-READ-SEC
@@ -440,6 +471,62 @@
            PERFORM 900-RECE41-READ-SEC
            .
        210-RECE443-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    コメント編集
+      *****************************************************************
+       2101-RECE45-COM-HENSYU-SEC         SECTION.
+      *
+           MOVE    ZERO                 TO      IDZ2
+      *
+           INITIALIZE                           RECE45-REC
+           MOVE    RECE41-HOSPID        TO      RECE45-HOSPID
+           MOVE    RECE41-SRYYM         TO      RECE45-SRYYM
+           MOVE    RECE41-NYUGAIKBN     TO      RECE45-NYUGAIKBN
+           MOVE    RECE41-PTID          TO      RECE45-PTID
+           MOVE    RECE41-RECEKA        TO      RECE45-RECEKA
+           MOVE    RECE41-HKNID         TO      RECE45-HKNID
+           MOVE    RECE41-TEKSTYMD      TO      RECE45-TEKSTYMD
+           MOVE    WRK-ZAINUM           TO      RECE45-ZAINUM
+           START   RECE45-FILE
+               KEY IS    >=   RECE45-KEY
+               INVALID
+                   MOVE    1            TO      FLG-RECE45
+               NOT INVALID
+                   PERFORM  900-RECE45-READ-SEC
+           END-START
+           PERFORM   UNTIL
+                  (RECE41-HOSPID        NOT =  RECE45-HOSPID)    OR
+                  (RECE41-SRYYM         NOT =  RECE45-SRYYM)     OR
+                  (RECE41-NYUGAIKBN     NOT =  RECE45-NYUGAIKBN) OR
+                  (RECE41-PTID          NOT =  RECE45-PTID)      OR
+                  (RECE41-RECEKA        NOT =  RECE45-RECEKA)    OR
+                  (RECE41-HKNID         NOT =  RECE45-HKNID)     OR
+                  (RECE41-TEKSTYMD      NOT =  RECE45-TEKSTYMD)  OR
+                  (WRK-ZAINUM           NOT =  RECE45-ZAINUM)    OR
+                  (FLG-RECE45               =      1        )
+      *
+                  PERFORM  VARYING   IDZ   FROM    1    BY   1
+                            UNTIL   (IDZ                >       5)  OR
+                                    (RECE45-SRYCD(IDZ)  =   SPACE)
+      *
+                     IF  (RECE45-SRYCD(IDZ)(1:1)  =   "8"  )  OR
+                         (RECE45-SRYCD(IDZ)(1:3)  =   "008")
+                         ADD       1                 TO  IDZ2
+                         IF   IDZ2  <=  10
+                            MOVE   RECE45-NAME(IDZ)  TO  WRK-COM(IDZ2)
+                         END-IF
+                     END-IF
+      *
+                  END-PERFORM
+      *
+                  PERFORM  900-RECE45-READ-SEC
+      *
+           END-PERFORM
+      *
+           .
+       2101-RECE45-COM-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -611,6 +698,21 @@
            EXIT.
       *
       *****************************************************************
+      *    レセプト０５データ読込処理
+      *****************************************************************
+       900-RECE45-READ-SEC            SECTION.
+      *
+           READ    RECE45-FILE   NEXT
+               AT  END
+                   MOVE    1      TO    FLG-RECE45
+               NOT AT  END
+                   MOVE    ZERO   TO    FLG-RECE45
+           END-READ
+           .
+       900-RECE45-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    中間ファイルＲＥＡＤ処理（Ｆ００４）
       *****************************************************************
        900-RECE443-READ-SEC            SECTION.
@@ -638,7 +740,109 @@
                    MOVE    ZERO          TO    FLG-RECE443
            END-READ
            .
-       900-RECE443-READ-EXT.
+       900-RECE443-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    中間ファイルＲＥＡＤ処理（Ｆ００４）
+      *****************************************************************
+       900-RECE443-INV2-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MATOME
+      *
+           INITIALIZE                      RECE443-REC
+           MOVE    RECE44-HOSPID       TO  RECE443-HOSPID
+           MOVE    RECE44-SRYYM        TO  RECE443-SRYYM
+           MOVE    RECE44-NYUGAIKBN    TO  RECE443-NYUGAIKBN
+           MOVE    RECE44-PTID         TO  RECE443-PTID
+           MOVE    RECE44-RECEKA       TO  RECE443-RECEKA
+           MOVE    RECE44-HKNID        TO  RECE443-HKNID
+           MOVE    RECE44-TEKSTYMD     TO  RECE443-TEKSTYMD
+           MOVE    RECE44-SRYKBN       TO  RECE443-SRYKBN
+      *    MOVE    SPACE               TO  RECE443-SRYSYUKBN
+           MOVE    RECE44-ZAITEN       TO  RECE443-ZAITEN
+           MOVE    RECE44-SRYCDTOTAL   TO  RECE443-SRYCDTOTAL
+           MOVE    RECE44-SURYOUTOTAL  TO  RECE443-SURYOUTOTAL
+           MOVE    RECE44-RUIKEITOTAL  TO  RECE443-RUIKEITOTAL
+           MOVE    RECE44-MEISAISU     TO  RECE443-MEISAISU
+           MOVE    RECE44-FLG-HOUTEN-COMMENT
+                                       TO  RECE443-FLG-HOUTEN-COMMENT
+           START   RECE443-FILE
+               KEY IS    >=   RECE443-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE443
+               NOT INVALID
+                   PERFORM  900-RECE443-READ-SEC
+           END-START
+           PERFORM   UNTIL
+                  (RECE44-HOSPID       NOT =  RECE443-HOSPID)       OR
+                  (RECE44-SRYYM        NOT =  RECE443-SRYYM)        OR
+                  (RECE44-NYUGAIKBN    NOT =  RECE443-NYUGAIKBN)    OR
+                  (RECE44-PTID         NOT =  RECE443-PTID)         OR
+                  (RECE44-RECEKA       NOT =  RECE443-RECEKA)       OR
+                  (RECE44-HKNID        NOT =  RECE443-HKNID)        OR
+                  (RECE44-TEKSTYMD     NOT =  RECE443-TEKSTYMD)     OR
+                  (RECE44-SRYKBN       NOT =  RECE443-SRYKBN)       OR
+      *           (SPACE               NOT =  RECE443-SRYSYUKBN)    OR
+                  (RECE44-ZAITEN       NOT =  RECE443-ZAITEN)       OR
+                  (RECE44-SRYCDTOTAL   NOT =  RECE443-SRYCDTOTAL)   OR
+                  (RECE44-SURYOUTOTAL  NOT =  RECE443-SURYOUTOTAL)  OR
+                  (RECE44-RUIKEITOTAL  NOT =  RECE443-RUIKEITOTAL)  OR
+                  (RECE44-MEISAISU     NOT =  RECE443-MEISAISU)     OR
+                  (RECE44-FLG-HOUTEN-COMMENT
+                                NOT =  RECE443-FLG-HOUTEN-COMMENT)  OR
+                  (FLG-RECE443             =  1)
+      *
+                  MOVE     ZERO     TO     FLG-NASHI
+                  MOVE     ZERO     TO     IDZ3
+                  INITIALIZE               WRK-INDEX-AREA
+      *
+                  PERFORM  VARYING   IDZ   FROM    1    BY   1
+                            UNTIL   (IDZ                >      10)  OR
+                                    (WRK-COM(IDZ)       =   SPACE)
+      *
+                     MOVE     ZERO     TO    FLG-ARI
+                     PERFORM VARYING IDZ2  FROM    1    BY   1
+                              UNTIL (IDZ2               >      10)  OR
+                                    (RECE443-COM(IDZ2)  =   SPACE)
+                        IF  RECE443-COM(IDZ2)  =  WRK-COM(IDZ)
+                            MOVE   ZERO   TO   FLG-NG
+                            PERFORM VARYING IDZ4  FROM  1  BY  1
+                               UNTIL (IDZ4             >  10 ) OR
+                                     (WRK-INDEX(IDZ4)  = ZERO)
+                               IF  WRK-INDEX(IDZ4)  =  IDZ2
+                                   MOVE   1   TO   FLG-NG
+                                   MOVE   10  TO   IDZ4
+                               END-IF
+                            END-PERFORM
+                            IF   FLG-NG  =   1
+                               CONTINUE
+                            ELSE
+                               MOVE   1       TO   FLG-ARI
+                               ADD    1       TO   IDZ3
+                               MOVE   IDZ2    TO   WRK-INDEX(IDZ3)
+                               MOVE   10      TO   IDZ2
+                            END-IF
+                        END-IF
+                     END-PERFORM
+                     IF   FLG-ARI  =  ZERO
+                         MOVE    10    TO    IDZ
+                         MOVE     1    TO    FLG-NASHI
+                     END-IF
+      *
+                  END-PERFORM
+      *
+                  IF   FLG-NASHI   =   1
+                     PERFORM  900-RECE443-READ-SEC
+                  ELSE
+                     MOVE    1    TO   FLG-RECE443
+                     MOVE    1    TO   FLG-MATOME
+                  END-IF
+      *
+           END-PERFORM
+      *
+           .
+       900-RECE443-INV2-EXT.
            EXIT.
       *
       *****************************************************************

@@ -33,6 +33,7 @@
       *  中止処理追加
       *  01.01.01    NACL-藤原    04/10/13  中止処理の追加
       *  01.01.02    NACL-門脇    05.09.06  自賠責従来様式対応
+      *  01.01.03    NACL-門脇    05/11/11  コメントを含む場合の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -49,6 +50,11 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE84-KEY
                                    FILE    STATUS  IS  STS-RECE84.
+           SELECT  RECE85-FILE     ASSIGN  RECE85PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  RECE85-KEY
+                                   FILE    STATUS  IS  STS-RECE85.
            SELECT  RECE843-FILE    ASSIGN  RECE843PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
@@ -83,6 +89,10 @@
        FD  RECE84-FILE.
        01  RECE84-REC. 
            COPY    "CPRCF084.INC".
+      *
+       FD  RECE85-FILE.
+       01  RECE85-REC. 
+           COPY    "CPRCF085.INC".
       *
        FD  RECE843-FILE.
        01  RECE843-REC. 
@@ -120,6 +130,10 @@
       *
            COPY    "CPCOMMONDAT2.INC"
                                    REPLACING  //RECE01//
+                                   BY         //RECE85//.
+      *
+           COPY    "CPCOMMONDAT2.INC"
+                                   REPLACING  //RECE01//
                                    BY         //RECE843//.
       *
            COPY    "CPCOMMONDAT2.INC"
@@ -136,6 +150,7 @@
        01  STS-AREA.
            03  STS-RECE82                              PIC X(02).
            03  STS-RECE84                              PIC X(02).
+           03  STS-RECE85                              PIC X(02).
            03  STS-RECE843                             PIC X(02).
            03  STS-RECE84X                             PIC X(02).
            03  STS-RECEERR                             PIC X(02).
@@ -144,7 +159,12 @@
            03  FLG-END                                 PIC 9(01).
            03  FLG-RECE82                              PIC 9(01).
            03  FLG-RECE84                              PIC 9(01).
+           03  FLG-RECE85                              PIC 9(01).
            03  FLG-RECE843                             PIC 9(01).
+           03  FLG-NASHI                               PIC 9(01).
+           03  FLG-ARI                                 PIC 9(01).
+           03  FLG-MATOME                              PIC 9(01).
+           03  FLG-NG                                  PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -157,6 +177,10 @@
        01  IDX-AREA.
            03  IDX                                     PIC 9(03).
            03  IDY                                     PIC 9(03).
+           03  IDZ                                     PIC 9(03).
+           03  IDZ2                                    PIC 9(03).
+           03  IDZ3                                    PIC 9(03).
+           03  IDZ4                                    PIC 9(03).
       *
       *    一時領域
        01  WRK-AREA.
@@ -169,6 +193,14 @@
                05  WRK-PARA-SHELLID                    PIC  X(08).
       *
            03  WRK-COMRENNUM           PIC 9(05).
+      *    剤番号の退避
+           03  WRK-ZAINUM              PIC 9(08).
+      *    コメント退避
+           03  WRK-COM-AREA.
+               05  WRK-COM             PIC X(200)    OCCURS  10.
+      *    インデックス退避
+           03  WRK-INDEX-AREA.
+               05  WRK-INDEX           PIC 9(003)    OCCURS  10.
       *
            03  WRK-RECEERR             PIC X(200). 
       *
@@ -238,6 +270,9 @@
            MOVE    "RECE841"           TO  RECE84PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE84PARA-TERMID
       *
+           MOVE    "RECE851"           TO  RECE85PARA-FILE-ID
+           MOVE    WRK-PARA-TERMID     TO  RECE85PARA-TERMID
+      *
            MOVE    "RECE843"           TO  RECE843PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE843PARA-TERMID
       *
@@ -283,6 +318,7 @@
       *    同一剤のまとめ処理
            OPEN    INPUT               RECE82-FILE
                                        RECE84-FILE
+                                       RECE85-FILE
            OPEN    I-O                 RECE843-FILE
            PERFORM 900-RECE82-READ-SEC
       *
@@ -291,6 +327,7 @@
                                    OR      FLG-END     =   1
            CLOSE   RECE843-FILE
                    RECE84-FILE
+                   RECE85-FILE
                    RECE82-FILE
       *
       *    元のレイアウトに出力処理
@@ -345,78 +382,79 @@
                OR     ( RECE82-HKNID     NOT =   RECE84-HKNID        )
                OR     ( RECE82-TEKSTYMD  NOT =   RECE84-TEKSTYMD     )
       *
-               IF      RECE84-COMCDFLG     =   "2"
-                   MOVE    SPACE               TO  RECE843-REC
-                   INITIALIZE                      RECE843-REC
-                   MOVE    RECE84-HOSPID       TO  RECE843-HOSPID
-                   MOVE    RECE84-SRYYM        TO  RECE843-SRYYM
-                   MOVE    RECE84-NYUGAIKBN    TO  RECE843-NYUGAIKBN
-                   MOVE    RECE84-PTID         TO  RECE843-PTID
-                   MOVE    RECE84-RECEKA       TO  RECE843-RECEKA
-                   MOVE    RECE84-HKNID        TO  RECE843-HKNID
-                   MOVE    RECE84-TEKSTYMD     TO  RECE843-TEKSTYMD
-                   MOVE    RECE84-SRYKBN       TO  RECE843-SRYKBN
-                   MOVE    RECE84-ZAITEN       TO  RECE843-ZAITEN
-                   MOVE    RECE84-SRYCDTOTAL   TO  RECE843-SRYCDTOTAL
-                   MOVE    RECE84-SURYOUTOTAL  TO  RECE843-SURYOUTOTAL
-                   MOVE    RECE84-RUIKEITOTAL  TO  RECE843-RUIKEITOTAL
-                   MOVE    RECE84-MEISAISU     TO  RECE843-MEISAISU 
-                   ADD     1                   TO  WRK-COMRENNUM
-                   MOVE    WRK-COMRENNUM       TO  RECE843-COMRENNUM
-                   MOVE    RECE84-ZAIKAISU     TO  RECE843-ZAIKAISU
-                   PERFORM VARYING IDX FROM    1   BY  1
-                           UNTIL   IDX >       4
-                       PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY >       31
-                           MOVE    RECE84-KAISU (IDX IDY)
-                                           TO   RECE843-KAISU (IDX IDY)
-                       END-PERFORM
-                   END-PERFORM
-                   MOVE    RECE84-REC          TO  RECE843-REC1
-                   WRITE   RECE843-REC
-                   ADD     1                   TO  CNT-RECE843
-               ELSE
+               MOVE    RECE84-ZAINUM     TO      WRK-ZAINUM
       *
-      *        複数診療科受診のとき
-      *            既に同一剤があるか
-                   MOVE    SPACE               TO  RECE843-REC
-                   INITIALIZE                      RECE843-REC
-                   MOVE    RECE84-HOSPID       TO  RECE843-HOSPID
-                   MOVE    RECE84-SRYYM        TO  RECE843-SRYYM
-                   MOVE    RECE84-NYUGAIKBN    TO  RECE843-NYUGAIKBN
-                   MOVE    RECE84-PTID         TO  RECE843-PTID
-                   MOVE    RECE84-RECEKA       TO  RECE843-RECEKA
-                   MOVE    RECE84-HKNID        TO  RECE843-HKNID
-                   MOVE    RECE84-TEKSTYMD     TO  RECE843-TEKSTYMD
-                   MOVE    RECE84-SRYKBN       TO  RECE843-SRYKBN
-                   MOVE    RECE84-ZAITEN       TO  RECE843-ZAITEN
-                   MOVE    RECE84-SRYCDTOTAL   TO  RECE843-SRYCDTOTAL
-                   MOVE    RECE84-SURYOUTOTAL  TO  RECE843-SURYOUTOTAL
-                   MOVE    RECE84-RUIKEITOTAL  TO  RECE843-RUIKEITOTAL
-                   MOVE    RECE84-MEISAISU     TO  RECE843-MEISAISU 
-                   MOVE    RECE843-REC         TO  WRK-RECE843-REC
-                   PERFORM 900-RECE843-INV-SEC
-                   IF      FLG-RECE843         =   1
-                       MOVE    WRK-RECE843-REC     TO  RECE843-REC
-                       MOVE    RECE84-REC          TO  RECE843-REC1
-                   END-IF
-      *            剤回数・日数回数テーブルの加算
-                   ADD     RECE84-ZAIKAISU     TO  RECE843-ZAIKAISU
-                   PERFORM VARYING IDX FROM    1   BY  1
-                           UNTIL   IDX >       4
-                       PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY >       31
-                           ADD     RECE84-KAISU (IDX IDY)
-                                           TO   RECE843-KAISU (IDX IDY)
-                       END-PERFORM
-                   END-PERFORM
-      *     
-                   IF      FLG-RECE843         =   1
-                       WRITE   RECE843-REC
-                       ADD     1                   TO  CNT-RECE843
-                   ELSE
-                       REWRITE RECE843-REC
-                   END-IF
+               INITIALIZE          WRK-COM-AREA
+               IF       RECE84-COMCDFLG   =   "2"
+                   PERFORM   2101-RECE85-COM-HENSYU-SEC
+               END-IF
+      *
+               MOVE    SPACE               TO  RECE843-REC
+               INITIALIZE                      RECE843-REC
+               MOVE    RECE84-HOSPID       TO  RECE843-HOSPID
+               MOVE    RECE84-SRYYM        TO  RECE843-SRYYM
+               MOVE    RECE84-NYUGAIKBN    TO  RECE843-NYUGAIKBN
+               MOVE    RECE84-PTID         TO  RECE843-PTID
+               MOVE    RECE84-RECEKA       TO  RECE843-RECEKA
+               MOVE    RECE84-HKNID        TO  RECE843-HKNID
+               MOVE    RECE84-TEKSTYMD     TO  RECE843-TEKSTYMD
+               MOVE    RECE84-SRYKBN       TO  RECE843-SRYKBN
+               MOVE    SPACE               TO  RECE843-SRYSYUKBN
+               MOVE    RECE84-ZAITEN       TO  RECE843-ZAITEN
+               MOVE    RECE84-SRYCDTOTAL   TO  RECE843-SRYCDTOTAL
+               MOVE    RECE84-SURYOUTOTAL  TO  RECE843-SURYOUTOTAL
+               MOVE    RECE84-RUIKEITOTAL  TO  RECE843-RUIKEITOTAL
+               MOVE    RECE84-MEISAISU     TO  RECE843-MEISAISU 
+               IF      RECE84-COMCDFLG   =   "2"
+                 ADD     1                 TO  WRK-COMRENNUM
+                 MOVE    WRK-COMRENNUM     TO  RECE843-COMRENNUM
+      *
+                 MOVE    RECE843-REC         TO  WRK-RECE843-REC
+                 PERFORM 900-RECE843-INV2-SEC
+                 IF      FLG-MATOME    =   ZERO
+                     MOVE    WRK-RECE843-REC     TO  RECE843-REC
+                     MOVE    RECE84-REC          TO  RECE843-REC1
+                     MOVE    WRK-COM-AREA        TO  RECE843-COM-AREA
+                 END-IF
+      *          剤回数・日数回数テーブルの加算
+                 ADD     RECE84-ZAIKAISU     TO  RECE843-ZAIKAISU
+                 PERFORM VARYING IDX FROM    1   BY  1
+                         UNTIL   IDX >       4
+                     PERFORM VARYING IDY FROM    1   BY  1
+                             UNTIL   IDY >       31
+                         ADD     RECE84-KAISU (IDX IDY)
+                                         TO   RECE843-KAISU (IDX IDY)
+                     END-PERFORM
+                 END-PERFORM
+                 IF      FLG-MATOME    =   ZERO
+                     WRITE   RECE843-REC
+                     ADD     1                   TO  CNT-RECE843
+                 ELSE
+                     REWRITE RECE843-REC
+                 END-IF
+               ELSE
+                 MOVE    RECE843-REC         TO  WRK-RECE843-REC
+                 PERFORM 900-RECE843-INV-SEC
+                 IF      FLG-RECE843         =   1
+                     MOVE    WRK-RECE843-REC     TO  RECE843-REC
+                     MOVE    RECE84-REC          TO  RECE843-REC1
+                 END-IF
+      *          剤回数・日数回数テーブルの加算
+                 ADD     RECE84-ZAIKAISU     TO  RECE843-ZAIKAISU
+                 PERFORM VARYING IDX FROM    1   BY  1
+                         UNTIL   IDX >       4
+                     PERFORM VARYING IDY FROM    1   BY  1
+                             UNTIL   IDY >       31
+                         ADD     RECE84-KAISU (IDX IDY)
+                                         TO   RECE843-KAISU (IDX IDY)
+                     END-PERFORM
+                 END-PERFORM
+                 IF      FLG-RECE843         =   1
+                     WRITE   RECE843-REC
+                     ADD     1                   TO  CNT-RECE843
+                 ELSE
+                     REWRITE RECE843-REC
+                 END-IF
                END-IF
       *
                PERFORM 900-RECE84-READ-SEC
@@ -433,7 +471,62 @@
        210-RECE843-WRITE-EXT.
            EXIT.
       *
-      * 
+      *****************************************************************
+      *    コメント編集
+      *****************************************************************
+       2101-RECE85-COM-HENSYU-SEC         SECTION.
+      *
+           MOVE    ZERO                 TO      IDZ2
+      *
+           INITIALIZE                           RECE85-REC
+           MOVE    RECE82-HOSPID        TO      RECE85-HOSPID
+           MOVE    RECE82-SRYYM         TO      RECE85-SRYYM
+           MOVE    RECE82-NYUGAIKBN     TO      RECE85-NYUGAIKBN
+           MOVE    RECE82-PTID          TO      RECE85-PTID
+           MOVE    RECE82-RECEKA        TO      RECE85-RECEKA
+           MOVE    RECE82-HKNID         TO      RECE85-HKNID
+           MOVE    RECE82-TEKSTYMD      TO      RECE85-TEKSTYMD
+           MOVE    WRK-ZAINUM           TO      RECE85-ZAINUM
+           START   RECE85-FILE
+               KEY IS    >=   RECE85-KEY
+               INVALID
+                   MOVE    1            TO      FLG-RECE85
+               NOT INVALID
+                   PERFORM  900-RECE85-READ-SEC
+           END-START
+           PERFORM   UNTIL
+                  (RECE82-HOSPID        NOT =  RECE85-HOSPID)    OR
+                  (RECE82-SRYYM         NOT =  RECE85-SRYYM)     OR
+                  (RECE82-NYUGAIKBN     NOT =  RECE85-NYUGAIKBN) OR
+                  (RECE82-PTID          NOT =  RECE85-PTID)      OR
+                  (RECE82-RECEKA        NOT =  RECE85-RECEKA)    OR
+                  (RECE82-HKNID         NOT =  RECE85-HKNID)     OR
+                  (RECE82-TEKSTYMD      NOT =  RECE85-TEKSTYMD)  OR
+                  (WRK-ZAINUM           NOT =  RECE85-ZAINUM)    OR
+                  (FLG-RECE85               =      1        )
+      *
+                  PERFORM  VARYING   IDZ   FROM    1    BY   1
+                            UNTIL   (IDZ                >       5)  OR
+                                    (RECE85-SRYCD(IDZ)  =   SPACE)
+      *
+                     IF  (RECE85-SRYCD(IDZ)(1:1)  =   "8"  )  OR
+                         (RECE85-SRYCD(IDZ)(1:3)  =   "008")
+                         ADD       1                 TO  IDZ2
+                         IF   IDZ2  <=  10
+                            MOVE   RECE85-NAME(IDZ)  TO  WRK-COM(IDZ2)
+                         END-IF
+                     END-IF
+      *
+                  END-PERFORM
+      *
+                  PERFORM  900-RECE85-READ-SEC
+      *
+           END-PERFORM
+      *
+           .
+       2101-RECE85-COM-HENSYU-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    主処理
       *****************************************************************
@@ -603,6 +696,21 @@
            EXIT.
       *
       *****************************************************************
+      *    レセプト０５データ読込処理
+      *****************************************************************
+       900-RECE85-READ-SEC            SECTION.
+      *
+           READ    RECE85-FILE   NEXT
+               AT  END
+                   MOVE    1      TO    FLG-RECE85
+               NOT AT  END
+                   MOVE    ZERO   TO    FLG-RECE85
+           END-READ
+           .
+       900-RECE85-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    中間ファイルＲＥＡＤ処理（Ｆ００４）
       *****************************************************************
        900-RECE843-READ-SEC            SECTION.
@@ -630,7 +738,105 @@
                    MOVE    ZERO          TO    FLG-RECE843
            END-READ
            .
-       900-RECE843-READ-EXT.
+       900-RECE843-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    中間ファイルＲＥＡＤ処理（Ｆ００４）
+      *****************************************************************
+       900-RECE843-INV2-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MATOME
+      *
+           INITIALIZE                      RECE843-REC
+           MOVE    RECE84-HOSPID       TO  RECE843-HOSPID
+           MOVE    RECE84-SRYYM        TO  RECE843-SRYYM
+           MOVE    RECE84-NYUGAIKBN    TO  RECE843-NYUGAIKBN
+           MOVE    RECE84-PTID         TO  RECE843-PTID
+           MOVE    RECE84-RECEKA       TO  RECE843-RECEKA
+           MOVE    RECE84-HKNID        TO  RECE843-HKNID
+           MOVE    RECE84-TEKSTYMD     TO  RECE843-TEKSTYMD
+           MOVE    RECE84-SRYKBN       TO  RECE843-SRYKBN
+      *    MOVE    SPACE               TO  RECE843-SRYSYUKBN
+           MOVE    RECE84-ZAITEN       TO  RECE843-ZAITEN
+           MOVE    RECE84-SRYCDTOTAL   TO  RECE843-SRYCDTOTAL
+           MOVE    RECE84-SURYOUTOTAL  TO  RECE843-SURYOUTOTAL
+           MOVE    RECE84-RUIKEITOTAL  TO  RECE843-RUIKEITOTAL
+           MOVE    RECE84-MEISAISU     TO  RECE843-MEISAISU
+           START   RECE843-FILE
+               KEY IS    >=   RECE843-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE843
+               NOT INVALID
+                   PERFORM  900-RECE843-READ-SEC
+           END-START
+           PERFORM   UNTIL
+                  (RECE84-HOSPID       NOT =  RECE843-HOSPID)       OR
+                  (RECE84-SRYYM        NOT =  RECE843-SRYYM)        OR
+                  (RECE84-NYUGAIKBN    NOT =  RECE843-NYUGAIKBN)    OR
+                  (RECE84-PTID         NOT =  RECE843-PTID)         OR
+                  (RECE84-RECEKA       NOT =  RECE843-RECEKA)       OR
+                  (RECE84-HKNID        NOT =  RECE843-HKNID)        OR
+                  (RECE84-TEKSTYMD     NOT =  RECE843-TEKSTYMD)     OR
+                  (RECE84-SRYKBN       NOT =  RECE843-SRYKBN)       OR
+      *           (SPACE               NOT =  RECE843-SRYSYUKBN)    OR
+                  (RECE84-ZAITEN       NOT =  RECE843-ZAITEN)       OR
+                  (RECE84-SRYCDTOTAL   NOT =  RECE843-SRYCDTOTAL)   OR
+                  (RECE84-SURYOUTOTAL  NOT =  RECE843-SURYOUTOTAL)  OR
+                  (RECE84-RUIKEITOTAL  NOT =  RECE843-RUIKEITOTAL)  OR
+                  (RECE84-MEISAISU     NOT =  RECE843-MEISAISU)     OR
+                  (FLG-RECE843             =  1)
+      *
+                  MOVE     ZERO     TO     FLG-NASHI
+                  MOVE     ZERO     TO     IDZ3
+                  INITIALIZE               WRK-INDEX-AREA
+      *
+                  PERFORM  VARYING   IDZ   FROM    1    BY   1
+                            UNTIL   (IDZ                >      10)  OR
+                                    (WRK-COM(IDZ)       =   SPACE)
+      *
+                     MOVE     ZERO     TO    FLG-ARI
+                     PERFORM VARYING IDZ2  FROM    1    BY   1
+                              UNTIL (IDZ2               >      10)  OR
+                                    (RECE843-COM(IDZ2)  =   SPACE)
+                        IF  RECE843-COM(IDZ2)  =  WRK-COM(IDZ)
+                            MOVE   ZERO   TO   FLG-NG
+                            PERFORM VARYING IDZ4  FROM  1  BY  1
+                               UNTIL (IDZ4             >  10 ) OR
+                                     (WRK-INDEX(IDZ4)  = ZERO)
+                               IF  WRK-INDEX(IDZ4)  =  IDZ2
+                                   MOVE   1   TO   FLG-NG
+                                   MOVE   10  TO   IDZ4
+                               END-IF
+                            END-PERFORM
+                            IF   FLG-NG  =   1
+                               CONTINUE
+                            ELSE
+                               MOVE   1       TO   FLG-ARI
+                               ADD    1       TO   IDZ3
+                               MOVE   IDZ2    TO   WRK-INDEX(IDZ3)
+                               MOVE   10      TO   IDZ2
+                            END-IF
+                        END-IF
+                     END-PERFORM
+                     IF   FLG-ARI  =  ZERO
+                         MOVE    10    TO    IDZ
+                         MOVE     1    TO    FLG-NASHI
+                     END-IF
+      *
+                  END-PERFORM
+      *
+                  IF   FLG-NASHI   =   1
+                     PERFORM  900-RECE843-READ-SEC
+                  ELSE
+                     MOVE    1    TO   FLG-RECE843
+                     MOVE    1    TO   FLG-MATOME
+                  END-IF
+      *
+           END-PERFORM
+      *
+           .
+       900-RECE843-INV2-EXT.
            EXIT.
       *
       *****************************************************************
