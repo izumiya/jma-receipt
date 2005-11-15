@@ -145,6 +145,7 @@
       *  01.03.10    NACL-門脇    05/10/25  島根県地方公費１０月改正対応
       *  01.03.11    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
       *  01.03.12    NACL-門脇    05/11/01  （検選）等コメント対応
+      *  01.03.13    NACL-門脇    05/11/11  コメントがある場合の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2095,7 +2096,7 @@
                        END-IF
                    END-IF
       *
-                   MOVE   "1"                  TO    RECE64-COMCDFLG
+      ***          MOVE   "1"                  TO    RECE64-COMCDFLG
                ELSE
                    MOVE    TNS-NAME            TO    RECE65-NAME(IDX4)
                                                      RECE65-INPUTCOMENT
@@ -2114,6 +2115,11 @@
                          COMPUTE  RECE65-YUKOKETA(IDX4) =
                                   RECE65-YUKOKETA(IDX4) + 2
                    END-IF
+               END-IF
+      *
+               IF    (SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
+                     (SRY-SRYCD    (IDX2)(1:3)     =   "008")
+                        MOVE     "1"       TO    RECE64-COMCDFLG
                END-IF
       *
                IF  RECE65-YUKOKETA(IDX4)  =  ZERO
