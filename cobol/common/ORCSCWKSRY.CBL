@@ -1054,7 +1054,9 @@
                END-IF
       *        ¿ôÎÌ¤ÎºÆ·×»»
                IF     (SPA-COM-KAISU2  (IDX2)  >   1    )  AND
-                      (SPA-COM-INPUTCD (IDX2)(1:1) =   "6" )
+                     ((SPA-COM-INPUTCD (IDX2)(1:1) =   "6"
+                                                   OR  "7" ) OR
+                      (SPA-COM-INPUTCD (IDX2)(1:3) =   "059"))
                    COMPUTE SPA-COM-SURYO2  (IDX2)
                                        =   SPA-COM-SURYO2  (IDX2)
                                        /   SPA-COM-KAISU2(IDX2)

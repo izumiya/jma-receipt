@@ -757,7 +757,9 @@
       *
       *    外用薬時、回数は１回とする（数量＊回数を数量とする）
            IF     (WRK-COM-SRYKBN (IDX-Z)  =   "23" ) AND
-                  (WRK-COM-INPUTCD(IDX-Z)(1:1) =   "6" )
+                 ((WRK-COM-INPUTCD(IDX-Z)(1:1) =   "6"
+                                               OR  "7" )  OR
+                  (WRK-COM-INPUTCD(IDX-Z)(1:3) =   "059" ))
                COMPUTE WRK-COM-SURYO (IDX-Z)   =   WRK-COM-SURYO2(IDX-Z)
                                                *   LNK-ORCSC-KAISU
                MOVE    1                   TO  WRK-KAISU
