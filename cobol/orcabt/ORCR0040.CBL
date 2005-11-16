@@ -69,6 +69,8 @@
       *  01.03.03    NACL-門脇    05/01/18  酸素計算式コメント対応
       *  01.03.04    NACL-門脇    05/04/20  内服薬剤逓減編集対応
       *  01.03.05    NACL-門脇    05/11/01  （検選）等コメント対応
+      *  01.03.06    NACL-門脇    05/11/15  傷病手当金、療養費同意書の自動
+      *                                     記載編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -354,6 +356,9 @@
            03  WRK-KEISAN2           PIC 9(03).
            03  WRK-KEISAN3           PIC 9(09)V9(03).
            03  WRK-KEISAN-TAIHI      PIC X(09).
+      *
+           03  WRK-HENYMD            PIC X(08).
+           03  WRK-TAIHI-XX          PIC X(02).
       *
        01  WRK-RECE04-REC. 
            COPY    "CPRCF004.INC"  REPLACING   //RECE04//
@@ -2991,11 +2996,42 @@
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
                  MOVE    "算定"  TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
                WHEN    4
-                 MOVE     4          TO    WRK-KETA
+                 MOVE     16         TO    WRK-KETA
                                            WRK-KETA-TAIHI
-                 MOVE     2          TO    WRK-KETA2
+                 MOVE     8          TO    WRK-KETA2
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
-                 MOVE    "交付"  TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
+                 MOVE    "交付　　年　　月"
+                                 TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
+      *
+                 INITIALIZE                      STS-AREA-DAY
+                 INITIALIZE                      LNK-DAY2-AREA
+                 MOVE    "21"                TO  LNK-DAY2-IRAI
+                 MOVE    RECE02-SRYYM        TO  WRK-HENYMD(1:6)
+                 MOVE    "01"                TO  WRK-HENYMD(7:2)
+                 MOVE    WRK-HENYMD          TO  LNK-DAY2-YMD
+                 CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                             LNK-DAY2-AREA
+                 IF  STS-DAY-RC1             =   ZERO
+                   MOVE    LNK-DAY2-EDTYMD1-Y   TO  WRK-TAIHI-XX
+                   INITIALIZE                       ORCSKANACHKAREA
+                   MOVE    "2"                  TO  KANACHK-SYORI
+                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                   IF      KANACHK-RC      =   ZERO
+                      MOVE    KANACHK-OUT-INPUT(1:4)
+                                        TO  WK-FREE-NAME2(IDZ)(5:4)
+                   END-IF
+      *
+                   MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
+                   INITIALIZE                       ORCSKANACHKAREA
+                   MOVE    "2"                  TO  KANACHK-SYORI
+                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                   IF      KANACHK-RC      =   ZERO
+                      MOVE    KANACHK-OUT-INPUT(1:4)
+                                        TO  WK-FREE-NAME2(IDZ)(11:4)
+                   END-IF
+                 END-IF
                WHEN    5
                  MOVE     4          TO    WRK-KETA
                                            WRK-KETA-TAIHI
@@ -3033,16 +3069,22 @@
       *
                        MOVE   TB-SANTEI-DAY(IDX)  TO  IDY
       *
-                       ADD   1  TO  WK-FREE-YUKOKETA2(IDZ)
-                       COMPUTE  WRK-KETA   =  WRK-KETA   +  1
-                       MOVE    "　"
-                           TO  WK-FREE-NAME2(IDZ)(WRK-KETA:2)
+                       IF   FLG-COMMENT   =   4
+                         ADD   2  TO  WK-FREE-YUKOKETA2(IDZ)
+                         COMPUTE  WRK-KETA   =  WRK-KETA   +  1
+                         MOVE    TBL-DAY(IDY)     
+                             TO  WK-FREE-NAME2(IDZ)(WRK-KETA:4)
+                       ELSE
+                         ADD   1  TO  WK-FREE-YUKOKETA2(IDZ)
+                         COMPUTE  WRK-KETA   =  WRK-KETA   +  1
+                         MOVE    "　"
+                             TO  WK-FREE-NAME2(IDZ)(WRK-KETA:2)
       *
-                       ADD   2  TO  WK-FREE-YUKOKETA2(IDZ)
-                       COMPUTE  WRK-KETA   =  WRK-KETA   +  2
-                       MOVE    TBL-DAY(IDY)     
-                           TO  WK-FREE-NAME2(IDZ)(WRK-KETA:4)
-      *
+                         ADD   2  TO  WK-FREE-YUKOKETA2(IDZ)
+                         COMPUTE  WRK-KETA   =  WRK-KETA   +  2
+                         MOVE    TBL-DAY(IDY)     
+                             TO  WK-FREE-NAME2(IDZ)(WRK-KETA:4)
+                       END-IF
                        ADD   1  TO  WK-FREE-YUKOKETA2(IDZ)
                        COMPUTE  WRK-KETA   =  WRK-KETA   +  4
                        MOVE    "日"

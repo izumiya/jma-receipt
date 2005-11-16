@@ -66,6 +66,8 @@
       *  01.02.11    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
       *  01.02.12    NACL-門脇    05/11/01  （検選）等コメント対応
       *  01.02.13    NACL-門脇    05/11/11  コメントがある場合の編集修正
+      *  01.02.14    NACL-門脇    05/11/15  傷病手当金、療養費同意書の自動
+      *                                     記載フラグ編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -234,6 +236,8 @@
            03  FLG-NYUINRYO                            PIC 9(01).
            03  FLG-HKNCOMBI                            PIC 9(01).
            03  FLG-HOUSIJI-COM                         PIC 9(01).
+           03  FLG-SYOBYO-COM                          PIC 9(01).
+           03  FLG-RYOYO-COM                           PIC 9(01).
            03  FLG-TAIGAI                              PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
       *
@@ -518,8 +522,14 @@
            03  CONS-HOUMON-COMMENT2  PIC X(09)  VALUE  "190723610".
       *    傷病手当金意見書交付料
            03  CONS-SYOBYO-COMMENT   PIC X(09)  VALUE  "180000710".
+      *    傷病手当金意見書交付年月日
+           03  CONS-SYOBYO2-COMMENT  PIC X(09)  VALUE  "840000011".
+      *    （相続）傷病手当金意見書交付年月日
+           03  CONS-SYOBYO3-COMMENT  PIC X(09)  VALUE  "840000012".
       *    療養費同意書交付料
            03  CONS-RYOYO-COMMENT    PIC X(09)  VALUE  "113004310".
+      *    療養費同意書交付年月日
+           03  CONS-RYOYO2-COMMENT   PIC X(09)  VALUE  "840000078".
       *    退院時服薬指導加算
            03  CONS-TAIIN-COMMENT    PIC X(09)  VALUE  "113006270".
       *    訪問看護指示料
@@ -1068,6 +1078,8 @@
                        MOVE   ZERO   TO   WRK-TANIMOJISU
                        MOVE   SPACE  TO   WRK-TANINAME
                        MOVE   ZERO   TO   FLG-HOUSIJI-COM
+                                          FLG-SYOBYO-COM
+                                          FLG-RYOYO-COM
       *
                        MOVE   ZERO   TO   FLG-WRITE85
                        PERFORM   2201-RECE84-TENSOU-SEC
@@ -1111,6 +1123,8 @@
                                  MOVE   ZERO   TO   WRK-TANIMOJISU
                                  MOVE   SPACE  TO   WRK-TANINAME
                                  MOVE   ZERO   TO   FLG-HOUSIJI-COM
+                                                    FLG-SYOBYO-COM
+                                                    FLG-RYOYO-COM
       *
                                  MOVE   ZERO   TO   FLG-WRITE85
                                  PERFORM   2201-RECE84-TENSOU-SEC
@@ -1138,6 +1152,8 @@
                                  MOVE   ZERO   TO   WRK-TANIMOJISU
                                  MOVE   SPACE  TO   WRK-TANINAME
                                  MOVE   ZERO   TO   FLG-HOUSIJI-COM
+                                                    FLG-SYOBYO-COM
+                                                    FLG-RYOYO-COM
       *
                                  MOVE   ZERO   TO   FLG-WRITE85
                                  PERFORM   2201-RECE84-TENSOU-SEC
@@ -3018,12 +3034,26 @@
                                             CONS-HOUMON-COMMENT2
                    MOVE   "1"   TO    RECE84-FLG-HOUMON-COMMENT
               END-IF
+      *
               IF   SRY-SRYCD(IDX2)    =     CONS-SYOBYO-COMMENT
+              AND  FLG-SYOBYO-COM     =     ZERO
                    MOVE   "1"   TO    RECE84-FLG-SYOBYO-COMMENT
               END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-SYOBYO2-COMMENT
+                                      OR    CONS-SYOBYO3-COMMENT
+                   MOVE  SPACE  TO    RECE84-FLG-SYOBYO-COMMENT
+                   MOVE    1    TO    FLG-SYOBYO-COM
+              END-IF
+      *
               IF   SRY-SRYCD(IDX2)    =     CONS-RYOYO-COMMENT
+              AND  FLG-RYOYO-COM      =     ZERO
                    MOVE   "1"   TO    RECE84-FLG-RYOYO-COMMENT
               END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-RYOYO2-COMMENT
+                   MOVE  SPACE  TO    RECE84-FLG-RYOYO-COMMENT
+                   MOVE    1    TO    FLG-RYOYO-COM
+              END-IF
+      *
               IF   SRY-SRYCD(IDX2)    =     CONS-TAIIN-COMMENT
                    MOVE   "1"   TO    RECE84-FLG-TAIIN-COMMENT
               END-IF

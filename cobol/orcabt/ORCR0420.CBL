@@ -93,6 +93,8 @@
       *  01.02.11    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
       *  01.02.12    NACL-門脇    05/11/01  （検選）等コメント対応
       *  01.02.13    NACL-門脇    05/11/11  コメントがある場合の編集修正
+      *  01.02.14    NACL-門脇    05/11/15  傷病手当金、療養費同意書の自動
+      *                                     記載フラグ編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -250,6 +252,8 @@
            03  FLG-SET                                 PIC 9(01).
            03  FLG-HOUSIJI-COM                         PIC 9(01).
            03  FLG-HOUTEN-COM                          PIC 9(01).
+           03  FLG-SYOBYO-COM                          PIC 9(01).
+           03  FLG-RYOYO-COM                           PIC 9(01).
            03  FLG-TAIGAI                              PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
       *
@@ -523,8 +527,14 @@
            03  CONS-MANSEI           PIC X(09)  VALUE  "113006510".
       *    傷病手当金意見書交付料
            03  CONS-SYOBYO-COMMENT   PIC X(09)  VALUE  "180000710".
+      *    傷病手当金意見書交付年月日
+           03  CONS-SYOBYO2-COMMENT  PIC X(09)  VALUE  "840000011".
+      *    （相続）傷病手当金意見書交付年月日
+           03  CONS-SYOBYO3-COMMENT  PIC X(09)  VALUE  "840000012".
       *    療養費同意書交付料
            03  CONS-RYOYO-COMMENT    PIC X(09)  VALUE  "113004310".
+      *    療養費同意書交付年月日
+           03  CONS-RYOYO2-COMMENT   PIC X(09)  VALUE  "840000078".
       *    訪問看護指示料
            03  CONS-HOUSIJI-COMMENT  PIC X(09)  VALUE  "114008010".
       *    訪問看護指示料算定日
@@ -920,6 +930,8 @@
                                MOVE    SPACE   TO      WRK-TANINAME
                                MOVE    ZERO    TO      FLG-HOUSIJI-COM
                                                        FLG-HOUTEN-COM
+                                                       FLG-SYOBYO-COM
+                                                       FLG-RYOYO-COM
       *
                                MOVE    SPACE   TO      WRK-KYUGYOFLG
       *
@@ -962,6 +974,8 @@
                                       MOVE  SPACE TO  WRK-TANINAME
                                       MOVE  ZERO  TO  FLG-HOUSIJI-COM
                                                       FLG-HOUTEN-COM
+                                                      FLG-SYOBYO-COM
+                                                      FLG-RYOYO-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
       *
@@ -989,6 +1003,8 @@
                                       MOVE  SPACE TO  WRK-TANINAME
                                       MOVE  ZERO  TO  FLG-HOUSIJI-COM
                                                       FLG-HOUTEN-COM
+                                                      FLG-SYOBYO-COM
+                                                      FLG-RYOYO-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
       *
@@ -1806,11 +1822,24 @@
               IF   SRY-SRYCD(IDX2)    =     CONS-MANSEI
                    MOVE   "1"   TO    RECE44-FLG-SHIDOU-COMMENT
               END-IF
+      *
               IF   SRY-SRYCD(IDX2)    =     CONS-SYOBYO-COMMENT
+              AND  FLG-SYOBYO-COM     =     ZERO
                    MOVE   "1"   TO    RECE44-FLG-SYOBYO-COMMENT
               END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-SYOBYO2-COMMENT
+                                      OR    CONS-SYOBYO3-COMMENT
+                   MOVE  SPACE  TO    RECE44-FLG-SYOBYO-COMMENT
+                   MOVE    1    TO    FLG-SYOBYO-COM
+              END-IF
+      *
               IF   SRY-SRYCD(IDX2)    =     CONS-RYOYO-COMMENT
+              AND  FLG-RYOYO-COM      =     ZERO
                    MOVE   "1"   TO    RECE44-FLG-RYOYO-COMMENT
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-RYOYO2-COMMENT
+                   MOVE  SPACE  TO    RECE44-FLG-RYOYO-COMMENT
+                   MOVE    1    TO    FLG-RYOYO-COM
               END-IF
            END-IF
       *
@@ -3717,6 +3746,8 @@
                                MOVE    SPACE   TO    WRK-TANINAME
                                MOVE    ZERO    TO    FLG-HOUSIJI-COM
                                                      FLG-HOUTEN-COM
+                                                     FLG-SYOBYO-COM
+                                                     FLG-RYOYO-COM
       *
                                MOVE    SPACE   TO    WRK-KYUGYOFLG
       *
@@ -3761,6 +3792,8 @@
                                       MOVE  SPACE TO  WRK-TANINAME
                                       MOVE  ZERO  TO  FLG-HOUSIJI-COM
                                                       FLG-HOUTEN-COM
+                                                      FLG-SYOBYO-COM
+                                                      FLG-RYOYO-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
       *
@@ -3790,6 +3823,8 @@
                                       MOVE  SPACE TO  WRK-TANINAME
                                       MOVE  ZERO  TO  FLG-HOUSIJI-COM
                                                       FLG-HOUTEN-COM
+                                                      FLG-SYOBYO-COM
+                                                      FLG-RYOYO-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
       *
