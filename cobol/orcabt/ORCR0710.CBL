@@ -105,6 +105,8 @@
       *  01.02.13    NACL-門脇    05/08/12  公費単独実日数０記載修正
       *  01.02.14    NACL-藤原    05/08/03  負担者番号の条件を追加
       *  01.02.15    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
+      *  01.02.16    NACL-伊藤    05/11/17  神奈川暫定対応
+      *                                     老人は給付割合を記載
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3098,6 +3100,31 @@
       *    国保のみ印字
            IF    ( RECE62-TEISYUTUSAKI =   "2"   )
            AND   ( RECE62-RJNHKNNUM    =   SPACE )
+               COMPUTE WRK-KYURATE-9   = 
+                                  (100 -   RECE62-KYURATE)
+                                           / 10 
+               IF      WRK-KYURATE-9       >   ZERO
+                   MOVE   "給割"               TO  HC06-KYURATE
+                   MOVE    WRK-KYURATE-9       TO  WRK-KYURATE
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "2"             TO  KANACHK-SYORI 
+                   MOVE    WRK-KYURATE     TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING
+                                           ORCSKANACHKAREA
+                  IF    ( KANACHK-RC       =   ZERO )
+                   AND   ( KANACHK-MAX     >   ZERO )
+                       MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               TO  HC06-KYURATE(5:)
+                   END-IF    
+               END-IF
+           END-IF
+      *
+      *    神奈川県国保老健は給付割合を記載（暫定的な対応）
+           IF    ( RECE62-TEISYUTUSAKI        =   "2"    )
+           AND   ( RECE62-PREFNUM             =   "14"   )
+           AND   ( RECE62-RJNHKNNUM       NOT =   SPACE  )
+           AND  (( RECE62-HKNJANUM-KEY (1:2)  =   "14"   )
+           OR    ( RECE62-HKNJANUM-KEY (1:4)  =   "6714" ))
                COMPUTE WRK-KYURATE-9   = 
                                   (100 -   RECE62-KYURATE)
                                            / 10 

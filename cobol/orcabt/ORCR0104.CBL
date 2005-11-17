@@ -97,6 +97,8 @@
       *  01.02.13    NACL-ÌçÏÆ    05/08/12  ¸øÈñÃ±ÆÈ¼ÂÆü¿ô£°µ­ºÜ½¤Àµ
       *  01.02.14    NACL-Æ£¸¶    05/08/03  ÉéÃ´¼ÔÈÖ¹æ¤Î¾ò·ï¤òÄÉ²Ã
       *  01.02.15    NACL-¾®Æ¦Âô  05/10/28  ÆÃµ­»ö¹à¡¡Àè¿Ê¡¢À©Ä¶¡¡ÂÐ±þ
+      *  01.02.16    NACL-°ËÆ£    05/11/17  ¿ÀÆàÀî»ÃÄêÂÐ±þ
+      *                                     Ï·¿Í¤ÏµëÉÕ³ä¹ç¤òµ­ºÜ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2990,6 +2992,29 @@
       *    ¹ñÊÝ¤Î¤ß°õ»ú
            IF    ( RECE02-TEISYUTUSAKI =   "2"   )
            AND   ( RECE02-RJNHKNNUM    =   SPACE )
+               COMPUTE WRK-KYURATE-9   =   (100 -   RECE02-KYURATE)
+                                           / 10 
+               IF      WRK-KYURATE-9       >   ZERO
+                   MOVE   "µë³ä"               TO  HC06-KYURATE
+                   MOVE    WRK-KYURATE-9       TO  WRK-KYURATE
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "2"             TO  KANACHK-SYORI 
+                   MOVE    WRK-KYURATE     TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF    ( KANACHK-RC      =   ZERO )
+                   AND   ( KANACHK-MAX     >   ZERO )
+                       MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               TO  HC06-KYURATE(5:)
+                   END-IF    
+               END-IF
+           END-IF
+      *
+      *    ¿ÀÆàÀî¸©¹ñÊÝÏ··ò¤ÏµëÉÕ³ä¹ç¤òµ­ºÜ¡Ê»ÃÄêÅª¤ÊÂÐ±þ¡Ë
+           IF    ( RECE02-TEISYUTUSAKI        =   "2"    )
+           AND   ( RECE02-PREFNUM             =   "14"   )
+           AND   ( RECE02-RJNHKNNUM       NOT =   SPACE  )
+           AND  (( RECE02-HKNJANUM-KEY (1:2)  =   "14"   )
+           OR    ( RECE02-HKNJANUM-KEY (1:4)  =   "6714" ))
                COMPUTE WRK-KYURATE-9   =   (100 -   RECE02-KYURATE)
                                            / 10 
                IF      WRK-KYURATE-9       >   ZERO
