@@ -166,6 +166,8 @@
       *  02.06.04    NACL-藤原    05/08/25  労災・自賠責の保険限定の場合の
       *                                     同一診療科の同一病名を登録可能
       *                                     とする
+      *  02.06.05    NACL-藤原    05/11/18  全科で入外区分指定のとき
+      *                                     該当のみ表示するようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1356,7 +1358,7 @@
                EVALUATE    WRK-DBPATH
                    WHEN    PATH-TBL-PTBYOMEI-KEY16
                        MOVE    PATH-TBL-PTBYOMEI-KEY22 TO  WRK-DBPATH
-                   WHEN    "PTBYOMEI-KEY17"
+                   WHEN    PATH-TBL-PTBYOMEI-KEY17
                        MOVE    PATH-TBL-PTBYOMEI-KEY23 TO  WRK-DBPATH
                END-EVALUATE
            END-IF
