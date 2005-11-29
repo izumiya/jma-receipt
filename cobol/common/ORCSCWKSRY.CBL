@@ -665,6 +665,15 @@
                                                    =   "99"   ) AND
                                       (SPA-COM-SRYSYUKBN (IDX-1 + 1)
                                                    =   SPACE   ))
+      *                         コメントの時
+                                OR   ((SPA-COM-SRYKBN (IDX-1)
+                                                   =   "95"
+                                                   OR  "96"    )  AND
+                                      (SPA-COM-SRYKBN (IDX-1 + 1)
+                                                   =   "99"
+                                                   OR  "98"   ) AND
+                                      (SPA-COM-SRYSYUKBN (IDX-1 + 1)
+                                                   =   SPACE   ))
                                    CONTINUE
                                ELSE
                                    MOVE    SPACE   TO  SPA-COM-KAIFLG
