@@ -1481,7 +1481,7 @@
            MOVE    SMEI-PTID       TO  SMEI2-PTID
            MOVE    SMEI-DENPNUM    TO  SMEI2-DENPNUM
            MOVE    SMEI-DENPEDANUM TO  SMEI2-DENPEDANUM
-           MOVE    "2"             TO  SMEI2-NYUGAIKBN
+           MOVE    SMEI-NYUGAIKBN  TO  SMEI2-NYUGAIKBN
            MOVE    SMEI2-REC       TO  MCPDATA-REC
            MOVE    "DBSELECT"      TO  MCP-FUNC
            MOVE    PATH-TBL-SYUMEI-KEY11   TO  MCP-PATH
