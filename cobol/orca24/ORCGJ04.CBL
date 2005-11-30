@@ -6064,17 +6064,27 @@
            MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-J01-SRYKA       TO  JYURRK-SRYKA
-           MOVE    SPA-SEL-DENPNUM     TO  JYURRK-DENPNUM
+           IF      SPA-NYUGAIKBN       =   "2"
+      *        外来の時、伝票番号
+               MOVE    SPA-SEL-DENPNUM     TO  JYURRK-DENPNUM
+               MOVE    "JYURRK-KEY6"       TO  WRK-PATH
+           ELSE
+      *        入院の時、診療年月日、保険組合せ
+               MOVE    SPA-SEL-RRKYMD      TO  JYURRK-SRYYMD
+               MOVE    SPA-SEL-RENNUM      TO  JYURRK-RENNUM
+               MOVE    SPA-HKNCOMBINUM     TO  JYURRK-HKNCOMBINUM
+               MOVE    "JYURRK-KEY19"      TO  WRK-PATH
+           END-IF
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "JYURRK-KEY6"       TO  ORC-DBPATH
+           MOVE    WRK-PATH            TO  ORC-DBPATH
            CALL    "ORCMCPSUB"          USING
                                         MCPAREA
                                         ORCMCPAREA
                                         MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "JYURRK-KEY6"       TO  ORC-DBPATH
+               MOVE    WRK-PATH            TO  ORC-DBPATH
                PERFORM 970-JYURRK-NEXT-SEC
            ELSE
                MOVE    1                   TO  FLG-JYURRK
@@ -6114,12 +6124,12 @@
                                                 MCPDATA-REC
                END-IF
       *
-               MOVE    "JYURRK-KEY6"            TO  ORC-DBPATH
+               MOVE    WRK-PATH               TO  ORC-DBPATH
                PERFORM 970-JYURRK-NEXT-SEC
            END-PERFORM
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-           MOVE    "JYURRK-KEY6"       TO  ORC-DBPATH
+           MOVE    WRK-PATH            TO  ORC-DBPATH
            CALL    "ORCMCPSUB"          USING
                                         MCPAREA
                                         ORCMCPAREA
