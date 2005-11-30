@@ -233,6 +233,7 @@
            03  WRK-SKYPRT-NYUKIN                   PIC S9(10).
            03  WRK-SEIKYU-PG                       PIC X(20).
            03  WRK-SKYPRTKBN                       PIC X(01).
+           03  WRK-OLD-NYUHEN-YMD                  PIC X(08).
       *
        01  WRK-ROW.
            03  WRK-SMEILIST1-ROW                   PIC S9(9)   BINARY.
@@ -2508,6 +2509,8 @@
       *
                PERFORM 900-SYUNOU-KEY-SEL-SEC
       *
+               MOVE    SMEI-NYUHEN-YMD     TO  WRK-OLD-NYUHEN-YMD
+      *
       *        ÆþÊÖ¶â³Û
                MOVE    SPA-GMN-NYUKIN      TO  SMEI-NYUHEN-MONEY
       *
@@ -2544,6 +2547,14 @@
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SMEI-UPYMD
                MOVE    SMCNDATE-HMS        TO  SMEI-UPHMS
+      *
+               IF    ( SMEI-NYUHEN-YMD     NOT =   WRK-OLD-NYUHEN-YMD )
+                   MOVE    SMEI-UPYMD          TO  SDAILYKEY-CREYMD
+                   MOVE    SMEI-UPHMS          TO  SDAILYKEY-CREHMS
+                   MOVE    SMEI-NYUHEN-YMD     TO  SDAILYKEY-BASEYMD
+                   PERFORM 800-DAILYKEY-SEC
+                   MOVE    SDAILYKEY-DAILYKEY  TO  SMEI-DAILYKEY
+               END-IF
       *
                MOVE    SYUMEI-REC          TO  MCPDATA-REC
                MOVE    "SYUMEI-KEY"        TO  ORC-DBPATH

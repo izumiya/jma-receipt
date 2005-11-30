@@ -127,6 +127,7 @@
            03  WRK-SYU-DENPNUM                     PIC 9(07).
            03  WRK-OIDMSG                          PIC X(100).
            03  WRK-SAGAKU                          PIC S9(10).
+           03  WRK-OLD-NYUHEN-YMD                  PIC X(08).
       *
        01  WRK-ROW.
            03  WRK-SMEILIST1-ROW                   PIC S9(9)   BINARY.
@@ -3338,6 +3339,8 @@
                MOVE    "1005"          TO  SPA-ERRCD
            ELSE
       *
+               MOVE    SMEI-NYUHEN-YMD     TO  WRK-OLD-NYUHEN-YMD
+      *
       *        ¿¡µ·∂‚≥€
                IF    ( SPA-NAI-O04-PROC-FLG    = 1 OR 2 )
                    MOVE    SPA-GMN-O04-CHOSEIIN
@@ -3390,6 +3393,14 @@
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SMEI-UPYMD
                MOVE    SMCNDATE-HMS        TO  SMEI-UPHMS
+      *
+               IF    ( SMEI-NYUHEN-YMD     NOT =   WRK-OLD-NYUHEN-YMD )
+                   MOVE    SMEI-UPYMD          TO  SDAILYKEY-CREYMD
+                   MOVE    SMEI-UPHMS          TO  SDAILYKEY-CREHMS
+                   MOVE    SMEI-NYUHEN-YMD     TO  SDAILYKEY-BASEYMD
+                   PERFORM 800-DAILYKEY-SEC
+                   MOVE    SDAILYKEY-DAILYKEY  TO  SMEI-DAILYKEY
+               END-IF
       *
                MOVE    SYUMEI-REC          TO  MCPDATA-REC
                MOVE    PATH-TBL-SYUMEI-KEY TO  MCP-PATH
