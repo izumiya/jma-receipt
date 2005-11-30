@@ -1613,6 +1613,19 @@
       *****************************************************************
        41021-KIHON-1013-SEC       SECTION.
       *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    SPA-GMN-JIHINAME    TO  KANACHK-MAE-INPUT
+           MOVE    20                  TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-JIHINAME
+           IF     (KANACHK-RC      NOT =   ZERO  )  OR
+                  (KANACHK-SYUBETU     =   1     )
+               MOVE    "0012"          TO  SPA-ERRCD
+               MOVE    70              TO  SPA-GMN-CUR
+           END-IF
+      *
            .
        41021-KIHON-1013-EXT.
            EXIT.
