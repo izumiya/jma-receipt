@@ -29,8 +29,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  01.00.01    NACL-Æ£¸¶    05/01/07  º¹¤·¹þ¤ß¥³¥á¥ó¥È¤òÂÐ¾Ý¤È¤¹¤ë
-      *
-      *  02.07.01    NACL-Æ£¸¶    05/08/20  ÆÃÊÌÎÅÍÜÈñÂÐ±þ
+      *  02.07.02    NACL-Æ£¸¶    05/12/02  ¿ÇÎÅ¶èÊ¬£¹£¹¤Ï£°£±¤ËÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -267,7 +266,7 @@
                 MOVE   RECE64-HKNCOMBI TO  WRK-HKNCOMBI
            END-IF
            IF      RECE64-SRYKBN   =   "99"
-               MOVE    "11"            TO  RECE641-SRYKBN
+               MOVE    "01"            TO  RECE641-SRYKBN
                IF  RECE64-HKNCOMBI     =   ZERO
                    MOVE    WRK-HKNCOMBI    TO  RECE64-HKNCOMBI
                END-IF
@@ -388,8 +387,7 @@
                              ( RECE64-TEISYUTUSAKI
                                                    =   "2"  )      )
                        OR  (   RECE64-RECESYUBETU  =   ZERO   OR 
-                                                       8888   OR 
-                                                       6666        )
+                                                       8888        )
       ****             OR  ( RECE64-SRYKBN         >=  "90"   AND 
       ****                                         <   "99"        )
                        OR  ( RECE64-SRYKBN         >=  "95"   AND 

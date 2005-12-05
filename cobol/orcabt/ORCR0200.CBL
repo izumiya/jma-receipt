@@ -32,8 +32,7 @@
       *  01.00.02    NACL-∆£∏∂    04/05/19  ø«Œ≈∂Ë ¨°·£π£µ§»£π£∂(º´»Ò)§Œ
       *                                     §œ¬–æ›§»§∑§ §§
       *  01.00.03    NACL-ÃÁœ∆    04/09/03   ›∏±¡»§ﬂπÁ§Ô§ª ‘Ω∏Ω§¿µ
-      *
-      *  02.07.01    NACL-∆£∏∂    05/08/20  ∆√ ÃŒ≈Õ‹»Ò¬–±˛
+      *  02.07.02    NACL-∆£∏∂    05/12/02  ø«Œ≈∂Ë ¨£π£π§œ£∞£±§À —ππ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -281,7 +280,7 @@
                 MOVE   RECE04-HKNCOMBI TO  WRK-HKNCOMBI
            END-IF
            IF      RECE04-SRYKBN   =   "99"
-               MOVE    "11"            TO  RECE041-SRYKBN
+               MOVE    "01"            TO  RECE041-SRYKBN
                IF  RECE04-HKNCOMBI     =   ZERO
                    MOVE    WRK-HKNCOMBI    TO  RECE04-HKNCOMBI
                END-IF
@@ -397,8 +396,7 @@
                              ( RECE04-TEISYUTUSAKI
                                                    =   "2"  )      )
                        OR  (   RECE04-RECESYUBETU  =   ZERO   OR 
-                                                       8888   OR 
-                                                       6666        )
+                                                       8888        )
                        OR  (   RECE04-SRYKBN       =   "95"   OR
                                                        "96"        )
                            CONTINUE
