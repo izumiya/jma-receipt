@@ -276,25 +276,13 @@
                MOVE    SPA-SRYYMDW(1:9)    TO  SPA-GMN-SRYYMD
            END-IF
       *
-      *    患者情報検索
-           MOVE    SPA-HOSPID          TO  PTINF-HOSPID
-           MOVE    SPA-PTID            TO  PTINF-PTID
-           PERFORM 900-PTINF-READ-SEC
-      *
-           MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
-           MOVE    PTINF-KANANAME      TO  SPA-GMN-KANANAME
-           MOVE    PTINF-NAME          TO  SPA-GMN-NAME
-           EVALUATE    PTINF-SEX
-               WHEN    "1"
-                   MOVE    "男"                TO  SPA-GMN-SEX
-               WHEN    "2"
-                   MOVE    "女"                TO  SPA-GMN-SEX
+           EVALUATE    SPA-SYORI-FLG
+               WHEN    1
+               WHEN    2
+                   PERFORM 30011-PTINF-HEN-SEC
+               WHEN    3
+                   PERFORM 30012-SPA-HEN-SEC
            END-EVALUATE
-      *
-           MOVE    PTINF-BIRTHDAY      TO  SPA-BIRTHDAY
-           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
-           PERFORM 800-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG         TO  SPA-GMN-BIRTHDAY
       *
       *    診療科初期編集
            MOVE    SPACE               TO  SYS-KEY
@@ -329,6 +317,39 @@
            MOVE    PATH-TBL-SYSKANRI-KEY2  TO  MCP-PATH
            PERFORM 990-DBCLOSE-SEC
       *
+      *    初期表示
+           PERFORM 3001-SPA-INIT-SEC
+      *
+           MOVE    2                   TO  SPA-GMN-CUR
+           .
+       3001-SPA-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者情報編集処理
+      *****************************************************************
+       30011-PTINF-HEN-SEC          SECTION.
+      *
+      *    患者情報検索
+           MOVE    SPA-HOSPID          TO  PTINF-HOSPID
+           MOVE    SPA-PTID            TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+      *
+           MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
+           MOVE    PTINF-KANANAME      TO  SPA-GMN-KANANAME
+           MOVE    PTINF-NAME          TO  SPA-GMN-NAME
+           EVALUATE    PTINF-SEX
+               WHEN    "1"
+                   MOVE    "男"                TO  SPA-GMN-SEX
+               WHEN    "2"
+                   MOVE    "女"                TO  SPA-GMN-SEX
+           END-EVALUATE
+      *
+           MOVE    PTINF-BIRTHDAY      TO  SPA-BIRTHDAY
+           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG         TO  SPA-GMN-BIRTHDAY
+      *
       *    保険組合せ
            INITIALIZE                  ORCSHKNSETAREA
            MOVE    "1"                 TO  ORCSHKN-KBN
@@ -346,13 +367,22 @@
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX)
                                        TO  SPA-GMN-THKNCOMBIMEI (IDX)
            END-PERFORM
-      *
-      *    初期表示
-           PERFORM 3001-SPA-INIT-SEC
-      *
-           MOVE    2                   TO  SPA-GMN-CUR
            .
-       3001-SPA-SET-EXT.
+       30011-PTINF-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者情報ＳＰＡ編集処理
+      *****************************************************************
+       30012-SPA-HEN-SEC          SECTION.
+      *
+           MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
+           MOVE    SPA-NAME            TO  SPA-GMN-NAME
+           MOVE    SPA-SEX             TO  SPA-GMN-SEX
+           MOVE    SPA-BIRTHDAYW       TO  SPA-GMN-BIRTHDAY
+      *
+           .
+       30012-SPA-HEN-EXT.
            EXIT.
       *
       *****************************************************************

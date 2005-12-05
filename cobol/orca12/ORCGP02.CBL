@@ -3184,6 +3184,9 @@
       *
            MOVE    SPA-GMN-PTID        TO  SPA-PTID
            MOVE    SPA-GMN-PTNUM       TO  SPA-PTNUM
+           MOVE    SPA-GMN-NAMEH       TO  SPA-NAME
+           MOVE    SPA-GMN-SEXH        TO  SPA-SEX
+           MOVE    SPA-GMN-BIRTHDAYH   TO  SPA-BIRTHDAYW
            MOVE    SPACE               TO  SPA-SRYKA
            MOVE    SPACE               TO  SPA-HKNCOMBINUM
            MOVE    SPACE               TO  SPA-DRCD
@@ -3196,7 +3199,8 @@
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
       *
            IF     (FLG-CLAIM-OK        =   ZERO )  AND
-                  (SPA-KEI-FLG         =   ZERO )
+                  (SPA-KEI-FLG         =   ZERO )  AND
+                  (FLG-USERPG      NOT =   2    )
                MOVE   "CHANGE"             TO  MCP-PUTTYPE
            ELSE
                MOVE    "JOIN"              TO  MCP-PUTTYPE
