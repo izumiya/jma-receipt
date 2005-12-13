@@ -2927,7 +2927,7 @@
                            COMPUTE WRK-RUIKEITOTAL2
                                =   WRK-RUIKEITOTAL2
                                + ((WRK-NUM + 1 )
-                               *   CONST-RUIKEI2(WRK-NUM))
+                               *   CONST-RUIKEI2(WRK-NUM + 1))
                                *  (10 ** ( 9 - IDX0 ))
       *
                        END-PERFORM
@@ -4673,34 +4673,39 @@
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
       *
-               PERFORM VARYING IDX23    FROM    1   BY  1
-                       UNTIL ( IDX23    >   WRK-HBTSRYKA-MAX )
-                       OR    ( WRK-HBTSRYKA (IDX23)
+               IF    ( WRK-HBTSRYKA-HBTKA (IDX-DAY)    NOT =   ZERO )
+      *
+                   PERFORM VARYING IDX23    FROM    1   BY  1
+                           UNTIL ( IDX23    >   WRK-HBTSRYKA-MAX )
+                           OR    ( WRK-HBTSRYKA (IDX23)
                                        = WRK-HBTSRYKA-HBTKA (IDX-DAY) )
       *
-                   CONTINUE
+                       CONTINUE
       *
-               END-PERFORM
+                   END-PERFORM
       *
-               MOVE    ZERO        TO  IDX24
+                   MOVE    ZERO        TO  IDX24
       *
-               IF    ( IDX23    >  WRK-HBTSRYKA-MAX )
+                   IF    ( IDX23    >  WRK-HBTSRYKA-MAX )
       *
-                   IF    ( WRK-HBTSRYKA-MAX    <   CONST-HBTSRYKA-MAX )
-                       COMPUTE WRK-HBTSRYKA-MAX
-                           =   WRK-HBTSRYKA-MAX    +   1
+                       IF    ( WRK-HBTSRYKA-MAX
+                                       <   CONST-HBTSRYKA-MAX )
+                           COMPUTE WRK-HBTSRYKA-MAX
+                               =   WRK-HBTSRYKA-MAX    +   1
       *
-                       MOVE    WRK-HBTSRYKA-MAX    TO  IDX24
+                           MOVE    WRK-HBTSRYKA-MAX    TO  IDX24
       *
-                       MOVE    WRK-HBTSRYKA-HBTKA (IDX-DAY)
-                                   TO  WRK-HBTSRYKA (IDX24)
+                           MOVE    WRK-HBTSRYKA-HBTKA (IDX-DAY)
+                                       TO  WRK-HBTSRYKA (IDX24)
+                       END-IF
+                   ELSE
+                       MOVE    IDX23   TO  IDX24
                    END-IF
-               ELSE
-                   MOVE    IDX23   TO  IDX24
-               END-IF
       *
-               IF    ( IDX24        >   ZERO )
-                   MOVE    1       TO  WRK-HBTSRYKA-DAY (IDX24 IDX-DAY)
+                   IF    ( IDX24       >   ZERO )
+                       MOVE    1       TO  WRK-HBTSRYKA-DAY
+                                            (IDX24 IDX-DAY)
+                   END-IF
                END-IF
       *
            END-PERFORM
@@ -4859,14 +4864,14 @@
                                        TO  ACCT-SURYOUTOTAL
            MOVE    HCM34S01-MEISAISU   (IDX28)
                                        TO  ACCT-MEISAISU
-           MOVE    HCM34S01-ZAIKAISU   (IDX28)
-                                       TO  ACCT-ZAIKAISU
       *
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
       *
-               MOVE    HCM34S01-DAY (IDX28 IDX-DAY)
+               MOVE    WRK-DAY (IDX-DAY)
                                        TO  ACCT-DAY (1 IDX-DAY)
+               COMPUTE ACCT-ZAIKAISU   =   ACCT-ZAIKAISU
+                                       +   WRK-DAY (IDX-DAY)
       *
            END-PERFORM
       *
@@ -4874,6 +4879,7 @@
       *
            MOVE    HCM34S01-RUIKEITOTAL(IDX28)
                                        TO  HCM34ACCT-RUIKEITOTAL
+           MOVE    ZERO                TO  HCM34ACCT-RUIKEITOTAL2
            MOVE    WRK-SRYCD           TO  HCM34ACCT-SRT-SRYCD
            MOVE    WRK-SRYSYUKBN       TO  HCM34ACCT-SRT-SRYSYUKBN
            MOVE    "2"                 TO  HCM34ACCT-ACCTKBN
