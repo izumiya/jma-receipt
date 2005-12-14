@@ -76,6 +76,7 @@
       *  01.02.21    NACL-門脇    05/11/11  コメントがある場合の編集修正
       *  01.02.22    NACL-門脇    05/11/15  傷病手当金、療養費同意書の自動
       *                                     記載フラグ編集修正
+      *  01.02.23    NACL-門脇    05/12/14  初診時間区分編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2364,9 +2365,9 @@
                          WHEN    1
                          WHEN    5
                              MOVE  "1"     TO   RECE82-SHOSHINTIME
-                         WHEN    4
-                             MOVE  "2"     TO   RECE82-SHOSHINTIME
                          WHEN    3
+                             MOVE  "2"     TO   RECE82-SHOSHINTIME
+                         WHEN    4
                              MOVE  "3"     TO   RECE82-SHOSHINTIME
                      END-EVALUATE
                      COMPUTE    RECE82-TENSU(1)  =
@@ -2637,9 +2638,9 @@
                          WHEN    1
                          WHEN    5
                              MOVE  "1"     TO   RECE82-SHOSHINTIME
-                         WHEN    4
-                             MOVE  "2"     TO   RECE82-SHOSHINTIME
                          WHEN    3
+                             MOVE  "2"     TO   RECE82-SHOSHINTIME
+                         WHEN    4
                              MOVE  "3"     TO   RECE82-SHOSHINTIME
                      END-EVALUATE
                      COMPUTE    RECE82-TENSU(1)  =
@@ -2971,9 +2972,9 @@
                          WHEN    1
                          WHEN    5
                              MOVE  "1"     TO   RECE82-SHOSHINTIME
-                         WHEN    4
-                             MOVE  "2"     TO   RECE82-SHOSHINTIME
                          WHEN    3
+                             MOVE  "2"     TO   RECE82-SHOSHINTIME
+                         WHEN    4
                              MOVE  "3"     TO   RECE82-SHOSHINTIME
                      END-EVALUATE
                      COMPUTE    RECE82-TENSU(1)    =

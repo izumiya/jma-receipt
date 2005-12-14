@@ -1349,8 +1349,8 @@
            INITIALIZE                      WRK-RECE85XX-REC
            MOVE   "810000001"          TO  WRK-RECE85XX-SRYCD(1 1)
            MOVE    ZERO                TO  WRK-RECE85XX-SRYSURYO(1 1)
-           MOVE    10                  TO  WRK-RECE85XX-YUKOKETA(1 1)
-           MOVE   "加算率（　．　　）％"
+           MOVE    9                   TO  WRK-RECE85XX-YUKOKETA(1 1)
+           MOVE   "加算率（　．　　）"
                                        TO  WRK-RECE85XX-NAME(1 1)
       *
            MOVE    RECE82-KSNRATE(1:1) TO  DAY-IDX3
