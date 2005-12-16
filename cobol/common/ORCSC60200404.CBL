@@ -2207,6 +2207,8 @@
                       (WRK-COM-DATAKBN   (IDX-Z)   =   "1"   )  AND
                       (WRK-COM-TEIGEN-FLG(IDX-Z)   =   ZERO )
                    PERFORM 20011-JYUFUKU-CHK-SEC
+      *            ２つ以上のチェック
+                   PERFORM 20012-JYUFUKU-CHK2-SEC
                END-IF
            END-PERFORM
       *
@@ -2500,10 +2502,10 @@
                MOVE    "1"                 TO  WRK-COM-CUR (WRK-JYU-IDX)
            END-IF
       *
-           IF      WRK-JYU-FLG     NOT =   SPACE
+      ***  IF      WRK-JYU-FLG     NOT =   SPACE
       *        別テーブルのチェック
-               PERFORM 20012-JYUFUKU-CHK2-SEC
-           END-IF
+      *        PERFORM 20012-JYUFUKU-CHK2-SEC
+      **** END-IF
            .
       *
        20011-JYUFUKU-CHK-EXT.
