@@ -1883,6 +1883,9 @@
       *
       *    中途終了分よりの時　初画面を編集
            INITIALIZE                  SPA-SCR-REC
+      *    ワーク診療行為解除
+           MOVE    ZERO            TO  FLG-MOD-FLG
+           PERFORM 4900-WKSRYACT-CLEAR-SEC
       *
       *    初期ＳＰＡ編集処理
            IF     (SPA-SRYYMD      NOT =   SPA-GMN-SRYYMD )  OR
