@@ -60,6 +60,7 @@
       *  01.02.04    NACL-門脇    05/11/01  （検選）等コメント対応
       *  01.02.05    NACL-門脇    05/11/15  傷病手当金、療養費同意書の自動
       *                                     記載編集修正
+      *  01.02.06    NACL-門脇    05/12/20  差し込みコメントの保険組合せ編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -309,6 +310,7 @@
            03  WRK-KETA2           PIC 9(04).
            03  WRK-KOHBUNRI        PIC 9(01).
            03  WRK-KOHBUNRI-JIDO   PIC 9(01).
+           03  WRK-HKNCOMBI-JIDO   PIC 9(04).
            03  WRK-RECEERR         PIC X(200).
       *
            03  WRK-FSANTEIYMD      PIC 9(08).
@@ -699,6 +701,7 @@
            INITIALIZE                      WRK-TAIHI-ZAINUM
       *
            MOVE  RECE62-KOHBUNRI-MIN   TO  WRK-KOHBUNRI-JIDO
+           MOVE  ZERO                  TO  WRK-HKNCOMBI-JIDO
       *
            IF   RECE62-COMCNTFLG   =   "1"
       *
@@ -753,29 +756,6 @@
       *
            END-IF
       *
-      *    他保険にて入院料算定済みのコメント
-      *
-           IF   RECE62-NYUINRYOFLG   NOT =   SPACE
-      *
-              IF    RECE62-RECESYUBETU  =  8888
-                  CONTINUE
-              ELSE
-                  PERFORM   2001-NYUINRYO-COMMENT-SEC
-              END-IF
-      *
-           END-IF
-      *
-      *    公費受診日のコメント
-      *
-           IF   RECE62-KOHJNISSUTBLINF    =   ALL " "
-              CONTINUE
-           ELSE
-              PERFORM   2001-KOHJYUSIN-COMMENT-SEC
-           END-IF
-      *
-      *    脳血管疾患急性発症日のコメント
-           PERFORM   2001-KYUSEIHASSYO-HANTEI-SEC
-      *
       *    パラメータ０４ファイルより編集
            INITIALIZE                      RECE64-REC
            MOVE    RECE62-HOSPID       TO  RECE64-HOSPID
@@ -813,6 +793,16 @@
                OR     ( RECE62-HOJOKBN-KEY
                                          NOT =   RECE64-HOJOKBN      )
                OR     ( RECE62-TEKSTYMD  NOT =   RECE64-TEKSTYMD     )
+      *
+               IF   WRK-HKNCOMBI-JIDO   =   ZERO
+                 IF    WRK-KOHBUNRI-JIDO   =   RECE64-KOHBUNRI
+                    IF  (RECE64-SRYKBN    NOT =  "95"  AND  "96")
+                    AND (RECE64-ZAITEN    NOT =   ZERO)
+                    AND (RECE64-ZAIKAISU  NOT =   ZERO)
+                       MOVE   RECE64-HKNCOMBI   TO   WRK-HKNCOMBI-JIDO
+                    END-IF
+                 END-IF
+               END-IF
       *
                EVALUATE      RECE64-SRYKBN
                    WHEN      "13"
@@ -916,6 +906,29 @@
                PERFORM 990-RECE64-NEXT-SEC
       *
            END-PERFORM
+      *
+      *    他保険にて入院料算定済みのコメント
+      *
+           IF   RECE62-NYUINRYOFLG   NOT =   SPACE
+      *
+              IF    RECE62-RECESYUBETU  =  8888
+                  CONTINUE
+              ELSE
+                  PERFORM   2001-NYUINRYO-COMMENT-SEC
+              END-IF
+      *
+           END-IF
+      *
+      *    公費受診日のコメント
+      *
+           IF   RECE62-KOHJNISSUTBLINF    =   ALL " "
+              CONTINUE
+           ELSE
+              PERFORM   2001-KOHJYUSIN-COMMENT-SEC
+           END-IF
+      *
+      *    脳血管疾患急性発症日のコメント
+           PERFORM   2001-KYUSEIHASSYO-HANTEI-SEC
       *
       *****差込編集２********************
            PERFORM     250-SASHIKOMI2-SEC
@@ -1075,6 +1088,7 @@
            MOVE    99999999            TO  RECE649-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE649-KOHBUNRI
            MOVE    "90"                TO  RECE649-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE649-HKNCOMBI
       *
            MOVE    1                   TO  RECE649-MEISAISU
       *
@@ -1247,6 +1261,7 @@
            MOVE    99999980            TO  RECE649-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE649-KOHBUNRI
            MOVE    "99"                TO  RECE649-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE649-HKNCOMBI
       *
            MOVE    WRK-CNT-MEISAI      TO  RECE649-MEISAISU
       *
@@ -1424,6 +1439,7 @@
            MOVE    99999998            TO  RECE649-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE649-KOHBUNRI
            MOVE    "99"                TO  RECE649-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE649-HKNCOMBI
       *
            MOVE    1                   TO  RECE649-MEISAISU
       *
