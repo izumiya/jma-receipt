@@ -1216,12 +1216,12 @@
                MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
            END-IF
       *    ºßÂðÎÁ
-           IF      WRK-COM-SRYKBN (IDX-Z)  =   "14"
-               IF      WRK-ERRCD       =   SPACE
-                   MOVE    "8017"          TO  WRK-ERRCD
-               END-IF
-               MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-           END-IF
+      **** IF      WRK-COM-SRYKBN (IDX-Z)  =   "14"
+      *        IF      WRK-ERRCD       =   SPACE
+      *            MOVE    "8017"          TO  WRK-ERRCD
+      *        END-IF
+      *        MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+      **** END-IF
       *
            .
        100113-RSI-AFTCHK-EXT.
