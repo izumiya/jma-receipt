@@ -100,6 +100,7 @@
       *  01.02.18    NACL-門脇    05/11/11  コメントがある場合の編集修正
       *  01.02.19    NACL-門脇    05/11/15  傷病手当金、療養費同意書の自動
       *                                     記載フラグ編集修正
+      *  01.02.20    NACL-門脇    06/01/05  アフターケア在宅料対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2923,6 +2924,58 @@
                          COMPUTE    RECE41-TENSU(5)  =
                                     RECE41-TENSU(5)  +
                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+      *
+      *    在宅のレセ点数欄の編集
+               WHEN    "14"
+                   MOVE      ZERO            TO   FLG-ZAITAKU
+      *            往診・特別往診（時間加算）
+                   IF    FLG-OSINKBN         =   1
+                       MOVE   1              TO   FLG-ZAITAKU
+                       COMPUTE   RECE41-TENSU(6)  =
+                                 RECE41-TENSU(6)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+      *            夜間
+                   IF    FLG-OSINKBN         =   2
+                       MOVE   1              TO   FLG-ZAITAKU
+                       COMPUTE   RECE41-TENSU(6)  =
+                                 RECE41-TENSU(6)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+      *            深夜・緊急
+                   IF    FLG-OSINKBN         =   3
+                       MOVE   1              TO   FLG-ZAITAKU
+                       COMPUTE   RECE41-TENSU(6)  =
+                                 RECE41-TENSU(6)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+      *            在宅患者訪問診療
+                   IF  ( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
+                       ((SRY-SRYCD(IDX3)   NOT =    "114000110")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114001610")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114000970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114000470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114001970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114000370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114001570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114001870")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114002070"))
+                       MOVE   1              TO   FLG-ZAITAKU
+                       COMPUTE   RECE41-TENSU(6)  =
+                                 RECE41-TENSU(6)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+      *            その他
+                   IF    FLG-ZAITAKU    =   ZERO
+                       COMPUTE   RECE41-TENSU(6)  =
+                                 RECE41-TENSU(6)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+      *            薬剤
+                   COMPUTE   RECE41-TENSU(6)  =
+                             RECE41-TENSU(6)  +
+                             (WK-KIZAITEN *   WK-ZAIKAISU)  +
+                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    投薬のレセ点数欄の編集
                WHEN    "21"
                    IF    (SRY-SRYCD(IDX3) (1:1)  = "6" OR "S" OR "8"
