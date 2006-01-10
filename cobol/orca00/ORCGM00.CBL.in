@@ -112,6 +112,9 @@
                05  WRK-WMM         PIC 9(02).
                05  WRK-WDD         PIC 9(02).
       *
+           03  WRK-GAI-JIKANKBN    PIC X(01).
+           03  WRK-SYSYMD-YOBI     PIC X(01).
+      *
            03  WRK-GNO             PIC X(02).
       *
            03  WRK-PATH            PIC X(64).
@@ -308,10 +311,14 @@
                MOVE    SPA-SYSYMDWH        TO  WRK-WSYSYMDH
                MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
                MOVE    SPA-SYSYMDW         TO  WRK-WYMD
+               MOVE    SPA-GAI-JIKANKBN    TO  WRK-GAI-JIKANKBN
+               MOVE    SPA-SYSYMD-YOBI     TO  WRK-SYSYMD-YOBI
                INITIALIZE                  SPA-AREA
                MOVE    WRK-WSYSYMDH        TO  SPA-SYSYMDWH
                MOVE    WRK-SYSYMD          TO  SPA-SYSYMD
                MOVE    WRK-WYMD            TO  SPA-SYSYMDW
+               MOVE    WRK-GAI-JIKANKBN    TO  SPA-GAI-JIKANKBN
+               MOVE    WRK-SYSYMD-YOBI     TO  SPA-SYSYMD-YOBI
            ELSE
       *---- (01.00.04) LINE ADD END   --------------------------------
       *
