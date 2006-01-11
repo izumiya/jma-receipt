@@ -204,7 +204,7 @@
            03  FILLER          PIC X(24)  VALUE   "ｍＬ（ｇ）".
       *
            03  FILLER          PIC X(03)  VALUE   "059".
-           03  FILLER          PIC X(24)  VALUE   "プリスター".
+           03  FILLER          PIC X(24)  VALUE   "ブリスター".
       *
            03  FILLER          PIC X(03)  VALUE   "060".
            03  FILLER          PIC X(24)  VALUE   "シート".
