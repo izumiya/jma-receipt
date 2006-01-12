@@ -43,7 +43,7 @@
       *                                     ¼ÂÇ¯ÎðÄÉ²Ã
       * 01.00.12     NACL-Â¿¡¹Ç¼  05/09/15  ÃÏÊý¸øÈñÃ±ÆÈ¶èÊ¬ÄÉ²Ã
       * 01.00.13     NACL-Â¿¡¹Ç¼  05/09/22  Ä¹ºê¸©ÈïÇú¼Ô°åÎÅ¡Ê£±£¸£¶¡ËÄÉ²Ã
-      * 01.00.14     NACL-Â¿¡¹Ç¼  05/10/04  ÆÃÊÌÎÅÍÜÈñ¡Ê£°£¶£¸¡ËÄÉ²Ã
+      * 02.00.01     NACL-Â¿¡¹Ç¼  06/01/12  »ùÆ¸ÊÝ¸î¡Ê£°£µ£³¡ËÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -463,8 +463,7 @@
                END-IF
                IF      FLG-PTHKNINF        =   ZERO
                    IF     (PTHKN-HOJOKBN       =   "8"  OR  "9") OR
-                          ((COMB-HKNNUM        =   "060"
-                                               OR  "068"       )  AND
+                          ((COMB-HKNNUM        =   "060"   )  AND
                            (PTHKN-HOJOKBN      =   "1"  OR  "2"
                                                OR  "4"  OR  "5"))
                        MOVE    1               TO  FLG-OK
@@ -534,6 +533,14 @@
                   (COMB-KOH2HKNNUM     =   "021" )  OR
                   (COMB-KOH3HKNNUM     =   "021" )  OR
                   (COMB-KOH4HKNNUM     =   "021" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
+      *    »ùÆ¸ÊÝ¸îÁ¼ÃÖµÚ¤ÓÃÎÅª¾ã³²¼ÔÊ¡»ã¤Î¤ß»þ
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "053" )  OR
+                  (COMB-KOH2HKNNUM     =   "053" )  OR
+                  (COMB-KOH3HKNNUM     =   "053" )  OR
+                  (COMB-KOH4HKNNUM     =   "053" ))
                MOVE    1               TO  FLG-OK2
            END-IF
       *    Ï·¿Í¸øÈñ¤Ç¡¢»ÙÊ§¶èÊ¬¤¬¤¢¤ë»þ
