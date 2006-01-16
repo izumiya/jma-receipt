@@ -99,6 +99,9 @@
       *  01.02.15    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
       *  01.02.16    NACL-伊藤    05/11/17  神奈川暫定対応
       *                                     老人は給付割合を記載
+      *  01.02.17    NACL-藤原    06/01/05  山形県のレセプト様式変更対応
+      *                                     平成１８年１月分から標準的な
+      *                                     レセプト様式へ変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5987,11 +5990,15 @@
                            GO  TO  990-RECE02-READ-SEC
                        ELSE
       *******************IF    ( SYS-1001-PREFNUM    =   "06" OR
-                         IF    ( RECE02-PREFNUM      =   "06" OR
-                                                         "40"    )
-                         AND   ( RECE02-TEISYUTUSAKI =   "2"     )
+                         IF    ( RECE02-PREFNUM      =   "06"     )
+                         AND   ( RECE02-TEISYUTUSAKI =   "2"      )
+                         AND   ( RECE02-SRYYM        <=  "200512" )
                            GO  TO  990-RECE02-READ-SEC
                          ELSE
+                          IF    ( RECE02-PREFNUM      =   "40"    )
+                          AND   ( RECE02-TEISYUTUSAKI =   "2"     )
+                            GO  TO  990-RECE02-READ-SEC
+                          ELSE
                            DISPLAY "RECE02  PTNUM=" RECE02-PTNUM     
       *
                            ADD     1               TO  CNT-RECE02
@@ -6016,6 +6023,7 @@
                                                    WRK-SYS-SRYYMD(7:2)
                                  PERFORM 900-SYSKANRI-HENSYU-SEC
                            END-IF
+                          END-IF
                          END-IF
                        END-IF 
                      END-IF

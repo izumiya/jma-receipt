@@ -73,6 +73,9 @@
       *                                     の負担区分を変更する
       *  01.00.20    NACL-小豆沢  05/09/05  福岡老人公費２割の保険番号変更
       *  01.00.21    NACL-藤原    05/08/03  負担者番号の条件を追加
+      *  01.00.22    NACL-藤原    06/01/05  山形県のレセプト様式変更対応
+      *                                     平成１８年１月分から標準的な
+      *                                     レセプト様式へ変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5180,26 +5183,9 @@
                                PERFORM 900-SYSKANRI-HENSYU-SEC
                            END-IF
       *
-      *                    山形地方公費対応（国保）
-                           IF    ( SYS-1001-PREFNUM    =   "06" )
+      *                    福岡地方公費対応（国保）
+                           IF    ( SYS-1001-PREFNUM    =   "40" )
                            AND   ( RECE62-TEISYUTUSAKI =   "2"  ) 
-                               IF    ( RECE62-KOHNUM (1) (1:1)
-                                                       =   "1" OR  "2" )
-                               OR    ( RECE62-KOHNUM (2) (1:1)
-                                                       =   "1" OR  "2" )
-                               OR    ( RECE62-KOHNUM (3) (1:1)
-                                                       =   "1" OR  "2" )
-                               OR    ( RECE62-KOHNUM (4) (1:1)
-                                                       =   "1" OR  "2" )
-                                   CONTINUE
-                               ELSE
-                                   MOVE    1               TO  FLG-READ
-                               END-IF
-                           ELSE
-      *
-      *                      福岡地方公費対応（国保）
-                             IF    ( SYS-1001-PREFNUM    =   "40" )
-                             AND   ( RECE62-TEISYUTUSAKI =   "2"  ) 
                                IF    ( RECE62-KOHNUM (1) (1:1)
                                                        =   "1" OR  "2" )
                                OR    ( RECE62-KOHNUM (2) (1:1)
@@ -5221,9 +5207,8 @@
                                ELSE
                                    MOVE    1           TO  FLG-READ
                                END-IF
-                             ELSE
+                           ELSE
                                MOVE    1               TO  FLG-READ
-                             END-IF
                            END-IF
                        END-IF    
       *
