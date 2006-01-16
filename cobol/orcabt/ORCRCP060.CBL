@@ -91,6 +91,8 @@
       *                                     負担者番号に条件を追加
       *  02.06.05    NACL-藤原    05/09/05  複数枚レセの連番記載
       *  02.06.06    NACL-小豆沢  05/10/28  特記事項　先進、制超　対応
+      *  02.06.07    NACL-藤原    06/01/05  平成１８年１月分から標準的な
+      *                                     レセプト様式へ変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5811,7 +5813,8 @@
                    AND     RECE02-TOTALTEN (5) =   ZERO
                        GO  TO  990-RECE02-READ-SEC
                    ELSE    
-                       IF      RECE02-SRYYM        <   WRK-CONS-SRYYM
+                       IF    ( RECE02-SRYYM        <   WRK-CONS-SRYYM )
+                       OR    ( RECE02-SRYYM        >  "200512"        )
                            GO  TO  990-RECE02-READ-SEC
                        ELSE
                          IF      RECE02-TEISYUTUSAKI =   "1"
@@ -5999,7 +6002,8 @@
                    MOVE    1                   TO  FLG-RECE02X
                NOT AT  END
       *           ２００３年３月以前のとき読み飛ばす
-                   IF      RECE02X-SRYYM       <   WRK-CONS-SRYYM
+                   IF    ( RECE02X-SRYYM       <   WRK-CONS-SRYYM )
+                   OR    ( RECE02X-SRYYM       >  "200512"        )
                        GO  TO  990-RECE02X-READ-SEC
                    END-IF
       *            テスト患者・レセプト種別不明のとき読み飛ばす

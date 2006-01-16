@@ -81,8 +81,9 @@
       *  02.06.05    NACL-小豆沢  05/09/05  福岡老人公費２割の保険番号変更
       *  02.06.06    NACL-藤原    05/09/12  一部負担金のカスタマイズ項目
       *                                     の編集
-      *
-      *  02.07.01    NACL-藤原    05/08/20  特別療養費対応
+      *  02.06.07    NACL-藤原    06/01/05  山形県のレセプト様式変更対応
+      *                                     平成１８年１月分から標準的な
+      *                                     レセプト様式へ変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5211,8 +5212,7 @@
                        OR  (   RECE62-PTNUM        =   SPACE       )
                        OR  (   RECE62-TSTPTNUMKBN  =   "1"         )
                        OR  (   RECE62-RECESYUBETU  =   ZERO   OR 
-                                                       8888   OR 
-                                                       6666        )
+                                                       8888        )
                            CONTINUE
                        ELSE
       *
@@ -5225,26 +5225,9 @@
                                PERFORM 900-SYSKANRI-HENSYU-SEC
                            END-IF
       *
-      *                    山形地方公費対応（国保）
-                           IF    ( SYS-1001-PREFNUM    =   "06" )
+      *                    福岡地方公費対応（国保）
+                           IF    ( SYS-1001-PREFNUM    =   "40" )
                            AND   ( RECE62-TEISYUTUSAKI =   "2"  ) 
-                               IF    ( RECE62-KOHNUM (1) (1:1)
-                                                       =   "1" OR  "2" )
-                               OR    ( RECE62-KOHNUM (2) (1:1)
-                                                       =   "1" OR  "2" )
-                               OR    ( RECE62-KOHNUM (3) (1:1)
-                                                       =   "1" OR  "2" )
-                               OR    ( RECE62-KOHNUM (4) (1:1)
-                                                       =   "1" OR  "2" )
-                                   CONTINUE
-                               ELSE
-                                   MOVE    1               TO  FLG-READ
-                               END-IF
-                           ELSE
-      *
-      *                      福岡地方公費対応（国保）
-                             IF    ( SYS-1001-PREFNUM    =   "40" )
-                             AND   ( RECE62-TEISYUTUSAKI =   "2"  ) 
                                IF    ( RECE62-KOHNUM (1) (1:1)
                                                        =   "1" OR  "2" )
                                OR    ( RECE62-KOHNUM (2) (1:1)
@@ -5266,9 +5249,8 @@
                                ELSE
                                    MOVE    1           TO  FLG-READ
                                END-IF
-                             ELSE
+                           ELSE
                                MOVE    1               TO  FLG-READ
-                             END-IF
                            END-IF
                        END-IF    
       *

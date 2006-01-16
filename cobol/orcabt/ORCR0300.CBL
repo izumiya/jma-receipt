@@ -164,8 +164,9 @@
       *  02.06.05    NACL-小豆沢  05/09/05  福岡老人公費２割の保険番号変更
       *  02.06.06    NACL-藤原    05/09/12  一部負担金のカスタマイズ項目
       *                                     の編集
-      *
-      *  02.07.01    NACL-藤原    05/08/20  特別療養費対応
+      *  02.06.07    NACL-藤原    06/01/05  山形県のレセプト様式変更対応
+      *                                     平成１８年１月分からレセ電に
+      *                                     記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5049,19 +5050,9 @@
                        OR  (   RECE02-PTNUM        =   SPACE       )
                        OR  (   RECE02-TSTPTNUMKBN  =   "1"         )
                        OR  (   RECE02-RECESYUBETU  =   ZERO   OR 
-                                                       8888   OR 
-                                                       6666        )
+                                                       8888        )
                            CONTINUE
                        ELSE
-                         IF    ( RECE02-TOTALTEN (1) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (2) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (3) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (4) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (5) =   ZERO     )
-                         AND   ( RECE02-RECESYUBETU  NOT =  8888
-                                                         AND ZERO )
-                             CONTINUE
-                         ELSE
       *
       *                    医療機関情報取得
                            IF      WRK-PARA-SRYYM  =   ZERO
@@ -5073,8 +5064,9 @@
                            END-IF
       *
       *                    山形地方公費対応（国保）
-                           IF    ( SYS-1001-PREFNUM    =   "06" )
-                           AND   ( RECE02-TEISYUTUSAKI =   "2"  ) 
+                           IF    ( SYS-1001-PREFNUM    =   "06"     )
+                           AND   ( RECE02-TEISYUTUSAKI =   "2"      )
+                           AND   ( RECE02-SRYYM        <=  "200512" ) 
                                IF    ( RECE02-KOHNUM (1) (1:1)
                                                        =   "1" OR  "2" )
                                OR    ( RECE02-KOHNUM (2) (1:1)
@@ -5117,7 +5109,6 @@
                                MOVE    1               TO  FLG-READ
                              END-IF
                            END-IF
-                         END-IF
                        END-IF    
       *
                        IF      FLG-READ            =   1

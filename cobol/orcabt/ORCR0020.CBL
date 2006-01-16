@@ -128,10 +128,9 @@
       *  02.06.06    NACL-藤原    05/07/28  レセプト特記事項編集情報のため
       *                                     のレセプト請求しない地方公費の
       *                                     を追加
-      *
-      *  02.07.01    NACL-藤原    05/08/20  特別療養費対応
-      *  02.07.02    NACL-藤原    05/10/06  公費単独の三歳未満の割合設定
-      *                                     をしないようにする
+      *  02.06.07    NACL-藤原    06/01/05  山形県のレセプト様式変更対応
+      *                                     平成１８年１月分から標準的な
+      *                                     レセプト様式へ変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -602,12 +601,10 @@
                        PERFORM 210-HENSYU-SEC
                    WHEN    "1"
                        IF      RECE01-HKNNUM   NOT =   "060" AND "067"
-                                                   AND "068" AND "069"    
                            PERFORM 210-HENSYU-SEC
                        END-IF
                    WHEN    "2"
                        IF      RECE01-HKNNUM       =   "060" OR  "067"
-                                                   OR  "068" OR  "069"
                            PERFORM 210-HENSYU-SEC
                        END-IF
                END-EVALUATE
@@ -693,8 +690,7 @@
                MOVE  RECE01-SRYKA(IDX)    TO   RECE02-SRYKA(IDX)
            END-PERFORM
       *    審査支払機関
-           IF      RECE01-HKNNUM        =   "060"   OR    "067"   OR
-                                            "068"   OR    "069"
+           IF      RECE01-HKNNUM        =   "060"   OR    "067"
                MOVE    2                TO  RECE02-TEISYUTUSAKI
            ELSE
                MOVE    1                TO  RECE02-TEISYUTUSAKI
@@ -716,15 +712,10 @@
            IF      RECE01-HKNID        NOT =   ZERO
                MOVE    RECE01-HKNNUM   TO  RECE02-HKNNUM
                MOVE    RECE01-HKNID    TO  RECE02-HKNID
-      *        法別番号のセットと給付割合情報の取得
-      *        （退職特別療養費の場合は退職国保から取得する）
+      *        法別番号のセット
                INITIALIZE                  HKNNUM-REC
                MOVE   RECE02-HOSPID    TO  HKN-HOSPID
-               IF     RECE02-HKNNUM    =   "069"
-                   MOVE    "067"           TO  HKN-HKNNUM
-               ELSE
-                   MOVE   RECE02-HKNNUM    TO  HKN-HKNNUM
-               END-IF
+               MOVE   RECE02-HKNNUM    TO  HKN-HKNNUM
                PERFORM 900-HKNNUM-CHK-SEC
                IF      FLG-HKNNUM      =   ZERO
                    MOVE    HKNNUM-REC      TO  WRK-HKNNUM-REC
@@ -1219,9 +1210,8 @@
       *         
            IF     (RECE02-HKNNUM        NOT =   SPACE)   AND
                   (WRK-JIHI-FLG         =   SPACE)
-               IF      RECE02-HKNNUM    =   "060"   OR   "067"   OR
-                                            "068"   OR   "069"
-                   IF   RECE02-HKNNUM   =   "060"   OR   "068"
+               IF      RECE02-HKNNUM    =   "060"   OR   "067"
+                   IF   RECE02-HKNNUM   =   "060"
                         MOVE   "1"      TO  WK-KOKUHO
                    ELSE
                         MOVE   "2"      TO  WK-KOKUHO
@@ -1246,8 +1236,9 @@
                END-IF
            END-PERFORM    
       *
-      *    山形地方公費対応
-           IF      RECE02-PREFNUM      =   "06"
+      *    山形地方公費対応（２００５年１２月診療分まで）
+           IF    ( RECE02-PREFNUM      =   "06"     )
+           AND   ( RECE02-SRYYM        <=  "200512" )
                IF  WK-KOKUHO               =     "1"  OR  "2"
                    IF   (RECE02-KOHNUM(1) (1:1)  =   "1")   OR
                         (RECE02-KOHNUM(2) (1:1)  =   "1")   OR
@@ -1340,7 +1331,6 @@
                                    MOVE   "8"   TO   WK-HONKZKKBN
                            END-EVALUATE
                        WHEN    "060" 
-                       WHEN    "068" 
                            IF     (WRK-NENREI  >=   70)  AND
                                   (WRK-NENREI  <=   74)
                                EVALUATE   RECE02-HOJOKBN
@@ -1909,12 +1899,6 @@
                    MOVE    1430            TO    RECE02-RECESYUBETU
              END-EVALUATE
            END-IF
-      *     
-      *    特別療養費のときのレセプト種別を編集
-           IF      RECE02-HKNNUM        =   "068"   OR  "069"
-               MOVE    RECE02-RECESYUBETU   TO  RECE02-RECESYUBETU-X 
-               MOVE    6666                 TO  RECE02-RECESYUBETU    
-           END-IF
       *----(01.00.13) LINE ADD END   --------------------------
       *     DISPLAY   "RECE02-RECESYUBETU: " RECE02-RECESYUBETU
            .
@@ -1966,7 +1950,6 @@
            IF      RECE02-SRYYM     >=      "200210"
                EVALUATE    RECE02-HKNNUM
                    WHEN    "060"
-                   WHEN    "068"
                        IF       WRK-NENREI           <     3
                            IF    RECE02-HOJOKBN =    "0"  OR   "1" OR
                                                      "4"
@@ -2004,7 +1987,6 @@
                            END-EVALUATE
                        END-IF
                    WHEN    "067"
-                   WHEN    "069"
                        IF       WRK-NENREI           <     3
                            MOVE  20      TO    RECE02-KYURATE
                        ELSE
@@ -2025,8 +2007,6 @@
                                END-IF
                            END-IF
                        END-IF
-                   WHEN    SPACE
-                       MOVE    ZERO            TO  RECE02-KYURATE
                    WHEN    OTHER
                        IF      WRK-NENREI           <     3
                            MOVE    20          TO  RECE02-KYURATE
@@ -2130,29 +2110,6 @@
       *****************************************************************
        ZAITAKU-SET-SEC                SECTION.
       *
-      *    自費または特別療養費、公費単独の場合は
-      *    在宅総合・在宅末期フラグをクリアする
-           IF      RECE02-RECESYUBETU  =   "8888"  OR  "6666"
-               MOVE    SPACE           TO  RECE02-ZAITAKU
-               GO  TO  ZAITAKU-SET-EXT
-           END-IF
-           IF      RECE02-HKNNUM        =   SPACE 
-               MOVE    SPACE           TO  RECE02-ZAITAKU
-               GO  TO  ZAITAKU-SET-EXT
-           END-IF
-      *
-      *    対象でない患者のとき在宅総合・在宅末期フラグをクリアする
-           IF    ( RECE02-AGE          >=  70      )   OR
-                 ( RECE02-AGE          >=  65  AND                    
-                   RECE01-KOHID    NOT  =   ZERO   )   OR
-                 ( RECE02-AGE          >=  65  AND                    
-                   FLG-ROUJINHOKEN      =   1      )
-               CONTINUE
-           ELSE
-               MOVE    SPACE           TO  RECE02-ZAITAKU
-               GO  TO  ZAITAKU-SET-EXT
-           END-IF
-      *
            IF   RECE01-SRYYM    >=  "200210"
       *
              MOVE      SPACE     TO    WRK-ZAITAKU
@@ -2218,13 +2175,21 @@
              END-PERFORM
       *
              IF    WRK-ZAITAKU   =   "1"
-      *******  IF  ( RECE02-AGE          >=  70      )   OR
-      *******      ( RECE02-AGE          >=  65  AND                    
-      *******        RECE01-KOHID    NOT  =   ZERO   )   OR
-      *******      ( RECE02-AGE          >=  65  AND                    
-      *******        FLG-ROUJINHOKEN      =   1      )
+               IF  ( RECE02-AGE          >=  70      )   OR
+                   ( RECE02-AGE          >=  65  AND                    
+                     RECE01-KOHID    NOT  =   ZERO   )   OR
+                   ( RECE02-AGE          >=  65  AND                    
+                     FLG-ROUJINHOKEN      =   1      )
                  MOVE    "1"           TO  RECE02-ZAITAKU
-      *******  END-IF
+      *
+                 IF  RECE02-RECESYUBETU   =   "8888"
+                     MOVE  SPACE       TO  RECE02-ZAITAKU
+                 END-IF
+                 IF  RECE02-HKNNUM        =   SPACE 
+                     MOVE  SPACE       TO  RECE02-ZAITAKU
+                 END-IF
+      *
+               END-IF
              END-IF
       *
            END-IF
@@ -2283,7 +2248,6 @@
                                                 TO  RECE09-TEKEDYMDX
       * 
                    IF      RECE01-HKNNUM       =   "060"   OR  "067"
-                                               OR  "068"   OR  "069"
                        MOVE    2               TO  RECE09-TEISYUTUSAKI
                    ELSE
                        MOVE    1               TO  RECE09-TEISYUTUSAKI
@@ -2877,15 +2841,17 @@
       *****************************************************************
        100-DBOPEN-SEC                SECTION.
       *
-           MOVE    "DBOPEN"            TO  MCP-FUNC
-           CALL    "MCPSUB"            USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           MOVE    "DBOPEN"            TO  MCP-FUNC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
       *
-           MOVE    "DBSTART"           TO  MCP-FUNC
-           CALL    "MCPSUB"            USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           MOVE    "DBSTART"           TO  MCP-FUNC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
            .
        100-DBOPEN-EXT.
            EXIT.
@@ -2895,15 +2861,17 @@
       *****************************************************************
        900-DBDISCONNECT-SEC            SECTION.
       *
-           MOVE    "DBCOMMIT"          TO  MCP-FUNC
-           CALL    "MCPSUB"            USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           MOVE    "DBCOMMIT"          TO  MCP-FUNC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
       *
-           MOVE    "DBDISCONNECT"      TO  MCP-FUNC
-           CALL    "MCPSUB"            USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           MOVE    "DBDISCONNECT"      TO  MCP-FUNC.
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC.
       *
            .
        900-DBDISCONNECT-EXT.
