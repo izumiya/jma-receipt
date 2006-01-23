@@ -2154,7 +2154,7 @@
       *    ©гне╡й
            MOVE    SRY-SRYKA           TO  SSANTEI-SRYKA
            MOVE    ACCT-HKNCOMBI       TO  SSANTEI-HKNCOMBINUM
-           MOVE    SPA-HKNKBN          TO  SSANTEI-HKNKBN
+           MOVE    JYURRK-HKNKBN       TO  SSANTEI-HKNKBN
            CALL    "ORCSSANTEI"        USING
                                        ORCSSANTEIAREA
                                        SPA-AREA
