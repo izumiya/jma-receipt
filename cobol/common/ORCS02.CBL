@@ -114,6 +114,7 @@
       *  01.01.25    NACL-ÌçÏÆ    06/01/17  ¹âÎð¼Ô£²³ä¡ÜÂçºå£±£¸£¸¤Î
       *                                     ¼çÊÝ¸±Ëô¤Ï£²£·Ï·¿Í¤Î£·£²£³£°£°
       *                                     ¡Ü¡÷ÂÐ±þ
+      *  01.01.26    NACL-ÌçÏÆ    06/01/26  ·²ÇÏ¸©¹âºê»ÔÏ·¿ÍÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1977,6 +1978,8 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
            OR (( WK-1001-PREFNUM   =  31                         ) AND
                ( HKN-HKNNUM(1:1)  >=  "1"  AND  <=  "8"          ))
+           OR (( WK-1001-PREFNUM   =  10                         ) AND
+               ( HKN-HKNNUM        = "155"                       ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       IF   HKN-HON-NYUMJGNGAK  NOT = ZERO
@@ -2825,6 +2828,8 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
            OR (( WK-1001-PREFNUM   =  31                         ) AND
                ( COMB-KOH1HKNNUM(1:1)  >=  "1"  AND  <=  "8"     ))
+           OR (( WK-1001-PREFNUM   =  10                         ) AND
+               ( COMB-KOH1HKNNUM   = "155"                       ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI1-M
@@ -2913,6 +2918,8 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
            OR (( WK-1001-PREFNUM   =  31                         ) AND
                ( COMB-KOH2HKNNUM(1:1)  >=  "1"  AND  <=  "8"     ))
+           OR (( WK-1001-PREFNUM   =  10                         ) AND
+               ( COMB-KOH2HKNNUM   = "155"                       ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI2-M
@@ -2996,6 +3003,8 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
            OR (( WK-1001-PREFNUM   =  31                         ) AND
                ( COMB-KOH3HKNNUM(1:1)  >=  "1"  AND  <=  "8"     ))
+           OR (( WK-1001-PREFNUM   =  10                         ) AND
+               ( COMB-KOH3HKNNUM   = "155"                       ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI3-M
@@ -3079,6 +3088,8 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
            OR (( WK-1001-PREFNUM   =  31                         ) AND
                ( COMB-KOH4HKNNUM(1:1)  >=  "1"  AND  <=  "8"     ))
+           OR (( WK-1001-PREFNUM   =  10                         ) AND
+               ( COMB-KOH4HKNNUM   = "155"                       ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI4-M
@@ -3333,36 +3344,51 @@
       ******************************************************************
        2108-ROUJIN41-JYOGEN-HENSYU-SEC           SECTION.
       *
-           IF   WK-1001-PREFNUM      =   01  OR  26  OR  27  OR  34
-                                                             OR  12
+           IF ((WK-1001-PREFNUM  =  01 OR 26 OR 27 OR 34 OR 12 ) AND
+               (COMB-KOH1HKNNUM  =  "241"                      ))
+           OR ((WK-1001-PREFNUM  =  10                         ) AND
+               (COMB-KOH1HKNNUM  =  "255"                      ))
       *
-              IF   COMB-KOH1HKNNUM         =  "241"
-                      MOVE  "1"          TO   COMB-KOH1-NYUJGNKBN
-                      MOVE   72300       TO   MAX-KIN-KOHI1-M
-                      MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
-                      MOVE   1           TO   FLG-IRYOHI2
-              END-IF
+                MOVE  "1"          TO   COMB-KOH1-NYUJGNKBN
+                MOVE   72300       TO   MAX-KIN-KOHI1-M
+                MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                MOVE   1           TO   FLG-IRYOHI2
       *
-              IF   COMB-KOH2HKNNUM         =  "241"
-                      MOVE  "1"          TO   COMB-KOH2-NYUJGNKBN
-                      MOVE   72300       TO   MAX-KIN-KOHI2-M
-                      MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
-                      MOVE   2           TO   FLG-IRYOHI2
-              END-IF
+           END-IF
       *
-              IF   COMB-KOH3HKNNUM         =  "241"
-                      MOVE  "1"          TO   COMB-KOH3-NYUJGNKBN
-                      MOVE   72300       TO   MAX-KIN-KOHI3-M
-                      MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
-                      MOVE   3           TO   FLG-IRYOHI2
-              END-IF
+           IF ((WK-1001-PREFNUM  =  01 OR 26 OR 27 OR 34 OR 12 ) AND
+               (COMB-KOH2HKNNUM  =  "241"                      ))
+           OR ((WK-1001-PREFNUM  =  10                         ) AND
+               (COMB-KOH2HKNNUM  =  "255"                      ))
       *
-              IF   COMB-KOH4HKNNUM         =  "241"
-                      MOVE  "1"          TO   COMB-KOH4-NYUJGNKBN
-                      MOVE   72300       TO   MAX-KIN-KOHI4-M
-                      MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
-                      MOVE   4           TO   FLG-IRYOHI2
-              END-IF
+                MOVE  "1"          TO   COMB-KOH2-NYUJGNKBN
+                MOVE   72300       TO   MAX-KIN-KOHI2-M
+                MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                MOVE   2           TO   FLG-IRYOHI2
+      *
+           END-IF
+      *
+           IF ((WK-1001-PREFNUM  =  01 OR 26 OR 27 OR 34 OR 12 ) AND
+               (COMB-KOH3HKNNUM  =  "241"                      ))
+           OR ((WK-1001-PREFNUM  =  10                         ) AND
+               (COMB-KOH3HKNNUM  =  "255"                      ))
+      *
+                MOVE  "1"          TO   COMB-KOH3-NYUJGNKBN
+                MOVE   72300       TO   MAX-KIN-KOHI3-M
+                MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                MOVE   3           TO   FLG-IRYOHI2
+      *
+           END-IF
+      *
+           IF ((WK-1001-PREFNUM  =  01 OR 26 OR 27 OR 34 OR 12 ) AND
+               (COMB-KOH4HKNNUM  =  "241"                      ))
+           OR ((WK-1001-PREFNUM  =  10                         ) AND
+               (COMB-KOH4HKNNUM  =  "255"                      ))
+      *
+                MOVE  "1"          TO   COMB-KOH4-NYUJGNKBN
+                MOVE   72300       TO   MAX-KIN-KOHI4-M
+                MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                MOVE   4           TO   FLG-IRYOHI2
       *
            END-IF
       *
@@ -6980,6 +7006,8 @@
                ( LNK-SYU-SRYYMD(1:6)      >= "200510"            ))
            OR (( WK-1001-PREFNUM   =  31                         ) AND
                ( COMB-KOHHKNNUM(KOH-IDX)(1:1)  >= "1" AND <= "8" ))
+           OR (( WK-1001-PREFNUM   =  10                         ) AND
+               ( COMB-KOHHKNNUM(KOH-IDX)  = "155"                ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                    MOVE    HKN-HON-NYUKFTNRATE  TO   WK-NYUKFTNRATE
