@@ -154,6 +154,10 @@
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
+           IF      SKARRK-SRYYM        =   SPACE
+               MOVE    SPA-SRYYMD(1:6)     TO  SKARRK-SRYYM
+           END-IF
+      *
       *    診療科履歴初期処理
            PERFORM 100-SRYKA-SYOKI-SEC
       *    算定履歴チェック処理
