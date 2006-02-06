@@ -461,7 +461,7 @@
            ELSE
       *        入院の最終履歴日を編集する
                IF     (WRK-NYULST-SRYYMD   NOT =   SPACE ) AND
-                      (WRK-LST-SRYYMD      <   WRK-NYULST-SRYYMD)
+                      (WRK-LST-SRYYMD          <   WRK-LST-SRYYMD)
                    MOVE    WRK-NYULST-SRYYMD   TO  WRK-LST-SRYYMD
                END-IF
            END-IF
