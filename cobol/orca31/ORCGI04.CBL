@@ -625,9 +625,10 @@
            MOVE    PTINF-NYUKIN-HOHO   TO  WRK-CMB-CD
            PERFORM 4103-CMB-NYKNHOHO-SRH-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
-               MOVE    SPA-GMN-I04-NYKNHOHO-ITM (1)
-                                   TO  SPA-GMN-I04-NYKNHOHO
-               MOVE    "2"         TO  SPA-NAI-I04-NYKNJYOTAI
+               MOVE    "01"            TO  WRK-CMB-CD
+               PERFORM 4103-CMB-NYKNHOHO-SRH-SEC
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-I04-NYKNHOHO
+               MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I04-NYKNJYOTAI
            ELSE
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-I04-NYKNHOHO
                MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I04-NYKNJYOTAI
