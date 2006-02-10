@@ -185,7 +185,7 @@
            03  WRK-SYUGI           PIC 9(04).
            03  WRK-YAKUZAI         PIC 9(04).
       *
-           03  WRK-SURYO           PIC 9(05)V99.
+           03  WRK-SURYO           PIC 9(05)V999.
       *
            03  WRK-BYOYMD.
                05  WRK-BYOYY           PIC 9(04).
