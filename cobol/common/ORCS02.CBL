@@ -10329,40 +10329,64 @@
              AND ( COMB-KOH1HKNNUM              =       "027" )
                   CONTINUE
              ELSE
+               IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+               AND ( FLG-IRYOHI2            =     1   )
+                    MOVE     LNK-SYU-KOH1COMPFTN  TO
+                                          LNK-SYU-KOH1HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH1HKNFTNMONEY  =                  
                                     LNK-SYU-KOH1COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH1HKNFTNMONEY  =                  
                                     LNK-SYU-KOH1HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH1HKNFTNMONEY  =                  
                                     LNK-SYU-KOH1HKNFTNMONEY *  10        
+               END-IF
              END-IF
            END-IF.
            IF   (COMB-KOH2HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH2-NYUJGNKBN    =     "1")
+               IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+               AND ( FLG-IRYOHI2            =     2   )
+                    MOVE     LNK-SYU-KOH2COMPFTN  TO
+                                          LNK-SYU-KOH2HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH2HKNFTNMONEY  =                  
                                     LNK-SYU-KOH2COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH2HKNFTNMONEY  =                  
                                     LNK-SYU-KOH2HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH2HKNFTNMONEY  =                  
                                     LNK-SYU-KOH2HKNFTNMONEY *  10        
+               END-IF
            END-IF.
            IF   (COMB-KOH3HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH3-NYUJGNKBN    =     "1")
+               IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+               AND ( FLG-IRYOHI2            =     3   )
+                    MOVE     LNK-SYU-KOH3COMPFTN  TO
+                                          LNK-SYU-KOH3HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH3HKNFTNMONEY  =                  
                                     LNK-SYU-KOH3COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH3HKNFTNMONEY  =                  
                                     LNK-SYU-KOH3HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH3HKNFTNMONEY  =                  
                                     LNK-SYU-KOH3HKNFTNMONEY *  10        
+               END-IF
            END-IF.
            IF   (COMB-KOH4HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH4-NYUJGNKBN    =     "1")
+               IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+               AND ( FLG-IRYOHI2            =     4   )
+                    MOVE     LNK-SYU-KOH4COMPFTN  TO
+                                          LNK-SYU-KOH4HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH4HKNFTNMONEY  =                  
                                     LNK-SYU-KOH4COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH4HKNFTNMONEY  =                  
                                     LNK-SYU-KOH4HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH4HKNFTNMONEY  =                  
                                     LNK-SYU-KOH4HKNFTNMONEY *  10        
+               END-IF
            END-IF.
       *
       *    ¥ì¥»µ­ºÜ¶â³ÛÂàÈòÍÑ¥¨¥ê¥¢¤«¤é¼ýÇ¼¹àÌÜ¤ØÊÔ½¸
@@ -10370,6 +10394,10 @@
            IF    WK-KOH-COMPFTN(1)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(1) = SPACE
                 AND  COMB-KOH1HKNNUM       NOT = "027"
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     1   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
                                     LNK-SYU-KOH1COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -10378,6 +10406,7 @@
                                     LNK-SYU-KOH1COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH1COMPTOTAL   =
                              LNK-SYU-KOH1COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 MOVE  WK-KOH-COMPFTN(1)  TO   LNK-SYU-KOH1COMPFTN       
@@ -10387,6 +10416,10 @@
            IF    WK-DAY-KOH-COMPFTN(1)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(1) = SPACE
                 AND  COMB-KOH1HKNNUM       NOT = "027"
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     1   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
                                     LNK-SYU-KOH1COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -10395,6 +10428,7 @@
                                     LNK-SYU-KOH1COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH1COMPTOTAL   =
                              LNK-SYU-KOH1COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(1) = SPACE
@@ -10416,6 +10450,10 @@
       *
            IF    WK-KOH-COMPFTN(2)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(2) = SPACE
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     2   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
                                     LNK-SYU-KOH2COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -10424,6 +10462,7 @@
                                     LNK-SYU-KOH2COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH2COMPTOTAL   =
                              LNK-SYU-KOH2COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 MOVE  WK-KOH-COMPFTN(2)  TO   LNK-SYU-KOH2COMPFTN       
@@ -10432,6 +10471,10 @@
            END-IF.                                                      
            IF    WK-DAY-KOH-COMPFTN(2)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(2) = SPACE
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     2   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
                                     LNK-SYU-KOH2COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -10440,6 +10483,7 @@
                                     LNK-SYU-KOH2COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH2COMPTOTAL   =
                              LNK-SYU-KOH2COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(2) = SPACE
@@ -10461,6 +10505,10 @@
       *
            IF    WK-KOH-COMPFTN(3)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     3   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
                                     LNK-SYU-KOH3COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
@@ -10469,6 +10517,7 @@
                                     LNK-SYU-KOH3COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH3COMPTOTAL   =
                              LNK-SYU-KOH3COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 MOVE  WK-KOH-COMPFTN(3)  TO   LNK-SYU-KOH3COMPFTN       
@@ -10477,6 +10526,10 @@
            END-IF.                                                      
            IF    WK-DAY-KOH-COMPFTN(3)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     3   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
                                     LNK-SYU-KOH3COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
@@ -10485,6 +10538,7 @@
                                     LNK-SYU-KOH3COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH3COMPTOTAL   =
                              LNK-SYU-KOH3COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
@@ -10506,6 +10560,10 @@
       *
            IF    WK-KOH-COMPFTN(4)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     4   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
                                     LNK-SYU-KOH4COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
@@ -10514,6 +10572,7 @@
                                     LNK-SYU-KOH4COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH4COMPTOTAL   =
                              LNK-SYU-KOH4COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 MOVE  WK-KOH-COMPFTN(4)  TO   LNK-SYU-KOH4COMPFTN       
@@ -10522,6 +10581,10 @@
            END-IF.                                                      
            IF    WK-DAY-KOH-COMPFTN(4)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
+                  IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
+                  AND ( FLG-IRYOHI2            =     4   )
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
                                     LNK-SYU-KOH4COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
@@ -10530,6 +10593,7 @@
                                     LNK-SYU-KOH4COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH4COMPTOTAL   =
                              LNK-SYU-KOH4COMPFTN
+                  END-IF
                 END-IF
            ELSE                                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
@@ -10585,11 +10649,11 @@
               OR ((FLG-IRYOHI2 = 2) AND (FLG-HIKAKU = 2))
               OR ((FLG-IRYOHI2 = 3) AND (FLG-HIKAKU = 3))
               OR ((FLG-IRYOHI2 = 4) AND (FLG-HIKAKU = 4))
-                IF   LNK-SYU-SKYMONEY   >   72300
+      ***       IF   LNK-SYU-SKYMONEY   >   72300
                   CONTINUE
-                ELSE
-                  MOVE    ZERO     TO    FLG-KOUGAKUCYO2
-                END-IF
+      ***       ELSE
+      ***         MOVE    ZERO     TO    FLG-KOUGAKUCYO2
+      ***       END-IF
               ELSE
                   MOVE    ZERO     TO    FLG-KOUGAKUCYO2
               END-IF
