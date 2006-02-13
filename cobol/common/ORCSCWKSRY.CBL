@@ -1169,6 +1169,15 @@
                MOVE    1                   TO  FLG-SYUBETU
            END-IF
       *
+      *    画像診断で部位から始まる場合
+           IF     (LNK-WKSRY-SRYKBN (IDX)      =   "70" )  AND
+                  (LNK-WKSRY-SRYKBN (IDX - 1 ) =   "70" )  AND
+                  (LNK-WKSRY-SRYCD (IDX IDY)(1:3)  =   "002")  AND
+                  (LNK-WKSRY-SRYSYUKBN (IDX)   =   SPACE )
+                MOVE    1               TO  FLG-SYUBETU
+                MOVE    "700"           TO  LNK-WKSRY-SRYSYUKBN (IDX)
+            END-IF
+      *
             IF      FLG-SYUBETU         =   1
                ADD     1                   TO  IDX2
                MOVE    "."                 TO  SPA-GMN-INPUTCD
