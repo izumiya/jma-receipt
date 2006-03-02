@@ -1504,6 +1504,7 @@
            CALL    "ORCSAGECHK"        USING
                                        ORCSAGECHKAREA
       *    画面表示用
+           MOVE    SPACE               TO  WRK-NENREI-G
            IF      AGECHK-NENREI2-YY   =   ZERO
                MOVE    AGECHK-NENREI2-MM   TO  WRK-NENREI-ZN
                MOVE    "ヶ月"              TO  WRK-NENREI-MEIN
