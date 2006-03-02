@@ -205,6 +205,7 @@
        01  WRK-NENREI-G.
            03  WRK-NENREI-Z        PIC ZZ9.
            03  WRK-NENREI-MEI      PIC X(02).
+           03  WRK-NENREI-B        PIC X(01).
        01  WRK-NENREI-GR           REDEFINES   WRK-NENREI-G.
            03  WRK-NENREI-ZN       PIC Z9.
            03  WRK-NENREI-MEIN     PIC X(04).
