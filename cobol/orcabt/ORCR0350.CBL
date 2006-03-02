@@ -87,6 +87,9 @@
       *  02.07.03    NACL-藤原    06/01/05  山形県のレセプト様式変更対応
       *                                     平成１８年１月分から標準的な
       *                                     レセプト様式へ変更
+      *
+      *  02.08.01    NACL-藤原    06/03/01  入退院履歴情報の入院中区分に
+      *                                     よる記載方法の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -416,7 +419,6 @@
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
       *
-       01  WRK-HEN-AREA.
            03  WRK-HENYMDG             PIC 9(08).
            03  WRK-HENYMDGR            REDEFINES   WRK-HENYMDG.
                05  FILLER              PIC 9(01).
@@ -460,6 +462,9 @@
       *
       *    手術歴編集
            03  WRK-OPECOM-HEN      PIC X(50).
+      *
+      *    入退院履歴編集（自院歴−入院中区分）
+           03  WRK-NYUINCHUKBN                 PIC X(01).
       *
       *    医薬品・特定器材用テーブル
        01  TBL-ZAIW-AREA.
@@ -2585,6 +2590,7 @@
        20079-HC101-NYUTAI-RIREKI-HEN-SEC      SECTION.
       *
            MOVE    ZERO                TO  FLG-NYUTAI-RIREKI
+           MOVE    ZERO                TO  WRK-NYUINCHUKBN
       *          
            INITIALIZE                      RECE68-REC
            MOVE    RECE62-HOSPID       TO  RECE68-HOSPID
@@ -2623,7 +2629,8 @@
                    OR    ( RECE62-TEKSTYMD   NOT =  RECE68-TEKSTYMD    )
       *
       *        再入院年月日
-               IF      RECE68-NYUINYMD     =   RECE62-NYUINYMD
+               IF    ( RECE68-NYUINYMD     =   RECE62-NYUINYMD )
+               OR    ( WRK-NYUINCHUKBN     =   "1"             )
                    CONTINUE
                ELSE
                    MOVE    SPACE               TO  WRK-REC
@@ -2666,8 +2673,9 @@
                END-IF
       *
       *        退院年月日                          
-               IF      RECE68-TAIINYMD (1:6)   
-                                           >   RECE62-SRYYM
+               IF    ( RECE68-TAIINYMD (1:6)   
+                                           >   RECE62-SRYYM    )
+               OR    ( RECE68-NYUINCHUKBN  =   "1"             )
                    CONTINUE
                ELSE
                    MOVE    SPACE               TO  WRK-REC
@@ -2708,6 +2716,8 @@
       *
                    PERFORM 5001-FILE-WRITE-SEC
                END-IF
+      *
+               MOVE    RECE68-NYUINCHUKBN  TO  WRK-NYUINCHUKBN    
       *
                PERFORM 900-RECE68-NEXT-SEC
            END-PERFORM
