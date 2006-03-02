@@ -172,6 +172,10 @@
       *  02.07.03    NACL-藤原    06/01/25  疑いフラグからの病名の編集方
       *                                     法の変更
       *  02.07.04    NACL-藤原    06/01/26  保険組合せを増やす
+      *
+      *  02.08.01    NACL-藤原    06/03/02  「０入院・入院外」指定で診療
+      *                                      科指定で削除処理した後の一覧
+      *                                      表示が消えるのを修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -916,8 +920,7 @@
                    IF      SPA-CID4-FLG        =   "OK"
                        PERFORM 440-SAKUJYO-SEC
       *                病名一覧
-                       MOVE    "tbl_userbyomei"
-                                               TO  WRK-MCP-TABLE
+                       MOVE    "tbl_ptbyomei"  TO  WRK-MCP-TABLE
                        MOVE    "key16"         TO  WRK-MCP-PATHNAME
                        INITIALIZE                  PTBYOMEI-REC
                        MOVE    SPA-HOSPID      TO  PTBYO-HOSPID
@@ -1383,6 +1386,8 @@
            END-IF
       *
            MOVE    PTBYO-SRYYMD        TO  WRK-SYSYMD
+      *
+           MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
