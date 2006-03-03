@@ -1374,6 +1374,9 @@
                IF      SPA-GMN-C02-SRYKA       =   ZERO
                    MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
                    MOVE    "key17"             TO  WRK-MCP-PATHNAME
+               ELSE
+                   MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
+                   MOVE    "key16"             TO  WRK-MCP-PATHNAME
                END-IF
            ELSE
                IF      SPA-GMN-C02-SRYKA       =   ZERO
@@ -1965,8 +1968,8 @@
       *
            MOVE    ZERO                TO  SPA-GMN-C02-MAX
       *    ¸¡º÷½èÍý
-           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key16"             TO  MCP-PATHNAME
+           MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
+           MOVE    "key16"             TO  WRK-MCP-PATHNAME
            INITIALIZE                  PTBYOMEI-REC
            MOVE    SPA-HOSPID          TO  PTBYO-HOSPID
            MOVE    SPA-NAI-C02-PTID    TO  PTBYO-PTID
