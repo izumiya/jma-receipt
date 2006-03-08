@@ -149,6 +149,7 @@
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
+           03  IDZ                     PIC 9(04).
       *
       *PARA¤ÎÀâÌÀ---------------------------------------------------------------------
       *        DENPPRTYM   ÀÁµáÆüÉÕ
@@ -264,6 +265,8 @@
            03  WRK-Z4                  PIC ZZZZ.
            03  WRK-Z5                  PIC ZZZZ9.
            03  WRK-Z8                  PIC ZZZZZZZ9.
+           03  WRK-HENPTNUM            PIC X(20).
+           03  WRK-HENPTNUM2           PIC X(08).
       *
       *    °õºþÊÔ½¸ÎÎ°è
        01  WRK-PRT-AREA.
@@ -1852,8 +1855,35 @@
            MOVE    "Æü"                TO  WRK-PRT4-FILLER3(IDX)
            MOVE    "ÅÀ"                TO  WRK-PRT4-FILLER4(IDX)
       *
-           MOVE    TOKEI-PTNUM         TO  WRK-Z8
-           MOVE    WRK-Z8              TO  WRK-PRT4-PTNUM(IDX)
+           MOVE    SPACE               TO  WRK-HENPTNUM
+           MOVE    ZERO                TO  IDZ
+      *
+           PERFORM VARYING     IDY     FROM    1   BY  1
+                   UNTIL       IDY     >   20
+               IF      TOKEI-PTNUM(IDY:1)  NOT =  SPACE
+                   COMPUTE IDZ =   IDZ +   1
+                   MOVE    TOKEI-PTNUM(IDY:1)   TO  WRK-HENPTNUM(IDZ:1)
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPACE               TO  WRK-HENPTNUM2
+           MOVE    8                   TO  IDZ
+      *
+           PERFORM VARYING     IDY     FROM    8   BY  -1
+                   UNTIL       IDY     <   1
+               IF      WRK-HENPTNUM(IDY:)   NOT =  SPACE
+                   MOVE    WRK-HENPTNUM(IDY:1)  TO  WRK-HENPTNUM2(IDZ:1)
+                   COMPUTE IDZ =   IDZ -   1
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING     IDY     FROM    IDZ   BY  -1
+                   UNTIL       IDY     <   1
+               MOVE    " "             TO  WRK-HENPTNUM2(IDY:1)
+           END-PERFORM
+      *
+           MOVE    WRK-HENPTNUM2       TO  WRK-PRT4-PTNUM(IDX)
+      *
            MOVE    TOKEI-NISSU         TO  WRK-Z5
            MOVE    WRK-Z5              TO  WRK-PRT4-NISSU(IDX)
            MOVE    TOKEI-TENSU         TO  WRK-Z8
