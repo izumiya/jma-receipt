@@ -6007,7 +6007,7 @@
                    END-IF
                ELSE
                    DISPLAY "I41 NYUINACCT READ ERR:" NACCT-KEY
-                   MOVE    "2000"         TO  SPA-ERRCD
+      **********   MOVE    "2000"         TO  SPA-ERRCD
       **********   GO  TO  4901-NYUINACCT-UPD-EXT
                END-IF
       *
@@ -6230,7 +6230,7 @@
                    END-IF
                ELSE
       *             DISPLAY "I41 NYUINACCT READ ERR02:" NACCT-KEY
-                    MOVE    "2000"          TO  SPA-ERRCD
+      ************  MOVE    "2000"          TO  SPA-ERRCD
       ************ GO  TO  490111-NYUINACCT-UPD3-EXT
                END-IF
       *
