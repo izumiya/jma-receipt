@@ -208,7 +208,8 @@
            WITH    POINTER   WRK-SQL-PNT
            END-STRING
       *
-           STRING  "SELECT COUNT(PTID) FROM (" DELIMITED   BY  SIZE
+           STRING  "SELECT COUNT(DISTINCT PTID) FROM ("
+                                       DELIMITED   BY  SIZE
            INTO    WRK-SQL-COUNT
            WITH    POINTER WRK-SQL-COUNT-PNT
            END-STRING
