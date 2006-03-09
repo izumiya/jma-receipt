@@ -5888,7 +5888,7 @@
                    IF      MCP-RC          NOT =   ZERO
                         DISPLAY "I41 NYUINACCT UPD ERR:" MCP-RC
                                            ",KEY:" ACCT-KEY
-                        MOVE    "2000"         TO  SPA-ERRCD
+      *                 MOVE    "2000"         TO  SPA-ERRCD
                         GO  TO  4901-NYUINACCT-UPD-EXT
                    END-IF
                ELSE
@@ -6105,7 +6105,7 @@
                         MOVE    1              TO  FLG-NYUINACT
                         DISPLAY "I41 NYUINACCT UPD ERR02:" MCP-RC
                                                ",KEY:" NACCT-KEY
-                        MOVE    "2000"          TO  SPA-ERRCD
+      *                 MOVE    "2000"          TO  SPA-ERRCD
                         GO  TO  490111-NYUINACCT-UPD3-EXT
                    END-IF
                ELSE
