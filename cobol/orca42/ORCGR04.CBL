@@ -51,6 +51,7 @@
       *
       *  02.07.01    NACL-藤原    05/10/31  MONFUNC対応
       *  02.07.02    NACL-藤原    05/12/12  国保レセプト編綴順対応
+      *  02.07.03    NACL-藤原    06/03/08  患者番号順の範囲指定を変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -953,7 +954,7 @@
                        AND     KANACHK-SYUBETU     =   "1"
                            IF      SPA-GMN-TSTDATA (IDX)(1:1)
                                               <  "0"    OR
-                                              >  "9"
+                                              >  "z"
                                MOVE    "0001"             TO  SPA-ERRCD
                            END-IF                        
                        ELSE
@@ -1018,7 +1019,7 @@
                        AND     KANACHK-SYUBETU     =   "1"
                            IF      SPA-GMN-TEDDATA (IDX)(1:1)
                                               <  "0"    OR
-                                              >  "9"
+                                              >  "z"
                                MOVE    "0001"             TO  SPA-ERRCD
                            END-IF                        
                        ELSE
@@ -1587,7 +1588,8 @@
                IF      SPA-GMN-PRTJYUN     =   "03"
                    MOVE    "ヵ"            TO  WRK-RECE09-EDDATA (1:2)
                ELSE
-                   MOVE    "Z"             TO  WRK-RECE09-EDDATA (1:1)
+                   MOVE    "zzzzzzzzzzzzzzzzzzzz"
+                                           TO  WRK-RECE09-EDDATA (1:20)
                END-IF
            ELSE     
                IF      SPA-GMN-PRTJYUN     =   "04"
