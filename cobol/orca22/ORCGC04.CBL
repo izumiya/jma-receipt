@@ -43,6 +43,7 @@
       *                                     をシス管の設定より行う
       *
       *  02.07.01    NACL-藤原    05/10/31  MONFUNC対応
+      *  02.07.02    NACL-藤原    06/03/13  病名検索時の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1113,8 +1114,12 @@
                MOVE    "key8"              TO  WRK-MCP-PATHNAME
                INITIALIZE                  USERBYOMEI-REC
                MOVE    SPA-HOSPID          TO  USBYO-HOSPID
-               MOVE    SPA-GMN-C04-KENBYOMEI
-                                           TO  USBYO-BYOMEI
+               STRING  "%"                 DELIMITED  BY  SIZE
+                       SPA-GMN-C04-KENBYOMEI
+                                           DELIMITED  BY  SPACE
+                       "%"                 DELIMITED  BY  SIZE
+                                           INTO    USBYO-BYOMEI
+               END-STRING
                PERFORM 3101-USERBYOMEI-LST-SEC
            END-IF    
       *
