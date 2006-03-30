@@ -917,10 +917,18 @@
                    PERFORM VARYING IDX0 FROM    1   BY  1
                            UNTIL ( IDX0 >   SPA-GMN-W24-CHIIKIKSN-MAX )
       *
-                       IF    ( CONST-CHIIKIKSN-SRYCD (IDX0)
-                                       =   SYS-5000-CHIIKIKSN )
-                           MOVE    SPA-GMN-W24-CHIIKIKSNLST (IDX0)
+                       IF    ( SYS-5000-STYUKYMD   >=  CONST-H180401 )
+                           IF    ( CONST-CHIIKIKSN-H1804 (IDX0)
+                                           =   SYS-5000-CHIIKIKSN )
+                               MOVE    SPA-GMN-W24-CHIIKIKSNLST (IDX0)
                                    TO  SPA-GMN-W24-CHIIKIKSN-G
+                           END-IF
+                       ELSE
+                           IF    ( CONST-CHIIKIKSN-SRYCD (IDX0)
+                                           =   SYS-5000-CHIIKIKSN )
+                               MOVE    SPA-GMN-W24-CHIIKIKSNLST (IDX0)
+                                   TO  SPA-GMN-W24-CHIIKIKSN-G
+                           END-IF
                        END-IF
       *
                    END-PERFORM
@@ -1811,8 +1819,13 @@
            IF    ( SPA-GMN-W24-CHIIKIKSN   >=  "1")
             AND  ( SPA-GMN-W24-CHIIKIKSN   <=  "6" )
                MOVE    SPA-GMN-W24-CHIIKIKSN   TO  WRK-CHIIKIKSN-G
-               MOVE    CONST-CHIIKIKSN-SRYCD (WRK-CHIIKIKSN)
+               IF    ( SYS-5000-STYUKYMD   >=  CONST-H180401 )
+                   MOVE    CONST-CHIIKIKSN-H1804 (WRK-CHIIKIKSN)
                                    TO  SYS-5000-CHIIKIKSN
+               ELSE
+                   MOVE    CONST-CHIIKIKSN-SRYCD (WRK-CHIIKIKSN)
+                                   TO  SYS-5000-CHIIKIKSN
+               END-IF
            END-IF
       *
       *    入院会計テーブル表示情報
