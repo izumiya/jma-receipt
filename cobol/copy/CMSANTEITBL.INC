@@ -111,11 +111,13 @@
            03  FILLER              PIC X(12)   VALUE   "   099800131".
            03  FILLER              PIC X(12)   VALUE   "   099800141".
            03  FILLER              PIC X(12)   VALUE   "   099800151".
+           03  FILLER              PIC X(12)   VALUE   "   099800161".
+           03  FILLER              PIC X(12)   VALUE   "   099800171".
       *
        01  TBL-SANTEI-AREA-R       REDEFINES   TBL-SANTEI-AREA.
       **** 03  TBL-SANTEI-OCC      OCCURS   39  INDEXED   TBL-SAN.
       *****03  TBL-SANTEI-OCC      OCCURS   41  INDEXED   TBL-SAN.
-           03  TBL-SANTEI-OCC      OCCURS   49  INDEXED   TBL-SAN.
+           03  TBL-SANTEI-OCC      OCCURS   51  INDEXED   TBL-SAN.
       *        リハビリ（K:個別、S:集団）
                05  TBL-RIGAKU-RYO      PIC X(01).
       *        リハビリ（R:理学,S:作業, G:言語)
