@@ -280,6 +280,8 @@
       *
       *    ½é¿Ç»»ÄêÆü
            03  WRK-SYOYMD              PIC X(08).
+      *    Æþ±¡Æü¡Ü£·Æü
+           03  WRK-NYUINYMD-7           PIC X(08).
       *
       *    ½ÅÊ£·Ù¶ç¥¨¥é¡¼ÍÑ
            03  IDX-KEI                 PIC 9(04).
@@ -1344,9 +1346,19 @@
                END-IF
            END-IF
       *
-      *    µßµÞ°åÎÅ´ÉÍý²Ã»»¡ÊÆþ±¡¡ËÆþ±¡Æü¤Î¤ß
+      *    µßµÞ°åÎÅ´ÉÍý²Ã»»¡ÊÆþ±¡¡ËÆþ±¡Æü¤«¤é£·Æü°ÊÆâ
            IF      WRK-COM-INPUTCD(IDX-Z)  =   "101110020"
-               IF      SPA-SRYYMD          =   LNK-ORCSC-NYUINYMD
+               INITIALIZE                      STS-AREA-DAY
+               INITIALIZE                      LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    LNK-ORCSC-NYUINYMD  TO  LNK-DAY6-KIJUN
+               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+               MOVE    7                   TO  LNK-DAY6-ZOGEN
+               CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KEISAN     TO  WRK-NYUINYMD-7
+               IF     (SPA-SRYYMD          >=  LNK-ORCSC-NYUINYMD)
+                 AND  (SPA-SRYYMD          <   WRK-NYUINYMD-7 )
                    CONTINUE
                ELSE
                    MOVE    "8022"          TO  WRK-ERRCD
