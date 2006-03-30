@@ -9302,22 +9302,32 @@
                     MOVE   SYS-5002-RYOYO-CD  TO
                                    WRK-NYUKHNKSN-SRYCD(IDX8)
                END-IF
+      *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£±°  ø¿Æ£±£∏«Øø∑¿ﬂ°À
+               IF   SYS-5002-BTU-RYOYO-H18-KBN     =   "2"
+                    ADD     1       TO     IDX8
+      *              MOVE   "190120210"  TO
+                    MOVE   SYS-5002-BTU-RYOYO-H18-CD  TO
+                                   WRK-NYUKHNKSN-SRYCD(IDX8)
+               END-IF
       *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£±
                IF   SYS-5002-BTU-RYOYO-KBN(1)     =   "2"
                     ADD     1       TO     IDX8
-                    MOVE   "190106070"  TO
+                    MOVE   SYS-5002-BTU-RYOYO-CD(1)  TO
+      *              MOVE   "190106070"  TO
                                    WRK-NYUKHNKSN-SRYCD(IDX8)
                END-IF
       *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£≤
                IF   SYS-5002-BTU-RYOYO-KBN(2)     =   "2"
                     ADD     1       TO     IDX8
-                    MOVE   "190106170"  TO
+      *              MOVE   "190106170"  TO
+                    MOVE   SYS-5002-BTU-RYOYO-CD(2)  TO
                                    WRK-NYUKHNKSN-SRYCD(IDX8)
                END-IF
       *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£≥
                IF   SYS-5002-BTU-RYOYO-KBN(3)     =   "2"
                     ADD     1       TO     IDX8
-                    MOVE   "190106270"  TO
+      *              MOVE   "190106270"  TO
+                    MOVE   SYS-5002-BTU-RYOYO-CD(3)  TO
                                    WRK-NYUKHNKSN-SRYCD(IDX8)
                END-IF
       *        Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª° ∏ƒºº°À
