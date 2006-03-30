@@ -5573,7 +5573,12 @@
                MOVE    "0007"              TO  SPA-ERRCD
            END-IF
            IF      SPA-ERRCD           =   SPACE
-               MOVE   "111011810"          TO  WRK-SRYCD
+               IF      SPA-HKNKBN      =   ZERO
+                   MOVE   "111011810"      TO  WRK-SRYCD
+               ELSE
+      *TE      Ï«ºÒ
+                   MOVE   "101110040"      TO  WRK-SRYCD
+               END-IF
                INITIALIZE                  SPA-GMN-TBLREC  (IDX-A)
                INITIALIZE                  SPA-COM-TBLREC  (IDX-A)
                MOVE    WRK-SRYCD       TO  SPA-GMN-INPUTCD (IDX-A)
