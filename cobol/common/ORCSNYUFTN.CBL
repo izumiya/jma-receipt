@@ -74,6 +74,7 @@
       *  01.00.28    NACL-門脇    06/01/20  標欠対応
       *  01.03.01    NACL-門脇    06/03/09  いわき市重心対応
       *  01.03.02    NACL-門脇    06/03/20  自立支援法対応
+      *  01.03.03    NACL-門脇    06/03/30  労災同日初診対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3405,7 +3406,8 @@
                       COMPUTE  WRK-TEN     =   TNS-TEN  /  10
       *
                       IF   SRY-SRYCD(IDZ) =  "101110010"  OR
-                                             "101110020"
+                                             "101110020"  OR
+                                             "101110040"
                            COMPUTE WRK-RSISHOSHIN = WRK-RSISHOSHIN +
                                   (WRK-TEN  *   SINRYO-COUNT)
                       END-IF
