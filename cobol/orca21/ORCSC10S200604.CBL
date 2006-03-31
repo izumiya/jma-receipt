@@ -3978,7 +3978,7 @@
       *
       *    在宅時医学総合管理料チェック
            IF     (SPA-ZAIKANRI-ARI    NOT =   ZERO )
-      *??    OR   (SPA-ZAIKANRI-ARI2   NOT =   ZERO )
+             OR   (SPA-ZAIKANRI-ARI2   NOT =   ZERO )
                PERFORM 5022-ZAIKANRI-CHK-SEC
            END-IF
       *
@@ -4454,7 +4454,7 @@
                    UNTIL      (IDX         >   200      )   OR
                               (SPA-ERRCD           NOT =   SPACE )  OR
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
-      *        検査、投薬、注射は算定できない
+      *        投薬は算定できない
                EVALUATE    SPA-COM-SRYKBN(IDX)
                    WHEN    "21"
                    WHEN    "22"
