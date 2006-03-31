@@ -1708,8 +1708,8 @@
       *             ºßÂðËö´ü°åÎÅÁí¹ç¿Ç»¡ÎÁ¤¢¤ê
                OR  (SPA-ZAIMATU-ARI            >   ZERO )
       *             ºßÂð»þ°åÎÅÁí¹ç´ÉÍýÎÁ¤¢¤ê
-               OR  (SPA-ZAIKANRI-ARI           =   ZERO)
-               OR  (SPA-ZAIKANRI-ARI2          =   ZERO)
+               OR  (SPA-ZAIKANRI-ARI           >   ZERO)
+               OR  (SPA-ZAIKANRI-ARI2          >   ZERO)
                CONTINUE
            ELSE
                MOVE    1                   TO  FLG-SYOHO-CHK
