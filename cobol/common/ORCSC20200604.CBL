@@ -517,7 +517,7 @@
                            (SPA-ZAIMATU-ARI2           =   ZERO) AND
                            (SPA-ZAIMATU-ARI            =   ZERO)
                        AND (SPA-ZAIKANRI-ARI           =   ZERO)
-      *??              AND (SPA-ZAIKANRI-ARI2          =   ZERO)
+                       AND (SPA-ZAIKANRI-ARI2          =   ZERO)
       *************    MOVE    "0074"          TO  WRK-ERRCD
       *                MOVE    "1"             TO  WRK-COM-CUR
       *************                                          (IDX-Z)
@@ -1707,6 +1707,9 @@
                    (LNK-ORCSC-SEIKATU-ARI      >   ZERO)
       *             ºßÂðËö´ü°åÎÅÁí¹ç¿Ç»¡ÎÁ¤¢¤ê
                OR  (SPA-ZAIMATU-ARI            >   ZERO )
+      *             ºßÂð»þ°åÎÅÁí¹ç´ÉÍýÎÁ¤¢¤ê
+               OR  (SPA-ZAIKANRI-ARI           =   ZERO)
+               OR  (SPA-ZAIKANRI-ARI2          =   ZERO)
                CONTINUE
            ELSE
                MOVE    1                   TO  FLG-SYOHO-CHK
