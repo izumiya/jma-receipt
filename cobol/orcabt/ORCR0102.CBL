@@ -97,6 +97,8 @@
       *                                     HCM09V04.red HCN06V05.red
       *                                     HCN061V03.red HCN062V03.red
       *                                     HCN063V02.red
+      *
+      *  02.08.01    NACL-藤原    06/04/01  対象データ表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1007,6 +1009,9 @@
        2002-RECEPRT-CLEAR-SEC          SECTION.
       *
       *    出力順エリアのクリア
+      *
+               DISPLAY "PTNUM=" RECE08-PTNUM
+      *
            MOVE    ZERO                 TO  RECE08-PRTJYUN
            MOVE    ZERO                 TO  RECE08-PRTRENNUM     
       *

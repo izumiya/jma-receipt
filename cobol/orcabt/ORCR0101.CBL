@@ -60,6 +60,7 @@
       *  02.07.01    NACL-藤原    05/12/12  国保レセプト編綴順対応
       *
       *  02.08.01    NACL-藤原    06/02/20  主科対応
+      *  02.08.02    NACL-藤原    06/04/01  対象データ表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -586,10 +587,12 @@
                                        MCPDATA-REC
       *                                  
            IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  RECE08-REC    
+               MOVE    MCPDATA-REC     TO  RECE08-REC
                MOVE    ZERO            TO  FLG-END
                ADD     1               TO  CNT-IN-CANCEL
                                            CNT-IN
+      *
+               DISPLAY "PTNUM=" RECE08-PTNUM 
            ELSE
                MOVE    1               TO  FLG-END
            END-IF
