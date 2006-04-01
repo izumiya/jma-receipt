@@ -176,10 +176,13 @@
       *  02.08.01    NACL-藤原    06/03/02  「０入院・入院外」指定で診療
       *                                      科指定で削除処理した後の一覧
       *                                      表示が消えるのを修正
-      *  02.08.02    NACL-藤原    06/02/01  自院病名コード検索追加
-      *  02.08.03    NACL-藤原    06/03/22  改正対応
-      *                                     疾患区分の表示を変更
-      *  02.08.04    NACL-藤原    06/03/30  旧総合病院のときの診療科の表示
+      *  02.08.02    NACL-藤原    06/02/01   自院病名コード検索追加
+      *  02.08.03    NACL-藤原    06/03/22   改正対応
+      *                                      疾患区分の表示を変更
+      *  02.08.04    NACL-藤原    06/03/30   旧総合病院のときの診療科の表示
+      *  02.08.05    NACL-藤原    06/04/01   自院病名検索時のチェックの修正
+      *                                      登録時の変更時の複数病名のチ
+      *                                      ェックの追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4888,13 +4891,21 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       6
                IF      SPA-GMN-C02-BYOMEICD (IDX)  NOT =   SPACE             
-                   IF    ( SPA-NAI-C02-USERBYOMEIFLG (IDX)
-                                           =   SPACE )
-                   AND   ( SPA-NAI-C02-BYOMEI (IDX)(1:2)
-                                       NOT =   "■"  )
+                   MOVE    ZERO                TO  WRK-LENGTH                    
+                   PERFORM VARYING IDY FROM    10  BY  -1
+                           UNTIL   IDY <       1
+                       IF      SPA-GMN-C02-BYOMEICD(IDX)(IDY:1)
+                                           NOT =   SPACE
+                           MOVE    IDY             TO  WRK-LENGTH
+                           MOVE    1               TO  IDY
+                       END-IF
+                   END-PERFORM
+                   IF    ( WRK-LENGTH          =   7    )
+                   AND   ( SPA-NAI-C02-BYOMEI(IDX)(1:2)
+                                           NOT =   "■" )
                        MOVE    "0069"              TO  SPA-ERRCD
-                       GO  TO  41029-USERBYOMEICD-KENSAKU-EXT 
-                   END-IF
+                       GO  TO  41029-USERBYOMEICD-KENSAKU-EXT
+                   END-IF 
                END-IF
            END-PERFORM
       *
@@ -6251,6 +6262,13 @@
       *    病名が未入力のとき
            IF      SPA-NAI-C02-BYOMEIMOJI   =   ZERO
                MOVE    "0010"               TO  SPA-ERRCD
+               GO      TO      450-TOUROKU-EXT
+           END-IF
+      *
+      *    新規以外のときは複数病名の入力不可
+           IF    ( SPA-GMN-C02-BANGO           >   ZERO )
+           AND   ( SPA-NAI-C02-BYOMEICD-MAX    >   1    )
+               MOVE    "0056"             TO  SPA-ERRCD
                GO      TO      450-TOUROKU-EXT
            END-IF
       *
@@ -7694,12 +7712,18 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       6
                IF      SPA-GMN-C02-BYOMEICD (IDX)  NOT =   SPACE             
-                   IF    ( SPA-NAI-C02-USERBYOMEIFLG (IDX)
-                                           =   SPACE )
-                   AND   ( SPA-NAI-C02-BYOMEI (IDX)(1:2)
-                                       NOT =   "■"  )
+                   MOVE    ZERO                TO  WRK-LENGTH                    
+                   PERFORM VARYING IDY FROM    10  BY  -1
+                           UNTIL   IDY <       1
+                       IF      SPA-GMN-C02-BYOMEICD(IDX)(IDY:1)
+                                           NOT =   SPACE
+                           MOVE    IDY             TO  WRK-LENGTH
+                           MOVE    1               TO  IDY
+                       END-IF
+                   END-PERFORM
+                   IF      WRK-LENGTH           =   7
                        MOVE    "0069"              TO  SPA-ERRCD
-                       GO  TO  490-USERBYOMEI-KENSAKU-EXT 
+                       GO  TO  490-USERBYOMEI-KENSAKU-EXT
                    END-IF
                END-IF
            END-PERFORM
