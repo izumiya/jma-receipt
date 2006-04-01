@@ -823,11 +823,11 @@
       *
            MOVE    SPACE               TO  SRYACT-REC
            INITIALIZE                      SRYACT-REC
-           MOVE    JYURRK-HOSPID       TO  SRY-HOSPID
-           MOVE    JYURRK-NYUGAIKBN    TO  SRY-NYUGAIKBN
-           MOVE    JYURRK-PTID         TO  SRY-PTID
-           MOVE    JYURRK-SRYKA        TO  SRY-SRYKA
-           MOVE    JYURRK-SRYYMD(1:6)  TO  SRY-SRYYM
+           MOVE    HZN-JYURRK-HOSPID       TO  SRY-HOSPID
+           MOVE    HZN-JYURRK-NYUGAIKBN    TO  SRY-NYUGAIKBN
+           MOVE    HZN-JYURRK-PTID         TO  SRY-PTID
+           MOVE    HZN-JYURRK-SRYKA        TO  SRY-SRYKA
+           MOVE    HZN-JYURRK-SRYYMD(1:6)  TO  SRY-SRYYM
            MOVE    WRK-ZAINUM          TO  SRY-ZAINUM
       *
            MOVE    SRYACT-REC          TO  MCPDATA-REC
