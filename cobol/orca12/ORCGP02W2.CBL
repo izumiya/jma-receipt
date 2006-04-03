@@ -52,6 +52,7 @@
       *                                     ÁÈ¹ç¤»ÄÉ²Ã
       *  02.00.13    NACL-ÌçÏÆ    06/03/23  021Àº¿ÀÄÌ±¡¤Ë´Ø¤¹¤ëÊÔ½¸½¤Àµ
       *  02.00.14    NACL-ÌçÏÆ    06/03/27  020Àº¿ÀÆþ±¡¤Ë´Ø¤¹¤ëÊÔ½¸½¤Àµ
+      *  02.00.15    NACL-ÌçÏÆ    06/04/03  ¼«Î©»Ù±ç°åÎÅÁÈ¹ç¤»ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4293,6 +4294,18 @@
                     (WRK-NYU-KBN (3)         =   "2")
                    MOVE    "3"            TO  WRK-FTN-FLG
                 END-IF
+             END-IF
+           END-IF
+      *
+           IF    FLG-HANTEI   =    2
+             IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "200604"
+               IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3"  ) AND
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2) = "021" OR "015"
+                                                         OR "016"))
+               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "021" OR "015"
+                                                         OR "016" )
+                     MOVE    "3"            TO  WRK-FTN-FLG
+               END-IF
              END-IF
            END-IF
       *
