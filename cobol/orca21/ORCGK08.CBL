@@ -3547,7 +3547,10 @@
                   ((SPA-NETAKIRI-ARI   =   ZERO )  AND
                    (SPA-NETAKIRI-ARI2  =   ZERO )  AND
                    (SPA-ZAIMATU-ARI    =   ZERO )  AND
-                   (SPA-ZAIMATU-ARI2   =   ZERO )  )
+                   (SPA-ZAIMATU-ARI2   =   ZERO )  AND
+      *            £È£±£¸¡¥£´ÄÉ²Ã
+                   (SPA-ZAIKANRI-ARI   =   ZERO )  AND
+                   (SPA-ZAIKANRI-ARI2  =   ZERO )  )
                CONTINUE
            ELSE
       *        ÊÝ¸±»»ÄêÇ¯Îð¤¬£·£°ºÐ°Ê¾å¤«¡¢Ï·¿ÍÊÝ¸±¤Î»þ
