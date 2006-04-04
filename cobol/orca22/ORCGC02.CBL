@@ -183,6 +183,7 @@
       *  02.08.05    NACL-藤原    06/04/01   自院病名検索時のチェックの修正
       *                                      登録時の変更時の複数病名のチ
       *                                      ェックの追加
+      *  02.08.05    NACL-藤原    06/04/04   自院病名検索時の病名種別のセット
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4936,8 +4937,7 @@
                                            TO  SPA-C01-TBYOMEITOP (IDY)
                        MOVE    SPA-NAI-C02-BYOMEISBT (IDX)
                                            TO  SPA-C01-TBYOMEISBT (IDY)
-                       MOVE    SPA-NAI-C02-USERBYOMEIFLG (IDX)
-                                           TO  SPA-C01-TUSERBYOMEIFLG
+                       MOVE    "1"         TO  SPA-C01-TUSERBYOMEIFLG
                                                                   (IDY)
                        MOVE    SPA-NAI-C02-BYOMEI    (IDX)
                                            TO  SPA-C01-TBYOMEI    (IDY)
@@ -7752,8 +7752,7 @@
                                            TO  SPA-C01-TBYOMEICD (IDY)
       *************MOVE    SPA-NAI-C02-BYOMEI   (IDX)
       *************                        TO  SPA-C01-TBYOMEI   (IDY)
-                   MOVE    SPA-NAI-C02-USERBYOMEIFLG (IDX)
-                                           TO  SPA-C01-TUSERBYOMEIFLG
+                   MOVE    "1"             TO  SPA-C01-TUSERBYOMEIFLG
                                                                  (IDY)
                END-IF                              
            END-PERFORM
