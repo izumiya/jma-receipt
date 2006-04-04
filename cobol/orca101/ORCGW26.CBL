@@ -1407,12 +1407,6 @@
                GO  TO  4900-KANRENCHK-EXT
            END-IF
       *
-           IF    ( FLG-190109670       =   1 )
-            AND  ( FLG-190117070       =   1 )
-               MOVE    "1004"          TO  SPA-ERRCD
-               GO  TO  4900-KANRENCHK-EXT
-           END-IF
-      *
            .
       *
        4900-KANRENCHK-EXT.
@@ -1697,11 +1691,6 @@
                MOVE    "看護配置加算はいずれか１つのみ選択してく"
                                        TO  SPA-ERRMSG (1 : 40)
                MOVE    "ださい"        TO  SPA-ERRMSG (41 : )
-           WHEN    "1004"
-               MOVE    "看護配置適合と複数医師及び看護配置適合は"
-                                       TO  SPA-ERRMSG (1 : 40)
-               MOVE    "同時に加算できません" 
-                                       TO  SPA-ERRMSG (41 : )
            WHEN    "1201"
            WHEN    "1202"
                MOVE    "更新できませんでした"
