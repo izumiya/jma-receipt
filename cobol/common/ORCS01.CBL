@@ -178,6 +178,7 @@
       *  01.03.02    NACL-ÌçÏÆ    06/03/09  ÅìµþÅÔ¥Þ¥ë¾ã¡ÜÄ¹´üÂÐ±þ
       *  01.03.03    NACL-ÌçÏÆ    06/03/20  ¼«Î©»Ù±çË¡ÂÐ±þ
       *  01.03.04    NACL-ÌçÏÆ    06/03/30  ¼«Î©»Ù±çË¡¡Ê¹â³ÛÎÅÍÜÈñ¸½ÊªÂÐ±þ¡Ë
+      *  01.03.05    NACL-ÌçÏÆ    06/04/04  ºßÁí¿ÇÂÐ¾ÝÊÔ½¸½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -277,6 +278,7 @@
            03  FLG-SEISINJYO           PIC 9(01).
            03  FLG-MIYAGI              PIC 9(01).
            03  FLG-FTNCHECK            PIC 9(01).
+           03  FLG-TAISYO              PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -670,6 +672,7 @@
            03  IDX7                    PIC  9(03).
            03  IDX8                    PIC  9(03).
            03  IDX9                    PIC  9(03).
+           03  IDX10                   PIC  9(03).
            03  Y-IDX                   PIC  9(03)  VALUE  ZERO.
            03  Y-IDX2                  PIC  9(03)  VALUE  ZERO.
            03  Y-IDX3                  PIC  9(03)  VALUE  ZERO.
@@ -748,6 +751,34 @@
       *
            03  WK-HEN-SYUCOMPFTN-ENTANI       PIC 9(07).
            03  WK-HEN-KOH1COMPFTN-ENTANI      PIC 9(07).
+      *
+      *
+      *    ºßÁí¿ÇÈ½ÄêÍÑ¥Æ¡¼¥Ö¥ë¡Ê£²£°£°£¶Ç¯£³·î¤Þ¤Ç¡Ë
+       01  TBL-ZAITAKU-AREA.
+           03  FILLER          PIC X(09)   VALUE    "114701210".
+           03  FILLER          PIC X(09)   VALUE    "114701710".
+           03  FILLER          PIC X(09)   VALUE    "114007610".
+           03  FILLER          PIC X(09)   VALUE    "114007710".
+      *
+       01  TBL-ZAITAKU-R       REDEFINES   TBL-ZAITAKU-AREA.
+           03  TBL-ZAITAKU     PIC X(09)   OCCURS    4.
+      *
+       01  TBL-ZAITAKU-MAX     PIC 9(02)   VALUE     4.
+      *
+      *    ºßÁí¿ÇÈ½ÄêÍÑ¥Æ¡¼¥Ö¥ë¡Ê£²£°£°£¶Ç¯£´·î¤«¤é¡Ë
+       01  TBL-ZAITAKU2-AREA.
+           03  FILLER          PIC X(09)   VALUE    "114007610".
+           03  FILLER          PIC X(09)   VALUE    "114007710".
+           03  FILLER          PIC X(09)   VALUE    "114012210".
+           03  FILLER          PIC X(09)   VALUE    "114012310".
+           03  FILLER          PIC X(09)   VALUE    "114012410".
+           03  FILLER          PIC X(09)   VALUE    "114007510".
+      *
+       01  TBL-ZAITAKU2-R      REDEFINES   TBL-ZAITAKU2-AREA.
+           03  TBL-ZAITAKU2    PIC X(09)   OCCURS    6.
+      *
+       01  TBL-ZAITAKU2-MAX    PIC 9(02)   VALUE     6.
+      *
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -2405,244 +2436,9 @@
                                              MCPDATA-REC
            END-IF
       *
-           IF  (LNK-S01-KOUREI-ZAITAKU-KBN   =   SPACE)   AND
-               (LNK-SYU-SRYYMD(1:6)          >=  "200210")
-      *        ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅÎÁ¡Ê±¡Æâ½èÊý¤»¤ó¤ò¸òÉÕ¤¹¤ë¡Ë
-               INITIALIZE                           SRYACT-REC
-               MOVE    LNK-SYU-HOSPID       TO      SRY-HOSPID
-               MOVE    LNK-SYU-NYUGAIKBN    TO      SRY-NYUGAIKBN
-               MOVE    LNK-SYU-PTID         TO      SRY-PTID
-               MOVE    LNK-SYU-SRYYMD(1:6)  TO      SRY-SRYYM
-               MOVE    "114701210"          TO      SRY-SRYCD(1)
-               MOVE    "114701210"          TO      SRY-SRYCD(2)
-               MOVE    "114701210"          TO      SRY-SRYCD(3)
-               MOVE    "114701210"          TO      SRY-SRYCD(4)
-               MOVE    "114701210"          TO      SRY-SRYCD(5)
-               MOVE    SRYACT-REC           TO      MCPDATA-REC
-               MOVE    "DBSELECT"           TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"        TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"           USING   MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-               IF      MCP-RC               =       ZERO
-                   MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH 
-                   PERFORM   SRYACT-READ-SEC
-                   IF      FLG-SRYACT       =       ZERO
-                       INITIALIZE                   SRYACCT-REC
-                       MOVE    SRY-HOSPID       TO   ACCT-HOSPID
-                       MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
-                       MOVE    SRY-SRYKA        TO   ACCT-SRYKA
-                       MOVE    SRY-PTID         TO   ACCT-PTID
-                       MOVE    SRY-SRYYM        TO   ACCT-SRYYM
-                       MOVE    SRY-ZAINUM       TO   ACCT-ZAINUM
-                       MOVE    SRYACCT-REC      TO   MCPDATA-REC
-                       MOVE    "DBSELECT"       TO   MCP-FUNC
-                       MOVE    "SRYACCT-KEY31"  TO   ORC-DBPATH
-                       CALL    "ORCMCPSUB"           USING
-                                                     MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-                       IF      MCP-RC           =       ZERO
-                           MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH 
-                           PERFORM   SRYACCT-READ-SEC
-                           IF      FLG-SRYACCT  =       ZERO
-                               IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
-                                   (ACCT-ZAIKAISU NOT =  ZERO)
-                                   MOVE  "1"    TO   
-                                            LNK-S01-KOUREI-ZAITAKU-KBN
-                               END-IF
-                           END-IF
-                       END-IF
-                       MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-                       MOVE    "SRYACCT-KEY31" TO  ORC-DBPATH
-                       CALL    "ORCMCPSUB"         USING
-                                                   MCPAREA
-                                                   ORCMCPAREA
-                                                   MCPDATA-REC
-                   END-IF
-               END-IF
-               MOVE    "DBCLOSECURSOR"  TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"      USING   MCPAREA
-                                                ORCMCPAREA
-                                                MCPDATA-REC
-      *        ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅÎÁ¡Ê±¡Æâ½èÊý¤»¤ó¤ò¸òÉÕ¤·¤Ê¤¤¡Ë
-               INITIALIZE                           SRYACT-REC
-               MOVE    LNK-SYU-HOSPID       TO      SRY-HOSPID
-               MOVE    LNK-SYU-NYUGAIKBN    TO      SRY-NYUGAIKBN
-               MOVE    LNK-SYU-PTID         TO      SRY-PTID
-               MOVE    LNK-SYU-SRYYMD(1:6)  TO      SRY-SRYYM
-               MOVE    "114701710"          TO      SRY-SRYCD(1)
-               MOVE    "114701710"          TO      SRY-SRYCD(2)
-               MOVE    "114701710"          TO      SRY-SRYCD(3)
-               MOVE    "114701710"          TO      SRY-SRYCD(4)
-               MOVE    "114701710"          TO      SRY-SRYCD(5)
-               MOVE    SRYACT-REC           TO      MCPDATA-REC
-               MOVE    "DBSELECT"           TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"        TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"           USING   MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-               IF      MCP-RC               =       ZERO
-                   MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH 
-                   PERFORM   SRYACT-READ-SEC
-                   IF      FLG-SRYACT       =       ZERO
-                       INITIALIZE                   SRYACCT-REC
-                       MOVE    SRY-HOSPID       TO   ACCT-HOSPID
-                       MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
-                       MOVE    SRY-SRYKA        TO   ACCT-SRYKA
-                       MOVE    SRY-PTID         TO   ACCT-PTID
-                       MOVE    SRY-SRYYM        TO   ACCT-SRYYM
-                       MOVE    SRY-ZAINUM       TO   ACCT-ZAINUM
-                       MOVE    SRYACCT-REC      TO   MCPDATA-REC
-                       MOVE    "DBSELECT"       TO   MCP-FUNC
-                       MOVE    "SRYACCT-KEY31"  TO   ORC-DBPATH
-                       CALL    "ORCMCPSUB"           USING
-                                                     MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-                       IF      MCP-RC           =       ZERO
-                           MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH 
-                           PERFORM   SRYACCT-READ-SEC
-                           IF      FLG-SRYACCT  =       ZERO
-                               IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
-                                   (ACCT-ZAIKAISU NOT =  ZERO)
-                                   MOVE  "1"    TO   
-                                            LNK-S01-KOUREI-ZAITAKU-KBN
-                               END-IF
-                           END-IF
-                       END-IF
-                       MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-                       MOVE    "SRYACCT-KEY31" TO  ORC-DBPATH
-                       CALL    "ORCMCPSUB"         USING
-                                                   MCPAREA
-                                                   ORCMCPAREA
-                                                   MCPDATA-REC
-                   END-IF
-               END-IF
-               MOVE    "DBCLOSECURSOR"  TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"      USING   MCPAREA
-                                                ORCMCPAREA
-                                                MCPDATA-REC
-      *        ºßÂðËö´ü°åÎÅÁí¹ç¿ÇÎÅÎÁ¡Ê±¡³°¡Ë
-               INITIALIZE                           SRYACT-REC
-               MOVE    LNK-SYU-HOSPID       TO      SRY-HOSPID
-               MOVE    LNK-SYU-NYUGAIKBN    TO      SRY-NYUGAIKBN
-               MOVE    LNK-SYU-PTID         TO      SRY-PTID
-               MOVE    LNK-SYU-SRYYMD(1:6)  TO      SRY-SRYYM
-               MOVE    "114007610"          TO      SRY-SRYCD(1)
-               MOVE    "114007610"          TO      SRY-SRYCD(2)
-               MOVE    "114007610"          TO      SRY-SRYCD(3)
-               MOVE    "114007610"          TO      SRY-SRYCD(4)
-               MOVE    "114007610"          TO      SRY-SRYCD(5)
-               MOVE    SRYACT-REC           TO      MCPDATA-REC
-               MOVE    "DBSELECT"           TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"        TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"           USING   MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-               IF      MCP-RC               =       ZERO
-                   MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH 
-                   PERFORM   SRYACT-READ-SEC
-                   IF      FLG-SRYACT       =       ZERO
-                       INITIALIZE                   SRYACCT-REC
-                       MOVE    SRY-HOSPID       TO   ACCT-HOSPID
-                       MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
-                       MOVE    SRY-SRYKA        TO   ACCT-SRYKA
-                       MOVE    SRY-PTID         TO   ACCT-PTID
-                       MOVE    SRY-SRYYM        TO   ACCT-SRYYM
-                       MOVE    SRY-ZAINUM       TO   ACCT-ZAINUM
-                       MOVE    SRYACCT-REC      TO   MCPDATA-REC
-                       MOVE    "DBSELECT"       TO   MCP-FUNC
-                       MOVE    "SRYACCT-KEY31"  TO   ORC-DBPATH
-                       CALL    "ORCMCPSUB"           USING
-                                                     MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-                       IF      MCP-RC           =       ZERO
-                           MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH 
-                           PERFORM   SRYACCT-READ-SEC
-                           IF      FLG-SRYACCT  =       ZERO
-                               IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
-                                   (ACCT-ZAIKAISU NOT =  ZERO)
-                                   MOVE  "1"    TO   
-                                            LNK-S01-KOUREI-ZAITAKU-KBN
-                               END-IF
-                           END-IF
-                       END-IF
-                       MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-                       MOVE    "SRYACCT-KEY31" TO  ORC-DBPATH
-                       CALL    "ORCMCPSUB"         USING
-                                                   MCPAREA
-                                                   ORCMCPAREA
-                                                   MCPDATA-REC
-                   END-IF
-               END-IF
-               MOVE    "DBCLOSECURSOR"  TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"      USING   MCPAREA
-                                                ORCMCPAREA
-                                                MCPDATA-REC
-      *        ºßÂðËö´ü°åÎÅÁí¹ç¿ÇÎÅÎÁ¡Ê±¡Æâ¡Ë
-               INITIALIZE                           SRYACT-REC
-               MOVE    LNK-SYU-HOSPID       TO      SRY-HOSPID
-               MOVE    LNK-SYU-NYUGAIKBN    TO      SRY-NYUGAIKBN
-               MOVE    LNK-SYU-PTID         TO      SRY-PTID
-               MOVE    LNK-SYU-SRYYMD(1:6)  TO      SRY-SRYYM
-               MOVE    "114007710"          TO      SRY-SRYCD(1)
-               MOVE    "114007710"          TO      SRY-SRYCD(2)
-               MOVE    "114007710"          TO      SRY-SRYCD(3)
-               MOVE    "114007710"          TO      SRY-SRYCD(4)
-               MOVE    "114007710"          TO      SRY-SRYCD(5)
-               MOVE    SRYACT-REC           TO      MCPDATA-REC
-               MOVE    "DBSELECT"           TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"        TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"           USING   MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-               IF      MCP-RC               =       ZERO
-                   MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH 
-                   PERFORM   SRYACT-READ-SEC
-                   IF      FLG-SRYACT       =       ZERO
-                       INITIALIZE                   SRYACCT-REC
-                       MOVE    SRY-HOSPID       TO   ACCT-HOSPID
-                       MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
-                       MOVE    SRY-SRYKA        TO   ACCT-SRYKA
-                       MOVE    SRY-PTID         TO   ACCT-PTID
-                       MOVE    SRY-SRYYM        TO   ACCT-SRYYM
-                       MOVE    SRY-ZAINUM       TO   ACCT-ZAINUM
-                       MOVE    SRYACCT-REC      TO   MCPDATA-REC
-                       MOVE    "DBSELECT"       TO   MCP-FUNC
-                       MOVE    "SRYACCT-KEY31"  TO   ORC-DBPATH
-                       CALL    "ORCMCPSUB"           USING
-                                                     MCPAREA
-                                                     ORCMCPAREA
-                                                     MCPDATA-REC
-                       IF      MCP-RC           =       ZERO
-                           MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH 
-                           PERFORM   SRYACCT-READ-SEC
-                           IF      FLG-SRYACCT  =       ZERO
-                               IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
-                                   (ACCT-ZAIKAISU NOT =  ZERO)
-                                   MOVE  "1"    TO   
-                                            LNK-S01-KOUREI-ZAITAKU-KBN
-                               END-IF
-                           END-IF
-                       END-IF
-                       MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-                       MOVE    "SRYACCT-KEY31" TO  ORC-DBPATH
-                       CALL    "ORCMCPSUB"         USING
-                                                   MCPAREA
-                                                   ORCMCPAREA
-                                                   MCPDATA-REC
-                   END-IF
-               END-IF
-               MOVE    "DBCLOSECURSOR"  TO      MCP-FUNC
-               MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH
-               CALL    "ORCMCPSUB"      USING   MCPAREA
-                                                ORCMCPAREA
-                                                MCPDATA-REC
+           MOVE       ZERO         TO      FLG-TAISYO
+           IF  (LNK-S01-KOUREI-ZAITAKU-KBN    =   SPACE  )
+           AND (LNK-SYU-SRYYMD(1:6)          >=  "200210")
       *
       *        ´µ¼ÔÇ¯Îð·×»»
                INITIALIZE                           PTINF-REC
@@ -2658,17 +2454,16 @@
                    MOVE    "PTINF-KEY"      TO      ORC-DBPATH
                    PERFORM  PTINF-READ-SEC
                ELSE
-                   DISPLAY   "PTINF SELECT ERR"
-      *
-                   INITIALIZE                   PTINF-REC
+                   DISPLAY "PTINF SELECT ERR"
+                   INITIALIZE      PTINF-REC
                END-IF
-      *
                MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
                MOVE    "PTINF-KEY"          TO  ORC-DBPATH
                CALL    "ORCMCPSUB"          USING
                                             MCPAREA
                                             ORCMCPAREA
                                             MCPDATA-REC
+      *
                INITIALIZE                  ORCSAGECHKAREA
                MOVE    LNK-SYU-HOSPID  TO  AGECHK-HOSPID
                MOVE    LNK-SYU-PTID    TO  AGECHK-PTID
@@ -2682,16 +2477,20 @@
                          COMB-KOH1HKNNUM  = "027"    ) OR
                        ( AGECHK-NENREI   >=  65  AND
                          FLG-ROUJINHOKEN  = "1"      )
-                       CONTINUE
-                   ELSE
-                       MOVE  SPACE   TO  LNK-S01-KOUREI-ZAITAKU-KBN
+                       MOVE   1      TO  FLG-TAISYO
                    END-IF
-               ELSE
-                   DISPLAY  "PTINF AGE-CHK ERR " LNK-SYU-PTID
-      *
-                   MOVE  SPACE       TO  LNK-S01-KOUREI-ZAITAKU-KBN
                END-IF
+      *
+               IF    FLG-TAISYO   =    1
+                  IF   LNK-SYU-SRYYMD(1:6)   >=   "200604"
+                        PERFORM   2002-ZAITAKU-HENSYU200604-SEC
+                  ELSE
+                        PERFORM   2001-ZAITAKU-HENSYU-SEC
+                  END-IF
+               END-IF
+      *
            END-IF
+      *
            IF   LNK-S01-KOUREI-ZAITAKU-KBN   =  "1"
                IF  COMB-SYU-HKNKOHSBTKBN   =   "8"
                    MOVE  SPACE       TO  LNK-S01-KOUREI-ZAITAKU-KBN
@@ -2719,17 +2518,16 @@
                    MOVE    "PTINF-KEY"      TO      ORC-DBPATH
                    PERFORM  PTINF-READ-SEC
                ELSE
-                   DISPLAY   "PTINF SELECT ERR"
-      *
-                   INITIALIZE                   PTINF-REC
+                   DISPLAY "PTINF SELECT ERR"
+                   INITIALIZE      PTINF-REC
                END-IF
-      *
                MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
                MOVE    "PTINF-KEY"          TO  ORC-DBPATH
                CALL    "ORCMCPSUB"          USING
                                             MCPAREA
                                             ORCMCPAREA
                                             MCPDATA-REC
+      *
                INITIALIZE                  ORCSAGECHKAREA
                MOVE    LNK-SYU-HOSPID  TO  AGECHK-HOSPID
                MOVE    LNK-SYU-PTID    TO  AGECHK-PTID
@@ -2747,7 +2545,6 @@
                    END-IF
                ELSE
                    DISPLAY  "PTINF AGE-CHK ERR " LNK-SYU-PTID
-      *
                    MOVE    SPACE       TO  FLG-KOUREI-KBN
                END-IF
            END-IF
@@ -2759,7 +2556,7 @@
                                    "068"  OR  "069"
                    MOVE  SPACE       TO  FLG-KOUREI-KBN
                END-IF
-           END-IF   
+           END-IF
       *
       *    Ï«ºÒ¡¦¼«ÇåÀÕ¤ÎºÆ·×»»»þ¤ÎÉéÃ´³ä¹ç¤òµá¤á¤ë
       *
@@ -2780,11 +2577,9 @@
                    MOVE    "PTINF-KEY"      TO      ORC-DBPATH
                    PERFORM  PTINF-READ-SEC
                ELSE
-                   DISPLAY   "PTINF SELECT ERR"
-      *
-                   INITIALIZE                   PTINF-REC
+                   DISPLAY "PTINF SELECT ERR"
+                   INITIALIZE      PTINF-REC
                END-IF
-      *
                MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
                MOVE    "PTINF-KEY"          TO  ORC-DBPATH
                CALL    "ORCMCPSUB"          USING
@@ -2822,6 +2617,156 @@
            .
       *
        200-HKNFTN-SANTEI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ºßÁí¿ÇÈ½Äê¡Ê£²£°£°£¶Ç¯£´·î¤Þ¤Ç¡Ë                        *
+      ******************************************************************
+       2001-ZAITAKU-HENSYU-SEC           SECTION.
+      *
+           PERFORM   VARYING   IDX10   FROM    1   BY  1
+                      UNTIL  ( IDX10    >   TBL-ZAITAKU-MAX      )
+                       OR    ( LNK-S01-KOUREI-ZAITAKU-KBN  = "1" )
+      *
+               INITIALIZE                           SRYACT-REC
+               MOVE    LNK-SYU-HOSPID       TO      SRY-HOSPID
+               MOVE    LNK-SYU-NYUGAIKBN    TO      SRY-NYUGAIKBN
+               MOVE    LNK-SYU-PTID         TO      SRY-PTID
+               MOVE    LNK-SYU-SRYYMD(1:6)  TO      SRY-SRYYM
+               MOVE    TBL-ZAITAKU(IDX10)   TO      SRY-SRYCD(1)
+               MOVE    TBL-ZAITAKU(IDX10)   TO      SRY-SRYCD(2)
+               MOVE    TBL-ZAITAKU(IDX10)   TO      SRY-SRYCD(3)
+               MOVE    TBL-ZAITAKU(IDX10)   TO      SRY-SRYCD(4)
+               MOVE    TBL-ZAITAKU(IDX10)   TO      SRY-SRYCD(5)
+               MOVE    SRYACT-REC           TO      MCPDATA-REC
+               MOVE    "DBSELECT"           TO      MCP-FUNC
+               MOVE    "SRYACT-KEY7"        TO      ORC-DBPATH
+               CALL    "ORCMCPSUB"           USING   MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+               IF      MCP-RC               =       ZERO
+                   MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH 
+                   PERFORM   SRYACT-READ-SEC
+                   IF      FLG-SRYACT       =       ZERO
+                       INITIALIZE                   SRYACCT-REC
+                       MOVE    SRY-HOSPID       TO   ACCT-HOSPID
+                       MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
+                       MOVE    SRY-SRYKA        TO   ACCT-SRYKA
+                       MOVE    SRY-PTID         TO   ACCT-PTID
+                       MOVE    SRY-SRYYM        TO   ACCT-SRYYM
+                       MOVE    SRY-ZAINUM       TO   ACCT-ZAINUM
+                       MOVE    SRYACCT-REC      TO   MCPDATA-REC
+                       MOVE    "DBSELECT"       TO   MCP-FUNC
+                       MOVE    "SRYACCT-KEY31"  TO   ORC-DBPATH
+                       CALL    "ORCMCPSUB"           USING
+                                                     MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+                       IF      MCP-RC           =       ZERO
+                           MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH
+                           PERFORM   SRYACCT-READ-SEC
+                           IF      FLG-SRYACCT  =       ZERO
+                               IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
+                                   (ACCT-ZAIKAISU NOT =  ZERO)
+                                   MOVE  "1"    TO
+                                            LNK-S01-KOUREI-ZAITAKU-KBN
+                               END-IF
+                           END-IF
+                       END-IF
+                       MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+                       MOVE    "SRYACCT-KEY31" TO  ORC-DBPATH
+                       CALL    "ORCMCPSUB"         USING
+                                                   MCPAREA
+                                                   ORCMCPAREA
+                                                   MCPDATA-REC
+                   END-IF
+               END-IF
+               MOVE    "DBCLOSECURSOR"  TO      MCP-FUNC
+               MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH
+               CALL    "ORCMCPSUB"      USING   MCPAREA
+                                                ORCMCPAREA
+                                                MCPDATA-REC
+      *
+           END-PERFORM
+      *
+           .
+      *
+       2001-ZAITAKU-HENSYU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ºßÁí¿ÇÈ½Äê¡Ê£²£°£°£¶Ç¯£´·î¤«¤é¡Ë                        *
+      ******************************************************************
+       2002-ZAITAKU-HENSYU200604-SEC           SECTION.
+      *
+           PERFORM   VARYING   IDX10   FROM    1   BY  1
+                      UNTIL  ( IDX10    >   TBL-ZAITAKU2-MAX     )
+                       OR    ( LNK-S01-KOUREI-ZAITAKU-KBN  = "1" )
+      *
+               INITIALIZE                           SRYACT-REC
+               MOVE    LNK-SYU-HOSPID       TO      SRY-HOSPID
+               MOVE    LNK-SYU-NYUGAIKBN    TO      SRY-NYUGAIKBN
+               MOVE    LNK-SYU-PTID         TO      SRY-PTID
+               MOVE    LNK-SYU-SRYYMD(1:6)  TO      SRY-SRYYM
+               MOVE    TBL-ZAITAKU2(IDX10)  TO      SRY-SRYCD(1)
+               MOVE    TBL-ZAITAKU2(IDX10)  TO      SRY-SRYCD(2)
+               MOVE    TBL-ZAITAKU2(IDX10)  TO      SRY-SRYCD(3)
+               MOVE    TBL-ZAITAKU2(IDX10)  TO      SRY-SRYCD(4)
+               MOVE    TBL-ZAITAKU2(IDX10)  TO      SRY-SRYCD(5)
+               MOVE    SRYACT-REC           TO      MCPDATA-REC
+               MOVE    "DBSELECT"           TO      MCP-FUNC
+               MOVE    "SRYACT-KEY7"        TO      ORC-DBPATH
+               CALL    "ORCMCPSUB"           USING   MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+               IF      MCP-RC               =       ZERO
+                   MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH 
+                   PERFORM   SRYACT-READ-SEC
+                   IF      FLG-SRYACT       =       ZERO
+                       INITIALIZE                   SRYACCT-REC
+                       MOVE    SRY-HOSPID       TO   ACCT-HOSPID
+                       MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
+                       MOVE    SRY-SRYKA        TO   ACCT-SRYKA
+                       MOVE    SRY-PTID         TO   ACCT-PTID
+                       MOVE    SRY-SRYYM        TO   ACCT-SRYYM
+                       MOVE    SRY-ZAINUM       TO   ACCT-ZAINUM
+                       MOVE    SRYACCT-REC      TO   MCPDATA-REC
+                       MOVE    "DBSELECT"       TO   MCP-FUNC
+                       MOVE    "SRYACCT-KEY31"  TO   ORC-DBPATH
+                       CALL    "ORCMCPSUB"           USING
+                                                     MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+                       IF      MCP-RC           =       ZERO
+                           MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH
+                           PERFORM   SRYACCT-READ-SEC
+                           IF      FLG-SRYACCT  =       ZERO
+                               IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
+                                   (ACCT-ZAIKAISU NOT =  ZERO)
+                                   MOVE  "1"    TO
+                                            LNK-S01-KOUREI-ZAITAKU-KBN
+                               END-IF
+                           END-IF
+                       END-IF
+                       MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+                       MOVE    "SRYACCT-KEY31" TO  ORC-DBPATH
+                       CALL    "ORCMCPSUB"         USING
+                                                   MCPAREA
+                                                   ORCMCPAREA
+                                                   MCPDATA-REC
+                   END-IF
+               END-IF
+               MOVE    "DBCLOSECURSOR"  TO      MCP-FUNC
+               MOVE    "SRYACT-KEY7"    TO      ORC-DBPATH
+               CALL    "ORCMCPSUB"      USING   MCPAREA
+                                                ORCMCPAREA
+                                                MCPDATA-REC
+      *
+           END-PERFORM
+      *
+           .
+      *
+       2002-ZAITAKU-HENSYU200604-EXT.
            EXIT.
       *
       ******************************************************************
