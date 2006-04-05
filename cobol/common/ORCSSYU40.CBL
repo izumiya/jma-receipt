@@ -504,10 +504,10 @@
                    WHEN    "5"
       *                ÆýÍÄ»ùÌë´Ö
                        MOVE    "111011570"         TO  WRK-SRYCD
-                   WHEN    "2"
+                   WHEN    "6"
       *                ÆýÍÄ»ùµÙÆü
                        MOVE    "111011670"         TO  WRK-SRYCD
-                   WHEN    "3"
+                   WHEN    "7"
       *                ÆýÍÄ»ù¿¼Ìë
                        MOVE    "111011770"         TO  WRK-SRYCD
                    WHEN    OTHER
@@ -564,10 +564,10 @@
                    WHEN    "5"
       *                ÆýÍÄ»ùÌë´Ö
                        MOVE    "111011570"         TO  WRK-SRYCD
-                   WHEN    "2"
+                   WHEN    "6"
       *                ÆýÍÄ»ùµÙÆü
                        MOVE    "111011670"         TO  WRK-SRYCD
-                   WHEN    "3"
+                   WHEN    "7"
       *                ÆýÍÄ»ù¿¼Ìë
                        MOVE    "111011770"         TO  WRK-SRYCD
                    WHEN    OTHER
