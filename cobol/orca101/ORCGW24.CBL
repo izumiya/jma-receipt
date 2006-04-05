@@ -1024,10 +1024,10 @@
            MOVE    SYS-5000-SKYPRTKBN   TO  WRK-CMB-CD
            PERFORM 4200-SKYPRTKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
-               MOVE    WRK-CMB-ITM         TO  SPA-GMN-W24-SKYPRTKBN
+               MOVE    WRK-CMB-ITM         TO  SPA-GMN-W24-SKYPRTKBN-G
            ELSE
                MOVE    SPA-GMN-W24-SKYPRTKBNLST (2)
-                                           TO  SPA-GMN-W24-SKYPRTKBN
+                                           TO  SPA-GMN-W24-SKYPRTKBN-G
            END-IF
       *
       *    ÀÁµá½ñÌ¤¼ý³Û°õºþ¶èÊ¬
@@ -2450,7 +2450,7 @@
            MOVE    SPA-GMN-W24-SENTEI-TAX
                                        TO  WRK-CMB-CD
            PERFORM 4200-SENTEI-TAXLST-CHK-SEC
-           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+           IF    ( WRK-CMB-ITM         =   SPACE )
                MOVE    SPA-GMN-W24-SENTEI-TAXLST (1)
                                        TO  SPA-GMN-W24-SENTEI-TAX-G
            ELSE
@@ -2503,7 +2503,7 @@
       *****************************************************************
        4101-MISYUPRTKBN-CHK-SEC       SECTION.
       *
-           MOVE    SPA-GMN-W24-MISYUPRTKBN-G
+           MOVE    SPA-GMN-W24-MISYUPRTKBN
                                        TO  WRK-CMB-CD
            PERFORM 4200-MISYUPRTKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM         =   SPACE )
