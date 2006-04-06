@@ -110,6 +110,8 @@
            03  FLG-GEN-ARI               PIC 9(01).
       *
            03  FLG-SRYKA-OK              PIC 9(01).
+      *    Æ±Æü½é¿Ç
+           03  FLG-DOUJITU               PIC 9(01).
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -2453,10 +2455,7 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   IDX-KOUI
       *
-      *        ¿ÇÎÅ²Ê¹¹¿·¡Ê½é¿ÇÎÁ»»Äê»þ¡¢½é¿ÇÆü£²¤Ø¥»¥Ã¥È
-               IF      LNK-WKSRY-SRYKBN (IDX)  =   "11"
-                   MOVE    SYU-SRYYMD          TO  WRK-KARRK-SYOSINYMD2
-               END-IF
+               MOVE    ZERO                TO  FLG-DOUJITU
       *
                PERFORM VARYING     IDY     FROM    1   BY  1
                        UNTIL      (IDY     >   5   )  OR
@@ -2467,6 +2466,12 @@
                        WHEN    "113003710"
                            MOVE    SYU-SRYYMD      TO
                                                    WRK-KARRK-SYOSINYMD2
+      *                Æ±Æü½é¿Ç
+                       WHEN    "101110040"
+                       WHEN    "111011810"
+                           IF      LNK-WKSRY-SRYKBN (IDX)  =   "11"
+                               MOVE    1               TO  FLG-DOUJITU
+                           END-IF
       *                ¸¡¿ÇÅù¤è¤ê
                        WHEN    "820000003"
                        WHEN    "820000004"
@@ -2479,6 +2484,12 @@
                            END-IF
                    END-EVALUATE
                END-PERFORM
+      *        ¿ÇÎÅ²Ê¹¹¿·¡Ê½é¿ÇÎÁ»»Äê»þ¡¢½é¿ÇÆü£²¤Ø¥»¥Ã¥È
+               IF     (LNK-WKSRY-SRYKBN (IDX)  =   "11" )  AND
+                      (FLG-DOUJITU             =   ZERO )
+                   MOVE    SYU-SRYYMD          TO  WRK-KARRK-SYOSINYMD2
+               END-IF
+      *
            END-PERFORM
       *
            .
