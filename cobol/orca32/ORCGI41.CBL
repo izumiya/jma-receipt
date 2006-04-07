@@ -4427,6 +4427,13 @@
                                            TO  WRK-SANTEISTYMD
                MOVE    PTNYUINRRK-TOKUTEI-NYUIN
                                            TO  WRK-TOKUTEI-NYUIN
+               DISPLAY "SPA-NAI-SRYYM = " SPA-NAI-SRYYM
+      *        Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µÎÅÍÜÉÂÅïÆþ±¡ÎÁ¤ÏÊ¿À®£±£¸Ç¯£³·îËø
+               IF     (PTNYUINRRK-TOKUTEI-KBN   =   "2")   AND
+                      (PTNYUINRRK-TOKUTEI-NYUIN =   "06")  AND
+                      (SPA-NAI-SRYYM           >=  "200604")
+                       MOVE      SPACE     TO  WRK-TOKUTEI-NYUIN
+               END-IF
                MOVE    PTNYUINRRK-REC      TO  WK-PTNYUINRRK-REC
       *         DISPLAY  "PTNYUINRRK-RRKNUM = " PTNYUINRRK-RRKNUM
            ELSE
@@ -4581,7 +4588,7 @@
                                                                   (2)
                PERFORM    4801-KIKAN-CHG-SEC
            END-IF
-      *    Ï·¿ÍÀ­ÃÔÊò¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ
+      *    Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190739910"
                MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
                                            LNK-SCNYUACCT-NYUKHN-SRYCD(1)
@@ -4592,13 +4599,25 @@
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
                MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
+               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
+                       (PTNYUINRRK-JTIKBN  = "1")
+                   MOVE   PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+               ELSE
+                   MOVE   SYOKIKSN-IN-SANTEISTYMD
+                                       TO  LNK-DAY6-KIJUN
+               END-IF
                MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               IF      PTNYUINRRK-SHOKAIKBN  = "1"
+               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
+                       (PTNYUINRRK-JTIKBN  = "1")
                    MOVE    89              TO  LNK-DAY6-ZOGEN
                ELSE
-                   COMPUTE  LNK-DAY6-ZOGEN = 89  -  STUSAN-NISSU03
+                    COMPUTE  LNK-DAY6-ZOGEN = 90  -  STUSAN-NISSU03
+      *             IF   STUSAN-NISSU03   >=     90
+      *                 MOVE   ZERO         TO   LNK-DAY6-ZOGEN
+      *             ELSE
+      *                 COMPUTE  LNK-DAY6-ZOGEN = 90  -  STUSAN-NISSU03
+      *             END-IF
                END-IF
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
@@ -4703,7 +4722,7 @@
                END-IF
            END-IF
       *
-      *    Ï·¿ÍÀ­ÃÔÊò¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
+      *    Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190813410"
                MOVE    SPACE           TO  SYOKIKSN-IN-KHNSRYCD
                                            LNK-SCNYUACCT-NYUKHN-SRYCD(1)
@@ -4714,13 +4733,27 @@
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
                MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
+               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
+                       (PTNYUINRRK-JTIKBN     = "1")
+                   MOVE   PTNYUINRRK-TENNYUYMD
                                        TO  LNK-DAY6-KIJUN
+               ELSE
+                   MOVE   SYOKIKSN-IN-SANTEISTYMD
+                                       TO  LNK-DAY6-KIJUN
+               END-IF
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               IF      PTNYUINRRK-SHOKAIKBN  = "1"
+               DISPLAY "PTNYUINRRK-SHOKAIKBN = " PTNYUINRRK-SHOKAIKBN
+               DISPLAY "PTNYUINRRK-JTIKBN = " PTNYUINRRK-JTIKBN
+               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
+                       (PTNYUINRRK-JTIKBN  = "1")
                    MOVE    89              TO  LNK-DAY6-ZOGEN
                ELSE
-                   COMPUTE  LNK-DAY6-ZOGEN = 89  -  STUSAN-NISSU03
+                    COMPUTE  LNK-DAY6-ZOGEN = 90  -  STUSAN-NISSU03
+      *             IF   STUSAN-NISSU03   >=     90
+      *                 MOVE   ZERO         TO   LNK-DAY6-ZOGEN
+      *             ELSE
+      *                 COMPUTE  LNK-DAY6-ZOGEN = 90  -  STUSAN-NISSU03
+      *             END-IF
                END-IF
                CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                                LNK-DAY6-AREA

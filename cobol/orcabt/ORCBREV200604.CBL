@@ -1385,6 +1385,12 @@
                                            TO  WRK-SANTEISTYMD
                MOVE    PTNYUINRRK-TOKUTEI-NYUIN
                                            TO  WRK-TOKUTEI-NYUIN
+      *        Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µÎÅÍÜÉÂÅïÆþ±¡ÎÁ¤ÏÊ¿À®£±£¸Ç¯£³·îËø
+               IF     (PTNYUINRRK-TOKUTEI-KBN   =   "2")   AND
+                      (PTNYUINRRK-TOKUTEI-NYUIN =   "06")  AND
+                      (WRK-PARA-SRYYM           >=  "200604")
+                       MOVE      SPACE     TO  WRK-TOKUTEI-NYUIN
+               END-IF
                MOVE    PTNYUINRRK-REC      TO  WK-PTNYUINRRK-REC
            ELSE
                INITIALIZE                  PTNYUINRRK-REC
@@ -2255,7 +2261,7 @@
                    WHEN    "05"
                        MOVE   "190739910"   TO  SYOKIKSN-IN-KHNSRYCD
                    WHEN    "06"
-                       MOVE   "190740110"   TO  SYOKIKSN-IN-KHNSRYCD
+                       MOVE "190740110"     TO  SYOKIKSN-IN-KHNSRYCD
                    WHEN    "07"
                        MOVE   "190055010"   TO  SYOKIKSN-IN-KHNSRYCD
                    WHEN    "08"
