@@ -9011,6 +9011,8 @@
                               MOVE      LNK-SYU-SYUCOMPFTN
                                                  TO WK-TOKUTEI-COMPFTN2
                               IF   COMB-SYU-HKNKOHSBTKBN  =  "8"
+                              AND  WK-1001-JIHIPOSITION   =  "3"
+                              AND  LNK-SYU-SRYYMD(1:6)   >=  "200604"
                                  CONTINUE
                               ELSE
                                  COMPUTE   LNK-SYU-SYUCOMPFTN =
@@ -9087,6 +9089,8 @@
                               MOVE      LNK-SYU-SYUCOMPFTN
                                                  TO WK-TOKUTEI-COMPFTN2
                               IF   COMB-SYU-HKNKOHSBTKBN  =  "8"
+                              AND  WK-1001-JIHIPOSITION   =  "3"
+                              AND  LNK-SYU-SRYYMD(1:6)   >=  "200604"
                                  CONTINUE
                               ELSE
                                  COMPUTE   LNK-SYU-SYUCOMPFTN =
