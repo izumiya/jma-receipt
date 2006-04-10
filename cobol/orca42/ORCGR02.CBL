@@ -89,6 +89,8 @@
       *  02.08.01    NACL-藤原    06/02/20  主科対応
       *  02.08.02    NACL-藤原    06/03/10  患者番号順の範囲指定を変更
       *  02.08.03    NACL-藤原    06/03/14  編綴順情報の表示の修正
+      *  02.08.04    NACL-藤原    06/04/07  編綴順指定のときの自費・不明分
+      *                                     レセが印刷されない現象の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2921,14 +2923,10 @@
            MOVE    WRK-PREFKBN         TO  WRK-RECE09-PREFKBN
            MOVE    SPA-R01-RECE07-NYUGAIKBN
                                        TO  WRK-RECE09-NYUGAIKBN
-           IF      WRK-TEISYUTUSAKI    =   "1"
-               MOVE    SPA-GMN-PRTJYUN     TO  WRK-RECE09-PRTJYUN
+           IF      WRK-TEISYUTUSAKI    =   "2"
+               MOVE    SPA-GMN-PRTJYUN1    TO  WRK-RECE09-PRTJYUN
            ELSE
-               IF      SPA-NAI-SYUBETU (IDW IDX IDY)   =   "6666"
-                   MOVE    SPA-GMN-PRTJYUN     TO  WRK-RECE09-PRTJYUN
-               ELSE
-                   MOVE    SPA-GMN-PRTJYUN1    TO  WRK-RECE09-PRTJYUN
-               END-IF
+               MOVE    SPA-GMN-PRTJYUN     TO  WRK-RECE09-PRTJYUN
            END-IF
       * 
            MOVE    SPA-GMN-TSTDATA (IDW IDX)
