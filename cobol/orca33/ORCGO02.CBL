@@ -2070,6 +2070,7 @@
                        MOVE    "1003"          TO  SPA-ERRCD
                        GO  TO  4501-SYS5012-HEN-EXT
                    END-IF
+                   MOVE    SYSKANRI-REC        TO  SYS-5010-REC
                    EVALUATE    TRUE
                    WHEN  ( SYS-5010-SEIKYU-DAY1    =   99 )
                        MOVE    "1"             TO  SYS-5012-KBT
