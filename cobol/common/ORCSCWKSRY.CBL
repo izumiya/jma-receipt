@@ -870,7 +870,7 @@
                                                               (IDX-1)
       *            入力コードの画面用再編集
                    PERFORM 10026-INPUTCD-HEN-SEC
-                   MOVE    SPACE               TO  SPA-MAE-INPUTCD (IDX)
+      *?           MOVE    SPACE               TO  SPA-MAE-INPUTCD (IDX)
                    MOVE    IDX-1               TO  SPA-GMN-IDX
       *
                    MOVE    SPACE               TO  SPA-COM-INPUTCD
@@ -1224,7 +1224,7 @@
                                            "12" OR
                                            "13"  )   AND
                  ((IDX2                >   ZERO  ) AND
-                  (SPA-COM-SRYSYUKBN  (IDX2)(1:2)
+                  (SPA-COM-SRYKBN (IDX2)
                                        =   "96"  OR  "95"))
                MOVE    1               TO  FLG-SYUBETU
            END-IF
@@ -1264,9 +1264,9 @@
                IF     (FLG-AUTO-OK         =   1 ) AND
                       (LNK-WKSRY-SRYKBN (IDX)  NOT =   "70" )
       *            前の剤が自費以外
-                   IF     LNK-WKSRY-SRYKBN (IDX - 1 )
-                                               =   "95"
-                                               OR  "96"
+                   IF      (IDX2                >   ZERO  ) AND
+                           (SPA-COM-SRYKBN (IDX2)
+                                               =   "96"  OR  "95")
                        CONTINUE
                    ELSE
                        MOVE    ZERO            TO  FLG-SYUBETU
