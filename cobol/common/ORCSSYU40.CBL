@@ -31,6 +31,7 @@
       *  01.00.01    NACL-多々納  04/03/11  Ｈ１６．４改正対応
       *  01.00.02    NACL-多々納  05/11/11  MONFUNC 対応 他
       *  01.00.03    NACL-多々納  06/03/20  Ｈ１８．４改正対応
+      *  01.00.04    NACL-多々納  06/04/12  電子化加算追加
       *****************************************************************
       *
       *
@@ -48,6 +49,7 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-SRYACT          PIC 9(01).
            03  FLG-SRYACCT         PIC 9(01).
            03  FLG-SYUNOU          PIC 9(01).
@@ -95,6 +97,8 @@
       *
            03  WRK-ZAINUM          PIC 9(08).
            03  WRK-H-ZAINUM        PIC 9(08).
+      *    電子化加算
+           03  WRK-DENSIKA         PIC 9(01).
       *
       *    診療行為コード一覧
        01  TBL-SINSATU-AREA.
@@ -205,6 +209,8 @@
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
       *
+           COPY    "CPSK1006.INC".
+      *
       *    診療行為マスター
        01  SRYACT-REC.
            COPY    "CPSRYACT.INC".
@@ -287,11 +293,58 @@
            .
       *
       *****************************************************************
+      *   電子化加算チェック処理
+      *****************************************************************
+       1000-SYSKANRI-HEN-SEC           SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1006-REC
+           INITIALIZE                      SYS-1006-REC
+           MOVE    "1006"              TO  SYS-1006-KANRICD
+           MOVE    "2"                 TO  SYS-1006-KBNCD
+           MOVE    WRK-SRYYMD          TO  SYS-1006-STYUKYMD
+           MOVE    WRK-SRYYMD          TO  SYS-1006-EDYUKYMD
+      *    システム管理検索（施設基準）
+           MOVE    SYS-1006-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  SYS-1006-REC
+               INITIALIZE                  SYS-1006-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    ZERO                TO  WRK-DENSIKA
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1006-REC
+               IF      SYS-1006-KBNCD      =   "2"
+      *            電子化加算
+                   IF      SYS-1006-SSTKIJUN (100) =   1
+                       MOVE    1               TO  WRK-DENSIKA
+                   END-IF
+               END-IF
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       1000-SYSKANRI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    診療行為作成処理
       *****************************************************************
        100-SRYKOU-GMN-SEC           SECTION.
       *
            MOVE    SPA-SRYYMD          TO  WRK-SRYYMD
+      *    電子化加算
+           IF      WRK-SRYYMD(1:6)     <   "200604"
+               MOVE    ZERO            TO  WRK-DENSIKA
+           ELSE
+               PERFORM 1000-SYSKANRI-HEN-SEC
+           END-IF
       *    当月最初の初診料算定日を判定する
            PERFORM 3000-SYOSIN-ALLCHK-SEC
       *
@@ -448,7 +501,7 @@
            END-IF
       *
       *    初診料点数を給付対象外点数へ
-           IF      SPA-SRYYMD(1:6)     <   "200604"
+           IF      WRK-SRYYMD(1:6)     <   "200604"
                PERFORM 10013-SYOSIN-TEN-SEC
            ELSE
                PERFORM 10013-SYOSIN02-TEN-SEC
@@ -547,6 +600,7 @@
                ADD     WRK-TENSU               TO  WRK-ZAITEN
       *
       *        乳幼児加算
+               MOVE    SPACE                   TO  WRK-SRYCD
       *        時間外
                EVALUATE    WRK-KASAN
                    WHEN    "1"
@@ -575,6 +629,12 @@
                        MOVE    "111000370"         TO  WRK-SRYCD
                END-EVALUATE
                IF      WRK-SRYCD       NOT =   SPACE
+                   PERFORM 10011-TENSU-SET-SEC
+                   ADD     WRK-TENSU               TO  WRK-ZAITEN
+               END-IF
+      *        電子化加算
+               IF      WRK-DENSIKA         =   1
+                   MOVE    "111012370"         TO  WRK-SRYCD
                    PERFORM 10011-TENSU-SET-SEC
                    ADD     WRK-TENSU               TO  WRK-ZAITEN
                END-IF
@@ -641,6 +701,12 @@
                   (JYURRK-RENNUM       =   1    )  AND
                   (JYURRK-SRYKBN1  NOT =   SPACE)
                MOVE    JYURRK-SRYYMD       TO  WRK-SRYYMD
+      *        電子化加算
+               IF      WRK-SRYYMD(1:6)     <   "200604"
+                   MOVE    ZERO            TO  WRK-DENSIKA
+               ELSE
+                   PERFORM 1000-SYSKANRI-HEN-SEC
+               END-IF
       *        当月最初の初診料算定日を判定する
                PERFORM 3000-SYOSIN-ALLCHK-SEC
       *****ELSE
@@ -1003,6 +1069,25 @@
       *
            .
        910-TENSU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理読み込み
+      *****************************************************************
+       900-SYSKANRI-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-SYSKANRI
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           .
+       900-SYSKANRI-READ-EXT.
            EXIT.
       *****************************************************************
       *    算定歴マスタ読み込み
