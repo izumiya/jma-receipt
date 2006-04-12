@@ -2292,7 +2292,8 @@
            MOVE    SPACE    TO   WRK-GAIHAKU-SRYCD
            MOVE    ZERO     TO   WRK-GAIHAKU-KHNTEN
       *
-           EVALUATE  TNS-SRYCD
+      ***  EVALUATE  TNS-SRYCD
+           EVALUATE  NSRY-SRYCD(SENTEI-IDX)
                WHEN  "190078210"
                      MOVE  "190077410"      TO   WRK-GAIHAKU-SRYCD
                WHEN  "190078310"
