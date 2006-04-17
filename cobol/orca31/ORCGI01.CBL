@@ -9832,6 +9832,11 @@
                END-IF
            END-IF
       *
+           PERFORM  4801-BTUSEL-SEC
+           MOVE     SYS-5001-BTU-KHNSRYCD
+                          TO    SYOKIKSN-IN-KHNSRYCD
+      *
+      *
            IF      SPA-GMN-I01-TOKNYUIN-CD    NOT =   SPACE
                PERFORM   4801-TOKTEI-NYUIN-SET-SEC
            ELSE
@@ -9849,6 +9854,7 @@
                    GO  TO  4801-TAIINKAIKEI-CANCEL-EXT
                END-IF
            END-IF
+      *
       *
       *    入院会計作成サブの呼出し
            INITIALIZE                      ORCSNYUACCT-AREA
