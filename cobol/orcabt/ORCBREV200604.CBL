@@ -782,6 +782,9 @@
                            MOVE  "入院会計を更新（再作成）しました"  
                                                      TO  WRK-NAIYO
                        END-IF
+                   WHEN    "2001"
+                       MOVE  "既に改正後の状態で会計が作成済です"
+                                                      TO  WRK-NAIYO
                    WHEN    "2003"
                        MOVE  "通算日数の取得に失敗しました"
                                                       TO  WRK-NAIYO
@@ -1340,6 +1343,31 @@
       *****************************************************************
        410191-NYUACCT-SAKUSEI-SEC   SECTION.
       *
+      *    既に改正置換え処理済みの入院会計であれば、
+      *    処理をしないこととする（夕食の剤があれば無処理とする）
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    WRK-HOSPID          TO  NACCT-HOSPID
+           MOVE    WRK-PTID            TO  NACCT-PTID
+           MOVE    WRK-PARA-SRYYM      TO  NACCT-SRYYM
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key32"             TO  MCP-PATHNAME
+           CALL    "MONFUNC"               USING
+                                           MCPAREA
+                                           MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "DBFETCH"       TO  MCP-FUNC
+               MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+               MOVE    "key32"         TO  MCP-PATHNAME
+               CALL    "MONFUNC"           USING
+                                           MCPAREA
+                                           MCPDATA-REC
+               IF      MCP-RC          =   ZERO 
+                       MOVE    "2001"          TO  WRK-ERRCD
+                       GO  TO  410191-NYUACCT-SAKUSEI-EXT
+               END-IF
+           END-IF
       *    既に作成済の入院会計が存在すれば
       *    削除を行う
            INITIALIZE                      NYUINACCT-REC
