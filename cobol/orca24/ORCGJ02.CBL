@@ -2154,7 +2154,7 @@
                               (JYURRK-SRYKA        =   SPA-RRK-SRYKA
                                                        (IDX2)  )
                           AND (JYURRK-HKNCOMBINUM  =
-                                                   SPA-GMN-RRKHKNCOMBI
+                                                   SPA-RRK-HKNCOMBI
                                                          (IDX2) )
                            MOVE    IDX2            TO  IDX-S
                            MOVE    SPA-RRK-MAX     TO  IDX2
