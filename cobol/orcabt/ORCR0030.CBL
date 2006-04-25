@@ -239,6 +239,7 @@
       *  02.09.03    NACL-Æ£¸¶    06/04/14  »°¼ï¤Î¸øÈñÊ»ÍÑ¤Ë·¸¤ï¤ëµ­ºÜÍ×
       *                                     ¹à¤ÎÆÃÎãÂÐ±þ
       *  02.09.04    NACL-ÌçÏÆ    06/04/20  ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»ÊÔ½¸
+      *  02.09.05    NACL-ÌçÏÆ    06/04/25  ÆýÍÄ»ù²Ã»»¤Ë´Ø¤¹¤ëÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -398,6 +399,7 @@
       *    ÆýÍÄ»ù²Ã»»¥«¥¦¥ó¥È
        01  CNT-SAISIN-AREA.
            03  CNT-NYUYOJI                             PIC 9(02).
+           03  CNT-NYUYOJI2                            PIC 9(02).
            03  CNT-YOJI                                PIC 9(02).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
@@ -3437,19 +3439,29 @@
                             MOVE     9       TO    FLG-YOJI
                        END-IF
       **
-                       IF  SRY-SRYCD(IDX3)  =    CONS-NYUYOJI        OR
+                       IF   RECE02-SRYYM  >= "200604"
+                         IF  SRY-SRYCD(IDX3)  =  CONS-NYUYOJI        OR
+                                                 CONS-GNYUYOJI
+                              COMPUTE  CNT-NYUYOJI  =  CNT-NYUYOJI
+                                                    +  WK-ZAIKAISU
+                              COMPUTE  CNT-NYUYOJI2 =  CNT-NYUYOJI2
+                                                    +  WK-ZAIKAISU
+                         END-IF
+                       ELSE
+                         IF  SRY-SRYCD(IDX3)  =  CONS-NYUYOJI        OR
                                                  CONS-NYUYOJI-JIKAN  OR
                                                  CONS-GNYUYOJI       OR
-                                                 CONS-GNYUYOJI-JIKAN 
-                            COMPUTE  CNT-NYUYOJI =   CNT-NYUYOJI
-                                                 +   WK-ZAIKAISU
-                       END-IF
-                       IF  SRY-SRYCD(IDX3)  =    CONS-YOJI           OR
+                                                 CONS-GNYUYOJI-JIKAN
+                              COMPUTE  CNT-NYUYOJI =   CNT-NYUYOJI
+                                                   +   WK-ZAIKAISU
+                         END-IF
+                         IF  SRY-SRYCD(IDX3)  =  CONS-YOJI           OR
                                                  CONS-YOJI-JIKAN     OR
                                                  CONS-GYOJI          OR
-                                                 CONS-GYOJI-JIKAN    
-                            COMPUTE  CNT-YOJI    =   CNT-YOJI
-                                                 +   WK-ZAIKAISU
+                                                 CONS-GYOJI-JIKAN
+                              COMPUTE  CNT-YOJI    =   CNT-YOJI
+                                                   +   WK-ZAIKAISU
+                         END-IF
                        END-IF
       **
                        IF ( SRY-SRYCD(IDX3)      =   CONS-KEIZOKU1  OR
@@ -3546,6 +3558,26 @@
                                   END-IF
                                   ADD   WK-ZAIKAISU  TO
                                                       RECE02-KAISU(4)
+                                  IF   RECE02-SRYYM  >= "200604"
+                                    IF SRY-SRYCD(IDX3) = "112015170" OR
+                                                         "112015270" OR
+                                                         "112015370" OR
+                                                         "112015470" OR
+                                                         "112014470" OR
+                                                         "112014570" OR
+                                                         "112014670" OR
+                                                         "112014770" OR
+                                                         "112014870" OR
+                                                         "112014970" OR
+                                                         "112015070" OR
+                                                         "112014170" OR
+                                                         "112014270" OR
+                                                         "112014370"
+                                        COMPUTE  CNT-NYUYOJI2 =
+                                                 CNT-NYUYOJI2 +
+                                                 WK-ZAIKAISU
+                                    END-IF
+                                  END-IF
                                   IF    BUN-IDX        =   1
                                      COMPUTE RECE02-TENSU(4 BUN-IDX) =
                                              RECE02-TENSU(4 BUN-IDX) +
@@ -3585,6 +3617,26 @@
                                   END-IF
                                   ADD   WK-ZAIKAISU   TO
                                                         RECE02-KAISU(5)
+                                  IF   RECE02-SRYYM  >= "200604"
+                                    IF SRY-SRYCD(IDX3) = "112015170" OR
+                                                         "112015270" OR
+                                                         "112015370" OR
+                                                         "112015470" OR
+                                                         "112014470" OR
+                                                         "112014570" OR
+                                                         "112014670" OR
+                                                         "112014770" OR
+                                                         "112014870" OR
+                                                         "112014970" OR
+                                                         "112015070" OR
+                                                         "112014170" OR
+                                                         "112014270" OR
+                                                         "112014370"
+                                        COMPUTE  CNT-NYUYOJI2 =
+                                                 CNT-NYUYOJI2 +
+                                                 WK-ZAIKAISU
+                                    END-IF
+                                  END-IF
                                   IF    BUN-IDX        =   1
                                     COMPUTE  RECE02-TENSU(5 BUN-IDX) =
                                              RECE02-TENSU(5 BUN-IDX) +
@@ -3624,6 +3676,26 @@
                                   END-IF
                                   ADD   WK-ZAIKAISU  TO
                                                       RECE02-KAISU(6)
+                                  IF   RECE02-SRYYM  >= "200604"
+                                    IF SRY-SRYCD(IDX3) = "112015170" OR
+                                                         "112015270" OR
+                                                         "112015370" OR
+                                                         "112015470" OR
+                                                         "112014470" OR
+                                                         "112014570" OR
+                                                         "112014670" OR
+                                                         "112014770" OR
+                                                         "112014870" OR
+                                                         "112014970" OR
+                                                         "112015070" OR
+                                                         "112014170" OR
+                                                         "112014270" OR
+                                                         "112014370"
+                                        COMPUTE  CNT-NYUYOJI2 =
+                                                 CNT-NYUYOJI2 +
+                                                 WK-ZAIKAISU
+                                    END-IF
+                                  END-IF
                                   IF    BUN-IDX        =   1
                                     COMPUTE  RECE02-TENSU(6 BUN-IDX) =
                                              RECE02-TENSU(6 BUN-IDX) +
@@ -5310,20 +5382,32 @@
       *****************************************************************
        2110-NYUYOJI-COMENTFLG-SET-SEC               SECTION.
       *
-           IF     RECE02-NYUYOJIFLG      =  SPACE
-             IF     CNT-NYUYOJI      NOT =  ZERO
-               IF   RECE02-KAISU(2)  NOT =  CNT-NYUYOJI
-                   MOVE     "1"        TO   RECE02-NYUYOJIFLG
-                   MOVE   ZERO         TO   RECE02-KHNTEN(2)
+           IF   RECE02-SRYYM  >= "200604"
+             IF    (CNT-NYUYOJI      NOT =  ZERO       )
+             AND   (RECE02-KAISU(2)  NOT =  CNT-NYUYOJI)
+                     MOVE   ZERO         TO   RECE02-KHNTEN(2)
+             END-IF
+             IF     RECE02-NYUYOJIFLG      =  SPACE
+               IF    (CNT-NYUYOJI2     NOT =  ZERO        )
+               AND   (RECE02-KAISU(2)  NOT =  CNT-NYUYOJI2)
+                     MOVE     "1"        TO   RECE02-NYUYOJIFLG
                END-IF
              END-IF
-           END-IF
-      *
-           IF     RECE02-NYUYOJIFLG      =  SPACE
-             IF     CNT-YOJI         NOT =  ZERO
-               IF   RECE02-KAISU(2)  NOT =  CNT-YOJI
-                   MOVE     "2"        TO   RECE02-NYUYOJIFLG
-                   MOVE   ZERO         TO   RECE02-KHNTEN(2)
+           ELSE
+             IF     RECE02-NYUYOJIFLG      =  SPACE
+               IF     CNT-NYUYOJI      NOT =  ZERO
+                 IF   RECE02-KAISU(2)  NOT =  CNT-NYUYOJI
+                     MOVE     "1"        TO   RECE02-NYUYOJIFLG
+                     MOVE   ZERO         TO   RECE02-KHNTEN(2)
+                 END-IF
+               END-IF
+             END-IF
+             IF     RECE02-NYUYOJIFLG      =  SPACE
+               IF     CNT-YOJI         NOT =  ZERO
+                 IF   RECE02-KAISU(2)  NOT =  CNT-YOJI
+                     MOVE     "2"        TO   RECE02-NYUYOJIFLG
+                     MOVE   ZERO         TO   RECE02-KHNTEN(2)
+                 END-IF
                END-IF
              END-IF
            END-IF
