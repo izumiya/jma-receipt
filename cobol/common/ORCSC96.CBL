@@ -399,6 +399,10 @@
                    MOVE
                    "在宅末期医療総合診察料を算定時、算定できません"
                                        TO  SPA-ERRMSG
+               WHEN    "1402"
+                   MOVE
+                   "在宅時医学総合管理料を算定時、算定できません"
+                                       TO  SPA-ERRMSG
                WHEN    "0070"
                    MOVE    "同時併施分です。入力できません"
                                        TO  SPA-ERRMSG
@@ -1075,6 +1079,13 @@
                    STRING  "警告！呼吸器リハビリテーション"
                                                DELIMITED  BY  SIZE
                            "発症日から９０日以上です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8028"
+                   STRING  "救急医療管理加算は入院日から７日間のみ"
+                                               DELIMITED  BY  SIZE
+                           "算定可能です。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING

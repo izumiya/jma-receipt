@@ -1361,7 +1361,7 @@
                  AND  (SPA-SRYYMD          <   WRK-NYUINYMD-7 )
                    CONTINUE
                ELSE
-                   MOVE    "8022"          TO  WRK-ERRCD
+                   MOVE    "8028"          TO  WRK-ERRCD
                    MOVE    "1"             TO  WRK-COM-CUR
                                                          (IDX-Z)
                    GO      TO      10013-RSI-SINSATU-CHK-EXT
