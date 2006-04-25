@@ -1162,7 +1162,8 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF      FLG-YAKUZAI         =   ZERO
+           IF     (FLG-YAKUZAI         =   ZERO )
+             AND  (LNK-WKSRY-SRYKBN (1)    =   "14" )
                CONTINUE
            ELSE
            IF     (IDX-KOUI        >   ZERO ) AND
@@ -1286,8 +1287,9 @@
                    END-IF
                    MOVE    IDY                 TO  IDX-W
                END-IF
-               IF       SRY-SRYCD (IDX)(1:1)   =   "6"
-                                               OR  "7"
+               IF      (SRY-SRYCD (IDX)(1:1)   =   "6"
+                                               OR  "7"  )
+                   OR  (SRY-SRYCD (IDX)(1:3)   =   "059")
                    MOVE    1                   TO  FLG-YAKUZAI
                END-IF
            END-PERFORM
