@@ -4489,7 +4489,7 @@
       *                      ½èÊý¤Î¤ß¤Ï£Ï£Ë
       *                      IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
       *                                            NOT =   "3" 
-      *                        MOVE    "0068"          TO  SPA-ERRCD
+      *                        MOVE    "1402"          TO  SPA-ERRCD
       *                        MOVE    "1"             TO  SPA-COM-CUR
       *                                                         (IDX)
       *                      END-IF
@@ -4499,7 +4499,7 @@
       *                    ½èÊý¤Î¤ß¤Ï£Ï£Ë
                            IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
                                                    NOT =   "3" 
-                               MOVE    "0068"          TO  SPA-ERRCD
+                               MOVE    "1402"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                              (IDX)
                            END-IF
