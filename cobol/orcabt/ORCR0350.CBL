@@ -96,6 +96,9 @@
       *  02.09.01    NACL-Æ£¸¶    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¿©»ö¤Î¿ôÎÌ¤Îµ­ºÜ
       *  02.09.02    NACL-Æ£¸¶    06/04/20  ¸¡ººÅù¼Â»ÜÈ½ÃÇ¥°¥ë¡¼¥×¤ÎÄÉ²Ã
+      *                                     ºÆ¿Ç¤Î¤È¤­¤Î»þ´Ö³°¤ÎÄÉ²Ã
+      *  02.09.03    NACL-Æ£¸¶    06/04/25  ¼ç²Ê¤Î¤È¤­¤Î¾É¾õ¾Üµ­¥Ç¡¼¥¿¤Î
+      *                                     ¥­¡¼¤ÎÀßÄê¤ò½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -819,17 +822,33 @@
                05  FILLER             PIC X(09)    VALUE   "112014570".
       *        ¿¼Ìë¡Ê³°Íè¿ÇÎÅ²Ê¡Ë
                05  FILLER             PIC X(09)    VALUE   "112014670".
+      *        ºÆ¿Ç¡ÊÆýÍÄ»ù»þ´Ö³°¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112014770".
+      *        ºÆ¿Ç¡ÊÆýÍÄ»ùµÙÆü¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112014870".
+      *        ºÆ¿Ç¡ÊÆýÍÄ»ù¿¼Ìë¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112014970".
+      *        ºÆ¿Ç¡ÊÆýÍÄ»ù»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112015070".
+      *        ³°Íè¿ÇÎÅ²Ê¡ÊÆýÍÄ»ù»þ´Ö³°¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112015170".
+      *        ³°Íè¿ÇÎÅ²Ê¡ÊÆýÍÄ»ùµÙÆü¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112015270".
+      *        ³°Íè¿ÇÎÅ²Ê¡ÊÆýÍÄ»ù¿¼Ìë¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112015370".
+      *        ³°Íè¿ÇÎÅ²Ê¡ÊÆýÍÄ»ù»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã»»
+               05  FILLER             PIC X(09)    VALUE   "112015470".
       *
            03  WRK-CONS-JIKANGAI-TABLE-R  REDEFINES   
                                       WRK-CONS-JIKANGAI-TABLE.
-               05  WRK-CONS-JIKANGAI-SRYCD-G       OCCURS  22.
+               05  WRK-CONS-JIKANGAI-SRYCD-G       OCCURS  30.
                    07  WRK-CONS-JIKANGAI-SRYCD
                                       PIC X(09).
            03  WRK-CONS-JIKANGAI-TEN-TABLE.
-               05  WRK-CONS-JIKANGAI-TEN-G         OCCURS  22.
+               05  WRK-CONS-JIKANGAI-TEN-G         OCCURS  30.
                    07  WRK-CONS-JIKANGAI-TEN
                                       PIC 9(09).
-           03  WRK-CONS-JIKANGAI-MAX  PIC 9(02)    VALUE   22.    
+           03  WRK-CONS-JIKANGAI-MAX  PIC 9(02)    VALUE   30.    
       *
       *    ±ÕÂÎ»ÀÁÇ¡¦²ÄÈÂ¼°±ÕÂÎ»ÀÁÇÍÆ´ï¡Ê£Ì£Ç£Ã¡Ë
            03  WRK-CONS-SANSO1        PIC X(09)   VALUE   "739210000".
@@ -4186,10 +4205,15 @@
                MOVE    RECE62-SRYYM        TO  RECEDEN-SRYYM
                MOVE    RECE62-NYUGAIKBN    TO  RECEDEN-NYUGAIKBN
                MOVE    RECE62-PTID         TO  RECEDEN-PTID
-               IF      RECE62-RECEKA       =   SPACE
-                   MOVE    ZERO            TO  RECEDEN-RECEKA
+               IF    ( SYS-2009-SYUKA-KBN  =   "1"                )
+               AND   ( RECE62-TEISYUTUSAKI =   "1"                )
+                   MOVE    RECE62-SYUKA        TO  RECEDEN-RECEKA
                ELSE
-                   MOVE    RECE62-RECEKA   TO  RECEDEN-RECEKA
+                   IF      RECE62-RECEKA       =   SPACE
+                       MOVE    ZERO            TO  RECEDEN-RECEKA
+                   ELSE
+                       MOVE    RECE62-RECEKA   TO  RECEDEN-RECEKA
+                   END-IF
                END-IF
                MOVE    RECE62-TEISYUTUSAKI TO
                                                RECEDEN-TEISYUTUSAKI
@@ -4376,10 +4400,15 @@
            MOVE    RECE62-SRYYM        TO  RECEDEN-SRYYM
            MOVE    RECE62-NYUGAIKBN    TO  RECEDEN-NYUGAIKBN
            MOVE    RECE62-PTID         TO  RECEDEN-PTID
-           IF      RECE62-RECEKA       =   SPACE
-               MOVE    ZERO            TO  RECEDEN-RECEKA
+           IF    ( SYS-2009-SYUKA-KBN  =   "1"                )
+           AND   ( RECE62-TEISYUTUSAKI =   "1"                )
+               MOVE    RECE62-SYUKA        TO  RECEDEN-RECEKA
            ELSE
-              MOVE    RECE62-RECEKA   TO  RECEDEN-RECEKA
+               IF      RECE62-RECEKA       =   SPACE
+                   MOVE    ZERO            TO  RECEDEN-RECEKA
+               ELSE
+                   MOVE    RECE62-RECEKA   TO  RECEDEN-RECEKA
+               END-IF
            END-IF
            MOVE    RECE62-TEISYUTUSAKI TO
                                                RECEDEN-TEISYUTUSAKI
@@ -4527,10 +4556,16 @@
                        MOVE    RECE62-SRYYM        TO  RECEDEN-SRYYM
                        MOVE    RECE62-NYUGAIKBN    TO  RECEDEN-NYUGAIKBN
                        MOVE    RECE62-PTID         TO  RECEDEN-PTID
-                       IF      RECE62-RECEKA       =   SPACE
-                           MOVE    ZERO            TO  RECEDEN-RECEKA
+                       IF    ( SYS-2009-SYUKA-KBN  =   "1" )
+                       AND   ( RECE62-TEISYUTUSAKI =   "1" )
+                           MOVE    RECE62-SYUKA    TO  RECEDEN-RECEKA
                        ELSE
-                           MOVE    RECE62-RECEKA   TO  RECEDEN-RECEKA
+                           IF      RECE62-RECEKA   =   SPACE
+                               MOVE    ZERO        TO  RECEDEN-RECEKA
+                           ELSE
+                               MOVE    RECE62-RECEKA
+                                                   TO  RECEDEN-RECEKA
+                           END-IF
                        END-IF
                        MOVE    RECE62-TEISYUTUSAKI TO
                                                    RECEDEN-TEISYUTUSAKI

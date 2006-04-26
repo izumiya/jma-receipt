@@ -104,6 +104,7 @@
       *  02.09.01    NACL-藤原    06/04/14  「１３指導」「日」の差し込み
       *                                     HCM10.red    HCN07.red
       *                                     HCRCP402.red HCRCP403.red
+      *  02.09.02    NACL-藤原    06/04/26  福岡国保レセの通し番号の編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -817,6 +818,14 @@
                        MOVE    RECE08-PRTDATA      TO  HCN07
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCN07-RENNUM
                        MOVE    HCN07               TO  RECE08-PRTDATA
+                   WHEN    "HCRCP402.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCRCP402
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCRCP402-RENNUM
+                       MOVE    HCRCP402            TO  RECE08-PRTDATA
+                   WHEN    "HCRCP403.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCRCP403
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCRCP403-RENNUM
+                       MOVE    HCRCP403            TO  RECE08-PRTDATA
                END-EVALUATE
            END-IF            
       *             

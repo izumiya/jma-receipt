@@ -174,7 +174,11 @@
       *  02.08.01    NACL-藤原    06/02/20  主科対応
       *
       *  ２００６年４月改正対応
-      *  02.09.01    NACL-藤原    06/04/20  検査等実施判断グループの追加
+      *  02.09.01    NACL-藤原    06/04/20  外来迅速検体検査加算対応
+      *                                     検査等実施判断グループの追加
+      *                                     再診のときの時間外の追加
+      *  02.09.02    NACL-藤原    06/04/25  主科のときの症状詳記データの
+      *                                     キーの設定を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -369,6 +373,11 @@
            03  IDXZ                    PIC 9(03).
            03  IDW1                    PIC 9(03).
            03  IDW2                    PIC 9(03).
+           03  IDZ1                    PIC 9(03).
+           03  IDZ2                    PIC 9(03).
+           03  IDZ3                    PIC 9(03).
+           03  IDZ4                    PIC 9(03).
+           03  IDZ5                    PIC 9(03).
       *
            03  SYSKAN-IDX              PIC 9(03).
            03  IDX0                    PIC 9(03).
@@ -445,6 +454,7 @@
       *
            03  WRK-RECE041-SRYKBN      PIC X(02).
            03  WRK-COM-FTNKBN          PIC X(01).
+           03  WRK-TAIHI-FTNKBN        PIC X(01).
       *
            03  WRK-CHUKSNCD            PIC X(04).
       *
@@ -775,6 +785,11 @@
        01  WRK-RECE05-REC.
            COPY    "CPRCF005.INC"  REPLACING  //RECE05//
                                    BY         //WRK-RECE05//.
+      *
+       01  WRK-TAIHI-RECE041-REC.
+           COPY    "CPRCF0041.INC"  REPLACING //RECE041//
+                                   BY         //WRK-TAIHI-RECE041//.
+      *
       *    画像診断用退避エリア
        01  WRK-721-RECE05-REC.
            COPY    "CPRCF005.INC"  REPLACING  //RECE05//
@@ -796,8 +811,167 @@
        01  WRK-TEIGEN-RECE05-REC.
            COPY    "CPRCF005.INC"  REPLACING  //RECE05//
                                    BY         //WRK-TEIGEN-RECE05//.
-      *  
+      *
+      *    外来迅速検体検査加算用退避エリア
+       01  TBL-KASAN-RECE04-AREA.
+         02  TBL-KASAN-RECE04-REC  OCCURS  5.
+      *
+           COPY    "CPRCF0041.INC"  REPLACING  //RECE041//
+                                   BY          //TBL-KASAN-RECE04//.
+      *
+         02  TBL-KASAN-RECE05-REC  OCCURS  5.
+           03  TBL-KASAN-RECE05-REC.   
+               05  TBL-KASAN-RECE05-SRYACTINF.
+      *診療コード
+                   07  TBL-KASAN-RECE05-SRYCD           PIC  X(09).
+      *診療種別区分
+                   07  TBL-KASAN-RECE05-SRYSYUKBN-X     PIC  X(03).
+      *数量
+                   07  TBL-KASAN-RECE05-SRYSURYO        PIC 9(05)V9(03).
+      *回数
+                   07  TBL-KASAN-RECE05-SRYKAISU        PIC  9(03).
+      *単位コード
+                   07  TBL-KASAN-RECE05-TANICD          PIC  9(03).
+      *単位名称有効桁数
+                   07  TBL-KASAN-RECE05-TANIMOJISU      PIC  9(01).
+      *単位名称
+                   07  TBL-KASAN-RECE05-TANINAME        PIC  X(24).
+      *点数識別区分
+                   07  TBL-KASAN-RECE05-TENSIKIBETU     PIC  9(01).
+      *点数
+                   07  TBL-KASAN-RECE05-TEN             PIC 9(09)V9(02).
+      *明細請求フラグ
+                   07  TBL-KASAN-RECE05-MEISKYFLG       PIC  X(01).
+      *自動算定区分
+                   07  TBL-KASAN-RECE05-AUTOKBN         PIC  X(01).
+      *名称入力番号
+                   07  TBL-KASAN-RECE05-INPUTNUM        PIC  9(03).
+      *点数欄集計先識別
+                   07  TBL-KASAN-RECE05-TENTTLKBN       PIC  9(03).
+      *データ区分
+                   07  TBL-KASAN-RECE05-DATAKBN         PIC  9(01).
+      *包括対象検査
+                   07  TBL-KASAN-RECE05-HOUKNSKBN       PIC  9(02).
+      *検査等実施判断
+                   07  TBL-KASAN-RECE05-KNSJISKBN       PIC  9(01).
+      *検査等実施判断グループ
+                   07  TBL-KASAN-RECE05-KNSJISGRPKBN    PIC  9(02).
+      *各種番号等
+                   07  TBL-KASAN-RECE05-CDKBNINF.
+                       09  RECE05-CDKBN-KBN        PIC  X(01).
+                       09  RECE05-CDKBN-SYO        PIC  9(01).
+                       09  RECE05-CDKBN-BU         PIC  9(02).
+                       09  RECE05-CDKBN-KBNNUM     PIC  9(03).
+                       09  RECE05-CDKBN-KBNNUM-EDA PIC  9(02).
+                       09  RECE05-CDKBN-KOUBAN     PIC  9(02).
+                       09  RECE05-KOUHYOJYUNNUM    PIC  9(09).
+      *告示等識別区分１
+                   07  TBL-KASAN-RECE05-KOKUJISKBKBN1   PIC  9(01).
+      *きざみ値計算識別
+                   07  TBL-KASAN-RECE05-KZMCOMPSIKIBETU PIC  9(01).
+      *注加算コード
+                   07  TBL-KASAN-RECE05-CHUKSNINF.
+      *コード
+                       09  RECE05-CHUKSNCD     PIC  X(04).
+      *通番
+                       09  RECE05-CHUKSNTUBAN  PIC  X(01).
+      *検体検査コメント
+                   07  TBL-KASAN-RECE05-KENTAICOMMENT    PIC  9(01).
+      *入力コメント
+                   07  TBL-KASAN-RECE05-INPUTCOMENT      PIC  X(80).
+      *名称情報
+               05  TBL-KASAN-RECE05-NAMEINF.
+      *漢字有効桁数
+                   07  TBL-KASAN-RECE05-YUKOKETA         PIC  9(02).
+      *漢字名称
+                   07  TBL-KASAN-RECE05-NAME             PIC  X(200).
+      *
+         02  TBL-KASAN-RECE04-MAX  PIC 9(03).
+      *
+      *    検体検査用退避エリア
+       01  TBL-KENTAI-RECE04-AREA.
+         02  TBL-KENTAI-RECE04-REC  OCCURS  100.
+      *
+           COPY    "CPRCF0041.INC"  REPLACING  //RECE041//
+                                    BY          //TBL-KENTAI-RECE04//.
+      *
+           03  TBL-KENTAI-RECE05-REC        OCCURS  50.
+               05  TBL-KENTAI-RECE05-SRYACTINF.
+      *            診療コード
+                   07  TBL-KENTAI-RECE05-SRYCD           PIC  X(09).
+      *            診療種別区分
+                   07  TBL-KENTAI-RECE05-SRYSYUKBN       PIC  X(03).
+      *            数量
+                   07  TBL-KENTAI-RECE05-SRYSURYO      PIC  9(05)V9(03).
+      *            回数
+                   07  TBL-KENTAI-RECE05-SRYKAISU        PIC  9(03).
+      *            単位コード
+                   07  TBL-KENTAI-RECE05-TANICD          PIC  9(03).
+      *            単位名称有効桁数
+                   07  TBL-KENTAI-RECE05-TANIMOJISU      PIC  9(01).
+      *            単位名称
+                   07  TBL-KENTAI-RECE05-TANINAME        PIC  X(24).
+      *            点数識別区分
+                   07  TBL-KENTAI-RECE05-TENSIKIBETU     PIC  9(01).
+      *            点数
+                   07  TBL-KENTAI-RECE05-TEN            PIC 9(09)V9(02).
+      *            明細請求フラグ
+                   07  TBL-KENTAI-RECE05-MEISKYFLG       PIC  X(01).
+      *            自動算定区分
+                   07  TBL-KENTAI-RECE05-AUTOKBN         PIC  X(01).
+      *            名称入力番号
+                   07  TBL-KENTAI-RECE05-INPUTNUM        PIC  9(03).
+      *            点数欄集計先識別
+                   07  TBL-KENTAI-RECE05-TENTTLKBN       PIC  9(03).
+      *            データ区分
+                   07  TBL-KENTAI-RECE05-DATAKBN         PIC  9(01).
+      *            包括対象検査
+                   07  TBL-KENTAI-RECE05-HOUKNSKBN       PIC  9(02).
+      *            検査等実施判断
+                   07  TBL-KENTAI-RECE05-KNSJISKBN       PIC  9(01).
+      *            検査等実施判断グループ
+                   07  TBL-KENTAI-RECE05-KNSJISGRPKBN    PIC  9(02).
+      *            各種番号等
+                   07  TBL-KENTAI-RECE05-CDKBNINF.
+                       09  TBL-KENTAI-RECE05-CDKBN-KBN   PIC  X(01).
+                       09  TBL-KENTAI-RECE05-CDKBN-SYO   PIC  9(01).
+                       09  TBL-KENTAI-RECE05-CDKBN-BU    PIC  9(02).
+                       09  TBL-KENTAI-RECE05-CDKBN-KBNNUM     PIC 9(03).
+                       09  TBL-KENTAI-RECE05-CDKBN-KBNNUM-EDA PIC 9(02).
+                       09  TBL-KENTAI-RECE05-CDKBN-KOUBAN     PIC 9(02).
+                       09  TBL-KENTAI-RECE05-KOUHYOJYUNNUM    PIC 9(09).
+      *            告示等識別区分１
+                   07  TBL-KENTAI-RECE05-KOKUJISKBKBN1   PIC  9(01).
+      *            きざみ値計算識別
+                   07  TBL-KENTAI-RECE05-KZMCOMPSIKIBETU PIC  9(01).
+      *            注加算コード
+                   07  TBL-KENTAI-RECE05-CHUKSNINF.
+      *                コード
+                       09  TBL-KENTAI-RECE05-CHUKSNCD    PIC  X(04).
+      *                通番
+                       09  TBL-KENTAI-RECE05-CHUKSNTUBAN PIC  X(01).
+      *            検体検査コメント
+                   07  TBL-KENTAI-RECE05-KENTAICOMMENT   PIC  9(01).
+      *            入力コメント
+                   07  TBL-KENTAI-RECE05-INPUTCOMENT     PIC  X(80). 
+      *        名称情報
+               05  TBL-KENTAI-RECE05-NAMEINF.
+      *            漢字有効桁数
+                   07  TBL-KENTAI-RECE05-YUKOKETA        PIC  9(02).
+      *            漢字名称
+                   07  TBL-KENTAI-RECE05-NAME            PIC  X(200).
+      *
+           03  TBL-KENTAI-SRYCD-MAX
+                                   PIC 9(02).
+      *
+         02  TBL-KENTAI-RECE04-MAX PIC 9(03).
+         02  TBL-KENTAI-RECE05-MAX PIC 9(03).
+      *
        01  WRK-CONS-AREA.
+      *    外来迅速検体検査加算
+           03  WRK-CONS-SRYCD          PIC X(09)   VALUE   "160177770".
+      *    検査日　日
+           03  WRK-CONS-COMMENT        PIC X(09)   VALUE   "840000099".
       *    コンマ
            03  WRK-KUGIRI             PIC X(01)   VALUE   ",".
       *    改行コード
@@ -867,17 +1041,33 @@
                05  FILLER             PIC X(09)    VALUE   "112014570".
       *        深夜（外来診療科）
                05  FILLER             PIC X(09)    VALUE   "112014670".
+      *        再診（乳幼児時間外）加算
+               05  FILLER             PIC X(09)    VALUE   "112014770".
+      *        再診（乳幼児休日）加算
+               05  FILLER             PIC X(09)    VALUE   "112014870".
+      *        再診（乳幼児深夜）加算
+               05  FILLER             PIC X(09)    VALUE   "112014970".
+      *        再診（乳幼児時間外特例医療機関）加算
+               05  FILLER             PIC X(09)    VALUE   "112015070".
+      *        外来診療科（乳幼児時間外）加算
+               05  FILLER             PIC X(09)    VALUE   "112015170".
+      *        外来診療科（乳幼児休日）加算
+               05  FILLER             PIC X(09)    VALUE   "112015270".
+      *        外来診療科（乳幼児深夜）加算
+               05  FILLER             PIC X(09)    VALUE   "112015370".
+      *        外来診療科（乳幼児時間外特例医療機関）加算
+               05  FILLER             PIC X(09)    VALUE   "112015470".
       *
            03  WRK-CONS-JIKANGAI-TABLE-R  REDEFINES   
                                       WRK-CONS-JIKANGAI-TABLE.
-               05  WRK-CONS-JIKANGAI-SRYCD-G       OCCURS  22.
+               05  WRK-CONS-JIKANGAI-SRYCD-G       OCCURS  30.
                    07  WRK-CONS-JIKANGAI-SRYCD
                                       PIC X(09).
            03  WRK-CONS-JIKANGAI-TEN-TABLE.
-               05  WRK-CONS-JIKANGAI-TEN-G         OCCURS  22.
+               05  WRK-CONS-JIKANGAI-TEN-G         OCCURS  30.
                    07  WRK-CONS-JIKANGAI-TEN
                                       PIC 9(09).
-           03  WRK-CONS-JIKANGAI-MAX  PIC 9(02)    VALUE   22.    
+           03  WRK-CONS-JIKANGAI-MAX  PIC 9(02)    VALUE   30.    
       *
       *    液体酸素・可搬式液体酸素容器（ＬＧＣ）
            03  WRK-CONS-SANSO1        PIC X(09)   VALUE   "739210000".
@@ -1247,9 +1437,11 @@
                MOVE    SPACE              TO  WRK-COM-SRYKBN
                                               WRK-COM-FTNKBN
       *
-               INITIALIZE                     WRK-RECE041-SRYKBN
-                                              TBL-KOUI-SRYKBN12-AREA
-      *
+               INITIALIZE                 WRK-RECE041-SRYKBN
+                                          TBL-KOUI-SRYKBN12-AREA
+               INITIALIZE                 TBL-KASAN-RECE04-AREA
+                                          TBL-KENTAI-RECE04-AREA
+      *  
       *        患者保険組み合わせ取得処理
                PERFORM     2001-HKNCOMBI-GET-SEC
       *
@@ -2215,6 +2407,24 @@
                    PERFORM 2008-COMMENT-HEN-01-SEC
                END-IF
       *
+      *        外来迅速検体検査加算がある場合の検査の編集
+               IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
+               AND   ( RECE041-SRYKBN      >   "60"     )
+               AND   ( TBL-KASAN-RECE04-MAX
+                                           >   0        )
+                   MOVE    RECE041-REC         TO  WRK-TAIHI-RECE041-REC
+                   MOVE    WRK-FTNKBN          TO  WRK-TAIHI-FTNKBN
+      *
+                   PERFORM 20078-KENSA-HENSYU-SEC
+      *
+                   MOVE    WRK-TAIHI-RECE041-REC
+                                               TO  RECE041-REC
+                   MOVE    WRK-TAIHI-FTNKBN    TO  WRK-FTNKBN
+      *
+                   INITIALIZE                  TBL-KASAN-RECE04-AREA
+                                               TBL-KENTAI-RECE04-AREA
+               END-IF
+      *
       *        明細テーブル退避処理
                PERFORM 20071-ZAI-TAIHI-SEC
       *
@@ -2231,6 +2441,16 @@
                    PERFORM 990-RECE041-NEXT-SEC
                END-IF     
            END-PERFORM
+      *
+      *    外来迅速検体検査加算がある場合の検査の編集
+           IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
+           AND   ( TBL-KASAN-RECE04-MAX
+                                       >   0        )
+               PERFORM 20078-KENSA-HENSYU-SEC
+      *
+               INITIALIZE                  TBL-KASAN-RECE04-AREA
+                                           TBL-KENTAI-RECE04-AREA
+           END-IF
       *
            .
        2007-HENSYU-EXT.
@@ -2431,6 +2651,21 @@
       *                                     
            MOVE    RECE041-SRYKBN      TO  WRK-SRYKBN
       *
+      *    外来迅速検体検査加算がある場合の検査退避
+           IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
+           AND   ( RECE041-KNSJISGRPKBN    >   ZERO )
+               IF      RECE041-KNSJISGRPKBN    =   99
+                   ADD     1               TO  TBL-KASAN-RECE04-MAX
+                   MOVE    RECE041-REC     TO  TBL-KASAN-RECE04-REC
+                                               (TBL-KASAN-RECE04-MAX)
+               ELSE
+                   ADD     1               TO  TBL-KENTAI-RECE04-MAX
+                   MOVE    RECE041-REC     TO  TBL-KENTAI-RECE04-REC
+                                               (TBL-KENTAI-RECE04-MAX)
+               END-IF
+           END-IF
+           MOVE    ZERO                 TO  TBL-KENTAI-RECE05-MAX
+      *
            INITIALIZE                      RECE05-REC
            MOVE    RECE041-HOSPID       TO  RECE05-HOSPID
            MOVE    RECE041-SRYYM        TO  RECE05-SRYYM
@@ -2489,7 +2724,16 @@
                                PERFORM 200711-COMMENT-TAIHI-SEC
                            END-IF
                        WHEN    "1"
-                           PERFORM 200711-KOUI-TAIHI-SEC
+                           IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
+                           AND   ( RECE041-KNSJISGRPKBN    >   ZERO )
+                           AND  (( RECE05-KNSJISKBN (IDX)  =   1    ) OR
+                                 ( RECE05-SRYCD (IDX)      =
+                                                       WRK-CONS-SRYCD )) 
+      *                        外来迅速検体検査加算がある場合の検査退避
+                               PERFORM 20012-KENSA-TAIHI-SEC
+                           ELSE
+                               PERFORM 200711-KOUI-TAIHI-SEC
+                           END-IF
                        WHEN    "6"
                            PERFORM 200711-YKZ-TAIHI-SEC
                        WHEN    "7"
@@ -2765,7 +3009,7 @@
       *****************************************************************
       *    摘要データ（診療行為）退避編集処理
       *****************************************************************
-          2007111-KOUI-TAIHI-HENSYU-SEC SECTION.
+       2007111-KOUI-TAIHI-HENSYU-SEC SECTION.
       *
            IF      WRK-TBLMAX1         >=  100
                MOVE    "*** ORCR0300 KOUI TABLE OVER  ***"
@@ -2822,6 +3066,39 @@
            .
        200711-KOUI-TAIHI-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算がある場合の検査退避処理
+      *****************************************************************
+       20012-KENSA-TAIHI-SEC           SECTION.
+      *
+           IF      RECE041-KNSJISGRPKBN    =   99
+               IF      RECE05-SRYCD (IDX)      =   WRK-CONS-SRYCD
+                   MOVE    RECE05-SRYACTINF (IDX)
+                                       TO  TBL-KASAN-RECE05-SRYACTINF
+                                               (TBL-KASAN-RECE04-MAX)
+                   MOVE    RECE05-NAMEINF   (IDX)
+                                       TO  TBL-KASAN-RECE05-NAMEINF
+                                               (TBL-KASAN-RECE04-MAX)
+               END-IF
+           ELSE
+               ADD     1               TO  TBL-KENTAI-RECE05-MAX
+               MOVE    RECE05-SRYACTINF (IDX)
+                                       TO  TBL-KENTAI-RECE05-SRYACTINF
+                           (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+               MOVE    RECE05-NAMEINF (IDX)
+                                       TO  TBL-KENTAI-RECE05-NAMEINF
+                           (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+               IF      RECE05-SRYCD (IDX) (1:1)  =   "1"
+                   MOVE    TBL-KENTAI-RECE05-MAX 
+                                       TO  TBL-KENTAI-SRYCD-MAX
+                                                (TBL-KENTAI-RECE04-MAX)
+               END-IF
+           END-IF
+      *
+           .
+       20012-KENSA-TAIHI-EXT.
+           EXIT. 
       *
       *****************************************************************
       *    摘要データ（医薬品）退避処理
@@ -3690,6 +3967,228 @@
            EXIT.
       *
       *****************************************************************
+      *    外来迅速検体検査加算を算定している検査の編集処理
+      *****************************************************************
+       20078-KENSA-HENSYU-SEC      SECTION.
+      *
+      *    外来迅速検体検査加算を算定している検査
+           PERFORM VARYING IDZ1 FROM    1   BY  1
+                   UNTIL   IDZ1 >       31
+               PERFORM VARYING IDZ2    FROM    1   BY  1
+                       UNTIL   IDZ2    >       TBL-KASAN-RECE04-MAX
+                   IF      TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+                                           >   0
+      *               負担区分編集処理
+                       MOVE    TBL-KASAN-RECE04-REC (IDZ2)
+                                               TO  RECE041-REC
+                       PERFORM 20070-FTNKBN-HENSYU-SEC
+                       MOVE    "60"                TO  WRK-SRYKBN
+      *
+                       PERFORM VARYING IDZ3 FROM    1   BY  1
+                               UNTIL   IDZ3 >   TBL-KENTAI-RECE04-MAX
+                           IF    ( TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+                                                   =
+                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1))
+                           AND   ( TBL-KASAN-RECE04-HKNCOMBI (IDZ2)
+                                                   =
+                                     TBL-KENTAI-RECE04-HKNCOMBI (IDZ3) )
+                               MOVE    TBL-KENTAI-RECE04-REC (IDZ3)
+                                                   TO  RECE041-REC
+                               MOVE    TBL-KENTAI-RECE04-KAISU
+                                                       (IDZ3 1 IDZ1)
+                                               TO  RECE041-ZAIKAISU
+                               PERFORM VARYING IDZ4    FROM    1   BY  1
+                                       UNTIL   IDZ4    >       50
+                                       OR      TBL-KENTAI-RECE05-REC
+                                                           (IDZ3 IDZ4)
+                                                       =   SPACE
+                                   MOVE    TBL-KENTAI-SRYCD-MAX (IDZ3) 
+                                                           TO  IDZ5
+                                   INITIALIZE      WRK-RECE05-REC
+                                   MOVE    TBL-KENTAI-RECE05-SRYACTINF
+                                                           (IDZ3 IDZ4)
+                                           TO  WRK-RECE05-SRYACTINF (1)
+                                   MOVE    TBL-KENTAI-RECE05-NAMEINF
+                                                           (IDZ3 IDZ4)
+                                           TO  WRK-RECE05-NAMEINF   (1)
+                                   PERFORM 200781-KENSA-HENSYU-SEC
+                               END-PERFORM
+      *
+                               COMPUTE
+                                   TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+                                       =
+                                   TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+                                       -
+                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+                               COMPUTE
+                                   TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
+                                       =
+                                   TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
+                                       -
+                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+                           END-IF
+                       END-PERFORM
+      *
+      *                外来迅速検体検査加算
+                       MOVE    TBL-KASAN-RECE04-REC (IDZ2)
+                                               TO  RECE041-REC
+                       MOVE    TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+                                               TO  RECE041-ZAIKAISU
+                       MOVE    1               TO  IDZ4
+                       MOVE    1               TO  IDZ5
+                       INITIALIZE                  WRK-RECE05-REC
+                       MOVE    TBL-KASAN-RECE05-SRYACTINF (IDZ2)
+                                           TO  WRK-RECE05-SRYACTINF (1)
+                       MOVE    TBL-KASAN-RECE05-NAMEINF   (IDZ2)
+                                           TO  WRK-RECE05-NAMEINF   (1)
+                       PERFORM 200781-KENSA-HENSYU-SEC
+      *
+      *                検査日
+                       INITIALIZE                  WRK-RECE05-REC
+                       MOVE    WRK-CONS-COMMENT
+                                               TO  WRK-RECE05-SRYCD (1)
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    IDZ1            TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF      KANACHK-RC      =   ZERO
+                           MOVE    KANACHK-OUT-INPUT(3:4)
+                                               TO  WRK-RECE05-NAME (1)
+                       END-IF
+                       PERFORM 200781-KENSA-HENSYU-SEC
+      *
+                       MOVE    ZERO            TO
+                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+      *    外来迅速検体検査加算を算定していない検査
+           PERFORM VARYING IDZ3 FROM    1   BY  1
+                   UNTIL   IDZ3 >   TBL-KENTAI-RECE04-MAX
+               IF      TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
+                                           >   0
+      *            負担区分編集処理
+                   MOVE    TBL-KENTAI-RECE04-REC (IDZ3)
+                                               TO  RECE041-REC
+                   PERFORM 20070-FTNKBN-HENSYU-SEC
+                   MOVE    "60"                TO  WRK-SRYKBN
+                   PERFORM VARYING IDZ4    FROM    1   BY  1
+                           UNTIL   IDZ4    >       50
+                           OR      TBL-KENTAI-RECE05-REC  (IDZ3 IDZ4)
+                                                   =   SPACE
+                       MOVE    TBL-KENTAI-SRYCD-MAX (IDZ3) 
+                                           TO  IDZ5
+                       INITIALIZE      WRK-RECE05-REC
+                       MOVE    TBL-KENTAI-RECE05-SRYACTINF
+                                                           (IDZ3 IDZ4)
+                                           TO  WRK-RECE05-SRYACTINF (1)
+                       MOVE    TBL-KENTAI-RECE05-NAMEINF
+                                                           (IDZ3 IDZ4)
+                                           TO  WRK-RECE05-NAMEINF   (1)
+                       PERFORM 200781-KENSA-HENSYU-SEC
+                   END-PERFORM
+               END-IF
+           END-PERFORM
+           .
+       20078-KENSA-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算を算定している検査の編集処理
+      *****************************************************************
+       200781-KENSA-HENSYU-SEC      SECTION.
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           EVALUATE    WRK-RECE05-SRYCD (1) (1:1)
+               WHEN    "0"
+               WHEN    "8"
+                   MOVE    "CO,"               TO  WRK-REC
+                   MOVE    3                   TO  WRK-REC-LENGTH
+      *            診療識別
+                   IF      WRK-SRYKBN      NOT =   SPACE
+                       MOVE    WRK-SRYKBN          TO  WRK-DATA
+                       MOVE    2                   TO  WRK-NAGASA
+                       MOVE    SPACE               TO  WRK-SRYKBN
+                   END-IF    
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            負担区分
+                   MOVE    WRK-FTNKBN          TO  WRK-DATA
+                   MOVE    1                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            コメントコード
+                   MOVE    WRK-RECE05-SRYCD (1)
+                                               TO  WRK-DATA
+                   MOVE    9                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            文字データ
+                   MOVE    WRK-RECE05-NAME (1) TO  WRK-DATA
+                   MOVE    76                  TO  WRK-NAGASA
+                   MOVE    1                   TO  WRK-END 
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+               WHEN    OTHER     
+                   MOVE    "SI,"               TO  WRK-REC
+                   MOVE    3                   TO  WRK-REC-LENGTH
+      *            診療識別
+                   IF      WRK-SRYKBN      NOT =   SPACE
+                       MOVE    WRK-SRYKBN          TO  WRK-DATA
+                       MOVE    2                   TO  WRK-NAGASA
+                       MOVE    SPACE               TO  WRK-SRYKBN
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            負担区分
+                   MOVE    WRK-FTNKBN          TO  WRK-DATA
+                   MOVE    1                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            診療行為コード
+                   MOVE    WRK-RECE05-SRYCD (1)
+                                               TO  WRK-DATA
+                   MOVE    9                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            数量
+                   IF      WRK-RECE05-SRYSURYO (1)
+                                           >   ZERO
+                       IF    ( WRK-RECE05-SRYCD (1) (1:1)
+                                               =   "1"        )
+                       AND   ( WRK-RECE05-KZMCOMPSIKIBETU (1)
+                                           NOT =   "1"        )
+                           CONTINUE
+                       ELSE
+                           MOVE    WRK-RECE05-SRYSURYO (1)
+                                               TO  WRK-SURYO
+                           MOVE    WRK-SURYO   TO  WRK-NUM
+                           MOVE    8           TO  WRK-NAGASA
+                       END-IF
+                   END-IF
+                   PERFORM 5005-NUM-HENSYU-SEC  
+      *            点数
+                   IF    ( IDZ4            =   IDZ5 )
+                   AND   ( RECE041-SYUTEN1 >   ZERO )
+                       MOVE    RECE041-SYUTEN1     TO  WRK-TENSU
+                       MOVE    WRK-TENSU           TO  WRK-NUM
+                       MOVE    7                   TO  WRK-NAGASA
+                   END-IF    
+                   PERFORM 5005-NUM-HENSYU-SEC  
+      *            回数
+                   IF    ( IDZ4            =   IDZ5 )
+                   AND   ( RECE041-ZAIKAISU
+                                           >   ZERO )
+                       MOVE    RECE041-ZAIKAISU    TO  WRK-KAISU
+                       MOVE    WRK-KAISU           TO  WRK-NUM
+                       MOVE    3                   TO  WRK-NAGASA
+                   END-IF
+                   MOVE    1                   TO  WRK-END 
+                   PERFORM 5005-NUM-HENSYU-SEC
+           END-EVALUATE  
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+           .
+       200781-KENSA-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    再診のときの編集処理
       *****************************************************************
        20079-SRYKBN12-JIKANGAI-HENSYU-SEC   SECTION.
@@ -4005,10 +4504,15 @@
                MOVE    RECE02-SRYYM        TO  RECEDEN-SRYYM
                MOVE    RECE02-NYUGAIKBN    TO  RECEDEN-NYUGAIKBN
                MOVE    RECE02-PTID         TO  RECEDEN-PTID
-               IF      RECE02-RECEKA       =   SPACE
-                   MOVE    ZERO            TO  RECEDEN-RECEKA
+               IF    ( SYS-2009-SYUKA-KBN  =   "1"                )
+               AND   ( RECE02-TEISYUTUSAKI =   "1"                )
+                   MOVE    RECE02-SYUKA        TO  RECEDEN-RECEKA
                ELSE
-                   MOVE    RECE02-RECEKA   TO  RECEDEN-RECEKA
+                   IF      RECE02-RECEKA       =   SPACE
+                       MOVE    ZERO            TO  RECEDEN-RECEKA
+                   ELSE
+                       MOVE    RECE02-RECEKA   TO  RECEDEN-RECEKA
+                   END-IF
                END-IF
                MOVE    RECE02-TEISYUTUSAKI TO
                                                RECEDEN-TEISYUTUSAKI
@@ -4195,10 +4699,15 @@
            MOVE    RECE02-SRYYM        TO  RECEDEN-SRYYM
            MOVE    RECE02-NYUGAIKBN    TO  RECEDEN-NYUGAIKBN
            MOVE    RECE02-PTID         TO  RECEDEN-PTID
-           IF      RECE02-RECEKA       =   SPACE
-               MOVE    ZERO            TO  RECEDEN-RECEKA
+           IF    ( SYS-2009-SYUKA-KBN  =   "1"                )
+           AND   ( RECE02-TEISYUTUSAKI =   "1"                )
+               MOVE    RECE02-SYUKA        TO  RECEDEN-RECEKA
            ELSE
-              MOVE    RECE02-RECEKA   TO  RECEDEN-RECEKA
+               IF      RECE02-RECEKA       =   SPACE
+                   MOVE    ZERO            TO  RECEDEN-RECEKA
+               ELSE
+                   MOVE    RECE02-RECEKA   TO  RECEDEN-RECEKA
+               END-IF
            END-IF
            MOVE    RECE02-TEISYUTUSAKI TO
                                                RECEDEN-TEISYUTUSAKI
@@ -4346,10 +4855,16 @@
                        MOVE    RECE02-SRYYM        TO  RECEDEN-SRYYM
                        MOVE    RECE02-NYUGAIKBN    TO  RECEDEN-NYUGAIKBN
                        MOVE    RECE02-PTID         TO  RECEDEN-PTID
-                       IF      RECE02-RECEKA       =   SPACE
-                           MOVE    ZERO            TO  RECEDEN-RECEKA
+                       IF    ( SYS-2009-SYUKA-KBN  =   "1" )
+                       AND   ( RECE02-TEISYUTUSAKI =   "1" )
+                           MOVE    RECE02-SYUKA    TO  RECEDEN-RECEKA
                        ELSE
-                           MOVE    RECE02-RECEKA   TO  RECEDEN-RECEKA
+                           IF      RECE02-RECEKA   =   SPACE
+                               MOVE    ZERO        TO  RECEDEN-RECEKA
+                           ELSE
+                               MOVE    RECE02-RECEKA
+                                                   TO  RECEDEN-RECEKA
+                           END-IF
                        END-IF
                        MOVE    RECE02-TEISYUTUSAKI TO
                                                    RECEDEN-TEISYUTUSAKI
