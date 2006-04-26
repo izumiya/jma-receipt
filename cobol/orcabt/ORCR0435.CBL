@@ -34,6 +34,7 @@
       *  01.01.01    NACL-Æ£¸¶    04/10/13  Ãæ»ß½èÍý¤ÎÄÉ²Ã
       *  01.01.02    NACL-ÌçÏÆ    05/07/15  ¼«ÇåÀÕ½¾ÍèÍÍ¼°ÂÐ±þ
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  02.09.02    NACL-ÌçÏÆ    06/04/26  µßµÞ°åÎÅ´ÉÍý²Ã»»¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -171,6 +172,7 @@
            03  FLG-RECE45          PIC 9(01).
            03  FLG-WRKRECE45       PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-COMMENT         PIC 9(02).
       *    
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -447,7 +449,38 @@
                MOVE          SPACE       TO      RECE441-REC
                INITIALIZE                        RECE441-REC
       *
-               EVALUATE      RECE44-SRYKBN
+               IF   RECE41-HKNKBN    NOT  =  "4"
+                 EVALUATE      RECE44-SRYKBN
+                   WHEN      "11"
+                      MOVE   ZERO      TO  FLG-COMMENT
+                      IF   FLG-COMMENT  =  ZERO
+                         IF    RECE44-FLG-SYODOU-COMMENT   =    "1"
+                            MOVE  99   TO  FLG-COMMENT
+                            PERFORM    2001-SYODOU-COMMENT-SEC
+                         END-IF
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                         IF  (RECE41-KYUKYU-PRTKBN   =      1       )
+                         AND (RECE44-SRYCDTOTAL(6:9) =  CONS-KYUKYU1
+                                                     OR CONS-KYUKYU2)
+                             MOVE  99  TO  FLG-COMMENT
+                             PERFORM  2001-KYUKYU-COMMENT-SEC
+                         END-IF
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                          MOVE       RECE44-REC    TO   RECE441-REC
+                          WRITE      RECE441-REC
+                          ADD     1          TO      CNT-RECE44
+                          PERFORM    2002-RECE45-TENSOU-SEC
+                      END-IF
+                   WHEN   OTHER
+                      MOVE       RECE44-REC    TO   RECE441-REC
+                      WRITE      RECE441-REC
+                      ADD     1          TO      CNT-RECE44
+                      PERFORM    2002-RECE45-TENSOU-SEC
+                 END-EVALUATE
+               ELSE
+                 EVALUATE      RECE44-SRYKBN
                    WHEN      "11"
                       IF    RECE44-FLG-SYODOU-COMMENT   =    "1"
                           PERFORM    2001-SYODOU-COMMENT-SEC
@@ -473,7 +506,8 @@
                       WRITE      RECE441-REC
                       ADD     1          TO      CNT-RECE44
                       PERFORM    2002-RECE45-TENSOU-SEC
-               END-EVALUATE
+                 END-EVALUATE
+               END-IF
       *
                PERFORM 990-RECE44-NEXT-SEC
       *

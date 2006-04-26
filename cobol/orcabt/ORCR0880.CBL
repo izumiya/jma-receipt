@@ -33,6 +33,7 @@
       *  01.01.01    NACL-Æ£¸¶    04/10/13  Ãæ»ß½èÍý¤ÎÄÉ²Ã
       *  01.01.02    NACL-ÌçÏÆ    05/07/15  ¼«ÇåÀÕ½¾ÍèÍÍ¼°ÂÐ±þ
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  02.09.02    NACL-ÌçÏÆ    06/04/26  µßµÞ°åÎÅ´ÉÍý²Ã»»¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -170,6 +171,8 @@
            03  FLG-RECE85          PIC 9(01).
            03  FLG-WRKRECE85       PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-NYU-RENZOKU     PIC 9(01).
+           03  FLG-COMMENT         PIC 9(02).
       *    
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -215,6 +218,12 @@
            03  WRK-FREEINF2                  OCCURS 50.
                05  WK-FREE-YUKOKETA2         PIC  9(02).
                05  WK-FREE-NAME2             PIC  X(200).
+      *
+       01  TBL-NYU-DAY.
+           03  TBL-NYU-DAY-OCC               OCCURS  31.
+               05  TBL-NYU-DAY-ST            PIC 9(02).
+               05  TBL-NYU-DAY-ED            PIC 9(02).
+               05  TBL-NYU-DAY-FLG           PIC 9(01).
       *
       *    ÆüÉÕÁ´³ÑÊÑ´¹ÎÎ°è
        01  TBL-TUKI-AREA.
@@ -443,7 +452,41 @@
                OR     ( RECE82-HKNID     NOT =   RECE84-HKNID        )
                OR     ( RECE82-TEKSTYMD  NOT =   RECE84-TEKSTYMD     )
       *
-               EVALUATE      RECE84-SRYKBN
+               IF   RECE82-HKNKBN    NOT  =  "4"
+                 EVALUATE      RECE84-SRYKBN
+                   WHEN      "11"
+                      MOVE   ZERO      TO  FLG-COMMENT
+                      IF   FLG-COMMENT  =  ZERO
+                         IF    RECE84-FLG-SYODOU-COMMENT   =    "1"
+                            MOVE  99   TO  FLG-COMMENT
+                            PERFORM    2001-SYODOU-COMMENT-SEC
+                         END-IF
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                         IF  (RECE82-KYUKYU-PRTKBN    =      1       )
+                         AND (RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU)
+                             MOVE  99  TO  FLG-COMMENT
+                             IF   RECE82-SRYYM   >=  "200604"
+                               PERFORM  2001-KYUKYU-COMMENT200604-SEC
+                             ELSE
+                               PERFORM  2001-KYUKYU-COMMENT-SEC
+                             END-IF
+                         END-IF
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                          MOVE       RECE84-REC    TO   RECE841-REC
+                          WRITE      RECE841-REC
+                          ADD     1          TO      CNT-RECE84
+                          PERFORM    2002-RECE85-TENSOU-SEC
+                      END-IF
+                   WHEN   OTHER
+                      MOVE       RECE84-REC    TO   RECE841-REC
+                      WRITE      RECE841-REC
+                      ADD     1          TO      CNT-RECE84
+                      PERFORM    2002-RECE85-TENSOU-SEC
+                 END-EVALUATE
+               ELSE
+                 EVALUATE      RECE84-SRYKBN
                    WHEN      "11"
                       IF    RECE84-FLG-SYODOU-COMMENT   =    "1"
                           PERFORM    2001-SYODOU-COMMENT-SEC
@@ -456,7 +499,11 @@
                    WHEN      "80"
                       IF  ( RECE82-KYUKYU-PRTKBN    =      1         )
                       AND ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU  )
-                          PERFORM    2001-KYUKYU-COMMENT-SEC
+                          IF   RECE82-SRYYM   >=  "200604"
+                            PERFORM  2001-KYUKYU-COMMENT200604-SEC
+                          ELSE
+                            PERFORM  2001-KYUKYU-COMMENT-SEC
+                          END-IF
                       ELSE
                           MOVE       RECE84-REC    TO   RECE841-REC
                           WRITE      RECE841-REC
@@ -468,7 +515,8 @@
                       WRITE      RECE841-REC
                       ADD     1          TO      CNT-RECE84
                       PERFORM    2002-RECE85-TENSOU-SEC
-               END-EVALUATE
+                 END-EVALUATE
+               END-IF
       *
                PERFORM 990-RECE84-NEXT-SEC
       *
@@ -540,6 +588,119 @@
       *    
            .
        2001-KYUKYU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    µßµÞ°åÎÅ´ÉÍý²Ã»»¤Î¥³¥á¥ó¥ÈÊÔ½¸¡Ê£²£°£°£¶£°£´°Ê¹ß¡Ë
+      *****************************************************************
+       2001-KYUKYU-COMMENT200604-SEC          SECTION.
+      *
+           PERFORM     20011-NYU-DAY-SEC
+      *
+           INITIALIZE                      RECE85-REC
+           MOVE    RECE84-HOSPID       TO  RECE85-HOSPID
+           MOVE    RECE84-SRYYM        TO  RECE85-SRYYM
+           MOVE    RECE84-NYUGAIKBN    TO  RECE85-NYUGAIKBN
+           MOVE    RECE84-PTID         TO  RECE85-PTID
+           MOVE    RECE84-RECEKA       TO  RECE85-RECEKA
+           MOVE    RECE84-HKNID        TO  RECE85-HKNID
+           MOVE    RECE84-TEKSTYMD     TO  RECE85-TEKSTYMD
+           MOVE    RECE84-ZAINUM       TO  RECE85-ZAINUM
+           START   RECE85-FILE
+                 KEY IS    >=   RECE85-KEY
+                 INVALID
+                     MOVE    1         TO  FLG-RECE85
+                 NOT INVALID
+                     PERFORM 990-RECE85-NEXT-SEC
+                     MOVE  RECE85-REC  TO  WRK-RECE85-REC
+           END-START
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    ZERO                TO  IDX-RECE85
+           MOVE    SPACE               TO  WRK-RECE85XX-REC
+           INITIALIZE                      WRK-RECE85XX-REC
+      *
+           MOVE    RECE84-MEISAISU     TO  MAX-MEISAISU
+      *
+      *    »»ÄêÆü¥³¥á¥ó¥È¤ÎÁÞÆþ
+           PERFORM  VARYING      IDX    FROM  1   BY   1
+                    UNTIL       (IDX    >     31)      OR
+                                (TBL-NYU-DAY-ST(IDX)  =  ZERO)
+               COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               MOVE   "810000001"
+                             TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
+               MOVE    ZERO  TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
+               IF    TBL-NYU-DAY-FLG(IDX)  =  1
+                 MOVE    8   TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+                 MOVE    "»»Äê¡¡¡¡·î¡¡¡¡Æü"
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+                 MOVE    RECE82-SRYYM(5:2)    TO  DAY-IDX
+                 MOVE    TBL-TUKI(DAY-IDX)
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(5:4)
+                 MOVE    TBL-NYU-DAY-ST(IDX)  TO  DAY-IDX
+                 MOVE    TBL-DAY(DAY-IDX)
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(11:4)
+               ELSE
+                 MOVE    12  TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+                 MOVE    "»»Äê¡¡¡¡·î¡¡¡¡Æü¡Á¡¡¡¡Æü"
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+                 MOVE    RECE82-SRYYM(5:2)    TO  DAY-IDX
+                 MOVE    TBL-TUKI(DAY-IDX)
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(5:4)
+                 MOVE    TBL-NYU-DAY-ST(IDX)  TO  DAY-IDX
+                 MOVE    TBL-DAY(DAY-IDX)
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(11:4)
+                 MOVE    TBL-NYU-DAY-ED(IDX)  TO  DAY-IDX
+                 MOVE    TBL-DAY(DAY-IDX)
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(19:4)
+               END-IF
+               MOVE    "2"   TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
+           END-PERFORM
+      *
+           PERFORM    20011-SRYACTINF-HENSYU-SEC
+      *
+           .
+       2001-KYUKYU-COMMENT200604-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Æü³ÎÄê
+      *****************************************************************
+       20011-NYU-DAY-SEC          SECTION.
+      *
+           INITIALIZE                TBL-NYU-DAY
+      *
+           MOVE    ZERO          TO  DAY-IDX
+           MOVE    ZERO          TO  FLG-NYU-RENZOKU
+      *
+           PERFORM    VARYING    IDX  FROM   1   BY   1
+                      UNTIL     (IDX      >   31)  OR
+                                (DAY-IDX  >   31)
+                IF    RECE84-KAISU(1 IDX)   =  ZERO
+                      MOVE  ZERO  TO  FLG-NYU-RENZOKU
+                ELSE
+                      IF    FLG-NYU-RENZOKU  =  ZERO
+                         ADD   1     TO  DAY-IDX
+                         MOVE  IDX   TO  TBL-NYU-DAY-ST(DAY-IDX)
+                      END-IF
+                      MOVE  IDX      TO  TBL-NYU-DAY-ED(DAY-IDX)
+                      MOVE  1        TO  FLG-NYU-RENZOKU
+                END-IF
+           END-PERFORM
+      *
+           PERFORM    VARYING    DAY-IDX  FROM   1   BY   1
+                      UNTIL  (DAY-IDX                      >   31)  OR
+                             (TBL-NYU-DAY-ST(DAY-IDX)  = ZERO)
+                IF    TBL-NYU-DAY-ST(DAY-IDX)
+                                    =   TBL-NYU-DAY-ED(DAY-IDX)
+                      MOVE  1       TO  TBL-NYU-DAY-FLG(DAY-IDX)
+                ELSE
+                      MOVE  2       TO  TBL-NYU-DAY-FLG(DAY-IDX)
+                END-IF
+           END-PERFORM
+      *
+           .
+       20011-NYU-DAY-EXT.
            EXIT.
       *
       *****************************************************************
@@ -635,6 +796,17 @@
                 MOVE    "2"  TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
            END-PERFORM
       *
+           PERFORM    20011-SRYACTINF-HENSYU-SEC
+      *
+           .
+       2001-SYODOU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £°£µ¡¡£Ó£Ò£Ù£Á£Ã£Ô£É£Î£ÆÊÔ½¸½èÍý
+      *****************************************************************
+       20011-SRYACTINF-HENSYU-SEC     SECTION.
+      *
            PERFORM
              UNTIL  ( FLG-RECE85           =   1                   )
              OR     ( RECE84-HOSPID    NOT =   RECE85-HOSPID       )
@@ -703,7 +875,7 @@
            ADD     1                 TO      CNT-RECE84
       *
            .
-       2001-SYODOU-COMMENT-EXT.
+       20011-SRYACTINF-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
