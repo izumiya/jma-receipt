@@ -202,6 +202,7 @@
            03  FLG-HIKAKIN         PIC 9(01).
            03  FLG-SRYCD1          PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-GAIJINKEN       PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -215,6 +216,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDV                 PIC 9(04). 
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
@@ -364,6 +366,7 @@
        01  WRK-KENSA-MATOME-TABLE.
            03  WRK-KENSA-MATOME            OCCURS  101.
                05  WRK-HOUKNSKBN           PIC 9(02).
+               05  WRK-GAIJINKEN           PIC 9(02).
                05  WRK-SRYSYUKBN-K         PIC X(03).
                05  WRK-KAISU-G.
                    07  WRK-KAKSU-OCC       OCCURS  4.
@@ -390,6 +393,7 @@
            03  WRK-MIN-KAISU-G             OCCURS  31.
                05  WRK-MIN-KAISU           PIC 9(03).
                05  WRK-MIN-HOUKNSKBN       PIC 9(02).
+               05  WRK-MIN-GAIJINKEN       PIC 9(02).
                05  WRK-MIN-SRYSYUKBN       PIC X(03).
        01  WRK-RECE44-FLG-TABLE.
            03  WRK-RECE44-FLG              PIC 9(01)
@@ -400,6 +404,7 @@
        01  WRK-RECE44-TABLE.
            03  WRK-RECE44-TBL              OCCURS  100.
                05  WRK-RECE44-HOUKNSKBN           PIC 9(02).
+               05  WRK-RECE44-GAIJINKEN           PIC 9(02).
                05  WRK-RECE44-SRYSYUKBN           PIC X(03).
                05  WRK-RECE44-REC                 PIC X(700).
                05  WRK-RECE44-SRYCD-G.
@@ -458,6 +463,22 @@
             03  WRK-CONS-KENSACOMMENT-R    REDEFINES
                                            WRK-CONS-KENSACOMMENT-G.
                 05  WRK-CONS-KENSACOMMENT  PIC X(50)   OCCURS  11.
+      *外来迅速検体検査加算算定日テーブル
+       01  WRK-KENTAIKASAN-TABLE.
+           03  WRK-KENTAIKASAN             PIC 9(01)
+                                                  OCCURS  31.
+       01  WRK-GAIJINKEN-ZAINUM            PIC 9(03).
+      *外来迅速検体検査加算算定日の剤情報退避
+       01  WRK-RECE44GJK-MAX               PIC 9(02).
+       01  WRK-RECE44GJK-TABLE.
+           03  WRK-RECE44GJK-TBL           OCCURS 31.
+               05  WRK-RECE44GJK-REC       PIC X(700).
+       01  RECE44GJK-REC.
+           COPY    "CPRCF044.INC"  REPLACING  //RECE44//
+                                   BY         //RECE44GJK//.
+       01  GJK-ZAIW-NAMEINF.
+           03  GJK-ZAIW-YUKOKETA           PIC  9(02).
+           03  GJK-ZAIW-NAME               PIC  X(200).
       *          
        01  TBL-ZAIW-AREA.
       *    剤の先頭の診療コード
@@ -689,6 +710,11 @@
       *    電子化加算
            03  CONS-SYOSIN-KASAN29 PIC X(09) VALUE "111012370".
       *
+      *    外来迅速検体検査加算
+           03  WRK-CONS-GAIJINKEN      PIC X(09)   VALUE 
+                                                   "160177770".
+           03  WRK-CONS-GAIJINKEN-N    PIC 9(09)   VALUE 
+                                                   160177770.
       *    検査の回数に集計しない診療行為
       *    採血（Ｂ−Ａ）
            03  WRK-CONS-SAIKETSU1      PIC X(09)   VALUE "160101210".
@@ -855,12 +881,19 @@
            MOVE    ZERO                TO  WRK-KENSA-KAISU
       *
            MOVE    ZERO                TO  CNT-SRYKBN60   
+                                           WRK-GAIJINKEN-ZAINUM
            INITIALIZE                      WRK-RECE44-TABLE
                                            WRK-RECE44-MAX 
                                            WRK-SUM-KAISU-TABLE
                                            WRK-KENSA-MATOME-TABLE
                                            WRK-KENSA-MATOME-MAX
                                            WRK-MIN-KAISU-TABLE
+                                           WRK-KENTAIKASAN-TABLE
+      *
+      *    外来迅速検体検査加算算定日を確認
+           IF      RECE41-KENTAIKASANFLG     =   '1'
+               PERFORM 2009-KENTAIKASAN-KAKUNIN-SEC
+           END-IF
       *
       *    パラメータ０４ファイルより編集
            INITIALIZE                      RECE44-REC
@@ -900,6 +933,7 @@
                                                FLG-COMMENT
                                                FLG-COMMENT2
                                                FLG-HIKAKIN 
+                                               FLG-GAIJINKEN
                MOVE    ZERO                TO  WRK-RECE45
                                                IDY                           
                MOVE    SPACE               TO  WRK-SRYSYUKBN
@@ -1657,6 +1691,10 @@
                                     TBL-ZAIW-SRYCD   (3 IDZ)
                    MOVE    TBL-HOUKNSKBN(IDX)  TO
                                     TBL-ZAIW-HOUKNSKBN(3 IDZ)
+                   IF      (FLG-GAIJINKEN  =   1) 
+                     AND   (IDX            =   WRK-KENSA-MAX) 
+                           PERFORM 200511-GJK-DAY-ADD-SEC
+                   END-IF
                    ADD     1                   TO  IDX                     
                ELSE
                    IF      IDX             =   1
@@ -1721,6 +1759,9 @@
                    MOVE    WRK-NAME    TO  TBL-ZAIW-NAME (3 IDZ)
                    COMPUTE TBL-ZAIW-YUKOKETA (3 IDZ) 
                                        =   WRK-YUKOKETA   /   2
+                   IF      (FLG-GAIJINKEN  =   1) 
+                           PERFORM 200512-GJK-DAY-ADD-SEC
+                   END-IF
                END-IF                                        
            END-PERFORM
       *
@@ -1768,6 +1809,102 @@
            .
        20051-SRYKBNELSE-KENSA-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算算定日編集処理
+      *****************************************************************
+       200511-GJK-DAY-ADD-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CHAR-HENKAN-AREA
+      *
+           PERFORM VARYING IDV FROM 1  BY  1
+                   UNTIL   IDV >           31
+                   IF  RECE44-KAISU (1 IDV)    >   0
+                       MOVE    IDV     TO  WRK-Z9
+                       MOVE    31      TO  IDV
+                   END-IF
+           END-PERFORM
+      *
+           MOVE    1                   TO  WRK-CHAR-FLG
+           MOVE    WRK-Z9 (3:2)        TO  WRK-CHAR-X
+           MOVE    2                   TO  WRK-CHAR-CNT
+           MOVE    IDZ                 TO  IDV
+           PERFORM 800-NUM-ZENKAKU-HENKAN-SEC
+           MOVE    IDV                 TO  IDZ
+      * 
+           IF      WRK-Z9              <   10
+                   MOVE    4           TO  IDV
+           ELSE
+                   MOVE    5           TO  IDV
+           END-IF
+           MOVE    SPACE               TO  WRK-NAME
+           COMPUTE WRK-YUKOKETA        =   TBL-ZAIW-YUKOKETA(3 IDZ)
+                                       +   IDV
+           IF      WRK-YUKOKETA        >   19
+                   ADD     1           TO  WRK-ZAIWMAX (3)
+                   MOVE    WRK-ZAIWMAX (3) TO  IDZ
+                   STRING  "（"               DELIMITED  BY  SIZE
+                           WRK-CHAR-N         DELIMITED  BY  SPACE
+                           "日）"             DELIMITED  BY  SIZE
+                                       INTO   TBL-ZAIW-NAME (3 IDZ)
+                   END-STRING
+                   MOVE    IDV         TO     TBL-ZAIW-YUKOKETA(3 IDZ)
+           ELSE
+                   STRING  TBL-ZAIW-NAME (3 IDZ)
+                                              DELIMITED  BY  SPACE
+                           "（"               DELIMITED  BY  SIZE
+                           WRK-CHAR-N         DELIMITED  BY  SPACE
+                           "日）"             DELIMITED  BY  SIZE
+                                       INTO   WRK-NAME
+                   END-STRING
+                   MOVE    WRK-NAME    TO  TBL-ZAIW-NAME (3 IDZ)
+                   MOVE    WRK-YUKOKETA    TO  TBL-ZAIW-YUKOKETA(3 IDZ)
+           END-IF
+      *                 
+           .
+       200511-GJK-DAY-ADD-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算算定日編集処理
+      *****************************************************************
+       200512-GJK-DAY-ADD-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CHAR-HENKAN-AREA
+      *
+           PERFORM VARYING IDV FROM 1  BY  1
+                   UNTIL   IDV >           31
+                   IF  RECE44-KAISU (1 IDV)    >   0
+                       MOVE    IDV     TO  WRK-Z9
+                       MOVE    31      TO  IDV
+                   END-IF
+           END-PERFORM
+      *
+           MOVE    1                   TO  WRK-CHAR-FLG
+           MOVE    WRK-Z9 (3:2)        TO  WRK-CHAR-X
+           MOVE    2                   TO  WRK-CHAR-CNT
+           MOVE    IDZ                 TO  IDV
+           PERFORM 800-NUM-ZENKAKU-HENKAN-SEC
+           MOVE    IDV                 TO  IDZ
+      * 
+           IF      WRK-Z9              <   10
+                   MOVE    4           TO  IDV
+           ELSE
+                   MOVE    5           TO  IDV
+           END-IF
+           ADD     1                   TO  WRK-ZAIWMAX (3)
+           MOVE    WRK-ZAIWMAX (3)     TO  IDZ
+           STRING  "（"                DELIMITED  BY  SIZE
+                   WRK-CHAR-N          DELIMITED  BY  SPACE
+                   "日）"              DELIMITED  BY  SIZE
+                                       INTO   TBL-ZAIW-NAME (3 IDZ)
+           END-STRING
+           MOVE    IDV                 TO  TBL-ZAIW-YUKOKETA(3 IDZ)
+      *                 
+           .
+       200512-GJK-DAY-ADD-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    剤　明細テーブルチェック 診療区分（その他） 処理
       *****************************************************************
@@ -1977,37 +2114,125 @@
       *****************************************************************
        2006-SRYKBN60-CHECK-SEC         SECTION.
       *
+           PERFORM 2006-GAIJINKEN-BUNRI-SEC
+      *
       *    薬剤やコメントがあればまとめない
            IF      FLG-SRYCD1          =   1
-               PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+               IF      RECE44-ZAIKAISU     >   0
+                       PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+               END-IF
+               PERFORM 2006-GAIJINKEN-HENSYU-SEC
            ELSE
       *        剤の明細数が３以上の場合と明細数が２で
       *        先頭が検体名コードでない場合はまとめない
                IF    ( RECE44-MEISAISU     >   2 )
                  OR (( RECE44-MEISAISU     =   2 )
                  AND ( TBL-ZAIW-KENTAICOMMENT-SRYCD (3 1) = 0 ))
-                   PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+                   IF      RECE44-ZAIKAISU     >   0
+                           PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+                   END-IF
+                   PERFORM 2006-GAIJINKEN-HENSYU-SEC
                ELSE    
       *            包括対象でないときまとめない         
-      ****         MOVE    TBL-ZAIW-SRYCD (3 1) TO      TNS-SRYCD
-      ****         MOVE    TNS-TENSU-REC        TO      MCPDATA-REC
-      ****         MOVE    RECE44-SRYYM         TO      ORC-DBYMD(1:6)
-      ****         MOVE    "01"                 TO      ORC-DBYMD(7:2)
-      ****         PERFORM 900-TENSU-INV-SEC
-      ****         IF      TNS-HOUKNSKBN        =   ZERO
-      ****             PERFORM 2005-SRYKBNELSE-HENSYU-SEC
-      ****         ELSE    
-      ****             PERFORM 2006-SRYKBN60-TAIHI-SEC
-      ****         END-IF
                    IF      TBL-ZAIW-HOUKNSKBN(3 1)  =   ZERO
-                       PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+                       IF      RECE44-ZAIKAISU     >   0
+                               PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+                       END-IF
+                       PERFORM 2006-GAIJINKEN-HENSYU-SEC
                    ELSE
-                       PERFORM 2006-SRYKBN60-TAIHI-SEC
+                       MOVE    ZERO                TO  FLG-GAIJINKEN
+                       IF      RECE44-ZAIKAISU     >   0
+                               PERFORM 2006-SRYKBN60-TAIHI-SEC
+                       END-IF
+                       IF      WRK-RECE44GJK-MAX   >   0
+                               PERFORM VARYING IDXX FROM  1  BY  1 
+                                       UNTIL   IDXX >  WRK-RECE44GJK-MAX 
+                                 MOVE  1           TO  FLG-GAIJINKEN
+                                 MOVE  WRK-RECE44GJK-REC (IDXX) 
+                                                   TO  RECE44-REC 
+                                 PERFORM 2006-SRYKBN60-TAIHI-SEC
+                               END-PERFORM
+                       END-IF
                    END-IF
                END-IF
            END-IF
            .
        2006-SRYKBN60-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算剤分離処理
+      *****************************************************************
+       2006-GAIJINKEN-BUNRI-SEC        SECTION.
+      *
+           INITIALIZE                  WRK-RECE44GJK-TABLE
+           MOVE    ZERO                TO  WRK-RECE44GJK-MAX
+      *
+           IF      ( RECE41-KENTAIKASANFLG   =   '1' )
+             AND   ( TBL-ZAIW-KNSJISKBN  NOT =   2 )
+             AND   ((RECE44-KNSJISGRPKBN     >   0)
+             AND    (RECE44-KNSJISGRPKBN     <   7))
+             MOVE    RECE44-REC        TO  RECE44GJK-REC
+             PERFORM VARYING IDX FROM  1   BY  1
+                     UNTIL   IDX >     31
+                 IF  RECE44-KAISU (1 IDX)    >   0
+                   IF  WRK-KENTAIKASAN (IDX) =   1
+                       MOVE    ZERO    TO  RECE44GJK-ZAIKAISU
+                                           RECE44GJK-DAY-AREA
+                       MOVE    RECE44-KAISU (1 IDX)
+                                       TO  RECE44GJK-ZAIKAISU
+                       MOVE    RECE44-KAISU (1 IDX)
+                                       TO  RECE44GJK-KAISU (1 IDX)
+                       MOVE    RECE44-KAISU (2 IDX)
+                                       TO  RECE44GJK-KAISU (2 IDX) 
+                       MOVE    RECE44-KAISU (3 IDX)
+                                       TO  RECE44GJK-KAISU (3 IDX) 
+                       MOVE    RECE44-KAISU (4 IDX)
+                                       TO  RECE44GJK-KAISU (4 IDX) 
+                       COMPUTE WRK-RECE44GJK-MAX =  WRK-RECE44GJK-MAX
+                                                 +  1
+                       MOVE    RECE44GJK-REC       
+                                       TO  WRK-RECE44GJK-REC 
+                                               (WRK-RECE44GJK-MAX)
+                       COMPUTE RECE44-ZAIKAISU   =  RECE44-ZAIKAISU
+                                       -   RECE44-KAISU (1 IDX)
+                       MOVE    ZERO    TO  RECE44-KAISU (1 IDX)
+                                           RECE44-KAISU (2 IDX) 
+                                           RECE44-KAISU (3 IDX) 
+                                           RECE44-KAISU (4 IDX) 
+                   END-IF
+                 END-IF
+             END-PERFORM
+           END-IF        
+           .
+       2006-GAIJINKEN-BUNRI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算対象剤処理
+      *****************************************************************
+       2006-GAIJINKEN-HENSYU-SEC       SECTION.
+      *
+           IF     WRK-RECE44GJK-MAX    >   0
+                  PERFORM VARYING IDXX FROM  1  BY  1 
+                          UNTIL   IDXX >     WRK-RECE44GJK-MAX 
+                      MOVE  WRK-RECE44GJK-REC (IDXX) 
+                                       TO  RECE44-REC 
+                      COMPUTE WRK-GAIJINKEN-ZAINUM  =
+                              WRK-GAIJINKEN-ZAINUM  +  1
+                      COMPUTE RECE44-ZAINUM = RECE44-ZAINUM
+                                            + WRK-GAIJINKEN-ZAINUM
+                                            * 100000
+                      MOVE    1        TO  FLG-GAIJINKEN
+                      MOVE    TBL-ZAIW-NAMEINF (3 1)
+                                       TO  GJK-ZAIW-NAMEINF
+                      PERFORM 2005-SRYKBNELSE-HENSYU-SEC
+                      MOVE    GJK-ZAIW-NAMEINF
+                                       TO  TBL-ZAIW-NAMEINF (3 1)
+                  END-PERFORM
+           END-IF
+           .
+       2006-GAIJINKEN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2023,6 +2248,19 @@
       ****                                            (WRK-RECE44-MAX)
            MOVE    TBL-ZAIW-HOUKNSKBN(3 1) TO  WRK-RECE44-HOUKNSKBN
                                                       (WRK-RECE44-MAX)
+           IF      FLG-GAIJINKEN   =   0                    
+                   MOVE ZERO       TO  WRK-RECE44-GAIJINKEN
+                                                      (WRK-RECE44-MAX)
+           ELSE
+                   PERFORM VARYING IDX FROM    1   BY  1
+                           UNTIL   IDX >       31
+                       IF  RECE44-KAISU (1 IDX)    >   0
+                           MOVE IDX TO  WRK-RECE44-GAIJINKEN
+                                                      (WRK-RECE44-MAX)
+                           MOVE 31  TO  IDX
+                       END-IF
+                   END-PERFORM
+           END-IF
            MOVE    TBL-ZAIW-SRYSYUKBN-INPUT(3 1)
                                    TO  WRK-RECE44-SRYSYUKBN
                                                       (WRK-RECE44-MAX)
@@ -2041,6 +2279,8 @@
                    MOVE RECE44-KAISU (1 IDX)   TO  WRK-MIN-KAISU (IDX)
                    MOVE TBL-ZAIW-HOUKNSKBN(3 1)
                                             TO  WRK-MIN-HOUKNSKBN (IDX)
+                   MOVE WRK-RECE44-GAIJINKEN (WRK-RECE44-MAX)
+                                            TO  WRK-MIN-GAIJINKEN (IDX)
                    MOVE TBL-ZAIW-SRYSYUKBN-INPUT(3 1)
                                             TO  WRK-MIN-SRYSYUKBN (IDX)
                  END-IF
@@ -2069,11 +2309,15 @@
                                        >=   WRK-MIN-KAISU (IDXX) )
                  AND   ( WRK-RECE44-HOUKNSKBN (IDY)
                                         =   WRK-MIN-HOUKNSKBN (IDXX) )
+                 AND   ( WRK-RECE44-GAIJINKEN (IDY)
+                                        =   WRK-MIN-GAIJINKEN (IDXX) )
                  AND   ( WRK-RECE44-SRYSYUKBN (IDY)
                                         =   WRK-MIN-SRYSYUKBN (IDXX) )
                  AND   ( WRK-RECE44-FLG (IDY)      =   ZERO )
                     MOVE  WRK-RECE44-HOUKNSKBN (IDY)
                                               TO  WRK-HOUKNSKBN (101)
+                    MOVE  WRK-RECE44-GAIJINKEN (IDY)
+                                              TO  WRK-GAIJINKEN (101)
                     MOVE  WRK-RECE44-SRYSYUKBN (IDY)
                                               TO  WRK-SRYSYUKBN-K (101)
                     MOVE  WRK-MIN-KAISU (IDXX)
@@ -2110,6 +2354,7 @@
                PERFORM  VARYING IDY FROM    1   BY  1
                         UNTIL   IDY >       WRK-KENSA-MATOME-MAX
                  IF    ( WRK-HOUKNSKBN (IDY)  =  WRK-HOUKNSKBN (101) )
+                 AND   ( WRK-GAIJINKEN (IDY)  =  WRK-GAIJINKEN (101) )
                  AND   ( WRK-KENSA-SU (IDY)   =  WRK-KENSA-SU (101) )
                    IF  ( WRK-RECE44-IDX-G (IDY)
                                            =  WRK-RECE44-IDX-G (101) )
@@ -2147,6 +2392,7 @@
       *        新たに最小回数情報をセットする
                MOVE     ZERO             TO  WRK-MIN-KAISU (IDXX)
                MOVE     ZERO             TO  WRK-MIN-HOUKNSKBN (IDXX)
+               MOVE     ZERO             TO  WRK-MIN-GAIJINKEN (IDXX)
                MOVE     SPACE            TO  WRK-MIN-SRYSYUKBN (IDXX)
                PERFORM  VARYING IDY FROM    1   BY  1
                         UNTIL   IDY >       WRK-RECE44-MAX
@@ -2158,6 +2404,8 @@
                                            TO  WRK-MIN-KAISU (IDXX)
                      MOVE WRK-RECE44-HOUKNSKBN (IDY)
                                            TO  WRK-MIN-HOUKNSKBN (IDXX)
+                     MOVE WRK-RECE44-GAIJINKEN (IDY)
+                                           TO  WRK-MIN-GAIJINKEN (IDXX)
                      MOVE WRK-RECE44-SRYSYUKBN (IDY)
                                            TO  WRK-MIN-SRYSYUKBN (IDXX)
                    END-IF
@@ -2193,7 +2441,17 @@
              END-PERFORM    
              MOVE    WRK-KAISU (IDXX 1)  TO  RECE44-ZAIKAISU
              MOVE    WRK-RECE44-ZAITEN   TO  RECE44-SYUTEN1
-                                             RECE44-ZAITEN                                                        
+                                             RECE44-ZAITEN
+             IF      WRK-GAIJINKEN (IDXX)  >  0
+                     COMPUTE WRK-GAIJINKEN-ZAINUM  =
+                             WRK-GAIJINKEN-ZAINUM  +  1
+                     COMPUTE RECE44-ZAINUM = RECE44-ZAINUM
+                                           + WRK-GAIJINKEN-ZAINUM
+                                           * 100000
+                     MOVE    1           TO  FLG-GAIJINKEN
+             ELSE
+                     MOVE    0           TO  FLG-GAIJINKEN
+             END-IF
       *
       *     レセプト０４剤編集前処理
             PERFORM 2001-RECE44-ZAIHEN-MAE-SEC
@@ -2206,6 +2464,59 @@
            END-PERFORM
            .
        2007-SRYKBN60-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来迅速検体検査加算の算定日確認処理
+      *****************************************************************
+       2009-KENTAIKASAN-KAKUNIN-SEC      SECTION.
+      *
+           INITIALIZE                      RECE44-REC
+           MOVE    RECE41-HOSPID       TO  RECE44-HOSPID
+           MOVE    RECE41-SRYYM        TO  RECE44-SRYYM
+           MOVE    RECE41-NYUGAIKBN    TO  RECE44-NYUGAIKBN
+           MOVE    RECE41-PTID         TO  RECE44-PTID
+           MOVE    RECE41-RECEKA       TO  RECE44-RECEKA
+           MOVE    RECE41-HKNID        TO  RECE44-HKNID
+           MOVE    RECE41-TEKSTYMD     TO  RECE44-TEKSTYMD
+           MOVE    ZERO                TO  RECE44-ZAINUM
+      *
+           START   RECE44-FILE
+               KEY IS    >=   RECE44-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE44
+               NOT INVALID
+                   PERFORM 990-RECE44-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( SPA-STS              =   2                   )
+               OR     ( FLG-RECE44           =   1                   )
+               OR     ( RECE41-HOSPID    NOT =   RECE44-HOSPID       )
+               OR     ( RECE41-SRYYM     NOT =   RECE44-SRYYM        )
+               OR     ( RECE41-NYUGAIKBN NOT =   RECE44-NYUGAIKBN    )
+               OR     ( RECE41-PTID      NOT =   RECE44-PTID         )
+               OR     ( RECE41-RECEKA    NOT =   RECE44-RECEKA       )
+               OR     ( RECE41-HKNID     NOT =   RECE44-HKNID        )
+               OR     ( RECE41-TEKSTYMD  NOT =   RECE44-TEKSTYMD     )
+      *
+               IF     RECE44-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+      *
+                   PERFORM VARYING IDX FROM      1  BY  1
+                           UNTIL   IDX >         31
+                       IF  RECE44-KAISU (1 IDX)  >    0
+                           MOVE    1         TO  WRK-KENTAIKASAN (IDX)
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+               PERFORM 990-RECE44-NEXT-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    ZERO                TO  FLG-RECE44
+           .
+      *
+       2009-KENTAIKASAN-KAKUNIN-EXT.
            EXIT.
       *
       *****************************************************************
