@@ -572,7 +572,7 @@
            END-IF
       *
       *    期間指定区分が設定されている場合、期間が設定されていること
-           IF    ( HCM34S01-SANTEIYM       =   "1" )
+           IF    ( HCM34S01-KIKANKBN       =   "1" )
                IF    ( HCM34S01-SKYSTYMD   IS  NOT NUMERIC )
                    MOVE    12              TO  HCM34S01-RC
                    PERFORM 990-EXIT-PROGRAM-SEC
