@@ -181,6 +181,7 @@
       *  02.09.03    NACL-藤原    06/04/14  三種の公費併用に係わる記載要
       *                                     項の特例対応
       *  02.09.04    NACL-門脇    06/04/20  外来迅速検体検査加算編集
+      *  02.09.05    NACL-門脇    06/04/26  生活保護一部負担編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8149,6 +8150,10 @@
                IF   RECE62-KOHNUM(KOHFTN-IDX) =  "021"
                      MOVE  "1"   TO
                                  RECE62-KISAIFLG(KOHFTN-IDX + 1)
+                     MOVE  "1"   TO
+                             RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+               END-IF
+               IF   RECE62-KOHNUM(KOHFTN-IDX) =  "012"
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
       *
