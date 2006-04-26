@@ -3986,12 +3986,14 @@
       *
                        PERFORM VARYING IDZ3 FROM    1   BY  1
                                UNTIL   IDZ3 >   TBL-KENTAI-RECE04-MAX
+      **                     IF    ( TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+      **                                             =
+      **                             TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1))
                            IF    ( TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+                                                   >   0               )
+                           AND   ( TBL-KASAN-RECE04-KOHBUNRI (IDZ2)
                                                    =
-                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1))
-                           AND   ( TBL-KASAN-RECE04-HKNCOMBI (IDZ2)
-                                                   =
-                                     TBL-KENTAI-RECE04-HKNCOMBI (IDZ3) )
+                                     TBL-KENTAI-RECE04-KOHBUNRI (IDZ3) )
                                MOVE    TBL-KENTAI-RECE04-REC (IDZ3)
                                                    TO  RECE041-REC
                                MOVE    TBL-KENTAI-RECE04-KAISU
@@ -4014,18 +4016,26 @@
                                    PERFORM 200781-KENSA-HENSYU-SEC
                                END-PERFORM
       *
-                               COMPUTE
-                                   TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
-                                       =
-                                   TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
-                                       -
-                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+      **                         COMPUTE
+      **                             TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+      **                                 =
+      **                             TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+      **                                 -
+      **                             TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+      **                         COMPUTE
+      **                             TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
+      **                                 =
+      **                             TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
+      **                                 -
+      **                             TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
                                COMPUTE
                                    TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
                                        =
                                    TBL-KENTAI-RECE04-ZAIKAISU (IDZ3)
                                        -
-                                   TBL-KASAN-RECE04-KAISU (IDZ2 1 IDZ1)
+                                   TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
+                               MOVE    ZERO          TO
+                                   TBL-KENTAI-RECE04-KAISU (IDZ3 1 IDZ1)
                            END-IF
                        END-PERFORM
       *
