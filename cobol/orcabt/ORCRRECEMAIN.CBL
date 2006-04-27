@@ -1288,11 +1288,40 @@
                PERFORM  900-SANTEIPRV-READ-SEC
                PERFORM  UNTIL
                         (FLG-SANTEI         =    1)
-                   MOVE    SANTEI-REC   TO      MCPDATA-REC
-                   MOVE    "DBINSERT"   TO      MCP-FUNC
+      *             DISPLAY "SANTEI-INSERT"
+      *             DISPLAY "SANTEI-HOSPID = " SANTEI-HOSPID
+      *             DISPLAY "SANTEI-PTID   = " SANTEI-PTID
+      *             DISPLAY "SANTEI-SRYYM  = " SANTEI-SRYYM
+      *             DISPLAY "SANTEI-SRYCD  = " SANTEI-SRYCD
+      *             DISPLAY "SANTEI-NYUGAIKBN = " SANTEI-NYUGAIKBN
+      *-----------------------------------------------------
+                   MOVE    SANTEI-REC     TO      MCPDATA-REC
+                   MOVE    "DBSELECT"        TO      MCP-FUNC
                    MOVE    PATH-TBL-SANTEI-KEY
-                                        TO      MCP-PATH
-                   PERFORM  900-REALDB-INS-SEC
+                                             TO      MCP-PATH
+                   CALL    "MCPSUB"             USING
+                                                MCPAREA
+                                                MCPDATA-REC
+                   IF      MCP-RC               =       ZERO
+                       MOVE    "DBFETCH"        TO      MCP-FUNC
+                       MOVE    PATH-TBL-SANTEI-KEY
+                                             TO      MCP-PATH
+                       CALL    "MCPSUB"             USING
+                                                    MCPAREA
+                                                    MCPDATA-REC
+                       IF      MCP-RC               =       ZERO
+                           CONTINUE
+                       ELSE
+      *-----------------------------------------------------
+                           MOVE    SANTEI-REC   TO      MCPDATA-REC
+                           MOVE    "DBINSERT"   TO      MCP-FUNC
+                           MOVE    PATH-TBL-SANTEI-KEY
+                                                TO      MCP-PATH
+                           PERFORM  900-REALDB-INS-SEC
+      *-----------------------------------------------------
+                       END-IF
+                   END-IF
+      *-----------------------------------------------------
                    MOVE    PATH-TBL-SANTEI-PRV-KEY2
                                         TO      MCP-PATH
                    PERFORM  900-SANTEIPRV-READ-SEC
