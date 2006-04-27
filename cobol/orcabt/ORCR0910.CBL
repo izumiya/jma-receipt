@@ -427,6 +427,9 @@
        01  RECE84GJK-REC.
            COPY    "CPRCF084.INC"  REPLACING  //RECE84//
                                    BY         //RECE84GJK//.
+       01  RECE84SAV-REC.
+           COPY    "CPRCF084.INC"  REPLACING  //RECE84//
+                                   BY         //RECE84SAV//.
        01  GJK-ZAIW-NAMEINF.
            03  GJK-ZAIW-YUKOKETA           PIC  9(02).
            03  GJK-ZAIW-NAME               PIC  X(200).
@@ -1901,35 +1904,44 @@
        2006-SRYKBN60-CHECK-SEC         SECTION.
       *
            PERFORM 2006-GAIJINKEN-BUNRI-SEC
+           MOVE    RECE84-REC          TO   RECE84SAV-REC
       *
       *    薬剤やコメントがあればまとめない
            IF      FLG-SRYCD1          =   1
+               PERFORM 2006-GAIJINKEN-HENSYU-SEC
+               MOVE    RECE84SAV-REC       TO  RECE84-REC
                IF      RECE84-ZAIKAISU     >   0
+                       MOVE    ZERO        TO  FLG-GAIJINKEN
+                       COMPUTE RECE84-ZAINUM   =   RECE84-ZAINUM
+                                               +   99000000
                        PERFORM 2005-SRYKBNELSE-HENSYU-SEC
                END-IF
-               PERFORM 2006-GAIJINKEN-HENSYU-SEC
            ELSE
       *        剤の明細数が３以上の場合と明細数が２で
       *        先頭が検体名コードでない場合はまとめない
                IF    ( RECE84-MEISAISU     >   2 )
                  OR (( RECE84-MEISAISU     =   2 )
                  AND ( TBL-ZAIW-KENTAICOMMENT-SRYCD (3 1) = 0 ))
+                   PERFORM 2006-GAIJINKEN-HENSYU-SEC
+                   MOVE    RECE84SAV-REC       TO  RECE84-REC
                    IF      RECE84-ZAIKAISU     >   0
+                           MOVE    ZERO        TO  FLG-GAIJINKEN
+                           COMPUTE RECE84-ZAINUM   =   RECE84-ZAINUM
+                                                   +   99000000
                            PERFORM 2005-SRYKBNELSE-HENSYU-SEC
                    END-IF
-                   PERFORM 2006-GAIJINKEN-HENSYU-SEC
                ELSE    
       *        包括対象でないときまとめない         
                    IF      TBL-ZAIW-HOUKNSKBN(3 1)  =   ZERO
+                       PERFORM 2006-GAIJINKEN-HENSYU-SEC
+                       MOVE    RECE84SAV-REC       TO  RECE84-REC
                        IF      RECE84-ZAIKAISU     >   0
+                               MOVE    ZERO        TO  FLG-GAIJINKEN
+                               COMPUTE RECE84-ZAINUM   =   RECE84-ZAINUM
+                                                       +   99000000
                                PERFORM 2005-SRYKBNELSE-HENSYU-SEC
                        END-IF
-                       PERFORM 2006-GAIJINKEN-HENSYU-SEC
                    ELSE
-                       MOVE    ZERO                TO  FLG-GAIJINKEN
-                       IF      RECE84-ZAIKAISU     >   0
-                               PERFORM 2006-SRYKBN60-TAIHI-SEC
-                       END-IF
                        IF      WRK-RECE84GJK-MAX   >   0
                                PERFORM VARYING IDXX FROM  1  BY  1 
                                        UNTIL   IDXX >  WRK-RECE84GJK-MAX 
@@ -1939,9 +1951,14 @@
                                  PERFORM 2006-SRYKBN60-TAIHI-SEC
                                END-PERFORM
                        END-IF
+                       MOVE    RECE84SAV-REC       TO  RECE84-REC
+                       IF      RECE84-ZAIKAISU     >   0
+                               MOVE    ZERO        TO  FLG-GAIJINKEN
+                               PERFORM 2006-SRYKBN60-TAIHI-SEC
+                       END-IF
                    END-IF
                END-IF
-           END-IF        
+           END-IF
            .
        2006-SRYKBN60-CHECK-EXT.
            EXIT.
@@ -2237,6 +2254,8 @@
                                            * 100000
                      MOVE    1           TO  FLG-GAIJINKEN
              ELSE
+                     COMPUTE RECE84-ZAINUM = RECE84-ZAINUM
+                                           + 99000000
                      MOVE    0           TO  FLG-GAIJINKEN
              END-IF
       *

@@ -615,6 +615,9 @@
        01  RECE04GJK-REC.
            COPY    "CPRCF004.INC"  REPLACING  //RECE04//
                                    BY         //RECE04GJK//.
+       01  RECE04SAV-REC.
+           COPY    "CPRCF004.INC"  REPLACING  //RECE04//
+                                   BY         //RECE04SAV//.
        01  GJK-ZAIW-NAMEINF.
            03  GJK-ZAIW-YUKOKETA           PIC  9(02).
            03  GJK-ZAIW-NAME               PIC  X(200).
@@ -2659,35 +2662,44 @@
        2006-SRYKBN60-CHECK-SEC         SECTION.
       *
            PERFORM 2006-GAIJINKEN-BUNRI-SEC
+           MOVE    RECE04-REC          TO   RECE04SAV-REC
       *
       *    薬剤やコメントがあればまとめない
            IF      FLG-SRYCD1          =   1
+               PERFORM 2006-GAIJINKEN-HENSYU-SEC
+               MOVE    RECE04SAV-REC       TO  RECE04-REC
                IF      RECE04-ZAIKAISU     >   0
+                       MOVE    ZERO        TO  FLG-GAIJINKEN
+                       COMPUTE RECE04-ZAINUM   =   RECE04-ZAINUM
+                                               +   99000000
                        PERFORM 2005-SRYKBNELSE-HENSYU-SEC
                END-IF
-               PERFORM 2006-GAIJINKEN-HENSYU-SEC
            ELSE
       *        剤の明細数が３以上の場合と明細数が２で
       *        先頭が検体名コードでない場合はまとめない
                IF    ( RECE04-MEISAISU     >   2 )
                  OR (( RECE04-MEISAISU     =   2 )
                  AND ( TBL-ZAIW-KENTAICOMMENT-SRYCD (3 1) = 0 ))
+                   PERFORM 2006-GAIJINKEN-HENSYU-SEC
+                   MOVE    RECE04SAV-REC       TO  RECE04-REC
                    IF      RECE04-ZAIKAISU     >   0
+                           MOVE    ZERO        TO  FLG-GAIJINKEN
+                           COMPUTE RECE04-ZAINUM   =   RECE04-ZAINUM
+                                                   +   99000000
                            PERFORM 2005-SRYKBNELSE-HENSYU-SEC
                    END-IF
-                   PERFORM 2006-GAIJINKEN-HENSYU-SEC
                ELSE    
       *            包括対象でないときまとめない         
                    IF      TBL-ZAIW-HOUKNSKBN(3 1)  =   ZERO
+                       PERFORM 2006-GAIJINKEN-HENSYU-SEC
+                       MOVE    RECE04SAV-REC       TO  RECE04-REC
                        IF      RECE04-ZAIKAISU     >   0
+                               MOVE    ZERO        TO  FLG-GAIJINKEN
+                               COMPUTE RECE04-ZAINUM   =   RECE04-ZAINUM
+                                                       +   99000000
                                PERFORM 2005-SRYKBNELSE-HENSYU-SEC
                        END-IF
-                       PERFORM 2006-GAIJINKEN-HENSYU-SEC
                    ELSE
-                       MOVE    ZERO                TO  FLG-GAIJINKEN
-                       IF      RECE04-ZAIKAISU     >   0
-                               PERFORM 2006-SRYKBN60-TAIHI-SEC
-                       END-IF
                        IF      WRK-RECE04GJK-MAX   >   0
                                PERFORM VARYING IDXX FROM  1  BY  1 
                                        UNTIL   IDXX >  WRK-RECE04GJK-MAX 
@@ -2696,6 +2708,11 @@
                                                    TO  RECE04-REC 
                                  PERFORM 2006-SRYKBN60-TAIHI-SEC
                                END-PERFORM
+                       END-IF
+                       MOVE    RECE04SAV-REC       TO  RECE04-REC
+                       IF      RECE04-ZAIKAISU     >   0
+                               MOVE    ZERO        TO  FLG-GAIJINKEN
+                               PERFORM 2006-SRYKBN60-TAIHI-SEC
                        END-IF
                    END-IF
                END-IF
@@ -2747,7 +2764,7 @@
                    END-IF
                  END-IF
              END-PERFORM
-           END-IF        
+           END-IF 
            .
        2006-GAIJINKEN-BUNRI-EXT.
            EXIT.
@@ -3006,6 +3023,8 @@
                                            * 100000
                      MOVE    1           TO  FLG-GAIJINKEN
              ELSE
+                     COMPUTE RECE04-ZAINUM = RECE04-ZAINUM
+                                           + 99000000
                      MOVE    0           TO  FLG-GAIJINKEN
              END-IF
       *
