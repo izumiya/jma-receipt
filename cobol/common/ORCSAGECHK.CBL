@@ -757,6 +757,22 @@
                    MOVE    1               TO  AGECHK-ROUJIN
                END-IF
            END-IF
+      *    Àº¿ÀÄÌ±¡¡¦¹¹Àµ¤Ç£¶£µºÐ°Ê¾å¤ÇÏ·¿Í¸øÈñ¤ò»ý¤Ã¤Æ¤¤¤ë¾ì¹ç¡¢Ï·¿Í
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                  (AGECHK-NENREI       >=  65    )  AND
+                  (AGECHK-ROUJIN       =   ZERO  )  AND
+                  (AGECHK-SRYYMD       >=  "20060401" )
+               IF     ((COMB-KOH1HKNNUM     =   "015" )  OR
+                       (COMB-KOH2HKNNUM     =   "015" )  OR
+                       (COMB-KOH3HKNNUM     =   "015" )  OR
+                       (COMB-KOH4HKNNUM     =   "015" ))  OR
+                      ((COMB-KOH1HKNNUM     =   "021" )  OR
+                       (COMB-KOH2HKNNUM     =   "021" )  OR
+                       (COMB-KOH3HKNNUM     =   "021" )  OR
+                       (COMB-KOH4HKNNUM     =   "021" ))
+                   PERFORM 2009-ROUJIN-CHK-SEC
+               END-IF
+           END-IF
       *    £¶£µºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í¸øÈñ¤ò¤â¤Ã¤Æ¤¤¤ë¤«¤ÎÈ½Äê
            IF      AGECHK-NENREI       >=  65
                IF      AGECHK-ROUJIN       =   ZERO
