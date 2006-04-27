@@ -243,6 +243,8 @@
       *  02.09.06    NACL-ÃÁœ∆    06/04/26  ¿∏≥Ë ›∏Ó∞Ï…Ù…È√¥ ‘Ω∏Ω§¿µ
       *  02.09.07    NACL-ÃÁœ∆    06/04/26  ¿Ó∫Íª‘πÒ ›°‹£≤£±¿∫ø¿∞Ï…Ù…È√¥
       *                                      ‘Ω∏Ω§¿µ
+      *  02.09.08    NACL-ÃÁœ∆    06/04/27  ¡ÍÃœ∏∂ª‘πÒ ›°‹£≤£±¿∫ø¿∞Ï…Ù…È√¥
+      *                                      ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5133,9 +5135,11 @@
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
               ELSE
-                IF     ( SYS-1001-PREFNUM           =  14     )
-                AND    ((RECE02-HKNJANUM(1:3)       = "145"  ) OR
-                        (RECE02-HKNJANUM(1:5)       = "67145"))
+                IF     ( SYS-1001-PREFNUM        =  14        )
+                AND    ((RECE02-HKNJANUM(1:3)    = "145"     ) OR
+                        (RECE02-HKNJANUM(1:5)    = "67145"   ) OR
+                        (RECE02-HKNJANUM(1:6)    = "140103"  ) OR
+                        (RECE02-HKNJANUM         = "67140103"))
                 AND    ( RECE02-KOHNUM(KH-IDX - 1)  = "021"   )
                   ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)

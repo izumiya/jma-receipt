@@ -184,6 +184,8 @@
       *  02.09.05    NACL-ÃÁœ∆    06/04/26  ¿∏≥Ë ›∏Ó∞Ï…Ù…È√¥ ‘Ω∏Ω§¿µ
       *  02.09.06    NACL-ÃÁœ∆    06/04/26  ¿Ó∫Íª‘πÒ ›°‹£≤£±¿∫ø¿∞Ï…Ù…È√¥
       *                                      ‘Ω∏Ω§¿µ
+      *  02.09.07    NACL-ÃÁœ∆    06/04/27  ¡ÍÃœ∏∂ª‘πÒ ›°‹£≤£±¿∫ø¿∞Ï…Ù…È√¥
+      *                                      ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7797,9 +7799,11 @@
                    ADD   SYU-SKJ-FTN(IDX3)          TO
                                    WRK-SKJ-FTN(KH-IDX)
                 ELSE
-                  IF     ( WRK-PREFNUM                = "14"    )
-                  AND    ((RECE62-HKNJANUM(1:3)       = "145"  ) OR
-                          (RECE62-HKNJANUM(1:5)       = "67145"))
+                  IF     ( WRK-PREFNUM             = "14"       )
+                  AND    ((RECE62-HKNJANUM(1:3)    = "145"     ) OR
+                          (RECE62-HKNJANUM(1:5)    = "67145"   ) OR
+                          (RECE62-HKNJANUM(1:6)    = "140103"  ) OR
+                          (RECE62-HKNJANUM         = "67140103"))
                   AND    ( RECE62-KOHNUM(KH-IDX - 1)  = "021"   )
                      ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                    RECE62-FTNMONEY(KH-IDX)
