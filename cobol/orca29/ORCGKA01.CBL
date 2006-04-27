@@ -1129,6 +1129,7 @@
            MOVE    ZERO                TO  WRK-ZAINUM
            MOVE    ZERO                TO  FLG-OK
            MOVE    ZERO                TO  FLG-ZAITAKU
+           MOVE    ZERO                TO  FLG-YAKUZAI
       *    処方せん対象のみ
            IF     (FLG-SRYACT          =   ZERO )  AND
                  ((SRY-SRYKBN          =   "14" )  OR
@@ -1247,7 +1248,6 @@
       *
            MOVE    ZERO                TO  IDX-W
            MOVE    ZERO                TO  IDY
-           MOVE    ZERO                TO  FLG-YAKUZAI
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX         >   5   )   OR
