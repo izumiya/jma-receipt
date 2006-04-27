@@ -119,8 +119,10 @@
       *
       *  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.01    NACL-Æ£¸¶    06/04/14  ¡Ö£±£³»ØÆ³¡×¡ÖÆü¡×¤Îº¹¤·¹þ¤ß
-      *                                      »°¼ï¤Î¸øÈñÊ»ÍÑ¤Ë·¸¤ï¤ëµ­ºÜÍ×
-      *                                      ¹à¤ÎÆÃÎãÂÐ±þ
+      *                                     »°¼ï¤Î¸øÈñÊ»ÍÑ¤Ë·¸¤ï¤ëµ­ºÜÍ×
+      *                                     ¹à¤ÎÆÃÎãÂÐ±þ
+      *  02.09.02    NACL-Æ£¸¶    06/04/26  ¼«Î©»Ù±ç°åÎÅ¡ÊÀº¿ÀÄÌ±¡°åÎÅ¡Ë
+      *                                     ¤ÈÀ¸³èÊÝ¸î¤ÎÊ»ÍÑ¤ÎÅÀ¿ôÍóµ­ºÜ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -349,7 +351,7 @@
            03  SYSKAN-IDX          PIC 9(03).
       *
       *    
-       01  KEY-AREA                          VALUE   LOW-VALUE.          
+       01  KEY-AREA                          VALUE   LOW-VALUE. 
            03  KEY-NEW.
                05  KEY-NEW1.
                    07  KEY-N-HOSPID    PIC  X(24).
@@ -424,6 +426,8 @@
            03  WRK-HSEQNUM         PIC 9(08).
       *
            03  WRK-HC06-HEAD4-G    PIC X(128).
+      *
+           03  WRK-SUM-TENSU       PIC 9(08).
       *
            03  WRK-1033-TABLE.
                05  WRK-1033-TBL    OCCURS  5.
@@ -3964,7 +3968,6 @@
                MOVE    1                  TO  IDX1
                MOVE    2                  TO  IDX2
            END-IF      
-
       *            
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   WRK-TEKIYOU-LINE
@@ -3997,7 +4000,19 @@
                MOVE    RECE02-KAISU(IDX)         TO  WRK-KAISUZ
                MOVE    WRK-KAISU                 TO  HC06-KAISU   (IDX)
       *        <ÅÀ¿ô¡¦¸øÈñÅÀ¿ô>
-               MOVE    RECE02-TENSU(IDX IDX1)    TO  WRK-TENSUZ
+      *        ¼«Î©»Ù±ç°åÎÅ¡ÊÀº¿ÀÄÌ±¡°åÎÅ¤ÈÀ¸³èÊÝ¸î¤ÎÊ»ÍÑ¤Î¤È¤­¡¢
+      *        ÅÀ¿ôÍó¤ËÁí°åÎÅÈñÊ¬¤òµ­ºÜ
+               IF    ( RECE02-SRYYM        >=  WRK-CONS-SRYYM-200604 )
+               AND   ( RECE02-HKNNUM       =   SPACE                 )
+               AND   ( RECE02-KOHNUM (1)   =   "021"                 )
+               AND   ( RECE02-KOHNUM (2)   =   "012"                 )
+                   COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX1)
+                                           +     RECE02-TENSU(IDX IDX2)
+                   MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+               ELSE
+                   MOVE    RECE02-TENSU(IDX IDX1)
+                                           TO  WRK-TENSUZ
+               END-IF
                MOVE    WRK-TENSU                 TO  HC06-TENSU   (IDX)
                IF      IDX2                      >   ZERO
                    MOVE    RECE02-TENSU(IDX IDX2)
