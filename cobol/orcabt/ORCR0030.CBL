@@ -245,6 +245,7 @@
       *                                      ‘Ω∏Ω§¿µ
       *  02.09.08    NACL-ÃÁœ∆    06/04/27  ¡ÍÃœ∏∂ª‘πÒ ›°‹£≤£±¿∫ø¿∞Ï…Ù…È√¥
       *                                      ‘Ω∏Ω§¿µ
+      *  02.09.09    NACL-ÃÁœ∆    06/04/28  ∫ﬂ¬ ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3827,7 +3828,7 @@
                        END-IF
                    END-IF
       *            ∫ﬂ¬¥µº‘À¨Ã‰ø«Œ≈
-                   IF  ( WRK-TNS-OSINKBN(IDX3)   =     1          )  AND
+                   IF (( WRK-TNS-OSINKBN(IDX3)   =     1          )  AND
                        ((SRY-SRYCD(IDX3)     NOT =    "114000110")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114001610")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114000970")   AND
@@ -3844,7 +3845,8 @@
                         (SRY-SRYCD(IDX3)     NOT =    "114011570")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114011870")   AND
-                        (SRY-SRYCD(IDX3)     NOT =    "114012070"))
+                        (SRY-SRYCD(IDX3)     NOT =    "114012070")))
+                   OR (  SRY-SRYCD(IDX3)         =    "114001110"  )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE02-KAISU(11)
                        IF    BUN-IDX        =   1
@@ -5553,7 +5555,8 @@
                OR ((SYS-1001-PREFNUM =   13           ) AND
                    (RECE02-KOHNUM(KOHFTN-IDX) =  "151" OR "451"))
                OR ((RECE02-KOHNUM(KOHFTN-IDX) =  "010" OR "021") AND
-                   (RECE02-HKNJANUM  =  "133033" OR "133280"   ))
+                   (RECE02-HKNJANUM(1:6)
+                                     =  "133033" OR "133280"   ))
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                ELSE

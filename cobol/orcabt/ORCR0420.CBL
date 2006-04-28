@@ -109,6 +109,7 @@
       *  02.09.02    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.03    NACL-Æ£¸¶    06/04/14  ¤­¤¶¤ßÃÍ·×»»¼±ÊÌ¤ÎÄÉ²Ã
       *  02.09.04    NACL-ÌçÏÆ    06/04/20  ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»ÊÔ½¸
+      *  02.09.05    NACL-ÌçÏÆ    06/04/28  ºßÂðÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2764,7 +2765,7 @@
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
       *            ºßÂð´µ¼ÔË¬Ìä¿ÇÎÅ
-                   IF  ( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
+                   IF (( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
                        ((SRY-SRYCD(IDX3)   NOT =    "114000110")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114001610")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114000970")   AND
@@ -2781,7 +2782,8 @@
                         (SRY-SRYCD(IDX3)   NOT =    "114011570")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114012070"))
+                        (SRY-SRYCD(IDX3)   NOT =    "114012070")))
+                   OR (  SRY-SRYCD(IDX3)       =    "114001110"  )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE41-KAISU(11)
                        COMPUTE   RECE41-TENSU(11)  =
@@ -3179,7 +3181,7 @@
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
       *            ºßÂð´µ¼ÔË¬Ìä¿ÇÎÅ
-                   IF  ( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
+                   IF (( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
                        ((SRY-SRYCD(IDX3)   NOT =    "114000110")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114001610")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114000970")   AND
@@ -3196,7 +3198,8 @@
                         (SRY-SRYCD(IDX3)   NOT =    "114011570")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114012070"))
+                        (SRY-SRYCD(IDX3)   NOT =    "114012070")))
+                   OR (  SRY-SRYCD(IDX3)       =    "114001110"  )
                        MOVE   1              TO   FLG-ZAITAKU
                        COMPUTE   RECE41-TENSU(6)  =
                                  RECE41-TENSU(6)  +
@@ -3553,7 +3556,7 @@
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
       *            ºßÂð´µ¼ÔË¬Ìä¿ÇÎÅ
-                   IF  ( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
+                   IF (( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
                        ((SRY-SRYCD(IDX3)   NOT =    "114000110")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114001610")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114000970")   AND
@@ -3570,7 +3573,8 @@
                         (SRY-SRYCD(IDX3)   NOT =    "114011570")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114012070"))
+                        (SRY-SRYCD(IDX3)   NOT =    "114012070")))
+                   OR (  SRY-SRYCD(IDX3)       =    "114001110"  )
                        MOVE   1              TO   FLG-ZAITAKU
                        COMPUTE   RECE41-TENSU(7)  =
                                  RECE41-TENSU(7)  +
@@ -4041,7 +4045,7 @@
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
       *            ºßÂð´µ¼ÔË¬Ìä¿ÇÎÅ
-                   IF  ( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
+                   IF (( WRK-TNS-OSINKBN(IDX3) =     1          )  AND
                        ((SRY-SRYCD(IDX3)   NOT =    "114000110")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114001610")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114000970")   AND
@@ -4058,7 +4062,8 @@
                         (SRY-SRYCD(IDX3)   NOT =    "114011570")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114012070"))
+                        (SRY-SRYCD(IDX3)   NOT =    "114012070")))
+                   OR (  SRY-SRYCD(IDX3)       =    "114001110"  )
                        MOVE   1              TO   FLG-ZAITAKU
                        COMPUTE   RECE41-TENSU(8)   =
                                  RECE41-TENSU(8)   +
