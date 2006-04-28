@@ -450,6 +450,8 @@
                ELSE
                    IF    ( WRK-PRTFLG          =   1   )
                    AND   ( WRK-PARA-NYUGAIKBN  =   "2" )
+                   AND   ( LNK-PRTKANRI-SRYYM  >=
+                                               WRK-CONS-SRYYM-200604 )
                        CONTINUE
                    ELSE
                        PERFORM 2001-GAIRAI-SYUKEI-SEC
