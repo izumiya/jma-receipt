@@ -3200,6 +3200,7 @@
                    COMPUTE WRK-TENSUKEI        =   WRK-TENSU-KEI
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
+                                               +   0.5
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-GEN
                END-IF
