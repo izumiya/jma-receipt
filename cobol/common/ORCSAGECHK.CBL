@@ -536,6 +536,14 @@
                   (COMB-KOH4HKNNUM     =   "011" ))
                MOVE    1               TO  FLG-OK2
            END-IF
+      *    更正のみ時
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "015" )  OR
+                  (COMB-KOH2HKNNUM     =   "015" )  OR
+                  (COMB-KOH3HKNNUM     =   "015" )  OR
+                  (COMB-KOH4HKNNUM     =   "015" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
       *    精神通院のみ時
            IF     (COMB-HKNNUM         =   SPACE )  AND
                  ((COMB-KOH1HKNNUM     =   "021" )  OR
