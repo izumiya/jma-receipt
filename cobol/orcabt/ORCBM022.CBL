@@ -51,6 +51,8 @@
       *
       *  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.01    NACL-Æ£¸¶    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  02.09.02    NACL-Æ£¸¶    06/04/28  Áí³çÉ½¡Ê°å²Ê¡¦Æþ±¡³°¡Ë¤Î¤È¤­
+      *                                     £²£°£°£¶Ç¯£³·î°ÊÁ°¤òÊ¬¤±¤Ê¤¤
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -446,22 +448,27 @@
                AND   ( LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200604 )
                    CONTINUE
                ELSE
-                   PERFORM 2001-GAIRAI-SYUKEI-SEC
+                   IF    ( WRK-PRTFLG          =   1   )
+                   AND   ( WRK-PARA-NYUGAIKBN  =   "2" )
+                       CONTINUE
+                   ELSE
+                       PERFORM 2001-GAIRAI-SYUKEI-SEC
       *
-                   IF      CNT-RECE10          >   ZERO 
-                       IF      WRK-PARA-NYUGAIKBN  =   "1"
-                           CALL    "ORCBM028"      USING 
+                       IF      CNT-RECE10          >   ZERO 
+                           IF      WRK-PARA-NYUGAIKBN  =   "1"
+                               CALL    "ORCBM028"      USING 
                                                    SUM-AREA
                                                    WRK-PARA
                                                    WRK-NYUGAIKBN
                                                    WRK-SYOKBN
                                                    WRK-PRTFLG
-                       ELSE
-                           CALL    "ORCBM027"      USING 
+                           ELSE
+                               CALL    "ORCBM027"      USING 
                                                    SUM-AREA
                                                    WRK-PARA
                                                    WRK-SYOKBN
                                                    WRK-PRTFLG
+                           END-IF
                        END-IF
                    END-IF
                END-IF    
@@ -1384,9 +1391,16 @@
                MOVE    WRK-CONS-SRYYM-200604
                                            TO  RECE10-XXSRYYM
            ELSE
-               MOVE    WRK-CONS-SRYYM-200604
-                                           TO  RECE10-SRYYM
-               MOVE    999999              TO  RECE10-XXSRYYM
+               IF    ( WRK-PRTFLG          =   2   )
+               AND   ( WRK-PARA-NYUGAIKBN  =   "2" )
+                   MOVE    WRK-CONS-SRYYM-200304
+                                               TO  RECE10-SRYYM
+                   MOVE    999999              TO  RECE10-XXSRYYM
+               ELSE
+                   MOVE    WRK-CONS-SRYYM-200604
+                                               TO  RECE10-SRYYM
+                   MOVE    999999              TO  RECE10-XXSRYYM
+               END-IF
            END-IF
            MOVE    WRK-NYUGAIKBN        TO  RECE10-NYUGAIKBN
       *
