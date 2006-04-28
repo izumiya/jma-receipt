@@ -14,7 +14,7 @@ tbl_rececom {
 	UPHMS				char(6);
 };
 primary	{
-	HOSPID,PTID,SRYKA,SRYYM,HKNCOMBI,SRYDD;
+	HOSPID,PTID,NYUGAIKBN,SRYKA,SRYYM,HKNCOMBI,SRYDD;
 };
 
 path	key		{ 	
