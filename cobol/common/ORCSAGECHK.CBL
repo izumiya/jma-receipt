@@ -542,7 +542,9 @@
                   (COMB-KOH2HKNNUM     =   "015" )  OR
                   (COMB-KOH3HKNNUM     =   "015" )  OR
                   (COMB-KOH4HKNNUM     =   "015" ))
-               MOVE    1               TO  FLG-OK2
+               IF      COMB-TEKSTYMD        >=   "20060401"
+                   MOVE    1               TO  FLG-OK2
+               END-IF
            END-IF
       *    精神通院のみ時
            IF     (COMB-HKNNUM         =   SPACE )  AND
