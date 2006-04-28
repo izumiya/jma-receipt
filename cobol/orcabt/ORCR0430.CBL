@@ -65,6 +65,7 @@
       *  01.02.09    NACL-ÌçÏÆ    05/11/15  ½ýÉÂ¼êÅö¶â¡¢ÎÅÍÜÈñÆ±°Õ½ñ¤Î¼«Æ°
       *                                     µ­ºÜÊÔ½¸½¤Àµ
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  02.09.02    NACL-ÌçÏÆ    06/04/28  ¥ê¥Ï¸¡º÷¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -296,6 +297,7 @@
            03  IDX11               PIC 9(04).
            03  IDX12               PIC 9(04).
            03  IDX13               PIC 9(04).
+           03  IDX15               PIC 9(01).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  DAY-IDX             PIC 9(04).
@@ -1753,9 +1755,14 @@
       *
            MOVE    ZERO                  TO  IDZ
            INITIALIZE                        WRK-FREE-AREA
+      *++++
+           PERFORM   VARYING   IDX15    FROM   2   BY  -1
+                      UNTIL   (IDX15          <    1)
+                       OR     (FLG-KYUSEI-OK  =    1)
       *
            INITIALIZE                        SRYACT-REC
            MOVE    RECE41-HOSPID         TO  SRY-HOSPID
+           MOVE    IDX15                 TO  SRY-NYUGAIKBN
            MOVE    RECE41-PTID           TO  SRY-PTID
            MOVE    WRK-KYUSEIYMD(1:6)    TO  SRY-SRYYM
            MOVE    WRK-SRYCD             TO  SRY-SRYCD (1)
@@ -1765,13 +1772,13 @@
            MOVE    WRK-SRYCD             TO  SRY-SRYCD (5)
            MOVE    SRYACT-REC            TO  MCPDATA-REC
            MOVE    "DBSELECT"            TO  MCP-FUNC
-           MOVE    "SRYACT-KEY12"        TO  ORC-DBPATH
+           MOVE    "SRYACT-KEY7"         TO  ORC-DBPATH
            CALL    "ORCMCPSUB"           USING
                                          MCPAREA
                                          ORCMCPAREA
                                          MCPDATA-REC
            IF      MCP-RC               =       ZERO
-               MOVE    "SRYACT-KEY12"    TO  ORC-DBPATH
+               MOVE    "SRYACT-KEY7"     TO  ORC-DBPATH
                PERFORM  900-SRYACT-READ-SEC
                PERFORM  UNTIL   FLG-SRYACT     =   1
                          OR     FLG-KYUSEI-OK  =   1
@@ -1820,18 +1827,20 @@
                                            ORCMCPAREA
                                            MCPDATA-REC
       *
-                 MOVE     "SRYACT-KEY12"   TO   ORC-DBPATH
+                 MOVE     "SRYACT-KEY7"    TO   ORC-DBPATH
                  PERFORM   900-SRYACT-READ-SEC
                END-PERFORM
            END-IF
            INITIALIZE                        MCPAREA
            MOVE    "DBCLOSECURSOR"   TO      MCP-FUNC
-           MOVE    "SRYACT-KEY12"    TO      ORC-DBPATH
+           MOVE    "SRYACT-KEY7"     TO      ORC-DBPATH
            CALL    "ORCMCPSUB"       USING
                                      MCPAREA
                                      ORCMCPAREA
                                      MCPDATA-REC
-      ***
+      *
+           END-PERFORM
+      *++++
            IF      WRK-KYUSEI-ZAINUM    NOT =    ZERO
               INITIALIZE                           SRYACT-REC
               MOVE    RECE41-HOSPID          TO    SRY-HOSPID
