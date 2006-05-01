@@ -298,6 +298,8 @@
       *    ºÞÌÀºÙÁí¿ô¡Ê¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÊÌ¡Ë
            03  WRK-ZAIWMAX-G.
                05  WRK-ZAIWMAX     PIC 9(03)   OCCURS  6.
+           03  WRK-ZAIWMAX-SAV-G.
+               05  WRK-ZAIWMAX-SAV PIC 9(03)   OCCURS  6.
       * 
            03  WRK-YUKOKETA        PIC  9(02).
            03  WRK-NAME            PIC  X(200).
@@ -530,9 +532,6 @@
        01  RECE64SAV-REC.
            COPY    "CPRCF064.INC"  REPLACING  //RECE64//
                                    BY         //RECE64SAV//.
-       01  GJK-ZAIW-NAMEINF.
-           03  GJK-ZAIW-YUKOKETA           PIC  9(02).
-           03  GJK-ZAIW-NAME               PIC  X(200).
       *
       *ºÞ¤ÎÀèÆ¬¤Î¿ÇÎÅ¥³¡¼¥É¾ðÊó
        01  WRK-ZAIW-AREA.
@@ -553,8 +552,8 @@
       *     
       *    ¿ÇÎÅ¹Ô°ÙÊÌ¥Æ¡¼¥Ö¥ë
       *    £±¡§¥æ¡¼¥¶¡¼¥³¥á¥ó¥È¡¢£²¡§¥³¥á¥ó¥È¡¢
-      *    £³¡§¿ÇÎÅ¹Ô°Ù¡¢£´¡§ÌôºÞ¡¢£µ¡§ÆÃÄê´ïºà                     
-           03  TBL-ZAIW-OCC                OCCURS 5.  
+      *    £³¡§¿ÇÎÅ¹Ô°Ù¡¢£´¡§ÌôºÞ¡¢£µ¡§ÆÃÄê´ïºà¡¢£¶¡§³°¿×¸¡ÂàÈòÍÑ
+           03  TBL-ZAIW-OCC                OCCURS 6.  
                05  TBL-ZAIW-REC            OCCURS 100.
                    07  TBL-ZAIW-SRYACTINF.
       *                ¿ÇÎÅ¥³¡¼¥É
@@ -808,6 +807,9 @@
                                                    "160177770".
            03  WRK-CONS-GAIJINKEN-N    PIC 9(09)   VALUE 
                                                    160177770.
+      *    Ç¢°ìÈÌ
+           03  WRK-CONS-NYOIPPAN-N     PIC 9(09)   VALUE 
+                                                   160000310.
       *    ¸¡ºº¤Î²ó¿ô¤Ë½¸·×¤·¤Ê¤¤¿ÇÎÅ¹Ô°Ù
       *    ºÎ·ì¡Ê£Â¡Ý£Á¡Ë
            03  WRK-CONS-SAIKETSU1      PIC X(09)   VALUE "160101210".
@@ -2253,8 +2255,9 @@
       *
            IF      ( RECE62-KENTAIKASANFLG   =   '1' )
              AND   ( WRK-ZAIW-KNSJISKBN  NOT =   2 )
-             AND   ((RECE64-KNSJISGRPKBN     >   0)
+             AND  (((RECE64-KNSJISGRPKBN     >   0)
              AND    (RECE64-KNSJISGRPKBN     <   7))
+             OR     (RECE64-SRYCDTOTAL       =   WRK-CONS-NYOIPPAN-N))
              MOVE    RECE64-REC        TO  RECE64GJK-REC
              PERFORM VARYING IDX FROM  1   BY  1
                      UNTIL   IDX >     31
@@ -2307,11 +2310,15 @@
                                             + WRK-GAIJINKEN-ZAINUM
                                             * 100000
                       MOVE    1        TO  FLG-GAIJINKEN
-                      MOVE    TBL-ZAIW-NAMEINF (3 1)
-                                       TO  GJK-ZAIW-NAMEINF
+                      MOVE    TBL-ZAIW-OCC (3)
+                                       TO  TBL-ZAIW-OCC (6)
+                      MOVE    WRK-ZAIWMAX-G
+                                       TO  WRK-ZAIWMAX-SAV-G
                       PERFORM 2005-SRYKBNELSE-HENSYU-SEC
-                      MOVE    GJK-ZAIW-NAMEINF
-                                       TO  TBL-ZAIW-NAMEINF (3 1)
+                      MOVE    TBL-ZAIW-OCC (6)
+                                       TO  TBL-ZAIW-OCC (3)
+                      MOVE    WRK-ZAIWMAX-SAV-G
+                                       TO  WRK-ZAIWMAX-G
                   END-PERFORM
            END-IF
            .
