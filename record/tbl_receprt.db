@@ -847,7 +847,7 @@ path	key37	{
                     AND     HKNJANUM_S   =   :HKNJANUM_S
                     AND     CHOUKI       LIKE :CHOUKI
                     AND     ZAITAKU      LIKE :ZAITAKU
-                   ORDER BY  CHOUKI,ZAITAKU,RECESYUBETU_SRT,PTNUM
+                   ORDER BY  CHOUKI,ZAITAKU,RECESYUBETU_SRT,PTNUM,SRYYM,RENNUM
 		;
 	};
 };
