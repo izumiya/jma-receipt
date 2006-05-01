@@ -449,7 +449,7 @@
                    CONTINUE
                ELSE
                    IF    ( WRK-PRTFLG          =   1   )
-                   AND   ( WRK-PARA-NYUGAIKBN  =   "2" )
+      *************AND   ( WRK-PARA-NYUGAIKBN  =   "2" )
                    AND   ( LNK-PRTKANRI-SRYYM  >=
                                                WRK-CONS-SRYYM-200604 )
                        CONTINUE
@@ -1394,7 +1394,7 @@
                                            TO  RECE10-XXSRYYM
            ELSE
                IF    ( WRK-PRTFLG          =   2   )
-               AND   ( WRK-PARA-NYUGAIKBN  =   "2" )
+               AND   ( WRK-NYUGAIKBN       =   "2" )
                    MOVE    WRK-CONS-SRYYM-200304
                                                TO  RECE10-SRYYM
                    MOVE    999999              TO  RECE10-XXSRYYM
