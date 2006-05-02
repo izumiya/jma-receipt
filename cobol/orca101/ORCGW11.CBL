@@ -3127,8 +3127,7 @@
                MOVE    WIDGET-INSENSITIVE  TO  W11-SELNUM-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W11-B03-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W11-B08-STATE
-               IF     (SPA-W01-STYUKYMD    NOT =   ZERO ) AND
-                      (SPA-W01-SELNUM      NOT =   ZERO )
+               IF     (SPA-W01-SELNUM      NOT =   ZERO )
                    MOVE    WIDGET-NORMAL       TO  W11-B03-STATE
                END-IF
            WHEN    "1031"
