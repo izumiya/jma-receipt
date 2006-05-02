@@ -3502,7 +3502,7 @@
                       (SPA-COM-KZMFLG2(IDX)    NOT =   SPACE )
       *            ÌóÂ«¥»¥Ã¥È
                    IF     (SPA-GMN-INPUTCD(IDX)(1:1)   =   "." )
-                      OR  (SPA-GMN-INPUTCD(IDX)(1:1)   =   "S" )
+      *?              OR  (SPA-GMN-INPUTCD(IDX)(1:1)   =   "S" )
                       CONTINUE
                    ELSE
                        MOVE    SPACE       TO  SPA-MAE-INPUTCD (IDX)
