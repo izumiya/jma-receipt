@@ -4250,7 +4250,14 @@
       *    同日初診がある時、同日初診
            IF      (SPA-DOUYMD     NOT =   SPACE )  AND
                    (SPA-DOUYMD         >   WRK-SYOYMD)
-               MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
+      *
+               IF   WRK-COM-INPUTCD(IDX-Z)  =  "113001910" OR
+                                               "113002010"
+                 CONTINUE
+               ELSE
+                 MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
+               END-IF
+      **         MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
            END-IF
       *
       *    最終退院日がある時、退院日
