@@ -3111,12 +3111,12 @@
        330121-SIDOU-CHK-SEC               SECTION.
       *
       *    同日初診がある時、同日初診
-           IF      (SPA-DOUYMD     NOT =   SPACE )  AND
-                   (SPA-DOUYMD         >   SPA-SYOYMD)
-               MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
-           ELSE
+      **   IF      (SPA-DOUYMD     NOT =   SPACE )  AND
+      **           (SPA-DOUYMD         >   SPA-SYOYMD)
+      **       MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
+      **   ELSE
                MOVE    SPA-SYOYMD          TO  WRK-SYOYMD
-           END-IF
+      **   END-IF
       *    最終退院日がある時、退院日
            IF     (SPA-K02N-TAIINYMD   =   SPACE )  OR
                   (SPA-K02N-TAIINYMD   <=  WRK-SYOYMD)
