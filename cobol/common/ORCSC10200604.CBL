@@ -4251,7 +4251,8 @@
            IF      (SPA-DOUYMD     NOT =   SPACE )  AND
                    (SPA-DOUYMD         >   WRK-SYOYMD)
       *
-               IF   WRK-COM-INPUTCD(IDX-Z)  =  "113001910" OR
+               IF   WRK-COM-INPUTCD(IDX-Z)  =  "113001810" OR
+                                               "113001910" OR
                                                "113002010"
                  CONTINUE
                ELSE
