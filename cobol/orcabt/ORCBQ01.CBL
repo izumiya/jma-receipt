@@ -187,7 +187,7 @@
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CSV-LASTYMD             PIC X(10).
            03  FILLER                  PIC X(01)   VALUE ",".
-           03  CSV-TEL                 PIC X(10).
+           03  CSV-TEL                 PIC X(15).
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CSV-POST                PIC X(07).
            03  FILLER                  PIC X(01)   VALUE ",".
