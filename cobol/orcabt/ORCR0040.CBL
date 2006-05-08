@@ -78,6 +78,7 @@
       *                                     µ­ºÜÊÔ½¸½¤Àµ
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.02    NACL-ÌçÏÆ    06/04/28  ¥ê¥Ï¸¡º÷¾ò·ï½¤Àµ
+      *  02.09.03    NACL-ÌçÏÆ    06/05/01  ¥ê¥ÏÈ¯¾ÉÆüÅö·îÊ¬µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -316,6 +317,7 @@
            03  IDX13               PIC 9(04).
            03  IDX14               PIC 9(04).
            03  IDX15               PIC 9(01).
+           03  IDX16               PIC 9(02).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -363,6 +365,9 @@
       *
            03  TBL-SANTEI-DAY.
                05  TB-SANTEI-DAY     PIC 9(02)   OCCURS  31.
+      *
+           03  TBL-RIHASANTEI-DAY.
+               05  TB-RIHASANTEI-DAY PIC 9(01)   OCCURS  31.
       *
            03  WRK-HKNCOMBINUMX      PIC X(04).
            03  WRK-HKNCOMBINUM9      REDEFINES  WRK-HKNCOMBINUMX
@@ -2144,13 +2149,30 @@
              MOVE      CONS-SINDAI     TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-SINDAI-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-SINDAI-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-SINDAI-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       ***
@@ -2158,13 +2180,30 @@
              MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-KOKYUKI-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-KOKYUKI-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-KOKYUKI-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       ***
@@ -2172,13 +2211,30 @@
              MOVE      CONS-NOUKE      TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-NOUKE-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-NOUKE-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-NOUKE-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       ***
@@ -2186,13 +2242,30 @@
              MOVE      CONS-UNDOKI      TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-UNDOKI-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-UNDOKI-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-UNDOKI-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       ***
@@ -2200,13 +2273,30 @@
              MOVE      CONS-NANBYO      TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-NANBYO-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-NANBYO-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-NANBYO-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       ***
@@ -2214,13 +2304,30 @@
              MOVE      CONS-SYOGAI      TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-SYOGAI-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-SYOGAI-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-SYOGAI-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       ***
@@ -2228,13 +2335,30 @@
              MOVE      CONS-SESSYOKU      TO   WRK-SRYCD
              PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
              IF        FLG-KYUSEI-COMMENT    =      1
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               PERFORM   VARYING   IDX14    FROM   1   BY   1
-                          UNTIL    IDX14      >    5
-                  IF   TBL-HASSYO-SESSYOKU-COMMENT(IDX14)   =  1
-                      PERFORM    20011-HASSYO-COMMENT-SEC
-                  END-IF
-               END-PERFORM
+               IF  WRK-KYUSEIYMD(7:2) = "00"
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-SESSYOKU-COMMENT(IDX14)   =  1
+                        PERFORM   VARYING   IDX16    FROM   1   BY   1
+                                   UNTIL    IDX16      >   31
+                          IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                            MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
+                            PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                            PERFORM    20011-HASSYO-COMMENT-SEC
+                          END-IF
+                        END-PERFORM
+                    END-IF
+                 END-PERFORM
+               ELSE
+                 PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                 PERFORM   VARYING   IDX14    FROM   1   BY   1
+                            UNTIL    IDX14      >    5
+                    IF   TBL-HASSYO-SESSYOKU-COMMENT(IDX14)   =  1
+                        MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
+                        PERFORM    20011-HASSYO-COMMENT-SEC
+                    END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       *
@@ -2388,6 +2512,7 @@
                    PERFORM   VARYING   IDX14    FROM   1   BY   1
                               UNTIL    IDX14      >    5
                       IF   TBL-HASSYO-KAITATU-COMMENT(IDX14)   =  1
+                          MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
                           PERFORM    20011-HASSYO-COMMENT-SEC
                       END-IF
                    END-PERFORM
@@ -2718,7 +2843,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(27:4)
-               COMPUTE WRK-ZAINUM    =  99999600  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99998000
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "40" TO  WRK-SRYKBN
              WHEN       CONS-SINDAI
                MOVE    20   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2730,7 +2856,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(35:4)
-               COMPUTE WRK-ZAINUM    =  99999610  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99998200
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-NOUKE
                MOVE    18   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2742,7 +2869,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(31:4)
-               COMPUTE WRK-ZAINUM    =  99999620  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99998400
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-UNDOKI
                MOVE    15   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2754,7 +2882,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(25:4)
-               COMPUTE WRK-ZAINUM    =  99999630  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99998600
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-KOKYUKI
                MOVE    17   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2766,7 +2895,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(29:4)
-               COMPUTE WRK-ZAINUM    =  99999640  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99998800
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-SESSYOKU
                MOVE    18   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2778,7 +2908,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(31:4)
-               COMPUTE WRK-ZAINUM    =  99999650  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99999000
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-NANBYO
                MOVE    16   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2790,7 +2921,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(27:4)
-               COMPUTE WRK-ZAINUM    =  99999660  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99999200
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-SYOGAI
                MOVE    18   TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
@@ -2802,7 +2934,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE05XX-NAME(IDX-RECE05 1)(31:4)
-               COMPUTE WRK-ZAINUM    =  99999670  +  IDX14
+               COMPUTE WRK-ZAINUM    =  99999400
+                                     + (IDX16 + (IDX14 * 31) - 31)
                MOVE    "80" TO  WRK-SRYKBN
            END-EVALUATE
       *
@@ -2896,6 +3029,7 @@
       *
            MOVE     ZERO     TO     FLG-KYUSEI-COMMENT
            MOVE     ZERO     TO     WRK-KYUSEIYMD
+           INITIALIZE               TBL-RIHASANTEI-DAY
       *
       *    ¥ê¥Ï³«»ÏÆü
       *
@@ -2923,6 +3057,22 @@
                                  ( FLG-KYUSEI-COMMENT =   1 )
       *
                  IF   SANTEI-SRYYM  <=  RECE02-SRYYM
+                  IF   SANTEI-SRYYM  =  RECE02-SRYYM
+                   PERFORM  VARYING   IDX3   FROM   1  BY  1
+                             UNTIL    IDX3    >    31
+      *
+                     IF   SANTEI-DAY(IDX3)  NOT =  ZERO
+      *
+                         MOVE   SANTEI-SRYYM   TO  WRK-KYUSEIYMD(1:6)
+                         MOVE   "00"           TO  WRK-KYUSEIYMD(7:2)
+                         MOVE   1     TO  TB-RIHASANTEI-DAY(IDX3)
+      *
+                         MOVE   1     TO  FLG-KYUSEI-COMMENT
+      *
+                     END-IF
+      *
+                   END-PERFORM
+                  ELSE
                    PERFORM  VARYING   IDX3   FROM  31  BY  -1
                              UNTIL   ( IDX3               <    1 )
                                OR    ( FLG-KYUSEI-COMMENT =    1 )
@@ -2937,6 +3087,7 @@
                      END-IF
       *
                    END-PERFORM
+                  END-IF
                  END-IF
       *
                  MOVE    "SANTEI-KEY3"       TO  ORC-DBPATH
