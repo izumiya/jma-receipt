@@ -98,6 +98,7 @@
            03  WRK-DAY-R   REDEFINES   WRK-DAY-X.
                05  WRK-DAY-9               PIC 9(02).
            03  WRK-SRYYMD                  PIC X(08). 
+           03  WRK-KONKAI-NYUINYMD         PIC X(08).
       *
        01  CONST-AREA.
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
@@ -184,7 +185,7 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-           PERFORM 800-DISPLAY-SEC
+      *     PERFORM 800-DISPLAY-SEC
       *
            .
        000-PROC-EXT.
@@ -255,6 +256,9 @@
       *
            IF    ( PTNYUINRRK-NYUINYMD <=  STUSAN-KJNYMD )
            AND   ( PTNYUINRRK-TAIINYMD >=  STUSAN-KJNYMD )
+      *
+               MOVE    PTNYUINRRK-NYUINYMD TO  WRK-KONKAI-NYUINYMD
+      *
                IF    ( PTNYUINRRK-JTIKBN   =   "5" OR "6" )
                    MOVE    02              TO  STUSAN-RC
                    GO  TO  2100-KONKAI-NYUIN-TUSAN-EXT
@@ -383,6 +387,20 @@
                    =   STUSAN-NISSU04  +   PTNYUINRRK-TAISYONISSU
                COMPUTE STUSAN-NISSU05
                    =   STUSAN-NISSU05  +   PTNYUINRRK-TAISYONISSU
+               DISPLAY "PTNYUINRRK-NYUINCHUKBN =" PTNYUINRRK-NYUINCHUKBN
+               IF    ( PTNYUINRRK-NYUINCHUKBN  =   "1" )
+                   MOVE   PTNYUINRRK-TAIINYMD
+                                       TO  WRK-YMD
+                   MOVE   "1"          TO  WRK-ZOGENPTN
+                   MOVE   1            TO  WRK-ZOGEN
+                   PERFORM 800-CALENDAR-SEC
+                   IF    ( WRK-KONKAI-NYUINYMD
+                                       =   WRK-KEISANYMD )
+                       COMPUTE STUSAN-NISSU01
+                           =   STUSAN-NISSU01
+                           +   PTNYUINRRK-TAISYONISSU
+                   END-IF
+               END-IF
            WHEN    OTHER
                MOVE    SDNTCHK-STYMD       TO  WRK-STYMD
                MOVE    PTNYUINRRK-TAIINYMD TO  WRK-EDYMD
@@ -741,19 +759,32 @@
                GO  TO  2100-RRK-DATA-SET-EXT
            END-IF
       *
-           COMPUTE STUSAN-RRK-CNT
-               =   STUSAN-RRK-CNT      +   1
-           MOVE    STUSAN-RRK-CNT      TO  IDX2
-      *
-           MOVE    PTNYUINRRK-JTIKBN   TO  STUSAN-RRK-JTIKBN   (IDX2)
-           MOVE    PTNYUINRRK-NYUINYMD TO  STUSAN-RRK-NYUINYMD (IDX2)
-           MOVE    PTNYUINRRK-TAIINYMD TO  STUSAN-RRK-TAIINYMD (IDX2)
-           MOVE    SDNTCHK-DJKBN       TO  STUSAN-RRK-DJKBN    (IDX2)
-           IF    ( PTNYUINRRK-JTIKBN   =   "5" OR  "6" )
-               MOVE    PTNYUINRRK-TAISYONISSU
-                                       TO  STUSAN-RRK-NISSU    (IDX2)
+           IF    ( PTNYUINRRK-NYUINCHUKBN  =   "1" )
+               IF    ( PTNYUINRRK-JTIKBN   =   "6" )
+                AND  ( STUSAN-RRK-CNT      >   ZERO )
+                   MOVE    STUSAN-RRK-CNT  TO  IDX2
+                   MOVE    PTNYUINRRK-NYUINYMD
+                                           TO  STUSAN-RRK-NYUINYMD(IDX2)
+                   COMPUTE STUSAN-RRK-NISSU   (IDX2)
+                       =   STUSAN-RRK-NISSU   (IDX2)
+                       +   PTNYUINRRK-TAISYONISSU
+               END-IF
            ELSE
-               MOVE    WRK-ACCT-NISSU  TO  STUSAN-RRK-NISSU    (IDX2)
+      *
+               COMPUTE STUSAN-RRK-CNT
+                   =   STUSAN-RRK-CNT      +   1
+               MOVE    STUSAN-RRK-CNT      TO  IDX2
+      *
+               MOVE    PTNYUINRRK-JTIKBN   TO  STUSAN-RRK-JTIKBN  (IDX2)
+               MOVE    PTNYUINRRK-NYUINYMD TO  STUSAN-RRK-NYUINYMD(IDX2)
+               MOVE    PTNYUINRRK-TAIINYMD TO  STUSAN-RRK-TAIINYMD(IDX2)
+               MOVE    SDNTCHK-DJKBN       TO  STUSAN-RRK-DJKBN   (IDX2)
+               IF    ( PTNYUINRRK-JTIKBN   =   "5" OR  "6" )
+                   MOVE    PTNYUINRRK-TAISYONISSU
+                                           TO  STUSAN-RRK-NISSU   (IDX2)
+               ELSE
+                   MOVE    WRK-ACCT-NISSU  TO  STUSAN-RRK-NISSU   (IDX2)
+               END-IF
            END-IF
       *
            .
