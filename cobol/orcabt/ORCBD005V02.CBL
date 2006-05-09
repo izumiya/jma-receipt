@@ -616,6 +616,9 @@
       *
            MOVE    ZERO            TO  FLG-SMEI
            PERFORM 900-BD00501-READ-SEC
+           IF    ( FLG-SMEI    NOT =   ZERO )
+               MOVE    1           TO  FLG-END
+           END-IF
       *
            PERFORM UNTIL   FLG-END     =   1
       *        帳票編集<見出し>処理
@@ -709,7 +712,13 @@
            PERFORM UNTIL ( FLG-END         =   1 )
                    OR    ( CNT-LINE       >=   30 )
       *
-               PERFORM 3202-BODY-MAIN-HEN-SEC
+               IF    ( FLG-NEXTPAGE        =   1 )
+                   PERFORM 3202-NEXT-PAGE-HEN-SEC
+               END-IF
+      *
+               IF    ( FLG-END         =   ZERO )
+                   PERFORM 3202-BODY-MAIN-HEN-SEC
+               END-IF
       *
            END-PERFORM
       *
@@ -718,32 +727,37 @@
            EXIT.
       *
       *****************************************************************
+      *    帳票編集<明細行　次ページ>処理
+      *****************************************************************
+       3202-NEXT-PAGE-HEN-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-OUT-AREA
+      *
+           MOVE    WRK-NAI-BTUNUM  TO  WRK-EDT-BTUNUM
+           PERFORM 3200-BODY-BTUNAME-HEN-SEC
+      *
+           MOVE    WRK-NAI-BRMNUM  TO  WRK-EDT-BRMNUM
+           PERFORM 3200-BODY-BRMNUM-HEN-SEC
+      *
+           MOVE    WRK-NAI-SRYKA   TO  WRK-EDT-SRYKA
+           PERFORM 3200-BODY-SRYKA-HEN-SEC
+      *
+           MOVE    WRK-NAI-HOSPID  TO  WRK-EDT-HOSPID
+           MOVE    WRK-NAI-PTID    TO  WRK-EDT-PTID
+           MOVE    WRK-NAI-PTNUM   TO  WRK-EDT-PTNUM
+           PERFORM 3201-BODY-PTID-HEN-SEC
+      *
+           PERFORM 3203-BODY-NAIYO-SET-SEC
+      *
+           MOVE    ZERO            TO  FLG-NEXTPAGE
+      *
+           .
+       3202-NEXT-PAGE-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
        3202-BODY-MAIN-HEN-SEC          SECTION.
-      *
-           IF    ( FLG-NEXTPAGE    =   1 )
-      *
-               INITIALIZE                  WRK-OUT-AREA
-      *
-               MOVE    WRK-NAI-BTUNUM  TO  WRK-EDT-BTUNUM
-               PERFORM 3200-BODY-BTUNAME-HEN-SEC
-      *
-               MOVE    WRK-NAI-BRMNUM  TO  WRK-EDT-BRMNUM
-               PERFORM 3200-BODY-BRMNUM-HEN-SEC
-      *
-               MOVE    WRK-NAI-SRYKA   TO  WRK-EDT-SRYKA
-               PERFORM 3200-BODY-SRYKA-HEN-SEC
-      *
-               MOVE    WRK-NAI-HOSPID  TO  WRK-EDT-HOSPID
-               MOVE    WRK-NAI-PTID    TO  WRK-EDT-PTID
-               MOVE    WRK-NAI-PTNUM   TO  WRK-EDT-PTNUM
-               PERFORM 3201-BODY-PTID-HEN-SEC
-      *
-               PERFORM 3203-BODY-NAIYO-SET-SEC
-      *
-               MOVE    ZERO            TO  FLG-NEXTPAGE
-           END-IF
       *
            MOVE    ZERO                TO  CNT-DENP
            INITIALIZE                      WRK-NAI-AREA
@@ -884,7 +898,8 @@
            IF    ( WRK-NAI-DENPNUM-X   =   ZERO OR SPACE)
                MOVE    SMEI-DENPNUM    TO  WRK-NAI-DENPNUM
            ELSE
-               IF    ( SMEI-DENPNUM    NOT =   WRK-NAI-DENPNUM )
+               IF    ( WRK-NAI-DENPNUM-X   =   ALL "*" )
+                OR   ( SMEI-DENPNUM    NOT =   WRK-NAI-DENPNUM )
                    MOVE    ALL "*"     TO  WRK-NAI-DENPNUM-X
                END-IF
            END-IF
@@ -1166,6 +1181,10 @@
       *
       *    MOVE    ZERO            TO  CNT-DENP
       *    INITIALIZE                  WRK-NAI-AREA
+      *
+           IF    ( FLG-SMEI        NOT =   ZERO )
+               MOVE    1           TO  FLG-END
+           END-IF
       *
            .
        3203-BODY-NAIYO-SET-EXT.
@@ -1462,7 +1481,6 @@
            READ    BD00501-FILE NEXT
            AT END
                MOVE    1               TO FLG-SMEI
-               MOVE    1               TO FLG-END
            NOT AT  END
                MOVE    BD00501-SMEI-DATA-AREA
                                        TO SMEI-REC
