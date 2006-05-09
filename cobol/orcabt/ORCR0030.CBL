@@ -246,6 +246,7 @@
       *  02.09.08    NACL-ÌçÏÆ    06/04/27  ÁêÌÏ¸¶»Ô¹ñÊÝ¡Ü£²£±Àº¿À°ìÉôÉéÃ´
       *                                     ÊÔ½¸½¤Àµ
       *  02.09.09    NACL-ÌçÏÆ    06/04/28  ºßÂðÊÔ½¸½¤Àµ
+      *  02.09.10    NACL-ÌçÏÆ    06/05/08  ¼ýÇ¼¤è¤êÁíÅÀ¿ô¤ò½¸·×
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4785,7 +4786,6 @@
       *
            MOVE    "SYUNOU-KEY16"     TO  WK-PATH
            PERFORM 900-CSR-CLOSE-SEC
-      *
            .
        2105-YKZFTN-SET-EXT.
            EXIT.
@@ -4795,15 +4795,16 @@
       *****************************************************************
        21052-RECE02-HENSYU3-SEC               SECTION.
       *
+      *    ¼ýÇ¼¤è¤êÁíÅÀ¿ô¤ò½¸·×
+           ADD       SYU-TOTAL-HKNTEN   TO   RECE02-RJNGAIFTN
+      *
+      *
            COMPUTE   RECE02-YKZFTN(1)   =    RECE02-YKZFTN(1)   +
                                              SYU-SYUCOMPYKZFTN
            IF      RECE02-SRYYM      >=  "200210"
              IF    RECE02-ZAITAKU      NOT =    SPACE
                 PERFORM     210521-HOKEN-FUTAN-HENSYU-SEC
              ELSE                                                       
-      ***>      IF    RECE02-RJNHKNNUM    NOT =    SPACE                
-      ***>        ADD    SYU-KOH1COMPFTN  TO   RECE02-RJNGAIFTN         
-      ***>      END-IF                                                  
       *         Á¥°÷ÊÝ¸±¡ÊÈïÊÝ¸±¼Ô¡Ë¡ÜÄÌ¶ÐºÒ³²
                 IF    RECE02-SENIN-TUUSAI     =    "1"
                   ADD    SYU-SYUCOMPFTN   TO   RECE02-FTNMONEY(1)
@@ -4812,7 +4813,6 @@
            ELSE
              IF    RECE02-RJNHKNNUM    NOT =    SPACE
                 ADD    SYU-KOH1COMPFTN  TO   RECE02-FTNMONEY(1)
-      ***>      ADD    SYU-KOH1COMPFTN  TO   RECE02-RJNGAIFTN
              END-IF
       *      Á¥°÷ÊÝ¸±¡ÊÈïÊÝ¸±¼Ô¡Ë¡ÜÄÌ¶ÐºÒ³²
              IF    RECE02-SENIN-TUUSAI     =    "1"
@@ -4932,7 +4932,6 @@
            AND  ( SYU-KOH-HKNNUM(4)   =   SPACE  )
                IF    RECE02-RJNHKNNUM    NOT =    SPACE
                  ADD    SYU-KOH1COMPFTN  TO   RECE02-FTNMONEY(1)
-      ***>                                    RECE02-RJNGAIFTN
                                               WRK-KOH-GAI
                ELSE
                  ADD    SYU-SYUCOMPFTN   TO   RECE02-FTNMONEY(1)
@@ -4994,15 +4993,9 @@
            IF  WRK-FTNKEI   >   FTN-KOH-YYY
                 ADD    FTN-KOH-YYY    TO  RECE02-FTNMONEY(1)
                                           FTN-KOH-XXX
-      ***>      IF    RECE02-RJNHKNNUM    NOT =    SPACE
-      ***>          ADD  FTN-KOH-YYY  TO  RECE02-RJNGAIFTN
-      ***>      END-IF
            ELSE
                 ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
                                           FTN-KOH-XXX
-      ***>      IF    RECE02-RJNHKNNUM    NOT =    SPACE
-      ***>          ADD  WRK-FTNKEI   TO  RECE02-RJNGAIFTN
-      ***>      END-IF
            END-IF
       *
            .

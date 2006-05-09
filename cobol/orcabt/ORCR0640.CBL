@@ -186,6 +186,7 @@
       *                                     ÊÔ½¸½¤Àµ
       *  02.09.07    NACL-ÌçÏÆ    06/04/27  ÁêÌÏ¸¶»Ô¹ñÊÝ¡Ü£²£±Àº¿À°ìÉôÉéÃ´
       *                                     ÊÔ½¸½¤Àµ
+      *  02.09.08    NACL-ÌçÏÆ    06/05/08  ¼ýÇ¼¤è¤êÁíÅÀ¿ô¤ò½¸·×
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7285,6 +7286,10 @@
       *****************************************************************
        21044-RECE62-FTN-HENSYU-SEC               SECTION.
       *
+      *    ¼ýÇ¼¤è¤êÁíÅÀ¿ô¤ò½¸·×
+           ADD       SYU-TOTAL-HKNTEN   TO   RECE62-RJNGAIFTN
+      *
+      *
            IF   RECE62-NYUINRYOFLG       =   "1"
            AND  FLG-NYUINRYO             =   ZERO
                PERFORM         210441-NYUINRYOFLG-SET-SEC
@@ -7312,8 +7317,6 @@
                                        RECE62-SHOKUJIRYOYOHI(1)
                    ADD   SYU-SKJ-FTN-RECE(1)  TO
                                        RECE62-SHOKUJIFTN(1)
-      *            ADD   SYU-SKJ-FTN-RECE(1)  TO
-      *                                RECE62-RJNNYUFTN
              END-IF
            END-IF
       *
@@ -7329,7 +7332,6 @@
            ELSE
              IF    RECE62-RJNHKNNUM    NOT =    SPACE
                 ADD    SYU-KOH1COMPFTN  TO   RECE62-FTNMONEY(1)
-      ***>      ADD    SYU-KOH1COMPFTN  TO   RECE62-RJNNYUFTN
              END-IF
       *      Á¥°÷ÊÝ¸±¡ÊÈïÊÝ¸±¼Ô¡Ë¡ÜÄÌ¶ÐºÒ³²
              IF    RECE62-SENIN-TUUSAI     =    "1"
@@ -7512,7 +7514,6 @@
            AND  ( SYU-KOH-HKNNUM(4)   =   SPACE  )                 
                IF    RECE62-RJNHKNNUM    NOT =    SPACE            
                  ADD    SYU-KOH1COMPFTN  TO   RECE62-FTNMONEY(1)   
-      ***>                                    RECE62-RJNNYUFTN     
                                               WRK-KOH-GAI          
                ELSE                                                
                  ADD    SYU-SYUCOMPFTN   TO   RECE62-FTNMONEY(1)   
@@ -7587,15 +7588,9 @@
            IF  WRK-FTNKEI  >  FTN-KOH-YYY
                 ADD      FTN-KOH-YYY  TO  RECE62-FTNMONEY(1)
                                           FTN-KOH-XXX
-      ***>      IF    RECE62-RJNHKNNUM    NOT =    SPACE
-      ***>          ADD  FTN-KOH-YYY  TO  RECE62-RJNNYUFTN
-      ***>      END-IF
            ELSE
                 ADD      WRK-FTNKEI   TO  RECE62-FTNMONEY(1)
                                           FTN-KOH-XXX
-      ***>      IF    RECE62-RJNHKNNUM    NOT =    SPACE
-      ***>          ADD  WRK-FTNKEI   TO  RECE62-RJNNYUFTN
-      ***>      END-IF
            END-IF
       *
            .
@@ -8113,7 +8108,8 @@
                OR ((WRK-PREFNUM      =   13           ) AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "151" OR "451"))
                OR ((RECE62-KOHNUM(KOHFTN-IDX) =  "010" OR "021") AND
-                   (RECE62-HKNJANUM  =  "133033" OR "133280"   ))
+                   (RECE62-HKNJANUM(1:6)
+                                     =  "133033" OR "133280"   ))
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                ELSE
