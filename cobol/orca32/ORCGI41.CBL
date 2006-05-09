@@ -5777,6 +5777,16 @@
            MOVE    "NYUKSNCHK-KEY" TO  WRK-DBPATH
            PERFORM 900-TBL-CLOSE-SEC
       *
+      *    老人特定入院基本料の加算チェック漏れ対応
+           IF   (WRK-BTU-NYUKSNKBN   =  "099")  AND
+                (WRK-KSN-NYUKSNKBN   =  "407"   OR
+                                        "408"   OR
+                                        "409"   OR
+                                        "410"   OR
+                                        "411"   OR
+                                        "412")
+               MOVE   ZERO     TO     FLG-NYUKSN
+           END-IF
            .
       *
        4801-NYUKSN-CHK-EXT.
