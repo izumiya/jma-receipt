@@ -186,7 +186,11 @@
       *                                     編集修正
       *  02.09.07    NACL-門脇    06/04/27  相模原市国保＋２１精神一部負担
       *                                     編集修正
-      *  02.09.08    NACL-門脇    06/05/08  収納より総点数を集計
+      *  02.09.08    NACL-門脇    06/05/08  改定通信医１６０４９号
+      *                                     日計表詳記レコード対応
+      *                                     収納より総点数を集計
+      *  02.09.11    NACL-藤原    06/05/09  ＯＣＲエリアの薬剤一部負担金
+      *                                     に生月日を記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -717,6 +721,8 @@
       *
            03  WRK-FUKA-KINGAKU                PIC 9(09).
            03  WRK-FUKA-VALUE                  PIC 9(01).
+      *
+           03  WRK-BIRTHDAY                    PIC X(08).
       *
       *    固定値
        01  CONST-AREA.
@@ -8631,7 +8637,11 @@
                    MOVE  ZERO           TO      OCR1-CHKDGT1
            END-IF
       *薬剤一部負担金
-           MOVE    ZERO                 TO      OCR1-YKZFTN
+      *****MOVE    ZERO                 TO      OCR1-YKZFTN
+      *生月日
+           MOVE    "0"                  TO      OCR1-YKZFTN (1:1)
+           MOVE    RECE62-BIRTHDAY      TO      WRK-BIRTHDAY
+           MOVE    WRK-BIRTHDAY (5:4)   TO      OCR1-YKZFTN (2:4)
       *チェックディジット２
            INITIALIZE                           LNK-CHKDGT-AREA
            MOVE    1                    TO      LNK-I-SYORIKBN

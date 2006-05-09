@@ -99,6 +99,8 @@
       *                                     検査等実施判断グループの追加
       *  02.09.03    NACL-藤原    06/04/25  主科のときの症状詳記データの
       *                                     キーの設定を修正
+      *  02.09.04    NACL-藤原    06/05/08  改定通信医１６０４９号
+      *                                     日計表、症状詳記レコード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -304,7 +306,7 @@
            03  IDXY                    PIC 9(03).
            03  IDXZ                    PIC 9(03).
            03  IDW1                    PIC 9(03).
-           03  IDW2                    PIC 9(03).
+           03  IDW2                    PIC 9(04).
            03  IDX0                    PIC 9(03).
            03  IDZ1                    PIC 9(03).
            03  IDZ2                    PIC 9(03).
@@ -369,12 +371,12 @@
       *    出力データ編集用
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-COM-SRYKBN          PIC X(02).
-           03  WRK-REC                 PIC X(200).
-           03  WRK-REC-LENGTH          PIC 9(03).
+           03  WRK-REC                 PIC X(2500).
+           03  WRK-REC-LENGTH          PIC 9(04).
            03  WRK-HENSYU-AREA.
-               05  WRK-DATA            PIC X(80).
+               05  WRK-DATA            PIC X(2400).
                05  WRK-NUM             PIC ZZZZZZZZZ9.999. 
-               05  WRK-NAGASA          PIC 9(03).
+               05  WRK-NAGASA          PIC 9(04).
                05  WRK-ST              PIC 9(02). 
                05  WRK-SYOSUU          PIC 9(01).
                05  WRK-END             PIC 9(01).
@@ -393,6 +395,7 @@
       *
            03  WRK-COM-FTNKBN          PIC X(01).
            03  WRK-TAIHI-FTNKBN        PIC X(01).
+           03  WRK-SJ-KBN              PIC X(02).
       *
       *    1桁目:生保 2桁目:結核 3桁目:精神
            03  WRK-3SYU-KBN.
@@ -910,6 +913,8 @@
          02  TBL-KENTAI-RECE65-MAX PIC 9(03).
       *
        01  WRK-CONS-AREA.
+      *    日計表レコード記載の条件点数
+           03  WRK-CONS-JYOGEN         PIC 9(06)   VALUE   350000.
       *    外来迅速検体検査加算
            03  WRK-CONS-SRYCD          PIC X(09)   VALUE   "160177770".
       *    検査日　日
@@ -4163,6 +4168,9 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       WRK-TBLMAX6
                PERFORM 200722-YKZ-HENSYU-SEC
+               IF      RECE62-RJNGAIFTN    >=  WRK-CONS-JYOGEN
+                   PERFORM 200725-NIKKEI-HENSYU-SEC
+               END-IF
            END-PERFORM            
       *
       *    特定器材データの編集                 
@@ -4286,6 +4294,34 @@
            PERFORM 5001-FILE-WRITE-SEC
            .
        200722-YKZ-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    摘要データ（日計表）編集処理
+      *****************************************************************
+       200725-NIKKEI-HENSYU-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *          
+           MOVE    "NI,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *    
+           PERFORM VARYING IDXX    FROM    1   BY  1
+                   UNTIL   IDXX    >       31
+               IF      RECE641-KAISU (1 IDXX)  >   ZERO
+                   MOVE    RECE641-KAISU (1 IDXX)    TO  WRK-NUM
+                   MOVE    3                         TO  WRK-NAGASA
+               END-IF
+               IF      IDXX                =   31
+                   MOVE    1                   TO  WRK-END 
+               END-IF     
+               PERFORM 5005-NUM-HENSYU-SEC
+           END-PERFORM  
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+           .
+       200725-NIKKEI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4945,8 +4981,6 @@
       *****************************************************************
        2009-COMMENT-HEN-99-SEC      SECTION.
       *
-           MOVE    "99"                TO  WRK-COM-SRYKBN
-      *
            INITIALIZE                      RECECOM-REC
            MOVE    RECE62-HOSPID       TO  RECECOM-HOSPID
            MOVE    RECE62-SRYYM        TO  RECECOM-SRYYM
@@ -5000,6 +5034,7 @@
       *                                          
            MOVE    RECECOM-COMMENT TO  WRK-COMM
            MOVE    ZERO            TO  WRK-RECEHEN                      
+           MOVE    "07"            TO  WRK-SJ-KBN               
       *
            PERFORM     UNTIL       WRK-RECEHEN  =   1      
       *
@@ -5091,8 +5126,8 @@
       *
                        ADD     1                   TO  CNT-OUT
       *
-      *                症状詳記（コメント）編集処理
-                       PERFORM 20099-COMMENT-HENSYU-SEC
+      *                症状詳記レコード編集処理
+                       PERFORM 20092-SJ-HENSYU-SEC
                      END-PERFORM
                  END-IF
                END-IF  
@@ -5101,6 +5136,38 @@
       *
            .
        20091-RECECOM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    症状詳記レコード編集処理
+      *****************************************************************
+       20092-SJ-HENSYU-SEC       SECTION.
+      *
+      *****IF      SYS-2005-RECECOMKBN =   "1"
+      *****    GO  TO  20092-SJ-HENSYU-EXT
+      *****END-IF
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           MOVE    "SJ,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *    症状詳記区分
+           IF      WRK-SJ-KBN      NOT =   SPACE     
+               MOVE    WRK-SJ-KBN          TO  WRK-DATA
+               MOVE    2                   TO  WRK-NAGASA
+           END-IF
+           MOVE    SPACE               TO  WRK-SJ-KBN
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    症状詳記データ
+           MOVE    RECEDEN-RECEDATA    TO  WRK-DATA
+           MOVE    2400                TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END 
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+            PERFORM 5001-FILE-WRITE-SEC
+           .
+       20092-SJ-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
