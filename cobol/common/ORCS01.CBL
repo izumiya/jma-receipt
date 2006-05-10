@@ -180,6 +180,7 @@
       *  01.03.04    NACL-ÌçÏÆ    06/03/30  ¼«Î©»Ù±çË¡¡Ê¹â³ÛÎÅÍÜÈñ¸½ÊªÂÐ±þ¡Ë
       *  01.03.05    NACL-ÌçÏÆ    06/04/04  ºßÁí¿ÇÂÐ¾ÝÊÔ½¸½¤Àµ
       *  02.09.01    NACL-ÌçÏÆ    06/04/19  ´ä¼ê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  02.09.02    NACL-ÌçÏÆ    06/05/02  ¼«Î©»Ù±ç¿À¸Í»ÔÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2269,6 +2270,9 @@
            OR (( WK-1001-PREFNUM   =  32                         ) AND
                ( HKN-HKNNUM        = "191" OR "391"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
+           OR (( WK-1001-PREFNUM   =  28                         ) AND
+               ( HKN-HKNNUM        = "100"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200604"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                   IF   HKN-HON-GAIMNAIJGNGAK  NOT = ZERO
@@ -3421,7 +3425,7 @@
                MOVE   "PTHKNINF-KEY" TO    ORC-DBPATH
                PERFORM  PTHKNINF-READ-SEC
                IF      FLG-PTHKNINF   =     ZERO
-                  IF   PTHKN-HKNJANUM = "133033" OR "133280"
+                  IF   PTHKN-HKNJANUM(1:6) = "133033" OR "133280"
                       MOVE    1      TO    FLG-SEISINJYO
                   END-IF
                END-IF
@@ -3503,6 +3507,9 @@
            OR (( WK-1001-PREFNUM   =  32                         ) AND
                ( COMB-KOH1HKNNUM   = "191" OR "391"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
+           OR (( WK-1001-PREFNUM   =  28                         ) AND
+               ( COMB-KOH1HKNNUM   = "100"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200604"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO  TEI-KIN-KOHI1-K
@@ -3670,6 +3677,9 @@
            OR (( WK-1001-PREFNUM   =  32                         ) AND
                ( COMB-KOH2HKNNUM   = "191" OR "391"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
+           OR (( WK-1001-PREFNUM   =  28                         ) AND
+               ( COMB-KOH2HKNNUM   = "100"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200604"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO  TEI-KIN-KOHI2-K
@@ -3822,6 +3832,9 @@
            OR (( WK-1001-PREFNUM   =  32                         ) AND
                ( COMB-KOH3HKNNUM   = "191" OR "391"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
+           OR (( WK-1001-PREFNUM   =  28                         ) AND
+               ( COMB-KOH3HKNNUM   = "100"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200604"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO   TEI-KIN-KOHI3-K
@@ -3974,6 +3987,9 @@
            OR (( WK-1001-PREFNUM   =  32                         ) AND
                ( COMB-KOH4HKNNUM   = "191" OR "391"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200510"             ))
+           OR (( WK-1001-PREFNUM   =  28                         ) AND
+               ( COMB-KOH4HKNNUM   = "100"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200604"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO   TEI-KIN-KOHI4-K
@@ -4231,6 +4247,40 @@
                                 MOVE  1           TO  FLG-IRYOHI
                             END-IF
                         END-IF
+                        IF  (WK-1001-PREFNUM =  28                    )
+                        AND (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
+                        AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
+                          IF   COMB-KOH2HKNNUM =  "100" OR "200"
+                            MOVE  TEI-KIN-KOHI2-K  TO  TEI-KIN-KOHI1-K
+                            MOVE  MAX-KIN-KOHI2-K  TO  MAX-KIN-KOHI1-K
+                            MOVE  MAX-KAI-KOHI2-D  TO  MAX-KAI-KOHI1-D
+                            MOVE  MAX-KAI-KOHI2-M  TO  MAX-KAI-KOHI1-M
+                            MOVE  MAX-KIN-KOHI2-D  TO  MAX-KIN-KOHI1-D
+                            MOVE  MAX-KIN-KOHI2-M  TO  MAX-KIN-KOHI1-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                          END-IF
+                          IF   COMB-KOH3HKNNUM =  "100" OR "200"
+                            MOVE  TEI-KIN-KOHI3-K  TO  TEI-KIN-KOHI1-K
+                            MOVE  MAX-KIN-KOHI3-K  TO  MAX-KIN-KOHI1-K
+                            MOVE  MAX-KAI-KOHI3-D  TO  MAX-KAI-KOHI1-D
+                            MOVE  MAX-KAI-KOHI3-M  TO  MAX-KAI-KOHI1-M
+                            MOVE  MAX-KIN-KOHI3-D  TO  MAX-KIN-KOHI1-D
+                            MOVE  MAX-KIN-KOHI3-M  TO  MAX-KIN-KOHI1-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                          END-IF
+                          IF   COMB-KOH4HKNNUM =  "100" OR "200"
+                            MOVE  TEI-KIN-KOHI4-K  TO  TEI-KIN-KOHI1-K
+                            MOVE  MAX-KIN-KOHI4-K  TO  MAX-KIN-KOHI1-K
+                            MOVE  MAX-KAI-KOHI4-D  TO  MAX-KAI-KOHI1-D
+                            MOVE  MAX-KAI-KOHI4-M  TO  MAX-KAI-KOHI1-M
+                            MOVE  MAX-KIN-KOHI4-D  TO  MAX-KIN-KOHI1-D
+                            MOVE  MAX-KIN-KOHI4-M  TO  MAX-KIN-KOHI1-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                          END-IF
+                        END-IF
                       WHEN  2
                         MOVE   WK-GAIJGNGAK        TO   MAX-KIN-KOHI2-M
                         MOVE     "1"   TO    COMB-KOH2-GAIJGNKBN
@@ -4298,6 +4348,30 @@
                                 MOVE  72300   TO   MAX-KIN-KOHI2-M
                             END-IF
                         END-IF
+                        IF  (WK-1001-PREFNUM =  28                    )
+                        AND (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
+                        AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
+                          IF   COMB-KOH3HKNNUM =  "100" OR "200"
+                            MOVE  TEI-KIN-KOHI3-K  TO  TEI-KIN-KOHI2-K
+                            MOVE  MAX-KIN-KOHI3-K  TO  MAX-KIN-KOHI2-K
+                            MOVE  MAX-KAI-KOHI3-D  TO  MAX-KAI-KOHI2-D
+                            MOVE  MAX-KAI-KOHI3-M  TO  MAX-KAI-KOHI2-M
+                            MOVE  MAX-KIN-KOHI3-D  TO  MAX-KIN-KOHI2-D
+                            MOVE  MAX-KIN-KOHI3-M  TO  MAX-KIN-KOHI2-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                          END-IF
+                          IF   COMB-KOH4HKNNUM =  "100" OR "200"
+                            MOVE  TEI-KIN-KOHI4-K  TO  TEI-KIN-KOHI2-K
+                            MOVE  MAX-KIN-KOHI4-K  TO  MAX-KIN-KOHI2-K
+                            MOVE  MAX-KAI-KOHI4-D  TO  MAX-KAI-KOHI2-D
+                            MOVE  MAX-KAI-KOHI4-M  TO  MAX-KAI-KOHI2-M
+                            MOVE  MAX-KIN-KOHI4-D  TO  MAX-KIN-KOHI2-D
+                            MOVE  MAX-KIN-KOHI4-M  TO  MAX-KIN-KOHI2-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                          END-IF
+                        END-IF
                       WHEN  3
                         MOVE   WK-GAIJGNGAK        TO   MAX-KIN-KOHI3-M
                         MOVE     "1"   TO    COMB-KOH3-GAIJGNKBN
@@ -4364,6 +4438,20 @@
                             IF  MAX-KIN-KOHI3-M = 9999999 OR 999999
                                 MOVE  72300   TO   MAX-KIN-KOHI3-M
                             END-IF
+                        END-IF
+                        IF  (WK-1001-PREFNUM =  28                    )
+                        AND (COMB-KOH3HKNNUM = "015" OR "016" OR "021")
+                        AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
+                          IF   COMB-KOH4HKNNUM =  "100" OR "200"
+                            MOVE  TEI-KIN-KOHI4-K  TO  TEI-KIN-KOHI3-K
+                            MOVE  MAX-KIN-KOHI4-K  TO  MAX-KIN-KOHI3-K
+                            MOVE  MAX-KAI-KOHI4-D  TO  MAX-KAI-KOHI3-D
+                            MOVE  MAX-KAI-KOHI4-M  TO  MAX-KAI-KOHI3-M
+                            MOVE  MAX-KIN-KOHI4-D  TO  MAX-KIN-KOHI3-D
+                            MOVE  MAX-KIN-KOHI4-M  TO  MAX-KIN-KOHI3-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                          END-IF
                         END-IF
                       WHEN  4
                         MOVE   WK-GAIJGNGAK        TO   MAX-KIN-KOHI4-M
@@ -9367,6 +9455,9 @@
            OR (( WK-1001-PREFNUM           =  32                 ) AND
                ( COMB-KOHHKNNUM(KOH-IDX)   = "191" OR "391"      ) AND
                ( LNK-SYU-SRYYMD(1:6)      >= "200510"            ))
+           OR (( WK-1001-PREFNUM           =  28                 ) AND
+               ( COMB-KOHHKNNUM(KOH-IDX)   = "100"               ) AND
+               ( LNK-SYU-SRYYMD(1:6)      >= "200604"            ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                    MOVE    HKN-HON-GAIKFTNRATE  TO   WK-GAIKFTNRATE
