@@ -27,6 +27,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  02.07.01    NACL-藤原    05/10/31  MONFUNC対応
+      *  02.09.01    NACL-藤原    06/05/10  処理中のメッセージ表示
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1543,6 +1544,8 @@
                    MOVE
                   "パラメタＤＢのＪＯＢＩＤ更新処理でエラーとなりました"
                                                        TO  SPA-ERRMSG
+               WHEN    "7777"
+                   MOVE    WRK-RECEERR                 TO  SPA-ERRMSG
            END-EVALUATE
       *
            MOVE    SPACE                TO  TERR
