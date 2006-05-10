@@ -79,6 +79,7 @@
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.02    NACL-ÌçÏÆ    06/04/28  ¥ê¥Ï¸¡º÷¾ò·ï½¤Àµ
       *  02.09.03    NACL-ÌçÏÆ    06/05/01  ¥ê¥ÏÈ¯¾ÉÆüÅö·îÊ¬µ­ºÜ½¤Àµ
+      *  02.09.04    NACL-ÌçÏÆ    05/05/10  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -279,6 +280,7 @@
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-FIRST           PIC 9(01).
            03  FLG-YAKUTEI         PIC 9(01).
+           03  FLG-YAKUTEI2        PIC 9(01).
            03  FLG-SRYACT          PIC 9(01).
            03  FLG-KYUSEI-OK       PIC 9(01).
            03  FLG-PTCOM           PIC 9(01).
@@ -318,6 +320,7 @@
            03  IDX14               PIC 9(04).
            03  IDX15               PIC 9(01).
            03  IDX16               PIC 9(02).
+           03  IDX17               PIC 9(04).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -572,9 +575,15 @@
                06  TBL-YT2X1-OCC                  OCCURS  25.
                  07  TBL-YT2X1-RECE04-REC         PIC X(300).
                  07  TBL-YT2X1-KAISU              PIC 9(03).
+                 07  TBL-YT2X1-DAY-AREA.
+                   09  TBL-YT2X1-OCC2               OCCURS  31.
+                       11  TBL-YT2X1-DAY            PIC 9(03).
                06  TBL-YT2X2-OCC                  OCCURS   3.
                  07  TBL-YT2X2-RECE04-REC         PIC X(300).
                  07  TBL-YT2X2-KAISU              PIC 9(03).
+                 07  TBL-YT2X2-DAY-AREA.
+                   09  TBL-YT2X2-OCC2               OCCURS  31.
+                       11  TBL-YT2X2-DAY            PIC 9(03).
              05  TBL-YT2Y-KAIT                  OCCURS     3.
                06  TBL-YT2Y1-OCC                  OCCURS  26.
                  07  TBL-YT2Y1-HIKAKU.
@@ -598,9 +607,15 @@
                06  TBL-YT3X1-OCC                  OCCURS  25.
                  07  TBL-YT3X1-RECE04-REC         PIC X(300).
                  07  TBL-YT3X1-KAISU              PIC 9(03).
+                 07  TBL-YT3X1-DAY-AREA.
+                   09  TBL-YT3X1-OCC2               OCCURS  31.
+                       11  TBL-YT3X1-DAY            PIC 9(03).
                06  TBL-YT3X2-OCC                  OCCURS   3.
                  07  TBL-YT3X2-RECE04-REC         PIC X(300).
                  07  TBL-YT3X2-KAISU              PIC 9(03).
+                 07  TBL-YT3X2-DAY-AREA.
+                   09  TBL-YT3X2-OCC2               OCCURS  31.
+                       11  TBL-YT3X2-DAY            PIC 9(03).
              05  TBL-YT3Y-KAIT.
                06  TBL-YT3Y1-OCC                  OCCURS  26.
                  07  TBL-YT3Y1-HIKAKU.
@@ -4487,6 +4502,8 @@
                                 TO  TBL-YT2X1-RECE04-REC(IDX7 IDX8 IDX9)
                              MOVE   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                                 TO  TBL-YT2X1-KAISU(IDX7 IDX8 IDX9)
+                             MOVE   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                                TO  TBL-YT2X1-DAY(IDX7 IDX8 IDX9 IDX7)
                              MOVE   TBL-YT1-HIKAKU(IDX6)
                                 TO  TBL-YT2Y1-HIKAKU(IDX7 IDX8 IDX9)
       *
@@ -4531,6 +4548,8 @@
                                 TO  TBL-YT2X2-RECE04-REC(IDX7 IDX8 IDX9)
                              MOVE   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                                 TO  TBL-YT2X2-KAISU(IDX7 IDX8 IDX9)
+                             MOVE   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                                TO  TBL-YT2X2-DAY(IDX7 IDX8 IDX9 IDX7)
                              MOVE   TBL-YT1-HIKAKU(IDX6)
                                 TO  TBL-YT2Y2-HIKAKU(IDX7 IDX8 IDX9)
       *
@@ -4587,22 +4606,51 @@
                     AND  (TBL-YT2Y2-HIKAKU(IDX7 IDX8  4) =
                                               TBL-YT3Y2-HIKAKU(IDX9  4))
       *
+                     MOVE    ZERO    TO   FLG-YAKUTEI2
+                     PERFORM      VARYING   IDX17  FROM   1   BY   1
+                         UNTIL (IDX17                         >    25 )
+                           OR  (TBL-YT3X1-RECE04-REC(IDX9 IDX17)
+                                                              =  SPACE)
+                       MOVE    ZERO    TO   FLG-YAKUTEI2
                        PERFORM    VARYING   IDX10  FROM   1   BY   1
                          UNTIL (IDX10                         >    25 )
                            OR  (TBL-YT2X1-RECE04-REC(IDX7 IDX8 IDX10)
                                                               =  SPACE)
+                           OR  (FLG-YAKUTEI2                  =   1   )
+                        IF  TBL-YT3Y1-HIKAKU(IDX9 IDX17)      =
+                            TBL-YT2Y1-HIKAKU(IDX7 IDX8 IDX10)
                          ADD    TBL-YT2X1-KAISU(IDX7 IDX8 IDX10)
-                                    TO  TBL-YT3X1-KAISU(IDX9 IDX10)
+                                    TO  TBL-YT3X1-KAISU(IDX9 IDX17)
+                         ADD    TBL-YT2X1-DAY(IDX7 IDX8 IDX10 IDX7)
+                                    TO  TBL-YT3X1-DAY(IDX9 IDX17 IDX7)
+                         MOVE   1   TO  FLG-YAKUTEI2
+                        END-IF
                        END-PERFORM
+                     END-PERFORM
+      *
+                     MOVE    ZERO    TO   FLG-YAKUTEI2
+                     PERFORM      VARYING   IDX17  FROM   1   BY   1
+                         UNTIL (IDX17                         >     3 )
+                           OR  (TBL-YT3X2-RECE04-REC(IDX9 IDX17)
+                                                              =  SPACE)
+                       MOVE    ZERO    TO   FLG-YAKUTEI2
                        PERFORM    VARYING   IDX10  FROM   1   BY   1
                          UNTIL (IDX10                         >     3 )
                            OR  (TBL-YT2X2-RECE04-REC(IDX7 IDX8 IDX10)
                                                               =  SPACE)
+                           OR  (FLG-YAKUTEI2                  =   1   )
+                        IF  TBL-YT3Y2-HIKAKU(IDX9 IDX17)      =
+                            TBL-YT2Y2-HIKAKU(IDX7 IDX8 IDX10)
                          ADD    TBL-YT2X2-KAISU(IDX7 IDX8 IDX10)
-                                    TO  TBL-YT3X2-KAISU(IDX9 IDX10)
+                                    TO  TBL-YT3X2-KAISU(IDX9 IDX17)
+                         ADD    TBL-YT2X2-DAY(IDX7 IDX8 IDX10 IDX7)
+                                    TO  TBL-YT3X2-DAY(IDX9 IDX17 IDX7)
+                         MOVE   1   TO  FLG-YAKUTEI2
+                        END-IF
                        END-PERFORM
+                     END-PERFORM
       *
-                       MOVE    1    TO    FLG-YAKUTEI
+                     MOVE    1    TO    FLG-YAKUTEI
                     END-IF
       *
                  END-PERFORM
@@ -4643,9 +4691,14 @@
                       MOVE   TBL-YT3X1-RECE04-REC(IDX7 IDX8)
                                   TO   RECE049-REC
                       MOVE   RECE049-ZAINUM  TO  WRK-YAKUTEI-ZAINUM
-                      INITIALIZE       RECE049-DAY-AREA
                       MOVE   TBL-YT3X1-KAISU(IDX7 IDX8)
                                   TO   RECE049-ZAIKAISU
+                      INITIALIZE       RECE049-DAY-AREA
+                      PERFORM VARYING IDX17 FROM 1 BY 1
+                               UNTIL  IDX17   > 31
+                        MOVE   TBL-YT3X1-DAY(IDX7 IDX8 IDX17)
+                                  TO   RECE049-KAISU(1 IDX17)
+                      END-PERFORM
                       ADD       1             TO  IDX11
                       COMPUTE   WRK-ZAINUM    =  99990000  +  IDX11
                       MOVE      WRK-ZAINUM    TO  RECE049-ZAINUM
@@ -4666,9 +4719,14 @@
                       MOVE   TBL-YT3X2-RECE04-REC(IDX7 IDX8)
                                   TO   RECE049-REC
                       MOVE   RECE049-ZAINUM  TO  WRK-YAKUTEI-ZAINUM
-                      INITIALIZE       RECE049-DAY-AREA
                       MOVE   TBL-YT3X2-KAISU(IDX7 IDX8)
                                   TO   RECE049-ZAIKAISU
+                      INITIALIZE       RECE049-DAY-AREA
+                      PERFORM VARYING IDX17 FROM 1 BY 1
+                               UNTIL  IDX17   > 31
+                        MOVE   TBL-YT3X2-DAY(IDX7 IDX8 IDX17)
+                                  TO   RECE049-KAISU(1 IDX17)
+                      END-PERFORM
                       ADD       1             TO  IDX11
                       COMPUTE   WRK-ZAINUM    =  99990000  +  IDX11
                       MOVE      WRK-ZAINUM    TO  RECE049-ZAINUM
