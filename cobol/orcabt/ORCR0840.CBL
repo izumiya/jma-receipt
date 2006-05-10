@@ -88,6 +88,7 @@
       *  02.09.02    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.03    NACL-Æ£¸¶    06/04/14  ¤­¤¶¤ßÃÍ·×»»¼±ÊÌ¤ÎÄÉ²Ã
       *  02.09.04    NACL-ÌçÏÆ    06/04/20  ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»ÊÔ½¸
+      *  02.09.05    NACL-ÌçÏÆ    06/05/09  Îß·×¥È¡¼¥¿¥ëÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4515,9 +4516,25 @@
                IF      NACCT-ZAISKBKBN      =       "7"
                   MOVE     199000510     TO  WRK-SRYCD
                END-IF
-               COMPUTE   RECE84-RUIKEITOTAL  =
-                         RECE84-RUIKEITOTAL  +
-                        (WRK-SRYCD  *  NSRY-SRYSURYO(IDX2))
+               COMPUTE  RECE84-RUIKEITOTAL  =
+                        RECE84-RUIKEITOTAL  +
+                       (WRK-SRYCD  *  NSRY-SRYSURYO(IDX2))
+               MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+               PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                         UNTIL   FUKA-IDX   >    9
+                 MOVE   WRK-SRYCD(FUKA-IDX:1)
+                                         TO  WRK-FUKA-VALUE
+                 IF  WRK-FUKA-VALUE  =  ZERO
+                   CONTINUE
+                 ELSE
+                   COMPUTE  WRK-FUKA-KINGAKU    =
+                            WRK-FUKA-KINGAKU    +
+                          ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                 END-IF
+               END-PERFORM
+               COMPUTE  RECE84-RUIKEITOTAL  =
+                        RECE84-RUIKEITOTAL  +
+                        WRK-FUKA-KINGAKU
       *
              END-IF  
            END-PERFORM
@@ -4644,6 +4661,7 @@
                                         TO      RECE84-ZAIKAISU
            MOVE    WRK-SKJ2-ZAITEN(SYUKEI-IDX3)
                                         TO      RECE84-SYUTEN1
+           MOVE    ZERO                 TO      RECE84-RUIKEITOTAL
            MOVE    ZERO                 TO      RECE84-SYUTEN2
            MOVE    ZERO                 TO      RECE84-YKZTEN
            MOVE    ZERO                 TO      RECE84-KIZAITEN
@@ -4859,6 +4877,7 @@
                                         TO  RECE84-MEISAISU
            MOVE    1                    TO  RECE84-ZAIKAISU
       *
+           MOVE    ZERO                 TO  RECE84-RUIKEITOTAL
            MOVE    ZERO                 TO  RECE84-SYUTEN2
            MOVE    ZERO                 TO  RECE84-YKZTEN
            MOVE    ZERO                 TO  RECE84-KIZAITEN
@@ -5663,6 +5682,7 @@
            MOVE    1                    TO      RECE84-ZAIKAISU
            MOVE    LNK-SROUNYUIN-ZAITEN(IDY)
                                         TO      RECE84-SYUTEN1
+           MOVE    ZERO                 TO      RECE84-RUIKEITOTAL
            MOVE    ZERO                 TO      RECE84-SYUTEN2
            MOVE    ZERO                 TO      RECE84-YKZTEN
            MOVE    ZERO                 TO      RECE84-KIZAITEN
