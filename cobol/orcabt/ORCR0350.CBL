@@ -4177,6 +4177,7 @@
                    WHEN    "31"    THRU    "33"
                    WHEN    "40"
                    WHEN    "50"  
+                   WHEN    "54"  
                        PERFORM 200725-NIKKEI-HENSYU-SEC
                END-EVALUATE
            END-IF
