@@ -3726,10 +3726,18 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       WRK-TBLMAX6
                PERFORM 200722-YKZ-HENSYU-SEC
-               IF      RECE02-RJNGAIFTN    >=  WRK-CONS-JYOGEN
-                   PERFORM 200725-NIKKEI-HENSYU-SEC
-               END-IF
            END-PERFORM            
+      *    日計表データの編集
+           IF    ( WRK-TBLMAX6         >   ZERO             )                 
+           AND   ( RECE02-RJNGAIFTN    >=  WRK-CONS-JYOGEN  )
+               EVALUATE    RECE041-SRYKBN
+                   WHEN    "21"    THRU    "28"
+                   WHEN    "31"    THRU    "33"
+                   WHEN    "40"
+                   WHEN    "50"  
+                       PERFORM 200725-NIKKEI-HENSYU-SEC
+               END-EVALUATE
+           END-IF
       *
       *    特定器材データの編集                 
            PERFORM VARYING IDXX    FROM    1   BY  1
