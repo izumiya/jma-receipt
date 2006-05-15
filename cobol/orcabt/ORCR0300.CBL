@@ -181,6 +181,8 @@
       *                                     キーの設定を修正
       *  02.09.03    NACL-藤原    06/05/08  改定通信医１６０４９号
       *                                     日計表、症状詳記レコード対応
+      *  02.09.04    NACL-藤原    06/05/15  加算がある場合の
+      *                                     外来迅速検体検査加算対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2731,9 +2733,9 @@
                        WHEN    "1"
                            IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
                            AND   ( RECE041-KNSJISGRPKBN    >   ZERO )
-                           AND  (( RECE05-KNSJISKBN (IDX)  =   1    ) OR
-                                 ( RECE05-SRYCD (IDX)      =
-                                                       WRK-CONS-SRYCD )) 
+      ****                 AND  (( RECE05-KNSJISKBN (IDX)  =   1    ) OR
+      ****                       ( RECE05-SRYCD (IDX)      =
+      ****                                             WRK-CONS-SRYCD )) 
       *                        外来迅速検体検査加算がある場合の検査退避
                                PERFORM 20012-KENSA-TAIHI-SEC
                            ELSE
