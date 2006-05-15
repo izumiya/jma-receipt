@@ -101,7 +101,7 @@
       *                                     キーの設定を修正
       *  02.09.04    NACL-藤原    06/05/08  改定通信医１６０４９号
       *                                     日計表、症状詳記レコード対応
-      *  02.09.05    NACL-藤原    06/05/15  加算がある場合の
+      *  02.09.05    NACL-藤原    06/05/15  加算等がある場合の
       *                                     外来迅速検体検査加算対応
       *****************************************************************
       *
@@ -3097,6 +3097,8 @@
                        WHEN    "1"
                            IF    ( RECE62-KENTAIKASANFLG   =   "1"  )
                            AND   ( RECE641-KNSJISGRPKBN    >   ZERO )
+                           AND   ( RECE65-KNSJISKBN (IDX)
+                                                       NOT =   2    )
       ****                 AND  (( RECE65-KNSJISKBN (IDX)  =   1    ) OR
       ****                       ( RECE65-SRYCD (IDX)      =
       ****                                             WRK-CONS-SRYCD )) 

@@ -2733,6 +2733,8 @@
                        WHEN    "1"
                            IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
                            AND   ( RECE041-KNSJISGRPKBN    >   ZERO )
+                           AND   ( RECE05-KNSJISKBN (IDX)
+                                                       NOT =   2    )
       ****                 AND  (( RECE05-KNSJISKBN (IDX)  =   1    ) OR
       ****                       ( RECE05-SRYCD (IDX)      =
       ****                                             WRK-CONS-SRYCD )) 
