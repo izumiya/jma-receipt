@@ -37,6 +37,8 @@
       *                                       精神科急性期治療病棟入院料２
       *                                     看護補助加算の変更
       *                                     改定による特定入院料次月作成変更
+      *  02.09.01    NACL-小豆沢  06/05/16  老人特定入院基本料を特定入院料
+      *                                     より外す
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1638,8 +1640,6 @@
            END-IF
       *
       *    老人性痴呆疾患治療病棟入院料２
-           DISPLAY "NINCHI 2 "
-           DISPLAY "SYOKIKSN-IN-KHNSRYCD = " SYOKIKSN-IN-KHNSRYCD
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190813410"
                MOVE    SPACE           TO  SYOKIKSN-IN-KHNSRYCD
                                            LNK-SCNYUACCT-NYUKHN-SRYCD(1)
@@ -1660,7 +1660,6 @@
                    MOVE   SYOKIKSN-IN-SANTEISTYMD
                                        TO  LNK-DAY6-KIJUN
                END-IF
-               DISPLAY "STUSAN-NISSU03 = " STUSAN-NISSU03
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
       **         IF      PTNYUINRRK-SHOKAIKBN  = "1"
                IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
@@ -1892,6 +1891,11 @@
                MOVE     "0"        TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
            ELSE
                MOVE     "1"        TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+      *        老人特定入院基本料の場合は特定入院料扱いから外す
+               IF    LNK-SCNYUACCT-NYUKHN-SRYCD(1)  =  "190799410" OR
+                                                       "190799510"
+                   MOVE  "0"     TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+               END-IF
            END-IF
       *    外泊
            MOVE   "099999911"      TO  LNK-SCNYUACCT-GAIHAKU-SRYCD

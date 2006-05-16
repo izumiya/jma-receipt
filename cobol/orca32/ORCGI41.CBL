@@ -58,6 +58,8 @@
       *                                     看護補助加算の変更
       *                                     選択食の廃止対応
       *                                     改定による特定入院料次月作成変更
+      *  02.09.01    NACL-小豆沢  06/05/16  老人特定入院基本料を特定入院料
+      *                                     より外す
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4980,6 +4982,11 @@
                MOVE     "0"        TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
            ELSE
                MOVE     "1"        TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+      *        老人特定入院基本料の場合は特定入院料扱いから外す
+               IF    LNK-SCNYUACCT-NYUKHN-SRYCD(1)  =  "190799410" OR
+                                                       "190799510"
+                   MOVE  "0"     TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+               END-IF
            END-IF
       *    外泊
            MOVE   "099999911"      TO  LNK-SCNYUACCT-GAIHAKU-SRYCD
