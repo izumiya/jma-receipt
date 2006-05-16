@@ -192,6 +192,8 @@
       *  02.09.09    NACL-ÃÁœ∆    06/05/09  Œﬂ∑◊•»°º•ø•Î ‘Ω∏Ω§¿µ
       *  02.09.10    NACL-∆£∏∂    06/05/09  £œ£√£“•®•Í•¢§ŒÃÙ∫ﬁ∞Ï…Ù…È√¥∂‚
       *                                     §À¿∏∑Ó∆¸§Úµ≠∫‹
+      *  02.09.11    NACL-ÃÁœ∆    06/05/16  œ∑øÕ∆√ƒÍ∆˛±°¥À‹Œ¡§Œø«Œ≈∂Ë ¨
+      *                                      ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3735,8 +3737,8 @@
                         ELSE                                            
                            MOVE   NACCT-DAY(IDY)  TO   WRK-DAY1(IDY) 
                            IF (NACCT-SRYKBN     =  "90"       )
-      *+++                 OR (NACCT-SRYCDTOTAL =   190799410 )
-      *+++                 OR (NACCT-SRYCDTOTAL =   190799510 )
+                           OR (NACCT-SRYCDTOTAL =   190799410 )
+                           OR (NACCT-SRYCDTOTAL =   190799510 )
                               MOVE  903  TO  WRK-DAY1-NYUTENTTLKBN(IDY) 
                            ELSE                                         
                               MOVE  920  TO  WRK-DAY1-NYUTENTTLKBN(IDY) 
@@ -3888,8 +3890,8 @@
                                  AND (WRK-DAY2(IDY) =  ZERO  OR  4)
                                     MOVE   NACCT-DAY(IDY)  
                                                TO   WRK-DAY21(IDY) 
-      *+++                          MOVE   WRK-DAY1-NYUTENTTLKBN(IDY)
-      *+++                                     TO   WRK-NYUTENTTLKBN
+                                    MOVE   WRK-DAY1-NYUTENTTLKBN(IDY)
+                                               TO   WRK-NYUTENTTLKBN
                                     ADD    1     TO   CNT-DAY21
                                     MOVE   1     TO   FLG-DAY21
                                  END-IF
@@ -4936,19 +4938,19 @@
            MOVE    RECE62-TEKSTYMD      TO      RECE64-TEKSTYMD
            MOVE    ZERO                 TO      RECE64-KOHBUNRI
            MOVE    NACCT-SRYKBN         TO      RECE64-SRYKBN
-      *+++ IF      NACCT-ZAISKBKBN      =       "1"
-      *+++   IF  (NACCT-SRYCDTOTAL =   190799410 )
-      *+++   OR  (NACCT-SRYCDTOTAL =   190799510 )
-      *+++      MOVE    "90"            TO      RECE64-SRYKBN
-      *+++   END-IF
-      *+++ END-IF
-      *+++ IF      NACCT-ZAISKBKBN      =       "6"
-      *+++   IF    WRK-NYUTENTTLKBN     =  903
-      *+++      MOVE    "90"            TO      RECE64-SRYKBN
-      *+++   ELSE
-      *+++      MOVE    "92"            TO      RECE64-SRYKBN
-      *+++   END-IF
-      *+++ END-IF
+           IF      NACCT-ZAISKBKBN      =       "1"
+             IF  (NACCT-SRYCDTOTAL =   190799410 )
+             OR  (NACCT-SRYCDTOTAL =   190799510 )
+                MOVE    "90"            TO      RECE64-SRYKBN
+             END-IF
+           END-IF
+           IF      NACCT-ZAISKBKBN      =       "6"
+             IF    WRK-NYUTENTTLKBN     =  903
+                MOVE    "90"            TO      RECE64-SRYKBN
+             ELSE
+                MOVE    "92"            TO      RECE64-SRYKBN
+             END-IF
+           END-IF
            MOVE    NACCT-ZAISKBKBN      TO      RECE64-ZAISKBKBN
            IF      NACCT-ZAISKBKBN      =       "7"
                 MOVE     "80"           TO      RECE64-SRYKBN
@@ -5082,22 +5084,22 @@
            MOVE    NSRY-SRYKA           TO      RECE65-SRYKA
            MOVE    NSRY-SRYKBN          TO      RECE65-SRYKBN
            MOVE    NSRY-SRYSYUKBN       TO      RECE65-SRYSYUKBN
-      *+++ IF      NACCT-ZAISKBKBN      =       "1"
-      *+++   IF  (NACCT-SRYCDTOTAL =   190799410 )
-      *+++   OR  (NACCT-SRYCDTOTAL =   190799510 )
-      *+++      MOVE    "90"            TO      RECE65-SRYKBN
-      *+++      MOVE    "900"           TO      RECE65-SRYSYUKBN
-      *+++   END-IF
-      *+++ END-IF
-      *+++ IF      NACCT-ZAISKBKBN      =       "6"
-      *+++   IF    WRK-NYUTENTTLKBN     =  903
-      *+++      MOVE    "90"            TO      RECE65-SRYKBN
-      *+++      MOVE    "900"           TO      RECE65-SRYSYUKBN
-      *+++   ELSE
-      *+++      MOVE    "92"            TO      RECE65-SRYKBN
-      *+++      MOVE    "920"           TO      RECE65-SRYSYUKBN
-      *+++   END-IF
-      *+++ END-IF
+           IF      NACCT-ZAISKBKBN      =       "1"
+             IF  (NACCT-SRYCDTOTAL =   190799410 )
+             OR  (NACCT-SRYCDTOTAL =   190799510 )
+                MOVE    "90"            TO      RECE65-SRYKBN
+                MOVE    "900"           TO      RECE65-SRYSYUKBN
+             END-IF
+           END-IF
+           IF      NACCT-ZAISKBKBN      =       "6"
+             IF    WRK-NYUTENTTLKBN     =  903
+                MOVE    "90"            TO      RECE65-SRYKBN
+                MOVE    "900"           TO      RECE65-SRYSYUKBN
+             ELSE
+                MOVE    "92"            TO      RECE65-SRYKBN
+                MOVE    "920"           TO      RECE65-SRYSYUKBN
+             END-IF
+           END-IF
            IF      NACCT-ZAISKBKBN      =       "7"
                 MOVE     "80"           TO      RECE65-SRYKBN
                 MOVE     "800"          TO      RECE65-SRYSYUKBN
@@ -5354,19 +5356,19 @@
            MOVE    RECE62-TEKSTYMD      TO      RECE64-TEKSTYMD
            MOVE    ZERO                 TO      RECE64-KOHBUNRI
            MOVE    NACCT-SRYKBN         TO      RECE64-SRYKBN
-      *+++ IF      NACCT-ZAISKBKBN      =       "1"
-      *+++   IF  (NACCT-SRYCDTOTAL =   190799410 )
-      *+++   OR  (NACCT-SRYCDTOTAL =   190799510 )
-      *+++      MOVE    "90"            TO      RECE64-SRYKBN
-      *+++   END-IF
-      *+++ END-IF
-      *+++ IF      NACCT-ZAISKBKBN      =       "6"
-      *+++   IF    WRK-NYUTENTTLKBN     =  903
-      *+++      MOVE    "90"            TO      RECE64-SRYKBN
-      *+++   ELSE
-      *+++      MOVE    "92"            TO      RECE64-SRYKBN
-      *+++   END-IF
-      *+++ END-IF
+           IF      NACCT-ZAISKBKBN      =       "1"
+             IF  (NACCT-SRYCDTOTAL =   190799410 )
+             OR  (NACCT-SRYCDTOTAL =   190799510 )
+                MOVE    "90"            TO      RECE64-SRYKBN
+             END-IF
+           END-IF
+           IF      NACCT-ZAISKBKBN      =       "6"
+             IF    WRK-NYUTENTTLKBN     =  903
+                MOVE    "90"            TO      RECE64-SRYKBN
+             ELSE
+                MOVE    "92"            TO      RECE64-SRYKBN
+             END-IF
+           END-IF
            MOVE    NACCT-ZAISKBKBN      TO      RECE64-ZAISKBKBN
       *
            MOVE        ZERO             TO      WRK-ZAINUM-CNT
@@ -5483,22 +5485,22 @@
            MOVE    NSRY-SRYKA           TO      RECE65-SRYKA
            MOVE    NSRY-SRYKBN          TO      RECE65-SRYKBN
            MOVE    NSRY-SRYSYUKBN       TO      RECE65-SRYSYUKBN
-      *+++ IF      NACCT-ZAISKBKBN      =       "1"
-      *+++   IF  (NACCT-SRYCDTOTAL =   190799410 )
-      *+++   OR  (NACCT-SRYCDTOTAL =   190799510 )
-      *+++      MOVE    "90"            TO      RECE65-SRYKBN
-      *+++      MOVE    "900"           TO      RECE65-SRYSYUKBN
-      *+++   END-IF
-      *+++ END-IF
-      *+++ IF      NACCT-ZAISKBKBN      =       "6"
-      *+++   IF    WRK-NYUTENTTLKBN     =  903
-      *+++      MOVE    "90"            TO      RECE65-SRYKBN
-      *+++      MOVE    "900"           TO      RECE65-SRYSYUKBN
-      *+++   ELSE
-      *+++      MOVE    "92"            TO      RECE65-SRYKBN
-      *+++      MOVE    "920"           TO      RECE65-SRYSYUKBN
-      *+++   END-IF
-      *+++ END-IF
+           IF      NACCT-ZAISKBKBN      =       "1"
+             IF  (NACCT-SRYCDTOTAL =   190799410 )
+             OR  (NACCT-SRYCDTOTAL =   190799510 )
+                MOVE    "90"            TO      RECE65-SRYKBN
+                MOVE    "900"           TO      RECE65-SRYSYUKBN
+             END-IF
+           END-IF
+           IF      NACCT-ZAISKBKBN      =       "6"
+             IF    WRK-NYUTENTTLKBN     =  903
+                MOVE    "90"            TO      RECE65-SRYKBN
+                MOVE    "900"           TO      RECE65-SRYSYUKBN
+             ELSE
+                MOVE    "92"            TO      RECE65-SRYKBN
+                MOVE    "920"           TO      RECE65-SRYSYUKBN
+             END-IF
+           END-IF
            MOVE    NSRY-JIHIMONEYTOTAL  TO      RECE65-JIHIMONEY
       *
            MOVE    ZERO                 TO      IDX4
