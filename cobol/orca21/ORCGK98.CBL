@@ -2163,8 +2163,10 @@
                        WHEN    3
                        WHEN    6
                            MOVE    "6"         TO  SPA-K98-CDSYUBETU
-                       WHEN    1
-                           MOVE    "6"         TO  SPA-K98-CDSYUBETU
+      ****             WHEN    1
+      ***                  MOVE    "6"         TO  SPA-K98-CDSYUBETU
+                       WHEN    OTHER
+                           MOVE    "A"         TO  SPA-K98-CDSYUBETU
                    END-EVALUATE
                ELSE
                    MOVE    "A"             TO  SPA-K98-CDSYUBETU

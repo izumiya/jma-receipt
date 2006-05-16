@@ -4295,8 +4295,9 @@
                                                     (SPA-GMN-IDX)
            ELSE
       *        文字変換・編集処理
-               PERFORM 410112-INPUTCD-HENKAN-SEC
-      *
+               IF      SPA-ERRCD           =   SPACE
+                   PERFORM 410112-INPUTCD-HENKAN-SEC
+               END-IF
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
