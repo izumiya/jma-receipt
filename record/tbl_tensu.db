@@ -1030,6 +1030,8 @@ path	key23s 	{
 			WHERE a.SRYCD    =   b.SRYCD
 			AND   a.YUKOSTYMD  <=  :YUKOSTYMD
 			AND   a.YUKOEDYMD  >=  :YUKOEDYMD
+			AND   b.YUKOSTYMD  <=  :YUKOSTYMD
+			AND   b.YUKOEDYMD  >=  :YUKOEDYMD
 			AND   a.SRYCD    >=  :SRYCD
 			AND   a.SRYCD    <=  :UPSRYCD
 			AND   b.TENPUYAKKBN  <>  ''
@@ -1046,6 +1048,8 @@ path	key23m	{
 			WHERE a.SRYCD    =   b.SRYCD
 			AND   a.YUKOSTYMD  <=  :YUKOSTYMD
 			AND   a.YUKOEDYMD  >=  :YUKOEDYMD
+			AND   b.YUKOSTYMD  <=  :YUKOSTYMD
+			AND   b.YUKOEDYMD  >=  :YUKOEDYMD
 			AND   a.SRYCD    >=  :SRYCD
 			AND   a.SRYCD    <=  :UPSRYCD
 			AND   b.TENPUYAKKBN  <>  ''
@@ -1062,6 +1066,8 @@ path	key23k 	{
 			WHERE a.SRYCD    =   b.SRYCD
 			AND   a.YUKOSTYMD  <=  :YUKOSTYMD
 			AND   a.YUKOEDYMD  >=  :YUKOEDYMD
+			AND   b.YUKOSTYMD  <=  :YUKOSTYMD
+			AND   b.YUKOEDYMD  >=  :YUKOEDYMD
 			AND   a.SRYCD    >=  :SRYCD
 			AND   a.SRYCD    <=  :UPSRYCD
 			AND   b.TENPUYAKKBN  <>  ''
