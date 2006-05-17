@@ -67,6 +67,7 @@
       *  02.09.01    NACL-ÃÁœ∆    06/04/13  £≤£∞£∞£∂«Ø£¥∑Ó≤˛¿µ¬–±˛
       *  02.09.02    NACL-ÃÁœ∆    06/05/16  œ∑øÕ∆√ƒÍ∆˛±°¥À‹Œ¡§Œø«Œ≈∂Ë ¨
       *                                      ‘Ω∏Ω§¿µ
+      *  02.09.03    NACL-ÃÁœ∆    06/05/17  Œ¨æŒ ‘Ω∏(190123250≈˘)
       *****************************************************************
       *
       *
@@ -3710,7 +3711,53 @@
       *
                 END-IF
               END-IF
-      *
+           ELSE
+              IF   ( RECE62-SRYYM  >= "200604"    )
+              AND  ( WRK-SRYCD      = "190123250" OR
+                                      "190123350" OR
+                                      "190123450" OR
+                                      "190123550" )
+                MOVE     ZERO     TO    FLG-ARI
+                PERFORM  VARYING  ID1    FROM    1   BY  1
+                      UNTIL   ID1                   > 20
+                        OR    RECE62-NYUSYUBETU(ID1) = SPACE
+                        OR    FLG-ARI                = 1 
+                   EVALUATE   WRK-SRYCD
+                     WHEN     "190123250"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:8) = "∞Ï»Ã∑–≤·"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                     WHEN     "190123350"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:8) = "∑Î≥À∑–≤·"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                     WHEN     "190123450"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:8) = "¿∫ø¿∑–≤·"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                     WHEN     "190123550"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:8) = "æ„≥≤∑–≤·"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                   END-EVALUATE
+                END-PERFORM  
+                IF  FLG-ARI  =  ZERO
+                   EVALUATE   WRK-SRYCD
+                     WHEN     "190123250"
+                      MOVE   "∞Ï»Ã∑–≤·"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:8)
+                     WHEN     "190123350"
+                      MOVE   "∑Î≥À∑–≤·"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:8)
+                     WHEN     "190123450"
+                      MOVE   "¿∫ø¿∑–≤·"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:8)
+                     WHEN     "190123550"
+                      MOVE   "æ„≥≤∑–≤·"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:8)
+                   END-EVALUATE
+                END-IF
+              END-IF
            END-IF
       *
            .
