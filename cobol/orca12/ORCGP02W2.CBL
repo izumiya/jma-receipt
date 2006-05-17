@@ -53,6 +53,8 @@
       *  02.00.13    NACL-門脇    06/03/23  021精神通院に関する編集修正
       *  02.00.14    NACL-門脇    06/03/27  020精神入院に関する編集修正
       *  02.00.15    NACL-門脇    06/04/03  自立支援医療組合せ編集修正
+      *  02.00.16    NACL-門脇    06/05/17  任意継続・継続の保険と公費がある
+      *                                     場合の保険組合せ作成修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4305,6 +4307,8 @@
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "021" OR "015"
                                                          OR "016" )
                      MOVE    "3"            TO  WRK-FTN-FLG
+      ****           自立支援＋生保の組合せを作成しない場合
+      ****           MOVE    "2"            TO  WRK-FTN-FLG
                END-IF
              END-IF
            END-IF
@@ -4450,8 +4454,9 @@
                   (WRK-HKN-HKNNUM (IDZ)  NOT =   "068"
                                               AND "069" )) AND
       *!
-                 (WRK-HKN-SAKJOKBN (IDZ)     =   SPACE)  AND
-                 (WRK-HKN-CONTKBN (IDZ)     =   SPACE)
+                 (WRK-HKN-SAKJOKBN (IDZ)     =   SPACE)
+      ***        (WRK-HKN-SAKJOKBN (IDZ)     =   SPACE)  AND
+      ***        (WRK-HKN-CONTKBN (IDZ)     =   SPACE)
       *
       ******* IF  (WRK-HKN-HKNNUM  (IDZ)  NOT =   "002")   OR
       *          ((WRK-HKN-HKNNUM  (IDZ)      =   "002") AND
