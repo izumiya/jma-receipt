@@ -30,6 +30,7 @@
       * 01.01.01     NACL-森脇     03/08/27  患者指定時修正
       * 01.02.01     NACL-森脇     04/01/23  包括分読み飛ばし
       * 01.02.02     NACL-森脇     04/08/31  条件修正
+      * 01.02.03     NACL-森脇     06/05/18  入外区分追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -60,6 +61,9 @@
        FD  TOKEI-FILE.
        01  TOKEI-REC. 
            03  TOKEI-KEY.
+      *----(01.02.03)--ADD-START---
+               05  TOKEI-NYUGAIKBN     PIC X(01).
+      *----(01.02.03)--ADD-END-----
                05  TOKEI-PTID          PIC 9(10).
                05  TOKEI-SYUBETU       PIC 9(01).
                05  TOKEI-YKZKBN        PIC 9(01).
@@ -71,6 +75,9 @@
        FD  TOKEIX-FILE.
        01  TOKEIX-REC. 
            03  TOKEIX-KEY.
+      *----(01.02.03)--ADD-START---
+               05  TOKEIX-NYUGAIKBN    PIC X(01).
+      *----(01.02.03)--ADD-END-----
                05  TOKEIX-PTID         PIC 9(10).
                05  TOKEIX-SYUBETU      PIC 9(01).
                05  TOKEIX-YKZKBN       PIC 9(01).
@@ -143,9 +150,15 @@
            03  PARA-DENPPRTYM          PIC X(06).
            03  PARA-SYORIKBN           PIC X(01).
            03  PARA-NAIYO              PIC X(20).
+      *----(01.02.03)--ADD-START---0全て、1入院、2外来
+           03  PARA-NYUGAIKBN          PIC X(01).
+      *----(01.02.03)--ADD-END-----
       *
       *    キー領域
        01  KEY-AREA.
+      *----(01.02.03)--ADD-START---
+           03  KEY-NYUGAIKBN           PIC X(01).
+      *----(01.02.03)--ADD-END-----
            03  KEY-PTID                PIC 9(10).
            03  KEY-SYUBETU             PIC X(01).
       *
@@ -181,6 +194,9 @@
            03  WRK-NAIYO               PIC 9(08).
            03  WRK-SYUBETU             PIC 9(01).
            03  WRK-YKZKBN              PIC 9(01).
+      *----(01.02.03)--ADD-START---
+           03  WRK-NYUGAIKBN           PIC X(01).
+      *----(01.02.03)--ADD-END-----
       *
            03  WRK-HENSURYO            PIC X(04).
            03  WRK-COM-G.
@@ -336,6 +352,9 @@
                                        PARA-DENPPRTYM
                                        PARA-SYORIKBN
                                        PARA-NAIYO
+      *----(01.02.03)--ADD-START---
+                                       PARA-NYUGAIKBN
+      *----(01.02.03)--ADD-END-----
       *
       *    ステップ管理開始処理
            MOVE    "STS"               TO  SJOBKANRI-MODE
@@ -516,8 +535,20 @@
       *
            OPEN    I-O                 TOKEI-FILE
       *
-      *    統計ファイルセット
-           PERFORM 210-TOKEI-SET-SEIKYU-SEC
+      *----(01.02.03)--ADD-START---
+      *    入院分
+           IF      PARA-NYUGAIKBN  NOT =   "2"
+               MOVE    "1"             TO  WRK-NYUGAIKBN
+      *        統計ファイルセット
+               PERFORM 210-TOKEI-SET-SEIKYU-SEC
+           END-IF
+      *    外来分
+           IF      PARA-NYUGAIKBN  NOT =   "1"
+               MOVE    "2"             TO  WRK-NYUGAIKBN
+      *        統計ファイルセット
+               PERFORM 210-TOKEI-SET-SEIKYU-SEC
+           END-IF
+      *----(01.02.03)--ADD-END-----
       *
            CLOSE                       TOKEI-FILE
       *
@@ -527,6 +558,9 @@
            PERFORM 900-TOKEI-NEXT-SEC
       *
            PERFORM UNTIL   FLG-TOKEI       =   1
+      *----(01.02.03)--ADD-START---
+               MOVE    TOKEI-NYUGAIKBN     TO  KEY-NYUGAIKBN
+      *----(01.02.03)--ADD-END-----
                MOVE    TOKEI-PTID          TO  KEY-PTID
                MOVE    TOKEI-SYUBETU       TO  KEY-SYUBETU
       *        帳票編集<見出し>処理
@@ -592,7 +626,7 @@
                INITIALIZE                  SRYACCT-REC
                MOVE    PARA-HOSPID         TO  ACCT-HOSPID
                MOVE    PARA-DENPPRTYM      TO  ACCT-SRYYM
-               MOVE    "1"                 TO  ACCT-NYUGAIKBN
+               MOVE    WRK-NYUGAIKBN       TO  ACCT-NYUGAIKBN
                MOVE    WRK-NAIYO           TO  ACCT-PTID
       *        統計ファイルセット
                PERFORM 220-MAIN-ACCT-SEC
@@ -734,6 +768,7 @@
       *
       *    統計データ検索
            INITIALIZE                  TOKEI-REC
+           MOVE    ACCT-NYUGAIKBN      TO  TOKEI-NYUGAIKBN
            MOVE    ACCT-PTID           TO  TOKEI-PTID
            MOVE    WRK-SYUBETU         TO  TOKEI-SYUBETU
            MOVE    WRK-YKZKBN          TO  TOKEI-YKZKBN
@@ -742,6 +777,7 @@
       *
            IF          FLG-TOKEI       =   1
                INITIALIZE                  TOKEI-REC
+               MOVE    ACCT-NYUGAIKBN      TO  TOKEI-NYUGAIKBN
                MOVE    ACCT-PTID           TO  TOKEI-PTID
                MOVE    WRK-SYUBETU         TO  TOKEI-SYUBETU
                MOVE    WRK-YKZKBN          TO  TOKEI-YKZKBN
@@ -772,6 +808,7 @@
                IF          ACCT-DAY(1 IDX-D)   >   ZERO
                    MOVE    IDX-D               TO  WRK-DD
                    IF      WRK-SYUBETU         =   "1"
+                       AND WRK-NYUGAIKBN       =   "1"
                        COMPUTE WRK-DAY         =   WRK-DD
                                                +   ACCT-DAY(1 WRK-DD)
                        MOVE    WRK-DD              TO  CNT-DAY
@@ -841,6 +878,9 @@
       *
            PERFORM UNTIL ( CNT-LINE        >=  31 )
                    OR    ( FLG-TOKEI       =   1 )
+      *----(01.02.03)--ADD-START---
+                   OR    ( KEY-NYUGAIKBN   NOT =   TOKEI-NYUGAIKBN )
+      *----(01.02.03)--ADD-END-----
                    OR    ( KEY-PTID    NOT =   TOKEI-PTID )
                    OR    ( KEY-SYUBETU NOT =   TOKEI-SYUBETU )
       *
@@ -1275,7 +1315,7 @@
            INITIALIZE                  RECE10-REC
            MOVE    PARA-HOSPID         TO  RECE10-HOSPID
            MOVE    PARA-DENPPRTYM      TO  RECE10-SRYYM
-           MOVE    "1"                 TO  RECE10-NYUGAIKBN
+           MOVE    WRK-NYUGAIKBN       TO  RECE10-NYUGAIKBN
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
