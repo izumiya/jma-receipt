@@ -103,6 +103,8 @@
       *                                     日計表、症状詳記レコード対応
       *  02.09.05    NACL-藤原    06/05/15  加算等がある場合の
       *                                     外来迅速検体検査加算対応
+      *  02.09.06    NACL-藤原    06/05/16  改定通信医１６０４９号
+      *                                     日計表レコードの記載方法の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -441,6 +443,12 @@
            03  WRK-HENYMDGR            REDEFINES   WRK-HENYMDG.
                05  FILLER              PIC 9(01).
                05  WRK-HENYMD          PIC 9(07).
+      *
+      *    診療年月の末日
+           03  WRK-EDYMD               PIC 9(08).
+           03  WRK-EDYMD-R             REDEFINES   WRK-EDYMD.
+               05  FILLER              PIC X(06).
+               05  WRK-EDDD            PIC 9(02).
       *                 
       *    保険履歴編集（適用欄）
            03  WRK-HKN-RIREKI-AREA.
@@ -737,6 +745,11 @@
        01  WRK-TAIHI-RECE641-REC.
            COPY    "CPRCF0641.INC"  REPLACING //RECE641//
                                    BY         //WRK-TAIHI-RECE641//.
+      *
+      *    日計表レコード用回数編集エリア
+       01  WRK-NI-RECE641-REC.
+           COPY    "CPRCF0641.INC"  REPLACING //RECE641//
+                                   BY         //WRK-NI-RECE641//.
       *    画像診断用退避エリア
        01  WRK-721-RECE65-REC.
            COPY    "CPRCF065.INC"  REPLACING  //RECE65//
@@ -1398,6 +1411,15 @@
       *    主処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
+      *
+      *    診療年月の末日の取得
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    RECE62-SRYYM        TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD
       *
       *    保険履歴情報編集処理
            PERFORM 2001-RIREKI-HEN-SEC 
@@ -3943,6 +3965,21 @@
       *****************************************************************
        20072-ZAI-HENSYU-SEC          SECTION.
       *
+      *    日計表データ用の回数の編集
+           INITIALIZE                WRK-NI-RECE641-REC
+      *
+           IF    ( WRK-TBLMAX6         >   ZERO             )                 
+           AND   ( RECE62-RJNGAIFTN    >=  WRK-CONS-JYOGEN  )
+               EVALUATE    RECE641-SRYKBN
+                   WHEN    "21"    THRU    "28"
+                   WHEN    "31"    THRU    "33"
+                   WHEN    "40"
+                   WHEN    "50"  
+                   WHEN    "54"  
+                       PERFORM 200721-NI-KAISU-HENSYU-SEC
+               END-EVALUATE
+           END-IF
+      *
       *    コメントデータの編集（診療区分７０）
            IF      RECE641-SRYKBN      =   "70"                 
                PERFORM VARYING IDX FROM    1   BY  1
@@ -4201,6 +4238,28 @@
            EXIT.
       *
       *****************************************************************
+      *    日計表データ用の回数の編集処理
+      *****************************************************************
+       200721-NI-KAISU-HENSYU-SEC       SECTION.
+      *    
+           PERFORM VARYING IDXX    FROM    1   BY  1
+                   UNTIL   IDXX    >       31
+               IF      RECE641-KAISU (1 IDXX)  >   ZERO
+                   MOVE    IDXX            TO  IDXZ
+                   PERFORM VARYING IDXY    FROM    1   BY  1
+                           UNTIL   IDXY    >       RECE641-KAISU(1 IDXX)
+                           OR      IDXZ    >       WRK-EDDD
+                       ADD     1       TO  WRK-NI-RECE641-KAISU (1 IDXZ)
+                                           IDXZ     
+                   END-PERFORM
+               END-IF
+           END-PERFORM  
+      *
+           .
+       200721-NI-KAISU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    摘要データ（コメント）編集処理（診療区分１３・１４）
       *****************************************************************
        200724-COMMENT-HENSYU-SEC       SECTION.
@@ -4322,9 +4381,9 @@
       *    
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       31
-               IF      RECE641-KAISU (1 IDXX)  >   ZERO
-                   MOVE    RECE641-KAISU (1 IDXX)    TO  WRK-NUM
-                   MOVE    3                         TO  WRK-NAGASA
+               IF      WRK-NI-RECE641-KAISU (1 IDXX)  >   ZERO
+                   MOVE    WRK-NI-RECE641-KAISU (1 IDXX)  TO  WRK-NUM
+                   MOVE    3                              TO  WRK-NAGASA
                END-IF
                IF      IDXX                =   31
                    MOVE    1                   TO  WRK-END 
