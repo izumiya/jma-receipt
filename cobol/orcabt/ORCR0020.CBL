@@ -138,6 +138,7 @@
       *
       *  02.08.01    NACL-Æ£¸¶    06/02/20  ¼ç²ÊÂÐ±þ
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  02.09.02    NACL-ÌçÏÆ    06/05/18  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2143,12 +2144,16 @@
                                        MOVE    10  TO  RECE02-KYURATE
                                END-EVALUATE
                            ELSE
-                               IF      RECE02-HONKZKKBN      =    "1"
+                               IF   RECE02-HKNJANUM = "67330753"
+                                 MOVE   20         TO  RECE02-KYURATE
+                               ELSE
+                                 IF RECE02-HONKZKKBN      =    "1"
                                    MOVE   WRK-HKN-HON-GAIKFTNRATE
                                                    TO  RECE02-KYURATE
-                               ELSE
+                                 ELSE
                                    MOVE   WRK-HKN-KZK-GAIKFTNRATE
                                                    TO  RECE02-KYURATE
+                                 END-IF
                                END-IF
                            END-IF
                        END-IF

@@ -181,6 +181,7 @@
       *  01.03.05    NACL-ÌçÏÆ    06/04/04  ºßÁí¿ÇÂÐ¾ÝÊÔ½¸½¤Àµ
       *  02.09.01    NACL-ÌçÏÆ    06/04/19  ´ä¼ê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  02.09.02    NACL-ÌçÏÆ    06/05/02  ¼«Î©»Ù±ç¿À¸Í»ÔÂÐ±þ
+      *  02.09.03    NACL-ÌçÏÆ    06/05/18  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -278,6 +279,7 @@
            03  FLG-GRPNYURYOKU         PIC 9(01).
            03  FLG-GENMEN              PIC 9(01).
            03  FLG-SEISINJYO           PIC 9(01).
+           03  FLG-TOKUREI-HKNJYA      PIC 9(01).
            03  FLG-MIYAGI              PIC 9(01).
            03  FLG-FTNCHECK            PIC 9(01).
            03  FLG-TAISYO              PIC 9(01).
@@ -936,7 +938,8 @@
            MOVE    ZERO            TO  LNK-SYU-JYO-COMPFTN.
            MOVE    ZERO            TO  LNK-SYU-JYO-COMPFTN-ENTANI.
       *
-           MOVE    ZERO            TO  FLG-SEISINJYO.
+           MOVE    ZERO            TO  FLG-SEISINJYO
+                                       FLG-TOKUREI-HKNJYA.
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý£±£°£°£±¤Î¼è¤ê¹þ¤ß
            PERFORM    SYS1001-READ-SEC.
@@ -2783,6 +2786,8 @@
       *
            INITIALIZE       WK-SYUHEN-TAIHI-AREA.
       *
+           PERFORM    2101-PTHKNINF-KENSAKU-SEC.
+      *
            IF ((COMB-KOH1HKNNUM       NOT =  SPACE )  AND
                (COMB-KOH1-GAIJGNKBN       =   "1"  ))
            OR ((COMB-KOH2HKNNUM       NOT =  SPACE )  AND
@@ -2851,7 +2856,6 @@
                  END-IF
       *
                  IF    COMB-KOH1HKNNUM       =  "010" OR "021"
-                     PERFORM  2101-PTHKNINF-KENSAKU-SEC
                      IF    FLG-SEISINJYO  =   1
                         MOVE   ZERO   TO    MAX-KIN-KOHI1-M
                         MOVE   SPACE  TO    COMB-KOH1-GAIJGNKBN
@@ -2948,7 +2952,6 @@
                  END-IF
       *
                  IF    COMB-KOH2HKNNUM       =  "010" OR "021"
-                     PERFORM  2101-PTHKNINF-KENSAKU-SEC
                      IF    FLG-SEISINJYO  =   1
                         MOVE   ZERO   TO    MAX-KIN-KOHI2-M
                         MOVE   SPACE  TO    COMB-KOH2-GAIJGNKBN
@@ -3045,7 +3048,6 @@
                  END-IF
       *
                  IF    COMB-KOH3HKNNUM       =  "010" OR "021"
-                     PERFORM  2101-PTHKNINF-KENSAKU-SEC
                      IF    FLG-SEISINJYO  =   1
                         MOVE   ZERO   TO    MAX-KIN-KOHI3-M
                         MOVE   SPACE  TO    COMB-KOH3-GAIJGNKBN
@@ -3142,7 +3144,6 @@
                  END-IF
       *
                  IF    COMB-KOH4HKNNUM       =  "010" OR "021"
-                     PERFORM  2101-PTHKNINF-KENSAKU-SEC
                      IF    FLG-SEISINJYO  =   1
                         MOVE   ZERO   TO    MAX-KIN-KOHI4-M
                         MOVE   SPACE  TO    COMB-KOH4-GAIJGNKBN
@@ -3410,6 +3411,7 @@
        2101-PTHKNINF-KENSAKU-SEC           SECTION.
       *
            MOVE   ZERO               TO    FLG-SEISINJYO
+                                           FLG-TOKUREI-HKNJYA
       *
            INITIALIZE                      PTHKNINF-REC
            MOVE   COMB-HOSPID        TO    PTHKN-HOSPID
@@ -3427,6 +3429,9 @@
                IF      FLG-PTHKNINF   =     ZERO
                   IF   PTHKN-HKNJANUM(1:6) = "133033" OR "133280"
                       MOVE    1      TO    FLG-SEISINJYO
+                  END-IF
+                  IF   PTHKN-HKNJANUM      = "67330753"
+                      MOVE    1      TO    FLG-TOKUREI-HKNJYA
                   END-IF
                END-IF
            END-IF
@@ -8939,6 +8944,15 @@
       *
            END-IF.
       *
+      *    ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ¡ÊÁ°´ü¹âÎð¼Ô¤ò½ü¤¯¡Ë
+           IF  (FLG-TOKUREI-HKNJYA    =     1  )
+           AND (COMB-HOJOKBN          =   SPACE)
+                 MOVE   20      TO   HKN-HON-GAIKFTNRATE
+                                     HKN-KZK-GAIKFTNRATE
+                                     HKN-TSY-GAIKFTNRATE
+                                     HKN-TNK-GAIKFTNRATE
+           END-IF.
+      *
       *    Ç¯Îð£³ºÐÌ¤Ëþ
            IF      LNK-SYU-SRYYMD       >=      "20021001"
                INITIALIZE                           PTINF-REC
@@ -9500,8 +9514,13 @@
            END-IF.
       *
            IF   COMB-KOHHKNNUM(KOH-IDX)  =  "010" OR "021"
-              IF   FLG-SEISINJYO  =  1
-                    MOVE     ZERO     TO    WK-GAIKFTNRATE
+              IF    (COMB-KOHHKNNUM(KOH-IDX)  =  "021"   )
+              AND   (LNK-SYU-SRYYMD(1:6)     >=  "200604")
+                 CONTINUE
+              ELSE
+                 IF   FLG-SEISINJYO  =  1
+                   MOVE     ZERO     TO    WK-GAIKFTNRATE
+                 END-IF
               END-IF
            END-IF.
       *

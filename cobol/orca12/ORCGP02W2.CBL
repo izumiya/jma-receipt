@@ -55,6 +55,7 @@
       *  02.00.15    NACL-ÌçÏÆ    06/04/03  ¼«Î©»Ù±ç°åÎÅÁÈ¹ç¤»ÊÔ½¸½¤Àµ
       *  02.00.16    NACL-ÌçÏÆ    06/05/17  Ç¤°Õ·ÑÂ³¡¦·ÑÂ³¤ÎÊÝ¸±¤È¸øÈñ¤¬¤¢¤ë
       *                                     ¾ì¹ç¤ÎÊÝ¸±ÁÈ¹ç¤»ºîÀ®½¤Àµ
+      *  02.00.17    NACL-ÌçÏÆ    06/05/18  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -298,6 +299,7 @@
                05  WRK-HOKEN-REC       OCCURS   100.
                    07  WRK-HKN-HKNID       PIC 9(10).
                    07  WRK-HKN-HKNNUM      PIC X(03).
+                   07  WRK-HKN-HKNJANUM    PIC X(08).
                    07  WRK-HKN-HONKZKKBN   PIC X(01).
                    07  WRK-HKN-HOJOKBN     PIC X(01).
                    07  WRK-HKN-CONTKBN     PIC X(01).
@@ -535,6 +537,7 @@
       *
            MOVE    PTHKN-HKNID          TO  WRK-HKN-HKNID    (CNT-HKN)
            MOVE    PTHKN-HKNNUM         TO  WRK-HKN-HKNNUM   (CNT-HKN)
+           MOVE    PTHKN-HKNJANUM       TO  WRK-HKN-HKNJANUM (CNT-HKN)
            MOVE    PTHKN-HONKZKKBN      TO  WRK-HKN-HONKZKKBN(CNT-HKN)
            MOVE    PTHKN-HOJOKBN        TO  WRK-HKN-HOJOKBN  (CNT-HKN)
            MOVE    PTHKN-CONTKBN        TO  WRK-HKN-CONTKBN  (CNT-HKN)
@@ -943,6 +946,10 @@
                                        TO  WRK-KCOMB-HKNID      (IDX2)
                MOVE    WRK-HKN-HKNNUM(IDX)
                                        TO  WRK-KCOMB-HKNNUM     (IDX2)
+               IF      WRK-HKN-HKNJANUM(IDX) = "67330753"
+               AND     WRK-HKN-HOJOKBN(IDX)  =  SPACE
+                 MOVE      9999        TO  WRK-KCOMB-HKNCOMBINUM(IDX2)
+               END-IF
                MOVE    WRK-HKN-HONKZKKBN (IDX) 
                                        TO  WRK-KCOMB-HONKZKKBN  (IDX2)
                MOVE    WRK-HKN-HOJOKBN   (IDX)
@@ -1783,6 +1790,12 @@
       *           == 1·ïÌÜ ==
                   MOVE    "1"                  TO  WRK-COMB-TENSO
                   IF  IDA                      =   1
+                      IF  WRK-LCOMB-HKNCOMBINUM(IDX2) = 9999
+                          MOVE    20       TO  HKN-HON-GAIKFTNRATE
+                                               HKN-HON-NYUKFTNRATE
+                                               HKN-KZK-GAIKFTNRATE
+                                               HKN-KZK-NYUKFTNRATE
+                      END-IF
                       IF  WRK-LCOMB-HONKZKKBN (IDX2) NOT =   "2"
       *                   <ËÜ¿Í>
                           MOVE    HKN-HON  TO  WRK-LCOMB-GAINYU(IDX2)
@@ -3315,6 +3328,10 @@
                                    TO  WRK-KCOMB-HKNID      (IDX2)
            MOVE    WRK-HKN-HKNNUM     (WRK-COMB-SYUHOIDX)
                                    TO  WRK-KCOMB-HKNNUM     (IDX2)
+           IF      WRK-HKN-HKNJANUM(WRK-COMB-SYUHOIDX)  = "67330753"
+           AND     WRK-HKN-HOJOKBN (WRK-COMB-SYUHOIDX)  =  SPACE
+               MOVE     9999       TO  WRK-KCOMB-HKNCOMBINUM(IDX2)
+           END-IF
            MOVE    WRK-HKN-HONKZKKBN  (WRK-COMB-SYUHOIDX)
                                    TO  WRK-KCOMB-HONKZKKBN  (IDX2)
            MOVE    WRK-HKN-HOJOKBN    (WRK-COMB-SYUHOIDX)
