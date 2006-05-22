@@ -1027,25 +1027,20 @@
       *
       *        初期画面セット
                PERFORM 300-SCREEN-SEC
-               IF      FLG-END             =   1
-                   GO      TO      100-INIT-EXT
-               END-IF
       *
       *        画面編集
-               PERFORM 500-GMNHEN-SEC
-               IF      FLG-END             =   1
-                   GO      TO      100-INIT-EXT
+               IF      FLG-END             =   ZERO
+                   PERFORM 500-GMNHEN-SEC
                END-IF
            END-IF
       *
-           MOVE    SPACE               TO  LINKAREA
-      *
-           MOVE   SPACE                TO  MCP-PUTTYPE
-           MOVE   "K02N"               TO  MCP-WINDOW
-      *
-           PERFORM 900-PUT-WINDOW.
-      *
-           MOVE    1                   TO  FLG-END
+           IF      FLG-END             =   ZERO
+               MOVE    SPACE               TO  LINKAREA
+               MOVE   SPACE                TO  MCP-PUTTYPE
+               MOVE   "K02N"               TO  MCP-WINDOW
+               PERFORM 900-PUT-WINDOW
+               MOVE    1                   TO  FLG-END
+           END-IF
            .
        100-INIT-EXT.
            EXIT.
@@ -5425,6 +5420,8 @@
       *                算定日が違った時、警告クリア
                        IF      WRK-NYUIN-AREA  NOT =
                                                SPA-COM-NYUIN-AREA(IDX)
+      *                    訂正時展開以外
+                       AND    (FLG-INIT            =   ZERO   )
                            MOVE    SPACE       TO  SPA-COM-KZMFLG(IDX)
                        END-IF
                        MOVE    WRK-KAISU       TO  SPA-COM-KAISU (IDX)
@@ -8487,14 +8484,12 @@
       *****************************************************************
        230-MAEKPTNUM-SEC             SECTION.
       *
-      *
            IF      SPA-LAST-PTNUM      =   SPACE
-               GO      TO      230-MAEKPTNUM-EXT
+               CONTINUE
+           ELSE
+               MOVE    SPA-LAST-PTNUM      TO  K02N-PTNUM
+               PERFORM 41010-PTNUM-SYORI-SEC
            END-IF
-      *
-           MOVE    SPA-LAST-PTNUM      TO  K02N-PTNUM
-           PERFORM 41010-PTNUM-SYORI-SEC
-      *
            .
        230-MAEKPTNUM-EXT.
            EXIT.
