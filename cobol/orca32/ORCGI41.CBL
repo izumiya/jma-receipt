@@ -60,6 +60,8 @@
       *                                     改定による特定入院料次月作成変更
       *  02.09.01    NACL-小豆沢  06/05/16  老人特定入院基本料を特定入院料
       *                                     より外す
+      *  02.09.02    NACL-小豆沢  06/05/22  他医療期間は外泊実更新の条件から
+      *                                     外す
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3596,7 +3598,7 @@
       *                外泊日の削除
                        PERFORM VARYING     IDX-D   FROM    1   BY  1
                                UNTIL       IDX-D   >   31
-                           IF      SPA-GMN-DAY-41(IDX-D)   =   ZERO
+                           IF      SPA-GMN-DAY-41(IDX-D)  =   ZERO OR 4
                                CONTINUE
                            ELSE
                                MOVE    ZERO         TO  SPA-NAI-DAY-41
