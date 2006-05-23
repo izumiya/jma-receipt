@@ -68,6 +68,7 @@
       *  02.09.02    NACL-ÌçÏÆ    06/05/16  Ï·¿ÍÆÃÄêÆþ±¡´ðËÜÎÁ¤Î¿ÇÎÅ¶èÊ¬
       *                                     ÊÔ½¸½¤Àµ
       *  02.09.03    NACL-ÌçÏÆ    06/05/17  Î¬¾ÎÊÔ½¸(190123250Åù)
+      *  02.09.04    NACL-ÌçÏÆ    06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
       *****************************************************************
       *
       *
@@ -2348,6 +2349,13 @@
                WHEN  "190813510"
                      MOVE  "190813410"      TO   WRK-GAIHAKU-SRYCD
            END-EVALUATE
+      *
+           IF   (RECE62-SRYYM      >= "200604"   )
+           AND  (WRK-GAIHAKU-SRYCD  = "190774110" OR
+                                      "190739910" OR
+                                      "190813410")
+               MOVE    SPACE    TO    WRK-GAIHAKU-SRYCD
+           END-IF
       *
            IF    WRK-GAIHAKU-SRYCD    NOT =   SPACE
                MOVE    SPACE         TO   TNS-TENSU-REC

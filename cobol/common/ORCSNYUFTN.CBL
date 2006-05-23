@@ -75,6 +75,7 @@
       *  01.03.01    NACL-ÌçÏÆ    06/03/09  ¤¤¤ï¤­»Ô½Å¿´ÂÐ±þ
       *  01.03.02    NACL-ÌçÏÆ    06/03/20  ¼«Î©»Ù±çË¡ÂÐ±þ
       *  01.03.03    NACL-ÌçÏÆ    06/03/30  Ï«ºÒÆ±Æü½é¿ÇÂÐ±þ
+      *  01.03.04    NACL-ÌçÏÆ    06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2444,6 +2445,13 @@
                WHEN  "190813510"
                      MOVE  "190813410"      TO   WRK-GAIHAKU-SRYCD
            END-EVALUATE
+      *
+           IF   (SYU-SRYYMD(1:6)   >= "200604"   )
+           AND  (WRK-GAIHAKU-SRYCD  = "190774110" OR
+                                      "190739910" OR
+                                      "190813410")
+               MOVE    SPACE    TO    WRK-GAIHAKU-SRYCD
+           END-IF
       *
            IF    WRK-GAIHAKU-SRYCD    NOT =   SPACE
                MOVE    SPACE         TO   TNS-TENSU-REC

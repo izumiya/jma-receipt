@@ -194,6 +194,7 @@
       *                                     ¤ËÀ¸·îÆü¤òµ­ºÜ
       *  02.09.11    NACL-ÌçÏÆ    06/05/16  Ï·¿ÍÆÃÄêÆþ±¡´ðËÜÎÁ¤Î¿ÇÎÅ¶èÊ¬
       *                                     ÊÔ½¸½¤Àµ
+      *  02.09.12    NACL-ÌçÏÆ    06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4479,6 +4480,13 @@
                WHEN  "190813510"
                      MOVE  "190813410"      TO   WRK-GAIHAKU-SRYCD
            END-EVALUATE
+      *
+           IF   (RECE62-SRYYM      >= "200604"   )
+           AND  (WRK-GAIHAKU-SRYCD  = "190774110" OR
+                                      "190739910" OR
+                                      "190813410")
+               MOVE    SPACE    TO    WRK-GAIHAKU-SRYCD
+           END-IF
       *
            IF    WRK-GAIHAKU-SRYCD    NOT =   SPACE
                MOVE    WRK-GAIHAKU-SRYCD   TO  WRK-SRYCD
