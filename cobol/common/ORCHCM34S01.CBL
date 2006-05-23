@@ -40,6 +40,7 @@
       *                                     Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
       *  01.00.06    NACL-¾®Æ¦Âô  06/03/22  ÆÃÄêÆþ±¡ÎÁÄÉ²ÃÊ¬¡ÊÇ¾Â´Ãæ¥±¥¢¥æ¥Ë¡Ë
       *                                     ³°ÇñÃÖ¤­´¹¤¨½èÍý
+      *  01.00.07    NACL-¾®Æ¦Âô  06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
       *****************************************************************
       *
       *
@@ -1336,6 +1337,13 @@
            WHEN  "190813510"
                  MOVE  "190813410"     TO  WRK-GAIHAKU-SRYCD
            END-EVALUATE
+      *
+           IF   (NACCT-SRYYM      >= "200604"   )
+           AND  (WRK-GAIHAKU-SRYCD  = "190774110" OR
+                                      "190739910" OR
+                                      "190813410")
+               MOVE    SPACE    TO    WRK-GAIHAKU-SRYCD
+           END-IF
       *
            IF    ( WRK-GAIHAKU-SRYCD   NOT =   SPACE )
                MOVE    WRK-GAIHAKU-SRYCD   TO  WRK-TNS-SRYCD

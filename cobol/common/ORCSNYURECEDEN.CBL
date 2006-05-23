@@ -41,6 +41,7 @@
       *                                     外泊置き換え処理
       *  01.00.06    NACL-小豆沢  06/04/05  MONFUNC対応
       *  01.00.07    NACL-小豆沢  06/04/19  食事記録方法の変更対応
+      *  01.00.08    NACL-小豆沢  06/05/23  外泊時の入院基本料取得修正
       *****************************************************************
       *
       *
@@ -2000,6 +2001,13 @@
                WHEN  "190813510"
                      MOVE  "190813410"      TO   WRK-GAIHAKU-SRYCD
            END-EVALUATE
+      *
+           IF   (LNK-NYURECEDEN-SANTEIYM  >= "200604"   )
+           AND  (WRK-GAIHAKU-SRYCD  = "190774110" OR
+                                      "190739910" OR
+                                      "190813410")
+               MOVE    SPACE    TO    WRK-GAIHAKU-SRYCD
+           END-IF
       *
            IF    WRK-GAIHAKU-SRYCD   NOT =   SPACE
                MOVE   WRK-GAIHAKU-SRYCD   TO   WRK-SO-SRYCD(IDX1 IDX2)
