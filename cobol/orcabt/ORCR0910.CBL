@@ -62,6 +62,7 @@
       *  ２００６年４月改正対応
       *  02.09.01    NACL-門脇    06/04/13  ２００６年４月改正対応
       *  02.09.02    NACL-藤原    06/04/14  包括対象検査「１１」の追加
+      *  02.09.03    NACL-門脇    06/05/22  電子化加算編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -489,6 +490,12 @@
       *
        01  TBL-ZAI-MAX         PIC  9(03)  VALUE   100.
       *
+      *    電子化加算情報
+       01  TBL-DENSHI-INF.
+           03  TBL-DENSHI-FLG              PIC  9(01).
+           03  TBL-DENSHI-TEN              PIC  9(07).
+           03  TBL-DENSHI-ZAIKAISU         PIC  9(04).
+      *
       *   日本語数字
        01  TBL-SUJI-AREA.
            03  FILLER          PIC X(20)   VALUE
@@ -842,6 +849,8 @@
                                            WRK-MIN-KAISU-TABLE
                                            WRK-KENTAIKASAN-TABLE
       *
+           INITIALIZE                      TBL-DENSHI-INF
+      *
       *    外来迅速検体検査加算算定日を確認
            IF      RECE82-KENTAIKASANFLG     =   '1'
                PERFORM 2009-KENTAIKASAN-KAKUNIN-SEC
@@ -943,6 +952,11 @@
                        MOVE    WRK-KENSA-KAISU    TO  RECE82-KAISU  (17)
                    END-IF
                    REWRITE RECE82-REC
+               END-IF
+      *
+      *        電子化加算編集
+               IF      TBL-DENSHI-FLG          =   1
+                   PERFORM 2010-DENSHI-HENSYU-SEC
                END-IF
       *
                PERFORM 990-RECE82-READ-SEC
@@ -1376,7 +1390,7 @@
                                             OR  WRK-CONS-SYOSIN-KASAN26
                                             OR  WRK-CONS-SYOSIN-KASAN27
                                             OR  WRK-CONS-SYOSIN-KASAN28
-                                            OR  WRK-CONS-SYOSIN-KASAN29
+      ***>                                  OR  WRK-CONS-SYOSIN-KASAN29
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
@@ -1392,6 +1406,16 @@
                    ADD     TBL-ZAIW-TEN (WRK-WIDX1 WRK-WIDX2)
                                              TO  WRK-TENSUGOKEI
                END-IF
+           END-IF
+      *
+           IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2) =
+                                            WRK-CONS-SYOSIN-KASAN29
+      *
+               MOVE     1              TO  TBL-DENSHI-FLG
+               MOVE  TBL-ZAIW-TEN (WRK-WIDX1 WRK-WIDX2)
+                                       TO  TBL-DENSHI-TEN
+               ADD   RECE84-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU
+      *
            END-IF
       *
            .
@@ -2330,6 +2354,70 @@
            .
       *
        2009-KENTAIKASAN-KAKUNIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    電子化加算編集
+      *****************************************************************
+       2010-DENSHI-HENSYU-SEC      SECTION.
+      *
+           IF  TBL-DENSHI-ZAIKAISU  NOT =  ZERO
+      *
+               MOVE    SPACE             TO  WRK-ZAI
+               MOVE    "＊"              TO  WRK-ZAI-MK
+               MOVE    "電子化加算"      TO  WRK-ZAI-NAME(1:10)
+      *        点数・回数セット
+               MOVE    TBL-DENSHI-TEN    TO  WRK-ZAITENX
+               MOVE    TBL-DENSHI-ZAIKAISU
+                                         TO  WRK-ZAIKAISUX
+      *        必要有効桁数・開始位置・回数編集
+               PERFORM 810-TENSUKAI-HEN-SEC
+      *
+               MOVE    WRK-TNSKAI(13:10) TO  WRK-ZAI-TNSKAI(13:10)
+      ****
+               MOVE    SPACE             TO  RECE86-REC
+               INITIALIZE                    RECE86-REC
+               MOVE    RECE82-KEY        TO  RECE86-KEY
+               MOVE    99999975          TO  RECE86-ZAINUM
+               MOVE    1                 TO  RECE86-LINENUM
+               MOVE    1                 TO  RECE86-ZAIMEISAISU
+               MOVE    RECE82-PTNUM      TO  RECE86-PTNUM
+               MOVE    SPACE             TO  RECE86-SRYKA
+               MOVE    "11"              TO  RECE86-SRYKBN
+               MOVE    SPACE             TO  RECE86-ZAISKBKBN
+               MOVE    ZERO              TO  RECE86-ZAISKBBAN
+               MOVE    ZERO              TO  RECE86-TENTEKIKBN
+               MOVE    ZERO              TO  RECE86-TENTEKIBAN
+               MOVE    WRK-ZAI           TO  RECE86-TEKIYO-INF
+      *
+               MOVE    99999999          TO  RECE86-ZAITEN
+               MOVE    ZERO              TO  RECE86-KNSJISKBN
+      *
+               MOVE    9                 TO  RECE86-CDKBN-SYO
+               MOVE    99                TO  RECE86-CDKBN-BU
+               MOVE    "9"               TO  RECE86-CDKBN-KBN
+               MOVE    999               TO  RECE86-CDKBN-KBNNUM
+               MOVE    99                TO  RECE86-CDKBN-KBNNUM-EDA
+               MOVE    99                TO  RECE86-CDKBN-KOUBAN
+               MOVE    999999999         TO  RECE86-KOUHYOJUNNUM
+      *
+               MOVE    SPACE             TO  RECE86-SAFLG
+               MOVE    SPACE             TO  RECE86-SRYSYUKBN
+               MOVE    ZERO              TO  RECE86-DAY
+      *
+               WRITE   RECE86-REC
+      *
+               IF  STS-RECE86        NOT =   ZERO
+                   DISPLAY "*** ORCR0910 RECE86 WRITE ERR(11)  ***"
+               ELSE
+                   ADD     1             TO  CNT-RECE86
+               END-IF
+      *
+           END-IF
+      *
+           .
+      *
+       2010-DENSHI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

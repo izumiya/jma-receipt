@@ -94,6 +94,7 @@
       *  02.09.01    NACL-門脇    06/04/13  ２００６年４月改正対応
       *  02.09.02    NACL-藤原    06/04/14  包括対象検査「１１」の追加
       *                                     検査等実施判断グループの追加
+      *  02.09.03    NACL-門脇    06/05/22  電子化加算編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -246,6 +247,8 @@
            03  IDX2                PIC 9(04).
            03  IDX3                PIC 9(04).
            03  IDX4                PIC 9(04).
+      *
+           03  IDX5                PIC 9(04).
       *
            03  IDXY                PIC 9(03).
            03  IDXZ                PIC 9(03).
@@ -623,6 +626,13 @@
                    07  TBL-ZAIW-KENTAICOMMENT-SRYCD PIC  9(09).
       *
        01  TBL-ZAI-MAX         PIC  9(03)  VALUE   100.              
+      *
+      *    電子化加算情報
+       01  TBL-DENSHI-INF.
+           03  TBL-DENSHI-FLG              PIC  9(01).
+           03  TBL-DENSHI-TEN              PIC  9(07).
+           03  TBL-DENSHI-OCC              OCCURS   5.
+               05  TBL-DENSHI-ZAIKAISU     PIC  9(04).
       *
       *   日本語数字
        01  TBL-SUJI-AREA.
@@ -1113,6 +1123,8 @@
                                            WRK-MIN-KAISU-TABLE
                                            WRK-KENTAIKASAN-TABLE
       *
+           INITIALIZE                      TBL-DENSHI-INF
+      *
       *    外来迅速検体検査加算算定日を確認
            IF      RECE62-KENTAIKASANFLG     =   '1'
                PERFORM 2009-KENTAIKASAN-KAKUNIN-SEC
@@ -1218,6 +1230,11 @@
       *        レセプト特記事項編集情報編集
                IF      FLG-SYS-2006            =   1
                    PERFORM 2008-SYS2006-HENSYU-SEC
+               END-IF
+      *
+      *        電子化加算編集
+               IF      TBL-DENSHI-FLG          =   1
+                   PERFORM 2010-DENSHI-HENSYU-SEC
                END-IF
       *
                REWRITE RECE62-REC
@@ -1629,7 +1646,7 @@
                                             OR  WRK-CONS-SYOSIN-KASAN26
                                             OR  WRK-CONS-SYOSIN-KASAN27
                                             OR  WRK-CONS-SYOSIN-KASAN28
-                                            OR  WRK-CONS-SYOSIN-KASAN29
+      ***>                                  OR  WRK-CONS-SYOSIN-KASAN29
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
@@ -1650,6 +1667,17 @@
                    ADD     TBL-ZAIW-TEN (WRK-WIDX1 WRK-WIDX2)
                                              TO  WRK-TENSUGOKEI
                END-IF
+           END-IF
+      *
+           IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2) =
+                                            WRK-CONS-SYOSIN-KASAN29
+      *
+               MOVE     1              TO  TBL-DENSHI-FLG
+               MOVE  TBL-ZAIW-TEN (WRK-WIDX1 WRK-WIDX2)
+                                       TO  TBL-DENSHI-TEN
+               COMPUTE  IDX5  =  RECE64-KOHBUNRI + 1
+               ADD   RECE64-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX5)
+      *
            END-IF
       *
            .
@@ -3018,6 +3046,77 @@
            .
       *
        2009-KENTAIKASAN-KAKUNIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    電子化加算編集
+      *****************************************************************
+       2010-DENSHI-HENSYU-SEC      SECTION.
+      *
+           PERFORM   VARYING   IDX5   FROM    1   BY  1
+                      UNTIL    IDX5    >      5
+      *
+             IF  TBL-DENSHI-ZAIKAISU(IDX5)  NOT =  ZERO
+      *
+               MOVE    SPACE             TO  WRK-ZAI
+               MOVE    "＊"              TO  WRK-ZAI-MK
+               MOVE    "電子化加算"      TO  WRK-ZAI-NAME(1:10)
+      *        点数・回数セット
+               MOVE    TBL-DENSHI-TEN    TO  WRK-ZAITENX
+               MOVE    TBL-DENSHI-ZAIKAISU(IDX5)
+                                         TO  WRK-ZAIKAISUX
+      *        必要有効桁数・開始位置・回数編集
+               PERFORM 810-TENSUKAI-HEN-SEC
+      *
+               MOVE    WRK-TNSKAI(13:10) TO  WRK-ZAI-TNSKAI(13:10)
+      ****
+               MOVE    SPACE             TO  RECE66-REC
+               INITIALIZE                    RECE66-REC
+               MOVE    RECE62-KEY        TO  RECE66-KEY
+               COMPUTE RECE66-KOHBUNRI = IDX5 - 1
+               COMPUTE RECE66-ZAINUM   = 99999974 + IDX5
+               MOVE    1                 TO  RECE66-LINENUM
+               MOVE    1                 TO  RECE66-ZAIMEISAISU
+               MOVE    RECE62-PTNUM      TO  RECE66-PTNUM
+               MOVE    SPACE             TO  RECE66-SRYKA
+               MOVE    "11"              TO  RECE66-SRYKBN
+               MOVE    SPACE             TO  RECE66-ZAISKBKBN
+               MOVE    ZERO              TO  RECE66-ZAISKBBAN
+               MOVE    ZERO              TO  RECE66-TENTEKIKBN
+               MOVE    ZERO              TO  RECE66-TENTEKIBAN
+               MOVE    WRK-ZAI           TO  RECE66-TEKIYO-INF
+      *
+               MOVE    99999999          TO  RECE66-ZAITEN
+               MOVE    ZERO              TO  RECE66-KNSJISKBN
+      *
+               MOVE    9                 TO  RECE66-CDKBN-SYO
+               MOVE    99                TO  RECE66-CDKBN-BU
+               MOVE    "9"               TO  RECE66-CDKBN-KBN
+               MOVE    999               TO  RECE66-CDKBN-KBNNUM
+               MOVE    99                TO  RECE66-CDKBN-KBNNUM-EDA
+               MOVE    99                TO  RECE66-CDKBN-KOUBAN
+               MOVE    999999999         TO  RECE66-KOUHYOJUNNUM
+      *
+               MOVE    SPACE             TO  RECE66-SAFLG
+               MOVE    SPACE             TO  RECE66-SRYSYUKBN
+               MOVE    ZERO              TO  RECE66-DAY
+      *
+               WRITE   RECE66-REC
+      *
+               IF  STS-RECE66        NOT =   ZERO
+                   DISPLAY "*** ORCR0690 RECE66 WRITE ERR(11)  ***"
+                   MOVE    5             TO  IDX5
+               ELSE
+                   ADD     1             TO  CNT-RECE66
+               END-IF
+      *
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+      *
+       2010-DENSHI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
