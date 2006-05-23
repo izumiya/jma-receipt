@@ -192,9 +192,11 @@
       *    保険組合せ名称
            03  WRK-SRYCD              PIC X(09).
       *    保険組合せ名称
-           03  WRK-HKNCOMBI         PIC X(04).
-           03  WRK-HKNCOMBIMEI      PIC X(100).
-           03  WRK-HKNKBN-MEI       PIC X(02).
+           03  WRK-HKNCOMBI           PIC X(04).
+           03  WRK-HKNCOMBIMEI        PIC X(100).
+           03  WRK-HKNKBN-MEI         PIC X(02).
+           03  WRK-COMB-TEKSTYMD      PIC X(08).
+           03  WRK-COMB-TEKEDYMD      PIC X(08).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -621,6 +623,10 @@
                          INTO              WRK-HKNCOMBIMEI
                END-STRING
            END-IF
+      *
+           MOVE    COMB-TEKSTYMD       TO  WRK-COMB-TEKSTYMD
+           MOVE    COMB-TEKEDYMD       TO  WRK-COMB-TEKEDYMD
+      *
       *    労災の時、コメントの追加
            IF      COMB-HKNNUM         =   "971"  OR  "973"
       *        患者保険情報検索
@@ -670,8 +676,12 @@
                            INTO              WRK-HKNCOMBIMEI
                    END-STRING
                END-IF
+      *        傷病年月日と療養開始日判定
+               IF     (PTRSI-SHOBYOYMD     NOT =   SPACE  )  AND
+                      (PTRSI-SHOBYOYMD         <   COMB-TEKSTYMD)
+                   MOVE    PTRSI-SHOBYOYMD     TO  WRK-COMB-TEKSTYMD
+               END-IF
            END-IF
-      *
            .
        31011-HKNCOMBI-SET-EXT.
            EXIT.
@@ -1410,10 +1420,10 @@
                        END-IF
                    END-PERFORM
                    IF      WRK-STDD        NOT =   ZERO
-                      IF  ((WRK-ST-SRYYMD      >=  COMB-TEKSTYMD )  AND
-                           (WRK-ST-SRYYMD      <=  COMB-TEKEDYMD )) AND
-                          ((WRK-ED-SRYYMD      >=  COMB-TEKSTYMD )  AND
-                           (WRK-ED-SRYYMD      <=  COMB-TEKEDYMD ))
+                      IF  ((WRK-ST-SRYYMD  >=  WRK-COMB-TEKSTYMD )  AND
+                           (WRK-ST-SRYYMD  <=  WRK-COMB-TEKEDYMD )) AND
+                          ((WRK-ED-SRYYMD  >=  WRK-COMB-TEKSTYMD )  AND
+                           (WRK-ED-SRYYMD  <=  WRK-COMB-TEKEDYMD ))
                          CONTINUE
                      ELSE
       *                  急性発生日はチェックなしとする
@@ -1799,7 +1809,6 @@
       *
            INITIALIZE                  ORCSKARRKAREA
            MOVE    SPA-NAI-SRYYM       TO  SKARRK-SRYYM
-      *
            CALL    "ORCSKARRK"         USING
                                        ORCSKARRKAREA
                                        SPA-AREA.
