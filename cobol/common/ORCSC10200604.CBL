@@ -3798,7 +3798,11 @@
                IF     ( SPA-SYORIFLG        =   ZERO     ) AND
                       ( SPA-RRK-LSTYMD      =   SPA-SRYYMD)
       *            б╬╡й╓н©гне
-                   IF    ( SPA-TAKA-SRYKA-R    =   SPACE  )
+                   IF    ( SPA-TAKA-SRYKA-R NOT =   SPACE  ) OR
+                         ( SPA-SRYKA        NOT =   WRK-COM-SRYKA
+                                                     (IDX-SINSATU2))
+                       CONTINUE
+                   ELSE
                        MOVE    "2067"          TO  SPA-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR
                                                        (IDX-SINSATU2)
