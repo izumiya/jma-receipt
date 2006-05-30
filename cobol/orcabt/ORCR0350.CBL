@@ -105,6 +105,9 @@
       *                                     外来迅速検体検査加算対応
       *  02.09.06    NACL-藤原    06/05/16  改定通信医１６０４９号
       *                                     日計表レコードの記載方法の変更
+      *  02.09.07    NACL-藤原    06/05/29  食事療養で食事負担ありの公費が 
+      *                                     ある場合は該当の公費をはずした
+      *                                     負担区分とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4576,10 +4579,10 @@
                            MOVE    ZERO                TO  FLG-CHK
                        ELSE
       *
-      *                    食事療養で食事愛媛県の地方公費がある場合は 
-      *                    該当の地方公費をはずした負担区分とする
+      *                    食事療養で食事負担ありの公費がある場合は 
+      *                    該当の公費をはずした負担区分とする
                            IF    ( IDZ1                =   3     )
-                           AND   ( SYS-1001-PREFNUM    =   "38"  )
+      *********************AND   ( SYS-1001-PREFNUM    =   "38"  )
                            AND   ( RECE62-FUKUSHIFLG-SKJINF-AREA
                                                    NOT =   SPACE )
                                EVALUATE    WRK-FTNKBN
@@ -4588,18 +4591,46 @@
                                    WHEN    "8"
                                        MOVE    "1"     TO  WRK-FTNKBN
                                    WHEN    "4"
-                                       IF      RECE62-FUKUSHIFLG-SKJ (1)
-                                                           =   "1"
-                                           MOVE    "3" TO  WRK-FTNKBN
+                                       IF    ( RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1" )
+                                       AND   ( RECE62-FUKUSHIFLG-SKJ (2)
+                                                           =   "1" )
+                                           MOVE    "1" TO  WRK-FTNKBN
                                        ELSE
-                                           MOVE    "2" TO  WRK-FTNKBN
+                                           IF  RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1"
+                                               MOVE   "3" TO  WRK-FTNKBN
+                                           ELSE
+                                               MOVE   "2" TO  WRK-FTNKBN
+                                           END-IF
                                        END-IF
                                    WHEN    "A"
+                                       IF    ( RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1" )
+                                       AND   ( RECE62-FUKUSHIFLG-SKJ (2)
+                                                           =   "1" )
+                                           MOVE    "1" TO  WRK-FTNKBN
+                                       ELSE
+                                           IF  RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1"
+                                               MOVE   "8" TO  WRK-FTNKBN
+                                           ELSE
+                                               MOVE   "3" TO  WRK-FTNKBN
+                                           END-IF
+                                       END-IF
+                                   WHEN    "7"
                                        IF      RECE62-FUKUSHIFLG-SKJ (1)
                                                            =   "1"
-                                           MOVE    "8" TO  WRK-FTNKBN
+                                           MOVE    "6" TO  WRK-FTNKBN
                                        ELSE
-                                           MOVE    "3" TO  WRK-FTNKBN
+                                           MOVE    "5" TO  WRK-FTNKBN
+                                       END-IF
+                                   WHEN    "D"
+                                       IF      RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1"
+                                           MOVE    "F" TO  WRK-FTNKBN
+                                       ELSE
+                                           MOVE    "6" TO  WRK-FTNKBN
                                        END-IF
                                END-EVALUATE
                            END-IF
