@@ -3467,6 +3467,8 @@
                                                OR  "113002210"
       *        てんかん指導管理料
                                                OR  "113002850"
+      *        小児悪性腫瘍指導管理料
+                                               OR  "113006610"
                    MOVE    1                   TO  FLG-SIDOU
                    PERFORM 230-SIDOU-SYOSIN-SEC
                END-IF
@@ -4251,19 +4253,19 @@
            ELSE
                MOVE    LNK-ORCSC-SYOYMD        TO  WRK-SYOYMD
            END-IF
-      *    同日初診がある時、同日初診
-           IF      (SPA-DOUYMD     NOT =   SPACE )  AND
-                   (SPA-DOUYMD         >   WRK-SYOYMD)
+      **** 同日初診がある時、同日初診
+      *    IF      (SPA-DOUYMD     NOT =   SPACE )  AND
+      *            (SPA-DOUYMD         >   WRK-SYOYMD)
       *
-               IF   WRK-COM-INPUTCD(IDX-Z)  =  "113001810" OR
-                                               "113001910" OR
-                                               "113002010"
-                 CONTINUE
-               ELSE
-                 MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
-               END-IF
+      *        IF   WRK-COM-INPUTCD(IDX-Z)  =  "113001810" OR
+      *                                        "113001910" OR
+      *                                        "113002010"
+      *          CONTINUE
+      *        ELSE
+      *          MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
+      *        END-IF
       **         MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
-           END-IF
+      **** END-IF
       *
       *    最終退院日がある時、退院日
            IF     (LNK-ORCSC-TAIINYMD  =   SPACE )  OR
@@ -4289,9 +4291,9 @@
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
       *TEST
-               DISPLAY "C10 WRK-SYOYMD:" WRK-SYOYMD
-                 ",LNK-DAY6-KEISAN:" LNK-DAY6-KEISAN
-                 ",LNK-DAY6-KEISANZEN:" LNK-DAY6-KEISANZEN
+      *        DISPLAY "C10 WRK-SYOYMD:" WRK-SYOYMD
+      *          ",LNK-DAY6-KEISAN:" LNK-DAY6-KEISAN
+      *          ",LNK-DAY6-KEISANZEN:" LNK-DAY6-KEISANZEN
       *TEST
                MOVE    LNK-DAY6-KEISAN     TO  WRK-KEIYMD
                MOVE    LNK-DAY6-KEISANZEN  TO  WRK-KEIYMDZEN
