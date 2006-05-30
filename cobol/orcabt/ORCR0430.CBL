@@ -68,6 +68,7 @@
       *  02.09.02    NACL-ÌçÏÆ    06/04/28  ¥ê¥Ï¸¡º÷¾ò·ï½¤Àµ
       *  02.09.03    NACL-ÌçÏÆ    06/05/01  ¥ê¥ÏÈ¯¾ÉÆüÅö·îÊ¬µ­ºÜ½¤Àµ
       *  02.09.04    NACL-ÌçÏÆ    05/05/10  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
+      *  02.09.05    NACL-ÌçÏÆ    06/05/30  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -257,6 +258,7 @@
            03  FLG-SHIDOU-COMMENT  PIC 9(01).
            03  FLG-HINKAI-COMMENT  PIC 9(01).
            03  FLG-KYUSEI-COMMENT  PIC 9(01).
+           03  FLG-KYUSEI-COMMENT2 PIC 9(01).
            03  FLG-COMMENT         PIC 9(02).
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
@@ -269,6 +271,7 @@
            03  FLG-PTCOM           PIC 9(01).
            03  FLG-NIKOCHINTOU-COMMENT
                                    PIC 9(01).
+           03  FLG-RIHA            PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -353,8 +356,17 @@
            03  TBL-SANTEI-DAY.
                05  TB-SANTEI-DAY   PIC 9(02)   OCCURS  31.
       *
+      *    ³ºÅö¿ÇÎÅ·îÊ¬
            03  TBL-RIHASANTEI-DAY.
                05  TB-RIHASANTEI-DAY PIC 9(01) OCCURS  31.
+      *
+      *    Ä¾¶áÊ¬
+           03  WRK-RIHASANTEI-YMD.
+               05  WRK-RIHASANTEI-YM PIC 9(06).
+               05  WRK-RIHASANTEI-DD PIC 9(02).
+      *
+      *    £²£°£°£¶Ç¯£´·î£±Æü¤Ë»»ÄêÆü¤¬¤¢¤ë¤«
+           03  WRK-RIHASANTEI41-FLG  PIC 9(01).
       *
            03  WRK-HKNCOMBINUMX      PIC X(04).
            03  WRK-HKNCOMBINUM9      REDEFINES  WRK-HKNCOMBINUMX
@@ -2046,7 +2058,8 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(27:4)
-               COMPUTE WRK-ZAINUM    =  99998000 + IDX16
+               COMPUTE WRK-ZAINUM    =    99998000
+                                     +   (IDX16 + 31)
                MOVE    "40" TO  WRK-SRYKBN
              WHEN       CONS-SINDAI
                MOVE    20   TO  WRK-RECE45XX-YUKOKETA(IDX-RECE45 1)
@@ -2058,7 +2071,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(35:4)
-               COMPUTE WRK-ZAINUM    =  99998200 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99998201      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99998200
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2074,7 +2092,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(31:4)
-               COMPUTE WRK-ZAINUM    =  99998400 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99998401      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99998400
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2090,7 +2113,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(25:4)
-               COMPUTE WRK-ZAINUM    =  99998600 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99998601      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99998600
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2106,7 +2134,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(29:4)
-               COMPUTE WRK-ZAINUM    =  99998800 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99998801      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99998800
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2122,7 +2155,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(31:4)
-               COMPUTE WRK-ZAINUM    =  99999000 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99999001      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99999000
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2138,7 +2176,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(27:4)
-               COMPUTE WRK-ZAINUM    =  99999200 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99999201      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99999200
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2154,7 +2197,12 @@
                MOVE    WRK-KYUSEIYMD(7:2)   TO  DAY-IDX2
                MOVE    TBL-DAY(DAY-IDX2)
                             TO  WRK-RECE45XX-NAME(IDX-RECE45 1)(31:4)
-               COMPUTE WRK-ZAINUM    =  99999400 + IDX16
+               IF      FLG-RIHA      =  1
+                 MOVE    99999401      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99999400
+                                       +   (IDX16 + 31)
+               END-IF
                IF   RECE41-HKNKBN    NOT  =  "4"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
@@ -2242,8 +2290,11 @@
        20011-RIHABIRIHASSYO-HANTEI-SEC          SECTION.
       *
            MOVE     ZERO     TO     FLG-KYUSEI-COMMENT
+           MOVE     ZERO     TO     FLG-KYUSEI-COMMENT2
            MOVE     ZERO     TO     WRK-KYUSEIYMD
            INITIALIZE               TBL-RIHASANTEI-DAY
+           MOVE     SPACE    TO     WRK-RIHASANTEI-YMD
+           MOVE     ZERO     TO     WRK-RIHASANTEI41-FLG
       *
       *    »»ÄêÍúÎò¸¡º÷
            INITIALIZE                  SANTEI-REC
@@ -2265,8 +2316,8 @@
                 MOVE    "SANTEI-KEY3"       TO  ORC-DBPATH
                 PERFORM        900-SANTEI-READ-SEC
       *
-                PERFORM   UNTIL  ( FLG-SANTEI         =   1 ) OR
-                                 ( FLG-KYUSEI-COMMENT =   1 )
+                PERFORM   UNTIL  ( FLG-SANTEI          =  1 ) OR
+                                 ( FLG-KYUSEI-COMMENT2 =  1 )
       *
                  IF   SANTEI-SRYYM  <=  RECE41-SRYYM
                   IF   SANTEI-SRYYM  =  RECE41-SRYYM
@@ -2275,26 +2326,47 @@
       *
                      IF   SANTEI-DAY(IDX3)  NOT =  ZERO
       *
-                         MOVE   SANTEI-SRYYM   TO  WRK-KYUSEIYMD(1:6)
-                         MOVE   "00"           TO  WRK-KYUSEIYMD(7:2)
+      ****               MOVE   SANTEI-SRYYM   TO  WRK-KYUSEIYMD(1:6)
+      ****               MOVE   "00"           TO  WRK-KYUSEIYMD(7:2)
                          MOVE   1     TO  TB-RIHASANTEI-DAY(IDX3)
       *
                          MOVE   1     TO  FLG-KYUSEI-COMMENT
+      *
+                         IF    (SANTEI-SRYYM = "200604")
+                         AND   (IDX3         =  1      )
+                            MOVE    1    TO   WRK-RIHASANTEI41-FLG
+                         END-IF
+                         IF    (SANTEI-SRYYM  NOT = "200604")
+                         AND   (IDX3              =  1      )
+                            MOVE   1     TO   FLG-KYUSEI-COMMENT2
+                         END-IF
       *
                      END-IF
       *
                    END-PERFORM
                   ELSE
                    PERFORM  VARYING   IDX3   FROM  31  BY  -1
-                             UNTIL   ( IDX3               <    1 )
-                               OR    ( FLG-KYUSEI-COMMENT =    1 )
+                             UNTIL   ( IDX3                <   1 )
+                               OR    ( FLG-KYUSEI-COMMENT2 =   1 )
       *
                      IF   SANTEI-DAY(IDX3)  NOT =  ZERO
       *
-                         MOVE   SANTEI-SRYYM   TO  WRK-KYUSEIYMD(1:6)
-                         MOVE   IDX3           TO  WRK-KYUSEIYMD(7:2)
+      ****               MOVE   SANTEI-SRYYM   TO  WRK-KYUSEIYMD(1:6)
+      ****               MOVE   IDX3           TO  WRK-KYUSEIYMD(7:2)
+                         MOVE   SANTEI-SRYYM
+                                          TO  WRK-RIHASANTEI-YMD(1:6)
+                         MOVE   IDX3      TO  WRK-RIHASANTEI-YMD(7:2)
       *
-                         MOVE   1              TO  FLG-KYUSEI-COMMENT
+                         MOVE   1         TO  FLG-KYUSEI-COMMENT
+                         MOVE   1         TO  FLG-KYUSEI-COMMENT2
+      *
+                         IF    (SANTEI-SRYYM = "200604")
+                         AND   (IDX3         =  1      )
+                            MOVE   ZERO  TO   FLG-KYUSEI-COMMENT2
+                         END-IF
+                         IF     WRK-RIHASANTEI41-FLG  =  1
+                            MOVE   ZERO  TO   TB-RIHASANTEI-DAY(1)
+                         END-IF
       *
                      END-IF
       *
@@ -2317,20 +2389,24 @@
                                        MCPDATA-REC
       *
            IF      FLG-KYUSEI-COMMENT    =      1
-             IF  WRK-KYUSEIYMD(7:2) = "00"
+               IF  WRK-RIHASANTEI-YMD  NOT = SPACE
+                     MOVE   1      TO  FLG-RIHA
+                     MOVE   WRK-RIHASANTEI-YMD
+                                   TO  WRK-KYUSEIYMD
+                     PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
+                     PERFORM    20011-HASSYO-COMMENT-SEC
+               END-IF
                PERFORM   VARYING   IDX16    FROM   1   BY   1
                           UNTIL    IDX16      >   31
                  IF  TB-RIHASANTEI-DAY(IDX16)  NOT = ZERO
+                     MOVE   2      TO  FLG-RIHA
+                     MOVE   RECE41-SRYYM
+                                   TO  WRK-KYUSEIYMD(1:6)
                      MOVE   IDX16  TO  WRK-KYUSEIYMD(7:2)
                      PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
                      PERFORM    20011-HASSYO-COMMENT-SEC
                  END-IF
                END-PERFORM
-             ELSE
-               PERFORM    20011-KYUSEIHASSYO-KENSAKU-SEC
-               MOVE       WRK-KYUSEIYMD(7:2)  TO  IDX16
-               PERFORM    20011-HASSYO-COMMENT-SEC
-             END-IF
            END-IF
       *
            .
