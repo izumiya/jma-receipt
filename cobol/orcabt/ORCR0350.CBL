@@ -4610,9 +4610,28 @@
                                                    NOT =   SPACE )
                                EVALUATE    WRK-FTNKBN
                                    WHEN    "2"
+                                       IF    ( RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1" )
+                                           MOVE    "1" TO WRK-FTNKBN
+                                       END-IF
                                    WHEN    "3"
+                                       IF      RECE62-RJNHKNNUM
+                                                           =   SPACE
+                                           IF  RECE62-FUKUSHIFLG-SKJ (2)
+                                                           =   "1"
+                                               MOVE    "1" TO WRK-FTNKBN
+                                           END-IF
+                                       ELSE
+                                           IF  RECE62-FUKUSHIFLG-SKJ (1)
+                                                           =   "1"
+                                               MOVE    "1" TO WRK-FTNKBN
+                                           END-IF
+                                       END-IF
                                    WHEN    "8"
-                                       MOVE    "1"     TO  WRK-FTNKBN
+                                       IF    ( RECE62-FUKUSHIFLG-SKJ (2)
+                                                           =   "1" )
+                                           MOVE    "1" TO WRK-FTNKBN
+                                       END-IF
                                    WHEN    "4"
                                        IF    ( RECE62-FUKUSHIFLG-SKJ (1)
                                                            =   "1" )
