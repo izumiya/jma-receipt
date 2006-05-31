@@ -400,7 +400,7 @@
       *
       *
        01  TBL-GAIRAI-AREAR       REDEFINES   TBL-GAIRAI-AREA.
-           03  TBL-GAIRAI-OCC          OCCURS  5    INDEXED  TBLG-IDX.
+           03  TBL-GAIRAI-OCC          OCCURS  3    INDEXED  TBLG-IDX.
       *        回数
                05  TBLG-KAISU           PIC 9(01).
       *        老人一般区分（０：一般、１：老人）
