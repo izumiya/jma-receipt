@@ -251,6 +251,8 @@
       *                                     º˝«º§Ë§Í¡Ì≈¿øÙ§ÚΩ∏∑◊
       *  02.09.11    NACL-∆£∏∂    06/05/09  £œ£√£“•®•Í•¢§ŒÃÙ∫ﬁ∞Ï…Ù…È√¥∂‚
       *                                     §À¿∏∑Ó∆¸§Úµ≠∫‹
+      *  02.09.12    NACL-ÃÁœ∆    06/05/31  ¿Ó∫Íª‘πÒ ›°¢¡ÍÃœ∏∂ª‘πÒ ›§Œ
+      *                                     ¬–±˛ºË§Íªﬂ§·
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5136,16 +5138,16 @@
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
               ELSE
-                IF     ( SYS-1001-PREFNUM        =  14        )
-                AND    ((RECE02-HKNJANUM(1:3)    = "145"     ) OR
-                        (RECE02-HKNJANUM(1:5)    = "67145"   ) OR
-                        (RECE02-HKNJANUM(1:6)    = "140103"  ) OR
-                        (RECE02-HKNJANUM         = "67140103"))
-                AND    ( RECE02-KOHNUM(KH-IDX - 1)  = "021"   )
-                  ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
-                                           RECE02-FTNMONEY(KH-IDX)
-                                           RECE02-FTNMONEY-KOJ(KH-IDX)
-                ELSE
+      ***       IF     ( SYS-1001-PREFNUM        =  14        )
+      ***       AND    ((RECE02-HKNJANUM(1:3)    = "145"     ) OR
+      ***               (RECE02-HKNJANUM(1:5)    = "67145"   ) OR
+      ***               (RECE02-HKNJANUM(1:6)    = "140103"  ) OR
+      ***               (RECE02-HKNJANUM         = "67140103"))
+      ***       AND    ( RECE02-KOHNUM(KH-IDX - 1)  = "021"   )
+      ***         ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
+      ***                                  RECE02-FTNMONEY(KH-IDX)
+      ***                                  RECE02-FTNMONEY-KOJ(KH-IDX)
+      ***       ELSE
                   IF    (RECE02-FTNMONEY(1)         =  ZERO )
                   AND   (RECE02-KOHNUM(KH-IDX - 1)  =  "010")
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
@@ -5155,7 +5157,7 @@
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
                   END-IF
-                END-IF
+      ***       END-IF
               END-IF
               IF   RECE02-KOHNUM(KH-IDX - 1)  =  "051"
               AND  FLG-KOH                NOT =   2

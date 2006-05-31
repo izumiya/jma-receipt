@@ -195,6 +195,8 @@
       *  02.09.11    NACL-ÌçÏÆ    06/05/16  Ï·¿ÍÆÃÄêÆþ±¡´ðËÜÎÁ¤Î¿ÇÎÅ¶èÊ¬
       *                                     ÊÔ½¸½¤Àµ
       *  02.09.12    NACL-ÌçÏÆ    06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
+      *  02.09.13    NACL-ÌçÏÆ    06/05/31  Àîºê»Ô¹ñÊÝ¡¢ÁêÌÏ¸¶»Ô¹ñÊÝ¤Î
+      *                                     ÂÐ±þ¼è¤ê»ß¤á
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8007,18 +8009,18 @@
                    ADD   SYU-SKJ-FTN(IDX3)          TO
                                    WRK-SKJ-FTN(KH-IDX)
                 ELSE
-                  IF     ( WRK-PREFNUM             = "14"       )
-                  AND    ((RECE62-HKNJANUM(1:3)    = "145"     ) OR
-                          (RECE62-HKNJANUM(1:5)    = "67145"   ) OR
-                          (RECE62-HKNJANUM(1:6)    = "140103"  ) OR
-                          (RECE62-HKNJANUM         = "67140103"))
-                  AND    ( RECE62-KOHNUM(KH-IDX - 1)  = "021"   )
-                     ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
-                                   RECE62-FTNMONEY(KH-IDX)
-                                   RECE62-FTNMONEY-KOJ(KH-IDX)
-                     ADD   SYU-SKJ-FTN(IDX3)          TO
-                                   WRK-SKJ-FTN(KH-IDX)
-                  ELSE
+      ***         IF     ( WRK-PREFNUM             = "14"       )
+      ***         AND    ((RECE62-HKNJANUM(1:3)    = "145"     ) OR
+      ***                 (RECE62-HKNJANUM(1:5)    = "67145"   ) OR
+      ***                 (RECE62-HKNJANUM(1:6)    = "140103"  ) OR
+      ***                 (RECE62-HKNJANUM         = "67140103"))
+      ***         AND    ( RECE62-KOHNUM(KH-IDX - 1)  = "021"   )
+      ***            ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
+      ***                          RECE62-FTNMONEY(KH-IDX)
+      ***                          RECE62-FTNMONEY-KOJ(KH-IDX)
+      ***            ADD   SYU-SKJ-FTN(IDX3)          TO
+      ***                          WRK-SKJ-FTN(KH-IDX)
+      ***         ELSE
                    IF    (RECE62-FTNMONEY(1)        =   ZERO )
                    AND   (RECE62-KOHNUM(KH-IDX - 1) =  "010" )
                          ADD   SYU-KOH-COMPFTN(IDX3)  TO
@@ -8030,7 +8032,7 @@
                          ADD   SYU-SKJ-FTN(IDX3)      TO
                                       WRK-SKJ-FTN(KH-IDX)
                    END-IF
-                  END-IF
+      ***         END-IF
                 END-IF
       *
                 IF ((WRK-PREFNUM           =  "38"          ) AND
