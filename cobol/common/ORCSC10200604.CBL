@@ -3467,8 +3467,6 @@
                                                OR  "113002210"
       *        ¤Æ¤ó¤«¤ó»ØÆ³´ÉÍýÎÁ
                                                OR  "113002850"
-      *        ¾®»ù°­À­¼ðáç»ØÆ³´ÉÍýÎÁ
-                                               OR  "113006610"
                    MOVE    1                   TO  FLG-SIDOU
                    PERFORM 230-SIDOU-SYOSIN-SEC
                END-IF
