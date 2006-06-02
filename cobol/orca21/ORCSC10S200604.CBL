@@ -3318,6 +3318,13 @@
       *
       *    入院日の時、初診料のみ算定する
            IF      SPA-NYUGAIKBN       =   "1" 
+      *        電子化加算
+               IF      SPA-DENSIKA         =   1
+                   MOVE    "111012370"         TO  WRK-SRYCD
+      *            追加共通処理
+                   MOVE    ZERO                TO  WRK-IDX-IN
+                   PERFORM 33041-SRYCD-ADD-SEC
+               END-IF
                GO      TO      2009-RSIHKN-SET-EXT
            END-IF
            IF      WRK-SRYCD(1:2)      =   "83"
@@ -3348,6 +3355,13 @@
       *
       *    以降、再診時のみ
            IF      SPA-SYOSIN          =   1
+      *        電子化加算
+               IF      SPA-DENSIKA         =   1
+                   MOVE    "111012370"         TO  WRK-SRYCD
+      *            追加共通処理
+                   MOVE    ZERO                TO  WRK-IDX-IN
+                   PERFORM 33041-SRYCD-ADD-SEC
+               END-IF
                GO      TO      2009-RSIHKN-SET-EXT
            END-IF
       *
