@@ -45,6 +45,7 @@
       *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
       *  02.09.02    NACL-ÌçÏÆ    06/05/17  Î¬¾ÎÊÔ½¸(190123250Åù)
       *  02.09.03    NACL-ÌçÏÆ    06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
+      *  02.09.04    NACL-ÌçÏÆ    06/06/02  êóáì´µ¼Ô´ÉÍý²Ã»»ÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
       *
@@ -692,7 +693,7 @@
                  IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                       (ACCT-ZAIKAISU  NOT =    ZERO)
                    IF   ACCT-SRYKBN  =  "90" OR "92"   
-                     IF   ACCT-SRYCDTOTAL(6:9)  =   
+                     IF ( ACCT-SRYCDTOTAL(6:9)  =
                                             CONS-KEIKAKU-GENSAN1
                                         OR  CONS-KEIKAKU-GENSAN2
                                         OR  CONS-INNAI-GENSAN1
@@ -704,9 +705,10 @@
                                         OR  CONS-NICHIJOU-KSN1
                                         OR  CONS-NICHIJOU-KSN2
                                         OR  CONS-CHIHOU-KSN1
-                                        OR  CONS-CHIHOU-KSN2
-                                        OR  CONS-JYOKU-KSN1
-                                        OR  CONS-JYOKU-KSN2
+                                        OR  CONS-CHIHOU-KSN2       )
+                     OR ((ACCT-SRYCDTOTAL(6:9)  =  CONS-JYOKU-KSN1
+                                               OR  CONS-JYOKU-KSN2) AND
+                         (LNK-SROUNYUIN-SANTEIYM  < "200604"      ))
       *                Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
