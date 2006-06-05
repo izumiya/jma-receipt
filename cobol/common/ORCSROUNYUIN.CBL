@@ -46,6 +46,8 @@
       *  02.09.02    NACL-ÃÁœ∆    06/05/17  Œ¨æŒ ‘Ω∏(190123250≈˘)
       *  02.09.03    NACL-ÃÁœ∆    06/05/23  ≥∞«Òª˛§Œ∆˛±°¥À‹Œ¡ºË∆¿Ω§¿µ
       *  02.09.04    NACL-ÃÁœ∆    06/06/02  ÍÛ·Ï¥µº‘¥…Õ˝≤√ªª ‘Ω∏¬–±˛
+      *  02.09.05    NACL-ÃÁœ∆    06/06/05   £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª§»
+      *                                     ¥«∏Ó«€√÷≈¨πÁ≤√ªª§Œ ‘Ω∏¬–±˛
       *****************************************************************
       *
       *
@@ -112,6 +114,10 @@
       *    ÍÛ·Ï¥µº‘¥…Õ˝≤√ªª
            03  CONS-JYOKU-KSN1             PIC X(09) VALUE "190116990".
            03  CONS-JYOKU-KSN2             PIC X(09) VALUE "190813390".
+      *     £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª
+           03  CONS-KANGO-KSN1             PIC X(09) VALUE "190117070".
+      *    ¥«∏Ó«€√÷≈¨πÁ≤√ªª
+           03  CONS-KANGO-KSN2             PIC X(09) VALUE "190109670".
       *
       *    œ´∫“º£Œ≈∑◊≤Ë≤√ªª
            03  CONS-ROSAICHIRYO            PIC X(09) VALUE "101910050".
@@ -199,6 +205,11 @@
       *    ÍÛ·Ï¥µº‘¥…Õ˝≤√ªª
            03  WRK-JYOKU-KSN1              PIC 9(03) OCCURS 31.
            03  WRK-JYOKU-KSN2              PIC 9(03) OCCURS 31.
+      *
+      *     £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª
+           03  WRK-KANGO-KSN1              PIC 9(03) OCCURS 31.
+      *    ¥«∏Ó«€√÷≈¨πÁ≤√ªª
+           03  WRK-KANGO-KSN2              PIC 9(03) OCCURS 31.
       *
       *    ø«Œ≈•≥°º•…∑◊Ω∏∑◊Õ—
            03  WRK-SRYCD-X                 PIC X(09).
@@ -644,6 +655,29 @@
                        AND   (LNK-SROUNYUIN-GAIHAKU(IDX1)  
                                              =  ZERO  OR  4)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+      *
+                         IF  (NACCT-SRYCDTOTAL(6:9) = CONS-KANGO-KSN1
+                                                   OR CONS-KANGO-KSN2)
+                         AND (LNK-SROUNYUIN-SANTEIYM  >= "200604"    )
+                           EVALUATE   NACCT-SRYCDTOTAL(6:9)
+                             WHEN  CONS-KANGO-KSN1
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-KANGO-KSN1(IDX1)
+                             WHEN  CONS-KANGO-KSN2
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-KANGO-KSN2(IDX1)
+                           END-EVALUATE
+      *
+                           IF   FLG-RYAKU   =   ZERO
+                              MOVE   NACCT-SRYCDTOTAL(6:9)
+                                            TO  WRK-RYAKU-SRYCD
+                              MOVE   NACCT-ZAISKBKBN
+                                            TO  WRK-ZAISKBKBN
+                              PERFORM   210-RYAKUSYO-HENSYU-SEC
+      *
+                              MOVE    1     TO    FLG-RYAKU
+                           END-IF
+                         ELSE
                            IF   FLG-KSN   =  ZERO
                                ADD     1    TO    KSN-IDX
                                MOVE    1    TO    FLG-KSN
@@ -664,6 +698,7 @@
       *
                               MOVE    1     TO    FLG-RYAKU
                            END-IF
+                         END-IF
       *
                        END-IF
                    END-PERFORM
@@ -882,6 +917,22 @@
                IF         WRK-CHIHOU-KSN2(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-CHIHOU-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *         £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª
+               IF         WRK-KANGO-KSN1(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-KANGO-KSN1      TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        ¥«∏Ó«€√÷≈¨πÁ≤√ªª
+               IF         WRK-KANGO-KSN2(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-KANGO-KSN2      TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
