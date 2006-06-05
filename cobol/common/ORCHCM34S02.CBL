@@ -74,6 +74,7 @@
                05  FLG-SYOKUDODAY              PIC 9(01)
                                                OCCURS  31.
            03  FLG-SANTEI                      PIC 9(01).
+           03  FLG-TARGET                      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -2322,15 +2323,26 @@
       *
            PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
       *
-               MOVE    NACCT-SRYCDTOTAL
-                                       TO  WRK-SRYCDTOTAL
-               MOVE    WRK-SRYCDTOTAL  TO  WRK-TNS-SRYCD
-               MOVE    HCM34S01-SANTEIYM
-                                       TO  WRK-DBYMD
-               MOVE    "01"            TO  WRK-DBYMD (7:2)
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU       =   ZERO )
-                   PERFORM 200111-NYUINKSN-HEN-SEC
+               MOVE    1               TO  FLG-TARGET
+      *
+               IF    ( HCM34S01-SANTEIYM   >=  CONST-H1804 )
+                    IF  ( NACCT-SRYCDTOTAL  =  190109670
+                                          OR   190117070   )
+                       MOVE    ZERO    TO  FLG-TARGET
+                    END-IF
+               END-IF
+      *
+               IF    ( FLG-TARGET      =   1 )
+                   MOVE    NACCT-SRYCDTOTAL
+                                           TO  WRK-SRYCDTOTAL
+                   MOVE    WRK-SRYCDTOTAL  TO  WRK-TNS-SRYCD
+                   MOVE    HCM34S01-SANTEIYM
+                                           TO  WRK-DBYMD
+                   MOVE    "01"            TO  WRK-DBYMD (7:2)
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       =   ZERO )
+                       PERFORM 200111-NYUINKSN-HEN-SEC
+                   END-IF
                END-IF
       *
                PERFORM 1001-NYUINACCT-KEY17-READ-SEC
