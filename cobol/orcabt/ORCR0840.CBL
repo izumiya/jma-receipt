@@ -90,6 +90,8 @@
       *  02.09.04    NACL-ÌçÏÆ    06/04/20  ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»ÊÔ½¸
       *  02.09.05    NACL-ÌçÏÆ    06/05/09  Îß·×¥È¡¼¥¿¥ëÊÔ½¸½¤Àµ
       *  02.09.06    NACL-ÌçÏÆ    06/06/02  êóáì´µ¼Ô´ÉÍý²Ã»»ÊÔ½¸ÂÐ±þ
+      *  02.09.07    NACL-ÌçÏÆ    06/06/05  Ê£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¤È
+      *                                     ´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¤ÎÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3857,6 +3859,14 @@
       *
                  IF     NACCT-ZAISKBKBN    =     "4"  OR  "6"  OR "7"
       *
+                   IF  (NACCT-ZAISKBKBN    =  "6"                  )
+                   AND (NACCT-SRYCDTOTAL   = 190117070 OR 190109670)
+                   AND (RECE82-SRYYM      >=  "200604"             )
+      *
+                      CONTINUE
+      *
+                   ELSE
+      *
                       INITIALIZE          WRK-DAY-TABLE2
                                           WRK-SKJ-TABLE
                                           WRK-SKJ-TABLE2
@@ -3938,6 +3948,8 @@
                          END-PERFORM
                        END-IF
                       END-IF
+      *
+                   END-IF
       *
                  END-IF
       *
