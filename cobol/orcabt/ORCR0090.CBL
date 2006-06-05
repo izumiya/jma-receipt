@@ -160,6 +160,9 @@
       *  02.09.02    NACL-藤原    06/04/14  包括対象検査「１１」の追加
       *                                     検査等実施判断グループの追加
       *  02.09.03    NACL-門脇    06/05/22  電子化加算編集修正
+      *  02.09.04    NACL-藤原    06/06/05  レセプト特記事項編集情報によ
+      *                                     るレセプト請求しない地方公費の
+      *                                     編集に給付割合を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3088,6 +3091,8 @@
            IF    ( RECE02-KOHNUM (1)   NOT =   SPACE )
            OR    ( RECE02-ETC-KOHNUM (1)
                                        NOT =   SPACE )
+           OR    ( RECE02-KOHSKY-KOHNUM (1)
+                                       NOT =   SPACE )
                MOVE    1                   TO  FLG-CHK-SYOKBN
                PERFORM 20081-SYS2006-HENSYU-SEC
                IF      FLG-2006-CHK        =   1
@@ -3113,6 +3118,8 @@
       *    レセ電・給付割合
            IF    ( RECE02-KOHNUM (1)   NOT =   SPACE )
            OR    ( RECE02-ETC-KOHNUM (1)
+                                       NOT =   SPACE )
+           OR    ( RECE02-KOHSKY-KOHNUM (1)
                                        NOT =   SPACE )
                MOVE    2                   TO  FLG-CHK-SYOKBN
                PERFORM 20081-SYS2006-HENSYU-SEC
@@ -3234,15 +3241,15 @@
       *
            IF      RECE02-ETC-KOHNUM (1)
                                        =   SPACE
-               GO  TO  20081-SYS2006-HENSYU-EXT
-           END-IF
+               CONTINUE
+           ELSE
       *
-      *    原爆（０１９）より優先順位が低い公費で検索した場合
-      *    レセプト記載外公費情報の原爆を検索
-           IF    ( SYS-2006-HKNNUM =   "023"    OR  "051"    OR
-                                       "091"    OR  "052"    OR
-                                       "053"    OR  "012"        )
-           OR    ( SYS-2006-HKNNUM >   "100"                     )
+      *      原爆（０１９）より優先順位が低い公費で検索した場合
+      *      レセプト記載外公費情報の原爆を検索
+             IF    ( SYS-2006-HKNNUM =   "023"    OR  "051"    OR
+                                         "091"    OR  "052"    OR
+                                         "053"    OR  "012"        )
+             OR    ( SYS-2006-HKNNUM >   "100"                     )
                PERFORM VARYING IDW1    FROM    1   BY  1
                        UNTIL ( IDW1    >       4                 )
                        OR    ( RECE02-ETC-KOHNUM(IDW1) =   SPACE )
@@ -3265,10 +3272,10 @@
                        MOVE    4               TO  IDW1
                    END-IF
                END-PERFORM
-           END-IF
+             END-IF
       *
-      *    割合が設定されなかったときレセプト記載外公費情報を検索
-           IF      FLG-2006-CHK     =   ZERO
+      *      割合が設定されなかったときレセプト記載外公費情報を検索
+             IF      FLG-2006-CHK     =   ZERO
                PERFORM VARYING IDW1    FROM    1   BY  1
                        UNTIL ( IDW1    >       4                 )
                        OR    ( RECE02-ETC-KOHNUM(IDW1) =   SPACE )
@@ -3287,6 +3294,44 @@
                    END-PERFORM
       *
                    MOVE    4               TO  IDW1
+               END-PERFORM
+             END-IF
+           END-IF  
+      *
+      *    割合が設定されなかったときレセプト請求しない地方公費情報を検索
+           IF      FLG-2006-CHK     =   ZERO
+               PERFORM VARYING IDW1    FROM    1   BY  1
+                       UNTIL ( IDW1    >       4                 )
+                       OR    ( RECE02-KOHSKY-KOHNUM(IDW1)
+                                                       =   SPACE )
+                       OR    ( FLG-HKNNUM-OK           =   1     )
+                   PERFORM VARYING IDW2    FROM     1   BY  1
+                           UNTIL   IDW2             >   SYSKAN-IDY
+                           OR      TBL-SYS2006 (IDW2)   =   SPACE
+                       MOVE    TBL-SYS2006 (IDW2)  TO  WRK-2006-REC
+      *
+                       IF      RECE02-KOHSKY-KOHNUM (IDW1)
+                                               =   WRK-2006-HKNNUM
+                           MOVE    1               TO  FLG-HKNNUM-OK
+                           MOVE    RECE02-KOHSKY-KOHFTNJANUM (IDW1)
+                                                   TO  WRK-FTNJANUM
+                           EVALUATE    FLG-CHK-SYOKBN
+                               WHEN    1
+                                   IF      WRK-2006-KYURATE    >   ZERO
+                                       PERFORM 200811-SYS2006-CHECK-SEC
+                                   END-IF
+                               WHEN    2
+                                   IF      WRK-2006-RECEDEN-KYURATE
+                                                               >   ZERO
+                                       PERFORM 200811-SYS2006-CHECK-SEC
+                                   END-IF
+                           END-EVALUATE
+                       END-IF
+                   END-PERFORM
+      *
+                   IF     FLG-2006-CHK     =   1
+                       MOVE    4               TO  IDW1
+                   END-IF
                END-PERFORM
            END-IF
            .
