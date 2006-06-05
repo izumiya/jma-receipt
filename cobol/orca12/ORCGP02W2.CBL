@@ -56,6 +56,7 @@
       *  02.00.16    NACL-門脇    06/05/17  任意継続・継続の保険と公費がある
       *                                     場合の保険組合せ作成修正
       *  02.00.17    NACL-門脇    06/05/18  岡山県西粟倉村退職者国保２割対応
+      *  02.00.18    NACL-門脇    06/06/01  特定疾患等＋長期対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3754,22 +3755,26 @@
                ELSE
       *          更生医療・小児特定・マル福がある場合、長期をつける
                  IF (( WRK-KCOMB-KOH1HKNNUM(IDX2)  = 
-                                            "015" OR "052" OR "019") OR
+                                         "015" OR "016" OR "019" OR
+                                         "051" OR "052" OR "091"   ) OR
                      ((WRK-KCOMB-KOH1HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH1HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH1HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH2HKNNUM(IDX2)  =
-                                            "015" OR "052" OR "019") OR
+                                         "015" OR "016" OR "019" OR
+                                         "051" OR "052" OR "091"   ) OR
                      ((WRK-KCOMB-KOH2HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH2HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH2HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH3HKNNUM(IDX2)  =
-                                            "015" OR "052" OR "019") OR
+                                         "015" OR "016" OR "019" OR
+                                         "051" OR "052" OR "091"   ) OR
                      ((WRK-KCOMB-KOH3HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH3HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH3HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH4HKNNUM(IDX2)  =
-                                            "015" OR "052" OR "019") OR
+                                         "015" OR "016" OR "019" OR
+                                         "051" OR "052" OR "091"   ) OR
                      ((WRK-KCOMB-KOH4HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH4HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH4HKNNUM(IDX2)(1:2)  =  "99"    ))   
