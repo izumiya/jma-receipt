@@ -133,6 +133,7 @@
       *  02.09.01    NACL-ÌçÏÆ    06/04/19  ´ä¼ê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  02.09.02    NACL-ÌçÏÆ    06/05/02  ¼«Î©»Ù±ç¿À¸Í»ÔÂÐ±þ
       *  02.09.03    NACL-ÌçÏÆ    06/05/18  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
+      *  02.09.04    NACL-ÌçÏÆ    06/06/01  ÆÃÄê¼À´µÅù¡ÜÄ¹´üÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9701,13 +9702,40 @@
            END-IF.
       *
            IF       LNK-SYU-SRYYMD(1:6)        >= "200604"
-             CONTINUE
+             IF  (((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "051"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "052"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200504"      ))  OR
+                  ((WK-1001-PREFNUM             =   13           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "151" OR "451") AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((WK-1001-PREFNUM             =   28           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "186"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      )))
+             AND ( (LNK-SYU-KOH-HKNNUM(1)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"         ) )
+               IF    LNK-SYU-KOH-COMPFTN(KOH-IDX)   >   10000
+                   MOVE    10000    TO    LNK-SYU-KOH-COMPFTN(KOH-IDX)
+               END-IF
+             END-IF
            ELSE
-             IF   ( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016")
-             AND  ((LNK-SYU-KOH-HKNNUM(1)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"  ))
+             IF  (( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016" )  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "051"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "052"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200504"      ))  OR
+                  ((WK-1001-PREFNUM             =   13           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "151" OR "451") AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((WK-1001-PREFNUM             =   28           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "186"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      )))
+             AND ( (LNK-SYU-KOH-HKNNUM(1)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"         ) )
                IF    LNK-SYU-KOH-COMPFTN(KOH-IDX)   >   10000
                    MOVE    10000    TO    LNK-SYU-KOH-COMPFTN(KOH-IDX)
                END-IF
@@ -9781,13 +9809,40 @@
            END-IF.
       *
            IF       LNK-SYU-SRYYMD(1:6)        >= "200604"
-             CONTINUE
+             IF  (((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "051"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "052"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200504"      ))  OR
+                  ((WK-1001-PREFNUM             =   13           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "151" OR "451") AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((WK-1001-PREFNUM             =   28           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "186"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      )))
+             AND ( (LNK-SYU-KOH-HKNNUM(1)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"         ) )
+               IF    WK-KOH-COMPFTN(KOH-IDX)   >   10000
+                   MOVE    10000    TO    WK-KOH-COMPFTN(KOH-IDX)
+               END-IF
+             END-IF
            ELSE
-             IF   ( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016")
-             AND  ((LNK-SYU-KOH-HKNNUM(1)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"  ))
+             IF  (( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016" )  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "051"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "052"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200504"      ))  OR
+                  ((WK-1001-PREFNUM             =   13           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "151" OR "451") AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((WK-1001-PREFNUM             =   28           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "186"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      )))
+             AND ( (LNK-SYU-KOH-HKNNUM(1)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"         ) )
                IF    WK-KOH-COMPFTN(KOH-IDX)   >   10000
                    MOVE    10000    TO    WK-KOH-COMPFTN(KOH-IDX)
                END-IF
@@ -9938,13 +9993,41 @@
            END-IF.
       *
            IF       LNK-SYU-SRYYMD(1:6)        >= "200604"
-             CONTINUE
+             IF  (((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "051"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "052"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200504"      ))  OR
+                  ((WK-1001-PREFNUM             =   13           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "151" OR "451") AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((WK-1001-PREFNUM             =   28           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "186"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      )))
+             AND ( (LNK-SYU-KOH-HKNNUM(1)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"         ) )
+               IF    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)   >   10000
+                   MOVE    10000    TO
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+               END-IF
+             END-IF
            ELSE
-             IF   ( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016")
-             AND  ((LNK-SYU-KOH-HKNNUM(1)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"  ) OR
-                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"  ))
+             IF  (( LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "015" OR "016" )  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "051"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "052"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200504"      ))  OR
+                  ((WK-1001-PREFNUM             =   13           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "151" OR "451") AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      ))  OR
+                  ((WK-1001-PREFNUM             =   28           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) =  "186"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >=  "200310"      )))
+             AND ( (LNK-SYU-KOH-HKNNUM(1)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(2)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(3)       =  "972"         ) OR
+                   (LNK-SYU-KOH-HKNNUM(4)       =  "972"         ) )
                IF    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)   >   10000
                    MOVE    10000    TO
                                  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
@@ -12618,7 +12701,7 @@
                END-IF
            END-IF
       *
-           IF    WK-CYOKI-ZAN-ENTANI  <  WK-KNJFTNKIN-ENTANI
+           IF    WK-CYOKI-ZAN-ENTANI  <=  WK-KNJFTNKIN-ENTANI
                MOVE   WK-CYOKI-ZAN-ENTANI   TO   WK-KNJFTNKIN-ENTANI
            END-IF
       *
@@ -12794,7 +12877,8 @@
                END-IF
            END-IF
       *
-           IF    WK-CYOKI-ZAN  <  WK-KNJFTNKIN
+           IF    WK-CYOKI-ZAN  <=  WK-KNJFTNKIN
+               MOVE     ZERO            TO     FLG-HIKAKU
                MOVE     WK-CYOKI-ZAN    TO     WK-KNJFTNKIN
            END-IF
       *
