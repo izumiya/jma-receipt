@@ -13936,7 +13936,7 @@
                        +   LNK-SYU-JIHI-10 (IDX11)
                    COMPUTE TTLSYU-JIHI-10
                        =   TTLSYU-JIHI-10
-                       +   LNK-SYU-JIHI-5 (IDX11)
+                       +   LNK-SYU-JIHI-10 (IDX11)
       *
       *            ¼«Èñ·×
                    COMPUTE SUMSYU-JIHI-TOTAL   (WRK-SYU-SUM-IDX)
