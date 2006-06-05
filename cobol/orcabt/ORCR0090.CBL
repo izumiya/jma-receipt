@@ -3304,7 +3304,6 @@
                        UNTIL ( IDW1    >       4                 )
                        OR    ( RECE02-KOHSKY-KOHNUM(IDW1)
                                                        =   SPACE )
-                       OR    ( FLG-HKNNUM-OK           =   1     )
                    PERFORM VARYING IDW2    FROM     1   BY  1
                            UNTIL   IDW2             >   SYSKAN-IDY
                            OR      TBL-SYS2006 (IDW2)   =   SPACE
@@ -3312,7 +3311,6 @@
       *
                        IF      RECE02-KOHSKY-KOHNUM (IDW1)
                                                =   WRK-2006-HKNNUM
-                           MOVE    1               TO  FLG-HKNNUM-OK
                            MOVE    RECE02-KOHSKY-KOHFTNJANUM (IDW1)
                                                    TO  WRK-FTNJANUM
                            EVALUATE    FLG-CHK-SYOKBN
