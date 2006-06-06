@@ -744,6 +744,9 @@
                      OR ((ACCT-SRYCDTOTAL(6:9)  =  CONS-JYOKU-KSN1
                                                OR  CONS-JYOKU-KSN2) AND
                          (LNK-SROUNYUIN-SANTEIYM  < "200604"      ))
+                     OR ((ACCT-SRYCDTOTAL(6:9)  =  CONS-KANGO-KSN1
+                                               OR  CONS-KANGO-KSN2) AND
+                         (LNK-SROUNYUIN-SANTEIYM >= "200604"      ))
       *                ∆˛±°Œ¡≤√ªª§Œ¬‡»Ú
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -801,6 +804,14 @@
                                 WHEN  CONS-JYOKU-KSN2
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-JYOKU-KSN2(IDX1)
+      *                          £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª
+                                WHEN  CONS-KANGO-KSN1
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-KANGO-KSN1(IDX1)
+      *                         ¥«∏Ó«€√÷≈¨πÁ≤√ªª
+                                WHEN  CONS-KANGO-KSN2
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-KANGO-KSN2(IDX1)
                               END-EVALUATE
       *
                               IF   FLG-RYAKU   =   ZERO

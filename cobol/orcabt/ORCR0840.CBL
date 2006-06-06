@@ -1281,6 +1281,8 @@
                                       OR  190109270  OR  190808670 )
                  OR ((ACCT-SRYCDTOTAL  =  190116990  OR  190813390) AND
                      (RECE82-SRYYM     <  "200604"                ))
+                 OR ((ACCT-SRYCDTOTAL  =  190117070  OR  190109670) AND
+                     (RECE82-SRYYM     >= "200604"                ))
                    CONTINUE
                  ELSE
                    IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
