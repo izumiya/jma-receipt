@@ -276,3 +276,13 @@ path	key12 	{
 	};
 };
 
+path	del2 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_santei
+			WHERE   HOSPID    =   :HOSPID
+			AND   PTID        =   :PTID
+			AND   SRYYM       =   :SRYYM
+		;
+	};
+};

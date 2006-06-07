@@ -28,7 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  XX.XX.XX    NACL-XXXX    XX/XX/XX  XXXXX
+      *  03.00.00    NACL-竹田    06/06/07  患者コメント取り込み不具合
+      *                                     対応
       *****************************************************************
       *
       *
@@ -504,6 +505,54 @@
            MOVE    PATH-TBL-SANTEI-KEY10
                                        TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
+           DISPLAY "take santei next" SRY-ZAINUM
+           INITIALIZE                      SANTEI-REC
+           MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+      *    MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
+           MOVE    SPA-SRYYMD(1:6)     TO  SANTEI-SRYYM
+      *    MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
+           MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+           MOVE   "113006510"          TO  SANTEI-SRYCD
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
+               PERFORM 915-SANTEI-NEXT2-SEC
+               DISPLAY "take santei fetch = " MCP-RC
+           ELSE
+               MOVE    "0002"          TO  SPA-ERRCD
+               MOVE    1               TO  FLG-SANTEI
+               DISPLAY "take santei fetch ng = " MCP-RC
+           END-IF
+           PERFORM
+                   UNTIL       FLG-SANTEI     =   1
+               MOVE    SANTEI-REC          TO  MCPDATA-REC
+            IF SPA-SRYYMD(1:6)     =   SANTEI-SRYYM
+               CONTINUE
+            ELSE
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               MOVE    PATH-TBL-SANTEI-PRV-KEY
+                                       TO  MCP-PATH
+               DISPLAY "take santei insert loop" SANTEI-SRYCD 
+               CALL    "MCPSUB"            USING
+                                           MCPAREA
+                                           MCPDATA-REC
+            END-IF
+               MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
+               PERFORM 915-SANTEI-NEXT2-SEC
+           END-PERFORM
+      *
+           MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
+           PERFORM 990-DBCLOSE2-SEC
            DISPLAY "take santei end" SRY-ZAINUM
            .
       *
@@ -573,13 +622,15 @@
            MOVE    SRY-RENNUM          TO  PTCOM-RENNUM
            MOVE    PTCOM-REC           TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    PATH-TBL-PTCOM-KEY3
+      *T   MOVE    PATH-TBL-PTCOM-KEY3
+           MOVE    PATH-TBL-PTCOM-KEY2
                                        TO  MCP-PATH
            CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    PATH-TBL-PTCOM-KEY3
+      *T       MOVE    PATH-TBL-PTCOM-KEY3
+               MOVE    PATH-TBL-PTCOM-KEY2
                                        TO  MCP-PATH
                PERFORM 915-PTCOM-NEXT2-SEC
                DISPLAY "take ptcom fetch = " MCP-RC
@@ -598,12 +649,14 @@
                CALL    "MCPSUB"            USING
                                            MCPAREA
                                            MCPDATA-REC
-               MOVE    PATH-TBL-PTCOM-KEY3
+      *T       MOVE    PATH-TBL-PTCOM-KEY3
+               MOVE    PATH-TBL-PTCOM-KEY2
                                        TO  MCP-PATH
                PERFORM 915-PTCOM-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    PATH-TBL-PTCOM-KEY3
+      *T   MOVE    PATH-TBL-PTCOM-KEY3
+           MOVE    PATH-TBL-PTCOM-KEY2
                                        TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
            .

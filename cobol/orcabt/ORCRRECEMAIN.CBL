@@ -982,7 +982,7 @@
                    " "  LNK-TIMEOFDAY(1:20)
            MOVE    WRK-PARA-HOSPID      TO      ACCT-HOSPID
            MOVE    WRK-PARA-NYUGAIKBN   TO      ACCT-NYUGAIKBN
-           MOVE    WRK-PARA-PTID         TO      WRK-PTID-X
+           MOVE    WRK-PARA-PTID        TO      WRK-PTID-X
            MOVE    WRK-PTID             TO      ACCT-PTID
            MOVE    WRK-PARA-A8          TO      ACCT-SRYYM
            MOVE    SRYACCT-REC          TO      MCPDATA-REC
@@ -1001,6 +1001,19 @@
            CALL "timeofday" USING LNK-TIMEOFDAY
            DISPLAY "real db(sryact) del ed  "
                    " "  LNK-TIMEOFDAY(1:20)
+      *»»ÄêÍúÎòºï½ü
+           DISPLAY "real db(santei) del ed  "
+           MOVE    WRK-PARA-HOSPID      TO      SANTEI-HOSPID
+           MOVE    WRK-PARA-PTID        TO      WRK-PTID-X
+           MOVE    WRK-PTID             TO      SANTEI-PTID
+           MOVE    WRK-PARA-A8          TO      SANTEI-SRYYM
+           MOVE    SANTEI-REC           TO      MCPDATA-REC
+           MOVE    "tbl_santei"         TO  MCP-TABLE
+           MOVE    "del2"               TO  MCP-PATHNAME
+           MOVE    "DBDELETE"           TO      MCP-FUNC
+           CALL    "MONFUNC"            USING
+                                        MCPAREA
+                                        MCPDATA-REC
            .
        20011-REAL-DB-DELETE-EXT.
            EXIT.
@@ -1288,40 +1301,18 @@
                PERFORM  900-SANTEIPRV-READ-SEC
                PERFORM  UNTIL
                         (FLG-SANTEI         =    1)
-      *             DISPLAY "SANTEI-INSERT"
-      *             DISPLAY "SANTEI-HOSPID = " SANTEI-HOSPID
-      *             DISPLAY "SANTEI-PTID   = " SANTEI-PTID
-      *             DISPLAY "SANTEI-SRYYM  = " SANTEI-SRYYM
-      *             DISPLAY "SANTEI-SRYCD  = " SANTEI-SRYCD
-      *             DISPLAY "SANTEI-NYUGAIKBN = " SANTEI-NYUGAIKBN
-      *-----------------------------------------------------
-                   MOVE    SANTEI-REC     TO      MCPDATA-REC
-                   MOVE    "DBSELECT"        TO      MCP-FUNC
+                   MOVE    SANTEI-REC   TO      MCPDATA-REC
+                DISPLAY "take para8 = "       WRK-PARA-A8
+                DISPLAY "take santei  " SANTEI-SRYYM 
+                IF SANTEI-SRYYM         <       WRK-PARA-A8
+                   CONTINUE
+                ELSE
+                   MOVE    "DBINSERT"   TO      MCP-FUNC
                    MOVE    PATH-TBL-SANTEI-KEY
-                                             TO      MCP-PATH
-                   CALL    "MCPSUB"             USING
-                                                MCPAREA
-                                                MCPDATA-REC
-                   IF      MCP-RC               =       ZERO
-                       MOVE    "DBFETCH"        TO      MCP-FUNC
-                       MOVE    PATH-TBL-SANTEI-KEY
-                                             TO      MCP-PATH
-                       CALL    "MCPSUB"             USING
-                                                    MCPAREA
-                                                    MCPDATA-REC
-                       IF      MCP-RC               =       ZERO
-                           CONTINUE
-                       ELSE
-      *-----------------------------------------------------
-                           MOVE    SANTEI-REC   TO      MCPDATA-REC
-                           MOVE    "DBINSERT"   TO      MCP-FUNC
-                           MOVE    PATH-TBL-SANTEI-KEY
-                                                TO      MCP-PATH
-                           PERFORM  900-REALDB-INS-SEC
-      *-----------------------------------------------------
-                       END-IF
-                   END-IF
-      *-----------------------------------------------------
+                                        TO      MCP-PATH
+                   PERFORM  900-REALDB-INS-SEC
+                   DISPLAY "take santei insert "
+                END-IF
                    MOVE    PATH-TBL-SANTEI-PRV-KEY2
                                         TO      MCP-PATH
                    PERFORM  900-SANTEIPRV-READ-SEC
@@ -1779,7 +1770,8 @@
       *
       *»»ÄêÍúÎò¥Þ¥¹¥¿
            MOVE    WRK-PARA-HOSPID      TO      SANTEI-HOSPID
-           MOVE    WRK-PARA-NYUGAIKBN   TO      SANTEI-NYUGAIKBN
+      *    MOVE    WRK-PARA-NYUGAIKBN   TO      SANTEI-NYUGAIKBN
+           MOVE    ZERO                 TO      SANTEI-NYUGAIKBN
            MOVE    WRK-PARA-PTID         TO      WRK-PTID-X
            MOVE    WRK-PTID             TO      SANTEI-PTID
            MOVE    SANTEI-REC           TO      MCPDATA-REC
