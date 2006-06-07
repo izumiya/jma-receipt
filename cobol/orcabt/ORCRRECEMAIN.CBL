@@ -1302,10 +1302,15 @@
                PERFORM  UNTIL
                         (FLG-SANTEI         =    1)
                    MOVE    SANTEI-REC   TO      MCPDATA-REC
+                IF SANTEI-SRYYM         <       WRK-PARA-A8
+                   CONTINUE
+                ELSE
                    MOVE    "DBINSERT"   TO      MCP-FUNC
                    MOVE    PATH-TBL-SANTEI-KEY
                                         TO      MCP-PATH
                    PERFORM  900-REALDB-INS-SEC
+                   DISPLAY "take santei insert "
+                END-IF
                    MOVE    PATH-TBL-SANTEI-PRV-KEY2
                                         TO      MCP-PATH
                    PERFORM  900-SANTEIPRV-READ-SEC
