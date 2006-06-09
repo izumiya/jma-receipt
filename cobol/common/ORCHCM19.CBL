@@ -2161,7 +2161,8 @@
       *        後発医薬品の時、表示（優先）
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            後発医薬品区分
-                   IF      TNS-KOUHATUKBN      NOT =   ZERO
+      **********   IF      TNS-KOUHATUKBN      NOT =   ZERO
+                   IF      TNS-KOUHATUKBN          =   "1"
                        MOVE    TNS-NAME        TO  WRK-TNS-NAME
                        COMPUTE KETA            =  (TNS-YUKOKETA  * 2)
                                                +   1
@@ -2174,6 +2175,7 @@
       *
       *        後発医薬品区分
                IF      TNS-KOUHATUKBN          =   ZERO
+                                               OR  "2"
                   MOVE    1                TO  FLG-KOUHATU
                END-IF
       *        麻薬判定
