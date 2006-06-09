@@ -1578,7 +1578,7 @@
                                            "232"  OR
                                            "292"     )
                IF      (WRK-COM-KOUHATUKBN (IDX)
-                                        NOT =   ZERO  )
+                                            =   "1"   )
                    MOVE    1                   TO  FLG-KOUHATU
                ELSE
       *            後発医薬品変更不可
