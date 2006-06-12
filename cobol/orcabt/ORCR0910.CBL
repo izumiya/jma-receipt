@@ -1543,6 +1543,8 @@
                                     TBL-ZAIW-HOUKNSKBN(3 IDZ)
                    IF      (FLG-GAIJINKEN  =   1) 
                      AND   (IDX            =   WRK-KENSA-MAX) 
+                     AND   (TBL-SRYCD (IDX)(1:1)
+                                       NOT =   "8")
                            PERFORM 200511-GJK-DAY-ADD-SEC
                    END-IF
                    ADD     1                   TO  IDX                     
