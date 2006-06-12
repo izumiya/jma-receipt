@@ -92,6 +92,8 @@
       *  02.09.06    NACL-門脇    06/06/02  褥瘡患者管理加算編集対応
       *  02.09.07    NACL-門脇    06/06/05  複数医師及び看護配置適合加算と
       *                                     看護配置適合加算の編集対応
+      *  02.09.08    NACL-門脇    06/06/09  労災（加算なし）を剤に含む
+      *                                     場合の編集修正（自賠責）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -575,6 +577,9 @@
            03  CONS-SOGAIKASAN PIC X(09)   VALUE   "150266970".
       *    療養担当手当（入院）
            03  CONS-RYOYOTEATE PIC X(09)   VALUE   "199000510".
+      *
+      *    労災（加算なし）
+           03  CONS-ROSAINASI  PIC X(09)   VALUE   "099509901".
       *
       *    フィルム料（乳幼児）加算
            03  CONS-FILM-YOUJI-KASAN  
@@ -1839,6 +1844,9 @@
                                               RECE85-SRYKBN
                    ELSE                                                 
                      IF      TNS-SRYKBN         =   "80"                
+                       IF   SRY-SRYCD(IDX2)     =   CONS-ROSAINASI
+                            CONTINUE
+                       ELSE
                         IF    TNS-NYUTENTTLKBN   =  130           
                             MOVE   "13"   TO  RECE84-SRYKBN       
                                               RECE85-SRYKBN       
@@ -1846,6 +1854,7 @@
                             MOVE   "40"   TO  RECE84-SRYKBN       
                                               RECE85-SRYKBN       
                         END-IF                                    
+                       END-IF
                      END-IF
                      IF      TNS-SRYKBN         =   "14"                
                             MOVE   "80"   TO  RECE84-SRYKBN       

@@ -110,6 +110,8 @@
       *  02.09.03    NACL-藤原    06/04/14  きざみ値計算識別の追加
       *  02.09.04    NACL-門脇    06/04/20  外来迅速検体検査加算編集
       *  02.09.05    NACL-門脇    06/04/28  在宅編集修正
+      *  02.09.06    NACL-門脇    06/06/09  労災（加算なし）を剤に含む
+      *                                     場合の編集修正（自賠責）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -559,6 +561,8 @@
       *    療養担当手当て
            03  CONS-RYOYOTEATE PIC X(09)   VALUE   "199000610".
       *
+      *    労災（加算なし）
+           03  CONS-ROSAINASI  PIC X(09)   VALUE   "099509901".
       *
       *    フィルム料（乳幼児）加算
            03  CONS-FILM-YOUJI-KASAN  
@@ -1534,7 +1538,8 @@
                                                     CONS-SHOHOSEN4 OR   
                                                     CONS-SHOHOKSN1 OR   
                                                     CONS-SHOHOKSN2 OR   
-                                                    CONS-SHOHOKSN3
+                                                    CONS-SHOHOKSN3 OR
+                                                    CONS-ROSAINASI
                               CONTINUE                                  
                        ELSE                                             
                               IF    TNS-GAITENTTLKBN   =  130           
