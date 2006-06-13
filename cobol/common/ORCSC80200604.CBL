@@ -1047,11 +1047,11 @@
            ELSE
                MOVE    LNK-ORCSC-SYOYMD        TO  WRK-SYOYMD
            END-IF
-      *    同日初診がある時、同日初診
-           IF      (SPA-DOUYMD     NOT =   SPACE )  AND
-                   (SPA-DOUYMD         >   WRK-SYOYMD)
-               MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
-           END-IF
+      **** 同日初診がある時、同日初診
+      *    IF      (SPA-DOUYMD     NOT =   SPACE )  AND
+      *            (SPA-DOUYMD         >   WRK-SYOYMD)
+      *        MOVE    SPA-DOUYMD          TO  WRK-SYOYMD
+      **** END-IF
       *    初診算定日から６月以内
            IF     (WRK-SYOYMD          =   SPACE  )  OR
                   (LNK-ORCSC-SYOSIN2   =   1      )  OR
@@ -1084,9 +1084,15 @@
                                                OR  "180007250"
                                                OR  "180007350"
                        IF      SPA-SRYYMD      >   WRK-SYOYMD
-                           MOVE    "0082"      TO  WRK-ERRCD
-                           MOVE    "1"         TO  WRK-COM-CUR
+                           IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)
+                           AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
+                               MOVE    IDX-Z       TO  LNK-ORCSC-KEI-IDX
+                               MOVE    "1"         TO  WRK-COM-KZMFLG
                                                            (IDX-Z)
+                               MOVE    "0082"      TO  WRK-ERRCD
+                               MOVE    "1"         TO  WRK-COM-CUR
+                                                           (IDX-Z)
+                           END-IF
                        END-IF
                    ELSE
                        MOVE    "0083"      TO  WRK-ERRCD
