@@ -190,11 +190,22 @@
            PERFORM 2100-GETUMATU-GET-SEC
            MOVE    WRK-YMD             TO  WRK-MMEDYMD
       *
+      *
+           PERFORM 900-PTNYUINRRK-KEY11-SEL-SEC
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM  910-DBCLOSECURSOR-SEC
+      *
       *    Æþ±¡´µ¼Ô¤ÎÏ·¿ÍÈ½Äê
            INITIALIZE   ORCSAGECHKAREA
            MOVE    SBTUSENTEI-HOSPID   TO  AGECHK-HOSPID
            MOVE    SBTUSENTEI-PTID     TO  AGECHK-PTID
            MOVE    WRK-MMSTYMD         TO  AGECHK-SRYYMD
+           IF    ( WRK-MMSTYMD         <   PTNYUINRRK-NYUINYMD )
+               MOVE    PTNYUINRRK-NYUINYMD
+                                       TO  AGECHK-SRYYMD
+           END-IF
            CALL    "ORCSAGECHK"        USING
                                        ORCSAGECHKAREA
            IF      ( AGECHK-RC    =    ZERO )

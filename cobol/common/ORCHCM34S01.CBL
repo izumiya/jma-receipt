@@ -1773,8 +1773,18 @@
            INITIALIZE   ORCSAGECHKAREA
            MOVE    HCM34S01-HOSPID     TO  AGECHK-HOSPID
            MOVE    HCM34S01-PTID       TO  AGECHK-PTID
-           MOVE    HCM34S01-SANTEIYM   TO  AGECHK-SRYYMD(1:6)
-           MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
+      *
+           MOVE    HCM34S01-SANTEIYM   TO  WRK-YYMM
+           MOVE    1                   TO  WRK-DD
+           PERFORM VARYING IDXD    FROM    1   BY  1
+               UNTIL ( IDXD        >   31 )
+               IF    ( FLG-NYUINDAY (IDXD) =   1 )
+                   MOVE    IDXD        TO  WRK-DD
+                   MOVE    31          TO  IDXD
+               END-IF
+           END-PERFORM
+           MOVE    WRK-YMD             TO  AGECHK-SRYYMD
+      *
            CALL    "ORCSAGECHK"        USING
                                        ORCSAGECHKAREA
            IF      ( AGECHK-RC    =    ZERO )
