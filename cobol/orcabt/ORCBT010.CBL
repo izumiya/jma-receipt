@@ -56,6 +56,8 @@
       *  02.07.01    NACL-藤原    05/08/20  特別療養費対応
       *  02.07.02    NACL-藤原    06/01/25  疑いフラグからの病名の編集方
       *                                     法の変更
+      *
+      *  03.00.01    NACL-藤原    06/06/07  包括の場合のデータ作成の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1079,27 +1081,35 @@
                MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
-      *            保険組合せ読込み
-                   INITIALIZE                  HKNCOMBI-REC
-                   MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
-                   MOVE    KEY-N-PTID          TO  COMB-PTID
-                   MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM 
-                   MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
-                   PERFORM 910-HKNCOMBI-INV-SEC
-      *
-      *            未訂正分があるか
-                   MOVE    SPACE               TO  WRK-ERR-AREA
-                   INITIALIZE                      WRK-ERR-AREA
-      *
-                   IF      FLG-HKNCOMBI    =   ZERO
-                       IF      COMB-TEKSTYMD   <=  WRK-STYMD
-                       AND     COMB-TEKEDYMD   >=  WRK-EDYMD
-                           MOVE    SPACE           TO  WRK-UPDKBN
-                        ELSE
-                           MOVE    "1"             TO  WRK-UPDKBN
-                       END-IF
+                   IF      KEY-N-HKNCOMBI      =   9999
+                       INITIALIZE                  HKNCOMBI-REC
+                       MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
+                       MOVE    KEY-N-PTID          TO  COMB-PTID
+                       MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM
+                       MOVE    ZERO                TO  FLG-HKNCOMBI 
                    ELSE
-                       MOVE    "1"             TO  WRK-TEISEIKBN
+      *                保険組合せ読込み
+                       INITIALIZE                  HKNCOMBI-REC
+                       MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
+                       MOVE    KEY-N-PTID          TO  COMB-PTID
+                       MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM 
+                       MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+                       PERFORM 910-HKNCOMBI-INV-SEC
+      *
+      *                未訂正分があるか
+                       MOVE    SPACE               TO  WRK-ERR-AREA
+                       INITIALIZE                      WRK-ERR-AREA
+      *
+                       IF      FLG-HKNCOMBI    =   ZERO
+                           IF      COMB-TEKSTYMD   <=  WRK-STYMD
+                           AND     COMB-TEKEDYMD   >=  WRK-EDYMD
+                               MOVE    SPACE           TO  WRK-UPDKBN
+                            ELSE
+                               MOVE    "1"             TO  WRK-UPDKBN
+                           END-IF
+                       ELSE
+                           MOVE    "1"             TO  WRK-TEISEIKBN
+                       END-IF
                    END-IF    
       *             
                    MOVE    KEY-NEW             TO  KEY-OLD
