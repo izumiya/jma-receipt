@@ -183,6 +183,8 @@
       *                                     日計表、症状詳記レコード対応
       *  02.09.04    NACL-藤原    06/05/15  加算がある場合の
       *                                     外来迅速検体検査加算対応
+      *  02.09.05    NACL-藤原    06/06/14  外来迅速検体検査加算を算定した
+      *                                     検査にコメントがある場合の記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2724,11 +2726,19 @@
                    EVALUATE    RECE05-SRYCD (IDX) (1:1)
                        WHEN    "0"
                        WHEN    "8"
-                           IF      RECE041-SRYKBN  =   "13"    OR  "14"
-                                                               OR  "70"
-                               PERFORM 200711-SRYKBN13-COMMENT-TAIHI-SEC
+                           IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
+                           AND   ( RECE041-KNSJISGRPKBN    >   ZERO )
+      *                        外来迅速検体検査加算がある場合の検査退避
+                               PERFORM 20012-KENSA-TAIHI-SEC
                            ELSE
-                               PERFORM 200711-COMMENT-TAIHI-SEC
+                               IF      RECE041-SRYKBN  =   "13"    OR 
+                                                           "14"    OR
+                                                           "70"
+                                   PERFORM
+                                       200711-SRYKBN13-COMMENT-TAIHI-SEC
+                               ELSE
+                                   PERFORM 200711-COMMENT-TAIHI-SEC
+                               END-IF
                            END-IF
                        WHEN    "1"
                            IF    ( RECE02-KENTAIKASANFLG   =   "1"  )
@@ -3081,14 +3091,29 @@
       *****************************************************************
        20012-KENSA-TAIHI-SEC           SECTION.
       *
-           IF      RECE041-KNSJISGRPKBN    =   99
-               IF      RECE05-SRYCD (IDX)      =   WRK-CONS-SRYCD
-                   MOVE    RECE05-SRYACTINF (IDX)
+           IF      RECE05-SRYCD (IDX) (1:1)  =   "1"
+               IF      RECE041-KNSJISGRPKBN    =   99
+                   IF      RECE05-SRYCD (IDX)      =   WRK-CONS-SRYCD
+                       MOVE    RECE05-SRYACTINF (IDX)
                                        TO  TBL-KASAN-RECE05-SRYACTINF
                                                (TBL-KASAN-RECE04-MAX)
-                   MOVE    RECE05-NAMEINF   (IDX)
+                       MOVE    RECE05-NAMEINF   (IDX)
                                        TO  TBL-KASAN-RECE05-NAMEINF
                                                (TBL-KASAN-RECE04-MAX)
+                   END-IF
+               ELSE
+                   ADD     1               TO  TBL-KENTAI-RECE05-MAX
+                   MOVE    RECE05-SRYACTINF (IDX)
+                                       TO  TBL-KENTAI-RECE05-SRYACTINF
+                           (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+                   MOVE    RECE05-NAMEINF (IDX)
+                                       TO  TBL-KENTAI-RECE05-NAMEINF
+                           (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+                   IF      RECE05-SRYCD (IDX) (1:1)  =   "1"
+                       MOVE    TBL-KENTAI-RECE05-MAX 
+                                           TO  TBL-KENTAI-SRYCD-MAX
+                                                (TBL-KENTAI-RECE04-MAX)
+                   END-IF
                END-IF
            ELSE
                ADD     1               TO  TBL-KENTAI-RECE05-MAX
@@ -3098,11 +3123,6 @@
                MOVE    RECE05-NAMEINF (IDX)
                                        TO  TBL-KENTAI-RECE05-NAMEINF
                            (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
-               IF      RECE05-SRYCD (IDX) (1:1)  =   "1"
-                   MOVE    TBL-KENTAI-RECE05-MAX 
-                                       TO  TBL-KENTAI-SRYCD-MAX
-                                                (TBL-KENTAI-RECE04-MAX)
-               END-IF
            END-IF
       *
            .

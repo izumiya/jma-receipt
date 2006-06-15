@@ -110,6 +110,9 @@
       *                                     負担区分とする
       *                                     公費単独で公費が全て食事負担あり
       *                                     の場合は「97」の記載はしない
+      *
+      *  02.09.08    NACL-藤原    06/06/14  外来迅速検体検査加算を算定した
+      *                                     検査にコメントがある場合の記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3115,11 +3118,19 @@
                    EVALUATE    RECE65-SRYCD (IDX) (1:1)
                        WHEN    "0"
                        WHEN    "8"
-                           IF      RECE641-SRYKBN  =   "13"    OR  "14"
-                                                               OR  "70"
-                               PERFORM 200711-SRYKBN13-COMMENT-TAIHI-SEC
+                           IF    ( RECE62-KENTAIKASANFLG   =   "1"  )
+                           AND   ( RECE641-KNSJISGRPKBN    >   ZERO )
+      *                        外来迅速検体検査加算がある場合の検査退避
+                               PERFORM 20012-KENSA-TAIHI-SEC
                            ELSE
-                               PERFORM 200711-COMMENT-TAIHI-SEC
+                               IF      RECE641-SRYKBN  =   "13"    OR 
+                                                           "14"    OR
+                                                           "70"
+                                   PERFORM
+                                       200711-SRYKBN13-COMMENT-TAIHI-SEC
+                               ELSE
+                                   PERFORM 200711-COMMENT-TAIHI-SEC
+                               END-IF
                            END-IF
                        WHEN    "1"
                            IF    ( RECE62-KENTAIKASANFLG   =   "1"  )
@@ -3429,14 +3440,29 @@
       *****************************************************************
        20012-KENSA-TAIHI-SEC           SECTION.
       *
-           IF      RECE641-KNSJISGRPKBN    =   99
-               IF      RECE65-SRYCD (IDX)      =   WRK-CONS-SRYCD
-                   MOVE    RECE65-SRYACTINF (IDX)
+           IF      RECE65-SRYCD (IDX) (1:1)  =   "1"
+               IF      RECE641-KNSJISGRPKBN    =   99
+                   IF      RECE65-SRYCD (IDX)      =   WRK-CONS-SRYCD
+                       MOVE    RECE65-SRYACTINF (IDX)
                                        TO  TBL-KASAN-RECE65-SRYACTINF
                                                (TBL-KASAN-RECE64-MAX)
-                   MOVE    RECE65-NAMEINF   (IDX)
+                       MOVE    RECE65-NAMEINF   (IDX)
                                        TO  TBL-KASAN-RECE65-NAMEINF
                                                (TBL-KASAN-RECE64-MAX)
+                   END-IF
+               ELSE
+                   ADD     1               TO  TBL-KENTAI-RECE65-MAX
+                   MOVE    RECE65-SRYACTINF (IDX)
+                                       TO  TBL-KENTAI-RECE65-SRYACTINF
+                           (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
+                   MOVE    RECE65-NAMEINF (IDX)
+                                       TO  TBL-KENTAI-RECE65-NAMEINF
+                           (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
+                   IF      RECE65-SRYCD (IDX) (1:1)  =   "1"
+                       MOVE    TBL-KENTAI-RECE65-MAX 
+                                       TO  TBL-KENTAI-SRYCD-MAX
+                                                (TBL-KENTAI-RECE64-MAX)
+                   END-IF
                END-IF
            ELSE
                ADD     1               TO  TBL-KENTAI-RECE65-MAX
@@ -3446,12 +3472,7 @@
                MOVE    RECE65-NAMEINF (IDX)
                                        TO  TBL-KENTAI-RECE65-NAMEINF
                            (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
-               IF      RECE65-SRYCD (IDX) (1:1)  =   "1"
-                   MOVE    TBL-KENTAI-RECE65-MAX 
-                                       TO  TBL-KENTAI-SRYCD-MAX
-                                                (TBL-KENTAI-RECE64-MAX)
-               END-IF
-           END-IF
+           END-IF    
       *
            .
        20012-KENSA-TAIHI-EXT.
