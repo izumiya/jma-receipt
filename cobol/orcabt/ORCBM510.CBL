@@ -289,12 +289,6 @@
            MOVE    "RECEERR"           TO  RECEERR-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
       *
-      *    ø«Œ≈«Ø∑Ó
-           MOVE    LNK-PRTKANRI-SRYYM  TO  WRK-SYMD(1:6)
-           MOVE    "01"                TO  WRK-SYMD(7:2)
-           PERFORM 31012-SEIWA-HEN-SEC
-           MOVE     WRK-HENYMDG(1:16)  TO  WRK-SRYYMWH
-      *
       *    ¿¡µ·¥…Õ˝∆…§ﬂπ˛§ﬂ
            EVALUATE    WRK-PARA-TEISYUTUSAKI
                            ALSO    WRK-PARA-NYUGAIKBN   
@@ -418,7 +412,10 @@
            END-EVALUATE
       *
       *    ø«Œ≈«Ø∑Ó
-           MOVE    WRK-SRYYMWH         TO  HCM37-SRYM
+           MOVE    LNK-PRTKANRI-SRYYM  TO  WRK-SYMD(1:6)
+           MOVE    "01"                TO  WRK-SYMD(7:2)
+           PERFORM 31012-SEIWA-HEN-SEC
+           MOVE     WRK-HENYMDG(1:16)  TO  HCM37-SRYM
       *
       *    ∞ÂŒ≈µ°¥ÿ•≥°º•…
            MOVE    SYS-1001-HOSPCD     TO  HCM37-HOSPCD
