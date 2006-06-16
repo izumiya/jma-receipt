@@ -76,6 +76,7 @@
       *  01.03.02    NACL-門脇    06/03/20  自立支援法対応
       *  01.03.03    NACL-門脇    06/03/30  労災同日初診対応
       *  01.03.04    NACL-門脇    06/05/23  外泊時の入院基本料取得修正
+      *  01.03.05    NACL-門脇    06/06/16  マル長がある場合の優先順位変更
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1187,6 +1188,9 @@
               ELSE
                      MOVE  WRK-HANBETU-KOH1HKNNUM(IDX)
                                 TO  WRK-HANBETU-YUSENBAN(IDX)
+                     IF    WRK-HANBETU-KOH1HKNNUM(IDX) = "972"
+                       MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
+                     END-IF
               END-IF
       *
               IF  WRK-HANBETU-KOH2HKNNUM(IDX) = SPACE 
@@ -1198,6 +1202,9 @@
                      MOVE  WRK-HANBETU-KOH2HKNNUM(IDX)
                                       TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
+                    IF  WRK-HANBETU-KOH2HKNNUM(IDX)  = "972"
+                       MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
+                    END-IF
               END-IF
       *
               IF  WRK-HANBETU-KOH3HKNNUM(IDX) = SPACE 
@@ -1208,6 +1215,9 @@
                      MOVE  WRK-HANBETU-KOH3HKNNUM(IDX)
                                       TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
+                    IF  WRK-HANBETU-KOH3HKNNUM(IDX)  = "972"
+                       MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
+                    END-IF
               END-IF
       *
               IF  WRK-HANBETU-KOH4HKNNUM(IDX) = SPACE 
@@ -1217,6 +1227,9 @@
                                        > WRK-HANBETU-KOH4HKNNUM(IDX)
                      MOVE  WRK-HANBETU-KOH4HKNNUM(IDX)
                                       TO WRK-HANBETU-YUSENBAN(IDX)
+                    END-IF
+                    IF  WRK-HANBETU-KOH4HKNNUM(IDX)  = "972"
+                       MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
               END-IF
       *
