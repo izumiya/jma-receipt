@@ -412,7 +412,7 @@
            END-EVALUATE
       *
       *    ©гнег╞╥Н
-           MOVE    LNK-PRTKANRI-SRYYM  TO  WRK-SYMD(1:6)
+           MOVE    RECE10-SRYYM        TO  WRK-SYMD(1:6)
            MOVE    "01"                TO  WRK-SYMD(7:2)
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE     WRK-HENYMDG(1:16)  TO  HCM37-SRYM
