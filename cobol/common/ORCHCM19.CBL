@@ -2162,7 +2162,7 @@
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            ∏Â»Ø∞ÂÃÙ… ∂Ë ¨
       **********   IF      TNS-KOUHATUKBN      NOT =   ZERO
-                   IF      TNS-KOUHATUKBN          =   "1"
+                   IF      TNS-KOUHATUKBN          =   1
                        MOVE    TNS-NAME        TO  WRK-TNS-NAME
                        COMPUTE KETA            =  (TNS-YUKOKETA  * 2)
                                                +   1
@@ -2175,7 +2175,7 @@
       *
       *        ∏Â»Ø∞ÂÃÙ… ∂Ë ¨
                IF      TNS-KOUHATUKBN          =   ZERO
-                                               OR  "2"
+                                               OR  2
                   MOVE    1                TO  FLG-KOUHATU
                END-IF
       *        À„ÃÙ»ΩƒÍ
