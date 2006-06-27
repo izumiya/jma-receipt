@@ -14682,6 +14682,42 @@
       *****************************************************************
        500-GMNHEN-STATE-EDIT-SEC       SECTION.
       *
+      *    処理区分応じて画面編集の内容を変更する
+           EVALUATE    SPA-GMN-I01-SYORIKBN-CD
+      *    入院登録
+           WHEN    "01"
+               PERFORM 4101-WIDGET-NYUIN-STT-SEC
+      *    退院登録
+           WHEN    "02"
+           WHEN    "11"
+      *
+               PERFORM 4101-WIDGET-TAIIN-STT-SEC
+      *
+      *    変更
+           WHEN    "03"
+               PERFORM 4101-WIDGET-HENKOU-STT-SEC
+      *    照会
+           WHEN    "04"
+               PERFORM 4201-WIDGET-INSENSITIVE-SEC
+      *    転科　転棟　転室
+           WHEN    "08"
+      *
+               PERFORM 4101-WIDGET-TENKA-STT-SEC
+      *
+      *    退院再計算
+           WHEN    "10"
+               PERFORM 4201-WIDGET-INSENSITIVE-SEC
+               MOVE    WIDGET-NORMAL   TO  SPA-GMN-I01-B12-STT
+      *    その他
+           WHEN    OTHER
+               PERFORM 4201-WIDGET-INSENSITIVE-SEC
+               MOVE    WIDGET-NORMAL   TO  SPA-GMN-I01-B12-STT
+           END-EVALUATE
+      *
+           IF    ( SPA-NAI-I01-PTID    =   ZERO )
+               PERFORM 4201-WIDGET-STATE-CLEAR-SEC
+           END-IF
+      *
       *    入院歴作成ボタン
            MOVE    SPA-GMN-I01-B07-STT
                                        TO  I01-B07-STT
