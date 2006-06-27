@@ -14718,6 +14718,11 @@
                PERFORM 4201-WIDGET-STATE-CLEAR-SEC
            END-IF
       *
+           IF    ( SPA-GMN-I01-SYORIKBN-CD =   "01" )
+            AND  ( SPA-GMN-I01-SHOKAI-CD   =   "2" )
+               MOVE    WIDGET-NORMAL   TO  SPA-GMN-I01-SHONUM-STT
+           END-IF
+      *
       *    入院歴作成ボタン
            MOVE    SPA-GMN-I01-B07-STT
                                        TO  I01-B07-STT
