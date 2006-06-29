@@ -63,6 +63,8 @@
       *  02.08.02    NACL-藤原    06/04/01  対象データ表示
       *
       *  03.00.01    NACL-藤原    06/05/29  印刷時のプリンター指定対応
+      *  03.00.02    NACL-藤原    06/06/29  入力順指定のときの続紙のプリ
+      *                                     ンター指定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -330,26 +332,24 @@
                MOVE    WRK-RECE08-PRTRENNUM TO  RECE08-PRTRENNUM
                EVALUATE    WRK-PARA-RECE09-PRTJYUN
                    WHEN    "05"
-                       IF      RECE08-RENNUM    =   1
-                           IF    ( RECE08-RECESYUBETU   =   "0000"  OR
-                                                            "6666"  OR
-                                                            "8888"     )
-                           OR    ( RECE08-TEISYUTUSAKI  =   "1"        )
-                               IF      RECE08-RENNUM    =   1
-                                   MOVE    WRK-PARA-PRTNM
-                                                        TO  RECE08-PRTNM
-                               ELSE
-                                   MOVE    WRK-PARA-PRTNM-N
-                                                        TO  RECE08-PRTNM
-                               END-IF
+                       IF    ( RECE08-RECESYUBETU   =   "0000"  OR
+                                                        "6666"  OR
+                                                        "8888"     )
+                       OR    ( RECE08-TEISYUTUSAKI  =   "1"        )
+                           IF      RECE08-RENNUM    =   1
+                               MOVE    WRK-PARA-PRTNM
+                                                    TO  RECE08-PRTNM
                            ELSE
-                               IF      RECE08-RENNUM    =   1
-                                   MOVE    WRK-PARA-KKHPRTNM
-                                                        TO  RECE08-PRTNM
-                               ELSE
-                                   MOVE    WRK-PARA-KKHPRTNM-N
-                                                        TO  RECE08-PRTNM
-                               END-IF
+                               MOVE    WRK-PARA-PRTNM-N
+                                                    TO  RECE08-PRTNM
+                           END-IF
+                       ELSE
+                           IF      RECE08-RENNUM    =   1
+                               MOVE    WRK-PARA-KKHPRTNM
+                                                    TO  RECE08-PRTNM
+                           ELSE
+                               MOVE    WRK-PARA-KKHPRTNM-N
+                                                    TO  RECE08-PRTNM
                            END-IF
                        END-IF
                    WHEN    OTHER
