@@ -3668,10 +3668,14 @@
                     IF    WRK-SKJ4-RYOYO(IDX1)  NOT =  SPACE
                         MOVE   "197001010"
                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
-                        COMPUTE   IDX-TSY90  =  IDX1  +  31
+                    END-IF
+                    COMPUTE   IDX-TSY90  =  IDX1  +  31
+                    IF    WRK-SKJ4-RYOYO(IDX-TSY90)  NOT =  SPACE
                         MOVE   "197001010"
                                         TO  WRK-SKJFTN2-SRYCD(IDX-TSY90)
-                        COMPUTE   IDX-TSY90  =  IDX1  +  62
+                    END-IF
+                    COMPUTE   IDX-TSY90  =  IDX1  +  62
+                    IF    WRK-SKJ4-RYOYO(IDX-TSY90)  NOT =  SPACE
                         MOVE   "197001010"
                                         TO  WRK-SKJFTN2-SRYCD(IDX-TSY90)
                     END-IF
