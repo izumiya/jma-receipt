@@ -1381,11 +1381,13 @@
                   MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
                WHEN   013  THRU  021
                WHEN   101  THRU  109
+               WHEN   147  THRU  152
                   MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
                WHEN   075  THRU  080
                   MOVE   "190108990"    TO   WRK-GAIHAKU(IDX1)
                WHEN   085  THRU  086
                WHEN   132  THRU  133
+               WHEN   153  THRU  158
                   MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
       *
            END-EVALUATE
