@@ -202,6 +202,7 @@
       *                                     記載対応
       *  03.00.02    NACL-門脇    06/06/22  往診、在宅患者訪問診療料の
       *                                     コメント自動記載対応
+      *  03.01.01    NACL-門脇    06/06/30  療養病棟の他医療機関受診対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5769,11 +5770,13 @@
                   MOVE   "190108790" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                WHEN   013  THRU  021
                WHEN   101  THRU  109
+               WHEN   147  THRU  152
                   MOVE   "190108890" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                WHEN   075  THRU  080
                   MOVE   "190108990" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                WHEN   085  THRU  086
                WHEN   132  THRU  133
+               WHEN   153  THRU  158
                   MOVE   "190109090" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
            END-EVALUATE
            .

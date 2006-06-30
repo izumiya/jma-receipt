@@ -49,6 +49,7 @@
       *  02.09.05    NACL-門脇    06/06/05  複数医師及び看護配置適合加算と
       *                                     看護配置適合加算の編集対応
       *  02.09.06    NACL-門脇    06/06/23  認知機能障害加算の編集対応
+      *  03.01.01    NACL-門脇    06/06/30  療養病棟の他医療機関受診対応
       *****************************************************************
       *
       *
@@ -1301,11 +1302,13 @@
                   MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
                WHEN   013  THRU  021
                WHEN   101  THRU  109
+               WHEN   147  THRU  152
                   MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
                WHEN   075  THRU  080
                   MOVE   "190108990"    TO   WRK-GAIHAKU(IDX1)
                WHEN   085  THRU  086
                WHEN   132  THRU  133
+               WHEN   153  THRU  158
                   MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
       *
            END-EVALUATE

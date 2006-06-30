@@ -41,6 +41,7 @@
       *  01.00.06    NACL-小豆沢  06/03/22  特定入院料追加分（脳卒中ケアユニ）
       *                                     外泊置き換え処理
       *  01.00.07    NACL-小豆沢  06/05/23  外泊時の入院基本料取得修正
+      *  03.01.01    NACL-門脇    06/06/30  療養病棟の他医療機関受診対応
       *****************************************************************
       *
       *
@@ -1432,11 +1433,13 @@
                MOVE    "190108790"     TO  WRK-GAIHAKU-SRYCD
            WHEN    013 THRU    021
            WHEN    101 THRU    109
+           WHEN    147 THRU    152
                MOVE    "190108890"     TO  WRK-GAIHAKU-SRYCD
            WHEN    075 THRU    080
                MOVE    "190108990"     TO  WRK-GAIHAKU-SRYCD
            WHEN    085 THRU    086
            WHEN    132 THRU    133
+           WHEN    153 THRU    158
                MOVE    "190109090"     TO  WRK-GAIHAKU-SRYCD
            END-EVALUATE
       *
