@@ -2003,7 +2003,8 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           MOVE    SPA-SRYYMD(7:2)     TO  IDX-ACT
+      **** MOVE    SPA-SRYYMD(7:2)     TO  IDX-ACT
+           MOVE    JYURRK-SRYYMD(7:2)  TO  IDX-ACT
            MOVE    ACCT-DAY (IDX-REN IDX-ACT)
                                        TO  WRK-KAISU
       *
