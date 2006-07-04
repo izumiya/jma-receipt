@@ -2199,9 +2199,10 @@
            END-IF
       *
       *    Æ±»þ»£±Æ¤Ë¤è¤ëÄþ¸º
-           IF     (WRK-CNT-SATUEI      >   1   )  AND
-                  (WRK-COM-TNSSRYSYUKBN(IDX-Z) =  "711"
-                                               OR "710"  )
+           IF    ((WRK-CNT-SATUEI      >   1   )  AND
+                  (WRK-COM-TNSSRYSYUKBN(IDX-Z) =  "711"  ))
+      ***                                      OR "710"  )
+              OR  (WRK-COM-TNSSRYSYUKBN(IDX-Z) =  "710"  )
                IF      WRK-COM-TNSSRYSYUKBN(IDX-Z) =  "711"
                    COMPUTE WRK-SATU-TEN        =   WRK-SATU-TEN
                                                /   2
