@@ -118,6 +118,10 @@
       *                                     よる記載対応
       *  03.00.02    NACL-藤原    06/06/14  外来迅速検体検査加算を算定した
       *                                     検査にコメントがある場合の記載
+      *  03.00.03    NACL-藤原    06/07/05  船員保険、及び共済組合保険の
+      *                                     「職務上」、「下船３月以内」、
+      *                                     「通勤」について食事標準負担額を
+      *                                     記録しないようにする
      *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4802,7 +4806,38 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN3
                                            OR  WRK-CONS-HYOJYUN-FUTAN4 )
                                    CONTINUE
-                               ELSE     
+                               ELSE
+                                 IF    ( RECE62-HKNNUM     =   "002"  )
+                                 AND   ( RECE62-HOJOKBN    =   "1" OR 
+                                                               "2" OR
+                                                               "3" OR
+                                                               "A" OR 
+                                                               "B" OR
+                                                               "C" OR
+                                                               "D" OR 
+                                                               "E" OR
+                                                               "F"    )
+                                 AND   (  LNK-NYURECEDEN-SRYCD
+                                                       (IDZ1 IDZ2 IDXZ)
+                                           =   WRK-CONS-HYOJYUN-FUTAN1
+                                           OR  WRK-CONS-HYOJYUN-FUTAN2
+                                           OR  WRK-CONS-HYOJYUN-FUTAN3
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                  CONTINUE
+                                 ELSE
+                                  IF    ( RECE62-HKNNUM (1:2)
+                                                          =   "03"   )
+                                  AND   ( RECE62-HOJOKBN  =   "2" OR 
+                                                              "B" OR
+                                                              "E"    )
+                                  AND   (  LNK-NYURECEDEN-SRYCD
+                                                       (IDZ1 IDZ2 IDXZ)
+                                           =   WRK-CONS-HYOJYUN-FUTAN1
+                                           OR  WRK-CONS-HYOJYUN-FUTAN2
+                                           OR  WRK-CONS-HYOJYUN-FUTAN3
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                       CONTINUE
+                                  ELSE
                                    MOVE    "SI,"           TO  WRK-REC
                                    MOVE    3               TO
                                                        WRK-REC-LENGTH
@@ -4860,7 +4895,9 @@
                                    END-IF
                                    MOVE    1               TO  WRK-END 
                                    PERFORM 5005-NUM-HENSYU-SEC
-                           END-IF
+                                  END-IF 
+                                 END-IF
+                               END-IF
                        END-EVALUATE
                        IF      WRK-REC-LENGTH      >   ZERO 
                            PERFORM 5001-FILE-WRITE-SEC
