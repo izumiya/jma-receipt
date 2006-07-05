@@ -1936,6 +1936,8 @@
            IF      FLG-OK              =   ZERO
                MOVE    "0002"              TO  SPA-ERRCD
            ELSE
+      *        保険組合せ
+               PERFORM 3101-HKNCOMBI-HEN-SEC
       *        初期編集
                PERFORM 314-SYOKI-SEC
                IF      SPA-ERRCD           =   SPACE
