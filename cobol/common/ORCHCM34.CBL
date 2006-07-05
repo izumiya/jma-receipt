@@ -35,6 +35,8 @@
       *  01.00.05    NACL-ÂÀÅÄ    04.04.01  êóáì´µ¼Ô´ÉÍý²Ã»»¤ÎÂÐ±þ
       *  01.00.06    NACL-ÌçÏÆ    06.06.02  êóáì´µ¼Ô´ÉÍý²Ã»»ÊÔ½¸ÂÐ±þ
       *  01.00.07    NACL-ÌçÏÆ    06.06.23  Ç§ÃÎµ¡Ç½¾ã³²²Ã»»¤ÎÊÔ½¸ÂÐ±þ
+      *  01.00.08    NACL-¾®Æ¦Âô  06.07.04  Ï«ºÒÆþ±¡ÎÁ¤Ë´Þ¤á¤ë²Ã»»¤¬¥³¥á¥ó¥È
+      *                                     ¤ÈÆ±»þÆþÎÏ¤µ¤ì¤¿¾ì¹ç¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3202,6 +3204,24 @@
                OR   (( ACCT-SRYCDTOTAL = 190117070 OR 190109670 ) AND
                      ( ORCHCM34-SRYYM  >= "200604"              )     )
                OR   (( ACCT-SRYCDTOTAL = 190121970 OR 190122670 ) AND
+                     ( ORCHCM34-SRYYM  >= "200607"              )     )
+               OR   (  SRY-SRYCD(1)    =   "190080470"   OR
+                                           "190799670"   OR
+                                           "190080570"   OR
+                                           "190799770"   OR
+                                           "190111690"   OR
+                                           "190809090"   OR
+                                           "190111790"   OR
+                                           "190809190"   OR
+                                           "190109170"   OR
+                                           "190807570"   OR
+                                           "190109270"   OR
+                                           "190808670" )
+               OR   (( SRY-SRYCD(1)  = "190116990" OR "190813390" ) AND
+                     ( ORCHCM34-SRYYM  <  "200604"              )     )
+               OR   (( SRY-SRYCD(1)  = "190117070" OR "190109670" ) AND
+                     ( ORCHCM34-SRYYM  >= "200604"              )     )
+               OR   (( SRY-SRYCD(1)  = "190121970" OR "190122670" ) AND
                      ( ORCHCM34-SRYYM  >= "200607"              )     )
                    GO  TO  20011-SRYACT-HEN-EXT
                END-IF
@@ -6416,6 +6436,8 @@
                IF    ( ACCT-PTID   NOT =   HCM34SRY-PTID )
                 OR   ( ACCT-ZAINUM NOT =   HCM34SRY-ZAINUM )
                    MOVE    1           TO  FLG-HCM34SRY
+               ELSE
+                   MOVE    HCM34SRY-DAT TO SRYACT-REC
                END-IF
            END-READ
       *

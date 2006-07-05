@@ -50,6 +50,8 @@
       *                                     看護配置適合加算の編集対応
       *  02.09.06    NACL-門脇    06/06/23  認知機能障害加算の編集対応
       *  03.01.01    NACL-門脇    06/06/30  療養病棟の他医療機関受診対応
+      *  03.01.02    NACL-小豆沢  06.07.04  入院料に含める加算がコメント
+      *                                     と同時入力された場合の対応
       *****************************************************************
       *
       *
@@ -738,7 +740,56 @@
                  MOVE      ZERO     TO      FLG-RYAKU
                  IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                       (ACCT-ZAIKAISU  NOT =    ZERO)
-                   IF   ACCT-SRYKBN  =  "90" OR "92"   
+                   IF   ACCT-SRYKBN  =  "90" OR "92"
+      *
+                     INITIALIZE                         SRYACT-REC
+                     MOVE    ACCT-HOSPID        TO      SRY-HOSPID
+                     MOVE    ACCT-NYUGAIKBN     TO      SRY-NYUGAIKBN
+                     MOVE    ACCT-PTID          TO      SRY-PTID
+                     MOVE    ACCT-SRYYM         TO      SRY-SRYYM
+                     MOVE    ACCT-ZAINUM        TO      SRY-ZAINUM
+                     MOVE    SRYACT-REC         TO      MCPDATA-REC
+                     MOVE    "DBSELECT"         TO      MCP-FUNC
+                     MOVE    "SRYACT-KEY9"      TO      ORC-DBPATH
+                     CALL    "ORCMCPSUB"        USING
+                                                MCPAREA
+                                                ORCMCPAREA
+                                                MCPDATA-REC
+                     IF      MCP-RC               =       ZERO
+                         MOVE    "SRYACT-KEY9"    TO      ORC-DBPATH
+                         PERFORM  910-SRYACT-READ-SEC
+                         IF   FLG-SRYACT    =    0
+                            IF (SRY-SRYCD(1)  =  CONS-KEIKAKU-GENSAN1
+                                              OR CONS-KEIKAKU-GENSAN2
+                                              OR CONS-INNAI-GENSAN1
+                                              OR CONS-INNAI-GENSAN2
+                                              OR CONS-ANZEN-GENSAN1
+                                              OR CONS-ANZEN-GENSAN2
+                                              OR CONS-JYOKU-GENSAN1
+                                              OR CONS-JYOKU-GENSAN2
+                                              OR CONS-NICHIJOU-KSN1
+                                              OR CONS-NICHIJOU-KSN2
+                                              OR CONS-CHIHOU-KSN1
+                                              OR CONS-CHIHOU-KSN2  )
+                           OR ((SRY-SRYCD(1)  =  CONS-JYOKU-KSN1
+                                               OR  CONS-JYOKU-KSN2) AND
+                              (LNK-SROUNYUIN-SANTEIYM  < "200604"  ))
+                           OR ((SRY-SRYCD(1)    =  CONS-KANGO-KSN1
+                                               OR  CONS-KANGO-KSN2) AND
+                              (LNK-SROUNYUIN-SANTEIYM >= "200604"  ))
+                           OR ((SRY-SRYCD(1)    = CONS-NINSYO-KSN1
+                                               OR CONS-NINSYO-KSN2) AND
+                              (LNK-SROUNYUIN-SANTEIYM >= "200607"  ))
+      *                                        
+                                MOVE  SRY-SRYCD(1)   TO
+                                               ACCT-SRYCDTOTAL(6:9)
+                            END-IF
+                         END-IF
+                     END-IF
+      *              診療行為クローズ
+                     MOVE    "SRYACT-KEY9"      TO  ORC-DBPATH
+                     PERFORM   910-DB-CLOSE-SEC
+      *
                      IF ( ACCT-SRYCDTOTAL(6:9)  =
                                             CONS-KEIKAKU-GENSAN1
                                         OR  CONS-KEIKAKU-GENSAN2

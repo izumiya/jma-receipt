@@ -97,6 +97,8 @@
       *  03.00.01    NACL-門脇    06/06/22  往診、在宅患者訪問診療料の
       *                                     コメント自動記載対応
       *  03.00.02    NACL-門脇    06/06/23  認知機能障害加算の編集対応
+      *  03.01.01    NACL-小豆沢  06.07.04  入院料に含める加算がコメント
+      *                                     と同時入力された場合の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1533,6 +1535,23 @@
            IF      MCP-RC               =       ZERO
                MOVE    "SRYACT-KEY9"    TO      ORC-DBPATH
                PERFORM  900-SRYACT-READ-SEC
+      *        労災入院の加算対象コードを診療行為テーブルで判定
+               IF ( SRY-SRYCD(1)     =  "190080470"  OR  "190799670"
+                                    OR  "190080570"  OR  "190799770"
+                                    OR  "190111690"  OR  "190809090"
+                                    OR  "190111790"  OR  "190809190"
+      *
+                                    OR  "190109170"  OR  "190807570"
+                                    OR  "190109270"  OR  "190808670" )
+               OR ((SRY-SRYCD(1)  =  "190116990"  OR  "190813390") AND
+                   (RECE82-SRYYM     <  "200604"                ))
+               OR ((SRY-SRYCD(1)  =  "190117070"  OR  "190109670") AND
+                   (RECE82-SRYYM     >= "200604"                ))
+               OR ((SRY-SRYCD(1)  =  "190121970"  OR  "190122670") AND
+                   (RECE82-SRYYM     >= "200607"                ))
+                 MOVE   ZERO         TO   FLG-WRITE85
+              ELSE
+      *
                PERFORM  UNTIL  FLG-SRYACT    =    1
                    MOVE    ZERO         TO      FLG-ZANHAIKI
                    MOVE    ZERO         TO      WRK-RENNUM
@@ -1549,6 +1568,7 @@
                    MOVE     "SRYACT-KEY9"    TO   ORC-DBPATH
                    PERFORM   900-SRYACT-READ-SEC
                END-PERFORM
+              END-IF
            END-IF
       *
            MOVE   "SRYACT-KEY9"      TO  WK-PATH
