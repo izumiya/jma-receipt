@@ -197,6 +197,10 @@
       *  02.09.12    NACL-門脇    06/05/23  外泊時の入院基本料取得修正
       *  02.09.13    NACL-門脇    06/05/31  川崎市国保、相模原市国保の
       *                                     対応取り止め
+      *  02.09.14    NACL-門脇    06/07/06  生保単独時の一部負担金記載
+      *                                     修正
+      *  02.09.15    NACL-門脇    06/07/06  公費単独時の食事負担額編集
+      *                                     修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8061,10 +8065,9 @@
                    END-IF
                 ELSE
                   IF    (SYU-SYUHKNNUM       =   SPACE         )
-                  AND   (SYU-KOH1HKNNUM      =   "012" OR "019"
-                                              OR "020" OR "053"
-                                              OR "021" OR "015"
-                                              OR "016"         )
+                  AND   (SYU-KOH1HKNNUM(1:1) =   "0"           )
+                  AND   (SYU-KOH1HKNNUM  NOT =  "010" AND "051"
+                                                      AND "052")
                   AND   (SYU-KOH2HKNNUM      =   SPACE         )
                   AND   (SYU-KOH3HKNNUM      =   SPACE         )
                   AND   (SYU-KOH4HKNNUM      =   SPACE         )
@@ -8384,7 +8387,14 @@
                IF   RECE62-KOHNUM(KOHFTN-IDX) =  "012"
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
-      *
+                     IF   ( KOHFTN-IDX        =     1   )
+                     AND  ( RECE62-HKNNUM     =   SPACE )
+                     AND  ( RECE62-KOHNUM(2)  =   SPACE )
+                     AND  ( RECE62-KOHNUM(3)  =   SPACE )
+                     AND  ( RECE62-KOHNUM(4)  =   SPACE )
+                         MOVE   SPACE  TO
+                             RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                     END-IF
                END-IF
       *
              END-PERFORM
