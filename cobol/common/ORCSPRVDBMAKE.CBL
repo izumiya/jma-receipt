@@ -30,6 +30,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.00.00    NACL-竹田    06/06/07  患者コメント取り込み不具合
       *                                     対応
+      *  03.00.00    NACL-竹田    06/07/07  患者コメント取り込み不具合
+      *                                     対応
       *****************************************************************
       *
       *
@@ -64,6 +66,7 @@
            03  FLG-SRYACCTPLUS     PIC 9(01).
       *----> take add start
            03  FLG-PTINFPRV        PIC 9(01).
+           03  FLG-PTCOMPRV        PIC 9(01).
       *----> take add ed
       *
            03  FLG-OK              PIC 9(01).
@@ -642,13 +645,16 @@
            PERFORM
                    UNTIL       FLG-PTCOM      =   1
                MOVE    PTCOM-REC           TO  MCPDATA-REC
-               MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    PATH-TBL-PTCOM-PRV-KEY
-                                       TO  MCP-PATH
-               DISPLAY "take ptcom init loop" PTCOM-ZAINUM
-               CALL    "MCPSUB"            USING
+               PERFORM 1001-PTCOMPRV-CHK-SEC
+               IF      FLG-PTCOM           =   1 
+                   MOVE    "DBINSERT"      TO  MCP-FUNC
+                   MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                           TO  MCP-PATH
+                   DISPLAY "take ptcom init loop" PTCOM-ZAINUM
+                   CALL    "MCPSUB"        USING
                                            MCPAREA
                                            MCPDATA-REC
+               END-IF
       *T       MOVE    PATH-TBL-PTCOM-KEY3
                MOVE    PATH-TBL-PTCOM-KEY2
                                        TO  MCP-PATH
@@ -665,6 +671,29 @@
            EXIT.
       *
       *----->take add ed
+      *
+      *****************************************************************
+      *    患者コメントチェック処理
+      *****************************************************************
+       1001-PTCOMPRV-CHK-SEC      SECTION.
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                       TO  MCP-PATH
+               PERFORM 915-PTCOM-NEXT2-SEC
+           END-IF
+           MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                       TO  MCP-PATH
+           PERFORM 990-DBCLOSE2-SEC
+           .
+      *
+       1001-PTCOMPRV-CHK-EXT.
+           EXIT.
       *
       *****************************************************************
       *    患者マスター読込
