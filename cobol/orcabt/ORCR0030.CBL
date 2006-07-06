@@ -258,6 +258,8 @@
       *                                     記載対応
       *  03.00.02    NACL-門脇    06/06/22  往診、在宅患者訪問診療料の
       *                                     コメント自動記載対応
+      *  03.00.03    NACL-門脇    06/07/06  生保単独時の一部負担金記載
+      *                                     修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5663,6 +5665,14 @@
                IF   RECE02-KOHNUM(KOHFTN-IDX) =  "012"
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                     IF   ( KOHFTN-IDX        =     1   )
+                     AND  ( RECE02-HKNNUM     =   SPACE )
+                     AND  ( RECE02-KOHNUM(2)  =   SPACE )
+                     AND  ( RECE02-KOHNUM(3)  =   SPACE )
+                     AND  ( RECE02-KOHNUM(4)  =   SPACE )
+                         MOVE   SPACE  TO
+                             RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                     END-IF
                END-IF
       *
              END-PERFORM

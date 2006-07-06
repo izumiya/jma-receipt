@@ -203,6 +203,10 @@
       *  03.00.02    NACL-ÌçÏÆ    06/06/22  ±ý¿Ç¡¢ºßÂð´µ¼ÔË¬Ìä¿ÇÎÅÎÁ¤Î
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
       *  03.01.01    NACL-ÌçÏÆ    06/06/30  ÎÅÍÜÉÂÅï¤ÎÂ¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
+      *  03.01.02    NACL-ÌçÏÆ    06/07/06  À¸ÊÝÃ±ÆÈ»þ¤Î°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     ½¤Àµ
+      *  03.01.03    NACL-ÌçÏÆ    06/07/06  ¸øÈñÃ±ÆÈ»þ¤Î¿©»öÉéÃ´³ÛÊÔ½¸
+      *                                     ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8093,10 +8097,9 @@
                    END-IF
                 ELSE
                   IF    (SYU-SYUHKNNUM       =   SPACE         )
-                  AND   (SYU-KOH1HKNNUM      =   "012" OR "019"
-                                              OR "020" OR "053"
-                                              OR "021" OR "015"
-                                              OR "016"         )
+                  AND   (SYU-KOH1HKNNUM(1:1) =   "0"           )
+                  AND   (SYU-KOH1HKNNUM  NOT =  "010" AND "051"
+                                                      AND "052")
                   AND   (SYU-KOH2HKNNUM      =   SPACE         )
                   AND   (SYU-KOH3HKNNUM      =   SPACE         )
                   AND   (SYU-KOH4HKNNUM      =   SPACE         )
@@ -8416,7 +8419,14 @@
                IF   RECE62-KOHNUM(KOHFTN-IDX) =  "012"
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
-      *
+                     IF   ( KOHFTN-IDX        =     1   )
+                     AND  ( RECE62-HKNNUM     =   SPACE )
+                     AND  ( RECE62-KOHNUM(2)  =   SPACE )
+                     AND  ( RECE62-KOHNUM(3)  =   SPACE )
+                     AND  ( RECE62-KOHNUM(4)  =   SPACE )
+                         MOVE   SPACE  TO
+                             RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                     END-IF
                END-IF
       *
              END-PERFORM
