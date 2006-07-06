@@ -30,6 +30,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.00.00    NACL-竹田    06/06/07  患者コメント取り込み不具合
       *                                     対応
+      *  03.00.00    NACL-竹田    06/07/07  患者コメント取り込み不具合
+      *                                     対応
       *****************************************************************
       *
       *
@@ -64,6 +66,7 @@
            03  FLG-SRYACCTPLUS     PIC 9(01).
       *----> take add start
            03  FLG-PTINFPRV        PIC 9(01).
+           03  FLG-PTCOMPRV        PIC 9(01).
       *----> take add ed
       *
            03  FLG-OK              PIC 9(01).
@@ -211,6 +214,7 @@
       *
            COPY    "MCPAREA".
            COPY    "ORCA-SPA".
+           COPY    "ORCA-DBPATH".
       *
       *
       *****************************************************************
@@ -296,11 +300,12 @@
                DISPLAY "K03 ZAINUM-SET ERR:" SPA-PTID
                GO      TO      100-PTINFPRV-INS-EXT
            END-IF
+           DISPLAY "take ptinf read ok"
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
-           MOVE    "tbl_ptinf_prv"     TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-PTINF-PRV-KEY
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC          NOT =   ZERO
@@ -325,14 +330,14 @@
            MOVE    "% "                TO  JYURRK-SRYYMD(7:2)
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key31"             TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-JYURRK-KEY31
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_jyurrk"    TO  MCP-TABLE
-               MOVE    "key31"         TO  MCP-PATHNAME
+               MOVE    PATH-TBL-JYURRK-KEY31
+                                       TO  MCP-PATH
                PERFORM 970-JYURRK-NEXT2-SEC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
@@ -343,18 +348,18 @@
       *
                MOVE    JYURRK-REC          TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_jyurrk_prv"    TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               MOVE    PATH-TBL-JYURRK-PRV-KEY
+                                           TO  MCP-PATH
+               CALL    "MCPSUB"            USING
                                            MCPAREA
                                            MCPDATA-REC
-               MOVE    "tbl_jyurrk"    TO  MCP-TABLE
-               MOVE    "key31"         TO  MCP-PATHNAME
+               MOVE    PATH-TBL-JYURRK-KEY31
+                                       TO  MCP-PATH
                PERFORM 970-JYURRK-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key31"              TO  MCP-PATHNAME
+           MOVE    PATH-TBL-JYURRK-KEY31
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
            .
       *
@@ -372,35 +377,38 @@
            MOVE    SPA-SRYYMD(1:6)     TO  ACCT-SRYYM
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-SRYACCT-KEY7
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_sryacct"   TO  MCP-TABLE
-               MOVE    "key7"          TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SRYACCT-KEY7
+                                       TO  MCP-PATH
                PERFORM 930-SRYACCT-NEXT2-SEC
+               DISPLAY "take acct fetch = " MCP-RC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    1               TO  FLG-SRYACCT
+               DISPLAY "take acct fetch ng = " MCP-RC
            END-IF
            PERFORM
                    UNTIL       FLG-SRYACCT     =   1
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_sryacct_prv"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               MOVE    PATH-TBL-SRYACCT-PRV-KEY
+                                       TO  MCP-PATH
+               DISPLAY "take acct loop"
+               CALL    "MCPSUB"            USING
                                            MCPAREA
-                                       MCPDATA-REC
-               MOVE    "tbl_sryacct"   TO  MCP-TABLE
-               MOVE    "key7"          TO  MCP-PATHNAME
+                                           MCPDATA-REC
+               MOVE    PATH-TBL-SRYACCT-KEY7
+                                       TO  MCP-PATH
                PERFORM 930-SRYACCT-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
+           MOVE    PATH-TBL-SRYACCT-KEY7
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
            .
       *
@@ -418,37 +426,38 @@
            MOVE    SPA-SRYYMD(1:6)     TO  ACCTP-SRYYM
            MOVE    SRYACCTPLUS-REC     TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-      *****************************************************************
-           MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-SRYACCT-KEY3
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
-      *****************************************************************
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SRYACCT-KEY3
+                                       TO  MCP-PATH
                PERFORM 930-SRYACCTPLUS-NEXT2-SEC
+               DISPLAY "take acctplus fetch = " MCP-RC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    1               TO  FLG-SRYACCTPLUS
+               DISPLAY "take acctplus fetch ng = " MCP-RC
            END-IF
            PERFORM
                    UNTIL       FLG-SRYACCTPLUS =   1
                MOVE    SRYACCTPLUS-REC     TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_sryacctplus_prv"   TO  MCP-TABLE
-               MOVE    "key"              TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               MOVE    PATH-TBL-SRYACCTPLUS-PRV-KEY
+                                       TO  MCP-PATH
+               DISPLAY "take acctplus loop"
+               CALL    "MCPSUB"            USING
                                            MCPAREA
                                            MCPDATA-REC
-               MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SRYACCT-KEY3
+                                       TO  MCP-PATH
                PERFORM 930-SRYACCTPLUS-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    PATH-TBL-SRYACCT-KEY3
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
            .
       *
@@ -466,36 +475,40 @@
            MOVE    SPA-SRYYMD(1:6)     TO  SANTEI-SRYYM
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-SANTEI-KEY10
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SANTEI-KEY10
+                                       TO  MCP-PATH
                PERFORM 915-SANTEI-NEXT2-SEC
+               DISPLAY "take santei fetch = " MCP-RC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    1               TO  FLG-SANTEI
+               DISPLAY "take santei fetch ng = " MCP-RC
            END-IF
            PERFORM
                    UNTIL       FLG-SANTEI     =   1
                MOVE    SANTEI-REC          TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_santei_prv"    TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               MOVE    PATH-TBL-SANTEI-PRV-KEY
+                                       TO  MCP-PATH
+               DISPLAY "take santei insert loop" SRY-ZAINUM
+               CALL    "MCPSUB"            USING
                                            MCPAREA
                                            MCPDATA-REC
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SANTEI-KEY10
+                                       TO  MCP-PATH
                PERFORM 915-SANTEI-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    PATH-TBL-SANTEI-KEY10
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
+           DISPLAY "take santei next" SRY-ZAINUM
            INITIALIZE                      SANTEI-REC
            MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
            MOVE    SPA-PTID            TO  SANTEI-PTID
@@ -506,18 +519,20 @@
            MOVE   "113006510"          TO  SANTEI-SRYCD
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key8"              TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key8"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
                PERFORM 915-SANTEI-NEXT2-SEC
+               DISPLAY "take santei fetch = " MCP-RC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    1               TO  FLG-SANTEI
+               DISPLAY "take santei fetch ng = " MCP-RC
            END-IF
            PERFORM
                    UNTIL       FLG-SANTEI     =   1
@@ -526,20 +541,22 @@
                CONTINUE
             ELSE
                MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_santei_prv"    TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               MOVE    PATH-TBL-SANTEI-PRV-KEY
+                                       TO  MCP-PATH
+               DISPLAY "take santei insert loop" SANTEI-SRYCD 
+               CALL    "MCPSUB"            USING
                                            MCPAREA
                                            MCPDATA-REC
             END-IF
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key8"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
                PERFORM 915-SANTEI-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key8"              TO  MCP-PATHNAME
+           MOVE    PATH-TBL-SANTEI-KEY8
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
+           DISPLAY "take santei end" SRY-ZAINUM
            .
       *
        100-SANTEIPRV-INS-EXT.
@@ -556,38 +573,41 @@
            MOVE    SPA-SRYYMD(1:6)     TO  SRY-SRYYM
            MOVE    SRYACT-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_sryact"        TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-SRYACT-KEY4
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_sryact"        TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SRYACT-KEY4
+                                       TO  MCP-PATH
                PERFORM 915-SRYACT-NEXT2-SEC
+               DISPLAY "take act fetch = " MCP-RC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    1               TO  FLG-SRYACT
+               DISPLAY "take act fetch ng = " MCP-RC
            END-IF
            PERFORM
                    UNTIL       FLG-SRYACT     =   1
                MOVE    SRYACT-REC          TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_sryact_prv"    TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               MOVE    PATH-TBL-SRYACT-PRV-KEY
+                                       TO  MCP-PATH
+               DISPLAY "take act init loop" SRY-ZAINUM
+               CALL    "MCPSUB"            USING
                                            MCPAREA
                                            MCPDATA-REC
       *
                PERFORM 100-PTCOMPRV-INS-SEC
       *
-               MOVE    "tbl_sryact"        TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-SRYACT-KEY4
+                                       TO  MCP-PATH
                PERFORM 915-SRYACT-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_sryact"        TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
+           MOVE    PATH-TBL-SRYACT-KEY4
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
            .
       *
@@ -605,35 +625,45 @@
            MOVE    SRY-RENNUM          TO  PTCOM-RENNUM
            MOVE    PTCOM-REC           TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_ptcom"         TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+      *T   MOVE    PATH-TBL-PTCOM-KEY3
+           MOVE    PATH-TBL-PTCOM-KEY2
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_ptcom"         TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
+      *T       MOVE    PATH-TBL-PTCOM-KEY3
+               MOVE    PATH-TBL-PTCOM-KEY2
+                                       TO  MCP-PATH
                PERFORM 915-PTCOM-NEXT2-SEC
+               DISPLAY "take ptcom fetch = " MCP-RC
            ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    1               TO  FLG-PTCOM
+               DISPLAY "take ptcom select ng = " MCP-RC
            END-IF
            PERFORM
                    UNTIL       FLG-PTCOM      =   1
                MOVE    PTCOM-REC           TO  MCPDATA-REC
-               MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_ptcom_prv"     TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
+               PERFORM 1001-PTCOMPRV-CHK-SEC
+               IF      FLG-PTCOM           =   1 
+                   MOVE    "DBINSERT"      TO  MCP-FUNC
+                   MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                           TO  MCP-PATH
+                   DISPLAY "take ptcom init loop" PTCOM-ZAINUM
+                   CALL    "MCPSUB"        USING
                                            MCPAREA
                                            MCPDATA-REC
-               MOVE    "tbl_ptcom"         TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
+               END-IF
+      *T       MOVE    PATH-TBL-PTCOM-KEY3
+               MOVE    PATH-TBL-PTCOM-KEY2
+                                       TO  MCP-PATH
                PERFORM 915-PTCOM-NEXT2-SEC
            END-PERFORM
       *
-           MOVE    "tbl_ptcom"         TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+      *T   MOVE    PATH-TBL-PTCOM-KEY3
+           MOVE    PATH-TBL-PTCOM-KEY2
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
            .
       *
@@ -643,24 +673,47 @@
       *----->take add ed
       *
       *****************************************************************
+      *    患者コメントチェック処理
+      *****************************************************************
+       1001-PTCOMPRV-CHK-SEC      SECTION.
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                       TO  MCP-PATH
+               PERFORM 915-PTCOM-NEXT2-SEC
+           END-IF
+           MOVE    PATH-TBL-PTCOM-PRV-KEY
+                                       TO  MCP-PATH
+           PERFORM 990-DBCLOSE2-SEC
+           .
+      *
+       1001-PTCOMPRV-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    患者マスター読込
       *****************************************************************
        940-PTINF-READ-SEC         SECTION.
       *
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           MOVE    "PTINF-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    "DBFETCH"           TO  MCP-FUNC
-               MOVE    "tbl_ptinf"         TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
-                                           MCPAREA
-                                           MCPDATA-REC
+               MOVE    "PTINF-KEY"         TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"          USING
+                                            MCPAREA
+                                            ORCMCPAREA
+                                            MCPDATA-REC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC        TO  PTINF-REC
                    MOVE    ZERO               TO  FLG-PTINF
@@ -671,8 +724,7 @@
                MOVE    1              TO  FLG-PTINF
            END-IF
       *
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "PTINF-KEY"         TO  ORC-DBPATH
            PERFORM 990-DBCLOSE-SEC
       *
            .
@@ -687,18 +739,18 @@
       *
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_ptinf_prv"     TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           CALL    "MONFUNC"           USING
+           MOVE    PATH-TBL-PTINF-PRV-KEY
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    "DBFETCH"       TO  MCP-FUNC
-               MOVE    "tbl_ptinf_prv"     TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"           USING
-                                           MCPAREA
-                                           MCPDATA-REC
+               MOVE    PATH-TBL-PTINF-PRV-KEY
+                                       TO  MCP-PATH
+               CALL    "MCPSUB"        USING
+                                       MCPAREA
+                                       MCPDATA-REC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC        TO  PTINF-REC
                    MOVE    ZERO               TO  FLG-PTINFPRV
@@ -709,8 +761,8 @@
                MOVE    1              TO  FLG-PTINFPRV
            END-IF
       *
-           MOVE    "tbl_ptinf_prv"     TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    PATH-TBL-PTINF-PRV-KEY
+                                       TO  MCP-PATH
            PERFORM 990-DBCLOSE2-SEC
       *
            .
@@ -724,9 +776,10 @@
        990-DBCLOSE-SEC         SECTION.
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
       *
            .
        990-DBCLOSE-EXT.
@@ -738,9 +791,9 @@
        990-DBCLOSE2-SEC         SECTION.
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "MCPSUB"             USING
+                                        MCPAREA
+                                        MCPDATA-REC
       *
            .
        990-DBCLOSE2-EXT.
@@ -754,7 +807,7 @@
        970-JYURRK-NEXT2-SEC           SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
@@ -775,9 +828,9 @@
        930-SRYACCT-NEXT2-SEC         SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "MCPSUB"             USING
+                                        MCPAREA
+                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  SRYACCT-REC
                MOVE    ZERO                TO  FLG-SRYACCT
@@ -795,9 +848,9 @@
        930-SRYACCTPLUS-NEXT2-SEC         SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "MCPSUB"             USING
+                                        MCPAREA
+                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  SRYACCTPLUS-REC
                MOVE    ZERO                TO  FLG-SRYACCTPLUS
@@ -815,9 +868,9 @@
        915-SRYACT-NEXT2-SEC         SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "MCPSUB"             USING
+                                        MCPAREA
+                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  SRYACT-REC
                MOVE    ZERO                TO  FLG-SRYACT
@@ -835,9 +888,9 @@
        915-PTCOM-NEXT2-SEC             SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "MCPSUB"             USING
+                                        MCPAREA
+                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  PTCOM-REC
                MOVE    ZERO                TO  FLG-PTCOM
@@ -855,9 +908,9 @@
        915-SANTEI-NEXT2-SEC            SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           CALL    "MCPSUB"             USING
+                                        MCPAREA
+                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  SANTEI-REC
                MOVE    ZERO                TO  FLG-SANTEI
@@ -875,7 +928,7 @@
        990-DBCLOSE-2-SEC         SECTION.
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
       *
