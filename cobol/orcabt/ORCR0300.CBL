@@ -189,6 +189,9 @@
       *                                     改行までを１レコードとする
       *  02.09.06    NACL-藤原    06/06/14  外来迅速検体検査加算を算定した
       *                                     検査にコメントがある場合の記載
+      *  02.09.07    NACL-藤原    06/07/10  外来迅速検体検査加算を算定した
+      *                                     検査にあるユーザーコメントを
+      *                                     フリーコメントに置き換える
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3143,6 +3146,24 @@
                MOVE    RECE05-NAMEINF (IDX)
                                        TO  TBL-KENTAI-RECE05-NAMEINF
                            (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+      *
+               IF      RECE05-SRYCD (IDX)   =   "810000001"
+                   CONTINUE
+               ELSE
+      *            部位／薬剤／ユーザーコメント
+                   IF      RECE05-SRYCD (IDX) (1:1)     =   "0"
+                       MOVE    "810000001"     TO  
+                                       TBL-KENTAI-RECE05-SRYCD
+                           (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+                   END-IF
+      *            コメント
+                   IF    ( RECE05-SRYCD (IDX) (1:1)     =   "8"   )
+                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008" )
+                       MOVE    RECE05-INPUTCOMENT (IDX)     TO
+                                       TBL-KENTAI-RECE05-NAME
+                           (TBL-KENTAI-RECE04-MAX TBL-KENTAI-RECE05-MAX)
+                   END-IF
+               END-IF
            END-IF
       *
            .
