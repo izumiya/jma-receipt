@@ -47,6 +47,12 @@
       *
       *  02.08.01    NACL-藤原    06/02/01  自院病名コード検索追加
       *  02.08.02    NACL-藤原    06/03/30  複数病名検索時のまとめかたの修正
+      *  03.00.02    NACL-藤原    06/07/03   同一病名のときのエラーメッセ
+      *                                      ージ(0002)を変更
+      *  03.00.03    NACL-藤原    06/07/05   入力したコードにエラーがある
+      *                                      とき確定で戻らないようにする
+      *  03.00.04    NACL-藤原    06/07/07   移行先病名で遷移したとき移行
+      *                                      前の病名に戻らないようにする
       ****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -116,6 +122,8 @@
            03  WRK-SEIGYO          PIC X(01). 
       * 
            03  WRK-C04-BYO-ROW     PIC S9(09). 
+      *
+           03  WRK-ERR-BYOMEI      PIC X(80).
       *
            03  WRK-CIDMSG          PIC X(80).
       *
@@ -261,8 +269,8 @@
                        GO  TO  100-INIT-EXT
                    END-IF
       *
-                   PERFORM 5001-MAPCUR-SEC
                END-IF
+               PERFORM 5001-MAPCUR-SEC
                MOVE    SPACE           TO  SPA-C01-ERRCD
            ELSE
       *        初期画面セット
@@ -364,43 +372,42 @@
       *
                  IF      SPA-C01-TUSERBYOMEIFLG (IDX)    =   "1"
                    IF      SPA-C01-INDEX   =   ZERO
-                     INITIALIZE                  USERBYOMEI-REC
-                     MOVE    SPA-HOSPID          TO  USBYO-HOSPID
-                     MOVE    SPA-GMN-C04-INPUTCD(IDX)
-                                                 TO  USBYO-BYOMEIINPUTCD
-                     PERFORM 900-USBYO-INV-SEC                            
-                     IF      FLG-USERBYOMEI      =   ZERO
-                         MOVE    USBYO-BYOMEI        TO
-                                            SPA-NAI-C04-BYOMEI   (IDX)
-                         MOVE    USBYO-BYOMEISBT     TO
+                       PERFORM VARYING IDZ FROM    1   BY  1
+                               UNTIL   IDZ >       6
+                           IF      SPA-C01-TBYOMEICD (IDX)
+                                       =   SPA-GMN-C02-BYOMEICD (IDZ)
+                               PERFORM VARYING IDX3    FROM    1   BY  1
+                                       UNTIL   IDX3    >       21
+                                       OR      SPA-NAI-C02-BYOMEICD-O
+                                                              (IDZ IDX3)
+                                                       =   SPACE
+                                       OR      SPA-NAI-C02-BYOMEICD-O
+                                                              (IDZ IDX3)
+                                                       =   ALL "9"
+                                   MOVE
+                                       SPA-NAI-C02-BYOMEICD-O (IDZ IDX3)
+                                           TO  SPA-NAI-C04-BYOMEICD-O
+                                                              (IDX IDX3)
+                                   MOVE
+                                       SPA-NAI-C02-BYOMEI-O   (IDZ IDX3)
+                                           TO  SPA-NAI-C04-BYOMEI-O
+                                                              (IDX IDX3)
+                               END-PERFORM    
+                               MOVE    SPA-NAI-C02-BYOMEI  (IDZ)
+                                           TO  SPA-NAI-C04-BYOMEI (IDX)
+      *******                  MOVE    SPA-NAI-C02-BYOMEITOP  (IDZ)
+      *******                              TO SPA-NAI-C04-BYOMEITOP(IDX)
+                               MOVE    SPA-NAI-C02-BYOMEISBT  (IDZ)
+                                           TO SPA-NAI-C04-BYOMEISBT(IDX)
+                               MOVE    6   TO  IDZ
+                           END-IF
+                       END-PERFORM 
+                     ELSE
+                       MOVE    SPA-C01-TBYOMEI (IDX)     TO
+                                           SPA-NAI-C04-BYOMEI    (IDX)
+                       MOVE    SPA-C01-TBYOMEISBT (IDX)  TO
                                            SPA-NAI-C04-BYOMEISBT (IDX)
-                         PERFORM VARYING IDY FROM    1   BY  1
-                                 UNTIL   IDY >       21
-                                 OR      USBYO-BYOMEICD(IDY) =   SPACE
-                             MOVE    USBYO-BYOMEICD (IDY)    TO
-                                       SPA-NAI-C04-BYOMEICD-O (IDX IDY)
-                             IF      SPA-NAI-C04-BYOMEICD-O (IDX IDY)
-                                                   =   WRK-CONS-BYOMEICD
-                                 MOVE    SPA-NAI-C04-BYOMEI   (IDX)
-                                           TO
-                                       SPA-NAI-C04-BYOMEI-O (IDX IDY)
-                             ELSE                           
-                                 MOVE    SPA-NAI-C04-BYOMEICD-O(IDX IDY)
-                                           TO   BYO-BYOMEICD
-                                 PERFORM 900-BYOMEI-READ-SEC
-                                 IF      FLG-BYOMEI        =   ZERO
-                                     MOVE    BYO-BYOMEI    TO
-                                       SPA-NAI-C04-BYOMEI-O    (IDX IDY)
-                                 END-IF 
-                             END-IF    
-                         END-PERFORM   
                      END-IF
-                   ELSE
-                     MOVE    SPA-C01-TBYOMEI (IDX)     TO
-                                            SPA-NAI-C04-BYOMEI   (IDX)
-                     MOVE    SPA-C01-TBYOMEISBT (IDX)  TO
-                                           SPA-NAI-C04-BYOMEISBT (IDX)
-                   END-IF
                  ELSE
                    MOVE    SPA-C01-TBYOMEI  (IDX)
                                        TO  SPA-NAI-C04-BYOMEI    (IDX)
@@ -994,6 +1001,7 @@
                PERFORM 900-USBYO-INV-SEC                            
                IF      FLG-USERBYOMEI      =   1
                    MOVE    "0004"          TO  SPA-ERRCD    
+                   MOVE    "■■■"        TO  SPA-NAI-C04-BYOMEI (IDZ)
                ELSE
                    MOVE    USBYO-BYOMEI    TO  SPA-NAI-C04-BYOMEI (IDZ)
                    MOVE    USBYO-BYOMEISBT TO
@@ -1685,6 +1693,19 @@
                GO  TO  450-KAKUTEI-EXT
            END-IF
       *
+      *    コードチェック
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       6
+               IF    ( SPA-GMN-C04-INPUTCD (IDX)
+                                           NOT =   SPACE )
+               AND   ( SPA-NAI-C04-BYOMEI(IDX) (1:2)
+                                               =   "■"  )
+                   COMPUTE SPA-GMN-C04-CUR     =   IDX     +   2
+                   MOVE    "0004"              TO  SPA-ERRCD
+                   GO  TO  450-KAKUTEI-EXT
+               END-IF
+           END-PERFORM    
+      *
       *    病名重複チェック
            MOVE    SPACE                   TO  WRK-BYOMEI-AREA
            MOVE    ZERO                    TO  IDY
@@ -1713,6 +1734,7 @@
                MOVE    WRK-BYOMEI      TO  WRK-BYOMEI-O (IDY)
            END-IF
       *
+           MOVE    SPACE               TO  WRK-ERR-BYOMEI
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       6
                    OR      WRK-BYOMEI-O (IDX)  =   SPACE
@@ -1722,7 +1744,9 @@
                    IF      IDY             >   IDX
                        IF      WRK-BYOMEI-O (IDX)  =
                                                WRK-BYOMEI-O (IDY)
-                           MOVE    "0002"              TO  SPA-ERRCD
+                           MOVE    "0002"          TO  SPA-ERRCD
+                           MOVE    WRK-BYOMEI-O (IDX)
+                                                   TO  WRK-ERR-BYOMEI
                            GO  TO  450-KAKUTEI-EXT
                        END-IF
                    END-IF
@@ -1938,8 +1962,11 @@
                WHEN    "0001"
                    MOVE    "入力エラーです"            TO  SPA-ERRMSG
                WHEN    "0002"
-                   MOVE    "既に同一病名入力コードが存在します" 
-                                                       TO  SPA-ERRMSG
+                   STRING   WRK-ERR-BYOMEI     DELIMITED   BY  SPACE
+                            "が複数入力されています"
+                                               DELIMITED   BY  SIZE 
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0003"
                    MOVE
                        "変更処理中なので病名はひとつしか入力できません"
@@ -1982,6 +2009,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  WRK-HAISIYMDH     
+                                            WRK-ERR-BYOMEI      
       *
            MOVE    SPACE                TO  CERR
            MOVE    SPA-ERRCD            TO  CERR-ERRCODE
