@@ -117,6 +117,9 @@
       *                                     「職務上」、「下船３月以内」、
       *                                     「通勤」について食事標準負担額を
       *                                     記録しないようにする
+      *  02.09.10    NACL-藤原    06/07/10  外来迅速検体検査加算を算定した
+      *                                     検査にあるユーザーコメントを
+      *                                     フリーコメントに置き換える
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3476,6 +3479,24 @@
                MOVE    RECE65-NAMEINF (IDX)
                                        TO  TBL-KENTAI-RECE65-NAMEINF
                            (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
+      *
+               IF      RECE65-SRYCD (IDX)   =   "810000001"
+                   CONTINUE
+               ELSE
+      *            部位／薬剤／ユーザーコメント
+                   IF      RECE65-SRYCD (IDX) (1:1)     =   "0"
+                       MOVE    "810000001"     TO  
+                                       TBL-KENTAI-RECE65-SRYCD
+                           (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
+                   END-IF
+      *            コメント
+                   IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
+                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
+                       MOVE    RECE65-INPUTCOMENT (IDX)     TO
+                                       TBL-KENTAI-RECE65-NAME
+                           (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
+                   END-IF
+               END-IF
            END-IF    
       *
            .
