@@ -184,6 +184,9 @@
       *                                      登録時の変更時の複数病名のチ
       *                                      ェックの追加
       *  02.08.05    NACL-藤原    06/04/04   自院病名検索時の病名種別のセット
+      *
+      *  02.09.01    NACL-藤原    06/07/06  自院コード入力時の移行病名の
+      *                                     特定疾患の表示をする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -899,6 +902,8 @@
                                        SPA-NAI-C02-BYOMEI-O (IDZ IDX2)
                            MOVE    BYO-HAISIYMD    TO
                                        SPA-NAI-C02-HAISIYMD (IDZ)
+                           MOVE    BYO-TOKSKNCD    TO
+                                       SPA-NAI-C02-TOKSKNCD (IDZ)
                        END-IF
                        MOVE    SPA-NAI-C02-BYOMEI-O (IDZ 1)
                                                TO
@@ -1872,6 +1877,14 @@
                            MOVE    SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
                                        TO  SPA-NAI-C02-BYOMEICD-O
                                                           (IDZ IDX3)
+                                           BYO-BYOMEICD
+                           PERFORM 900-BYOMEI-READ-SEC
+                           IF      FLG-BYOMEI      =   ZERO
+                               MOVE    BYO-HAISIYMD    TO
+                                           SPA-NAI-C02-HAISIYMD (IDZ)
+                               MOVE    BYO-TOKSKNCD    TO
+                                           SPA-NAI-C02-TOKSKNCD (IDZ)
+                           END-IF
                            MOVE    SPA-NAI-C04-BYOMEI-O (IDX IDX3)
                                        TO  SPA-NAI-C02-BYOMEI-O
                                                           (IDZ IDX3)
@@ -1899,6 +1912,14 @@
                    MOVE    SPA-NAI-C04-BYOMEICD-O (IDZ IDX3)
                                        TO  SPA-NAI-C02-BYOMEICD-O
                                                           (IDZ IDX3)
+                                           BYO-BYOMEICD
+                   PERFORM 900-BYOMEI-READ-SEC
+                   IF      FLG-BYOMEI      =   ZERO
+                       MOVE    BYO-HAISIYMD    TO
+                                           SPA-NAI-C02-HAISIYMD (IDZ)
+                       MOVE    BYO-TOKSKNCD    TO
+                                           SPA-NAI-C02-TOKSKNCD (IDZ)
+                   END-IF
                    MOVE    SPA-NAI-C04-BYOMEI-O   (IDZ IDX3)
                                        TO  SPA-NAI-C02-BYOMEI-O
                                                           (IDZ IDX3)
@@ -7750,10 +7771,14 @@
                    ADD     1               TO  IDY              
                    MOVE    SPA-GMN-C02-BYOMEICD (IDX)
                                            TO  SPA-C01-TBYOMEICD (IDY)
-      *************MOVE    SPA-NAI-C02-BYOMEI   (IDX)
-      *************                        TO  SPA-C01-TBYOMEI   (IDY)
                    MOVE    "1"             TO  SPA-C01-TUSERBYOMEIFLG
                                                                  (IDY)
+                   MOVE    SPA-NAI-C02-BYOMEI   (IDX)
+                                           TO  SPA-C01-TBYOMEI   (IDY)
+                   MOVE    SPA-NAI-C02-BYOMEITOP (IDX)
+                                           TO  SPA-C01-TBYOMEITOP (IDY)
+                   MOVE    SPA-NAI-C02-BYOMEISBT (IDX)
+                                           TO  SPA-C01-TBYOMEISBT (IDY)
                END-IF                              
            END-PERFORM
       *
