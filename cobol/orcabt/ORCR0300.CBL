@@ -196,6 +196,7 @@
       *  03.00.04    NACL-藤原    06/07/10  外来迅速検体検査加算を算定した
       *                                     検査にあるユーザーコメントを
       *                                     フリーコメントに置き換える
+      *  03.00.05    NACL-藤原    06/07/11  前期高齢者の一部負担金の記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1890,6 +1891,12 @@
       *    医療保険一部負担金額
            IF      RECE02-FTNMONEY(IDX1)
                                        >   ZERO
+               IF    ( RECE02-RECESYUBETU (4:1)
+                                           =   "8" OR  "0" )
+               AND   ( RECE02-RJNHKNNUM    =   SPACE       )
+                   MOVE    RECE02-FTNMONEY(IDX1) TO  WRK-NUM
+                   MOVE    9                     TO  WRK-NAGASA
+               END-IF
                IF    ( RECE02-HKNNUM       =   "002" )
                AND   ( RECE02-HOJOKBN      =   "3"   )
                    MOVE    RECE02-FTNMONEY(IDX1) TO  WRK-NUM
