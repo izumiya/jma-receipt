@@ -4256,6 +4256,9 @@
                                        SPA-AREA
                                        ORCSSYU40AREA
                                        SYUNOU-REC
+           ELSE
+      *        診療区分別給付外点数クリア
+               INITIALIZE              SYU-KYUFUGAI
            END-IF
       *
            .
