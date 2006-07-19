@@ -123,6 +123,8 @@
       *  02.09.10    NACL-藤原    06/07/10  外来迅速検体検査加算を算定した
       *                                     検査にあるユーザーコメントを
       *                                     フリーコメントに置き換える
+      *  02.09.11    NACL-藤原    06/07/18  外来迅速検体検査加算にコメント
+      *                                     がある場合の記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -335,7 +337,8 @@
            03  IDZ3                    PIC 9(03).
            03  IDZ4                    PIC 9(03).
            03  IDZ5                    PIC 9(03).
-          03  SYSKAN-IDX              PIC 9(03).
+           03  IDZ6                    PIC 9(03).
+           03  SYSKAN-IDX              PIC 9(03).
       *    
        01  KEY-AREA                          VALUE   LOW-VALUE.          
            03  KEY-NEW.
@@ -455,6 +458,7 @@
            03  WRK-SRYCD72-MAX         PIC 9(03).           
            03  WRK-KOKUJISKBKBN1-KOUI-TEN
                                        PIC 9(09)V9(02).     
+           03  WRK-RECE64-ZAIKAISU     PIC 9(04).    
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
       *
@@ -793,13 +797,12 @@
       *
       *    外来迅速検体検査加算用退避エリア
        01  TBL-KASAN-RECE64-AREA.
-         02  TBL-KASAN-RECE64-REC  OCCURS  5.
+         02  TBL-KASAN-RECE64-REC  OCCURS  100.
       *
            COPY    "CPRCF0641.INC"  REPLACING  //RECE641//
                                    BY          //TBL-KASAN-RECE64//.
       *
-         02  TBL-KASAN-RECE65-REC  OCCURS  5.
-           03  TBL-KASAN-RECE65-REC.   
+           03  TBL-KASAN-RECE65-REC  OCCURS  5.
                05  TBL-KASAN-RECE65-SRYACTINF.
       *診療コード
                    07  TBL-KASAN-RECE65-SRYCD           PIC  X(09).
@@ -866,6 +869,7 @@
                    07  TBL-KASAN-RECE65-NAME             PIC  X(200).
       *
          02  TBL-KASAN-RECE64-MAX  PIC 9(03).
+         02  TBL-KASAN-RECE65-MAX  PIC 9(03).
       *
       *    検体検査用退避エリア
        01  TBL-KENTAI-RECE64-AREA.
@@ -3092,6 +3096,7 @@
                END-IF
            END-IF
            MOVE    ZERO                 TO  TBL-KENTAI-RECE65-MAX
+                                            TBL-KASAN-RECE65-MAX 
       *
            INITIALIZE                      RECE65-REC
            MOVE    RECE641-HOSPID       TO  RECE65-HOSPID
@@ -3469,13 +3474,20 @@
            IF      RECE65-SRYCD (IDX) (1:1)  =   "1"
                IF      RECE641-KNSJISGRPKBN    =   99
                    IF      RECE65-SRYCD (IDX)      =   WRK-CONS-SRYCD
-                       MOVE    RECE65-SRYACTINF (IDX)
-                                       TO  TBL-KASAN-RECE65-SRYACTINF
-                                               (TBL-KASAN-RECE64-MAX)
-                       MOVE    RECE65-NAMEINF   (IDX)
-                                       TO  TBL-KASAN-RECE65-NAMEINF
-                                               (TBL-KASAN-RECE64-MAX)
+                       MOVE    1               TO  TBL-KASAN-RECE65-MAX
+                   ELSE
+                       IF      TBL-KASAN-RECE65-MAX
+                                               =   ZERO
+                           MOVE    1           TO  TBL-KASAN-RECE65-MAX
+                       END-IF
+                       ADD     1               TO  TBL-KASAN-RECE65-MAX
                    END-IF
+                   MOVE    RECE65-SRYACTINF (IDX)
+                                       TO  TBL-KASAN-RECE65-SRYACTINF
+                           (TBL-KASAN-RECE64-MAX TBL-KASAN-RECE65-MAX)
+                   MOVE    RECE65-NAMEINF   (IDX)
+                                       TO  TBL-KASAN-RECE65-NAMEINF
+                           (TBL-KASAN-RECE64-MAX TBL-KASAN-RECE65-MAX)
                ELSE
                    ADD     1               TO  TBL-KENTAI-RECE65-MAX
                    MOVE    RECE65-SRYACTINF (IDX)
@@ -3491,32 +3503,64 @@
                    END-IF
                END-IF
            ELSE
-               ADD     1               TO  TBL-KENTAI-RECE65-MAX
-               MOVE    RECE65-SRYACTINF (IDX)
+               IF      RECE641-KNSJISGRPKBN    =   99
+                   IF      TBL-KASAN-RECE65-MAX
+                                               =   ZERO
+                       MOVE    1           TO  TBL-KASAN-RECE65-MAX
+                   END-IF
+                   ADD     1               TO  TBL-KASAN-RECE65-MAX
+                   MOVE    RECE65-SRYACTINF (IDX)
+                                       TO  TBL-KASAN-RECE65-SRYACTINF
+                           (TBL-KASAN-RECE64-MAX TBL-KASAN-RECE65-MAX)
+                   MOVE    RECE65-NAMEINF   (IDX)
+                                       TO  TBL-KASAN-RECE65-NAMEINF
+                           (TBL-KASAN-RECE64-MAX TBL-KASAN-RECE65-MAX)
+      *
+                   IF      RECE65-SRYCD (IDX)   =   "810000001"
+                       CONTINUE
+                   ELSE
+      *                部位／薬剤／ユーザーコメント
+                       IF      RECE65-SRYCD (IDX) (1:1)     =   "0"
+                           MOVE    "810000001"     TO  
+                                       TBL-KASAN-RECE65-SRYCD
+                           (TBL-KASAN-RECE64-MAX TBL-KASAN-RECE65-MAX)
+                       END-IF
+      *                コメント
+                       IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
+                       OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
+                           MOVE    RECE65-INPUTCOMENT (IDX)     TO
+                                       TBL-KASAN-RECE65-NAME
+                           (TBL-KASAN-RECE64-MAX TBL-KASAN-RECE65-MAX)
+                       END-IF
+                   END-IF
+               ELSE
+                   ADD     1               TO  TBL-KENTAI-RECE65-MAX
+                   MOVE    RECE65-SRYACTINF (IDX)
                                        TO  TBL-KENTAI-RECE65-SRYACTINF
                            (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
-               MOVE    RECE65-NAMEINF (IDX)
+                   MOVE    RECE65-NAMEINF (IDX)
                                        TO  TBL-KENTAI-RECE65-NAMEINF
                            (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
       *
-               IF      RECE65-SRYCD (IDX)   =   "810000001"
-                   CONTINUE
-               ELSE
-      *            部位／薬剤／ユーザーコメント
-                   IF      RECE65-SRYCD (IDX) (1:1)     =   "0"
-                       MOVE    "810000001"     TO  
+                   IF      RECE65-SRYCD (IDX)   =   "810000001"
+                       CONTINUE
+                   ELSE
+      *                部位／薬剤／ユーザーコメント
+                       IF      RECE65-SRYCD (IDX) (1:1)     =   "0"
+                           MOVE    "810000001"     TO  
                                        TBL-KENTAI-RECE65-SRYCD
                            (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
-                   END-IF
-      *            コメント
-                   IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
-                       MOVE    RECE65-INPUTCOMENT (IDX)     TO
+                       END-IF
+      *                コメント
+                       IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
+                       OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
+                           MOVE    RECE65-INPUTCOMENT (IDX)     TO
                                        TBL-KENTAI-RECE65-NAME
                            (TBL-KENTAI-RECE64-MAX TBL-KENTAI-RECE65-MAX)
+                       END-IF
                    END-IF
                END-IF
-           END-IF    
+           END-IF
       *
            .
        20012-KENSA-TAIHI-EXT.
@@ -3655,6 +3699,23 @@
                        PERFORM 20070-FTNKBN-HENSYU-SEC
                        MOVE    "60"                TO  WRK-SRYKBN
       *
+      *                日毎の同じ項目数の外来迅速検体検査加算の回数をまとめる
+                       MOVE    TBL-KASAN-RECE64-KAISU (IDZ2 1 IDZ1)
+                                               TO  WRK-RECE64-ZAIKAISU
+                       PERFORM VARYING IDZ6    FROM    IDZ2    BY  1
+                               UNTIL   IDZ6    >   TBL-KASAN-RECE64-MAX
+                           IF    ( TBL-KASAN-RECE64-KAISU (IDZ6 1 IDZ1)
+                                                       >   0           )
+                           AND   ( TBL-KASAN-RECE64-KOHBUNRI (IDZ2)
+                                                       =
+                                     TBL-KASAN-RECE64-KOHBUNRI (IDZ6) )
+                           AND   ( IDZ6                >   IDZ2       )    
+                               ADD   TBL-KASAN-RECE64-KAISU
+                                                       (IDZ6 1 IDZ1)
+                                               TO  WRK-RECE64-ZAIKAISU
+                           END-IF
+                       END-PERFORM
+      *
                        PERFORM VARYING IDZ3 FROM    1   BY  1
                                UNTIL   IDZ3 >   TBL-KENTAI-RECE64-MAX
       **                     IF    ( TBL-KENTAI-RECE64-KAISU (IDZ3 1 IDZ1)
@@ -3713,16 +3774,45 @@
       *                外来迅速検体検査加算
                        MOVE    TBL-KASAN-RECE64-REC (IDZ2)
                                                TO  RECE641-REC
-                       MOVE    TBL-KASAN-RECE64-KAISU (IDZ2 1 IDZ1)
+                       MOVE    WRK-RECE64-ZAIKAISU
                                                TO  RECE641-ZAIKAISU
                        MOVE    1               TO  IDZ4
                        MOVE    1               TO  IDZ5
                        INITIALIZE                  WRK-RECE65-REC
-                       MOVE    TBL-KASAN-RECE65-SRYACTINF (IDZ2)
+                       MOVE    TBL-KASAN-RECE65-SRYACTINF (IDZ2 1)
                                            TO  WRK-RECE65-SRYACTINF (1)
-                       MOVE    TBL-KASAN-RECE65-NAMEINF   (IDZ2)
+                       MOVE    TBL-KASAN-RECE65-NAMEINF   (IDZ2 1)
                                            TO  WRK-RECE65-NAMEINF   (1)
                        PERFORM 200781-KENSA-HENSYU-SEC
+      *
+      *                外来迅速検体検査加算と同剤のその他の入力
+                       PERFORM VARYING IDZ6    FROM    IDZ2    BY  1
+                               UNTIL   IDZ6    >   TBL-KASAN-RECE64-MAX
+                           IF    ( TBL-KASAN-RECE64-KAISU (IDZ6 1 IDZ1)
+                                                       >   0           )
+                           AND   ( TBL-KASAN-RECE64-KOHBUNRI (IDZ2)
+                                                       =
+                                     TBL-KASAN-RECE64-KOHBUNRI (IDZ6) )
+                               PERFORM VARYING IDZ4    FROM    2   BY  1
+                                       UNTIL   IDZ4    >       5
+                                       OR      TBL-KASAN-RECE65-SRYCD
+                                                           (IDZ6 IDZ4)
+                                               =   SPACE
+                                   INITIALIZE      WRK-RECE65-REC
+                                   MOVE    TBL-KASAN-RECE65-SRYACTINF
+                                                           (IDZ6 IDZ4)
+                                           TO  WRK-RECE65-SRYACTINF (1)
+                                   MOVE    TBL-KASAN-RECE65-NAMEINF
+                                                           (IDZ6 IDZ4)
+                                           TO  WRK-RECE65-NAMEINF   (1)
+                                   PERFORM 200781-KENSA-HENSYU-SEC
+                               END-PERFORM
+      *
+                               MOVE    ZERO
+                                           TO  TBL-KASAN-RECE64-KAISU
+                                                       (IDZ6 1 IDZ1)
+                           END-IF
+                       END-PERFORM    
       *
       *                検査日
                        INITIALIZE                  WRK-RECE65-REC
@@ -3737,9 +3827,6 @@
                                                TO  WRK-RECE65-NAME (1)
                        END-IF
                        PERFORM 200781-KENSA-HENSYU-SEC
-      *
-                       MOVE    ZERO            TO
-                                   TBL-KASAN-RECE64-KAISU (IDZ2 1 IDZ1)
                    END-IF
                END-PERFORM
            END-PERFORM
