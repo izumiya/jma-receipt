@@ -176,8 +176,8 @@
            03  WRK-SRYCD2          PIC X(09). 
       *
            03  WRK-TENSU-KEISAN.
-               05  WRK-SUM-TENSUKEI    PIC 9(08).
-               05  WRK-SUM-TENGAKEI    PIC 9(08).
+               05  WRK-SUM-TENSUKEI    PIC 9(08)V99.
+               05  WRK-SUM-TENGAKEI    PIC 9(08)V99.
       *        »£±ÆÎÁ¤ÎÅÀ¿ô·×
                05  WRK-TENSUKEI1       PIC S9(08)V999.
       *        ¿ÇÃÇÎÁ¤ÎÅÀ¿ô·×
@@ -2347,8 +2347,9 @@
                                            +   WRK-TENSUKEI3
                                            +   WRK-TENSUKEI
                WHEN    OTHER
-                   COMPUTE LNK-SC90-TENSU  =   WRK-SUM-TENSUKEI
-                                           +   WRK-SUM-TENGAKEI
+                   COMPUTE LNK-SC90-TENSU  =  (WRK-SUM-TENSUKEI
+                                           +   WRK-SUM-TENGAKEI )
+                                           +   0.5
            END-EVALUATE
       *
            .
@@ -2387,6 +2388,7 @@
                                                +   0.5
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
+                   MOVE    ZERO                TO  WRK-TENSUKEI
                END-IF
       *        ¡ó¸º»»
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
@@ -2399,6 +2401,7 @@
                                                /   100
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   MOVE    ZERO                TO  WRK-TENSUKEI
                END-IF
              END-IF
            END-PERFORM
