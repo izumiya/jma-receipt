@@ -189,6 +189,8 @@
       *  03.00.02    NACL-藤原    06/06/19   C06,C07,C08 削除
       *  03.00.03    NACL-藤原    06/07/06  自院コード入力時の移行病名の
       *                                     特定疾患の表示をする
+      *  03.00.04    NACL-藤原    06/07/21  保険組合せの名称の編集方法の
+      *                                     修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1677,13 +1679,17 @@
            END-IF    
       *     
            MOVE    COMB-HKNCOMBINUM    TO  SPA-GMN-C02-HKNCOMBIL(IDX)
-           MOVE    WRK-HKNCOMBIMEI     TO
+                                       SPA-NAI-C02-THKNCOMBINUM (IDX)
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    WRK-HKNCOMBIMEI     TO  KANACHK-MAE-INPUT
+           MOVE    35                  TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO
+                                       SPA-NAI-C02-THKNCOMBIMEI (IDX)
                                        SPA-GMN-C02-HKNCOMBIMEIL (IDX)
       *                                 
-           MOVE    COMB-HKNCOMBINUM    TO
-                                       SPA-NAI-C02-THKNCOMBINUM (IDX)
-           MOVE    WRK-HKNCOMBIMEI     TO
-                                       SPA-NAI-C02-THKNCOMBIMEI (IDX)
            MOVE    COMB-TEKSTYMD       TO  SPA-NAI-C02-TEKSTYMD(IDX)
            MOVE    COMB-TEKEDYMD       TO  SPA-NAI-C02-TEKEDYMD(IDX)
       *
