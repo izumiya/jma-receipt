@@ -3676,7 +3676,7 @@
                                            >   0
       *               …È√¥∂Ë ¨ ‘Ω∏ΩËÕ˝
                        MOVE    TBL-KASAN-RECE64-REC (IDZ2)
-                                               TO  RECE641-REC
+                                               TO  WRK-RECE641-REC
                        PERFORM 20070-FTNKBN-HENSYU-SEC
                        MOVE    "60"                TO  WRK-SRYKBN
       *
@@ -3819,7 +3819,7 @@
                                            >   0
       *            …È√¥∂Ë ¨ ‘Ω∏ΩËÕ˝
                    MOVE    TBL-KENTAI-RECE64-REC (IDZ3)
-                                               TO  RECE641-REC
+                                               TO  WRK-RECE641-REC
                    PERFORM 20070-FTNKBN-HENSYU-SEC
                    MOVE    "60"                TO  WRK-SRYKBN
                    PERFORM VARYING IDZ4    FROM    1   BY  1
