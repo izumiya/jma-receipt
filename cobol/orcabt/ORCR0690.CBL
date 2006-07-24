@@ -3075,7 +3075,8 @@
                                          NOT =   RECE64-HOJOKBN      )
                OR     ( RECE62-TEKSTYMD  NOT =   RECE64-TEKSTYMD     )
       *
-               IF     RECE64-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+      ***      IF     RECE64-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+               IF     RECE64-KNSJISGRPKBN    =   99
       *
                    PERFORM VARYING IDX FROM      1  BY  1
                            UNTIL   IDX >         31
