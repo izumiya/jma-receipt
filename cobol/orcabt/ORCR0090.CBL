@@ -3555,7 +3555,8 @@
                                          NOT =   RECE04-HOJOKBN      )
                OR     ( RECE02-TEKSTYMD  NOT =   RECE04-TEKSTYMD     )
       *
-               IF     RECE04-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+      ***      IF     RECE04-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+               IF     RECE04-KNSJISGRPKBN    =   99
       *
                    PERFORM VARYING IDX FROM      1  BY  1
                            UNTIL   IDX >         31
