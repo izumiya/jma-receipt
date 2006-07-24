@@ -2553,7 +2553,8 @@
                OR     ( RECE41-HKNID     NOT =   RECE44-HKNID        )
                OR     ( RECE41-TEKSTYMD  NOT =   RECE44-TEKSTYMD     )
       *
-               IF     RECE44-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+      ***      IF     RECE44-SRYCDTOTAL      =   WRK-CONS-GAIJINKEN-N
+               IF     RECE44-KNSJISGRPKBN    =   99
       *
                    PERFORM VARYING IDX FROM      1  BY  1
                            UNTIL   IDX >         31
