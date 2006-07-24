@@ -1545,6 +1545,8 @@
       ****           AND   (IDX            =   WRK-KENSA-MAX) 
                      AND   (TBL-SRYCD (IDX)(1:1)
                                        NOT =   "8")
+                     AND   (TBL-SRYCD (IDX)(1:3)
+                                       NOT =   "008")
                            PERFORM 200511-GJK-DAY-ADD-SEC
                    END-IF
                    ADD     1                   TO  IDX                     
