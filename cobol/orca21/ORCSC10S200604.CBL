@@ -4043,7 +4043,7 @@
                     (SPA-GMN-INPUTCD(IDX)(1:1)   =   "#"  OR
                                                      "$" )
       *              コメント
-                 OR (SPA-GMN-INPUTCD(IDX)(1:1)   =   "8" )
+                 OR (SPA-COM-INPUTCD(IDX)(1:1)   =   "8" )
                  CONTINUE
              ELSE
       *        小児科外来診療科の時、小児科外来診療科のみであること
@@ -4149,7 +4149,8 @@
                                                                 (IDX)
                            END-IF
       *                    その他の診療種別
-                           IF      SPA-GMN-INPUTCD(IDX)    =   ".800"
+                           IF      SPA-GMN-INPUTCD(IDX)(1:4)  =   ".800"
+                                                              OR  ".850"
                                MOVE    SPACE       TO  SPA-ERRCD
                                MOVE    SPACE       TO  SPA-COM-CUR
                                                                 (IDX)
