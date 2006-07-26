@@ -4047,7 +4047,8 @@
                                                                 (IDX)
                            END-IF
       *                    その他の診療種別
-                           IF      SPA-GMN-INPUTCD(IDX)    =   ".800"
+                           IF      SPA-GMN-INPUTCD(IDX)(1:4)  =   ".800"
+                                                              OR  ".850"
                                MOVE    SPACE       TO  SPA-ERRCD
                                MOVE    SPACE       TO  SPA-COM-CUR
                                                                 (IDX)
