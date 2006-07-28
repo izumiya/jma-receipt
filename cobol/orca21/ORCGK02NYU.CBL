@@ -7607,6 +7607,7 @@
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
            MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_wksryact"      TO  MCP-TABLE
                MOVE    "key7"              TO  MCP-PATHNAME
