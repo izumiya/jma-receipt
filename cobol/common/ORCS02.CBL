@@ -139,6 +139,7 @@
       *                                     ¹âÎð¼Ô¡¢Ä¹´ü¤Ë´Ø¤¹¤ëÉéÃ´·×»»½¤Àµ
       *  03.01.01    NACL-ÌçÏÆ    06/07/06  ÎÎ¼ý½ñÂÐ±þ
       *  03.01.02    NACL-ÌçÏÆ    06/07/20  ËÌ³¤Æ»¤ÎÆÃÄê¼À´µ¿©»öÂÐ±þ
+      *  03.02.01    NACL-ÌçÏÆ    06/07/31  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -213,6 +214,7 @@
            03  FLG-MIYAGI              PIC 9(01).
            03  FLG-FTNCHECK            PIC 9(01).
            03  FLG-NYUSKJJYOGAK        PIC 9(01).
+           03  FLG-KEIKASOCHI-IPAN     PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -2368,6 +2370,46 @@
                END-IF
            END-IF.                                               
       *
+      *    °ìÈÌ·Ð²áÁ¼ÃÖÂÐ¾Ý¼Ô
+           MOVE      ZERO     TO    FLG-KEIKASOCHI-IPAN.
+           IF  (LNK-S02-KOUREI-NYUIN-KBN      =   "1"    )
+           AND (LNK-SYU-SRYYMD(1:6)          >=  "200608")
+           AND (LNK-SYU-SRYYMD(1:6)          <=  "200808")
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPID       TO  PTKOH-HOSPID
+                MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+                MOVE    "978"                TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "DBSELECT"           TO  MCP-FUNC
+                MOVE    "PTKOHINF-KEY4"      TO  ORC-DBPATH
+                CALL    "ORCMCPSUB"           USING   MCPAREA
+                                                      ORCMCPAREA
+                                                      MCPDATA-REC
+                IF      MCP-RC               =       ZERO
+                    MOVE    "PTKOHINF-KEY4"  TO      ORC-DBPATH
+                    PERFORM  PTKOHINF-READ-SEC
+                    PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                        IF  (PTKOH-TEKSTYMD(1:6)  <=
+                                                 LNK-SYU-SRYYMD(1:6))
+                        AND (LNK-SYU-SRYYMD(1:6)  <=
+                                                 PTKOH-TEKEDYMD(1:6))
+                        AND (PTKOH-SAKJOKBN   =  SPACE              )
+                           MOVE    1         TO  FLG-KEIKASOCHI-IPAN
+                           MOVE    1         TO  FLG-PTKOHINF
+                        ELSE
+                           MOVE    "PTKOHINF-KEY4"  TO  ORC-DBPATH
+                           PERFORM  PTKOHINF-READ-SEC
+                        END-IF
+                    END-PERFORM
+                END-IF
+                MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
+                MOVE    "PTKOHINF-KEY4"      TO  ORC-DBPATH
+                CALL    "ORCMCPSUB"          USING
+                                             MCPAREA
+                                             ORCMCPAREA
+                                             MCPDATA-REC
+           END-IF.
+      *
       *    Ï«ºÒ¡¦¼«ÇåÀÕ¤ÎÉéÃ´³ä¹ç¤òµá¤á¤ë
       *
       *    IF   WK-HKNKBN              =   "1"
@@ -2852,12 +2894,16 @@
                            END-IF
                        WHEN   "02"
                            MOVE  "1"          TO   COMB-KOH1-NYUJGNKBN
-                           MOVE   72300       TO   MAX-KIN-KOHI1-M
-                           IF  (COMB-KOH2HKNNUM    =  SPACE)              
-                           AND (COMB-KOH3HKNNUM    =  SPACE)
-                           AND (COMB-KOH4HKNNUM    =  SPACE)
-                             MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
-                             MOVE   1           TO   FLG-IRYOHI
+                           IF   FLG-KEIKASOCHI-IPAN  =  1
+                             MOVE   40200       TO   MAX-KIN-KOHI1-M
+                           ELSE
+                             MOVE   72300       TO   MAX-KIN-KOHI1-M
+                             IF  (COMB-KOH2HKNNUM    =  SPACE)              
+                             AND (COMB-KOH3HKNNUM    =  SPACE)
+                             AND (COMB-KOH4HKNNUM    =  SPACE)
+                               MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                               MOVE   1           TO   FLG-IRYOHI
+                             END-IF
                            END-IF
                    END-EVALUATE
                ELSE
@@ -2877,13 +2923,17 @@
                        WHEN   "2"
                        WHEN   "6"
                        WHEN   "8"
-                           MOVE   72300       TO   MAX-KIN-SYU-M
-                           IF  (COMB-KOH1HKNNUM    =  SPACE)              
-                           AND (COMB-KOH2HKNNUM    =  SPACE)
-                           AND (COMB-KOH3HKNNUM    =  SPACE)
-                           AND (COMB-KOH4HKNNUM    =  SPACE)
-                             MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
-                             MOVE   2           TO   FLG-IRYOHI
+                           IF   FLG-KEIKASOCHI-IPAN  =  1
+                             MOVE   40200       TO   MAX-KIN-SYU-M
+                           ELSE
+                             MOVE   72300       TO   MAX-KIN-SYU-M
+                             IF  (COMB-KOH1HKNNUM    =  SPACE)              
+                             AND (COMB-KOH2HKNNUM    =  SPACE)
+                             AND (COMB-KOH3HKNNUM    =  SPACE)
+                             AND (COMB-KOH4HKNNUM    =  SPACE)
+                               MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                               MOVE   2           TO   FLG-IRYOHI
+                             END-IF
                            END-IF
                    END-EVALUATE
                END-IF

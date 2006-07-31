@@ -59,6 +59,7 @@
       *  02.00.18    NACL-ÌçÏÆ    06/06/01  ÆÃÄê¼À´µÅù¡ÜÄ¹´üÂÐ±þ
       *  03.01.01    NACL-ÌçÏÆ    06/06/26  ¡ãËÌ³¤Æ»¡ä£°£¹£±¡Ü£´£±Ï·¿Í¤Î
       *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
+      *  03.02.01    NACL-ÌçÏÆ    06/07/31  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -513,7 +514,8 @@
                       (SPA-ERRCD   NOT =   SPACE     )
       *
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
-               IF      PTKOH-SAKJOKBN      =   SPACE
+               IF     (PTKOH-SAKJOKBN      =   SPACE          )
+               AND    (PTKOH-KOHNUM    NOT =   "978" AND "979")
                    ADD     1               TO  CNT-KOH
                    IF  CNT-KOH             >   100
                        MOVE    "0015"      TO  SPA-ERRCD
