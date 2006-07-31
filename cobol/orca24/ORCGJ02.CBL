@@ -230,6 +230,7 @@
            03  IDR                 PIC 9(04).
            03  IDR2                PIC 9(02).
            03  IDR3                PIC 9(04).
+           03  IDD3                PIC 9(02).
       *
            03  IDR4                PIC 9(04).
            03  IDR5                PIC 9(04).
@@ -8298,6 +8299,20 @@
                MOVE    WRK-RRK-RENNUM      TO  SPA-RRK-RENNUM   (IDR)
                MOVE    WRK-RRK-DOUJI-RENNUM
                                            TO  SPA-RRK-DOUJI-RENNUM(IDR)
+           END-IF
+      *    連番が１以上の時、回数テーブルの判定
+           IF      SPA-RRK-RENNUM   (IDR)  >   1
+               MOVE    SPA-RRK-RENNUM   (IDR)  TO  IDD3
+               ADD     1                       TO  IDD3
+               MOVE    ZERO                TO  SPA-GNAI-DAY
+                                                     (2 SPA-DAY-IDX)
+               MOVE    ZERO                TO  SPA-GNAI-DAY
+                                                     (3 SPA-DAY-IDX)
+               MOVE    ZERO                TO  SPA-GNAI-DAY
+                                                     (4 SPA-DAY-IDX)
+               MOVE    SPA-GNAI-DAY (1 SPA-DAY-IDX)
+                                           TO  SPA-GNAI-DAY
+                                                     (IDD3 SPA-DAY-IDX)
            END-IF
       *
            MOVE    1                   TO  SPA-RRK-KAIKEI-RENNUM(IDR)
