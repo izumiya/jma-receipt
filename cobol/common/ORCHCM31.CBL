@@ -331,8 +331,8 @@
       *    ¼«Èñ·×»»
            COMPUTE WRK-JIHIMONEY   =   SYU-RMSAGAKU
                                    +   SYU-SKYMONEY-SKJ-JIHI-KEI
-                                   +   SYU-TGMONEY (12)
-                                   +   SYU-TGMONEY-TAX (12)
+                                   +   SYU-TOTAL-TGMONEY
+                                   +   SYU-TOTAL-TGMONEY-TAX
                                    +   SYU-JIHI-TOTAL
                                    +   SYU-JIHI-TOTAL-TAX
                                    +   SYU-JIHI-TAX
