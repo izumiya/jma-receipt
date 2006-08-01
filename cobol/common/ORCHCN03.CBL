@@ -633,10 +633,10 @@
                  ( COMB-HKNNUM             =    "973"  AND
                    SYU-PTFTNRATE           =    ZERO )
                PERFORM VARYING     IDX1    FROM  1   BY  1
-                       UNTIL       IDX1    >     11
+                       UNTIL       IDX1    >     15
                    MOVE    SPACE           TO  HCN03-HKNRYO(IDX1)
                END-PERFORM
-               MOVE    ALL "*"             TO  HCN03-HKNRYO(12)
+               MOVE    ALL "*"             TO  HCN03-HKNRYO(16)
            END-IF
       *
       *    保険適用分
