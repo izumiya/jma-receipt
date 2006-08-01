@@ -916,8 +916,8 @@
       *
       *    保険適用外分
            MOVE    ZERO                TO  WRK-GOKTEN
-           COMPUTE WRK-GOKTEN          =   SYU-TGMONEY (12)
-                                       +   SYU-TGMONEY-TAX  (12)
+           COMPUTE WRK-GOKTEN          =   SYU-TGMONEY (16)
+                                       +   SYU-TGMONEY-TAX  (16)
            MOVE    WRK-GOKTEN          TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HC03-HOKENGAI
