@@ -391,6 +391,9 @@
                                                   MCPAREA
                                                   ORCMCPAREA
                                                   MCPDATA-REC
+                 IF      SPA-ERRCD     NOT =   SPACE
+                     GO       TO          MAIN-EXT
+                 END-IF
                  IF   WRK-GRPCNT  >  1
                        PERFORM   4400-SYUTOTAL-FIND-SEC
                        IF   FLG-NG   =   1
