@@ -81,6 +81,7 @@
       *  02.09.03    NACL-門脇    06/05/01  リハ発症日当月分記載修正
       *  02.09.04    NACL-門脇    05/05/10  内服薬剤逓減編集修正
       *  02.09.05    NACL-門脇    06/05/30  リハ発症日記載修正
+      *  03.02.01    NACL-門脇    06/08/01  リハ発症日記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -288,6 +289,7 @@
            03  FLG-NIKOCHINTOU-COMMENT
                                    PIC 9(01).
            03  FLG-RIHA            PIC 9(01).
+           03  FLG-TENSU           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -690,6 +692,9 @@
       *    患者コメント
        01  PTCOM-REC.
            COPY    "CPPTCOM.INC".
+      *
+      *    点数
+           COPY    "CPTENSU.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -2708,6 +2713,18 @@
                          ADD     1     TO    IDZ
                          MOVE    PTCOM-INPUTCOMENT
                                                 TO  WK-FREE-NAME(IDZ)
+                         PERFORM   VARYING   IDX13   FROM   200   BY  -1
+                                    UNTIL    IDX13    <    1
+                           IF  WK-FREE-NAME(IDZ)(IDX13:1)  NOT =  SPACE
+                             COMPUTE  WK-FREE-YUKOKETA(IDZ)  =
+                                      IDX13    /    2
+                             MOVE     1     TO      IDX13
+                           END-IF
+                         END-PERFORM
+                       ELSE
+                         PERFORM      900-TENSU-TBL-SEC
+                         ADD     1           TO  IDZ
+                         MOVE    TNS-NAME    TO  WK-FREE-NAME(IDZ)
                          PERFORM   VARYING   IDX13   FROM   200   BY  -1
                                     UNTIL    IDX13    <    1
                            IF  WK-FREE-NAME(IDZ)(IDX13:1)  NOT =  SPACE
@@ -5819,6 +5836,53 @@
       *
            .
        900-PTCOM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数テーブルの検索
+      *****************************************************************
+       900-TENSU-TBL-SEC               SECTION.
+      *
+           INITIALIZE                       TNS-TENSU-REC
+           MOVE    SRY-SRYCD(IDX12) TO      TNS-SRYCD
+           MOVE    SRY-SRYYM        TO      ORC-DBYMD(1:6)
+           MOVE    "01"             TO      ORC-DBYMD(7:2)
+           MOVE    TNS-TENSU-REC    TO      MCPDATA-REC
+           MOVE    "DBSELECT"       TO      MCP-FUNC
+           MOVE    "TENSU-KEY"      TO      ORC-DBPATH
+           CALL    "ORCMCPSUB"      USING
+                                    MCPAREA
+                                    ORCMCPAREA
+                                    MCPDATA-REC
+           IF      MCP-RC               =       ZERO
+               MOVE    "DBFETCH"           TO  MCP-FUNC
+               MOVE    "TENSU-KEY"         TO  ORC-DBPATH
+               CALL    "ORCMCPSUB"          USING
+                                            MCPAREA
+                                            ORCMCPAREA
+                                            MCPDATA-REC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+                   MOVE    ZERO            TO  FLG-TENSU
+               ELSE
+                   INITIALIZE                  TNS-TENSU-REC
+                   MOVE    1               TO  FLG-TENSU
+               END-IF
+           ELSE
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE    1                   TO  FLG-TENSU
+           END-IF
+      *
+           INITIALIZE                     MCPAREA
+           MOVE    "DBCLOSECURSOR"   TO   MCP-FUNC
+           MOVE    "TENSU-KEY"       TO   ORC-DBPATH
+           CALL    "ORCMCPSUB"       USING
+                                     MCPAREA
+                                     ORCMCPAREA
+                                     MCPDATA-REC
+      *
+           .
+       900-TENSU-TBL-EXT.
            EXIT.
       *
       *****************************************************************
