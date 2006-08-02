@@ -347,6 +347,7 @@
                      MOVE    "SYUNOU-KEY27"   TO  ORC-DBPATH
                      PERFORM  900-SYUNOU-READ-SEC
                      PERFORM  UNTIL  (FLG-SYUNOU   =    1)
+                              OR     (SPA-ERRCD    NOT =   SPACE)
                        IF   SYU-DENPJTIKBN  NOT =  "3"
                           IF   WRK-TAIHI-HKNCOMBINUM  NOT =  SPACE
                           AND  WRK-TAIHI-HKNCOMBINUM
@@ -355,34 +356,41 @@
                                 PERFORM   4400-SYUTOTAL-FIND-SEC
                                 IF   FLG-NG   =   1
                                     MOVE    "0062"   TO  SPA-ERRCD
-                                    GO       TO          MAIN-EXT
                                 END-IF
                             ELSE
                               IF   WRK-GRPCNT  =  1
                                 PERFORM   4400-SYUTOTAL-FIND2-SEC
                                 IF   FLG-NG   =   1
                                     MOVE    "0062"   TO  SPA-ERRCD
-                                    GO       TO          MAIN-EXT
                                 END-IF
                               END-IF
                             END-IF
                             MOVE   ZERO      TO  WRK-GRPCNT
                           END-IF
-                          ADD   1            TO  IDY
-                          MOVE  SYUNOU-REC   TO  LNK-SYUNOU-REC(IDY)
-                          MOVE  SYU-SKYMONEY TO  WRK-MAE-SEIKYUGK(IDY)
-                          MOVE  SYU-HKNCOMBINUM
+                          IF      SPA-ERRCD  =   SPACE
+                              ADD   1            TO  IDY
+                              MOVE  SYUNOU-REC   TO  LNK-SYUNOU-REC(IDY)
+                              MOVE  SYU-SKYMONEY
+                                             TO  WRK-MAE-SEIKYUGK(IDY)
+                              MOVE  SYU-HKNCOMBINUM
                                              TO  WRK-TAIHI-HKNCOMBINUM
-                          MOVE  SYU-FUKU-DENPNUM
+                              MOVE  SYU-FUKU-DENPNUM
                                              TO  WRK-TAIHI-DENPNUM
-                          MOVE  SYU-SYUHKNNUM
+                              MOVE  SYU-SYUHKNNUM
                                              TO  WRK-TAIHI-SYUHKNNUM
-                          ADD   1            TO  WRK-GRPCNT
+                              ADD   1            TO  WRK-GRPCNT
+                           END-IF
                        END-IF
                        MOVE    "SYUNOU-KEY27"   TO  ORC-DBPATH
                        PERFORM  900-SYUNOU-READ-SEC
                      END-PERFORM
                  END-IF
+                 MOVE    "DBCLOSECURSOR"         TO  MCP-FUNC
+                 MOVE    "SYUNOU-KEY27"          TO  ORC-DBPATH
+                 CALL    "ORCMCPSUB"              USING
+                                                  MCPAREA
+                                                  ORCMCPAREA
+                                                  MCPDATA-REC
                  IF   WRK-GRPCNT  >  1
                        PERFORM   4400-SYUTOTAL-FIND-SEC
                        IF   FLG-NG   =   1
@@ -398,12 +406,6 @@
                        END-IF
                     END-IF
                  END-IF
-                 MOVE    "DBCLOSECURSOR"         TO  MCP-FUNC
-                 MOVE    "SYUNOU-KEY27"          TO  ORC-DBPATH
-                 CALL    "ORCMCPSUB"              USING
-                                                  MCPAREA
-                                                  ORCMCPAREA
-                                                  MCPDATA-REC
                END-IF
       *
                IF    IDY   =   ZERO
