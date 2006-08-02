@@ -6175,6 +6175,7 @@
                MOVE    SMCNDATE-HMS        TO  SYUTTL-UPHMS
       *
                MOVE    SYUTTL-REC          TO  MCPDATA-REC
+               MOVE    "DBINSERT"          TO  MCP-FUNC
                MOVE    "tbl_syutotal"      TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
                CALL    "MONFUNC"           USING
