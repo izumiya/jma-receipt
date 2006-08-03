@@ -3690,13 +3690,16 @@
       *
       *    £È£±£´¡¥£±£° ²þÀµ
       *!   IF      FLG-TOUROKU2         =   1
+      *    ¸øÈñÄÉ²Ã°Ê³°
+           IF      FLG-KOH-ADD2         =   ZERO
+              AND  FLG-ERRCHK           =   ZERO
       *        £·£°ºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í³ä¹ç¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¤³¤È
                IF     (SPA-SYSYMD          >=  "20021001" )  AND
                       (SPA-BYMD-70         >   ZERO       )  AND
                       (SPA-SYSYMD          >=  SPA-BYMD-70)
                    PERFORM 410331-RJN-HKNCHK-SEC
                END-IF
-      *!   END-IF
+           END-IF
            .
       *
        4103-HKNKOH-TBL-EXT.
