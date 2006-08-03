@@ -1441,7 +1441,7 @@
                                            "232"  OR
                                            "292"     ) AND
                   (WRK-COM-KOUHATUKBN (IDX)
-                                    NOT =   ZERO  )
+                                       =   1     )
                MOVE    1                   TO  FLG-KOUHATU
            END-IF
       *
