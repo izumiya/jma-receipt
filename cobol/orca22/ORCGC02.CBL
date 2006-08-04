@@ -191,6 +191,8 @@
       *                                     特定疾患の表示をする
       *  03.00.04    NACL-藤原    06/07/21  保険組合せの名称の編集方法の
       *                                     修正
+      *  03.02.02    NACL-藤原    06/08/04  自院検索で移行病名がないときの
+      *                                     疾患区分の表示方法の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1885,16 +1887,21 @@
                                OR      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
                                                        =   ALL "9"
                            MOVE    SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
-                                       TO  SPA-NAI-C02-BYOMEICD-O
-                                                          (IDZ IDX3)
-                                           BYO-BYOMEICD
+                                       TO  BYO-BYOMEICD
                            PERFORM 900-BYOMEI-READ-SEC
                            IF      FLG-BYOMEI      =   ZERO
                                MOVE    BYO-HAISIYMD    TO
                                            SPA-NAI-C02-HAISIYMD (IDZ)
-                               MOVE    BYO-TOKSKNCD    TO
+                               IF      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
+                                           NOT =
+                                       SPA-NAI-C02-BYOMEICD-O (IDZ IDX3)
+                                   MOVE    BYO-TOKSKNCD    TO
                                            SPA-NAI-C02-TOKSKNCD (IDZ)
+                               END-IF 
                            END-IF
+                           MOVE    SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
+                                       TO  SPA-NAI-C02-BYOMEICD-O
+                                                          (IDZ IDX3)
                            MOVE    SPA-NAI-C04-BYOMEI-O (IDX IDX3)
                                        TO  SPA-NAI-C02-BYOMEI-O
                                                           (IDZ IDX3)
@@ -1920,16 +1927,21 @@
                        OR      SPA-NAI-C04-BYOMEICD-O (IDZ IDX3)
                                                =   ALL "9"
                    MOVE    SPA-NAI-C04-BYOMEICD-O (IDZ IDX3)
-                                       TO  SPA-NAI-C02-BYOMEICD-O
-                                                          (IDZ IDX3)
-                                           BYO-BYOMEICD
+                                           TO  BYO-BYOMEICD
                    PERFORM 900-BYOMEI-READ-SEC
                    IF      FLG-BYOMEI      =   ZERO
                        MOVE    BYO-HAISIYMD    TO
                                            SPA-NAI-C02-HAISIYMD (IDZ)
-                       MOVE    BYO-TOKSKNCD    TO
+                       IF      SPA-NAI-C04-BYOMEICD-O (IDZ IDX3)
+                                       NOT =   SPA-NAI-C02-BYOMEICD-O
+                                                          (IDZ IDX3)
+                           MOVE    BYO-TOKSKNCD    TO
                                            SPA-NAI-C02-TOKSKNCD (IDZ)
+                       END-IF
                    END-IF
+                   MOVE    SPA-NAI-C04-BYOMEICD-O (IDZ IDX3)
+                                       TO  SPA-NAI-C02-BYOMEICD-O
+                                                          (IDZ IDX3)
                    MOVE    SPA-NAI-C04-BYOMEI-O   (IDZ IDX3)
                                        TO  SPA-NAI-C02-BYOMEI-O
                                                           (IDZ IDX3)
