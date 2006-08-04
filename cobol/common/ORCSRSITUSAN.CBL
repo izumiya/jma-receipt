@@ -346,9 +346,11 @@
                 END-IF
            END-PERFORM
       *
-           IF    ( FLG-HKNCOMBIDAY-G       =   ZERO )
-               MOVE    99                  TO  RSITUSAN-RC
-               PERFORM 990-EXIT-PROGRAM-SEC
+           IF    ( WRK-SRYYM               =   RSITUSAN-SRYYM )
+               IF    ( FLG-HKNCOMBIDAY-G   =   ZERO )
+                   MOVE    99                  TO  RSITUSAN-RC
+                   PERFORM 990-EXIT-PROGRAM-SEC
+               END-IF
            END-IF
       *
            .
