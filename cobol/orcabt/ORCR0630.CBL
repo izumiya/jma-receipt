@@ -70,6 +70,7 @@
       *  02.09.03    NACL-ÌçÏÆ    06/05/17  Î¬¾ÎÊÔ½¸(190123250Åù)
       *  02.09.04    NACL-ÌçÏÆ    06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
       *  03.01.01    NACL-ÌçÏÆ    06/06/28  ¼ÂÆü¿ô¸º»»¥³¡¼¥ÉÂÐ±þ
+      *  03.02.01    NACL-ÌçÏÆ    06/08/04  £¹£°Æþ±¡Íó¤ÎÆü¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
       *
@@ -138,6 +139,7 @@
            03  FLG-SET                                 PIC 9(01).
            03  FLG-FUKUSHI                             PIC 9(01).
            03  FLG-NYURYAKUWRK                         PIC 9(01).
+           03  FLG-NISSUSET                            PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1429,6 +1431,7 @@
                    PERFORM  VARYING  IDY    FROM    1   BY  1
                                   UNTIL   IDY     >       31
       *
+                      MOVE     ZERO    TO   FLG-NISSUSET
                       PERFORM  VARYING  IDX1    FROM    1   BY  1
                              UNTIL   IDX1    >       10
                              OR      RECE62-HKNCOMBI (IDX1)  =   ZERO 
@@ -1769,9 +1772,11 @@
                                                               = ZERO
                                   OR    FLG-ARI               = 1
                       IF  RECE62-NYUKHNRYO(ID1)  =  WRK-NYUKHNRYO
-                            IF   KH-IDX =  1
-                            OR   RECE62-HKNNUM  =  SPACE
+      ****                  IF   KH-IDX =  1
+      ****                  OR   RECE62-HKNNUM  =  SPACE
+                            IF   FLG-NISSUSET   =  ZERO
                               ADD   1   TO   RECE62-NYUKHNNISSU(ID1)
+                              MOVE  1   TO   FLG-NISSUSET
                             END-IF
                             IF     FLG-FUKUSHI =   1
                             AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
@@ -1788,6 +1793,7 @@
                     END-PERFORM  
                     IF  FLG-ARI  =  ZERO  
                       ADD        1           TO  RECE62-NYUKHNNISSU(ID1)
+                      MOVE       1           TO  FLG-NISSUSET
                       MOVE   WRK-NYUKHNRYO   TO  RECE62-NYUKHNRYO(ID1)
                       IF     FLG-FUKUSHI =   1
                       AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
@@ -1888,9 +1894,11 @@
                           OR  ( RECE62-NYUTOKNISSU(ID1)      = ZERO  )
                           OR  ( FLG-ARI                      = 1     )
                       IF  RECE62-NYUTOKRYO-RYAKU(ID1)  =  WRK-RYAKUSHO
-                            IF   KH-IDX =  1
-                            OR   RECE62-HKNNUM  =  SPACE
+      ****                  IF   KH-IDX =  1
+      ****                  OR   RECE62-HKNNUM  =  SPACE
+                            IF   FLG-NISSUSET   =  ZERO
                               ADD   1   TO   RECE62-NYUTOKNISSU(ID1)
+                              MOVE  1   TO   FLG-NISSUSET
                             END-IF
                             IF     FLG-FUKUSHI =   1
                             AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
@@ -1907,6 +1915,7 @@
                     END-PERFORM  
                     IF  FLG-ARI  =  ZERO  
                       ADD        1           TO  RECE62-NYUTOKNISSU(ID1)
+                      MOVE       1           TO  FLG-NISSUSET
                       MOVE   WRK-RYAKUSHO    TO  RECE62-NYUTOKRYO-RYAKU
                                                                    (ID1)
       ***             Î¬¾Î¤¬¶õÇò¤Î¾ì¹ç¤Î°Ù¤Î½èÃÖ
@@ -1930,9 +1939,11 @@
                           OR  ( RECE62-NYUTOKNISSU(ID1)      = ZERO  )
                           OR  ( FLG-ARI                      = 1     )
                       IF  RECE62-NYUTOKRYO(ID1)  =  WRK-NYUTOKRYO
-                            IF   KH-IDX =  1
-                            OR   RECE62-HKNNUM  =  SPACE
+      ****                  IF   KH-IDX =  1
+      ****                  OR   RECE62-HKNNUM  =  SPACE
+                            IF   FLG-NISSUSET   =  ZERO
                               ADD   1   TO   RECE62-NYUTOKNISSU(ID1)
+                              MOVE  1   TO   FLG-NISSUSET
                             END-IF
                             IF     FLG-FUKUSHI =   1
                             AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
@@ -1949,6 +1960,7 @@
                     END-PERFORM  
                     IF  FLG-ARI  =  ZERO  
                       ADD        1           TO  RECE62-NYUTOKNISSU(ID1)
+                      MOVE       1           TO  FLG-NISSUSET
       ***             ÅÀ¿ô¤¬¥¼¥í¤Î¾ì¹ç¤Î°Ù¤Î½èÃÖ
                       MOVE   "£¹£¹£¹£¹£¹£¹£¹"
                                              TO  RECE62-NYUTOKRYO-RYAKU
