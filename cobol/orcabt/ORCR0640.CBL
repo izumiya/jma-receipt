@@ -208,6 +208,8 @@
       *  03.01.03    NACL-ÌçÏÆ    06/07/06  ¸øÈñÃ±ÆÈ»þ¤Î¿©»öÉéÃ´³ÛÊÔ½¸
       *                                     ½¤Àµ
       *  03.01.04    NACL-ÌçÏÆ    06/07/20  ËÌ³¤Æ»¤ÎÆÃÄê¼À´µ¿©»öÂÐ±þ
+      *  03.02.01    NACL-ÌçÏÆ    06/08/04  ¿ÇÎÅ¹Ô°Ù¤Î¤ß¤Î¸øÈñ¤Î¿©»öÍó
+      *                                     ÊÔ½¸½¤Àµ¡Ê£°µ­ºÜ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8092,7 +8094,8 @@
                     (RECE62-SRYYM         >=  "200510"      ))
                 OR ((SYU-SKJ-FTNKBN(IDX3)  =  "1" OR "2"       ) AND
                     (SYU-SKJ-FTN(IDX3) = SYU-SKJ-FTN-RECE(IDX3)))
-                   IF  SYU-SKJ-NISSU(IDX3)  NOT =  ZERO
+                OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
+                   IF   RECE62-SHOKUJINISSU(KH-IDX)  =  ZERO
                        MOVE    "1"      TO
                                RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
                    END-IF
@@ -8108,6 +8111,8 @@
                                    RECE62-SHOKUJINISSU(KH-IDX)
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    RECE62-SHOKUJIRYOYOHI(KH-IDX)
+                     MOVE  SPACE                  TO
+                                   RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
                   ELSE
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
                                    RECE62-SHOKUJINISSU(KH-IDX)
@@ -8115,6 +8120,8 @@
                                    RECE62-SHOKUJIRYOYOHI(KH-IDX)
                      ADD   SYU-SKJ-FTN-RECE(IDX3) TO
                                    RECE62-SHOKUJIFTN(KH-IDX)
+                     MOVE  SPACE                  TO
+                                   RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
                   END-IF
                 END-IF
       *
