@@ -33,6 +33,7 @@
       *  •◊•Ì•∞•È•‡Ω§¿µÕ˙ŒÚ
       * Maj/Min/Rev  Ω§¿µº‘       ∆¸…’      ∆‚Õ∆
       *  01.00.01    NACL-¬ø°π«º  06/05/09  º´»Ò¬æƒ…≤√
+      *  01.00.02    NACL-¬ø°π«º  06/08/08  º˝«º —ππ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -92,6 +93,7 @@
            03  FLG-OK              PIC 9(01).
       *
            03  FLG-SYOHOU          PIC 9(01).
+           03  FLG-ERR             PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -112,6 +114,7 @@
            03  IDX-LF2             PIC 9(04).
            03  IDX-JI              PIC 9(04).
            03  IDX-IJ              PIC 9(04).
+           03  IDX-IJ2             PIC 9(04).
            03  IDX-SINSATU         PIC 9(04).
            03  IDX-BUI             PIC 9(04).
            03  IDX-SATU            PIC 9(04).
@@ -1895,9 +1898,12 @@
            MOVE    SYU-TOTAL-HKNTEN     TO  TBL-TENNSUALL(IDX-LF)
       *    ¿¡µ·≈¿øÙ
            MOVE    ZERO                TO  IDX-IJ
+           MOVE    ZERO                TO  IDX-IJ2
+           MOVE    ZERO                TO  FLG-ERR
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       10
+                   UNTIL   IDX     >       15
                ADD     1                   TO  IDX-IJ
+               ADD     1                   TO  IDX-IJ2
       *        ¿¡µ·•≥°º•…
                MOVE    IDX                 TO  TBL-IJICD(IDX-LF IDX-IJ)
                MOVE    "0"                 TO  TBL-SRYSYUBETSU
@@ -1925,22 +1931,38 @@
                        MOVE    "ΩË√÷"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    7
-                       MOVE    "ºÍΩ—°¶À„øÏ"    TO  TBL-ALSNAME
+                       MOVE    "ºÍΩ—"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    8
-                       MOVE    "∏°∫∫"          TO  TBL-ALSNAME
+                       MOVE    "À„øÏ"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    9
-                       MOVE    "≤Ë¡¸ø«√«"      TO  TBL-ALSNAME
+                       MOVE    "∏°∫∫"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    10
-                       MOVE    "§Ω§Œ¬æ"        TO  TBL-ALSNAME
+                       MOVE    "≤Ë¡¸ø«√«"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    11
+                       MOVE    "•Í•œ•”•Í"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    12
+                       MOVE    "¿∫ø¿≤ ¿ÏÃÁ"    TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    13
+                       MOVE    " ¸ºÕ¿˛º£Œ≈"    TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    14
+                       MOVE    "∆˛±°Œ¡≈˘"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    15
+                       MOVE    "Œ≈Õ‹√¥≈ˆºÍ≈ˆ"  TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                END-EVALUATE
            END-PERFORM
       *     ›∏±≈¨Õ—∂‚≥€
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
            MOVE    SYU-HKNTEKMONEY     TO  TBL-MEISAITANKA
@@ -1949,7 +1971,8 @@
                                                       (IDX-LF IDX-IJ)
       *    ÃÙ∫ﬁ∞Ï…Ù…È√¥∂‚
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
            MOVE    SYU-YKZ-FTN         TO  TBL-MEISAITANKA
@@ -1958,7 +1981,8 @@
                                                       (IDX-LF IDX-IJ)
       *    œ∑øÕ∞Ï…Ù…È√¥∂‚
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
            MOVE    SYU-RJN-FTN         TO  TBL-MEISAITANKA
@@ -1967,7 +1991,8 @@
                                                       (IDX-LF IDX-IJ)
       *    ∏¯»Ò∞Ï…Ù…È√¥∂‚
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
            MOVE    SYU-KOH-FTN         TO  TBL-MEISAITANKA
@@ -1976,7 +2001,8 @@
                                                       (IDX-LF IDX-IJ)
       *    ƒ¥¿∞∂‚
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                      (IDX-LF IDX-IJ)
            MOVE    SYU-CHOSEI          TO  TBL-MEISAITANKA
@@ -1986,7 +2012,14 @@
       *
       *    ¿¡µ·∂‚≥€
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           IF      IDX-IJ              >   20
+               PERFORM 200531-IDX-CNT-SEC
+               IF      FLG-ERR            =   1
+                   GO      TO      2005-SYUNOU-SET-EXT
+               END-IF
+           END-IF
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
            MOVE    SYU-SKYMONEY        TO  TBL-MEISAITANKA
@@ -1995,7 +2028,8 @@
                                                       (IDX-LF IDX-IJ)
       *    ∆˛∂‚πÁ∑◊≥€
            ADD     1                   TO  IDX-IJ
-           MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+           ADD     1                   TO  IDX-IJ2
+           MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
            MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
            MOVE    SMEI-NYUHEN-MONEY   TO  TBL-MEISAITANKA
@@ -2005,7 +2039,8 @@
       *    ƒ˚¿µª˛
            IF      SMEI-DENPEDANUM     >   1
                ADD     1                   TO  IDX-IJ
-               MOVE    IDX-IJ              TO  TBL-IJICD(IDX-LF IDX-IJ)
+               ADD     1                   TO  IDX-IJ2
+               MOVE    IDX-IJ2             TO  TBL-IJICD(IDX-LF IDX-IJ)
                MOVE    "0"                 TO  TBL-SRYSYUBETSU
                                                         (IDX-LF IDX-IJ)
                MOVE    SMEI-SKYMONEY       TO  TBL-MEISAITANKA
@@ -2132,8 +2167,9 @@
                                        +   SYU-JIHI-TOTAL
       *     ›∏± ¨
            MOVE    ZERO                TO  IDX-IJ
+           MOVE    ZERO                TO  FLG-ERR
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       10
+                   UNTIL   IDX     >       15
                IF      SYU-TGMONEY (IDX)   NOT =   ZERO
                    ADD     1               TO  IDX-IJ
       *            ¿¡µ·•≥°º•…
@@ -2166,25 +2202,46 @@
                        MOVE    "ΩË√÷"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    7
-                       MOVE    "ºÍΩ—°¶À„øÏ"    TO  TBL-ALSNAME
+                       MOVE    "ºÍΩ—"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    8
-                       MOVE    "∏°∫∫"          TO  TBL-ALSNAME
+                       MOVE    "À„øÏ"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    9
-                       MOVE    "≤Ë¡¸ø«√«"      TO  TBL-ALSNAME
+                       MOVE    "∏°∫∫"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    10
-                       MOVE    "§Ω§Œ¬æ"        TO  TBL-ALSNAME
+                       MOVE    "≤Ë¡¸ø«√«"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    11
+                       MOVE    "•Í•œ•”•Í"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    12
+                       MOVE    "¿∫ø¿≤ ¿ÏÃÁ"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    13
+                       MOVE    " ¸ºÕ¿˛º£Œ≈"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    14
+                       MOVE    "∆˛±°Œ¡≈˘"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    15
+                       MOVE    "Œ≈Õ‹√¥≈ˆºÍ≈ˆ"  TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    END-EVALUATE
                END-IF
            END-PERFORM
       *    º´»Ò
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       10
+                   UNTIL  (IDX     >       10  )
+                       OR (FLG-ERR     =   1   )
                IF      SYU-JIHI-TAXNASI (IDX)  NOT =   ZERO
                    ADD     1               TO  IDX-IJ
+                   IF      IDX-IJ              >   20
+                       PERFORM 200531-IDX-CNT-SEC
+                   END-IF
+                   IF      FLG-ERR            =   ZERO
+      *
       *            ¿¡µ·•≥°º•…
                    MOVE    IDX             TO  TBL-IJICD(IDX-LF IDX-IJ)
                    MOVE    "0"             TO  TBL-SRYSYUBETSU
@@ -2194,10 +2251,36 @@
                                                         (IDX-LF IDX-IJ)
                    MOVE    TBL-JIHIMSG (IDX)   TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
+                   END-IF
                END-IF
            END-PERFORM
            .
        20052-JIHI-TEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    •∆°º•÷•Î•´•¶•Û•»ΩËÕ˝
+      *****************************************************************
+       200531-IDX-CNT-SEC                 SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ERR
+           ADD     1                   TO  IDX-LF2
+           IF      IDX-LF2             >   20
+               DISPLAY "ZAI 20 OVER ???"
+               MOVE    1                   TO  FLG-ERR
+               GO      TO      200531-IDX-CNT-EXT
+           END-IF
+           MOVE    TBL-KAISU  (IDX-LF) TO  TBL-KAISU (IDX-LF2)
+           MOVE    TBL-SRYCD  (IDX-LF) TO  TBL-SRYCD (IDX-LF2)
+           MOVE    TBL-SRYNAME(IDX-LF) TO  TBL-SRYNAME (IDX-LF2)
+           MOVE    TBL-TENNSUALL(IDX-LF)
+                                       TO  TBL-TENNSUALL(IDX-LF2)
+           MOVE    TBL-GINGAKUALL(IDX-LF)
+                                       TO  TBL-GINGAKUALL(IDX-LF2)
+           MOVE    IDX-LF2             TO  IDX-LF
+           MOVE    1                   TO  IDX-IJ
+           .
+       200531-IDX-CNT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2229,7 +2312,7 @@
       *     ›∏± ¨
            MOVE    ZERO                TO  IDX-IJ
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       10
+                   UNTIL   IDX     >       15
                IF      SYU-TGMONEY-TAX (IDX)   NOT =   ZERO
                    ADD     1               TO  IDX-IJ
       *            ¿¡µ·•≥°º•…
@@ -2265,22 +2348,43 @@
                        MOVE    "ºÍΩ—°¶À„øÏ"    TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    8
-                       MOVE    "∏°∫∫"          TO  TBL-ALSNAME
+                       MOVE    "À„øÏ"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    9
-                       MOVE    "≤Ë¡¸ø«√«"      TO  TBL-ALSNAME
+                       MOVE    "∏°∫∫"          TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    WHEN    10
-                       MOVE    "§Ω§Œ¬æ"        TO  TBL-ALSNAME
+                       MOVE    "≤Ë¡¸ø«√«"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    11
+                       MOVE    "•Í•œ•”•Í"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    12
+                       MOVE    "¿∫ø¿≤ ¿ÏÃÁ"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    13
+                       MOVE    " ¸ºÕ¿˛º£Œ≈"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    14
+                       MOVE    "∆˛±°Œ¡≈˘"      TO  TBL-ALSNAME
+                                                        (IDX-LF IDX-IJ)
+                   WHEN    15
+                       MOVE    "Œ≈Õ‹√¥≈ˆºÍ≈ˆ"  TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
                    END-EVALUATE
                END-IF
            END-PERFORM
       *    º´»Ò
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       10
+                   UNTIL  (IDX     >       10  )
+                       OR (FLG-ERR     =   1   )
                IF      SYU-JIHI-TAXARI (IDX)   NOT =   ZERO
                    ADD     1               TO  IDX-IJ
+                   IF      IDX-IJ              >   20
+                       PERFORM 200531-IDX-CNT-SEC
+                   END-IF
+                   IF      FLG-ERR            =   ZERO
+      *
       *            ¿¡µ·•≥°º•…
                    MOVE    IDX             TO  TBL-IJICD(IDX-LF IDX-IJ)
                    MOVE    "0"             TO  TBL-SRYSYUBETSU
@@ -2291,10 +2395,16 @@
                                                         (IDX-LF IDX-IJ)
                    MOVE    TBL-JIHIMSG (IDX)   TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
+                  END-IF
                END-IF
            END-PERFORM
            IF      SYU-JIHI-TAX    NOT =   ZERO
                ADD     1               TO  IDX-IJ
+               IF      IDX-IJ              >   20
+                   PERFORM 200531-IDX-CNT-SEC
+               END-IF
+               IF      FLG-ERR            =   ZERO
+      *
       *        ¿¡µ·•≥°º•…
                MOVE    "0099"          TO  TBL-IJICD(IDX-LF IDX-IJ)
                MOVE    "0"             TO  TBL-SRYSYUBETSU
@@ -2304,6 +2414,7 @@
                                                         (IDX-LF IDX-IJ)
                MOVE    "º´»Ò∂‚≥€æ√»Ò¿«"   TO  TBL-ALSNAME
                                                         (IDX-LF IDX-IJ)
+               END-IF
            END-IF
            .
        20053-JIHITEX-TEN-EXT.
