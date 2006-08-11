@@ -211,6 +211,7 @@
       *  03.01.05    NACL-門脇    06/07/20  北海道の特定疾患食事対応
       *  03.02.01    NACL-門脇    06/08/04  診療行為のみの公費の食事欄
       *                                     編集修正（０記載）
+      *  03.02.02    NACL-門脇    06/08/10  高齢者上限額経過措置対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -362,7 +363,7 @@
            03  FLG-ZENKOH-ARI                          PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
            03  FLG-TOKKI                               PIC 9(01).
-      *
+           03  FLG-PTKOHINF                            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -522,6 +523,7 @@
            03  WRK-FTNKEI4                             PIC 9(09).
            03  WRK-KINGAKU                             PIC 9(09).
            03  WRK-KINGAKU2                            PIC 9(09).
+           03  FLG-CYOKI                               PIC 9(01).
       *
        01  WRK-DAY-TABLE.
            03  WRK-DAY-T                               OCCURS   31.
@@ -655,6 +657,14 @@
            03  WRK-CHK-HKNID                           PIC 9(10).
            03  WRK-CHK-HKNNUM                          PIC X(03).
            03  WRK-CHK-ICHIBUGAKU                      PIC 9(07).
+           03  WRK-CHK-FTNGAKU                         PIC 9(07).
+           03  WRK-CHK-KOHFTNGAKU                      PIC 9(07).
+           03  WRK-CHK-KEISAN1                         PIC 9(07).
+           03  WRK-CHK-KEISAN2                         PIC 9(07).
+           03  WRK-CHK-KINGAKU                         PIC 9(07).
+           03  WRK-CHK-KEIKASOCHIXX                    PIC 9(07).
+           03  WRK-CHK-KEIKASOCHI1                     PIC S9(07).
+           03  WRK-CHK-KEIKASOCHI2                     PIC S9(07).
       *
            03  WRK-ZENKAKU                             PIC X(80).
            03  WRK-NUM.
@@ -786,6 +796,7 @@
            03  CONS-TOKKI12        PIC X(14) VALUE "00000099990112".
            03  CONS-TOKKI13        PIC X(14) VALUE "00000099990113".
            03  CONS-TOKKI14        PIC X(14) VALUE "00000099990114".
+           03  CONS-TOKKI15        PIC X(14) VALUE "00000099990115".
       *
       *    病床数編集フラグ編集の為のコード（特定疾患療養指導料等）
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -1032,6 +1043,11 @@
       *    保険組み合わせ
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
+      *
+      *    患者公費情報
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
+      *
       *****保険番号
       *01  HKNNUM-REC.
       *****COPY    "CPHKNNUM.INC".
@@ -1859,7 +1875,8 @@
                                                        CONS-TOKKI11 OR
                                                        CONS-TOKKI12 OR
                                                        CONS-TOKKI13 OR
-                                                       CONS-TOKKI14
+                                                       CONS-TOKKI14 OR
+                                                       CONS-TOKKI15
                                       MOVE    1    TO      FLG-TOKKI
                                       PERFORM   21013-TOKKI-HENSYU-SEC
                                  ELSE
@@ -2187,7 +2204,8 @@
                                      OR  CONS-TOKKI11(6:9)
                                      OR  CONS-TOKKI12(6:9)
                                      OR  CONS-TOKKI13(6:9)
-                                     OR  CONS-TOKKI14(6:9) )
+                                     OR  CONS-TOKKI14(6:9)
+                                     OR  CONS-TOKKI15(6:9) )
                   COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -2233,7 +2251,8 @@
                                        OR  CONS-TOKKI11(6:9)
                                        OR  CONS-TOKKI12(6:9)
                                        OR  CONS-TOKKI13(6:9)
-                                       OR  CONS-TOKKI14(6:9) )
+                                       OR  CONS-TOKKI14(6:9)
+                                       OR  CONS-TOKKI15(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
@@ -3737,6 +3756,8 @@
                        MOVE    "13"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI14
                        MOVE    "14"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI15
+                       MOVE    "15"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        2
                EVALUATE    SRY-SRYCD(IDX2)
@@ -3766,9 +3787,13 @@
                        MOVE    "13"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI14(6:9)
                        MOVE    "14"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI15(6:9)
+                       MOVE    "15"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        3
                        MOVE    "14"      TO      WRK-TOKKI
+             WHEN        4
+                       MOVE    "15"      TO      WRK-TOKKI
            END-EVALUATE
       *
       *    既に同じ特記事項コードが編集済みのときはセットしない
@@ -7447,7 +7472,9 @@
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN
       *
       *    高齢者の一部負担金額記載に関するチェック
+      *
            IF    RECE62-KOUREI  NOT =    SPACE
+                PERFORM   21048-KEIKASOCHI-HANTEI-SEC
                 PERFORM   21041-KOREISYA-KOHI-SEC
                 PERFORM   21042-KOREISYA-CHECK-SEC
            END-IF
@@ -7545,6 +7572,8 @@
                                            WRK-CHK-TAISYO
                                            WRK-CHK-HKNID
            MOVE    ZERO                TO  WRK-CHK-ICHIBUGAKU
+                                           WRK-CHK-FTNGAKU
+                                           WRK-CHK-KOHFTNGAKU
       *
            INITIALIZE                      RECE69-REC
            MOVE    RECE62-HOSPID       TO  RECE69-HOSPID
@@ -7620,10 +7649,16 @@
                 MOVE    WRK-CHK-HKNID  TO  LNK-KOREIFTNCHK-HKNID
                 MOVE    RECE62-TEISYOTOKU
                                        TO  LNK-KOREIFTNCHK-TEISYOTOKU
+                MOVE    RECE62-RJNGENMENKBN
+                                       TO  LNK-KOREIFTNCHK-KEIKASOCHI
       *
                 CALL    "ORCSKOREIFTNCHK"   USING
                                             ORCSKOREIFTNCHKAREA
                 IF      LNK-KOREIFTNCHK-RC   =   ZERO
+                    MOVE   LNK-KOREIFTNCHK-FTNGAKU
+                                       TO  WRK-CHK-FTNGAKU
+                    MOVE   LNK-KOREIFTNCHK-KOHFTNGAKU
+                                       TO  WRK-CHK-KOHFTNGAKU
                     MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU
                                        TO  FTN-KOH-XXX
                                            WRK-CHK-ICHIBUGAKU
@@ -7887,6 +7922,7 @@
                OR   ( SYU-KOH-HKNNUM(2) =   "972" )
                OR   ( SYU-KOH-HKNNUM(3) =   "972" )
                OR   ( SYU-KOH-HKNNUM(4) =   "972" )
+                 MOVE    1         TO   FLG-CYOKI
                  MOVE    10000     TO   WRK-KINGAKU
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                ELSE
@@ -7904,6 +7940,7 @@
                  ELSE
                    IF   (  RECE62-KYURATE         =  20     )
                    AND  (  FLG-ZENKOH-ARI         =  ZERO   )
+                   AND  (  RECE62-RJNGENMENKBN    =  SPACE  )
                       COMPUTE   WRK-CHIHOU-KIN   =
                                 WRK-CHIHOU-KIN   +
                                (SYU-TOTAL-HKNTEN * 10)
@@ -8680,6 +8717,44 @@
               END-IF
            END-IF
       *
+           IF      RECE62-RJNGENMENKBN   =   "1"
+      *
+               COMPUTE  WRK-CHK-KEISAN1 = WRK-KOH-FTN         +  5
+               COMPUTE  WRK-CHK-KEISAN1 = WRK-CHK-KEISAN1     / 10
+               COMPUTE  WRK-CHK-KEISAN1 = WRK-CHK-KEISAN1     * 10
+      *
+               COMPUTE  WRK-CHK-KEISAN2 = WRK-CHK-KOHFTNGAKU  +  5
+               COMPUTE  WRK-CHK-KEISAN2 = WRK-CHK-KEISAN2     / 10
+               COMPUTE  WRK-CHK-KEISAN2 = WRK-CHK-KEISAN2     * 10
+      *
+               COMPUTE  WRK-CHK-KEIKASOCHIXX
+                                  =   WRK-KOH-GAI  +  WRK-CHK-KEISAN1
+      *
+               IF    FLG-CYOKI   =    1
+                   MOVE      10000    TO    WRK-CHK-KINGAKU
+               ELSE
+                   MOVE      40200    TO    WRK-CHK-KINGAKU
+               END-IF
+      *
+               COMPUTE  WRK-CHK-KEIKASOCHI1  =  WRK-CHK-KINGAKU -
+                                               (WRK-CHK-FTNGAKU +
+                                                WRK-CHK-KEISAN2)
+               COMPUTE  WRK-CHK-KEIKASOCHI2  =  WRK-CHK-KINGAKU -
+                                                WRK-CHK-ICHIBUGAKU
+               IF   WRK-CHK-KEIKASOCHI1  <   ZERO
+                    MOVE   ZERO    TO   WRK-CHK-KEIKASOCHI1
+               END-IF
+               IF   WRK-CHK-KEIKASOCHI2  <   ZERO
+                    MOVE   ZERO    TO   WRK-CHK-KEIKASOCHI2
+               END-IF
+               IF  (WRK-CHK-KEIKASOCHIXX  >=  WRK-CHK-KEIKASOCHI1)
+               OR  (FTN-KOH-XXX           >=  WRK-CHK-KEIKASOCHI2)
+                    MOVE    4    TO      FLG-TOKKI
+                    PERFORM   21013-TOKKI-HENSYU-SEC
+               END-IF
+      *
+           END-IF
+      *
            IF      RECE62-SRYYM      >=  "200210"
              IF    RECE62-KOUREI  NOT =    SPACE
                 IF   RECE62-KOHNUM(1) =  SPACE
@@ -8700,7 +8775,8 @@
                             END-IF
                       END-EVALUATE
                    ELSE
-                      IF   RECE62-KYURATE   =   20
+                      IF  (RECE62-KYURATE        =    20  )
+                      AND (RECE62-RJNGENMENKBN   =   SPACE)
                          COMPUTE   WRK-CHIHOU-KIN       =
                                    RECE62-TOTALTEN(1)   *   10
                          IF   WRK-CHIHOU-KIN  >  361500
@@ -8719,6 +8795,10 @@
                       ELSE
                          IF     RECE62-FTNMONEY(1)  >  40200
                                MOVE  40200   TO   RECE62-FTNMONEY(1)
+                               IF   RECE62-RJNGENMENKBN   =   "1"
+                                  MOVE    4    TO      FLG-TOKKI
+                                  PERFORM   21013-TOKKI-HENSYU-SEC
+                               END-IF
                          END-IF
                       END-IF
                    END-IF
@@ -8771,6 +8851,47 @@
       *
            .
        21047-SKJ-RAYKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    高齢者の経過措置判定
+      *****************************************************************
+       21048-KEIKASOCHI-HANTEI-SEC      SECTION.
+      *
+      *    一般経過措置対象者
+           IF   (RECE62-SRYYM   >=  "200608")
+           AND  (RECE62-SRYYM   <=  "200808")
+           AND  (RECE62-KYURATE  =   20     )
+      *
+              INITIALIZE                      PTKOHINF-REC
+              MOVE    RECE62-HOSPID       TO  PTKOH-HOSPID
+              MOVE    RECE62-PTID         TO  PTKOH-PTID
+              MOVE    "978"               TO  PTKOH-KOHNUM
+              MOVE    RECE62-SRYYM        TO  PTKOH-TEKSTYMD(1:6)
+              MOVE    "01"                TO  PTKOH-TEKSTYMD(7:2)
+              MOVE    RECE62-SRYYM        TO  PTKOH-TEKEDYMD(1:6)
+              MOVE    "01"                TO  PTKOH-TEKEDYMD(7:2)
+              MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+              MOVE    "DBSELECT"          TO  MCP-FUNC
+              MOVE    "PTKOHINF-KEY6"     TO  ORC-DBPATH
+              CALL    "ORCMCPSUB"         USING   MCPAREA
+                                                  ORCMCPAREA
+                                                  MCPDATA-REC
+              IF      MCP-RC               =       ZERO
+                  MOVE    "PTKOHINF-KEY6" TO  ORC-DBPATH
+                  PERFORM  900-PTKOHINF-READ-SEC
+                  IF       FLG-PTKOHINF    =   ZERO
+                      MOVE    "1"         TO  RECE62-RJNGENMENKBN
+                  END-IF
+              END-IF
+      *
+              MOVE   "PTKOHINF-KEY6"      TO  WK-PATH
+              PERFORM   CSR-CLOSE-SEC
+      *
+           END-IF
+      *
+           .
+       21048-KEIKASOCHI-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -9859,6 +9980,28 @@
       *
            .
        900-SYUNOU-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報読込
+      *****************************************************************
+       900-PTKOHINF-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+               MOVE    ZERO            TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-EXT.
            EXIT.
       *
       *****************************************************************

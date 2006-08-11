@@ -116,6 +116,7 @@
       *                                     コメント自動記載対応
       *  03.01.01    NACL-門脇    06/07/10  在支援コメント自動記載対応
       *  03.01.02    NACL-門脇    06/07/14  診療区分置き換えフラグの編集
+      *  03.02.01    NACL-門脇    06/08/10  高齢者上限額経過措置対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -516,6 +517,7 @@
            03  CONS-TOKKI12        PIC X(14) VALUE "00000099990112".
            03  CONS-TOKKI13        PIC X(14) VALUE "00000099990113".
            03  CONS-TOKKI14        PIC X(14) VALUE "00000099990114".
+           03  CONS-TOKKI15        PIC X(14) VALUE "00000099990115".
       *    乳幼児加算
            03  CONS-NYUKSN1        PIC X(09) VALUE "111000370".         
            03  CONS-NYUKSN2        PIC X(09) VALUE "111011470".
@@ -1166,7 +1168,8 @@
                                                        CONS-TOKKI11 OR
                                                        CONS-TOKKI12 OR
                                                        CONS-TOKKI13 OR
-                                                       CONS-TOKKI14
+                                                       CONS-TOKKI14 OR
+                                                       CONS-TOKKI15
                                       CONTINUE
                                  ELSE
                                       MOVE  ZERO  TO  WRK-TEN
@@ -1441,7 +1444,8 @@
                                       OR  CONS-TOKKI11(6:9)
                                       OR  CONS-TOKKI12(6:9)
                                       OR  CONS-TOKKI13(6:9)
-                                      OR  CONS-TOKKI14(6:9) )
+                                      OR  CONS-TOKKI14(6:9)
+                                      OR  CONS-TOKKI15(6:9) )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
@@ -1472,7 +1476,8 @@
                                        OR  CONS-TOKKI11(6:9)
                                        OR  CONS-TOKKI12(6:9)
                                        OR  CONS-TOKKI13(6:9)
-                                       OR  CONS-TOKKI14(6:9) )
+                                       OR  CONS-TOKKI14(6:9)
+                                       OR  CONS-TOKKI15(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
@@ -4887,7 +4892,8 @@
                                                        CONS-TOKKI11 OR
                                                        CONS-TOKKI12 OR
                                                        CONS-TOKKI13 OR
-                                                       CONS-TOKKI14
+                                                       CONS-TOKKI14 OR
+                                                       CONS-TOKKI15
                                       CONTINUE
                                  ELSE
                                       MOVE  ACCT-DAY(1 WRK-DAY)  

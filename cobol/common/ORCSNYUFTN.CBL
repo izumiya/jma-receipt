@@ -78,6 +78,7 @@
       *  01.03.04    NACL-門脇    06/05/23  外泊時の入院基本料取得修正
       *  01.03.05    NACL-門脇    06/06/16  マル長がある場合の優先順位変更
       *  03.01.01    NACL-門脇    06/07/06  領収書対応
+      *  03.02.01    NACL-門脇    06/08/10  高齢者上限額経過措置対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -149,10 +150,11 @@
            02  WRK-HANBETU-TBL OCCURS   10.
               03 WRK-HANBETU-KEY.
                 05 WRK-HANBETU-SKYYM       PIC X(06).
+                05 WRK-HANBETU-YUSENYMD    PIC X(08).
                 05 WRK-HANBETU-YUSENBAN    PIC 9(03).
+                05 WRK-HANBETU-KAISHI      PIC X(02).
               03 WRK-HANBETU-HKNCOMBINUM   PIC 9(04).
               03 WRK-HANBETU-DAY           PIC X(01)   OCCURS   31.
-              03 WRK-HANBETU-KAISHI        PIC X(02).
               03 WRK-HANBETU-KAISHI2       PIC X(02).
               03 WRK-HANBETU-SYURYO        PIC X(02).
               03 WRK-HANBETU-SYUHKNNUM     PIC X(03).
@@ -170,7 +172,7 @@
               03 WRK-HANBETU2-HKNCOMBINUM  PIC 9(04).
               03 WRK-HANBETU2-DAY          PIC X(01)   OCCURS   31.
       *
-       01  WRK-HANBETU-DATA                PIC X(70).                   
+       01  WRK-HANBETU-DATA                PIC X(78).                   
       *
       *    入院点数算定用ワークエリア
        01  WRK-NYUIN-TENSU-AREA.
@@ -1135,6 +1137,14 @@
               MOVE COMB-KOH3HKNNUM    TO WRK-HANBETU-KOH3HKNNUM(IDX)
               MOVE COMB-KOH4HKNNUM    TO WRK-HANBETU-KOH4HKNNUM(IDX)
               MOVE COMB-NYU-KFTNRATE  TO WRK-HANBETU-PTFTNRATE(IDX)
+      *
+              IF   COMB-TEKSTYMD(1:6) <  WRK-HANBETU-SKYYM(IDX)
+                 MOVE WRK-HANBETU-SKYYM(IDX)
+                                      TO WRK-HANBETU-YUSENYMD(IDX)(1:6)
+                 MOVE "01"            TO WRK-HANBETU-YUSENYMD(IDX)(7:2)
+              ELSE
+                 MOVE COMB-TEKSTYMD   TO WRK-HANBETU-YUSENYMD(IDX)
+              END-IF
       *
       *       特殊計算フラグセット
               IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(1)
