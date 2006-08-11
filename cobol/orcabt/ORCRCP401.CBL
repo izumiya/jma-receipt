@@ -54,6 +54,7 @@
       *  02.09.02    NACL-Æ£¸¶    06/04/14  ¡Ö£±£³»ØÆ³¡×¡ÖÆü¡×¤Îº¹¤·¹þ¤ß
       *                                      »°¼ï¤Î¸øÈñÊ»ÍÑ¤Ë·¸¤ï¤ëµ­ºÜÍ×
       *                                      ¹à¤ÎÆÃÎãÂÐ±þ
+      *  03.02.01    NACL-ÌçÏÆ    06/08/10  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -622,8 +623,10 @@
            03  FILLER          PIC X(10)   VALUE   "£±£³Àè¿Ê".
            03  FILLER          PIC X(02)   VALUE   "14".
            03  FILLER          PIC X(10)   VALUE   "£±£´À©Ä¶".
+           03  FILLER          PIC X(02)   VALUE   "15".
+           03  FILLER          PIC X(10)   VALUE   "£±£µ·Ð²á".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   13.
+           03  TBL-TOKKI       OCCURS   14.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
       *
@@ -3288,7 +3291,7 @@
                    OR    ( IDZ                 =   4     ) 
       *
                PERFORM VARYING IDY     FROM    1   BY  1
-                       UNTIL ( IDY             >   13    )
+                       UNTIL ( IDY             >   14    )
                    IF      RECE62-TOKKI(IDX)   =   TBL-TOKKICD(IDY)
                        ADD     1                TO  IDZ
                        MOVE    TBL-TOKKINAME(IDY)
@@ -3297,7 +3300,7 @@
                        AND  RECE62-SRYYM      >=  "200504"
                           MOVE   "£±£²´ï¼£"     TO  HC06-TOKKI (IDZ)
                        END-IF
-                       MOVE    13               TO  IDY
+                       MOVE    14               TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM

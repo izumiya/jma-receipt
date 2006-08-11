@@ -22,6 +22,9 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.02.01    NACL-門脇    06/08/10  高齢者経過措置フラグ追加
+      *                                     主保険単独の患者負担額追加
+      *                                     公費を含む場合の患者負担額追加
       ************************************************************
        01  ORCSKOREIFTNCHKAREA.
       *
@@ -42,10 +45,16 @@
            03  LNK-KOREIFTNCHK-TEISYOTOKU   PIC X(01).
       *    レセプト科
            03  LNK-KOREIFTNCHK-RECEKA       PIC X(02).
+      *    高齢者経過措置フラグ
+           03  LNK-KOREIFTNCHK-KEIKASOCHI   PIC X(01).
       *
       *返却値
            03  LNK-KOREIFTNCHK-OUT-AREA.
-      *一部負担額
+      *主保険単独の患者負担額
+             05  LNK-KOREIFTNCHK-FTNGAKU    PIC 9(07).
+      *公費を含む場合の患者負担額
+             05  LNK-KOREIFTNCHK-KOHFTNGAKU PIC 9(07).
+      *公費を含む場合の主保険の一部負担額
              05  LNK-KOREIFTNCHK-ICHIBUGAKU PIC 9(07).
       *入院：高齢者２割＋地方公費の請求金額
              05  LNK-KOREIFTNCHK-CHIHOUGAKU PIC 9(07).
