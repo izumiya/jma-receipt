@@ -26,6 +26,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.02.01    NACL-門脇    06/08/10  高齢者上限額経過措置対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -171,12 +172,12 @@
                PERFORM
                     UNTIL   (IDX1             >=    50 )   OR
                             (FLG-HKNCOMBI  NOT =   ZERO)
-                   IF  ( COMB-KOH1HKNNUM  =  SPACE  OR "027" )
-                   AND ( COMB-KOH2HKNNUM  =  SPACE           )
-                   AND ( COMB-KOH3HKNNUM  =  SPACE           )
-                   AND ( COMB-KOH4HKNNUM  =  SPACE           )
-                      CONTINUE
-                   ELSE
+      ****         IF  ( COMB-KOH1HKNNUM  =  SPACE  OR "027" )
+      ****         AND ( COMB-KOH2HKNNUM  =  SPACE           )
+      ****         AND ( COMB-KOH3HKNNUM  =  SPACE           )
+      ****         AND ( COMB-KOH4HKNNUM  =  SPACE           )
+      ****            CONTINUE
+      ****         ELSE
                       ADD     1     TO     IDX1
                       MOVE    COMB-HKNCOMBINUM  TO
                                         WRK-HKNCOMBINUM(IDX1)
@@ -195,7 +196,7 @@
                         END-IF
                       END-IF
                       PERFORM   210-KYURATE-HENSYU-SEC
-                   END-IF
+      ****         END-IF
                    MOVE    "HKNCOMBI-KEY5"   TO  ORC-DBPATH
                    PERFORM 910-HKNCOMBI-READ-SEC
                END-PERFORM
@@ -232,14 +233,29 @@
                        MOVE   20     TO   WRK-KYURATE(IDX1)
                 END-EVALUATE
            ELSE
+             IF      LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
                 EVALUATE   COMB-HOJOKBN
                    WHEN   "1"
+                   WHEN   "5"
                    WHEN   "9"
                        MOVE   10     TO   WRK-KYURATE(IDX1)
                    WHEN   "2"
+                   WHEN   "6"
                    WHEN   "8"
                        MOVE   20     TO   WRK-KYURATE(IDX1)
                 END-EVALUATE
+             ELSE
+                EVALUATE   COMB-HOJOKBN
+                   WHEN   "1"
+                   WHEN   "4"
+                   WHEN   "9"
+                       MOVE   10     TO   WRK-KYURATE(IDX1)
+                   WHEN   "2"
+                   WHEN   "5"
+                   WHEN   "8"
+                       MOVE   20     TO   WRK-KYURATE(IDX1)
+                END-EVALUATE
+             END-IF
            END-IF
       *
            .
@@ -307,6 +323,17 @@
                   PERFORM 910-SYUNOU-READ-SEC
                   PERFORM  UNTIL
                              (FLG-SYUNOU        =    1)
+                   IF  ( SYU-KOH-HKNNUM(1)  =  SPACE  OR "027" )
+                   AND ( SYU-KOH-HKNNUM(2)  =  SPACE           )
+                   AND ( SYU-KOH-HKNNUM(3)  =  SPACE           )
+                   AND ( SYU-KOH-HKNNUM(4)  =  SPACE           )
+                    IF   SYU-KOH-HKNNUM(1)  =  "027"
+                      ADD  SYU-KOH1COMPFTN  TO  LNK-KOREIFTNCHK-FTNGAKU
+                    ELSE
+                      ADD  SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
+                    END-IF
+                   ELSE
+                    ADD    SYU-KOH-FTN   TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
                     COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                         * 10
@@ -345,6 +372,8 @@
                         ELSE
                           IF   (  WRK-KYURATE(IDX1)      =  20     )
                           AND  (  FLG-ZENKOH-ARI         =  ZERO   )
+                          AND  (  LNK-KOREIFTNCHK-KEIKASOCHI
+                                                         =  SPACE  )
                              COMPUTE   LNK-KOREIFTNCHK-CHIHOUGAKU   =
                                        LNK-KOREIFTNCHK-CHIHOUGAKU   +
                                       (SYU-TOTAL-HKNTEN * 10)
@@ -366,9 +395,10 @@
                         END-IF
                       END-IF
                     END-IF
+                   END-IF
       *
-                    MOVE   "SYUNOU-KEY19"   TO  ORC-DBPATH
-                    PERFORM 910-SYUNOU-READ-SEC
+                   MOVE   "SYUNOU-KEY19"   TO  ORC-DBPATH
+                   PERFORM 910-SYUNOU-READ-SEC
                   END-PERFORM
               END-IF
       *
@@ -442,6 +472,17 @@
                   PERFORM 910-SYUNOU-READ-SEC
                   PERFORM  UNTIL
                              (FLG-SYUNOU        =    1)
+                   IF  ( SYU-KOH-HKNNUM(1)  =  SPACE  OR "027" )
+                   AND ( SYU-KOH-HKNNUM(2)  =  SPACE           )
+                   AND ( SYU-KOH-HKNNUM(3)  =  SPACE           )
+                   AND ( SYU-KOH-HKNNUM(4)  =  SPACE           )
+                    IF   SYU-KOH-HKNNUM(1)  =  "027"
+                      ADD  SYU-KOH1COMPFTN  TO  LNK-KOREIFTNCHK-FTNGAKU
+                    ELSE
+                      ADD  SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
+                    END-IF
+                   ELSE
+                    ADD    SYU-KOH-FTN   TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
                     COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                         * 10
@@ -479,6 +520,8 @@
                         ELSE
                           IF   (  WRK-KYURATE(IDX1)      =  20     )
                           AND  (  FLG-ZENKOH-ARI         =  ZERO   )
+                          AND  (  LNK-KOREIFTNCHK-KEIKASOCHI
+                                                         =  SPACE  )
                              MOVE       40200  TO   WRK-KINGAKU
                              PERFORM   2201-ICHIBUFTN-KOH-SET-SEC
                           ELSE
@@ -488,9 +531,10 @@
                         END-IF
                       END-IF
                     END-IF
+                   END-IF
       *
-                    MOVE   "SYUNOU-KEY41"   TO  ORC-DBPATH
-                    PERFORM 910-SYUNOU-READ-SEC
+                   MOVE   "SYUNOU-KEY41"   TO  ORC-DBPATH
+                   PERFORM 910-SYUNOU-READ-SEC
                   END-PERFORM
               END-IF
       *
