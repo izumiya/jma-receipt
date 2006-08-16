@@ -86,7 +86,6 @@
            03  WRK-STTSYYMD-FROM                   PIC X(08).
            03  WRK-STTSYYMD-TO                     PIC X(08).
            03  WRK-EDTSYYMD                        PIC X(08).
-           03  WRK-EDPTNUM                         PIC X(20).
            03  WRK-SQL                             PIC X(20000).
            03  WRK-SQL-PNT                         PIC 9(06).
            03  WRK-PNT                             PIC 9(06).
@@ -365,13 +364,6 @@
            ELSE
                MOVE    SPA-Q01-EDLASTYMD
                                    TO  WRK-EDLASTYMD
-           END-IF
-      *
-           IF      ( SPA-Q01-EDPTNUM   =   SPACE )
-               MOVE    ALL "Z"     TO  WRK-EDPTNUM
-           ELSE
-               MOVE    SPA-Q01-EDPTNUM
-                                   TO  WRK-EDPTNUM
            END-IF
       *
            IF      ( SPA-Q01-STTENKIYMD =   SPACE )
@@ -2144,15 +2136,25 @@
            END-STRING
       *
            IF  ( SPA-Q01-GTBL (1)  =   "1" )
-               STRING  "AND (H.PTNUM>='"   DELIMITED  BY  SIZE
-                       SPA-Q01-STPTNUM     DELIMITED  BY  SIZE
-                       "') AND "           DELIMITED  BY  SIZE
-                       "(H.PTNUM<='"       DELIMITED  BY  SIZE
-                       WRK-EDPTNUM         DELIMITED  BY  SIZE
-                       "')"                DELIMITED  BY  SIZE
-               INTO    WRK-SQL
-               WITH    POINTER WRK-SQL-PNT
-               END-STRING
+      *
+               IF    ( SPA-Q01-STPTNUM     NOT =   SPACE )
+                   STRING  "AND (H.PTNUM>='"   DELIMITED  BY  SIZE
+                           SPA-Q01-STPTNUM     DELIMITED  BY  SIZE
+                           "')"                DELIMITED  BY  SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               END-IF
+      *
+               IF    ( SPA-Q01-EDPTNUM     NOT =   SPACE )
+                   STRING  "AND (H.PTNUM<='"   DELIMITED  BY  SIZE
+                           SPA-Q01-EDPTNUM     DELIMITED  BY  SIZE
+                           "')"                DELIMITED  BY  SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               END-IF
+      *
            END-IF
       *
            STRING  ")"         DELIMITED   BY  SIZE
