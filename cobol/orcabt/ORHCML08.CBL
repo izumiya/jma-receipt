@@ -277,23 +277,16 @@
       *    Ä¢É¼°õºþ³«»Ï½èÍý
            PERFORM 900-DBSELECT-SEC
       *
-           IF  FLG-TENSU  =  ZERO
-               PERFORM 900-ICDSELECT-SEC
+           PERFORM UNTIL   FLG-TENSU   =   1
+      *        Ä¢É¼ÊÔ½¸<¸«½Ð¤·>½èÍý
+               PERFORM 310-HEAD-HEN-SEC 
+      *        Ä¢É¼ÊÔ½¸<ÌÀºÙ>½èÍý
+               PERFORM 320-BODY-HEN-SEC
+      *        Ä¢É¼°õºþ½èÍý
+               PERFORM 390-PRINT-OUT-SEC
+           END-PERFORM
       *
-               PERFORM              UNTIL   FLG-TENSU     =   1
-      *            Ä¢É¼ÊÔ½¸<¸«½Ð¤·>½èÍý
-                   PERFORM 310-HEAD-HEN-SEC
-      *            Ä¢É¼ÊÔ½¸<ÌÀºÙ>½èÍý
-                   PERFORM 320-BODY-HEN-SEC
-      *            Ä¢É¼°õºþ½èÍý
-                   PERFORM 390-PRINT-OUT-SEC
-               END-PERFORM
-      *
-               PERFORM 900-ICDCLOSE-SEC  
-      *
-           END-IF
-      *
-           PERFORM 900-DBCLOSE-SEC           
+           PERFORM 900-DBCLOSE-SEC          
       *
            MOVE    1               TO  FLG-END 
            .
@@ -325,31 +318,26 @@
       *****************************************************************
        320-BODY-HEN-SEC      SECTION.
       *
-           MOVE    ZERO                TO  CNT-LINE
-      *
-           PERFORM             UNTIL   FLG-TENSU   =   1
-                               OR      CNT-LINE    =   35  
-      *          
-               PERFORM         UNTIL   FLG-ICD   =   1
-                               OR      CNT-LINE    =   35   
-      *
+           PERFORM UNTIL   FLG-TENSU     =   1
+                   OR      CNT-LINE      =   35
+               PERFORM 900-ICDSELECT-SEC 
+               PERFORM UNTIL   FLG-ICD   =   1
+                   IF      CNT-LINE    =   35  
+      *                Ä¢É¼°õºþ½èÍý
+                       PERFORM 390-PRINT-OUT-SEC
+      *                Ä¢É¼ÊÔ½¸<¸«½Ð¤·>½èÍý
+                       PERFORM 310-HEAD-HEN-SEC
+                   END-IF
                    ADD     1                 TO  CNT-LINE
                    MOVE    TNS-TEN           TO  WRK-TEN
                    MOVE    WRK-TEN           TO  HCML06-TEN(CNT-LINE)
                    MOVE    ICD-INPUTCD       TO  HCML06-SRYCD(CNT-LINE)
                    MOVE    TNS-NAME          TO  HCML06-NAME(CNT-LINE)
-      *
-                   PERFORM 900-ICDFETCH-SEC 
-      *
+                   PERFORM 900-ICDFETCH-SEC
                END-PERFORM 
-      *
-               IF  FLG-ICD   =   1
-                   PERFORM 900-DBFETCH-SEC 
-                   MOVE    ZERO              TO  FLG-ICD
-                   PERFORM 900-ICDSELECT-SEC   
-               END-IF                
-      *              
-           END-PERFORM     
+               PERFORM 900-ICDCLOSE-SEC 
+               PERFORM 900-DBFETCH-SEC 
+           END-PERFORM    
       *
            .
        320-BODY-HEN-EXT.
