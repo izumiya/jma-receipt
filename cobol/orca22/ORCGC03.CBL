@@ -89,6 +89,8 @@
       *
       *  03.01.01    NACL-藤原    06/06/01  病名入力コードのアルファベッ
       *                                     ト７文字対応
+      *  03.01.02    NACL-藤原    06/08/01  選択後すぐに登録したときに
+      *                                     エラーとならないようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1197,6 +1199,7 @@
                                        TO SPA-NAI-CDSYU
            MOVE    SPA-GMN-TBYOMEIINPUTCD (SPA-NAI-SELNO)
                                        TO  SPA-GMN-BYOMEIINPUTCD
+                                           SPA-NAI-BYOMEIINPUTCD
            PERFORM 410111-USERBYOMEI-HENSYU-SEC
       *
            .
@@ -2780,7 +2783,11 @@
       *    入力コードのチェック
            IF      SPA-GMN-BYOMEIINPUTCD  NOT =   SPACE
            AND     SPA-NAI-BYOMEIINPUTCD      =   SPACE
-               MOVE    "0032"               TO  SPA-ERRCD
+               IF      SPA-NAI-SELNO       >   ZERO
+                   MOVE    "0050"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    "0032"              TO  SPA-ERRCD
+               END-IF
                MOVE    2                    TO  SPA-GMN-CUR
                GO  TO  450-TOUROKU-EXT
            END-IF

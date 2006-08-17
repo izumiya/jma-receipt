@@ -198,6 +198,8 @@
       *                                     修正
       *  03.01.04    NACL-藤原    06/08/04  自院検索で移行病名がないときの
       *                                     疾患区分の表示方法の修正
+      *  03.01.05    NACL-藤原    06/08/16  自院コードのみのときの自院検索
+      *                                     遷移がエラーにならないようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3576,6 +3578,23 @@
       *
            MOVE    PTBYOMEI-REC        TO  SPA-PTBYOMEI-REC
       *
+      *    病名コード
+           PERFORM VARYING IDZ     FROM    1   BY  1
+                   UNTIL   IDZ     >       21
+               MOVE    PTBYO-BYOMEICD(IDZ)
+                                   TO  SPA-NAI-C02-BYOMEICD   (IDZ)
+                                       SPA-NAI-C02-BYOMEICD-O (IDZ 1)
+                                       BYO-BYOMEICD
+               PERFORM 410111-BYOMEI-HENSYU-SEC
+               MOVE    SPACE       TO  SPA-NAI-C02-BYOMEITOP (IDZ) 
+               IF      SPA-NAI-C02-BYOMEICD-O (IDZ 1)
+                                   =   WRK-CONS-BYOMEICD
+                   MOVE    PTBYO-BYOMEI
+                                   TO  SPA-NAI-C02-BYOMEI-O (IDZ 1)
+                                       SPA-NAI-C02-BYOMEI   (IDZ)
+               END-IF
+           END-PERFORM
+      *
       *    入力コード
            PERFORM VARYING IDZ     FROM    1   BY  1
                    UNTIL   IDZ     >       6
@@ -3634,22 +3653,6 @@
                END-IF
            END-PERFORM
       *
-      *    病名コード
-           PERFORM VARYING IDZ     FROM    1   BY  1
-                   UNTIL   IDZ     >       21
-               MOVE    PTBYO-BYOMEICD(IDZ)
-                                   TO  SPA-NAI-C02-BYOMEICD   (IDZ)
-                                       SPA-NAI-C02-BYOMEICD-O (IDZ 1)
-                                       BYO-BYOMEICD
-               PERFORM 410111-BYOMEI-HENSYU-SEC
-               MOVE    SPACE       TO  SPA-NAI-C02-BYOMEITOP (IDZ) 
-               IF      SPA-NAI-C02-BYOMEICD-O (IDZ 1)
-                                   =   WRK-CONS-BYOMEICD
-                   MOVE    PTBYO-BYOMEI
-                                   TO  SPA-NAI-C02-BYOMEI-O (IDZ 1)
-                                       SPA-NAI-C02-BYOMEI   (IDZ)
-               END-IF
-           END-PERFORM
            MOVE    "1"             TO  SPA-NAI-C02-BYOMEITOP (1)
       *
            PERFORM 4101111-BYOMEI-SELECT-HENSYU-SEC              
