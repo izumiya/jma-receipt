@@ -139,6 +139,7 @@
       *                                     ¹âÎð¼Ô¡¢Ä¹´ü¤Ë´Ø¤¹¤ëÉéÃ´·×»»½¤Àµ
       *  03.01.01    NACL-ÌçÏÆ    06/07/20  ËÌ³¤Æ»¤ÎÆÃÄê¼À´µ¿©»öÂÐ±þ
       *  03.02.01    NACL-ÌçÏÆ    06/07/31  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
+      *  03.02.02    NACL-ÌçÏÆ    06/08/17  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9592,7 +9593,8 @@
                                                     OR "354"))
              OR ( FLG-MIYAGI          NOT  =   ZERO          )
              OR ((WK-1001-PREFNUM          =   08           ) AND
-                 (COMB-KOHHKNNUM(KOH-IDX)  =  "146"         ) AND
+                 (COMB-KOHHKNNUM(KOH-IDX)  =  "146"
+                                           OR "183" OR "185") AND
                  (LNK-SYU-SRYYMD(1:6)    >= "200511"
                                      AND <= "200703"        ))
                        MOVE     1     TO   FLG-NYUSKJJYOGAK
@@ -9603,7 +9605,8 @@
                                                     OR "354"))
              OR ( FLG-MIYAGI          NOT  =   ZERO          )
              OR ((WK-1001-PREFNUM          =   08           ) AND
-                 (COMB-KOHHKNNUM(KOH-IDX)  =  "146"         ) AND
+                 (COMB-KOHHKNNUM(KOH-IDX)  =  "146"
+                                           OR "183" OR "185") AND
                  (LNK-SYU-SRYYMD(1:6)    >= "200511"
                                      AND <= "200703"        ))
                  EVALUATE   FLG-SKJ
