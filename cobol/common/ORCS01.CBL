@@ -189,6 +189,7 @@
       *                                     Á´¹ñÈÄ¶â¶È¡Ü£°£²£±Àº¿ÀÂÐ±þ
       *  03.01.01    NACL-ÌçÏÆ    06/07/06  ÎÎ¼ý½ñÂÐ±þ
       *  03.02.01    NACL-ÌçÏÆ    06/07/31  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
+      *  03.02.02    NACL-ÌçÏÆ    06/08/17  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4999,6 +5000,8 @@
       *    °ñ¾ë¸©¡Ê£±£´£³¡¢£±£´£µ¡Ë
            IF   WK-1001-PREFNUM          =  08
               IF     SYU-KOH1HKNNUM  =  "143" OR "145"
+                                     OR "181" OR "182" OR "189"
+                                     OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
                 END-IF
@@ -5013,6 +5016,8 @@
                 END-IF
               END-IF
               IF     SYU-KOH2HKNNUM  =  "143" OR "145"
+                                     OR "181" OR "182" OR "189"
+                                     OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
                 END-IF
@@ -5027,6 +5032,8 @@
                 END-IF
               END-IF
               IF     SYU-KOH3HKNNUM  =  "143" OR "145"
+                                     OR "181" OR "182" OR "189"
+                                     OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
                 END-IF
@@ -5041,6 +5048,8 @@
                 END-IF
               END-IF
               IF     SYU-KOH4HKNNUM  =  "143" OR "145"
+                                     OR "181" OR "182" OR "189"
+                                     OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
                 END-IF
