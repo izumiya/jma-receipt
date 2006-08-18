@@ -3644,6 +3644,7 @@
            END-PERFORM
       *
       *    カーソルクロース
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
@@ -3748,6 +3749,7 @@
                     MOVE    1                   TO  FLG-CLAIM-MULTIHOST
                END-IF
                IF      SYS-9000-SETUZOKU   =   ZERO
+                                           OR  SPACE
                    CONTINUE
                ELSE
                    MOVE    SYS-9000-CODE       TO  SPA-U02X-CODE
