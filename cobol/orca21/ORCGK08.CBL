@@ -46,6 +46,7 @@
       *  01.00.17    NACL-¬ø°π«º  05/11/17  MONFUNC ¬–±˛
       *  01.00.18    NACL-¬ø°π«º  05/12/21  ≈–œøΩÁƒ…≤√
       *  01.00.19    NACL-¬ø°π«º  06/01/23  Õ—ŒÃ≥‰πÁ°¶ Ò≥Á∏°∫∫øÙƒ…≤√
+      *  01.00.21    NACL-¬ø°π«º  06/08/18   °≤¨∏©√œ ˝∏¯»Ò§À∆±∆¸ΩÈø«ƒ…≤√
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -261,6 +262,7 @@
            03  FLG-SYOSIN-OK       PIC 9(01).
       *
            03  FLG-SIJISEN         PIC 9(01).
+           03  FLG-SYU40           PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -3404,6 +3406,8 @@
            MOVE    SPACE               TO  LNK-SYUNOU2-AREA
            INITIALIZE                  LNK-SYUNOU2-AREA
            INITIALIZE                  LNK-SYUNOU2-MAX
+      *     °≤¨∏¯»ÒÕ—
+           MOVE    ZERO                TO  FLG-SYU40
       *
            PERFORM VARYING   IDH1      FROM    1   BY  1
                    UNTIL    (IDH1      >   15  )   OR
@@ -4220,6 +4224,16 @@
                                        SPA-AREA
                                        ORCSSYU40AREA
                                        SYUNOU-REC
+      *        ΩÈø«Œ¡§»∆±∆¸ΩÈø«§¨§¢§Îª˛°¢ΩÈø«Œ¡§Œ§ﬂ
+               IF      FLG-SYU40           =   1
+                   COMPUTE SYU-KYUFUGAI-GOKEI-TEN
+                                           =   SYU-KYUFUGAI-GOKEI-TEN
+                                           -   SYU-KYUFUGAI-SHOSHIN-TEN
+                   MOVE    ZERO            TO  SYU-KYUFUGAI-SHOSHIN-TEN
+               END-IF
+               IF      SYU-KYUFUGAI-SHOSHIN-TEN    >   ZERO
+                   MOVE    1               TO  FLG-SYU40
+               END-IF
            ELSE
       *        ø«Œ≈∂Ë ¨ ÃµÎ…’≥∞≈¿øÙ•Ø•Í•¢
                INITIALIZE              SYU-KYUFUGAI
