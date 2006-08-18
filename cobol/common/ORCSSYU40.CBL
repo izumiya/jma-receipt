@@ -32,6 +32,7 @@
       *  01.00.02    NACL-多々納  05/11/11  MONFUNC 対応 他
       *  01.00.03    NACL-多々納  06/03/20  Ｈ１８．４改正対応
       *  01.00.04    NACL-多々納  06/04/12  電子化加算追加
+      *  01.00.05    NACL-多々納  06/08/18  同日初診追加
       *****************************************************************
       *
       *
@@ -61,6 +62,8 @@
            03  FLG-OK2             PIC 9(01).
            03  FLG-ERR             PIC 9(01).
            03  FLG-SYOSIN-ERR      PIC 9(01).
+           03  FLG-SYOSIN          PIC 9(01).
+           03  FLG-DOUJITU         PIC 9(01).
       *
            03  FLG-SYORI-END       PIC 9(01).
            03  FLG-SYONIKA         PIC 9(01).
@@ -88,6 +91,7 @@
            03  WRK-HEN-SRYCD       PIC X(09).
       *    初診算定日
            03  WRK-DD              PIC 9(02).
+           03  WRK-DD2             PIC 9(02).
            03  WRK-DD-S            PIC 9(02).
       *
            03  WRK-SRYYMD.
@@ -99,6 +103,8 @@
            03  WRK-H-ZAINUM        PIC 9(08).
       *    電子化加算
            03  WRK-DENSIKA         PIC 9(01).
+      *    同日初診
+           03  WRK-DOUJITU         PIC X(01).
       *
       *    診療行為コード一覧
        01  TBL-SINSATU-AREA.
@@ -153,16 +159,19 @@
       *    小児科外来診察料(初診時時間外加算)
            03  FILLER              PIC X(13)   VALUE   "113009670 2 1".
       *
+      *    初診料（同日複数診療科）
+           03  FILLER              PIC X(13)   VALUE   "111011810 110".
+      *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       *****03  TBL-SINSATU-OCC         OCCURS  18    INDEXED  TBL-IDX.
-           03  TBL-SINSATU-OCC         OCCURS  22    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  23    INDEXED  TBL-IDX.
       *        診療コード
                05  TBL-SRYCD           PIC X(09).
       *
                05  TBL-YOBO1           PIC X(01).
       *        データ区分
                05  TBL-DATAKBN         PIC X(01).
-      *
+      *        （1:同日初診）
                05  TBL-YOBO2           PIC X(01).
       *        往診加算（0:なし,1:夜間、2:深夜・緊急）
       *        時間加算（0:なし,1:時間外、2:休日、3:深夜、4:特例
@@ -348,6 +357,8 @@
            ELSE
                PERFORM 1000-SYSKANRI-HEN-SEC
            END-IF
+           MOVE    ZERO                TO  FLG-DOUJITU
+           MOVE    ZERO                TO  FLG-SYOSIN
       *    当月最初の初診料算定日を判定する
            PERFORM 3000-SYOSIN-ALLCHK-SEC
       *
@@ -373,6 +384,8 @@
                                            +   SYU-KYUFUGAI-OSIN3-TEN
       *
       *TEST
+      *    DISPLAY "SYU-SRYKA :" SYU-SRYKA
+      *    DISPLAY "SYU-HKNCOMBINUM :" SYU-HKNCOMBINUM
       *    DISPLAY "SYU-KYUFUGAI-SHOSHIN-TEN:" SYU-KYUFUGAI-SHOSHIN-TEN
       *    DISPLAY "SYU-KYUFUGAI-SIDOU-TEN:" SYU-KYUFUGAI-SIDOU-TEN
       *    DISPLAY "SYU-KYUFUGAI-OSIN1-TEN:" SYU-KYUFUGAI-OSIN1-TEN
@@ -390,6 +403,7 @@
       *
            MOVE    ZERO                TO  FLG-OK
            MOVE    ZERO                TO  WRK-KASAN
+           MOVE    SPACE               TO  WRK-DOUJITU
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2            >   5   )  OR
                               (ORCS40-SRYCD (IDX IDX2)
@@ -406,6 +420,7 @@
                        END-IF
                        IF      TBL-DATAKBN (TBL-IDX)   =   "1"
                            MOVE    1               TO  FLG-OK
+                           MOVE    TBL-YOBO2 (TBL-IDX) TO  WRK-DOUJITU
                            MOVE    IDX2            TO  IDX-SYU
                        END-IF
                END-SEARCH
@@ -421,9 +436,19 @@
       *            初診料の時、当月最初かどうかの判定
                    IF     (WRK-DD              =   ZERO )  OR
                           (WRK-SRYDD           <=  WRK-DD)
-      *                給付対象外点数（初診）
-                       MOVE    ORCS40-ZAITEN (IDX)
+                       IF     (WRK-SRYDD           =   WRK-DD) AND
+                              (FLG-SYOSIN          =   1     )
+      *                    初診料と同日初診が同日にある場合、初診料のみ
+                           IF      WRK-DOUJITU     =   SPACE
+      *                    給付対象外点数（初診）
+                               MOVE    ORCS40-ZAITEN (IDX)
                                            TO  SYU-KYUFUGAI-SHOSHIN-TEN
+                           END-IF
+                       ELSE
+      *                    給付対象外点数（初診）
+                           MOVE    ORCS40-ZAITEN (IDX)
+                                           TO  SYU-KYUFUGAI-SHOSHIN-TEN
+                       END-IF
                    END-IF
                WHEN    "14"
                    EVALUATE    WRK-KASAN
@@ -759,6 +784,7 @@
        3000-SYOSIN-ALLCHK-SEC            SECTION.
       *
            MOVE    ZERO                TO  FLG-ERR
+           MOVE    ZERO                TO  FLG-DOUJITU
       *    算定履歴検索
            MOVE    SPACE               TO  SANTEI-REC
            INITIALIZE                  SANTEI-REC
@@ -778,8 +804,8 @@
            END-IF
       *
            PERFORM
-               UNTIL      (FLG-SANTEI      =   1  )  OR
-                          (FLG-ERR         =   1  )
+               UNTIL      (FLG-SANTEI      =   1  )
+      *D               OR (FLG-ERR         =   1  )
       *
                IF      SANTEI-MSANTEICNT   >   ZERO
       *            当月算定分
@@ -792,6 +818,19 @@
            MOVE    "tbl_santei"        TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *    処理日に初診料算定
+           IF      WRK-DD              =   WRK-SRYDD
+               MOVE    1               TO  FLG-SYOSIN
+           END-IF
+      *    同日初診編集
+           IF      WRK-DD2             >   ZERO
+               IF     (WRK-DD          >   WRK-DD2 )
+                  OR  (WRK-DD          =   ZERO    )
+                   MOVE    WRK-DD2         TO  WRK-DD
+                   MOVE    ZERO            TO  FLG-SYOSIN
+               END-IF
+           END-IF
            .
        3000-SYOSIN-ALLCHK-EXT.
            EXIT.
@@ -819,6 +858,13 @@
                    END-IF
                    IF      WRK-DD              <   WRK-SRYDD
                         MOVE    1              TO  FLG-ERR
+                   END-IF
+      *        同日複数診療科
+               WHEN    "111011810"
+      *            最小の算定日編集
+                   IF     (WRK-DD2             =   ZERO )  OR
+                          (SANTEI-MSANTEID     <   WRK-DD2)
+                       MOVE    SANTEI-MSANTEID     TO  WRK-DD2
                    END-IF
            END-EVALUATE
       *
@@ -946,6 +992,7 @@
       *****************************************************************
        300111-TBL-CHK-SEC            SECTION.
       *
+           MOVE    SPACE               TO  WRK-DOUJITU
       *    コードチェック
            SET     TBL-IDX             TO  1
            SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
@@ -957,10 +1004,20 @@
                    END-IF
                    IF      TBL-DATAKBN (TBL-IDX)   =   "1"
                        MOVE    1               TO  FLG-OK
+                       MOVE    TBL-YOBO2 (TBL-IDX) TO  WRK-DOUJITU
                        MOVE    TBL-IDX         TO  IDX-SYU
                    END-IF
                    MOVE    1               TO  FLG-OK2
            END-SEARCH
+      *
+           IF      FLG-OK                  =   1
+      *        同日初診コードで同日に初診料がないこと
+               IF      WRK-DOUJITU         =   "1"
+                   IF      FLG-SYOSIN      =   1
+                       MOVE    ZERO            TO  FLG-OK
+                   END-IF
+               END-IF
+           END-IF
       *
            IF      FLG-OK2                 =   ZERO
       *        紹介加算の判定
