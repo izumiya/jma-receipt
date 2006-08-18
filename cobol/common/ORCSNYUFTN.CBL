@@ -78,6 +78,7 @@
       *  01.03.04    NACL-ÃÁœ∆    06/05/23  ≥∞«Òª˛§Œ∆˛±°¥À‹Œ¡ºË∆¿Ω§¿µ
       *  01.03.05    NACL-ÃÁœ∆    06/06/16  •ﬁ•Îƒπ§¨§¢§ÎæÏπÁ§ŒÕ•¿ËΩÁ∞Ã —ππ
       *  03.02.01    NACL-ÃÁœ∆    06/08/10  π‚Œº‘æÂ∏¬≥€∑–≤·¡º√÷¬–±˛
+      *  03.02.02    NACL-ÃÁœ∆    06/08/18   °≤¨∏©µÎ…’≥∞≈¿øÙ∑◊ªªΩ§¿µ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -318,15 +319,29 @@
            03  FILLER          PIC X(09)   VALUE    "111000110".
       *    ΩÈø«Œ¡° œ∑øÕ°°…¬±°°À
            03  FILLER          PIC X(09)   VALUE    "111700110".
-      *    æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡° ±°≥∞ΩË ˝°ÀΩÈø«ª˛
-           03  FILLER          PIC X(09)   VALUE    "113003510".
-      *    æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡° ±°∆‚ΩË ˝°ÀΩÈø«ª˛
-           03  FILLER          PIC X(09)   VALUE    "113003710".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    6.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS    4.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     6.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     4.
+      *
+      *    ΩÈø«Œ¡ªªƒÍ•’•È•∞Õ—•∆°º•÷•Î°  °≤¨Õ—°À
+       01  TBL-SYOSIN2-AREA.
+      *    ΩÈø«Œ¡° ∞Ï»Ã°°ø«Œ≈ΩÍ°À
+           03  FILLER          PIC X(09)   VALUE    "111003610".
+      *    ΩÈø«Œ¡° œ∑øÕ°°ø«Œ≈ΩÍ°À
+           03  FILLER          PIC X(09)   VALUE    "111700210".
+      *    ΩÈø«Œ¡° œ∑øÕ°°…¬±°°À
+           03  FILLER          PIC X(09)   VALUE    "111000110".
+      *    ΩÈø«Œ¡° œ∑øÕ°°…¬±°°À
+           03  FILLER          PIC X(09)   VALUE    "111700110".
+      *    ΩÈø«° ∆±∆¸ £øÙø«Œ≈≤ °À
+           03  FILLER          PIC X(09)   VALUE    "111011810".
+      *
+       01  TBL-SYOSIN2-R       REDEFINES   TBL-SYOSIN2-AREA.
+           03  TBL-SYOSIN2     PIC X(09)   OCCURS    5.
+      *
+       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     5.
       *
       *     °≤¨∏©∏¯»Ò§ŒµÎ…’¬–æ›≥∞»ΩƒÍÕ—§ŒΩÈø«¬‡»Ú•∆°º•÷•Î
        01  TBL-FUKUOKA.
@@ -3027,13 +3042,13 @@
       *        ≈ˆ≥∫¥µº‘§ŒΩÈø«ªªƒÍÕ˙ŒÚ§Ú•Ô°º•Ø•∆°º•÷•Î§À¿ﬂƒÍ
                IF   FLG-KYUFUGAI     =     1
                    PERFORM   VARYING  FUKU-IDX    FROM   1  BY  1
-                             UNTIL    FUKU-IDX    >   TBL-SYOSIN-MAX
+                             UNTIL    FUKU-IDX    >   TBL-SYOSIN2-MAX
                        MOVE        SPACE        TO  SANTEI-REC
                        INITIALIZE                   SANTEI-REC
                        MOVE    SYU-HOSPID       TO  SANTEI-HOSPID
                        MOVE    SYU-PTID         TO  SANTEI-PTID
                        MOVE    SYU-SRYYMD(1:6)  TO  SANTEI-SRYYM
-                       MOVE    TBL-SYOSIN(FUKU-IDX)
+                       MOVE    TBL-SYOSIN2(FUKU-IDX)
                                                 TO  SANTEI-SRYCD
                        MOVE    ZERO             TO  SANTEI-HKNCOMBINUM
                        MOVE    SANTEI-REC       TO  MCPDATA-REC
@@ -3044,21 +3059,44 @@
                                                     ORCMCPAREA
                                                     MCPDATA-REC
                        IF      MCP-RC           =   ZERO
-                           MOVE    "SANTEI-KEY7"    TO  ORC-DBPATH
-                           PERFORM  SANTEI-READ-SEC
-                           IF    FLG-SANTEI     =   ZERO
-                               IF   SANTEI-MSANTEICNT  NOT =  ZERO
-                                 PERFORM VARYING FUKU-IDX2 FROM 1 BY 1
-                                         UNTIL   FUKU-IDX2  >  31
-                                   IF   SANTEI-DAY(FUKU-IDX2)
-                                                           NOT =  ZERO
-                                       ADD  SANTEI-DAY(FUKU-IDX2)
-                                                TO  TBL-FUKUOKA-SYOSIN
-                                                          (FUKU-IDX2)
-                                   END-IF
-                                 END-PERFORM
-                               END-IF
-                           END-IF
+                         MOVE    "SANTEI-KEY7"    TO  ORC-DBPATH
+                         PERFORM  SANTEI-READ-SEC
+                         IF    FLG-SANTEI             =  ZERO
+                          IF   SANTEI-MSANTEICNT  NOT =  ZERO
+                           PERFORM VARYING FUKU-IDX2 FROM 1 BY 1
+                                    UNTIL  FUKU-IDX2  >  31
+                            IF  SANTEI-DAY(FUKU-IDX2) NOT =  ZERO
+      ***                     ADD  SANTEI-DAY(FUKU-IDX2)
+      ***                          TO  TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                              IF TBL-SYOSIN2(FUKU-IDX) = "111011810"
+                                 EVALUATE TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                                   WHEN    0
+                                     MOVE  2  TO
+                                          TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                                   WHEN    1
+                                     MOVE  3  TO
+                                          TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                                   WHEN    2
+                                   WHEN    3
+                                     CONTINUE
+                                 END-EVALUATE
+                              ELSE
+                                 EVALUATE TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                                   WHEN    0
+                                     MOVE  1  TO
+                                          TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                                   WHEN    2
+                                     MOVE  3  TO
+                                          TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
+                                   WHEN    1
+                                   WHEN    3
+                                     CONTINUE
+                                 END-EVALUATE
+                              END-IF
+                            END-IF
+                           END-PERFORM
+                          END-IF
+                         END-IF
                        END-IF
                        MOVE     "SANTEI-KEY7"      TO  WK-PATH
                        PERFORM   CSR-CLOSE-SEC
@@ -3145,31 +3183,17 @@
       *                °≤¨µÎ…’≥∞≈¿øÙ§Œ»ΩƒÍ
                       IF    (FLG-KYUFUGAI     =     1)   AND
                             (ACCT-SRYKBN      =   "11")
-                          IF   TBL-ZAIKAISU(SYU-IDX)  NOT = ZERO
-                            IF  SYU-IDX       =     1
-                               COMPUTE  SYU-KYUFUGAI-SHOSHIN-TEN =
-                                        SYU-KYUFUGAI-SHOSHIN-TEN +
-                                       (ACCT-ZAITEN  *
-                                                 TBL-ZAIKAISU(SYU-IDX))
-                               COMPUTE  SYU-KYUFUGAI-GOKEI-TEN =
-                                        SYU-KYUFUGAI-GOKEI-TEN +
-                                       (ACCT-ZAITEN  *
-                                                 TBL-ZAIKAISU(SYU-IDX))
-                            ELSE
-                               MOVE    ZERO    TO   FUKU-IDX
-                               COMPUTE  FUKU-IDX  =  SYU-IDX  - 1
-                               IF   TBL-FUKUOKA(1:FUKU-IDX)  = ALL"0"
-                                 COMPUTE  SYU-KYUFUGAI-SHOSHIN-TEN =
-                                          SYU-KYUFUGAI-SHOSHIN-TEN +
-                                         (ACCT-ZAITEN  *
-                                                 TBL-ZAIKAISU(SYU-IDX))
-                                 COMPUTE  SYU-KYUFUGAI-GOKEI-TEN =
-                                          SYU-KYUFUGAI-GOKEI-TEN +
-                                         (ACCT-ZAITEN  *
-                                                 TBL-ZAIKAISU(SYU-IDX))
-                               END-IF
+                        IF   TBL-ZAIKAISU(SYU-IDX)  NOT = ZERO
+                          IF  SYU-IDX       =     1
+                            PERFORM   FUKUOKA-KYUFUGAI-HENSYU-SEC
+                          ELSE
+                            MOVE    ZERO    TO   FUKU-IDX
+                            COMPUTE  FUKU-IDX  =  SYU-IDX  - 1
+                            IF   TBL-FUKUOKA(1:FUKU-IDX)  =  ALL"0"
+                               PERFORM   FUKUOKA-KYUFUGAI-HENSYU-SEC
                             END-IF
                           END-IF
+                        END-IF
                       END-IF
                     END-PERFORM                                        
                     IF   ACCT-SRYKBN                =  "11"             
@@ -3383,6 +3407,59 @@
            .
       *
        SRYACCT-SET-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *     °≤¨°¶µÎ…’≥∞≈¿øÙ ‘Ω∏
+      **************************************************************
+       FUKUOKA-KYUFUGAI-HENSYU-SEC          SECTION.
+      *
+           IF   TBL-FUKUOKA-SYOSIN(SYU-IDX)  =   3
+              INITIALIZE                      SRYACT-REC
+              MOVE    ACCT-HOSPID        TO   SRY-HOSPID
+              MOVE    ACCT-NYUGAIKBN     TO   SRY-NYUGAIKBN
+              MOVE    ACCT-PTID          TO   SRY-PTID
+              MOVE    ACCT-SRYKA         TO   SRY-SRYKA
+              MOVE    ACCT-SRYYM         TO   SRY-SRYYM
+              MOVE    ACCT-ZAINUM        TO   SRY-ZAINUM
+              MOVE    SRYACT-REC         TO   MCPDATA-REC
+              MOVE    "DBSELECT"         TO   MCP-FUNC
+              MOVE    "SRYACT-KEY2"      TO   ORC-DBPATH
+              CALL    "ORCMCPSUB"             USING
+                                              MCPAREA
+                                              ORCMCPAREA
+                                              MCPDATA-REC
+              IF      MCP-RC             =    ZERO
+                MOVE    "SRYACT-KEY2"    TO   ORC-DBPATH
+                PERFORM  SRYACT-READ-SEC
+              ELSE
+                MOVE    1                TO   FLG-SRYACT
+              END-IF
+              IF      FLG-SRYACT          =   ZERO
+                 IF   SRY-SRYCD(1)  =  "111011810"
+                    CONTINUE
+                 ELSE
+                    COMPUTE  SYU-KYUFUGAI-SHOSHIN-TEN =
+                             SYU-KYUFUGAI-SHOSHIN-TEN +
+                            (ACCT-ZAITEN  *  TBL-ZAIKAISU(SYU-IDX))
+                    COMPUTE  SYU-KYUFUGAI-GOKEI-TEN =
+                             SYU-KYUFUGAI-GOKEI-TEN +
+                            (ACCT-ZAITEN  *  TBL-ZAIKAISU(SYU-IDX))
+                 END-IF
+              END-IF
+              MOVE   "SRYACT-KEY2"      TO  WK-PATH
+              PERFORM   CSR-CLOSE-SEC
+           ELSE
+              COMPUTE  SYU-KYUFUGAI-SHOSHIN-TEN =
+                       SYU-KYUFUGAI-SHOSHIN-TEN +
+                      (ACCT-ZAITEN  *  TBL-ZAIKAISU(SYU-IDX))
+              COMPUTE  SYU-KYUFUGAI-GOKEI-TEN =
+                       SYU-KYUFUGAI-GOKEI-TEN +
+                      (ACCT-ZAITEN  *  TBL-ZAIKAISU(SYU-IDX))
+           END-IF
+      *
+           .
+       FUKUOKA-KYUFUGAI-HENSYU-EXT.
            EXIT.
       *
       **************************************************************
