@@ -583,6 +583,10 @@
                        MOVE    "key"                   TO  MCP-PATHNAME
                        PERFORM   910-DB-CLOSE-SEC
                    ELSE
+      *                保険組合せクローズ
+                       MOVE    "tbl_hkncombi"          TO  MCP-TABLE
+                       MOVE    "key"                   TO  MCP-PATHNAME
+                       PERFORM   910-DB-CLOSE-SEC
                        MOVE    5              TO  LNK-NYURECEDEN-RC
                    END-IF
                END-IF
