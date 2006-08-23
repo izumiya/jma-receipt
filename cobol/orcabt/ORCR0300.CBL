@@ -195,6 +195,8 @@
       *  02.09.08    NACL-藤原    06/07/11  前期高齢者の一部負担金の記載
       *  02.09.09    NACL-藤原    06/07/18  外来迅速検体検査加算にコメント
       *                                     がある場合の記載
+      *  02.09.10    NACL-藤原    06/08/23  船員保険のとき保険限定がある
+      *                                     病名の記載の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2230,7 +2232,8 @@
            MOVE    RECE02-RECEKA       TO  RECE031-RECEKA
            MOVE    RECE02-TEISYUTUSAKI TO  RECE031-TEISYUTUSAKI
            MOVE    RECE02-RECESYUBETU  TO  RECE031-RECESYUBETU
-           MOVE    RECE02-HKNJANUM     TO  RECE031-HKNJANUM
+           MOVE    RECE02-HKNJANUM-KEY TO  RECE031-HKNJANUM
+           MOVE    RECE02-HOJOKBN-KEY  TO  RECE031-HOJOKBN
            MOVE    RECE02-TEKSTYMD     TO  RECE031-TEKSTYMD
       *
            START   RECE03-FILE
@@ -2256,8 +2259,10 @@
                                      NOT =   RECE031-TEISYUTUSAKI )
                    OR     ( RECE02-RECESYUBETU
                                      NOT =   RECE031-RECESYUBETU  )
-                   OR     ( RECE02-HKNJANUM
+                   OR     ( RECE02-HKNJANUM-KEY
                                      NOT =   RECE031-HKNJANUM     )
+                   OR     ( RECE02-HOJOKBN-KEY
+                                     NOT =   RECE031-HOJOKBN      )
                    OR     ( RECE02-TEKSTYMD
                                      NOT =   RECE031-TEKSTYMD     )
       *        転帰区分:8(移行)以外 処理対象
