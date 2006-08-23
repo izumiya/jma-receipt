@@ -127,7 +127,9 @@
       *                                     フリーコメントに置き換える
       *  03.00.05    NACL-藤原    06/07/18  外来迅速検体検査加算にコメント
       *                                     がある場合の記載
-     *****************************************************************
+      *  03.00.06    NACL-藤原    06/08/23  船員保険のとき保険限定がある
+      *                                     病名の記載の修正
+      *****************************************************************
       *
        ENVIRONMENT             DIVISION.
        CONFIGURATION           SECTION.
@@ -2485,7 +2487,8 @@
            MOVE    RECE62-RECEKA       TO  RECE631-RECEKA
            MOVE    RECE62-TEISYUTUSAKI TO  RECE631-TEISYUTUSAKI
            MOVE    RECE62-RECESYUBETU  TO  RECE631-RECESYUBETU
-           MOVE    RECE62-HKNJANUM     TO  RECE631-HKNJANUM
+           MOVE    RECE62-HKNJANUM-KEY TO  RECE631-HKNJANUM
+           MOVE    RECE62-HOJOKBN-KEY  TO  RECE631-HOJOKBN
            MOVE    RECE62-TEKSTYMD     TO  RECE631-TEKSTYMD
       *
            START   RECE63-FILE
@@ -2511,8 +2514,10 @@
                                      NOT =   RECE631-TEISYUTUSAKI )
                    OR     ( RECE62-RECESYUBETU
                                      NOT =   RECE631-RECESYUBETU  )
-                   OR     ( RECE62-HKNJANUM
+                   OR     ( RECE62-HKNJANUM-KEY
                                      NOT =   RECE631-HKNJANUM     )
+                   OR     ( RECE62-HOJOKBN-KEY
+                                     NOT =   RECE631-HOJOKBN      )
                    OR     ( RECE62-TEKSTYMD
                                      NOT =   RECE631-TEKSTYMD     )
       *        転帰区分:8(移行)以外 処理対象
