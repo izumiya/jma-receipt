@@ -35,6 +35,8 @@
       *  02.06.02    NACL-藤原    05/08/03  条件に負担者番号を追加
       *
       *  02.08.01    NACL-藤原    06/02/25  有効期間の未入力時の更新処理
+      *
+      *  03.01.01    NACL-藤原    06/08/23  DBCLOSECURSOR追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3040,6 +3042,10 @@
                                            TO  MCP-PATH
                PERFORM 900-HKNNUM-READ-N-SEC
            END-PERFORM
+      *
+           MOVE    PATH-TBL-HKNNUM-KEY7
+                                       TO  MCP-PATH
+           PERFORM 900-DB-CLOSE-SEC
       *
            .
        900-HKNNUM-READ-EXT.
