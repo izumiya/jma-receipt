@@ -8733,25 +8733,29 @@
               MOVE    RECE62-HOSPID       TO  PTKOH-HOSPID
               MOVE    RECE62-PTID         TO  PTKOH-PTID
               MOVE    "978"               TO  PTKOH-KOHNUM
-              MOVE    RECE62-SRYYM        TO  PTKOH-TEKSTYMD(1:6)
-              MOVE    "01"                TO  PTKOH-TEKSTYMD(7:2)
-              MOVE    RECE62-SRYYM        TO  PTKOH-TEKEDYMD(1:6)
-              MOVE    "01"                TO  PTKOH-TEKEDYMD(7:2)
               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
               MOVE    "DBSELECT"          TO  MCP-FUNC
-              MOVE    "PTKOHINF-KEY6"     TO  ORC-DBPATH
+              MOVE    "PTKOHINF-KEY4"     TO  ORC-DBPATH
               CALL    "ORCMCPSUB"         USING   MCPAREA
                                                   ORCMCPAREA
                                                   MCPDATA-REC
               IF      MCP-RC               =       ZERO
-                  MOVE    "PTKOHINF-KEY6" TO  ORC-DBPATH
+                  MOVE    "PTKOHINF-KEY4" TO  ORC-DBPATH
                   PERFORM  900-PTKOHINF-READ-SEC
-                  IF       FLG-PTKOHINF    =   ZERO
-                      MOVE    "1"         TO  RECE62-RJNGENMENKBN
-                  END-IF
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                     IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE62-SRYYM       )
+                     AND (RECE62-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
+                     AND (PTKOH-SAKJOKBN        =   SPACE              )
+                         MOVE    "1"         TO  RECE62-RJNGENMENKBN
+                         MOVE     1          TO  FLG-PTKOHINF
+                     ELSE
+                         MOVE    "PTKOHINF-KEY4"  TO  ORC-DBPATH
+                         PERFORM  900-PTKOHINF-READ-SEC
+                     END-IF
+                  END-PERFORM
               END-IF
       *
-              MOVE   "PTKOHINF-KEY6"      TO  WK-PATH
+              MOVE   "PTKOHINF-KEY4"      TO  WK-PATH
               PERFORM   CSR-CLOSE-SEC
       *
            END-IF
