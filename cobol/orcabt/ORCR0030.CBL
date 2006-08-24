@@ -1560,25 +1560,29 @@
               MOVE    RECE02-HOSPID       TO  PTKOH-HOSPID
               MOVE    RECE02-PTID         TO  PTKOH-PTID
               MOVE    "978"               TO  PTKOH-KOHNUM
-              MOVE    RECE02-SRYYM        TO  PTKOH-TEKSTYMD(1:6)
-              MOVE    "01"                TO  PTKOH-TEKSTYMD(7:2)
-              MOVE    RECE02-SRYYM        TO  PTKOH-TEKEDYMD(1:6)
-              MOVE    "01"                TO  PTKOH-TEKEDYMD(7:2)
               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
               MOVE    "DBSELECT"          TO  MCP-FUNC
-              MOVE    "PTKOHINF-KEY6"     TO  ORC-DBPATH
+              MOVE    "PTKOHINF-KEY4"     TO  ORC-DBPATH
               CALL    "ORCMCPSUB"         USING   MCPAREA
                                                   ORCMCPAREA
                                                   MCPDATA-REC
               IF      MCP-RC               =       ZERO
-                  MOVE    "PTKOHINF-KEY6" TO  ORC-DBPATH
+                  MOVE    "PTKOHINF-KEY4" TO  ORC-DBPATH
                   PERFORM  900-PTKOHINF-READ-SEC
-                  IF       FLG-PTKOHINF    =   ZERO
-                      MOVE    "1"         TO  RECE02-RJNGENMENKBN
-                  END-IF
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                     IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE02-SRYYM       )
+                     AND (RECE02-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
+                     AND (PTKOH-SAKJOKBN        =   SPACE              )
+                         MOVE    "1"         TO  RECE02-RJNGENMENKBN
+                         MOVE     1          TO  FLG-PTKOHINF
+                     ELSE
+                         MOVE    "PTKOHINF-KEY4"  TO  ORC-DBPATH
+                         PERFORM  900-PTKOHINF-READ-SEC
+                     END-IF
+                  END-PERFORM
               END-IF
       *
-              MOVE   "PTKOHINF-KEY6"      TO  WK-PATH
+              MOVE   "PTKOHINF-KEY4"      TO  WK-PATH
               PERFORM   900-CSR-CLOSE-SEC
       *
            END-IF
