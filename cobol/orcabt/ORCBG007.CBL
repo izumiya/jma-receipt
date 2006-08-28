@@ -706,9 +706,18 @@
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   TSRYKA-MAX )
       *
-               PERFORM 21011-NYU-BG00701-WRITE-SEC
-               IF    ( FLG-END     =   1 )
-                   GO  TO  21011-NYU-BG00701-OUT-EXT
+               IF    ( WRK-PARA-BTUNUM     =   SPACE )
+                       PERFORM 21011-NYU-BG00701-WRITE-SEC
+                       IF    ( FLG-END     =   1 )
+                           GO  TO  21011-NYU-BG00701-OUT-EXT
+                       END-IF
+               ELSE
+                   IF    ( WRK-PARA-BTUNUM =   LASTRRK-BTUNUM )
+                       PERFORM 21011-NYU-BG00701-WRITE-SEC
+                       IF    ( FLG-END         NOT =   ZERO )
+                           GO  TO  21011-NYU-BG00701-OUT-EXT
+                       END-IF
+                   END-IF
                END-IF
       *
            END-PERFORM
