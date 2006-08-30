@@ -205,6 +205,7 @@
       *  03.02.01    NACL-ÌçÏÆ    06/08/04  ¿ÇÎÅ¹Ô°Ù¤Î¤ß¤Î¸øÈñ¤Î¿©»öÍó
       *                                     ÊÔ½¸½¤Àµ¡Ê£°µ­ºÜ¡Ë
       *  03.02.02    NACL-ÌçÏÆ    06/08/10  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
+      *  03.02.03    NACL-ÌçÏÆ    06/08/30  Æþ±¡ÅÀÅ©¤ÎºÞÈÖ¹æÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -651,6 +652,8 @@
            03  WRK-CHK-KEIKASOCHIXX                    PIC 9(07).
            03  WRK-CHK-KEIKASOCHI1                     PIC S9(07).
            03  WRK-CHK-KEIKASOCHI2                     PIC S9(07).
+      *
+           03  WRK-KEISAN                              PIC 9(07).
       *
            03  WRK-ZENKAKU                             PIC X(80).
            03  WRK-NUM                                 PIC X(80).
@@ -7055,9 +7058,15 @@
            MOVE    "33"                 TO      RECE64-SRYKBN
            MOVE    SPACE                TO      RECE64-ZAISKBKBN
            IF    FLG-SIKIBETU  =  1
-             COMPUTE WRK-ZAINUM    =  99999700  +  IDY
+      ***    COMPUTE WRK-ZAINUM    =  99999700  +  IDY
+             COMPUTE WRK-KEISAN    =  (CNT-ZAIREN *  31) -  31
+             COMPUTE WRK-ZAINUM    =  99997000
+                                   +  (WRK-KEISAN + IDY)
            ELSE
-             COMPUTE WRK-ZAINUM    =  99999740  +  IDY
+      ***    COMPUTE WRK-ZAINUM    =  99999740  +  IDY
+             COMPUTE WRK-KEISAN    =  (CNT-ZAIREN *  50) -  50
+             COMPUTE WRK-ZAINUM    =  99997400
+                                   +  (WRK-KEISAN + IDY)
            END-IF
            MOVE    WRK-ZAINUM           TO      RECE64-ZAINUM
            MOVE    CNT-ZAIREN           TO      RECE64-ZAIREN
@@ -7145,9 +7154,15 @@
               MOVE    RECE62-TEKSTYMD      TO   RECE65-TEKSTYMD
               MOVE    ZERO                 TO   RECE65-KOHBUNRI
               IF    FLG-SIKIBETU  =  1
-                COMPUTE WRK-ZAINUM    =  99999700  +  IDY
+      ***       COMPUTE WRK-ZAINUM    =  99999700  +  IDY
+                COMPUTE WRK-KEISAN    =  (CNT-ZAIREN *  31) -  31
+                COMPUTE WRK-ZAINUM    =  99997000
+                                      +  (WRK-KEISAN + IDY)
               ELSE
-                COMPUTE WRK-ZAINUM    =  99999740  +  IDY
+      ***       COMPUTE WRK-ZAINUM    =  99999740  +  IDY
+                COMPUTE WRK-KEISAN    =  (CNT-ZAIREN *  50) -  50
+                COMPUTE WRK-ZAINUM    =  99997400
+                                      +  (WRK-KEISAN + IDY)
               END-IF
               MOVE    WRK-ZAINUM           TO   RECE65-ZAINUM
               MOVE    CNT-ZAIREN           TO   RECE65-ZAIREN
