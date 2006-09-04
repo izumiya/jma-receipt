@@ -393,6 +393,13 @@
                MOVE    1                   TO  FLG-KENSASORT
            END-IF
       *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           MOVE    "tbl_kensasort"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+      *
       *    なければそのまま
            IF      FLG-KENSASORT       NOT =   ZERO
                MOVE    3               TO  WRK-ERRCD
@@ -462,7 +469,7 @@
            END-IF
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "tbl_kensasort"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            CALL    "MONFUNC"           USING
                                        MCPAREA
