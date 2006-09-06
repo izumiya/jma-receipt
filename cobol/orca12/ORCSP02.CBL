@@ -40,6 +40,8 @@
       * 02.00.08     NACL-¬ø°π«º  05/11/14  MONFUNC ¬–±˛
       * 02.00.09     NACL-¬ø°π«º  06/02/24  ºÁ≤ ¬–±˛¬–±˛
       * 02.00.10     NACL-¬ø°π«º  06/05/18  ¿¡µ·ΩÒ»Øπ‘∂Ë ¨ƒ…≤√
+      * 03.00.01     NACL-¬ø°π«º  06/08/25   ø¿Æ£±£∏«Ø£±£∞∑Ó≤˛¿µ¬–±˛
+      *                                     ° œ∑øÕ≥‰πÁ —ππ°À
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -777,11 +779,11 @@
       *    ø«Œ≈∆‚Õ∆§Ú£”£–£¡§À•ª•√•»
            PERFORM 311-SRYNAI-SPASET-SEC
       *
-      *    ø¶∞˜æ Û§Ú£”£–£¡§À•ª•√•»
-           PERFORM 312-DOCTOR-SPASET-SEC
-      *
       *    ø«Œ≈≤ §Ú£”£–£¡§À•ª•√•»
            PERFORM 313-SRYKA-SPASET-SEC
+      *
+      *    ø¶∞˜æ Û§Ú£”£–£¡§À•ª•√•»
+           PERFORM 312-DOCTOR-SPASET-SEC
       *
       *    ¥µº‘≈–œøæ Û§Ú£”£–£¡§À•ª•√•»
            PERFORM 10031-SYSKANRI1017-SET-SEC
@@ -913,11 +915,12 @@
       *    ø¶∞˜æ Û  •π•—ΩÈ¥¸ ‘Ω∏ΩËÕ˝
       *****************************************************************
        312-DOCTOR-SPASET-SEC              SECTION.
+      *
       *    •…•Ø•ø°º ‘Ω∏
            INITIALIZE                  ORCSDRSETAREA
            MOVE    SPA-SYSYMD          TO  ORCSDR-SYSYMD
            MOVE    "1"                 TO  ORCSDR-KBN
-           MOVE    SPACE               TO  ORCSDR-SRYKA
+           MOVE    SPA-GMN20-SRYKA     TO  ORCSDR-SRYKA
            MOVE    SPACE               TO  ORCSDR-IN-DRCD
            CALL   "ORCSDRSET"          USING
                                        SPA-AREA
@@ -925,53 +928,9 @@
            MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN20-DRCDLST-G
            MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
       *
-      **** MOVE    SPACE               TO  SYS-1010-REC
-      *    MOVE    "1010"              TO  SYS-1010-KANRICD
-      *    MOVE    SYS-1010-REC        TO  MCPDATA-REC
-      *    MOVE    "DBSELECT"          TO  MCP-FUNC
-      *    MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
-      *    MOVE    SPA-SYSYMD          TO  ORC-DBYMD
-      *    CALL    "ORCMCPSUB"          USING
-      *                                 MCPAREA
-      *                                 ORCMCPAREA
-      *                                 MCPDATA-REC
-      *    IF      MCP-RC              =   ZERO
-      *        MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
-      *        PERFORM 900-SYSTEM-READ-SEC
-      *    ELSE
-      *        MOVE    1               TO  FLG-SYSKANRI
-      *    END-IF
-      ***  PERFORM VARYING IDX
-      *            FROM    1       BY  1
-      *            UNTIL      (IDX             >   10    )   OR
-      ******                  (FLG-SYSKANRI    =   1     ) 
-      *    MOVE    ZERO                TO  IDX
-      *    PERFORM     UNTIL  (FLG-SYSKANRI    =   1     )    OR
-      *                       (IDX             >=  50    )
-      *        MOVE    MCPDATA-REC             TO  SYS-1010-REC
-      *        IF      SYS-1010-KBNCD (1:1)  =   "1"
-      *            ADD     1                   TO  IDX
-      *            MOVE    SYS-1010-KBNCD (2:4)    TO  SPA-GMN20-DRCDCD
-      *            MOVE    SPACE               TO  SPA-GMN20-TANT1
-      *            MOVE    SYS-1010-NAME       TO  SPA-GMN20-DRCDMEI
-      *            MOVE    SPA-GMN20-DRCD      TO  SPA-GMN20-DRCDLST
-      *                                                          (IDX)
-      *            MOVE    IDX                 TO  SPA-DRCD-MAX
-      *        END-IF
-      *        MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
-      *        PERFORM 900-SYSTEM-READ-SEC
-      *****END-PERFORM
-      *
            IF     SPA-GMN20-DRCDLST (1)    NOT =   SPACE
                MOVE    SPA-GMN20-DRCDLST(1)   TO  SPA-GMN20-DRCD
            END-IF
-      *****•´°º•Ω•Î•Ø•Ì°º•π
-      *    MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-      *    MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
-      *    CALL    "ORCMCPSUB"          USING
-      *                                 MCPAREA
-      *                                 ORCMCPAREA
-      *********                         MCPDATA-REC
       *
            .
        312-DOCTOR-SPASET-EXT.
@@ -1087,7 +1046,8 @@
       *                    œ∑øÕ§Œª˛
                            IF     (HKN-HKNNUM      =   "027"  )  AND
                                   (HKN-PAYKBN      =   "01"  OR
-                                                       "02"   )  AND
+                                                       "02"  OR
+                                                       "03"   )  AND
                                   (HKN-PAYKBN  NOT =   SPA-NAI-KOHPAYKBN
                                                      (SPA-GMN-KOHMAX))
                                MOVE    1               TO  FLG-OK
@@ -1157,7 +1117,8 @@
            MOVE    HKN-HKNNUM          TO  SPA-GMN-KOHNUML
                                                     (SPA-GMN-KOHMAX)
            IF    ( HKN-HKNNUM          =   "027"  )  AND
-                 ( HKN-PAYKBN      NOT =   "01"  AND "02"  )
+                 ( HKN-PAYKBN      NOT =   "01"  AND "02"
+                                                 AND "03"  )
                MOVE    "œ∑øÕ ›∑Ú"          TO  SPA-GMN-KOHNUMMEIL
                                                     (SPA-GMN-KOHMAX)
            ELSE
@@ -1167,7 +1128,8 @@
       *
       *    œ∑øÕ§«…È√¥≥‰πÁ Ã§Œª˛°¢£±°§£≤§Ú ‘Ω∏§π§Î
            IF     (HKN-HKNNUM          =   "027"  ) AND
-                  (HKN-PAYKBN          =   "01"  OR  "02"  )
+                  (HKN-PAYKBN          =   "01"  OR  "02"
+                                                 OR  "03"  )
                MOVE    HKN-PAYKBN(2:1)     TO  SPA-GMN-KOHKBNL
                                                     (SPA-GMN-KOHMAX)
            ELSE
@@ -1191,7 +1153,8 @@
       *    ªŸ ß∂Ë ¨
       *    œ∑øÕ§«…È√¥≥‰πÁ Ã§Œª˛°¢£±°§£≤§Ú ‘Ω∏§π§Î
            IF     (HKN-HKNNUM          =   "027"  ) AND
-                  (HKN-PAYKBN      NOT =   "01"  AND "02"  )
+                  (HKN-PAYKBN      NOT =   "01"  AND "02"
+                                                 AND "03"  )
                MOVE    ZERO                TO  SPA-NAI-KOHPAYKBN
                                                     (SPA-GMN-KOHMAX)
            ELSE
