@@ -4376,7 +4376,8 @@
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-PIDCD           =   SPACE )
                IF     (FLG-RJNCHK          =   1     )  AND
-                      (FLG-RJNERR          =   1     )
+                      (FLG-RJNERR          =   1     )  AND
+                      (FLG-RJNCHK2         =   ZERO  )
                    MOVE    SPA-PTHKN-HKNNUM-MEI(SPA-HKN-IDX1)
                                                    TO  SPA-PIDMSG
                    MOVE    "0110"              TO  SPA-PIDCD
