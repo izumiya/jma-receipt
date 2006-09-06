@@ -37,8 +37,8 @@
            SELECT  PRT-FILE        ASSIGN  HC01PARA
                                    FILE    STATUS  IS  STS-PARA.
       *    エラーファイル
-           SELECT  RECEERR-FILE    ASSIGN  RECEERR
-                                   FILE    STATUS  IS  STS-RECEERR.
+           SELECT  ML09ERR-FILE    ASSIGN  ML09ERR
+                                   FILE    STATUS  IS  STS-ML09ERR.
       *
       *----(00.00.01)--ADD-START---
       *    並び換え用
@@ -47,9 +47,6 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  TOKEI-KEY
                                    FILE    STATUS  IS  STS-TOKEI.
-      *    並び換え用
-           SELECT  TOKEIX-FILE     ASSIGN  TOKEIPARA
-                                   FILE    STATUS  IS  STS-TOKEIX.
       *----(00.00.01)--ADD-END-----
       *
        DATA                        DIVISION.
@@ -60,8 +57,8 @@
            COPY    "HCML09.INC".
       *
       *    エラーファイル
-       FD  RECEERR-FILE.
-       01  RECEERR-REC             PIC X(200).
+       FD  ML09ERR-FILE.
+       01  ML09ERR-REC             PIC X(200).
       *
       *----(00.00.01)--ADD-START---
       *    並び換え用ファイル
@@ -75,9 +72,6 @@
            03  TOKEI-BYOMEI            PIC X(160).
            03  TOKEI-MANSEIKBN         PIC 9(02).
            03  TOKEI-UTAGAIFLG         PIC X(01).
-      *    クリア用
-       FD  TOKEIX-FILE.
-       01  TOKEIX-REC                  PIC X(200).
       *----(00.00.01)--ADD-END-----
       *
        WORKING-STORAGE             SECTION.
@@ -90,7 +84,7 @@
            COPY    "ORCA-DBPATH".
       *    エラーファイル 名称領域 
            COPY    "CPCOMMONDAT2.INC"  REPLACING  //RECE01PARA//
-                                       BY         //RECEERR//.
+                                       BY         //ML09ERR//.
            03                          PIC X(04)   VALUE   ".dat".
       *----(00.00.01)--ADD-START---
       *    並び換え用 名称領域 
@@ -102,10 +96,9 @@
       *    スパ領域
        01  STS-AREA.
            03  STS-PARA            PIC X(02).
-           03  STS-RECEERR         PIC X(02).
+           03  STS-ML09ERR         PIC X(02).
       *----(00.00.01)--ADD-START---
            03  STS-TOKEI           PIC X(02).
-           03  STS-TOKEIX          PIC X(02).
       *----(00.00.01)--ADD-END-----
       *
       *    フラグ領域
@@ -138,7 +131,7 @@
                05  WRK-PARA-SYUKBN PIC X(01).
       *----(00.00.01)--ADD-END-----
       *
-           03  WRK-RECEERR         PIC X(200).
+           03  WRK-ML09ERR         PIC X(200).
       *  
            03  WRK-SYSYMD.
                05  WRK-SYSYY       PIC 9(04).
@@ -258,8 +251,8 @@
                                                WRK-PARA-SYUKBN
       *----(00.00.01)--ADD-END-----
       *
-           MOVE    "RECEERR"       TO  RECEERR-FILE-ID
-           MOVE    WRK-PARA-TERMID TO  RECEERR-TERMID
+           MOVE    "ML09ERR"       TO  ML09ERR-FILE-ID
+           MOVE    WRK-PARA-TERMID TO  ML09ERR-TERMID
       *----(00.00.01)--ADD-START---
            MOVE    "TOKEIZZ"       TO  TOKEIPARA-FILE-ID
            MOVE    WRK-PARA-TERMID TO  TOKEIPARA-TERMID
@@ -301,8 +294,8 @@
        200-MAIN-SEC                SECTION.
       *
       *    並び換え用ファイルをクリアする
-           OPEN    OUTPUT              TOKEIX-FILE
-           CLOSE                       TOKEIX-FILE
+           OPEN    OUTPUT              TOKEI-FILE
+           CLOSE                       TOKEI-FILE
       *    並び換え用ファイルを開く
            OPEN    I-O                 TOKEI-FILE
       *
@@ -326,8 +319,8 @@
       *    並び換え用ファイルを閉じる
            CLOSE                       TOKEI-FILE
       *    並び換え用ファイルをクリアする
-           OPEN    OUTPUT              TOKEIX-FILE
-           CLOSE                       TOKEIX-FILE
+           OPEN    OUTPUT              TOKEI-FILE
+           CLOSE                       TOKEI-FILE
       *
       *    ファイル削除
            MOVE    ZERO            TO  IF-RESULT
@@ -547,18 +540,18 @@
       *****************************************************************
        500-ERR-HENSYU-SEC          SECTION.
       *
-           OPEN    INPUT   RECEERR-FILE
+           OPEN    INPUT   ML09ERR-FILE
       *     
-           IF      STS-RECEERR         =   ZERO
+           IF      STS-ML09ERR         =   ZERO
                CONTINUE
            ELSE
-               OPEN    OUTPUT              RECEERR-FILE
+               OPEN    OUTPUT              ML09ERR-FILE
       *
-               MOVE    WRK-RECEERR     TO  RECEERR-REC
-               WRITE   RECEERR-REC
+               MOVE    WRK-ML09ERR     TO  ML09ERR-REC
+               WRITE   ML09ERR-REC
            END-IF
       *
-           CLOSE   RECEERR-FILE
+           CLOSE   ML09ERR-FILE
       *
            MOVE    1               TO  FLG-END
       * 
