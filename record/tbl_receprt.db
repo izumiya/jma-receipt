@@ -337,6 +337,7 @@ path	key16		{
                     AND     NYUGAIKBN    =   :NYUGAIKBN 
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
+                    AND     RECESYUBETU  <>  '6666' 
                     AND     SRYKA        LIKE :SRYKA
                     AND     RENNUM       >=  :STRENNUM
                     AND     RENNUM       <=  :EDRENNUM
@@ -361,6 +362,7 @@ path	key17	{
                     AND     NYUGAIKBN    =   :NYUGAIKBN 
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
+                    AND     RECESYUBETU  <>  '6666' 
                     AND     SRYKA        LIKE :SRYKA
                     AND     RENNUM       >=  :STRENNUM
                     AND     RENNUM       <=  :EDRENNUM
@@ -795,6 +797,7 @@ path	key35		{
                     AND     NYUGAIKBN    =   :NYUGAIKBN 
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
+                    AND     RECESYUBETU  <>  '6666' 
                     AND     SRYKA        LIKE :SRYKA
                     AND     RENNUM       >=  :STRENNUM
                     AND     RENNUM       <=  :EDRENNUM
@@ -819,6 +822,7 @@ path	key36	{
                     AND     NYUGAIKBN    =   :NYUGAIKBN 
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
+                    AND     RECESYUBETU  <>  '6666' 
                     AND     SRYKA        LIKE :SRYKA
                     AND     RENNUM       >=  :STRENNUM
                     AND     RENNUM       <=  :EDRENNUM
