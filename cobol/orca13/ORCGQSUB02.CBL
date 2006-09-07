@@ -1617,7 +1617,9 @@
                    MOVE    WRK-STR-LEN             TO  WRK-KIGO-LEN
       *
                    IF    ( SPA-Q01-KOHNUM (IDX1)   =   "027" )
-                    AND  ( SPA-Q01-PAYKBN (IDX1)   =   "01" OR "02" )
+                    AND  ( SPA-Q01-PAYKBN (IDX1)   =   "01" 
+                                                    OR "02"
+                                                    OR "03")
                        STRING  "(("            DELIMITED   BY  SIZE
                            WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
                            ".KOHNUM ='"        DELIMITED   BY  SIZE
@@ -1677,7 +1679,7 @@
            MOVE    WRK-STR-LEN             TO  WRK-KIGO-LEN
       *
            IF    ( WRK-KOHNUM          =   "027" )
-            AND  ( WRK-PAYKBN          =   "01" OR "02" )
+            AND  ( WRK-PAYKBN          =   "01" OR "02" OR "03" )
                STRING  "(("            DELIMITED   BY  SIZE
                    WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
                    ".KOHNUM ='"        DELIMITED   BY  SIZE
