@@ -79,6 +79,7 @@
       *  01.03.05    NACL-ÌçÏÆ    06/06/16  ¥Þ¥ëÄ¹¤¬¤¢¤ë¾ì¹ç¤ÎÍ¥Àè½ç°ÌÊÑ¹¹
       *  03.02.01    NACL-ÌçÏÆ    06/08/10  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
       *  03.02.02    NACL-ÌçÏÆ    06/08/18  Ê¡²¬¸©µëÉÕ³°ÅÀ¿ô·×»»½¤Àµ
+      *  03.02.03    NACL-ÌçÏÆ    06/09/05  ·ò¹¯ÊÝ¸±Ë¡£±£°·î²þÀµÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1203,6 +1204,7 @@
                     WHEN   "3"                                          
                     WHEN   "C"                                          
                     WHEN   "F"                                          
+                    WHEN   "I"
                         MOVE   "1"    TO WRK-HANBETU-SENINFLG(IDX)      
                  END-EVALUATE                                           
               END-IF                                                    
@@ -1213,7 +1215,7 @@
               ELSE
                      MOVE  WRK-HANBETU-KOH1HKNNUM(IDX)
                                 TO  WRK-HANBETU-YUSENBAN(IDX)
-                     IF    WRK-HANBETU-KOH1HKNNUM(IDX) = "972"
+                     IF    WRK-HANBETU-KOH1HKNNUM(IDX) = "972" OR "974"
                        MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
                      END-IF
               END-IF
@@ -1227,7 +1229,7 @@
                      MOVE  WRK-HANBETU-KOH2HKNNUM(IDX)
                                       TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
-                    IF  WRK-HANBETU-KOH2HKNNUM(IDX)  = "972"
+                    IF  WRK-HANBETU-KOH2HKNNUM(IDX)  = "972" OR "974"
                        MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
               END-IF
@@ -1240,7 +1242,7 @@
                      MOVE  WRK-HANBETU-KOH3HKNNUM(IDX)
                                       TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
-                    IF  WRK-HANBETU-KOH3HKNNUM(IDX)  = "972"
+                    IF  WRK-HANBETU-KOH3HKNNUM(IDX)  = "972" OR "974"
                        MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
               END-IF
@@ -1253,7 +1255,7 @@
                      MOVE  WRK-HANBETU-KOH4HKNNUM(IDX)
                                       TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
-                    IF  WRK-HANBETU-KOH4HKNNUM(IDX)  = "972"
+                    IF  WRK-HANBETU-KOH4HKNNUM(IDX)  = "972" OR "974"
                        MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
                     END-IF
               END-IF
