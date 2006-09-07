@@ -1225,7 +1225,7 @@
                    IF    ( IDX5            >   ZERO )
                        IF    ( HKN-HKNNUM  =   SRH-KOHNUML (IDX5))
                            IF    ( HKN-HKNNUM  =   "027"  ) 
-                             AND ( HKN-PAYKBN  =   "01" OR "02"  )
+                             AND ( HKN-PAYKBN  =   "01" OR "02" OR "03")
                                IF ( HKN-PAYKBN
                                            NOT =   SRH-PAYKBNL (IDX5))
       *                            公費情報編集
@@ -1298,7 +1298,7 @@
            MOVE    HKN-HKNNUM          TO  SRH-KOHNUML (IDX5)
       *
            IF    ( HKN-HKNNUM          =   "027" )
-            AND  ( HKN-PAYKBN      NOT =   "01" AND "02" )
+            AND  ( HKN-PAYKBN      NOT =   "01" AND "02" AND "03" )
                MOVE    "老人保健"      TO  SRH-KOHNUMMEIL (IDX5)
            ELSE
                MOVE    HKN-TANSEIDONAME
@@ -1306,7 +1306,7 @@
            END-IF
       *
            IF    ( HKN-HKNNUM          =   "027" )
-            AND  ( HKN-PAYKBN          =   "01" OR  "02" )
+            AND  ( HKN-PAYKBN          =   "01" OR  "02" OR "03" )
                MOVE    HKN-PAYKBN
                                        TO  SRH-PAYKBNL (IDX5)
            ELSE
@@ -3603,7 +3603,7 @@
                IF    ( FLG-CHKEND (3)          =   ZERO )
       *
       *            長期以外を対象とする
-                   IF    ( PTKOH-KOHNUM    NOT =   "972" )
+                   IF    ( PTKOH-KOHNUM    NOT =   "972" AND "974" )
                         PERFORM 200111-FTNJKYNUM-CHK-SEC
                    END-IF
                END-IF
@@ -3832,6 +3832,20 @@
                        GO  TO  200112-HKNAGE-CHK-EXT
                    END-IF
                END-IF
+      *
+               IF    ( AGECHK-RJNCHK       =   3 )
+                   MOVE    COMB-HKNNUM     TO  SRH-HKNNUM
+                   MOVE    "040004"        TO  WRK-ERRCD
+                   PERFORM 200112-HKNAGE-ERRMES-HEN-SEC
+                   PERFORM 215-ERRMES-HEN-SEC
+      *
+                   IF    ( ORCBSD01-CHKKBN (4) =   "1" )
+                       MOVE    1           TO  FLG-CHKEND (4)
+                       GO  TO  200112-HKNAGE-CHK-EXT
+                   END-IF
+               END-IF
+
+      *
            END-IF
       *
            IF    ( FLG-RJN             =   ZERO )
@@ -7650,7 +7664,7 @@
            PERFORM VARYING SRH-IDX FROM    1   BY  1
                    UNTIL ( SRH-IDX >   SRH-KOHNUM-MAX )
                IF    ( SRH-KOHNUM  =   "027" )
-                AND  ( SRH-PAYKBN  =   "01" OR "02" )
+                AND  ( SRH-PAYKBN  =   "01" OR "02" OR "03" )
                    IF    ( SRH-KOHNUM  =   SRH-KOHNUML (SRH-IDX) )
                     AND  ( SRH-PAYKBN  =   SRH-PAYKBNL (SRH-IDX) )
                        MOVE    SRH-KOHNUMMEIL (SRH-IDX)

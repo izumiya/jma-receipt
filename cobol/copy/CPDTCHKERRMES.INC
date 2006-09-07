@@ -147,6 +147,11 @@
            05 PIC  X(30)   VALUE   "老人保健が未設定です          ".
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
+      *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "040004".
+           05 PIC  X(30)   VALUE   "老人の負担割合が２割です。３割".
+           05 PIC  X(30)   VALUE   "に登録し直して下さい          ".
+           05 PIC  X(30)   VALUE   "                              ".
       *
       *    ** 050xxx 患者病名
       *                            +---------+---------+---------+.
@@ -395,7 +400,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  66.
+           05 ERRMES-OCC   OCCURS  67.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(90).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   66.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   67.
