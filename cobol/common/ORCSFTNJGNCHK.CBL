@@ -31,6 +31,7 @@
       *  01.00.03    NACL-門脇    05/06/01  長期高額療養レセ記載判定追加
       *  01.00.04    NACL-門脇    05/08/12  滋賀県地方公費対応
       *  01.00.05    NACL-門脇    05/10/04  島根県地方公費対応
+      *  03.02.01    NACL-門脇    06/09/05  長期９７４対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -216,9 +217,9 @@
            PERFORM    210-HKNNUM-GET-SEC
       *
            IF   FLG-HKNNUM     =    ZERO
-             IF    HKN-RECEJGNDSPKBN    =   "1"
-             OR    HKN-HKNNUM           =   "972"
-             OR    WRK-RECEJGNDSPKBN    =   "1"
+             IF   (HKN-RECEJGNDSPKBN    =   "1"           )
+             OR   (HKN-HKNNUM           =   "972" OR "974")
+             OR   (WRK-RECEJGNDSPKBN    =   "1"           )
       *        患者公費負担マスタから負担上限額の取得
                PERFORM    210-PTKOHFTN-GET-SEC
       *        保険の上限額と収納の負担額を比較判定
