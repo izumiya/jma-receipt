@@ -4184,7 +4184,8 @@
                IF     (COMB-HONKZKKBN      =   "1"  )  AND
                       (COMB-HOJOKBN        =   "3"  OR
                                                "C"  OR
-                                               "F"  )
+                                               "F"  OR
+                                               "I"   )
                    MOVE    "1"             TO  LNK-S01-SENINFLG
                                                       (LNK-SYUNOU2-MAX)
                END-IF
