@@ -39,6 +39,8 @@
       * 01.00.10     NACL-Â¿¡¹Ç¼  05/10/19  ÆÃÊÌÎÅÍÜÈñÄÉ²Ã
       *                                     ¼«ÈñÊä½õ¶èÊ¬ÊÑ¹¹½¤Àµ
       * 01.00.11     NACL-Â¿¡¹Ç¼  05/11/15  MONFUNC ÂÐ±þ
+      * 03.00.01     NACL-Â¿¡¹Ç¼  06/08/25  Ê¿À®£±£¸Ç¯£±£°·î²þÀµÂÐ±þ
+      *                                     ¡ÊÏ·¿Í³ä¹çÊÑ¹¹¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -190,6 +192,36 @@
                    07  FILLER          PIC X(10) VALUE "E £²³ä²¼Á¥".
                05  WRK-HJO-REC-R5      REDEFINES   WRK-HJO-REC-G5.
                    07  WRK-HJO-REC5    PIC X(10) OCCURS  5.
+      *        Á¥°÷¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+               05  WRK-HJO-REC-G1-2.
+                   07  FILLER          PIC X(10) VALUE "1 ¿¦Ì³".
+                   07  FILLER          PIC X(10) VALUE "2 ²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "3 ÄÌ¶Ð".
+                   07  FILLER          PIC X(10) VALUE "7 £³³ä".
+                   07  FILLER          PIC X(10) VALUE "9 £±³ä".
+                   07  FILLER          PIC X(10) VALUE "A £±³ä¿¦Ì³".
+                   07  FILLER          PIC X(10) VALUE "B £±³ä²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "C £±³äÄÌ¶Ð".
+                   07  FILLER          PIC X(10) VALUE "G £³³ä¿¦Ì³".
+                   07  FILLER          PIC X(10) VALUE "H £³³ä²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "I £³³äÄÌ¶Ð".
+               05  WRK-HJO-REC-R1-2    REDEFINES   WRK-HJO-REC-G1-2.
+                   07  WRK-HJO-REC1-2  PIC X(10) OCCURS  11.
+      *        Ï·¿Í¤ÎÊä½õ¶èÊ¬ÄÉ²Ã¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+               05  WRK-HJO-REC-G4-2.
+                   07  FILLER          PIC X(06) VALUE "7 £³³ä".
+                   07  FILLER          PIC X(06) VALUE "9 £±³ä".
+               05  WRK-HJO-REC-R4-2    REDEFINES   WRK-HJO-REC-G4-2.
+                   07  WRK-HJO-REC4-2  PIC X(06) OCCURS  2.
+      *        ¶¦ºÑ¤Î²¼Á¥¸åÊä½õ¶èÊ¬ÄÉ²Ã¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+               05  WRK-HJO-REC-G5-2.
+                   07  FILLER          PIC X(10) VALUE "2 ²¼Á¥£³·î".
+                   07  FILLER          PIC X(10) VALUE "7 £³³ä".
+                   07  FILLER          PIC X(10) VALUE "9 £±³ä".
+                   07  FILLER          PIC X(10) VALUE "B £±³ä²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "H £³³ä²¼Á¥".
+               05  WRK-HJO-REC-R5-2      REDEFINES   WRK-HJO-REC-G5-2.
+                   07  WRK-HJO-REC5-2    PIC X(10) OCCURS  5.
       *
       *
            03  WRK-KEI-TBL.
@@ -275,6 +307,10 @@
       *        ÊÝ¸±½ÅÊ£´ü´Ö½èÍý
                WHEN    "0105"
                    PERFORM 300-HKNKIKAN-SYORI-SEC
+                   MOVE    SPACE           TO  SPA-PIDCD
+      *        Ï·¿Í£²³äÀÚÂØ¤¨½èÍý¡Ê£È£±£¸¡¥£±£°²þÀµ¡Ë
+               WHEN    "0110"
+                   PERFORM 330-RJNHKNKIKAN-SYORI-SEC
                    MOVE    SPACE           TO  SPA-PIDCD
       *        ÊÝ¸±¼«Æ°ÀÚ¤êÂØ¤¨½èÍý
                WHEN    "0201"
@@ -819,9 +855,18 @@
                    PERFORM VARYING     IDT     FROM    IDY BY  1
                            UNTIL       IDT     >   WRK-HJO-MAX
                        ADD     1           TO  SPA-GMN-HOJO-MAX
-                       MOVE    WRK-HJO-REC1 (IDT)
+      *            £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                       IF     (SPA-NAI-HTEKSTYMD   >=  "20061001")
+                          OR ((SPA-NAI-HTEKSTYMD   =   SPACE  )  AND
+                              (SPA-SYSYMD          >=  "20061001"))
+                           MOVE    WRK-HJO-REC1-2 (IDT)
                                            TO  SPA-GMN-HOJOKBNL
                                                     (SPA-GMN-HOJO-MAX)
+                       ELSE
+                           MOVE    WRK-HJO-REC1 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL
+                                                    (SPA-GMN-HOJO-MAX)
+                       END-IF
                    END-PERFORM
                    IF     (SPA-GMN-HOJOKBN     =   SPACE      )  AND
                           (SPA-NAI-BIRTHDAY    >=  "19321001" )
@@ -889,9 +934,18 @@
                    PERFORM VARYING     IDT     FROM    IDY BY  1
                            UNTIL       IDT     >   WRK-HJO-MAX
                        ADD     1           TO  SPA-GMN-HOJO-MAX
-                       MOVE    WRK-HJO-REC5 (IDT)
+      *            £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                       IF     (SPA-NAI-HTEKSTYMD   >=  "20061001")
+                          OR ((SPA-NAI-HTEKSTYMD   =   SPACE  )  AND
+                              (SPA-SYSYMD          >=  "20061001"))
+                           MOVE    WRK-HJO-REC5-2 (IDT)
                                            TO  SPA-GMN-HOJOKBNL
                                                     (SPA-GMN-HOJO-MAX)
+                       ELSE
+                           MOVE    WRK-HJO-REC5 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL
+                                                    (SPA-GMN-HOJO-MAX)
+                       END-IF
                    END-PERFORM
                    IF     (SPA-GMN-HOJOKBN     =   SPACE      )  AND
                           (SPA-NAI-BIRTHDAY    >=  "19321001" )
@@ -1011,8 +1065,16 @@
                    (SPA-GMN-HKNNUM(1:1)    NOT =   "9" )
                PERFORM VARYING     IDT     FROM    1  BY  1
                        UNTIL       IDT     >   2
-                   MOVE    WRK-HJO-REC4 (IDT)
+      *            £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                   IF     (SPA-NAI-HTEKSTYMD   >=  "20061001")
+                      OR ((SPA-NAI-HTEKSTYMD   =   SPACE  )  AND
+                          (SPA-SYSYMD          >=  "20061001"))
+                       MOVE    WRK-HJO-REC4-2 (IDT)
                                            TO  SPA-GMN-HOJOKBNL (IDT)
+                   ELSE
+                       MOVE    WRK-HJO-REC4 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL (IDT)
+                   END-IF
                    MOVE    IDT             TO  SPA-GMN-HOJO-MAX
                END-PERFORM
       *        ½é´üÃÍ¤Ï£±³ä¤È¤¹¤ë
@@ -1136,9 +1198,15 @@
                  ((SPA-NAI-HTEKSTYMD   >=  "20021001"   ) AND
                   (SPA-NAI-HTEKSTYMD   >=  SPA-BYMD-70  )    )
                IF      (SPA-GMN-HOJOKBN    =   "3"  OR  "6")
+      *            £È£±£¸¡¥£±£° ²þÀµ ¥Á¥§¥Ã¥¯¤Ê¤·
+                   IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
+                       CONTINUE
+                   ELSE
+      *
                    MOVE    "1066"          TO  SPA-ERRCD
                    MOVE    11              TO  SPA-GMN-CUR
                    GO      TO      1001-HOJOKBN-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *
@@ -1152,13 +1220,25 @@
                    GO      TO      1001-HOJOKBN-CHK-EXT
                END-IF
       *        Ï·¿Í
-               IF      (SPA-GMN-HOJO-MAX    =   8      )  AND
-                       (SPA-GMN-HOJOKBN     NOT =   "8"  AND
-                                                    "9")
-                   MOVE    "1066"          TO  SPA-ERRCD
-                   MOVE    11              TO  SPA-GMN-CUR
-                   GO      TO      1001-HOJOKBN-CHK-EXT
+      *        £È£±£¸¡¥£±£° ²þÀµ
+               IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
+                   IF      (SPA-GMN-HOJO-MAX    =   8      )  AND
+                           (SPA-GMN-HOJOKBN     NOT =   "7"  AND
+                                                        "9")
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
+               ELSE
+                   IF      (SPA-GMN-HOJO-MAX    =   8      )  AND
+                           (SPA-GMN-HOJOKBN     NOT =   "8"  AND
+                                                        "9")
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
                END-IF
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      1001-HOJOKBN-CHK-EXT
            END-IF
       *
       *    ¶¦ºÑ²ÈÂ²¤ÇÏ·¿Í°Ê³°»þ¡¢Êä½õ¶èÊ¬¤ÏÆþÎÏ¤Ç¤­¤Ê¤¤
@@ -1174,13 +1254,25 @@
                    GO      TO      1001-HOJOKBN-CHK-EXT
                END-IF
       *        Ï·¿Í
-               IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
-                       (SPA-GMN-HOJOKBN     =   "B"   OR
-                                                "E"   )
-                   MOVE    "1066"          TO  SPA-ERRCD
-                   MOVE    11              TO  SPA-GMN-CUR
-                   GO      TO      1001-HOJOKBN-CHK-EXT
+      *        £È£±£¸¡¥£±£° ²þÀµ
+               IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
+                   IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
+                           (SPA-GMN-HOJOKBN     =   "B"   OR
+                                                    "H"   )
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
+               ELSE
+                   IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
+                           (SPA-GMN-HOJOKBN     =   "B"   OR
+                                                    "E"   )
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
                END-IF
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      1001-HOJOKBN-CHK-EXT
            END-IF
       *
            MOVE    ZERO                TO  FLG-CHK
@@ -2080,6 +2172,7 @@
                    (SPA-PTHKN-HOJOKBN(IDX) =   "2" OR  "B" OR "E")) OR
                   ((SPA-PTHKN-HKNNUM(IDX)  =   "002" )  AND
                    (SPA-PTHKN-HOJOKBN(IDX) NOT =   SPACE AND
+                                                   "7"   AND
                                                    "8"   AND
                                                    "9"  ))
                GO      TO      20041-KIKAN-CHK1-EXT
@@ -2271,6 +2364,147 @@
       *
            .
        300-HKNKIKAN-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ï·¿Í£²³äÀÚÂØ¤¨½èÍý¡Ê£È£±£¸¡¥£±£°²þÀµ¡Ë
+      *****************************************************************
+       330-RJNHKNKIKAN-SYORI-SEC         SECTION.
+      *
+      *    ÃÖ´¹¤¨Á°¤ÎÊÝ¸±¤ò½ªÎ»¤µ¤»¤ë
+           MOVE    SPA-HKN-IDX1        TO  IDX
+           MOVE    SPA-PTHKN-TEKEDYMD(IDX)
+                                       TO  WRK-TEKEDYMD
+           MOVE    SPA-PTHKN-TEKEDYMDW(IDX)
+                                       TO  WRK-TEKEDYMDW
+      *    £È£±£¸¡¥£¹¡¥£³£°¤Þ¤ÇÍ­¸ú
+           MOVE    "20060930"          TO  WRK-SYMD
+           PERFORM 410112-SEIYMDHEN-SEC
+           MOVE    WRK-SYMD            TO  SPA-PTHKN-TEKEDYMD(IDX)
+           MOVE    WRK-HENYMD          TO  SPA-PTHKN-TEKEDYMDW(IDX)
+           MOVE    SPA-SYSYMD          TO  SPA-PTHKN-KAKUNINYMD (IDX)
+           MOVE    SPA-SYSYMDWH        TO  SPA-PTHKN-KAKUNINYMDW(IDX)
+      *
+      *    ÊÝ¸±¤ò£È£±£¸¡¥£±£°¡¥£±¤«¤é¤È¤¹¤ë
+           INITIALIZE                  SPA-GMN-HKN-AREA
+           MOVE    ZERO                TO  SPA-NAI-HKNSTR
+           MOVE    SPA-HKN-IDX1        TO  IDX
+      *
+           MOVE    SPA-PTHKN-HKNNUM (IDX)  TO  SPA-GMN-HKNNUM
+           MOVE    ZERO                TO  SPA-NAI-HKNID
+      *
+           MOVE    SPA-PTHKN-HKNJANUM(IDX) TO  SPA-GMN-HKNJANUM
+           MOVE    SPA-PTHKN-HONKZKKBN (IDX)
+                                       TO  SPA-GMN-HONKZKKBN
+           MOVE    SPA-PTHKN-CONTKBN (IDX)
+                                       TO  SPA-GMN-CONTKBN
+           MOVE    SPA-PTHKN-HIHKNJANAME (IDX)
+                                       TO  SPA-GMN-HIHKNJANAME
+           MOVE    SPA-PTHKN-KIGO    (IDX) TO  SPA-GMN-KIGO
+           MOVE    SPA-PTHKN-NUM     (IDX) TO  SPA-GMN-NUM
+      *
+           MOVE    SPA-PTHKN-SKKGETYMD  (IDX)
+                                       TO  SPA-NAI-SKKGETYMD
+           MOVE    "20061001"          TO  SPA-NAI-HTEKSTYMD
+           MOVE    WRK-TEKEDYMD        TO  SPA-NAI-HTEKEDYMD
+           MOVE    SPA-SYSYMD          TO  SPA-NAI-HKAKUNINYMD
+      *
+           MOVE    SPA-PTHKN-SKKGETYMDW (IDX)
+                                       TO  SPA-GMN-SKKGETYMD
+           MOVE    "20061001"          TO  WRK-SYMD
+           PERFORM 410112-SEIYMDHEN-SEC
+           MOVE    WRK-HENYMD          TO  SPA-GMN-HTEKSTYMD
+           MOVE    WRK-TEKEDYMDW       TO  SPA-GMN-HTEKEDYMD
+           MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HKAKUNINYMD
+      *
+      *    ÊÝ¸±¾ðÊó
+           PERFORM VARYING     IDH     FROM    1   BY  1
+                   UNTIL       IDH     >   SPA-GMN-HKNMAX
+               IF      SPA-GMN-HKNNUML (IDH)   =   SPA-GMN-HKNNUM
+                   MOVE    SPA-GMN-HKNNUMLST (IDH)
+                                               TO  SPA-GMN-HKNNUM-G
+      *            ¼±ÊÌ
+                   MOVE    SPA-NAI-HKNSBTKBN (IDH)
+                                               TO  SPA-NAI-PTHKN-SBTKBN
+               END-IF
+           END-PERFORM
+      *    Á¥°÷¤Î»þ¡¢Êä½õ¶èÊ¬¤ò£³³ä¤ËÀßÄê¤¹¤ë
+           IF      SPA-GMN-HKNNUM      =   "002"
+               EVALUATE    SPA-PTHKN-HOJOKBN (IDX)
+                   WHEN    "D"
+                       MOVE    "G"             TO  SPA-GMN-HOJOKBN
+                   WHEN    "E"
+                       MOVE    "H"             TO  SPA-GMN-HOJOKBN
+                   WHEN    "F"
+                       MOVE    "I"             TO  SPA-GMN-HOJOKBN
+                   WHEN    SPACE
+                       MOVE    "7"             TO  SPA-GMN-HOJOKBN
+               END-EVALUATE
+           END-IF
+      *    ¶¦ºÑ¤Î²¼Á¥£³·î
+           IF     (SPA-GMN-HKNNUM      =   "031"  OR
+                                           "032"  OR
+                                           "033"  OR
+                                           "034" )
+               EVALUATE    SPA-PTHKN-HOJOKBN (IDX)
+                   WHEN    "E"
+                       MOVE    "H"             TO  SPA-GMN-HOJOKBN
+                   WHEN    SPACE
+                       MOVE    "7"             TO  SPA-GMN-HOJOKBN
+               END-EVALUATE
+           END-IF
+      *    ¹ñÊÝ
+           IF      SPA-GMN-HKNNUM      =   "060"  OR
+                                           "068"
+               EVALUATE    SPA-PTHKN-HOJOKBN (IDX)
+                   WHEN    "2"
+                       MOVE    "3"             TO  SPA-GMN-HOJOKBN
+               END-EVALUATE
+           END-IF
+      *    ¤½¤ÎÂ¾
+           IF      SPA-GMN-HOJOKBN     =   SPACE
+               EVALUATE    SPA-PTHKN-HOJOKBN (IDX)
+                   WHEN    "8"
+                       MOVE    "7"             TO  SPA-GMN-HOJOKBN
+               END-EVALUATE
+           END-IF
+      *
+      *    Êä½õ¡¦ËÜ¿Í²ÈÂ²¶èÊ¬Åù
+           PERFORM 31011-HKN-HEN-SEC
+      *
+      *    ÊÝ¸±¼ÔÈÖ¹æ¡¡¸¡º÷¥Á¥§¥Ã¥¯
+           INITIALIZE                  HKNJAINF-REC
+           MOVE    SPA-HOSPID          TO  HKNJA-HOSPID
+           MOVE    SPA-GMN-HKNJANUM    TO  HKNJA-HKNJANUM
+      *
+           MOVE    HKNJAINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_hknjainf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hknjainf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-HKNJAINF-READ-SEC
+           ELSE
+               INITIALIZE                  HKNJAINF-REC
+               MOVE    1               TO  FLG-HKNJAINF
+           END-IF
+           MOVE    "tbl_hknjainf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-HKNJAINF        =   ZERO
+               MOVE    HKNJA-HKNJANAME     TO  SPA-HKNJA-HKNJANAME
+               MOVE    HKNJA-ADRS          TO  SPA-HKNJA-ADRS
+               MOVE    HKNJA-BANTI         TO  SPA-HKNJA-BANTI
+               MOVE    HKNJA-TEL           TO  SPA-HKNJA-TEL
+           ELSE
+               MOVE    SPACE               TO  SPA-HKNJA-HKNJANAME
+               MOVE    SPACE               TO  SPA-HKNJA-ADRS
+               MOVE    SPACE               TO  SPA-HKNJA-BANTI
+               MOVE    SPACE               TO  SPA-HKNJA-TEL
+           END-IF
+      *
+           .
+       330-RJNHKNKIKAN-SYORI-EXT.
            EXIT.
       *
       *****************************************************************

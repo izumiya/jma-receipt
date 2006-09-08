@@ -46,6 +46,8 @@
       * 01.00.14     NACL-Â¿¡¹Ç¼  05/10/04  ÆÃÊÌÎÅÍÜÈñ¡Ê£°£¶£¸¡ËÄÉ²Ã
       * 02.00.00     NACL-ÂÀÅÄ    05/10/25  MONFUNC ÂÐ±þ
       * 02.00.01     NACL-Â¿¡¹Ç¼  06/01/12  »ùÆ¸ÊÝ¸î¡Ê£°£µ£³¡ËÄÉ²Ã
+      * 03.00.01     NACL-Â¿¡¹Ç¼  06/08/25  Ê¿À®£±£¸Ç¯£±£°·î²þÀµÂÐ±þ
+      *                                     ¡ÊÏ·¿Í³ä¹çÊÑ¹¹¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -78,6 +80,10 @@
            03  FLG-KOHCHK          PIC 9(01).
            03  FLG-KOH186          PIC 9(01).
       *
+           03  FLG-ERR             PIC 9(01).
+           03  FLG-ERR2            PIC 9(01).
+           03  FLG-KAKUNIN         PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -96,6 +102,11 @@
            03  WRK-NENREI-YY           PIC 9(03).
            03  WRK-NENREI-MM           PIC 9(02).
            03  WRK-NENREI-DD           PIC 9(02).
+      *    £·£°ºÐ³«»ÏÆü
+           03  WRK-BYMD-70.
+               05  WRK-B70-YY          PIC 9(04).
+               05  WRK-B70-MM          PIC 9(02).
+               05  WRK-B70-DD          PIC 9(02).
       *
            03  WRK-HKNNUM              PIC X(03).
            03  WRK-PAYKBN              PIC X(02).
@@ -151,7 +162,7 @@
       *
       *
            COPY    "MCPDATA.INC".
-      *    COPY    "CPORCMCP.INC".
+      *****COPY    "CPORCMCP.INC".
       *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
@@ -264,6 +275,9 @@
                END-IF
                MOVE    01              TO  WRK-BDD
            END-IF
+      *    £·£°ºÐÅþÃ£Æü¡ÊÁ°´ü¹âÎð¼Ô³«»ÏÆü¡Ë
+           MOVE    WRK-BYMD            TO  WRK-BYMD-70
+           COMPUTE WRK-B70-YY          =   WRK-B70-YY  +   70
       *
       *    ÊÝ¸±Ç¯Îð¤ò·×»»¤¹¤ë
            MOVE    AGECHK-SRYYMD       TO  WRK-SYMD
@@ -418,18 +432,12 @@
       *    £È£±£µ¡¥£´²þÀµ¸å°Ê²¼¤Î¥Á¥§¥Ã¥¯¤ò¹Ô¤¦
            IF      AGECHK-SRYYMD       >=  "20030401"
                PERFORM 400-PTHKNCHK-SEC
-               IF      AGECHK-HKNCHK   NOT =   ZERO
-                   GO      TO      200-FTNRATE-EXT
-               END-IF
       *        ¸øÈñ¤Î´ü¸ÂÀÚ¤ì¥Á¥§¥Ã¥¯
-               PERFORM 410-PTKOHCHK-SEC
-               IF      AGECHK-HKNCHK   NOT =   ZERO
-                   GO      TO      200-FTNRATE-EXT
+               IF      AGECHK-HKNCHK       =   ZERO
+                   PERFORM 410-PTKOHCHK-SEC
                END-IF
            END-IF
-      *
-      *    £·£°ºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í¤Ç¤¢¤ë¤³¤È
-           IF      AGECHK-NENREI       <   70
+           IF      AGECHK-HKNCHK   NOT =   ZERO
                GO      TO      200-FTNRATE-EXT
            END-IF
       *
@@ -438,70 +446,67 @@
                GO      TO      200-FTNRATE-EXT
            END-IF
       *
-      *    ¼çÊÝ¸±È½Äê
-           MOVE    COMB-HKNNUM         TO  WRK-HKNNUM
-           MOVE    ZERO                TO  WRK-PAYKBN
-           PERFORM 3001-HKNNUM-CHK-SEC
-           IF      FLG-HKNNUM          =   ZERO
-      *        Ï«ºÒ¡¦¼«Èñ¡¦¼£¸³
-               IF      HKN-HKNKOHSBTKBN    =   "4"  OR  "8"  OR  "9"
-                   MOVE    1                   TO  FLG-OK
-                   GO      TO      200-FTNRATE-EXT
-               END-IF
-      *        ÊÝ¸±¼ÔÊÔ½¸
-               INITIALIZE                  PTHKNINF-REC
-               MOVE    AGECHK-HOSPID       TO  PTHKN-HOSPID
-               MOVE    AGECHK-PTID         TO  PTHKN-PTID
-               MOVE    COMB-HKNID          TO  PTHKN-HKNID
+      *    £·£°ºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í¤Ç¤¢¤ë¤³¤È
+           IF      AGECHK-NENREI       >=  70
+               PERFORM 2000-RJNCHK-SYORI-SEC
+           END-IF
+      *    £È£±£µ¡¥£´²þÀµ¸å
+           IF     (AGECHK-SRYYMD       >=  "20061001")  AND
+                  (AGECHK-NENREI       >=  65   AND
+                                       <   70        )
+      *        £¶£µºÐ°Ê¾åÏ·¿Í¸øÈñ¤Î³ä¹çÈ½Äê
+               PERFORM 2001-RJNCHK65-SYORI-SEC
+           END-IF
       *
-               MOVE    PTHKNINF-REC        TO  MCPDATA-REC
-               MOVE    "DBSELECT"          TO  MCP-FUNC
-               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "MONFUNC"            USING
-                                            MCPAREA
-                                            MCPDATA-REC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-                   MOVE    "key"               TO  MCP-PATHNAME
-                   PERFORM 910-PTHKNINF-READ-SEC
-               ELSE
-                   MOVE    1               TO  FLG-PTHKNINF
-               END-IF
-               IF      FLG-PTHKNINF        =   ZERO
-                   IF     (PTHKN-HOJOKBN       =   "8"  OR  "9") OR
-                          ((COMB-HKNNUM        =   "060"
-                                               OR  "068"       )  AND
-                           (PTHKN-HOJOKBN      =   "1"  OR  "2"
-                                               OR  "4"  OR  "5"))
-                       MOVE    1               TO  FLG-OK
-                   END-IF
-      *            Á¥°÷¤ÇÊä½õ¶èÊ¬¤Î¤¢¤ë»þ£Ï£Ë¤È¤¹¤ë
-                   IF     (COMB-HKNNUM         =   "002" ) AND
-                          (PTHKN-HOJOKBN   NOT =   SPACE )
-                       IF      PTHKN-HOJOKBN       >=  "A" AND
-                                                   <=  "F"
-                           MOVE    2               TO  FLG-OK
+           .
+       200-FTNRATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £¶£µºÐ°Ê¾åÏ·¿Í¸øÈñ¤Î³ä¹çÈ½Äê½èÍý¡Ê£È£±£¸¡¥£±£°¤«¤é¡Ë
+      *****************************************************************
+       2001-RJNCHK65-SYORI-SEC         SECTION.
+      *
+      *    Ï·¿Í¸øÈñ¤Ç¡¢»ÙÊ§¶èÊ¬¤¬¤¢¤ë»þ
+           PERFORM 294-KOH027-18-CHK-SEC
+      *    Ï·¿Í£²³ä¥¨¥é¡¼
+           IF     (FLG-ERR2            =   1   )
+               MOVE    3               TO  AGECHK-RJNCHK
+           END-IF
+           .
+       2001-RJNCHK65-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï·¿ÍÀßÄêÍ­ÌµÈ½Äê½èÍý¡Ê£·£°ºÐ°Ê¾å¡Ë
+      *****************************************************************
+       2000-RJNCHK-SYORI-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           MOVE    ZERO                TO  FLG-OK2
+           MOVE    ZERO                TO  FLG-ERR
+           MOVE    ZERO                TO  FLG-ERR2
+           MOVE    ZERO                TO  FLG-KAKUNIN
+      *    ¼çÊÝ¸±È½Äê
+           IF      COMB-HKNNUM     NOT =   SPACE
+               MOVE    COMB-HKNNUM         TO  WRK-HKNNUM
+               MOVE    ZERO                TO  WRK-PAYKBN
+               PERFORM 3001-HKNNUM-CHK-SEC
+               IF      FLG-HKNNUM          =   ZERO
+      *            Ï«ºÒ¡¦¼«Èñ¡¦¼£¸³
+                   IF      HKN-HKNKOHSBTKBN    =   "4"  OR  "8"  OR  "9"
+                       MOVE    3                   TO  FLG-OK
+                   ELSE
+                       IF      AGECHK-SRYYMD       >=  "20061001"
+      *                    £È£±£¸¡¥£±£°²þÀµ°Ê¹ß¤Î¥Á¥§¥Ã¥¯
+                           PERFORM 291-HOJOKBN-CHK18-SEC
                        ELSE
-                           MOVE    1               TO  FLG-OK
+      *                    £È£±£´¡¥£±£°²þÀµ¤Î¥Á¥§¥Ã¥¯
+                           PERFORM 290-HOJOKBN-CHK14-SEC
                        END-IF
                    END-IF
-      *            ¶¦ºÑ¤ÇÏ·¿Í¶èÊ¬¤Î¤¢¤ë»þ£Ï£Ë¤È¤¹¤ë
-                   IF     (COMB-HKNNUM         =   "031"  OR
-                                                   "032"  OR
-                                                   "033"  OR
-                                                   "034" ) AND
-                          (PTHKN-HOJOKBN       =   "B"  OR  "E")
-                       MOVE    2               TO  FLG-OK
-                   END-IF
                END-IF
-               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 990-DBCLOSE-SEC
            END-IF
-      **** IF      FLG-OK                  =   1
-      *        GO      TO      200-FTNRATE-EXT
-      **** END-IF
       *
       *    À¸³èÊÝ¸î¤Î¤ß¤Î»þ
            IF     (COMB-HKNNUM         =   SPACE )  AND
@@ -510,7 +515,6 @@
                   (COMB-KOH3HKNNUM     =   "012" )  OR
                   (COMB-KOH4HKNNUM     =   "012" ))
                MOVE    1               TO  FLG-OK2
-      *********GO      TO      200-FTNRATE-EXT
            END-IF
       *
       *    ¸¶Çú¤Î¤ß¤Î»þ
@@ -563,16 +567,16 @@
                MOVE    1               TO  FLG-OK2
            END-IF
       *    Ï·¿Í¸øÈñ¤Ç¡¢»ÙÊ§¶èÊ¬¤¬¤¢¤ë»þ
-           IF    ((COMB-KOH1HKNNUM     =   "027" )  AND
-                  (COMB-KOH1PAYKBN     =   "01" OR "02" ))  OR
-                 ((COMB-KOH2HKNNUM     =   "027" )  AND
-                  (COMB-KOH2PAYKBN     =   "01" OR "02"  ))  OR
-                 ((COMB-KOH3HKNNUM     =   "027" )  AND
-                  (COMB-KOH3PAYKBN     =   "01" OR "02" ))  OR
-                 ((COMB-KOH4HKNNUM     =   "027" )  AND
-                  (COMB-KOH4PAYKBN     =   "01" OR "02" ))
-               MOVE    1               TO  FLG-OK2
+           IF      AGECHK-SRYYMD       >=  "20061001"
+      *        £È£±£¸¡¥£±£°²þÀµ°Ê¹ß¤Î¥Á¥§¥Ã¥¯
+               PERFORM 294-KOH027-18-CHK-SEC
            ELSE
+      *        £È£±£´¡¥£±£°²þÀµ°Ê¹ß¤Î¥Á¥§¥Ã¥¯
+               PERFORM 293-KOH027-14-CHK-SEC
+           END-IF
+      *
+      *    ³Æ¸øÈñ¤¬Ï·¿Í¸øÈñ¤«¤ÎÈ½Äê
+           IF      FLG-OK2             =   ZERO
       *        ¸øÈñ£±
                IF      COMB-KOH1HKNNUM     NOT =   SPACE
                    MOVE    COMB-KOH1HKNNUM     TO  WRK-HKNNUM
@@ -617,24 +621,86 @@
                        END-IF
                    END-IF
                END-IF
-      *
            END-IF
       *
-           IF      FLG-OK              =   ZERO   AND
-                   FLG-OK2             =   ZERO
+      *    Ï·¿Í¶èÊ¬¤Ê¤·
+           IF     (FLG-OK              =   ZERO )  AND
+                  (FLG-OK2             =   ZERO )
                MOVE    1               TO  AGECHK-RJNCHK
-               GO      TO      200-FTNRATE-EXT
-           END-IF
-      *    £·£µºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í¸øÈñ¤¬¤¢¤ë¤³¤È
-      **** IF     (AGECHK-NENREI       >=  75 )  AND
-           IF     (AGECHK-NENREI       >=  WRK-ROU-NEN )  AND
-                  (FLG-OK2             =   ZERO)
-               MOVE    2               TO  AGECHK-RJNCHK
            END-IF
       *
+           IF     (AGECHK-RJNCHK       =   ZERO )  AND
+                  (FLG-OK          NOT =   3    )
+      *    £·£µºÐ°Ê¾å¤Î»þ¡¢Ï·¿Í¸øÈñ¤¬¤¢¤ë¤³¤È
+               IF     (AGECHK-NENREI       >=  WRK-ROU-NEN )  AND
+                      (FLG-OK2             =   ZERO)
+                   MOVE    2               TO  AGECHK-RJNCHK
+               END-IF
+           END-IF
+      *
+      *    £È£±£¸¡¥£±£°¤«¤é¡¢Ï·¿Í£²³ä¥¨¥é¡¼
+           IF    ((FLG-ERR             =   1   )  AND
+                  (FLG-OK2             =   ZERO) )  OR
+                  (FLG-ERR2            =   1   )
+               MOVE    3               TO  AGECHK-RJNCHK
+           END-IF
+      *
+      *DDD ¹ñÊÝ¤ÎÁ°´ü¹âÎð¼Ô°Ê¹ß¤Î³ÎÇ§Í­Ìµ
+      *    IF    (FLG-KAKUNIN          =   1 ) AND
+      *          (FLG-OK2              =   ZERO)
+      *        MOVE    1               TO  AGECHK-KAKUNINCHK
+      *DDD END-IF
       *
            .
-       200-FTNRATE-EXT.
+       2000-RJNCHK-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï·¿Í¸øÈñ»ÙÊ§¶èÊ¬È½Äê½èÍý¡Ê£È£±£´¡¥£±£°°Ê¹ß¡Ë
+      *****************************************************************
+       293-KOH027-14-CHK-SEC         SECTION.
+      *
+           IF    ((COMB-KOH1HKNNUM     =   "027" )  AND
+                  (COMB-KOH1PAYKBN     =   "01" OR "02" ))  OR
+                 ((COMB-KOH2HKNNUM     =   "027" )  AND
+                  (COMB-KOH2PAYKBN     =   "01" OR "02"  ))  OR
+                 ((COMB-KOH3HKNNUM     =   "027" )  AND
+                  (COMB-KOH3PAYKBN     =   "01" OR "02" ))  OR
+                 ((COMB-KOH4HKNNUM     =   "027" )  AND
+                  (COMB-KOH4PAYKBN     =   "01" OR "02" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
+           .
+       293-KOH027-14-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ï·¿Í¸øÈñ»ÙÊ§¶èÊ¬È½Äê½èÍý¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+      *****************************************************************
+       294-KOH027-18-CHK-SEC         SECTION.
+      *
+           IF    ((COMB-KOH1HKNNUM     =   "027" )  AND
+                  (COMB-KOH1PAYKBN     =   "01" OR "03" ))  OR
+                 ((COMB-KOH2HKNNUM     =   "027" )  AND
+                  (COMB-KOH2PAYKBN     =   "01" OR "03"  ))  OR
+                 ((COMB-KOH3HKNNUM     =   "027" )  AND
+                  (COMB-KOH3PAYKBN     =   "01" OR "03" ))  OR
+                 ((COMB-KOH4HKNNUM     =   "027" )  AND
+                  (COMB-KOH4PAYKBN     =   "01" OR "03" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
+      *    £²³ä¤ÎÈ½Äê
+           IF    ((COMB-KOH1HKNNUM     =   "027" )  AND
+                  (COMB-KOH1PAYKBN     =   "02" ))  OR
+                 ((COMB-KOH2HKNNUM     =   "027" )  AND
+                  (COMB-KOH2PAYKBN     =   "02"  ))  OR
+                 ((COMB-KOH3HKNNUM     =   "027" )  AND
+                  (COMB-KOH3PAYKBN     =   "02" ))  OR
+                 ((COMB-KOH4HKNNUM     =   "027" )  AND
+                  (COMB-KOH4PAYKBN     =   "02" ))
+               MOVE    1               TO  FLG-ERR2
+           END-IF
+           .
+       294-KOH027-18-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -647,6 +713,177 @@
        2001-KOH-CHK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    £È£±£´¡¥£±£°²þÀµ¤Î¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       290-HOJOKBN-CHK14-SEC         SECTION.
+      *
+      *    ÊÝ¸±¼ÔÊÔ½¸
+           INITIALIZE                  PTHKNINF-REC
+           MOVE    AGECHK-HOSPID       TO  PTHKN-HOSPID
+           MOVE    AGECHK-PTID         TO  PTHKN-PTID
+           MOVE    COMB-HKNID          TO  PTHKN-HKNID
+      *
+           MOVE    PTHKNINF-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-PTHKNINF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTHKNINF
+           END-IF
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-PTHKNINF        =   ZERO
+               IF     (PTHKN-HOJOKBN       =   "8"  OR  "9") OR
+                      ((COMB-HKNNUM        =   "060"
+                                           OR  "068"       )  AND
+                       (PTHKN-HOJOKBN      =   "1"  OR  "2"
+                                           OR  "4"  OR  "5"))
+                   MOVE    1               TO  FLG-OK
+               END-IF
+      *        Á¥°÷¤ÇÊä½õ¶èÊ¬¤Î¤¢¤ë»þ£Ï£Ë¤È¤¹¤ë
+               IF     (COMB-HKNNUM         =   "002" ) AND
+                      (PTHKN-HOJOKBN   NOT =   SPACE )
+                   IF      PTHKN-HOJOKBN       >=  "A" AND
+                                               <=  "F"
+                       MOVE    2               TO  FLG-OK
+                   ELSE
+                       MOVE    1               TO  FLG-OK
+                   END-IF
+               END-IF
+      *        ¶¦ºÑ¤ÇÏ·¿Í¶èÊ¬¤Î¤¢¤ë»þ£Ï£Ë¤È¤¹¤ë
+               IF     (COMB-HKNNUM         =   "031"  OR
+                                               "032"  OR
+                                               "033"  OR
+                                               "034" ) AND
+                      (PTHKN-HOJOKBN       =   "B"  OR  "E")
+                   MOVE    2               TO  FLG-OK
+               END-IF
+      *        ¹ñÊÝ¤ÇÏ·¿Í¶èÊ¬¤Î¤¢¤ë»þ£Ï£Ë¤È¤¹¤ë
+      *            Á°´ü¹âÎð¼Ô³«»ÏÆü°Ê¹ß¤Ë³ÎÄê¤¬¤Ê¤¤»þ¡¢·Ù¹ð
+               IF     (COMB-HKNNUM         =   "060"
+                                           OR  "068"       )
+                   IF     (PTHKN-TEKSTYMD      <   WRK-BYMD-70 )
+                      AND (PTHKN-TEKEDYMD      >=  WRK-BYMD-70 )
+                      AND (PTHKN-KAKUNINYMD    <   WRK-BYMD-70 )
+                       MOVE    1               TO  FLG-KAKUNIN
+                   END-IF
+               END-IF
+           END-IF
+           .
+       290-HOJOKBN-CHK14-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £È£±£¸¡¥£±£°²þÀµ¤Î¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       291-HOJOKBN-CHK18-SEC         SECTION.
+      *
+      *    ÊÝ¸±¼ÔÊÔ½¸
+           INITIALIZE                  PTHKNINF-REC
+           MOVE    AGECHK-HOSPID       TO  PTHKN-HOSPID
+           MOVE    AGECHK-PTID         TO  PTHKN-PTID
+           MOVE    COMB-HKNID          TO  PTHKN-HKNID
+      *
+           MOVE    PTHKNINF-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-PTHKNINF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTHKNINF
+           END-IF
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           EVALUATE    COMB-HKNNUM
+               WHEN    "060"
+               WHEN    "068"
+      *            ¹ñÊÝ
+      *            ÁÈ¹ç¹ñÊÝ°Ê³°¤Ï¡¢£²³ä¤Ï·Ù¹ð
+                   IF      PTHKN-HKNJANUM (3:1)    =   "3"
+                       MOVE    1               TO  FLG-OK
+                   ELSE
+                       MOVE    1               TO  FLG-OK
+                       IF      PTHKN-HOJOKBN       =   "2"
+                           MOVE    1               TO  FLG-ERR
+                       END-IF
+                   END-IF
+      *            Á°´ü¹âÎð¼Ô³«»ÏÆü°Ê¹ß¤Ë³ÎÄê¤¬¤Ê¤¤»þ¡¢·Ù¹ð
+                   IF     (PTHKN-TEKSTYMD      <   WRK-BYMD-70 )
+                      AND (PTHKN-TEKEDYMD      >=  WRK-BYMD-70 )
+                      AND (PTHKN-KAKUNINYMD    <   WRK-BYMD-70 )
+                       MOVE    1               TO  FLG-KAKUNIN
+                   END-IF
+               WHEN    "002"
+      *        Á¥°÷
+                   IF      PTHKN-HOJOKBN       =   "1"   OR  "2"
+                                               OR  "3"   OR  SPACE
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-OK
+      *                £²³ä¤Ç·ÑÂ³°Ê³°¤Ï¥¨¥é¡¼
+                       IF      PTHKN-HOJOKBN       =   "8"
+                                                   OR  "D"
+                                                   OR  "E"
+                                                   OR  "F"
+                           IF      PTHKN-CONTKBN   =   SPACE
+                               MOVE    1               TO  FLG-ERR
+                           END-IF
+                       END-IF
+                   END-IF
+               WHEN    "031"
+               WHEN    "032"
+               WHEN    "033"
+               WHEN    "034"
+      *            ¶¦ºÑ¤ÇÏ·¿Í¶èÊ¬¤Î¤¢¤ë»þ£Ï£Ë¤È¤¹¤ë
+                   IF     PTHKN-HOJOKBN        =   SPACE
+                                               OR  "2"
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-OK
+      *                £²³ä¤Ç·ÑÂ³°Ê³°¤Ï¥¨¥é¡¼
+                       IF      PTHKN-HOJOKBN       =   "8"
+                                                   OR  "E"
+                           IF      PTHKN-CONTKBN   =   SPACE
+                               MOVE    1               TO  FLG-ERR
+                           END-IF
+                       ELSE
+                           MOVE    2               TO  FLG-OK
+                       END-IF
+                   END-IF
+               WHEN    OTHER
+      *            ¤½¤ÎÂ¾
+                   IF     PTHKN-HOJOKBN        =   "7"
+                                               OR  "8"
+                                               OR  "9"
+                       MOVE    1               TO  FLG-OK
+      *                £²³ä¤Ç·ÑÂ³°Ê³°¤Ï¥¨¥é¡¼
+                       IF      PTHKN-HOJOKBN       =   "8"
+                           IF      PTHKN-CONTKBN   =   SPACE
+                               MOVE    1               TO  FLG-ERR
+                           END-IF
+                       END-IF
+                   END-IF
+           END-EVALUATE
+           .
+       291-HOJOKBN-CHK18-EXT.
+           EXIT.
       *
       *****************************************************************
       *    Ï«ºÒ¤Î»þ¡¢³ä¹ç¤ÎÊÑ¹¹½èÍý
@@ -1121,7 +1358,6 @@
                PERFORM 4101-KIKANCHK-CHK-SEC
                IF      FLG-HKNNUM-OK       =   ZERO
                    MOVE    2               TO  AGECHK-HKNCHK
-                   GO      TO      410-PTKOHCHK-EXT
                END-IF
            END-IF
       *

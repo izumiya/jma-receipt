@@ -58,6 +58,8 @@
       *  02.00.17    NACL-ÌçÏÆ    06/05/18  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *  02.00.18    NACL-ÌçÏÆ    06/06/01  ÆÃÄê¼À´µÅù¡ÜÄ¹´üÂÐ±þ
       *  03.02.01    NACL-ÌçÏÆ    06/07/31  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
+      *  03.02.02    NACL-Â¿¡¹Ç¼  06/08/25  Ê¿À®£±£¸Ç¯£±£°·î²þÀµÂÐ±þ
+      *                                     ¡ÊÏ·¿Í³ä¹çÊÑ¹¹¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -689,7 +691,8 @@
       *    ¶¦ºÑ
               ((WRK-KEN-HKNNUM       =   "031"  OR  "032"  OR
                                          "033"  OR  "034" ) AND
-               (WRK-KEN-HOJOKBN      =   "2"  OR  "B"  OR  "E"))
+               (WRK-KEN-HOJOKBN      =   "2"  OR  "B"  OR  "E"
+                                                       OR  "H"))
                EVALUATE    WRK-KEN-HOJOKBN
                WHEN    "1"
                    MOVE    "Á¥°÷¿¦Ì³¾å"        TO  WRK-KEN-SEIDO
@@ -709,6 +712,13 @@
                    MOVE    "Á¥²¼Á¥¹â£²"        TO  WRK-KEN-SEIDO
                WHEN    "F"
                    MOVE    "Á¥ÄÌ¶Ð¹â£²"        TO  WRK-KEN-SEIDO
+      *        £È£±£¸¡¥£±£°²þÀµ
+               WHEN    "G"
+                   MOVE    "Á¥¿¦Ì³¹â£³"        TO  WRK-KEN-SEIDO
+               WHEN    "H"
+                   MOVE    "Á¥²¼Á¥¹â£³"        TO  WRK-KEN-SEIDO
+               WHEN    "I"
+                   MOVE    "Á¥ÄÌ¶Ð¹â£³"        TO  WRK-KEN-SEIDO
                WHEN    OTHER
                    MOVE    HKN-TANSEIDONAME    TO  WRK-KEN-SEIDO
                END-EVALUATE
@@ -979,13 +989,17 @@
                                                    "C"  OR
                                                    "D"  OR
                                                    "E"  OR
-                                                   "F" ) )   OR
+                                                   "F"  OR
+                                                   "G"  OR
+                                                   "H"  OR
+                                                   "I" ) )   OR
                   ((WRK-HKN-HKNNUM (IDX)       =   "031" OR
                                                    "032" OR
                                                    "033" OR
                                                    "034" ) AND
                    (WRK-HKN-HOJOKBN(IDX)       =   "2"  OR
                                                    "B"  OR
+                                                   "H"  OR
                                                    "E"   ))
                  ADD     1             TO  WRK-LCOMB-MAX
                  MOVE    WRK-KCOMB-REC (IDX2)
@@ -1624,13 +1638,17 @@
                                                    "C"  OR
                                                    "D"  OR
                                                    "E"  OR
-                                                   "F" ))   OR
+                                                   "F"  OR
+                                                   "G"  OR
+                                                   "H"  OR
+                                                   "I" ) )   OR
                   ((WRK-LCOMB-HKNNUM (IDX2)    =   "031" OR
                                                    "032" OR
                                                    "033" OR
                                                    "034" ) AND
                    (WRK-LCOMB-HOJOKBN(IDX2)    =   "2"  OR
                                                    "B"  OR
+                                                   "H"  OR
                                                    "E"   ))
             INITIALIZE                         WRK-KENSAKU-AREA
             MOVE    WRK-LCOMB-HKNNUM  (IDX2)   TO  WRK-KEN-HKNNUM
@@ -1999,6 +2017,10 @@
                    WHEN    "9"
       *                £±³äÉéÃ´
                        MOVE    10                TO  WRK-GAIKFTNRATE
+      *            £È£±£¸¡¥£±£°²þÀµ ÄÉ²Ã
+                   WHEN    "7"
+      *                £³³äÉéÃ´
+                       MOVE    30                TO  WRK-GAIKFTNRATE
                    WHEN    OTHER
       *                ¤½¤ÎÂ¾
                        MOVE    ZERO              TO  WRK-GAIKFTNRATE
@@ -3153,13 +3175,17 @@
                                                            "C"  OR
                                                            "D"  OR
                                                            "E"  OR
-                                                           "F"  ))  OR
+                                                           "F"  OR
+                                                           "G"  OR
+                                                           "H"  OR
+                                                           "I"  ))  OR
                                ((WRK-HKN-HKNNUM (IDY2)  =   "031" OR
                                                            "032" OR
                                                            "033" OR
                                                            "034" )  AND
                                 (WRK-HKN-HOJOKBN(IDY2)  =   "2" OR
                                                            "B" OR
+                                                           "H" OR
                                                            "E"  ))
                                CONTINUE
                            ELSE
@@ -4488,6 +4514,7 @@
       ******* IF  (WRK-HKN-HKNNUM  (IDZ)  NOT =   "002")   OR
               IF ((WRK-HKN-HKNNUM  (IDZ)      =   "002") AND
                   (WRK-HKN-HOJOKBN (IDZ)  NOT =    SPACE  AND
+                                                   "7"    AND
                                                    "8"    AND
                                                    "9" ))  OR
                  ((WRK-HKN-HKNNUM  (IDZ)      =   "031"  OR
@@ -4495,6 +4522,7 @@
                                                   "033"  OR
                                                   "034"  )  AND
                   (WRK-HKN-HOJOKBN (IDZ)  NOT =    SPACE  AND
+                                                   "7"    AND
                                                    "8"    AND
                                                    "9" ))
                    CONTINUE

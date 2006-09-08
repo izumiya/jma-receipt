@@ -40,6 +40,7 @@
       * 01.00.11     NACL-Â¿¡¹Ç¼  05/02/10  ÆÃÄê¤Î½ÅÊ£ÅÐÏ¿²ÄÇ½
       * 01.00.12     NACL-Â¿¡¹Ç¼  05/11/15  MONFUNC ÂÐ±þ
       * 01.00.13     NACL-Â¿¡¹Ç¼  06/03/10  '015¹¹Àµ','016°éÀ®'½ÅÊ£²Ä
+      * 01.00.14     NACL-Â¿¡¹Ç¼  06/08/25  Ê¿À®£±£¸Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1146,6 +1147,21 @@
                PERFORM 2001-HISSU-CHK-SEC
                IF      SPA-ERRCD       NOT =   SPACE
                    GO      TO      200-KANREN-CHK-EXT
+               END-IF
+           END-IF
+      *
+      *£È£±£¸¡¥£±£°²þÀµ¤Î¥Á¥§¥Ã¥¯
+           IF     (SPA-ERRCD           =   SPACE  )   AND
+                  (SPA-GMN-KOHNUM(IDX-K)   =   "027") AND
+                  (SPA-GMN-KOHKBN(IDX-K)   =   "2"  )
+               IF      (SPA-NAI-KTEKSTYMD (IDX-K)
+                                               >=  "20061001") OR
+                      ((SPA-NAI-KTEKSTYMD (IDX-K)
+                                               =   SPACE  )  AND
+                       (SPA-SYSYMD             >=  "20061001" ))
+      *            £È£±£¸¡¥£±£°°Ê¹ß¤Ï¡¢£²³ä¤Ï¥¨¥é¡¼
+                   MOVE    "0098"          TO  SPA-ERRCD
+                   MOVE    21              TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
