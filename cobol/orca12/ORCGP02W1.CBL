@@ -70,6 +70,9 @@
       *  02.00.17    NACL-Â¿¡¹Ç¼  05/10/19  ÆÃÊÌÎÅÍÜÈñÄÉ²Ã
       *  02.00.18    NACL-Â¿¡¹Ç¼  05/10/20  ¸øÈñºï½ü½¤Àµ
       *  02.00.19    NACL-Â¿¡¹Ç¼  05/11/14  MONFUNC ÂÐ±þ Â¾
+      *  03.00.01    NACL-Â¿¡¹Ç¼  06/08/25  Ê¿À®£±£¸Ç¯£±£°·î²þÀµÂÐ±þ
+      *                                     ¡ÊÏ·¿Í³ä¹çÊÑ¹¹¡Ë
+      *                                     ¸øÈñ¤Ï¥¨¥é¡¼
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -177,6 +180,12 @@
       *
       *    ½ÅÊ£¥¨¥é¡¼¤Ê¤·
            03  FLG-ERRCHK         PIC 9(01).
+      *    £È£±£¸¡¥£±£°²þÀµÂÐ±þ
+           03  FLG-RJNCHK2             PIC 9(01).
+           03  FLG-RJNERR              PIC 9(01).
+           03  FLG-KOKUHO              PIC 9(01).
+           03  FLG-RJNKOHERR           PIC 9(01).
+           03  FLG-KOH27               PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -219,6 +228,8 @@
            03  IDX-K               PIC 9(04).
            03  IDX-K2              PIC 9(04).
            03  IDX-KOH             PIC 9(04).
+      *
+           03  IDXK                PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -469,6 +480,36 @@
                    07  FILLER          PIC X(10) VALUE "E £²³ä²¼Á¥".
                05  WRK-HJO-REC-R5      REDEFINES   WRK-HJO-REC-G5.
                    07  WRK-HJO-REC5    PIC X(10) OCCURS  5.
+      *        Á¥°÷¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+               05  WRK-HJO-REC-G1-2.
+                   07  FILLER          PIC X(10) VALUE "1 ¿¦Ì³".
+                   07  FILLER          PIC X(10) VALUE "2 ²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "3 ÄÌ¶Ð".
+                   07  FILLER          PIC X(10) VALUE "7 £³³ä".
+                   07  FILLER          PIC X(10) VALUE "9 £±³ä".
+                   07  FILLER          PIC X(10) VALUE "A £±³ä¿¦Ì³".
+                   07  FILLER          PIC X(10) VALUE "B £±³ä²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "C £±³äÄÌ¶Ð".
+                   07  FILLER          PIC X(10) VALUE "G £³³ä¿¦Ì³".
+                   07  FILLER          PIC X(10) VALUE "H £³³ä²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "I £³³äÄÌ¶Ð".
+               05  WRK-HJO-REC-R1-2    REDEFINES   WRK-HJO-REC-G1-2.
+                   07  WRK-HJO-REC1-2  PIC X(10) OCCURS  11.
+      *        Ï·¿Í¤ÎÊä½õ¶èÊ¬ÄÉ²Ã¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+               05  WRK-HJO-REC-G4-2.
+                   07  FILLER          PIC X(06) VALUE "7 £³³ä".
+                   07  FILLER          PIC X(06) VALUE "9 £±³ä".
+               05  WRK-HJO-REC-R4-2    REDEFINES   WRK-HJO-REC-G4-2.
+                   07  WRK-HJO-REC4-2  PIC X(06) OCCURS  2.
+      *        ¶¦ºÑ¤Î²¼Á¥¸åÊä½õ¶èÊ¬ÄÉ²Ã¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+               05  WRK-HJO-REC-G5-2.
+                   07  FILLER          PIC X(10) VALUE "2 ²¼Á¥£³·î".
+                   07  FILLER          PIC X(10) VALUE "7 £³³ä".
+                   07  FILLER          PIC X(10) VALUE "9 £±³ä".
+                   07  FILLER          PIC X(10) VALUE "B £±³ä²¼Á¥".
+                   07  FILLER          PIC X(10) VALUE "H £³³ä²¼Á¥".
+               05  WRK-HJO-REC-R5-2      REDEFINES   WRK-HJO-REC-G5-2.
+                   07  WRK-HJO-REC5-2    PIC X(10) OCCURS  5.
       *
            03  WRK-KEI-TBL.
                05  WRK-KEI-REC-G.
@@ -833,8 +874,15 @@
            EVALUATE    SPA-PIDCD
                WHEN    "0104"
                WHEN    "0105"
+               WHEN    "0110"
       *            ÊÝ¸±½ÅÊ£½èÍý
                    CALL    "ORCSP03A"          USING   SPA-AREA
+                                                       SPA-P02SCRAREA
+                                                       SPA-P02KYOUTU
+               WHEN    "0111"
+      *            Ï·¿Í¸øÈñ£²³ä¤ò£³³ä¤Ø
+                   MOVE    ZERO                TO  SPA-KOH-ADD
+                   CALL    "ORCSP03B"          USING   SPA-AREA
                                                        SPA-P02SCRAREA
                                                        SPA-P02KYOUTU
                WHEN    "0106"
@@ -965,6 +1013,18 @@
       *************MOVE    ZERO                TO  SPA-GMN-HOJO-MAX
                    PERFORM VARYING     IDT     FROM    IDY BY  1
                            UNTIL       IDT     >   WRK-HJO-MAX
+      *              £È£±£¸¡¥£±£° ²þÀµ
+                     IF    ((SPA-PTHKN-TEKSTYMD(IDX) =   SPACE )  AND
+                            (SPA-SYSYMD              >=  "20061001")) OR
+                            (SPA-PTHKN-TEKSTYMD(IDX) >=  "20061001")
+                       IF      WRK-HJO-REC1-2 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC1-2 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    WRK-HJO-MAX     TO  IDT
+                       END-IF
+                     ELSE
                        IF      WRK-HJO-REC1 (IDT)(1:1)
                                            =   SPA-PTHKN-HOJOKBN(IDX)
                            MOVE    WRK-HJO-REC1 (IDT)(3:)
@@ -972,6 +1032,7 @@
                                                                  (IDX)
                            MOVE    WRK-HJO-MAX     TO  IDT
                        END-IF
+                     END-IF
                    END-PERFORM
       *        ¹ñÊÝ
                WHEN    "060"
@@ -1000,9 +1061,20 @@
                        MOVE    1               TO  IDY
                        MOVE    1               TO  WRK-HJO-MAX
                    END-IF
-      *************MOVE    ZERO                TO  SPA-GMN-HOJO-MAX
                    PERFORM VARYING     IDT     FROM    IDY BY  1
                            UNTIL       IDT     >   WRK-HJO-MAX
+      *              £È£±£¸¡¥£±£° ²þÀµ
+                     IF     (SPA-PTHKN-TEKSTYMD(IDX) >=  "20061001")
+                        OR ((SPA-PTHKN-TEKSTYMD(IDX) =   SPACE  )  AND
+                            (SPA-SYSYMD              >=  "20061001"))
+                       IF      WRK-HJO-REC5-2 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC5-2 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    WRK-HJO-MAX     TO  IDT
+                       END-IF
+                     ELSE
                        IF      WRK-HJO-REC5 (IDT)(1:1)
                                            =   SPA-PTHKN-HOJOKBN(IDX)
                            MOVE    WRK-HJO-REC5 (IDT)(3:)
@@ -1010,6 +1082,7 @@
                                                                  (IDX)
                            MOVE    WRK-HJO-MAX     TO  IDT
                        END-IF
+                     END-IF
                    END-PERFORM
       *        ¤½¤ÎÂ¾
                WHEN    OTHER
@@ -1049,6 +1122,18 @@
                    (SPA-PTHKN-HKNNUM(IDX)(1:1) NOT =   "9")
                PERFORM VARYING     IDT     FROM    1  BY  1
                        UNTIL       IDT     >   2
+      *          £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                 IF     (SPA-PTHKN-TEKSTYMD(IDX) >=  "20061001")
+                    OR ((SPA-PTHKN-TEKSTYMD(IDX) =   SPACE  )  AND
+                        (SPA-SYSYMD              >=  "20061001"))
+                   IF      WRK-HJO-REC4-2 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                       MOVE    WRK-HJO-REC4-2 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                       MOVE    2               TO  IDT
+                   END-IF
+                 ELSE
                    IF      WRK-HJO-REC4 (IDT)(1:1)
                                            =   SPA-PTHKN-HOJOKBN(IDX)
                        MOVE    WRK-HJO-REC4 (IDT)(3:)
@@ -1056,6 +1141,7 @@
                                                                  (IDX)
                        MOVE    2               TO  IDT
                    END-IF
+                 END-IF
                END-PERFORM
            END-IF
            .
@@ -1369,9 +1455,18 @@
                    PERFORM VARYING     IDT     FROM    IDY BY  1
                            UNTIL       IDT     >   WRK-HJO-MAX
                        ADD     1           TO  SPA-GMN-HOJO-MAX
-                       MOVE    WRK-HJO-REC1 (IDT)
+      *            £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                       IF     (SPA-NAI-HTEKSTYMD   >=  "20061001" )
+                          OR ((SPA-NAI-HTEKSTYMD   =   SPACE  )  AND
+                              (SPA-SYSYMD          >=  "20061001"))
+                           MOVE    WRK-HJO-REC1-2 (IDT)
                                            TO  SPA-GMN-HOJOKBNL
                                                     (SPA-GMN-HOJO-MAX)
+                       ELSE
+                           MOVE    WRK-HJO-REC1 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL
+                                                    (SPA-GMN-HOJO-MAX)
+                       END-IF
                    END-PERFORM
       *        ¹ñÊÝ
                WHEN    "060"
@@ -1400,9 +1495,18 @@
                    PERFORM VARYING     IDT     FROM    IDY BY  1
                            UNTIL       IDT     >   WRK-HJO-MAX
                        ADD     1           TO  SPA-GMN-HOJO-MAX
-                       MOVE    WRK-HJO-REC5 (IDT)
+      *            £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                       IF     (SPA-NAI-HTEKSTYMD   >=  "20061001"  )
+                          OR ((SPA-NAI-HTEKSTYMD   =   SPACE  )  AND
+                              (SPA-SYSYMD          >=  "20061001"))
+                           MOVE    WRK-HJO-REC5-2 (IDT)
                                            TO  SPA-GMN-HOJOKBNL
                                                     (SPA-GMN-HOJO-MAX)
+                       ELSE
+                           MOVE    WRK-HJO-REC5   (IDT)
+                                           TO  SPA-GMN-HOJOKBNL
+                                                    (SPA-GMN-HOJO-MAX)
+                       END-IF
                    END-PERFORM
       *        ¤½¤ÎÂ¾
                WHEN    OTHER
@@ -1450,8 +1554,16 @@
                    (SPA-GMN-HKNNUM(1:1) NOT =   "9")
                PERFORM VARYING     IDT     FROM    1  BY  1
                        UNTIL       IDT     >   2
-                   MOVE    WRK-HJO-REC4 (IDT)
+      *            £È£±£¸¡¥£±£° ²þÀµ¤è¤ê
+                   IF     (SPA-NAI-HTEKSTYMD       >=  "20061001" )
+                      OR ((SPA-NAI-HTEKSTYMD       =   SPACE  )  AND
+                          (SPA-SYSYMD              >=  "20061001"))
+                       MOVE    WRK-HJO-REC4-2 (IDT)
                                            TO  SPA-GMN-HOJOKBNL (IDT)
+                   ELSE
+                       MOVE    WRK-HJO-REC4 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL (IDT)
+                   END-IF
                    MOVE    IDT             TO  SPA-GMN-HOJO-MAX
                END-PERFORM
            END-IF
@@ -3698,6 +3810,10 @@
                       (SPA-BYMD-70         >   ZERO       )  AND
                       (SPA-SYSYMD          >=  SPA-BYMD-70)
                    PERFORM 410331-RJN-HKNCHK-SEC
+               ELSE
+      *        £È£±£¸¡¥£±£° ²þÀµ
+      *        Ï·¿Í¸øÈñ£²³ä¥Á¥§¥Ã¥¯
+                   PERFORM 410332-RJN27-CHK-SEC
                END-IF
            END-IF
            .
@@ -4014,9 +4130,13 @@
        410331-RJN-HKNCHK-SEC      SECTION.
       *
            MOVE    ZERO                TO  FLG-RJNCHK
+           MOVE    ZERO                TO  FLG-RJNCHK2
            MOVE    ZERO                TO  FLG-HKNCHK
            MOVE    ZERO                TO  FLG-SEIHOGO
            MOVE    ZERO                TO  SPA-HKN-IDX1
+           MOVE    ZERO                TO  FLG-RJNERR
+           MOVE    ZERO                TO  FLG-RJNKOHERR
+           MOVE    ZERO                TO  FLG-KOKUHO
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       IDX     >   SPA-PTHKN-MAX
                IF     (SPA-PTHKN-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
@@ -4024,10 +4144,52 @@
                       (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
       *            ¹ñÊÝ
                    IF     (SPA-PTHKN-HKNNUM  (IDX) =   "060"
-                                                   OR  "068" )  AND
-                          (SPA-PTHKN-HOJOKBN (IDX) =   "1"  OR  "2"
-                                                   OR  "4"  OR  "5")
-                       MOVE    1                   TO  FLG-RJNCHK
+                                                   OR  "068" )
+      *                £È£±£¸¡¥£±£°¤Þ¤Ç
+                       IF     (SPA-PTHKN-TEKEDYMD (IDX) <  "20061001")
+                           IF    (SPA-PTHKN-HOJOKBN (IDX)  =   "1"
+                                                           OR  "2"
+                                                           OR  "4"
+                                                           OR  "5")
+                               MOVE    1               TO  FLG-RJNCHK
+                           END-IF
+                       ELSE
+                           IF    (SPA-BYMD-70          <  "20061001")
+                             AND (SPA-PTHKN-TEKSTYMD (IDX)
+                                                       <= SPA-BYMD-70)
+                             AND (SPA-SYSYMD           <  "20061001")
+                               IF    (SPA-PTHKN-HOJOKBN (IDX)
+                                                           =   "1"
+                                                           OR  "2"
+                                                           OR  "4"
+                                                           OR  "5")
+                                   MOVE    1           TO  FLG-RJNCHK
+                               END-IF
+                           ELSE
+      *                £È£±£¸¡¥£±£°°Ê¹ß
+                            IF      SPA-PTHKN-HOJOKBN (IDX)  NOT =   "0"
+                               MOVE    1               TO  FLG-RJNCHK
+                             END-IF
+                           END-IF
+      *                    ÁÈ¹ç¹ñÊÝ°Ê³°¤Ï£²³ä¥¨¥é¡¼
+                           IF    (SPA-PTHKN-HKNJANUM(IDX)(3:1)
+                                                       NOT =  "3" ) AND
+                                 (SPA-PTHKN-HOJOKBN (IDX)  =   "2")
+                               IF      SPA-PTHKN-TEKSTYMD (IDX)
+                                                       <  "20061001"
+                                   MOVE    1           TO  FLG-RJNERR
+                                   MOVE    IDX         TO  SPA-HKN-IDX1
+                               ELSE
+                                   MOVE    2           TO  FLG-RJNERR
+                                   MOVE    IDX         TO  SPA-HKN-IDX1
+                               END-IF
+                           END-IF
+      *                    ÁÈ¹ç¹ñÊÝ
+                           IF    (SPA-PTHKN-HKNJANUM(IDX)(3:1)
+                                                       =  "3" )
+                               MOVE    1               TO  FLG-KOKUHO
+                           END-IF
+                       END-IF
                    END-IF
       *            ¹ñÊÝ°Ê³°
                    IF     (SPA-PTHKN-HKNNUM(IDX)       =   "060"
@@ -4036,7 +4198,17 @@
                        CONTINUE
                    ELSE
                        IF      SPA-PTHKN-HOJOKBN (IDX) =   "8"  OR  "9"
+                                                       OR  "7"
                            MOVE    1                   TO  FLG-RJNCHK
+                       END-IF
+      *                £È£±£¸¡¥£±£°²þÀµ¡ÊÏ·¿Í£²³ä¤ÏÊÑ¹¹¡Ë
+                       IF     (SPA-PTHKN-TEKSTYMD (IDX) <   "20061001")
+                          AND (SPA-PTHKN-TEKEDYMD (IDX) >=  "20061001")
+                           IF     (SPA-PTHKN-HOJOKBN (IDX) =   "8" )
+                              AND (SPA-PTHKN-CONTKBN (IDX) =   SPACE)
+                               MOVE    1               TO  FLG-RJNERR
+                               MOVE    IDX             TO  SPA-HKN-IDX1
+                           END-IF
                        END-IF
                    END-IF
       *            Á¥°÷¤ÇÊä½õ¶èÊ¬¤¢¤ê
@@ -4044,8 +4216,23 @@
                           (SPA-PTHKN-HOJOKBN (IDX)     =   "8" OR "9"
                                                        OR  "A" OR "B"
                                                        OR  "C" OR "D"
-                                                       OR  "E" OR "F" )
+                                                       OR  "E" OR "F"
+                                                       OR  "7"
+                                                       OR  "G" OR "H"
+                                                       OR  "I"        )
                        MOVE    1                   TO  FLG-RJNCHK
+      *                £È£±£¸¡¥£±£°²þÀµ¡ÊÏ·¿Í£²³ä¤ÏÊÑ¹¹¡Ë
+                       IF     (SPA-PTHKN-TEKSTYMD (IDX) <   "20061001")
+                          AND (SPA-PTHKN-TEKEDYMD (IDX) >=  "20061001")
+                           IF     (SPA-PTHKN-HOJOKBN (IDX) =   "8"
+                                                           OR  "D"
+                                                           OR  "E"
+                                                           OR  "F"  )
+                              AND (SPA-PTHKN-CONTKBN (IDX) =   SPACE)
+                               MOVE    1               TO  FLG-RJNERR
+                               MOVE    IDX             TO  SPA-HKN-IDX1
+                           END-IF
+                       END-IF
                    END-IF
       *            ¶¦ºÑ¤ÇÏ·¿Í¶èÊ¬¤¢¤ê
                    IF     (SPA-PTHKN-HKNNUM(IDX)       =   "031"
@@ -4053,7 +4240,18 @@
                                                        OR  "033"
                                                        OR  "034")  AND
                           (SPA-PTHKN-HOJOKBN (IDX)     =   "8" OR "9"
-                                                       OR  "B" OR "E")
+                                                       OR  "B" OR "E"
+                                                       OR  "H"       )
+      *                £È£±£¸¡¥£±£°²þÀµ¡ÊÏ·¿Í£²³ä¤ÏÊÑ¹¹¡Ë
+                       IF     (SPA-PTHKN-TEKSTYMD (IDX) <   "20061001")
+                          AND (SPA-PTHKN-TEKEDYMD (IDX) >=  "20061001")
+                           IF     (SPA-PTHKN-HOJOKBN (IDX) =   "8"
+                                                           OR  "E"  )
+                              AND (SPA-PTHKN-CONTKBN (IDX) =   SPACE)
+                               MOVE    1               TO  FLG-RJNERR
+                               MOVE    IDX             TO  SPA-HKN-IDX1
+                           END-IF
+                       END-IF
                        MOVE    1                   TO  FLG-RJNCHK
                    END-IF
                END-IF
@@ -4063,15 +4261,19 @@
                       (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
                    IF      SPA-PTHKN-HKN-SBTKBN (IDX)   =   "1"
                        MOVE    1               TO  FLG-HKNCHK
-                       MOVE    IDX             TO  SPA-HKN-IDX1
+                       IF      SPA-HKN-IDX1    =   ZERO
+                           MOVE    IDX             TO  SPA-HKN-IDX1
+                       END-IF
                    END-IF
                END-IF
            END-PERFORM
-           IF      FLG-RJNCHK          =   1
-               GO      TO      410331-RJN-HKNCHK-EXT
-           END-IF
+      ***  IF     (FLG-RJNCHK          =   1   )
+      *      AND  (FLG-RJNERR          =   ZERO)
+      *        GO      TO      410331-RJN-HKNCHK-EXT
+      ***  END-IF
       *
       *    ¸øÈñ
+           MOVE    ZERO                TO  SPA-KOH-IDX2
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       IDX     >   SPA-PTKOH-MAX
                IF     (SPA-PTKOH-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
@@ -4080,17 +4282,38 @@
       *            Ï·¿Í
                    IF     (SPA-PTKOH-KOHNUM  (IDX) =   "027" )  OR
                           (SPA-PTKOH-HKN-SBTKBN (IDX)  =   "3" )
-                       MOVE    1                   TO  FLG-RJNCHK
+                       MOVE    1                   TO  FLG-RJNCHK2
                    END-IF
       *            À¸³èÊÝ¸î
                    IF      SPA-PTKOH-KOHNUM  (IDX) =   "012"
                        MOVE    1                   TO  FLG-SEIHOGO
                    END-IF
                END-IF
+      *        £È£±£¸¡¥£±£°²þÀµ Ï·¿Í£²³ä¤ò£³³ä¤Ø
+               IF     (SPA-PTKOH-SAKJOKBN (IDX) NOT =  "1"        )
+                   IF     (SPA-PTKOH-KOHNUM  (IDX) =   "027" )  AND
+                          (SPA-PTKOH-TEKEDYMD(IDX) >=  "20061001") AND
+                          (SPA-PTKOH-PAYKBN(IDX)(2:1)  =   "2"   )
+      *                ÀÚÂØ¤¨¸å¤Î£³³ä¤¬¤¢¤ë¤³¤È
+                       PERFORM 4103319-RJNKOH-CHK-SEC
+                       IF      FLG-KOH27           =   1
+                           MOVE    1                   TO  FLG-RJNKOHERR
+                           MOVE    IDX                 TO  SPA-KOH-IDX2
+                       END-IF
+                   END-IF
+               END-IF
            END-PERFORM
+      *    Á°´ü¹âÎð¼Ô¶èÊ¬¤¬¤¢¤ê¡¢Ï·¿Í¸øÈñ¤¬¤Ê¤¤»þ
+           IF     (FLG-RJNCHK          =   1   )
+             AND  (FLG-RJNCHK2         =   ZERO)
+             AND  (FLG-RJNERR          =   ZERO)
+             AND  (FLG-RJNKOHERR       =   ZERO)
+               GO      TO      410331-RJN-HKNCHK-EXT
+           END-IF
       *
       *    Ï·¿ÍÊÝ¸±¤¬¤Ê¤¯¡¢ÊÝ¸±¤¬Â¸ºß¤¹¤ë»þ
            IF     (FLG-RJNCHK          =   ZERO  )  AND
+                  (FLG-RJNCHK2         =   ZERO  )  AND
                   (FLG-HKNCHK          =   1     )
       *        £Ó£·¡¥£¹¡¥£³£°°ÊÁ°¤Î»þÏ·¿Í¸øÈñ¤¬¤¢¤ë¤³¤È¤È¤¹¤ë
                IF     (SPA-NAI-BIRTHDAY    <=  "19320930" )  OR
@@ -4112,9 +4335,161 @@
                   END-IF
                END-IF
            END-IF
+      *    Ï·¿Í¸øÈñ¤¬¤Ê¤¯¡¢£²³ä¤ÎÊÝ¸±¤¬Â¸ºß¤¹¤ë»þ
+           IF     (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-PIDCD           =   SPACE )
+               IF     (FLG-RJNCHK          =   1     )  AND
+                      (FLG-RJNERR          =   1     )  AND
+                      (FLG-RJNCHK2         =   ZERO  )
+                   MOVE    SPA-PTHKN-HKNNUM-MEI(SPA-HKN-IDX1)
+                                                   TO  SPA-PIDMSG
+                   MOVE    "0110"              TO  SPA-PIDCD
+                   MOVE    8                   TO  SPA-GMN-CUR
+               END-IF
+      *        Êä½õ¶èÊ¬ÁªÂò¥¨¥é¡¼
+               IF      FLG-RJNERR          =   2
+                   MOVE    "1067"              TO  SPA-ERRCD
+                   MOVE    11                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+      *    Ï·¿Í¸øÈñ£²³ä¤ÎÊÝ¸±¤¬Â¸ºß¤¹¤ë»þ¡ÊVER.3.2.0¤«¤é¡Ë
+           IF     (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-PIDCD           =   SPACE )
+               IF     (FLG-RJNKOHERR       =   1     )
+                   MOVE    "0111"              TO  SPA-ERRCD
+                   MOVE    21                  TO  SPA-GMN-CUR
+      ***          ²èÌÌ°ÌÃÖ
+      *            IF      SPA-KOH-MAX         >=  3
+      *                ¹ÔÁÞÆþ
+      *                MOVE    ZERO                TO  SPA-HKNKOH-FLG
+      *                PERFORM 4104-KOH-ADD-SEC
+      *                MOVE    1                   TO  SPA-KOH-GMN2
+      *            ELSE
+      *                COMPUTE SPA-KOH-GMN2   =   SPA-KOH-MAX
+      *                                       +   1
+      *            END-IF
+      *            MOVE    ZERO                TO  SPA-KOH-GMN1
+      *            MOVE    ZERO                TO  FLG-KOH27
+      *            PERFORM VARYING     IDX-K   FROM    1   BY  1
+      *                    UNTIL       IDX-K   >   3
+      *                IF     (SPA-NAI-PTKOH-EDANUM(IDX-K)
+      *                                        =   SPA-KOH-IDX2 )
+      *                  AND  (SPA-GMN-KOHNUM (IDX-K)  =   "027" )
+      *                    MOVE    IDX-K           TO  SPA-KOH-GMN1
+      *                END-IF
+      *            END-PERFORM
+      *            MOVE    "0111"              TO  SPA-PIDCD
+      ***********  MOVE    21                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
       *
            .
        410331-RJN-HKNCHK-EXT.
+           EXIT.
+      ****************************************************************
+      *    Ï·¿Í¸øÈñ£²³ä¥Á¥§¥Ã¥¯½èÍý
+      ****************************************************************
+       410332-RJN27-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-RJNKOHERR
+      *DDD MOVE    ZERO                TO  FLG-KOKUHO
+      *    PERFORM VARYING     IDX     FROM    1  BY  1
+      *            UNTIL       IDX     >   SPA-PTHKN-MAX
+      *        IF     (SPA-PTHKN-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
+      *               (SPA-PTHKN-TEKEDYMD (IDX)    >=  SPA-SYSYMD ) AND
+      *               (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
+      *            ÁÈ¹ç¹ñÊÝ¤ÎÍ­Ìµ
+      *            IF     (SPA-PTHKN-HKNNUM  (IDX) =   "060"
+      *                                            OR  "068" )  AND
+      *                   (SPA-PTHKN-TEKEDYMD (IDX) <   "20061001")
+      *                ÁÈ¹ç¹ñÊÝ
+      *                IF    (SPA-PTHKN-HKNJANUM(IDX)(3:1)
+      *                                            =  "3" )
+      *                    MOVE    1               TO  FLG-KOKUHO
+      *                END-IF
+      *            END-IF
+      *        END-IF
+      *DDD END-PERFORM
+      *
+      *    ¸øÈñ
+           MOVE    ZERO                TO  SPA-KOH-IDX2
+           PERFORM VARYING     IDX     FROM    1  BY  1
+                   UNTIL       IDX     >   SPA-PTKOH-MAX
+      ******** IF     (SPA-PTKOH-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
+               IF     (SPA-PTKOH-TEKEDYMD (IDX)    >=  SPA-SYSYMD ) AND
+                      (SPA-PTKOH-SAKJOKBN (IDX) NOT =  "1"        )
+      *            £È£±£¸¡¥£±£°²þÀµ Ï·¿Í£²³ä¤ò£³³ä¤Ø
+                   IF     (SPA-PTKOH-KOHNUM  (IDX) =   "027" )  AND
+                          (SPA-PTKOH-TEKEDYMD(IDX) >=  "20061001") AND
+                          (SPA-PTKOH-PAYKBN(IDX)(2:1)  =   "2"   )
+      *                ÀÚÂØ¤¨¸å¤Î£³³ä¤¬¤¢¤ë¤³¤È
+                       PERFORM 4103319-RJNKOH-CHK-SEC
+                       IF      FLG-KOH27           =   1
+                           MOVE    1                   TO  FLG-RJNKOHERR
+                           MOVE    IDX                 TO  SPA-KOH-IDX2
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *    Ï·¿Í¸øÈñ£²³ä¤ÎÊÝ¸±¤¬Â¸ºß¤¹¤ë»þ
+           IF     (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-PIDCD           =   SPACE )
+               IF     (FLG-RJNKOHERR       =   1     )
+                   MOVE     "0111"             TO  SPA-ERRCD
+                   MOVE    21                  TO  SPA-GMN-CUR
+      *****        ²èÌÌ°ÌÃÖ
+      *            IF      SPA-KOH-MAX         >=  3
+      *                ¹ÔÁÞÆþ
+      *                MOVE    ZERO                TO  SPA-HKNKOH-FLG
+      *                PERFORM 4104-KOH-ADD-SEC
+      *                MOVE    1                   TO  SPA-KOH-GMN2
+      *            ELSE
+      *                COMPUTE SPA-KOH-GMN2   =   SPA-KOH-MAX
+      *                                       +   1
+      *            END-IF
+      *            MOVE    ZERO                TO  SPA-KOH-GMN1
+      *            MOVE    ZERO                TO  FLG-KOH27
+      *            PERFORM VARYING     IDX-K   FROM    1   BY  1
+      *                    UNTIL       IDX-K   >   3
+      *                IF     (SPA-NAI-PTKOH-EDANUM(IDX-K)
+      *                                        =   SPA-KOH-IDX2 )
+      *                  AND  (SPA-GMN-KOHNUM (IDX-K)  =   "027" )
+      *                    MOVE    IDX-K           TO  SPA-KOH-GMN1
+      *                END-IF
+      *            END-PERFORM
+      *TEST
+      *       DISPLAY "SPA-KOH-GMN2:" SPA-KOH-GMN2
+      *        ",SPA-KOH-GMN1:" SPA-KOH-GMN1
+      *         ",SPA-KOH-IDX2:" SPA-KOH-IDX2
+      *         ",FLG-KOH27:" FLG-KOH27
+      *TEST
+      *            MOVE    "0111"              TO  SPA-PIDCD
+      *************MOVE    21                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           .
+       410332-RJN27-CHK-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      *    ÊÝ¸±¤È¸øÈñ¤Î´ü´Ö½ÅÊ£¥Á¥§¥Ã¥¯½èÍý
+      ****************************************************************
+       4103319-RJNKOH-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KOH27
+           PERFORM VARYING     IDXK    FROM    1   BY  1
+                   UNTIL       IDXK    >   SPA-GMN-KOHMAX
+               IF     (SPA-GMN-KOHNUML (IDXK)   =   "027" )  AND
+                      (SPA-GMN-KOHKBNL (IDXK)   =   "3"   )
+                   MOVE    1               TO  FLG-KOH27
+                   MOVE    SPA-GMN-KOHMAX  TO  IDXK
+               END-IF
+           END-PERFORM
+      *
+           .
+       4103319-RJNKOH-CHK-EXT.
            EXIT.
       *
       ****************************************************************
