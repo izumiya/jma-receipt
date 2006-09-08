@@ -115,6 +115,7 @@
       *  03.00.01    NACL-門脇    06/06/22  往診、在宅患者訪問診療料の
       *                                     コメント自動記載対応
       *  03.02.01    NACL-門脇    06/08/10  高齢者上限額経過措置対応
+      *  03.02.02    NACL-門脇    06/09/08  フイルムの単価編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1888,8 +1889,9 @@
       *
       *        特定器材（画像診断のフィルム以外）のとき単価を編集
                IF      SRY-SRYCD (IDX2) (1:1)  =   "7"
-                   IF   (( SRY-SRYKBN               =   "70" )  AND
-                         ( TNS-DATAKBN              =   "3"  ))
+      ***          IF   (( SRY-SRYKBN               =   "70" )  AND
+      ***                ( TNS-DATAKBN              =   "3"  ))
+                   IF   (  TNS-DATAKBN              =   "3"   )
                    OR   (  SRY-SRYCD (IDX2)         =
                                     CONS-FILM-YOUJI-KASAN  OR  
                                     CONS-SANSO             OR
