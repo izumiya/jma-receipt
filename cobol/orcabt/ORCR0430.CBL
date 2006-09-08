@@ -70,6 +70,7 @@
       *  02.09.04    NACL-ÌçÏÆ    05/05/10  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *  02.09.05    NACL-ÌçÏÆ    06/05/30  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
       *  03.02.01    NACL-ÌçÏÆ    06/08/01  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
+      *  03.02.02    NACL-ÌçÏÆ    06/09/07  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -354,6 +355,8 @@
       *
            03  WRK-HENSYU-KASANRITU   PIC X(01).
            03  WRK-HENSYU-KASANRITU2  PIC X(02).
+      *
+           03  WRK-RUIKEITOTAL     PIC 9(15)V9(03).
       *
            03  TBL-SANTEI-DAY.
                05  TB-SANTEI-DAY   PIC 9(02)   OCCURS  31.
@@ -3779,7 +3782,12 @@
                                 TO  TBL-YT2Y1-SRYCDTOTAL(IDX7 IDX8 26)
                              ADD    TBL-YT1-SURYOUTOTAL(IDX6)
                                 TO  TBL-YT2Y1-SURYOUTOTAL(IDX7 IDX8 26)
-                             ADD    TBL-YT1-RUIKEITOTAL(IDX6)
+      ***                    ADD    TBL-YT1-RUIKEITOTAL(IDX6)
+      ***                       TO  TBL-YT2Y1-RUIKEITOTAL(IDX7 IDX8 26)
+                             COMPUTE WRK-RUIKEITOTAL  =
+                                     TBL-YT1-RUIKEITOTAL(IDX6)  *
+                                     TBL-YT1-MEISAISU(IDX6)
+                             ADD     WRK-RUIKEITOTAL
                                 TO  TBL-YT2Y1-RUIKEITOTAL(IDX7 IDX8 26)
                              ADD    TBL-YT1-MEISAISU(IDX6)
                                 TO  TBL-YT2Y1-MEISAISU(IDX7 IDX8 26)
@@ -3825,7 +3833,12 @@
                                 TO  TBL-YT2Y2-SRYCDTOTAL(IDX7 IDX8 4)
                              ADD    TBL-YT1-SURYOUTOTAL(IDX6)
                                 TO  TBL-YT2Y2-SURYOUTOTAL(IDX7 IDX8 4)
-                             ADD    TBL-YT1-RUIKEITOTAL(IDX6)
+      ***                    ADD    TBL-YT1-RUIKEITOTAL(IDX6)
+      ***                       TO  TBL-YT2Y2-RUIKEITOTAL(IDX7 IDX8 4)
+                             COMPUTE WRK-RUIKEITOTAL  =
+                                     TBL-YT1-RUIKEITOTAL(IDX6)  *
+                                     TBL-YT1-MEISAISU(IDX6)
+                             ADD     WRK-RUIKEITOTAL
                                 TO  TBL-YT2Y2-RUIKEITOTAL(IDX7 IDX8 4)
                              ADD    TBL-YT1-MEISAISU(IDX6)
                                 TO  TBL-YT2Y2-MEISAISU(IDX7 IDX8 4)
@@ -3861,6 +3874,8 @@
               PERFORM   VARYING   IDX8    FROM   1   BY   1
                          UNTIL   (IDX8      >    3)
       *
+               IF  (TBL-YT2Y1-HIKAKU(IDX7 IDX8 26)  NOT = ZERO)
+               OR  (TBL-YT2Y2-HIKAKU(IDX7 IDX8  4)  NOT = ZERO)
                  MOVE     ZERO     TO    FLG-YAKUTEI
                  PERFORM    VARYING   IDX9    FROM   1   BY   1
                        UNTIL   (IDX9                          >   100 )
@@ -3930,6 +3945,7 @@
                                       TO  TBL-YT3Y-KAIT(IDX9)
                     END-IF
                  END-IF
+               END-IF
       *
               END-PERFORM
       *
