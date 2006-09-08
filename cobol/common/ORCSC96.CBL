@@ -1305,6 +1305,20 @@
                                        TO  SPA-ERRMSG
                    MOVE    "調剤技術基本料は算定できません。"
                                        TO  SPA-ERRMSG(31:)
+
+      *        Ｈ１８．１０改正から
+               WHEN    "1070"
+                   STRING  "老人の保険割合が２割です。"
+                           "３割に保険を登録し直して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "1071"
+                   STRING  "国保の前期高齢者到達日以降の確認が"
+                           "ありません。保険を確認して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *!
                WHEN    "1050"
                    MOVE    "労災・自賠責、包括分入力の"

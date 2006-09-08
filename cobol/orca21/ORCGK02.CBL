@@ -3368,6 +3368,11 @@
                MOVE    ZERO                TO  SPA-NAI-ROUFLG
            END-IF
       *
+      *    老人でＨ１８．１０の保険変更がない時（２割）
+           IF      AGECHK-RJNCHK       =   3
+               MOVE    "1070"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-RJN-ERR
+           END-IF
       *    老人判定
            MOVE    AGECHK-ROUJIN       TO  SPA-NAI-ROUJIN
            MOVE    AGECHK-ROUJIN2      TO  SPA-NAI-ROUJIN2
@@ -10639,6 +10644,11 @@
                MOVE    "1027"              TO  SPA-ERRCD
                GO      TO      41001-KIHON-CHK-EXT
            END-IF
+      *    老人保険編集エラーがある時、エラーとする
+           IF      SPA-RJN-ERR         =   2
+               MOVE    "1070"              TO  SPA-ERRCD
+               GO      TO      41001-KIHON-CHK-EXT
+           END-IF
       *    保険エラーがある時、エラーとする
            IF      SPA-HKN-ERR         =   1
                MOVE    "1028"              TO  SPA-ERRCD
@@ -11392,6 +11402,10 @@
       *    老人保険編集エラーがある時、エラーとする
            IF      SPA-RJN-ERR         =   1
                MOVE    "1027"              TO  SPA-ERRCD
+           END-IF
+      *    老人保険編集エラーがある時、エラーとする
+           IF      SPA-RJN-ERR         =   2
+               MOVE    "1070"              TO  SPA-ERRCD
            END-IF
       *    保険エラーがある時、エラーとする
            IF      SPA-HKN-ERR         =   1
