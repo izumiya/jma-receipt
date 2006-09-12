@@ -583,7 +583,7 @@
            03  FLG-IRYOHI3             PIC 9(01).
            03  FLG-IRYOHI3X            PIC 9(02).
            03  FLG-IRYOHI4             PIC 9(01).
-           03  FLG-IRYOHI5             PIC 9(01).
+           03  FLG-IRYOHI5             PIC 9(02).
            03  FLG-KOUGAKUCYO          PIC 9(01).
            03  FLG-KOUGAKUCYO2         PIC 9(01).
            03  FLG-KOUGAKUCYO3         PIC 9(01).
@@ -4498,15 +4498,21 @@
            END-IF
       *
       *    ²¬»³¸©ÃÏÊý¸øÈñ
-           IF  (WK-1001-PREFNUM           =    33               )
-           AND (LNK-S02-KOUREI-NYUIN-KBN  =    SPACE            )
-           AND (COMB-KOH1HKNNUM           =   "385" OR "585" OR
-                                              "280" OR "286"    )
-           AND (LNK-SYU-SRYYMD(1:6)      >=   "200610"          )
-      *
-                MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI3
-                MOVE   1           TO   FLG-IRYOHI5
-      *
+           IF  (WK-1001-PREFNUM        =    33     )
+           AND (LNK-SYU-SRYYMD(1:6)   >=   "200610")
+             IF  COMB-KOH1HKNNUM   =   "385" OR "280" OR "286"
+                 MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI3
+                 MOVE   11          TO   FLG-IRYOHI5
+             END-IF
+             IF   COMB-KOH1HKNNUM  =   "585"
+                 MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI3
+                 MOVE   12          TO   FLG-IRYOHI5
+             END-IF
+             IF  (COMB-KOH1HKNNUM  =   "027"         )
+             AND (COMB-KOH2HKNNUM  =   "280" OR "286")
+                 MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI3
+                 MOVE   21          TO   FLG-IRYOHI5
+             END-IF
            END-IF
       *
            .
@@ -4774,11 +4780,27 @@
                 END-IF
               END-IF
       *       ²¬»³¸©ÃÏÊý¸øÈñÍÑ
-              IF     FLG-IRYOHI5     =      1
-                IF  WK-KOUREI-IRYOHI3  >  723000
+              IF     FLG-IRYOHI5     =      11
+                IF  WK-KOUREI-IRYOHI3  >  801000
                    COMPUTE WK-KOUREI-IRYOHI4 = 
-                         (( WK-KOUREI-IRYOHI3 -  723000 ) * 0.01 )
+                         (( WK-KOUREI-IRYOHI3 -  801000 ) * 0.01 )
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
+                                             +   WK-KOUREI-IRYOHI4
+                END-IF
+              END-IF
+              IF     FLG-IRYOHI5     =      12
+                IF  WK-KOUREI-IRYOHI3  >  2002500
+                   COMPUTE WK-KOUREI-IRYOHI4 = 
+                         (( WK-KOUREI-IRYOHI3 - 2002500 ) * 0.01 )
+                   COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
+                                             +   WK-KOUREI-IRYOHI4
+                END-IF
+              END-IF
+              IF     FLG-IRYOHI5     =      21
+                IF  WK-KOUREI-IRYOHI3  >  801000
+                   COMPUTE WK-KOUREI-IRYOHI4 = 
+                         (( WK-KOUREI-IRYOHI3 -  801000 ) * 0.01 )
+                   COMPUTE  MAX-KIN-KOHI2-M  =   MAX-KIN-KOHI2-M 
                                              +   WK-KOUREI-IRYOHI4
                 END-IF
               END-IF
@@ -5353,7 +5375,7 @@
                    COMPUTE  WK-KOUREI-IRYOHI  =  WK-KOUREI-IRYOHI  +  
                                                 (SYU-HKNTEN (16) * 10)
                  END-IF
-                 IF    (FLG-IRYOHI5     =      1)
+                 IF     FLG-IRYOHI5     =      11 OR 12
                    COMPUTE  WK-KOUREI-IRYOHI3 =  WK-KOUREI-IRYOHI3 +  
                                                 (SYU-HKNTEN (16) * 10)
                  END-IF
@@ -5712,6 +5734,11 @@
                      (COMB-KOH2ID         =  WRK-COMB-KOH3ID))
                OR   ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM ) AND
                      (COMB-KOH2ID         =  WRK-COMB-KOH4ID))
+      *
+                 IF     FLG-IRYOHI5     =      21
+                   COMPUTE  WK-KOUREI-IRYOHI3 =  WK-KOUREI-IRYOHI3 +  
+                                                (SYU-HKNTEN (16) * 10)
+                 END-IF
       *
                  IF ((WK-1001-PREFNUM         =  07      ) AND
                      (LNK-SYU-KOH2HKNNUM      = "245"    ) AND
