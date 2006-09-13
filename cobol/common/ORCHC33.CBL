@@ -200,7 +200,8 @@
       *
       *    集計テーブル
        01  TBL-AREA.
-           03  TBL-OCC-1               OCCURS   10.
+      *?   03  TBL-OCC-1               OCCURS   10.
+           03  TBL-OCC-1               OCCURS   11.
       *        剤点数
                05  TBL-OCC-2           OCCURS   400.
                    07  TBL-ZAITEN          PIC S9(05).
@@ -745,7 +746,11 @@
                    MOVE    7               TO  IDX1
       *        その他
                WHEN    OTHER
-                   MOVE    ZERO            TO  IDX1
+                   IF      ACCT-SRYKBN     =   "95"  OR  "96"
+                       MOVE    11              TO  IDX1
+                   ELSE
+                       MOVE    ZERO            TO  IDX1
+                   END-IF
            END-EVALUATE
       *
            MOVE    ZERO                TO  IDX2
@@ -1152,6 +1157,16 @@
                        END-IF
                    END-PERFORM
                END-PERFORM
+      *        自費コードのみの判定
+               IF      FLG-ARI             =   ZERO
+                   PERFORM VARYING     IDX2    FROM    1   BY  1
+                           UNTIL       IDX2    >   400
+                       IF      TBL-DAY (11 IDX2 IDX)   >   ZERO
+                           MOVE    1               TO  FLG-ARI
+                           MOVE    400             TO  IDX2
+                       END-IF
+                   END-PERFORM
+               END-IF
                IF      FLG-ARI             =   1
                    IF      ORCHC33-KARUTE3KBN  =   "1"
       *                日毎のテーブル編集
@@ -1994,27 +2009,13 @@
       *****************************************************************
        910-HKNCOMBI-READ-SEC         SECTION.
       *
-           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
-           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 920-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
-                   MOVE    ZERO            TO  FLG-HKNCOMBI
-               ELSE
-                   MOVE    1               TO  FLG-HKNCOMBI
-               END-IF
+               MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+               MOVE    ZERO            TO  FLG-HKNCOMBI
            ELSE
                MOVE    1               TO  FLG-HKNCOMBI
            END-IF
-     *
-           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
       *
            .
        910-HKNCOMBI-READ-EXT.
