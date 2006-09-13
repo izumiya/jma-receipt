@@ -142,6 +142,8 @@
       *  02.09.02    NACL-ÌçÏÆ    06/05/18  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *  3.0.0
       *  03.00.01    NACL-Æ£¸¶    06/05/15  ÆþÂà±¡ÍúÎòµ­ºÜÂÐ±þ
+      *  03.00.02    NACL-Æ£¸¶    06/09/07  £²£°£°£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *                                     Ê¡²¬ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1538,7 +1540,8 @@
            END-IF
       *
       *    Ê¡²¬ÃÏÊý¸øÈñÂÐ±þ
-           IF      RECE02-PREFNUM      =   "40"
+           IF    ( RECE02-PREFNUM      =   "40"     )
+           AND   ( RECE02-SRYYM        <=  "200609" )
                IF  WK-KOKUHO               =   "1" OR  "2"
                    IF   (RECE02-KOHNUM   (1)(1:1)  =   "1" OR  "2")
                    AND  (RECE02-KOHHBTNUM(1)   NOT =   "41"       )     
@@ -1590,8 +1593,77 @@
       *    "£¹"¤Þ¤¿¤Ï"£¸"¤ò¥»¥Ã¥È
       *    Ï·¿ÍÊÝ¸±¤Î¾ì¹ç¤Ï£×£Ë¡Ý£Ò£Ê£Î¤Ë¥»¥Ã¥È¤¹¤ë
            IF  RECE02-HKNID             NOT =   ZERO
-               IF      RECE02-SRYYM     >=      "200210"
-                   EVALUATE    RECE02-HKNNUM
+               EVALUATE    TRUE
+                   WHEN    RECE02-SRYYM     >=      "200610"
+                     EVALUATE    RECE02-HKNNUM
+                       WHEN    "002" 
+                           EVALUATE   RECE02-HOJOKBN
+                               WHEN   "A"
+                               WHEN   "B"
+                               WHEN   "C"
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "D"
+                               WHEN   "E"
+                               WHEN   "F"
+                               WHEN   "8"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                               WHEN   "G"
+                               WHEN   "H"
+                               WHEN   "I"
+                               WHEN   "7"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "031"  THRU    "034"  
+                           EVALUATE   RECE02-HOJOKBN
+                               WHEN   "B"
+                               WHEN   "9"   
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "E"
+                               WHEN   "8"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                               WHEN   "H"
+                               WHEN   "7"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "060" 
+                       WHEN    "068" 
+                           IF     (WRK-NENREI  >=   70)  AND
+                                  (WRK-NENREI  <=   74)
+                               EVALUATE   RECE02-HOJOKBN
+                                   WHEN   "1"
+                                   WHEN   "4"
+                                       MOVE   "9"   TO   WK-HONKZKKBN
+                                   WHEN   "2"
+                                   WHEN   "5"
+                                       MOVE   "8"   TO   WK-HONKZKKBN
+                                   WHEN   "3"
+                                   WHEN   "6"
+                                       MOVE   "?"   TO   WK-HONKZKKBN
+                               END-EVALUATE
+                           END-IF     
+                       WHEN    OTHER 
+                           EVALUATE   RECE02-HOJOKBN
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "8"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                               WHEN   "7"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                     END-EVALUATE
+                     IF      RECE02-RJNHKNID >   ZERO
+                       EVALUATE   RECE02-RJNPAYKBN
+                           WHEN   "01"
+                               MOVE   "9"   TO   WK-RJN
+                           WHEN   "02"
+                               MOVE   "?"   TO   WK-RJN
+                           WHEN   "03"
+                               MOVE   "?"   TO   WK-RJN
+                       END-EVALUATE
+                     END-IF
+                   WHEN    RECE02-SRYYM     >=      "200210"
+                     EVALUATE    RECE02-HKNNUM
                        WHEN    "002" 
                            EVALUATE   RECE02-HOJOKBN
                                WHEN   "A"
@@ -1634,16 +1706,16 @@
                                WHEN   "8"
                                    MOVE   "8"   TO   WK-HONKZKKBN
                            END-EVALUATE
-                   END-EVALUATE
-                   IF      RECE02-RJNHKNID >   ZERO
+                     END-EVALUATE
+                     IF      RECE02-RJNHKNID >   ZERO
                        EVALUATE   RECE02-RJNPAYKBN
                            WHEN   "01"
                                MOVE   "9"   TO   WK-RJN
                            WHEN   "02"
                                MOVE   "8"   TO   WK-RJN
                        END-EVALUATE
-                   END-IF
-               END-IF
+                     END-IF
+               END-EVALUATE
            END-IF
       *
            IF    ( WK-RJN          NOT =   SPACE )
