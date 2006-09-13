@@ -98,7 +98,9 @@
       *
       *  03.01.01    NACL-藤原    06/07/03  旧総合病院の科表示
       *  03.01.02    NACL-門脇    06/07/13  項目クリア追加
+      *
       *  03.02.01    NACL-門脇    06/08/10  高齢者上限額経過措置対応
+      *  03.02.02    NACL-藤原    06/09/07  福岡地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6319,7 +6321,8 @@
                    AND     RECE02-TOTALTEN (5) =   ZERO
                        GO  TO  990-RECE02-READ-SEC
                    ELSE    
-                       IF      RECE02-SRYYM        <   WRK-CONS-SRYYM
+                       IF    ( RECE02-SRYYM        <   WRK-CONS-SRYYM )
+                       OR    ( RECE02-SRYYM        >   "200609"       )
                            GO  TO  990-RECE02-READ-SEC
                        ELSE
                          IF      RECE02-TEISYUTUSAKI =   "1"
