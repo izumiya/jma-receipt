@@ -55,6 +55,7 @@
       *                                      »°¼ï¤Î¸øÈñÊ»ÍÑ¤Ë·¸¤ï¤ëµ­ºÜÍ×
       *                                      ¹à¤ÎÆÃÎãÂÐ±þ
       *  03.02.01    NACL-ÌçÏÆ    06/08/10  ¹âÎð¼Ô¾å¸Â³Û·Ð²áÁ¼ÃÖÂÐ±þ
+      *  03.02.02    NACL-Æ£¸¶    06/09/07  Ê¡²¬ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6725,6 +6726,9 @@
                    MOVE    HIGH-VALUE          TO  KEY-NEW
                NOT AT  END
                    MOVE    ZERO                TO  FLG-RECE62
+                   IF      RECE62-SRYYM        >   "200609"
+                       GO  TO  900-RECE62-READ-SEC
+                   END-IF
                    IF      RECE62-RECESYUBETU  =   6666
                        GO  TO  900-RECE62-READ-SEC
                    END-IF

@@ -26,6 +26,9 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.02.01    NACL-藤原    06/09/05  ２００６年１０月改正対応
+      *                                     長期９７４対応
+      *                                     福岡地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -153,30 +156,31 @@
       *
        01  WRK-SRT-AREA.
            03  WRK-SRT-TABLE.
-               05                      PIC X(03)   VALUE   "027".  
-               05                      PIC X(03)   VALUE   "013".  
-               05                      PIC X(03)   VALUE   "014".  
-               05                      PIC X(03)   VALUE   "018".  
-               05                      PIC X(03)   VALUE   "029".  
-               05                      PIC X(03)   VALUE   "010".  
-               05                      PIC X(03)   VALUE   "011".  
-               05                      PIC X(03)   VALUE   "020".  
-               05                      PIC X(03)   VALUE   "021".  
-               05                      PIC X(03)   VALUE   "022".  
-               05                      PIC X(03)   VALUE   "028".  
-               05                      PIC X(03)   VALUE   "015".  
-               05                      PIC X(03)   VALUE   "016".  
-               05                      PIC X(03)   VALUE   "017".  
-               05                      PIC X(03)   VALUE   "019".  
-               05                      PIC X(03)   VALUE   "023".  
-               05                      PIC X(03)   VALUE   "051".  
-               05                      PIC X(03)   VALUE   "091".  
-               05                      PIC X(03)   VALUE   "052".  
-               05                      PIC X(03)   VALUE   "053".  
-               05                      PIC X(03)   VALUE   "012".
-               05                      PIC X(03)   VALUE   "972".
+               05  FILLER              PIC X(03)   VALUE   "027".  
+               05  FILLER              PIC X(03)   VALUE   "013".  
+               05  FILLER              PIC X(03)   VALUE   "014".  
+               05  FILLER              PIC X(03)   VALUE   "018".  
+               05  FILLER              PIC X(03)   VALUE   "029".  
+               05  FILLER              PIC X(03)   VALUE   "010".  
+               05  FILLER              PIC X(03)   VALUE   "011".  
+               05  FILLER              PIC X(03)   VALUE   "020".  
+               05  FILLER              PIC X(03)   VALUE   "021".  
+               05  FILLER              PIC X(03)   VALUE   "022".  
+               05  FILLER              PIC X(03)   VALUE   "028".  
+               05  FILLER              PIC X(03)   VALUE   "015".  
+               05  FILLER              PIC X(03)   VALUE   "016".  
+               05  FILLER              PIC X(03)   VALUE   "017".  
+               05  FILLER              PIC X(03)   VALUE   "019".  
+               05  FILLER              PIC X(03)   VALUE   "023".  
+               05  FILLER              PIC X(03)   VALUE   "051".  
+               05  FILLER              PIC X(03)   VALUE   "091".  
+               05  FILLER              PIC X(03)   VALUE   "052".  
+               05  FILLER              PIC X(03)   VALUE   "053".  
+               05  FILLER              PIC X(03)   VALUE   "012".
+               05  FILLER              PIC X(03)   VALUE   "972".
+               05  FILLER              PIC X(03)   VALUE   "974".
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
-               05  WRK-SRT-KOHHKNNUM   PIC X(03)   OCCURS  22.
+               05  WRK-SRT-KOHHKNNUM   PIC X(03)   OCCURS  23.
       *     
       *    ワーク保険組合せ（入院会計用） 
        01  WRK-HKNCOMBI-TABLE.
@@ -217,6 +221,10 @@
            03  WRK-CONS-JIBAI-HKNNUM   PIC X(03)   VALUE   "973".
       *    長期
            03  WRK-CONS-CHOUKI-HKNNUM  PIC X(03)   VALUE   "972".
+      *    長期（上位所得者）
+           03  WRK-CONS-CHOUKI-HKNNUM2 PIC X(03)   VALUE   "974".
+      *
+           03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -371,7 +379,7 @@
                GO  TO  100-INIT-EXT
            END-IF
       *??
-      *     DISPLAY "AGE       =" WRK-NENREI
+           DISPLAY "AGE       =" WRK-NENREI
       *??
       *     
       *    レセプト編集区分情報
@@ -393,7 +401,8 @@
            END-IF
       * 
       *    県内扱い保険者情報（福岡のみ）
-           IF      LNK-SYUBETU-PREFNUM =   "40"
+           IF    ( LNK-SYUBETU-PREFNUM =   "40"                  )
+           AND   ( LNK-SYUBETU-SRYYM   <=  WRK-CONS-SRYYM-200609 )
                MOVE    SPACE           TO  WRK-1033-TABLE
       *     
                MOVE    SPACE           TO  SYS-1033-REC
@@ -773,7 +782,7 @@
       *****************PERFORM 900-PTRSIINF-INV-SEC
                    WHEN    OTHER
                        INITIALIZE                      PTHKNINF-REC
-                       MOVE    LNK-SYUBETU-HOSPID      TO  PTHKN-HOSPID
+                       MOVE    LNK-SYUBETU-HOSPID  TO  PTHKN-HOSPID
                        MOVE    COMB-PTID           TO  PTHKN-PTID
                        MOVE    COMB-HKNID          TO  PTHKN-HKNID
                        MOVE    PTHKNINF-REC        TO  MCPDATA-REC
@@ -809,13 +818,17 @@
                    AND   ( LNK-SYUBETU-PREFNUM =   "40"              )
                    AND   ( HKN-HBTNUM      NOT =   "41"              )    
                    AND   ( COMB-KOHHKNNUM(IDX)(1:1)
-                                              >=  "1" AND <=  "8"    )
+                                              >=  "1" AND <=  " 8"   )
+                   AND   ( LNK-SYUBETU-SRYYM  <=
+                                              WRK-CONS-SRYYM-200609  ) 
                        PERFORM 200191-PREFKBN-40-CHECK-SEC
                    ELSE
       *                福岡県の社保のとき（４１老人）
                        IF    ( COMB-HKNNUM     NOT =   "060" AND "067" )
                        AND   ( LNK-SYUBETU-PREFNUM =   "40"            )
                        AND   ( HKN-HBTNUM          =   "41"            )    
+                       AND   ( LNK-SYUBETU-SRYYM  <=
+                                              WRK-CONS-SRYYM-200609    ) 
                            IF      COMB-HONKZKKBN      =   "1" 
                                MOVE    2                   TO  IDX1
                            ELSE
@@ -863,7 +876,7 @@
                    END-IF
                ELSE
                    MOVE    1                      TO  IDX1
-                   IF   COMB-KOHHKNNUM (IDX)  =  "972"
+                   IF   COMB-KOHHKNNUM (IDX)  =  "972" OR "974"
       *                長期高額療養レセ記載判定
                        MOVE    ZERO        TO  FLG-KOHRECEDSP
                        INITIALIZE              ORCSFTNJGNCHKAREA
@@ -928,6 +941,11 @@
                                WHEN   "F"
                                WHEN   "8"
                                    MOVE    "0" TO  WRK-RECE61-HONKZKKBN
+                               WHEN   "G"
+                               WHEN   "H"
+                               WHEN   "I"
+                               WHEN   "7"
+                                   MOVE    "0" TO  WRK-RECE61-HONKZKKBN
                            END-EVALUATE
                        WHEN    "031"  THRU    "034"  
                            EVALUATE   PTHKN-HOJOKBN
@@ -936,6 +954,9 @@
                                    MOVE    "0" TO  WRK-RECE61-HONKZKKBN
                                WHEN   "E"
                                WHEN   "8"
+                                   MOVE    "0" TO  WRK-RECE61-HONKZKKBN
+                               WHEN   "H"
+                               WHEN   "7"
                                    MOVE    "0" TO  WRK-RECE61-HONKZKKBN
                              END-EVALUATE
                        WHEN    "060" 
@@ -953,6 +974,9 @@
                                                TO  WRK-RECE61-HONKZKKBN
                                        WHEN   "0"
                                        WHEN   "4"
+                                           MOVE    "0"
+                                               TO  WRK-RECE61-HONKZKKBN
+                                       WHEN   "3"
                                            MOVE    "0"
                                                TO  WRK-RECE61-HONKZKKBN
                                    END-EVALUATE
@@ -978,6 +1002,8 @@
                                  MOVE    "0" TO  WRK-RECE61-HONKZKKBN
                              WHEN   "8"
                                  MOVE    "0" TO  WRK-RECE61-HONKZKKBN
+                             WHEN   "7"
+                                 MOVE    "0" TO  WRK-RECE61-HONKZKKBN
                          END-EVALUATE
                    END-EVALUATE
                END-IF 
@@ -985,7 +1011,8 @@
       *
            MOVE    PTHKN-HKNJANUM      TO  WRK-RECE61-HKNJANUM       
            MOVE    ZERO                TO  WRK-RECE61-TEKSTYMD 
-           EVALUATE    PTHKN-HKNNUM
+           IF      LNK-SYUBETU-SRYYM   <=   "200609"
+             EVALUATE    PTHKN-HKNNUM
                WHEN    "002"
                WHEN    "031"   THRU    "034"
                    IF      PTHKN-HOJOKBN   =   SPACE
@@ -1028,7 +1055,56 @@
                            MOVE    PTHKN-HOJOKBN
                                                TO  WRK-RECE61-HOJOKBN
                    END-EVALUATE             
-           END-EVALUATE             
+             END-EVALUATE
+           ELSE
+             EVALUATE    PTHKN-HKNNUM
+               WHEN    "002"
+               WHEN    "031"   THRU    "034"
+                   IF      PTHKN-HOJOKBN   =   SPACE
+                       CONTINUE
+                   ELSE    
+                       MOVE    PTHKN-HOJOKBN   TO  WRK-RECE61-HOJOKBN
+                   END-IF
+               WHEN    "060" 
+               WHEN    "068" 
+                   EVALUATE    LNK-SYUBETU-NYUGAIKBN
+                       WHEN    "1"
+                           EVALUATE   PTHKN-HOJOKBN
+                               WHEN   "0"
+                               WHEN   "4"
+                                   MOVE    "0" TO  WRK-RECE61-HOJOKBN
+                               WHEN   "1"
+                               WHEN   "5"
+                                   MOVE    "1" TO  WRK-RECE61-HOJOKBN
+                               WHEN   "2"
+                               WHEN   "6"
+                                   MOVE    "2" TO  WRK-RECE61-HOJOKBN
+                               WHEN   "3"
+                                   MOVE    "3" TO  WRK-RECE61-HOJOKBN
+                           END-EVALUATE
+                       WHEN    "2"
+                           EVALUATE   PTHKN-HOJOKBN
+                               WHEN   "1"
+                               WHEN   "4"
+                                   MOVE    "1" TO  WRK-RECE61-HOJOKBN
+                               WHEN   "2"
+                               WHEN   "5"
+                                   MOVE    "2" TO  WRK-RECE61-HOJOKBN
+                               WHEN   "3"
+                               WHEN   "6"
+                                   MOVE    "3" TO  WRK-RECE61-HOJOKBN
+                           END-EVALUATE
+                   END-EVALUATE
+               WHEN    OTHER 
+                   EVALUATE   PTHKN-HOJOKBN
+                       WHEN   "9"
+                       WHEN   "8"
+                       WHEN   "7"
+                           MOVE    PTHKN-HOJOKBN
+                                               TO  WRK-RECE61-HOJOKBN
+                   END-EVALUATE             
+             END-EVALUATE
+           END-IF             
            MOVE    SPACE               TO WRK-RECE61-RECEKA
       *
            PERFORM VARYING IDXX    FROM    1   BY  1
@@ -1092,7 +1168,7 @@
            ELSE
                INITIALIZE                  ORCSKOHPLUS-AREA
                MOVE    COMB-HOSPID         TO  LNK-SKOHPLUS-HOSPID
-               MOVE    LNK-SYUBETU-PREFNUM     TO  LNK-SKOHPLUS-PREFNUM
+               MOVE    LNK-SYUBETU-PREFNUM TO  LNK-SKOHPLUS-PREFNUM
                MOVE    COMB-PTID           TO  LNK-SKOHPLUS-PTID
                MOVE    COMB-HKNCOMBINUM    TO  LNK-SKOHPLUS-HKNCOMBI
                MOVE    LNK-SYUBETU-SRYYM   TO  LNK-SKOHPLUS-SRYYMD (1:6)
@@ -1305,6 +1381,7 @@
       *                長期のとき
                        IF      WRK-SEIKYU-KOHHKNNUM(IDX1 IDX)  
                                            =   WRK-CONS-CHOUKI-HKNNUM
+                                           OR  WRK-CONS-CHOUKI-HKNNUM2
                            MOVE    "4"         TO  WRK-RECESKYKBN
                        ELSE
                            MOVE    SPACE       TO  WRK-RECESKYKBN
@@ -1324,7 +1401,7 @@
            MOVE    ZERO                    TO  TBL-MAX
       *
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       22
+                   UNTIL   IDX >       23
                    OR      TBL-MAX     =   4 
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       4
@@ -1372,7 +1449,9 @@
                    MOVE    WRK-KOHI-TBL (IDX)  TO 
                                            WRK-RECE61-KOHI-TBL(TBL-MAX)
       *            法別番号（福岡のみ）
-                   IF      LNK-SYUBETU-PREFNUM =   "40"
+                   IF    ( LNK-SYUBETU-PREFNUM =   "40"             )
+                   AND   ( LNK-SYUBETU-SRYYM   <=
+                                              WRK-CONS-SRYYM-200609 ) 
                        INITIALIZE                  HKNNUM-REC
                        MOVE   LNK-SYUBETU-HOSPID   TO  HKN-HOSPID
                        MOVE   WRK-RECE61-KOHHKNNUM-O (TBL-MAX)
@@ -1558,7 +1637,8 @@
            END-PERFORM    
       *
       *    福岡地方公費対応
-           IF      LNK-SYUBETU-PREFNUM     =   "40"
+           IF    ( LNK-SYUBETU-PREFNUM     =   "40"                  )
+           AND   ( LNK-SYUBETU-SRYYM       <=  WRK-CONS-SRYYM-200609 )
                IF      WK-KOKUHO           =   "1" OR  "2"
                    IF   (WRK-RECE61-KOHHKNNUM-O
                                              (1)(1:1)  =   "1" OR  "2")
@@ -1596,6 +1676,7 @@
       *    "９"または"８"をセット
       *    老人保険の場合はＷＫ−ＲＪＮにセットする	
            IF      WRK-RECE61-HKNID             NOT =   ZERO
+             IF      LNK-SYUBETU-SRYYM       <= WRK-CONS-SRYYM-200609
                EVALUATE    WRK-RECE61-HKNNUM
                    WHEN    "002" 
                        EVALUATE   WRK-RECE61-HOJOKBN
@@ -1660,6 +1741,89 @@
                            MOVE   "8"   TO   WK-RJN
                    END-EVALUATE
                END-IF
+             ELSE
+               EVALUATE    WRK-RECE61-HKNNUM
+                   WHEN    "002" 
+                       EVALUATE   WRK-RECE61-HOJOKBN
+                           WHEN   "A"
+                           WHEN   "B"
+                           WHEN   "C"
+                           WHEN   "9"
+                               MOVE   "9"   TO   WK-HONKZKKBN
+                           WHEN   "D"
+                           WHEN   "E"
+                           WHEN   "F"
+                           WHEN   "8"
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           WHEN   "G"
+                           WHEN   "H"
+                           WHEN   "I"
+                           WHEN   "7"
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                       END-EVALUATE
+                   WHEN    "031"  THRU    "034"  
+                       EVALUATE   WRK-RECE61-HOJOKBN
+                           WHEN   "B"
+                           WHEN   "9"   
+                               MOVE   "9"   TO   WK-HONKZKKBN
+                           WHEN   "E"
+                           WHEN   "8"
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           WHEN   "H"
+                           WHEN   "7"
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                       END-EVALUATE
+                   WHEN    "060" 
+                   WHEN    "068" 
+                       IF    ( WRK-NENREI  >=   70 )    AND
+                             ( WRK-NENREI  <=   74 )
+                           EVALUATE    LNK-SYUBETU-NYUGAIKBN
+                               WHEN    "1"
+                                   EVALUATE   WRK-RECE61-HOJOKBN
+                                       WHEN   "1"
+                                       WHEN   "5"
+                                           MOVE   "9"  TO  WK-HONKZKKBN
+                                       WHEN   "2"
+                                       WHEN   "6"
+                                           MOVE   "8"  TO  WK-HONKZKKBN
+                                       WHEN   "3"
+                                           MOVE   "?"  TO  WK-HONKZKKBN
+                                   END-EVALUATE
+                               WHEN    "2"
+                                   EVALUATE   WRK-RECE61-HOJOKBN
+                                       WHEN   "1"
+                                       WHEN   "4"
+                                           MOVE   "9"  TO  WK-HONKZKKBN
+                                       WHEN   "2"
+                                       WHEN   "5"
+                                           MOVE   "8"  TO  WK-HONKZKKBN
+                                       WHEN   "3"
+                                       WHEN   "6"
+                                           MOVE   "?"  TO  WK-HONKZKKBN
+                                   END-EVALUATE
+                           END-EVALUATE
+                       END-IF     
+                   WHEN    OTHER 
+                       EVALUATE   WRK-RECE61-HOJOKBN
+                           WHEN   "9"
+                               MOVE   "9"   TO   WK-HONKZKKBN
+                           WHEN   "8"
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           WHEN   "7"
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                       END-EVALUATE
+               END-EVALUATE
+               IF      WRK-RECE61-KOHID >   ZERO
+                   EVALUATE   WRK-RECE61-RJNPAYKBN
+                       WHEN   "01"
+                           MOVE   "9"   TO   WK-RJN
+                       WHEN   "02"
+                           MOVE   "?"   TO   WK-RJN
+                       WHEN   "03"
+                           MOVE   "?"   TO   WK-RJN
+                   END-EVALUATE
+               END-IF
+             END-IF
            END-IF
       *
            IF    ( WK-RJN          NOT =   SPACE )
