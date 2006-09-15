@@ -47,9 +47,6 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  TOKEI-KEY
                                    FILE    STATUS  IS  STS-TOKEI.
-      *    並び換え用
-           SELECT  TOKEIX-FILE     ASSIGN  TOKEIPARA
-                                   FILE    STATUS  IS  STS-TOKEIX.
       *----(00.00.01)--ADD-END-----
       *
        DATA                        DIVISION.
@@ -75,9 +72,6 @@
            03  TOKEI-BYOMEI            PIC X(160).
            03  TOKEI-MANSEIKBN         PIC 9(02).
            03  TOKEI-UTAGAIFLG         PIC X(01).
-      *    クリア用
-       FD  TOKEIX-FILE.
-       01  TOKEIX-REC                  PIC X(200).
       *----(00.00.01)--ADD-END-----
       *
        WORKING-STORAGE             SECTION.
@@ -105,7 +99,6 @@
            03  STS-RECEERR         PIC X(02).
       *----(00.00.01)--ADD-START---
            03  STS-TOKEI           PIC X(02).
-           03  STS-TOKEIX          PIC X(02).
       *----(00.00.01)--ADD-END-----
       *
       *    フラグ領域
@@ -301,8 +294,8 @@
        200-MAIN-SEC                SECTION.
       *
       *    並び換え用ファイルをクリアする
-           OPEN    OUTPUT              TOKEIX-FILE
-           CLOSE                       TOKEIX-FILE
+           OPEN    OUTPUT              TOKEI-FILE
+           CLOSE                       TOKEI-FILE
       *    並び換え用ファイルを開く
            OPEN    I-O                 TOKEI-FILE
       *
@@ -326,8 +319,8 @@
       *    並び換え用ファイルを閉じる
            CLOSE                       TOKEI-FILE
       *    並び換え用ファイルをクリアする
-           OPEN    OUTPUT              TOKEIX-FILE
-           CLOSE                       TOKEIX-FILE
+           OPEN    OUTPUT              TOKEI-FILE
+           CLOSE                       TOKEI-FILE
       *
       *    ファイル削除
            MOVE    ZERO            TO  IF-RESULT
