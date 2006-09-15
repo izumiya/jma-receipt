@@ -1603,6 +1603,13 @@
                    MOVE    "2"          TO  WK-IHO
                END-IF
            END-IF    
+      *
+           IF      RECE62-SRYYM        >=  "200610"
+               IF    ( WK-HONKZKKBN        =   "?" )
+               OR    ( WK-RJN              =   "?" )
+                   MOVE    8                    TO  RECE62-ERR-ERRKBN
+               END-IF
+           END-IF    
       *          
       *
       *    DISPLAY "WK-HONKZKKBN: " WK-HONKZKKBN 
