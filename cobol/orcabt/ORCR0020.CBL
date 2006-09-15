@@ -1580,6 +1580,13 @@
                    MOVE    "2"          TO  WK-IHO
                END-IF
            END-IF    
+      *
+           IF      RECE02-SRYYM        >=  "200610"
+               IF    ( WK-HONKZKKBN        =   "?" )
+               OR    ( WK-RJN              =   "?" )
+                   MOVE    7                    TO  RECE02-ERR-ERRKBN
+               END-IF
+           END-IF
       *          
       *----(01.00.13) LINE ADD END   --------------------------
       *

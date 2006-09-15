@@ -893,6 +893,9 @@
            03  WRK-ERR-MSG-6           PIC X(14)  VALUE
                "¡Ú¼ç²ÊÌ¤ÀßÄê¡Û".
       *
+           03  WRK-ERR-MSG-7           PIC X(30)  VALUE
+               "¡ÚÊ¿À®£±£¸Ç¯£±£°·î²þÀµÌ¤ÂÐ±þ¡Û".
+      *
        01  WRK-CONS-AREA.
            03  WRK-CONS-SRYYM-200604  PIC 9(06)   VALUE   200604. 
       *
@@ -2579,6 +2582,8 @@
                    MOVE    WRK-ERR-MSG-4   TO   HC06-HEAD4-G (5:)
                WHEN    7
                    MOVE    WRK-ERR-MSG-5   TO   HC06-HEAD4-G (5:)
+               WHEN    8
+                   MOVE    WRK-ERR-MSG-7   TO   HC06-HEAD4-G (5:)
            END-EVALUATE
            INSPECT HC06-HEAD4-G  REPLACING ALL "  "    BY  "¡¡"
       *
