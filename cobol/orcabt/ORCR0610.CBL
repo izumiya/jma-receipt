@@ -1143,7 +1143,6 @@
                        AND   ( HKN-HBTNUM  NOT =   "41"              )    
                        AND   ( COMB-KOHHKNNUM(IDX)(1:1)
                                                >=  "1" AND <=  "8"   )
-                       AND   ( WRK-STYMD (1:6) <=   "200609"         ) 
                            ADD     1                      TO  IDZ    
                            MOVE    COMB-KOHHKNNUM (IDX)   TO 
                                           WRK-SEIKYU-KOHHKNNUM(2 IDZ)
@@ -1515,7 +1514,6 @@
                        AND   ( HKN-HBTNUM  NOT =   "41"              )    
                        AND   ( COMB-KOHHKNNUM(IDX)(1:1)
                                                >=  "1" AND <=  "8"   )
-                       AND   ( WRK-STYMD (1:6) <=   "200609"         ) 
                            ADD     1                      TO  IDZ    
                            MOVE    COMB-KOHHKNNUM (IDX)   TO 
                                           WRK-SEIKYU-KOHHKNNUM(2 IDZ)
