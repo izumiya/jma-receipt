@@ -143,6 +143,7 @@
       *  03.02.02    NACL-ÌçÏÆ    06/08/17  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  03.02.03    NACL-ÌçÏÆ    06/08/18  ²¬»³¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       *  03.02.04    NACL-ÌçÏÆ    06/09/05  ·ò¹¯ÊÝ¸±Ë¡£±£°·î²þÀµÂÐ±þ
+      *  03.02.05    NACL-ÌçÏÆ    06/09/16  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2168,7 +2169,7 @@
            MOVE     SPACE     TO    WK-NYUJGNKBN.
       *
            IF (( WK-1001-PREFNUM   =  01  OR  26  OR  27  OR 34
-                                                          OR 12  ) AND
+                                                  OR  12  OR 19  ) AND
                ( HKN-HKNNUM        = "141"                       ))
            OR (( WK-1001-PREFNUM   =  28                         ) AND
                ( HKN-HKNNUM        = "241" OR "180" OR "182" OR
@@ -3378,7 +3379,7 @@
        2103-KOH1-KAISU-SEC           SECTION.
       *
            IF (( WK-1001-PREFNUM   =  01  OR  26  OR  27  OR 34
-                                                          OR 12  ) AND
+                                                  OR  12  OR 19  ) AND
                ( COMB-KOH1HKNNUM   = "141"                       ))
            OR (( WK-1001-PREFNUM   =  28                         ) AND
                ( COMB-KOH1HKNNUM   = "241" OR "180" OR "182" OR
@@ -3516,7 +3517,7 @@
        2104-KOH2-KAISU-SEC           SECTION.
       *
            IF (( WK-1001-PREFNUM   =  01  OR  26  OR  27  OR 34
-                                                          OR 12  ) AND
+                                                  OR  12  OR 19  ) AND
                ( COMB-KOH2HKNNUM   = "141"                       ))
            OR (( WK-1001-PREFNUM   =  28                         ) AND
                ( COMB-KOH2HKNNUM   = "241" OR "180" OR "182" OR
@@ -3649,7 +3650,7 @@
        2105-KOH3-KAISU-SEC           SECTION.
       *
            IF (( WK-1001-PREFNUM   =  01  OR  26  OR  27  OR 34
-                                                          OR 12  ) AND
+                                                  OR  12  OR 19  ) AND
                ( COMB-KOH3HKNNUM   = "141"                       ))
            OR (( WK-1001-PREFNUM   =  28                         ) AND
                ( COMB-KOH3HKNNUM   = "241" OR "180" OR "182" OR
@@ -3782,7 +3783,7 @@
        2106-KOH4-KAISU-SEC           SECTION.
       *
            IF (( WK-1001-PREFNUM   =  01  OR  26  OR  27  OR 34
-                                                          OR 12  ) AND
+                                                  OR  12  OR 19  ) AND
                ( COMB-KOH4HKNNUM   = "141"                       ))
            OR (( WK-1001-PREFNUM   =  28                         ) AND
                ( COMB-KOH4HKNNUM   = "241" OR "180" OR "182" OR
@@ -10056,7 +10057,7 @@
            MOVE       ZERO                TO   FLG-NYUSKJJYOGAK.
       *
            IF (( WK-1001-PREFNUM   =  01  OR  26  OR  27  OR 34
-                                                          OR 12  ) AND
+                                                  OR  12  OR 19  ) AND
                ( COMB-KOHHKNNUM(KOH-IDX)  = "141"                ))
            OR (( WK-1001-PREFNUM   =  28                         ) AND
                ( COMB-KOHHKNNUM(KOH-IDX)   = "241" OR "180" OR
