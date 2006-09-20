@@ -52,6 +52,7 @@
       * 01.00.17     NACL-Â¿¡¹Ç¼  06/01/24  ÍÑÎÌ¥³¡¼¥ÉÈ½ÄêÄÉ²Ã
       * 01.00.18     NACL-Â¿¡¹Ç¼  06/03/XX  £È£±£¸Ç¯£´·î²þÀµÂÐ±þ
       * 01.00.19     NACL-Â¿¡¹Ç¼  06/06/09  ¸åÈ¯°åÌôÉÊ¶èÊ¬ÊÑ¹¹
+      * 03.02.00     NACL-Â¿¡¹Ç¼  06/09/20  £È£±£¸Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -1284,6 +1285,10 @@
                                MOVE    1           TO  FLG-RJNHKN
                            WHEN    "2"
                                MOVE    2           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  START -----------------------------------
+                           WHEN    "3"
+                               MOVE    3           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  END   -----------------------------------
                        END-EVALUATE
       *                °Ê³°
                    WHEN    OTHER
@@ -1304,6 +1309,13 @@
                                WHEN    "F"
       *                        £²³ä
                                    MOVE    2           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  START -----------------------------------
+                               WHEN    "7"
+                               WHEN    "G"
+                               WHEN    "H"
+                               WHEN    "I"
+                                   MOVE    3           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  END   -----------------------------------
                            END-EVALUATE
                        END-IF
                END-EVALUATE
@@ -1318,6 +1330,11 @@
                        WHEN    "02"
       *                        £²³ä
                            MOVE    2           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  START -----------------------------------
+                       WHEN    "03"
+      *                        £³³ä
+                           MOVE    3           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  END   -----------------------------------
                    END-EVALUATE
                WHEN    COMB-KOH2HKNNUM     =  "027"
                    EVALUATE    COMB-KOH2PAYKBN
@@ -1325,6 +1342,11 @@
                            MOVE    1           TO  FLG-RJNHKN
                        WHEN    "02"
                            MOVE    2           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  START -----------------------------------
+                       WHEN    "03"
+      *                        £³³ä
+                           MOVE    3           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  END   -----------------------------------
                    END-EVALUATE
                WHEN    COMB-KOH3HKNNUM     =  "027"
                    EVALUATE    COMB-KOH3PAYKBN
@@ -1332,6 +1354,11 @@
                            MOVE    1           TO  FLG-RJNHKN
                        WHEN    "02"
                            MOVE    2           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  START -----------------------------------
+                       WHEN    "03"
+      *                        £³³ä
+                           MOVE    3           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  END   -----------------------------------
                    END-EVALUATE
                WHEN    COMB-KOH4HKNNUM     =  "027"
                    EVALUATE    COMB-KOH4PAYKBN
@@ -1339,6 +1366,11 @@
                            MOVE    1           TO  FLG-RJNHKN
                        WHEN    "02"
                            MOVE    2           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  START -----------------------------------
+                       WHEN    "03"
+      *                        £³³ä
+                           MOVE    3           TO  FLG-RJNHKN
+      *---(03.02.00) LINE ADD  END   -----------------------------------
                    END-EVALUATE
            END-EVALUATE
       *
@@ -1347,6 +1379,10 @@
                    MOVE    "¡Ê¹â£¹¡Ë"          TO  WRK-BIKOU
                WHEN    2
                    MOVE    "¡Ê¹â£¸¡Ë"          TO  WRK-BIKOU
+      *---(03.02.00) LINE ADD  START -----------------------------------
+               WHEN    3
+                   MOVE    "¡Ê¹â£·¡Ë"          TO  WRK-BIKOU
+      *---(03.02.00) LINE ADD  END   -----------------------------------
            END-EVALUATE
       *
            .
