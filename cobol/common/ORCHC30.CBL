@@ -1047,7 +1047,7 @@
       *
       *    用量の方が多い場合エラー
            IF     ORCHC30-SURYO(CNT-PARA)
-                  <= ORCHC30-YOURYOU(CNT-PARA WRK-KBN)
+                  <  ORCHC30-YOURYOU(CNT-PARA WRK-KBN)
                MOVE    1               TO  WRK-FLG
                GO  TO  243-HENKBN-YOURYOU-SET-EXT
            END-IF
