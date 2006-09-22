@@ -2188,8 +2188,8 @@
       *               (SPA-NYUGAIKBN       =   "2" )
       *            MOVE    ZERO            TO  WRK-IDX-IN
       *            PERFORM 3305-NETAKIRI-SET-SEC
-      *        END-IF
-      *********GO      TO      3301-SYOSIN-SYORI-EXT
+      ******** END-IF
+               GO      TO      3301-SYOSIN-SYORI-EXT
            END-IF
       *H18.4¤«¤é
       *    ºÆ¿ÇÎÁ»»Äê¡ÊÆýÍÄ»ù²Ã»»¡Ë
