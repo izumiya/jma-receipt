@@ -1159,6 +1159,13 @@
                END-PERFORM
       *        自費コードのみの判定
                IF      FLG-ARI             =   ZERO
+                   IF      ORCHC33-KARUTE3KBN  =   "1"
+                       CONTINUE
+                   ELSE
+                       INITIALIZE                  TBL-HEN-AREA
+                       MOVE    ZERO                TO  IDX-T1
+                       MOVE    ZERO                TO  IDX-MAX
+                   END-IF
                    PERFORM VARYING     IDX2    FROM    1   BY  1
                            UNTIL       IDX2    >   400
                        IF      TBL-DAY (11 IDX2 IDX)   >   ZERO
