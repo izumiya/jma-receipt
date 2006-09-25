@@ -194,6 +194,7 @@
       *  03.02.04    NACL-ÌçÏÆ    06/09/05  ·ò¹¯ÊÝ¸±Ë¡£±£°·î²þÀµÂÐ±þ
       *  03.02.05    NACL-ÌçÏÆ    06/09/16  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
       *  03.02.06    NACL-ÌçÏÆ    06/09/20  ÂçÊ¬¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
+      *  03.02.07    NACL-ÌçÏÆ    06/09/25  °¦ÃÎ¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2319,6 +2320,9 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
            OR (( WK-1001-PREFNUM   =  19                         ) AND
                ( HKN-HKNNUM        = "141"                       ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( HKN-HKNNUM        = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                   IF   HKN-HON-GAIMNAIJGNGAK  NOT = ZERO
@@ -3776,6 +3780,9 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
            OR (( WK-1001-PREFNUM   =  19                         ) AND
                ( COMB-KOH1HKNNUM   = "141"                       ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH1HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO  TEI-KIN-KOHI1-K
@@ -3977,6 +3984,9 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
            OR (( WK-1001-PREFNUM   =  19                         ) AND
                ( COMB-KOH2HKNNUM   = "141"                       ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH2HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO  TEI-KIN-KOHI2-K
@@ -4163,6 +4173,9 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
            OR (( WK-1001-PREFNUM   =  19                         ) AND
                ( COMB-KOH3HKNNUM   = "141"                       ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH3HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO   TEI-KIN-KOHI3-K
@@ -4349,6 +4362,9 @@
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
            OR (( WK-1001-PREFNUM   =  19                         ) AND
                ( COMB-KOH4HKNNUM   = "141"                       ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH4HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                         MOVE  HKN-HON-GAIKKOTGAK TO   TEI-KIN-KOHI4-K
@@ -10848,6 +10864,9 @@
                ( LNK-SYU-SRYYMD(1:6)      >= "200610"            ))
            OR (( WK-1001-PREFNUM           =  19                 ) AND
                ( COMB-KOHHKNNUM(KOH-IDX)   = "141"               ))
+           OR (( WK-1001-PREFNUM           =  23                 ) AND
+               ( COMB-KOHHKNNUM(KOH-IDX)   = "141"               ) AND
+               ( LNK-SYU-SRYYMD(1:6)      >= "200610"            ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                    MOVE    HKN-HON-GAIKFTNRATE  TO   WK-GAIKFTNRATE

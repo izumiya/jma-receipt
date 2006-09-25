@@ -145,6 +145,7 @@
       *  03.02.04    NACL-ÌçÏÆ    06/09/05  ·ò¹¯ÊÝ¸±Ë¡£±£°·î²þÀµÂÐ±þ
       *  03.02.05    NACL-ÌçÏÆ    06/09/16  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
       *  03.02.06    NACL-ÌçÏÆ    06/09/20  ÂçÊ¬¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
+      *  03.02.07    NACL-ÌçÏÆ    06/09/25  °¦ÃÎ¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -593,6 +594,7 @@
            03  FLG-KOUGAKUCYO          PIC 9(01).
            03  FLG-KOUGAKUCYO2         PIC 9(01).
            03  FLG-KOUGAKUCYO3         PIC 9(01).
+           03  FLG-KOUGAKUCYO5         PIC 9(01).
            03  FLG-SKJ                 PIC 9(01).
            03  WK-SYU-SYUCOMPFTN       PIC 9(08).
            03  WK-KOUREI-IRYOHI        PIC 9(08).
@@ -1014,6 +1016,7 @@
                OR   FLG-KOUGAKUCYO           =    1 
                OR   FLG-KOUGAKUCYO2          =    1 
                OR   FLG-KOUGAKUCYO3          =    1 
+               OR   FLG-KOUGAKUCYO5          =    1 
                OR   FLG-KUMAMOTO             =   "1"
                OR   COMB-SYU-HKNKOHSBTKBN    =   "8"
                    CONTINUE
@@ -2196,6 +2199,9 @@
            OR (( WK-1001-PREFNUM   =  33                         ) AND
                ( HKN-HKNNUM        = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( HKN-HKNNUM        = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
@@ -3407,6 +3413,9 @@
                ( COMB-KOH1HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH1HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI1-M
@@ -3545,6 +3554,9 @@
                ( COMB-KOH2HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH2HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI2-M
@@ -3678,6 +3690,9 @@
                ( COMB-KOH3HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH3HKNNUM   = "141"                       ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
                       MOVE  HKN-HON-NYUMJGNCNT TO  MAX-KAI-KOHI3-M
@@ -3810,6 +3825,9 @@
            OR (( WK-1001-PREFNUM   =  33                         ) AND
                ( COMB-KOH4HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
+               ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOH4HKNNUM   = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
                   WHEN   "1"
@@ -4491,6 +4509,9 @@
            OR ((WK-1001-PREFNUM  =  33                         ) AND
                (COMB-KOH1HKNNUM  =  "241"                      ) AND
                (LNK-SYU-SRYYMD(1:6)   >=   "200610"            ))
+           OR ((WK-1001-PREFNUM  =  23                         ) AND
+               (COMB-KOH1HKNNUM  =  "241"                      ) AND
+               (LNK-SYU-SRYYMD(1:6)   >=   "200610"            ))
       *
                 IF  LNK-SYU-SRYYMD(1:6)   >=   "200610"
                     CONTINUE
@@ -4792,25 +4813,28 @@
               IF     FLG-IRYOHI5     =      11
                 IF  WK-KOUREI-IRYOHI3  >  801000
                    COMPUTE WK-KOUREI-IRYOHI4 = 
-                         (( WK-KOUREI-IRYOHI3 -  801000 ) * 0.01 )
+                         (( WK-KOUREI-IRYOHI3 -  801000 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
                                              +   WK-KOUREI-IRYOHI4
+                   MOVE    1    TO    FLG-KOUGAKUCYO5
                 END-IF
               END-IF
               IF     FLG-IRYOHI5     =      12
                 IF  WK-KOUREI-IRYOHI3  >  2002500
                    COMPUTE WK-KOUREI-IRYOHI4 = 
-                         (( WK-KOUREI-IRYOHI3 - 2002500 ) * 0.01 )
+                         (( WK-KOUREI-IRYOHI3 - 2002500 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
                                              +   WK-KOUREI-IRYOHI4
+                   MOVE    1    TO    FLG-KOUGAKUCYO5
                 END-IF
               END-IF
               IF     FLG-IRYOHI5     =      21
                 IF  WK-KOUREI-IRYOHI3  >  801000
                    COMPUTE WK-KOUREI-IRYOHI4 = 
-                         (( WK-KOUREI-IRYOHI3 -  801000 ) * 0.01 )
+                         (( WK-KOUREI-IRYOHI3 -  801000 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI2-M  =   MAX-KIN-KOHI2-M 
                                              +   WK-KOUREI-IRYOHI4
+                   MOVE    1    TO    FLG-KOUGAKUCYO5
                 END-IF
               END-IF
       *       ¼«Î©»Ù±çÍÑ
@@ -10163,6 +10187,9 @@
                                              "485" OR "180" OR
                                              "186"               ) AND
                ( LNK-SYU-SRYYMD(1:6)      >= "200610"            ))
+           OR (( WK-1001-PREFNUM   =  23                         ) AND
+               ( COMB-KOHHKNNUM(KOH-IDX)   = "141"               ) AND
+               ( LNK-SYU-SRYYMD(1:6)      >= "200610"            ))
              EVALUATE   FLG-SANSHOU2
                WHEN   "1"
                    MOVE    HKN-HON-NYUKFTNRATE  TO   WK-NYUKFTNRATE
@@ -13616,8 +13643,10 @@
              AND ( COMB-KOH1HKNNUM              =       "027" )
                   CONTINUE
              ELSE
-               IF  ( FLG-KOUGAKUCYO2    NOT =    ZERO )
-               AND ( FLG-IRYOHI2            =     1   )
+               IF  (( FLG-KOUGAKUCYO2    NOT =    ZERO ) AND
+                    ( FLG-IRYOHI2            =     1   ))
+               OR  (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
+                    ( FLG-IRYOHI5        =   11 OR 12  ))
                     MOVE     LNK-SYU-KOH1COMPFTN  TO
                                           LNK-SYU-KOH1HKNFTNMONEY
                ELSE
@@ -13632,12 +13661,18 @@
            END-IF.
            IF   (COMB-KOH2HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH2-NYUJGNKBN    =     "1")
+               IF   ( FLG-KOUGAKUCYO5    NOT =    ZERO )
+               AND  ( FLG-IRYOHI5            =    21   )
+                    MOVE     LNK-SYU-KOH2COMPFTN  TO
+                                          LNK-SYU-KOH2HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH2HKNFTNMONEY  =                  
                                     LNK-SYU-KOH2COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH2HKNFTNMONEY  =                  
                                     LNK-SYU-KOH2HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH2HKNFTNMONEY  =                  
                                     LNK-SYU-KOH2HKNFTNMONEY *  10        
+               END-IF
            END-IF.
            IF   (COMB-KOH3HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH3-NYUJGNKBN    =     "1")
@@ -13669,6 +13704,8 @@
                   OR (( FLG-KOUGAKUCYO3    NOT =    ZERO ) AND
                       ( FLG-IRYOHI3X           =     11  ) AND
                       ( FLG-SYOUKAN(1)         =    "1"  ))
+                  OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
+                      ( FLG-IRYOHI5        =   11 OR 12  ))
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -13694,6 +13731,8 @@
                   OR (( FLG-KOUGAKUCYO3    NOT =    ZERO ) AND
                       ( FLG-IRYOHI3X           =     11  ) AND
                       ( FLG-SYOUKAN(1)         =    "1"  ))
+                  OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
+                      ( FLG-IRYOHI5        =   11 OR 12  ))
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -13731,6 +13770,8 @@
                   IF (( FLG-KOUGAKUCYO3    NOT =    ZERO ) AND
                       ( FLG-IRYOHI3X           =     21  ) AND
                       ( FLG-SYOUKAN(2)         =    "1"  ))
+                  OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
+                      ( FLG-IRYOHI5            =     21  ))
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -13753,6 +13794,8 @@
                   IF (( FLG-KOUGAKUCYO3    NOT =    ZERO ) AND
                       ( FLG-IRYOHI3X           =     21  ) AND
                       ( FLG-SYOUKAN(2)         =    "1"  ))
+                  OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
+                      ( FLG-IRYOHI5            =     21  ))
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -13935,6 +13978,15 @@
                   CONTINUE
               ELSE
                   MOVE    ZERO     TO    FLG-KOUGAKUCYO3
+              END-IF
+           END-IF.
+      *
+           IF   FLG-KOUGAKUCYO5        NOT =    ZERO
+              IF ((FLG-IRYOHI5 = 11 OR 12 ) AND (FLG-HIKAKU = 1))
+              OR ((FLG-IRYOHI5 = 21       ) AND (FLG-HIKAKU = 2))
+                  CONTINUE
+              ELSE
+                  MOVE    ZERO     TO    FLG-KOUGAKUCYO5
               END-IF
            END-IF.
       *
