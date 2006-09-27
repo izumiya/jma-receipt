@@ -220,6 +220,7 @@
            03  FLG-MIYAGI              PIC 9(01).
            03  FLG-NYUSKJJYOGAK        PIC 9(01).
            03  FLG-KEIKASOCHI-IPAN     PIC 9(01).
+           03  FLG-ROJIN41             PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -4502,6 +4503,7 @@
        2108-ROUJIN41-JYOGEN-HENSYU-SEC           SECTION.
       *
       *    £´£±Ï·¿Í
+           MOVE       ZERO        TO      FLG-ROJIN41
            IF ((WK-1001-PREFNUM  =  01 OR 26 OR 27 OR 34 OR 12 ) AND
                (COMB-KOH1HKNNUM  =  "241"                      ))
            OR ((WK-1001-PREFNUM  =  10                         ) AND
@@ -4521,6 +4523,16 @@
                 END-IF
                 MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
                 MOVE   1           TO   FLG-IRYOHI2
+      *
+                IF ((WK-1001-PREFNUM =  01 OR 26 OR 27 OR 34 OR 12 ) AND
+                    (COMB-KOH1HKNNUM =  "241"                      ))
+                OR ((WK-1001-PREFNUM =  10                         ) AND
+                    (COMB-KOH1HKNNUM =  "255"                      ))
+                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200610"
+                   AND   MAX-KIN-KOHI1-M        =    72300
+                      MOVE     1      TO    FLG-ROJIN41
+                   END-IF
+                END-IF
       *
            END-IF
       *
@@ -4801,6 +4813,15 @@
               END-IF
       *       £´£±Ï·¿ÍÍÑ
               IF     FLG-IRYOHI2     =      1
+               IF  FLG-ROJIN41   =   1
+                IF  WK-KOUREI-IRYOHI  >  361500
+                   COMPUTE WK-KOUREI-IRYOHI2 = 
+                        (( WK-KOUREI-IRYOHI   -  361500 ) * 0.01 ) + 0.5
+                   COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
+                                             +   WK-KOUREI-IRYOHI2
+                   MOVE    1    TO    FLG-KOUGAKUCYO2
+                END-IF
+               ELSE
                 IF  WK-KOUREI-IRYOHI  >  267000
                    COMPUTE WK-KOUREI-IRYOHI2 = 
                         (( WK-KOUREI-IRYOHI   -  267000 ) * 0.01 ) + 0.5
@@ -4808,6 +4829,7 @@
                                              +   WK-KOUREI-IRYOHI2
                    MOVE    1    TO    FLG-KOUGAKUCYO2
                 END-IF
+               END-IF
               END-IF
       *       ²¬»³¸©ÃÏÊý¸øÈñÍÑ
               IF     FLG-IRYOHI5     =      11
