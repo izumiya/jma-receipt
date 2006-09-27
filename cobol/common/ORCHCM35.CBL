@@ -123,7 +123,7 @@
        01  PARA-FILEKBN                PIC X(40).
        01  PARA-TBL1.
       *----(00.00.01)--UPD-START---
-           03  PARA-TBL-OCC            OCCURS   30.
+           03  PARA-TBL-OCC            OCCURS   21.
       *----(00.00.01)--UPD-END-----
                05  PARA-TBL-G          OCCURS   36.
                    07  PARA-TPAGE      PIC 9(04).
@@ -215,7 +215,7 @@
       *    ¹ñÊÝ
       *----(00.00.01)--UPD-START---
            PERFORM VARYING IDY     FROM    2   BY  1
-                   UNTIL   IDY     >   30
+                   UNTIL   IDY     >   21
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >   36
                    OR      PARA-TSYURUINAME(IDY IDX) =  SPACE
