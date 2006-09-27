@@ -4524,13 +4524,12 @@
                 MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
                 MOVE   1           TO   FLG-IRYOHI2
       *
-                IF ((WK-1001-PREFNUM =  01 OR 26 OR 27 OR 34 OR 12 ) AND
-                    (COMB-KOH1HKNNUM =  "241"                      ))
-                OR ((WK-1001-PREFNUM =  10                         ) AND
-                    (COMB-KOH1HKNNUM =  "255"                      ))
-                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200610"
-                   AND   MAX-KIN-KOHI1-M        =    72300
+                IF  LNK-SYU-SRYYMD(1:6)   >=   "200610"
+                   IF   MAX-KIN-KOHI1-M    =    72300
                       MOVE     1      TO    FLG-ROJIN41
+                   END-IF
+                   IF   MAX-KIN-KOHI1-M    =    80100
+                      MOVE     2      TO    FLG-ROJIN41
                    END-IF
                 END-IF
       *
@@ -4821,7 +4820,8 @@
                                              +   WK-KOUREI-IRYOHI2
                    MOVE    1    TO    FLG-KOUGAKUCYO2
                 END-IF
-               ELSE
+               END-IF
+               IF  FLG-ROJIN41   =   2
                 IF  WK-KOUREI-IRYOHI  >  267000
                    COMPUTE WK-KOUREI-IRYOHI2 = 
                         (( WK-KOUREI-IRYOHI   -  267000 ) * 0.01 ) + 0.5
