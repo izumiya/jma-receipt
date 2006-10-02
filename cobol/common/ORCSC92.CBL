@@ -964,7 +964,8 @@
                MOVE    SPACE           TO  SPA-COM-SURFLG(IDX-T)
            ELSE
                MOVE    LNK-SC97-SURYO  TO  SPA-COM-SURYO(IDX-T)
-               IF      SPA-COM-SURYO(IDX-T)  =  ZERO
+               IF     (SPA-COM-SURYO(IDX-T)  =  ZERO )
+               AND    (LNK-SC92-PG     NOT =   "K05" )
                    MOVE    1           TO  SPA-COM-SURYO(IDX-T)
                END-IF
                MOVE    "1"             TO  SPA-COM-SURFLG(IDX-T)
