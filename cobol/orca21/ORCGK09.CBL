@@ -200,7 +200,7 @@
            03  IDK1                PIC 9(04).
            03  IDK2                PIC 9(04).
            03  IDX1                PIC 9(04).
-           03  IDX2                PIC 9(02).
+           03  IDX2                PIC 9(04).
            03  IDX-P               PIC 9(04).
            03  IDX-KOUI            PIC 9(04).
            03  IDX-SIN             PIC 9(04).
@@ -948,8 +948,7 @@
            MOVE    JYURRK-GRP-RENNUM  TO  SPA-K09NAI-GRP-RENNUM (IDX)
            MOVE    JYURRK-SYU-UPDKBN  TO  SPA-K09NAI-SYU-UPDKBN (IDX)
       *
-           MOVE    IDX                 TO  SPA-K09GMN-MAX1
-      *
+      *****MOVE    IDX                 TO  SPA-K09GMN-MAX1
       *
            .
        31011-JYURRK-SPAHEN-EXT.
