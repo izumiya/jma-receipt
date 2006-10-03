@@ -133,6 +133,8 @@
       *                                     病名の記載の修正
       *  03.02.03    NACL-藤原    06/09/04  公費レコードの負担金額の編集
       *                                     方法の修正
+      *  03.02.04    NACL-藤原    06/10/02  全角空白のみのコメントを出力
+      *                                     しないようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -328,7 +330,7 @@
       *
        01  INDEX-AREA.
            03  IDW                     PIC 9(03).
-           03  IDX                     PIC 9(03). 
+           03  IDX                     PIC 9(04). 
            03  IDY                     PIC 9(03). 
            03  IDZ                     PIC 9(03).
            03  IDY1                    PIC 9(03).
@@ -5776,6 +5778,20 @@
            IF      SYS-2005-RECECOMKBN =   "1"
                GO  TO  20099-COMMENT-HENSYU-EXT
            END-IF
+      *
+      *    全角スペースのみのレコードは記載しない
+           MOVE    ZERO                TO  WRK-SJ-CHK
+           PERFORM VARYING IDX FROM    1   BY  2
+                   UNTIL   IDX >       2500
+                   OR      RECEDEN-RECEDATA(IDX:2) =   SPACE
+                   OR      WRK-SJ-CHK              =   1
+               IF      RECEDEN-RECEDATA(IDX:2) NOT =   "　"
+                   MOVE    1               TO  WRK-SJ-CHK
+               END-IF
+           END-PERFORM 
+           IF      WRK-SJ-CHK          =   ZERO
+               GO  TO  20099-COMMENT-HENSYU-EXT
+           END-IF   
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
