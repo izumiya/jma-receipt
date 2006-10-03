@@ -651,7 +651,7 @@
       *
            PERFORM 900-ADRS-EDIT-SEC
       *
-           IF    ( WRK-ADRS (69:)  NOT =   SPACE )
+           IF    ( WRK-ADRS (51:)  NOT =   SPACE )
                MOVE    WRK-ADRS        TO  HC28-JYUSYO2 (CNT-LINE)
            ELSE
                MOVE    WRK-ADRS        TO  HC28-JYUSYO (CNT-LINE)
