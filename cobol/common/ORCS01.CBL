@@ -5270,7 +5270,9 @@
                          (( WK-IRYOHI  -  267000 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
                                              +   WK-IRYOHI2
-                   MOVE    1    TO    FLG-KOUGAKUCYO2
+                   IF   WK-IRYOHI   >   860340
+                      MOVE    1    TO    FLG-KOUGAKUCYO2
+                   END-IF
                 END-IF
               END-IF
               IF     FLG-IRYOHI2     =      2
@@ -13849,15 +13851,7 @@
       *    £´£±Ï·¿ÍÍÑ
            IF   FLG-KOUGAKUCYO2        NOT =    ZERO
               IF   (FLG-IRYOHI2 = 1 OR 2)  AND (FLG-HIKAKU = 1)
-                IF     FLG-IRYOHI2  =  2
-                    CONTINUE
-                ELSE
-                  IF   WK-IRYOHI   >   860340
-                    CONTINUE
-                  ELSE
-                    MOVE    ZERO     TO    FLG-KOUGAKUCYO2
-                  END-IF
-                END-IF
+                  CONTINUE
               ELSE
                   MOVE     ZERO      TO    FLG-KOUGAKUCYO2
               END-IF
