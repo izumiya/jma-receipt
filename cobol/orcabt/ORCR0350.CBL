@@ -126,6 +126,8 @@
       *                                     病名の記載の修正
       *  02.09.13    NACL-藤原    06/09/04  公費レコードの負担金額の編集
       *                                     方法の修正
+      *  02.09.04    NACL-藤原    06/10/02  全角空白のみのコメントを出力
+      *                                     しないようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -422,6 +424,7 @@
            03  WRK-COM-FTNKBN          PIC X(01).
            03  WRK-TAIHI-FTNKBN        PIC X(01).
            03  WRK-SJ-KBN              PIC X(02).
+           03  WRK-SJ-CHK              PIC 9(01).
       *
       *    1桁目:生保 2桁目:結核 3桁目:精神
            03  WRK-3SYU-KBN.
@@ -5495,6 +5498,20 @@
       *****    GO  TO  20092-SJ-HENSYU-EXT
       *****END-IF
       *
+      *    全角スペースのみのレコードは記載しない
+           MOVE    ZERO                TO  WRK-SJ-CHK
+           PERFORM VARYING IDX FROM    1   BY  2
+                   UNTIL   IDX >       250
+                   OR      RECEDEN-RECEDATA(IDX:2) =   SPACE
+                   OR      WRK-SJ-CHK              =   1
+               IF      RECEDEN-RECEDATA(IDX:2) NOT =   "　"
+                   MOVE    1               TO  WRK-SJ-CHK
+               END-IF
+           END-PERFORM 
+           IF      WRK-SJ-CHK          =   ZERO
+               GO  TO  20099-COMMENT-HENSYU-EXT
+           END-IF   
+      *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
       *
@@ -5526,6 +5543,20 @@
            IF      SYS-2005-RECECOMKBN =   "1"
                GO  TO  20099-COMMENT-HENSYU-EXT
            END-IF
+      *
+      *    全角スペースのみのレコードは記載しない
+           MOVE    ZERO                TO  WRK-SJ-CHK
+           PERFORM VARYING IDX FROM    1   BY  2
+                   UNTIL   IDX >       250
+                   OR      RECEDEN-RECEDATA(IDX:2) =   SPACE
+                   OR      WRK-SJ-CHK              =   1
+               IF      RECEDEN-RECEDATA(IDX:2) NOT =   "　"
+                   MOVE    1               TO  WRK-SJ-CHK
+               END-IF
+           END-PERFORM 
+           IF      WRK-SJ-CHK          =   ZERO
+               GO  TO  20099-COMMENT-HENSYU-EXT
+           END-IF   
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
