@@ -33,6 +33,8 @@
       *                           04/10/13  県内、県外別に出力
       *  01.01.02    NACL-小豆沢  04/10/20  請求ＤＢ更新処理追加
       *  01.01.03    NACL-藤原    05/02/16  返戻分を処理対象としない
+      *
+      *  03.02.01    NACL-藤原    06/10/04  システム管理の条件を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1258,7 +1260,7 @@
       *
            MOVE    LNK-PRTKANRI-SRYYM
                                    TO  ORC-DBYMD (1:6)
-           MOVE    "00"            TO  ORC-DBYMD (7:2)
+           MOVE    "01"            TO  ORC-DBYMD (7:2)
            MOVE    "DBSELECT"      TO  MCP-FUNC
            MOVE    "SYSKANRI-KEY"  TO  ORC-DBPATH
            CALL    "ORCMCPSUB"         USING
