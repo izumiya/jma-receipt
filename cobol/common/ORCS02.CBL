@@ -149,6 +149,7 @@
       *  03.02.08    NACL-ÌçÏÆ    06/09/25  °¦ÃÎ¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       *  03.02.09    NACL-ÌçÏÆ    06/10/02  ÅìµþÅÔÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       *  03.02.10    NACL-ÌçÏÆ    06/10/03  ¿ÀÆàÀî¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
+      *  03.02.11    NACL-ÌçÏÆ    06/10/04  ÏÂ²Î»³¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2241,7 +2242,7 @@
                ( HKN-HKNNUM        = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
-           OR (( WK-1001-PREFNUM   =  23  OR  14                 ) AND
+           OR (( WK-1001-PREFNUM   =  23  OR  14  OR  30         ) AND
                ( HKN-HKNNUM        = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
@@ -3454,7 +3455,7 @@
                ( COMB-KOH1HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
-           OR (( WK-1001-PREFNUM   =  23  OR  14                 ) AND
+           OR (( WK-1001-PREFNUM   =  23  OR  14  OR  30         ) AND
                ( COMB-KOH1HKNNUM   = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
@@ -3595,7 +3596,7 @@
                ( COMB-KOH2HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
-           OR (( WK-1001-PREFNUM   =  23  OR  14                 ) AND
+           OR (( WK-1001-PREFNUM   =  23  OR  14  OR  30         ) AND
                ( COMB-KOH2HKNNUM   = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
@@ -3731,7 +3732,7 @@
                ( COMB-KOH3HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
-           OR (( WK-1001-PREFNUM   =  23  OR  14                 ) AND
+           OR (( WK-1001-PREFNUM   =  23  OR  14  OR  30         ) AND
                ( COMB-KOH3HKNNUM   = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
@@ -3867,7 +3868,7 @@
                ( COMB-KOH4HKNNUM   = "141" OR "285" OR "485" OR
                                      "180" OR "186"              ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
-           OR (( WK-1001-PREFNUM   =  23  OR  14                 ) AND
+           OR (( WK-1001-PREFNUM   =  23  OR  14  OR  30         ) AND
                ( COMB-KOH4HKNNUM   = "141"                       ) AND
                ( LNK-SYU-SRYYMD(1:6)   >=   "200610"             ))
               EVALUATE   FLG-SANSHOU2
@@ -10706,7 +10707,7 @@
                                              "485" OR "180" OR
                                              "186"               ) AND
                ( LNK-SYU-SRYYMD(1:6)      >= "200610"            ))
-           OR (( WK-1001-PREFNUM   =  23  OR  14                 ) AND
+           OR (( WK-1001-PREFNUM   =  23  OR  14  OR  30         ) AND
                ( COMB-KOHHKNNUM(KOH-IDX)   = "141"               ) AND
                ( LNK-SYU-SRYYMD(1:6)      >= "200610"            ))
              EVALUATE   FLG-SANSHOU2
