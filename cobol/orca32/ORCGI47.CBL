@@ -681,8 +681,9 @@
            IF    ( FLG-NYUINACCT   =   ZERO )
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
-                   MOVE    NACCT-DAY (IDX-DAY)
-                                   TO  SPA-I47-NYUIN-DAY (IDX-DAY)
+                   IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
+                       MOVE    1   TO  SPA-I47-NYUIN-DAY (IDX-DAY)
+                   END-IF
                END-PERFORM
            END-IF
       *
