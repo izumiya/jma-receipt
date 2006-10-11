@@ -42,6 +42,7 @@
       * 02.01.03     NACL-¿¹ÏÆ     04/10/22  CLOSE½èÍý
       * 02.02.01     NACL-¿¹ÏÆ     05/12/13  ÌôºÞ¾ðÊó»²¾ÈÄÉ²Ã
       * 02.02.02     NACL-¿¹ÏÆ     06/05/11  ÌôºÞ¾ðÊó¥ê¥¹¥ÈÄÉ²Ã
+      * 02.02.06     NACL-¿¹ÏÆ     06/10/06  ÌôºÞÌ¾¥¯¥ê¥¢½èÍý½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -1247,7 +1248,14 @@
            MOVE    SPA-NAI-SRYCD   TO  YAKUJYO-SRYCD
            MOVE    1               TO  YAKUJYO-TEKNUM
       *
-           MOVE    SPA-GMN-NAME        TO  YAKUJYO-NAME
+      *----(02.02.06)--UPD-START---
+           IF     ( SPA-GMN-NAME   =   SPACE )
+               OR ( SPA-GMN-NAME   =   SPA-GMN-KENNAME )
+               MOVE    SPACE           TO  YAKUJYO-NAME
+           ELSE
+               MOVE    SPA-GMN-NAME    TO  YAKUJYO-NAME
+           END-IF
+      *----(02.02.06)--UPD-END-----
            MOVE    SPA-GMN-EFFECT      TO  YAKUJYO-EFFECT
            MOVE    SPA-GMN-CAUTION     TO  YAKUJYO-CAUTION
            MOVE    SPA-GMN-PHOTO       TO  YAKUJYO-PHOTO
@@ -1842,7 +1850,13 @@
            PERFORM 900-YAKUJYO-READ-SEC
       *
       *    ÌôºÞ¾ðÊó¥»¥Ã¥È
-           MOVE    YAKUJYO-NAME        TO  SPA-GMN-NAME
+      *----(02.02.06)--UPD-START---
+           IF      YAKUJYO-NAME    =   SPACE
+               MOVE    SPA-GMN-KENNAME     TO  SPA-GMN-NAME
+           ELSE
+               MOVE    YAKUJYO-NAME        TO  SPA-GMN-NAME
+           END-IF
+      *----(02.02.06)--UPD-END-----
            MOVE    YAKUJYO-EFFECT      TO  SPA-GMN-EFFECT
            MOVE    YAKUJYO-CAUTION     TO  SPA-GMN-CAUTION
            MOVE    YAKUJYO-PHOTO       TO  SPA-GMN-PHOTO
