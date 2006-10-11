@@ -44,6 +44,8 @@
       * 02.02.02     NACL-森脇     06/05/11  薬剤情報リスト追加
       * 02.02.03     NACL-森脇     06/08/29  薬剤情報文字数チェック追加
       * 02.02.04     NACL-森脇     06/09/21  参照処理前スパセット
+      * 02.02.05     NACL-森脇     06/09/29  登録後内容スパクリア
+      * 02.02.06     NACL-森脇     06/10/06  薬剤名クリア処理修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1451,13 +1453,15 @@
       *        画面初期化
                PERFORM 310-SPASET-SEC
            ELSE
-               MOVE    SPA-NAI-KENCD   TO  SPA-GMN-KENCD
-               MOVE    SPACE           TO  SPA-GMN-KENNAME
-               MOVE    ZERO            TO  SPA-GMN-SELNUM
-                                           SPA-NAI-SELNUM
-               INITIALIZE          SPA-GMN-ENTRY
-               INITIALIZE          SPA-NAI-ENTRY
-               MOVE    3       TO  SPA-GMN-CUR
+      *----(02.02.05)--UPD-START---
+               MOVE    SPA-NAI-KENCD       TO  SPA-GMN-KENCD
+               MOVE    SPA-NAI-KENNAIYO    TO  SPA-GMN-KENNAIYO
+               MOVE    ZERO                TO  SPA-GMN-SELNUM
+               MOVE    SPACE               TO  SPA-GMN-KENNAME
+               INITIALIZE                      SPA-GMN-ENTRY
+               INITIALIZE                      SPA-NAI-AREA
+               MOVE    3                   TO  SPA-GMN-CUR
+      *----(02.02.05)--UPD-END-----
            END-IF
       *----(00.01.04)--UPD-END------
            .
@@ -1512,7 +1516,14 @@
            MOVE    SPA-NAI-SRYCD   TO  YAKUJYO-SRYCD
            MOVE    1               TO  YAKUJYO-TEKNUM
       *
-           MOVE    SPA-GMN-NAME        TO  YAKUJYO-NAME
+      *----(02.02.06)--UPD-START---
+           IF     ( SPA-GMN-NAME   =   SPACE )
+               OR ( SPA-GMN-NAME   =   SPA-GMN-KENNAME )
+               MOVE    SPACE           TO  YAKUJYO-NAME
+           ELSE
+               MOVE    SPA-GMN-NAME    TO  YAKUJYO-NAME
+           END-IF
+      *----(02.02.06)--UPD-END-----
            MOVE    SPA-GMN-EFFECT      TO  YAKUJYO-EFFECT
            MOVE    SPA-GMN-CAUTION     TO  YAKUJYO-CAUTION
            MOVE    SPA-GMN-PHOTO       TO  YAKUJYO-PHOTO
@@ -1548,13 +1559,15 @@
       *        画面初期化
                PERFORM 310-SPASET-SEC
            ELSE
-               MOVE    SPA-NAI-KENCD   TO  SPA-GMN-KENCD
-               MOVE    SPACE           TO  SPA-GMN-KENNAME
-               MOVE    ZERO            TO  SPA-GMN-SELNUM
-                                           SPA-NAI-SELNUM
-               INITIALIZE          SPA-GMN-ENTRY
-               INITIALIZE          SPA-NAI-ENTRY
-               MOVE    3       TO  SPA-GMN-CUR
+      *----(02.02.05)--UPD-START---
+               MOVE    SPA-NAI-KENCD       TO  SPA-GMN-KENCD
+               MOVE    SPA-NAI-KENNAIYO    TO  SPA-GMN-KENNAIYO
+               MOVE    ZERO                TO  SPA-GMN-SELNUM
+               MOVE    SPACE               TO  SPA-GMN-KENNAME
+               INITIALIZE                      SPA-GMN-ENTRY
+               INITIALIZE                      SPA-NAI-AREA
+               MOVE    3                   TO  SPA-GMN-CUR
+      *----(02.02.05)--UPD-END-----
            END-IF
       *----(00.01.04)--UPD-END------
            .
@@ -1971,8 +1984,11 @@
                    MOVE    "データを入力して下さい"
                                            TO  SPA-ERRMSG
                WHEN    "0011"
-                   MOVE    "コードを入力して下さい"
+      *----(02.02.05)--UPD-START---
+      *             MOVE    "コードを入力して下さい"
+                   MOVE    "薬剤を指定して下さい"
                                            TO  SPA-ERRMSG
+      *----(02.02.05)--UPD-END-----
       *----(00.01.01)--ADD-START----
       *         WHEN    "0012"
       *             MOVE    "該当データがありません"
@@ -2182,7 +2198,13 @@
            PERFORM 900-YAKUJYO-READ-SEC
       *
       *    薬剤情報セット
-           MOVE    YAKUJYO-NAME        TO  SPA-GMN-NAME
+      *----(02.02.06)--UPD-START---
+           IF      YAKUJYO-NAME    =   SPACE
+               MOVE    SPA-GMN-KENNAME     TO  SPA-GMN-NAME
+           ELSE
+               MOVE    YAKUJYO-NAME        TO  SPA-GMN-NAME
+           END-IF
+      *----(02.02.06)--UPD-END-----
            MOVE    YAKUJYO-EFFECT      TO  SPA-GMN-EFFECT
            MOVE    YAKUJYO-CAUTION     TO  SPA-GMN-CAUTION
            MOVE    YAKUJYO-PHOTO       TO  SPA-GMN-PHOTO
