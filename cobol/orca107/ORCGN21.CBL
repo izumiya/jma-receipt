@@ -944,6 +944,10 @@
                    END-IF
       *----(02.02.03)--ADD-END-----
                END-IF
+      *----(02.02.06)--ADD-START---
+           ELSE
+               MOVE    SPA-GMN-KENNAME     TO  SPA-GMN-NAME
+      *----(02.02.06)--ADD-END-----
            END-IF
       *
       *    効能効果半角文字混在チェック
