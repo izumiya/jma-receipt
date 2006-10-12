@@ -801,6 +801,10 @@
                    MOVE    4           TO  SPA-GMN-CUR
                    GO  TO  430-TEXTCHK-EXT
                END-IF
+      *----(02.02.06)--ADD-START---
+           ELSE
+               MOVE    SPA-GMN-KENNAME     TO  SPA-GMN-NAME
+      *----(02.02.06)--ADD-END-----
            END-IF
       *
       *    効能効果半角文字混在チェック
