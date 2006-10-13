@@ -1075,7 +1075,11 @@
                    IF     (WRK-DD              =   ZERO )  OR
                           (WRK-SRYDD           <=  WRK-DD)
       *                ½é¿ÇÎÁÅÀ¿ô¤òµëÉÕÂÐ¾Ý³°ÅÀ¿ô¤Ø
-                       PERFORM 10013-SYOSIN-TEN-SEC
+                       IF      WRK-SRYYMD(1:6)     <   "200604"
+                           PERFORM 10013-SYOSIN-TEN-SEC
+                       ELSE
+                           PERFORM 10013-SYOSIN02-TEN-SEC
+                       END-IF
                        MOVE    1                   TO  FLG-SYONIKA
                    ELSE
                        MOVE    1                   TO  FLG-SYORI-END
@@ -1084,7 +1088,12 @@
       *            ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ
       *            ½é¿ÇÎÁÅÀ¿ô¤òµëÉÕÂÐ¾Ý³°ÅÀ¿ô¤Ø
                    IF      FLG-SYONIKA         =   1
-                       PERFORM 10013-SYOSIN-TEN-SEC
+      *                ½é¿ÇÎÁÅÀ¿ô¤òµëÉÕÂÐ¾Ý³°ÅÀ¿ô¤Ø
+                       IF      WRK-SRYYMD(1:6)     <   "200604"
+                           PERFORM 10013-SYOSIN-TEN-SEC
+                       ELSE
+                           PERFORM 10013-SYOSIN02-TEN-SEC
+                       END-IF
                    END-IF
            END-EVALUATE
       *
