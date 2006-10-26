@@ -37,6 +37,7 @@
       *                                     ¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
       *  03.03.03    NACL-Æ£¸¶    06/10/25  £²£°£°£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *                                     Ê¡²¬ÃÏÊý¸øÈñ¤Î¾ã³²
+      *  03.03.04    NACL-Æ£¸¶    06/10/26  Ê¡²¬ÃÏÊý¸øÈñ¤Î¥ì¥»µ­ºÜÈ½Äê¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -834,7 +835,18 @@
                    AND   ( HKN-HBTNUM      NOT =   "41"              )
                    AND   ( COMB-KOHHKNNUM(IDX)(1:1)
                                               >=  "1" AND <=  "8"   )
-                       PERFORM 200191-PREFKBN-40-CHECK-SEC
+                       IF    ( LNK-SYUBETU-SRYYM
+                                              >  WRK-CONS-SRYYM-200609 )
+                       AND   ( COMB-KOHHKNNUM (IDX)
+                                          NOT =   "180"                )
+                           IF      HKN-RECESKYKBN  =   "1" OR  "3"
+                               MOVE    2               TO  IDX1
+                           ELSE
+                               MOVE    1               TO  IDX1
+                           END-IF
+                       ELSE
+                           PERFORM 200191-PREFKBN-40-CHECK-SEC
+                       END-IF
                    ELSE
       *                Ê¡²¬¸©¤Î¼ÒÊÝ¤Î¤È¤­¡Ê£´£±Ï·¿Í¡Ë
                        IF    ( COMB-HKNNUM     NOT =   "060" AND "067" )
@@ -1144,13 +1156,6 @@
       *    Ê¡²¬¸©¸øÈñ¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
        200191-PREFKBN-40-CHECK-SEC      SECTION.
-      *??
-      *
-           IF    ( LNK-SYUBETU-SRYYM    >  WRK-CONS-SRYYM-200609 )
-           AND   ( COMB-KOHHKNNUM (IDX)
-                                   NOT =   "180"                 )
-               GO  TO  200191-PREFKBN-40-CHECK-EXT
-           END-IF
       *
            MOVE    SPACE               TO  WRK-PREFKBN
                                            WRK-PREFNUM
