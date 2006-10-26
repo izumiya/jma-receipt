@@ -1098,7 +1098,7 @@
            MOVE    SPACE               TO  INPUTSET-REC
            INITIALIZE                      INPUTSET-REC
            MOVE    SPA-HOSPID          TO  ISET-HOSPID
-           MOVE    ICD-INPUTCD         TO  ISET-SETCD
+           MOVE    ICD-SRYCD           TO  ISET-SETCD
            MOVE    SPA-SRYYMD          TO  ISET-YUKOSTYMD
            MOVE    SPA-SRYYMD          TO  ISET-YUKOEDYMD
       *
