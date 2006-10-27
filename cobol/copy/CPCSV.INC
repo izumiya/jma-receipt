@@ -8,7 +8,7 @@
           03  CSV-NYUGAIKBN       PIC X(01).
           03  CSV-ZAIKBN          PIC X(01).
           03  CSV-SRYYM           PIC X(06).
-          03  CSV-SYUBETUKBN      PIC X(02).
+          03  CSV-SYUBETUKBN      PIC X(01).
           03  CSV-KBN             PIC X(03).
           03  CSV-PTNUM           PIC X(20).
           03  CSV-RENNUM          PIC 9(01).
