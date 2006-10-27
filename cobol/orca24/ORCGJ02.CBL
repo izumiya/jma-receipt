@@ -190,6 +190,7 @@
            03  FLG-NAIBUN          PIC 9(01).
       *
            03  FLG-HKN-OK          PIC 9(01).
+           03  FLG-RRKNUM-ARI      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -5258,6 +5259,7 @@
            MOVE    ZERO                TO  WRK-RRK-RENNUM
            MOVE    ZERO                TO  WRK-RRK-DOUJI-RENNUM 
            MOVE    JYURRK-SRYKA        TO  WRK-SRYKA
+           MOVE    ZERO                TO  FLG-RRKNUM-ARI
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-RRK-MAX )
                IF     (SPA-RRK-RRKYMD (IDX)
@@ -5277,11 +5279,16 @@
                        MOVE    SPA-RRK-DOUJI-RENNUM (IDX)
                                           TO  WRK-RRK-DOUJI-RENNUM
                    END-IF
+                   MOVE    1              TO  FLG-RRKNUM-ARI
                 END-IF
            END-PERFORM
            IF      SPA-NYUGAIKBN       =   "1"
                MOVE    1               TO  WRK-RRK-RENNUM
-               ADD     1               TO  WRK-RRK-DOUJI-RENNUM
+               IF      FLG-RRKNUM-ARI  =   1
+                   ADD     1               TO  WRK-RRK-DOUJI-RENNUM
+               ELSE
+                   MOVE    ZERO            TO  WRK-RRK-DOUJI-RENNUM
+               END-IF
            ELSE
                ADD     1               TO  WRK-RRK-RENNUM
                MOVE    ZERO            TO  WRK-RRK-DOUJI-RENNUM

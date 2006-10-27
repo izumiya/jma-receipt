@@ -34,6 +34,7 @@
       *  01.00.05    NACL-多々納  05/04/22  レセ電対応
       *  01.00.06    NACL-多々納  05/11/28  MONFUNC 対応
       *  01.00.07    NACL-多々納  06/03/06  主科設定追加
+      *  03.03.00    NACL-多々納  06/10/27  削除時の受診履歴変更追加
       *****************************************************************
       *
       *
@@ -105,6 +106,9 @@
       *    内分泌負荷試験
            03  FLG-NAIBUN                PIC 9(01).
       *
+           03  FLG-DEL             PIC 9(01).
+           03  FLG-RENNUM          PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -123,6 +127,7 @@
            03  IDX-ATO             PIC 9(04).
            03  IDX-1               PIC 9(02).
            03  IDX-2               PIC 9(02).
+           03  IDX-3               PIC 9(02).
       *
            03  IDX-K               PIC 9(02).
       *
@@ -184,14 +189,18 @@
       *
       *    受診時間
            03  WRK-TIME1.
-               05  WRK-TIME11      PIC 9(08).
+               05  WRK-TIME11          PIC 9(08).
            03  WRK-TIME2.
-               05  WRK-TIME22      PIC 9(04).
+               05  WRK-TIME22          PIC 9(04).
       *    保険組合せ保存
            03  WRK-HZN-HKNCOMBINUM     PIC X(04).
            03  WRK-HZN-HKNKBN          PIC X(01).
       *
            03  WRK-SRYKA               PIC X(02).
+      *
+           03  WRK-RENNUM-KEY          PIC 9(01).
+           03  WRK-RENNUM              PIC 9(01).
+           03  WRK-DOUJI-RENNUM-KEY    PIC 9(01).
       *
       *    診療行為内容比較用テーブル
        01  TBL-AREA.
@@ -444,6 +453,7 @@
            END-IF
       *
       *    診療行為更新
+           MOVE    ZERO                TO  FLG-DEL
            MOVE    ZERO                TO  FLG-PARA
            MOVE    SPACE               TO  LNK-WKSRYACT-AREA
            INITIALIZE                  LNK-WKSRYACT-AREA
@@ -462,6 +472,7 @@
                                   (SPA-ERRCD   NOT =   SPACE )
                IF      PARA-FILEMEI        =   "WKSRYACT"
                    MOVE    PARA-DATA-REC       TO  WRK-WKSRYACT-REC
+                   MOVE    1                   TO  FLG-DEL
       *
                    IF     (IDX-KOUI        >   ZERO  )  AND
                           (WRK-WKSRY-ZAINUM     NOT =
@@ -496,6 +507,13 @@
                    PERFORM 100-SRYACT-KOU-SEC
                    PERFORM 200-JYURRK-SYORI-SEC
                END-IF
+           END-IF
+      *
+      *    削除の時、受診履歴の連番更新
+           IF     (FLG-DEL             =   ZERO )
+             OR  ((SPA-OLD-SRYKA   NOT =   SPACE  )  AND
+                  (SPA-SRYKA       NOT =   SPA-OLD-SRYKA))
+               PERFORM 4500115-TEISEI-RENNUM-SEC
            END-IF
       *
       *    包括まとめの時、以下対象外
@@ -1682,11 +1700,15 @@
                    (LNK-WKSRY-AUTOKBN(1 1) =   "3"   )
                GO      TO      200-JYURRK-SYORI-EXT
            END-IF
+           IF      (WRK-ZAINUM         =   ZERO ) 
+               GO      TO      200-JYURRK-SYORI-EXT
+           END-IF
       *
       *    当月
            PERFORM VARYING     IDX-KAI1    FROM    1   BY  1
                    UNTIL      (IDX-KAI1    >   10  )  OR
                               (TBL-KAISU (IDX-KAI1)    =   ZERO )
+                          OR  (SPA-ERRCD       NOT =   SPACE )
                PERFORM VARYING     IDX-KAI2    FROM    1   BY  1
                        UNTIL       IDX-KAI2    >   31
                    IF      TBL-DAY (IDX-KAI1 IDX-KAI2) NOT =   ZERO
@@ -1724,7 +1746,7 @@
            MOVE    WRK-SRYYMD          TO  JYURRK-SRYYMD
            MOVE    1                   TO  JYURRK-RENNUM
       *    １日連番１とする
-           MOVE    "JYURRK-KEY5"       TO  WRK-PATH
+      *    MOVE    "JYURRK-KEY5"       TO  WRK-PATH
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -1854,8 +1876,8 @@
                    MOVE    "0006"          TO  SPA-ERRCD
                    MOVE    ZERO            TO  WRK-JYURRK-EDANUM
                END-IF
+      *        受診履歴新規（ＤＢ更新をキャンセルさせる為エラーでも更新）
                ADD     1                   TO  WRK-JYURRK-EDANUM
-      *        受診履歴新規
                PERFORM 20011-JYURRK-SYOKI-SEC
            END-IF
       *
@@ -2429,7 +2451,198 @@
        4500114-TEISEI-JYURRKDEL-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    削除・科変更時の受診履歴の連番変更処理
+      *****************************************************************
+       4500115-TEISEI-RENNUM-SEC          SECTION.
       *
+           MOVE    SPACE               TO  JYURRK-REC
+           INITIALIZE                      JYURRK-REC
+           MOVE    SPA-HOSPID          TO  JYURRK-HOSPID
+           MOVE    SPA-PTID            TO  JYURRK-PTID
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           IF      SPA-OLD-SRYKA       =   SPACE
+               MOVE    SPA-SRYKA           TO  JYURRK-SRYKA
+           ELSE
+                MOVE    SPA-OLD-SRYKA       TO  JYURRK-SRYKA
+           END-IF
+           MOVE    SPA-SRYYMD          TO  JYURRK-SRYYMD
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key9"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-JYURRK
+           END-IF
+           MOVE    ZERO                TO  WRK-RENNUM
+           MOVE    ZERO                TO  WRK-RENNUM-KEY
+           MOVE    ZERO                TO  WRK-JYURRK-RENNUM
+           MOVE    ZERO                TO  WRK-JYURRK-DOUJI-RENNUM
+           PERFORM
+                   UNTIL       FLG-JYURRK  =   1
+               IF      JYURRK-RENNUM       =   WRK-RENNUM-KEY
+                   CONTINUE
+               ELSE
+                   ADD     1                   TO  WRK-JYURRK-RENNUM
+                   MOVE    JYURRK-RENNUM       TO  WRK-RENNUM-KEY
+               END-IF
+               IF      JYURRK-DOUJI-RENNUM =   WRK-DOUJI-RENNUM-KEY
+                   CONTINUE
+               ELSE
+                   ADD     1               TO  WRK-RENNUM
+                   IF      WRK-RENNUM      >   1
+                       ADD     1           TO  WRK-JYURRK-DOUJI-RENNUM
+                   END-IF
+                   MOVE    JYURRK-DOUJI-RENNUM TO  WRK-DOUJI-RENNUM-KEY
+               END-IF
+      *
+               IF      JYURRK-RENNUM       =   WRK-JYURRK-RENNUM
+                  AND  JYURRK-DOUJI-RENNUM =   WRK-JYURRK-DOUJI-RENNUM
+                   CONTINUE
+               ELSE
+      *
+                   MOVE    JYURRK-REC          TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MCPDATA-REC
+      *
+                   IF      JYURRK-RENNUM   NOT =   WRK-JYURRK-RENNUM
+                       MOVE    1               TO  FLG-RENNUM
+                   ELSE
+                       MOVE    ZERO            TO  FLG-RENNUM
+                   END-IF
+      *
+                   MOVE    WRK-JYURRK-RENNUM   TO  JYURRK-RENNUM
+                   MOVE    WRK-JYURRK-DOUJI-RENNUM
+                                               TO  JYURRK-DOUJI-RENNUM
+      *
+                   MOVE    SMCNDATE-YMD        TO  JYURRK-CREYMD
+                   MOVE    SMCNDATE-YMD        TO  JYURRK-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  JYURRK-UPHMS
+      *
+                   MOVE    JYURRK-REC          TO  MCPDATA-REC
+                   MOVE    "DBINSERT"          TO  MCP-FUNC
+                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                   IF      MCP-RC          NOT =   ZERO
+                       DISPLAY "K03 JYURRK INS ERR:" JYURRK-KEY
+                           ",MCP-RC:" MCP-RC
+                       MOVE    "0005"          TO  SPA-ERRCD
+                   END-IF
+      *            診療会計修正
+                   IF      FLG-RENNUM          =   1
+                       PERFORM 4500115-TEISEI-SRYACTUPD-SEC
+                   END-IF
+               END-IF
+      *
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key9"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-NEXT-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       4500115-TEISEI-RENNUM-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療会計修正処理
+      *****************************************************************
+       4500115-TEISEI-SRYACTUPD-SEC          SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX         >   15  )  OR
+                              (JYURRK-ZAINUM (IDX) =   ZERO)
+                           OR (SPA-ERRCD       NOT =   SPACE )
+      *
+               INITIALIZE                      SRYACCT-REC
+               MOVE    JYURRK-HOSPID       TO  ACCT-HOSPID
+               MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+               MOVE    JYURRK-PTID         TO  ACCT-PTID
+               MOVE    JYURRK-SRYKA        TO  ACCT-SRYKA
+               MOVE    JYURRK-SRYYMD(1:6)  TO  ACCT-SRYYM
+               MOVE    JYURRK-ZAINUM (IDX) TO  ACCT-ZAINUM
+      *
+               MOVE    SRYACCT-REC         TO  MCPDATA-REC
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key5"              TO  MCP-PATHNAME
+                   PERFORM 930-SRYACCT-NEXT-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-SRYACCT
+               END-IF
+               PERFORM
+                   UNTIL   (FLG-SRYACCT        =   1    )
+                       OR  (SPA-ERRCD      NOT =   SPACE)
+      *
+                   MOVE    JYURRK-SRYYMD(7:2)      TO  IDX-2
+                   EVALUATE    JYURRK-RENNUM
+                       WHEN    1
+                           MOVE    2               TO  IDX-1
+                       WHEN    2
+                           MOVE    3               TO  IDX-1
+                       WHEN    OTHER
+                           MOVE    4               TO  IDX-1
+                   END-EVALUATE
+                       EVALUATE    WRK-RENNUM-KEY
+                           WHEN    1
+                               MOVE    2               TO  IDX-3
+                           WHEN    2
+                               MOVE    3               TO  IDX-3
+                           WHEN    OTHER
+                               MOVE    4               TO  IDX-3
+                       END-EVALUATE
+      *                剤回数　変更
+                       ADD     ACCT-DAY (IDX-3 IDX-2)
+                                              TO  ACCT-DAY (IDX-1 IDX-2)
+                       MOVE    ZERO           TO  ACCT-DAY (IDX-3 IDX-2)
+      *
+      *
+                       MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
+                       MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+      *
+                       MOVE    SRYACCT-REC         TO  MCPDATA-REC
+                       MOVE    "DBUPDATE"          TO  MCP-FUNC
+                       MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                       MOVE    "key"               TO  MCP-PATHNAME
+                       CALL    "MONFUNC"           USING
+                                                   MCPAREA
+                                                   MCPDATA-REC
+      *
+                       IF      MCP-RC          NOT =   ZERO
+                            DISPLAY "K03 SRYACCT UPD ERR:" MCP-RC
+                             ",KEY:"  ACCT-KEY
+                            MOVE    "0005"          TO  SPA-ERRCD
+                       END-IF
+      *
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key5"              TO  MCP-PATHNAME
+                   PERFORM 930-SRYACCT-NEXT-SEC
+               END-PERFORM
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+           END-PERFORM
+      *
+           .
+       4500115-TEISEI-SRYACTUPD-EXT.
+           EXIT.
       *****************************************************************
       *    算定用の診療コードへ変更処理
       *****************************************************************
