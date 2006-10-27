@@ -32,7 +32,7 @@
       *                                      統計ファイルをひとつにまとめる
       *  00.00.02    NACL-森脇     05/10/26  特別療養費追加
       *                                      MONFUNCに変更
-      *  03.03.01    NACL-森脇     06/10/16  老人三割対応
+      *  03.03.01    NACL-森脇     06/10/20  老人３割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -68,12 +68,12 @@
       *        SRYYMFLG    診療月フラグ
       *        HKNKBN      保険区分    1:医保、2:老人、3:公費
       *        SYUBETUKBN  種別区分
-      *                    社保  医保  01:老人９割、02:老人８割、03:老人７割、04:本人、05:家族、06:３歳
-      *                          老人  01:老人９割、02:老人８割、03:老人７割
-      *                          公費  01:公費と公費の併用、02:公費単独
-      *                    国保  一般  01:老人９割、02:老人８割、03:老人７割、04:被保険者、05:３歳、
-      *                          退職  06:退職本人、07:老人９割、08:老人８割、09:老人７割、10:被扶養者、11:３歳
-      *                          老人  01:老人９割、02:老人８割、03:老人７割
+      *                    社保  医保  1:老人９割、2:老人８割、3:本人、4:家族、5:３歳
+      *                          老人  1:老人９割、2:老人８割
+      *                          公費  1:公費と公費の併用、2:公費単独
+      *                    国保  一般  1:老人９割、2:老人８割、3:被保険者、4:３歳、
+      *                          退職  5:退職本人、6:老人９割、7:老人８割、8:被扶養者、9:三歳
+      *                          老人  1:老人９割、2:老人８割
       *        KBN         詳細区分
       *                    社保  医保  001:公費併用合計、002:政、003:船、004:日、005:日特、
       *                                006:共、007:組、008:自、009:退
@@ -93,7 +93,7 @@
                05  TOKEI-ZAIKBN        PIC X(01).
                05  TOKEI-SRYYMFLG      PIC 9(03).
                05  TOKEI-HKNKBN        PIC X(01).
-               05  TOKEI-SYUBETUKBN    PIC X(02).
+               05  TOKEI-SYUBETUKBN    PIC X(01).
                05  TOKEI-KBN           PIC X(03).
                05  TOKEI-JYUNBAN       PIC X(131).
            03  TOKEI-SRYYM             PIC X(06).
@@ -154,14 +154,15 @@
       *        NYUGAIKBN   入外区分    O:全部、1:入院分、2:外来分
       *        ZAIKBN      在総診区分  0:全部、1:その他のレセ、2:在総診または在医総を算定したレセ
       *        SYUBETUKBN  種別区分
-      *                    社保  医保  01:老人９割、02:老人８割、03:老人７割、04:本人、05:家族、06:３歳
-      *                          老人  07:老人９割、08:老人８割、09:老人７割
-      *                          公費  10:公費と公費の併用、11:公費単独
-      *                    国保  一般  12:老人９割、13:老人８割、14:老人７割、15:被保険者、16:３歳
-      *                          退職  17:本人、18:老人９割、19:老人８割、20:老人７割、21:被扶養者、22:３歳
-      *                          老人  23:老人９割、24:老人８割、25:老人７割
+      *                    社保  医保  1:老人９割、2:老人８割、3:保本人、4:家族、5:三歳
+      *                          老人  6:老人９割、7:老人８割
+      *                          公費  8:公費と公費の併用、9:公費単独
+      *                    国保  一般 10:老人９割、11:老人８割、12:被保険者、13:３歳
+      *                          退職 14:本人、15:老人９割、16:老人８割、17:被扶養者、18:三歳
+      *                          老人 19:老人９割、20:老人８割
       *        KBN         詳細区分
-      *                    社保  医保  1:公費併用合計、2:政、3:船、4:日、5:日特、6:共、7:組、8:自、9:退
+      *                    社保  医保  1:公費併用合計、2:政、3:船、4:日、5:日特、
+      *                                6:共、7:組、8:自、9:退
       *                          老人  1:公費併用合計、2:単独合計
       *        JYUNBAN     出力順      0:患者カナ氏名順、1:患者番号順、2:点数順
       *-------------------------------------------------------------------------------
@@ -207,7 +208,7 @@
                05  WRK-ZAIKBN          PIC X(01).
                05  WRK-SRYYMFLG        PIC 9(03).
                05  WRK-HKNKBN          PIC X(01).
-               05  WRK-SYUBETUKBN      PIC X(02).
+               05  WRK-SYUBETUKBN      PIC X(01).
                05  WRK-KBN             PIC X(03).
                05  WRK-SRYYM           PIC X(06).
                05  WRK-RENNUM          PIC 9(01).
@@ -487,11 +488,11 @@
       *    提出先判定
            EVALUATE    WRK-PARA-SYUBETUKBN
       *        社保をセット
-               WHEN    "01"    THRU    "11"
+               WHEN    "01"    THRU    "09"
                    MOVE    "1"         TO  WRK-PARA-TEISYUTU
       *----(00.00.02)--UPD-START---
       *        国保をセット
-      *         WHEN    "12"    THRU    "25"
+      *         WHEN    "10"    THRU    "20"
       *             MOVE    "2"         TO  WRK-PARA-TEISYUTU
       *----(00.00.02)--UPD-END-----
            END-EVALUATE
@@ -648,14 +649,14 @@
                OR     ( RECE10-HOJOKBN     =   SPACE ))
       *        三歳以下の時
                IF      RECE10-AGE      <   3
-                   MOVE    "06"            TO  WRK-SYUBETUKBN
+                   MOVE    "5"             TO  WRK-SYUBETUKBN
                ELSE
       *            本人の時
                    IF      RECE10-HONKZKKBN        =   "1"
-                       MOVE    "04"            TO  WRK-SYUBETUKBN
+                       MOVE    "3"             TO  WRK-SYUBETUKBN
                    ELSE
       *            家族の時
-                       MOVE    "05"            TO  WRK-SYUBETUKBN
+                       MOVE    "4"             TO  WRK-SYUBETUKBN
                    END-IF
                END-IF
            ELSE
@@ -666,14 +667,14 @@
                    OR     ( RECE10-HOJOKBN =   SPACE ))
       *            三歳以下の時
                    IF      RECE10-AGE      <   3
-                       MOVE    "06"            TO  WRK-SYUBETUKBN
+                       MOVE    "5"             TO  WRK-SYUBETUKBN
                    ELSE
       *                本人の時
                        IF      RECE10-HONKZKKBN        =   "1"
-                           MOVE    "04"            TO  WRK-SYUBETUKBN
+                           MOVE    "3"             TO  WRK-SYUBETUKBN
                        ELSE
       *                家族の時
-                           MOVE    "05"            TO  WRK-SYUBETUKBN
+                           MOVE    "4"             TO  WRK-SYUBETUKBN
                        END-IF
                    END-IF
                ELSE
@@ -685,61 +686,58 @@
                                WHEN    "A"
                                WHEN    "B"
                                WHEN    "C"
-                                   MOVE    "01"    TO  WRK-SYUBETUKBN
+                                   MOVE    "1"     TO  WRK-SYUBETUKBN
                                WHEN    "8"
                                WHEN    "D"
                                WHEN    "E"
                                WHEN    "F"
-                                   MOVE    "02"    TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-START---
                                WHEN    "7"
                                WHEN    "G"
                                WHEN    "H"
                                WHEN    "I"
-                                   MOVE    "03"    TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-END-----
+                                   MOVE    "2"     TO  WRK-SYUBETUKBN
                            END-EVALUATE
                        ELSE
       *                共済組合の補助区分が前期高齢者の時
                            IF        ( RECE10-HKNNUM   >=  "031" )
                                AND   ( RECE10-HKNNUM   <=  "034" )
                                EVALUATE    RECE10-HOJOKBN
-                               WHEN    "9"
-                               WHEN    "B"
-                                   MOVE    "01"    TO  WRK-SYUBETUKBN
-                               WHEN    "8"
-                               WHEN    "E"
-                                   MOVE    "02"    TO  WRK-SYUBETUKBN
+                                   WHEN    "9"
+                                   WHEN    "B"
+                                       MOVE    "1" TO  WRK-SYUBETUKBN
+                                   WHEN    "8"
+                                   WHEN    "E"
       *----(03.03.01)--ADD-START---
-                               WHEN    "7"
-                               WHEN    "H"
-                                   MOVE    "03"    TO  WRK-SYUBETUKBN
+                                   WHEN    "7"
+                                   WHEN    "H"
       *----(03.03.01)--ADD-END-----
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
                                END-EVALUATE
                            ELSE
                                EVALUATE    RECE10-KYURATE
-                               WHEN    9
-                                   MOVE    "01"    TO  WRK-SYUBETUKBN
-                               WHEN    8
-                                   MOVE    "02"    TO  WRK-SYUBETUKBN
+                                   WHEN    9
+                                       MOVE    "1" TO  WRK-SYUBETUKBN
+                                   WHEN    8
       *----(03.03.01)--ADD-START---
-                               WHEN    7
-                                   MOVE    "03"    TO  WRK-SYUBETUKBN
+                                   WHEN    7
       *----(03.03.01)--ADD-END-----
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
                                END-EVALUATE
                            END-IF
                        END-IF
                    ELSE
       *                三歳以下の時
                        IF      RECE10-AGE      <   3
-                           MOVE    "06"            TO  WRK-SYUBETUKBN
+                           MOVE    "5"             TO  WRK-SYUBETUKBN
                        ELSE
       *                    本人の時
                            IF      RECE10-HONKZKKBN    =   "1"
-                               MOVE    "04"        TO  WRK-SYUBETUKBN
+                               MOVE    "3"         TO  WRK-SYUBETUKBN
                            ELSE
       *                    家族の時
-                               MOVE    "05"        TO  WRK-SYUBETUKBN
+                               MOVE    "4"         TO  WRK-SYUBETUKBN
                            END-IF
                        END-IF
                    END-IF
@@ -806,13 +804,12 @@
       *    レセプト種別区分分類
            EVALUATE    RECE10-KYURATE
                WHEN    9
-                   MOVE    "01"            TO  WRK-SYUBETUKBN
+                   MOVE    "1"             TO  WRK-SYUBETUKBN
                WHEN    8
-                   MOVE    "02"            TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-START---
                WHEN    7
-                   MOVE    "03"            TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-END-----
+                   MOVE    "2"             TO  WRK-SYUBETUKBN
            END-EVALUATE
       *
       *    詳細区分分類
@@ -858,10 +855,10 @@
            ELSE
                IF      RECE10-KOHNUM(2)    NOT =   SPACE
       *            公費と公費の併用欄
-                   MOVE    "01"            TO  WRK-SYUBETUKBN
+                   MOVE    "1"             TO  WRK-SYUBETUKBN
                ELSE
       *            公費単独欄
-                   MOVE    "02"            TO  WRK-SYUBETUKBN
+                   MOVE    "2"             TO  WRK-SYUBETUKBN
                END-IF
            END-IF
       *
@@ -910,19 +907,18 @@
                    IF      RECE10-AGE          >=  70
                        EVALUATE    RECE10-KYURATE
                            WHEN    9
-                               MOVE    "01"        TO  WRK-SYUBETUKBN
+                               MOVE    "1"         TO  WRK-SYUBETUKBN
                            WHEN    8
-                               MOVE    "02"        TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-START---
                            WHEN    7
-                               MOVE    "03"        TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-END-----
+                               MOVE    "2"         TO  WRK-SYUBETUKBN
                        END-EVALUATE
                    ELSE
                        IF      RECE10-AGE      <   3
-                           MOVE    "05"            TO  WRK-SYUBETUKBN
+                           MOVE    "4"         TO  WRK-SYUBETUKBN
                        ELSE
-                           MOVE    "04"            TO  WRK-SYUBETUKBN
+                           MOVE    "3"         TO  WRK-SYUBETUKBN
                        END-IF
                    END-IF
                WHEN    "067"
@@ -930,22 +926,21 @@
                    IF      RECE10-AGE          >=  70
                        EVALUATE    RECE10-KYURATE
                            WHEN    9
-                               MOVE    "07"        TO  WRK-SYUBETUKBN
+                               MOVE    "6"         TO  WRK-SYUBETUKBN
                            WHEN    8
-                               MOVE    "08"        TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-START---
                            WHEN    7
-                               MOVE    "09"        TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-END-----
+                               MOVE    "7"         TO  WRK-SYUBETUKBN
                        END-EVALUATE
                    ELSE
                        IF      RECE10-AGE      <   3
-                           MOVE    "11"            TO  WRK-SYUBETUKBN
+                           MOVE    "9"         TO  WRK-SYUBETUKBN
                        ELSE
                            IF      RECE10-HONKZKKBN    =   "1"
-                               MOVE    "06"        TO  WRK-SYUBETUKBN
+                               MOVE    "5"         TO  WRK-SYUBETUKBN
                            ELSE
-                               MOVE    "10"        TO  WRK-SYUBETUKBN
+                               MOVE    "8"         TO  WRK-SYUBETUKBN
                            END-IF
                        END-IF
                    END-IF
@@ -977,13 +972,12 @@
       *    レセプト種別区分分類
            EVALUATE    RECE10-KYURATE
                WHEN    9
-                   MOVE    "01"            TO  WRK-SYUBETUKBN
+                   MOVE    "1"             TO  WRK-SYUBETUKBN
                WHEN    8
-                   MOVE    "02"            TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-START---
                WHEN    7
-                   MOVE    "03"            TO  WRK-SYUBETUKBN
       *----(03.03.01)--ADD-END-----
+                   MOVE    "2"             TO  WRK-SYUBETUKBN
            END-EVALUATE
       *
       *    保健集計処理
@@ -1012,79 +1006,56 @@
                WHEN    ANY ALSO    ANY ALSO    ANY ALSO    SPACE
                WHEN    ANY ALSO    ANY ALSO    ANY ALSO    ZERO
       *        社保医保老人９割
-               WHEN    "1" ALSO    "1" ALSO    "01" ALSO   "01"
-      *        社保医保老人８割
-               WHEN    "1" ALSO    "1" ALSO    "02" ALSO   "02"
-      *----(03.03.01)--ADD-START---
-      *        社保医保老人７割
-               WHEN    "1" ALSO    "1" ALSO    "03" ALSO   "03"
-      *----(03.03.01)--ADD-END-----
+               WHEN    "1" ALSO    "1" ALSO    "1" ALSO    "01"
+      *        社保医保老人８割・７割
+               WHEN    "1" ALSO    "1" ALSO    "2" ALSO    "02"
       *        社保医保本人
-               WHEN    "1" ALSO    "1" ALSO    "04" ALSO   "04"
+               WHEN    "1" ALSO    "1" ALSO    "3" ALSO    "03"
       *        社保医保家族
-               WHEN    "1" ALSO    "1" ALSO    "05" ALSO   "05"
+               WHEN    "1" ALSO    "1" ALSO    "4" ALSO    "04"
       *        社保医保三歳
-               WHEN    "1" ALSO    "1" ALSO    "06" ALSO   "06"
+               WHEN    "1" ALSO    "1" ALSO    "5" ALSO    "05"
       *        社保老人９割
-               WHEN    "1" ALSO    "2" ALSO    "01" ALSO   "07"
-      *        社保老人８割
-               WHEN    "1" ALSO    "2" ALSO    "02" ALSO   "08"
-      *----(03.03.01)--ADD-START---
-      *        社保老人７割
-               WHEN    "1" ALSO    "2" ALSO    "03" ALSO   "09"
-      *----(03.03.01)--ADD-END-----
+               WHEN    "1" ALSO    "2" ALSO    "1" ALSO    "06"
+      *        社保老人８割・７割
+               WHEN    "1" ALSO    "2" ALSO    "2" ALSO    "07"
       *        社保公費と公費の併用
-               WHEN    "1" ALSO    "3" ALSO    "01" ALSO   "10"
+               WHEN    "1" ALSO    "3" ALSO    "1" ALSO    "08"
       *        社保公費単独
-               WHEN    "1" ALSO    "3" ALSO    "02" ALSO   "11"
+               WHEN    "1" ALSO    "3" ALSO    "2" ALSO    "09"
       *        国保、特別療養費一般老人９割
-               WHEN    "2" ALSO    "1" ALSO    "01" ALSO   "12"
-               WHEN    "3" ALSO    "1" ALSO    "01" ALSO   "12"
-      *        国保、特別療養費一般老人８割
-               WHEN    "2" ALSO    "1" ALSO    "02" ALSO   "13"
-               WHEN    "3" ALSO    "1" ALSO    "02" ALSO   "13"
-      *----(03.03.01)--ADD-START---
-      *        国保、特別療養費一般老人７割
-               WHEN    "2" ALSO    "1" ALSO    "03" ALSO   "14"
-               WHEN    "3" ALSO    "1" ALSO    "03" ALSO   "14"
-      *----(03.03.01)--ADD-END-----
+               WHEN    "2" ALSO    "1" ALSO    "1" ALSO    "10"
+               WHEN    "3" ALSO    "1" ALSO    "1" ALSO    "10"
+      *        国保、特別療養費一般老人８割・７割
+               WHEN    "2" ALSO    "1" ALSO    "2" ALSO    "11"
+               WHEN    "3" ALSO    "1" ALSO    "2" ALSO    "11"
       *        国保、特別療養費一般被保険者
-               WHEN    "2" ALSO    "1" ALSO    "04" ALSO   "15"
-               WHEN    "3" ALSO    "1" ALSO    "04" ALSO   "15"
+               WHEN    "2" ALSO    "1" ALSO    "3" ALSO    "12"
+               WHEN    "3" ALSO    "1" ALSO    "3" ALSO    "12"
       *        国保、特別療養費一般三歳
-               WHEN    "2" ALSO    "1" ALSO    "05" ALSO   "16"
-               WHEN    "3" ALSO    "1" ALSO    "05" ALSO   "16"
+               WHEN    "2" ALSO    "1" ALSO    "4" ALSO    "13"
+               WHEN    "3" ALSO    "1" ALSO    "4" ALSO    "13"
       *        国保、特別療養費退職本人
-               WHEN    "2" ALSO    "1" ALSO    "06" ALSO   "17"
-               WHEN    "3" ALSO    "1" ALSO    "06" ALSO   "17"
+               WHEN    "2" ALSO    "1" ALSO    "5" ALSO    "14"
+               WHEN    "3" ALSO    "1" ALSO    "5" ALSO    "14"
       *        国保、特別療養費退職老人９割
-               WHEN    "2" ALSO    "1" ALSO    "07" ALSO   "18"
-               WHEN    "3" ALSO    "1" ALSO    "07" ALSO   "18"
-      *        国保、特別療養費退職老人８割
-               WHEN    "2" ALSO    "1" ALSO    "08" ALSO   "19"
-               WHEN    "3" ALSO    "1" ALSO    "08" ALSO   "19"
-      *----(03.03.01)--ADD-START---
-      *        国保、特別療養費退職老人７割
-               WHEN    "2" ALSO    "1" ALSO    "09" ALSO   "20"
-               WHEN    "3" ALSO    "1" ALSO    "09" ALSO   "20"
-      *----(03.03.01)--ADD-END-----
+               WHEN    "2" ALSO    "1" ALSO    "6" ALSO    "15"
+               WHEN    "3" ALSO    "1" ALSO    "6" ALSO    "15"
+      *        国保、特別療養費退職老人８割・７割
+               WHEN    "2" ALSO    "1" ALSO    "7" ALSO    "16"
+               WHEN    "3" ALSO    "1" ALSO    "7" ALSO    "16"
       *        国保、特別療養費退職被扶養者
-               WHEN    "2" ALSO    "1" ALSO    "10" ALSO   "21"
-               WHEN    "3" ALSO    "1" ALSO    "10" ALSO   "21"
+               WHEN    "2" ALSO    "1" ALSO    "8" ALSO    "17"
+               WHEN    "3" ALSO    "1" ALSO    "8" ALSO    "17"
       *        国保、特別療養費退職三歳
-               WHEN    "2" ALSO    "1" ALSO    "11" ALSO   "22"
-               WHEN    "3" ALSO    "1" ALSO    "11" ALSO   "22"
+               WHEN    "2" ALSO    "1" ALSO    "9" ALSO    "18"
+               WHEN    "3" ALSO    "1" ALSO    "9" ALSO    "18"
       *        国保、特別療養費老人９割
-               WHEN    "2" ALSO    "2" ALSO    "01" ALSO   "23"
-               WHEN    "3" ALSO    "2" ALSO    "01" ALSO   "23"
-      *        国保、特別療養費老人８割
-               WHEN    "2" ALSO    "2" ALSO    "02" ALSO   "24"
-               WHEN    "3" ALSO    "2" ALSO    "02" ALSO   "24"
-      *----(03.03.01)--ADD-START---
-      *        国保、特別療養費老人７割
-               WHEN    "2" ALSO    "2" ALSO    "03" ALSO   "25"
-               WHEN    "3" ALSO    "2" ALSO    "03" ALSO   "25"
-      *----(03.03.01)--ADD-END-----
+               WHEN    "2" ALSO    "2" ALSO    "1" ALSO    "19"
+               WHEN    "3" ALSO    "2" ALSO    "1" ALSO    "19"
+      *        国保、特別療養費老人８割・７割
+               WHEN    "2" ALSO    "2" ALSO    "2" ALSO    "20"
+               WHEN    "3" ALSO    "2" ALSO    "2" ALSO    "20"
                    CONTINUE
       *        指定したレセ種別が正しくない場合は処理抜ける
                WHEN    OTHER
@@ -1682,107 +1653,117 @@
       *----(00.00.02)--UPD-START---
            EVALUATE    TOKEI-TEISYUTU      ALSO    TOKEI-HKNKBN
                ALSO    TOKEI-SYUBETUKBN    ALSO    TOKEI-KBN
-               WHEN    "1" ALSO    "1" ALSO    "01" ALSO   "001"
+               WHEN    "1" ALSO    "1" ALSO    "1" ALSO    "001"
                    MOVE    "＊医保（７０歳以上９割）と公費の併用"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "01" ALSO   ANY
+               WHEN    "1" ALSO    "1" ALSO    "1" ALSO    ANY
                    MOVE    "＊医保単独（７０歳以上９割）"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "02" ALSO   "001"
-                   MOVE    "＊医保（７０歳以上８割）と公費の併用"
+               WHEN    "1" ALSO    "1" ALSO    "2" ALSO    "001"
+      *----(03.03.01)--UPD-START---
+                   IF      TOKEI-SRYYM     <     "200610"
+                       MOVE    "＊医保（７０歳以上８割）と公費の併用"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "02" ALSO   ANY
-                   MOVE    "＊医保単独（７０歳以上８割）"
+                   ELSE
+                       MOVE    "＊医保（７０歳以上７割）と公費の併用"
                                                    TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-START---
-               WHEN    "1" ALSO    "1" ALSO    "03" ALSO   "001"
-                   MOVE    "＊医保（７０歳以上７割）と公費の併用"
+                   END-IF
+      *----(03.03.01)--UPD-END-----
+               WHEN    "1" ALSO    "1" ALSO    "2" ALSO    ANY
+      *----(03.03.01)--UPD-START---
+                   IF      TOKEI-SRYYM     <     "200610"
+                       MOVE    "＊医保単独（７０歳以上８割）"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "03" ALSO   ANY
-                   MOVE    "＊医保単独（７０歳以上７割）"
+                   ELSE
+                       MOVE    "＊医保単独（７０歳以上７割）"
                                                    TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-END-----
-               WHEN    "1" ALSO    "1" ALSO    "04" ALSO   "001"
+                   END-IF
+      *----(03.03.01)--UPD-END-----
+               WHEN    "1" ALSO    "1" ALSO    "3" ALSO    "001"
                    MOVE    "＊医保（本人）と公費の併用"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "04" ALSO   ANY
+               WHEN    "1" ALSO    "1" ALSO    "3" ALSO    ANY
                    MOVE    "＊医保単独（本人）"    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "05" ALSO   "001"
+               WHEN    "1" ALSO    "1" ALSO    "4" ALSO    "001"
                    MOVE    "＊医保（家族）と公費の併用"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "05" ALSO   ANY
+               WHEN    "1" ALSO    "1" ALSO    "4" ALSO    ANY
                    MOVE    "＊医保単独（家族）"    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "06" ALSO   "001"
+               WHEN    "1" ALSO    "1" ALSO    "5" ALSO    "001"
                    MOVE    "＊医保（３歳）と公費の併用"
                                                    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "1" ALSO    "06" ALSO   ANY
+               WHEN    "1" ALSO    "1" ALSO    "5" ALSO    ANY
                    MOVE    "＊医保単独（３歳）"    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "2" ALSO    "01" ALSO   ANY
+               WHEN    "1" ALSO    "2" ALSO    "1" ALSO    ANY
                    MOVE    "＊老人９割"            TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "2" ALSO    "02" ALSO   ANY
-                   MOVE    "＊老人８割"            TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-START---
-               WHEN    "1" ALSO    "2" ALSO    "03" ALSO   ANY
-                   MOVE    "＊老人７割"            TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-END-----
-               WHEN    "1" ALSO    "3" ALSO    "01" ALSO   ANY
+               WHEN    "1" ALSO    "2" ALSO    "2" ALSO    ANY
+      *----(03.03.01)--UPD-START---
+                   IF      TOKEI-SRYYM     <     "200610"
+                       MOVE    "＊老人８割"        TO  WRK-PRT-LINE
+                   ELSE
+                       MOVE    "＊老人７割"        TO  WRK-PRT-LINE
+                   END-IF
+      *----(03.03.01)--UPD-END-----
+               WHEN    "1" ALSO    "3" ALSO    "1" ALSO    ANY
                    MOVE    "＊公費と公費の併用"    TO  WRK-PRT-LINE
-               WHEN    "1" ALSO    "3" ALSO    "02" ALSO   ANY
+               WHEN    "1" ALSO    "3" ALSO    "2" ALSO    ANY
                    MOVE    "＊公費単独"            TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "01" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "01" ALSO   ANY
+               WHEN    "2" ALSO    "1" ALSO    "1" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "1" ALSO    ANY
                    MOVE    "＊一般（７０歳以上９割）"
                                                    TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "02" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "02" ALSO   ANY
-                   MOVE    "＊一般（７０歳以上８割）"
+               WHEN    "2" ALSO    "1" ALSO    "2" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "2" ALSO    ANY
+      *----(03.03.01)--UPD-START---
+                   IF      TOKEI-SRYYM     <     "200610"
+                       MOVE    "＊一般（７０歳以上８割）"
                                                    TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-START---
-               WHEN    "2" ALSO    "1" ALSO    "03" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "03" ALSO   ANY
-                   MOVE    "＊一般（７０歳以上７割）"
+                   ELSE
+                       MOVE    "＊一般（７０歳以上７割）"
                                                    TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-END-----
-               WHEN    "2" ALSO    "1" ALSO    "04" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "04" ALSO   ANY
+                   END-IF
+               WHEN    "2" ALSO    "1" ALSO    "3" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "3" ALSO    ANY
                    MOVE    "＊一般被保険者"        TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "05" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "05" ALSO   ANY
+               WHEN    "2" ALSO    "1" ALSO    "4" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "4" ALSO    ANY
                    MOVE    "＊一般（３歳未満）"    TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "06" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "06" ALSO   ANY
+               WHEN    "2" ALSO    "1" ALSO    "5" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "5" ALSO    ANY
                    MOVE    "＊退職（本人）"        TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "07" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "07" ALSO   ANY
+               WHEN    "2" ALSO    "1" ALSO    "6" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "6" ALSO    ANY
                    MOVE    "＊退職（７０歳以上９割）"
                                                    TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "08" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "08" ALSO   ANY
-                   MOVE    "＊退職（７０歳以上８割）"
+               WHEN    "2" ALSO    "1" ALSO    "7" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "7" ALSO    ANY
+      *----(03.03.01)--UPD-START---
+                   IF      TOKEI-SRYYM     <     "200610"
+                       MOVE    "＊退職（７０歳以上８割）"
                                                    TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-START---
-               WHEN    "2" ALSO    "1" ALSO    "09" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "09" ALSO   ANY
-                   MOVE    "＊退職（７０歳以上７割）"
+                   ELSE
+                       MOVE    "＊退職（７０歳以上７割）"
                                                    TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-END-----
-               WHEN    "2" ALSO    "1" ALSO    "10" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "10" ALSO   ANY
+                   END-IF
+      *----(03.03.01)--UPD-END-----
+               WHEN    "2" ALSO    "1" ALSO    "8" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "8" ALSO    ANY
                    MOVE    "＊退職（被扶養者）"    TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "1" ALSO    "11" ALSO   ANY
-               WHEN    "3" ALSO    "1" ALSO    "11" ALSO   ANY
+               WHEN    "2" ALSO    "1" ALSO    "9" ALSO    ANY
+               WHEN    "3" ALSO    "1" ALSO    "9" ALSO    ANY
                    MOVE    "＊退職（３歳未満）"    TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "2" ALSO    "01" ALSO   ANY
-               WHEN    "3" ALSO    "2" ALSO    "01" ALSO   ANY
+               WHEN    "2" ALSO    "2" ALSO    "1" ALSO    ANY
+               WHEN    "3" ALSO    "2" ALSO    "1" ALSO    ANY
                    MOVE    "＊老人９割"            TO  WRK-PRT-LINE
-               WHEN    "2" ALSO    "2" ALSO    "02" ALSO   ANY
-               WHEN    "3" ALSO    "2" ALSO    "02" ALSO   ANY
-                   MOVE    "＊老人８割"            TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-START---
-               WHEN    "2" ALSO    "2" ALSO    "03" ALSO   ANY
-               WHEN    "3" ALSO    "2" ALSO    "03" ALSO   ANY
-                   MOVE    "＊老人７割"            TO  WRK-PRT-LINE
-      *----(03.03.01)--ADD-END-----
+               WHEN    "2" ALSO    "2" ALSO    "2" ALSO    ANY
+               WHEN    "3" ALSO    "2" ALSO    "2" ALSO    ANY
+      *----(03.03.01)--UPD-START---
+                   IF      TOKEI-SRYYM     <     "200610"
+                       MOVE    "＊老人８割"        TO  WRK-PRT-LINE
+                   ELSE
+                       MOVE    "＊老人７割"        TO  WRK-PRT-LINE
+                   END-IF
+      *----(03.03.01)--UPD-END-----
                WHEN    OTHER
                    GO  TO  3201-SYUBETU-BODY-HEN-EXT
            END-EVALUATE
