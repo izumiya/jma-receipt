@@ -1252,7 +1252,7 @@
                                                 "60" OR  "70" OR
                                                 "80" OR  "14" OR
                                                 "21" OR  "22" OR
-                                                "23"          )
+                                                "23" OR  "13" )
                        MOVE    SPA-COM-SRYKBN(IDX - 1)
                                                TO  SPA-COM-SRYKBN(IDX)
                        MOVE    SPACE           TO  SPA-COM-ZAIEND
