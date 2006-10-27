@@ -535,7 +535,7 @@
               MOVE    "*"                  TO    SYS-4001-KBNCD
               MOVE    WRK-PARA-SRYYM       TO    SYS-4001-STYUKYMD (1:6)
               MOVE    "01"                 TO    SYS-4001-STYUKYMD (7:2)
-              MOVE    SYS-1009-STYUKYMD    TO    SYS-4001-EDYUKYMD  
+              MOVE    SYS-4001-STYUKYMD    TO    SYS-4001-EDYUKYMD  
               MOVE    SYS-4001-REC         TO    MCPDATA-REC
               PERFORM 800-SYSKANRI-READ-SEC
               IF      FLG-SYSKANRI        =   ZERO
@@ -2278,6 +2278,7 @@
                                            MCPDATA-REC
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO                TO  FLG-SYSKANRI
+                   MOVE    MCPDATA-REC         TO  SYSKANRI-REC
                ELSE
                    MOVE    1                   TO  FLG-SYSKANRI
                END-IF
