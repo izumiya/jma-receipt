@@ -38,6 +38,8 @@
       *  03.03.03    NACL-藤原    06/10/25  ２００６年１０月改正対応
       *                                     福岡地方公費の障害
       *  03.03.04    NACL-藤原    06/10/26  福岡地方公費のレセ記載判定の修正
+      *  03.03.05    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
+      *                                     い場合記載の対象としない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -899,7 +901,7 @@
                    END-IF
                ELSE
                    MOVE    1                      TO  IDX1
-                   IF   COMB-KOHHKNNUM (IDX)  =  "972" OR "974"
+                   IF   COMB-KOHHKNNUM (IDX)  =  "972" OR "974" OR "012"
       *                長期高額療養レセ記載判定
                        MOVE    ZERO        TO  FLG-KOHRECEDSP
                        INITIALIZE              ORCSFTNJGNCHKAREA

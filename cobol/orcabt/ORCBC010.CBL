@@ -29,6 +29,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.03.01    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
+      *                                     い場合記載の対象としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2509,6 +2511,33 @@
                ELSE
       *            全国公費のとき（長期）
                    IF      HKN-HKNKOHSBTKBN    =   "2" 
+                       GO  TO  200121-KOHID-HENSYU-EXT
+                   END-IF
+      *            全国公費のとき（生保）
+                   IF   COMB-KOHHKNNUM (IDX)   =   "012"
+      *                レセ記載判定
+                       INITIALIZE          ORCSFTNJGNCHKAREA
+                       MOVE    COMB-HOSPID TO  LNK-FTNJGNCHK-HOSPID
+                       MOVE    COMB-PTID   TO  LNK-FTNJGNCHK-PTID
+                       MOVE    WRK-PARA-NYUGAIKBN
+                                           TO  LNK-FTNJGNCHK-NYUGAIKBN
+      *                診療年月
+                       MOVE    WRK-PARA-SRYYM
+                                           TO  LNK-FTNJGNCHK-SRYYM
+      *                公費番号
+                       MOVE    COMB-KOHHKNNUM (IDX)
+                                           TO  LNK-FTNJGNCHK-KOHNUM
+      *                公費ＩＤ
+                       MOVE    COMB-KOHID (IDX)
+                                           TO  LNK-FTNJGNCHK-KOHID
+      *
+                       CALL    "ORCSFTNJGNCHK" USING
+                                               ORCSFTNJGNCHKAREA
+                       IF     LNK-FTNJGNCHK-RC =   1
+                           MOVE    "2"     TO  COLDAT01-TRECESKYKBN(IDY)
+                       ELSE
+                           MOVE    "1"     TO  COLDAT01-TRECESKYKBN(IDY)
+                       END-IF
                        GO  TO  200121-KOHID-HENSYU-EXT
                    END-IF
       *            全国公費のとき（老人原爆）
