@@ -4480,12 +4480,12 @@
         <point val="2.3,23.15"/>
       </attribute>
       <attribute name="obj_bb">
-        <rectangle val="2.3,22.9311;4.2796,23.2111"/>
+        <rectangle val="2.3,22.9311;4.5624,23.2111"/>
       </attribute>
       <attribute name="text">
         <composite type="text">
           <attribute name="string">
-            <string>#&#163;&#178;&#163;&#177;&#161;&#202;&#192;&#186;&#163;&#179;&#163;&#178;&#161;&#203;#</string>
+            <string>#&#163;&#178;&#163;&#177;&#161;&#202;&#192;&#186;&#191;&#192;&#196;&#204;&#177;&#161;&#161;&#203;#</string>
           </attribute>
           <attribute name="font">
             <font name="Courier"/>
