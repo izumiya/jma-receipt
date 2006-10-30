@@ -68,6 +68,7 @@
        01  WRK-AREA.
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
+           03  WRK-SEIKYU         PIC 9(10).
            03  WRK-PREFNUM        PIC 9(02).
       *
            03  WRK-TEISYOTOKU-YMD.
@@ -218,7 +219,8 @@
       *
            IF   FLG-HKNNUM     =    ZERO
              IF   (HKN-RECEJGNDSPKBN    =   "1"           )
-             OR   (HKN-HKNNUM           =   "972" OR "974")
+             OR   (HKN-HKNNUM           =   "972" OR "974"
+                                                  OR "012")
              OR   (WRK-RECEJGNDSPKBN    =   "1"           )
       *        ´µ¼Ô¸øÈñÉéÃ´¥Þ¥¹¥¿¤«¤éÉéÃ´¾å¸Â³Û¤Î¼èÆÀ
                PERFORM    210-PTKOHFTN-GET-SEC
@@ -405,7 +407,7 @@
       *
            IF ((WRK-PREFNUM                  =  13            )  AND
                (LNK-FTNJGNCHK-KOHNUM         = "151" OR "451" )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200310")           )
+               (LNK-FTNJGNCHK-SRYYM         >= "200310"))
       *
            OR ((WRK-PREFNUM                  =  28     )  AND
                (LNK-FTNJGNCHK-KOHNUM         = "186"   )  AND
@@ -591,6 +593,7 @@
                IF   FLG-SYUNOU             =   ZERO
       *            ´µ¼ÔÉéÃ´¶â¤Î½¸·×
                    MOVE      ZERO          TO      WRK-KOHFTN
+                   MOVE      ZERO          TO      WRK-SEIKYU
                    PERFORM   UNTIL    FLG-SYUNOU  =   1
                        MOVE     ZERO       TO      FLG-ARI
                        PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -613,6 +616,7 @@
                                    ADD    SYU-KOH-HKNFTNMONEY(4)
                                                        TO   WRK-KOHFTN
                              END-EVALUATE
+                             ADD    SYU-TOTAL-HKNTEN   TO   WRK-SEIKYU
                           END-IF
                        END-PERFORM
                        IF      LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
@@ -622,8 +626,14 @@
                        END-IF
                        PERFORM  910-SYUNOU-READ-SEC
                    END-PERFORM
-                   IF   WRK-HKNMST-JGNGAK       >   WRK-KOHFTN
+                   IF   LNK-FTNJGNCHK-KOHNUM    =   "012"
+                     IF   WRK-SEIKYU            =   ZERO
                         MOVE   01               TO  LNK-FTNJGNCHK-RC
+                     END-IF
+                   ELSE
+                     IF   WRK-HKNMST-JGNGAK     >   WRK-KOHFTN
+                        MOVE   01               TO  LNK-FTNJGNCHK-RC
+                     END-IF
                    END-IF
                END-IF
            END-IF
