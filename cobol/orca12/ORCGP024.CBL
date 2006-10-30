@@ -1531,6 +1531,15 @@
                    MOVE    "外来減額（円）"     TO  SPA-GMN24-FTNMSG1
                    MOVE    "入院減額（円）"     TO  SPA-GMN24-FTNMSG2
                END-IF
+      *
+               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "079"
+                                           OR  "024"   )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=   "20061001"  )
+                   MOVE    "医療部分上限額"     TO  SPA-GMN24-FTNMSG1
+                   MOVE    "食事療養上限額"     TO  SPA-GMN24-FTNMSG2
+               END-IF
            END-IF
       *
       *    対象のデータをパラメタファイルより編集する
