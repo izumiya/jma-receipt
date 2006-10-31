@@ -36,6 +36,8 @@
       *  01.01.01    NACL-藤原    03/07/07  プレビュー機能追加
       *  01.01.02    NACL-太田    04/06/06  情報削除画面遷移追加
       *  02.07.00    NACL-竹田    05/10/24  MONFUNC 対応
+      *
+      *  03.03.01    NACL-藤原    06/10/31  総括のとき頁指定を必須とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1252,7 +1254,15 @@
                        END-IF
                    END-IF
                END-IF            
-           END-IF                                
+           END-IF           
+      *                     
+           EVALUATE    SPA-PRTKANRI-TBL-KEY
+               WHEN    "SOKATU"
+                   IF      SPA-GMN-EDPAGE      =   ZERO
+                   AND     SPA-GMN-STPAGE      =   ZERO
+                       MOVE    "0099"              TO  SPA-ERRCD
+                   END-IF
+           END-EVALUATE
       *
            IF      SPA-ERRCD       NOT =   SPACE                 
                GO  TO  450-PRINT-GID-EXT               
@@ -1808,6 +1818,9 @@
                                                TO  SPA-ERRMSG
                WHEN    "0006"
                    MOVE    "該当の帳票はありません" 
+                                               TO  SPA-ERRMSG
+               WHEN    "0099"
+                   MOVE    "頁の入力がありません" 
                                                TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "帳票管理ＤＢが削除できませんでした"
