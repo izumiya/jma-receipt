@@ -3070,7 +3070,7 @@
            MOVE    SPA-TERMID      TO  SHELLTBL-ARG1
            MOVE    SPA-HOSPID      TO  SHELLTBL-ARG2
            MOVE    SPA-PREFNUM     TO  SHELLTBL-ARG3
-           MOVE    SPA-NAI-SRYYM   TO  SHELLTBL-ARG4
+           MOVE    SPA-NAI-SKYYM   TO  SHELLTBL-ARG4
            MOVE    SPA-BEDFLG      TO  SHELLTBL-ARG5
            MOVE    WRK-CONS-JOB-JOBID-COLLECT
                                    TO  SHELLTBL-ARG6
