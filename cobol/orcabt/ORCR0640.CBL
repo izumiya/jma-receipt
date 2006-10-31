@@ -223,6 +223,8 @@
       *  03.03.05    NACL-ÌçÏÆ    06/10/10  Ï·ÎðÊ¡»ãÇ¯¶â¤Ë¤Ä¤¤¤Æ¤ÎÂÐ±þ
       *  03.03.06    NACL-ÌçÏÆ    06/10/11  Æþ±¡»þÀ¸³èÎÅÍÜÈñÂÐ±þ
       *  03.03.07    NACL-ÌçÏÆ    06/10/17  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
+      *  03.03.08    NACL-ÌçÏÆ    06/10/30  ¾ã³²»ù»ÜÀß°åÎÅ¡¦ÎÅÍÜ²ð¸î°åÎÅ
+      *                                     ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1789,8 +1791,8 @@
                            END-IF
                        ELSE
       *                    ¼«Î©»Ù±çË¡
-                           IF  RECE62-KOHNUM (IDX)  =   "021"  OR
-                                                        "015"  OR  "016"
+                           IF  RECE62-KOHNUM (IDX)  =   "021"  OR  "015"
+                                                    OR  "016"  OR  "024"
                                MOVE    "1"          TO  WRK-3SYU (3:1)
                                MOVE     IDX         TO  SESNIDX
                            END-IF
@@ -8510,7 +8512,8 @@
                         IF    (RECE62-KOUREI    NOT =    SPACE )
                         AND   (SYU-KOH-HKNNUM(IDX3 - 1)
                                                     =  "015" OR "016"
-                                                    OR "051" OR "021")
+                                                    OR "051" OR "021"
+                                                    OR "024" OR "079")
                            ADD   SYU-KOH-HKNFTNMONEY(IDX3 - 1)  TO
                                          RECE62-FTNMONEY-FTN(KH-IDX)
                         ELSE
@@ -8731,7 +8734,8 @@
                 ADD      1    TO   RECE62-KOHKENSU(KH-IDX - 1)
                 IF   (RECE62-KOUREI       NOT    =   SPACE        )
                 AND  (RECE62-KOHNUM(KH-IDX - 1)  =  "015" OR "016"
-                                                 OR "051" OR "021")
+                                                 OR "051" OR "021"
+                                                 OR "024" OR "079")
                    ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                    RECE62-FTNMONEY(KH-IDX)
                                    RECE62-FTNMONEY-KOJ(KH-IDX)
@@ -8796,6 +8800,7 @@
                     (RECE62-SRYYM         >=  "200510"      ))
                 OR ((SYU-SKJ-FTNKBN(IDX3)  =  "1" OR "2"       ) AND
                     (SYU-SKJ-FTN(IDX3) = SYU-SKJ-FTN-RECE(IDX3)))
+                OR ( SYU-SKJ-FTNKBN(IDX3)  =  "6"            )
       *         OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
                 OR ( SYU-SKJ-RYOYOHI(IDX3) =   ZERO          )
       *            IF   RECE62-SHOKUJINISSU(KH-IDX)  =  ZERO
@@ -9184,6 +9189,23 @@
                          MOVE   SPACE  TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                      END-IF
+               END-IF
+      *
+             END-PERFORM
+      *
+           END-IF
+      *
+           IF    RECE62-SRYYM        >=  "200610"
+      *
+             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                         UNTIL    KOHFTN-IDX     >    4
+      *
+               IF   RECE62-KOHNUM(KOHFTN-IDX) =  "024" OR "079"
+                     MOVE  "1"   TO
+                                 RECE62-KISAIFLG(KOHFTN-IDX + 1)
+                     MOVE  "1"   TO
+                             RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+      *
                END-IF
       *
              END-PERFORM

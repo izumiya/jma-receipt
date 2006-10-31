@@ -27,7 +27,9 @@
       ****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
-      *  01.00.01    NACL-ÌçÏÆ    05/03/20  ¼«Î©»Ù±çË¡ÂÐ±þ
+      *  01.00.01    NACL-ÌçÏÆ    06/03/20  ¼«Î©»Ù±çË¡ÂÐ±þ
+      *  01.00.02    NACL-ÌçÏÆ    06/10/30  ¾ã³²»ù»ÜÀß°åÎÅ¡¦ÎÅÍÜ²ð¸î°åÎÅ
+      *                                     ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -298,6 +300,16 @@
                   WHEN     "015"
                   WHEN     "016"
                   WHEN     "021"
+                     MOVE   LNK-ORCSJGNGET-NYUJGNGAK
+                                TO  LNK-ORCSJGNGET-TAFTNRUIKEI
+                     MOVE   LNK-ORCSJGNGET-GAIJGNGAK
+                                TO  LNK-ORCSJGNGET-NYUJGNGAK
+               END-EVALUATE
+           END-IF
+           IF     LNK-ORCSJGNGET-SRYYM   >=   "200610"
+               EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
+                  WHEN     "024"
+                  WHEN     "079"
                      MOVE   LNK-ORCSJGNGET-NYUJGNGAK
                                 TO  LNK-ORCSJGNGET-TAFTNRUIKEI
                      MOVE   LNK-ORCSJGNGET-GAIJGNGAK

@@ -274,6 +274,8 @@
       *  03.03.05    NACL-ÌçÏÆ    06/10/10  Ï·ÎðÊ¡»ãÇ¯¶â¤Ë¤Ä¤¤¤Æ¤ÎÂÐ±þ
       *  03.03.06    NACL-ÌçÏÆ    06/10/17  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       *  03.03.07    NACL-ÌçÏÆ    06/10/18  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
+      *  03.03.08    NACL-ÌçÏÆ    06/10/30  ¾ã³²»ù»ÜÀß°åÎÅ¡¦ÎÅÍÜ²ð¸î°åÎÅ
+      *                                     ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1537,8 +1539,8 @@
                            END-IF
                        ELSE
       *                    ¼«Î©»Ù±çË¡
-                           IF  RECE02-KOHNUM (IDX)  =   "021"  OR 
-                                                        "015"  OR  "016"
+                           IF  RECE02-KOHNUM (IDX)  =   "021"  OR  "015"
+                                                    OR  "016"  OR  "024"
                                MOVE    "1"          TO  WRK-3SYU (3:1)
                                MOVE     IDX         TO  SESNIDX
                            END-IF
@@ -5659,7 +5661,8 @@
               ADD      1      TO   RECE02-KOHKENSU(KH-IDX - 1)
               IF    (RECE02-ZAITAKU        NOT  =    SPACE       )
               AND   (RECE02-KOHNUM(KH-IDX - 1)  =  "015" OR "016"
-                                                OR "051" OR "021")
+                                                OR "051" OR "021"
+                                                OR "024" OR "079")
                   ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
@@ -6211,6 +6214,22 @@
                          MOVE   SPACE  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                      END-IF
+               END-IF
+      *
+             END-PERFORM
+      *
+           END-IF
+      *
+           IF    RECE02-SRYYM        >=  "200610"
+      *
+             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                         UNTIL    KOHFTN-IDX     >    4
+      *
+               IF   RECE02-KOHNUM(KOHFTN-IDX) =  "024" OR "079"
+                     MOVE  "1"  TO
+                                 RECE02-KISAIFLG(KOHFTN-IDX + 1)
+                     MOVE  "1"  TO
+                             RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
       *
              END-PERFORM
