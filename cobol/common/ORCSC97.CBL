@@ -932,6 +932,7 @@
       *    漢字変換処理
       *****************************************************************
        2010-MOJI-HENKAN-SEC    SECTION.
+      *
       *    漢字変換
            MOVE    SPACE               TO  WRK-HENKAN-ATO
            MOVE    WRK-STR             TO  IDH1
@@ -1060,7 +1061,7 @@
       *                    ６桁
                            WHEN    6
                                MOVE    "6"         TO  WRK-ICD-CDSYU
-      * 
+      *
                            WHEN    OTHER
                                MOVE    "A"         TO  WRK-ICD-CDSYU
                        END-EVALUATE
@@ -1173,7 +1174,7 @@
            MOVE    LNK-SC97-INPUTCD(IDX-D:)
                                        TO  WRK-HENKAN-MAE
            MOVE    1                   TO  WRK-STR
-           MOVE    20                  TO  WRK-END
+           MOVE    22                  TO  WRK-END
            PERFORM 2010-MOJI-HENKAN-SEC
            MOVE    WRK-HENKAN-ATO      TO  LNK-SC97-INPUTCD(IDX-D:)
       *
@@ -1185,7 +1186,6 @@
                EVALUATE    LNK-SC97-INPUTCD(IDX:1)
                    WHEN    "*"
                        MOVE    1               TO  FLG-AST
-      *TEST
                    WHEN    "@"
       *                数量の直後であること
                        IF     (FLG-SP          =   1    )  AND
@@ -1193,7 +1193,6 @@
                               (WRK-SUR     NOT =   SPACE )
                            MOVE    1               TO  FLG-AUTO
                        END-IF
-      *TEST
                    WHEN    SPACE
                        ADD     1               TO  FLG-SP
       *                空白は１つとする
@@ -1304,15 +1303,15 @@
                        MOVE    ZERO            TO  LNK-SC97-SURYOFLG
                    END-IF
                END-IF
-      *TEST
+      *
                IF      LNK-SC97-SURYO   >   ZERO
                    IF      FLG-AUTO         =   1
                        MOVE    "1"          TO  LNK-SC97-AUTOFLG2
                    END-IF
                END-IF
-      *TEST
+      *
            END-IF
-      *TEST
+      *
            END-IF
       *
       *    回数（＊があるが、回数が入力されてない時、＊削除する）
