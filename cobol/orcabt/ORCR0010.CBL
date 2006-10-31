@@ -126,6 +126,7 @@
       *  03.03.04    NACL-∆£∏∂    06/10/26   °≤¨√œ ˝∏¯»Ò§Œ•Ï•ªµ≠∫‹»ΩƒÍ§ŒΩ§¿µ
       *  03.03.05    NACL-∆£∏∂    06/10/27  •Ï•ª•◊•»§«¿∏≥Ë ›∏Ó§Œ¿¡µ·§¨§ 
       *                                     §§æÏπÁµ≠∫‹§Œ¬–æ›§»§∑§ §§
+      *  03.03.06    NACL-∆£∏∂    06/10/31  Œ≈Õ‹≤∏Ó∞ÂŒ≈£≤£¥§Œƒ…≤√
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -380,6 +381,7 @@
                05  FILLER              PIC X(03)   VALUE   "974".
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
                05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -392,17 +394,18 @@
                05  FILLER              PIC X(03)   VALUE   "021".  
                05  FILLER              PIC X(03)   VALUE   "015".  
                05  FILLER              PIC X(03)   VALUE   "016".  
+               05  FILLER              PIC X(03)   VALUE   "024".  
                05  FILLER              PIC X(03)   VALUE   "022".  
                05  FILLER              PIC X(03)   VALUE   "028".  
                05  FILLER              PIC X(03)   VALUE   "017".  
-               05                      PIC X(03)   VALUE   "079".  
+               05  FILLER              PIC X(03)   VALUE   "079".  
                05  FILLER              PIC X(03)   VALUE   "019".  
                05  FILLER              PIC X(03)   VALUE   "023".  
                05  FILLER              PIC X(03)   VALUE   "051".  
                05  FILLER              PIC X(03)   VALUE   "091".  
                05  FILLER              PIC X(03)   VALUE   "052".  
                05  FILLER              PIC X(03)   VALUE   "053".  
-               05                      PIC X(03)   VALUE   "066".  
+               05  FILLER              PIC X(03)   VALUE   "066".  
                05  FILLER              PIC X(03)   VALUE   "012".
                05  FILLER              PIC X(03)   VALUE   "972".
                05  FILLER              PIC X(03)   VALUE   "974".
@@ -410,9 +413,9 @@
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
                05  WRK-SRT-OCC         OCCURS  2.
                    07  WRK-SRT-KOHHKNNUM
-                                       PIC X(03)   OCCURS  25.
+                                       PIC X(03)   OCCURS  26.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   25.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   26.
       *
       *    ∞ÂŒ≈µ°¥ÿ° ¥À‹æ Û°À¬‡»ÚÕ—ŒŒ∞Ë
        01  TBL-SYS1001-T.

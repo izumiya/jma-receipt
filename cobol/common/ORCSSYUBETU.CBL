@@ -40,6 +40,7 @@
       *  03.03.04    NACL-Æ£¸¶    06/10/26  Ê¡²¬ÃÏÊý¸øÈñ¤Î¥ì¥»µ­ºÜÈ½Äê¤Î½¤Àµ
       *  03.03.05    NACL-Æ£¸¶    06/10/27  ¥ì¥»¥×¥È¤ÇÀ¸³èÊÝ¸î¤ÎÀÁµá¤¬¤Ê
       *                                     ¤¤¾ì¹çµ­ºÜ¤ÎÂÐ¾Ý¤È¤·¤Ê¤¤
+      *  03.03.06    NACL-Æ£¸¶    06/10/31  ÎÅÍÜ²ð¸î°åÎÅ£²£´¤ÎÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -167,35 +168,36 @@
       *
        01  WRK-SRT-AREA.
            03  WRK-SRT-TABLE.
-               05                      PIC X(03)   VALUE   "027".  
-               05                      PIC X(03)   VALUE   "013".  
-               05                      PIC X(03)   VALUE   "014".  
-               05                      PIC X(03)   VALUE   "018".  
-               05                      PIC X(03)   VALUE   "029".  
-               05                      PIC X(03)   VALUE   "010".  
-               05                      PIC X(03)   VALUE   "011".  
-               05                      PIC X(03)   VALUE   "020".  
-               05                      PIC X(03)   VALUE   "021".  
-               05                      PIC X(03)   VALUE   "022".  
-               05                      PIC X(03)   VALUE   "028".  
-               05                      PIC X(03)   VALUE   "015".  
-               05                      PIC X(03)   VALUE   "016".  
-               05                      PIC X(03)   VALUE   "017".  
-               05                      PIC X(03)   VALUE   "079".  
-               05                      PIC X(03)   VALUE   "019".  
-               05                      PIC X(03)   VALUE   "023".  
-               05                      PIC X(03)   VALUE   "051".  
-               05                      PIC X(03)   VALUE   "091".  
-               05                      PIC X(03)   VALUE   "052".  
-               05                      PIC X(03)   VALUE   "053".  
-               05                      PIC X(03)   VALUE   "066".  
-               05                      PIC X(03)   VALUE   "012".
-               05                      PIC X(03)   VALUE   "972".
-               05                      PIC X(03)   VALUE   "974".
+               05  FILLER              PIC X(03)   VALUE   "027".  
+               05  FILLER              PIC X(03)   VALUE   "013".  
+               05  FILLER              PIC X(03)   VALUE   "014".  
+               05  FILLER              PIC X(03)   VALUE   "018".  
+               05  FILLER              PIC X(03)   VALUE   "029".  
+               05  FILLER              PIC X(03)   VALUE   "010".  
+               05  FILLER              PIC X(03)   VALUE   "011".  
+               05  FILLER              PIC X(03)   VALUE   "020".  
+               05  FILLER              PIC X(03)   VALUE   "021".  
+               05  FILLER              PIC X(03)   VALUE   "015".  
+               05  FILLER              PIC X(03)   VALUE   "016".  
+               05  FILLER              PIC X(03)   VALUE   "024".  
+               05  FILLER              PIC X(03)   VALUE   "022".  
+               05  FILLER              PIC X(03)   VALUE   "028".  
+               05  FILLER              PIC X(03)   VALUE   "017".  
+               05  FILLER              PIC X(03)   VALUE   "079".  
+               05  FILLER              PIC X(03)   VALUE   "019".  
+               05  FILLER              PIC X(03)   VALUE   "023".  
+               05  FILLER              PIC X(03)   VALUE   "051".  
+               05  FILLER              PIC X(03)   VALUE   "091".  
+               05  FILLER              PIC X(03)   VALUE   "052".  
+               05  FILLER              PIC X(03)   VALUE   "053".  
+               05  FILLER              PIC X(03)   VALUE   "066".  
+               05  FILLER              PIC X(03)   VALUE   "012".
+               05  FILLER              PIC X(03)   VALUE   "972".
+               05  FILLER              PIC X(03)   VALUE   "974".
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
-               05  WRK-SRT-KOHHKNNUM   PIC X(03)   OCCURS  25.
+               05  WRK-SRT-KOHHKNNUM   PIC X(03)   OCCURS  26.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   25.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   26.
       *     
       *    ¥ï¡¼¥¯ÊÝ¸±ÁÈ¹ç¤»¡ÊÆþ±¡²ñ·×ÍÑ¡Ë 
        01  WRK-HKNCOMBI-TABLE.

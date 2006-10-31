@@ -89,6 +89,7 @@
       *  03.03.04    NACL-藤原    06/10/26  福岡地方公費のレセ記載判定の修正
       *  03.03.05    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
       *                                     い場合記載の対象としない
+      *  03.03.06    NACL-藤原    06/10/31  療養介護医療２４の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -358,6 +359,7 @@
                05                      PIC X(03)   VALUE   "974".
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
                05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -370,6 +372,7 @@
                05  FILLER              PIC X(03)   VALUE   "021".  
                05  FILLER              PIC X(03)   VALUE   "015".  
                05  FILLER              PIC X(03)   VALUE   "016".  
+               05  FILLER              PIC X(03)   VALUE   "024".  
                05  FILLER              PIC X(03)   VALUE   "022".  
                05  FILLER              PIC X(03)   VALUE   "028".  
                05  FILLER              PIC X(03)   VALUE   "017".  
@@ -388,9 +391,9 @@
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
                05  WRK-SRT-OCC         OCCURS  2.
                    07  WRK-SRT-KOHHKNNUM
-                                       PIC X(03)   OCCURS  25.
+                                       PIC X(03)   OCCURS  26.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   25.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   26.
       *     
       *    ワーク保険組合せ（入院会計用） 
        01  WRK-HKNCOMBI-TABLE.
