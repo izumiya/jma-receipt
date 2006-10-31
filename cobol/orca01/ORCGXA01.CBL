@@ -1256,13 +1256,13 @@
                END-IF            
            END-IF           
       *                     
-           EVALUATE    SPA-PRTKANRI-TBL-KEY
-               WHEN    "SOKATU"
-                   IF      SPA-GMN-EDPAGE      =   ZERO
-                   AND     SPA-GMN-STPAGE      =   ZERO
-                       MOVE    "0099"              TO  SPA-ERRCD
-                   END-IF
-           END-EVALUATE
+      **   EVALUATE    SPA-PRTKANRI-TBL-KEY
+      **       WHEN    "SOKATU"
+      **           IF      SPA-GMN-EDPAGE      =   ZERO
+      **           AND     SPA-GMN-STPAGE      =   ZERO
+      **               MOVE    "0099"              TO  SPA-ERRCD
+      **           END-IF
+      **   END-EVALUATE
       *
            IF      SPA-ERRCD       NOT =   SPACE                 
                GO  TO  450-PRINT-GID-EXT               
