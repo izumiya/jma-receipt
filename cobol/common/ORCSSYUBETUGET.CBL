@@ -554,7 +554,7 @@
                    MOVE    1418     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "1"    ALSO
                        SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
-                   MOVE    1409     TO  LNK-SYUBETUGET-RECESYUBETU
+                   MOVE    1419     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "2"    ALSO
                        SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
                    MOVE    1410     TO  LNK-SYUBETUGET-RECESYUBETU
@@ -951,7 +951,7 @@
                        SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
                WHEN    "7"   ALSO   "1"    ALSO
                        SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
-                   MOVE    1409     TO  LNK-SYUBETUGET-RECESYUBETU
+                   MOVE    1419     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "2"    ALSO
                        SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
                WHEN    "7"   ALSO   "2"    ALSO
