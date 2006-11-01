@@ -3599,6 +3599,9 @@
            IF      SPA-SYORIFLG        =   ZERO
       *        未収・返金なし
                IF    ( SPA-GMN-NYUKINKBN   =   "1"  )
+      *@@
+                OR   ((SPA-GMN-ZENMISYU    =   ZERO ) AND
+                      (SPA-GMN-CHOKAKIN    =   ZERO ))
       *            今回分のみ
                    MOVE    ZERO                TO  SPA-NYU-ZENMISYU
                    PERFORM 31050-NYUKIN-SYOKICHK-SEC
