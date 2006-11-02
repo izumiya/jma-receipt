@@ -3738,7 +3738,7 @@
                                                TO  SPA-ERRMSG
       *!
                WHEN    "2074"
-                   STRING  "961 減免（円）は現在 使用できません。"
+                   STRING  "961 減額（円）は現在 使用できません。"
                            "削除して下さい。"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
