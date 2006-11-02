@@ -3736,6 +3736,14 @@
                WHEN    "0074"
                    MOVE    "公費の種別は変更できません"
                                                TO  SPA-ERRMSG
+      *!
+               WHEN    "2074"
+                   STRING  "961 は現在 使用できません。"
+                           "削除して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+      *!
                WHEN    "0075"
                    MOVE    "受給者番号は全角・半角の混在はできません。"
                                                TO  SPA-ERRMSG

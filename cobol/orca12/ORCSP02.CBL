@@ -1115,7 +1115,7 @@
        10042-KOHHEN-SEC          SECTION.
       *
            IF    ( SPA-GMN-KOHMAX      >=  100 )
-           OR    ( HKN-HKNNUM  = "960" OR "961" OR "962" OR "963" )
+      *****OR    ( HKN-HKNNUM  = "960" OR "961" OR "962" OR "963" )
                GO      TO      10042-KOHHEN-EXT
            END-IF
            ADD     1                   TO  SPA-GMN-KOHMAX

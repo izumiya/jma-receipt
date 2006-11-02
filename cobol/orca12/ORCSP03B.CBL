@@ -752,6 +752,13 @@
                GO      TO      1001-KOHNUM-CHK-EXT
            END-IF
       *
+      *!９６１ 減免金額は仕様決定までエラーとする
+           IF      SPA-GMN-KOHNUM(IDX-K)   =   "961"
+               MOVE    "2074"          TO  SPA-ERRCD
+               MOVE    22              TO  SPA-GMN-CUR
+               GO      TO      1001-KOHNUM-CHK-EXT
+           END-IF
+      *!
       *    新規の時、チェック・編集
            IF     (IDX-K2              =   ZERO    )  OR
                   (SPA-PTKOH-SINKIKBN (IDX-K2)
