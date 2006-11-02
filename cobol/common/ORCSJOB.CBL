@@ -122,6 +122,8 @@
                        PERFORM 900-DBCOMMIT-SEC
                        PERFORM 900-DBSTART-SEC
                        PERFORM 120-JBE-SEC
+                       PERFORM 900-DBCOMMIT-SEC
+                       PERFORM 900-DBSTART-SEC
                WHEN    "STS"
                        PERFORM 130-STS-SEC
                        PERFORM 900-DBCOMMIT-SEC
