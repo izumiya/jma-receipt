@@ -4076,13 +4076,13 @@
            MOVE    WRK-KJNYMD          TO  WRK-SYMD
            MOVE    "2"                 TO  WRK-ZOGENPTN
            IF    ( SYS-1101-KYUSEIKKN-X    IS  NUMERIC )
-               COMPUTE WRK-ZOGEN
-                   =   SYS-1101-KYUSEIKKN  *   -1
-           ELSE
-               MOVE    -2              TO  WRK-ZOGEN
+               IF    ( SYS-1101-KYUSEIKKN  >   ZERO )
+                   COMPUTE WRK-ZOGEN
+                       =   SYS-1101-KYUSEIKKN  *   -1
+                   PERFORM 800-CALENDAR-SEC
+                   MOVE    WRK-SYMD (1:6)  TO  WRK-KYUSEI-CHK-YM
+               END-IF
            END-IF
-           PERFORM 800-CALENDAR-SEC
-           MOVE    WRK-SYMD (1:6)      TO  WRK-KYUSEI-CHK-YM
       *
            .
        200111-PTBYOMEI-CHK-INIT-EXT.
@@ -4681,17 +4681,20 @@
       *****************************************************************
        2001121-PTBYO-KYUSEI-CHK-SEC    SECTION.
       *
-           IF    ( PTBYO-UTAGAIFLG     = "2" OR "3")
-            AND  ( PTBYO-TENKIKBN      = SPACE)
-            AND  ( PTBYO-SRYYMD (1:6) <= WRK-KYUSEI-CHK-YM )
-               MOVE    PTBYO-SRYKA         TO  SRH-1005-SRYKA
-               MOVE    WRK-PTBYOMES-PLUS   TO  WRK-ERRMES-PLUS
-               MOVE    "070002"            TO  WRK-ERRCD
-               PERFORM 213-ERRMES-HEN-SEC
+           IF    ( WRK-KYUSEI-CHK-YM   NOT =   SPACE )
       *
-               IF    ( ORCBSD01-CHKKBN (7) =   "1" )
-                   MOVE    1           TO  FLG-CHKEND (7)
-                   GO  TO  2001121-PTBYO-KYUSEI-CHK-EXT
+               IF    ( PTBYO-UTAGAIFLG     = "2" OR "3")
+                AND  ( PTBYO-TENKIKBN      = SPACE)
+                AND  ( PTBYO-SRYYMD (1:6) <= WRK-KYUSEI-CHK-YM )
+                   MOVE    PTBYO-SRYKA         TO  SRH-1005-SRYKA
+                   MOVE    WRK-PTBYOMES-PLUS   TO  WRK-ERRMES-PLUS
+                   MOVE    "070002"            TO  WRK-ERRCD
+                   PERFORM 213-ERRMES-HEN-SEC
+      *
+                   IF    ( ORCBSD01-CHKKBN (7) =   "1" )
+                       MOVE    1           TO  FLG-CHKEND (7)
+                       GO  TO  2001121-PTBYO-KYUSEI-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *

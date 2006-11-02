@@ -440,12 +440,7 @@
       *
            MOVE    SPA-GMN-KYUSEIKKNKBN TO  WRK-CMB-CD
            PERFORM 4200-KYUSEIKKNKBNLST-CHK-SEC
-           IF    ( WRK-CMB-ITM     =   SPACE )
-               MOVE    SPA-GMN-KYUSEIKKNKBNLST (2)
-                                   TO  SPA-GMN-KYUSEIKKNKBN-G
-           ELSE
-               MOVE    WRK-CMB-ITM TO  SPA-GMN-KYUSEIKKNKBN-G
-           END-IF
+           MOVE    WRK-CMB-ITM          TO  SPA-GMN-KYUSEIKKNKBN-G
       *
            MOVE    SPA-GMN-YBUTAGAIKBN TO  WRK-CMB-CD
            PERFORM 4200-YBUTAGAIKBNLST-CHK-SEC
@@ -586,9 +581,6 @@
       *
            MOVE    "2"             TO  SPA-GMN-KYUSEIKKNKBNL    (2)
            MOVE    "£²¥ö·î"        TO  SPA-GMN-KYUSEIKKNKBNMEIL (2)
-      *
-           MOVE    SPA-GMN-KYUSEIKKNKBNLST  (2)
-                                   TO  SPA-GMN-KYUSEIKKNKBN-G
       *
            . 
        3101-KYUSEIKKNKBNLST-EXT.
@@ -927,9 +919,6 @@
            MOVE    SPA-GMN-KYUSEIKKNKBN TO  WRK-CMB-CD
            PERFORM 4200-KYUSEIKKNKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
-               MOVE    SPA-GMN-KYUSEIKKNKBNLST (2)
-                                   TO  SPA-GMN-KYUSEIKKNKBN-G
-           ELSE
                MOVE    WRK-CMB-ITM TO  SPA-GMN-KYUSEIKKNKBN-G
            END-IF
       *
