@@ -390,6 +390,74 @@
            COPY    "CPSYUMEI.INC"  REPLACING //SMEI-//
                                    BY        //WKSMEI-//.
       *
+       01  PAT-1039-REC.
+           03  PAT-1039-KEY.
+      *管理コード
+               05  PAT-1039-KANRICD     PIC  X(04).
+      *区分コード
+               05  PAT-1039-KBNCD       PIC  X(08).
+      *有効開始年月日
+               05  PAT-1039-STYUKYMD    PIC  X(08).
+      *有効終了年月日
+               05  PAT-1039-EDYUKYMD    PIC  X(08).
+      *管理テーブル
+           03  PAT-1039-TBL.
+      *入金管理区分
+               05  PAT-1039-NYKNKNRKBN  PIC  X(01).
+      *請求書兼領収書発行区分（外来）
+               05  PAT-1039-SKYPRTGKBN  PIC  X(01).
+      *請求書兼領収書発行区分（入院）
+               05  PAT-1039-SKYPRTNKBN  PIC  X(01).
+      *統計時間
+               05  PAT-1039-STIME.
+                   07  PAT-1039-STIME-HH   PIC  X(02).
+                   07  PAT-1039-STIME-MM   PIC  X(02).
+      *仮締時間
+               05  PAT-1039-KARITIME.
+                   07  PAT-1039-KARITIME-OCC1          OCCURS  2.
+                       09  PAT-1039-KARIDAY    PIC X   OCCURS  7.
+                       09  PAT-1039-KARITIME-OCC2      OCCURS  2.
+                           11  PAT-1039-KARISTTIME.
+                               13  PAT-1039-KARIST-HH  PIC X(02).
+                               13  PAT-1039-KARIST-MM  PIC X(02).
+                           11  PAT-1039-KARIEDTIME.
+                               13  PAT-1039-KARIED-HH  PIC X(02).
+                               13  PAT-1039-KARIED-MM  PIC X(02).
+      *診療費明細書発行区分（外来）
+               05  PAT-1039-SRYPRTGKBN  PIC  X(01).
+      *診療費明細書発行区分（入院）
+               05  PAT-1039-SRYPRTNKBN  PIC  X(01).
+      *一括入金画面請求書兼領収書発行区分（入院）
+               05  PAT-1039-S06SKYPRTNKBN
+                                        PIC  X(01).
+      *一括入金画面請求書兼領収書発行区分（外来）
+               05  PAT-1039-S06SKYPRTGKBN
+                                        PIC  X(01).
+      *一括入金画面外来分発行方法
+               05  PAT-1039-S06SKYSUMKBN
+                                        PIC  X(01).
+      *請求一覧画面外来請求書兼領収書発行方法
+               05  PAT-1039-S02SKYSAIKBN
+                                        PIC  X(01).
+      *請求一覧画面外来請求書兼領収書未収印字区分
+               05  PAT-1039-S02SKYMISYUPRTKBN
+                                        PIC  X(01).
+      *請求確認画面外来請求書兼領収書未収印字区分
+               05  PAT-1039-S03SKYMISYUPRTKBN
+                                        PIC  X(01).
+      *予備
+               05                       PIC  X(439).
+      *端末ＩＤ
+           03  PAT-1039-TERMID          PIC  X(16).
+      *オペーレータＩＤ
+           03  PAT-1039-OPID            PIC  X(16).
+      *作成年月日
+           03  PAT-1039-CREYMD          PIC  X(08).
+      *更新年月日
+           03  PAT-1039-UPYMD           PIC  X(08).
+      *更新時間
+           03  PAT-1039-UPHMS           PIC  X(06).
+      *
       **************************************************************
       *    ファイルレイアウト
       **************************************************************
@@ -3004,6 +3072,7 @@
            MOVE    SYS-1039-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC        TO  SYS-1039-REC
+                                           PAT-1039-REC
       *
            MOVE    "1"                 TO  WRK-NYUGAIKBN
            PERFORM 3101-MISYU-SUM-SEC
@@ -3034,10 +3103,15 @@
                                        SYUPARA02-AREA
       *
            MOVE    "2"                 TO  SYUPARA01-NYUGAIKBN
-           MOVE    WRK-NYU-MISYU       TO  SYUPARA01-NYU-MISYU
-           MOVE    WRK-GAI-MISYU       TO  SYUPARA01-GAI-MISYU
-           MOVE    WRK-GAI-MISYU-P     TO  SYUPARA01-GAI-MISYU-P
-           MOVE    WRK-GAI-MISYU-M     TO  SYUPARA01-GAI-MISYU-M
+      *
+           IF    ( PAT-1039-S02SKYMISYUPRTKBN  =   "0" )
+               CONTINUE
+           ELSE
+               MOVE    WRK-NYU-MISYU   TO  SYUPARA01-NYU-MISYU
+               MOVE    WRK-GAI-MISYU   TO  SYUPARA01-GAI-MISYU
+               MOVE    WRK-GAI-MISYU-P TO  SYUPARA01-GAI-MISYU-P
+               MOVE    WRK-GAI-MISYU-M TO  SYUPARA01-GAI-MISYU-M
+           END-IF
            MOVE    ZERO                TO  SYUPARA01-NYU-NYUKIN
            MOVE    ZERO                TO  SYUPARA01-GAI-NYUKIN
            MOVE    1                   TO  SYUPARA01-HAKKOFLG
@@ -3149,28 +3223,32 @@
            MOVE    1                   TO  ORCHC03-HAKKOFLG
            MOVE    ZERO                TO  ORCHC03-HAKHOUFLG
            MOVE    1                   TO  ORCHC03-PARAFLG
-           COMPUTE ORCHC03-ZENMISYU
-               =   WRK-GAI-MISYU
-               -   WRK-GAI-ZENMISYU
-           IF    ( ORCHC03-ZENMISYU    <   ZERO )
-               MOVE    ORCHC03-ZENMISYU
-                                       TO  ORCHC03-HENKIN
-               MOVE    ZERO            TO  ORCHC03-ZENMISYU
-           END-IF
-      *
-           MOVE    WRK-GAI-MISYU-P     TO  ORCHC03-ZENMISYU-2
-      *
-           COMPUTE ORCHC03-KANYUKIN
-               =   WRK-GAI-MISYU-M     *   -1
-      *
-           IF    ( WRK-GAI-ZENMISYU    <   ZERO )
-               COMPUTE ORCHC03-KANYUKIN
-                   =   ORCHC03-KANYUKIN
-                   - ( WRK-GAI-ZENMISYU    *   -1 )
+           IF    ( PAT-1039-S02SKYMISYUPRTKBN  =   "0" )
+               CONTINUE
            ELSE
-               COMPUTE ORCHC03-ZENMISYU-2
-                   =   ORCHC03-ZENMISYU-2
+               COMPUTE ORCHC03-ZENMISYU
+                   =   WRK-GAI-MISYU
                    -   WRK-GAI-ZENMISYU
+               IF    ( ORCHC03-ZENMISYU    <   ZERO )
+                   MOVE    ORCHC03-ZENMISYU
+                                       TO  ORCHC03-HENKIN
+                   MOVE    ZERO        TO  ORCHC03-ZENMISYU
+               END-IF
+      *
+               MOVE    WRK-GAI-MISYU-P     TO  ORCHC03-ZENMISYU-2
+      *
+               COMPUTE ORCHC03-KANYUKIN
+                   =   WRK-GAI-MISYU-M     *   -1
+      *
+               IF    ( WRK-GAI-ZENMISYU    <   ZERO )
+                   COMPUTE ORCHC03-KANYUKIN
+                       =   ORCHC03-KANYUKIN
+                       - ( WRK-GAI-ZENMISYU    *   -1 )
+               ELSE
+                   COMPUTE ORCHC03-ZENMISYU-2
+                       =   ORCHC03-ZENMISYU-2
+                       -   WRK-GAI-ZENMISYU
+               END-IF
            END-IF
            MOVE    "S02"               TO  ORCHC03-PARA-GYOUMUID
            MOVE    SPA-TERMID          TO  ORCHC03-PARA-TERMID

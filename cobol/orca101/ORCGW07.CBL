@@ -80,6 +80,7 @@
       *  02.01.26    NACL-太田    06/08/16  収納機能情報
       *                                     請求書兼領収書発行区分追加
       *  03.02.00    NACL-多々納  06/08/29  レセコメント詳記区分の追加
+      *  03.03.00    NACL-太田    06/11/02  パッチ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -697,6 +698,74 @@
                05  FILLER          PIC X(01)   VALUE   ".".
                05  WRK-HDD         PIC 9(02).
       *
+       01  PAT-1039-REC.
+           03  PAT-1039-KEY.
+      *管理コード
+               05  PAT-1039-KANRICD     PIC  X(04).
+      *区分コード
+               05  PAT-1039-KBNCD       PIC  X(08).
+      *有効開始年月日
+               05  PAT-1039-STYUKYMD    PIC  X(08).
+      *有効終了年月日
+               05  PAT-1039-EDYUKYMD    PIC  X(08).
+      *管理テーブル
+           03  PAT-1039-TBL.
+      *入金管理区分
+               05  PAT-1039-NYKNKNRKBN  PIC  X(01).
+      *請求書兼領収書発行区分（外来）
+               05  PAT-1039-SKYPRTGKBN  PIC  X(01).
+      *請求書兼領収書発行区分（入院）
+               05  PAT-1039-SKYPRTNKBN  PIC  X(01).
+      *統計時間
+               05  PAT-1039-STIME.
+                   07  PAT-1039-STIME-HH   PIC  X(02).
+                   07  PAT-1039-STIME-MM   PIC  X(02).
+      *仮締時間
+               05  PAT-1039-KARITIME.
+                   07  PAT-1039-KARITIME-OCC1          OCCURS  2.
+                       09  PAT-1039-KARIDAY    PIC X   OCCURS  7.
+                       09  PAT-1039-KARITIME-OCC2      OCCURS  2.
+                           11  PAT-1039-KARISTTIME.
+                               13  PAT-1039-KARIST-HH  PIC X(02).
+                               13  PAT-1039-KARIST-MM  PIC X(02).
+                           11  PAT-1039-KARIEDTIME.
+                               13  PAT-1039-KARIED-HH  PIC X(02).
+                               13  PAT-1039-KARIED-MM  PIC X(02).
+      *診療費明細書発行区分（外来）
+               05  PAT-1039-SRYPRTGKBN  PIC  X(01).
+      *診療費明細書発行区分（入院）
+               05  PAT-1039-SRYPRTNKBN  PIC  X(01).
+      *一括入金画面請求書兼領収書発行区分（入院）
+               05  PAT-1039-S06SKYPRTNKBN
+                                        PIC  X(01).
+      *一括入金画面請求書兼領収書発行区分（外来）
+               05  PAT-1039-S06SKYPRTGKBN
+                                        PIC  X(01).
+      *一括入金画面外来分発行方法
+               05  PAT-1039-S06SKYSUMKBN
+                                        PIC  X(01).
+      *請求一覧画面外来請求書兼領収書発行方法
+               05  PAT-1039-S02SKYSAIKBN
+                                        PIC  X(01).
+      *請求一覧画面外来請求書兼領収書未収印字区分
+               05  PAT-1039-S02SKYMISYUPRTKBN
+                                        PIC  X(01).
+      *請求確認画面外来請求書兼領収書未収印字区分
+               05  PAT-1039-S03SKYMISYUPRTKBN
+                                        PIC  X(01).
+      *予備
+               05                       PIC  X(439).
+      *端末ＩＤ
+           03  PAT-1039-TERMID          PIC  X(16).
+      *オペーレータＩＤ
+           03  PAT-1039-OPID            PIC  X(16).
+      *作成年月日
+           03  PAT-1039-CREYMD          PIC  X(08).
+      *更新年月日
+           03  PAT-1039-UPYMD           PIC  X(08).
+      *更新時間
+           03  PAT-1039-UPHMS           PIC  X(06).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -1166,7 +1235,11 @@
            MOVE    "0 個別に発行"      TO  SPA-GMN-S02SKYSAILST(1)
            MOVE    "1 診療行為で指定した方法で発行"
                                        TO  SPA-GMN-S02SKYSAILST(2)
-           MOVE    2                   TO  SPA-GMN-S02SKYSAI-MAX
+           MOVE    "2 個別に（前回未収印字なし）"
+                                       TO  SPA-GMN-S02SKYSAILST(3)
+           MOVE    "3 診療行為で（前回未収印字なし）"
+                                       TO  SPA-GMN-S02SKYSAILST(4)
+           MOVE    4                   TO  SPA-GMN-S02SKYSAI-MAX
       *
            MOVE    "0 表示する"        TO  SPA-GMN-MSG1-DSPKBNLST(1)
            MOVE    "1 表示しない"      TO  SPA-GMN-MSG1-DSPKBNLST(2)
@@ -2024,6 +2097,8 @@
                INITIALIZE  SYS-1039-REC
            END-IF
       *
+           MOVE    SYS-1039-REC        TO  PAT-1039-REC
+      *
       *    入金管理区分
            MOVE    SYS-1039-NYKNKNRKBN TO  SPA-GMN-SYUNYKNKNRKBN
       *
@@ -2071,8 +2146,6 @@
            PERFORM 3101-S06SKYSUM-SYOKI-SEC
       *
       *    収納請求一覧画面外来請求書兼領収書発行方法
-           MOVE    SYS-1039-S02SKYSAIKBN
-                                       TO  SPA-GMN-S02SKYSAI
            PERFORM 3101-S02SKYSAI-SYOKI-SEC
       *
            IF    ( SYS-1039-STIME          IS  NUMERIC )
@@ -2318,6 +2391,22 @@
       *    収納一括入金画面外来分発行方法初期値設定処理
       *****************************************************************
        3101-S02SKYSAI-SYOKI-SEC        SECTION.
+      *
+           EVALUATE    SYS-1039-S02SKYSAIKBN
+                                  ALSO PAT-1039-S02SKYMISYUPRTKBN
+           WHEN    "0"            ALSO " "
+           WHEN    "0"            ALSO "1"
+               MOVE    "0"        TO  SPA-GMN-S02SKYSAI
+           WHEN    "0"            ALSO "0"
+               MOVE    "2"        TO  SPA-GMN-S02SKYSAI
+           WHEN    "1"            ALSO " "
+           WHEN    "1"            ALSO "1"
+               MOVE    "1"        TO  SPA-GMN-S02SKYSAI
+           WHEN    "1"            ALSO "0"
+               MOVE    "3"        TO  SPA-GMN-S02SKYSAI
+           WHEN    OTHER
+               MOVE    "0"        TO  SPA-GMN-S02SKYSAI
+           END-EVALUATE
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING IDY         FROM    1   BY  1
@@ -5346,7 +5435,6 @@
            MOVE    SPA-GMN-S06SKYPRT       TO  SYS-1039-S06SKYPRTGKBN
                                                SYS-1039-S06SKYPRTNKBN
            MOVE    SPA-GMN-S06SKYSUM       TO  SYS-1039-S06SKYSUMKBN
-           MOVE    SPA-GMN-S02SKYSAI       TO  SYS-1039-S02SKYSAIKBN
            MOVE    SPA-GMN-SYUSKYPRTG      TO  SYS-1039-SKYPRTGKBN
            MOVE    SPA-GMN-SYUSKYPRTN      TO  SYS-1039-SKYPRTNKBN
            MOVE    SPA-GMN-SYUSRYPRTG      TO  SYS-1039-SRYPRTGKBN
@@ -5376,7 +5464,26 @@
                END-PERFORM
            END-PERFORM
       *
-           MOVE    SYS-1039-REC            TO  SYSKANRI-REC
+           MOVE    SYS-1039-REC            TO  PAT-1039-REC
+           EVALUATE    SPA-GMN-S02SKYSAI
+           WHEN    "0"
+               MOVE    "0"             TO  PAT-1039-S02SKYSAIKBN
+               MOVE    "1"             TO  PAT-1039-S02SKYMISYUPRTKBN
+           WHEN    "1"
+               MOVE    "1"             TO  PAT-1039-S02SKYSAIKBN
+               MOVE    "1"             TO  PAT-1039-S02SKYMISYUPRTKBN
+           WHEN    "2"
+               MOVE    "0"             TO  PAT-1039-S02SKYSAIKBN
+               MOVE    "0"             TO  PAT-1039-S02SKYMISYUPRTKBN
+           WHEN    "3"
+               MOVE    "1"             TO  PAT-1039-S02SKYSAIKBN
+               MOVE    "0"             TO  PAT-1039-S02SKYMISYUPRTKBN
+           END-EVALUATE
+      *
+           MOVE    PAT-1039-S02SKYMISYUPRTKBN
+                                       TO  PAT-1039-S03SKYMISYUPRTKBN
+      *
+           MOVE    PAT-1039-REC        TO  SYSKANRI-REC
       *
            IF      FLG-SYSKANRI            =   ZERO
       *
