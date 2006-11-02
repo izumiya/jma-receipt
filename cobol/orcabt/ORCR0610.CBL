@@ -90,6 +90,8 @@
       *  03.03.05    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
       *                                     い場合記載の対象としない
       *  03.03.06    NACL-藤原    06/10/31  療養介護医療２４の追加
+      *  03.03.07    NACL-藤原    06/11/02  福岡地方公費の障害のついて全て
+      *                                     公費付加情報より記載判定を行う
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1604,17 +1606,21 @@
            MOVE    SPACE               TO  WRK-PREFKBN
                                            WRK-PREFNUM
       *
-      *    県外扱いの保険者はレセプトへ記載しない
-           IF      PTHKN-HKNJANUM (1:2)    =   "67"
-               MOVE    PTHKN-HKNJANUM (3:2)
-                                       TO  WRK-PREFNUM
-           ELSE
-               MOVE    PTHKN-HKNJANUM (1:2)
-                                       TO  WRK-PREFNUM
-           END-IF
-           IF      WRK-PREFNUM         =   SYS-1001-PREFNUM
+      *    ２００６年１０月以降は公費付加情報より設定
+           IF    ( WRK-SRYYMD(1:6)    >=  "200610" )
                MOVE    "1"                 TO  WRK-PREFKBN
            ELSE
+      *      県外扱いの保険者はレセプトへ記載しない（２００６年９月まで）
+             IF      PTHKN-HKNJANUM (1:2)    =   "67"
+               MOVE    PTHKN-HKNJANUM (3:2)
+                                       TO  WRK-PREFNUM
+             ELSE
+               MOVE    PTHKN-HKNJANUM (1:2)
+                                       TO  WRK-PREFNUM
+             END-IF
+             IF      WRK-PREFNUM         =   SYS-1001-PREFNUM
+               MOVE    "1"                 TO  WRK-PREFKBN
+             ELSE
                IF      WRK-PARA-SYOKBN     =   "1"
                    MOVE    SYS-2001-SRYYM      TO  WRK-SYMD (1:6)
                ELSE
@@ -1638,6 +1644,7 @@
                        END-PERFORM
                    END-IF            
                END-PERFORM
+             END-IF
            END-IF
       *        
       *    県内扱いの場合、公費付加情報よりレセプト請求区分を取得
