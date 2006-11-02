@@ -1734,7 +1734,7 @@
            MOVE    ZERO                TO  WRK-JYURRK-EDANUM
            MOVE    ZERO                TO  WRK-JYURRK-DOUJI-RENNUM
            IF      SPA-DOUJI-RENNUM    NOT =   ZERO
-               MOVE    SPA-DOUJI-RENNUM    TO  WRK-JYURRK-RENNUM
+               MOVE    SPA-DOUJI-RENNUM    TO  WRK-JYURRK-DOUJI-RENNUM
            END-IF
       *
            MOVE    SPACE               TO  JYURRK-REC
@@ -1783,6 +1783,11 @@
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *    訂正で科・保険組合せ変更がない時、前の同日連番
+           IF     (SPA-SYORIFLG        =   1  )  AND
+                  (SPA-SRYKA           =   SPA-OLD-SRYKA )
+               MOVE    SPA-DOUJI-RENNUM    TO  WRK-JYURRK-DOUJI-RENNUM
+           END-IF
       *
            IF      FLG-OK              =   ZERO
                MOVE    1                   TO  WRK-JYURRK-EDANUM
