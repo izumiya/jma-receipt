@@ -1235,9 +1235,9 @@
            MOVE    "0 個別に発行"      TO  SPA-GMN-S02SKYSAILST(1)
            MOVE    "1 診療行為で指定した方法で発行"
                                        TO  SPA-GMN-S02SKYSAILST(2)
-           MOVE    "2 個別に（前回未収印字なし）"
+           MOVE    "2 個別に（前回請求印字なし）"
                                        TO  SPA-GMN-S02SKYSAILST(3)
-           MOVE    "3 診療行為で（前回未収印字なし）"
+           MOVE    "3 診療行為で（前回請求印字なし）"
                                        TO  SPA-GMN-S02SKYSAILST(4)
            MOVE    4                   TO  SPA-GMN-S02SKYSAI-MAX
       *
