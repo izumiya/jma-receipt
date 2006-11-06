@@ -1737,7 +1737,6 @@ path	key49	{
                   AND (    ( ETC_KOHNUM1 <>   '972'    )
                        AND ( ETC_KOHNUM2 <>   '972'    )  
                        AND ( ETC_KOHNUM3 <>   '972'    )  
-                       AND ( ETC_KOHNUM4 <>   '972'    )  )
                        AND ( ETC_KOHNUM4 <>   '972'    )
                        AND ( ETC_KOHNUM1 <>   '974'    )  
                        AND ( ETC_KOHNUM2 <>   '974'    )  
