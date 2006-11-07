@@ -1922,9 +1922,9 @@
       *        前ページ
                WHEN    "CLICKED"       ALSO    "B07S"
                    PERFORM 270-BACK-SEC
-      *!       確定
-      *!       WHEN    "CLICKED"       ALSO    "B12"
-      *!           PERFORM 290-KAKUTEI-SEC
+      *        確定
+               WHEN    "CLICKED"       ALSO    "B12"
+                   PERFORM 290-KAKUTEI-SEC
            END-EVALUATE
           .
       *
