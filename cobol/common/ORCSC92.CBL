@@ -98,6 +98,8 @@
       *
            03  FLG-MANSEI-CHK          PIC 9(01).
       *
+           03  FLG-KONKAI              PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -1401,6 +1403,7 @@
                GO      TO      2005-HEIYOU-CHK-EXT
            END-IF
       *
+           MOVE    ZERO                TO  FLG-KONKAI
       *    当月算定済み
            PERFORM 200512-SANTEI-SELECT-SEC
       *
@@ -1454,7 +1457,10 @@
                   (SPA-SRYYMD          >=  "20021017" )  AND
                   (LNK-SC92-SRYCD      =   "113006510" OR
                    WRK-CHK-CD          =   "113006510" )
-               PERFORM 20053-MANSEI-CHK-SEC
+      *        今回入力時エラーはそのまま
+               IF      FLG-KONKAI          =   ZERO
+                   PERFORM 20053-MANSEI-CHK-SEC
+               END-IF
            END-IF
       *
            .
@@ -1729,6 +1735,7 @@
                                TNS-NAME            DELIMITED  BY  SPACE
                               INTO                 LNK-SC92-ERRMSG
                        END-STRING
+                       MOVE    1                   TO  FLG-KONKAI
                    END-IF
                END-IF
            END-PERFORM
