@@ -223,6 +223,8 @@
       *                                     ードの一部負担金の記録対応
       *  03.03.06    NACL-藤原    06/10/23  外来迅速検体検査加算の検査日
       *                                     の記録をやめる
+      *  03.03.07    NACL-藤原    06/11/08  きざみ値による数量の記録の条件
+      *                                     の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3969,12 +3971,12 @@
                        PERFORM 5004-MOJI-HENSYU-SEC  
       *                数量
                        IF      TBL-KOUI-SRYSURYO (IDX) >   ZERO
-                           IF    ( RECE041-SRYKBN(1:1) =
-                                                   "1" OR  "2" OR "3" )
-                           AND   ( TBL-KOUI-SRYSURYO (IDX)
-                                                   <=  1              )
-                               CONTINUE
-                           ELSE
+      ****************     IF    ( RECE041-SRYKBN(1:1) =
+      ****************                             "1" OR  "2" OR "3" )
+      ****************     AND   ( TBL-KOUI-SRYSURYO (IDX)
+      ****************                             <=  1              )
+      ****************         CONTINUE
+      ****************     ELSE
                                IF    ( TBL-KOUI-SRYCD (IDX) (1:1)
                                                        =   "1"        )
                                AND   ( TBL-KOUI-KZMCOMPSIKIBETU (IDX)
@@ -3986,7 +3988,7 @@
                                    MOVE    WRK-SURYO   TO  WRK-NUM
                                    MOVE    8           TO  WRK-NAGASA
                                END-IF
-                           END-IF
+      ****************     END-IF
                        END-IF    
                        PERFORM 5005-NUM-HENSYU-SEC  
       *                点数
