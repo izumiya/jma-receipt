@@ -45,6 +45,7 @@
       *                                     SRYACCT-KEY29 -> SRYACCT-KEY36
       *                                     SRYACCT-KEY30 -> SRYACCT-KEY37
       *  02.07.03    NACL-門脇    05/02/17  診療会計個別処理の編集条件修正
+      *  03.03.01    NACL-門脇    06/11/08  個別処理時の項目クリア
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1323,6 +1324,9 @@
            MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD
       *
       *    診療会計読み込み
+      *
+           MOVE    SPACE               TO  WRK-DATAKBN
+      *
            MOVE    ZERO                TO  FLG-SYORI
       *
            INITIALIZE                  SRYACCT-REC
@@ -1438,6 +1442,8 @@
            END-IF
       *
            MOVE    SPACE               TO  WRK-DATAKBN
+      *
+           MOVE    ZERO                TO  FLG-SYORI
       *
       *    診療年月編集
            MOVE    SYS-2002-SRYYM      TO  WRK-STYMD (1:6)
