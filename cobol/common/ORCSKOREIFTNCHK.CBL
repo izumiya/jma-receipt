@@ -30,6 +30,7 @@
       *  03.03.01    NACL-ÌçÏÆ    06/09/29  £È£±£¸Ç¯£±£°·î²þÀµ¤ËÈ¼¤¦°ìÉô
       *                                     ÉéÃ´¶âÊÔ½¸ÂÐ±þ
       *  03.03.02    NACL-ÌçÏÆ    06/10/10  Ï·ÎðÊ¡»ãÇ¯¶â¤Ë¤Ä¤¤¤Æ¤ÎÂÐ±þ
+      *  03.03.03    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -67,6 +68,7 @@
            03  WRK-KINGAKU2          PIC 9(09).
            03  WRK-FTN-KOH-XXX       PIC 9(09).
            03  WRK-FTN-KOH-YYY       PIC 9(09).
+           03  WRK-GENGAKU-RITUX     PIC 9(03).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -625,6 +627,62 @@
       *    ÊÝ¸±Íó¤Î°ìÉôÉéÃ´¶â³Û¥»¥Ã¥È¡Ê¸øÈñ´Þ¤à¾ì¹ç¡Ë
       *****************************************************************
        2201-ICHIBUFTN-KOH-SET-SEC               SECTION.
+      *
+           IF   LNK-KOREIFTNCHK-GENGAKUKBN   NOT =   ZERO
+      *
+               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+                                   * 10
+                                   * WRK-KYURATE(IDX1)
+                                   / 100
+               EVALUATE   LNK-KOREIFTNCHK-GENGAKUKBN
+                 WHEN        1
+                   IF  LNK-KOREIFTNCHK-GENGAKU-RITU = 100
+                       MOVE   ZERO     TO   WRK-FTNKEI
+                   ELSE
+                       COMPUTE  WRK-GENGAKU-RITUX =
+                                100 - LNK-KOREIFTNCHK-GENGAKU-RITU
+                       IF    WRK-FTNKEI  NOT = ZERO
+                          COMPUTE  WRK-FTNKEI         =
+                                   WRK-FTNKEI         *
+                                   WRK-GENGAKU-RITUX  /
+                                   100
+                       END-IF
+                   END-IF
+                 WHEN        2
+                   CONTINUE
+                 WHEN        3
+                 WHEN        4
+                       MOVE   ZERO     TO   WRK-FTNKEI
+               END-EVALUATE
+               COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+               COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+               COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+      *
+               EVALUATE   LNK-KOREIFTNCHK-GENGAKUKBN
+                 WHEN        1
+                   IF  LNK-KOREIFTNCHK-GENGAKU-RITU = 100
+                       MOVE   ZERO     TO   WRK-KINGAKU
+                   ELSE
+                       COMPUTE  WRK-GENGAKU-RITUX =
+                                100 - LNK-KOREIFTNCHK-GENGAKU-RITU
+                       IF    WRK-KINGAKU  NOT = ZERO
+                         COMPUTE  WRK-KINGAKU         =
+                                  WRK-KINGAKU         *
+                                  WRK-GENGAKU-RITUX   /
+                                  100
+                       END-IF
+                   END-IF
+                 WHEN        2
+                   CONTINUE
+                 WHEN        3
+                 WHEN        4
+                       MOVE   ZERO     TO   WRK-KINGAKU
+               END-EVALUATE
+               COMPUTE  WRK-KINGAKU  =  WRK-KINGAKU   +    5
+               COMPUTE  WRK-KINGAKU  =  WRK-KINGAKU   /   10
+               COMPUTE  WRK-KINGAKU  =  WRK-KINGAKU   *   10
+      *
+           END-IF
       *
            IF  WRK-FTN-KOH-XXX   >   WRK-KINGAKU
                 MOVE   WRK-KINGAKU    TO   WRK-FTN-KOH-XXX

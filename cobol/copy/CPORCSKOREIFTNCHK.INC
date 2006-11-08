@@ -25,6 +25,7 @@
       *  03.02.01    NACL-門脇    06/08/10  高齢者経過措置フラグ追加
       *                                     主保険単独の患者負担額追加
       *                                     公費を含む場合の患者負担額追加
+      *  03.03.01    NACL-門脇    06/11/02  減額・免除・支払猶予対応
       ************************************************************
        01  ORCSKOREIFTNCHKAREA.
       *
@@ -47,6 +48,12 @@
            03  LNK-KOREIFTNCHK-RECEKA       PIC X(02).
       *    高齢者経過措置フラグ
            03  LNK-KOREIFTNCHK-KEIKASOCHI   PIC X(01).
+      *    減額区分
+           03  LNK-KOREIFTNCHK-GENGAKUKBN   PIC 9(01).
+      *    減額（割合）
+           03  LNK-KOREIFTNCHK-GENGAKU-RITU PIC 9(03).
+      *    減額（金額）
+           03  LNK-KOREIFTNCHK-GENGAKU-KIN  PIC 9(07).
       *
       *返却値
            03  LNK-KOREIFTNCHK-OUT-AREA.

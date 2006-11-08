@@ -32,6 +32,7 @@
       *  01.00.04    NACL-ÌçÏÆ    05/08/12  ¼¢²ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  01.00.05    NACL-ÌçÏÆ    05/10/04  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  03.02.01    NACL-ÌçÏÆ    06/09/05  Ä¹´ü£¹£·£´ÂÐ±þ
+      *  03.03.01    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -58,6 +59,7 @@
            03  FLG-CHECK           PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-ARI             PIC 9(01).
+           03  FLG-GENMEN          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -594,6 +596,7 @@
       *            ´µ¼ÔÉéÃ´¶â¤Î½¸·×
                    MOVE      ZERO          TO      WRK-KOHFTN
                    MOVE      ZERO          TO      WRK-SEIKYU
+                   MOVE      ZERO          TO      FLG-GENMEN
                    PERFORM   UNTIL    FLG-SYUNOU  =   1
                        MOVE     ZERO       TO      FLG-ARI
                        PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -617,6 +620,9 @@
                                                        TO   WRK-KOHFTN
                              END-EVALUATE
                              ADD    SYU-TOTAL-HKNTEN   TO   WRK-SEIKYU
+                             IF     SYU-YKZKENNUM  NOT = ZERO
+                                MOVE    1    TO   FLG-GENMEN
+                             END-IF
                           END-IF
                        END-PERFORM
                        IF      LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
@@ -626,15 +632,25 @@
                        END-IF
                        PERFORM  910-SYUNOU-READ-SEC
                    END-PERFORM
-                   IF   LNK-FTNJGNCHK-KOHNUM    =   "012"
-                     IF   WRK-SEIKYU            =   ZERO
-                        MOVE   01               TO  LNK-FTNJGNCHK-RC
-                     END-IF
-                   ELSE
-                     IF   WRK-HKNMST-JGNGAK     >   WRK-KOHFTN
-                        MOVE   01               TO  LNK-FTNJGNCHK-RC
-                     END-IF
-                   END-IF
+                   EVALUATE   LNK-FTNJGNCHK-KOHNUM
+                     WHEN       "012"
+                       IF   WRK-SEIKYU            =   ZERO
+                           MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       END-IF
+                     WHEN       "972"
+                     WHEN       "974"
+                       IF   FLG-GENMEN   =   1
+                         CONTINUE
+                       ELSE
+                         IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
+                           MOVE   01        TO  LNK-FTNJGNCHK-RC
+                         END-IF
+                       END-IF
+                     WHEN       OTHER
+                       IF     WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
+                           MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       END-IF
+                   END-EVALUATE
                END-IF
            END-IF
       *    ¼ýÇ¼¥¯¥í¡¼¥º

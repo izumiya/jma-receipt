@@ -157,6 +157,7 @@
       *                                     ÄãÇ¯¶â¥¿¥ÖÍ­¸ú²½ÂÐ±þ
       *  03.03.03    NACL-ÌçÏÆ    06/10/30  ¾ã³²»ù»ÜÀß°åÎÅ¡¦ÎÅÍÜ²ð¸î°åÎÅ
       *                                     ÂÐ±þ
+      *  03.03.04    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -390,14 +391,8 @@
            03  WK-GENGAKU-RITU             PIC  9(03).
            03  WK-GENGAKU-RITUX            PIC  9(03).
            03  WK-GENGAKU-KIN              PIC  9(07).
-           03  WK-GENGAKU-ZAN              PIC  9(07).
-           03  WK-GENGAKU-ZAN-ENTANI       PIC  9(07)V9(01).
            03  WK-GENGAKU-GAK              PIC  9(07).
            03  WK-GENGAKU-GAK-ENTANI       PIC  9(07)V9(01).
-           03  WK-GENGAKU-GAK-TAIHI        PIC  9(07).
-           03  WK-GENGAKU-GAK-TAIHI2       PIC  9(07)V9(01).
-           03  WK-GENGAKU-GAK-RUI          PIC  9(07).
-           03  WK-GENGAKU-GAK-RUI2         PIC  9(07)V9(01).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -983,6 +978,7 @@
            MOVE    ZERO            TO  LNK-SYU-JYO-COMPFTN-ENTANI.
            MOVE    ZERO            TO  LNK-SYU-NYNSHOKAISU.
            MOVE    SPACE           TO  LNK-SYU-KOHTAIYKZKBN.
+           MOVE    ZERO            TO  LNK-SYU-YKZKENNUM.
       *
            MOVE    ZERO            TO  FLG-SEISINJYO
                                        FLG-TOKUREI-HKNJYA.
@@ -2674,6 +2670,11 @@
               END-PERFORM
             END-IF
       *
+            IF   WK-GENGAKUKBN    =   2
+                   MOVE     ZERO    TO    WK-GENGAKUKBN
+            END-IF
+            MOVE   WK-GENGAKUKBN    TO    LNK-SYU-YKZKENNUM
+      *
            END-IF.
       *
       *    Ï«ºÒ¡¦¼«ÇåÀÕ¤ÎÉéÃ´³ä¹ç¤òµá¤á¤ë
@@ -3236,11 +3237,6 @@
                PERFORM   2107-KOHFTN-KINGAKU-SEC
            END-IF.
       *
-      *    ¸º³Û¡Ê³ä¹ç¡¦¶â³Û¡Ë¼è¤ê¹þ¤ß
-           IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
-               PERFORM   2109-KOHFTN-KINGAKU-GEN-SEC
-           END-IF.
-      *
            IF  LNK-S02-KOUREI-NYUIN-KBN   =   "1"
                IF  COMB-KOH1-HKNKOHSBTKBN   =   "3"
                    EVALUATE   COMB-KOH1PAYKBN
@@ -3544,6 +3540,11 @@
                    END-IF
                 END-IF
       *
+           END-IF.
+      *
+      *    ¸º³Û¡Ê³ä¹ç¡¦¶â³Û¡Ë¼è¤ê¹þ¤ß
+           IF    WK-GENGAKUKBN     NOT  =   ZERO
+               PERFORM   2109-KOHFTN-KINGAKU-GEN-SEC
            END-IF.
       *
       *    £´£±Ï·¿Í¾å¸Â³ÛÊÔ½¸½èÍýÅù
@@ -5032,6 +5033,72 @@
       *
            END-IF
       *
+           IF  LNK-S02-KOUREI-NYUIN-KBN   =   "1"
+      *
+              IF   COMB-KOH1HKNNUM          =  "027"
+                IF   MAX-KIN-KOHI1-M   NOT =  ZERO
+                 IF  FLG-IRYOHI  = ZERO
+                 AND FLG-IRYOHI3 = ZERO
+                   EVALUATE   WK-GENGAKUKBN
+                     WHEN          1
+                        IF  WK-GENGAKU-RITU = 100
+                          MOVE   ZERO   TO   MAX-KIN-KOHI1-M
+                        ELSE
+                          COMPUTE  WK-GENGAKU-RITUX =
+                                   100 - WK-GENGAKU-RITU
+                          COMPUTE  MAX-KIN-KOHI1-M     =
+                                   MAX-KIN-KOHI1-M     *
+                                   WK-GENGAKU-RITUX    /
+                                   100
+                        END-IF
+                     WHEN          2
+                        CONTINUE
+                     WHEN          3
+                     WHEN          4
+                        MOVE   ZERO   TO   MAX-KIN-KOHI1-M
+                   END-EVALUATE
+                   COMPUTE  MAX-KIN-KOHI1-M =
+                            MAX-KIN-KOHI1-M +  5
+                   COMPUTE  MAX-KIN-KOHI1-M =
+                            MAX-KIN-KOHI1-M /  10
+                   COMPUTE  MAX-KIN-KOHI1-M =
+                            MAX-KIN-KOHI1-M *  10
+                 END-IF
+                END-IF
+              ELSE
+                IF   MAX-KIN-SYU-M     NOT =  ZERO
+                 IF  FLG-IRYOHI  = ZERO
+                 AND FLG-IRYOHI3 = ZERO
+                   EVALUATE   WK-GENGAKUKBN
+                     WHEN          1
+                        IF  WK-GENGAKU-RITU = 100
+                          MOVE   ZERO   TO   MAX-KIN-SYU-M
+                        ELSE
+                          COMPUTE  WK-GENGAKU-RITUX =
+                                   100 - WK-GENGAKU-RITU
+                          COMPUTE  MAX-KIN-SYU-M       =
+                                   MAX-KIN-SYU-M       *
+                                   WK-GENGAKU-RITUX    /
+                                   100
+                        END-IF
+                     WHEN          2
+                        CONTINUE
+                     WHEN          3
+                     WHEN          4
+                        MOVE   ZERO   TO   MAX-KIN-SYU-M
+                   END-EVALUATE
+                   COMPUTE  MAX-KIN-SYU-M =
+                            MAX-KIN-SYU-M +  5
+                   COMPUTE  MAX-KIN-SYU-M =
+                            MAX-KIN-SYU-M /  10
+                   COMPUTE  MAX-KIN-SYU-M =
+                            MAX-KIN-SYU-M *  10
+                 END-IF
+                END-IF
+              END-IF
+      *
+           END-IF
+      *
            .
       *
        2109-KOHFTN-KINGAKU-GEN-EXT.
@@ -5051,9 +5118,6 @@
       *
            MOVE     ZERO        TO    WK-OITA-HKNFTNMONEY.
            MOVE     ZERO        TO    WK-OITA-CYOFTN.
-      *
-           MOVE     ZERO        TO    WK-GENGAKU-GAK-RUI.
-           MOVE     ZERO        TO    WK-GENGAKU-GAK-RUI2.
       *
            IF  (LNK-S02-KOUREI-NYUIN-KBN  =   "1"   )
            AND (WK-1001-PREFNUM           =   13    )
@@ -5078,8 +5142,7 @@
                (COMB-KOH2-NYUJGNKBN       =       "1")      OR
                (COMB-KOH3-NYUJGNKBN       =       "1")      OR
                (COMB-KOH4-NYUJGNKBN       =       "1")      OR
-               (LNK-S02-KOUREI-NYUIN-KBN  =       "1")      OR
-               (WK-GENGAKUKBN             =        2 )
+               (LNK-S02-KOUREI-NYUIN-KBN  =       "1")
       *
                IF   WK-1001-PREFNUM       =     32
                AND  LNK-SYU-SRYYMD(1:6)   <    "200510"
@@ -5299,6 +5362,9 @@
                                              +   WK-KOUREI-IRYOHI2
                    MOVE    1    TO    FLG-KOUGAKUCYO
                 END-IF
+                IF    WK-GENGAKUKBN  NOT = ZERO
+                     PERFORM   2202-KOHFTN-KINGAKU-GEN2-SEC
+                END-IF
               END-IF
               IF     FLG-IRYOHI     =      2
                 IF  WK-KOUREI-IRYOHI  >  267000
@@ -5307,6 +5373,9 @@
                    COMPUTE  MAX-KIN-SYU-M    =   MAX-KIN-SYU-M 
                                              +   WK-KOUREI-IRYOHI2
                    MOVE    1    TO    FLG-KOUGAKUCYO
+                END-IF
+                IF    WK-GENGAKUKBN  NOT = ZERO
+                     PERFORM   2202-KOHFTN-KINGAKU-GEN2-SEC
                 END-IF
               END-IF
               IF     FLG-IRYOHI3    =      1
@@ -5317,6 +5386,9 @@
                                              +   WK-KOUREI-IRYOHI2
                    MOVE    1    TO    FLG-KOUGAKUCYO3
                 END-IF
+                IF    WK-GENGAKUKBN  NOT = ZERO
+                     PERFORM   2202-KOHFTN-KINGAKU-GEN2-SEC
+                END-IF
               END-IF
               IF     FLG-IRYOHI3    =      2
                 IF  WK-KOUREI-IRYOHI  >  267000
@@ -5325,6 +5397,9 @@
                    COMPUTE  MAX-KIN-SYU-M    =   MAX-KIN-SYU-M 
                                              +   WK-KOUREI-IRYOHI2
                    MOVE    1    TO    FLG-KOUGAKUCYO3
+                END-IF
+                IF    WK-GENGAKUKBN  NOT = ZERO
+                     PERFORM   2202-KOHFTN-KINGAKU-GEN2-SEC
                 END-IF
               END-IF
       *       £´£±Ï·¿ÍÍÑ
@@ -5897,11 +5972,6 @@
                  END-IF                                                 
       *
                END-IF
-             END-IF
-      *
-             IF   WK-GENGAKUKBN    =   2
-                ADD   SYU-JYO-HKNFTNMONEY    TO  WK-GENGAKU-GAK-RUI
-                ADD   SYU-JYO-COMPFTN-ENTANI TO  WK-GENGAKU-GAK-RUI2
              END-IF
       *
              IF  (WK-1001-PREFNUM          =  44      ) AND
@@ -7943,6 +8013,88 @@
            EXIT.
       *
       ******************************************************************
+      *        ´µ¼Ô¸øÈñÉéÃ´¡Ê¸º³Û¡Ê³ä¹ç¡¦¶â³Û¡Ë¡Ë¼è¹þ¤ß½èÍý                                *
+      ******************************************************************
+       2202-KOHFTN-KINGAKU-GEN2-SEC           SECTION.
+      *
+           IF    ( FLG-IRYOHI     =      1 )
+           OR    ( FLG-IRYOHI3    =      1 )
+               IF   MAX-KIN-KOHI1-M   NOT =  ZERO
+                   IF   FLG-IRYOHI     =      1
+                       MOVE     ZERO     TO    FLG-KOUGAKUCYO
+                   END-IF
+                   IF   FLG-IRYOHI3    =      1
+                       MOVE     ZERO     TO    FLG-KOUGAKUCYO3
+                   END-IF
+                   EVALUATE   WK-GENGAKUKBN
+                     WHEN          1
+                        IF  WK-GENGAKU-RITU = 100
+                          MOVE   ZERO   TO   MAX-KIN-KOHI1-M
+                        ELSE
+                          COMPUTE  WK-GENGAKU-RITUX =
+                                   100 - WK-GENGAKU-RITU
+                          COMPUTE  MAX-KIN-KOHI1-M     =
+                                   MAX-KIN-KOHI1-M     *
+                                   WK-GENGAKU-RITUX    /
+                                   100
+                        END-IF
+                     WHEN          2
+                        CONTINUE
+                     WHEN          3
+                     WHEN          4
+                        MOVE   ZERO   TO   MAX-KIN-KOHI1-M
+                   END-EVALUATE
+                   COMPUTE  MAX-KIN-KOHI1-M =
+                            MAX-KIN-KOHI1-M +  5
+                   COMPUTE  MAX-KIN-KOHI1-M =
+                            MAX-KIN-KOHI1-M /  10
+                   COMPUTE  MAX-KIN-KOHI1-M =
+                            MAX-KIN-KOHI1-M *  10
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-IRYOHI     =      2 )
+           OR    ( FLG-IRYOHI3    =      2 )
+               IF   MAX-KIN-SYU-M     NOT = ZERO
+                   IF   FLG-IRYOHI     =      2
+                       MOVE     ZERO     TO    FLG-KOUGAKUCYO
+                   END-IF
+                   IF   FLG-IRYOHI3    =      2
+                       MOVE     ZERO     TO    FLG-KOUGAKUCYO3
+                   END-IF
+                   EVALUATE   WK-GENGAKUKBN
+                     WHEN          1
+                        IF  WK-GENGAKU-RITU = 100
+                          MOVE   ZERO   TO   MAX-KIN-SYU-M
+                        ELSE
+                          COMPUTE  WK-GENGAKU-RITUX =
+                                   100 - WK-GENGAKU-RITU
+                          COMPUTE  MAX-KIN-SYU-M       =
+                                   MAX-KIN-SYU-M       *
+                                   WK-GENGAKU-RITUX    /
+                                   100
+                        END-IF
+                     WHEN          2
+                        CONTINUE
+                     WHEN          3
+                     WHEN          4
+                        MOVE   ZERO   TO   MAX-KIN-SYU-M
+                   END-EVALUATE
+                   COMPUTE  MAX-KIN-SYU-M =
+                            MAX-KIN-SYU-M +  5
+                   COMPUTE  MAX-KIN-SYU-M =
+                            MAX-KIN-SYU-M /  10
+                   COMPUTE  MAX-KIN-SYU-M =
+                            MAX-KIN-SYU-M *  10
+               END-IF
+           END-IF
+      *
+           .
+      *
+       2202-KOHFTN-KINGAKU-GEN2-EXT.
+           EXIT.
+      *
+      ******************************************************************
       *    ÊÝ¸±¡¦¸øÈñ¤ÎÉéÃ´¶â·×»»
       ******************************************************************
        230-FTNKIN-SEC           SECTION.
@@ -8873,22 +9025,6 @@
                                               -  FTN-KOHI4-SKJ
                   END-IF
                END-IF
-           END-IF.
-      *
-           IF   WK-GENGAKUKBN    =   2
-              IF  WK-GENGAKU-KIN  >  WK-GENGAKU-GAK-RUI
-                COMPUTE  WK-GENGAKU-ZAN  =   WK-GENGAKU-KIN
-                                         -   WK-GENGAKU-GAK-RUI
-              ELSE
-                MOVE     ZERO    TO   WK-GENGAKU-ZAN
-              END-IF
-              IF  WK-GENGAKU-KIN  >  WK-GENGAKU-GAK-RUI2
-                COMPUTE  WK-GENGAKU-ZAN-ENTANI
-                                         =   WK-GENGAKU-KIN
-                                         -   WK-GENGAKU-GAK-RUI2
-              ELSE
-                MOVE     ZERO    TO   WK-GENGAKU-ZAN-ENTANI
-              END-IF
            END-IF.
       *
       *    ¼çÊÝ¸±ÉéÃ´¶â³Û¤Î¸øÈñ¸ÂÅÙ³ÛÂÐ±þÍÑ¡¡»Ä¶â³Û·×»»
@@ -11196,38 +11332,13 @@
                                             100
                                   END-IF
                                 WHEN        2
-                                  IF  WK-GENGAKU-ZAN
-                                           >= LNK-SYU-SYUCOMPFTN
-                                   MOVE  ZERO  TO  WK-GENGAKU-GAK
-                                  ELSE
-                                   COMPUTE  WK-GENGAKU-GAK     =
-                                            LNK-SYU-SYUCOMPFTN -
-                                            WK-GENGAKU-ZAN
-                                  END-IF
-                                  IF  WK-GENGAKU-ZAN-ENTANI
-                                           >= LNK-SYU-SYUCOMPFTN-ENTANI
-                                   MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
-                                  ELSE
-                                   COMPUTE  WK-GENGAKU-GAK-ENTANI     =
-                                            LNK-SYU-SYUCOMPFTN-ENTANI -
-                                            WK-GENGAKU-ZAN-ENTANI
-                                  END-IF
+                                  CONTINUE
                                 WHEN        3
                                 WHEN        4
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
                               END-EVALUATE
                               IF  WK-GENGAKUKBN  NOT =  ZERO
-                                  MOVE  LNK-SYU-SYUCOMPFTN
-                                        TO  WK-GENGAKU-GAK-TAIHI
-                                  COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                            WK-GENGAKU-GAK-TAIHI +  5
-                                  COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                            WK-GENGAKU-GAK-TAIHI /  10
-                                  COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                            WK-GENGAKU-GAK-TAIHI *  10
-                                  MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
-                                        TO  WK-GENGAKU-GAK-TAIHI2
                                   MOVE  WK-GENGAKU-GAK
                                           TO  LNK-SYU-SYUCOMPFTN
                                   MOVE  WK-GENGAKU-GAK-ENTANI
@@ -11246,17 +11357,6 @@
                                            LNK-SYU-SYUCOMPFTN  /  10
                                  COMPUTE   LNK-SYU-SYUCOMPFTN =
                                            WK-FTN   *  10
-                                 IF  WK-GENGAKUKBN  NOT =  ZERO
-                                  COMPUTE LNK-SYU-JYO-HKNFTNMONEY    =
-                                          WK-GENGAKU-GAK-TAIHI       -
-                                          LNK-SYU-SYUCOMPFTN
-                                  COMPUTE LNK-SYU-JYO-COMPFTN        =
-                                          WK-GENGAKU-GAK-TAIHI       -
-                                          LNK-SYU-SYUCOMPFTN
-                                  COMPUTE LNK-SYU-JYO-COMPFTN-ENTANI =
-                                          WK-GENGAKU-GAK-TAIHI2      -
-                                          LNK-SYU-SYUCOMPFTN-ENTANI
-                                 END-IF
                               END-IF
                         END-IF
       *
@@ -11345,38 +11445,13 @@
                                             100
                                   END-IF
                                 WHEN        2
-                                  IF  WK-GENGAKU-ZAN
-                                           >= LNK-SYU-SYUCOMPFTN
-                                   MOVE  ZERO  TO  WK-GENGAKU-GAK
-                                  ELSE
-                                   COMPUTE  WK-GENGAKU-GAK     =
-                                            LNK-SYU-SYUCOMPFTN -
-                                            WK-GENGAKU-ZAN
-                                  END-IF
-                                  IF  WK-GENGAKU-ZAN-ENTANI
-                                           >= LNK-SYU-SYUCOMPFTN-ENTANI
-                                   MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
-                                  ELSE
-                                   COMPUTE  WK-GENGAKU-GAK-ENTANI     =
-                                            LNK-SYU-SYUCOMPFTN-ENTANI -
-                                            WK-GENGAKU-ZAN-ENTANI
-                                  END-IF
+                                  CONTINUE
                                 WHEN        3
                                 WHEN        4
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
                               END-EVALUATE
                               IF  WK-GENGAKUKBN  NOT =  ZERO
-                                  MOVE  LNK-SYU-SYUCOMPFTN
-                                        TO  WK-GENGAKU-GAK-TAIHI
-                                  COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                            WK-GENGAKU-GAK-TAIHI +  5
-                                  COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                            WK-GENGAKU-GAK-TAIHI /  10
-                                  COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                            WK-GENGAKU-GAK-TAIHI *  10
-                                  MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
-                                        TO  WK-GENGAKU-GAK-TAIHI2
                                   MOVE  WK-GENGAKU-GAK
                                           TO  LNK-SYU-SYUCOMPFTN
                                   MOVE  WK-GENGAKU-GAK-ENTANI
@@ -11395,17 +11470,6 @@
                                            LNK-SYU-SYUCOMPFTN  /  10
                                  COMPUTE   LNK-SYU-SYUCOMPFTN =
                                            WK-FTN   *  10
-                                 IF  WK-GENGAKUKBN  NOT =  ZERO
-                                  COMPUTE LNK-SYU-JYO-HKNFTNMONEY    =
-                                          WK-GENGAKU-GAK-TAIHI       -
-                                          LNK-SYU-SYUCOMPFTN
-                                  COMPUTE LNK-SYU-JYO-COMPFTN        =
-                                          WK-GENGAKU-GAK-TAIHI       -
-                                          LNK-SYU-SYUCOMPFTN
-                                  COMPUTE LNK-SYU-JYO-COMPFTN-ENTANI =
-                                          WK-GENGAKU-GAK-TAIHI2      -
-                                          LNK-SYU-SYUCOMPFTN-ENTANI
-                                 END-IF
                               END-IF
                         END-IF
       *
@@ -12090,38 +12154,13 @@
                                   100
                         END-IF
                       WHEN        2
-                        IF WK-GENGAKU-ZAN
-                                       >= LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                          MOVE  ZERO  TO  WK-GENGAKU-GAK
-                        ELSE
-                          COMPUTE  WK-GENGAKU-GAK               =
-                                   LNK-SYU-KOH-COMPFTN(KOH-IDX) -
-                                   WK-GENGAKU-ZAN
-                        END-IF
-                        IF WK-GENGAKU-ZAN-ENTANI
-                                >= LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                          MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
-                        ELSE
-                          COMPUTE  WK-GENGAKU-GAK-ENTANI               =
-                                   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
-                                   WK-GENGAKU-ZAN-ENTANI
-                        END-IF
+                        CONTINUE
                       WHEN        3
                       WHEN        4
                         MOVE  ZERO  TO  WK-GENGAKU-GAK
                         MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
                     END-EVALUATE
                     IF  WK-GENGAKUKBN  NOT =  ZERO
-                        MOVE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                                      TO  WK-GENGAKU-GAK-TAIHI
-                        COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                  WK-GENGAKU-GAK-TAIHI +  5
-                        COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                  WK-GENGAKU-GAK-TAIHI /  10
-                        COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                  WK-GENGAKU-GAK-TAIHI *  10
-                        MOVE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                               TO  WK-GENGAKU-GAK-TAIHI2
                         MOVE  WK-GENGAKU-GAK
                                TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                         MOVE  WK-GENGAKU-GAK-ENTANI
@@ -12152,18 +12191,6 @@
                              LNK-SYU-KOH-COMPFTN(KOH-IDX)  / 10
                    COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
                              WK-FTN   *  10
-                   IF  (WK-GENGAKUKBN            NOT =  ZERO )
-                   AND (LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027")
-                       COMPUTE LNK-SYU-JYO-HKNFTNMONEY    =
-                               WK-GENGAKU-GAK-TAIHI       -
-                               LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                       COMPUTE LNK-SYU-JYO-COMPFTN        =
-                               WK-GENGAKU-GAK-TAIHI       -
-                               LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                       COMPUTE LNK-SYU-JYO-COMPFTN-ENTANI =
-                               WK-GENGAKU-GAK-TAIHI2      -
-                               LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                   END-IF
                END-IF
                IF  ( FLG-SYUHEN                   =   "1" )
                AND ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027")
@@ -12623,38 +12650,13 @@
                                   100
                         END-IF
                       WHEN        2
-                        IF WK-GENGAKU-ZAN
-                                       >= LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                          MOVE  ZERO  TO  WK-GENGAKU-GAK
-                        ELSE
-                          COMPUTE  WK-GENGAKU-GAK               =
-                                   LNK-SYU-KOH-COMPFTN(KOH-IDX) -
-                                   WK-GENGAKU-ZAN
-                        END-IF
-                        IF WK-GENGAKU-ZAN-ENTANI
-                                >= LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                          MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
-                        ELSE
-                          COMPUTE  WK-GENGAKU-GAK-ENTANI               =
-                                   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
-                                   WK-GENGAKU-ZAN-ENTANI
-                        END-IF
+                        CONTINUE
                       WHEN        3
                       WHEN        4
                         MOVE  ZERO  TO  WK-GENGAKU-GAK
                         MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
                     END-EVALUATE
                     IF  WK-GENGAKUKBN  NOT =  ZERO
-                        MOVE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                                      TO  WK-GENGAKU-GAK-TAIHI
-                        COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                  WK-GENGAKU-GAK-TAIHI +  5
-                        COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                  WK-GENGAKU-GAK-TAIHI /  10
-                        COMPUTE   WK-GENGAKU-GAK-TAIHI =
-                                  WK-GENGAKU-GAK-TAIHI *  10
-                        MOVE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                               TO  WK-GENGAKU-GAK-TAIHI2
                         MOVE  WK-GENGAKU-GAK
                                TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                         MOVE  WK-GENGAKU-GAK-ENTANI
@@ -12685,18 +12687,6 @@
                              LNK-SYU-KOH-COMPFTN(KOH-IDX)  /  10
                    COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX) =  WK-FTN
                                                               *  10
-                   IF  (WK-GENGAKUKBN            NOT =  ZERO )
-                   AND (LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027")
-                       COMPUTE LNK-SYU-JYO-HKNFTNMONEY    =
-                               WK-GENGAKU-GAK-TAIHI       -
-                               LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                       COMPUTE LNK-SYU-JYO-COMPFTN        =
-                               WK-GENGAKU-GAK-TAIHI       -
-                               LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                       COMPUTE LNK-SYU-JYO-COMPFTN-ENTANI =
-                               WK-GENGAKU-GAK-TAIHI2      -
-                               LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                   END-IF
                END-IF
            ELSE
                IF   (WK-1001-PREFNUM         =  43           ) AND
