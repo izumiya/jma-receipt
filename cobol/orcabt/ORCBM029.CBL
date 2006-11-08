@@ -46,6 +46,7 @@
       *  03.03.01    NACL-Æ£¸¶    06/10/10  £²£°£°£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *                                     HCM2W.red ¢ª HCM2WV01.red
       *                                     HCM2X.red ¢ª HCM2XV01.red 
+      *  03.03.02    NACL-Æ£¸¶    06/11/08  À¸³èÎÅÍÜ¤Î¤ß¤Î¾ì¹ç¤Î½¸·×
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -695,13 +696,13 @@
                   ADD     RECE10-SHOKUJINISSU   (IDX1)
                                          TO
                                   SUM-SHOKUJINISSU    (IDX2)
-                  ADD     RECE10-SHOKUJIRYOYOHI (IDX1)
+               END-IF
+               ADD     RECE10-SHOKUJIRYOYOHI (IDX1)
                                          TO
                                   SUM-SHOKUJIRYOYOHI  (IDX2)
-                  ADD     RECE10-SHOKUJIFTN     (IDX1)
+               ADD     RECE10-SHOKUJIFTN     (IDX1)
                                          TO
                                   SUM-SHOKUJIFTN      (IDX2)
-               END-IF
            END-IF    
       *
            MOVE    1               TO  FLG-UPD 
@@ -765,13 +766,13 @@
                   ADD     RECE10-SHOKUJINISSU   (IDY)
                                          TO
                                   SUM-KOH-SHOKUJINISSU   (IDX2)
-                  ADD     RECE10-SHOKUJIRYOYOHI (IDY)
+               END-IF
+               ADD     RECE10-SHOKUJIRYOYOHI (IDY)
                                          TO
                                   SUM-KOH-SHOKUJIRYOYOHI (IDX2)
-                  ADD     RECE10-SHOKUJIFTN     (IDY)
+               ADD     RECE10-SHOKUJIFTN     (IDY)
                                          TO
                                   SUM-KOH-SHOKUJIFTN     (IDX2)
-               END-IF
            END-IF    
       *
            MOVE    1               TO  FLG-UPD 
