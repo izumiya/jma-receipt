@@ -41,6 +41,7 @@
       *                                     HCM2R.red → HCM2RV01.red
       * 
       *                                     MONFUNC対応
+      *  03.03.02    NACL-藤原    06/11/08  生活療養のみの場合の集計
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -571,11 +572,11 @@
            IF          RECE10-NYUGAIKBN    =   "1"
                IF          RECE10-SHOKUJINISSU(1)   >   ZERO
                    ADD     1       TO   SUM-SHOKUJIKENSU(IDX)
-                   ADD     RECE10-SHOKUJIRYOYOHI(1)
-                                   TO   SUM-SHOKUJIRYOYOHI(IDX)
-                   ADD     RECE10-SHOKUJIFTN(1)
-                                   TO   SUM-SHOKUJIFTN(IDX)
                END-IF
+               ADD     RECE10-SHOKUJIRYOYOHI(1)
+                                   TO   SUM-SHOKUJIRYOYOHI(IDX)
+               ADD     RECE10-SHOKUJIFTN(1)
+                                   TO   SUM-SHOKUJIFTN(IDX)
            END-IF
       *
            MOVE    1               TO  FLG-UPD
@@ -607,11 +608,11 @@
                WHEN    "1"
                    IF      RECE10-SHOKUJINISSU(IDY)   >   ZERO
                        ADD     1   TO  SUM-SHOKUJIKENSU(12)
-                       ADD     RECE10-SHOKUJIRYOYOHI(IDY)
-                                   TO  SUM-SHOKUJIRYOYOHI(12)
-                       ADD     RECE10-SHOKUJIFTN(IDY)
-                                   TO  SUM-SHOKUJIFTN(12)
                    END-IF
+                   ADD     RECE10-SHOKUJIRYOYOHI(IDY)
+                                   TO  SUM-SHOKUJIRYOYOHI(12)
+                   ADD     RECE10-SHOKUJIFTN(IDY)
+                                   TO  SUM-SHOKUJIFTN(12)
                END-EVALUATE
       *
                MOVE    1               TO  FLG-UPD
