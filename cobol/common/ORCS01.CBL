@@ -204,6 +204,9 @@
       *  03.03.04    NACL-ÌçÏÆ    06/10/30  ¾ã³²»ù»ÜÀß°åÎÅ¡¦ÎÅÍÜ²ð¸î°åÎÅ
       *                                     ÂÐ±þ
       *  03.03.05    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
+      *  03.03.06    NACL-ÌçÏÆ    06/11/08  ²¬»³¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
+      *  03.03.07    NACL-ÌçÏÆ    06/11/09  ¹âÎð¼Ô¤ÇÄã½êÆÀ¤«¤ÄÁ´¹ñ¸øÈñ¤ò
+      *                                     ¤â¤Ä¾ì¹ç¤Î¾å¸Â³ÛÊÔ½¸½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3184,6 +3187,23 @@
                  END-IF
                END-IF
       *
+               IF  ( WK-1001-PREFNUM         =  33   ) AND
+                   ( COMB-KOH1HKNNUM(2:2)    = "80"  ) AND
+                   ( LNK-SYU-SRYYMD(1:6)  >= "200610")
+                 IF (COMB-KOH2HKNNUM         = "972") OR
+                    (COMB-KOH3HKNNUM         = "972") OR
+                    (COMB-KOH4HKNNUM         = "972")
+                    MOVE   10000   TO    MAX-KIN-KOHI1-M
+                    MOVE    "1"    TO    COMB-KOH1-GAIJGNKBN
+                 END-IF
+                 IF (COMB-KOH2HKNNUM         = "974") OR
+                    (COMB-KOH3HKNNUM         = "974") OR
+                    (COMB-KOH4HKNNUM         = "974")
+                    MOVE   20000   TO    MAX-KIN-KOHI1-M
+                    MOVE    "1"    TO    COMB-KOH1-GAIJGNKBN
+                 END-IF
+               END-IF
+      *
            END-IF.
       *
       *    *¸øÈñ£²¤Î¾å¸Â²ó¿ô¡Ê¶â³Û¡Ë¼è¹þ¤ß
@@ -3289,6 +3309,23 @@
       *
                IF  ( WK-1001-PREFNUM         =  13             ) AND
                    ( COMB-KOH2HKNNUM         = "180"           )
+                 IF (COMB-KOH1HKNNUM         = "972") OR
+                    (COMB-KOH3HKNNUM         = "972") OR
+                    (COMB-KOH4HKNNUM         = "972")
+                    MOVE   10000   TO    MAX-KIN-KOHI2-M
+                    MOVE    "1"    TO    COMB-KOH2-GAIJGNKBN
+                 END-IF
+                 IF (COMB-KOH1HKNNUM         = "974") OR
+                    (COMB-KOH3HKNNUM         = "974") OR
+                    (COMB-KOH4HKNNUM         = "974")
+                    MOVE   20000   TO    MAX-KIN-KOHI2-M
+                    MOVE    "1"    TO    COMB-KOH2-GAIJGNKBN
+                 END-IF
+               END-IF
+      *
+               IF  ( WK-1001-PREFNUM         =  33   ) AND
+                   ( COMB-KOH2HKNNUM(2:2)    = "80"  ) AND
+                   ( LNK-SYU-SRYYMD(1:6)  >= "200610")
                  IF (COMB-KOH1HKNNUM         = "972") OR
                     (COMB-KOH3HKNNUM         = "972") OR
                     (COMB-KOH4HKNNUM         = "972")
@@ -3422,6 +3459,23 @@
                  END-IF
                END-IF
       *
+               IF  ( WK-1001-PREFNUM         =  33   ) AND
+                   ( COMB-KOH3HKNNUM(2:2)    = "80"  ) AND
+                   ( LNK-SYU-SRYYMD(1:6)  >= "200610")
+                 IF (COMB-KOH1HKNNUM         = "972") OR
+                    (COMB-KOH2HKNNUM         = "972") OR
+                    (COMB-KOH4HKNNUM         = "972")
+                    MOVE   10000   TO    MAX-KIN-KOHI3-M
+                    MOVE    "1"    TO    COMB-KOH3-GAIJGNKBN
+                 END-IF
+                 IF (COMB-KOH1HKNNUM         = "974") OR
+                    (COMB-KOH2HKNNUM         = "974") OR
+                    (COMB-KOH4HKNNUM         = "974")
+                    MOVE   20000   TO    MAX-KIN-KOHI3-M
+                    MOVE    "1"    TO    COMB-KOH3-GAIJGNKBN
+                 END-IF
+               END-IF
+      *
            END-IF.
       *
       *    *¸øÈñ£´¤Î¾å¸Â²ó¿ô¡Ê¶â³Û¡Ë¼è¹þ¤ß
@@ -3527,6 +3581,23 @@
       *
                IF  ( WK-1001-PREFNUM         =  13             ) AND
                    ( COMB-KOH4HKNNUM         = "180"           )
+                 IF (COMB-KOH1HKNNUM         = "972") OR
+                    (COMB-KOH2HKNNUM         = "972") OR
+                    (COMB-KOH3HKNNUM         = "972")
+                    MOVE   10000   TO    MAX-KIN-KOHI4-M
+                    MOVE    "1"    TO    COMB-KOH4-GAIJGNKBN
+                 END-IF
+                 IF (COMB-KOH1HKNNUM         = "974") OR
+                    (COMB-KOH2HKNNUM         = "974") OR
+                    (COMB-KOH3HKNNUM         = "974")
+                    MOVE   20000   TO    MAX-KIN-KOHI4-M
+                    MOVE    "1"    TO    COMB-KOH4-GAIJGNKBN
+                 END-IF
+               END-IF
+      *
+               IF  ( WK-1001-PREFNUM         =  33   ) AND
+                   ( COMB-KOH4HKNNUM(2:2)    = "80"  ) AND
+                   ( LNK-SYU-SRYYMD(1:6)  >= "200610")
                  IF (COMB-KOH1HKNNUM         = "972") OR
                     (COMB-KOH2HKNNUM         = "972") OR
                     (COMB-KOH3HKNNUM         = "972")
@@ -3711,10 +3782,10 @@
                       OR  (COMB-KOH4HKNNUM(1:1) = "0")
                           MOVE    "1"    TO   FLG-SYUHEN
                           IF  LNK-S01-KOUREI-ZAITAKU-KBN   =  "1" 
-                             IF   MAX-KIN-KOHI1-M   >  12000
+      *****                  IF   MAX-KIN-KOHI1-M   >  12000
                                MOVE   12000   TO   MAX-KIN-KOHI1-D
                                                    MAX-KIN-KOHI1-M
-                             END-IF
+      *****                  END-IF
                           ELSE
                                MOVE    "1"    TO   COMB-KOH1-GAIJGNKBN
                                MOVE   12000   TO   MAX-KIN-KOHI1-D
@@ -3805,9 +3876,9 @@
                       OR  (COMB-KOH4HKNNUM(1:1) = "0")
                           MOVE    "1"    TO   FLG-SYUHEN
                           IF  LNK-S01-KOUREI-ZAITAKU-KBN   =  "1" 
-                            IF   MAX-KIN-SYU-M   >  12000
+      *****                 IF   MAX-KIN-SYU-M   >  12000
                               MOVE   12000   TO   MAX-KIN-SYU-M
-                            END-IF
+      *****                 END-IF
                           ELSE
                               MOVE   12000   TO   MAX-KIN-SYU-M
                           END-IF
@@ -4211,6 +4282,25 @@
              END-IF
            END-IF.
       *
+           IF  ( WK-1001-PREFNUM         =  33   ) AND
+               ( COMB-KOH1HKNNUM(2:2)    = "80"  ) AND
+               ( LNK-SYU-SRYYMD(1:6)  >= "200610")
+             IF (COMB-KOH2HKNNUM         = "972") OR
+                (COMB-KOH3HKNNUM         = "972") OR
+                (COMB-KOH4HKNNUM         = "972")
+               IF   MAX-KIN-KOHI1-M   >     10000
+                     MOVE    10000   TO    MAX-KIN-KOHI1-M
+               END-IF
+             END-IF
+             IF (COMB-KOH2HKNNUM         = "974") OR
+                (COMB-KOH3HKNNUM         = "974") OR
+                (COMB-KOH4HKNNUM         = "974")
+               IF   MAX-KIN-KOHI1-M   >     20000
+                     MOVE    20000   TO    MAX-KIN-KOHI1-M
+               END-IF
+             END-IF
+           END-IF.
+      *
        2103-KOH1-KAISU-EXT.
            EXIT.
       ******************************************************************
@@ -4475,6 +4565,25 @@
       *
            IF  ( WK-1001-PREFNUM         =  13             ) AND
                ( COMB-KOH2HKNNUM         = "180"           )
+             IF (COMB-KOH1HKNNUM         = "972") OR
+                (COMB-KOH3HKNNUM         = "972") OR
+                (COMB-KOH4HKNNUM         = "972")
+               IF   MAX-KIN-KOHI2-M   >     10000
+                     MOVE    10000   TO    MAX-KIN-KOHI2-M
+               END-IF
+             END-IF
+             IF (COMB-KOH1HKNNUM         = "974") OR
+                (COMB-KOH3HKNNUM         = "974") OR
+                (COMB-KOH4HKNNUM         = "974")
+               IF   MAX-KIN-KOHI2-M   >     20000
+                     MOVE    20000   TO    MAX-KIN-KOHI2-M
+               END-IF
+             END-IF
+           END-IF.
+      *
+           IF  ( WK-1001-PREFNUM         =  33   ) AND
+               ( COMB-KOH2HKNNUM(2:2)    = "80"  ) AND
+               ( LNK-SYU-SRYYMD(1:6)  >= "200610")
              IF (COMB-KOH1HKNNUM         = "972") OR
                 (COMB-KOH3HKNNUM         = "972") OR
                 (COMB-KOH4HKNNUM         = "972")
@@ -4771,6 +4880,25 @@
              END-IF
            END-IF.
       *
+           IF  ( WK-1001-PREFNUM         =  33   ) AND
+               ( COMB-KOH3HKNNUM(2:2)    = "80"  ) AND
+               ( LNK-SYU-SRYYMD(1:6)  >= "200610")
+             IF (COMB-KOH1HKNNUM         = "972") OR
+                (COMB-KOH2HKNNUM         = "972") OR
+                (COMB-KOH4HKNNUM         = "972")
+               IF   MAX-KIN-KOHI3-M   >     10000
+                     MOVE    10000   TO    MAX-KIN-KOHI3-M
+               END-IF
+             END-IF
+             IF (COMB-KOH1HKNNUM         = "974") OR
+                (COMB-KOH2HKNNUM         = "974") OR
+                (COMB-KOH4HKNNUM         = "974")
+               IF   MAX-KIN-KOHI3-M   >     20000
+                     MOVE    20000   TO    MAX-KIN-KOHI3-M
+               END-IF
+             END-IF
+           END-IF.
+      *
        2105-KOH3-KAISU-EXT.
            EXIT.
       ******************************************************************
@@ -5035,6 +5163,25 @@
       *
            IF  ( WK-1001-PREFNUM         =  13             ) AND
                ( COMB-KOH4HKNNUM         = "180"           )
+             IF (COMB-KOH1HKNNUM         = "972") OR
+                (COMB-KOH2HKNNUM         = "972") OR
+                (COMB-KOH3HKNNUM         = "972")
+               IF   MAX-KIN-KOHI4-M   >     10000
+                     MOVE    10000   TO    MAX-KIN-KOHI4-M
+               END-IF
+             END-IF
+             IF (COMB-KOH1HKNNUM         = "974") OR
+                (COMB-KOH2HKNNUM         = "974") OR
+                (COMB-KOH3HKNNUM         = "974")
+               IF   MAX-KIN-KOHI4-M   >     20000
+                     MOVE    20000   TO    MAX-KIN-KOHI4-M
+               END-IF
+             END-IF
+           END-IF.
+      *
+           IF  ( WK-1001-PREFNUM         =  33   ) AND
+               ( COMB-KOH4HKNNUM(2:2)    = "80"  ) AND
+               ( LNK-SYU-SRYYMD(1:6)  >= "200610")
              IF (COMB-KOH1HKNNUM         = "972") OR
                 (COMB-KOH2HKNNUM         = "972") OR
                 (COMB-KOH3HKNNUM         = "972")
