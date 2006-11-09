@@ -2295,7 +2295,9 @@
            WHEN    "CHKKBN13"
                MOVE    16              TO  SPA-GMN-D01-CUR
            WHEN    "CHKKBN14"
+               MOVE    17              TO  SPA-GMN-D01-CUR
            WHEN    "CHKKBN15"
+               MOVE    18              TO  SPA-GMN-D01-CUR
            WHEN    "CHKKBN16"
            WHEN    "CHKKBN17"
            WHEN    "CHKKBN18"
