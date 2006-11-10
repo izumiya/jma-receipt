@@ -448,6 +448,7 @@
                05  WRK-SYUKA-KBN           PIC X(02).
                05  WRK-SYUKA-YMD           PIC X(08).
            03  WRK-CHK-YMD                 PIC X(08).
+           03  WRK-CMB-TOKNYUIN-AREA           PIC X(3000).
       *
        01  BAK-AREA.
            03  BAK-AGE-G.
@@ -4320,28 +4321,34 @@
       *
                        IF    ( SYS-5001-BTU-SBT            =   "04" )
                         AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
-                           PERFORM 41011-PT-AGE-SEC
-                           IF    ( WRK-NENREI >=  70 )
-                            OR   ( FLG-ROUJIN  =   1 )
-                               MOVE    1       TO  FLG-TARGET
-                           ELSE
-                               IF    ( SYS-5111-SEIKATU-RYOKBN
+                           IF    ( SYS-5111-SEIKATU-RYOKBN
                                                            =   SPACE )
-                                   MOVE    1   TO  FLG-TARGET
+                               MOVE    1   TO  FLG-TARGET
+                           ELSE
+                               PERFORM 41011-PT-AGE-SEC
+                               IF    ( WRK-NENREI >=  70 )
+                                OR   ( FLG-ROUJIN  =   1 )
+                                    IF    ( SPA-NAI-I01-RSI-HKNKBN
+                                                   =   SPACE )
+                                        MOVE    1  TO  FLG-TARGET
+                                    END-IF
                                END-IF
                            END-IF
                        END-IF
       *
                        IF    ( SYS-5001-BTU-SBT            =   "09" )
                         AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
-                           PERFORM 41011-PT-AGE-SEC
-                           IF    ( WRK-NENREI >=  70 )
-                            OR   ( FLG-ROUJIN  =   1 )
-                               MOVE    1       TO  FLG-TARGET
-                           ELSE
-                               IF    ( SYS-5111-SEIKATU-RYOKBN
+                           IF    ( SYS-5111-SEIKATU-RYOKBN
                                                            =   SPACE )
-                                   MOVE    1   TO  FLG-TARGET
+                               MOVE    1   TO  FLG-TARGET
+                           ELSE
+                               PERFORM 41011-PT-AGE-SEC
+                               IF    ( WRK-NENREI >=  70 )
+                                OR   ( FLG-ROUJIN  =   1 )
+                                    IF    ( SPA-NAI-I01-RSI-HKNKBN
+                                                   =   SPACE )
+                                        MOVE    1  TO  FLG-TARGET
+                                    END-IF
                                END-IF
                            END-IF
                        END-IF
@@ -4436,15 +4443,18 @@
                        PERFORM 41011-PT-AGE-SEC
                        IF    ( WRK-NENREI  >=  70 )
                         OR   ( FLG-ROUJIN  =   1 )
-                           MOVE    "5111"      TO  WRK-KANRICD
-                           MOVE    "49"        TO  WRK-KBNCD
-                           MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                           PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                           IF    ( SPA-NAI-I01-RSI-HKNKBN
+                                                   =   SPACE )
+                               MOVE    "5111"      TO  WRK-KANRICD
+                               MOVE    "49"        TO  WRK-KBNCD
+                               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
-                           MOVE    "5111"      TO  WRK-KANRICD
-                           MOVE    "51"        TO  WRK-KBNCD
-                           MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                           PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                               MOVE    "5111"      TO  WRK-KANRICD
+                               MOVE    "51"        TO  WRK-KBNCD
+                               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                           END-IF
       *
                        END-IF
       *
@@ -4484,10 +4494,12 @@
            PERFORM 41011-PT-AGE-SEC
            IF    ( WRK-NENREI  >=  70 )
             OR   ( FLG-ROUJIN   =   1 )
-               MOVE    "5111"      TO  WRK-KANRICD
-               MOVE    "50"        TO  WRK-KBNCD
-               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               IF    ( SPA-NAI-I01-RSI-HKNKBN  =   SPACE )
+                   MOVE    "5111"      TO  WRK-KANRICD
+                   MOVE    "50"        TO  WRK-KBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               END-IF
            END-IF
       *
            .
@@ -4986,6 +4998,19 @@
                MOVE    "0023"      TO  SPA-ERRCD
                MOVE    15          TO  SPA-GMN-I01-CUR
                GO  TO  4101-HKNCOMBI-CHK-EXT
+           END-IF
+      *
+           IF    ( WRK-MCP-WIDGET  =   "HKNCOMBI" )
+               MOVE    SPA-GMN-I01-CMB-TOKNYUIN
+                                   TO  WRK-CMB-TOKNYUIN-AREA 
+               MOVE    WRK-KIHON-KJNYMD    TO  WRK-KJNYMD
+               PERFORM 4101-CMB-TOKNYUIN-SET-SEC
+               IF    ( SPA-GMN-I01-CMB-TOKNYUIN
+                               NOT =   WRK-CMB-TOKNYUIN-AREA  )
+                   MOVE    WRK-KIHON-KJNYMD    TO  WRK-KJNYMD
+                   PERFORM 4101-TOKNYUIN-SYOKI-SEC
+               END-IF
+      *
            END-IF
       *
            .
