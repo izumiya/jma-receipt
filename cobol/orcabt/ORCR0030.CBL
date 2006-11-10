@@ -277,6 +277,7 @@
       *  03.03.08    NACL-門脇    06/10/30  障害児施設医療・療養介護医療
       *                                     対応
       *  03.03.09    NACL-門脇    06/11/02  減額・免除・支払猶予対応
+      *  03.03.10    NACL-門脇    06/11/10  往診のコメント自動記載条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -976,6 +977,15 @@
            03  CONS-ZAIHOU-COMMENT   PIC X(09)  VALUE  "114001110".
       *    訪問診療日コメント
            03  CONS-ZAIHOU2-COMMENT  PIC X(09)  VALUE  "840000066".
+      *
+      *    在宅時医学総合管理料１（院外処方せん）
+           03  CONS-ZAIIKAN1-COMMENT PIC X(09)  VALUE  "114012210".
+      *    在宅時医学総合管理料１（院内処方せん）
+           03  CONS-ZAIIKAN2-COMMENT PIC X(09)  VALUE  "114012310".
+      *    在宅時医学総合管理料２（院内処方せん）
+           03  CONS-ZAIIKAN3-COMMENT PIC X(09)  VALUE  "114012410".
+      *    在宅時医学総合管理料２（院外処方せん）
+           03  CONS-ZAIIKAN4-COMMENT PIC X(09)  VALUE  "114007510".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -3244,6 +3254,15 @@
               IF   SRY-SRYCD(IDX2)    =     CONS-OSIN3-COMMENT
                    MOVE  SPACE  TO    RECE04-FLG-OSIN-COMMENT
                    MOVE    1    TO    FLG-OSIN-COM
+              END-IF
+      *
+              IF   SRY-SRYCD(IDX2)    =     CONS-ZAIIKAN1-COMMENT
+                                      OR    CONS-ZAIIKAN2-COMMENT
+                                      OR    CONS-ZAIIKAN3-COMMENT
+                                      OR    CONS-ZAIIKAN4-COMMENT
+                                      OR    CONS-ZAIHOU-COMMENT
+                   MOVE   "1"   TO    RECE02-COMCNTFLG
+                   MOVE   "2"   TO    RECE04-FLG-OSIN-COMMENT
               END-IF
       *
               IF   SRY-SRYCD(IDX2)    =     CONS-ZAIHOU-COMMENT

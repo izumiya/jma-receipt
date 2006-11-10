@@ -75,6 +75,7 @@
       *  03.01.03    NACL-ÌçÏÆ    06/07/14  ¿ÇÎÅ¶èÊ¬ÃÖ¤­´¹¤¨¥Õ¥é¥°¤ÎÊÔ½¸
       *  03.02.01    NACL-ÌçÏÆ    06/08/01  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
       *  03.02.02    NACL-ÌçÏÆ    06/09/07  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
+      *  03.03.01    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -279,6 +280,7 @@
                                    PIC 9(01).
            03  FLG-RIHA            PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
+           03  FLG-OSIN-HENSYU     PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -809,6 +811,8 @@
       *
            INITIALIZE                      TBL-YAKUTEI-INF
       *
+           MOVE       ZERO             TO  FLG-OSIN-HENSYU
+      *
            MOVE       ZERO             TO  IDX6
       *
            IF   RECE41-COMCNTFLG   =   "1"
@@ -862,6 +866,10 @@
                             MOVE  RECE44-REC  TO  WRK-RECE44-REC
                             MOVE  1           TO  TBL-ZAISIEN-COMMENT
                          END-IF
+      *               ¡Ê±ý¿Ç¤Ë´Ø¤¹¤ëÊÔ½¸¡Ë
+                         IF  RECE44-FLG-OSIN-COMMENT     =  "2"
+                            MOVE  1           TO  FLG-OSIN-HENSYU
+                         END-IF
                       WHEN      "40"
       *               ¡Ê²ðÃ£¸£°ú¤¢¤ê¡Ë
                          IF  RECE44-KAITATU-COMMENT      =  "1"
@@ -912,6 +920,10 @@
                          IF  RECE44-FLG-ZAISIEN-COMMENT  =  "1"
                             MOVE  RECE44-REC  TO  WRK-RECE44-REC
                             MOVE  1           TO  TBL-ZAISIEN-COMMENT
+                         END-IF
+      *               ¡Ê±ý¿Ç¤Ë´Ø¤¹¤ëÊÔ½¸¡Ë
+                         IF  RECE44-FLG-OSIN-COMMENT     =  "2"
+                            MOVE  1           TO  FLG-OSIN-HENSYU
                          END-IF
                       WHEN      "40"
       *               ¡Ê²ðÃ£¸£°ú¤¢¤ê¡Ë
@@ -3022,6 +3034,7 @@
        2001-OSIN-HANTEI-SEC          SECTION.
       *
            IF     RECE44-FLG-OSIN-COMMENT   =    "1"
+           AND    FLG-OSIN-HENSYU           =     1 
                MOVE       6       TO     FLG-COMMENT
                PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
            END-IF

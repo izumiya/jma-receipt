@@ -119,6 +119,7 @@
       *  03.02.01    NACL-門脇    06/08/10  高齢者上限額経過措置対応
       *  03.02.02    NACL-門脇    06/09/08  フイルムの単価編集修正
       *  03.03.01    NACL-門脇    06/09/27  特記事項１６長２対応
+      *  03.03.02    NACL-門脇    06/11/10  往診のコメント自動記載条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -702,6 +703,15 @@
            03  CONS-ZAIHOU-COMMENT   PIC X(09)  VALUE  "114001110".
       *    訪問診療日コメント
            03  CONS-ZAIHOU2-COMMENT  PIC X(09)  VALUE  "840000066".
+      *
+      *    在宅時医学総合管理料１（院外処方せん）
+           03  CONS-ZAIIKAN1-COMMENT PIC X(09)  VALUE  "114012210".
+      *    在宅時医学総合管理料１（院内処方せん）
+           03  CONS-ZAIIKAN2-COMMENT PIC X(09)  VALUE  "114012310".
+      *    在宅時医学総合管理料２（院内処方せん）
+           03  CONS-ZAIIKAN3-COMMENT PIC X(09)  VALUE  "114012410".
+      *    在宅時医学総合管理料２（院外処方せん）
+           03  CONS-ZAIIKAN4-COMMENT PIC X(09)  VALUE  "114007510".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -2260,6 +2270,14 @@
               IF   SRY-SRYCD(IDX2)    =     CONS-OSIN3-COMMENT
                    MOVE  SPACE  TO    RECE44-FLG-OSIN-COMMENT
                    MOVE    1    TO    FLG-OSIN-COM
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-ZAIIKAN1-COMMENT
+                                      OR    CONS-ZAIIKAN2-COMMENT
+                                      OR    CONS-ZAIIKAN3-COMMENT
+                                      OR    CONS-ZAIIKAN4-COMMENT
+                                      OR    CONS-ZAIHOU-COMMENT
+                   MOVE   "1"   TO    RECE41-COMCNTFLG
+                   MOVE   "2"   TO    RECE44-FLG-OSIN-COMMENT
               END-IF
       *
               IF   SRY-SRYCD(IDX2)    =     CONS-ZAIHOU-COMMENT

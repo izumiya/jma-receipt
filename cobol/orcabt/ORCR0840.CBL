@@ -106,6 +106,7 @@
       *  03.02.02    NACL-ÌçÏÆ    06/09/08  ¥Õ¥¤¥ë¥à¤ÎÃ±²ÁÊÔ½¸½¤Àµ
       *  03.03.01    NACL-ÌçÏÆ    06/09/27  ÆÃµ­»ö¹à£±£¶Ä¹£²ÂÐ±þ
       *  03.03.02    NACL-ÌçÏÆ    06/10/11  Æþ±¡»þÀ¸³èÎÅÍÜÈñÂÐ±þ
+      *  03.03.03    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2491,15 +2492,15 @@
                    MOVE   "1"   TO    RECE84-FLG-HINKAI-COMMENT
               END-IF
       *
-              IF  (SRY-SRYCD(IDX2)    =     CONS-OSIN-COMMENT
-                                      OR    CONS-OSIN2-COMMENT)
-              AND (FLG-OSIN-COM       =     ZERO              )
-                   MOVE   "1"   TO    RECE84-FLG-OSIN-COMMENT
-              END-IF
-              IF   SRY-SRYCD(IDX2)    =     CONS-OSIN3-COMMENT
-                   MOVE  SPACE  TO    RECE84-FLG-OSIN-COMMENT
-                   MOVE    1    TO    FLG-OSIN-COM
-              END-IF
+      ***     IF  (SRY-SRYCD(IDX2)    =     CONS-OSIN-COMMENT
+      ***                             OR    CONS-OSIN2-COMMENT)
+      ***     AND (FLG-OSIN-COM       =     ZERO              )
+      ***          MOVE   "1"   TO    RECE84-FLG-OSIN-COMMENT
+      ***     END-IF
+      ***     IF   SRY-SRYCD(IDX2)    =     CONS-OSIN3-COMMENT
+      ***          MOVE  SPACE  TO    RECE84-FLG-OSIN-COMMENT
+      ***          MOVE    1    TO    FLG-OSIN-COM
+      ***     END-IF
       *
               IF  (RECE82-SRYYM      >=     "200604")
               AND (WRK-SISETU613      =      1      )
