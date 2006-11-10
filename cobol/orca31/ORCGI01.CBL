@@ -4719,15 +4719,18 @@
            PERFORM 41011-PT-AGE-SEC
            IF    ( WRK-NENREI  >=  70 )
             OR   ( FLG-ROUJIN  =   1 )
-               PERFORM VARYING IDX10   FROM    1   BY  1
-                       UNTIL ( IDX10 > CONST-TOK-LIFECD-MAX)
-                   IF    ( WRK-CMB-CD  =   CONST-TOK-LIFECD-IPN (IDX10))
-                       MOVE    CONST-TOK-LIFECD-LIFE (IDX10)
+               IF    ( SPA-NAI-I01-RSI-HKNKBN  =   SPACE )
+                   PERFORM VARYING IDX10   FROM    1   BY  1
+                           UNTIL ( IDX10 > CONST-TOK-LIFECD-MAX)
+                       IF    ( WRK-CMB-CD
+                               =   CONST-TOK-LIFECD-IPN (IDX10))
+                           MOVE    CONST-TOK-LIFECD-LIFE (IDX10)
                                        TO  WRK-CMB-CD
-                       MOVE    CONST-TOK-LIFECD-MAX
+                           MOVE    CONST-TOK-LIFECD-MAX
                                        TO  IDX10
-                   END-IF
-               END-PERFORM
+                       END-IF
+                   END-PERFORM
+               END-IF
            END-IF
       *
            .
