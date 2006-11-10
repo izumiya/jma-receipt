@@ -4188,6 +4188,11 @@
                END-PERFORM
            END-IF
       *
+           IF      SPA-ERRCD           =   SPACE
+      *        減免重複チェック
+               PERFORM 4909-960JYUFUKU-CHK-SEC
+           END-IF
+      *
            .
        41033-HKNKOH-CHK-EXT.
            EXIT.
@@ -4569,6 +4574,42 @@
       *
            .
        410331-HKNKOH-JYUFUKU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    減免重複チェック処理
+      *****************************************************************
+       4909-960JYUFUKU-CHK-SEC             SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-PTKOH-MAX )  OR
+                              (SPA-ERRCD   NOT =   SPACE )
+               IF      (SPA-PTKOH-SAKJOKBN (IDX)    =   SPACE )  AND
+                       (SPA-PTKOH-KOHNUM   (IDX)    =   "027" )
+                   PERFORM VARYING  IDY     FROM    1   BY  1
+                           UNTIL   (IDY     >   SPA-PTKOH-MAX )  OR
+                                   (SPA-ERRCD   NOT =   SPACE )
+                      IF      (SPA-PTKOH-SAKJOKBN (IDY)    =   SPACE )
+                        AND   (SPA-PTKOH-KOHNUM   (IDY)    =   "960"
+                                                           OR  "961"
+                                                           OR  "962"
+                                                           OR  "963" )
+                           IF     (SPA-PTKOH-TEKEDYMD (IDY)
+                                       <   SPA-PTKOH-TEKSTYMD (IDX)) OR
+                                  (SPA-PTKOH-TEKSTYMD (IDY)
+                                       >   SPA-PTKOH-TEKEDYMD (IDX))
+                               CONTINUE
+                           ELSE
+                               MOVE    "0112"      TO  SPA-ERRCD
+      *                        公費の１番目にカーソル移動
+                               MOVE    21          TO  SPA-GMN-CUR
+                           END-IF
+                      END-IF
+                   END-PERFORM
+              END-IF
+           END-PERFORM
+           .
+       4909-960JYUFUKU-CHK-EXT.
            EXIT.
       *
       ****************************************************************

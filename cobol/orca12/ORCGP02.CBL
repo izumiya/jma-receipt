@@ -3846,6 +3846,12 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
+               WHEN    "0112"
+                   STRING  "老人保健は徴収猶予及び減免の対象ではありま"
+                           "せん。確認して下さい。"
+                                       DELIMITED  BY  SIZE
+                                               INTO   SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "0099"
                    MOVE    "日付変換エラーです。"
