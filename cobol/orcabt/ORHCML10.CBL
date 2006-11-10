@@ -583,16 +583,29 @@
            MOVE    WRK-PARA-MSTYMD     TO  TNS-YUKOSTYMD
                                            TNS-YUKOEDYMD
       *
-            EVALUATE    WRK-PARA-SYUKBN        
-                WHEN    1
-                    MOVE    "key12s1"   TO  WRK-PATH 
-                WHEN    2
-                    MOVE    "key12m1"   TO  WRK-PATH 
-                WHEN    3
-                    MOVE    "key12k1"   TO  WRK-PATH
-                WHEN    4
-                    MOVE    "key12i1"   TO  WRK-PATH
-            END-EVALUATE  
+           EVALUATE    WRK-PARA-CYUKBN
+               WHEN    1  
+                   EVALUATE    WRK-PARA-SYUKBN        
+                       WHEN    1
+                           MOVE    "key12s"    TO  WRK-PATH 
+                       WHEN    2
+                           MOVE    "key12m"    TO  WRK-PATH 
+                       WHEN    3
+                           MOVE    "key12k"    TO  WRK-PATH
+                   END-EVALUATE 
+               WHEN    2 
+               WHEN    3
+                   EVALUATE    WRK-PARA-SYUKBN        
+                       WHEN    1
+                           MOVE    "key12s1"   TO  WRK-PATH 
+                       WHEN    2
+                           MOVE    "key12m1"   TO  WRK-PATH 
+                       WHEN    3
+                           MOVE    "key12k1"   TO  WRK-PATH
+                       WHEN    4
+                           MOVE    "key12i1"   TO  WRK-PATH
+                   END-EVALUATE 
+           END-EVALUATE 
       *
            MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
            MOVE    "DBSELECT"      TO  MCP-FUNC
