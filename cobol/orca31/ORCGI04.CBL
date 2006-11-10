@@ -3819,9 +3819,9 @@
                MOVE    "1"         TO  WKPTNYUINRRK-DRCD1
                MOVE    SPA-GMN-I04-DR-CD
                                    TO  WKPTNYUINRRK-DRCD1 (2 : )
-               MOVE    WKPTNYUINRRK-REC
-                                   TO  LNK-PTNYUINRRK
            END-IF
+           MOVE    WKPTNYUINRRK-REC
+                                   TO  LNK-PTNYUINRRK
       *
            CALL    WRK-PRINT-PG    USING   WRK-SPA-AREA
                                            LNK-PTNYUINRRK
