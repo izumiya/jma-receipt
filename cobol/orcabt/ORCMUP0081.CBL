@@ -107,7 +107,7 @@
       *
       *    ¥³¥ó¥¹¥¿¥ó¥ÈÎÎ°è
        01  CONST-AREA.
-           03  CONST-CR                PIC X(02)  VALUE  X"5C0A".
+           03  CONST-CR                PIC X(01)  VALUE  X"0A".
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -136,6 +136,7 @@
            03  WRK-STR2                PIC X(2048).
            03  WRK-STR                 PIC X(2048).
            03  WRK-CRCNT               PIC 9(02).
+           03  WRK-CRCNT2              PIC 9(04).
       *
            03  WRK-IN                  PIC X(01).
       *
@@ -628,7 +629,6 @@
                   ADD     1               TO  CNT-IN
                   PERFORM 901-IN-KENSAKU-CRCNV-SEC
           END-READ
-      *
           .
        900-IN-KENSAKU-EXT.
           EXIT.
@@ -639,50 +639,73 @@
        901-IN-KENSAKU-CRCNV-SEC          SECTION.
       *
       * ¾É¾õ
-           MOVE    ZERO         TO         WRK-CRCNT
-           INSPECT IN-SYOJYOU   TALLYING   WRK-CRCNT
-                                FOR        ALL "¡ï£î"
-           IF      WRK-CRCNT        >      0
-             PERFORM VARYING IDX FROM 1 BY 1 UNTIL IDX > WRK-CRCNT
-               MOVE     SPACE    TO        WRK-STR
-               MOVE     SPACE    TO        WRK-STR1
-               MOVE     SPACE    TO        WRK-STR2
-               UNSTRING IN-SYOJYOU DELIMITED BY "¡ï£î"
-                        INTO WRK-STR1 WRK-STR2
-               END-UNSTRING
-               STRING WRK-STR1 DELIMITED BY SPACE
-                      CONST-CR DELIMITED BY SIZE
+           MOVE    ZERO                TO  WRK-CRCNT
+           INSPECT IN-SYOJYOU          TALLYING  WRK-CRCNT
+                                       FOR ALL "¡ï£î"
+           IF      WRK-CRCNT           >   0
+               MOVE    SPACE           TO  WRK-STR
+               PERFORM VARYING  IDX    FROM  1  BY  1
+                                UNTIL  IDX  >  WRK-CRCNT
+                 MOVE  SPACE           TO  WRK-STR1
+                 MOVE  SPACE           TO  WRK-STR2
+                 MOVE  ZERO            TO  WRK-CRCNT2
+                 INSPECT IN-SYOJYOU    TALLYING   WRK-CRCNT2
+                                       FOR   CHARACTERS
+                                       BEFORE INITIAL "¡ï£î"
+                 IF      WRK-CRCNT2    >   0
+                     MOVE  IN-SYOJYOU(1:WRK-CRCNT2)
+                                       TO  WRK-STR1
+                     MOVE  IN-SYOJYOU(WRK-CRCNT2 + 5:)
+                                       TO  WRK-STR2
+                     STRING WRK-STR  DELIMITED BY SPACE
+                            WRK-STR1 DELIMITED BY SPACE
+                            CONST-CR DELIMITED BY SIZE
+                            INTO WRK-STR
+                     END-STRING
+                     MOVE   WRK-STR2   TO  IN-SYOJYOU
+                 END-IF
+               END-PERFORM
+               STRING WRK-STR  DELIMITED BY SPACE
                       WRK-STR2 DELIMITED BY SPACE
-                      INTO WRK-STR
+                      INTO IN-SYOJYOU
                END-STRING
-               MOVE   WRK-STR  TO        IN-SYOJYOU
-             END-PERFORM
            END-IF
       *
       * ºîÍÑµ¡½ø
-           MOVE    ZERO         TO         WRK-CRCNT
-           INSPECT IN-SAYOKIJYO   TALLYING   WRK-CRCNT
-                                FOR        ALL "¡ï£î"
-           IF      WRK-CRCNT        >      0
-             PERFORM VARYING IDX FROM 1 BY 1 UNTIL IDX > WRK-CRCNT
-               MOVE     SPACE    TO        WRK-STR
-               MOVE     SPACE    TO        WRK-STR1
-               MOVE     SPACE    TO        WRK-STR2
-               UNSTRING IN-SAYOKIJYO DELIMITED BY "¡ï£î"
-                        INTO WRK-STR1 WRK-STR2
-               END-UNSTRING
-               STRING WRK-STR1 DELIMITED BY SPACE
-                      CONST-CR DELIMITED BY SIZE
+           MOVE    ZERO                TO  WRK-CRCNT
+           INSPECT IN-SAYOKIJYO        TALLYING  WRK-CRCNT
+                                       FOR ALL "¡ï£î"
+           IF      WRK-CRCNT           >   0
+               MOVE    SPACE           TO  WRK-STR
+               PERFORM VARYING  IDX    FROM  1  BY  1
+                                UNTIL  IDX  >  WRK-CRCNT
+                 MOVE  SPACE           TO  WRK-STR1
+                 MOVE  SPACE           TO  WRK-STR2
+                 MOVE  ZERO            TO  WRK-CRCNT2
+                 INSPECT IN-SAYOKIJYO  TALLYING   WRK-CRCNT2
+                                       FOR   CHARACTERS
+                                       BEFORE INITIAL "¡ï£î"
+                 IF      WRK-CRCNT2    >   0
+                     MOVE  IN-SAYOKIJYO(1:WRK-CRCNT2)
+                                       TO  WRK-STR1
+                     MOVE  IN-SAYOKIJYO(WRK-CRCNT2 + 5:)
+                                       TO  WRK-STR2
+                     STRING WRK-STR  DELIMITED BY SPACE
+                            WRK-STR1 DELIMITED BY SPACE
+                            CONST-CR DELIMITED BY SIZE
+                            INTO WRK-STR
+                     END-STRING
+                     MOVE   WRK-STR2   TO  IN-SAYOKIJYO
+                 END-IF
+               END-PERFORM
+               STRING WRK-STR  DELIMITED BY SPACE
                       WRK-STR2 DELIMITED BY SPACE
-                      INTO WRK-STR
+                      INTO IN-SAYOKIJYO
                END-STRING
-               MOVE   WRK-STR  TO        IN-SAYOKIJYO
-             END-PERFORM
            END-IF
-      *
-          .
+           .
        901-IN-KENSAKU-CRCNV-EXT.
-          EXIT.
+           EXIT.
       *
       *****************************************************************
       *     ¾É¾õÁ¼ÃÖµ¡½ø¥Þ¥¹¥¿¡¼ÆÉ¹þ
@@ -700,7 +723,6 @@
                INITIALIZE                  SSKIJYO-REC
                MOVE    1                   TO  FLG-SSKIJYO
            END-IF
-      *
            .
        910-SSKIJYO-READ-EXT.
            EXIT.
@@ -715,10 +737,8 @@
                                            MCPAREA
                                            MCPDATA-REC
            .
-      *
        990-DBCLOSE-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    £Ä£Â¡¡¥ª¡¼¥×¥ó½èÍý
