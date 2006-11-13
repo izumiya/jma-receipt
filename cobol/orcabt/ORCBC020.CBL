@@ -29,7 +29,6 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  01.00.01    NACL-藤原    04/02/01  病名コード２１に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -119,7 +118,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20061001".
+       01  PRGSKBNO                PIC X(08)  VALUE "20061113".
       *
       *    病院基本情報データ
            COPY    "CPCOMMONDAT5.INC"
@@ -618,14 +617,10 @@
            MOVE    COLDAT01-TAIINYMD   TO  WRK-DATA
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
-      *    診療実日数
-           MOVE    1                   TO  WRK-NUM
-           MOVE    2                   TO  WRK-NAGASA
-           PERFORM 5005-NUM-HENSYU-SEC
       *    患者ＩＤ
-      **** MOVE    COLDAT01-PTID       TO  WRK-NUM
-      **** MOVE    10                  TO  WRK-NAGASA
-      **** PERFORM 5005-NUM-HENSYU-SEC
+           MOVE    SPACE               TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
       *    郵便番号
            MOVE    COLDAT01-HOME-POST      TO  WRK-DATA
            MOVE    7                       TO  WRK-NAGASA
