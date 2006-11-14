@@ -4188,10 +4188,10 @@
                END-PERFORM
            END-IF
       *
-           IF      SPA-ERRCD           =   SPACE
+      *****IF      SPA-ERRCD           =   SPACE
       *        減免重複チェック
-               PERFORM 4909-960JYUFUKU-CHK-SEC
-           END-IF
+      *        PERFORM 4909-960JYUFUKU-CHK-SEC
+      **** END-IF
       *
            .
        41033-HKNKOH-CHK-EXT.
