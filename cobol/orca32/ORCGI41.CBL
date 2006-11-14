@@ -1590,35 +1590,37 @@
            END-IF
            PERFORM
                    UNTIL      FLG-PTNYUINRRK    =   1
-               MOVE    ZERO                TO  IDX-DS
-               MOVE    ZERO                TO  IDX-DE
-      *        転入日
-               IF      SPA-NAI-SRYYM    =   PTNYUINRRK-TENNYUYMD(1:6)
-                   MOVE    PTNYUINRRK-TENNYUYMD(7:2)   TO IDX-DS
-               ELSE
-                   MOVE    1                   TO  IDX-DS
-               END-IF
-      *        転出日
-               IF      SPA-NAI-SRYYM    =   PTNYUINRRK-TENSTUYMD(1:6)
-                   MOVE    PTNYUINRRK-TENSTUYMD(7:2)   TO  IDX-DE
-                   IF     PTNYUINRRK-TAIINYMD  =   PTNYUINRRK-TENSTUYMD
-                       CONTINUE
+               IF   PTNYUINRRK-JTIKBN   NOT = "5"  AND  "6"
+                   MOVE    ZERO                TO  IDX-DS
+                   MOVE    ZERO                TO  IDX-DE
+      *            転入日
+                   IF      SPA-NAI-SRYYM  =   PTNYUINRRK-TENNYUYMD(1:6)
+                       MOVE    PTNYUINRRK-TENNYUYMD(7:2)   TO IDX-DS
                    ELSE
-      *                退院日でない時、前日
-                       COMPUTE IDX-DE          =   IDX-DE  -   1
+                       MOVE    1                   TO  IDX-DS
                    END-IF
-               ELSE
-                   MOVE    SPA-NAI-SRYMATU      TO  IDX-DE
-               END-IF
+      *            転出日
+                   IF      SPA-NAI-SRYYM  =   PTNYUINRRK-TENSTUYMD(1:6)
+                       MOVE    PTNYUINRRK-TENSTUYMD(7:2)   TO  IDX-DE
+                       IF  PTNYUINRRK-TAIINYMD  =  PTNYUINRRK-TENSTUYMD
+                           CONTINUE
+                       ELSE
+      *                    退院日でない時、前日
+                           COMPUTE IDX-DE          =   IDX-DE  -   1
+                       END-IF
+                   ELSE
+                       MOVE    SPA-NAI-SRYMATU      TO  IDX-DE
+                   END-IF
       *
-               PERFORM VARYING    IDK      FROM    IDX-DS   BY  1
-                       UNTIL      IDK      >   IDX-DE
-                   MOVE    "1"             TO  SPA-CHK-DAY (IDK)
-                   IF      SPA-CHK-SRYKA (IDK) =   SPACE
-                       MOVE    PTNYUINRRK-NYUINKA  TO  SPA-CHK-SRYKA
-                                                                (IDK)
-                   END-IF
-               END-PERFORM
+                   PERFORM VARYING    IDK      FROM    IDX-DS   BY  1
+                           UNTIL      IDK      >   IDX-DE
+                       MOVE    "1"             TO  SPA-CHK-DAY (IDK)
+                       IF      SPA-CHK-SRYKA (IDK) =   SPACE
+                           MOVE   PTNYUINRRK-NYUINKA  TO  SPA-CHK-SRYKA
+                                                                  (IDK)
+                       END-IF
+                   END-PERFORM
+               END-IF
       *
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
                MOVE    WRK-DBPATH          TO  MCP-PATHNAME
