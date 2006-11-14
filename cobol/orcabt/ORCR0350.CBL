@@ -152,6 +152,7 @@
       *                                     Ä§¼ýÍ±Í½µÚ¤Ó¸ºÌÈ¤Îµ­Ï¿
       *  03.03.06    NACL-Æ£¸¶    06/10/23  ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»¤Î¸¡ººÆü
       *                                     ¤Îµ­Ï¿¤ò¤ä¤á¤ë
+      *  03.03.08    NACL-Æ£¸¶    06/11/14  Ï·¿Í¸ºÌÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2360,6 +2361,11 @@
            AND   (RECE62-ETC-KOHNUM  (1)   =   "019" ) 
                MOVE    4                   TO  WRK-NUM
                MOVE    1                   TO  WRK-NAGASA
+           ELSE
+               IF      RECE62-GENMENKBN    =   1   OR  2
+                   MOVE    RECE62-GENMENKBN    TO  WRK-NUM
+                   MOVE    1                   TO  WRK-NAGASA
+               END-IF                                 
            END-IF    
            PERFORM 5005-NUM-HENSYU-SEC     
       *    Ï·¿Í°åÎÅ¡ÊÏ·¿Í³°Íè¶â³Û¡Ë

@@ -225,6 +225,7 @@
       *                                     の記録をやめる
       *  03.03.07    NACL-藤原    06/11/08  きざみ値による数量の記録の条件
       *                                     の修正
+      *  03.03.08    NACL-藤原    06/11/14  老人減免対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2155,6 +2156,11 @@
            AND   (RECE02-ETC-KOHNUM  (1)   =   "019" ) 
                MOVE    4                   TO  WRK-NUM
                MOVE    1                   TO  WRK-NAGASA
+           ELSE
+               IF      RECE02-GENMENKBN    =   1   OR  2
+                   MOVE    RECE02-GENMENKBN    TO  WRK-NUM
+                   MOVE    1                   TO  WRK-NAGASA
+               END-IF                                 
            END-IF    
            PERFORM 5005-NUM-HENSYU-SEC     
       *    老人医療（老人外来金額）
