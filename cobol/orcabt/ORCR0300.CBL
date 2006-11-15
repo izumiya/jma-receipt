@@ -2035,7 +2035,13 @@
                    MOVE    RECE02-FTNMONEY(IDX1) TO  WRK-NUM
                    MOVE    9                     TO  WRK-NAGASA
                END-IF
-           END-IF
+           ELSE
+               IF      RECE02-ZAITAKU  NOT =   SPACE
+                   MOVE    RECE02-FTNMONEY (IDX1)
+                                               TO  WRK-NUM
+                   MOVE    9                   TO  WRK-NAGASA
+               END-IF
+           END-IF    
       *
       *    ∏©√±Õ—π‡Ã‹
            IF      FLG-RECE11          =   ZERO
@@ -2170,6 +2176,16 @@
                MOVE    RECE02-FTNMONEY (IDX1)
                                            TO  WRK-NUM
                MOVE    6                   TO  WRK-NAGASA
+           END-IF   
+           IF      RECE02-FTNMONEY (IDX1)
+                                       =   ZERO
+               IF  (   RECE02-ZAITAKU  NOT =   SPACE           )
+               OR  ( ( RECE02-RJNNYUFTN    =   1         ) AND
+                     ( RECE02-GENMENKBN    =   1   OR  2 )     )   
+                   MOVE    RECE02-FTNMONEY (IDX1)
+                                               TO  WRK-NUM
+                   MOVE    6                   TO  WRK-NAGASA
+               END-IF
            END-IF    
       *
       *    ∏©√±Õ—π‡Ã‹

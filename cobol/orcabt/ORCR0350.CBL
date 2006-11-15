@@ -2244,6 +2244,12 @@
                    MOVE    RECE62-FTNMONEY(IDX1) TO  WRK-NUM
                    MOVE    9                     TO  WRK-NAGASA
                END-IF
+           ELSE
+               IF      RECE62-KOUREI   NOT =   SPACE
+                   MOVE    RECE62-FTNMONEY (IDX1)
+                                               TO  WRK-NUM
+                   MOVE    9                   TO  WRK-NAGASA
+               END-IF
            END-IF
       *
       *    ∏©√±Õ—π‡Ã‹
@@ -2384,6 +2390,14 @@
                MOVE    RECE62-FTNMONEY (IDX1)
                                            TO  WRK-NUM
                MOVE    6                   TO  WRK-NAGASA
+           END-IF    
+           IF      RECE62-FTNMONEY (IDX1)
+                                       =   ZERO
+               IF      RECE62-KOUREI   NOT =   SPACE
+                   MOVE    RECE62-FTNMONEY (IDX1)
+                                               TO  WRK-NUM
+                   MOVE    6                   TO  WRK-NAGASA
+               END-IF
            END-IF    
       *
       *    ∏©√±Õ—π‡Ã‹
