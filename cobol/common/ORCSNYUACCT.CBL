@@ -77,6 +77,7 @@
       *    取消
            03  FLG-DELETE              PIC 9(01).
            03  FLG-DELETE-OK           PIC 9(01).
+           03  FLG-DEL                 PIC 9(01).
       *
            03  FLG-RYOYOU              PIC 9(01).
       *
@@ -2012,18 +2013,28 @@
       *
                PERFORM 20011-NYUINACCT-DELDAY-SEC
       *        回数がゼロか、外泊で月をすべて削除する時
-               IF    ((NACCT-ZAISKBKBN NOT =   "2"  )  AND
+      *        食事追加
+               IF    ((NACCT-ZAISKBKBN NOT =   "2"
+                                           AND "4"   )  AND
                       (NACCT-ZAIKAISU      =   ZERO ))   OR
-                     ((NACCT-ZAISKBKBN     =   "2"  )  AND
+                     ((NACCT-ZAISKBKBN     =   "2"
+                                           OR  "4"  )  AND
                       (NACCT-ZAIKAISU      =   ZERO )  AND
                       (WRK-STDD            =   01   ))
       *            退院月の時は削除しない
       *            （転出以外の時）
                    IF     (NACCT-SRYYM(1:6)    =   WRK-RRK-YMD(1:6))
                      AND  (WRK-RRK-YMD(7:2)        NOT =   "01" )
-                     AND  (LNK-SCNYUACCT-SYORI-KBN NOT =   "8" )
-      *                 診療会計更新
-                       PERFORM 20013-NYUINACCT-UPDATE-SEC
+                     AND  (LNK-SCNYUACCT-SYORI-KBN NOT =   "8"  )
+      *                異動取消で入院料の場合、削除
+                       IF     (LNK-SCNYUACCT-SYORI-KBN =   "4"  )  AND
+                              (NACCT-ZAISKBKBN         =   "1"
+                                                       OR  "6"  )
+                           PERFORM 20019-NYUINACCT-CHK-SEC
+                       ELSE
+      *                    診療会計更新
+                           PERFORM 20013-NYUINACCT-UPDATE-SEC
+                       END-IF
                    ELSE
       *                診療会計削除
                        PERFORM 20012-NYUINACCT-DELETE-SEC
@@ -2042,6 +2053,58 @@
            PERFORM 990-DBCLOSE-SEC
            .
        2001-NYUINACCT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   診療会計マスター編集処理
+      *****************************************************************
+       20019-NYUINACCT-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-DEL
+           IF      NACCT-ZAISKBKBN     =   "1"
+      *    診療会計マスターから診療行為マスターを検索する
+               INITIALIZE                      NYUINACT-REC
+               MOVE    NACCT-HOSPID        TO  NSRY-HOSPID
+               MOVE    NACCT-NYUGAIKBN     TO  NSRY-NYUGAIKBN
+               MOVE    NACCT-PTID          TO  NSRY-PTID
+               MOVE    NACCT-SRYKA         TO  NSRY-SRYKA
+               MOVE    NACCT-SRYYM         TO  NSRY-SRYYM
+               MOVE    NACCT-ZAINUM        TO  NSRY-ZAINUM
+      *
+               MOVE    NYUINACT-REC        TO  MCPDATA-REC
+               MOVE    "tbl_nyuinact"      TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_nyuinact"      TO  MCP-TABLE
+                   MOVE    "key2"              TO  MCP-PATHNAME
+                   PERFORM 920-NYUINACT-READ-SEC
+                ELSE
+                   MOVE    1                   TO  FLG-NYUINACT
+                   INITIALIZE                      NYUINACT-REC
+               END-IF
+               MOVE    "tbl_nyuinact"      TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL      (IDX2        >   5   )  OR
+                                  (FLG-DEL     =   1     )  OR
+                                  (NSRY-SRYCD(IDX2)    =   SPACE )
+                   IF      NSRY-SRYCD  (IDX2)  =   "099999916"
+                       MOVE    1               TO  FLG-DEL
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF      FLG-DEL             =   1
+      *        診療会計更新
+               PERFORM 20013-NYUINACCT-UPDATE-SEC
+           ELSE
+      *        診療会計削除
+               PERFORM 20012-NYUINACCT-DELETE-SEC
+           END-IF
+           .
+       20019-NYUINACCT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
