@@ -5325,6 +5325,26 @@
                 IF    RECE02-SENIN-TUUSAI     =    "1"
                   ADD    SYU-SYUCOMPFTN   TO   RECE02-FTNMONEY(1)
                 END-IF
+      *         Ï·¿Í¸ºÌÈ
+                IF    RECE02-RJNHKNNUM   NOT  =    SPACE
+                AND   WK-GENGAKUKBN      NOT  =    ZERO
+                   EVALUATE  WK-GENGAKUKBN
+                     WHEN        1
+                       IF    RECE02-KOHNUM(1)   =    SPACE
+                       AND   RECE02-KOHNUM(2)   =    SPACE
+                       AND   RECE02-KOHNUM(3)   =    SPACE
+                       AND   RECE02-KOHNUM(4)   =    SPACE
+                          ADD    SYU-KOH1COMPFTN
+                                        TO   RECE02-FTNMONEY(1)
+                          MOVE   1      TO   RECE02-RJNNYUFTN
+                       END-IF
+                     WHEN        2
+                       CONTINUE
+                     WHEN        3
+                     WHEN        4
+                          MOVE   1      TO   RECE02-RJNNYUFTN
+                   END-EVALUATE
+                END-IF
              END-IF
            ELSE
              IF    RECE02-RJNHKNNUM    NOT =    SPACE

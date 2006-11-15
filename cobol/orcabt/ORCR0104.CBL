@@ -143,6 +143,8 @@
       *                                     ¸ºÌÈ
       *  03.03.03    NACL-ÌçÏÆ    06/10/16  ²¬»³¸©ÃÏÊý¸øÈñ¼ÂÆü¿ôÊÔ½¸
       *  03.03.04    NACL-Æ£¸¶    06/10/31  ÎÅÍÜ²ð¸î°åÎÅ£²£´¤ÎÄÉ²Ã
+      *
+      *  03.04.01    NACL-Æ£¸¶    06/11/01  ¾È²ñµ¡Ç½Ï¢·ÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1559,8 +1561,6 @@
            IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
                MOVE    WRK-PARA-SHELLID    TO  BTPARA-SHELLID
                MOVE    WRK-PARA-JOBID      TO  BTPARA-JOBID
-               MOVE    PATH-TBL-BTPARA-KEY5
-                                           TO  MCP-PATH
                PERFORM 900-BTPARA-READ-SEC
                IF      FLG-BTPARA          =   1
                    MOVE
@@ -4273,6 +4273,7 @@
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(1)
                IF    ( RECE02-FTNMONEY (IDX1) >    ZERO   )
                OR    ( RECE02-ZAITAKU     NOT =    SPACE  )
+               OR    ( RECE02-RJNNYUFTN       =    1      )
                    MOVE    RECE02-FTNMONEY (IDX1) TO  WRK-KGK7
                    IF      RECE02-GENMENKBN   =   ZERO
                        MOVE    WRK-KGK7           TO  HC06-FTNMONEY (1)
@@ -6111,7 +6112,7 @@
            IF      WRK-PARA-SYOKBN     =   "1"
                MOVE    WRK-RECENUM         TO  RECE08-RECENUM
            ELSE
-               IF      BTPARA-INFO-KBN     =   "01"
+               IF      BTPARA-INFO-KBN     =   "01"    OR  "04"
                    COMPUTE RECE08-RECENUM  =
                            RECE02-PRTSEQ   *   100 +   
                                                TBL-RECE-RENNUM (IDXY)
@@ -6472,6 +6473,10 @@
                                                    TO  RECE07-STYMD
                            MOVE    BTPARA-INFO-PARA (9:8)
                                                    TO  RECE07-EDYMD
+                       WHEN    "04"
+                           MOVE    "3"             TO  RECE07-SYORISBT
+                           MOVE    BTPARA-INFO-PARA (1:6)
+                                                   TO  RECE07-STYMD
                    END-EVALUATE
                END-IF 
                MOVE    1                   TO  RECE07-PAGE
@@ -7727,24 +7732,24 @@
        900-BTPARA-READ-SEC         SECTION.
       *
            MOVE    BTPARA-REC          TO  MCPDATA-REC
+           MOVE    "tbl_btpara"        TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           CALL    "MCPSUB"            USING
+           CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    PATH-TBL-BTPARA-KEY5    TO  MCP-PATH
+               MOVE    "tbl_btpara"        TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
                PERFORM 900-BTPARA-READ-N-SEC
            ELSE
                MOVE    1                   TO  FLG-BTPARA
                INITIALIZE                      BTPARA-REC
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-           MOVE    PATH-TBL-BTPARA-KEY5
-                                       TO  MCP-PATH
-           CALL    "MCPSUB"            USING
-                                       MCPAREA
-                                       MCPDATA-REC
+           MOVE    "tbl_btpara"        TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
       *
            .
        900-BTPARA-READ-EXT.
@@ -7756,7 +7761,7 @@
        900-BTPARA-READ-N-SEC          SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MCPSUB"            USING
+           CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
