@@ -5330,13 +5330,17 @@
                 AND   WK-GENGAKUKBN      NOT  =    ZERO
                    EVALUATE  WK-GENGAKUKBN
                      WHEN        1
-                       IF    RECE02-KOHNUM(1)   =    SPACE
-                       AND   RECE02-KOHNUM(2)   =    SPACE
-                       AND   RECE02-KOHNUM(3)   =    SPACE
-                       AND   RECE02-KOHNUM(4)   =    SPACE
+                       IF    WK-GENGAKU-RITU  =  100
+                          MOVE   1      TO   RECE02-RJNNYUFTN
+                       ELSE
+                         IF    RECE02-KOHNUM(1)   =    SPACE
+                         AND   RECE02-KOHNUM(2)   =    SPACE
+                         AND   RECE02-KOHNUM(3)   =    SPACE
+                         AND   RECE02-KOHNUM(4)   =    SPACE
                           ADD    SYU-KOH1COMPFTN
                                         TO   RECE02-FTNMONEY(1)
                           MOVE   1      TO   RECE02-RJNNYUFTN
+                         END-IF
                        END-IF
                      WHEN        2
                        CONTINUE
