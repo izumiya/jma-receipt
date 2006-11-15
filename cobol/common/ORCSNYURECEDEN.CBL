@@ -94,7 +94,7 @@
            03  GENSAN-IDX                  PIC 9(04).
            03  GENSAN-IDX2                 PIC 9(04).
            03  IDV                         PIC 9(04).
-           03  TSY90-IDX                   PIC 9(04).
+           03  TSY90-IDX                   PIC 9(02).
            03  ETC-IDX                     PIC 9(04).
            03  IDX-TSY90                   PIC 9(04).
            03  IDX-ADL                     PIC 9(04).
