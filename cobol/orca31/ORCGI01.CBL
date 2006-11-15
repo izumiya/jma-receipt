@@ -187,6 +187,8 @@
            03  FLG-TAINTUSANMINUS          PIC 9(01).
            03  FLG-TARGET                  PIC 9(01).
            03  FLG-ROUJIN                  PIC 9(01).
+           03  FLG-SYS5000                 PIC 9(01).
+           03  FLG-SYS5001                 PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -449,6 +451,7 @@
                05  WRK-SYUKA-YMD           PIC X(08).
            03  WRK-CHK-YMD                 PIC X(08).
            03  WRK-CMB-TOKNYUIN-AREA           PIC X(3000).
+           03  WRK-ERRMSG                  PIC X(10).
       *
        01  BAK-AREA.
            03  BAK-AGE-G.
@@ -6737,9 +6740,15 @@
                END-IF
            END-IF
       *
-           PERFORM 48011-H18-KAISEI-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4801-KANREN-CHK-EXT
+           IF    ( SPA-GMN-I01-SYORIKBN-CD     =   "01"
+                                                OR "02"
+                                                OR "10"
+                                                OR "11"
+                                                OR "08" )
+               PERFORM 48011-H18-KAISEI-CHK-SEC
+               IF    ( SPA-ERRCD   NOT =   SPACE )
+                   GO  TO  4801-KANREN-CHK-EXT
+               END-IF
            END-IF
       *
            .
@@ -6756,19 +6765,23 @@
            WHEN    "01"
                MOVE    SPA-NAI-I01-NYUINYMD
                                    TO  WRK-CHK-YMD
+               MOVE    "入院日に"  TO  WRK-ERRMSG
       *    退院登録
            WHEN    "02"
            WHEN    "10"
            WHEN    "11"
                MOVE    SPA-NAI-I01-TAIINYMD
                                    TO  WRK-CHK-YMD
+               MOVE    "退院日に"  TO  WRK-ERRMSG
       *    転科　転棟　転室
            WHEN    "08"
       *
                MOVE    SPA-NAI-I01-IDOYMD
                                    TO  WRK-CHK-YMD
+               MOVE    "異動日に"  TO  WRK-ERRMSG
            END-EVALUATE
       *
+           MOVE        ZERO            TO  FLG-SYS5001
            INITIALIZE  SYS-5001-REC
            MOVE    "5001"              TO  SYS-5001-KANRICD
            MOVE    SPA-GMN-I01-BTUNAME-CD  TO  SYS-5001-KBNCD
@@ -6782,12 +6795,19 @@
                MOVE    MCPDATA-REC     TO  SYS-5001-REC
            ELSE
               INITIALIZE                   SYS-5001-REC
+               MOVE    1               TO  FLG-SYS5001
            END-IF
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           IF    ( FLG-SYS5001         NOT =   ZERO )
+               MOVE    "1045"          TO  SPA-ERRCD
+               GO  TO  48011-H18-KAISEI-CHK-EXT
+           END-IF
+      *
+           MOVE        ZERO            TO  FLG-SYS5000
            INITIALIZE  SYS-5000-REC
            MOVE    "5000"              TO  SYS-5000-KANRICD
            MOVE    "*"                 TO  SYS-5000-KBNCD
@@ -6800,12 +6820,18 @@
            IF    ( MCP-RC      =   ZERO )
                MOVE    MCPDATA-REC     TO  SYS-5000-REC
            ELSE
+              MOVE        1            TO  FLG-SYS5000
               INITIALIZE                  SYS-5000-REC
            END-IF
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF    ( FLG-SYS5000         NOT =   ZERO )
+               MOVE    "1044"          TO  SPA-ERRCD
+               GO  TO  48011-H18-KAISEI-CHK-EXT
+           END-IF
       *
            IF    ( WRK-CHK-YMD     >=  CONST-H180401 )
       *
@@ -15932,6 +15958,21 @@
                                        TO  SPA-ERRMSG (1 : 40)
                MOVE    "行ってください"
                                        TO  SPA-ERRMSG (41 : )
+           WHEN    "1044"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  WRK-ERRMSG          DELIMITED   BY  SPACE
+                       "有効な医療機関情報−入院基本の設定が"
+                                           DELIMITED   BY  SIZE
+                       "存在しません"      DELIMITED   BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "1045"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  WRK-ERRMSG          DELIMITED   BY  SPACE
+                       "有効な病棟管理情報が存在しません"
+                                           DELIMITED   BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
            WHEN    "2012"
                MOVE    "退院計算に必要な会計情報が作成されていません"
                                        TO  SPA-ERRMSG
