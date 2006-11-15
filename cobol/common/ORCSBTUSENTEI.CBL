@@ -162,7 +162,7 @@
        100-PRM-CHK-SEC                     SECTION.
       *
            IF    ( SBTUSENTEI-SRYYM    =   SPACE )
-               MOVE    99              TO  SBTUSENTEI-RC
+               MOVE    01              TO  SBTUSENTEI-RC
                GO  TO  100-PRM-CHK-EXT
            END-IF
       *
@@ -345,10 +345,12 @@
                IF    ( SBTUSENTEI-RC       NOT =   ZERO )
                    DISPLAY "SBTUSENTEI-PTID2 = " SBTUSENTEI-PTID
                    DISPLAY "SBTUSENTEI-RC2 = " SBTUSENTEI-RC
-                   GO  TO  2100-PTNYUINRRK-EDIT-EXT
+                   MOVE    1               TO  FLG-PTNYUINRRK
                END-IF
       *
-               PERFORM 900-PTNYUINRRK-KEY11-FET-SEC
+               IF    ( FLG-PTNYUINRRK      =   ZERO )
+                   PERFORM 900-PTNYUINRRK-KEY11-FET-SEC
+               END-IF
       *
            END-PERFORM
       *
@@ -406,11 +408,11 @@
            SET     SRH-5001-IDX        TO  1
            SEARCH  SRH-5001-OCC        VARYING SRH-5001-IDX
            AT      END
-               MOVE    99              TO  SBTUSENTEI-RC
+               MOVE    02              TO  SBTUSENTEI-RC
                GO  TO  2100-SENTEI-SET-EXT
            WHEN  ( SRH-5001-BTUNUM (SRH-5001-IDX)
                                        =   SPACE )
-               MOVE    99              TO  SBTUSENTEI-RC
+               MOVE    03              TO  SBTUSENTEI-RC
                GO  TO  2100-SENTEI-SET-EXT
            WHEN  ( SRH-5001-BTUNUM (SRH-5001-IDX)
                                        =   WRK-CHK-BTUNUM )
@@ -454,7 +456,7 @@
                MOVE    SGDAY-OTDAY         TO  WRK-HENYMDG
                MOVE    SGDAY-SDAY          TO  WRK-SYMD
            ELSE
-               MOVE    99                  TO  SBTUSENTEI-RC
+               MOVE    04                  TO  SBTUSENTEI-RC
            END-IF
            .
        800-HIZUKE-CHK-EXT.
@@ -476,7 +478,7 @@
                                            STS-AREA-DAY
                                            LNK-DAY5-AREA
            IF    ( STS-DAY-RC1     NOT =   ZERO )
-               MOVE    99              TO  SBTUSENTEI-RC
+               MOVE    05              TO  SBTUSENTEI-RC
                GO  TO                      800-KIKAN-CALC-EXT
            END-IF
       *
