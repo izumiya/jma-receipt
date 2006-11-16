@@ -4577,11 +4577,21 @@
                      IF   WRK-SKJ200604-DAY-KAN(IDX1 SYUKEI-IDX3)
                                                         NOT =  ZERO
                      AND  WRK-NYULIFE-KBN(SYUKEI-IDX3)  NOT =  SPACE
-                        PERFORM 210219-RECE64-TENSOU2-SKJ200610-KAN-SEC
-                        PERFORM 210220-RECE65-HENSYU2-SKJ200610-KAN-SEC
-                        PERFORM RECE65-WRITE-SEC
-                        PERFORM RECE64-WRITE-SEC
+                       PERFORM 210219-RECE64-TENSOU2-SKJ200610-KAN-SEC
+                       PERFORM 210220-RECE65-HENSYU2-SKJ200610-KAN-SEC
+                       PERFORM RECE65-WRITE-SEC
+                       PERFORM RECE64-WRITE-SEC
       *
+                       IF  (RECE62-HKNNUMHC(IDX1)        =  SPACE)
+                       AND (RECE62-KOHNUMHC(IDX1 1)(1:1) =  "0"  )
+                       AND (RECE62-KOHNUMHC(IDX1 1)  NOT =  "010" AND
+                                                            "051" AND
+                                                            "052")
+                       AND (RECE62-KOHNUMHC(IDX1 2)      =  SPACE)
+                       AND (RECE62-KOHNUMHC(IDX1 3)      =  SPACE)
+                       AND (RECE62-KOHNUMHC(IDX1 4)      =  SPACE)
+                        CONTINUE
+                       ELSE
                         IF   WRK-NYULIFE-SKJFTN-SRYCD(SYUKEI-IDX3)
                                                         NOT =  SPACE
                         AND  WRK-NYULIFE-SKJFTN-MONEY(SYUKEI-IDX3)
@@ -4605,7 +4615,7 @@
                           PERFORM RECE65-WRITE-SEC
                           PERFORM RECE64-WRITE-SEC
                         END-IF
-      *
+                       END-IF
                      END-IF
       *
                    END-PERFORM
