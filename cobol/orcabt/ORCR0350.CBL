@@ -153,6 +153,9 @@
       *  03.03.06    NACL-∆£∏∂    06/10/23  ≥∞ÕËø◊¬Æ∏°¬Œ∏°∫∫≤√ªª§Œ∏°∫∫∆¸
       *                                     §Œµ≠œø§Ú§‰§·§Î
       *  03.03.08    NACL-∆£∏∂    06/11/14  œ∑øÕ∏∫Ã»¬–±˛
+      *  03.03.09    NACL-∆£∏∂    06/11/16  ∏¯»Ò√±∆»§«∏¯»Ò§¨¡¥§∆¿∏≥ËŒ≈Õ‹
+      *                                     ø©ªˆ…È√¥§¢§Í§ŒæÏπÁ§œ°÷97°◊§Œ
+      *                                     µ≠∫‹§œ§∑§ §§
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1242,6 +1245,39 @@
       *        …∏Ω‡…È√¥≥€° ƒ„ΩÍ∆¿£≤°¶£π£∞∆¸ƒ∂°À
                05  WRK-CONS-HYOJYUN-FUTAN4
                                       PIC X(09)   VALUE   "197001010".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€
+               05  WRK-CONS-HYOJYUN-FUTAN5
+                                      PIC X(09)   VALUE   "197001910".
+      *        ¿∏≥ËŒ≈Õ‹° £±°À°¶…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN6
+                                      PIC X(09)   VALUE   "197002010".
+      *        ¿∏≥ËŒ≈Õ‹° £≤°À°¶…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN7
+                                      PIC X(09)   VALUE   "197002110".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ƒ„£≤°À
+               05  WRK-CONS-HYOJYUN-FUTAN8
+                                      PIC X(09)   VALUE   "197002210".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ƒ„£±°À
+               05  WRK-CONS-HYOJYUN-FUTAN9
+                                      PIC X(09)   VALUE   "197002310".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °∞ ≥∞°À°À
+               05  WRK-CONS-HYOJYUN-FUTAN10
+                                      PIC X(09)   VALUE   "197002410".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °°À°À
+               05  WRK-CONS-HYOJYUN-FUTAN11
+                                      PIC X(09)   VALUE   "197002510".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN12
+                                      PIC X(09)   VALUE   "197002710".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸∞ ≤º°À
+               05  WRK-CONS-HYOJYUN-FUTAN13
+                                      PIC X(09)   VALUE   "197002810".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸ƒ∂°À
+               05  WRK-CONS-HYOJYUN-FUTAN14
+                                      PIC X(09)   VALUE   "197002910".
+      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
+               05  WRK-CONS-HYOJYUN-FUTAN15
+                                      PIC X(09)   VALUE   "197003010".
       *
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
       *
@@ -5482,7 +5518,18 @@
                                            =   WRK-CONS-HYOJYUN-FUTAN1
                                            OR  WRK-CONS-HYOJYUN-FUTAN2
                                            OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4
+                                           OR  WRK-CONS-HYOJYUN-FUTAN5
+                                           OR  WRK-CONS-HYOJYUN-FUTAN6
+                                           OR  WRK-CONS-HYOJYUN-FUTAN7
+                                           OR  WRK-CONS-HYOJYUN-FUTAN8
+                                           OR  WRK-CONS-HYOJYUN-FUTAN9
+                                           OR  WRK-CONS-HYOJYUN-FUTAN10
+                                           OR  WRK-CONS-HYOJYUN-FUTAN11
+                                           OR  WRK-CONS-HYOJYUN-FUTAN12
+                                           OR  WRK-CONS-HYOJYUN-FUTAN13
+                                           OR  WRK-CONS-HYOJYUN-FUTAN14
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
                                    CONTINUE
                                ELSE
                                  IF    ( RECE62-HKNNUM     =   "002"  )
