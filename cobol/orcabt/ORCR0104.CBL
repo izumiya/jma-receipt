@@ -143,8 +143,6 @@
       *                                     ¸ºÌÈ
       *  03.03.03    NACL-ÌçÏÆ    06/10/16  ²¬»³¸©ÃÏÊý¸øÈñ¼ÂÆü¿ôÊÔ½¸
       *  03.03.04    NACL-Æ£¸¶    06/10/31  ÎÅÍÜ²ð¸î°åÎÅ£²£´¤ÎÄÉ²Ã
-      *
-      *  03.04.01    NACL-Æ£¸¶    06/11/01  ¾È²ñµ¡Ç½Ï¢·ÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1561,6 +1559,8 @@
            IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
                MOVE    WRK-PARA-SHELLID    TO  BTPARA-SHELLID
                MOVE    WRK-PARA-JOBID      TO  BTPARA-JOBID
+               MOVE    PATH-TBL-BTPARA-KEY5
+                                           TO  MCP-PATH
                PERFORM 900-BTPARA-READ-SEC
                IF      FLG-BTPARA          =   1
                    MOVE
@@ -6112,7 +6112,7 @@
            IF      WRK-PARA-SYOKBN     =   "1"
                MOVE    WRK-RECENUM         TO  RECE08-RECENUM
            ELSE
-               IF      BTPARA-INFO-KBN     =   "01"    OR  "04"
+               IF      BTPARA-INFO-KBN     =   "01"
                    COMPUTE RECE08-RECENUM  =
                            RECE02-PRTSEQ   *   100 +   
                                                TBL-RECE-RENNUM (IDXY)
@@ -6473,10 +6473,6 @@
                                                    TO  RECE07-STYMD
                            MOVE    BTPARA-INFO-PARA (9:8)
                                                    TO  RECE07-EDYMD
-                       WHEN    "04"
-                           MOVE    "3"             TO  RECE07-SYORISBT
-                           MOVE    BTPARA-INFO-PARA (1:6)
-                                                   TO  RECE07-STYMD
                    END-EVALUATE
                END-IF 
                MOVE    1                   TO  RECE07-PAGE
@@ -7732,24 +7728,24 @@
        900-BTPARA-READ-SEC         SECTION.
       *
            MOVE    BTPARA-REC          TO  MCPDATA-REC
-           MOVE    "tbl_btpara"        TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
            MOVE    "DBSELECT"          TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_btpara"        TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
+               MOVE    PATH-TBL-BTPARA-KEY5    TO  MCP-PATH
                PERFORM 900-BTPARA-READ-N-SEC
            ELSE
                MOVE    1                   TO  FLG-BTPARA
                INITIALIZE                      BTPARA-REC
            END-IF
       *
-           MOVE    "tbl_btpara"        TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           MOVE    PATH-TBL-BTPARA-KEY5
+                                       TO  MCP-PATH
+           CALL    "MCPSUB"            USING
+                                       MCPAREA
+                                       MCPDATA-REC
       *
            .
        900-BTPARA-READ-EXT.
@@ -7761,7 +7757,7 @@
        900-BTPARA-READ-N-SEC          SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
+           CALL    "MCPSUB"            USING
                                        MCPAREA
                                        MCPDATA-REC
            IF      MCP-RC              =   ZERO
