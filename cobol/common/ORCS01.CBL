@@ -3715,8 +3715,9 @@
                END-IF
            END-IF.
       *
-           IF  ((LNK-S01-KOUREI-ZAITAKU-KBN   =       "1" ) OR
-                (FLG-KOUREI-KBN               =       "1" ))
+      **>  IF  ((LNK-S01-KOUREI-ZAITAKU-KBN   =       "1" ) 
+      **>       (FLG-KOUREI-KBN               =       "1" ))
+           IF  ( LNK-S01-KOUREI-ZAITAKU-KBN   =       "1"  )
            AND ( COMB-HKNNUM            NOT   =     SPACE  )
       *
                 IF   COMB-KOH1HKNNUM      =    "027"
@@ -5790,8 +5791,8 @@
       *
            END-IF
       *
-           IF   (LNK-S01-KOUREI-ZAITAKU-KBN   =       "1" ) OR
-                (FLG-KOUREI-KBN               =       "1" )
+           IF   (LNK-S01-KOUREI-ZAITAKU-KBN   =       "1" )
+      ***> OR   (FLG-KOUREI-KBN               =       "1" )
       *
               IF   COMB-KOH1HKNNUM          =  "027"
                  IF   MAX-KIN-KOHI1-M   NOT =  ZERO
