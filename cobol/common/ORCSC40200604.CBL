@@ -656,34 +656,34 @@
            END-IF
       *
       *    １日に１回数のみチェック（Ｋ０２のみのチェック）
-           IF      (LNK-ORCSC-PG       =   "K02" )
+      *    IF      (LNK-ORCSC-PG       =   "K02" )
       *        労災の時、チェックをしない
-               AND (SPA-HKNKBN         =   ZERO  )
-               MOVE    ZERO            TO  WRK-DAY-CNT
-               MOVE    SPACE           TO  WRK-ERRCD2
-               PERFORM VARYING     IDX-TBL     FROM    1   BY  1
-                       UNTIL      (IDX-TBL     >   TBL-SYOCHI-MAX) OR
-                                  (WRK-ERRCD2  NOT =   SPACE)
-                   SET     TBL-IDX             TO  IDX-TBL
-                   MOVE    TBL-SRYCD (TBL-IDX) TO  WRK-SRYCD
-                   PERFORM 3001-SANTEI-CHK-SEC
-                   ADD     LNK-SC91-DAYCNT     TO  WRK-DAY-CNT
-                   IF      WRK-DAY-CNT         >   1
+      *        AND (SPA-HKNKBN         =   ZERO  )
+      *        MOVE    ZERO            TO  WRK-DAY-CNT
+      *        MOVE    SPACE           TO  WRK-ERRCD2
+      *        PERFORM VARYING     IDX-TBL     FROM    1   BY  1
+      *                UNTIL      (IDX-TBL     >   TBL-SYOCHI-MAX) OR
+      *                           (WRK-ERRCD2  NOT =   SPACE)
+      *            SET     TBL-IDX             TO  IDX-TBL
+      *            MOVE    TBL-SRYCD (TBL-IDX) TO  WRK-SRYCD
+      *            PERFORM 3001-SANTEI-CHK-SEC
+      *            ADD     LNK-SC91-DAYCNT     TO  WRK-DAY-CNT
+      *            IF      WRK-DAY-CNT         >   1
       ***********  IF    ((WRK-SRYCD           =   WRK-COM-INPUTCD
       *                                                    (IDX-Z)) AND
       *                   (LNK-SC91-DAYCNT     >   1              ))  OR
       *                  ((WRK-SRYCD       NOT =   WRK-COM-INPUTCD
       *                                                    (IDX-Z)) AND
       ********************(LNK-SC91-DAYCNT     >   ZERO          ))
-                       MOVE    "1022"          TO  WRK-ERRCD2
-                       MOVE    IDX-Z           TO  WRK-IDX-ERR
+      *                MOVE    "1022"          TO  WRK-ERRCD2
+      *                MOVE    IDX-Z           TO  WRK-IDX-ERR
       *****************MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                   END-IF
-               END-PERFORM
-               IF      WRK-ERRCD2      NOT =   SPACE
-                   GO      TO      100112-SYOEN-CHK-EXT
-               END-IF
-           END-IF
+      *            END-IF
+      *        END-PERFORM
+      *        IF      WRK-ERRCD2      NOT =   SPACE
+      *            GO      TO      100112-SYOEN-CHK-EXT
+      *        END-IF
+      *****END-IF
       *
       *    労災でマッサージ等、器具等の時、日に３部位とする
            IF     (LNK-ORCSC-PG       =   "K02" ) AND
