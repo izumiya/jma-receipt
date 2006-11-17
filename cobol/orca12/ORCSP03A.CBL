@@ -2239,7 +2239,7 @@
            END-IF
       *
            IF      (SPA-HKNJA-IDOYMD   <=  SPA-NAI-HTEKSTYMD )  OR
-                   (SPA-HKNJA-IDOYMD   <=  SPA-NAI-HTEKEDYMD )
+                   (SPA-HKNJA-IDOYMD   <   SPA-NAI-HTEKEDYMD )
                CONTINUE
            ELSE
                MOVE    SPACE           TO  SPA-HKNJA-KEIFLG
