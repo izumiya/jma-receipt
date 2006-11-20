@@ -226,6 +226,11 @@
       *  03.03.07    NACL-藤原    06/11/08  きざみ値による数量の記録の条件
       *                                     の修正
       *  03.03.08    NACL-藤原    06/11/14  老人減免対応
+      *  03.03.11    NACL-藤原    06/11/17  福岡県対応
+      *                                     ２００６年１０月以降全て対象
+      *                                     とする
+      *  03.03.12    NACL-藤原    06/11/17  主科未設定の場合でも科別印刷
+      *                                     設定のときはレセ電を記録する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6599,19 +6604,31 @@
                        OR  (   RECE02-RECESYUBETU  =   ZERO   OR 
                                                        8888   OR 
                                                        6666        )
-                       OR  ( RECE02-SYUKA        =   "XX"          )
-                           CONTINUE
+                           MOVE    2               TO  FLG-READ
                        ELSE
-                         IF    ( RECE02-TOTALTEN (1) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (2) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (3) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (4) =   ZERO     )
-                         AND   ( RECE02-TOTALTEN (5) =   ZERO     )
-                         AND   ( RECE02-RECESYUBETU  NOT =  8888
-                                                         AND ZERO )
-                             CONTINUE
-                         ELSE
+      *                    主科設定のとき未設定なら更新しない
+                           IF    ( SYS-2009-SYUKA-KBN  =   "1"  )
+                           AND   ( RECE02-SYUKA        =   "XX" )
+                             IF  (     ( RECE02-TEISYUTUSAKI   = "1" )
+                                   AND ( SYS-2009-SYUKA-SYAHO  = "1" ) )
+                             OR  (     ( RECE02-TEISYUTUSAKI   = "2" )
+                                   AND ( SYS-2009-SYUKA-KOKUHO = "1" ) )
+                               MOVE    2               TO  FLG-READ
+                             END-IF
+                           ELSE
+                               IF    ( RECE02-TOTALTEN (1) =   ZERO    )
+                               AND   ( RECE02-TOTALTEN (2) =   ZERO    )
+                               AND   ( RECE02-TOTALTEN (3) =   ZERO    )
+                               AND   ( RECE02-TOTALTEN (4) =   ZERO    )
+                               AND   ( RECE02-TOTALTEN (5) =   ZERO    )
+                               AND   ( RECE02-RECESYUBETU  NOT =  8888
+                                                              AND ZERO )
+                                   MOVE    2               TO  FLG-READ
+                               END-IF
+                           END-IF
+                       END-IF    
       *
+                       IF      FLG-READ            =   ZERO
       *                    医療機関情報取得
                            IF      WRK-PARA-SRYYM  =   ZERO
                                MOVE  RECE02-SRYYM      TO
@@ -6640,8 +6657,9 @@
                            ELSE
       *
       *                      福岡地方公費対応（国保）
-                             IF    ( SYS-1001-PREFNUM    =   "40" )
-                             AND   ( RECE02-TEISYUTUSAKI =   "2"  ) 
+                             IF    ( SYS-1001-PREFNUM    =   "40"   )
+                             AND   ( RECE02-TEISYUTUSAKI =   "2"    ) 
+                             AND   ( RECE02-SRYYM        <=  200609 ) 
                                IF    ( RECE02-KOHNUM (1) (1:1)
                                                        =   "1" OR  "2" )
                                OR    ( RECE02-KOHNUM (2) (1:1)
@@ -6667,7 +6685,6 @@
                                MOVE    1               TO  FLG-READ
                              END-IF
                            END-IF
-                         END-IF
                        END-IF    
       *
                        IF      FLG-READ            =   1
@@ -6677,6 +6694,8 @@
       *
                            DISPLAY "RECE02  PTNUM=" RECE02-PTNUM     
                                    " RJNGAIFTN=" RECE02-RJNGAIFTN    
+                       ELSE
+                           MOVE    ZERO        TO  FLG-READ     
                        END-IF
                END-READ
            END-PERFORM

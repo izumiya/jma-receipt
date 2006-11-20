@@ -156,6 +156,13 @@
       *  03.03.09    NACL-藤原    06/11/16  公費単独で公費が全て生活療養
       *                                     食事負担ありの場合は「97」の
       *                                     記載はしない
+      *  03.03.10    NACL-藤原    06/11/17  検査の判断料の負担区分の記録
+      *                                     の修正
+      *  03.03.11    NACL-藤原    06/11/17  福岡県対応
+      *                                     ２００６年１０月以降全て対象
+      *                                     とする
+      *  03.03.12    NACL-藤原    06/11/17  主科未設定の場合でも科別印刷
+      *                                     設定のときはレセ電を記録する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4183,7 +4190,7 @@
                                            >   0
       *            負担区分編集処理
                    MOVE    TBL-KENSA-RECE64-REC (IDZ3)
-                                               TO  RECE641-REC
+                                               TO  WRK-RECE641-REC
                    PERFORM 20070-FTNKBN-HENSYU-SEC
                    MOVE    "60"                TO  WRK-SRYKBN
                    PERFORM VARYING IDZ4    FROM    1   BY  1
@@ -7095,10 +7102,21 @@
                        OR  (   RECE62-RECESYUBETU  =   ZERO   OR 
                                                        8888   OR 
                                                        6666        )
-                       OR  (   RECE62-SYUKA        =   "XX"        )
-                           CONTINUE
+                           MOVE    2               TO  FLG-READ
                        ELSE
+      *                    主科設定のとき未設定なら更新しない
+                           IF    ( SYS-2009-SYUKA-KBN  =   "1"  )
+                           AND   ( RECE62-SYUKA        =   "XX" )
+                             IF  (     ( RECE62-TEISYUTUSAKI   = "1" )
+                                   AND ( SYS-2009-SYUKA-SYAHO  = "1" ) )
+                             OR  (     ( RECE62-TEISYUTUSAKI   = "2" )
+                                   AND ( SYS-2009-SYUKA-KOKUHO = "1" ) )
+                               MOVE    2               TO  FLG-READ
+                             END-IF
+                           END-IF
+                       END-IF    
       *
+                       IF      FLG-READ            =   ZERO
       *                    医療機関情報取得
                            IF      WRK-PARA-SRYYM  =   ZERO
                                MOVE  RECE62-SRYYM      TO
@@ -7109,8 +7127,10 @@
                            END-IF
       *
       *                    福岡地方公費対応（国保）
-                           IF    ( SYS-1001-PREFNUM    =   "40" )
-                           AND   ( RECE62-TEISYUTUSAKI =   "2"  ) 
+                           IF    ( SYS-1001-PREFNUM    =   "40"      )
+                           AND   ( RECE62-TEISYUTUSAKI =   "2"       ) 
+                           AND   ( RECE62-SRYYM        <=
+                                               WRK-CONS-SRYYM-200609 ) 
                                IF    ( RECE62-KOHNUM (1) (1:1)
                                                        =   "1" OR  "2" )
                                OR    ( RECE62-KOHNUM (2) (1:1)
@@ -7150,6 +7170,8 @@
       *
                            DISPLAY "RECE62  PTNUM=" RECE62-PTNUM  
                                    "  RJNGAIFTN=" RECE62-RJNGAIFTN    
+                       ELSE
+                           MOVE    ZERO        TO  FLG-READ     
                        END-IF
                END-READ
            END-PERFORM
