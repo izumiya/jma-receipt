@@ -3819,6 +3819,9 @@
                MOVE    "1"         TO  WKPTNYUINRRK-DRCD1
                MOVE    SPA-GMN-I04-DR-CD
                                    TO  WKPTNYUINRRK-DRCD1 (2 : )
+           ELSE
+               MOVE    SPACE
+                                   TO  WKPTNYUINRRK-DRCD1 (2 : )
            END-IF
            MOVE    WKPTNYUINRRK-REC
                                    TO  LNK-PTNYUINRRK

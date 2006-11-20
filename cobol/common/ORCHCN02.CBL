@@ -355,7 +355,7 @@
       *
       *    ¿¦°÷¾ðÊó
            IF          LNK-PTNYUINRRK-DRCD1    =   SPACE
-               CONTINUE
+               MOVE    SPACE                   TO  SYS-1010-REC
            ELSE
                INITIALIZE                      SYS-1010-REC
                MOVE    "1010"                  TO  SYS-1010-KANRICD
