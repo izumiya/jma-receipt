@@ -655,6 +655,23 @@
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-ZHENSYU24           TO  HCN03-HOKENBUN
       *
+      *    ø©ªˆŒ≈Õ‹°¢¿∏≥ËŒ≈Õ‹§Œ ‘Ω∏
+           MOVE    ZERO                  TO  WRK-SKJRYO
+           COMPUTE    WRK-SKJRYO   =
+                      SYU-RYOYOHI-SKJ    +   SYU-RYOYOHI-SKJ-JIHI
+           MOVE    WRK-SKJRYO            TO  WRK-KINGAKU-Z
+           MOVE    WRK-KINGAKU-Z         TO  WRK-ZHENSYU12
+           PERFORM 800-HENKAN-SEC
+           MOVE    WRK-ZHENSYU24         TO  HCN03-SKJRYO
+      *
+           MOVE    ZERO                  TO  WRK-LIFERYO
+           COMPUTE    WRK-LIFERYO   =
+                      SYU-RYOYOHI-LIFE   +   SYU-RYOYOHI-LIFE-JIHI
+           MOVE    WRK-LIFERYO           TO  WRK-KINGAKU-Z
+           MOVE    WRK-KINGAKU-Z         TO  WRK-ZHENSYU12
+           PERFORM 800-HENKAN-SEC
+           MOVE    WRK-ZHENSYU24         TO  HCN03-LIFERYO
+      *
       *    œ´∫“°¶º´«Â§Œª˛°¢≈¿øÙ…Ωº®§ §∑
            IF    ( COMB-HKNNUM             =    "971"
                                            OR   "973" )
@@ -676,25 +693,10 @@
                        MOVE    WRK-ZHENSYU24   TO  HCN03-HOKENBUN
                WHEN    OTHER
                    MOVE    SPACE           TO  HCN03-HOKENBUN
+                                               HCN03-SKJRYO
+                                               HCN03-LIFERYO
                END-EVALUATE
            END-IF
-      *
-      *    ø©ªˆŒ≈Õ‹°¢¿∏≥ËŒ≈Õ‹§Œ ‘Ω∏
-           MOVE    ZERO                  TO  WRK-SKJRYO
-           COMPUTE    WRK-SKJRYO   =
-                      SYU-RYOYOHI-SKJ    +   SYU-RYOYOHI-SKJ-JIHI
-           MOVE    WRK-SKJRYO            TO  WRK-KINGAKU-Z
-           MOVE    WRK-KINGAKU-Z         TO  WRK-ZHENSYU12
-           PERFORM 800-HENKAN-SEC
-           MOVE    WRK-ZHENSYU24         TO  HCN03-SKJRYO
-      *
-           MOVE    ZERO                  TO  WRK-LIFERYO
-           COMPUTE    WRK-LIFERYO   =
-                      SYU-RYOYOHI-LIFE   +   SYU-RYOYOHI-LIFE-JIHI
-           MOVE    WRK-LIFERYO           TO  WRK-KINGAKU-Z
-           MOVE    WRK-KINGAKU-Z         TO  WRK-ZHENSYU12
-           PERFORM 800-HENKAN-SEC
-           MOVE    WRK-ZHENSYU24         TO  HCN03-LIFERYO
       *
       *    œ´∫“°¶º´«Â§Œø«ª°Œ¡≈˘§Œµ≠∫‹
            IF   (SYU-RSI-TOTAL     NOT =   ZERO) AND
