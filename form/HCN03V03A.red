@@ -201,7 +201,7 @@
         <embed object="string" length="2"/>
       </appinfo>
     </element>
-    <element name="SJKRYO" occurs="1">
+    <element name="SKJRYO" occurs="1">
       <appinfo>
         <embed object="string" length="24"/>
       </appinfo>
@@ -9488,7 +9488,7 @@
         <rectangle val="5.0185,16.9764;8.2,17.3264"/>
       </attribute>
       <attribute name="dnode_path">
-        <string>#SJKRYO#</string>
+        <string>#SKJRYO#</string>
       </attribute>
       <attribute name="embed_text_string">
         <enum val="0"/>
