@@ -44,3 +44,5 @@
             02  HCN03V02A-RSIMIDASI PIC X(16).
             02  HCN03V02A-RSIBUN    PIC X(18).
             02  HCN03V02A-RSIEN PIC X(2).
+            02  HCN03V02A-SKJRYO    PIC X(24).
+            02  HCN03V02A-LIFERYO   PIC X(24).
