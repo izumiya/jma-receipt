@@ -117,6 +117,9 @@
       *
            03  WRK-GOKTEN          PIC S9(11).
       *
+           03  WRK-SKJRYO          PIC S9(11).
+           03  WRK-LIFERYO         PIC S9(11).
+      *
            03  WRK-DENPNUM         PIC 9(07).
       *
            03  WRK-WARI            PIC 9(02)V9.
@@ -675,6 +678,23 @@
                    MOVE    SPACE           TO  HCN03-HOKENBUN
                END-EVALUATE
            END-IF
+      *
+      *    ø©ªˆŒ≈Õ‹°¢¿∏≥ËŒ≈Õ‹§Œ ‘Ω∏
+           MOVE    ZERO                  TO  WRK-SKJRYO
+           COMPUTE    WRK-SKJRYO   =
+                      SYU-RYOYOHI-SKJ    +   SYU-RYOYOHI-SKJ-JIHI
+           MOVE    WRK-SKJRYO            TO  WRK-KINGAKU-Z
+           MOVE    WRK-KINGAKU-Z         TO  WRK-ZHENSYU12
+           PERFORM 800-HENKAN-SEC
+           MOVE    WRK-ZHENSYU24         TO  HCN03-SKJRYO
+      *
+           MOVE    ZERO                  TO  WRK-LIFERYO
+           COMPUTE    WRK-LIFERYO   =
+                      SYU-RYOYOHI-LIFE   +   SYU-RYOYOHI-LIFE-JIHI
+           MOVE    WRK-LIFERYO           TO  WRK-KINGAKU-Z
+           MOVE    WRK-KINGAKU-Z         TO  WRK-ZHENSYU12
+           PERFORM 800-HENKAN-SEC
+           MOVE    WRK-ZHENSYU24         TO  HCN03-LIFERYO
       *
       *    œ´∫“°¶º´«Â§Œø«ª°Œ¡≈˘§Œµ≠∫‹
            IF   (SYU-RSI-TOTAL     NOT =   ZERO) AND
