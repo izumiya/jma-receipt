@@ -37,6 +37,7 @@
       *  01.00.07    NACL-Â¿¡¹Ç¼  04.09.02  Ï«ºÒ¤Î¼¾ÉÛ½èÃÖ»»Äê½¤Àµ
       *  01.00.08    NACL-Â¿¡¹Ç¼  05/11/22  MONFUNC ÂÐ±þ Â¾
       *  03.03.00    NACL-Â¿¡¹Ç¼  06/10/20  ¶ºÀµ¸ÇÄêÅùÄÉ²Ã
+      *  03.03.00    NACL-Â¿¡¹Ç¼  06/11/17  Æ±»þ»»Äê¥Á¥§¥Ã¥¯ÊýË¡½¤Àµ
       *****************************************************************
       *
       *
@@ -59,12 +60,18 @@
            03  FLG-NYU-CHK         PIC 9(01).
            03  FLG-ERR             PIC 9(01).
       *
+           03  FLG-TAISYO          PIC 9(01).
+           03  FLG-SANTEI-ARI      PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDX2                PIC 9(04).
            03  IDX-Y2              PIC 9(02).
+      *
+           03  IDX-SAN             PIC 9(04).
+           03  IDX-SAN2            PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -224,6 +231,11 @@
       *    »»ÄêÍúÎò
        01  SANTEI-REC.
            COPY    "CPSANTEI.INC".
+      *    »»ÄêÍúÎò
+       01  HZN-SANTEI-AREA.
+           02  HZN-SANTEI-REC          OCCURS  30.
+           COPY    "CPSANTEI.INC"      REPLACING
+                                       //SANTEI-// BY //HZN-SANTEI-//.
       *
       *    £Ä£Â¸¡º÷
       *01  MCPDATA-REC                 PIC X(5000).
@@ -896,6 +908,7 @@
       *****************************************************************
        200-DOUJI-CHK-SEC      SECTION.
       *
+           PERFORM 2000-SANTEI-HZN-SEC
       *
            MOVE    SPACE               TO  WRK-CHK-SRYCD
            MOVE    SPACE               TO  WRK-CHK-NAME
@@ -918,6 +931,7 @@
                ELSE
                    MOVE    ZERO                TO  FLG-ERR
                END-IF
+      *
                IF      (WRK-CODE           =   TBL-CODE  (TBL-IDX))
                    AND (LNK-SC91-SRYCD NOT =   TBL-SRYCD(TBL-IDX) )
                    AND (FLG-ERR            =   ZERO    )
@@ -928,12 +942,11 @@
                           (TNS-SANTEIRRKKBN    =   ZERO )
                        CONTINUE
                    ELSE
-      *
                        IF      LNK-SC91-SYORIFLG   =   1
                            PERFORM 1001-TEISEI-CNT-SEC
                        ELSE
                            MOVE    ZERO            TO  WRK-TEI-CNT
-                       END-IF
+                      END-IF
       *
                       IF      LNK-SC91-KBN        =   "4"
                            CONTINUE
@@ -1077,62 +1090,75 @@
       *
       *    ÊÝ¸±Ëè¤Î¥³¡¼¥É¤ÎÈ½Äê
            PERFORM 1000-SANTEI-CHK-SEC
+      *    »»ÄêÍúÎò¥Æ¡¼¥Ö¥ë¸¡º÷
+           MOVE    ZERO                TO  FLG-SANTEI-ARI
+           INITIALIZE                  SANTEI-REC
+           PERFORM VARYING     IDX-SAN2    FROM    1   BY  1
+                   UNTIL      (IDX-SAN2    >   IDX-SAN )
+                           OR (FLG-SANTEI-ARI  =   1   )
+               IF      HZN-SANTEI-SRYCD (IDX-SAN2)
+                                           =  WRK-SRYCD
+                   MOVE    HZN-SANTEI-REC (IDX-SAN2)
+                                           TO  SANTEI-REC
+                   MOVE    1               TO  FLG-SANTEI-ARI
+               END-IF
+           END-PERFORM
       *
       *    »»ÄêÍúÎò¸¡º÷
-           INITIALIZE                  SANTEI-REC
-           MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
-           MOVE    SPA-PTID            TO  SANTEI-PTID
-           MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
-           MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
-           EVALUATE    TNS-SANTEIRRKKBN
-               WHEN    1
-                   MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-                   MOVE    ZERO                TO  SANTEI-SRYKA
-               WHEN    2
-                   MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
-                   MOVE    ZERO                TO  SANTEI-SRYKA
-               WHEN    3
-                   MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-                   MOVE    SPA-SRYKA           TO  SANTEI-SRYKA
-               WHEN    4
-                   MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
-                   MOVE    SPA-SRYKA           TO  SANTEI-SRYKA
-           END-EVALUATE
+      *    INITIALIZE                  SANTEI-REC
+      *    MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
+      *    MOVE    SPA-PTID            TO  SANTEI-PTID
+      *    MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
+      *    MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
+      *    EVALUATE    TNS-SANTEIRRKKBN
+      *        WHEN    1
+      *            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+      *            MOVE    ZERO                TO  SANTEI-SRYKA
+      *        WHEN    2
+      *            MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
+      *            MOVE    ZERO                TO  SANTEI-SRYKA
+      *        WHEN    3
+      *            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+      *            MOVE    SPA-SRYKA           TO  SANTEI-SRYKA
+      *        WHEN    4
+      *            MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
+      *            MOVE    SPA-SRYKA           TO  SANTEI-SRYKA
+      *    END-EVALUATE
       *
-           IF     (FLG-HKNSAN          =   1   )  AND
-                  (SPA-HKNKBN      NOT =   ZERO)
-               MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
-           ELSE
-               MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
-           END-IF
+      *    IF     (FLG-HKNSAN          =   1   )  AND
+      *           (SPA-HKNKBN      NOT =   ZERO)
+      *        MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
+      *    ELSE
+      *        MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+      *    END-IF
       *
-           IF      WRK-RSI-KBN         =   SPACE
+      *    IF      WRK-RSI-KBN         =   SPACE
       *        ¼ç¥­¡¼
-               MOVE    "key"               TO  WRK-ORC-DBPATH
-           ELSE
+      *        MOVE    "key"               TO  WRK-ORC-DBPATH
+      *    ELSE
       *        Ï«ºÒËè¤Î»»Äê
-               MOVE    "key3"              TO  WRK-ORC-DBPATH
-           END-IF
+      *        MOVE    "key3"              TO  WRK-ORC-DBPATH
+      *    END-IF
       *
-           MOVE    SANTEI-REC          TO  MCPDATA-REC
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
-               PERFORM 920-SANTEI-READ-SEC
-           ELSE
-               MOVE    1                   TO  FLG-SANTEI
-           END-IF
+      *    MOVE    SANTEI-REC          TO  MCPDATA-REC
+      *    MOVE    "tbl_santei"        TO  MCP-TABLE
+      *    MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
+      *    PERFORM 910-DBSELECT-SEC
+      *    IF      MCP-RC              =   ZERO
+      *        MOVE    "tbl_santei"        TO  MCP-TABLE
+      *        MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
+      *        PERFORM 920-SANTEI-READ-SEC
+      *    ELSE
+      *        MOVE    1                   TO  FLG-SANTEI
+      *    END-IF
       *
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
+      *    MOVE    "tbl_santei"        TO  MCP-TABLE
+      *    MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
+      *    PERFORM 990-DBCLOSE-SEC
       *
-           IF      FLG-SANTEI          =   1
-               INITIALIZE              SANTEI-REC
-           END-IF
+      **   IF      FLG-SANTEI          =   1
+      **       INITIALIZE              SANTEI-REC
+      **** END-IF
       *
       *    »»ÄêÎò¤Î²ó¿ô¤ò¥Á¥§¥Ã¥¯¤¹¤ë
            IF      TNS-JGNCNT          >   ZERO
@@ -1350,6 +1376,73 @@
       *
            .
        2003-DOJINPUT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    »»ÄêÍúÎò¥Æ¡¼¥Ö¥ëÊÔ½¸½èÍý
+      *****************************************************************
+       2000-SANTEI-HZN-SEC         SECTION.
+      *
+           INITIALIZE                  HZN-SANTEI-AREA
+           MOVE    ZERO                TO  IDX-SAN
+      *
+           MOVE    SPACE               TO  SANTEI-REC
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           PERFORM
+               UNTIL      (FLG-SANTEI      =   1  )
+               SET     TBL-IDX              TO  1
+               SEARCH  TBL-DOUJI-OCC        VARYING   TBL-IDX
+                   AT  END
+                       MOVE    ZERO            TO  FLG-TAISYO
+                   WHEN    SANTEI-SRYCD        =   TBL-SRYCD (TBL-IDX)
+                       MOVE    1               TO  FLG-TAISYO
+               END-SEARCH
+               IF      FLG-TAISYO          =   1
+      *            ÊÝ¸±Ëè¤Î¥³¡¼¥É¤ÎÈ½Äê
+                   MOVE    SANTEI-SRYCD            TO  WRK-SRYCD
+                   PERFORM 1000-SANTEI-CHK-SEC
+                   IF     (FLG-HKNSAN          =   1   )  AND
+                          (SPA-HKNKBN      NOT =   ZERO)
+                       IF      SPA-HKNCOMBINUM =   SANTEI-HKNCOMBINUM
+                           MOVE    1               TO  FLG-TAISYO
+                       ELSE
+                           MOVE    ZERO            TO  FLG-TAISYO
+                       END-IF
+                   ELSE
+                       IF      SANTEI-HKNCOMBINUM  NOT =   ZERO
+                           MOVE    ZERO            TO  FLG-TAISYO
+                       END-IF
+                   END-IF
+               END-IF
+               IF      FLG-TAISYO          =   1
+                   ADD     1                   TO  IDX-SAN
+                   MOVE    SANTEI-REC          TO  HZN-SANTEI-REC
+                                                            (IDX-SAN)
+               END-IF
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       2000-SANTEI-HZN-EXT.
            EXIT.
       *
       *****************************************************************
