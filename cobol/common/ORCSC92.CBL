@@ -107,6 +107,8 @@
       *
            03  IDX1                PIC 9(04).
            03  IDX2                PIC 9(04).
+           03  IDX3                PIC 9(04).
+           03  IDX4                PIC 9(04).
       *
            03  IDX-C               PIC 9(04).
            03  IDX-T               PIC 9(04).
@@ -170,6 +172,12 @@
       *
            03  WRK-MOJI                PIC X(01).
            03  WRK-BUNGSU              PIC 9(08).
+      *    エラーメッセージ
+           03  WRK-MANSEI-ERR          PIC X(04).
+      *    年齢上限
+           03  WRK-TNS-KGNAGE          PIC X(02).
+           03  WRK-TNS-JGNAGE          PIC X(02).
+           03  WRK-LNK-SC92-ERRCD5     PIC X(04).
       *
       *    コメントの入力値用
        01  WRK-INPUT-SET-AREA.
@@ -714,6 +722,8 @@
       *    対象年齢チェック
            IF     (LNK-SC92-SRYCD(1:1) =   "1" )  OR
                   (LNK-SC92-SRYCD(1:1) =   "7" )
+               MOVE    TNS-KGNAGE          TO  WRK-TNS-KGNAGE
+               MOVE    TNS-JGNAGE          TO  WRK-TNS-JGNAGE
                PERFORM 2003-NENREI-CHK-SEC
            END-IF
       *
@@ -1279,14 +1289,14 @@
       *
            MOVE    ZERO                TO  WRK-KGNAGE
            MOVE    ZERO                TO  WRK-JGNAGE
-           MOVE    TNS-KGNAGE          TO  WRK-KGNAGE(2:2)
-           MOVE    TNS-JGNAGE          TO  WRK-JGNAGE(2:2)
+           MOVE    WRK-TNS-KGNAGE      TO  WRK-KGNAGE(2:2)
+           MOVE    WRK-TNS-JGNAGE      TO  WRK-JGNAGE(2:2)
       *
       *    下限年齢チェック
-           IF      TNS-KGNAGE          =   SPACE  OR  ZERO
+           IF      WRK-TNS-KGNAGE          =   SPACE  OR  ZERO
                CONTINUE
            ELSE
-               IF      TNS-KGNAGE          =   "AA"
+               IF      WRK-TNS-KGNAGE          =   "AA"
       *            新生児判定
                    IF     (LNK-SC92-NENREI-YY   =   ZERO )  AND
                           (LNK-SC92-NENREI-MM   =   ZERO )  AND
@@ -1303,10 +1313,10 @@
            END-IF
       *
       *    上限年齢チェック
-           IF      TNS-JGNAGE          =   SPACE  OR  ZERO
+           IF      WRK-TNS-JGNAGE          =   SPACE  OR  ZERO
                CONTINUE
            ELSE
-               IF      TNS-JGNAGE          =   "AA"
+               IF      WRK-TNS-JGNAGE          =   "AA"
       *            新生児判定
                    IF     (LNK-SC92-NENREI-YY    =   ZERO )  AND
                           (LNK-SC92-NENREI-MM    =   ZERO )  AND
@@ -1428,6 +1438,7 @@
            ELSE
                MOVE    1                   TO  FLG-CHKMST
            END-IF
+           MOVE    SPACE               TO  WRK-MANSEI-ERR
            PERFORM
                    UNTIL     (FLG-CHKMST       =   1    )  OR
                              (LNK-SC92-ERRCD6 NOT =   SPACE )
@@ -1435,9 +1446,22 @@
                        UNTIL      (IDX-C           >   10  )    OR
                                   (CHK-CD (IDX-C)  =   SPACE )  OR
                                   (LNK-SC92-ERRCD6 NOT =   SPACE )
+                   MOVE    ZERO                TO  FLG-MANSEI-CHK
+      *            算定履歴とのチェック
                    PERFORM 20051-CHK-SANTEI-SEC
       *            入力値とのチェック
                    PERFORM 20052-CHK-INPUT-SEC
+      *
+                   IF     (LNK-SC92-ERRCD6 NOT =   SPACE )  AND
+                          (FLG-MANSEI-CHK      =   1     )  AND
+                          (FLG-KONKAI          =   ZERO  )
+                       IF      WRK-MANSEI-ERR      =   SPACE
+                           MOVE    LNK-SC92-ERRCD6
+                                                   TO  WRK-MANSEI-ERR
+                           MOVE    CHK-CD (IDX-C)  TO  WRK-CHK-CD
+                       END-IF
+                       MOVE    SPACE           TO  LNK-SC92-ERRCD6
+                   END-IF
                    IF      LNK-SC92-ERRCD6 NOT =   SPACE
                        MOVE    CHK-CD (IDX-C)  TO  WRK-CHK-CD
                    END-IF
@@ -1452,6 +1476,10 @@
            MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           IF     (LNK-SC92-ERRCD6     =   SPACE )  AND
+                  (WRK-MANSEI-ERR  NOT =   SPACE )
+               MOVE    WRK-MANSEI-ERR      TO  LNK-SC92-ERRCD6
+           END-IF
       *    慢性疼痛疾患管理料のチェック
            IF     (LNK-SC92-ERRCD6 NOT =   SPACE      )  AND
                   (SPA-SRYYMD          >=  "20021017" )  AND
@@ -1519,15 +1547,9 @@
       *****************************************************************
        20051-CHK-SANTEI-SEC            SECTION.
       *
-      *    点数マスタ読込
-      *D   MOVE    CHK-CD (IDX-C)      TO  TNS-SRYCD
-      *D   PERFORM 910-TENSU-READ-SEC
-      *D   IF      FLG-TENSU           =   1
-      *D       GO      TO      20051-CHK-SANTEI-EXT
-      *D   END-IF
-      *
       *    保険毎のコードの判定
            PERFORM 1000-SANTEI-CHK-SEC
+      *
            INITIALIZE                  SANTEI-REC
            MOVE    ZERO                TO  FLG-SANTEI-OK
            PERFORM VARYING     IDX2    FROM    1   BY   1
@@ -1542,50 +1564,6 @@
            IF      FLG-SANTEI-OK       =   ZERO
                INITIALIZE                  SANTEI-REC
            END-IF
-      *
-      *    INITIALIZE                  HZN-SANTEI-REC
-      *    算定履歴検索
-      *    INITIALIZE                  SANTEI-REC
-      *    MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
-      *    MOVE    SPA-PTID            TO  SANTEI-PTID
-      *    MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
-      *    MOVE    CHK-CD (IDX-C)      TO  SANTEI-SRYCD
-      *    保険毎の時、保険組合せが同じこと
-      *    IF     (FLG-HKNSAN          =   1   )  AND
-      *           (SPA-HKNKBN      NOT =   ZERO)
-      *        MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
-      *    ELSE
-      *        MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
-      *    END-IF
-      *
-      *    MOVE    SANTEI-REC          TO  MCPDATA-REC
-      *    MOVE    "DBSELECT"          TO  MCP-FUNC
-      *    MOVE    "SANTEI-KEY7"       TO  ORC-DBPATH
-      *    CALL    "ORCMCPSUB"          USING
-      *                                 MCPAREA
-      *                                 ORCMCPAREA
-      *                                 MCPDATA-REC
-      *    IF      MCP-RC              =   ZERO
-      *        MOVE    "SANTEI-KEY7"       TO  ORC-DBPATH
-      *        PERFORM 920-SANTEI-READ-SEC
-      *    ELSE
-      *        MOVE    1                   TO  FLG-SANTEI
-      *    END-IF
-      *    PERFORM UNTIL       FLG-SANTEI      =   1
-      *
-      *        対象の算定履歴判定
-      *        PERFORM 200511-SANTEI-CHK-SEC
-      *
-      *        IF      FLG-SANTEI-OK       =   1
-      *            MOVE    SANTEI-REC              TO  HZN-SANTEI-REC
-      *        END-IF
-      *
-      *        MOVE    "SANTEI-KEY7"       TO  ORC-DBPATH
-      *        PERFORM 920-SANTEI-READ-SEC
-      *    END-PERFORM
-      *
-      **** MOVE    HZN-SANTEI-REC      TO  SANTEI-REC
-      *
       *
       *    算定歴の回数をチェックする
            MOVE    SANTEI-MSANTEICNT   TO  WRK-SANTEI-CNT
@@ -1720,7 +1698,7 @@
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   WRK-MAX   )  OR
-                              (LNK-SC92-ERRCD6     NOT =   SPACE )
+                              (FLG-KONKAI          =   1     )
                IF      IDX                 =   IDX-T
                    CONTINUE
                ELSE
@@ -2369,10 +2347,7 @@
            MOVE    TNS-HOUKATUTEIGENKBN    TO  SPA-COM-HOUKATUTEIGENKBN
                                                              (IDX-T)
       *    年齢加算
-           MOVE    TNS-AGEKSNTBL(1)    TO  SPA-COM-AGEKSNTBL (IDX-T 1)
-           MOVE    TNS-AGEKSNTBL(2)    TO  SPA-COM-AGEKSNTBL (IDX-T 2)
-           MOVE    TNS-AGEKSNTBL(3)    TO  SPA-COM-AGEKSNTBL (IDX-T 3)
-           MOVE    TNS-AGEKSNTBL(4)    TO  SPA-COM-AGEKSNTBL (IDX-T 4)
+           PERFORM 3007-AGEKSN-NENREI-SEC
       *    往診区分
            MOVE    TNS-OSINKBN         TO  SPA-COM-OSINKBN   (IDX-T)
       *    告示識別区分
@@ -2911,6 +2886,38 @@
       *
            .
        3005-SYOCHI-SYUGI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    年齢加算コードの年齢編集処理
+      *****************************************************************
+       3007-AGEKSN-NENREI-SEC          SECTION.
+      *
+           MOVE    LNK-SC92-ERRCD5     TO  WRK-LNK-SC92-ERRCD5
+           MOVE    ZERO                TO  IDX4
+           PERFORM VARYING     IDX3    FROM    1   BY  1
+                   UNTIL      (IDX3        >   4       )   OR
+                              (TNS-AGEKSNSRYCD(IDX3)
+                                          =   SPACE  OR  ZERO )
+               MOVE    SPACE                  TO  LNK-SC92-ERRCD5
+               IF     (TNS-AGEKSNKGN (IDX3)   =   SPACE  OR  ZERO )  AND
+                      (TNS-AGEKSNJGN (IDX3)   =   SPACE  OR  ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    TNS-AGEKSNKGN (IDX3)   TO  WRK-TNS-KGNAGE
+                   MOVE    TNS-AGEKSNJGN (IDX3)   TO  WRK-TNS-JGNAGE
+                   PERFORM 2003-NENREI-CHK-SEC
+               END-IF
+               IF      LNK-SC92-ERRCD5        =   SPACE
+                   ADD     1                  TO  IDX4
+                   MOVE    TNS-AGEKSNTBL(IDX3)
+                                              TO  SPA-COM-AGEKSNTBL
+                                                         (IDX-T IDX4)
+               END-IF
+           END-PERFORM
+           MOVE    WRK-LNK-SC92-ERRCD5     TO  LNK-SC92-ERRCD5
+           .
+       3007-AGEKSN-NENREI-EXT.
            EXIT.
       *
       *****************************************************************

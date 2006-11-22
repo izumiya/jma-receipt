@@ -85,6 +85,7 @@
            03  FLG-SYUGI           PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
+           03  FLG-DAYCHK          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -683,7 +684,7 @@
       *        IF      WRK-ERRCD2      NOT =   SPACE
       *            GO      TO      100112-SYOEN-CHK-EXT
       *        END-IF
-      *****END-IF
+      **   END-IF
       *
       *    労災でマッサージ等、器具等の時、日に３部位とする
            IF     (LNK-ORCSC-PG       =   "K02" ) AND
@@ -710,6 +711,14 @@
            IF     (WRK-SYOCHI-KBN      =   "04")
                CONTINUE
            ELSE
+      *        消炎鎮痛等処置の回数集計（マッサージ以外）
+               IF     (SPA-NYUGAIKBN       =   "1" )  AND
+                      (WRK-SYOCHI-KBN  NOT =   "01")  AND
+                      (WRK-COM-NYU-KAI (IDX-Z)  >   ZERO )
+                   COMPUTE LNK-ORCSC-SYOEN-CNT  =  LNK-ORCSC-SYOEN-CNT
+                                                +  WRK-COM-NYU-KAI
+                                                            (IDX-Z)
+               END-IF
                GO      TO      100112-SYOEN-CHK-EXT
            END-IF
       *
@@ -849,6 +858,10 @@
                COMPUTE WRK-DAY-CNT     =   WRK-DAY-CNT
                                        -   WRK-TEI-CNT
            END-IF
+      *    今回分追加
+           COMPUTE WRK-DAY-CNT         =   WRK-DAY-CNT
+                                       +  (LNK-ORCSC-KAISU
+                                       -   1    )
       *
            IF      WRK-DAY-CNT         >=  3
                MOVE    "0076"              TO  WRK-ERRCD
@@ -2026,6 +2039,85 @@
        300-AUTO-SYORI-SEC                SECTION.
      *
        300-AUTO-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    算定履歴チェック処理
+      *****************************************************************
+       3001-SANTEI-KAISU-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  SANTEI-REC
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           MOVE    ZERO                TO  WRK-DAY-CNT
+           MOVE    SPACE               TO  WRK-ERRCD2
+           PERFORM
+               UNTIL      (FLG-SANTEI      =   1  )  OR
+                          (WRK-ERRCD2  NOT =   SPACE )
+               SET     TBL-IDX              TO  1
+               SEARCH  TBL-SYOCHI-OCC       VARYING   TBL-IDX
+                   AT  END
+                       MOVE    ZERO            TO  FLG-DAYCHK
+                   WHEN    SANTEI-SRYCD        =   TBL-SRYCD (TBL-IDX)
+                       MOVE    1               TO  FLG-DAYCHK
+               END-SEARCH
+               IF     (FLG-DAYCHK          =   1   )  AND
+                      (SANTEI-HKNCOMBINUM  =   ZERO)
+                   PERFORM 30011-SANTEI-CNT-CHK-SEC
+                   IF      WRK-DAY-CNT         >   1
+                       MOVE    "1022"          TO  WRK-ERRCD2
+                       MOVE    IDX-Z           TO  WRK-IDX-ERR
+                   END-IF
+               END-IF
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       3001-SANTEI-KAISU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    算定履歴チェック処理
+      *****************************************************************
+       30011-SANTEI-CNT-CHK-SEC         SECTION.
+      *
+           MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+           COMPUTE WRK-DAY-CNT         =   WRK-DAY-CNT
+                                       +   SANTEI-DAY (IDX-Y2)
+      *    訂正の時、訂正分はカウントしない
+           MOVE    ZERO                TO  WRK-TEI-CNT
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   200 )  OR
+                              (LNK-ORCSC-TEI-SRYCD(IDX)
+                                       =   SPACE )
+               IF      SANTEI-SRYCD    =   LNK-ORCSC-TEI-SRYCD(IDX)
+                   ADD     LNK-ORCSC-TEI-KAISU(IDX)
+                                           TO  WRK-TEI-CNT
+               END-IF
+           END-PERFORM
+           COMPUTE WRK-DAY-CNT         =   WRK-DAY-CNT
+                                       -   WRK-TEI-CNT
+           .
+       30011-SANTEI-CNT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
