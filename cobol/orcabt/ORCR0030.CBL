@@ -278,6 +278,7 @@
       *                                     ÂÐ±þ
       *  03.03.09    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       *  03.03.10    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
+      *  03.03.11    NACL-ÌçÏÆ    06/11/24  µÜ¾ë¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5702,7 +5703,11 @@
                            MOVE     1    TO     FLG-MIYAGI
                      END-IF
                      IF  RECE02-KOHFTNJANUM(KH-IDX - 1)(1:7) = "8304125"
+                       IF  RECE02-SRYYM   >=   "200610"
+                           CONTINUE
+                       ELSE
                            MOVE     2    TO     FLG-MIYAGI
+                       END-IF
                      END-IF
       *
                      IF    FLG-MIYAGI    NOT  =    ZERO

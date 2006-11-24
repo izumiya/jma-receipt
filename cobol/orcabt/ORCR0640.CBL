@@ -228,6 +228,7 @@
       *  03.03.09    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       *  03.03.10    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
       *  03.03.11    NACL-ÌçÏÆ    06/11/15  Æþ±¡»þÀ¸³èÎÅÍÜÈñ¿©»öÉéÃ´ÆâÌõ
+      *  03.03.12    NACL-ÌçÏÆ    06/11/24  µÜ¾ë¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -382,6 +383,7 @@
            03  FLG-PTKOHINF                            PIC 9(01).
            03  FLG-TOKUSYU-SKJ                         PIC 9(01).
            03  FLG-SKJ200610FTN                        PIC 9(01).
+           03  FLG-MIYAGI                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -9073,27 +9075,41 @@
                 ELSE
                       MOVE    ZERO   TO    FLG-TOKUSYU-SKJ
                 END-IF
-      *
+      ****
+                MOVE          ZERO   TO    FLG-MIYAGI
+                IF ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                                   "183" OR "383" OR "483"  ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304004" OR "8304009" OR
+                                "8304017" OR "8304023" OR
+                                "8304026" OR "8304028" OR
+                                "8304036" OR "8304041"      ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "200510"      ) AND
+                    (RECE62-SRYYM         <   "200610"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                                   "183" OR "383" OR "483"  ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304017" OR "8304028" OR
+                                "8304079"                   ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "200610"      ))
+                   MOVE       1      TO    FLG-MIYAGI
+                END-IF
+      ****
                 IF ((WRK-PREFNUM           =  "38"          ) AND
                     (RECE62-KOHNUM(KH-IDX - 1)(1:1)
                                      >=  "1" AND <=  "8"    ) AND
                     (IDZ                   =   1            ))
-                OR ((WRK-PREFNUM           =  "04"          ) AND
-                    (RECE62-KOHNUM(KH-IDX - 1) =
-                                   "183" OR "383" OR "483"  ) AND
-                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)  NOT =
-                                "8304004" AND "8304009" AND
-                                "8304017" AND "8304023" AND
-                                "8304026" AND "8304028" AND
-                                "8304036" AND "8304041"     ) AND
-                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
-                    (RECE62-SRYYM         >=  "200510"      ))
                 OR ((WRK-PREFNUM           =  "39"          ) AND
                     (RECE62-KOHHBTNUM(KH-IDX - 1)  =
                               "72" OR "73" OR "74" OR "75"  ) AND
                     (RECE62-SRYYM         >=  "200510"      ))
                 OR ((SYU-SKJ-FTNKBN(IDX3)  =  "1" OR "2"       ) AND
-                    (SYU-SKJ-FTN(IDX3) = SYU-SKJ-FTN-RECE(IDX3)))
+                    (SYU-SKJ-FTN(IDX3) = SYU-SKJ-FTN-RECE(IDX3)) AND
+                    (FLG-MIYAGI        = ZERO                  ))
                 OR ( SYU-SKJ-FTNKBN(IDX3)  =  "6"            )
       *         OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
                 OR ( SYU-SKJ-RYOYOHI(IDX3) =   ZERO          )
