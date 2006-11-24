@@ -191,10 +191,10 @@
            MOVE    WRK-YMD             TO  WRK-MMEDYMD
       *
       *
-           PERFORM 900-PTNYUINRRK-KEY11-SEL-SEC
+           PERFORM 900-PTNYUINRRK-KEY41-SEL-SEC
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key11"             TO  MCP-PATHNAME
+           MOVE    "key41"             TO  MCP-PATHNAME
            PERFORM  910-DBCLOSECURSOR-SEC
       *
       *    Æþ±¡´µ¼Ô¤ÎÏ·¿ÍÈ½Äê
@@ -336,7 +336,7 @@
       *****************************************************************
        2100-PTNYUINRRK-EDIT-SEC            SECTION.
       *
-           PERFORM 900-PTNYUINRRK-KEY11-SEL-SEC
+           PERFORM 900-PTNYUINRRK-KEY41-SEL-SEC
       *
            PERFORM UNTIL ( FLG-PTNYUINRRK  NOT =   ZERO )
       *
@@ -349,13 +349,13 @@
                END-IF
       *
                IF    ( FLG-PTNYUINRRK      =   ZERO )
-                   PERFORM 900-PTNYUINRRK-KEY11-FET-SEC
+                   PERFORM 900-PTNYUINRRK-KEY41-FET-SEC
                END-IF
       *
            END-PERFORM
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key11"             TO  MCP-PATHNAME
+           MOVE    "key41"             TO  MCP-PATHNAME
            PERFORM  910-DBCLOSECURSOR-SEC
       *
            .
@@ -365,6 +365,7 @@
       *    ÆüÊÌÉÂÅï¾ðÊóÊÔ½¸¤¹¤ë
       *****************************************************************
        2100-DAY-BTUINF-EDIT-SEC             SECTION.
+      *
       *
            IF    ( PTNYUINRRK-TENNYUYMD    <   WRK-MMSTYMD )
                MOVE    WRK-MMSTYMD (7:2)   TO  WRK-STIDX
@@ -530,18 +531,18 @@
       *****************************************************************
       *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷½èÍý(KEY11)
       *****************************************************************
-       900-PTNYUINRRK-KEY11-SEL-SEC    SECTION.
+       900-PTNYUINRRK-KEY41-SEL-SEC    SECTION.
       *
            MOVE    ZERO                TO  FLG-PTNYUINRRK
       *
            INITIALIZE  PTNYUINRRK-REC
            MOVE    SBTUSENTEI-HOSPID   TO  PTNYUINRRK-HOSPID
            MOVE    SBTUSENTEI-PTID     TO  PTNYUINRRK-PTID
-           MOVE    WRK-MMEDYMD         TO  PTNYUINRRK-NYUINYMD
-           MOVE    WRK-MMSTYMD         TO  PTNYUINRRK-TAIINYMD
+           MOVE    WRK-MMEDYMD         TO  PTNYUINRRK-TENNYUYMD
+           MOVE    WRK-MMSTYMD         TO  PTNYUINRRK-TENSTUYMD
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key11"             TO  MCP-PATHNAME
+           MOVE    "key41"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
@@ -551,17 +552,17 @@
            END-IF
       *
            .
-       900-PTNYUINRRK-KEY11-SEL-EXT.
+       900-PTNYUINRRK-KEY41-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ´µ¼ÔÆþ±¡ÍúÎòFETCH½èÍý(KEY11)
       *****************************************************************
-       900-PTNYUINRRK-KEY11-FET-SEC    SECTION.
+       900-PTNYUINRRK-KEY41-FET-SEC    SECTION.
       *
            MOVE    ZERO                TO  FLG-PTNYUINRRK
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key11"             TO  MCP-PATHNAME
+           MOVE    "key41"             TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
@@ -571,7 +572,7 @@
            END-IF
       *
            .
-       900-PTNYUINRRK-KEY11-FET-EXT.
+       900-PTNYUINRRK-KEY41-FET-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý
