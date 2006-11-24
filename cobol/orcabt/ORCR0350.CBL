@@ -4283,17 +4283,20 @@
                    PERFORM 5005-NUM-HENSYU-SEC  
       *            点数
                    IF    ( IDZ4            =   IDZ5 )
-                   AND   ( RECE641-SYUTEN1 >   ZERO )
-                       MOVE    RECE641-SYUTEN1     TO  WRK-TENSU
+                   AND   ( WRK-RECE641-SYUTEN1
+                                           >   ZERO )
+                       MOVE    WRK-RECE641-SYUTEN1
+                                                   TO  WRK-TENSU
                        MOVE    WRK-TENSU           TO  WRK-NUM
                        MOVE    7                   TO  WRK-NAGASA
                    END-IF    
                    PERFORM 5005-NUM-HENSYU-SEC  
       *            回数
                    IF    ( IDZ4            =   IDZ5 )
-                   AND   ( RECE641-ZAIKAISU
+                   AND   ( WRK-RECE641-ZAIKAISU
                                            >   ZERO )
-                       MOVE    RECE641-ZAIKAISU    TO  WRK-KAISU
+                       MOVE    WRK-RECE641-ZAIKAISU
+                                                   TO  WRK-KAISU
                        MOVE    WRK-KAISU           TO  WRK-NUM
                        MOVE    3                   TO  WRK-NAGASA
                    END-IF
