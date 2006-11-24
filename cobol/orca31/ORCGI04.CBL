@@ -3821,7 +3821,7 @@
                                    TO  WKPTNYUINRRK-DRCD1 (2 : )
            ELSE
                MOVE    SPACE
-                                   TO  WKPTNYUINRRK-DRCD1 (2 : )
+                                   TO  WKPTNYUINRRK-DRCD1
            END-IF
            MOVE    WKPTNYUINRRK-REC
                                    TO  LNK-PTNYUINRRK
