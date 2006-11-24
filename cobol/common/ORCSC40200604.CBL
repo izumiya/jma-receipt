@@ -620,7 +620,6 @@
       *
       *    包括まとめ入力は以下対象外
            IF      SPA-HKNCOMBINUM     =   "9999"
-           OR     (WRK-COM-HKNCOMBI(IDX-Z) =   "9999" )
                GO      TO      100112-SYOEN-CHK-EXT
            END-IF
       *
@@ -2039,85 +2038,6 @@
        300-AUTO-SYORI-SEC                SECTION.
      *
        300-AUTO-SYORI-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    算定履歴チェック処理
-      *****************************************************************
-       3001-SANTEI-KAISU-SEC         SECTION.
-      *
-           MOVE    SPACE               TO  SANTEI-REC
-           INITIALIZE                  SANTEI-REC
-           MOVE    SPA-HOSPID          TO  SANTEI-HOSPID
-           MOVE    SPA-PTID            TO  SANTEI-PTID
-           MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
-      *
-           MOVE    SANTEI-REC          TO  MCPDATA-REC
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 920-SANTEI-READ-SEC
-           ELSE
-               MOVE    1                   TO  FLG-SANTEI
-           END-IF
-      *
-           MOVE    ZERO                TO  WRK-DAY-CNT
-           MOVE    SPACE               TO  WRK-ERRCD2
-           PERFORM
-               UNTIL      (FLG-SANTEI      =   1  )  OR
-                          (WRK-ERRCD2  NOT =   SPACE )
-               SET     TBL-IDX              TO  1
-               SEARCH  TBL-SYOCHI-OCC       VARYING   TBL-IDX
-                   AT  END
-                       MOVE    ZERO            TO  FLG-DAYCHK
-                   WHEN    SANTEI-SRYCD        =   TBL-SRYCD (TBL-IDX)
-                       MOVE    1               TO  FLG-DAYCHK
-               END-SEARCH
-               IF     (FLG-DAYCHK          =   1   )  AND
-                      (SANTEI-HKNCOMBINUM  =   ZERO)
-                   PERFORM 30011-SANTEI-CNT-CHK-SEC
-                   IF      WRK-DAY-CNT         >   1
-                       MOVE    "1022"          TO  WRK-ERRCD2
-                       MOVE    IDX-Z           TO  WRK-IDX-ERR
-                   END-IF
-               END-IF
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 920-SANTEI-READ-SEC
-           END-PERFORM
-      *
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-           .
-       3001-SANTEI-KAISU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    算定履歴チェック処理
-      *****************************************************************
-       30011-SANTEI-CNT-CHK-SEC         SECTION.
-      *
-           MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
-           COMPUTE WRK-DAY-CNT         =   WRK-DAY-CNT
-                                       +   SANTEI-DAY (IDX-Y2)
-      *    訂正の時、訂正分はカウントしない
-           MOVE    ZERO                TO  WRK-TEI-CNT
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   200 )  OR
-                              (LNK-ORCSC-TEI-SRYCD(IDX)
-                                       =   SPACE )
-               IF      SANTEI-SRYCD    =   LNK-ORCSC-TEI-SRYCD(IDX)
-                   ADD     LNK-ORCSC-TEI-KAISU(IDX)
-                                           TO  WRK-TEI-CNT
-               END-IF
-           END-PERFORM
-           COMPUTE WRK-DAY-CNT         =   WRK-DAY-CNT
-                                       -   WRK-TEI-CNT
-           .
-       30011-SANTEI-CNT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
