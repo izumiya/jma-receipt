@@ -111,6 +111,7 @@
       *                                     œ∑Œ °ª„«Ø∂‚
       *                                     …¬≈Ô∂Ë ¨£∞£±°¢£∞£≤°¢£∞£∑
       *  03.03.02    NACL-∆£∏∂    06/09/19  ∑Ó≈”√Ê§«§Œª·Ãæ —ππ¬–±˛
+      *  03.04.01    NACL-ÃÁœ∆    06/11/29  …¬≈Ô∂Ë ¨ ‘Ω∏Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -333,6 +334,7 @@
                05  WRK-SRYDD                           PIC  9(02).
            03  WK-PTNYUINRRK-TENSTUYMD                 PIC  X(08).
            03  WK-PTNYUINRRK-TENSTUYMD2                PIC  X(08).
+           03  WK-PTNYUINRRK-TENNYUYMD                 PIC  X(08).
       *
       *    ¥µº‘«ØŒªªΩ–Õ—•®•Í•¢
        01  WRK-NENREI-AREA.
@@ -2129,6 +2131,7 @@
            INITIALIZE                      WRK-BYOTOKBN-TABLE
                                            WRK-SHONUM
            MOVE      SPACE             TO  WK-PTNYUINRRK-TENSTUYMD2
+           MOVE      SPACE             TO  WK-PTNYUINRRK-TENNYUYMD
       *
       *    ø«Œ≈∑Ó∆‚§Œ∆˛¬‡±°æ Û
            INITIALIZE                      PTNYUINRRK-REC
@@ -2377,6 +2380,11 @@
                                                <   RECE62-SRYYM )
                    OR    ( PTNYUINRRK-TENNYUYMD (1:6)
                                                >   RECE62-SRYYM )
+                   OR    ((PTNYUINRRK-TENNYUYMD
+                                               =
+                                        WK-PTNYUINRRK-TENNYUYMD) AND
+                          (WK-PTNYUINRRK-TENNYUYMD
+                                           NOT =   SPACE       ))
                        CONTINUE
                    ELSE 
                       IF      SYS-5001-RECEDSPKBN =  SPACE
@@ -2395,6 +2403,8 @@
                       END-IF
                       MOVE   WK-PTNYUINRRK-TENSTUYMD  TO
                                             WK-PTNYUINRRK-TENSTUYMD2
+                      MOVE   PTNYUINRRK-TENNYUYMD     TO
+                                            WK-PTNYUINRRK-TENNYUYMD
                    END-IF
       *        …¬≈Ô»÷πÊ°¶ºÔ Ã
                MOVE    RECE62-SRYYM        TO  WRK-SRYYYMM

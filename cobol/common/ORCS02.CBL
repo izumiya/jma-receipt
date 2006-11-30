@@ -162,6 +162,8 @@
       *  03.03.06    NACL-門脇    06/11/09  高齢者で低所得かつ全国公費を
       *                                     もつ場合の上限額編集修正
       *  03.03.07    NACL-門脇    06/11/24  宮城県地方公費１０月改正対応
+      *  03.03.08    NACL-門脇    06/11/29  入院時生活療養費の公費対象外対応
+      *                                     （新潟県地方公費）
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12197,6 +12199,11 @@
                IF ((WK-1001-PREFNUM         =  10           ) AND
                    (COMB-KOHHKNNUM(KOH-IDX) = "146" OR "246"
                                            OR "143" OR "243"))
+               OR ((WK-1001-PREFNUM         =  15           ) AND
+                   (COMB-KOHHKNNUM(KOH-IDX) = "261" OR "361"
+                                                    OR "561"
+                                           OR "264" OR "364"
+                                                    OR "564"))
                    IF     FLG-SEIKATUS       =   1
                          MOVE  "5"    TO  WK-NYUSKJRYYKBN
                          MOVE  "1"    TO  WK-NYUSKJRYYKBN-TOKU(KOH-IDX)

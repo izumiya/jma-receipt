@@ -229,6 +229,7 @@
       *  03.03.10    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
       *  03.03.11    NACL-ÌçÏÆ    06/11/15  Æþ±¡»þÀ¸³èÎÅÍÜÈñ¿©»öÉéÃ´ÆâÌõ
       *  03.03.12    NACL-ÌçÏÆ    06/11/24  µÜ¾ë¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
+      *  03.03.13    NACL-ÌçÏÆ    06/11/29  Æþ±¡»þÀ¸³èÎÅÍÜÈñÂÐ±þ¡Ê¿·³ã¸©¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9064,10 +9065,15 @@
                 END-IF
       *
                 IF   RECE62-SRYYM    >=  "200610"
-                  IF   (WRK-PREFNUM                   =    "10"   )
-                  AND  (RECE62-KOHNUM(KH-IDX - 1)     =
-                                "146" OR "246" OR "143" OR "243"  )
-                  AND  (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "3")
+                  IF ((WRK-PREFNUM                   =    "10"   ) AND
+                      (RECE62-KOHNUM(KH-IDX - 1)     =
+                               "146" OR "246" OR "143" OR "243"  ) AND
+                      (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "3"))
+                  OR ((WRK-PREFNUM                   =    "15"   ) AND
+                      (RECE62-KOHNUM(KH-IDX - 1)     =
+                                        "261" OR "361" OR "561"
+                                     OR "264" OR "364" OR "564"  ) AND
+                      (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "3"))
                       MOVE     1     TO    FLG-TOKUSYU-SKJ
                   ELSE
                       MOVE    ZERO   TO    FLG-TOKUSYU-SKJ

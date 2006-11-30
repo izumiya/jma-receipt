@@ -63,6 +63,7 @@
       *  03.02.02    NACL-多々納  06/08/25  平成１８年１０月改正対応
       *                                     （老人割合変更）
       *  03.03.01    NACL-門脇    06/10/23  長期併用の保険組み合わせ修正
+      *  03.03.02    NACL-門脇    06/11/29  保険組み合わせ作成条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -805,12 +806,12 @@
            PERFORM     VARYING   IDZ   FROM    1   BY  1
                        UNTIL   ( IDZ   >       100 )
                        OR      ( IDZ   >       WRK-LCOMB-MAX )
-             IF  ( WRK-LCOMB-GAI-KFTNRATE (IDZ)    =   ZERO ) AND
-                 ( WRK-LCOMB-GAI-KKOTGAK  (IDZ)    =   ZERO ) AND
-                 ( WRK-LCOMB-GAI-KJGNGAK  (IDZ)    =   ZERO ) AND
-                 ( WRK-LCOMB-GAI-FTNKBN   (IDZ)    =   "1"  )
-               CONTINUE
-             ELSE
+      ***    IF  ( WRK-LCOMB-GAI-KFTNRATE (IDZ)    =   ZERO ) AND
+      ***        ( WRK-LCOMB-GAI-KKOTGAK  (IDZ)    =   ZERO ) AND
+      ***        ( WRK-LCOMB-GAI-KJGNGAK  (IDZ)    =   ZERO ) AND
+      ***        ( WRK-LCOMB-GAI-FTNKBN   (IDZ)    =   "1"  )
+      ***      CONTINUE
+      ***    ELSE
               IF     (  FLG-SYOCYO   =  ZERO                    )
               OR     (( FLG-SYOCYO   =   1                     ) AND
                       ((WRK-LCOMB-KOH1HKNNUM(IDZ)(1:2) = "99" ) OR
@@ -919,7 +920,7 @@
                                               MCPDATA-REC
                END-IF
               END-IF
-             END-IF
+      ***    END-IF
            END-PERFORM
       *
            INITIALIZE                      WRK-LCOMB-AREA
