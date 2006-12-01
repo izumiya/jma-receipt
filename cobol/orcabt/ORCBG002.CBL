@@ -42,13 +42,6 @@
                                   ACCESS  MODE    IS  SEQUENTIAL
                                   RECORD  KEY     IS  BG00201-ISAM-KEY
                                   FILE    STATUS  IS  STS-BG00201.
-      *
-      *    定期請求情報ファイル（書込用）
-           SELECT  BG00202-FILE   ASSIGN   ORCBG002PARA
-                                  ORGANIZATION    IS  INDEXED
-                                  ACCESS  MODE    IS  DYNAMIC
-                                  RECORD  KEY     IS  BG00202-ISAM-KEY
-                                  FILE    STATUS  IS  STS-BG00202.
       * 
 006900*    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -60,7 +53,7 @@
        FD  BG00201-FILE.
        01  BG00201-REC.
       *----(02.00.01)--UPD-START---
-           02  BG00201-ISAM-KEY                PIC X(41).
+           02  BG00201-ISAM-KEY                PIC X(48).
       *----(02.00.01)--UPD-END-----
            02  BG00201-SYU-DATA-AREA.
            COPY    "CPSYUNOU.INC"  REPLACING   //SYU-//
@@ -69,18 +62,6 @@
            COPY    "CPPTTEIKIRRK.INC"  REPLACING
                                                //PTTEIKIRRK-//
                                    BY          //BG00201-PTTEIKIRRK-//.
-       FD  BG00202-FILE.
-       01  BG00202-REC.
-      *----(02.00.01)--UPD-START---
-           02  BG00202-ISAM-KEY                PIC X(41).
-      *----(02.00.01)--UPD-END-----
-           02  BG00202-SYU-DATA-AREA.
-           COPY    "CPSYUNOU.INC"  REPLACING   //SYU-//
-                                   BY          //BG00202-SYU-//.
-           02  BG00202-PTTEIKIRRK-DATA-AREA.
-           COPY    "CPPTTEIKIRRK.INC"  REPLACING
-                                               //PTTEIKIRRK-//
-                                   BY          //BG00202-PTTEIKIRRK-//.
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -104,7 +85,6 @@
       *    スパ領域
        01  STS-AREA.
            03  STS-BG00201                         PIC X(02).
-           03  STS-BG00202                         PIC X(02).
            03  STS-RECEERR                         PIC X(02).
       *
       *    フラグ領域
@@ -155,6 +135,7 @@
                05  ISAM-KEY-PTNUM       PIC X(20).
                05  ISAM-KEY-SAKKBN      PIC X(01).
                05  ISAM-KEY-SRYYMD      PIC X(08).
+               05  ISAM-KEY-DENPNUM     PIC X(07).
            03  ISAM-KEY2.
                05  ISAM-KEY2-PTNUM      PIC X(20).
                05  ISAM-KEY2-BTUNUM     PIC X(02).
@@ -162,6 +143,7 @@
                05  ISAM-KEY2-SRYKA      PIC X(02).
                05  ISAM-KEY2-SAKKBN     PIC X(01).
                05  ISAM-KEY2-SRYYMD     PIC X(08).
+               05  ISAM-KEY2-DENPNUM    PIC X(07).
       *----(02.00.01)--ADD-END-----
       *
       *    一時領域
@@ -510,7 +492,7 @@
            OPEN    OUTPUT              BG00201-FILE
            CLOSE   BG00201-FILE
       *
-           OPEN    OUTPUT              BG00202-FILE
+           OPEN    OUTPUT              BG00201-FILE
       *
       *    患者定期請求履歴検索
            MOVE    ZERO                TO  FLG-PTTEIKIRRK
@@ -552,7 +534,7 @@
            MOVE    "PTTEIKIRRK-KEY5"   TO  WRK-DBPATH
            PERFORM 900-TBL-CLOSE-SEC
       *
-           CLOSE   BG00202-FILE
+           CLOSE   BG00201-FILE
       *
            .
        110-TEIKI-OUT-EXT.
@@ -593,7 +575,7 @@
                GO  TO  1101-TEIKI-EDIT-EXT
            END-IF
       *
-           INITIALIZE  BG00202-REC
+           INITIALIZE  BG00201-REC
       *----(02.00.01)--ADD-START---
            INITIALIZE  ISAM-AREA
       *----(02.00.01)--ADD-END-----
@@ -617,6 +599,7 @@
            MOVE    WRK-SPTID-PTNUM     TO  ISAM-KEY-PTNUM
            MOVE    PTTEIKIRRK-SAKKBN   TO  ISAM-KEY-SAKKBN
            MOVE    SYU-SRYYMD          TO  ISAM-KEY-SRYYMD
+           MOVE    SYU-DENPNUM         TO  ISAM-KEY-DENPNUM
       *----(02.00.01)--UPD-END-----
       *
       *----(02.00.01)--ADD-START---
@@ -627,16 +610,17 @@
                MOVE    ISAM-KEY-PTNUM      TO  ISAM-KEY2-PTNUM
                MOVE    ISAM-KEY-SAKKBN     TO  ISAM-KEY2-SAKKBN
                MOVE    ISAM-KEY-SRYYMD     TO  ISAM-KEY2-SRYYMD
-               MOVE    ISAM-KEY2           TO  BG00202-ISAM-KEY
+               MOVE    ISAM-KEY-DENPNUM    TO  ISAM-KEY2-DENPNUM
+               MOVE    ISAM-KEY2           TO  BG00201-ISAM-KEY
            ELSE
-               MOVE    ISAM-KEY            TO  BG00202-ISAM-KEY
+               MOVE    ISAM-KEY            TO  BG00201-ISAM-KEY
            END-IF
       *----(02.00.01)--ADD-END-----
       *
-           MOVE    SYUNOU-REC          TO  BG00202-SYU-DATA-AREA
-           MOVE    PTTEIKIRRK-REC      TO  BG00202-PTTEIKIRRK-DATA-AREA
+           MOVE    SYUNOU-REC          TO  BG00201-SYU-DATA-AREA
+           MOVE    PTTEIKIRRK-REC      TO  BG00201-PTTEIKIRRK-DATA-AREA
       *
-           WRITE   BG00202-REC
+           WRITE   BG00201-REC
       *
            .
        1101-TEIKI-EDIT-EXT.
@@ -1243,6 +1227,7 @@
                    MOVE    ISAM-KEY2-SRYKA    TO  ISAM-KEY-SRYKA
                    MOVE    ISAM-KEY2-SAKKBN   TO  ISAM-KEY-SAKKBN
                    MOVE    ISAM-KEY2-SRYYMD   TO  ISAM-KEY-SRYYMD
+                   MOVE    ISAM-KEY2-DENPNUM  TO  ISAM-KEY-DENPNUM
                ELSE
                    MOVE    BG00201-ISAM-KEY   TO  ISAM-KEY
                END-IF
