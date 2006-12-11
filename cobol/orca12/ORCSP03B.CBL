@@ -1682,7 +1682,7 @@
            IF      (SPA-PTKOH-IDOYMD (IDX-K)
                                        <=  SPA-NAI-KTEKSTYMD(IDX-K)) OR
                    (SPA-PTKOH-IDOYMD (IDX-K)
-                                       <=  SPA-NAI-KTEKEDYMD(IDX-K))
+                                       <   SPA-NAI-KTEKEDYMD(IDX-K))
                MOVE    "K004"          TO  SPA-ERRCD
                MOVE    "1"             TO  SPA-NAI-PTKOH-KEIFLG (IDX-K)
                MOVE    20              TO  SPA-GMN-CUR
