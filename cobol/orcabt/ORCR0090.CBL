@@ -165,6 +165,10 @@
       *                                     編集に給付割合を追加
       *  03.01.01    NACL-門脇    06/06/28  実日数減算コード対応
       *  03.01.02    NACL-門脇    06/07/10  在支援コメント自動記載対応
+      *
+      *  03.03.01    NACL-藤原    06/12/11  レセプト特記事項編集情報によ
+      *                                     るレセプト請求しない公費の編集
+      *                                     について神奈川障害のときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3291,8 +3295,7 @@
                            UNTIL   IDW2             >   SYSKAN-IDY
                        MOVE    TBL-SYS2006 (IDW2)  TO  WRK-2006-REC
       *
-                       IF    ( WRK-2006-KYURATE
-                                                   >   ZERO            )
+                       IF    ( WRK-2006-KYURATE    >   ZERO            )
                        AND   ( RECE02-ETC-KOHNUM (IDW1)
                                                    =   WRK-2006-HKNNUM )
                            MOVE    RECE02-ETC-KOHFTNJANUM (IDW1)
@@ -3301,7 +3304,9 @@
                        END-IF
                    END-PERFORM
       *
-                   MOVE    4               TO  IDW1
+                   IF     FLG-2006-CHK     =   1
+                       MOVE    4               TO  IDW1
+                   END-IF
                END-PERFORM
              END-IF
            END-IF  
