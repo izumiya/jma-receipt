@@ -1379,7 +1379,9 @@
            MOVE    ZERO                 TO  FLG-ROUSAI
       *    労災用　区分番号
            IF      WRK-COM-CDKBN-KBN (IDX-Z)  =   "H"
+             AND  (WRK-COM-DATAKBN (IDX-Z) =   "1"  )
                EVALUATE    WRK-COM-CDKBN-KBNNUM (IDX-Z)
+                   WHEN    "000"
                    WHEN    "001"
                    WHEN    "002"
                    WHEN    "003"
@@ -1450,10 +1452,11 @@
                    MOVE    IDX1            TO  IDX-T
                    MOVE    1               TO  FLG-ARI
                ELSE
-                   IF     (WRK-COM-INPUTCD (IDX1)(1:1) =  "1" ) AND
-                          (WRK-COM-DATAKBN (IDX1)      =  "2" )
-                      MOVE    IDX1             TO  IDX-T
-                   END-IF
+      *!四肢加算は手技料の直下とする
+      *!           IF     (WRK-COM-INPUTCD (IDX1)(1:1) =  "1" ) AND
+      *                   (WRK-COM-DATAKBN (IDX1)      =  "2" )
+      *               MOVE    IDX1             TO  IDX-T
+      *!           END-IF
                    IF     (WRK-COM-INPUTCD (IDX1)(1:1) =  "1" ) AND
                           (WRK-COM-DATAKBN (IDX1)      =  "1" )
                       MOVE    200              TO  IDX1
