@@ -41,6 +41,11 @@
       *  03.03.05    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
       *                                     い場合記載の対象としない
       *  03.03.06    NACL-藤原    06/10/31  療養介護医療２４の追加
+      *  03.03.07    NACL-藤原    06/12/04  福岡地方公費の障害のついて全て
+      *                                     公費付加情報より記載判定を行う
+      *  03.03.08    NACL-藤原    06/12/14  不明分のとき生保単独の上限
+      *                                     チェックはしない
+      *  03.03.09    NACL-藤原    06/12/14  地方公費のみのときは対象としない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -904,7 +909,12 @@
                ELSE
                    MOVE    1                      TO  IDX1
                    IF   COMB-KOHHKNNUM (IDX)  =  "972" OR "974" OR "012"
-      *                長期高額療養レセ記載判定
+                     IF    ( WRK-TEISEIKBN       NOT =   SPACE )
+                     AND   ( COMB-KOHHKNNUM (IDX)    =   "012" )
+                     AND   ( COMB-HKNNUM             =   SPACE )
+                         CONTINUE
+                     ELSE 
+      *                長期高額療養レセ記載判定（生保単独の不明分はしない）
                        MOVE    ZERO        TO  FLG-KOHRECEDSP
                        INITIALIZE              ORCSFTNJGNCHKAREA
                        MOVE    COMB-HOSPID TO  LNK-FTNJGNCHK-HOSPID
@@ -925,6 +935,7 @@
                        IF     LNK-FTNJGNCHK-RC =   1
                            MOVE       1            TO    FLG-KOHRECEDSP
                        END-IF
+                     END-IF
                    END-IF
                END-IF       
       *
@@ -1139,6 +1150,13 @@
            END-IF             
            MOVE    SPACE               TO WRK-RECE61-RECEKA
       *
+      *    地方公費のみの場合は出力しない
+           IF    ( WRK-RECE61-HKNNUM      =   SPACE )
+           AND   ( WRK-RECE61-KOHID       =   ZERO  )
+           AND   ( WRK-SEIKYU-KOHID (1 1) =   ZERO  )
+               GO  TO  20019-FILE-SYORI-EXT
+           END-IF
+      *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       100
                IF      TBL-RECE61-HOSPID (IDXX)  =   SPACE   
@@ -1164,34 +1182,40 @@
            MOVE    SPACE               TO  WRK-PREFKBN
                                            WRK-PREFNUM
       *
-      *    県外扱いの保険者はレセプトへ記載しない
-           IF      PTHKN-HKNJANUM (1:2)    =   "67"
-               MOVE    PTHKN-HKNJANUM (3:2)
-                                       TO  WRK-PREFNUM
-           ELSE
-               MOVE    PTHKN-HKNJANUM (1:2)
-                                       TO  WRK-PREFNUM
-           END-IF
-           IF      WRK-PREFNUM         =   LNK-SYUBETU-PREFNUM
+      *
+      *    ２００６年１０月以降は公費付加情報より設定
+           IF    ( LNK-SYUBETU-SRYYM   >  WRK-CONS-SRYYM-200609 )
                MOVE    "1"                 TO  WRK-PREFKBN
            ELSE
-               PERFORM VARYING IDX2    FROM    1   BY  1
-                       UNTIL   IDX2    >       5
-                       OR      WRK-1033-STYUKYMD (IDX2) =   SPACE
-                   IF      WRK-1033-STYUKYMD   (IDX2)  <=  WRK-STYMD
-                   AND     WRK-1033-EDYUKYMD   (IDX2)  >=  WRK-STYMD      
-                       PERFORM VARYING IDX3 FROM    1   BY  1
-                               UNTIL   IDX3 >       20
-                               OR      WRK-1033-HKNJANUM (IDX2 IDX3)
-                                                   =   SPACE
-                               OR      WRK-PREFKBN =   "1"     
-                           IF      PTHKN-HKNJANUM = 
+      *        県外扱いの保険者はレセプトへ記載しない
+               IF      PTHKN-HKNJANUM (1:2)    =   "67"
+                   MOVE    PTHKN-HKNJANUM (3:2)
+                                           TO  WRK-PREFNUM
+               ELSE
+                   MOVE    PTHKN-HKNJANUM (1:2)
+                                           TO  WRK-PREFNUM
+               END-IF
+               IF      WRK-PREFNUM         =   LNK-SYUBETU-PREFNUM
+                   MOVE    "1"                 TO  WRK-PREFKBN
+               ELSE
+                   PERFORM VARYING IDX2    FROM    1   BY  1
+                           UNTIL   IDX2    >       5
+                           OR      WRK-1033-STYUKYMD (IDX2) =   SPACE
+                       IF      WRK-1033-STYUKYMD   (IDX2)  <=  WRK-STYMD
+                       AND     WRK-1033-EDYUKYMD   (IDX2)  >=  WRK-STYMD      
+                           PERFORM VARYING IDX3 FROM    1   BY  1
+                                   UNTIL   IDX3 >       20
+                                   OR      WRK-1033-HKNJANUM (IDX2 IDX3)
+                                                       =   SPACE
+                                   OR      WRK-PREFKBN =   "1"     
+                               IF      PTHKN-HKNJANUM = 
                                            WRK-1033-HKNJANUM (IDX2 IDX3)
-                               MOVE    "1"     TO  WRK-PREFKBN
-                           END-IF
-                       END-PERFORM
-                   END-IF            
-               END-PERFORM
+                                   MOVE    "1"     TO  WRK-PREFKBN
+                               END-IF
+                           END-PERFORM
+                       END-IF            
+                   END-PERFORM
+               END-IF
            END-IF
       *        
       *    県内扱いの場合、公費付加情報よりレセプト請求区分を取得
