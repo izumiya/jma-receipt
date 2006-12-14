@@ -111,6 +111,9 @@
       *                                     老齢福祉年金
       *                                     病棟区分０１、０２、０７
       *  03.03.02    NACL-藤原    06/09/19  月途中での氏名変更対応
+      *  03.03.03    NACL-藤原    06/12/13  公費分で種別が設定できなかっ
+      *                                     たときの対応
+      *
       *  03.04.01    NACL-門脇    06/11/29  病棟区分編集修正
       *****************************************************************
       *
@@ -1717,7 +1720,13 @@
            MOVE    LNK-SYUBETUGET-RECESYUBETU-X
                                        TO  RECE62-RECESYUBETU-X
       *
-      *    DISPLAY   "RECE62-RECESYUBETU: " RECE62-RECESYUBETU
+      *    公費分で種別が設定できなかったとき不明分にしない
+           IF    ( IDZ                 =   2    )
+           AND   ( RECE62-RECESYUBETU  =   ZERO ) 
+               MOVE    "5555"              TO  RECE62-RECESYUBETU
+           END-IF                 
+      *
+      *     DISPLAY   "RECE62-RECESYUBETU: " RECE62-RECESYUBETU
            .
        RECESYUBETU-SET-EXT.
            EXIT.

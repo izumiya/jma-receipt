@@ -154,6 +154,8 @@
       *                                     レセプト種別
       *                                     老齢福祉年金 
       *  03.03.02    NACL-藤原    06/09/19  月途中での氏名変更対応
+      *  03.03.03    NACL-藤原    06/12/13  公費分で種別が設定できなかっ
+      *                                     たときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1853,6 +1855,12 @@
                                        TO  RECE02-RECESYUBETU
            MOVE    LNK-SYUBETUGET-RECESYUBETU-X
                                        TO  RECE02-RECESYUBETU-X
+      *
+      *    公費分で種別が設定できなかったとき不明分にしない
+           IF    ( IDZ                 =   2    )
+           AND   ( RECE02-RECESYUBETU  =   ZERO ) 
+               MOVE    "5555"              TO  RECE02-RECESYUBETU
+           END-IF                 
       *
       *     DISPLAY   "RECE02-RECESYUBETU: " RECE02-RECESYUBETU
            .
