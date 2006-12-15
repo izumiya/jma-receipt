@@ -1791,6 +1791,9 @@
       * 
                INITIALIZE                     TABLE-AREA
       *
+      *???
+           DISPLAY   "RECE62-RECESYUBETU: " RECE62-RECESYUBETU
+      *???
                IF      RECE62X-RECESYUBETU     =   ZERO
                    IF      RECE62X-HKNNUM      NOT =   SPACE 
                        CONTINUE
@@ -1884,6 +1887,9 @@
            MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
            MOVE    "key43"             TO  WRK-MCP-PATHNAME
            PERFORM 900-SEIKYU-INV-SEC
+      *???
+           DISPLAY   "FLG-SEIKYU: " FLG-SEIKYU "#" KOHSKY-KEY "#"
+      *???
            IF      FLG-SEIKYU          =   ZERO
                MOVE    MCPDATA-REC         TO  RECE10-REC
                MOVE    RECE10-RECESYUBETU  TO  KOHSKY-RECESYUBETU

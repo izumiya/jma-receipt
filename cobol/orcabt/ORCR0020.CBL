@@ -1859,7 +1859,7 @@
       *    公費分で種別が設定できなかったとき不明分にしない
            IF    ( IDZ                 =   2    )
            AND   ( RECE02-RECESYUBETU  =   ZERO ) 
-               MOVE    "5555"              TO  RECE02-RECESYUBETU
+               MOVE    5555                TO  RECE02-RECESYUBETU
            END-IF                 
       *
       *     DISPLAY   "RECE02-RECESYUBETU: " RECE02-RECESYUBETU

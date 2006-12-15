@@ -1348,9 +1348,25 @@
                                            WRK-HKNCOMBI-SYOKBN (IDX1)
                        END-IF
                    ELSE
-                       MOVE    WRK-DAY (2 IDX) TO
+                       IF      COMB-DELKBN         =   "1"
+                           MOVE    HKNCOMBI-REC    TO
+                                               WRK-HKNCOMBI-REC  (IDX1)
+      *                    医保以外読み飛ばし
+                           IF      COMB-HKNNUM     =
+                                               WRK-CONS-ROUSAI-HKNNUM OR
+                                               WRK-CONS-JIBAI-HKNNUM 
+                               MOVE    "1"         TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                           ELSE
+                               MOVE    "2"             TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                           END-IF
+                       ELSE
+                           MOVE    WRK-DAY (2 IDX) TO
                                            WRK-COMB-HKNCOMBINUM (IDX1)
-                       MOVE    "2"     TO  WRK-HKNCOMBI-SYOKBN  (IDX1)
+                           MOVE    "2"             TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                       END-IF
                    END-IF
                END-IF
       *
