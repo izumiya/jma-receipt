@@ -64,6 +64,7 @@
       *                                     公費単独のレセプトとする
       *  03.03.05    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
       *                                     い場合記載の対象としない
+      *  03.03.06    NACL-藤原    06/12/15  入院の包括のデータ作成の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -313,6 +314,7 @@
            02  WRK-TOUKEI01-OCC    OCCURS  100.
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
                                    BY         //WRK-TOUKEI01//.
+       01  WRK-TOUKEI01-TABLE-MAX  PIC 9(03)   VALUE   100.
       *
       *    ワーク患者病名
        01  WRK-PTBYOMEI-REC.
@@ -928,28 +930,36 @@
            END-IF
       *
            PERFORM UNTIL       FLG-SRYACCT     =   1
-      *        保険組合せ読込み
-               INITIALIZE                  HKNCOMBI-REC
-               MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
-               MOVE    PTINF-PTID          TO  COMB-PTID
-               MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM 
-               MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
-               PERFORM 910-HKNCOMBI-INV-SEC
-      *
       *        未訂正分があるか
                MOVE    SPACE               TO  WRK-ERR-AREA
                INITIALIZE                      WRK-ERR-AREA
       *
-               IF      FLG-HKNCOMBI    =   ZERO
-                   IF      COMB-TEKSTYMD   <=  WRK-STYMD
-                   AND     COMB-TEKEDYMD   >=  WRK-EDYMD
-                       MOVE    SPACE           TO  WRK-UPDKBN
-                    ELSE
-                       MOVE    "1"             TO  WRK-UPDKBN
-                   END-IF
+               IF      KEY-N-HKNCOMBI      =   9999
+                   INITIALIZE                  HKNCOMBI-REC
+                   MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
+                   MOVE    PTINF-PTID          TO  COMB-PTID
+                   MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM 
+                   MOVE    ZERO                TO  FLG-HKNCOMBI 
                ELSE
-                   MOVE    "1"             TO  WRK-TEISEIKBN
-               END-IF    
+      *            保険組合せ読込み
+                   INITIALIZE                  HKNCOMBI-REC
+                   MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
+                   MOVE    PTINF-PTID          TO  COMB-PTID
+                   MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM 
+                   MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+                   PERFORM 910-HKNCOMBI-INV-SEC
+      *
+                   IF      FLG-HKNCOMBI    =   ZERO
+                       IF      COMB-TEKSTYMD   <=  WRK-STYMD
+                       AND     COMB-TEKEDYMD   >=  WRK-EDYMD
+                           MOVE    SPACE           TO  WRK-UPDKBN
+                        ELSE
+                           MOVE    "1"             TO  WRK-UPDKBN
+                       END-IF
+                   ELSE
+                      MOVE    "1"             TO  WRK-TEISEIKBN
+                   END-IF
+               END-IF
       *             
                MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
@@ -1090,6 +1100,10 @@
                MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
+      *            未訂正分があるか
+                   MOVE    SPACE               TO  WRK-ERR-AREA
+                   INITIALIZE                      WRK-ERR-AREA
+      *
                    IF      KEY-N-HKNCOMBI      =   9999
                        INITIALIZE                  HKNCOMBI-REC
                        MOVE    WRK-PARA-HOSPID     TO  COMB-HOSPID
@@ -1104,10 +1118,6 @@
                        MOVE    KEY-N-HKNCOMBI      TO  COMB-HKNCOMBINUM 
                        MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
                        PERFORM 910-HKNCOMBI-INV-SEC
-      *
-      *                未訂正分があるか
-                       MOVE    SPACE               TO  WRK-ERR-AREA
-                       INITIALIZE                      WRK-ERR-AREA
       *
                        IF      FLG-HKNCOMBI    =   ZERO
                            IF      COMB-TEKSTYMD   <=  WRK-STYMD
@@ -1223,7 +1233,7 @@
                        PERFORM 910-PTHKNINF-INV-SEC
                END-EVALUATE 
            END-IF
-      *            
+      *
       *    ファイル編集処理
            INITIALIZE                      TOUKEI01-REC
            MOVE    WRK-PARA-HOSPID     TO  TOUKEI01-HOSPID
@@ -1405,16 +1415,22 @@
              END-EVALUATE
            END-IF             
       *
-           PERFORM VARYING IDXX    FROM    1   BY  1
-                   UNTIL   IDXX    >       100
+           IF      COMB-HKNCOMBINUM    =    9999
+               MOVE    "9999999"            TO  TOUKEI01-HKNJANUM
+           END-IF
+      *
+           PERFORM VARYING IDXX    FROM   1   BY  1
+                   UNTIL   IDXX    >      WRK-TOUKEI01-TABLE-MAX
                IF      WRK-TOUKEI01-HOSPID (IDXX)  =   SPACE   
                    PERFORM 20011-TOUKEI01-WRITE-SEC
-                   MOVE    100             TO  IDXX
+                   MOVE    WRK-TOUKEI01-TABLE-MAX
+                                              TO  IDXX
                ELSE
                    IF      WRK-TOUKEI01-KEY (IDXX) =
-                                           TOUKEI01-KEY
+                                               TOUKEI01-KEY
                        PERFORM 20011-TOUKEI01-REWRITE-SEC
-                       MOVE    100             TO  IDXX
+                       MOVE    WRK-TOUKEI01-TABLE-MAX
+                                                   TO  IDXX
                    END-IF
                END-IF
            END-PERFORM
@@ -1966,7 +1982,7 @@
        2002-KIHON-WRITE-SEC              SECTION.
       *
            PERFORM VARYING IDXX    FROM    1   BY  1
-                   UNTIL   IDXX    >       100
+                   UNTIL   IDXX    >       WRK-TOUKEI01-TABLE-MAX
                    OR      WRK-TOUKEI01-HOSPID (IDXX)  =   SPACE
                MOVE    WRK-TOUKEI01-OCC (IDXX)     TO  TOUKEI01-REC
       *
@@ -1994,6 +2010,10 @@
       *    保険変更後、訂正していないとき
       *    保険組合せがないとき
            IF      TOUKEI01-TEISEIKBN  =   "1"
+               GO  TO  20021-RECESYUBETU-SET-EXT
+           END-IF
+      *    包括のとき
+           IF      TOUKEI01-HKNJANUM   =   "9999999"
                GO  TO  20021-RECESYUBETU-SET-EXT
            END-IF
       *     
@@ -2757,6 +2777,11 @@
       *    保険組合せマスタ読込
       *****************************************************************
        910-HKNCOMBI-INV-SEC         SECTION.
+      *
+           IF      COMB-HKNCOMBINUM =   9999
+               MOVE    ZERO                TO  FLG-HKNCOMBI
+               GO  TO  910-HKNCOMBI-INV-EXT
+           END-IF
       *
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "HKNCOMBI-KEY"      TO  ORC-DBPATH

@@ -31,6 +31,7 @@
       *
       *  03.03.01    NACL-藤原    06/10/10  主保険がない場合、精神入院は
       *                                     公費単独のレセプトとする
+      *  03.03.02    NACL-藤原    06/12/15  入院の包括のデータ作成の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -629,7 +630,7 @@
            MOVE    10                  TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    保険者番号
-           IF      TOUKEI02-HKNNUM NOT =   SPACE    
+           IF      TOUKEI02-HKNNUM NOT =   SPACE   AND "9999999"    
                MOVE    TOUKEI02-HKNJANUM   TO  WRK-DATA
                MOVE    8                   TO  WRK-NAGASA
            END-IF
