@@ -163,6 +163,8 @@
       *                                     §»§π§Î
       *  03.03.12    NACL-∆£∏∂    06/11/17  ºÁ≤ Ã§¿ﬂƒÍ§ŒæÏπÁ§«§‚≤  Ã∞ı∫˛
       *                                     ¿ﬂƒÍ§Œ§»§≠§œ•Ï•ª≈≈§Úµ≠œø§π§Î
+      *  03.03.13    NACL-∆£∏∂    06/12/19  ¥Ω‡…‘≈¨πÁƒ„∏∫∂Ë ¨§À§Ë§Îµ≠∫‹
+      *                                     ΩÁ§ŒΩ§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1218,6 +1220,18 @@
       *    ƒ∂≤ª«»∆‚ªÎ∂¿≤√ªª
            03  WRK-CONS-CHOONPA-KASAN
                                       PIC X(09)   VALUE   "160148670".
+      *
+      *    ª‹¿ﬂ¥Ω‡…‘≈¨πÁ° ∏°∫∫°À° £±£∞£∞ ¨§Œ£∏£∞°À
+           03  WRK-CONS-SISETUKIJYUN-KENSA
+                                      PIC X(09)   VALUE   "160174470".
+      *
+      *    ª‹¿ﬂ¥Ω‡…‘≈¨πÁ° ≤Ë¡¸°À° £±£∞£∞ ¨§Œ£∏£∞°À
+           03  WRK-CONS-SISETUKIJYUN-GAZOU
+                                      PIC X(09)   VALUE   "170025170".
+      *
+      *    ª‹¿ﬂ¥Ω‡…‘≈¨πÁ°  ¸ºÕ¿˛°À° £±£∞£∞ ¨§Œ£∑£∞°À
+           03  WRK-CONS-SISETUKIJYUN-HOUSYASEN
+                                      PIC X(09)   VALUE   "180025270".
       *
       *    ª¿¡« ‰¿µŒ®£±°•£≥° £±µ§∞µ°À
            03  WRK-CONS-SANSO-HOSEI   PIC X(09)   VALUE   "770020070".
@@ -4390,19 +4404,27 @@
                                                  WRK-CONS-CHOONPA-KASAN
                                      MOVE    4               TO  IDZ  
                                    ELSE
-                                     IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
+                                     IF      WRK-KOUI-TAIHI-SRYCD (IDX)
+                                                           =
+                                         WRK-CONS-SISETUKIJYUN-KENSA  OR
+                                         WRK-CONS-SISETUKIJYUN-GAZOU  OR
+                                         WRK-CONS-SISETUKIJYUN-HOUSYASEN
+                                       MOVE    2               TO  IDZ  
+                                     ELSE
+                                      IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
                                                                (IDX)
                                                          =   5   OR  6 )
-                                     AND   ( WRK-KOUI-TAIHI-CHUKSNCD
+                                      AND   ( WRK-KOUI-TAIHI-CHUKSNCD
                                                                  (IDX)
                                                          =   "0000"    )
-                                     AND   ( RECE641-SRYKBN
+                                      AND   ( RECE641-SRYKBN
                                                      NOT =   "54"      ) 
-                                       MOVE    3               TO  IDZ
-                                     ELSE
-                                       MOVE    2               TO  IDZ
+                                        MOVE    3               TO  IDZ
+                                      ELSE
+                                        MOVE    2               TO  IDZ
+                                      END-IF
                                      END-IF
-                                   END-IF   
+                                   END-IF    
                                WHEN    "9" 
                                    MOVE    4               TO  IDZ  
                            END-EVALUATE
