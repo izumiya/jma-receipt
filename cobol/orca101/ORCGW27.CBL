@@ -1440,6 +1440,23 @@
            MOVE    TNS-NAME                TO  SPA-GMN-W27-KHNRYO
            MOVE    TNS-NYUKHNKSNKBN        TO  SPA-NAI-W27-KSNKBN
       *
+           EVALUATE    SPA-NAI-W27-KIHONRYO
+           WHEN    "099999950"
+               MOVE    "190097010"     TO  WRK-TNS-SRYCD
+               MOVE    SPA-NAI-W27-STYUKYMD
+                                       TO  WRK-TNS-KJNYMD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-NYUKHNKSNKBN TO SPA-NAI-W27-KSNKBN
+           WHEN    "099999951"
+               MOVE    "190097210"     TO  WRK-TNS-SRYCD
+               MOVE    SPA-NAI-W27-STYUKYMD
+                                       TO  WRK-TNS-KJNYMD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-NYUKHNKSNKBN TO SPA-NAI-W27-KSNKBN
+           WHEN    OTHER
+               CONTINUE
+           END-EVALUATE
+      *
            .
        41001-BTUINF-SET-EXT.
            EXIT.

@@ -1033,6 +1033,21 @@
                MOVE    SYS-5001-BTU-KHNSRYCD
                                            TO  SPA-NAI-W26-KHNRYO
                MOVE    TNS-NYUKHNKSNKBN    TO  SPA-NAI-W26-KSNKBN
+      *
+               EVALUATE    SYS-5001-BTU-KHNSRYCD
+               WHEN    "099999950"
+                   MOVE    "190097010"     TO  WRK-TNS-SRYCD
+                   MOVE    WRK-STYUKYMD    TO  WRK-TNS-KJNYMD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   MOVE    TNS-NYUKHNKSNKBN TO SPA-NAI-W26-KSNKBN
+               WHEN    "099999951"
+                   MOVE    "190097210"     TO  WRK-TNS-SRYCD
+                   MOVE    WRK-STYUKYMD    TO  WRK-TNS-KJNYMD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   MOVE    TNS-NYUKHNKSNKBN TO SPA-NAI-W26-KSNKBN
+               WHEN    OTHER
+                   CONTINUE
+               END-EVALUATE
            ELSE
                INITIALIZE                      SYSKANRI-REC
                MOVE    "5110"              TO  SYS-KANRICD
