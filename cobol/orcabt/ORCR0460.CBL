@@ -389,6 +389,7 @@
                        09  WRK-KENSA-KENTAICOMMENT-SRYCD
                                            PIC 9(09).
                        09  WRK-KENSA-SRYCD PIC 9(09).
+                       09  WRK-KENSA-SRYSURYO PIC 9(05)V9(03).
       *
        01  WRK-RECE44-ZAITEN               PIC 9(08). 
       *         
@@ -418,6 +419,7 @@
                    07  WRK-RECE44-KENTAICOMMENT-SRYCD
                                                   PIC 9(09).
                    07  WRK-RECE44-SRYCD           PIC 9(09).
+                   07  WRK-RECE44-SRYSURYO        PIC 9(05)V9(03).
                05  WRK-RECE44-DAY-AREA.
                    07  WRK-RECE44-DAY-TBL         OCCURS  4.
                        09  WRK-RECE44-KAISUINF    OCCURS  31.
@@ -2329,6 +2331,9 @@
                                                       (WRK-RECE44-MAX)
            MOVE    TBL-ZAIW-SRYCD(3 1)
                                    TO  WRK-RECE44-SRYCD
+                                                      (WRK-RECE44-MAX)
+           MOVE    TBL-ZAIW-SRYSURYO(3 1)
+                                   TO  WRK-RECE44-SRYSURYO
                                                       (WRK-RECE44-MAX)
            MOVE    TBL-ZAIW-KENTAICOMMENT-SRYCD (3 1)
                                    TO  WRK-RECE44-KENTAICOMMENT-SRYCD
