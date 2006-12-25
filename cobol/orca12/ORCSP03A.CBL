@@ -1813,15 +1813,15 @@
                PERFORM 2004-KANREN-HKN-CHECK-SEC
            END-IF
       *
-      *    保険者異動日チェック
-           IF     (SPA-ERRCD           =   SPACE )  AND
-                  (SPA-PIDCD           =   SPACE )
-               IF      SPA-HKNJA-IDOYMD    =   SPACE
-                   CONTINUE
-               ELSE
-                   PERFORM 2005-IDOYMD-CHECK-SEC
-               END-IF
-           END-IF
+      *!!  保険者異動日チェック
+      *    IF     (SPA-ERRCD           =   SPACE )  AND
+      *           (SPA-PIDCD           =   SPACE )
+      *        IF      SPA-HKNJA-IDOYMD    =   SPACE
+      *            CONTINUE
+      *        ELSE
+      *            PERFORM 2005-IDOYMD-CHECK-SEC
+      *        END-IF
+      *!!  END-IF
       *
            .
        200-KANREN-CHK-EXT.

@@ -1221,13 +1221,13 @@
                GO      TO      200-KANREN-CHK-EXT
            END-IF
       *
-      *    保険者異動日チェック
-           IF     (SPA-PTKOH-IDOYMD(IDX-K)     =   SPACE)  OR
-                  (SPA-NAI-PTKOH-KEIFLG (IDX-K)    =   "1")
-               CONTINUE
-           ELSE
-               PERFORM 2005-IDOYMD-CHECK-SEC
-           END-IF
+      *!!  保険者異動日チェック
+      *    IF     (SPA-PTKOH-IDOYMD(IDX-K)     =   SPACE)  OR
+      *           (SPA-NAI-PTKOH-KEIFLG (IDX-K)    =   "1")
+      *        CONTINUE
+      *    ELSE
+      *        PERFORM 2005-IDOYMD-CHECK-SEC
+      *!!  END-IF
       *
            .
        200-KANREN-CHK-EXT.
