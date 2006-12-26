@@ -1329,7 +1329,7 @@
                GO  TO  3103-91DAYS-EDIT-EXT
            END-IF
       *
-           MOVE    STUSAN-NISSU05  TO  WRK-TUSAN
+           MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
