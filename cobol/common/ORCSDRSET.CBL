@@ -313,13 +313,15 @@
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL       IDX2    >   20
                IF      SYS-1011-DRCD(IDX2) NOT =   SPACE
-                   ADD     1               TO  IDX
-                   MOVE    SYS-1011-DRCD(IDX2)(2:4)
-                                               TO  ORCSDR-DRCD (IDX)
                    MOVE    SYS-1011-DRCD(IDX2) TO  WRK-KEY-DRCD
                    PERFORM 10001-DRCDNAME-HEN-SEC
-                   MOVE    SYS-1010-NAME       TO  ORCSDR-DRCDMEI
+                   IF      FLG-SYSKANRI        =   ZERO
+                       ADD     1               TO  IDX
+                       MOVE    SYS-1011-DRCD(IDX2)(2:4)
+                                               TO  ORCSDR-DRCD (IDX)
+                       MOVE    SYS-1010-NAME       TO  ORCSDR-DRCDMEI
                                                               (IDX)
+                   END-IF
                END-IF
            END-PERFORM
            MOVE    IDX                 TO  ORCSDR-DRCD-MAX
