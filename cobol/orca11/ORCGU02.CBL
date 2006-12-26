@@ -2735,6 +2735,7 @@
                    IF      SPA-ERRCD       NOT =   SPACE
                        MOVE    SPA-GMN-DRCDLST(1)
                                                    TO  SPA-GMN-DRCD-G
+                       MOVE    SPACE               TO  SPA-ERRCD
                    END-IF
                END-IF
            END-IF
