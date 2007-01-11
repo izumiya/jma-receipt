@@ -68,6 +68,7 @@
            03  IDX                 PIC 9(04).
            03  IDX2                PIC 9(04).
            03  IDX3                PIC 9(04).
+           03  IDX4                PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDH1                PIC 9(04).
            03  IDH2                PIC 9(04).
@@ -92,7 +93,7 @@
       *
            03  WRK-CHK-FLG         PIC X(01).
       *
-           03  WRK-KOUMOKU         PIC X(20).
+           03  WRK-KOUMOKU         PIC X(40).
            03  WRK-LEN             PIC 9(04).
       *
            03  WRK-STR             PIC 9(02).
@@ -839,7 +840,10 @@
            MOVE    ZERO                TO  FLG-SUJI
            MOVE    ZERO                TO  WRK-CD-MCNT
            MOVE    SPACE               TO  WRK-CD
-           PERFORM VARYING IDX     FROM    WRK-IDX-FT   BY  1
+           MOVE    WRK-IDX-FT          TO  IDX
+           MOVE    1                   TO  IDX4
+     *D    PERFORM VARYING IDX     FROM    WRK-IDX-FT   BY  1
+           PERFORM
                    UNTIL  (IDX         >   22     )
                     OR    (WRK-INPUTCD(IDX:1)
                                        =   SPACE  OR  "*" )
@@ -847,10 +851,23 @@
              IF      WRK-INPUTCD(IDX:2)    =  "¡ö" OR "¡¡"
                  MOVE    22                TO  IDX
              ELSE
-      *
-               ADD     1                   TO  WRK-CD-MCNT
-               MOVE    WRK-INPUTCD(IDX:1)
-                                           TO  WRK-CD (WRK-CD-MCNT:1)
+      *          Á´³ÑÈ½Äê
+                 MOVE    WRK-INPUTCD(IDX:2)    TO  WRK-KOUMOKU
+                 MOVE    2                     TO  WRK-LEN
+                 PERFORM 1009-KANACONV-SEC
+                 IF      FLG-ZENKAKU         =   1
+                     MOVE    WRK-INPUTCD(IDX:2)
+                                           TO  WRK-CD (IDX4:2)
+                     ADD     2             TO  WRK-CD-MCNT
+                     ADD     2             TO  IDX4
+                     ADD     2             TO  IDX
+                 ELSE
+                     MOVE    WRK-INPUTCD(IDX:1)
+                                           TO  WRK-CD (IDX4:1)
+                     ADD     1             TO  WRK-CD-MCNT
+                     ADD     1             TO  IDX4
+                     ADD     1             TO  IDX
+                 END-IF
              END-IF
       ******** IF      WRK-INPUTCD (IDX:1)
       **********                      >=  X"A1"
