@@ -5275,6 +5275,11 @@
                    MOVE    ZERO                TO  WRK-NYUKIN
                ELSE
                    MOVE    WRK-SEIKYU          TO  WRK-NYUKIN
+      *!!
+                   IF      WRK-SEIKYU          >=  SPA-GOK-NYUKIN
+                       MOVE    SPA-GOK-NYUKIN      TO  WRK-NYUKIN
+                   END-IF
+      *!!
                END-IF
            ELSE
                MOVE    LNK-SCNYUKIN-FURIWAKEZAN    TO  WRK-NYUKIN
