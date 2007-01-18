@@ -233,6 +233,7 @@
       *  03.03.14    NACL-門脇    06/12/04  上限額に食事を含む場合の食事療養
       *                                     欄記載修正
       *  03.03.15    NACL-門脇    06/12/06  茨城県地方公費一部負担金記載対応
+      *  03.03.16    NACL-門脇    07/01/16  （　）再掲記載の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9679,9 +9680,9 @@
                   IF  FLG-KOH     =   ZERO
                      COMPUTE   RECE62-KOUREI-SAIKEI  =  
                                FTN-KOH-XXX
-                     IF   FTN-KOH-XXX   <=   WRK-KOH-FTN 
-                           MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
-                     END-IF
+      ****           IF   FTN-KOH-XXX   <=   WRK-KOH-FTN 
+      ****                 MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
+      ****           END-IF
                      IF   FTN-KOH-XXX    =   RECE62-FTNMONEY(1)
                            MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
                      END-IF
@@ -9696,9 +9697,9 @@
                         COMPUTE   RECE62-KOUREI-SAIKEI  =  
                                   FTN-KOH-XXX
                      END-IF
-                     IF   FTN-KOH-XXX   <=   WRK-KOH-FTN 
-                           MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
-                     END-IF
+      ****           IF   FTN-KOH-XXX   <=   WRK-KOH-FTN 
+      ****                 MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
+      ****           END-IF
                      IF   FTN-KOH-XXX    =   RECE62-FTNMONEY(1)
                            MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
                      END-IF
