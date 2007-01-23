@@ -236,6 +236,7 @@
       *  03.03.16    NACL-ÌçÏÆ    07/01/16  ¡Ê¡¡¡ËºÆ·Çµ­ºÜ¤Î½¤Àµ
       *  03.03.17    NACL-ÌçÏÆ    07/01/19  ²¬»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê£°£¹£±¤ò»ý¤Ä¾ì¹ç¤ÎÀÁµáÅÀµ­ºÜ¡Ë
+      *  03.04.18    NACL-ÌçÏÆ    07/01/23  £µ£±¡ÜÄã½êÆÀÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -541,6 +542,7 @@
       *
        01  WRK-AREA-SAIKEI.
            03  WRK-KOH-FTN                             PIC 9(09).
+           03  WRK-KOH-KOUGAKU                         PIC 9(09).
            03  WRK-KOH-GAI                             PIC 9(09).
            03  FTN-KOH-XXX                             PIC 9(09).       
            03  FTN-KOH-YYY                             PIC 9(09).       
@@ -8688,6 +8690,8 @@
       *
            ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
       *
+           ADD   SYU-SKJ-FTNGAKU(1)  TO  WRK-KOH-KOUGAKU
+      *
            .
        210442-HOKEN-FUTAN-HENSYU-EXT.
            EXIT.
@@ -9644,33 +9648,33 @@
              MOVE    LNK-ORCSJGNGET-NYUJGNGAK
                                       TO  WRK-NYUJGNGAK
       *
-             IF    RECE62-KOUREI  NOT =    SPACE
-               IF     RECE62-KOHNUM(KOHFTN-IDX) =  "012"
-                   CONTINUE
-               ELSE
-                 IF    RECE62-SRYYM       >=  "200610"
-                   IF    WRK-NYUJGNGAK    >  44400
-                           MOVE    44400    TO   WRK-NYUJGNGAK
-                   END-IF
-                 ELSE
-                   IF    WRK-NYUJGNGAK    >  40200
-                           MOVE    40200    TO   WRK-NYUJGNGAK
-                   END-IF
-                 END-IF
-                 EVALUATE   RECE62-TEISYOTOKU
-                   WHEN  "1"
-                   WHEN  "4"
-                     IF  WRK-NYUJGNGAK    >  15000
-                           MOVE    15000    TO   WRK-NYUJGNGAK
-                     END-IF
-                   WHEN  "2"
-                   WHEN  "3"
-                     IF  WRK-NYUJGNGAK    >  24600
-                           MOVE    24600    TO   WRK-NYUJGNGAK
-                     END-IF
-                 END-EVALUATE
-               END-IF
-             END-IF
+      ***    IF    RECE62-KOUREI  NOT =    SPACE
+      ***      IF     RECE62-KOHNUM(KOHFTN-IDX) =  "012"
+      ***          CONTINUE
+      ***      ELSE
+      ***        IF    RECE62-SRYYM       >=  "200610"
+      ***          IF    WRK-NYUJGNGAK    >  44400
+      ***                  MOVE    44400    TO   WRK-NYUJGNGAK
+      ***          END-IF
+      ***        ELSE
+      ***          IF    WRK-NYUJGNGAK    >  40200
+      ***                  MOVE    40200    TO   WRK-NYUJGNGAK
+      ***          END-IF
+      ***        END-IF
+      ***        EVALUATE   RECE62-TEISYOTOKU
+      ***          WHEN  "1"
+      ***          WHEN  "4"
+      ***            IF  WRK-NYUJGNGAK    >  15000
+      ***                  MOVE    15000    TO   WRK-NYUJGNGAK
+      ***            END-IF
+      ***          WHEN  "2"
+      ***          WHEN  "3"
+      ***            IF  WRK-NYUJGNGAK    >  24600
+      ***                  MOVE    24600    TO   WRK-NYUJGNGAK
+      ***            END-IF
+      ***        END-EVALUATE
+      ***      END-IF
+      ***    END-IF
       *
            END-IF
       *
@@ -9688,7 +9692,22 @@
            ELSE
                 MOVE     ZERO    TO    FTN-KOH-XXX
            END-IF
-      *
+      ***
+           IF   WRK-KOH-KOUGAKU   NOT =  ZERO
+             IF   WRK-KOH-KOUGAKU  <   RECE62-FTNMONEY(1)
+                COMPUTE  RECE62-FTNMONEY(1) =  RECE62-FTNMONEY(1)
+                                            -  WRK-KOH-KOUGAKU
+             ELSE
+                MOVE     ZERO    TO    RECE62-FTNMONEY(1)
+             END-IF
+             IF   WRK-KOH-KOUGAKU  <   FTN-KOH-XXX
+                COMPUTE  FTN-KOH-XXX        =  FTN-KOH-XXX
+                                            -  WRK-KOH-KOUGAKU
+             ELSE
+                MOVE     ZERO    TO    FTN-KOH-XXX
+             END-IF
+           END-IF
+      ***
            IF   RECE62-KOUREI  =  SPACE
                   MOVE     ZERO      TO     RECE62-KOUREI-SAIKEI
            ELSE
