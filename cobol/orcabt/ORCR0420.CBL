@@ -120,6 +120,7 @@
       *  03.02.02    NACL-ÌçÏÆ    06/09/08  ¥Õ¥¤¥ë¥à¤ÎÃ±²ÁÊÔ½¸½¤Àµ
       *  03.03.01    NACL-ÌçÏÆ    06/09/27  ÆÃµ­»ö¹à£±£¶Ä¹£²ÂÐ±þ
       *  03.03.02    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
+      *  03.03.03    NACL-ÌçÏÆ    07/01/23  Ãí¼Í²Ã»»¤ÎÌ¾¾ÎÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1836,10 +1837,12 @@
                     END-IF
                END-IF
       *
-               IF          SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
+               IF          SRY-SRYKBN       =     "31"
+                 IF        SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
                                            OR    CONS-SEIBUTU
                                            OR    CONS-MAYAKU
                    MOVE    SPACE           TO    RECE45-NAME(IDX4)
+                 END-IF
                END-IF
                IF  ( SRY-SRYSYUKBN         =  "334"       )
                AND ((SRY-SRYCD(IDX2)       =  "810000001") OR
