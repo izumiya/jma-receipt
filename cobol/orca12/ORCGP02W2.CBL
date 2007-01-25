@@ -64,6 +64,8 @@
       *                                     （老人割合変更）
       *  03.03.01    NACL-門脇    06/10/23  長期併用の保険組み合わせ修正
       *  03.03.02    NACL-門脇    06/11/29  保険組み合わせ作成条件修正
+      *  03.04.03    NACL-門脇    07/01/25  ＜岡山＞０９１＋重心の
+      *                                     保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3544,6 +3546,17 @@
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                             END-IF
+                          WHEN     33
+                            IF  WRK-SRT-HJO-KOHNO  =  "091"
+                             IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(2:2)
+                                                          = "80"
+                                PERFORM 5701413-SYUKOH-HJO-SEC
+                             END-IF
+                            ELSE
+                             IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
+                                PERFORM 5701413-SYUKOH-HJO-SEC
+                             END-IF
+                            END-IF
                           WHEN     OTHER
                              IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
                                PERFORM 5701413-SYUKOH-HJO-SEC
@@ -4399,6 +4412,13 @@
                 END-IF
              END-IF
              IF   SPA-PREFNUM  =  01
+               IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
+               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
+                   MOVE    "3"            TO  WRK-FTN-FLG
+               END-IF
+             END-IF
+             IF   SPA-PREFNUM  =  33
                IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                     (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
