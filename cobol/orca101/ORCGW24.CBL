@@ -691,7 +691,7 @@
                                    TO  SPA-GMN-W24-SENTEI-FTNKBNMEIL (2)
       *
            MOVE    "3"             TO  SPA-GMN-W24-SENTEI-FTNKBNL    (3)
-           MOVE    "3 病棟別に設定"
+           MOVE    "病棟別に設定"
                                    TO  SPA-GMN-W24-SENTEI-FTNKBNMEIL (3)
       *
            .
