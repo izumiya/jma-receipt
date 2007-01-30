@@ -2399,14 +2399,14 @@
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_inputcd"       TO  MCP-TABLE
                MOVE    "key4"              TO  MCP-PATHNAME
-               PERFORM                     920-INPUTCD-NEXT-SEC
+               PERFORM 920-INPUTCD-NEXT-SEC
            ELSE
                MOVE    1                   TO  FLG-INPUTCD
            END-IF
       *
            PERFORM
                UNTIL    (FLG-INPUTCD       =   1    )   OR
-                        (SPA-ERRCD     NOT =   SPACE)
+                        (IDX               >   5    )
                IF      ICD-INPUTCD         =   SPA-GMN-SETCODE
                    CONTINUE
                ELSE
