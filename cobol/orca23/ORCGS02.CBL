@@ -1509,7 +1509,7 @@
                MOVE    SPACE               TO  SHELLTBL
       *        ファイルデイレクトリ位置指定
                INITIALIZE                  ORCSMKPASSAREA
-               MOVE    "/scripts/allways/print.sh"
+               MOVE    "/scripts/allways/print_prv.sh"
                                            TO  MKPASS-IN-01
                CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
                MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
@@ -1523,7 +1523,7 @@
                MOVE    ZERO                TO  LNK-PRTKANRI-SHORI-RENNUM
                MOVE    "000000"            TO  LNK-PRTKANRI-SRYYM
                MOVE    SPA-SYSYMD          TO  LNK-PRTKANRI-SKYYMD
-               MOVE    "print.sh"          TO  LNK-PRTKANRI-SHELLID
+               MOVE    "print_prv"         TO  LNK-PRTKANRI-SHELLID
                MOVE    ZERO                TO  LNK-PRTKANRI-PRIORITY
                MOVE    SPA-TERMID          TO  LNK-PRTKANRI-TERMID
                MOVE    SPA-OPID            TO  LNK-PRTKANRI-OPID
@@ -1549,6 +1549,14 @@
                MOVE    CONST-JOB-SHELLID   TO  SHELLTBL-ARG14
                MOVE    WRK-STPAGE          TO  SHELLTBL-ARG15
                MOVE    WRK-EDPAGE          TO  SHELLTBL-ARG16
+               EVALUATE    SPA-S01-SHR-ORDER
+               WHEN    "PV"
+                   MOVE    "3"             TO  SHELLTBL-ARG17
+      *         WHEN    "NO"
+      *             MOVE    "3"             TO  SHELLTBL-ARG17
+               WHEN    "OK"
+                   MOVE    "2"             TO  SHELLTBL-ARG17
+               END-EVALUATE
                MOVE    SHELLTBL            TO  MCPDATA-REC
                MOVE    "SHELL"             TO  MCP-FUNC
                MOVE    "shell"             TO  MCP-TABLE
