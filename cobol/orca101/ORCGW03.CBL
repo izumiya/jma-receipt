@@ -450,7 +450,7 @@
            MOVE    ZERO                TO  IDX
            MOVE    SPACE               TO  WRK-EDYUKYMD
            PERFORM     UNTIL   FLG-SYSKANRI   =   1
-                       OR      IDX            >=  1000
+      *D               OR      IDX            >=  1000
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
                IF      SPA-W01-STYUKYMD    >   SYS-1006-EDYUKYMD
                    IF      WRK-EDYUKYMD        <   SYS-1006-EDYUKYMD
@@ -468,6 +468,7 @@
                                                TO  SPA-NAI-TSSTKIJUN
                                                               (IDX)
                    END-PERFORM
+                   MOVE    SYS-1006-EDYUKYMD   TO  WRK-EDYUKYMD
                END-IF
       *
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
