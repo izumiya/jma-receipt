@@ -74,7 +74,8 @@ path	key5	{
 		SELECT *
 		FROM tbl_syskanri
 			WHERE   KANRICD      =   :KANRICD
-			ORDER	BY	KBNCD,STYUKYMD
+			ORDER	BY	STYUKYMD,
+                                        KBNCD
 		;
 	};
 };
