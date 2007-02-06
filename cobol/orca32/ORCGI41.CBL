@@ -1336,7 +1336,7 @@
                IF    ( STUSAN-RRK-JTIKBN (IDX10)
                                            NOT = "5" )
                    COMPUTE WRK-TUSAN
-                       =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
+                       =   WRK-TUSAN   -   STUSAN-NISSU03
                    IF    ( WRK-TUSAN  <    91 )
                        INITIALIZE                  STS-AREA-DAY
                        INITIALIZE                  LNK-DAY6-AREA
