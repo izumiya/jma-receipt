@@ -3194,6 +3194,12 @@
                    GO  TO  4201-GAI-SAIHAKKOU-EXT
                END-IF
            END-IF
+           IF    ( PAT-1039-S02SKYMISYUPRTKBN  =   "0" )
+               MOVE    ZERO            TO  SYUPARA01-NYU-MISYU
+                                           SYUPARA01-GAI-MISYU
+                                           SYUPARA01-GAI-MISYU-P
+                                           SYUPARA01-GAI-MISYU-M
+           END-IF
       *
            INITIALIZE                      PARA-REC
            MOVE    "S02"               TO  PARA-GYOUMUID
