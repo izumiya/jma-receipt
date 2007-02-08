@@ -27,7 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       *  Maj/Min/Rev  修正者       日付      内容
-      *  01.00.01    NACL-門脇    05/01/12  自費欄集計修正（端数処理）
+      *  01.00.01    NACL-門脇     05/01/12  自費欄集計修正（端数処理）
+      *  03.40.01    NACL-森脇     07/02/08  平成１９年４月自費消費税表示変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -174,6 +175,11 @@
            03  WRK-CONS-ROUSAI-HKNNUM  PIC X(03)   VALUE   "971".
       *    自賠責保険番号
            03  WRK-CONS-JIBAI-HKNNUM   PIC X(03)   VALUE   "973".
+      *
+      *----(03.04.01)--ADD-START---
+       01  CONST-AREA.
+           03  CONST-H190401           PIC X(08)   VALUE   "20070401".
+      *----(03.04.01)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -580,13 +586,18 @@
                    IF      IDX             =   7
                        MOVE    ZERO            TO  WRK-JIHI
                    ELSE
+      *----(03.04.01)--UPD-START---
                        COMPUTE WRK-JIHI    =   SYU-TOTAL-TGMONEY
                                            +   SYU-TOTAL-TGMONEY-TAX
                                            +   SYU-JIHI-TOTAL
                                            +   SYU-JIHI-TOTAL-TAX
-                                           +   SYU-JIHI-TAX
                                            +   SYU-RMSAGAKU
                                        +   SYU-SKYMONEY-SKJ-JIHI-KEI
+                       IF      SYU-SRYYMD  <   CONST-H190401
+                           COMPUTE WRK-JIHI    =   WRK-JIHI
+                                               +   SYU-JIHI-TAX
+                       END-IF
+      *----(03.04.01)--UPD-END-----
                    END-IF
                    IF    IDX  =  8  OR  9
                        COMPUTE WRK-MONEY   =   SYU-RSIJIBAI-SKYMONEY

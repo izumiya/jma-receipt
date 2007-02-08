@@ -33,6 +33,7 @@
       *  02.01.02    NACL-森脇    04/10/25  CLOSE追加
       *  02.01.03    NACL-森脇    04/11/09  パラメタ変更,バッチ処理に変更
       *  02.01.04    NACL-森脇    04/11/25  印刷ＤＢに書き込むよう変更
+      *  03.04.01    NACL-森脇    07/02/08  平成１９年４月自費消費税表示変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -120,6 +121,9 @@
        01  CONST-AREA.
            03  CONST-HEN-MAX       PIC 9(05)   VALUE   2000.
            03  CONST-LINE-MAX      PIC 9(05)   VALUE   30.
+      *----(03.04.01)--ADD-START---
+           03  CONST-H190401       PIC X(08)   VALUE   "20070401".
+      *----(03.04.01)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -335,7 +339,12 @@
                                    +   SYU-TOTAL-TGMONEY-TAX
                                    +   SYU-JIHI-TOTAL
                                    +   SYU-JIHI-TOTAL-TAX
-                                   +   SYU-JIHI-TAX
+      *----(03.04.01)--UPD-START---
+           IF      SYU-SRYYMD  <   CONST-H190401
+               COMPUTE WRK-JIHIMONEY   =   WRK-JIHIMONEY
+                                       +   SYU-JIHI-TAX
+           END-IF
+      *----(03.04.01)--UPD-END-----
       *
       *    入金編集処理
            PERFORM 220-NUKIN-HENSYU-SEC

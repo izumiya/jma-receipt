@@ -37,6 +37,7 @@
       *  01.00.07    NACL-小豆沢  05.05.25  労災・自賠責の患者請求分は明細を
       *                                     表示するように変更
       *  02.08.00    NACL-太田    06.02.15  再印刷、プレビュー対応
+      *  03.04.01    NACL-森脇    07/02/08  平成１９年４月自費消費税表示変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -179,6 +180,11 @@
                                        BY          //MISYU-//.
       *
            COPY    "COMMON-SPA".
+      *
+      *----(03.04.01)--ADD-START---
+       01  CONST-AREA.
+           03  CONST-H190401           PIC X(08)   VALUE   "20070401".
+      *----(03.04.01)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -751,9 +757,15 @@
            MOVE    WRK-KINGAKU-Z       TO  WRK-ZHENSYU12
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-ZHENSYU24       TO  HCN03-JIHI(7)
-      *    自費合計
-           COMPUTE WRK-GOKTEN          =   WRK-JIHI-TOTAL
-                                       +   SYU-JIHI-TAX
+      *----(03.04.01)--UPD-START---
+           IF      SYU-SRYYMD     <    CONST-H190401
+      *        自費合計
+               COMPUTE WRK-GOKTEN          =   WRK-JIHI-TOTAL
+                                           +   SYU-JIHI-TAX
+           ELSE
+               MOVE    WRK-JIHI-TOTAL      TO  WRK-GOKTEN
+           END-IF
+      *----(03.04.01)--UPD-END-----
            MOVE    WRK-GOKTEN          TO  WRK-KINGAKU-Z
            MOVE    WRK-KINGAKU-Z       TO  WRK-ZHENSYU12
            PERFORM 800-HENKAN-SEC
