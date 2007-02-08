@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-多々納  04/12/15  追記印刷・日集計追加他
       * 01.00.02     NACL-多々納  06/05/15  MONFUNC 対応
+      * 03.04.01     NACL-森脇    07/02/08  平成１９年４月自費消費税表示変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -255,6 +256,10 @@
                05  WRK-THH         PIC 99.
                05  FILLER          PIC X(01)   VALUE  ":".
                05  WRK-TMM         PIC 99.
+      *----(03.04.01)--ADD-START---
+       01  CONST-AREA.
+           03  CONST-H190401       PIC X(08)   VALUE   "20070401".
+      *----(03.04.01)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1513,12 +1518,17 @@
                        (ORCHC33-SRYKA  NOT =   SYU-SRYKA)
                    CONTINUE
                ELSE
+      *----(03.04.01)--UPD-START---
       *            自費計
                    COMPUTE WRK-JIHIKEI     =   SYU-JIHI-TOTAL
                                            +   SYU-JIHI-TOTAL-TAX
-                                           +   SYU-JIHI-TAX
                                            +   SYU-TOTAL-TGMONEY
                                            +   SYU-TOTAL-TGMONEY-TAX
+                   IF      SYU-SRYYMD      <   CONST-H190401
+                       COMPUTE WRK-JIHIKEI     =   WRK-JIHIKEI
+                                               +   SYU-JIHI-TAX
+                   END-IF
+      *----(03.04.01)--UPD-END-----
                    ADD     WRK-JIHIKEI         TO  WRK-GOK-JIHIKEI
                    ADD     WRK-JIHIKEI         TO  WRK-TUK-JIHIKEI
       *            請求金額−自費計
@@ -1592,12 +1602,17 @@
                        (ORCHC33-SRYKA  NOT =   SYU-SRYKA)
                    CONTINUE
                ELSE
+      *----(03.04.01)--UPD-START---
       *            自費計
                    COMPUTE WRK-JIHIKEI     =   SYU-JIHI-TOTAL
                                            +   SYU-JIHI-TOTAL-TAX
-                                           +   SYU-JIHI-TAX
                                            +   SYU-TOTAL-TGMONEY
                                            +   SYU-TOTAL-TGMONEY-TAX
+                   IF      SYU-SRYYMD      <   CONST-H190401
+                       COMPUTE WRK-JIHIKEI     =   WRK-JIHIKEI
+                                               +   SYU-JIHI-TAX
+                   END-IF
+      *----(03.04.01)--UPD-END-----
                    ADD     WRK-JIHIKEI         TO  WRK-GOK-JIHIKEI
                    ADD     WRK-JIHIKEI         TO  WRK-TUK-JIHIKEI
       *            請求金額−自費計
