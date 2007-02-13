@@ -74,8 +74,7 @@ path	key5	{
 		SELECT *
 		FROM tbl_syskanri
 			WHERE   KANRICD      =   :KANRICD
-			ORDER	BY	STYUKYMD,
-                                        KBNCD
+			ORDER	BY	KBNCD,STYUKYMD
 		;
 	};
 };
@@ -271,3 +270,15 @@ path	key16	{
 	};
 };
 
+
+path	key17	{
+	DBSELECT	{
+		DECLARE tbl_syskanri_key17_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri
+			WHERE   KANRICD      =   :KANRICD
+			ORDER	BY	STYUKYMD,
+                                        KBNCD
+		;
+	};
+};
