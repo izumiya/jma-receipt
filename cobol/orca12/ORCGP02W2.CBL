@@ -64,7 +64,9 @@
       *                                     ¡ÊÏ·¿Í³ä¹çÊÑ¹¹¡Ë
       *  03.03.01    NACL-ÌçÏÆ    06/10/23  Ä¹´üÊ»ÍÑ¤ÎÊÝ¸±ÁÈ¤ß¹ç¤ï¤»½¤Àµ
       *  03.03.02    NACL-ÌçÏÆ    06/11/29  ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»ºîÀ®¾ò·ï½¤Àµ
-      *  03.04.03    NACL-ÌçÏÆ    07/01/25  ¡ã²¬»³¡ä£°£¹£±¡Ü½Å¿´¤Î
+      *  03.03.03    NACL-ÌçÏÆ    07/01/25  ¡ã²¬»³¡ä£°£¹£±¡Ü½Å¿´¤Î
+      *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
+      *  03.03.04    NACL-ÌçÏÆ    07/02/15  ¡ãµÜºê¡ä£°£¹£±¡Ü¾ã³²¤Î
       *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
       *****************************************************************
       *
@@ -3557,6 +3559,17 @@
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                             END-IF
+                          WHEN     45
+                            IF  WRK-SRT-HJO-KOHNO  =  "091"
+                             IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(2:2)
+                                                          = "95"
+                                PERFORM 5701413-SYUKOH-HJO-SEC
+                             END-IF
+                            ELSE
+                             IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
+                                PERFORM 5701413-SYUKOH-HJO-SEC
+                             END-IF
+                            END-IF
                           WHEN     OTHER
                              IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
                                PERFORM 5701413-SYUKOH-HJO-SEC
@@ -4411,14 +4424,7 @@
                    MOVE    "3"            TO  WRK-FTN-FLG
                 END-IF
              END-IF
-             IF   SPA-PREFNUM  =  01
-               IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
-               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
-                   MOVE    "3"            TO  WRK-FTN-FLG
-               END-IF
-             END-IF
-             IF   SPA-PREFNUM  =  33
+             IF   SPA-PREFNUM  =  01 OR 33 OR 45
                IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                     (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
