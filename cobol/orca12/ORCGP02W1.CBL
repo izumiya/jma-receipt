@@ -5422,6 +5422,11 @@
                                                OR  "024"  )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20061001"))
       *
+      *            Ê¡Åç¤ÎÃÏÊý¸øÈñ¡Ê£È£±£¹¡¥£²°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "281" )  AND
+                      (SPA-PREFNUM             =   07    )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070201"))
+      *
                    MOVE    ZERO                TO  IDY
                    PERFORM VARYING     IDX2    FROM    1   BY  1
                            UNTIL       IDX2    >   SPA-FTN1-MAX

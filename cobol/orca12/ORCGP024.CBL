@@ -517,6 +517,7 @@
                  IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "021"
                                            OR  "015"
+                                           OR  "281"
                                            OR  "016"     )  AND
                       (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
                                            >=   "20060401"  )
@@ -1507,6 +1508,7 @@
                IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "021"
                                            OR  "015"
+                                           OR  "281"
                                            OR  "016"     )  AND
                       (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
                                            >=   "20060401"  )
