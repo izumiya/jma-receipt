@@ -282,6 +282,7 @@
       *  03.03.12    NACL-ÃÁœ∆    06/12/06  ∞ÒæÎ∏©√œ ˝∏¯»Ò∞Ï…Ù…È√¥∂‚µ≠∫‹¬–±˛
       *  03.03.13    NACL-ÃÁœ∆    07/01/16  ° °°°À∫∆∑«µ≠∫‹§ŒΩ§¿µ
       *  03.03.14    NACL-ÃÁœ∆    07/01/23  √ÌºÕ≤√ªª§ŒÃææŒ ‘Ω∏Ω§¿µ
+      *  03.03.15    NACL-ÃÁœ∆    07/02/14   °≈Á∏©»”¥€¬º¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6291,11 +6292,10 @@
       *    ∏¯»Ò∞Ï…Ù…È√¥∂‚•Ï•ªµ≠∫‹•’•È•∞§Œ ‘Ω∏
       *    ∏¯»Ò∞Ï…Ù…È√¥∂‚£∞±ﬂµ≠∫‹•’•È•∞§Œ ‘Ω∏
       *
-           IF    RECE02-SRYYM        >=  "200404"
+           PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX     >    4
       *
-             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                         UNTIL    KOHFTN-IDX     >    4
-      *
+             IF    RECE02-SRYYM        >=  "200404"
                IF ( RECE02-KOHNUM(KOHFTN-IDX) =  "012" OR "015"
                                               OR "016" OR "051" )
                OR ((SYS-1001-PREFNUM =   13           ) AND
@@ -6305,7 +6305,6 @@
                      MOVE  "1"  TO
                              RECE02-KISAIFLG(KOHFTN-IDX + 1)
                END-IF
-      *
                IF ( RECE02-KOHNUM(KOHFTN-IDX) =  "015" OR "016"
                                                        OR "051" )
                OR ((SYS-1001-PREFNUM =   13           ) AND
@@ -6343,32 +6342,18 @@
                      END-IF
                  END-IF
                END-IF
+             END-IF
       *
-             END-PERFORM
-      *
-           END-IF
-      *
-           IF    RECE02-SRYYM        >=  "200504"
-      *
-             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                         UNTIL    KOHFTN-IDX     >    4
-      *
+             IF    RECE02-SRYYM        >=  "200504"
                IF   RECE02-KOHNUM(KOHFTN-IDX) =  "052"
                      MOVE  "1"  TO
                                  RECE02-KISAIFLG(KOHFTN-IDX + 1)
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
+             END-IF
       *
-             END-PERFORM
-      *
-           END-IF
-      *
-           IF    RECE02-SRYYM        >=  "200604"
-      *
-             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                         UNTIL    KOHFTN-IDX     >    4
-      *
+             IF    RECE02-SRYYM        >=  "200604"
                IF   RECE02-KOHNUM(KOHFTN-IDX) =  "021"
                      MOVE  "1"  TO
                                  RECE02-KISAIFLG(KOHFTN-IDX + 1)
@@ -6387,33 +6372,15 @@
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                      END-IF
                END-IF
+             END-IF
       *
-             END-PERFORM
-      *
-           END-IF
-      *
-           IF    RECE02-SRYYM        >=  "200610"
-      *
-             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                         UNTIL    KOHFTN-IDX     >    4
-      *
+             IF    RECE02-SRYYM        >=  "200610"
                IF   RECE02-KOHNUM(KOHFTN-IDX) =  "024" OR "079"
                      MOVE  "1"  TO
                                  RECE02-KISAIFLG(KOHFTN-IDX + 1)
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
-      *
-             END-PERFORM
-      *
-           END-IF
-      *
-      *    ≤¨ª≥∏©√œ ˝∏¯»Ò
-           IF    RECE02-SRYYM        >=  "200610"
-      *
-             PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                         UNTIL    KOHFTN-IDX     >    4
-      *
                IF  (SYS-1001-PREFNUM =   33           ) AND
                    (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
                                    >=  "1" AND <=  "8")
@@ -6422,10 +6389,19 @@
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
+             END-IF
       *
-             END-PERFORM
+             IF    RECE02-SRYYM        >=  "200702"
+               IF  (SYS-1001-PREFNUM =   07           ) AND
+                   (RECE02-KOHNUM(KOHFTN-IDX) =  "281")
+                     MOVE  "1"  TO
+                                 RECE02-KISAIFLG(KOHFTN-IDX + 1)
+                     MOVE  "1"  TO
+                             RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+               END-IF
+             END-IF
       *
-           END-IF
+           END-PERFORM
       *
       *    ∞Ï…Ù…È√¥∂‚°¶ø©ªˆŒ≈Õ‹»Ò…∏Ω‡…È√¥≥€∂Ë ¨§Œ ‘Ω∏
       *

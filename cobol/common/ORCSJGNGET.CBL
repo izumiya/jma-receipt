@@ -30,6 +30,7 @@
       *  01.00.01    NACL-ÌçÏÆ    06/03/20  ¼«Î©»Ù±çË¡ÂÐ±þ
       *  01.00.02    NACL-ÌçÏÆ    06/10/30  ¾ã³²»ù»ÜÀß°åÎÅ¡¦ÎÅÍÜ²ð¸î°åÎÅ
       *                                     ÂÐ±þ
+      *  03.03.01    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -310,6 +311,16 @@
                EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
                   WHEN     "024"
                   WHEN     "079"
+                     MOVE   LNK-ORCSJGNGET-NYUJGNGAK
+                                TO  LNK-ORCSJGNGET-TAFTNRUIKEI
+                     MOVE   LNK-ORCSJGNGET-GAIJGNGAK
+                                TO  LNK-ORCSJGNGET-NYUJGNGAK
+               END-EVALUATE
+           END-IF
+      *    Ê¡Åç¸©ÈÓ´ÛÂ¼
+           IF     LNK-ORCSJGNGET-SRYYM   >=   "200702"
+               EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
+                  WHEN     "281"
                      MOVE   LNK-ORCSJGNGET-NYUJGNGAK
                                 TO  LNK-ORCSJGNGET-TAFTNRUIKEI
                      MOVE   LNK-ORCSJGNGET-GAIJGNGAK
