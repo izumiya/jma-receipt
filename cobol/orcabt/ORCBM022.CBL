@@ -58,6 +58,8 @@
       *                                     MONFUNCÂÐ±þ
       *
       *  03.03.01    NACL-Æ£¸¶    06/10/13  £²£°£°£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  03.03.02    NACL-Æ£¸¶    07/02/10  Æ±°ìÃÏÊý¸øÈñ¤Î¤Þ¤È¤á½¸·×
+      *                                     ²¬»³ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1263,6 +1265,31 @@
       *        ÆÃÄê¼À´µÌµ¤·¤Î¤È¤­ 
                IF      RECE10-KOHNUM (IDZ) =   "091"
                    MOVE    "051"               TO  RECE10-KOHNUM (IDZ)
+               END-IF
+      *
+      *        ²¬»³¸©¤ÎÃÏÊý¸øÈñ¤Î¤Þ¤È¤á¡Ê£²£°£°£¶Ç¯£±£°·î°Ê¹ß¡Ë
+               IF    ( SYS-1001-PREFNUM    =   "33"                  ) 
+               AND   ( LNK-PRTKANRI-SRYYM  >=  WRK-CONS-SRYYM-200610 )
+                   EVALUATE    RECE10-KOHNUM (IDZ)
+                       WHEN    "141"
+                       WHEN    "241"
+                       WHEN    "341"
+                           MOVE    "141"       TO  RECE10-KOHNUM (IDZ)
+                       WHEN    "185"
+                       WHEN    "285"
+                       WHEN    "385"
+                       WHEN    "485"
+                       WHEN    "585"
+                           MOVE    "185"       TO  RECE10-KOHNUM (IDZ)
+                       WHEN    "180"
+                       WHEN    "280"
+                       WHEN    "380"
+                       WHEN    "480"
+                           MOVE    "180"       TO  RECE10-KOHNUM (IDZ)
+                       WHEN    "186"
+                       WHEN    "286"
+                           MOVE    "186"       TO  RECE10-KOHNUM (IDZ)
+                   END-EVALUATE
                END-IF
       *
                PERFORM VARYING IDX2    FROM    1   BY  1

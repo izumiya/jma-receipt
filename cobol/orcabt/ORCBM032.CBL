@@ -28,6 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.03.01    NACL-藤原    07/02/10  同一地方公費のまとめ集計
+      *                                     岡山対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -836,6 +838,20 @@
            MOVE    "tbl_hknnum"        TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    岡山県の地方公費のまとめ
+           IF      SYS-1001-PREFNUM    =   "33"
+               EVALUATE    SUM-KOH-KOHNUM (IDX3 IDX1 IDX IDX2)
+                   WHEN    "141"
+                       MOVE    "（類似）"      TO   WRK-HKNNAME
+                   WHEN    "185"
+                       MOVE    "（乳幼児）"    TO   WRK-HKNNAME
+                   WHEN    "180"
+                       MOVE    "（心身）"      TO   WRK-HKNNAME
+                   WHEN    "186"
+                       MOVE    "（ひとり親）"  TO   WRK-HKNNAME
+               END-EVALUATE
+           END-IF
       *
            MOVE    WRK-KOHKBN          TO  HCM2Y-KOHKBN (IDX IDY)
            .
