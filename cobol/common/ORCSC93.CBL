@@ -958,19 +958,28 @@
                                                    TO  SPA-COM-HOUKNSKBN
                                                                (IDX-1)
       *                    診療種別
-                           MOVE    SPA-COM-SRYSYUKBN (IDX-1 - 1)
+                           IF    (SPA-COM-SRYKBN (IDX-1 - 1)
+                                               =  SPA-COM-SRYKBN
+                                                             (IDX-1))
+                           AND   (SPA-COM-HOUKNSKBN(IDX-1)
+                                               =  SPA-COM-HOUKNSKBN
+                                                          (IDX-1 - 1))
+                           AND   (SPA-COM-HOUKNSKBN(IDX-1)
+                                               NOT =   ZERO        )
+                               MOVE    SPA-COM-SRYSYUKBN (IDX-1 - 1)
                                                  TO  SPA-COM-SRYSYUKBN
                                                              (IDX-1)
+                               MOVE    SPACE       TO  SPA-COM-ZAIEND
+                                                         (IDX-1 - 1)
+                               MOVE    SPA-COM-SRYSYUKBN (IDX-1 - 1)
+                                                   TO  WRK-SRYSYUKBN
+                           END-IF
       *                    同一検査判定コード
                            MOVE    SPA-COM-INPUTCD(IDX-1)
                                                    TO  SPA-COM-KENGRP
                                                                (IDX)
                            MOVE    SPACE           TO  SPA-COM-ZAIEND
                                                          (IDX-1)
-                           MOVE    SPACE           TO  SPA-COM-ZAIEND
-                                                         (IDX-1 - 1)
-                           MOVE    SPA-COM-SRYSYUKBN (IDX-1 - 1)
-                                                   TO  WRK-SRYSYUKBN
                            IF      FLG-SYORI       =   2
                                MOVE    1               TO  FLG-SYORI
                            END-IF
