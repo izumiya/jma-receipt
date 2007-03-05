@@ -57,6 +57,7 @@
       *  03.01.03    NACL-ÌçÏÆ    06/07/14  ¿ÇÎÅ¶èÊ¬ÃÖ¤­´¹¤¨¥Õ¥é¥°¤ÎÊÔ½¸
       *  03.02.01    NACL-ÌçÏÆ    06/08/01  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
       *  03.03.01    NACL-ÌçÏÆ    06/10/19  ÎÅÍÜÉÂÅï¥ì¥»¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
+      *  03.03.02    NACL-ÌçÏÆ    07/03/05  »ÀÁÇ·×»»¼°½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -361,7 +362,8 @@
       *
            03  WRK-KEISAN            PIC 9(09).
            03  WRK-KEISAN2           PIC 9(03).
-           03  WRK-KEISAN3           PIC 9(09)V9(03).
+           03  WRK-KEISAN3           PIC 9(09).
+           03  WRK-KEISAN4           PIC 9(09).
            03  WRK-KEISAN-TAIHI      PIC X(09).
       *
            03  WRK-KYUSEI-NYUGAIKBN  PIC X(01).
@@ -3689,7 +3691,7 @@
        250111-SANSO-FREE-COMMENT-SEC          SECTION.                 
       *
            MOVE     1          TO    WRK-KETA
-           MOVE    ZERO        TO    WRK-KEISAN3
+           MOVE    ZERO        TO    WRK-KEISAN4
       *
            PERFORM   VARYING   IDX    FROM   1   BY   1
                       UNTIL   (IDX                 >    10)
@@ -3723,8 +3725,12 @@
                 MOVE    "£Ì¡ß£±¡¥£³¡Ë" TO  WK-FREE-NAME3(WRK-KETA:12)
                 COMPUTE  WRK-KETA   =  WRK-KETA   +  12
       *
-                COMPUTE  WRK-KEISAN3   =   WRK-KEISAN3  +
+      ***       COMPUTE  WRK-KEISAN3   =   WRK-KEISAN3  +
+      ***         (TBL-SANSO-TEN(IDX) * TBL-SANSO-SRYSURYO(IDX) * 1.3)
+                COMPUTE  WRK-KEISAN3   =
                   (TBL-SANSO-TEN(IDX) * TBL-SANSO-SRYSURYO(IDX) * 1.3)
+                                                                + 0.5
+                COMPUTE  WRK-KEISAN4  = WRK-KEISAN4 + WRK-KEISAN3
              ELSE
                 MOVE    "£Ì¡ß£±¡¥£³¡ß" TO  WK-FREE-NAME3(WRK-KETA:12)
                 COMPUTE  WRK-KETA   =  WRK-KETA   +  12
@@ -3739,9 +3745,13 @@
                 MOVE    "¡Ë" TO  WK-FREE-NAME3(WRK-KETA:2)
                 COMPUTE  WRK-KETA   =  WRK-KETA   +  2
       *
-                COMPUTE  WRK-KEISAN3   =   WRK-KEISAN3  +
+      ***       COMPUTE  WRK-KEISAN3   =   WRK-KEISAN3  +
+      ***         (TBL-SANSO-TEN(IDX) * TBL-SANSO-SRYSURYO(IDX) * 1.3
+      ***                             * TBL-KASAN-SRYSURYO)
+                COMPUTE  WRK-KEISAN3   =
                   (TBL-SANSO-TEN(IDX) * TBL-SANSO-SRYSURYO(IDX) * 1.3
-                                      * TBL-KASAN-SRYSURYO)
+                                      * TBL-KASAN-SRYSURYO)     + 0.5
+                COMPUTE  WRK-KEISAN4  = WRK-KEISAN4 + WRK-KEISAN3
              END-IF
       *
            END-PERFORM
@@ -3750,8 +3760,9 @@
               MOVE    "¡à£±£°¡á"  TO  WK-FREE-NAME3(WRK-KETA:8)
               COMPUTE  WRK-KETA   =  WRK-KETA   +  8
       *
-              COMPUTE  WRK-KEISAN =   WRK-KEISAN3  +  0.5
-              COMPUTE  WRK-KEISAN =  (WRK-KEISAN   /  10)  +  0.5
+      ***     COMPUTE  WRK-KEISAN =   WRK-KEISAN3  +  0.5
+      ***     COMPUTE  WRK-KEISAN =  (WRK-KEISAN   /  10)  +  0.5
+              COMPUTE  WRK-KEISAN =  (WRK-KEISAN4  /  10)  +  0.5
               MOVE     ZERO       TO   WRK-KEISAN2
       *
               PERFORM  2501111-SANSO-FREE-COMMENT-SUCHI-SEC
@@ -3768,8 +3779,9 @@
                   MOVE    "¡Ë¡à£±£°¡á"  TO  WK-FREE-NAME3(WRK-KETA:10)
                   COMPUTE  WRK-KETA   =  WRK-KETA   +  10
       *
-                  COMPUTE  WRK-KEISAN =   WRK-KEISAN3  +  0.5
-                  COMPUTE  WRK-KEISAN =  (WRK-KEISAN   /  10)  +  0.5
+      ***         COMPUTE  WRK-KEISAN =   WRK-KEISAN3  +  0.5
+      ***         COMPUTE  WRK-KEISAN =  (WRK-KEISAN   /  10)  +  0.5
+                  COMPUTE  WRK-KEISAN =  (WRK-KEISAN4  /  10)  +  0.5
                   MOVE     ZERO       TO   WRK-KEISAN2
       *
                   PERFORM  2501111-SANSO-FREE-COMMENT-SUCHI-SEC
