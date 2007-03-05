@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  03.03.00    NACL-Â¿¡¹Ç¼  07/03/06  »ÀÁÇÅÀ¿ô·×»»½¤Àµ
       *****************************************************************
       *
       *
@@ -57,6 +58,9 @@
            03  IDX-STR             PIC 9(04).
            03  IDX-END             PIC 9(04).
            03  IDX-SYU             PIC 9(04).
+      *
+           03  IDX-H               PIC 9(04).
+           03  IDX-K               PIC 9(04).
       *
            03  IDX7                PIC 9(04).
       *
@@ -90,6 +94,7 @@
       *    »ÀÁÇ
            03  WRK-SANSOKIN        PIC 9(08)V999.
            03  WRK-SANSOKIN-SUM    PIC 9(08)V999.
+           03  WRK-SANSOGOK        PIC 9(08).
            03  WRK-SANTEN          PIC 9(08).
       *
       *    ÌôºÞÅÀ¿ô
@@ -596,36 +601,74 @@
       *
            MOVE      ZERO              TO  LNK-SC90-SANTEN
       *
+      *    »ÀÁÇËè¤ÎÊäÀµÎ¨²Ã»»¤È¤¹¤ë
+           MOVE    ZERO                TO  WRK-SANSOKIN-SUM
+           MOVE    ZERO                TO  IDX-H
+           MOVE    ZERO                TO  IDX-K
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   IDX-MAX
+                   UNTIL      (IDX         >   IDX-MAX )
                EVALUATE    LNK-COM-INPUTCD (IDX)
       *            »ÀÁÇÊäÀµÎ¨¼«Æ°²Ã»»
                    WHEN    "770020070"
-      *                »ÀÁÇ¶â³Û¡Ü¡Ê»ÀÁÇ¶â³Û¡ßÊäÀµÎ¨¡¿£±£°£°¡Ë¡¡»Í¼Î¸ÞÆþ
-                       COMPUTE WRK-SYOKEIS     =   WRK-SANSOKIN-SUM
-                                               *   LNK-COM-KISOTEN (IDX)
-                                               /   100
-                       COMPUTE WRK-SANSOKIN    =   WRK-SANSOKIN-SUM
-                                               +   WRK-SYOKEIS
+                       MOVE    IDX             TO  IDX-H
+      *            ¹âµ¤°µ»ÀÁÇ·×»»
+                   WHEN    "770030070"
+                       MOVE    IDX             TO  IDX-K
                END-EVALUATE
            END-PERFORM
       *
+           MOVE    ZERO                TO  WRK-SYOKEI
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   IDX-MAX
-               EVALUATE    LNK-COM-INPUTCD (IDX)
+                   UNTIL      (IDX     >   IDX-MAX )
+               MOVE    ZERO                TO  WRK-SANSOKIN
+               MOVE    ZERO                TO  WRK-SANSOGOK
+      *        »ÀÁÇ
+               IF     (LNK-COM-INPUTCD (IDX)(1:1)  =   "7"  ) AND
+                      (LNK-COM-TENSIKIBETU (IDX)   =   1
+                                                   OR  2    ) AND
+                      (LNK-COM-TOKUKIZAISBT1(IDX)  =   2    ) AND
+                      (LNK-COM-SANSOKBN (IDX)      =   1    )
+      *            (¹ØÆþ²Á³Ê¡ö¿ôÎÌ)
+                   COMPUTE WRK-SYOKEIS2    =   LNK-COM-KISOTEN(IDX)
+                                           *   LNK-COM-SURYO  (IDX)
+      *            »ÀÁÇ¶â³Û¡Ü¡Ê»ÀÁÇ¶â³Û¡ßÊäÀµÎ¨¡¿£±£°£°¡Ë¡¡»Í¼Î¸ÞÆþ
+                   COMPUTE WRK-SYOKEIS3    =   WRK-SYOKEIS2
+                                           *   LNK-COM-KISOTEN (IDX-H)
+                                           /   100
+                   COMPUTE WRK-SANSOKIN    =   WRK-SYOKEIS2
+                                           +   WRK-SYOKEIS3
       *            ¹âµ¤°µ»ÀÁÇ·×»»
-                   WHEN    "770030070"
+                   IF      IDX-K           >   ZERO
       *                »ÀÁÇ¶â³Û¡Ü¡Ê»ÀÁÇ¶â³Û¡ßÊäÀµÎ¨¡¿£±£°£°¡Ë
       *                                           ¡ßµ¤°µ¿ô¡¡»Í¼Î¸ÞÆþ
                        COMPUTE WRK-SYOKEIS     =   WRK-SANSOKIN
-                                               *   LNK-COM-SURYO (IDX)
+                                               *   LNK-COM-SURYO (IDX-K)
                        MOVE    WRK-SYOKEIS     TO  WRK-SANSOKIN
-               END-EVALUATE
+                   END-IF
+      *            ¶â³Û¡¡»Í¼Î¸ÞÆþ
+                   COMPUTE WRK-SANSOGOK        =   WRK-SANSOKIN
+                                               +   0.5
+                   COMPUTE WRK-SYOKEI      =   WRK-SYOKEI
+                                           +   WRK-SANSOGOK
+               END-IF
            END-PERFORM
+      *
+      *    PERFORM VARYING     IDX     FROM    1   BY  1
+      *            UNTIL       IDX     >   IDX-MAX
+      *        EVALUATE    LNK-COM-INPUTCD (IDX)
+      *            ¹âµ¤°µ»ÀÁÇ·×»»
+      *            WHEN    "770030070"
+      *                »ÀÁÇ¶â³Û¡Ü¡Ê»ÀÁÇ¶â³Û¡ßÊäÀµÎ¨¡¿£±£°£°¡Ë
+      *                                           ¡ßµ¤°µ¿ô¡¡»Í¼Î¸ÞÆþ
+      *                COMPUTE WRK-SYOKEIS     =   WRK-SANSOKIN
+      *                                        *   LNK-COM-SURYO (IDX)
+      *                MOVE    WRK-SYOKEIS     TO  WRK-SANSOKIN
+      *        END-EVALUATE
+      *    END-PERFORM
       *    »ÀÁÇ¤ÎÅÀ¿ô¿ô·×»»
       *    ¶â³Û·×¡¡»Í¼Î¸ÞÆþ
-           COMPUTE WRK-SYOKEI          =   WRK-SANSOKIN
-                                       +   0.5
+      *    COMPUTE WRK-SYOKEI          =   WRK-SANSOKIN
+      *                                +   0.5
       *    ¶â³Û·×¡à£±£°¡¡»Í¼Î¸ÞÆþ
            COMPUTE WRK-SYOKEIS2        =   WRK-SYOKEI
                                        /   10
