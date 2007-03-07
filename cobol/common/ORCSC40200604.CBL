@@ -923,12 +923,12 @@
       *
       *    初診時ブラッシング料は初診算定時のみの算定とする
            IF      WRK-COM-INPUTCD(IDX-ZS) =   "101400030"
-               IF      LNK-ORCSC-SYOSIN2       =   1
-                   CONTINUE
-               ELSE
-                   MOVE    "8014"              TO  WRK-ERRCD
-                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-ZS)
-               END-IF
+      *@@@@    IF      LNK-ORCSC-SYOSIN2       =   1
+      *            CONTINUE
+      *        ELSE
+      *            MOVE    "8014"              TO  WRK-ERRCD
+      *            MOVE    "1"                 TO  WRK-COM-CUR (IDX-ZS)
+      *@@@@@@  END-IF
       *        アフターケアの時算定不可
                IF      SPA-RSI-HKNKBN          =   "3"
                    MOVE    "8018"              TO  WRK-ERRCD
