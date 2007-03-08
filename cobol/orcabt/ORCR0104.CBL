@@ -143,6 +143,8 @@
       *                                     ∏∫Ã»
       *  03.03.03    NACL-ÃÁœ∆    06/10/16  ≤¨ª≥∏©√œ ˝∏¯»Òº¬∆¸øÙ ‘Ω∏
       *  03.03.04    NACL-∆£∏∂    06/10/31  Œ≈Õ‹≤∏Ó∞ÂŒ≈£≤£¥§Œƒ…≤√
+      *  03.03.05    NACL-ÃÁœ∆    07/02/15  º´Œ©ªŸ±Á∞ÂŒ≈° ππ¿∏°¶∞È¿Æ°À
+      *                                     §»¿∏≥Ë ›∏Ó§Œ ªÕ—§Œ≈¿øÙÕÛµ≠∫‹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -905,6 +907,7 @@
            03  WRK-CONS-SRYYM          PIC 9(06)   VALUE   200304. 
            03  WRK-CONS-SRYYM-200604   PIC 9(06)   VALUE   200604. 
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609. 
+           03  WRK-CONS-SRYYM-200703   PIC 9(06)   VALUE   200703. 
       *
        01  WRK-RECE07-REC. 
            COPY    "CPRCF007.INC"  REPLACING  //RECE07//
@@ -4198,12 +4201,15 @@
                MOVE    RECE02-KAISU(IDX)         TO  WRK-KAISUZ
                MOVE    WRK-KAISU                 TO  HC06-KAISU   (IDX)
       *        <≈¿øÙ°¶∏¯»Ò≈¿øÙ>
-      *        º´Œ©ªŸ±Á∞ÂŒ≈° ¿∫ø¿ƒÃ±°∞ÂŒ≈§»¿∏≥Ë ›∏Ó§Œ ªÕ—§Œ§»§≠°¢
-      *        ≈¿øÙÕÛ§À¡Ì∞ÂŒ≈»Ò ¨§Úµ≠∫‹
-               IF    ( RECE02-SRYYM        >=  WRK-CONS-SRYYM-200604 )
-               AND   ( RECE02-HKNNUM       =   SPACE                 )
-               AND   ( RECE02-KOHNUM (1)   =   "021"                 )
-               AND   ( RECE02-KOHNUM (2)   =   "012"                 )
+      *        º´Œ©ªŸ±Á∞ÂŒ≈§»¿∏≥Ë ›∏Ó§Œ ªÕ—§Œª˛°¢≈¿øÙÕÛ§À¡Ì∞ÂŒ≈»Ò ¨§Úµ≠∫‹
+               IF (( RECE02-SRYYM      >=  WRK-CONS-SRYYM-200604 ) AND
+                   ( RECE02-HKNNUM     =   SPACE                 ) AND
+                   ( RECE02-KOHNUM (1) =   "021"                 ) AND
+                   ( RECE02-KOHNUM (2) =   "012"                 ))
+               OR (( RECE02-SRYYM      >=  WRK-CONS-SRYYM-200703 ) AND
+                   ( RECE02-HKNNUM     =   SPACE                 ) AND
+                   ( RECE02-KOHNUM (1) =   "015" OR "016"        ) AND
+                   ( RECE02-KOHNUM (2) =   "012"                 ))
                    COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX1)
                                            +     RECE02-TENSU(IDX IDX2)
                    MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
