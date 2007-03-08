@@ -82,6 +82,7 @@
       *  03.02.02    NACL-門脇    06/08/18  福岡県給付外点数計算修正
       *  03.02.03    NACL-門脇    06/09/05  健康保険法１０月改正対応
       *  03.02.04    NACL-門脇    06/10/04  計算の優先順位編集修正
+      *  03.02.05    NACL-門脇    07/03/08  計算の優先順位編集修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -420,6 +421,10 @@
       *    算定履歴
        01  SANTEI-REC.
            COPY    "CPSANTEI.INC".
+      *
+      *    患者保険情報
+       01  PTHKNINF-REC.
+           COPY    "CPPTHKNINF.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1172,12 +1177,49 @@
               MOVE COMB-KOH4HKNNUM    TO WRK-HANBETU-KOH4HKNNUM(IDX)
               MOVE COMB-NYU-KFTNRATE  TO WRK-HANBETU-PTFTNRATE(IDX)
       *
-              IF   COMB-TEKSTYMD(1:6) <  WRK-HANBETU-SKYYM(IDX)
-                 MOVE WRK-HANBETU-SKYYM(IDX)
-                                      TO WRK-HANBETU-YUSENYMD(IDX)(1:6)
-                 MOVE "01"            TO WRK-HANBETU-YUSENYMD(IDX)(7:2)
+              IF   COMB-HKNNUM  NOT =  SPACE
+                INITIALIZE                           PTHKNINF-REC
+                MOVE    LNK-S02-HOSPID       TO      PTHKN-HOSPID
+                MOVE    LNK-S02-PTID         TO      PTHKN-PTID
+                MOVE    COMB-HKNID           TO      PTHKN-HKNID
+                MOVE    PTHKNINF-REC         TO      MCPDATA-REC
+                MOVE    "DBSELECT"           TO      MCP-FUNC
+                MOVE    "PTHKNINF-KEY"       TO      ORC-DBPATH
+                CALL    "ORCMCPSUB"          USING   MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+                IF      MCP-RC               =       ZERO
+                    MOVE    "PTHKNINF-KEY"   TO      ORC-DBPATH
+                    MOVE    "DBFETCH"        TO      MCP-FUNC
+                    CALL    "ORCMCPSUB"      USING   MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+                    IF      MCP-RC           =       ZERO
+                       MOVE  MCPDATA-REC     TO      PTHKNINF-REC
+                    END-IF
+                END-IF
+                MOVE    "DBCLOSECURSOR"      TO      MCP-FUNC
+                MOVE    "PTHKNINF-KEY"       TO      ORC-DBPATH
+                CALL    "ORCMCPSUB"          USING   MCPAREA
+                                                     ORCMCPAREA
+                                                     MCPDATA-REC
+              END-IF
+              IF   PTHKN-TEKSTYMD   NOT =  SPACE
+                IF   PTHKN-TEKSTYMD(1:6) <  WRK-HANBETU-SKYYM(IDX)
+                   MOVE WRK-HANBETU-SKYYM(IDX)
+                                     TO WRK-HANBETU-YUSENYMD(IDX)(1:6)
+                   MOVE "01"         TO WRK-HANBETU-YUSENYMD(IDX)(7:2)
+                ELSE
+                   MOVE PTHKN-TEKSTYMD  TO WRK-HANBETU-YUSENYMD(IDX)
+                END-IF
               ELSE
-                 MOVE COMB-TEKSTYMD   TO WRK-HANBETU-YUSENYMD(IDX)
+                IF   COMB-TEKSTYMD(1:6)  <  WRK-HANBETU-SKYYM(IDX)
+                   MOVE WRK-HANBETU-SKYYM(IDX)
+                                     TO WRK-HANBETU-YUSENYMD(IDX)(1:6)
+                   MOVE "01"         TO WRK-HANBETU-YUSENYMD(IDX)(7:2)
+                ELSE
+                   MOVE COMB-TEKSTYMD   TO WRK-HANBETU-YUSENYMD(IDX)
+                END-IF
               END-IF
       *
               MOVE     ZERO    TO    IDX5
