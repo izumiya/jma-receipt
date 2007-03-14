@@ -82,7 +82,8 @@
       *  03.02.02    NACL-ÌçÏÆ    06/08/18  Ê¡²¬¸©µëÉÕ³°ÅÀ¿ô·×»»½¤Àµ
       *  03.02.03    NACL-ÌçÏÆ    06/09/05  ·ò¹¯ÊÝ¸±Ë¡£±£°·î²þÀµÂÐ±þ
       *  03.02.04    NACL-ÌçÏÆ    06/10/04  ·×»»¤ÎÍ¥Àè½ç°ÌÊÔ½¸½¤Àµ
-      *  03.02.05    NACL-ÌçÏÆ    07/03/08  ·×»»¤ÎÍ¥Àè½ç°ÌÊÔ½¸½¤Àµ
+      *  03.04.01    NACL-ÌçÏÆ    07/01/25  ¾ÃÈñÀÇÁí³ÛÉ½¼¨ÂÐ±þ
+      *  03.04.02    NACL-ÌçÏÆ    07/03/08  ·×»»¤ÎÍ¥Àè½ç°ÌÊÔ½¸½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -104,6 +105,8 @@
                05  WRK-KBNCD-X             PIC 9(02).
            03  WRK-KBNCD2                  PIC X(06).
            03  WRK-HYOKETU-TEN             PIC 9(09)V99.
+           03  WRK-BRMSGK-TAXKBN           PIC X(01).
+           03  WRK-KEISAN                  PIC 9(07).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -1457,6 +1460,8 @@
            MOVE    LNK-SYUNOU-REC(IDX) TO  SYUNOU-REC
            MOVE    LNK-SYUDAY-REC(IDX) TO  SYUDAY-REC                  
       *
+           PERFORM      SYSKANRI-TAXKBN-GET-SEC
+      *
       *³°Çñ¾ðÊó¤Î¼èÆÀ
            MOVE    ZERO                TO  FLG-NYUINACCT
            INITIALIZE                      NYUINACCT-REC
@@ -1691,6 +1696,8 @@
            MOVE    LNK-SYUNOU-REC(IDX) TO  SYUNOU-REC
            MOVE    LNK-SYUDAY-REC(IDX) TO  SYUDAY-REC                  
       *
+           PERFORM      SYSKANRI-TAXKBN-GET-SEC
+      *
       *    Æþ±¡Ï«ºÒ²ñ·×ºîÀ®¥µ¥Ö¤è¤êÆþ±¡ÎÁ¡¦³°Çñ¤ò¼èÆÀ
       *
            INITIALIZE   TABLE-GAIHAKU
@@ -1734,6 +1741,38 @@
            .
       *
        NYUIN-KAIKEI-SET2-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ¾ÃÈñÀÇÃ¼¿ô¶èÊ¬¤Î¼è¤ê¹þ¤ß
+      **************************************************************
+       SYSKANRI-TAXKBN-GET-SEC           SECTION.
+      *
+           MOVE    SPACE                TO    WRK-TAX1001-KBN
+      *    ¾ÃÈñÀÇÃ¼¿ô¶èÊ¬¤Î¼è¤ê¹þ¤ß
+           MOVE    ZERO                 TO    FLG-SYSKANRI
+           INITIALIZE                         SYSKANRI-REC
+           MOVE    "1001"               TO    SYS-KANRICD
+           MOVE    "*"                  TO    SYS-KBNCD
+           MOVE    SYU-SRYYMD           TO    ORC-DBYMD
+           MOVE    SYSKANRI-REC         TO    MCPDATA-REC
+           MOVE    "DBSELECT"           TO    MCP-FUNC
+           MOVE    "SYSKANRI-KEY"       TO    ORC-DBPATH
+           CALL    "ORCMCPSUB"    USING       MCPAREA
+                                              ORCMCPAREA
+                                              MCPDATA-REC
+           IF      MCP-RC               =     ZERO
+               MOVE     "SYSKANRI-KEY"  TO    ORC-DBPATH
+               PERFORM   SYSKANRI-READ-SEC
+               MOVE      SYS-1001-TAX-HASU-KBN
+                                        TO    WRK-TAX1001-KBN
+           END-IF
+      *
+           MOVE     "SYSKANRI-KEY"      TO    WK-PATH
+           PERFORM   CSR-CLOSE-SEC
+      *
+           .
+       SYSKANRI-TAXKBN-GET-EXT.
            EXIT.
       *
       **************************************************************
@@ -2059,8 +2098,24 @@
                            IF  (SYU-DAY(SYU-IDX)       =   "1")    AND
                                (NACCT-DAY(SYU-IDX) NOT =  ZERO)
                              MOVE  NACCT-DAY(SYU-IDX)  TO  RMSAGAKU-IDX
-                             ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
-                                                 TO   SYU-RMSAGAKU
+                             IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
+                             AND (SYU-SRYYMD(1:6)     >= "200704")
+                               IF    WRK-TAX1001-KBN  =  "1"
+                                 COMPUTE WRK-KEISAN  =
+                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                         * 0.05) + 0.5
+                               ELSE
+                                 COMPUTE WRK-KEISAN  =
+                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                         * 0.05)
+                               END-IF
+                               ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
+                                                   TO   SYU-RMSAGAKU
+                               ADD   WRK-KEISAN    TO   SYU-RMSAGAKU
+                             ELSE
+                               ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
+                                                   TO   SYU-RMSAGAKU
+                             END-IF
                            END-IF
                          WHEN  "2"
                            IF  SYU-SRYYMD(1:6)   =  WRK-SKYYM(1)
@@ -2068,8 +2123,24 @@
                                               WRK-DAY5(1 SYU-IDX))  AND
                                  (NACCT-DAY(SYU-IDX) NOT =  ZERO)
                                MOVE  NACCT-DAY(SYU-IDX) TO RMSAGAKU-IDX
-                               ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
-                                                   TO   SYU-RMSAGAKU
+                               IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
+                               AND (SYU-SRYYMD(1:6)     >= "200704")
+                                 IF    WRK-TAX1001-KBN  =  "1"
+                                   COMPUTE WRK-KEISAN  =
+                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                         * 0.05) + 0.5
+                                 ELSE
+                                   COMPUTE WRK-KEISAN  =
+                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                         * 0.05)
+                                 END-IF
+                                 ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
+                                                     TO   SYU-RMSAGAKU
+                                 ADD   WRK-KEISAN    TO   SYU-RMSAGAKU
+                               ELSE
+                                 ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
+                                                     TO   SYU-RMSAGAKU
+                               END-IF
                              END-IF
                            ELSE
                              IF  (SYU-SRYYMD(1:6)  =  WRK-SKYYM(2)) AND
@@ -2077,8 +2148,24 @@
                                               WRK-DAY5(2 SYU-IDX))  AND
                                  (NACCT-DAY(SYU-IDX) NOT =  ZERO)
                                MOVE  NACCT-DAY(SYU-IDX) TO RMSAGAKU-IDX
-                               ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
-                                                   TO   SYU-RMSAGAKU
+                               IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
+                               AND (SYU-SRYYMD(1:6)     >= "200704")
+                                 IF    WRK-TAX1001-KBN  =  "1"
+                                   COMPUTE WRK-KEISAN  =
+                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                         * 0.05) + 0.5
+                                 ELSE
+                                   COMPUTE WRK-KEISAN  =
+                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                         * 0.05)
+                                 END-IF
+                                 ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
+                                                     TO   SYU-RMSAGAKU
+                                 ADD   WRK-KEISAN    TO   SYU-RMSAGAKU
+                               ELSE
+                                 ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
+                                                     TO   SYU-RMSAGAKU
+                               END-IF
                              END-IF
                            END-IF
                        END-EVALUATE
@@ -2133,6 +2220,7 @@
       *
            PERFORM   SYS-5000-CHK-SEC
       *
+           MOVE      SPACE               TO  WRK-BRMSGK-TAXKBN
            IF        WRK-SYS5000-COUNT    =     ZERO
              INITIALIZE   TABLE-5000-NACCT
              MOVE    ZERO                TO  FLG-SYSKANRI
@@ -2155,6 +2243,8 @@
                       MOVE   SYS-5000-NACCT-BRMSGKKBN
                                   TO  TBL-5000-NACCT-BRMSGKKBN(SYU-IDX)
                END-PERFORM
+               MOVE   SYS-5000-BRMSGK-TAXKBN
+                                  TO  WRK-BRMSGK-TAXKBN
              END-IF
              MOVE     "SYSKANRI-KEY"   TO  WK-PATH
              PERFORM   CSR-CLOSE-SEC
@@ -2182,6 +2272,8 @@
                       MOVE   SYS-5000-NACCT-BRMSGKKBN
                                 TO  TBL-5000-NACCT-BRMSGKKBN(SYU-IDX)
                END-PERFORM
+               MOVE   SYS-5000-BRMSGK-TAXKBN
+                                TO  WRK-BRMSGK-TAXKBN
              END-IF
       *
              MOVE     "SYSKANRI-KEY"   TO  WK-PATH
@@ -2598,28 +2690,6 @@
       **************************************************************
        SENTEI-PTFTN-SEC           SECTION.
       *
-      *    ¾ÃÈñÀÇÃ¼¿ô¶èÊ¬¤Î¼è¤ê¹þ¤ß
-           MOVE    ZERO                 TO    FLG-SYSKANRI
-           INITIALIZE                         SYS-1001-REC
-           MOVE    "1001"               TO    SYS-1001-KANRICD
-           MOVE    "*"                  TO    SYS-1001-KBNCD
-           MOVE    SYU-SRYYMD           TO    ORC-DBYMD
-           MOVE    SYS-1001-REC         TO    MCPDATA-REC
-           MOVE    "DBSELECT"           TO    MCP-FUNC
-           MOVE    "SYSKANRI-KEY"       TO    ORC-DBPATH
-           CALL    "ORCMCPSUB"    USING       MCPAREA
-                                              ORCMCPAREA
-                                              MCPDATA-REC
-           IF      MCP-RC               =     ZERO
-               MOVE     "SYSKANRI-KEY"  TO    ORC-DBPATH
-               PERFORM   SYSKANRI-READ-SEC
-               MOVE      SYS-1001-TAX-HASU-KBN       
-                                        TO    WRK-TAX1001-KBN
-           END-IF
-      *
-           MOVE     "SYSKANRI-KEY"      TO    WK-PATH
-           PERFORM   CSR-CLOSE-SEC
-      *
            MOVE    ZERO                TO  FLG-SYSKANRI
            INITIALIZE                      SYSKANRI-REC
            MOVE    "5000"              TO  SYS-KANRICD
@@ -2710,6 +2780,24 @@
                                             ((WRK-KHNTEN  -  
                                               WRK-SENTEI-KHNTEN) * 
                                               SYS-5000-SENTEI-TANKA)
+                                     IF  SYU-SRYYMD(1:6) >= "200704"
+                                      IF    WRK-TAX1001-KBN  =  "1"
+                                       COMPUTE WRK-KEISAN =
+                                             ((WRK-KHNTEN -
+                                               WRK-SENTEI-KHNTEN)    *
+                                               SYS-5000-SENTEI-TANKA *
+                                               0.05) + 0.5
+                                      ELSE
+                                       COMPUTE WRK-KEISAN =
+                                             ((WRK-KHNTEN -
+                                               WRK-SENTEI-KHNTEN)    *
+                                               SYS-5000-SENTEI-TANKA *
+                                               0.05)
+                                      END-IF
+                                      COMPUTE  NYUIN-TGMONEY-TAX =
+                                               NYUIN-TGMONEY-TAX +
+                                               WRK-KEISAN
+                                     END-IF
       *                          ³°Çñ¡Ê£±£µ¡ó¤ÈÁªÄê³°Çñ¤Îº¹³Û¡Ë
                                  WHEN   3
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
@@ -2725,6 +2813,24 @@
                                             ((WRK-SENTEI-GAIHAKU1 -
                                               WRK-SENTEI-GAIHAKU2)
                                               *  SYS-5000-SENTEI-TANKA)
+                                     IF  SYU-SRYYMD(1:6) >= "200704"
+                                      IF    WRK-TAX1001-KBN  =  "1"
+                                       COMPUTE WRK-KEISAN =
+                                             ((WRK-SENTEI-GAIHAKU1 -
+                                               WRK-SENTEI-GAIHAKU2)  *
+                                               SYS-5000-SENTEI-TANKA *
+                                               0.05) + 0.5
+                                      ELSE
+                                       COMPUTE WRK-KEISAN =
+                                             ((WRK-SENTEI-GAIHAKU1 -
+                                               WRK-SENTEI-GAIHAKU2)  *
+                                               SYS-5000-SENTEI-TANKA *
+                                               0.05)
+                                      END-IF
+                                      COMPUTE  NYUIN-TGMONEY-TAX =
+                                               NYUIN-TGMONEY-TAX +
+                                               WRK-KEISAN
+                                     END-IF
                                  WHEN   4
                                      IF  SYU-SRYYMD(1:6) >= "200404"
                                       MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
@@ -2741,6 +2847,24 @@
                                              ((WRK-SENTEI-GAIHAKU1 -
                                                WRK-SENTEI-GAIHAKU2)
                                                *  SYS-5000-SENTEI-TANKA)
+                                      IF  SYU-SRYYMD(1:6) >= "200704"
+                                       IF    WRK-TAX1001-KBN  =  "1"
+                                        COMPUTE WRK-KEISAN =
+                                              ((WRK-SENTEI-GAIHAKU1 -
+                                                WRK-SENTEI-GAIHAKU2)  *
+                                                SYS-5000-SENTEI-TANKA *
+                                                0.05) + 0.5
+                                       ELSE
+                                        COMPUTE WRK-KEISAN =
+                                              ((WRK-SENTEI-GAIHAKU1 -
+                                                WRK-SENTEI-GAIHAKU2)  *
+                                                SYS-5000-SENTEI-TANKA *
+                                                0.05)
+                                       END-IF
+                                       COMPUTE  NYUIN-TGMONEY-TAX =
+                                                NYUIN-TGMONEY-TAX +
+                                                WRK-KEISAN
+                                      END-IF
                                      ELSE
                                       MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                       MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
@@ -2806,6 +2930,20 @@
                                      COMPUTE  NYUIN-TGMONEY-TAX =
                                               NYUIN-TGMONEY-TAX +
                                               SYS-5000-SENTEI-KINGAKU
+                                     IF  SYU-SRYYMD(1:6) >= "200704"
+                                      IF    WRK-TAX1001-KBN  =  "1"
+                                       COMPUTE WRK-KEISAN =
+                                              (SYS-5000-SENTEI-KINGAKU *
+                                               0.05) + 0.5
+                                      ELSE
+                                       COMPUTE WRK-KEISAN =
+                                              (SYS-5000-SENTEI-KINGAKU *
+                                               0.05)
+                                      END-IF
+                                      COMPUTE  NYUIN-TGMONEY-TAX =
+                                               NYUIN-TGMONEY-TAX +
+                                               WRK-KEISAN
+                                     END-IF
                                END-EVALUATE
                        END-EVALUATE
       *            ÉÂÅïÀßÄê
@@ -2892,6 +3030,24 @@
                                         ((WRK-KHNTEN  -  
                                           WRK-SENTEI-KHNTEN) * 
                                        SBTUSENTEI-DAY-TANKA(SYU-IDX))
+                                 IF  SYU-SRYYMD(1:6) >= "200704"
+                                  IF    WRK-TAX1001-KBN  =  "1"
+                                   COMPUTE   WRK-KEISAN =
+                                           ((WRK-KHNTEN -
+                                             WRK-SENTEI-KHNTEN)    *
+                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                             0.05) + 0.5
+                                  ELSE
+                                   COMPUTE   WRK-KEISAN =
+                                           ((WRK-KHNTEN -
+                                             WRK-SENTEI-KHNTEN)    *
+                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                             0.05)
+                                  END-IF
+                                  COMPUTE  NYUIN-TGMONEY-TAX =
+                                           NYUIN-TGMONEY-TAX +
+                                           WRK-KEISAN
+                                 END-IF
       *                      ³°Çñ¡Ê£±£µ¡ó¤ÈÁªÄê³°Çñ¤Îº¹³Û¡Ë
                              WHEN   3
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
@@ -2907,6 +3063,24 @@
                                         ((WRK-SENTEI-GAIHAKU1 -
                                           WRK-SENTEI-GAIHAKU2)
                                       *  SBTUSENTEI-DAY-TANKA(SYU-IDX))
+                                 IF  SYU-SRYYMD(1:6) >= "200704"
+                                  IF    WRK-TAX1001-KBN  =  "1"
+                                   COMPUTE   WRK-KEISAN =
+                                           ((WRK-SENTEI-GAIHAKU1 -
+                                             WRK-SENTEI-GAIHAKU2)  *
+                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                             0.05) + 0.5
+                                  ELSE
+                                   COMPUTE   WRK-KEISAN =
+                                           ((WRK-SENTEI-GAIHAKU1 -
+                                             WRK-SENTEI-GAIHAKU2)  *
+                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                             0.05)
+                                  END-IF
+                                  COMPUTE  NYUIN-TGMONEY-TAX =
+                                           NYUIN-TGMONEY-TAX +
+                                           WRK-KEISAN
+                                 END-IF
                              WHEN   4
                                  IF  SYU-SRYYMD(1:6) >= "200404"
                                   MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
@@ -2923,6 +3097,24 @@
                                          ((WRK-SENTEI-GAIHAKU1 -
                                            WRK-SENTEI-GAIHAKU2)
                                        *  SBTUSENTEI-DAY-TANKA(SYU-IDX))
+                                  IF  SYU-SRYYMD(1:6) >= "200704"
+                                   IF    WRK-TAX1001-KBN  =  "1"
+                                    COMPUTE   WRK-KEISAN =
+                                            ((WRK-SENTEI-GAIHAKU1 -
+                                              WRK-SENTEI-GAIHAKU2)  *
+                                      SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                              0.05) + 0.5
+                                   ELSE
+                                    COMPUTE   WRK-KEISAN =
+                                            ((WRK-SENTEI-GAIHAKU1 -
+                                              WRK-SENTEI-GAIHAKU2)  *
+                                      SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                              0.05)
+                                   END-IF
+                                   COMPUTE  NYUIN-TGMONEY-TAX =
+                                            NYUIN-TGMONEY-TAX +
+                                            WRK-KEISAN
+                                  END-IF
                                  ELSE
                                   MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                   MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
@@ -2963,6 +3155,20 @@
                                  COMPUTE  NYUIN-TGMONEY-TAX =
                                           NYUIN-TGMONEY-TAX +
                                        SBTUSENTEI-DAY-KINGAKU(SYU-IDX)
+                                 IF  SYU-SRYYMD(1:6) >= "200704"
+                                  IF    WRK-TAX1001-KBN  =  "1"
+                                   COMPUTE WRK-KEISAN =
+                                     (SBTUSENTEI-DAY-KINGAKU(SYU-IDX) *
+                                           0.05) + 0.5
+                                  ELSE
+                                   COMPUTE WRK-KEISAN =
+                                     (SBTUSENTEI-DAY-KINGAKU(SYU-IDX) *
+                                           0.05)
+                                  END-IF
+                                  COMPUTE  NYUIN-TGMONEY-TAX =
+                                           NYUIN-TGMONEY-TAX +
+                                           WRK-KEISAN
+                                 END-IF
                            END-EVALUATE
                    END-EVALUATE
            END-EVALUATE
