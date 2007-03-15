@@ -318,6 +318,12 @@
                WHEN    "0055"
                    MOVE    "自費入力できません"
                                        TO  SPA-ERRMSG
+               WHEN    "0086"
+                   STRING  "金額が税込みです。"
+                           ".950 では算定できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0056"
                    MOVE    "検査の逓減ができません。算定日が前後します"
                                        TO  SPA-ERRMSG

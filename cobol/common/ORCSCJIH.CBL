@@ -46,6 +46,7 @@
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
       *
            03  FLG-ERR             PIC 9(01).
            03  FLG-CHK             PIC 9(01).
@@ -70,6 +71,12 @@
            03  WRK-KINGAK          PIC 9(08).
       *
       *
+           03  WRK-ZEIKIN-9        PIC 9(08)V9(5).
+           03  WRK-ZEIKIN          PIC 9(08).
+           03  WRK-TANKA           PIC 9(08).
+           03  WRK-KISOTEN         PIC 9(08)V99.
+           03  WRK-TAX-HASU-KBN    PIC X(01).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -77,6 +84,8 @@
       *    点数マスタ−
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
+      *
+           COPY    "CPSK1001.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -225,7 +234,16 @@
       *!                                                  (IDX-Z)
       *!               END-IF
       *!           END-IF
-                           CONTINUE
+      *            Ｈ１９／４／１から税込み追加
+                   IF     (WRK-COM-INPUTCD(IDX-Z)(1:3) =   "095" OR
+                                                           "096" )
+                       IF     (WRK-COM-TENSIKIBETU(IDX-Z)  =  4  )  AND
+                              (WRK-COM-SRYKBN  (IDX-Z)     =  "95")
+                           MOVE    "0086"          TO  WRK-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-Z)
+                       END-IF
+                   END-IF
       *
                WHEN    OTHER
       *            計算できる点数識別であること
@@ -245,7 +263,47 @@
            .
        10011-CHK-EXT.
            EXIT.
+      *@
+      *****************************************************************
+      *    消費税端数設定処理
+      *****************************************************************
+       10021-TAX-HASU-SET-SEC                  SECTION.
       *
+           MOVE    SPACE               TO  WRK-TAX-HASU-KBN
+      *    システム管理検索（医療機関情報）
+           MOVE    SPACE               TO  SYS-1001-REC
+           INITIALIZE                  SYS-1001-REC
+           MOVE    "1001"              TO  SYS-1001-KANRICD
+           MOVE    "*"                 TO  SYS-1001-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-1001-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1001-EDYUKYMD
+           MOVE    SYS-1001-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SYSKANRI
+                   MOVE    MCPDATA-REC         TO  SYS-1001-REC
+      *            消費税端数設定
+                   MOVE    SYS-1001-TAX-HASU-KBN   TO  WRK-TAX-HASU-KBN
+               ELSE
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       10021-TAX-HASU-SET-EXT.
+           EXIT.
+      *@
       *****************************************************************
       *    点数計算編集処理
       *****************************************************************
@@ -255,6 +313,9 @@
       *
            INITIALIZE                  WRK-AREA
            INITIALIZE                  ORCSC90AREA
+      *@
+           PERFORM 10021-TAX-HASU-SET-SEC
+      *@
       *
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   200     )   OR
@@ -331,12 +392,42 @@
            IF      WRK-COM-KISOTEN(IDX-Z)      =   ZERO
                CONTINUE
            ELSE
-               COMPUTE WRK-KINGAK      =   WRK-COM-KISOTEN (IDX-Z)
+      *        消費税計算
+               IF      (SPA-SRYYMD     >=  "20070401" )  AND
+                       (WRK-COM-SRYKBN(IDX-Z)  =   "96")  AND
+                       (WRK-COM-TENSIKIBETU(IDX-Z)  =  0 )
+                   MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-KISOTEN
+                   PERFORM 10021-ZEIKEISEN-SEC
+               ELSE
+                   MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-TANKA
+               END-IF
+               COMPUTE WRK-KINGAK      =   WRK-TANKA
                                        *   WRK-COM-SURYO(IDX-Z)
            END-IF
       *
            .
        10021-JIHI-KEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    消費税計算処理
+      *****************************************************************
+       10021-ZEIKEISEN-SEC                  SECTION.
+      *
+           COMPUTE WRK-ZEIKIN-9        =   WRK-KISOTEN
+                                       *   0.05
+           IF      WRK-TAX-HASU-KBN    =   "1"
+      *        小数点以下四捨五入
+               COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
+                                       +   0.5
+           ELSE
+      *        小数点以下切り捨て
+               MOVE    WRK-ZEIKIN-9        TO  WRK-ZEIKIN
+           END-IF
+           COMPUTE WRK-TANKA           =   WRK-KISOTEN
+                                       +   WRK-ZEIKIN
+           .
+       10021-ZEIKEISEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -355,16 +446,30 @@
            EVALUATE    WRK-COM-TENSIKIBETU(IDX-Z)
       *        金額
                WHEN    1
-                   COMPUTE WRK-KINGAK-9    =   WRK-COM-KISOTEN (IDX-Z)
+      *            消費税計算
+                   IF      (SPA-SRYYMD     >=  "20070401" )  AND
+                           (WRK-COM-SRYKBN(IDX-Z)  =   "96")
+                       MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-KISOTEN
+                       PERFORM 10021-ZEIKEISEN-SEC
+                   ELSE
+                       MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-TANKA
+                   END-IF
+                   COMPUTE WRK-KINGAK-9    =   WRK-TANKA
                                            *   WRK-COM-SURYO(IDX-Z)
                                            +   0.5
                    MOVE    WRK-KINGAK-9    TO  WRK-KINGAK
       *        点数
                WHEN    3
                WHEN    4
-                   COMPUTE WRK-KINGAK      =  (WRK-COM-KISOTEN(IDX-Z)
-                                           *   WRK-COM-SURYO(IDX-Z) )
+                   COMPUTE WRK-KISOTEN     =   WRK-COM-KISOTEN (IDX-Z)
                                            *   10
+                   IF      (SPA-SRYYMD     >=  "20070401" )  AND
+                           (WRK-COM-SRYKBN(IDX-Z)  =   "96")
+                       PERFORM 10021-ZEIKEISEN-SEC
+                   ELSE
+                       MOVE    WRK-KISOTEN     TO  WRK-TANKA
+                   END-IF
+                   MOVE    WRK-TANKA       TO  WRK-KINGAK
            END-EVALUATE
       *
            .
@@ -388,5 +493,46 @@
       *
            .
        300-AUTO-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+      *
+           .
+      *
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢクロース処理
+      *****************************************************************
+       990-DBCLOSE-SEC           SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       MCPDATA-REC
+      *
+           .
+       990-DBCLOSE-EXT.
            EXIT.
       *

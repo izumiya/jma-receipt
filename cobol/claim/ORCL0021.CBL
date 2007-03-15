@@ -2352,10 +2352,16 @@
                END-IF
            END-PERFORM
       *    合計金額
-           COMPUTE TBL-GINGAKUALL (IDX-LF)
+           IF      LNK-SRYYMD          <   "20070401"
+               COMPUTE TBL-GINGAKUALL (IDX-LF)
                                        =   SYU-TOTAL-TGMONEY-TAX
                                        +   SYU-JIHI-TOTAL-TAX
                                        +   SYU-JIHI-TAX
+           ELSE
+               COMPUTE TBL-GINGAKUALL (IDX-LF)
+                                       =   SYU-TOTAL-TGMONEY-TAX
+                                       +   SYU-JIHI-TOTAL-TAX
+           END-IF
       *    保険分
            MOVE    ZERO                TO  IDX-IJ
            PERFORM VARYING IDX     FROM    1   BY  1

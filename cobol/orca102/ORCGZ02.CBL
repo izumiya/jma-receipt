@@ -36,6 +36,7 @@
       *  02.00.00    NACL-多々納  03/06/13  一括入力へ変更
       *  02.00.01    NACL-多々納  05/12/09  登録コードチェック追加
       *                                     MONFUNC対応他
+      *  03.03.00    NACL-多々納  07/02/15  H19/4/1から自費総額設定追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -95,7 +96,8 @@
                    11  SPA-GMN-BUIKBN          PIC X(01).
                    11  SPA-GMN-F1              PIC X(01).
                    11  SPA-GMN-BUIKBNMEI       PIC X(06).
-               05  SPA-GMN-BUIKBNLST           OCCURS  8.
+               05  SPA-GMN-BUIKBNLST-G.
+                 07  SPA-GMN-BUIKBNLST           OCCURS  8.
                    09  SPA-GMN-BUIKBNL         PIC X(01).
                    09  SPA-GMN-F1L             PIC X(01).
                    09  SPA-GMN-BUIKBNMEIL      PIC X(06).
@@ -110,6 +112,8 @@
                05  SPA-NAI-YUKOEDYMD           PIC X(08).
       *
                05  SPA-SRYCDCHK                PIC 9(01).
+      *
+               05  SPA-JIHIKBN                 PIC 9(01).
       *
                05  SPA-NAI-KEIFLG1             PIC 9(01).
                05  SPA-NAI-KEIFLG2             PIC 9(01).
@@ -162,6 +166,8 @@
       *
            03  WRK-YMD             PIC X(08).
            03  WRK-OTYMD           PIC X(08).
+      *
+           03  WRK-JIHIKBN         PIC 9(01).
       *
            03  WRK-MAE-INPUT       PIC X(400).
            03  WRK-ATO-INPUT       PIC X(400).
@@ -391,6 +397,28 @@
            MOVE    "0"                   TO  SPA-GMN-BUIKBNL    (8)
            MOVE    "その他"              TO  SPA-GMN-BUIKBNMEIL (8)
            MOVE    8                     TO  SPA-GMN-BUIKBN-MAX
+      *    自費コードの時、金額種別表示とする
+           MOVE    ZERO                TO  SPA-JIHIKBN
+           IF      (SPA-Z01-SRYCD(1:3) =   "095"
+                                       OR  "096" )
+               MOVE    1               TO  SPA-JIHIKBN
+               IF     (SPA-NAI-YUKOSTYMD   >=  "20070401")  AND
+                      (SPA-Z01-SRYCD(1:3)  =   "096"     )
+                   MOVE    2                 TO  SPA-JIHIKBN
+               END-IF
+           END-IF
+           IF      SPA-JIHIKBN     NOT =   ZERO
+               INITIALIZE                  SPA-GMN-BUIKBNLST-G
+               MOVE    "0"                 TO  SPA-GMN-BUIKBNL    (1)
+               MOVE    "税抜き"            TO  SPA-GMN-BUIKBNMEIL (1)
+               IF      SPA-JIHIKBN         =   2
+                   MOVE    "4"             TO  SPA-GMN-BUIKBNL    (2)
+                   MOVE    "税込み"        TO  SPA-GMN-BUIKBNMEIL (2)
+                   MOVE    2               TO  SPA-GMN-BUIKBN-MAX
+               ELSE
+                   MOVE    1               TO  SPA-GMN-BUIKBN-MAX
+               END-IF
+           END-IF
       *
       *    点数マスタ読込み
            MOVE    SPACE               TO  TNS-TENSU-REC
@@ -456,6 +484,10 @@
                    MOVE  TNS-GAITENTTLKBN    TO  SPA-GMN-GAITENTTLKBN
                    MOVE  TNS-NYUTENTTLKBN    TO  SPA-GMN-NYUTENTTLKBN
                    MOVE  TNS-BUIKBN          TO  SPA-GMN-BUIKBN  
+      *            自費コードの時、点数識別とする
+                   IF      SPA-JIHIKBN       NOT =   ZERO
+                       MOVE    TNS-TENSIKIBETU     TO  SPA-GMN-BUIKBN
+                   END-IF
                    PERFORM VARYING IDXX    FROM    1   BY  1
                            UNTIL   IDXX    >   SPA-GMN-BUIKBN-MAX
                        IF      SPA-GMN-BUIKBN 
@@ -481,6 +513,10 @@
       *        部位はその他とする
                MOVE    SPA-GMN-BUIKBNLST (8)
                                            TO  SPA-GMN-BUIKBN-G
+               IF      SPA-JIHIKBN     NOT =   ZERO
+                   MOVE    SPA-GMN-BUIKBNLST (1)
+                                           TO  SPA-GMN-BUIKBN-G
+               END-IF
            END-IF
       *
       *    点数マスタ付加情報検索
@@ -673,6 +709,12 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 507-BUIKBN-CHK-SEC
            END-IF
+      *    自費の時、有効開始日により金額区分を修正
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-JIHIKBN     NOT =   ZERO
+                   PERFORM 508-JIHI-KBN-SEC
+               END-IF
+           END-IF
            .
       *
        4102-KIHON-CHK-EXT.
@@ -788,6 +830,12 @@
       *****************************************************************
        506-HKNTEKKBN-CHK-SEC          SECTION.
       *
+      *    自費保険は保険適用 ２とする
+           IF      SPA-JIHIKBN     NOT =   ZERO
+               MOVE    SPA-GMN-HKNTEKKBNLST (03)
+                                           TO  SPA-GMN-HKNTEKKBN-G
+           END-IF
+      *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >   SPA-GMN-HKNTEKKBN-MAX
@@ -825,11 +873,42 @@
            END-PERFORM
            IF      FLG-OK              =   ZERO
                MOVE    "0007"              TO  SPA-ERRCD
+               IF      SPA-GMN-BUIKBN-MAX  <   3
+                   MOVE    "0009"              TO  SPA-ERRCD
+               END-IF
                MOVE    18                  TO  SPA-GMN-CUR
            END-IF
            .
       *
        507-BUIKBN-CHK-EXT.
+           EXIT.
+      ****************************************************************
+      *    有効開始日により金額区分処理
+      ****************************************************************
+       508-JIHI-KBN-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  WRK-JIHIKBN
+           IF     (SPA-NAI-YUKOSTYMD   >=  "20070401")  AND
+                  (SPA-Z01-SRYCD(1:3)  =   "096"     )
+               MOVE    2                   TO  WRK-JIHIKBN
+           ELSE
+               MOVE    1                   TO  WRK-JIHIKBN
+           END-IF
+           IF      SPA-JIHIKBN     NOT =   WRK-JIHIKBN
+               MOVE    WRK-JIHIKBN         TO  SPA-JIHIKBN
+               INITIALIZE                  SPA-GMN-BUIKBNLST-G
+               MOVE    "0"                 TO  SPA-GMN-BUIKBNL    (1)
+               MOVE    "税抜き"            TO  SPA-GMN-BUIKBNMEIL (1)
+               IF      SPA-JIHIKBN         =   2
+                   MOVE    "4"             TO  SPA-GMN-BUIKBNL    (2)
+                   MOVE    "税込み"        TO  SPA-GMN-BUIKBNMEIL (2)
+                   MOVE    2               TO  SPA-GMN-BUIKBN-MAX
+               ELSE
+                   MOVE    1               TO  SPA-GMN-BUIKBN-MAX
+               END-IF
+           END-IF
+           .
+       508-JIHI-KBN-EXT.
            EXIT.
       *
       ****************************************************************
@@ -1438,6 +1517,11 @@
            MOVE  SPA-GMN-GAITENTTLKBN          TO  TNS-GAITENTTLKBN
            MOVE  SPA-GMN-NYUTENTTLKBN          TO  TNS-NYUTENTTLKBN  
            MOVE  SPA-GMN-BUIKBN                TO  TNS-BUIKBN  
+      *    自費コードの時、部位区分は点数識別とする
+           IF      SPA-JIHIKBN     NOT =   ZERO
+               MOVE    SPA-GMN-BUIKBN          TO  TNS-TENSIKIBETU
+               MOVE    ZERO                    TO  TNS-BUIKBN
+           END-IF
       *
       *****MOVE  SPA-GMN-INPCHKKBN             TO  TNSP-INPCHKKBN
            .
@@ -1713,6 +1797,12 @@
                                                  TO  SPA-ERRMSG
                WHEN    "0007"
                    MOVE    "部位区分がありません"
+                                                 TO  SPA-ERRMSG
+               WHEN    "0009"
+                   MOVE    "金額種別がありません"
+                                                 TO  SPA-ERRMSG
+               WHEN    "0010"
+                   MOVE    "金額種別が税込みです。金額を入力して下さい"
                                                  TO  SPA-ERRMSG
                WHEN    "0008"
                    STRING  "レセプト編集情報はコメントコードでのみ"

@@ -1162,26 +1162,16 @@
                PERFORM 910-TENSU-READ-SEC
                IF      TNS-TEN                 =   ZERO
                    MOVE    "1"                 TO  SPA-COM-KEIFLG(IDX2)
-                   MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
-                                               TO  SPA-COM-KEI   (IDX2)
-                   MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
-                                               TO  SPA-GMN-KEI   (IDX2)
-                   MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
-                                               TO  SPA-COM-JIHIMONEY
-                                                                 (IDX2)
                ELSE
                    MOVE    "2"                 TO  SPA-COM-KEIFLG(IDX2)
-                   MOVE    TNS-TEN             TO  SPA-COM-KISOTEN(IDX2)
-                   COMPUTE WRK-KINGAK          =   SPA-COM-KISOTEN(IDX2)
-                                               *   SPA-COM-SURYO(IDX2)
-                   MOVE    WRK-KINGAK
+               END-IF
+               MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
                                                TO  SPA-COM-KEI   (IDX2)
-                   MOVE    WRK-KINGAK
+               MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
                                                TO  SPA-GMN-KEI   (IDX2)
-                   MOVE    WRK-KINGAK
+               MOVE    LNK-WKSRY-JIHIMONEY(IDX IDY)
                                                TO  SPA-COM-JIHIMONEY
                                                                  (IDX2)
-               END-IF
       *        剤点数の設定（訂正前）
                MOVE    SPA-COM-JIHIMONEY(IDX2)
                                            TO  SPA-COM-MAE-TENSU (IDX2)
