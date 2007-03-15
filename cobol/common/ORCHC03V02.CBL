@@ -997,8 +997,12 @@
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HC03-JIHI(7)
       *    ¼«Èñ¹ç·×
-           COMPUTE WRK-GOKTEN          =   WRK-JIHI-TOTAL
+           IF      SYU-SRYYMD          <=  "20070331"
+             COMPUTE WRK-GOKTEN        =   WRK-JIHI-TOTAL
                                        +   SYU-JIHI-TAX
+           ELSE
+             MOVE    WRK-JIHI-TOTAL    TO  WRK-GOKTEN
+           END-IF
            MOVE    WRK-GOKTEN          TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HC03-JIHI(6)

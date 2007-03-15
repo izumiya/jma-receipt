@@ -355,6 +355,7 @@
       *
       *    コンスタント値
        01  CONST-AREA.
+           03  CONST-H1904                 PIC X(06)   VALUE "200704".
            03  CONST-H1804                 PIC X(06)   VALUE "200604".
       *    入院料編集作業領域最大件数
            03  CONST-WNYUINRYO-MAX             PIC 9(05)   VALUE 20.
@@ -1462,6 +1463,12 @@
                    MOVE    1           TO  FLG-HIT
                    MOVE    WRK-SYS-5113-BRMSAGAKU(IDX3)
                                        TO  WRK-BRMSAGAKU
+                   IF    ( HCM34S01-SANTEIYM   >=  CONST-H1904 )
+                       IF    ( SYS-5000-BRMSGK-TAXKBN  =   "1" )
+                           COMPUTE WRK-BRMSAGAKU
+                               =   WRK-BRMSAGAKU   *   1.05
+                       END-IF
+                   END-IF
                END-IF
       *
            END-PERFORM

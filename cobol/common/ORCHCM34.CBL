@@ -533,6 +533,7 @@
                05  RSIJBI-NAME                     PIC X(200).
       *
        01  CONST-AREA.
+           03  CONST-H190401           PIC X(08)   VALUE "20070401".
            03  CONST-H141001           PIC X(08)   VALUE "20021001".
            03  CONST-H181001           PIC X(08)   VALUE "20061001".
       *    œ´∫“º´«Â ‘Ω∏ŒŒ∞Ë∫«¬Áπ‘
@@ -4076,15 +4077,31 @@
       *
       *        æ√»Ò¿« ¨§¨§¢§ÎæÏπÁ§œæ√»Ò¿«≥€§Ú ‘Ω∏
                IF    ( WRK-TTL-JIHI-TAX    >   ZERO )
-                   MOVE    "°°°°°°°°°°º´»Òæ√»Ò¿«≥€"
+                   IF    ( ORCHCM34-SRYYM  >=   CONST-H190401 (1:6))
+                       MOVE    "°°°°°°°°°°º´»Òæ√»Ò¿«≥€° ∫∆∑«°À"
                                            TO  WRK-KINGAKKU-LBL
-                   IF   ( SYS-1001-TAX-HASU-KBN =   "1" )
-                       COMPUTE  WRK-KINGAKKU
-                            = ( WRK-TTL-JIHI-TAX   *  0.05 )
-                            +  0.5
                    ELSE
-                       COMPUTE  WRK-KINGAKKU
-                            = ( WRK-TTL-JIHI-TAX   *  0.05 )
+                       MOVE    "°°°°°°°°°°º´»Òæ√»Ò¿«≥€"
+                                           TO  WRK-KINGAKKU-LBL
+                   END-IF
+                   IF   ( SYS-1001-TAX-HASU-KBN =   "1" )
+                       IF    ( ORCHCM34-SRYYM  >=   CONST-H190401 (1:6))
+                           COMPUTE  WRK-KINGAKKU
+                                = ( WRK-TTL-JIHI-TAX   *  5 / 105)
+                                +  0.5
+                       ELSE
+                           COMPUTE  WRK-KINGAKKU
+                                = ( WRK-TTL-JIHI-TAX   *  0.05 )
+                                +  0.5
+                       END-IF
+                   ELSE
+                       IF    ( ORCHCM34-SRYYM  >=   CONST-H190401 (1:6))
+                           COMPUTE  WRK-KINGAKKU
+                                = ( WRK-TTL-JIHI-TAX   *  5 / 105)
+                       ELSE
+                           COMPUTE  WRK-KINGAKKU
+                                = ( WRK-TTL-JIHI-TAX   *  0.05 )
+                       END-IF
                    END-IF
                    PERFORM 2001111-KINGAKU-HEN-SEC
                END-IF
@@ -5212,11 +5229,23 @@
       *
       *        æ√»Ò¿«…Ωº® ‘Ω∏»ΩƒÍ
                IF    ( SYS-5000-BRMSGK-TAXKBN  =   "1" )
-                   COMPUTE    WRK-TTL-BRMSAGAKU-TAX
-                       =    ( WRK-TTL-BRMSAGAKU    *   0.05 )
+      *
+                   IF    ( ORCHCM34-SRYYM  >=   CONST-H190401 (1:6))
+                       COMPUTE  WRK-TTL-BRMSAGAKU-TAX
+                            = ( WRK-TTL-BRMSAGAKU  *  5 / 105)
+                   ELSE
+                       COMPUTE  WRK-TTL-BRMSAGAKU-TAX
+                            = ( WRK-TTL-BRMSAGAKU  *  0.05 )
+                   END-IF
+      *
                    IF    ( WRK-TTL-BRMSAGAKU-TAX   >   ZERO )
-                       MOVE    "°°°°°°°°°°ººŒ¡∫π≥€æ√»Ò¿«≥€"
+                       IF    ( ORCHCM34-SRYYM  >=   CONST-H190401 (1:6))
+                           MOVE    "°°°°°°°°°°ººŒ¡∫π≥€æ√»Ò¿«≥€° ∫∆∑«°À"
                                            TO  WRK-KINGAKKU-LBL
+                       ELSE
+                           MOVE    "°°°°°°°°°°ººŒ¡∫π≥€æ√»Ò¿«≥€"
+                                           TO  WRK-KINGAKKU-LBL
+                       END-IF
                        MOVE    WRK-TTL-BRMSAGAKU-TAX
                                            TO  WRK-KINGAKKU
                        PERFORM 2001111-KINGAKU-HEN-SEC
