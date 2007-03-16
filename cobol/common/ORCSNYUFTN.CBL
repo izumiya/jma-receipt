@@ -213,7 +213,6 @@
            03  FLG-SANTEI                  PIC 9(01).
            03  FLG-TOKUSYU                 PIC 9(01).
            03  FLG-KOUREISYA               PIC 9(01).
-           03  FLG-JIRITU-SAI              PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
@@ -611,19 +610,14 @@
                      MOVE      1       TO     FLG-KOUREISYA
                 END-IF
       *
-                IF      (LNK-S02-SKYSTYMD(1:6)     >=  "200604")
-                AND     (LNK-S02-JIRITU-SAI-KBN     =    "1"   )
-                     MOVE      1       TO     FLG-JIRITU-SAI
-                END-IF
-      *
            END-PERFORM.
       *
       *    ÆÃ¼ì·×»»¡ÊºÆ·×»»¡Ë
            IF       CNT-KENSU  >   1
-              IF     ( FLG-TOKUSYU           =    1  )
-              OR     ( FLG-JIRITU-SAI        =    1  )
-              OR     ((FLG-KOUREISYA         =    1 ) AND
-                      (LNK-S02-TEIKI-KBN     =   "X"))
+              IF     ( FLG-TOKUSYU            =    1       )
+              OR     ((FLG-KOUREISYA          =    1      ) AND
+                      (LNK-S02-TEIKI-KBN      =   "X"     ) AND
+                      (LNK-S02-SKYSTYMD(1:6)  <   "200704"))
                    PERFORM     TOKUSYU-SANTEI-SEC
               END-IF
            END-IF.

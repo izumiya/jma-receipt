@@ -278,11 +278,15 @@
       *                                     ÂÐ±þ
       *  03.03.09    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
       *  03.03.10    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
-      *  03.03.11    NACL-ÌçÏÆ    06/11/24  µÜ¾ë¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
-      *  03.03.12    NACL-ÌçÏÆ    06/12/06  °ñ¾ë¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
-      *  03.03.13    NACL-ÌçÏÆ    07/01/16  ¡Ê¡¡¡ËºÆ·Çµ­ºÜ¤Î½¤Àµ
-      *  03.03.14    NACL-ÌçÏÆ    07/01/23  Ãí¼Í²Ã»»¤ÎÌ¾¾ÎÊÔ½¸½¤Àµ
-      *  03.03.15    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
+      *  03.04.01    NACL-ÌçÏÆ    06/11/20  ¹â³Û£´²óÌÜ°Ê¹ßÂÐ±þ
+      *  03.04.02    NACL-ÌçÏÆ    06/11/24  µÜ¾ë¸©ÃÏÊý¸øÈñ£±£°·î²þÀµÂÐ±þ
+      *  03.04.03    NACL-ÌçÏÆ    06/12/06  °ñ¾ë¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
+      *  03.04.04    NACL-ÌçÏÆ    06/12/26  ÅìµþÍýÍÆÅù¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  03.04.05    NACL-ÌçÏÆ    07/01/16  ¡Ê¡¡¡ËºÆ·Çµ­ºÜ¤Î½¤Àµ
+      *  03.04.06    NACL-ÌçÏÆ    07/01/23  Ãí¼Í²Ã»»¤ÎÌ¾¾ÎÊÔ½¸½¤Àµ
+      *  03.04.07    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
+      *  03.04.08    NACL-ÌçÏÆ    07/02/19  ËÌ³¤Æ»£µ£±¡Ü£´£±ÂÐ±þ
+      *  03.04.09    NACL-ÌçÏÆ    07/03/14  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -425,6 +429,7 @@
            03  FLG-TOKKI                               PIC 9(01).
            03  FLG-MIYAGI                              PIC 9(01).
            03  FLG-PTKOHINF                            PIC 9(01).
+           03  FLG-KEISAN                              PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -586,8 +591,11 @@
        01  WRK-AREA-SAIKEI.
            03  WRK-KOH-FTN                             PIC 9(09).
            03  WRK-KOH-GAI                             PIC 9(09).
+           03  WRK-KOH-GAI2                            PIC 9(09).
            03  FTN-KOH-XXX                             PIC 9(09).       
+           03  FTN-KOH-XX2                             PIC 9(09).
            03  FTN-KOH-YYY                             PIC 9(09).       
+           03  FTN-KOH-YY2                             PIC 9(09).
            03  FLG-KOH                                 PIC 9(01).
            03  WRK-FTNKEI                              PIC 9(09).
            03  WRK-FTNKEI-FTN                          PIC 9(09).
@@ -685,8 +693,6 @@
            03  WRK-RENNUM                              PIC 9(02).
       *
            03  WRK-SRYCD                               PIC 9(09).
-      *
-           03  WRK-JYOGEN41                            PIC 9(09).
       *
            03  WRK-SISETU613                           PIC 9(01).
       *
@@ -1920,6 +1926,12 @@
                 MOVE    WK-GENGAKU-RITU
                                        TO  LNK-KOREIFTNCHK-GENGAKU-RITU
                 MOVE    WK-GENGAKU-KIN TO  LNK-KOREIFTNCHK-GENGAKU-KIN
+                MOVE    SPACE          TO  LNK-KOREIFTNCHK-KOHYONKAIME
+                IF      FLG-ZENKOH-ARI   =  1
+                   MOVE    "1"         TO  LNK-KOREIFTNCHK-ZENKOHARI
+                ELSE
+                   MOVE    SPACE       TO  LNK-KOREIFTNCHK-ZENKOHARI
+                END-IF
       *
                 CALL    "ORCSKOREIFTNCHK"   USING
                                             ORCSKOREIFTNCHKAREA
@@ -1931,6 +1943,8 @@
                     MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU
                                        TO  FTN-KOH-XXX
                                            WRK-CHK-ICHIBUGAKU
+                    MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU2
+                                       TO  FTN-KOH-XX2
                 END-IF
       *
            END-IF
@@ -5475,15 +5489,18 @@
                IF    RECE02-RJNHKNNUM    NOT =    SPACE
                  ADD    SYU-KOH1COMPFTN  TO   RECE02-FTNMONEY(1)
                                               WRK-KOH-GAI
+                                              WRK-KOH-GAI2
                ELSE
                  ADD    SYU-SYUCOMPFTN   TO   RECE02-FTNMONEY(1)
                                               WRK-KOH-GAI
+                                              WRK-KOH-GAI2
                END-IF
            ELSE
              IF   ( SYU-KOH-HKNNUM(1)   =   "012" )
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" )
              OR   ( SYU-KOH-HKNNUM(3)   =   "012" )
              OR   ( SYU-KOH-HKNNUM(4)   =   "012" )
+                 MOVE    ZERO     TO   FLG-KEISAN
                  MOVE    8000     TO   WRK-KINGAKU
                  PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
              ELSE
@@ -5491,6 +5508,7 @@
                OR   ( SYU-KOH-HKNNUM(2) =   "972" )
                OR   ( SYU-KOH-HKNNUM(3) =   "972" )
                OR   ( SYU-KOH-HKNNUM(4) =   "972" )
+                 MOVE    ZERO        TO   FLG-KEISAN
                  IF      RECE02-TEISYOTOKU  NOT =  SPACE
                     MOVE     8000    TO   WRK-KINGAKU
                     PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
@@ -5502,12 +5520,14 @@
                ELSE
                  IF   (  RECE02-TEISYOTOKU  NOT =  SPACE  )
                  AND  (  FLG-ZENKOH-ARI         =  ZERO   )
+                   MOVE  ZERO     TO   FLG-KEISAN
                    MOVE  8000     TO   WRK-KINGAKU
                    PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
                  ELSE
                    IF   (  RECE02-KYURATE         =  20 OR 30 )
                    AND  (  FLG-ZENKOH-ARI         =  ZERO     )
                    AND  (  RECE02-RJNGENMENKBN    =  SPACE    )
+                     MOVE  ZERO      TO   FLG-KEISAN
                      IF    RECE02-SRYYM   >=  "200610"
                       MOVE 44400     TO   WRK-KINGAKU
                       PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
@@ -5516,12 +5536,17 @@
                       PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
                      END-IF
                    ELSE
-                     IF (  RECE02-RJNGENMENKBN    = "1"    )
-                     OR (((SYU-KOH-HKNNUM(1)  NOT = "027") AND
-                          (SYU-KOH-HKNNUM(1)(1:1) = "0"  )) OR
-                         ( SYU-KOH-HKNNUM(2)(1:1) = "0"   ) OR
-                         ( SYU-KOH-HKNNUM(3)(1:1) = "0"   ) OR
-                         ( SYU-KOH-HKNNUM(4)(1:1) = "0"   ))
+                    IF     FLG-ZENKOH-ARI            =  ZERO
+                         MOVE ZERO      TO   FLG-KEISAN
+                         MOVE 12000     TO   WRK-KINGAKU
+                         PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                    ELSE
+                     IF  ((SYU-KOH-HKNNUM(1)     NOT = "027") AND
+                          (SYU-KOH-HKNNUM(1)(1:1)    = "0"  ))
+                     OR  ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
+                     OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
+                     OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
+                         MOVE ZERO      TO   FLG-KEISAN
                          MOVE 12000     TO   WRK-KINGAKU
                          PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
                      ELSE
@@ -5530,13 +5555,34 @@
                              (SYU-KOH-HKNNUM(2) = "974"    ) OR
                              (SYU-KOH-HKNNUM(3) = "974"    ) OR
                              (SYU-KOH-HKNNUM(4) = "974"    ))
+                         MOVE ZERO      TO   FLG-KEISAN
                          MOVE 20000     TO   WRK-KINGAKU
                          PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
                        ELSE
-                         MOVE 12000     TO   WRK-KINGAKU
-                         PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                         IF   RECE02-TEISYOTOKU  NOT =  SPACE
+                           MOVE  1        TO   FLG-KEISAN
+                           MOVE  8000     TO   WRK-KINGAKU
+                           PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                         ELSE
+                           IF   (  RECE02-KYURATE         =  20 OR 30 )
+                           AND  (  RECE02-RJNGENMENKBN    =  SPACE    )
+                             MOVE   1         TO   FLG-KEISAN
+                             IF    RECE02-SRYYM   >=  "200610"
+                               MOVE 44400     TO   WRK-KINGAKU
+                               PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                             ELSE
+                               MOVE 40200     TO   WRK-KINGAKU
+                               PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                             END-IF
+                           ELSE
+                             MOVE   1         TO   FLG-KEISAN
+                             MOVE   12000     TO   WRK-KINGAKU
+                             PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
+                           END-IF
+                         END-IF
                        END-IF
                      END-IF
+                    END-IF
                    END-IF
                  END-IF
                END-IF
@@ -5610,16 +5656,32 @@
       *
            END-IF
       *
-           IF  FTN-KOH-XXX  >   WRK-KINGAKU
-                MOVE   WRK-KINGAKU    TO  FTN-KOH-XXX
-           END-IF
-           COMPUTE  FTN-KOH-YYY  =   WRK-KINGAKU -  FTN-KOH-XXX
-           IF  WRK-FTNKEI   >   FTN-KOH-YYY
-                ADD    FTN-KOH-YYY    TO  RECE02-FTNMONEY(1)
-                                          FTN-KOH-XXX
+           IF  FLG-KEISAN  =  1
+             IF  FTN-KOH-XX2  >   WRK-KINGAKU
+                  MOVE   WRK-KINGAKU    TO  FTN-KOH-XX2
+             END-IF
+             COMPUTE  FTN-KOH-YY2  =   WRK-KINGAKU -  FTN-KOH-XX2
+             IF  WRK-FTNKEI   >   FTN-KOH-YY2
+                  ADD    FTN-KOH-YY2    TO  RECE02-FTNMONEY(1)
+                                            FTN-KOH-XX2
+                                            WRK-KOH-GAI
+             ELSE
+                  ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
+                                            FTN-KOH-XX2
+                                            WRK-KOH-GAI
+             END-IF
            ELSE
-                ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
-                                          FTN-KOH-XXX
+             IF  FTN-KOH-XXX  >   WRK-KINGAKU
+                  MOVE   WRK-KINGAKU    TO  FTN-KOH-XXX
+             END-IF
+             COMPUTE  FTN-KOH-YYY  =   WRK-KINGAKU -  FTN-KOH-XXX
+             IF  WRK-FTNKEI   >   FTN-KOH-YYY
+                  ADD    FTN-KOH-YYY    TO  RECE02-FTNMONEY(1)
+                                            FTN-KOH-XXX
+             ELSE
+                  ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
+                                            FTN-KOH-XXX
+             END-IF
            END-IF
       *
            .
@@ -6033,7 +6095,7 @@
                COMPUTE  WRK-CHK-KEISAN2 = WRK-CHK-KEISAN2     * 10
       *
                COMPUTE  WRK-CHK-KEIKASOCHIXX
-                                  =   WRK-KOH-GAI  +  WRK-CHK-KEISAN1
+                                  =   WRK-KOH-GAI2  +  WRK-CHK-KEISAN1
       *
                IF    FLG-CYOKI   =    1
                    MOVE      10000    TO    WRK-CHK-KINGAKU
@@ -6242,8 +6304,6 @@
       *
                    IF   RECE02-KOHHBTNUM(KOHFTN-IDX) =  "41"
       *
-                          MOVE    ZERO    TO   WRK-JYOGEN41
-      *
                           COMPUTE  WRK-FTNKEI
                                 =  RECE02-TOTALTEN(KOHFTN-IDX + 1)
                                 *  10
@@ -6253,35 +6313,9 @@
                           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
                           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
       *
-                          IF      RECE02-HON-GAIMNAIJGNGAK (KOHFTN-IDX)
-                                               NOT = ZERO
-                              MOVE
-                                  RECE02-HON-GAIMNAIJGNGAK (KOHFTN-IDX)
-                                               TO   WRK-JYOGEN41
-                          ELSE
-                              IF  RECE02-HON-GAIMGAIJGNGAK (KOHFTN-IDX)
-                                               NOT = ZERO
-                                  MOVE
-                                      RECE02-HON-GAIMGAIJGNGAK
-                                                           (KOHFTN-IDX)
-                                               TO   WRK-JYOGEN41
-                              END-IF
-                          END-IF
-                          IF   WRK-JYOGEN41  =  ZERO
-                              MOVE   WRK-FTNKEI   TO
+                          MOVE     WRK-FTNKEI   TO
                                    RECE02-FTNMONEY(KOHFTN-IDX + 1)
                                    RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-                          ELSE
-                            IF   WRK-JYOGEN41  <  WRK-FTNKEI
-                              MOVE   WRK-JYOGEN41 TO
-                                   RECE02-FTNMONEY(KOHFTN-IDX + 1) 
-                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-                            ELSE
-                              MOVE   WRK-FTNKEI   TO
-                                   RECE02-FTNMONEY(KOHFTN-IDX + 1) 
-                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-                            END-IF
-                          END-IF
       *
                    END-IF
       *

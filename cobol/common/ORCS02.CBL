@@ -6784,13 +6784,6 @@
                         MOVE     SYU-KOH-FTN  TO  WK-SYU-SYUCOMPFTN
                         COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
       *
-                        IF     FLG-IRYOHI3       =   1
-                        AND    SYU-KOHTAIYKZKBN  =  "1"
-                            COMPUTE  WK-KOUREI-IRYOHI  =
-                                     WK-KOUREI-IRYOHI  +
-                                    (SYU-HKNTEN (16) * 10)
-                        END-IF
-      *
                        ELSE
                         IF  (SYU-KOH2HKNNUM     =  SPACE)              
                         AND (SYU-KOH3HKNNUM     =  SPACE)
@@ -6889,13 +6882,6 @@
                         MOVE     SYU-KOH-FTN  TO  WK-SYU-SYUCOMPFTN
                         COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
       *
-                        IF     FLG-IRYOHI3       =   2
-                        AND    SYU-KOHTAIYKZKBN  =  "2"
-                            COMPUTE  WK-KOUREI-IRYOHI  =
-                                     WK-KOUREI-IRYOHI  +
-                                    (SYU-HKNTEN (16) * 10)
-                        END-IF
-      *
                        ELSE
                         IF  (SYU-KOH1HKNNUM     =  SPACE)              
                         AND (SYU-KOH2HKNNUM     =  SPACE)
@@ -6970,6 +6956,7 @@
                (COMB-KOH1-NYUJGNKBN       =  "1"             ) AND
                (FLG-KOUREI                =  ZERO            ))
            OR ( FLG-IRYOHI70              =  3 OR 4 OR 5 OR 6 )
+           OR ( FLG-IRYOHI3               =  2                )
              IF  ( SYU-NYUGAIKBN              =   "1"   )
              OR  ((SYU-NYUGAIKBN              =   "2"  ) AND
                   (FLG-NYUGAI                 =    1   ))
@@ -7006,6 +6993,7 @@
                  ELSE
                   IF    (FLG-IRYOHI2     =      1)
                   OR    (FLG-IRYOHI4     =      1)
+                  OR    (FLG-IRYOHI3     =      2)
                    COMPUTE  WK-KOUREI-IRYOHI  =  WK-KOUREI-IRYOHI  +  
                                                 (SYU-HKNTEN (16) * 10)
                   END-IF
@@ -7503,8 +7491,9 @@
              END-IF
            END-IF.
       *    ¸øÈñ£²¥«¥¦¥ó¥È
-           IF  (COMB-KOH2HKNNUM               NOT = SPACE)   AND
-               (COMB-KOH2-NYUJGNKBN           =     "1")     
+           IF ((COMB-KOH2HKNNUM       NOT =  SPACE          ) AND
+               (COMB-KOH2-NYUJGNKBN       =  "1"            ))
+           OR ( FLG-IRYOHI3               =   1              )
              IF  ( SYU-NYUGAIKBN              =   "1"   )
              OR  ((SYU-NYUGAIKBN              =   "2"  ) AND
                   (FLG-NYUGAI                 =    2   ))
@@ -7527,6 +7516,10 @@
                             (SYU-HKNTEN (16) * 10)
                   END-IF
                  ELSE
+                  IF     FLG-IRYOHI3     =      1
+                   COMPUTE  WK-KOUREI-IRYOHI  =  WK-KOUREI-IRYOHI  +  
+                                                (SYU-HKNTEN (16) * 10)
+                  END-IF
                   IF     FLG-IRYOHI5     =      21
                    COMPUTE  WK-KOUREI-IRYOHI3 =  WK-KOUREI-IRYOHI3 +  
                                                 (SYU-HKNTEN (16) * 10)
@@ -16463,13 +16456,6 @@
               END-IF
            END-IF.
       *
-           EVALUATE     FLG-IRYOHI3
-              WHEN    1
-                  MOVE    "1"      TO    LNK-SYU-KOHTAIYKZKBN
-              WHEN    2
-                  MOVE    "2"      TO    LNK-SYU-KOHTAIYKZKBN
-           END-EVALUATE.
-      *
            IF   FLG-KOUGAKUCYO3        NOT =    ZERO
               IF ((FLG-IRYOHI3X = 11      ) AND (FLG-SYOUKAN(1) = "1")
                                             AND (FLG-HIKAKU     =  1 ))
@@ -16521,6 +16507,7 @@
       *
            IF   FLG-SYUHEN                 =   "1"
            AND  LNK-S02-TEIKI-KBN          =   "X"
+           AND  LNK-SYU-SRYYMD(1:6)        <   "200704"
       *
               IF   COMB-HKNNUM            NOT =   SPACE
               AND  LNK-SYU-SYUCOMPFTN     NOT =   WK-HEN-SYUCOMPFTN
