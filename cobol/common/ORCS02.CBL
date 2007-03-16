@@ -6966,9 +6966,10 @@
            END-IF.
       *
       *    ¸øÈñ£±¥«¥¦¥ó¥È
-           IF  (COMB-KOH1HKNNUM               NOT =   SPACE)  AND
-               (COMB-KOH1-NYUJGNKBN           =       "1"  )  AND
-               (FLG-KOUREI                    =       ZERO )            
+           IF ((COMB-KOH1HKNNUM       NOT =  SPACE           ) AND
+               (COMB-KOH1-NYUJGNKBN       =  "1"             ) AND
+               (FLG-KOUREI                =  ZERO            ))
+           OR ( FLG-IRYOHI70              =  3 OR 4 OR 5 OR 6 )
              IF  ( SYU-NYUGAIKBN              =   "1"   )
              OR  ((SYU-NYUGAIKBN              =   "2"  ) AND
                   (FLG-NYUGAI                 =    1   ))
