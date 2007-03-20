@@ -3659,6 +3659,11 @@
                    MOVE    "1"             TO
                                            LNK-S01-KOUREI-ZAITAKU-KBN
                END-IF
+      *        Ｈ１９．４から年令に関係なくすべて対象
+               IF     ( SPA-SRYYMD         >=  "20070401")
+                   MOVE    "1"             TO
+                                           LNK-S01-KOUREI-ZAITAKU-KBN
+               END-IF
            END-IF
       *    初診料算定フラグ（地方公費用）
            IF      FLG-SYOSIN-OK       =   1
