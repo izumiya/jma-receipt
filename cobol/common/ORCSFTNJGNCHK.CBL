@@ -33,7 +33,9 @@
       *  01.00.05    NACL-ÌçÏÆ    05/10/04  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  03.02.01    NACL-ÌçÏÆ    06/09/05  Ä¹´ü£¹£·£´ÂÐ±þ
       *  03.03.01    NACL-ÌçÏÆ    06/11/02  ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ±þ
-      *  03.03.02    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
+      *  03.04.01    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
+      *  03.04.02    NACL-ÌçÏÆ    07/03/22  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -637,7 +639,15 @@
                        END-IF
                        PERFORM  910-SYUNOU-READ-SEC
                    END-PERFORM
-                   EVALUATE   LNK-FTNJGNCHK-KOHNUM
+                   IF  (WRK-PREFNUM            =  11     )
+                   AND (LNK-FTNJGNCHK-KOHNUM   =
+                         "181" OR "182" OR "183" OR "281")
+                   AND (LNK-FTNJGNCHK-SRYYM   >= "200704")
+                    IF   WRK-KOHFTN   NOT = ZERO
+                           MOVE   01        TO  LNK-FTNJGNCHK-RC
+                    END-IF
+                   ELSE
+                    EVALUATE   LNK-FTNJGNCHK-KOHNUM
                      WHEN       "012"
                        IF   WRK-SEIKYU            =   ZERO
                            MOVE   01        TO  LNK-FTNJGNCHK-RC
@@ -655,7 +665,8 @@
                        IF     WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
                            MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
-                   END-EVALUATE
+                    END-EVALUATE
+                   END-IF
                END-IF
            END-IF
       *    ¼ýÇ¼¥¯¥í¡¼¥º
