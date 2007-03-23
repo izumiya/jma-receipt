@@ -175,6 +175,7 @@
       *  03.04.10    NACL-ÌçÏÆ    07/02/21  ¹â³Û¸½ÊªµëÉÕÂÐ±þ
       *  03.04.11    NACL-ÌçÏÆ    07/03/22  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
+      *  03.04.12    NACL-ÌçÏÆ    07/03/23  ËÌ³¤Æ»¾®Ã®»ÔÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12651,7 +12652,8 @@
            END-IF.
       *
            IF  (WK-1001-PREFNUM         =  01                    ) AND
-               (COMB-KOHHKNNUM(KOH-IDX) = "142" OR "143" OR "144") AND
+               (COMB-KOHHKNNUM(KOH-IDX) = "142" OR "143" OR "144"
+                                                         OR "744") AND
                (LNK-SYU-SRYYMD(1:6)    >= "200410"               )
                IF    LNK-S02-SYOSINFLG  =  SPACE
                     MOVE    SPACE   TO   COMB-KOH-NYUJGNKBN(KOH-IDX)
