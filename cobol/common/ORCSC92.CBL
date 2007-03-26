@@ -1939,7 +1939,12 @@
                   (FLG-RKAN-OK2        =   ZERO ))     OR
                  ((FLG-RKAN-OK         =   1    )  AND
                   (FLG-RKAN-OK2        =   1    ))
-               GO      TO      20054-RIHA-CHKSYORIK-EXT
+               GO      TO      20054-RIHA-CHKSYORI-EXT
+           END-IF
+      *    どちらかが慢性疼痛疾患管理料の場合、エラー
+           IF     (LNK-SC92-SRYCD      =   "113006510" OR
+                   WRK-CHK-CD          =   "113006510" )
+               GO      TO      20054-RIHA-CHKSYORI-EXT
            END-IF
       *
       *    直帰の初診算定日を決定する
@@ -2020,7 +2025,7 @@
            END-IF
       *
            .
-       20054-RIHA-CHKSYORIK-EXT.
+       20054-RIHA-CHKSYORI-EXT.
            EXIT.
       *****************************************************************
       *    算定履歴チェック処理（リハビリ）
