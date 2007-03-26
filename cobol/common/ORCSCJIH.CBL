@@ -73,7 +73,7 @@
       *
            03  WRK-ZEIKIN-9        PIC 9(08)V9(5).
            03  WRK-ZEIKIN          PIC 9(08).
-           03  WRK-TANKA           PIC 9(08).
+           03  WRK-TANKA           PIC 9(08)V99.
            03  WRK-KISOTEN         PIC 9(08)V99.
            03  WRK-TAX-HASU-KBN    PIC X(01).
       *
