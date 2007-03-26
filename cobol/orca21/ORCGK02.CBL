@@ -9090,6 +9090,7 @@
       *    当月診療行為チェック用編集、当月累計点数計算
            MOVE    ZERO                TO  SPA-ZAITENTOTAL
            INITIALIZE                      SPA-NAIACCT2-AREA
+           INITIALIZE                      SPA-RIGAKU-NCNT-AREA
            MOVE    SPACE               TO  SPA-ACCT2-SRYCD
            MOVE    ZERO                TO  SPA-ACCT2-ZAINUM
            MOVE    ZERO                TO  SPA-ACCT2-CSYYOURYO

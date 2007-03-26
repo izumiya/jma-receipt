@@ -26,6 +26,7 @@
       *                                     介達牽引追加
       *                                     言語視覚療法３追加
       *  01.00.03    NACL-多々納  04/12/02  急性発生日追加
+      *  03.03.01    NACL-多々納  07/03/XX  医学管理料追加
       *****************************************************************
       *
       *    算定履歴保険番号毎のコード
@@ -127,17 +128,28 @@
            03  FILLER              PIC X(12)   VALUE   "   099800161".
            03  FILLER              PIC X(12)   VALUE   "   099800171".
       *
+      *リハビリ医学管理料追加（Ｈ１９／４から）
+           03  FILLER              PIC X(12)   VALUE   "  S180029910".
+           03  FILLER              PIC X(12)   VALUE   "  S180030010".
+           03  FILLER              PIC X(12)   VALUE   "  S180030110".
+           03  FILLER              PIC X(12)   VALUE   "  S180030210".
+           03  FILLER              PIC X(12)   VALUE   "  S180030310".
+           03  FILLER              PIC X(12)   VALUE   "  S180030410".
+           03  FILLER              PIC X(12)   VALUE   "  S180030510".
+           03  FILLER              PIC X(12)   VALUE   "  S180030610".
+      *
        01  TBL-SANTEI-AREA-R       REDEFINES   TBL-SANTEI-AREA.
       **** 03  TBL-SANTEI-OCC      OCCURS   39  INDEXED   TBL-SAN.
       *****03  TBL-SANTEI-OCC      OCCURS   41  INDEXED   TBL-SAN.
-           03  TBL-SANTEI-OCC      OCCURS   57  INDEXED   TBL-SAN.
+      **** 03  TBL-SANTEI-OCC      OCCURS   57  INDEXED   TBL-SAN.
+           03  TBL-SANTEI-OCC      OCCURS   65  INDEXED   TBL-SAN.
       *        リハビリ（K:個別、S:集団）(H:Ｈ１８．４から）
                05  TBL-RIGAKU-RYO      PIC X(01).
       *        リハビリ（R:理学,S:作業, G:言語)
       *        消炎鎮痛処置(M:マッサージ等,K:器具等、P:湿布
       *                     T:介達牽引、E:その他)
                05  TBL-RIGAKU-KBN      PIC X(01).
-      *        (R:労災毎１回)
+      *        (R:労災毎１回),(S:リハビリ医学管理料)
                05  TBL-RSI-KBN         PIC X(01).
       *
                05  TBL-SANTEI-SRYCD    PIC X(09).

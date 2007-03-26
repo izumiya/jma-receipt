@@ -25,23 +25,37 @@
       *    ¥ê¥Ï¥Ó¥ê¤Î¥³¡¼¥É
        01  TBL-RIHABIRI-AREA.
       *    ¿´·ì´É¼ÀÉÂ¥ê¥Ï¥Ó¥ê
-           03  FILLER              PIC X(12)   VALUE   "1  180027410".
-           03  FILLER              PIC X(12)   VALUE   "1  180027510".
+           03  FILLER              PIC X(13)   VALUE   "1 1 180027410".
+           03  FILLER              PIC X(13)   VALUE   "1 2 180027510".
+      *    ¿´·ì´É¼ÀÉÂ¥ê¥Ï¥Ó¥ê¡Ê£±£²£°Ä¶¡Ë
+           03  FILLER              PIC X(13)   VALUE   "121 180029110".
+           03  FILLER              PIC X(13)   VALUE   "122 180029210".
       *    Ç¾·ì´É¼ÀÉÂ¥ê¥Ï¥Ó¥ê
-           03  FILLER              PIC X(12)   VALUE   "2  180027610".
-           03  FILLER              PIC X(12)   VALUE   "2  180027710".
+           03  FILLER              PIC X(13)   VALUE   "2 1 180027610".
+           03  FILLER              PIC X(13)   VALUE   "2 2 180027710".
+      *    Ç¾·ì´É¼ÀÉÂ¥ê¥Ï¥Ó¥ê¡Ê£±£´£°Ä¶¡Ë
+           03  FILLER              PIC X(13)   VALUE   "221 180029310".
+           03  FILLER              PIC X(13)   VALUE   "222 180029410".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê
-           03  FILLER              PIC X(12)   VALUE   "3  180027810".
-           03  FILLER              PIC X(12)   VALUE   "3  180027910".
+           03  FILLER              PIC X(13)   VALUE   "3 1 180027810".
+           03  FILLER              PIC X(13)   VALUE   "3 2 180027910".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¡Ê£±£²£°Ä¶¡Ë
+           03  FILLER              PIC X(13)   VALUE   "321 180029510".
+           03  FILLER              PIC X(13)   VALUE   "322 180029610".
       *    ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê
-           03  FILLER              PIC X(12)   VALUE   "4  180028010".
-           03  FILLER              PIC X(12)   VALUE   "4  180028110".
+           03  FILLER              PIC X(13)   VALUE   "4 1 180028010".
+           03  FILLER              PIC X(13)   VALUE   "4 2 180028110".
+      *    ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¡Ê£¸£°Ä¶¡Ë
+           03  FILLER              PIC X(13)   VALUE   "421 180029710".
+           03  FILLER              PIC X(13)   VALUE   "422 180029810".
       *
        01  TBL-RIHABIRI-AREA-R     REDEFINES   TBL-RIHABIRI-AREA.
-           03  TBL-RIHABIRI-OCC    OCCURS   8   INDEXED   TBL-RIH.
+           03  TBL-RIHABIRI-OCC    OCCURS   16   INDEXED   TBL-RIH.
       *        ¥ê¥Ï¥Ó¥ê¼ïÎà
                05  TBL-RIHA-KBN        PIC X(01).
-               05  TBL-RIHA-YOBO       PIC X(02).
+               05  TBL-RIHA-GEN        PIC X(01).
+               05  TBL-RIHA-KBN2       PIC X(01).
+               05  TBL-RIHA-YOBO       PIC X(01).
                05  TBL-RIHA-SRYCD      PIC X(09).
       *
        01  FLG-RIHA-OK                 PIC 9(01).

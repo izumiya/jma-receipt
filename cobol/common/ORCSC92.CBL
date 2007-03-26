@@ -55,6 +55,7 @@
       *  02.00.15    NACL-多々納  06/01/23  用量割合コード追加
       *  02.00.16    NACL-多々納  06/03/06  経過措置対応、入力値設定他
       *  03.03.00    NACL-多々納  06/10/20  矯正固定等追加
+      *  03.03.02    NACL-多々納  07/03/XX  リハビリ医学管理料追加(H19.4改正）
       *****************************************************************
       *
       *
@@ -99,6 +100,11 @@
            03  FLG-MANSEI-CHK          PIC 9(01).
       *
            03  FLG-KONKAI              PIC 9(01).
+      *
+           03  FLG-RKAN-OK             PIC 9(01).
+           03  FLG-RKAN-OK2            PIC 9(01).
+           03  FLG-RKAN-ARI            PIC 9(01).
+           03  FLG-RKAN-ARI2           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -161,11 +167,17 @@
            03  WRK-SRYKAMEI        PIC X(20).
       *
            03  WRK-SRYCD               PIC X(09).
+           03  WRK-SRYCD2              PIC X(09).
+           03  WRK-SRYCD-3             PIC X(09).
       *
            03  WRK-SYOSINYMD1          PIC X(08).
            03  WRK-YMD.
                05  WRK-YYMM            PIC X(06).
                05  WRK-DD              PIC 9(02).
+           03  WRK-YMD2.
+               05  WRK-YYMM2           PIC X(06).
+               05  WRK-DD2             PIC 9(02).
+           03  WRK-FSANTEIYMD          PIC X(08).
       *
            03  WRK-CHK-CD              PIC X(09).
            03  WRK-CHK-CD2             PIC X(09).
@@ -226,8 +238,26 @@
        01  TBL-SUJI-R          REDEFINES   TBL-SUJI-AREA.
            03  TBL-SUJI        PIC X(02)   OCCURS   10.
       *
+      *    リハビリ医学管理料テーブル
+       01  TBL-RIHA-KANRI-AREA.
+      *    リハビリ医学管理料
+           03  FILLER              PIC X(09)   VALUE   "180029910".
+           03  FILLER              PIC X(09)   VALUE   "180030010".
+           03  FILLER              PIC X(09)   VALUE   "180030110".
+           03  FILLER              PIC X(09)   VALUE   "180030210".
+           03  FILLER              PIC X(09)   VALUE   "180030310".
+           03  FILLER              PIC X(09)   VALUE   "180030410".
+           03  FILLER              PIC X(09)   VALUE   "180030510".
+           03  FILLER              PIC X(09)   VALUE   "180030610".
+       01  TBL-RIHA-KANRI-AREA-R   REDEFINES   TBL-RIHA-KANRI-AREA.
+           03  TBL-RIHA-KANRI-OCC      OCCURS   8
+                                                INDEXED   TBL-RKA.
+               05  TBL-RIHA-KAN-SRYCD      PIC X(09).
+      *
       *    保険別算定履歴テーブル
            COPY   "CMSANTEITBL.INC".
+      *    リハビリ同一算定コードテーブル
+           COPY   "CMRIHACDTBL.INC".
       *
       *    酸素コードテーブル
            COPY     "CMSANSOTBL.INC".
@@ -1490,6 +1520,15 @@
                    PERFORM 20053-MANSEI-CHK-SEC
                END-IF
            END-IF
+      *@   リハビリテーション管理料チェック
+           IF     (LNK-SC92-ERRCD6 NOT =   SPACE      )  AND
+                  (SPA-SRYYMD          >=  "20070401" )
+      *        今回入力時エラーはそのまま
+               IF      FLG-KONKAI          =   ZERO
+                   PERFORM 20054-RIHA-CHKSYORI-SEC
+               END-IF
+           END-IF
+      *@
       *
            .
        2005-HEIYOU-CHK-EXT.
@@ -1873,6 +1912,271 @@
            .
        20055-NYUIN-MANSEI-CHK-EXT.
            EXIT.
+      *****************************************************************
+      *    リハビリ管理料のチェック処理
+      *****************************************************************
+       20054-RIHA-CHKSYORI-SEC        SECTION.
+      *
+           SET     TBL-RKA             TO  1
+           SEARCH  TBL-RIHA-KANRI-OCC  VARYING   TBL-RKA
+                   AT  END
+                       MOVE    ZERO            TO  FLG-RKAN-OK
+                   WHEN   (LNK-SC92-SRYCD      =   TBL-RIHA-KAN-SRYCD
+                                                           (TBL-RKA))
+                       MOVE    1               TO  FLG-RKAN-OK
+           END-SEARCH
+      *
+           SET     TBL-RKA             TO  1
+           SEARCH  TBL-RIHA-KANRI-OCC  VARYING   TBL-RKA
+                   AT  END
+                       MOVE    ZERO            TO  FLG-RKAN-OK2
+                   WHEN   (WRK-CHK-CD          =   TBL-RIHA-KAN-SRYCD
+                                                          (TBL-RKA))
+                       MOVE    1               TO  FLG-RKAN-OK2
+           END-SEARCH
+      *    両方ともにリハビリ管理料の場合、エラー
+           IF    ((FLG-RKAN-OK         =   ZERO )  AND
+                  (FLG-RKAN-OK2        =   ZERO ))     OR
+                 ((FLG-RKAN-OK         =   1    )  AND
+                  (FLG-RKAN-OK2        =   1    ))
+               GO      TO      20054-RIHA-CHKSYORIK-EXT
+           END-IF
+      *
+      *    直帰の初診算定日を決定する
+           PERFORM 200531-SYOSIN-SANTEI-SEC
+      *
+      *    直帰のリハビリ管理料算定日
+           IF      FLG-RKAN-OK         =   1
+               MOVE    LNK-SC92-SRYCD      TO  WRK-SRYCD
+               MOVE    WRK-CHK-CD          TO  WRK-SRYCD2
+           ELSE
+               MOVE    WRK-CHK-CD          TO  WRK-SRYCD
+               MOVE    LNK-SC92-SRYCD      TO  WRK-SRYCD2
+           END-IF
+           MOVE    SPACE               TO  WRK-FSANTEIYMD
+      *    入力が医学管理料の時、算定履歴検索
+           IF      LNK-SC92-SRYCD      =   WRK-SRYCD
+               PERFORM 2005332-SANTEI-CHK-SEC
+           ELSE
+      *        今月の算定有無
+               PERFORM 200543-KANRICHK-SEC
+           END-IF
+      *    訂正の時、訂正日が初回の場合
+           IF      LNK-SC92-SYORIFLG   =   1
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   100 )  OR
+                                  (LNK-SC92-TEI-SRYCD (IDX)  =   SPACE)
+                   IF      LNK-SC92-TEI-SRYCD (IDX)    =   WRK-SRYCD
+                       IF      WRK-FSANTEIYMD      =   SPA-SRYYMD
+                           MOVE    SPACE           TO  WRK-FSANTEIYMD
+                           MOVE    SPACE           TO  WRK-YMD
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+           PERFORM 200541-RIHASANTEI-CHK-SEC
+      *    今回入力でないこと
+           MOVE    ZERO                TO  FLG-RKAN-ARI
+           MOVE    ZERO                TO  FLG-RKAN-ARI2
+           IF      LNK-SC92-SRYCD  NOT =   WRK-SRYCD
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   200  )  OR
+                                 ((SPA-GMN-INPUTCD (IDX)
+                                               =   SPACE ) AND
+                                  (SPA-COM-INPUTCD (IDX)
+                                               =   SPACE ))
+                  IF      SPA-COM-INPUTCD(IDX)     =   WRK-SRYCD
+                       MOVE    1                   TO  FLG-RKAN-ARI
+                   END-IF
+                   IF      SPA-COM-INPUTCD(IDX)     =   WRK-SRYCD2
+                       MOVE    1                   TO  FLG-RKAN-ARI2
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    初回リハビリ管理料がない時ＯＫ
+           IF     (WRK-YMD             =   SPACE  )  AND
+                  (FLG-RKAN-ARI        =   ZERO   )
+               MOVE    SPACE           TO  LNK-SC92-ERRCD6
+               MOVE    SPACE           TO  LNK-SC92-ERRMSG
+           END-IF
+      *    訂正の時、当日ならＯＫとする
+           IF      LNK-SC92-SYORIFLG   =   1
+               IF     (WRK-YMD             =   SPA-SRYYMD  )  AND
+                      (FLG-RKAN-ARI        =   ZERO   )  AND
+                      (FLG-RKAN-ARI2       =   ZERO   )
+                   MOVE    SPACE           TO  LNK-SC92-ERRCD6
+                   MOVE    SPACE           TO  LNK-SC92-ERRMSG
+               END-IF
+           END-IF
+      *
+      *    初診算定日が前回の算定日より後の時、算定ができること
+           IF    ((WRK-YMD             =   SPACE  )  OR
+                  (WRK-SYOSINYMD1      >   WRK-YMD))
+              AND (FLG-RKAN-ARI        =   ZERO   )
+              AND (FLG-RKAN-ARI2       =   ZERO   )
+               MOVE    SPACE           TO  LNK-SC92-ERRCD6
+               MOVE    SPACE           TO  LNK-SC92-ERRMSG
+           END-IF
+      *
+           .
+       20054-RIHA-CHKSYORIK-EXT.
+           EXIT.
+      *****************************************************************
+      *    算定履歴チェック処理（リハビリ）
+      *****************************************************************
+       200543-KANRICHK-SEC                SECTION.
+      *
+      *    保険毎のコードの判定
+           SET     TBL-SAN             TO  1
+           SEARCH  TBL-SANTEI-OCC      VARYING   TBL-SAN
+               AT  END
+                   MOVE    ZERO            TO  FLG-HKNSAN
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-SRYCD           =   TBL-SANTEI-SRYCD
+                                                          (TBL-SAN)
+                   MOVE    1               TO  FLG-HKNSAN
+                   MOVE    TBL-RSI-KBN    (TBL-SAN)
+                                           TO  WRK-RSI-KBN
+      *            Ｈ１８／４月から対応
+                   IF      TBL-RIGAKU-RYO(TBL-SAN) =   "H"
+                       IF      SPA-SRYYMD      >=  "20060401"
+                           MOVE    ZERO            TO  FLG-HKNSAN
+                           MOVE    SPACE           TO  WRK-RSI-KBN
+                       END-IF
+                   END-IF
+           END-SEARCH
+      *
+           INITIALIZE                  SANTEI-REC
+           MOVE    ZERO                TO  FLG-SANTEI-OK
+           PERFORM VARYING     IDX2    FROM    1   BY   1
+                   UNTIL      (IDX2    >   IDX-TBL )  OR
+                              (FLG-SANTEI-OK   =   1  )
+               IF      WRK-SRYCD       =   TBLW-SANTEI-SRYCD(IDX2)
+      *            対象の算定履歴判定
+                   MOVE    TBLW-SANTEI-REC(IDX2)   TO  SANTEI-REC
+                   PERFORM 200511-SANTEI-CHK-SEC
+               END-IF
+           END-PERFORM
+           IF      FLG-SANTEI-OK       =   ZERO
+               INITIALIZE                  SANTEI-REC
+           END-IF
+           IF      SANTEI-MSANTEICNT   >   ZERO
+               PERFORM VARYING     IDX-Y2  FROM    1  BY  1
+                       UNTIL       IDX-Y2      >   31
+                   IF      SANTEI-DAY (IDX-Y2) >   ZERO
+                       MOVE    IDX-Y2          TO  WRK-DD
+                       MOVE    31              TO  IDX-Y2
+                   END-IF
+               END-PERFORM
+               MOVE    SANTEI-SRYYM        TO  WRK-YYMM
+      *        初回リハビリ管理料の時、診療日より後の時なしとする
+               IF    ((FLG-RKAN-OK         =   1  )  OR
+                      (FLG-RKAN-OK2        =   1  ))  AND
+                      (SANTEI-FSANTEIYMD(1:6)
+                                           =   SANTEI-SRYYM ) AND
+                       (SPA-SRYYMD(1:6)    =   SANTEI-SRYYM ) AND
+                       (SPA-SRYYMD(7:2)    <   SANTEI-MSANTEID)
+                   MOVE    SPACE               TO  WRK-YMD
+               END-IF
+               IF    ((FLG-RKAN-OK         =   1  )  OR
+                      (FLG-RKAN-OK2        =   1  ))
+                   MOVE    SANTEI-FSANTEIYMD   TO  WRK-FSANTEIYMD
+               END-IF
+           END-IF
+      *
+           .
+       200543-KANRICHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    算定履歴チェック処理（リハビリ）
+      *****************************************************************
+       200541-RIHASANTEI-CHK-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-YMD2
+      *
+      *    保険毎のコードの判定
+           SET     TBL-SAN             TO  1
+           SEARCH  TBL-SANTEI-OCC      VARYING   TBL-SAN
+               AT  END
+                   MOVE    ZERO            TO  FLG-HKNSAN
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-SRYCD2          =   TBL-SANTEI-SRYCD
+                                                          (TBL-SAN)
+                   MOVE    1               TO  FLG-HKNSAN
+                   MOVE    TBL-RSI-KBN    (TBL-SAN)
+                                           TO  WRK-RSI-KBN
+      *            Ｈ１８／４月から対応
+                   IF      TBL-RIGAKU-RYO(TBL-SAN) =   "H"
+                       IF      SPA-SRYYMD      >=  "20060401"
+                           MOVE    ZERO            TO  FLG-HKNSAN
+                           MOVE    SPACE           TO  WRK-RSI-KBN
+                       END-IF
+                   END-IF
+           END-SEARCH
+      *
+           INITIALIZE                  SANTEI-REC
+           MOVE    ZERO                TO  FLG-SANTEI-OK
+           PERFORM VARYING     IDX2    FROM    1   BY   1
+                   UNTIL      (IDX2    >   IDX-TBL )  OR
+                              (FLG-SANTEI-OK   =   1  )
+               IF      WRK-SRYCD2          =   TBLW-SANTEI-SRYCD(IDX2)
+      *            対象の算定履歴判定
+                   MOVE    TBLW-SANTEI-REC(IDX2)   TO  SANTEI-REC
+                   PERFORM 200511-SANTEI-CHK-SEC
+               END-IF
+           END-PERFORM
+           IF      FLG-SANTEI-OK       =   ZERO
+               INITIALIZE                  SANTEI-REC
+           END-IF
+      *
+      *    訂正の時、訂正分はカウントしない
+           IF      LNK-SC92-SYORIFLG   =   1
+               MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+               IF     (SANTEI-SRYYM        =   SPA-SRYYMD(1:6)) AND
+                      (SANTEI-DAY (IDX-Y2) >   ZERO ) 
+                   MOVE    ZERO            TO  SANTEI-DAY (IDX-Y2)
+               END-IF
+           END-IF
+           IF      SANTEI-MSANTEICNT   >   ZERO
+               PERFORM VARYING     IDX-Y2  FROM    1  BY  1
+                       UNTIL       IDX-Y2      >   31
+                   IF      SANTEI-DAY (IDX-Y2) >   ZERO
+                       MOVE    IDX-Y2          TO  WRK-DD2
+                   END-IF
+               END-PERFORM
+               IF      WRK-DD2         NOT =   SPACE
+                   MOVE    SANTEI-SRYYM        TO  WRK-YYMM2
+               END-IF
+      *        初回リハビリ管理料より前の時なしとする
+               IF     (WRK-FSANTEIYMD  NOT =   SPACE )  AND
+                      (WRK-YMD2            <   WRK-FSANTEIYMD)
+                   IF      LNK-SC92-SRYCD  =   WRK-SRYCD
+                       MOVE    SPACE           TO  WRK-YMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+      *
+       200541-RIHASANTEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     リハビリ料チェック処理
+      *****************************************************************
+       200542-RIHA-HENKAN-SEC        SECTION.
+      *
+           SET     TBL-RIH             TO  1
+           SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
+                   AT  END
+                       MOVE    ZERO            TO  FLG-RIHA-OK
+                   WHEN    WRK-SRYCD-3     =   TBL-RIHA-SRYCD(TBL-RIH)
+                       MOVE    1               TO  FLG-RIHA-OK
+           END-SEARCH
+           .
+       200542-RIHA-HENKAN-EXT.
+           EXIT.
       *
       *****************************************************************
       *     在宅寝たきり患者処置指導管理料のチェック処理
@@ -2092,6 +2396,19 @@
                           (SPA-SRYYMD(1:6) =   SANTEI-SRYYM ) AND
                           (SPA-SRYYMD(7:2) <   SANTEI-MSANTEID)
                    MOVE    SPACE               TO  WRK-YMD
+               END-IF
+      *        初回リハビリ管理料の時、診療日より後の時なしとする
+               IF    ((FLG-RKAN-OK         =   1  )  OR
+                      (FLG-RKAN-OK2        =   1  )) AND
+                      (SANTEI-FSANTEIYMD(1:6)
+                                           =   SANTEI-SRYYM ) AND
+                       (SPA-SRYYMD(1:6)    =   SANTEI-SRYYM ) AND
+                       (SPA-SRYYMD(7:2)    <   SANTEI-MSANTEID)
+                   MOVE    SPACE               TO  WRK-YMD
+               END-IF
+               IF    ((FLG-RKAN-OK         =   1  )  OR
+                      (FLG-RKAN-OK2        =   1  ))
+                   MOVE    SANTEI-FSANTEIYMD   TO  WRK-FSANTEIYMD
                END-IF
            END-IF
       *

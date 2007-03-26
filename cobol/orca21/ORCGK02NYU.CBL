@@ -5480,6 +5480,7 @@
       *                    訂正時展開以外
                        AND    (FLG-INIT            =   ZERO   )
                            MOVE    SPACE       TO  SPA-COM-KZMFLG(IDX)
+                           MOVE    SPACE       TO  SPA-COM-CHKFLG(IDX)
                        END-IF
                        MOVE    WRK-KAISU       TO  SPA-COM-KAISU (IDX)
                        MOVE    WRK-NYUIN-AREA  TO  SPA-COM-NYUIN-AREA
@@ -5822,7 +5823,8 @@
                    END-IF
                    MOVE    LNK-SC91-ERRMSG     TO  SPA-ERRMSG2
       *
-                   IF      SPA-ERRCD           =   SPACE
+                   IF     (SPA-ERRCD           =   SPACE  )  AND
+                          (SPA-COM-CHKFLG (IDX)   =   SPACE)
       *                併用算定チェック
       *                点数マスタ編集・基本チェック
                        INITIALIZE                  ORCSC92AREA
@@ -5850,11 +5852,14 @@
                            MOVE    LNK-SC92-ERRCD(6)   TO  SPA-ERRCD
                            MOVE    LNK-SC92-ERRMSG     TO  SPA-ERRMSG2
                        END-IF
+                       MOVE    SPACE           TO  SPA-COM-CHKFLG (IDX)
                    END-IF
                END-IF
            END-PERFORM
       *
-           IF      SPA-ERRCD       NOT =   SPACE
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    "1"                 TO  SPA-COM-CHKFLG (IDX)
+           ELSE
                MOVE    "1"                 TO  SPA-COM-CUR (IDX)
            END-IF
       *
@@ -7368,6 +7373,8 @@
                                            TO  SPA-GMN-SRYYMD
            END-IF
       *
+           INITIALIZE                      SPA-NAIACCT2-AREA
+           INITIALIZE                      SPA-RIGAKU-NCNT-AREA
       *    当月診療行為チェック用編集、当月累計点数計算
       *****PERFORM 3201-TOUCHKSET-SEC
       *    点滴の変更

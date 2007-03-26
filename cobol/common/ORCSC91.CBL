@@ -418,6 +418,10 @@
                MOVE    1                   TO  FLG-HKN-SANTEI
            END-IF
       *
+           IF      WRK-RSI-KBN         =   "S"
+               MOVE    SPACE               TO  WRK-RSI-KBN
+           END-IF
+      *
            .
        1000-SANTEI-CHK-EXT.
            EXIT.

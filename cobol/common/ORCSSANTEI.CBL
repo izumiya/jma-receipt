@@ -29,6 +29,7 @@
       *  01.00.03    NACL-多々納  05.03.05  内分泌負荷試験点数の追加
       *  01.00.04    NACL-多々納  05/11/18  MONFUNC 対応 他
       *  03.03.00    NACL-多々納  06/10/20  矯正固定等追加
+      *  03.03.01    NACL-多々納  07/03/XX  リハビリ管理料追加（H19.4改正）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -56,6 +57,8 @@
       *
            03  FLG-NAIBUN-ADD      PIC 9(01).
            03  FLG-NAIBUN-DEL      PIC 9(01).
+      *
+           03  FLG-RKAN-OK         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -344,6 +347,19 @@
            END-IF
       *    慢性疼痛疾患管理料の時、初診料算定日から初回算定日を始める
            IF     (WRK-MAE-SRYCD       =   WRK-MANSEI ) 
+               PERFORM 1009-MANSE-CHK-SEC
+           END-IF
+      *    リハビリ医学管理料の時、慢性疼痛と同様の処理とする
+           SET     TBL-SAN             TO  1
+           SEARCH  TBL-SANTEI-OCC      VARYING   TBL-SAN
+               AT  END
+                       MOVE    ZERO            TO  FLG-RKAN-OK
+               WHEN   (SSANTEI-SRYCD   =   TBL-SANTEI-SRYCD
+                                                          (TBL-SAN))
+                  AND (TBL-RSI-KBN (TBL-SAN)   =   "S"   )
+                       MOVE    1               TO  FLG-RKAN-OK
+           END-SEARCH
+           IF      FLG-RKAN-OK         =   1
                PERFORM 1009-MANSE-CHK-SEC
            END-IF
       *

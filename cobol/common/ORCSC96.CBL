@@ -823,10 +823,11 @@
                    MOVE    "日付−日付の期間が違います。"
                                        TO  SPA-ERRMSG
                WHEN    "9014"
-                   MOVE    "消炎鎮痛等処理などは逓減になります。"
-                                       TO  SPA-ERRMSG
-                   MOVE    "分けて入力して下さい。"
-                                       TO  SPA-ERRMSG(31:)
+                   STRING  "消炎鎮痛等処理などは逓減になります。"
+                           "分けて入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "9015"
                    MOVE    "点滴手技料の算定できない液量です。"
                                        TO  SPA-ERRMSG
@@ -1150,6 +1151,13 @@
                    STRING  "救急医療管理加算は入院日から７日間のみ"
                                                DELIMITED  BY  SIZE
                            "算定可能です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8043"
+                   STRING  "リハビリテーション料は逓減になります。"
+                                               DELIMITED  BY  SIZE
+                       "逓減を分けて入力して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
