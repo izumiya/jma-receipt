@@ -91,6 +91,7 @@
       *  03.01.01    NACL-門脇    06/06/28  実日数減算コード対応
       *  03.01.02    NACL-門脇    06/07/10  在支援コメント自動記載対応
       *  03.01.03    NACL-門脇    06/07/14  診療区分置き換えフラグの編集
+      *  03.03.01    NACL-門脇    07/03/23  月途中医療機関コード変更時対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -627,10 +628,12 @@
            03  FILLER          PIC X(09)   VALUE   "099800171".
       *    実日数減算
            03  FILLER          PIC X(09)   VALUE   "099409903".
+      *    在医総・在医総管（ＤＵＭＭＹ）
+           03  FILLER          PIC X(09)   VALUE   "099140003".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   36.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   37.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   36.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   37.
       *
       *    固定値
        01  CONST-AREA.

@@ -156,6 +156,7 @@
       *  03.03.02    NACL-藤原    06/09/19  月途中での氏名変更対応
       *  03.03.03    NACL-藤原    06/12/13  公費分で種別が設定できなかっ
       *                                     たときの対応
+      *  03.03.04    NACL-門脇    07/03/23  月途中医療機関コード変更時対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -520,11 +521,13 @@
            03  FILLER          PIC X(09)   VALUE   "114012410".
       *    在宅時医学総合管理料２（院外処方せん）
            03  FILLER          PIC X(09)   VALUE   "114007510".
+      *    在医総・在医総管（ＤＵＭＭＹ）
+           03  FILLER          PIC X(09)   VALUE   "099140003".
       *
        01  TBL-ZAITAKU2-R      REDEFINES   TBL-ZAITAKU2-AREA.
-            03  TBL-ZAITAKU2   PIC X(09)   OCCURS   6.
+            03  TBL-ZAITAKU2   PIC X(09)   OCCURS   7.
       *
-       01  TBL-ZAITAKU2-MAX    PIC 9(02)   VALUE    6.
+       01  TBL-ZAITAKU2-MAX    PIC 9(02)   VALUE    7.
       *
            COPY    "MCPAREA".
       *
@@ -2257,10 +2260,16 @@
                            MOVE    "SRYACCT-KEY31"  TO  ORC-DBPATH 
                            PERFORM   SRYACCT-READ-SEC
                            IF      FLG-SRYACCT  =       ZERO
+                             IF TBL-ZAITAKU2(IDX3)  = "099140003"
+                               IF  (ACCT-ZAIKAISU NOT =  ZERO)
+                                   MOVE    "1" TO   WRK-ZAITAKU
+                               END-IF
+                             ELSE
                                IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
                                    (ACCT-ZAIKAISU NOT =  ZERO)
                                    MOVE    "1" TO   WRK-ZAITAKU
                                END-IF
+                             END-IF
                            END-IF
                        END-IF
       *
