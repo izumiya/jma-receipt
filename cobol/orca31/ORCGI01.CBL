@@ -1420,7 +1420,7 @@
            MOVE    SYSKANRI-REC    TO  MCPDATA-REC
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key9"          TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
@@ -1436,13 +1436,13 @@
                            TO  SPA-GMN-I01-DRMEIL(IDX1)
       *
                MOVE    "tbl_syskanri"  TO  MCP-TABLE
-               MOVE    "key"           TO  MCP-PATHNAME
+               MOVE    "key9"          TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
       *
            END-PERFORM
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key9"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
