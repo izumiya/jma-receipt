@@ -4308,10 +4308,19 @@
                           MOVE   10000   TO   MAX-KIN-SYU-M
                       END-IF
                  ELSE
-                  IF  (COMB-KOH1HKNNUM(1:1) = "0")
-                  OR  (COMB-KOH2HKNNUM(1:1) = "0")
-                  OR  (COMB-KOH3HKNNUM(1:1) = "0")
-                  OR  (COMB-KOH4HKNNUM(1:1) = "0")
+                  IF  ( COMB-KOH1HKNNUM  =   "974" )
+                  OR  ( COMB-KOH2HKNNUM  =   "974" )
+                  OR  ( COMB-KOH3HKNNUM  =   "974" )
+                  OR  ( COMB-KOH4HKNNUM  =   "974" )
+      ***             MOVE    "1"    TO   FLG-SYUHEN
+                      IF   MAX-KIN-SYU-M   >  20000
+                          MOVE   20000   TO   MAX-KIN-SYU-M
+                      END-IF
+                  ELSE
+                    IF  (COMB-KOH1HKNNUM(1:1) = "0")
+                    OR  (COMB-KOH2HKNNUM(1:1) = "0")
+                    OR  (COMB-KOH3HKNNUM(1:1) = "0")
+                    OR  (COMB-KOH4HKNNUM(1:1) = "0")
       ***             MOVE    "1"        TO   FLG-SYUHEN
                       IF  FLG-KOHYONKAIME = 1
                         MOVE   44400       TO   MAX-KIN-SYU-M
@@ -4319,15 +4328,6 @@
                         MOVE   80100       TO   MAX-KIN-SYU-M
                         MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI70
                         MOVE   6           TO   FLG-IRYOHI70
-                      END-IF
-                  ELSE
-                    IF  (COMB-KOH1HKNNUM = "974")
-                    OR  (COMB-KOH2HKNNUM = "974")
-                    OR  (COMB-KOH3HKNNUM = "974")
-                    OR  (COMB-KOH4HKNNUM = "974")
-      ***             MOVE    "1"    TO   FLG-SYUHEN
-                      IF   MAX-KIN-SYU-M   >  20000
-                          MOVE   20000   TO   MAX-KIN-SYU-M
                       END-IF
                     END-IF
                   END-IF
