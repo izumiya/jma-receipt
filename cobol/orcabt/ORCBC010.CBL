@@ -142,7 +142,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20061001".
+       01  PRGSKBNO                PIC X(08)  VALUE "20070326".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
@@ -1174,16 +1174,6 @@
       *        診療会計編集処理
                PERFORM 20012-NYUIN-SRYACCT-HENSYU-SEC
       *
-      *        実日数編集
-               PERFORM   20012-JNISSU-SET-SEC
-               PERFORM   20013-TOTALTENSU-SET-SEC
-               INITIALIZE                  TBL-JNISSU
-               INITIALIZE                  TBL-JNISSU-GEN
-               INITIALIZE                  TBL-TOTALTENSU-INF
-               INITIALIZE                  TBL-SKJNISSU-INF
-               INITIALIZE                  TBL-SKJRYOYOHI-INF
-               INITIALIZE                  TBL-SKJFTN-INF
-      *
       *        基本ファイル出力処理
                PERFORM 2002-KIHON-WRITE-SEC
            END-IF
@@ -1612,6 +1602,15 @@
                        PERFORM 900-SRYACCT-READ-SEC
                    END-IF
                END-PERFORM
+      *        実日数編集
+               PERFORM   20012-JNISSU-SET-SEC
+               PERFORM   20013-TOTALTENSU-SET-SEC
+               INITIALIZE                  TBL-JNISSU
+               INITIALIZE                  TBL-JNISSU-GEN
+               INITIALIZE                  TBL-TOTALTENSU-INF
+               INITIALIZE                  TBL-SKJNISSU-INF
+               INITIALIZE                  TBL-SKJRYOYOHI-INF
+               INITIALIZE                  TBL-SKJFTN-INF
            END-PERFORM
       *
            MOVE    "tbl_sryacct"      TO  MCP-TABLE
