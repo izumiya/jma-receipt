@@ -570,7 +570,13 @@
                PERFORM 10091-SRYKARRK-CHK-SEC
                IF     (WRK-SYOSINYMD       =   SPACE )  OR
                       (WRK-SYOSINYMD       >   WRK-FSANTEIYMD)
-                   MOVE    SSANTEI-SRYYMD      TO  WRK-FSANTEIYMD
+                   IF     (SSANTEI-NYUGAIKBN   =   "1"   ) AND
+                          (WRK-SYOSINYMD       =   SPACE ) AND
+                          (WRK-FSANTEIYMD  NOT =   SPACE )
+                       CONTINUE
+                   ELSE
+                       MOVE    SSANTEI-SRYYMD      TO  WRK-FSANTEIYMD
+                   END-IF
                END-IF
                MOVE    WRK-SYOSINYMD       TO  WRK-SYOSINYMD-1
            ELSE
