@@ -4802,8 +4802,13 @@
       *
       *    剤内に入院回数がある時、併用算定と算定チェックをしない
       **** IF      SPA-COM-NYU-KAI  (SPA-GMN-IDX)
-      ***                          NOT =   ZERO
+      ****                         NOT =   ZERO
            IF      SPA-SYORIFLG        =   ZERO
+               IF      (LNK-SC92-ERRCD(3)  NOT =   SPACE )
+                   OR  (LNK-SC92-ERRCD(6)  NOT =   SPACE )
+                   MOVE    SPACE           TO  SPA-COM-CHKFLG
+                                                 (SPA-GMN-IDX)
+               END-IF
                MOVE    SPACE           TO  LNK-SC92-ERRCD(3)
                MOVE    SPACE           TO  LNK-SC92-ERRCD(6)
            END-IF
@@ -5505,11 +5510,13 @@
            END-PERFORM
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   WRK-GYO-MAX
+                   UNTIL      (IDX     >   WRK-GYO-MAX )
+                          OR  (SPA-ERRCD   NOT =   SPACE )
       *        入院日数がある時回数のチェック
                IF     (SPA-COM-SANTEIRRKKBN (IDX)
-                                           NOT =   ZERO  )  AND
-                      (SPA-COM-NYU-KAI (IDX)   >   ZERO  )
+                                           NOT =   ZERO  )
+                 AND  (SPA-SYORIFLG            =   ZERO  )
+      ********** AND  (SPA-COM-NYU-KAI (IDX)   >   ZERO  )
                    PERFORM 51019-NYUIN-SANCHK-SEC
                END-IF
            END-PERFORM
@@ -5861,6 +5868,7 @@
                MOVE    "1"                 TO  SPA-COM-CHKFLG (IDX)
            ELSE
                MOVE    "1"                 TO  SPA-COM-CUR (IDX)
+               MOVE    SPACE           TO  SPA-COM-CHKFLG (IDX)
            END-IF
       *
            MOVE    WRK-SPA-SRYYMD      TO  SPA-SRYYMD
