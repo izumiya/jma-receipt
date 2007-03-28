@@ -4808,6 +4808,13 @@
                    OR  (LNK-SC92-ERRCD(6)  NOT =   SPACE )
                    MOVE    SPACE           TO  SPA-COM-CHKFLG
                                                  (SPA-GMN-IDX)
+               ELSE
+      *            日の指定がある時、フラククリア
+                   IF     (SPA-COM-NYU-KAI  (SPA-GMN-IDX)
+                                           NOT =   ZERO ) 
+                       MOVE    SPACE           TO  SPA-COM-CHKFLG
+                                                     (SPA-GMN-IDX)
+                   END-IF
                END-IF
                MOVE    SPACE           TO  LNK-SC92-ERRCD(3)
                MOVE    SPACE           TO  LNK-SC92-ERRCD(6)
@@ -5516,7 +5523,6 @@
                IF     (SPA-COM-SANTEIRRKKBN (IDX)
                                            NOT =   ZERO  )
                  AND  (SPA-SYORIFLG            =   ZERO  )
-      ********** AND  (SPA-COM-NYU-KAI (IDX)   >   ZERO  )
                    PERFORM 51019-NYUIN-SANCHK-SEC
                END-IF
            END-PERFORM
