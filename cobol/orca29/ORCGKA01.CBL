@@ -777,15 +777,22 @@
       *****************************************************************
        300111-JYURRK-CHK-SEC       SECTION.
       *
-           MOVE    WRK-JYURRK-REC (1)  TO  HZN-JYURRK-REC
-      *
            MOVE    ZERO                TO  FLG-OK
-           IF     (HZN-JYURRK-SRYKBN2  =   "01" )  OR
-                  (HZN-JYURRK-SRYKBN3  =   "01" )  OR
-                  (HZN-JYURRK-SRYKBN4  =   "01" )
-      *        ÅêÌô¤¢¤ê
-               MOVE    1                   TO  FLG-OK
-           ELSE
+           PERFORM VARYING     IDX-J   FROM    1   BY  1
+                   UNTIL      (IDX-J   >   IDX     )   OR
+                              (FLG-OK  =   1       )
+               MOVE    WRK-JYURRK-REC (IDX-J)  TO  HZN-JYURRK-REC
+      *
+               IF     (HZN-JYURRK-SRYKBN2  =   "01" )  OR
+                      (HZN-JYURRK-SRYKBN3  =   "01" )  OR
+                      (HZN-JYURRK-SRYKBN4  =   "01" )
+      *            ÅêÌô¤¢¤ê
+                   MOVE    1                   TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-OK              =   ZERO
+               MOVE    WRK-JYURRK-REC (01)  TO  HZN-JYURRK-REC
                IF      HZN-JYURRK-SRYKBN1  =   "01"
                    PERFORM VARYING     IDX-J   FROM    1   BY  1
                            UNTIL      (IDX-J   >   IDX     )   OR
