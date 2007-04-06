@@ -287,6 +287,7 @@
       *  03.04.07    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
       *  03.04.08    NACL-ÌçÏÆ    07/02/19  ËÌ³¤Æ»£µ£±¡Ü£´£±ÂÐ±þ
       *  03.04.09    NACL-ÌçÏÆ    07/03/14  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  03.04.10    NACL-ÌçÏÆ    07/03/28  ÆÃÄê´ïºà¼ïÊÌ£±¡¢»ÀÁÇÅù¶èÊ¬¤ÎÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2763,6 +2764,9 @@
                                       TO RECE05-KENTAICOMMENT  (IDX4)
                MOVE    TNS-KNSJISGRPKBN
                                       TO RECE05-KNSJISGRPKBN   (IDX4)
+               MOVE    TNS-TOKUKIZAISBT1
+                                      TO RECE05-TOKUKIZAISBT1  (IDX4)
+               MOVE    TNS-SANSOKBN   TO RECE05-SANSOKBN       (IDX4)
       *
                IF     TNS-SRYCD       =  "170022290"  OR
                                          "170022390"  OR

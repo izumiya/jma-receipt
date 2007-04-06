@@ -166,6 +166,7 @@
       *  03.03.13    NACL-Æ£¸¶    06/12/19  ´ð½àÉÔÅ¬¹çÄã¸º¶èÊ¬¤Ë¤è¤ëµ­ºÜ
       *                                     ½ç¤Î½¤Àµ
       *  03.04.01    NACL-ÌçÏÆ    07/03/22  ¸øÈñµëÉÕÂÐ¾Ý°ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
+      *  03.04.02    NACL-Æ£¸¶    07/03/27  ÆÃÄê´ïºà¤Îµ­ºÜÊýË¡¤ÎÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -484,6 +485,7 @@
            03  WRK-TBLMAX1             PIC 9(03).
            03  WRK-TBLMAX6             PIC 9(03).
            03  WRK-TBLMAX7             PIC 9(03).
+           03  WRK-TBLMAX7-SRT         PIC 9(03).
            03  WRK-TBLMAX8             PIC 9(03).
            03  WRK-SURYO               PIC 9(08).
            03  WRK-TENSU               PIC 9(07).
@@ -566,9 +568,9 @@
       *    ÆþÂà±¡ÍúÎòÊÔ½¸¡Ê¼«±¡Îò¡ÝÆþ±¡Ãæ¶èÊ¬¡Ë
            03  WRK-NYUINCHUKBN                 PIC X(01).
       *
-      *    °åÌôÉÊ¡¦ÆÃÄê´ïºàÍÑ¥Æ¡¼¥Ö¥ë
+      *    °åÌôÉÊ¡¦ÆÃÄê´ïºàÍÑ¥Æ¡¼¥Ö¥ë¡Ê£±°åÌôÉÊ £²ÆÃÄê´ïºà £³ÆÃÄê´ïºàÊÂ¤ÓÊÑ¤¨ÍÑ¡Ë
        01  TBL-ZAIW-AREA.
-           03  TBL-ZAIW-TABLE          OCCURS  2.
+           03  TBL-ZAIW-TABLE          OCCURS  3.
                05  TBL-ZAIW-REC        OCCURS 100.
                    07  TBL-ZAIW-SRYACTINF.
       *                ¿ÇÎÅ¥³¡¼¥É
@@ -635,7 +637,11 @@
       *                ´Á»úÌ¾¾Î
                        09  TBL-ZAIW-NAME            PIC  X(200).
       *            ¥Ç¡¼¥¿¼±ÊÌ(£±¡§¥Õ¥£¥ë¥à £²¡§ÆÃÄêµ¡ºà)
-                   07  TBL-ZAIW-DATSKB              PIC 9(01).
+                   07  TBL-ZAIW-DATSKB              PIC  9(01).
+      *            ÆÃÄê´ïºà¼ïÊÌ£±
+                   07  TBL-ZAIW-TOKUKIZAISBT1       PIC  9(01).
+      *            »ÀÁÇÅù¶èÊ¬
+                   07  TBL-ZAIW-SANSOKBN            PIC  9(01).
       *
       *    ¿ÇÎÅ¹Ô°Ù¡¦¥³¥á¥ó¥ÈÍÑ¥Æ¡¼¥Ö¥ë
        01  TBL-KOUI-AREA.
@@ -1360,6 +1366,9 @@
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
       *****************************************************************
+      *
+      *    ¥ì¥»´ïºàºÆÊÔ½¸¥µ¥Ö
+           COPY    "CPORCSRECESORT.INC".
       *
       *    Æþ±¡²ñ·×ºîÀ®ÍÑ¥Ñ¥é¥á¥¿
            COPY    "CPORCSNYURECEDEN.INC".
@@ -3321,6 +3330,7 @@
            MOVE    ZERO                TO  WRK-TBLMAX1
                                            WRK-TBLMAX6
                                            WRK-TBLMAX7
+                                           WRK-TBLMAX7-SRT 
                                            WRK-TBLMAX8
                                            FLG-TEIGEN
                                            FLG-YKZ20
@@ -3455,6 +3465,9 @@
                            PERFORM 200711-YKZ-TAIHI-SEC
                        WHEN    "7"
                            PERFORM 200711-KIZAI-TAIHI-SEC
+      *********************IF      RECE041-ZAIREQFLG       =   1
+                               PERFORM 200711-KIZAI-ACCT-TAIHI-SEC
+      *********************END-IF
                    END-EVALUATE
                  END-IF
                END-PERFORM
@@ -4016,6 +4029,50 @@
            END-IF
            .
        200711-KIZAI-TAIHI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Å¦Í×¥Ç¡¼¥¿¡Ê¤½¤ÎÂ¾¡ËÆÃÄê´ïºàÂàÈò½èÍý
+      *****************************************************************
+       200711-KIZAI-ACCT-TAIHI-SEC          SECTION.
+      *
+           IF      RECE641-SRYKBN    NOT =   "70"
+               IF      RECE641-KIZAITEN  =   ZERO
+                   GO  TO  200711-KIZAI-ACCT-TAIHI-EXT
+               END-IF
+           END-IF
+      *                                   
+           ADD     1                   TO  WRK-TBLMAX7-SRT
+      *     
+           IF      WRK-TBLMAX7-SRT      >   100
+               MOVE    "*** ORCR0300 TABLE 100 OVER  ***"
+                                           TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+               MOVE    1                   TO  FLG-END
+           ELSE
+               MOVE    RECE65-SRYCD      (IDX) TO
+                                   TBL-ZAIW-SRYCD    (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-SRYSURYO   (IDX) TO
+                                   TBL-ZAIW-SRYSURYO (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-TANICD     (IDX) TO
+                                   TBL-ZAIW-TANICD   (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-TENSIKIBETU(IDX) TO
+                                   TBL-ZAIW-TENSIKIBETU
+                                                     (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-TEN        (IDX) TO
+                                   TBL-ZAIW-TEN      (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-DATAKBN    (IDX) TO
+                                   TBL-ZAIW-DATAKBN  (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-NAMEINF   (IDX)  TO
+                                   TBL-ZAIW-NAMEINF  (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-TOKUKIZAISBT1 (IDX)  TO
+                                   TBL-ZAIW-TOKUKIZAISBT1
+                                                     (3 WRK-TBLMAX7-SRT)
+               MOVE    RECE65-SANSOKBN  (IDX)  TO
+                                   TBL-ZAIW-SANSOKBN (3 WRK-TBLMAX7-SRT)
+           END-IF
+           .
+       200711-KIZAI-ACCT-TAIHI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4760,15 +4817,70 @@
            END-IF
       *
       *    ÆÃÄê´ïºà¥Ç¡¼¥¿¤ÎÊÔ½¸                 
-           PERFORM VARYING IDXX    FROM    1   BY  1
-                   UNTIL   IDXX    >       2
+      *****IF      RECE641-ZAIREQFLG       =   SPACE
+      *****    PERFORM VARYING IDXX    FROM    1   BY  1
+      *****            UNTIL   IDXX    >       2
+      *****        PERFORM VARYING IDX FROM    1   BY  1
+      *****                UNTIL   IDX >       WRK-TBLMAX7
+      *****            IF      IDXX        =   TBL-ZAIW-DATSKB (2 IDX)
+      *****                PERFORM 200723-KIZAI-HENSYU-SEC
+      *****            END-IF
+      *****        END-PERFORM
+      *****    END-PERFORM
+      *****ELSE
+               INITIALIZE                      ORCSRECESORTAREA
+               MOVE    RECE62-HOSPID       TO  ORCSRECESORT-HOSPID
+               MOVE    RECE62-NYUGAIKBN    TO  ORCSRECESORT-NYUGAIKBN
+               MOVE    RECE62-PTID         TO  ORCSRECESORT-PTID
+               MOVE    RECE62-SRYYM        TO  ORCSRECESORT-SRYYM
+               MOVE    RECE641-SRYKBN      TO  ORCSRECESORT-SRYKBN
+               MOVE    RECE641-ZAINUM      TO  ORCSRECESORT-ZAINUM
                PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       WRK-TBLMAX7
-                   IF      IDXX        =   TBL-ZAIW-DATSKB (2 IDX)
-                       PERFORM 200723-KIZAI-HENSYU-SEC
-                   END-IF
+                       UNTIL   IDX >       WRK-TBLMAX7-SRT
+                   MOVE    TBL-ZAIW-SRYCD         (3 IDX)  TO
+                                   ORCSRECESORT-IN-SRYCD (IDX)
+                   MOVE    TBL-ZAIW-DATAKBN       (3 IDX)  TO
+                                   ORCSRECESORT-IN-DATAKBN(IDX)
+                   MOVE    TBL-ZAIW-SRYSURYO      (3 IDX)  TO
+                                   ORCSRECESORT-IN-SRYSURYO (IDX)
+                   MOVE    TBL-ZAIW-SRYKAISU      (3 IDX)  TO
+                                   ORCSRECESORT-IN-SRYKAISU (IDX)
+                   MOVE    TBL-ZAIW-TANICD        (3 IDX)  TO
+                                   ORCSRECESORT-IN-TANICD (IDX)
+                   MOVE    TBL-ZAIW-TEN           (3 IDX)  TO
+                                   ORCSRECESORT-IN-TEN (IDX)
+                   MOVE    TBL-ZAIW-TENSIKIBETU   (3 IDX)  TO
+                                   ORCSRECESORT-IN-TENSIKIBETU (IDX)
+                   MOVE    TBL-ZAIW-NAME          (3 IDX)  TO
+                                   ORCSRECESORT-IN-NAME (IDX)
+                   MOVE    TBL-ZAIW-TOKUKIZAISBT1 (3 IDX)  TO
+                                   ORCSRECESORT-IN-TOKUKIZAISBT1 (IDX)
+                   MOVE    TBL-ZAIW-SANSOKBN      (3 IDX)  TO
+                                   ORCSRECESORT-IN-SANSOKBN (IDX)
                END-PERFORM
-           END-PERFORM
+               CALL    "ORCSRECESORT"      USING   ORCSRECESORTAREA
+               IF      ORCSRECESORT-ERRCD  =   ZERO
+                   PERFORM VARYING IDXX    FROM    1   BY  1
+                           UNTIL   IDXX    >       4
+                       PERFORM VARYING IDX     FROM    1   BY  1
+                               UNTIL   IDX     >       50
+                               OR      ORCSRECESORT-SRYCD (IDXX IDX)
+                                                       =   SPACE
+                           PERFORM 200723-KIZAI-SORT-HENSYU-SEC
+                       END-PERFORM
+                   END-PERFORM
+               ELSE    
+                   PERFORM VARYING IDXX    FROM    1   BY  1
+                           UNTIL   IDXX    >       2
+                       PERFORM VARYING IDX FROM    1   BY  1
+                               UNTIL   IDX >       WRK-TBLMAX7
+                           IF      IDXX    =   TBL-ZAIW-DATSKB (2 IDX)
+                               PERFORM 200723-KIZAI-HENSYU-SEC
+                           END-IF
+                       END-PERFORM
+                   END-PERFORM
+               END-IF
+      *****END-IF
            .
        20072-ZAI-HENSYU-EXT.
            EXIT.
@@ -5073,6 +5185,111 @@
            PERFORM 5001-FILE-WRITE-SEC
            .
        200723-KIZAI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Å¦Í×¥Ç¡¼¥¿¡ÊºÆÊÔ½¸ÆÃÄêµ¡ºà¡ËÊÔ½¸½èÍý
+      *****************************************************************
+       200723-KIZAI-SORT-HENSYU-SEC    SECTION.
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           MOVE    "TO,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *    ¿ÇÎÅ¼±ÊÌ
+           IF      WRK-SRYKBN      NOT =   SPACE
+               MOVE    WRK-SRYKBN          TO  WRK-DATA
+               MOVE    2                   TO  WRK-NAGASA
+               MOVE    SPACE               TO  WRK-SRYKBN
+           END-IF
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *    ÉéÃ´¶èÊ¬
+           MOVE    WRK-FTNKBN          TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *    ÆÃÄê´ïºà¥³¡¼¥É
+           MOVE    ORCSRECESORT-SRYCD (IDXX IDX)
+                                       TO  WRK-DATA
+           MOVE    9                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *    »ÈÍÑÎÌ
+           IF      ORCSRECESORT-SRYSURYO (IDXX IDX)
+                                       >   ZERO
+               MOVE    ORCSRECESORT-SRYSURYO (IDXX IDX)
+                                           TO  WRK-SRYSURYO
+               MOVE    WRK-SRYSURYO        TO  WRK-NUM
+               MOVE    9                   TO  WRK-NAGASA
+               MOVE    3                   TO  WRK-SYOSUU
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
+      *    ÅÀ¿ô
+           IF      ORCSRECESORT-TBLMAX (IDXX)
+                                       =   IDX
+               MOVE    ORCSRECESORT-ZAITEN (IDXX)
+                                           TO  WRK-TENSU
+               IF      WRK-TENSU       >   ZERO
+                   MOVE    WRK-TENSU           TO  WRK-NUM
+                   MOVE    7                   TO  WRK-NAGASA
+               END-IF
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
+      *    ²ó¿ô
+           IF      ORCSRECESORT-TBLMAX (IDXX)
+                                       =   IDX
+               IF      RECE641-ZAIKAISU    >   ZERO
+                   MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
+                   MOVE    3                   TO  WRK-NAGASA
+               END-IF
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
+      *    Ã±°Ì¥³¡¼¥É
+           IF      ORCSRECESORT-TANICD (IDXX IDX)
+                                       >   ZERO
+               MOVE    ORCSRECESORT-TANICD (IDXX IDX)
+                                               TO  WRK-NUM
+               MOVE    3                       TO  WRK-NAGASA
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
+      *    Ã±²Á
+           IF    ( ORCSRECESORT-TENSIKIBETU (IDXX IDX)
+                                       =   2               )
+           OR    ( ORCSRECESORT-SRYCD       (IDXX IDX)
+                                       =   "777770000"     )
+           OR    ( ORCSRECESORT-SRYCD       (IDXX IDX)
+                                       =   WRK-CONS-SANSO1
+                                       OR  WRK-CONS-SANSO2
+                                       OR  WRK-CONS-SANSO3
+                                       OR  WRK-CONS-SANSO4
+                                       OR  WRK-CONS-SANSO5
+                                       OR  WRK-CONS-SANSO6
+                                       OR  WRK-CONS-SANSO7
+                                       OR  WRK-CONS-SANSO8 )
+               IF      ORCSRECESORT-TEN (IDXX IDX)  >   ZERO
+                   MOVE    ORCSRECESORT-TEN (IDXX IDX)
+                                                 TO  WRK-TANKA
+                   MOVE    WRK-TANKA             TO  WRK-NUM
+                   MOVE    10                    TO  WRK-NAGASA
+                   MOVE    2                     TO  WRK-SYOSUU
+               END-IF
+           END-IF
+           PERFORM 5005-NUM-HENSYU-SEC
+      *    ÆÃÄê´ïºàÌ¾¾Î
+           IF      ORCSRECESORT-SRYCD (IDXX IDX)
+                                       =   "777770000"
+               MOVE    ORCSRECESORT-NAME (IDXX IDX)
+                                           TO  WRK-DATA
+           END-IF
+           MOVE    40                  TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *    ¾¦ÉÊÌ¾µÚ¤Óµ¬³ÊÌ¾µÚ¤Ó¥µ¥¤¥º
+           MOVE    300                 TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+           .
+       200723-KIZAI-SORT-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
