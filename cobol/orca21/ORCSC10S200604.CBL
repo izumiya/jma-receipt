@@ -309,6 +309,8 @@
            03  WRK-HEN-SRYKA               PIC X(02).
       *    ºßÂðÎÅÍÜ»ØÆ³ÎÁ»»Äê
            03  WRK-ZAITAKU-CNT         PIC 9(04).
+      *    ¥ê¥Ï¥Ó¥ê°å³Ø´ÉÍýÎÁ
+           03  WRK-RIHA-KBN            PIC X(01).
       *
       *    ¿Ç»¡ÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-SINSATU-AREA.
@@ -1402,6 +1404,13 @@
                                                TO  WRK-ZAITAKU-CNT
                        END-IF
                    END-IF
+      *H19/04¤«¤é
+      *            ¥ê¥Ï¥Ó¥ê°å³Ø´ÉÍýÎÁ»»Äê»þ¡¢³°Íè´ÉÍý²Ã»»»»Äê¤Ê¤·
+                   IF      WRK-RIHA-KBN        =   "S"
+                       IF      SANTEI-MSANTEICNT   >   ZERO
+                           MOVE    1               TO  SPA-GAIRAI-NASI
+                       END-IF
+                   END-IF
            END-EVALUATE
       *
            .
@@ -1878,9 +1887,13 @@
            SEARCH  TBL-SANTEI-OCC      VARYING   TBL-SAN
                AT  END
                    MOVE    ZERO            TO  FLG-HKNSAN
+                   MOVE    SPACE           TO  WRK-RIHA-KBN
                WHEN    WRK-SRYCD       =   TBL-SANTEI-SRYCD
                                                           (TBL-SAN)
                    MOVE    1               TO  FLG-HKNSAN
+      *H19.4¤«¤é¥ê¥Ï¥Ó¥ê´ÉÍýÎÁ
+                   MOVE    TBL-RSI-KBN (TBL-SAN)
+                                           TO  WRK-RIHA-KBN
            END-SEARCH
       *
            .
@@ -2784,6 +2797,17 @@
       *    ÊÝ¸±Ëè¤Î¥³¡¼¥É¤ÎÈ½Äê
            PERFORM 1000-SANTEI-CHK-SEC
       *
+           MOVE    ZERO                 TO  WRK-TEI-KAISU
+           PERFORM VARYING     IDX-T   FROM    1   BY  1
+                   UNTIL      (IDX-T       >   100 )  OR
+                              (SPA-K02-TEI-SRYCD(IDX-T)  =   SPACE)
+               IF      SPA-K02-TEI-SRYCD(IDX-T)    =   WRK-SRYCD
+                   MOVE    SPA-K02-TEI-KAISU (IDX-T)
+                                               TO  WRK-TEI-KAISU
+                   MOVE    100                 TO  IDX-T
+               END-IF
+           END-PERFORM
+      *
       *    »»ÄêÍúÎò¸¡º÷
            MOVE    SPACE               TO  SANTEI-REC
            INITIALIZE                  SANTEI-REC
@@ -2838,6 +2862,7 @@
                    IF      SANTEI-SRYYM        =   SPA-SRYYMD(1:6)
                        MOVE    SANTEI-SRYYM        TO  WRK-SANTEI-YM
                        MOVE    SANTEI-MSANTEICNT   TO  FLG-TOUG-SANTEI
+                       MOVE    1                   TO  FLG-SANTEI
       *                ËýÀ­áÖÄË¤Î»þ¡¢¿ÇÎÅÆü¤è¤ê¸å¤Î»þ¤Ê¤·¤È¤¹¤ë
                        IF     (WRK-SRYCD       =   "113006510" ) AND
                               (SANTEI-FSANTEIYMD(1:6)
@@ -2859,10 +2884,9 @@
                           (SANTEI-SRYYM        =   SPA-SRYYMD(1:6))
                        MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
                        IF     (SANTEI-DAY (IDX-Y2) >   ZERO )  AND
-                              (FLG-TOUG-SANTEI     >   ZERO )
-                           COMPUTE FLG-TOUG-SANTEI
-                                           =   FLG-TOUG-SANTEI
-                                           -   SANTEI-DAY (IDX-Y2)
+                              (FLG-TOUG-SANTEI     >   ZERO )  AND
+                              (WRK-TEI-KAISU       >   ZERO )
+                           MOVE    ZERO        TO  FLG-TOUG-SANTEI
                        END-IF
                    END-IF
                END-IF
