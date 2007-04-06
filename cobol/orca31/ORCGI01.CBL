@@ -1093,6 +1093,9 @@
       *    検索時患者表示コンボ
            PERFORM 310-CMB-DISPKBN-SET-SEC
       *
+           MOVE    WRK-KJNYMD      TO  SPA-GMN-I01-DISPKBNMEIL (5)
+      *
+      *
            .
        310-CMB-SYOKI-EXT.
            EXIT.
@@ -5379,6 +5382,42 @@
                                    TO  WRK-CMB-ITM
                END-IF
            END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+      *
+               INITIALIZE              SYSKANRI-REC
+               MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+               MOVE    "1010"          TO  SYS-KANRICD
+               MOVE    "1"             TO  SYS-KBNCD (1:1)
+               MOVE    WRK-CMB-CD      TO  SYS-KBNCD (2:)
+               MOVE    SPA-GMN-I01-DISPKBNMEIL (5)
+                                       TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC      =   ZERO )
+                   MOVE    MCPDATA-REC TO  SYSKANRI-REC
+               ELSE
+                   MOVE    1           TO  FLG-SYSKANRI
+                   INITIALIZE              SYSKANRI-REC
+               END-IF
+      *
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *
+               IF    ( FLG-SYSKANRI    =   ZERO )
+                   MOVE    SYSKANRI-REC    TO  SYS-1010-REC
+                   MOVE    SYS-1010-KBNCD (2:4)
+                                           TO  WRK-CMB-ITM (1:4)
+                   MOVE    SYS-1010-NAME   TO  WRK-CMB-ITM (6:)
+               END-IF
+      *
+           END-IF
+      *
       *
            .
       *
