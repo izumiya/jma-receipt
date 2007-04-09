@@ -158,3 +158,19 @@ path	del3 	{
 		;
 	};
 };
+
+path	key4 	{
+	DBSELECT	{
+		DECLARE tbl_sryacctplus_key4_csr CURSOR FOR
+		SELECT *
+		FROM tbl_sryacctplus
+			WHERE   HOSPID    =   :HOSPID
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYM       =   :SRYYM
+			AND   ZAINUM      =   :ZAINUM
+			ORDER   BY      RENNUM
+		;
+	};
+};
+
