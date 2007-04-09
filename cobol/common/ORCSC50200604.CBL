@@ -830,17 +830,17 @@
                IF       WRK-COM-INPUTCD (IDX1) =   "101500010"  OR
                                                    "101500020"  OR
                                                    "099509901"
-                   IF      FLG-ROU-ARI     =   ZERO
-                       MOVE    "8004"          TO  SPA-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX1)
-                   ELSE
+      *D           IF      FLG-ROU-ARI     =   ZERO
+      *                MOVE    "8004"          TO  SPA-ERRCD
+      *                MOVE    "1"             TO  WRK-COM-CUR (IDX1)
+      *D           ELSE
                        IF      IDX-KSN         >   ZERO
                            MOVE    "8004"      TO  SPA-ERRCD
                            MOVE    "1"         TO  WRK-COM-CUR (IDX1)
                        ELSE
                            MOVE    IDX1        TO  IDX-KSN
                        END-IF
-                   END-IF
+      *D           END-IF
                END-IF
            END-PERFORM
       *    自動発生の有無
