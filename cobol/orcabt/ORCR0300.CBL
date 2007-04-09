@@ -4309,6 +4309,8 @@
                        END-PERFORM
                    END-PERFORM
                ELSE
+                   DISPLAY "ORCSRECESORT-ERRCD=" ORCSRECESORT-ERRCD
+      *
                    PERFORM VARYING IDXX    FROM    1   BY  1
                            UNTIL   IDXX    >       2
                        PERFORM VARYING IDX FROM    1   BY  1
