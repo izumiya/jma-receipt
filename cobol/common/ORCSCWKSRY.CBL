@@ -1796,6 +1796,8 @@
                                                                  (IDY)
       *            ²ó¿ô
                    IF      SPA-COM-DATAKBN (IDX)   =   "3"
+      *                ²èÁü¿ÇÃÇ¤Î¤ß
+                    AND   (SPA-COM-SRYKBN  (IDX)   =   "70" )
                        MOVE    SPA-COM-BUNGSU(IDX) TO  WKSRY-SRYKAISU
                                                                  (IDY)
                    END-IF
