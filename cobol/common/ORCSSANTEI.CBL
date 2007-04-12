@@ -693,6 +693,13 @@
            MOVE    SPA-PTID            TO  SANTEI-PTID
            MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
            MOVE    WRK-SRYYM           TO  SANTEI-SRYYM
+      *    健保以外で保険別の時、保険をセット
+           IF     (FLG-HKNSAN          =   1   )  AND
+                  (SSANTEI-HKNKBN  NOT =   ZERO)
+               MOVE    SSANTEI-HKNCOMBINUM TO  SANTEI-HKNCOMBINUM
+           ELSE
+               MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+           END-IF
       *
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei"        TO  MCP-TABLE

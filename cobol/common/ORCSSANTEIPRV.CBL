@@ -54,6 +54,8 @@
            03  FLG-NAIBUN-ADD      PIC 9(01).
            03  FLG-NAIBUN-DEL      PIC 9(01).
       *
+           03  FLG-RKAN-OK         PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -99,6 +101,10 @@
            03  WRK-DBPATH              PIC X(64). 
       *
            03  WRK-RIGAKU-RYO          PIC X(01). 
+      *
+           03  WRK-STR-SRYCD           PIC X(09).
+           03  WRK-STR-YMD             PIC X(08).
+           03  WRK-RIH-YMD             PIC X(08).
       *
       *    同一初回算定日コードテーブル
        01  TBL-AREA.
@@ -342,6 +348,19 @@
       *    慢性疼痛疾患管理料の時、初診料算定日から初回算定日を始める
            IF     (WRK-MAE-SRYCD       =   WRK-MANSEI ) 
                PERFORM 1009-MANSE-CHK-SEC
+           END-IF
+      *    リハビリ医学管理料の時、慢性疼痛と同様の処理とする
+           SET     TBL-SAN             TO  1
+           SEARCH  TBL-SANTEI-OCC      VARYING   TBL-SAN
+               AT  END
+                       MOVE    ZERO            TO  FLG-RKAN-OK
+               WHEN   (SSANTEI-SRYCD   =   TBL-SANTEI-SRYCD
+                                                          (TBL-SAN))
+                  AND (TBL-RSI-KBN (TBL-SAN)   =   "S"   )
+                  MOVE    1               TO  FLG-RKAN-OK
+           END-SEARCH
+           IF      FLG-RKAN-OK         =   1
+               PERFORM 10011-RIHAKANRI-SYORI-SEC
            END-IF
       *
            .
@@ -654,6 +673,9 @@
       *****************************************************************
        100912-SANTEI-CHK-SEC      SECTION.
       *
+      *    保険毎のコードの判定
+           PERFORM 1000-SANTEI-CHK-SEC
+      *
            MOVE    SPACE               TO  WRK-YMD
       *    算定履歴検索
            INITIALIZE                  SANTEI-REC
@@ -661,6 +683,13 @@
            MOVE    SPA-PTID            TO  SANTEI-PTID
            MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
            MOVE    WRK-SRYYM           TO  SANTEI-SRYYM
+      *    健保以外で保険別の時、保険をセット
+           IF     (FLG-HKNSAN          =   1   )  AND
+                  (SSANTEI-HKNKBN  NOT =   ZERO)
+               MOVE    SSANTEI-HKNCOMBINUM TO  SANTEI-HKNCOMBINUM
+           ELSE
+               MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+           END-IF
       *
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei_prv"    TO  MCP-TABLE
@@ -726,6 +755,77 @@
       *
            .
        1000-SANTEI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *     疾患別リハビリ医学管理料処理
+      *****************************************************************
+       10011-RIHAKANRI-SYORI-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  WRK-STR-SRYCD
+           EVALUATE    SSANTEI-SRYCD
+      *        心大血管疾患
+               WHEN    "180029910"
+               WHEN    "180030010"
+                   MOVE    "099800111"         TO  WRK-STR-SRYCD
+      *        脳血管疾患
+               WHEN    "180030110"
+               WHEN    "180030210"
+                   MOVE    "099800121"         TO  WRK-STR-SRYCD
+      *        運動器
+               WHEN    "180030310"
+               WHEN    "180030410"
+                   MOVE    "099800131"         TO  WRK-STR-SRYCD
+      *        呼吸器
+               WHEN    "180030510"
+               WHEN    "180030610"
+                   MOVE    "099800141"         TO  WRK-STR-SRYCD
+           END-EVALUATE
+           MOVE    SSANTEI-SRYYMD(1:6) TO  WRK-SRYYM
+           MOVE    SPACE               TO  WRK-STR-YMD
+      *    発生日検索
+           MOVE    WRK-STR-SRYCD       TO  WRK-SRYCD
+           PERFORM 100912-SANTEI-CHK-SEC
+           MOVE    WRK-YMD             TO  WRK-STR-YMD
+           MOVE    WRK-STR-YMD         TO  WRK-RIH-YMD
+      *    慢性疼痛と同様に初回算定日を決定する
+      *    初診料算定日がない時、診療科履歴から算定
+           IF      SSANTEI-SYOYMD      =   SPACE
+               MOVE    SSANTEI-SRYYMD(1:6)     TO  WRK-SRYYM
+               PERFORM 10091-SRYKARRK-CHK-SEC
+           ELSE
+               MOVE    SSANTEI-SYOYMD      TO  WRK-SYOSINYMD
+           END-IF
+      *    初診算定日より、発生日が後の時
+           IF      WRK-SYOSINYMD       <   WRK-RIH-YMD
+               MOVE    WRK-RIH-YMD         TO  WRK-SYOSINYMD
+           END-IF
+      *
+           IF     (WRK-SYOSINYMD       =   SPACE )  OR
+                  (WRK-SYOSINYMD       >   WRK-FSANTEIYMD)
+               IF     (SSANTEI-NYUGAIKBN   =   "1"   ) AND
+                      (WRK-SYOSINYMD       =   SPACE ) AND
+                      (WRK-FSANTEIYMD  NOT =   SPACE )
+                   CONTINUE
+               ELSE
+                   MOVE    SSANTEI-SRYYMD      TO  WRK-FSANTEIYMD
+               END-IF
+           END-IF
+           MOVE    WRK-SYOSINYMD       TO  WRK-SYOSINYMD-1
+      *
+           MOVE    ZERO                TO  FLG-MANSEI-ALL
+           MOVE    ZERO                TO  FLG-SYOKAI
+           IF      WRK-FSANTEIYMD-OLD  NOT =   SPACE
+               MOVE    WRK-FSANTEIYMD-OLD(1:6) TO  WRK-SRYYM
+               PERFORM 10091-SRYKARRK-CHK-SEC
+               IF     (WRK-SYOSINYMD   NOT =   SPACE     )   AND
+                      (WRK-SYOSINYMD       <   WRK-FSANTEIYMD-OLD) AND
+                      (WRK-SYOSINYMD       =   WRK-SYOSINYMD-1)
+                   MOVE    1               TO  FLG-MANSEI-ALL
+                   MOVE    WRK-FSANTEIYMD  TO  WRK-KON-FSANTEIYMD
+               END-IF
+           END-IF
+           .
+       10011-RIHAKANRI-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
