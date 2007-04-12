@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  00.00.01    NACL-多々納  06/08/29  詳記区分初期表示の追加
+      *  03.04.00    NACL-多々納  07/04/12  詳記区分 ５０、５１追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -903,6 +904,32 @@
                                        TO  SPA-GMN-SJKBNLST (10)
            MOVE    10                  TO  SPA-SJKBN-MAX
       *
+           IF      SPA-NAI-SRYYM       >=  "200704"
+               MOVE    "50 治験概要"
+                                           TO  SPA-GMN-SJKBNLST (10)
+               MOVE    "51 疾患別リハビリテーションに係る治療継続理由"
+                                           TO  SPA-GMN-SJKBNLST (11)
+               MOVE    "99 レセプト摘要欄コメント"
+                                           TO  SPA-GMN-SJKBNLST (12)
+               MOVE    12                  TO  SPA-SJKBN-MAX
+           END-IF
+      *
+           IF      SPA-GMN-SJKBN   NOT =   SPACE
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING    IDX      FROM    1   BY  1
+                       UNTIL     (IDX      >   SPA-SJKBN-MAX )
+                              OR (FLG-OK   =   1       )
+                   IF      SPA-GMN-SJKBN       =   SPA-GMN-SJKBNLST
+                                                         (IDX)(1:2)
+                       MOVE    SPA-GMN-SJKBN-LIST  (IDX)
+                                               TO  SPA-GMN-SJKBN-G
+                       MOVE    1               TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   PERFORM 31031-SJKBN-INI-SEC
+               END-IF
+           END-IF
       *
            .
        3106-SJKBN-HEN-EXT.
@@ -1999,7 +2026,7 @@
                END-IF
            END-PERFORM
            IF      FLG-OK              =   ZERO
-               MOVE    "0002"              TO  SPA-ERRCD
+               MOVE    "0008"              TO  SPA-ERRCD
            ELSE
       *        保険組合せ
                PERFORM 3101-HKNCOMBI-HEN-SEC
@@ -2483,7 +2510,7 @@
                MOVE    SPACE           TO  SPA-GMN-SJKBN-G
            ELSE
                IF      FLG-OK              =   ZERO
-                   MOVE    "0002"              TO  SPA-ERRCD
+                   MOVE    "0009"              TO  SPA-ERRCD
                    MOVE    16                  TO  SPA-GMN-CUR
                END-IF
            END-IF
@@ -2642,6 +2669,11 @@
            IF     (SPA-ERRCD           =   SPACE ) AND
                   (SPA-C50IDCD         =   SPACE )
                PERFORM 2130-HKNCOMBI-CHK-SEC
+           END-IF
+      *    症状詳記区分チェック
+           IF     (SPA-ERRCD           =   SPACE ) AND
+                  (SPA-C50IDCD         =   SPACE )
+               PERFORM 2131-SJKBNCOPYCHK-SEC
            END-IF
       *
            IF     (SPA-ERRCD           =   SPACE ) AND
@@ -2898,6 +2930,32 @@
       *
            .
        21301-HKNCOBMI-RSCHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプトコメントチェック処理
+      *****************************************************************
+       2131-SJKBNCOPYCHK-SEC          SECTION.
+      *
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL     (IDX          >   SPA-COMMENT-MAX )
+                          OR (SPA-ERRCD    NOT =   SPACE  )
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING    IDY      FROM    1   BY  1
+                       UNTIL     (IDY      >   SPA-SJKBN-MAX )
+                              OR (FLG-OK   =   1       )
+                   IF      SPA-GMN-TSJKBN (IDX)    =   SPA-GMN-SJKBNLST
+                                                             (IDY)(1:2)
+                       MOVE    1               TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   MOVE    "0016"          TO  SPA-ERRCD
+                   MOVE    14              TO  SPA-GMN-CUR
+               END-IF
+           END-PERFORM
+           .
+       2131-SJKBNCOPYCHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3935,6 +3993,8 @@
       *    診療科
            PERFORM 3102-SRYKA-HEN-SEC
       *
+      *    症状詳記区分
+           PERFORM 3106-SJKBN-HEN-SEC
       *    初期編集
            PERFORM 314-SYOKI-SEC
       *
@@ -4165,7 +4225,7 @@
                                                   LNK-DAY6-AREA
            MOVE    LNK-DAY6-KEISAN(1:6)   TO  SPA-NAI-SRYYM
       *
-           MOVE    SPA-NAI-SRYYM        TO  WRK-SYMD (1:6)
+           MOVE    SPA-NAI-SRYYM          TO  WRK-SYMD (1:6)
            MOVE    "01"                   TO  WRK-SYMD (7:2)  
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG (1:6)      TO  SPA-GMN-SRYYM
@@ -4177,6 +4237,8 @@
       *
       *    入院判定
            PERFORM 3105-NYUGAI-HEN-SEC
+      *    症状詳記区分
+           PERFORM 3106-SJKBN-HEN-SEC
       *
       *    初期編集
            PERFORM 314-SYOKI-SEC
@@ -4222,6 +4284,8 @@
       *
       *    入院判定
            PERFORM 3105-NYUGAI-HEN-SEC
+      *    症状詳記区分
+           PERFORM 3106-SJKBN-HEN-SEC
       *
       *    初期編集
            PERFORM 314-SYOKI-SEC
@@ -4345,6 +4409,17 @@
                WHEN    "0007"
                    MOVE    "コメント内容が未入力です。入力して下さい"
                                        TO  SPA-ERRMSG
+               WHEN    "0008"
+                   MOVE    "入外区分入力エラー"
+                                       TO  SPA-ERRMSG
+               WHEN    "0009"
+                   MOVE    "症状詳記区分入力エラー"
+                                       TO  SPA-ERRMSG
+               WHEN    "0016"
+                   STRING  "症状詳記区分が診療年月ではありません。"
+                           "症状詳記区分を変更して下さい。"
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0010"
                    MOVE    "文例の最大登録番号が９９９です。"
                                        TO  SPA-ERRMSG

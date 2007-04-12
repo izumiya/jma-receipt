@@ -1287,9 +1287,14 @@
                                        TO  SPA-GMN-SJKBNLST (08)
            MOVE    "09 その他（３）"
                                        TO  SPA-GMN-SJKBNLST (09)
-           MOVE    "99 レセプト摘要欄コメント"
+      *    Ｈ１９．４からの追加
+           MOVE    "50 治験概要"
                                        TO  SPA-GMN-SJKBNLST (10)
-           MOVE    10                  TO  SPA-GMN-SJKBN-MAX
+           MOVE    "51 疾患別リハビリテーションに係る治療継続理由"
+                                       TO  SPA-GMN-SJKBNLST (11)
+           MOVE    "99 レセプト摘要欄コメント"
+                                       TO  SPA-GMN-SJKBNLST (12)
+           MOVE    12                  TO  SPA-GMN-SJKBN-MAX
       *
       *    会計照会情報
            MOVE    "0 診療科順"        TO  SPA-GMN-SRYKBN-LIST(1)
