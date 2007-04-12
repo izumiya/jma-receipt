@@ -145,6 +145,7 @@
       *  03.03.04    NACL-Æ£¸¶    06/10/31  ÎÅÍÜ²ð¸î°åÎÅ£²£´¤ÎÄÉ²Ã
       *  03.03.05    NACL-ÌçÏÆ    07/02/15  ¼«Î©»Ù±ç°åÎÅ¡Ê¹¹À¸¡¦°éÀ®¡Ë
       *                                     ¤ÈÀ¸³èÊÝ¸î¤ÎÊ»ÍÑ¤ÎÅÀ¿ôÍóµ­ºÜ
+      *  03.03.06    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -706,11 +707,17 @@
            03  FILLER          PIC X(10)   VALUE   "£±£µ·Ð²á".
            03  FILLER          PIC X(02)   VALUE   "16".
            03  FILLER          PIC X(10)   VALUE   "£±£¶Ä¹£²".
+           03  FILLER          PIC X(02)   VALUE   "17".
+           03  FILLER          PIC X(10)   VALUE   "£±£·¾å°Ì".
+           03  FILLER          PIC X(02)   VALUE   "18".
+           03  FILLER          PIC X(10)   VALUE   "£±£¸°ìÈÌ".
+           03  FILLER          PIC X(02)   VALUE   "19".
+           03  FILLER          PIC X(10)   VALUE   "£±£¹Äã½ê".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   15.
+           03  TBL-TOKKI       OCCURS   18.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
-       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   15.
+       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   18.
       *
       *   ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê
        01  TBL-RECECOM-AREA.
@@ -2121,9 +2128,11 @@
                                        TO  KOHSKY-SHOKUJIINF (IDX)
            END-PERFORM
            MOVE    RECE02X-SHOSHINTIME TO  KOHSKY-SHOSHINTIME
-           MOVE    RECE02X-ZAITAKU     TO  KOHSKY-ZAITAKU
-           MOVE    RECE02X-ZAITAKU-SAIKEI
-                                       TO  KOHSKY-ZAITAKU-SAIKEI
+           IF      RECE02X-ZAITAKU  =  "1"
+             MOVE    RECE02X-ZAITAKU   TO  KOHSKY-ZAITAKU
+           END-IF
+      ***  MOVE    RECE02X-ZAITAKU-SAIKEI
+      ***                              TO  KOHSKY-ZAITAKU-SAIKEI
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬
            MOVE    RECE02X-SHOKUJIFTNKBN
                                        TO  KOHSKY-SHOKUJIFTNKBN
@@ -4278,7 +4287,7 @@
                MOVE    RECE02-TOTALTEN (IDX1) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(1)
                IF    ( RECE02-FTNMONEY (IDX1) >    ZERO   )
-               OR    ( RECE02-ZAITAKU     NOT =    SPACE  )
+               OR    ( RECE02-ZAITAKU       =  "1" OR "2" )
                OR    ( RECE02-RJNNYUFTN       =    1      )
                    MOVE    RECE02-FTNMONEY (IDX1) TO  WRK-KGK7
                    IF      RECE02-GENMENKBN   =   ZERO
@@ -6702,7 +6711,9 @@
            END-IF
       *     
            MOVE    RECE02-AGE          TO  RECE10-AGE  
-           MOVE    RECE02-ZAITAKU      TO  RECE10-ZAITAKU
+           IF      RECE02-ZAITAKU  =  "1"
+             MOVE    RECE02-ZAITAKU    TO  RECE10-ZAITAKU
+           END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       4

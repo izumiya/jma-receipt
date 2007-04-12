@@ -107,6 +107,7 @@
       *  03.03.01    NACL-ÌçÏÆ    06/09/27  ÆÃµ­»ö¹à£±£¶Ä¹£²ÂÐ±þ
       *  03.03.02    NACL-ÌçÏÆ    06/10/11  Æþ±¡»þÀ¸³èÎÅÍÜÈñÂÐ±þ
       *  03.03.03    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
+      *  03.03.04    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -565,6 +566,9 @@
            03  CONS-TOKKI14        PIC X(14) VALUE "00000099990114".
            03  CONS-TOKKI15        PIC X(14) VALUE "00000099990115".
            03  CONS-TOKKI16        PIC X(14) VALUE "00000099990116".
+           03  CONS-TOKKI17        PIC X(14) VALUE "00000099990117".
+           03  CONS-TOKKI18        PIC X(14) VALUE "00000099990118".
+           03  CONS-TOKKI19        PIC X(14) VALUE "00000099990119".
       *    ÆýÍÄ»ù²Ã»»
            03  CONS-NYUKSN1        PIC X(09) VALUE "111000370".
            03  CONS-NYUKSN2        PIC X(09) VALUE "111011470".
@@ -1471,7 +1475,10 @@
                                                      CONS-TOKKI13 OR
                                                      CONS-TOKKI14 OR
                                                      CONS-TOKKI15 OR
-                                                     CONS-TOKKI16
+                                                     CONS-TOKKI16 OR
+                                                     CONS-TOKKI17 OR
+                                                     CONS-TOKKI18 OR
+                                                     CONS-TOKKI19
                                  CONTINUE
                                ELSE
                                  MOVE   ZERO   TO   WRK-TEN
@@ -1802,7 +1809,10 @@
                                      OR  CONS-TOKKI13(6:9)
                                      OR  CONS-TOKKI14(6:9)
                                      OR  CONS-TOKKI15(6:9)
-                                     OR  CONS-TOKKI16(6:9) )
+                                     OR  CONS-TOKKI16(6:9)
+                                     OR  CONS-TOKKI17(6:9)
+                                     OR  CONS-TOKKI18(6:9)
+                                     OR  CONS-TOKKI19(6:9) )
             OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
             OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                     (TNS-TEN               =  ZERO )       )
@@ -1854,7 +1864,10 @@
                                        OR  CONS-TOKKI13(6:9)
                                        OR  CONS-TOKKI14(6:9)
                                        OR  CONS-TOKKI15(6:9)
-                                       OR  CONS-TOKKI16(6:9) )
+                                       OR  CONS-TOKKI16(6:9)
+                                       OR  CONS-TOKKI17(6:9)
+                                       OR  CONS-TOKKI18(6:9)
+                                       OR  CONS-TOKKI19(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )

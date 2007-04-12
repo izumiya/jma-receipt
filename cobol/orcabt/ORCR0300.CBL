@@ -235,6 +235,7 @@
       *                                     ½ç¤Î½¤Àµ
       *  03.04.01    NACL-ÌçÏÆ    07/03/22  ¸øÈñµëÉÕÂÐ¾Ý°ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *  03.04.02    NACL-Æ£¸¶    07/03/27  ÆÃÄê´ïºà¤Îµ­ºÜÊýË¡¤ÎÊÑ¹¹
+      *  03.04.03    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1315,6 +1316,8 @@
       *********¡Ê»ÄÎÌÇÑ´þ¡Ë
       *********05  WRK-CONS-COMMENT4  PIC X(09)   VALUE   "099309901".
       *
+           03  WRK-CONS-SRYYM-200704  PIC 9(06)   VALUE    200704.
+      *
       *    ²þ¹Ô¥³¡¼¥É
        01  WRK-CONS-RETURN          PIC X(01)   VALUE   X"0A".
       *
@@ -2053,11 +2056,18 @@
       *    °åÎÅÊÝ¸±°ìÉôÉéÃ´¶â³Û
            IF      RECE02-FTNMONEY(IDX1)
                                        >   ZERO
-               IF    ( RECE02-RECESYUBETU (4:1)
-                                           =   "8" OR  "0" )
-               AND   ( RECE02-RJNHKNNUM    =   SPACE       )
+               IF    RECE02-SRYYM   >=   WRK-CONS-SRYYM-200704
+                 IF    ( RECE02-ZAITAKU      =   "1" OR  "2" )
                    MOVE    RECE02-FTNMONEY(IDX1) TO  WRK-NUM
                    MOVE    9                     TO  WRK-NAGASA
+                 END-IF
+               ELSE
+                 IF    ( RECE02-RECESYUBETU (4:1)
+                                             =   "8" OR  "0" )
+                 AND   ( RECE02-RJNHKNNUM    =   SPACE       )
+                   MOVE    RECE02-FTNMONEY(IDX1) TO  WRK-NUM
+                   MOVE    9                     TO  WRK-NAGASA
+                 END-IF
                END-IF
                IF    ( RECE02-HKNNUM       =   "002" )
                AND   ( RECE02-HOJOKBN      =   "3"   )
@@ -2065,7 +2075,7 @@
                    MOVE    9                     TO  WRK-NAGASA
                END-IF
            ELSE
-               IF      RECE02-ZAITAKU  NOT =   SPACE
+               IF      RECE02-ZAITAKU   =   "1" OR "2"
                    MOVE    RECE02-FTNMONEY (IDX1)
                                                TO  WRK-NUM
                    MOVE    9                   TO  WRK-NAGASA
@@ -2208,7 +2218,7 @@
            END-IF   
            IF      RECE02-FTNMONEY (IDX1)
                                        =   ZERO
-               IF  (   RECE02-ZAITAKU  NOT =   SPACE           )
+               IF  (   RECE02-ZAITAKU      =  "1"  OR  "2"     )
                OR  ( ( RECE02-RJNNYUFTN    =   1         ) AND
                      ( RECE02-GENMENKBN    =   1   OR  2 )     )   
                    MOVE    RECE02-FTNMONEY (IDX1)

@@ -115,6 +115,7 @@
       *                                     たときの対応
       *
       *  03.04.01    NACL-門脇    06/11/29  病棟区分編集修正
+      *  03.04.02    NACL-門脇    07/04/01  現物給付対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1225,21 +1226,23 @@
            END-EVALUATE
       *     
       *    高齢者フラグ
-           IF      RECE62-SRYYM      >=  "200210"
-              IF    ( RECE62-AGE          >=  70      )   OR
-                    ( RECE62-AGE          >=  65  AND                    
-                      RECE61-KOHID    NOT  =   ZERO   )   OR             
-                    ( RECE62-AGE          >=  65  AND                    
+           MOVE     SPACE    TO    RECE62-KOUREI
+           IF  (RECE62-RECESYUBETU   =   "8888" OR "6666")
+           OR  (RECE62-HKNNUM        =   SPACE           )
+              CONTINUE
+           ELSE
+              IF      RECE62-SRYYM  >=  "200210"
+                IF  ( RECE62-AGE          >=  70      )   OR
+                    ( RECE62-AGE          >=  65  AND
+                      RECE61-KOHID    NOT  =   ZERO   )   OR
+                    ( RECE62-AGE          >=  65  AND
                       FLG-ROUJINHOKEN      =   1      )
-                  MOVE    "1"                 TO  RECE62-KOUREI
-      *
-                  IF  RECE62-RECESYUBETU   =   "8888" OR "6666"
-                      MOVE  SPACE       TO  RECE62-KOUREI
+                   MOVE     "1"     TO   RECE62-KOUREI
+                ELSE
+                  IF  RECE62-SRYYM  >=  "200704"
+                     MOVE   "2"     TO   RECE62-KOUREI
                   END-IF
-                  IF  RECE62-HKNNUM        =   SPACE 
-                      MOVE  SPACE       TO  RECE62-KOUREI
-                  END-IF
-      *
+                END-IF
               END-IF
            END-IF
       *

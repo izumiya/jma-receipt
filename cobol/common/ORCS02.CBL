@@ -701,6 +701,7 @@
            03  FLG-KOUGAKUCYO2         PIC 9(01).
            03  FLG-KOUGAKUCYO3         PIC 9(01).
            03  FLG-KOUGAKUCYO5         PIC 9(01).
+           03  FLG-KOUGAKUCYO-JIRITU   PIC 9(01).
            03  FLG-KOUGAKUCYO-ININ     PIC 9(01).
            03  FLG-KOUGAKUCYO-GEN70    PIC 9(01).
            03  FLG-KOUGAKUCYO-GEN70K   PIC 9(01).
@@ -1197,6 +1198,7 @@
                OR   FLG-KOUGAKUCYO2          =    1 
                OR   FLG-KOUGAKUCYO3          =    1 
                OR   FLG-KOUGAKUCYO5          =    1 
+               OR   FLG-KOUGAKUCYO-JIRITU    =    1
                OR   FLG-KOUGAKUCYO-ININ      =    1
                OR   FLG-KOUGAKUCYO-GEN70     =    1
                OR   FLG-KOUGAKUCYO-GEN70K    =    1
@@ -5267,7 +5269,7 @@
                               EVALUATE  WK-GEN70-GENDOGAKU
                                WHEN       80100
                                  MOVE  WK-ZENGAKU TO WK-KOUREI-IRYOHI70K
-                                 MOVE  1          TO FLG-IRYOHI70K
+                                 MOVE  2          TO FLG-IRYOHI70K
                               END-EVALUATE
                             END-IF
                          END-IF
@@ -6409,6 +6411,20 @@
                         (( WK-KOUREI-IRYOHI70K - 267000 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M
                                              +   WK-KOUREI-IRYOHI70X
+                   IF   WK-KOUREI-IRYOHI70K   >  1935690
+                      MOVE    1    TO    FLG-KOUGAKUCYO-GEN70K
+                   END-IF
+                END-IF
+              END-IF
+              IF     FLG-IRYOHI70K    =  2
+                IF  WK-KOUREI-IRYOHI70K >  267000
+                   COMPUTE WK-KOUREI-IRYOHI70X =
+                        (( WK-KOUREI-IRYOHI70K - 267000 ) * 0.01 ) + 0.5
+                   COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M
+                                             +   WK-KOUREI-IRYOHI70X
+                   IF   WK-KOUREI-IRYOHI70K   >   860340
+                      MOVE    1    TO    FLG-KOUGAKUCYO-GEN70K
+                   END-IF
                 END-IF
               END-IF
       *       £´£±Ï·¿ÍÍÑ
@@ -6555,6 +6571,9 @@
                          (( WK-KOUREI-IRYOHI  -  267000 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
                                              +   WK-KOUREI-IRYOHI2
+                   IF   WK-KOUREI-IRYOHI   >   860340
+                        MOVE    1    TO    FLG-KOUGAKUCYO-JIRITU
+                   END-IF
                 END-IF
               END-IF
             ELSE
@@ -6611,6 +6630,9 @@
                          (( WK-KOUREI-IRYOHI  -  241000 ) * 0.01 ) + 0.5
                    COMPUTE  MAX-KIN-KOHI1-M  =   MAX-KIN-KOHI1-M 
                                              +   WK-KOUREI-IRYOHI2
+                   IF   WK-KOUREI-IRYOHI   >   776540
+                        MOVE    1    TO    FLG-KOUGAKUCYO-JIRITU
+                   END-IF
                 END-IF
               END-IF
             END-IF
@@ -16188,6 +16210,8 @@
                     ( FLG-SYOUKAN(1)         =    "1"  ))
                OR  (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
                     ( FLG-IRYOHI5        =   11 OR 12  ))
+               OR  (  FLG-KOUGAKUCYO-JIRITU
+                                         NOT =    ZERO  )
                OR  (  FLG-KOUGAKUCYO-GEN70K
                                          NOT =    ZERO  )
                OR  (( FLG-KOUGAKUCYO-GEN70
@@ -16256,6 +16280,8 @@
                       ( FLG-SYOUKAN(1)         =    "1"  ))
                   OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
                       ( FLG-IRYOHI5        =   11 OR 12  ))
+                  OR (  FLG-KOUGAKUCYO-JIRITU
+                                           NOT =    ZERO  )
                   OR (  FLG-KOUGAKUCYO-GEN70K
                                            NOT =    ZERO  )
                   OR (( FLG-KOUGAKUCYO-GEN70
@@ -16289,6 +16315,8 @@
                       ( FLG-SYOUKAN(1)         =    "1"  ))
                   OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
                       ( FLG-IRYOHI5        =   11 OR 12  ))
+                  OR (  FLG-KOUGAKUCYO-JIRITU
+                                           NOT =    ZERO  )
                   OR (  FLG-KOUGAKUCYO-GEN70K
                                            NOT =    ZERO  )
                   OR (( FLG-KOUGAKUCYO-GEN70
@@ -16528,6 +16556,13 @@
                   CONTINUE
               ELSE
                   MOVE    ZERO     TO    FLG-KOUGAKUCYO2
+              END-IF
+           END-IF.
+           IF   FLG-KOUGAKUCYO-JIRITU  NOT =    ZERO
+              IF   FLG-HIKAKU     =     1
+                  CONTINUE
+              ELSE
+                  MOVE     ZERO      TO    FLG-KOUGAKUCYO-JIRITU
               END-IF
            END-IF.
       *
