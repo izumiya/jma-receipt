@@ -2220,17 +2220,24 @@
       *****             MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
               END-IF
-              IF   SRY-SRYCD(IDX2)    =     CONS-SINDAI5-COMMENT  OR
-                                            CONS-SINDAI6-COMMENT  OR
-                                            CONS-KOKYUKI5-COMMENT OR
-                                            CONS-KOKYUKI6-COMMENT OR
-                                            CONS-NOUKE5-COMMENT   OR
-                                            CONS-NOUKE6-COMMENT   OR
-                                            CONS-UNDOKI5-COMMENT  OR
-                                            CONS-UNDOKI6-COMMENT
-      ****              MOVE   "1"    TO    RECE41-COMCNTFLG
+              EVALUATE      SRY-SRYCD(IDX2)
+                WHEN     CONS-SINDAI5-COMMENT
                         MOVE   "2"    TO    RECE44-RIHABIRI-COMMENT
-              END-IF
+                WHEN     CONS-SINDAI6-COMMENT
+                        MOVE   "3"    TO    RECE44-RIHABIRI-COMMENT
+                WHEN     CONS-KOKYUKI5-COMMENT
+                        MOVE   "4"    TO    RECE44-RIHABIRI-COMMENT
+                WHEN     CONS-KOKYUKI6-COMMENT
+                        MOVE   "5"    TO    RECE44-RIHABIRI-COMMENT
+                WHEN     CONS-NOUKE5-COMMENT
+                        MOVE   "6"    TO    RECE44-RIHABIRI-COMMENT
+                WHEN     CONS-NOUKE6-COMMENT
+                        MOVE   "7"    TO    RECE44-RIHABIRI-COMMENT
+                WHEN     CONS-UNDOKI5-COMMENT
+                        MOVE   "8"    TO    RECE44-RIHABIRI-COMMENT
+                WHEN     CONS-UNDOKI6-COMMENT
+                        MOVE   "9"    TO    RECE44-RIHABIRI-COMMENT
+              END-EVALUATE
       *       リハビリ（発症日記載）
               IF   RECE41-SRYYM      >=    "200604"
                 IF   SRY-SRYCD(IDX2)  =     CONS-SINDAI1-COMMENT
