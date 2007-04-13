@@ -122,6 +122,7 @@
       *  03.03.02    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
       *  03.03.03    NACL-ÌçÏÆ    07/01/23  Ãí¼Í²Ã»»¤ÎÌ¾¾ÎÊÔ½¸½¤Àµ
       *  03.03.04    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
+      *  03.03.05    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -674,18 +675,50 @@
            03  CONS-SINDAI1-COMMENT  PIC X(09)  VALUE  "180027410".
       *    ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
            03  CONS-SINDAI2-COMMENT  PIC X(09)  VALUE  "180027510".
+      **   ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡Ê£±£²£°ÆüÄ¶¡Ë
+           03  CONS-SINDAI3-COMMENT  PIC X(09)  VALUE  "180029110".
+      **   ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡Ê£±£²£°ÆüÄ¶¡Ë
+           03  CONS-SINDAI4-COMMENT  PIC X(09)  VALUE  "180029210".
+      **   ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-SINDAI5-COMMENT  PIC X(09)  VALUE  "180029910".
+      **   ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-SINDAI6-COMMENT  PIC X(09)  VALUE  "180030010".
       *    ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-KOKYUKI1-COMMENT PIC X(09)  VALUE  "180028010".
       *    ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
            03  CONS-KOKYUKI2-COMMENT PIC X(09)  VALUE  "180028110".
+      **   ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡Ê£¸£°ÆüÄ¶¡Ë
+           03  CONS-KOKYUKI3-COMMENT PIC X(09)  VALUE  "180029710".
+      **   ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡Ê£¸£°ÆüÄ¶¡Ë
+           03  CONS-KOKYUKI4-COMMENT PIC X(09)  VALUE  "180029810".
+      **   ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-KOKYUKI5-COMMENT PIC X(09)  VALUE  "180030510".
+      **   ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-KOKYUKI6-COMMENT PIC X(09)  VALUE  "180030610".
       *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-NOUKE1-COMMENT   PIC X(09)  VALUE  "180027610".
       *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
            03  CONS-NOUKE2-COMMENT   PIC X(09)  VALUE  "180027710".
+      **   Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡Ê£±£´£°ÆüÄ¶¡Ë
+           03  CONS-NOUKE3-COMMENT   PIC X(09)  VALUE  "180029310".
+      **   Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡Ê£±£´£°ÆüÄ¶¡Ë
+           03  CONS-NOUKE4-COMMENT   PIC X(09)  VALUE  "180029410".
+      **   Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-NOUKE5-COMMENT   PIC X(09)  VALUE  "180030110".
+      **   Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-NOUKE6-COMMENT   PIC X(09)  VALUE  "180030210".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
            03  CONS-UNDOKI2-COMMENT  PIC X(09)  VALUE  "180027910".
+      **   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡Ê£±£²£°ÆüÄ¶¡Ë
+           03  CONS-UNDOKI3-COMMENT  PIC X(09)  VALUE  "180029510".
+      **   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡Ê£±£²£°ÆüÄ¶¡Ë
+           03  CONS-UNDOKI4-COMMENT  PIC X(09)  VALUE  "180029610".
+      **   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-UNDOKI5-COMMENT  PIC X(09)  VALUE  "180030310".
+      **   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-UNDOKI6-COMMENT  PIC X(09)  VALUE  "180030410".
       *    ÆñÉÂ´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    ¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£¶ºÐÌ¤Ëþ¡Ë
@@ -2167,37 +2200,72 @@
               END-IF
               IF   SRY-SRYCD(IDX2)    =     CONS-SINDAI1-COMMENT  OR
                                             CONS-SINDAI2-COMMENT  OR
+                                            CONS-SINDAI3-COMMENT  OR
+                                            CONS-SINDAI4-COMMENT  OR
                                             CONS-KOKYUKI1-COMMENT OR
                                             CONS-KOKYUKI2-COMMENT OR
+                                            CONS-KOKYUKI3-COMMENT OR
+                                            CONS-KOKYUKI4-COMMENT OR
                                             CONS-NOUKE1-COMMENT   OR
                                             CONS-NOUKE2-COMMENT   OR
+                                            CONS-NOUKE3-COMMENT   OR
+                                            CONS-NOUKE4-COMMENT   OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
+                                            CONS-UNDOKI3-COMMENT  OR
+                                            CONS-UNDOKI4-COMMENT  OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT
       *****             MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
               END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-SINDAI5-COMMENT  OR
+                                            CONS-SINDAI6-COMMENT  OR
+                                            CONS-KOKYUKI5-COMMENT OR
+                                            CONS-KOKYUKI6-COMMENT OR
+                                            CONS-NOUKE5-COMMENT   OR
+                                            CONS-NOUKE6-COMMENT   OR
+                                            CONS-UNDOKI5-COMMENT  OR
+                                            CONS-UNDOKI6-COMMENT
+      ****              MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "2"    TO    RECE44-RIHABIRI-COMMENT
+              END-IF
       *       ¥ê¥Ï¥Ó¥ê¡ÊÈ¯¾ÉÆüµ­ºÜ¡Ë
               IF   RECE41-SRYYM      >=    "200604"
                 IF   SRY-SRYCD(IDX2)  =     CONS-SINDAI1-COMMENT
                                       OR    CONS-SINDAI2-COMMENT
+                                      OR    CONS-SINDAI3-COMMENT
+                                      OR    CONS-SINDAI4-COMMENT
+                                      OR    CONS-SINDAI5-COMMENT
+                                      OR    CONS-SINDAI6-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SINDAI-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-KOKYUKI1-COMMENT
                                       OR    CONS-KOKYUKI2-COMMENT
+                                      OR    CONS-KOKYUKI3-COMMENT
+                                      OR    CONS-KOKYUKI4-COMMENT
+                                      OR    CONS-KOKYUKI5-COMMENT
+                                      OR    CONS-KOKYUKI6-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-KOKYUKI-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-NOUKE1-COMMENT
                                       OR    CONS-NOUKE2-COMMENT
+                                      OR    CONS-NOUKE3-COMMENT
+                                      OR    CONS-NOUKE4-COMMENT
+                                      OR    CONS-NOUKE5-COMMENT
+                                      OR    CONS-NOUKE6-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-NOUKE-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-UNDOKI1-COMMENT
                                       OR    CONS-UNDOKI2-COMMENT
+                                      OR    CONS-UNDOKI3-COMMENT
+                                      OR    CONS-UNDOKI4-COMMENT
+                                      OR    CONS-UNDOKI5-COMMENT
+                                      OR    CONS-UNDOKI6-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-UNDOKI-COMMENT
                 END-IF
