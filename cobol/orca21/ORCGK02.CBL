@@ -629,6 +629,11 @@
            03  WRK-SYOKAI-YMD          PIC X(08).
       *
            03  WRK-SPA-GMN-SYOSINYMD   PIC X(24).
+      *@
+      *    今回リハビリ発生日
+           03  WRK-KYUSEI-INP-G.
+               05  WRK-KYUSEI-IN-G         OCCURS   7.
+                   07  WRK-KYUSEI-ST       PIC X(01).
       *
       *    小児科外来診察料テーブル
       **** COPY   "CMSYONIKATBL.INC".
@@ -7254,6 +7259,7 @@
            MOVE    ZERO                TO  WRK-KAISU
            MOVE    SPACE               TO  WRK-KYUSEI-YMD
            MOVE    SPACE               TO  WRK-KYUSEI-END
+           MOVE    SPACE               TO  WRK-KYUSEI-INP-G
       *    同日初診フラグ
            MOVE    ZERO                TO  WRK-DOUSIN
       *
@@ -7287,6 +7293,23 @@
                        IF      SPA-COM-INPUTCD(IDX)    =   "099800102"
                            MOVE    SPA-SRYYMD      TO  WRK-KYUSEI-END
                        END-IF
+                       EVALUATE    SPA-COM-INPUTCD(IDX)
+      *                疾患別リハビリ発生日
+                           WHEN    "099800111"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (1)
+                           WHEN    "099800121"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (2)
+                           WHEN    "099800131"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (3)
+                           WHEN    "099800141"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (4)
+                           WHEN    "099800151"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (5)
+                           WHEN    "099800161"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (6)
+                           WHEN    "099800171"
+                               MOVE    "1"         TO  WRK-KYUSEI-ST (7)
+                       END-EVALUATE
                    END-IF
       *            内分泌負担試験有無
                    IF     (SPA-COM-SRYKBN (IDX)    =   "60"  )  AND
@@ -7376,6 +7399,8 @@
            INITIALIZE                  ORCSC00AREA
       *    リハビリ初回
            MOVE    SPACE               TO  SPA-RIGAKU-INIT
+      *    リハビリ算定回数
+           MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC (1:7)
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   200      )   OR

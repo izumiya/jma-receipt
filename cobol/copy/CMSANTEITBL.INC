@@ -137,12 +137,18 @@
            03  FILLER              PIC X(12)   VALUE   "  S180030410".
            03  FILLER              PIC X(12)   VALUE   "  S180030510".
            03  FILLER              PIC X(12)   VALUE   "  S180030610".
+      *リハビリ医学管理料算定時の実施日（Ｈ１９／４）
+           03  FILLER              PIC X(12)   VALUE   "   099800311".
+           03  FILLER              PIC X(12)   VALUE   "   099800321".
+           03  FILLER              PIC X(12)   VALUE   "   099800331".
+           03  FILLER              PIC X(12)   VALUE   "   099800341".
       *
        01  TBL-SANTEI-AREA-R       REDEFINES   TBL-SANTEI-AREA.
       **** 03  TBL-SANTEI-OCC      OCCURS   39  INDEXED   TBL-SAN.
       *****03  TBL-SANTEI-OCC      OCCURS   41  INDEXED   TBL-SAN.
       **** 03  TBL-SANTEI-OCC      OCCURS   57  INDEXED   TBL-SAN.
-           03  TBL-SANTEI-OCC      OCCURS   65  INDEXED   TBL-SAN.
+      **** 03  TBL-SANTEI-OCC      OCCURS   65  INDEXED   TBL-SAN.
+           03  TBL-SANTEI-OCC      OCCURS   69  INDEXED   TBL-SAN.
       *        リハビリ（K:個別、S:集団）(H:Ｈ１８．４から）
                05  TBL-RIGAKU-RYO      PIC X(01).
       *        リハビリ（R:理学,S:作業, G:言語)

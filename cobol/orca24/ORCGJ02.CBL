@@ -8201,10 +8201,12 @@
            MOVE    ZERO                TO  IDG
            PERFORM VARYING     IDXG    FROM    1   BY  1
                    UNTIL       IDXG    >   SPA-GMN-MAX
-               IF      SPA-GMN-BANGO       =   SPA-GMN-TBANGO
+               IF      SPA-GMN-TBLREC(IDXG)(1:3)   NOT =   "---"
+                   IF      SPA-GMN-BANGO       =   SPA-GMN-TBANGO
                                                             (IDXG)
-                   MOVE    IDXG                TO  IDG
-                   MOVE    SPA-GMN-MAX         TO  IDXG
+                       MOVE    IDXG                TO  IDG
+                       MOVE    SPA-GMN-MAX         TO  IDXG
+                   END-IF
                END-IF
            END-PERFORM
       *
