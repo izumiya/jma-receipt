@@ -37,6 +37,7 @@
       *  01.01.06     NACL-¿¹ÏÆ    05/05/12  ¸øÈñÃ±ÆÈ¤Î¾ì¹ç¾ò·ïÊÑ¹¹
       *  01.01.07     NACL-¿¹ÏÆ    06/06/16  ¾É¾õ¾Üµ­¶èÊ¬ÄÉ²ÃmonfuncÂÐ±þ
       *  03.03.01     NACL-¿¹ÏÆ    06/10/18  Ï·¿Í»°³äÂÐ±þ
+      *  03.04.01     NACL-¿¹ÏÆ    07/04/16  ¥³¥á¥ó¥È¼ïÎàÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -157,6 +158,14 @@
            03  WRK-MOJI8.
                05  FILLER81            PIC X(50)   VALUE
                    "¡Ú¿ÇÎÅÊó½·ÌÀºÙ½ñÅ¦Í×Íóµ­ºÜ¥³¥á¥ó¥È¡Û".
+      *----(03.04.01)--ADD-START---
+           03  WRK-MOJI9.
+               05  FILLER91            PIC X(50)   VALUE
+                   "¡ÚÌô»öË¡¤Ëµ¬Äê¤¹¤ë¼£¸³¤Ë·¸¤ë¼£¸³³µÍ×¡Û".
+           03  WRK-MOJI10.
+               05  FILLER101           PIC X(50)   VALUE
+                   "¡Ú¼À´µÊÌ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¤Ë·¸¤ë¼£ÎÅ·ÑÂ³¤ÎÍýÍ³Åù¡Û".
+      *----(03.04.01)--ADD-END-----
       *
            COPY    "CPSHELLTBL.INC".
       *
@@ -416,6 +425,14 @@
                            WHEN    "07"
                                MOVE    WRK-MOJI7
                                        TO  HCM37-NAIYO(CNT-LINE)
+      *----(03.04.01)--ADD-START---
+                           WHEN    "50"
+                               MOVE    WRK-MOJI9
+                                       TO  HCM37-NAIYO(CNT-LINE)
+                           WHEN    "51"
+                               MOVE    WRK-MOJI10
+                                       TO  HCM37-NAIYO(CNT-LINE)
+      *----(03.04.01)--ADD-END-----
                            WHEN    "99"
                                MOVE    WRK-MOJI8
                                        TO  HCM37-NAIYO(CNT-LINE)
@@ -1004,6 +1021,10 @@
                                            OR  "05"
                                            OR  "06"
                                            OR  "07"
+      *----(03.04.01)--ADD-START---
+                                           OR  "50"
+                                           OR  "51"
+      *----(03.04.01)--ADD-END-----
                                            OR  "99"
                        ADD     1               TO  CNT-RECEDEN
                        MOVE    1               TO  FLG-RECEDENOK
