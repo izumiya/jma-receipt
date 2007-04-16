@@ -76,6 +76,7 @@
       *  03.02.01    NACL-ÌçÏÆ    06/08/01  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
       *  03.03.01    NACL-ÌçÏÆ    06/10/19  ÎÅÍÜÉÂÅï¥ì¥»¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  03.03.02    NACL-ÌçÏÆ    07/03/05  »ÀÁÇ·×»»¼°½¤Àµ
+      *  03.03.03    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -398,6 +399,14 @@
            03  WRK-HENYMD            PIC X(08).
            03  WRK-TAIHI-XX          PIC X(02).
       *
+           03  WRK-RIHAIGAKU-SRYCD           PIC X(09).
+           03  WRK-RIHAIGAKU-SRYCD2          PIC X(09).
+           03  WRK-RIHAIGAKU-FSANTEIYMD      PIC X(08).
+           03  WRK-RIHAIGAKU-SANTEI-AREA.
+               05  WRK-RIHAIGAKU-SANTEI-FLG  PIC X(01).
+               05  WRK-RIHAIGAKU-SANTEI-DAY  PIC 9(03)
+                                             OCCURS 31.
+      *
        01  WRK-RECE64-REC. 
            COPY    "CPRCF064.INC"  REPLACING   //RECE64//
                                    BY          //WRK-RECE64//.
@@ -496,6 +505,32 @@
            03  CONS-SYOGAI          PIC X(09) VALUE "099800171".
       *    ÀÝ¿©ÎÅË¡³«»ÏÆü
            03  CONS-SESSYOKU        PIC X(09) VALUE "099800151".
+      *
+      *    ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-SINDAI-IGAKU1   PIC X(09) VALUE "180029910".
+      *    ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-SINDAI-IGAKU2   PIC X(09) VALUE "180030010".
+      *    ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-KOKYUKI-IGAKU1  PIC X(09) VALUE "180030510".
+      *    ¸ÆµÛ´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-KOKYUKI-IGAKU2  PIC X(09) VALUE "180030610".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-NOUKE-IGAKU1    PIC X(09) VALUE "180030110".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-NOUKE-IGAKU2    PIC X(09) VALUE "180030210".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£±¡Ë
+           03  CONS-UNDOKI-IGAKU1   PIC X(09) VALUE "180030310".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
+           03  CONS-UNDOKI-IGAKU2   PIC X(09) VALUE "180030410".
+      *
+      *    ¿´Âç·ì´É¼À´µ¥ê¥Ï¼Â»Ü
+           03  CONS-SINDAI-DUMMY    PIC X(09) VALUE "099800311".
+      *    ¸ÆµÛ´ï¥ê¥Ï¼Â»Ü
+           03  CONS-KOKYUKI-DUMMY   PIC X(09) VALUE "099800341".
+      *    Ç¾·ì´É¼À´µ¥ê¥Ï¼Â»Ü
+           03  CONS-NOUKE-DUMMY     PIC X(09) VALUE "099800321".
+      *    ±¿Æ°´ï¥ê¥Ï¼Â»Ü
+           03  CONS-UNDOKI-DUMMY    PIC X(09) VALUE "099800331".
       *
        01  TBL-HASSYO-INF.
            03  TBL-HASSYO-KAITATU-FLG           PIC 9(01).
@@ -1022,10 +1057,15 @@
                       END-IF
       *            ¡Ê¥ê¥Ï¥Ó¥ê¤Î¥»¥Ã¥È¡Ë
                       IF   FLG-COMMENT  =  ZERO
-                         IF  RECE64-RIHABIRI-COMMENT     =  "1"
-                             MOVE      99   TO   FLG-COMMENT
-                             PERFORM   2001-RIHA-COMMENT-SEC
-                         END-IF
+                        IF    RECE64-RIHABIRI-COMMENT  NOT = SPACE
+                          IF  RECE64-RIHABIRI-COMMENT      =  "1"
+                            MOVE      99   TO   FLG-COMMENT
+                            PERFORM   2001-RIHA-COMMENT-SEC
+                          ELSE
+                            MOVE      99   TO   FLG-COMMENT
+                            PERFORM   2001-RIHAIGAKU-COMMENT-SEC
+                          END-IF
+                        END-IF
                       END-IF
       *            ¡Ê¡Ê¥ê¥ÏÁª¡ËÆü¤Î¥»¥Ã¥È¡Ë
                       IF   FLG-COMMENT  =  ZERO
@@ -3353,6 +3393,13 @@
                                            WRK-KETA-TAIHI
                  MOVE     0          TO    WRK-KETA2
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
+              WHEN    7
+                 MOVE     8          TO    WRK-KETA
+                                           WRK-KETA-TAIHI
+                 MOVE     4          TO    WRK-KETA2
+                 MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
+                 MOVE    "¥ê¥Ï¼Â»Ü"
+                                 TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
            END-EVALUATE
       *
            MOVE      ZERO          TO  FLG-FIRST
@@ -3739,6 +3786,185 @@
       *
            .
        2001-RIHA-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ê¥Ï¥Ó¥ê°å³Ø´ÉÍýÎÁ¤Î¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2001-RIHAIGAKU-COMMENT-SEC          SECTION.
+      *
+           EVALUATE      RECE64-RIHABIRI-COMMENT
+              WHEN           "2"
+                  MOVE   CONS-SINDAI-IGAKU1   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-SINDAI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "3"
+                  MOVE   CONS-SINDAI-IGAKU2   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-SINDAI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "4"
+                  MOVE   CONS-KOKYUKI-IGAKU1  TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-KOKYUKI-DUMMY   TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "5"
+                  MOVE   CONS-KOKYUKI-IGAKU2  TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-KOKYUKI-DUMMY   TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "6"
+                  MOVE   CONS-NOUKE-IGAKU1    TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-NOUKE-DUMMY     TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "7"
+                  MOVE   CONS-NOUKE-IGAKU2    TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-NOUKE-DUMMY     TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "8"
+                  MOVE   CONS-UNDOKI-IGAKU1   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-UNDOKI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "9"
+                  MOVE   CONS-UNDOKI-IGAKU2   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-UNDOKI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+           END-EVALUATE
+      ***
+           MOVE          SPACE          TO  WRK-RIHAIGAKU-FSANTEIYMD
+      *    °å³Ø´ÉÍý¡§»»ÄêÍúÎò¸¡º÷
+           INITIALIZE                       SANTEI-REC
+           MOVE    RECE64-HOSPID        TO  SANTEI-HOSPID
+           MOVE    RECE64-PTID          TO  SANTEI-PTID
+           MOVE    RECE64-SRYYM         TO  SANTEI-SRYYM
+           MOVE    WRK-RIHAIGAKU-SRYCD  TO  SANTEI-SRYCD
+           MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                 TO  SANTEI-SRYKA
+           MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
+           MOVE    SANTEI-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"           TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC               =   ZERO
+             MOVE    "SANTEI-KEY"       TO  ORC-DBPATH
+             PERFORM  900-SANTEI-READ-SEC
+             IF       FLG-SANTEI        =   ZERO
+                MOVE  SANTEI-FSANTEIYMD TO  WRK-RIHAIGAKU-FSANTEIYMD
+             END-IF
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      ***
+           INITIALIZE      WRK-RIHAIGAKU-SANTEI-AREA
+      *    ¥ê¥Ï¼Â»Ü¥À¥ß¡¼¡§»»ÄêÍúÎò¸¡º÷
+           INITIALIZE                       SANTEI-REC
+           MOVE    RECE64-HOSPID        TO  SANTEI-HOSPID
+           MOVE    RECE64-PTID          TO  SANTEI-PTID
+           MOVE    RECE64-SRYYM         TO  SANTEI-SRYYM
+           MOVE    WRK-RIHAIGAKU-SRYCD2 TO  SANTEI-SRYCD
+           MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                 TO  SANTEI-SRYKA
+           MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
+           MOVE    SANTEI-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"           TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC               =   ZERO
+             MOVE    "SANTEI-KEY"       TO  ORC-DBPATH
+             PERFORM  900-SANTEI-READ-SEC
+             IF       FLG-SANTEI        =   ZERO
+               PERFORM  VARYING  IDX  FROM  1  BY  1
+                         UNTIL   IDX    >  31
+                 IF   SANTEI-DAY(IDX)   NOT =  ZERO
+                    MOVE  "1"  TO  WRK-RIHAIGAKU-SANTEI-FLG
+                    MOVE  SANTEI-DAY(IDX)
+                               TO  WRK-RIHAIGAKU-SANTEI-DAY(IDX)
+                 END-IF
+               END-PERFORM
+             END-IF
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      *
+      ***
+      *
+           PERFORM  200111-RECE65-TAIHI-SEC
+      *
+           MOVE    ZERO                 TO  IDX-RECE65
+           MOVE    SPACE                TO  WRK-RECE65XX-REC
+           INITIALIZE                       WRK-RECE65XX-REC
+      *
+           COMPUTE  MAX-MEISAISU        =   RECE64-MEISAISU  +  1
+      *
+           MOVE    "810000001"
+                         TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+           MOVE    ZERO  TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+           MOVE    9     TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+           MOVE    "³«»Ï¡¡¡¡¡¡·î¡¡¡¡Æü"
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           IF      WRK-RIHAIGAKU-FSANTEIYMD  NOT = SPACE
+             MOVE    WRK-RIHAIGAKU-FSANTEIYMD(5:2)   TO  DAY-IDX2
+             MOVE    TBL-DAY(DAY-IDX2)
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(7:4)
+             MOVE    WRK-RIHAIGAKU-FSANTEIYMD(7:2)   TO  DAY-IDX2
+             MOVE    TBL-DAY(DAY-IDX2)
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(13:4)
+           END-IF
+      *
+           IF      WRK-RIHAIGAKU-SANTEI-FLG  NOT = SPACE
+             PERFORM    20011-RIHAIGAKU-DUMMY-COMMENT-SEC
+           ELSE
+             PERFORM    200111-SRYACTINF-HENSYU-SEC
+           END-IF
+      *
+           .
+       2001-RIHAIGAKU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ê¥Ï¥Ó¥ê°å³Ø´ÉÍýÎÁ¤Î¥³¥á¥ó¥ÈÊÔ½¸¡Ê¥ê¥Ï¼Â»ÜÆü¡Ë
+      *****************************************************************
+       20011-RIHAIGAKU-DUMMY-COMMENT-SEC          SECTION.
+      *
+           INITIALIZE             TBL-SANTEI-DAY
+      *
+           MOVE     ZERO      TO   DAY-IDX
+           PERFORM  VARYING  IDX  FROM   1   BY   1
+                     UNTIL   IDX    >   31
+             IF  WRK-RIHAIGAKU-SANTEI-DAY(IDX)  NOT = ZERO
+                 ADD    1     TO   DAY-IDX
+                 MOVE   IDX   TO   TB-SANTEI-DAY(DAY-IDX)
+             END-IF
+           END-PERFORM
+      *
+           MOVE     ZERO      TO   IDZ
+           INITIALIZE         WRK-FREE-AREA2
+      *
+           MOVE     7         TO   FLG-COMMENT
+           PERFORM  200111-FREE-COMMENT2-SEC
+      *
+           PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX                >   50    )
+                         OR      ( WK-FREE-NAME2(IDX) =   SPACE )
+                COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+                MOVE   "810000001"
+                             TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+                MOVE   ZERO  TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+                MOVE   WK-FREE-YUKOKETA2(IDX)
+                             TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+                MOVE   WK-FREE-NAME2(IDX)
+                             TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-PERFORM
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-RIHAIGAKU-DUMMY-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

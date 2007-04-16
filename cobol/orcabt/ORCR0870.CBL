@@ -58,6 +58,7 @@
       *  03.02.01    NACL-門脇    06/08/01  リハ発症日記載修正
       *  03.03.01    NACL-門脇    06/10/19  療養病棟レセコメント記載対応
       *  03.03.02    NACL-門脇    07/03/05  酸素計算式修正
+      *  03.03.03    NACL-門脇    07/04/13  リハビリ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -375,6 +376,14 @@
       *
            03  WRK-OKIKAEFLG         PIC X(01).
       *
+           03  WRK-RIHAIGAKU-SRYCD           PIC X(09).
+           03  WRK-RIHAIGAKU-SRYCD2          PIC X(09).
+           03  WRK-RIHAIGAKU-FSANTEIYMD      PIC X(08).
+           03  WRK-RIHAIGAKU-SANTEI-AREA.
+               05  WRK-RIHAIGAKU-SANTEI-FLG  PIC X(01).
+               05  WRK-RIHAIGAKU-SANTEI-DAY  PIC 9(03)
+                                             OCCURS 31.
+      *
        01  WRK-RECE84-REC. 
            COPY    "CPRCF084.INC"  REPLACING   //RECE84//
                                    BY          //WRK-RECE84//.
@@ -471,6 +480,32 @@
            03  CONS-SYOGAI          PIC X(09) VALUE "099800171".
       *    摂食療法開始日
            03  CONS-SESSYOKU        PIC X(09) VALUE "099800151".
+      *
+      *    心大血管疾患リハビリテーション医学管理料（１）
+           03  CONS-SINDAI-IGAKU1   PIC X(09) VALUE "180029910".
+      *    心大血管疾患リハビリテーション医学管理料（２）
+           03  CONS-SINDAI-IGAKU2   PIC X(09) VALUE "180030010".
+      *    呼吸器リハビリテーション医学管理料（１）
+           03  CONS-KOKYUKI-IGAKU1  PIC X(09) VALUE "180030510".
+      *    呼吸器リハビリテーション医学管理料（２）
+           03  CONS-KOKYUKI-IGAKU2  PIC X(09) VALUE "180030610".
+      *    脳血管疾患等リハビリテーション医学管理料（１）
+           03  CONS-NOUKE-IGAKU1    PIC X(09) VALUE "180030110".
+      *    脳血管疾患等リハビリテーション医学管理料（２）
+           03  CONS-NOUKE-IGAKU2    PIC X(09) VALUE "180030210".
+      *    運動器リハビリテーション医学管理料（１）
+           03  CONS-UNDOKI-IGAKU1   PIC X(09) VALUE "180030310".
+      *    運動器リハビリテーション医学管理料（２）
+           03  CONS-UNDOKI-IGAKU2   PIC X(09) VALUE "180030410".
+      *
+      *    心大血管疾患リハ実施
+           03  CONS-SINDAI-DUMMY    PIC X(09) VALUE "099800311".
+      *    呼吸器リハ実施
+           03  CONS-KOKYUKI-DUMMY   PIC X(09) VALUE "099800341".
+      *    脳血管疾患リハ実施
+           03  CONS-NOUKE-DUMMY     PIC X(09) VALUE "099800321".
+      *    運動器リハ実施
+           03  CONS-UNDOKI-DUMMY    PIC X(09) VALUE "099800331".
       *
        01  TBL-HASSYO-INF.
            03  TBL-HASSYO-KAITATU-COMMENT   PIC 9(01).
@@ -937,9 +972,14 @@
                       END-IF
       *            （リハビリのセット）
                       IF   FLG-COMMENT  =  ZERO
-                        IF  RECE84-RIHABIRI-COMMENT     =  "1"
+                        IF    RECE84-RIHABIRI-COMMENT  NOT = SPACE
+                          IF  RECE84-RIHABIRI-COMMENT      =  "1"
                             MOVE      99   TO   FLG-COMMENT
                             PERFORM   2001-RIHA-COMMENT-SEC
+                          ELSE
+                            MOVE      99   TO   FLG-COMMENT
+                            PERFORM   2001-RIHAIGAKU-COMMENT-SEC
+                          END-IF
                         END-IF
                       END-IF
       *            （（リハ選）日のセット）
@@ -1012,9 +1052,14 @@
                       END-IF
       *            （リハビリのセット）
                       IF   FLG-COMMENT  =  ZERO
-                        IF  RECE84-RIHABIRI-COMMENT     =  "1"
+                        IF    RECE84-RIHABIRI-COMMENT  NOT = SPACE
+                          IF  RECE84-RIHABIRI-COMMENT      =  "1"
                             MOVE      99   TO   FLG-COMMENT
                             PERFORM   2001-RIHA-COMMENT-SEC
+                          ELSE
+                            MOVE      99   TO   FLG-COMMENT
+                            PERFORM   2001-RIHAIGAKU-COMMENT-SEC
+                          END-IF
                         END-IF
                       END-IF
       *            （（リハ選）日のセット）
@@ -2936,6 +2981,13 @@
                                            WRK-KETA-TAIHI
                  MOVE     0          TO    WRK-KETA2
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
+              WHEN    7
+                 MOVE     8          TO    WRK-KETA
+                                           WRK-KETA-TAIHI
+                 MOVE     4          TO    WRK-KETA2
+                 MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
+                 MOVE    "リハ実施"
+                                 TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
            END-EVALUATE
       *
            MOVE      ZERO          TO  FLG-FIRST
@@ -3130,6 +3182,187 @@
       *
            .
        2001-RIHA-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    リハビリ医学管理料のコメント編集
+      *****************************************************************
+       2001-RIHAIGAKU-COMMENT-SEC          SECTION.
+      *
+           EVALUATE      RECE84-RIHABIRI-COMMENT
+              WHEN           "2"
+                  MOVE   CONS-SINDAI-IGAKU1   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-SINDAI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "3"
+                  MOVE   CONS-SINDAI-IGAKU2   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-SINDAI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "4"
+                  MOVE   CONS-KOKYUKI-IGAKU1  TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-KOKYUKI-DUMMY   TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "5"
+                  MOVE   CONS-KOKYUKI-IGAKU2  TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-KOKYUKI-DUMMY   TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "6"
+                  MOVE   CONS-NOUKE-IGAKU1    TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-NOUKE-DUMMY     TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "7"
+                  MOVE   CONS-NOUKE-IGAKU2    TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-NOUKE-DUMMY     TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "8"
+                  MOVE   CONS-UNDOKI-IGAKU1   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-UNDOKI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+              WHEN           "9"
+                  MOVE   CONS-UNDOKI-IGAKU2   TO  WRK-RIHAIGAKU-SRYCD
+                  MOVE   CONS-UNDOKI-DUMMY    TO  WRK-RIHAIGAKU-SRYCD2
+           END-EVALUATE
+      ***
+           MOVE          SPACE          TO  WRK-RIHAIGAKU-FSANTEIYMD
+      *    医学管理：算定履歴検索
+           INITIALIZE                       SANTEI-REC
+           MOVE    RECE84-HOSPID        TO  SANTEI-HOSPID
+           MOVE    RECE84-PTID          TO  SANTEI-PTID
+           MOVE    RECE84-SRYYM         TO  SANTEI-SRYYM
+           MOVE    WRK-RIHAIGAKU-SRYCD  TO  SANTEI-SRYCD
+           MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                 TO  SANTEI-SRYKA
+           MOVE    RECE84-HKNCOMBI      TO  SANTEI-HKNCOMBINUM
+           MOVE    SANTEI-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"           TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC               =   ZERO
+             MOVE    "SANTEI-KEY"       TO  ORC-DBPATH
+             PERFORM  900-SANTEI-READ-SEC
+             IF       FLG-SANTEI        =   ZERO
+                MOVE  SANTEI-FSANTEIYMD TO  WRK-RIHAIGAKU-FSANTEIYMD
+             END-IF
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      ***
+           INITIALIZE      WRK-RIHAIGAKU-SANTEI-AREA
+      *    リハ実施ダミー：算定履歴検索
+           INITIALIZE                       SANTEI-REC
+           MOVE    RECE84-HOSPID        TO  SANTEI-HOSPID
+           MOVE    RECE84-PTID          TO  SANTEI-PTID
+           MOVE    RECE84-SRYYM         TO  SANTEI-SRYYM
+           MOVE    WRK-RIHAIGAKU-SRYCD2 TO  SANTEI-SRYCD
+           MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                 TO  SANTEI-SRYKA
+           MOVE    RECE84-HKNCOMBI      TO  SANTEI-HKNCOMBINUM
+           MOVE    SANTEI-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"           TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+           IF      MCP-RC               =   ZERO
+             MOVE    "SANTEI-KEY"       TO  ORC-DBPATH
+             PERFORM  900-SANTEI-READ-SEC
+             IF       FLG-SANTEI        =   ZERO
+               PERFORM  VARYING  IDX  FROM  1  BY  1
+                         UNTIL   IDX    >  31
+                 IF   SANTEI-DAY(IDX)   NOT =  ZERO
+                    MOVE  "1"  TO  WRK-RIHAIGAKU-SANTEI-FLG
+                    MOVE  SANTEI-DAY(IDX)
+                               TO  WRK-RIHAIGAKU-SANTEI-DAY(IDX)
+                 END-IF
+               END-PERFORM
+             END-IF
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
+           MOVE    "SANTEI-KEY"         TO  ORC-DBPATH
+           CALL    "ORCMCPSUB"          USING
+                                        MCPAREA
+                                        ORCMCPAREA
+                                        MCPDATA-REC
+      *
+      ***
+      *
+           PERFORM  200111-RECE85-TAIHI-SEC
+      *
+           MOVE    ZERO                 TO  IDX-RECE85
+           MOVE    SPACE                TO  WRK-RECE85XX-REC
+           INITIALIZE                       WRK-RECE85XX-REC
+      *
+           COMPUTE  MAX-MEISAISU        =   RECE84-MEISAISU  +  1
+      *
+           MOVE    "810000001"
+                         TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
+           MOVE    ZERO  TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
+           MOVE    9     TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+           MOVE    "開始　　　月　　日"
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+           MOVE    "1"   TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
+           IF      WRK-RIHAIGAKU-FSANTEIYMD  NOT = SPACE
+             MOVE    WRK-RIHAIGAKU-FSANTEIYMD(5:2)   TO  DAY-IDX2
+             MOVE    TBL-DAY(DAY-IDX2)
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(7:4)
+             MOVE    WRK-RIHAIGAKU-FSANTEIYMD(7:2)   TO  DAY-IDX2
+             MOVE    TBL-DAY(DAY-IDX2)
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(13:4)
+           END-IF
+      *
+           IF      WRK-RIHAIGAKU-SANTEI-FLG  NOT = SPACE
+             PERFORM    20011-RIHAIGAKU-DUMMY-COMMENT-SEC
+           ELSE
+             PERFORM    200111-SRYACTINF-HENSYU-SEC
+           END-IF
+      *
+           .
+       2001-RIHAIGAKU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    リハビリ医学管理料のコメント編集（リハ実施日）
+      *****************************************************************
+       20011-RIHAIGAKU-DUMMY-COMMENT-SEC          SECTION.
+      *
+           INITIALIZE             TBL-SANTEI-DAY
+      *
+           MOVE     ZERO      TO   DAY-IDX
+           PERFORM  VARYING  IDX  FROM   1   BY   1
+                     UNTIL   IDX    >   31
+             IF  WRK-RIHAIGAKU-SANTEI-DAY(IDX)  NOT = ZERO
+                 ADD    1     TO   DAY-IDX
+                 MOVE   IDX   TO   TB-SANTEI-DAY(DAY-IDX)
+             END-IF
+           END-PERFORM
+      *
+           MOVE     ZERO      TO   IDZ
+           INITIALIZE         WRK-FREE-AREA2
+      *
+           MOVE     7         TO   FLG-COMMENT
+           PERFORM  200111-FREE-COMMENT2-SEC
+      *
+           PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX                >   50    )
+                         OR      ( WK-FREE-NAME2(IDX) =   SPACE )
+                COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+                MOVE   "810000001"
+                             TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
+                MOVE   ZERO  TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
+                MOVE   WK-FREE-YUKOKETA2(IDX)
+                             TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+                MOVE   WK-FREE-NAME2(IDX)
+                             TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+                MOVE    "1"  TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
+           END-PERFORM
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-RIHAIGAKU-DUMMY-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
