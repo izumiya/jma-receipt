@@ -53,6 +53,7 @@
       * 02.00.06     NACL-多々納  05/11/21  開放型病院共同指導料チェック追加
       * 02.00.07     NACL-多々納  05/12/14  .213 自動変換対応
       * 03.03.00     NACL-多々納  06/10/20  矯正固定等追加
+      * 03.03.01     NACL-多々納  07/04/XX  H19.4改正
       *****************************************************************
       *
       *
@@ -1409,6 +1410,12 @@
                    IF      WRK-RIHA-KBN        =   "S"
                        IF      SANTEI-MSANTEICNT   >   ZERO
                            MOVE    1               TO  SPA-GAIRAI-NASI
+                       END-IF
+      *                初回算定日より前は算定可能
+                       IF    (SANTEI-FSANTEIYMD(1:6)
+                                                   =   SPA-SRYYMD(1:6))
+                         AND (SANTEI-FSANTEIYMD    >   SPA-SRYYMD )
+                           MOVE    ZERO            TO  SPA-GAIRAI-NASI
                        END-IF
                    END-IF
            END-EVALUATE
