@@ -167,7 +167,9 @@
       *                                     順の修正
       *  03.04.01    NACL-門脇    07/03/22  公費給付対象一部負担金編集修正
       *  03.04.02    NACL-藤原    07/03/27  特定器材の記載方法の変更
+      *  ２００７年４月改正
       *  03.04.03    NACL-門脇    07/04/01  現物給付対応
+      *  03.04.04    NACL-藤原    07/04/13  症状詳記区分コード追加に伴う対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6259,7 +6261,7 @@
            MOVE    "key7"              TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
       *     
-      *    症状詳記コメント     
+      *    症状詳記コメント（０１〜０６）     
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
            MOVE    "key8"              TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
@@ -6267,6 +6269,11 @@
       *    症状詳記コメント（その他）    
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
+           PERFORM 2009-RECECOM-HENSYU-SEC
+      *     
+      *    症状詳記コメント（５０、５１）       
+           MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
+           MOVE    "key12"             TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
            .
        2009-COMMENT-HEN-99-EXT.

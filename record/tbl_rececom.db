@@ -181,8 +181,8 @@ path	key9		{
 			AND     PTID      =   :PTID
 			AND     SRYYM     =   :SRYYM
 			AND     NYUGAIKBN =   :NYUGAIKBN
-			AND     SJKBN     >   '06'
-			AND     SJKBN     <   '99'
+			AND     SJKBN     >=  '07'
+			AND     SJKBN     <=  '09'
 			ORDER BY HKNCOMBI,SJKBN,SRYDD
 		;
 	};
@@ -233,3 +233,20 @@ path	del2 	{
 		;
 	};
 };
+
+path	key12		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key12_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPID    =   :HOSPID
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     >=  '50'
+			AND     SJKBN     <=  '51'
+			ORDER BY HKNCOMBI,SJKBN,SRYDD
+		;
+	};
+};
+
