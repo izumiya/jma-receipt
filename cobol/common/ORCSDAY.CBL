@@ -759,15 +759,21 @@
 068400 DTKIKN-100.
 068500************
 068600     IF  WK-ST  +  10000  NOT >  WK-END
-068700******** COMPUTE  WK-ST1  =  WK-ST1  +  1
-068800         MOVE     WK-ST      TO  WK-YYMMDD
+               IF       WK-ST2      <  0301
+068800             MOVE     WK-ST      TO  WK-YYMMDD
+               ELSE
+068700             COMPUTE  WK-ST1  =  WK-ST1  +  1
+068800             MOVE     WK-ST      TO  WK-YYMMDD
+               END-IF
 068900         PERFORM  URUDOSHI-CHK-RTN
 069000         IF  WK-UERR  =  1
 069100             COMPUTE  WK-NISU =  WK-NISU +  366
 069200           ELSE
 069300             COMPUTE  WK-NISU =  WK-NISU +  365
 069400         END-IF
-               COMPUTE  WK-ST1  =  WK-ST1  +  1
+               IF       WK-ST2      <  0301
+                   COMPUTE  WK-ST1  =  WK-ST1  +  1
+               END-IF
 069500         GO  TO      DTKIKN-100
            END-IF.
 069600     IF  WK-ST  =  WK-END
