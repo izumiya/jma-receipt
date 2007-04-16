@@ -2981,13 +2981,6 @@
                                            WRK-KETA-TAIHI
                  MOVE     0          TO    WRK-KETA2
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
-              WHEN    7
-                 MOVE     8          TO    WRK-KETA
-                                           WRK-KETA-TAIHI
-                 MOVE     4          TO    WRK-KETA2
-                 MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
-                 MOVE    "¥ê¥Ï¼Â»Ü"
-                                 TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
            END-EVALUATE
       *
            MOVE      ZERO          TO  FLG-FIRST
@@ -3342,7 +3335,7 @@
            MOVE     ZERO      TO   IDZ
            INITIALIZE         WRK-FREE-AREA2
       *
-           MOVE     7         TO   FLG-COMMENT
+           MOVE     2         TO   FLG-COMMENT
            PERFORM  200111-FREE-COMMENT2-SEC
       *
            PERFORM   VARYING   IDX   FROM    1   BY  1
