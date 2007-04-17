@@ -26,10 +26,16 @@
       *  ºîÀ®ÆüÉÕ    ºî¶È¼Ô        µ­½Ò
       *  06/10/01    NACL-Æ£¸¶     ¿·µ¬ºîÀ®
       *****************************************************************
-      *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
+      *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò 
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  03.03.01    NACL-Æ£¸¶    07/02/10  Æ±°ìÃÏÊý¸øÈñ¤Î¤Þ¤È¤á½¸·×
       *                                     ²¬»³ÂÐ±þ
+      *  03.03.02    NACL-Æ£¸¶    07/04/13  È÷¹ÍÍó¤Î¸øÈñÌ¾¾Î¤òº¹¤·¹þ¤ß¹à
+      *                                     ÌÜ¤È¤¹¤ë
+      *                                     HCM2TV02.red ¢ª  HCM2TV03.red
+      *                                     £²£°£°£·¡¥£´²þÀµÂÐ±þ
+      *                                     £±£°¡Ê·ë£³£´¡Ë¢ª£±£°¡Ê´¶À÷£³£·¤Î£²¡Ë
+      *                                     £±£±¡Ê·ë£³£µ¡Ë¢ª£±£±¡Ê·ë³ËÆþ±¡¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -58,7 +64,7 @@
       *
            COPY    "HCM2SV02.INC"  REPLACING  //HCM2SV02//
                                    BY         //HCM2S//.
-           COPY    "HCM2TV02.INC"  REPLACING  //HCM2TV02//
+           COPY    "HCM2TV03.INC"  REPLACING  //HCM2TV03//
                                    BY         //HCM2T//.
       *
       *    ¥¹¥ÑÎÎ°è
@@ -121,6 +127,11 @@
                05  WRK-HKNNAME       PIC X(40). 
       *
            COPY    "CPSHELLTBL.INC".
+      *
+      *    ¸ÇÄê¹àÌÜ
+       01  WRK-CONS-AREA.
+      *    £²£°£°£·Ç¯£´·î²þÀµ
+           03  WRK-CONS-SRYYM-200704   PIC X(06)   VALUE   "200704".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -557,6 +568,22 @@
            END-EVALUATE           
       *
            MOVE    SYS-1005-SRYKANAME    TO  HCM2T-SRYKA
+      *
+           MOVE    "£´£³¡ÊÏ·¿ÍÈïÇú¡Ë"    TO  HCM2T-BKO-KOHKBN (1)
+           IF      LNK-PRTKANRI-SRYYM    <   WRK-CONS-SRYYM-200704
+               MOVE    "£±£°¡Ê·ë£³£´¡Ë"      TO  HCM2T-BKO-KOHKBN (2)
+               MOVE    "£±£±¡Ê·ë£³£µ¡Ë"      TO  HCM2T-BKO-KOHKBN (3)
+           ELSE
+               MOVE    "£±£°(´¶À÷37¤Î2) "    TO  HCM2T-BKO-KOHKBN (2)
+               MOVE    "£±£±¡Ê·ë³ËÆþ±¡¡Ë"    TO  HCM2T-BKO-KOHKBN (3)
+           END-IF
+           MOVE    "£±£²¡ÊÀ¸ÊÝ¡Ë"        TO  HCM2T-BKO-KOHKBN (4)
+           MOVE    "£±£µ¡Ê¹¹À¸¡Ë"        TO  HCM2T-BKO-KOHKBN (5)
+           MOVE    "£²£°¡ÊÀº£²£¹¡Ë"      TO  HCM2T-BKO-KOHKBN (6)
+           MOVE    "£²£±¡ÊÀº¿ÀÄÌ±¡¡Ë"    TO  HCM2T-BKO-KOHKBN (7)
+           MOVE    "£²£²¡ÊËãÌô¡Ë"        TO  HCM2T-BKO-KOHKBN (8)
+           MOVE    "£²£¸¡Ê´¶À÷¾É¡Ë"      TO  HCM2T-BKO-KOHKBN (9)
+           MOVE    "£µ£±¡ÊÆÃ¼À¡Ë"        TO  HCM2T-BKO-KOHKBN (10)
       *
            .
        310-HEAD-HEN-02-EXT.
@@ -1126,7 +1153,8 @@
       *********MOVE    "HCM2JV04.red"      TO  SPRT-PRTID
       *********MOVE    "HCM2T.red"         TO  SPRT-PRTID
       *********MOVE    "HCM2TV01.red"      TO  SPRT-PRTID
-               MOVE    "HCM2TV02.red"      TO  SPRT-PRTID
+      *********MOVE    "HCM2TV02.red"      TO  SPRT-PRTID
+               MOVE    "HCM2TV03.red"      TO  SPRT-PRTID
                MOVE    HCM2T               TO  SPRT-PRTDATA
            END-IF    
            IF      WRK-PARA-MARUCHO    =   "2"
