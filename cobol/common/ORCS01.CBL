@@ -7151,19 +7151,28 @@
                          AND (SYU-KOH4HKNNUM     =  SPACE)
                            COMPUTE WK-ENTANI =
                                           SYU-SYUCOMPFTN-ENTANI + 0.9
-                           IF  ( COMB-KOH1HKNNUM        =    SPACE )
-                           AND ( COMB-KOH2HKNNUM        =    SPACE )
-                           AND ( COMB-KOH3HKNNUM        =    SPACE )
-                           AND ( COMB-KOH4HKNNUM        =    SPACE )
-                           AND ( FLG-IRYOHI70           =    1 OR 2)
-                              COMPUTE   WK-KOUREI-IRYOHI70  =
-                                        WK-KOUREI-IRYOHI70  +
-                                       (SYU-HKNTEN (16) * 10)
-                           END-IF
+      ****                 IF  ( COMB-KOH1HKNNUM        =    SPACE )
+      ****                 AND ( COMB-KOH2HKNNUM        =    SPACE )
+      ****                 AND ( COMB-KOH3HKNNUM        =    SPACE )
+      ****                 AND ( COMB-KOH4HKNNUM        =    SPACE )
+      ****                 AND ( FLG-IRYOHI70           =    1 OR 2)
+      ****                    COMPUTE   WK-KOUREI-IRYOHI70  =
+      ****                              WK-KOUREI-IRYOHI70  +
+      ****                             (SYU-HKNTEN (16) * 10)
+      ****                 END-IF
                          END-IF
                         END-IF
                         ADD   WK-SYU-SYUCOMPFTN     TO   FTN-SYU-M
                         ADD   WK-ENTANI       TO   FTN-SYU-M-ENTANI
+                        IF  ( COMB-KOH1HKNNUM        =    SPACE )
+                        AND ( COMB-KOH2HKNNUM        =    SPACE )
+                        AND ( COMB-KOH3HKNNUM        =    SPACE )
+                        AND ( COMB-KOH4HKNNUM        =    SPACE )
+                        AND ( FLG-IRYOHI70           =    1 OR 2)
+                           COMPUTE   WK-KOUREI-IRYOHI70  =
+                                     WK-KOUREI-IRYOHI70  +
+                                    (SYU-HKNTEN (16) * 10)
+                        END-IF
                        END-IF
                       END-IF
                  END-IF                                                 

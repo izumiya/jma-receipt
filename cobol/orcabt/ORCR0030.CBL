@@ -6453,7 +6453,8 @@
                       ELSE
                         COMPUTE   WRK-CHIHOU-KIN3  =
                                   WRK-CHIHOU-KIN3  +
-                                 (WRK-JYOGENKBN-TEN * 10)
+                                 (RECE02-RJNGAIFTN  * 10)
+      ***                        (WRK-JYOGENKBN-TEN * 10)
                         IF   WRK-CHIHOU-KIN3  >  500000
                             COMPUTE  WRK-KINGAKU2 =
                                (( WRK-CHIHOU-KIN3 -  500000 ) * 0.01 )
@@ -6470,7 +6471,8 @@
                       ELSE
                         COMPUTE   WRK-CHIHOU-KIN3  =
                                   WRK-CHIHOU-KIN3  +
-                                 (WRK-JYOGENKBN-TEN * 10)
+                                 (RECE02-RJNGAIFTN  * 10)
+      ***                        (WRK-JYOGENKBN-TEN * 10)
                         IF   WRK-CHIHOU-KIN3  >  267000
                             COMPUTE  WRK-KINGAKU2 =
                                (( WRK-CHIHOU-KIN3 -  267000 ) * 0.01 )

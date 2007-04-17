@@ -678,12 +678,14 @@
       *****************************************************************
        2202-NYUIN-WAKODO-SYUKEI-SEC            SECTION.
       *
+           ADD      SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+      *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(4)  =  SPACE )
              ADD    SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-             ADD    SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+      ***    ADD    SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
            ELSE
              ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
@@ -1078,12 +1080,14 @@
       *****************************************************************
        2302-GAIRAI-WAKODO-SYUKEI-SEC            SECTION.
       *
+           ADD      SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+      *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(4)  =  SPACE )
              ADD    SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-             ADD    SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+      ***    ADD    SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
            ELSE
              ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
