@@ -418,7 +418,9 @@
                MOVE    1                   TO  FLG-HKN-SANTEI
            END-IF
       *
-           IF      WRK-RSI-KBN         =   "S"
+           IF      WRK-RSI-KBN         =   "R"
+               CONTINUE
+           ELSE
                MOVE    SPACE               TO  WRK-RSI-KBN
            END-IF
       *
