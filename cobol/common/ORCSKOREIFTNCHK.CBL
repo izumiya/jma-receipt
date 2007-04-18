@@ -506,6 +506,10 @@
       *****************************************************************
        2201-NYUIN-KOREI-SYUKEI-SEC            SECTION.
       *
+           COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
+                    LNK-KOREIFTNCHK-CHIHOUGAKU3 +
+                   (SYU-TOTAL-HKNTEN * 10)
+      *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE  OR "027" )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE           )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE           )
@@ -678,14 +682,18 @@
       *****************************************************************
        2202-NYUIN-WAKODO-SYUKEI-SEC            SECTION.
       *
-           ADD      SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+           COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
+                    LNK-KOREIFTNCHK-CHIHOUGAKU3 +
+                   (SYU-TOTAL-HKNTEN * 10)
       *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(4)  =  SPACE )
              ADD    SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-      ***    ADD    SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+      ***    COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
+      ***             LNK-KOREIFTNCHK-CHIHOUGAKU3 +
+      ***            (SYU-TOTAL-HKNTEN * 10)
            ELSE
              ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
@@ -941,6 +949,10 @@
       *****************************************************************
        2301-GAIRAI-KOREI-SYUKEI-SEC            SECTION.
       *
+           COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
+                    LNK-KOREIFTNCHK-CHIHOUGAKU3 +
+                   (SYU-TOTAL-HKNTEN * 10)
+      *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE  OR "027" )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE           )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE           )
@@ -1080,14 +1092,18 @@
       *****************************************************************
        2302-GAIRAI-WAKODO-SYUKEI-SEC            SECTION.
       *
-           ADD      SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+           COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
+                    LNK-KOREIFTNCHK-CHIHOUGAKU3 +
+                   (SYU-TOTAL-HKNTEN * 10)
       *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(4)  =  SPACE )
              ADD    SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-      ***    ADD    SYU-TOTAL-HKNTEN TO  LNK-KOREIFTNCHK-CHIHOUGAKU3
+      ***    COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
+      ***             LNK-KOREIFTNCHK-CHIHOUGAKU3 +
+      ***            (SYU-TOTAL-HKNTEN * 10)
            ELSE
              ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *

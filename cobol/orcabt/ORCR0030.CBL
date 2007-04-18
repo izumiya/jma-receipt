@@ -762,6 +762,7 @@
            03  WRK-CHIHOU-KIN                  PIC  9(09).
            03  WRK-CHIHOU-KIN2                 PIC  9(09).
            03  WRK-CHIHOU-KIN3                 PIC  9(09).
+           03  WRK-CHIHOU-KIN9                 PIC  9(09).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -1562,6 +1563,7 @@
            MOVE      ZERO       TO      WRK-CHIHOU-KIN
            MOVE      ZERO       TO      WRK-CHIHOU-KIN2
            MOVE      ZERO       TO      WRK-CHIHOU-KIN3
+           MOVE      ZERO       TO      WRK-CHIHOU-KIN9
            MOVE      ZERO       TO      FLG-GENBUTU70
            MOVE      ZERO       TO      FLG-KOHYONKAIME
            IF    RECE02-ZAITAKU          =    "2"
@@ -5568,6 +5570,8 @@
       *    ¼ýÇ¼¤è¤êÁíÅÀ¿ô¤ò½¸·×
            ADD       SYU-TOTAL-HKNTEN   TO   RECE02-RJNGAIFTN
       *
+           COMPUTE   WRK-CHIHOU-KIN9    =    WRK-CHIHOU-KIN3    +
+                                            (RECE02-TOTALTEN(1) * 10)
       *
            COMPUTE   RECE02-YKZFTN(1)   =    RECE02-YKZFTN(1)   +
                                              SYU-SYUCOMPYKZFTN
@@ -6015,6 +6019,16 @@
                IF  FLG-KOHYONKAIME = 1
                   MOVE   83400   TO   WRK-KINGAKU
                ELSE
+                 IF  FLG-KEISAN  =  1
+                  IF   WRK-CHIHOU-KIN9 >  500000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN9 -  500000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  = 150000  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE    150000  TO   WRK-KINGAKU
+                  END-IF
+                 ELSE
                   COMPUTE   WRK-CHIHOU-KIN  =  WRK-CHIHOU-KIN
                                             + (SYU-TOTAL-HKNTEN * 10)
                   IF   WRK-CHIHOU-KIN  >  500000
@@ -6025,6 +6039,7 @@
                   ELSE
                      MOVE    150000  TO   WRK-KINGAKU
                   END-IF
+                 END-IF
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU
                PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
@@ -6032,6 +6047,16 @@
                IF  FLG-KOHYONKAIME = 1
                   MOVE   44400   TO   WRK-KINGAKU
                ELSE
+                 IF  FLG-KEISAN  =  1
+                  IF   WRK-CHIHOU-KIN9 >  267000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN9 -  267000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     80100  TO   WRK-KINGAKU
+                  END-IF
+                 ELSE
                   COMPUTE   WRK-CHIHOU-KIN  =  WRK-CHIHOU-KIN
                                             + (SYU-TOTAL-HKNTEN * 10)
                   IF   WRK-CHIHOU-KIN  >  267000
@@ -6042,6 +6067,7 @@
                   ELSE
                      MOVE     80100  TO   WRK-KINGAKU
                   END-IF
+                 END-IF
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU
                PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
