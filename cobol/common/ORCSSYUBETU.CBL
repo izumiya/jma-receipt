@@ -46,6 +46,7 @@
       *  03.03.08    NACL-藤原    06/12/14  不明分のとき生保単独の上限
       *                                     チェックはしない
       *  03.03.09    NACL-藤原    06/12/14  地方公費のみのときは対象としない
+      *  03.03.10    NACL-藤原    07/04/04  特例退職医療の種別決定条件の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1888,7 +1889,7 @@
            END-IF
       *
            IF    ( WK-RJN          NOT =   SPACE )
-           AND   ( WRK-RECE61-HONKZKKBN
+           AND   ( WRK-RECE61-HKN-HONKZKKBN
                                        =   "1"   )     
                IF      WRK-RECE61-HKNNUM   =   "063"   OR  "072"   OR
                                                "073"   OR  "074"   OR

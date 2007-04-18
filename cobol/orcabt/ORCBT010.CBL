@@ -65,6 +65,7 @@
       *  03.03.05    NACL-藤原    06/10/27  レセプトで生活保護の請求がな
       *                                     い場合記載の対象としない
       *  03.03.06    NACL-藤原    06/12/15  入院の包括のデータ作成の修正
+      *  03.03.07    NACL-藤原    07/04/04  特例退職医療の種別決定条件の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2250,8 +2251,9 @@
                END-IF
            END-IF
       *
-           IF    ( WK-RJN          NOT =   SPACE )     
-           AND   ( WK-HONKZKKBN        =   "1"   )     
+           IF    ( WK-RJN          NOT =   SPACE )
+           AND   ( TOUKEI01-THONKZKKBN (IDY)
+                                       =   "1"   )
                IF      TOUKEI01-HKNNUM =   "063"   OR  "072"   OR
                                            "073"   OR  "074"   OR
                                            "075"
