@@ -202,6 +202,7 @@
            03  IDX-INT-MAX          PIC 9(04).
       *
            03  IDX-STR              PIC 9(02).
+           03  IDX-R                PIC 9(02).
       *
       *    一時領域
        01  WRK-AREA.
@@ -312,6 +313,14 @@
            03  WRK-ZAITAKU-CNT         PIC 9(04).
       *    リハビリ医学管理料
            03  WRK-RIHA-KBN            PIC X(01).
+           03  WRK-RIHA-SYUKBN         PIC X(01).
+      *
+           03  WRK-RIHA-KAN-G.
+               05  WRK-RIHA-KAN        OCCURS   4.
+                   07  WRK-RIHA-DD     PIC 9(02).
+                   07  WRK-RIHA-STDD   PIC 9(02).
+                   07  WRK-RIHA-EDDD   PIC 9(02).
+           03  WRK-RDD                 PIC 9(02).
       *
       *    診察料テーブル
        01  TBL-SINSATU-AREA.
@@ -1176,6 +1185,7 @@
       *
       *    急性発生日決定
            PERFORM 10019-KYUSEI-CHK-SEC
+           INITIALIZE                  WRK-RIHA-KAN-G
       *
       *    算定履歴検索
            MOVE    SPACE               TO  SANTEI-REC
@@ -1210,6 +1220,9 @@
            MOVE    "tbl_santei"        TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *    疾患別リハビリ医学管理料判定処理
+           PERFORM 100113-RIHABI-CHK-SEC
       *
            .
        1001-TOUGETU-KAISU-EXT.
@@ -1407,21 +1420,106 @@
                    END-IF
       *H19/04から
       *            リハビリ医学管理料算定時、外来管理加算算定なし
-                   IF      WRK-RIHA-KBN        =   "S"
-                       IF      SANTEI-MSANTEICNT   >   ZERO
-                           MOVE    1               TO  SPA-GAIRAI-NASI
-                       END-IF
-      *                初回算定日より前は算定可能
-                       IF    (SANTEI-FSANTEIYMD(1:6)
-                                                   =   SPA-SRYYMD(1:6))
-                         AND (SANTEI-FSANTEIYMD    >   SPA-SRYYMD )
-                           MOVE    ZERO            TO  SPA-GAIRAI-NASI
-                       END-IF
+                   IF     (WRK-RIHA-KBN        =   "S"
+                                               OR  "H"
+                                               OR  "E"   ) 
+                       PERFORM 100112-RIHABI-HEN-SEC
                    END-IF
            END-EVALUATE
       *
            .
        10011-TOUGETU-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    疾患別リハビリ医学管理料処理
+      *****************************************************************
+       100112-RIHABI-HEN-SEC            SECTION.
+      *
+      *    最終算定日（システム日までにあれば）
+           MOVE    ZERO                TO  WRK-RDD
+           MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+           PERFORM VARYING     IDX-Y3  FROM  1   BY  1
+                   UNTIL       IDX-Y3  >     31
+               IF      SANTEI-DAY (IDX-Y3)   >   ZERO
+                   IF      WRK-RDD           =   ZERO
+                       MOVE    IDX-Y3            TO  WRK-RDD
+                   ELSE
+                       IF      IDX-Y3            <   IDX-Y2
+                           MOVE    IDX-Y3            TO  WRK-RDD
+                       END-IF
+                   END-IF
+               END-IF
+      *        発生日はシステム日までを対象とする
+               IF     (WRK-RIHA-KBN     =   "H" )  AND
+                      (IDX-Y3           >   IDX-Y2)
+                   MOVE    31               TO  IDX-Y3
+               END-IF
+      *        終了日はシステム日以前を対象とする
+               IF     (WRK-RIHA-KBN     =   "E" )  AND
+                      (IDX-Y3           >=  IDX-Y2)
+                   MOVE    31               TO  IDX-Y3
+               END-IF
+           END-PERFORM
+      *
+           MOVE    ZERO                TO  IDX-R
+           EVALUATE    WRK-RIHA-SYUKBN
+               WHEN    "1"
+                   MOVE    1               TO  IDX-R
+               WHEN    "2"
+                   MOVE    2               TO  IDX-R
+               WHEN    "3"
+                   MOVE    3               TO  IDX-R
+               WHEN    "4"
+                   MOVE    4               TO  IDX-R
+           END-EVALUATE
+           IF      IDX-R               =   ZERO
+               CONTINUE
+           ELSE
+               EVALUATE    WRK-RIHA-KBN
+               WHEN    "S"
+      *            リハビリ医学管理
+      *            初回算定日より前は算定可能
+                   IF    (SANTEI-FSANTEIYMD(1:6)
+                                               =   SPA-SRYYMD(1:6))
+                     AND (SANTEI-FSANTEIYMD    >   SPA-SRYYMD )
+                         CONTINUE
+                   ELSE
+                       IF      SANTEI-MSANTEICNT   >   ZERO
+                           MOVE    WRK-RDD         TO  WRK-RIHA-DD
+                                                             (IDX-R)
+                       END-IF
+                   END-IF
+               WHEN    "H"
+      *            リハビリ開始日
+                   MOVE    WRK-RDD         TO  WRK-RIHA-STDD(IDX-R)
+               WHEN    "E"
+      *            リハビリ終了日
+                   MOVE    WRK-RDD         TO  WRK-RIHA-EDDD(IDX-R)
+               END-EVALUATE
+           END-IF
+           .
+       100112-RIHABI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    疾患別リハビリ医学管理料判定処理
+      *****************************************************************
+       100113-RIHABI-CHK-SEC            SECTION.
+      *
+           MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+           MOVE    ZERO                TO  SPA-GAIRAI-NASI
+           PERFORM VARYING     IDX-R   FROM    1   BY  1
+                   UNTIL       IDX-R   >   4
+               IF      (WRK-RIHA-DD (IDX-R)    >   ZERO )
+                   IF     (WRK-RIHA-STDD (IDX-R)  =   ZERO )  AND
+                          (WRK-RIHA-EDDD (IDX-R)  =   ZERO )
+                       MOVE    1               TO  SPA-GAIRAI-NASI
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       100113-RIHABI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1895,12 +1993,15 @@
                AT  END
                    MOVE    ZERO            TO  FLG-HKNSAN
                    MOVE    SPACE           TO  WRK-RIHA-KBN
+                   MOVE    SPACE           TO  WRK-RIHA-SYUKBN
                WHEN    WRK-SRYCD       =   TBL-SANTEI-SRYCD
                                                           (TBL-SAN)
                    MOVE    1               TO  FLG-HKNSAN
       *H19.4からリハビリ管理料
                    MOVE    TBL-RSI-KBN (TBL-SAN)
                                            TO  WRK-RIHA-KBN
+                   MOVE    TBL-RIHA-SYUKBN (TBL-SAN)
+                                           TO  WRK-RIHA-SYUKBN
            END-SEARCH
       *
            .

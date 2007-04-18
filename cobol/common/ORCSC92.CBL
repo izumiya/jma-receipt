@@ -2307,6 +2307,10 @@
                        MOVE    SPA-SRYYMD      TO  WRK-YMD
                    END-IF
                END-IF
+      *        発生日より後の時、算定なしとする
+               IF      WRK-STYMD           <=  WRK-YMD2
+                   MOVE    SPACE               TO  WRK-YMD
+               END-IF
            END-IF
       *
            .
