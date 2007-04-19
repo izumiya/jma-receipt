@@ -2016,8 +2016,18 @@
            END-PERFORM
            MOVE    RECE62X-SHOSHINTIME TO  KOHSKY-SHOSHINTIME
       **** MOVE    RECE62X-KOUREI      TO  KOHSKY-ZAITAKU
-      **** MOVE    RECE62X-KOUREI-SAIKEI
-      ****                             TO  KOHSKY-ZAITAKU-SAIKEI
+           IF      RECE62X-KOUREI   =  "2" OR "3"
+             EVALUATE  RECE62X-DISCOUNTTENTNK
+               WHEN       "17"
+                 MOVE   "2"     TO   KOHSKY-ZAITAKU
+               WHEN       "18"
+                 MOVE   "3"     TO   KOHSKY-ZAITAKU
+               WHEN       "19"
+                 MOVE   "4"     TO   KOHSKY-ZAITAKU
+             END-EVALUATE
+           END-IF
+           MOVE    RECE62X-KOUREI-SAIKEI
+                                       TO  KOHSKY-ZAITAKU-SAIKEI
       *    ∞Ï…Ù…È√¥∂‚°¶ø©ªˆŒ≈Õ‹»Ò…∏Ω‡…È√¥≥€∂Ë ¨
            MOVE    RECE62X-SHOKUJIFTNKBN
                                        TO  KOHSKY-SHOKUJIFTNKBN

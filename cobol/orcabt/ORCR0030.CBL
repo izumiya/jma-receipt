@@ -1896,6 +1896,15 @@
                 PERFORM   21045-TOKKI-HENSYU-SEC
            END-IF
       *
+           EVALUATE   FLG-GENBUTU70
+             WHEN     1
+                 MOVE   "17"   TO    RECE02-DISCOUNTTENTNK
+             WHEN     2
+                 MOVE   "18"   TO    RECE02-DISCOUNTTENTNK
+             WHEN     3
+                 MOVE   "19"   TO    RECE02-DISCOUNTTENTNK
+           END-EVALUATE
+      *
            .
        2118-GENBUTU70-HANTEI-EXT.
            EXIT.

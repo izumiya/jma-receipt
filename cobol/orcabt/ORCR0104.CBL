@@ -2137,8 +2137,18 @@
            IF      RECE02X-ZAITAKU  =  "1"
              MOVE    RECE02X-ZAITAKU   TO  KOHSKY-ZAITAKU
            END-IF
-      ***  MOVE    RECE02X-ZAITAKU-SAIKEI
-      ***                              TO  KOHSKY-ZAITAKU-SAIKEI
+           IF      RECE02X-ZAITAKU  =  "2" OR "3"
+             EVALUATE  RECE02X-DISCOUNTTENTNK
+               WHEN       "17"
+                 MOVE   "2"     TO   KOHSKY-ZAITAKU
+               WHEN       "18"
+                 MOVE   "3"     TO   KOHSKY-ZAITAKU
+               WHEN       "19"
+                 MOVE   "4"     TO   KOHSKY-ZAITAKU
+             END-EVALUATE
+           END-IF
+           MOVE    RECE02X-ZAITAKU-SAIKEI
+                                       TO  KOHSKY-ZAITAKU-SAIKEI
       *    ∞Ï…Ù…È√¥∂‚°¶ø©ªˆŒ≈Õ‹»Ò…∏Ω‡…È√¥≥€∂Ë ¨
            MOVE    RECE02X-SHOKUJIFTNKBN
                                        TO  KOHSKY-SHOKUJIFTNKBN
