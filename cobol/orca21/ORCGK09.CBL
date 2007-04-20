@@ -1622,21 +1622,21 @@
                    UNTIL    FLG-JYURRK     =   1
                IF      SPA-K09NAI-DOUJI-RENNUM (SPA-NAI-DOSELNUM)
                                            =   JYURRK-DOUJI-RENNUM
-      *            ¿ÇÎÅ¶èÊ¬¤ÎÈ½Äê
-                   IF      JYURRK-EDANUM       =   1
-                       MOVE    ZERO                TO  FLG-OK2
-                       IF      SPA-GMN-SRYKBN      =   "00"
-                                                   OR  "90"
-                            MOVE    1              TO  FLG-OK2
-                       ELSE
-                            PERFORM 41012-SRYKBN-CHK-SEC
-                       END-IF
-                   END-IF
+      ***          ¿ÇÎÅ¶èÊ¬¤ÎÈ½Äê
+      *            IF      JYURRK-EDANUM       =   1
+      *                MOVE    ZERO                TO  FLG-OK2
+      *                IF      SPA-GMN-SRYKBN      =   "00"
+      *                                            OR  "90"
+      *                     MOVE    1              TO  FLG-OK2
+      *                ELSE
+      *                     PERFORM 41012-SRYKBN-CHK-SEC
+      *                END-IF
+      ***          END-IF
       *
                    PERFORM VARYING     IDX-R   FROM    1   BY  1
                            UNTIL      (IDG             >   400 )  OR
                                       (IDX-R           >   15  )
-                                   OR (FLG-OK2         =   ZERO)
+      ********************         OR (FLG-OK2         =   ZERO)
                        IF      JYURRK-ZAINUM (IDX-R)   NOT =   ZERO
                            PERFORM 41011-ZAISET-HEN-SEC
                        END-IF
