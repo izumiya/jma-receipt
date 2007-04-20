@@ -634,6 +634,7 @@
            03  WRK-KYUSEI-INP-G.
                05  WRK-KYUSEI-IN-G         OCCURS   7.
                    07  WRK-KYUSEI-ST       PIC X(01).
+               05  WRK-TEIGEN-IN           PIC X(01).
       *
       *    ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¥Æ¡¼¥Ö¥ë
       **** COPY   "CMSYONIKATBL.INC".
@@ -7309,6 +7310,8 @@
                                MOVE    "1"         TO  WRK-KYUSEI-ST (6)
                            WHEN    "099800171"
                                MOVE    "1"         TO  WRK-KYUSEI-ST (7)
+                           WHEN    "099800401"
+                               MOVE    "1"         TO  WRK-TEIGEN-IN
                        END-EVALUATE
                    END-IF
       *            ÆâÊ¬ÈçÉéÃ´»î¸³Í­Ìµ
@@ -7400,7 +7403,7 @@
       *    ¥ê¥Ï¥Ó¥ê½é²ó
            MOVE    SPACE               TO  SPA-RIGAKU-INIT
       *    ¥ê¥Ï¥Ó¥ê»»Äê²ó¿ô
-           MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC (1:7)
+           MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC (1:8)
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   200      )   OR
