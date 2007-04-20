@@ -263,19 +263,22 @@
            03  WRK-KYUSEI-INP-G.
                05  WRK-KYUSEI-IN-G         OCCURS   7.
                    07  WRK-KYUSEI-ST       PIC X(01).
-      *    Åö·î»»Äê²ó¿ô
-           03  WRK-RIHA-DAY-G.
-               05  WRK-RIHA-DAY            PIC 9(03)
-                                           OCCURS   31.
+               05  WRK-TEIGEN-IN           PIC X(01).
       *    º£²ó»»Äê²ó¿ô
            03  WRK-RIHA-CNT-G.
                05  WRK-RIHA-CNT            PIC 9(03)
+                                           OCCURS   31.
+      *    Åö·î»»Äê²ó¿ô
+           03  WRK-RIHA-DAY-G.
+               05  WRK-RIHA-DAY            PIC 9(03)
                                            OCCURS   31.
       *    µÞÀ­È¯À¸Æü
            03  WRK-KYUSEI1-YMD             PIC X(08).
            03  WRK-KYUSEI2-YMD             PIC X(08).
            03  WRK-KYUSEI3-YMD             PIC X(08).
            03  WRK-KYUSEI4-YMD             PIC X(08).
+      *    Äþ¸ºÂÐ¾Ý³°
+           03  WRK-TEIGEN-GAI              PIC X(08).
       *    ÄÌ±¡Àº¿ÀÍÑÆ±Æü½é¿Ç
            03  WRK-DOUSYOSIN-AREA.
                05  WRK-DOUSYOSIN-OCC       OCCURS   10.
@@ -514,6 +517,11 @@
            PERFORM 10001-KYUSEI-YMD-SEC
            MOVE    WRK-YMD             TO  WRK-KYUSEI4-YMD
       *
+      *    Äþ¸ºÂÐ¾Ý³°
+           MOVE    "099800401"         TO  WRK-SRYCD
+           PERFORM 10001-KYUSEI-YMD-SEC
+           MOVE    WRK-YMD             TO  WRK-TEIGEN-GAI
+      *
       *    ³°Íè¤Î»þ¡¢Àº¿ÀÄÌ±¡
            IF      SPA-NYUGAIKBN       =   "2"
                PERFORM 10002-DOUJIT-YMD-SEC
@@ -541,6 +549,8 @@
       *
       *    Ï«ºÒËè¤È¤¹¤ë
            IF      SPA-HKNKBN          =   1
+      *        Äþ¸ºÂÐ¾Ý³°¤Ï£±·ï
+              AND (WRK-SRYCD       NOT =   "099800401" )
                MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
            ELSE
                MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
@@ -1081,6 +1091,8 @@
       *        ¾ã³²¼Ô¥ê¥Ï¥Ó¥ê
                WHEN    "099800171"
                    MOVE    "1"             TO  WRK-KYUSEI-ST (7)
+               WHEN    "099800401"
+                   MOVE    "1"             TO  WRK-TEIGEN-IN
            END-EVALUATE
       *
            .
@@ -1370,6 +1382,13 @@
                    END-IF
                    MOVE    80                  TO  WRK-ZOGEN
            END-EVALUATE
+      *
+      *    Äþ¸ºÂÐ¾Ý³°¤Î¥³¡¼¥É»»Äê¤Î»þ¡¢Äþ¸º¤È¤·¤Ê¤¤
+           IF    ((WRK-TEIGEN-GAI  NOT =   SPACE )
+              AND (WRK-TEIGEN-GAI      >=  WRK-TEIGEN ))
+               OR (WRK-TEIGEN-IN       =   "1"   )
+               MOVE    SPACE               TO  WRK-TEIGEN
+           END-IF
       *
            IF      WRK-TEIGEN      NOT =   SPACE
       *    Æü¸å·×»»
