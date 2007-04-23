@@ -222,6 +222,7 @@
            03  FLG-SYS-1901        PIC 9(01).
            03  FLG-SYS-1902        PIC 9(01).
            03  FLG-RECECOM-SJKBN   PIC 9(01).
+           03  FLG-RECECOM-HENSYU  PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -2020,6 +2021,9 @@
                    PERFORM VARYING IDX FROM    1   BY  1
                            UNTIL   IDX >       16
                            OR      WRK-COMMENT (IDX)   =   SPACE
+      * 
+                       MOVE    ZERO            TO  FLG-RECECOM-HENSYU 
+      *                                          
                        IF      WRK-KEIKA-LINE  <   WRK-KEIKA-HC21-LINE
       *                  ½ýÉÂ¤Î·Ð²áÍó¤Ø¾É¾õ¾Üµ­¶èÊ¬¤Î¸«½Ð¤·¤òµ­ºÜ
                          IF      FLG-RECECOM-SJKBN   =   1
@@ -2035,7 +2039,11 @@
                              MOVE    WRK-COMMENT (IDX)
                                                  TO
                                          HC21-KEIKA (WRK-KEIKA-LINE)
-                         ELSE
+                           MOVE    1           TO  FLG-RECECOM-HENSYU                                           
+                         END-IF
+                       END-IF
+      * 
+                       IF      FLG-RECECOM-HENSYU  =   ZERO
       *                    Å¦Í×Íó¤ØÊÔ½¸
                            IF      WRK-RECECOM         =   ZERO
       *                        Å¦Í×Íó¤Ë£±¹Ô¤¢¤±¤ë
@@ -2076,7 +2084,6 @@
                                MOVE    WRK-COMMENT (IDX)
                                            TO  HC24-TEKIYO (WRK-LINETEK)
                            END-IF
-                         END-IF
                        END-IF                    
                    END-PERFORM
                END-IF  
