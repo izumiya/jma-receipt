@@ -40,6 +40,7 @@
       *  01.00.07    NACL-ÌçÏÆ    06/03/27  ¿©»ö²þÀµÂÐ±þ¡Ê£²£°£°£¶Ç¯£´·î¡Ë
       *  01.00.08    NACL-¾®Æ¦Âô  06/05/23  ³°Çñ»þ¤ÎÆþ±¡´ðËÜÎÁ¼èÆÀ½¤Àµ
       *  01.00.09    NACL-¾®Æ¦Âô  06/10/24  Æþ±¡»þÀ¸³èÎÅÍÜÂÐ±þ
+      *  03.04.01    NACL-Æ£¸¶    07/04/18  £Ä£Â£Ã£Ì£Ï£Ó£Å£Ã£Õ£Ò£Ó£Ï£ÒÂÐ±þ
       *****************************************************************
       *
       *
@@ -450,7 +451,7 @@
                GO  TO  100-PRM-CHK-EXT
            END-IF
       *
-      *    Æþ±¡Ãæ¤Î¥Á¥§¥Ã¥¯¡ÊÆþ±¡²ñ·×¥Þ¥¹¥¿¡¼¸¡º÷¡Ë
+      *    Æþ±¡Ãæ¤Î¥Á¥§¥Ã¥¯¡ÊÆþ±¡²ñ·×¥Þ¥¹¥¿¡¼¸¡º÷¡ÝÊÝ¸±ÁÈ¹ç¤»¤ÎºÞ¡Ë
            INITIALIZE                      NYUINACCT-REC
            MOVE    LNK-ORCHCN33SUB-HOSPID   TO  NACCT-HOSPID
            MOVE    LNK-ORCHCN33SUB-PTID     TO  NACCT-PTID
@@ -460,7 +461,7 @@
            PERFORM 910-NYUINACCT-SELECT-SEC
            IF      FLG-NYUINACCT           NOT =   ZERO
                MOVE    4               TO  LNK-ORCHCN33SUB-RC
-               GO  TO  100-PRM-CHK-EXT
+      *********GO  TO  100-PRM-CHK-EXT
            ELSE
                MOVE    "key17"             TO  MCP-PATHNAME
                PERFORM 910-NYUINACCT-READ-SEC
@@ -578,12 +579,16 @@
                END-PERFORM
            ELSE
                MOVE     5      TO      LNK-ORCHCN33SUB-RC
-               GO   TO    200-MAIN-EXT
+      *********GO   TO    200-MAIN-EXT
            END-IF
       *    ´µ¼ÔÆþ±¡ÍúÎò¥¯¥í¡¼¥º
            MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
            MOVE    "key3"                  TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
+      *
+           IF    ( LNK-ORCHCN33SUB-RC       NOT =   ZERO )
+               GO   TO    200-MAIN-EXT
+           END-IF
       *
            IF      LNK-ORCHCN33SUB-SRYKA   NOT =    "00"
                PERFORM    VARYING  IDX1   FROM  1  BY  1
@@ -743,17 +748,21 @@
                    PERFORM 910-NYUINACCT-READ-SEC
                END-PERFORM
                IF   FLG-OK     =   ZERO
-                   MOVE     3      TO      LNK-ORCHCN33SUB-RC
-                   GO   TO    210-NYUINTEN-GET-EXT
+                   MOVE     7      TO      LNK-ORCHCN33SUB-RC
+      *************GO   TO    210-NYUINTEN-GET-EXT
                END-IF
            ELSE
-               MOVE     3      TO      LNK-ORCHCN33SUB-RC
-               GO   TO    210-NYUINTEN-GET-EXT
+               MOVE     6      TO      LNK-ORCHCN33SUB-RC
+      *********GO   TO    210-NYUINTEN-GET-EXT
            END-IF
       *    Æþ±¡²ñ·×¥¯¥í¡¼¥º
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
            MOVE    "key17"                 TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
+      *
+           IF    ( LNK-ORCHCN33SUB-RC       NOT =   ZERO )
+                GO   TO    210-NYUINTEN-GET-EXT
+          END-IF
       *
       *Æþ±¡»þ¤Î³°Çñ¼èÆÀ
            INITIALIZE                          NYUINACCT-REC
