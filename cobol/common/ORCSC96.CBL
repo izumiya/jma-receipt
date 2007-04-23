@@ -1161,6 +1161,18 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "8044"
+                   STRING  "労災・自賠責ではリハビリテーション料の"
+                           "逓減はありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8045"
+                   STRING  "労災・自賠責ではリハビリテーション"
+                           "医学管理料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *
            END-EVALUATE
            .

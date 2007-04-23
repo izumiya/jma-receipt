@@ -192,6 +192,7 @@
            03  WRK-RIGAKU-KBN      PIC X(01).
            03  WRK-RIGAKU-RYO      PIC X(01).
            03  WRK-RIGAK-CNTALL    PIC 9(03).
+           03  WRK-TBL-RSI-KBN     PIC X(01).
       *!
       *    酸素計算用
            03  WRK-SANSO               PIC 9(08).
@@ -1259,12 +1260,28 @@
            IF     (FLG-RIHA-OK         =   ZERO )
                GO      TO      100112-RIGAKU-CHK-EXT
            END-IF
+      *    労災の時、逓減コードはエラーとする
+           IF     (SPA-HKNKBN          =   1   )
+             AND  (SPA-RSI-HKNKBN  NOT =   "5" )
+               IF      WRK-RIHA-GEN        =   "2"
+                   MOVE    "8044"      TO  WRK-ERRCD
+                   MOVE    "1"         TO  WRK-COM-CUR (IDX-Z)
+                   GO      TO      100112-RIGAKU-CHK-EXT
+               END-IF
+           END-IF
       *
       *    急性発生日計算処理
            PERFORM 1001121-KYUSEIYMD15-SEC
       *@@
       *    逓減開始日計算処理
            PERFORM 100112-TEIGENYMD15-SEC
+      *    労災・自賠責は逓減なしとする
+           IF     (SPA-HKNKBN          =   1   )
+             AND  (SPA-RSI-HKNKBN  NOT =   "5" )
+               MOVE    SPACE           TO  WRK-TEIGEN
+               MOVE    SPACE           TO  WRK-TEIGEN-YMD
+               MOVE    SPACE           TO  WRK-TEIGEN-MSG
+           END-IF
       *@@
       *
            IF     (SPA-NYUGAIKBN       =   "2" ) OR
@@ -1518,6 +1535,17 @@
                    MOVE    HZN-IDX             TO  IDX-Z
                END-IF
            END-IF
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      100113-RSIHKN-SYORI-EXT
+           END-IF
+      *    リハビリ医学管理料はエラー
+           MOVE    WRK-COM-INPUTCD (IDX-Z)     TO  WRK-SRYCD2
+           PERFORM 10011312-RIGAKU-SERCH-SEC
+           IF      WRK-TBL-RSI-KBN     =   "S"
+               MOVE    "8045"          TO  WRK-ERRCD
+               MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+               GO      TO      100113-RSIHKN-SYORI-EXT
+           END-IF
       *
       *    リハビリテーション総合計画評価料は対象外
            IF      WRK-COM-INPUTCD (IDX-Z) =   "180024710"
@@ -1648,16 +1676,19 @@
            SET     TBL-SAN             TO  1
            SEARCH      TBL-SANTEI-OCC  VARYING   TBL-SAN
                    AT  END
-                       MOVE    SPACE           TO  WRK-RIGAKU-RYO
-                       MOVE    SPACE           TO  WRK-RIGAKU-KBN
+      *D               MOVE    SPACE           TO  WRK-RIGAKU-RYO
+      *D               MOVE    SPACE           TO  WRK-RIGAKU-KBN
                        MOVE    ZERO            TO  FLG-RIGAKU
+                       MOVE    SPACE           TO  WRK-TBL-RSI-KBN
                    WHEN    WRK-SRYCD2          =   TBL-SANTEI-SRYCD
                                                            (TBL-SAN)
-                       MOVE    TBL-RIGAKU-KBN   (TBL-SAN)
-                                               TO  WRK-RIGAKU-KBN
-                       MOVE    TBL-RIGAKU-RYO   (TBL-SAN)
-                                               TO  WRK-RIGAKU-RYO
+      *D               MOVE    TBL-RIGAKU-KBN   (TBL-SAN)
+      *                                        TO  WRK-RIGAKU-KBN
+      *                MOVE    TBL-RIGAKU-RYO   (TBL-SAN)
+      *D                                       TO  WRK-RIGAKU-RYO
                        MOVE    1               TO  FLG-RIGAKU
+                       MOVE    TBL-RSI-KBN (TBL-SAN)
+                                               TO  WRK-TBL-RSI-KBN
            END-SEARCH
       *
            .
