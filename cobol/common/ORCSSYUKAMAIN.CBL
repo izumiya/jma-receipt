@@ -26,6 +26,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.04.01    NACL-藤原    07/04/23  入院基本料カレンダー未設定時の
+      *                                     主科設定対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -452,7 +454,7 @@
            IF      LNK-ORCHCN33SUB-RC  =   ZERO
                CONTINUE
            ELSE
-               IF      LNK-ORCHCN33SUB-RC  =   4
+               IF      LNK-ORCHCN33SUB-RC  =   4   OR  7
                    DISPLAY "ORCHCN33SUB=" LNK-ORCHCN33SUB-RC
                    GO  TO  2003-ORCHCN33SUB-EXT
                ELSE
