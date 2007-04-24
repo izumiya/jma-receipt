@@ -2906,7 +2906,7 @@
                 AND  (WRK-TBLMAX         =   1   )
       *         AND  (TBL-ZAI-IDX(IDY)   =   1   )
                 AND  (TBL-ZAI-SRYCD(IDY) =  "130004410" OR "130008510"
-                                         OR "130011210"               )
+                                         OR "130004670"               )
                          MOVE   2              TO  RECE86-TENTEKIKBN
                          MOVE   RECE84-ZAINUM  TO  RECE86-TENTEKIBAN
                 END-IF
