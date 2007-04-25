@@ -686,16 +686,25 @@
                     LNK-KOREIFTNCHK-CHIHOUGAKU3 +
                    (SYU-TOTAL-HKNTEN * 10)
       *
+           IF     SYU-KOHTAIYKZKBN  =   "9"
+                COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70 =
+                         LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70 +
+                        (SYU-TOTAL-HKNTEN * 10)
+           END-IF
+      *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(4)  =  SPACE )
              ADD    SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-      ***    COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
-      ***             LNK-KOREIFTNCHK-CHIHOUGAKU3 +
-      ***            (SYU-TOTAL-HKNTEN * 10)
+             IF     SYU-KOHTAIYKZKBN  =   "9"
+               ADD  SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU-GEN70
+             END-IF
            ELSE
              ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
+             IF     SYU-KOHTAIYKZKBN  =   "9"
+               ADD  SYU-KOH-FTN   TO  LNK-KOREIFTNCHK-KOHFTNGAKU-GEN70
+             END-IF
       *
              COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                  * 10
@@ -1096,16 +1105,25 @@
                     LNK-KOREIFTNCHK-CHIHOUGAKU3 +
                    (SYU-TOTAL-HKNTEN * 10)
       *
+           IF     SYU-KOHTAIYKZKBN  =   "9"
+                COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70 =
+                         LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70 +
+                        (SYU-TOTAL-HKNTEN * 10)
+           END-IF
+      *
            IF  ( SYU-KOH-HKNNUM(1)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(2)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(3)  =  SPACE )
            AND ( SYU-KOH-HKNNUM(4)  =  SPACE )
              ADD    SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-      ***    COMPUTE  LNK-KOREIFTNCHK-CHIHOUGAKU3 =
-      ***             LNK-KOREIFTNCHK-CHIHOUGAKU3 +
-      ***            (SYU-TOTAL-HKNTEN * 10)
+             IF     SYU-KOHTAIYKZKBN  =   "9"
+               ADD  SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU-GEN70
+             END-IF
            ELSE
              ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
+             IF     SYU-KOHTAIYKZKBN  =   "9"
+               ADD  SYU-KOH-FTN   TO  LNK-KOREIFTNCHK-KOHFTNGAKU-GEN70
+             END-IF
       *
              COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                  * 10

@@ -88,8 +88,13 @@
              05 LNK-KOREIFTNCHK-CHIHOUGAKU  PIC 9(07).
       *入外：７０歳未満現物給付＋全国公費ありの請求金額
              05 LNK-KOREIFTNCHK-CHIHOUGAKU2 PIC 9(07).
-      *入外：７０歳未満現物給付＋公費なしの請求金額
+      *入外：７０歳未満現物給付＋単独なし時の請求金額
              05 LNK-KOREIFTNCHK-CHIHOUGAKU3 PIC 9(07).
+      *
+      *入外：７０歳未満現物給付＋単独あり時
+             05 LNK-KOREIFTNCHK-FTNGAKU-GEN70     PIC 9(07).
+             05 LNK-KOREIFTNCHK-KOHFTNGAKU-GEN70  PIC 9(07).
+             05 LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70  PIC 9(07).
       *
       *復帰コード
            03  LNK-KOREIFTNCHK-RC           PIC 9(02).

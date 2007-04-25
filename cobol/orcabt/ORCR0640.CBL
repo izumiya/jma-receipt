@@ -401,6 +401,7 @@
            03  FLG-MIYAGI                              PIC 9(01).
            03  FLG-KEISAN                              PIC 9(01).
            03  FLG-GENBUTU70                           PIC 9(01).
+           03  FLG-GENBUTU-TAISYOOK                    PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -551,9 +552,11 @@
       *
        01  WRK-AREA-SAIKEI.
            03  WRK-KOH-FTN                             PIC 9(09).
+           03  WRK-KOH-FTN-GEN70                       PIC 9(09).
            03  WRK-KOH-KOUGAKU                         PIC 9(09).
            03  WRK-KOH-GAI                             PIC 9(09).
            03  WRK-KOH-GAI2                            PIC 9(09).
+           03  WRK-KOH-GAI-GEN70                       PIC 9(09).
            03  FTN-KOH-XXX                             PIC 9(09).       
            03  FTN-KOH-XX2                             PIC 9(09).
            03  FTN-KOH-YYY                             PIC 9(09).       
@@ -722,6 +725,8 @@
            03  WRK-CHK-ICHIBUGAKU                      PIC 9(07).
            03  WRK-CHK-FTNGAKU                         PIC 9(07).
            03  WRK-CHK-KOHFTNGAKU                      PIC 9(07).
+           03  WRK-CHK-FTNGAKU-GEN70                   PIC 9(07).
+           03  WRK-CHK-KOHFTNGAKU-GEN70                PIC 9(07).
            03  WRK-CHK-KEISAN1                         PIC 9(07).
            03  WRK-CHK-KEISAN2                         PIC 9(07).
            03  WRK-CHK-KINGAKU                         PIC 9(07).
@@ -760,6 +765,7 @@
            03  WRK-CHIHOU-KIN                          PIC 9(09).
            03  WRK-CHIHOU-KIN2                         PIC 9(09).
            03  WRK-CHIHOU-KIN3                         PIC 9(09).
+           03  WRK-CHIHOU-KIN-GEN70                    PIC 9(09).
            03  WRK-CHIHOU-KIN9                         PIC 9(09).
       *
            03  WRK-RECEERR                             PIC X(200).
@@ -8351,7 +8357,10 @@
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN2
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN3
+           MOVE    ZERO                 TO      WRK-CHIHOU-KIN-GEN70
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN9
+      *
+           MOVE    ZERO                 TO      FLG-GENBUTU-TAISYOOK
       *
            MOVE    ZERO                 TO      FLG-GENBUTU70
            MOVE    ZERO                 TO      FLG-KOHYONKAIME
@@ -8465,6 +8474,8 @@
            MOVE    ZERO                TO  WRK-CHK-ICHIBUGAKU
                                            WRK-CHK-FTNGAKU
                                            WRK-CHK-KOHFTNGAKU
+                                           WRK-CHK-FTNGAKU-GEN70
+                                           WRK-CHK-KOHFTNGAKU-GEN70
       *
            INITIALIZE                      RECE69-REC
            MOVE    RECE62-HOSPID       TO  RECE69-HOSPID
@@ -8572,6 +8583,12 @@
                                        TO  WRK-CHIHOU-KIN2
                     MOVE   LNK-KOREIFTNCHK-CHIHOUGAKU3
                                        TO  WRK-CHIHOU-KIN3
+                    MOVE   LNK-KOREIFTNCHK-FTNGAKU-GEN70
+                                       TO  WRK-CHK-FTNGAKU-GEN70
+                    MOVE   LNK-KOREIFTNCHK-KOHFTNGAKU-GEN70
+                                       TO  WRK-CHK-KOHFTNGAKU-GEN70
+                    MOVE   LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70
+                                       TO  WRK-CHIHOU-KIN-GEN70
                 END-IF
       *
            END-IF
@@ -8892,6 +8909,11 @@
            COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
            COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
       *
+           IF     SYU-KOHTAIYKZKBN  =   "9"
+                 ADD    SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN
+                 ADD    SYU-KOH-FTN      TO   WRK-KOH-FTN-GEN70
+           END-IF
+      *
            IF   ( SYU-KOH-FTN         =   ZERO   )
            AND  ( SYU-KOH-HKNNUM(1)   =   SPACE  )
            AND  ( SYU-KOH-HKNNUM(2)   =   SPACE  )
@@ -8901,7 +8923,10 @@
                                               WRK-KOH-GAI
                                               WRK-KOH-GAI2
                  MOVE   1                TO   FLG-JYOGENKBN
-                 ADD    SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN
+                 IF     SYU-KOHTAIYKZKBN  =   "9"
+                     MOVE      1            TO  FLG-GENBUTU-TAISYOOK
+                     ADD    SYU-SYUCOMPFTN  TO  WRK-KOH-GAI-GEN70
+                 END-IF
            ELSE
              IF   ( SYU-KOH-HKNNUM(1)   =   "012" )
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" )
@@ -10123,14 +10148,13 @@
                       IF  FLG-KOHYONKAIME = 1
                         MOVE         83400  TO  WRK-KINGAKU-GENBUTU3
                       ELSE
-                        COMPUTE   WRK-CHIHOU-KIN3  =
-                                  WRK-CHIHOU-KIN3  +
-                                 (RECE62-RJNGAIFTN  * 10)
-      ***                        (WRK-JYOGENKBN-TEN * 10)
-                        IF   WRK-CHIHOU-KIN3  >  500000
+                        COMPUTE   WRK-CHIHOU-KIN-GEN70  =
+                                  WRK-CHIHOU-KIN-GEN70  +
+                                 (WRK-JYOGENKBN-TEN * 10)
+                        IF   WRK-CHIHOU-KIN-GEN70  >  500000
                             COMPUTE  WRK-KINGAKU2 =
-                               (( WRK-CHIHOU-KIN3 -  500000 ) * 0.01 )
-                                                              + 0.5
+                            (( WRK-CHIHOU-KIN-GEN70 -  500000 ) * 0.01 )
+                                                                + 0.5
                             COMPUTE WRK-KINGAKU-GENBUTU3 =
                                     150000  +   WRK-KINGAKU2
                         ELSE
@@ -10141,14 +10165,13 @@
                       IF  FLG-KOHYONKAIME = 1
                         MOVE         44400  TO  WRK-KINGAKU-GENBUTU3
                       ELSE
-                        COMPUTE   WRK-CHIHOU-KIN3  =
-                                  WRK-CHIHOU-KIN3  +
-                                 (RECE62-RJNGAIFTN  * 10)
-      ***                        (WRK-JYOGENKBN-TEN * 10)
-                        IF   WRK-CHIHOU-KIN3  >  267000
+                        COMPUTE   WRK-CHIHOU-KIN-GEN70  =
+                                  WRK-CHIHOU-KIN-GEN70  +
+                                 (WRK-JYOGENKBN-TEN * 10)
+                        IF   WRK-CHIHOU-KIN-GEN70  >  267000
                             COMPUTE  WRK-KINGAKU2 =
-                               (( WRK-CHIHOU-KIN3 -  267000 ) * 0.01 )
-                                                              + 0.5
+                            (( WRK-CHIHOU-KIN-GEN70 -  267000 ) * 0.01 )
+                                                                + 0.5
                             COMPUTE WRK-KINGAKU-GENBUTU3 =
                                     80100   +   WRK-KINGAKU2
                         ELSE
@@ -10245,13 +10268,26 @@
       *
                IF  (WRK-CHK-KINGAKU    NOT = 9999999)
                AND (WRK-CHK-KINGAKU2       = 9999999)
-                 COMPUTE  WRK-CHK-KEIKASOCHI1  =  WRK-CHK-KINGAKU -
-                                                 (WRK-CHK-FTNGAKU +
-                                                  WRK-CHK-KOHFTNGAKU)
+                 IF   (FLG-JYOGENKBN        =   1   )
+                    COMPUTE  WRK-CHK-KEIKASOCHI1
+                                  =  WRK-CHK-KINGAKU -
+                                    (WRK-CHK-FTNGAKU-GEN70 +
+                                     WRK-CHK-KOHFTNGAKU-GEN70)
+                 ELSE
+                    COMPUTE  WRK-CHK-KEIKASOCHI1
+                                  =  WRK-CHK-KINGAKU -
+                                    (WRK-CHK-FTNGAKU +
+                                     WRK-CHK-KOHFTNGAKU)
+                 END-IF
                  IF   WRK-CHK-KEIKASOCHI1  <   ZERO
                      MOVE   ZERO     TO   WRK-CHK-KEIKASOCHI1
                  END-IF
-                 IF   WRK-KOH-GAI2         >=  WRK-CHK-KEIKASOCHI1
+                 IF   (FLG-JYOGENKBN        =   1   )
+                 AND  (FLG-GENBUTU-TAISYOOK =   ZERO)
+                     MOVE   9999999  TO   WRK-CHK-KEIKASOCHI1
+                 END-IF
+      ***        IF   WRK-KOH-GAI2         >=  WRK-CHK-KEIKASOCHI1
+                 IF   WRK-KOH-GAI-GEN70    >=  WRK-CHK-KEIKASOCHI1
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE62-KOUREI
@@ -10267,14 +10303,28 @@
                END-IF
                IF  (WRK-CHK-KINGAKU    NOT = 9999999)
                AND (WRK-CHK-KINGAKU2   NOT = 9999999)
-                 COMPUTE  WRK-CHK-KEIKASOCHI1  =  WRK-CHK-KINGAKU -
-                                                 (WRK-CHK-FTNGAKU +
-                                                  WRK-CHK-KOHFTNGAKU)
+                 IF   (FLG-JYOGENKBN        =   1   )
+                    COMPUTE  WRK-CHK-KEIKASOCHI1
+                                  =  WRK-CHK-KINGAKU -
+                                    (WRK-CHK-FTNGAKU-GEN70 +
+                                     WRK-CHK-KOHFTNGAKU-GEN70)
+                 ELSE
+                    COMPUTE  WRK-CHK-KEIKASOCHI1
+                                  =  WRK-CHK-KINGAKU -
+                                    (WRK-CHK-FTNGAKU +
+                                     WRK-CHK-KOHFTNGAKU)
+                 END-IF
                  IF   WRK-CHK-KEIKASOCHI1  <   ZERO
                      MOVE   ZERO     TO   WRK-CHK-KEIKASOCHI1
                  END-IF
-                 COMPUTE  WRK-CHK-KEIKASOCHIXX  =  WRK-KOH-GAI2
-                                                +  WRK-KOH-FTN
+                 IF   (FLG-JYOGENKBN        =   1   )
+                 AND  (FLG-GENBUTU-TAISYOOK =   ZERO)
+                     MOVE   9999999  TO   WRK-CHK-KEIKASOCHI1
+                 END-IF
+      ***        COMPUTE  WRK-CHK-KEIKASOCHIXX  =  WRK-KOH-GAI2
+      ***                                       +  WRK-KOH-FTN
+                 COMPUTE  WRK-CHK-KEIKASOCHIXX  =  WRK-KOH-GAI-GEN70
+                                                +  WRK-KOH-FTN-GEN70
                  IF  (WRK-CHK-KEIKASOCHIXX  >=  WRK-CHK-KEIKASOCHI1)
                  OR  (FTN-KOH-XXX           >=  WRK-CHK-KINGAKU2   )
                     CONTINUE
