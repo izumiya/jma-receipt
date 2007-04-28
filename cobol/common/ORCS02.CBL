@@ -234,6 +234,9 @@
            03  WK-GENBUTU-KOH2COMPFTN  PIC 9(07).
            03  WK-GENBUTU-KOH3COMPFTN  PIC 9(07).
            03  WK-GENBUTU-KOH4COMPFTN  PIC 9(07).
+           03  WK-GENBUTU-HKNKIN       PIC 9(10).
+           03  WK-GENBUTU-HKNKIN2      PIC 9(10).
+           03  WK-GENBUTU-HKNKIN3      PIC 9(10).
        01  FLG-AREA.
            03  FLG-SYUNOU              PIC 9(01).
            03  FLG-TNKRRK              PIC 9(01).
@@ -6114,6 +6117,8 @@
       *
            MOVE     ZERO        TO    FLG-SYUKEI2.
       *
+           MOVE     ZERO        TO    WK-GENBUTU-HKNKIN.
+      *
            IF  (LNK-S02-KOUREI-NYUIN-KBN  =   "1"   )
            AND (WK-1001-PREFNUM           =   13    )
            AND (LNK-SYU-SRYYMD(1:6)      >= "200610")
@@ -6942,17 +6947,24 @@
                        AND ( COMB-KOH3HKNNUM        =    SPACE )
                        AND ( COMB-KOH4HKNNUM        =    SPACE )
                         IF   FLG-IRYOHI70           =    1 OR 2
-                         IF  SYU-KOHTAIYKZKBN       =   "9"
+                         IF (SYU-KOHTAIYKZKBN =   "9")
+                         OR (SYU-HKNCOMBINUM  =   COMB-HKNCOMBINUM)
                           COMPUTE   WK-KOUREI-IRYOHI70  =
                                     WK-KOUREI-IRYOHI70  +
                                    (SYU-HKNTEN (16) * 10)
                          END-IF
                         END-IF
-                        IF   SYU-KOHTAIYKZKBN       =   "9"
+                        IF (SYU-KOHTAIYKZKBN =   "9")
+                        OR (SYU-HKNCOMBINUM  =   COMB-HKNCOMBINUM)
                           CONTINUE
                         ELSE
                           MOVE   ZERO  TO  WK-SYU-SYUCOMPFTN
                           MOVE   ZERO  TO  WK-ENTANI
+                        END-IF
+                        IF (SYU-HKNCOMBINUM  =   COMB-HKNCOMBINUM)
+                          COMPUTE   WK-GENBUTU-HKNKIN  =
+                                    WK-GENBUTU-HKNKIN  +
+                                   (SYU-HKNTEN (16) * 10)
                         END-IF
                        END-IF
                        ADD   WK-SYU-SYUCOMPFTN     TO   FTN-SYU-M        
@@ -12003,6 +12015,21 @@
                             IF  WK-TOKUTEI-COMPFTN2  >=  21000
                                MOVE   1   TO  FLG-GENBUTU-TAISYODATA
                             END-IF
+                            IF  (COMB-KOH1HKNNUM        =  SPACE)
+                            AND (COMB-KOH2HKNNUM        =  SPACE)
+                            AND (COMB-KOH3HKNNUM        =  SPACE)
+                            AND (COMB-KOH4HKNNUM        =  SPACE)
+                            AND (FLG-GENBUTU-TAISYODATA =  ZERO )
+                            AND (WK-GENBUTU-HKNKIN  NOT =  ZERO )
+                               COMPUTE  WK-GENBUTU-HKNKIN2 =
+                                       (WK-ZENGAKU + WK-GENBUTU-HKNKIN)
+                               COMPUTE  WK-GENBUTU-HKNKIN3  =
+                                       (WK-GENBUTU-HKNKIN2  *
+                                        WK-FUTANWARI)
+                               IF  WK-GENBUTU-HKNKIN3  >=  21000
+                                 MOVE   1   TO  FLG-GENBUTU-TAISYODATA
+                               END-IF
+                            END-IF
                         END-IF
                         IF   (LNK-S02-KOUREI-NYUIN-KBN   =   "1")
                         OR   (FLG-KOHININBARAI           =    1 )
@@ -12154,6 +12181,21 @@
       ***                   IF  LNK-SYU-SYUCOMPFTN   >=  21000
                             IF  WK-TOKUTEI-COMPFTN2  >=  21000
                                MOVE   1   TO  FLG-GENBUTU-TAISYODATA
+                            END-IF
+                            IF  (COMB-KOH1HKNNUM        =  SPACE)
+                            AND (COMB-KOH2HKNNUM        =  SPACE)
+                            AND (COMB-KOH3HKNNUM        =  SPACE)
+                            AND (COMB-KOH4HKNNUM        =  SPACE)
+                            AND (FLG-GENBUTU-TAISYODATA =  ZERO )
+                            AND (WK-GENBUTU-HKNKIN  NOT =  ZERO )
+                               COMPUTE  WK-GENBUTU-HKNKIN2 =
+                                       (WK-ZENGAKU + WK-GENBUTU-HKNKIN)
+                               COMPUTE  WK-GENBUTU-HKNKIN3  =
+                                       (WK-GENBUTU-HKNKIN2  *
+                                        WK-FUTANWARI)
+                               IF  WK-GENBUTU-HKNKIN3  >=  21000
+                                 MOVE   1   TO  FLG-GENBUTU-TAISYODATA
+                               END-IF
                             END-IF
                         END-IF
                         IF   (LNK-S02-KOUREI-NYUIN-KBN   =   "1")
