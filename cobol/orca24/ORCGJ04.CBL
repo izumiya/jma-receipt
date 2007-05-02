@@ -530,7 +530,7 @@
            03  WRK-HENKAN-ATO      PIC X(20).
            03  IDH1                PIC 9(04).
            03  IDH2                PIC 9(04).
-           03  IDX-D               PIC 9(04).
+           03  IDX-D               PIC 9(02).
       *
       *    ¸¡ºº¡¡È½ÃÇ¥°¥ë¡¼¥×
        01  WRK-KENSA-AREA.
@@ -6035,6 +6035,13 @@
            IF      SPA-SEL-RRKYMD      =   SPACE
                MOVE    SRY-SRYYM           TO  SSANTEI-SRYYMD(1:6)
                MOVE    "01"                TO  SSANTEI-SRYYMD(7:2)
+               PERFORM   VARYING   IDX-D   FROM    1   BY  1
+                         UNTIL     IDX-D       >   31
+                   IF      SPA-SEL-DAY (IDX-D)     >   ZERO
+                       MOVE    IDX-D       TO  SSANTEI-SRYYMD(7:2)
+                       MOVE    31          TO  IDX-D
+                   END-IF
+               END-PERFORM
            ELSE
                MOVE    SPA-SEL-RRKYMD      TO  SSANTEI-SRYYMD
            END-IF

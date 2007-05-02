@@ -10313,6 +10313,9 @@
            PERFORM VARYING IDX-D       FROM    1   BY  1
                    UNTIL   IDX-D       >   31
                IF      SPA-NAI-DAY (IDX 1 IDX-D)  >   ZERO
+                   IF      SSANTEI-SRYYMD(7:2)    =  "01"
+                       MOVE    IDX-D       TO  SSANTEI-SRYYMD(7:2)
+                   END-IF
                    MOVE    SPA-NAI-DAY (IDX 1 IDX-D)
                                            TO  SSANTEI-DAY (IDX-D)
                END-IF
