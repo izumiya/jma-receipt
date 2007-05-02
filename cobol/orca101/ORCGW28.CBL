@@ -942,6 +942,9 @@
                        GO  TO  481-TOUROKU-EXT
                    END-IF
       *
+                   MOVE    "SYSKANRI-KEY"  TO  WRK-DBPATH
+                   PERFORM 900-TBL-CLOSE-SEC
+      *
                    MOVE    MCPDATA-REC     TO  SYS-5001-REC
       *
                    PERFORM 4811-SYS5001-EDIT-SEC
