@@ -6033,7 +6033,35 @@
                                            TO  WRK-CHK-SRYCD
                        PERFORM 900-DTCHK008-READ-SEC
                        IF    ( FLG-DTCHK008    =   1 )
-                           PERFORM 200112-CHKMST-HEI-SRY-CHK-SEC
+                           IF    ( TSRYCD-SRYCD (IDX6)
+                                           =   "180027410"
+                                            OR "180027510"
+                                            OR "180027610"
+                                            OR "180027710"
+                                            OR "180027810"
+                                            OR "180027910"
+                                            OR "180028010"
+                                            OR "180028110"
+                                            OR "180029110"
+                                            OR "180029210"
+                                            OR "180029310"
+                                            OR "180029410"
+                                            OR "180029510"
+                                            OR "180029610"
+                                            OR "180029710"
+                                            OR "180029810"
+                                            OR "180029910"
+                                            OR "180030010"
+                                            OR "180030110"
+                                            OR "180030210"
+                                            OR "180030310"
+                                            OR "180030410"
+                                            OR "180030510"
+                                            OR "180030610" )
+                               CONTINUE
+                           ELSE
+                               PERFORM 200112-CHKMST-HEI-SRY-CHK-SEC
+                           END-IF
                        END-IF
                    END-IF
       *
