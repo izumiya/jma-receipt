@@ -176,6 +176,7 @@
       *  03.04.11    NACL-門脇    07/03/22  埼玉県地方公費対応
       *                                     （川口・春日部市）
       *  03.04.12    NACL-門脇    07/03/23  北海道小樽市地方公費対応
+      *  03.04.13    NACL-門脇    07/05/02  高齢者の計算修正
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -16743,107 +16744,107 @@
       *    日別データ置き換え編集処理
            PERFORM   23094-DAYDATA-OKIKAE-HENSYU-SEC.
       *
-           IF   FLG-SYUHEN                 =   "1"
-           AND  LNK-S02-TEIKI-KBN          =   "X"
-           AND  LNK-SYU-SRYYMD(1:6)        <   "200704"
+      ***  IF   FLG-SYUHEN                 =   "1"
+      ***  AND  LNK-S02-TEIKI-KBN          =   "X"
+      ***  AND  LNK-SYU-SRYYMD(1:6)        <   "200704"
       *
-              IF   COMB-HKNNUM            NOT =   SPACE
-              AND  LNK-SYU-SYUCOMPFTN     NOT =   WK-HEN-SYUCOMPFTN
+      ***     IF   COMB-HKNNUM            NOT =   SPACE
+      ***     AND  LNK-SYU-SYUCOMPFTN     NOT =   WK-HEN-SYUCOMPFTN
       *
-                 IF   COMB-KOH1-NYUJGNKBN     =     "1"
-                    IF   LNK-SYU-KOH1HKNFTNMONEY  >  WK-HEN-SYUCOMPFTN
-                       MOVE  LNK-SYU-KOH1HKNFTNMONEY
-                                                 TO  LNK-SYU-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN
-                    ELSE
-                       MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN
-                    END-IF
-                 ELSE
-                    IF   LNK-SYU-KOH1COMPFTN  >  WK-HEN-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPFTN   =
-                                 LNK-SYU-KOH1COMPFTN  +   5
-                       COMPUTE   WK-FTN               =
-                                 LNK-SYU-SYUCOMPFTN   /  10
-                       COMPUTE   LNK-SYU-SYUCOMPFTN   =
-                                 WK-FTN               *  10
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN
-                    ELSE
-                       MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN
-                    END-IF
-                 END-IF
+      ***        IF   COMB-KOH1-NYUJGNKBN     =     "1"
+      ***           IF   LNK-SYU-KOH1HKNFTNMONEY  >  WK-HEN-SYUCOMPFTN
+      ***              MOVE  LNK-SYU-KOH1HKNFTNMONEY
+      ***                                        TO  LNK-SYU-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN
+      ***           END-IF
+      ***        ELSE
+      ***           IF   LNK-SYU-KOH1COMPFTN  >  WK-HEN-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPFTN   =
+      ***                        LNK-SYU-KOH1COMPFTN  +   5
+      ***              COMPUTE   WK-FTN               =
+      ***                        LNK-SYU-SYUCOMPFTN   /  10
+      ***              COMPUTE   LNK-SYU-SYUCOMPFTN   =
+      ***                        WK-FTN               *  10
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN
+      ***           END-IF
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-              IF   COMB-HKNNUM       NOT =   SPACE
-              AND  LNK-SYU-SYUCOMPFTN-ENTANI
-                                     NOT =   WK-HEN-SYUCOMPFTN-ENTANI
+      ***     IF   COMB-HKNNUM       NOT =   SPACE
+      ***     AND  LNK-SYU-SYUCOMPFTN-ENTANI
+      ***                            NOT =   WK-HEN-SYUCOMPFTN-ENTANI
       *
-                 IF   LNK-SYU-KOH1COMPFTN-ENTANI  >
-                                          WK-HEN-SYUCOMPFTN-ENTANI
-                    MOVE   LNK-SYU-KOH1COMPFTN-ENTANI
-                                TO   LNK-SYU-SYUCOMPFTN-ENTANI
-                 ELSE
-                    MOVE   WK-HEN-SYUCOMPFTN-ENTANI
-                                TO   LNK-SYU-SYUCOMPFTN-ENTANI
-                 END-IF
+      ***        IF   LNK-SYU-KOH1COMPFTN-ENTANI  >
+      ***                                 WK-HEN-SYUCOMPFTN-ENTANI
+      ***           MOVE   LNK-SYU-KOH1COMPFTN-ENTANI
+      ***                       TO   LNK-SYU-SYUCOMPFTN-ENTANI
+      ***        ELSE
+      ***           MOVE   WK-HEN-SYUCOMPFTN-ENTANI
+      ***                       TO   LNK-SYU-SYUCOMPFTN-ENTANI
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-              IF   COMB-KOH1HKNNUM            =   "027"
-              AND  LNK-SYU-KOH1COMPFTN    NOT =   WK-HEN-KOH1COMPFTN
+      ***     IF   COMB-KOH1HKNNUM            =   "027"
+      ***     AND  LNK-SYU-KOH1COMPFTN    NOT =   WK-HEN-KOH1COMPFTN
       *
-                 IF   COMB-KOH2-NYUJGNKBN     =     "1"
-                    IF   LNK-SYU-KOH2HKNFTNMONEY  >  WK-HEN-KOH1COMPFTN
-                       MOVE  LNK-SYU-KOH2HKNFTNMONEY
-                                                 TO  LNK-SYU-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN
-                    ELSE
-                       MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN
-                    END-IF
-                 ELSE
-                    IF   LNK-SYU-KOH2COMPFTN  >  WK-HEN-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPFTN  =
-                                 LNK-SYU-KOH2COMPFTN  +   5
-                       COMPUTE   WK-FTN               =
-                                 LNK-SYU-KOH1COMPFTN  /  10
-                       COMPUTE   LNK-SYU-KOH1COMPFTN  =
-                                 WK-FTN               *  10
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN
-                    ELSE
-                       MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN
-                    END-IF
-                 END-IF
+      ***        IF   COMB-KOH2-NYUJGNKBN     =     "1"
+      ***           IF   LNK-SYU-KOH2HKNFTNMONEY  >  WK-HEN-KOH1COMPFTN
+      ***              MOVE  LNK-SYU-KOH2HKNFTNMONEY
+      ***                                        TO  LNK-SYU-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN
+      ***           END-IF
+      ***        ELSE
+      ***           IF   LNK-SYU-KOH2COMPFTN  >  WK-HEN-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPFTN  =
+      ***                        LNK-SYU-KOH2COMPFTN  +   5
+      ***              COMPUTE   WK-FTN               =
+      ***                        LNK-SYU-KOH1COMPFTN  /  10
+      ***              COMPUTE   LNK-SYU-KOH1COMPFTN  =
+      ***                        WK-FTN               *  10
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN
+      ***           END-IF
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-              IF   COMB-KOH1HKNNUM            =   "027"
-              AND  LNK-SYU-KOH1COMPFTN-ENTANI
-                                    NOT =   WK-HEN-KOH1COMPFTN-ENTANI
+      ***     IF   COMB-KOH1HKNNUM            =   "027"
+      ***     AND  LNK-SYU-KOH1COMPFTN-ENTANI
+      ***                           NOT =   WK-HEN-KOH1COMPFTN-ENTANI
       *
-                 IF   LNK-SYU-KOH2COMPFTN-ENTANI  >
-                                          WK-HEN-KOH1COMPFTN-ENTANI
-                    MOVE   LNK-SYU-KOH2COMPFTN-ENTANI
-                                TO   LNK-SYU-KOH1COMPFTN-ENTANI
-                 ELSE
-                    MOVE   WK-HEN-KOH1COMPFTN-ENTANI
-                                TO   LNK-SYU-KOH1COMPFTN-ENTANI
-                 END-IF
+      ***        IF   LNK-SYU-KOH2COMPFTN-ENTANI  >
+      ***                                 WK-HEN-KOH1COMPFTN-ENTANI
+      ***           MOVE   LNK-SYU-KOH2COMPFTN-ENTANI
+      ***                       TO   LNK-SYU-KOH1COMPFTN-ENTANI
+      ***        ELSE
+      ***           MOVE   WK-HEN-KOH1COMPFTN-ENTANI
+      ***                       TO   LNK-SYU-KOH1COMPFTN-ENTANI
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-           END-IF.
+      ***  END-IF.
       *
       *    現物給付に関する対象データフラグ編集
            PERFORM   23096-GENBUTU-TAISYODATA-HENSYU-SEC.

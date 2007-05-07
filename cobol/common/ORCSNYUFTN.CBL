@@ -86,6 +86,7 @@
       *  03.04.02    NACL-ÌçÏÆ    07/03/08  ·×»»¤ÎÍ¥Àè½ç°ÌÊÔ½¸½¤Àµ
       *  03.04.03    NACL-ÌçÏÆ    07/03/22  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
+      *  03.04.04    NACL-ÌçÏÆ    07/05/02  ¹âÎð¼Ô¤Î·×»»½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -617,9 +618,9 @@
       *    ÆÃ¼ì·×»»¡ÊºÆ·×»»¡Ë
            IF       CNT-KENSU  >   1
               IF     ( FLG-TOKUSYU            =    1       )
-              OR     ((FLG-KOUREISYA          =    1      ) AND
-                      (LNK-S02-TEIKI-KBN      =   "X"     ) AND
-                      (LNK-S02-SKYSTYMD(1:6)  <   "200704"))
+      *****   OR     ((FLG-KOUREISYA          =    1      ) AND
+      *****           (LNK-S02-TEIKI-KBN      =   "X"     ) AND
+      *****           (LNK-S02-SKYSTYMD(1:6)  <   "200704"))
                    PERFORM     TOKUSYU-SANTEI-SEC
               END-IF
            END-IF.
