@@ -35,6 +35,7 @@
       * 03.03.03     NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       * 03.03.04     NACL-Æ£¸¶    07/04/13  ¾É¾õ¾Üµ­¶èÊ¬¥³¡¼¥ÉÄÉ²Ã¤ËÈ¼¤¦ÂÐ±þ
       *  03.03.05    NACL-Æ£¸¶    07/04/23  ¡Ö¶èÊ¬¡×Íó¤Îµ­ºÜ¤ÎÊÑ¹¹
+      * 03.03.06     NACL-ÌçÏÆ    07/05/07  Âè£²¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜ¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5089,17 +5090,19 @@
            AND   ((RECE62-TOTALTEN (IDX3)
                                       NOT =   RECE62-TOTALTEN (IDX1)) OR
                   (RECE62-FTNMONEY (IDX3)
-                                      NOT =   RECE62-FTNMONEY (IDX1))  )
+                                      NOT =   RECE62-FTNMONEY (IDX1)) OR
+                  (RECE62-FTNMONEY (IDX3)
+                                      NOT =   RECE62-FTNMONEY (IDX2))  )
       *
-               IF      RECE62-FTNMONEY (IDX3)
-                                          NOT =   RECE62-FTNMONEY (IDX2)
+      ***      IF      RECE62-FTNMONEY (IDX3)
+      ***                                 NOT =   RECE62-FTNMONEY (IDX2)
       *
                    IF      RECE62-FTNMONEY (IDX3)   >   ZERO
                        MOVE    RECE62-FTNMONEY (IDX3)
                                            TO  WRK-KGK7
                        MOVE    WRK-KGK7    TO  HC06-FTNMONEY(3)
                    END-IF
-               END-IF
+      ***      END-IF
            END-IF
            IF    ( RECE62-TOTALTEN (IDX3) >   ZERO                  )
            AND   ( RECE62-FTNMONEY (IDX3) =   RECE62-FTNMONEY (IDX2))
