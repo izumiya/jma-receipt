@@ -29,6 +29,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-小豆沢  06/05/22  MONFUNC対応
+      * 01.00.02     NACL-伊藤    07/05/08  重複チェック見直し
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -374,7 +375,7 @@
                                        MCPDATA-REC
       *
            IF      FLG-SRYCDCHG        =   ZERO
-               MOVE    1               TO  WRK-ERRCD
+               MOVE    2               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
                GO      TO      2010-INSERT-SYORI-EXT
            END-IF
@@ -404,8 +405,13 @@
                                        MCPAREA
                                        MCPDATA-REC
       *
+           IF    ( FLG-SRYCDCHG            =  ZERO )
+             AND ( CHGWK-RJNSRYCD (1:1)    =  "6"  )
+               MOVE    1               TO  FLG-SRYCDCHG   
+           END-IF
+      *
            IF      FLG-SRYCDCHG        =   ZERO
-               MOVE    2               TO  WRK-ERRCD
+               MOVE    1               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
                GO      TO      2010-INSERT-SYORI-EXT
            END-IF
