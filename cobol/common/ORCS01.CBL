@@ -218,6 +218,7 @@
       *  03.04.09    NACL-ÌçÏÆ    07/03/22  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
       *  03.04.10    NACL-ÌçÏÆ    07/04/26  ¹­Åç¸©½Å¿´¡ÜÄ¹´üÂÐ±þ
+      *  03.04.11    NACL-ÌçÏÆ    07/05/08  ËÌ³¤Æ»°°Àî»ÔÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12973,7 +12974,7 @@
                            WK-ZENGAKU   *  WK-FUTANWARI
                  IF  (WK-1001-PREFNUM             =  01           )
                  AND (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "642" OR "643"
-                                                          OR "644")
+                                                 OR "644" OR "743")
                  AND (LNK-S01-SYOSINFLG       NOT =  SPACE        )
                      IF   LNK-SYU-KOH-COMPFTN(KOH-IDX)         <   580
                         MOVE  ZERO  TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
@@ -13465,6 +13466,26 @@
                            WK-ZENGAKU   *  WK-FUTANWARI
                  COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
                            WK-ZENGAKU   *  WK-FUTANWARI
+                 IF  (WK-1001-PREFNUM             =  01           )
+                 AND (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "642" OR "643"
+                                                 OR "644" OR "743")
+                 AND (LNK-S01-SYOSINFLG       NOT =  SPACE        )
+                     IF   LNK-SYU-KOH-COMPFTN(KOH-IDX)         <   580
+                        MOVE  ZERO  TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                     ELSE
+                        COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                                 LNK-SYU-KOH-COMPFTN(KOH-IDX) -
+                                 580
+                     END-IF
+                     IF   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  <   580
+                        MOVE  ZERO  TO
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                     ELSE
+                        COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) =
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
+                                 580
+                     END-IF
+                 END-IF
                END-IF
       *
                IF    LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0"
@@ -15646,114 +15667,114 @@
                END-IF
            END-IF.
       *
-           IF   FLG-SYUHEN                 =   "1"
-           AND  LNK-SYU-SRYYMD(1:6)        <   "200704"
+      ***  IF   FLG-SYUHEN                 =   "1"
+      ***  AND  LNK-SYU-SRYYMD(1:6)        <   "200704"
       *
-              IF   COMB-HKNNUM            NOT =   SPACE
-              AND  LNK-SYU-SYUCOMPFTN     NOT =   WK-HEN-SYUCOMPFTN
+      ***     IF   COMB-HKNNUM            NOT =   SPACE
+      ***     AND  LNK-SYU-SYUCOMPFTN     NOT =   WK-HEN-SYUCOMPFTN
       *
-                 IF   COMB-KOH1-GAIJGNKBN     =     "1"
-                    IF   LNK-SYU-KOH1HKNFTNMONEY  >  WK-HEN-SYUCOMPFTN
-                       MOVE  LNK-SYU-KOH1HKNFTNMONEY
-                                                 TO  LNK-SYU-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN     +
-                                 LNK-SYU-SYUCOMPYKZFTN
-                    ELSE
-                       MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN     +
-                                 LNK-SYU-SYUCOMPYKZFTN
-                    END-IF
-                 ELSE
-                    IF   LNK-SYU-KOH1COMPFTN  >  WK-HEN-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPFTN   =
-                                 LNK-SYU-KOH1COMPFTN  +   5
-                       COMPUTE   WK-FTN               =
-                                 LNK-SYU-SYUCOMPFTN   /  10
-                       COMPUTE   LNK-SYU-SYUCOMPFTN   =
-                                 WK-FTN               *  10
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN     +
-                                 LNK-SYU-SYUCOMPYKZFTN
-                    ELSE
-                       MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
-                       COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
-                                 LNK-SYU-SYUCOMPFTN     +
-                                 LNK-SYU-SYUCOMPYKZFTN
-                    END-IF
-                 END-IF
+      ***        IF   COMB-KOH1-GAIJGNKBN     =     "1"
+      ***           IF   LNK-SYU-KOH1HKNFTNMONEY  >  WK-HEN-SYUCOMPFTN
+      ***              MOVE  LNK-SYU-KOH1HKNFTNMONEY
+      ***                                        TO  LNK-SYU-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN     +
+      ***                        LNK-SYU-SYUCOMPYKZFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN     +
+      ***                        LNK-SYU-SYUCOMPYKZFTN
+      ***           END-IF
+      ***        ELSE
+      ***           IF   LNK-SYU-KOH1COMPFTN  >  WK-HEN-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPFTN   =
+      ***                        LNK-SYU-KOH1COMPFTN  +   5
+      ***              COMPUTE   WK-FTN               =
+      ***                        LNK-SYU-SYUCOMPFTN   /  10
+      ***              COMPUTE   LNK-SYU-SYUCOMPFTN   =
+      ***                        WK-FTN               *  10
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN     +
+      ***                        LNK-SYU-SYUCOMPYKZFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-SYUCOMPFTN   TO  LNK-SYU-SYUCOMPFTN
+      ***              COMPUTE   LNK-SYU-SYUCOMPTOTAL   =
+      ***                        LNK-SYU-SYUCOMPFTN     +
+      ***                        LNK-SYU-SYUCOMPYKZFTN
+      ***           END-IF
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-              IF   COMB-HKNNUM       NOT =   SPACE
-              AND  LNK-SYU-SYUCOMPFTN-ENTANI
-                                     NOT =   WK-HEN-SYUCOMPFTN-ENTANI
+      ***     IF   COMB-HKNNUM       NOT =   SPACE
+      ***     AND  LNK-SYU-SYUCOMPFTN-ENTANI
+      ***                            NOT =   WK-HEN-SYUCOMPFTN-ENTANI
       *
-                 IF   LNK-SYU-KOH1COMPFTN-ENTANI  >
-                                          WK-HEN-SYUCOMPFTN-ENTANI
-                    MOVE   LNK-SYU-KOH1COMPFTN-ENTANI
-                                TO   LNK-SYU-SYUCOMPFTN-ENTANI
-                 ELSE
-                    MOVE   WK-HEN-SYUCOMPFTN-ENTANI
-                                TO   LNK-SYU-SYUCOMPFTN-ENTANI
-                 END-IF
+      ***        IF   LNK-SYU-KOH1COMPFTN-ENTANI  >
+      ***                                 WK-HEN-SYUCOMPFTN-ENTANI
+      ***           MOVE   LNK-SYU-KOH1COMPFTN-ENTANI
+      ***                       TO   LNK-SYU-SYUCOMPFTN-ENTANI
+      ***        ELSE
+      ***           MOVE   WK-HEN-SYUCOMPFTN-ENTANI
+      ***                       TO   LNK-SYU-SYUCOMPFTN-ENTANI
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-              IF   COMB-KOH1HKNNUM            =   "027"
-              AND  LNK-SYU-KOH1COMPFTN    NOT =   WK-HEN-KOH1COMPFTN
+      ***     IF   COMB-KOH1HKNNUM            =   "027"
+      ***     AND  LNK-SYU-KOH1COMPFTN    NOT =   WK-HEN-KOH1COMPFTN
       *
-                 IF   COMB-KOH2-GAIJGNKBN     =     "1"
-                    IF   LNK-SYU-KOH2HKNFTNMONEY  >  WK-HEN-KOH1COMPFTN
-                       MOVE  LNK-SYU-KOH2HKNFTNMONEY
-                                                 TO  LNK-SYU-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN     +
-                                 LNK-SYU-KOH1COMPYKZFTN
-                    ELSE
-                       MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN     +
-                                 LNK-SYU-KOH1COMPYKZFTN
-                    END-IF
-                 ELSE
-                    IF   LNK-SYU-KOH2COMPFTN  >  WK-HEN-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPFTN  =
-                                 LNK-SYU-KOH2COMPFTN  +   5
-                       COMPUTE   WK-FTN               =
-                                 LNK-SYU-KOH1COMPFTN  /  10
-                       COMPUTE   LNK-SYU-KOH1COMPFTN  =
-                                 WK-FTN               *  10
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN     +
-                                 LNK-SYU-KOH1COMPYKZFTN
-                    ELSE
-                       MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
-                       COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
-                                 LNK-SYU-KOH1COMPFTN     +
-                                 LNK-SYU-KOH1COMPYKZFTN
-                    END-IF
-                 END-IF
+      ***        IF   COMB-KOH2-GAIJGNKBN     =     "1"
+      ***           IF   LNK-SYU-KOH2HKNFTNMONEY  >  WK-HEN-KOH1COMPFTN
+      ***              MOVE  LNK-SYU-KOH2HKNFTNMONEY
+      ***                                        TO  LNK-SYU-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN     +
+      ***                        LNK-SYU-KOH1COMPYKZFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN     +
+      ***                        LNK-SYU-KOH1COMPYKZFTN
+      ***           END-IF
+      ***        ELSE
+      ***           IF   LNK-SYU-KOH2COMPFTN  >  WK-HEN-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPFTN  =
+      ***                        LNK-SYU-KOH2COMPFTN  +   5
+      ***              COMPUTE   WK-FTN               =
+      ***                        LNK-SYU-KOH1COMPFTN  /  10
+      ***              COMPUTE   LNK-SYU-KOH1COMPFTN  =
+      ***                        WK-FTN               *  10
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN     +
+      ***                        LNK-SYU-KOH1COMPYKZFTN
+      ***           ELSE
+      ***              MOVE  WK-HEN-KOH1COMPFTN  TO  LNK-SYU-KOH1COMPFTN
+      ***              COMPUTE   LNK-SYU-KOH1COMPTOTAL   =
+      ***                        LNK-SYU-KOH1COMPFTN     +
+      ***                        LNK-SYU-KOH1COMPYKZFTN
+      ***           END-IF
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-              IF   COMB-KOH1HKNNUM            =   "027"
-              AND  LNK-SYU-KOH1COMPFTN-ENTANI
-                                    NOT =   WK-HEN-KOH1COMPFTN-ENTANI
+      ***     IF   COMB-KOH1HKNNUM            =   "027"
+      ***     AND  LNK-SYU-KOH1COMPFTN-ENTANI
+      ***                           NOT =   WK-HEN-KOH1COMPFTN-ENTANI
       *
-                 IF   LNK-SYU-KOH2COMPFTN-ENTANI  >
-                                          WK-HEN-KOH1COMPFTN-ENTANI
-                    MOVE   LNK-SYU-KOH2COMPFTN-ENTANI
-                                TO   LNK-SYU-KOH1COMPFTN-ENTANI
-                 ELSE
-                    MOVE   WK-HEN-KOH1COMPFTN-ENTANI
-                                TO   LNK-SYU-KOH1COMPFTN-ENTANI
-                 END-IF
+      ***        IF   LNK-SYU-KOH2COMPFTN-ENTANI  >
+      ***                                 WK-HEN-KOH1COMPFTN-ENTANI
+      ***           MOVE   LNK-SYU-KOH2COMPFTN-ENTANI
+      ***                       TO   LNK-SYU-KOH1COMPFTN-ENTANI
+      ***        ELSE
+      ***           MOVE   WK-HEN-KOH1COMPFTN-ENTANI
+      ***                       TO   LNK-SYU-KOH1COMPFTN-ENTANI
+      ***        END-IF
       *
-              END-IF
+      ***     END-IF
       *
-           END-IF.
+      ***  END-IF.
       *
        2307-FTNKIN-HIKAKU-EXT.
            EXIT.

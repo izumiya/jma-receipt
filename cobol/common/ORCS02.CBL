@@ -177,6 +177,7 @@
       *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
       *  03.04.12    NACL-ÌçÏÆ    07/03/23  ËÌ³¤Æ»¾®Ã®»ÔÃÏÊý¸øÈñÂÐ±þ
       *  03.04.13    NACL-ÌçÏÆ    07/05/02  ¹âÎð¼Ô¤Î·×»»½¤Àµ
+      *  03.04.14    NACL-ÌçÏÆ    07/05/08  ËÌ³¤Æ»°°Àî»ÔÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12957,7 +12958,7 @@
                            WK-ZENGAKU   *  WK-FUTANWARI
                  IF  (WK-1001-PREFNUM             =  01           )
                  AND (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "642" OR "643"
-                                                          OR "644")
+                                                 OR "644" OR "743")
                  AND (LNK-S02-SYOSINFLG       NOT =  SPACE        )
                      IF   LNK-SYU-KOH-COMPFTN(KOH-IDX)         <   580
                         MOVE  ZERO  TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
@@ -13477,6 +13478,26 @@
                            WK-ZENGAKU   *  WK-FUTANWARI
                  COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
                            WK-ZENGAKU   *  WK-FUTANWARI
+                 IF  (WK-1001-PREFNUM             =  01           )
+                 AND (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "642" OR "643"
+                                                 OR "644" OR "743")
+                 AND (LNK-S02-SYOSINFLG       NOT =  SPACE        )
+                     IF   LNK-SYU-KOH-COMPFTN(KOH-IDX)         <   580
+                        MOVE  ZERO  TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                     ELSE
+                        COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                                 LNK-SYU-KOH-COMPFTN(KOH-IDX) -
+                                 580
+                     END-IF
+                     IF   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  <   580
+                        MOVE  ZERO  TO
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                     ELSE
+                        COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) =
+                                 LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
+                                 580
+                     END-IF
+                 END-IF
                END-IF
       *
                IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =      "027"           
