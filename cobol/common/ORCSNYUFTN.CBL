@@ -1542,7 +1542,7 @@
                        (FLG-SENTEI-SET =       1      )
       *
       *
-           MOVE     "NYUINACT-KEY22"    TO  WK-PATH
+           MOVE     "NYUINACCT-KEY22"  TO  WK-PATH
            PERFORM   CSR-CLOSE-SEC
       *
       *選定外泊の係数セット
