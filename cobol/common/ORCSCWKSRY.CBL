@@ -3150,6 +3150,8 @@
            COMPUTE WRK-EN              =   SPA-COM-TEN (IDX)
                                        *   SPA-COM-KAISU (IDX)
            ADD     WRK-EN              TO  SYU-RSIETC-MONEY
+      *    Ï«ºÒ¤Î±ß
+           MOVE    WRK-EN              TO  SPA-COM-RSIKIN(IDX)
       *
            .
        450112-JIBAISEKI-SET-EXT.
