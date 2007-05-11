@@ -109,6 +109,7 @@
       *  03.03.03    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
       *  03.03.04    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *  03.03.05    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
+      *  03.03.06    NACL-ÌçÏÆ    07/05/11  Ï«ºÒ¡¦¼«ÇåÀÕÃ±²Á£±£°±ßÌ¤ËþÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -285,6 +286,7 @@
            03  FLG-TAIGAI                              PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
            03  FLG-KHNRYO-SKJ                          PIC 9(01).
+           03  FLG-TAISYO                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -536,6 +538,8 @@
       *
            03  WRK-FUKA-KINGAKU                PIC 9(09).
            03  WRK-FUKA-VALUE                  PIC 9(01).
+      *
+           03  WRK-ZAITENNASHI                 PIC 9(09).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -828,6 +832,10 @@
       *    ¿ÇÎÅ²ñ·×
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
+      *
+      *    ¿ÇÎÅ²ñ·×ÉÕ²Ã¾ðÊó¥Þ¥¹¥¿¡Ý
+       01  SRYACCTPLUS-REC.
+           COPY    "CPSRYACCTPLUS.INC".
       *
       *    ¿ÇÎÅ¹Ô°Ù
        01  SRYACT-REC.
@@ -1397,6 +1405,8 @@
       *
            MOVE   ZERO   TO    WRK-KINGAKU-JI
       *
+           MOVE   ZERO   TO    WRK-ZAITENNASHI
+      *
            PERFORM    220-RECE84-HENSYU-SEC
            PERFORM    230-RECE84-HENSYU2-SEC
            PERFORM    240-RECE84-HENSYU3-SEC
@@ -1459,8 +1469,17 @@
                      (RECE82-SRYYM     >= "200607"                ))
                    CONTINUE
                  ELSE
-                   IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
-                        (ACCT-ZAIKAISU  NOT =    ZERO)
+      *
+                   MOVE     ZERO    TO    FLG-TAISYO
+                   IF   (ACCT-SRYKBN         =   "80" )
+                   AND  (ACCT-ZAITEN         =   ZERO )
+                   AND  (ACCT-ZAIKAISU   NOT =   ZERO )
+                     PERFORM  2204-SRYACCTPLUS-KENSAKU-SEC
+                   END-IF
+      *
+                   IF  ((ACCT-ZAITEN    NOT =    ZERO ) AND
+                        (ACCT-ZAIKAISU  NOT =    ZERO ))
+                   OR  ( FLG-TAISYO         =      1   )
       *
                        MOVE   ZERO   TO   WRK-TEN
                                           WRK-MEISAI-CNT
@@ -2905,8 +2924,9 @@
                      MOVE    ZERO     TO    WK-KIZAITEN
                      MOVE    ZERO     TO    WK-YKZTEN
                END-IF
-               IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
-                    (ACCT-ZAIKAISU  NOT =    ZERO)
+               IF  ((ACCT-ZAITEN    NOT =    ZERO) AND
+                    (ACCT-ZAIKAISU  NOT =    ZERO))
+               OR  ( FLG-TAISYO         =     1   )
                   IF   RECE82-HKNKBN   NOT  =   "4"                     
                         PERFORM   220221-RECE-LEFT-SET-SEC
                   ELSE                                                  
@@ -3187,6 +3207,11 @@
                          COMPUTE   RECE82-KINGAKU2(2)  =
                                    RECE82-KINGAKU2(2)  +
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
+                         IF   FLG-TAISYO   =   1
+                          COMPUTE  WRK-ZAITENNASHI  =
+                                   WRK-ZAITENNASHI  +
+                                  (TNS-TEN     *   ACCT-ZAIKAISU)
+                         END-IF
                      ELSE                
                        IF    TNS-NYUTENTTLKBN   =    130
                          COMPUTE   RECE82-TENSU(2)  =
@@ -3517,9 +3542,15 @@
                                   RECE82-KINGAKU3(3)  +                 
       ***>                       (TNS-TEN   *   ACCT-ZAIKAISU)          
                          (WRK-JIBAIKZI-TNS(IDX3) *   ACCT-ZAIKAISU)
-                       COMPUTE    RECE82-KINGAKU3-SYO  =
-                                  RECE82-KINGAKU3-SYO  +
+                       IF   FLG-TAISYO   =   1
+                          COMPUTE  WRK-ZAITENNASHI  =
+                                   WRK-ZAITENNASHI  +
+                         (WRK-JIBAIKZI-TNS(IDX3) *   ACCT-ZAIKAISU)
+                       ELSE
+                          COMPUTE  RECE82-KINGAKU3-SYO  =
+                                   RECE82-KINGAKU3-SYO  +
                          (WRK-JIBAIKZI-SYO(IDX3) *   ACCT-ZAIKAISU)
+                       END-IF
                     ELSE                                                
                      IF  SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
                        COMPUTE    RECE82-KINGAKU3(3)  =                 
@@ -4038,6 +4069,50 @@
       *
            .
        2203-SINRYO-CHECK-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ¿ÇÎÅ²ñ·×ÉÕ²Ã¾ðÊó¸¡º÷
+      **************************************************************
+       2204-SRYACCTPLUS-KENSAKU-SEC           SECTION.
+      *
+           INITIALIZE                      SRYACCTPLUS-REC
+           MOVE    ACCT-HOSPID        TO   ACCTP-HOSPID
+           MOVE    ACCT-NYUGAIKBN     TO   ACCTP-NYUGAIKBN
+           MOVE    ACCT-PTID          TO   ACCTP-PTID
+           MOVE    ACCT-SRYKA         TO   ACCTP-SRYKA
+           MOVE    ACCT-SRYYM         TO   ACCTP-SRYYM
+           MOVE    ACCT-ZAINUM        TO   ACCTP-ZAINUM
+           MOVE    1                  TO   ACCTP-RENNUM
+           MOVE    SRYACCTPLUS-REC    TO   MCPDATA-REC
+           MOVE    "DBSELECT"         TO   MCP-FUNC
+           MOVE    "tbl_sryacctplus"  TO   MCP-TABLE
+           MOVE    "key"              TO   MCP-PATHNAME
+           CALL    "MONFUNC"          USING  MCPAREA
+                                             MCPDATA-REC
+           IF      MCP-RC              =   ZERO
+               MOVE    "DBFETCH"          TO  MCP-FUNC
+               MOVE    "tbl_sryacctplus"  TO  MCP-TABLE
+               MOVE    "key"              TO  MCP-PATHNAME
+               CALL    "MONFUNC"          USING  MCPAREA
+                                                 MCPDATA-REC
+               IF      MCP-RC          =   ZERO
+                   MOVE    MCPDATA-REC    TO  SRYACCTPLUS-REC
+                   IF   ACCTP-RSIKINGAKU  NOT = ZERO
+                      MOVE    1   TO   FLG-TAISYO
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"    TO   MCP-FUNC
+           MOVE    "tbl_sryacctplus"  TO   MCP-TABLE
+           MOVE    "key"              TO   MCP-PATHNAME
+           CALL    "MONFUNC"          USING  MCPAREA
+                                             MCPDATA-REC
+      *
+           .
+      *
+       2204-SRYACCTPLUS-KENSAKU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6899,6 +6974,11 @@
       *****************************************************************
        280-RECE82-REWRITE-SEC                SECTION.
       *
+           IF   RECE82-HKNKBN     NOT  =   "4"
+             COMPUTE  RECE82-KINGAKU2-SYO  =  RECE82-KINGAKU2-SYO
+                                           +  WRK-ZAITENNASHI
+           END-IF
+      *
            IF   RECE82-HKNKBN     =   "4"                               
       *
              EVALUATE  WRK-PARA-RECEKBN
@@ -6915,6 +6995,10 @@
                COMPUTE   RECE82-TENSU-YAK(11) =  RECE82-TENSU-YAK(4)    
                                               +  RECE82-TENSU-YAK(5)   
                                               +  RECE82-TENSU-YAK(6)   
+      *
+               COMPUTE   RECE82-KINGAKU3-SYO  =
+                         RECE82-KINGAKU3-SYO  +
+                         WRK-ZAITENNASHI
       *
                COMPUTE   RECE82-TOTALKIN-ETC      =
                          RECE82-KINGAKU3-SYO      +
