@@ -60,6 +60,9 @@
       *  03.03.01    NACL-Æ£¸¶    06/10/13  £²£°£°£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  03.03.02    NACL-Æ£¸¶    07/02/10  Æ±°ìÃÏÊý¸øÈñ¤Î¤Þ¤È¤á½¸·×
       *                                     ²¬»³ÂÐ±þ
+      *  03.03.03    NACL-Æ£¸¶    07/05/16  Æ±°ìÃÏÊý¸øÈñ¤Î¤Þ¤È¤á½¸·×
+      *                                     ²¬»³ÂÐ±þ
+      *                                    ¡Ê¸øÈñÈÖ¹æ¤ÎÄÉ²Ã¤ËÈ¼¤¦¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1270,24 +1273,14 @@
       *        ²¬»³¸©¤ÎÃÏÊý¸øÈñ¤Î¤Þ¤È¤á¡Ê£²£°£°£¶Ç¯£±£°·î°Ê¹ß¡Ë
                IF    ( SYS-1001-PREFNUM    =   "33"                  ) 
                AND   ( LNK-PRTKANRI-SRYYM  >=  WRK-CONS-SRYYM-200610 )
-                   EVALUATE    RECE10-KOHNUM (IDZ)
-                       WHEN    "141"
-                       WHEN    "241"
-                       WHEN    "341"
+                   EVALUATE    RECE10-KOHNUM (IDZ) (2:2)
+                       WHEN    "41"
                            MOVE    "141"       TO  RECE10-KOHNUM (IDZ)
-                       WHEN    "185"
-                       WHEN    "285"
-                       WHEN    "385"
-                       WHEN    "485"
-                       WHEN    "585"
+                       WHEN    "85"
                            MOVE    "185"       TO  RECE10-KOHNUM (IDZ)
-                       WHEN    "180"
-                       WHEN    "280"
-                       WHEN    "380"
-                       WHEN    "480"
+                       WHEN    "80"
                            MOVE    "180"       TO  RECE10-KOHNUM (IDZ)
-                       WHEN    "186"
-                       WHEN    "286"
+                       WHEN    "86"
                            MOVE    "186"       TO  RECE10-KOHNUM (IDZ)
                    END-EVALUATE
                END-IF
