@@ -1223,6 +1223,7 @@ COPYS = \
 	CPORCSRECESORT.INC \
         HCM2TV03.INC \
         HCM2TV03.INC \
+        CPORCSTENTEK2.INC \
          
 
 DBPATH = \
