@@ -5130,14 +5130,8 @@
                            END-IF
                            MOVE    1               TO  FLG-OK
                        END-IF
-      *TEST
-              DISPLAY "SPA-RRK-RRKYMD:" SPA-RRK-RRKYMD (IDX)
-                     ",SRYKA:" SPA-RRK-SRYKA (IDX)
-                     ",RENNUM:" SPA-RRK-RENNUM (IDX) 
-                     ", SPA-NAI-KEIFLG2:"  SPA-NAI-KEIFLG2
-                    ",SRYKA:" WRK-SRYKA
       *
-      *                PERFORM VARYING     IDT2    FROM    1   BY  1
+      *****            PERFORM VARYING     IDT2    FROM    1   BY  1
       *                        UNTIL      (IDT2    >   10      )  OR
       *                                   (TBL-HKNCOMBI(IDT IDT2)
       *                                                =   SPACE )
@@ -8079,6 +8073,9 @@
                MOVE    SPA-MAE-STRNUM  TO  SPA-STRNUM
            END-IF
       *
+      *    受診履歴編集
+           PERFORM 3103-JYURRK-HEN-SEC
+      *
       *    保存用パラメタ作成
            PERFORM 4201-SRYACCT-PARA-SEC
       *
@@ -8134,9 +8131,11 @@
            MOVE    SPA-ENDNUM          TO  SPA-STRNUM
            ADD     1                   TO  SPA-STRNUM
       *
+      *    受診履歴編集
+           PERFORM 3103-JYURRK-HEN-SEC
+      *
       *    保存用パラメタ作成
            PERFORM 4201-SRYACCT-PARA-SEC
-      *
       *
       *    診療会計マスターより編集をする
            PERFORM 410181-SRYACCT-HEN-SEC
