@@ -290,6 +290,7 @@
       *  03.04.10    NACL-ÌçÏÆ    07/03/28  ÆÃÄê´ïºà¼ïÊÌ£±¡¢»ÀÁÇÅù¶èÊ¬¤ÎÊÔ½¸
       *  03.04.11    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *  03.04.12    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
+      *  03.04.13    NACL-ÌçÏÆ    07/05/22  µþÅÔÉÜ£µ£±¡Ü£´£±ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7168,6 +7169,20 @@
                                RECE02-TOTALTEN(2)
                    END-IF
       *
+               END-IF
+      *
+      *      µþÅÔÉÜ£µ£±¡Ü£´£±
+      *
+             WHEN    "26"
+      *
+               IF  ( RECE02-HKNNUM       NOT = SPACE    )
+               AND ( RECE02-KOHNUM(1)        = "051"    )
+               AND ( RECE02-KOHHBTNUM(2)     = "41"     )
+               AND ( RECE02-TOTALTEN(1)  NOT =
+                                      RECE02-TOTALTEN(2))
+                  COMPUTE  RECE02-TOTALTEN(3) =
+                           RECE02-TOTALTEN(1) -
+                           RECE02-TOTALTEN(2)
                END-IF
       *
            END-EVALUATE
