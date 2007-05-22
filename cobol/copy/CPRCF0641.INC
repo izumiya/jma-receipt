@@ -49,6 +49,8 @@
                05  RECE641-TEKSTYMD        PIC  X(08).
       *ø«Œ≈∂Ë ¨
                05  RECE641-SRYKBN          PIC  X(02).
+      *•≥°º•……ΩÕ—»÷πÊ°›∂Ë ¨»÷πÊ
+               05  RECE641-CDKBN-KBNNUM    PIC  9(03).
       *∫ﬁ»÷πÊ
                05  RECE641-ZAINUM          PIC  9(08).
       *∏¯»Ò ¨Œ•∂Ë ¨
