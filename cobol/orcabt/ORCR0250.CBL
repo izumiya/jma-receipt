@@ -385,14 +385,15 @@
                ( RECE64-HOJOKBN        =   RECE65-HOJOKBN      )  AND
                ( RECE64-TEKSTYMD       =   RECE65-TEKSTYMD     )  AND
                ( RECE64-ZAINUM         =   RECE65-ZAINUM       )
-               IF     RECE65-CDKBN-KBNNUM   NOT =    ZERO
-                  IF     RECE65-CDKBN-KBNNUM  <=    6
+               IF     RECE65-CDKBN-KBNNUM(1)   NOT =    ZERO
+                  IF     RECE65-CDKBN-KBNNUM(1)  <=    6
                       MOVE   RECE65-CDKBN-KBNNUM
                                        TO  RECE641-CDKBN-KBNNUM
                   ELSE
-                      MOVE   RECE65-CDKBN-KBNNUM
+                      MOVE   RECE65-CDKBN-KBNNUM(1)
                                        TO  RECE641-CDKBN-KBNNUM
                       ADD    10        TO  RECE641-CDKBN-KBNNUM
+                  END-IF
                ELSE
                    IF     RECE64-YKZTEN   NOT =   ZERO
                        MOVE   7        TO  RECE641-CDKBN-KBNNUM
