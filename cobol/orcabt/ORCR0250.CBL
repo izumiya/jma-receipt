@@ -387,7 +387,7 @@
                ( RECE64-ZAINUM         =   RECE65-ZAINUM       )
                IF     RECE65-CDKBN-KBNNUM(1)   NOT =    ZERO
                   IF     RECE65-CDKBN-KBNNUM(1)  <=    6
-                      MOVE   RECE65-CDKBN-KBNNUM
+                      MOVE   RECE65-CDKBN-KBNNUM(1)
                                        TO  RECE641-CDKBN-KBNNUM
                   ELSE
                       MOVE   RECE65-CDKBN-KBNNUM(1)
