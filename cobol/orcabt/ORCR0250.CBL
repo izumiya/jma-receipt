@@ -385,22 +385,46 @@
                ( RECE64-HOJOKBN        =   RECE65-HOJOKBN      )  AND
                ( RECE64-TEKSTYMD       =   RECE65-TEKSTYMD     )  AND
                ( RECE64-ZAINUM         =   RECE65-ZAINUM       )
+      *
+      *        …ΩÕ—°›∂Ë ¨»÷πÊ
+      *        £¥:≈¿≈©
+      *        £µ°ß√Êø¥¿≈ÃÆ
+      *        £∂°ß√Êø¥¿≈ÃÆ±…Õ‹
+      *        £∑∞ æÂ°°§Ω§Œ¬æ√ÌºÕ
                IF     RECE65-CDKBN-KBNNUM(1)   NOT =    ZERO
                   IF     RECE65-CDKBN-KBNNUM(1)  <=    6
-                      MOVE   RECE65-CDKBN-KBNNUM(1)
-                                       TO  RECE641-CDKBN-KBNNUM
+                      EVALUATE    RECE65-CDKBN-KBNNUM(1)
+                         WHEN     5
+                             MOVE   6     TO   RECE641-CDKBN-KBNNUM
+                         WHEN     6
+                             MOVE   8     TO   RECE641-CDKBN-KBNNUM
+                         WHEN  OTHER
+                             MOVE   RECE65-CDKBN-KBNNUM(1)
+                                          TO   RECE641-CDKBN-KBNNUM
+                      END-EVALUATE
                   ELSE
                       MOVE   RECE65-CDKBN-KBNNUM(1)
                                        TO  RECE641-CDKBN-KBNNUM
                       ADD    10        TO  RECE641-CDKBN-KBNNUM
                   END-IF
+      *           ≈¿≈©√ÌºÕ° ∑Ïﬁ˘¿Æ ¨¿Ω∫ﬁ ∏ΩÒ°À≤√ªª
+                  IF     RECE65-SRYCD(1)    =   "130010570"
+                      MOVE    5        TO  RECE641-CDKBN-KBNNUM
+                  END-IF
+      *           √Êø¥¿≈ÃÆ√ÌºÕ° ∑Ïﬁ˘¿Æ ¨¿Ω∫ﬁ ∏ΩÒ°À≤√ªª
+                  IF     RECE65-SRYCD(1)    =   "130010670"
+                      MOVE    7        TO  RECE641-CDKBN-KBNNUM
+                  END-IF
                ELSE
+      *            ÃÙ∫ﬁ
                    IF     RECE64-YKZTEN   NOT =   ZERO
-                       MOVE   7        TO  RECE641-CDKBN-KBNNUM
+                       MOVE   9        TO  RECE641-CDKBN-KBNNUM
                    END-IF
+      *            ¥Ô∫‡
                    IF     RECE64-KIZAITEN   NOT =   ZERO
-                       MOVE   8        TO  RECE641-CDKBN-KBNNUM
+                       MOVE  10        TO  RECE641-CDKBN-KBNNUM
                    END-IF
+      *            •≥•·•Û•»
                    IF    (RECE65-SRYCD(1)(1:1)    =   "8")   OR
                          (RECE65-SRYCD(1)(1:3)    =   "008")
                        MOVE   999      TO  RECE641-CDKBN-KBNNUM
