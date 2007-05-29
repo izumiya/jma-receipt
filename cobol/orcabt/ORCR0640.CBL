@@ -1262,7 +1262,7 @@
            COPY    "CPORCSNYULIFE.INC".
       *
       *    Æþ±¡ÅÀÅ©¼êµ»²Ã»»¤Þ¤È¤á¥µ¥Ö
-           COPY    "CPORCSTENTEK2.INC".
+      **@@ COPY    "CPORCSTENTEK2.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -1873,7 +1873,7 @@
       *
            PERFORM        2110-GENGAKU-HANTEI-SEC
       *
-           PERFORM        2111-TENTEKIMATOME-HENSYU-SEC
+      **@@ PERFORM        2111-TENTEKIMATOME-HENSYU-SEC
       *
       ***  PERFORM    VARYING    IDX    FROM   1   BY   1
       ***             UNTIL     (IDX      >   10)  OR
@@ -2129,35 +2129,35 @@
       *****************************************************************
       *    ÅÀÅ©¼êµ»²Ã»»¤Þ¤È¤áÊÔ½¸
       *****************************************************************
-       2111-TENTEKIMATOME-HENSYU-SEC      SECTION.
+      * 2111-TENTEKIMATOME-HENSYU-SEC      SECTION.
       *
-           PERFORM    VARYING    IDX    FROM   1   BY   1
-                       UNTIL    (IDX                   >   10  )
-                         OR     (RECE62-HKNCOMBI(IDX)  =   ZERO)
+      *     PERFORM    VARYING    IDX    FROM   1   BY   1
+      *                 UNTIL    (IDX                   >   10  )
+      *                   OR     (RECE62-HKNCOMBI(IDX)  =   ZERO)
       *
-             INITIALIZE                 ORCSTENTEK2AREA
-             MOVE    RECE62-HOSPID  TO  LNK-ORCSTEN2-HOSPID
-             MOVE    RECE62-PTID    TO  LNK-ORCSTEN2-PTID
-             MOVE    RECE62-SRYYM   TO  LNK-ORCSTEN2-SRYYM
-             MOVE    RECE62-HKNCOMBI(IDX)
-                                    TO  LNK-ORCSTEN2-HKNCOMBI
-             CALL    "ORCSTENTEK2"  USING
-                                    ORCSTENTEK2AREA
-             IF      LNK-ORCSTEN2-RC  =   ZERO
-               IF   (LNK-ORCSTEN2-TENTEK-ERRCD  = ZERO)
-               OR   (LNK-ORCSTEN2-CHUJOU-ERRCD  = ZERO)
-                 MOVE  RECE62-HKNCOMBI(IDX)
-                                    TO  WRK-TENTEKI2-HKNCOMBI(IDX)
-                 MOVE  LNK-ORCSTEN2-OUT-AREA
-                                    TO  WRK-TENTEKI2-HENKYAKU-AREA(IDX)
-               END-IF
-             END-IF
+      *       INITIALIZE                 ORCSTENTEK2AREA
+      *       MOVE    RECE62-HOSPID  TO  LNK-ORCSTEN2-HOSPID
+      *       MOVE    RECE62-PTID    TO  LNK-ORCSTEN2-PTID
+      *       MOVE    RECE62-SRYYM   TO  LNK-ORCSTEN2-SRYYM
+      *       MOVE    RECE62-HKNCOMBI(IDX)
+      *                              TO  LNK-ORCSTEN2-HKNCOMBI
+      *       CALL    "ORCSTENTEK2"  USING
+      *                              ORCSTENTEK2AREA
+      *       IF      LNK-ORCSTEN2-RC  =   ZERO
+      *         IF   (LNK-ORCSTEN2-TENTEK-ERRCD  = ZERO)
+      *         OR   (LNK-ORCSTEN2-CHUJOU-ERRCD  = ZERO)
+      *           MOVE  RECE62-HKNCOMBI(IDX)
+      *                              TO  WRK-TENTEKI2-HKNCOMBI(IDX)
+      *           MOVE  LNK-ORCSTEN2-OUT-AREA
+      *                              TO  WRK-TENTEKI2-HENKYAKU-AREA(IDX)
+      *         END-IF
+      *       END-IF
       *
-           END-PERFORM
+      *     END-PERFORM
       *
-           .
-       2111-TENTEKIMATOME-HENSYU-EXT.
-           EXIT.
+      *     .
+      * 2111-TENTEKIMATOME-HENSYU-EXT.
+      *     EXIT.
       *
       *****************************************************************
       *    ¥ì¥»¥×¥ÈÃæ´Ö¥Õ¥¡¥¤¥ë¤ÎºîÀ®¡Ê£Æ£°£°£´¡Ë
