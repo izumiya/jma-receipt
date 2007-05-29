@@ -288,9 +288,9 @@
            MOVE    RECE64-HKNJANUM     TO  RECE641-HKNJANUM
            MOVE    RECE64-HOJOKBN      TO  RECE641-HOJOKBN
            MOVE    RECE64-TEKSTYMD     TO  RECE641-TEKSTYMD
-           IF      RECE64-SRYKBN       =   "33"
-               PERFORM   210-KBNNUM-SET-SEC
-           END-IF
+      ***     IF      RECE64-SRYKBN       =   "33"
+      ***         PERFORM   210-KBNNUM-SET-SEC
+      ***     END-IF
            MOVE    RECE64-ZAINUM       TO  RECE641-ZAINUM
            MOVE    RECE64-KOHBUNRI     TO  RECE641-KOHBUNRI
            IF      RECE64-KEY(1:65)    NOT =   OLD-KEY
