@@ -153,18 +153,16 @@
            INITIALIZE                  LNK-ORCSTEN2-OUT-AREA
       *
       *    パラメータチェック
-      ***     PERFORM 100-PRM-CHK-SEC
-      ***     IF    ( LNK-ORCSTEN2-RC       NOT =   ZERO )
-      ***         GO  TO  000-PROC-EXT
-      ***     END-IF
+           PERFORM 100-PRM-CHK-SEC
+           IF    ( LNK-ORCSTEN2-RC       NOT =   ZERO )
+               GO  TO  000-PROC-EXT
+           END-IF
       *
       *    主処理
-      ***     IF      LNK-ORCSTEN2-RC       =    ZERO
-      ***         PERFORM 200-MAIN-SEC
-      ***     END-IF
+           IF      LNK-ORCSTEN2-RC       =    ZERO
+               PERFORM 200-MAIN-SEC
+           END-IF
       *
-      *
-           MOVE     9        TO     LNK-ORCSTEN2-RC
            .
        000-PROC-EXT.
       *
