@@ -248,12 +248,18 @@
            PERFORM 910-NYUINACCT-SELECT-SEC
            IF      FLG-NYUINACCT           NOT =   ZERO
                MOVE    4               TO  LNK-ORCBT120SUB-RC
+      *        入院会計クローズ
+               MOVE    "NYUINACCT-KEY17"    TO  ORC-DBPATH
+               PERFORM   910-DB-CLOSE-SEC
                GO  TO  100-PRM-CHK-EXT
            ELSE
                MOVE    "NYUINACCT-KEY17"   TO  ORC-DBPATH
                PERFORM 910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT          NOT =   ZERO
                     MOVE    4              TO  LNK-ORCBT120SUB-RC
+      *             入院会計クローズ
+                    MOVE    "NYUINACCT-KEY17"    TO  ORC-DBPATH
+                    PERFORM   910-DB-CLOSE-SEC
                     GO  TO  100-PRM-CHK-EXT
                ELSE
                     MOVE       LNK-ORCBT120SUB-SANTEIYMD
@@ -418,6 +424,9 @@
                    END-IF
                END-IF
            END-IF
+      *    システム管理クローズ
+           MOVE    "SYSKANRI-KEY"       TO  ORC-DBPATH
+           PERFORM   910-DB-CLOSE-SEC
       *
       *    レセ電入院科の取得(前算定日）
            MOVE    SPACE               TO  SYS-1005-REC
@@ -455,6 +464,9 @@
                    END-IF
                END-IF
            END-IF
+      *    システム管理クローズ
+           MOVE    "SYSKANRI-KEY"       TO  ORC-DBPATH
+           PERFORM   910-DB-CLOSE-SEC
       *
       *入院時の外泊取得
            INITIALIZE                          NYUINACCT-REC
@@ -593,6 +605,9 @@
                        END-PERFORM
                    END-IF
                END-IF
+      *        保険組合せクローズ
+               MOVE    "HKNCOMBI-KEY"       TO  ORC-DBPATH
+               PERFORM   910-DB-CLOSE-SEC
            END-PERFORM
       *
       *    レセプト種別の取得
