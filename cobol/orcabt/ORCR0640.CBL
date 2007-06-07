@@ -245,6 +245,7 @@
       *  03.04.14    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
       *  03.04.15    NACL-ÌçÏÆ    07/05/15  ÅÀÅ©¤Îµ­ºÜÊÔ½¸½¤Àµ
       *  03.04.16    NACL-ÌçÏÆ    07/05/22  µþÅÔÉÜ£µ£±¡Ü£´£±ÂÐ±þ
+      *  03.04.17    NACL-ÌçÏÆ    07/06/07  ¿©»ö¤¬¤Ê¤¤¾ì¹ç¤Î¿©»öÍóµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10463,6 +10464,19 @@
                END-IF
       *
            END-EVALUATE
+      *
+           IF   ( RECE62-SHOKUJIRYOYOHI(1) = ZERO )
+           AND  ( RECE62-SHOKUJIRYOYOHI(2) = ZERO )
+           AND  ( RECE62-SHOKUJIRYOYOHI(3) = ZERO )
+           AND  ( RECE62-SHOKUJIRYOYOHI(4) = ZERO )
+           AND  ( RECE62-SHOKUJIRYOYOHI(5) = ZERO )
+              PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                          UNTIL    KOHFTN-IDX     >    4
+                MOVE  SPACE  TO  RECE62-FUKUSHIFLG-SKJ(KOHFTN-IDX)
+                MOVE  SPACE  TO  RECE62-FUKUSHIFLG-SKJIPA(KOHFTN-IDX)
+                MOVE  SPACE  TO  RECE62-FUKUSHIFLG-SKJSEI(KOHFTN-IDX)
+              END-PERFORM
+           END-IF
       *
            .
        21045-KOH-FUTAN-SET-EXT.
