@@ -36,6 +36,7 @@
       *  03.04.01    NACL-ÌçÏÆ    07/02/14  Ê¡Åç¸©ÈÓ´ÛÂ¼ÂÐ±þ
       *  03.04.02    NACL-ÌçÏÆ    07/03/22  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
+      *  03.04.03    NACL-ÌçÏÆ    07/06/04  Ä¹ºê»ÔÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -63,6 +64,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-ARI             PIC 9(01).
            03  FLG-GENMEN          PIC 9(01).
+           03  FLG-DAYCHK          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -72,6 +74,7 @@
       *    °ì»þÎÎ°è
        01  WRK-AREA.
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
+           03  WRK-HKNMST-JGNGAK2 PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-SEIKYU         PIC 9(10).
            03  WRK-PREFNUM        PIC 9(02).
@@ -302,6 +305,11 @@
                    END-IF
                    IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-HON-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF  (WRK-PREFNUM              =  42     )
+                   AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
+                   AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
+                      MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK2
                    END-IF
                  WHEN     "1"
                    IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
@@ -604,6 +612,7 @@
                    MOVE      ZERO          TO      WRK-KOHFTN
                    MOVE      ZERO          TO      WRK-SEIKYU
                    MOVE      ZERO          TO      FLG-GENMEN
+                   MOVE      ZERO          TO      FLG-DAYCHK
                    PERFORM   UNTIL    FLG-SYUNOU  =   1
                        MOVE     ZERO       TO      FLG-ARI
                        PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -630,6 +639,33 @@
                              IF     SYU-YKZKENNUM  NOT = ZERO
                                 MOVE    1    TO   FLG-GENMEN
                              END-IF
+                             IF  (WRK-PREFNUM              =  42     )
+                             AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
+                             AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
+                             AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
+                               EVALUATE   LNK-FTNJGNCHK-KOHNUM
+                                 WHEN   SYU-KOH-HKNNUM(1)
+                                   IF   SYU-KOH-HKNFTNMONEY(1)
+                                                >= WRK-HKNMST-JGNGAK2
+                                        MOVE   1    TO   FLG-DAYCHK
+                                   END-IF
+                                 WHEN   SYU-KOH-HKNNUM(2)
+                                   IF   SYU-KOH-HKNFTNMONEY(2)
+                                                >= WRK-HKNMST-JGNGAK2
+                                        MOVE   1    TO   FLG-DAYCHK
+                                   END-IF
+                                 WHEN   SYU-KOH-HKNNUM(3)
+                                   IF   SYU-KOH-HKNFTNMONEY(3)
+                                                >= WRK-HKNMST-JGNGAK2
+                                        MOVE   1    TO   FLG-DAYCHK
+                                   END-IF
+                                 WHEN   SYU-KOH-HKNNUM(4)
+                                   IF   SYU-KOH-HKNFTNMONEY(4)
+                                                >= WRK-HKNMST-JGNGAK2
+                                        MOVE   1    TO   FLG-DAYCHK
+                                   END-IF
+                               END-EVALUATE
+                             END-IF
                           END-IF
                        END-PERFORM
                        IF      LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
@@ -639,33 +675,44 @@
                        END-IF
                        PERFORM  910-SYUNOU-READ-SEC
                    END-PERFORM
-                   IF  (WRK-PREFNUM            =  11     )
-                   AND (LNK-FTNJGNCHK-KOHNUM   =
-                         "181" OR "182" OR "183" OR "281")
-                   AND (LNK-FTNJGNCHK-SRYYM   >= "200704")
-                    IF   WRK-KOHFTN   NOT = ZERO
+      *
+                   IF  (WRK-PREFNUM              =  42     )
+                   AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
+                   AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
+                   AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
+                     IF   ( WRK-HKNMST-JGNGAK   >   WRK-KOHFTN )
+                     AND  ( FLG-DAYCHK          =   ZERO       )
                            MOVE   01        TO  LNK-FTNJGNCHK-RC
-                    END-IF
+                     END-IF
                    ELSE
-                    EVALUATE   LNK-FTNJGNCHK-KOHNUM
-                     WHEN       "012"
-                       IF   WRK-SEIKYU            =   ZERO
-                           MOVE   01        TO  LNK-FTNJGNCHK-RC
+                     IF  (WRK-PREFNUM            =  11     )
+                     AND (LNK-FTNJGNCHK-KOHNUM   =
+                           "181" OR "182" OR "183" OR "281")
+                     AND (LNK-FTNJGNCHK-SRYYM   >= "200704")
+                       IF   WRK-KOHFTN   NOT = ZERO
+                               MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
-                     WHEN       "972"
-                     WHEN       "974"
-                       IF   FLG-GENMEN   =   1
-                         CONTINUE
-                       ELSE
-                         IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
-                           MOVE   01        TO  LNK-FTNJGNCHK-RC
-                         END-IF
-                       END-IF
-                     WHEN       OTHER
-                       IF     WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
-                           MOVE   01        TO  LNK-FTNJGNCHK-RC
-                       END-IF
-                    END-EVALUATE
+                     ELSE
+                       EVALUATE   LNK-FTNJGNCHK-KOHNUM
+                         WHEN       "012"
+                           IF   WRK-SEIKYU            =   ZERO
+                               MOVE   01        TO  LNK-FTNJGNCHK-RC
+                           END-IF
+                         WHEN       "972"
+                         WHEN       "974"
+                           IF   FLG-GENMEN   =   1
+                             CONTINUE
+                           ELSE
+                             IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
+                               MOVE   01        TO  LNK-FTNJGNCHK-RC
+                             END-IF
+                           END-IF
+                         WHEN       OTHER
+                           IF     WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
+                               MOVE   01        TO  LNK-FTNJGNCHK-RC
+                           END-IF
+                       END-EVALUATE
+                     END-IF
                    END-IF
                END-IF
            END-IF
