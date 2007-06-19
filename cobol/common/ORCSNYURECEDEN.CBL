@@ -46,6 +46,9 @@
       *  01.00.10    NACL-¾®Æ¦Âô  06/09/13  Äê¿ôÄ¶²áÂÐ±þ
       *  01.00.11    NACL-¾®Æ¦Âô  06/10/06  ÎÅÍÜÉÂ¾²¥ì¥»¥³¥á¥ó¥ÈÂÐ±þ
       *  01.00.12    NACL-¾®Æ¦Âô  06/10/11  Æþ±¡»þÀ¸³èÎÅÍÜÈñÂÐ±þ
+      *  01.00.13    NACL-¾®Æ¦Âô  07/06/19  °Ê²¼Æþ±¡ÎÁ²Ã»»¤Îµ­Ï¿½ç½¤Àµ
+      *                                     Ê£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»
+      *                                     ´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»
       *****************************************************************
       *
       *
@@ -201,6 +204,18 @@
                    07  WRK-IRYOADL-TEN-MOJI     PIC X(04).
                    07  WRK-IRYOADL-GAITOU-TBL.
                      09  WRK-IRYOADL-GAITOU-KBN   PIC 9(01)  OCCURS 31.
+      *
+      *    Ê£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»ÂàÈòÎÎ°è
+           03  WRK-FUKUSU-NYUKSN-AREA.
+                   07  WRK-FUKUSU-NYUKSN         PIC X(09).
+                   07  WRK-FUKUSU-NYUKSN-ZAITEN  PIC 9(08).
+                   07  WRK-FUKUSU-NYUKSN-DAY     PIC 9(03)  OCCURS 31.
+      *
+      *    ´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»ÂàÈòÎÎ°è
+           03  WRK-KANGO-NYUKSN-AREA.
+                   07  WRK-KANGO-NYUKSN          PIC X(09).
+                   07  WRK-KANGO-NYUKSN-ZAITEN   PIC 9(08).
+                   07  WRK-KANGO-NYUKSN-DAY      PIC 9(03)  OCCURS 31.
       *
       *    Æþ±¡ÎÁ²Ã»»ÂàÈòÎÎ°è
            03  WRK-NYUKSN-TABLE.
@@ -983,6 +998,93 @@
            MOVE    "key17"                 TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
+      *Æþ±¡»þ¤ÎÆþ±¡ÎÁ²Ã»»¼èÆÀ¡ÊÆþ±¡²ñ·×¤è¤ê¡Ë¡ÊÊ£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖ
+      *                                        Å¬¹ç²Ã»»¡Ë
+           MOVE    ZERO                    TO  KSN-IDX
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-NYURECEDEN-HOSPID   TO  NACCT-HOSPID
+           MOVE    LNK-NYURECEDEN-PTID     TO  NACCT-PTID
+           MOVE    LNK-NYURECEDEN-SANTEIYM TO  NACCT-SRYYM
+           MOVE    "6"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE     "key17"            TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                   MOVE      ZERO     TO      FLG-RYAKU
+      *            Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+                   PERFORM    VARYING   IDX1   FROM   1   BY   1
+                              UNTIL     IDX1   >   31
+                       IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190117070
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                        TO  WRK-FUKUSU-NYUKSN
+                           MOVE   NACCT-ZAITEN  
+                                        TO  WRK-FUKUSU-NYUKSN-ZAITEN
+                           MOVE   NACCT-DAY(IDX1)
+                                        TO WRK-FUKUSU-NYUKSN-DAY(IDX1)
+                         END-IF
+      *
+                       END-IF
+                   END-PERFORM
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-READ-SEC
+               END-PERFORM
+           END-IF
+      *    Æþ±¡²ñ·×¥¯¥í¡¼¥º
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *Æþ±¡»þ¤ÎÆþ±¡ÎÁ²Ã»»¼èÆÀ¡ÊÆþ±¡²ñ·×¤è¤ê¡Ë¡Ê´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë
+           MOVE    ZERO                    TO  KSN-IDX
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-NYURECEDEN-HOSPID   TO  NACCT-HOSPID
+           MOVE    LNK-NYURECEDEN-PTID     TO  NACCT-PTID
+           MOVE    LNK-NYURECEDEN-SANTEIYM TO  NACCT-SRYYM
+           MOVE    "6"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE     "key17"            TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                   MOVE      ZERO     TO      FLG-RYAKU
+      *            Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+                   PERFORM    VARYING   IDX1   FROM   1   BY   1
+                              UNTIL     IDX1   >   31
+                       IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190109670
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                        TO  WRK-KANGO-NYUKSN
+                           MOVE   NACCT-ZAITEN  
+                                        TO  WRK-KANGO-NYUKSN-ZAITEN
+                           MOVE   NACCT-DAY(IDX1)
+                                        TO WRK-KANGO-NYUKSN-DAY(IDX1)
+                         END-IF
+      *
+                       END-IF
+                   END-PERFORM
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-READ-SEC
+               END-PERFORM
+           END-IF
+      *    Æþ±¡²ñ·×¥¯¥í¡¼¥º
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
       *Æþ±¡»þ¤ÎÆþ±¡ÎÁ²Ã»»¼èÆÀ¡ÊÆþ±¡²ñ·×¤è¤ê¡Ë
            MOVE    ZERO                    TO  KSN-IDX
            INITIALIZE                          NYUINACCT-REC
@@ -1006,6 +1108,10 @@
                        IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
                        AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                         IF   (NACCT-SRYCDTOTAL(6:9) =  190117070)  OR
+                              (NACCT-SRYCDTOTAL(6:9) =  190109670)
+                             CONTINUE
+                         ELSE
                            IF   FLG-KSN   =  ZERO
                                ADD     1    TO    KSN-IDX
                                MOVE    1    TO    FLG-KSN
@@ -1016,6 +1122,7 @@
                                         TO  WRK-NYUKSN-ZAITEN(KSN-IDX)
                            MOVE   NACCT-DAY(IDX1)
                                         TO WRK-NYUKSN-DAY(KSN-IDX IDX1)
+                         END-IF
       *
                        END-IF
                    END-PERFORM
@@ -1028,7 +1135,6 @@
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
            MOVE    "key17"                 TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
-      *
       *
       *Æþ±¡»þ¤ÎÆþ±¡ÎÁ²Ã»»¼èÆÀ¡Ê¿ÇÎÅ²ñ·×¤è¤ê¡Ë
            INITIALIZE                          SRYACCT-REC
@@ -1293,6 +1399,25 @@
                                             TO  WRK-SO-GAIHAKU-KBN
                                                            (IDX1 IDX1)
                END-IF
+      *
+      *        Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÊ£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë
+               IF    WRK-FUKUSU-NYUKSN-DAY(IDX1)  =  ZERO
+                   CONTINUE
+               ELSE
+                   ADD   1               TO  WRK-MEISAISU
+                   MOVE  WRK-FUKUSU-NYUKSN
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+               END-IF
+      *
+      *        Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë
+               IF    WRK-KANGO-NYUKSN-DAY(IDX1)  =  ZERO
+                   CONTINUE
+               ELSE
+                   ADD   1               TO  WRK-MEISAISU
+                   MOVE  WRK-KANGO-NYUKSN
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+               END-IF
+      *
       *        Æþ±¡²ñ·×²Ã»»¾ðÊó
                PERFORM   VARYING   KSN-IDX   FROM   1  BY   1
                          UNTIL (WRK-NYUKSN(KSN-IDX)  =  SPACE)  OR
