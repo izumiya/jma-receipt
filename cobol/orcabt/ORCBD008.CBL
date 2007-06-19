@@ -105,6 +105,7 @@
            03  FLG-PTNUM           PIC 9(01).
            03  FLG-PTHKNINF        PIC 9(01).
            03  FLG-SYUNOU          PIC 9(01).
+           03  FLG-OK              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -500,14 +501,14 @@
            PERFORM UNTIL   FLG-END     =   1
                    OR      CNT-LINE    =   30
       *    患者情報読み込み
-               INITIALIZE                  PTINF-REC
-               MOVE    SYU-HOSPID    TO  PTINF-HOSPID
-               MOVE    SYU-PTID      TO  PTINF-PTID
-               PERFORM 900-PTINF-READ-SEC
-               IF    ( FLG-PTINF               =   ZERO )
-                AND  ( PTINF-TSTPTNUMKBN   NOT =   "1" )
+      *         INITIALIZE                  PTINF-REC
+      *         MOVE    SYU-HOSPID    TO  PTINF-HOSPID
+      *         MOVE    SYU-PTID      TO  PTINF-PTID
+      *         PERFORM 900-PTINF-READ-SEC
+      *         IF    ( FLG-PTINF               =   ZERO )
+      *          AND  ( PTINF-TSTPTNUMKBN   NOT =   "1" )
                    PERFORM 3201-BODY-HEN-SEC
-               END-IF
+      *         END-IF
       *
                PERFORM 900-BD00801-READ-SEC
       *
@@ -973,13 +974,28 @@
       *****************************************************************
        900-BD00801-READ-SEC            SECTION.
       *
-           READ    BD00801-FILE        NEXT
-           AT  END
-               MOVE    1               TO  FLG-END
-           NOT AT  END
-               MOVE    ZERO            TO  FLG-END
-               MOVE    BD00801-SYU-DAT TO  SYU-REC
-           END-READ
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM UNTIL   FLG-OK      =   1
+               READ    BD00801-FILE        NEXT
+               AT  END
+                   MOVE    1               TO  FLG-END
+                   MOVE    1               TO  FLG-OK
+               NOT AT  END
+                   MOVE    ZERO            TO  FLG-END
+                   MOVE    BD00801-SYU-DAT TO  SYU-REC
+      *            患者情報読み込み
+                   INITIALIZE                  PTINF-REC
+                   MOVE    SYU-HOSPID    TO  PTINF-HOSPID
+                   MOVE    SYU-PTID      TO  PTINF-PTID
+                   PERFORM 900-PTINF-READ-SEC
+                   IF    ( FLG-PTINF               =   ZERO )
+                    AND  ( PTINF-TSTPTNUMKBN   NOT =   "1" )
+                       MOVE    1               TO  FLG-OK
+                   ELSE
+                       MOVE    ZERO            TO  FLG-OK
+                   END-IF
+               END-READ
+           END-PERFORM
       *
            .
        900-BD00801-READ-EXT.
