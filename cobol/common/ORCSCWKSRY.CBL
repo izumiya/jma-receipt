@@ -1223,6 +1223,17 @@
                MOVE    1               TO  FLG-SYUBETU
            END-IF
       *
+      *    ¿Ç»¡ÎÁ¤ÇÁ°¤ÎºÞ¤¬731¤Î»þ
+           IF     (LNK-WKSRY-SRYSYUKBN(IDX)(1:2)
+                                       =   "11" OR
+                                           "12" OR
+                                           "13"  )   AND
+                 ((IDX2                >   ZERO  ) AND
+                  (SPA-COM-SRYSYUKBN (IDX2)
+                                       =   "731" ))
+               MOVE    1               TO  FLG-SYUBETU
+           END-IF
+      *
       *    ÄûÀµ¤Î»þ¡¢ºÆ¿ÇÎÁ»»Äê²Ê¤òºÆ¿Ç¤È¤¹¤ë
            IF     (LNK-WKSRY-SRYKBN    (IDX)       =   "12" AND
                    LNK-WKSRY-SRYCD (IDX IDY)       =   "830000021")
