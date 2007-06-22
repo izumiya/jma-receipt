@@ -1169,7 +1169,7 @@
                PERFORM VARYING     IDX     FROM    1   BY  1
                        UNTIL       IDX     >   WRK-MAX
                    IF      IDX         NOT =   IDX-T
-      *                    注加算コード、通番が同じ時エラー
+      *                注加算コード、通番が同じ時エラー
                        IF      (SPA-COM-CHUKSNCD   (IDX)
                                                    =  TNS-CHUKSNCD) AND
                                (SPA-COM-CHUKSNTUBAN(IDX)
@@ -2308,7 +2308,15 @@
                    END-IF
                END-IF
       *        発生日より後の時、算定なしとする
-               IF      WRK-STYMD           <=  WRK-YMD2
+      *D       IF      WRK-STYMD           <=  WRK-YMD2
+               IF     (WRK-STYMD   NOT =   SPACE   )  AND
+                      (WRK-STYMD           <=  WRK-YMD2  )
+                   MOVE    SPACE               TO  WRK-YMD
+               END-IF
+      *!
+      *        医学管理料算定より前の時、なし
+               IF     (LNK-SC92-SRYCD  =   WRK-SRYCD  )
+                  AND (WRK-YMD2        <   WRK-YMD    )
                    MOVE    SPACE               TO  WRK-YMD
                END-IF
            END-IF
