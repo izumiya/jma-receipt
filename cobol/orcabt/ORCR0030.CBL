@@ -291,6 +291,7 @@
       *  03.04.11    NACL-門脇    07/04/01  現物給付対応
       *  03.04.12    NACL-門脇    07/04/13  リハビリ対応
       *  03.04.13    NACL-門脇    07/05/22  京都府５１＋４１対応
+      *  03.04.14    NACL-門脇    07/06/27  実日数テーブル編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6377,7 +6378,7 @@
            END-PERFORM
       *実日数テーブル編集
            PERFORM    VARYING    HKN-IDX    FROM   1   BY   1
-                      UNTIL      HKN-IDX    >      2
+                      UNTIL      HKN-IDX    >      5
                PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
                           UNTIL      ACCT-IDX    >     31
                     IF    TBL-JNISSU-DAY(HKN-IDX ACCT-IDX)
