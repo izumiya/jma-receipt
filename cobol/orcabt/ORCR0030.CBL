@@ -292,6 +292,7 @@
       *  03.04.12    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
       *  03.04.13    NACL-ÌçÏÆ    07/05/22  µþÅÔÉÜ£µ£±¡Ü£´£±ÂÐ±þ
       *  03.04.14    NACL-ÌçÏÆ    07/06/13  ¸½ÊªµëÉÕ¹â³Û£´²óÌÜ¸øÈñÊ»ÍÑ»þÂÐ±þ
+      *  03.04.15    NACL-ÌçÏÆ    07/06/27  ¼ÂÆü¿ô¥Æ¡¼¥Ö¥ëÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6385,7 +6386,7 @@
            END-PERFORM
       *¼ÂÆü¿ô¥Æ¡¼¥Ö¥ëÊÔ½¸
            PERFORM    VARYING    HKN-IDX    FROM   1   BY   1
-                      UNTIL      HKN-IDX    >      2
+                      UNTIL      HKN-IDX    >      5
                PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
                           UNTIL      ACCT-IDX    >     31
                     IF    TBL-JNISSU-DAY(HKN-IDX ACCT-IDX)
