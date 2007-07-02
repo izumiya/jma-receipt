@@ -4325,7 +4325,8 @@
                                  ( SPA-COM-SRYSYUKBN(IDX)
                                                        =   "212" OR
                                                            "222" OR
-                                                           "232" )
+                                                           "232" OR
+                                                           "292" )
                                CONTINUE
                            ELSE
       *                      処方のみはＯＫ
@@ -4534,7 +4535,8 @@
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
-                                                       "232"  )
+                                                       "232" OR
+                                                       "292"  )
       *!!                  院外処方箋を交付しない場合の時、エラー
       *                    IF      SPA-ROUMANSEI-ARI   =   2
       *                      処方のみはＯＫ
@@ -4666,7 +4668,8 @@
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
-                                                       "232"  )
+                                                       "232" OR
+                                                       "292"  )
       *!!                  院外処方箋を交付しない場合の時、エラー
       *                    IF     (SPA-SEIKATU-ARI     =   2 )  OR
       *                           (SPA-SEIKATU-ARI2    =   2 )
@@ -4729,7 +4732,8 @@
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
-                                                       "232"  )
+                                                       "232" OR
+                                                       "292"  )
       *!!                  院外処方箋を交付しない場合の時、エラー
       *                    IF     (SPA-SEIKATU-ARI     =   2 )  OR
       *                           (SPA-SEIKATU-ARI2    =   2 )
@@ -4800,7 +4804,8 @@
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
-                                                       "232"  )
+                                                       "232" OR
+                                                       "292"  )
                            CONTINUE
                        ELSE
       *                    処方のみはＯＫ
