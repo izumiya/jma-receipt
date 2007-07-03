@@ -155,8 +155,9 @@ path	key4		{
 		AND		A.YUKOSTYMD  <=   :SELYUKOSTYMD
 		AND		A.YUKOEDYMD  >=   :SELYUKOEDYMD
 		AND		A.CDKBN       =   :SELCDKBN
-		AND	 ( B.BYOMEI LIKE '%' || TRIM(A.BYOMEI) || '%' );
+		AND	 ( B.BYOMEI LIKE '%' || TRIM(A.BYOMEI) || '%' )
 		AND   B.DLTFLG      =   ' '
+		;
 	};
 };
 
@@ -271,8 +272,9 @@ path	key8		{
 		AND		A.YUKOSTYMD  <=   :SELYUKOSTYMD
 		AND		A.YUKOEDYMD  >=   :SELYUKOEDYMD
 		AND		A.CDKBN       =   :SELCDKBN
-		AND	 ( B.BYOMEI LIKE '%' || TRIM(A.BYOMEI) || '%' );
+		AND	 ( B.BYOMEI LIKE '%' || TRIM(A.BYOMEI) || '%' )
 		AND   B.DLTFLG      =   ' '
+		;
 	};
 };
 
