@@ -4631,6 +4631,17 @@
                    MOVE    SPA-SRYYMD      TO  WRK-SYOYMD
                END-IF
            END-IF
+      *@
+      *    凝價隙く棟咥恔反轉情ゥ及心�衝磥�允月
+           IF      WRK-COM-INPUTCD(IDX-Z)  =   "113002210"
+               IF     (FLG-TAIIN           =   1    ) OR
+                      (WRK-SYOYMD(1:6)     =   SPA-SRYYMD(1:6))
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-SYOYMD
+               END-IF
+           END-IF
+      *@
       *
            MOVE    ZERO                TO  FLG-KYUJITU
            IF      WRK-SYOYMD          =   SPACE
