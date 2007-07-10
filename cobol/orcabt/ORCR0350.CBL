@@ -172,6 +172,7 @@
       *  03.04.04    NACL-藤原    07/04/13  症状詳記区分コード追加に伴う対応
       *  03.04.05    NACL-藤原    07/04/26  注加算による加算項目の記載
       *                                     注射（その他）
+      *  03.04.06    NACL-藤原    07/07/10  特定器材再編集用の器材点数追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4848,6 +4849,7 @@
                MOVE    RECE62-SRYYM        TO  ORCSRECESORT-SRYYM
                MOVE    RECE641-SRYKBN      TO  ORCSRECESORT-SRYKBN
                MOVE    RECE641-ZAINUM      TO  ORCSRECESORT-ZAINUM
+               MOVE    RECE641-KIZAITEN    TO  ORCSRECESORT-KIZAITEN
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       WRK-TBLMAX7-SRT
                    MOVE    TBL-ZAIW-SRYCD         (3 IDX)  TO
