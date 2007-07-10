@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.04.01    NACL-多々納  07/07/10  フィルム無しの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -45,6 +46,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-SRYACCTPLUS     PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-PLUS-ARI        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -60,7 +62,8 @@
            03  IDX-HOSI            PIC 9(04).
       *
       *    一時領域
-      *01  WRK-AREA.
+       01  WRK-AREA.
+           03  WRK-KIZIGOK         PIC 9(07).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -221,13 +224,30 @@
            MOVE    ACCTP-CHISOTEN      TO  ORCSRECESORT-ZAITEN (3)
       *
       *    手技毎の点数を集計（本来は別々にレセ電記載する）
+           MOVE    ZERO                TO  FLG-PLUS-ARI
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   5
       *        フィルム
                ADD     ACCTP-FIRTEN (IDX)  TO  ORCSRECESORT-ZAITEN (1)
       *        その他器材点数（フィルム・酸素・窒素以外）
                ADD     ACCTP-KIZAITEN(IDX) TO  ORCSRECESORT-ZAITEN (4)
+      *
+               IF     (ACCTP-FIRTEN (IDX)  NOT =   ZERO )  OR
+                      (ACCTP-KIZAITEN(IDX) NOT =   ZERO )
+                   MOVE    1                   TO  FLG-PLUS-ARI
+               END-IF
            END-PERFORM
+           ADD     ORCSRECESORT-ZAITEN(1)  TO  WRK-KIZIGOK
+           ADD     ORCSRECESORT-ZAITEN(2)  TO  WRK-KIZIGOK
+           ADD     ORCSRECESORT-ZAITEN(3)  TO  WRK-KIZIGOK
+           ADD     ORCSRECESORT-ZAITEN(4)  TO  WRK-KIZIGOK
+      *    器材合計が違う時、付加情報に器材点記載なしとする
+           IF     (WRK-KIZIGOK         <   ORCSRECESORT-KIZAITEN ) AND
+                  (FLG-PLUS-ARI        =   ZERO     )
+               COMPUTE ORCSRECESORT-ZAITEN (4) =   ORCSRECESORT-KIZAITEN
+                                               -  (ACCTP-SANSOTEN
+                                               +   ACCTP-CHISOTEN )
+           END-IF
            .
        200-MAIN-SYORI-EXT.
            EXIT.
