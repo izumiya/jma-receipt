@@ -467,10 +467,9 @@
            MOVE    RSITUSAN-HOSPID TO  PTNYUINRRK-HOSPID
            MOVE    RSITUSAN-PTID   TO  PTNYUINRRK-PTID
            MOVE    WRK-GETUMATUYMD TO  PTNYUINRRK-NYUINYMD
-           MOVE    WRK-SHONUM      TO  PTNYUINRRK-SHONUM
       *
            MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
-           MOVE    PATH-TBL-PTNYUINRRK-KEY13
+           MOVE    PATH-TBL-PTNYUINRRK-KEY25
                                    TO  MCP-PATH
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC      NOT =   ZERO )
@@ -483,13 +482,14 @@
       *
                IF    ( PTNYUINRRK-RRKEDANUM    =   1 )
                    IF    ( PTNYUINRRK-JTIKBN   =   "6" )
+                    AND  ( PTNYUINRRK-SHONUM   =   WRK-SHONUM )
                        PERFORM 2110-JIINRRK-NISSU-HEN-SEC
                    ELSE
                        PERFORM 2110-NISSU-HEN-SEC
                    END-IF
                END-IF
       *
-               MOVE    PATH-TBL-PTNYUINRRK-KEY13
+               MOVE    PATH-TBL-PTNYUINRRK-KEY25
                                    TO  MCP-PATH
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC      NOT =   ZERO )
@@ -500,7 +500,7 @@
       *
            END-PERFORM
       *
-           MOVE    PATH-TBL-PTNYUINRRK-KEY13
+           MOVE    PATH-TBL-PTNYUINRRK-KEY25
                                    TO  MCP-PATH
            PERFORM 910-DBCLOSE-SEC
       *
@@ -614,18 +614,18 @@
            PERFORM VARYING IDX1    FROM    WRK-STIDX   BY  1
                    UNTIL ( IDX1    >       WRK-EDIDX )
       *
+               IF    ( FLG-NYUINRYODAY (IDX1)  >   ZERO )
+                   IF   ( PTNYUINRRK-SHONUM    =   WRK-SHONUM )
+                     OR ( FLG-HKNCOMBIDAY (IDX1)   >   ZERO )
       *
-               IF    ( FLG-HKNCOMBIDAY (IDX1)  >   ZERO )
-                AND  ( FLG-NYUINRYODAY (IDX1)  >   ZERO )
+                       COMPUTE WRK-NISSU   =   WRK-NISSU   +   1
       *
-                   COMPUTE WRK-NISSU   =   WRK-NISSU   +   1
-      *
-                   IF    ( WRK-NISSU   <=  14 )
-                       MOVE    WRK-STSRYYM TO  WRK-SANTEIEDYMD
-                       MOVE    IDX1        TO  WRK-DAY-9
-                       MOVE    WRK-DAY-X   TO  WRK-SANTEIEDYMD (7:2)
+                       IF    ( WRK-NISSU   <=  14 )
+                           MOVE    WRK-STSRYYM TO  WRK-SANTEIEDYMD
+                           MOVE    IDX1        TO  WRK-DAY-9
+                           MOVE    WRK-DAY-X   TO  WRK-SANTEIEDYMD (7:2)
+                       END-IF
                    END-IF
-      *
                END-IF
       *
            END-PERFORM
