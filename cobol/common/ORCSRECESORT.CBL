@@ -237,6 +237,7 @@
                    MOVE    1                   TO  FLG-PLUS-ARI
                END-IF
            END-PERFORM
+           MOVE    ZERO                TO  WRK-KIZIGOK
            ADD     ORCSRECESORT-ZAITEN(1)  TO  WRK-KIZIGOK
            ADD     ORCSRECESORT-ZAITEN(2)  TO  WRK-KIZIGOK
            ADD     ORCSRECESORT-ZAITEN(3)  TO  WRK-KIZIGOK
