@@ -21,6 +21,7 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  03.04.01    NACL-藤原    07/04/19  器材点数追加
       ************************************************************
        01  ORCSRECESORTAREA.
       *
@@ -38,6 +39,8 @@
                05  ORCSRECESORT-SRYKBN          PIC  X(02).
       *剤番号
                05  ORCSRECESORT-ZAINUM          PIC  9(08).
+      *器材点数
+               05  ORCSRECESORT-KIZAITEN        PIC  9(07).
       *剤内容
                05  ORCSRECESORT-IN-TBL.
                    07  ORCSRECESORT-IN-SRYCD-G  OCCURS   50.
