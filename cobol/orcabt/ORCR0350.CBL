@@ -172,8 +172,9 @@
       *  £²£°£°£·Ç¯£´·î²þÀµ
       *  03.04.04    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *  03.04.05    NACL-Æ£¸¶    07/04/13  ¾É¾õ¾Üµ­¶èÊ¬¥³¡¼¥ÉÄÉ²Ã¤ËÈ¼¤¦ÂÐ±þ
-      *  03.04.05    NACL-Æ£¸¶    07/04/26  Ãí²Ã»»¤Ë¤è¤ë²Ã»»¹àÌÜ¤Îµ­ºÜ
+      *  03.04.06    NACL-Æ£¸¶    07/04/26  Ãí²Ã»»¤Ë¤è¤ë²Ã»»¹àÌÜ¤Îµ­ºÜ
       *                                     Ãí¼Í¡Ê¤½¤ÎÂ¾¡Ë
+      *  03.04.07    NACL-Æ£¸¶    07/07/10  ÆÃÄê´ïºàºÆÊÔ½¸ÍÑ¤Î´ïºàÅÀ¿ôÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4858,6 +4859,7 @@
                MOVE    RECE62-SRYYM        TO  ORCSRECESORT-SRYYM
                MOVE    RECE641-SRYKBN      TO  ORCSRECESORT-SRYKBN
                MOVE    RECE641-ZAINUM      TO  ORCSRECESORT-ZAINUM
+               MOVE    RECE641-ZAITEN      TO  ORCSRECESORT-ZAITEN
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       WRK-TBLMAX7-SRT
                    MOVE    TBL-ZAIW-SRYCD         (3 IDX)  TO
