@@ -4859,7 +4859,7 @@
                MOVE    RECE62-SRYYM        TO  ORCSRECESORT-SRYYM
                MOVE    RECE641-SRYKBN      TO  ORCSRECESORT-SRYKBN
                MOVE    RECE641-ZAINUM      TO  ORCSRECESORT-ZAINUM
-               MOVE    RECE641-ZAITEN      TO  ORCSRECESORT-ZAITEN
+               MOVE    RECE641-KIZAITEN    TO  ORCSRECESORT-KIZAITEN
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       WRK-TBLMAX7-SRT
                    MOVE    TBL-ZAIW-SRYCD         (3 IDX)  TO

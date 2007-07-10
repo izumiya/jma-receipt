@@ -4290,7 +4290,7 @@
                MOVE    RECE02-SRYYM        TO  ORCSRECESORT-SRYYM
                MOVE    RECE041-SRYKBN      TO  ORCSRECESORT-SRYKBN
                MOVE    RECE041-ZAINUM      TO  ORCSRECESORT-ZAINUM
-               MOVE    RECE041-ZAITEN      TO  ORCSRECESORT-ZAITEN
+               MOVE    RECE041-KIZAITEN    TO  ORCSRECESORT-KIZAITEN
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       WRK-TBLMAX7-SRT
                    MOVE    TBL-ZAIW-SRYCD         (3 IDX)  TO
