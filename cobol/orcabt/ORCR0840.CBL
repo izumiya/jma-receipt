@@ -112,6 +112,7 @@
       *  03.03.06    NACL-ÌçÏÆ    07/05/11  Ï«ºÒ¡¦¼«ÇåÀÕÃ±²Á£±£°±ßÌ¤ËþÂÐ±þ
       *  03.03.07    NACL-ÌçÏÆ    07/05/15  ÅÀÅ©¤Îµ­ºÜÊÔ½¸½¤Àµ
       *  03.03.08    NACL-ÌçÏÆ    07/06/07  Æþ±¡¼¼ÎÁ²Ã»»¤Î¥³¥á¥ó¥ÈÂÐ±þ
+      *  03.03.09    NACL-ÌçÏÆ    07/07/17  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -457,7 +458,7 @@
       *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
-           03  TBL-SYS5000-OCC     OCCURS  10.
+           03  TBL-SYS5000-OCC     OCCURS  100.
                05  TBL-SYS5000                         PIC X(610).
       *    °åÎÅµ¡´Ø¡Ê´ðËÜ¾ðÊó¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS1001-T.
@@ -1233,6 +1234,7 @@
                  MOVE    "SYSKANRI-KEY8" TO  ORC-DBPATH
                  PERFORM 960-KANRIMST-READ-SEC
                  PERFORM  UNTIL  (FLG-SYSKANRI  =    1)
+                           OR    (SYSKAN-IDX   >=  100)
       *
                    MOVE    MCPDATA-REC  TO  SYS-5000-REC
                    ADD     1            TO  SYSKAN-IDX
@@ -7853,7 +7855,7 @@
                MOVE  RECE82-SRYYM TO  WRK-SYS-SRYYMD(1:6)
                MOVE  "01"         TO  WRK-SYS-SRYYMD(7:2)
                PERFORM  VARYING  SYSKAN-IDX  FROM  1  BY  1
-                    UNTIL  ( SYSKAN-IDX              >  10   )
+                    UNTIL  ( SYSKAN-IDX              >  100  )
                      OR    ( TBL-SYS5000(SYSKAN-IDX) = SPACE )
                      OR    ( FLG-SET                 =   1   )
       *
