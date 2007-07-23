@@ -180,6 +180,7 @@
       *  03.04.14    NACL-ÌçÏÆ    07/05/08  ËÌ³¤Æ»°°Àî»ÔÂÐ±þ
       *  03.04.15    NACL-ÌçÏÆ    07/06/13  ¸½ÊªµëÉÕ¹â³Û£´²óÌÜ¸øÈñÊ»ÍÑ»þÂÐ±þ
       *  03.04.16    NACL-ÌçÏÆ    07/07/13  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
+      *  03.04.17    NACL-ÌçÏÆ    07/07/20  ËÌ³¤Æ»£´£±Ï·¿Í¸½ÊªµëÉÕÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4181,6 +4182,13 @@
                    ( COMB-KOH3HKNNUM        =    SPACE) AND
                    ( COMB-KOH4HKNNUM        =    SPACE))
       ***          MOVE    "1"    TO   FLG-SYUHEN
+                   IF  (WK-1001-PREFNUM  =  01            )
+                   AND (COMB-KOH1HKNNUM  =  "141" OR "241")
+                     MOVE     80100   TO   MAX-KIN-SYU-M
+                     IF  FLG-KOHYONKAIME = 1
+                        MOVE  44400   TO   MAX-KIN-SYU-M
+                     END-IF
+                   END-IF
                    EVALUATE  MAX-KIN-SYU-M
                      WHEN      150000
                        MOVE  WK-ZENGAKU  TO  WK-KOUREI-IRYOHI70
@@ -12955,7 +12963,8 @@
            AND ( COMB-KOHHKNNUM(KOH-IDX)(1:1)   >=     "1"  )
            AND ( COMB-KOHHKNNUM(KOH-IDX)(1:1)   <=     "8"  )
            AND ( COMB-KOH-NYUJGNKBN(KOH-IDX)     =   SPACE  )
-           AND ( WK-NYUKFTNRATE                  =     100  )
+           AND ( WK-NYUKFTNRATE                  =     100
+                                                OR      30  )
                  MOVE    "1"    TO    FLG-SYOUKAN(KOH-IDX)
            END-IF.
       *
