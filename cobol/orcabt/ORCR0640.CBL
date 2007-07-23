@@ -247,6 +247,7 @@
       *  03.04.16    NACL-ÌçÏÆ    07/05/22  µþÅÔÉÜ£µ£±¡Ü£´£±ÂÐ±þ
       *  03.04.17    NACL-ÌçÏÆ    07/06/07  ¿©»ö¤¬¤Ê¤¤¾ì¹ç¤Î¿©»öÍóµ­ºÜ½¤Àµ
       *  03.04.18    NACL-ÌçÏÆ    07/07/17  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°ÊÔ½¸½¤Àµ
+      *  03.04.19    NACL-ÌçÏÆ    07/07/20  ËÌ³¤Æ»£´£±Ï·¿Í¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9539,7 +9540,37 @@
       *****************************************************************
        2104424-ICHIBUFTN-KOH-HEN3-SEC               SECTION.
       *
-           EVALUATE     FLG-GENBUTU70
+           IF   (WRK-PREFNUM        = "01"          )
+           AND  (SYU-KOH-HKNNUM(1)  = "141" OR "241")
+            IF  FLG-KOHYONKAIME = 1
+               MOVE   44400   TO   WRK-KINGAKU
+            ELSE
+              IF  FLG-KEISAN  =  1
+               IF   WRK-CHIHOU-KIN9 >  267000
+                  COMPUTE  WRK-KINGAKU2 =
+                        (( WRK-CHIHOU-KIN9 -  267000 ) * 0.01 )
+                                                       + 0.5
+                  COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+               ELSE
+                  MOVE     80100  TO   WRK-KINGAKU
+               END-IF
+              ELSE
+               COMPUTE   WRK-CHIHOU-KIN  =  WRK-CHIHOU-KIN
+                                         + (SYU-TOTAL-HKNTEN * 10)
+               IF   WRK-CHIHOU-KIN  >  267000
+                  COMPUTE  WRK-KINGAKU2 =
+                        (( WRK-CHIHOU-KIN -  267000 ) * 0.01 )
+                                                      + 0.5
+                  COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+               ELSE
+                  MOVE     80100  TO   WRK-KINGAKU
+               END-IF
+              END-IF
+            END-IF
+            MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU
+            PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+           ELSE
+            EVALUATE     FLG-GENBUTU70
              WHEN           1
                IF  FLG-KOHYONKAIME = 1
                   MOVE   83400   TO   WRK-KINGAKU
@@ -9604,7 +9635,8 @@
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU
                PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
            .
        2104424-ICHIBUFTN-KOH-HEN3-EXT.
@@ -10412,6 +10444,16 @@
                      MOVE  "1"  TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                  END-IF
+               END-IF
+             END-IF
+      *
+             IF    RECE62-SRYYM     >=  "200704"
+               IF  (WRK-PREFNUM      =  "01"          ) AND
+                   (KOHFTN-IDX       =   1            ) AND
+                   (RECE62-KOHNUM(KOHFTN-IDX)
+                                     =  "141" OR "241")
+                     MOVE  "1"  TO
+                                 RECE62-KISAIFLG(KOHFTN-IDX + 1)
                END-IF
              END-IF
       *
