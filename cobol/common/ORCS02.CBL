@@ -12831,7 +12831,7 @@
                (WK-NYUKFTNRATE          =  ZERO                  ) AND
                (LNK-SYU-SRYYMD(1:6)    >= "200410"               ))
            OR ((WK-1001-PREFNUM         =  01                    ) AND
-               (COMB-KOHHKNNUM(KOH-IDX) = "190" OR "291"         ) AND
+               (COMB-KOHHKNNUM(KOH-IDX) = "190" OR "291" OR "292") AND
                (LNK-SYU-SRYYMD(1:6)    >= "200708"               ))
                IF    LNK-S02-SYOSINFLG  =  SPACE
                     MOVE    SPACE   TO   COMB-KOH-NYUJGNKBN(KOH-IDX)
