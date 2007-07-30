@@ -1288,6 +1288,19 @@
                 MOVE    "700"           TO  LNK-WKSRY-SRYSYUKBN (IDX)
             END-IF
       *
+      *    診療種別のない投薬で前が検査の時
+           IF     (FLG-SYUBETU         =   ZERO ) AND
+                  (LNK-WKSRY-SRYSYUKBN (IDX)   =   SPACE ) AND
+                  (LNK-WKSRY-SRYKBN (IDX)(1:1) =   "2"   ) AND
+                  (LNK-WKSRY-SRYKBN (IDX - 1 ) =   "60"  ) 
+                MOVE    1               TO  FLG-SYUBETU
+                MOVE    LNK-WKSRY-SRYKBN (IDX)
+                                        TO  LNK-WKSRY-SRYSYUKBN (IDX)
+                                                           (1:2)
+                MOVE    "0"             TO  LNK-WKSRY-SRYSYUKBN (IDX)
+                                                           (3:1)
+            END-IF
+      *
             IF      FLG-SYUBETU         =   1
                ADD     1                   TO  IDX2
                MOVE    "."                 TO  SPA-GMN-INPUTCD
