@@ -249,6 +249,7 @@
       *  03.04.18    NACL-ÌçÏÆ    07/06/13  ¸½ÊªµëÉÕ¹â³Û£´²óÌÜ¸øÈñÊ»ÍÑ»þÂÐ±þ
       *  03.04.19    NACL-ÌçÏÆ    07/07/17  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°ÊÔ½¸½¤Àµ
       *  03.04.20    NACL-ÌçÏÆ    07/07/20  ËÌ³¤Æ»£´£±Ï·¿Í¸½ÊªµëÉÕÂÐ±þ
+      *  03.04.21    NACL-ÌçÏÆ    07/07/31  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕÊÝ¸±¼ÔËè¤Ç·×»»
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -409,6 +410,8 @@
            03  FLG-GENBUTU70                           PIC 9(01).
            03  FLG-GENBUTU-TAISYOOK                    PIC 9(01).
            03  FLG-TENTEKIMATOME                       PIC 9(01).
+           03  FLG-HANTEI                              PIC 9(01).
+           03  FLG-TAISYO                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -899,6 +902,10 @@
            03  WRK-TENTEKI2-SRYCD-X.
                05  WRK-TENTEKI2-SRYCD          PIC  X(09)
                                                OCCURS    5.
+      *
+           03  WRK-GEN70-YMD.
+               05  WRK-GEN70-YM                PIC  9(06).
+               05  WRK-GEN70-DD                PIC  9(02).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -8724,17 +8731,25 @@
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN-GEN70
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN9
       *
+           MOVE    ZERO                 TO      WRK-CHK-ICHIBUGAKU
+                                                WRK-CHK-FTNGAKU
+                                                WRK-CHK-KOHFTNGAKU
+                                                WRK-CHK-FTNGAKU-GEN70
+                                                WRK-CHK-KOHFTNGAKU-GEN70
+      *
            MOVE    ZERO                 TO      FLG-GENBUTU-TAISYOOK
       *
            MOVE    ZERO                 TO      FLG-GENBUTU70
            MOVE    ZERO                 TO      FLG-KOHYONKAIME
+      *
            IF    RECE62-KOUREI      =    "2"
                PERFORM    21049-GENBUTU70-HANTEI-SEC
+               PERFORM    21041-KOREISYA-KOHI-SEC
+               IF   FLG-TAISYO  =  1
+                  PERFORM 21042-KOREISYA-CHECK-SEC
+               END-IF
            END-IF
-      *
-      *    ¹âÎð¼Ô¤Î°ìÉôÉéÃ´¶â³Ûµ­ºÜ¤Ë´Ø¤¹¤ë¥Á¥§¥Ã¥¯
-      *
-           IF    RECE62-KOUREI   =   "1" OR "2"
+           IF    RECE62-KOUREI      =    "1"
                 PERFORM   21048-KEIKASOCHI-HANTEI-SEC
                 PERFORM   21041-KOREISYA-KOHI-SEC
                 PERFORM   21042-KOREISYA-CHECK-SEC
@@ -8814,12 +8829,26 @@
            PERFORM   VARYING  IDX1    FROM    1   BY  1
                       UNTIL   IDX1    >       10
                        OR     RECE62-HKNCOMBI (IDX1)  =   ZERO
-                    IF      RECE62-HKNCOMBIFLG (IDX1)
-                                               =   1
+                    IF      RECE62-HKNCOMBIFLG (IDX1)  =  1 OR 2
                        MOVE     1        TO     FLG-ZENKOH-ARI
                        MOVE    10        TO     IDX1
                     END-IF
            END-PERFORM
+      *
+           IF    RECE62-KOUREI           =    "2"
+              MOVE      ZERO        TO     FLG-TAISYO
+              PERFORM   VARYING  IDX1    FROM    1   BY  1
+                         UNTIL   IDX1    >       10
+                          OR     RECE62-HKNCOMBI (IDX1)  =   ZERO
+                    IF      RECE62-HKNCOMBIFLG (IDX1)  =  2 OR 3
+                        IF   FLG-TAISYO  =  ZERO
+                           MOVE   1     TO   FLG-TAISYO
+                        END-IF
+                    ELSE
+                        MOVE      9     TO   FLG-TAISYO
+                    END-IF
+              END-PERFORM
+           END-IF
       *
            .
        21041-KOREISYA-KOHI-EXT.
@@ -8835,11 +8864,6 @@
            MOVE    ZERO                TO  WRK-CHK-IDOU
                                            WRK-CHK-TAISYO
                                            WRK-CHK-HKNID
-           MOVE    ZERO                TO  WRK-CHK-ICHIBUGAKU
-                                           WRK-CHK-FTNGAKU
-                                           WRK-CHK-KOHFTNGAKU
-                                           WRK-CHK-FTNGAKU-GEN70
-                                           WRK-CHK-KOHFTNGAKU-GEN70
       *
            INITIALIZE                      RECE69-REC
            MOVE    RECE62-HOSPID       TO  RECE69-HOSPID
@@ -11308,11 +11332,10 @@
        21048-KEIKASOCHI-HANTEI-SEC      SECTION.
       *
       *    °ìÈÌ·Ð²áÁ¼ÃÖÂÐ¾Ý¼Ô
-           IF     RECE62-KOUREI   =  "1"
       *
-             IF   (RECE62-SRYYM   >=  "200608")
-             AND  (RECE62-SRYYM   <=  "200808")
-             AND  (RECE62-KYURATE  =  20 OR 30)
+           IF   (RECE62-SRYYM   >=  "200608")
+           AND  (RECE62-SRYYM   <=  "200808")
+           AND  (RECE62-KYURATE  =  20 OR 30)
                INITIALIZE                      PTKOHINF-REC
                MOVE    RECE62-HOSPID       TO  PTKOH-HOSPID
                MOVE    RECE62-PTID         TO  PTKOH-PTID
@@ -11340,15 +11363,14 @@
                END-IF
                MOVE   "PTKOHINF-KEY4"      TO  WK-PATH
                PERFORM   CSR-CLOSE-SEC
-             END-IF
+           END-IF
       *
-      *      ¹â³Û£´²óÌÜ°Ê¹ßÂÐ¾Ý¼Ô
-             IF   (RECE62-KYURATE       =  20 OR 30)
-             AND  (RECE62-RJNGENMENKBN  =  SPACE   )
+      *    ¹â³Û£´²óÌÜ°Ê¹ßÂÐ¾Ý¼Ô
+           IF   (RECE62-KYURATE       =  20 OR 30)
+           AND  (RECE62-RJNGENMENKBN  =  SPACE   )
       *
+                MOVE      1      TO     FLG-HANTEI
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC
-      *
-             END-IF
       *
            END-IF
       *
@@ -11362,6 +11384,12 @@
        21049-GENBUTU70-HANTEI-SEC      SECTION.
       *
       *    £·£°ºÐÌ¤Ëþ¹â³Û¸½ÊªµëÉÕÂÐ¾Ý¼Ô
+           MOVE      RECE62-SRYYM          TO   WRK-GEN70-YM
+           IF   RECE62-TEKSTYMD(1:6)  >=  RECE62-SRYYM
+              MOVE   RECE62-TEKSTYMD(7:2)  TO   WRK-GEN70-DD
+           ELSE
+              MOVE   01                    TO   WRK-GEN70-DD
+           END-IF
            PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
                       UNTIL   (GEN-IDX    >    TBL-GENBUTU70-MAX)
                         OR    (FLG-GENBUTU70   NOT = ZERO       )
@@ -11380,9 +11408,9 @@
                   MOVE    "PTKOHINF-KEY4" TO  ORC-DBPATH
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE62-SRYYM       )
-                     AND (RECE62-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
-                     AND (PTKOH-SAKJOKBN        =   SPACE              )
+                     IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                     AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                     AND (PTKOH-SAKJOKBN   =   SPACE         )
                          EVALUATE   GEN-IDX
                            WHEN        1
                              MOVE    1   TO  FLG-GENBUTU70
@@ -11408,6 +11436,7 @@
                 MOVE    SPACE    TO     RECE62-KOUREI
            ELSE
       *         ¹â³Û£´²óÌÜ°Ê¹ßÂÐ¾Ý¼Ô
+                MOVE      2      TO     FLG-HANTEI
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC
       *
                 MOVE      5      TO     FLG-TOKKI
@@ -11446,6 +11475,7 @@
                MOVE    "PTKOHINF-KEY4" TO  ORC-DBPATH
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                IF    FLG-HANTEI   =   1
                   IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE62-SRYYM       )
                   AND (RECE62-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
                   AND (PTKOH-SAKJOKBN        =   SPACE              )
@@ -11455,6 +11485,17 @@
                       MOVE    "PTKOHINF-KEY4"  TO  ORC-DBPATH
                       PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
+                ELSE
+                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                      MOVE     1          TO  FLG-KOHYONKAIME
+                      MOVE     1          TO  FLG-PTKOHINF
+                  ELSE
+                      MOVE    "PTKOHINF-KEY4"  TO  ORC-DBPATH
+                      PERFORM  900-PTKOHINF-READ-SEC
+                  END-IF
+                END-IF
                END-PERFORM
            END-IF
       *
