@@ -158,6 +158,7 @@
       *                                     たときの対応
       *  03.03.04    NACL-門脇    07/03/23  月途中医療機関コード変更時対応
       *  03.03.05    NACL-門脇    07/04/01  現物給付対応
+      *  03.03.06    NACL-門脇    07/07/31  ７０歳未満現物給付保険者毎で計算
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -317,6 +318,7 @@
            03  FLG-SET                                 PIC 9(01).
            03  FLG-ROUJINHOKEN                         PIC 9(01).
            03  FLG-GENBUTU70                           PIC 9(01).
+           03  FLG-TAISYO                              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -1165,6 +1167,27 @@
                        MOVE    4           TO  IDY2
                    END-IF
                END-PERFORM
+      *
+               MOVE    ZERO     TO   FLG-TAISYO
+               PERFORM VARYING IDY2    FROM    1   BY  1
+                       UNTIL   IDY2    >       4
+                   IF   RECE01-KOHNUMHC (IDX IDY2) NOT = SPACE
+                     IF RECE01-KOHNUMHC (IDX IDY2) = "972" OR "974"
+                        IF   FLG-TAISYO  =  ZERO
+                           MOVE   1     TO   FLG-TAISYO
+                        END-IF
+                     ELSE
+                        MOVE      9     TO   FLG-TAISYO
+                     END-IF
+                   END-IF
+               END-PERFORM
+               IF   FLG-TAISYO  =  1
+                   IF  RECE02-HKNCOMBIFLG(IDX)  =  1
+                        MOVE      2     TO   RECE02-HKNCOMBIFLG(IDX)
+                   ELSE
+                        MOVE      3     TO   RECE02-HKNCOMBIFLG(IDX)
+                   END-IF
+               END-IF
       *        組合せ公費保険番号情報のセット
                PERFORM   KOHNUMHC-SET-SEC
            END-PERFORM

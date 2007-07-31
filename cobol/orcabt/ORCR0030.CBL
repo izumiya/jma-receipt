@@ -293,6 +293,7 @@
       *  03.04.13    NACL-ÌçÏÆ    07/05/22  µþÅÔÉÜ£µ£±¡Ü£´£±ÂÐ±þ
       *  03.04.14    NACL-ÌçÏÆ    07/06/27  ¼ÂÆü¿ô¥Æ¡¼¥Ö¥ëÊÔ½¸½¤Àµ
       *  03.04.15    NACL-ÌçÏÆ    07/07/20  ËÌ³¤Æ»£´£±Ï·¿Í¸½ÊªµëÉÕÂÐ±þ
+      *  03.04.16    NACL-ÌçÏÆ    07/07/31  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕÊÝ¸±¼ÔËè¤Ç·×»»
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -438,6 +439,7 @@
            03  FLG-KEISAN                              PIC 9(01).
            03  FLG-GENBUTU70                           PIC 9(01).
            03  FLG-KOHYONKAIME                         PIC 9(01).
+           03  FLG-TAISYO                              PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -766,6 +768,10 @@
            03  WRK-CHIHOU-KIN2                 PIC  9(09).
            03  WRK-CHIHOU-KIN3                 PIC  9(09).
            03  WRK-CHIHOU-KIN9                 PIC  9(09).
+      *
+           03  WRK-GEN70-YMD.
+               05  WRK-GEN70-YM                PIC  9(06).
+               05  WRK-GEN70-DD                PIC  9(02).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -1567,13 +1573,24 @@
            MOVE      ZERO       TO      WRK-CHIHOU-KIN2
            MOVE      ZERO       TO      WRK-CHIHOU-KIN3
            MOVE      ZERO       TO      WRK-CHIHOU-KIN9
+           MOVE      ZERO       TO      WRK-CHK-ICHIBUGAKU
+                                        WRK-CHK-FTNGAKU
+                                        WRK-CHK-KOHFTNGAKU
            MOVE      ZERO       TO      FLG-GENBUTU70
            MOVE      ZERO       TO      FLG-KOHYONKAIME
+      *
            IF    RECE02-ZAITAKU          =    "2"
                PERFORM     2118-GENBUTU70-HANTEI-SEC
+               PERFORM     2101-KOREISYA-KOHI-SEC
+               IF   FLG-TAISYO  =  1
+                 IF   RECE02-RECEKA  =  SPACE
+                  PERFORM     2102-KOREISYA-CHECK-SEC
+      *********  ELSE
+      *********   PERFORM     2103-KOREISYA-CHECK2-SEC
+                 END-IF
+               END-IF
            END-IF
-      *
-           IF    RECE02-ZAITAKU  =   "1" OR "2"
+           IF    RECE02-ZAITAKU          =    "1"
                PERFORM     2116-KEIKASOCHI-HANTEI-SEC
                PERFORM     2101-KOREISYA-KOHI-SEC
                IF   RECE02-RECEKA  =  SPACE
@@ -1821,6 +1838,12 @@
        2118-GENBUTU70-HANTEI-SEC      SECTION.
       *
       *    £·£°ºÐÌ¤Ëþ¹â³Û¸½ÊªµëÉÕÂÐ¾Ý¼Ô
+           MOVE      RECE02-SRYYM          TO   WRK-GEN70-YM
+           IF   RECE02-TEKSTYMD(1:6)  >=  RECE02-SRYYM
+              MOVE   RECE02-TEKSTYMD(7:2)  TO   WRK-GEN70-DD
+           ELSE
+              MOVE   01                    TO   WRK-GEN70-DD
+           END-IF
            PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
                       UNTIL   (GEN-IDX    >    TBL-GENBUTU70-MAX)
                         OR    (FLG-GENBUTU70   NOT = ZERO       )
@@ -1839,9 +1862,9 @@
                   MOVE    "PTKOHINF-KEY4" TO  ORC-DBPATH
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE02-SRYYM       )
-                     AND (RECE02-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
-                     AND (PTKOH-SAKJOKBN        =   SPACE              )
+                     IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                     AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                     AND (PTKOH-SAKJOKBN   =   SPACE         )
                          EVALUATE   GEN-IDX
                            WHEN        1
                              MOVE    1   TO  FLG-GENBUTU70
@@ -1881,9 +1904,9 @@
       ***         MOVE    "PTKOHINF-KEY4" TO  ORC-DBPATH
       ***         PERFORM  900-PTKOHINF-READ-SEC
       ***         PERFORM  UNTIL   FLG-PTKOHINF    =   1
-      ***            IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE02-SRYYM       )
-      ***            AND (RECE02-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
-      ***            AND (PTKOH-SAKJOKBN        =   SPACE              )
+      ***            IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+      ***            AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+      ***            AND (PTKOH-SAKJOKBN   =   SPACE         )
       ***                MOVE     1      TO  FLG-KOHYONKAIME
       ***                MOVE     1      TO  FLG-PTKOHINF
       ***            ELSE
@@ -1918,11 +1941,10 @@
        2116-KEIKASOCHI-HANTEI-SEC      SECTION.
       *
       *    °ìÈÌ·Ð²áÁ¼ÃÖÂÐ¾Ý¼Ô
-           IF     RECE02-ZAITAKU  =  "1"
       *
-             IF   (RECE02-SRYYM   >=  "200608")
-             AND  (RECE02-SRYYM   <=  "200808")
-             AND  (RECE02-KYURATE  =  20 OR 30)
+           IF   (RECE02-SRYYM   >=  "200608")
+           AND  (RECE02-SRYYM   <=  "200808")
+           AND  (RECE02-KYURATE  =  20 OR 30)
                INITIALIZE                      PTKOHINF-REC
                MOVE    RECE02-HOSPID       TO  PTKOH-HOSPID
                MOVE    RECE02-PTID         TO  PTKOH-PTID
@@ -1950,8 +1972,6 @@
                END-IF
                MOVE   "PTKOHINF-KEY4"      TO  WK-PATH
                PERFORM   900-CSR-CLOSE-SEC
-             END-IF
-      *
            END-IF
       *
            .
@@ -1967,12 +1987,26 @@
            PERFORM   VARYING  IDY2    FROM    1   BY  1
                       UNTIL   IDY2    >       10
                        OR     RECE02-HKNCOMBI (IDY2)  =   ZERO
-                    IF      RECE02-HKNCOMBIFLG (IDY2)
-                                               =   1
+                    IF      RECE02-HKNCOMBIFLG (IDY2)  =  1 OR 2
                        MOVE     1        TO     FLG-ZENKOH-ARI
                        MOVE    10        TO     IDY2
                     END-IF
            END-PERFORM
+      *
+           IF    RECE02-ZAITAKU          =    "2"
+              MOVE      ZERO        TO     FLG-TAISYO
+              PERFORM   VARYING  IDY2    FROM    1   BY  1
+                         UNTIL   IDY2    >       10
+                          OR     RECE02-HKNCOMBI (IDY2)  =   ZERO
+                    IF      RECE02-HKNCOMBIFLG (IDY2)  =  2 OR 3
+                        IF   FLG-TAISYO  =  ZERO
+                           MOVE   1     TO   FLG-TAISYO
+                        END-IF
+                    ELSE
+                        MOVE      9     TO   FLG-TAISYO
+                    END-IF
+              END-PERFORM
+           END-IF
       *
            .
        2101-KOREISYA-KOHI-EXT.
@@ -1988,9 +2022,6 @@
            MOVE    ZERO                TO  WRK-CHK-IDOU
                                            WRK-CHK-TAISYO
                                            WRK-CHK-HKNID
-           MOVE    ZERO                TO  WRK-CHK-ICHIBUGAKU
-                                           WRK-CHK-FTNGAKU
-                                           WRK-CHK-KOHFTNGAKU
       *
            INITIALIZE                      RECE09-REC
            MOVE    RECE02-HOSPID       TO  RECE09-HOSPID
