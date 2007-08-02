@@ -2546,6 +2546,8 @@
       *    点数マスタ編集・基本チェック
            INITIALIZE                  ORCSC92AREA
            MOVE    "J04"               TO  LNK-SC92-PG
+      *    入力値編集あり
+           MOVE    "1"                 TO  LNK-SC92-INFLG
            MOVE    SPACE               TO  LNK-SC92-KBN
            MOVE    SPA-GMN-IDX         TO  LNK-SC92-GMN-IDX
            MOVE    SPA-COM-INPUTCD (SPA-GMN-IDX)
