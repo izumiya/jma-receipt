@@ -1271,6 +1271,7 @@
            INITIALIZE                  SPA-AREA
                                        WRK-AREA
                                        TTNS-AREA
+                                       FLG-AREA
       *
            MOVE    ZERO                TO  FLG-END
       *
