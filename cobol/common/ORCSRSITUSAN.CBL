@@ -482,8 +482,9 @@
       *
                IF    ( PTNYUINRRK-RRKEDANUM    =   1 )
                    IF    ( PTNYUINRRK-JTIKBN   =   "6" )
-                    AND  ( PTNYUINRRK-SHONUM   =   WRK-SHONUM )
-                       PERFORM 2110-JIINRRK-NISSU-HEN-SEC
+                        IF     ( PTNYUINRRK-SHONUM =   WRK-SHONUM )
+                            PERFORM 2110-JIINRRK-NISSU-HEN-SEC
+                        END-IF
                    ELSE
                        PERFORM 2110-NISSU-HEN-SEC
                    END-IF
