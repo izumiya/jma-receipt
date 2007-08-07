@@ -81,6 +81,7 @@
       *  03.04.03    NACL-門脇    07/01/15  リハビリ手術日・急性増悪日記載対応
       *  03.04.04    NACL-門脇    07/03/05  酸素計算式修正
       *  03.04.05    NACL-門脇    07/04/13  リハビリ対応
+      *  03.04.06    NACL-門脇    07/08/07  算定履歴に関わる記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3418,11 +3419,14 @@
                  PERFORM   UNTIL  ( FLG-SANTEI              =   1 )
                              OR   ( FLG-NIKOCHINTOU-COMMENT =   1 )
       *
-                    MOVE  SANTEI-FSANTEIYMD  TO  WRK-NIKOCHINTOU-YMD
-                    MOVE    1                TO  FLG-NIKOCHINTOU-COMMENT
+                   IF   SANTEI-SRYYM  <=  RECE44-SRYYM
+                    MOVE  SANTEI-SRYYM     TO  WRK-NIKOCHINTOU-YMD(1:6)
+                    MOVE  SANTEI-MSANTEID  TO  WRK-NIKOCHINTOU-YMD(7:2)
+                    MOVE    1              TO  FLG-NIKOCHINTOU-COMMENT
+                   END-IF
       *
-                    MOVE    "SANTEI-KEY3"    TO  ORC-DBPATH
-                    PERFORM        900-SANTEI-READ-SEC
+                   MOVE    "SANTEI-KEY3"   TO  ORC-DBPATH
+                   PERFORM        900-SANTEI-READ-SEC
                  END-PERFORM
              END-IF
       *
@@ -3588,7 +3592,9 @@
                     PERFORM   UNTIL  ( FLG-SANTEI         =   1 ) OR
                                      ( FLG-HINKAI-COMMENT =   1 )
       *
-                       MOVE   SANTEI-FSANTEIYMD  TO  WRK-FSANTEIYMD
+                      IF   SANTEI-SRYYM  <=  RECE44-SRYYM
+                       MOVE   SANTEI-SRYYM     TO  WRK-FSANTEIYMD(1:6)
+                       MOVE   SANTEI-MSANTEID  TO  WRK-FSANTEIYMD(7:2)
       *
                        INITIALIZE                  STS-AREA-DAY
                        INITIALIZE                  LNK-DAY6-AREA
@@ -3610,9 +3616,10 @@
                              MOVE  WRK-FSANTEIYMD
                                           TO   WRK-TOSEKIYMD
                        END-IF
+                      END-IF
       * 
-                       MOVE    "SANTEI-KEY3"       TO  ORC-DBPATH
-                       PERFORM        900-SANTEI-READ-SEC
+                      MOVE    "SANTEI-KEY3"    TO  ORC-DBPATH
+                      PERFORM        900-SANTEI-READ-SEC
                     END-PERFORM
              END-IF
       *
