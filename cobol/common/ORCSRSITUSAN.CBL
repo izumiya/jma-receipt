@@ -46,6 +46,7 @@
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
            03  FLG-HIT                     PIC 9(01).
+           03  FLG-TARGET                  PIC 9(01).
            03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-NYUINRYODAY-G.
@@ -616,8 +617,19 @@
                    UNTIL ( IDX1    >       WRK-EDIDX )
       *
                IF    ( FLG-NYUINRYODAY (IDX1)  >   ZERO )
+      *
+                   MOVE    ZERO        TO  FLG-TARGET
                    IF   ( PTNYUINRRK-SHONUM    =   WRK-SHONUM )
-                     OR ( FLG-HKNCOMBIDAY (IDX1)   >   ZERO )
+                           MOVE        1   TO  FLG-TARGET
+                   ELSE
+                       IF    ( WRK-STSRYYM     =   RSITUSAN-SRYYM )
+                        AND  ( FLG-HKNCOMBIDAY (IDX1)
+                                               =   1 )
+                           MOVE        1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+      *
+                   IF   ( FLG-TARGET       =   1 )
       *
                        COMPUTE WRK-NISSU   =   WRK-NISSU   +   1
       *
