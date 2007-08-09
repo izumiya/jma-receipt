@@ -3004,11 +3004,9 @@
       ***           MOVE    "PTKOHINF-KEY4"  TO      ORC-DBPATH
       ***           PERFORM  PTKOHINF-READ-SEC
       ***           PERFORM  UNTIL   FLG-PTKOHINF    =   1
-      ***               IF  (PTKOH-TEKSTYMD(1:6)  <=
-      ***                                        LNK-SYU-SRYYMD(1:6))
-      ***               AND (LNK-SYU-SRYYMD(1:6)  <=
-      ***                                        PTKOH-TEKEDYMD(1:6))
-      ***               AND (PTKOH-SAKJOKBN   =  SPACE              )
+      ***               IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+      ***               AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+      ***               AND (PTKOH-SAKJOKBN   =  SPACE         )
       ***                  MOVE    1         TO  FLG-KOHININBARAI
       ***                  MOVE   PTKOH-KOHID
       ***                                    TO  WK-KOHININBARAI-KOHID
@@ -6744,7 +6742,8 @@
            CALL    "ORCMCPSUB"           USING   MCPAREA
                                                  ORCMCPAREA
                                                  MCPDATA-REC.
-           IF      FLG-GENBUTU70   NOT =  ZERO
+           IF     (FLG-GENBUTU70     NOT =  ZERO)
+           OR     (FLG-KOHININBARAI      =    1 )
              MOVE   SPACE              TO    WK-HKNJANUM2
              INITIALIZE                      PTHKNINF-REC
              MOVE   WRK-COMB-HOSPID    TO    PTHKN-HOSPID
@@ -6981,12 +6980,14 @@
                        AND (SYU-KOH2HKNNUM     =  SPACE)
                        AND (SYU-KOH3HKNNUM     =  SPACE)
                        AND (SYU-KOH4HKNNUM     =  SPACE)
+                        IF  WK-HKNJANUM2  =  WK-HKNJANUM
                           MOVE   SYU-SYUCOMPFTN
                                             TO   WK-SYU-SYUCOMPFTN
                           COMPUTE WK-ENTANI =
                                   SYU-SYUCOMPFTN-ENTANI + 0.9
                           ADD   WK-SYU-SYUCOMPFTN  TO  FTN-SYU-M
                           ADD   WK-ENTANI          TO  FTN-SYU-M-ENTANI
+                        END-IF
                        END-IF
                      ELSE
                       IF  FLG-GENBUTU70    NOT =  ZERO
