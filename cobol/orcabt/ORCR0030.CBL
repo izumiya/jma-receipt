@@ -6067,7 +6067,38 @@
       *****************************************************************
        2105213-ICHIBUFTN-KOH-HEN2-SEC               SECTION.
       *
-           EVALUATE     FLG-GENBUTU70
+           IF   (SYS-1001-PREFNUM   = 01            )
+           AND  (SYU-SYUHKNNUM NOT = "060" AND "067")
+           AND  (SYU-KOH-HKNNUM(1)  = "141" OR "241")
+            IF  FLG-KOHYONKAIME = 1
+               MOVE   44400   TO   WRK-KINGAKU
+            ELSE
+              IF  FLG-KEISAN  =  1
+               IF   WRK-CHIHOU-KIN9 >  267000
+                  COMPUTE  WRK-KINGAKU2 =
+                        (( WRK-CHIHOU-KIN9 -  267000 ) * 0.01 )
+                                                       + 0.5
+                  COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+               ELSE
+                  MOVE     80100  TO   WRK-KINGAKU
+               END-IF
+              ELSE
+               COMPUTE   WRK-CHIHOU-KIN  =  WRK-CHIHOU-KIN
+                                         + (SYU-TOTAL-HKNTEN * 10)
+               IF   WRK-CHIHOU-KIN  >  267000
+                  COMPUTE  WRK-KINGAKU2 =
+                        (( WRK-CHIHOU-KIN -  267000 ) * 0.01 )
+                                                      + 0.5
+                  COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+               ELSE
+                  MOVE     80100  TO   WRK-KINGAKU
+               END-IF
+              END-IF
+            END-IF
+            MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU
+            PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+           ELSE
+            EVALUATE     FLG-GENBUTU70
              WHEN           1
                IF  FLG-KOHYONKAIME = 1
                   MOVE   83400   TO   WRK-KINGAKU
@@ -6132,7 +6163,8 @@
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU
                PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
            .
        2105213-ICHIBUFTN-KOH-HEN2-EXT.
