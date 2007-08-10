@@ -2013,10 +2013,22 @@
                    MOVE    SPA-GMN-INPUTCD(IDX)
                                            TO  SPA-MAE-INPUTCD(IDX)
                END-IF
-      *        複数科
-               IF     (WRK-ERRCD3      NOT =   SPACE )  AND
-                      (SPA-GMN-INPUTCD(IDX)(1:1)   =   "#"
-                                                   OR  "$" )
+      *        追加時にエラーがあれば、再読込みを行う
+               IF    ((WRK-ERRCD1      NOT =   SPACE )  OR
+                      (WRK-ERRCD3      NOT =   SPACE ))
+                  AND (IDX                 >   IDX-STR2 )
+                   MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
+               END-IF
+      *        保険組合せエラーの時、保険の行へ
+               IF     (IDX                 >   IDX-STR2 )
+                   IF     (WRK-ERRCD3          =   "1051"  )  AND
+                          (SPA-GMN-INPUTCD(IDX)(1:1)   =   "#" )
+                       MOVE    "1"             TO  SPA-COM-CUR (IDX)
+                       MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
+                   END-IF
+               END-IF
+               IF     (SPA-GMN-INPUTCD(IDX)(1:1)   =   "P" )
+                   MOVE    "1"             TO  SPA-COM-CUR (IDX)
                    MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
                END-IF
            END-PERFORM
