@@ -31,6 +31,7 @@
       *  01.00.01    NACL-多々納  05/11/22  MONFUNC 対応
       *  01.00.02    NACL-多々納  06/07/06  収納変更対応
       *  03.04.00    NACL-多々納  07/02/XX  包括診療対応
+      *  03.04.01    NACL-多々納  07/06/01  セット対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -93,6 +94,8 @@
       *
            03  FLG-AUTO-ARI        PIC 9(01).
            03  FLG-AUTO-NASI       PIC 9(01).
+      *
+           03  FLG-WKSYORIFLG      PIC 9(01).
       *
            03  FLG-TIME            PIC 9(01).
            03  FLG-HKN999          PIC 9(01).
@@ -403,6 +406,7 @@
            MOVE    ORCSCWKSRY-STRIDX  TO  IDX2
       *
            MOVE    ZERO               TO  FLG-SYORIFLG
+           MOVE    ZERO               TO  FLG-WKSYORIFLG
            MOVE    ZERO               TO  FLG-ZENKAI
       *
            MOVE    ZERO               TO  FLG-AUTO-ARI
@@ -410,6 +414,7 @@
       *    ワーク診療行為からの時は、訂正と同様に編集する
            IF      LNK-WKSRY-TERMID (1)    =   "WKSRYACT"
                MOVE    1               TO  FLG-SYORIFLG
+               MOVE    1               TO  FLG-WKSYORIFLG
            ELSE
       *        訂正展開
                IF      ORCSCWKSRY-SYORIFLG =   ZERO
@@ -670,6 +675,7 @@
                ELSE
                    IF      SPA-ERRCD       NOT =   SPACE
                        MOVE    SPA-ERRCD       TO  WRK-ERRCD2
+                       MOVE    SPACE           TO  SPA-ERRCD
                    END-IF
                    IF      IDX2            <   SPA-GMN-MAX
                        MOVE    SPA-GMN-MAX         TO  IDX2
@@ -682,10 +688,25 @@
            END-IF
            MOVE    ZERO                TO  IDX-TEI
            COMPUTE IDX-STR             =   ORCSCWKSRY-STRIDX  +  1
+      *    ワーク診療行為の時、セットの展開
+           IF     (FLG-WKSYORIFLG      =   1     )
+               PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
+                       UNTIL      (IDX-1     >   WRK-GYO-MAX )
+                            OR   ((SPA-GMN-INPUTCD(IDX-1) =   SPACE )
+                              AND (SPA-COM-INPUTCD(IDX-1) =   SPACE ))
+                   IF      (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "P" )  OR
+                           (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "P" )
+                       MOVE    IDX-1               TO  SPA-GMN-IDX
+                       PERFORM 10028-INPUTSET-SYORI-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
       *    約束コード以外の画面再編集
            PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
                    UNTIL      (IDX-1     >   WRK-GYO-MAX )  OR
-                              (IDX-1     >   IDX2   )
+                             ((SPA-GMN-INPUTCD(IDX-1) =   SPACE )
+                          AND (SPA-COM-INPUTCD(IDX-1) =   SPACE ))
                IF     (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "S" OR ".") OR
                       (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "S"       ) OR
                       (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "*"       ) OR
@@ -693,7 +714,6 @@
                                                      OR  "$"       )
                    CONTINUE
                ELSE
-      *
       *            点数マスタ編集
                    INITIALIZE                  ORCSC92AREA
                    MOVE    SPACE               TO  LNK-SC92-KBN
@@ -830,6 +850,8 @@
                IF      SPA-COM-ZAIEND (IDX-1)  =   "1"
                    MOVE    ZERO                TO  IDX-TEI
                END-IF
+      *        最終行
+               MOVE    IDX-1               TO  IDX2
            END-PERFORM
       *
            MOVE    ZERO              TO  FLG-FIRUMU
