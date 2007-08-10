@@ -10475,10 +10475,11 @@
              END-IF
       *
              IF    RECE62-SRYYM     >=  "200704"
-               IF  (WRK-PREFNUM      =  "01"          ) AND
-                   (KOHFTN-IDX       =   1            ) AND
-                   (RECE62-KOHNUM(KOHFTN-IDX)
-                                     =  "141" OR "241")
+               IF  (WRK-PREFNUM       =  "01"          )
+               AND (RECE62-HKNNUM NOT = "060" AND "067")
+               AND (KOHFTN-IDX        =   1            )
+               AND (RECE62-KOHNUM(KOHFTN-IDX)
+                                      =  "141" OR "241")
                      MOVE  "1"  TO
                                  RECE62-KISAIFLG(KOHFTN-IDX + 1)
                END-IF
