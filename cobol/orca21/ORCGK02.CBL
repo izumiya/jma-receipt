@@ -72,6 +72,7 @@
       *  03.00.24    NACL-多々納  05/11/10  前回処方印刷変更
       *  03.00.25    NACL-多々納  05/11/18  MONFUNC 対応 他
       *  03.02.01    NACL-多々納  06/08/29  平成１８年１０月改正対応
+      *  03.03.XX    NACL-多々納  07/06/06  中途終了データ追加時の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1999,10 +2000,28 @@
                    MOVE    SPA-GMN-INPUTCD(IDX)
                                            TO  SPA-MAE-INPUTCD(IDX)
                END-IF
-      *        複数科
-               IF     (WRK-ERRCD3      NOT =   SPACE )  AND
-                      (SPA-GMN-INPUTCD(IDX)(1:1)   =   "#"
-                                                   OR  "$" )
+      ***      複数科
+      *        IF     (WRK-ERRCD3      NOT =   SPACE )  AND
+      *               (SPA-GMN-INPUTCD(IDX)(1:1)   =   "#"
+      *                                            OR  "$" )
+      *            MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
+      ****     END-IF
+      *        追加時にエラーがあれば、再読込みを行う
+               IF    ((WRK-ERRCD1      NOT =   SPACE )  OR
+                      (WRK-ERRCD3      NOT =   SPACE ))
+                  AND (IDX                 >   IDX-STR2 )
+                   MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
+               END-IF
+      *        保険組合せエラーの時、保険の行へ
+               IF     (IDX                 >   IDX-STR2 )
+                   IF     (WRK-ERRCD3          =   "1051"  )  AND
+                          (SPA-GMN-INPUTCD(IDX)(1:1)   =   "#" )
+                       MOVE    "1"             TO  SPA-COM-CUR (IDX)
+                       MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
+                   END-IF
+               END-IF
+               IF     (SPA-GMN-INPUTCD(IDX)(1:1)   =   "P" )
+                   MOVE    "1"             TO  SPA-COM-CUR (IDX)
                    MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
                END-IF
            END-PERFORM
