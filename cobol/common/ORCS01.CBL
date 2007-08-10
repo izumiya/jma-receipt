@@ -4280,6 +4280,14 @@
                    ( COMB-KOH3HKNNUM        =    SPACE) AND
                    ( COMB-KOH4HKNNUM        =    SPACE))
       ***          MOVE    "1"    TO   FLG-SYUHEN
+                   IF  (WK-1001-PREFNUM  =  01            )
+                   AND (COMB-HKNNUM  NOT = "060" AND "067")
+                   AND (COMB-KOH1HKNNUM  =  "141" OR "241")
+                     MOVE     80100   TO   MAX-KIN-SYU-M
+                     IF  FLG-KOHYONKAIME = 1
+                        MOVE  44400   TO   MAX-KIN-SYU-M
+                     END-IF
+                   END-IF
                    EVALUATE  MAX-KIN-SYU-M
                      WHEN      150000
                        MOVE  WK-ZENGAKU  TO  WK-KOUREI-IRYOHI70
