@@ -63,6 +63,9 @@
       *  03.03.03    NACL-藤原    07/05/16  同一地方公費のまとめ集計
       *                                     岡山対応
       *                                    （公費番号の追加に伴う）
+      *
+      *  03.04.01    NACL-藤原    07/08/20  同一地方公費のまとめ集計
+      *                                     北海道対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1282,6 +1285,19 @@
                            MOVE    "180"       TO  RECE10-KOHNUM (IDZ)
                        WHEN    "86"
                            MOVE    "186"       TO  RECE10-KOHNUM (IDZ)
+                   END-EVALUATE
+               END-IF
+      *
+      *        北海道の地方公費のまとめ（２００７年８月以降）
+               IF    ( SYS-1001-PREFNUM    =   "01"     ) 
+               AND   ( LNK-PRTKANRI-SRYYM  >=  "200708" )
+                   EVALUATE    RECE10-KOHNUM (IDZ) (2:2)
+                       WHEN    "90"
+                           MOVE    "190"       TO  RECE10-KOHNUM (IDZ)
+                       WHEN    "91"
+                           MOVE    "191"       TO  RECE10-KOHNUM (IDZ)
+                       WHEN    "92"
+                           MOVE    "192"       TO  RECE10-KOHNUM (IDZ)
                    END-EVALUATE
                END-IF
       *

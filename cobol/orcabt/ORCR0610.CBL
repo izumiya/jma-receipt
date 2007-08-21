@@ -94,6 +94,8 @@
       *                                     ¸øÈñÉÕ²Ã¾ðÊó¤è¤êµ­ºÜÈ½Äê¤ò¹Ô¤¦
       *  03.03.08    NACL-Æ£¸¶    06/12/14  ÉÔÌÀÊ¬¤Î¤È¤­À¸ÊÝÃ±ÆÈ¤Î¾å¸Â
       *                                     ¥Á¥§¥Ã¥¯¤Ï¤·¤Ê¤¤
+      *
+      *  03.04.03    NACL-Æ£¸¶    07/08/20  ËÌ³¤Æ»¤ÎÃÏÊý¸øÈñ¤Îµ­ºÜ½çÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2340,13 +2342,29 @@
                COMPUTE IDX1    =   IDX     +   1
                PERFORM VARYING IDY FROM    IDX1    BY  1
                        UNTIL   IDY >       4
-                   IF      WRK-KOHHKNNUM-O (IDX)
-                                           >   WRK-KOHHKNNUM-O (IDY)
-                   OR      WRK-KOHHKNNUM-O (IDX) =   SPACE 
+                   IF     WRK-KOHHKNNUM-O (IDX) =   SPACE
                        MOVE    WRK-KOHI-TBL(IDX) TO  WRK-KOHI
                        MOVE    WRK-KOHI-TBL(IDY) TO  WRK-KOHI-TBL(IDX)
                        MOVE    WRK-KOHI          TO  WRK-KOHI-TBL(IDY)
-                   END-IF
+                   ELSE
+      *                ËÌ³¤Æ»¤ÎÃÏÊý¸øÈñ¡Ê£±£¹£±¡Ü£²£¹£°¡Ë
+                       IF    ( SYS-1001-PREFNUM    =   "01"  ) 
+                       AND   ( WRK-KOHHKNNUM-O (IDX)
+                                                   =   "290" )
+                       AND   ( WRK-KOHHKNNUM-O (IDY)
+                                                   =   "191" )
+                           CONTINUE
+                       ELSE
+                           IF      WRK-KOHHKNNUM-O (IDX)
+                                               >   WRK-KOHHKNNUM-O (IDY)
+                               MOVE    WRK-KOHI-TBL(IDX)
+                                                   TO  WRK-KOHI
+                               MOVE    WRK-KOHI-TBL(IDY)
+                                                   TO  WRK-KOHI-TBL(IDX)
+                               MOVE    WRK-KOHI    TO  WRK-KOHI-TBL(IDY)
+                           END-IF
+                       END-IF    
+                   END-IF    
                END-PERFORM
            END-PERFORM
       *
