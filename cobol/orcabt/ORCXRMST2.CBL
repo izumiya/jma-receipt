@@ -294,9 +294,22 @@
       *    入力　初期処理
            OPEN    INPUT           IN-FILE
            IF      STS-IN          NOT =   ZERO
-               MOVE    1           TO  FLG-CHECK
-               DISPLAY "*(ORCXRMST2)* IN-FILE OPN STS["
-                                       STS-IN "]"
+               STRING  HOMEDIR-NAME        DELIMITED  BY  SPACE
+                       "patch-lib/"        DELIMITED  BY  SIZE
+                       PARA-UPPG           DELIMITED  BY  SPACE
+                       ".so"               DELIMITED  BY  SIZE
+                                           INTO   PGEXIST01 
+               END-STRING
+               OPEN    INPUT           IN-FILE
+               IF      STS-IN          NOT =   ZERO
+                   MOVE    1           TO  FLG-CHECK
+                   DISPLAY "*(ORCXRMST2)* IN-FILE OPN STS["
+                                           STS-IN "]"
+               ELSE
+                   CLOSE    IN-FILE
+               END-IF
+           ELSE
+               CLOSE    IN-FILE
            END-IF
            .
        2001-PGEXIST-EXT.
