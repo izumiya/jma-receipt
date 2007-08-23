@@ -142,7 +142,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20070418".
+       01  PRGSKBNO                PIC X(08)  VALUE "20070809".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
@@ -1171,6 +1171,15 @@
                PERFORM 20011-SKJFTN-SEC
                PERFORM 200111-NYUIN-JNISSU-TAIHI-SEC
                PERFORM 200112-SKJNISSU-TAIHI-SEC
+      *        実日数、点数編集
+               PERFORM   20012-JNISSU-SET-SEC
+               PERFORM   20013-TOTALTENSU-SET-SEC
+               INITIALIZE                  TBL-JNISSU
+               INITIALIZE                  TBL-JNISSU-GEN
+               INITIALIZE                  TBL-TOTALTENSU-INF
+               INITIALIZE                  TBL-SKJNISSU-INF
+               INITIALIZE                  TBL-SKJRYOYOHI-INF
+               INITIALIZE                  TBL-SKJFTN-INF
       *        診療会計編集処理
                PERFORM 20012-NYUIN-SRYACCT-HENSYU-SEC
       *
@@ -2685,18 +2694,24 @@
        20013-TOTALTENSU-SET-SEC    SECTION.
       *
       *    主保険
-           MOVE    TBL-TOTALTENSU (1)  TO  COLDAT01-HKNTOTALTENSU
-           MOVE    TBL-SKJRYOYOHI (1)  TO  COLDAT01-HKNSKJRYOYOHI
-           MOVE    TBL-SKJFTN     (1)  TO  COLDAT01-HKNSKJFTN
+           COMPUTE COLDAT01-HKNTOTALTENSU  =   COLDAT01-HKNTOTALTENSU
+                                           +   TBL-TOTALTENSU (1)
+           COMPUTE COLDAT01-HKNSKJRYOYOHI  =   COLDAT01-HKNSKJRYOYOHI
+                                           +   TBL-SKJRYOYOHI (1)
+           COMPUTE COLDAT01-HKNSKJFTN      =   COLDAT01-HKNSKJFTN
+                                           +   TBL-SKJFTN     (1)
       *    公費
            PERFORM    VARYING    JN-IDX    FROM   2   BY   1
                       UNTIL      JN-IDX    >      5
-               MOVE   TBL-TOTALTENSU (JN-IDX)
-                               TO  COLDAT01-TKOHTOTALTENSU(JN-IDX - 1)
-               MOVE   TBL-SKJRYOYOHI (JN-IDX)
-                               TO  COLDAT01-TKOHSKJRYOYOHI(JN-IDX - 1)
-               MOVE   TBL-SKJFTN (JN-IDX)
-                               TO  COLDAT01-TKOHSKJFTN(JN-IDX - 1)
+               COMPUTE COLDAT01-TKOHTOTALTENSU(JN-IDX - 1) =
+                       COLDAT01-TKOHTOTALTENSU(JN-IDX - 1)
+                                           +   TBL-TOTALTENSU (JN-IDX)
+               COMPUTE COLDAT01-TKOHSKJRYOYOHI(JN-IDX - 1) =
+                       COLDAT01-TKOHSKJRYOYOHI(JN-IDX - 1)
+                                           +   TBL-SKJRYOYOHI (JN-IDX)
+               COMPUTE COLDAT01-TKOHSKJFTN(JN-IDX - 1)     =
+                       COLDAT01-TKOHSKJFTN(JN-IDX - 1)
+                                           +   TBL-SKJFTN (JN-IDX)
            END-PERFORM
       *    テーブルレコード入れ替え
            PERFORM VARYING IDXX    FROM    1   BY  1
@@ -3625,7 +3640,8 @@
                                              + (ACCT-ZAITEN
                                              *  ACCT-ZAIKAISU)
              ELSE
-               IF        ACCT-SRYKBN         =   "95"   OR  "96"
+               IF      ( ACCT-SRYKBN         =   "95"   OR  "96" )
+                OR     ( COLDAT02-SRYCD      =   "099999912" )
                    CONTINUE
                ELSE
                  IF        ACCT-SRYCDTOTAL    =    630010002
