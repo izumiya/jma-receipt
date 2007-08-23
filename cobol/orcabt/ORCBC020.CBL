@@ -118,7 +118,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20070327".
+       01  PRGSKBNO                PIC X(08)  VALUE "20070809".
       *
       *    病院基本情報データ
            COPY    "CPCOMMONDAT5.INC"
@@ -525,6 +525,7 @@
       *
            PERFORM 2001-FILE-HENSYU-SEC
            PERFORM 20011-FILE-HENSYU-SEC
+           PERFORM 2002-FILE-HENSYU-SEC
       *
       *    診療情報（１件目先読み）
            INITIALIZE                          COLDAT02-REC
@@ -537,9 +538,6 @@
                    NOT INVALID
                        PERFORM 900-COLDAT02-READ-SEC
            END-START
-      *
-      *    保険情報
-           PERFORM 2002-FILE-HENSYU-SEC
       *
       *    病名情報
            INITIALIZE                          COLDAT03-REC
@@ -779,34 +777,38 @@
       *****************************************************************
        2002-FILE-HENSYU-SEC         SECTION.
       *
-           MOVE    SPACE               TO  WRK-REC
-           MOVE    ZERO                TO  WRK-REC-LENGTH
-      *    レコード識別
-           MOVE    "H"                 TO  WRK-DATA
-           MOVE    1                   TO  WRK-NAGASA
-           PERFORM 5004-MOJI-HENSYU-SEC
-      *    保険組合せ
-           MOVE    COLDAT02-HKNCOMBI   TO  WRK-NUM
-           MOVE    4                   TO  WRK-NAGASA
-           PERFORM 5005-NUM-HENSYU-SEC
-      *    保険番号
-           MOVE    COLDAT02-HKNNUM     TO  WRK-DATA
-           MOVE    3                   TO  WRK-NAGASA
-           PERFORM 5004-MOJI-HENSYU-SEC
-      *    本人家族区分
-           MOVE    COLDAT02-HONKZKKBN  TO  WRK-DATA
-           MOVE    1                   TO  WRK-NAGASA
-           PERFORM 5004-MOJI-HENSYU-SEC
-      *    補助区分
-           MOVE    COLDAT02-HOJOKBN    TO  WRK-DATA
-           MOVE    1                   TO  WRK-NAGASA
-           PERFORM 5004-MOJI-HENSYU-SEC
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       10
+                   OR      COLDAT01-HKNCOMBI (IDX)  =   ZERO 
+      *
+             MOVE    SPACE               TO  WRK-REC
+             MOVE    ZERO                TO  WRK-REC-LENGTH
+      *      レコード識別
+             MOVE    "H"                 TO  WRK-DATA
+             MOVE    1                   TO  WRK-NAGASA
+             PERFORM 5004-MOJI-HENSYU-SEC
+      *      保険組合せ
+             MOVE    COLDAT01-HKNCOMBI (IDX)   TO  WRK-NUM
+             MOVE    4                         TO  WRK-NAGASA
+             PERFORM 5005-NUM-HENSYU-SEC
+      *      保険番号
+             MOVE    COLDAT01-HKNNUM     TO  WRK-DATA
+             MOVE    3                   TO  WRK-NAGASA
+             PERFORM 5004-MOJI-HENSYU-SEC
+      *      本人家族区分
+             MOVE    COLDAT01-HONKZKKBN  TO  WRK-DATA
+             MOVE    1                   TO  WRK-NAGASA
+             PERFORM 5004-MOJI-HENSYU-SEC
+      *      補助区分
+             MOVE    COLDAT01-HOJOKBN    TO  WRK-DATA
+             MOVE    1                   TO  WRK-NAGASA
+             PERFORM 5004-MOJI-HENSYU-SEC
       *
       *公費情報
       *
-           MOVE    ZERO                TO  WRK-KOH-MAX
+             MOVE    ZERO                TO  WRK-KOH-MAX
       *
-           IF      COLDAT01-KOHID      >   ZERO
+             IF      COLDAT01-KOHID      >   ZERO
                MOVE    COLDAT01-RJNHKNNUM  TO  WRK-KOHHKNNUM
                MOVE    COLDAT01-KOHID      TO  WRK-KOHID
                MOVE    COLDAT01-RJNPAYKBN  TO  WRK-KOHPAYKBN
@@ -815,17 +817,17 @@
                MOVE    COLDAT01-RJNTEKEDYMD
                                            TO  WRK-KOHTEKEDYMD
                PERFORM 20021-KOH-HENSYU-SEC
-           END-IF
+             END-IF
       *
-           PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL   IDX1    >       4
-                   OR      WRK-KOH-MAX     =   4 
+             PERFORM VARYING IDX1    FROM    1   BY  1
+                     UNTIL   IDX1    >       4
+                     OR      WRK-KOH-MAX     =   4 
                INITIALIZE                  WRK-KOHI-AREA
-               IF      COLDAT02-TKOHID (IDX1)  >   ZERO
+               IF      COLDAT01-KOHIDHC (IDX IDX1)  >   ZERO
                    PERFORM VARYING IDX2    FROM    1   BY  1
                            UNTIL   IDX2    >       10
                            OR      COLDAT01-TKOHID (IDX2)  =   ZERO
-                       IF      COLDAT02-TKOHID (IDX1)  =
+                       IF      COLDAT01-KOHIDHC (IDX IDX1)  =
                                                COLDAT01-TKOHID (IDX2)
                            MOVE    COLDAT01-KOHI-TBL (IDX2)
                                                        TO  WRK-KOHI-AREA
@@ -834,24 +836,25 @@
                        END-IF
                    END-PERFORM
                END-IF
-           END-PERFORM
+             END-PERFORM
       *
-           PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL   IDX1    >       4
-                   OR      WRK-KOH-MAX     =   4 
+             PERFORM VARYING IDX1    FROM    1   BY  1
+                     UNTIL   IDX1    >       4
+                     OR      WRK-KOH-MAX     =   4 
                INITIALIZE                  WRK-KOHI-AREA
                PERFORM 20021-KOH-HENSYU-SEC
-           END-PERFORM
+             END-PERFORM
       *
       *労災情報
       *
-      *    保険区分
-           MOVE    COLDAT01-HKNKBN         TO  WRK-DATA
-           MOVE    1                       TO  WRK-NAGASA
-           MOVE    1                       TO  WRK-END
-           PERFORM 5004-MOJI-HENSYU-SEC
+      *      保険区分
+             MOVE    COLDAT01-HKNKBN         TO  WRK-DATA
+             MOVE    1                       TO  WRK-NAGASA
+             MOVE    1                       TO  WRK-END
+             PERFORM 5004-MOJI-HENSYU-SEC
       *
-           PERFORM 5001-FILE-WRITE-SEC
+             PERFORM 5001-FILE-WRITE-SEC
+           END-PERFORM
            .
        2002-FILE-HENSYU-EXT.
            EXIT. 
