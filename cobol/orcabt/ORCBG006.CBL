@@ -482,6 +482,8 @@
       *        ø«Œ≈≤ Ã‹ ‘Ω∏
                PERFORM 900-SYS1005-DBFETCH-SEC
            END-PERFORM
+      *    ø«Œ≈≤ Ã‹ ‘Ω∏
+           PERFORM 900-SYS1005-DBCLOSE-SEC
       *
            EVALUATE    CNT-SRYKA
                WHEN    1   THRU    4
