@@ -2004,8 +2004,6 @@
            MOVE    2                   TO  FLG-USERPG
            PERFORM 4907-USERPG-SEC
            IF      FLG-END             =   1
-      *        排他制御解除処理
-               PERFORM 990-LOCK-OUT-SEC
                GO      TO      4991-DELETE-SYORI-EXT
            END-IF
       *
@@ -2732,8 +2730,6 @@
            MOVE    1                   TO  FLG-USERPG
            PERFORM 4907-USERPG-SEC
            IF      FLG-END             =   1
-      *        排他制御解除処理
-               PERFORM 990-LOCK-OUT-SEC
                MOVE    ZERO                TO  SPA-KEI-FLG
                GO      TO      49021-KOUSIN-AFTER-EXT
            END-IF
@@ -3299,6 +3295,8 @@
       *
       *    パラメタファイル削除
            PERFORM 992-PARA-DEL-SEC
+      *    排他制御解除処理
+           PERFORM 990-LOCK-OUT-SEC
       *
            IF      FLG-BACK            =   ZERO
                MOVE    "P02"               TO  SPA-SAKIPG

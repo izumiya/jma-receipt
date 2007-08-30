@@ -4051,6 +4051,8 @@
       *****************************************************************
        49071-XD01-SYORI-SEC              SECTION.
       *
+      *    排他制御解除処理
+           PERFORM 990-LOCK-OUT-SEC
            EVALUATE    SPA-MOTOPG
       *        ＣＬＡＩＭ画面より
                WHEN    "U02X"
