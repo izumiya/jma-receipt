@@ -86,6 +86,8 @@
       *                                     変更による対応
       *
       *  02.07.01    NACL-藤原    05/12/12  国保レセプト編綴順対応
+      *
+      *  03.04.01    NACL-藤原    07/09/01  照会機能連携対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4272,6 +4274,7 @@
       *
                EVALUATE    BTPARA-INFO-KBN
                    WHEN    "01"
+                   WHEN    "04"
       *                レセプト指示（個別指示）コード読み込み
                        INITIALIZE                      SYS-2002-REC
                        MOVE    "2002"              TO  SYS-2002-KANRICD
@@ -4292,6 +4295,10 @@
       *
                        PERFORM         UNTIL       FLG-KANRIMST    =   1
                            MOVE    MCPDATA-REC     TO  SYS-2002-REC
+      *
+                           DISPLAY "DELETE PTNUM=" SYS-2002-PTNUM
+                                           " SRYYM=" SYS-2002-SRYYM
+      *
       *                    診療年月の請求管理削除処理
                            INITIALIZE                  RECE10-REC
                            MOVE    SYS-1001-HOSPID TO  RECE10-HOSPID
@@ -4398,6 +4405,10 @@
                        END-IF
       *
                        PERFORM     UNTIL       FLG-PTINF       =   1
+      *
+                           DISPLAY "DELETE PTID=" PTINF-PTID
+                                       " SRYYM=" BTPARA-INFO-PARA (17:6)
+      *
       *                    診療年月の請求管理削除処理
                            INITIALIZE                  RECE10-REC
                            MOVE    SYS-1001-HOSPID TO  RECE10-HOSPID
@@ -4506,6 +4517,10 @@
                        END-IF
       *
                        PERFORM     UNTIL       FLG-PTINF       =   1
+      *
+                           DISPLAY "DELETE PTID=" PTINF-PTID
+                                       " SRYYM=" BTPARA-INFO-PARA (1:6)
+      *
       *                    診療年月の請求管理削除処理
                            INITIALIZE                  RECE10-REC
                            MOVE    SYS-1001-HOSPID TO  RECE10-HOSPID
