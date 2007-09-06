@@ -920,8 +920,9 @@
       *
       *    ¿ôÎÌ£ÚÊÔ½¸
            PERFORM 250-ZHEN-SURYO-SET-SEC
+           MOVE    SPACE               TO  WRK-HENNAIYO
       *
-           IF  WRK-SURYO-X(11:)    =   SPACE
+           IF  WRK-SURYO-X(12:)    =   SPACE
       *        Á´³ÑÊÑ´¹
                MOVE    SPACE               TO  ORCSKANACHKAREA
                INITIALIZE                  ORCSKANACHKAREA
