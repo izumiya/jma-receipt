@@ -4680,7 +4680,7 @@
                                                    HC06-FTNMONEY(2)
                END-IF
                IF      RECE02-KOHNUM (2)   =   "190"
-                   MOVE    SPACE               TO  HC06-TOTALTEN(2)
+                   MOVE    SPACE               TO  HC06-TOTALTEN(3)
                                                    HC06-FTNMONEY(3)
                END-IF
            END-IF
