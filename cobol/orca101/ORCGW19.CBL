@@ -410,6 +410,21 @@
                    IF    ( FLG-ENTRY       =   1 )
                        MOVE    1         TO  SPA-GMN-W19-TSTATUS (IDX1)
                    END-IF
+                   IF    ( SYS-0044-KBNCD  =   "1027" )
+      *
+                       COMPUTE IDX1    =   IDX1    +   1
+      *
+                       MOVE  "0044"      TO  SPA-NAI-W19-TKANRICD(IDX1)
+                       MOVE  "1028"      TO  SPA-NAI-W19-TKBNCD  (IDX1)
+                       MOVE  "チェックマスタ経過措置薬剤更新リスト"
+                                         TO  SPA-GMN-W19-THCNAME (IDX1)
+                       MOVE  "ORCBG018"  TO  SPA-GMN-W19-TPRGNAME(IDX1)
+                                             WRK-PGSRH-CHK-PGNAME
+                       PERFORM 3101-ENTRYPRT-CHK-SEC
+                       IF    ( FLG-ENTRY       =   1 )
+                           MOVE    1     TO  SPA-GMN-W19-TSTATUS (IDX1)
+                       END-IF
+                   END-IF
                WHEN    "3001"
                    MOVE  SYSKANRI-REC    TO  SYS-3001-REC
                    MOVE  SYS-3001-KANRICD
