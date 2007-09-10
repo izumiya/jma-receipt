@@ -363,15 +363,32 @@
       *
            PERFORM 3101-GMN-CLEAR-SEC
       *
-           INITIALIZE              SYS-TOUKEI-REC
+           IF    ( WRK-KANRICD         =   "0044" )
+            AND  ( WRK-KBNCD           =   "1028" )
+               MOVE    ZERO            TO  FLG-SYSKANRI
+               INITIALIZE              SYS-TOUKEI-REC
+               MOVE    "0044"          TO  SYS-TOUKEI-KANRICD
+               MOVE    "1028"          TO  SYS-TOUKEI-KBNCD
+               MOVE    "00000000"      TO  SYS-TOUKEI-STYUKYMD
+               MOVE    "99999999"      TO  SYS-TOUKEI-EDYUKYMD
+               MOVE    "チェックマスタ経過措置薬剤更新リスト"
+                                       TO  SYS-TOUKEI-HCNAME
+               MOVE    "ORCBG018"      TO  SYS-TOUKEI-PRGNAME
+               MOVE    "有効終了日"    TO  SYS-TOUKEI-PARAHYOJI(1)
+               MOVE    "YMD"           TO  SYS-TOUKEI-PARA     (1)
+               MOVE    "1"             TO  SYS-TOUKEI-HISSU-KBN(1)
+               MOVE    SYS-TOUKEI-REC  TO  MCPDATA-REC
+           ELSE
+               INITIALIZE              SYS-TOUKEI-REC
       *
-           MOVE    WRK-KANRICD         TO  SYS-TOUKEI-KANRICD
-           MOVE    WRK-KBNCD           TO  SYS-TOUKEI-KBNCD
-           MOVE    SPA-W10-SEL-STYUKYMD
-                                       TO  SYS-TOUKEI-STYUKYMD
-                                           SYS-TOUKEI-EDYUKYMD
-           MOVE    SYS-TOUKEI-REC      TO  MCPDATA-REC
-           PERFORM 900-SYSKANRI-INV-SEC
+               MOVE    WRK-KANRICD         TO  SYS-TOUKEI-KANRICD
+               MOVE    WRK-KBNCD           TO  SYS-TOUKEI-KBNCD
+               MOVE    SPA-W10-SEL-STYUKYMD
+                                           TO  SYS-TOUKEI-STYUKYMD
+                                               SYS-TOUKEI-EDYUKYMD
+               MOVE    SYS-TOUKEI-REC      TO  MCPDATA-REC
+               PERFORM 900-SYSKANRI-INV-SEC
+           END-IF
       *
            IF    ( FLG-SYSKANRI        =   ZERO )
       *
@@ -444,7 +461,28 @@
                    MOVE    SYS-TOUKEI-PRGNAME
                                            TO  WRK-PGID
       *
-                   PERFORM 3101-TOKEIMEMO-SEL-SEC
+                   IF    ( WRK-KANRICD         =   "0044" )
+                    AND  ( WRK-KBNCD           =   "1028" )
+                       INITIALIZE              TOUKEIMEMO-REC
+                       STRING  "有効終了日　薬剤の有効終了日を入力"
+                                                   DELIMITED   BY  SIZE
+                               "します。"
+                                                   DELIMITED   BY  SIZE
+                               X"0A"
+                                                   DELIMITED   BY  SIZE
+                               X"0A"
+                                                   DELIMITED   BY  SIZE
+                               "※注意：薬剤と病名の区分のみを対象"
+                                                   DELIMITED   BY  SIZE
+                               "としています。他の区分については"
+                                                   DELIMITED   BY  SIZE
+                               "対応していません。"
+                                                   DELIMITED   BY  SIZE
+                       INTO    TKIMEMO-MEMO
+                       END-STRING
+                   ELSE
+                       PERFORM 3101-TOKEIMEMO-SEL-SEC
+                   END-IF
       *
                    MOVE    TKIMEMO-MEMO    TO  SPA-GMN-W10-MEMO1
       *
