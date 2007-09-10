@@ -1086,6 +1086,7 @@
                    MOVE    6           TO  SPA-GMN-CUR
                    GO  TO  430-KEIJYO-SET-EXT
                END-IF
+               ADD     1                TO  IDZ2
            END-IF
       *
       *    形半角文字混在チェック
@@ -1109,6 +1110,7 @@
                    MOVE    7           TO  SPA-GMN-CUR
                    GO  TO  430-KEIJYO-SET-EXT
                END-IF
+               ADD     1                TO  IDZ2
            END-IF
       *
       *    記号半角文字混在チェック
@@ -1128,7 +1130,8 @@
       *        文字数チェック
                IF      KANACHK-SYUBETU =   1
                    MOVE    14              TO  KOU-MAX
-                   PERFORM 430-MARK-HENSYU-SYORI-SEC
+                   PERFORM 430-HENSYU-SYORI-SEC
+      *             PERFORM 430-MARK-HENSYU-SYORI-SEC
                ELSE
                    PERFORM 430-HENSYU-SYORI-SEC
                END-IF
@@ -1146,47 +1149,49 @@
       *****************************************************************
       *   記号半角編集処理
       *****************************************************************
-       430-MARK-HENSYU-SYORI-SEC   SECTION.
+      * 430-MARK-HENSYU-SYORI-SEC   SECTION.
       *
-           MOVE    1               TO  IDX-STR
-           MOVE    1               TO  IDX-KET
-           MOVE    1               TO  IDX-STR1
+      *     MOVE    1               TO  IDX-STR
+      *     MOVE    1               TO  IDX-KET
+      *     MOVE    1               TO  IDX-STR1
       *
-           PERFORM UNTIL  (IDX-STR     >   800 )
-                   OR     (IDZ2        >   GYO-MAX )
-                   OR     (WRK-NAIYOU(IDX-STR:)  =   SPACE)
+      *     PERFORM UNTIL  (IDX-STR     >   800 )
+      *             OR     (IDZ2        >   GYO-MAX )
+      *             OR     (WRK-NAIYOU(IDX-STR:)  =   SPACE)
       *        改行は対象外
-               IF      (WRK-NAIYOU(IDX-STR:1)  =   X"0A")
-                   IF      IDX-STR     >   1
-                       COMPUTE IDX-STR1    =   IDX-STR   -  1
-                   END-IF
+      *         IF      (WRK-NAIYOU(IDX-STR:1)  =   X"0A")
+      *             IF      IDX-STR     >   1
+      *                 COMPUTE IDX-STR1    =   IDX-STR   -  1
+      *             END-IF
       *            行の最後が改行の時
-                   IF     (IDX-KET     =   1)  AND
-                          (IDX-STR     >   1)  AND
-                          (WRK-NAIYOU(IDX-STR1:1)  >=  X"A1")
-                       ADD     1               TO  IDX-STR
-                   ELSE
-                       MOVE    KOU-MAX         TO  IDX-KET
-                       ADD     1               TO  IDX-STR
-                   END-IF
-               ELSE
-                   ADD     1               TO  IDX-STR
-                   ADD     1               TO  IDX-KET
-               END-IF
+      *             IF     (IDX-KET     =   1)  AND
+      *                    (IDX-STR     >   1)
+      *                    (IDX-STR     >   1)  AND
+      *                    (WRK-NAIYOU(IDX-STR1:1)  >=  X"A1")
+      *                 ADD     1               TO  IDX-STR
+      *             ELSE
+      *                 MOVE    KOU-MAX         TO  IDX-KET
+      *                 ADD     1               TO  IDX-STR
+      *             END-IF
+      *         ELSE
+      *             ADD     1               TO  IDX-STR
+      *             ADD     1               TO  IDX-KET
+      *         END-IF
       *
       *        改行、最大文字で改行
-               IF         (IDX-KET         >=  KOU-MAX)
-                   ADD     1               TO  IDZ2
-                   MOVE    1               TO  IDX-KET
-                   IF      WRK-NAIYOU(IDX-STR:1)    =   X"0A"
-                       COMPUTE IDX-STR =   IDX-STR     +   1
-                   END-IF
-               END-IF
-           END-PERFORM
-           .
+      *         IF         (IDX-KET         >=  KOU-MAX)
+      *             ADD     1               TO  IDZ2
+      *             MOVE    1               TO  IDX-KET
+      *             IF      WRK-NAIYOU(IDX-STR:1)    =   X"0A"
+      *                 COMPUTE IDX-STR =   IDX-STR     +   1
+      *             END-IF
+      *         END-IF
       *
-       430-MARK-HENSYU-SYORI-EXT.
-           EXIT.
+      *     END-PERFORM
+      *     .
+      *
+      * 430-MARK-HENSYU-SYORI-EXT.
+      *     EXIT.
       *
       *----(03.04.01)--ADD-END-----
       *****************************************************************
@@ -1202,32 +1207,52 @@
                    OR     (IDZ2        >   GYO-MAX )
                    OR     (WRK-NAIYOU(IDX-STR:)  =   SPACE)
       *        改行は対象外
-               IF      (WRK-NAIYOU(IDX-STR:1)  =   X"0A")
-                   IF      IDX-STR     >   1
-                       COMPUTE IDX-STR1    =   IDX-STR   -  1
-                   END-IF
+      *         IF      (WRK-NAIYOU(IDX-STR:1)  =   X"0A")
+      *             IF      IDX-STR     >   1
+      *                 COMPUTE IDX-STR1    =   IDX-STR   -  1
+      *             END-IF
       *            行の最後が改行の時
-                   IF     (IDX-KET     =   1)  AND
-                          (IDX-STR     >   1)  AND
-                          (WRK-NAIYOU(IDX-STR1:1)  >=  X"A1")
+      *             IF     (IDX-KET     =   1)  AND
+      *                    (IDX-STR     >   1)
+      *                    (IDX-STR     >   1)  AND
+      *                    (WRK-NAIYOU(IDX-STR1:1)  >=  X"A1")
+      *                 ADD     1               TO  IDX-STR
+      *             ELSE
+      *                 MOVE    KOU-MAX         TO  IDX-KET
+      *                 ADD     1               TO  IDX-STR
+      *             END-IF
+      *         ELSE
+      *             IF      WRK-NAIYOU(IDX-STR:1)   >=  X"A1"
+      *                 ADD     2               TO  IDX-STR
+      *                 ADD     2               TO  IDX-KET
+      *             ELSE
+      *                 ADD     1               TO  IDX-STR
+      *             END-IF
+      *             ADD     1               TO  IDX-STR
+      *             ADD     1               TO  IDX-KET
+      *         END-IF
+      *
+      *        改行は対象外
+               IF      (WRK-NAIYOU(IDX-STR:1)  =   X"0A")
+      *            行の最後が改行の時
+                   IF     (IDX-KET     =   1)
                        ADD     1               TO  IDX-STR
                    ELSE
                        MOVE    KOU-MAX         TO  IDX-KET
                        ADD     1               TO  IDX-STR
                    END-IF
                ELSE
-                   IF      WRK-NAIYOU(IDX-STR:1)   >=  X"A1"
-                       ADD     2               TO  IDX-STR
-                       ADD     2               TO  IDX-KET
-                   ELSE
+                   ADD     1               TO  IDX-STR
+                   ADD     1               TO  IDX-KET
+               END-IF
+      *        改行、最大文字で改行
+               IF         (IDX-KET         >=  KOU-MAX)
+                   ADD     1               TO  IDZ2
+                   ADD     1               TO  IDX-STR
+                   MOVE    1               TO  IDX-KET
+                   IF      WRK-NAIYOU(IDX-STR:1)    =   X"0A"
                        ADD     1               TO  IDX-STR
                    END-IF
-               END-IF
-      *
-      *        改行、最大文字で改行
-               IF     (IDX-KET         >=  KOU-MAX)
-                   ADD     1               TO  IDZ2
-                   MOVE    1               TO  IDX-KET
                END-IF
            END-PERFORM
            .
@@ -1261,7 +1286,7 @@
            PERFORM UNTIL   IDZ <       1
                IF        ( KANACHK-OUT-INPUT(IDZ:1)    =   SPACE )
                    OR    ( KANACHK-OUT-INPUT(IDZ:1)    =   X"0A" )
-                   OR    ( KANACHK-OUT-INPUT(IDZ:1)    =   X"A1" )
+      *             OR    ( KANACHK-OUT-INPUT(IDZ:1)    =   X"A1" )
                    COMPUTE IDZ =   IDZ -   1
                ELSE
                    IF    ( KANACHK-OUT-INPUT(IDZ:2)    =   "　"  )
