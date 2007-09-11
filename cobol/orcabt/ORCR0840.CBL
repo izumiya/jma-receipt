@@ -113,6 +113,7 @@
       *  03.03.07    NACL-ÌçÏÆ    07/05/15  ÅÀÅ©¤Îµ­ºÜÊÔ½¸½¤Àµ
       *  03.03.08    NACL-ÌçÏÆ    07/06/07  Æþ±¡¼¼ÎÁ²Ã»»¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  03.03.09    NACL-ÌçÏÆ    07/07/17  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°ÊÔ½¸½¤Àµ
+      *  03.03.10    NACL-ÌçÏÆ    07/09/11  ÅÀÅ©¼êµ»½¸·×½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6654,19 +6655,34 @@
       **************¡Ê¿·ÍÍ¼°¡Ë
                     ADD   RECE84-ZAIKAISU    TO   RECE82-KAISU(12)
       *
-                    COMPUTE   RECE82-TENSU-YAK(13)  =
-                              RECE82-TENSU-YAK(13)  +
-                              (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                    IF    FLG-SIKIBETU  =  3 OR 4
+                       COMPUTE   RECE82-TENSU(12)  =
+                                 RECE82-TENSU(12)  +
+                                 (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                    ELSE
+                       COMPUTE   RECE82-TENSU-YAK(13)  =
+                                 RECE82-TENSU-YAK(13)  +
+                                 (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                    END-IF
                   WHEN      "5"
       **************¡Ê½¾ÍèÍÍ¼°¡Ë
                     ADD   RECE84-ZAIKAISU    TO   RECE82-KAISU(13)
       *
-                    COMPUTE   RECE82-TENSU(13)  =
-                              RECE82-TENSU(13)  +
-                              (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
-                    COMPUTE   TBL-YKZTEN-JI(13) =
-                              TBL-YKZTEN-JI(13) +
-                              (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                    IF    FLG-SIKIBETU  =  3 OR 4
+                       COMPUTE   RECE82-TENSU(13)  =
+                                 RECE82-TENSU(13)  +
+                                 (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                       COMPUTE   TBL-SYUTEN-JI(13)  =
+                                 TBL-SYUTEN-JI(13)  +
+                                 (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                    ELSE
+                       COMPUTE   RECE82-TENSU(13)  =
+                                 RECE82-TENSU(13)  +
+                                 (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                       COMPUTE   TBL-YKZTEN-JI(13) =
+                                 TBL-YKZTEN-JI(13) +
+                                 (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                    END-IF
                 END-EVALUATE
            END-IF
            .                                           
