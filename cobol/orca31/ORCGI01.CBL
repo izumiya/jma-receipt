@@ -173,6 +173,7 @@
            03  FLG-SRYACCT                 PIC 9(01).
            03  FLG-SYUARI                  PIC 9(01).
            03  FLG-RJN                     PIC 9(01).
+           03  FLG-LIFE-RJN                PIC 9(01).
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-NYUINACCTARI            PIC 9(01).
            03  FLG-WKPTTEIKIRRK            PIC 9(01).
@@ -4286,6 +4287,9 @@
                        SPA-NAI-I01-BRMKHNKBNCD
                        SPA-NAI-I01-SELNYUKHN
       *
+           MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
+           PERFORM 4801-RJN-TAISYO-CHK-SEC
+      *
       *    ÉÂÅï¾ðÊó¤«¤é¥³¥ó¥Ü¹àÌÜ¤òÀßÄê
            MOVE    "5001"          TO  WRK-KANRICD
            MOVE    SPA-GMN-I01-BTUNAME-CD
@@ -4327,34 +4331,34 @@
       *
                        IF    ( SYS-5001-BTU-SBT            =   "04" )
                         AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
-                           IF    ( SYS-5111-SEIKATU-RYOKBN
+                           IF    ( FLG-LIFE-RJN            =   ZERO )
+                            OR   ( SPA-NAI-I01-RSI-HKNKBN
+                                           NOT =   SPACE )
+                               IF    ( SYS-5111-SEIKATU-RYOKBN
                                                            =   SPACE )
-                               MOVE    1   TO  FLG-TARGET
+                                   MOVE    1   TO  FLG-TARGET
+                               END-IF
                            ELSE
-                               PERFORM 41011-PT-AGE-SEC
-                               IF    ( WRK-NENREI >=  70 )
-                                OR   ( FLG-ROUJIN  =   1 )
-                                    IF    ( SPA-NAI-I01-RSI-HKNKBN
-                                                   =   SPACE )
-                                        MOVE    1  TO  FLG-TARGET
-                                    END-IF
+                               IF    ( SYS-5111-SEIKATU-RYOKBN
+                                                       NOT =   SPACE )
+                                   MOVE    1   TO  FLG-TARGET
                                END-IF
                            END-IF
                        END-IF
       *
                        IF    ( SYS-5001-BTU-SBT            =   "09" )
                         AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
-                           IF    ( SYS-5111-SEIKATU-RYOKBN
+                           IF    ( FLG-LIFE-RJN            =   ZERO )
+                            OR   ( SPA-NAI-I01-RSI-HKNKBN
+                                           NOT =   SPACE )
+                               IF    ( SYS-5111-SEIKATU-RYOKBN
                                                            =   SPACE )
-                               MOVE    1   TO  FLG-TARGET
+                                   MOVE    1   TO  FLG-TARGET
+                               END-IF
                            ELSE
-                               PERFORM 41011-PT-AGE-SEC
-                               IF    ( WRK-NENREI >=  70 )
-                                OR   ( FLG-ROUJIN  =   1 )
-                                    IF    ( SPA-NAI-I01-RSI-HKNKBN
-                                                   =   SPACE )
-                                        MOVE    1  TO  FLG-TARGET
-                                    END-IF
+                               IF    ( SYS-5111-SEIKATU-RYOKBN
+                                                       NOT =   SPACE )
+                                   MOVE    1   TO  FLG-TARGET
                                END-IF
                            END-IF
                        END-IF
@@ -4722,9 +4726,9 @@
       *****************************************************************
        41011-TOKNYUIN-SYOKI-SEC        SECTION.
       *
-           PERFORM 41011-PT-AGE-SEC
-           IF    ( WRK-NENREI  >=  70 )
-            OR   ( FLG-ROUJIN  =   1 )
+           MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
+           PERFORM 4801-RJN-TAISYO-CHK-SEC
+           IF    ( FLG-LIFE-RJN                =   1 )
                IF    ( SPA-NAI-I01-RSI-HKNKBN  =   SPACE )
                    PERFORM VARYING IDX10   FROM    1   BY  1
                            UNTIL ( IDX10 > CONST-TOK-LIFECD-MAX)
@@ -13996,6 +14000,7 @@
        4801-RJN-TAISYO-CHK-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-RJN
+           MOVE    ZERO                TO  FLG-LIFE-RJN
       *
       *    Æþ±¡´µ¼Ô¤ÎÏ·¿ÍÊÝ¸±È½Äê
            MOVE    ZERO                TO   FLG-HKNCOMBI
@@ -14071,6 +14076,16 @@
            MOVE    "tbl_ptkohinf"   TO   MCP-TABLE
            MOVE    "key6"           TO   MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           MOVE    FLG-RJN          TO  FLG-LIFE-RJN
+      *
+      *    Ï·¿ÍÂÐ¾Ý´µ¼ÔÈ½Äê
+           IF    ((FLG-HKNCOMBI     =   ZERO)    AND
+                  (COMB-KOH1HKNNUM  =   "027"))      OR
+                  (AGECHK-NENREI   >=    70)
+               MOVE    1            TO  FLG-LIFE-RJN
+           END-IF
+      *
       *
            .
        4801-RJN-TAISYO-CHK-EXT.
