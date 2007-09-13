@@ -159,6 +159,8 @@
       *  03.04.10    NACL-ÌçÏÆ    07/05/07  Âè£²¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜ¾ò·ï½¤Àµ
       *  03.04.11    NACL-Æ£¸¶    07/09/04  µÜºê¸©¡Ö¸øÈñ£¹£°¡×ÂÐ±þ
       *                                     £²£°£°£·Ç¯£¹·î°Ê¹ß¤Î¤ßÂÐ¾Ý 
+      *  03.04.12    NACL-Æ£¸¶    07/09/11  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ
+      *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2711,6 +2713,20 @@
                      END-IF
                     END-IF
                    END-IF
+               END-IF
+           END-IF
+      *
+      *    ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+           IF      CNT-PAGE            =   1
+               IF    ( RECE02-PREFNUM      =   "15"   )
+               AND   ( RECE02-SRYYM        >=  200709 )
+               AND   ( RECE02-SRYYM        <=  200712 )
+                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -7307,6 +7323,17 @@
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬
            MOVE    RECE02-SHOKUJIFTNKBN
                                        TO  RECE10-SHOKUJIFTNKBN
+      *
+      *    ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+           IF    ( RECE02-PREFNUM      =   "15"   )
+           AND   ( RECE02-SRYYM        >=  200709 )
+           AND   ( RECE02-SRYYM        <=  200712 )
+               IF      RECE02-RJNGAIKOHFTN (1)
+                                           >   ZERO
+                   MOVE    RECE02-RJNGAIKOHFTN (1)
+                                           TO  RECE10-ETC-YKZFTN (1)
+               END-IF
+           END-IF
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "SEIKYU-KEY"        TO  ORC-DBPATH

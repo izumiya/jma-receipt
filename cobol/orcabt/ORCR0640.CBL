@@ -252,6 +252,8 @@
       *  03.04.21    NACL-ÃÁœ∆    07/07/31  £∑£∞∫–Ã§À˛∏Ω ™µÎ…’ ›∏±º‘ÀË§«∑◊ªª
       *  03.04.22    NACL-ÃÁœ∆    07/08/10  ÀÃ≥§∆ª£¥£±œ∑øÕ∏Ω ™µÎ…’¬–±˛Ω§¿µ
       *  03.04.23    NACL-ÃÁœ∆    07/09/03  ∏∫≥€∏∫Ã»¡¥πÒ∏¯»Ò¬–±˛
+      *  03.04.24    NACL-∆£∏∂    07/09/11  ø∑≥„∏©√Ê±€≤≠√œøÃ¬–±˛
+      *                                     £≤£∞£∞£∑«Ø£π∑Ó°¡£±£≤∑Ó¬–æ› 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2034,6 +2036,40 @@
                IF      KOHIDX          >   ZERO
                    PERFORM 300-KYUFUGAI-HENSYU-SEC
                END-IF 
+           END-IF
+      *
+      *    ø∑≥„∏©√Ê±€≤≠√œøÃ¬–±˛ 
+           IF    ( IDZ                 =   1      )
+           AND   ( SYS-1001-PREFNUM    =   "15"   )
+           AND   ( RECE62-SRYYM        >=  200709 )
+           AND   ( RECE62-SRYYM        <=  200712 )
+               IF    ( RECE62-HKNNUM   NOT =   SPACE )
+               AND   ( RECE62-HKNJANUM     =   SPACE )
+                   MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
+               ELSE
+                   IF    ( RECE62-RJNHKNNUM
+                                           NOT =   SPACE )
+                   AND   ( RECE62-RJNFTNJANUM  =   SPACE )
+                       MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
+                   ELSE
+      *                ∏∫Ã»¬–æ›º‘§Œ§»§≠   
+                       IF      RECE62-GENMENKBN    >   ZERO
+                           MOVE    2       TO  RECE62-RJNGAIKOHFTN (1)
+                       END-IF
+      *                µ≠πÊ°¶»÷πÊ§¨…‘Ã¿§Œ§»§≠
+                       IF    ( RECE62-HKNNUM   NOT =   SPACE )
+                       AND   ( RECE62-KIGO         =   SPACE )
+                       AND   ( RECE62-NUM          =   SPACE )
+                           MOVE    1       TO  RECE62-RJNGAIKOHFTN (1)
+                       END-IF   
+      *                œ∑øÕ ›∑Ú§ŒºıµÎº‘»÷πÊ§¨…‘Ã¿§Œ§»§≠
+                       IF    ( RECE62-RJNHKNNUM
+                                               NOT =   SPACE )
+                       AND   ( RECE62-RJNJKYSNUM   =   SPACE )
+                           MOVE    1       TO  RECE62-RJNGAIKOHFTN (1)
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
            PERFORM     RECE62-REWRITE-SEC
