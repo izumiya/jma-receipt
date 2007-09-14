@@ -66,6 +66,8 @@
       *
       *  03.04.01    NACL-∆£∏∂    07/08/20  ∆±∞Ï√œ ˝∏¯»Ò§Œ§ﬁ§»§·Ω∏∑◊
       *                                     ÀÃ≥§∆ª¬–±˛
+      *  03.04.02    NACL-∆£∏∂    07/09/11  ø∑≥„∏©√Ê±€≤≠√œøÃ¬–±˛
+      *                                     £≤£∞£∞£∑«Ø£π∑Ó°¡£±£≤∑Ó¬–æ› 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -148,13 +150,14 @@
       *    •—•È•·•øŒŒ∞Ë
        01  WRK-PARA.
            COPY    "CPORCSPRTLNK.INC".
+           03  WRK-PARA-HOSPID     PIC X(24).
            03  WRK-PARA-JOBID      PIC 9(07).
            03  WRK-PARA-SHELLID    PIC X(08).
-           03  WRK-PARA-HOSPID     PIC X(24).
            03  WRK-PARA-PAGE       PIC 9(10).
            03  WRK-PARA-NYUGAIKBN  PIC X(01).
            03  WRK-PARA-SYOKBN     PIC X(01).
            03  WRK-PARA-MARUCHO    PIC X(01).
+           03  WRK-PARA-GENMENKBN  PIC 9(01).
       *          
       *    ∞Ïª˛ŒŒ∞Ë
        01  WRK-AREA.
@@ -339,7 +342,11 @@
                                                WRK-PARA-NYUGAIKBN
                                                WRK-PARA-SYOKBN
                                                WRK-PARA-MARUCHO 
-           END-UNSTRING  
+           END-UNSTRING
+      *    ø∑≥„∏©√Ê±€≤≠√œøÃ¬–±˛
+           MOVE    LNK-PRTKANRI-PRIORITY
+                                   TO  WRK-PARA-GENMENKBN
+           MOVE    ZERO            TO  LNK-PRTKANRI-PRIORITY
       *
       *    •π•∆•√•◊¥…Õ˝≥´ªœΩËÕ˝
            MOVE    "STS"           TO  SJOBKANRI-MODE
@@ -348,8 +355,13 @@
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
            MOVE    "ORCBM022"      TO  JOB-PGID
-           MOVE    "º“ ›¡Ì≥Á…Ω° ≤˛¿µ»«°À"
+           IF      WRK-PARA-GENMENKBN  =   ZERO 
+               MOVE    "º“ ›¡Ì≥Á…Ω° ≤˛¿µ»«°À"
                                    TO  JOB-SHELLMSG
+           ELSE
+               MOVE    "Ã§≥ŒƒÍ ¨°¶º“ ›¡Ì≥Á…Ω° ≤˛¿µ»«°À"
+                                   TO  JOB-SHELLMSG
+           END-IF
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA  
                                    JOBKANRI-REC
@@ -1566,6 +1578,16 @@
                                    NOT =   WRK-NYUGAIKBN
                    GO  TO  900-SEIKYU-READ-SEC
                END-IF
+               EVALUATE    WRK-PARA-GENMENKBN
+                   WHEN    ZERO
+                       IF      RECE10-ETC-YKZFTN (1)   >   ZERO
+                           GO  TO  900-SEIKYU-READ-SEC
+                       END-IF
+                   WHEN    1
+                       IF      RECE10-ETC-YKZFTN (1)   =   ZERO
+                           GO  TO  900-SEIKYU-READ-SEC
+                       END-IF
+               END-EVALUATE 
       *
       *        •∆•π•»¥µº‘§Œ§»§≠§œ∆…§ﬂ»Ù§–§π
                MOVE    SPACE               TO  PTINF-REC
@@ -1581,7 +1603,7 @@
       *         
                ADD     1                   TO  CNT-RECE10
       *         
-               DISPLAY "PTNUM=" RECE10-PTNUM 
+               DISPLAY "PTNUM=" RECE10-PTNUM " " RECE10-ETC-YKZFTN (1)
       *         
            ELSE
                MOVE    1                   TO  FLG-RECE10

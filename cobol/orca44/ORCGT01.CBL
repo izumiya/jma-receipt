@@ -85,6 +85,8 @@
       *  03.02.02    NACL-Æ£¸¶    06/07/31  ¹ñÊÝ¼ç²ÊÂÐ±þ
       *
       *  03.04.01    NACL-Æ£¸¶    06/12/05  Ì¤ÀÁµá¥ì¥»ÂÐ±þ
+      *  03.04.02    NACL-Æ£¸¶    07/09/11  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ
+      *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -175,6 +177,7 @@
              05  WRK-SHELL-SYSYMD  PIC  X(08).  
       *       
            03  WRK-SHELL-RECEKBN   PIC X(01).
+           03  WRK-SHELL-SYOKBN    PIC X(01).
       *  
            03  WRK-STPAGE          PIC 9(05).
            03  WRK-EDPAGE          PIC 9(05).
@@ -2129,9 +2132,19 @@
                WHEN    T01-DATAKBN4-VALUE    =   "T"
                    IF      SPA-NAI-PRTKBN1       =   SPACE  
                        MOVE    "1"                 TO  WRK-SHELL-RECEKBN
+                       MOVE    "1"                 TO  WRK-SHELL-SYOKBN
                        PERFORM 45013-SOKATU-SYORI-SEC
+      *
+      *                ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+                       IF    ( SPA-PREFNUM       =   "15"   )
+                       AND   ( SPA-NAI-SKYYM     >=  200709 )
+                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
+                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
+                           PERFORM 45013-SOKATU-SYORI-SEC
+                       END-IF
                    END-IF     
            END-EVALUATE                                               
+           MOVE    SPACE               TO  WRK-SHELL-SYOKBN
       *     
       *    Áí³çÉ½°õºþ¡Ê¹ñÊÝ¡Ë
            EVALUATE    TRUE
@@ -2404,6 +2417,13 @@
                                    TO  SHELLTBL-ARG7       
            MOVE    LNK-PRTKANRI-PRIORITY
                                    TO  SHELLTBL-ARG8      
+      *    ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+           IF    ( WRK-SHELL-RECEKBN   =   "1" )
+           AND   ( WRK-SHELL-SYOKBN    =   "2" )
+               MOVE    1               TO  LNK-PRTKANRI-PRIORITY
+               MOVE    LNK-PRTKANRI-PRIORITY
+                                       TO  SHELLTBL-ARG8      
+           END-IF
            MOVE    LNK-PRTKANRI-TERMID
                                    TO  SHELLTBL-ARG9       
            MOVE    LNK-PRTKANRI-OPID
