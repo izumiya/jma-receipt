@@ -175,6 +175,8 @@
       *  03.04.06    NACL-Æ£¸¶    07/07/10  ÆÃÄê´ïºàºÆÊÔ½¸ÍÑ¤Î´ïºàÅÀ¿ôÄÉ²Ã
       *  03.04.07    NACL-Æ£¸¶    07/09/04  µÜºê¸©¡Ö¸øÈñ£¹£°¡×ÂÐ±þ
       *                                     £²£°£°£·Ç¯£¹·î°Ê¹ß¤Î¤ßÂÐ¾Ý 
+      *  03.04.08    NACL-Æ£¸¶    07/09/11  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ
+      *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7470,7 +7472,17 @@
                                    MOVE    1           TO  FLG-READ
                                END-IF
                            ELSE
-                               MOVE    1               TO  FLG-READ
+      *                        ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+                               IF    ( SYS-1001-PREFNUM    =   "15"   )
+                               AND   ( RECE62-SRYYM        >=  200709 )
+                               AND   ( RECE62-SRYYM        <=  200712 )
+                                   IF      RECE62-RJNGAIKOHFTN (1)
+                                                           =   ZERO
+                                       MOVE    1           TO  FLG-READ
+                                   END-IF
+                               ELSE
+                                   MOVE    1               TO  FLG-READ
+                               END-IF
                            END-IF
                        END-IF    
       *
