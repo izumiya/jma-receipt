@@ -254,6 +254,8 @@
       *  03.04.23    NACL-ÌçÏÆ    07/09/03  ¸º³Û¸ºÌÈÁ´¹ñ¸øÈñÂÐ±þ
       *  03.04.24    NACL-Æ£¸¶    07/09/11  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ
       *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
+      *  03.04.25    NACL-ÌçÏÆ    07/09/27  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ½¤Àµ
+      *                                     ¡ÊÏ·¿Í¤ÏÂÐ¾Ý³°¤È¤¹¤ë¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11629,8 +11631,12 @@
                               "133207" OR "133223" OR
                               "133249" OR "133256" OR
                               "133272"
+               IF  RECE62-RJNHKNNUM  NOT =  SPACE
+                CONTINUE
+               ELSE
                 MOVE   ZERO                 TO  WRK-JYOGEN-KOH
                 MOVE   ZERO                 TO  FLG-IRYOHI70K
+               END-IF
              END-IF
            ELSE
              INITIALIZE                     LNK-ORCSJGNGET-REC

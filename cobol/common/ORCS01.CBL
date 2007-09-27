@@ -227,6 +227,8 @@
       *  03.04.17    NACL-門脇    07/09/03  減額減免全国公費対応
       *  03.04.18    NACL-門脇    07/09/12  東京都マル子対応
       *  03.04.19    NACL-門脇    07/09/13  所沢市乳幼児対応
+      *  03.04.20    NACL-門脇    07/09/27  特定保険者＋精神、結核対応修正
+      *                                     （老人は対象外とする）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4607,7 +4609,11 @@
                                              "133207" OR "133223" OR
                                              "133249" OR "133256" OR
                                              "133272"
+                    IF     COMB-KOH1HKNNUM    =     "027"
+                      CONTINUE
+                    ELSE
                       MOVE    1      TO    FLG-SEISINJYO
+                    END-IF
                   END-IF
                   IF   PTHKN-HKNJANUM      = "67330753"
                       MOVE    1      TO    FLG-TOKUREI-HKNJYA
