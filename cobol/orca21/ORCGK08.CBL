@@ -804,9 +804,11 @@
            IF      SPA-MOTOPG          =   "KERR"
                IF     (SPA-ERRMSG2     NOT =   SPACE )  AND
                       (SPA-KEI-FLG         =   1     )
+                   MOVE    SPACE               TO  SPA-ERRMSG2
                    MOVE    "JOIN"              TO  WRK-MCP-PUTTYPE
                    PERFORM 45021-END-SYORI-SEC
                ELSE
+                   MOVE    SPACE               TO  SPA-ERRMSG2
                    MOVE    SPACE               TO  SPA-MOTOPG
                    PERFORM 5001-MAPCUR-SEC
                END-IF
@@ -955,6 +957,9 @@
       *            入院更新処理
                    MOVE    1               TO  FLG-KAKU-FLG
                    PERFORM 4502-NYUKOUSIN-SYORI-SEC
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       PERFORM 510-ERRSET-SEC
+                   END-IF
                WHEN    2
       *        発行のみ
                    IF      (SPA-K081GMN-SYOHOU     =   "1" )  OR
