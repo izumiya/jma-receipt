@@ -256,6 +256,7 @@
       *                                     ２００７年９月〜１２月対象 
       *  03.04.25    NACL-門脇    07/09/27  特定保険者＋精神、結核対応修正
       *                                     （老人は対象外とする）
+      *  03.04.26    NACL-門脇    07/10/03  秋田県乳幼児一部負担金記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10711,6 +10712,11 @@
                          END-IF
                      END-IF
                  END-IF
+               END-IF
+               IF  (WRK-PREFNUM               =   05  ) AND
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "174")
+                     MOVE  "1"  TO
+                             RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
              END-IF
       *
