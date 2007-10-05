@@ -4394,7 +4394,8 @@
                        END-IF
                    WHEN  ( SYS-5001-BTU-TOKTEI-NYUIN
                                        =   "13" OR "16" )
-                       IF    ( FLG-LIFE-RJN            =   ZERO )
+                       IF    ( FLG-LIFE-RJN        =   ZERO )
+                        OR   ( SPA-NAI-I01-BTUSBT  NOT =   "04" )
                            MOVE    "5110"      TO  WRK-KANRICD
                            MOVE    "13"        TO  WRK-KBNCD
                            MOVE    "2"         TO  WRK-TOKNYUIN-KBN
@@ -4436,7 +4437,8 @@
                    WHEN    ( SYS-5002-BRM-TOKTEI-NYUIN   =   "02"
                                                           OR "49")
       *
-                       IF    ( FLG-LIFE-RJN              =   ZERO )
++                       IF    ( FLG-LIFE-RJN        =   ZERO )
++                        OR   ( SPA-NAI-I01-BTUSBT  NOT =   "09" )
                            MOVE    "5111"      TO  WRK-KANRICD
                            MOVE    "02"        TO  WRK-KBNCD
                            MOVE    "3"         TO  WRK-TOKNYUIN-KBN
@@ -4485,7 +4487,9 @@
            END-IF
       *
       *    短期滞在手術基本料をコンボに設定
-           IF    ( FLG-LIFE-RJN            =   ZERO )
+           IF    ( FLG-LIFE-RJN        =   ZERO )
+            OR  (( SPA-NAI-I01-BTUSBT  NOT =   "04" )
+             AND ( SPA-NAI-I01-BTUSBT  NOT =   "09" ))
                MOVE    "5111"      TO  WRK-KANRICD
                MOVE    "21"        TO  WRK-KBNCD
                MOVE    "3"         TO  WRK-TOKNYUIN-KBN
