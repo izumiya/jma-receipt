@@ -214,6 +214,9 @@
       *  03.04.06    NACL-藤原    07/05/14  カナチェック後の編集の修正
       *  03.04.07    NACL-藤原    07/06/21  処理区分、入外区分変更時の
       *                                     診療科の表示
+      *  03.04.08    NACL-藤原    07/10/12  ファンクションキー操作による
+      *                                     処理区分、入外区分変更時の
+      *                                     診療科の表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7707,6 +7710,9 @@
                                        SPA-GMN-C02-MAX
                                        SPA-PTBYOMEI-REC
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
+           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+               MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
+           END-IF
       *
            EVALUATE    SPA-GMN-C02-SYOKBN
                WHEN    ZERO
@@ -7765,6 +7771,9 @@
                                        SPA-GMN-C02-MAX
                                        SPA-PTBYOMEI-REC
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
+           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+               MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
+           END-IF
       *
            EVALUATE    SPA-GMN-C02-HNYUGAIKBN
                WHEN    ZERO
