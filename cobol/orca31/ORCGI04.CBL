@@ -3012,6 +3012,9 @@
                GO  TO  452-TOUROKU-EXT
            END-IF
       *
+           PERFORM 900-PTNYUINRRK-KEY-SEL-SEC
+           MOVE    PTNYUINRRK-REC  TO  WKPTNYUINRRK-REC
+      *
       *    帳票出力処理
            PERFORM 451-PRTOUT-SEC
       *
@@ -4159,6 +4162,36 @@
       *
            .
        900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE  PTNYUINRRK-REC
+           MOVE    SPA-HOSPID          TO  PTNYUINRRK-HOSPID
+           MOVE    SPA-NAI-I04-PTID    TO  PTNYUINRRK-PTID
+           MOVE    SPA-I01-I04-RRKNUM  TO  PTNYUINRRK-RRKNUM
+           MOVE    SPA-I01-I04-RRKEDANUM TO PTNYUINRRK-RRKEDANUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+               INITIALIZE                  PTNYUINRRK-REC
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    システム管理検索処理(KEY10)
