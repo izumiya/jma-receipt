@@ -71,6 +71,8 @@
       *  03.03.04    NACL-ÌçÏÆ    07/02/15  ¡ãµÜºê¡ä£°£¹£±¡Ü¾ã³²¤Î
       *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
       *  03.04.05    NACL-ÌçÏÆ    07/02/21  ¹â³Û¸½ÊªµëÉÕÂÐ±þ
+      *  03.04.06    NACL-ÌçÏÆ    07/10/16  ¡ã²¬»³¡ä£°£¹£±¡ÜÃÏÊý¸øÈñ
+      *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3553,8 +3555,8 @@
                             END-IF
                           WHEN     33
                             IF  WRK-SRT-HJO-KOHNO  =  "091"
-                             IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(2:2)
-                                                          = "80"
+                             IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
+                                             >=  "1" AND <=  "8"
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                             ELSE
