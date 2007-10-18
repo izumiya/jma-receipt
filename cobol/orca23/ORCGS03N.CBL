@@ -1578,7 +1578,11 @@
       *
       *
            IF    ( SPA-NAI-HEAD-DENPJTIKBN =   "3" )
-               MOVE    WIDGET-INSENSITIVE 
+               IF    ( SPA-NAI-LASTHENKINFLG
+                           =   1 )
+                   CONTINUE
+               ELSE
+                   MOVE    WIDGET-INSENSITIVE 
                                        TO  S03N-CHOSEIIN-STATE
                                            S03N-NYUKINGK2-STATE
                                            S03N-NYUKINYMD-STATE
@@ -1589,6 +1593,7 @@
                                            S03N-SRYPRT-STATE
                                            S03N-SRYPRTLST-STATE
                                            S03N-B12-STATE
+               END-IF
       *
                MOVE    SPACE               TO  S03N-B03-LABEL
       *
