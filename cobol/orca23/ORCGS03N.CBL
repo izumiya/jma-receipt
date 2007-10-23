@@ -1504,11 +1504,7 @@
            END-IF
       *
            IF    ( SPA-S01-SYORINO     =   CONST-PROC-SYOKAI )
-               IF    ( SPA-NAI-LASTHENKINFLG
-                           =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    WIDGET-INSENSITIVE 
+               MOVE    WIDGET-INSENSITIVE
                                        TO  S03N-NYUKINGK2-STATE
                                            S03N-NYUKINYMD-STATE
                                            S03N-NYUKINHOUHOU-STATE
@@ -1518,7 +1514,6 @@
                                            S03N-SRYPRT-STATE
                                            S03N-SRYPRTLST-STATE
                                            S03N-B12-STATE
-               END-IF
            END-IF
       *
            IF    ( SPA-NAI-HEAD-DENPJTIKBN =   "3" )
