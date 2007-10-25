@@ -894,9 +894,9 @@
                    MOVE    2               TO  SPA-K10GMN-CUR
                END-IF
            ELSE
-               IF     (SPA-K10-HKNCOMBI(SPA-K10-SELNUM)
-                                           =   "9999"  ) OR
-                      (SPA-K10-HKNKBN (SPA-K10-SELNUM)
+      ****     IF     (SPA-K10-HKNCOMBI(SPA-K10-SELNUM)
+      ****                                 =   "9999"  ) OR
+               IF     (SPA-K10-HKNKBN (SPA-K10-SELNUM)
                                            =   "1"     )
                    MOVE    "0006"          TO  SPA-ERRCD
                    MOVE    2               TO  SPA-K10GMN-CUR
