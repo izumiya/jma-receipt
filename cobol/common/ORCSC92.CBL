@@ -766,6 +766,7 @@
       *    対象年齢チェック
            IF     (LNK-SC92-SRYCD(1:1) =   "1" )  OR
                   (LNK-SC92-SRYCD(1:1) =   "7" )
+             OR   (LNK-SC92-SRYCD(1:3) =   "059" )
                MOVE    TNS-KGNAGE          TO  WRK-TNS-KGNAGE
                MOVE    TNS-JGNAGE          TO  WRK-TNS-JGNAGE
                PERFORM 2003-NENREI-CHK-SEC
