@@ -142,7 +142,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20070809".
+       01  PRGSKBNO                PIC X(08)  VALUE "20071029".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
@@ -361,6 +361,11 @@
        01  TBL-JNISSU.
            03  TBL-JNISSU-HKN                          OCCURS   5.
                05  TBL-JNISSU-DAY                      PIC X(01)
+                                                       OCCURS   31.
+      *    実日数カウント用退避領域
+       01  TBL-JNISSU-S.
+           03  TBL-JNISSU-HKN-S                        OCCURS   5.
+               05  TBL-JNISSU-DAY-S                    PIC X(01)
                                                        OCCURS   31.
       *    実日数減カウント用領域
        01  TBL-JNISSU-GEN.
@@ -1077,6 +1082,7 @@
       *
            INITIALIZE                  WRK-COLDAT01-TABLE
            INITIALIZE                  TBL-JNISSU
+           INITIALIZE                  TBL-JNISSU-S
            INITIALIZE                  TBL-JNISSU-GEN
            INITIALIZE                  TBL-TOTALTENSU-INF
            INITIALIZE                  TBL-SKJNISSU-INF
@@ -1174,6 +1180,7 @@
       *        実日数、点数編集
                PERFORM   20012-JNISSU-SET-SEC
                PERFORM   20013-TOTALTENSU-SET-SEC
+               MOVE    TBL-JNISSU      TO  TBL-JNISSU-S
                INITIALIZE                  TBL-JNISSU
                INITIALIZE                  TBL-JNISSU-GEN
                INITIALIZE                  TBL-TOTALTENSU-INF
@@ -1801,11 +1808,11 @@
                    MOVE    PTNYUINRRK-NYUINKA
                                        TO  TBL-NYUINKA (IDX-DAY)
                END-PERFORM
-             END-IF
-             MOVE    PTNYUINRRK-NYUINYMD
+               MOVE    PTNYUINRRK-NYUINYMD
                                        TO  WRK-NYUINYMD
-             MOVE    PTNYUINRRK-TAIINYMD
+               MOVE    PTNYUINRRK-TAIINYMD
                                        TO  WRK-TAIINYMD
+             END-IF
              PERFORM 900-PTNYUINRRK-KEY41-FET-SEC
            END-PERFORM
       *
@@ -1823,6 +1830,7 @@
       *
            INITIALIZE                  WRK-COLDAT01-TABLE
            INITIALIZE                  TBL-JNISSU
+           INITIALIZE                  TBL-JNISSU-S
            INITIALIZE                  TBL-JNISSU-GEN
            INITIALIZE                  TBL-TOTALTENSU-INF
            INITIALIZE                  TBL-SKJNISSU-INF
@@ -2662,8 +2670,10 @@
       *    主保険
            PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
                       UNTIL      ACCT-IDX    >     31
-                    IF    TBL-JNISSU-DAY(1 ACCT-IDX)
-                                        NOT =  SPACE
+                    IF  ( TBL-JNISSU-DAY(1 ACCT-IDX)
+                                        NOT =  SPACE )
+                    AND ( TBL-JNISSU-DAY-S(1 ACCT-IDX)
+                                            =  SPACE )
                           ADD    1      TO    COLDAT01-HKNJNISSU
                     END-IF
                     ADD   TBL-SKJNISSU(1 ACCT-IDX)
@@ -2674,8 +2684,10 @@
                       UNTIL      JN-IDX    >      5
                PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
                           UNTIL      ACCT-IDX    >     31
-                    IF    TBL-JNISSU-DAY(JN-IDX ACCT-IDX)
-                                        NOT =  SPACE
+                    IF  ( TBL-JNISSU-DAY(JN-IDX ACCT-IDX)
+                                        NOT =  SPACE )
+                    AND ( TBL-JNISSU-DAY-S(JN-IDX ACCT-IDX)
+                                            =  SPACE )
                           ADD    1      TO
                                        COLDAT01-TKOHJNISSU(JN-IDX - 1)
                     END-IF
@@ -3214,6 +3226,8 @@
        2003-SRYACCT-HENSYU-SEC              SECTION.
       *
            MOVE    ZERO                TO  WRK-RENNUM
+           MOVE    ZERO                TO  FLG-SHOSAISIN
+           MOVE    ZERO                TO  FLG-SHOSAISIN-GEN
       *
       *    レセプト診療科
            INITIALIZE                      SYS-1005-REC
