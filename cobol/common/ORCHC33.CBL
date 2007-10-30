@@ -206,7 +206,7 @@
            03  TBL-OCC-1               OCCURS   11.
       *        剤点数
                05  TBL-OCC-2           OCCURS   400.
-                   07  TBL-ZAITEN          PIC S9(05).
+                   07  TBL-ZAITEN          PIC S9(07).
                    07  TBL-OCC-3           OCCURS   31.
                        09  TBL-DAY         PIC 9(03).
       *    集計テーブル（労災円）
