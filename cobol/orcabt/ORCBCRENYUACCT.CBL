@@ -1551,7 +1551,7 @@
                PERFORM    4801-KIKAN-CHG-SEC
            END-IF
       *
-      *    戏客拉迷黍祭吹迹闻陕棚掐薄瘟
+      *    戏客拉千梦沮祭吹迹闻陕棚掐薄瘟１
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190739910"
                MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
                                            LNK-SCNYUACCT-NYUKHN-SRYCD(1)
@@ -1685,7 +1685,7 @@
                END-IF
            END-IF
       *
-      *    戏客拉迷黍祭吹迹闻陕棚掐薄瘟２
+      *    戏客拉千梦沮祭吹迹闻陕棚掐薄瘟２
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190813410"
                MOVE    SPACE           TO  SYOKIKSN-IN-KHNSRYCD
                                            LNK-SCNYUACCT-NYUKHN-SRYCD(1)

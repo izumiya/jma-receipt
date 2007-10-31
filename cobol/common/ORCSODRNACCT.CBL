@@ -2614,18 +2614,19 @@
                                                                (TN-IDX)
            END-IF
       *
-      *    牁諦嶺譎抈撬斯慫恓匟麟ェ情恔
+      *    牁諦嶺ロ襞據撬斯慫恓匟麟ェ情恔ㄠ
            IF    SYOKIKSN-IN-KHNSRYCD   =   "190739910"
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-                 IF     STUSAN-NISSU01      <=  90
+                 IF     STUSAN-NISSU03      <=  90
                      ADD    1           TO  TN-IDX
                      MOVE   "190739910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
-      *              牁諦嶺譎抈撬斯慫恓匟麟ェ情恔及ㄨㄟゥ動ま及蔽ゥ毛瘋煌遙
+      *              牁諦嶺ロ襞據撬斯慫恓匟麟ェ情恔ㄠ及ㄨㄟゥ動ま及蔽ゥ
+      *              毛瘋煌遙
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  90  - STUSAN-NISSU01
+                     COMPUTE  WK-TOKUTEI-DAY  =  90  - STUSAN-NISSU03
                      MOVE   LNK-PTNYUINRRK-TENNYUYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
@@ -2669,18 +2670,19 @@
                                                                (TN-IDX)
            END-IF
       *
-      *    牁諦嶺譎抈撬斯慫恓匟麟ェ情恔ㄡ
+      *    牁諦嶺ロ襞據撬斯慫恓匟麟ェ情恔ㄡ
            IF    SYOKIKSN-IN-KHNSRYCD   =   "190813410"
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-                 IF     STUSAN-NISSU01      <=  90
+                 IF     STUSAN-NISSU03      <=  90
                      ADD    1           TO  TN-IDX
                      MOVE   "190813410" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
-      *              牁諦嶺譎抈撬斯慫恓匟麟ェ情恔及ㄨㄟゥ動ま及蔽ゥ毛瘋煌遙
+      *              牁諦嶺ロ襞據撬斯慫恓匟麟ェ情恔ㄡ及ㄨㄟゥ動ま及蔽ゥ
+      *              毛瘋煌遙
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  90  - STUSAN-NISSU01
+                     COMPUTE  WK-TOKUTEI-DAY  =  90  - STUSAN-NISSU03
                      MOVE   LNK-PTNYUINRRK-TENNYUYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)

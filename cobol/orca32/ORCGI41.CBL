@@ -5242,7 +5242,7 @@
                PERFORM    4801-KIKAN-CHG-SEC
            END-IF
       *
-      *    牁諦嶺ロ襞導撬斯慫恓匟麟ェ情恔
+      *    牁諦嶺ロ襞導撬斯慫恓匟麟ェ情恔ㄠ
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190739910"
                MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
                                            LNK-SCNYUACCT-NYUKHN-SRYCD(1)
