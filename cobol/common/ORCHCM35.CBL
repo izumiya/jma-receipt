@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  00.00.01    NACL-森脇    06/01/20  編綴分対応
       *  03.04.01    NACL-森脇    06/11/29  パラメタ変更
+      *  03.05.00    NACL-森脇    07/11/05  グループ診療対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -377,6 +378,9 @@
        400-PRINT-OUT-SEC           SECTION.
       *
       *    印刷用ファイル作成
+      *----(03.05.00)--ADD-START---
+           MOVE    SPA-HOSPNUM         TO  HC01PARA-HOSPNUM
+      *----(03.05.00)--ADD-END-----
            MOVE    "HC01"              TO  HC01PARA-FORM-ID
            MOVE    SPA-TERMID          TO  HC01PARA-TERMID
            MOVE    SYS-TIME            TO  HC01PARA-SYOHMS
