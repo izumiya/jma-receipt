@@ -1465,6 +1465,7 @@
        400-SYOKI-PRINT-SEC             SECTION.
       *
       *    ¥Õ¥¡¥¤¥ë£Ï£Ð£Å£Î
+           MOVE   SPA-HOSPNUM          TO  HC01PARA-HOSPNUM
            MOVE    "HC44"              TO  HC01PARA-FORM-ID
            MOVE    SPA-TERMID          TO  HC01PARA-TERMID
            MOVE    SMCNDATE-HMS        TO  HC01PARA-SYOHMS
