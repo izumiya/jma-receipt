@@ -303,6 +303,8 @@
       *                                     ¡ÊÏ·¿Í¤ÏÂÐ¾Ý³°¤È¤¹¤ë¡Ë
       *  03.04.22    NACL-ÌçÏÆ    07/10/03  ½©ÅÄ¸©ÆýÍÄ»ù°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  03.04.23    NACL-ÌçÏÆ    07/10/04  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
+      *  03.04.24    NACL-ÌçÏÆ    07/10/25  ËÌ³¤Æ»£µ£±¡ÊÆ»Ã±ÆÈ»ö¶È¡Ë¤Ë´Ø¤ï¤ë
+      *                                     ¡Ê¡¡¡ËºÆ·Çµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -453,6 +455,7 @@
            03  FLG-KOUREI-KBN                          PIC 9(01).
            03  FLG-IRYOHI70K                           PIC 9(01).
            03  FLG-KOUGAKUCYO-GEN70K                   PIC 9(01).
+           03  FLG-SAIKEI-KISAI                        PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -6923,42 +6926,38 @@
              END-IF
            END-IF
       ***
+           MOVE     ZERO     TO    FLG-SAIKEI-KISAI
+           EVALUATE   SYS-1001-PREFNUM
+             WHEN       "01"
+               IF  RECE02-SRYYM   >=  "200510"
+                 PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
+                           UNTIL   KOHFTN-IDX   >    4
+                   IF  (RECE02-KOHNUM(KOHFTN-IDX) =  "051"   )
+                   AND (RECE02-KOHJKYSNUM(KOHFTN-IDX)(1:2)  =
+                        "91" OR "92" OR "93" OR "94" OR "95" )
+                       MOVE     1     TO    FLG-SAIKEI-KISAI
+                   END-IF
+                 END-PERFORM
+               END-IF
+           END-EVALUATE
+      *
            IF   RECE02-ZAITAKU  =  SPACE  OR  "3"
                   MOVE     ZERO      TO     RECE02-ZAITAKU-SAIKEI
            ELSE
               IF   FTN-KOH-XXX   =   ZERO        
-      *       OR   WRK-KOH-FTN   =   ZERO
                   MOVE     ZERO      TO     RECE02-ZAITAKU-SAIKEI
               ELSE 
-                  IF  FLG-KOH     =   ZERO
-                     COMPUTE   RECE02-ZAITAKU-SAIKEI  =  
-                               FTN-KOH-XXX
-      ****           IF   FTN-KOH-XXX   =   WRK-KOH-FTN 
-      ****                 MOVE  ZERO   TO   RECE02-ZAITAKU-SAIKEI
-      ****           END-IF
-                     IF  (FTN-KOH-XXX        = RECE02-FTNMONEY(1))
-                     AND (RECE02-TOTALTEN(1) = RECE02-TOTALTEN(2))
-                           MOVE  ZERO   TO   RECE02-ZAITAKU-SAIKEI
-                     END-IF
-                  ELSE
-                     IF  FLG-KOH  =   1
-                        COMPUTE   RECE02-ZAITAKU-SAIKEI  =  
-                                  FTN-KOH-XXX
-                     END-IF
                      IF  FLG-KOH  =   2
                         ADD   WRK-KOH-GAI   TO  RECE02-FTNMONEY(2)
                                                 RECE02-FTNMONEY-KOJ(2)
-                        COMPUTE   RECE02-ZAITAKU-SAIKEI  =  
-                                  FTN-KOH-XXX
                      END-IF
-      ****           IF   FTN-KOH-XXX   =   WRK-KOH-FTN 
-      ****                 MOVE  ZERO   TO   RECE02-ZAITAKU-SAIKEI
-      ****           END-IF
+                     COMPUTE   RECE02-ZAITAKU-SAIKEI  =  
+                               FTN-KOH-XXX
                      IF  (FTN-KOH-XXX        = RECE02-FTNMONEY(1))
                      AND (RECE02-TOTALTEN(1) = RECE02-TOTALTEN(2))
+                     AND (FLG-SAIKEI-KISAI   = ZERO              )
                            MOVE  ZERO   TO   RECE02-ZAITAKU-SAIKEI
                      END-IF
-                  END-IF
               END-IF
            END-IF
       *

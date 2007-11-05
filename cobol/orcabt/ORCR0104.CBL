@@ -161,6 +161,8 @@
       *                                     £²£°£°£·Ç¯£¹·î°Ê¹ß¤Î¤ßÂÐ¾Ý 
       *  03.04.12    NACL-Æ£¸¶    07/09/11  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ
       *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
+      *  03.04.13    NACL-ÌçÏÆ    07/10/25  ËÌ³¤Æ»£µ£±¡ÊÆ»Ã±ÆÈ»ö¶È¡Ë¤Ë´Ø¤ï¤ë
+      *                                     ÀÁµáÅÀµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4559,11 +4561,17 @@
                MOVE    RECE02-TOTALTEN (IDX2) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(2)
            END-IF
-           IF     (RECE02-SRYYM          >=  "200610"  )
-           AND    (SYS-1001-PREFNUM       =    33      )
-           AND    (RECE02-KOHNUM(1)(1:1)
-                                    >=  "1" AND <=  "8")
-           AND    (RECE02-TOTALTEN (IDX2) >   ZERO     )
+           IF    ((RECE02-SRYYM          >=  "200610"  ) AND
+                  (SYS-1001-PREFNUM       =    33      ) AND
+                  (RECE02-KOHNUM(1)(1:1)
+                                    >=  "1" AND <=  "8") AND
+                  (RECE02-TOTALTEN (IDX2) >   ZERO     ))
+           OR    ((RECE02-SRYYM          >=  "200510"  ) AND
+                  (SYS-1001-PREFNUM       =    01      ) AND
+                  (RECE02-KOHNUM(1)       =  "051"     ) AND
+                  (RECE02-KOHJKYSNUM(1)(1:2)  =
+                   "91" OR "92" OR "93" OR "94" OR "95") AND
+                  (RECE02-TOTALTEN (IDX2) >   ZERO     ))
                MOVE    RECE02-TOTALTEN (IDX2) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(2)
            END-IF
@@ -4619,11 +4627,25 @@
                    MOVE    WRK-KGK6               TO  HC06-TOTALTEN(3)
                END-IF
            END-IF
-           IF     (RECE02-SRYYM          >=  "200610"  )
-           AND    (SYS-1001-PREFNUM       =    33      )
-           AND    (RECE02-KOHNUM(2)(1:1)
-                                    >=  "1" AND <=  "8")
-           AND    (RECE02-TOTALTEN (IDX3) >   ZERO     )
+           IF    ((RECE02-SRYYM          >=  "200610"  ) AND
+                  (SYS-1001-PREFNUM       =    33      ) AND
+                  (RECE02-KOHNUM(2)(1:1)
+                                    >=  "1" AND <=  "8") AND
+                  (RECE02-TOTALTEN (IDX3) >   ZERO     ))
+           OR    ((RECE02-SRYYM          >=  "200510"  ) AND
+                  (SYS-1001-PREFNUM       =    01      ) AND
+                  (RECE02-KOHNUM(2)       =  "051"     ) AND
+                  (RECE02-KOHJKYSNUM(2)(1:2)  =
+                   "91" OR "92" OR "93" OR "94" OR "95") AND
+                  (RECE02-TOTALTEN (IDX3) >   ZERO     ))
+           OR    ((RECE02-SRYYM          >=  "200510"  ) AND
+                  (SYS-1001-PREFNUM       =    01      ) AND
+                  (RECE02-KOHNUM(1)       =  "051"     ) AND
+                  (RECE02-KOHJKYSNUM(1)(1:2)  =
+                   "91" OR "92" OR "93" OR "94" OR "95") AND
+                  (RECE02-TOTALTEN (IDX2) >   ZERO     ) AND
+                  (RECE02-KOHHBTNUM(2)    =  "41"      ) AND
+                  (RECE02-TOTALTEN (IDX3) >   ZERO     ))
                MOVE    RECE02-TOTALTEN (IDX3) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(3)
            END-IF
