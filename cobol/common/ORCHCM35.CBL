@@ -224,7 +224,10 @@
       *    ¹ñÊÝ
       *----(00.00.01)--UPD-START---
            PERFORM VARYING IDY     FROM    2   BY  1
-                   UNTIL   IDY     >   21
+      *----(03.05.00)--UPD-START---
+      *             UNTIL   IDY     >   21
+                   UNTIL   IDY     >   19
+      *----(03.05.00)--UPD-END-----
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >   36
                    OR      SPA-GMN-TSYURUINAME(IDY IDX) =  SPACE
