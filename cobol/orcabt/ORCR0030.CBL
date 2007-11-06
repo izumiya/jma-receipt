@@ -314,6 +314,7 @@
       *  03.05.23    NACL-ÌçÏÆ    07/10/04  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
       *  03.05.24    NACL-ÌçÏÆ    07/10/25  ËÌ³¤Æ»£µ£±¡ÊÆ»Ã±ÆÈ»ö¶È¡Ë¤Ë´Ø¤ï¤ë
       *                                     ¡Ê¡¡¡ËºÆ·Çµ­ºÜÂÐ±þ
+      *  03.05.25    NACL-ÌçÏÆ    07/11/06  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5775,24 +5776,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ADD    SYU-SYUCOMPFTN   TO   RECE02-FTNMONEY(1)
                 END-IF
       *         Ï·¿Í¸ºÌÈ
-      ***       IF    RECE02-RJNHKNNUM   NOT  =    SPACE
-      ***       AND   WK-GENGAKUKBN      NOT  =    ZERO
-      ***          EVALUATE  WK-GENGAKUKBN
-      ***            WHEN        1
-      ***              IF    WK-GENGAKU-RITU  =  100
-      ***                 MOVE   1      TO   RECE02-RJNNYUFTN
-      ***              ELSE
-      ***                 ADD    SYU-KOH1COMPFTN
-      ***                               TO   RECE02-FTNMONEY(1)
-      ***                 MOVE   1      TO   RECE02-RJNNYUFTN
-      ***              END-IF
-      ***            WHEN        2
-      ***              CONTINUE
-      ***            WHEN        3
-      ***            WHEN        4
-      ***                 MOVE   1      TO   RECE02-RJNNYUFTN
-      ***          END-EVALUATE
-      ***       END-IF
+                IF    RECE02-RJNHKNNUM   NOT  =    SPACE
+                AND   WK-GENGAKUKBN      NOT  =    ZERO
+                   EVALUATE  WK-GENGAKUKBN
+                     WHEN        1
+                       IF    WK-GENGAKU-RITU  =  100
+                          MOVE   1      TO   RECE02-RJNNYUFTN
+                       ELSE
+                          ADD    SYU-KOH1COMPFTN
+                                        TO   RECE02-FTNMONEY(1)
+                          MOVE   1      TO   RECE02-RJNNYUFTN
+                       END-IF
+                     WHEN        2
+                       CONTINUE
+                     WHEN        3
+                     WHEN        4
+                          MOVE   1      TO   RECE02-RJNNYUFTN
+                   END-EVALUATE
+                END-IF
              END-IF
            ELSE
              IF    RECE02-RJNHKNNUM    NOT =    SPACE
