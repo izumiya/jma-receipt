@@ -100,7 +100,7 @@ path	key3	{
 		FROM tbl_ptbyomei
 			WHERE   HOSPID    =   :HOSPID
 			AND   PTID        =   :PTID
-			ORDER  BY  PTID,SRYYMD,SRYKA
+			ORDER  BY  PTID,SRYYMD,RENNUM,SRYKA
 		;
 	};
 };
