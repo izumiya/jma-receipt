@@ -105,7 +105,7 @@ path	key3	{
 			WHERE   HOSPNUM    =   :HOSPNUM
 			AND   PTID        =   :PTID
 			AND   DLTFLG      =   ' '
-			ORDER  BY  PTID,SRYYMD,SRYKA
+			ORDER  BY  PTID,SRYYMD,RENNUM,SRYKA
 		;
 	};
 };
