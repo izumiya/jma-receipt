@@ -83,6 +83,8 @@
       *    主　　処理
       *****************************************************************
        000-PROC-SEC                SECTION.
+      *           
+           INITIALIZE                     FLG-AREA
       *
       *    医療機関識別番号設定
            PERFORM 100-HOSPNUM-SET-SEC
