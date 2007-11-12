@@ -267,6 +267,7 @@
       *  03.05.15    NACL-門脇    07/10/04  新潟県中越沖地震対応修正
       *  03.05.16    NACL-門脇    07/10/25  北海道５１（道単独事業）に関わる
       *                                     （　）再掲記載対応
+      *  03.05.17    NACL-門脇    07/11/12  千葉県乳幼児一部負担金記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10765,8 +10766,10 @@
                      END-IF
                  END-IF
                END-IF
-               IF  (WRK-PREFNUM               =   05  ) AND
-                   (RECE62-KOHNUM(KOHFTN-IDX) =  "174")
+               IF ((WRK-PREFNUM               =   05  ) AND
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "174"))
+               OR ((WRK-PREFNUM               =   12  ) AND
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "183"))
                      MOVE  "1"  TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
