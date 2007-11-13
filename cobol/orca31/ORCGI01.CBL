@@ -10709,7 +10709,7 @@
                  MOVE    LNK-DAY6-KEISAN
                                   TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
       *
-                 MOVE   "190069910"    TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+                 MOVE   "190066910"    TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
                  INITIALIZE                STS-AREA-DAY
                  INITIALIZE                LNK-DAY6-AREA
                  MOVE    "61"              TO  LNK-DAY6-IRAI
