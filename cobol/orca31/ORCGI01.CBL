@@ -216,6 +216,7 @@
            03  IDX-SKJ-TAIHI               PIC 9(02).
            03  IDX-RRKBYO                  PIC 9(05).
            03  IDX-BTUNUM                  PIC 9(05).
+           03  IDX-MATSUBI                 PIC 9(02).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -10939,23 +10940,33 @@
                                          TO  WRK-TENROOM-SKJ-SRYYM(1)
                  MOVE    SPA-NAI-I01-IDOYMD(7:2)
                                          TO  IDX-SHOKUJIX
+      *          月末日を算定
+                 INITIALIZE                  STS-AREA-DAY
+                 INITIALIZE                  LNK-DAY7-AREA
+                 MOVE      "71"          TO  LNK-DAY7-IRAI
+                 MOVE    SPA-NAI-I01-IDOYMD(1:6)
+                                         TO  LNK-DAY7-YM
+                 CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                 LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI TO  IDX-MATSUBI
+      *
                  EVALUATE  IDX-SKJ-TAIHI
                      WHEN  1
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
-                           UNTIL     IDX-SKJ   >   31
-                               MOVE   ZERO
+                           UNTIL     IDX-SKJ   >   IDX-MATSUBI
+                               MOVE   1
                                          TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
                         END-PERFORM
                      WHEN  2
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
-                           UNTIL     IDX-SKJ   >   31
-                               MOVE   ZERO
+                           UNTIL     IDX-SKJ   >   IDX-MATSUBI
+                               MOVE   1
                                          TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
                         END-PERFORM
                      WHEN  3
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
-                           UNTIL     IDX-SKJ   >   31
-                               MOVE   ZERO
+                           UNTIL     IDX-SKJ   >   IDX-MATSUBI
+                               MOVE   1
                                          TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
                         END-PERFORM
                  END-EVALUATE
