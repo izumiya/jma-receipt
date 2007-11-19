@@ -919,7 +919,11 @@
            MOVE    SPACE               TO  SYS-1005-REC
            INITIALIZE                      SYS-1005-REC
            MOVE    "1005"              TO  SYS-1005-KANRICD
-           MOVE    WRK-SRYKA           TO  SYS-1005-KBNCD
+           IF      SPA-SRYKA           =   "XX"
+               MOVE    WRK-SRYKA           TO  SYS-1005-KBNCD
+           ELSE
+               MOVE    SPA-SRYKA           TO  SYS-1005-KBNCD
+           END-IF
            MOVE    SPA-SYSYMD          TO  SYS-1005-STYUKYMD
            MOVE    SPA-SYSYMD          TO  SYS-1005-EDYUKYMD
            MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
