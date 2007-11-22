@@ -11916,13 +11916,6 @@
                          LNK-SCNYUACCT-RC
            END-IF
       *
-           IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
-               MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
-               MOVE    IPN-SANTEISTYMD   TO   WRK-SANTEISTYMD
-               MOVE    IPN-SANTEISTYMD   TO   SPA-NAI-I01-IDOYMD
-               MOVE    IPN-SANTEISTYMD   TO   PTNYUINRRK-TENNYUYMD
-           END-IF
-      *
       *    入院会計作成後に退避データの食事区分を復元
            IF  SPA-NAI-I01-IDOYMD(1:6)  >= "200604"
       *       （異動月分）
@@ -12160,6 +12153,13 @@
                    MOVE    "key28"             TO  MCP-PATHNAME
                    PERFORM 910-DBCLOSECURSOR-SEC
                END-IF
+           END-IF
+      *
+           IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
+               MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
+               MOVE    IPN-SANTEISTYMD   TO   WRK-SANTEISTYMD
+               MOVE    IPN-SANTEISTYMD   TO   SPA-NAI-I01-IDOYMD
+               MOVE    IPN-SANTEISTYMD   TO   PTNYUINRRK-TENNYUYMD
            END-IF
       *
            .
