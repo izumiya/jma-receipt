@@ -1322,8 +1322,8 @@
       *
            CALL    "ORCSODRS01"        USING   SODR-AREA
                                                SODRS01-AREA
-                                               SPA-AREA
                                                LNK-ODRITEM-REC
+                                               SPA-AREA
            MOVE    SODRS01-RC      TO  FLG-END
       *
            .
