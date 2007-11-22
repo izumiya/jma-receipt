@@ -190,6 +190,7 @@
            03  KIKAN-IDX1          PIC 9(04).
            03  KIKAN-IDX2          PIC 9(04).
            03  IDX-SHOKUDOU        PIC 9(02).
+           03  IDU                 PIC 9(04).
       *
       *    点数マスタ予約コード領域（選定入院料）
        01  WRK-YOYAKU.
@@ -2691,27 +2692,33 @@
       *
                    IF      FLG-SYSKANRI        =   ZERO
                        MOVE    MCPDATA-REC     TO  SYS-5001-REC
-      *                入院料の比較
-                       IF (SPA-GMN-TSRYCD (1)  =  SYS-5001-BTU-KHNSRYCD)
+      *              入院料の比較
+                     PERFORM    VARYING   IDU   FROM   1  BY  1
+                                UNTIL    (IDU   >    10)  OR
+                                         (SPA-GMN-TSRYCD(IDU) = SPACE)
+                      IF  SPA-GMN-TDAY-41(IDU 1)   =  "  1"
+                        IF (SPA-GMN-TSRYCD(IDU) = SYS-5001-BTU-KHNSRYCD)
                                                OR
-                          ((SPA-GMN-TSRYCD (1)  =  "190097010"   OR
-                                                   "190097110"   OR
-                                                   "190119510"   OR
-                                                   "190119610")  AND
+                          ((SPA-GMN-TSRYCD (IDU)  = "190097010"   OR
+                                                    "190097110"   OR
+                                                    "190119510"   OR
+                                                    "190119610")  AND
                            (SYS-5001-BTU-KHNSRYCD = "099999950"))
                                                OR
-                          ((SPA-GMN-TSRYCD (1)  =  "190097210"   OR
-                                                   "190097310"   OR
-                                                   "190119710"   OR
-                                                   "190119810")  AND
+                          ((SPA-GMN-TSRYCD (IDU)  = "190097210"   OR
+                                                    "190097310"   OR
+                                                    "190119710"   OR
+                                                    "190119810")  AND
                            (SYS-5001-BTU-KHNSRYCD = "099999951"))
                                CONTINUE
-                       ELSE
+                        ELSE
                            MOVE   SPACE  TO  SPA-GMN-KEIKOKU
                            MOVE
                "算定入院料と病棟設定が異なります。確認してください。"
                                        TO      SPA-GMN-KEIKOKU
-                       END-IF
+                        END-IF
+                      END-IF
+                     END-PERFORM
                    ELSE
                        INITIALIZE                  SYS-5001-REC
                         MOVE   SPACE   TO  SPA-GMN-KEIKOKU
