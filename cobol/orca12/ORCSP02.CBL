@@ -1319,6 +1319,12 @@
            END-IF
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       FLG-UKETUKE     =  1
+               IF     (UKE-PTID        NOT =   ZERO )  AND
+                      (UKE-PTID        NOT =   SPA-GMN-PTID)
+      *            受付の患者ＩＤが画面と違う時、受付は対象外とする
+                   CONTINUE
+               ELSE
+      *
                MOVE    SPACE               TO  PARA-REC
                MOVE    "UKETUKE"           TO  PARA-FILEMEI
                MOVE    IDX                 TO  PARA-EDANUM
@@ -1332,6 +1338,8 @@
       *
                MOVE    PARA-EDANUM          TO  SPA-NAI20-UKEMAX
       *
+               END-IF
+      *
                MOVE    "tbl_uketuke"       TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 930-UKETUKE-NEXT-SEC
@@ -1339,6 +1347,10 @@
            MOVE    "tbl_uketuke"       TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+           IF      SPA-NAI20-UKEMAX    =   ZERO
+               MOVE    ZERO            TO  SPA-P02-UKEID
+           END-IF
            .
        4104-UKETUKE-HEN-EXT.
            EXIT.
