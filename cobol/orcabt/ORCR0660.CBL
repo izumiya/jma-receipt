@@ -84,6 +84,7 @@
       *  03.04.06    NACL-門脇    07/04/13  リハビリ対応
       *  03.05.01    NACL-小豆沢  07/06/04  グループ診療対応
       *  03.05.02    NACL-門脇    07/08/07  算定履歴に関わる記載修正
+      *  03.05.03    NACL-門脇    07/11/30  パス修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3038,7 +3039,7 @@
       *
                      MOVE    SRYACCT-REC    TO      MCPDATA-REC
                      MOVE    "tbl_sryacct"  TO      MCP-TABLE
-                     MOVE    "key7"         TO      MCP-PATHNAME
+                     MOVE    "key31"        TO      MCP-PATHNAME
                      PERFORM   900-DBSELECT-SEC
       *
                      IF  MCP-RC                =  ZERO
