@@ -298,6 +298,8 @@
       *---(04.00.00) LINE ADD START ------------------------------------
       *ＱＲ対応
            03  WRK-FILE-CNT            PIC 9(02).
+           03  WRK-FILE-CNT2           PIC 9(02).
+           03  WRK-SYS-TIME            PIC 9(08).
       *---(04.00.00) LINE ADD END   ------------------------------------
       *
       *    剤毎の内容
@@ -575,7 +577,7 @@
            MOVE    SPA-HOSPNUM         TO  HC01PARA-HOSPNUM
            MOVE    "HC2Q"              TO  HC01PARA-FORM-ID
            MOVE    SPA-TERMID          TO  HC01PARA-TERMID
-           MOVE    SYS-TIME            TO  HC01PARA-SYOHMS
+           MOVE    WRK-SYS-TIME        TO  HC01PARA-SYOHMS
       *    変更★★★★★★
       *****MOVE    "001"               TO  HC01PARA-CNT
            ADD     1                   TO  WRK-PAGE
@@ -904,6 +906,10 @@
            INITIALIZE                  ORCSQRCSVAREA
            MOVE    ZERO                TO  IDX-QR1
            MOVE    ZERO                TO  IDX-QRB
+      *    時間
+           ADD     1                   TO  WRK-FILE-CNT2
+           COMPUTE WRK-SYS-TIME        =   SYS-TIME
+                                       +   WRK-FILE-CNT2
       *---(04.00.00) LINE ADD END   ------------------------------------
       *
            .
@@ -1848,7 +1854,7 @@
                    MOVE    SPA-HOSPNUM         TO  QR-FILE-HOSPNUM
                    MOVE    "HC2Q"              TO  QR-FILE-FORM-ID
                    MOVE    SPA-TERMID          TO  QR-FILE-TERMID
-                   MOVE    SYS-TIME            TO  QR-FILE-SYOHMS
+                   MOVE    WRK-SYS-TIME        TO  QR-FILE-SYOHMS
                    MOVE    WRK-FILE-CNT        TO  QR-FILE-ID
       *            ファイル存在チェック
                    INITIALIZE                      ORCSFILECHKAREA
@@ -3131,6 +3137,10 @@
            INITIALIZE                  ORCSQRCSVAREA
            MOVE    ZERO                TO  IDX-QR1
            MOVE    ZERO                TO  IDX-QRB
+      *    時間
+           ADD     1                   TO  WRK-FILE-CNT2
+           COMPUTE WRK-SYS-TIME        =   SYS-TIME
+                                       +   WRK-FILE-CNT2
       *---(04.00.00) LINE ADD END   ------------------------------------
       *
            .
@@ -3492,6 +3502,10 @@
            INITIALIZE                  ORCSQRCSVAREA
            MOVE    ZERO                TO  IDX-QR1
            MOVE    ZERO                TO  IDX-QRB
+      *    時間
+           ADD     1                   TO  WRK-FILE-CNT2
+           COMPUTE WRK-SYS-TIME        =   SYS-TIME
+                                       +   WRK-FILE-CNT2
       *---(04.00.00) LINE ADD END   ------------------------------------
            MOVE    ZERO                TO  FLG-KOUHATU-HEN
            MOVE    ZERO                TO  FLG-KOUHATU-CHK
@@ -3760,7 +3774,7 @@
       *    一部負担割合備考
            MOVE    WRK-BIKOU           TO  ORCSQRCSV-BIKO-FTN
       *    ファイル名組み立て項目
-           MOVE    SYS-TIME            TO  ORCSQRCSV-SYSTIME
+           MOVE    WRK-SYS-TIME        TO  ORCSQRCSV-SYSTIME
       *
            CALL    "ORCSQRCSV"         USING
                                        SPA-AREA
