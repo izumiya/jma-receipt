@@ -1477,11 +1477,11 @@
       *
            MOVE    SPA-Z01-SRYCD       TO  TNS-SRYCD
            MOVE    SPA-Z01-TYUKOSTYMD(SPA-Z01-SELNUM)
-                                       TO  TNSP-YUKOSTYMD
+                                       TO  TNS-YUKOSTYMD
            MOVE    SPA-Z01-TYUKOEDYMD(SPA-Z01-SELNUM)
-                                       TO  TNSP-YUKOEDYMD
+                                       TO  TNS-YUKOEDYMD
       *
-           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_tensu"         TO  MCP-TABLE
