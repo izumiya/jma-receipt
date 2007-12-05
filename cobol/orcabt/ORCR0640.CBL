@@ -262,6 +262,7 @@
       *                                     ¡Ê¡¡¡ËºÆ·Çµ­ºÜÂÐ±þ
       *  03.04.29    NACL-ÌçÏÆ    07/11/12  ÀéÍÕ¸©ÆýÍÄ»ù°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  03.04.30    NACL-ÌçÏÆ    07/11/29  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
+      *  03.04.31    NACL-ÌçÏÆ    07/12/03  ËÌ³¤Æ»ÆÃÄê¼À´µ¡ÊÆ»Ã±ÆÈ»ö¶È¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -428,6 +429,8 @@
            03  FLG-IRYOHI70K                           PIC 9(01).
            03  FLG-KOUGAKUCYO-GEN70K                   PIC 9(01).
            03  FLG-SAIKEI-KISAI                        PIC 9(01).
+           03  FLG-DOTANDOKU-IGAI                      PIC 9(01).
+           03  FLG-DOTANDOKU                           PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -8919,6 +8922,29 @@
                     END-IF
            END-PERFORM
       *
+           MOVE      ZERO        TO     FLG-DOTANDOKU-IGAI
+                                        FLG-DOTANDOKU
+           IF   ( WRK-PREFNUM         =  "01"     )
+           AND  ( RECE62-SRYYM       >=  "200510" )
+             PERFORM   VARYING  IDX1    FROM    1   BY  1
+                        UNTIL   IDX1      >     4
+               IF RECE62-KOHNUM(IDX1)(1:1) =  "0" OR "9"
+                  IF  (RECE62-KOHNUM(IDX1) =  "051"          )
+                  AND (RECE62-KOHJKYSNUM(IDX1)(1:2)  =
+                         "91" OR "92" OR "93" OR "94" OR "95")
+                     MOVE    1     TO    FLG-DOTANDOKU
+                  ELSE
+                     MOVE    1     TO    FLG-DOTANDOKU-IGAI
+                  END-IF
+               END-IF
+             END-PERFORM
+             IF   (FLG-DOTANDOKU-IGAI   =   ZERO)
+             AND  (FLG-DOTANDOKU        =    1  )
+             AND  (FLG-ZENKOH-ARI       =    1  )
+                     MOVE   ZERO   TO    FLG-ZENKOH-ARI
+             END-IF
+           END-IF
+      *
            IF    RECE62-KOUREI           =    "2"
               MOVE      ZERO        TO     FLG-TAISYO
               PERFORM   VARYING  IDX1    FROM    1   BY  1
@@ -9036,6 +9062,7 @@
                 MOVE    RECE62-KOUREI  TO  LNK-KOREIFTNCHK-NENREIKBN
                 MOVE    RECE62-AGE     TO  LNK-KOREIFTNCHK-AGE
                 MOVE    FLG-GENBUTU70  TO  LNK-KOREIFTNCHK-SYOTOKUKBN
+                MOVE    WRK-PREFNUM    TO  LNK-KOREIFTNCHK-PREFNUM
       *
                 CALL    "ORCSKOREIFTNCHK"   USING
                                             ORCSKOREIFTNCHKAREA
@@ -11172,7 +11199,14 @@
                       PERFORM  210462-GENGAKU-OKIKAE-SEC
                    END-IF
                  ELSE
+                   IF  (WRK-PREFNUM       =  "01"            )
+                   AND (RECE62-KOHNUM(1)  =  "051"           )
+                   AND (RECE62-KOHJKYSNUM(1)(1:2)  =
+                        "91" OR "92" OR "93" OR "94" OR "95" )
+                      CONTINUE
+                   ELSE
                       PERFORM  210462-GENGAKU-OKIKAE-SEC
+                   END-IF
                  END-IF
                ELSE
                  IF  RECE62-KOHNUM(1) = "972" OR "974"
