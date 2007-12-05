@@ -36,6 +36,7 @@
       *  03.04.03    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *  03.04.04    NACL-ÌçÏÆ    07/06/13  ¸½ÊªµëÉÕ¹â³Û£´²óÌÜ¸øÈñÊ»ÍÑ»þÂÐ±þ
       *  03.04.05    NACL-ÌçÏÆ    07/09/03  ¸º³Û¸ºÌÈÁ´¹ñ¸øÈñÂÐ±þ
+      *  03.04.06    NACL-ÌçÏÆ    07/12/03  ËÌ³¤Æ»ÆÃÄê¼À´µ¡ÊÆ»Ã±ÆÈ»ö¶È¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -63,6 +64,7 @@
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                  PIC 9(04).
+           03  IDX2                  PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -79,6 +81,10 @@
            03  WRK-FTN-KOH-YYY       PIC 9(09).
            03  WRK-FTN-KOH-YY2       PIC 9(09).
            03  WRK-GENGAKU-RITUX     PIC 9(03).
+      *
+           03  WRK-DOTANDOKU-TBL.
+             04  WRK-DOTANDOKU-OCC      OCCURS   4.
+               05  WRK-DOTANDOKU     PIC 9(01).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -98,6 +104,10 @@
       *    ´µ¼ÔÊÝ¸±¾ðÊó
        01  PTHKNINF-REC.
            COPY    "CPPTHKNINF.INC".
+      *
+      *    ´µ¼Ô¸øÈñ¾ðÊó
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -196,24 +206,80 @@
                    ADD     1     TO     IDX1
                    MOVE    COMB-HKNCOMBINUM  TO
                                      WRK-HKNCOMBINUM(IDX1)
+      ***
+                   INITIALIZE        WRK-DOTANDOKU-TBL
+      *
+                   IF  (LNK-KOREIFTNCHK-PREFNUM   = "01"    )
+                   AND (LNK-KOREIFTNCHK-SRYYM    >= "200510")
+      *
+                     PERFORM    VARYING   IDX2    FROM   1   BY   1
+                                 UNTIL    IDX2      >    4
+      *
+                      IF  COMB-KOHHKNNUM(IDX2) = "051"
+                        INITIALIZE                       PTKOHINF-REC
+                        MOVE  LNK-KOREIFTNCHK-HOSPID TO  PTKOH-HOSPID
+                        MOVE  LNK-KOREIFTNCHK-PTID   TO  PTKOH-PTID
+                        MOVE  COMB-KOHID(IDX2)       TO  PTKOH-KOHID
+                        MOVE  PTKOHINF-REC           TO  MCPDATA-REC
+                        MOVE  "DBSELECT"             TO  MCP-FUNC
+                        MOVE  "tbl_ptkohinf"         TO  MCP-TABLE
+                        MOVE  "key8"                 TO  MCP-PATHNAME
+                        CALL  "MONFUNC"              USING
+                                                     MCPAREA
+                                                     MCPDATA-REC
+                        IF      MCP-RC               =       ZERO
+                            MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                            MOVE    "key8"           TO  MCP-PATHNAME
+                            MOVE    "DBFETCH"        TO  MCP-FUNC
+                            CALL    "MONFUNC"        USING
+                                                     MCPAREA
+                                                     MCPDATA-REC
+                            IF      MCP-RC           =       ZERO
+                              MOVE    MCPDATA-REC    TO  PTKOHINF-REC
+                              IF  PTKOH-JKYSNUM(1:2) = "91" OR "92"
+                                                    OR "93" OR "94"
+                                                    OR "95"
+                                  MOVE   1   TO  WRK-DOTANDOKU(IDX2)
+                              END-IF
+                            END-IF
+                        END-IF
+                        MOVE    "DBCLOSECURSOR"      TO  MCP-FUNC
+                        MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                        MOVE    "key8"               TO  MCP-PATHNAME
+                        CALL    "MONFUNC"            USING
+                                                     MCPAREA
+                                                     MCPDATA-REC
+                      END-IF
+      *
+                     END-PERFORM
+      *
+                   END-IF
+      ***
                    IF   COMB-KOH1HKNNUM =  "027"
                      IF ((COMB-KOH2HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(2)         =  ZERO   ))
                      OR ((COMB-KOH3HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(3)         =  ZERO   ))
                      OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(4)         =  ZERO   ))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    ELSE
                      IF ((COMB-KOH1HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH1HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH1HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(1)         =  ZERO   ))
                      OR ((COMB-KOH2HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(2)         =  ZERO   ))
                      OR ((COMB-KOH3HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(3)         =  ZERO   ))
                      OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(4)         =  ZERO   ))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    END-IF
