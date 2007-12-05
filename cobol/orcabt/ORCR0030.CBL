@@ -317,6 +317,7 @@
       *  03.05.25    NACL-ÌçÏÆ    07/11/06  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
       *  03.05.26    NACL-ÌçÏÆ    07/11/12  ÀéÍÕ¸©ÆýÍÄ»ù°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  03.05.27    NACL-ÌçÏÆ    07/11/29  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
+      *  03.05.28    NACL-ÌçÏÆ    07/12/03  ËÌ³¤Æ»ÆÃÄê¼À´µ¡ÊÆ»Ã±ÆÈ»ö¶È¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -470,6 +471,8 @@
            03  FLG-IRYOHI70K                           PIC 9(01).
            03  FLG-KOUGAKUCYO-GEN70K                   PIC 9(01).
            03  FLG-SAIKEI-KISAI                        PIC 9(01).
+           03  FLG-DOTANDOKU-IGAI                      PIC 9(01).
+           03  FLG-DOTANDOKU                           PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -2104,6 +2107,29 @@ grpsys         PERFORM 900-DBSELECT-SEC
                     END-IF
            END-PERFORM
       *
+           MOVE      ZERO        TO     FLG-DOTANDOKU-IGAI
+                                        FLG-DOTANDOKU
+           IF   ( SYS-1001-PREFNUM    =   01      )
+           AND  ( RECE02-SRYYM       >=  "200510" )
+             PERFORM   VARYING  IDY2    FROM    1   BY  1
+                        UNTIL   IDY2      >     4
+               IF RECE02-KOHNUM(IDY2)(1:1) =  "0" OR "9"
+                  IF  (RECE02-KOHNUM(IDY2) =  "051"          )
+                  AND (RECE02-KOHJKYSNUM(IDY2)(1:2)  =
+                         "91" OR "92" OR "93" OR "94" OR "95")
+                     MOVE    1     TO    FLG-DOTANDOKU
+                  ELSE
+                     MOVE    1     TO    FLG-DOTANDOKU-IGAI
+                  END-IF
+               END-IF
+             END-PERFORM
+             IF   (FLG-DOTANDOKU-IGAI   =   ZERO)
+             AND  (FLG-DOTANDOKU        =    1  )
+             AND  (FLG-ZENKOH-ARI       =    1  )
+                     MOVE   ZERO   TO    FLG-ZENKOH-ARI
+             END-IF
+           END-IF
+      *
            IF    RECE02-ZAITAKU          =    "2"
               MOVE      ZERO        TO     FLG-TAISYO
               PERFORM   VARYING  IDY2    FROM    1   BY  1
@@ -2221,6 +2247,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                 MOVE    RECE02-ZAITAKU TO  LNK-KOREIFTNCHK-NENREIKBN
                 MOVE    RECE02-AGE     TO  LNK-KOREIFTNCHK-AGE
                 MOVE    FLG-GENBUTU70  TO  LNK-KOREIFTNCHK-SYOTOKUKBN
+                MOVE    SYS-1001-PREFNUM
+                                       TO  LNK-KOREIFTNCHK-PREFNUM
       *
                 CALL    "ORCSKOREIFTNCHK"   USING
                                             ORCSKOREIFTNCHKAREA
@@ -6961,7 +6989,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       PERFORM  21092-GENGAKU-OKIKAE-SEC
                    END-IF
                  ELSE
+                   IF  (SYS-1001-PREFNUM  =   01             )
+                   AND (RECE02-KOHNUM(1)  =  "051"           )
+                   AND (RECE02-KOHJKYSNUM(1)(1:2)  =
+                        "91" OR "92" OR "93" OR "94" OR "95" )
+                      CONTINUE
+                   ELSE
                       PERFORM  21092-GENGAKU-OKIKAE-SEC
+                   END-IF
                  END-IF
                ELSE
                  IF  RECE02-KOHNUM(1) = "972" OR "974"

@@ -36,6 +36,7 @@
       *                                     返却値に請求金額追加
       *
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
+      *  03.05.02    NACL-門脇    07/12/03  県番号追加
       ************************************************************
        01  ORCSKOREIFTNCHKAREA.
       *
@@ -74,6 +75,8 @@
            03  LNK-KOREIFTNCHK-AGE          PIC 9(03).
       *    若人所得区分
            03  LNK-KOREIFTNCHK-SYOTOKUKBN   PIC 9(01).
+      *    県番号
+           03  LNK-KOREIFTNCHK-PREFNUM      PIC X(02).
       *
       *返却値
            03  LNK-KOREIFTNCHK-OUT-AREA.

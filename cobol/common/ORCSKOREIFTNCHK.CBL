@@ -38,6 +38,7 @@
       *
       *  03.05.01    NACL-Æ£¸¶    07/04/19  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  03.05.02    NACL-ÌçÏÆ    07/09/03  ¸º³Û¸ºÌÈÁ´¹ñ¸øÈñÂÐ±þ
+      *  03.05.03    NACL-ÌçÏÆ    07/12/03  ËÌ³¤Æ»ÆÃÄê¼À´µ¡ÊÆ»Ã±ÆÈ»ö¶È¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -61,10 +62,12 @@
            03  FLG-KEISAN            PIC 9(01).
            03  FLG-PTHKNINF          PIC 9(01).
            03  FLG-TOKUREI-HKNJYA    PIC 9(01).
+           03  FLG-PTKOHINF          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                  PIC 9(04).
+           03  IDX2                  PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -81,6 +84,10 @@
            03  WRK-FTN-KOH-YYY       PIC 9(09).
            03  WRK-FTN-KOH-YY2       PIC 9(09).
            03  WRK-GENGAKU-RITUX     PIC 9(03).
+      *
+           03  WRK-DOTANDOKU-TBL.
+             04  WRK-DOTANDOKU-OCC      OCCURS   4.
+               05  WRK-DOTANDOKU     PIC 9(01).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -100,6 +107,10 @@
       *    ´µ¼ÔÊÝ¸±¾ðÊó
        01  PTHKNINF-REC.
            COPY    "CPPTHKNINF.INC".
+      *
+      *    ´µ¼Ô¸øÈñ¾ðÊó
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -203,24 +214,69 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                    ADD     1     TO     IDX1
                    MOVE    COMB-HKNCOMBINUM  TO
                                      WRK-HKNCOMBINUM(IDX1)
+      ***
+                   INITIALIZE        WRK-DOTANDOKU-TBL
+      *
+                   IF  (LNK-KOREIFTNCHK-PREFNUM   = "01"    )
+                   AND (LNK-KOREIFTNCHK-SRYYM    >= "200510")
+      *
+                     PERFORM    VARYING   IDX2    FROM   1   BY   1
+                                 UNTIL    IDX2      >    4
+      *
+                      IF  COMB-KOHHKNNUM(IDX2) = "051"
+                        INITIALIZE                       PTKOHINF-REC
+                        MOVE LNK-KOREIFTNCHK-HOSPNUM TO  PTKOH-HOSPNUM
+                        MOVE LNK-KOREIFTNCHK-PTID    TO  PTKOH-PTID
+                        MOVE COMB-KOHID(IDX2)        TO  PTKOH-KOHID
+                        MOVE "tbl_ptkohinf"          TO  MCP-TABLE
+                        MOVE "key8"                  TO  MCP-PATHNAME
+                        PERFORM 900-PTKOHINF-SELECT-SEC
+                        IF      FLG-PTKOHINF         =       ZERO
+                            MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                            MOVE    "key8"           TO  MCP-PATHNAME
+                            PERFORM 910-PTKOHINF-READ-SEC
+                            IF      FLG-PTKOHINF     =       ZERO
+                              IF  PTKOH-JKYSNUM(1:2) = "91" OR "92"
+                                                    OR "93" OR "94"
+                                                    OR "95"
+                                  MOVE   1   TO  WRK-DOTANDOKU(IDX2)
+                              END-IF
+                            END-IF
+                        END-IF
+                        MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                        MOVE    "key8"               TO  MCP-PATHNAME
+                        PERFORM  920-DB-CLOSE-SEC
+                      END-IF
+      *
+                     END-PERFORM
+      *
+                   END-IF
+      ***
                    IF   COMB-KOH1HKNNUM =  "027"
                      IF ((COMB-KOH2HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(2)         =  ZERO   ))
                      OR ((COMB-KOH3HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(3)         =  ZERO   ))
                      OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(4)         =  ZERO   ))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    ELSE
                      IF ((COMB-KOH1HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH1HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH1HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(1)         =  ZERO   ))
                      OR ((COMB-KOH2HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(2)         =  ZERO   ))
                      OR ((COMB-KOH3HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(3)         =  ZERO   ))
                      OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ))
+                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
+                         (WRK-DOTANDOKU(4)         =  ZERO   ))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    END-IF
@@ -1577,6 +1633,47 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *
            .
        900-PTHKNINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊó¸¡º÷
+      *****************************************************************
+       900-PTKOHINF-SELECT-SEC        SECTION.
+      *
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-PTKOHINF
+           ELSE
+               MOVE    1                  TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊóÆÉ¹þ
+      *****************************************************************
+       910-PTKOHINF-READ-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+               MOVE    ZERO            TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       910-PTKOHINF-READ-EXT.
            EXIT.
       *
       *****************************************************************
