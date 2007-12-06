@@ -2033,7 +2033,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM     TO      SANTEI-HOSPNUM
            MOVE    WRK-PARA-A8          TO      SANTEI-SRYYM
            MOVE    SANTEI-REC           TO      MCPDATA-REC
            MOVE    "tbl_santei"         TO  MCP-TABLE
-           MOVE    "del2"               TO  MCP-PATHNAME
+           MOVE    "del1"               TO  MCP-PATHNAME
            MOVE    "DBDELETE"           TO      MCP-FUNC
 grpsys     PERFORM 900-ORCDBMAIN-SEC
            .
