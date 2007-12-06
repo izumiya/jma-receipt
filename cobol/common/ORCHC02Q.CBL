@@ -762,6 +762,7 @@
                    INITIALIZE                  WRK-SYOHOU-AREA
                    MOVE    1                   TO  WRK-PAGE-MAX
                    MOVE    SPA-HKNCOMBINUM     TO  WRK-HKNCOMBINUM
+                   INITIALIZE                  ORCSQRCSVAREA
                    PERFORM 400-PRINT-SYORI-SEC
                WHEN    "4"
                WHEN    "5"
