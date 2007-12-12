@@ -50,6 +50,8 @@
       *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
       *  03.04.14    NACL-ÌçÏÆ    07/10/25  ËÌ³¤Æ»£µ£±¡ÊÆ»Ã±ÆÈ»ö¶È¡Ë¤Ë´Ø¤ï¤ë
       *                                     ÀÁµáÅÀµ­ºÜÂÐ±þ
+      *  03.04.15    NACL-Æ£¸¶    07/12/08  Ä¹ºê¸©ÂÐ±þ
+      *                                     À¸ÊÝ¤ÈÈïÇú£¸£¶¤Îµ­ºÜ½ç 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4801,10 +4803,18 @@
       *     
            IF      RECE62-HKNNUM      =   SPACE
                IF      SEIHIDX            >   ZERO 
-                   COMPUTE IDX1    =   SEIHIDX   +   1
-                   MOVE    2                  TO  IDX2
-                   IF      IDX1               =   IDX2
-                       COMPUTE  IDX2  =  IDX1  +  1
+      *            Ä¹ºê¤ÎÀ¸ÊÝ¤ÈÈïÇú¡Ê£°£±£²¡Ü£±£¸£¶¡Ë¤Î¤È¤­¤Ï¤½¤Î¤Þ¤Þµ­ºÜ
+                   IF    ( SYS-1001-PREFNUM    =   "42"  )
+                   AND   ( RECE62-KOHNUM (1)   =   "186" )
+                   AND   ( RECE62-KOHNUM (2)   =   "012" )
+                       MOVE    2                  TO  IDX1
+                       MOVE    3                  TO  IDX2
+                   ELSE
+                       COMPUTE IDX1    =   SEIHIDX   +   1
+                       MOVE    2                  TO  IDX2
+                       IF      IDX1               =   IDX2
+                           COMPUTE  IDX2  =  IDX1  +  1
+                       END-IF
                    END-IF
                ELSE
                    MOVE    2                  TO  IDX1

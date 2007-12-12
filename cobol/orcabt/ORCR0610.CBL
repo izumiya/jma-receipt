@@ -99,6 +99,8 @@
       *  03.04.02    NACL-Æ£¸¶    06/12/05  Ì¤ÀÁµá¥ì¥»ÂÐ±þ
       *                                     MONFUNCÂÐ±þ
       *  03.04.03    NACL-Æ£¸¶    07/08/20  ËÌ³¤Æ»¤ÎÃÏÊý¸øÈñ¤Îµ­ºÜ½çÂÐ±þ
+      *  03.04.04    NACL-Æ£¸¶    07/12/08  Ä¹ºê¸©ÂÐ±þ
+      *                                     À¸ÊÝ¤ÈÈïÇú£¸£¶¤Îµ­ºÜ½ç 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -307,6 +309,9 @@
       *
            03  WRK-SYUKA-SRYYM         PIC X(06).
            03  WRK-SYUKA-PTID          PIC 9(10).
+      *
+           03  WRK-SEIHO-IDX           PIC 9(01).
+           03  WRK-HIBAKU-IDX          PIC 9(01).
       *
            03  WRK-1033-TABLE.
                05  WRK-1033-TBL    OCCURS  5.
@@ -2454,9 +2459,41 @@
                                            WRK-RECE61-KOHI-TBL(TBL-MAX)
                END-IF    
            END-PERFORM
-076800     .
-076900 20012-KOHID-HENSYU-EXT.
-077000     EXIT.
+      *
+      *    Ä¹ºê¤ÎÀ¸ÊÝ¤ÈÈïÇú¡Ê£°£±£²¡Ü£±£¸£¶¡Ë
+           IF      SYS-1001-PREFNUM    =   "42"
+               MOVE    ZERO                TO  WRK-SEIHO-IDX
+                                               WRK-HIBAKU-IDX                                                 
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       4
+                       OR      WRK-RECE61-KOHHKNNUM-O (IDX)
+                                   =       SPACE
+                   IF      WRK-RECE61-KOHHKNNUM-O (IDX)
+                                               =   "012"
+                       IF      WRK-HIBAKU-IDX      =   0 
+                           MOVE    IDX                 TO  WRK-SEIHO-IDX
+                       ELSE
+                           MOVE    4                   TO  IDX
+                       END-IF
+                   END-IF
+                   IF      WRK-RECE61-KOHHKNNUM-O (IDX)
+                                               =   "186"
+                       IF      WRK-SEIHO-IDX       >   0
+                           MOVE    WRK-RECE61-KOHI-TBL(IDX)
+                                               TO  WRK-KOHI
+                           MOVE    WRK-RECE61-KOHI-TBL (WRK-SEIHO-IDX)
+                                               TO  WRK-RECE61-KOHI-TBL
+                                                   (IDX)
+                           MOVE    WRK-KOHI    TO  WRK-RECE61-KOHI-TBL
+                                                   (WRK-SEIHO-IDX)
+                       END-IF
+                       MOVE    4                   TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+           .
+       20012-KOHID-HENSYU-EXT.
+           EXIT.
       * 
       *****************************************************************
       *    ¸øÈñ¾ðÊóÂàÈò½èÍý
