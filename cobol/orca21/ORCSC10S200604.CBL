@@ -4650,6 +4650,10 @@
                    UNTIL      (IDX         >   200      )   OR
                               (SPA-ERRCD           NOT =   SPACE )  OR
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
+               IF    (SPA-GMN-INPUTCD  (IDX)(1:1) =   "#"
+                                                 OR  "$"   )
+                   CONTINUE
+               ELSE
       *        検査、投薬、注射は算定できない
                EVALUATE    SPA-COM-SRYKBN(IDX)
                    WHEN    "21"
@@ -4696,6 +4700,7 @@
                            END-IF
                        END-IF
                END-EVALUATE
+               END-IF
            END-PERFORM
            .
        5022-ZAIKANRI-CHK-EXT.
@@ -4709,6 +4714,10 @@
                    UNTIL      (IDX         >   200      )   OR
                               (SPA-ERRCD           NOT =   SPACE )  OR
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
+               IF    (SPA-GMN-INPUTCD  (IDX)(1:1) =   "#"
+                                                 OR  "$"   )
+                   CONTINUE
+               ELSE
       *        今回入力
                IF      SPA-ZAIMATU-ARI    NOT  =   ZERO
       *            在宅料以外は算定できない
@@ -4759,6 +4768,8 @@
                            MOVE    "1401"          TO  SPA-ERRCD
                            MOVE    "1"             TO  SPA-COM-CUR (IDX)
                    END-EVALUATE
+               END-IF
+      *
                END-IF
            END-PERFORM
            .
