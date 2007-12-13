@@ -4505,6 +4505,8 @@
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
       *       Ò≥Á ›∏±
              IF     (SPA-COM-HKNCOMBI (IDX)      =   "9999")
+                 OR (SPA-GMN-INPUTCD  (IDX)(1:1) =   "#"
+                                                 OR  "$"   )
                CONTINUE
              ELSE
       *        ¿∏≥Ëªÿ∆≥°¢∏°∫∫°¢√ÌºÕ°¢∫ﬂ¬Œ¡∞ ≥∞§«§¢§Î§≥§»
@@ -4638,6 +4640,8 @@
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
       *       Ò≥Á ›∏±
              IF     (SPA-COM-HKNCOMBI (IDX)      =   "9999")
+                 OR (SPA-GMN-INPUTCD  (IDX)(1:1) =   "#"
+                                                 OR  "$"   )
                CONTINUE
              ELSE
       *        ∏°∫∫°¢≈ÍÃÙ°¢√ÌºÕ§œªªƒÍ§«§≠§ §§
@@ -4708,6 +4712,8 @@
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
       *       Ò≥Á ›∏±
              IF     (SPA-COM-HKNCOMBI (IDX)      =   "9999")
+                 OR (SPA-GMN-INPUTCD  (IDX)(1:1) =   "#"
+                                                 OR  "$"   )
                CONTINUE
              ELSE
       *        ∏°∫∫°¢≈ÍÃÙ°¢√ÌºÕ§œªªƒÍ§«§≠§ §§
@@ -4772,6 +4778,8 @@
                               (SPA-GMN-INPUTCD (IDX)   =   SPACE )
       *       Ò≥Á ›∏±
              IF     (SPA-COM-HKNCOMBI (IDX)      =   "9999")
+                 OR (SPA-GMN-INPUTCD  (IDX)(1:1) =   "#"
+                                                 OR  "$"   )
                CONTINUE
              ELSE
       *        ∫£≤Û∆˛Œœ
