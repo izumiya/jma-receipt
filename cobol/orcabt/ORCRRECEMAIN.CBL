@@ -2284,15 +2284,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                PERFORM  UNTIL
                         (FLG-SANTEI         =    1)
                    MOVE    SANTEI-REC   TO      MCPDATA-REC
-                IF SANTEI-SRYYM         <       WRK-PARA-A8
-                   CONTINUE
-                ELSE
                    MOVE    "DBINSERT"   TO      MCP-FUNC
                    MOVE    "tbl_santei" TO  MCP-TABLE
                    MOVE    "key"        TO  MCP-PATHNAME
                    PERFORM  900-REALDB-INS-SEC
                    DISPLAY "take santei insert "
-                END-IF
       *
                 MOVE    "tbl_santei_prv"     TO  MCP-TABLE
                 MOVE    "key2"               TO  MCP-PATHNAME
