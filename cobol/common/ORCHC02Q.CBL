@@ -2144,9 +2144,9 @@
                        IF      SRY-SRYCD (IDXA)(1:3) =   "001"
                            MOVE    TNS-NAME        TO  ORCSQRCSV-BIKOU
                                                            (IDX-QRB)
-      *****            ELSE
-      *****                MOVE    WRK-TNS-NAME    TO  ORCSQRCSV-BIKOU
-      *****                                                (IDX-QRB)
+                       ELSE
+                           MOVE    WRK-TNS-NAME    TO  ORCSQRCSV-BIKOU
+                                                           (IDX-QRB)
                        END-IF
                    END-IF
       *---(04.00.00) LINE ADD END   ------------------------------------
@@ -2358,8 +2358,8 @@
                ADD     1                   TO  IDX-QR2
                MOVE    SRY-SRYCD (IDXA)    TO  ORCSQRCSV-SRYCD
                                                   (IDX-QR1 IDX-QR2)
-      *****    MOVE    TNS-NAME            TO  ORCSQRCSV-TNS-NAME
-      *****                                       (IDX-QR1 IDX-QR2)
+               MOVE    TNS-NAME            TO  ORCSQRCSV-TNS-NAME
+                                                  (IDX-QR1 IDX-QR2)
            END-IF
       *---(04.00.00) LINE ADD END   ------------------------------------
       *
@@ -3288,9 +3288,9 @@
                    IF      WKSRY-SRYCD (IDXA)(1:3) =   "001"
                        MOVE    TNS-NAME        TO  ORCSQRCSV-BIKOU
                                                            (IDX-QRB)
-      *****        ELSE
-      *****            MOVE    WRK-TNS-NAME    TO  ORCSQRCSV-BIKOU
-      *****                                                (IDX-QRB)
+                   ELSE
+                       MOVE    WRK-TNS-NAME    TO  ORCSQRCSV-BIKOU
+                                                           (IDX-QRB)
                    END-IF
                END-IF
       *---(04.00.00) LINE ADD END   ------------------------------------
@@ -3607,9 +3607,9 @@
                   IF      ORCHC19-SRYCD (IDX-L IDX-L2)(1:3) =   "001"
                       MOVE    TNS-NAME         TO  ORCSQRCSV-BIKOU
                                                            (IDX-QRB)
-      *****        ELSE
-      *****           MOVE    WRK-TNS-NAME     TO  ORCSQRCSV-BIKOU
-      *****                                                (IDX-QRB)
+                   ELSE
+                      MOVE    WRK-TNS-NAME     TO  ORCSQRCSV-BIKOU
+                                                           (IDX-QRB)
                    END-IF
                END-IF
       *---(04.00.00) LINE ADD END   ------------------------------------
