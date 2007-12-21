@@ -4153,8 +4153,8 @@
                     MOVE    "key8"           TO  MCP-PATHNAME
                     PERFORM  PTKOHINF-READ-SEC
                     IF       FLG-PTKOHINF    =       ZERO
-                      IF  PTKOH-JKYSNUM(1:2) = "91" OR "92" OR "93"
-                                            OR "94" OR "95"
+                      IF (PTKOH-JKYSNUM(1:2) >= "91" AND <= "95")
+                      OR (PTKOH-JKYSNUM(1:2) >= "71" AND <= "88")
                          MOVE    1    TO   WK-DOTANDOKU(KOH-IDX)
                       END-IF
                     END-IF

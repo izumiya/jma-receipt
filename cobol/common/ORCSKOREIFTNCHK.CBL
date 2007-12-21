@@ -236,9 +236,10 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                             MOVE    "key8"           TO  MCP-PATHNAME
                             PERFORM 910-PTKOHINF-READ-SEC
                             IF      FLG-PTKOHINF     =       ZERO
-                              IF  PTKOH-JKYSNUM(1:2) = "91" OR "92"
-                                                    OR "93" OR "94"
-                                                    OR "95"
+                              IF (PTKOH-JKYSNUM(1:2) >= "91"
+                                                 AND <= "95")
+                              OR (PTKOH-JKYSNUM(1:2) >= "71"
+                                                 AND <= "88")
                                   MOVE   1   TO  WRK-DOTANDOKU(IDX2)
                               END-IF
                             END-IF
