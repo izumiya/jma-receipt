@@ -2096,9 +2096,11 @@
              PERFORM   VARYING  IDY2    FROM    1   BY  1
                         UNTIL   IDY2      >     4
                IF RECE02-KOHNUM(IDY2)(1:1) =  "0" OR "9"
-                  IF  (RECE02-KOHNUM(IDY2) =  "051"          )
-                  AND (RECE02-KOHJKYSNUM(IDY2)(1:2)  =
-                         "91" OR "92" OR "93" OR "94" OR "95")
+                  IF  ( RECE02-KOHNUM(IDY2) =  "051"         )
+                  AND ((RECE02-KOHJKYSNUM(IDY2)(1:2) >= "91"
+                                                 AND <= "95") OR
+                       (RECE02-KOHJKYSNUM(IDY2)(1:2) >= "71"
+                                                 AND <= "88"))
                      MOVE    1     TO    FLG-DOTANDOKU
                   ELSE
                      MOVE    1     TO    FLG-DOTANDOKU-IGAI
@@ -6936,10 +6938,12 @@
                       PERFORM  21092-GENGAKU-OKIKAE-SEC
                    END-IF
                  ELSE
-                   IF  (SYS-1001-PREFNUM  =   01             )
-                   AND (RECE02-KOHNUM(1)  =  "051"           )
-                   AND (RECE02-KOHJKYSNUM(1)(1:2)  =
-                        "91" OR "92" OR "93" OR "94" OR "95" )
+                   IF  ( SYS-1001-PREFNUM  =   01          )
+                   AND ( RECE02-KOHNUM(1)  =  "051"        )
+                   AND ((RECE02-KOHJKYSNUM(1)(1:2) >= "91"
+                                               AND <= "95") OR
+                        (RECE02-KOHJKYSNUM(1)(1:2) >= "71"
+                                               AND <= "88"))
                       CONTINUE
                    ELSE
                       PERFORM  21092-GENGAKU-OKIKAE-SEC
@@ -6970,9 +6974,11 @@
                IF  RECE02-SRYYM   >=  "200510"
                  PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
                            UNTIL   KOHFTN-IDX   >    4
-                   IF  (RECE02-KOHNUM(KOHFTN-IDX) =  "051"   )
-                   AND (RECE02-KOHJKYSNUM(KOHFTN-IDX)(1:2)  =
-                        "91" OR "92" OR "93" OR "94" OR "95" )
+                   IF  ( RECE02-KOHNUM(KOHFTN-IDX) =  "051"         )
+                   AND ((RECE02-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "91"
+                                                        AND <= "95") OR
+                        (RECE02-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "71"
+                                                        AND <= "88"))
                        MOVE     1     TO    FLG-SAIKEI-KISAI
                    END-IF
                  END-PERFORM

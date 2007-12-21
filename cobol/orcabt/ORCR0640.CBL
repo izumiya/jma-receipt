@@ -8930,9 +8930,11 @@
              PERFORM   VARYING  IDX1    FROM    1   BY  1
                         UNTIL   IDX1      >     4
                IF RECE62-KOHNUM(IDX1)(1:1) =  "0" OR "9"
-                  IF  (RECE62-KOHNUM(IDX1) =  "051"          )
-                  AND (RECE62-KOHJKYSNUM(IDX1)(1:2)  =
-                         "91" OR "92" OR "93" OR "94" OR "95")
+                  IF  ( RECE62-KOHNUM(IDX1) =  "051"         )
+                  AND ((RECE62-KOHJKYSNUM(IDX1)(1:2) >= "91"
+                                                 AND <= "95") OR
+                       (RECE62-KOHJKYSNUM(IDX1)(1:2) >= "71"
+                                                 AND <= "88"))
                      MOVE    1     TO    FLG-DOTANDOKU
                   ELSE
                      MOVE    1     TO    FLG-DOTANDOKU-IGAI
@@ -10564,8 +10566,8 @@
                    (RECE62-SRYYM             >=  "200604"      ))
                OR ((WRK-PREFNUM               =  "01"          )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "051"         )  AND
-                   (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2)  =
-                          "91" OR "92" OR "93" OR "94" OR "95" )  AND
+                   (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "91"
+                                                   AND <= "95" )  AND
                    (RECE62-SRYYM             >=  "200510"      ))
                 CONTINUE
                ELSE
@@ -11129,10 +11131,12 @@
                       PERFORM  210462-GENGAKU-OKIKAE-SEC
                    END-IF
                  ELSE
-                   IF  (WRK-PREFNUM       =  "01"            )
-                   AND (RECE62-KOHNUM(1)  =  "051"           )
-                   AND (RECE62-KOHJKYSNUM(1)(1:2)  =
-                        "91" OR "92" OR "93" OR "94" OR "95" )
+                   IF  ( WRK-PREFNUM       =  "01"         )
+                   AND ( RECE62-KOHNUM(1)  =  "051"        )
+                   AND ((RECE62-KOHJKYSNUM(1)(1:2) >= "91"
+                                               AND <= "95") OR
+                        (RECE62-KOHJKYSNUM(1)(1:2) >= "71"
+                                               AND <= "88"))
                       CONTINUE
                    ELSE
                       PERFORM  210462-GENGAKU-OKIKAE-SEC
@@ -11163,9 +11167,11 @@
                IF  RECE62-SRYYM   >=  "200510"
                  PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
                            UNTIL   KOHFTN-IDX   >    4
-                   IF  (RECE62-KOHNUM(KOHFTN-IDX) =  "051"   )
-                   AND (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2)  =
-                        "91" OR "92" OR "93" OR "94" OR "95" )
+                   IF  ( RECE62-KOHNUM(KOHFTN-IDX) =  "051"         )
+                   AND ((RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "91"
+                                                        AND <= "95") OR
+                        (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "71"
+                                                        AND <= "88"))
                        MOVE     1     TO    FLG-SAIKEI-KISAI
                    END-IF
                  END-PERFORM

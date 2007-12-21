@@ -4223,8 +4223,8 @@
                                              MCPDATA-REC
                     IF      MCP-RC           =       ZERO
                       MOVE    MCPDATA-REC    TO  PTKOHINF-REC
-                      IF  PTKOH-JKYSNUM(1:2) = "91" OR "92" OR "93"
-                                            OR "94" OR "95"
+                      IF (PTKOH-JKYSNUM(1:2) >= "91" AND <= "95")
+                      OR (PTKOH-JKYSNUM(1:2) >= "71" AND <= "88")
                          MOVE    1    TO   WK-DOTANDOKU(KOH-IDX)
                       END-IF
                     END-IF

@@ -4402,8 +4402,10 @@
            OR    ((RECE02-SRYYM          >=  "200510"  ) AND
                   (SYS-1001-PREFNUM       =    01      ) AND
                   (RECE02-KOHNUM(1)       =  "051"     ) AND
-                  (RECE02-KOHJKYSNUM(1)(1:2)  =
-                   "91" OR "92" OR "93" OR "94" OR "95") AND
+                  ((RECE02-KOHJKYSNUM(1)(1:2) >= "91"
+                                          AND <= "95" ) OR
+                   (RECE02-KOHJKYSNUM(1)(1:2) >= "71"
+                                          AND <= "88" )) AND
                   (RECE02-TOTALTEN (IDX2) >   ZERO     ))
                MOVE    RECE02-TOTALTEN (IDX2) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(2)
@@ -4460,14 +4462,18 @@
            OR    ((RECE02-SRYYM          >=  "200510"  ) AND
                   (SYS-1001-PREFNUM       =    01      ) AND
                   (RECE02-KOHNUM(2)       =  "051"     ) AND
-                  (RECE02-KOHJKYSNUM(2)(1:2)  =
-                   "91" OR "92" OR "93" OR "94" OR "95") AND
+                  ((RECE02-KOHJKYSNUM(2)(1:2) >= "91"
+                                          AND <= "95" ) OR
+                   (RECE02-KOHJKYSNUM(2)(1:2) >= "71"
+                                          AND <= "88" )) AND
                   (RECE02-TOTALTEN (IDX3) >   ZERO     ))
            OR    ((RECE02-SRYYM          >=  "200510"  ) AND
                   (SYS-1001-PREFNUM       =    01      ) AND
                   (RECE02-KOHNUM(1)       =  "051"     ) AND
-                  (RECE02-KOHJKYSNUM(1)(1:2)  =
-                   "91" OR "92" OR "93" OR "94" OR "95") AND
+                  ((RECE02-KOHJKYSNUM(1)(1:2) >= "91"
+                                          AND <= "95" ) OR
+                   (RECE02-KOHJKYSNUM(1)(1:2) >= "71"
+                                          AND <= "88" )) AND
                   (RECE02-TOTALTEN (IDX2) >   ZERO     ) AND
                   (RECE02-KOHHBTNUM(2)    =  "41"      ) AND
                   (RECE02-TOTALTEN (IDX3) >   ZERO     ))

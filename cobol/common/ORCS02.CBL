@@ -474,6 +474,7 @@
            03  WK-DOTANDOKU-TBL.
                05  WK-DOTANDOKU-OCC        OCCURS   4.
                  06  WK-DOTANDOKU          PIC  9(01).
+                 06  WK-DOTANDOKUFLG       PIC  9(01).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -4024,8 +4025,11 @@
                                              MCPDATA-REC
                     IF      MCP-RC           =       ZERO
                       MOVE    MCPDATA-REC    TO  PTKOHINF-REC
-                      IF  PTKOH-JKYSNUM(1:2) = "91" OR "92" OR "93"
-                                            OR "94" OR "95"
+                      IF  PTKOH-JKYSNUM(1:2) >= "91" AND <= "95"
+                         MOVE    1    TO   WK-DOTANDOKU(KOH-IDX)
+                         MOVE    1    TO   WK-DOTANDOKUFLG(KOH-IDX)
+                      END-IF
+                      IF  PTKOH-JKYSNUM(1:2) >= "71" AND <= "88"
                          MOVE    1    TO   WK-DOTANDOKU(KOH-IDX)
                       END-IF
                     END-IF
@@ -13366,7 +13370,8 @@
            END-IF.
       *
       *    ËÌ³¤Æ»¡¦ÆÃÄê¼À´µ¡Ê£°£µ£±¡Ë¡ÊÆ»Ã±ÆÈ»ö¶È¡Ë
-           IF     WK-DOTANDOKU(KOH-IDX)  =   1
+           IF    (WK-DOTANDOKU(KOH-IDX)     =   1)
+           AND   (WK-DOTANDOKUFLG(KOH-IDX)  =   1)
                MOVE    "1"       TO   WK-NYUSKJRYYKBN
                MOVE    9999999   TO   WK-TAIHI-NYUJGNGAK(KOH-IDX)
            END-IF.
