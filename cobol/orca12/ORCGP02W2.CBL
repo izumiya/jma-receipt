@@ -77,6 +77,9 @@
       *  04.00.01    NACL-¾®Æ¦Âô  07/11/30  °ìÈÌÎÅÍÜ¡¢ÆÃÊÌÎÅÍÜ¡ÊµìÆü¸ÛÊÝ¸±¡Ë
       *                                     ¤Î¾ì¹ç¤ÏÀ¸³èÊÝ¸î¤ÎÃ±ÆÈ¤òºîÀ®²ÄÇ½
       *                                     ¤ËÊÑ¹¹
+      *  04.00.02    NACL-¾®Æ¦Âô  07/12/21  °ìÈÌÎÅÍÜ¡¢ÆÃÊÌÎÅÍÜ¡ÊµìÆü¸ÛÊÝ¸±¡Ë
+      *                                     ¤Î¾ì¹ç¤Ï·ë³ËÆþ±¡¤ÎÃ±ÆÈ¤òºîÀ®²ÄÇ½
+      *                                     ¤ËÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3102,7 +3105,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                        OR      ( IDX   >       CNT-KOH )
              IF ((WRK-KOH-SBT   (IDX)  =   "6")   AND
                  (WRK-KOH-SAKJOKBN   (IDX)  =   SPACE)) OR
-                ((WRK-KOH-HKNNUM   (IDX)  =   "019" OR "012")   AND
+                ((WRK-KOH-HKNNUM   (IDX)  =   "019" OR "012" OR
+                                              "011")   AND
                  (WRK-KOH-SAKJOKBN (IDX)  =   SPACE)   AND
                  (WRK-HIYATOI-FLG         =   1 )     )
       *
@@ -3123,7 +3127,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                         TO  WRK-LCOMB-TEKSTYMD   (IDX2)
                MOVE    WRK-KOH-TEKEDYMD(IDX)
                                         TO  WRK-LCOMB-TEKEDYMD   (IDX2)
-               IF      WRK-KOH-HKNNUM   (IDX)  =   "019" OR "012"
+               IF      WRK-KOH-HKNNUM   (IDX)  =   "019" OR "012" OR
+                                                   "011"
                    MOVE   WRK-HIYATOI-TEKSTYMD
                                         TO  WRK-LCOMB-TEKSTYMD   (IDX2)
                    MOVE   WRK-HIYATOI-TEKEDYMD
