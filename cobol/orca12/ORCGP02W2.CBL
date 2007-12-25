@@ -155,6 +155,7 @@
       *----(01.00.01) LINE ADD END   ---------------------------------
            03  FLG-SYOCYO          PIC 9(01).
            03  FLG-HANTEI          PIC 9(01).
+           03  FLG-KOH-CHK          PIC 9(01).
       *
       *    市它件玄恄啗
        01  CNT-AREA.
@@ -3105,10 +3106,29 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                        OR      ( IDX   >       CNT-KOH )
              IF ((WRK-KOH-SBT   (IDX)  =   "6")   AND
                  (WRK-KOH-SAKJOKBN   (IDX)  =   SPACE)) OR
-                ((WRK-KOH-HKNNUM   (IDX)  =   "019" OR "012" OR
-                                              "011")   AND
+                ((WRK-KOH-HKNNUM   (IDX)  =   "019"
+                                          OR "012"
+                                          OR  "011")   AND
                  (WRK-KOH-SAKJOKBN (IDX)  =   SPACE)   AND
                  (WRK-HIYATOI-FLG         =   1 )     )
+      *
+               MOVE    ZERO            TO  FLG-KOH-CHK
+               IF      WRK-KOH-HKNNUM   (IDX)  =   "019"
+                                               OR "012"
+                                               OR  "011"
+                   MOVE    1           TO  FLG-KOH-CHK
+      *            ゥ誠中及�炾炡陘牬轃恕楔吨�
+                   IF    (WRK-KOH-TEKSTYMD(IDX)
+                                       >   WRK-HIYATOI-TEKEDYMD )
+                     OR  (WRK-KOH-TEKEDYMD(IDX)
+                                       <   WRK-HIYATOI-TEKSTYMD )
+                       MOVE    2           TO  FLG-KOH-CHK
+                   END-IF
+               END-IF
+      *
+               IF     (FLG-KOH-CHK      =   2    )
+                   CONTINUE
+               ELSE
       *
                INITIALIZE                  WRK-COMB-AREA
       *
@@ -3127,12 +3147,17 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                         TO  WRK-LCOMB-TEKSTYMD   (IDX2)
                MOVE    WRK-KOH-TEKEDYMD(IDX)
                                         TO  WRK-LCOMB-TEKEDYMD   (IDX2)
-               IF      WRK-KOH-HKNNUM   (IDX)  =   "019" OR "012" OR
-                                                   "011"
+               IF      (FLG-KOH-CHK      =   1    )
+                   AND (WRK-HIYATOI-TEKSTYMD
+                                         >=    WRK-KOH-TEKSTYMD(IDX))
                    MOVE   WRK-HIYATOI-TEKSTYMD
                                         TO  WRK-LCOMB-TEKSTYMD   (IDX2)
-                   MOVE   WRK-HIYATOI-TEKEDYMD
-                                        TO  WRK-LCOMB-TEKEDYMD   (IDX2)
+               END-IF
+               IF    (FLG-KOH-CHK      =   1    )
+                 AND (WRK-HIYATOI-TEKEDYMD
+                                            <=   WRK-KOH-TEKEDYMD(IDX))
+                      MOVE   WRK-HIYATOI-TEKEDYMD
+                                       TO  WRK-LCOMB-TEKEDYMD   (IDX2)
                END-IF
                MOVE    WRK-KOH-SEIDO  (IDX)
                                   TO  WRK-LCOMB-KOH1-TANSEIDONAME(IDX2)
@@ -3143,6 +3168,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 57012-FUTAN-SET-SEC
       *
                PERFORM     57010-NC01PARA-OUT-SEC
+      *
+             END-IF
       *
              END-IF
            END-PERFORM
