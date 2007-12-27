@@ -132,6 +132,8 @@
       *
            03  FLG-NYUINIDOU       PIC 9(01). 
       *
+           03  FLG-SURYO           PIC 9(01). 
+      *
       *    キー領域
        01  KEY-AREA                    VALUE   LOW-VALUE.
            03  KEY-NEW.
@@ -1857,6 +1859,7 @@
                                        TO  TBL-WKSRY-INPUTCD
                                              (TBL-MAX IDX-S)
            END-IF
+           MOVE    ZERO                 TO  FLG-SURYO
       *    コメント値
            IF    ((TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:2)
                                        =   "84"   )  OR
@@ -1864,8 +1867,21 @@
                                        =   "0084"  ))  AND
                   (LF04-SURYO (IDX1 IDX2)  NOT =   SPACE )
                PERFORM 200321-INPUTCHI-HEN-SEC
-           ELSE
+               MOVE    1               TO  FLG-SURYO
+           END-IF
+      *    画像診断のフィルム
+           IF    ((TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)
+                                       =   "7"   )  OR
+                  (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
+                                       =   "059"  ))  AND
+                  (TNS-DATAKBN         =   "3"    )   AND
+                  ( WRK-SRYKBN         =   "70"   )   AND
+                  (LF04-SURYO (IDX1 IDX2)  NOT =   SPACE )
+               PERFORM 200322-FIRUMU-HEN70-SEC
+               MOVE    1               TO  FLG-SURYO
+           END-IF
       *
+           IF      FLG-SURYO           =   ZERO
       *        数量
                MOVE    ZERO                TO  WRK-SURYO
                INITIALIZE                      ORCSNUMAREA
@@ -1998,6 +2014,66 @@
       *
            .
        200321-INPUTCHI-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    画像診断のフィルム数量編集処理
+      *****************************************************************
+       200322-FIRUMU-HEN70-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  WRK-INPUTCHI-G
+           MOVE    1                   TO  IDX-I1
+           MOVE    ZERO                TO  IDX-I2
+           PERFORM VARYING     IDX-I   FROM    1   BY  1
+                   UNTIL      (IDX-I   >   12  )   OR
+                              (IDX-I1  >   4   )
+               IF      LF04-SURYO (IDX1 IDX2)(IDX-I:1) =   "-"
+                   ADD     1               TO  IDX-I1
+                   MOVE    ZERO            TO  IDX-I2
+               ELSE
+                   ADD     1               TO  IDX-I2
+                   MOVE    LF04-SURYO (IDX1 IDX2)(IDX-I:1)
+                                           TO  WRK-INPUTCHI
+                                                 (IDX-I1)(IDX-I2:1)
+               END-IF
+           END-PERFORM
+      *    数量
+           MOVE    ZERO                TO  WRK-SURYO
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    WRK-INPUTCHI(1)     TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-MINKBN         =   "1"   )   OR
+                  (SNUM-SEISUU         >   7     )   OR
+                  (SNUM-SYOSUU         >   3     )
+               MOVE    ZERO                TO  WRK-SURYO
+           ELSE
+               MOVE    SNUM-OUTNUM         TO  WRK-SURYO
+           END-IF
+           IF      WRK-SURYO           =   ZERO
+               MOVE    1               TO  WRK-SURYO
+           END-IF
+           MOVE    WRK-SURYO           TO  TBL-WKSRY-SRYSURYO
+                                                     (TBL-MAX IDX-S)
+      *    分画数
+           IF      WRK-INPUTCHI(2) NOT =   SPACE
+               INITIALIZE                      ORCSNUMAREA
+               MOVE    WRK-INPUTCHI(2)     TO  SNUM-INX
+               CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+               IF     (SNUM-RC         NOT =   ZERO  )   OR
+                      (SNUM-MINKBN         =   "1"   )   OR
+                      (SNUM-SEISUU         >   7     )   OR
+                      (SNUM-SYOSUU         >   3     )
+                   CONTINUE
+               ELSE
+                   MOVE    SNUM-OUTNUM         TO  TBL-WKSRY-SRYKAISU
+                                                     (TBL-MAX IDX-S)
+               END-IF
+           END-IF
+      *
+           .
+       200322-FIRUMU-HEN70-EXT.
            EXIT.
       *
       *****************************************************************
