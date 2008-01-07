@@ -3903,6 +3903,7 @@
                                                      "$" )
       *              •≥•·•Û•»
                  OR (SPA-COM-INPUTCD(IDX)(1:1)   =   "8" )
+                 OR (SPA-COM-INPUTCD(IDX)(1:3)   =   "008" )
       *           Ò≥Á ›∏±
                  OR (SPA-COM-HKNCOMBI (IDX)      =   "9999")
                  CONTINUE
