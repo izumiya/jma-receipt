@@ -66,7 +66,7 @@
            03  WRK-HKNNUM              PIC X(03).
       *
        01  CONST-AREA.
-           03  CONST-HKNCOMBI-MAX      PIC 9(05)   VALUE   100.
+           03  CONST-HKNCOMBI-MAX      PIC 9(05)   VALUE   1000.
            03  CONST-HKNINF-MAX        PIC 9(05)   VALUE   50.
       *
       *****************************************************************
@@ -97,7 +97,7 @@
       *
            COPY    "CPORCSDTCHK02.INC".
            01  LNK-HKNCOMBI-AREA.
-             02  LNK-HKNCOMBI-OCC      OCCURS  100.
+             02  LNK-HKNCOMBI-OCC      OCCURS  1000.
            COPY    "CPHKNCOMBI.INC"    REPLACING  //COMB-//
                                        BY         //LNK-COMB-//.
              

@@ -136,7 +136,7 @@
            COPY    "CPSK1101.INC".
            COPY    "CPORCSDTCHK02.INC".
            01  LNK-HKNCOMBI-AREA.
-             02  LNK-HKNCOMBI-OCC      OCCURS  100.
+             02  LNK-HKNCOMBI-OCC      OCCURS  1000.
            COPY    "CPHKNCOMBI.INC"    REPLACING  //COMB-//
                                        BY         //LNK-COMB-//.
       *
