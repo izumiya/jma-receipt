@@ -22,7 +22,7 @@
            03  SDTCHK02-OT.
                05  SDTCHK02-O-MAX              PIC 9(05).
                05  SDTCHK02-O-HKNCOMBIMEI      PIC X(50)
-                                               OCCURS  100.
+                                               OCCURS  1000.
            03  SDTCHK02-OT-HKNINF.
                05  SDTCHK02-O-HKNINF-MAX       PIC 9(05).
                05  SDTCHK02-O-HKNINF-OCC       OCCURS  50.

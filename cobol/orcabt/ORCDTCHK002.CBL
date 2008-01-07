@@ -1123,7 +1123,7 @@
       *    保険組合せ取得サブ
            COPY    "CPORCSDTCHK02.INC".
            01  LNK-HKNCOMBI-AREA.
-             02  LNK-HKNCOMBI-OCC      OCCURS  100.
+             02  LNK-HKNCOMBI-OCC      OCCURS  1000.
            COPY    "CPHKNCOMBI.INC"    REPLACING  //COMB-//
                                        BY         //LNK-COMB-//.
       *
@@ -7878,6 +7878,9 @@
                        WITH    POINTER WRK-NISSU-PTR
                        END-STRING
                    END-IF
+      *
+                   MOVE    SPACE               TO  WRK-NISSU-ST-X
+                                                   WRK-NISSU-ED-X
       *
                    IF    ( WRK-NISSU-RENZOKU-CNT  >   ZERO )
                        COMPUTE WRK-NISSU-ED    =   WRK-NISSU-ED    -   1
