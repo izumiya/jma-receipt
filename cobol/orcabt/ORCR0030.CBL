@@ -309,6 +309,8 @@
       *  03.04.26    NACL-ÌçÏÆ    07/11/12  ÀéÍÕ¸©ÆýÍÄ»ù°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  03.04.27    NACL-ÌçÏÆ    07/11/29  ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ½¤Àµ
       *  03.04.28    NACL-ÌçÏÆ    07/12/03  ËÌ³¤Æ»ÆÃÄê¼À´µ¡ÊÆ»Ã±ÆÈ»ö¶È¡ËÂÐ±þ
+      *  03.04.29    NACL-ÌçÏÆ    08/01/07  µþÅÔÉÜÃÏÊý¸øÈñÀÁµáÅÀµ­ºÜÂÐ±þ
+      *  03.04.30    NACL-ÌçÏÆ    08/01/07  ÆÁÅç¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7851,6 +7853,16 @@
       *
            END-PERFORM
       *
+      *    ÆÁÅç£²£´£µÆýÍÄ»ù¡Ê¹ñÊÝ¡Ë
+           IF   (RECE02-SRYYM         >=  "200802")
+           AND  (RECE02-TEISYUTUSAKI   =   2      )
+           AND  (RECE02-KOHNUM(1)      =  "245"   )
+           AND  (RECE02-KOHHBTNUM(2)   =  "48"    )
+           AND  (SYS-1001-PREFNUM      =   36     )
+                        MOVE  ZERO  TO  RECE02-FTNMONEY(2)
+                        MOVE  ZERO  TO  RECE02-ZEROKISAIFLG(2)
+           END-IF
+      *
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬¤ÎÊÔ½¸
       *
            EVALUATE    RECE02-TEISYOTOKU
@@ -7900,13 +7912,14 @@
       *
                END-IF
       *
-      *      µþÅÔÉÜ£µ£±¡Ü£´£±
+      *      µþÅÔÉÜÃÏÊý¸øÈñ
       *
              WHEN    "26"
       *
                IF  ( RECE02-HKNNUM       NOT = SPACE    )
-               AND ( RECE02-KOHNUM(1)        = "051"    )
-               AND ( RECE02-KOHHBTNUM(2)     = "41"     )
+               AND ( RECE02-KOHNUM(1)(1:1)   =  "0"     )
+               AND ( RECE02-KOHNUM(2)(1:1)
+                                       >= "1" AND <= "8")
                AND ( RECE02-TOTALTEN(1)  NOT =
                                       RECE02-TOTALTEN(2))
                   COMPUTE  RECE02-TOTALTEN(3) =
