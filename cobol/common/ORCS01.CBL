@@ -233,6 +233,7 @@
       *  03.05.10    NACL-ÌçÏÆ    07/09/27  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ½¤Àµ
       *                                     ¡ÊÏ·¿Í¤ÏÂÐ¾Ý³°¤È¤¹¤ë¡Ë
       *  03.05.11    NACL-ÌçÏÆ    07/12/03  ËÌ³¤Æ»ÆÃÄê¼À´µ¡ÊÆ»Ã±ÆÈ»ö¶È¡ËÂÐ±þ
+      *  03.05.12    NACL-ÌçÏÆ    08/01/17  ¹âÎð¼Ô£³³äºßÁí¿Ç·×»»½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4319,8 +4320,8 @@
                       OR  (COMB-KOH4HKNNUM(1:1) = "0")
                           MOVE    "1"    TO   FLG-SYUHEN
       *****               IF   MAX-KIN-KOHI1-M   >  12000
-                            MOVE   12000   TO   MAX-KIN-KOHI1-D
-                                                MAX-KIN-KOHI1-M
+      ***>                  MOVE   12000   TO   MAX-KIN-KOHI1-D
+      ***>                                      MAX-KIN-KOHI1-M
       *****               END-IF
                       ELSE
                         IF  (COMB-KOH2HKNNUM = "974")
@@ -4398,7 +4399,7 @@
                       OR  (COMB-KOH4HKNNUM(1:1) = "0")
                           MOVE    "1"    TO   FLG-SYUHEN
       *****               IF   MAX-KIN-SYU-M   >  12000
-                            MOVE   12000   TO   MAX-KIN-SYU-M
+      ***>                  MOVE   12000   TO   MAX-KIN-SYU-M
       *****               END-IF
                       ELSE
                         IF  (COMB-KOH1HKNNUM = "974")
