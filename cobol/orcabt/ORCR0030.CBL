@@ -320,6 +320,7 @@
       *  03.05.28    NACL-門脇    07/12/03  北海道特定疾患（道単独事業）対応
       *  03.05.29    NACL-門脇    08/01/07  京都府地方公費請求点記載対応
       *  03.05.30    NACL-門脇    08/01/07  徳島県地方公費一部負担金記載対応
+      *  03.05.31    NACL-藤原    07/01/18  埋め込みコメント編集方法の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3154,7 +3155,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *            
                    IF      SRY-SRYCD (IDX2)(1:1)
                                                 =   "8"
-                       IF      PTCOM-INPUTCHI1     =   SPACE
+                       IF    ( PTCOM-INPUTCHI1     =   SPACE  )
+                       OR    ( SRY-SRYCD (IDX2)(1:2)
+                                               NOT =   "84"   )
                            INITIALIZE                  ORCSKANACHKAREA
                            MOVE    "2"             TO  KANACHK-SYORI 
                            MOVE    TNS-NAME        TO  KANACHK-MAE-INPUT
