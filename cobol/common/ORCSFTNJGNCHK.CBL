@@ -41,6 +41,7 @@
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
       *  03.05.02    NACL-門脇    07/08/01  所得情報取扱い機能強化対応
       *  03.05.03    NACL-門脇    07/08/01  月途中の所得情報変更対応
+      *  03.05.04    NACL-門脇    08/01/18  埼玉県川島町地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -690,10 +691,13 @@
                            MOVE   01        TO  LNK-FTNJGNCHK-RC
                      END-IF
                    ELSE
-                     IF  (WRK-PREFNUM            =  11     )
-                     AND (LNK-FTNJGNCHK-KOHNUM   =
-                           "181" OR "182" OR "183" OR "281")
-                     AND (LNK-FTNJGNCHK-SRYYM   >= "200704")
+                     IF ((WRK-PREFNUM            =  11     ) AND
+                         (LNK-FTNJGNCHK-KOHNUM   =
+                           "181" OR "182" OR "183" OR "281") AND
+                         (LNK-FTNJGNCHK-SRYYM   >= "200704"))
+                     OR ((WRK-PREFNUM            =  11     ) AND
+                         (LNK-FTNJGNCHK-KOHNUM   = "381"   ) AND
+                         (LNK-FTNJGNCHK-SRYYM   >= "200801"))
                        IF   WRK-KOHFTN   NOT = ZERO
                                MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
