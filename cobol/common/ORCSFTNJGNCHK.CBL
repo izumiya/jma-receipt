@@ -37,6 +37,7 @@
       *  03.04.02    NACL-ÌçÏÆ    07/03/22  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡ÊÀî¸ý¡¦½ÕÆüÉô»Ô¡Ë
       *  03.04.03    NACL-ÌçÏÆ    07/06/04  Ä¹ºê»ÔÃÏÊý¸øÈñÂÐ±þ
+      *  03.04.04    NACL-ÌçÏÆ    08/01/18  ºë¶Ì¸©ÀîÅçÄ®ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -685,10 +686,13 @@
                            MOVE   01        TO  LNK-FTNJGNCHK-RC
                      END-IF
                    ELSE
-                     IF  (WRK-PREFNUM            =  11     )
-                     AND (LNK-FTNJGNCHK-KOHNUM   =
-                           "181" OR "182" OR "183" OR "281")
-                     AND (LNK-FTNJGNCHK-SRYYM   >= "200704")
+                     IF ((WRK-PREFNUM            =  11     ) AND
+                         (LNK-FTNJGNCHK-KOHNUM   =
+                           "181" OR "182" OR "183" OR "281") AND
+                         (LNK-FTNJGNCHK-SRYYM   >= "200704"))
+                     OR ((WRK-PREFNUM            =  11     ) AND
+                         (LNK-FTNJGNCHK-KOHNUM   = "381"   ) AND
+                         (LNK-FTNJGNCHK-SRYYM   >= "200801"))
                        IF   WRK-KOHFTN   NOT = ZERO
                                MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
