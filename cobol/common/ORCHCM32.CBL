@@ -103,8 +103,8 @@
                05  WRK-KEY-YMD     PIC X(08).
                05  WRK-HEN-MAX     PIC 9(04).
                05  WRK-NYUIN       PIC 9(01).
-      *        ºÇÂç£±£³·ï¡¦¡¦¡¦£±£³·ïÌÜ¤ÏÊÂ¤ÓÂØ¤¨ÍÑ
-               05  WRK-HENSYU-OCC  OCCURS  13.
+      *        ºÇÂç£²£µ·ï¡¦¡¦¡¦£²£µ·ïÌÜ¤ÏÊÂ¤ÓÂØ¤¨ÍÑ
+               05  WRK-HENSYU-OCC  OCCURS  25.
                    07  WRK-HENSYU-KEY.
                        09  WRK-NYUGAIKBN  PIC X(01).
                        09  WRK-HIDUKE PIC X(06).
@@ -152,7 +152,7 @@
            03  KEY-NYUGAIKBN       PIC X(01).
       *
        01  CONST-AREA.
-           03  CONST-HEN-MAX       PIC 9(05)   VALUE   12.
+           03  CONST-HEN-MAX       PIC 9(05)   VALUE   24.
            03  CONST-LINE-MAX      PIC 9(05)   VALUE   12.
            03  CONST-SRH-COMB-MAX  PIC 9(03)   VALUE   100.
       *----(03.04.01)--ADD-START---
@@ -721,10 +721,10 @@
                    IF      WRK-HENSYU-KEY (IDX)
                                    >   WRK-HENSYU-KEY (IDY)
                        MOVE    WRK-HENSYU-OCC(IDX)
-                                       TO  WRK-HENSYU-OCC(13)
+                                       TO  WRK-HENSYU-OCC(25)
                        MOVE    WRK-HENSYU-OCC(IDY)
                                        TO  WRK-HENSYU-OCC(IDX)
-                       MOVE    WRK-HENSYU-OCC(13)
+                       MOVE    WRK-HENSYU-OCC(25)
                                        TO  WRK-HENSYU-OCC(IDY)
                    END-IF
                END-PERFORM
