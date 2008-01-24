@@ -660,7 +660,7 @@
            IF      SPA-ERRCD           =   SPACE
                MOVE    LNK-SC92-SRYCD      TO  SPA-COM-INPUTCD (IDX-T)
                MOVE    ZERO                TO  WRK-CD-MCNT
-               PERFORM VARYING     IDX     FROM    WRK-IDX-FT  BY  1
+               PERFORM VARYING     IDX     FROM    1   BY  1
                        UNTIL      (IDX         >   22  )   OR
                                   (SPA-GMN-INPUTCD(IDX-T)(IDX:1)
                                            =   SPACE   OR  "*" )
