@@ -2047,7 +2047,7 @@
                        PERFORM 20011-RECE61-WRITE-SEC
                    END-IF
                WHEN    "2"
-                   IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
+      *************IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
                        MOVE    WRK-RECE61-KEY      TO  RECE61X-KEY 
                        PERFORM 900-RECE61X-READ-SEC
                        IF      FLG-RECE61X         =   ZERO
@@ -2056,7 +2056,7 @@
                        ELSE
                            PERFORM 20011-RECE61-WRITE-SEC
                        END-IF
-                   END-IF
+      *************END-IF    
            END-EVALUATE
            .
        20011-FILE-HENSYU-EXT.

@@ -743,6 +743,10 @@
                                                RECE67PARA-HOSPNUM
       *
                PERFORM 200-HENSYU-SEC
+      *        
+               IF      WRK-PARA-SHELLID    =   "RECEPTX"
+                   MOVE    1                   TO  FLG-END
+               END-IF
            END-PERFORM 
       *
            MOVE    1                   TO  FLG-END

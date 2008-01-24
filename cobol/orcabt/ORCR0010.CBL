@@ -1606,7 +1606,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                        PERFORM 20011-RECE01-WRITE-SEC
                    END-IF
                WHEN    "2"
-                   IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
+      *************IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
                        IF      SYS-1001-HOSPSBT1   =   1
                            MOVE    SYS-1005-RECESRYKA
                                                    TO WRK-RECE01-RECEKA
@@ -1621,7 +1621,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                        ELSE
                            PERFORM 20011-RECE01-WRITE-SEC
                        END-IF
-                   END-IF    
+      *************END-IF    
            END-EVALUATE
            .
        20011-FILE-HENSYU-EXT.
