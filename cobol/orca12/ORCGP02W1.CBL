@@ -77,6 +77,7 @@
       *  03.03.00    NACL-Â¿¡¹Ç¼  06/10/17  ¸ºÌÈ³ä¹ç¡¦¶â³ÛÄÉ²Ã
       *  03.04.00    NACL-Â¿¡¹Ç¼  06/11/14  ¹â³Û°ÑÇ¤Ê§¤¤ÄÉ²Ã
       *  03.04.01    NACL-Â¿¡¹Ç¼  07/02/16  £Ñ£Ò¼õÉÕÂÐ±þ
+      *  03.04.01    NACL-Â¿¡¹Ç¼  08/01/25  ¸øÈñÉéÃ´³Û¤Ë·ë³ËÆþ½ê'011'ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5428,6 +5429,11 @@
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "281" )  AND
                       (SPA-PREFNUM             =   07    )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070201"))
+      *
+      *            ·ë³ËÆþ½ê¡Ê£°£±£±¡Ë¡Ê£È£±£¹¡¥£´°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "011" )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070401"))
+      *
                    MOVE    ZERO                TO  IDY
                    PERFORM VARYING     IDX2    FROM    1   BY  1
                            UNTIL       IDX2    >   SPA-FTN1-MAX
