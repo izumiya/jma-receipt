@@ -33,6 +33,7 @@
       * 01.00.01     NACL-多々納  04/12/16   カルテ３号紙（入院）追加
       * 01.00.02     NACL-太田    05/10/24   MONFUNC 対応
       * 01.00.03     NACL-多々納  06/04/10   診療費明細書追加
+      * 04.00.00     NACL-多々納  08/01/25   標準の旧処方せん名対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -51,6 +52,7 @@
        01  FLG-AREA.
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-ORG             PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -161,6 +163,7 @@
       *
            MOVE    SPACE               TO  ORCSPRTNM-PRTPG
            MOVE    SPACE               TO  WRK-PRTPG
+           MOVE    ZERO                TO  FLG-ORG
       *
       *    職員毎のプログラム名取得
            MOVE    ORCSPRTNM-KBNCD     TO  WRK-KBNCD
@@ -171,6 +174,12 @@
       *        標準のプログラム名取得
                MOVE    ORCSPRTNM-KBNCD     TO  WRK-KBNCD
                PERFORM 1001-PGNAME-SET-SEC
+           END-IF
+      *
+      *    処方せん標準で Ｈ１４．１０以前のＰＧ名
+           IF     (FLG-ORG             =   1  )
+              AND (WRK-PRTPG           =   "ORCHC19")
+               MOVE    SPACE               TO  WRK-PRTPG
            END-IF
       *
            IF      WRK-PRTPG           =   SPACE
@@ -299,9 +308,11 @@ grpsys                            SPA-AREA
       *        独自開発分
                IF      SYS-1032-ORCACSTCHK     =   "T"
                    MOVE    SYS-1032-ORCACSTNM  TO  WRK-PRTPG
+                   MOVE    ZERO                TO  FLG-ORG
                ELSE
       *        ＯＲＣＡ標準分
                    MOVE    SYS-1032-ORCAORGNM  TO  WRK-PRTPG
+                   MOVE    1                   TO  FLG-ORG
                END-IF
            END-IF
       *
@@ -350,9 +361,11 @@ grpsys                            SPA-AREA
       *        独自開発分
                IF      SYS-1035-ORCACSTCHK     =   "T"
                    MOVE    SYS-1035-ORCACSTNM  TO  WRK-PRTPG
+                   MOVE    ZERO                TO  FLG-ORG
                ELSE
       *        ＯＲＣＡ標準分
                    MOVE    SYS-1035-ORCAORGNM  TO  WRK-PRTPG
+                   MOVE    1                   TO  FLG-ORG
                END-IF
            END-IF
       *
