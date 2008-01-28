@@ -1768,6 +1768,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ADD     1               TO  WRK-PRTKANRI-RENNUM
            MOVE    WRK-PRTKANRI-RENNUM
                                    TO  LNK-PRTKANRI-RENNUM
+           MOVE    1               TO  LNK-PRTKANRI-SHORI-RENNUM
            MOVE    WRK-CONS-PRTKANRI-TBL-KEY
                                    TO  LNK-PRTKANRI-TBL-KEY 
            MOVE    WRK-CONS-PRTKANRI-TBL-GROUP
