@@ -2546,7 +2546,7 @@
                END-EVALUATE
       *
                IF    ( SYS-1101-YBKENSAYAKUKBN =   "2" )
-                   IF    ( DCACCT-SRYKBN =   "60"  OR "70" )
+                   IF    ( DCACCT-SRYKBN =   "40"  OR  "60"  OR "70" )
                        MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
                END-IF
