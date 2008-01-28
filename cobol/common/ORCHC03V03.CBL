@@ -1525,8 +1525,14 @@
                    MOVE    "ø«Œ≈«Ø∑Ó"      TO  WRK-LBLSRYYMD
                    MOVE    SYU-SRYYMD      TO  WRK-SYMD
                    PERFORM 31012-SEIWA-HEN-SEC
-                   MOVE    WRK-HENYMDG  (1:16)
+                   IF    ( ORCHC03-SIZE    =   "A5" )
+                       MOVE    "°°°°"      TO  WRK-SRYYMDG (1:4)
+                       MOVE    WRK-HENYMDG  (1:16)
+                                           TO  WRK-SRYYMDG (5:)
+                   ELSE
+                       MOVE    WRK-HENYMDG  (1:16)
                                            TO  WRK-SRYYMDG
+                   END-IF
            ELSE
                IF    ( ORCHC03-PARAFLG         =   1 )
                 AND  ( SYUPARA03-STSRYYMD  NOT =   SYUPARA03-EDSRYYMD )
