@@ -275,6 +275,7 @@
       *                                     ¹æÈÖ¹æ¤Î¤ßÊÑ¹¹¤Ë¤Ê¤Ã¤¿¾ì¹ç¤ÎÂÐ±þ
       *  03.05.21    NACL-ÌçÏÆ    08/01/07  µþÅÔÉÜÃÏÊý¸øÈñÀÁµáÅÀµ­ºÜÂÐ±þ
       *  03.05.22    NACL-ÌçÏÆ    08/01/07  ÆÁÅç¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
+      *  03.05.23    NACL-ÌçÏÆ    08/01/25  ·ë³ËÆþ±¡¸ÂÅÙ³ÛÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9943,7 +9944,8 @@
                         AND   (SYU-KOH-HKNNUM(IDX3 - 1)
                                                     =  "015" OR "016"
                                                     OR "051" OR "021"
-                                                    OR "024" OR "079")
+                                                    OR "024" OR "079"
+                                                             OR "011")
                            ADD   SYU-KOH-HKNFTNMONEY(IDX3 - 1)  TO
                                          RECE62-FTNMONEY-FTN(KH-IDX)
                         ELSE
@@ -10231,7 +10233,7 @@
                 AND  (RECE62-KOHNUM(KH-IDX - 1)  =  "015" OR "016"
                                                  OR "051" OR "021"
                                                  OR "024" OR "079"
-                                                          OR "052")
+                                                 OR "052" OR "011")
                    ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                    RECE62-FTNMONEY(KH-IDX)
                                    RECE62-FTNMONEY-KOJ(KH-IDX)
@@ -10272,7 +10274,8 @@
                 IF    (RECE62-KOHNUM(KH-IDX - 1) =
                                        "010" OR "012" OR "015" OR
                                        "016" OR "021" OR "024" OR
-                                       "051" OR "052" OR "079"   )
+                                       "051" OR "052" OR "079" OR
+                                       "011"                     )
                 AND   (KH-IDX  =  2                              )
                   EVALUATE   RECE62-KOHNUM(KH-IDX - 1)
                     WHEN       "010"
@@ -10293,6 +10296,7 @@
                     WHEN       "012"
                     WHEN       "051"
                     WHEN       "052"
+                    WHEN       "011"
                       COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
                                                  * 10
                                                  * RECE62-KYURATE
@@ -10894,6 +10898,13 @@
                END-IF
              END-IF
       *
+             IF    RECE62-SRYYM     >=  "200704"
+               IF   RECE62-KOHNUM(KOHFTN-IDX) =  "011"
+                     MOVE  "1"   TO
+                                 RECE62-KISAIFLG(KOHFTN-IDX + 1)
+               END-IF
+             END-IF
+      *
            END-PERFORM
       *
       *    ÆÁÅç£²£´£µÆýÍÄ»ù¡Ê¹ñÊÝ¡Ë
@@ -11224,7 +11235,7 @@
                            UNTIL   KOHFTN-IDX   >    4
                    IF  ( RECE62-KOHNUM(KOHFTN-IDX) =
                               "015" OR "016" OR "051" OR "021" OR
-                              "024" OR "079" OR "052"              )
+                              "024" OR "079" OR "052" OR "011"     )
                    OR  ((WRK-PREFNUM             =   33           ) AND
                         (RECE62-KOHNUM(KOHFTN-IDX)(1:1)
                                                 >= "1" AND <=  "8"))
@@ -11284,7 +11295,8 @@
              AND (RECE62-HKNNUM    NOT =  SPACE  )
                IF (RECE62-KOHNUM(1) = "010" OR "012" OR "015" OR
                                       "016" OR "021" OR "024" OR
-                                      "051" OR "052" OR "079"   )
+                                      "051" OR "052" OR "079"
+                                                     OR "011"   )
                  IF  RECE62-KOHNUM(1)    = "010"
                    IF   RECE62-KOUREI    = "1" OR "2"
                       PERFORM  210462-GENGAKU-OKIKAE-SEC
