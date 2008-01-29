@@ -1953,8 +1953,8 @@
       *****************************************************************
        200-SINSATU-SET-SEC             SECTION.
       *
-           MOVE    SPACE               TO  SPA-SCR-REC
-           INITIALIZE                  SPA-SCR-REC
+      ***  MOVE    SPACE               TO  SPA-SCR-REC
+      **** INITIALIZE                  SPA-SCR-REC
            MOVE    ZERO                TO  IDX2
            MOVE    ZERO                TO  SPA-GMN-IDX
            MOVE    ZERO                TO  SPA-GAIRAISIN
