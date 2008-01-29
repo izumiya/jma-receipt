@@ -2773,8 +2773,9 @@
       *
       *    初診料がないこと
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   SPA-GMN-MAX ) OR
-                              (FLG-OK3     =   1       )
+                   UNTIL      (IDX     >   SPA-MAX-LINE )
+                           OR (SPA-GMN-INPUTCD (IDX)   =   SPACE )
+                           OR (FLG-OK3     =   1        )
                IF      SPA-COM-SRYKBN (IDX)    =   "11"
                    MOVE    1               TO  FLG-OK3
                END-IF
