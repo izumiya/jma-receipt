@@ -53,6 +53,7 @@
       *  03.05.02    NACL-小豆沢  07/07/20  平成１８年４月以降の食事情報
       *                                     編集の患者所得情報取得をサブ
       *                                     ルーチンに変更
+      *  04.01.00    NACL-小豆沢  08/02/04  標欠と定数超過の外泊修正
       *****************************************************************
       *
       *
@@ -1390,14 +1391,16 @@
                END-IF
       *
       *        標欠
-               IF      WRK-HYOUKETSU(IDX1)   NOT =         SPACE
+               IF     (WRK-GAIHAKU(IDX1)     =             SPACE) AND
+                      (WRK-HYOUKETSU(IDX1)   NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *
       *        定数超過
-               IF      WRK-TEISU(IDX1)      NOT =         SPACE
+               IF     (WRK-GAIHAKU(IDX1)     =             SPACE) AND
+                      (WRK-TEISU(IDX1)       NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-TEISU(IDX1)  TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
