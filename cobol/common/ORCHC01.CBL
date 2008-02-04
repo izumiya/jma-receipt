@@ -472,11 +472,7 @@
        20031-HC01-ONL-SEC             SECTION.
       *
       *    ファイルＯＰＥＮ
-           MOVE    "HC01"              TO  HC01PARA-FORM-ID
-           MOVE    SPA-TERMID          TO  HC01PARA-TERMID
-           MOVE    SYS-TIME            TO  HC01PARA-SYOHMS
-           ADD     1                   TO  WRK-PAGE
-           MOVE    WRK-PAGE            TO  HC01PARA-CNT
+           PERFORM 200311-HC01-FILE-SEC
            OPEN    OUTPUT              PRT-FILE
       *    印刷用データ出力
            MOVE    HC01                TO  PRT-REC
@@ -497,6 +493,30 @@
        20031-HC01-ONL-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    カルテファイル名処理（オンライン）
+      *****************************************************************
+       200311-HC01-FILE-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM
+               UNTIL       FLG-OK      =   1
+               MOVE    "HC01"              TO  HC01PARA-FORM-ID
+               MOVE    SPA-TERMID          TO  HC01PARA-TERMID
+               MOVE    SYS-TIME            TO  HC01PARA-SYOHMS
+               ADD     1                   TO  WRK-PAGE
+               MOVE    WRK-PAGE            TO  HC01PARA-CNT
+      *
+               OPEN    INPUT               PRT-FILE
+               IF      STS-PARA        NOT =   ZERO
+                   MOVE    1               TO  FLG-OK
+               END-IF
+               CLOSE                       PRT-FILE
+           END-PERFORM
+      *
+           .
+       200311-HC01-FILE-EXT.
+           EXIT.
       *****************************************************************
       *    続紙印刷処理
       *****************************************************************
@@ -522,11 +542,7 @@
        20032-HC011-ONL-SEC             SECTION.
       *
       *    ファイルＯＰＥＮ
-           MOVE    "HC01"              TO  HC01PARA-FORM-ID
-           MOVE    SPA-TERMID          TO  HC01PARA-TERMID
-           MOVE    SYS-TIME            TO  HC01PARA-SYOHMS
-           ADD     1                   TO  WRK-PAGE
-           MOVE    WRK-PAGE            TO  HC01PARA-CNT
+           PERFORM 200311-HC01-FILE-SEC
            OPEN    OUTPUT              PRT-FILE
       *    印刷用データ出力
            MOVE    HC011               TO  PRT-REC
