@@ -54,6 +54,7 @@
       *                                     と同時入力された場合の対応
       *  03.04.01    NACL-門脇    06/12/01  自賠責健保準拠対応
       *  03.04.02    NACL-門脇    07/03/12  包括診療対応
+      *  03.04.03    NACL-門脇    08/02/04  標欠外泊計算修正
       *****************************************************************
       *
       *
@@ -1265,11 +1266,15 @@
                END-IF
       *        標欠
                IF       WRK-HYOKETU(IDX1)    NOT =         SPACE
+                 IF     WRK-GAIHAKU(IDX1)        =         SPACE
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOKETU(IDX1)  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "6"           TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
+                 ELSE
+                   MOVE   SPACE             TO  WRK-HYOKETU(IDX1)
+                 END-IF
                END-IF
       *        入院料加算（入院会計）
       *         PERFORM   VARYING   KSN-IDX   FROM  1  BY  1
