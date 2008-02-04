@@ -1220,12 +1220,12 @@
                        MOVE    TNS-TEN             TO  WRK-KHNTEN
                        MOVE    TNS-NYUKHNKSNKBN    TO  WRK-NYUKHNKSNKBN
                        MOVE    IDX2                TO  IDX-KHN
-                   ELSE
-                       EVALUATE  TNS-TENSIKIBETU
-                       WHEN     6
-                           MOVE  TNS-SRYCD TO  WRK-HYOKETU-SRYCD
-                           MOVE  TNS-TEN   TO  WRK-HYOKETU-TEN
-                       END-EVALUATE
+      *            ELSE
+      *                EVALUATE  TNS-TENSIKIBETU
+      *                WHEN     6
+      *                    MOVE  TNS-SRYCD TO  WRK-HYOKETU-SRYCD
+      *                    MOVE  TNS-TEN   TO  WRK-HYOKETU-TEN
+      *                END-EVALUATE
                    END-IF
                END-IF
            END-PERFORM
@@ -1244,14 +1244,14 @@
                MOVE    WRK-GAIHAKU-KHNTEN  TO  WRK-KHNTEN
            END-IF
       *
-           IF    ( WRK-HYOKETU-TEN NOT =   ZERO )
+      *    IF    ( WRK-HYOKETU-TEN NOT =   ZERO )
       *
       *       É¸·ç¡§¡ó¸º»»
-               COMPUTE WRK-KHNTEN
-                   =   WRK-KHNTEN
-                   -   WRK-KHNTEN * ( WRK-HYOKETU-TEN / 100)
-                   +  0.5
-           END-IF
+      *        COMPUTE WRK-KHNTEN
+      *            =   WRK-KHNTEN
+      *            -   WRK-KHNTEN * ( WRK-HYOKETU-TEN / 100)
+      *            +  0.5
+      *    END-IF
       *
            .
        200111-GAIHAKU-KHNTEN-GET-EXT.
@@ -1476,13 +1476,13 @@
                    +   WRK-SRYCD-9
            END-IF
       *
-           IF    ( WRK-HYOKETU-SRYCD   NOT =   SPACE )
-            AND  ( WRK-HYOKETU-SRYCD       IS  NUMERIC )
-               MOVE    WRK-HYOKETU-SRYCD   TO  WRK-SRYCD
-               COMPUTE WRK-GAIHAKU-SRYCDTOTAL
-                   =   WRK-GAIHAKU-SRYCDTOTAL
-                   +   WRK-SRYCD-9
-           END-IF
+      *    IF    ( WRK-HYOKETU-SRYCD   NOT =   SPACE )
+      *     AND  ( WRK-HYOKETU-SRYCD       IS  NUMERIC )
+      *        MOVE    WRK-HYOKETU-SRYCD   TO  WRK-SRYCD
+      *        COMPUTE WRK-GAIHAKU-SRYCDTOTAL
+      *            =   WRK-GAIHAKU-SRYCDTOTAL
+      *            +   WRK-SRYCD-9
+      *    END-IF
       *
            .
        200111-GAIHAKU-SRYCD-GET-EXT.
@@ -1641,10 +1641,10 @@
                                                            (IDXA IDXB)
                    MOVE    WRK-GAIHAKU-SRYCD
                                        TO  WGAIHAKU-SRYCD  (IDXA IDXB 1)
-                   IF    ( WRK-HYOKETU-SRYCD   NOT =   SPACE )
-                       MOVE    WRK-HYOKETU-SRYCD
-                                       TO  WGAIHAKU-SRYCD  (IDXA IDXB 2)
-                   END-IF
+      *            IF    ( WRK-HYOKETU-SRYCD   NOT =   SPACE )
+      *                MOVE    WRK-HYOKETU-SRYCD
+      *                                TO  WGAIHAKU-SRYCD  (IDXA IDXB 2)
+      *            END-IF
                END-IF
            END-IF
       *
