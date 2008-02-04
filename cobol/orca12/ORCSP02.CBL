@@ -1231,12 +1231,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN20-KARUTE-LST(1)
                                        TO  SPA-GMN20-KARUTE-G
       *    患者登録のカルテ発行
-           IF      SPA-P02-SYORI       =   1
-               IF      SPA-NAI-KARUTE-HAKKO    =   "1"  OR  "2"
-                   MOVE    SPA-GMN20-KARUTE-LST(2)
-                                       TO  SPA-GMN20-KARUTE-G
-               END-IF
-           END-IF
+      *    IF      SPA-P02-SYORI       =   1
+      *        IF      SPA-NAI-KARUTE-HAKKO    =   "1"  OR  "2"
+      *            MOVE    SPA-GMN20-KARUTE-LST(2)
+      *                                TO  SPA-GMN20-KARUTE-G
+      *        END-IF
+      *    END-IF
       *
            MOVE    "0 発行なし"        TO  SPA-GMN20-SYOHOU-LST (1)
            MOVE    "1 発行あり"        TO  SPA-GMN20-SYOHOU-LST (2)
