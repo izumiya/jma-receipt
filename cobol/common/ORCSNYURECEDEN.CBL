@@ -49,6 +49,7 @@
       *  01.00.13    NACL-¾®Æ¦Âô  07/06/19  °Ê²¼Æþ±¡ÎÁ²Ã»»¤Îµ­Ï¿½ç½¤Àµ
       *                                     Ê£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»
       *                                     ´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»
+      *  04.01.00    NACL-¾®Æ¦Âô  08/02/04  É¸·ç¤ÈÄê¿ôÄ¶²á¤Î³°Çñ½¤Àµ
       *****************************************************************
       *
       *
@@ -1377,14 +1378,16 @@
                END-IF
       *
       *        É¸·ç
-               IF      WRK-HYOUKETSU(IDX1)   NOT =         SPACE
+               IF     (WRK-GAIHAKU(IDX1)     =             SPACE) AND
+                      (WRK-HYOUKETSU(IDX1)   NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *
       *        Äê¿ôÄ¶²á
-               IF      WRK-TEISU(IDX1)      NOT =         SPACE
+               IF     (WRK-GAIHAKU(IDX1)     =             SPACE) AND
+                      (WRK-TEISU(IDX1)       NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-TEISU(IDX1)  TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
