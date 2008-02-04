@@ -276,6 +276,7 @@
       *  03.05.21    NACL-ÌçÏÆ    08/01/07  µþÅÔÉÜÃÏÊý¸øÈñÀÁµáÅÀµ­ºÜÂÐ±þ
       *  03.05.22    NACL-ÌçÏÆ    08/01/07  ÆÁÅç¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  03.05.23    NACL-ÌçÏÆ    08/01/25  ·ë³ËÆþ±¡¸ÂÅÙ³ÛÂÐ±þ
+      *  03.05.24    NACL-ÌçÏÆ    08/02/04  É¸·ç³°Çñ·×»»½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5142,8 +5143,8 @@
                                 COMPUTE  WRK-KSNTEN = TNS-TEN * -1
                             WHEN     6
                                 MOVE  TNS-TEN  TO  WRK-HYOKETU-TEN
-                                MOVE  NSRY-SRYCD(IDX2)
-                                               TO  WRK-HYOKETU-SRYCD
+      ***                       MOVE  NSRY-SRYCD(IDX2)
+      ***                                      TO  WRK-HYOKETU-SRYCD
                           END-EVALUATE
                        END-IF
                      END-IF                  
@@ -5201,13 +5202,13 @@
            MOVE    "key9"              TO      MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-           IF     WRK-HYOKETU-TEN    NOT =   ZERO
+      ***  IF     WRK-HYOKETU-TEN    NOT =   ZERO
       *      É¸·ç¡§¡ó¸º»»
-             COMPUTE    WRK-KHNTEN  =
-                      ( WRK-KHNTEN  -
-                       (WRK-KHNTEN  *
-                        (WRK-HYOKETU-TEN   /  100)))  +  0.5
-           END-IF
+      ***    COMPUTE    WRK-KHNTEN  =
+      ***             ( WRK-KHNTEN  -
+      ***              (WRK-KHNTEN  *
+      ***               (WRK-HYOKETU-TEN   /  100)))  +  0.5
+      ***  END-IF
       *
            .
        210201-NYUINKHN-GET-EXT.

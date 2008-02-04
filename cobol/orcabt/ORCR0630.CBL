@@ -74,6 +74,7 @@
       *  03.05.01    NACL-小豆沢  07/06/01  グループ診療対応
       *  03.05.02    NACL-門脇    07/06/27  実日数テーブル編集修正
       *  03.05.03    NACL-門脇    07/07/17  個別時のシステム管理編集修正
+      *  03.05.04    NACL-門脇    08/02/04  標欠外泊計算修正
       *****************************************************************
       *
       *
@@ -2202,13 +2203,13 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
-           IF     WRK-HYOKETU-TEN    NOT =   ZERO
+      ***  IF     WRK-HYOKETU-TEN    NOT =   ZERO
       *      標欠：％減算
-             COMPUTE    WRK-KHNTEN  =
-                      ( WRK-KHNTEN  -
-                       (WRK-KHNTEN  *
-                        (WRK-HYOKETU-TEN   /  100)))  +  0.5
-           END-IF
+      ***    COMPUTE    WRK-KHNTEN  =
+      ***             ( WRK-KHNTEN  -
+      ***              (WRK-KHNTEN  *
+      ***               (WRK-HYOKETU-TEN   /  100)))  +  0.5
+      ***  END-IF
       *
            .
        2001123-NYUINKHN-GET-EXT.
