@@ -124,6 +124,7 @@
            03  WRK-ST              PIC 9(04).
            03  WRK-ED              PIC 9(04).
       *
+           03  WRK-EDANUM          PIC 9(04).
            03  WRK-SELNUM          PIC 9(04).
       *    入力項目名
            03  WRK-MCP-WIDGET          PIC X(64).
@@ -1630,6 +1631,7 @@
                MOVE    1               TO  FLG-UKETUKE
            END-IF
       *
+           MOVE    ZERO                TO  WRK-EDANUM
            PERFORM
                UNTIL   FLG-UKETUKE     =   1
              IF        UKE-UKEID           =   ZERO
@@ -1744,11 +1746,12 @@
       *****************************************************************
        5002-UKE-PARA-SEC              SECTION.
       *
+           ADD     1                   TO  WRK-EDANUM
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
            MOVE    SPA-TERMID          TO  PARA-TERMID
            MOVE    "UKETUKE"           TO  PARA-FILEMEI
-           MOVE    IDX                 TO  PARA-EDANUM
+           MOVE    WRK-EDANUM          TO  PARA-EDANUM
            MOVE    UKETUKE-REC         TO  PARA-DATA-REC
       *
            MOVE    PARA-REC            TO  MCPDATA-REC
