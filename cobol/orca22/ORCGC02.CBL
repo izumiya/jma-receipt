@@ -217,6 +217,7 @@
       *  03.04.08    NACL-藤原    07/10/12  ファンクションキー操作による
       *                                     処理区分、入外区分変更時の
       *                                     診療科の表示
+      *  03.04.09    NACL-藤原    08/02/06  登録年月日の更新時の編集追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7400,6 +7401,9 @@
                        ELSE
                            MOVE    PTBYO-KEY       TO
                                                    WRK-PTBYO-KEY (IDXX)
+                           MOVE    PTBYO-CREYMD    TO
+                                                   WRK-PTBYO-CREYMD
+                                                                 (IDXX)
                            MOVE    WRK-PTBYOMEI-REC (IDXX)
                                                    TO  PTBYOMEI-REC
       *
