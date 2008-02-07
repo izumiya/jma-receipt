@@ -2623,10 +2623,16 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
                IF      JYURRK-DOUJI-RENNUM =   WRK-DOUJI-RENNUM-KEY
                    CONTINUE
+                   IF      JYURRK-EDANUM       =   1
+                       ADD     1               TO  WRK-RENNUM
+                   END-IF
                ELSE
-                   ADD     1               TO  WRK-RENNUM
-                   IF      WRK-RENNUM      >   1
-                       ADD     1           TO  WRK-JYURRK-DOUJI-RENNUM
+                   IF      JYURRK-EDANUM       =   1
+                       ADD     1               TO  WRK-RENNUM
+                       IF      WRK-RENNUM      >   1
+                          ADD     1            TO
+                                               WRK-JYURRK-DOUJI-RENNUM
+                       END-IF
                    END-IF
                    MOVE    JYURRK-DOUJI-RENNUM TO  WRK-DOUJI-RENNUM-KEY
                END-IF
