@@ -321,6 +321,7 @@
       *  03.05.29    NACL-ÌçÏÆ    08/01/07  µþÅÔÉÜÃÏÊý¸øÈñÀÁµáÅÀµ­ºÜÂÐ±þ
       *  03.05.30    NACL-ÌçÏÆ    08/01/07  ÆÁÅç¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  03.05.31    NACL-Æ£¸¶    07/01/18  Ëä¤á¹þ¤ß¥³¥á¥ó¥ÈÊÔ½¸ÊýË¡¤Î½¤Àµ
+      *  03.05.32    NACL-ÌçÏÆ    07/02/06  ²¬»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6189,9 +6190,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105213-ICHIBUFTN-KOH-HEN2-SEC               SECTION.
       *
-           IF   (SYS-1001-PREFNUM   = 01            )
-           AND  (SYU-SYUHKNNUM NOT = "060" AND "067")
-           AND  (SYU-KOH-HKNNUM(1)  = "141" OR "241")
+           IF  ((SYS-1001-PREFNUM   = 01            ) AND
+                (SYU-SYUHKNNUM NOT = "060" AND "067") AND
+                (SYU-KOH-HKNNUM(1)  = "141" OR "241"))
+           OR  ((SYS-1001-PREFNUM   = 33            ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)
+                                 >=  "1" AND <=  "8"))
             IF  FLG-KOHYONKAIME = 1
                MOVE   44400   TO   WRK-KINGAKU
             ELSE
@@ -6545,7 +6549,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         WRK-TAIHI-FTNMONEY(KH-IDX)
                                         WRK-TAIHI-FTNMONEY-KOJ(KH-IDX)
               ELSE
-                IF     (RECE02-ZAITAKU       =  "1" OR "2")
+      ***       IF     (RECE02-ZAITAKU       =  "1" OR "2")
+                IF     (RECE02-ZAITAKU       =  "1"       )
                 AND    (RECE02-SRYYM        >=  "200610"  )
                 AND    (SYS-1001-PREFNUM     =   33       )
                 AND    (RECE02-KOHNUM(KH-IDX - 1)(1:1)
@@ -6945,9 +6950,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF  ( RECE02-KOHNUM(KOHFTN-IDX) =
                               "015" OR "016" OR "051" OR "021" OR
                               "024" OR "079" OR "052"              )
-                   OR  ((SYS-1001-PREFNUM        =   33           ) AND
-                        (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
-                                                >= "1" AND <=  "8"))
+      ***          OR  ((SYS-1001-PREFNUM        =   33           ) AND
+      ***               (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
+      ***                                       >= "1" AND <=  "8"))
                       MOVE  WRK-TAIHI-FTNMONEY    (KOHFTN-IDX + 1)
                                 TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
                       MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)
