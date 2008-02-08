@@ -34,7 +34,7 @@
       *£È£¹£¹²èÌÌ¤è¤ê
            05  SPA-H99-AREA.
                07  SPA-H99-KEY. 
-                   09  SPA-H99-HOSPID       PIC  X(24).
+                   09  SPA-H99-HOSPNUM      PIC  9(02).
                    09  SPA-H99-SRYYM        PIC  9(06).
                    09  SPA-H99-NYUGAIKBN    PIC  X(01).
                    09  SPA-H99-PTID         PIC  9(10).
