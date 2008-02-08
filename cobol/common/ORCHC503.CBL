@@ -589,15 +589,19 @@
        2002-DRCD-HENSYU-SEC          SECTION.
       *
       *    職員情報（ドクター）
-           MOVE    SPACE               TO  SYS-1010-REC
-           MOVE    "1010"              TO  SYS-1010-KANRICD
-           MOVE    WRK-DRCD            TO  SYS-1010-KBNCD
-           MOVE    SYS-1010-REC        TO  SYSKANRI-REC
-           PERFORM 900-SYSKANRI-READ-SEC
-           IF      FLG-SYSKANRI        =   ZERO
-               MOVE    SYSKANRI-REC        TO  SYS-1010-REC
-           ELSE
+           IF      WRK-DRCD            =   SPACE
                INITIALIZE                      SYS-1010-REC
+           ELSE
+               MOVE    SPACE               TO  SYS-1010-REC
+               MOVE    "1010"              TO  SYS-1010-KANRICD
+               MOVE    WRK-DRCD            TO  SYS-1010-KBNCD
+               MOVE    SYS-1010-REC        TO  SYSKANRI-REC
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-1010-REC
+               ELSE
+                   INITIALIZE                      SYS-1010-REC
+               END-IF
            END-IF
            .
        2002-DRCD-HENSYU-EXT.
@@ -1210,18 +1214,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        900-SYSKANRI-READ-SEC         SECTION.
       *
-           MOVE    ZERO                TO  WRK-MOJISU
-           PERFORM VARYING     IDXS    FROM    8   BY  -1
-                   UNTIL       IDXS    <       1
-               IF      SYS-KBNCD(IDXS:1)   NOT =   SPACE
-                   MOVE    IDXS            TO  WRK-MOJISU 
-                   MOVE    1               TO  IDXS
-               END-IF
-           END-PERFORM
-           IF      WRK-MOJISU          <   8
-               COMPUTE IDXS            =   WRK-MOJISU  +  1
-               MOVE    "%"             TO  SYS-KBNCD(IDXS:1)
-           END-IF
+      *    MOVE    ZERO                TO  WRK-MOJISU
+      *    PERFORM VARYING     IDXS    FROM    8   BY  -1
+      *            UNTIL       IDXS    <       1
+      *        IF      SYS-KBNCD(IDXS:1)   NOT =   SPACE
+      *            MOVE    IDXS            TO  WRK-MOJISU 
+      *            MOVE    1               TO  IDXS
+      *        END-IF
+      *    END-PERFORM
+      *    IF      WRK-MOJISU          <   8
+      *        COMPUTE IDXS            =   WRK-MOJISU  +  1
+      *        MOVE    "%"             TO  SYS-KBNCD(IDXS:1)
+      *    END-IF
       *
            MOVE    ORCHC503-SRYYMD     TO  SYS-STYUKYMD
            MOVE    ORCHC503-SRYYMD     TO  SYS-EDYUKYMD
@@ -1229,7 +1233,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                PERFORM 920-DBFETCH-SEC
@@ -1242,7 +1246,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    1                   TO  FLG-SYSKANRI
            END-IF
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            .
