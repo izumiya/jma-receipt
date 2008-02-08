@@ -202,6 +202,7 @@ path	key12		{
 		FROM tbl_syskanri
 			WHERE   KANRICD      =   :KANRICD 
 			GROUP BY KANRICD,STYUKYMD,EDYUKYMD
+			ORDER	BY	STYUKYMD
 		;
 	};
 };
