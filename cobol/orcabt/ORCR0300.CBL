@@ -245,6 +245,8 @@
       *                                     £≤£∞£∞£∑«Ø£π∑Ó∞ πﬂ§Œ§ﬂ¬–æ› 
       *  03.04.08    NACL-∆£∏∂    07/09/11  ø∑≥„∏©√Ê±€≤≠√œøÃ¬–±˛
       *                                     £≤£∞£∞£∑«Ø£π∑Ó°¡£±£≤∑Ó¬–æ› 
+      *  03.04.09    NACL-∆£∏∂    08/02/12  µ‹∫Í∏©°÷∏¯»Ò£π£∞°◊¬–±˛
+      *                                     ƒÃæÔ§Œµ≠∫‹ ˝À°§ÀÃ·§π 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1326,7 +1328,6 @@
       *********05  WRK-CONS-COMMENT4  PIC X(09)   VALUE   "099309901".
       *
            03  WRK-CONS-SRYYM-200704  PIC 9(06)   VALUE    200704.
-           03  WRK-CONS-SRYYM-200709  PIC 9(06)   VALUE    200709.      
       *
       *    ≤˛π‘•≥°º•…
        01  WRK-CONS-RETURN          PIC X(01)   VALUE   X"0A".
@@ -2410,80 +2411,49 @@
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC
       *    ø«Œ≈º¬∆¸øÙ     
-      *    µ‹∫Í√œ ˝∏¯»Ò¬–±˛
-           IF    ( RECE02-PREFNUM      =   "45"                  )
-           AND   ( RECE02-SRYYM        >=  WRK-CONS-SRYYM-200709 )
-           AND   ( RECE02-TEISYUTUSAKI =   "2"                   )
-           AND   ( RECE02-KOHNUM (IDY) =   "190"                 )
-               CONTINUE
-           ELSE
-               MOVE    RECE02-JNISSU(IDX)     TO  WRK-NUM
-               MOVE    2                      TO  WRK-NAGASA
-           END-IF
+           MOVE    RECE02-JNISSU(IDX)     TO  WRK-NUM
+           MOVE    2                      TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    πÁ∑◊≈¿øÙ     
       *    µ‹∫Í√œ ˝∏¯»Ò¬–±˛
-           IF    ( RECE02-PREFNUM      =   "45"                  )
-           AND   ( RECE02-SRYYM        >=  WRK-CONS-SRYYM-200709 )
-           AND   ( RECE02-TEISYUTUSAKI =   "2"                   )
-           AND   ( RECE02-KOHNUM (IDY) =   "190"                 )
-               CONTINUE
-           ELSE
-               MOVE    RECE02-TOTALTEN(IDX)   TO  WRK-NUM
-               MOVE    8                      TO  WRK-NAGASA
-           END-IF
+           MOVE    RECE02-TOTALTEN(IDX)   TO  WRK-NUM
+           MOVE    8                      TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    …È√¥∂‚≥€° ∏¯»Ò°À
-      *    µ‹∫Í√œ ˝∏¯»Ò¬–±˛
-           IF    ( RECE02-PREFNUM      =   "45"                  )
-           AND   ( RECE02-SRYYM        >=  WRK-CONS-SRYYM-200709 )
-           AND   ( RECE02-TEISYUTUSAKI =   "2"                   )
-           AND   ( RECE02-KOHNUM (IDY) =   "190"                 )
-               CONTINUE
+           IF     RECE02-KOHFTNJANUM (IDY) (1:2)
+                                           =   "51"
+               IF      RECE02-KOHFTNJANUM (IDY) (5:3)
+                                               =   "602"
+                   MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
+                   MOVE    8                      TO  WRK-NAGASA
+               END-IF
            ELSE
-               IF     RECE02-KOHFTNJANUM (IDY) (1:2)
-                                               =   "51"
-                   IF      RECE02-KOHFTNJANUM (IDY) (5:3)
-                                                   =   "602"
-                       MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
-                       MOVE    8                      TO  WRK-NAGASA
-                   END-IF
+               IF      RECE02-FTNMONEY(IDX)   >   ZERO     
+                   MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
+                   MOVE    8                      TO  WRK-NAGASA
                ELSE
-                   IF      RECE02-FTNMONEY(IDX)   >   ZERO     
+                   IF    ( RECE02-TOTALTEN (IDX)      >   ZERO )
+                   AND   ( RECE02-FTNMONEY (IDX)      =   ZERO )
+                   AND   ( RECE02-ZEROKISAIFLG (IDX)  =   "1"  )
                        MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
                        MOVE    8                      TO  WRK-NAGASA
-                   ELSE
-                       IF    ( RECE02-TOTALTEN (IDX)      >   ZERO )
-                       AND   ( RECE02-FTNMONEY (IDX)      =   ZERO )
-                       AND   ( RECE02-ZEROKISAIFLG (IDX)  =   "1"  )
-                           MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
-                           MOVE    8                      TO  WRK-NAGASA
-                       END-IF
                    END-IF
                END-IF
-      *        ∏©√±Õ—π‡Ã‹
-               IF      FLG-RECE11          =   ZERO
-                   IF      RECE11-RECEDEN-FTNMONEY(IDX)
-                                               =   999999999
-                       MOVE    ZERO                TO  WRK-NUM
-                       MOVE    8                   TO  WRK-NAGASA
-                   END-IF
+           END-IF
+      *    ∏©√±Õ—π‡Ã‹
+           IF      FLG-RECE11          =   ZERO
+               IF      RECE11-RECEDEN-FTNMONEY(IDX)
+                                           =   999999999
+                   MOVE    ZERO                TO  WRK-NUM
+                   MOVE    8                   TO  WRK-NAGASA
                END-IF
-           END-IF    
+           END-IF
            PERFORM 5005-NUM-HENSYU-SEC
       *    …È√¥∂‚≥€° ∏¯»ÒµÎ…’¬–æ›≥∞ÕË∞Ï…Ù…È√¥∂‚°À
-      *    µ‹∫Í√œ ˝∏¯»Ò¬–±˛
-           IF    ( RECE02-PREFNUM      =   "45"                  )
-           AND   ( RECE02-SRYYM        >=  WRK-CONS-SRYYM-200709 )
-           AND   ( RECE02-TEISYUTUSAKI =   "2"                   )
-           AND   ( RECE02-KOHNUM (IDY) =   "190"                 )
-               CONTINUE
-           ELSE
-               IF      RECE02-ZAITAKU-SAIKEI   >   ZERO
-               AND     IDY                     =   1
-                   MOVE   RECE02-ZAITAKU-SAIKEI    TO  WRK-NUM
-                   MOVE    6                       TO  WRK-NAGASA
-               END-IF
+           IF      RECE02-ZAITAKU-SAIKEI   >   ZERO
+           AND     IDY                     =   1
+               MOVE   RECE02-ZAITAKU-SAIKEI    TO  WRK-NUM
+               MOVE    6                       TO  WRK-NAGASA
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC
       *    …È√¥∂‚≥€° ∏¯»ÒµÎ…’¬–æ›∆˛±°∞Ï…Ù…È√¥∂‚°À

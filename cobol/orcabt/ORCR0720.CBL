@@ -52,6 +52,8 @@
       *                                     ÀÁµáÅÀµ­ºÜÂÐ±þ
       *  03.04.15    NACL-Æ£¸¶    07/12/08  Ä¹ºê¸©ÂÐ±þ
       *                                     À¸ÊÝ¤ÈÈïÇú£¸£¶¤Îµ­ºÜ½ç 
+      *  03.04.16    NACL-Æ£¸¶    08/02/12  µÜºê¸©¡Ö¸øÈñ£¹£°¡×ÂÐ±þ
+      *                                     ÄÌ¾ï¤Îµ­ºÜÊýË¡¤ËÌá¤¹ 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -880,7 +882,6 @@
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
       *
            03  WRK-CONS-SRYYM-200703   PIC 9(06)   VALUE   200703.
-           03  WRK-CONS-SRYYM-200709   PIC 9(06)   VALUE   200709.      
       *
            03  WRK-CONS-BODYLIST-MAX
                                    PIC 9(02)   VALUE   50.
@@ -3609,18 +3610,6 @@
                        MOVE    WRK-JINISSU2    TO  HC06-JINISSU2
                    END-IF
                END-IF
-      *
-      *        µÜºêÃÏÊý¸øÈñÂÐ±þ
-               IF    ( RECE62-PREFNUM      =   "45"                  )
-               AND   ( RECE62-SRYYM        >=  WRK-CONS-SRYYM-200709 )
-               AND   ( RECE62-TEISYUTUSAKI =   "2"                   )
-                   IF      RECE62-KOHNUM (IDA) =   "190"
-                       MOVE    SPACE               TO  HC06-JINISSU1
-                   END-IF
-                   IF      RECE62-KOHNUM (IDB) =   "190"
-                       MOVE    SPACE               TO  HC06-JINISSU2
-                   END-IF
-               END-IF
            END-IF
       *
            .
@@ -5598,26 +5587,6 @@
                                                        TO  WRK-KGK7
                    END-IF 
                    MOVE    WRK-KGK7            TO  HC06-SYOFTNMONEY (3)
-               END-IF
-           END-IF
-      *
-      *    µÜºêÃÏÊý¸øÈñÂÐ±þ
-           IF    ( RECE62-PREFNUM      =   "45"                  )
-           AND   ( RECE62-SRYYM        >=  WRK-CONS-SRYYM-200709 )
-           AND   ( RECE62-TEISYUTUSAKI =   "2"                   )
-               IF      RECE62-KOHNUM (1)   =   "190"
-                   MOVE    SPACE               TO  HC06-TOTALTEN(2)
-                                                   HC06-FTNMONEY(2)
-                                                   HC06-SYONISSU(2)
-                                                   HC06-SYOTOTALTEN (2)
-                                                   HC06-SYOFTNMONEY (2)
-               END-IF
-               IF      RECE62-KOHNUM (2)   =   "190"
-                   MOVE    SPACE               TO  HC06-TOTALTEN(3)
-                                                   HC06-FTNMONEY(3)
-                                                   HC06-SYONISSU(3)
-                                                   HC06-SYOTOTALTEN (3)
-                                                   HC06-SYOFTNMONEY (3)
                END-IF
            END-IF
            .
