@@ -116,6 +116,7 @@
       *  03.04.07    NACL-ÌçÏÆ    07/06/07  Æþ±¡¼¼ÎÁ²Ã»»¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  03.04.08    NACL-ÌçÏÆ    07/07/17  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°ÊÔ½¸½¤Àµ
       *  03.04.09    NACL-ÌçÏÆ    07/09/11  ÅÀÅ©¼êµ»½¸·×½¤Àµ
+      *  03.04.10    NACL-ÌçÏÆ    08/02/12  ½èÊýÎÁÅù¥«¥¦¥ó¥È½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3185,13 +3186,23 @@
                             (WK-ZAITEN   *   WK-ZAIKAISU)
       *    Ä´ºÞ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "24"
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(7)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(7)
+                   END-IF
                    COMPUTE   RECE82-TENSU(7)  =
                              RECE82-TENSU(7)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
       *    ËãÆÇ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "26"
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(8)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(8)
+                   END-IF
                    COMPUTE   RECE82-TENSU(8)  =
                              RECE82-TENSU(8)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
@@ -3484,11 +3495,17 @@
                          MOVE  TNS-TEN    TO    RECE82-KHNTEN(7)
                    ELSE
                       IF   RECE82-KHNTEN(7) NOT = TNS-TEN
+                      AND  TNS-TEN          NOT = ZERO
                            MOVE   ZERO    TO    RECE82-KHNTEN(7)
                            MOVE   1       TO    FLG-KHNTEN7-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(7)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(7)
+                   END-IF
                    COMPUTE   RECE82-TENSU(7)  =
                              RECE82-TENSU(7)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
@@ -3498,11 +3515,17 @@
                          MOVE  TNS-TEN    TO    RECE82-KHNTEN(8)
                    ELSE
                       IF   RECE82-KHNTEN(8) NOT = TNS-TEN
+                      AND  TNS-TEN          NOT = ZERO
                            MOVE   ZERO    TO    RECE82-KHNTEN(8)
                            MOVE   1       TO    FLG-KHNTEN8-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(8)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(8)
+                   END-IF
                    COMPUTE   RECE82-TENSU(8)  =
                              RECE82-TENSU(8)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
@@ -3512,11 +3535,17 @@
                          MOVE  TNS-TEN    TO    RECE82-KHNTEN(9)
                    ELSE
                       IF   RECE82-KHNTEN(9) NOT = TNS-TEN
+                      AND  TNS-TEN          NOT = ZERO
                            MOVE   ZERO    TO    RECE82-KHNTEN(9)
                            MOVE   1       TO    FLG-KHNTEN9-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(9)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(9)
+                   END-IF
                    COMPUTE   RECE82-TENSU(9)  =
                              RECE82-TENSU(9)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
@@ -3909,11 +3938,17 @@
                          MOVE  TNS-TEN    TO    RECE82-KHNTEN(7)
                    ELSE
                       IF   RECE82-KHNTEN(7) NOT = TNS-TEN
+                      AND  TNS-TEN          NOT = ZERO
                            MOVE   ZERO    TO    RECE82-KHNTEN(7)
                            MOVE   1       TO    FLG-KHNTEN7-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(7)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(7)
+                   END-IF
                    COMPUTE   RECE82-TENSU(7)  =
                              RECE82-TENSU(7)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
@@ -3926,11 +3961,17 @@
                          MOVE  TNS-TEN    TO    RECE82-KHNTEN(8)
                    ELSE
                       IF   RECE82-KHNTEN(8) NOT = TNS-TEN
+                      AND  TNS-TEN          NOT = ZERO
                            MOVE   ZERO    TO    RECE82-KHNTEN(8)
                            MOVE   1       TO    FLG-KHNTEN8-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(8)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(8)
+                   END-IF
                    COMPUTE   RECE82-TENSU(8)  =
                              RECE82-TENSU(8)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)
@@ -3943,11 +3984,17 @@
                          MOVE  TNS-TEN    TO    RECE82-KHNTEN(9)
                    ELSE
                       IF   RECE82-KHNTEN(9) NOT = TNS-TEN
+                      AND  TNS-TEN          NOT = ZERO
                            MOVE   ZERO    TO    RECE82-KHNTEN(9)
                            MOVE   1       TO    FLG-KHNTEN9-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU    TO   RECE82-KAISU(9)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE82-KAISU(9)
+                   END-IF
                    COMPUTE   RECE82-TENSU(9)  =
                              RECE82-TENSU(9)  +
                             (TNS-TEN   *   ACCT-ZAIKAISU)

@@ -311,8 +311,9 @@
       *  03.04.28    NACL-門脇    07/12/03  北海道特定疾患（道単独事業）対応
       *  03.04.29    NACL-門脇    08/01/07  京都府地方公費請求点記載対応
       *  03.04.30    NACL-門脇    08/01/07  徳島県地方公費一部負担金記載対応
-      *  03.04.31    NACL-藤原    07/01/18  埋め込みコメント編集方法の修正
-      *  03.04.32    NACL-門脇    07/02/06  岡山県地方公費対応
+      *  03.04.31    NACL-藤原    08/01/18  埋め込みコメント編集方法の修正
+      *  03.04.32    NACL-門脇    08/02/06  岡山県地方公費対応
+      *  03.04.33    NACL-門脇    08/02/12  処方料等カウント修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5017,11 +5018,17 @@
                       MOVE  WRK-TNS-TEN(IDX3) TO  RECE02-KHNTEN(19)
                    ELSE
                       IF   RECE02-KHNTEN(19) NOT = WRK-TNS-TEN(IDX3)
+                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
                            MOVE   ZERO    TO    RECE02-KHNTEN(19)
                            MOVE   1       TO    FLG-KHNTEN19
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU     TO    RECE02-KAISU(19)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE02-KAISU(19)
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE02-TENSU(19 BUN-IDX)  =
                                  RECE02-TENSU(19 BUN-IDX)  +
@@ -5044,7 +5051,12 @@
                    END-IF
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   ADD    WK-ZAIKAISU     TO   RECE02-KAISU(20)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE02-KAISU(20)
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    "120001310"
                     COMPUTE WRK-MADOKU-SHOHO = WRK-MADOKU-SHOHO +
                                                WK-ZAIKAISU 
