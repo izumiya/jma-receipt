@@ -277,7 +277,8 @@
       *  03.05.22    NACL-門脇    08/01/07  徳島県地方公費一部負担金記載対応
       *  03.05.23    NACL-門脇    08/01/25  結核入院限度額対応
       *  03.05.24    NACL-門脇    08/02/04  標欠外泊計算修正
-      *  03.05.25    NACL-門脇    07/02/06  岡山県地方公費対応
+      *  03.05.25    NACL-門脇    08/02/06  岡山県地方公費対応
+      *  03.05.26    NACL-門脇    08/02/12  処方料等カウント修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3895,7 +3896,12 @@
                    END-IF
       *    調剤のレセ点数欄の編集
                WHEN    "24"
-                   ADD    WK-ZAIKAISU     TO    RECE62-KAISU(7)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE62-KAISU(7)
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE62-TENSU(7 BUN-IDX)  =
                                  RECE62-TENSU(7 BUN-IDX)  +
@@ -3918,7 +3924,12 @@
                    END-IF
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   ADD    WK-ZAIKAISU     TO   RECE62-KAISU(8)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE62-KAISU(8)
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE62-TENSU(8 BUN-IDX)  =
                                  RECE62-TENSU(8 BUN-IDX)  +

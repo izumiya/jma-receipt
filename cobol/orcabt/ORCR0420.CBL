@@ -135,6 +135,7 @@
       *  03.05.06    NACL-門脇    07/09/13  皮下筋肉、静脈注射の記載変更対応
       *  03.05.07    NACL-門脇    07/09/18  画像診断の加算（データ区分：手技）
       *                                     の記載順変更対応
+      *  03.05.08    NACL-門脇    08/02/12  処方料等カウント修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3331,17 +3332,28 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(19)
                    ELSE
                       IF   RECE41-KHNTEN(19) NOT = WRK-TNS-TEN(IDX3)
+                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
                            MOVE   ZERO    TO    RECE41-KHNTEN(19)
                            MOVE   1       TO    FLG-KHNTEN19
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU     TO    RECE41-KAISU(19)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(19)
+                   END-IF
                    COMPUTE   RECE41-TENSU(19)  =
                              RECE41-TENSU(19)  +
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   ADD    WK-ZAIKAISU     TO   RECE41-KAISU(20)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(20)
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    "120001310"
                     COMPUTE WRK-MADOKU-SHOHO = WRK-MADOKU-SHOHO +
                                                WK-ZAIKAISU 
@@ -3735,13 +3747,23 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
-                   ADD    WK-ZAIKAISU     TO    RECE41-KAISU(12)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(12)
+                   END-IF
                    COMPUTE   RECE41-TENSU(12)  =
                              RECE41-TENSU(12)  +
                             (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   ADD    WK-ZAIKAISU     TO   RECE41-KAISU(13)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(13)
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    "120001310"
                     COMPUTE WRK-MADOKU-SHOHO = WRK-MADOKU-SHOHO +
                                                WK-ZAIKAISU 
@@ -4135,17 +4157,28 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(14)
                    ELSE
                       IF   RECE41-KHNTEN(14) NOT = WRK-TNS-TEN(IDX3)
+                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
                            MOVE   ZERO    TO    RECE41-KHNTEN(14)
                            MOVE   1       TO    FLG-KHNTEN14-JI
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU     TO    RECE41-KAISU(14)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(14)
+                   END-IF
                    COMPUTE   RECE41-TENSU(14)  =
                              RECE41-TENSU(14)  +
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   ADD    WK-ZAIKAISU     TO   RECE41-KAISU(15)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(15)
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    "120001310"
                     COMPUTE WRK-MADOKU-SHOHO = WRK-MADOKU-SHOHO +
                                                WK-ZAIKAISU 
@@ -4155,7 +4188,12 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *    調基のレセ点数欄の編集
                WHEN    "27"
-                   ADD    WK-ZAIKAISU     TO   RECE41-KAISU(16)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(16)
+                   END-IF
                    COMPUTE   RECE41-TENSU(16)  =
                              RECE41-TENSU(16)  +
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -4876,11 +4914,17 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(15)
                    ELSE
                       IF   RECE41-KHNTEN(15) NOT = WRK-TNS-TEN(IDX3)
+                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
                            MOVE   ZERO    TO    RECE41-KHNTEN(15)
                            MOVE   1       TO    FLG-KHNTEN15-JI2
                       END-IF
                    END-IF
-                   ADD    WK-ZAIKAISU     TO    RECE41-KAISU(15)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(15)
+                   END-IF
                    COMPUTE   RECE41-TENSU(15)   =
                              RECE41-TENSU(15)   +
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -4889,7 +4933,12 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   ADD    WK-ZAIKAISU     TO   RECE41-KAISU(16)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(16)
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    "120001310"
                     COMPUTE WRK-MADOKU-SHOHO = WRK-MADOKU-SHOHO +
                                                WK-ZAIKAISU 
@@ -4902,7 +4951,12 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *    調基のレセ点数欄の編集
                WHEN    "27"
-                   ADD    WK-ZAIKAISU     TO   RECE41-KAISU(17)
+                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                      CONTINUE
+                   ELSE
+                      ADD    WK-ZAIKAISU     TO    RECE41-KAISU(17)
+                   END-IF
                    COMPUTE   RECE41-TENSU(17)   =
                              RECE41-TENSU(17)   +
                             (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
