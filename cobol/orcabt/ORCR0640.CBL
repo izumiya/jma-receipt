@@ -272,6 +272,7 @@
       *  03.04.36    NACL-ÌçÏÆ    08/02/04  É¸·ç³°Çñ·×»»½¤Àµ
       *  03.04.37    NACL-ÌçÏÆ    08/02/06  ²¬»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *  03.04.38    NACL-ÌçÏÆ    08/02/12  ½èÊýÎÁÅù¥«¥¦¥ó¥È½¤Àµ
+      *  03.04.39    NACL-ÌçÏÆ    08/02/15  ÉéÃ´¶â³Û¡Ê°ìÉôÉéÃ´³Û¡ËÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9914,6 +9915,9 @@
                                                  *  10
                                                  *  RECE62-KYURATE
                                                  /  100
+                        COMPUTE  WRK-FTNKEI-FTN = WRK-FTNKEI-FTN +  5
+                        COMPUTE  WRK-FTNKEI-FTN = WRK-FTNKEI-FTN / 10
+                        COMPUTE  WRK-FTNKEI-FTN = WRK-FTNKEI-FTN * 10
                         ADD      WRK-FTNKEI-FTN  TO
                                          RECE62-FTNMONEY-FTN(KH-IDX)
                       WHEN      3
@@ -9983,6 +9987,9 @@
                                                  *  10
                                                  *  RECE62-KYURATE
                                                  /  100
+                        COMPUTE  WRK-FTNKEI-FTN = WRK-FTNKEI-FTN +  5
+                        COMPUTE  WRK-FTNKEI-FTN = WRK-FTNKEI-FTN / 10
+                        COMPUTE  WRK-FTNKEI-FTN = WRK-FTNKEI-FTN * 10
                         ADD      WRK-FTNKEI-FTN  TO
                                          RECE62-FTNMONEY-FTN(KH-IDX)
                       WHEN      3
