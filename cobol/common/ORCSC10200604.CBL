@@ -2256,7 +2256,8 @@
            PERFORM VARYING     IDX1    FROM    1   BY  1
                    UNTIL      (IDX1        >   SPA-MAX-LINE   ) OR
                               (FLG-ARI                 =   1  ) OR
-                              (WRK-COM-INPUTCD (IDX1)  =   SPACE )
+                             ((WRK-COM-INPUTCD (IDX1)  =   SPACE ) AND
+                              (WRK-GMN-INPUTCD (IDX1)  =   SPACE ))
                IF      (WRK-COM-CDKBN-KBN (IDX1)   =   "D" )  AND
                        (WRK-COM-CDKBN-KBNNUM(IDX1) =   "009")
                    PERFORM 100121-AKUSEI-COMMENT-SEC
