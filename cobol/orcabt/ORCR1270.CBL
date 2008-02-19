@@ -28,6 +28,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.02.01    NACL-Æ£¸¶    08/02/19  ÃÂÀ¸Ç¯¤Îµ­ºÜ¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1084,15 +1085,15 @@
       *
       *    À¸Ç¯·îÆü
            MOVE    RECE200-BIRTHDAY    TO  WRK-SYMD
-           PERFORM 31012-SE-WA-YMDEDIT-SEC
-           EVALUATE    LNK-DAY1-GENGO
-               WHEN    "1"
+           PERFORM 31012-SEIWA-HEN-SEC
+           EVALUATE    LNK-DAY2-EDTYMD1-G
+               WHEN    "M"
                    MOVE    "¡û"            TO  HCN58-BIRTHG (1)
-               WHEN    "2"
+               WHEN    "T"
                    MOVE    "¡û"            TO  HCN58-BIRTHG (2)
-               WHEN    "3"
+               WHEN    "S"
                    MOVE    "¡û"            TO  HCN58-BIRTHG (3)
-               WHEN    "4"
+               WHEN    "H"
                    MOVE    "¡û"            TO  HCN58-BIRTHG (4)
            END-EVALUATE
            MOVE    LNK-DAY2-EDTYMD1-Y  TO  HCN58-BIRTHYY
@@ -2880,26 +2881,6 @@ grpsys     MOVE    RECE200-HOSPNUM     TO  RECE10-HOSPNUM
       *     MOVE    LNK-DAY2-EDTYMD3    TO  WRK-HENYMDG
            .
        31012-SEIWA-HEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    À¾Îñ¢ªÏÂÎñÆüÉÕÊÔ½¸
-      *****************************************************************
-       31012-SE-WA-YMDEDIT-SEC        SECTION.
-      *
-           MOVE    SPACE               TO  STS-AREA-DAY
-           INITIALIZE                      STS-AREA-DAY
-           MOVE    SPACE               TO  LNK-DAY1-AREA
-           MOVE    "11"                TO  LNK-DAY1-IRAI
-           MOVE    WRK-SYMD            TO  LNK-DAY1-YMD
-           CALL    "ORCSDAY"   USING   STS-AREA-DAY  LNK-DAY1-AREA
-           IF  STS-DAY-RC1             =   ZERO
-               MOVE    LNK-DAY1-YMD        TO  WRK-SYMD
-           ELSE
-               MOVE    SPACE               TO  WRK-SYMD
-           END-IF
-           .
-       31012-SE-WA-YMDEDIT-EXT.
            EXIT.
       *
       *****************************************************************
