@@ -66,6 +66,9 @@
       *                                     適用欄コメント対応
       *  04.01.05    NACL-藤原    08/02/12  宮崎県「公費９０」対応
       *                                     通常の記載方法に戻す 
+      *  04.01.06    NACL-藤原    08/02/20  レセプトカスタマイズされてい
+      *                                     るときの適用欄下段コメントの
+      *                                     編集方法の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6046,12 +6049,17 @@
            END-IF
       *
       *    県単用項目
-           IF      FLG-RECE67           =   ZERO
+           IF    ( FLG-RECE67           =   ZERO  )
+           AND   ( RECE67-HC06-BODY NOT =   SPACE )    
                INSPECT RECE67-HC06-BODY     REPLACING   ALL "  "
                                                         BY  "　" 
+               MOVE    RECE67-HC06-BODY     TO  HC06-BODY
+           END-IF
+      *
+      *    県単用項目（適用欄下段欄外コメント）
+           IF      FLG-RECE67           =   ZERO
                INSPECT RECE67-HC06-FOOT     REPLACING   ALL "  "
                                                         BY  "　" 
-               MOVE    RECE67-HC06-BODY     TO  HC06-BODY
                MOVE    RECE67-HC06-FOOT     TO  HC06-FOOT
            END-IF
       *

@@ -173,7 +173,10 @@
       *  04.01.03    NACL-藤原    08/01/10  レセプト特記事項編集情報
       *                                     適用欄コメント対応
       *  04.01.04    NACL-藤原    08/02/12  宮崎県「公費９０」対応
-      *                                     通常の記載方法に戻す 
+      *                                     通常の記載方法に戻す
+      *  04.01.05    NACL-藤原    08/02/20  レセプトカスタマイズされてい
+      *                                     るときの適用欄下段コメントの
+      *                                     編集方法の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5651,12 +5654,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    県単用項目
-           IF      FLG-RECE11           =   ZERO
+           IF    ( FLG-RECE11           =   ZERO  )
+           AND   ( RECE11-HC06-BODY NOT =   SPACE )    
                INSPECT RECE11-HC06-BODY     REPLACING   ALL "  "
                                                         BY  "　" 
+               MOVE    RECE11-HC06-BODY     TO  HC06-BODY
+           END-IF
+      *
+      *    県単用項目（適用欄下段欄外コメント）
+           IF      FLG-RECE11           =   ZERO
                INSPECT RECE11-HC06-FOOT-G   REPLACING   ALL "  "
                                                         BY  "　" 
-               MOVE    RECE11-HC06-BODY     TO  HC06-BODY
                MOVE    RECE11-HC06-FOOT-G   TO  HC06-FOOT-G
            END-IF
       *
