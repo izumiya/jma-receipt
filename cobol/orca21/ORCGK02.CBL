@@ -1216,6 +1216,8 @@
            CALL    "ORCSSPACHK"        USING    SPA-AREA
       *!
       *
+           MOVE    MAX-LINE-VALUE      TO  SPA-MAX-LINE
+      *
            MOVE    "2"                 TO  SPA-NYUGAIKBN
       *
       *    入院機能の判定
