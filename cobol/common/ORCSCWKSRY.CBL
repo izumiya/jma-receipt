@@ -696,8 +696,6 @@
            IF     (FLG-WKSYORIFLG      =   1     )
                PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
                        UNTIL      (IDX-1     >   SPA-MAX-LINE )
-      **                    OR   ((SPA-GMN-INPUTCD(IDX-1) =   SPACE )
-      **                      AND (SPA-COM-INPUTCD(IDX-1) =   SPACE ))
                    IF      (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "P" )  OR
                            (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "P" )
                        MOVE    SPACE               TO  SPA-COM-KAIFLG
@@ -1749,20 +1747,23 @@
       *****************************************************************
        100282-SYOKYO-SEC         SECTION.
       *
+           MOVE    SPA-SCR-REC         TO  WRK-HZN-SCR-AREA
+           MOVE    ZERO                TO  SPA-GMN-IDX
+           INITIALIZE                      SPA-SCR-REC
+      *
            PERFORM VARYING     IDX-1     FROM    1   BY  1
                    UNTIL       IDX-1     >=  SPA-MAX-LINE
-               IF     (SPA-GMN-INPUTCD(IDX-1)    =   SPACE ) AND
-                      (SPA-COM-INPUTCD(IDX-1)    =   SPACE )
-                   MOVE    SPA-COM-TBLREC (IDX-1 + 1) 
-                                               TO  SPA-COM-TBLREC
-                                                        (IDX-1)
-                   MOVE    SPA-GMN-TBLREC (IDX-1 + 1) 
-                                               TO  SPA-GMN-TBLREC
-                                                       (IDX-1)
-                   INITIALIZE                  SPA-COM-TBLREC
-                                                      (IDX-1 + 1) 
-                   INITIALIZE                  SPA-GMN-TBLREC
-                                                      (IDX-1 + 1) 
+               IF     (WRK-HZN-GMN-INPUTCD(IDX-1)    =   SPACE ) AND
+                      (WRK-HZN-COM-INPUTCD(IDX-1)    =   SPACE )
+                   CONTINUE
+               ELSE
+                   ADD     1               TO  SPA-GMN-IDX
+                   MOVE    WRK-HZN-COM-TBLREC (IDX-1) 
+                                           TO  SPA-COM-TBLREC
+                                                    (SPA-GMN-IDX)
+                   MOVE    WRK-HZN-GMN-TBLREC (IDX-1) 
+                                           TO  SPA-GMN-TBLREC
+                                                    (SPA-GMN-IDX)
                END-IF
            END-PERFORM
            .
