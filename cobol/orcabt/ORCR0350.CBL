@@ -5818,6 +5818,7 @@
                                MOVE    1               TO  WRK-END 
                                PERFORM 5004-MOJI-HENSYU-SEC  
                            WHEN    OTHER
+                               MOVE    ZERO            TO  FLG-PRT
                                IF    ( RECE62-RECESYUBETU
                                            =   "1211"  OR  "1221"  OR
                                                "1231"                  )
