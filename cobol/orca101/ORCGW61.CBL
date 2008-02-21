@@ -41,6 +41,7 @@
       *
       *  04.01.01    NACL-藤原    08/01/10  適用欄コメント対応
       *  04.01.02    NACL-藤原    08/02/14  保険名称の取得方法の修正
+      *  04.01.03    NACL-藤原    08/02/20  適用欄コメントのチェックの修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1562,6 +1563,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                INITIALIZE                      ORCSKANACHKAREA
                MOVE    "1"                 TO  KANACHK-SYORI 
                MOVE    SPA-GMN-TOKKI       TO  KANACHK-MAE-INPUT
+               MOVE    12                  TO  KANACHK-MAX-CNT
                CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
                MOVE    KANACHK-MAE-INPUT   TO  SPA-GMN-TOKKI
                IF      KANACHK-RC2         =   7
@@ -1569,6 +1571,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                END-IF
                IF    ( KANACHK-RC          =   ZERO )
                AND   ( KANACHK-SYUBETU     =   2    )
+                   MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-TOKKI
                    IF      KANACHK-RC3         =   2
                        MOVE    "0032"              TO  SPA-ERRCD
                    END-IF
@@ -1739,6 +1742,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                END-IF
                IF    ( KANACHK-RC          =   ZERO )
                AND   ( KANACHK-SYUBETU     =   2    )
+                   MOVE    KANACHK-OUT-INPUT
+                                           TO  SPA-GMN-TEKIYOU-COMMENT1
                    IF      KANACHK-RC3         =   2
                        MOVE    "0032"              TO  SPA-ERRCD
                    END-IF
@@ -1820,6 +1825,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                END-IF
                IF    ( KANACHK-RC          =   ZERO )
                AND   ( KANACHK-SYUBETU     =   2    )
+                   MOVE    KANACHK-OUT-INPUT
+                                           TO  SPA-GMN-TEKIYOU-COMMENT2
                    IF      KANACHK-RC3         =   2
                        MOVE    "0032"              TO  SPA-ERRCD
                    END-IF
