@@ -306,17 +306,20 @@ HCPOM.red	＊	セット一覧表　等
 HCML09.dia	＊	自院病名一覧
 
 HCML01.dia 	＊	点数マスターリスト（医薬品）
-HCML02.dia 	＊	点数マスターリスト（特定器材）
+HCML02.dia 		点数マスターリスト（特定器材）
+HCML02V01.red 	＊	点数マスターリスト（特定器材）			VER4.1.0
 HCML03.dia 	＊	点数マスターリスト（診療行為）
 HCML04.red	＊	点数マスターリスト（その他）
 HCML05.dia 	＊	点数マスターリスト（保険適用）
 HCML07.red 	＊	点数マスターリスト（特定器材）
 HCML06.dia	＊	入力コード点数マスタ一覧
 HCM44.red	＊	チェクマスタ一覧表
-HCM47.red	＊	薬剤情報マスタ一覧
+HCM47.red		薬剤情報マスタ一覧
+HCM61.red	＊	薬剤情報マスタ一覧				VER4.1.0
 
 HCM17.red		日計表
-HCM41.red	＊	日計表
+HCM41.red		日計表
+HCM41V01.red	＊	日計表						VER4.1.0
 HCM07.red		収納一覧表（入院外）等
 HCM07V01.red		収納一覧表（入院外）等
 HCM07V02.red	＊	収納一覧表（入院外）等
@@ -345,7 +348,8 @@ HCG016.red	＊	指定診療行為件数調
 HCG017.red	＊	診療行為別集計表
 
 HCM51.red	＊	収納日報（明細）
-HCM52.red	＊	収納日報（合計）
+HCM52.red		収納日報（合計）
+HCM52V01.red	＊	収納日報（合計）				VER4.1.0
 
 HCMSL55.red	＊	帳票（横）
 HCMSL80.red	＊	帳票（縦）

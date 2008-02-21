@@ -53,6 +53,8 @@ P02Q.glade	orca12	(P02Q)患者登録-ＱＲ受付一覧
 P02Q1.glade	orca12	(P02Q1)患者登録-ＱＲ患者確認
 P02S.glade	orca12	(P02S)患者登録-主科設定画面
 P02X.glade	orca12	(P02X)患者登録ＣＬＡＩＭ送信選択サブ
+P02Y.glade	orca12	(P02Y)患者登録-禁忌薬剤登録			VER4.1.0
+P02Y1.glade	orca12	(P02Y1)患者登録-薬剤一覧選択サブ		VER4.1.0
 P014.glade	orca12	(P01)患者登録-患者番号発行
 P015.glade	orca12	(P015)患者登録-患者番号再発行
 P98.glade	orca12	(P98)住所検索
@@ -73,7 +75,7 @@ Q99.glade	orca13	(Q99)住所検索-町域選択画面
 Q100.glade	orca13	(Q100)出力指示画面
 QERR.glade	orca13	(QERR)エラー情報
 QID1.glade	orca13	(QID1)確認画面
-QFIL.glade	orca13	(QFIL)クライアント保存画面			VER4.0.0
+QFIL.glade	orca13	(QFIL)クライアント保存画面			VER4.1.0
 
 Y01.glade	orca14	(Y01)予約登録-予約状況
 Y03.glade	orca14	(Y03)予約登録-予約一覧
@@ -209,6 +211,7 @@ I22.glade	orca36	(I22)出力指示画面
 I23.glade	orca36	(I23)処理結果
 I2ERR.glade	orca36	(I2ERR)エラー情報
 I2ID1.glade	orca36	(I2ID1)確認画面
+I2FIL.glade	orca36	(I2FIL)クライアント保存画面			VER4.1.0
 
 D01.glade	orca41	(D01)レセプトチェック指示
 D02.glade	orca41	(D02)データチェック-個別指示			VER4.0.0
@@ -314,6 +317,7 @@ W30.glade	orca101	(W30)システム管理情報-入院指示せん設定
 W31.glade	orca101	(W31)システム管理情報-医療区分表示設定
 W32.glade	orca101	(W32)システム管理情報-包括診療行為設定		VER4.0.0
 W33.glade	orca101	(W33)システム管理情報-印刷情報削除設定		VER4.0.0
+W34.glade	orca101	(W34)システム管理情報-プログラムオプション設定	VER4.1.0
 W60.glade	orca101	(W60)システム管理情報-データチェック機能情報２
 W61.glade	orca101	(W61)システム管理情報-レセプト特記事項編集情報設定
 W62.glade	orca101	(W62)印刷設定確認画面
@@ -334,6 +338,7 @@ Z04.glade	orca102	(Z04)点数マスタ設定-医薬品設定
 Z05.glade	orca102	(Z05)点数マスタ設定-特定器材設定
 Z06.glade	orca102	(Z06)点数マスタ設定-用法コード設定
 Z07.glade	orca102	(Z07)自院コード期限切れ置換
+Z08.glade	orca102	(Z08)点数マスタ設定-器材商品名設定		VER4.1.0
 Z90.glade	orca102	(Z90)点数マスタ設定-老人一般コード振替設定
 Z91.glade	orca102	(Z91)点数マスター帳票出力設定
 Z97.glade	orca102	(Z97)処理結果
