@@ -696,14 +696,18 @@
            IF     (FLG-WKSYORIFLG      =   1     )
                PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
                        UNTIL      (IDX-1     >   SPA-MAX-LINE )
-                            OR   ((SPA-GMN-INPUTCD(IDX-1) =   SPACE )
-                              AND (SPA-COM-INPUTCD(IDX-1) =   SPACE ))
+      **                    OR   ((SPA-GMN-INPUTCD(IDX-1) =   SPACE )
+      **                      AND (SPA-COM-INPUTCD(IDX-1) =   SPACE ))
                    IF      (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "P" )  OR
                            (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "P" )
+                       MOVE    SPACE               TO  SPA-COM-KAIFLG
+                                                            (IDX-1)
                        MOVE    IDX-1               TO  SPA-GMN-IDX
                        PERFORM 10028-INPUTSET-SYORI-SEC
                    END-IF
                END-PERFORM
+      *        空白行削除
+               PERFORM 100282-SYOKYO-SEC
            END-IF
       *    約束コード以外の画面再編集
            PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
@@ -923,6 +927,13 @@
       *
                    PERFORM 10028-INPUTSET-SYORI-SEC
                END-IF
+           END-PERFORM
+      *    最大行数
+           PERFORM VARYING     IDX-1   FROM    1   BY  1
+                   UNTIL      (IDX-1   >   SPA-MAX-LINE )
+                          OR ((SPA-COM-INPUTCD(IDX-1)    =   SPACE)
+                          AND (SPA-GMN-INPUTCD(IDX-1)    =   SPACE))
+               MOVE    IDX-1               TO  SPA-GMN-MAX
            END-PERFORM
       *
            IF      WRK-ERRCD1      NOT =   SPACE
@@ -1732,6 +1743,30 @@
       *
            .
        10028-INPUTSET-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    セット展開の空白行削除処理
+      *****************************************************************
+       100282-SYOKYO-SEC         SECTION.
+      *
+           PERFORM VARYING     IDX-1     FROM    1   BY  1
+                   UNTIL       IDX-1     >=  SPA-MAX-LINE
+               IF     (SPA-GMN-INPUTCD(IDX-1)    =   SPACE ) AND
+                      (SPA-COM-INPUTCD(IDX-1)    =   SPACE )
+                   MOVE    SPA-COM-TBLREC (IDX-1 + 1) 
+                                               TO  SPA-COM-TBLREC
+                                                        (IDX-1)
+                   MOVE    SPA-GMN-TBLREC (IDX-1 + 1) 
+                                               TO  SPA-GMN-TBLREC
+                                                       (IDX-1)
+                   INITIALIZE                  SPA-COM-TBLREC
+                                                      (IDX-1 + 1) 
+                   INITIALIZE                  SPA-GMN-TBLREC
+                                                      (IDX-1 + 1) 
+               END-IF
+           END-PERFORM
+           .
+       100282-SYOKYO-EXT.
            EXIT.
       *****************************************************************
       *    ワーク診療行為マスタ登録（中途終了登録）処理
