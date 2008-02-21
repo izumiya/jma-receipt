@@ -1069,6 +1069,8 @@
                    MOVE    SPA-WORK        TO  SPA-K01KYOUTU
                    MOVE    1               TO  SPA-GMN-CUR
                END-IF
+      *        テーブル最大行
+               MOVE    MAX-LINE-VALUE      TO  SPA-MAX-LINE
       *!
                CALL    "ORCSSPACHK"        USING    SPA-AREA
       *!
