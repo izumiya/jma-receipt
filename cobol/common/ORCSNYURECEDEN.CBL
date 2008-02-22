@@ -779,6 +779,10 @@
       *
                                MOVE    1    TO   FLG-OK
                            END-IF
+                           IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)
+                           AND   (LNK-NYUINDAY-KBN(IDX1)  =  "1")
+                               MOVE    1    TO   FLG-OK
+                           END-IF                           
                        END-PERFORM
                    END-IF
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
@@ -786,7 +790,7 @@
                    PERFORM 910-NYUINACCT-READ-SEC
                END-PERFORM
                IF   FLG-OK     =   ZERO
-                   MOVE     3      TO      LNK-NYURECEDEN-RC
+                   MOVE     4      TO      LNK-NYURECEDEN-RC
       *            入院会計クローズ
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                    MOVE    "key17"                 TO  MCP-PATHNAME
@@ -794,7 +798,7 @@
                    GO   TO    200-MAIN-EXT
                END-IF
            ELSE
-               MOVE     3      TO      LNK-NYURECEDEN-RC
+               MOVE     4      TO      LNK-NYURECEDEN-RC
       *        入院会計クローズ
                MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                MOVE    "key17"                 TO  MCP-PATHNAME
