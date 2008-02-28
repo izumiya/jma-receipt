@@ -967,10 +967,14 @@
       *            ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
                    IF      SYS-1006-SSTKIJUN (121) =   1
                        MOVE    1               TO  SPA-SYONIKA
+                   ELSE
+                       MOVE    0               TO  SPA-SYONIKA
                    END-IF
       *            Ï·¿Í³°ÍèÁí¹ç¿Ç»¡
                    IF      SYS-1006-SSTKIJUN (128) =   1
                        MOVE    1               TO  SPA-ROUMANSEI
+                   ELSE
+                       MOVE    0               TO  SPA-ROUMANSEI
                    END-IF
       *            »þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø
                    IF      SYS-1006-SSTKIJUN (011) =   1
@@ -981,6 +985,8 @@
       *            ÅÅ»Ò²½²Ã»»
                    IF      SYS-1006-SSTKIJUN (100) =   1
                        MOVE    1               TO  SPA-DENSIKA
+                   ELSE
+                       MOVE    0               TO  SPA-DENSIKA
                    END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
