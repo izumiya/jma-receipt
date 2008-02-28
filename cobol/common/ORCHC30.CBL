@@ -1101,9 +1101,9 @@
                            MOVE    "1"         TO  WRK-YKJ-KBN(IDX-KBN)
                            MOVE    "Êñ"        TO  WRK-TANINAME
                        ELSE
+                           COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
+                                                   +   WRK-SURYO
                            IF      WRK-HENSURYO(2:)    NOT =   SPACE
-                               COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
-                                                       +   WRK-SURYO
                                MOVE    WRK-HENSURYO(1:3)
                                                TO  WRK-YKJ-KBN(IDX-KBN)
                            ELSE
