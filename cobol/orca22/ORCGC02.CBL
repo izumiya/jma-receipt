@@ -225,6 +225,7 @@
       *  04.01.02    NACL-藤原    07/10/26  公務災害対応
       *  04.01.03    NACL-藤原    08/02/06  登録年月日の更新時の編集追加
       *  04.01.04    NACL-藤原    08/02/13  診療科チェックの修正
+      *  04.01.05    NACL-藤原    08/03/03  特定疾患区分07,08の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1024,7 +1025,15 @@ grpsys                     MOVE    SPA-HOSPNUM TO  PTBYO-HOSPNUM
            MOVE    "特定疾患療養管理料"
                                    TO  SPA-GMN-C02-MANSEIKBNMEIL    (3)
            MOVE    "特定疾患"      TO  SPA-GMN-C02-MANSEIKBNTANL    (3)
-           MOVE    3               TO  SPA-GMN-C02-MANSEIKBN-MAX
+           MOVE    "07"            TO  SPA-GMN-C02-MANSEIKBNL       (4)
+           MOVE    "てんかん指導料"
+                                   TO  SPA-GMN-C02-MANSEIKBNMEIL    (4)
+           MOVE    "てんかん"      TO  SPA-GMN-C02-MANSEIKBNTANL    (4)
+           MOVE    "08"            TO  SPA-GMN-C02-MANSEIKBNL       (5)
+           MOVE    "特定疾患療養管理料又はてんかん指導料"
+                                   TO  SPA-GMN-C02-MANSEIKBNMEIL    (5)
+           MOVE    "特定・てん"    TO  SPA-GMN-C02-MANSEIKBNTANL    (5)
+           MOVE    5               TO  SPA-GMN-C02-MANSEIKBN-MAX
       *
            MOVE    "1"             TO  SPA-GMN-C02-NYUGAIKBNL       (1)
            MOVE    "入院"          TO  SPA-GMN-C02-NYUGAIKBNMEIL    (1)

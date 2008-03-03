@@ -25,7 +25,7 @@ C10	{
 				value	varchar(46);
 			};
 			count	int;
-			item	varchar(46)[4];
+			item	varchar(46)[6];
 		};
 		HKNCOMBICOMBO	{
 			HKNCOMBI	{

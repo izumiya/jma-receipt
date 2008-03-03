@@ -55,6 +55,7 @@
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
       *
       *  04.01.01    NACL-藤原    07/10/11  診療科コピー（移動）機能対応
+      *  04.01.02    NACL-藤原    08/03/03  特定疾患区分07,08の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -415,7 +416,13 @@
            MOVE    "05"            TO  SPA-GMN-C10-MANSEIKBNL       (4)
            MOVE    "特定疾患療養管理料"
                                    TO  SPA-GMN-C10-MANSEIKBNMEIL    (4)
-           MOVE    4               TO  SPA-GMN-C10-MANSEIKBN-MAX
+           MOVE    "07"            TO  SPA-GMN-C10-MANSEIKBNL       (5)
+           MOVE    "てんかん指導料"
+                                   TO  SPA-GMN-C10-MANSEIKBNMEIL    (5)
+           MOVE    "08"            TO  SPA-GMN-C10-MANSEIKBNL       (6)
+           MOVE    "特定疾患療養管理料又はてんかん指導料"
+                                   TO  SPA-GMN-C10-MANSEIKBNMEIL    (6)
+           MOVE    6               TO  SPA-GMN-C10-MANSEIKBN-MAX
       *
            MOVE    "-"             TO  SPA-GMN-C10-NYUGAIKBNL       (1)
            MOVE    "取消"          TO  SPA-GMN-C10-NYUGAIKBNMEIL    (1)
