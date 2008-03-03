@@ -924,8 +924,7 @@
       *
       *    換算されていれば元の数量をセット
            IF      TNS-TANINAME    NOT =   WRK-TANINAME
-               COMPUTE WRK-SURYO   =   ORCHC30-SURYO(CNT-PARA)
-                                   *   ORCHC30-KAISU(CNT-PARA)
+               MOVE    ORCHC30-SURYO(CNT-PARA) TO  WRK-SURYO
       *        数量Ｚ編集
                PERFORM 250-ZHEN-SURYO-SET-SEC
                IF      WRK-SURYO-X(12:)    =   SPACE
