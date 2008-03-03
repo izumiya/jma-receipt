@@ -5671,6 +5671,7 @@
            END-PERFORM
       *    泼年她拉祭吹回瞥瘟
            IF      FLG-TOKUTEI         =   05
+                                       OR  08
                IF      IDX-HKN         >   IDX-A
                    MOVE    IDX-HKN         TO  SPA-GMN-IDX
                ELSE

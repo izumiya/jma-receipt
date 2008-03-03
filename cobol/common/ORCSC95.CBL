@@ -43,6 +43,7 @@
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/04/XX  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  03.05.01    NACL-Â¿¡¹Ç¼  07/08/27  ¸øÈñ´ü¸ÂÀÚ¤ìÂÐ±þ
       *  04.00.00    NACL-Â¿¡¹Ç¼  07/09/XX  ¥Æ¡¼¥Ö¥ë£´£°£°ÂÐ±þ
+      *  04.01.01    NACL-Â¿¡¹Ç¼  08/03/03  ÆÃÄê¼À´µ¶èÊ¬²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -3853,6 +3854,7 @@
                               (SPA-TOKU-SRYKA (IDX)    =   SPACE)
                IF      SPA-TOKU-SRYKA (IDX)    =   SPA-SRYKA
                    IF      SPA-TOKU-FLG(IDX)   =   05
+                                               OR  08
       *                ÆÃÄê¼À´µ¤ÎÍ­Ìµ
                        MOVE    1                   TO  SPA-TOKUTEI
                    ELSE
@@ -3880,15 +3882,18 @@
                    IF      SPA-TOKU-SRYKA (IDX)    =   PTBYO-SRYKA
                        EVALUATE    SPA-TOKU-FLG (IDX)
                            WHEN    05
+                           WHEN    08
                                CONTINUE
                            WHEN    03
                                IF      PTBYO-MANSEIKBN     =   05
+                                                           OR  08
                                    MOVE    PTBYO-MANSEIKBN
                                                    TO  SPA-TOKU-FLG(IDX)
                                END-IF
                            WHEN    04
                                IF      PTBYO-MANSEIKBN     =   03
                                                            OR  05
+                                                           OR  08
                                    MOVE    PTBYO-MANSEIKBN
                                                    TO  SPA-TOKU-FLG(IDX)
                                END-IF
@@ -3976,6 +3981,7 @@
                    IF      PTBYO-MANSEIKBN     =   05
                                                OR  03
                                                OR  04
+                                               OR  08
                        IF     (PTBYO-TENKIKBN      =   SPACE )  OR
                               (PTBYO-TENKIYMD      >=  SPA-SRYYMD)
                            PERFORM 110111-MANSEIKBN-SET-SEC
