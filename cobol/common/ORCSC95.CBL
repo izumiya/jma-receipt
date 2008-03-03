@@ -3549,6 +3549,7 @@
                               (SPA-TOKU-SRYKA (IDX)    =   SPACE)
                IF      SPA-TOKU-SRYKA (IDX)    =   SPA-SRYKA
                    IF      SPA-TOKU-FLG(IDX)   =   05
+                                               OR  08
       *                特定疾患の有無
                        MOVE    1                   TO  SPA-TOKUTEI
                    ELSE
@@ -3576,15 +3577,18 @@
                    IF      SPA-TOKU-SRYKA (IDX)    =   PTBYO-SRYKA
                        EVALUATE    SPA-TOKU-FLG (IDX)
                            WHEN    05
+                           WHEN    08
                                CONTINUE
                            WHEN    03
                                IF      PTBYO-MANSEIKBN     =   05
+                                                           OR  08
                                    MOVE    PTBYO-MANSEIKBN
                                                    TO  SPA-TOKU-FLG(IDX)
                                END-IF
                            WHEN    04
                                IF      PTBYO-MANSEIKBN     =   03
                                                            OR  05
+                                                           OR  08
                                    MOVE    PTBYO-MANSEIKBN
                                                    TO  SPA-TOKU-FLG(IDX)
                                END-IF
@@ -3672,6 +3676,7 @@
                    IF      PTBYO-MANSEIKBN     =   05
                                                OR  03
                                                OR  04
+                                               OR  08
                        IF     (PTBYO-TENKIKBN      =   SPACE )  OR
                               (PTBYO-TENKIYMD      >=  SPA-SRYYMD)
                            PERFORM 110111-MANSEIKBN-SET-SEC
