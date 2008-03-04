@@ -51,6 +51,7 @@
       *  03.04.01    NACL-藤原    06/11/01  病名一括削除機能対応
       *  03.04.02    NACL-藤原    06/11/27   ＳＰＡデータの削除
       *  03.04.03    NACL-藤原    07/03/02  月途中保険変更時の病名対応中止
+      *  03.04.04    NACL-藤原    08/03/03  特定疾患区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -392,7 +393,13 @@
            MOVE    "05"            TO  SPA-GMN-C10-MANSEIKBNL       (4)
            MOVE    "特定疾患療養管理料"
                                    TO  SPA-GMN-C10-MANSEIKBNMEIL    (4)
-           MOVE    4               TO  SPA-GMN-C10-MANSEIKBN-MAX
+           MOVE    "07"            TO  SPA-GMN-C10-MANSEIKBNL       (5)
+           MOVE    "てんかん指導料"
+                                   TO  SPA-GMN-C10-MANSEIKBNMEIL    (5)
+           MOVE    "08"            TO  SPA-GMN-C10-MANSEIKBNL       (6)
+           MOVE    "特定疾患療養管理料又はてんかん指導料"
+                                   TO  SPA-GMN-C10-MANSEIKBNMEIL    (6)
+           MOVE    6               TO  SPA-GMN-C10-MANSEIKBN-MAX
       *
            MOVE    "-"             TO  SPA-GMN-C10-NYUGAIKBNL       (1)
            MOVE    "取消"          TO  SPA-GMN-C10-NYUGAIKBNMEIL    (1)

@@ -95,6 +95,7 @@
       *  03.01.04    NACL-森脇    06/08/31  ジョブ管理削除、確認ボタン追加
       *
       *  03.04.01    NACL-藤原    06/11/27   ＳＰＡデータの削除
+      *  03.04.02    NACL-藤原    08/03/03  特定疾患区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -785,7 +786,15 @@
            MOVE    "特定疾患療養管理料"
                                    TO  SPA-GMN-C03-MANSEIKBNMEIL    (3)
            MOVE    "特定疾患"      TO  SPA-GMN-C03-MANSEIKBNTANL    (3)
-           MOVE    3               TO  SPA-GMN-C03-MANSEIKBN-MAX
+           MOVE    "07"            TO  SPA-GMN-C03-MANSEIKBNL       (4)
+           MOVE    "てんかん指導料"
+                                   TO  SPA-GMN-C03-MANSEIKBNMEIL    (4)
+           MOVE    "てんかん"      TO  SPA-GMN-C03-MANSEIKBNTANL    (4)
+           MOVE    "08"            TO  SPA-GMN-C03-MANSEIKBNL       (5)
+           MOVE    "特定疾患療養管理料又はてんかん指導料"
+                                   TO  SPA-GMN-C03-MANSEIKBNMEIL    (5)
+           MOVE    "特定・てん"    TO  SPA-GMN-C03-MANSEIKBNTANL    (5)
+           MOVE    5               TO  SPA-GMN-C03-MANSEIKBN-MAX
       *
            MOVE    "1"             TO  SPA-GMN-C03-HKNBYOMEIFLGL    (1)
            MOVE    "保険病名"      TO  SPA-GMN-C03-HKNBYOMEIFLGMEIL (1)

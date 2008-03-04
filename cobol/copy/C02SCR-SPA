@@ -78,6 +78,7 @@
       *  03.04.02    NACL-藤原    06/11/05  病名検索画面ＳＰＡ、自院病名
       *                                     登録画面ＳＰＡの追加  
       *  03.04.03    NACL-藤原    06/12/01  月途中保険変更時の病名対応
+      *  03.04.04    NACL-藤原    08/03/03  特定疾患区分の追加
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -243,7 +244,7 @@
                            11  SPA-GMN-C02-SYUBYOFLGMEIL   PIC X(12).    
                        09  SPA-GMN-C02-SYUBYOFLG-MAX       PIC 9(02).
       *                         
-                       09  SPA-GMN-C02-MANSEIKBNLST        OCCURS  3.
+                       09  SPA-GMN-C02-MANSEIKBNLST        OCCURS  5.
                            11  SPA-GMN-C02-MANSEIKBNL      PIC X(02).
                            11  SPA-GMN-F1L                 PIC X(01).
                            11  SPA-GMN-C02-MANSEIKBNMEIL   PIC X(42).    
@@ -694,12 +695,10 @@
                            11  SPA-GMN-C10-SYUBYOFLGMEIL   PIC X(12).    
                        09  SPA-GMN-C10-SYUBYOFLG-MAX       PIC 9(02).
       *                         
-                       09  SPA-GMN-C10-MANSEIKBNLST        OCCURS  5.
+                       09  SPA-GMN-C10-MANSEIKBNLST        OCCURS  6.
                            11  SPA-GMN-C10-MANSEIKBNL      PIC X(02).
                            11  SPA-GMN-F1L                 PIC X(01).
                            11  SPA-GMN-C10-MANSEIKBNMEIL   PIC X(42).    
-                       09  SPA-GMN-C10-MANSEITANLST        OCCURS  5.
-                           11  SPA-GMN-C10-MANSEIKBNTANL   PIC X(10).    
                        09  SPA-GMN-C10-MANSEIKBN-MAX       PIC 9(02).
       *                         
                        09  SPA-GMN-C10-NYUGAIKBNLST        OCCURS  5.
