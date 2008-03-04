@@ -15,7 +15,7 @@
                 04  C10-MANSEIFLG.
                   05  C10-VALUE   PIC X(46).
                 04  C10-MANSEIFLG-COUNT   PIC S9(9)   BINARY.
-                04  C10-MANSEIFLG-ITEM    PIC X(46)   OCCURS  4 TIMES.
+                04  C10-MANSEIFLG-ITEM    PIC X(46)   OCCURS  6 TIMES.
               03  C10-HKNCOMBICOMBO.
                 04  C10-HKNCOMBI.
                   05  C10-VALUE   PIC X(40).
