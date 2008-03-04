@@ -27,6 +27,7 @@
       *****************************************************************
       *  00.00.01    NACL-øπœ∆     ΩÁ»÷ ¬§”¬ÿ§®(«—ªﬂ)
       *  00.00.02    NACL-øπœ∆     CSVΩ–Œœ¬–±˛
+      *  04.02.01    NACL-øπœ∆     08/03/04  º¿¥µ∂Ë ¨ —ππ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -409,8 +410,14 @@
                        MOVE   "»È…Ê£≤"   TO  HCML09-MANSEIKBN(CNT-LINE)
                    WHEN    "05"
                        MOVE   "∆√ƒÍº¿¥µ" TO  HCML09-MANSEIKBN(CNT-LINE)
+      *----(04.02.01)--UPD-START---
+      *             WHEN    "07"
+      *                 MOVE   "»È…Ê£≥"   TO  HCML09-MANSEIKBN(CNT-LINE)
                    WHEN    "07"
-                       MOVE   "»È…Ê£≥"   TO  HCML09-MANSEIKBN(CNT-LINE)
+                       MOVE   "§∆§Û§´§Û"  TO  HCML09-MANSEIKBN(CNT-LINE)
+                   WHEN    "08"
+                       MOVE   "∆√º¿§∆§Û"  TO  HCML09-MANSEIKBN(CNT-LINE)
+      *----(04.02.01)--UPD-END-----
                END-EVALUATE
       *
                EVALUATE    USBYO-UTAGAIFLG
