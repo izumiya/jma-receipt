@@ -3894,11 +3894,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM    
            MOVE    4                   TO  W02-DISCOUNTHASU2-COUNT     
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       4
+                   UNTIL   IDX >       2 
                MOVE    SPA-GMN-GENTAIKBNLST(IDX)
                                        TO  W02-GENTAIKBNLST (IDX)
            END-PERFORM    
-           MOVE    4                   TO  W02-GENTAIKBN-COUNT     
+           MOVE    2                   TO  W02-GENTAIKBN-COUNT     
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       2
                MOVE    SPA-GMN-TAX-HASU-KBNLST(IDX)
