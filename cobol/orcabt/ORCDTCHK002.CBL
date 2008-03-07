@@ -4154,6 +4154,7 @@
       *
            MOVE    ZERO                TO  CNT-PTBYOMEI1
                                            CNT-PTBYOMEI2
+                                           CNT-PTSYUBYO
       *
            MOVE    ZERO                TO  FLG-CHK-END
       *
