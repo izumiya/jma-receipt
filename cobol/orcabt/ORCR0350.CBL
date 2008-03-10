@@ -195,6 +195,7 @@
       *                                     通常の記載方法に戻す 
       *  04.01.04    NACL-藤原    08/02/19  公費単独のときの食事負担の記
       *                                     載方法の変更
+      *  04.01.05    NACL-藤原    08/03/10  特定器材名称の記録方法の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -665,7 +666,7 @@
       *            名称情報
                    07  TBL-ZAIW-NAMEINF.
       *                漢字有効桁数
-                       09  TBL-ZAIW-YUKOKETA        PIC  9(02).
+                       09  TBL-ZAIW-YUKOKETA        PIC  9(03).
       *                漢字名称
                        09  TBL-ZAIW-NAME            PIC  X(200).
       *            データ識別(１：フィルム ２：特定機材)
@@ -741,7 +742,7 @@
       *        名称情報
                05  TBL-KOUI-NAMEINF.
       *            漢字有効桁数
-                   07  TBL-KOUI-YUKOKETA        PIC  9(02).
+                   07  TBL-KOUI-YUKOKETA        PIC  9(03).
       *            漢字名称
                    07  TBL-KOUI-NAME            PIC  X(200).
       *
@@ -829,7 +830,7 @@
       *        名称情報
                    07  WRK-KOUI-NAMEINF.
       *            漢字有効桁数
-                       09  WRK-KOUI-YUKOKETA        PIC  9(02).
+                       09  WRK-KOUI-YUKOKETA        PIC  9(03).
       *            漢字名称
                        09  WRK-KOUI-NAME            PIC  X(200).
       *
@@ -955,7 +956,7 @@
       *名称情報
                05  TBL-KASAN-RECE65-NAMEINF.
       *漢字有効桁数
-                   07  TBL-KASAN-RECE65-YUKOKETA         PIC  9(02).
+                   07  TBL-KASAN-RECE65-YUKOKETA         PIC  9(03).
       *漢字名称
                    07  TBL-KASAN-RECE65-NAME             PIC  X(200).
       *
@@ -1031,7 +1032,7 @@
       *        名称情報
                05  TBL-KENTAI-RECE65-NAMEINF.
       *            漢字有効桁数
-                   07  TBL-KENTAI-RECE65-YUKOKETA        PIC  9(02).
+                   07  TBL-KENTAI-RECE65-YUKOKETA        PIC  9(03).
       *            漢字名称
                    07  TBL-KENTAI-RECE65-NAME            PIC  X(200).
       *
@@ -1110,7 +1111,7 @@
       *        名称情報
                05  TBL-KENSA-RECE65-NAMEINF.
       *            漢字有効桁数
-                   07  TBL-KENSA-RECE65-YUKOKETA        PIC  9(02).
+                   07  TBL-KENSA-RECE65-YUKOKETA        PIC  9(03).
       *            漢字名称
                    07  TBL-KENSA-RECE65-NAME            PIC  X(200).
       *
