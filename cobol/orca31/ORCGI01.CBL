@@ -2828,6 +2828,8 @@
       *    Ã´Åö°å£±
            MOVE    PTNYUINRRK-DRCD1 (2 : 4)
                                    TO  WRK-CMB-CD
+           MOVE    PTNYUINRRK-TENNYUYMD
+                                   TO  WRK-KJNYMD
            MOVE    1               TO  IDX1
            PERFORM 4103-CMB-DR-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-DR (1)
@@ -2835,6 +2837,8 @@
       *    Ã´Åö°å£²
            MOVE    PTNYUINRRK-DRCD2 (2 : 4) 
                                    TO  WRK-CMB-CD
+           MOVE    PTNYUINRRK-TENNYUYMD
+                                   TO  WRK-KJNYMD
            MOVE    2               TO  IDX1
            PERFORM 4103-CMB-DR-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-DR (2)
@@ -2842,6 +2846,8 @@
       *    Ã´Åö°å£³
            MOVE    PTNYUINRRK-DRCD3 (2 : 4)
                                    TO  WRK-CMB-CD
+           MOVE    PTNYUINRRK-TENNYUYMD
+                                   TO  WRK-KJNYMD
            MOVE    3               TO  IDX1
            PERFORM 4103-CMB-DR-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-DR (3)
@@ -5380,6 +5386,7 @@
       *
            MOVE    SPA-GMN-I01-DR-CD (IDX1)
                                    TO  WRK-CMB-CD
+           MOVE    WRK-KIHON-KJNYMD TO WRK-KJNYMD
            PERFORM 4103-CMB-DR-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-DR (IDX1)
@@ -5889,7 +5896,7 @@
                MOVE    "1010"          TO  WRK-KANRICD
                MOVE    "1"             TO  WRK-KBNCD (1:1)
                MOVE    WRK-CMB-CD      TO  WRK-KBNCD (2:)
-               MOVE    WRK-KIHON-KJNYMD TO WRK-YUKYMD
+               MOVE    WRK-KJNYMD      TO WRK-YUKYMD
                PERFORM 900-SYSKANRI-KEY10-SEL-SEC
                IF    ( FLG-SYSKANRI    =   ZERO )
                    MOVE    SYSKANRI-REC    TO  SYS-1010-REC
