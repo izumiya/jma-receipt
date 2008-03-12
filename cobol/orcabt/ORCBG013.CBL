@@ -392,6 +392,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                INITIALIZE          SYS-1010-REC
            END-IF
       *
+           MOVE    SYS-1010-KBNCD      TO  SPA-STAFFCD
+      *
            .
        1001-SYS1010-SEL-EXT.
            EXIT.
@@ -409,7 +411,6 @@ grpsys*DD  MOVE    WRK-PARA-HOSPID     TO  SPA-HOSPID
 grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            MOVE    LNK-PRTKANRI-TERMID TO  SPA-TERMID
-           MOVE    SYS-1010-KBNCD      TO  SPA-STAFFCD
       *
            .
        1001-SPA-SET-EXT.
