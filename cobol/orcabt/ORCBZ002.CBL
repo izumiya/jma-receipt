@@ -489,11 +489,11 @@
       *
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key15"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptinf"         TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
+               MOVE    "key15"             TO  MCP-PATHNAME
                PERFORM 900-PTINF-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-PTINF
@@ -526,11 +526,11 @@
                END-IF
       *
                MOVE    "tbl_ptinf"         TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
+               MOVE    "key15"             TO  MCP-PATHNAME
                PERFORM 900-PTINF-READ-SEC
            END-PERFORM
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key15"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
              .
