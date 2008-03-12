@@ -1617,14 +1617,14 @@
            MOVE    "key14"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *    リハビリテーション管理料チェック
-           IF     (LNK-SC92-ERRCD6 NOT =   SPACE      )  AND
-                  (SPA-SRYYMD          >=  "20070401" )
+      **** リハビリテーション管理料チェック
+      *    IF     (LNK-SC92-ERRCD6 NOT =   SPACE      )  AND
+      *           (SPA-SRYYMD          >=  "20070401" )
       *        今回入力時エラーはそのまま
-               IF      FLG-KONKAI          =   ZERO
-                   PERFORM 20054-RIHA-CHKSYORI-SEC
-               END-IF
-           END-IF
+      *        IF      FLG-KONKAI          =   ZERO
+      *            PERFORM 20054-RIHA-CHKSYORI-SEC
+      *        END-IF
+      ***  END-IF
       *
            IF      FLG-CHKERR          =   1
       *        エラーメッセージ
@@ -1816,6 +1816,12 @@
                       END-IF
                   END-IF
               END-IF
+           END-IF
+      *    リハビリテーション管理料チェック
+           IF    ((FLG-CHKERR          =   1          )
+              OR  (WRK-KEI-SRYCD   NOT =   SPACE      ))  AND
+                  (SPA-SRYYMD          >=  "20070401" )
+               PERFORM 20054-RIHA-CHKSYORI-SEC
            END-IF
            .
        20051-CHK-SANTEI-EXT.
@@ -2152,7 +2158,7 @@
                    AT  END
                        MOVE    ZERO            TO  FLG-RKAN-OK2
                        MOVE    SPACE           TO  WRK-KAN-KBN2
-                   WHEN   (WRK-CHK-CD          =   TBL-RIHA-KAN-SRYCD
+                   WHEN   (CHK-CD              =   TBL-RIHA-KAN-SRYCD
                                                           (TBL-RKA))
                        MOVE    1               TO  FLG-RKAN-OK2
                        MOVE    TBL-RIHA-KAN-KBN (TBL-RKA)
@@ -2167,7 +2173,7 @@
            END-IF
       *    どちらかが慢性疼痛疾患管理料の場合、エラー
            IF     (LNK-SC92-SRYCD      =   "113006510" OR
-                   WRK-CHK-CD          =   "113006510" )
+                   CHK-CD              =   "113006510" )
                GO      TO      20054-RIHA-CHKSYORI-EXT
            END-IF
       *
@@ -2180,9 +2186,9 @@
       *    直帰のリハビリ管理料算定日
            IF      FLG-RKAN-OK         =   1
                MOVE    LNK-SC92-SRYCD      TO  WRK-SRYCD
-               MOVE    WRK-CHK-CD          TO  WRK-SRYCD2
+               MOVE    CHK-CD              TO  WRK-SRYCD2
            ELSE
-               MOVE    WRK-CHK-CD          TO  WRK-SRYCD
+               MOVE    CHK-CD              TO  WRK-SRYCD
                MOVE    LNK-SC92-SRYCD      TO  WRK-SRYCD2
            END-IF
            MOVE    SPACE               TO  WRK-FSANTEIYMD
@@ -2231,6 +2237,8 @@
                   (FLG-RKAN-ARI        =   ZERO   )
                MOVE    SPACE           TO  LNK-SC92-ERRCD6
                MOVE    SPACE           TO  LNK-SC92-ERRMSG
+               MOVE    ZERO            TO  FLG-CHKERR 
+               MOVE    SPACE           TO  WRK-KEI-SRYCD
            END-IF
       *    訂正の時、当日ならＯＫとする
            IF      LNK-SC92-SYORIFLG   =   1
@@ -2239,6 +2247,8 @@
                       (FLG-RKAN-ARI2       =   ZERO   )
                    MOVE    SPACE           TO  LNK-SC92-ERRCD6
                    MOVE    SPACE           TO  LNK-SC92-ERRMSG
+                   MOVE    ZERO            TO  FLG-CHKERR 
+                   MOVE    SPACE           TO  WRK-KEI-SRYCD
                END-IF
            END-IF
       *
@@ -2249,6 +2259,8 @@
               AND (FLG-RKAN-ARI2       =   ZERO   )
                MOVE    SPACE           TO  LNK-SC92-ERRCD6
                MOVE    SPACE           TO  LNK-SC92-ERRMSG
+               MOVE    ZERO            TO  FLG-CHKERR 
+               MOVE    SPACE           TO  WRK-KEI-SRYCD
            END-IF
       *
            .
