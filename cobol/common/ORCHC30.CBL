@@ -922,6 +922,54 @@
       *****************************************************************
        241-NAIYO-SURYO-SET-SEC     SECTION.
       *
+      *    服用時点で換算済み
+           IF      WRK-ZENSURYO    >   0
+               IF     ORCHC30-ZAIKBN(CNT-PARA)     NOT =   3
+                   COMPUTE WRK-SURYO   =   WRK-ZENSURYO
+                                       *   ORCHC30-KAISU(CNT-PARA)
+               ELSE
+                   COMPUTE WRK-SURYO   =   WRK-ZENSURYO
+                                       *   ORCHC30-SRYKAISU(CNT-PARA)
+               END-IF
+           ELSE
+               IF     ORCHC30-ZAIKBN(CNT-PARA)     NOT =   3
+                   COMPUTE WRK-SURYO   =   ORCHC30-SURYO(CNT-PARA)
+                                       *   ORCHC30-KAISU(CNT-PARA)
+               ELSE
+                   MOVE    ORCHC30-SURYO(CNT-PARA) TO  WRK-SURYO
+               END-IF
+      *        換算値で数量を割る
+               COMPUTE WRK-WARI    =   WRK-SURYO
+                                   /   TNSP-KANZANCHI
+      *        割り切れればセット
+               IF      WRK-SURYO       =   WRK-WARI
+                                       *   TNSP-KANZANCHI
+                   MOVE    WRK-WARI        TO  WRK-SURYO
+                   MOVE    TNSP-KANZANTANINAME TO  WRK-TANINAME
+               END-IF
+           END-IF
+      *
+      *    数量Ｚ編集
+           PERFORM 250-ZHEN-SURYO-SET-SEC
+           IF      WRK-SURYO-X(12:)    =   SPACE
+      *        全角変換
+               MOVE    SPACE           TO  ORCSKANACHKAREA
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "2"             TO  KANACHK-SYORI
+               MOVE    WRK-HENSURYO    TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+      *        数量文字セット
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               STRING  "全"                DELIMITED  BY  SIZE
+                       KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                           DELIMITED  BY  SIZE
+                       WRK-TANINAME        DELIMITED  BY  SPACE
+                       INTO                WRK-HENSYUDATA
+               END-STRING
+               MOVE    WRK-HENSYUDATA  TO  WRK-ZENSUATO
+           END-IF
+      *
       *    換算されていれば元の数量をセット
            IF      TNS-TANINAME    NOT =   WRK-TANINAME
                MOVE    ORCHC30-SURYO(CNT-PARA) TO  WRK-SURYO
@@ -946,36 +994,6 @@
                    END-STRING
                    MOVE    WRK-HENSYUDATA  TO  WRK-ZENSUMAE
                END-IF
-           END-IF
-      *
-      *    全数量
-           IF      WRK-ZENSURYO    >   0
-               COMPUTE WRK-SURYO   =   WRK-ZENSURYO
-                                   *   ORCHC30-KAISU(CNT-PARA)
-           ELSE
-               COMPUTE WRK-SURYO   =   ORCHC30-SURYO(CNT-PARA)
-                                   *   ORCHC30-KAISU(CNT-PARA)
-           END-IF
-      *
-      *    数量Ｚ編集
-           PERFORM 250-ZHEN-SURYO-SET-SEC
-           IF      WRK-SURYO-X(12:)    =   SPACE
-      *        全角変換
-               MOVE    SPACE           TO  ORCSKANACHKAREA
-               INITIALIZE                  ORCSKANACHKAREA
-               MOVE    "2"             TO  KANACHK-SYORI
-               MOVE    WRK-HENSURYO    TO  KANACHK-MAE-INPUT
-               CALL    "ORCSKANACHK"       USING
-                                           ORCSKANACHKAREA
-      *        数量文字セット
-               MOVE    SPACE           TO  WRK-HENSYUDATA
-               STRING  "全"                DELIMITED  BY  SIZE
-                       KANACHK-OUT-INPUT(1:KANACHK-MAX)
-                                           DELIMITED  BY  SIZE
-                       WRK-TANINAME        DELIMITED  BY  SPACE
-                       INTO                WRK-HENSYUDATA
-               END-STRING
-               MOVE    WRK-HENSYUDATA  TO  WRK-ZENSUATO
            END-IF
       *
            .
