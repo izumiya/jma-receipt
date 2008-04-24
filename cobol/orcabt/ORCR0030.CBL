@@ -343,6 +343,7 @@
       *  04.02.04    NACL-Æ£¸¶    08/03/31  ¹­°èÏ¢¹ç£Ï£Ã£Ò½ÐÎÏ¶èÊ¬ÄÉ²Ã
       *  04.02.05    NACL-ÌçÏÆ    08/04/08  ¼¢²ì¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  04.02.06    NACL-ÌçÏÆ    08/04/08  ËÌ³¤Æ»Æ»Ï·ÇÑ»ß
+      *  04.02.07    NACL-ÌçÏÆ    08/04/24  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1729,6 +1730,21 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                         WRK-TAIHI-GENKIN-EN
            MOVE      ZERO       TO      FLG-ZENKI-TOKUREI
       *
+           IF    (RECE02-SRYYM   >=  "200804")
+           AND   (RECE02-SRYYM   <=  "200903")
+             IF  (RECE02-HKNNUM       =   SPACE                      )
+             OR  (RECE02-HKNNUM(1:2)  =   "98"                       )
+             OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
+             OR  (RECE02-AGE          <    70                        )
+             OR  (RECE02-AGE          >    74                        )
+               CONTINUE
+             ELSE
+               IF  RECE02-HOJOKBN     =   "1"  OR  "9"
+                  MOVE      1     TO    FLG-ZENKI-TOKUREI
+               END-IF
+             END-IF
+           END-IF
+      *
            IF    RECE02-ZAITAKU    =    "1"  OR  "2"
              IF    RECE02-ZAITAKU    =    "1"
                 PERFORM     2116-KEIKASOCHI-HANTEI-SEC
@@ -2162,21 +2178,6 @@ grpsys         PERFORM 900-DBSELECT-SEC
                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
                MOVE    "key4"               TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
-           END-IF
-      *
-           IF    (RECE02-SRYYM   >=  "200804")
-           AND   (RECE02-SRYYM   <=  "200903")
-             IF  (RECE02-HKNNUM       =   SPACE                      )
-             OR  (RECE02-HKNNUM(1:2)  =   "98"                       )
-             OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
-             OR  (RECE02-AGE          <    70                        )
-             OR  (RECE02-AGE          >    74                        )
-               CONTINUE
-             ELSE
-               IF  RECE02-HOJOKBN     =   "1"  OR  "9"
-                  MOVE      1     TO    FLG-ZENKI-TOKUREI
-               END-IF
-             END-IF
            END-IF
       *
            .

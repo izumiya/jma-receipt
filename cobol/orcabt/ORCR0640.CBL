@@ -305,6 +305,7 @@
       *  04.02.07    NACL-ÌçÏÆ    08/04/03  ¡û¡û¤Ë¤ÆÆþ±¡ÎÁ»»ÄêºÑ¤Î¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *  04.02.08    NACL-ÌçÏÆ    08/04/08  ¼¢²ì¸©ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  04.02.09    NACL-ÌçÏÆ    08/04/08  ËÌ³¤Æ»Æ»Ï·ÇÑ»ß
+      *  04.02.10    NACL-ÌçÏÆ    08/04/24  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11046,6 +11047,10 @@
                    (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "91"
                                                    AND <= "95" )  AND
                    (RECE62-SRYYM             >=  "200510"      ))
+               OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "051"         )  AND
+                   (TBL-DOTANDOKU-FLG(KOHFTN-IDX)  = ZERO      )  AND
+                   (KOHFTN-IDX                =   1            ))
                 CONTINUE
                ELSE
                 COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(KOHFTN-IDX + 1)
