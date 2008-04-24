@@ -33,6 +33,8 @@
       *                                     ¡ÊÊ¿À®£±£¹Ç¯£´·î²þÀµÍÍ¼°¡Ë
       *
       *  04.01.01    NACL-Æ£¸¶    07/11/22  ¸ø³²¥ì¥»¥×¥ÈÂÐ±þ
+      *
+      *  04.02.01    NACL-Æ£¸¶    08/04/24  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -325,6 +327,15 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-1031-HOSPNUM
            IF      SYS-2005-KKHPRTNM-N =   SPACE
                MOVE    SYS-1031-PRTNM (4)  TO  SYS-2005-KKHPRTNM-N
            END-IF                                              
+      *    ¹­°è°õºþÀè
+           IF      SYS-200501-KOUIKIPRTNM
+                                       =   SPACE
+               MOVE    SYS-1031-PRTNM (4)  TO  SYS-200501-KOUIKIPRTNM
+           END-IF                                              
+           IF      SYS-200501-KOUIKIPRTNM-N
+                                       =   SPACE
+               MOVE    SYS-1031-PRTNM (4)  TO  SYS-200501-KOUIKIPRTNM-N
+           END-IF                                              
       *    ¼ÒÊÝ°õºþÀè¡ÊÂ³»æ¡Ë
            IF      SYS-2005-SYAPRTNM-NEXT  =   SPACE
                IF      SYS-2005-SYAPRTNM       =   SPACE
@@ -361,6 +372,25 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-1031-HOSPNUM
                ELSE                                              
                    MOVE    SYS-2005-KKHPRTNM-N  TO
                                            SYS-2005-KKHPRTNM-NEXT-N
+               END-IF
+           END-IF                                              
+      *    ¹­°è°õºþÀè¡ÊÂ³»æ¡Ë
+           IF      SYS-200501-KOUIKIPRTNM-NEXT  =   SPACE
+               IF      SYS-200501-KOUIKIPRTNM       =   SPACE
+                   MOVE    SYS-1031-PRTNM (4)  TO
+                                           SYS-200501-KOUIKIPRTNM-NEXT
+               ELSE                                              
+                   MOVE    SYS-200501-KOUIKIPRTNM   TO
+                                           SYS-200501-KOUIKIPRTNM-NEXT
+               END-IF
+           END-IF                                              
+           IF      SYS-200501-KOUIKIPRTNM-NEXT-N  =   SPACE
+               IF      SYS-200501-KOUIKIPRTNM-N       =   SPACE
+                   MOVE    SYS-1031-PRTNM (4)  TO
+                                           SYS-200501-KOUIKIPRTNM-NEXT-N
+               ELSE                                              
+                   MOVE    SYS-200501-KOUIKIPRTNM-N  TO
+                                           SYS-200501-KOUIKIPRTNM-NEXT-N
                END-IF
            END-IF                                              
       *    Ï«ºÒ°õºþÀè
@@ -546,22 +576,39 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                WHEN   "1"              ALSO    "3"
                    MOVE    SYS-2005-SYAPRTNM-N
                                    TO  SHELLTBL-ARG15
-                   MOVE    SYS-2005-KKHPRTNM-N
-                                   TO  SHELLTBL-ARG16
                    MOVE    SYS-2005-SYAPRTNM-NEXT-N
-                                   TO  SHELLTBL-ARG28
-                   MOVE    SYS-2005-KKHPRTNM-NEXT-N
-                                   TO  SHELLTBL-ARG29
+                                   TO  SHELLTBL-ARG16
+                   STRING  SYS-2005-KKHPRTNM-N DELIMITED  BY  SPACE
+                           "#/"                    DELIMITED  BY  SIZE
+                           SYS-200501-KOUIKIPRTNM-N
+                                                   DELIMITED  BY  SPACE
+                                           INTO    SHELLTBL-ARG28
+                   END-STRING
+                   STRING  SYS-2005-KKHPRTNM-NEXT-N
+                                                   DELIMITED  BY  SPACE
+                           "#/"                    DELIMITED  BY  SIZE
+                           SYS-200501-KOUIKIPRTNM-NEXT-N
+                                                   DELIMITED  BY  SPACE
+                                           INTO    SHELLTBL-ARG29
+                   END-STRING
                WHEN   "2"              ALSO    "0"
                WHEN   "2"              ALSO    "3"
                    MOVE    SYS-2005-SYAPRTNM
                                    TO  SHELLTBL-ARG15
-                   MOVE    SYS-2005-KKHPRTNM
-                                   TO  SHELLTBL-ARG16
                    MOVE    SYS-2005-SYAPRTNM-NEXT
-                                   TO  SHELLTBL-ARG28
-                   MOVE    SYS-2005-KKHPRTNM-NEXT
-                                   TO  SHELLTBL-ARG29
+                                   TO  SHELLTBL-ARG16
+                   STRING  SYS-2005-KKHPRTNM       DELIMITED  BY  SPACE
+                           "#/"                    DELIMITED  BY  SIZE
+                           SYS-200501-KOUIKIPRTNM  DELIMITED  BY  SPACE
+                                           INTO    SHELLTBL-ARG28
+                   END-STRING
+                   STRING  SYS-2005-KKHPRTNM-NEXT
+                                                   DELIMITED  BY  SPACE
+                           "#/"                    DELIMITED  BY  SIZE
+                           SYS-200501-KOUIKIPRTNM-NEXT
+                                                   DELIMITED  BY  SPACE
+                                           INTO    SHELLTBL-ARG29
+                   END-STRING
                WHEN   "1"              ALSO    "1"
                    MOVE    SYS-2005-ROUPRTNM-N
                                    TO  SHELLTBL-ARG15

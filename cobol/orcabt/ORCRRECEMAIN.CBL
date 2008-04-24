@@ -113,8 +113,8 @@
                05  WRK-PARA-A25                        PIC  X(64).
                05  WRK-PARA-A26                        PIC  X(16).
                05  WRK-PARA-A27                        PIC  X(16).
-               05  WRK-PARA-A28                        PIC  X(16).
-               05  WRK-PARA-A29                        PIC  X(16).
+               05  WRK-PARA-A28                        PIC  X(34).
+               05  WRK-PARA-A29                        PIC  X(34).
       *
                05  WRK-PARA-PTID                       PIC  9(10).
                05  WRK-PARA-NYUGAIKBN                  PIC  X(01).
