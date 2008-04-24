@@ -410,6 +410,9 @@ FORM_files = \
 	      HCM3E.red \
 	      HCM3F.red \
 	      HCM3G.red \
+	      HCM12.red \
+	      HCM13.red \
+	      HCM14.red \
 
 all:   
 
