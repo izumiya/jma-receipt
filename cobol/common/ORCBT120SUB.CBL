@@ -31,6 +31,7 @@
       *  04.01.01    NACL-¾®Æ¦Âô  07/11/16  ¸øÌ³ºÒ³²¡¢¸ø³²¤Î¼ïÊÌÈ½ÄêÄÉ²Ã
       *Ê¿À®£²£°Ç¯£´·î²þÄêÂÐ±þ
       *  04.02.00    NACL-¾®Æ¦Âô  08/04/15  ¥ì¥»¥×¥È¼ïÊÌÂÐ±þ
+      *  04.02.01    NACL-Æ£¸¶    08/04/23  ¸å´ü¹âÎð¼Ô¤ÎÁ¥°÷ÊÝ¸±¤òËÜ¿Í¤È¤¹¤ë
       *****************************************************************
       *
       *
@@ -939,6 +940,25 @@
       *
       *        Ê¿À®£²£°Ç¯£´·î°Ê¹ß
                IF     LNK-ORCBT120SUB-SANTEIYMD(1:6)  >=  "200804"
+                   IF    ( LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
+                                           =   "002" )
+                   AND  ( WRK-AGE          >=  75    )
+                       EVALUATE    LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                           WHEN    "A"
+                           WHEN    "G"
+                               MOVE    "1"
+                                   TO  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                           WHEN    "B"
+                           WHEN    "H"
+                               MOVE    "2"
+                                   TO  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                           WHEN    "C"
+                           WHEN    "I"
+                               MOVE    "3"
+                                   TO  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                       END-EVALUATE
+                   END-IF
+      *
                    EVALUATE    LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
                        WHEN    "002" 
                            EVALUATE   LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
