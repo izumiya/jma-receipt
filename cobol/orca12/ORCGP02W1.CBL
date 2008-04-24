@@ -5641,6 +5641,7 @@
                                                    SPA-AREA
                                                    SPA-P02SCRAREA
                                                    SPA-P02KYOUTU
+                       PERFORM 410312-HKN-SPATBL-SET-SEC
                    END-IF
                END-PERFORM
                IF     (SPA-ERRCD       NOT =   SPACE )  OR
