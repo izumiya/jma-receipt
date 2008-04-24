@@ -5598,7 +5598,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            IF      SPA-GMN-SYUKA-MAX   >   ZERO
              MOVE    WIDGET-NORMAL       TO  R02-SYUKA-STATE
       *      Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤ÎÀßÄê
-             IF      SPA-R01-RECE07-SRYYM    >   WRK-CONS-SRYYM-200804
+             IF      SPA-R01-RECE07-SRYYM    >=  WRK-CONS-SRYYM-200804
                IF    ( SPA-R01-RECE07-SRYKA
                                        NOT =   "00" )
                AND   ( SPA-R01-RECE07-SRYKA-KOKUHO
