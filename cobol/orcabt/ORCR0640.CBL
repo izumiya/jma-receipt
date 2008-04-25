@@ -306,6 +306,7 @@
       *  04.02.08    NACL-門脇    08/04/08  滋賀県地方公費一部負担金記載対応
       *  04.02.09    NACL-門脇    08/04/08  北海道道老廃止
       *  04.02.10    NACL-門脇    08/04/24  ７０歳代前半特例一部負担金記載修正
+      *  04.02.11    NACL-門脇    08/04/25  ７０歳代前半特例対象者編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2206,6 +2207,10 @@
                        END-IF
                    END-IF
                END-IF
+           END-IF
+      *
+           IF   FLG-ZENKI-TOKUREI  =   1
+              MOVE      1     TO     RECE62-RJNGAIKOHFTN(2)
            END-IF
       *
            PERFORM     RECE62-REWRITE-SEC
