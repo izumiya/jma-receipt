@@ -413,6 +413,7 @@ FORM_files = \
 	      HCM12.red \
 	      HCM13.red \
 	      HCM14.red \
+	      HCM37V01.red \
 
 all:   
 

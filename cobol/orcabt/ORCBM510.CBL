@@ -42,7 +42,8 @@
       *  03.04.01     NACL-¿¹ÏÆ    07/04/16  ¥³¥á¥ó¥È¸«½Ð¤·ÄÉ²Ã
       *
       *  03.05.01    NACL-Æ£¸¶    07/04/19  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
-      *  04.02.01    NACL-¿¹ÏÆ    08/04/14  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
+      *  04.02.01    NACL-¿¹ÏÆ    08/04/17  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
+      *  04.02.02    NACL-¿¹ÏÆ    08/04/25  Ä¢É¼ÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -66,7 +67,10 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM37.INC".
+      *----(04.02.02)--UPD-START---
+           COPY    "HCM37V01.INC"  REPLACING  //HCM37V01//
+                                   BY         //HCM37//.
+      *----(04.02.02)--UPD-END-----
       *
       *    ¥¹¥ÑÎÎ°è
        01  STS-AREA.
@@ -628,6 +632,12 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE10-NUM          TO  HCM37-NUM
       *----(01.01.05)--ADD-END-----
       *
+      *----(04.02.02)--ADD-START---
+           IF      RECE10-SRYYM    <   CONST-H2004
+               MOVE    "»ÔÄ®Â¼ÈÖ¹æ¡§"      TO  HCM37-RJNFTNJANAME
+               MOVE    "Ï·¿Í¼õµë¼ÔÈÖ¹æ¡§"  TO  HCM37-RJNJKYSNAME
+           END-IF
+      *----(04.02.02)--ADD-START---
       *    Ï·¿ÍÊÝ¸±
            IF      RECE10-RJNHKNNUM    NOT =   SPACE
                IF      RECE10-RJNHKNID     NOT =   ZERO
@@ -803,7 +813,9 @@ grpsys                     MOVE    SPA-HOSPNUM     TO
                                        TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE   "HCM37.red"          TO  SPRT-PRTID
+      *----(04.02.02)--UPD-START---
+           MOVE   "HCM37V01.red"       TO  SPRT-PRTID
+      *----(04.02.02)--UPD-END-----
            EVALUATE    WRK-PARA-TEISYUTUSAKI
                            ALSO    WRK-PARA-NYUGAIKBN   
                WHEN    "1" ALSO    ZERO
