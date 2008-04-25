@@ -44,6 +44,7 @@
       *  04.01.01    NACL-ÌçÏÆ    08/01/18  ºë¶Ì¸©ÀîÅçÄ®ÃÏÊý¸øÈñÂÐ±þ
       *  04.01.02    NACL-ÌçÏÆ    08/01/31  ¼¢²ì¸©£´£´£±ÄÉ²Ã¤ËÈ¼¤¦½¤Àµ
       *  04.02.01    NACL-ÌçÏÆ    08/03/19  À¸ÊÝ¤Î£·£¹Ê»ÍÑ»þ¤ÎÂÐ±þ
+      *  04.02.02    NACL-ÌçÏÆ    08/04/24  ºë¶Ì¸©»ÖÌÚ»ÔÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -274,6 +275,14 @@
       *
            END-IF
       *
+           IF  (WRK-PREFNUM           =  11            ) AND
+               (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
+               (LNK-FTNJGNCHK-SRYYM  >= "200804"       )
+      *
+               PERFORM    2101-SYOTOKU-HENSYU-SEC
+      *
+           END-IF
+      *
            INITIALIZE                           HKNNUM-REC
            MOVE    LNK-FTNJGNCHK-HOSPNUM  TO    HKN-HOSPNUM
            MOVE    LNK-FTNJGNCHK-KOHNUM   TO    HKN-HKNNUM
@@ -345,6 +354,12 @@
                       MOVE HKN-TSY-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
                    END-IF
                END-EVALUATE
+             END-IF
+             IF   (WRK-PREFNUM             =  11                     )
+             AND  (LNK-FTNJGNCHK-KOHNUM    = "481" OR "482" OR "483" )
+             AND  (LNK-FTNJGNCHK-NYUGAIKBN = "1"                     )
+             AND  (LNK-FTNJGNCHK-SRYYM    >= "200804"                )
+                      MOVE     999999            TO WRK-HKNMST-JGNGAK
              END-IF
            END-IF
       *
@@ -712,6 +727,16 @@
                      OR ((WRK-PREFNUM            =  11     ) AND
                          (LNK-FTNJGNCHK-KOHNUM   = "381"   ) AND
                          (LNK-FTNJGNCHK-SRYYM   >= "200801"))
+                     OR ((WRK-PREFNUM            =  11     ) AND
+                         (LNK-FTNJGNCHK-KOHNUM   = "481" OR
+                                                   "482"   ) AND
+                         (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                         (LNK-FTNJGNCHK-SRYYM   >= "200804"))
+                     OR ((WRK-PREFNUM            =  11     ) AND
+                         (LNK-FTNJGNCHK-KOHNUM   = "483"   ) AND
+                         (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                         (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                         (LNK-FTNJGNCHK-SRYYM   >= "200804"))
                        IF   WRK-KOHFTN   NOT = ZERO
                                MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
