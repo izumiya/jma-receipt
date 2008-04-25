@@ -307,6 +307,8 @@
       *  04.02.09    NACL-ÌçÏÆ    08/04/08  ËÌ³¤Æ»Æ»Ï·ÇÑ»ß
       *  04.02.10    NACL-ÌçÏÆ    08/04/24  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.02.11    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎãÂÐ¾Ý¼ÔÊÔ½¸
+      *  04.02.12    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10685,8 +10687,7 @@
                     WHEN       "025"
                     WHEN       "038"
                       IF  ((FLG-ZENKI-TOKUREI             =   1  ) AND
-                           (RECE62-KOHNUM(KH-IDX - 1)     = "051") AND
-                           (TBL-DOTANDOKU-FLG(KH-IDX - 1) = ZERO ))
+                           (RECE62-KOHNUM(KH-IDX - 1)     = "051"))
                       OR  ((FLG-ZENKI-TOKUREI             =   1  ) AND
                            (RECE62-KOHNUM(KH-IDX - 1)     = "038"))
                         COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
@@ -11054,7 +11055,6 @@
                    (RECE62-SRYYM             >=  "200510"      ))
                OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "051"         )  AND
-                   (TBL-DOTANDOKU-FLG(KOHFTN-IDX)  = ZERO      )  AND
                    (KOHFTN-IDX                =   1            ))
                 CONTINUE
                ELSE
@@ -11786,8 +11786,7 @@
       *
       *    £·£°ºÐÂåÁ°È¾·Ú¸ºÆÃÎãÁ¼ÃÖÂÐ±þ
            IF  ((FLG-ZENKI-TOKUREI     =   1  ) AND
-                (RECE62-KOHNUM(1)      = "051") AND
-                (TBL-DOTANDOKU-FLG(1)  = ZERO ))
+                (RECE62-KOHNUM(1)      = "051"))
            OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
                 (RECE62-KOHNUM(1)      = "038"))
               PERFORM  210463-ZENKI-TOKUREI-OKIKAE-SEC
@@ -12589,6 +12588,10 @@
            END-IF
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
+            IF  (RECE62-KOHNUM(1)      = "051")
+            AND (TBL-DOTANDOKU-FLG(1)  =   1  )
+             CONTINUE
+            ELSE
              IF  WRK-KOH-GENDOGAKU   NOT =  ZERO
                  EVALUATE   WK-GENGAKUKBN
                    WHEN        1
@@ -12638,6 +12641,7 @@
                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH / 10
                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH * 10
              END-IF
+            END-IF
            END-IF
       ****
            IF  RECE62-KOHNUM(1) = "038"
@@ -12668,10 +12672,14 @@
                                         RECE62-FTNMONEY-KOJ(2)
       *
            IF     RECE62-KOHNUM(1)  =  "051"
-             COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(2) + WRK-SKJ-FTN(2)
-             MOVE     RECE62-FTNMONEY(2)    TO    WRK-FTNKEI3
+             IF  (WRK-PREFNUM        =  "01"                   )
+             AND (RECE62-KOHJKYSNUM(1)(1:2) >= "91" AND <= "95")
+              CONTINUE
+             ELSE
+              COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(2) + WRK-SKJ-FTN(2)
+              MOVE     RECE62-FTNMONEY(2)    TO    WRK-FTNKEI3
       *
-             IF  WRK-JYOGEN-KOH2  NOT =  ZERO
+              IF  WRK-JYOGEN-KOH2  NOT =  ZERO
                 IF   WRK-FTNKEI3  =  WRK-JYOGEN-KOH2
                    MOVE  WRK-FTNKEI3
                               TO  RECE62-FTNMONEY(2)
@@ -12681,6 +12689,7 @@
                               TO  RECE62-FTNMONEY(2)
                                   RECE62-FTNMONEY-KOJ(2)
                 END-IF
+              END-IF
              END-IF
            END-IF
       *

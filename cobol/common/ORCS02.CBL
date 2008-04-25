@@ -208,6 +208,8 @@
       *  04.02.04    NACL-ÌçÏÆ    08/03/24  Ä»¼è¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.05    NACL-ÌçÏÆ    08/04/08  ËÌ³¤Æ»Æ»Ï·ÇÑ»ß
       *  04.02.06    NACL-ÌçÏÆ    08/04/09  £·£°ºÐÂåÆÃÎãÁ¼ÃÖ£°£µ£±¿©»ö·×»»
+      *  04.02.07    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÆÃÎãÁ¼ÃÖ£°£µ£±¿©»ö·×»»
+      *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -14310,7 +14312,7 @@
       *
                IF  (FLG-ZENKI-TOKUREI           =   1  )
                AND (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051")
-               AND (WK-DOTANDOKU(KOH-IDX)       =  ZERO)
+      ***      AND (WK-DOTANDOKU(KOH-IDX)       =  ZERO)
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY
                                    =  WK-ZENGAKU  *  0.2
                   IF   WK-ZENKI-TOKUREI-MONEY  <  ZAN-KOHI-T(KOH-IDX)

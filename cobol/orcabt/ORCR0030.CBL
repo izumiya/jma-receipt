@@ -345,6 +345,8 @@
       *  04.02.06    NACL-ÌçÏÆ    08/04/08  ËÌ³¤Æ»Æ»Ï·ÇÑ»ß
       *  04.02.07    NACL-ÌçÏÆ    08/04/24  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.02.08    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎãÂÐ¾Ý¼ÔÊÔ½¸
+      *  04.02.09    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6920,8 +6922,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   WHEN       "025"
                   WHEN       "038"
                     IF  ((FLG-ZENKI-TOKUREI             =   1  ) AND
-                         (RECE02-KOHNUM(KH-IDX - 1)     = "051") AND
-                         (TBL-DOTANDOKU-FLG(KH-IDX - 1) = ZERO ))
+                         (RECE02-KOHNUM(KH-IDX - 1)     = "051"))
                     OR  ((FLG-ZENKI-TOKUREI             =   1  ) AND
                          (RECE02-KOHNUM(KH-IDX - 1)     = "038"))
                       COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
@@ -7330,8 +7331,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
       *    £·£°ºÐÂåÁ°È¾·Ú¸ºÆÃÎãÁ¼ÃÖÂÐ±þ
            IF  ((FLG-ZENKI-TOKUREI     =   1  ) AND
-                (RECE02-KOHNUM(1)      = "051") AND
-                (TBL-DOTANDOKU-FLG(1)  = ZERO ))
+                (RECE02-KOHNUM(1)      = "051"))
            OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
                 (RECE02-KOHNUM(1)      = "038"))
               PERFORM  21093-ZENKI-TOKUREI-OKIKAE-SEC
@@ -8064,6 +8064,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
+            IF  (RECE02-KOHNUM(1)      = "051")
+            AND (TBL-DOTANDOKU-FLG(1)  =   1  )
+             CONTINUE
+            ELSE
              IF  WRK-KOH-GENDOGAKU   NOT =  ZERO
                  EVALUATE   WK-GENGAKUKBN
                    WHEN        1
@@ -8113,6 +8117,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH / 10
                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH * 10
              END-IF
+            END-IF
            END-IF
       ****
            IF  RECE02-KOHNUM(1) = "038"
@@ -8124,8 +8129,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
            END-IF
       *
-           IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
+           IF  (RECE02-KOHNUM(1)      =  "051")
+           AND (TBL-DOTANDOKU-FLG(1)  =   1   )
+           AND (RECE02-ZAITAKU        =  SPACE)
+             CONTINUE
+           ELSE
+             IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
                 MOVE   WRK-KOH-GENDOGAKU   TO   WRK-JYOGEN-KOH
+             END-IF
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
