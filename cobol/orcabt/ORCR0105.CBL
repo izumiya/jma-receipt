@@ -35,6 +35,10 @@
       *  04.02.03    NACL-ÃÁœ∆    08/04/08  ÀÃ≥§∆ª∆ªœ∑«—ªﬂ
       *  04.02.04    NACL-∆£∏∂    08/04/18  °÷•Ï•ª≈≈ƒÃøÆ∞Â£≤£∞£∞£∞£∂πÊ°◊
       *                                     æ…æıæ‹µ≠∂Ë ¨•≥°º•…£µ£≤§Œƒ…≤√
+      *  04.02.05    NACL-∆£∏∂    08/04/24  ¬≥ªÊ§Œ —ππ
+      *                                     £∑£∞∫–¬Â¡∞»æ§Œ∆√Œ„¡º√÷¬–æ›º‘
+      *                                     ¬–±˛ 
+      *                                     πÒ ›§Œ§ﬂ£≤≥‰§Œµ≠∫‹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -165,13 +169,13 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM11.INC"  REPLACING  //HCM11//
+           COPY    "HCM11.INC"     REPLACING  //HCM11//
                                    BY         //HC06//.
-           COPY    "HCN061V03.INC" REPLACING  //HCN061V03//
+           COPY    "HCM12.INC"     REPLACING  //HCM12//
                                    BY         //HC061//.
-           COPY    "HCN062V03.INC" REPLACING  //HCN062V03//
+           COPY    "HCM13.INC"     REPLACING  //HCM13//
                                    BY         //HC062//.
-           COPY    "HCN063V02.INC" REPLACING  //HCN063V02//
+           COPY    "HCM14.INC"     REPLACING  //HCM14//
                                    BY         //HC063//.
       *
       *    •’•È•∞ŒŒ∞Ë
@@ -2255,6 +2259,11 @@
                                        TO  KOHSKY-SHOKUJIFTNKBN
       *
            MOVE    RECE02X-SYUGAKUKBN  TO  KOHSKY-FLG (1)
+      *    £∑£∞∫–¬Â¡∞»æ§Œ∆√Œ„¡º√÷¬–æ›º‘§Œ§ﬂ£≤≥‰§Œµ≠∫‹
+           IF      RECE02X-RJNGAIKOHFTN (2)
+                                       =   1
+               MOVE    1                   TO  KOHSKY-FLG (2)
+           END-IF
       *
            MOVE    KOHSKY-REC          TO  MCPDATA-REC
            MOVE    "tbl_kohsky"        TO  MCP-TABLE
@@ -3557,8 +3566,13 @@
       *          
       *    πÒ ›§Œ§ﬂ∞ıª˙
            IF    ( RECE02-TEISYUTUSAKI =   "2"   )
-               COMPUTE WRK-KYURATE-9   =   (100 -   RECE02-KYURATE)
-                                           / 10 
+      *        £∑£∞∫–¬Â¡∞»æ§Œ∆√Œ„¡º√÷¬–æ›º‘§Œ§ﬂ£≤≥‰§Œµ≠∫‹
+               IF      RECE02-RJNGAIKOHFTN (2)     =   1
+                   MOVE    8               TO  WRK-KYURATE-9
+               ELSE
+                   COMPUTE WRK-KYURATE-9   =   (100 -   RECE02-KYURATE)
+                                               / 10 
+               END-IF
                IF      WRK-KYURATE-9       >   ZERO
                    MOVE   "µÎ≥‰"               TO  HC06-KYURATE
                    MOVE    WRK-KYURATE-9       TO  WRK-KYURATE
@@ -6171,17 +6185,17 @@
                        MOVE    HC06            TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
                    WHEN    "1"   
-                       MOVE    "HCN061V03.red" TO
+                       MOVE    "HCM12.red" TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC061           TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
                    WHEN    "2"   
-                       MOVE    "HCN062V03.red" TO
+                       MOVE    "HCM13.red" TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC062           TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
                    WHEN    "3"   
-                       MOVE    "HCN063V02.red" TO
+                       MOVE    "HCM14.red" TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC063           TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -6423,17 +6437,17 @@
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE
                            MOVE    HC06            TO RECE08-PRTDATA
-                       WHEN    "HCN061V03.red"                  
+                       WHEN    "HCM12.red"                  
                            MOVE    RECE08-PRTDATA  TO HC061
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC061-PAGE
                            MOVE    HC061           TO RECE08-PRTDATA
-                       WHEN    "HCN062V03.red"                  
+                       WHEN    "HCM13.red"                  
                            MOVE    RECE08-PRTDATA  TO HC062
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC062-PAGE
                            MOVE    HC062           TO RECE08-PRTDATA
-                       WHEN    "HCN063V02.red"                  
+                       WHEN    "HCM14.red"                  
                            MOVE    RECE08-PRTDATA  TO HC063
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC063-PAGE
@@ -7217,8 +7231,13 @@
                END-IF        
            END-IF
       *     
-           MOVE    RECE02-AGE          TO  RECE10-AGE  
+           MOVE    RECE02-AGE          TO  RECE10-AGE 
            MOVE    RECE02-SYUGAKUKBN   TO  RECE10-FLG (1)
+      *    £∑£∞∫–¬Â¡∞»æ§Œ∆√Œ„¡º√÷¬–æ›º‘§Œ§ﬂ£≤≥‰§Œµ≠∫‹
+           IF      RECE02-RJNGAIKOHFTN (2) =   1
+               MOVE    1                   TO  RECE10-FLG (2)
+           END-IF
+      *
            IF      RECE02-ZAITAKU  =  "1"
              MOVE    RECE02-ZAITAKU    TO  RECE10-ZAITAKU
            END-IF

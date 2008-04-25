@@ -126,6 +126,10 @@
       *
       *  04.02.01    NACL-藤原    08/02/25  対象なしのときのエラー追加
       *  04.02.02    NACL-藤原    08/03/25  平成２０年４月改正対応
+      *  04.02.03    NACL-藤原    08/04/24  続紙の変更
+      *                                     HCM12.red
+      *                                     HCM13.red
+      *                                     HCM14.red
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -296,6 +300,9 @@
            COPY    "HCRCP403.INC".
            COPY    "HCM11.INC".
            COPY    "HCN09.INC".
+           COPY    "HCM12.INC".
+           COPY    "HCM13.INC".
+           COPY    "HCM14.INC".
       *
       *    ファイルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
@@ -893,6 +900,18 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        MOVE    RECE08-PRTDATA      TO  HCM11
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCM11-RENNUM
                        MOVE    HCM11               TO  RECE08-PRTDATA
+                   WHEN    "HCM12.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCM12
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCM12-RENNUM
+                       MOVE    HCM12               TO  RECE08-PRTDATA
+                   WHEN    "HCM13.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCM13
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCM13-RENNUM
+                       MOVE    HCM13               TO  RECE08-PRTDATA
+                   WHEN    "HCM14.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCM14
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCM14-RENNUM
+                       MOVE    HCM14               TO  RECE08-PRTDATA
                END-EVALUATE
            END-IF            
       *             
@@ -1031,6 +1050,9 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCN063V01.red" ALSO    "2"              
                WHEN    "HCN063V02.red" ALSO    "2"              
                WHEN    "HCM11.red"     ALSO    ANY               
+               WHEN    "HCM12.red"     ALSO    "2"              
+               WHEN    "HCM13.red"     ALSO    "2"              
+               WHEN    "HCM14.red"     ALSO    "2"              
                    MOVE    "医科レセプト（入院外）"    TO  SPRT-TITLE
                WHEN    "HCN06.red"     ALSO    ANY             
                WHEN    "HCN06V01.red"  ALSO    ANY             
@@ -1061,6 +1083,9 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCN08V02.red"  ALSO    ANY               
                WHEN    "HCRCP403.red"  ALSO    ANY                
                WHEN    "HCN09.red"     ALSO    ANY               
+               WHEN    "HCM12.red"     ALSO    "1"              
+               WHEN    "HCM13.red"     ALSO    "1"              
+               WHEN    "HCM14.red"     ALSO    "1"              
                    MOVE    "医科レセプト（入院）"      TO  SPRT-TITLE
                END-EVALUATE
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID

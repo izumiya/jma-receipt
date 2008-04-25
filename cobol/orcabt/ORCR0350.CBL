@@ -206,6 +206,10 @@
       *                                     広域連合対応
       *  04.02.06    NACL-藤原    08/04/10  平成２０年４月改正に伴う記録
       *                                     条件仕様の変更
+      *  04.02.07    NACL-藤原    08/04/24  続紙の変更
+      *                                     ７０歳代前半の特例措置対象者
+      *                                     対応 
+      *                                     国保のみ２割の記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2195,6 +2199,11 @@
       *    給付割合（国保OR退職者のみ）
            IF    ( RECE62-TEISYUTUSAKI =   "2"   )
            AND   ( RECE62-RJNHKNNUM    =   SPACE )
+      *        ７０歳代前半の特例措置対象者のみ２割の記載
+               IF      RECE62-RJNGAIKOHFTN (2)     =   1
+                   MOVE    20              TO  RECE62-KYURATE
+               END-IF
+      *
                COMPUTE WRK-KYURATE     =   100 -   RECE62-KYURATE
                MOVE   WRK-KYURATE          TO  WRK-NUM
                MOVE    3                   TO  WRK-NAGASA
