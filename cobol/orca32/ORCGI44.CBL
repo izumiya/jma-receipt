@@ -1655,9 +1655,12 @@
        410112-KOUI-SPACHK-SEC          SECTION.
       *
            MOVE    1                   TO  SPA-GMN-CUR.
+           IF      WRK-STR             =   ZERO
+               MOVE    1                   TO  WRK-STR
+           END-IF
       *
       *    変換・削除処理
-           MOVE    WRK-STR             TO  SPA-GMN-IDX.
+           MOVE    WRK-STR             TO  SPA-GMN-IDX
            MOVE    ZERO                TO  WRK-IDX2.
            MOVE    ZERO                TO  FLG-INS.
            PERFORM VARYING SPA-GMN-IDX     FROM    1   BY  1
@@ -1674,8 +1677,8 @@
            END-IF
       *
       *    入力のチェック
-           MOVE    WRK-STR             TO  SPA-GMN-IDX.
-           MOVE    ZERO                TO  FLG-INS.
+           MOVE    WRK-STR             TO  SPA-GMN-IDX
+           MOVE    ZERO                TO  FLG-INS
            PERFORM UNTIL      (SPA-GMN-IDX    >   200  )  OR
                               (SPA-ERRCD   NOT =   SPACE)  OR
                               (FLG-END     NOT =   ZERO )
@@ -1760,7 +1763,6 @@
       *********MOVE    WRK-HENKAN      TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
                MOVE    "1030"          TO  SPA-ERRCD
                MOVE    "1"             TO  SPA-COM-CUR    (SPA-GMN-IDX)
-               GO  TO                  41011-KOUI-HENDEL-EXT
            END-IF.
       *
        41011-KOUI-HENDEL-EXT.
@@ -2844,8 +2846,8 @@
                GO      TO      41014-GYOINSN-EXT
            END-IF.
       *
-           MOVE    SPA-GMN-REC         TO  WRK-GMN-REC.
-           INITIALIZE                      SPA-GMN-REC.
+           MOVE    SPA-GMN-REC         TO  WRK-GMN-REC
+           INITIALIZE                      SPA-GMN-REC
            MOVE    ZERO                TO  IDY.
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   200
@@ -2987,16 +2989,16 @@
        41001-KOUI-ALLCHK-SEC       SECTION.
       *
       *    画面をＳＰＡへ編集
-           MOVE    1                   TO  WRK-IDX2.
+           MOVE    1                   TO  WRK-IDX2
            PERFORM 2002-GMNSPA-SET-SEC.
       *
       *    入力コード・名称チェック処理
-           MOVE    "1"                 TO  FLG-TOROKU.
+           MOVE    "1"                 TO  FLG-TOROKU
            PERFORM 410112-KOUI-SPACHK-SEC
       *
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-GMN-MAX     =   ZERO
-                   MOVE    "1020"          TO  SPA-ERRCD
+                   MOVE    "1021"          TO  SPA-ERRCD
                END-IF
            END-IF
            .
