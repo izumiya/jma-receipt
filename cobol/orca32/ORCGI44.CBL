@@ -3010,29 +3010,31 @@
        4100-TOROKU-SEC             SECTION.
       *
       *    診療行為入力チェック
-           PERFORM 41001-KOUI-ALLCHK-SEC.
+           PERFORM 41001-KOUI-ALLCHK-SEC
            IF     (SPA-ERRCD       NOT =   SPACE)  OR
                   (FLG-END             =   1    )
                GO      TO      4100-TOROKU-EXT
-           END-IF,
+           END-IF
       *
       *    剤のチェック
-           PERFORM 45011-NAIYOU-CHK-SEC.
-      *    同一剤が存在している時、エラーとする
-           IF      FLG-OK              =   1
-               MOVE    "1025"              TO  SPA-ERRCD
-               GO      TO      4100-TOROKU-EXT
-           END-IF.
+           PERFORM 45011-NAIYOU-CHK-SEC
+           IF      SPA-ERRCD           =   SPACE
+      *        同一剤が存在している時、エラーとする
+               IF      FLG-OK              =   1
+                   MOVE    "1025"              TO  SPA-ERRCD
+               END-IF
+           END-IF
       *
-           IF     (FLG-OK2             =   1   )  AND
-                  (WRK-ZAINUM          =   ZERO)
-      *        剤変更なしとして、処理を終了する
-               PERFORM 210-BACK
-               GO      TO      4100-TOROKU-EXT
-           END-IF.
-      *
-           MOVE    "0101"              TO  SPA-IIDCD.
-      *
+           IF      SPA-ERRCD           =   SPACE
+               IF     (FLG-OK2             =   1   )  AND
+                      (WRK-ZAINUM          =   ZERO)
+      *            剤変更なしとして、処理を終了する
+                   PERFORM 210-BACK
+               ELSE
+                   MOVE    "0101"              TO  SPA-IIDCD
+               END-IF
+           END-IF
+           .
        4100-TOROKU-EXT.
            EXIT.
       *
@@ -3121,6 +3123,10 @@
       *    点数計算・剤内容集計
            PERFORM 5102-TENSU-KEISEN-SEC
       *
+           IF       WRK-MEISAISU       =   ZERO
+               MOVE    "1021"              TO  SPA-ERRCD
+               GO      TO      45011-NAIYOU-CHK-EXT
+           END-IF
       *
            MOVE    ZERO                TO  WRK-ZAINUM
            MOVE    ZERO                TO  FLG-OK
@@ -3734,6 +3740,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-ERRMSG
                WHEN    "1020"
                    MOVE    "区分が異なります"
+                                       TO  SPA-ERRMSG
+               WHEN    "1021"
+                   MOVE    "剤の内容がありません。登録できません。"
                                        TO  SPA-ERRMSG
                WHEN    "1025"
                    MOVE    "既に同じ診療行為の剤が存在します。"
