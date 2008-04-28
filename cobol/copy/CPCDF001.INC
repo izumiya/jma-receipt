@@ -133,6 +133,8 @@
                05  COLDAT01-BIRTHDAY        PIC  9(08).
       *        年齢
                05  COLDAT01-AGE             PIC  9(03).
+      *        就学前区分（１：就学前）
+               05  COLDAT01-SYUGAKUKBN      PIC  9(01).
       *        自宅−郵便番号
                05  COLDAT01-HOME-POST       PIC  X(07).
       *    保険組合せ

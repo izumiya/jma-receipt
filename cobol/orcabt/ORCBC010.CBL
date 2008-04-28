@@ -32,6 +32,7 @@
       *  03.03.01    NACL-∆£∏∂    06/10/27  •Ï•ª•◊•»§«¿∏≥Ë ›∏Ó§Œ¿¡µ·§¨§ 
       *                                     §§æÏπÁµ≠∫‹§Œ¬–æ›§»§∑§ §§
       *  04.01.01    NACL-æÆ∆¶¬Ù  07/11/16  ∏¯Ã≥∫“≥≤°¢∏¯≥≤§ŒºÔ Ã»ΩƒÍƒ…≤√
+      *  04.02.01    NACL-∞À∆£    08/ 4/22  ≤˛ƒÍ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -143,7 +144,8 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20071029".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20071029".
+       01  PRGSKBNO                PIC X(08)  VALUE "20080428".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
@@ -211,6 +213,7 @@
            03  IDX3                            PIC 9(03).
            03  IDX4                            PIC 9(03).
            03  IDX5                            PIC 9(03).
+           03  IDX6                            PIC 9(03).
            03  IDY                             PIC 9(03).
            03  IDZ                             PIC 9(03).
            03  IDZ1                            PIC 9(03).
@@ -418,6 +421,8 @@
       *
       *    ¿∏≥Ë ›∏Ó ›∏±»÷πÊ 
            03  WRK-CONS-SEIHO-HKNNUM   PIC X(03)   VALUE   "012".
+      *    √ÊπÒªƒŒ±ÀÆøÕ≈˘ ›∏±»÷πÊ 
+           03  WRK-CONS-ZANRYUU-HKNNUM PIC X(03)   VALUE   "025". 
       *    º´»Ò ›∏±»÷πÊ 
            03  WRK-CONS-JIHI-HKNNUM    PIC X(03)   VALUE   "980".
       *    œ´∫“ ›∏±»÷πÊ 
@@ -441,6 +446,8 @@
            03  WRK-CONS-BYOMEICD-KYUSEI
                                    PIC X(07)   VALUE   "ZZZ4012".
       *
+           03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+      *
       *    ∆√µ≠ªˆπ‡
            03  CONS-TOKKI1         PIC X(09) VALUE "099990101".
            03  CONS-TOKKI2         PIC X(09) VALUE "099990102".
@@ -457,6 +464,10 @@
            03  CONS-TOKKI14        PIC X(09) VALUE "099990114".
            03  CONS-TOKKI15        PIC X(09) VALUE "099990115".
            03  CONS-TOKKI16        PIC X(09) VALUE "099990116".
+           03  CONS-TOKKI17        PIC X(09) VALUE "099990117".
+           03  CONS-TOKKI18        PIC X(09) VALUE "099990118".
+           03  CONS-TOKKI19        PIC X(09) VALUE "099990119".
+           03  CONS-TOKKI20        PIC X(09) VALUE "099990120".
       *
       *    …∏Ω‡…È√¥≥€
            03  WRK-CONS-HYOJYUN-FUTAN-G.
@@ -535,9 +546,6 @@
            COPY    "CPSK1006.INC".
       *
            COPY    "CPSK2005.INC".
-      *
-      *    ¥µº‘≈–œøµ°«Ω¿©∏Êæ Û
-           COPY  "CPSK1017.INC".
       *
       *    ø«Œ≈≤Ò∑◊
        01  SRYACCT-REC.
@@ -676,6 +684,7 @@
            MOVE    "ORCBC010"      TO  JOB-PGID
            MOVE    "º˝Ω∏•«°º•ø∫Ó¿Æ° √ÍΩ–°À"
                                    TO  JOB-SHELLMSG
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA
                                    JOBKANRI-REC
@@ -757,26 +766,6 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
            END-IF
            IF      SYS-2005-RJNGNBKKBN =   SPACE
                MOVE    ZERO                TO  SYS-2005-RJNGNBKKBN
-           END-IF
-      *
-      *    ¥µº‘≈–œøµ°«Ω¿©∏Êæ Û
-           INITIALIZE                      SYS-1017-REC
-grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1017-HOSPNUM
-           MOVE    "1017"              TO  SYS-1017-KANRICD
-           MOVE    "*"                 TO  SYS-1017-KBNCD
-           MOVE    WRK-PARA-SRYYM      TO  SYS-1017-STYUKYMD (1:6)
-           MOVE    "01"                TO  SYS-1017-STYUKYMD (7:2)
-           MOVE    SYS-1017-STYUKYMD   TO  SYS-1017-EDYUKYMD
-           MOVE    SYS-1017-REC        TO  MCPDATA-REC
-           PERFORM 910-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-1017-REC
-           ELSE
-               INITIALIZE                      SYS-1017-REC
-           END-IF
-           IF      SYS-1017-SEIHO-JKYSNUM
-                                       =   SPACE
-               MOVE    ZERO                TO  SYS-1017-SEIHO-JKYSNUM
            END-IF
       *
       *    ∏©∆‚∞∑§§ ›∏±º‘æ Û
@@ -1181,21 +1170,22 @@ grpsys     MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
                    IF      WRK-HKNCOMBI-SYOKBN (IDX2)  NOT =   "1"
                        PERFORM 20013-NYUIN-KIHON-SEC
                    END-IF
-               END-PERFORM
+      *ito 20080425  END-PERFORM §Ú15π‘§Ø§È§§∏Â§À∞‹∆∞§µ§ª§ø
       *
-               PERFORM 20011-SKJFTN-SEC
-               PERFORM 200111-NYUIN-JNISSU-TAIHI-SEC
-               PERFORM 200112-SKJNISSU-TAIHI-SEC
-      *        º¬∆¸øÙ°¢≈¿øÙ ‘Ω∏
-               PERFORM 20012-JNISSU-SET-SEC
-               PERFORM 20013-TOTALTENSU-SET-SEC
-               MOVE    TBL-JNISSU      TO  TBL-JNISSU-S
-               INITIALIZE                  TBL-JNISSU
-               INITIALIZE                  TBL-JNISSU-GEN
-               INITIALIZE                  TBL-TOTALTENSU-INF
-               INITIALIZE                  TBL-SKJNISSU-INF
-               INITIALIZE                  TBL-SKJRYOYOHI-INF
-               INITIALIZE                  TBL-SKJFTN-INF
+                   PERFORM 20011-SKJFTN-SEC
+                   PERFORM 200111-NYUIN-JNISSU-TAIHI-SEC
+                   PERFORM 200112-SKJNISSU-TAIHI-SEC
+      *            º¬∆¸øÙ°¢≈¿øÙ ‘Ω∏
+                   PERFORM 20012-JNISSU-SET-SEC
+                   PERFORM 20013-TOTALTENSU-SET-SEC
+                   MOVE    TBL-JNISSU      TO  TBL-JNISSU-S
+                   INITIALIZE                  TBL-JNISSU
+                   INITIALIZE                  TBL-JNISSU-GEN
+                   INITIALIZE                  TBL-TOTALTENSU-INF
+                   INITIALIZE                  TBL-SKJNISSU-INF
+                   INITIALIZE                  TBL-SKJRYOYOHI-INF
+                   INITIALIZE                  TBL-SKJFTN-INF
+               END-PERFORM
       *        ø«Œ≈≤Ò∑◊ ‘Ω∏ΩËÕ˝
                PERFORM 20012-NYUIN-SRYACCT-HENSYU-SEC
       *
@@ -1264,13 +1254,18 @@ grpsys             MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
        20011-SKJFTN-SEC            SECTION.
       *
            INITIALIZE                      ORCSNYURECEDEN-AREA
+           MOVE    SPA-HOSPNUM         TO  LNK-NYURECEDEN-HOSPNUM
            MOVE    PTINF-PTID          TO  LNK-NYURECEDEN-PTID
            MOVE    WRK-PARA-SRYYM      TO  LNK-NYURECEDEN-SANTEIYM
            IF      COLDAT01-HKNNUM     =   "060" OR "067" OR
                                            "068" OR "069"
                MOVE    "2"             TO  LNK-NYURECEDEN-HKNKBN
            ELSE
-               MOVE    "1"             TO  LNK-NYURECEDEN-HKNKBN
+               IF      COLDAT01-HKNNUM     =   "039" OR "040"
+                   MOVE    "3"             TO  LNK-NYURECEDEN-HKNKBN
+               ELSE
+                   MOVE    "1"             TO  LNK-NYURECEDEN-HKNKBN
+               END-IF
            END-IF
            CALL    "ORCSNYURECEDEN"    USING   ORCSNYURECEDEN-AREA
                                                SPA-AREA
@@ -1280,7 +1275,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
            END-IF
       *
            PERFORM VARYING IDZ1    FROM    3   BY  1
-                   UNTIL   IDZ1    >       4
+                   UNTIL   IDZ1    >       5
              PERFORM VARYING IDZ2    FROM    1   BY  1
                      UNTIL   IDZ2    >       31
                      OR      LNK-NYURECEDEN-HKNCOMBI (IDZ1 IDZ2)
@@ -1338,7 +1333,11 @@ grpsys             MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
                                            TO  COLDAT02-ZAIKAISU
                    MOVE    LNK-NYURECEDEN-HKNCOMBI (IDZ1 IDZ2)
                                            TO  COLDAT02-HKNCOMBI
-                   MOVE    SKJFTN-DAY-AREA TO  COLDAT02-DAY-AREA
+                   PERFORM VARYING IDZ3    FROM    1   BY  1
+                           UNTIL   IDZ3    >   31
+                     MOVE  SKJFTN-KAISU (IDZ3)
+                                           TO  COLDAT02-KAISU (IDZ3)
+                   END-PERFORM
                    MOVE    LNK-NYURECEDEN-SRYCD (IDZ1 IDZ2 IDXZ)
                                            TO  COLDAT02-SRYCD
                    MOVE    LNK-NYURECEDEN-SURYO (IDZ1 IDZ2 IDXZ)
@@ -1397,17 +1396,18 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
       *****************************************************************
        200111-NYUIN-JNISSU-TAIHI-SEC     SECTION.
       *
-           PERFORM VARYING    IDX2   FROM  1  BY  1
-                   UNTIL      IDX2     >   31
-               IF  WRK-DAY (1 IDX2)    >   ZERO    AND
-                   WRK-DAY (2 IDX2)    >   ZERO
-                 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
-                     (COLDAT01-RJNHKNNUM   NOT =   SPACE)
-                     MOVE    "1"       TO  TBL-JNISSU-DAY(1 IDX2)
+           PERFORM VARYING    IDX6   FROM  1  BY  1
+                   UNTIL      IDX6     >   31
+               IF  WRK-DAY (1 IDX6)    >   ZERO    AND
+                   WRK-DAY (2 IDX6)    >   ZERO
+                 IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
+      *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
+      *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)
+                     MOVE    "1"       TO  TBL-JNISSU-DAY(1 IDX6)
                  END-IF
                  PERFORM VARYING  IDX3   FROM   1   BY   1
                          UNTIL    IDX3     >    10
-                     IF  COLDAT01-HKNCOMBI(IDX3) = WRK-DAY(2 IDX2)
+                     IF  COLDAT01-HKNCOMBI(IDX3) = WRK-DAY(2 IDX6)
                            MOVE  IDX3       TO  HC-IDX
                            MOVE  10         TO  IDX3
                      END-IF
@@ -1419,7 +1419,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(1)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(1)
-                          MOVE    "1"       TO  TBL-JNISSU-DAY(2 IDX2)
+                          MOVE    "1"       TO  TBL-JNISSU-DAY(2 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1432,7 +1432,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(2)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(2)
-                          MOVE    "1"       TO  TBL-JNISSU-DAY(3 IDX2)
+                          MOVE    "1"       TO  TBL-JNISSU-DAY(3 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1445,7 +1445,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(3)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(3)
-                          MOVE    "1"       TO  TBL-JNISSU-DAY(4 IDX2)
+                          MOVE    "1"       TO  TBL-JNISSU-DAY(4 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1458,7 +1458,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(4)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(4)
-                          MOVE    "1"       TO  TBL-JNISSU-DAY(5 IDX2)
+                          MOVE    "1"       TO  TBL-JNISSU-DAY(5 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1475,18 +1475,19 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
       *****************************************************************
        200112-SKJNISSU-TAIHI-SEC     SECTION.
       *
-           PERFORM VARYING    IDX2   FROM  1  BY  1
-                   UNTIL      IDX2     >   31
-               IF (WRK-DAY (3 IDX2)    >   ZERO)        AND
-                  (WRK-DAY (2 IDX2)    NOT =   ZERO)    AND
-                  (WRK-DAY (4 IDX2)    =   ZERO  OR  4)
-                 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
-                     (COLDAT01-RJNHKNNUM   NOT =   SPACE)
-                     MOVE WRK-DAY (3 IDX2)  TO  TBL-SKJNISSU(1 IDX2)
+           PERFORM VARYING    IDX6   FROM  1  BY  1
+                   UNTIL      IDX6     >   31
+               IF (WRK-DAY (3 IDX6)    >   ZERO)        AND
+                  (WRK-DAY (2 IDX6)    NOT =   ZERO)    AND
+                  (WRK-DAY (4 IDX6)    =   ZERO  OR  4)
+                 IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
+      *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
+      *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)
+                     MOVE WRK-DAY (3 IDX6)  TO  TBL-SKJNISSU(1 IDX6)
                  END-IF
                  PERFORM VARYING  IDX3   FROM   1   BY   1
                          UNTIL    IDX3     >    10
-                     IF  COLDAT01-HKNCOMBI(IDX3) = WRK-DAY(2 IDX2)
+                     IF  COLDAT01-HKNCOMBI(IDX3) = WRK-DAY(2 IDX6)
                            MOVE  IDX3       TO  HC-IDX
                            MOVE  10         TO  IDX3
                      END-IF
@@ -1498,8 +1499,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(1)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(1)
-                          MOVE WRK-DAY (3 IDX2)
-                                            TO  TBL-SKJNISSU(2 IDX2)
+                          MOVE WRK-DAY (3 IDX6)
+                                            TO  TBL-SKJNISSU(2 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1512,8 +1513,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(2)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(2)
-                          MOVE WRK-DAY (3 IDX2)
-                                            TO  TBL-SKJNISSU(3 IDX2)
+                          MOVE WRK-DAY (3 IDX6)
+                                            TO  TBL-SKJNISSU(3 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1526,8 +1527,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(3)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(3)
-                          MOVE WRK-DAY (3 IDX2)
-                                            TO  TBL-SKJNISSU(4 IDX2)
+                          MOVE WRK-DAY (3 IDX6)
+                                            TO  TBL-SKJNISSU(4 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1540,8 +1541,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                                                 COLDAT01-TKOHHKNNUM(4)
                       AND COLDAT01-KOHIDHC(HC-IDX IDX3) =
                                                 COLDAT01-TKOHID(4)
-                          MOVE WRK-DAY (3 IDX2)
-                                            TO  TBL-SKJNISSU(5 IDX2)
+                          MOVE WRK-DAY (3 IDX6)
+                                            TO  TBL-SKJNISSU(5 IDX6)
                       END-IF
                      ELSE
                          MOVE  10      TO     IDX3
@@ -1992,7 +1993,34 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                            END-IF
                        END-IF
                    END-IF
-            END-EVALUATE
+           END-EVALUATE
+      *
+      *    «ØŒ
+           INITIALIZE                  ORCSAGECHKAREA
+           MOVE    COMB-HOSPNUM    TO  AGECHK-HOSPNUM
+           MOVE    COLDAT01-PTID   TO  AGECHK-PTID
+           MOVE    WRK-PARA-SRYYM  TO  AGECHK-SRYYMD(1:6)
+           MOVE    "01"            TO  AGECHK-SRYYMD(7:2)
+           MOVE    PTINF-BIRTHDAY  TO  AGECHK-BIRTHDAY
+           CALL    "ORCSAGECHK"        USING
+                                       ORCSAGECHKAREA
+                                       SPA-AREA
+      *
+      *     ø¿Æ£≤£∞«Ø£¥∑Ó∞ πﬂ§Àœ∑øÕ ›∏±ª»Õ—§Œ§»§≠
+           IF    ( WRK-TEISEIKBN       =   SPACE                 )
+           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-200804 )
+           AND   ( COMB-KOH1HKNNUM     =   "027"                 )
+               MOVE    "1"                 TO  WRK-TEISEIKBN
+           END-IF
+      *
+      *     ø¿Æ£≤£∞«Ø£¥∑Ó∞ πﬂ§À¬‡ø¶πÒ ›§«£∂£µ∫–∞ æÂ§Œ§»§≠
+           IF    ( WRK-TEISEIKBN       =   SPACE                 )
+           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-200804 )
+           AND   ( COMB-HKNNUM         =   "067"                 )
+               IF      AGECHK-NENREI       >=  65
+                   MOVE    "1"                 TO  WRK-TEISEIKBN
+               END-IF
+          END-IF
       *
       *   ºÁ ›∏±æ Û∆…§ﬂΩ–§∑
            INITIALIZE                      PTHKNINF-REC
@@ -2079,7 +2107,14 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
                                WHEN   "6"
                                    MOVE    "0" TO  COLDAT01-HONKZKKBN
                               END-EVALUATE
-                      WHEN    OTHER 
+                      WHEN    "040"
+                      WHEN    "039"
+                          EVALUATE   PTHKN-HOJOKBN
+                              WHEN   "1"
+                              WHEN   "3"
+                                 MOVE    "0"   TO  COLDAT01-HONKZKKBN
+                          END-EVALUATE
+                      WHEN    OTHER
                           EVALUATE   PTHKN-HOJOKBN
                              WHEN   "9"
                                  MOVE    "0" TO  COLDAT01-HONKZKKBN
@@ -2148,6 +2183,30 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
            ELSE
              EVALUATE    PTHKN-HKNNUM
                WHEN    "002"
+                   IF      PTHKN-HOJOKBN   =   SPACE
+                       CONTINUE
+                   ELSE
+                       IF    ( WRK-PARA-SRYYM
+                                             <   WRK-CONS-SRYYM-200804 )
+                       OR    ( AGECHK-NENREI <=  74                    )
+                           MOVE    PTHKN-HOJOKBN   TO  COLDAT01-HOJOKBN
+                       ELSE
+                           EVALUATE    PTHKN-HOJOKBN
+                               WHEN    "A"
+                               WHEN    "G"
+                                   MOVE    "1" TO  COLDAT01-HOJOKBN
+                               WHEN    "B"
+                               WHEN    "H"
+                                   MOVE    "2" TO  COLDAT01-HOJOKBN
+                               WHEN    "C"
+                               WHEN    "I"
+                                   MOVE    "3" TO  COLDAT01-HOJOKBN
+                               WHEN    OTHER
+                                   MOVE    PTHKN-HOJOKBN
+                                               TO  COLDAT01-HOJOKBN
+                           END-EVALUATE
+                       END-IF
+                   END-IF
                WHEN    "031"   THRU    "034"
                    IF      PTHKN-HOJOKBN   =   SPACE
                        CONTINUE
@@ -2183,6 +2242,13 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
                                WHEN   "6"
                                    MOVE    "3" TO  COLDAT01-HOJOKBN
                            END-EVALUATE
+                   END-EVALUATE
+               WHEN    "040"
+               WHEN    "039"
+                   EVALUATE   PTHKN-HOJOKBN
+                       WHEN   "1"
+                       WHEN   "3"
+                           MOVE    PTHKN-HOJOKBN   TO  COLDAT01-HOJOKBN
                    END-EVALUATE
                WHEN    OTHER 
                    EVALUATE   PTHKN-HOJOKBN
@@ -2241,6 +2307,25 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
                    MOVE    PTHKN-TEKEDYMD  TO  COLDAT01-TTEKEDYMD  (1)
                    MOVE    PTHKN-CONTKBN   TO  COLDAT01-TCONTKBN   (1)
                    MOVE    PTHKN-HOJOKBN   TO  COLDAT01-THOJOKBN   (1)
+                   IF      PTHKN-HKNNUM    =   "002"
+                       IF    ( WRK-PARA-SRYYM
+                                             <   WRK-CONS-SRYYM-200804 )
+                       OR    ( AGECHK-NENREI <=  74                    )
+                           CONTINUE
+                       ELSE
+                           EVALUATE    PTHKN-HOJOKBN
+                               WHEN    "A"
+                               WHEN    "G"
+                                   MOVE    "1" TO  COLDAT01-THOJOKBN (1)
+                               WHEN    "B"
+                               WHEN    "H"
+                                   MOVE    "2" TO  COLDAT01-THOJOKBN (1)
+                               WHEN    "C"
+                               WHEN    "I"
+                                   MOVE    "3" TO  COLDAT01-THOJOKBN (1)
+                           END-EVALUATE
+                       END-IF
+                   END-IF
                    MOVE    PTHKN-HONKZKKBN TO  COLDAT01-THONKZKKBN (1)
       *            À° Ã»÷πÊ
                    INITIALIZE                      HKNNUM-REC
@@ -2294,6 +2379,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
       *
       *    «ØŒ
            INITIALIZE                  ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM     TO  AGECHK-HOSPNUM
            MOVE    COLDAT01-PTID   TO  AGECHK-PTID
            MOVE    WRK-PARA-SRYYM  TO  AGECHK-SRYYMD(1:6)
            MOVE    "01"            TO  AGECHK-SRYYMD(7:2)
@@ -2303,6 +2389,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
                                        SPA-AREA
            IF      AGECHK-RC       =   ZERO
                MOVE  AGECHK-NENREI     TO  COLDAT01-AGE
+               MOVE  AGECHK-SYUGAKUKBN TO  COLDAT01-SYUGAKUKBN
            END-IF
       *
            MOVE    COMB-HKNCOMBINUM    TO  COLDAT01-HKNCOMBI (1)
@@ -2364,6 +2451,28 @@ grpsys             MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
                                            TO  COLDAT01-TCONTKBN  (IDX)
                              MOVE    PTHKN-HOJOKBN
                                            TO  COLDAT01-THOJOKBN  (IDX)
+                             IF      PTHKN-HKNNUM    =   "002"
+                                 IF    ( WRK-PARA-SRYYM
+                                             <   WRK-CONS-SRYYM-200804 )
+                                 OR    ( AGECHK-NENREI <=  74          )
+                                     CONTINUE
+                                 ELSE
+                                     EVALUATE    PTHKN-HOJOKBN
+                                       WHEN    "A"
+                                       WHEN    "G"
+                                         MOVE    "1"
+                                           TO  COLDAT01-THOJOKBN (IDX)
+                                       WHEN    "B"
+                                       WHEN    "H"
+                                         MOVE    "2"
+                                           TO  COLDAT01-THOJOKBN (IDX)
+                                       WHEN    "C"
+                                       WHEN    "I"
+                                         MOVE    "3"
+                                           TO  COLDAT01-THOJOKBN (IDX)
+                                     END-EVALUATE
+                                 END-IF
+                             END-IF
                              MOVE    PTHKN-HONKZKKBN
                                            TO  COLDAT01-THONKZKKBN(IDX)
                              MOVE    5     TO  IDX
@@ -2503,29 +2612,35 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                                            >=  "1" AND <=  "8" )
                OR    ( COMB-KOHHKNNUM (IDX)(1:2)
                                            =  "99"             )
-      ************  °≤¨∏©§ŒπÒ ›§Œ§»§≠° £¥£±œ∑øÕ∞ ≥∞°À
-      ************ IF    ( COMB-HKNNUM         =   "060"   OR  "067" )
-      ************ AND   ( SYS-1001-PREFNUM    =   "40"              )
-      ************ AND   ( HKN-HBTNUM      NOT =   "41"              )    
-      ************     PERFORM 20011-PREFKBN-40-CHECK-SEC
-      ************ ELSE
-                       IF      COMB-HKNNUM     =   "060"   OR  "067" 
-                           IF      HKN-RECESKYKBN  =   "1" OR  "3"
+                   EVALUATE    COMB-HKNNUM
+                       WHEN    "060"
+                       WHEN    "067"
+                           IF      HKN-RECESKYKBN      =   "1" OR  "3"
+                                                               OR  "5"
                                MOVE    "2" TO  COLDAT01-TRECESKYKBN(IDY)
                            ELSE
                                MOVE    "1" TO  COLDAT01-TRECESKYKBN(IDY)
                            END-IF
-                       ELSE                
-                           IF      HKN-RECESKYKBN  =   "2" OR  "3"
+                       WHEN    "039"
+                           IF      HKN-RECESKYKBN      =   "1" OR  "3"
+                                                               OR  "4"
                                MOVE    "2" TO  COLDAT01-TRECESKYKBN(IDY)
                            ELSE
                                MOVE    "1" TO  COLDAT01-TRECESKYKBN(IDY)
                            END-IF
-                       END-IF
-      ************ END-IF
+                       WHEN    OTHER
+                           IF      HKN-RECESKYKBN      =   "2" OR  "3"
+                                                       OR  "4" OR  "5"
+                               MOVE    "2" TO  COLDAT01-TRECESKYKBN(IDY)
+                           ELSE
+                               MOVE    "1" TO  COLDAT01-TRECESKYKBN(IDY)
+                           END-IF
+                   END-EVALUATE
                    IF     COLDAT01-TRECESKYKBN (IDY)   =   1
       *                √œ ˝∏¯»Ò•Ï•ªµ≠∫‹»ΩƒÍ
                        INITIALIZE          ORCSFTNJGNCHKAREA
+                       MOVE    COMB-HOSPNUM
+                                           TO  LNK-FTNJGNCHK-HOSPNUM
                        MOVE    COMB-PTID   TO  LNK-FTNJGNCHK-PTID
                        MOVE    WRK-PARA-NYUGAIKBN
                                            TO  LNK-FTNJGNCHK-NYUGAIKBN
@@ -2555,6 +2670,8 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                    IF   COMB-KOHHKNNUM (IDX)   =   "012"
       *                •Ï•ªµ≠∫‹»ΩƒÍ
                        INITIALIZE          ORCSFTNJGNCHKAREA
+                       MOVE    COMB-HOSPNUM
+                                           TO  LNK-FTNJGNCHK-HOSPNUM
                        MOVE    COMB-PTID   TO  LNK-FTNJGNCHK-PTID
                        MOVE    WRK-PARA-NYUGAIKBN
                                            TO  LNK-FTNJGNCHK-NYUGAIKBN
@@ -2649,6 +2766,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                MOVE    "2"                 TO  COLDAT01-TRECESKYKBN(IDY)
            ELSE
                INITIALIZE                  ORCSKOHPLUS-AREA
+               MOVE    COMB-HOSPNUM        TO  LNK-SKOHPLUS-HOSPNUM
                MOVE    SYS-1001-PREFNUM    TO  LNK-SKOHPLUS-PREFNUM
                MOVE    COMB-PTID           TO  LNK-SKOHPLUS-PTID
                MOVE    COMB-HKNCOMBINUM    TO  LNK-SKOHPLUS-HKNCOMBI
@@ -2775,7 +2893,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                                           "068" OR "069"
                    MOVE    2            TO  COLDAT01-TEISYUTUSAKI
                ELSE
-                   MOVE    1            TO  COLDAT01-TEISYUTUSAKI
+                   IF      COLDAT01-HKNNUM =  "039" OR "040"
+                       MOVE    3            TO  COLDAT01-TEISYUTUSAKI
+                   ELSE
+                       MOVE    1            TO  COLDAT01-TEISYUTUSAKI
+                   END-IF
                END-IF
       *        •Ï•ª•◊•»ºÔ Ã
                PERFORM 20021-RECESYUBETU-SET-SEC
@@ -2870,16 +2992,19 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
            END-IF
       *
            IF      COLDAT01-HKNNUM     NOT =   SPACE
-               IF      COLDAT01-HKNNUM     =   "060"   OR   "067"   OR
-                                               "068"   OR   "069"
-                   IF      COLDAT01-HKNNUM     =   "060"   OR  "068"
-                        MOVE   "1"             TO  WK-KOKUHO
-                   ELSE
-                        MOVE   "2"             TO  WK-KOKUHO
-                   END-IF
-               ELSE
-                   MOVE    "1"             TO  WK-IHO
-               END-IF
+               EVALUATE    COLDAT01-HKNNUM
+                   WHEN    "060"
+                   WHEN    "068"
+                       MOVE   "1"          TO  WK-KOKUHO
+                   WHEN    "067"
+                   WHEN    "069"
+                       MOVE   "2"          TO  WK-KOKUHO
+                   WHEN    "039"
+                   WHEN    "040"
+                       MOVE   "3"          TO  WK-KOKUHO
+                   WHEN    OTHER
+                       MOVE    "1"         TO  WK-IHO
+               END-EVALUATE
            END-IF
       *
            IF      WRK-PARA-SRYYM     <      "200210"
@@ -2913,14 +3038,118 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                END-PERFORM
                MOVE    COLDAT01-THONKZKKBN (IDY)   TO  WK-HONKZKKBN
       *
-               IF    ( WRK-PARA-SRYYM      >=  "200210" )
+               IF    ( WRK-PARA-SRYYM      >=  "200210"              )
+               AND   ( WRK-PARA-SRYYM      <   WRK-CONS-SRYYM-200804 )
       *            £≥∫–Ã§À˛§ŒæÏπÁ°¢£◊£À°›£»£œ£Œ£À£⁄£À£À£¬£Œ§À"£≥"§Ú•ª•√•»
                    IF      COLDAT01-AGE         <     3
                                MOVE   "3"     TO   WK-HONKZKKBN
                    END-IF
                END-IF
+      *         ø¿Æ£≤£∞«Ø£¥∑Ó≤˛¿µ¬–±˛
+               IF      WRK-PARA-SRYYM      >=  WRK-CONS-SRYYM-200804
+                   IF      COLDAT01-SYUGAKUKBN =   1
+                       MOVE   "3"          TO  WK-HONKZKKBN
+                   END-IF
+               END-IF
+      *
+               IF      WRK-PARA-SRYYM  >=  WRK-CONS-SRYYM-200804
+                   EVALUATE    COLDAT01-HKNNUM
+                       WHEN    "002"
+                           EVALUATE   COLDAT01-THOJOKBN (IDY)
+                               WHEN   "A"
+                               WHEN   "B"
+                               WHEN   "C"
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "D"
+                               WHEN   "E"
+                               WHEN   "F"
+                               WHEN   "8"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                               WHEN   "G"
+                               WHEN   "H"
+                               WHEN   "I"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "031"  THRU    "034"
+                           EVALUATE   COLDAT01-THOJOKBN (IDY)
+                               WHEN   "B"
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "E"
+                               WHEN   "8"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                               WHEN   "H"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "060"
+                       WHEN    "068"
+                           IF  (COLDAT01-AGE  >=   70)  AND
+                               (COLDAT01-AGE  <=   74)
+                             EVALUATE    WRK-PARA-NYUGAIKBN
+                               WHEN    "1"
+                                   EVALUATE   COLDAT01-THOJOKBN (IDY)
+                                       WHEN   "1"
+                                       WHEN   "5"
+                                           MOVE   "9"  TO  WK-HONKZKKBN
+                                       WHEN   "2"
+                                       WHEN   "6"
+                                           MOVE   "8"  TO  WK-HONKZKKBN
+                                       WHEN   "3"
+                                           MOVE   "7"  TO  WK-HONKZKKBN
+                                   END-EVALUATE
+                               WHEN    "2"
+                                   EVALUATE   COLDAT01-THOJOKBN (IDY)
+                                       WHEN   "1"
+                                       WHEN   "4"
+                                           MOVE   "9"  TO  WK-HONKZKKBN
+                                       WHEN   "2"
+                                       WHEN   "5"
+                                           MOVE   "8"  TO  WK-HONKZKKBN
+                                       WHEN   "3"
+                                       WHEN   "6"
+                                           MOVE   "7"  TO  WK-HONKZKKBN
+                                   END-EVALUATE
+                             END-EVALUATE
+                           END-IF
+                       WHEN    "039"
+                       WHEN    "040"
+                           EVALUATE   COLDAT01-THOJOKBN (IDY)
+                               WHEN   "1"
+                                   MOVE   "9"   TO   WK-RJN
+                               WHEN   "3"
+                                   MOVE   "7"   TO   WK-RJN
+                           END-EVALUATE
+                       WHEN    "067"
+                       WHEN    "069"
+                           IF      COLDAT01-AGE  >=   65
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           ELSE
+                               EVALUATE   COLDAT01-THOJOKBN (IDY)
+                                   WHEN   "9"
+                                       MOVE   "9"   TO   WK-HONKZKKBN
+                                   WHEN   "8"
+                                       MOVE   "?"   TO   WK-HONKZKKBN
+                                   WHEN   "7"
+                                       MOVE   "7"   TO   WK-HONKZKKBN
+                               END-EVALUATE
+                           END-IF
+                       WHEN    OTHER
+                           EVALUATE   COLDAT01-THOJOKBN (IDY)
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "8"
+                                   MOVE   "?"   TO   WK-HONKZKKBN
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                     END-EVALUATE
+               END-IF
       *
                IF    ( WRK-PARA-SRYYM      >=  "200610" )
+               AND   ( WRK-PARA-SRYYM      <   WRK-CONS-SRYYM-200804 )
                    EVALUATE    COLDAT01-HKNNUM
                        WHEN    "002"
                            EVALUATE   COLDAT01-THOJOKBN (IDY)
@@ -3096,7 +3325,6 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
            MOVE    LNK-SYUBETUGET-RECESYUBETU
                                        TO  COLDAT01-RECESYUBETU
       *
-      *    DISPLAY "COLDAT01-RECESYUBETU=" COLDAT01-RECESYUBETU
            .
         20021-RECESYUBETU-SET-EXT.
            EXIT.
@@ -3441,7 +3669,11 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                                       OR  CONS-TOKKI13
                                       OR  CONS-TOKKI14
                                       OR  CONS-TOKKI15
-                                      OR  CONS-TOKKI16 )
+                                      OR  CONS-TOKKI16
+                                      OR  CONS-TOKKI17
+                                      OR  CONS-TOKKI18
+                                      OR  CONS-TOKKI19
+                                      OR  CONS-TOKKI20 )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
@@ -3863,8 +4095,9 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
                MOVE    WRK-PARA-SHELLID
                                        TO  JOB-SHELLID
-               MOVE    WRK-COLDATERR     TO  JOB-YOBI
+               MOVE    WRK-COLDATERR   TO  JOB-YOBI
                MOVE    "9999"          TO  JOB-ERRCD
+               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
                CALL    "ORCSJOB"       USING
                                        ORCSJOBKANRIAREA
                                        JOBKANRI-REC
@@ -3900,6 +4133,7 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
            MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA
                                    JOBKANRI-REC

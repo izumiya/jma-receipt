@@ -29,6 +29,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  01.01.01    NACL-伊藤    08/ 4/28  Dカレンダーレコード追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -118,7 +119,8 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20070809".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20070809".
+       01  PRGSKBNO                PIC X(08)  VALUE "20080428".
       *
       *    病院基本情報データ
            COPY    "CPCOMMONDAT5.INC"
@@ -1181,12 +1183,16 @@
       *      名称
              MOVE    COLDAT02-NAME       TO  WRK-DATA
              MOVE    40                  TO  WRK-NAGASA
-             MOVE    1                   TO  WRK-END 
+             MOVE    1                   TO  WRK-END
              PERFORM 5004-MOJI-HENSYU-SEC
       *
            END-IF
       *
            PERFORM 5001-FILE-WRITE-SEC
+      *
+           IF      COLDAT02-SEQNO      =   1
+             PERFORM 20042-CALENDAR-MAKE-SEC
+           END-IF
            .
        2004-FILE-HENSYU-EXT.
            EXIT.
@@ -1210,6 +1216,36 @@
            END-IF
            .
        20041-SANSO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    カレンダーレコード作成
+      *****************************************************************
+       20042-CALENDAR-MAKE-SEC     SECTION.
+      *
+           MOVE    "D,"                TO  WRK-REC
+           MOVE    2                   TO  WRK-REC-LENGTH
+      *
+           PERFORM VARYING    IDX3     FROM  1  BY  1
+                   UNTIL      IDX3     >     31
+               IF    IDX3              =   31
+                   MOVE    1                   TO  WRK-END
+               END-IF
+               IF      COLDAT02-KAISU(IDX3)    =   ZERO
+                   MOVE    SPACE               TO  WRK-DATA
+                   MOVE    1                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC
+               ELSE
+                   MOVE    COLDAT02-KAISU(IDX3)
+                                               TO  WRK-NUM
+                   MOVE    3                   TO  WRK-NAGASA
+                   PERFORM 5005-NUM-HENSYU-SEC
+               END-IF
+           END-PERFORM
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+           .
+       20042-CALENDAR-MAKE-EXT.
            EXIT.
       *
       *****************************************************************
