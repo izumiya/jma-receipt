@@ -8611,18 +8611,6 @@
                    MOVE    1         TO  FLG-RECE09
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE09
-      *
-      *            後期高齢者で船員保険の履歴は対象外とする
-                   IF      RECE09-HKNNUM   =   "002"
-                       IF    ( RECE02-AGE  >=  75    )
-                       OR    ( RECE02-AGE  =   74                 AND
-                               RECE02-BIRTHDAY (5:2)
-                                           =   RECE02-SRYYM (5:2) AND 
-                               RECE02-BIRTHDAY (7:2)
-                                       NOT =   "01"  )   
-                           GO  TO  990-RECE09-NEXT-SEC
-                       END-IF
-                   END-IF
            END-READ
       *
            .
