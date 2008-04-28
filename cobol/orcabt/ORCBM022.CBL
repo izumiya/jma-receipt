@@ -875,6 +875,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                IF    ( RECE10-HKNNUM           =   "002"               )
                AND   ( RECE10-HOJOKBN          =   "1" OR  "2" OR  "3"
                                                        OR  SPACE       )
+                 IF  ( RECE10-SRYYM  >=  WRK-CONS-SRYYM-200804 )
+                 AND ( RECE10-FLG (1) =   1                    )
+                       MOVE    5                       TO  IDY1
+                 ELSE
                    IF      RECE10-AGE              <   3
                        MOVE    5                       TO  IDY1
                    ELSE                    
@@ -884,12 +888,17 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                           MOVE    4                       TO  IDY1
                        END-IF
                    END-IF
+                 END-IF
                ELSE    
       *      
       *            共済組合の補助区分が前期高齢者以外の時     
                    IF    (  RECE10-HKNNUM          >=  "031"   AND
                                                    <=  "034"         )
                    AND   (  RECE10-HOJOKBN         =   "2" OR  SPACE ) 
+                     IF  ( RECE10-SRYYM  >=  WRK-CONS-SRYYM-200804 )
+                     AND ( RECE10-FLG (1) =   1                    )
+                           MOVE    5                       TO  IDY1
+                     ELSE
                        IF      RECE10-AGE              <   3
                            MOVE    5                       TO  IDY1
                        ELSE                    
@@ -899,6 +908,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                MOVE    4                       TO  IDY1
                            END-IF
                        END-IF
+                     END-IF
                    ELSE    
                        IF      RECE10-AGE          >=  70
       *                    船員保険の補助区分が前期高齢者の時
