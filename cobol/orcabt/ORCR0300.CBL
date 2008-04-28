@@ -270,7 +270,6 @@
       *                                     ７０歳代前半の特例措置対象者
       *                                     対応 
       *                                     国保のみ２割の記載
-      *  04.02.08    NACL-藤原    08/04/25  保険履歴の記載変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -453,7 +452,6 @@ grpsys     COPY    "COMMON-SPA".
            03  FLG-HIT                 PIC 9(01).
            03  FLG-COMMENT             PIC 9(01).
            03  FLG-KOUI                PIC 9(01).
-           03  FLG-RIREKI-HEN          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -4980,8 +4978,6 @@ grpsys     MOVE    RECE02-HOSPNUM  TO  COMB-HOSPNUM
       *****************************************************************
        2001-RIREKI-HEN-SEC      SECTION.
       *
-           MOVE    ZERO                TO  FLG-RIREKI-HEN
-      *
       *    診療年月編集
            MOVE    RECE02-SRYYM        TO  WRK-SYMD (1:6)
            MOVE    "01"                TO  WRK-SYMD (7:2)
@@ -5157,7 +5153,6 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                                       WRK-HKN-FL1     (WRK-RIREKI-MAX)
                    MOVE    "まで"             TO
                                       WRK-HKN-FL2     (WRK-RIREKI-MAX)                                     
-                   MOVE    1                  TO  FLG-RIREKI-HEN
                ELSE
                    MOVE    "から有効"         TO
                                       WRK-HKN-FL      (WRK-RIREKI-MAX) 
@@ -5167,7 +5162,6 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
            END-PERFORM
       *
            IF    ( CNT-RECE09             =   1    )
-           OR    ( FLG-RIREKI-HEN         =   ZERO ) 
                MOVE    SPACE                  TO  WRK-HKN-RIREKI-AREA
                MOVE    ZERO                   TO  WRK-RIREKI-MAX
            END-IF          

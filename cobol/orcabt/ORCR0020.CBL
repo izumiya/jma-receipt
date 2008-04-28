@@ -186,6 +186,7 @@
       *                                     国保で負担者番号が空白の場合
       *                                     法別番号８０で判定して
       *                                     公費カウントしない
+      *  04.02.06    NACL-藤原    08/04/25  保険履歴の記載変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -345,6 +346,7 @@
            03  FLG-GENBUTU70                           PIC 9(01).
            03  FLG-TAISYO                              PIC 9(01).
            03  FLG-SEIHO                               PIC 9(01).
+           03  FLG-RIREKI-HEN                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -2748,6 +2750,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *****************************************************************
        230-RECE09-HENSYU-SEC                   SECTION.
       *
+           MOVE    ZERO                TO  FLG-RIREKI-HEN
+      *
            IF      RECE01-HKNID             NOT =   ZERO
            AND     RECE01-HKNNUM(1:2)       NOT =   "98"
            AND     RECE01-TEISEIKBN             =   SPACE
@@ -2809,8 +2813,26 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    ELSE
                        MOVE    1                TO  FLG-PTHKNINF  
                    END-IF
+      *
                    PERFORM              UNTIL   FLG-PTHKNINF     =   1
+                                        OR      FLG-RIREKI-HEN   =   1
                        IF      PTHKN-SAKJOKBN   =   SPACE
+      *                    後期高齢者で船員保険の履歴は対象外とする
+                           IF  (   PTHKN-HKNNUM     =   "002"         )
+                           AND (   PTHKN-HOJOKBN    =   "A" OR "B" OR
+                                                        "C" OR "G" OR 
+                                                        "H" OR "I"    )
+                               IF    ( RECE01-AGE  >=  75    )
+                               OR    ( RECE01-AGE  =   74          AND
+                                       RECE01-BIRTHDAY (5:2)
+                                               =
+                                                 RECE01-SRYYM(5:2) AND 
+                                       RECE01-BIRTHDAY (7:2)
+                                           NOT =   "01"  ) 
+                                   MOVE    1   TO  FLG-RIREKI-HEN
+                               END-IF  
+                         END-IF
+                         IF      FLG-RIREKI-HEN = ZERO
                            MOVE   PTHKN-HKNID      TO  RECE09-HKNID
                            MOVE   PTHKN-HKNNUM     TO  RECE09-HKNNUM
                            MOVE   PTHKN-HKNJANUM   TO  RECE09-HKNJANUM
@@ -2849,18 +2871,21 @@ grpsys                     PERFORM 900-DBSELECT-SEC
                            MOVE   "key5"           TO  MCP-PATHNAME
                            PERFORM 900-CLOSE-SEC
                            MOVE    1                TO  FLG-PTHKNINF
-                       ELSE
-                           MOVE    "tbl_pthkninf"   TO  MCP-TABLE
-                           MOVE    "key4"           TO  MCP-PATHNAME
-                           PERFORM PTHKNINF-READ-SEC
+                         END-IF
                        END-IF
+      * 
+                       MOVE    "tbl_pthkninf"   TO  MCP-TABLE
+                       MOVE    "key4"           TO  MCP-PATHNAME
+                       PERFORM PTHKNINF-READ-SEC
                    END-PERFORM
                    MOVE    "tbl_pthkninf"       TO  MCP-TABLE
                    MOVE    "key4"               TO  MCP-PATHNAME
                    PERFORM 900-CLOSE-SEC
       *
-                   WRITE   RECE09-REC
-                   ADD     1                  TO  CNT-RECE09
+                   IF      FLG-RIREKI-HEN     =   ZERO
+                       WRITE   RECE09-REC
+                       ADD     1                  TO  CNT-RECE09
+                   END-IF
                  END-IF  
                END-PERFORM
            END-IF           
