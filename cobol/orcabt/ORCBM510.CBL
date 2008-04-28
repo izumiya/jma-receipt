@@ -63,9 +63,11 @@
       *
        WORKING-STORAGE             SECTION.
       *
+      *----(04.02.02)--UPD-START---
       *    ¥¨¥é¡¼¥Õ¥¡¥¤¥ë Ì¾¾ÎÎÎ°è 
-           COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
-                                   BY         //RECEERR//.
+      *     COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
+      *                             BY         //RECEERR//.
+      *----(04.02.02)--UPD-END-----
       *
       *----(04.02.02)--UPD-START---
            COPY    "HCM37V01.INC"  REPLACING  //HCM37V01//
@@ -112,6 +114,9 @@
            05  WRK-PARA-JOBID          PIC 9(07).
            05  WRK-PARA-SHELLID        PIC X(08).
            05  WRK-PARA-HOSPNUM        PIC 9(02).
+      *----(04.02.01)--ADD-START---
+           05  RECEERR                 PIC X(100).
+      *----(04.02.01)--ADD-END-----
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -868,6 +873,8 @@ grpsys                                     SPA-AREA
            IF          SPRT-RETURN         =   ZERO
                CONTINUE
            ELSE
+               MOVE    "*** ORCBM510 PRINT ERR ***" 
+                                           TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
            .
@@ -1140,6 +1147,9 @@ grpsys         PERFORM 900-DBFETCH-SEC
                                            OR  "50"
                                            OR  "51"
       *----(03.04.02)--ADD-END-----
+      *----(04.02.01)--ADD-START---
+                                           OR  "52"
+      *----(04.02.01)--ADD-END-----
                                            OR  "99"
                        ADD     1               TO  CNT-RECEDEN
                        MOVE    1               TO  FLG-RECEDENOK
