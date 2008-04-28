@@ -47,6 +47,7 @@
       *  01.00.13    NACL-森脇     06/07/26  MONFUNC対応
       *  03.05.00    NACL-多々納   07/05/16  グループ診療対応
       *  04.01.00    NACL-多々納   07/11/05  保険追加処理削除対応
+      *  04.02.00    NACL-多々納   08/04/28  後期高齢者対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -320,11 +321,12 @@
                05  ERR1-LINENO         PIC X(06).
                05  FILLER              PIC X(01).
                05  ERR1-NAIYO          PIC X(03).
+               05  FILLER              PIC X(01).
                05  ERR-OCCURS          OCCURS   4.
-                   07  FILLER          PIC X(01).
                    07  ERR1-ERRNO      PIC X(03).
                    07  ERR1-KOMOKU     PIC X(09).
                    07  ERR1-ATAI       PIC X(08).
+                   07  FILLER          PIC X(01).
       *    エラー番号５・６・７・８・９　で使用
            03  ERR-REC2.
                05  ERR2-LINENO         PIC X(06).
@@ -424,6 +426,7 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
+      *
       *    パラメタセット
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
                                        INTO    ASS-PARA
@@ -1111,11 +1114,16 @@
                WHEN    "01"    THRU    "04"
                WHEN    "06"    THRU    "07"
                WHEN    "31"    THRU    "34"
+      *        後期高齢者
+               WHEN    "39"
+               WHEN    "40"
                WHEN    "60"
                WHEN    "63"
                WHEN    "67"
+               WHEN    "68"
+               WHEN    "69"
                WHEN    "72"    THRU    "75"
-               WHEN    "98"    THRU    "99"
+               WHEN    "99"
                    CONTINUE
       *        誤入力
                WHEN    OTHER
@@ -1125,9 +1133,9 @@
       *
       *    保険番号セット
            EVALUATE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
-      *        労災？？→保険番号不確定
-               WHEN    "98"
-                   MOVE    "971"       TO  PTHKN-HKNNUM
+      *        労災（エラーとする）
+      *        WHEN    "98"
+      *            MOVE    "971"       TO  PTHKN-HKNNUM
       *        自費
                WHEN    "99"
                    MOVE    "980"       TO  PTHKN-HKNNUM
@@ -1282,11 +1290,23 @@
                    END-EVALUATE
       *        国保
                WHEN    "060"
+      *        国保（特別療養費）
+               WHEN    "068"
                    EVALUATE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                        WHEN    "0"
                        WHEN    "1"     THRU    "3"
                            MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                                            TO  WRK-HEN-HOJOKBN
+      *                誤入力
+                       WHEN    OTHER
+                           MOVE    3       TO  FLG-ERR
+                   END-EVALUATE
+      *        後期高齢者
+               WHEN    "039"
+               WHEN    "040"
+                   EVALUATE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
+                       WHEN    "0"
+                           MOVE    SPACE   TO  WRK-HEN-HOJOKBN
       *                誤入力
                        WHEN    OTHER
                            MOVE    3       TO  FLG-ERR
@@ -1392,6 +1412,12 @@
            IF      FLG-ERR         =   ZERO
                MOVE    WRK-DATA (1:WRK-LEN)
                                    TO  PTHKN-KIGO
+           END-IF
+      *    後期高齢者保険は記号入力をエラーとする
+           IF      PTHKN-HKNNUM        =   "039"
+               IF      PTHKN-KIGO      NOT =   SPACE
+                   MOVE    3               TO  FLG-ERR
+               END-IF
            END-IF
       *
       *全角変換を追加した為、以下は削除(VER.3.5)
@@ -1634,6 +1660,9 @@
                MOVE    WRK-SYMD        TO  WRK-HEN-TEKEDYMD
            END-IF
       *
+           IF      WRK-HEN-TEKSTYMD    >   WRK-HEN-TEKEDYMD
+               MOVE    3               TO  FLG-ERR
+           END-IF
            .
        2410-TEKEDYMD-SET-EXT.
            EXIT.

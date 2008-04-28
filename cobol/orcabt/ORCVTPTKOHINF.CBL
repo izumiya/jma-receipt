@@ -43,6 +43,7 @@
       *  01.01.06    NACL-森脇    06/07/26  MONFUNC対応
       *  03.05.00    NACL-多々納  07/05/16  グループ診療対応
       *  04.01.00    NACL-多々納  07/11/06  公費追加処理削除
+      *  04.02.00    NACL-多々納  08/04/28  Ｈ２０．４改正対応他
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -400,7 +401,6 @@
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
                                        INTO    ASS-PARA
            END-UNSTRING
-      *
       *
       *    パラメータ情報取得
            PERFORM 101-PARA-GET-SEC
@@ -1038,6 +1038,12 @@
                WHEN    "23"
                WHEN    "27"  THRU   "29"
                WHEN    "50"  THRU   "53"
+               WHEN    "24"
+               WHEN    "25"
+               WHEN    "30"
+               WHEN    "38"
+               WHEN    "66"
+               WHEN    "79"
       **コメント START ---------------------------------------------
       *                                 OR  "55"  OR  "56"
       **コメント END   ---------------------------------------------
@@ -1209,7 +1215,12 @@
            PERFORM 2401-SPACE-HENSYU-SEC
            MOVE    WRK-DATA (1:WRK-LEN)
                                    TO  PTKOH-JKYSNUM
-      *
+      *    医療観察法の受給者番号入力はエラー
+           IF      PTKOH-KOHNUM    =   "030"
+               IF      PTKOH-JKYSNUM   NOT =   SPACE
+                   MOVE    3           TO  FLG-ERR
+               END-IF
+           END-IF
            .
        2410-JKYSNUM-SET-EXT.
            EXIT.
@@ -1282,6 +1293,9 @@
                MOVE    WRK-SYMD        TO  WRK-HEN-TEKEDYMD
            END-IF
       *
+           IF      WRK-HEN-TEKSTYMD    >   WRK-HEN-TEKEDYMD
+               MOVE    3               TO  FLG-ERR
+           END-IF
            .
        2410-TEKEDYMD-SET-EXT.
            EXIT.

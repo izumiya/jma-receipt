@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者        日付      内容
+      *  04.02.00    NACL-多々納   08/04/28  後期高齢者対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -197,6 +198,10 @@
                05  WRK-B70-MM          PIC 9(02).
                05  WRK-B70-DD          PIC 9(02).
            03  WRK-BYMD-70-1           PIC X(08).
+           03  WRK-BYMD-75.
+               05  WRK-B75-YY          PIC 9(04).
+               05  WRK-B75-MM          PIC 9(02).
+               05  WRK-B75-DD          PIC 9(02).
       *
            03  WRK-HEN-GAIFTN          PIC 9(03).
            03  WRK-HEN-NYUFTN          PIC 9(03).
@@ -254,7 +259,9 @@
                05  MES-TITLE2-L2.
                    07  FILLER          PIC X(10) VALUE SPACE.
                    07  FILLER          PIC X(42) VALUE
-                   " [7]患者番号更新失敗  [8]患者保険出力失敗".
+                   " [5]補助区分エラー [6]開始日＞後期高齢年齢".
+                   07  FILLER          PIC X(42) VALUE
+                   " [7]患者番号更新失敗[8]患者保険出力失敗".
                05  MES-TITLE2-L4.
                    07  FILLER          PIC X(50) VALUE
                    "--------------------------------------------------".
@@ -688,6 +695,9 @@
       *
                IF     (TBL-PTHKN-HKNNUM (IDX)  =   "980" ) OR
                       (TBL-PTHKN-CONTKBN (IDX) NOT =   SPACE )
+                  OR ((TBL-PTHKN-HKNNUM (IDX)   =   "002" )  AND
+                      (TBL-PTHKN-HOJOKBN  (IDX) NOT =   SPACE) AND
+                      (TBL-PTHKN-HONKZKKBN(IDX) =   "1"   ))
                    CONTINUE
                ELSE
                    MOVE    TBL-PTHKN-TEKSTYMD(IDX) TO  WRK-HEN-TEKSTYMD
@@ -714,6 +724,9 @@
                        (TBL-PTHKN-HKNNUM (IDX-C)   =   "980" ) OR
                        (TBL-PTHKN-CONTKBN (IDX-C)  NOT =   SPACE )
                    OR  (TBL-PTHKN-HKNNUM (IDX-C)   =   SPACE )
+                   OR ((TBL-PTHKN-HKNNUM (IDX-C)   =   "002" )  AND
+                       (TBL-PTHKN-HOJOKBN  (IDX-C) NOT =   SPACE) AND
+                       (TBL-PTHKN-HONKZKKBN(IDX-C) =   "1"   ))
                    CONTINUE
                ELSE
                    IF     (WRK-HEN-TEKEDYMD    <   TBL-PTHKN-TEKSTYMD
@@ -866,6 +879,7 @@
       *    １日ならば生年月日、１日以外ならば生年月日の翌月１日
            MOVE    ZERO                TO  WRK-BASEYMD
            MOVE    ZERO                TO  WRK-BYMD-70
+           MOVE    ZERO                TO  WRK-BYMD-75
            MOVE    PTINF-BIRTHDAY      TO  WRK-BASEYMD
            IF      WRK-BDD         NOT =   01
                COMPUTE WRK-BMM         =   WRK-BMM     +   1
@@ -894,6 +908,9 @@
                   (WRK-BYMD-70         <=  WRK-SYSYMD )
                MOVE    1                   TO  FLG-ROUJIN
            END-IF
+      *    ７５歳を迎える日
+           MOVE    WRK-BASEYMD         TO  WRK-BYMD-75
+           COMPUTE WRK-B75-YY          =   WRK-B75-YY  +   75
       *
            PERFORM VARYING    IDX      FROM    1   BY  1
                    UNTIL     (IDX      >   20  )
@@ -903,19 +920,26 @@
                MOVE    TBL-ISAM-FTNKBN  (IDX)  TO  WRK-HEN-FTNKBN
                MOVE    TBL-ISAM-GAIFTN  (IDX)  TO  WRK-HEN-GAIFTN
                MOVE    TBL-ISAM-NYUFTN  (IDX)  TO  WRK-HEN-NYUFTN
+               MOVE    PTHKN-HOJOKBN           TO  WRK-HEN-HOJOKBN
       *
-               IF      PTHKN-HKNNUM    =   "980"
-                   CONTINUE
-               ELSE
-                   IF     (FLG-ROUJIN          =   1       )
-                     AND  (PTHKN-CONTKBN       =   SPACE   )
-      *                前期高齢者
-                       PERFORM 5002-ROUJIN-CHK-SEC
-                   ELSE
-      *                補助区分再セット
-                       PERFORM 5003-HOJYOKBN-HEN-SEC
-                   END-IF
-               END-IF
+               EVALUATE    PTHKN-HKNNUM
+                   WHEN    "980"
+      *            自費
+                       PERFORM 5004-HKNNUM980-HEN-SEC
+                   WHEN    "039"
+                   WHEN    "040"
+      *            後期高齢者
+                       PERFORM 5004-HKNNUM039-HEN-SEC
+                   WHEN    OTHER
+                       IF     (FLG-ROUJIN          =   1       )
+                         AND  (PTHKN-CONTKBN       =   SPACE   )
+      *                    前期高齢者
+                           PERFORM 5002-ROUJIN-CHK-SEC
+                       ELSE
+      *                    補助区分再セット
+                           PERFORM 5003-HOJYOKBN-HEN-SEC
+                       END-IF
+               END-EVALUATE
            END-PERFORM
       *
       *    患者保険マスター登録
@@ -939,10 +963,12 @@
       *    補助区分再セット処理（前期高齢者以外）
       *****************************************************************
        5003-HOJYOKBN-HEN-SEC        SECTION.
-     *
+      *
            EVALUATE    PTHKN-HKNNUM
       *    国保
            WHEN    "060"
+      *    国保（特別療養費）
+           WHEN    "068"
                IF    ( PTHKN-HKNJANUM(7:)      =   SPACE ) AND
                      ( PTHKN-HKNJANUM(3:1)     =   "3" )
       *            組合国保
@@ -954,8 +980,59 @@
                    WHEN    30      ALSO    20
                        MOVE    "6"             TO  PTHKN-HOJOKBN
                    END-EVALUATE
+      *
+                   MOVE    PTHKNINF-REC    TO  TBL-PTHKNINF-REC (IDX)
+               END-IF
+      *        補助区分未設定はエラー
+               IF      PTHKN-HOJOKBN       =   SPACE
+                   MOVE    5               TO  FLG-ERR
+                   MOVE    "5"             TO  TBL-ISAM-ERR (IDX)
+               END-IF
+      *    船員
+           WHEN    "002"
+               IF      (PTINF-BIRTHDAY     <=  "19320930" )
+                  AND  (PTHKN-HONKZKKBN    =   "1"    )
+      *            前期高齢者でない高齢者の補助区分設定
+                   IF      WRK-HEN-FTNKBN  =   SPACE
+                                           OR  "0"
+                       MOVE    "1"         TO  WRK-HEN-FTNKBN
+                   END-IF
+                   IF      (PTHKN-TEKSTYMD     >=   "20061001" )
+                       IF      WRK-HEN-FTNKBN  =   "2"
+                           MOVE    "3"         TO  WRK-HEN-FTNKBN
+                       END-IF
+                   ELSE
+                       IF      WRK-HEN-FTNKBN  =   "3"
+                           MOVE    "2"         TO  WRK-HEN-FTNKBN
+                       END-IF
+                   END-IF
+                   PERFORM 5003-ROJIN-HOJYOKBN-HEN-SEC
+                   MOVE    PTHKNINF-REC    TO  TBL-PTHKNINF-REC (IDX)
+               END-IF
+      *    共済組合
+           WHEN    "031"
+           WHEN    "032"
+           WHEN    "033"
+           WHEN    "034"
+               CONTINUE
+           WHEN    OTHER
+               IF      PTHKN-HOJOKBN   NOT =   SPACE
+                   MOVE    5               TO  FLG-ERR
+                   MOVE    "5"             TO  TBL-ISAM-ERR (IDX)
                END-IF
            END-EVALUATE
+      *
+      *    Ｈ２０．４から開始日が７５歳以上の日はエラー
+           IF      (PTHKN-HKNNUM       =   "002"  )
+              AND  (PTHKN-HONKZKKBN    =   "1"    )
+               CONTINUE
+           ELSE
+               IF      (PTHKN-TEKSTYMD     >=   "20080401"  )
+                  AND  (PTHKN-TEKSTYMD     >=   WRK-BYMD-75 )
+                   MOVE    6               TO  FLG-ERR
+                   MOVE    "6"             TO  TBL-ISAM-ERR (IDX)
+               END-IF
+           END-IF
            .
        5003-HOJYOKBN-HEN-EXT.
            EXIT.
@@ -988,7 +1065,16 @@
                        IF      WRK-HEN-FTNKBN      =   "2"
                            MOVE    "3"             TO  WRK-HEN-FTNKBN
                        END-IF
-                       PERFORM 5003-ROJIN-HOJYOKBN-HEN-SEC
+      *                開始日が７５歳以上の日はエラー
+                       IF      (PTHKN-TEKSTYMD     <    "20080401" )
+                          OR   (PTHKN-TEKSTYMD     <    WRK-BYMD-75 )
+                          OR  ((PTHKN-HKNNUM       =   "002"  ) AND
+                               (PTHKN-HONKZKKBN    =   "1"    ))
+                           PERFORM 5003-ROJIN-HOJYOKBN-HEN-SEC
+                       ELSE
+                           MOVE    6               TO  FLG-ERR
+                           MOVE    "6"             TO  TBL-ISAM-ERR(IDX)
+                       END-IF
                    END-IF
                ELSE
       *            Ｈ１８．１０以降に前期高齢者
@@ -1141,6 +1227,8 @@
                END-EVALUATE
       *    国保
            WHEN    "060"
+      *    国保（特別療養費）
+           WHEN    "068"
                IF    ( PTHKN-HKNJANUM(7:)      =   SPACE ) AND
                      ( PTHKN-HKNJANUM(3:1)     =   "3" )
                    EVALUATE    WRK-HEN-GAIFTN  ALSO  WRK-HEN-NYUFTN
@@ -1177,7 +1265,6 @@
                            MOVE    "3"             TO  PTHKN-HOJOKBN
                    END-EVALUATE
                END-IF
-      *
            WHEN    OTHER
       *    通常の場合
                EVALUATE    WRK-HEN-FTNKBN
@@ -1192,9 +1279,54 @@
                        MOVE    "7"             TO  PTHKN-HOJOKBN
                END-EVALUATE
            END-EVALUATE
+      *    補助区分未設定はエラー
+           IF      PTHKN-HOJOKBN       =   SPACE
+               MOVE    5               TO  FLG-ERR
+               MOVE    "5"             TO  TBL-ISAM-ERR(IDX)
+           END-IF
       *
            .
        5003-ROJIN-HOJYOKBN-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    後期高齢者処理
+      *****************************************************************
+       5004-HKNNUM039-HEN-SEC            SECTION.
+      *
+           EVALUATE    WRK-HEN-FTNKBN
+      *    負担割合１
+               WHEN    "1"
+                   MOVE    "1"             TO  PTHKN-HOJOKBN
+      *    負担割合３
+               WHEN    "3"
+                   MOVE    "3"             TO  PTHKN-HOJOKBN
+               WHEN    OTHER
+      *            １、３以外はエラー
+                   MOVE    5               TO  FLG-ERR
+                   MOVE    "5"             TO  TBL-ISAM-ERR(IDX)
+           END-EVALUATE
+      *
+           MOVE    PTHKNINF-REC        TO  TBL-PTHKNINF-REC (IDX)
+           .
+       5004-HKNNUM039-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    自費保険処理
+      *****************************************************************
+       5004-HKNNUM980-HEN-SEC            SECTION.
+      *
+      *    負担割合
+           IF      PTHKN-HOJOKBN       =   SPACE
+               MOVE    "1"             TO  PTHKN-HOJOKBN
+           END-IF
+      *    本人家族区分はすべて本人とする
+           IF      PTHKN-HONKZKKBN NOT =   "1"
+               MOVE    "1"             TO  PTHKN-HONKZKKBN
+           END-IF
+      *
+           MOVE    PTHKNINF-REC        TO  TBL-PTHKNINF-REC  (IDX)
+           .
+       5004-HKNNUM980-HEN-EXT.
            EXIT.
       *****************************************************************
       *    患者保険マスター登録処理
@@ -1312,7 +1444,7 @@
            MOVE    TBL-PTHKN-PTID (1)  TO  ERR2-PTID
       *
            EVALUATE    FLG-ERR
-               WHEN    3
+               WHEN    1
                WHEN    7
                WHEN    4
                    MOVE    TBL-ISAM-CNT (1)    TO  ERR2-LINENO

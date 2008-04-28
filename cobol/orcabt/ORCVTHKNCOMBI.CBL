@@ -42,6 +42,8 @@
       *  02.00.01    NACL-多々納  06/07/27  MONFUNC 対応
       *  03.05.00    NACL-多々納  07/05/16  グループ診療対応
       *  04.01.00    NACL-多々納  07/11/12  保険番号マスタ期間変更削除
+      *  04.02.00    NACL-多々納  08/04/28  後期高齢者対応
+      *                                     期間変更削除
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -884,51 +886,105 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO                TO  FLG-HENKOU
       *    労災・自費・治験
-           IF      WRK-HKNKOHSBTKBN    =   "4"  OR  "8"  OR  "9"
+      **** IF      WRK-HKNKOHSBTKBN    =   "4"  OR  "8"  OR  "9"
+           IF      WRK-HKNKOHSBTKBN    =   "4"  OR  "9"
                GO  TO  22011-HOJOKBN-CHK-EXT
            END-IF
-      *
+      *    補助区分の内容チェック
            EVALUATE    PTHKN-HKNNUM
                WHEN    "002"
       *            船員
                    EVALUATE    PTHKN-HOJOKBN
                        WHEN    "1"
-                           MOVE    "A"         TO  PTHKN-HOJOKBN
-                           MOVE    1           TO  FLG-HENKOU
                        WHEN    "2"
-                           MOVE    "B"         TO  PTHKN-HOJOKBN
-                           MOVE    1           TO  FLG-HENKOU
                        WHEN    "3"
-                           MOVE    "C"         TO  PTHKN-HOJOKBN
-                           MOVE    1           TO  FLG-HENKOU
-                       WHEN    "0"
                        WHEN    SPACE
-                           MOVE    "9"         TO  PTHKN-HOJOKBN
-                           MOVE    1           TO  FLG-HENKOU
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
                    END-EVALUATE
                WHEN    "060"
+               WHEN    "068"
       *            国保
                    EVALUATE    PTHKN-HOJOKBN
-                       WHEN    "1"
+                       WHEN    "0"
+                       WHEN    SPACE
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
+                   END-EVALUATE
+               WHEN    "031"
+               WHEN    "032"
+               WHEN    "033"
+               WHEN    "034"
+      *            共済
+                   EVALUATE    PTHKN-HOJOKBN
+                       WHEN    "0"
                        WHEN    "2"
-                       WHEN    "4"
-                       WHEN    "5"
+                       WHEN    SPACE
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
+                   END-EVALUATE
+               WHEN    "039"
+               WHEN    "040"
+      *            後期高齢者
+                   EVALUATE    PTHKN-HOJOKBN
+                       WHEN    "1"
+                       WHEN    "3"
                            CONTINUE
                        WHEN    OTHER
-                           MOVE    "1"         TO  PTHKN-HOJOKBN
-                           MOVE    1           TO  FLG-HENKOU
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
+                   END-EVALUATE
+      *        自費
+               WHEN    "980"   THRU   "989"
+                   EVALUATE    PTHKN-HOJOKBN
+                       WHEN    SPACE
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
                    END-EVALUATE
                WHEN    OTHER
       *            その他
                    EVALUATE    PTHKN-HOJOKBN
-                       WHEN    "9"
-                       WHEN    "8"
-                           CONTINUE
-                       WHEN    OTHER
-                           MOVE    "9"         TO  PTHKN-HOJOKBN
-                           MOVE    1           TO  FLG-HENKOU
+                       WHEN    SPACE
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
                    END-EVALUATE
            END-EVALUATE
+      *
+      **** EVALUATE    PTHKN-HKNNUM
+      *        WHEN    "002"
+      *            船員
+      *            EVALUATE    PTHKN-HOJOKBN
+      *                WHEN    "1"
+      *                    MOVE    "A"         TO  PTHKN-HOJOKBN
+      *                    MOVE    1           TO  FLG-HENKOU
+      *                WHEN    "2"
+      *                    MOVE    "B"         TO  PTHKN-HOJOKBN
+      *                    MOVE    1           TO  FLG-HENKOU
+      *                WHEN    "3"
+      *                    MOVE    "C"         TO  PTHKN-HOJOKBN
+      *                    MOVE    1           TO  FLG-HENKOU
+      *                WHEN    "0"
+      *                WHEN    SPACE
+      *                    MOVE    "9"         TO  PTHKN-HOJOKBN
+      *                    MOVE    1           TO  FLG-HENKOU
+      *            END-EVALUATE
+      *        WHEN    "060"
+      *            国保
+      *            EVALUATE    PTHKN-HOJOKBN
+      *                WHEN    "1"
+      *                WHEN    "2"
+      *                WHEN    "4"
+      *                WHEN    "5"
+      *                    CONTINUE
+      *                WHEN    OTHER
+      *                    MOVE    "1"         TO  PTHKN-HOJOKBN
+      *                    MOVE    1           TO  FLG-HENKOU
+      *            END-EVALUATE
+      *        WHEN    OTHER
+      *            その他
+      *            EVALUATE    PTHKN-HOJOKBN
+      *                WHEN    "9"
+      *                WHEN    "8"
+      *                    CONTINUE
+      *                WHEN    OTHER
+      *                    MOVE    "9"         TO  PTHKN-HOJOKBN
+      *                    MOVE    1           TO  FLG-HENKOU
+      *            END-EVALUATE
+      **** END-EVALUATE
       *
            .
        22011-HOJOKBN-CHK-EXT.
@@ -940,33 +996,94 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
         22012-HOJOKBN-CHK2-SEC     SECTION.
       *
       *    老人年齢、労災・自費・治験
-           IF     (PTINF-BIRTHDAY      <=  "19320930" ) OR
-                  (WRK-HKNKOHSBTKBN    =   "4"  OR  "8"  OR  "9")
+      ***  IF     (PTINF-BIRTHDAY      <=  "19320930" ) OR
+      ****        (WRK-HKNKOHSBTKBN    =   "4"  OR  "8"  OR  "9")
+      *    労災・治験
+           IF     (WRK-HKNKOHSBTKBN    =   "4"  OR  "9")
                GO  TO  22012-HOJOKBN-CHK2-EXT
            END-IF
       *
            EVALUATE    PTHKN-HKNNUM
                WHEN    "002"
       *            船員
+                   IF     (PTINF-BIRTHDAY      <=  "19320930" )
+                       EVALUATE    PTHKN-HOJOKBN
+                           WHEN    "1"
+                           WHEN    "2"
+                           WHEN    "3"
+                           WHEN    SPACE
+                               MOVE    "5"             TO  WRK-KEN-ERFLG
+                       END-EVALUATE
+                   ELSE
+                       EVALUATE    PTHKN-HOJOKBN
+                           WHEN    "1"
+                           WHEN    "2"
+                           WHEN    "3"
+                           WHEN    SPACE
+                               CONTINUE
+                           WHEN    OTHER
+                               MOVE    "5"             TO  WRK-KEN-ERFLG
+                       END-EVALUATE
+                   END-IF
+               WHEN    "060"
+               WHEN    "068"
+      *            国保
+                   EVALUATE    PTHKN-HOJOKBN
+                       WHEN    SPACE
+                           MOVE    "5"             TO  WRK-KEN-ERFLG
+                   END-EVALUATE
+               WHEN    "031"
+               WHEN    "032"
+               WHEN    "033"
+               WHEN    "034"
+      *            共済
+                   IF     (PTINF-BIRTHDAY      <=  "19320930" )
+                       CONTINUE
+                   ELSE
+                       EVALUATE    PTHKN-HOJOKBN
+                           WHEN    "2"
+                           WHEN    SPACE
+                               CONTINUE
+                           WHEN    OTHER
+                               MOVE    "5"             TO  WRK-KEN-ERFLG
+                       END-EVALUATE
+                   END-IF
+               WHEN    "039"
+               WHEN    "040"
+      *            後期高齢者
                    EVALUATE    PTHKN-HOJOKBN
                        WHEN    "1"
-                       WHEN    "2"
                        WHEN    "3"
-                       WHEN    SPACE
                            CONTINUE
                        WHEN    OTHER
                            MOVE    "5"             TO  WRK-KEN-ERFLG
                    END-EVALUATE
-               WHEN    "060"
-      *            国保
-                   CONTINUE
-               WHEN    OTHER
-      *            その他
+      *        自費
+               WHEN    "980"   THRU   "989"
                    EVALUATE    PTHKN-HOJOKBN
-                       WHEN    "9"
-                       WHEN    "8"
+                       WHEN    SPACE
                            MOVE    "5"             TO  WRK-KEN-ERFLG
                    END-EVALUATE
+               WHEN    OTHER
+      *            その他
+                   IF     (PTINF-BIRTHDAY      <=  "19320930" )
+                       EVALUATE    PTHKN-HOJOKBN
+                           WHEN    SPACE
+                           WHEN    "9"
+                           WHEN    "8"
+                           WHEN    "7"
+                               CONTINUE
+                           WHEN    OTHER
+                               MOVE    "5"             TO  WRK-KEN-ERFLG
+                       END-EVALUATE
+                   ELSE
+                       EVALUATE    PTHKN-HOJOKBN
+                           WHEN    "9"
+                           WHEN    "8"
+                           WHEN    "7"
+                               MOVE    "5"             TO  WRK-KEN-ERFLG
+                       END-EVALUATE
+                   END-IF
            END-EVALUATE
       *
            .

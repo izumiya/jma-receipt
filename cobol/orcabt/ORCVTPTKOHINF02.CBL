@@ -28,6 +28,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô        ÆüÉÕ      ÆâÍÆ
+      *  04.02.00    NACL-Â¿¡¹Ç¼  08/04/28  £È£²£°¡¥£´²þÀµÂÐ±þÂ¾
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -840,7 +841,8 @@
        500141-KOH027-CHKSYORI-SEC        SECTION.
       *
       *    Ï·¿Í¸øÈñ¤ÏÊ¿À®£²£°¡¥£³¡¥£³£±¤Ç½ªÎ»
-           IF      PTKOH-TEKEDYMD      >   "20080331"
+           IF     (PTKOH-TEKSTYMD      <=  "20080331"  )  AND
+                  (PTKOH-TEKEDYMD      >   "20080331"  )
                MOVE    "20080331"          TO  TBL-PTKOH-TEKEDYMD (IDX)
                MOVE    "20080331"          TO  PTKOH-TEKEDYMD
            END-IF
@@ -1208,9 +1210,9 @@
            MOVE    TBL-PTKOH-PTID (1)  TO  ERR2-PTID
       *
            EVALUATE    FLG-ERR
-               WHEN    3
-               WHEN    7
+               WHEN    1
                WHEN    4
+               WHEN    7
                    MOVE    "ERR"               TO  ERR2-NAIYO
                    MOVE    TBL-ISAM-CNT (1)    TO  ERR2-LINENO
                    PERFORM 2901-ERRLST-OUT-SEC
