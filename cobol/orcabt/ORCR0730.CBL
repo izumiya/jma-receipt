@@ -39,6 +39,7 @@
       *                                     ７０歳代前半の特例措置対象者
       *                                     対応 
       *                                     国保のみ２割の記載
+      *  04.02.06    NACL-藤原    08/04/25  保険履歴の記載変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -225,6 +226,7 @@
            03  FLG-JIRITU-HENSYU   PIC 9(01).
            03  FLG-RECE-PUT-UM     PIC 9(01).
            03  FLG-HENSYU          PIC 9(01).
+           03  FLG-RIREKI-HEN      PIC 9(01).
            03  FLG-STS             PIC 9(04).
       *
       *    カウント領域
@@ -1798,6 +1800,8 @@
       *****************************************************************
        2001-RIREKI-HEN-SEC      SECTION.
       *
+           MOVE    ZERO                TO  FLG-RIREKI-HEN
+      *
       *    診療年月編集
            MOVE    RECE62-SRYYM        TO  WRK-SYMD (1:6)
            MOVE    "01"                TO  WRK-SYMD (7:2)
@@ -1976,6 +1980,7 @@
                                       WRK-HKN-FL1     (WRK-RIREKI-MAX)
                    MOVE    "まで"             TO
                                       WRK-HKN-FL2     (WRK-RIREKI-MAX)                                     
+                   MOVE    1                  TO  FLG-RIREKI-HEN
                ELSE
                    MOVE    "から有効"         TO
                                       WRK-HKN-FL      (WRK-RIREKI-MAX) 
@@ -1984,7 +1989,8 @@
                PERFORM 900-RECE69-NEXT-SEC
            END-PERFORM
       *
-           IF      CNT-RECE69             =   1
+           IF    ( CNT-RECE69             =   1    )
+           OR    ( FLG-RIREKI-HEN         =   ZERO ) 
                MOVE    SPACE                  TO  WRK-HKN-RIREKI-AREA
                MOVE    ZERO                   TO  WRK-RIREKI-MAX
            END-IF          

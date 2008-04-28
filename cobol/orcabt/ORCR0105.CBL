@@ -39,6 +39,7 @@
       *                                     £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô
       *                                     ÂÐ±þ 
       *                                     ¹ñÊÝ¤Î¤ß£²³ä¤Îµ­ºÜ
+      *  04.02.06    NACL-Æ£¸¶    08/04/25  ÊÝ¸±ÍúÎò¤Îµ­ºÜÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -224,6 +225,7 @@
            03  FLG-HENSYU          PIC 9(01).
            03  FLG-LINE            PIC 9(01).
            03  FLG-RECECOM-SJKBN   PIC 9(01).
+           03  FLG-RIREKI-HEN      PIC 9(01).
            03  FLG-STS             PIC 9(04).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
@@ -1756,6 +1758,8 @@
       *****************************************************************
        2001-RIREKI-HEN-SEC      SECTION.
       *
+           MOVE    ZERO                TO  FLG-RIREKI-HEN
+      *
       *    ¿ÇÎÅÇ¯·îÊÔ½¸
            MOVE    RECE02-SRYYM        TO  WRK-SYMD (1:6)
            MOVE    "01"                TO  WRK-SYMD (7:2)
@@ -1933,7 +1937,8 @@
                    MOVE    "¤«¤é"             TO
                                       WRK-HKN-FL1     (WRK-RIREKI-MAX)
                    MOVE    "¤Þ¤Ç"             TO
-                                      WRK-HKN-FL2     (WRK-RIREKI-MAX)                                     
+                                      WRK-HKN-FL2     (WRK-RIREKI-MAX)
+                   MOVE    1                  TO  FLG-RIREKI-HEN
                ELSE
                    MOVE    "¤«¤éÍ­¸ú"         TO
                                       WRK-HKN-FL      (WRK-RIREKI-MAX) 
@@ -1942,7 +1947,8 @@
                PERFORM 990-RECE09-NEXT-SEC
            END-PERFORM
       *
-           IF      CNT-RECE09             =   1
+           IF    ( CNT-RECE09             =   1    )
+           OR    ( FLG-RIREKI-HEN         =   ZERO ) 
                MOVE    SPACE                  TO  WRK-HKN-RIREKI-AREA
                MOVE    ZERO                   TO  WRK-RIREKI-MAX
            END-IF          
@@ -8611,6 +8617,18 @@
                    MOVE    1         TO  FLG-RECE09
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE09
+      *
+      *            ¸å´ü¹âÎð¼Ô¤ÇÁ¥°÷ÊÝ¸±¤ÎÍúÎò¤ÏÂÐ¾Ý³°¤È¤¹¤ë
+                   IF      RECE09-HKNNUM   =   "002"
+                       IF    ( RECE02-AGE  >=  75    )
+                       OR    ( RECE02-AGE  =   74                 AND
+                               RECE02-BIRTHDAY (5:2)
+                                           =   RECE02-SRYYM (5:2) AND 
+                               RECE02-BIRTHDAY (7:2)
+                                       NOT =   "01"  )   
+                           GO  TO  990-RECE09-NEXT-SEC
+                       END-IF
+                   END-IF
            END-READ
       *
            .
