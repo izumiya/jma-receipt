@@ -1318,6 +1318,10 @@
                ELSE
                    MOVE    ZERO                TO  WRK-TODAY-CNTG
                END-IF
+      *        訂正前にないとき、当日分集計
+               IF      WRK-TEI-CNT         =   ZERO
+                   ADD     WRK-TODAY-CNTG     TO  WRK-SANTEI-CNT
+               END-IF
            END-IF
            .
        108121-SANTEI-CHK-EXT.
@@ -3899,8 +3903,12 @@
       *****************************************************************
        3005-AUTO-SAIKETU-SEC         SECTION.
       *
+      *    同一コードチェック
+           PERFORM 30051-INPUT-CHECK-SEC
       *    共通チェック処理
-           PERFORM 3001-KYOUTU-CHEK-SEC
+           IF      FLG-ERR         =   ZERO
+               PERFORM 3001-KYOUTU-CHEK-SEC
+           END-IF
       *
            IF      FLG-ERR         =   ZERO
       *
@@ -3943,6 +3951,28 @@
       *
            .
        3005-AUTO-SAIKETU-EXT.
+           EXIT.
+      *****************************************************************
+      *    同一コードチェック処理
+      *****************************************************************
+       30051-INPUT-CHECK-SEC         SECTION.
+      *
+      *    入力判定
+           MOVE    ZERO                TO  FLG-ERR
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z       >   SPA-MAX-LINE )   OR
+                              (FLG-ERR     NOT         =   ZERO)  OR
+                             ((WRK-GMN-INPUTCD (IDX-Z) =   SPACE ) AND
+                              (WRK-COM-INPUTCD (IDX-Z) =   SPACE ))
+      *
+               IF     (WRK-COM-HKNCOMBI(IDX-Z) NOT =   "9999" )
+                 AND  (WRK-COM-SRYKBN  (IDX-Z)     =   "60"   ) 
+                 AND  (WRK-COM-INPUTCD (IDX-Z)     =   WRK-SRYCD )
+                   MOVE    1                   TO  FLG-ERR
+               END-IF
+           END-PERFORM
+           .
+       30051-INPUT-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
