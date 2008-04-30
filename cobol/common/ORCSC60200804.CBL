@@ -4277,8 +4277,12 @@
       *****************************************************************
        3007-BA-DAY-SEC         SECTION.
       *
+      *    同一コードチェック
+           PERFORM 30051-INPUT-CHECK-SEC
       *    共通チェック処理
-           PERFORM 3001-KYOUTU-CHEK-SEC
+           IF      FLG-ERR         =   ZERO
+               PERFORM 3001-KYOUTU-CHEK-SEC
+           END-IF
       *
            IF      FLG-ERR         =   ZERO
       *
