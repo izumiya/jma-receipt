@@ -59,6 +59,20 @@
       *  04.01.02    NACL-門脇    07/12/19  入院料未算定日対応
       *  04.01.03    NACL-門脇    08/02/04  標欠外泊計算修正
       *  04.02.01    NACL-門脇    08/02/29  平成２０年４月改正対応
+      *  04.02.02    NACL-小豆沢  08/04/30  有床診療所の加算を労災入院加算に
+      *                                     含める（入院会計より）
+      *                                     ・夜間緊急体制確保加算
+      *                                     ・医師配置適合加算
+      *                                     ・看護配置加算１
+      *                                     ・看護配置加算２
+      *                                     ・夜間看護配置加算１
+      *                                     ・夜間看護配置加算２
+      *                                     特定機能病院−精神病棟の加算を労災入院加算に
+      *                                     含める（診療会計より）
+      *                                     ・重度認知症加算（特定機能病院精神病棟）
+      *                                     回復期リハビリテーション病棟入院料１の加算を
+      *                                     労災入院加算に含める（入院会計より）
+      *                                     ・重症患者回復病棟加算
       *****************************************************************
       *
       *
@@ -105,35 +119,58 @@
       *
       *    コンスタント値
        01  CONSTANT-AREA.
-      *    入院診療計画未実施減算
+      *    入院診療計画未実施減算（平成１８年３月まで）
            03  CONS-KEIKAKU-GENSAN1        PIC X(09) VALUE "190080470".
            03  CONS-KEIKAKU-GENSAN2        PIC X(09) VALUE "190799670".
-      *    院内感染防止対策未実施減算
+      *    院内感染防止対策未実施減算（平成１８年３月まで）
            03  CONS-INNAI-GENSAN1          PIC X(09) VALUE "190080570".
            03  CONS-INNAI-GENSAN2          PIC X(09) VALUE "190799770".
-      *    医療安全管理体制未整備減算
+      *    医療安全管理体制未整備減算（平成１８年３月まで）
            03  CONS-ANZEN-GENSAN1          PIC X(09) VALUE "190111690".
            03  CONS-ANZEN-GENSAN2          PIC X(09) VALUE "190809090".
-      *    褥瘡対策未実施減算
+      *    褥瘡対策未実施減算（平成１８年３月まで）
            03  CONS-JYOKU-GENSAN1          PIC X(09) VALUE "190111790".
            03  CONS-JYOKU-GENSAN2          PIC X(09) VALUE "190809190".
-      *    日常生活障害加算
+      *    日常生活障害加算（平成１８年６月まで）
            03  CONS-NICHIJOU-KSN1          PIC X(09) VALUE "190109170".
            03  CONS-NICHIJOU-KSN2          PIC X(09) VALUE "190807570".
-      *    痴呆加算
+      *    認知症加算（平成１８年６月まで）
            03  CONS-CHIHOU-KSN1            PIC X(09) VALUE "190109270".
            03  CONS-CHIHOU-KSN2            PIC X(09) VALUE "190808670".
       *    褥瘡患者管理加算
            03  CONS-JYOKU-KSN1             PIC X(09) VALUE "190116990".
            03  CONS-JYOKU-KSN2             PIC X(09) VALUE "190813390".
-      *    複数医師及び看護配置適合加算
+      *    複数医師及び看護配置適合加算（平成２０年３月まで）
            03  CONS-KANGO-KSN1             PIC X(09) VALUE "190117070".
-      *    看護配置適合加算
+      *    看護配置適合加算（平成２０年３月まで）
            03  CONS-KANGO-KSN2             PIC X(09) VALUE "190109670".
-      *    認知機能障害加算（療養病棟）
+      *    認知機能障害加算（療養病棟）（平成２０年３月まで）
            03  CONS-NINSYO-KSN1            PIC X(09) VALUE "190121970".
-      *    認知機能障害加算（有床診療所）
+      *    認知機能障害加算（有床診療所）（平成２０年３月まで）
            03  CONS-NINSYO-KSN2            PIC X(09) VALUE "190122670".
+      *
+      *--平成２０年４月以降に対処を追加した加算------------------------
+      *    夜間緊急体制確保加算
+           03  CONS-200804-KSN1            PIC X(09) VALUE "190126470".
+      *    医師配置適合加算
+           03  CONS-200804-KSN2            PIC X(09) VALUE "190117070".
+      *    看護配置加算１
+           03  CONS-200804-KSN3            PIC X(09) VALUE "190126570".
+      *    看護配置加算２
+           03  CONS-200804-KSN4            PIC X(09) VALUE "190109670".
+      *    夜間看護配置加算１
+           03  CONS-200804-KSN5            PIC X(09) VALUE "190126670".
+      *    夜間看護配置加算２
+           03  CONS-200804-KSN6            PIC X(09) VALUE "190126770".
+      *    重度認知症加算（特定機能病院精神病棟）
+           03  CONS-200804-KSN7            PIC X(09) VALUE "190119210".
+      *    褥瘡評価実施加算（療養病棟）
+           03  CONS-200804-KSN8            PIC X(09) VALUE "190121970".
+      *    褥瘡評価実施加算（有床診療所）
+           03  CONS-200804-KSN9            PIC X(09) VALUE "190122670".
+      *    重症患者回復病棟加算
+           03  CONS-200804-KSN10           PIC X(09) VALUE "190129870".
+      *----------------------------------------------------------------
       *
       *    労災治療計画加算
            03  CONS-ROSAICHIRYO            PIC X(09) VALUE "101910050".
@@ -231,6 +268,19 @@
            03  WRK-NINSYO-KSN1             PIC 9(03) OCCURS 31.
       *    認知機能障害加算（有床診療所）
            03  WRK-NINSYO-KSN2             PIC 9(03) OCCURS 31.
+      *
+      *--平成２０年４月以降に対処を追加した加算の退避領域--------------
+           03  WRK-200804-KSN1             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN2             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN3             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN4             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN5             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN6             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN7             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN8             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN9             PIC 9(03) OCCURS 31.
+           03  WRK-200804-KSN10            PIC 9(03) OCCURS 31.
+      *----------------------------------------------------------------
       *
       *    診療コード計集計用
            03  WRK-SRYCD-X                 PIC X(09).
@@ -511,6 +561,20 @@
       *    主取得
       *****************************************************************
        200-MAIN-SEC            SECTION.
+      *
+           IF      LNK-SROUNYUIN-SANTEIYM   <=   "200803"
+               PERFORM 210-ROUNYUIN-SET1-SEC
+           ELSE
+               PERFORM 210-ROUNYUIN-SET2-SEC
+           END-IF
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    労災入院サブの返却値セット（平成２０年３月まで）
+      *****************************************************************
+       210-ROUNYUIN-SET1-SEC            SECTION.
       *
       *労災乗数の２週間以内の最終日を取得
            INITIALIZE                      ORCSRSITUSANAREA
@@ -1410,7 +1474,682 @@
            END-IF
       *
            .
-       200-MAIN-EXT.
+       210-ROUNYUIN-SET1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    労災入院サブの返却値セット（平成２０年４月以降）
+      *****************************************************************
+       210-ROUNYUIN-SET2-SEC            SECTION.
+      *
+      *労災乗数の２週間以内の最終日を取得
+           INITIALIZE                      ORCSRSITUSANAREA
+           MOVE    LNK-SROUNYUIN-HOSPNUM
+                                       TO  RSITUSAN-HOSPNUM
+           MOVE    LNK-SROUNYUIN-PTID
+                                       TO  RSITUSAN-PTID
+           MOVE    LNK-SROUNYUIN-HKNCOMBI
+                                       TO  RSITUSAN-HKNCOMBI
+           MOVE    LNK-SROUNYUIN-SANTEIYM
+                                       TO  RSITUSAN-SRYYM
+           CALL    "ORCSRSITUSAN"      USING
+                                           ORCSRSITUSANAREA
+                                           SPA-AREA
+           IF    ( RSITUSAN-RC          =   ZERO )
+               CONTINUE
+           ELSE
+               INITIALIZE  ORCSRSITUSANAREA
+           END-IF
+           PERFORM   VARYING   IDX1   FROM 1  BY  1
+                     UNTIL     IDX1   >    31
+               MOVE  RSITUSAN-DAY(IDX1) TO LNK-SROUNYUIN-JOUSU-KBN(IDX1)
+           END-PERFORM
+      *
+      *労災入院料の取得
+           MOVE    ZERO                    TO  FLG-OK
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-SROUNYUIN-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-SROUNYUIN-PTID      TO  NACCT-PTID
+           MOVE    LNK-SROUNYUIN-SANTEIYM  TO  NACCT-SRYYM
+           MOVE    "1"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE     "key17"            TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                   MOVE      ZERO     TO      FLG-RYAKU
+                                              WRK-KSNKBN
+                   MOVE      SPACE    TO      WRK-RYAKUSHO
+                                              WRK-SRYKBN
+                                              WRK-SHOKIKSN-TAIHI
+                                              WRK-HYOKETU-TAIHI
+                   IF    NACCT-SRYCDTOTAL     =    99999916
+                       CONTINUE
+                   ELSE
+      *                該当入院行為テーブルの読み込み
+                       PERFORM    210-NYUINACT-GET-SEC
+      *                入院基本料と初期加算（長期減算）の退避
+                       PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                  UNTIL     IDX1   >   31
+                           IF    (LNK-SROUNYUIN-NYUIN-FLG(IDX1) = "1")
+                           AND   (NACCT-DAY(IDX1)    NOT =  ZERO) 
+                               MOVE    NSRY-SRYCD(1)   TO  
+                                                   WRK-NYUINKHN(IDX1)
+      *
+                               IF   FLG-RYAKU   =   ZERO
+      *
+                                  PERFORM  VARYING  IDX3  FROM  2  BY  1
+                                            UNTIL   IDX3   >    3
+                                    IF   NSRY-SRYCD(IDX3)  NOT =   SPACE
+                                      INITIALIZE    TNS-TENSU-REC
+                                      MOVE NSRY-SRYCD(IDX3)
+                                                TO  TNS-SRYCD
+                                      MOVE LNK-SROUNYUIN-HOSPNUM
+                                                TO  TNS-HOSPNUM
+                                      MOVE LNK-SROUNYUIN-SANTEIYM
+                                                TO  TNS-YUKOSTYMD(1:6)
+                                      MOVE "01" TO  TNS-YUKOSTYMD(7:2)
+                                      MOVE LNK-SROUNYUIN-SANTEIYM
+                                                TO  TNS-YUKOEDYMD(1:6)
+                                      MOVE "01" TO  TNS-YUKOEDYMD(7:2)
+                                      PERFORM 910-TENSU-READ-SEC
+                                      EVALUATE  TNS-TENSIKIBETU
+                                         WHEN     3
+                                         WHEN     8
+                                             MOVE   NSRY-SRYCD(IDX3)  TO
+                                                      WRK-SHOKIKSN-TAIHI
+                                         WHEN     6
+                                             MOVE   NSRY-SRYCD(IDX3)  TO
+                                                      WRK-HYOKETU-TAIHI
+                                      END-EVALUATE
+                                    END-IF
+                                  END-PERFORM
+      *
+                                  MOVE    NACCT-SRYKBN
+                                                TO  WRK-SRYKBN
+      *                           外泊コード編集用に入院基本料加算区分
+      *                           の退避
+                                  PERFORM   210-GAIHAKU-MAE-SEC
+      *
+                                  MOVE   NSRY-SRYCD(1)
+                                                TO  WRK-RYAKU-SRYCD
+                                  MOVE   NACCT-ZAISKBKBN
+                                                TO  WRK-ZAISKBKBN
+                                  PERFORM   210-RYAKUSYO-HENSYU-SEC
+      *
+                                  MOVE    1     TO    FLG-RYAKU
+                               END-IF
+      *
+                               IF    WRK-SHOKIKSN-TAIHI  NOT = SPACE
+                                  MOVE  WRK-SHOKIKSN-TAIHI
+                                               TO  WRK-SHOKIKSN(IDX1)
+                               END-IF
+                               IF    WRK-HYOKETU-TAIHI   NOT = SPACE
+                                  MOVE  WRK-HYOKETU-TAIHI
+                                               TO  WRK-HYOKETU(IDX1)
+                               END-IF
+      *
+                               MOVE  WRK-SRYKBN
+                                         TO  LNK-SROUNYUIN-SRYKBN(IDX1)
+                               MOVE  WRK-KSNKBN
+                                         TO  WRK-NYUKHNKSNKBN(IDX1)
+      *
+                               IF    WRK-RYAKUSHO   NOT =  SPACE
+                                  MOVE  WRK-RYAKUSHO
+                                      TO  LNK-SROUNYUIN-RYAKUSYO(IDX1)
+                               END-IF
+      *
+                               MOVE    1    TO   FLG-OK
+                           END-IF
+                       END-PERFORM
+                   END-IF
+                   MOVE   "tbl_nyuinacct"   TO  MCP-TABLE
+                   MOVE   "key17"           TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-READ-SEC
+               END-PERFORM
+      ***      IF   FLG-OK     =   ZERO
+      ***          MOVE     6      TO      LNK-SROUNYUIN-RC
+      ***      END-IF
+           ELSE
+               MOVE     6      TO      LNK-SROUNYUIN-RC
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"   TO  MCP-TABLE
+           MOVE     "key17"           TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           IF   LNK-SROUNYUIN-RC    NOT =   ZERO
+                   GO   TO    200-MAIN-EXT
+           END-IF
+      *
+      *労災入院時の外泊取得
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-SROUNYUIN-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-SROUNYUIN-PTID      TO  NACCT-PTID
+           MOVE    LNK-SROUNYUIN-SANTEIYM  TO  NACCT-SRYYM
+           MOVE    "2"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE     "key17"            TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+      *            外泊区分の退避
+                   PERFORM    VARYING   IDX1   FROM   1   BY   1
+                              UNTIL     IDX1   >   31
+      ****             IF    (WRK-NYUINKHN(IDX1) NOT = SPACE) 
+                       IF     NACCT-DAY(IDX1)    NOT =  ZERO
+                              PERFORM     210-GAIHAKU-SET-SEC
+                       END-IF
+                   END-PERFORM
+                   MOVE   "tbl_nyuinacct"  TO  MCP-TABLE
+                   MOVE   "key17"          TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-READ-SEC
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"        TO  MCP-TABLE
+           MOVE     "key17"                TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *労災入院時の入院料加算取得（入院会計より）
+           MOVE    ZERO                    TO  KSN-IDX
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-SROUNYUIN-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-SROUNYUIN-PTID      TO  NACCT-PTID
+           MOVE    LNK-SROUNYUIN-SANTEIYM  TO  NACCT-SRYYM
+           MOVE    "6"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE     "key17"            TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                   MOVE      ZERO     TO      FLG-RYAKU
+                   MOVE      ZERO     TO      FLG-KSN
+      *            入院料加算の退避
+                   PERFORM    VARYING   IDX1   FROM   1   BY   1
+                              UNTIL     IDX1   >   31
+                       IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+                              (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
+                       AND   (LNK-SROUNYUIN-GAIHAKU(IDX1)  
+                                             =  ZERO  OR  4)
+                       AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+      *
+      *                  KSN1：夜間緊急体制確保加算
+      *                  KSN2：医師配置適合加算
+      *                  KSN3：看護配置加算１
+      *                  KSN4：看護配置加算２
+      *                  KSN5：夜間看護配置加算１
+      *                  KSN6：夜間看護配置加算２
+      *                  KSN10：重症患者回復病棟加算
+                         IF (NACCT-SRYCDTOTAL(6:9) = CONS-200804-KSN1
+                                                  OR CONS-200804-KSN2
+                                                  OR CONS-200804-KSN3
+                                                  OR CONS-200804-KSN4
+                                                  OR CONS-200804-KSN5
+                                                  OR CONS-200804-KSN6
+                                                  OR CONS-200804-KSN10)
+                          IF    (WRK-NYUINKHN(IDX1)      NOT = SPACE)
+                          AND   (LNK-SROUNYUIN-GAIHAKU(IDX1) =  ZERO)
+                           EVALUATE   NACCT-SRYCDTOTAL(6:9)
+                             WHEN  CONS-200804-KSN1
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN1(IDX1)
+                             WHEN  CONS-200804-KSN2
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN2(IDX1)
+                             WHEN  CONS-200804-KSN3
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN3(IDX1)
+                             WHEN  CONS-200804-KSN4
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN4(IDX1)
+                             WHEN  CONS-200804-KSN5
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN5(IDX1)
+                             WHEN  CONS-200804-KSN6
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN6(IDX1)
+                             WHEN  CONS-200804-KSN10
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-200804-KSN10(IDX1)
+                           END-EVALUATE
+      *
+                           IF   FLG-RYAKU   =   ZERO
+                              MOVE   NACCT-SRYCDTOTAL(6:9)
+                                            TO  WRK-RYAKU-SRYCD
+                              MOVE   NACCT-ZAISKBKBN
+                                            TO  WRK-ZAISKBKBN
+                              PERFORM   210-RYAKUSYO-HENSYU-SEC
+      *
+                              MOVE    1     TO    FLG-RYAKU
+                           END-IF
+                          END-IF
+                         ELSE
+                           IF   FLG-KSN   =  ZERO
+                               ADD     1    TO    KSN-IDX
+                               MOVE    1    TO    FLG-KSN
+                           END-IF
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                        TO  WRK-NYUKSN(KSN-IDX)
+                           MOVE   NACCT-ZAITEN  
+                                        TO  WRK-NYUKSN-ZAITEN(KSN-IDX)
+                           MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-NYUKSN-DAY(KSN-IDX IDX1)
+      *
+                           IF   FLG-RYAKU   =   ZERO
+                              MOVE   NACCT-SRYCDTOTAL(6:9)
+                                            TO  WRK-RYAKU-SRYCD
+                              MOVE   NACCT-ZAISKBKBN
+                                            TO  WRK-ZAISKBKBN
+                              PERFORM   210-RYAKUSYO-HENSYU-SEC
+      *
+                              MOVE    1     TO    FLG-RYAKU
+                           END-IF
+                         END-IF
+      *
+                       END-IF
+                   END-PERFORM
+                   MOVE   "tbl_nyuinacct"   TO  MCP-TABLE
+                   MOVE   "key17"           TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-READ-SEC
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE     "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *
+      *労災入院時の入院料加算取得（診療会計より）
+           INITIALIZE                           SRYACCT-REC
+           MOVE    LNK-SROUNYUIN-HOSPNUM   TO   ACCT-HOSPNUM
+           MOVE    "1"                     TO   ACCT-NYUGAIKBN
+           MOVE    LNK-SROUNYUIN-PTID      TO   ACCT-PTID
+           MOVE    LNK-SROUNYUIN-SANTEIYM  TO   ACCT-SRYYM
+           MOVE    LNK-SROUNYUIN-HKNCOMBI  TO   ACCT-HKNCOMBI
+           MOVE    "tbl_sryacct"           TO   MCP-TABLE
+           MOVE    "key22"                 TO   MCP-PATHNAME
+           PERFORM 910-SRYACCT-SELECT-SEC
+           IF      FLG-SRYACCT           =   ZERO
+               MOVE     "tbl_sryacct"      TO   MCP-TABLE
+               MOVE     "key22"            TO   MCP-PATHNAME
+               PERFORM   910-SRYACCT-READ-SEC
+               PERFORM   UNTIL   (FLG-SRYACCT    =   1)
+                 MOVE      ZERO     TO      FLG-RYAKU
+                 IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
+                      (ACCT-ZAIKAISU  NOT =    ZERO)    AND
+                      (ACCT-JIHOKBN       =   SPACE)
+                   IF   ACCT-SRYKBN  =  "90" OR "92"
+      *
+                     INITIALIZE                         SRYACT-REC
+                     MOVE    ACCT-HOSPNUM       TO      SRY-HOSPNUM
+                     MOVE    ACCT-NYUGAIKBN     TO      SRY-NYUGAIKBN
+                     MOVE    ACCT-PTID          TO      SRY-PTID
+                     MOVE    ACCT-SRYYM         TO      SRY-SRYYM
+                     MOVE    ACCT-ZAINUM        TO      SRY-ZAINUM
+                     MOVE    SRYACT-REC         TO      MCPDATA-REC
+                     MOVE    "DBSELECT"         TO      MCP-FUNC
+                     MOVE    "tbl_sryact"       TO      MCP-TABLE
+                     MOVE    "key9"             TO      MCP-PATHNAME
+                     CALL    "ORCDBMAIN"        USING   MCPAREA
+                                                        MCPDATA-REC
+                                                        SPA-AREA
+                     IF      MCP-RC               =       ZERO
+                         MOVE    "tbl_sryact"   TO      MCP-TABLE
+                         MOVE    "key9"         TO      MCP-PATHNAME
+                         PERFORM  910-SRYACT-READ-SEC
+                         IF   FLG-SRYACT    =    0
+      *                     KSN7：重度認知症加算
+      *                     KSN8：褥瘡評価実施加算（療養病棟）
+      *                     KSN9：褥瘡評価実施加算（有床診療所）
+                            IF (SRY-SRYCD(1)  =  CONS-200804-KSN7
+                                              OR CONS-200804-KSN8
+                                              OR CONS-200804-KSN9 )
+      *                                        
+                                MOVE  SRY-SRYCD(1)   TO
+                                               ACCT-SRYCDTOTAL(6:9)
+                            END-IF
+                         END-IF
+                     END-IF
+      *              診療行為クローズ
+                     MOVE     "tbl_sryact"    TO    MCP-TABLE
+                     MOVE     "key9"          TO    MCP-PATHNAME
+                     PERFORM   910-DB-CLOSE-SEC
+      *
+                     IF ( ACCT-SRYCDTOTAL(6:9)  =
+                                            CONS-200804-KSN7
+                                        OR  CONS-200804-KSN8
+                                        OR  CONS-200804-KSN9 )
+      *                入院料加算の退避
+                       PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                  UNTIL     IDX1   >   31
+                           IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
+                           AND   (LNK-SROUNYUIN-GAIHAKU(IDX1)  
+                                                        =  ZERO)
+                           AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
+                              EVALUATE   ACCT-SRYCDTOTAL(6:9)
+      *                         重度認知症加算
+                                WHEN  CONS-200804-KSN7
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN7(IDX1)
+      *                         褥瘡評価実施加算（療養病棟）
+                                WHEN  CONS-200804-KSN8
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN8(IDX1)
+      *                         褥瘡評価実施加算（有床診療所）
+                                WHEN  CONS-200804-KSN9
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN9(IDX1)
+                              END-EVALUATE
+      *
+                              IF   FLG-RYAKU   =   ZERO
+                                 MOVE   ACCT-SRYCDTOTAL(6:9)
+                                               TO  WRK-RYAKU-SRYCD
+                                 MOVE   "6"    TO  WRK-ZAISKBKBN
+                                 PERFORM   210-RYAKUSYO-HENSYU-SEC
+      *
+                                 MOVE    1     TO    FLG-RYAKU
+                              END-IF
+      *
+                           END-IF
+                       END-PERFORM
+                     ELSE
+                       IF   ACCT-SRYCDTOTAL(6:9)  =  CONS-ROSAICHIRYO
+                                                 OR  CONS-BYOUI
+                                                 OR  CONS-TOKUKANSI
+      *                  入院料加算の退避
+                         PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                    UNTIL     IDX1   >   31
+                             IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+                                    (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
+                             AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+                               COMPUTE LNK-SROUNYUIN-ZAITEN-ACCTETC
+                                                             (IDX1)
+                                    =  LNK-SROUNYUIN-ZAITEN-ACCTETC
+                                                             (IDX1)
+                                    + (ACCT-ZAITEN * ACCT-DAY(1 IDX1))
+      *
+                               IF   FLG-RYAKU   =   ZERO
+                                  MOVE   ACCT-SRYCDTOTAL(6:9)
+                                                TO  WRK-RYAKU-SRYCD
+                                  MOVE   "6"    TO  WRK-ZAISKBKBN
+                                  PERFORM   210-RYAKUSYO-HENSYU-SEC
+      *
+                                  MOVE    1     TO    FLG-RYAKU
+                               END-IF
+      *
+                             END-IF
+                         END-PERFORM
+                       ELSE
+      *                  入院料加算の退避
+                         PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                    UNTIL     IDX1   >   31
+                             IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+                                    (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
+                             AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+                               COMPUTE LNK-SROUNYUIN-ZAITEN-ACCT(IDX1)
+                                    =  LNK-SROUNYUIN-ZAITEN-ACCT(IDX1)
+                                    + (ACCT-ZAITEN * ACCT-DAY(1 IDX1))
+      *
+                               IF   FLG-RYAKU   =   ZERO
+                                  PERFORM   210-SRYACT-HENSYU-SEC
+      *
+                                  MOVE    1     TO    FLG-RYAKU
+                               END-IF
+      *
+                             END-IF
+                         END-PERFORM
+                       END-IF
+                     END-IF
+                   END-IF
+                 END-IF
+                 MOVE     "tbl_sryacct"         TO    MCP-TABLE
+                 MOVE     "key22"               TO    MCP-PATHNAME
+                 PERFORM   910-SRYACCT-READ-SEC
+               END-PERFORM
+           END-IF
+      *    診療会計クローズ
+           MOVE     "tbl_sryacct"         TO    MCP-TABLE
+           MOVE     "key22"               TO    MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *
+      *    取得した労災入院情報から日単位の入院会計情報を再構築
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+                        UNTIL      IDX1   >   31
+               MOVE     ZERO                TO  WRK-MEISAISU
+      *        入院基本料
+               IF         WRK-NYUINKHN(IDX1)  NOT =        SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-NYUINKHN(IDX1) TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "1"           TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        外泊
+               IF        (WRK-NYUINKHN(IDX1)  NOT =        SPACE)
+               AND       (WRK-GAIHAKU(IDX1)   NOT =        SPACE)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-GAIHAKU(IDX1)  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "2"           TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        夜間緊急体制確保加算
+               IF         WRK-200804-KSN1(IDX1)   NOT =   ZERO
+                   ADD      1                 TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN1  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"            TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        医師配置適合加算
+               IF         WRK-200804-KSN2(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        看護配置加算１
+               IF         WRK-200804-KSN3(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN3     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        看護配置加算２
+               IF         WRK-200804-KSN4(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN4     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        夜間看護配置加算１
+               IF         WRK-200804-KSN5(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN5     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        夜間看護配置加算２
+               IF         WRK-200804-KSN6(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN6     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        重度認知症加算（特定機能病院精神病棟）
+               IF         WRK-200804-KSN7(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN7     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        褥瘡評価実施加算（療養病棟）
+               IF         WRK-200804-KSN8(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        褥瘡評価実施加算（有床診療所）
+               IF         WRK-200804-KSN9(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        重症患者回復病棟加算
+               IF         WRK-200804-KSN10(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN10    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
+               IF      (WRK-NYUINKHN(IDX1)   NOT =         SPACE)  AND
+                       (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
+                       (WRK-GENSAN-IRYO(IDX1)   NOT =      SPACE)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-GENSAN3       TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"          TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE     1               TO  WRK-GENSAN3-MIJISI
+               END-IF
+               IF      (WRK-NYUINKHN(IDX1)   NOT =         SPACE)  AND
+                       (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
+                       (WRK-GENSAN-JYOKU(IDX1)   NOT =     SPACE)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-GENSAN4       TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"          TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE     1               TO  WRK-GENSAN4-MIJISI
+               END-IF
+      *        労災乗数（特定入院料の場合は労災乗数なし）
+               IF       LNK-SROUNYUIN-SRYKBN(IDX1)    =    "90"
+                 IF     FLG-KENPOJYUNKYO  =  1
+                   CONTINUE
+                 ELSE
+                   EVALUATE  LNK-SROUNYUIN-JOUSU-KBN(IDX1)
+                       WHEN  "1"
+                           ADD      1           TO  WRK-MEISAISU
+                           MOVE   "101900010"   TO  LNK-SROUNYUIN-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                           MOVE    "4"      TO  LNK-SROUNYUIN-SRYCD-SK
+                                               (IDX1 WRK-MEISAISU)
+                       WHEN  "2"
+                           ADD      1           TO  WRK-MEISAISU
+                           MOVE   "101900020"   TO  LNK-SROUNYUIN-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                           MOVE    "4"      TO  LNK-SROUNYUIN-SRYCD-SK
+                                               (IDX1 WRK-MEISAISU)
+                   END-EVALUATE
+                 END-IF
+               END-IF
+      *        初期加算（長期減算）
+               IF      (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
+                       (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-SHOKIKSN(IDX1) TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "5"           TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        標欠
+               IF       WRK-HYOKETU(IDX1)    NOT =         SPACE
+                 IF     WRK-GAIHAKU(IDX1)        =         SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-HYOKETU(IDX1)  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "6"           TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 ELSE
+                   MOVE   SPACE             TO  WRK-HYOKETU(IDX1)
+                 END-IF
+               END-IF
+      *        入院料加算（入院会計）
+      *         PERFORM   VARYING   KSN-IDX   FROM  1  BY  1
+      *                   UNTIL    (WRK-NYUKSN(KSN-IDX)  =  SPACE)  OR
+      *                            (KSN-IDX             >  20)
+      *            IF    WRK-NYUKSN-DAY(KSN-IDX IDX1)  =  ZERO
+      *                CONTINUE
+      *            ELSE
+      *                ADD     1           TO  WRK-MEISAISU
+      *                MOVE WRK-NYUKSN(KSN-IDX)
+      *                                    TO  LNK-SROUNYUIN-SRYCD
+      *                                   (IDX1 WRK-MEISAISU)
+      *            END-IF
+      *         END-PERFORM
+           END-PERFORM
+      *
+      *    再構築した労災入院会計情報から点数の算定
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+                        UNTIL      IDX1   >   31
+      *
+               MOVE     ZERO       TO       WRK-HYOKETU-TEN
+                                            WRK-ZAITEN-HYOKETU
+               IF   WRK-HYOKETU(IDX1)   =   SPACE
+      *          点数マスタの読み込み
+                 PERFORM   VARYING   IDX2    FROM   1  BY   1
+                      UNTIL (LNK-SROUNYUIN-SRYCD(IDX1 IDX2) = SPACE)
+                         OR (IDX2    >      20)
+                     PERFORM    210-TENSU-KEISAN-SEC
+                 END-PERFORM
+               ELSE
+      *          点数マスタの読み込み
+                 INITIALIZE                          TNS-TENSU-REC
+                 MOVE    WRK-HYOKETU(IDX1)       TO  TNS-SRYCD
+                 MOVE    LNK-SROUNYUIN-HOSPNUM   TO  TNS-HOSPNUM
+                 MOVE    LNK-SROUNYUIN-SANTEIYM  TO  TNS-YUKOSTYMD(1:6)
+                 MOVE    "01"                    TO  TNS-YUKOSTYMD(7:2)
+                 MOVE    LNK-SROUNYUIN-SANTEIYM  TO  TNS-YUKOEDYMD(1:6)
+                 MOVE    "01"                    TO  TNS-YUKOEDYMD(7:2)
+                 PERFORM 910-TENSU-READ-SEC
+                 MOVE    TNS-TEN                 TO  WRK-HYOKETU-TEN
+      *
+                 PERFORM   VARYING   IDX2    FROM   1  BY   1
+                      UNTIL (LNK-SROUNYUIN-SRYCD(IDX1 IDX2) = SPACE)
+                         OR (IDX2    >      20)
+                     PERFORM    210-TENSU-KEISAN-HYOKETU-SEC
+                 END-PERFORM
+               END-IF
+      *
+               PERFORM   VARYING   KSN-IDX   FROM   1  BY   1
+                         UNTIL (WRK-NYUKSN(KSN-IDX)  =  SPACE)  OR
+                               (KSN-IDX    >      20)
+                  IF    WRK-NYUKSN-DAY(KSN-IDX IDX1)  =  ZERO
+                      CONTINUE
+                  ELSE
+                      ADD  WRK-NYUKSN-ZAITEN(KSN-IDX)
+                                 TO  LNK-SROUNYUIN-ZAITEN-NACCT(IDX1)
+                  END-IF
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+      *
+           .
+       210-ROUNYUIN-SET2-EXT.
            EXIT.
       *
       *****************************************************************
