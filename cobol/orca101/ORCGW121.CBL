@@ -700,6 +700,8 @@
                    WHEN    "1003"
                        PERFORM 490-EDYUKYMD-KOUSHIN-SEC
                    WHEN    "1004"
+                       MOVE    SPACE           TO  SPA-WID1-FLG
+                       MOVE    SPACE           TO  SPA-WIDCD      
                        MOVE    "JOIN"          TO  MCP-PUTTYPE
                        PERFORM 210-BACK-SYORI-SEC
                        GO  TO  330-WID1-SET-EXT
