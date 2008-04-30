@@ -144,6 +144,7 @@
       *                                     （リハ：専用コード追加）
       *                                     （在支病自動記載対応）
       *  04.02.03    NACL-門脇    08/04/03  ○○にて入院料算定済のフラグ編集修正
+      *  04.02.04    NACL-門脇    08/04/30  入院料に含める加算対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1563,9 +1564,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  OR ((ACCT-SRYCDTOTAL  =  190116990  OR  190813390) AND
                      (RECE82-SRYYM     <  "200604"                ))
                  OR ((ACCT-SRYCDTOTAL  =  190117070  OR  190109670) AND
-                     (RECE82-SRYYM     >= "200604"                ))
+                     (RECE82-SRYYM     >= "200604"                ) AND
+                     (RECE82-SRYYM     <= "200803"                ))
                  OR ((ACCT-SRYCDTOTAL  =  190121970  OR  190122670) AND
                      (RECE82-SRYYM     >= "200607"                ))
+                 OR ((ACCT-SRYCDTOTAL  =  190119210               ) AND
+                     (RECE82-SRYYM     >= "200804"                ))
                    CONTINUE
                  ELSE
       *
@@ -1838,11 +1842,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                     OR  "190109170"  OR  "190807570"
                                     OR  "190109270"  OR  "190808670" )
                OR ((SRY-SRYCD(1)  =  "190116990"  OR  "190813390") AND
-                   (RECE82-SRYYM     <  "200604"                ))
+                   (RECE82-SRYYM     <  "200604"                 ))
                OR ((SRY-SRYCD(1)  =  "190117070"  OR  "190109670") AND
-                   (RECE82-SRYYM     >= "200604"                ))
+                   (RECE82-SRYYM     >= "200604"                 ) AND
+                   (RECE82-SRYYM     <= "200803"                 ))
                OR ((SRY-SRYCD(1)  =  "190121970"  OR  "190122670") AND
-                   (RECE82-SRYYM     >= "200607"                ))
+                   (RECE82-SRYYM     >= "200607"                 ))
+               OR ((SRY-SRYCD(1)  =  "190119210"                 ) AND
+                   (RECE82-SRYYM     >= "200804"                 ))
                  MOVE   ZERO         TO   FLG-WRITE85
                ELSE
                  PERFORM  UNTIL  FLG-SRYACT    =    1
@@ -5013,9 +5020,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF     NACCT-ZAISKBKBN    =     "4"  OR  "6"  OR "7"
       *
-                   IF  (NACCT-ZAISKBKBN    =  "6"                  )
-                   AND (NACCT-SRYCDTOTAL   = 190117070 OR 190109670)
-                   AND (RECE82-SRYYM      >=  "200604"             )
+                   IF ((NACCT-ZAISKBKBN    =  "6"                  ) AND
+                       (NACCT-SRYCDTOTAL   = 190117070 OR 190109670) AND
+                       (RECE82-SRYYM      >=  "200604"             ))
+                   OR ((NACCT-ZAISKBKBN    =  "6"                  ) AND
+                       (NACCT-SRYCDTOTAL   = 190126670 OR 190126770
+                                          OR 190126570 OR 190126470
+                                          OR 190129870             ) AND
+                       (RECE82-SRYYM      >=  "200804"             ))
       *
                       CONTINUE
       *
