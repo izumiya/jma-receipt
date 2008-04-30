@@ -4581,6 +4581,8 @@
       *****************************************************************
        5022-KOURESRY-CHK-SEC                SECTION.
       *
+           MOVE    ZERO                TO  FLG-CHK
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX         >   SPA-MAX-LINE    )   OR
                               (SPA-ERRCD           NOT =   SPACE )  OR
@@ -4599,10 +4601,16 @@
       *                ºÍµª°¶≤√ªª§«£µ£µ£∞≈¿∞ ≤º§œ•®•È°º
                        IF      SPA-COM-INPUTCD  (IDX)(1:1) =   "1"
                            IF      SPA-COM-TEN (IDX)       <   550
-                               MOVE    "0241"          TO  SPA-ERRCD
-                               MOVE    "1"             TO  SPA-COM-CUR
+                               IF     (SPA-COM-DATAKBN(IDX)  =   "1" )
+                                   OR (FLG-CHK               =   ZERO)
+                                   MOVE    "0241"      TO  SPA-ERRCD
+                                   MOVE    "1"         TO  SPA-COM-CUR
                                                                 (IDX)
+                               END-IF
                            ELSE
+                               IF      SPA-COM-DATAKBN(IDX)  =   "1"
+                                   MOVE    1                 TO  FLG-CHK
+                               END-IF
       *                    £µ£µ£∞≈¿ ∞ æÂ§œ∑Ÿπ
                                IF     (SPA-COM-KZMFLG (IDX)
                                                        =   SPACE )
@@ -4613,6 +4621,10 @@
                                                                 (IDX)
                                END-IF
                            END-IF
+                       END-IF
+      *                ∫ﬁΩ™Œª
+                       IF      SPA-COM-ZAIEND (IDX)    =   "1"
+                           MOVE    ZERO               TO  FLG-CHK
                        END-IF
       *                ΩË√÷∞ÂŒ≈µ°¥Ô≤√ªª§œªªƒÍ≤ƒ«Ω
                        IF      (SPA-COM-CDKBN-KBN    (IDX) =   "J" )
