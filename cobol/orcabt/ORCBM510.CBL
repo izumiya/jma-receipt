@@ -955,12 +955,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    WRK-PATH        TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
-           IF      CNT-RECEDEN         =   ZERO
-               MOVE    "処理対象のデータがありませんでした"
-                                           TO  WRK-RECEERR
-               PERFORM 500-ERR-HENSYU-SEC
-           ELSE
-      *
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
