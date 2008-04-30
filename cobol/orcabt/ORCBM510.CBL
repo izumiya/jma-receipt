@@ -128,6 +128,9 @@
            03  WRK-MOJI                PIC X(100).
            03  WRK-KOHID               PIC 9(10).
            03  WRK-KOHNUM              PIC X(03).
+      *----(04.02.02)--ADD-START---
+           03  WRK-JKYSNUM             PIC X(20).
+      *----(04.02.02)--ADD-START---
       *
            03  WRK-SYMD                PIC 9(08).
            03  WRK-HENYMDG             PIC X(22).
@@ -637,29 +640,36 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE10-NUM          TO  HCM37-NUM
       *----(01.01.05)--ADD-END-----
       *
-      *----(04.02.02)--ADD-START---
+      *----(04.02.02)--UPD-START---
            IF      RECE10-SRYYM    <   CONST-H2004
                MOVE    "市町村番号："      TO  HCM37-RJNFTNJANAME
                MOVE    "老人受給者番号："  TO  HCM37-RJNJKYSNAME
-           END-IF
-      *----(04.02.02)--ADD-START---
-      *    老人保険
-           IF      RECE10-RJNHKNNUM    NOT =   SPACE
-               IF      RECE10-RJNHKNID     NOT =   ZERO
-                   MOVE    RECE10-RJNHKNID     TO  WRK-KOHID
-                   PERFORM 900-PTKOH-READ-KOH-SEC
-               ELSE
-                   MOVE    RECE10-RJNHKNNUM    TO  WRK-KOHNUM
-                   PERFORM 900-PTKOH-READ-SEC
+      *        老人保険
+               IF      RECE10-RJNHKNNUM    NOT =   SPACE
+                   MOVE    SPACE               TO  WRK-JKYSNUM
+                   IF      RECE10-RJNHKNID     NOT =   ZERO
+                       MOVE    RECE10-RJNHKNID     TO  WRK-KOHID
+                       PERFORM 900-PTKOH-READ-KOH-SEC
+                   ELSE
+                       MOVE    RECE10-RJNHKNNUM    TO  WRK-KOHNUM
+                       PERFORM 900-PTKOH-READ-SEC
+                   END-IF
+                   IF      FLG-PTKOH           =   ZERO
+                       MOVE    PTKOH-FTNJANUM      TO  HCM37-RJNFTNJANUM
+                       MOVE    PTKOH-JKYSNUM       TO  WRK-JKYSNUM
+                   END-IF
+                   IF      WRK-JKYSNUM(8:)     NOT =   SPACE
+                       MOVE    WRK-JKYSNUM         TO  HCM37-RJNJKYSNUM2
+                   ELSE
+                       MOVE    WRK-JKYSNUM(1:7)    TO  HCM37-RJNJKYSNUM
+                   END-IF
                END-IF
-               IF      FLG-PTKOH           =   ZERO
-                   MOVE    PTKOH-FTNJANUM      TO  HCM37-RJNFTNJANUM
-                   MOVE    PTKOH-JKYSNUM       TO  HCM37-RJNJKYSNUM
-               END-IF
            END-IF
+      *----(04.02.02)--UPD-START---
       *
       *----(01.01.02)--UPD-START---
       *----(01.01.06)--UPD-START---
+      *----(04.02.02)--UPD-START---
       *    保険公費
            PERFORM VARYING   IDX    FROM    1   BY   1
                    UNTIL    (IDX    >       4)
@@ -672,6 +682,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    PERFORM 900-PTKOH-READ-SEC
                END-IF
                IF      FLG-PTKOH           =   ZERO
+                   MOVE    SPACE               TO  WRK-JKYSNUM
       *        生保のとき月代わり受給者番号マスタより受給者番号をセット 
                    IF    ( PTKOH-KOHNUM    =   "012" )
       *----(04.02.01)--ADD-START---
@@ -689,8 +700,7 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  MONTHLYNUM-HOSPNUM
                        MOVE    MONTHLYNUM-REC  TO  MCPDATA-REC
                        PERFORM 910-MONTHLYNUM-READ-SEC
                        IF      FLG-MONTHLYNUM  =   ZERO
-                           MOVE    MONTHLYNUM-JKYSNUM
-                                                   TO  HCM37-KOHJKYSNUM
+                           MOVE    MONTHLYNUM-JKYSNUM  TO  WRK-JKYSNUM
                        ELSE
                            INITIALIZE                  MONTHLYNUM-REC
 grpsys                     MOVE    SPA-HOSPNUM     TO
@@ -706,19 +716,24 @@ grpsys                     MOVE    SPA-HOSPNUM     TO
                            PERFORM 910-MONTHLYNUM-READ-SEC
                            IF      FLG-MONTHLYNUM  =   ZERO
                                MOVE    MONTHLYNUM-JKYSNUM
-                                                   TO  HCM37-KOHJKYSNUM
+                                                       TO  WRK-JKYSNUM
                            ELSE
-                               MOVE    PTKOH-JKYSNUM
-                                                   TO  HCM37-KOHJKYSNUM
+                               MOVE    PTKOH-JKYSNUM   TO  WRK-JKYSNUM
                            END-IF
                        END-IF
                    ELSE
-                       MOVE    PTKOH-JKYSNUM   TO  HCM37-KOHJKYSNUM
-                   END-IF    
+                       MOVE    PTKOH-JKYSNUM   TO  WRK-JKYSNUM
+                   END-IF
+                   IF      WRK-JKYSNUM(8:)     NOT =   SPACE
+                       MOVE    WRK-JKYSNUM         TO  HCM37-KOHJKYSNUM2
+                   ELSE
+                       MOVE    WRK-JKYSNUM(1:7)    TO  HCM37-KOHJKYSNUM
+                   END-IF
                    MOVE    PTKOH-FTNJANUM  TO  HCM37-KOHFTNJANUM
                    MOVE    4               TO  IDX
                END-IF
            END-PERFORM
+      *----(04.02.02)--UPD-END-----
       *----(01.01.06)--UPD-END-----
       *----(01.01.02)--UPD-END-----
       *
@@ -873,8 +888,12 @@ grpsys                                     SPA-AREA
            IF          SPRT-RETURN         =   ZERO
                CONTINUE
            ELSE
-               MOVE    "*** ORCBM510 PRINT ERR ***" 
-                                           TO  WRK-RECEERR
+               MOVE    SPACE               TO  WRK-RECEERR
+               STRING "ファイル 書き込みエラー 患者番号="
+                                               DELIMITED  BY  SIZE
+                      RECE10-PTNUM             DELIMITED  BY  SIZE
+                                       INTO    WRK-RECEERR
+               END-STRING
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
            .
@@ -935,6 +954,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    WRK-TABLE       TO  MCP-TABLE
            MOVE    WRK-PATH        TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+           IF      CNT-RECEDEN         =   ZERO
+               MOVE    "処理対象のデータがありませんでした"
+                                           TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+           ELSE
       *
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
@@ -1000,7 +1025,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1001-HOSPNUM
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-1001-REC
            ELSE
-               MOVE    "*** ORCBM510 SYS1001 INVALID ***" 
+               MOVE    "医療機関情報（基本）が取得できません" 
                                            TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
            END-IF

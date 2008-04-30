@@ -27,3 +27,5 @@
                     PIC X(100)  OCCURS  32 TIMES.
             02  HCM37V01-KIGO   PIC X(40).
             02  HCM37V01-NUM    PIC X(40).
+            02  HCM37V01-RJNJKYSNUM2    PIC X(20).
+            02  HCM37V01-KOHJKYSNUM2    PIC X(20).
