@@ -705,12 +705,8 @@
                                    TO  SPA-GMN-UTAGAIKBNL (1)
                MOVE    CONST-UTAGAIKBNMEI1 (4)
                                    TO  SPA-GMN-UTAGAIKBNMEIL (1)
-               MOVE    CONST-UTAGAIKBNCD (5)
-                                   TO  SPA-GMN-UTAGAIKBNL (2)
-               MOVE    CONST-UTAGAIKBNMEI1 (5)
-                                   TO  SPA-GMN-UTAGAIKBNMEIL (2)
       *
-               MOVE    2           TO  SPA-GMN-UTAGAIKBN-MAX
+               MOVE    1           TO  SPA-GMN-UTAGAIKBN-MAX
            END-EVALUATE
       *
            . 
