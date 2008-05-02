@@ -5630,6 +5630,8 @@
                               (SPA-PIDCD   NOT =   SPACE )  OR
                               (SPA-ERRCD   NOT =   SPACE )
                    INITIALIZE                  SPA-GMN-HKN-AREA
+      *            被保険者名の自動変更はしない
+                   MOVE    1               TO  SPA-NAI-HIHKNFLG
                    IF      SPA-PTHKN-SAKJOKBN (IDX)    =   SPACE
                        IF      WRK-NAI-HKNSTR      =   ZERO
                            MOVE    IDX             TO  WRK-NAI-HKNSTR
