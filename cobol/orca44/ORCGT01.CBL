@@ -606,7 +606,7 @@ grpsys                                         SPA-AREA
            MOVE    "2"             TO  SPA-GMN-DATAKBNL        (2)
            MOVE    "ＭＯ"          TO  SPA-GMN-DATAKBNMEIL     (2)
            MOVE    "3"             TO  SPA-GMN-DATAKBNL        (3)
-           MOVE    "システム管理設定場所（フロッピー用）"
+           MOVE    "システム管理設定場所（フロッピィ用）"
                                    TO  SPA-GMN-DATAKBNMEIL     (3)
            MOVE    "4"             TO  SPA-GMN-DATAKBNL        (4)
            MOVE    "システム管理設定場所（ＭＯ用）"
@@ -4906,14 +4906,14 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    WRK-WRNO        TO  WRK-MSG1-WRNO
                    MOVE    SPA-T01-EDNO    TO  WRK-MSG1-EDNO
                    STRING   WRK-MSG1   DELIMITED  BY  SIZE
-                            "枚目のフロッピーの書き込みを行います。"
+                            "枚目のフロッピィの書き込みを行います。"
                                        DELIMITED  BY  SIZE
                             "媒体をドライブにセットして下さい"
                                        DELIMITED  BY  SIZE
                                        INTO  WRK-TIDMSG
                    END-STRING
                WHEN    "2007"
-                   STRING   "フロッピーへの書き込み処理が途中ですが"
+                   STRING   "フロッピィへの書き込み処理が途中ですが"
                                        DELIMITED  BY  SIZE
                             "終了してよろしいですか"
                                        DELIMITED  BY  SIZE
