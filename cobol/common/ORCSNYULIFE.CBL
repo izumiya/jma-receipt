@@ -41,6 +41,8 @@
       *                                       回復期リハビリテーション病棟入院料２
       *  04.02.00    NACL-小豆沢  08/04/11  後期高齢者の判定をサブルーチン使用
       *                                     に変更
+      *  04.02.00    NACL-小豆沢  08/05/02  特別入院基本料算定時にＡＤＬ入力から
+      *                                     医療度の高い患者を判定
       *****************************************************************
       *
       *
@@ -175,6 +177,9 @@
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
       *
+      *    医療区分取得サブ
+           COPY    "CPORCSS008.INC".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -273,6 +278,14 @@
       *****************************************************************
        200-MAIN-SEC            SECTION.
       *
+      *    医療区分取得サブの呼出し（特別入院基本料算定時の医療区分判定用）
+           INITIALIZE                      SS008-AREA
+           MOVE    LNK-NYULIFE-HOSPNUM     TO  SPA-HOSPNUM
+           MOVE    LNK-NYULIFE-PTID        TO  SPA-PTID
+           MOVE    LNK-NYULIFE-SANTEIYM    TO  SS008-SRYYM
+           CALL   "ORCSS008"       USING   SS008-AREA
+                                           SPA-AREA
+      *
       *    入院時生活療養費の該当日と軽減区分２（入院料判定）を取得
            MOVE    ZERO                    TO  FLG-OK
            INITIALIZE                          NYUINACCT-REC
@@ -333,6 +346,17 @@
                                                      CONS-ROUKAN1  OR
                                                      CONS-TANKI2   OR
                                                      CONS-TANKI3
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
+      *                        病状の程度、治療の内容をしん酌して標準
+      *                        負担額を軽減する患者の判定（特別入院基本料算定時の
+      *                                                    ＡＤＬ入力判断）
+                               IF (NSRY-SRYCD(1)  =  CONS-RYOYO2TOKU OR
+                                                     CONS-SRYOYO2TOKU)
+                                                 AND
+                                  (SS008-MEDKBNDAY(IDX1)  =  "2" OR
+                                                             "3" )
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE-FTNKBN2(IDX1)
                                END-IF
