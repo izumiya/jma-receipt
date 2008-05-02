@@ -40,6 +40,7 @@
       *  03.05.02    NACL-門脇    07/09/03  減額減免全国公費対応
       *  03.05.03    NACL-門脇    07/12/03  北海道特定疾患（道単独事業）対応
       *  04.02.01    NACL-門脇    08/04/01  平成２０年４月改正対応
+      *  04.02.02    NACL-門脇    08/05/01  後期高齢者月途中保険者変更対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -341,7 +342,11 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                  INITIALIZE     LNK-KOREIFTNCHK-OUT-AREA
                END-IF
              ELSE
+               IF   LNK-KOREIFTNCHK-HKNNUM  =  "039"
+                 CONTINUE
+               ELSE
                  INITIALIZE     LNK-KOREIFTNCHK-OUT-AREA
+               END-IF
              END-IF
            END-IF
       *

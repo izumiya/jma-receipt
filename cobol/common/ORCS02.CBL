@@ -211,6 +211,7 @@
       *  04.02.07    NACL-門脇    08/04/25  ７０歳代特例措置０５１食事計算
       *                                     （道単独事業５１）
       *  04.02.08    NACL-門脇    08/04/28  埼玉県川越市地方公費対応
+      *  04.02.09    NACL-門脇    08/05/01  後期高齢者月途中保険者変更対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9519,7 +9520,7 @@
       *
            IF     COMB-HKNNUM     = "039"
              IF   (SYU-SYUHKNNUM    =  "039"      )
-             AND  (WK-HKNJANUM2     =  WK-HKNJANUM)
+      ***    AND  (WK-HKNJANUM2     =  WK-HKNJANUM)
                IF  (SYU-KOH1HKNNUM     NOT = SPACE)
                OR  (SYU-KOH2HKNNUM     NOT = SPACE)
                OR  (SYU-KOH3HKNNUM     NOT = SPACE)

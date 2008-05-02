@@ -252,6 +252,7 @@
       *  04.02.08    NACL-門脇    08/04/08  北海道道老廃止
       *  04.02.09    NACL-門脇    08/04/24  埼玉県志木市地方公費対応
       *  04.02.10    NACL-門脇    08/04/28  埼玉県川越市地方公費対応
+      *  04.02.11    NACL-門脇    08/05/01  後期高齢者月途中保険者変更対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -10715,7 +10716,7 @@
       *
            IF     COMB-HKNNUM     = "039"
              IF   (SYU-SYUHKNNUM    =  "039"      )
-             AND  (WK-HKNJANUM2     =  WK-HKNJANUM)
+      ***    AND  (WK-HKNJANUM2     =  WK-HKNJANUM)
                IF  (SYU-KOH1HKNNUM     NOT = SPACE)
                OR  (SYU-KOH2HKNNUM     NOT = SPACE)
                OR  (SYU-KOH3HKNNUM     NOT = SPACE)

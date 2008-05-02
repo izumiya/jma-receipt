@@ -309,6 +309,7 @@
       *  04.02.11    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎãÂÐ¾Ý¼ÔÊÔ½¸
       *  04.02.12    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
+      *  04.02.13    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9327,8 +9328,10 @@
        21042-KOREISYA-CHECK-SEC               SECTION.
       *
            IF    RECE62-SRYYM       >=  "200804"
-             IF  ( RECE62-KOUREI       =   "1"  OR  "2" )
-             AND ( FLG-TAISYO          =    1           )
+             IF  ((RECE62-KOUREI       =   "1"         ) AND
+                  (RECE62-HKNNUM       =   "039"       ))
+             OR  ((RECE62-KOUREI       =   "1"  OR  "2") AND
+                  (FLG-TAISYO          =    1          ))
                 CONTINUE
              ELSE
                 GO   TO   21042-KOREISYA-CHECK-EXT

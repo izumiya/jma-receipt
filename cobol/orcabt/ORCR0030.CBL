@@ -347,6 +347,7 @@
       *  04.02.08    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎãÂÐ¾Ý¼ÔÊÔ½¸
       *  04.02.09    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
+      *  04.02.10    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2254,8 +2255,10 @@ grpsys         PERFORM 900-DBSELECT-SEC
        2102-KOREISYA-CHECK-SEC               SECTION.
       *
            IF    RECE02-SRYYM       >=  "200804"
-             IF  ( RECE02-ZAITAKU      =   "1"  OR  "2" )
-             AND ( FLG-TAISYO          =    1           )
+             IF  ((RECE02-ZAITAKU      =   "1"         ) AND
+                  (RECE02-HKNNUM       =   "039"       ))
+             OR  ((RECE02-ZAITAKU      =   "1"  OR  "2") AND
+                  (FLG-TAISYO          =    1          ))
                 CONTINUE
              ELSE
                 GO   TO   2102-KOREISYA-CHECK-EXT
