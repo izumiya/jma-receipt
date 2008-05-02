@@ -1108,15 +1108,15 @@
                    MOVE    WRK-HENKBN(IDX-KBN) TO  WRK-SURYO
       *            ¿ôÎÌ£ÚÊÔ½¸
                    PERFORM 250-ZHEN-SURYO-SET-SEC
-                   IF      WRK-HENSURYO(4:)    NOT =   SPACE
-                       MOVE    1               TO  FLG-KBN
+                   IF    ( PARA-TIMESURYO      NOT =   1 ) AND
+                         ( WRK-HENSURYO(2:1)   =   "." )
+                       COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
+                                               +   1
+                       MOVE    "1"         TO  WRK-YKJ-KBN(IDX-KBN)
+                       MOVE    "Êñ"        TO  WRK-TANINAME
                    ELSE
-                       IF    ( PARA-TIMESURYO      NOT =   1 ) AND
-                             ( WRK-HENSURYO(2:1)   =   "." )
-                           COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
-                                                   +   1
-                           MOVE    "1"         TO  WRK-YKJ-KBN(IDX-KBN)
-                           MOVE    "Êñ"        TO  WRK-TANINAME
+                       IF      WRK-HENSURYO(4:)    NOT =   SPACE
+                           MOVE    1               TO  FLG-KBN
                        ELSE
                            COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
                                                    +   WRK-SURYO
