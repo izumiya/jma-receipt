@@ -359,7 +359,7 @@
            MOVE    "F"             TO  SPA-GMN-OFFKBN
       *
            MOVE    "1"             TO  SPA-GMN-CDL(1)
-           MOVE    "¥Õ¥í¥Ã¥Ô¡¼"    TO  SPA-GMN-MEIL(1)
+           MOVE    "¥Õ¥í¥Ã¥Ô¥£"    TO  SPA-GMN-MEIL(1)
            MOVE    "2"             TO  SPA-GMN-CDL(2)
            MOVE    "£Ã£Ä¡Ý£Ò£Ï£Í"  TO  SPA-GMN-MEIL(2)
            MOVE    2               TO  SPA-GMN-OFFLIST-MAX
