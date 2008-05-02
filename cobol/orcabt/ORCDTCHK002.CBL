@@ -8184,6 +8184,8 @@
                    PERFORM VARYING IDX-DAY FROM    1   BY  1
                            UNTIL ( IDX-DAY >   31 )
                        IF    ( TSRYCD-DAY (IDX6 IDX-DAY)   >   ZERO )
+                        AND  ( TSRYCD-DAY-HKNFLG (IDX6 IDX-DAY)
+                                                           =   1 )
                            MOVE    1       TO  FLG-INGAI-DAY (IDX-DAY)
                        END-IF
                    END-PERFORM
@@ -8192,6 +8194,8 @@
                    PERFORM VARYING IDX-DAY FROM    1   BY  1
                            UNTIL ( IDX-DAY >   31 )
                        IF    ( TSRYCD-DAY (IDX6 IDX-DAY)   >   ZERO )
+                        AND  ( TSRYCD-DAY-HKNFLG (IDX6 IDX-DAY)
+                                                           =   1 )
                            MOVE    1       TO  FLG-INNAI-DAY (IDX-DAY)
                        END-IF
                    END-PERFORM
