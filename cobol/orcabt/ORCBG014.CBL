@@ -189,6 +189,9 @@ grpsys     03  FILLER              PIC X(04)   VALUE   ".csv".
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
            03  IDZ                     PIC 9(04).
+      *----(04.02.01)--ADD-START---
+           03  IDZZ                    PIC 9(04).
+      *----(04.02.01)--ADD-END-----
       *
       *PARAの説明---------------------------------------------------------------------
       *        DENPPRTYM   請求日付
@@ -409,6 +412,9 @@ grpsys     03  RECEERR                 PIC X(100).
       *
            COPY    "CPSHELLTBL.INC".
       *----(04.02.01)--ADD-START---
+      *    広域連合番号テーブル
+           COPY    "CMKOUIKITBL.INC".
+      *
        01  CONST-AREA.
          03  CONST-H2004           PIC X(06)   VALUE   "200804".
       *----(04.02.01)--ADD-END-----
@@ -1875,15 +1881,29 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
       *
       *        請求、未請求分
                IF     TOKEI-SKYKBN     =   "1"
-      *            帳票編集<見出し>処理
-                   PERFORM 310-HEAD-HEN-SEC
-      *            帳票編集<明細>処理
-                   PERFORM 320-BODY-HEN-SEC
-                       UNTIL ( FLG-TOKEI   =   1 )
-                       OR    ( TOKEI-SKYKBN    NOT =   WRK-SKYKBN )
-                       OR    ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
-                       OR    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM )
-                       OR    ( TOKEI-SYOKBN    NOT =   WRK-SYOKBN )
+      *            広域分は分ける
+                   IF      TOKEI-TEISYUTU  =   "6"
+      *                帳票編集<見出し>処理４
+                       PERFORM 310-HEAD-HEN4-SEC
+      *                帳票編集<明細>処理４
+                       PERFORM 320-BODY-HEN4-SEC
+                           UNTIL ( FLG-TOKEI   =   1 )
+                           OR    ( TOKEI-SKYKBN    NOT =  WRK-SKYKBN )
+                           OR    ( TOKEI-TEISYUTU  NOT =  WRK-TEISYUTU )
+                           OR    ( TOKEI-HKNJANUM(1:4)
+                                               NOT =  WRK-HKNJANUM(1:4))
+                           OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
+                   ELSE
+      *                帳票編集<見出し>処理
+                       PERFORM 310-HEAD-HEN-SEC
+      *                帳票編集<明細>処理
+                       PERFORM 320-BODY-HEN-SEC
+                           UNTIL ( FLG-TOKEI   =   1 )
+                           OR    ( TOKEI-SKYKBN    NOT =  WRK-SKYKBN )
+                           OR    ( TOKEI-TEISYUTU  NOT =  WRK-TEISYUTU )
+                           OR    ( TOKEI-HKNJANUM  NOT =  WRK-HKNJANUM )
+                           OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
+                   END-IF
                END-IF
       *
       *        請求しない分
@@ -1943,14 +1963,6 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
                WHEN    "3"     ALSO    "3"
                    MOVE    "（特別月遅れ分）"  TO  WRK-PRT1-BUNRUI
       *----(00.00.02)--ADD-END-----
-      *----(04.02.01)--ADD-START---
-               WHEN    "6"     ALSO    "1"
-                   MOVE    "（広域分）"        TO  WRK-PRT1-BUNRUI
-               WHEN    "6"     ALSO    "2"
-                   MOVE    "（広域返戻分）　"  TO  WRK-PRT1-BUNRUI
-               WHEN    "6"     ALSO    "3"
-                   MOVE    "（広域月遅れ分）"  TO  WRK-PRT1-BUNRUI
-      *----(04.02.01)--ADD-END-----
       *----(04.01.01)--ADD-START---
                WHEN    "9"     ALSO    "1"
                    MOVE    "（公害分）"        TO  WRK-PRT1-BUNRUI
@@ -1965,12 +1977,9 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
            MOVE    WRK-SYOKBN      TO  CSV-SYOKBN
       *
       *----(00.00.02)--UPD-START---
-      *    国保分、特別療養費分、後期連合の場合は保険者名セット
+      *    国保分、特別療養費分の場合は保険者名セット
            IF        ( WRK-TEISYUTU    =   "2" )
                OR    ( WRK-TEISYUTU    =   "3" )
-      *----(04.02.01)--ADD-START---
-               OR    ( WRK-TEISYUTU    =   "6" )
-      *----(04.02.01)--ADD-START---
                MOVE    SPACE           TO  HKNJAINF-REC
                INITIALIZE                  HKNJAINF-REC
 grpsys*DD      MOVE    WRK-PARA-HOSPID TO  HKNJA-HOSPID
@@ -2055,6 +2064,64 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
            EXIT.
       *
       *----(03.04.02)--ADD-END-----
+      *----(04.02.01)--ADD-START---
+      *****************************************************************
+      *    帳票編集<見出し>処理4
+      *****************************************************************
+       310-HEAD-HEN4-SEC            SECTION.
+      *
+      *    初期処理
+           PERFORM 310-HEAD-KEY-SET-SEC
+      *
+      *    分類セット
+           EVALUATE    WRK-TEISYUTU    ALSO    WRK-SYOKBN
+               WHEN    "6"     ALSO    "1"
+                   MOVE    "（広域分）"        TO  WRK-PRT1-BUNRUI
+               WHEN    "6"     ALSO    "2"
+                   MOVE    "（広域返戻分）　"  TO  WRK-PRT1-BUNRUI
+               WHEN    "6"     ALSO    "3"
+                   MOVE    "（広域月遅れ分）"  TO  WRK-PRT1-BUNRUI
+           END-EVALUATE
+      *
+           MOVE    WRK-TEISYUTU    TO  CSV-TEISYUTU
+           MOVE    WRK-SYOKBN      TO  CSV-SYOKBN
+      *
+      *    広域連合名セット
+           IF      WRK-HKNJANUM(1:4)   =   "0000"
+               MOVE    WRK-HKNJANUM    TO  WRK-PRT2-HKNJANUM
+               MOVE    SPACE           TO  WRK-PRT2-FILLER
+               MOVE     "保険者番号入力なし"
+                                       TO  WRK-PRT2-HKNJANAME
+           ELSE
+               MOVE    WRK-HKNJANUM(1:4)   TO  WRK-PRT2-HKNJANUM
+               MOVE    SPACE               TO  WRK-PRT2-FILLER
+               PERFORM VARYING IDZZ    FROM    1   BY  1
+                       UNTIL   IDZZ    >       CONST-KOUIKI-MAX
+                   IF      WRK-HKNJANUM(1:4)   =
+                                           CONST-KOUIKI-NUM (IDZZ) (1:4)
+                       MOVE    CONST-KOUIKI-NAME (IDZZ)
+                                                TO  WRK-PRT2-HKNJANAME
+                       MOVE    CONST-KOUIKI-MAX     TO  IDZZ
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    医療機関名セット
+           PERFORM 310-HEAD-SYSKANRI-HEN-SEC
+      *
+      *    帳票クリア
+           PERFORM 310-HEAD-SET-SEC
+      *
+           IF      WRK-HKNJANUM    NOT =   "00000000"
+               MOVE    4               TO  CNT-LINE
+      *        保険者名セット
+               PERFORM 3201-HKNJANUM-BODY-HEN-SEC
+           END-IF
+      *
+           .
+       310-HEAD-HEN4-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    帳票編集<見出し>初期処理
       *****************************************************************
@@ -2204,6 +2271,29 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
            EXIT.
       *
       *----(03.04.02)--ADD-END-----
+      *----(04.02.01)--ADD-START---
+      *****************************************************************
+      *    帳票編集<明細行>処理
+      *****************************************************************
+       320-BODY-HEN4-SEC           SECTION.
+      *
+      *    グループ見出しセット
+           PERFORM 3201-BODY-HEN-STR4-SEC
+      *
+      *    患者情報
+           PERFORM 3202-BODY-SUB-HEN-SEC
+      *
+      *    区分合計
+           PERFORM 3202-KBN-BODY-END-SEC
+      *
+      *    グループ合計セット
+           PERFORM 3203-BODY-HEN-END4-SEC
+      *
+           .
+       320-BODY-HEN4-EXT.
+           EXIT.
+      *
+      *----(04.02.01)--ADD-END-----
       *****************************************************************
       *    帳票編集<明細行>セット処理
       *****************************************************************
@@ -2345,6 +2435,54 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
        3201-BODY-HEN-STR3-EXT.
            EXIT.
       *
+      *----(04.02.01)--ADD-START---
+      *****************************************************************
+      *    帳票編集<明細行>見出し処理
+      *****************************************************************
+       3201-BODY-HEN-STR4-SEC       SECTION.
+      *
+      *    保険者見出し
+           IF      TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM
+               PERFORM 3201-HKNJANUM-BODY-HEN-SEC
+           END-IF
+      *
+      *    入外区分見出し
+           IF      TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN
+               PERFORM 3201-NYUGAIKBN-BODY-HEN-SEC
+           END-IF
+      *
+      *    在総診区分見出し
+           IF      TOKEI-ZAIKBN    NOT =   WRK-ZAIKBN
+               PERFORM 3201-ZAIKBN-BODY-HEN-SEC
+           END-IF
+      *
+      *    診療月見出し
+           IF      TOKEI-SRYYMFLG  NOT =   WRK-SRYYMFLG
+               PERFORM 3201-SRYYM-BODY-HEN-SEC
+           END-IF
+      *
+      *    保険区分見出し
+           IF      TOKEI-HKNKBN    NOT =   WRK-HKNKBN
+               MOVE    TOKEI-HKNKBN    TO  WRK-HKNKBN
+               MOVE    SPACE           TO  WRK-SYUBETUKBN
+               MOVE    SPACE           TO  WRK-KBN
+           END-IF
+      *
+      *    種別区分見出し
+           IF      TOKEI-SYUBETUKBN    NOT =   WRK-SYUBETUKBN
+               PERFORM 3201-SYUBETU-BODY-HEN-SEC
+           END-IF
+      *
+      *    詳細区分見出し
+           IF      TOKEI-KBN           NOT =   WRK-KBN
+               PERFORM 3201-KBN-BODY-HEN-SEC
+           END-IF
+      *
+           .
+       3201-BODY-HEN-STR4-EXT.
+           EXIT.
+      *
+      *----(04.02.01)--ADD-END-----
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
@@ -2444,6 +2582,46 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
        3201-TEISYUTU-BODY-HEN-EXT.
            EXIT.
       *
+      *----(04.02.01)--ADD-START---
+      *****************************************************************
+      *    帳票編集<明細行>処理
+      *****************************************************************
+       3201-HKNJANUM-BODY-HEN-SEC SECTION.
+      *
+           MOVE    SPACE           TO  WRK-PRT-LINE
+      *
+           MOVE    SPACE           TO  HKNJAINF-REC
+           INITIALIZE                  HKNJAINF-REC
+grpsys*DD  MOVE    WRK-PARA-HOSPID TO  HKNJA-HOSPID
+grpsys     MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
+           MOVE    TOKEI-HKNJANUM  TO  HKNJA-HKNJANUM
+           MOVE    HKNJAINF-REC    TO  MCPDATA-REC
+           PERFORM 900-HKNJAINF-READ-SEC
+           IF      FLG-HKNJAINF        =   ZERO
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "2"             TO  KANACHK-SYORI
+               MOVE    HKNJA-HKNJANAME TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+               IF      KANACHK-RC      =   0
+                   MOVE    KANACHK-OUT-INPUT(1:40)
+                                           TO  WRK-PRT-LINE(11:40)
+                                               CSV-HKNJANAME
+               END-IF
+           END-IF
+           MOVE    TOKEI-HKNJANUM  TO  WRK-PRT-LINE(1:8)
+                                       CSV-HKNJANUM
+      *
+      *    見出し行セット
+           PERFORM 320-BODY-SET-SEC
+      *
+           MOVE    TOKEI-HKNJANUM  TO  WRK-HKNJANUM
+           MOVE    SPACE           TO  WRK-NYUGAIKBN
+           .
+      *
+       3201-HKNJANUM-BODY-HEN-EXT.
+           EXIT.
+      *
+      *----(04.02.01)--ADD-END-----
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
@@ -3180,7 +3358,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
       *****************************************************************
        3202-KBN-BODY-END-SEC       SECTION.
       *
-      *     MOVE    SPACE               TO  WRK-PRT-LINE-AREA
+           MOVE    SPACE               TO  WRK-PRT-LINE-AREA
       *
            MOVE    SUM-GOK-KENSU(1)    TO  WRK-PRT-KENSU
            MOVE    SUM-GOK-NISSU(1)    TO  WRK-PRT-NISSU
@@ -3374,6 +3552,38 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
            EXIT.
       *
       *----(03.04.02)--ADD-END-----
+      *----(04.02.01)--ADD-START---
+      *****************************************************************
+      *    帳票編集<明細行>処理
+      *****************************************************************
+       3203-BODY-HEN-END4-SEC      SECTION.
+      *
+      *    レセプト合計、在総診合計
+           IF        ( TOKEI-SKYKBN    NOT =   WRK-SKYKBN )
+               OR    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM)
+               OR    ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
+               OR    ( TOKEI-SYOKBN    NOT =   WRK-SYOKBN )
+               OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
+               OR    ( TOKEI-ZAIKBN    NOT =   WRK-ZAIKBN )
+               OR    ( FLG-TOKEI       =   1 )
+               PERFORM 3203-ZAIKBN-BODY-END-SEC
+               IF        ( TOKEI-SKYKBN    NOT =   WRK-SKYKBN )
+                   OR    ( TOKEI-HKNJANUM(1:4) NOT =
+                                                   WRK-HKNJANUM(1:4) )
+                   OR    ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
+                   OR    ( TOKEI-SYOKBN    NOT =   WRK-SYOKBN )
+                   OR    ( FLG-TOKEI       =   1 )
+                   OR    ( CNT-LINE        >=  55 )
+                   PERFORM 390-PRINT-OUT-SEC
+                   PERFORM 310-HEAD-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       3203-BODY-HEN-END4-EXT.
+           EXIT.
+      *
+      *----(04.02.01)--ADD-END-----
       *****************************************************************
       *    帳票編集<明細行>処理    保険区分合計行セット
       *****************************************************************
