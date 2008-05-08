@@ -2115,12 +2115,13 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                MOVE     "保険者番号入力なし"
                                        TO  WRK-PRT2-HKNJANAME
            ELSE
-               MOVE    WRK-HKNJANUM(1:4)   TO  WRK-PRT2-HKNJANUM
                MOVE    SPACE               TO  WRK-PRT2-FILLER
                PERFORM VARYING IDZZ    FROM    1   BY  1
                        UNTIL   IDZZ    >       CONST-KOUIKI-MAX
                    IF      WRK-HKNJANUM(1:4)   =
                                            CONST-KOUIKI-NUM (IDZZ) (1:4)
+                       MOVE    CONST-KOUIKI-NUM (IDZZ)
+                                                TO  WRK-PRT2-HKNJANUM
                        MOVE    CONST-KOUIKI-NAME (IDZZ)
                                                 TO  WRK-PRT2-HKNJANAME
                        MOVE    CONST-KOUIKI-MAX     TO  IDZZ
