@@ -98,6 +98,7 @@
       *  04.01.06    NACL-ÌçÏÆ    08/02/04  É¸·ç³°Çñ·×»»½¤Àµ
       *  04.02.01    NACL-ÌçÏÆ    08/02/29  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *  04.02.02    NACL-ÌçÏÆ    08/04/28  ºë¶Ì¸©Àî±Û»ÔÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.03    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3813,6 +3814,7 @@ grpsys                                        SPA-AREA
                            EVALUATE  SRY-SRYSYUKBN
                                WHEN  "330"
                                WHEN  "331"
+                               WHEN  "332"
                                   COMPUTE SYU-HKNTEN (05) = 
                                           SYU-HKNTEN (05) + 
                                          (ACCT-SYUTEN1 * SINRYO-COUNT)

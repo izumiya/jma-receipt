@@ -32,6 +32,7 @@
       *                                     ¡Ê½é¿Ç¡ÊÌë´Ö¡¦ÁáÄ«Åù¡Ë²Ã»»ÄÉ²Ã¡Ë
       *                                     ¡ÊÅÀÅ©ÊÔ½¸½¤Àµ¡Ë
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
+      *  04.02.02    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2803,22 +2804,22 @@
                IF      RECE220-SRYKBN      =  "33"
       *
                 IF     RECE200-SRYYM      >=  "200804"
-                  IF  (WRK-SRYSYUKBN      =  "330")
+                  IF  (WRK-SRYSYUKBN      =  "330" OR "332"            )
                   AND (TBL-ZAI-SRYCD(1)   =  "130003710" OR "130003810")
                           MOVE   1              TO  RECE240-TENTEKIKBN
                   END-IF
-                  IF  (WRK-SRYSYUKBN      =  "330")
+                  IF  (WRK-SRYSYUKBN      =  "330" OR "332"            )
                   AND (TBL-ZAI-SRYCD(1)   =  "130000110" OR "130000210"
                                           OR "130000310" OR "130010570"
                                           OR "130010670" OR "130011570")
-                  AND (RECE240-TENTEKIKBN  =  ZERO )
+                  AND (RECE240-TENTEKIKBN  =  ZERO                     )
                           MOVE   2              TO  RECE240-TENTEKIKBN
                   END-IF
-                  IF  (WRK-SRYSYUKBN      =  "330")
-                  AND (RECE220-ZAITEN  NOT =  ZERO )
-                  AND (RECE220-YKZTEN      =  ZERO )
-                  AND (RECE220-KIZAITEN    =  ZERO )
-                  AND (RECE240-TENTEKIKBN  =  ZERO )
+                  IF  (WRK-SRYSYUKBN       =  "330" OR "332")
+                  AND (RECE220-ZAITEN  NOT =  ZERO          )
+                  AND (RECE220-YKZTEN      =  ZERO          )
+                  AND (RECE220-KIZAITEN    =  ZERO          )
+                  AND (RECE240-TENTEKIKBN  =  ZERO          )
                           MOVE   3              TO  RECE240-TENTEKIKBN
                   END-IF
       *
@@ -2840,14 +2841,14 @@
                           MOVE   5              TO  RECE240-TENTEKIKBN
                   END-IF
                 ELSE
-                  IF  (WRK-SRYSYUKBN      =  "330")
+                  IF  (WRK-SRYSYUKBN      =  "330" OR "332"            )
                   AND (TBL-ZAI-SRYCD(1)   =  "130003710" OR "130003810"
                                           OR "130700310" OR "130700410"
                                           OR "130702910" OR "130701010"
-                                          OR "130702810")
+                                          OR "130702810"               )
                           MOVE   1              TO  RECE240-TENTEKIKBN
                   END-IF
-                  IF  (WRK-SRYSYUKBN      =  "330")
+                  IF  (WRK-SRYSYUKBN      =  "330" OR "332"            )
                   AND (TBL-ZAI-SRYCD(1)   =  "130000110" OR "130000210"
                                           OR "130000310" OR "130008270"
                                           OR "130701270" OR "130004570"
@@ -2855,14 +2856,14 @@
                                           OR "130010570" OR "130702670"
                                           OR "130010670" OR "130702770"
                                           OR "130011070"               )
-                  AND (RECE240-TENTEKIKBN  =  ZERO )
+                  AND (RECE240-TENTEKIKBN  =  ZERO                     )
                           MOVE   2              TO  RECE240-TENTEKIKBN
                   END-IF
-                  IF  (WRK-SRYSYUKBN      =  "330")
-                  AND (RECE220-ZAITEN  NOT =  ZERO )
-                  AND (RECE220-YKZTEN      =  ZERO )
-                  AND (RECE220-KIZAITEN    =  ZERO )
-                  AND (RECE240-TENTEKIKBN  =  ZERO )
+                  IF  (WRK-SRYSYUKBN       =  "330" OR "332")
+                  AND (RECE220-ZAITEN  NOT =  ZERO          )
+                  AND (RECE220-YKZTEN      =  ZERO          )
+                  AND (RECE220-KIZAITEN    =  ZERO          )
+                  AND (RECE240-TENTEKIKBN  =  ZERO          )
                           MOVE   3              TO  RECE240-TENTEKIKBN
                   END-IF
       *

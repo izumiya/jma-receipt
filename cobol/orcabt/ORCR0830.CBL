@@ -54,6 +54,7 @@
       *  04.01.02    NACL-ÌçÏÆ    07/12/19  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *  04.02.01    NACL-ÌçÏÆ    08/03/24  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡ÊºÆ½¢Ï«¡§±ßÊÑ¹¹ÂÐ±þ¡Ë
+      *  04.02.02    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1712,6 +1713,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          EVALUATE  SRY-SRYSYUKBN
                             WHEN  "330"
                             WHEN  "331"
+                            WHEN  "332"
                               COMPUTE  TBL-SYUTEN-JI(IDY)  =
                                        TBL-SYUTEN-JI(IDY)  +
                                       (WRK-ZAIKAISU-JI * ACCT-SYUTEN1)
@@ -1925,6 +1927,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 EVALUATE  SRY-SRYSYUKBN
                     WHEN  "330"
                     WHEN  "331"
+                    WHEN  "332"
                        COMPUTE WRK-TENTEK-SYUTEN = WRK-TENTEK-SYUTEN +
                                (ACCT-SYUTEN1 * ACCT-ZAIKAISU)
                     WHEN  "340"

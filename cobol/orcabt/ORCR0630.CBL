@@ -76,6 +76,7 @@
       *  03.05.03    NACL-門脇    07/07/17  個別時のシステム管理編集修正
       *  04.01.01    NACL-門脇    07/12/19  入院料未算定日対応
       *  04.01.02    NACL-門脇    08/02/04  標欠外泊計算修正
+      *  04.02.01    NACL-門脇    08/05/08  点滴３３２の手技料編集
       *****************************************************************
       *
       *
@@ -3327,6 +3328,7 @@
                 EVALUATE  SRY-SRYSYUKBN
                     WHEN  "330"
                     WHEN  "331"
+                    WHEN  "332"
                        COMPUTE WRK-TENTEK-SYUTEN = WRK-TENTEK-SYUTEN +
                                (ACCT-SYUTEN1 * ACCT-ZAIKAISU)
                     WHEN  "340"
