@@ -227,6 +227,7 @@
       *  04.01.04    NACL-藤原    08/02/13  診療科チェックの修正
       *
       *  04.02.01    NACL-藤原    08/03/03  特定疾患区分07,08の追加
+      *  04.02.02    NACL-藤原    08/05/07  更新時の診療科未入力エラー
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5867,7 +5868,7 @@ grpsys                                       SPA-AREA
            MOVE    C02-BSRYKA          TO  SPA-GMN-C02-BSRYKA-G
       *
            IF      SPA-GMN-C02-BSRYKA  =   SPACE
-               IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+               IF      SPA-GMN-C02-SRYKA   NOT =   ZERO    AND SPACE
                    MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
                ELSE
                    MOVE    "0030"              TO  SPA-ERRCD
@@ -8942,7 +8943,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                    MOVE    "基本病名が入力してありません"
                                                        TO  SPA-ERRMSG
                WHEN    "0030"
-                   MOVE    "診療科目入力エラー"
+                   MOVE    "診療科入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0031"
                    MOVE    "該当の患者が存在しません"
