@@ -76,7 +76,8 @@
       *                                     （診療区分６４：病理診断対応）
       *                                     （在支病自動記載対応）
       *  04.02.02    NACL-門脇    08/04/03  ○○にて入院料算定済編集修正
-      *  04.02.02    NACL-小豆沢  08/04/08  医療区分コメント改定対応
+      *  04.02.03    NACL-小豆沢  08/04/08  医療区分コメント改定対応
+      *  04.02.04    NACL-門脇    08/05/07  退院時服薬指導加算算定日記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -306,6 +307,8 @@
            03  IDX13               PIC 9(04).
            03  IDX15               PIC 9(01).
            03  IDX16               PIC 9(02).
+           03  IDX17               PIC 9(02).
+           03  IDX18               PIC 9(02).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  DAY-IDX             PIC 9(04).
@@ -3194,16 +3197,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                MOVE    "810000001"          TO  RECE859-SRYCD(2)
                MOVE    ZERO                 TO  RECE859-SRYSURYO(2)
                PERFORM  200111-SANTEI-DAY-SEC
-               MOVE     TB-SANTEI-DAY(1)    TO  DAY-IDX
-               IF       DAY-IDX  <  10
-                 MOVE    5                  TO  RECE859-YUKOKETA(2)
-                 MOVE    "算定　　日"       TO  RECE859-NAME(2)
-                 MOVE   TBL-DAY(DAY-IDX)    TO  RECE859-NAME(2)(5:4)
-               ELSE
-                 MOVE    6                  TO  RECE859-YUKOKETA(2)
-                 MOVE    "算定　　　日"     TO  RECE859-NAME(2)
-                 MOVE   TBL-DAY(DAY-IDX)    TO  RECE859-NAME(2)(7:4)
-               END-IF
+               PERFORM  200111-TAIIN-COMMENT-HENSYU-SEC
                MOVE     "1"                 TO  RECE859-SIKFLG(2)
              WHEN       2
                MOVE    RECE85-SRYACT-TBL(1) TO  RECE859-SRYACT-TBL(1)
@@ -3215,16 +3209,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                MOVE    "810000001"          TO  RECE859-SRYCD(2)
                MOVE    ZERO                 TO  RECE859-SRYSURYO(2)
                PERFORM  200111-SANTEI-DAY-SEC
-               MOVE     TB-SANTEI-DAY(1)    TO  DAY-IDX
-               IF       DAY-IDX  <  10
-                 MOVE    5                  TO  RECE859-YUKOKETA(2)
-                 MOVE    "算定　　日"       TO  RECE859-NAME(2)
-                 MOVE   TBL-DAY(DAY-IDX)    TO  RECE859-NAME(2)(5:4)
-               ELSE
-                 MOVE    6                  TO  RECE859-YUKOKETA(2)
-                 MOVE    "算定　　　日"     TO  RECE859-NAME(2)
-                 MOVE   TBL-DAY(DAY-IDX)    TO  RECE859-NAME(2)(7:4)
-               END-IF
+               PERFORM  200111-TAIIN-COMMENT-HENSYU-SEC
                MOVE     "1"                 TO  RECE859-SIKFLG(2)
       *
                MOVE    SPACE                TO  RECE859-SRYACT-TBL(3)
@@ -3246,6 +3231,100 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        20011-TAIIN-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    算定日編集
+      *****************************************************************
+       200111-TAIIN-COMMENT-HENSYU-SEC          SECTION.
+      *
+           MOVE     TB-SANTEI-DAY(1)    TO  DAY-IDX
+           IF       DAY-IDX  <  10
+             MOVE    5                  TO  RECE859-YUKOKETA(2)
+             MOVE    "算定　　日"       TO  RECE859-NAME(2)(1:10)
+             MOVE   TBL-DAY(DAY-IDX)    TO  RECE859-NAME(2)(5:4)
+             MOVE   11                  TO  IDX17
+           ELSE
+             MOVE    6                  TO  RECE859-YUKOKETA(2)
+             MOVE    "算定　　　日"     TO  RECE859-NAME(2)(1:12)
+             MOVE   TBL-DAY(DAY-IDX)    TO  RECE859-NAME(2)(7:4)
+             MOVE   13                  TO  IDX17
+           END-IF
+           IF       TB-SANTEI-DAY(2)  NOT = ZERO
+             MOVE   TB-SANTEI-DAY(2)    TO  DAY-IDX
+             IF       DAY-IDX  <  10
+               ADD   3              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　日"       TO  RECE859-NAME(2)(IDX17:6)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)(3:2)
+                                    TO  RECE859-NAME(2)(IDX18:2)
+               COMPUTE  IDX17 = IDX17 + 6
+             ELSE
+               ADD   4              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　　日"     TO  RECE859-NAME(2)(IDX17:8)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)
+                                    TO  RECE859-NAME(2)(IDX18:4)
+               COMPUTE  IDX17 = IDX17 + 8
+             END-IF
+           END-IF
+           IF       TB-SANTEI-DAY(3)  NOT = ZERO
+             MOVE   TB-SANTEI-DAY(3)    TO  DAY-IDX
+             IF       DAY-IDX  <  10
+               ADD   3              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　日"       TO  RECE859-NAME(2)(IDX17:6)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)(3:2)
+                                    TO  RECE859-NAME(2)(IDX18:2)
+               COMPUTE  IDX17 = IDX17 + 6
+             ELSE
+               ADD   4              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　　日"     TO  RECE859-NAME(2)(IDX17:8)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)
+                                    TO  RECE859-NAME(2)(IDX18:4)
+               COMPUTE  IDX17 = IDX17 + 8
+             END-IF
+           END-IF
+           IF       TB-SANTEI-DAY(4)  NOT = ZERO
+             MOVE   TB-SANTEI-DAY(4)    TO  DAY-IDX
+             IF       DAY-IDX  <  10
+               ADD   3              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　日"       TO  RECE859-NAME(2)(IDX17:6)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)(3:2)
+                                    TO  RECE859-NAME(2)(IDX18:2)
+               COMPUTE  IDX17 = IDX17 + 6
+             ELSE
+               ADD   4              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　　日"     TO  RECE859-NAME(2)(IDX17:8)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)
+                                    TO  RECE859-NAME(2)(IDX18:4)
+               COMPUTE  IDX17 = IDX17 + 8
+             END-IF
+           END-IF
+           IF       TB-SANTEI-DAY(5)  NOT = ZERO
+             MOVE   TB-SANTEI-DAY(5)    TO  DAY-IDX
+             IF       DAY-IDX  <  10
+               ADD   3              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　日"       TO  RECE859-NAME(2)(IDX17:6)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)(3:2)
+                                    TO  RECE859-NAME(2)(IDX18:2)
+               COMPUTE  IDX17 = IDX17 + 6
+             ELSE
+               ADD   4              TO  RECE859-YUKOKETA(2)
+               MOVE  "、　　日"     TO  RECE859-NAME(2)(IDX17:8)
+               COMPUTE  IDX18 = IDX17 + 2
+               MOVE TBL-DAY(DAY-IDX)
+                                    TO  RECE859-NAME(2)(IDX18:4)
+               COMPUTE  IDX17 = IDX17 + 8
+             END-IF
+           END-IF
+      *
+           .
+       200111-TAIIN-COMMENT-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
