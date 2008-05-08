@@ -69,6 +69,9 @@ grpsys     SELECT  RECECSV-FILE    ASSIGN  RECECSV
       *        TEISYUTU    提出先区分  1:社保、2:国保、3:特別療養費、4:未請求設定、5:未請求解除、9:公害
       *        HKNJANUM    保険者番号  国保の時だけ使用、社保＆請求しない場合はオールゼロ
       *        SYOKBN      処理区分    1:通常分、2:返戻分、3:月遅れ分
+      *----(04.02.01)--ADD-START---
+      *        HKNJANUM2   保険者番号  広域の時だけ使用、それ以外はオールゼロ
+      *----(04.02.01)--ADD-END-----
       *        NYUGAIKBN   入外区分    1:外来分、2:入院分
       *        ZAIKBN      在総診区分  1:その他のレセ、2:在総診または在医総を算定したレセ
       *        SRYYMFLG    診療月フラグ
@@ -92,6 +95,7 @@ grpsys     SELECT  RECECSV-FILE    ASSIGN  RECECSV
       *        TEISYUTU    提出先区分  1:社保、2:国保、3:特別療養費、4:未請求設定、5:未請求解除、6:広域連合、9:公害
       *        HKNJANUM    保険者番号  国保と広域連合の時だけ使用、社保＆請求しない場合はオールゼロ
       *        SYOKBN      処理区分    1:通常分、2:返戻分、3:月遅れ分
+      *        HKNJANUM2   保険者番号  広域の時だけ使用、それ以外はオールゼロ
       *        NYUGAIKBN   入外区分    1:外来分、2:入院分
       *        ZAIKBN      在総診区分  1:その他のレセ、2:在総診または在医総を算定したレセ
       *        SRYYMFLG    診療月フラグ
@@ -118,6 +122,9 @@ grpsys     SELECT  RECECSV-FILE    ASSIGN  RECECSV
                05  TOKEI-TEISYUTU      PIC X(01).
                05  TOKEI-HKNJANUM      PIC X(08).
                05  TOKEI-SYOKBN        PIC X(01).
+      *----(04.02.01)--ADD-START---
+               05  TOKEI-HKNJANUM2     PIC X(08).
+      *----(04.02.01)--ADD-END-----
                05  TOKEI-NYUGAIKBN     PIC X(01).
                05  TOKEI-ZAIKBN        PIC X(01).
                05  TOKEI-SRYYMFLG      PIC 9(03).
@@ -272,6 +279,9 @@ grpsys     03  RECEERR                 PIC X(100).
                05  WRK-TEISYUTU        PIC X(01).
                05  WRK-HKNJANUM        PIC X(08).
                05  WRK-SYOKBN          PIC X(01).
+      *----(04.02.01)--ADD-START---
+               05  WRK-HKNJANUM2       PIC X(08).
+      *----(04.02.01)--ADD-END-----
                05  WRK-NYUGAIKBN       PIC X(01).
                05  WRK-ZAIKBN          PIC X(01).
                05  WRK-SRYYMFLG        PIC 9(03).
@@ -809,6 +819,9 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
                MOVE    WRK-TEISYUTU    TO  TOKEI-TEISYUTU
                MOVE    WRK-HKNJANUM    TO  TOKEI-HKNJANUM
                MOVE    WRK-SYOKBN      TO  TOKEI-SYOKBN
+      *----(04.02.01)--ADD-START---
+               MOVE    WRK-HKNJANUM2   TO  TOKEI-HKNJANUM2
+      *----(04.02.01)--ADD-END-----
                MOVE    WRK-SRYYMFLG    TO  TOKEI-SRYYMFLG
                MOVE    WRK-NYUGAIKBN   TO  TOKEI-NYUGAIKBN
                MOVE    WRK-ZAIKBN      TO  TOKEI-ZAIKBN
@@ -1804,6 +1817,9 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
                MOVE    WRK-TEISYUTU    TO  TOKEI-TEISYUTU
                MOVE    WRK-HKNJANUM    TO  TOKEI-HKNJANUM
                MOVE    WRK-SYOKBN      TO  TOKEI-SYOKBN
+      *----(04.02.01)--ADD-START---
+               MOVE    WRK-HKNJANUM2   TO  TOKEI-HKNJANUM2
+      *----(04.02.01)--ADD-END-----
                MOVE    WRK-SRYYMFLG    TO  TOKEI-SRYYMFLG
                MOVE    WRK-NYUGAIKBN   TO  TOKEI-NYUGAIKBN
                MOVE    WRK-ZAIKBN      TO  TOKEI-ZAIKBN
@@ -1890,8 +1906,7 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
                            UNTIL ( FLG-TOKEI   =   1 )
                            OR    ( TOKEI-SKYKBN    NOT =  WRK-SKYKBN )
                            OR    ( TOKEI-TEISYUTU  NOT =  WRK-TEISYUTU )
-                           OR    ( TOKEI-HKNJANUM(1:4)
-                                               NOT =  WRK-HKNJANUM(1:4))
+                           OR    ( TOKEI-HKNJANUM  NOT =  WRK-HKNJANUM )
                            OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
                    ELSE
       *                帳票編集<見出し>処理
@@ -1980,6 +1995,12 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
       *    国保分、特別療養費分の場合は保険者名セット
            IF        ( WRK-TEISYUTU    =   "2" )
                OR    ( WRK-TEISYUTU    =   "3" )
+           IF      WRK-HKNJANUM    =   "00000000"
+               MOVE    WRK-HKNJANUM    TO  WRK-PRT2-HKNJANUM
+               MOVE    SPACE           TO  WRK-PRT2-FILLER
+               MOVE     "保険者番号入力なし"
+                                       TO  WRK-PRT2-HKNJANAME
+           ELSE
                MOVE    SPACE           TO  HKNJAINF-REC
                INITIALIZE                  HKNJAINF-REC
 grpsys*DD      MOVE    WRK-PARA-HOSPID TO  HKNJA-HOSPID
@@ -2001,6 +2022,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                MOVE    WRK-HKNJANUM    TO  WRK-PRT2-HKNJANUM
                                            CSV-HKNJANUM
                MOVE    SPACE           TO  WRK-PRT2-FILLER
+           END-IF
            END-IF
       *----(00.00.02)--UPD-END-----
       *
@@ -2087,7 +2109,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
            MOVE    WRK-SYOKBN      TO  CSV-SYOKBN
       *
       *    広域連合名セット
-           IF      WRK-HKNJANUM(1:4)   =   "0000"
+           IF      WRK-HKNJANUM    =   "00000000"
                MOVE    WRK-HKNJANUM    TO  WRK-PRT2-HKNJANUM
                MOVE    SPACE           TO  WRK-PRT2-FILLER
                MOVE     "保険者番号入力なし"
@@ -2112,10 +2134,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
       *    帳票クリア
            PERFORM 310-HEAD-SET-SEC
       *
-           IF      WRK-HKNJANUM    NOT =   "00000000"
-               MOVE    4               TO  CNT-LINE
+           IF      WRK-HKNJANUM2   NOT =   "00000000"
       *        保険者名セット
-               PERFORM 3201-HKNJANUM-BODY-HEN-SEC
+               PERFORM 3201-HKNJANUM2-BODY-HEN-SEC
            END-IF
       *
            .
@@ -2134,6 +2155,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
            MOVE    TOKEI-TEISYUTU      TO  WRK-TEISYUTU
            MOVE    TOKEI-HKNJANUM      TO  WRK-HKNJANUM
            MOVE    TOKEI-SYOKBN        TO  WRK-SYOKBN
+      *----(04.02.01)--ADD-START---
+           MOVE    TOKEI-HKNJANUM2     TO  WRK-HKNJANUM2
+      *----(04.02.01)--ADD-END-----
            MOVE    ZERO                TO  SUM-AREA
       *
       *----(03.04.02)--ADD-START---
@@ -2439,11 +2463,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
       *****************************************************************
       *    帳票編集<明細行>見出し処理
       *****************************************************************
-       3201-BODY-HEN-STR4-SEC       SECTION.
+       3201-BODY-HEN-STR4-SEC      SECTION.
       *
       *    保険者見出し
-           IF      TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM
-               PERFORM 3201-HKNJANUM-BODY-HEN-SEC
+           IF      TOKEI-HKNJANUM2 NOT =   WRK-HKNJANUM2
+               PERFORM 3201-HKNJANUM2-BODY-HEN-SEC
            END-IF
       *
       *    入外区分見出し
@@ -2586,7 +2610,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
-       3201-HKNJANUM-BODY-HEN-SEC SECTION.
+       3201-HKNJANUM2-BODY-HEN-SEC SECTION.
       *
            MOVE    SPACE           TO  WRK-PRT-LINE
       *
@@ -2594,7 +2618,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
            INITIALIZE                  HKNJAINF-REC
 grpsys*DD  MOVE    WRK-PARA-HOSPID TO  HKNJA-HOSPID
 grpsys     MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
-           MOVE    TOKEI-HKNJANUM  TO  HKNJA-HKNJANUM
+           MOVE    TOKEI-HKNJANUM2 TO  HKNJA-HKNJANUM
            MOVE    HKNJAINF-REC    TO  MCPDATA-REC
            PERFORM 900-HKNJAINF-READ-SEC
            IF      FLG-HKNJAINF        =   ZERO
@@ -2608,17 +2632,17 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                                                CSV-HKNJANAME
                END-IF
            END-IF
-           MOVE    TOKEI-HKNJANUM  TO  WRK-PRT-LINE(1:8)
+           MOVE    TOKEI-HKNJANUM2 TO  WRK-PRT-LINE(1:8)
                                        CSV-HKNJANUM
       *
       *    見出し行セット
            PERFORM 320-BODY-SET-SEC
       *
-           MOVE    TOKEI-HKNJANUM  TO  WRK-HKNJANUM
+           MOVE    TOKEI-HKNJANUM2 TO  WRK-HKNJANUM2
            MOVE    SPACE           TO  WRK-NYUGAIKBN
            .
       *
-       3201-HKNJANUM-BODY-HEN-EXT.
+       3201-HKNJANUM2-BODY-HEN-EXT.
            EXIT.
       *
       *----(04.02.01)--ADD-END-----
@@ -3141,6 +3165,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
                    OR    ( WRK-TEISYUTU    NOT =   TOKEI-TEISYUTU )
                    OR    ( WRK-HKNJANUM    NOT =   TOKEI-HKNJANUM )
                    OR    ( WRK-SYOKBN      NOT =   TOKEI-SYOKBN )
+      *----(04.02.01)--ADD-START---
+                   OR    ( WRK-HKNJANUM2   NOT =   TOKEI-HKNJANUM2 )
+      *----(04.02.01)--ADD-END-----
                    OR    ( WRK-SRYYMFLG    NOT =   TOKEI-SRYYMFLG )
                    OR    ( WRK-NYUGAIKBN   NOT =   TOKEI-NYUGAIKBN )
                    OR    ( WRK-ZAIKBN      NOT =   TOKEI-ZAIKBN )
@@ -3560,7 +3587,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
       *
       *    レセプト合計、在総診合計
            IF        ( TOKEI-SKYKBN    NOT =   WRK-SKYKBN )
-               OR    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM)
+               OR    ( TOKEI-HKNJANUM2 NOT =   WRK-HKNJANUM2)
                OR    ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
                OR    ( TOKEI-SYOKBN    NOT =   WRK-SYOKBN )
                OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
@@ -3568,8 +3595,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
                OR    ( FLG-TOKEI       =   1 )
                PERFORM 3203-ZAIKBN-BODY-END-SEC
                IF        ( TOKEI-SKYKBN    NOT =   WRK-SKYKBN )
-                   OR    ( TOKEI-HKNJANUM(1:4) NOT =
-                                                   WRK-HKNJANUM(1:4) )
+                   OR    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM )
                    OR    ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
                    OR    ( TOKEI-SYOKBN    NOT =   WRK-SYOKBN )
                    OR    ( FLG-TOKEI       =   1 )
@@ -4004,6 +4030,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
       *
            MOVE    "3"             TO  WRK-SKYKBN
            MOVE    "00000000"      TO  WRK-HKNJANUM
+      *----(04.02.01)--ADD-START---
+           MOVE    "00000000"      TO  WRK-HKNJANUM2
+      *----(04.02.01)--ADD-END-----
            MOVE    "3"             TO  WRK-SYOKBN
            MOVE    "1"             TO  WRK-ZAIKBN
            MOVE    SPACE           TO  WRK-HKNKBN
@@ -4298,20 +4327,31 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
                END-IF
                MOVE    "2"             TO  WRK-SKYKBN
                MOVE    "00000000"      TO  WRK-HKNJANUM
+      *----(04.02.01)--ADD-START---
+               MOVE    "00000000"      TO  WRK-HKNJANUM
+      *----(04.02.01)--ADD-END-----
                MOVE    "3"             TO  WRK-SYOKBN
                MOVE    "1"             TO  WRK-ZAIKBN
            ELSE
+      *----(04.02.01)--UPD-START---
       *        請求区分チェック（請求分）
                MOVE    "1"             TO  WRK-SKYKBN
                IF        ( WRK-TEISYUTU    =   "2" )
                    OR    ( WRK-TEISYUTU    =   "3" )
-      *----(04.02.01)--ADD-START---
-                   OR    ( WRK-TEISYUTU    =   "6" )
-      *----(04.02.01)--ADD-END-----
                    MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM
+                   MOVE    "00000000"          TO  WRK-HKNJANUM2
                ELSE
-                   MOVE    "00000000"          TO  WRK-HKNJANUM
+                   IF   ( WRK-TEISYUTU    =   "6" )
+                       MOVE    RECE10-HKNJANUM-S(1:4)
+                                                   TO  WRK-HKNJANUM(1:4)
+                       MOVE    "0000"              TO  WRK-HKNJANUM(5:4)
+                       MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM2
+                   ELSE
+                       MOVE    "00000000"          TO  WRK-HKNJANUM
+                       MOVE    "00000000"          TO  WRK-HKNJANUM2
+                   END-IF
                END-IF
+      *----(04.02.01)--UPD-END-----
       *        返戻分チェック
                IF      RECE10-HENREIYM     =   "000000"
                    IF      WRK-SRYYM       =   WRK-PARA-DENPPRTYM
