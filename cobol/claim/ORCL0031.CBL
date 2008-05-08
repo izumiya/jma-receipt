@@ -971,7 +971,7 @@
            INITIALIZE                      CLMUID-REC
            MOVE    SPA-HOSPNUM         TO  CLMUID-HOSPNUM
            MOVE    WRK-PTID            TO  CLMUID-PTID
-           MOVE    WRK-SRYKA           TO  CLMUID-SRYKA
+           MOVE    WRK-SRYKA-KEY       TO  CLMUID-SRYKA
            PERFORM 903-CLMUID-READ-SEC
            IF      FLG-CLMUID          =   1
                DISPLAY "*** ORCL0031 CLMUID INVALID ***"
