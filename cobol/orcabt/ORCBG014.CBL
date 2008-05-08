@@ -2468,6 +2468,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
       *
       *    保険者見出し
            IF      TOKEI-HKNJANUM2 NOT =   WRK-HKNJANUM2
+               ADD     1                   TO  CNT-LINE
                PERFORM 3201-HKNJANUM2-BODY-HEN-SEC
            END-IF
       *
