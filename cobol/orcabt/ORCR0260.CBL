@@ -34,6 +34,7 @@
       *
       *  04.02.01    NACL-藤原    08/03/25  平成２０年４月改正対応
       *                                     広域連合対応
+      *  04.02.02    NACL-藤原    08/05/09  広域連合分記載もれ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -338,7 +339,7 @@
                                                    =   "2"  )      )
                        OR  ( ( WRK-PARA-KOUIKIRECEKBN
                                                    =   ZERO
-                                                   OR  "2"  )  AND
+                                                   OR  "1"  )  AND
                              ( RECE631-TEISYUTUSAKI
                                                    =   "6"  )      )
                        OR  (   RECE631-RECESYUBETU =   ZERO   OR 
