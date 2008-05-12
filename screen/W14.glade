@@ -4446,7 +4446,7 @@
 
     <widget>
       <class>GtkPandaEntry</class>
-      <name>PRTNM08</name>
+      <name>PRTNM09</name>
       <x>640</x>
       <y>275</y>
       <width>80</width>
