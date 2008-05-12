@@ -214,7 +214,7 @@
            03  FILLER              PIC X(02)   VALUE   "39".
            03  FILLER              PIC X(08)   VALUE   "39390000".
            03  FILLER              PIC X(100)  VALUE
-                                   "後置県後期高齢者医療広域連合".
+                                   "高知県後期高齢者医療広域連合".
       *
            03  FILLER              PIC X(02)   VALUE   "40".
            03  FILLER              PIC X(08)   VALUE   "39400007".
