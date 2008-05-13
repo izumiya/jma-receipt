@@ -1136,10 +1136,6 @@
        50022-HKNINF-BYMD-SEC        SECTION.
       *
            IF     (PTHKN-TEKSTYMD      <   WRK-BYMD-70 )
-      *        ÅþÃ£ÆüÁ°Æü
-               MOVE    WRK-BYMD-70-1       TO  PTHKN-TEKEDYMD
-      *        °ìÈÌ¤ÎÊä½õ¶èÊ¬ºÆ¥»¥Ã¥È
-               PERFORM 5003-HOJYOKBN-HEN-SEC
       *        ÄÉ²Ã
                ADD     1                   TO  IDX-T
                MOVE    TBL-DATA-REC (IDX)  TO  TBL-DATA-REC (IDX-T)
@@ -1148,12 +1144,13 @@
                                                                (IDX-T)
                MOVE    WRK-BYMD-70         TO  TBL-PTHKN-TEKSTYMD
                                                                (IDX-T)
+      *        ÅþÃ£ÆüÁ°Æü
+               MOVE    WRK-BYMD-70-1       TO  PTHKN-TEKEDYMD
+      *        °ìÈÌ¤ÎÊä½õ¶èÊ¬ºÆ¥»¥Ã¥È
+               PERFORM 5003-HOJYOKBN-HEN-SEC
            ELSE
       *        £È£±£´¡¥£±£°¤Ç
                IF      PTHKN-TEKSTYMD      <   "20021001"
-                   MOVE    "20020930"          TO  PTHKN-TEKEDYMD
-      *            °ìÈÌ¤ÎÊä½õ¶èÊ¬ºÆ¥»¥Ã¥È
-                   PERFORM 5003-HOJYOKBN-HEN-SEC
       *            ÄÉ²Ã
                    ADD     1                   TO  IDX-T
                    MOVE    TBL-DATA-REC (IDX)  TO  TBL-DATA-REC
@@ -1163,6 +1160,10 @@
                                                                (IDX-T)
                    MOVE    "20021001"          TO  TBL-PTHKN-TEKSTYMD
                                                                (IDX-T)
+      *            ÅþÃ£ÆüÁ°Æü
+                   MOVE    "20020930"          TO  PTHKN-TEKEDYMD
+      *            °ìÈÌ¤ÎÊä½õ¶èÊ¬ºÆ¥»¥Ã¥È
+                   PERFORM 5003-HOJYOKBN-HEN-SEC
                END-IF
            END-IF
            .
