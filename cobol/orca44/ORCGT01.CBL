@@ -100,6 +100,7 @@
       *                                     メタ種別の置き換え
       *  04.02.03    NACL-藤原    08/03/31  広域連合対応
       *  04.02.04    NACL-藤原    08/04/21  広域連合の保険者番号指定をしない
+      *  04.02.05    NACL-藤原    08/05/14  診療年月による対象帳票の再取得
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -861,6 +862,88 @@ grpsys                                         SPA-AREA
                                            SPA-CHK31-VALUE
                                            SPA-CHK32-VALUE
       *
+      *    診療年月によるシステム管理の取得処理
+           PERFORM 3103-SYSKANRI-HENSYU-SEC
+      *
+      *    未実施の未請求解除データのチェック処理
+           PERFORM 3101-SYUKA-CHECK-SEC
+      *
+           MOVE    1               TO  SPA-GMN-PAGE
+           MOVE    1               TO  SPA-GMN-CUR
+      *
+           .
+       310-SPASET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    未実施の未請求解除データのチェック処理
+      *****************************************************************
+       3101-SYUKA-CHECK-SEC            SECTION.
+      *
+           INITIALIZE                  SYUKA-REC
+grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
+           MOVE    "%"             TO  SYUKA-NYUGAIKBN
+           MOVE    "YYYY"          TO  SYUKA-RECESYUBETU
+           MOVE    "02"            TO  SYUKA-MISEIKYU-FLG
+           MOVE    SPA-NAI-SKYYM   TO  SYUKA-SRYYM
+           MOVE    SYUKA-REC       TO  MCPDATA-REC
+           PERFORM 900-SYUKA-READ-SEC
+           IF      FLG-SYUKA       =   ZERO
+               MOVE    "未実施の未請求解除データがあります"
+                                       TO  SPA-GMN-TITLE    
+           ELSE
+               MOVE    SPACE           TO  SPA-GMN-TITLE
+           END-IF
+      *
+           .
+       3101-SYUKA-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイル保存情報チェック処理
+      *****************************************************************
+       3102-FILE-INFO-CHECK-SEC            SECTION.
+      *
+           MOVE    WIDGET-INSENSITIVE  TO  SPA-B19-STATE
+           IF      SPA-NAI-SKYYM       =   ZERO
+               CONTINUE
+           ELSE
+               INITIALIZE                  ORCSFILESVAREA
+               MOVE    "R"                 TO  SFILESV-MODE
+               MOVE    WRK-CONS-JOB-SHELLID
+                                           TO  SFILESV-TBL-KEY
+               MOVE    SPA-NAI-SKYYM       TO  SFILESV-SRYYM (1)
+               CALL    "ORCSFILESV"        USING
+                                               ORCSFILESVAREA
+                                               SPA-AREA
+               IF      SFILESV-RETURN      =   ZERO         
+                   PERFORM VARYING IDXY    FROM    1   BY  1
+                           UNTIL   IDXY    >       100
+                           OR      SFILESV-SHELLID (IDXY)
+                                           =       SPACE
+                       IF      SFILESV-SHELLID (IDXY)
+                                           =   WRK-CONS-BTPARA-SCRIPTID
+                           CONTINUE
+                       ELSE
+                           MOVE    WIDGET-NORMAL   TO  SPA-B19-STATE
+                           MOVE    100             TO  IDXY
+                       END-IF
+                   END-PERFORM
+               END-IF
+           END-IF
+      *
+           .
+       3102-FILE-INFO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療年月によるシステム管理の取得処理
+      *****************************************************************
+       3103-SYSKANRI-HENSYU-SEC    SECTION.
+      *
+           INITIALIZE                      SPA-3004-AREA
+                                           SPA-T02-AREA
+      *
       *    標準総括表印刷指示
            MOVE    SPACE               TO  SYS-3003-REC 
            INITIALIZE                      SYS-3003-REC
@@ -1114,75 +1197,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "処理する"      TO  SPA-GMN-T02-SYORIFLGMEIL(2)
            MOVE    2               TO  SPA-GMN-T02-SYORIFLG-MAX
       *
-      *    未実施の未請求解除データのチェック処理
-           PERFORM 3101-SYUKA-CHECK-SEC
-      *
-           MOVE    1               TO  SPA-GMN-PAGE
-           MOVE    1               TO  SPA-GMN-CUR
-      *
            .
-       310-SPASET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    未実施の未請求解除データのチェック処理
-      *****************************************************************
-       3101-SYUKA-CHECK-SEC            SECTION.
-      *
-           INITIALIZE                  SYUKA-REC
-grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
-           MOVE    "%"             TO  SYUKA-NYUGAIKBN
-           MOVE    "YYYY"          TO  SYUKA-RECESYUBETU
-           MOVE    "02"            TO  SYUKA-MISEIKYU-FLG
-           MOVE    SPA-NAI-SKYYM   TO  SYUKA-SRYYM
-           MOVE    SYUKA-REC       TO  MCPDATA-REC
-           PERFORM 900-SYUKA-READ-SEC
-           IF      FLG-SYUKA       =   ZERO
-               MOVE    "未実施の未請求解除データがあります"
-                                       TO  SPA-GMN-TITLE    
-           ELSE
-               MOVE    SPACE           TO  SPA-GMN-TITLE
-           END-IF
-      *
-           .
-       3101-SYUKA-CHECK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ファイル保存情報チェック処理
-      *****************************************************************
-       3102-FILE-INFO-CHECK-SEC            SECTION.
-      *
-           MOVE    WIDGET-INSENSITIVE  TO  SPA-B19-STATE
-           IF      SPA-NAI-SKYYM       =   ZERO
-               CONTINUE
-           ELSE
-               INITIALIZE                  ORCSFILESVAREA
-               MOVE    "R"                 TO  SFILESV-MODE
-               MOVE    WRK-CONS-JOB-SHELLID
-                                           TO  SFILESV-TBL-KEY
-               MOVE    SPA-NAI-SKYYM       TO  SFILESV-SRYYM (1)
-               CALL    "ORCSFILESV"        USING
-                                               ORCSFILESVAREA
-                                               SPA-AREA
-               IF      SFILESV-RETURN      =   ZERO         
-                   PERFORM VARYING IDXY    FROM    1   BY  1
-                           UNTIL   IDXY    >       100
-                           OR      SFILESV-SHELLID (IDXY)
-                                           =       SPACE
-                       IF      SFILESV-SHELLID (IDXY)
-                                           =   WRK-CONS-BTPARA-SCRIPTID
-                           CONTINUE
-                       ELSE
-                           MOVE    WIDGET-NORMAL   TO  SPA-B19-STATE
-                           MOVE    100             TO  IDXY
-                       END-IF
-                   END-PERFORM
-               END-IF
-           END-IF
-      *
-           .
-       3102-FILE-INFO-CHECK-EXT.
+       3103-SYSKANRI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2151,6 +2167,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                END-IF
            END-IF
       *
+      *    診療年月によるシステム管理の取得処理
+           PERFORM 3103-SYSKANRI-HENSYU-SEC
       *
       *    ファイル保存情報
            PERFORM 3102-FILE-INFO-CHECK-SEC
@@ -4791,13 +4809,13 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
       *
            EVALUATE    SPA-ERRCD
                WHEN    "0001"
-                   MOVE    "請求年月が未入力です" 
+                   MOVE    "診療年月が未入力です" 
                                                TO  SPA-ERRMSG
                WHEN    "0002"
                    MOVE    "請求年月日が未入力です" 
                                                TO  SPA-ERRMSG
                WHEN    "0003"
-                   MOVE    "請求年月入力エラー" 
+                   MOVE    "診療年月入力エラー" 
                                                TO  SPA-ERRMSG
                WHEN    "0004"
                    MOVE    "請求年月日入力エラー" 
