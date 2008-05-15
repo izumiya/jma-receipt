@@ -3532,7 +3532,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    WRK-CONS-TERMID TO  LNK-PRTKANRI-TERMID 
            MOVE    SPA-OPID        TO  LNK-PRTKANRI-OPID
            PERFORM VARYING IDXX    FROM    1   BY  1
-                   UNTIL   IDXX    >       4
+                   UNTIL   IDXX    >       5
                IF      SPA-3004-KBNCD  (IDXX)
                                            =   903
                    MOVE    SPA-3004-PRTNM (IDXX)
