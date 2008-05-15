@@ -55,6 +55,7 @@
       *  03.05.02    NACL-藤原    07/07/17  強制終了処理対応
       *
       *  04.01.01    NACL-藤原    07/10/24  総括表の地方公費記載対応
+      *  04.02.02    NACL-藤原    08/05/15  公費番号まとめの編集方法訂正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -831,6 +832,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
            PERFORM VARYING IDZ     FROM    1   BY  1
                    UNTIL   IDZ     >       4
                    OR  RECE10-KOHNUM (IDZ) =   SPACE
+      *
+               MOVE    SPACE               TO  WRK-MEISYO 
       *
       *        特定疾患無しのとき 
                IF      RECE10-KOHNUM (IDZ) =   "091"
