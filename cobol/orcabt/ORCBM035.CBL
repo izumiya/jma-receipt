@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.02.01    NACL-藤原    08/04/21  広域連合診療報酬請求書区分
       *                                     による作成
+      *  04.02.02    NACL-藤原    08/05/15  公費番号まとめの編集方法訂正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -815,6 +816,8 @@
            PERFORM VARYING IDZ     FROM    1   BY  1
                    UNTIL   IDZ     >       4
                    OR  RECE10-KOHNUM (IDZ) =   SPACE
+      *
+               MOVE    SPACE               TO  WRK-MEISYO 
       *
       *        特定疾患無しのとき 
                IF      RECE10-KOHNUM (IDZ) =   "091"
