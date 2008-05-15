@@ -1973,6 +1973,7 @@
       *****************************************************************
        20055-MANSEI-CHK-SEC        SECTION.
       *
+           MOVE    SANTEI-REC          TO  HZN2-SANTEI-REC
       *    直帰の初診算定日を決定する
            PERFORM 200531-SYOSIN-SANTEI-SEC
       *
@@ -2010,8 +2011,9 @@
                    MOVE    ZERO            TO  WRK-SANTEI-CNT
                END-IF
            END-IF
+           MOVE    HZN2-SANTEI-REC     TO  SANTEI-REC
            .
-       20053-MANSEI-CHK-EXT.
+       20055-MANSEI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
