@@ -34,11 +34,26 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
+      *    データ
+           SELECT  USER-FILE       ASSIGN  FILE-NAME
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
+                                   FILE    STATUS  IS  STS-DATA.
       *
        DATA                    DIVISION.
        FILE                        SECTION.
       *
+      *    データ
+       FD  USER-FILE.
+       01  USER-REC                     PIC X(600).
+      *
        WORKING-STORAGE             SECTION.
+      *
+      * データ領域
+       01  FILE-NAME.
+           03  FILLER              PIC X(40)   VALUE
+           "/etc/jma-receipt/das-upload.d/das-upload".
+           03  FILE-HOSPNUM        PIC 9(02)   VALUE   ZERO.
+           03  FILLER              PIC X(05)   VALUE   ".conf".
       *
       *    スパ領域
            COPY    "COMMON-SPA".
@@ -87,6 +102,7 @@
       *    フラグ領域
        01  STS-AREA.
            03  STS-RECEERR         PIC X(02).
+           03  STS-DATA            PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -94,6 +110,7 @@
            03  FLG-JOBLOG                          PIC 9(01).
            03  FLG-END                             PIC 9(01).
            03  FLG-LIST-ROW                        PIC 9(01).
+           03  FLG-USER                            PIC 9(01).
       *
       *    システム領域
        01  SYS-AREA.
@@ -112,6 +129,8 @@
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
+           03  IXY                 PIC 9(04).
+           03  IXZ                 PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -135,6 +154,8 @@
            03  WRK-STPAGE          PIC 9(05).
            03  WRK-EDPAGE-G.
                05  WRK-EDPAGE      PIC 9(05).
+           03  WRK-STR-G.
+               05  WRK-STR         PIC X(01)   OCCURS  30.
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -893,13 +914,13 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
       *
            INITIALIZE                      SPA-MUID-AREA
            MOVE    SPACE                TO  SPA-MIDCD
-      *
            MOVE    SPACE                TO  MUID
-           MOVE    "USER"               TO  MCP-WIDGET
       *
+           PERFORM 4902-MUID-SET-SEC
+      *
+           MOVE    "USER"               TO  MCP-WIDGET
            MOVE    "M98 "               TO  SPA-MOTOPG
            MOVE    "MUID"               TO  SPA-SAKIPG
-      *
            MOVE    "NEW"                TO  MCP-PUTTYPE
            MOVE    "MUID"               TO  MCP-WINDOW
       *
@@ -908,6 +929,63 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
            MOVE    1                    TO  FLG-END
            .
        4901-MUID-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    設定内容セット処理
+      *****************************************************************
+       4902-MUID-SET-SEC               SECTION.
+      *
+           MOVE    SPA-HOSPNUM         TO  FILE-HOSPNUM
+      *
+           OPEN    INPUT               USER-FILE
+           IF      STS-DATA        NOT =   ZERO
+               GO      TO      4902-MUID-SET-EXT
+           END-IF
+           PERFORM 900-IN-USER-SEC
+           PERFORM UNTIL    FLG-USER   =   1
+             IF    ( USER-REC(2:4)     =   "User" )
+             AND   ( USER-REC(11:1)    =   '"' )
+                 MOVE    SPACE               TO  WRK-STR-G
+                 MOVE    ZERO                TO  IXZ
+                 PERFORM VARYING  IXY  FROM  12  BY  1
+                         UNTIL    IXY  >     30
+                   IF    USER-REC(IXY:1)     =   '"'
+                       MOVE    30            TO  IXY
+                       MOVE    WRK-STR-G(1:IXZ)
+                                             TO  SPA-MUID-USER
+                       MOVE    SPA-MUID-USER TO  MUID-USER
+                   ELSE
+                       COMPUTE IXZ           =   IXZ  +  1
+                       MOVE    USER-REC(IXY:1)
+                                             TO  WRK-STR(IXZ)
+                   END-IF
+                 END-PERFORM
+             END-IF
+             IF    ( USER-REC(2:8)     =   "Password" )
+             AND   ( USER-REC(15:1)    =   '"' )
+                 MOVE    SPACE               TO  WRK-STR-G
+                 MOVE    ZERO                TO  IXZ
+                 PERFORM VARYING  IXY  FROM  16  BY  1
+                         UNTIL    IXY  >     30
+                   IF    USER-REC(IXY:1)     =   '"'
+                       MOVE    30            TO  IXY
+                       MOVE    WRK-STR-G(1:IXZ)
+                                             TO  SPA-MUID-PASSWORD
+                       MOVE    SPA-MUID-PASSWORD
+                                             TO  MUID-PASSWORD
+                   ELSE
+                       COMPUTE IXZ           =   IXZ  +  1
+                       MOVE    USER-REC(IXY:1)
+                                             TO  WRK-STR(IXZ)
+                   END-IF
+                 END-PERFORM
+             END-IF
+             PERFORM 900-IN-USER-SEC
+           END-PERFORM
+           CLOSE                       USER-FILE
+           .
+       4902-MUID-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1195,6 +1273,21 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
            .
        900-SYSKANRI-INV-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    データファイル読込み処理
+      *****************************************************************
+       900-IN-USER-SEC                 SECTION.
+      *
+          READ    USER-FILE
+              AT  END
+                  MOVE    1               TO  FLG-USER
+              NOT AT  END
+                  MOVE    ZERO            TO  FLG-USER
+          END-READ
+          .
+       900-IN-USER-EXT.
+          EXIT.
       *
       *****************************************************************
       *    ＰＵＴ　処理

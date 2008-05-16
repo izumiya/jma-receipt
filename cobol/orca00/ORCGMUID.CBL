@@ -384,14 +384,17 @@
            PERFORM 4101-GMN-SPA-SET-SEC
       *    基本チェック処理
            PERFORM 4102-KIHON-CHK-SEC
-      *    必須入力チェック
-           IF      SPA-MUID-USER       =   SPACE
-               MOVE    "0002"          TO  SPA-ERRCD
-               MOVE    1               TO  SPA-MUID-CUR
-           ELSE
-               IF      SPA-MUID-PASSWORD   =   SPACE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   MOVE    2               TO  SPA-MUID-CUR
+           IF     (SPA-MUID-USER       NOT =   SPACE)  OR
+                  (SPA-MUID-PASSWORD   NOT =   SPACE)
+      *        必須入力チェック
+               IF      SPA-MUID-USER       =   SPACE
+                   MOVE    "0002"          TO  SPA-ERRCD
+                   MOVE    1               TO  SPA-MUID-CUR
+               ELSE
+                   IF      SPA-MUID-PASSWORD   =   SPACE
+                       MOVE    "0004"          TO  SPA-ERRCD
+                       MOVE    2               TO  SPA-MUID-CUR
+                   END-IF
                END-IF
            END-IF
       *
@@ -647,36 +650,6 @@
       *
            .
        520-MIDSET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    テーブル検索処理
-      *****************************************************************
-       910-DBSELECT-SEC                SECTION.
-      *
-           MOVE    ZERO            TO  MCP-RC
-      *
-           MOVE    "DBSELECT"      TO  MCP-FUNC
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-      *
-           .
-       910-DBSELECT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ＤＢクロース処理
-      *****************************************************************
-       990-DBCLOSE-SEC           SECTION.
-      *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-      *
-           .
-       990-DBCLOSE-EXT.
            EXIT.
       *
       *****************************************************************
