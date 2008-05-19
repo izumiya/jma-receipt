@@ -310,6 +310,7 @@
       *  04.02.12    NACL-ÌçÏÆ    08/04/25  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
       *  04.02.13    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
+      *  04.02.14    NACL-ÌçÏÆ    08/05/15  ÆÁÅç¸©ÃÏÊý¸øÈñÀÁµáÅÀµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11389,11 +11390,17 @@
       *    ÆÁÅç£²£´£µÆýÍÄ»ù¡Ê¹ñÊÝ¡Ë
            IF   (RECE62-SRYYM         >=  "200802")
            AND  (RECE62-TEISYUTUSAKI   =   2 OR 6 )
-           AND  (RECE62-KOHNUM(1)      =  "245"   )
-           AND  (RECE62-KOHHBTNUM(2)   =  "48"    )
            AND  (WRK-PREFNUM           =   36     )
-                        MOVE  ZERO  TO  RECE62-FTNMONEY(2)
-                        MOVE  ZERO  TO  RECE62-ZEROKISAIFLG(2)
+             IF   (RECE62-KOHNUM(1)      =  "245")
+             AND  (RECE62-KOHHBTNUM(2)   =  "48" )
+                  MOVE  ZERO  TO  RECE62-FTNMONEY(2)
+                  MOVE  ZERO  TO  RECE62-ZEROKISAIFLG(2)
+             END-IF
+             IF   (RECE62-KOHNUM(2)      =  "245")
+             AND  (RECE62-KOHHBTNUM(3)   =  "48" )
+                  MOVE  ZERO  TO  RECE62-FTNMONEY(3)
+                  MOVE  ZERO  TO  RECE62-ZEROKISAIFLG(3)
+             END-IF
            END-IF
       *
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬¤ÎÊÔ½¸
@@ -11472,6 +11479,32 @@
                   COMPUTE  RECE62-TOTALTEN(3) =
                            RECE62-TOTALTEN(1) -
                            RECE62-TOTALTEN(2)
+               END-IF
+      *
+      *      ÆÁÅç¸©ÃÏÊý¸øÈñ
+      *
+             WHEN    "36"
+      *
+               IF   RECE62-SRYYM    >=   "200805"
+      *
+                   IF  ( RECE62-HKNNUM       NOT = SPACE    )
+                   AND ( RECE62-KOHNUM(1)(1:1)   =  "0"     )
+                   AND ( RECE62-KOHNUM(2)(1:1)
+                                           >= "1" AND <= "8")
+                   AND ( RECE62-TOTALTEN(1)  NOT =
+                                          RECE62-TOTALTEN(2))
+                      COMPUTE  RECE62-TOTALTEN(3) =
+                               RECE62-TOTALTEN(1) -
+                               RECE62-TOTALTEN(2)
+      *
+                      IF   (RECE62-KOHNUM(2)      =  "245")
+                      AND  (RECE62-KOHHBTNUM(3)   =  "48" )
+                        COMPUTE  RECE62-TOTALTEN(4) =
+                                 RECE62-TOTALTEN(1) -
+                                 RECE62-TOTALTEN(2)
+                      END-IF
+                    END-IF
+      *
                END-IF
       *
            END-EVALUATE
