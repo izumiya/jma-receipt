@@ -369,6 +369,11 @@
                MOVE    SPACE               TO  PTHKN-NUM
                MOVE    "1"                 TO  PTHKN-HONKZKKBN
            END-IF
+      *    ¸øÈñÃ±ÆÈ¤ÏËÜ¿Í¤È¤¹¤ë
+           IF     (COMB-HKNNUM         =   SPACE )
+             AND  (COMB-KOHHKNNUM (1)  NOT =   SPACE )
+               MOVE    "1"                 TO  PTHKN-HONKZKKBN
+           END-IF
       *    ¸å´ü¹âÎð¼Ô¤Ïµ­¹æ¥¯¥ê¥¢
            IF      COMB-HKNNUM         =   "039"
                MOVE    SPACE               TO  PTHKN-KIGO
@@ -515,14 +520,18 @@
                 INITIALIZE                      HKNCOMBI-REC
            END-IF
       *    ´µ¼ÔÊÝ¸±¾ðÊó¸¡º÷
-           INITIALIZE                      PTHKNINF-REC
-           MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
-           MOVE    SPA-PTID            TO  PTHKN-PTID
-      *    ¼çÊÝ¸±¡Ý£É£Ä
-           MOVE    COMB-HKNID          TO  PTHKN-HKNID
-           PERFORM 920-PTHKNINF-READ-SEC
-           IF      FLG-PTHKNINF      NOT =   ZERO
-               INITIALIZE              PTHKNINF-REC
+           IF      COMB-HKNID          =   ZERO
+               INITIALIZE                  PTHKNINF-REC
+           ELSE
+               INITIALIZE                      PTHKNINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
+               MOVE    SPA-PTID            TO  PTHKN-PTID
+      *        ¼çÊÝ¸±¡Ý£É£Ä
+               MOVE    COMB-HKNID          TO  PTHKN-HKNID
+               PERFORM 920-PTHKNINF-READ-SEC
+               IF      FLG-PTHKNINF    NOT =   ZERO
+                   INITIALIZE              PTHKNINF-REC
+               END-IF
            END-IF
       *    ¸øÈñÊÝ·ò¾ðÊóÊÔ½¸½èÍý
            PERFORM 1001-KOHHKN-HEN-SEC
