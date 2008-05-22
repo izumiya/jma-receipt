@@ -1318,10 +1318,6 @@
                ELSE
                    MOVE    ZERO                TO  WRK-TODAY-CNTG
                END-IF
-      *        訂正前にないとき、当日分集計
-               IF      WRK-TEI-CNT         =   ZERO
-                   ADD     WRK-TODAY-CNTG     TO  WRK-SANTEI-CNT
-               END-IF
            END-IF
            .
        108121-SANTEI-CHK-EXT.
