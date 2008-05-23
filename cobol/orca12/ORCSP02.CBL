@@ -1067,7 +1067,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            MOVE    1               TO  FLG-OK
                        END-IF
       *
-                       IF      FLG-OK              =   1
+                       IF     (FLG-OK              =   1   )
+                          AND (SPA-GMN-HKNMAX      <   50  )
       *                     ›∏±æ Û ‘Ω∏
                            PERFORM 10041-HKNHEN-SEC
                        END-IF
@@ -1088,7 +1089,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        ELSE
                            MOVE    1               TO  FLG-OK
                        END-IF
-                       IF      FLG-OK              =   1
+                       IF     (FLG-OK              =   1   )
+                         AND  (SPA-GMN-KOHMAX      <   100 )
       *                    ∏¯»Òæ Û ‘Ω∏
                            PERFORM 10042-KOHHEN-SEC
                        END-IF
@@ -1112,9 +1114,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        10041-HKNHEN-SEC          SECTION.
       *
-           IF      SPA-GMN-HKNMAX      >=  50
-               GO      TO      10041-HKNHEN-EXT
-           END-IF
+      ***  IF      SPA-GMN-HKNMAX      >=  50
+      *        GO      TO      10041-HKNHEN-EXT
+      ***  END-IF
            ADD     1                   TO  SPA-GMN-HKNMAX
       *
            MOVE    HKN-HKNNUM          TO  SPA-GMN-HKNNUML
@@ -1142,10 +1144,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        10042-KOHHEN-SEC          SECTION.
       *
-           IF    ( SPA-GMN-KOHMAX      >=  100 )
+      **** IF    ( SPA-GMN-KOHMAX      >=  100 )
       *****OR    ( HKN-HKNNUM  = "960" OR "961" OR "962" OR "963" )
-               GO      TO      10042-KOHHEN-EXT
-           END-IF
+      *        GO      TO      10042-KOHHEN-EXT
+      **** END-IF
            ADD     1                   TO  SPA-GMN-KOHMAX
       *
            MOVE    HKN-HKNNUM          TO  SPA-GMN-KOHNUML
@@ -1379,7 +1381,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1               TO  FLG-UKETUKE
            END-IF
-           PERFORM VARYING     IDX     FROM    1  BY  1
+           MOVE    ZERO                TO  IDX
+           PERFORM
                    UNTIL       FLG-UKETUKE     =  1
                IF     (UKE-PTID        NOT =   ZERO )  AND
                       (UKE-PTID        NOT =   SPA-GMN-PTID)
@@ -1387,15 +1390,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    CONTINUE
                ELSE
       *
+               ADD     1                   TO  IDX
                MOVE    SPACE               TO  PARA-REC
                MOVE    "UKETUKE"           TO  PARA-FILEMEI
                MOVE    IDX                 TO  PARA-EDANUM
       ******** MOVE    SPA-PTID            TO  UKE-PTID
                MOVE    UKETUKE-REC         TO  PARA-DATA-REC
                PERFORM 400-PARA-INSERT-SEC
-      *********WRITE   PARA-REC
       *        ≤ËÃÃ£”£–£¡§ÿ ‘Ω∏
-               PERFORM 3101-UKETU-HEN-SEC
+               IF      IDX                 <=  10
+                   PERFORM 3101-UKETU-HEN-SEC
+               END-IF
                MOVE    UKE-NAME            TO  SPA-NAME
       *
                MOVE    PARA-EDANUM          TO  SPA-NAI20-UKEMAX
@@ -1422,9 +1427,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        3101-UKETU-HEN-SEC              SECTION.
       *
-           IF      IDX                 >   10
-               GO      TO      3101-UKETU-HEN-EXT
-           END-IF
+      **** IF      IDX                 >   10
+      *        GO      TO      3101-UKETU-HEN-EXT
+      **** END-IF
       *
            MOVE    IDX                 TO  SPA-GMN20-YBANGOU (IDX)
            MOVE    UKE-UKEID           TO  SPA-NAI20-UKEID (IDX)
@@ -1594,7 +1599,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    PTINF-COMMENT-1     TO  SPA-GMN-COMMENT-1
            MOVE    PTINF-COMMENT-2     TO  SPA-GMN-COMMENT-2
       *    «ØŒ∑◊ªª
-           PERFORM 410121-NENREI-SET-SEC
+           IF      SPA-NAI-BIRTHDAY    =   SPACE  OR  ZERO
+               MOVE    SPACE               TO  SPA-GMN-NENREI
+           ELSE
+               PERFORM 410121-NENREI-SET-SEC
+           END-IF
       *    ∏∫Ã»ªˆÕ≥
            MOVE    PTINF-DISCOUNT-KBN  TO  SPA-GMN-DISCOUNTKBN
       *    ≥‰∞˙Œ®
@@ -1763,11 +1772,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    «ØŒ∑◊ªªΩËÕ˝
       *****************************************************************
        410121-NENREI-SET-SEC             SECTION.
-      *
-           IF      SPA-NAI-BIRTHDAY    =   SPACE  OR  ZERO
-               MOVE    SPACE               TO  SPA-GMN-NENREI
-               GO      TO      410121-NENREI-SET-EXT
-           END-IF
       *
            MOVE    SPA-NAI-BIRTHDAY    TO  WRK-YMDS1
            MOVE    SPA-SYSYMD          TO  WRK-YMDS2
@@ -3016,7 +3020,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ≥‰∞˙Œ®
            MOVE    ZERO                TO  P02-P02-DISCOUNT-COUNT
            PERFORM VARYING   IDX       FROM    1   BY  1
-                   UNTIL    (IDX           >   10  )  OR
+                   UNTIL    (IDX           >   SPA-DISCOUNT-MAX)  OR
                             (SPA-GMN-DISCOUNT-EDIT (IDX)
                                            =   SPACE)
                MOVE    SPA-GMN-DISCOUNT-EDIT (IDX)
