@@ -213,6 +213,9 @@
        01  PARA-REC.
            COPY    "CPPARA.INC".
       *
+      *    受付
+       01  UKETUKE-REC.
+           COPY    "CPUKETUKE.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1084,6 +1087,49 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *    受付
+           IF      SPA-P02-UKEID   NOT =   ZERO
+               PERFORM 100229-UKETUKE-SET-SEC
+           END-IF
+           .
+       10022-PARA-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    受付作成処理
+      *****************************************************************
+       100229-UKETUKE-SET-SEC           SECTION.
+      *
+      *    パラメタ登録
+           MOVE    SPACE               TO  UKETUKE-REC
+           MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
+           MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
+           MOVE    SPA-P02-UKEID       TO  UKE-UKEID
+           MOVE    UKETUKE-REC         TO  MCPDATA-REC
+      *
+           MOVE    "tbl_uketuke"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_uketuke"       TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC                  =   ZERO
+                   MOVE    MCPDATA-REC         TO  UKETUKE-REC
+      *
+                   MOVE    SPACE               TO  PARA-REC
+                   INITIALIZE                      PARA-REC
+                   MOVE    "UKETUKE"           TO  PARA-FILEMEI
+                   MOVE    1                   TO  PARA-EDANUM
+                   MOVE    UKETUKE-REC         TO  PARA-DATA-REC
+                   PERFORM 400-PARA-INSERT-SEC
+               ELSE
+                   MOVE    SPACE               TO  UKETUKE-REC
+               END-IF
+           END-IF
+           MOVE    "tbl_uketuke"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
            .
        10022-PARA-SET-EXT.
            EXIT.
