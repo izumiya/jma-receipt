@@ -495,14 +495,25 @@
            03  FILLER              PIC X(02)   VALUE   "57".
            03  FILLER              PIC X(50)   VALUE
                "後期高齢者退院時薬剤情報提供料".
+           03  FILLER              PIC X(02)   VALUE   "58".
+           03  FILLER              PIC X(50)   VALUE
+               "特定施設入居時等医学総合管理料".
+           03  FILLER              PIC X(02)   VALUE   "59".
+           03  FILLER              PIC X(50)   VALUE
+               "在宅患者連携指導料".
+           03  FILLER              PIC X(02)   VALUE   "60".
+           03  FILLER              PIC X(50)   VALUE
+               "耳鼻咽喉科特定疾患指導管理料".
       *
        01  TBL-SDOKNRYO-AREA-R     REDEFINES   TBL-SDOKNRYO-AREA.
       *    03  TBL-SDOKNRYO-OCC        OCCURS  45      INDEXED  SDO-IDX.
-           03  TBL-SDOKNRYO-OCC        OCCURS  58      INDEXED  SDO-IDX.
+      **** 03  TBL-SDOKNRYO-OCC        OCCURS  58      INDEXED  SDO-IDX.
+           03  TBL-SDOKNRYO-OCC        OCCURS  61      INDEXED  SDO-IDX.
                05  TBL-SDOKNRYO        PIC X(02).
                05  TBL-SDOKNRYOMEI     PIC X(50).
       *01  SDO-MAX                     PIC 9(04)   VALUE   45.
-       01  SDO-MAX                     PIC 9(04)   VALUE   58.
+      *01  SDO-MAX                     PIC 9(04)   VALUE   58.
+       01  SDO-MAX                     PIC 9(04)   VALUE   61.
       *
       *****************************************************************
       *    ファイルレイアウト
