@@ -2113,6 +2113,7 @@
                              IF      MCP-RC        =       ZERO
                                MOVE   MCPDATA-REC  TO   HKNCOMBI-REC
                                IF   COMB-HKNNUM = "971" OR "973"
+                                                        OR "975"
                                    CONTINUE
                                ELSE
                                    MOVE   1   TO  FLG-KYUSEI-OK

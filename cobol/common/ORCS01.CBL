@@ -253,6 +253,7 @@
       *  04.02.09    NACL-ÌçÏÆ    08/04/24  ºë¶Ì¸©»ÖÌÚ»ÔÃÏÊý¸øÈñÂÐ±þ
       *  04.02.10    NACL-ÌçÏÆ    08/04/28  ºë¶Ì¸©Àî±Û»ÔÃÏÊý¸øÈñÂÐ±þ
       *  04.02.11    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
+      *  04.02.12    NACL-ÌçÏÆ    08/05/22  ºßÁí¿ÇÈ½Äê¾ò·ï½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -376,6 +377,7 @@
            03  FLG-SYUGAKUMAE          PIC 9(01).
            03  FLG-TAISYO              PIC 9(01).
            03  FLG-ZENKI-TOKUREI       PIC 9(01).
+           03  FLG-ZAIARI              PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -506,6 +508,8 @@
            03  WK-TOTORI-JIRITU            PIC  9(01).
       *
            03  WK-ZAITAKU-SRYCD            PIC  X(09).
+      *
+           03  WK-KOUREI-ZAITAKU-KBN       PIC  X(01).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â²ó¿ô¤È¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -2983,37 +2987,43 @@
              END-IF
            END-IF
       *
+           MOVE     SPACE     TO     WK-KOUREI-ZAITAKU-KBN
+           MOVE     ZERO      TO     FLG-ZAIARI
            IF   FLG-KOUREI-KBN        =   SPACE
              IF   FLG-GENBUTU70   NOT =   ZERO
-               IF   LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"
-                 MOVE     SPACE  TO  LNK-S01-KOUREI-ZAITAKU-KBN
+               IF   LNK-SYU-SRYYMD(1:6)   >=   "200804"
+                  PERFORM   2003-ZAITAKU-HENSYU200804-SEC
                ELSE
-                 IF   LNK-SYU-SRYYMD(1:6)   >=   "200804"
-                    PERFORM   2003-ZAITAKU-HENSYU200804-SEC
-                 ELSE
-                    PERFORM   2002-ZAITAKU-HENSYU200604-SEC
+                  PERFORM   2002-ZAITAKU-HENSYU200604-SEC
+               END-IF
+               IF   FLG-ZAIARI  =  ZERO
+                 IF LNK-S01-KOUREI-ZAITAKU-KBN  =  SPACE
+                   MOVE   ZERO   TO  FLG-GENBUTU70
                  END-IF
-                 IF LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"
-                   MOVE   SPACE  TO  LNK-S01-KOUREI-ZAITAKU-KBN
-                 ELSE
+               ELSE
+                 IF WK-KOUREI-ZAITAKU-KBN       =  SPACE
                    MOVE   ZERO   TO  FLG-GENBUTU70
                  END-IF
                END-IF
+             END-IF
+             MOVE   SPACE   TO   LNK-S01-KOUREI-ZAITAKU-KBN
+           ELSE
+             IF   LNK-SYU-SRYYMD(1:6)   >=   "200804"
+                  PERFORM   2003-ZAITAKU-HENSYU200804-SEC
              ELSE
-               IF   LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"
-                 MOVE     SPACE  TO  LNK-S01-KOUREI-ZAITAKU-KBN
+               IF LNK-SYU-SRYYMD(1:6)   >=   "200604"
+                  PERFORM   2002-ZAITAKU-HENSYU200604-SEC
+               ELSE
+                  PERFORM   2001-ZAITAKU-HENSYU-SEC
                END-IF
              END-IF
-           ELSE
-             IF     LNK-S01-KOUREI-ZAITAKU-KBN  =  SPACE
-               IF   LNK-SYU-SRYYMD(1:6)   >=   "200804"
-                    PERFORM   2003-ZAITAKU-HENSYU200804-SEC
+             IF   FLG-ZAIARI  =  ZERO
+               CONTINUE
+             ELSE
+               IF WK-KOUREI-ZAITAKU-KBN       =  SPACE
+                 MOVE   SPACE  TO  LNK-S01-KOUREI-ZAITAKU-KBN
                ELSE
-                 IF LNK-SYU-SRYYMD(1:6)   >=   "200604"
-                    PERFORM   2002-ZAITAKU-HENSYU200604-SEC
-                 ELSE
-                    PERFORM   2001-ZAITAKU-HENSYU-SEC
-                 END-IF
+                 MOVE   "1"    TO  LNK-S01-KOUREI-ZAITAKU-KBN
                END-IF
              END-IF
            END-IF
@@ -3314,7 +3324,7 @@
       *
            PERFORM   VARYING   IDX10   FROM    1   BY  1
                       UNTIL  ( IDX10    >   TBL-ZAITAKU-MAX      )
-                       OR    ( LNK-S01-KOUREI-ZAITAKU-KBN  = "1" )
+                       OR    ( WK-KOUREI-ZAITAKU-KBN  = "1"      )
       *
              MOVE     TBL-ZAITAKU(IDX10)     TO   WK-ZAITAKU-SRYCD
              PERFORM  20011-ZAITAKU-HANTEI-SEC
@@ -3333,7 +3343,7 @@
       *
            PERFORM   VARYING   IDX10   FROM    1   BY  1
                       UNTIL  ( IDX10    >   TBL-ZAITAKU2-MAX     )
-                       OR    ( LNK-S01-KOUREI-ZAITAKU-KBN  = "1" )
+                       OR    ( WK-KOUREI-ZAITAKU-KBN  = "1"      )
       *
              MOVE     TBL-ZAITAKU2(IDX10)    TO   WK-ZAITAKU-SRYCD
              PERFORM  20011-ZAITAKU-HANTEI-SEC
@@ -3352,7 +3362,7 @@
       *
            PERFORM   VARYING   IDX10   FROM    1   BY  1
                       UNTIL  ( IDX10    >   TBL-ZAITAKU3-MAX     )
-                       OR    ( LNK-S01-KOUREI-ZAITAKU-KBN  = "1" )
+                       OR    ( WK-KOUREI-ZAITAKU-KBN  = "1"      )
       *
              MOVE     TBL-ZAITAKU3(IDX10)    TO   WK-ZAITAKU-SRYCD
              PERFORM  20011-ZAITAKU-HANTEI-SEC
@@ -3390,7 +3400,7 @@
                MOVE    "tbl_sryact"     TO      MCP-TABLE
                MOVE    "key7"           TO      MCP-PATHNAME
                PERFORM   SRYACT-READ-SEC
-               IF      FLG-SRYACT       =       ZERO
+               PERFORM   UNTIL   FLG-SRYACT   =    1
                    INITIALIZE                   SRYACCT-REC
                    MOVE    SRY-HOSPNUM      TO   ACCT-HOSPNUM
                    MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
@@ -3412,15 +3422,50 @@
                        IF      FLG-SRYACCT  =       ZERO
                            IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
                                (ACCT-ZAIKAISU NOT =  ZERO)
-                               MOVE  "1"    TO
-                                        LNK-S01-KOUREI-ZAITAKU-KBN
+      *                      ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¤Î¸¡º÷
+                             MOVE     1      TO  FLG-ZAIARI
+                             INITIALIZE             WRK-HKNCOMBI-REC
+                             MOVE ACCT-HOSPNUM   TO WRK-COMB-HOSPNUM
+                             MOVE ACCT-PTID      TO WRK-COMB-PTID
+                             MOVE ACCT-HKNCOMBI  TO WRK-COMB-HKNCOMBINUM
+                             MOVE WRK-HKNCOMBI-REC
+                                                 TO MCPDATA-REC
+                             MOVE "DBSELECT"     TO MCP-FUNC
+                             MOVE "tbl_hkncombi" TO MCP-TABLE
+                             MOVE "key"          TO MCP-PATHNAME
+                             CALL "ORCDBMAIN" USING MCPAREA
+                                                    MCPDATA-REC
+                                                    SPA-AREA
+                             IF    MCP-RC  =  ZERO
+                               MOVE "tbl_hkncombi" TO MCP-TABLE
+                               MOVE "key"          TO MCP-PATHNAME
+                               PERFORM HKNCOMBI-READ2-SEC
+                               IF  FLG-HKNCOMBI = ZERO
+                                 IF (WRK-COMB-HKNNUM = "971" OR "973" OR
+                                                       "975" OR "068" OR
+                                                       "069" OR "040")
+                                 OR (WRK-COMB-SYU-HKNKOHSBTKBN =  "8")
+                                   CONTINUE
+                                 ELSE
+                                   MOVE   "1"    TO
+                                        WK-KOUREI-ZAITAKU-KBN
+                                 END-IF
+                               END-IF
+                             END-IF
+                             MOVE "tbl_hkncombi" TO MCP-TABLE
+                             MOVE "key"          TO MCP-PATHNAME
+                             PERFORM DB-CLOSE-SEC
                            END-IF
                        END-IF
                    END-IF
                    MOVE    "tbl_sryacct" TO  MCP-TABLE
                    MOVE    "key31"       TO  MCP-PATHNAME
                    PERFORM  DB-CLOSE-SEC
-               END-IF
+      *
+                   MOVE    "tbl_sryact"  TO  MCP-TABLE
+                   MOVE    "key7"        TO  MCP-PATHNAME
+                   PERFORM   SRYACT-READ-SEC
+               END-PERFORM
            END-IF
            MOVE    "tbl_sryact"         TO      MCP-TABLE
            MOVE    "key7"               TO      MCP-PATHNAME

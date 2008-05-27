@@ -187,6 +187,7 @@
       *                                     Ë¡ÊÌÈÖ¹æ£¸£°¤ÇÈ½Äê¤·¤Æ
       *                                     ¸øÈñ¥«¥¦¥ó¥È¤·¤Ê¤¤
       *  04.02.06    NACL-Æ£¸¶    08/04/25  ÊÝ¸±ÍúÎò¤Îµ­ºÜÊÑ¹¹
+      *  04.02.07    NACL-ÌçÏÆ    08/05/22  ºßÁí¿ÇÈ½Äê¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2690,7 +2691,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "tbl_sryact"         TO  MCP-TABLE
                MOVE    "key7"               TO  MCP-PATHNAME
                PERFORM   SRYACT-READ-SEC
-               IF      FLG-SRYACT       =       ZERO
+               PERFORM   UNTIL   FLG-SRYACT   =    1
                    INITIALIZE                    SRYACCT-REC
 grpsys             MOVE    SRY-HOSPNUM      TO   ACCT-HOSPNUM
                    MOVE    SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
@@ -2709,12 +2710,12 @@ grpsys             PERFORM 900-DBSELECT-SEC
                        IF      FLG-SRYACCT  =       ZERO
                          IF  WRK-ZAITAKU-SRYCD  = "099140003"
                            IF  (ACCT-ZAIKAISU NOT =  ZERO)
-                               MOVE    "1" TO   WRK-ZAITAKU
+                             PERFORM  ZAITAKU-HENSYU-HKNKENSAKU-SEC
                            END-IF
                          ELSE
                            IF  (ACCT-ZAITEN   NOT =  ZERO)  AND
                                (ACCT-ZAIKAISU NOT =  ZERO)
-                               MOVE    "1" TO   WRK-ZAITAKU
+                             PERFORM  ZAITAKU-HENSYU-HKNKENSAKU-SEC
                            END-IF
                          END-IF
                        END-IF
@@ -2722,7 +2723,11 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    MOVE    "tbl_sryacct"    TO   MCP-TABLE
                    MOVE    "key31"          TO   MCP-PATHNAME
                    PERFORM 900-CLOSE-SEC
-               END-IF
+      *
+                   MOVE    "tbl_sryact"     TO  MCP-TABLE
+                   MOVE    "key7"           TO  MCP-PATHNAME
+                   PERFORM   SRYACT-READ-SEC
+               END-PERFORM
            END-IF
            MOVE    "tbl_sryact"         TO  MCP-TABLE
            MOVE    "key7"               TO  MCP-PATHNAME
@@ -2730,6 +2735,31 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *
            .
        ZAITAKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºßÁí¿ÇÊÝ¸±¸¡º÷
+      *****************************************************************
+       ZAITAKU-HENSYU-HKNKENSAKU-SEC                SECTION.
+      *
+           INITIALIZE                HKNCOMBI-REC
+           MOVE    ACCT-HOSPNUM  TO  COMB-HOSPNUM
+           MOVE    ACCT-PTID     TO  COMB-PTID
+           MOVE    ACCT-HKNCOMBI TO  COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC  TO  MCPDATA-REC
+           PERFORM 910-HKNCOMBI-INV-SEC
+           IF      FLG-HKNCOMBI  =   ZERO
+              IF (COMB-HKNNUM = "971" OR "973" OR "975"
+                             OR "068" OR "069" OR "040")
+              OR (COMB-SYU-HKNKOHSBTKBN  =  "8"        )
+                 CONTINUE
+              ELSE
+                 MOVE    "1"     TO  WRK-ZAITAKU
+              END-IF
+           END-IF
+      *
+           .
+       ZAITAKU-HENSYU-HKNKENSAKU-EXT.
            EXIT.
       *
       *****************************************************************
