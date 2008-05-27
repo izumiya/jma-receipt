@@ -212,6 +212,8 @@
       *                                     （道単独事業５１）
       *  04.02.08    NACL-門脇    08/04/28  埼玉県川越市地方公費対応
       *  04.02.09    NACL-門脇    08/05/01  後期高齢者月途中保険者変更対応
+      *  04.02.10    NACL-門脇    08/05/23  月途中で後期高齢者から７０歳未満
+      *                                     現物給付へ変更となった場合の対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2931,6 +2933,10 @@
                          COMB-HKNNUM      = "039"    )
                      IF  LNK-S02-KOUREI-NYUIN-KBN     =   SPACE
                        MOVE  "1"     TO  LNK-S02-KOUREI-NYUIN-KBN
+                     END-IF
+                   ELSE
+                     IF  LNK-S02-KOUREI-NYUIN-KBN     =   "1"
+                       MOVE  SPACE   TO  LNK-S02-KOUREI-NYUIN-KBN
                      END-IF
                    END-IF
                    MOVE   AGECHK-FTNRATE  TO  LNK-SYU-PTFTNRATE
