@@ -129,6 +129,7 @@
       *
            MOVE    "CHK"               TO  SJOBKANRI-MODE
            INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
            MOVE    WRK-CONS-JOB-JOBID-COLLECT
                                        TO  JOB-JOBID
            MOVE    WRK-CONS-JOB-SHELLID-COLLECT

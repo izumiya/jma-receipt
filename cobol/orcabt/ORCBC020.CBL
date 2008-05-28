@@ -355,6 +355,7 @@
            MOVE    "ORCBC020"      TO  JOB-PGID
            MOVE    "¼ý½¸¥Ç¡¼¥¿ºîÀ®¡Ê£Ã£Ó£Ö¡Ë"
                                    TO  JOB-SHELLMSG
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA
                                    JOBKANRI-REC
@@ -1413,6 +1414,7 @@
                                        TO  JOB-SHELLID
                MOVE    WRK-COLDATERR   TO  JOB-YOBI
                MOVE    "9999"          TO  JOB-ERRCD
+               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
                CALL    "ORCSJOB"       USING
                                        ORCSJOBKANRIAREA
                                        JOBKANRI-REC
@@ -1446,6 +1448,7 @@
            MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA
                                    JOBKANRI-REC
