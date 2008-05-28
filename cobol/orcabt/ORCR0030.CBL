@@ -349,6 +349,8 @@
       *                                     ¡ÊÆ»Ã±ÆÈ»ö¶È£µ£±¡Ë
       *  04.02.10    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *  04.02.11    NACL-ÌçÏÆ    08/05/15  ÆÁÅç¸©ÃÏÊý¸øÈñÀÁµáÅÀµ­ºÜÂÐ±þ
+      *  04.02.12    NACL-ÌçÏÆ    08/05/28  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *                                     ¡ÊÅÔÃ±ÆÈ»ö¶È£µ£±¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6960,6 +6962,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ADD      WRK-TAIHI-GENKIN2  TO   WRK-TAIHI-GENKIN
                 END-EVALUATE
               END-IF
+      *
+              IF  (  FLG-ZENKI-TOKUREI         =   1             )
+              AND (  KH-IDX                    =   2             )
+              AND (((SYS-1001-PREFNUM          =  13           ) AND
+                    (RECE02-KOHNUM(KH-IDX - 1) = "151" OR "451")))
+      **>       OR ((SYS-1001-PREFNUM          =  28           ) AND
+      **>           (RECE02-KOHNUM(KH-IDX - 1) = "186"         )))
+                    COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                               * 10
+                                               * 20
+                                               / 100
+                    ADD      WRK-TAIHI-GENKIN2  TO   WRK-TAIHI-GENKIN-EN
+                    COMPUTE  WRK-TAIHI-GENKIN2 = WRK-TAIHI-GENKIN2 +  5
+                    COMPUTE  WRK-TAIHI-GENKIN2 = WRK-TAIHI-GENKIN2 / 10
+                    COMPUTE  WRK-TAIHI-GENKIN2 = WRK-TAIHI-GENKIN2 * 10
+                    ADD      WRK-TAIHI-GENKIN2  TO   WRK-TAIHI-GENKIN
+              END-IF
+      *
               IF   RECE02-KOHNUM(KH-IDX - 1)  =  "051"
               AND  FLG-KOH                NOT =   2
                     MOVE     1    TO    FLG-KOH
@@ -7338,6 +7358,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (RECE02-KOHNUM(1)      = "051"))
            OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
                 (RECE02-KOHNUM(1)      = "038"))
+           OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
+                (SYS-1001-PREFNUM      =  13  ) AND
+                (RECE02-KOHNUM(1)      = "151"
+                                      OR "451"))
+      **>  OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
+      **>       (SYS-1001-PREFNUM      =  28  ) AND
+      **>       (RECE02-KOHNUM(1)      = "186"))
               PERFORM  21093-ZENKI-TOKUREI-OKIKAE-SEC
            END-IF
       *
@@ -8068,8 +8095,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
-            IF  (RECE02-KOHNUM(1)      = "051")
-            AND (TBL-DOTANDOKU-FLG(1)  =   1  )
+            IF  ((RECE02-KOHNUM(1)      = "051") AND
+                 (TBL-DOTANDOKU-FLG(1)  =   1  ))
+            OR  ((SYS-1001-PREFNUM      =  13  ) AND
+                 (RECE02-KOHNUM(1)      = "151"
+                                       OR "451"))
+      **>   OR  ((SYS-1001-PREFNUM      =  28  ) AND
+      **>        (RECE02-KOHNUM(1)      = "186"))
              CONTINUE
             ELSE
              IF  WRK-KOH-GENDOGAKU   NOT =  ZERO
@@ -8133,9 +8165,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
            END-IF
       *
-           IF  (RECE02-KOHNUM(1)      =  "051")
-           AND (TBL-DOTANDOKU-FLG(1)  =   1   )
-           AND (RECE02-ZAITAKU        =  SPACE)
+           IF  (  RECE02-ZAITAKU        =  SPACE )
+           AND (((RECE02-KOHNUM(1)      = "051") AND
+                 (TBL-DOTANDOKU-FLG(1)  =   1  ))
+             OR ((SYS-1001-PREFNUM      =  13  ) AND
+                 (RECE02-KOHNUM(1)      = "151"
+                                       OR "451")))
+      **>    OR ((SYS-1001-PREFNUM      =  28  ) AND
+      **>        (RECE02-KOHNUM(1)      = "186")))
              CONTINUE
            ELSE
              IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU

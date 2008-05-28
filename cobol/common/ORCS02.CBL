@@ -214,6 +214,8 @@
       *  04.02.09    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *  04.02.10    NACL-ÌçÏÆ    08/05/23  ·îÅÓÃæ¤Ç¸å´ü¹âÎð¼Ô¤«¤é£·£°ºÐÌ¤Ëþ
       *                                     ¸½ÊªµëÉÕ¤ØÊÑ¹¹¤È¤Ê¤Ã¤¿¾ì¹ç¤ÎÂÐ±þ
+      *  04.02.11    NACL-ÌçÏÆ    08/05/28  £·£°ºÐÂåÆÃÎãÁ¼ÃÖ£°£µ£±¿©»ö·×»»
+      *                                     ¡ÊÅÔÃ±ÆÈ»ö¶È£µ£±¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -14378,9 +14380,12 @@
                END-IF
                PERFORM   23072-KOHHI-HIKAKU-SEC
       *
-               IF  (FLG-ZENKI-TOKUREI           =   1  )
-               AND (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051")
-      ***      AND (WK-DOTANDOKU(KOH-IDX)       =  ZERO)
+               IF  (  FLG-ZENKI-TOKUREI           =   1             )
+               AND (( LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051"          )
+                 OR ((WK-1001-PREFNUM             =  13           ) AND
+                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "151" OR "451")))
+      **>        OR ((WK-1001-PREFNUM             =  28           ) AND
+      **>            (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "186"         )))
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY
                                    =  WK-ZENGAKU  *  0.2
                   IF   WK-ZENKI-TOKUREI-MONEY  <  ZAN-KOHI-T(KOH-IDX)
