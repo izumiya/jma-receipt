@@ -254,6 +254,7 @@
       *  04.02.10    NACL-ÌçÏÆ    08/04/28  ºë¶Ì¸©Àî±Û»ÔÃÏÊý¸øÈñÂÐ±þ
       *  04.02.11    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *  04.02.12    NACL-ÌçÏÆ    08/05/22  ºßÁí¿ÇÈ½Äê¾ò·ï½¤Àµ
+      *  04.02.13    NACL-ÌçÏÆ    08/05/29  ¸½ÊªµëÉÕÊÝ¸±¼ÔÃ±°Ì¾ò·ïÄÉ²Ã
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -491,8 +492,16 @@
       *
            03  WK-KOHININBARAI-KOHID       PIC  9(10).
       *
-           03  WK-HKNJANUM                 PIC  X(08).
-           03  WK-HKNJANUM2                PIC  X(08).
+           03  WK-HKNJANUM-TBL.
+               05  WK-HKNJANUM             PIC  X(08).
+               05  WK-HONKZKKBN            PIC  X(01).
+               05  WK-KIGO                 PIC  X(80).
+               05  WK-NUM                  PIC  X(80).
+           03  WK-HKNJANUM2-TBL.
+               05  WK-HKNJANUM2            PIC  X(08).
+               05  WK-HONKZKKBN2           PIC  X(01).
+               05  WK-KIGO2                PIC  X(80).
+               05  WK-NUM2                 PIC  X(80).
       *
            03  WK-GENTAI-SKYMONEY          PIC  9(07).
            03  WK-GENTAI-SKYMONEY2         PIC  9(07).
@@ -4659,7 +4668,7 @@
       *
            MOVE   ZERO               TO    FLG-SEISINJYO
                                            FLG-TOKUREI-HKNJYA
-           MOVE   SPACE              TO    WK-HKNJANUM
+           MOVE   SPACE              TO    WK-HKNJANUM-TBL
       *
            INITIALIZE                      PTHKNINF-REC
            MOVE   COMB-HOSPNUM       TO    PTHKN-HOSPNUM
@@ -4697,6 +4706,9 @@
                       MOVE    1      TO    FLG-TOKUREI-HKNJYA
                   END-IF
                   MOVE    PTHKN-HKNJANUM   TO    WK-HKNJANUM
+                  MOVE    PTHKN-HONKZKKBN  TO    WK-HONKZKKBN
+                  MOVE    PTHKN-KIGO       TO    WK-KIGO
+                  MOVE    PTHKN-NUM        TO    WK-NUM
                END-IF
            END-IF
       *
@@ -7384,7 +7396,7 @@
            IF     (FLG-GENBUTU70            NOT =  ZERO)
            OR     (FLG-KOHININBARAI             =    1 )
            OR     (LNK-S01-KOUREI-ZAITAKU-KBN   =   "1")
-             MOVE   SPACE              TO    WK-HKNJANUM2
+             MOVE   SPACE              TO    WK-HKNJANUM2-TBL
              INITIALIZE                      PTHKNINF-REC
              MOVE   WRK-COMB-HOSPNUM   TO    PTHKN-HOSPNUM
              MOVE   WRK-COMB-PTID      TO    PTHKN-PTID
@@ -7402,6 +7414,9 @@
                  PERFORM  PTHKNINF-READ-SEC
                  IF      FLG-PTHKNINF   =     ZERO
                     MOVE  PTHKN-HKNJANUM    TO    WK-HKNJANUM2
+                    MOVE  PTHKN-HONKZKKBN   TO    WK-HONKZKKBN2
+                    MOVE  PTHKN-KIGO        TO    WK-KIGO2
+                    MOVE  PTHKN-NUM         TO    WK-NUM2
                  END-IF
              END-IF
              MOVE     "tbl_pthkninf"   TO    MCP-TABLE
@@ -7631,7 +7646,7 @@
                         IF  (SYU-KOH2HKNNUM   =  SPACE)
                         AND (SYU-KOH3HKNNUM   =  SPACE)
                         AND (SYU-KOH4HKNNUM   =  SPACE)
-                         IF  WK-HKNJANUM2  =  WK-HKNJANUM
+                         IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                           IF  LNK-SYU-SRYYMD(7:2)  =  SYU-SRYYMD(7:2)
                             ADD   WK-SYU-SYUCOMPFTN TO   FTN-KOHI1-D
                           END-IF
@@ -7661,7 +7676,7 @@
                         AND (SYU-KOH2HKNNUM   =  SPACE)
                         AND (SYU-KOH3HKNNUM   =  SPACE)
                         AND (SYU-KOH4HKNNUM   =  SPACE)
-                         IF  WK-HKNJANUM2  =  WK-HKNJANUM
+                         IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                           ADD   WK-SYU-SYUCOMPFTN TO  FTN-SYU-M
       *
                           COMPUTE WK-ENTANI =
@@ -7749,7 +7764,7 @@
       *
                   IF   SYU-NYUGAIKBN  =   "2"
                    IF  FLG-GENBUTU70    NOT =  ZERO
-                    IF  WK-HKNJANUM2  =   WK-HKNJANUM
+                    IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                      IF   FLG-IRYOHI70  =  3 OR 4 OR 6
                        COMPUTE  WK-KOUREI-IRYOHI70  =
                                 WK-KOUREI-IRYOHI70  +
@@ -8468,7 +8483,7 @@
       *
                   IF   SYU-NYUGAIKBN  =   "2"
                    IF  FLG-GENBUTU70    NOT =  ZERO
-                    IF  WK-HKNJANUM2  =   WK-HKNJANUM
+                    IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                      IF   (FLG-IRYOHI70       =  6            )
                      AND  (FLG-SYUKEI         =  ZERO         )
                        IF  ((WK-1001-PREFNUM    =  07           ) AND
@@ -10685,7 +10700,7 @@
              AND (SYU-KOH2HKNNUM     =  SPACE)
              AND (SYU-KOH3HKNNUM     =  SPACE)
              AND (SYU-KOH4HKNNUM     =  SPACE)
-               IF  (WK-HKNJANUM2     =  WK-HKNJANUM)
+               IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                  COMPUTE WK-ENTANI = SYU-SYUCOMPFTN-ENTANI + 0.9
                  IF    FLG-IRYOHI70  =  1 OR 2
                    COMPUTE   WK-KOUREI-IRYOHI70  =
@@ -10699,7 +10714,7 @@
                  MOVE   1     TO  FLG-TAISYO
                END-IF
              ELSE
-               IF  (WK-HKNJANUM2     =  WK-HKNJANUM)
+               IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                  MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
                  COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
                  IF    FLG-IRYOHI70  =  1 OR 2
@@ -10719,7 +10734,7 @@
              AND (SYU-KOH2HKNNUM     =  SPACE)
              AND (SYU-KOH3HKNNUM     =  SPACE)
              AND (SYU-KOH4HKNNUM     =  SPACE)
-               IF  (WK-HKNJANUM2     =  WK-HKNJANUM)
+               IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
       ***        COMPUTE WK-ENTANI = SYU-SYUCOMPFTN-ENTANI + 0.9
       ***        IF    FLG-IRYOHI70  =  3 OR 4 OR 6
       ***          COMPUTE   WK-KOUREI-IRYOHI70  =
@@ -10735,7 +10750,7 @@
                  MOVE   1     TO  FLG-TAISYO
                END-IF
              ELSE
-               IF  (WK-HKNJANUM2     =  WK-HKNJANUM)
+               IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                  MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
                  COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
                  MOVE   ZERO  TO  FLG-TAISYO
@@ -10760,8 +10775,8 @@
        22025-KOUREI-SYU-HENSYU-SEC          SECTION.
       *
            IF     COMB-HKNNUM     = "039"
-             IF   (SYU-SYUHKNNUM    =  "039"      )
-      ***    AND  (WK-HKNJANUM2     =  WK-HKNJANUM)
+             IF   (SYU-SYUHKNNUM    =  "039"         )
+      ***    AND  (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL)
                IF  (SYU-KOH1HKNNUM     NOT = SPACE)
                OR  (SYU-KOH2HKNNUM     NOT = SPACE)
                OR  (SYU-KOH3HKNNUM     NOT = SPACE)
@@ -10787,7 +10802,7 @@
            ELSE
              IF    LNK-SYU-SRYYMD(1:6)  >= "200804"
                IF   (SYU-SYUHKNNUM   NOT =  "039"      )
-               AND  (WK-HKNJANUM2        =  WK-HKNJANUM)
+               AND  (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL)
                  IF  (SYU-KOH1HKNNUM     NOT = SPACE)
                  OR  (SYU-KOH2HKNNUM     NOT = SPACE)
                  OR  (SYU-KOH3HKNNUM     NOT = SPACE)

@@ -351,6 +351,7 @@
       *  04.02.11    NACL-ÃÁœ∆    08/05/15  ∆¡≈Á∏©√œ ˝∏¯»Ò¿¡µ·≈¿µ≠∫‹¬–±˛
       *  04.02.12    NACL-ÃÁœ∆    08/05/28  £∑£∞∫–¬Â¡∞»æ∆√Œ„∞Ï…Ù…È√¥∂‚µ≠∫‹Ω§¿µ
       *                                     ° ≈‘√±∆»ªˆ∂»£µ£±°À
+      *  04.02.13    NACL-ÃÁœ∆    08/05/29  ∏Ω ™µÎ…’ ›∏±º‘√±∞ÃæÚ∑Ôƒ…≤√
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -758,6 +759,7 @@
            03  WRK-SYS-SRYYMD                          PIC X(08).
       *
            03  WRK-CHK-HKNJANUM                        PIC X(08).
+           03  WRK-CHK-HONKZKKBN                       PIC X(01).
            03  WRK-CHK-IDOU                            PIC 9(01).
            03  WRK-CHK-TAISYO                          PIC 9(01).
            03  WRK-CHK-HKNID                           PIC 9(10).
@@ -2278,6 +2280,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
            MOVE    SPACE               TO  WRK-CHK-HKNJANUM
                                            WRK-CHK-HKNNUM
+                                           WRK-CHK-HONKZKKBN
            MOVE    ZERO                TO  WRK-CHK-IDOU
                                            WRK-CHK-TAISYO
                                            WRK-CHK-HKNID
@@ -2310,12 +2313,17 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                          IF   RECE09-HKNJANUM  NOT =  SPACE
                             MOVE    1             TO  WRK-CHK-IDOU
                             MOVE  RECE09-HKNJANUM TO  WRK-CHK-HKNJANUM
+                            MOVE  RECE09-HONKZKKBN
+                                                  TO  WRK-CHK-HONKZKKBN
                             MOVE  RECE09-HKNID    TO  WRK-CHK-HKNID
                             MOVE  RECE09-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
                        WHEN     1
-                         IF   RECE09-HKNJANUM  NOT =  WRK-CHK-HKNJANUM
-                         AND  RECE09-HKNJANUM  NOT =  SPACE
+                         IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
+                             (RECE09-HKNJANUM  NOT =
+                                                 WRK-CHK-HKNJANUM ))
+                         OR ( RECE09-HONKZKKBN NOT =
+                                                 WRK-CHK-HONKZKKBN )
                              MOVE    1            TO  WRK-CHK-TAISYO
                          END-IF
                        WHEN     2
@@ -2328,6 +2336,8 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                          IF   RECE09-HKNJANUM  NOT =  SPACE
                             MOVE    2             TO  WRK-CHK-IDOU
                             MOVE  RECE09-HKNJANUM TO  WRK-CHK-HKNJANUM
+                            MOVE  RECE09-HONKZKKBN
+                                                  TO  WRK-CHK-HONKZKKBN
                             MOVE  RECE09-HKNID    TO  WRK-CHK-HKNID
                             MOVE  RECE09-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
@@ -2335,8 +2345,11 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                        WHEN     6
                          MOVE    1                TO  WRK-CHK-TAISYO
                        WHEN     2
-                         IF   RECE09-HKNJANUM  NOT =  WRK-CHK-HKNJANUM
-                         AND  RECE09-HKNJANUM  NOT =  SPACE
+                         IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
+                             (RECE09-HKNJANUM  NOT =
+                                                 WRK-CHK-HKNJANUM ))
+                         OR ( RECE09-HONKZKKBN NOT =
+                                                 WRK-CHK-HONKZKKBN )
                              MOVE    1            TO  WRK-CHK-TAISYO
                          END-IF
                      END-EVALUATE
@@ -2346,6 +2359,8 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                          IF   RECE09-HKNJANUM  NOT =  SPACE
                             MOVE    6             TO  WRK-CHK-IDOU
                             MOVE  RECE09-HKNJANUM TO  WRK-CHK-HKNJANUM
+                            MOVE  RECE09-HONKZKKBN
+                                                  TO  WRK-CHK-HONKZKKBN
                             MOVE  RECE09-HKNID    TO  WRK-CHK-HKNID
                             MOVE  RECE09-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
@@ -2353,8 +2368,11 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                        WHEN     2
                          MOVE    1                TO  WRK-CHK-TAISYO
                        WHEN     6
-                         IF   RECE09-HKNJANUM  NOT =  WRK-CHK-HKNJANUM
-                         AND  RECE09-HKNJANUM  NOT =  SPACE
+                         IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
+                             (RECE09-HKNJANUM  NOT =
+                                                 WRK-CHK-HKNJANUM ))
+                         OR ( RECE09-HONKZKKBN NOT =
+                                                 WRK-CHK-HONKZKKBN )
                              MOVE    1            TO  WRK-CHK-TAISYO
                          END-IF
                      END-EVALUATE
@@ -2364,8 +2382,9 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
            END-PERFORM
       *
            IF   WRK-CHK-TAISYO       =  1
-           AND  RECE02-HKNJANUM  NOT =  SPACE
-           AND  RECE02-HKNJANUM  NOT =  WRK-CHK-HKNJANUM
+             IF ((RECE02-HKNJANUM  NOT = SPACE            ) AND
+                 (RECE02-HKNJANUM  NOT = WRK-CHK-HKNJANUM ))
+             OR ( RECE02-HONKZKKBN NOT = WRK-CHK-HONKZKKBN )
       *
                 INITIALIZE                 ORCSKOREIFTNCHKAREA
 grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
