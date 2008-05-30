@@ -1812,6 +1812,9 @@
                WHEN    13
                    MOVE    "2002"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    14
+                   MOVE    "2003"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    OTHER
                    MOVE    "2001"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
@@ -2754,6 +2757,13 @@
            WHEN    "2002"
                MOVE    "退院計算に必要な会計情報が作成されていません"
                                        TO  SPA-ERRMSG
+           WHEN    "2003"
+               STRING  "入院料と異なる保険の入院料加算があります。"
+                                           DELIMITED   BY  SPACE
+                       "確認してください。"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
            END-EVALUATE
       *
            MOVE    SPACE               TO  I5ERR

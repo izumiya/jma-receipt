@@ -211,6 +211,8 @@
                "処理対象のデータがありませんでした".
            03  ERR-MSG10                   PIC X(100)    VALUE
                "定期請求管理情報の取得に失敗しました".
+           03  ERR-MSG11                   PIC X(100)    VALUE
+               "入院料加算の保険組合せを確認してください".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -886,6 +888,8 @@
                EVALUATE LNK-S02-RC
                WHEN    13
                    MOVE    "0005"      TO  ERR-ERRCD
+               WHEN    14
+                   MOVE    "0011"      TO  ERR-ERRCD
                WHEN    OTHER
                    MOVE    "0006"      TO  ERR-ERRCD
                END-EVALUATE
@@ -1509,6 +1513,8 @@
                MOVE    ERR-MSG09       TO  ERR-ERRMSG
            WHEN    "0010"
                MOVE    ERR-MSG10       TO  ERR-ERRMSG
+           WHEN    "0011"
+               MOVE    ERR-MSG11       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE

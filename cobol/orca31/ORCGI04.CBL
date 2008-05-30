@@ -1047,7 +1047,7 @@
                                            LNK-ORCS02-REC
                                            LNK-SYUNOU-REC-T
                                            LNK-SYUDAY-REC-T
-                   IF    ( LNK-S02-RC      =   ZERO )
+                   IF    ( LNK-S02-RC      =   ZERO OR 14 )
                        PERFORM VARYING IDX6    FROM    1   BY  1
                                UNTIL ( IDX6    >   10 )
       *

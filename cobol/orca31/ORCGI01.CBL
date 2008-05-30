@@ -17102,11 +17102,14 @@
                                        I0SUB02-LNK
            EVALUATE    TRUE
            WHEN  ( I0SUB02-S02-RC  NOT =   ZERO )
-               IF    ( I0SUB02-S02-RC  =   13 )
+               EVALUATE    I0SUB02-S02-RC
+               WHEN    13
                    MOVE    "2012"  TO  SPA-ERRCD
-               ELSE
+               WHEN    14
+                   MOVE    "2013"  TO  SPA-ERRCD
+               WHEN    OTHER
                    MOVE    "2008"  TO  SPA-ERRCD
-               END-IF
+               END-EVALUATE
            WHEN  ( I0SUB02-RC     NOT =   ZERO )
                    MOVE    "2008"  TO  SPA-ERRCD
            WHEN    OTHER
@@ -18423,6 +18426,14 @@
            WHEN    "2012"
                MOVE    "退院計算に必要な会計情報が作成されていません"
                                        TO  SPA-ERRMSG
+           WHEN    "2013"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "入院料と異なる保険の入院料加算があります。"
+                                           DELIMITED   BY  SPACE
+                       "確認してください。"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
            WHEN    "2008"
                MOVE    "負担金計算処理に失敗しました"
                                        TO  SPA-ERRMSG
