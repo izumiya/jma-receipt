@@ -44,6 +44,7 @@
       *  03.05.01    NACL-門脇    07/06/01  グループ診療対応
       *  03.05.02    NACL-藤原    07/06/01  realtime preview 処理追加
       *  03.05.03    NACL-門脇    07/07/17  個別時のシステム管理編集修正
+      *  04.02.01    NACL-門脇    08/05/29  入院料加算保険組み合わせチェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -999,8 +1000,17 @@ grpsys         PERFORM 900-DBSELECT-SEC
                   DISPLAY "SKYSTYMD=" WRK-SEIKYUSTYMD
                   DISPLAY "SKYEDYMD=" WRK-SEIKYUEDYMD
       *
-                  MOVE    "仮収納データの取得に失敗"
+                  EVALUATE   LNK-S02-RC
+                    WHEN       13
+                      MOVE "入院会計が未作成です"
                                           TO  ERR-ERRMSG
+                    WHEN       14
+                      MOVE "入院料加算の保険組合せ確認"
+                                          TO  ERR-ERRMSG
+                    WHEN      OTHER
+                      MOVE "仮収納データの取得に失敗"
+                                          TO  ERR-ERRMSG
+                  END-EVALUATE
                   PERFORM 600-ERRMSG-EDIT-SEC
       *
                   MOVE  ERR-HEN-ERRMSG    TO  WRK-RECEERR

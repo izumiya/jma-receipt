@@ -56,6 +56,7 @@
       * 
       *  04.02.01    NACL-藤原    08/03/04  平成２０年４月改正対応
       *                                     広域連合対応
+      *  04.02.02    NACL-門脇    08/05/29  入院料加算保険組み合わせチェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1146,8 +1147,17 @@
                   DISPLAY "SKYSTYMD=" WRK-SEIKYUSTYMD
                   DISPLAY "SKYEDYMD=" WRK-SEIKYUEDYMD
       *
-                  MOVE    "仮収納データの取得に失敗"
+                  EVALUATE   LNK-S02-RC
+                    WHEN       13
+                      MOVE "入院会計が未作成です"
                                           TO  ERR-ERRMSG
+                    WHEN       14
+                      MOVE "入院料加算の保険組合せ確認"
+                                          TO  ERR-ERRMSG
+                    WHEN      OTHER
+                      MOVE "仮収納データの取得に失敗"
+                                          TO  ERR-ERRMSG
+                  END-EVALUATE
                   PERFORM 600-ERRMSG-EDIT-SEC
       *
                   MOVE  ERR-HEN-ERRMSG    TO  WRK-RECEERR
