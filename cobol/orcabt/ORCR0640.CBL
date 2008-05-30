@@ -486,6 +486,7 @@
            03  FLG-DOTANDOKU                           PIC 9(01).
            03  FLG-ZENKI-TOKUREI                       PIC 9(01).
            03  FLG-SKJFTNNASI                          PIC 9(01).
+           03  FLG-HOKENICHIBU                         PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1024,6 +1025,8 @@
            03  WRK-TAIHI-GENKIN3               PIC  9(07).
       *
            03  WRK-FORMALNAME                  PIC  X(300).
+      *
+           03  WRK-HOKENICHIBUGAK              PIC  9(07).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -9206,6 +9209,8 @@
            PERFORM         2104B-TOKUTEISIKKAN-CHECK-SEC
       *
            MOVE    ZERO                 TO      FLG-NYUINRYO
+           MOVE    ZERO                 TO      FLG-HOKENICHIBU
+           MOVE    ZERO                 TO      WRK-HOKENICHIBUGAK
       *
            INITIALIZE                           WRK-TOKUSYU-SKJFLG-T
       *
@@ -9392,15 +9397,22 @@
                             MOVE  RECE69-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
                        WHEN     1
-                         IF ((RECE69-HKNJANUM  NOT = SPACE        ) AND
-                             (RECE69-HKNJANUM  NOT =
-                                                 WRK-CHK-HKNJANUM ))
-                         OR ( RECE69-HONKZKKBN NOT =
-                                                 WRK-CHK-HONKZKKBN )
-                             MOVE    1            TO  WRK-CHK-TAISYO
+                         IF    RECE62-KOUREI    =   "1"
+                          IF  (RECE69-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE69-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
+                         ELSE
+                          IF ((RECE69-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE69-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM ))
+                          OR ( RECE69-HONKZKKBN NOT =
+                                                  WRK-CHK-HONKZKKBN )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
                          END-IF
                        WHEN     2
-                       WHEN     6
                          MOVE    1                TO  WRK-CHK-TAISYO
                      END-EVALUATE
                    WHEN    "2"
@@ -9415,15 +9427,23 @@
                             MOVE  RECE69-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
                        WHEN     1
-                       WHEN     6
                          MOVE    1                TO  WRK-CHK-TAISYO
                        WHEN     2
-                         IF ((RECE69-HKNJANUM  NOT = SPACE        ) AND
-                             (RECE69-HKNJANUM  NOT =
-                                                 WRK-CHK-HKNJANUM ))
-                         OR ( RECE69-HONKZKKBN NOT =
-                                                 WRK-CHK-HONKZKKBN )
-                             MOVE    1            TO  WRK-CHK-TAISYO
+                         IF    RECE62-HKNNUM  = "060"
+                         OR    RECE62-KOUREI  =  "1"
+                          IF  (RECE69-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE69-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
+                         ELSE
+                          IF ((RECE69-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE69-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM ))
+                          OR ( RECE69-HONKZKKBN NOT =
+                                                  WRK-CHK-HONKZKKBN )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
                          END-IF
                      END-EVALUATE
                    WHEN    "6"
@@ -9437,15 +9457,10 @@
                             MOVE  RECE69-HKNID    TO  WRK-CHK-HKNID
                             MOVE  RECE69-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
-                       WHEN     1
-                       WHEN     2
-                         MOVE    1                TO  WRK-CHK-TAISYO
                        WHEN     6
-                         IF ((RECE69-HKNJANUM  NOT = SPACE        ) AND
+                         IF  (RECE69-HKNJANUM  NOT = SPACE        ) AND
                              (RECE69-HKNJANUM  NOT =
-                                                 WRK-CHK-HKNJANUM ))
-                         OR ( RECE69-HONKZKKBN NOT =
-                                                 WRK-CHK-HONKZKKBN )
+                                                 WRK-CHK-HKNJANUM )
                              MOVE    1            TO  WRK-CHK-TAISYO
                          END-IF
                      END-EVALUATE
@@ -9520,6 +9535,7 @@
                                        TO  WRK-CHIHOU-KIN-GEN70
                 END-IF
       *
+             END-IF
            END-IF
       *
            .
@@ -9774,6 +9790,7 @@
                                               WRK-KOH-GAI2
                END-IF                                              
            ELSE
+             MOVE      1      TO    FLG-HOKENICHIBU
              IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
@@ -9864,7 +9881,11 @@
                  END-IF
                  ADD    SYU-SYUCOMPFTN      TO  WRK-KOH-GAI-GEN70
                  ADD    SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN
+      *
+                 ADD    WRK-FTNKEI          TO  WRK-HOKENICHIBUGAK
+      *
            ELSE
+             MOVE      1      TO    FLG-HOKENICHIBU
              IF     SYU-KOHTAIYKZKBN  =   "9"
                  ADD    SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN
                  ADD    SYU-KOH-FTN         TO  WRK-KOH-FTN-GEN70
@@ -11755,7 +11776,15 @@
                  END-IF
       ***        IF   WRK-KOH-GAI2         >=  WRK-CHK-KEIKASOCHI1
                  IF   WRK-KOH-GAI-GEN70    >=  WRK-CHK-KEIKASOCHI1
-                    CONTINUE
+      ***           CONTINUE
+                    IF   RECE62-KOHNUM(1)  =  SPACE
+                    AND  RECE62-KOHNUM(2)  =  SPACE
+                    AND  RECE62-KOHNUM(3)  =  SPACE
+                    AND  RECE62-KOHNUM(4)  =  SPACE
+                    AND  FLG-HOKENICHIBU   =  ZERO
+                    AND  WRK-KOH-GAI-GEN70 =  WRK-HOKENICHIBUGAK
+                      MOVE  "3"      TO   RECE62-KOUREI
+                    END-IF
                  ELSE
                     MOVE    "3"      TO   RECE62-KOUREI
                  END-IF
@@ -12045,10 +12074,11 @@
       *
            IF      RECE62-SRYYM      >=  "200210"
              IF    RECE62-KOUREI   =   "1" OR "2"
-                IF   RECE62-KOHNUM(1) =  SPACE
-                AND  RECE62-KOHNUM(2) =  SPACE
-                AND  RECE62-KOHNUM(3) =  SPACE
-                AND  RECE62-KOHNUM(4) =  SPACE
+                IF   RECE62-KOHNUM(1)     =  SPACE
+                AND  RECE62-KOHNUM(2)     =  SPACE
+                AND  RECE62-KOHNUM(3)     =  SPACE
+                AND  RECE62-KOHNUM(4)     =  SPACE
+                AND  FLG-HOKENICHIBU  NOT =  ZERO
       *
                  EVALUATE   RECE62-KOUREI
                   WHEN        "1"

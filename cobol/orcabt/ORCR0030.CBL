@@ -511,6 +511,7 @@
            03  FLG-DOTANDOKU-IGAI                      PIC 9(01).
            03  FLG-DOTANDOKU                           PIC 9(01).
            03  FLG-ZENKI-TOKUREI                       PIC 9(01).
+           03  FLG-HOKENICHIBU                         PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -890,6 +891,8 @@
            03  WRK-TAIHI-GENKIN3               PIC  9(07).
       *
            03  WRK-FORMALNAME                  PIC  X(300).
+      *
+           03  WRK-HOKENICHIBUGAK              PIC  9(07).
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
@@ -1738,6 +1741,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      WRK-TAIHI-GENKIN
                                         WRK-TAIHI-GENKIN-EN
            MOVE      ZERO       TO      FLG-ZENKI-TOKUREI
+           MOVE      ZERO       TO      FLG-HOKENICHIBU
+           MOVE      ZERO       TO      WRK-HOKENICHIBUGAK
       *
            IF    (RECE02-SRYYM   >=  "200804")
            AND   (RECE02-SRYYM   <=  "200903")
@@ -2319,15 +2324,22 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                             MOVE  RECE09-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
                        WHEN     1
-                         IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
-                             (RECE09-HKNJANUM  NOT =
-                                                 WRK-CHK-HKNJANUM ))
-                         OR ( RECE09-HONKZKKBN NOT =
-                                                 WRK-CHK-HONKZKKBN )
-                             MOVE    1            TO  WRK-CHK-TAISYO
+                         IF    RECE02-ZAITAKU   =   "1"
+                          IF  (RECE09-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE09-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
+                         ELSE
+                          IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE09-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM ))
+                          OR ( RECE09-HONKZKKBN NOT =
+                                                  WRK-CHK-HONKZKKBN )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
                          END-IF
                        WHEN     2
-                       WHEN     6
                          MOVE    1                TO  WRK-CHK-TAISYO
                      END-EVALUATE
                    WHEN    "2"
@@ -2342,15 +2354,23 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                             MOVE  RECE09-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
                        WHEN     1
-                       WHEN     6
                          MOVE    1                TO  WRK-CHK-TAISYO
                        WHEN     2
-                         IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
-                             (RECE09-HKNJANUM  NOT =
-                                                 WRK-CHK-HKNJANUM ))
-                         OR ( RECE09-HONKZKKBN NOT =
-                                                 WRK-CHK-HONKZKKBN )
-                             MOVE    1            TO  WRK-CHK-TAISYO
+                         IF    RECE02-HKNNUM  = "060"
+                         OR    RECE02-ZAITAKU =  "1"
+                          IF  (RECE09-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE09-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
+                         ELSE
+                          IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
+                              (RECE09-HKNJANUM  NOT =
+                                                  WRK-CHK-HKNJANUM ))
+                          OR ( RECE09-HONKZKKBN NOT =
+                                                  WRK-CHK-HONKZKKBN )
+                              MOVE    1           TO  WRK-CHK-TAISYO
+                          END-IF
                          END-IF
                      END-EVALUATE
                    WHEN    "6"
@@ -2364,15 +2384,10 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                             MOVE  RECE09-HKNID    TO  WRK-CHK-HKNID
                             MOVE  RECE09-HKNNUM   TO  WRK-CHK-HKNNUM
                          END-IF
-                       WHEN     1
-                       WHEN     2
-                         MOVE    1                TO  WRK-CHK-TAISYO
                        WHEN     6
-                         IF ((RECE09-HKNJANUM  NOT = SPACE        ) AND
+                         IF  (RECE09-HKNJANUM  NOT = SPACE        ) AND
                              (RECE09-HKNJANUM  NOT =
-                                                 WRK-CHK-HKNJANUM ))
-                         OR ( RECE09-HONKZKKBN NOT =
-                                                 WRK-CHK-HONKZKKBN )
+                                                 WRK-CHK-HKNJANUM )
                              MOVE    1            TO  WRK-CHK-TAISYO
                          END-IF
                      END-EVALUATE
@@ -2442,6 +2457,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                                        TO  WRK-CHIHOU-KIN3
                 END-IF
       *
+             END-IF
            END-IF
       *
            .
@@ -6299,6 +6315,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               WRK-KOH-GAI2
                END-IF
            ELSE
+             MOVE      1      TO    FLG-HOKENICHIBU
              IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
@@ -6390,7 +6407,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               WRK-KOH-GAI2
                  MOVE   1                TO   FLG-JYOGENKBN
                  ADD    SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN
+      *
+                 ADD    WRK-FTNKEI       TO   WRK-HOKENICHIBUGAK
+      *
            ELSE
+             MOVE      1      TO    FLG-HOKENICHIBU
              IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
@@ -7289,7 +7310,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE   ZERO     TO   WRK-CHK-KEIKASOCHI1
                  END-IF
                  IF   WRK-KOH-GAI2         >=  WRK-CHK-KEIKASOCHI1
-                    CONTINUE
+     ***            CONTINUE
+                    IF   RECE02-KOHNUM(1)  =  SPACE
+                    AND  RECE02-KOHNUM(2)  =  SPACE
+                    AND  RECE02-KOHNUM(3)  =  SPACE
+                    AND  RECE02-KOHNUM(4)  =  SPACE
+                    AND  FLG-HOKENICHIBU   =  ZERO
+                    AND  WRK-KOH-GAI2      =  WRK-HOKENICHIBUGAK
+                      MOVE  "3"      TO   RECE02-ZAITAKU
+                    END-IF
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
                  END-IF
@@ -7536,10 +7565,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF      RECE02-SRYYM      >=  "200210"
              IF    RECE02-ZAITAKU     =  "1" OR "2"
-                IF   RECE02-KOHNUM(1) =  SPACE
-                AND  RECE02-KOHNUM(2) =  SPACE
-                AND  RECE02-KOHNUM(3) =  SPACE
-                AND  RECE02-KOHNUM(4) =  SPACE
+                IF   RECE02-KOHNUM(1)     =  SPACE
+                AND  RECE02-KOHNUM(2)     =  SPACE
+                AND  RECE02-KOHNUM(3)     =  SPACE
+                AND  RECE02-KOHNUM(4)     =  SPACE
+                AND  FLG-HOKENICHIBU  NOT =  ZERO
       *
                  EVALUATE   RECE02-ZAITAKU
                   WHEN        "1"
