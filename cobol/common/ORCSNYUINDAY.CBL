@@ -29,6 +29,7 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *Ê¿ÀÅ£²£°Ç¯£´·î²þÄêÂÐ±þ
       *  04.02.00    NACL-¾®Æ¦Âô  08/03/05  Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£³¤ÎÆþ±¡ÄÉ²Ã
+      *  04.02.00    NACL-¾®Æ¦Âô  08/06/02  µßµÞÈÂÁ÷¿ÇÎÅÎÁ¤Î»»ÄêÆü¤òÈ½ÄêÄÉ²Ã
       *****************************************************************
       *
       *
@@ -47,6 +48,8 @@
        01  FLG-AREA.
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-NYUINACT                PIC 9(01).
+           03  FLG-SRYACCT                 PIC 9(01).
+           03  FLG-SRYACT                  PIC 9(01).
            03  FLG-PTINF                   PIC 9(01).
            03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-TANKI2                  PIC 9(01).
@@ -84,6 +87,14 @@
       *    Æþ±¡¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼
        01  NYUINACT-REC.
            COPY    "CPNYUINACT.INC".
+      *
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡Ý
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
+      *
+      *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
       *
       *    ´µ¼ÔÆþ±¡ÍúÎò¥Þ¥¹¥¿¡Ý
        01  PTNYUINRRK-REC.
@@ -512,6 +523,63 @@
                END-IF
            END-PERFORM
       *
+      *    Æþ±¡Ãæ¤ÎµßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÆü¤ò¿©»ö»»Äê²ÄÇ½¤È¤¹¤ë
+           INITIALIZE                          SRYACT-REC
+           MOVE    LNK-NYUINDAY-HOSPNUM    TO  SRY-HOSPNUM
+           MOVE    "1"                     TO  SRY-NYUGAIKBN
+           MOVE    LNK-NYUINDAY-PTID       TO  SRY-PTID
+           MOVE    LNK-NYUINDAY-SANTEIYM   TO  SRY-SRYYM
+           MOVE    "114003010"             TO  SRY-SRYCD(1)
+                                               SRY-SRYCD(2)
+                                               SRY-SRYCD(3)
+                                               SRY-SRYCD(4)
+                                               SRY-SRYCD(5)
+           MOVE    "tbl_sryact"            TO  MCP-TABLE
+           MOVE    "key7"                  TO  MCP-PATHNAME
+           PERFORM 910-SRYACT-SELECT-SEC
+           IF      FLG-SRYACT             =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM   910-SRYACT-READ-SEC
+               PERFORM   UNTIL   (FLG-SRYACT  =   1)
+                   INITIALIZE                  SRYACCT-REC
+                   MOVE    SRY-HOSPNUM     TO  ACCT-HOSPNUM
+                   MOVE    SRY-NYUGAIKBN   TO  ACCT-NYUGAIKBN
+                   MOVE    SRY-PTID        TO  ACCT-PTID
+                   MOVE    SRY-SRYKA       TO  ACCT-SRYKA
+                   MOVE    SRY-SRYYM       TO  ACCT-SRYYM
+                   MOVE    SRY-ZAINUM      TO  ACCT-ZAINUM
+                   MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                   MOVE    "key5"          TO  MCP-PATHNAME
+                   PERFORM   910-SRYACCT-SELECT-SEC
+                   MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                   MOVE    "key5"          TO  MCP-PATHNAME
+                   PERFORM   910-SRYACCT-READ-SEC
+                   IF    FLG-SRYACCT       =   0
+                       PERFORM    VARYING   IDX   FROM   1   BY   1
+                         UNTIL     IDX   >   31
+                           IF   ACCT-DAY(1 IDX)   NOT =   ZERO
+                             MOVE   "1"    TO   LNK-NYUINDAY-KBN(IDX)
+                           END-IF
+                       END-PERFORM
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×¥¯¥í¡¼¥º
+                   MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                   MOVE    "key5"          TO  MCP-PATHNAME
+                   PERFORM   900-CLOSE-SEC
+      *
+                   MOVE    "tbl_sryact"    TO  MCP-TABLE
+                   MOVE    "key7"          TO  MCP-PATHNAME
+                   PERFORM 910-SRYACT-READ-SEC
+               END-PERFORM
+           END-IF
+      *
+      *    ¿ÇÎÅ¹Ô°Ù¥¯¥í¡¼¥º
+           MOVE    "tbl_sryact"            TO  MCP-TABLE
+           MOVE    "key7"                  TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
            IF       LNK-NYUINDAY-TBL   =    SPACE
                MOVE     4              TO   LNK-NYUINDAY-RC
            END-IF
@@ -682,9 +750,78 @@
                INITIALIZE                      NYUINACT-REC
                MOVE    1                   TO  FLG-NYUINACT
            END-IF
-      *
            .
        910-NYUINACT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡¼¸¡º÷
+      *****************************************************************
+       910-SRYACCT-SELECT-SEC        SECTION.
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-SRYACCT
+           ELSE
+               MOVE    1                  TO  FLG-SRYACCT
+           END-IF
+      *
+           .
+       910-SRYACCT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡¼ÆÉ¹þ
+      *****************************************************************
+       910-SRYACCT-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  SRYACCT-REC
+               MOVE    ZERO               TO  FLG-SRYACCT
+           ELSE
+               INITIALIZE                     SRYACCT-REC
+               MOVE    1                  TO  FLG-SRYACCT
+           END-IF
+      *
+           .
+       910-SRYACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼¸¡º÷
+      *****************************************************************
+       910-SRYACT-SELECT-SEC        SECTION.
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-SRYACT
+           ELSE
+               MOVE    1                  TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       910-SRYACT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼ÆÉ¹þ
+      *****************************************************************
+       910-SRYACT-READ-SEC         SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SRYACT-REC
+               MOVE    ZERO                TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                      SRYACT-REC
+               MOVE    1                   TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       910-SRYACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
