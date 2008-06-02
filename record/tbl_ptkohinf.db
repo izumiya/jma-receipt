@@ -181,7 +181,8 @@ path	key10 	{
 			AND   a.TEKSTYMD    <   :TEKSTYMD
 			AND   a.TEKEDYMD    >=  :TEKEDYMD
 			AND   a.SAKJOKBN    <>   '1'
-			AND   a.PTID      =   b.PTID
+			AND ( a.PTID      =   b.PTID   AND
+                              b.HOSPNUM   =   :HOSPNUM     )
 			ORDER   BY      b.PTNUM,a.FTNJANUM
 		;
 	};
