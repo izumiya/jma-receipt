@@ -2435,6 +2435,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL       IDX-T   >   10
                MOVE    ZERO                TO  TNSP2-TOUYOKGNAGE(IDX-T)
                MOVE    ZERO                TO  TNSP2-TOUYOJGNAGE(IDX-T)
+               MOVE    ZERO                TO  TNSP2-TOUYORYO1  (IDX-T)
+               MOVE    ZERO                TO  TNSP2-TOUYORYO2  (IDX-T)
            END-PERFORM
            PERFORM VARYING     IDX-T   FROM    1   BY  1
                    UNTIL       IDX-T   >   10
