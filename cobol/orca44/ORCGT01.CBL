@@ -101,6 +101,7 @@
       *  04.02.03    NACL-藤原    08/03/31  広域連合対応
       *  04.02.04    NACL-藤原    08/04/21  広域連合の保険者番号指定をしない
       *  04.02.05    NACL-藤原    08/05/14  診療年月による対象帳票の再取得
+      *  04.02.06    NACL-藤原    08/06/02  公費請求書ボタンの再設定をしない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -183,6 +184,7 @@
            03  WRK-PAGE            PIC ZZZZZZZZZ9.
            03  WRK-WRNO-X          PIC Z9.   
            03  WRK-WRNO            PIC 9(02).   
+           03  WRK-SKYYM-OLD       PIC 9(06).
       *     
            03  WRK-SHELL-ARG1.
              05  WRK-SHELL-SRYYM   PIC  X(06).
@@ -831,11 +833,11 @@ grpsys                                         SPA-AREA
       *    ★
            MOVE    "F"                TO  SPA-DATAKBN2-VALUE  
       *
-           IF      SPA-NAI-SRYYM      =   ZERO
-               MOVE    WIDGET-INSENSITIVE  TO  SPA-DATAKBN3-STATE
-                                               SPA-B21-STATE
-               MOVE    "F"                 TO  SPA-DATAKBN3-VALUE  
-           END-IF
+      *****IF      SPA-NAI-SRYYM      =   ZERO
+      ******** MOVE    WIDGET-INSENSITIVE  TO  SPA-DATAKBN3-STATE
+      ********                                 SPA-B21-STATE
+      ******** MOVE    "F"                 TO  SPA-DATAKBN3-VALUE  
+      *****END-IF
       *
            IF      SYS-2005-KKHRECEKBN =   "1" OR  "2" OR  "3"
                CONTINUE
@@ -1180,16 +1182,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    IDX                 TO  SPA-3004-MAX
            MOVE    IDY                 TO  SPA-GMN-T02-SHELLID-MAX
       *
-           IF      SPA-NAI-SRYYM      =   ZERO
-               IF      SPA-GMN-T02-SHELLID-MAX
-                                           >   ZERO
-                   MOVE    WIDGET-NORMAL       TO  SPA-B21-STATE
-                   IF      FLG-3004-PARAKBN    =   ZERO
-                       MOVE    WIDGET-NORMAL   TO  SPA-DATAKBN3-STATE
-                       MOVE    "T"             TO  SPA-DATAKBN3-VALUE  
-                   END-IF
-               END-IF
-           END-IF
+      *****IF      SPA-NAI-SRYYM      =   ZERO
+      *****    IF      SPA-GMN-T02-SHELLID-MAX
+      *****                                >   ZERO
+      *****        MOVE    WIDGET-NORMAL       TO  SPA-B21-STATE
+      *****        IF      FLG-3004-PARAKBN    =   ZERO
+      *****            MOVE    WIDGET-NORMAL   TO  SPA-DATAKBN3-STATE
+      *****            MOVE    "T"             TO  SPA-DATAKBN3-VALUE  
+      *****        END-IF
+      *****    END-IF
+      *****END-IF
       *
            MOVE    "0"             TO  SPA-GMN-T02-SYORIFLGL   (1)
            MOVE    "処理しない"    TO  SPA-GMN-T02-SYORIFLGMEIL(1)
@@ -2147,6 +2149,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        4101-SKYYM-CHK-SEC           SECTION.
       *
+           MOVE    SPA-NAI-SKYYM    TO  WRK-SKYYM-OLD
+      *
            MOVE    ZERO             TO  SPA-NAI-SKYYM
            MOVE    SPACE            TO  SPA-GMN-TITLE  
       *
@@ -2168,7 +2172,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
       *
       *    診療年月によるシステム管理の取得処理
-           PERFORM 3103-SYSKANRI-HENSYU-SEC
+           IF      SPA-NAI-SKYYM  NOT =   WRK-SKYYM-OLD
+               PERFORM 3103-SYSKANRI-HENSYU-SEC
+           END-IF
       *
       *    ファイル保存情報
            PERFORM 3102-FILE-INFO-CHECK-SEC
