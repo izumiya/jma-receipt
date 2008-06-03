@@ -39,6 +39,7 @@
       *                                     （小児特定疾患カウンセリング料
       *                                       の自動記載対応）
       *                                     （在支病自動記載対応）
+      *  04.02.02    NACL-門脇    08/06/03  ネブライザー加算編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -142,6 +143,7 @@
            03  FLG-WRITE05                             PIC 9(01).
            03  FLG-WRITE05X                            PIC 9(01).
            03  FLG-TAHOKEN                             PIC 9(01).
+           03  FLG-NEBU                                PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -962,6 +964,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-SYOUNI-COM
       *
                                MOVE  ZERO  TO   WRK-FILMTEN
+                               MOVE  ZERO  TO   FLG-NEBU
       *
                                MOVE  ZERO  TO   FLG-WRITE05
                                PERFORM 21043-RECE120-TENSOU-SEC
@@ -1015,6 +1018,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-SYOUNI-COM
       *
                                       MOVE  ZERO  TO   WRK-FILMTEN
+                                      MOVE  ZERO  TO   FLG-NEBU
       *
                                       MOVE  ZERO  TO   FLG-WRITE05
                                       PERFORM   21043-RECE120-TENSOU-SEC
@@ -1047,6 +1051,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-SYOUNI-COM
       *
                                     MOVE  ZERO  TO   WRK-FILMTEN
+                                    MOVE  ZERO  TO   FLG-NEBU
       *
                                     MOVE  ZERO  TO   FLG-WRITE05
                                     PERFORM   21043-RECE120-TENSOU-SEC
@@ -2777,25 +2782,45 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       COMPUTE    RECE100-TENSU(7 2)  =
                                  RECE100-TENSU(7 2)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                      IF   FLG-NEBU  =  ZERO
+                         MOVE     1    TO    FLG-NEBU
+                      END-IF
       *            公害外来療養指導料
                    WHEN     "102130020"
       ***             ADD   WK-ZAIKAISU TO  RECE100-KAISU(8)
                       COMPUTE    RECE100-TENSU(8 2)  =
                                  RECE100-TENSU(8 2)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                      IF   FLG-NEBU  =  ZERO
+                         MOVE     2    TO    FLG-NEBU
+                      END-IF
+      *            ネブライザー加算
+                   WHEN     "102400010"
+                      EVALUATE  FLG-NEBU
+                        WHEN       1
+                          COMPUTE  RECE100-TENSU(8 2)  =
+                                   RECE100-TENSU(8 2)  +
+                                  (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
+                          COMPUTE  RECE100-TENSU(7 2) =
+                                   RECE100-TENSU(7 2) -
+                                  (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
+                        WHEN       2
+                          CONTINUE
+                        WHEN       3
+                          COMPUTE  RECE100-TENSU(8 2)  =
+                                   RECE100-TENSU(8 2)  +
+                                  (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
+                          COMPUTE  RECE100-TENSU(9 1) =
+                                   RECE100-TENSU(9 1) -
+                                  (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
+                      END-EVALUATE
                    WHEN      OTHER
                       ADD   WK-ZAIKAISU TO  RECE100-KAISU(9)
                       COMPUTE    RECE100-TENSU(9 1)  =
                                  RECE100-TENSU(9 1)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
-      *               ネブライザー加算
-                      IF    SRY-SRYCD(IDX3)  =  "102400010"
-                       COMPUTE    RECE100-TENSU(8 2)  =
-                                  RECE100-TENSU(8 2)  +
-                                 (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
-                       COMPUTE    RECE100-TENSU(9 1) =
-                                  RECE100-TENSU(9 1) -
-                                 (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
+                      IF   FLG-NEBU  =  ZERO
+                         MOVE     3    TO    FLG-NEBU
                       END-IF
                  END-EVALUATE
       *    在宅のレセ点数欄の編集
