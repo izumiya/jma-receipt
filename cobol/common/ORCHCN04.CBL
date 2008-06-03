@@ -34,6 +34,7 @@
       *  04.01.00    NACL-Â¿¡¹Ç¼  07/11/22  ´ïºà¾¦ÉÊÌ¾¥³¡¼¥ÉÂÐ±þ
       *  04.01.00    NACL-ÂÀÅÄ    08/01/30  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *  04.02.00    NACL-Â¿¡¹Ç¼  08/03/06  £È£²£°Ç¯£´·î²þÀµÂÐ±þ
+      *  04.02.00    NACL-ÂÀÅÄ    08/06/02  Ï«ºÒ¡¦¼«ÇåÀÕÆþ±¡ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -83,6 +84,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-CHK             PIC 9(01).
            03  FLG-PLUSKBN         PIC 9(01).
+           03  FLG-RSIKSN          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -176,6 +178,7 @@
                05  WRK-HOSPADRS2       PIC X(50).
            03  WRK-HOSPTEL             PIC X(15).
       *----(03.04.01)--ADD-END-----
+           03  WRK-SRYCD               PIC X(09).
       *
        01  TBL-DATA-AREA.
            03  TBL-SRYKBN              PIC X(02).
@@ -789,29 +792,33 @@
                MOVE    1               TO  FLG-SRYACT
            END-IF
       *
+      *
            MOVE    ZERO                TO  IDX-S
-           PERFORM
-                   UNTIL   FLG-SRYACT      =   1
-               PERFORM VARYING     IDXA    FROM    1   BY  1
-                       UNTIL      (IDXA    >   5   )   OR
-                                  (SRY-SRYCD (IDXA)    =   SPACE)
-      *            ¿ÇÎÅ¡¦ÌôºÞ¡¦´ïºà¡¦Éô°Ì¡¦¼«Èñ¤òÂÐ¾Ý¤È¤¹¤ë
-                   IF      (SRY-SRYCD (IDXA)(1:1)      =   "1"
-                                                       OR  "6"
-                                                       OR  "7" ) OR
-                           (SRY-SRYCD (IDXA)(1:3)      =   "059"
-                                                       OR  "002"
-                                                       OR  "095"
-                                                       OR  "096")
-      *            ´ïºà¾¦ÉÊÌ¾ÂÐ¾Ý
-                       OR  (SRY-SRYCD (IDXA)(1:3)      =   "058")
-                       PERFORM 200321-MEISAI-HEN-SEC
-                   END-IF
+           MOVE    SRY-SRYCD(1)        TO  WRK-SRYCD
+           PERFORM 2005-RSIKSN-CHK-SEC
+           IF    ( FLG-RSIKSN          =   ZERO )
+               PERFORM UNTIL   FLG-SRYACT      =   1
+                   PERFORM VARYING     IDXA    FROM    1   BY  1
+                           UNTIL      (IDXA    >   5   )   OR
+                                      (SRY-SRYCD (IDXA)    =   SPACE)
+      *                ¿ÇÎÅ¡¦ÌôºÞ¡¦´ïºà¡¦Éô°Ì¡¦¼«Èñ¤òÂÐ¾Ý¤È¤¹¤ë
+                       IF      (SRY-SRYCD (IDXA)(1:1)      =   "1"
+                                                           OR  "6"
+                                                           OR  "7" ) OR
+                               (SRY-SRYCD (IDXA)(1:3)      =   "059"
+                                                           OR  "002"
+                                                           OR  "095"
+                                                           OR  "096")
+      *                ´ïºà¾¦ÉÊÌ¾ÂÐ¾Ý
+                           OR  (SRY-SRYCD (IDXA)(1:3)      =   "058")
+                           PERFORM 200321-MEISAI-HEN-SEC
+                       END-IF
+                   END-PERFORM
+                   MOVE    "tbl_sryact"        TO  MCP-TABLE
+                   MOVE    "key2"              TO  MCP-PATHNAME
+                   PERFORM 920-SRYACT-READ-SEC
                END-PERFORM
-               MOVE    "tbl_sryact"        TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 920-SRYACT-READ-SEC
-           END-PERFORM
+           END-IF
       *
            MOVE    "tbl_sryact"        TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
@@ -1497,7 +1504,56 @@
            .
        2005-JIHI-SYORI-EXT.
            EXIT.
+      *****************************************************************
+      *   Ï«ºÒÆþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2005-RSIKSN-CHK-SEC             SECTION.
       *
+           MOVE    ZERO                TO  FLG-RSIKSN
+      *
+           IF    ( SYU-SYUHKNNUM       =   "971"  OR "973" )
+      *        Ï«ºÒ¼«Çå¤Î¤È¤­
+      *        Ì¤¼Â»Ü¸º»»¡¦Æü¾ïÀ¸³è¾ã³²²Ã»»¡¦ÃÔÊò²Ã»»¡¦
+      *        áì´µ¼Ô´ÉÍý²Ã»»¤ò½ü¤¯
+               IF   (  WRK-SRYCD    =   "190080470"   OR
+                                           "190799670"   OR
+                                           "190080570"   OR
+                                           "190799770"   OR
+                                           "190111690"   OR
+                                           "190809090"   OR
+                                           "190111790"   OR
+                                           "190809190"   OR
+                                           "190109170"   OR
+                                           "190807570"   OR
+                                           "190109270"   OR
+                                           "190808670" )
+               OR   (( WRK-SRYCD         = "190116990" OR 
+                                           "190813390" ) AND
+                     ( SYU-SKYSTYMD      < "20060401"  ))
+               OR   (( WRK-SRYCD         = "190117070" OR
+                                           "190109670" ) AND
+                     ( SYU-SKYSTYMD     >= "20060401"  ))
+               OR   (( WRK-SRYCD         = "190121970" OR
+                                           "190122670" ) AND
+                     ( SYU-SKYSTYMD     >= "20060701"  ))
+               OR   (( WRK-SRYCD         = "190126470" OR
+                                           "190117070" OR
+                                           "190126570" OR
+                                           "190109670" OR
+                                           "190126670" OR
+                                           "190126770" OR
+                                           "190119210" OR
+                                           "190121970" OR
+                                           "190122670" OR
+                                           "190129870" ) AND
+                     ( SYU-SKYSTYMD     >= "20080401"  ))
+                   MOVE    1           TO  FLG-RSIKSN
+               END-IF
+           END-IF
+      *
+           .
+       2005-RSIKSN-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    À¾ÎñÆüËÜ¸ìÊÑ´¹½èÍý
       *****************************************************************

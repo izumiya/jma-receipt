@@ -366,6 +366,8 @@
        01  CONST-AREA.
            03  CONST-H1904                 PIC X(06)   VALUE "200704".
            03  CONST-H1804                 PIC X(06)   VALUE "200604".
+           03  CONST-H1807                 PIC X(06)   VALUE "200604".
+           03  CONST-H2004                 PIC X(06)   VALUE "200804".
       *    Æþ±¡ÎÁÊÔ½¸ºî¶ÈÎÎ°èºÇÂç·ï¿ô
            03  CONST-WNYUINRYO-MAX             PIC 9(05)   VALUE 20.
       *    ³°ÇñÊÔ½¸ºî¶ÈÎÎ°èºÇÂç·ï¿ô
@@ -2346,11 +2348,39 @@
       *
                MOVE    1               TO  FLG-TARGET
       *
-               IF    ( HCM34S01-SANTEIYM   >=  CONST-H1804 )
-                    IF  ( NACCT-SRYCDTOTAL  =  190109670
-                                          OR   190117070   )
+               IF   (  NACCT-SRYCDTOTAL    =   190080470   OR
+                                               190799670   OR
+                                               190080570   OR
+                                               190799770   OR
+                                               190111690   OR
+                                               190809090   OR
+                                               190111790   OR
+                                               190809190   OR
+                                               190109170   OR
+                                               190807570   OR
+                                               190109270   OR
+                                               190808670 )
+               OR   (( NACCT-SRYCDTOTAL    =   190116990   OR
+                                               190813390 ) AND
+                     ( HCM34S01-SANTEIYM   <  "200604"     ))
+               OR   (( NACCT-SRYCDTOTAL    =   190117070   OR
+                                               190109670 ) AND
+                     ( HCM34S01-SANTEIYM  >= "200604"      ))
+               OR   (( NACCT-SRYCDTOTAL    =   190121970   OR
+                                               190122670 ) AND
+                     ( HCM34S01-SANTEIYM  >= "200607"      ))
+               OR   (( NACCT-SRYCDTOTAL  =     190126470 OR
+                                               190117070 OR
+                                               190126570 OR
+                                               190109670 OR
+                                               190126670 OR
+                                               190126770 OR
+                                               190119210 OR
+                                               190121970 OR
+                                               190122670 OR
+                                               190129870 ) AND
+                     ( HCM34S01-SANTEIYM  >= "200804"      ))
                        MOVE    ZERO    TO  FLG-TARGET
-                    END-IF
                END-IF
       *
                IF    ( FLG-TARGET      =   1 )
