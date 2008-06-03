@@ -1294,6 +1294,11 @@
       *****************************************************************
        5004-HKNNUM039-HEN-SEC            SECTION.
       *
+           IF      WRK-HEN-FTNKBN      =   SPACE
+                                       OR  "0"
+               MOVE    "1"             TO  WRK-HEN-FTNKBN
+           END-IF
+      *
            EVALUATE    WRK-HEN-FTNKBN
       *    …È√¥≥‰πÁ£±
                WHEN    "1"
