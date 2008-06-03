@@ -217,6 +217,8 @@
       *  04.02.11    NACL-門脇    08/05/28  ７０歳代特例措置０５１食事計算
       *                                     （都単独事業５１）
       *  04.02.12    NACL-門脇    08/05/29  現物給付保険者単位条件追加
+      *  04.02.13    NACL-門脇    08/06/03  入院時生活療養費の公費対象外対応
+      *                                     （群馬県地方公費）
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -13787,7 +13789,8 @@
            AND  (WK-NYUSKJRYYKBN         =  "3"     )
                IF ((WK-1001-PREFNUM         =  10           ) AND
                    (COMB-KOHHKNNUM(KOH-IDX) = "146" OR "246"
-                                           OR "143" OR "243"))
+                                           OR "143" OR "243"
+                                           OR "177" OR "187"))
                OR ((WK-1001-PREFNUM         =  15           ) AND
                    (COMB-KOHHKNNUM(KOH-IDX) = "261" OR "361"
                                                     OR "561"
