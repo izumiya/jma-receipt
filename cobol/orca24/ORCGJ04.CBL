@@ -1124,37 +1124,54 @@
            MOVE    SPACE               TO  SYS-1006-REC
            INITIALIZE                      SYS-1006-REC
            MOVE    "1006"              TO  SYS-1006-KANRICD
-           MOVE    "1"                 TO  SYS-1006-KBNCD
+      **** MOVE    "1"                 TO  SYS-1006-KBNCD
            MOVE    SPA-SRYYMD          TO  SYS-1006-STYUKYMD
            MOVE    SPA-SRYYMD          TO  SYS-1006-EDYUKYMD
       *    システム管理検索（施設基準）
            MOVE    SPA-HOSPNUM         TO  SYS-1006-HOSPNUM
            MOVE    SYS-1006-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-KANRIMST-READ-SEC
            ELSE
                MOVE    SPACE               TO  SYS-1006-REC
                INITIALIZE                  SYS-1006-REC
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
-           IF      FLG-SYSKANRI        =   ZERO
+           PERFORM UNTIL   FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
-               IF      SYS-1006-SSTKIJUN (121) =   1
-                   MOVE    1               TO  SPA-SYONIKA
+               IF      SYS-1006-KBNCD      =   "1"
+      *            小児科外来診療科
+                   IF      SYS-1006-SSTKIJUN (121) =   1
+                       MOVE    1               TO  SPA-SYONIKA
+                   ELSE
+                       MOVE    0               TO  SPA-SYONIKA
+                   END-IF
+      *            時間外特例医療機関
+                   IF      SYS-1006-SSTKIJUN (011) =   1
+                       MOVE    1               TO  SPA-JIKANTOKU
+                   END-IF
                END-IF
-      *        時間外特例医療機関
-               IF      SYS-1006-SSTKIJUN (011) =   1
-                   MOVE    1               TO  SPA-JIKANTOKU
-               END-IF
-           END-IF
+      **       IF      SYS-1006-KBNCD      =   "2"
+      *            夜間・早朝加算
+      *            IF      SYS-1006-SSTKIJUN (172) =   1
+      *                MOVE    1               TO  SPA-YAKANKBN
+      *            ELSE
+      *                MOVE    0               TO  SPA-YAKANKBN
+      *            END-IF
+      ***      END-IF
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-KANRIMST-READ-SEC
+           END-PERFORM
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *    時間外特例医療機関の施設基準はすべてありとする
+           MOVE    1                   TO  SPA-JIKANTOKU
       *
       *    システム管理検索（チェック機能制御情報）
            MOVE    SPACE               TO  SYS-1008-REC
@@ -1776,7 +1793,7 @@
       *
            MOVE    SPA-COM-INPUTCD (IDX2)  TO  SPA-GMN-INPUTCD  (IDX2)
            IF      SRY-AUTOKBN (IDS)   =   "A" OR "B" OR "C"  OR  "D"
-                                       OR  "E" OR "F" OR "G"
+                                       OR  "E" OR "F" OR "G"  OR  "H"
                PERFORM 31011-JIKANKBN-SET-SEC
                MOVE    SPACE               TO  SPA-COM-AUTOKBN (IDX2)
            END-IF
@@ -1925,6 +1942,8 @@
                    MOVE    "6"             TO  WRK-TIMEFLG
                WHEN    "G"
                    MOVE    "7"             TO  WRK-TIMEFLG
+               WHEN    "H"
+                   MOVE    "8"             TO  WRK-TIMEFLG
            END-EVALUATE
            MOVE    SPACE               TO  SPA-GMN-INPUTCD (IDX2)
            MOVE    WRK-TIMEFLG         TO  SPA-GMN-INPUTCD (IDX2)(1:1)
@@ -5717,6 +5736,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "F"      TO  SRY-AUTOKBN  (IDS)
                    WHEN    "7"
                        MOVE    "G"      TO  SRY-AUTOKBN  (IDS)
+                   WHEN    "8"
+                       MOVE    "H"      TO  SRY-AUTOKBN  (IDS)
                END-EVALUATE
            END-IF
            .

@@ -1658,6 +1658,7 @@
       *
       *    夜間・早朝加算
            IF      WRK-COM-TIMEFLG(IDX-Z)  =   8
+             AND  (LNK-ORCSC-PG        =   "K02" )
                IF     (SPA-YAKANKBN        =   1  )
                    CONTINUE
                ELSE
