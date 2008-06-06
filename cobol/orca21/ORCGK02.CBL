@@ -6242,7 +6242,8 @@
       *!                               TO  SPA-MAE-INPUTCD(SPA-GMN-IDX)
       *    Ï·¿Í¡¦°ìÈÌÈ½Äê
       *    £¶£µºÐ°Ê¾å¤ÇÏ·¿Í¸øÈñ¤Î¤¢¤ë¾ì¹ç¡¢
-           IF      SPA-NAI-ROUJIN2     =   1
+           IF     (SPA-NAI-ROUJIN2     =   1   )
+             AND  (WRK-HKNCOMBI    NOT =   "9999" )
                INITIALIZE                  ORCSAGECHKAREA
                MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
                MOVE    SPA-PTID            TO  AGECHK-PTID
@@ -7880,7 +7881,6 @@
                        MOVE    ZERO            TO  WRK-COM-JIHIMONEY
                                                                (IDX-Z)
                     END-IF
-      *
                END-IF
       *        ²ó¿ôÊÔ½¸
                IF      SPA-GMN-INPUTCD(IDX)(1:1)   =   "."

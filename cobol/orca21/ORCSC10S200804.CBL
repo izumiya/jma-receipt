@@ -2070,7 +2070,8 @@
       *            ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
                    IF     (SPA-SYONIKA         =   1   )  AND
                           (SPA-NYUGAIKBN       =   "2" )  AND
-                          (FLG-SYONIKA-ARI     =   1   )
+                         ((FLG-SYONIKA-ARI     =   1   ) OR
+                          (SPA-SYONIKA-ARI3    =   1   ))
                        PERFORM 3303-SYONIKA-SET-SEC
                    END-IF
                    IF      FLG-SYONIKA       =   1
@@ -5952,7 +5953,8 @@
       *    Ï·¿Í¡¦°ìÈÌÈ½Äê
       *    £¶£µºÐ°Ê¾å¤ÇÏ·¿Í¸øÈñ¤Î¤¢¤ë¾ì¹ç¡¢
            IF     (SPA-ERRCD           =   SPACE  )  AND
-                   SPA-NAI-ROUJIN2     =   1
+                  (SPA-NAI-ROUJIN2     =   1      )
+             AND  (WRK-HKNCOMBI    NOT =   "9999" )
                INITIALIZE                  ORCSAGECHKAREA
                MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
                MOVE    SPA-PTID            TO  AGECHK-PTID
