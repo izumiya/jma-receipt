@@ -1056,10 +1056,15 @@
                    MOVE    WRK-KIKAN-SKYEDYMD (IDX1)  TO  WRK-EDYMD
                    IF    ( WRK-STYMD   <   CONST-H180401 )
                        PERFORM 800-ORCSDNTCHK-SEC
+                   ELSE
+                       INITIALIZE                  SDNTCHK-AREA
+                       MOVE    PTNYUINRRK-NYUINYMD TO  SDNTCHK-STYMD
                    END-IF
                    IF    ( WRK-STYMD (1:6) =   SDNTCHK-STYMD(1:6))
-                       MOVE    SDNTCHK-STYMD (7:2)
-                                           TO  WRK-STYMD (7:2)
+                       IF    ( SDNTCHK-STYMD   >   WRK-STYMD )
+                           MOVE    SDNTCHK-STYMD
+                                           TO  WRK-STYMD
+                       END-IF
                    END-IF
                    PERFORM 4150-SYUNOU-SEL-SEC
                    IF    ( FLG-SYUARI  =   1 )
@@ -1103,7 +1108,7 @@
       *                DISPLAY "PTNYUINRRK-NYUINYMD = " 
       *                         PTNYUINRRK-NYUINYMD
                    END-PERFORM
-                   MOVE    IDX2            TO  IDX1
+                   COMPUTE IDX1    =   IDX1    +   1
                ELSE
                    MOVE    1               TO  WRK-KIKAN-FLG (IDX1)
                    COMPUTE IDX1    =   IDX1    +   1
