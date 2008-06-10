@@ -8117,7 +8117,7 @@
                                MOVE    1   TO  TNYUKSN-ERR-DAY
                                                        (IDX23 IDX22)
                        ELSE
-                           IF    ( TNYUKSN-HKNCOMBI-DAY (IDX0 IDX22)
+                           IF    ( TKHNRYO-HKNCOMBI-DAY (IDX0 IDX22)
                                            =   ZERO )
                                COMPUTE TNYUKSN-ERR-CNT (IDX23)
                                    =   TNYUKSN-ERR-CNT (IDX23)
