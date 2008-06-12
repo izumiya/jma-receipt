@@ -207,7 +207,7 @@
                05  MEDH20-23FL5     PIC X(04)    VALUE  "ㄡㄢ".
                05  MEDH20-23FL6     PIC X(06)    VALUE  "ㄡㄢ﹛".
                05  MEDH20-23FL7     PIC X(100)   VALUE  
-           "公及職及ろ匟﹋旦乒件菴太ㄠㄡ℅ㄠㄣ引匹毛輪仁﹝﹌".
+           "公及職及ろ匟﹋旦乒件菴太ㄡㄟ℅ㄡㄡ引匹毛輪仁﹝﹌".
                05  MEDH20-24FL1     PIC X(09)    VALUE  "820000072".
                05  MEDH20-24FL2     PIC X(09)    VALUE  "820000119".
                05  MEDH20-24FL3     PIC X(01)    VALUE  "2".
