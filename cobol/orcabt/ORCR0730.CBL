@@ -40,6 +40,8 @@
       *                                     ÂÐ±þ 
       *                                     ¹ñÊÝ¤Î¤ß£²³ä¤Îµ­ºÜ
       *  04.02.06    NACL-Æ£¸¶    08/04/25  ÊÝ¸±ÍúÎò¤Îµ­ºÜÊÑ¹¹
+      *  04.02.07    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¡Ê°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2276,8 +2278,9 @@
                  MOVE   "4"     TO   KOHSKY-ZAITAKU
              END-EVALUATE
            END-IF
-           MOVE    RECE62X-KOUREI-SAIKEI
-                                       TO  KOHSKY-ZAITAKU-SAIKEI
+           IF      RECE62X-KOUREI-SAIKEI  NOT =  999999999
+             MOVE  RECE62X-KOUREI-SAIKEI  TO  KOHSKY-ZAITAKU-SAIKEI
+           END-IF
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬
            MOVE    RECE62X-SHOKUJIFTNKBN
                                        TO  KOHSKY-SHOKUJIFTNKBN
@@ -5277,9 +5280,9 @@
                    END-IF
                END-IF
            END-IF
-           IF      RECE62-KOUREI-SAIKEI  >   ZERO
+           IF      RECE62-KOUREI-SAIKEI  NOT =  999999999
                MOVE    "("                    TO  HC06-FTNMONEYSAI(1:1)
-               MOVE   RECE62-KOUREI-SAIKEI   TO  WRK-KGK7
+               MOVE   RECE62-KOUREI-SAIKEI    TO  WRK-KGK7
                MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI(3:8)
                MOVE    ")"                    TO
                                               HC06-FTNMONEYSAI(11:1)

@@ -318,6 +318,8 @@
       *                                     ¡Ê·²ÇÏ¸©ÃÏÊý¸øÈñ¡Ë
       *  04.02.18    NACL-ÌçÏÆ    08/06/09  ·ë³Ë¡ÜÀ¸ÊÝ¿©»öÎÅÍÜµ­ºÜÂÐ±þ
       *  04.02.19    NACL-ÌçÏÆ    08/06/09  ·²ÇÏ¸©¸å´ü¹âÎð¼Ô¥ì¥»µ­ºÜÂÐ±þ
+      *  04.02.20    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¡Ê°ìÉôÉéÃ´¶â¡¦°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12072,12 +12074,21 @@
                      END-IF
                      COMPUTE   RECE62-KOUREI-SAIKEI  =  
                                FTN-KOH-XXX
-                     IF  (FTN-KOH-XXX        = RECE62-FTNMONEY(1))
-                     AND (RECE62-TOTALTEN(1) = RECE62-TOTALTEN(2))
-                     AND (FLG-SAIKEI-KISAI   = ZERO              )
+                     IF      RECE62-KOHNUM(1)    = SPACE
                            MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
+                     ELSE
+                       IF    RECE62-HKNCOMBI(2)  = ZERO
+                         IF  (FTN-KOH-XXX        = RECE62-FTNMONEY(1))
+                         AND (FLG-SAIKEI-KISAI   = ZERO              )
+                           MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
+                         END-IF
+                       END-IF
                      END-IF
               END-IF
+           END-IF
+           IF     (RECE62-SRYYM          >=  "200804")
+           AND    (RECE62-KOUREI-SAIKEI   =   ZERO   )
+               MOVE   999999999   TO   RECE62-KOUREI-SAIKEI
            END-IF
       *
            IF      RECE62-RJNGENMENKBN   =   "1"
@@ -12163,23 +12174,12 @@
            END-IF
       *
            IF      RECE62-SRYYM      >=  "200210"
-             IF ((RECE62-KOUREI        =  "1" OR "2") AND
-                 (RECE62-KOHNUM(1)     =  SPACE     ) AND
-                 (RECE62-KOHNUM(2)     =  SPACE     ) AND
-                 (RECE62-KOHNUM(3)     =  SPACE     ) AND
-                 (RECE62-KOHNUM(4)     =  SPACE     ) AND
-                 (FLG-HOKENICHIBU  NOT =  ZERO      ))
-             OR ((WRK-PREFNUM          =  "10"      ) AND
-                 (RECE62-SRYYM        >=  "200804"  ) AND
-                 (RECE62-TEISYUTUSAKI  =   6        ) AND
-                 (RECE62-KOUREI        =  "1"       ) AND
-                 (RECE62-KOHNUM(1)(1:1)
-                                   >= "1" AND <= "8") AND
-                 (RECE62-KOHNUM(2)     =  SPACE     ) AND
-                 (RECE62-KOHNUM(3)     =  SPACE     ) AND
-                 (RECE62-KOHNUM(4)     =  SPACE     ) AND
-                 (RECE62-TOTALTEN(1) NOT =
-                                  RECE62-TOTALTEN(2)))
+             IF  (RECE62-KOUREI        =  "1" OR "2")
+             AND (RECE62-KOHNUM(1)     =  SPACE     )
+             AND (RECE62-KOHNUM(2)     =  SPACE     )
+             AND (RECE62-KOHNUM(3)     =  SPACE     )
+             AND (RECE62-KOHNUM(4)     =  SPACE     )
+             AND (FLG-HOKENICHIBU  NOT =  ZERO      )
       *
                  PERFORM  210464-JYOGENGAKU-HENSYU-SEC
       *
@@ -12191,49 +12191,118 @@
                        END-IF
                  END-IF
       *
-                 MOVE  ZERO   TO   RECE62-KOUREI-SAIKEI
-      *
              END-IF
            END-IF
       *
-           IF  (WRK-PREFNUM            =  "10"              ) AND
-               (RECE62-SRYYM          >=  "200804"          ) AND
-               (RECE62-TEISYUTUSAKI    =   6                ) AND
-               (RECE62-KOUREI          =  "1"               ) AND
-               (RECE62-KOHNUM(1)(1:1)  =  "0"               ) AND
-               (RECE62-KOHNUM(2)(1:1) >=  "1" AND <= "8"    ) AND
-               (RECE62-TOTALTEN(1) NOT =  RECE62-TOTALTEN(2)) AND
-               (RECE62-TOTALTEN(1)     =  RECE62-TOTALTEN(3))
-      *
-                 PERFORM  210464-JYOGENGAKU-HENSYU-SEC
-      *
-                 IF  FLG-KOH  =   2
-                    COMPUTE  WRK-CHK-KOKIGAK2 =  RECE62-FTNMONEY(2)
-                                              -  WRK-KOH-GAI
-                 ELSE
-                    MOVE     RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+           EVALUATE   WRK-PREFNUM
+      *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
+             WHEN    "10"
+               IF  (RECE62-SRYYM        >=  "200804")
+               AND (RECE62-TEISYUTUSAKI  =   6      )
+               AND (RECE62-KOUREI        =  "1"     )
+                 IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
+                 AND (RECE62-KOHNUM(2)       =  SPACE            )
+                 AND (RECE62-KOHNUM(3)       =  SPACE            )
+                 AND (RECE62-KOHNUM(4)       =  SPACE            )
+                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+                   PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+                   IF   RECE62-FTNMONEY(1)  >  WRK-KINGAKU3
+                     MOVE   WRK-KINGAKU3   TO  RECE62-FTNMONEY(1)
+                     IF   RECE62-RJNGENMENKBN   =   "1"
+                       MOVE    4    TO      FLG-TOKKI
+                       PERFORM   21013-TOKKI-HENSYU-SEC
+                     END-IF
+                   END-IF
+                   MOVE  999999999  TO   RECE62-KOUREI-SAIKEI
                  END-IF
-      *
-                 COMPUTE  WRK-CHK-KOKIGAK  = RECE62-FTNMONEY(1)
-                                           - FTN-KOH-XXX
-                                           + WRK-CHK-KOKIGAK2
-      *
-                 IF   WRK-CHK-KOKIGAK   >   WRK-KINGAKU3
-                    COMPUTE  WRK-CHK-KOKIGAK3   = WRK-KINGAKU3
-                                                - WRK-CHK-KOKIGAK2
-                    COMPUTE  RECE62-FTNMONEY(1) = WRK-CHK-KOKIGAK3
-                                                + FTN-KOH-XXX
-                    IF  FLG-KOH  =   2
+                 IF  (RECE62-KOHNUM(1)(1:1)  = "0"               )
+                 AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+                 AND (RECE62-TOTALTEN(1)     = RECE62-TOTALTEN(3))
+                   PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+                   IF   FLG-KOH  =   2
+                     COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
+                                               - WRK-KOH-GAI
+                   ELSE
+                     MOVE  RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                   END-IF
+                   COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
+                                            - FTN-KOH-XXX
+                                            + WRK-CHK-KOKIGAK2
+                   IF   WRK-CHK-KOKIGAK  >  WRK-KINGAKU3
+                     COMPUTE  WRK-CHK-KOKIGAK3   = WRK-KINGAKU3
+                                                 - WRK-CHK-KOKIGAK2
+                     COMPUTE  RECE62-FTNMONEY(1) = WRK-CHK-KOKIGAK3
+                                                 + FTN-KOH-XXX
+                     IF   FLG-KOH  =   2
                        COMPUTE  RECE62-FTNMONEY(2) = WRK-CHK-KOKIGAK2
                                                    + WRK-CHK-KOKIGAK3
-                    END-IF
-                    IF   RECE62-RJNGENMENKBN   =   "1"
-                        MOVE    4    TO      FLG-TOKKI
-                        PERFORM   21013-TOKKI-HENSYU-SEC
-                    END-IF
+                     END-IF
+                     IF   RECE62-RJNGENMENKBN   =   "1"
+                       MOVE    4    TO      FLG-TOKKI
+                       PERFORM   21013-TOKKI-HENSYU-SEC
+                     END-IF
+                   END-IF
                  END-IF
-      *
-           END-IF
+               END-IF
+      *      °¦É²¸©ÃÏÊý¸øÈñ
+             WHEN    "38"
+               IF  (RECE62-SRYYM        >=  "200804"  )
+               AND (RECE62-KOUREI        =  "1" OR "2")
+                 IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
+                 AND (RECE62-KOHNUM(2)       =  SPACE            )
+                 AND (RECE62-KOHNUM(3)       =  SPACE            )
+                 AND (RECE62-KOHNUM(4)       =  SPACE            )
+                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+                   PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+                   IF   RECE62-FTNMONEY(1)  >  WRK-KINGAKU3
+                     COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
+                                              - WRK-KINGAKU3
+                     MOVE   WRK-KINGAKU3   TO  RECE62-FTNMONEY(1)
+                     IF RECE62-KOUREI-SAIKEI > WRK-CHK-KOKIGAK
+                       COMPUTE  RECE62-KOUREI-SAIKEI =
+                                RECE62-KOUREI-SAIKEI - WRK-CHK-KOKIGAK
+                     ELSE
+                       MOVE     ZERO       TO  RECE62-KOUREI-SAIKEI
+                     END-IF
+                   END-IF
+                 END-IF
+                 IF  (RECE62-KOHNUM(1)       = "972" OR "974"    )
+                 AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+                 AND (RECE62-KOHNUM(3)       =  SPACE            )
+                 AND (RECE62-KOHNUM(4)       =  SPACE            )
+                 AND (RECE62-TOTALTEN(1)     = RECE62-TOTALTEN(2))
+                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(3))
+                   PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+                   EVALUATE   RECE62-KOHNUM(1)
+                     WHEN      "972"
+                       IF   WRK-KINGAKU3  >   10000
+                         MOVE   10000  TO  WRK-KINGAKU3
+                       END-IF
+                     WHEN      "974"
+                       IF   WRK-KINGAKU3  >   20000
+                         MOVE   20000  TO  WRK-KINGAKU3
+                       END-IF
+                   END-EVALUATE
+                   IF   RECE62-FTNMONEY(1)  =  WRK-KINGAKU3
+                     COMPUTE  WRK-CHK-KOKIGAK = 
+                          (RECE62-TOTALTEN(1) - RECE62-TOTALTEN(3)) 
+                                              * 10
+                                              * RECE62-KYURATE
+                                              / 100
+                     COMPUTE  WRK-CHK-KOKIGAK = WRK-CHK-KOKIGAK +  5
+                     COMPUTE  WRK-CHK-KOKIGAK = WRK-CHK-KOKIGAK / 10
+                     COMPUTE  WRK-CHK-KOKIGAK = WRK-CHK-KOKIGAK * 10
+                     IF  RECE62-KOUREI-SAIKEI > WRK-CHK-KOKIGAK
+                       COMPUTE  RECE62-KOUREI-SAIKEI =
+                                RECE62-KOUREI-SAIKEI - WRK-CHK-KOKIGAK
+                     ELSE
+                       MOVE   ZERO            TO  RECE62-KOUREI-SAIKEI
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
+           END-EVALUATE
       *
            .
        21046-SAIKEI-KEISAN-EXT.

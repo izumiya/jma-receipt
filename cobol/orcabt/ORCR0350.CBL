@@ -210,6 +210,8 @@
       *                                     £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô
       *                                     ÂÐ±þ 
       *                                     ¹ñÊÝ¤Î¤ß£²³ä¤Îµ­ºÜ
+      *  04.02.08    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¡Ê°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2873,8 +2875,12 @@
       *    ÉéÃ´¶â³Û¡ÊÏ·¿Í¸øÈñµëÉÕÂÐ¾ÝÏ·¿Í³°Íè°ìÉôÉéÃ´¶â¡Ë
            PERFORM 5005-NUM-HENSYU-SEC
       *    ÉéÃ´¶â³Û¡ÊÏ·¿Í¸øÈñµëÉÕÂÐ¾ÝÏ·¿ÍÆþ±¡°ìÉôÉéÃ´¶â¡Ë
-           IF      RECE62-KOUREI-SAIKEI    >   ZERO
-           AND     IDY                     =   1
+           IF    ((RECE62-SRYYM  >=  WRK-CONS-SRYYM-200804) AND
+                  (RECE62-KOUREI-SAIKEI  NOT =   999999999) AND
+                  (IDY                       =   1        ))
+           OR    ((RECE62-SRYYM  <   WRK-CONS-SRYYM-200804) AND
+                  (RECE62-KOUREI-SAIKEI      >  ZERO      ) AND
+                  (IDY                       =   1        ))
                MOVE   RECE62-KOUREI-SAIKEI     TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF

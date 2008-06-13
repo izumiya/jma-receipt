@@ -270,6 +270,8 @@
       *                                     £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô
       *                                     ÂÐ±þ 
       *                                     ¹ñÊÝ¤Î¤ß£²³ä¤Îµ­ºÜ
+      *  04.02.08    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¡Ê°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2573,8 +2575,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC
       *    ÉéÃ´¶â³Û¡Ê¸øÈñµëÉÕÂÐ¾Ý³°Íè°ìÉôÉéÃ´¶â¡Ë
-           IF      RECE02-ZAITAKU-SAIKEI   >   ZERO
-           AND     IDY                     =   1
+           IF    ((RECE02-SRYYM  >=  WRK-CONS-SRYYM-200804) AND
+                  (RECE02-ZAITAKU-SAIKEI NOT =   999999999) AND
+                  (IDY                       =   1        ))
+           OR    ((RECE02-SRYYM  <   WRK-CONS-SRYYM-200804) AND
+                  (RECE02-ZAITAKU-SAIKEI     >  ZERO      ) AND
+                  (IDY                       =   1        ))
                MOVE   RECE02-ZAITAKU-SAIKEI    TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
