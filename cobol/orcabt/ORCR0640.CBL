@@ -320,6 +320,8 @@
       *  04.02.19    NACL-ÌçÏÆ    08/06/09  ·²ÇÏ¸©¸å´ü¹âÎð¼Ô¥ì¥»µ­ºÜÂÐ±þ
       *  04.02.20    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê°ìÉôÉéÃ´¶â¡¦°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
+      *  04.02.21    NACL-ÌçÏÆ    08/06/13  Âà±¡Á°Ë¬Ìä»ØÆ³ÎÁ¡¢Àº¿À²ÊÂà±¡Á°Ë¬Ìä
+      *                                     »ØÆ³ÎÁ¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -493,6 +495,8 @@
            03  FLG-ZENKI-TOKUREI                       PIC 9(01).
            03  FLG-SKJFTNNASI                          PIC 9(01).
            03  FLG-HOKENICHIBU                         PIC 9(01).
+           03  FLG-HOUSEI-COM                          PIC 9(01).
+           03  FLG-HOUMON-COM                          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1102,6 +1106,8 @@
            03  CONS-HOUMON-COMMENT1  PIC X(09)  VALUE  "190030310".
       *    ¡ÊÏ·¡ËÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUMON-COMMENT2  PIC X(09)  VALUE  "190723610".
+      *    Âà±¡Á°Ë¬Ìä»ØÆ³ÎÁ»»ÄêÆü
+           03  CONS-HOUMON-COMMENT3  PIC X(09)  VALUE  "840000055".
       *    ½ýÉÂ¼êÅö¶â°Õ¸«½ñ¸òÉÕÎÁ
            03  CONS-SYOBYO-COMMENT   PIC X(09)  VALUE  "180000710".
       *    ½ýÉÂ¼êÅö¶â°Õ¸«½ñ¸òÉÕÇ¯·îÆü
@@ -1156,6 +1162,8 @@
            03  CONS-CTMRI-COMMENT17  PIC X(09)  VALUE  "170023510".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
+      *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ»»ÄêÆü
+           03  CONS-HOUSEI-COMMENT2  PIC X(09)  VALUE  "840000079".
       *    Àº¿À²Ê³ÖÎ¥ÉÂ¼¼´ÉÍý²Ã»»
            03  CONS-KAKURI-COMMENT   PIC X(09)  VALUE  "190107070".
       *    ºßÂð·ì±ÕÆ©ÀÏÉÑ²ó»ØÆ³´ÉÍýÎÁ
@@ -2456,6 +2464,8 @@
                                                   FLG-RYOYO-COM
                                                   FLG-SYODOU-COM
                                                   FLG-OSIN-COM
+                                                  FLG-HOUSEI-COM
+                                                  FLG-HOUMON-COM
                                                   FLG-TAHOKEN
       *
                                MOVE   ZERO   TO   WRK-FILMTEN
@@ -2507,6 +2517,8 @@
                                                          FLG-RYOYO-COM
                                                          FLG-SYODOU-COM
                                                          FLG-OSIN-COM
+                                                         FLG-HOUSEI-COM
+                                                         FLG-HOUMON-COM
                                                          FLG-TAHOKEN
       *
                                       MOVE   ZERO   TO   WRK-FILMTEN
@@ -2534,6 +2546,8 @@
                                                          FLG-RYOYO-COM
                                                          FLG-SYODOU-COM
                                                          FLG-OSIN-COM
+                                                         FLG-HOUSEI-COM
+                                                         FLG-HOUMON-COM
                                                          FLG-TAHOKEN
       *
                                       MOVE   ZERO   TO   WRK-FILMTEN
@@ -3486,9 +3500,15 @@
               IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT
                    MOVE   "1"   TO    RECE64-FLG-NYUEIYO-COMMENT
               END-IF
-              IF   SRY-SRYCD(IDX2)    =     CONS-HOUMON-COMMENT1  OR
-                                            CONS-HOUMON-COMMENT2
+      *
+              IF  (SRY-SRYCD(IDX2)    =     CONS-HOUMON-COMMENT1  OR
+                                            CONS-HOUMON-COMMENT2)
+              AND (FLG-HOUMON-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE64-FLG-HOUMON-COMMENT
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-HOUMON-COMMENT3
+                   MOVE  SPACE  TO    RECE64-FLG-HOUMON-COMMENT
+                   MOVE    1    TO    FLG-HOUMON-COM
               END-IF
       *
               IF   SRY-SRYCD(IDX2)    =     CONS-SYOBYO-COMMENT
@@ -3598,7 +3618,12 @@
       *
            IF      RECE64-SRYKBN      =     "80"
               IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT
+              AND  FLG-HOUSEI-COM     =     ZERO
                    MOVE   "1"   TO    RECE64-FLG-HOUSEI-COMMENT
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT2
+                   MOVE  SPACE  TO    RECE64-FLG-HOUSEI-COMMENT
+                   MOVE    1    TO    FLG-HOUSEI-COM
               END-IF
            END-IF
       *
