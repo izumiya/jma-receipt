@@ -1056,6 +1056,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    点数情報取得エラー
            WHEN    5
                PERFORM 2910-ERRREC-EDIT-BETU2-SEC
+               PERFORM 2950-ERRLST-OUT-SEC
+               MOVE    0           TO  FLG-ERRARI
       *    入力ＣＤ登録済み
            WHEN    7
            WHEN    8
