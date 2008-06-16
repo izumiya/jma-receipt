@@ -84,6 +84,7 @@
       *                                     に変更
       *  04.00.04    NACL-門脇    08/02/14  自立支援＋生保の組合せを作成しない
       *  04.02.00    NACL-多々納  08/03/XX  Ｈ２０．４改正対応
+      *  04.02.01    NACL-門脇    08/06/16  大阪府地方公費組み合わせ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3715,6 +3716,35 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                          END-IF
                        END-IF
                      END-PERFORM
+                   ELSE
+                     EVALUATE  SPA-PREFNUM
+                      WHEN       27
+                        IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
+                                                 >=  "1" AND <=  "8"
+                         PERFORM   VARYING   IDZ2  FROM  1   BY  1
+                                    UNTIL    IDZ2    >   IDZ3
+                          IF  (WRK-RCOMB-KOH1HKNNUM(IDZ2) = "021"
+                                                         OR "010")
+                          AND (WRK-RCOMB-KOH2HKNNUM(IDZ2) = "121")
+                            IF WRK-RCOMB-KOH2HKNNUM(IDZ2) =
+                                         WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)
+                              CONTINUE
+                            ELSE
+                              IF (WRK-KOH-GENHKNNUM1(WRK-COMB-HJOIDX) =
+                                                                  SPACE)
+                              OR (WRK-KOH-GENHKNNUM1(WRK-COMB-HJOIDX) =
+                                             WRK-RCOMB-KOH2HKNNUM(IDZ2))
+                              OR (WRK-KOH-GENHKNNUM2(WRK-COMB-HJOIDX) =
+                                             WRK-RCOMB-KOH2HKNNUM(IDZ2))
+                              OR (WRK-KOH-GENHKNNUM3(WRK-COMB-HJOIDX) =
+                                             WRK-RCOMB-KOH2HKNNUM(IDZ2))
+                                 PERFORM 5701414-SYUKOH-HJO2-SEC
+                              END-IF
+                            END-IF
+                          END-IF
+                         END-PERFORM
+                        END-IF
+                     END-EVALUATE
                    END-IF
                  END-PERFORM
                ELSE
