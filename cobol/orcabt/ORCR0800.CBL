@@ -1009,7 +1009,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                       MOVE "入院料加算の保険組合せ確認"
                                           TO  ERR-ERRMSG
                     WHEN       15
-                      MOVE "入院料加算算定日の外泊確認"
+                      MOVE "外泊日の入院料加算確認"
                                           TO  ERR-ERRMSG
                     WHEN      OTHER
                       MOVE "仮収納データの取得に失敗"
