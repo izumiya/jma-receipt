@@ -100,6 +100,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/04/28  ºë¶Ì¸©Àî±Û»ÔÃÏÊý¸øÈñÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
       *  04.02.04    NACL-ÌçÏÆ    08/05/29  Æþ±¡ÎÁ²Ã»»ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¥Á¥§¥Ã¥¯
+      *  04.02.05    NACL-ÌçÏÆ    08/06/15  Æþ±¡ÎÁ²Ã»»³°Çñ¥Á¥§¥Ã¥¯
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -668,9 +669,12 @@
                        UNTIL   (IDX                 >   10  )
                          OR    (LNK-SYU-SRYYMD(IDX) =  SPACE)
                          OR    (LNK-S02-RC      NOT =  ZERO )
-              IF   WRK-KAIKEING(IDX)  =   1
-                 MOVE     14       TO    LNK-S02-RC
-              END-IF
+              EVALUATE  WRK-KAIKEING(IDX)
+                WHEN      1
+                    MOVE     14     TO    LNK-S02-RC
+                WHEN      2
+                    MOVE     15     TO    LNK-S02-RC
+              END-EVALUATE
            END-PERFORM.
       *
        MAIN-EXT.
@@ -3704,6 +3708,7 @@ grpsys                                        SPA-AREA
                       (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
                  AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
                  AND ( SYU-HKNCOMBINUM      =    ACCT-HKNCOMBI )
+                 AND ( TBL-GAIHAKU(SYU-IDX) =    ZERO   OR   4 )
                  AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
                      ADD   ACCT-DAY(1 SYU-IDX)
                                       TO   SINRYO-COUNT
@@ -3719,7 +3724,18 @@ grpsys                                        SPA-AREA
                  AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
                  AND ( SYU-HKNCOMBINUM    NOT =  ACCT-HKNCOMBI )
                  AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
-                     MOVE    1     TO    WRK-KAIKEING(IDX)
+                    IF   WRK-KAIKEING(IDX) = ZERO
+                       MOVE    1     TO    WRK-KAIKEING(IDX)
+                    END-IF
+                 END-IF
+                 IF  ((SYU-DAY(SYU-IDX)                =   "1") OR
+                      (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
+                 AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
+                 AND ( TBL-GAIHAKU(SYU-IDX)  NOT =  ZERO AND 4 )
+                 AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
+                    IF   WRK-KAIKEING(IDX) = ZERO
+                       MOVE    2     TO    WRK-KAIKEING(IDX)
+                    END-IF
                  END-IF
              END-PERFORM
            ELSE

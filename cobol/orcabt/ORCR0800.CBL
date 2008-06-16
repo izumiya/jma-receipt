@@ -45,6 +45,7 @@
       *  03.05.02    NACL-藤原    07/06/01  realtime preview 処理追加
       *  03.05.03    NACL-門脇    07/07/17  個別時のシステム管理編集修正
       *  04.02.01    NACL-門脇    08/05/29  入院料加算保険組み合わせチェック
+      *  04.02.02    NACL-門脇    08/06/15  入院料加算外泊チェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1006,6 +1007,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                           TO  ERR-ERRMSG
                     WHEN       14
                       MOVE "入院料加算の保険組合せ確認"
+                                          TO  ERR-ERRMSG
+                    WHEN       15
+                      MOVE "入院料加算算定日の外泊確認"
                                           TO  ERR-ERRMSG
                     WHEN      OTHER
                       MOVE "仮収納データの取得に失敗"
