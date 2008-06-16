@@ -212,6 +212,8 @@
       *                                     国保のみ２割の記載
       *  04.02.08    NACL-門脇    08/06/12  愛媛県地方公費対応
       *                                     （一部負担金再掲欄編集）
+      *  04.02.09    NACL-藤原    08/06/11  コメントが途中にある場合の
+      *                                     注加算による加算項目の記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -396,6 +398,7 @@
            03  FLG-COMMENT             PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
            03  FLG-PRT                 PIC 9(01).
+           03  FLG-KOUI                PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -518,6 +521,8 @@
            03  WRK-SJ-KBN              PIC X(02).
            03  WRK-RECECOM-SJKBN       PIC X(02).
            03  WRK-SJ-CHK              PIC 9(01).
+      *
+           03  WRK-CHUKSNCD            PIC X(04).
       *
       *    1桁目:生保 2桁目:結核 3桁目:精神
            03  WRK-3SYU-KBN.
@@ -4319,19 +4324,116 @@
                GO  TO  20074-ZAI-KOUI-SORT-EXT
            END-IF
       *
-           PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       WRK-TBLMAX1
-               MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC          (IDX)
-               MOVE    TBL-KOUI-SRYCD        (IDX) TO
-                                       WRK-KOUI-TAIHI-SRYCD        (IDX)
-               MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
-                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDX)
-               MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
-                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDX)
-               MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
-                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
+           MOVE    ZERO                TO  IDY
+      *
+      *    コメントを最後に編集（手術のとき）
+           IF      RECE641-SRYKBN      =   "50"
+             PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       WRK-TBLMAX1
+               EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
+                   WHEN    SPACE
+                       CONTINUE
+                   WHEN    "0"
+                   WHEN    "8" 
+                       ADD     1                           TO  IDY
+                       MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDY)
+                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                       INITIALIZE      TBL-KOUI-REC (IDX)
+                 END-EVALUATE
+              END-PERFORM
+            END-IF             
+      *
+           MOVE    1                   TO  IDX
+           PERFORM UNTIL   IDX >   WRK-TBLMAX1
+               MOVE    SPACE               TO  WRK-CHUKSNCD
+               MOVE    ZERO                TO  FLG-KOUI
+      *
+               PERFORM UNTIL   IDX >   WRK-TBLMAX1
+                 IF      TBL-KOUI-SRYCD (IDX) = "150268970"
+                      MOVE    1      TO  
+                                  TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                 END-IF
+                 EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
+                           ALSO    TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                   WHEN    SPACE   ALSO    ANY
+                   WHEN    "0"     ALSO    ANY
+                   WHEN    "8"     ALSO    ANY
+                       CONTINUE
+                   WHEN    ANY    ALSO    "1"
+                   WHEN    ANY    ALSO    "3"
+                   WHEN    ANY    ALSO    "5"
+                       IF      WRK-CHUKSNCD        =   SPACE
+                           MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-CHUKSNCD
+                           ADD     1                           TO  IDY
+                           MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDY)
+                           MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                           MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                           MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                           MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                           INITIALIZE      TBL-KOUI-REC (IDX)
+                           MOVE    IDY             TO  WRK-SRYCD1-MAX
+                       ELSE
+                           MOVE    1               TO  FLG-KOUI
+                       END-IF    
+                   WHEN    OTHER
+                       ADD     1                           TO  IDY
+                       MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC          (IDY)
+                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                       INITIALIZE      TBL-KOUI-REC (IDX)
+                       MOVE    IDY             TO  WRK-SRYCD1-MAX
+                 END-EVALUATE    
+                 COMPUTE IDX     =   IDX     +   1
+               END-PERFORM
+      *
+      *        出力対象となっていないデータがある 
+               IF      FLG-KOUI            =   1
+                   MOVE    1                   TO  IDX
+               END-IF
            END-PERFORM
+      *
+      *    コメントを最後に編集
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       WRK-TBLMAX1
+               EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
+                   WHEN    SPACE
+                       CONTINUE
+                   WHEN    "0"
+                   WHEN    "8"
+                       ADD     1                           TO  IDY
+                       MOVE    TBL-KOUI-REC          (IDX) TO
+                                       WRK-KOUI-TAIHI-REC         (IDY)
+                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
+                                       WRK-KOUI-TAIHI-SRYCD       (IDY)
+                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
+                                       WRK-KOUI-TAIHI-TENSIKIBETU (IDY)
+                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
+                                       WRK-KOUI-TAIHI-CHUKSNCD    (IDY)
+                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
+                                      WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                 END-EVALUATE
+            END-PERFORM           
       *
            INITIALIZE                      TBL-KOUI-AREA
            MOVE    ZERO                TO  WRK-TBLMAX1
@@ -4359,10 +4461,6 @@
                                                        =   SPACE
                                OR      WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
                                                    NOT =   "1"
-                           IF  WRK-KOUI-TAIHI-SRYCD (IDX) = "150268970"
-                              MOVE    1      TO  
-                                      WRK-KOUI-TAIHI-KOKUJISKBKBN1 (IDX)
-                           END-IF
                            EVALUATE    WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
                                WHEN    "1"
                                WHEN    "3" 
@@ -4395,12 +4493,12 @@
                                                          =   "0000"    )
                                       AND   ( RECE641-SRYKBN
                                                      NOT =   "54"      ) 
-                                        MOVE    3               TO  IDZ
+                                       MOVE    3               TO  IDZ
                                       ELSE
-                                        MOVE    2               TO  IDZ
+                                       MOVE    2               TO  IDZ
                                       END-IF
                                      END-IF
-                                   END-IF    
+                                   END-IF   
                                WHEN    "9" 
                                    MOVE    4               TO  IDZ  
                            END-EVALUATE
