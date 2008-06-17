@@ -1815,6 +1815,12 @@
                WHEN    14
                    MOVE    "2003"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    15
+                   MOVE    "2004"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    16
+                   MOVE    "2005"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    OTHER
                    MOVE    "2001"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
@@ -1955,40 +1961,29 @@
                        +   LNK-SYU-KOH-FTN  (IDX11)
       *
       *            自費
-                   COMPUTE SUMSYU-JIHI-1   (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-1   (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-1 (IDX11)
-                   COMPUTE TTLSYU-JIHI-1
-                       =   TTLSYU-JIHI-1
-                       +   LNK-SYU-JIHI-1 (IDX11)
+                   PERFORM VARYING IDX-JIHI    FROM    1   BY  1
+                           UNTIL ( IDX-JIHI    >   CONST-JIHI-MAX )
       *
-                   COMPUTE SUMSYU-JIHI-2   (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-2   (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-2 (IDX11)
-                   COMPUTE TTLSYU-JIHI-2
-                       =   TTLSYU-JIHI-2
-                       +   LNK-SYU-JIHI-2 (IDX11)
+                       COMPUTE SUMSYU-JIHI-TAXNASI
+                                              (WRK-SYU-SUM-IDX IDX-JIHI)
+                           =   SUMSYU-JIHI-TAXNASI
+                                              (WRK-SYU-SUM-IDX IDX-JIHI)
+                           +   LNK-SYU-JIHI-TAXNASI   (IDX11   IDX-JIHI)
       *
-                   COMPUTE SUMSYU-JIHI-3   (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-3   (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-3 (IDX11)
-                   COMPUTE TTLSYU-JIHI-3
-                       =   TTLSYU-JIHI-3
-                       +   LNK-SYU-JIHI-3 (IDX11)
+                       COMPUTE TTLSYU-JIHI-TAXNASI    (IDX-JIHI)
+                           =   TTLSYU-JIHI-TAXNASI    (IDX-JIHI)
+                           +   LNK-SYU-JIHI-TAXNASI   (IDX11   IDX-JIHI)
       *
-                   COMPUTE SUMSYU-JIHI-4   (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-4   (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-4 (IDX11)
-                   COMPUTE TTLSYU-JIHI-4
-                       =   TTLSYU-JIHI-4
-                       +   LNK-SYU-JIHI-4 (IDX11)
+                       COMPUTE SUMSYU-JIHI-TAXARI
+                                              (WRK-SYU-SUM-IDX IDX-JIHI)
+                           =   SUMSYU-JIHI-TAXARI
+                                              (WRK-SYU-SUM-IDX IDX-JIHI)
+                           +   LNK-SYU-JIHI-TAXARI    (IDX11   IDX-JIHI)
       *
-                   COMPUTE SUMSYU-JIHI-5   (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-5   (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-5 (IDX11)
-                   COMPUTE TTLSYU-JIHI-5
-                       =   TTLSYU-JIHI-5
-                       +   LNK-SYU-JIHI-5 (IDX11)
+                       COMPUTE TTLSYU-JIHI-TAXARI     (IDX-JIHI)
+                           =   TTLSYU-JIHI-TAXARI     (IDX-JIHI)
+                           +   LNK-SYU-JIHI-TAXARI    (IDX11   IDX-JIHI)
+                   END-PERFORM
       *
       *            自費計
                    COMPUTE SUMSYU-JIHI-TOTAL   (WRK-SYU-SUM-IDX)
@@ -1997,42 +1992,6 @@
                    COMPUTE TTLSYU-JIHI-TOTAL
                        =   TTLSYU-JIHI-TOTAL
                        +   LNK-SYU-JIHI-TOTAL (IDX11)
-      *
-      *            自費（消費税あり）
-                   COMPUTE SUMSYU-JIHI-1-TAX    (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-1-TAX    (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-1-TAX  (IDX11)
-                   COMPUTE TTLSYU-JIHI-1-TAX
-                       =   TTLSYU-JIHI-1-TAX
-                       +   LNK-SYU-JIHI-1-TAX  (IDX11)
-      *
-                   COMPUTE SUMSYU-JIHI-2-TAX    (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-2-TAX    (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-2-TAX  (IDX11)
-                   COMPUTE TTLSYU-JIHI-2-TAX
-                       =   TTLSYU-JIHI-2-TAX
-                       +   LNK-SYU-JIHI-2-TAX  (IDX11)
-      *
-                   COMPUTE SUMSYU-JIHI-3-TAX    (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-3-TAX    (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-3-TAX  (IDX11)
-                   COMPUTE TTLSYU-JIHI-3-TAX
-                       =   TTLSYU-JIHI-3-TAX
-                       +   LNK-SYU-JIHI-3-TAX  (IDX11)
-      *
-                   COMPUTE SUMSYU-JIHI-4-TAX    (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-4-TAX    (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-4-TAX  (IDX11)
-                   COMPUTE TTLSYU-JIHI-4-TAX
-                       =   TTLSYU-JIHI-4-TAX
-                       +   LNK-SYU-JIHI-4-TAX  (IDX11)
-      *
-                   COMPUTE SUMSYU-JIHI-5-TAX    (WRK-SYU-SUM-IDX)
-                       =   SUMSYU-JIHI-5-TAX    (WRK-SYU-SUM-IDX)
-                       +   LNK-SYU-JIHI-5-TAX  (IDX11)
-                   COMPUTE TTLSYU-JIHI-5-TAX
-                       =   TTLSYU-JIHI-5-TAX
-                       +   LNK-SYU-JIHI-5-TAX  (IDX11)
       *
       *            自費計（消費税あり）
                    COMPUTE SUMSYU-JIHI-TOTAL-TAX (WRK-SYU-SUM-IDX)
@@ -2760,7 +2719,19 @@
            WHEN    "2003"
                STRING  "入院料と異なる保険の入院料加算があります。"
                                            DELIMITED   BY  SPACE
-                       "確認してください。"
+                       "確認してください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2004"
+               STRING  "外泊日に入院料加算が算定されています"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2005"
+               STRING  "入院料の算定が無い日に入院料加算が"
+                                           DELIMITED   BY  SPACE
+                       "算定されています"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING
