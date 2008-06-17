@@ -213,6 +213,10 @@
                "定期請求管理情報の取得に失敗しました".
            03  ERR-MSG11                   PIC X(100)    VALUE
                "入院料加算の保険組合せを確認してください".
+           03  ERR-MSG12                   PIC X(100)    VALUE
+               "外泊日に入院料加算が算定されています".
+           03  ERR-MSG13                   PIC X(100)    VALUE
+               "入院料の算定が無い日に入院料加算が算定されています".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -890,6 +894,10 @@
                    MOVE    "0005"      TO  ERR-ERRCD
                WHEN    14
                    MOVE    "0011"      TO  ERR-ERRCD
+               WHEN    15
+                   MOVE    "0012"      TO  ERR-ERRCD
+               WHEN    16
+                   MOVE    "0013"      TO  ERR-ERRCD
                WHEN    OTHER
                    MOVE    "0006"      TO  ERR-ERRCD
                END-EVALUATE
@@ -1515,6 +1523,10 @@
                MOVE    ERR-MSG10       TO  ERR-ERRMSG
            WHEN    "0011"
                MOVE    ERR-MSG11       TO  ERR-ERRMSG
+           WHEN    "0012"
+               MOVE    ERR-MSG12       TO  ERR-ERRMSG
+           WHEN    "0013"
+               MOVE    ERR-MSG13       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE
