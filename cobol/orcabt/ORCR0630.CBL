@@ -77,6 +77,7 @@
       *  04.01.01    NACL-ÌçÏÆ    07/12/19  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *  04.01.02    NACL-ÌçÏÆ    08/02/04  É¸·ç³°Çñ·×»»½¤Àµ
       *  04.02.01    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
+      *  04.02.02    NACL-ÌçÏÆ    08/06/17  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *****************************************************************
       *
       *
@@ -262,6 +263,10 @@
            03  WRK-NYUYAKU-CD                         PIC X(09).
            03  WRK-NYURYAKU-IDX                       PIC 9(03).
            03  WRK-NYURYAKU-MAX                       PIC 9(03).
+      *
+           03  WRK-NYUINDAY-TANKI2-TBL.
+               05  WRK-NYUINDAY-TANKI2-KBN            PIC X(01)
+                                                      OCCURS  31.
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC 9(07).
@@ -915,6 +920,9 @@
       *
            MOVE       ZERO              TO     FLG-FUKUSHI
       *
+           MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
+           INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
+      *
       *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
            INITIALIZE                   ORCSNYUINDAY-AREA
            MOVE    RECE62-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
@@ -924,6 +932,8 @@
                                             SPA-AREA
            IF      LNK-NYUINDAY-RC     =   ZERO
                MOVE   LNK-NYUINDAY-TBL  TO  RECE62-NYUINDAY-TBL
+               MOVE   LNK-NYUINDAY-TANKI2-TBL
+                                        TO  WRK-NYUINDAY-TANKI2-TBL
            END-IF
       *
       ***  PERFORM    VARYING    IDX    FROM   1   BY   1
@@ -2056,10 +2066,29 @@
            END-IF
       *
            IF RECE62-NYUINDAY-KBN(IDY) = "1"
-                    COMPUTE  WRK-NYUTOKKEI2(KH-IDX)     =
-                             WRK-NYUTOKKEI2(KH-IDX)     +  NACCT-ZAITEN
-                    COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
-                             RECE62-NYUTOKKEI2(KH-IDX)  +  NACCT-ZAITEN
+               IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
+                 IF     FLG-FUKUSHI =   1
+                 AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
+                                        >=  "1" AND <=  "8"
+                    CONTINUE
+                 ELSE
+                    COMPUTE  WRK-NYUTOKKEI2(KH-IDX)  =
+                             WRK-NYUTOKKEI2(KH-IDX)  +  NACCT-ZAITEN
+                 END-IF
+                 COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
+                          RECE62-NYUTOKKEI2(KH-IDX)  +  NACCT-ZAITEN
+               ELSE
+                 IF     FLG-FUKUSHI =   1
+                 AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
+                                        >=  "1" AND <=  "8"
+                    CONTINUE
+                 ELSE
+                    COMPUTE  WRK-NYUKHNKEI2(KH-IDX)  =
+                             WRK-NYUKHNKEI2(KH-IDX)  +  NACCT-ZAITEN
+                 END-IF
+                 COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
+                          RECE62-NYUKHNKEI2(KH-IDX)  +  NACCT-ZAITEN
+               END-IF
            END-IF
       *
            .
@@ -2548,12 +2577,33 @@
            END-EVALUATE
       *
            IF    RECE62-NYUINDAY-KBN(ACCT-IDX) = "1"
-                    COMPUTE  WRK-NYUTOKKEI2(KH-IDX)     =
-                             WRK-NYUTOKKEI2(KH-IDX)     +
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                    COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
-                             RECE62-NYUTOKKEI2(KH-IDX)  +
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+             IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX) NOT = SPACE
+               IF     FLG-FUKUSHI =   1
+               AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
+                                      >=  "1" AND <=  "8"
+                  CONTINUE
+               ELSE
+                  COMPUTE  WRK-NYUTOKKEI2(KH-IDX)  =
+                           WRK-NYUTOKKEI2(KH-IDX)  +
+                           (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+               END-IF
+               COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
+                        RECE62-NYUTOKKEI2(KH-IDX)  +
+                           (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+             ELSE
+               IF     FLG-FUKUSHI =   1
+               AND    RECE62-KOHNUM(KH-IDX - 1)(1:1)
+                                      >=  "1" AND <=  "8"
+                  CONTINUE
+               ELSE
+                  COMPUTE  WRK-NYUKHNKEI2(KH-IDX)  =
+                           WRK-NYUKHNKEI2(KH-IDX)  +
+                           (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+               END-IF
+               COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
+                        RECE62-NYUKHNKEI2(KH-IDX)  +
+                           (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+             END-IF
            END-IF
       *
            .

@@ -55,6 +55,7 @@
       *  04.02.01    NACL-ÌçÏÆ    08/03/24  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡ÊºÆ½¢Ï«¡§±ßÊÑ¹¹ÂÐ±þ¡Ë
       *  04.02.02    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
+      *  04.02.03    NACL-ÌçÏÆ    08/06/17  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -210,6 +211,10 @@
       *
            03  WRK-KEISAN                              PIC  9(09).
            03  WRK-KEISAN2                             PIC  9(09).
+      *
+           03  WRK-NYUINDAY-TANKI2-TBL.
+               05  WRK-NYUINDAY-TANKI2-KBN             PIC X(01)
+                                                       OCCURS  31.
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC  9(07).
@@ -714,6 +719,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                WRK-MEISAI-TUU
                                                WRK-MEISAI-KIN
       *
+           MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
+           INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
+      *
       *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
            INITIALIZE                   ORCSNYUINDAY-AREA
            MOVE    RECE82-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
@@ -723,6 +731,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             SPA-AREA
            IF      LNK-NYUINDAY-RC     =   ZERO
                MOVE   LNK-NYUINDAY-TBL  TO  RECE82-NYUINDAY-TBL
+               MOVE   LNK-NYUINDAY-TANKI2-TBL
+                                        TO  WRK-NYUINDAY-TANKI2-TBL
            END-IF
       *
            PERFORM     220-RECE82-HENSYU-SEC
@@ -1177,15 +1187,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF   RECE82-NYUINDAY-KBN(IDY)  =  "1"
       *
+             IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                   COMPUTE  RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +
                            LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
-      *
                   COMPUTE  RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +  
                            LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
-      *
-                  COMPUTE  RECE82-NYUTOKKEI2  =
+             ELSE
+                  COMPUTE  RECE82-NYUKHNKEI2  =
+                           RECE82-NYUKHNKEI2  +
+                           LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
+                  COMPUTE  RECE82-NYUKHNKEI2  =
+                           RECE82-NYUKHNKEI2  +
+                           LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
+             END-IF
+             COMPUTE       RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +
                            LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
       *

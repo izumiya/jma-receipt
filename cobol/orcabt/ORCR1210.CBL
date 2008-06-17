@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.02.01    NACL-ÌçÏÆ    08/06/17  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -128,9 +129,11 @@
                05  WRK-KOGAI-ZAIKAISU1                 PIC 9(04).
                05  WRK-KOGAI-ZAIKAISU2                 PIC 9(04).
                05  WRK-KOGAI-ZAIKAISU3                 PIC 9(04).
+               05  WRK-KOGAI-ZAIKAISU4                 PIC 9(04).
                05  WRK-KOGAI-GOKEI1                    PIC 9(08).
                05  WRK-KOGAI-GOKEI2                    PIC 9(08).
                05  WRK-KOGAI-GOKEI3                    PIC 9(08).
+               05  WRK-KOGAI-GOKEI4                    PIC 9(08).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -153,6 +156,10 @@
            03  WRK-NYUYAKU-CD                         PIC X(09).
            03  WRK-NYURYAKU-IDX                       PIC 9(03).
            03  WRK-NYURYAKU-MAX                       PIC 9(03).
+      *
+           03  WRK-NYUINDAY-TANKI2-TBL.
+               05  WRK-NYUINDAY-TANKI2-KBN            PIC X(01)
+                                                      OCCURS  31.
       *
        01  WRK-CONS-AREA.
       *    ¸ÇÄêÃ¼Ëö£É£Ä
@@ -344,6 +351,9 @@
            MOVE       SPACE             TO     WRK-KOGAI-TABLE
            INITIALIZE                          WRK-KOGAI-TABLE
       *
+           MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
+           INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
+      *
       *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
            INITIALIZE                    ORCSNYUINDAY-AREA
            MOVE    RECE200-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
@@ -353,6 +363,8 @@
                                              SPA-AREA
            IF      LNK-NYUINDAY-RC     =   ZERO
                MOVE   LNK-NYUINDAY-TBL  TO  RECE200-NYUINDAY-TBL
+               MOVE   LNK-NYUINDAY-TANKI2-TBL
+                                        TO  WRK-NYUINDAY-TANKI2-TBL
            END-IF
       *
            PERFORM     200111-RECE200-HENSYU-SEC
@@ -673,8 +685,14 @@
                                             TO  WRK-KOGAI-ZAIKAISU2(1)
                                 END-EVALUATE
                                 IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                  IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
+                                                            NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(1)
+                                  ELSE
+                                    ADD   ACCT-DAY(1 ACCT-IDX)
+                                            TO  WRK-KOGAI-ZAIKAISU4(1)
+                                  END-IF
                                 END-IF
                               WHEN     "102900020"
                                 MOVE  TNS-TEN  TO  WRK-KOGAI-TEN(2)
@@ -687,8 +705,14 @@
                                             TO  WRK-KOGAI-ZAIKAISU2(2)
                                 END-EVALUATE
                                 IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                  IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
+                                                            NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(2)
+                                  ELSE
+                                      ADD   ACCT-DAY(1 ACCT-IDX)
+                                            TO  WRK-KOGAI-ZAIKAISU4(2)
+                                  END-IF
                                 END-IF
                               WHEN     "102900030"
                                 MOVE  TNS-TEN  TO  WRK-KOGAI-TEN(3)
@@ -701,8 +725,14 @@
                                             TO  WRK-KOGAI-ZAIKAISU2(3)
                                 END-EVALUATE
                                 IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                  IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
+                                                            NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(3)
+                                  ELSE
+                                      ADD   ACCT-DAY(1 ACCT-IDX)
+                                            TO  WRK-KOGAI-ZAIKAISU4(3)
+                                  END-IF
                                 END-IF
                               WHEN     "102900040"
                                 MOVE  TNS-TEN  TO  WRK-KOGAI-TEN(4)
@@ -715,8 +745,14 @@
                                             TO  WRK-KOGAI-ZAIKAISU2(4)
                                 END-EVALUATE
                                 IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                  IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
+                                                            NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(4)
+                                  ELSE
+                                    ADD   ACCT-DAY(1 ACCT-IDX)
+                                            TO  WRK-KOGAI-ZAIKAISU4(4)
+                                  END-IF
                                 END-IF
                             END-EVALUATE
       *
@@ -1001,8 +1037,13 @@
            END-EVALUATE
       *
            IF  RECE200-NYUINDAY-KBN(IDY) = "1"
+              IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                     COMPUTE  RECE200-NYUTOKKEI2  =
                              RECE200-NYUTOKKEI2  +  NACCT-ZAITEN
+              ELSE
+                    COMPUTE  RECE200-NYUKHNKEI2  =
+                             RECE200-NYUKHNKEI2  +  NACCT-ZAITEN
+              END-IF
            END-IF
       *
            .
@@ -1321,9 +1362,15 @@
                  END-EVALUATE
       *
                  IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                    IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX) NOT = SPACE
                        COMPUTE  RECE200-NYUTOKKEI2  =
                                 RECE200-NYUTOKKEI2  +
                                (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                    ELSE
+                       COMPUTE  RECE200-NYUKHNKEI2  =
+                                RECE200-NYUKHNKEI2  +
+                               (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                    END-IF
                  END-IF
       *
               END-IF
@@ -1619,14 +1666,19 @@
                        UNTIL     IDY    >      4
               COMPUTE  WRK-KOGAI-GOKEI1(IDY) = WRK-KOGAI-TEN(IDY)
                                              * WRK-KOGAI-ZAIKAISU1(IDY)
-              COMPUTE  RECE200-NYUKHNKEI2    = RECE200-NYUKHNKEI2
-                                             - WRK-KOGAI-GOKEI1(IDY)
               COMPUTE  WRK-KOGAI-GOKEI2(IDY) = WRK-KOGAI-TEN(IDY)
                                              * WRK-KOGAI-ZAIKAISU2(IDY)
               COMPUTE  WRK-KOGAI-GOKEI3(IDY) = WRK-KOGAI-TEN(IDY)
                                              * WRK-KOGAI-ZAIKAISU3(IDY)
+              COMPUTE  WRK-KOGAI-GOKEI4(IDY) = WRK-KOGAI-TEN(IDY)
+                                             * WRK-KOGAI-ZAIKAISU4(IDY)
+      *
+              COMPUTE  RECE200-NYUKHNKEI2    = RECE200-NYUKHNKEI2
+                                             - WRK-KOGAI-GOKEI1(IDY)
               COMPUTE  RECE200-NYUTOKKEI2    = RECE200-NYUTOKKEI2
                                              - WRK-KOGAI-GOKEI3(IDY)
+              COMPUTE  RECE200-NYUKHNKEI2    = RECE200-NYUKHNKEI2
+                                             - WRK-KOGAI-GOKEI4(IDY)
            END-PERFORM
       *
       *    ¸ø³²Æþ±¡ÎÅÍÜ»ØÆ³
@@ -1638,20 +1690,24 @@
                                   =  WRK-KOGAI-ZAIKAISU1(1)
                                   +  WRK-KOGAI-ZAIKAISU2(1)
                                   +  WRK-KOGAI-ZAIKAISU3(1)
+                                  +  WRK-KOGAI-ZAIKAISU4(1)
                 COMPUTE  RECE200-KOGAISIDOKEI(1)
                                   =  WRK-KOGAI-GOKEI1(1)
                                   +  WRK-KOGAI-GOKEI2(1)
                                   +  WRK-KOGAI-GOKEI3(1)
+                                  +  WRK-KOGAI-GOKEI4(1)
                 IF   WRK-KOGAI-TEN(2)  NOT = ZERO
                   MOVE     WRK-KOGAI-TEN(2)  TO  RECE200-KOGAISIDORYO(2)
                   COMPUTE  RECE200-KOGAISIDONISSU(2)
                                   =  WRK-KOGAI-ZAIKAISU1(2)
                                   +  WRK-KOGAI-ZAIKAISU2(2)
                                   +  WRK-KOGAI-ZAIKAISU3(2)
+                                  +  WRK-KOGAI-ZAIKAISU4(2)
                   COMPUTE  RECE200-KOGAISIDOKEI(2)
                                   =  WRK-KOGAI-GOKEI1(2)
                                   +  WRK-KOGAI-GOKEI2(2)
                                   +  WRK-KOGAI-GOKEI3(2)
+                                  +  WRK-KOGAI-GOKEI4(2)
                 END-IF
              ELSE
                 MOVE     WRK-KOGAI-TEN(2)    TO  RECE200-KOGAISIDORYO(1)
@@ -1659,10 +1715,12 @@
                                   =  WRK-KOGAI-ZAIKAISU1(2)
                                   +  WRK-KOGAI-ZAIKAISU2(2)
                                   +  WRK-KOGAI-ZAIKAISU3(2)
+                                  +  WRK-KOGAI-ZAIKAISU4(2)
                 COMPUTE  RECE200-KOGAISIDOKEI(1)
                                   =  WRK-KOGAI-GOKEI1(2)
                                   +  WRK-KOGAI-GOKEI2(2)
                                   +  WRK-KOGAI-GOKEI3(2)
+                                  +  WRK-KOGAI-GOKEI4(2)
              END-IF
            ELSE
              IF   WRK-KOGAI-TEN(3)  NOT = ZERO
@@ -1671,10 +1729,12 @@
                                   =  WRK-KOGAI-ZAIKAISU1(3)
                                   +  WRK-KOGAI-ZAIKAISU2(3)
                                   +  WRK-KOGAI-ZAIKAISU3(3)
+                                  +  WRK-KOGAI-ZAIKAISU4(3)
                 COMPUTE  RECE200-KOGAISIDOKEI(1)
                                   =  WRK-KOGAI-GOKEI1(3)
                                   +  WRK-KOGAI-GOKEI2(3)
                                   +  WRK-KOGAI-GOKEI3(3)
+                                  +  WRK-KOGAI-GOKEI4(3)
              END-IF
            END-IF
       *
@@ -1684,9 +1744,11 @@
              COMPUTE  RECE200-SEIKANNISSU  =  WRK-KOGAI-ZAIKAISU1(4)
                                            +  WRK-KOGAI-ZAIKAISU2(4)
                                            +  WRK-KOGAI-ZAIKAISU3(4)
+                                           +  WRK-KOGAI-ZAIKAISU4(4)
              COMPUTE  RECE200-SEIKANKEI    =  WRK-KOGAI-GOKEI1(4)
                                            +  WRK-KOGAI-GOKEI2(4)
                                            +  WRK-KOGAI-GOKEI3(4)
+                                           +  WRK-KOGAI-GOKEI4(4)
            END-IF
       *
            .
