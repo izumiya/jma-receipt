@@ -1156,7 +1156,10 @@
                       MOVE "入院料加算の保険組合せ確認"
                                           TO  ERR-ERRMSG
                     WHEN       15
-                      MOVE "外泊日の入院料加算確認"
+                      MOVE "外泊日に入院料加算有"
+                                          TO  ERR-ERRMSG
+                    WHEN       16
+                      MOVE "入院料未算定日に入院料加算有"
                                           TO  ERR-ERRMSG
                     WHEN      OTHER
                       MOVE "仮収納データの取得に失敗"

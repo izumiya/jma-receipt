@@ -674,6 +674,8 @@
                     MOVE     14     TO    LNK-S02-RC
                 WHEN      2
                     MOVE     15     TO    LNK-S02-RC
+                WHEN      3
+                    MOVE     16     TO    LNK-S02-RC
               END-EVALUATE
            END-PERFORM.
       *
@@ -3719,23 +3721,29 @@ grpsys                                        SPA-AREA
                                       TO   TBL-ZAIKAISU(SYU-IDX)       
                      END-IF                                            
                  END-IF
-                 IF  ((SYU-DAY(SYU-IDX)                =   "1") OR
-                      (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
-                 AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
-                 AND ( SYU-HKNCOMBINUM    NOT =  ACCT-HKNCOMBI )
-                 AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
-                    IF   WRK-KAIKEING(IDX) = ZERO
-                       MOVE    1     TO    WRK-KAIKEING(IDX)
-                    END-IF
-                 END-IF
-                 IF  ((SYU-DAY(SYU-IDX)                =   "1") OR
-                      (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
-                 AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
-                 AND ( TBL-GAIHAKU(SYU-IDX)  NOT =  ZERO AND 4 )
-                 AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
-                    IF   WRK-KAIKEING(IDX) = ZERO
-                       MOVE    2     TO    WRK-KAIKEING(IDX)
-                    END-IF
+                 IF  (ACCT-DAY(1 SYU-IDX)         NOT =  ZERO)
+                 AND (WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO)
+                   IF  (SYU-DAY(SYU-IDX)                =   "1")
+                   OR  (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1")
+                     IF  TBL-GAIHAKU(SYU-IDX) =  ZERO OR 4
+                       CONTINUE
+                     ELSE
+                       IF   WRK-KAIKEING(IDX) = ZERO
+                          MOVE    2     TO    WRK-KAIKEING(IDX)
+                       END-IF
+                     END-IF
+                     IF  SYU-HKNCOMBINUM = ACCT-HKNCOMBI
+                       CONTINUE
+                     ELSE
+                       IF   WRK-KAIKEING(IDX) = ZERO
+                          MOVE    1     TO    WRK-KAIKEING(IDX)
+                       END-IF
+                     END-IF
+                   ELSE
+                     IF     WRK-KAIKEING(IDX) = ZERO
+                          MOVE    3     TO    WRK-KAIKEING(IDX)
+                     END-IF
+                   END-IF
                  END-IF
              END-PERFORM
            ELSE
