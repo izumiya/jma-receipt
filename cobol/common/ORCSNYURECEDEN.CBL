@@ -1780,8 +1780,13 @@
                         UNTIL      IDX1   >   31
       *        ø«Œ≈∂Ë ¨
                MOVE   WRK-SRYKBN(IDX1)  TO  WRK-SO-SRYKBN(IDX1)
-               IF     LNK-NYUINDAY-KBN(IDX1)   =    "1"
+               IF    (LNK-NYUINDAY-KBN(IDX1)   =    "1")   AND
+                     (LNK-NYUINDAY-TANKI2-KBN(IDX1)  NOT =    SPACE)
                    MOVE   "92"     TO       WRK-SO-SRYKBN(IDX1)
+               END-IF
+               IF    (LNK-NYUINDAY-KBN(IDX1)   =    "1")   AND
+                     (LNK-NYUINDAY-TANKI2-KBN(IDX1)  =    SPACE)
+                   MOVE   "90"     TO       WRK-SO-SRYKBN(IDX1)
                END-IF
       *         ›∏±¡»πÁ§ª
                MOVE   WRK-HKNCOMBI-DAY(IDX1)
