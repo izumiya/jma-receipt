@@ -147,6 +147,7 @@
       *  04.02.04    NACL-ÌçÏÆ    08/04/30  Æþ±¡ÎÁ¤Ë´Þ¤á¤ë²Ã»»ÂÐ±þ
       *  04.02.05    NACL-ÌçÏÆ    08/06/13  Âà±¡Á°Ë¬Ìä»ØÆ³ÎÁ¡¢Àº¿À²ÊÂà±¡Á°Ë¬Ìä
       *                                     »ØÆ³ÎÁ¤Î¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.02.06    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2652,6 +2653,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
                IF    SRY-SRYKBN     =  "14"
+      *
+                 IF (SRY-SRYCD(IDX2) =  "114001110")
+                 OR (SRY-SRYCD(IDX2) =  "114012910")
+                    MOVE        9         TO    FLG-OSINKBN
+                 END-IF
+      *
                  EVALUATE    SRY-SRYCD(IDX2)
       *±ý¿Ç¡ÊÆÃÊÌ±ý¿Ç¡Ë
                    WHEN    "114000110"
@@ -2659,7 +2666,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114000970"
                    WHEN    "114002470"
                    WHEN    "114002970"
-                   IF  FLG-OSINKBN        NOT = 2  AND 3
+                   IF  FLG-OSINKBN        NOT = 2  AND  3  AND  9
                        MOVE     1         TO    FLG-OSINKBN
                    END-IF
       *Ìë´Ö
@@ -2667,7 +2674,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114001970"
                    WHEN    "114011670"
                    WHEN    "114011970"
+                   IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
+                   END-IF
       *¿¼Ìë¡¦¶ÛµÞ
                    WHEN    "114000370"
                    WHEN    "114000570"
@@ -2677,7 +2686,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114011770"
                    WHEN    "114011870"
                    WHEN    "114012070"
+                   IF  FLG-OSINKBN        NOT = 9
                        MOVE     3         TO    FLG-OSINKBN
+                   END-IF
                  END-EVALUATE
                END-IF
       *
@@ -4643,7 +4654,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011870")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114012070")))
-                   OR (  SRY-SRYCD(IDX3)       =    "114001110"  )
+                   OR (  FLG-OSINKBN           =     9           )
+      ***          OR (  SRY-SRYCD(IDX3) =    "114001110"        )
+      ***          OR (  SRY-SRYCD(IDX3) =    "114012910"        )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE82-KAISU(13)
                        COMPUTE   RECE82-TENSU(13)   =

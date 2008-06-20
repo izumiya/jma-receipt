@@ -40,6 +40,7 @@
       *                                       の自動記載対応）
       *                                     （在支病自動記載対応）
       *  04.02.02    NACL-門脇    08/06/03  ネブライザー加算編集修正
+      *  04.02.03    NACL-門脇    08/06/20  在宅編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1760,6 +1761,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *        深夜・緊急の剤判定を追加
       *----------------------------------------------------------------
                IF    SRY-SRYKBN     =  "14"
+      *
+                 IF (SRY-SRYCD(IDX2) =  CONS-ZAIHOU-COMMENT )
+                 OR (SRY-SRYCD(IDX2) =  CONS-ZAIHOU3-COMMENT)
+                    MOVE        9         TO    FLG-OSINKBN
+                 END-IF
+      *
                  EVALUATE    SRY-SRYCD(IDX2)
       *往診（特別往診）
                    WHEN    "114000110"
@@ -1767,7 +1774,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114000970"
                    WHEN    "114002470"
                    WHEN    "114002970"
-                   IF  FLG-OSINKBN        NOT = 2  AND 3
+                   IF  FLG-OSINKBN        NOT = 2  AND  3  AND  9
                        MOVE     1         TO    FLG-OSINKBN
                    END-IF
       *夜間
@@ -1775,7 +1782,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114001970"
                    WHEN    "114011670"
                    WHEN    "114011970"
+                   IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
+                   END-IF
       *深夜・緊急
                    WHEN    "114000370"
                    WHEN    "114000570"
@@ -1785,7 +1794,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114011770"
                    WHEN    "114011870"
                    WHEN    "114012070"
+                   IF  FLG-OSINKBN        NOT = 9
                        MOVE     3         TO    FLG-OSINKBN
+                   END-IF
                  END-EVALUATE
                END-IF
               END-IF
@@ -2896,8 +2907,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         (SRY-SRYCD(IDX3)     NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114011870")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114012070")))
-                   OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU-COMMENT  )
-                   OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU3-COMMENT )
+                   OR (  FLG-OSINKBN             =     9           )
+      ***          OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU-COMMENT  )
+      ***          OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU3-COMMENT )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE100-KAISU(13)
                        COMPUTE   RECE100-TENSU(13 1)  =

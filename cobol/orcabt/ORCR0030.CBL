@@ -355,6 +355,7 @@
       *  04.02.14    NACL-ÌçÏÆ    08/06/09  ·²ÇÏ¸©¸å´ü¹âÎð¼Ô¥ì¥»µ­ºÜÂÐ±þ
       *  04.02.15    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê°ìÉôÉéÃ´¶â¡¦°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
+      *  04.02.16    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3582,6 +3583,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *        ¿¼Ìë¡¦¶ÛµÞ¤ÎºÞÈ½Äê¤òÄÉ²Ã
       *----------------------------------------------------------------
                IF    SRY-SRYKBN     =  "14"
+      *
+                 IF (SRY-SRYCD(IDX2) =  CONS-ZAIHOU-COMMENT )
+                 OR (SRY-SRYCD(IDX2) =  CONS-ZAIHOU3-COMMENT)
+                    MOVE        9         TO    FLG-OSINKBN
+                 END-IF
+      *
                  EVALUATE    SRY-SRYCD(IDX2)
       *±ý¿Ç¡ÊÆÃÊÌ±ý¿Ç¡Ë
                    WHEN    "114000110"
@@ -3589,7 +3596,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114000970"
                    WHEN    "114002470"
                    WHEN    "114002970"
-                   IF  FLG-OSINKBN        NOT = 2  AND 3
+                   IF  FLG-OSINKBN        NOT = 2  AND  3  AND  9
                        MOVE     1         TO    FLG-OSINKBN
                    END-IF
       *Ìë´Ö
@@ -3597,7 +3604,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114001970"
                    WHEN    "114011670"
                    WHEN    "114011970"
+                   IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
+                   END-IF
       *¿¼Ìë¡¦¶ÛµÞ
                    WHEN    "114000370"
                    WHEN    "114000570"
@@ -3607,7 +3616,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114011770"
                    WHEN    "114011870"
                    WHEN    "114012070"
+                   IF  FLG-OSINKBN        NOT = 9
                        MOVE     3         TO    FLG-OSINKBN
+                   END-IF
                  END-EVALUATE
                END-IF
               END-IF
@@ -5114,8 +5125,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         (SRY-SRYCD(IDX3)     NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114011870")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114012070")))
-                   OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU-COMMENT  )
-                   OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU3-COMMENT )
+                   OR (  FLG-OSINKBN             =     9           )
+      ***          OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU-COMMENT  )
+      ***          OR (  SRY-SRYCD(IDX3) =    CONS-ZAIHOU3-COMMENT )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE02-KAISU(11)
                        IF    BUN-IDX        =   1
