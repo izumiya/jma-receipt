@@ -1026,20 +1026,9 @@
            END-IF
       *
            EVALUATE    SPA-MOTOPG(1:4)
-      *        保険組合一覧より
-      **       WHEN    "J021"
-      *******      IF      SPA-J021-HKNCOMBI       NOT =   SPACE
-      *                MOVE    SPA-J021-HKNCOMBI   TO  J02-HKNCOMBI
-      *                PERFORM 41017-HKNCOMBI-CHK-SEC
-      ************ END-IF
-      *            PERFORM 3004-HKNCOMBI-HENKAN-SEC
-      ************ GO      TO      300-SCREEN-EXT
       *        回数入力より
                WHEN    "J022"
                    PERFORM 3002-J022-HEN-SEC
-      ****     レセコメントより
-      *        WHEN    "J023"
-      ****         CONTINUE
       *        カルテ印刷より
                WHEN    "J026"
                    CONTINUE
@@ -4844,11 +4833,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  FLG-K2
            MOVE    1                   TO  IDW1
            MOVE    ZERO                TO  FLG-IKKATUFLG
-      *TEST
+      *
            MOVE    SPACE               TO  WRK-HZNSU
            MOVE    ZERO                TO  IDW1
            MOVE    ZERO                TO  IDW9
-      *TEST
+      *
            PERFORM VARYING    IDW5     FROM    1   BY  1
                    UNTIL     (IDW5     >   20  )  OR
                              (SPA-ERRCD    NOT =   SPACE )
@@ -9689,7 +9678,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    受診歴を検索する  医療機関、患者ＩＤ、伝票番号
            INITIALIZE                  JYURRK-REC
-           MOVE    SPA-HOSPNUM          TO  JYURRK-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-RRK-SRYKA (IDX) TO  JYURRK-SRYKA
@@ -11153,8 +11142,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 41201-PRINT-SYORI-SEC
                WHEN    14
       *            受診履歴編集
-                   PERFORM 3103-JYURRK-HEN-SEC
-                   MOVE    1                   TO  SPA-GMN-PAGE
+      **           PERFORM 3103-JYURRK-HEN-SEC
+      **           MOVE    1                   TO  SPA-GMN-PAGE
       *            プレビューへ
       *            プレビュー確認
                    IF      SPA-XC01-CHK        =   "1"
@@ -11915,6 +11904,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-UPDFLG          =   "1"
       *        診療会計マスター更新
                PERFORM 4901-SRYACCT-UPD-SEC
+               IF     (SPA-ERRCD           =   SPACE )
+      *            更新後再編集
+                   PERFORM 41016219-INSSYORI-END-SEC
+               END-IF
                IF     (SPA-ERRCD       NOT =   SPACE ) OR
                       (FLG-END             =   1     )
                    MOVE    13              TO  SPA-J025-SYORI
@@ -11955,38 +11948,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 900-PUT-WINDOW
       *
            MOVE    1                   TO  FLG-END
-      *
-      *!1
-      *    カルテ３号紙
-      *    INITIALIZE                      ORCSPRTNMAREA
-      *    MOVE    "1"                 TO  ORCSPRTNM-KBN
-      *    MOVE    "00000005"          TO  ORCSPRTNM-KBNCD
-      *    MOVE    SPA-NAI-SRYYM       TO  ORCSPRTNM-SRYYMD(1:6)
-      *    MOVE    "01"                TO  ORCSPRTNM-SRYYMD(7:2)
-      *    CALL    "ORCSPRTNM"         USING
-      *                                    ORCSPRTNMAREA
-      *                                    SPA-AREA
-      *                                    SYSKANRI-REC
-      *    IF      ORCSPRTNM-RC        =   ZERO
-      *        MOVE    ORCSPRTNM-PRTPG     TO  WRK-PRINT-PG
-      *    ELSE
-      *        MOVE    "ORCHC33"           TO  WRK-PRINT-PG
-      *    END-IF
-      *
-      *    INITIALIZE                  ORCHC33AREA
-      *    MOVE    "1"                 TO  ORCHC33-KBN
-      *    MOVE    SPA-GMN-PTNUM       TO  ORCHC33-PTNUM
-      *    MOVE    SPA-GMN-PTID        TO  ORCHC33-PTID
-      *    MOVE    SPA-GMN-NAME        TO  ORCHC33-NAME
-      *    MOVE    SPA-GMN-BIRTHDAY    TO  ORCHC33-BIRTHDAY
-      *    MOVE    SPA-GMN-SEX         TO  ORCHC33-SEX
-      *    MOVE    SPA-NAI-SRYYM       TO  ORCHC33-SRYYM
-      *    MOVE    SPACE               TO  ORCHC33-SRYYM-END
-      *    MOVE    SPA-GMN-NYUGAIKBN   TO  ORCHC33-NYUGAIKBN
-      *    MOVE    SPA-J01-SRYKA       TO  ORCHC33-SRYKA
-      *    CALL    WRK-PRINT-PG        USING
-      *                                SPA-AREA
-      *!!                              ORCHC33AREA
       *
            .
        41201-PRINT-SYORI-EXT.
@@ -12325,10 +12286,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      SPA-UPDFLG          =   "1"
                PERFORM 4901-SRYACCT-UPD-SEC
+               IF     (SPA-ERRCD           =   SPACE )
+      *            更新後再編集
+                   PERFORM 41016219-INSSYORI-END-SEC
+                   MOVE    1                   TO  SPA-GMN-PAGE
+               END-IF
                IF     (SPA-ERRCD      NOT  =   SPACE ) OR
                       (FLG-END             =   1     )
                    MOVE    14              TO  SPA-J025-SYORI
                ELSE
+      *
       *            プレビュー確認
                    IF      SPA-XC01-CHK        =   "1"
                        MOVE    "0125"          TO  SPA-JIDCD
