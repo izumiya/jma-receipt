@@ -1467,21 +1467,21 @@ grpsys     MOVE    SPA-TERMID        TO  EIE01PARA-TERMID.
            END-IF.
       *
       *½¤Àµ/*³«»Ï*03.06.05*********************************************
-           IF  (WK-TBL-CHKBTN01  = "T")      AND
-               (WK-TBL-MSG-KBN   = "T")
-               PERFORM VARYING IDX1  FROM  1  BY 1
-                       UNTIL   IDX1  >     900
+      *     IF  (WK-TBL-CHKBTN01  = "T")      AND
+      *         (WK-TBL-MSG-KBN   = "T")
+      *         PERFORM VARYING IDX1  FROM  1  BY 1
+      *                 UNTIL   IDX1  >     900
       *************IF  WK-TBL-MSG-C (IDX1)(1:6)   =   "HOSPID"
-                   IF  WK-TBL-MSG-C (IDX1)(1:7)   =   "HOSPNUM"
-                       MOVE    SPACE                 TO  EIE01-REC
-                       MOVE    WK-TBL-MSG-C (IDX1)   TO  EIE01-REC
+      *             IF  WK-TBL-MSG-C (IDX1)(1:7)   =   "HOSPNUM"
+      *                 MOVE    SPACE                 TO  EIE01-REC
+      *                 MOVE    WK-TBL-MSG-C (IDX1)   TO  EIE01-REC
       *****************MOVE    "HOSPID**"            TO  EIE01-REC(1:8)
-                       MOVE    "HOSPNUM*"            TO  EIE01-REC(1:8)
-                       WRITE   EIE01-REC
-                       MOVE    901                   TO  IDX1
-                   END-IF
-               END-PERFORM
-           END-IF.
+      *                 MOVE    "HOSPNUM*"            TO  EIE01-REC(1:8)
+      *                 WRITE   EIE01-REC
+      *                 MOVE    901                   TO  IDX1
+      *             END-IF
+      *         END-PERFORM
+      *     END-IF.
       *½¤Àµ/*½ªÎ»*03.06.05*********************************************
       *
            CLOSE                           EIE01-FILE.
