@@ -214,6 +214,7 @@
       *                                     （一部負担金再掲欄編集）
       *  04.02.09    NACL-藤原    08/06/11  コメントが途中にある場合の
       *                                     注加算による加算項目の記載
+      *  04.02.10    NACL-門脇    08/06/25  全国公費２種の一部負担金等記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2887,6 +2888,12 @@
                   (RECE62-KOUREI-SAIKEI      >  ZERO      ) AND
                   (IDY                       =   1        ))
                MOVE   RECE62-KOUREI-SAIKEI     TO  WRK-NUM
+               MOVE    6                       TO  WRK-NAGASA
+           END-IF
+           IF     (RECE62-SRYYM  >=  WRK-CONS-SRYYM-200804) AND
+                  (RECE62-KOUREI-SAIKEI2 NOT =   999999999) AND
+                  (IDY                       =   2        )
+               MOVE   RECE62-KOUREI-SAIKEI2    TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC

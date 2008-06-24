@@ -41,6 +41,7 @@
       *                                     ¹ñÊÝ¤Î¤ß£²³ä¤Îµ­ºÜ
       *  04.02.06    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
+      *  04.02.07    NACL-ÌçÏÆ    08/06/25  Á´¹ñ¸øÈñ£²¼ï¤Î°ìÉôÉéÃ´¶âÅùµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4382,12 +4383,18 @@
                    END-IF
                END-IF
            END-IF
-           IF      RECE02-ZAITAKU-SAIKEI  NOT =  999999999
-               MOVE    "("                    TO  HC06-FTNMONEYSAI(1:1)
-               MOVE   RECE02-ZAITAKU-SAIKEI   TO  WRK-KGK7
-               MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI(3:8)
-               MOVE    ")"                    TO  HC06-FTNMONEYSAI(11:1)
-           END-IF    
+           IF      RECE02-ZAITAKU-SAIKEI    NOT =  999999999
+             MOVE    "("                    TO  HC06-FTNMONEYSAI(1:1)
+             MOVE   RECE02-ZAITAKU-SAIKEI   TO  WRK-KGK7
+             MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI(3:8)
+             MOVE    ")"                    TO  HC06-FTNMONEYSAI(11:1)
+           END-IF
+           IF      RECE02-ZAITAKU-SAIKEI2   NOT =  999999999
+             MOVE    "("                    TO  HC06-FTNMONEYSAI2(1:1)
+             MOVE   RECE02-ZAITAKU-SAIKEI2  TO  WRK-KGK7
+             MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI2(3:8)
+             MOVE    ")"                    TO  HC06-FTNMONEYSAI2(11:1)
+           END-IF
       *    ¸øÈñ£±
            IF    ( RECE02-TOTALTEN (IDX2) >   ZERO                     )
            AND   ((RECE02-TOTALTEN (IDX2)
