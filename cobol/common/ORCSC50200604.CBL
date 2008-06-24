@@ -38,6 +38,7 @@
       * 01.00.08     NACL-多々納  04/03/16  Ｈ１６年４月改正追加
       * 01.00.09     NACL-多々納  05/12/14  MONFUNC 対応
       * 03.05.00     NACL-多々納  07/04/XX  グループ診療対応
+      * 04.02.00     NACL-多々納  08/06/24  通則加算を通則加算対象の所定点数としない
       *****************************************************************
       *
       *
@@ -1298,6 +1299,15 @@
                        MOVE    "1"             TO  WRK-COM-CUR(IDX-Z)
                    END-IF
                END-IF
+           END-IF
+      *
+      *    通則加算は通則加算対象外とする（告示２で判定）
+           IF      (SPA-ERRCD                  =   SPACE )  AND
+                   (WRK-COM-TENSIKIBETU (IDX-Z)    =   3    )  AND
+                   (WRK-COM-KOKUJISKBKBN2(IDX-Z)   =   "9"  )  AND
+                   (WRK-COM-TUSOKUGAIKBN (IDX-Z)   =   "0" )
+               MOVE    "1"                 TO  WRK-COM-TUSOKUGAIKBN
+                                                               (IDX-Z)
            END-IF
       *
            .

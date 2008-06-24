@@ -39,6 +39,7 @@
       * 01.00.09     NACL-多々納  05/12/14  MONFUNC 対応
       * 03.05.00     NACL-多々納  07/04/XX  グループ診療対応
       * 04.02.00     NACL-多々納  08/03/XX  Ｈ２０年４月改正追加
+      * 04.02.00     NACL-多々納  08/06/24  通則加算を通則加算対象の所定点数としない
       *****************************************************************
       *
       *
@@ -1328,6 +1329,15 @@
                END-IF
            END-IF
       *
+      *    通則加算は通則加算対象外とする（告示２で判定）
+           IF      (SPA-ERRCD                  =   SPACE )  AND
+                   (WRK-COM-TENSIKIBETU (IDX-Z)    =   3    )  AND
+                   (WRK-COM-KOKUJISKBKBN2(IDX-Z)   =   "9"  )  AND
+                   (WRK-COM-TUSOKUGAIKBN (IDX-Z)   =   "0" )
+               MOVE    "1"                 TO  WRK-COM-TUSOKUGAIKBN
+                                                               (IDX-Z)
+           END-IF
+      *
            .
        1005-KASAN-CHK-EXT.
            EXIT.
@@ -1472,6 +1482,7 @@
                                                  OR  6
                GO      TO      100212-SYUGI-KEI-EXT
            END-IF
+      *
       *    労災の手技の時、
            IF      WRK-COM-INPUTCD(IDX-Z)(1:3) =   "101"
                IF      WRK-COM-INPUTCD(IDX-ZS) =   "101400030"
