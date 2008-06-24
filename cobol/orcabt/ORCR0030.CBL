@@ -356,6 +356,7 @@
       *  04.02.15    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê°ìÉôÉéÃ´¶â¡¦°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *  04.02.16    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
+      *  04.02.17    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7834,8 +7835,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF   ( RECE02-AGE           >=  70    )
            OR   ((RECE02-AGE           >=  65   )  AND
                  (RECE02-RJNHKNNUM  NOT =  SPACE))
-           OR   ((RECE02-AGE           >=  65   )  AND
-                 (RECE02-HKNNUM         =  "039"))
+      ***  OR   ((RECE02-AGE           >=  65   )  AND
+      ***        (RECE02-HKNNUM         =  "039"))
+           OR   ( RECE02-HKNNUM         =  "039" )
               MOVE    1    TO   FLG-KOUREI-KBN
            END-IF
       *

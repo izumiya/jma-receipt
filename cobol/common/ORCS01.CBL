@@ -255,6 +255,7 @@
       *  04.02.11    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *  04.02.12    NACL-ÌçÏÆ    08/05/22  ºßÁí¿ÇÈ½Äê¾ò·ï½¤Àµ
       *  04.02.13    NACL-ÌçÏÆ    08/05/29  ¸½ÊªµëÉÕÊÝ¸±¼ÔÃ±°Ì¾ò·ïÄÉ²Ã
+      *  04.02.14    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2899,10 +2900,12 @@
                    IF  ( AGECHK-NENREI   >=  70      ) OR
                        ( AGECHK-NENREI   >=  65  AND
                          COMB-KOH1HKNNUM  = "027"    ) OR
-                       ( AGECHK-NENREI   >=  65  AND
-                         FLG-ROUJINHOKEN  = "1"      ) OR
-                       ( AGECHK-NENREI   >=  65  AND
-                         COMB-HKNNUM      = "039"    )
+      ***              ( AGECHK-NENREI   >=  65  AND
+      ***                FLG-ROUJINHOKEN  = "1"      ) OR
+      ***              ( AGECHK-NENREI   >=  65  AND
+      ***                COMB-HKNNUM      = "039"    )
+                       ( FLG-ROUJINHOKEN  = "1"      ) OR
+                       ( COMB-HKNNUM      = "039"    )
                        MOVE    "1"     TO  FLG-KOUREI-KBN
                    END-IF
                    IF    LNK-S01-SAIKEISAN-KBN  =   "1"
@@ -3817,7 +3820,7 @@
                END-IF
       *
                IF  ( WK-1001-PREFNUM         =  13             ) AND
-                   ( COMB-KOH1HKNNUM         = "180"           )
+                   ( COMB-KOH1HKNNUM         = "180" OR "380"  )
                  IF (COMB-KOH2HKNNUM         = "972") OR
                     (COMB-KOH3HKNNUM         = "972") OR
                     (COMB-KOH4HKNNUM         = "972")
@@ -3954,7 +3957,7 @@
                END-IF
       *
                IF  ( WK-1001-PREFNUM         =  13             ) AND
-                   ( COMB-KOH2HKNNUM         = "180"           )
+                   ( COMB-KOH2HKNNUM         = "180" OR "380"  )
                  IF (COMB-KOH1HKNNUM         = "972") OR
                     (COMB-KOH3HKNNUM         = "972") OR
                     (COMB-KOH4HKNNUM         = "972")
@@ -4071,7 +4074,7 @@
                END-IF
       *
                IF  ( WK-1001-PREFNUM         =  13             ) AND
-                   ( COMB-KOH3HKNNUM         = "180"           )
+                   ( COMB-KOH3HKNNUM         = "180" OR "380"  )
                  IF (COMB-KOH1HKNNUM         = "972") OR
                     (COMB-KOH2HKNNUM         = "972") OR
                     (COMB-KOH4HKNNUM         = "972")
@@ -4188,7 +4191,7 @@
                END-IF
       *
                IF  ( WK-1001-PREFNUM         =  13             ) AND
-                   ( COMB-KOH4HKNNUM         = "180"           )
+                   ( COMB-KOH4HKNNUM         = "180" OR "380"  )
                  IF (COMB-KOH1HKNNUM         = "972") OR
                     (COMB-KOH2HKNNUM         = "972") OR
                     (COMB-KOH3HKNNUM         = "972")
@@ -5028,7 +5031,7 @@
            END-IF.
       *
            IF  ( WK-1001-PREFNUM         =  13             ) AND
-               ( COMB-KOH1HKNNUM         = "180"           )
+               ( COMB-KOH1HKNNUM         = "180" OR "380"  )
              IF (COMB-KOH2HKNNUM         = "972") OR
                 (COMB-KOH3HKNNUM         = "972") OR
                 (COMB-KOH4HKNNUM         = "972")
@@ -5333,7 +5336,7 @@
            END-IF.
       *
            IF  ( WK-1001-PREFNUM         =  13             ) AND
-               ( COMB-KOH2HKNNUM         = "180"           )
+               ( COMB-KOH2HKNNUM         = "180" OR "380"  )
              IF (COMB-KOH1HKNNUM         = "972") OR
                 (COMB-KOH3HKNNUM         = "972") OR
                 (COMB-KOH4HKNNUM         = "972")
@@ -5632,7 +5635,7 @@
            END-IF.
       *
            IF  ( WK-1001-PREFNUM         =  13             ) AND
-               ( COMB-KOH3HKNNUM         = "180"           )
+               ( COMB-KOH3HKNNUM         = "180" OR "380"  )
              IF (COMB-KOH1HKNNUM         = "972") OR
                 (COMB-KOH2HKNNUM         = "972") OR
                 (COMB-KOH4HKNNUM         = "972")
@@ -5931,7 +5934,7 @@
            END-IF.
       *
            IF  ( WK-1001-PREFNUM         =  13             ) AND
-               ( COMB-KOH4HKNNUM         = "180"           )
+               ( COMB-KOH4HKNNUM         = "180" OR "380"  )
              IF (COMB-KOH1HKNNUM         = "972") OR
                 (COMB-KOH2HKNNUM         = "972") OR
                 (COMB-KOH3HKNNUM         = "972")
@@ -7470,9 +7473,10 @@
       *
       *    °ñ¾ë¸©¡Ê£±£´£³¡¢£±£´£µ¡Ë
            IF   WK-1001-PREFNUM          =  08
-              IF     SYU-KOH1HKNNUM  =  "143" OR "145"
-                                     OR "181" OR "182" OR "189"
-                                     OR "187" OR "188"
+              IF     SYU-KOH1HKNNUM(1:1)   >=  "1" AND <=  "8"
+      ***     IF     SYU-KOH1HKNNUM  =  "143" OR "145"
+      ***                            OR "181" OR "182" OR "189"
+      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
                 END-IF
@@ -7486,9 +7490,10 @@
                    MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
                 END-IF
               END-IF
-              IF     SYU-KOH2HKNNUM  =  "143" OR "145"
-                                     OR "181" OR "182" OR "189"
-                                     OR "187" OR "188"
+              IF     SYU-KOH2HKNNUM(1:1)   >=  "1" AND <=  "8"
+      ***     IF     SYU-KOH2HKNNUM  =  "143" OR "145"
+      ***                            OR "181" OR "182" OR "189"
+      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
                 END-IF
@@ -7502,9 +7507,10 @@
                    MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
                 END-IF
               END-IF
-              IF     SYU-KOH3HKNNUM  =  "143" OR "145"
-                                     OR "181" OR "182" OR "189"
-                                     OR "187" OR "188"
+              IF     SYU-KOH3HKNNUM(1:1)   >=  "1" AND <=  "8"
+      ***     IF     SYU-KOH3HKNNUM  =  "143" OR "145"
+      ***                            OR "181" OR "182" OR "189"
+      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
                 END-IF
@@ -7518,9 +7524,10 @@
                    MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
                 END-IF
               END-IF
-              IF     SYU-KOH4HKNNUM  =  "143" OR "145"
-                                     OR "181" OR "182" OR "189"
-                                     OR "187" OR "188"
+              IF     SYU-KOH4HKNNUM(1:1)   >=  "1" AND <=  "8"
+      ***     IF     SYU-KOH4HKNNUM  =  "143" OR "145"
+      ***                            OR "181" OR "182" OR "189"
+      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
                 END-IF

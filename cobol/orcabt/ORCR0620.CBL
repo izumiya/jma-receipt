@@ -147,6 +147,7 @@
       *                                     Ë¡ÊÌÈÖ¹æ£¸£°¤ÇÈ½Äê¤·¤Æ
       *                                     ¸øÈñ¥«¥¦¥ó¥È¤·¤Ê¤¤
       *  04.02.06    NACL-Æ£¸¶    08/04/25  ÊÝ¸±ÍúÎò¤Îµ­ºÜÊÑ¹¹
+      *  04.02.07    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1301,10 +1302,12 @@
                 IF  ( RECE62-AGE          >=  70      )   OR
                     ( RECE62-AGE          >=  65  AND
                       RECE61-KOHID    NOT  =   ZERO   )   OR
-                    ( RECE62-AGE          >=  65  AND
-                      FLG-ROUJINHOKEN      =   1      )   OR
-                    ( RECE62-AGE          >=  65  AND                    
-                      RECE62-HKNNUM        =  "039"   )
+      ***           ( RECE62-AGE          >=  65  AND
+      ***             FLG-ROUJINHOKEN      =   1      )   OR
+      ***           ( RECE62-AGE          >=  65  AND                    
+      ***             RECE62-HKNNUM        =  "039"   )
+                    ( FLG-ROUJINHOKEN      =   1      )   OR
+                    ( RECE62-HKNNUM        =  "039"   )
                    MOVE     "1"     TO   RECE62-KOUREI
                 ELSE
                   IF  RECE62-SRYYM  >=  "200704"
