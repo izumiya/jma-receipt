@@ -1314,7 +1314,7 @@ path	key25	{
 			AND   DATAKBN       =  1
 			AND   CHUKSNTSUBAN  =  '0'
 			AND   NYUKHNKSNKBN  >  0
-			ORDER   BY          KOUHYOJYUNNUM
+			ORDER   BY          KOUHYOJYUNNUM,SRYCD
 			;
 	};
 };
