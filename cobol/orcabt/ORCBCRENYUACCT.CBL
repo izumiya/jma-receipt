@@ -52,6 +52,8 @@
       *                                     精神科救急・合併症入院料
       *                                     短期滞在手術基本料３
       *  04.02.00    NACL-小豆沢  08/03/07  シス管病棟設定の加算判定変更
+      *  04.02.00    NACL-小豆沢  08/06/26  他院（特別な関係の医療機関）通算日数
+      *                                     カウント変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2147,6 +2149,10 @@
                MOVE    "2003"      TO  WRK-ERRCD
                GO  TO  4801-TSUSAN-SANTEI-GET-EXT
            END-IF
+      *
+      *    他院（特別な関係にある医療機関）の日数を加算
+           ADD     STUSAN-TAINREL-NISSU  TO   STUSAN-NISSU03
+           ADD     STUSAN-TAINREL-NISSU  TO   STUSAN-NISSU05
       *
            COMPUTE WRK-TSUSAN      =   STUSAN-NISSU03  -   1
            MOVE    PTNYUINRRK-TENNYUYMD

@@ -92,6 +92,8 @@
       *  04.02.00    NACL-小豆沢  08/03/10  療養病棟（病床）入院料の名称
       *                                     表示変更
       *  04.02.00    NACL-小豆沢  08/03/14  会計点数の不整合メッセージ追加
+      *  04.02.00    NACL-小豆沢  08/06/26  他院（特別な関係の医療機関）通算日数
+      *                                     カウント変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1300,6 +1302,10 @@
                    CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
                                                    SPA-AREA
       *
+      *            他院（特別な関係にある医療機関）の日数を加算
+                   ADD     STUSAN-TAINREL-NISSU  TO   STUSAN-NISSU03
+                   ADD     STUSAN-TAINREL-NISSU  TO   STUSAN-NISSU05
+      *
       *            ９１日編集処理
                    PERFORM 3103-91DAYS-EDIT-SEC
       *           １８０日編集処理
@@ -1383,7 +1389,6 @@
            END-IF
       *
            MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
-           ADD     STUSAN-TAINREL-NISSU  TO  WRK-TUSAN
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
@@ -6219,6 +6224,10 @@
                MOVE    "2003"      TO  SPA-ERRCD
                GO  TO  4801-TSUSAN-SANTEI-GET-EXT
            END-IF
+      *
+      *    他院（特別な関係にある医療機関）の日数を加算
+           ADD     STUSAN-TAINREL-NISSU  TO   STUSAN-NISSU03
+           ADD     STUSAN-TAINREL-NISSU  TO   STUSAN-NISSU05
       *
            COMPUTE WRK-TSUSAN      =   STUSAN-NISSU03  -   1
            MOVE    PTNYUINRRK-TENNYUYMD
