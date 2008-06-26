@@ -751,14 +751,20 @@
                    PERFORM 2004-WKSRYACT-OUT-SEC
                END-IF
       *
-      *        病名セット処理
-               PERFORM 2006-BYOMEI-SET-SEC
+      ***      病名セット処理
+      ****     PERFORM 2006-BYOMEI-SET-SEC
       *
       *        入院移動処理
                IF      FLG-NYUINIDOU       =   1
                    PERFORM 2007-ORCL0031N-SEC
                END-IF
            END-IF
+      *
+           IF      FLG-END             =   ZERO
+      *        病名セット処理
+               PERFORM 2006-BYOMEI-SET-SEC
+           END-IF
+      *
       *    外来の時、受付に会計待を設定
            IF      WRK-NYUGAIKBN       =   "2"
               AND (FLG-ERR             =   ZERO )
