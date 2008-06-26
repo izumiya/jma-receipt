@@ -2576,18 +2576,23 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC
       *    ÉéÃ´¶â³Û¡Ê¸øÈñµëÉÕÂÐ¾Ý³°Íè°ìÉôÉéÃ´¶â¡Ë
-           IF    ((RECE02-SRYYM  >=  WRK-CONS-SRYYM-200804) AND
-                  (RECE02-ZAITAKU-SAIKEI NOT =   999999999) AND
-                  (IDY                       =   1        ))
-           OR    ((RECE02-SRYYM  <   WRK-CONS-SRYYM-200804) AND
-                  (RECE02-ZAITAKU-SAIKEI     >  ZERO      ) AND
-                  (IDY                       =   1        ))
+           IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-PREFNUM      =  "38"                     ) AND
+                (RECE02-ZAITAKU-SAIKEI   NOT = 999999999         ) AND
+                (IDY                 =   1                       ))
+           OR  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-PREFNUM  NOT =  "38"                     ) AND
+                (RECE02-ZAITAKU-SAIKEI   NOT = 999999999 AND ZERO) AND
+                (IDY                 =   1                       ))
+           OR  ((RECE02-SRYYM       <   WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-ZAITAKU-SAIKEI      >  ZERO              ) AND
+                (IDY                 =   1                       ))
                MOVE   RECE02-ZAITAKU-SAIKEI    TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
-           IF     (RECE02-SRYYM  >=  WRK-CONS-SRYYM-200804) AND
-                  (RECE02-ZAITAKU-SAIKEI2 NOT =  999999999) AND
-                  (IDY                        =   2       )
+           IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-ZAITAKU-SAIKEI2  NOT = 999999999 AND ZERO) AND
+                (IDY                 =   2                       ))
                MOVE   RECE02-ZAITAKU-SAIKEI2   TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF

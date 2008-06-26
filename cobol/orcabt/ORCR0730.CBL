@@ -5281,13 +5281,16 @@
                    END-IF
                END-IF
            END-IF
-           IF      RECE62-KOUREI-SAIKEI    NOT =  999999999
+           IF  ((SYS-1001-PREFNUM            =   "38"             ) AND
+                (RECE62-KOUREI-SAIKEI    NOT =  999999999         ))
+           OR  ((SYS-1001-PREFNUM        NOT =   "38"             ) AND
+                (RECE62-KOUREI-SAIKEI    NOT =  999999999 AND ZERO))
              MOVE    "("                   TO  HC06-FTNMONEYSAI(1:1)
              MOVE   RECE62-KOUREI-SAIKEI   TO  WRK-KGK7
              MOVE   WRK-KGK7               TO  HC06-FTNMONEYSAI(3:8)
              MOVE    ")"                   TO  HC06-FTNMONEYSAI(11:1)
            END-IF
-           IF      RECE62-KOUREI-SAIKEI2   NOT =  999999999
+           IF    RECE62-KOUREI-SAIKEI2   NOT =  999999999 AND ZERO
              MOVE    "("                   TO  HC06-FTNMONEYSAI2(1:1)
              MOVE   RECE62-KOUREI-SAIKEI2  TO  WRK-KGK7
              MOVE   WRK-KGK7               TO  HC06-FTNMONEYSAI2(3:8)
