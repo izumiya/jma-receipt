@@ -2234,8 +2234,8 @@
       *
            PERFORM VARYING     IDX     FROM    IDX-SYU  BY  1
                    UNTIL       IDX         >=  HZN-IDX
-      *        手技料の点数を所定点数とする
-      *        ％加算
+      *      手技料の点数を所定点数とする
+      *      ％加算
              IF       (WRK-COM-INPUTCD(IDX)(1:3)   NOT =   "101") AND
                       (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
@@ -2290,12 +2290,26 @@
                    UNTIL       IDX         >=  HZN-IDX
       *
       *        手技料の点数を所定点数とする
-      *        ％加算
+      *        労災１．５ ％加算
                IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
                       (WRK-COM-SANFLG     (IDX)    =   2   )
                    MOVE    ZERO                TO  WRK-TENSUKEI
       *****        COMPUTE WRK-TENSUKEI        =   LNK-SC90-TENSU
+                   COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
+                                                             (IDX-SYU)
+                                               -   WRK-TENSUKEI-G )
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-RSI
+               END-IF
+      *        労災リハ（１．２）加算
+               IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   0   )
+                   MOVE    ZERO                TO  WRK-TENSUKEI
                    COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
                                                              (IDX-SYU)
                                                -   WRK-TENSUKEI-G )
