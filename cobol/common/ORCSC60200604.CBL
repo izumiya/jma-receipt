@@ -4121,7 +4121,7 @@
            IF      FLG-INPUT           =   ZERO
       *        点数マスタ編集・基本チェック
                INITIALIZE                  ORCSC92AREA
-               MOVE    "3"                 TO  LNK-SC92-KBN
+               MOVE    "2"                 TO  LNK-SC92-KBN
                COMPUTE WRK-GMN-MAX     =   WRK-GMN-MAX
                                            +   1
                IF      WRK-GMN-MAX     >   SPA-MAX-LINE
