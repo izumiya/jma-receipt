@@ -124,6 +124,8 @@
            03  WRK-HYOKETU-TEN             PIC 9(09)V99.
            03  WRK-BRMSGK-TAXKBN           PIC X(01).
            03  WRK-KEISAN                  PIC 9(07).
+           03  WRK-CHECK-STDAY             PIC 9(02).
+           03  WRK-CHECK-EDDAY             PIC 9(02).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -3703,6 +3705,8 @@ grpsys                                        SPA-AREA
       *    算定対象日数を求める
            MOVE      ZERO          TO     SINRYO-COUNT
            INITIALIZE                     TABLE-ZAIKAISU               
+           MOVE   ZERO             TO     WRK-CHECK-STDAY
+           MOVE   ZERO             TO     WRK-CHECK-EDDAY
            IF   ACCT-SRYKBN  =  "90"  OR  "92"
              PERFORM   VARYING   SYU-IDX   FROM   1   BY   1
                      UNTIL      SYU-IDX   >   31
@@ -3728,20 +3732,31 @@ grpsys                                        SPA-AREA
                      IF  TBL-GAIHAKU(SYU-IDX) =  ZERO OR 4
                        CONTINUE
                      ELSE
-                       IF   WRK-KAIKEING(IDX) = ZERO
-                          MOVE    2     TO    WRK-KAIKEING(IDX)
+                       IF  ACCT-ZAITEN  NOT = ZERO
+                         IF   WRK-KAIKEING(IDX) = ZERO
+                            MOVE    2     TO    WRK-KAIKEING(IDX)
+                         END-IF
                        END-IF
                      END-IF
                      IF  SYU-HKNCOMBINUM = ACCT-HKNCOMBI
                        CONTINUE
                      ELSE
-                       IF   WRK-KAIKEING(IDX) = ZERO
-                          MOVE    1     TO    WRK-KAIKEING(IDX)
+                       IF  ACCT-ZAITEN  NOT = ZERO
+                         IF   WRK-KAIKEING(IDX) = ZERO
+                            MOVE    1     TO    WRK-KAIKEING(IDX)
+                         END-IF
                        END-IF
                      END-IF
                    ELSE
-                     IF     WRK-KAIKEING(IDX) = ZERO
-                          MOVE    3     TO    WRK-KAIKEING(IDX)
+                     MOVE   SYU-SKYSTYMD(7:2)  TO  WRK-CHECK-STDAY
+                     MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
+                     IF     (WRK-CHECK-STDAY  <=  SYU-IDX        )
+                     AND    (SYU-IDX          <=  WRK-CHECK-EDDAY)
+                       IF  ACCT-ZAITEN  NOT = ZERO
+                         IF     WRK-KAIKEING(IDX) = ZERO
+                            MOVE    3     TO    WRK-KAIKEING(IDX)
+                         END-IF
+                       END-IF
                      END-IF
                    END-IF
                  END-IF
