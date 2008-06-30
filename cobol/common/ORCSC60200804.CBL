@@ -4166,22 +4166,14 @@
        3006-AUTO-KENTAIKASN-SEC         SECTION.
       *
            MOVE    "160177770"         TO  WRK-SRYCD
-      *    入力判定
-           MOVE    ZERO                TO  FLG-INPUT
-           PERFORM VARYING     IDX-Z   FROM    1   BY  1
-                   UNTIL      (IDX-Z       >   SPA-MAX-LINE )   OR
-                              (FLG-INPUT   NOT =   ZERO)  OR
-                             ((WRK-GMN-INPUTCD (IDX-Z) =   SPACE ) AND
-                              (WRK-COM-INPUTCD (IDX-Z) =   SPACE ))
+      *    同一コードチェック
+           PERFORM 30051-INPUT-CHECK-SEC
+      *    共通チェック処理
+           IF      FLG-ERR             =   ZERO
+               PERFORM 3001-KYOUTU-CHEK-SEC
+           END-IF
       *
-             IF      WRK-COM-HKNCOMBI(IDX-Z) NOT =   "9999"
-      *
-               IF     (WRK-COM-SRYKBN  (IDX-Z) =   "60" ) AND
-                      (WRK-COM-INPUTCD (IDX-Z) =   WRK-SRYCD )
-                   MOVE    1                   TO  FLG-INPUT
-               END-IF
-             END-IF
-           END-PERFORM
+           IF      FLG-ERR         =   ZERO
       *
       *    当日回数
            INITIALIZE                      ORCSC91AREA
@@ -4206,7 +4198,7 @@
                END-IF
            END-IF
       *    入力にないとき、検査数で自動発生
-           IF      FLG-INPUT           =   ZERO
+      *****IF      FLG-INPUT           =   ZERO
       *        点数マスタ編集・基本チェック
                INITIALIZE                  ORCSC92AREA
                MOVE    "2"                 TO  LNK-SC92-KBN
