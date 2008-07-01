@@ -263,6 +263,8 @@
       * ³°ÇñÂàÈòÍÑ¥Æ¡¼¥Ö¥ë     
        01  TABLE-GAIHAKU.
            03  TBL-GAIHAKU                 PIC 9(01)   OCCURS  31.
+       01  TABLE-GAIHAKU2.
+           03  TBL-GAIHAKU2                PIC 9(01)   OCCURS  31.
       *
       * Ì¤¼Â»Ü¸º»»ÂàÈòÍÑ¥Æ¡¼¥Ö¥ë     
        01  TABLE-GENSAN.
@@ -562,6 +564,7 @@
       *
            PERFORM       SYUNOU-SET-SEC.
       *
+           INITIALIZE    TABLE-GAIHAKU2.
       *    Æþ±¡²ñ·×¤«¤é¼ýÇ¼¥¨¥ê¥¢¤Ø¤Î¥»¥Ã¥È
            PERFORM    VARYING   IDX    FROM   1   BY   1
                       UNTIL  (IDX            >    10)
@@ -1998,6 +2001,7 @@ grpsys                            SPA-AREA
                    IF   NACCT-DAY(SYU-IDX) NOT =  ZERO
                        MOVE   NACCT-DAY(SYU-IDX)
                                   TO  TBL-GAIHAKU (SYU-IDX)
+                                      TBL-GAIHAKU2(SYU-IDX)
                        IF  SYU-DAY(SYU-IDX)    =  "1"
                        AND WRK-DOJITU-FLG(IDX SYU-IDX)
                                                =  ZERO
@@ -2606,6 +2610,7 @@ grpsys                              SPA-AREA
       *
                      MOVE  LNK-SROUNYUIN-GAIHAKU(SYU-IDX)
                                           TO   TBL-GAIHAKU(SYU-IDX)
+                                               TBL-GAIHAKU2(SYU-IDX)
       *
                 END-IF
       *
@@ -3713,8 +3718,8 @@ grpsys                                        SPA-AREA
                  IF  ((SYU-DAY(SYU-IDX)                =   "1") OR
                       (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
                  AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
-                 AND ( SYU-HKNCOMBINUM      =    ACCT-HKNCOMBI )
-                 AND ( TBL-GAIHAKU(SYU-IDX) =    ZERO   OR   4 )
+                 AND ( SYU-HKNCOMBINUM       =   ACCT-HKNCOMBI )
+                 AND ( TBL-GAIHAKU2(SYU-IDX) =   ZERO   OR   4 )
                  AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
                      ADD   ACCT-DAY(1 SYU-IDX)
                                       TO   SINRYO-COUNT
@@ -3729,7 +3734,7 @@ grpsys                                        SPA-AREA
                  AND (WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO)
                    IF  (SYU-DAY(SYU-IDX)                =   "1")
                    OR  (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1")
-                     IF  TBL-GAIHAKU(SYU-IDX) =  ZERO OR 4
+                     IF  TBL-GAIHAKU2(SYU-IDX) =  ZERO OR 4
                        CONTINUE
                      ELSE
                        IF  ACCT-ZAITEN  NOT = ZERO
