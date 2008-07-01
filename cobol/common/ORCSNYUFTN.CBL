@@ -3752,6 +3752,7 @@ grpsys                                        SPA-AREA
                      MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
                      IF     (WRK-CHECK-STDAY  <=  SYU-IDX        )
                      AND    (SYU-IDX          <=  WRK-CHECK-EDDAY)
+                     AND    (SYU-HKNCOMBINUM   =  ACCT-HKNCOMBI  )
                        IF  ACCT-ZAITEN  NOT = ZERO
                          IF     WRK-KAIKEING(IDX) = ZERO
                             MOVE    3     TO    WRK-KAIKEING(IDX)
