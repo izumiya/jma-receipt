@@ -167,6 +167,17 @@
                05  WRK-SRYMM           PIC 9(02).
                05  WRK-SRYDD           PIC 9(02).
       *
+           03  WRK-LST-SRYYMD.
+               05  WRK-LST-YYMM.
+                   07  WRK-LST-YY      PIC 9(04).
+                   07  WRK-LST-MM      PIC 9(02).
+               05  WRK-LST-DD          PIC 9(02).
+           03  WRK-STR-YMD.
+               05  WRK-STR-YYMM.
+                   07  WRK-STR-YY      PIC 9(04).
+                   07  WRK-STR-MM      PIC 9(02).
+               05  WRK-STR-DD          PIC 9(02).
+      *
            03  WRK-ZAINUM          PIC 9(08).
            03  WRK-H-ZAINUM        PIC 9(08).
       *    ¿ÇÎÅ²ñ·×ÍÑ½¸·×
@@ -3087,6 +3098,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1                   TO  FLG-JYURRK
            END-IF
+           MOVE    SPACE                TO  WRK-LST-SRYYMD
            PERFORM
                    UNTIL       FLG-JYURRK      =   1
       *
@@ -3115,6 +3127,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
 grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
+      *
+               IF      WRK-LST-SRYYMD      <   JYURRK-SRYYMD
+                   MOVE    JYURRK-SRYYMD       TO  WRK-LST-SRYYMD
+               END-IF
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    "key14"             TO  MCP-PATHNAME
@@ -3150,27 +3166,32 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    Æþ±¡Ä´ºÞÎÁ¤Î¼«Æ°ºï½ü
-           INITIALIZE                  ORCSCHOZAIAREA
-           MOVE    "2"                 TO  ORCSCHO-KBN
-           MOVE    SPA-PTID            TO  ORCSCHO-PTID
-           MOVE    ORCSCNYUIN-YMD(1:6) TO  ORCSCHO-SRYYM
-           CALL    "ORCSCHOZAI"        USING
-                                       SPA-AREA
-                                       ORCSCHOZAIAREA
-      *    Íâ·î¤Îºï½ü¤â¤ª¤³¤Ê¤¦
-           MOVE    ORCSCNYUIN-YMD      TO  WRK-SRYYMD
-           COMPUTE WRK-SRYMM           =   WRK-SRYMM   +   1
-           IF      WRK-SRYMM           >   12
-               COMPUTE WRK-SRYYY           =   WRK-SRYYY   +   1
-               MOVE    1                   TO  WRK-SRYMM
+           MOVE    ORCSCNYUIN-YMD(1:6) TO  WRK-STR-YYMM
+           IF      WRK-LST-SRYYMD      =   SPACE
+               MOVE    WRK-STR-YYMM        TO  WRK-LST-YYMM
            END-IF
-           INITIALIZE                  ORCSCHOZAIAREA
-           MOVE    "2"                 TO  ORCSCHO-KBN
-           MOVE    SPA-PTID            TO  ORCSCHO-PTID
-           MOVE    WRK-SRYYMD(1:6)     TO  ORCSCHO-SRYYM
-           CALL    "ORCSCHOZAI"        USING
-                                       SPA-AREA
-                                       ORCSCHOZAIAREA
+      *    ºÇ½ª¼õ¿ÇÇ¯·î¡Ü£±·î¤òºï½üÂÐ¾Ý¤È¤¹¤ë
+           COMPUTE WRK-LST-MM          =   WRK-LST-MM  +   1
+           IF      WRK-LST-MM          >   12
+               COMPUTE WRK-LST-YY          =   WRK-LST-YY  +   1
+               MOVE    1                   TO  WRK-LST-MM
+           END-IF
+           PERFORM
+               UNTIL    WRK-STR-YYMM   >   WRK-LST-YYMM
+      *        Æþ±¡Ä´ºÞÎÁºï½ü
+               INITIALIZE                  ORCSCHOZAIAREA
+               MOVE    "2"                 TO  ORCSCHO-KBN
+               MOVE    SPA-PTID            TO  ORCSCHO-PTID
+               MOVE    WRK-STR-YYMM        TO  ORCSCHO-SRYYM
+               CALL    "ORCSCHOZAI"        USING
+                                           SPA-AREA
+                                           ORCSCHOZAIAREA
+               COMPUTE WRK-STR-MM          =   WRK-STR-MM  +   1
+               IF      WRK-STR-MM          >   12
+                   COMPUTE WRK-STR-YY          =   WRK-STR-YY  +   1
+                   MOVE    1                   TO  WRK-STR-MM
+               END-IF
+           END-PERFORM
       *
            MOVE    ZERO                TO  SPA-SRYKA
       *
