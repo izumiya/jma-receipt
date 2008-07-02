@@ -1920,6 +1920,14 @@
                        MOVE    IDX         TO  WRK-IDX1
                    END-IF
       *
+      *            生活保護・残留邦人の重複不可
+                   IF      (SPA-NAI-PTKOH-SBTKBN (IDX-K) =  "5") AND
+                           (SPA-PTKOH-HKN-SBTKBN (IDX)   =  "5")
+                       MOVE    "0127"      TO  SPA-ERRCD
+                       MOVE    23          TO  SPA-GMN-CUR
+                       MOVE    IDX         TO  WRK-IDX1
+                   END-IF
+      *
                    END-IF
                END-IF
            END-PERFORM
