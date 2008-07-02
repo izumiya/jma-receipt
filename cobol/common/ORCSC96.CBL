@@ -979,6 +979,12 @@
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "9037"
+                   STRING  "剤内の注加算コードが違います。"
+                           "注加算コード毎に剤を分けて下さい。"
+                                       DELIMITED  BY  SPACE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "9100"
                    MOVE    "診療内容が４００行を超えます。"
                                        TO  SPA-ERRMSG

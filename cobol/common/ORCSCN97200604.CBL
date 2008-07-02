@@ -32,6 +32,7 @@
       *  01.00.02    NACL−多々納 06/03/XX  回数チェック追加
       *  01.00.03    NACL−多々納 06/05/17  計算方法修正他
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
+      *  04.02.00    NACL-多々納  08/06/19  注加算コードのチェック
       *****************************************************************
       *
       *
@@ -99,6 +100,8 @@
       *
            03  WRK-MOJI            PIC X(01). 
            03  WRK-SRYCD           PIC X(09). 
+      *
+           03  WRK-CHUKSNCD        PIC X(04). 
       *
            03  WRK-TENSUKEI        PIC 9(08)V99.
            03  WRK-TENSUKEI-9      PIC 9(08).
@@ -308,6 +311,8 @@
                        MOVE    IDX-Z           TO  IDX-ZS
                        MOVE    IDX-Z           TO  IDX-ZS2
                    END-IF
+      *            注加算コードのチェック
+                   PERFORM 1003-CHUKSNCD-CHK-SEC
       *        器材
                WHEN    "7"
                    MOVE    "0047"              TO  WRK-ERRCD
@@ -318,6 +323,23 @@
        10011-CHK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    注加算コードのチェック処理
+      *****************************************************************
+       1003-CHUKSNCD-CHK-SEC        SECTION.
+      *
+           IF      WRK-CHUKSNCD        =   SPACE
+               MOVE    WRK-COM-CHUKSNCD (IDX-Z)    TO  WRK-CHUKSNCD
+           END-IF
+      *    剤内の注加算コードは同じであること
+           IF      WRK-COM-CHUKSNCD (IDX-Z)
+                                   NOT =   WRK-CHUKSNCD
+               MOVE    "9037"          TO  WRK-ERRCD
+               MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+           END-IF
+           .
+       1003-CHUKSNCD-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    自動加算追加処理
       *****************************************************************
