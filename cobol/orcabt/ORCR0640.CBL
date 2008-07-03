@@ -324,6 +324,7 @@
       *                                     指導料のコメント対応
       *  04.02.22    NACL-門脇    08/06/25  全国公費２種の一部負担金等記載対応
       *  04.02.23    NACL-門脇    08/06/30  高齢者一般経過措置延長対応
+      *  04.02.24    NACL-門脇    08/07/03  山梨県４１老人対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11961,6 +11962,10 @@
                  ELSE
                     MOVE    "3"      TO   RECE62-KOUREI
                  END-IF
+               END-IF
+               IF  (WRK-PREFNUM       =  19           )
+               AND (RECE62-KOHNUM(1)  = "141" OR "241")
+                    MOVE    "3"      TO   RECE62-KOUREI
                END-IF
                IF  (WRK-KEISAN-YYY    NOT =  ZERO)
                AND (RECE62-KOUREI         =  "3" )

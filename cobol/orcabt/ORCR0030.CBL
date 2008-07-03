@@ -359,6 +359,7 @@
       *  04.02.17    NACL-門脇    08/06/24  後期高齢者の現物給付対象編集修正
       *  04.02.18    NACL-門脇    08/06/25  全国公費２種の一部負担金等記載対応
       *  04.02.19    NACL-門脇    08/06/30  高齢者一般経過措置延長対応
+      *  04.02.20    NACL-門脇    08/07/03  山梨県４１老人対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7428,6 +7429,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
                  END-IF
+               END-IF
+               IF  (SYS-1001-PREFNUM  =  19           )
+               AND (RECE02-KOHNUM(1)  = "141" OR "241")
+                    MOVE    "3"      TO   RECE02-ZAITAKU
                END-IF
                IF  (WRK-KEISAN-YYY    NOT =  ZERO)
                AND (RECE02-ZAITAKU        =  "3" )
