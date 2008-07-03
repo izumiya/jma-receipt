@@ -256,6 +256,7 @@
       *  04.02.12    NACL-ÌçÏÆ    08/05/22  ºßÁí¿ÇÈ½Äê¾ò·ï½¤Àµ
       *  04.02.13    NACL-ÌçÏÆ    08/05/29  ¸½ÊªµëÉÕÊÝ¸±¼ÔÃ±°Ì¾ò·ïÄÉ²Ã
       *  04.02.14    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
+      *  04.02.15    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3069,7 +3070,7 @@
            MOVE      ZERO     TO    FLG-KEIKASOCHI-IPAN
            IF  (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1"    )
            AND (LNK-SYU-SRYYMD(1:6)          >=  "200608")
-           AND (LNK-SYU-SRYYMD(1:6)          <=  "200808")
+      *    AND (LNK-SYU-SRYYMD(1:6)          <=  "200808")
                 INITIALIZE                       PTKOHINF-REC
                 MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
                 MOVE    LNK-SYU-PTID         TO  PTKOH-PTID

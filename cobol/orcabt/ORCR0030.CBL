@@ -358,6 +358,7 @@
       *  04.02.16    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
       *  04.02.17    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *  04.02.18    NACL-ÌçÏÆ    08/06/25  Á´¹ñ¸øÈñ£²¼ï¤Î°ìÉôÉéÃ´¶âÅùµ­ºÜÂÐ±þ
+      *  04.02.19    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2182,7 +2183,7 @@ grpsys          PERFORM 900-DBSELECT-SEC
       *    °ìÈÌ·Ð²áÁ¼ÃÖÂÐ¾Ý¼Ô
       *
            IF   (RECE02-SRYYM   >=  "200608")
-           AND  (RECE02-SRYYM   <=  "200808")
+      *    AND  (RECE02-SRYYM   <=  "200808")
            AND  (RECE02-KYURATE  =  20 OR 30)
                INITIALIZE                      PTKOHINF-REC
 grpsys         MOVE    RECE02-HOSPNUM      TO  PTKOH-HOSPNUM
