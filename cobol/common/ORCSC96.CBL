@@ -980,7 +980,7 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "9037"
-                   STRING  "剤内の注加算コードが違います。"
+                   STRING  "剤内の注加算コードが異なります。"
                            "注加算コード毎に剤を分けて下さい。"
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
