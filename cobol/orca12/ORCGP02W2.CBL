@@ -3629,6 +3629,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                             END-IF
+                          WHEN     27
                           WHEN     33
                             IF  WRK-SRT-HJO-KOHNO  =  "091"
                              IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
@@ -4540,7 +4541,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "3"            TO  WRK-FTN-FLG
                 END-IF
              END-IF
-             IF   SPA-PREFNUM  =  01 OR 33 OR 45
+             IF   SPA-PREFNUM  =  01 OR 33 OR 45 OR 27
                IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                     (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
