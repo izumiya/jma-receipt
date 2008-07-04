@@ -45,6 +45,7 @@
       *  04.01.02    NACL-ÌçÏÆ    08/01/31  ¼¢²ì¸©£´£´£±ÄÉ²Ã¤ËÈ¼¤¦½¤Àµ
       *  04.02.01    NACL-ÌçÏÆ    08/03/19  À¸ÊÝ¤Î£·£¹Ê»ÍÑ»þ¤ÎÂÐ±þ
       *  04.02.02    NACL-ÌçÏÆ    08/04/24  ºë¶Ì¸©»ÖÌÚ»ÔÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.03    NACL-ÌçÏÆ    08/07/02  ÂçºåÉÜ£´£±Ï·¿Í¡Ü£±£¸£¸ÅùÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -92,7 +93,9 @@
            03  WRK-RECEJGNDSPKBN  PIC X(01).
       *
            03  WRK-HKNCOMBINUM-TBL.
-               05  WRK-HKNCOMBINUM   PIC 9(04)  OCCURS 50.
+               05  WRK-HKNCOMBINUM-OCC      OCCURS 50.
+                 07  WRK-HKNCOMBINUM        PIC 9(04).
+                 07  WRK-HKNCOMBINUM-FLG    PIC 9(01).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -280,6 +283,14 @@
                (LNK-FTNJGNCHK-SRYYM  >= "200804"       )
       *
                PERFORM    2101-SYOTOKU-HENSYU-SEC
+      *
+           END-IF
+      *
+           IF  (WRK-PREFNUM           =  27            ) AND
+               (LNK-FTNJGNCHK-KOHNUM  = "141" OR "241" ) AND
+               (LNK-FTNJGNCHK-SRYYM  >= "200804"       )
+      *
+               MOVE     "1"      TO     WRK-RECEJGNDSPKBN
       *
            END-IF
       *
@@ -511,6 +522,27 @@
                                         WRK-HKNCOMBINUM(IDX)
       *
                    IF    WRK-RECEJGNDSPKBN    =   "1"
+                   AND   WRK-PREFNUM          =   27
+      *
+                     IF ((COMB-KOH1HKNNUM = LNK-FTNJGNCHK-KOHNUM) AND
+                         (COMB-KOH2HKNNUM = "187" OR "188"
+                                         OR "189" OR "190"      ))
+                     OR ((COMB-KOH2HKNNUM = LNK-FTNJGNCHK-KOHNUM) AND
+                         (COMB-KOH3HKNNUM = "187" OR "188"
+                                         OR "189" OR "190"      ))
+                     OR ((COMB-KOH1HKNNUM = "187" OR "188"
+                                         OR "189" OR "190"      ) AND
+                         (COMB-KOH2HKNNUM = LNK-FTNJGNCHK-KOHNUM))
+                     OR ((COMB-KOH2HKNNUM = "187" OR "188"
+                                         OR "189" OR "190"      ) AND
+                         (COMB-KOH3HKNNUM = LNK-FTNJGNCHK-KOHNUM))
+                         MOVE  1   TO   WRK-HKNCOMBINUM-FLG(IDX)
+                     END-IF
+      *
+                   END-IF
+      *
+                   IF    WRK-RECEJGNDSPKBN    =   "1"
+                   AND   WRK-PREFNUM          =   32
                    AND   FLG-CHECK            =   ZERO
       *
                      IF   COMB-HKNNUM     NOT =  SPACE
@@ -699,6 +731,9 @@
                                                    TO  WRK-SKJ-FTN
                                END-IF
                              END-IF
+                             IF   WRK-HKNCOMBINUM-FLG(IDX1) =  1
+                                 MOVE   01         TO  LNK-FTNJGNCHK-RC
+                             END-IF
                           END-IF
                        END-PERFORM
                        IF      LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
@@ -711,6 +746,11 @@
                        PERFORM  910-SYUNOU-READ-SEC
                    END-PERFORM
       *
+                   IF  (WRK-PREFNUM              =  27           )
+                   AND (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241")
+                   AND (LNK-FTNJGNCHK-SRYYM     >= "200804"      )
+                      MOVE   9999999999     TO  WRK-KOHFTN
+                   END-IF
                    IF  (WRK-PREFNUM              =  42     )
                    AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
                    AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
