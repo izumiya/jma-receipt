@@ -2478,6 +2478,13 @@
       *    最後の行に回数を編集
            IF      WRK-SRYCD (1:1)     =   "6"
                ADD     1                   TO  IDX-S
+           ELSE
+               IF     (WRK-KAISUU (IDX-S)  =   SPACE )  AND
+                      (WRK-HINICHI(IDX-S)  =   SPACE )
+                   CONTINUE
+               ELSE
+                   ADD     1                   TO  IDX-S
+               END-IF
            END-IF
       *
       *---(03.04.00) LINE ADD START ------------------------------------
