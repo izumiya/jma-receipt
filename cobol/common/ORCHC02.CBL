@@ -1512,7 +1512,7 @@
            END-STRING
       *
       *    変更可の署名あり、変更不可の入力がある時
-      *****後発医薬品・先発品がない
+      *    後発医薬品・先発品がない
            IF     (FLG-KOUHATU-HEN     =   1  )
               OR  (FLG-KOUHATUFUKA-ARI =   1  )
       *****   OR  (FLG-KOUHATU-ARI     =   ZERO )
