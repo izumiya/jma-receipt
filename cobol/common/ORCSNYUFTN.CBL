@@ -126,6 +126,7 @@
            03  WRK-KEISAN                  PIC 9(07).
            03  WRK-CHECK-STDAY             PIC 9(02).
            03  WRK-CHECK-EDDAY             PIC 9(02).
+           03  WRK-MSGCD                   PIC 9(02).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -670,19 +671,28 @@
       *
       *    入院料算定保険組み合わせ以外の保険組み合わせで
       *    入院料加算があるかチェック
-           PERFORM    VARYING   IDX    FROM   1   BY   1
-                       UNTIL   (IDX                 >   10  )
-                         OR    (LNK-SYU-SRYYMD(IDX) =  SPACE)
-                         OR    (LNK-S02-RC      NOT =  ZERO )
-              EVALUATE  WRK-KAIKEING(IDX)
-                WHEN      1
-                    MOVE     14     TO    LNK-S02-RC
-                WHEN      2
-                    MOVE     15     TO    LNK-S02-RC
-                WHEN      3
-                    MOVE     16     TO    LNK-S02-RC
-              END-EVALUATE
-           END-PERFORM.
+           IF    LNK-S02-RC   =   ZERO
+             MOVE     ZERO     TO    WRK-MSGCD
+             PERFORM   VARYING   IDX    FROM   1   BY   1
+                        UNTIL   (IDX                 >   10  )
+                         OR     (LNK-SYU-SRYYMD(IDX) =  SPACE)
+                EVALUATE   WRK-KAIKEING(IDX)
+                  WHEN      1
+                    IF   WRK-MSGCD = ZERO OR 16
+                        MOVE     14     TO    WRK-MSGCD
+                    END-IF
+                  WHEN      2
+                        MOVE     15     TO    WRK-MSGCD
+                  WHEN      3
+                    IF   WRK-MSGCD = ZERO
+                        MOVE     16     TO    WRK-MSGCD
+                    END-IF
+                END-EVALUATE
+             END-PERFORM
+             IF   WRK-MSGCD   NOT =  ZERO
+                MOVE     WRK-MSGCD    TO    LNK-S02-RC
+             END-IF
+           END-IF.
       *
        MAIN-EXT.
            EXIT PROGRAM
@@ -3738,16 +3748,14 @@ grpsys                                        SPA-AREA
                        CONTINUE
                      ELSE
                        IF  ACCT-ZAITEN  NOT = ZERO
-                         IF   WRK-KAIKEING(IDX) = ZERO
                             MOVE    2     TO    WRK-KAIKEING(IDX)
-                         END-IF
                        END-IF
                      END-IF
                      IF  SYU-HKNCOMBINUM = ACCT-HKNCOMBI
                        CONTINUE
                      ELSE
                        IF  ACCT-ZAITEN  NOT = ZERO
-                         IF   WRK-KAIKEING(IDX) = ZERO
+                         IF   WRK-KAIKEING(IDX) = ZERO OR 3
                             MOVE    1     TO    WRK-KAIKEING(IDX)
                          END-IF
                        END-IF
