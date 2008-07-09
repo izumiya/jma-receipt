@@ -519,6 +519,7 @@
            03  WRK-SAISHIN-ERRCD                       PIC X(06).
            03  WRK-HKNFLG                              PIC 9(01).
            03  WRK-SRTKBN                              PIC X(01).
+           03  WRK-BYOEDYMD                            PIC X(08).
       *
        01  TKANRIRYO-AREA.
            03  TKANRIRYO-OCC                           OCCURS  9.
@@ -4655,6 +4656,36 @@
                IF    ( FLG-TAISYO-HKN  =   ZERO )
                    MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
                END-IF
+      *
+               MOVE    ZERO            TO  WRK-HKNCOMBI
+               PERFORM VARYING IDX-COMB    FROM    1   BY  1
+                       UNTIL ( IDX-COMB    >   THKNCOMBI-MAX )
+                        OR   ( WRK-HKNCOMBI    NOT =   ZERO )
+      *
+                   IF    ( COMB-HKNCOMBINUM    =   THKNCOMBI-HKNCOMBI
+                                                        (IDX-COMB))
+                       MOVE    THKNCOMBI-HKNCOMBI (IDX-COMB)
+                                       TO  WRK-HKNCOMBI
+                       MOVE    "99999999"          TO  WRK-BYOEDYMD
+                       IF    ( PTBYO-TENKIYMD  NOT =   SPACE )
+                           MOVE    PTBYO-TENKIYMD  TO  WRK-BYOEDYMD
+                       END-IF
+      *
+                       IF    ( PTBYO-SRYYMD    <=  COMB-TEKEDYMD )
+                        AND  ( WRK-BYOEDYMD    >=  COMB-TEKSTYMD )
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
+                       END-IF
+      *
+                   END-IF
+      *
+               END-PERFORM
+      *
+               IF    ( WRK-HKNCOMBI    =   ZERO )
+                           MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
+               END-IF
+      *
            ELSE
                IF    ( DTCHK003-HKNKBN =   CONST-ROSAI
                                        OR  CONST-JIBAI 
@@ -5647,6 +5678,7 @@
                MOVE    ORCBSD01-NYUGAIKBN
                                        TO  SDTCHK01-NYUGAIKBN
                MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
+               MOVE    THKNCOMBI-AREA  TO  SPA-WORK
                CALL    "ORCSDTCHK01"   USING   SDTCHK01AREA
                                                SYS-1101-REC
                                                SDTCHK02AREA
@@ -5830,6 +5862,7 @@
                MOVE    ORCBSD01-NYUGAIKBN
                                        TO  SDTCHK01-NYUGAIKBN
                MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
+               MOVE    THKNCOMBI-AREA  TO  SPA-WORK
                CALL    "ORCSDTCHK01"   USING   SDTCHK01AREA
                                                SYS-1101-REC
                                                SDTCHK02AREA
@@ -7361,6 +7394,7 @@
                MOVE    ORCBSD01-NYUGAIKBN
                                        TO  SDTCHK06-NYUGAIKBN
                MOVE    DTCHK003-HKNKBN TO  SDTCHK06-HKNKBN
+               MOVE    THKNCOMBI-AREA  TO  SPA-WORK
                CALL    "ORCSDTCHK06"   USING   SDTCHK06AREA
                                                SYS-1101-REC
                                                SDTCHK02AREA
@@ -9250,7 +9284,7 @@
       *
            PERFORM VARYING IDX-COMB    FROM    1   BY  1
                    UNTIL ( IDX-COMB    >   SDTCHK02-O-MAX )
-                    OR   ( COMB-HKNNUM    NOT =   SPACE )
+                    OR   ( COMB-HOSPNUM    NOT =   ZERO )
       *
                IF    ( LNK-COMB-HKNCOMBINUM (IDX-COMB)
                                   =    WRK-HKNCOMBI )

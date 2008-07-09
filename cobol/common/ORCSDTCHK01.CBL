@@ -74,6 +74,7 @@
            03  WRK-PTBYOMEI-KEY            PIC X(200).
            03  WRK-HKNCOMBI                PIC 9(04).
            03  WRK-ZAIHKNNUM               PIC X(03).
+           03  WRK-BYOEDYMD                PIC X(08).
       *
        01  LEN-AREA.
            03  LEN-CHKMST                  PIC 9(05).
@@ -91,6 +92,18 @@
                    07  TBYOMEI-ERRFLG      PIC 9(01).
                    07  TBYOMEI-SRYKA       PIC X(02).
                    07  TBYOMEI-SRYYMD      PIC X(08).
+      *
+      *    保険組合せ退避ワーク
+       01  THKNCOMBI-AREA.
+           03  THKNCOMBI-MAX                           PIC 9(05).
+           03  THKNCOMBI-OCC                           OCCURS 40.
+               05  THKNCOMBI-HKNCOMBI                  PIC 9(04).
+               05  THKNCOMBI-ACCTKBN                   PIC X(01).
+               05  THKNCOMBI-STYMD                     PIC X(08).
+               05  THKNCOMBI-EDYMD                     PIC X(08).
+               05  THKNCOMBI-DAY-G.
+                   07  THKNCOMBI-DAY                   PIC 9(01)
+                                                       OCCURS  31.
       *
        01  CONST-AREA.
            03  CONST-TBYOMEI-MAX       PIC 9(05)   VALUE   100.
@@ -184,6 +197,8 @@
                                        WRK-AREA
                                        LEN-AREA
                                        TBYOMEI-AREA
+      *
+           MOVE    SPA-WORK        TO  THKNCOMBI-AREA
       *
            MOVE    ZERO            TO  FLG-CHKMST-BYOMEI
       *
@@ -516,7 +531,7 @@
       *
            PERFORM VARYING IDX-COMB    FROM    1   BY  1
                    UNTIL ( IDX-COMB    >   SDTCHK02-O-MAX )
-                    OR   ( COMB-HKNNUM    NOT =   SPACE )
+                    OR   ( COMB-HOSPNUM    NOT =   ZERO )
       *
                IF    ( LNK-COMB-HKNCOMBINUM (IDX-COMB)
                                   =    WRK-HKNCOMBI )
@@ -772,6 +787,40 @@
                        IF    ( FLG-TAISYO-HKN  =   ZERO )
                            MOVE    ZERO            TO  FLG-LOOP-END
                        END-IF
+      *
+                       MOVE    ZERO            TO  WRK-HKNCOMBI
+                       PERFORM VARYING IDX-COMB    FROM    1   BY  1
+                               UNTIL ( IDX-COMB    >   THKNCOMBI-MAX )
+                                OR   ( WRK-HKNCOMBI    NOT =   ZERO )
+      *
+                           IF    ( COMB-HKNCOMBINUM
+                                               =   THKNCOMBI-HKNCOMBI
+                                                        (IDX-COMB))
+                               MOVE    THKNCOMBI-HKNCOMBI (IDX-COMB)
+                                                   TO  WRK-HKNCOMBI
+                               MOVE    "99999999"  TO  WRK-BYOEDYMD
+                               IF    ( QDTCHK-TENKIYMD  NOT =   SPACE )
+                                   MOVE    QDTCHK-TENKIYMD
+                                                   TO  WRK-BYOEDYMD
+                               END-IF
+      *
+                               IF    ( QDTCHK-SRYYMD
+                                               <=  COMB-TEKEDYMD )
+                                AND  ( WRK-BYOEDYMD
+                                               >=  COMB-TEKSTYMD )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    ZERO    TO  FLG-LOOP-END
+                               END-IF
+      *
+                           END-IF
+      *
+                       END-PERFORM
+      *
+                       IF    ( WRK-HKNCOMBI    =   ZERO )
+                                   MOVE    ZERO    TO  FLG-LOOP-END
+                       END-IF
+      *
                    ELSE
                        IF    ( SDTCHK01-HKNKBN      =  CONST-ROSAI
                                                     OR CONST-JIBAI
