@@ -658,8 +658,7 @@
            MOVE    PTKOH-TEKSTYMD       TO  WRK-KOH-TEKSTYMD  (CNT-KOH)
            MOVE    PTKOH-TEKEDYMD       TO  WRK-KOH-TEKEDYMD  (CNT-KOH)
            MOVE    PTKOH-SAKJOKBN       TO  WRK-KOH-SAKJOKBN  (CNT-KOH)
-      *    精神通院と特定疾患（水俣）の保険組合せ作成については
-      *    暫定対応の為、以下コメント行としておく
+      *    精神通院と特定疾患（水俣）の保険組合せ作成用の負担者番号判定用
            MOVE    PTKOH-FTNJANUM       TO  WRK-KOH-FTNJANUM  (CNT-KOH)
       *
       *
