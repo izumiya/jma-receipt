@@ -660,7 +660,7 @@
            MOVE    PTKOH-SAKJOKBN       TO  WRK-KOH-SAKJOKBN  (CNT-KOH)
       *    精神通院と特定疾患（水俣）の保険組合せ作成については
       *    暫定対応の為、以下コメント行としておく
-      **   MOVE    PTKOH-FTNJANUM       TO  WRK-KOH-FTNJANUM  (CNT-KOH)
+           MOVE    PTKOH-FTNJANUM       TO  WRK-KOH-FTNJANUM  (CNT-KOH)
       *
       *
       *    制度名等は毎回編集する
@@ -3597,7 +3597,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                       IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:2) = "99"
                             PERFORM 5701413-SYUKOH-HJO-SEC
                       ELSE
-                        IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) =
+                       IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) =
                                "019" OR "053" OR "091"
                           IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) =
                                    "019" OR "053"
@@ -3607,6 +3607,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                           ELSE
+      *                      精神通院と特定疾患（水俣）の保険組合せ対応
       *                      IF   SPA-PREFNUM    =    43
                              IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
                                           =   "51433027"
