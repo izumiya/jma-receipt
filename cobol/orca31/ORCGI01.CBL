@@ -12819,20 +12819,47 @@
                      WHEN  1
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   IDX-MATSUBI
-                               MOVE   1
+                               EVALUATE   PTNYUINRRK-SKJKBN
+                                   WHEN   "0"
+                                     MOVE   0
                                          TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
+                                   WHEN   "1"
+                                     MOVE   1
+                                         TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
+                                   WHEN   "2"
+                                     MOVE   2
+                                         TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
+                               END-EVALUATE
                         END-PERFORM
                      WHEN  2
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   IDX-MATSUBI
-                               MOVE   1
+                               EVALUATE   PTNYUINRRK-SKJKBN
+                                   WHEN   "0"
+                                     MOVE   0
                                          TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
+                                   WHEN   "1"
+                                     MOVE   1
+                                         TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
+                                   WHEN   "2"
+                                     MOVE   2
+                                         TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
+                               END-EVALUATE
                         END-PERFORM
                      WHEN  3
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   IDX-MATSUBI
-                               MOVE   1
+                               EVALUATE   PTNYUINRRK-SKJKBN
+                                   WHEN   "0"
+                                     MOVE   0
                                          TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
+                                   WHEN   "1"
+                                     MOVE   1
+                                         TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
+                                   WHEN   "2"
+                                     MOVE   2
+                                         TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
+                               END-EVALUATE
                         END-PERFORM
                  END-EVALUATE
                  MOVE    SPACE           TO  WRK-TENROOM-SKJ-SRYYM(1)
@@ -13988,12 +14015,20 @@
            END-IF
       *    ¿©»ö¶èÊ¬
            MOVE   "099999913"   TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
-           IF     WRK-TAIHI-SHOKUJI    NOT =   ZERO
-                  MOVE   WRK-TAIHI-SHOKUJI
-                                TO  LNK-SCNYUACCT-SHOKUJIKBN
-           ELSE
-                  MOVE   1      TO  LNK-SCNYUACCT-SHOKUJIKBN
-           END-IF
+      ***     IF     WRK-TAIHI-SHOKUJI    NOT =   ZERO
+      ***            MOVE   WRK-TAIHI-SHOKUJI
+      ***                          TO  LNK-SCNYUACCT-SHOKUJIKBN
+      ***     ELSE
+      ***            MOVE   1      TO  LNK-SCNYUACCT-SHOKUJIKBN
+      ***     END-IF
+           EVALUATE   PTNYUINRRK-SKJKBN
+               WHEN   "0"
+                      MOVE   0     TO  LNK-SCNYUACCT-SHOKUJIKBN
+               WHEN   "1"
+                      MOVE   1     TO  LNK-SCNYUACCT-SHOKUJIKBN
+               WHEN   "2"
+                      MOVE   2     TO  LNK-SCNYUACCT-SHOKUJIKBN
+           END-EVALUATE
       *    ¿©Æ²²Ã»»
            PERFORM     4801-BTUSEL-SEC
            IF   FLG-SYSKANRI           =    ZERO
