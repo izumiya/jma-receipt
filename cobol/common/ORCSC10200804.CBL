@@ -5437,8 +5437,15 @@
                        MOVE    ZERO            TO  FLG-ARI
                    WHEN    WRK-COM-INPUTCD(IDX)
                                                =   TBL-SRYCD (TBL-IDX)
-                       MOVE    1               TO  FLG-ARI
+                       IF     (TBL-KBN (TBL-IDX)   =   "F"  )
+                       AND    (TBL-KBN2(TBL-IDX)   =   "D"  )
+      *                   同日初診は削除なし
+                           MOVE    ZERO            TO  FLG-ARI
+                       ELSE
+                           MOVE    1               TO  FLG-ARI
+                       END-IF
            END-SEARCH
+      *
            IF      FLG-ARI             =   1
                GO      TO      2911-SINSATU-CHK-SYORI-EXT
            END-IF
