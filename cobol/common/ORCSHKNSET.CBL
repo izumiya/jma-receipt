@@ -201,7 +201,7 @@
       *
            MOVE    SPA-SRYYMD          TO  WRK-SRYYMD
            IF      SPA-SRYYMD(7:2)     =   "00"
-               MOVE    "01"            TO  WRK-SRYYMD
+               MOVE    "01"            TO  WRK-SRYYMD(7:2)
            END-IF
       *
       *    保険組合せ編集処理
@@ -234,7 +234,7 @@
            INITIALIZE                  ORCSAGECHKAREA
            MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
            MOVE    SPA-PTID            TO  AGECHK-PTID
-           MOVE    SPA-SRYYMD          TO  AGECHK-SRYYMD
+           MOVE    WRK-SRYYMD          TO  AGECHK-SRYYMD
            MOVE    SPA-BIRTHDAY        TO  AGECHK-BIRTHDAY
            MOVE    SPA-NYUGAIKBN       TO  AGECHK-NYUGAIKBN
            CALL    "ORCSAGECHK"        USING
