@@ -2248,6 +2248,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    ¼õ¿ÇÍúÎòºï½ü
            PERFORM 4500114-TEISEI-JYURRKDEL-SEC
+      *    ¼õ¿ÇÍúÎò¤ÎÏ¢ÈÖ¹¹¿·
+           IF      SPA-ERRCD           =   SPACE
+               IF     (SPA-SRYKA           =   SPA-OLD-SRYKA)
+                   PERFORM 4500115-TEISEI-RENNUM-SEC
+               END-IF
+           END-IF
       *
            .
        300-TEISEI-SYORI-EXT.
