@@ -2674,6 +2674,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  WRK-RENNUM-KEY
            MOVE    ZERO                TO  WRK-JYURRK-RENNUM
            MOVE    ZERO                TO  WRK-JYURRK-DOUJI-RENNUM
+           MOVE    ZERO                TO  WRK-DOUJI-RENNUM-KEY
            PERFORM
                    UNTIL       FLG-JYURRK  =   1
                IF      JYURRK-RENNUM       =   WRK-RENNUM-KEY
