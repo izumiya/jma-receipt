@@ -1850,22 +1850,6 @@
                MOVE    "1"                 TO  SPA-NAI-PTKOH-KEIFLG(IDY)
            END-IF
       *
-      *
-      *    PERFORM VARYING     IDX-K   FROM    1   BY  1
-      *            UNTIL      (IDX-K   >   SPA-GMN-KOHMAX  )
-      *                   OR  (SPA-GMN-KOHNUMMEI (IDY)
-      *                                NOT =   SPACE       )
-      *        IF     (SPA-GMN-KOHNUML (IDX-K)
-      *                                    =   SPA-GMN-KOHNUM (IDY)) AND
-      *               (SPA-GMN-KOHKBNL (IDX-K)
-      *                                    =   SPA-GMN-KOHKBN (IDY))
-      *            MOVE    SPA-GMN-KOHNUMLST (IDX-K)
-      *                                        TO  SPA-GMN-KOHNUM-G(IDY)
-      *            MOVE    SPA-GMN-KOHNUMLST (IDX-K)
-      *                                        TO  SPA-MAE-KOHNUM-G(IDY)
-      *            MOVE    SPA-GMN-KOHMAX      TO  IDX-K
-      *        END-IF
-      *    END-PERFORM
            .
        3102-KOUHI-HEN-EXT.
            EXIT.
@@ -3090,7 +3074,8 @@
                    MOVE    SPA-NAI-PTKOH-EDANUM(IDX-K) TO  IDX-K2
                    ADD     1                   TO  IDX-K2
                ELSE
-                   MOVE    4                   TO  IDX-K2
+      *********    MOVE    4                   TO  IDX-K2
+                   COMPUTE IDX-K2              =   SPA-PTKOH-MAX + 1
                END-IF
            END-IF
            MOVE    IDX-K               TO  IDY
