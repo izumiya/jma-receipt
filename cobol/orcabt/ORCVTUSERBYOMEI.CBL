@@ -1053,12 +1053,19 @@
            MOVE    LNK-BYO-BYOMEICDSU  TO  WKUSBYO-BYOMEICDSU
       *
       *    病名コードセット
+           MOVE    ZERO                TO  IDJ 
            PERFORM VARYING IDI FROM  1 BY  1
-                   UNTIL ( IDI >   LNK-BYO-BYOMEICDSU )
-                   OR    ( LNK-BYO-TBYOMEICD(IDI)  =   SPACE )
-               MOVE    LNK-BYO-TBYOMEICD(IDI)
-                                       TO  WKUSBYO-BYOMEICD(IDI)
+                   UNTIL ( IDI >   LNK-BYO-BYOMEI-MAX )
+               IF      LNK-BYO-TBYOMEICD(IDI)  NOT =   SPACE
+                   ADD     1               TO  IDJ
+                   MOVE    LNK-BYO-TBYOMEICD(IDI)
+                                       TO  WKUSBYO-BYOMEICD(IDJ)
+               END-IF
            END-PERFORM
+           IF      LNK-BYO-BYOMEICDSU  <   21   
+               ADD     1               TO  IDJ 
+               MOVE    ALL "9"         TO  WKUSBYO-BYOMEICD(IDJ)
+           END-IF 
       *
       *    疑いフラグ
            MOVE    LNK-BYO-UTAGAIFLG   TO  WKUSBYO-UTAGAIFLG
