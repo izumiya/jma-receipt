@@ -3112,49 +3112,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                    EVALUATE  TBL-ZAIW-SRYCD1
                      WHEN     "101130010"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999961   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
                      WHEN     "101800180"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999962   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       MOVE      999999982   TO  TBL-ZAIW-KOUHYOJYUNNUM
                    END-EVALUATE
                  END-IF
                  EVALUATE    TBL-ZAIW-SRYCD1
-                     WHEN     "101800210"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999971   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800220"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999972   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800230"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999973   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800240"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999974   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800250"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999975   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800260"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999976   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800270"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999977   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800280"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999978   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800290"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999979   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800300"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999980   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800310"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800320"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999982   TO  TBL-ZAIW-KOUHYOJYUNNUM
                      WHEN     "101800330"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999983   TO  TBL-ZAIW-KOUHYOJYUNNUM
