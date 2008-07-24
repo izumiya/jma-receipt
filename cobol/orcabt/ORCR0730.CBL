@@ -43,6 +43,7 @@
       *  04.02.07    NACL-門脇    08/06/12  愛媛県地方公費対応
       *                                     （一部負担金再掲欄編集）
       *  04.02.08    NACL-門脇    08/06/25  全国公費２種の一部負担金等記載対応
+      *  04.02.05    NACL-藤原    08/07/23  船員保険３割の「職務上の事由」の記載
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2481,14 +2482,17 @@
                        WHEN    "1"
                        WHEN    "A"
                        WHEN    "D"
+                       WHEN    "G"
                            MOVE    "職務上"              TO  HC06-JIYU
                        WHEN    "2"
                        WHEN    "B"
                        WHEN    "E"
+                       WHEN    "H"
                            MOVE    "下船後３ヶ月以内"    TO  HC06-JIYU
                        WHEN    "3"
                        WHEN    "C"
                        WHEN    "F"
+                       WHEN    "I"
                            MOVE    "通勤災害"            TO  HC06-JIYU
                    END-EVALUATE
            END-EVALUATE        
