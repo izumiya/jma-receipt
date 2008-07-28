@@ -2251,6 +2251,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    受診履歴の連番更新
            IF      SPA-ERRCD           =   SPACE
                IF     (SPA-SRYKA           =   SPA-OLD-SRYKA)
+               AND    (SPA-OLD-HKNCOMBI    NOT =   SPA-HKNCOMBINUM  )
                    PERFORM 4500115-TEISEI-RENNUM-SEC
                END-IF
            END-IF
