@@ -1607,37 +1607,21 @@
                                                         SPA-SYSYMD
                                 IF   PTNYUINRRK-RRKEDANUM  NOT =
                                               PTNYUINRRK-MAXEDANUM
-                                  IF  PTNYUINRRK-TENSTUYMD  =
-                                                  PTNYUINRRK-TAIINYMD
-                                      MOVE  PTNYUINRRK-TAIINYMD
-                                                   TO  LNK-DAY5-END
-                                  ELSE
-      *                               転出日のマイナス１日
-                                      INITIALIZE   LNK-DAY6-AREA
-                                      MOVE  "61"   TO  LNK-DAY6-IRAI
-                                      MOVE  PTNYUINRRK-TENSTUYMD
-                                                   TO  LNK-DAY6-KIJUN
-                                      MOVE  "1"    TO  LNK-DAY6-ZOGENPTN
-                                      MOVE  -1     TO  LNK-DAY6-ZOGEN
-                                      CALL  "ORCSDAY"    USING
-                                                         STS-AREA-DAY
-                                                         LNK-DAY6-AREA
-                                      MOVE   LNK-DAY6-KEISAN
-                                                   TO  LNK-DAY5-END
-                                  END-IF
+      *                             転出日のマイナス１日
+                                    INITIALIZE   LNK-DAY6-AREA
+                                    MOVE  "61"   TO  LNK-DAY6-IRAI
+                                    MOVE  PTNYUINRRK-TENSTUYMD
+                                                 TO  LNK-DAY6-KIJUN
+                                    MOVE  "1"    TO  LNK-DAY6-ZOGENPTN
+                                    MOVE  -1     TO  LNK-DAY6-ZOGEN
+                                    CALL  "ORCSDAY"    USING
+                                                       STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                                    MOVE   LNK-DAY6-KEISAN
+                                                 TO  LNK-DAY5-END
                                 ELSE
-      *                           転出日のマイナス１日
-                                  INITIALIZE   LNK-DAY6-AREA
-                                  MOVE  "61"   TO  LNK-DAY6-IRAI
-                                  MOVE  PTNYUINRRK-TENSTUYMD
-                                               TO  LNK-DAY6-KIJUN
-                                  MOVE  "1"    TO  LNK-DAY6-ZOGENPTN
-                                  MOVE  -1     TO  LNK-DAY6-ZOGEN
-                                  CALL  "ORCSDAY"    USING
-                                                     STS-AREA-DAY
-                                                     LNK-DAY6-AREA
-                                  MOVE   LNK-DAY6-KEISAN
-                                               TO  LNK-DAY5-END
+                                    MOVE  PTNYUINRRK-TAIINYMD
+                                                 TO  LNK-DAY5-END
                                 END-IF
                                ELSE
                                   MOVE  SPA-SYSYMD TO  LNK-DAY5-END
