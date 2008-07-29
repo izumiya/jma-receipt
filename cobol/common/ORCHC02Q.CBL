@@ -2475,18 +2475,6 @@
       *****************************************************************
        20029-SRYACT-HENSYU-SEC         SECTION.
       *
-      *    最後の行に回数を編集
-           IF      WRK-SRYCD (1:1)     =   "6"
-               ADD     1                   TO  IDX-S
-           ELSE
-               IF     (WRK-KAISUU (IDX-S)  =   SPACE )  AND
-                      (WRK-HINICHI(IDX-S)  =   SPACE )
-                   CONTINUE
-               ELSE
-                   ADD     1                   TO  IDX-S
-               END-IF
-           END-IF
-      *
       *---(03.04.00) LINE ADD START ------------------------------------
       *    内服で総量表示の薬剤のみの場合、外用と同様の表示とする
            IF     (WRK-SRYKBN          =   "21"  )  AND
@@ -2494,6 +2482,30 @@
                MOVE    "23"                TO  WRK-SRYKBN
            END-IF
       *---(03.04.00) LINE ADD END   ------------------------------------
+           EVALUATE    WRK-SRYKBN
+           WHEN    "21"
+           WHEN    "22"
+      *    内服・頓服
+      *        最後の行に回数を編集
+               IF      WRK-SRYCD (1:1)     =   "6"
+                   ADD     1                   TO  IDX-S
+               ELSE
+      *            名称が回数表示まで編集されている時、行追加
+                   IF      WRK-M-KETA      >   66    AND
+                                           <=  80
+                       ADD     1                   TO  IDX-S
+                   END-IF
+               END-IF
+           END-EVALUATE
+      *    回数行で２０行以上の時
+           IF      IDX-S               >=  LINE-MAX
+               COMPUTE IDX-S           =   LINE-MAX   -   1
+      *        帳票編集処理
+               PERFORM 20022-PRINT-HEN-SEC
+               MOVE    SPACE               TO  WRK-NAIYOU-AREA
+               MOVE    1                   TO  IDX-S
+           END-IF
+      *
       *    最後の行に回数を編集
            IF      ORCHC19-KBN         =   "1"
                                        OR  "B"
@@ -2517,11 +2529,11 @@
                WHEN    "22"
                    MOVE    "（"                  TO  WRK-K3      (IDX-S)
                    MOVE    "回分）"              TO  WRK-HINICHI (IDX-S)
-               WHEN    "23"
-               WHEN    "14"
-                   IF      WRK-NAIYOU-Z (IDX-S)  =   SPACE
-                       COMPUTE IDX-S             =   IDX-S    -   1
-                   END-IF
+      *******  WHEN    "23"
+      *        WHEN    "14"
+      *            IF      WRK-NAIYOU-Z (IDX-S)  =   SPACE
+      *                COMPUTE IDX-S             =   IDX-S    -   1
+      **********   END-IF
            END-EVALUATE
       *
            INSPECT WRK-NAIYOU-Z (IDX-S)    REPLACING  ALL "  "  BY  "　"
@@ -2789,6 +2801,7 @@
            INSPECT WRK-MEISYOU1 (IDX-S)  REPLACING  ALL "  "  BY  "　"
            INSPECT WRK-SURYOU (IDX-S)    REPLACING  ALL "  "  BY  "　"
            INSPECT WRK-TANI   (IDX-S)    REPLACING  ALL "  "  BY  "　"
+           INSPECT WRK-FIL11  (IDX-S)    REPLACING  ALL "  "  BY  "　"
       *
       *    後発医薬品変更可能判定
            IF      FLG-KOUHATU         =   1
