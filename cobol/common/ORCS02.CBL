@@ -221,6 +221,7 @@
       *                                     ¡Ê·²ÇÏ¸©ÃÏÊý¸øÈñ¡Ë
       *  04.02.14    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *  04.02.15    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.02.16    NACL-ÌçÏÆ    08/07/30  ¹âÎð¼Ô£³³ä£¸£°£±£°£°¡Ü¡÷¤Î·×»»½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4355,15 +4356,16 @@
                         IF  (COMB-KOH2HKNNUM(1:1) = "0")
                         OR  (COMB-KOH3HKNNUM(1:1) = "0")
                         OR  (COMB-KOH4HKNNUM(1:1) = "0")
-                           IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
+                           CONTINUE
+      **>                  IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
       *****                  IF   MAX-KIN-KOHI1-M   >  44400
-                               MOVE   44400   TO   MAX-KIN-KOHI1-M
+      **>                      MOVE   44400   TO   MAX-KIN-KOHI1-M
       *****                  END-IF
-                           ELSE
+      **>                  ELSE
       *****                  IF   MAX-KIN-KOHI1-M   >  40200
-                               MOVE   40200   TO   MAX-KIN-KOHI1-M
+      **>                      MOVE   40200   TO   MAX-KIN-KOHI1-M
       *****                  END-IF
-                           END-IF
+      **>                  END-IF
                         END-IF
                       END-IF
                      END-IF
@@ -4439,15 +4441,16 @@
                         OR  (COMB-KOH2HKNNUM(1:1) = "0")
                         OR  (COMB-KOH3HKNNUM(1:1) = "0")
                         OR  (COMB-KOH4HKNNUM(1:1) = "0")
-                           IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
+                           CONTINUE
+      **>                  IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
       *****                  IF   MAX-KIN-SYU-M   >  44400
-                               MOVE   44400   TO   MAX-KIN-SYU-M
+      **>                      MOVE   44400   TO   MAX-KIN-SYU-M
       *****                  END-IF
-                           ELSE
+      **>                  ELSE
       *****                  IF   MAX-KIN-SYU-M   >  40200
-                               MOVE   40200   TO   MAX-KIN-SYU-M
+      **>                      MOVE   40200   TO   MAX-KIN-SYU-M
       *****                  END-IF
-                           END-IF
+      **>                  END-IF
                         END-IF
                       END-IF
                      END-IF
@@ -7497,35 +7500,22 @@
                        IF  (SYU-KOH2HKNNUM     NOT = SPACE)              
                        OR  (SYU-KOH3HKNNUM     NOT = SPACE)
                        OR  (SYU-KOH4HKNNUM     NOT = SPACE)
-      *
                         MOVE     SYU-KOH-FTN  TO  WK-SYU-SYUCOMPFTN
                         COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
-      *
                        ELSE
-                        IF  (SYU-KOH2HKNNUM     =  SPACE)              
-                        AND (SYU-KOH3HKNNUM     =  SPACE)
-                        AND (SYU-KOH4HKNNUM     =  SPACE)
-                          MOVE   SYU-KOH1COMPFTN
-                                            TO   WK-SYU-SYUCOMPFTN
-      *
-      ****                IF  ( COMB-KOH2HKNNUM        =    SPACE)
-      ****                AND ( COMB-KOH3HKNNUM        =    SPACE)
-      ****                AND ( COMB-KOH4HKNNUM        =    SPACE)
-      ****                AND ( FLG-IRYOHI         NOT =    ZERO )
-      ****                   COMPUTE   WK-KOUREI-IRYOHI  =   
-      ****                             WK-KOUREI-IRYOHI  +  
-      ****                            (SYU-HKNTEN (17) * 10)
-      ****                END-IF
-      *
-                          COMPUTE WK-ENTANI =
-                                 SYU-KOH1COMPFTN-ENTANI + 0.9
-                        END-IF
+                        MOVE     SYU-KOH1COMPFTN
+                                              TO  WK-SYU-SYUCOMPFTN
+                        COMPUTE WK-ENTANI = SYU-KOH1COMPFTN-ENTANI
+                                                               + 0.9
                        END-IF
                        ADD   WK-SYU-SYUCOMPFTN     TO   FTN-KOHI1-M      
                        ADD   WK-ENTANI       TO   FTN-KOHI1-M-ENTANI
                        IF  ( COMB-KOH2HKNNUM        =    SPACE)
                        AND ( COMB-KOH3HKNNUM        =    SPACE)
                        AND ( COMB-KOH4HKNNUM        =    SPACE)
+                       AND ( SYU-KOH2HKNNUM         =    SPACE)
+                       AND ( SYU-KOH3HKNNUM         =    SPACE)
+                       AND ( SYU-KOH4HKNNUM         =    SPACE)
                        AND ( FLG-IRYOHI         NOT =    ZERO )
                           COMPUTE   WK-KOUREI-IRYOHI  =   
                                     WK-KOUREI-IRYOHI  +  
@@ -9566,6 +9556,10 @@
                AND ( COMB-KOH2HKNNUM        =    SPACE)
                AND ( COMB-KOH3HKNNUM        =    SPACE)
                AND ( COMB-KOH4HKNNUM        =    SPACE)
+               AND ( SYU-KOH1HKNNUM         =    SPACE)
+               AND ( SYU-KOH2HKNNUM         =    SPACE)
+               AND ( SYU-KOH3HKNNUM         =    SPACE)
+               AND ( SYU-KOH4HKNNUM         =    SPACE)
                AND ( FLG-IRYOHI         NOT =    ZERO )
                    COMPUTE   WK-KOUREI-IRYOHI  =
                              WK-KOUREI-IRYOHI  +
@@ -9597,6 +9591,10 @@
                  AND ( COMB-KOH2HKNNUM        =    SPACE)
                  AND ( COMB-KOH3HKNNUM        =    SPACE)
                  AND ( COMB-KOH4HKNNUM        =    SPACE)
+                 AND ( SYU-KOH1HKNNUM         =    SPACE)
+                 AND ( SYU-KOH2HKNNUM         =    SPACE)
+                 AND ( SYU-KOH3HKNNUM         =    SPACE)
+                 AND ( SYU-KOH4HKNNUM         =    SPACE)
                  AND ( FLG-IRYOHI         NOT =    ZERO )
                      COMPUTE   WK-KOUREI-IRYOHI  =
                                WK-KOUREI-IRYOHI  +
@@ -9625,6 +9623,10 @@
                AND ( COMB-KOH2HKNNUM        =    SPACE)
                AND ( COMB-KOH3HKNNUM        =    SPACE)
                AND ( COMB-KOH4HKNNUM        =    SPACE)
+               AND ( SYU-KOH1HKNNUM         =    SPACE)
+               AND ( SYU-KOH2HKNNUM         =    SPACE)
+               AND ( SYU-KOH3HKNNUM         =    SPACE)
+               AND ( SYU-KOH4HKNNUM         =    SPACE)
                AND ( FLG-IRYOHI         NOT =    ZERO )
                    COMPUTE   WK-KOUREI-IRYOHI  =
                              WK-KOUREI-IRYOHI  +
