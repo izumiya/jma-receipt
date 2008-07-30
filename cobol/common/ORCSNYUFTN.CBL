@@ -101,6 +101,7 @@
       *  04.02.03    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
       *  04.02.04    NACL-ÌçÏÆ    08/05/29  Æþ±¡ÎÁ²Ã»»ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¥Á¥§¥Ã¥¯
       *  04.02.05    NACL-ÌçÏÆ    08/06/15  Æþ±¡ÎÁ²Ã»»³°Çñ¥Á¥§¥Ã¥¯
+      *  03.02.06    NACL-ÌçÏÆ    08/07/28  ·×»»Í¥Àè½ç°ÌÊÔ½¸½¤Àµ¡ÊÄ¹´ü¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -198,6 +199,7 @@
                    07 WRK-HANBETU-YUSENYM  PIC 9(06).
                    07 WRK-HANBETU-YUSENDD  PIC 9(02).
                 05 WRK-HANBETU-YUSENBAN    PIC 9(03).
+                05 WRK-HANBETU-YUSENBAN2   PIC 9(03).
                 05 WRK-HANBETU-KAISHI      PIC X(02).
               03 WRK-HANBETU-HKNCOMBINUM   PIC 9(04).
               03 WRK-HANBETU-DAY           PIC X(01)   OCCURS   31.
@@ -219,7 +221,7 @@
               03 WRK-HANBETU2-HKNCOMBINUM  PIC 9(04).
               03 WRK-HANBETU2-DAY          PIC X(01)   OCCURS   31.
       *
-       01  WRK-HANBETU-DATA                PIC X(109).
+       01  WRK-HANBETU-DATA                PIC X(112).
       *
       *    Æþ±¡ÅÀ¿ô»»ÄêÍÑ¥ï¡¼¥¯¥¨¥ê¥¢
        01  WRK-NYUIN-TENSU-AREA.
@@ -1278,7 +1280,7 @@
       *
               IF   COMB-HKNNUM  NOT =  SPACE
                 INITIALIZE                           PTHKNINF-REC
-                MOVE    LNK-S02-HOSPNUM       TO      PTHKN-HOSPNUM
+                MOVE    LNK-S02-HOSPNUM      TO      PTHKN-HOSPNUM
                 MOVE    LNK-S02-PTID         TO      PTHKN-PTID
                 MOVE    COMB-HKNID           TO      PTHKN-HKNID
                 MOVE    PTHKNINF-REC         TO      MCPDATA-REC
@@ -1305,6 +1307,8 @@
                 CALL "ORCDBMAIN"  USING MCPAREA
                                         MCPDATA-REC
                                         SPA-AREA
+              ELSE
+                INITIALIZE                           PTHKNINF-REC
               END-IF
               IF   PTHKN-TEKSTYMD   NOT =  SPACE
                 IF   PTHKN-TEKSTYMD(1:6) <  WRK-HANBETU-SKYYM(IDX)
@@ -1479,55 +1483,85 @@
               IF  WRK-HANBETU-KOH1HKNNUM(IDX) = SPACE OR "027"
                   CONTINUE
               ELSE
+                  MOVE  WRK-HANBETU-KOH1HKNNUM(IDX)
+                              TO  WRK-HANBETU-YUSENBAN(IDX)
+                  IF    WRK-HANBETU-KOH1HKNNUM(IDX) = "972" OR "974"
+                     MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
+                  ELSE
                      MOVE  WRK-HANBETU-KOH1HKNNUM(IDX)
-                                TO  WRK-HANBETU-YUSENBAN(IDX)
-                     IF    WRK-HANBETU-KOH1HKNNUM(IDX) = "972" OR "974"
-                       MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
-                     END-IF
+                              TO  WRK-HANBETU-YUSENBAN2(IDX)
+                  END-IF
               END-IF
       *
-              IF  WRK-HANBETU-KOH2HKNNUM(IDX) = SPACE 
+              IF  WRK-HANBETU-KOH2HKNNUM(IDX) = SPACE
                   CONTINUE
               ELSE
-                    IF (WRK-HANBETU-YUSENBAN(IDX) 
-                                       > WRK-HANBETU-KOH2HKNNUM(IDX))
-                    OR (WRK-HANBETU-KOH1HKNNUM(IDX)  =  "027"       )
+                  IF (WRK-HANBETU-YUSENBAN(IDX)
+                                     > WRK-HANBETU-KOH2HKNNUM(IDX))
+                  OR (WRK-HANBETU-KOH1HKNNUM(IDX)  =  "027"       )
                      MOVE  WRK-HANBETU-KOH2HKNNUM(IDX)
-                                      TO WRK-HANBETU-YUSENBAN(IDX)
-                    END-IF
-                    IF  WRK-HANBETU-KOH2HKNNUM(IDX)  = "972" OR "974"
-                       MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
-                    END-IF
+                              TO  WRK-HANBETU-YUSENBAN(IDX)
+                  END-IF
+                  IF     WRK-HANBETU-KOH2HKNNUM(IDX) = "972" OR "974"
+                     MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
+                  ELSE
+                     IF (WRK-HANBETU-YUSENBAN2(IDX)
+                                     > WRK-HANBETU-KOH2HKNNUM(IDX))
+                     OR (WRK-HANBETU-KOH1HKNNUM(IDX)  =  "027"    )
+                        MOVE  WRK-HANBETU-KOH2HKNNUM(IDX)
+                              TO  WRK-HANBETU-YUSENBAN2(IDX)
+                     END-IF
+                  END-IF
               END-IF
       *
-              IF  WRK-HANBETU-KOH3HKNNUM(IDX) = SPACE 
+              IF  WRK-HANBETU-KOH3HKNNUM(IDX) = SPACE
                   CONTINUE
               ELSE
-                    IF  WRK-HANBETU-YUSENBAN(IDX) 
-                                       > WRK-HANBETU-KOH3HKNNUM(IDX)
+                  IF  WRK-HANBETU-YUSENBAN(IDX)
+                                     > WRK-HANBETU-KOH3HKNNUM(IDX)
                      MOVE  WRK-HANBETU-KOH3HKNNUM(IDX)
-                                      TO WRK-HANBETU-YUSENBAN(IDX)
-                    END-IF
-                    IF  WRK-HANBETU-KOH3HKNNUM(IDX)  = "972" OR "974"
-                       MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
-                    END-IF
+                              TO  WRK-HANBETU-YUSENBAN(IDX)
+                  END-IF
+                  IF     WRK-HANBETU-KOH3HKNNUM(IDX) = "972" OR "974"
+                     MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
+                  ELSE
+                     IF  WRK-HANBETU-YUSENBAN2(IDX)
+                                     > WRK-HANBETU-KOH3HKNNUM(IDX)
+                        MOVE  WRK-HANBETU-KOH3HKNNUM(IDX)
+                              TO  WRK-HANBETU-YUSENBAN2(IDX)
+                     END-IF
+                  END-IF
               END-IF
       *
-              IF  WRK-HANBETU-KOH4HKNNUM(IDX) = SPACE 
+              IF  WRK-HANBETU-KOH4HKNNUM(IDX) = SPACE
                   CONTINUE
               ELSE
-                    IF  WRK-HANBETU-YUSENBAN(IDX) 
-                                       > WRK-HANBETU-KOH4HKNNUM(IDX)
+                  IF  WRK-HANBETU-YUSENBAN(IDX)
+                                     > WRK-HANBETU-KOH4HKNNUM(IDX)
                      MOVE  WRK-HANBETU-KOH4HKNNUM(IDX)
-                                      TO WRK-HANBETU-YUSENBAN(IDX)
-                    END-IF
-                    IF  WRK-HANBETU-KOH4HKNNUM(IDX)  = "972" OR "974"
-                       MOVE    1      TO WRK-HANBETU-YUSENBAN(IDX)
-                    END-IF
+                              TO  WRK-HANBETU-YUSENBAN(IDX)
+                  END-IF
+                  IF     WRK-HANBETU-KOH4HKNNUM(IDX) = "972" OR "974"
+                     MOVE  1  TO  WRK-HANBETU-YUSENBAN(IDX)
+                  ELSE
+                     IF  WRK-HANBETU-YUSENBAN2(IDX)
+                                     > WRK-HANBETU-KOH4HKNNUM(IDX)
+                        MOVE  WRK-HANBETU-KOH4HKNNUM(IDX)
+                              TO  WRK-HANBETU-YUSENBAN2(IDX)
+                     END-IF
+                  END-IF
               END-IF
       *
               IF  WRK-HANBETU-YUSENBAN(IDX)  =   ZERO
-                     MOVE   999       TO  WRK-HANBETU-YUSENBAN(IDX)
+                   MOVE   999   TO  WRK-HANBETU-YUSENBAN(IDX)
+              END-IF
+      *
+              IF  WRK-HANBETU-YUSENBAN(IDX)  =   1
+                IF   WRK-HANBETU-YUSENBAN2(IDX)  =   ZERO
+                   MOVE   999   TO  WRK-HANBETU-YUSENBAN2(IDX)
+                END-IF
+              ELSE
+                   MOVE   999   TO  WRK-HANBETU-YUSENBAN2(IDX)
               END-IF
       *
            END-PERFORM.

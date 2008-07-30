@@ -16466,22 +16466,22 @@
                 (COMB-KOH3HKNNUM     = "972" OR "974") OR
                 (COMB-KOH4HKNNUM     = "972" OR "974")
       ***   IF   FLG-ZENKI-TOKUREI  =  1
-            IF   LNK-SYU-SRYYMD(1:6)   >= "200804"
+      **>   IF   LNK-SYU-SRYYMD(1:6)   >= "200804"
                  PERFORM   23071-FTNKIN-HIKAKU-CYOKI-SEC
-            ELSE
-              IF  ((COMB-KOH1HKNNUM     = "972" OR "974" ) AND
-                   (COMB-KOH2HKNNUM     =  SPACE         ) AND
-                   (COMB-KOH3HKNNUM     =  SPACE         ) AND
-                   (COMB-KOH4HKNNUM     =  SPACE         ))
-              OR  ((COMB-KOH1HKNNUM     = "027"          ) AND
-                   (COMB-KOH2HKNNUM     = "972" OR "974" ) AND
-                   (COMB-KOH3HKNNUM     =  SPACE         ) AND
-                   (COMB-KOH4HKNNUM     =  SPACE         ))
-                 PERFORM   23072-FTNKIN-HIKAKU-TUJYO-SEC
-              ELSE
-                 PERFORM   23071-FTNKIN-HIKAKU-CYOKI-SEC
-              END-IF
-            END-IF
+      **>   ELSE
+      **>     IF  ((COMB-KOH1HKNNUM     = "972" OR "974" ) AND
+      **>          (COMB-KOH2HKNNUM     =  SPACE         ) AND
+      **>          (COMB-KOH3HKNNUM     =  SPACE         ) AND
+      **>          (COMB-KOH4HKNNUM     =  SPACE         ))
+      **>     OR  ((COMB-KOH1HKNNUM     = "027"          ) AND
+      **>          (COMB-KOH2HKNNUM     = "972" OR "974" ) AND
+      **>          (COMB-KOH3HKNNUM     =  SPACE         ) AND
+      **>          (COMB-KOH4HKNNUM     =  SPACE         ))
+      **>        PERFORM   23072-FTNKIN-HIKAKU-TUJYO-SEC
+      **>     ELSE
+      **>        PERFORM   23071-FTNKIN-HIKAKU-CYOKI-SEC
+      **>     END-IF
+      **>   END-IF
            ELSE
                  PERFORM   23072-FTNKIN-HIKAKU-TUJYO-SEC
            END-IF.
