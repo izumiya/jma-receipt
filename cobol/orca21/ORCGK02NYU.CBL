@@ -7925,6 +7925,8 @@
            MOVE    1               TO  SPA-GMN-PAGE
       *
            IF      SPA-SYORIFLG        =   ZERO
+      *        排他中は削除なし
+             AND  (SPA-LOCK            =   ZERO )
                PERFORM 2201-WKSRYACT-CHK-SEC
            ELSE
                MOVE    ZERO            TO  FLG-WKSRYACT-ARI
@@ -8034,6 +8036,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ワーク診療行為クリア処理
       *****************************************************************
        4900-WKSRYACT-CLEAR-SEC             SECTION.
+      *
+           IF      SPA-LOCK            =   ZERO
+               CONTINUE
+           ELSE
+               GO      TO      4900-WKSRYACT-CLEAR-EXT
+           END-IF
       *
            INITIALIZE                  WKSRYACT-REC
            MOVE    SPA-HOSPNUM         TO  WKSRY-HOSPNUM
