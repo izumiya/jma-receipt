@@ -2252,7 +2252,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD           =   SPACE
                IF     (SPA-SRYKA           =   SPA-OLD-SRYKA)
                AND    (SPA-OLD-HKNCOMBI    NOT =   SPA-HKNCOMBINUM  )
-                   PERFORM 4500115-TEISEI-RENNUM-SEC
+                   PERFORM 3009-TEISEI-JYURRK-SEC
                END-IF
            END-IF
       *
@@ -2641,6 +2641,43 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        4500114-TEISEI-JYURRKDEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険変更時の受診履歴連番号変更処理
+      *****************************************************************
+       3009-TEISEI-JYURRK-SEC          SECTION.
+      *
+      *    変更後の保険組合せで受診履歴が登録済みの時、連番号変更
+           MOVE    SPACE               TO  JYURRK-REC
+           INITIALIZE                      JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-PTID            TO  JYURRK-PTID
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           MOVE    SPA-SRYKA           TO  JYURRK-SRYKA
+           MOVE    SPA-HKNCOMBINUM     TO  JYURRK-HKNCOMBINUM
+           MOVE    SPA-SRYYMD          TO  JYURRK-SRYYMD
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key38"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key38"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-JYURRK
+           END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key38"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-JYURRK          =   ZERO
+               PERFORM 4500115-TEISEI-RENNUM-SEC
+           END-IF
+           .
+       3009-TEISEI-JYURRK-EXT.
            EXIT.
       *
       *****************************************************************
