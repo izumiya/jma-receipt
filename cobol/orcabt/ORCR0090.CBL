@@ -184,6 +184,7 @@
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
       *  04.02.02    NACL-ÌçÏÆ    08/04/21  £¸£°¤½¤ÎÂ¾µ­ºÜ½çÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/07/18  ºÆ¿Ç¤Î²Ã»»ÊÔ½¸ÂÐ±þ
+      *  04.02.04    NACL-ÌçÏÆ    08/08/05  ºÆ¿Ç¤Î²Ã»»ÊÔ½¸ÂÐ±þ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1483,6 +1484,7 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
                END-IF
       *
       *        ÅÅ»Ò²½²Ã»»ÅùÊÔ½¸
+               MOVE    ZERO      TO    FLG-TEIGEN
                PERFORM  VARYING  IDX6   FROM   1   BY  1
                          UNTIL   IDX6    >     7
                  IF      TBL-DENSHI-FLG(IDX6)  =   1
