@@ -42,6 +42,8 @@
       *  04.02.06    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *  04.02.07    NACL-ÌçÏÆ    08/06/25  Á´¹ñ¸øÈñ£²¼ï¤Î°ìÉôÉéÃ´¶âÅùµ­ºÜÂÐ±þ
+      *  04.02.08    NACL-Æ£¸¶    08/07/23  µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+      *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2643,6 +2645,19 @@
                      END-IF
                     END-IF
                    END-IF
+               END-IF
+           END-IF
+      *
+      *    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+           IF      CNT-PAGE            =   1
+               IF    ( RECE02-PREFNUM      =   "03"    OR  "04" )
+               AND   ( RECE02-SRYYM        >=  200806           )
+                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -7334,11 +7349,18 @@
                END-PERFORM
            END-IF
       *
+      *    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+           IF    ( RECE02-PREFNUM      =   "03"    OR  "04" )
+           AND   ( RECE02-SRYYM        >=  200806           )
+               IF      RECE02-RJNGAIKOHFTN (1)
+                                           >   ZERO
+                   MOVE    RECE02-RJNGAIKOHFTN (1)
+                                           TO  RECE10-ETC-YKZFTN (1)
+               END-IF
+           END-IF
+      *
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
-      *??
-           DISPLAY "SYUGAKU=" RECE02-SYUGAKUKBN "#"  RECE10-FLG (1)
-      *???
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE

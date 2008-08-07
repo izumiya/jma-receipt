@@ -43,7 +43,9 @@
       *  04.02.07    NACL-ÌçÏÆ    08/06/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê°ìÉôÉéÃ´¶âºÆ·ÇÍóÊÔ½¸¡Ë
       *  04.02.08    NACL-ÌçÏÆ    08/06/25  Á´¹ñ¸øÈñ£²¼ï¤Î°ìÉôÉéÃ´¶âÅùµ­ºÜÂÐ±þ
-      *  04.02.05    NACL-Æ£¸¶    08/07/23  Á¥°÷ÊÝ¸±£³³ä¤Î¡Ö¿¦Ì³¾å¤Î»öÍ³¡×¤Îµ­ºÜ
+      *  04.02.09    NACL-Æ£¸¶    08/07/23  Á¥°÷ÊÝ¸±£³³ä¤Î¡Ö¿¦Ì³¾å¤Î»öÍ³¡×¤Îµ­ºÜ
+      *  04.02.10    NACL-Æ£¸¶    08/07/23  µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+      *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2721,6 +2723,19 @@
                      END-IF
                     END-IF
                    END-IF
+               END-IF
+           END-IF
+      *
+      *    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+           IF      CNT-PAGE            =   1
+               IF    ( RECE62-PREFNUM      =   "03"    OR  "04" )
+               AND   ( RECE62-SRYYM        >=  200806           )
+                   EVALUATE    RECE62-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -7993,6 +8008,16 @@
                        PERFORM 39041-RECE10-TOKKI-HENSYU-SEC
                    END-IF
                END-PERFORM
+           END-IF
+      *
+      *    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+           IF    ( RECE62-PREFNUM      =   "03"    OR  "04" )
+           AND   ( RECE62-SRYYM        >=  200806           )
+               IF      RECE62-RJNGAIKOHFTN (1)
+                                           >   ZERO
+                   MOVE    RECE62-RJNGAIKOHFTN (1)
+                                           TO  RECE10-ETC-YKZFTN (1)
+               END-IF
            END-IF
       *
            MOVE    "00000000000000000000000000000000000000000000000000"

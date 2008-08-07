@@ -360,6 +360,7 @@
       *  04.02.18    NACL-ÌçÏÆ    08/06/25  Á´¹ñ¸øÈñ£²¼ï¤Î°ìÉôÉéÃ´¶âÅùµ­ºÜÂÐ±þ
       *  04.02.19    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.02.20    NACL-ÌçÏÆ    08/07/03  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
+      *  04.02.21    NACL-ÌçÏÆ    08/07/23  ´ä¼ê¡¦µÜ¾ëÆâÎ¦ÃÏ¿ÌÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1890,10 +1891,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            END-IF
       *
       *    ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
-           IF    ( IDZ                 =   1      )
-           AND   ( SYS-1001-PREFNUM    =   "15"   )
-           AND   ( RECE02-SRYYM        >=  200709 )
-           AND   ( RECE02-SRYYM        <=  200712 )
+      *    ´ä¼ê¡¦µÜ¾ëÆâÎ¦ÃÏ¿ÌÂÐ±þ 
+           IF   (( IDZ                 =   1            ) AND
+                 ( SYS-1001-PREFNUM    =   "15"         ) AND
+                 ( RECE02-SRYYM       >=   200709       ) AND
+                 ( RECE02-SRYYM       <=   200712       ))
+           OR   (( IDZ                 =   1            ) AND
+                 ( SYS-1001-PREFNUM    =   "03" OR "04" ) AND
+                 ( RECE02-SRYYM       >=   200806       ) AND
+                 ( RECE02-SRYYM       <=   200812       ))
                IF    ( RECE02-HKNNUM   NOT =   SPACE )
                AND   ( RECE02-HKNJANUM     =   SPACE )
                    MOVE    3           TO  RECE02-RJNGAIKOHFTN (1)

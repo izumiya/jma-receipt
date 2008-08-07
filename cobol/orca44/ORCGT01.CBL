@@ -102,6 +102,8 @@
       *  04.02.04    NACL-Æ£¸¶    08/04/21  ¹­°èÏ¢¹ç¤ÎÊÝ¸±¼ÔÈÖ¹æ»ØÄê¤ò¤·¤Ê¤¤
       *  04.02.05    NACL-Æ£¸¶    08/05/14  ¿ÇÎÅÇ¯·î¤Ë¤è¤ëÂÐ¾ÝÄ¢É¼¤ÎºÆ¼èÆÀ
       *  04.02.06    NACL-Æ£¸¶    08/06/02  ¸øÈñÀÁµá½ñ¥Ü¥¿¥ó¤ÎºÆÀßÄê¤ò¤·¤Ê¤¤
+      *  04.02.07    NACL-Æ£¸¶    08/07/23  µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
+      *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2723,6 +2725,14 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                            MOVE    "2"             TO  WRK-SHELL-SYOKBN
                            PERFORM 45013-SOKATU-SYORI-SEC
                        END-IF
+      *
+      *                µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ 
+                       IF    ( SPA-PREFNUM       =   "03"    OR  "04" )
+                       AND   ( SPA-NAI-SKYYM     >=  200806           )
+                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
+                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
+                           PERFORM 45013-SOKATU-SYORI-SEC
+                       END-IF
                    END-IF     
            END-EVALUATE                                               
            MOVE    SPACE               TO  WRK-SHELL-SYOKBN
@@ -3105,6 +3115,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
                MOVE    "0"             TO  SHELLTBL-ARG24
            END-IF
       *    ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+      *    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ 
            IF    ( WRK-SHELL-RECEKBN   =   "1" )
            AND   ( WRK-SHELL-SYOKBN    =   "2" )
                MOVE    "1"             TO  SHELLTBL-ARG25      
