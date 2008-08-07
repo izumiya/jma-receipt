@@ -33,6 +33,7 @@
       *                                     い場合記載の対象としない
       *  04.01.01    NACL-小豆沢  07/11/16  公務災害、公害の種別判定追加
       *  04.02.01    NACL-伊藤    08/ 4/22  改定対応
+      *  04.02.02    NACL-門脇    08/08/07  精神通院の請求点判定追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2667,7 +2668,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                        GO  TO  200121-KOHID-HENSYU-EXT
                    END-IF
       *            全国公費のとき（生保）
-                   IF   COMB-KOHHKNNUM (IDX)   =   "012"
+                   IF   COMB-KOHHKNNUM (IDX)   =   "012" OR "021"
       *                レセ記載判定
                        INITIALIZE          ORCSFTNJGNCHKAREA
                        MOVE    COMB-HOSPNUM
@@ -2715,7 +2716,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                        END-IF
                        GO  TO  200121-KOHID-HENSYU-EXT
                    END-IF
-      *            全国公費のとき（長期・老人原爆・生保以外）
+      *            全国公費のとき（長期・老人原爆・生保・精神以外）
                    MOVE    "1"         TO  COLDAT01-TRECESKYKBN(IDY)
                END-IF
            END-IF

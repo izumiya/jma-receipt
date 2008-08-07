@@ -46,6 +46,7 @@
       *  04.02.01    NACL-ÌçÏÆ    08/03/19  À¸ÊÝ¤Î£·£¹Ê»ÍÑ»þ¤ÎÂÐ±þ
       *  04.02.02    NACL-ÌçÏÆ    08/04/24  ºë¶Ì¸©»ÖÌÚ»ÔÃÏÊý¸øÈñÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/07/02  ÂçºåÉÜ£´£±Ï·¿Í¡Ü£±£¸£¸ÅùÂÐ±þ
+      *  04.02.04    NACL-ÌçÏÆ    08/08/07  Àº¿ÀÄÌ±¡¤ÎÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -244,7 +245,7 @@
            IF   FLG-HKNNUM     =    ZERO
              IF   (HKN-RECEJGNDSPKBN    =   "1"           )
              OR   (HKN-HKNNUM           =   "972" OR "974"
-                                                  OR "012")
+                                         OR "012" OR "021")
              OR   (WRK-RECEJGNDSPKBN    =   "1"           )
       *        ´µ¼Ô¸øÈñÉéÃ´¥Þ¥¹¥¿¤«¤éÉéÃ´¾å¸Â³Û¤Î¼èÆÀ
                PERFORM    210-PTKOHFTN-GET-SEC
@@ -787,6 +788,10 @@
                                MOVE   01        TO  LNK-FTNJGNCHK-RC
                            END-IF
                            IF   WRK-SKJ-FTN  >=  14880
+                               MOVE   01        TO  LNK-FTNJGNCHK-RC
+                           END-IF
+                         WHEN       "021"
+                           IF   WRK-SEIKYU            =   ZERO
                                MOVE   01        TO  LNK-FTNJGNCHK-RC
                            END-IF
                          WHEN       "972"

@@ -121,6 +121,7 @@
       *                                     平成２０年４月以降は公費付加
       *                                     情報より記載判定はしない
       *  04.02.06    NACL-藤原    08/04/23  後期高齢者の船員保険を本人とする
+      *  04.02.07    NACL-門脇    08/08/07  精神通院の請求点判定追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1260,8 +1261,10 @@
                ELSE
                    MOVE    1                      TO  IDX1
                    IF   COMB-KOHHKNNUM (IDX)  =  "972" OR "974" OR "012"
+                                                       OR "021"
                      IF    ( WRK-ERR-ERRKBN          >   ZERO  )
-                     AND   ( COMB-KOHHKNNUM (IDX)    =   "012" )
+                     AND   ( COMB-KOHHKNNUM (IDX)    =   "012"
+                                                     OR  "021" )
                      AND   ( COMB-HKNNUM             =   SPACE )
                          CONTINUE
                      ELSE 
@@ -1683,8 +1686,10 @@
                ELSE
                    MOVE    1                      TO  IDX1
                    IF   COMB-KOHHKNNUM (IDX)  =  "972" OR "974" OR "012"
+                                                       OR "021"
                      IF    ( WRK-ERR-ERRKBN          >   ZERO  )
-                     AND   ( COMB-KOHHKNNUM (IDX)    =   "012" )
+                     AND   ( COMB-KOHHKNNUM (IDX)    =   "012"
+                                                     OR  "021" )
                      AND   ( COMB-HKNNUM             =   SPACE )
                          CONTINUE
                      ELSE 
