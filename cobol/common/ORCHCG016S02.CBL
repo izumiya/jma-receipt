@@ -482,9 +482,9 @@
            MOVE    NACCT-HOSPNUM        TO  PTNYUINRRK-HOSPNUM
            MOVE    NACCT-PTID          TO  PTNYUINRRK-PTID
            MOVE    NACCT-SRYYM         TO  PTNYUINRRK-TENNYUYMD
-           MOVE    "31"                TO  PTNYUINRRK-TENNYUYMD
+           MOVE    "31"                TO  PTNYUINRRK-TENNYUYMD(7:2)
            MOVE    NACCT-SRYYM         TO  PTNYUINRRK-TENSTUYMD
-           MOVE    "01"                TO  PTNYUINRRK-TENSTUYMD
+           MOVE    "01"                TO  PTNYUINRRK-TENSTUYMD(7:2)
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
            MOVE    "key41"             TO  MCP-PATHNAME
