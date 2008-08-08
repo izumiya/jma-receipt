@@ -2155,6 +2155,15 @@
                        MOVE    "下船３月"  TO  WRK-PTHKN-HOJOKBNMEI
                    END-EVALUATE
                END-IF
+      *    後期高齢者
+           WHEN    "039"
+           WHEN    "040"
+               EVALUATE    WRK-PTHKN-HOJOKBN
+               WHEN    "1"
+                   MOVE    "１割"          TO  WRK-PTHKN-HOJOKBNMEI
+               WHEN    "3" 
+                   MOVE    "３割"          TO  WRK-PTHKN-HOJOKBNMEI
+               END-EVALUATE
       *    その他
            WHEN    OTHER
       *        自費
