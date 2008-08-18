@@ -299,6 +299,9 @@
            COPY    "CPK02SPASCR.INC"  REPLACING
                                        //SPA-// BY //HZN-//.
       *
+      *時間外コメント（日時分）
+       01  CONS-JIKAN                  PIC X(09)   VALUE   "840000113".
+      *
       *****************************************************************
       *    逓減検査包括テーブル
       *****************************************************************
@@ -2469,6 +2472,7 @@
       *        時間入力追加
                MOVE    "840000044"         TO  WRK-SRYCD
                IF      WRK-COM-INPUTCD(IDX-Z + 1)  =   WRK-SRYCD
+                                                   OR  CONS-JIKAN
                    CONTINUE
                ELSE
                    MOVE    IDX-Z               TO  IDX-S
@@ -3234,6 +3238,7 @@
       *        時間入力追加
                MOVE    "840000044"         TO  WRK-SRYCD
                IF      WRK-COM-INPUTCD(IDX-JIKAN + 1)  =   WRK-SRYCD
+                                                       OR  CONS-JIKAN
                    CONTINUE
                ELSE
                    MOVE    IDX-JIKAN           TO  IDX-S

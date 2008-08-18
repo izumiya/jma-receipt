@@ -285,6 +285,9 @@
            COPY    "CPK02SPASCR.INC"  REPLACING
                                        //SPA-// BY //HOZ-//.
       *
+      *時間外コメント（日時分）
+       01  CONS-JIKAN                  PIC X(09)   VALUE   "840000114".
+      *
       *   Ｘ線同時併施（診断・撮影）
        01  TBL-DOUJI-HEISI-AREA.
       *    特殊撮影
@@ -2537,6 +2540,7 @@
       *        時間入力追加
                MOVE    "840000071"             TO  WRK-SRYCD
                IF      WRK-COM-INPUTCD(IDX-Z + 1)  =   WRK-SRYCD
+                                                   OR  CONS-JIKAN
                    CONTINUE
                ELSE
                    MOVE    ZERO                TO  FLG-SATU
