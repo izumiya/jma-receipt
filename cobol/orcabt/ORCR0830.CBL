@@ -1187,21 +1187,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF   RECE82-NYUINDAY-KBN(IDY)  =  "1"
       *
-             IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
+      ***    IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                   COMPUTE  RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +
                            LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
                   COMPUTE  RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +  
                            LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
-             ELSE
-                  COMPUTE  RECE82-NYUKHNKEI2  =
-                           RECE82-NYUKHNKEI2  +
-                           LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
-                  COMPUTE  RECE82-NYUKHNKEI2  =
-                           RECE82-NYUKHNKEI2  +
-                           LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
-             END-IF
+      ***    ELSE
+      ***         COMPUTE  RECE82-NYUKHNKEI2  =
+      ***                  RECE82-NYUKHNKEI2  +
+      ***                  LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
+      ***         COMPUTE  RECE82-NYUKHNKEI2  =
+      ***                  RECE82-NYUKHNKEI2  +
+      ***                  LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
+      ***    END-IF
              COMPUTE       RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +
                            LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
