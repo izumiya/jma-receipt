@@ -361,6 +361,7 @@
       *  04.02.19    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.02.20    NACL-ÌçÏÆ    08/07/03  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
       *  04.02.21    NACL-ÌçÏÆ    08/07/23  ´ä¼ê¡¦µÜ¾ëÆâÎ¦ÃÏ¿ÌÂÐ±þ
+      *  04.02.22    NACL-ÌçÏÆ    08/08/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2533,6 +2534,22 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                         END-IF
                     END-PERFORM
                   END-IF
+             END-IF
+      *
+             IF    SYS-1001-PREFNUM  =   27
+               IF  ( RECE02-HKNNUM       NOT = SPACE             )
+               AND ( RECE02-KOHNUM(1)(1:1)   =  "0"              )
+               AND ( RECE02-KOHNUM(1)    NOT =  "012" AND "025"  )
+               AND ( RECE02-KOHNUM(2)(1:1)  >=  "1" AND <= "8"   )
+               AND ( RECE02-KOHNUM(3)        = SPACE             )
+               AND ( RECE02-KOHNUM(4)        = SPACE             )
+      *
+                  MOVE        2           TO   FLG-ZENKOKUKOHI-NISYU
+      *
+                  IF    RECE02-HKNCOMBI(2)   =   ZERO
+                          MOVE    ZERO    TO   FLG-ZENKOKUKOHI-NISYU
+                  END-IF
+               END-IF
              END-IF
       *
            END-IF
@@ -6442,7 +6459,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        IF   RECE02-RJNGENMENKBN  =   "1"
                           MOVE   1      TO   FLG-RJNGENMEN-CHIARI
                        END-IF
-                       MOVE      1      TO   FLG-KEISAN
+                       IF  (FLG-ZENKOKUKOHI-NISYU  =   2  )
+                       AND (SYU-KOH-HKNNUM(1)  NOT = "974")
+                       AND (SYU-KOH-HKNNUM(2)  NOT = "974")
+                       AND (SYU-KOH-HKNNUM(3)  NOT = "974")
+                       AND (SYU-KOH-HKNNUM(4)  NOT = "974")
+                          MOVE      2     TO   FLG-KEISAN
+                       ELSE
+                          MOVE      1     TO   FLG-KEISAN
+                       END-IF
                        PERFORM   2105212-ICHIBUFTN-KOH-HEN1-SEC
                      END-IF
                    END-IF
@@ -6561,20 +6586,37 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105211-ICHIBUFTN-KOH-SET-SEC               SECTION.
       *
-           IF  FLG-KEISAN  =  1
-             IF  FTN-KOH-XX2  >   WRK-KINGAKU
-                  MOVE   WRK-KINGAKU    TO  FTN-KOH-XX2
-             END-IF
-             COMPUTE  FTN-KOH-YY2  =   WRK-KINGAKU -  FTN-KOH-XX2
-             IF  WRK-FTNKEI   >   FTN-KOH-YY2
-                  ADD    FTN-KOH-YY2    TO  RECE02-FTNMONEY(1)
-                                            FTN-KOH-XX2
-                                            WRK-KOH-GAI
-             ELSE
-                  ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
-                                            FTN-KOH-XX2
-                                            WRK-KOH-GAI
-             END-IF
+           IF  FLG-KEISAN   NOT =  ZERO
+             EVALUATE   FLG-KEISAN
+               WHEN         1
+                 IF  FTN-KOH-XX2  >   WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  FTN-KOH-XX2
+                 END-IF
+                 COMPUTE  FTN-KOH-YY2  =   WRK-KINGAKU -  FTN-KOH-XX2
+                 IF  WRK-FTNKEI   >   FTN-KOH-YY2
+                      ADD    FTN-KOH-YY2    TO  RECE02-FTNMONEY(1)
+                                                FTN-KOH-XX2
+                                                WRK-KOH-GAI
+                 ELSE
+                      ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
+                                                FTN-KOH-XX2
+                                                WRK-KOH-GAI
+                 END-IF
+               WHEN         2
+                 IF  FTN-KOH-XX3  >   WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  FTN-KOH-XX3
+                 END-IF
+                 COMPUTE  FTN-KOH-YY3  =   WRK-KINGAKU -  FTN-KOH-XX3
+                 IF  WRK-FTNKEI   >   FTN-KOH-YY3
+                      ADD    FTN-KOH-YY3    TO  RECE02-FTNMONEY(1)
+                                                FTN-KOH-XX3
+                                                WRK-KOH-GAI
+                 ELSE
+                      ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
+                                                FTN-KOH-XX3
+                                                WRK-KOH-GAI
+                 END-IF
+             END-EVALUATE
            ELSE
              EVALUATE   FLG-KEISAN2
                WHEN        ZERO
@@ -7001,11 +7043,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         WRK-TAIHI-FTNMONEY-KOJ(KH-IDX)
               ELSE
       ***       IF     (RECE02-ZAITAKU       =  "1" OR "2")
-                IF     (RECE02-ZAITAKU       =  "1"       )
-                AND    (RECE02-SRYYM        >=  "200610"  )
-                AND    (SYS-1001-PREFNUM     =   33       )
-                AND    (RECE02-KOHNUM(KH-IDX - 1)(1:1)
-                                       >=  "1" AND <=  "8")
+                IF    ((RECE02-ZAITAKU       =  "1"       ) AND
+                       (RECE02-SRYYM        >=  "200610"  ) AND
+                       (SYS-1001-PREFNUM     =   33       ) AND
+                       (RECE02-KOHNUM(KH-IDX - 1)(1:1)
+                                       >=  "1" AND <=  "8"))
+                OR    ((RECE02-ZAITAKU       =  "1"       ) AND
+                       (RECE02-SRYYM        >=  "200804"  ) AND
+                       (SYS-1001-PREFNUM     =   27       ) AND
+                       (RECE02-KOHNUM(KH-IDX - 1)(1:1)
+                                       >=  "1" AND <=  "8"))
                   ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)

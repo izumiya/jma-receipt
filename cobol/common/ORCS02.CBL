@@ -222,6 +222,7 @@
       *  04.02.14    NACL-ÌçÏÆ    08/06/24  ¸å´ü¹âÎð¼Ô¤Î¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *  04.02.15    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.02.16    NACL-ÌçÏÆ    08/07/30  ¹âÎð¼Ô£³³ä£¸£°£±£°£°¡Ü¡÷¤Î·×»»½¤Àµ
+      *  04.02.17    NACL-ÌçÏÆ    08/08/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -15357,6 +15358,13 @@
            PERFORM    23072-KOHHI-HIKAKU-SEC.
            PERFORM    23074-KOHHI-HIKAKU3-SEC.
            PERFORM    23075-KOHHI-HIKAKU4-SEC.                                
+      *
+           IF   LNK-SYU-KOH-COMPFTN(KOH-IDX) = ZERO
+              PERFORM    VARYING   IDX2    FROM   1   BY   1
+                          UNTIL    IDX2     >    31
+                 MOVE   ZERO   TO   LNK-SDAY-SANTEIFLG(IDX2 KOH-IDX)
+              END-PERFORM
+           END-IF.
       *
            MOVE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                                     TO LNK-SYU-KOH-COMPTOTAL(KOH-IDX).
