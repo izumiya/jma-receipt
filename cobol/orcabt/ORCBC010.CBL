@@ -146,7 +146,8 @@
        WORKING-STORAGE             SECTION.
       *
       *01  PRGSKBNO                PIC X(08)  VALUE "20071029".
-       01  PRGSKBNO                PIC X(08)  VALUE "20080428".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20080428".
+       01  PRGSKBNO                PIC X(08)  VALUE "20080826".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
