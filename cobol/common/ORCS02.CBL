@@ -223,6 +223,7 @@
       *  04.02.15    NACL-ÌçÏÆ    08/06/30  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.02.16    NACL-ÌçÏÆ    08/07/30  ¹âÎð¼Ô£³³ä£¸£°£±£°£°¡Ü¡÷¤Î·×»»½¤Àµ
       *  04.02.17    NACL-ÌçÏÆ    08/08/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.18    NACL-ÌçÏÆ    08/08/26  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¥Þ¥ëÄ¹¤Ë´Ø¤¹¤ë½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9475,8 +9476,13 @@
                  MOVE   1     TO  FLG-TAISYO
                END-IF
              ELSE
-               IF  (SYU-KOHTAIYKZKBN =   "9"          )
-               AND (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL)
+               IF ((SYU-KOHTAIYKZKBN =   "9"          ) AND
+                   (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL))
+               OR ((SYU-KOH1HKNNUM   = "972" OR "974" ) AND
+                   (SYU-KOH2HKNNUM   = SPACE          ) AND
+                   (SYU-KOH3HKNNUM   = SPACE          ) AND
+                   (SYU-KOH4HKNNUM   = SPACE          ) AND
+                   (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL))
                  MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
                  COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
                  IF    FLG-IRYOHI70  =  1 OR 2
@@ -9484,6 +9490,9 @@
                              WK-KOUREI-IRYOHI70  +
                             (SYU-HKNTEN (17) * 10)
                  END-IF
+                 COMPUTE     WK-GENBUTU-HKNKIN   =
+                             WK-GENBUTU-HKNKIN   +
+                            (SYU-HKNTEN (17) * 10)
                  MOVE   ZERO  TO  FLG-TAISYO
                ELSE
                  MOVE   ZERO  TO  WK-SYU-SYUCOMPFTN
@@ -19450,33 +19459,30 @@
                AND ( COMB-KOH4HKNNUM   =  SPACE )
                          MOVE    1       TO    FLG-GENBUTU-TAISYOOK
                ELSE
-                 IF ( COMB-KOH1HKNNUM  =  "972" OR "974" )
-                 OR ( COMB-KOH2HKNNUM  =  "972" OR "974" )
-                 OR ( COMB-KOH3HKNNUM  =  "972" OR "974" )
-                 OR ( COMB-KOH4HKNNUM  =  "972" OR "974" )
-                         CONTINUE
-                 ELSE
-                   IF    COMB-KOH1HKNNUM  NOT = SPACE
+                   IF   (COMB-KOH1HKNNUM  NOT = SPACE          )
+                   AND  (COMB-KOH1HKNNUM  NOT = "972" AND "974")
                       IF  WK-GENBUTU-KOH1COMPFTN  NOT = ZERO
                          MOVE    1       TO    FLG-GENBUTU-TAISYOOK
                       END-IF
                    END-IF
-                   IF    COMB-KOH2HKNNUM  NOT = SPACE
+                   IF   (COMB-KOH2HKNNUM  NOT = SPACE          )
+                   AND  (COMB-KOH2HKNNUM  NOT = "972" AND "974")
                       IF  WK-GENBUTU-KOH2COMPFTN  NOT = ZERO
                          MOVE    1       TO    FLG-GENBUTU-TAISYOOK
                       END-IF
                    END-IF
-                   IF    COMB-KOH3HKNNUM  NOT = SPACE
+                   IF   (COMB-KOH3HKNNUM  NOT = SPACE          )
+                   AND  (COMB-KOH3HKNNUM  NOT = "972" AND "974")
                       IF  WK-GENBUTU-KOH3COMPFTN  NOT = ZERO
                          MOVE    1       TO    FLG-GENBUTU-TAISYOOK
                       END-IF
                    END-IF
-                   IF    COMB-KOH4HKNNUM  NOT = SPACE
+                   IF   (COMB-KOH4HKNNUM  NOT = SPACE          )
+                   AND  (COMB-KOH4HKNNUM  NOT = "972" AND "974")
                       IF  WK-GENBUTU-KOH4COMPFTN  NOT = ZERO
                          MOVE    1       TO    FLG-GENBUTU-TAISYOOK
                       END-IF
                    END-IF
-                 END-IF
                END-IF
       *
                IF   FLG-GENBUTU-TAISYOOK  =  1

@@ -362,6 +362,7 @@
       *  04.02.20    NACL-ÌçÏÆ    08/07/03  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
       *  04.02.21    NACL-ÌçÏÆ    08/07/23  ´ä¼ê¡¦µÜ¾ëÆâÎ¦ÃÏ¿ÌÂÐ±þ
       *  04.02.22    NACL-ÌçÏÆ    08/08/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.23    NACL-ÌçÏÆ    08/08/26  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¥Þ¥ëÄ¹¤Ë´Ø¤¹¤ë½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7419,9 +7420,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      MOVE  35400                TO  WRK-CHK-KINGAKU2
                    END-IF
-                 WHEN       ANY         ALSO     2
+                 WHEN       ZERO        ALSO     2
                    MOVE    10000                TO  WRK-CHK-KINGAKU2
-                 WHEN       ANY         ALSO     3
+                 WHEN       1           ALSO     2
+                   MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
+                   MOVE    10000                TO  WRK-CHK-KINGAKU2
+                 WHEN       ZERO        ALSO     3
+                   MOVE    20000                TO  WRK-CHK-KINGAKU2
+                 WHEN       1           ALSO     3
+                   MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                    MOVE    20000                TO  WRK-CHK-KINGAKU2
                  WHEN       ZERO        ALSO     4
                    MOVE    WRK-KINGAKU-GENBUTU  TO  WRK-CHK-KINGAKU2
