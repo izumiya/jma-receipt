@@ -102,6 +102,7 @@
       *  04.02.04    NACL-門脇    08/05/29  入院料加算保険組み合わせチェック
       *  04.02.05    NACL-門脇    08/06/15  入院料加算外泊チェック
       *  03.02.06    NACL-門脇    08/07/28  計算優先順位編集修正（長期）
+      *  03.02.07    NACL-門脇    08/08/27  入院料加算外泊チェック修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -266,8 +267,6 @@
       * 外泊退避用テーブル     
        01  TABLE-GAIHAKU.
            03  TBL-GAIHAKU                 PIC 9(01)   OCCURS  31.
-       01  TABLE-GAIHAKU2.
-           03  TBL-GAIHAKU2                PIC 9(01)   OCCURS  31.
       *
       * 未実施減算退避用テーブル     
        01  TABLE-GENSAN.
@@ -567,7 +566,6 @@
       *
            PERFORM       SYUNOU-SET-SEC.
       *
-           INITIALIZE    TABLE-GAIHAKU2.
       *    入院会計から収納エリアへのセット
            PERFORM    VARYING   IDX    FROM   1   BY   1
                       UNTIL  (IDX            >    10)
@@ -1699,38 +1697,7 @@
       *
            PERFORM      SYSKANRI-TAXKBN-GET-SEC
       *
-      *外泊情報の取得
-           MOVE    ZERO                TO  FLG-NYUINACCT
-           INITIALIZE                      NYUINACCT-REC
-           MOVE    SYU-HOSPNUM         TO  NACCT-HOSPNUM
-           MOVE    SYU-PTID            TO  NACCT-PTID
-           MOVE    SYU-SRYYMD (1:6)    TO  NACCT-SRYYM
-           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
-           MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key26"             TO  MCP-PATHNAME
-grpsys     CALL "ORCDBMAIN" USING MCPAREA
-                                  MCPDATA-REC
-grpsys                            SPA-AREA
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-               MOVE    "key26"         TO  MCP-PATHNAME
-               PERFORM  NYUINACCT-READ-SEC
-           ELSE
-               MOVE    1               TO  FLG-NYUINACCT
-           END-IF
-      *
-           MOVE     ZERO               TO  FLG-GAIHAKU-SET
-           INITIALIZE                      TABLE-GAIHAKU
-           MOVE     ZERO               TO  WRK-GAIHAKU-COUNT
-      *
-           PERFORM      GAIHAKU-SET-SEC
-               UNTIL   (FLG-NYUINACCT   =       1      )   OR
-                       (FLG-GAIHAKU-SET =       1      )
-      *
-           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key26"             TO  MCP-PATHNAME
-           PERFORM   CSR-CLOSE-SEC
+           PERFORM      GAIHAKU-HENSYU-SEC
       *
       *選定療養情報の取得
            MOVE     ZERO               TO  FLG-SENTEI-SET
@@ -1949,9 +1916,10 @@ grpsys                              SPA-AREA
       *
            PERFORM      SYSKANRI-TAXKBN-GET-SEC
       *
+           PERFORM      GAIHAKU-HENSYU-SEC
+      *
       *    入院労災会計作成サブより入院料・外泊を取得
       *
-           INITIALIZE   TABLE-GAIHAKU
            PERFORM      ROSAI-JIBAI-NYUINRYO-SEC
       *
       *入院料関係の取得
@@ -2033,19 +2001,59 @@ grpsys                            SPA-AREA
        SYSKANRI-TAXKBN-GET-EXT.
            EXIT.
       *
+      ******************************************************************
+      *    外泊編集処理
+      ******************************************************************
+       GAIHAKU-HENSYU-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-NYUINACCT
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SYU-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SYU-PTID            TO  NACCT-PTID
+           MOVE    SYU-SRYYMD (1:6)    TO  NACCT-SRYYM
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key26"             TO  MCP-PATHNAME
+           CALL "ORCDBMAIN" USING MCPAREA
+                                  MCPDATA-REC
+                                  SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+               MOVE    "key26"         TO  MCP-PATHNAME
+               PERFORM  NYUINACCT-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-NYUINACCT
+           END-IF
+      *
+           MOVE     ZERO               TO  FLG-GAIHAKU-SET
+           INITIALIZE                      TABLE-GAIHAKU
+           MOVE     ZERO               TO  WRK-GAIHAKU-COUNT
+      *
+           PERFORM      GAIHAKU-SET-SEC
+               UNTIL   (FLG-NYUINACCT   =       1      )   OR
+                       (FLG-GAIHAKU-SET =       1      )
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key26"             TO  MCP-PATHNAME
+           PERFORM   CSR-CLOSE-SEC
+      *
+           .
+      *
+       GAIHAKU-HENSYU-EXT.
+           EXIT.
+      *
       **************************************************************
       *    外泊情報の取込み
       **************************************************************
        GAIHAKU-SET-SEC           SECTION.
       *
            IF  NACCT-SRYYM      =   SYU-SRYYMD(1:6)
-      *    外泊情報のテーブルセット
                PERFORM   VARYING  SYU-IDX  FROM  1  BY  1
                          UNTIL    SYU-IDX  >   31
                    IF   NACCT-DAY(SYU-IDX) NOT =  ZERO
                        MOVE   NACCT-DAY(SYU-IDX)
                                   TO  TBL-GAIHAKU (SYU-IDX)
-                                      TBL-GAIHAKU2(SYU-IDX)
                        IF  SYU-DAY(SYU-IDX)    =  "1"
                        AND WRK-DOJITU-FLG(IDX SYU-IDX)
                                                =  ZERO
@@ -2651,10 +2659,6 @@ grpsys                              SPA-AREA
                                                  TO  SYU-HKNTEN(15)
                      ADD   LNK-SROUNYUIN-ZAITEN-ACCTETC(SYU-IDX)
                                                  TO  SYU-HKNTEN(15)
-      *
-                     MOVE  LNK-SROUNYUIN-GAIHAKU(SYU-IDX)
-                                          TO   TBL-GAIHAKU(SYU-IDX)
-                                               TBL-GAIHAKU2(SYU-IDX)
       *
                 END-IF
       *
@@ -3505,6 +3509,8 @@ grpsys                            SPA-AREA
            MOVE    LNK-SYUNOU-REC(IDX) TO  SYUNOU-REC
            MOVE    LNK-SYUDAY-REC(IDX) TO  SYUDAY-REC                  
       *
+           PERFORM      GAIHAKU-HENSYU-SEC
+      *
       *    システム管理４００１から自賠責固定帯加算等取扱を読み込む
            MOVE    SPACE     TO    WRK-4001-KOTEIKBN
            IF   SYU-SYUHKNNUM    =    "973"
@@ -3763,7 +3769,7 @@ grpsys                                        SPA-AREA
                       (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
                  AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
                  AND ( SYU-HKNCOMBINUM       =   ACCT-HKNCOMBI )
-                 AND ( TBL-GAIHAKU2(SYU-IDX) =   ZERO   OR   4 )
+                 AND ( TBL-GAIHAKU(SYU-IDX)  =   ZERO   OR   4 )
                  AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
                      ADD   ACCT-DAY(1 SYU-IDX)
                                       TO   SINRYO-COUNT
@@ -3778,7 +3784,7 @@ grpsys                                        SPA-AREA
                  AND (WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO)
                    IF  (SYU-DAY(SYU-IDX)                =   "1")
                    OR  (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1")
-                     IF  TBL-GAIHAKU2(SYU-IDX) =  ZERO OR 4
+                     IF  TBL-GAIHAKU(SYU-IDX)  =  ZERO OR 4
                        CONTINUE
                      ELSE
                        IF  ACCT-ZAITEN  NOT = ZERO
