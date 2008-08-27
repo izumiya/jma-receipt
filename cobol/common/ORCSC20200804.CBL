@@ -3218,6 +3218,7 @@
                END-EVALUATE
              END-IF
            END-PERFORM
+           MOVE    ZERO                TO  FLG-ALL
            IF      FLG-ERR             =   1
                GO      TO      3002-KASAN-SYORI-EXT
            END-IF
