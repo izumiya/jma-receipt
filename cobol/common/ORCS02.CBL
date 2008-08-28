@@ -224,6 +224,7 @@
       *  04.02.16    NACL-ÌçÏÆ    08/07/30  ¹âÎð¼Ô£³³ä£¸£°£±£°£°¡Ü¡÷¤Î·×»»½¤Àµ
       *  04.02.17    NACL-ÌçÏÆ    08/08/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.02.18    NACL-ÌçÏÆ    08/08/26  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¥Þ¥ëÄ¹¤Ë´Ø¤¹¤ë½¤Àµ
+      *  04.02.19    NACL-ÌçÏÆ    08/08/28  º´²ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -7345,21 +7346,21 @@
            MOVE    "tbl_hkncombi"       TO       MCP-TABLE.
            MOVE    "key"                TO       MCP-PATHNAME.
            PERFORM  DB-CLOSE-SEC.
-           IF     (FLG-GENBUTU70         NOT =  ZERO)
-           OR     (FLG-KOHININBARAI          =   1  )
-           OR     (LNK-S02-KOUREI-NYUIN-KBN  =  "1" )
-             MOVE   SPACE              TO    WK-HKNJANUM2-TBL
-             INITIALIZE                      PTHKNINF-REC
-             MOVE   WRK-COMB-HOSPNUM   TO    PTHKN-HOSPNUM
-             MOVE   WRK-COMB-PTID      TO    PTHKN-PTID
-             MOVE   WRK-COMB-HKNID     TO    PTHKN-HKNID
-             MOVE   PTHKNINF-REC       TO    MCPDATA-REC
-             MOVE   "DBSELECT"         TO    MCP-FUNC
-             MOVE   "tbl_pthkninf"     TO    MCP-TABLE
-             MOVE   "key"              TO    MCP-PATHNAME
+      ***  IF     (FLG-GENBUTU70         NOT =  ZERO)
+      ***  OR     (FLG-KOHININBARAI          =   1  )
+      ***  OR     (LNK-S02-KOUREI-NYUIN-KBN  =  "1" )
+             MOVE   SPACE              TO    WK-HKNJANUM2-TBL.
+             INITIALIZE                      PTHKNINF-REC.
+             MOVE   WRK-COMB-HOSPNUM   TO    PTHKN-HOSPNUM.
+             MOVE   WRK-COMB-PTID      TO    PTHKN-PTID.
+             MOVE   WRK-COMB-HKNID     TO    PTHKN-HKNID.
+             MOVE   PTHKNINF-REC       TO    MCPDATA-REC.
+             MOVE   "DBSELECT"         TO    MCP-FUNC.
+             MOVE   "tbl_pthkninf"     TO    MCP-TABLE.
+             MOVE   "key"              TO    MCP-PATHNAME.
              CALL   "ORCDBMAIN"        USING MCPAREA
                                              MCPDATA-REC
-                                             SPA-AREA
+                                             SPA-AREA.
              IF      MCP-RC            =     ZERO
                  MOVE    "tbl_pthkninf"     TO    MCP-TABLE
                  MOVE    "key"              TO    MCP-PATHNAME
@@ -7370,11 +7371,11 @@
                     MOVE  PTHKN-KIGO        TO    WK-KIGO2
                     MOVE  PTHKN-NUM         TO    WK-NUM2
                  END-IF
-             END-IF
-             MOVE     "tbl_pthkninf"   TO    MCP-TABLE
-             MOVE     "key"            TO    MCP-PATHNAME
-             PERFORM   DB-CLOSE-SEC
-           END-IF.
+             END-IF.
+             MOVE     "tbl_pthkninf"   TO    MCP-TABLE.
+             MOVE     "key"            TO    MCP-PATHNAME.
+             PERFORM   DB-CLOSE-SEC.
+      ***  END-IF.
       *
       *    ÆÃÄê¼À´µ
            IF    LNK-SYU-SRYYMD(1:6)         >= "200310"
@@ -7418,6 +7419,43 @@
                 END-IF
               END-IF
       *
+           END-IF.
+      *
+      *    º´²ì¸©ÆýÍÄ»ù
+           IF    (WK-1001-PREFNUM       =   41         )
+           AND   (WK-HKNJANUM2      NOT =   WK-HKNJANUM)
+              IF     SYU-KOH1HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH3ID
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH4ID
+                END-IF
+              END-IF
            END-IF.
       *
       *    ¼«Î©»Ù±ç¡ÊÀº¿ÀÄÌ±¡¡¢¹¹À¸¡¢°éÀ®¡Ë
