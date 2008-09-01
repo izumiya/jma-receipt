@@ -226,6 +226,7 @@
       *  04.02.18    NACL-ÌçÏÆ    08/08/26  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¥Þ¥ëÄ¹¤Ë´Ø¤¹¤ë½¤Àµ
       *  04.02.19    NACL-ÌçÏÆ    08/08/28  º´²ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       *  04.02.20    NACL-ÌçÏÆ    08/09/01  £µ£±¡ÜÄã½êÆÀÂÐ±þ½¤Àµ
+      *  04.02.21    NACL-ÌçÏÆ    08/09/01  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -7450,6 +7451,42 @@
                 END-IF
               END-IF
               IF     SYU-KOH4HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH4ID
+                END-IF
+              END-IF
+           END-IF.
+      *    ÆÁÅç¸©ÆýÍÄ»ù
+           IF    (WK-1001-PREFNUM       =   36         )
+           AND   (WK-HKNJANUM2      NOT =   WK-HKNJANUM)
+              IF     SYU-KOH1HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH3ID
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM  =  "245" OR "445"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
                 OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
                 OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
