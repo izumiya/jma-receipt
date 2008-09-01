@@ -225,6 +225,7 @@
       *  04.02.17    NACL-ÌçÏÆ    08/08/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.02.18    NACL-ÌçÏÆ    08/08/26  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¥Þ¥ëÄ¹¤Ë´Ø¤¹¤ë½¤Àµ
       *  04.02.19    NACL-ÌçÏÆ    08/08/28  º´²ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
+      *  04.02.20    NACL-ÌçÏÆ    08/09/01  £µ£±¡ÜÄã½êÆÀÂÐ±þ½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4359,16 +4360,16 @@
                         IF  (COMB-KOH2HKNNUM(1:1) = "0")
                         OR  (COMB-KOH3HKNNUM(1:1) = "0")
                         OR  (COMB-KOH4HKNNUM(1:1) = "0")
-                           CONTINUE
-      **>                  IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
+      *****                CONTINUE
+                           IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
       *****                  IF   MAX-KIN-KOHI1-M   >  44400
-      **>                      MOVE   44400   TO   MAX-KIN-KOHI1-M
+                               MOVE   44400   TO   MAX-KIN-KOHI1-M
       *****                  END-IF
-      **>                  ELSE
+                           ELSE
       *****                  IF   MAX-KIN-KOHI1-M   >  40200
-      **>                      MOVE   40200   TO   MAX-KIN-KOHI1-M
+                               MOVE   40200   TO   MAX-KIN-KOHI1-M
       *****                  END-IF
-      **>                  END-IF
+                           END-IF
                         END-IF
                       END-IF
                      END-IF
@@ -4444,16 +4445,16 @@
                         OR  (COMB-KOH2HKNNUM(1:1) = "0")
                         OR  (COMB-KOH3HKNNUM(1:1) = "0")
                         OR  (COMB-KOH4HKNNUM(1:1) = "0")
-                           CONTINUE
-      **>                  IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
+      *****                CONTINUE
+                           IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
       *****                  IF   MAX-KIN-SYU-M   >  44400
-      **>                      MOVE   44400   TO   MAX-KIN-SYU-M
+                               MOVE   44400   TO   MAX-KIN-SYU-M
       *****                  END-IF
-      **>                  ELSE
+                           ELSE
       *****                  IF   MAX-KIN-SYU-M   >  40200
-      **>                      MOVE   40200   TO   MAX-KIN-SYU-M
+                               MOVE   40200   TO   MAX-KIN-SYU-M
       *****                  END-IF
-      **>                  END-IF
+                           END-IF
                         END-IF
                       END-IF
                      END-IF
