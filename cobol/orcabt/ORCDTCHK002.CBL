@@ -778,9 +778,10 @@
                05  TNYUKSN-HKNCOMBI                PIC 9(04).
                05  TNYUKSN-HKNCOMBI-DAY            PIC 9(01)
                                                    OCCURS  31.
-               05  TNYUKSN-ERR-CNT                 PIC 9(02).
-               05  TNYUKSN-ERR-DAY-G.
-                   07  TNYUKSN-ERR-DAY             PIC 9(01)
+               05  TNYUKSN-ERR-OCC                 OCCURS  3.
+                   07  TNYUKSN-ERR-CNT             PIC 9(02).
+                   07  TNYUKSN-ERR-DAY-G.
+                       09  TNYUKSN-ERR-DAY         PIC 9(01)
                                                    OCCURS  31.
       *
        01  SRH-AREA.
@@ -8144,21 +8145,31 @@
                        END-PERFORM
       *
                        IF    ( IDX0    >   TKHNRYO-HKNCOMBI-MAX )
-                               COMPUTE TNYUKSN-ERR-CNT (IDX23)
-                                   =   TNYUKSN-ERR-CNT (IDX23)
+                               COMPUTE TNYUKSN-ERR-CNT (IDX23 1)
+                                   =   TNYUKSN-ERR-CNT (IDX23 1)
                                    +   1
       *
                                MOVE    1   TO  TNYUKSN-ERR-DAY
-                                                       (IDX23 IDX22)
+                                                       (IDX23 1 IDX22)
                        ELSE
                            IF    ( TKHNRYO-HKNCOMBI-DAY (IDX0 IDX22)
                                            =   ZERO )
-                               COMPUTE TNYUKSN-ERR-CNT (IDX23)
-                                   =   TNYUKSN-ERR-CNT (IDX23)
-                                   +   1
+                               IF    ( TNACCT-GAIHAKU-DAY (IDX22)
+                                                       =   ZERO )
+                                   COMPUTE TNYUKSN-ERR-CNT (IDX23 2)
+                                       =   TNYUKSN-ERR-CNT (IDX23 2)
+                                       +   1
       *
-                               MOVE    1   TO  TNYUKSN-ERR-DAY
-                                                       (IDX23 IDX22)
+                                   MOVE    1   TO  TNYUKSN-ERR-DAY
+                                                       (IDX23 2 IDX22)
+                               ELSE
+                                   COMPUTE TNYUKSN-ERR-CNT (IDX23 3)
+                                       =   TNYUKSN-ERR-CNT (IDX23 3)
+                                       +   1
+      *
+                                   MOVE    1   TO  TNYUKSN-ERR-DAY
+                                                       (IDX23 3 IDX22)
+                               END-IF
                            END-IF
                        END-IF
       *
@@ -8170,29 +8181,40 @@
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   TNYUKSN-MAX )
       *
-               IF    ( TNYUKSN-ERR-CNT (IDX0) >   ZERO )
+              PERFORM VARYING IDX22   FROM    1   BY  1
+                      UNTIL ( IDX22   >   3 )
       *
-                   MOVE    TNYUKSN-HKNCOMBI (IDX0)
+                   IF    ( TNYUKSN-ERR-CNT (IDX0 IDX22) >   ZERO )
+      *
+                       MOVE    TNYUKSN-HKNCOMBI (IDX0)
                                        TO  WRK-HKNCOMBI
-                   PERFORM 220-HKNCOMBI-GET-SEC
+                       PERFORM 220-HKNCOMBI-GET-SEC
       *
-                   INITIALIZE  WRK-NISSU-AREA
-                   MOVE    TNYUKSN-ERR-DAY-G (IDX0)
+                       INITIALIZE  WRK-NISSU-AREA
+                       MOVE    TNYUKSN-ERR-DAY-G (IDX0 IDX22)
                                        TO  WRK-NISSU-DAY-G
-                   PERFORM 200111-NISSU-HEN-SEC
+                       PERFORM 200111-NISSU-HEN-SEC
       *
-                   MOVE    SPACE       TO  WRK-ERRMES-PLUS
+                       MOVE    SPACE       TO  WRK-ERRMES-PLUS
       *
-                   STRING  WRK-HKNCOMBIMEI
-                                           DELIMITED   BY  SPACE
-                           WRK-NISSU-MES   DELIMITED   BY  SPACE
-                   INTO    WRK-ERRMES-PLUS
-                   END-STRING
+                       STRING  WRK-HKNCOMBIMEI DELIMITED   BY  SPACE
+                               WRK-NISSU-MES   DELIMITED   BY  SPACE
+                       INTO    WRK-ERRMES-PLUS
+                       END-STRING
       *
-                   MOVE    "990002"    TO  WRK-ERRCD
-                   PERFORM 215-ERRMES-HEN-SEC
+                       EVALUATE    IDX22
+                       WHEN    2
+                           MOVE    "990007"    TO  WRK-ERRCD
+                       WHEN    3
+                           MOVE    "990008"    TO  WRK-ERRCD
+                       WHEN    OTHER
+                           MOVE    "990002"    TO  WRK-ERRCD
+                       END-EVALUATE
       *
-               END-IF
+                       PERFORM 215-ERRMES-HEN-SEC
+                   END-IF
+      *
+               END-PERFORM
       *
            END-PERFORM
       *
