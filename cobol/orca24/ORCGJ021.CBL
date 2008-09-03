@@ -1190,6 +1190,11 @@
                                                                  (4:)
                END-IF
       *
+      *        後期高齢者を選択している場合、老人
+               IF      COMB-HKNNUM         =   "039"
+                                           OR  "040"
+                   MOVE    1               TO  FLG-MAE-ROUJIN
+               END-IF
       *        老人判定
                IF    ((COMB-KOH1HKNNUM     =   "027"  )  OR
                       (COMB-KOH2HKNNUM     =   "027"  )  OR
