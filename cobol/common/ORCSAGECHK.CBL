@@ -1385,9 +1385,13 @@
            END-IF
            PERFORM UNTIL      (FLG-PTHKNINF    =   1   )
                          OR   (AGECHK-ROUJIN2  =   1   )
-               IF      PTHKN-HKNNUM        =   "039"
-                                           OR  "040"
-                   MOVE    1               TO  AGECHK-ROUJIN2
+               IF      PTHKN-SAKJOKBN      =   "1"
+                   CONTINUE
+               ELSE
+                   IF      PTHKN-HKNNUM        =   "039"
+                                               OR  "040"
+                       MOVE    1               TO  AGECHK-ROUJIN2
+                   END-IF
                END-IF
                MOVE    "tbl_pthkninf"      TO  MCP-TABLE
                MOVE    "key8"              TO  MCP-PATHNAME
