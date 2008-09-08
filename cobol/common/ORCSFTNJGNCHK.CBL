@@ -47,6 +47,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/04/24  ºë¶Ì¸©»ÖÌÚ»ÔÃÏÊý¸øÈñÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/07/02  ÂçºåÉÜ£´£±Ï·¿Í¡Ü£±£¸£¸ÅùÂÐ±þ
       *  04.02.04    NACL-ÌçÏÆ    08/08/07  Àº¿ÀÄÌ±¡¤ÎÀÁµáÅÀÈ½ÄêÄÉ²Ã
+      *  04.02.05    NACL-ÌçÏÆ    08/09/04  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -747,11 +748,17 @@
                        PERFORM  910-SYUNOU-READ-SEC
                    END-PERFORM
       *
-                   IF  (WRK-PREFNUM              =  27           )
-                   AND (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241")
-                   AND (LNK-FTNJGNCHK-SRYYM     >= "200804"      )
+                   IF  ((WRK-PREFNUM              =  27           ) AND
+                        (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241") AND
+                        (LNK-FTNJGNCHK-SRYYM     >= "200804"      ))
+                   OR  ((WRK-PREFNUM              =  40           ) AND
+                        (LNK-FTNJGNCHK-KOHNUM(1:1)
+                                               >=  "1" AND <=  "8") AND
+                        (LNK-FTNJGNCHK-NYUGAIKBN  = "1"           ) AND
+                        (LNK-FTNJGNCHK-SRYYM     >= "200810"      ))
                       MOVE   9999999999     TO  WRK-KOHFTN
                    END-IF
+      *
                    IF  (WRK-PREFNUM              =  42     )
                    AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
                    AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )

@@ -227,6 +227,7 @@
       *  04.02.19    NACL-ÌçÏÆ    08/08/28  º´²ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       *  04.02.20    NACL-ÌçÏÆ    08/09/01  £µ£±¡ÜÄã½êÆÀÂÐ±þ½¤Àµ
       *  04.02.21    NACL-ÌçÏÆ    08/09/01  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
+      *  04.02.22    NACL-ÌçÏÆ    08/09/04  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -15129,6 +15130,13 @@
                       "163" OR "263" OR "165" OR "265" OR
                       "190" OR "290" OR
                       "164" OR "264" OR "364" OR "464" OR "564"
+                 MOVE         1      TO      FLG-HIKOTEI
+              END-IF
+           END-IF.
+           IF      WK-1001-PREFNUM       =   40
+              IF  (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)
+                                               >=  "1" AND <=  "8")
+              AND (LNK-SYU-SRYYMD(1:6)         >=  "200810"       )
                  MOVE         1      TO      FLG-HIKOTEI
               END-IF
            END-IF.
