@@ -504,7 +504,8 @@
       *
            MOVE    YAKUJYO-REC     TO  WKYAKUJYO-REC
            MOVE    CHG-RJNSRYCD    TO  WKYAKUJYO-SRYCD
-           MOVE    SPACE           TO  WKYAKUJYO-TERMID
+           MOVE    SPACE           TO  WKYAKUJYO-NAME
+                                       WKYAKUJYO-TERMID
                                        WKYAKUJYO-OPID
            MOVE    SMCNDATE-YMD    TO  WKYAKUJYO-CREYMD
                                        WKYAKUJYO-UPYMD
@@ -735,7 +736,6 @@
            CALL    "ORCSPRT"           USING
                                        ORCSPRTAREA
 grpsys                                 SPA-AREA
-           DISPLAY "[" HCMSL55 "]"
            IF    ( SPRT-RETURN     =   ZERO )
                CONTINUE
            ELSE
