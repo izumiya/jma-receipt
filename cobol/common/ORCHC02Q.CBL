@@ -2868,7 +2868,8 @@
                MOVE    TNS-NAME        TO  ORCSQRCSV-TNS-NAME
                                                   (IDX-QR1 IDX-QR2)
            ELSE
-               IF      WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"
+               IF     (WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"   )
+                 AND  (TNSP-IPN-KISAIKBN           =   ZERO  )
                    CONTINUE
                ELSE
                    MOVE    WRK-TNS-NAME    TO  ORCSQRCSV-TNS-NAME
