@@ -365,6 +365,7 @@
       *  04.02.23    NACL-門脇    08/08/26  ７０歳未満現物給付マル長に関する修正
       *  04.02.24    NACL-門脇    08/09/08  兵庫県地方公費対応
       *  04.02.25    NACL-門脇    08/09/09  建設連合組合＋精神、結核対応
+      *  04.02.26    NACL-門脇    08/09/10  広島県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8798,6 +8799,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE02-KOHNUM(KOHFTN-IDX) =  "174"))
                OR ((SYS-1001-PREFNUM          =   12  ) AND
                    (RECE02-KOHNUM(KOHFTN-IDX) =  "183"))
+               OR ((SYS-1001-PREFNUM          =   34  ) AND
+                   (RECE02-KOHNUM(KOHFTN-IDX) =  "391"
+                                              OR "392"))
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                END-IF
