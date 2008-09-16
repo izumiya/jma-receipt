@@ -32,7 +32,8 @@
       * 01.00.02     NACL-多々納  04/10/20  変更期間追加
       * 01.00.03     NACL-多々納  05/04/20  診療会計附加情報追加
       * 01.00.04     NACL-多々納  05/11/29  MONFUNC 対応
-      *  03.05.00    NACL-多々納  07/05/XX  グループ診療対応
+      * 03.05.00     NACL-多々納  07/05/XX  グループ診療対応
+      * 04.02.00     NACL-多々納  08/03/XX  Ｈ２０年４月改正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -524,6 +525,15 @@
                        MOVE    1               TO  SPA-NAI-TROUJIN
                                                       (SPA-J021-MAX)
                    END-IF
+      *            後期該当判定
+                   IF    ((COMB-KOH1HKNNUM     =   "698"  )  OR
+                          (COMB-KOH2HKNNUM     =   "698"  )  OR
+                          (COMB-KOH3HKNNUM     =   "698"  )  OR
+                          (COMB-KOH4HKNNUM     =   "698"  ) )  OR
+                         ( SPA-J02-ROUJIN      =   1        )
+                       MOVE    1               TO  SPA-NAI-TROUJIN
+                                                      (SPA-J021-MAX)
+                   END-IF
       *
       *            保険算定年齢チェック等
                    INITIALIZE                  ORCSAGECHKAREA
@@ -638,6 +648,7 @@
                       OR  (SPA-J021-ROUJIN =   1  )
       *        老人公費
                IF      PTKOH-KOHNUM        =   "027"
+                                           OR  "968"
                    IF      (SPA-NAI-SRYYM  >=  PTKOH-TEKSTYMD(1:6)) AND
                            (SPA-NAI-SRYYM  <=  PTKOH-TEKEDYMD(1:6))
                        MOVE    1               TO  SPA-J021-KOHCHK
@@ -916,6 +927,11 @@
       *    画面項目→ＳＰＡ編集処理
       *****************************************************************
        2002-GMNSPA-SET-SEC               SECTION.
+      *
+           IF     (J021-MAE-HKNCOMBI   NOT =   SPA-J021-MAE-HKNCOMBI)
+              OR  (J021-ATO-HKNCOMBI   NOT =   SPA-J021-ATO-HKNCOMBI)
+               MOVE    ZERO            TO  SPA-J021-KEIFLG
+           END-IF
       *
            IF      J021-MAE-HKNCOMBI   =   SPA-J021-MAE-HKNCOMBI
                MOVE    ZERO            TO  FLG-MAE-HEN
@@ -1413,7 +1429,6 @@
                MOVE    "0003"              TO  SPA-ERRCD
            END-IF
       *
-      *
            IF      SPA-ERRCD           =   SPACE
                IF      FLG-MAE-ROUJIN      =   FLG-ATO-ROUJIN
       *            どちらかがが生保単独ので場合
@@ -1425,6 +1440,15 @@
                    END-IF
                ELSE
                    MOVE    "0004"              TO  SPA-ERRCD
+               END-IF
+      *        Ｈ２０．４から変更可能として、警告表示とする
+               IF      (SPA-NAI-SRYYM      >   "200804" )   AND
+                       (SPA-ERRCD      NOT =   SPACE    )
+                   MOVE    SPACE               TO  SPA-ERRCD
+                   IF      SPA-J021-KEIFLG     =   ZERO
+                       MOVE    "K999"              TO  SPA-ERRCD
+                       MOVE    1                   TO  SPA-J021-KEIFLG
+                   END-IF
                END-IF
            END-IF
       *
@@ -3399,6 +3423,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-ERRMSG
                    MOVE    "変更できません。"
                                        TO  SPA-ERRMSG(43:)
+               WHEN    "K999"
+                   STRING  "警告！！"
+                           "変更前と後の一般・老人判定が違います。"
+                           "変更後、診療内容を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
       *
            MOVE    SPACE               TO  JERR
