@@ -42,6 +42,7 @@
       *  03.05.00    NACL-太田    07.05.17  グループ診療対応
       *  04.01.00    NACL-太田    07/10/22  公務災害対応
       *  04.02.00    NACL-太田    08/03/07  改正対応
+      *  04.03.00    NACL-太田    08/09/17  改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -201,6 +202,7 @@
        01  CONST-AREA.
            03  CONST-H190401       PIC X(08)   VALUE   "20070401".
            03  CONST-H200401       PIC X(08)   VALUE   "20080401".
+           03  CONST-H201001       PIC X(08)   VALUE   "20081001".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1082,6 +1084,11 @@
             AND  ( PTRSI-HKNKBN        =    "5" )
                MOVE    PTHKN-KIGO      TO  WRK-HKNCOMBI
            ELSE
+      *
+               IF    ( SYU-SRYYMD      >=      CONST-H201001 )
+                AND  ( COMB-HKNNUM      =      "001" )
+                   MOVE    "協会"      TO  COMB-SYU-TANSEIDONAME
+               END-IF
       *
                STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
                        "　"                    DELIMITED  BY  SIZE

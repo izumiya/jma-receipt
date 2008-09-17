@@ -35,6 +35,7 @@
       *  04.01.00    NACL-Â¿¡¹Ç¼  07/10/23  ¸øÌ³ºÒ³²ÂÐ±þ
       *  04.01.00    NACL-Â¿¡¹Ç¼  07/11/22  ´ïºà¾¦ÉÊÌ¾¥³¡¼¥ÉÂÐ±þ
       *  04.02.00    NACL-Â¿¡¹Ç¼  08/03/06  £È£²£°Ç¯£´·î²þÀµÂÐ±þ
+      *  04.03.00    NACL-ÂÀÅÄ    08/09/17  ²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -213,6 +214,7 @@
                    07  TBL-H-KINGAKU         PIC X(11).
       *Ä¢É¼ÌÀºÙ¿ô
        01  LINE-MAX                    PIC 9(03)   VALUE   70.
+       01  CONST-H201001               PIC X(08)   VALUE   "20081001".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -1160,6 +1162,11 @@
        40012-HKNCOMBIMEI-HEN-SEC             SECTION.
       *
            MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+      *
+           IF    ( SYU-SRYYMD      >=      CONST-H201001 )
+            AND  ( COMB-HKNNUM      =      "001" )
+               MOVE    "¶¨²ñ"      TO      COMB-SYU-TANSEIDONAME
+           END-IF
       *
            STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
                    "¡¡"                    DELIMITED  BY  SIZE

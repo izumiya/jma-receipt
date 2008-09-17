@@ -27,6 +27,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-太田    07/05/21  グループ診療対応
+      *  04.03.00    NACL-太田    08/09/17  改正対応
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -121,6 +122,7 @@
                                        OCCURS  31.
       *
        01  CONST-AREA.
+           03  CONST-H201001           PIC X(08)   VALUE   "20081001".
            03  CONST-SRT-MAX           PIC 9(05)   VALUE   1000.
            03  CONST-SRT-TMP           PIC 9(05)   VALUE   1001.
            03  CONST-SRT-KBT-HKNCOMBI-MAX  PIC 9(03)   VALUE   50.
@@ -906,6 +908,13 @@
             AND  ( PTRSI-HKNKBN        =    "5" )
                MOVE    PTHKN-KIGO      TO  WRK-HKNCOMBIMEI
            ELSE
+      *
+               IF    ( SYUPARA03-STSRYYMD
+                                       >=      CONST-H201001 )
+                AND  ( COMB-HKNNUM      =      "001" )
+                   MOVE    "協会"      TO      COMB-SYU-TANSEIDONAME
+               END-IF
+      *
                STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
                    "　"                    DELIMITED  BY  SIZE
                    COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
