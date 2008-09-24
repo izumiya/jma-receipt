@@ -367,6 +367,7 @@
       *  04.02.25    NACL-ÌçÏÆ    08/09/09  ·úÀßÏ¢¹çÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *  04.02.26    NACL-ÌçÏÆ    08/09/10  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.27    NACL-ÌçÏÆ    08/09/16  °ìÉôÉéÃ´¶âºÆ·ÇÍóµ­ºÜ½¤Àµ
+      *  04.02.28    NACL-ÌçÏÆ    08/09/24  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6090,7 +6091,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            EVALUATE  WRK-TOKKI
              WHEN      "15"
                IF  (RECE02-SRYYM   >=  "200608")
-               AND (RECE02-SRYYM   <=  "200808")
+      *        AND (RECE02-SRYYM   <=  "200808")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT
