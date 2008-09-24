@@ -78,6 +78,7 @@
       *  04.01.02    NACL-ÃÁœ∆    08/02/04  …∏∑Á≥∞«Ò∑◊ªªΩ§¿µ
       *  04.02.01    NACL-ÃÁœ∆    08/05/08  ≈¿≈©£≥£≥£≤§ŒºÍµªŒ¡ ‘Ω∏
       *  04.02.02    NACL-ÃÁœ∆    08/06/17  ∆˛±°Œ¡Ã§ªªƒÍ∆¸¬–±˛
+      *  04.02.03    NACL-ÃÁœ∆    08/09/24  ∆˛±°Œ¨æŒ ‘Ω∏ƒ…≤√
       *****************************************************************
       *
       *
@@ -3851,6 +3852,44 @@
                      WHEN     "190123550"
                       MOVE   "æ„≥≤∑–≤·"
                                  TO   RECE62-NYUSYUBETU(ID1)(1:8)
+                   END-EVALUATE
+                END-IF
+              END-IF
+              IF   ( RECE62-SRYYM  >= "200807"    )
+              AND  ( WRK-SRYCD      = "190130810" OR
+                                      "190131010" OR
+                                      "190131110" )
+                MOVE     ZERO     TO    FLG-ARI
+                PERFORM  VARYING  ID1    FROM    1   BY  1
+                      UNTIL   ID1                   > 20
+                        OR    RECE62-NYUSYUBETU(ID1) = SPACE
+                        OR    FLG-ARI                = 1 
+                   EVALUATE   WRK-SRYCD
+                     WHEN     "190130810"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:8) = "∞Ï»Ã£±£∞"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                     WHEN     "190131010"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:6) = "∑Î£±£∞"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                     WHEN     "190131110"
+                      IF  RECE62-NYUSYUBETU(ID1)(1:6) = "¿Ï£±£∞"
+                          MOVE  1   TO   FLG-ARI
+                      END-IF
+                   END-EVALUATE
+                END-PERFORM  
+                IF  FLG-ARI  =  ZERO
+                   EVALUATE   WRK-SRYCD
+                     WHEN     "190130810"
+                      MOVE   "∞Ï»Ã£±£∞"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:8)
+                     WHEN     "190131010"
+                      MOVE   "∑Î£±£∞"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:6)
+                     WHEN     "190131110"
+                      MOVE   "¿Ï£±£∞"
+                                 TO   RECE62-NYUSYUBETU(ID1)(1:6)
                    END-EVALUATE
                 END-IF
               END-IF
