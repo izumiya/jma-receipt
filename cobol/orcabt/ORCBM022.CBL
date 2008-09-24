@@ -74,6 +74,7 @@
       *  04.01.01    NACL-Æ£¸¶    07/10/24  Áí³çÉ½¤ÎÃÏÊý¸øÈñµ­ºÜÂÐ±þ
       *
       *  04.02.01    NACL-Æ£¸¶    08/03/04  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
+      *  04.02.02    NACL-Æ£¸¶    08/09/24  Ê¿À®£²£°Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -980,6 +981,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                        WHEN    1
                            EVALUATE    RECE10-HKNNUM
                                WHEN    "001"
+                               WHEN    "009"
                                    MOVE    2               TO  IDY2
                                WHEN    "002"
                                    EVALUATE    RECE10-HOJOKBN
@@ -1010,6 +1012,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                        WHEN    2
                            EVALUATE    RECE10-HKNNUM
                                WHEN    "001"
+                               WHEN    "009"
                                    MOVE    2               TO  IDY2
                                WHEN    "002"    
                                    EVALUATE    RECE10-HOJOKBN
@@ -1041,6 +1044,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                        WHEN    3
                            EVALUATE    RECE10-HKNNUM
                                WHEN    "001"
+                               WHEN    "009"
                                    MOVE    2               TO  IDY2
                                WHEN    "002"    
                                    IF      RECE10-HOJOKBN  =   "1" OR
@@ -1075,6 +1079,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                        WHEN    5
                            EVALUATE    RECE10-HKNNUM
                                WHEN    "001"
+                               WHEN    "009"
                                    MOVE    2               TO  IDY2
                                WHEN    "002"
                                    MOVE    3               TO  IDY2

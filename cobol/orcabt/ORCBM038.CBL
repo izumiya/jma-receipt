@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.02.01    NACL-藤原    08/09/24  平成２０年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -52,7 +53,8 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM3A.INC".
+           COPY    "HCM3AV01.INC"  REPLACING  //HCM3AV01//
+                                   BY         //HCM3A//.
            COPY    "HCM3B.INC".
       *
       *    スパ領域
@@ -124,6 +126,11 @@
                05  WRK-HOSPADRS2   PIC X(50).
       *
            COPY    "CPSHELLTBL.INC".
+      *
+      *    固定項目
+       01  WRK-CONS-AREA.
+      *    ２００８年１０月改正
+           03  WRK-CONS-SRYYM-200810   PIC X(06)   VALUE   "200810".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -472,6 +479,18 @@
        310-HEAD-HEN-01-SEC          SECTION.
       *
            INITIALIZE                      HCM3A
+      *
+           IF      LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200810
+               MOVE    "（政）"            TO  HCM3A-SEIDONAME (1)
+                                               HCM3A-SEIDONAME (2)
+                                               HCM3A-SEIDONAME (3)
+                                               HCM3A-SEIDONAME (4)
+           ELSE
+               MOVE    "（協会）"          TO  HCM3A-SEIDONAME (1)
+                                               HCM3A-SEIDONAME (2)
+                                               HCM3A-SEIDONAME (3)
+                                               HCM3A-SEIDONAME (4)
+           END-IF
       *
            MOVE    WRK-SEIYMDWH        TO  HCM3A-SEIYMD
       *
@@ -1031,7 +1050,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            IF      FLG-PRTKBN          =   ZERO                            
-               MOVE    "HCM3A.red"         TO  SPRT-PRTID
+               MOVE    "HCM3AV01.red"      TO  SPRT-PRTID
                MOVE    HCM3A               TO  SPRT-PRTDATA
            ELSE                          
                MOVE    "HCM3B.red"         TO  SPRT-PRTID

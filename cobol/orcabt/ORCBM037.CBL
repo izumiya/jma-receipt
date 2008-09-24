@@ -28,6 +28,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.02.01    NACL-Æ£¸¶    08/09/24  Ê¿À®£²£°Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -52,7 +53,8 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM3C.INC".
+           COPY    "HCM3CV01.INC"  REPLACING  //HCM3CV01//
+                                   BY         //HCM3C//.
            COPY    "HCM3D.INC".
       *
       *    ¥¹¥ÑÎÎ°è
@@ -121,6 +123,11 @@
                05  WRK-HOSPADRS2   PIC X(50).
       *
            COPY    "CPSHELLTBL.INC".
+      *
+      *    ¸ÇÄê¹àÌÜ
+       01  WRK-CONS-AREA.
+      *    £²£°£°£¸Ç¯£±£°·î²þÀµ
+           03  WRK-CONS-SRYYM-200810   PIC X(06)   VALUE   "200810".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -467,7 +474,19 @@
       *****************************************************************
        310-HEAD-HEN-01-SEC          SECTION.
       *
-           INITIALIZE                      HCM3C      
+           INITIALIZE                      HCM3C
+      *
+           IF      LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200810
+               MOVE    "¡ÊÀ¯¡Ë"            TO  HCM3C-SEIDONAME (1)
+                                               HCM3C-SEIDONAME (2)
+                                               HCM3C-SEIDONAME (3)
+                                               HCM3C-SEIDONAME (4)
+           ELSE
+               MOVE    "¡Ê¶¨²ñ¡Ë"          TO  HCM3C-SEIDONAME (1)
+                                               HCM3C-SEIDONAME (2)
+                                               HCM3C-SEIDONAME (3)
+                                               HCM3C-SEIDONAME (4)
+           END-IF
       *
            MOVE    WRK-SEIYMDWH        TO  HCM3C-SEIYMD
       *
@@ -869,11 +888,11 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            IF      FLG-PRTKBN          =   ZERO                            
-               MOVE    "HCM3C.red"      TO  SPRT-PRTID
+               MOVE    "HCM3CV01.red"      TO  SPRT-PRTID
                MOVE    HCM3C               TO  SPRT-PRTDATA
            ELSE                          
-               MOVE    "HCM3D.red"      TO  SPRT-PRTID
-              MOVE    HCM3D               TO  SPRT-PRTDATA
+               MOVE    "HCM3D.red"         TO  SPRT-PRTID
+               MOVE    HCM3D               TO  SPRT-PRTDATA
            END-IF    
            IF      WRK-PARA-MARUCHO    =   "2"
                EVALUATE    IDX1    ALSO    WRK-SYOKBN
