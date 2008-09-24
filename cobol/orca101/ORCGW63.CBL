@@ -346,6 +346,7 @@
            03  CONST-UPDATE        PIC X(03)   VALUE   "UPD".
            03  CONST-DELETE        PIC X(03)   VALUE   "DEL".
            03  CONST-H039          PIC X(03)   VALUE   "039".
+           03  CONST-H009          PIC X(03)   VALUE   "009".
       *
            COPY    "CPKGNMCHK.INC".
       *
@@ -1281,6 +1282,8 @@
                MOVE    KGNMCHK-H006-IDX    TO  IDX-KGNM
            WHEN    CONST-H039
                MOVE    KGNMCHK-H039-IDX    TO  IDX-KGNM
+           WHEN    CONST-H009
+               MOVE    KGNMCHK-H009-IDX    TO  IDX-KGNM
            END-EVALUATE
       *
       *
@@ -1747,13 +1750,17 @@
                                    TO  SPA-GMN-HKNNUM-G
                        IF    ( SPA-NAI-HKNNUM-BF  =  SPACE )
                         OR   ( SPA-GMN-HKNNUM NOT =  SPA-NAI-HKNNUM-BF )
-                           IF    ( SPA-GMN-HKNNUM =  CONST-H039 )
+                           EVALUATE    SPA-GMN-HKNNUM
+                           WHEN    CONST-H039
                                MOVE    KGNMCHK-H039-KGCHECK
                                            TO  SPA-GMN-KGCHKPTN
-                           ELSE
+                           WHEN    CONST-H009
+                               MOVE    KGNMCHK-H009-KGCHECK
+                                           TO  SPA-GMN-KGCHKPTN
+                           WHEN    OTHER
                                MOVE    KGNMCHK-HDEF-KGCHECK
                                            TO  SPA-GMN-KGCHKPTN
-                           END-IF
+                           END-EVALUATE
                            PERFORM 4201-CHKCMB-DEFAULT-SET-SEC
                            PERFORM 4202-CHKCMB-DEFAULT-SET-SEC
                        END-IF
@@ -1786,13 +1793,17 @@
                    IF    ( WRK-MCP-WIDGET =   "HKNNUM" )
                        IF    ( SPA-NAI-HKNNUM-BF  =  SPACE )
                         OR   ( SPA-GMN-HKNNUM NOT =  SPA-NAI-HKNNUM-BF )
-                           IF    ( SPA-GMN-HKNNUM =  CONST-H039 )
+                           EVALUATE    SPA-GMN-HKNNUM
+                           WHEN    CONST-H039
                                MOVE    KGNMCHK-H039-KGCHECK
                                            TO  SPA-GMN-KGCHKPTN
-                           ELSE
+                           WHEN    CONST-H009
+                               MOVE    KGNMCHK-H009-KGCHECK
+                                           TO  SPA-GMN-KGCHKPTN
+                           WHEN    OTHER
                                MOVE    KGNMCHK-HDEF-KGCHECK
                                            TO  SPA-GMN-KGCHKPTN
-                           END-IF
+                           END-EVALUATE
                            PERFORM 4201-CHKCMB-DEFAULT-SET-SEC
                            PERFORM 4202-CHKCMB-DEFAULT-SET-SEC
                        END-IF

@@ -1074,6 +1074,7 @@
                        09   CONST-TSANTEICD-TYPE
                                                PIC X(02).
            03  CONST-H039                      PIC X(03)   VALUE "039".
+           03  CONST-H009                      PIC X(03)   VALUE "009".
            03  CONST-H2004                 PIC X(06)   VALUE "200804".
       *
       *
@@ -9277,13 +9278,17 @@
            END-PERFORM
       *
            IF    ( FLG-HIT     =   ZERO )
-               IF    ( SRH-1102-HKNNUM =   CONST-H039 )
+               EVALUATE    SRH-1102-HKNNUM
+               WHEN    CONST-H039
                    MOVE    KGNMCHK-H039-KGCHECK
                                        TO  SRH-1102-KGCHKPTN
-               ELSE
+               WHEN    CONST-H009
+                   MOVE    KGNMCHK-H009-KGCHECK
+                                       TO  SRH-1102-KGCHKPTN
+               WHEN    OTHER
                    MOVE    KGNMCHK-HDEF-KGCHECK
                                        TO  SRH-1102-KGCHKPTN
-               END-IF
+               END-EVALUATE
                PERFORM 21111-CK4-1102-DEFAULT-SET-SEC
            END-IF
       *
@@ -9310,6 +9315,8 @@
                MOVE    KGNMCHK-H006-IDX    TO  IDX-KGNM
            WHEN    CONST-H039
                MOVE    KGNMCHK-H039-IDX    TO  IDX-KGNM
+           WHEN    CONST-H009
+               MOVE    KGNMCHK-H009-IDX    TO  IDX-KGNM
            END-EVALUATE
       *
            MOVE    KGNMCHK-KGSUJI(IDX-KGNM)

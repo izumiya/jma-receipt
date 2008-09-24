@@ -144,6 +144,30 @@
            05   KGNMCHK-H039-NM2KAKKO     PIC X(01)   VALUE   "2".
            05   KGNMCHK-H039-NM2ETC       PIC X(01)   VALUE   "2".
       ****
+           05   KGNMCHK-H009-KGCHECK      PIC X(01)   VALUE   "0".
+           05   KGNMCHK-H009-KGSUJI       PIC X(01)   VALUE   "1".
+           05   KGNMCHK-H009-KGKANJI      PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-KGABT        PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-KGHYPN       PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-KGKAKKO      PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-KGETC        PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-KGKANJINASHI PIC X(01)   VALUE   "1".
+      *
+           05   KGNMCHK-H009-NM1SUJI      PIC X(01)   VALUE   "1".
+           05   KGNMCHK-H009-NM1KANJI     PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NM1ABT       PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NM1HYPN      PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NM1KAKKO     PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NM1ETC       PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NMSUJINASHI  PIC X(01)   VALUE   "2".
+      *
+           05   KGNMCHK-H009-NM2SUJI      PIC X(01)   VALUE   "1".
+           05   KGNMCHK-H009-NM2KANJI     PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NM2ABT       PIC X(01)   VALUE   "1".
+           05   KGNMCHK-H009-NM2HYPN      PIC X(01)   VALUE   "1".
+           05   KGNMCHK-H009-NM2KAKKO     PIC X(01)   VALUE   "2".
+           05   KGNMCHK-H009-NM2ETC       PIC X(01)   VALUE   "2".
+      ****
            05   KGNMCHK-HDEF-KGCHECK      PIC X(01)   VALUE   "0".
            05   KGNMCHK-HDEF-KGSUJI       PIC X(01)   VALUE   "1".
            05   KGNMCHK-HDEF-KGKANJI      PIC X(01)   VALUE   "1".
@@ -168,7 +192,7 @@
            05   KGNMCHK-HDEF-NM2KAKKO     PIC X(01)   VALUE   "1".
            05   KGNMCHK-HDEF-NM2ETC       PIC X(01)   VALUE   "1".
          03  KGNMCHK-R REDEFINES   KGNMCHK-VAL.
-           05   KGNMCHK-OCC               OCCURS 6.
+           05   KGNMCHK-OCC               OCCURS 7.
              07   KGNMCHK-KGCHECK         PIC X(01).
              07   KGNMCHK-KGSUJI          PIC X(01).
              07   KGNMCHK-KGKANJI         PIC X(01).
@@ -197,5 +221,6 @@
          03  KGNMCHK-H033-IDX             PIC 9(03)  VALUE 3.
          03  KGNMCHK-H006-IDX             PIC 9(03)  VALUE 4.
          03  KGNMCHK-H039-IDX             PIC 9(03)  VALUE 5.
-         03  KGNMCHK-HDEF-IDX             PIC 9(03)  VALUE 6.
+         03  KGNMCHK-H009-IDX             PIC 9(03)  VALUE 6.
+         03  KGNMCHK-HDEF-IDX             PIC 9(03)  VALUE 7.
       *
