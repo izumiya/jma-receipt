@@ -476,16 +476,19 @@
       *
            INITIALIZE                      HCM3C
       *
-           IF      LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200810
+      *****IF      LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200810
+           IF      LNK-PRTKANRI-SRYYM  <   "999999"
                MOVE    "（政）"            TO  HCM3C-SEIDONAME (1)
                                                HCM3C-SEIDONAME (2)
                                                HCM3C-SEIDONAME (3)
                                                HCM3C-SEIDONAME (4)
+                                               HCM3C-SEIDONAME (5)
            ELSE
                MOVE    "（協会）"          TO  HCM3C-SEIDONAME (1)
                                                HCM3C-SEIDONAME (2)
                                                HCM3C-SEIDONAME (3)
                                                HCM3C-SEIDONAME (4)
+                                               HCM3C-SEIDONAME (5)
            END-IF
       *
            MOVE    WRK-SEIYMDWH        TO  HCM3C-SEIYMD
