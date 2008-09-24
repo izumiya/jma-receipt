@@ -4363,16 +4363,16 @@
                         IF  (COMB-KOH2HKNNUM(1:1) = "0")
                         OR  (COMB-KOH3HKNNUM(1:1) = "0")
                         OR  (COMB-KOH4HKNNUM(1:1) = "0")
-      *****                CONTINUE
-                           IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
+                           CONTINUE
+      **>                  IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
       *****                  IF   MAX-KIN-KOHI1-M   >  44400
-                               MOVE   44400   TO   MAX-KIN-KOHI1-M
+      **>                      MOVE   44400   TO   MAX-KIN-KOHI1-M
       *****                  END-IF
-                           ELSE
+      **>                  ELSE
       *****                  IF   MAX-KIN-KOHI1-M   >  40200
-                               MOVE   40200   TO   MAX-KIN-KOHI1-M
+      **>                      MOVE   40200   TO   MAX-KIN-KOHI1-M
       *****                  END-IF
-                           END-IF
+      **>                  END-IF
                         END-IF
                       END-IF
                      END-IF
@@ -4448,16 +4448,16 @@
                         OR  (COMB-KOH2HKNNUM(1:1) = "0")
                         OR  (COMB-KOH3HKNNUM(1:1) = "0")
                         OR  (COMB-KOH4HKNNUM(1:1) = "0")
-      *****                CONTINUE
-                           IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
+                           CONTINUE
+      **>                  IF  LNK-SYU-SRYYMD(1:6)  >= "200610"
       *****                  IF   MAX-KIN-SYU-M   >  44400
-                               MOVE   44400   TO   MAX-KIN-SYU-M
+      **>                      MOVE   44400   TO   MAX-KIN-SYU-M
       *****                  END-IF
-                           ELSE
+      **>                  ELSE
       *****                  IF   MAX-KIN-SYU-M   >  40200
-                               MOVE   40200   TO   MAX-KIN-SYU-M
+      **>                      MOVE   40200   TO   MAX-KIN-SYU-M
       *****                  END-IF
-                           END-IF
+      **>                  END-IF
                         END-IF
                       END-IF
                      END-IF
