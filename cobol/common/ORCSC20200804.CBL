@@ -2557,6 +2557,7 @@
            END-IF
            MOVE    1                   TO  FLG-ALL
            PERFORM 3003-YAKJYO-CHK-SEC
+           MOVE    ZERO                TO  FLG-ALL
       *****PERFORM 3002-KASAN-SYORI-SEC
            IF      FLG-ERR             =   ZERO
                MOVE    "130"           TO  LNK-ORCSC-SRYSYUKBN(02 IDXS)
