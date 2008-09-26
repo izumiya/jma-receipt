@@ -912,7 +912,8 @@
                IF    ( SYUPARA03-STSRYYMD
                                        >=      CONST-H201001 )
                 AND  ( COMB-HKNNUM      =      "001" )
-                   MOVE    "¶¨²ñ"      TO      COMB-SYU-TANSEIDONAME
+                   INSPECT COMB-SYU-TANSEIDONAME
+                           REPLACING    ALL    "À¯´É"   BY  "¶¨²ñ"
                END-IF
       *
                STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
