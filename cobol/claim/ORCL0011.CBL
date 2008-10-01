@@ -1071,7 +1071,7 @@
                        MOVE    WRK-HENYMD      
                                TO  WRK-LF01-TEKEDYMD (IDX)
                        PERFORM VARYING IDW FROM    1   BY  1
-                               UNTIL   IDW >       45
+                               UNTIL   IDW >       MML0031-TMAX
                          IF    PTHKN-HKNNUM  =  MML0031-HOKEN (IDW)
                                MOVE    MML0031-NAME(IDW) 
                                        TO  WRK-LF01-HKNSBT  (IDX)
