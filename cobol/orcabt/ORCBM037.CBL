@@ -476,8 +476,7 @@
       *
            INITIALIZE                      HCM3C
       *
-      *****IF      LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200810
-           IF      LNK-PRTKANRI-SRYYM  <   "999999"
+           IF      LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200810
                MOVE    "¡ÊÀ¯¡Ë"            TO  HCM3C-SEIDONAME (1)
                                                HCM3C-SEIDONAME (2)
                                                HCM3C-SEIDONAME (3)
