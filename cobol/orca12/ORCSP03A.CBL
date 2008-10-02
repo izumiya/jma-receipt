@@ -1630,6 +1630,7 @@
       *    後期高齢者の時、開始日が７５歳以上は警告
            IF      SPA-GMN-HKNNUM      =   "039"
                                        OR  "040"
+               PERFORM 310110-HOJKBN-HENSYU-SEC
                PERFORM 10011-TEKSTYMD-SET39-SEC
                IF     (SPA-NAI-HTEKSTYMD   NOT =   SPACE )  AND
                       (SPA-NAI-HTEKSTYMD       <   SPA-BYMD-75-2)

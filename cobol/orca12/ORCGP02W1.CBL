@@ -1521,10 +1521,18 @@
            END-IF
       *
       *    ∑—¬≥∂Ë ¨
-           IF    ( SPA-NAI-PTHKN-SBTKBN    =   "1"  ) AND
-                 ( SPA-GMN-HKNNUM      NOT =   "060"  AND "067"
-      *        ∆√ ÃŒ≈Õ‹»Òƒ…≤√
-                                           AND "068"  AND "069" )
+           IF    ( SPA-NAI-PTHKN-SBTKBN    NOT =   "1"  ) OR
+                 ( SPA-GMN-HKNNUM          =   "060"
+                                           OR  "067"
+      *              ∆√ ÃŒ≈Õ‹»Òƒ…≤√
+                                           OR  "068"
+                                           OR  "069"
+      *              ∏Â¥¸π‚Œº‘ƒ…≤√
+                                           OR  "039"
+                                           OR  "040" )
+               MOVE    ZERO                TO  SPA-GMN-CONT-MAX
+               MOVE    SPACE               TO  SPA-GMN-CONTKBN-G
+           ELSE
                IF      SPA-GMN-HKNNUM      =   "002"
                    MOVE    3               TO  WRK-CONT-MAX
                ELSE
@@ -1541,9 +1549,6 @@
                    END-IF
                    MOVE    IDT             TO  SPA-GMN-CONT-MAX
                END-PERFORM
-           ELSE
-               MOVE    ZERO                TO  SPA-GMN-CONT-MAX
-               MOVE    SPACE               TO  SPA-GMN-CONTKBN-G
            END-IF
       *
       *    …È√¥≥‰πÁ
