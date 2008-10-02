@@ -73,6 +73,7 @@
            03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-TAINFUKA                PIC 9(01).
+           03  FLG-LOOPEND                 PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1690,38 +1691,25 @@
       *****************************************************************
        4801-ZIIN-NYUINCHU-CHK-SEC          SECTION.
       *
-           INITIALIZE  PTNYUINRRK-REC
-      *    Æþ±¡ÍúÎò¥Þ¥¹¥¿¸¡º÷
-           MOVE    ZERO                TO  FLG-PTNYUINRRK
-           INITIALIZE  PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM          TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-I01-I03-PTID
-                                       TO  PTNYUINRRK-PTID
-           MOVE    SPA-NAI-I03-NYUINYMD
-                                       TO  PTNYUINRRK-NYUINYMD
-           MOVE    SPA-GMN-I03-SHONUM  TO  PTNYUINRRK-SHONUM
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
-           MOVE    "key16"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      =   ZERO  )
-               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
-           ELSE
-               MOVE    1               TO  FLG-PTNYUINRRK
-           END-IF
+           PERFORM 900-PTNYUINRRK-KEY16-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-PTNYUINRRK  NOT =   ZERO )
+                    OR   ( PTNYUINRRK-RRKNUM
+                                           NOT =   SPA-I01-I03-PTRRKNUM)
+      *
+               PERFORM 900-PTNYUINRRK-KEY16-FET-SEC
+      *
+           END-PERFORM
       *
            MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
            MOVE    "key16"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           IF    ( FLG-PTNYUINRRK  NOT =   ZERO )
-               GO  TO  4801-ZIIN-NYUINCHU-EXT
-           END-IF
-      *
-           IF    ( PTNYUINRRK-JTIKBN       =   "6" )
-            AND  ( PTNYUINRRK-NYUINCHUKBN  =   "1" )
-               MOVE    "1011"      TO  SPA-ERRCD
-               GO  TO  4801-ZIIN-NYUINCHU-EXT
+           IF    ( FLG-PTNYUINRRK      =   ZERO )
+               IF    ( PTNYUINRRK-JTIKBN       =   "6" )
+                AND  ( PTNYUINRRK-NYUINCHUKBN  =   "1" )
+                   MOVE    "1011"      TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
@@ -1732,60 +1720,44 @@
       *****************************************************************
        4801-KEIZOKU-NYUIN-CHK-SEC  SECTION.
       *
-           INITIALIZE  PTNYUINRRK-REC
-      *    Æþ±¡ÍúÎò¥Þ¥¹¥¿¸¡º÷
-           MOVE    ZERO                TO  FLG-PTNYUINRRK
-           INITIALIZE  PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-I01-I03-PTID
-                                       TO  PTNYUINRRK-PTID
-           MOVE    SPA-NAI-I03-TAIINYMD
-                                       TO  PTNYUINRRK-NYUINYMD
-           MOVE    SPA-GMN-I03-SHONUM  TO  PTNYUINRRK-SHONUM
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
-           MOVE    "key20"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      =   ZERO  )
-               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
-           ELSE
-               MOVE    1               TO  FLG-PTNYUINRRK
-           END-IF
+           PERFORM 900-PTNYUINRRK-KEY20-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-PTNYUINRRK  NOT =   ZERO )
+                    OR   ( PTNYUINRRK-RRKNUM
+                                           NOT =   SPA-I01-I03-PTRRKNUM)
+      *
+               PERFORM 900-PTNYUINRRK-KEY20-FET-SEC
+      *
+           END-PERFORM
       *
            MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
            MOVE    "key20"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           IF    ( FLG-PTNYUINRRK  NOT =   ZERO )
-               GO  TO  4801-KEIZOKU-NYUIN-CHK-EXT
-           END-IF
-      *
-
-           INITIALIZE                  STS-AREA-DAY
-           INITIALIZE                  LNK-DAY6-AREA
-           MOVE    "61"                TO  LNK-DAY6-IRAI
-           MOVE    SPA-NAI-I03-TAIINYMD
+           IF    ( FLG-PTNYUINRRK      =   ZERO )
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE    "61"            TO  LNK-DAY6-IRAI
+               MOVE    SPA-NAI-I03-TAIINYMD
                                        TO  LNK-DAY6-KIJUN
-           DISPLAY "SPA-NAI-I03-TAIINYMD = " SPA-NAI-I03-TAIINYMD
-           MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-           MOVE    1                   TO  LNK-DAY6-ZOGEN
-           CALL    "ORCSDAY"   USING   STS-AREA-DAY
-                                           LNK-DAY6-AREA
-           MOVE    LNK-DAY6-KEISAN     TO  WRK-DAY6-KEISAN
+               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+               MOVE    1               TO  LNK-DAY6-ZOGEN
+               CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KEISAN TO  WRK-DAY6-KEISAN
       *
-           EVALUATE PTNYUINRRK-JTIKBN
-           WHEN    "5" 
-               MOVE    "1013"      TO  SPA-ERRCD
-               GO  TO  4801-KEIZOKU-NYUIN-CHK-EXT
-           WHEN    "6"
-               MOVE    "1014"      TO  SPA-ERRCD
-               GO  TO  4801-KEIZOKU-NYUIN-CHK-EXT
-           WHEN    OTHER
-               IF    ( PTNYUINRRK-NYUINYMD NOT =   WRK-DAY6-KEISAN )
-                   MOVE    "1012"      TO  SPA-ERRCD
-                   GO  TO  4801-KEIZOKU-NYUIN-CHK-EXT
-               END-IF
-           END-EVALUATE
+               EVALUATE PTNYUINRRK-JTIKBN
+               WHEN    "5" 
+                   MOVE    "1013"      TO  SPA-ERRCD
+               WHEN    "6"
+                   MOVE    "1014"      TO  SPA-ERRCD
+               WHEN    OTHER
+                   IF    ( PTNYUINRRK-NYUINYMD NOT =   WRK-DAY6-KEISAN )
+                       MOVE    "1012"  TO  SPA-ERRCD
+                       GO  TO  4801-KEIZOKU-NYUIN-CHK-EXT
+                   END-IF
+               END-EVALUATE
+           END-IF
       *
            .
        4801-KEIZOKU-NYUIN-CHK-EXT.
@@ -2296,6 +2268,101 @@
            .
       *
        800-MCNDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY16-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE  PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-I01-I03-PTID    TO  PTNYUINRRK-PTID
+           MOVE    SPA-NAI-I03-NYUINYMD
+                                       TO  PTNYUINRRK-NYUINYMD
+           MOVE    SPA-GMN-I03-SHONUM  TO  PTNYUINRRK-SHONUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      =   ZERO  )
+               MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE              PTNYUINRRK-REC
+               MOVE    1           TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       900-PTNYUINRRK-KEY16-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎòFETCH½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY16-FET-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTNYUINRRK
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC      =   ZERO  )
+               MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE              PTNYUINRRK-REC
+               MOVE    1           TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       900-PTNYUINRRK-KEY16-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY20-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE  PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-I01-I03-PTID
+                                       TO  PTNYUINRRK-PTID
+           MOVE    SPA-NAI-I03-TAIINYMD
+                                       TO  PTNYUINRRK-NYUINYMD
+           MOVE    SPA-GMN-I03-SHONUM  TO  PTNYUINRRK-SHONUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
+           MOVE    "key20"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      =   ZERO  )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE              PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       900-PTNYUINRRK-KEY20-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎòFETCH½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY20-FET-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTNYUINRRK
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
+           MOVE    "key20"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC      =   ZERO  )
+               MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE              PTNYUINRRK-REC
+               MOVE    1           TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       900-PTNYUINRRK-KEY20-FET-EXT.
            EXIT.
       *****************************************************************
       *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷½èÍý
