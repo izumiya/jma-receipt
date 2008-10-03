@@ -38,6 +38,7 @@
       *  03.05.01    NACL-森脇     07/06/04  グループ診療対応
       *  04.01.01    NACL-森脇     07/12/26  公害対応
       *  04.02.01    NACL-森脇     08/04/15  平成２０年４月改正
+      *  04.03.00    NACL-森脇     08/10/03  協会けんぽ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -107,7 +108,7 @@ grpsys     SELECT  RECECSV-FILE    ASSIGN  RECECSV
       *                          退職  5:本人、8:被扶養者、9:６歳
       *                    広域連合    1:後期高齢者９割、2:後期高齢者７割
       *        KBN         詳細区分
-      *                    社保  医保  001:公費併用合計、002:政、003:船、004:日、005:日特
+      *                    社保  医保  001:公費併用合計、002:政・協会、003:船、004:日、005:日特
       *                                006:共、007:組、008:自、009:退
       *                          公費  001〜999
       *                    国保        001
@@ -233,7 +234,7 @@ grpsys     03  FILLER              PIC X(04)   VALUE   ".csv".
       *                          退職 14:本人、17:被扶養者、18:６歳
       *                    広域連合   21:後期高齢者９割、22:後期高齢者７割
       *        KBN         詳細区分
-      *                    社保  医保  1:公費併用合計、2:政、3:船、4:日、5:日特、
+      *                    社保  医保  1:公費併用合計、2:政・協会、3:船、4:日、5:日特、
       *                                6:共、7:組、8:自、9:退
       *        JYUNBAN     出力順      0:患者カナ氏名順、1:患者番号順、2:点数順
       *----(04.02.01)--ADD-END-----
@@ -428,6 +429,7 @@ grpsys     03  RECEERR                 PIC X(100).
        01  CONST-AREA.
          03  CONST-H2004           PIC X(06)   VALUE   "200804".
       *----(04.02.01)--ADD-END-----
+         03  CONST-H2010           PIC X(06)   VALUE   "200810".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1106,7 +1108,9 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
            ELSE
       *        単独
                EVALUATE    RECE10-HKNNUM
+      *            政管は協会に変更になる
                    WHEN    "001"
+                   WHEN    "009"
                        MOVE    "002"           TO  WRK-KBN
                    WHEN    "002"
                        MOVE    "003"           TO  WRK-KBN
@@ -1263,7 +1267,9 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
            ELSE
       *        単独
                EVALUATE    RECE10-HKNNUM
+      *            政管は協会に変更する
                    WHEN    "001"
+                   WHEN    "009"
                        MOVE    "002"           TO  WRK-KBN
                    WHEN    "002"
                        MOVE    "003"           TO  WRK-KBN
@@ -3049,7 +3055,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                    MOVE    TOKEI-KBN                   TO  WRK-KBN
                    GO  TO  3201-KBN-BODY-HEN-EXT
                WHEN    "1"     ALSO    "002"
-                   MOVE    "・０１（政）"              TO  WRK-PRT-LINE
+                   IF      TOKEI-SRYYM     <   CONST-H2010
+                       MOVE    "・０１（政）"          TO  WRK-PRT-LINE
+                   ELSE
+                       MOVE    "・０１（協会）"        TO  WRK-PRT-LINE
+                   END-IF
                WHEN    "1"     ALSO    "003"
                    MOVE    "・０２（船）"              TO  WRK-PRT-LINE
                WHEN    "1"     ALSO    "004"
