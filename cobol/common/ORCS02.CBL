@@ -229,6 +229,7 @@
       *  04.02.21    NACL-ÌçÏÆ    08/09/01  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       *  04.02.22    NACL-ÌçÏÆ    08/09/04  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.23    NACL-ÌçÏÆ    08/09/09  ·úÀßÏ¢¹çÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.02.24    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4084,6 +4085,7 @@
       *
            IF     (WK-1001-PREFNUM         =  01     )
            AND    (LNK-SYU-SRYYMD(1:6)    >= "200510")
+           AND    (LNK-SYU-SRYYMD(1:6)    <  "200810")
       *
              PERFORM    VARYING   KOH-IDX    FROM   1   BY   1
                          UNTIL    KOH-IDX      >    4
@@ -4111,6 +4113,43 @@
                       END-IF
                       IF  PTKOH-JKYSNUM(1:2) >= "71" AND <= "88"
                          MOVE    1    TO   WK-DOTANDOKU(KOH-IDX)
+                      END-IF
+                    END-IF
+                END-IF
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key8"               TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
+              END-IF
+      *
+             END-PERFORM
+      *
+           END-IF.
+      *
+           IF     (WK-1001-PREFNUM         =  01     )
+           AND    (LNK-SYU-SRYYMD(1:6)    >= "200810")
+      *
+             PERFORM    VARYING   KOH-IDX    FROM   1   BY   1
+                         UNTIL    KOH-IDX      >    4
+      *
+              IF  COMB-KOHHKNNUM(KOH-IDX) = "183"
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+                MOVE    COMB-KOHID(KOH-IDX)  TO  PTKOH-KOHID
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "DBSELECT"           TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key8"               TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"          USING  MCPAREA
+                                                    MCPDATA-REC
+                                                    SPA-AREA
+                IF      MCP-RC               =       ZERO
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key8"           TO  MCP-PATHNAME
+                    PERFORM  PTKOHINF-READ-SEC
+                    IF       FLG-PTKOHINF    =       ZERO
+                      IF  PTKOH-JKYSNUM(1:2) >= "91" AND <= "95"
+                         MOVE    1    TO   WK-DOTANDOKUFLG(KOH-IDX)
                       END-IF
                     END-IF
                 END-IF
@@ -5508,6 +5547,10 @@
       *
              OR ((COMB-KOHHKNNUM(KOH-IDX)      = "038" OR "025" )  AND
                  (LNK-SYU-SRYYMD(1:6)         >= "200804")           )
+      *
+             OR ((WK-1001-PREFNUM              =  01     )  AND
+                 (COMB-KOHHKNNUM(KOH-IDX)      = "183"   )  AND
+                 (LNK-SYU-SRYYMD(1:6)         >= "200810"))
       *
       ***    OR ( COMB-KOHHKNNUM(KOH-IDX)(1:1) = "1" OR "2" OR "3" OR 
       ***                                        "4" OR "5" OR "6" OR
@@ -7393,6 +7436,29 @@
                 END-IF
               END-IF
               IF     SYU-KOH2HKNNUM  =  "051" 
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+      *
+           END-IF.
+      *
+      *    ËÌ³¤Æ»ÆÃÄê¼À´µ
+           IF   (WK-1001-PREFNUM          =  01     )
+           AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
+      *
+              IF     SYU-KOH1HKNNUM  =  "183"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "183"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
                 END-IF
@@ -13806,8 +13872,7 @@
            END-IF.
       *
       *    ËÌ³¤Æ»¡¦ÆÃÄê¼À´µ¡Ê£°£µ£±¡Ë¡ÊÆ»Ã±ÆÈ»ö¶È¡Ë
-           IF    (WK-DOTANDOKU(KOH-IDX)     =   1)
-           AND   (WK-DOTANDOKUFLG(KOH-IDX)  =   1)
+           IF    WK-DOTANDOKUFLG(KOH-IDX)  =   1
                MOVE    "1"       TO   WK-NYUSKJRYYKBN
                MOVE    9999999   TO   WK-TAIHI-NYUJGNGAK(KOH-IDX)
            END-IF.
@@ -14495,9 +14560,12 @@
                IF  (  FLG-ZENKI-TOKUREI           =   1             )
                AND (( LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051"          )
                  OR ((WK-1001-PREFNUM             =  13           ) AND
-                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "151" OR "451")))
+                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "151" OR "451"))
       **>        OR ((WK-1001-PREFNUM             =  28           ) AND
-      **>            (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "186"         )))
+      **>            (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "186"         ))
+                 OR ((WK-1001-PREFNUM             =  01           ) AND
+                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "183"         ) AND
+                     (LNK-SYU-SRYYMD(1:6)        >= "200810"      )))
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY
                                    =  WK-ZENGAKU  *  0.2
                   IF   WK-ZENKI-TOKUREI-MONEY  <  ZAN-KOHI-T(KOH-IDX)
@@ -17663,6 +17731,36 @@
                OR ((LNK-SYU-KOH2HKNNUM = "281") AND (FLG-HIKAKU = 2))
                OR ((LNK-SYU-KOH3HKNNUM = "281") AND (FLG-HIKAKU = 3))
                OR ((LNK-SYU-KOH4HKNNUM = "281") AND (FLG-HIKAKU = 4))
+                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
+                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
+                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
+                COMPUTE   WK-FTN   =   WK-FTN     +   5
+                COMPUTE   WK-FTN   =   WK-FTN     /  10
+                COMPUTE   WK-FTN   =   WK-FTN     *  10
+                IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
+                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
+                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
+                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
+                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
+                                               LNK-SYU-SKYMONEY-SKJ-TAX
+                                               LNK-SYU-SKYMONEY-SKJ-KEI
+                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
+                                               LNK-SYU-SKYMONEY-LIFE-TAX
+                                               LNK-SYU-SKYMONEY-LIFE-KEI
+                END-IF
+               END-IF
+             END-IF
+           END-IF.
+      *
+           IF    LNK-SYU-SRYYMD(1:6)   <   "200810"
+               CONTINUE
+           ELSE
+      *      ËÌ³¤Æ»ÃÏÊý¸øÈñ¡÷¡÷¡÷¤¬¤¢¤ëÊý¤ÎÆÃÎã½èÍý
+             IF   WK-1001-PREFNUM    =   01
+               IF ((LNK-SYU-KOH1HKNNUM = "183") AND (FLG-HIKAKU = 1))
+               OR ((LNK-SYU-KOH2HKNNUM = "183") AND (FLG-HIKAKU = 2))
+               OR ((LNK-SYU-KOH3HKNNUM = "183") AND (FLG-HIKAKU = 3))
+               OR ((LNK-SYU-KOH4HKNNUM = "183") AND (FLG-HIKAKU = 4))
                 COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
                                    +   LNK-SYU-SKYMONEY-SKJ-KEI
                                    +   LNK-SYU-SKYMONEY-LIFE-KEI

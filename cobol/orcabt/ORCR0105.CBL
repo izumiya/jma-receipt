@@ -45,6 +45,7 @@
       *  04.02.08    NACL-Æ£¸¶    08/07/23  µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
       *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *  04.02.09    NACL-Æ£¸¶    08/09/24  Ê¿À®£²£°Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.02.10    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4456,12 +4457,17 @@
                                     >=  "1" AND <=  "8") AND
                   (RECE02-TOTALTEN (IDX2) >   ZERO     ))
            OR    ((RECE02-SRYYM          >=  "200510"  ) AND
+                  (RECE02-SRYYM          <   "200810"  ) AND
                   (SYS-1001-PREFNUM       =    01      ) AND
                   (RECE02-KOHNUM(1)       =  "051"     ) AND
                   ((RECE02-KOHJKYSNUM(1)(1:2) >= "91"
                                           AND <= "95" ) OR
                    (RECE02-KOHJKYSNUM(1)(1:2) >= "71"
                                           AND <= "88" )) AND
+                  (RECE02-TOTALTEN (IDX2) >   ZERO     ))
+           OR    ((RECE02-SRYYM          >=  "200810"  ) AND
+                  (SYS-1001-PREFNUM       =    01      ) AND
+                  (RECE02-KOHNUM(1)       =  "183"     ) AND
                   (RECE02-TOTALTEN (IDX2) >   ZERO     ))
                MOVE    RECE02-TOTALTEN (IDX2) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(2)
@@ -4518,12 +4524,17 @@
                                     >=  "1" AND <=  "8") AND
                   (RECE02-TOTALTEN (IDX3) >   ZERO     ))
            OR    ((RECE02-SRYYM          >=  "200510"  ) AND
+                  (RECE02-SRYYM          <   "200810"  ) AND
                   (SYS-1001-PREFNUM       =    01      ) AND
                   (RECE02-KOHNUM(2)       =  "051"     ) AND
                   ((RECE02-KOHJKYSNUM(2)(1:2) >= "91"
                                           AND <= "95" ) OR
                    (RECE02-KOHJKYSNUM(2)(1:2) >= "71"
                                           AND <= "88" )) AND
+                  (RECE02-TOTALTEN (IDX3) >   ZERO     ))
+           OR    ((RECE02-SRYYM          >=  "200810"  ) AND
+                  (SYS-1001-PREFNUM       =    01      ) AND
+                  (RECE02-KOHNUM(2)       =  "183"     ) AND
                   (RECE02-TOTALTEN (IDX3) >   ZERO     ))
                MOVE    RECE02-TOTALTEN (IDX3) TO  WRK-KGK6
                MOVE    WRK-KGK6               TO  HC06-TOTALTEN(3)

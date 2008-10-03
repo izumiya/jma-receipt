@@ -48,6 +48,7 @@
       *  04.02.03    NACL-ÌçÏÆ    08/07/02  ÂçºåÉÜ£´£±Ï·¿Í¡Ü£±£¸£¸ÅùÂÐ±þ
       *  04.02.04    NACL-ÌçÏÆ    08/08/07  Àº¿ÀÄÌ±¡¤ÎÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *  04.02.05    NACL-ÌçÏÆ    08/09/04  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.06    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -454,6 +455,10 @@
            OR ((WRK-PREFNUM                  =  07     )  AND
                (LNK-FTNJGNCHK-KOHNUM         = "281"   )  AND
                (LNK-FTNJGNCHK-SRYYM         >= "200702"))
+      *
+           OR ((WRK-PREFNUM                  =  01     )  AND
+               (LNK-FTNJGNCHK-KOHNUM         = "183"   )  AND
+               (LNK-FTNJGNCHK-SRYYM         >= "200810"))
       *
       *         ¸øÈñ·î¾å¸Â³Û¼èÆÀ
                 INITIALIZE                    LNK-ORCSJGNGET-REC

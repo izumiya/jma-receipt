@@ -260,6 +260,7 @@
       *  04.02.16    NACL-ÌçÏÆ    08/08/28  º´²ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       *  04.02.17    NACL-ÌçÏÆ    08/09/01  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       *  04.02.18    NACL-ÌçÏÆ    08/09/09  ·úÀßÏ¢¹çÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.02.19    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4235,6 +4236,7 @@
       *
            IF     (WK-1001-PREFNUM         =  01     )
            AND    (LNK-SYU-SRYYMD(1:6)    >= "200510")
+           AND    (LNK-SYU-SRYYMD(1:6)    <  "200810")
       *
              PERFORM    VARYING   KOH-IDX    FROM   1   BY   1
                          UNTIL    KOH-IDX      >    4
@@ -6018,6 +6020,10 @@
              OR ((COMB-KOHHKNNUM(KOH-IDX)      = "038" OR "025" )  AND
                  (LNK-SYU-SRYYMD(1:6)         >= "200804")           )
       *
+             OR ((WK-1001-PREFNUM              =  01     )  AND
+                 (COMB-KOHHKNNUM(KOH-IDX)      = "183"   )  AND
+                 (LNK-SYU-SRYYMD(1:6)         >= "200810"))
+      *
       ***    OR ( COMB-KOHHKNNUM(KOH-IDX)(1:1) = "1" OR "2" OR "3" OR 
       ***                                        "4" OR "5" OR "6" OR
       ***                                        "7" OR "8"          )
@@ -7443,6 +7449,29 @@
                 END-IF
               END-IF
               IF     SYU-KOH2HKNNUM  =  "051" 
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+      *
+           END-IF.
+      *
+      *    ËÌ³¤Æ»ÆÃÄê¼À´µ
+           IF   (WK-1001-PREFNUM          =  01     )
+           AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
+      *
+              IF     SYU-KOH1HKNNUM  =  "183"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "183"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
                 END-IF
