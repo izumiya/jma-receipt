@@ -567,17 +567,22 @@
       *    特定の受給者番号
            MOVE    SPACE               TO  SPA-GMN24-JKYSNUM
            IF      SPA-GMN24-FTNSELNUM >   ZERO
-               IF      (SPA-NAI24-FTNSELNUM >   ZERO   )  AND
-                       (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+               IF      (SPA-NAI24-FTNSELNUM >   ZERO   )
+                   IF   (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "051"
                                            OR  "052"
                                            OR  "015"
                                            OR  "016"
-                                           OR  "091"    )
+                                           OR  "091"    )   OR
+      *               北海道の地方公費
+                        ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                            =   "183" ) AND
+                         (SPA-PREFNUM       =    01    )) 
                    MOVE    "受給者番号："      TO  SPA-GMN24-JKYSNUM
                    MOVE    SPA-NAI24-TJKYSNUM (SPA-NAI24-FTNSELNUM)
                                                TO  SPA-GMN24-JKYSNUM
                                                           (13:)
+                   END-IF
                END-IF
       *    名称
              IF     (SPA-NAI24-FTNSELNUM >   ZERO   ) 
@@ -1662,17 +1667,22 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    特定の受給者番号
            MOVE    SPACE               TO  SPA-GMN24-JKYSNUM
-           IF     (SPA-NAI24-FTNSELNUM >   ZERO   )  AND
-                  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+           IF     (SPA-NAI24-FTNSELNUM >   ZERO   )
+               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                        =   "051"  OR   "052"
                                        OR  "015"
                                        OR  "016"
                                        OR  "091"
-                                       OR  "021"    )
-               MOVE    "受給者番号："      TO  SPA-GMN24-JKYSNUM
-               MOVE    SPA-NAI24-TJKYSNUM (SPA-NAI24-FTNSELNUM)
-                                           TO  SPA-GMN24-JKYSNUM
+                                       OR  "021"    )   OR
+      *               北海道の地方公費
+                      ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                            =   "183" ) AND
+                      (SPA-PREFNUM          =    01    )) 
+                   MOVE    "受給者番号："      TO  SPA-GMN24-JKYSNUM
+                   MOVE    SPA-NAI24-TJKYSNUM (SPA-NAI24-FTNSELNUM)
+                                               TO  SPA-GMN24-JKYSNUM
                                                           (13:)
+               END-IF
            END-IF
       *    名称
            IF     (SPA-NAI24-FTNSELNUM >   ZERO   ) 

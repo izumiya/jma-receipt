@@ -1781,11 +1781,14 @@
       *                特定は重複可とする
                        IF     (SPA-GMN-KOHNUM (IDX-K)
                                            =   SPA-GMN-KOHNUM(IDK2))
-                       AND    (SPA-GMN-KOHNUM(IDX-K)
+                       AND   ((SPA-GMN-KOHNUM(IDX-K)
                                            =   "051"  OR  "052"
                                            OR  "091"
       *                更正・育成追加
                                            OR  "015"  OR  "016"    )
+      *                北海道の地方公費
+                          OR  (SPA-GMN-KOHNUM(IDX-K)   =   "183"  AND
+                               SPA-PREFNUM             =   01    ))
                            CONTINUE
                        ELSE
       *
@@ -1902,11 +1905,14 @@
       *            特定は重複可とする
                    IF     (SPA-GMN-KOHNUM (IDX-K)
                                            =   SPA-PTKOH-KOHNUM(IDX))
-                   AND    (SPA-GMN-KOHNUM(IDX-K)
+                   AND   ((SPA-GMN-KOHNUM(IDX-K)
                                            =   "051"  OR  "052"
                                            OR  "091" 
       *                更正・育成追加
                                            OR  "015"  OR  "016"    )
+      *                北海道の地方公費
+                          OR  (SPA-GMN-KOHNUM(IDX-K)   =   "183"  AND
+                               SPA-PREFNUM             =   01    ) )
                      CONTINUE
                    ELSE
       *
