@@ -261,6 +261,7 @@
       *  04.02.17    NACL-ÌçÏÆ    08/09/01  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÆýÍÄ»ù¡Ë
       *  04.02.18    NACL-ÌçÏÆ    08/09/09  ·úÀßÏ¢¹çÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *  04.02.19    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
+      *  04.02.20    NACL-ÌçÏÆ    08/10/06  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12531,11 +12532,6 @@
                                            "190" OR "280"
                   PERFORM    23083-ZANOKIKAE-HENSYU3-SEC
              END-IF
-             IF   COMB-KOH4HKNNUM       =  "180" OR "182" OR "186" OR
-                                           "187" OR "188" OR "189" OR
-                                           "190" OR "280"
-                  PERFORM    23084-ZANOKIKAE-HENSYU4-SEC
-             END-IF
            END-IF
       *
            IF     WK-1001-PREFNUM       =   34
@@ -12543,13 +12539,22 @@
                   PERFORM    23081-ZANOKIKAE-HENSYU1-SEC
              END-IF
              IF   COMB-KOH2HKNNUM       =  "191" OR "291"
+               IF  ( COMB-KOH1HKNNUM    =  "015" OR "016" )
+               AND ((COMB-KOH3HKNNUM    =  "972" OR "974") OR
+                    (COMB-KOH4HKNNUM    =  "972" OR "974"))
+                  CONTINUE
+               ELSE
                   PERFORM    23082-ZANOKIKAE-HENSYU2-SEC
+               END-IF
              END-IF
              IF   COMB-KOH3HKNNUM       =  "191" OR "291"
+               IF  ((COMB-KOH1HKNNUM    =  "015" OR "016") OR
+                    (COMB-KOH2HKNNUM    =  "015" OR "016"))
+               AND ( COMB-KOH4HKNNUM    =  "972" OR "974" )
+                  CONTINUE
+               ELSE
                   PERFORM    23083-ZANOKIKAE-HENSYU3-SEC
-             END-IF
-             IF   COMB-KOH4HKNNUM       =  "191" OR "291"
-                  PERFORM    23084-ZANOKIKAE-HENSYU4-SEC
+               END-IF
              END-IF
            END-IF
       *
@@ -12607,17 +12612,6 @@
       ******************************************************************
        23082-ZANOKIKAE-HENSYU2-SEC           SECTION.
       *
-           IF   COMB-KOH1HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI2  >  ZAN-KOHI1
-                 MOVE   ZAN-KOHI1   TO  ZAN-KOHI2
-              END-IF
-              IF   ZAN-KOHI22 >  ZAN-KOHI12
-                 MOVE   ZAN-KOHI12  TO  ZAN-KOHI22
-              END-IF
-              IF   ZAN-KOHI23 >  ZAN-KOHI13
-                 MOVE   ZAN-KOHI13  TO  ZAN-KOHI23
-              END-IF
-           END-IF
            IF   COMB-KOH3HKNNUM  =  "972" OR "974"
               IF   ZAN-KOHI2  >  ZAN-KOHI3
                  MOVE   ZAN-KOHI3   TO  ZAN-KOHI2
@@ -12651,28 +12645,6 @@
       ******************************************************************
        23083-ZANOKIKAE-HENSYU3-SEC           SECTION.
       *
-           IF   COMB-KOH1HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI3  >  ZAN-KOHI1
-                 MOVE   ZAN-KOHI1   TO  ZAN-KOHI3
-              END-IF
-              IF   ZAN-KOHI32 >  ZAN-KOHI12
-                 MOVE   ZAN-KOHI12  TO  ZAN-KOHI32
-              END-IF
-              IF   ZAN-KOHI33 >  ZAN-KOHI13
-                 MOVE   ZAN-KOHI13  TO  ZAN-KOHI33
-              END-IF
-           END-IF
-           IF   COMB-KOH2HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI3  >  ZAN-KOHI2
-                 MOVE   ZAN-KOHI2   TO  ZAN-KOHI3
-              END-IF
-              IF   ZAN-KOHI32 >  ZAN-KOHI22
-                 MOVE   ZAN-KOHI22  TO  ZAN-KOHI32
-              END-IF
-              IF   ZAN-KOHI33 >  ZAN-KOHI23
-                 MOVE   ZAN-KOHI23  TO  ZAN-KOHI33
-              END-IF
-           END-IF
            IF   COMB-KOH4HKNNUM  =  "972" OR "974"
               IF   ZAN-KOHI3  >  ZAN-KOHI4
                  MOVE   ZAN-KOHI4   TO  ZAN-KOHI3
@@ -12688,50 +12660,6 @@
            .
       *
        23083-ZANOKIKAE-HENSYU3-EXT.
-           EXIT.
-      *
-      ******************************************************************
-      *    ÃÖ¤­´¹¤¨ÊÔ½¸£´
-      ******************************************************************
-       23084-ZANOKIKAE-HENSYU4-SEC           SECTION.
-      *
-           IF   COMB-KOH1HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI4  >  ZAN-KOHI1
-                 MOVE   ZAN-KOHI1   TO  ZAN-KOHI4
-              END-IF
-              IF   ZAN-KOHI42 >  ZAN-KOHI12
-                 MOVE   ZAN-KOHI12  TO  ZAN-KOHI42
-              END-IF
-              IF   ZAN-KOHI43 >  ZAN-KOHI13
-                 MOVE   ZAN-KOHI13  TO  ZAN-KOHI43
-              END-IF
-           END-IF
-           IF   COMB-KOH2HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI4  >  ZAN-KOHI2
-                 MOVE   ZAN-KOHI2   TO  ZAN-KOHI4
-              END-IF
-              IF   ZAN-KOHI42 >  ZAN-KOHI22
-                 MOVE   ZAN-KOHI22  TO  ZAN-KOHI42
-              END-IF
-              IF   ZAN-KOHI43 >  ZAN-KOHI23
-                 MOVE   ZAN-KOHI23  TO  ZAN-KOHI43
-              END-IF
-           END-IF
-           IF   COMB-KOH3HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI4  >  ZAN-KOHI3
-                 MOVE   ZAN-KOHI3   TO  ZAN-KOHI4
-              END-IF
-              IF   ZAN-KOHI42 >  ZAN-KOHI32
-                 MOVE   ZAN-KOHI32  TO  ZAN-KOHI42
-              END-IF
-              IF   ZAN-KOHI43 >  ZAN-KOHI33
-                 MOVE   ZAN-KOHI33  TO  ZAN-KOHI43
-              END-IF
-           END-IF
-      *
-           .
-      *
-       23084-ZANOKIKAE-HENSYU4-EXT.
            EXIT.
       *
       ******************************************************************
