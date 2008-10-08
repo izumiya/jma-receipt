@@ -48,6 +48,7 @@
       *  03.05.00    NACL-多々納   07/05/16  グループ診療対応
       *  04.01.00    NACL-多々納   07/11/05  保険追加処理削除対応
       *  04.02.00    NACL-多々納   08/04/28  後期高齢者対応
+      *  04.03.00    NACL-多々納   08/10/08  協会けんぽ、資格取得日対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -679,7 +680,7 @@
       *    患者保険ＣＳＶファイルに存在する項目数分、繰り返す
       *    またはレコード終了、または項目エラー４個まで
            PERFORM VARYING   IDX   FROM    1   BY  1
-                   UNTIL   ( IDX           >   18   )
+                   UNTIL   ( IDX           >   19   )
                    OR      ( WRK-PO-ED     >=  300  )
                    OR      ( IDE           >   4    )
       *
@@ -737,7 +738,7 @@
                    OR      ( FLG-COMMA     =   1    )
       *        カンマの位置
                IF    ( CSV-X (IDY)     =   ","  )  OR
-                     ((IDX             =   18   )  AND
+                     ((IDX             =   19   )  AND
                       (CSV-X (IDY)     =   SPACE))
                    MOVE    IDY         TO  WRK-PO-ED
                    MOVE    1           TO  FLG-COMMA
@@ -756,6 +757,12 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+           IF      FLG-COMMA           =   ZERO
+               IF      WRK-PO-ST       NOT =   WRK-PO-ED
+                   COMPUTE WRK-PO-ED       =   WRK-PO-ED   +   1
+               END-IF
+           END-IF
       *
            .
        210-CHAR-END-GET-EXT.
@@ -869,6 +876,9 @@
       *    １８：更新日
            WHEN    18
                PERFORM 2410-UPYMD-SET-SEC
+      *    １９：取得年月日
+           WHEN    19
+               PERFORM 2410-SKKGETYMD-SET-SEC
       *    フォーマットエラー
            WHEN    OTHER
       *        旧フォーマットの場合
@@ -1220,6 +1230,14 @@
            PERFORM 2401-SPACE-HENSYU-SEC
            MOVE    WRK-DATA (1:WRK-LEN)
                                    TO  PTHKN-HKNJANUM
+      *
+      *    協会けんぽ対応
+           IF      PTHKN-HKNNUM        =   "001"
+      *        政管で保険者番号が８桁は協会とする
+               IF      WRK-LEN             =   8
+                   MOVE    "009"           TO  PTHKN-HKNNUM
+               END-IF
+           END-IF
       *
            .
        2410-HKNJANUM-SET-EXT.
@@ -1760,6 +1778,34 @@
        2410-UPYMD-SET-EXT.
            EXIT.
       *****************************************************************
+      *    項目１９：資格取得日　処理
+      *****************************************************************
+       2410-SKKGETYMD-SET-SEC          SECTION.
+      *
+      *    未入力
+           IF      FLG-NODATA          =   1
+               GO  TO  2410-SKKGETYMD-SET-EXT
+           END-IF
+      *
+      *    項目桁数不正
+           IF      WRK-MO-CNT          NOT =   8
+               MOVE    2               TO  FLG-ERR
+               GO  TO  2410-SKKGETYMD-SET-EXT
+           END-IF
+      *
+      *    更新日セット
+           MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
+                                   TO   WRK-SYMD
+           PERFORM 31012-SEIWA-HEN-SEC
+           IF      FLG-YMD         =   1
+               MOVE    3               TO  FLG-ERR
+           ELSE
+               MOVE    WRK-SYMD        TO  PTHKN-SKKGETYMD
+           END-IF
+           .
+       2410-SKKGETYMD-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    患者保険マスタ中間データ作成処理
       *****************************************************************
        400-PTHKNINF-ISM-SEC        SECTION.
@@ -1928,6 +1974,9 @@
       *    １８：更新日
            WHEN    18
                MOVE    "更新日  :"     TO  ERR1-KOMOKU(IDE)
+      *    １９：取得日
+           WHEN    19
+               MOVE    "取得日  :"     TO  ERR1-KOMOKU(IDE)
       *    フォーマットエラー
            WHEN    OTHER
                MOVE    "過多項目:"     TO  ERR1-KOMOKU(IDE)

@@ -745,6 +745,12 @@
                END-IF
            END-PERFORM
       *
+           IF      FLG-COMMA           =   ZERO
+               IF      WRK-PO-ST       NOT =   WRK-PO-ED
+                   COMPUTE WRK-PO-ED       =   WRK-PO-ED   +   1
+               END-IF
+           END-IF
+      *
            .
        210-CHAR-END-GET-EXT.
            EXIT.
@@ -1393,7 +1399,7 @@
            IF      FLG-PTNUM           =   1
                MOVE    5               TO  FLG-ERR
            END-IF
-      *    患者番号読み込み
+      *    患者情報読み込み
            PERFORM 900-PTINF-READ-SEC
            IF      FLG-PTINF           =   1
                MOVE    6               TO  FLG-ERR
