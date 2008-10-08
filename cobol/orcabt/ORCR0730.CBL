@@ -48,6 +48,7 @@
       *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *  04.02.11    NACL-Æ£¸¶    08/09/24  Ê¿À®£²£°Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.02.12    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
+      *  04.02.13    NACL-ÌçÏÆ    08/10/08  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8846,6 +8847,21 @@
       *            ¥Æ¥¹¥È´µ¼Ô¤Î¤È¤­ÆÉ¤ßÈô¤Ð¤¹
                    IF      RECE62X-TSTPTNUMKBN     =   "1"
                        GO  TO  990-RECE62X-READ-SEC
+                   END-IF
+      *
+                   IF    ( RECE62X-TOTALTEN (1)      =   ZERO )
+                   AND   ( RECE62X-TOTALTEN (2)      =   ZERO )
+                   AND   ( RECE62X-TOTALTEN (3)      =   ZERO )
+                   AND   ( RECE62X-TOTALTEN (4)      =   ZERO )
+                   AND   ( RECE62X-TOTALTEN (5)      =   ZERO )
+                   AND   ( RECE62X-SHOKUJIRYOYOHI(1) =   ZERO )
+                   AND   ( RECE62X-SHOKUJIRYOYOHI(2) =   ZERO )
+                   AND   ( RECE62X-SHOKUJIRYOYOHI(3) =   ZERO )
+                   AND   ( RECE62X-SHOKUJIRYOYOHI(4) =   ZERO )
+                   AND   ( RECE62X-SHOKUJIRYOYOHI(5) =   ZERO )
+                       IF  RECE62X-RECESYUBETU   NOT =   ZERO
+                           GO  TO  990-RECE62X-READ-SEC
+                       END-IF
                    END-IF
       *
                    DISPLAY "RECE62X PTNUM=" RECE62X-PTNUM

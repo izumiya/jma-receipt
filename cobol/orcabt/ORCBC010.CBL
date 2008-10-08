@@ -34,6 +34,7 @@
       *  04.01.01    NACL-¾®Æ¦Âô  07/11/16  ¸øÌ³ºÒ³²¡¢¸ø³²¤Î¼ïÊÌÈ½ÄêÄÉ²Ã
       *  04.02.01    NACL-°ËÆ£    08/ 4/22  ²þÄêÂÐ±þ
       *  04.02.02    NACL-ÌçÏÆ    08/08/07  Àº¿ÀÄÌ±¡¤ÎÀÁµáÅÀÈ½ÄêÄÉ²Ã
+      *  04.02.03    NACL-ÌçÏÆ    08/10/08  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2655,6 +2656,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
       *                ¸øÈñ£É£Ä
                        MOVE    COMB-KOHID (IDX)
                                            TO  LNK-FTNJGNCHK-KOHID
+      *                ÅÔÆ»ÉÜ¸©ÈÖ¹æ
+                       MOVE    SYS-1001-PREFNUM
+                                           TO  LNK-FTNJGNCHK-PREFNUM
       *
                        CALL    "ORCSFTNJGNCHK" USING
                                                ORCSFTNJGNCHKAREA
@@ -2669,7 +2673,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                        GO  TO  200121-KOHID-HENSYU-EXT
                    END-IF
       *            Á´¹ñ¸øÈñ¤Î¤È¤­¡ÊÀ¸ÊÝ¡Ë
-                   IF   COMB-KOHHKNNUM (IDX)   =   "012" OR "021"
+      **>          IF   COMB-KOHHKNNUM (IDX)   =   "012" OR "021"
       *                ¥ì¥»µ­ºÜÈ½Äê
                        INITIALIZE          ORCSFTNJGNCHKAREA
                        MOVE    COMB-HOSPNUM
@@ -2686,6 +2690,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
       *                ¸øÈñ£É£Ä
                        MOVE    COMB-KOHID (IDX)
                                            TO  LNK-FTNJGNCHK-KOHID
+      *                ÅÔÆ»ÉÜ¸©ÈÖ¹æ
+                       MOVE    SYS-1001-PREFNUM
+                                           TO  LNK-FTNJGNCHK-PREFNUM
       *
                        CALL    "ORCSFTNJGNCHK" USING
                                                ORCSFTNJGNCHKAREA
@@ -2695,30 +2702,27 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                        ELSE
                            MOVE    "1"     TO  COLDAT01-TRECESKYKBN(IDY)
                        END-IF
-                       GO  TO  200121-KOHID-HENSYU-EXT
-                   END-IF
+      **>              GO  TO  200121-KOHID-HENSYU-EXT
+      **>          END-IF
       *            Á´¹ñ¸øÈñ¤Î¤È¤­¡ÊÏ·¿Í¸¶Çú¡Ë
                    IF    ( COLDAT01-RJNHKNNUM
                                        NOT =   SPACE                   )
                    AND   ( COMB-KOHHKNNUM (IDX)
                                            =   WRK-CONS-GENBAKU-HKNNUM )
+                   AND   ( COLDAT01-TRECESKYKBN(IDY)  =  "1"           )
                        IF      COLDAT01-HKNNUM =   "060"   OR  "067"
                            IF      SYS-2005-RJNGNBKKBN =   "1" OR  ZERO
-                               CONTINUE 
-                           ELSE
-                               MOVE    "1" TO  COLDAT01-TRECESKYKBN(IDY)
+                               MOVE    "2" TO  COLDAT01-TRECESKYKBN(IDY)
                            END-IF
                        ELSE                
                            IF      SYS-2005-RJNGNBKKBN =   "2" OR  ZERO
-                               CONTINUE 
-                           ELSE
-                               MOVE    "1" TO  COLDAT01-TRECESKYKBN(IDY)
+                               MOVE    "2" TO  COLDAT01-TRECESKYKBN(IDY)
                            END-IF
                        END-IF
-                       GO  TO  200121-KOHID-HENSYU-EXT
+      **>              GO  TO  200121-KOHID-HENSYU-EXT
                    END-IF
       *            Á´¹ñ¸øÈñ¤Î¤È¤­¡ÊÄ¹´ü¡¦Ï·¿Í¸¶Çú¡¦À¸ÊÝ¡¦Àº¿À°Ê³°¡Ë
-                   MOVE    "1"         TO  COLDAT01-TRECESKYKBN(IDY)
+      **>          MOVE    "1"         TO  COLDAT01-TRECESKYKBN(IDY)
                END-IF
            END-IF
            .

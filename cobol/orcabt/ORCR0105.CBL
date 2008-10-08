@@ -46,6 +46,7 @@
       *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *  04.02.09    NACL-Æ£¸¶    08/09/24  Ê¿À®£²£°Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.02.10    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
+      *  04.02.11    NACL-ÌçÏÆ    08/10/08  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8479,6 +8480,17 @@
                    IF      RECE02X-TSTPTNUMKBN     =   "1"
                        GO  TO  990-RECE02X-READ-SEC
                    END-IF
+      *
+                   IF    ( RECE02X-TOTALTEN (1) =   ZERO )
+                   AND   ( RECE02X-TOTALTEN (2) =   ZERO )
+                   AND   ( RECE02X-TOTALTEN (3) =   ZERO )
+                   AND   ( RECE02X-TOTALTEN (4) =   ZERO )
+                   AND   ( RECE02X-TOTALTEN (5) =   ZERO )
+                       IF  RECE02X-RECESYUBETU   NOT =  ZERO
+                           GO  TO  990-RECE02X-READ-SEC
+                       END-IF
+                   END-IF
+      *
                    DISPLAY "RECE02X PTNUM=" RECE02X-PTNUM     
       *
                    MOVE    ZERO                TO  FLG-RECE02X

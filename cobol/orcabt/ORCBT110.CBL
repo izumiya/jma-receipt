@@ -323,8 +323,6 @@
            COPY    "CPORCSJOBKANRI.INC".
       *   保険算定用年齢・割合計算サブ
            COPY    "CPORCSAGECHK.INC".
-      *    患者自己負担金レセプト記載判定
-           COPY    "CPORCSFTNJGNCHK.INC".
       *
       *    レセプト種別返却サブ
            COPY    "CPORCSSYUBETUGET.INC".
