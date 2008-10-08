@@ -1163,7 +1163,11 @@
                    (LNK-ORCSC-SINSATU-ARI  =   ZERO )  AND
                    (SPA-GAI-JIKANKBN   NOT =   ZERO )
               AND  (WRK-COM-HKNCOMBI (IDX-ZS) NOT =   "9999")
-               PERFORM 10019-JIKANKASAN-CHK-SEC
+               IF      (SPA-GAI-JIKANKBN       =   8 )
+                   CONTINUE
+               ELSE
+                   PERFORM 10019-JIKANKASAN-CHK-SEC
+               END-IF
            END-IF
       *    »þ´Ö²Ã»»
            IF      (LNK-ORCSC-TIMEFLG          NOT =   ZERO   OR

@@ -933,7 +933,11 @@
                    (SPA-GAI-JIKANKBN   NOT =   ZERO )  AND
                    (WRK-COM-TIMEKSNKBN(IDX-ZS)
                                        NOT =   ZERO )
-               PERFORM 10019-JIKANKASAN-CHK-SEC
+               IF      (SPA-GAI-JIKANKBN       =   8 )
+                   CONTINUE
+               ELSE
+                   PERFORM 10019-JIKANKASAN-CHK-SEC
+               END-IF
            END-IF
       *    »þ´Ö²Ã»»
            IF     ((LNK-ORCSC-TIMEFLG          NOT =   ZERO )  OR
