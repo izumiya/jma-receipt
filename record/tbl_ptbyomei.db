@@ -206,6 +206,7 @@ path	key9		{
 			WHERE   HOSPNUM    =   :HOSPNUM
 			AND   PTID        =   :PTID
 			AND   SRYYMD      <   :SRYYMD
+			AND   DLTFLG      =   ' '
 			AND  ((TENKIKBN    =   :TENKIKBN )
                           OR (TENKIYMD    =
                            (SELECT MAX(TENKIYMD)
@@ -213,15 +214,16 @@ path	key9		{
                                	WHERE   HOSPNUM    =   :HOSPNUM
 		        	AND   PTID        =   :PTID
                                 AND   SRYYMD      <   :SRYYMD
-                                AND   TENKIKBN    =   '1'))
+                                AND   TENKIKBN    =   '1'
+		         	AND   DLTFLG      =   ' ' ))
                           OR (TENKIYMD    =
                            (SELECT MAX(TENKIYMD)
                                    FROM tbl_ptbyomei 
                                	WHERE   HOSPNUM    =   :HOSPNUM
 		        	AND   PTID        =   :PTID
                                 AND   SRYYMD      <   :SRYYMD
-                                AND   TENKIKBN    =   '3'))) 
-			AND   DLTFLG      =   ' '
+                                AND   TENKIKBN    =   '3'
+		         	AND   DLTFLG      =   ' ' )))
 			ORDER  BY  TENKIKBN DESC,
                                    SRYYMD
 		;
