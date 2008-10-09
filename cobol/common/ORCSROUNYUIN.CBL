@@ -1698,8 +1698,8 @@
                                                   OR CONS-200804-KSN5
                                                   OR CONS-200804-KSN6
                                                   OR CONS-200804-KSN10)
-                          IF    (WRK-NYUINKHN(IDX1)      NOT = SPACE)
-                          AND   (LNK-SROUNYUIN-GAIHAKU(IDX1) =  ZERO)
+                          IF  (WRK-NYUINKHN(IDX1)      NOT = SPACE)
+                          AND (LNK-SROUNYUIN-GAIHAKU(IDX1) = ZERO OR 4)
                            EVALUATE   NACCT-SRYCDTOTAL(6:9)
                              WHEN  CONS-200804-KSN1
                                   MOVE   NACCT-DAY(IDX1)
@@ -1835,7 +1835,7 @@
                                   UNTIL     IDX1   >   31
                            IF    (WRK-NYUINKHN(IDX1) NOT = SPACE)
                            AND   (LNK-SROUNYUIN-GAIHAKU(IDX1)  
-                                                        =  ZERO)
+                                                        =  ZERO OR 4)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
       *                         重度認知症加算
