@@ -101,6 +101,7 @@
       *                                     （小児特定疾患カウンセリング料
       *                                       の自動記載対応）
       *                                     （在支病自動記載対応）
+      *  04.02.02    NACL-門脇    08/10/14  内服薬剤逓減編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5082,6 +5083,14 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                              MOVE   TBL-YT1-HIKAKU(IDX6)
                                 TO  TBL-YT2Y1-HIKAKU(IDX7 IDX8 IDX9)
       *
+                             COMPUTE WRK-RUIKEITOTAL  =
+                                     TBL-YT1-RUIKEITOTAL(IDX6)  *
+                                     TBL-YT1-MEISAISU(IDX6)     *
+                                     TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                             MOVE    WRK-RUIKEITOTAL
+                                TO  TBL-YT2Y1-RUIKEITOTAL
+                                                       (IDX7 IDX8 IDX9)
+      *
                              ADD    TBL-YT1-ZAITEN(IDX6)
                                 TO  TBL-YT2Y1-ZAITEN(IDX7 IDX8 26)
                              ADD    TBL-YT1-SRYCDTOTAL(IDX6)
@@ -5092,7 +5101,8 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       ***                       TO  TBL-YT2Y1-RUIKEITOTAL(IDX7 IDX8 26)
                              COMPUTE WRK-RUIKEITOTAL  =
                                      TBL-YT1-RUIKEITOTAL(IDX6)  *
-                                     TBL-YT1-MEISAISU(IDX6)
+                                     TBL-YT1-MEISAISU(IDX6)     *
+                                     TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                              ADD     WRK-RUIKEITOTAL
                                 TO  TBL-YT2Y1-RUIKEITOTAL(IDX7 IDX8 26)
                              ADD    TBL-YT1-MEISAISU(IDX6)
@@ -5133,6 +5143,14 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                              MOVE   TBL-YT1-HIKAKU(IDX6)
                                 TO  TBL-YT2Y2-HIKAKU(IDX7 IDX8 IDX9)
       *
+                             COMPUTE WRK-RUIKEITOTAL  =
+                                     TBL-YT1-RUIKEITOTAL(IDX6)  *
+                                     TBL-YT1-MEISAISU(IDX6)     *
+                                     TBL-YT1-KAISU(IDX6 IDX7 IDX8)
+                             MOVE    WRK-RUIKEITOTAL
+                                TO  TBL-YT2Y1-RUIKEITOTAL
+                                                       (IDX7 IDX8 IDX9)
+      *
                              ADD    TBL-YT1-ZAITEN(IDX6)
                                 TO  TBL-YT2Y2-ZAITEN(IDX7 IDX8 4)
                              ADD    TBL-YT1-SRYCDTOTAL(IDX6)
@@ -5143,7 +5161,8 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       ***                       TO  TBL-YT2Y2-RUIKEITOTAL(IDX7 IDX8 4)
                              COMPUTE WRK-RUIKEITOTAL  =
                                      TBL-YT1-RUIKEITOTAL(IDX6)  *
-                                     TBL-YT1-MEISAISU(IDX6)
+                                     TBL-YT1-MEISAISU(IDX6)     *
+                                     TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                              ADD     WRK-RUIKEITOTAL
                                 TO  TBL-YT2Y2-RUIKEITOTAL(IDX7 IDX8 4)
                              ADD    TBL-YT1-MEISAISU(IDX6)
