@@ -3330,10 +3330,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
       *
            EVALUATE    SPA-CID5-FLG
                WHEN    "OK"
-                   MOVE    "0"         TO  SHELLTBL-ARG4
+                   MOVE    "0"         TO  SHELLTBL-ARG4(1:1)
                WHEN    "CSV"
-                   MOVE    "1"         TO  SHELLTBL-ARG4
+                   MOVE    "1"         TO  SHELLTBL-ARG4(1:1)
            END-EVALUATE
+           MOVE    SPA-STAFFCD         TO  SHELLTBL-ARG4(2:5)
       *
            MOVE    CONST-JOBID         TO  SHELLTBL-ARG5
            MOVE    CONST-JOB-SHELLID   TO  SHELLTBL-ARG6
