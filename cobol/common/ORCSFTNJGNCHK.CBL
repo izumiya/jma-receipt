@@ -389,11 +389,15 @@
                EVALUATE   WRK-TEISYOTOKU
                  WHEN     SPACE
                    MOVE   HKN-HON-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
-                   IF  (LNK-FTNJGNCHK-PREFNUM =  25            ) AND
-                       (LNK-FTNJGNCHK-KOHNUM  = "140" OR "241" OR
-                                                "243" OR "244" OR
-                                                "245" OR "441" ) AND
-                       (LNK-FTNJGNCHK-SRYYM  >= "200508"       )
+      ***          IF  (LNK-FTNJGNCHK-PREFNUM =  25            ) AND
+      ***              (LNK-FTNJGNCHK-KOHNUM  = "140" OR "241" OR
+      ***                                       "243" OR "244" OR
+      ***                                       "245" OR "441" ) AND
+      ***              (LNK-FTNJGNCHK-SRYYM  >= "200508"       )
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     25        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
+                   AND (LNK-FTNJGNCHK-SRYYM       >= "200508"      )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
                  WHEN     "1"
