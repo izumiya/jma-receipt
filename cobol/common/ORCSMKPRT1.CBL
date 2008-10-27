@@ -77,7 +77,7 @@
       *
       *    ¥·¥§¥ëÍÑÎÎ°è
            COPY    "CPSHELLTBL.INC".
-           COPY    "ORCA-DBPATH".
+      *    COPY    "ORCA-DBPATH".
       *
        01  FLG-AREA.
            03  FLG-SYORI           PIC 9(01).
@@ -377,6 +377,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF        ( STS-IN     NOT  =   ZERO )
                    DISPLAY "INPUT OPEN ERR"
            ELSE
+               INITIALIZE   PRT-IN-REC
                READ PRT-IN-FILE
                MOVE HC01PARA-FORM-ID   TO PRTOUTPARA-FORM-ID
                MOVE SPA-PRT-UUID       TO PRTOUTPARA-UUID
