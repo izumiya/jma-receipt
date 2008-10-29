@@ -5214,6 +5214,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        41016-HENSRYYMD-CHK-SEC             SECTION.
       *
+           IF      SPA-LOCK            =   ZERO
+               CONTINUE
+           ELSE
+               MOVE    "0076"          TO  SPA-ERRCD
+               GO      TO      41016-HENSRYYMD-CHK-EXT
+           END-IF
+      *
       *    剤修正のチェック
            IF      SPA-GMN-BANGO   NOT =   ZERO
                MOVE    "0009"          TO  SPA-ERRCD
@@ -12666,6 +12673,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                WHEN    "0075"
                    STRING  "変更前と変更後が同日です。"
+                           "診療日変更はできません。"
+                                       DELIMITED   BY  SIZE
+                                       INTO   WRK-ERRMSG
+                   END-STRING
+      *
+               WHEN    "0076"
+                   STRING  "他端末で使用中です。" 
                            "診療日変更はできません。"
                                        DELIMITED   BY  SIZE
                                        INTO   WRK-ERRMSG
