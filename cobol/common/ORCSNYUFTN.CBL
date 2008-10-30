@@ -103,6 +103,8 @@
       *  04.02.05    NACL-門脇    08/06/15  入院料加算外泊チェック
       *  03.02.06    NACL-門脇    08/07/28  計算優先順位編集修正（長期）
       *  03.02.07    NACL-門脇    08/08/27  入院料加算外泊チェック修正
+      *  04.02.08    NACL-門脇    08/10/07  入院基本料有効期間チェック
+      *  04.02.09    NACL-門脇    08/10/30  保険組合せ有効期間チェック
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -129,6 +131,8 @@
            03  WRK-CHECK-STDAY             PIC 9(02).
            03  WRK-CHECK-EDDAY             PIC 9(02).
            03  WRK-MSGCD                   PIC 9(02).
+           03  WRK-NYUINRYO-ERR            PIC 9(01).
+           03  WRK-HANTEI-YMD              PIC X(08).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -215,6 +219,8 @@
               03 WRK-HANBETU-PTFTNRATE     PIC 9(03).
               03 WRK-HANBETU-SENINFLG      PIC X(01).                   
               03 WRK-HANBETU-SENINFLG2     PIC X(01).                   
+              03 WRK-HANBETU-TEKSTYMD      PIC X(08).
+              03 WRK-HANBETU-TEKEDYMD      PIC X(08).
       *
        01  WRK-HANBETU2-TABLE.
            02  WRK-HANBETU2-TBL OCCURS   10.
@@ -222,7 +228,7 @@
               03 WRK-HANBETU2-HKNCOMBINUM  PIC 9(04).
               03 WRK-HANBETU2-DAY          PIC X(01)   OCCURS   31.
       *
-       01  WRK-HANBETU-DATA                PIC X(112).
+       01  WRK-HANBETU-DATA                PIC X(128).
       *
       *    入院点数算定用ワークエリア
        01  WRK-NYUIN-TENSU-AREA.
@@ -252,6 +258,7 @@
            03  FLG-SANTEI                  PIC 9(01).
            03  FLG-TOKUSYU                 PIC 9(01).
            03  FLG-KOUREISYA               PIC 9(01).
+           03  FLG-KUMIAWASE-HANTEI        PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
@@ -566,6 +573,12 @@
       *
            PERFORM       SYUNOU-SET-SEC.
       *
+           IF    LNK-S02-RC            =    ZERO
+           AND   FLG-KUMIAWASE-HANTEI  =    1
+                 MOVE   18       TO    LNK-S02-RC
+                 GO   TO   MAIN-EXT
+           END-IF.
+      *
       *    入院会計から収納エリアへのセット
            PERFORM    VARYING   IDX    FROM   1   BY   1
                       UNTIL  (IDX            >    10)
@@ -691,6 +704,12 @@
              END-PERFORM
              IF   WRK-MSGCD   NOT =  ZERO
                 MOVE     WRK-MSGCD    TO    LNK-S02-RC
+             END-IF
+           END-IF.
+      *
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-NYUINRYO-ERR  =  1
+                MOVE     17     TO    LNK-S02-RC
              END-IF
            END-IF.
       *
@@ -1269,6 +1288,15 @@
                                              MCPDATA-REC
                                              SPA-AREA
       *
+              MOVE COMB-TEKSTYMD      TO WRK-HANBETU-TEKSTYMD(IDX)
+              IF   WRK-HANBETU-TEKSTYMD(IDX) = SPACE
+                 MOVE  "00000000"     TO WRK-HANBETU-TEKSTYMD(IDX)
+              END-IF
+              MOVE COMB-TEKEDYMD      TO WRK-HANBETU-TEKEDYMD(IDX)
+              IF   WRK-HANBETU-TEKEDYMD(IDX) = SPACE
+                 MOVE  "00000000"     TO WRK-HANBETU-TEKEDYMD(IDX)
+              END-IF
+      *
               MOVE COMB-HKNNUM        TO WRK-HANBETU-SYUHKNNUM(IDX)
               MOVE COMB-KOH1HKNNUM    TO WRK-HANBETU-KOH1HKNNUM(IDX)
               MOVE COMB-KOH2HKNNUM    TO WRK-HANBETU-KOH2HKNNUM(IDX)
@@ -1601,6 +1629,8 @@
       ******************************************************************
        SYUNOU-SET-SEC         SECTION.
       *
+           MOVE       ZERO      TO     FLG-KUMIAWASE-HANTEI.
+      *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                               UNTIL  (IDX            >    10)
                                 OR   (WRK-HANBETU-SKYYM(IDX) =  SPACE)
@@ -1648,6 +1678,17 @@
                              UNTIL  IDY            >    31
                    MOVE  WRK-HANBETU-DAY(IDX IDY) 
                                       TO LNK-SYU-DAY(IDX IDY)
+      *
+                   IF    WRK-HANBETU-DAY(IDX IDY)  NOT = SPACE
+                     MOVE WRK-HANBETU-SKYYM(IDX) TO WRK-HANTEI-YMD(1:6)
+                     MOVE IDY                    TO WRK-HANTEI-YMD(7:2)
+                     IF  WRK-HANBETU-TEKSTYMD(IDX) <= WRK-HANTEI-YMD
+                     AND WRK-HANBETU-TEKEDYMD(IDX) >= WRK-HANTEI-YMD
+                         CONTINUE
+                     ELSE
+                         MOVE      1     TO     FLG-KUMIAWASE-HANTEI
+                     END-IF
+                   END-IF
               END-PERFORM
       *
       *       ワーク日別収納レコードセット処理                         
@@ -2123,6 +2164,13 @@ grpsys                            SPA-AREA
       *    入院料関係の取得
       **************************************************************
        NYUINACCT-GET-SEC           SECTION.
+      *
+           IF    (NACCT-ZAITEN          = ZERO           )
+           AND   (NACCT-SRYYM(1:6)      = SYU-SRYYMD(1:6))
+           AND   (NACCT-ZAISKBKBN       = "1"            )
+           AND   (NACCT-SRYCDTOTAL  NOT = 99999916       )
+               MOVE      1      TO     WRK-NYUINRYO-ERR
+           END-IF
       *
            IF    (NACCT-ZAITEN    NOT = ZERO           ) AND
                  (NACCT-SRYYM(1:6)    = SYU-SRYYMD(1:6))
@@ -2664,6 +2712,12 @@ grpsys                              SPA-AREA
       *
               END-PERFORM
       *
+           ELSE
+      *
+              IF   LNK-SROUNYUIN-RC   =   7
+                   MOVE    1    TO   WRK-NYUINRYO-ERR
+              END-IF
+      *
            END-IF
       *
            .
@@ -2730,6 +2784,10 @@ grpsys                            SPA-AREA
                                 WHEN     6
                                     MOVE  TNS-TEN  TO  WRK-HYOKETU-TEN
                               END-EVALUATE
+                         END-IF
+                     ELSE
+                         IF  NYUINACT-IDX    =    1
+                              MOVE    1    TO   WRK-NYUINRYO-ERR
                          END-IF
                      END-IF                  
                END-PERFORM
@@ -4929,6 +4987,7 @@ grpsys                                    SPA-AREA
                                                 SINRYO-COUNT)
                                     END-EVALUATE
                                    WHEN   "90"
+                                   WHEN   "92"
                                        COMPUTE  TBL-TGMONEY(15)  =
                                                 TBL-TGMONEY(15)  +
                                                (SRY-JIHIMONEY(IDZ) *
@@ -5242,6 +5301,7 @@ grpsys                                    SPA-AREA
                                                 SINRYO-COUNT)
                                     END-EVALUATE
                                    WHEN   "90"
+                                   WHEN   "92"
                                        COMPUTE  TBL-TGMONEY-TAX(15)  =
                                                 TBL-TGMONEY-TAX(15)  +
                                                (SRY-JIHIMONEY(IDZ) *

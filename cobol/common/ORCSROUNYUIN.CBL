@@ -74,6 +74,7 @@
       *                                     Ï«ºÒÆþ±¡²Ã»»¤Ë´Þ¤á¤ë¡ÊÆþ±¡²ñ·×¤è¤ê¡Ë
       *                                     ¡¦½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»
       *  04.02.03    NACL-ÌçÏÆ    08/09/24  Æþ±¡Î¬¾ÎÊÔ½¸ÄÉ²Ã
+      *  04.02.04    NACL-ÌçÏÆ    08/10/07  Æþ±¡´ðËÜÎÁÍ­¸ú´ü´Ö¥Á¥§¥Ã¥¯
       *****************************************************************
       *
       *
@@ -204,6 +205,8 @@
            03  WRK-HYOKETU-TAIHI           PIC X(09).
            03  WRK-HYOKETU-TEN             PIC 9(09)V99.
            03  WRK-ZAITEN-HYOKETU          PIC 9(08).
+      *
+           03  WRK-NYUINRYO-ERR            PIC 9(01).
       *
       *    Ï«ºÒÆþ±¡²ñ·×¥ï¡¼¥¯
            03  WRK-ROUSAI-TABLE.
@@ -568,6 +571,12 @@
            ELSE
                PERFORM 210-ROUNYUIN-SET2-SEC
            END-IF
+      *
+           IF  LNK-SROUNYUIN-RC  =  ZERO
+             IF   WRK-NYUINRYO-ERR  =  1
+                MOVE     7     TO    LNK-SROUNYUIN-RC
+             END-IF
+           END-IF
            .
        200-MAIN-EXT.
            EXIT.
@@ -634,6 +643,24 @@
                                                    WRK-NYUINKHN(IDX1)
       *
                                IF   FLG-RYAKU   =   ZERO
+      *
+                                  IF   NSRY-SRYCD(1)  NOT =   SPACE
+                                      INITIALIZE    TNS-TENSU-REC
+                                      MOVE NSRY-SRYCD(1)
+                                                TO  TNS-SRYCD
+                                      MOVE LNK-SROUNYUIN-HOSPNUM
+                                                TO  TNS-HOSPNUM
+                                      MOVE LNK-SROUNYUIN-SANTEIYM
+                                                TO  TNS-YUKOSTYMD(1:6)
+                                      MOVE "01" TO  TNS-YUKOSTYMD(7:2)
+                                      MOVE LNK-SROUNYUIN-SANTEIYM
+                                                TO  TNS-YUKOEDYMD(1:6)
+                                      MOVE "01" TO  TNS-YUKOEDYMD(7:2)
+                                      PERFORM 910-TENSU-READ-SEC
+                                      IF  FLG-TENSU  NOT = ZERO
+                                        MOVE  1 TO  WRK-NYUINRYO-ERR
+                                      END-IF
+                                  END-IF
       *
                                   PERFORM  VARYING  IDX3  FROM  2  BY  1
                                             UNTIL   IDX3   >    3
@@ -1541,6 +1568,24 @@
                                                    WRK-NYUINKHN(IDX1)
       *
                                IF   FLG-RYAKU   =   ZERO
+      *
+                                  IF   NSRY-SRYCD(1)  NOT =   SPACE
+                                      INITIALIZE    TNS-TENSU-REC
+                                      MOVE NSRY-SRYCD(1)
+                                                TO  TNS-SRYCD
+                                      MOVE LNK-SROUNYUIN-HOSPNUM
+                                                TO  TNS-HOSPNUM
+                                      MOVE LNK-SROUNYUIN-SANTEIYM
+                                                TO  TNS-YUKOSTYMD(1:6)
+                                      MOVE "01" TO  TNS-YUKOSTYMD(7:2)
+                                      MOVE LNK-SROUNYUIN-SANTEIYM
+                                                TO  TNS-YUKOEDYMD(1:6)
+                                      MOVE "01" TO  TNS-YUKOEDYMD(7:2)
+                                      PERFORM 910-TENSU-READ-SEC
+                                      IF  FLG-TENSU  NOT = ZERO
+                                        MOVE  1 TO  WRK-NYUINRYO-ERR
+                                      END-IF
+                                  END-IF
       *
                                   PERFORM  VARYING  IDX3  FROM  2  BY  1
                                             UNTIL   IDX3   >    3
