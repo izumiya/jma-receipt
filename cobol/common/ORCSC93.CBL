@@ -1491,6 +1491,12 @@
                            MOVE    "1"             TO  SPA-COM-ZAIEND
                                                                   (IDX)
                            MOVE    1               TO  FLG-ZAI
+      *!!
+      *入院は算定不可とする（VER.4.3のマスタ変更の為
+                           IF      SPA-NYUGAIKBN   =   "1"
+                              MOVE    "0014"           TO  SPA-ERRCD
+                           END-IF
+      *!!
       *                後発医薬品への変更不可（薬剤毎）
                        WHEN    "099209903"
                            IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
@@ -1503,6 +1509,12 @@
                            ELSE
                                MOVE    "2063"        TO  SPA-ERRCD
                            END-IF
+      *!!
+      *入院は算定不可とする（VER.4.3のマスタ変更の為
+                           IF      SPA-NYUGAIKBN   =   "1"
+                              MOVE    "0014"           TO  SPA-ERRCD
+                           END-IF
+      *!!
       *
                        WHEN    OTHER
       *                Ｈ１８．４からリハビリ発生日
