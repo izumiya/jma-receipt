@@ -575,8 +575,12 @@
       *
            IF    LNK-S02-RC            =    ZERO
            AND   FLG-KUMIAWASE-HANTEI  =    1
+              IF   LNK-S02-TEIKI-KBN   =   "X"
+                 CONTINUE
+              ELSE
                  MOVE   18       TO    LNK-S02-RC
                  GO   TO   MAIN-EXT
+              END-IF
            END-IF.
       *
       *    入院会計から収納エリアへのセット
