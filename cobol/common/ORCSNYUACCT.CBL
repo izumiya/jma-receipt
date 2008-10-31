@@ -884,7 +884,7 @@
                IF      FLG-TENSU       NOT =   ZERO
                    DISPLAY "ORCSNYUACCT TENSU INV:" 
                            LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
-                   MOVE    2               TO  LNK-SCNYUACCT-RC
+      *             MOVE    2               TO  LNK-SCNYUACCT-RC
                END-IF
                MOVE    ZERO                TO  WRK-MAXCNT
       *
@@ -1265,7 +1265,7 @@
            PERFORM 910-TENSU-READ-SEC
            IF      FLG-TENSU       NOT =   ZERO
                DISPLAY "ORCSNYUACCT TENSU INV:" TBL-SRYCD (IDX)
-               MOVE    2               TO  LNK-SCNYUACCT-RC
+      *         MOVE    2               TO  LNK-SCNYUACCT-RC
            END-IF
       *    対象年齢チェック（入院基本料以外）
            IF      WRK-ACT-ZAISKBKBN    =  "1"
