@@ -1821,6 +1821,12 @@
                WHEN    16
                    MOVE    "2005"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    17
+                   MOVE    "2006"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    18
+                   MOVE    "2007"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    OTHER
                    MOVE    "2001"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
@@ -2732,6 +2738,22 @@
                STRING  "入院料の算定が無い日に入院料加算が"
                                            DELIMITED   BY  SPACE
                        "算定されています"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2006"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "入院料の有効期間が切れています。"
+                                           DELIMITED   BY  SPACE
+                       "確認してください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2007"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "保険組合せの有効期間が切れています。"
+                                           DELIMITED   BY  SPACE
+                       "確認してください"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

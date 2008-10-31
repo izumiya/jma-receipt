@@ -217,6 +217,10 @@
                "外泊日に入院料加算が算定されています".
            03  ERR-MSG13                   PIC X(100)    VALUE
                "入院料の算定が無い日に入院料加算が算定されています".
+           03  ERR-MSG14                   PIC X(100)    VALUE
+               "入院料の有効期間が切れています".
+           03  ERR-MSG15                   PIC X(100)    VALUE
+               "保険組合せの有効期間が切れています".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -898,6 +902,10 @@
                    MOVE    "0012"      TO  ERR-ERRCD
                WHEN    16
                    MOVE    "0013"      TO  ERR-ERRCD
+               WHEN    17
+                   MOVE    "0014"      TO  ERR-ERRCD
+               WHEN    18
+                   MOVE    "0015"      TO  ERR-ERRCD
                WHEN    OTHER
                    MOVE    "0006"      TO  ERR-ERRCD
                END-EVALUATE
@@ -1527,6 +1535,10 @@
                MOVE    ERR-MSG12       TO  ERR-ERRMSG
            WHEN    "0013"
                MOVE    ERR-MSG13       TO  ERR-ERRMSG
+           WHEN    "0014"
+               MOVE    ERR-MSG14       TO  ERR-ERRMSG
+           WHEN    "0015"
+               MOVE    ERR-MSG15       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE
