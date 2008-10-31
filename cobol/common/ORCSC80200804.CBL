@@ -1689,7 +1689,7 @@
       **** END-IF
       *    £È£²£°¡¥£´¤«¤é£±Ç¯Ì¤Ëþ¤È¤¹¤ë
            COMPUTE WRK-SYO2-YY         =   WRK-SYO2-YY   +   1
-           IF      SPA-SRYYMD          >   WRK-SYOYMD2
+           IF      SPA-SRYYMD          >=  WRK-SYOYMD2
                MOVE    1               TO  FLG-NENREI
            END-IF
       *
@@ -1708,7 +1708,7 @@
                                                OR  "180031110"
                                                OR  "180031210"
                                                OR  "180031310"
-                       IF      SPA-SRYYMD      >   WRK-SYOYMD2
+                       IF      SPA-SRYYMD      >=  WRK-SYOYMD2
                            IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)
                            AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
                                MOVE    IDX-Z       TO  LNK-ORCSC-KEI-IDX
