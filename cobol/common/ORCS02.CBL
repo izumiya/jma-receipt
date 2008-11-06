@@ -232,6 +232,7 @@
       *  04.02.24    NACL-門脇    08/10/02  北海道特定疾患対応
       *  04.02.25    NACL-門脇    08/10/22  神戸市地方公費大阪府対応
       *  04.02.26    NACL-門脇    08/11/05  鳥取県地方公費対応
+      *  04.02.27    NACL-門脇    08/11/05  上限に食事を含む場合の残編集修正
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -14347,7 +14348,8 @@
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)     
                IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
                    COMPUTE   ZAN-KOHI-T(KOH-IDX) =
-                             ZAN-KOHI-T(KOH-IDX)  +  5
+      ***                    ZAN-KOHI-T(KOH-IDX)  +  5
+                             ZAN-KOHI-T(KOH-IDX)  +  4
                    COMPUTE   WK-FTN      =
                              ZAN-KOHI-T(KOH-IDX)  /  10
                    COMPUTE   ZAN-KOHI-T(KOH-IDX) =
@@ -14652,7 +14654,8 @@
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)     
                IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
                    COMPUTE   ZAN-KOHI-T(KOH-IDX) =
-                             ZAN-KOHI-T(KOH-IDX)  +  5
+      ***                    ZAN-KOHI-T(KOH-IDX)  +  5
+                             ZAN-KOHI-T(KOH-IDX)  +  4
                    COMPUTE   WK-FTN      =
                              ZAN-KOHI-T(KOH-IDX)  /  10
                    COMPUTE   ZAN-KOHI-T(KOH-IDX) =
@@ -17188,7 +17191,8 @@
       *
            IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
                COMPUTE   ZAN-KOHI-T(KOH-IDX) =
-                         ZAN-KOHI-T(KOH-IDX) +   5
+      ***                ZAN-KOHI-T(KOH-IDX) +   5
+                         ZAN-KOHI-T(KOH-IDX) +   4
                COMPUTE   WK-FTN      =
                          ZAN-KOHI-T(KOH-IDX) /  10
                COMPUTE   ZAN-KOHI-T(KOH-IDX) =
