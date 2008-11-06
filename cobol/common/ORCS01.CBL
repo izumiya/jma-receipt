@@ -263,6 +263,7 @@
       *  04.02.19    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       *  04.02.20    NACL-ÌçÏÆ    08/10/06  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.21    NACL-ÌçÏÆ    08/10/22  ¿À¸Í»ÔÃÏÊý¸øÈñÂçºåÉÜÂÐ±þ
+      *  04.02.22    NACL-ÌçÏÆ    08/11/05  Ä»¼è¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -7506,12 +7507,9 @@
       *
            END-IF.
       *
-      *    °ñ¾ë¸©¡Ê£±£´£³¡¢£±£´£µ¡Ë
-           IF   WK-1001-PREFNUM          =  08
+      *    °ñ¾ë¸©¡¢Ä»¼è¸©
+           IF   WK-1001-PREFNUM          =  08 OR 31
               IF     SYU-KOH1HKNNUM(1:1)   >=  "1" AND <=  "8"
-      ***     IF     SYU-KOH1HKNNUM  =  "143" OR "145"
-      ***                            OR "181" OR "182" OR "189"
-      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
                 END-IF
@@ -7526,9 +7524,6 @@
                 END-IF
               END-IF
               IF     SYU-KOH2HKNNUM(1:1)   >=  "1" AND <=  "8"
-      ***     IF     SYU-KOH2HKNNUM  =  "143" OR "145"
-      ***                            OR "181" OR "182" OR "189"
-      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
                 END-IF
@@ -7543,9 +7538,6 @@
                 END-IF
               END-IF
               IF     SYU-KOH3HKNNUM(1:1)   >=  "1" AND <=  "8"
-      ***     IF     SYU-KOH3HKNNUM  =  "143" OR "145"
-      ***                            OR "181" OR "182" OR "189"
-      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
                 END-IF
@@ -7560,9 +7552,6 @@
                 END-IF
               END-IF
               IF     SYU-KOH4HKNNUM(1:1)   >=  "1" AND <=  "8"
-      ***     IF     SYU-KOH4HKNNUM  =  "143" OR "145"
-      ***                            OR "181" OR "182" OR "189"
-      ***                            OR "187" OR "188"
                 IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
                 END-IF
