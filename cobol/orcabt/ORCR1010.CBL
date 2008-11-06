@@ -41,6 +41,7 @@
       *                                     （在支病自動記載対応）
       *  04.02.02    NACL-門脇    08/06/03  ネブライザー加算編集修正
       *  04.02.03    NACL-門脇    08/06/20  在宅編集修正
+      *  04.02.04    NACL-門脇    08/11/06  皮下筋肉、静脈注射の記載変更対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1639,10 +1640,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
                IF          SRY-SRYKBN       =     "31" OR "32"
                  IF        SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
-                                           OR    CONS-SEIBUTU
-                                           OR    CONS-MAYAKU
+      ***                                  OR    CONS-SEIBUTU
+      ***                                  OR    CONS-MAYAKU
                                            OR    CONS-JYOMYAKU
-                                           OR    CONS-JYOMYAKUKASAN
+      ***                                  OR    CONS-JYOMYAKUKASAN
                    MOVE    SPACE           TO    RECE130-NAME(IDX4)
                  END-IF
                END-IF

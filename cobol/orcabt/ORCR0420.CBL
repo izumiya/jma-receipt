@@ -155,6 +155,7 @@
       *                                       の自動記載対応）
       *                                     （在支病自動記載対応）
       *  04.02.02    NACL-門脇    08/06/20  在宅編集修正
+      *  04.02.03    NACL-門脇    08/11/06  皮下筋肉、静脈注射の記載変更対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2064,10 +2065,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                IF          SRY-SRYKBN       =     "31" OR "32"
                  IF        SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
-                                           OR    CONS-SEIBUTU
-                                           OR    CONS-MAYAKU
+      ***                                  OR    CONS-SEIBUTU
+      ***                                  OR    CONS-MAYAKU
                                            OR    CONS-JYOMYAKU
-                                           OR    CONS-JYOMYAKUKASAN
+      ***                                  OR    CONS-JYOMYAKUKASAN
                    MOVE    SPACE           TO    RECE45-NAME(IDX4)
                  END-IF
                END-IF
