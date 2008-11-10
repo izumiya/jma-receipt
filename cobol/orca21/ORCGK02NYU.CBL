@@ -2638,7 +2638,7 @@
       *
       *    入力コード・名称チェック処理
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   (IDX        >   200 )  OR
+                   UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
                IF      SPA-COM-CUR (IDX)   =   SPACE
@@ -2663,7 +2663,7 @@
            MOVE    ZERO                TO  WRK-MAE-TENSU
            MOVE    ZERO                TO  FLG-MAE-TENSU
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   (IDX        >   200 )  OR
+                   UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
                IF     (SPA-COM-KZMFLG (IDX)    NOT =   SPACE )  OR
@@ -6941,7 +6941,7 @@
                       (SPA-COM-SET  (IDX + 1)  =   "1"))
                    MOVE    SPACE           TO  SPA-GMN-INPUTCD(IDX)
                    PERFORM 410151-SETDEL2-SEC
-                   MOVE    200             TO  IDX
+                   MOVE    SPA-MAX-LINE    TO  IDX
                ELSE
                    MOVE    SPACE           TO  SPA-GMN-INPUTCD(IDX)
                    IF    ((IDX                 <   SPA-MAX-LINE ) AND
@@ -6980,7 +6980,7 @@
                    MOVE    SPACE           TO  SPA-GMN-INPUTCD(IDX3)
                    ADD     1               TO  SPA-GMN-IDX
                ELSE
-                   MOVE    200             TO  IDX3
+                   MOVE    SPA-MAX-LINE    TO  IDX3
                END-IF
            END-PERFORM
       *
@@ -7074,7 +7074,7 @@
                    END-IF
       *
                    IF     (WRK-COM-ZAIEND (IDX)    =   "1" )  OR
-                         ((IDX                     <   200 )  AND
+                         ((IDX                     <   SPA-MAX-LINE) AND
                           (WRK-GMN-SRYKBN (IDX + 1)    NOT =   SPACE))
                        MOVE    ZERO            TO  FLG-ZAIEND
                    END-IF
