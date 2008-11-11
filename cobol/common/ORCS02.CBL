@@ -233,6 +233,7 @@
       *  04.02.25    NACL-ÌçÏÆ    08/10/22  ¿À¸Í»ÔÃÏÊý¸øÈñÂçºåÉÜÂÐ±þ
       *  04.02.26    NACL-ÌçÏÆ    08/11/05  Ä»¼è¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.27    NACL-ÌçÏÆ    08/11/05  ¾å¸Â¤Ë¿©»ö¤ò´Þ¤à¾ì¹ç¤Î»ÄÊÔ½¸½¤Àµ
+      *  04.02.28    NACL-ÌçÏÆ    08/11/10  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -346,6 +347,7 @@
            03  FLG-SYUGAKUMAE          PIC 9(01).
            03  FLG-TAISYO              PIC 9(01).
            03  FLG-ZENKI-TOKUREI       PIC 9(01).
+           03  FLG-CHECK-OK            PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -539,6 +541,11 @@
            03  WK-TOTORI-JIRITU            PIC  9(01).
       *
            03  WK-ZENKI-TOKUREI-MONEY      PIC  9(07).
+      *
+           03  WK-CHECK-FTNJANUM           PIC  X(08).
+           03  WK-CHECK-FTNJANUM2          PIC  X(08).
+           03  WK-CHECK-JKYSNUM            PIC  X(20).
+           03  WK-CHECK-JKYSNUM2           PIC  X(20).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -780,6 +787,8 @@
            03  NYULIFE-IDX             PIC  9(02).
            03  GEN-IDX                 PIC  9(02).
            03  SYOTOKU-IDX             PIC  9(02).
+           03  CHECK-IDX               PIC  9(02).
+           03  CHECK-IDX2              PIC  9(02).
       *
       *    ¹âÎð¼Ô¤ÎÉéÃ´¾å¸Â»»Äê¥¨¥ê¥¢
        01  WK-SYUHKN-TAIHI-AREA.
@@ -7427,250 +7436,8 @@
              PERFORM   DB-CLOSE-SEC.
       ***  END-IF.
       *
-      *    ÆÃÄê¼À´µ
-           IF    LNK-SYU-SRYYMD(1:6)         >= "200310"
-      *
-              IF     SYU-KOH1HKNNUM  =  "051" 
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "051" 
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-      *
-           END-IF.
-      *
-      *    ËÌ³¤Æ»ÆÃÄê¼À´µ
-           IF   (WK-1001-PREFNUM          =  01     )
-           AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
-      *
-              IF     SYU-KOH1HKNNUM  =  "183"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "183"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-      *
-           END-IF.
-      *
-      *    ¾®»ùÆÃÄê
-           IF    LNK-SYU-SRYYMD(1:6)         >= "200504"
-      *
-              IF     SYU-KOH1HKNNUM  =  "052"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "052"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-      *
-           END-IF.
-      *
-      *    °ñ¾ë¸©¡¢Ä»¼è¸©
-           IF   WK-1001-PREFNUM          =  08 OR 31
-              IF     SYU-KOH1HKNNUM(1:1)   >=  "1" AND <=  "8"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM(1:1)   >=  "1" AND <=  "8"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-              IF     SYU-KOH3HKNNUM(1:1)   >=  "1" AND <=  "8"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH3ID
-                END-IF
-                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
-                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH3ID
-                END-IF
-                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
-                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
-                END-IF
-              END-IF
-              IF     SYU-KOH4HKNNUM(1:1)   >=  "1" AND <=  "8"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
-                END-IF
-                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH4ID
-                END-IF
-                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
-                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH4ID
-                END-IF
-                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
-                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH4ID
-                END-IF
-              END-IF
-           END-IF.
-      *
-      *    º´²ì¸©ÆýÍÄ»ù
-           IF    (WK-1001-PREFNUM       =   41         )
-           AND   (WK-HKNJANUM2      NOT =   WK-HKNJANUM)
-              IF     SYU-KOH1HKNNUM  =  "181"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "181"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-              IF     SYU-KOH3HKNNUM  =  "181"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH3ID
-                END-IF
-              END-IF
-              IF     SYU-KOH4HKNNUM  =  "181"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH4ID
-                END-IF
-              END-IF
-           END-IF.
-      *    ÆÁÅç¸©ÆýÍÄ»ù
-           IF    (WK-1001-PREFNUM       =   36         )
-           AND   (WK-HKNJANUM2      NOT =   WK-HKNJANUM)
-              IF     SYU-KOH1HKNNUM  =  "245" OR "445"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "245" OR "445"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-              IF     SYU-KOH3HKNNUM  =  "245" OR "445"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH3ID
-                END-IF
-              END-IF
-              IF     SYU-KOH4HKNNUM  =  "245" OR "445"
-                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
-                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
-                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
-                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
-                   MOVE   9999999999     TO  WRK-COMB-KOH4ID
-                END-IF
-              END-IF
-           END-IF.
-      *
-      *    ¼«Î©»Ù±ç¡ÊÀº¿ÀÄÌ±¡¡¢¹¹À¸¡¢°éÀ®¡Ë
-           IF    LNK-SYU-SRYYMD(1:6)         >= "200604"
-      *
-              MOVE  LNK-SYU-SRYYMD(1:6)  TO  WK-JIRITU-SRYYMD(1:6)
-              MOVE  "01"                 TO  WK-JIRITU-SRYYMD(7:2)
-      *
-              IF     SYU-KOH1HKNNUM  =  "015" OR "016" OR "021"
-                IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM  )
-                AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID )
-                AND  (WK-JIRITU-CYUKANSOU(1)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
-                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
-                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
-                END-IF
-                IF   (LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM  )
-                AND  (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID )
-                AND  (WK-JIRITU-CYUKANSOU(2)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
-                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
-                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
-                END-IF
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "015" OR "016" OR "021"
-                IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM  )
-                AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID )
-                AND  (WK-JIRITU-CYUKANSOU(1)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
-                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
-                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
-                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
-                END-IF
-                IF   (LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM  )
-                AND  (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID )
-                AND  (WK-JIRITU-CYUKANSOU(2)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
-                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
-                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
-                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
-                END-IF
-              END-IF
-      *
-           END-IF.
+      *    ¸øÈñ£É£ÄÊÔ½¸
+           PERFORM  22014-KOHID-HENSYU-SEC.
       *
            IF  (WK-1001-PREFNUM          =  44      ) AND
                (LNK-SYU-SRYYMD(1:6)     >= "200610" )
@@ -9880,6 +9647,479 @@
            .
       *
        22013-CYOKI-FTN-HENSYU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ¸øÈñ£É£ÄÊÔ½¸
+      ******************************************************************
+       22014-KOHID-HENSYU-SEC          SECTION.
+      *
+      *    ÆÃÄê¼À´µ
+           IF    LNK-SYU-SRYYMD(1:6)         >= "200310"
+              IF     SYU-KOH1HKNNUM  =  "051" 
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "051" 
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    ¾®»ùÆÃÄê
+           IF    LNK-SYU-SRYYMD(1:6)         >= "200504"
+              IF     SYU-KOH1HKNNUM  =  "052"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "052"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    ¼«Î©»Ù±ç¡ÊÀº¿ÀÄÌ±¡¡¢¹¹À¸¡¢°éÀ®¡Ë
+           IF    LNK-SYU-SRYYMD(1:6)         >= "200604"
+              MOVE  LNK-SYU-SRYYMD(1:6)  TO  WK-JIRITU-SRYYMD(1:6)
+              MOVE  "01"                 TO  WK-JIRITU-SRYYMD(7:2)
+              IF     SYU-KOH1HKNNUM  =  "015" OR "016" OR "021"
+                IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM  )
+                AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID )
+                AND  (WK-JIRITU-CYUKANSOU(1)   =  2          )
+                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
+                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   (LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM  )
+                AND  (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID )
+                AND  (WK-JIRITU-CYUKANSOU(2)   =  2          )
+                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
+                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "015" OR "016" OR "021"
+                IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM  )
+                AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID )
+                AND  (WK-JIRITU-CYUKANSOU(1)   =  2          )
+                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
+                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   (LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM  )
+                AND  (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID )
+                AND  (WK-JIRITU-CYUKANSOU(2)   =  2          )
+                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
+                AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    ËÌ³¤Æ»ÆÃÄê¼À´µ
+           IF   (WK-1001-PREFNUM          =  01     )
+           AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
+              IF     SYU-KOH1HKNNUM  =  "183"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "183"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    °ñ¾ë¸©¡¢Ä»¼è¸©
+           IF   WK-1001-PREFNUM          =  08 OR 31
+              IF     SYU-KOH1HKNNUM(1:1)   >=  "1" AND <=  "8"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH1ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM(1:1)   >=  "1" AND <=  "8"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH2ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM(1:1)   >=  "1" AND <=  "8"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH3ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH3ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM(1:1)   >=  "1" AND <=  "8"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
+                END-IF
+                IF   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH4ID
+                END-IF
+                IF   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH4ID
+                END-IF
+                IF   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH4ID
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    ¹­Åç¸©
+           IF   WK-1001-PREFNUM          =  34
+              IF     SYU-KOH1HKNNUM   =  "191" OR "291"
+                IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM )
+                AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID)
+                   MOVE     1      TO    CHECK-IDX
+                   MOVE     1      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM )
+                AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID)
+                   MOVE     2      TO    CHECK-IDX
+                   MOVE     1      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM )
+                AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH1ID)
+                   MOVE     3      TO    CHECK-IDX
+                   MOVE     1      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH1ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM )
+                AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH1ID)
+                   MOVE     4      TO    CHECK-IDX
+                   MOVE     1      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
+                   END-IF
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM   =  "191" OR "291"
+                IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM )
+                AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID)
+                   MOVE     1      TO    CHECK-IDX
+                   MOVE     2      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM )
+                AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID)
+                   MOVE     2      TO    CHECK-IDX
+                   MOVE     2      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM )
+                AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH2ID)
+                   MOVE     3      TO    CHECK-IDX
+                   MOVE     2      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH2ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM )
+                AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH2ID)
+                   MOVE     4      TO    CHECK-IDX
+                   MOVE     2      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
+                   END-IF
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM   =  "191" OR "291"
+                IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM )
+                AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH3ID)
+                   MOVE     1      TO    CHECK-IDX
+                   MOVE     3      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM )
+                AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH3ID)
+                   MOVE     2      TO    CHECK-IDX
+                   MOVE     3      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH3ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM )
+                AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH3ID)
+                   MOVE     3      TO    CHECK-IDX
+                   MOVE     3      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH3ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM )
+                AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH3ID)
+                   MOVE     4      TO    CHECK-IDX
+                   MOVE     3      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
+                   END-IF
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM   =  "191" OR "291"
+                IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM )
+                AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH4ID)
+                   MOVE     1      TO    CHECK-IDX
+                   MOVE     4      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM )
+                AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH4ID)
+                   MOVE     2      TO    CHECK-IDX
+                   MOVE     4      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH4ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM )
+                AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH4ID)
+                   MOVE     3      TO    CHECK-IDX
+                   MOVE     4      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH4ID
+                   END-IF
+                END-IF
+                IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM )
+                AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH4ID)
+                   MOVE     4      TO    CHECK-IDX
+                   MOVE     4      TO    CHECK-IDX2
+                   PERFORM  220141-KOHINF-CHECK-SEC
+                   IF   FLG-CHECK-OK  =  1
+                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH4ID
+                   END-IF
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    º´²ì¸©ÆýÍÄ»ù
+           IF    (WK-1001-PREFNUM       =   41         )
+           AND   (WK-HKNJANUM2      NOT =   WK-HKNJANUM)
+              IF     SYU-KOH1HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH3ID
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM  =  "181"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH4ID
+                END-IF
+              END-IF
+           END-IF
+      *
+      *    ÆÁÅç¸©ÆýÍÄ»ù
+           IF    (WK-1001-PREFNUM       =   36         )
+           AND   (WK-HKNJANUM2      NOT =   WK-HKNJANUM)
+              IF     SYU-KOH1HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
+              IF     SYU-KOH2HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH2ID
+                END-IF
+              END-IF
+              IF     SYU-KOH3HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH3ID
+                END-IF
+              END-IF
+              IF     SYU-KOH4HKNNUM  =  "245" OR "445"
+                IF   LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM
+                OR   LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM
+                   MOVE   9999999999     TO  WRK-COMB-KOH4ID
+                END-IF
+              END-IF
+           END-IF
+      *
+           .
+      *
+       22014-KOHID-HENSYU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ¸øÈñ¾ðÊó¥Á¥§¥Ã¥¯
+      ******************************************************************
+       220141-KOHINF-CHECK-SEC          SECTION.
+      *
+           MOVE    ZERO               TO  FLG-CHECK-OK
+           MOVE    SPACE              TO  WK-CHECK-FTNJANUM
+                                          WK-CHECK-FTNJANUM2
+                                          WK-CHECK-JKYSNUM
+                                          WK-CHECK-JKYSNUM2
+      *
+           INITIALIZE                     PTKOHINF-REC
+           MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
+           MOVE    COMB-KOHID(CHECK-IDX)
+                                      TO  PTKOH-KOHID
+           MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+           MOVE    "DBSELECT"         TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE    "key8"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"        USING  MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+             MOVE    "key8"           TO  MCP-PATHNAME
+             PERFORM  PTKOHINF-READ-SEC
+             IF       FLG-PTKOHINF    =   ZERO
+               MOVE   PTKOH-FTNJANUM  TO  WK-CHECK-FTNJANUM
+               MOVE   PTKOH-JKYSNUM   TO  WK-CHECK-JKYSNUM
+             END-IF
+           END-IF
+           MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE    "key8"             TO  MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           INITIALIZE                     PTKOHINF-REC
+           MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
+           MOVE    WRK-COMB-KOHID(CHECK-IDX2)
+                                      TO  PTKOH-KOHID
+           MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+           MOVE    "DBSELECT"         TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE    "key8"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"        USING  MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+             MOVE    "key8"           TO  MCP-PATHNAME
+             PERFORM  PTKOHINF-READ-SEC
+             IF       FLG-PTKOHINF    =   ZERO
+               MOVE   PTKOH-FTNJANUM  TO  WK-CHECK-FTNJANUM2
+               MOVE   PTKOH-JKYSNUM   TO  WK-CHECK-JKYSNUM2
+             END-IF
+           END-IF
+           MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE    "key8"             TO  MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           IF  WK-CHECK-FTNJANUM(3:5)  =  WK-CHECK-FTNJANUM2(3:5)
+               MOVE       1           TO  FLG-CHECK-OK
+           END-IF
+      *
+           .
+      *
+       220141-KOHINF-CHECK-EXT.
            EXIT.
       *
       ******************************************************************
