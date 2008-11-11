@@ -85,6 +85,7 @@
       *  04.00.04    NACL-門脇    08/02/14  自立支援＋生保の組合せを作成しない
       *  04.02.00    NACL-多々納  08/03/XX  Ｈ２０．４改正対応
       *  04.02.01    NACL-門脇    08/06/16  大阪府地方公費組み合わせ作成
+      *  04.02.02    NACL-門脇    08/11/11  適用開始終了同一日対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1124,7 +1125,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                        PERFORM 570112-SYUHKN-SEH-SEC
                      END-PERFORM
                      IF  WRK-KCOMB-TEKSTYMD (IDX2)
-                                      NOT =  WRK-KCOMB-TEKEDYMD (IDX2)
+      *@@>                            NOT =  WRK-KCOMB-TEKEDYMD (IDX2)
+                                      <=     WRK-KCOMB-TEKEDYMD (IDX2)
       ****(2005.10.25)                <=     WRK-KCOMB-TEKEDYMD (IDX2)
                        ADD     1           TO  WRK-RCOMB-MAX
                        MOVE    WRK-KCOMB-REC (IDX2)
@@ -1248,8 +1250,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
       *            [組合せ 終了日]≦[生保 終了日]
       *            ○組合せ元の開始日変更
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                     TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      ***          MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
+      ***                            TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE  "99999999"  TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE  "00000000"  TO  WRK-KCOMB-TEKEDYMD (IDX2)
                END-IF
                MOVE    WRK-COMB-SEIHOIDX    TO  WRK-COMB-IDX
                PERFORM 5701121-KOH-IREKAE-SEC
@@ -3074,7 +3078,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-PERFORM
       *            主保険が終了しその後、生保のみが存在する場合
                    IF  WRK-KCOMB-TEKSTYMD (IDX2)
-                                     NOT =   WRK-KCOMB-TEKEDYMD (IDX2)
+      *@@>                           NOT =   WRK-KCOMB-TEKEDYMD (IDX2)
+                                        <=   WRK-KCOMB-TEKEDYMD (IDX2)
                        ADD     1         TO  WRK-LCOMB-MAX
                        MOVE    WRK-KCOMB-REC (IDX2)
                                          TO  WRK-LCOMB-REC
@@ -3334,7 +3339,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-PERFORM
       *            主保険と期間が重複しない主公費のみが存在する場合
                    IF  WRK-KCOMB-TEKSTYMD (IDX2)
-                                     NOT =   WRK-KCOMB-TEKEDYMD(IDX2)
+      *@@>                           NOT =   WRK-KCOMB-TEKEDYMD(IDX2)
+                                        <=   WRK-KCOMB-TEKEDYMD(IDX2)
                        ADD     1         TO  WRK-RCOMB-MAX
                        MOVE    WRK-KCOMB-REC (IDX2)
                                          TO  WRK-RCOMB-REC
@@ -3881,7 +3887,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 570112-SYUHKN-SEH-SEC
                  END-PERFORM
                  IF  WRK-KCOMB-TEKSTYMD (IDX2)
-                                      NOT =  WRK-KCOMB-TEKEDYMD (IDX2)
+      *@@>                            NOT =  WRK-KCOMB-TEKEDYMD (IDX2)
+                                         <=  WRK-KCOMB-TEKEDYMD (IDX2)
                    ADD     1               TO  WRK-RCOMB-MAX
                    MOVE    WRK-KCOMB-REC (IDX2)
                                            TO  WRK-RCOMB-REC
@@ -4299,8 +4306,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
              IF  WRK-KCOMB-TEKEDYMD (IDX2)
                                       <=  WRK-HKN-TEKEDYMD
                                                    (WRK-COMB-SYUHOIDX)
-                 MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                      TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      ***        MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
+      ***                             TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                 MOVE    "99999999"   TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                 MOVE    "00000000"   TO  WRK-KCOMB-TEKEDYMD (IDX2)
              ELSE
       *  　　    [主保険 終了日]≦[組合せ 終了日]
       *          ○主保険終了日の翌日取得
@@ -4815,8 +4824,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    WRK-SYMD TO  WRK-KCOMB-TEKSTYMD (IDX2)
                ELSE
       *            [生保 終了日]≦[保険 終了日]
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                    TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      ***          MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
+      ***                           TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE  "99999999" TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE  "00000000" TO  WRK-KCOMB-TEKEDYMD (IDX2)
                END-IF
            ELSE
       *        [生保 開始日]＜[保険 開始日]
@@ -5127,8 +5138,14 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
       *    支払区分は老人（０２７）のみ
            IF      WRK-KEN-HKNNUM      =   "027"
                MOVE    1                   TO  FLG-RJN
-               IF     (HKN-PAYKBN (1:1)    =   SPA-HOSPSBT)  AND
-                      (HKN-PAYKBN (2:1)    =   SPA-ROUPAYKBN)
+      *        Ｈ１２．１２．３１までの支払区分は００
+               IF     (WRK-KEN-TEKEDYMD    >=  "20010101"   )
+                   IF     (HKN-PAYKBN (1:1)    =   SPA-HOSPSBT)  AND
+                          (HKN-PAYKBN (2:1)    =   SPA-ROUPAYKBN)
+                       MOVE    1               TO  FLG-HKNNUM
+                       MOVE    SPACE           TO  WRK-KEN-ERFLG
+                   END-IF
+               ELSE
                    MOVE    1               TO  FLG-HKNNUM
                    MOVE    SPACE           TO  WRK-KEN-ERFLG
                END-IF
