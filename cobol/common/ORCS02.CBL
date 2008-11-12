@@ -14872,6 +14872,12 @@
                      (LNK-SYU-SRYYMD(1:6)        >= "200810"      )))
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY
                                    =  WK-ZENGAKU  *  0.2
+                  COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
+                           WK-ZENKI-TOKUREI-MONEY  +  5
+                  COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
+                           WK-ZENKI-TOKUREI-MONEY  / 10
+                  COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
+                           WK-ZENKI-TOKUREI-MONEY  * 10
                   IF   WK-ZENKI-TOKUREI-MONEY  <  ZAN-KOHI-T(KOH-IDX)
                     COMPUTE   ZAN-KOHI-T(KOH-IDX)  =
                               ZAN-KOHI-T(KOH-IDX)  -
