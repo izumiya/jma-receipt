@@ -265,6 +265,7 @@
       *  04.02.21    NACL-ÌçÏÆ    08/10/22  ¿À¸Í»ÔÃÏÊý¸øÈñÂçºåÉÜÂÐ±þ
       *  04.02.22    NACL-ÌçÏÆ    08/11/05  Ä»¼è¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.23    NACL-ÌçÏÆ    08/11/10  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.24    NACL-ÌçÏÆ    08/11/13  ¸½ÊªµëÉÕ¹ç»»¾ò·ï½¤Àµ¡ÊÇ¤·Ñ¡¢·ÑÂ³¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -513,6 +514,9 @@
                05  WK-HONKZKKBN2           PIC  X(01).
                05  WK-KIGO2                PIC  X(80).
                05  WK-NUM2                 PIC  X(80).
+      *
+           03  WK-CONTKBN                  PIC  X(01).
+           03  WK-CONTKBN2                 PIC  X(01).
       *
            03  WK-GENTAI-SKYMONEY          PIC  9(07).
            03  WK-GENTAI-SKYMONEY2         PIC  9(07).
@@ -4690,6 +4694,7 @@
            MOVE   ZERO               TO    FLG-SEISINJYO
                                            FLG-TOKUREI-HKNJYA
            MOVE   SPACE              TO    WK-HKNJANUM-TBL
+           MOVE   SPACE              TO    WK-CONTKBN
       *
            INITIALIZE                      PTHKNINF-REC
            MOVE   COMB-HOSPNUM       TO    PTHKN-HOSPNUM
@@ -4730,6 +4735,7 @@
                   MOVE    PTHKN-HONKZKKBN  TO    WK-HONKZKKBN
                   MOVE    PTHKN-KIGO       TO    WK-KIGO
                   MOVE    PTHKN-NUM        TO    WK-NUM
+                  MOVE    PTHKN-CONTKBN    TO    WK-CONTKBN
                END-IF
            END-IF
       *
@@ -7422,6 +7428,7 @@
       ***  OR     (FLG-KOHININBARAI             =    1 )
       ***  OR     (LNK-S01-KOUREI-ZAITAKU-KBN   =   "1")
              MOVE   SPACE              TO    WK-HKNJANUM2-TBL.
+             MOVE   SPACE              TO    WK-CONTKBN2.
              INITIALIZE                      PTHKNINF-REC.
              MOVE   WRK-COMB-HOSPNUM   TO    PTHKN-HOSPNUM.
              MOVE   WRK-COMB-PTID      TO    PTHKN-PTID.
@@ -7442,12 +7449,22 @@
                     MOVE  PTHKN-HONKZKKBN   TO    WK-HONKZKKBN2
                     MOVE  PTHKN-KIGO        TO    WK-KIGO2
                     MOVE  PTHKN-NUM         TO    WK-NUM2
+                    MOVE  PTHKN-CONTKBN     TO    WK-CONTKBN2
                  END-IF
              END-IF.
              MOVE     "tbl_pthkninf"   TO    MCP-TABLE.
              MOVE     "key"            TO    MCP-PATHNAME.
              PERFORM   DB-CLOSE-SEC.
       ***  END-IF.
+      *
+           IF  (WK-CONTKBN   NOT = SPACE)
+           OR  (WK-CONTKBN2  NOT = SPACE)
+              IF  (WK-HKNJANUM2  = WK-HKNJANUM )
+              AND (WK-HONKZKKBN2 = WK-HONKZKKBN)
+                MOVE  WK-KIGO  TO  WK-KIGO2
+                MOVE  WK-NUM   TO  WK-NUM2
+              END-IF
+           END-IF.
       *
       *    ¸øÈñ£É£ÄÊÔ½¸
            PERFORM  22027-KOHID-HENSYU-SEC.
