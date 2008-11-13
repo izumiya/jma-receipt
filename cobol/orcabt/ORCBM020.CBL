@@ -34,6 +34,8 @@
       *  01.01.02    NACL-藤原    03.07.01  入院・入院外による集計
       *
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
+      *
+      *  04.02.01    NACL-藤原    08/11/05  協会けんぽ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -313,6 +315,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1031-HOSPNUM
                        MOVE    2                   TO  IDX 
                    ELSE
                        EVALUATE    RECE10-HKNNUM
+                           WHEN    "009"
                            WHEN    "001"
                            WHEN    "002"
                            WHEN    "003"
@@ -330,6 +333,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1031-HOSPNUM
                        MOVE    3                   TO  IDX 
                    ELSE
                        EVALUATE    RECE10-HKNNUM
+                           WHEN    "009"
                            WHEN    "001"
                            WHEN    "002"
                            WHEN    "003"
