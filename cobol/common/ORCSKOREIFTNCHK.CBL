@@ -222,6 +222,7 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
       *
                    IF  (LNK-KOREIFTNCHK-PREFNUM   = "01"    )
                    AND (LNK-KOREIFTNCHK-SRYYM    >= "200510")
+                   AND (LNK-KOREIFTNCHK-SRYYM    <  "200810")
       *
                      PERFORM    VARYING   IDX2    FROM   1   BY   1
                                  UNTIL    IDX2      >    4
