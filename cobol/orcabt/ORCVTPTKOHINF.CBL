@@ -153,6 +153,7 @@
       *
            03  FLG-OK                  PIC 9(01).
            03  FLG-YMD                 PIC 9(01).
+           03  FLG-ZENKAKU             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -896,19 +897,30 @@
                IF      WRK-LEN             >   1
                    INITIALIZE                  ORCSKANACHKAREA
                    MOVE    "1"             TO  KANACHK-SYORI
-                   MOVE    WRK-DATA        TO  KANACHK-MAE-INPUT
-                   MOVE    WRK-CNT         TO  KANACHK-MAX-CNT
+                   MOVE    WRK-DATA(1:WRK-LEN)
+                                           TO  KANACHK-MAE-INPUT
+                   MOVE    WRK-LEN         TO  KANACHK-MAX-CNT
                    CALL    "ORCSKANACHK"       USING
                                                ORCSKANACHKAREA
-      *             IF     (KANACHK-RC          =   ZERO  )  AND
-      *                    (KANACHK-RC2     NOT =   7     )
-                   IF     (KANACHK-RC          =   ZERO  )  AND
-                          (KANACHK-SYUBETU     =   1     )  AND
-                          (KANACHK-MAE-INPUT   =   KANACHK-OUT-INPUT)
-                       CONTINUE
+                   IF      FLG-ZENKAKU         =   1
+      *                受給者番号は混在をエラー
+                       IF     (KANACHK-RC          NOT =   ZERO )  OR
+                              (KANACHK-SYUBETU         =   ZERO )  OR
+                              (KANACHK-RC2         NOT =   ZERO )  OR
+                              (WRK-DATA(1:WRK-LEN) NOT =
+                                                   KANACHK-OUT-INPUT)
+                           MOVE    3               TO  FLG-ERR
+                       END-IF
                    ELSE
-      *                全角半角混在、間の空白はエラー
-                       MOVE    3               TO  FLG-ERR
+                       IF     (KANACHK-RC          =   ZERO  )  AND
+                              (KANACHK-SYUBETU     =   1     )  AND
+                              (KANACHK-MAE-INPUT   =
+                                                   KANACHK-OUT-INPUT)
+                           CONTINUE
+                       ELSE
+      *                    全角・混在、間の空白はエラー
+                           MOVE    3               TO  FLG-ERR
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -1194,6 +1206,7 @@
       *
            MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                                    TO  WRK-DATA
+           MOVE    ZERO            TO  FLG-ZENKAKU
            PERFORM 2401-SPACE-HENSYU-SEC
            MOVE    WRK-DATA (1:WRK-LEN)
                                    TO  PTKOH-FTNJANUM
@@ -1218,6 +1231,7 @@
       *
            MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                                    TO  WRK-DATA
+           MOVE    1               TO  FLG-ZENKAKU
            PERFORM 2401-SPACE-HENSYU-SEC
            MOVE    WRK-DATA (1:WRK-LEN)
                                    TO  PTKOH-JKYSNUM
