@@ -3783,7 +3783,7 @@
                    MOVE    WRK-NISSU2
                                TO  WRK-NISSU
       *
-                   IF    ( SPA-NAI-I01-TDJKBN (IDX2)   =   SPACE )
+                   IF    ( SPA-NAI-I01-TDJKBN (IDX2)   =   SPACE OR "2")
                        COMPUTE WRK-TSUSAN
                            =   WRK-TSUSAN  +   WRK-NISSU2
                    ELSE
