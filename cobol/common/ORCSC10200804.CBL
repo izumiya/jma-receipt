@@ -689,21 +689,32 @@
                END-EVALUATE
       *
       *        初診、再診、指導、在宅の時、回数は１のみ
-               IF     (WRK-COM-SRYKBN (IDX-Z)  =   "11"  OR
-                                                   "12"  OR
-                                                   "13"  OR
-                                                   "14" )
-                  AND (WRK-ERRCD               =   SPACE )
-                  AND (WRK-GMN-INPUTCD (IDX-Z)(1:1)
-                                           NOT =   "."  )
+      *        IF     (WRK-COM-SRYKBN (IDX-Z)  =   "11"  OR
+      *                                            "12"  OR
+      *                                            "13"  OR
+      *                                            "14" )
+      *           AND (WRK-ERRCD               =   SPACE )
+      *           AND (WRK-GMN-INPUTCD (IDX-Z)(1:1)
+      *                                    NOT =   "."  )
       *?????          (WRK-COM-SRYKBN (IDX-Z)  =   "14" )
       *??????     AND  WRK-COM-SRYSYUKBN(IDX-Z)  = "140" )
       *?????      IF      (WRK-COM-KAIFLG (IDX-Z)  =   1  )  AND
-                  IF      (WRK-COM-KAISU(IDX-Z)    >   1  )
+      *           IF      (WRK-COM-KAISU(IDX-Z)    >   1  )
+      *                PERFORM 10012-KAISU-CHK-SEC
+      *            END-IF
+      *******  END-IF
+           END-PERFORM
+      *    初診、再診、指導、在宅の時、回数は１のみ
+           IF     (WRK-ERRCD           =   SPACE)
+               IF     (WRK-COM-SRYKBN (IDX-MAX)  =   "11"  OR
+                                                   "12"  OR
+                                                   "13"  OR
+                                                   "14" )
+                  IF      (WRK-COM-KAISU(IDX-MAX)    >   1  )
                        PERFORM 10012-KAISU-CHK-SEC
                    END-IF
                END-IF
-           END-PERFORM
+           END-IF
       *
       *    年齢加算算定チェック
            IF      FLG-TIME-NYU        =   ZERO
@@ -757,9 +768,8 @@
                CONTINUE
            ELSE
                MOVE    "0008"          TO  WRK-ERRCD
-               MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+               MOVE    "1"             TO  WRK-COM-CUR (IDX-MAX)
            END-IF
-      *
            .
        10012-KAISU-CHK-EXT.
            EXIT.
