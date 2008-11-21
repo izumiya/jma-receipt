@@ -694,6 +694,8 @@
                                                    "13"  OR
                                                    "14" )
                   AND (WRK-ERRCD               =   SPACE )
+                  AND (WRK-GMN-INPUTCD (IDX-Z)(1:1)
+                                           NOT =   "."  )
       *?????          (WRK-COM-SRYKBN (IDX-Z)  =   "14" )
       *??????     AND  WRK-COM-SRYSYUKBN(IDX-Z)  = "140" )
       *?????      IF      (WRK-COM-KAIFLG (IDX-Z)  =   1  )  AND
