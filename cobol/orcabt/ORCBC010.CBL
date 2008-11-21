@@ -302,6 +302,8 @@
            03  WRK-MOJISU          PIC 9(03).
       *
            03  WRK-YM              PIC 9(06).
+      *
+           03  WRK-MSG-NYUGAI      PIC X(04).
       *    レセプト種別判定用領域
        01  WK-RECESYUBETU-AREA.
            03  WK-KOKUHO                               PIC X(01).
@@ -690,8 +692,24 @@
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
            MOVE    "ORCBC010"      TO  JOB-PGID
-           MOVE    "収集データ作成（抽出）"
-                                   TO  JOB-SHELLMSG
+           IF      WRK-PARA-NYUGAIKBN  =  "1"
+               MOVE    "入院"          TO  WRK-MSG-NYUGAI
+           ELSE
+               MOVE    "外来"          TO  WRK-MSG-NYUGAI
+           END-IF
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY2-AREA
+           MOVE    "21"            TO  LNK-DAY2-IRAI
+           MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD (1:6)
+           MOVE    "01"            TO  WRK-SYMD (7:2)
+           MOVE    WRK-SYMD        TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                           LNK-DAY2-AREA
+           STRING  LNK-DAY2-EDTYMD3(5:12)     DELIMITED BY SIZE
+                   WRK-MSG-NYUGAI             DELIMITED BY SIZE
+                   "分収集データ作成（抽出）" DELIMITED BY SIZE
+                                 INTO  JOB-SHELLMSG
+           END-STRING
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA

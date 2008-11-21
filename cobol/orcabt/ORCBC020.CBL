@@ -292,6 +292,9 @@
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *   日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *    数字変換領域
            COPY    "CPORCSNUM.INC".
       *   ジョブ管理ＤＢ制御サブ
@@ -353,8 +356,18 @@
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
            MOVE    "ORCBC020"      TO  JOB-PGID
-           MOVE    "収集データ作成（ＣＳＶ）"
-                                   TO  JOB-SHELLMSG
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY2-AREA
+           MOVE    "21"            TO  LNK-DAY2-IRAI
+           MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD (1:6)
+           MOVE    "01"            TO  WRK-SYMD (7:2)
+           MOVE    WRK-SYMD        TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                           LNK-DAY2-AREA
+           STRING  LNK-DAY2-EDTYMD3(5:12)       DELIMITED BY SIZE
+                   "分収集データ作成（ＣＳＶ）" DELIMITED BY SIZE
+                                 INTO  JOB-SHELLMSG
+           END-STRING
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA
@@ -385,6 +398,8 @@
            PERFORM 900-COLDAT91-READ-SEC
            IF      CNT-COLDAT91        >   ZERO
                OPEN    OUTPUT              COLDAT04-FILE
+           ELSE
+               MOVE    1               TO  FLG-END
            END-IF
            PERFORM UNTIL        FLG-COLDAT91    =   1
                    PERFORM 1001-FILE-HENSYU-SEC
@@ -1436,7 +1451,9 @@
            CLOSE   COLDAT91-FILE
                    COLDAT01-FILE
                    COLDAT02-FILE
-                   COLDAT04-FILE
+           IF      CNT-COLDAT91        >   ZERO
+               CLOSE   COLDAT04-FILE
+           END-IF
       *
       **   IF      CNT-COLDAT01           =   ZERO  
       **       MOVE    "処理対象のデータがありませんでした"
