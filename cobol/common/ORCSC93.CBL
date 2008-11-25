@@ -1512,7 +1512,7 @@
       *!!
       *入院は算定不可とする（VER.4.3のマスタ変更の為
                            IF      SPA-NYUGAIKBN   =   "1"
-                              MOVE    "0014"           TO  SPA-ERRCD
+                              MOVE    "0114"           TO  SPA-ERRCD
                            END-IF
       *!!
       *
