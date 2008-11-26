@@ -1936,7 +1936,7 @@
                                        TO      SPA-ERRMSG
                WHEN    "K241"
                    STRING  "警告！！"
-                           "後期高齢者診療料を算定を算定してます。"
+                           "後期高齢者診療料を算定してます。"
                            "急性増悪時のみ算定可能です。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
