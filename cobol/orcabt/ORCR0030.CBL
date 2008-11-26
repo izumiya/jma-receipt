@@ -378,6 +378,7 @@
       *                                     ÊÔ½¸ÂÐ±þ
       *  04.03.03    NACL-ÌçÏÆ    08/07/14  ²¾¥ì¥»ºîÀ®¡Ê±¡³°½èÊý´Þ¤à¡ËÂÐ±þ
       *                                     ÅêÌôºÞÅÀ£°¡Ê±¡³°Åù¡Ëµ­ºÜ
+      *  04.03.04    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8255,7 +8256,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               "133181" OR "133199" OR
                               "133207" OR "133223" OR
                               "133249" OR "133256" OR
-                              "133272" OR "233064"
+                              "133272" OR "233064" OR
+                              "283077"
                IF  RECE02-RJNHKNNUM  NOT =  SPACE
                 CONTINUE
                ELSE
@@ -8880,7 +8882,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         "133181" OR "133199" OR
                                         "133207" OR "133223" OR
                                         "133249" OR "133256" OR
-                                        "133272" OR "233064"   ))
+                                        "133272" OR "233064" OR
+                                        "283077"               ))
                      MOVE  "1"  TO
                              RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                ELSE
@@ -9083,21 +9086,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EVALUATE   SYS-1001-PREFNUM
       *      Åçº¬¸©ÆýÍÄ»ù¡¦Ê¡»ã
              WHEN    "32"
-               IF   RECE02-SRYYM    >=   "200510"
+               IF  (RECE02-SRYYM        >=  "200510"    )
+               AND (RECE02-TEISYUTUSAKI  =   2 OR 6     )
                    PERFORM  21112-SEIKYUTEN-HENSYU-SEC
                END-IF
       *      µþÅÔÉÜÃÏÊý¸øÈñ
              WHEN    "26"
+               IF  (RECE02-TEISYUTUSAKI  =   2 OR 6     )
                    PERFORM  21112-SEIKYUTEN-HENSYU-SEC
+               END-IF
       *      ÆÁÅç¸©ÃÏÊý¸øÈñ
              WHEN    "36"
-               IF   RECE02-SRYYM    >=   "200805"
+               IF  (RECE02-SRYYM        >=  "200805"    )
+               AND (RECE02-TEISYUTUSAKI  =   1 OR 2 OR 6)
                    PERFORM  21112-SEIKYUTEN-HENSYU-SEC
                END-IF
       *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
              WHEN    "10"
-               IF  (RECE02-SRYYM    >=   "200804")
-               AND (RECE02-TEISYUTUSAKI  =   6   )
+               IF  (RECE02-SRYYM        >=  "200804"    )
+               AND (RECE02-TEISYUTUSAKI  =   6          )
                    PERFORM  21112-SEIKYUTEN-HENSYU-SEC
                END-IF
            END-EVALUATE
