@@ -335,6 +335,7 @@
       *  04.02.32    NACL-ÌçÏÆ    08/09/24  ¹âÎð¼Ô°ìÈÌ·Ð²áÁ¼ÃÖ±äÄ¹ÂÐ±þ½¤Àµ
       *  04.02.33    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       *  04.02.34    NACL-ÌçÏÆ    08/10/22  ¿À¸Í»ÔÃÏÊý¸øÈñÂçºåÉÜÂÐ±þ
+      *  04.02.35    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11417,7 +11418,8 @@
                                         "133181" OR "133199" OR
                                         "133207" OR "133223" OR
                                         "133249" OR "133256" OR
-                                        "133272" OR "233064"   ))
+                                        "133272" OR "233064" OR
+                                        "283077"               ))
                      MOVE  "1"   TO
                              RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                ELSE
@@ -11630,21 +11632,25 @@
            EVALUATE   WRK-PREFNUM
       *      Åçº¬¸©ÆýÍÄ»ù¡¦Ê¡»ã
              WHEN    "32"
-               IF   RECE62-SRYYM    >=   "200510"
+               IF  (RECE62-SRYYM        >=  "200510"    )
+               AND (RECE62-TEISYUTUSAKI  =   2 OR 6     )
                    PERFORM  210452-SEIKYUTEN-HENSYU-SEC
                END-IF
       *      µþÅÔÉÜÃÏÊý¸øÈñ
              WHEN    "26"
+               IF  (RECE62-TEISYUTUSAKI  =   2 OR 6     )
                    PERFORM  210452-SEIKYUTEN-HENSYU-SEC
+               END-IF
       *      ÆÁÅç¸©ÃÏÊý¸øÈñ
              WHEN    "36"
-               IF   RECE62-SRYYM    >=   "200805"
+               IF  (RECE62-SRYYM        >=  "200805"    )
+               AND (RECE62-TEISYUTUSAKI  =   1 OR 2 OR 6)
                    PERFORM  210452-SEIKYUTEN-HENSYU-SEC
                END-IF
       *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
              WHEN    "10"
-               IF  (RECE62-SRYYM    >=   "200804")
-               AND (RECE62-TEISYUTUSAKI  =   6   )
+               IF  (RECE62-SRYYM        >=  "200804"    )
+               AND (RECE62-TEISYUTUSAKI  =   6          )
                    PERFORM  210452-SEIKYUTEN-HENSYU-SEC
                    PERFORM  210453-SEIKYUGAK-SKJ-HENSYU-SEC
                END-IF
@@ -12781,7 +12787,8 @@
                               "133181" OR "133199" OR
                               "133207" OR "133223" OR
                               "133249" OR "133256" OR
-                              "133272" OR "233064"
+                              "133272" OR "233064" OR
+                              "283077"
                IF  RECE62-RJNHKNNUM  NOT =  SPACE
                 CONTINUE
                ELSE
