@@ -7973,6 +7973,7 @@
                    MOVE    TSRYCD-SRYCD (IDX6) TO  WRK-TNS-YMD
                    PERFORM 900-TENSU-KEY-SEL-SEC
                    IF    ( TNS-TANICD          =   SPACE OR ZERO )
+                    AND  ( TNS-TENSIKIBETU     =   0 OR 1 OR 2)
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   31 )
                            IF    ( TSRYCD-DAY-NYUGAIKBN (IDX6 IDX-DAY)
