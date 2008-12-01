@@ -52,6 +52,7 @@
       *  04.02.07    NACL-ÌçÏÆ    08/09/02  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *  04.02.08    NACL-ÌçÏÆ    08/11/05  £±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¤·¤Ê¤¤¾ì¹ç¤Î
       *                                     È½Äê½¤Àµ
+      *  04.03.01    NACL-ÌçÏÆ    08/11/28  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -92,6 +93,7 @@
            03  WRK-HKNMST-JGNGAK2 PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-SEIKYU         PIC 9(10).
+           03  WRK-KYUFUGAITEN    PIC 9(10).
            03  WRK-SKJ-FTN        PIC 9(10).
            03  WRK-PREFNUM        PIC 9(02).
            03  WRK-CHIHOUNUMKBN   PIC X(01).
@@ -754,6 +756,7 @@
       *    ´µ¼ÔÉéÃ´¶â¤Î½¸·×
            MOVE      ZERO          TO      WRK-KOHFTN
            MOVE      ZERO          TO      WRK-SEIKYU
+           MOVE      ZERO          TO      WRK-KYUFUGAITEN
            MOVE      ZERO          TO      FLG-GENMEN
            MOVE      ZERO          TO      FLG-DAYCHK
            MOVE      ZERO          TO      WRK-SKJ-FTN
@@ -780,6 +783,12 @@
                        ADD  SYU-KOH-COMPFTN(4)     TO  WRK-KOHFTN
                   END-EVALUATE
                   ADD       SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU
+                  IF  (LNK-FTNJGNCHK-PREFNUM  =   40            )
+                  AND (LNK-FTNJGNCHK-KOHNUM(1:1)
+                                             >=  "1" AND <=  "8")
+                  AND (LNK-FTNJGNCHK-SRYYM   >=  "200810"       )
+                    ADD     SYU-KYUFUGAI-GOKEI-TEN TO  WRK-KYUFUGAITEN
+                  END-IF
                   IF     SYU-YKZKENNUM  NOT = ZERO
                        MOVE    1    TO   FLG-GENMEN
                   END-IF
@@ -837,11 +846,11 @@
            IF  ((LNK-FTNJGNCHK-PREFNUM    =  27           ) AND
                 (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241") AND
                 (LNK-FTNJGNCHK-SRYYM     >= "200804"      ))
-           OR  ((LNK-FTNJGNCHK-PREFNUM    =  40           ) AND
-                (LNK-FTNJGNCHK-KOHNUM(1:1)
-                                       >=  "1" AND <=  "8") AND
-                (LNK-FTNJGNCHK-NYUGAIKBN  = "1"           ) AND
-                (LNK-FTNJGNCHK-SRYYM     >= "200810"      ))
+      ***  OR  ((LNK-FTNJGNCHK-PREFNUM    =  40           ) AND
+      ***       (LNK-FTNJGNCHK-KOHNUM(1:1)
+      ***                              >=  "1" AND <=  "8") AND
+      ***       (LNK-FTNJGNCHK-NYUGAIKBN  = "1"           ) AND
+      ***       (LNK-FTNJGNCHK-SRYYM     >= "200810"      ))
               MOVE   9999999999     TO  WRK-KOHFTN
            END-IF
       *
@@ -900,6 +909,11 @@
            IF    LNK-FTNJGNCHK-RC  =   ZERO
              IF  WRK-SEIKYU        =   ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
+             ELSE
+               IF  (WRK-KYUFUGAITEN  NOT =  ZERO      )
+               AND (WRK-KYUFUGAITEN      =  WRK-SEIKYU)
+                      MOVE   01        TO  LNK-FTNJGNCHK-RC
+               END-IF
              END-IF
            END-IF
       *
