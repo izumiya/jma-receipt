@@ -1339,7 +1339,8 @@
                    IF      SRY-NYUGAIKBN   =   "1"
                        MOVE    "2"             TO  WRK-NYUGAIKBN
                    END-IF
-                   IF      WRK-PARA-NYUGAIKBN  =   "0"
+                   IF        ( WRK-PARA-NYUGAIKBN  =   "0" )
+                       OR    ( WRK-PARA-NYUGAIKBN  =   SPACE )
                        MOVE    1               TO  FLG-OK
                    ELSE
                        IF      WRK-PARA-NYUGAIKBN  =   WRK-NYUGAIKBN
