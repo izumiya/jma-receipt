@@ -3259,7 +3259,11 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                   ELSE
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
-                        CONTINUE
+                        IF   SRY-SRYSYUKBN  =  "148" OR "149"
+                          IF   RECE04-TOYAKUFLG = SPACE
+                            MOVE   "2"    TO    RECE04-TOYAKUFLG
+                          END-IF
+                        END-IF
                     ELSE
                         MOVE    "1"       TO    RECE04-TOYAKUFLG
                     END-IF

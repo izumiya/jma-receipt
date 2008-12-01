@@ -1377,7 +1377,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ELSE
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
-                        CONTINUE
+                        IF   SRY-SRYSYUKBN  =  "148" OR "149"
+                          EVALUATE  WRK-PARA-PRTKBN
+                           WHEN      "1"
+                             MOVE   "9"  TO    RECE120-TOYAKUFLG
+                           WHEN      "2"
+                             IF   RECE120-TOYAKUFLG = SPACE
+                               MOVE "2"  TO    RECE120-TOYAKUFLG
+                             END-IF
+                          END-EVALUATE
+                        END-IF
                     ELSE
                         EVALUATE  WRK-PARA-PRTKBN
                           WHEN      "1"
