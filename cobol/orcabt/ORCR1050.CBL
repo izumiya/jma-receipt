@@ -36,6 +36,7 @@
       *
       *  04.03.01    NACL-門脇    08/07/09  投薬の記載順変更（日付順）
       *  04.03.02    NACL-門脇    08/07/14  投薬剤点０（院外等）記載対応
+      *  04.03.03    NACL-門脇    08/12/01  在宅（院外分）編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3481,6 +3482,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE120
                    ADD     1         TO  CNT-IN-CANCEL 
+                   IF   RECE120-TOYAKUFLG   =   "9"
+                       GO  TO  990-RECE120-NEXT-SEC
+                   END-IF
            END-READ
       *
            .

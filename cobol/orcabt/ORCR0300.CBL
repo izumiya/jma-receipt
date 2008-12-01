@@ -279,6 +279,7 @@
       *  04.03.03    NACL-Æ£¸¶    08/08/05  ´µ¼ÔÅÐÏ¿ÆÃµ­»ö¹àÆþÎÏÂÐ±þ
       *  04.03.04    NACL-Æ£¸¶    08/07/23  µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
       *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
+      *  04.03.05    NACL-ÌçÏÆ    08/12/01  ºßÂð¡Ê±¡³°Ê¬¡ËÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3788,7 +3789,8 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
        200711-KIZAI-TAIHI-SEC          SECTION.
       *
            IF      RECE041-SRYKBN    NOT =   "70"
-               IF      RECE041-KIZAITEN  =   ZERO
+               IF    ( RECE041-KIZAITEN  =   ZERO  )
+               AND   ( RECE041-TOYAKUFLG =   SPACE )
                    GO  TO  200711-KIZAI-TAIHI-EXT
                END-IF
            END-IF
@@ -3880,7 +3882,8 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
        200711-KIZAI-ACCT-TAIHI-SEC          SECTION.
       *
            IF      RECE041-SRYKBN    NOT =   "70"
-               IF      RECE041-KIZAITEN  =   ZERO
+               IF    ( RECE041-KIZAITEN  =   ZERO  )
+               AND   ( RECE041-TOYAKUFLG =   SPACE )
                    GO  TO  200711-KIZAI-ACCT-TAIHI-EXT
                END-IF
            END-IF

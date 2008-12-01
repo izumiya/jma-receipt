@@ -379,6 +379,7 @@
       *  04.03.03    NACL-ÌçÏÆ    08/07/14  ²¾¥ì¥»ºîÀ®¡Ê±¡³°½èÊý´Þ¤à¡ËÂÐ±þ
       *                                     ÅêÌôºÞÅÀ£°¡Ê±¡³°Åù¡Ëµ­ºÜ
       *  04.03.04    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.03.05    NACL-ÌçÏÆ    08/12/01  ºßÂð¡Ê±¡³°Ê¬¡ËÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2667,10 +2668,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            ELSE
                              IF   ACCT-ZAIKAISU  NOT =    ZERO
                                IF ( ACCT-SRYKBN  =  "11" OR "12" OR
-                                                    "14" OR "99" )
-                               OR ((RECE02-SRYYM >= 200804       ) AND
+                                                    "99"          )
+                               OR ((RECE02-SRYYM >= "200804"     ) AND
                                    (ACCT-SRYKBN  =  "21" OR "22" OR
-                                                    "23"        ))
+                                                    "23" OR "14" ))
                                  IF  ACCT-SRYCDTOTAL = CONS-TOKKI1 OR
                                                        CONS-TOKKI2 OR
                                                        CONS-TOKKI3 OR
@@ -3245,6 +3246,20 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                       IF   RECE04-TOYAKUFLG = SPACE
                         MOVE    "2"       TO    RECE04-TOYAKUFLG
                       END-IF
+                    ELSE
+                        MOVE    "1"       TO    RECE04-TOYAKUFLG
+                    END-IF
+                  END-IF
+               END-IF
+      *
+               IF    ( SRY-SRYKBN        =     "14" )
+               AND   ( RECE04-ZAITEN     =     ZERO )
+                  IF     RECE04-SAFLG   NOT =  SPACE
+                        MOVE   SPACE      TO    RECE04-TOYAKUFLG
+                  ELSE
+                    IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
+                    OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
+                        CONTINUE
                     ELSE
                         MOVE    "1"       TO    RECE04-TOYAKUFLG
                     END-IF

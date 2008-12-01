@@ -156,6 +156,7 @@
       *                                     ÅêÌôºÞÅÀ£°¡Ê±¡³°Åù¡Ëµ­ºÜ
       *  04.03.04    NACL-ÌçÏÆ    08/08/19  Æþ±¡ÎÁÌ¤»»Äê»þ¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  04.03.05    NACL-ÌçÏÆ    08/09/25  ¼«ÇåÀÕ£°£¹£µ£¹£³¤Î½¸·×ÀèÂÐ±þ
+      *  04.03.06    NACL-ÌçÏÆ    08/12/01  ºßÂð¡Ê±¡³°Ê¬¡ËÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1668,13 +1669,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                        IF  (ACCT-ZAIKAISU  NOT =    ZERO) AND
                            (FLG-TENTEKIMATOME  =    ZERO)
-                            IF ( ACCT-SRYKBN  =  "11" OR "14" OR
+                            IF ( ACCT-SRYKBN  =  "11" OR
                                                  "33" OR "99" OR
-                                                 "90" OR "92" )
-                            OR ((WRK-PARA-PRTKBN
-                                              =  "2"          ) AND
+                                                 "90" OR "92"  )
+                            OR ((RECE82-SRYYM >= "200804"     ) AND
+                                (ACCT-SRYKBN  =  "14"         ))
+                            OR ((RECE82-SRYYM >= "200804"     ) AND
                                 (ACCT-SRYKBN  =  "21" OR "22" OR
-                                                 "23"        ))
+                                                 "23"         ) AND
+                                (WRK-PARA-PRTKBN  =  "2"      ))
                                IF  ACCT-SRYCDTOTAL = CONS-TOKKI1  OR
                                                      CONS-TOKKI2  OR
                                                      CONS-TOKKI3  OR
@@ -2169,6 +2172,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       END-IF
                     ELSE
                         MOVE    "1"       TO    RECE84-TOYAKUFLG
+                    END-IF
+                  END-IF
+               END-IF
+      *
+               IF    ( SRY-SRYKBN        =     "14" )
+               AND   ( RECE84-ZAITEN     =     ZERO )
+                  IF     RECE84-SAFLG   NOT =  SPACE
+                        MOVE   SPACE      TO    RECE84-TOYAKUFLG
+                  ELSE
+                    IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
+                    OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
+                        CONTINUE
+                    ELSE
+                        EVALUATE  WRK-PARA-PRTKBN
+                          WHEN      "1"
+                            MOVE  "9"    TO    RECE84-TOYAKUFLG
+                          WHEN      "2"
+                            MOVE  "1"    TO    RECE84-TOYAKUFLG
+                        END-EVALUATE
                     END-IF
                   END-IF
                END-IF

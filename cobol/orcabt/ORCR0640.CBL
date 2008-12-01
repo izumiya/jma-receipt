@@ -344,6 +344,7 @@
       *                                     ÅêÌôºÞÅÀ£°¡Ê±¡³°Åù¡Ëµ­ºÜ
       *  04.03.04    NACL-ÌçÏÆ    08/08/19  Æþ±¡ÎÁÌ¤»»Äê»þ¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  04.03.05    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.03.06    NACL-ÌçÏÆ    08/12/01  ºßÂð¡Ê±¡³°Ê¬¡ËÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2522,12 +2523,12 @@
                            ELSE
                              IF  (ACCT-ZAIKAISU  NOT =    ZERO)   AND
                                  (FLG-TENTEKIMATOME  =    ZERO)
-                               IF ( ACCT-SRYKBN  =  "11" OR "14" OR
+                               IF ( ACCT-SRYKBN  =  "11" OR
                                                     "33" OR "99" OR
-                                                    "90" OR "92" )
-                               OR ((RECE62-SRYYM >= 200804       ) AND
+                                                    "90" OR "92"  )
+                               OR ((RECE62-SRYYM >= "200804"     ) AND
                                    (ACCT-SRYKBN  =  "21" OR "22" OR
-                                                    "23"        ))
+                                                    "23" OR "14" ))
                                  IF  ACCT-SRYCDTOTAL = CONS-TOKKI1 OR
                                                        CONS-TOKKI2 OR
                                                        CONS-TOKKI3 OR
@@ -3025,6 +3026,20 @@
                       IF   RECE64-TOYAKUFLG = SPACE
                         MOVE    "2"       TO    RECE64-TOYAKUFLG
                       END-IF
+                    ELSE
+                        MOVE    "1"       TO    RECE64-TOYAKUFLG
+                    END-IF
+                  END-IF
+               END-IF
+      *
+               IF    ( SRY-SRYKBN        =     "14" )
+               AND   ( RECE64-ZAITEN     =     ZERO )
+                  IF     RECE64-SAFLG   NOT =  SPACE
+                        MOVE   SPACE      TO    RECE64-TOYAKUFLG
+                  ELSE
+                    IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
+                    OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
+                        CONTINUE
                     ELSE
                         MOVE    "1"       TO    RECE64-TOYAKUFLG
                     END-IF

@@ -47,6 +47,7 @@
       *                                     編集対応
       *  04.03.02    NACL-門脇    08/07/14  仮レセ作成（院外処方含む）対応
       *                                     投薬剤点０（院外等）記載
+      *  04.03.03    NACL-門脇    08/12/01  在宅（院外分）編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -984,11 +985,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF   ACCT-ZAIKAISU  NOT =    ZERO
                                IF ( ACCT-SRYKBN  =  "11" OR "12" OR
-                                                    "14" OR "99" )
-                               OR ((WRK-PARA-PRTKBN
-                                                 =  "2"          ) AND
+                                                    "99"          )
+                               OR ((RECE100-SRYYM >= "200804"    ) AND
+                                   (ACCT-SRYKBN  =  "14"         ))
+                               OR ((RECE100-SRYYM >= "200804"    ) AND
                                    (ACCT-SRYKBN  =  "21" OR "22" OR
-                                                    "23"        ))
+                                                    "23"         ) AND
+                                   (WRK-PARA-PRTKBN  =  "2"      ))
                                  IF  ACCT-SRYCDTOTAL = CONS-TOKKI1 OR
                                                        CONS-TOKKI2 OR
                                                        CONS-TOKKI3 OR
@@ -1363,6 +1366,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       END-IF
                     ELSE
                         MOVE    "1"       TO    RECE120-TOYAKUFLG
+                    END-IF
+                  END-IF
+               END-IF
+      *
+               IF    ( SRY-SRYKBN        =     "14" )
+               AND   ( RECE120-ZAITEN    =     ZERO )
+                  IF     RECE120-SAFLG   NOT =  SPACE
+                        MOVE   SPACE      TO    RECE120-TOYAKUFLG
+                  ELSE
+                    IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
+                    OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
+                        CONTINUE
+                    ELSE
+                        EVALUATE  WRK-PARA-PRTKBN
+                          WHEN      "1"
+                            MOVE  "9"    TO    RECE120-TOYAKUFLG
+                          WHEN      "2"
+                            MOVE  "1"    TO    RECE120-TOYAKUFLG
+                        END-EVALUATE
                     END-IF
                   END-IF
                END-IF

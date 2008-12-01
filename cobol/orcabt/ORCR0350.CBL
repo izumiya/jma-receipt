@@ -223,6 +223,7 @@
       *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *  04.03.05    NACL-Æ£¸¶    08/09/16  ¸å´ü¹âÎð¼Ô¤Î£Î£É¥ì¥³¡¼¥É¤Îºî
       *                                     À®¤Î½¤Àµ
+      *  04.03.06    NACL-ÌçÏÆ    08/12/01  ºßÂð¡Ê±¡³°Ê¬¡ËÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4245,6 +4246,7 @@
       *
            IF    ( RECE641-SRYKBN  NOT =   "70" )
            AND   ( RECE641-KIZAITEN    =   ZERO )
+           AND   ( RECE641-TOYAKUFLG   =   SPACE)
                GO  TO  200711-KIZAI-TAIHI-EXT
            END-IF
       *
@@ -4334,7 +4336,8 @@
        200711-KIZAI-ACCT-TAIHI-SEC          SECTION.
       *
            IF      RECE641-SRYKBN    NOT =   "70"
-               IF      RECE641-KIZAITEN  =   ZERO
+               IF    ( RECE641-KIZAITEN  =   ZERO )
+               AND   ( RECE641-TOYAKUFLG =   SPACE)
                    GO  TO  200711-KIZAI-ACCT-TAIHI-EXT
                END-IF
            END-IF
