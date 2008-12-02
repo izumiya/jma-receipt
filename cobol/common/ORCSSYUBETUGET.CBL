@@ -29,6 +29,7 @@
       *  04.02.01    NACL-Æ£¸¶    08/03/25  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *
       *  04.03.01    NACL-Æ£¸¶    08/05/07  ¸øÈñ£´¼ï¤Þ¤Ç¤ÎÊ»ÍÑ¤Îµ­Ï¿ÂÐ±þ
+      *  04.03.02    NACL-Æ£¸¶    08/12/01  ¼«Èñ¤Î¼ïÊÌÀßÄê¾ò·ï¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1605,18 +1606,18 @@
        2001-JYOKEN-HENSYU-SEC          SECTION.
       *
       **  DISPLAY "SRYYM          " LNK-SYUBETUGET-SRYYM
-      **  DISPLAY "HKNNUM         " LNK-SYUBETUGET-HKNNUM
+          DISPLAY "HKNNUM         " LNK-SYUBETUGET-HKNNUM
       **  DISPLAY "NYUGAIKBN      " LNK-SYUBETUGET-NYUGAIKBN 
       **  DISPLAY "HONKZKKBN      " LNK-SYUBETUGET-HKN-HONKZKKBN
       **  DISPLAY "HOJOKBN        " LNK-SYUBETUGET-HKN-HOJOKBN
-      **  DISPLAY "HKNKOHSBTKBN   " LNK-SYUBETUGET-HKN-HKNKOHSBTKBN
+          DISPLAY "HKNKOHSBTKBN   " LNK-SYUBETUGET-HKN-HKNKOHSBTKBN
       **  DISPLAY "AGE            " LNK-SYUBETUGET-AGE 
       **  DISPLAY "SYUGAKUKBN     " LNK-SYUBETUGET-SYUGAKUKBN
       **  DISPLAY "PREFNUM        " LNK-SYUBETUGET-PREFNUM
-      **  DISPLAY "KOHNUM     (1) " LNK-SYUBETUGET-KOHNUM     (1)
-      **  DISPLAY "RECESKYKBN (1) " LNK-SYUBETUGET-RECESKYKBN (1)
-      **  DISPLAY "KOHNUM     (2) " LNK-SYUBETUGET-KOHNUM     (2)
-      **  DISPLAY "RECESKYKBN (2) " LNK-SYUBETUGET-RECESKYKBN (2)
+          DISPLAY "KOHNUM     (1) " LNK-SYUBETUGET-KOHNUM     (1)
+          DISPLAY "RECESKYKBN (1) " LNK-SYUBETUGET-RECESKYKBN (1)
+          DISPLAY "KOHNUM     (2) " LNK-SYUBETUGET-KOHNUM     (2)
+          DISPLAY "RECESKYKBN (2) " LNK-SYUBETUGET-RECESKYKBN (2)
       **  DISPLAY "KOHNUM     (3) " LNK-SYUBETUGET-KOHNUM     (3)
       **  DISPLAY "RECESKYKBN (3) " LNK-SYUBETUGET-RECESKYKBN (3)
       **  DISPLAY "KOHNUM     (4) " LNK-SYUBETUGET-KOHNUM     (4)
@@ -1677,8 +1678,10 @@
            END-IF
       *     
       *    ¼«Èñ¤Î¤È¤­
-           IF     LNK-SYUBETUGET-HKN-HKNKOHSBTKBN
-                                       =   "8"
+           IF    ( LNK-SYUBETUGET-HKNNUM
+                                   NOT =   SPACE )
+           AND   ( LNK-SYUBETUGET-HKN-HKNKOHSBTKBN
+                                       =   "8"   )
                MOVE    8888            TO  LNK-SYUBETUGET-RECESYUBETU
                GO  TO  2001-JYOKEN-HENSYU-EXT
            END-IF
