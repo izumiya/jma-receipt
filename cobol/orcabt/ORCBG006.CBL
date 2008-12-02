@@ -31,7 +31,6 @@
       *  02.01.01    NACL-森脇    05/01/27  高速化による変更
       *  03.05.01    NACL-森脇    07/06/05  グループ診療対応
       *  04.02.01    NACL-森脇    08/05/27  残量廃棄対応
-      *  04.03.01    NACL-森脇    08/07/29  パラメタに入外区分追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -57,7 +56,6 @@
        FD  TOKEI-FILE.
        01  TOKEI-REC. 
            03  TOKEI-KEY.
-               05  TOKEI-NYUGAIKBN     PIC X(01).
                05  TOKEI-INGAIKBN      PIC 9(01).
                05  TOKEI-YKZKBN        PIC 9(01).
                05  TOKEI-KANANAME      PIC X(200).
@@ -131,7 +129,6 @@
            03  WRK-PARA-DENPPRTYM      PIC X(06).
            03  WRK-PARA-YKZKBN         PIC 9(01).
            03  WRK-PARA-INGAIKBN       PIC 9(01).
-           03  WRK-PARA-NYUGAIKBN      PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -150,7 +147,6 @@
            03  WRK-SRYCD               PIC X(9).
            03  WRK-YKZKBN              PIC X(01).
            03  WRK-INGAIKBN            PIC X(01).
-           03  WRK-NYUGAIKBN           PIC X(01).
       *
            03  WRK-GSURYO              PIC 9(10)V9(03).
       *
@@ -194,12 +190,11 @@
                05  WRK-SYSYMDWH        PIC X(22).
                05  WRK-YMD-MSG1        PIC X(4).
            03  WRK-DAI.
-               05  WRK-NYUGAIKBNWH     PIC X(4).
                05  WRK-DAI-MSG1        PIC X(32).
                05  WRK-DENPPRTYMWH     PIC X(16).
-               05  WRK-DAI-MSG2        PIC X(4).
+               05  WRK-DAI-MSG2        PIC X(6).
                05  WRK-YKZKBNWH        PIC X(12).
-               05  WRK-INGAIKBNWH      PIC X(8).
+               05  WRK-INGAIKBNWH      PIC X(12).
            03  WRK-PAGE.
                05  WRK-PAGE1           PIC X(03).
                05  WRK-PAGE-MSG1       PIC X(01).
@@ -222,7 +217,7 @@
       *
            COPY    "CPSHELLTBL.INC".
       *
-      *    COPY    "ORCA-DBPATH".
+           COPY    "ORCA-DBPATH".
       *
       *    点数マスタ退避ワーク
            COPY    "CPTTNS.INC".
@@ -356,7 +351,6 @@
                                        WRK-PARA-DENPPRTYM
                                        WRK-PARA-YKZKBN
                                        WRK-PARA-INGAIKBN
-                                       WRK-PARA-NYUGAIKBN
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
@@ -410,7 +404,7 @@
       *    表題編集
            MOVE    "診療科別医薬品使用量統計（月報）"
                                    TO  WRK-DAI-MSG1
-           MOVE    "分　"          TO  WRK-DAI-MSG2
+           MOVE    "分　　"        TO  WRK-DAI-MSG2
            MOVE    "作成"          TO  WRK-YMD-MSG1
       *
            .
@@ -752,7 +746,6 @@
       *
       *    統計データ合計
            INITIALIZE                  TOKEI-REC
-           MOVE    WRK-NYUGAIKBN   TO  TOKEI-NYUGAIKBN
            MOVE    WRK-INGAIKBN    TO  TOKEI-INGAIKBN
            MOVE    TNS-YKZKBN      TO  TOKEI-YKZKBN
            MOVE    "合計"          TO  TOKEI-KANANAME
@@ -785,7 +778,6 @@
       *
       *    統計データ検索
            INITIALIZE                  TOKEI-REC
-           MOVE    WRK-NYUGAIKBN   TO  TOKEI-NYUGAIKBN
            MOVE    WRK-INGAIKBN    TO  TOKEI-INGAIKBN
            MOVE    TNS-YKZKBN      TO  TOKEI-YKZKBN
            MOVE    TNS-KANANAME    TO  TOKEI-KANANAME
@@ -795,7 +787,6 @@
       *
            IF        ( FLG-TOKEI       =   1 )
                INITIALIZE                  TOKEI-REC
-               MOVE    WRK-NYUGAIKBN   TO  TOKEI-NYUGAIKBN
                MOVE    WRK-INGAIKBN    TO  TOKEI-INGAIKBN
                MOVE    TNS-YKZKBN      TO  TOKEI-YKZKBN
                MOVE    TNS-KANANAME    TO  TOKEI-KANANAME
@@ -832,11 +823,10 @@
       *
            MOVE    TOKEI-INGAIKBN      TO  WRK-INGAIKBN
            MOVE    TOKEI-YKZKBN        TO  WRK-YKZKBN
-           MOVE    TOKEI-NYUGAIKBN     TO  WRK-NYUGAIKBN
-           PERFORM UNTIL ( FLG-TOKEI           =   1  )
-                   OR    ( TOKEI-INGAIKBN  NOT = WRK-INGAIKBN )
-                   OR    ( TOKEI-YKZKBN    NOT = WRK-YKZKBN )
-                   OR    ( TOKEI-NYUGAIKBN NOT = WRK-NYUGAIKBN )
+           PERFORM
+               UNTIL    (FLG-TOKEI         =   1  )  OR
+                        (TOKEI-INGAIKBN    NOT = WRK-INGAIKBN) OR
+                        (TOKEI-YKZKBN  NOT = WRK-YKZKBN)
       *        統計編集処理
                PERFORM 2601-TOUKEI-HEN-SEC
            END-PERFORM
@@ -878,11 +868,11 @@
       *
            MOVE    TOKEI-SRYCD         TO  WRK-SRYCD
            MOVE    ZERO                TO  WRK-GSURYO
-           PERFORM UNTIL ( FLG-TOKEI           =   1  )
-                   OR    ( TOKEI-YKZKBN    NOT = WRK-YKZKBN )
-                   OR    ( TOKEI-INGAIKBN  NOT = WRK-INGAIKBN )
-                   OR    ( TOKEI-NYUGAIKBN NOT = WRK-NYUGAIKBN )
-                   OR    ( TOKEI-SRYCD     NOT = WRK-SRYCD )
+           PERFORM
+               UNTIL    (FLG-TOKEI         =   1  )  OR
+                        (TOKEI-YKZKBN  NOT = WRK-YKZKBN)  OR
+                        (TOKEI-INGAIKBN    NOT = WRK-INGAIKBN)  OR
+                        (TOKEI-SRYCD   NOT = WRK-SRYCD )
       *        数量編集処理
                PERFORM 26011-SURYOU-HEN-SEC
       *
@@ -989,11 +979,11 @@
       *    見出し
            EVALUATE  WRK-YKZKBN
                WHEN  "1"
-                   MOVE    "（内服薬）　"      TO  WRK-YKZKBNWH
+                   MOVE    "（内服薬）"        TO  WRK-YKZKBNWH
                WHEN  "4"
-                   MOVE    "（注射薬）　"      TO  WRK-YKZKBNWH
+                   MOVE    "（注射薬）"        TO  WRK-YKZKBNWH
                WHEN  "6"
-                   MOVE    "（外用薬）　"      TO  WRK-YKZKBNWH
+                   MOVE    "（外用薬）"        TO  WRK-YKZKBNWH
                WHEN  "8"
                    MOVE    "（歯科薬剤）"      TO  WRK-YKZKBNWH
                WHEN  "9"
@@ -1006,14 +996,6 @@
                    MOVE    "（院内）"        TO  WRK-INGAIKBNWH
                WHEN  "2"
                    MOVE    "（院外）"        TO  WRK-INGAIKBNWH
-           END-EVALUATE
-      *
-           DISPLAY "WRK-NYUGAIKBN=" WRK-NYUGAIKBN
-           EVALUATE  WRK-NYUGAIKBN
-               WHEN  "1"
-                   MOVE    "外来"            TO  WRK-NYUGAIKBNWH
-               WHEN  "2"
-                   MOVE    "入院"            TO  WRK-NYUGAIKBNWH
            END-EVALUATE
       *
            IF          CNT-MAX         <=  5
@@ -1320,37 +1302,16 @@
       *****************************************************************
        900-SRY-DBFETCH-SEC         SECTION.
       *
-      *    入外区分チェック
-           MOVE    ZERO                TO  FLG-OK
-           PERFORM UNTIL  ( FLG-OK     =   1 )
-                   OR     ( FLG-SRYACT =   1 )
-               MOVE    "DBFETCH"       TO  MCP-FUNC
-               CALL    "ORCDBMAIN"     USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-      *
-               IF        ( MCP-RC          =   ZERO )
-                   MOVE    ZERO            TO  FLG-SRYACT
-                   MOVE    MCPDATA-REC     TO  SRYACT-REC
-                   MOVE    SPACE           TO  WRK-NYUGAIKBN
-                   IF      SRY-NYUGAIKBN   =   "2"
-                       MOVE    "1"             TO  WRK-NYUGAIKBN
-                   END-IF
-                   IF      SRY-NYUGAIKBN   =   "1"
-                       MOVE    "2"             TO  WRK-NYUGAIKBN
-                   END-IF
-                   IF        ( WRK-PARA-NYUGAIKBN  =   "0" )
-                       OR    ( WRK-PARA-NYUGAIKBN  =   SPACE )
-                       MOVE    1               TO  FLG-OK
-                   ELSE
-                       IF      WRK-PARA-NYUGAIKBN  =   WRK-NYUGAIKBN
-                           MOVE    1               TO  FLG-OK
-                       END-IF
-                   END-IF
-               ELSE
-                   MOVE    1               TO  FLG-SRYACT
-               END-IF
-           END-PERFORM
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"     USING   MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           IF        ( MCP-RC          =   ZERO )
+               MOVE    ZERO            TO  FLG-SRYACT
+               MOVE    MCPDATA-REC     TO  SRYACT-REC
+           ELSE
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
       *
            .
        900-SRY-DBFETCH-EXT.
