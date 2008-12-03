@@ -39,6 +39,8 @@
       *  04.03.01    NACL-藤原    08/08/22  公費４種までの併用の記録対応
       *                                     レセプト種別はレセプト種別
       *                                     （紙レセプト）から表示する
+      *
+      *  04.04.01    NACL-藤原    08/12/02  自費レセプトの種別表示の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -964,6 +966,10 @@ grpsys         MOVE    SPA-HOSPNUM     TO  LNK-SYUBETU-HOSPNUM
                                                               (IDX1)
                            WHEN    "6666"
                                MOVE    "特別療養費"
+                                   TO  SPA-GMN-R96-PTNUM-TRECESYUBETU
+                                                              (IDX1)
+                           WHEN    "8888"
+                               MOVE    "自費"
                                    TO  SPA-GMN-R96-PTNUM-TRECESYUBETU
                                                               (IDX1)
                            WHEN    OTHER

@@ -71,6 +71,9 @@
       *  04.03.01    NACL-藤原    08/05/07  公費４種までの併用の記録対応
       *                                     レセプト種別（紙レセプト）の追加
       *  04.03.02    NACL-門脇    08/09/02  請求点判定追加
+      *
+      *  04.04.01    NACL-藤原    08/12/02  自費、不明分のレセプト種別
+      *                                     （紙レセプト）への設定追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1911,14 +1914,16 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
       *    保険組合せがないとき
            IF      WRK-RECE61-TEISEIKBN
                                    =   "1"
-               MOVE    "0000"      TO  LNK-SYUBETU-RECESYUBETU (IDZZ)
+               MOVE    "0000"      TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
+                                       LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
                GO  TO  30011-RECESYUBETU-SET-EXT
            END-IF
       *     
       *    自費のとき
            IF     WRK-RECE61-HKNKOHSBTKBN
                                    =   "8"
-               MOVE    "8888"      TO  LNK-SYUBETU-RECESYUBETU (IDZZ)
+               MOVE    "8888"      TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
+                                       LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
                GO  TO  30011-RECESYUBETU-SET-EXT
            END-IF
       *
