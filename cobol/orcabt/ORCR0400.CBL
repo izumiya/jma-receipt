@@ -1048,6 +1048,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    MCPDATA-REC         TO  SYS-2002-REC
       *
            DISPLAY "SYS PTID=" SYS-2002-PTID 
+                   " SRYYM="   SYS-2002-SRYYM
       *
       *    該当診療年月の医療機関情報取得
            MOVE  ZERO           TO  FLG-SET

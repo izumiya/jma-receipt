@@ -852,6 +852,10 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
            MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
            MOVE    KEY-N-PTID              TO  PTINF-PTID
            PERFORM 900-PTINF-READ-SEC
+      *
+           DISPLAY "NYUINACCT PTID=" KEY-N-PTID 
+                   " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
+      *
            IF      FLG-PTINF           =   ZERO
            AND     PTINF-TSTPTNUMKBN   =   "1"
                MOVE    KEY-NEW             TO  KEY-OLD
@@ -1504,6 +1508,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    MCPDATA-REC         TO  SYS-2002-REC
       *
            DISPLAY "SYS PTID=" SYS-2002-PTID 
+                   " SRYYM="   SYS-2002-SRYYM
       *
       *    ∞ÂŒ≈µ°¥ÿ£…£ƒ ‘Ω∏
            MOVE  ZERO           TO  FLG-SET

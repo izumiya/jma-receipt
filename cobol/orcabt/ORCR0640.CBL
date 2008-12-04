@@ -336,6 +336,7 @@
       *  04.02.33    NACL-ÌçÏÆ    08/10/02  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       *  04.02.34    NACL-ÌçÏÆ    08/10/22  ¿À¸Í»ÔÃÏÊý¸øÈñÂçºåÉÜÂÐ±þ
       *  04.02.35    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.02.36    NACL-ÌçÏÆ    08/12/04  ²¾¼ýÇ¼¥Á¥§¥Ã¥¯½èÍýÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -514,6 +515,7 @@
            03  FLG-HOUMON-COM                          PIC 9(01).
            03  FLG-ZENKOKUKOHI-NISYU                   PIC 9(01).
            03  FLG-CHI-TAISYO                          PIC 9(01).
+           03  FLG-SYUNOU-ARI                          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -659,6 +661,12 @@
        01  WK-SYUTEN                                   PIC S9(08).
        01  WK-KIZAITEN                                 PIC S9(08).
        01  WK-YKZTEN                                   PIC S9(08).
+      *
+      *    ¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸ÊÔ½¸ÎÎ°è
+       01  ERR-EDIT-AREA.
+           03  ERR-PTNUM                               PIC X(20).
+           03  ERR-ERRMSG                              PIC X(80).
+           03  ERR-HEN-ERRMSG                          PIC X(200).
       *
       *    ÅÀ¿ô¥Æ¡¼¥Ö¥ë¸¡º÷ÍÑÂÐ¾ÝÆüÎÎ°è
        01  WK-TAIHI-AREA.
@@ -1059,6 +1067,11 @@
            03  WRK-HOKENICHIBUGAK              PIC  9(07).
       *
            03  WRK-HANTEI-TOTALTEN             PIC  9(09).
+      *
+           03  WRK-STR                         PIC  X(200).
+           03  WRK-LEN                         PIC  9(05).
+           03  WRK-SHO                         PIC  9(05).
+           03  WRK-AMARI                       PIC  9(05).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -2053,8 +2066,9 @@
            PERFORM    RECE62-READ-SEC
       *
            PERFORM                     UNTIL   FLG-RECE62  =   1
-               PERFORM     210-HENSYU-SEC
+             PERFORM     210-HENSYU-SEC
       *
+             IF  FLG-RECE62 = ZERO
                PERFORM     RECE62-READ-SEC
                IF  CNT-IN-COMMIT   =   300
                    MOVE  ZERO          TO      CNT-IN-COMMIT
@@ -2067,6 +2081,7 @@
                    MOVE    ZERO                TO  CNT-IN-CANCEL
                    PERFORM 500-CANCEL-HENSYU-SEC
                END-IF
+             END-IF
            END-PERFORM
       *
            CLOSE   RECE62-FILE
@@ -2200,8 +2215,9 @@
            END-IF
       *
       *    Ê¡²¬¸©ÃÏÊý¸øÈñ¤ÎÈ½Äê
-           DISPLAY   "RECE62-PREFNUM = " RECE62-PREFNUM
-           IF      RECE62-PREFNUM     =   40
+      ***  DISPLAY   "RECE62-PREFNUM = " RECE62-PREFNUM
+           IF     (RECE62-PREFNUM     =   40    )
+           AND    (RECE62-SRYYM      <=   200609)
                MOVE    ZERO               TO  KOHIDX
                PERFORM   VARYING   IDX  FROM    1   BY  1
                          UNTIL   ( IDX                >    4    )
@@ -9253,6 +9269,8 @@
            MOVE    ZERO                 TO      FLG-ZENKOKUKOHI-NISYU
            MOVE    ZERO                 TO      FLG-CHI-TAISYO
       *
+           MOVE    ZERO                 TO      FLG-SYUNOU-ARI
+      *
            IF    RECE62-KOUREI    =    "1"  OR  "2"
               IF    RECE62-KOUREI    =    "1"
                  PERFORM   21048-KEIKASOCHI-HANTEI-SEC
@@ -9298,6 +9316,7 @@
                                                 RECE62-HKNCOMBI (IDX1)
                            IF  SYU-DENPJTIKBN    NOT =  "3"
                                PERFORM   21044-RECE62-FTN-HENSYU-SEC
+                               MOVE   1   TO   FLG-SYUNOU-ARI
                            END-IF
                            MOVE    10              TO  IDX1
                        END-IF
@@ -9327,6 +9346,15 @@
            IF   RECE62-SRYYM  >= "200604"
            AND  RECE62-SRYYM  <  "200610"
                 PERFORM    21047-SKJ-RAYKU-HENSYU-SEC
+           END-IF
+      *
+           IF   FLG-SYUNOU-ARI  =  ZERO
+              DISPLAY "<SYUNOU NG STOP>"
+              MOVE    "²¾¼ýÇ¼¥Ç¡¼¥¿¤¬¤¢¤ê¤Þ¤»¤ó"  TO  ERR-ERRMSG
+              PERFORM 600-ERRMSG-EDIT-SEC
+              MOVE    ERR-HEN-ERRMSG    TO  WRK-RECEERR
+              PERFORM 500-ERR-HENSYU-SEC
+              MOVE    1                 TO  FLG-RECE62
            END-IF
       *
            .
@@ -13608,61 +13636,6 @@
                END-IF
              END-IF
       *
-      *      ¼ç¡ÜÁ´£Á¡Ü£±£²¡¢¼ç¡Ü£±£²
-      ***    IF  ( RECE62-HKNNUM      NOT =  SPACE          )
-      ***    AND ( RECE62-KOHNUM(1)(1:1)  =  "0"            )
-      ***    AND ( RECE62-KOHNUM(1)   NOT =  "012" AND "025")
-      ***    AND ( RECE62-KOHNUM(2)       =  "012" OR  "025")
-      ***    AND ( RECE62-KOHNUM(3)       =  SPACE          )
-      ***    AND ( RECE62-KOHNUM(4)       =  SPACE          )
-      *
-      ***      IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
-      ***      AND (RECE62-TOTALTEN(1)      = RECE62-TOTALTEN(3))
-      ***         MOVE      2       TO     FLG-ZENKOKUKOHI-NISYU
-      ***      END-IF
-      *
-      ***    END-IF
-      *
-      *      ¼ç¡ÜÁ´£Á¡ÜÁ´£Â¡¢¼ç¡ÜÁ´£Â
-      ***    IF  ( RECE62-HKNNUM      NOT =  SPACE          )
-      ***    AND ( RECE62-KOHNUM(1)(1:1)  =  "0"            )
-      ***    AND ( RECE62-KOHNUM(1)   NOT =  "012" AND "025")
-      ***    AND ( RECE62-KOHNUM(2)(1:1)  =  "0"            )
-      ***    AND ( RECE62-KOHNUM(2)   NOT =  "012" AND "025")
-      ***    AND ( RECE62-KOHNUM(3)       =  SPACE          )
-      ***    AND ( RECE62-KOHNUM(4)       =  SPACE          )
-      *
-      ***      IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
-      ***      AND (RECE62-TOTALTEN(1)      = RECE62-TOTALTEN(3))
-      ***         MOVE      3       TO     FLG-ZENKOKUKOHI-NISYU
-      ***      END-IF
-      *
-      ***    END-IF
-      *
-      *      ¼ç¡ÜÁ´£Á¡ÜÄ¹¡¢¼ç¡ÜÁ´£Â¡ÜÄ¹
-      *      ¼ç¡ÜÁ´£Á¡ÜÃÏ¡ÜÄ¹¡¢¼ç¡ÜÁ´£Â¡ÜÃÏ¡ÜÄ¹
-      **     IF  ( RECE62-HKNNUM      NOT =  SPACE          )
-      **     AND ( RECE62-KOHNUM(1)(1:1)      =  "0"        )
-      **     AND ( RECE62-KOHNUM(2)(1:1)      =  "0"        )
-      **     AND ( RECE62-KOHNUM(3)(1:1)  NOT =  "0"        )
-      **     AND ( RECE62-KOHNUM(4)(1:1)  NOT =  "0"        )
-      **     AND ((RECE62-KOHNUM(3)       =  "972" OR "974") OR
-      **          (RECE62-KOHNUM(4)       =  "972" OR "974"))
-      *
-      **       IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
-      **       AND (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(3))
-      **          IF  (RECE62-KOHNUM(3)   =  "972" OR "974"    )
-      **          AND (RECE62-TOTALTEN(1) =  RECE62-TOTALTEN(4))
-      **              MOVE      4       TO     FLG-ZENKOKUKOHI-NISYU
-      **          END-IF
-      **          IF  (RECE62-KOHNUM(4)   =  "972" OR "974"    )
-      **          AND (RECE62-TOTALTEN(1) =  RECE62-TOTALTEN(5))
-      **              MOVE      4       TO     FLG-ZENKOKUKOHI-NISYU
-      **          END-IF
-      **       END-IF
-      *
-      **     END-IF
-      *
            END-IF
       *
            .
@@ -14884,6 +14857,7 @@
                                        CNT-IN-CANCEL
       *
                    DISPLAY "RECE62 " IDZ " PTNUM=" RECE62-PTNUM     
+                                         " (PTID=" RECE62-PTID ")"
       *
                    PERFORM 910-SYSKANRI-HENSYU-SEC
       *
@@ -15261,6 +15235,50 @@
            END-IF
            .
        500-CANCEL-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸ÊÔ½¸½èÍý
+      *****************************************************************
+       600-ERRMSG-EDIT-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  ERR-HEN-ERRMSG
+      *
+           MOVE    RECE62-PTNUM        TO  ERR-PTNUM
+      *
+           MOVE    ZERO                TO  WRK-SHO
+                                           WRK-AMARI
+           MOVE    1                   TO  WRK-LEN
+           MOVE    SPACE               TO  WRK-STR
+           STRING  ERR-PTNUM           DELIMITED   BY  SPACE
+           INTO    WRK-STR
+           WITH  POINTER WRK-LEN
+           END-STRING
+      *
+           COMPUTE WRK-LEN =   WRK-LEN -   1
+      *
+           DIVIDE  2   INTO    WRK-LEN GIVING  WRK-SHO
+           REMAINDER WRK-AMARI
+           END-DIVIDE
+      *
+           IF    ( WRK-AMARI   =   ZERO )
+              STRING  ERR-ERRMSG          DELIMITED   BY  SPACE
+                      "¡Î´µ¼ÔÈÖ¹æ¡§"      DELIMITED   BY  SIZE
+                      ERR-PTNUM           DELIMITED   BY  SPACE
+                      "¡Ï"                DELIMITED   BY  SIZE
+              INTO    ERR-HEN-ERRMSG
+              END-STRING
+           ELSE
+              STRING  ERR-ERRMSG          DELIMITED   BY  SPACE
+                      "¡Î´µ¼ÔÈÖ¹æ:"       DELIMITED   BY  SIZE
+                      ERR-PTNUM           DELIMITED   BY  SPACE
+                      "¡Ï"                DELIMITED   BY  SIZE
+              INTO    ERR-HEN-ERRMSG
+              END-STRING
+           END-IF
+      *
+           .
+       600-ERRMSG-EDIT-EXT.
            EXIT.
       *
       *****************************************************************

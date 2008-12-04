@@ -60,6 +60,7 @@
       *  04.02.03    NACL-門脇    08/06/15  入院料加算外泊チェック
       *  04.02.04    NACL-門脇    08/10/07  入院基本料有効期間チェック
       *  04.02.05    NACL-門脇    08/10/30  保険組合せ有効期間チェック
+      *  04.03.01    NACL-門脇    08/12/04  仮収納作成時のディスプレイ追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -980,6 +981,8 @@
       *****************************************************************
        20011-HENSYU-SEC                SECTION.
       *
+           MOVE    "1"                 TO  WRK-DATAKBN
+      *
       *    ダミー収納削除処理
       *
            INITIALIZE                      SYUNOU-REC
@@ -1190,7 +1193,7 @@
       *****************************************************************
        20011-KARITEIKI-OUTPUT-SEC      SECTION.
       *
-           MOVE    "1"                 TO  WRK-DATAKBN
+      ***  MOVE    "1"                 TO  WRK-DATAKBN
       *
            MOVE    LNK-SYUNOU-REC (IDX1)
                                        TO  SYUNOU-REC
@@ -1225,6 +1228,24 @@
            PERFORM    900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO 
                COMPUTE CNT-OUT1    =   CNT-OUT1    +   1
+               DISPLAY "<SYUNOU>PTID=" KEY-O-PTID
+               DISPLAY "HKNCOMBINUM="    LNK-SYU-HKNCOMBINUM(IDX1)
+               DISPLAY "SKYSTYMD="       LNK-SYU-SKYSTYMD   (IDX1)
+               IF  LNK-SYU-SYUHKNNUM(IDX1)  NOT = SPACE
+                 DISPLAY "SYUHKNNUM="    LNK-SYU-SYUHKNNUM  (IDX1)
+               END-IF
+               IF  LNK-SYU-KOH1HKNNUM(IDX1) NOT = SPACE
+                 DISPLAY "KOH1HKNNUM="   LNK-SYU-KOH1HKNNUM (IDX1)
+               END-IF
+               IF  LNK-SYU-KOH2HKNNUM(IDX1) NOT = SPACE
+                 DISPLAY "KOH2HKNNUM="   LNK-SYU-KOH2HKNNUM (IDX1)
+               END-IF
+               IF  LNK-SYU-KOH3HKNNUM(IDX1) NOT = SPACE
+                 DISPLAY "KOH3HKNNUM="   LNK-SYU-KOH3HKNNUM (IDX1)
+               END-IF
+               IF  LNK-SYU-KOH4HKNNUM(IDX1) NOT = SPACE
+                 DISPLAY "KOH4HKNNUM="   LNK-SYU-KOH4HKNNUM (IDX1)
+               END-IF
            ELSE 
                DISPLAY "PTID=" KEY-O-PTID
                DISPLAY "SKYSTYMD=" WRK-SEIKYUSTYMD
@@ -1324,7 +1345,9 @@
            MOVE    WRK-PARA-PTID    TO  SYS-2002-PTID
            MOVE    WRK-PARA-SRYYM-O TO  SYS-2002-SRYYM
            MOVE    "1"              TO  SYS-2002-NYUGAIKBN
+      *
            DISPLAY "SYS PTID=" SYS-2002-PTID
+                   " SRYYM="   SYS-2002-SRYYM
       *
       *    該当診療年月の医療機関情報取得
            MOVE  ZERO           TO  FLG-SET

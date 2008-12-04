@@ -156,7 +156,7 @@ grpsys     SPA-AREA
       *****************************************************************
        100-PRM-CHK-SEC                     SECTION.
       *
-           DISPLAY "KOHPLUS PRM-CHK-SEC"
+      ***  DISPLAY "KOHPLUS PRM-CHK-SEC"
            IF    ( LNK-SKOHPLUS-SRYYMD    =   SPACE )
                MOVE    1               TO  LNK-SKOHPLUS-RC
                GO  TO  100-PRM-CHK-EXT
@@ -181,7 +181,7 @@ grpsys     MOVE    LNK-SKOHPLUS-HOSPNUM   TO  PTINF-HOSPNUM
       *****************************************************************
        200-MAIN-SEC            SECTION.
       *
-           DISPLAY "KOHPLUS MAIN-SEC"
+      ***  DISPLAY "KOHPLUS MAIN-SEC"
       *保険組合せ情報取得
            MOVE    ZERO                TO   FLG-HKNCOMBI
            INITIALIZE                       HKNCOMBI-REC
@@ -258,7 +258,7 @@ grpsys     MOVE    LNK-SKOHPLUS-HOSPNUM   TO  KOHPLUS-HOSPNUM
                MOVE    "key2"             TO  MCP-PATHNAME
                PERFORM   910-KOHPLUS-READ-SEC
                IF    FLG-KOHPLUS          =   ZERO
-                   DISPLAY "KOHPLUS FETCH COMPLETE"
+      ***          DISPLAY "KOHPLUS FETCH COMPLETE"
       *            返却領域のセット
                    MOVE   KOHPLUS-FTNKBN  TO LNK-SKOHPLUS-FTNKBN
                    MOVE   KOHPLUS-NYUSKJRYYKBN
@@ -290,7 +290,7 @@ grpsys             MOVE    LNK-SKOHPLUS-HOSPNUM   TO  KOHPLUS-HOSPNUM
                        MOVE    "key2"             TO  MCP-PATHNAME
                        PERFORM   910-KOHPLUS-READ-SEC
                        IF    FLG-KOHPLUS          =   ZERO
-                           DISPLAY "KOHPLUS FETCH COMPLETE"
+      ***                  DISPLAY "KOHPLUS FETCH COMPLETE"
       *                    返却領域のセット
                            MOVE   KOHPLUS-FTNKBN TO LNK-SKOHPLUS-FTNKBN
                            MOVE   KOHPLUS-NYUSKJRYYKBN
@@ -298,7 +298,7 @@ grpsys             MOVE    LNK-SKOHPLUS-HOSPNUM   TO  KOHPLUS-HOSPNUM
                            MOVE   KOHPLUS-RECESKYKBN
                                           TO  LNK-SKOHPLUS-RECESKYKBN
                        ELSE
-                           DISPLAY "KOHPLUS FETCH ERR "
+      ***                  DISPLAY "KOHPLUS FETCH ERR "
                            MOVE    3              TO  LNK-SKOHPLUS-RC
                        END-IF
                    ELSE
