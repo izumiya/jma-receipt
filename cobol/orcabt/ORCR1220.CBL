@@ -49,6 +49,7 @@
       *                                     投薬剤点０（院外等）記載
       *  04.03.03    NACL-門脇    08/08/19  入院料未算定時のコメント対応
       *  04.03.04    NACL-門脇    08/12/01  在宅（院外分）編集修正
+      *  04.03.05    NACL-門脇    08/12/04  仮収納チェック処理追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -158,6 +159,7 @@
            03  FLG-KHNRYO-SKJ      PIC 9(01).
            03  FLG-HOUSEI-COM      PIC 9(01).
            03  FLG-HOUMON-COM      PIC 9(01).
+           03  FLG-SYUNOU-ARI      PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -209,6 +211,12 @@
        01  WK-SYUTEN               PIC S9(08).
        01  WK-KIZAITEN             PIC S9(08).
        01  WK-YKZTEN               PIC S9(08).
+      *
+      *    エラーメッセージ編集領域
+       01  ERR-EDIT-AREA.
+           03  ERR-PTNUM           PIC X(20).
+           03  ERR-ERRMSG          PIC X(80).
+           03  ERR-HEN-ERRMSG      PIC X(200).
       *
       *    点数テーブル検索用対象日領域
        01  WK-TAIHI-AREA.
@@ -411,6 +419,11 @@
                                                OCCURS    5.
       *
            03  WRK-SYOKUJIKEI                  PIC  9(07).
+      *
+           03  WRK-STR                         PIC  X(200).
+           03  WRK-LEN                         PIC  9(05).
+           03  WRK-SHO                         PIC  9(05).
+           03  WRK-AMARI                       PIC  9(05).
       *
       *    固定値
        01  CONST-AREA.
@@ -1137,9 +1150,10 @@
       *
            PERFORM             UNTIL   FLG-RECE200 =   1
                                OR      FLG-END     =   1
-      *        編集処理
-               PERFORM 210-HENSYU-SEC
+      *      編集処理
+             PERFORM 210-HENSYU-SEC
       *
+             IF   FLG-RECE200  =  ZERO
                PERFORM RECE200-READ-SEC
                IF      CNT-IN-COMMIT   =   300
                    MOVE  ZERO              TO  CNT-IN-COMMIT
@@ -1152,6 +1166,7 @@
                    MOVE    ZERO                TO  CNT-IN-CANCEL
                    PERFORM 500-CANCEL-HENSYU-SEC
                END-IF
+             END-IF
            END-PERFORM
       *
            MOVE    1                   TO  FLG-END
@@ -5102,6 +5117,8 @@
       *
            MOVE    ZERO                 TO      FLG-NYUINRYO
       *
+           MOVE    ZERO                 TO      FLG-SYUNOU-ARI
+      *
            INITIALIZE                           SYUNOU-REC
            MOVE    RECE200-HOSPNUM      TO      SYU-HOSPNUM
            MOVE    RECE200-NYUGAIKBN    TO      SYU-NYUGAIKBN
@@ -5122,6 +5139,7 @@
       *
                    IF  SYU-DENPJTIKBN    NOT =  "3"
                        PERFORM   21044-RECE200-FTN-HENSYU-SEC
+                       MOVE   1   TO   FLG-SYUNOU-ARI
                    END-IF
       *
                    MOVE    "tbl_syunou" TO      MCP-TABLE
@@ -5135,6 +5153,15 @@
            MOVE    "tbl_syunou"         TO      MCP-TABLE
            MOVE    "key19"              TO      MCP-PATHNAME
            PERFORM  900-CLOSE-SEC
+      *
+           IF   FLG-SYUNOU-ARI  =  ZERO
+              DISPLAY "<SYUNOU NG STOP>"
+              MOVE    "仮収納データがありません"  TO  ERR-ERRMSG
+              PERFORM 600-ERRMSG-EDIT-SEC
+              MOVE    ERR-HEN-ERRMSG    TO  WRK-RECEERR
+              PERFORM 500-ERR-HENSYU-SEC
+              MOVE    1                 TO  FLG-RECE200
+           END-IF
       *
            .
        2104-FTN-SET-EXT.
@@ -5846,6 +5873,7 @@
                                        CNT-IN-CANCEL
       *
                    DISPLAY "RECE200 "  " PTNUM=" RECE200-PTNUM
+                                       " (PTID=" RECE200-PTID ")"
       *
                    PERFORM 910-SYSKANRI-HENSYU-SEC
       *
@@ -6116,6 +6144,50 @@
            END-IF
            .
        500-CANCEL-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラーメッセージ編集処理
+      *****************************************************************
+       600-ERRMSG-EDIT-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  ERR-HEN-ERRMSG
+      *
+           MOVE    RECE200-PTNUM       TO  ERR-PTNUM
+      *
+           MOVE    ZERO                TO  WRK-SHO
+                                           WRK-AMARI
+           MOVE    1                   TO  WRK-LEN
+           MOVE    SPACE               TO  WRK-STR
+           STRING  ERR-PTNUM           DELIMITED   BY  SPACE
+           INTO    WRK-STR
+           WITH  POINTER WRK-LEN
+           END-STRING
+      *
+           COMPUTE WRK-LEN =   WRK-LEN -   1
+      *
+           DIVIDE  2   INTO    WRK-LEN GIVING  WRK-SHO
+           REMAINDER WRK-AMARI
+           END-DIVIDE
+      *
+           IF    ( WRK-AMARI   =   ZERO )
+              STRING  ERR-ERRMSG          DELIMITED   BY  SPACE
+                      "［患者番号："      DELIMITED   BY  SIZE
+                      ERR-PTNUM           DELIMITED   BY  SPACE
+                      "］"                DELIMITED   BY  SIZE
+              INTO    ERR-HEN-ERRMSG
+              END-STRING
+           ELSE
+              STRING  ERR-ERRMSG          DELIMITED   BY  SPACE
+                      "［患者番号:"       DELIMITED   BY  SIZE
+                      ERR-PTNUM           DELIMITED   BY  SPACE
+                      "］"                DELIMITED   BY  SIZE
+              INTO    ERR-HEN-ERRMSG
+              END-STRING
+           END-IF
+      *
+           .
+       600-ERRMSG-EDIT-EXT.
            EXIT.
       *
       *****************************************************************

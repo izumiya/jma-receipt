@@ -3645,10 +3645,11 @@ grpsys                            SPA-AREA
            MOVE    "key30"         TO  MCP-PATHNAME
            PERFORM   CSR-CLOSE-SEC
       *
-           DISPLAY  "SYU-KYUFUGAI-SHOSHIN-TEN = " 
-                     SYU-KYUFUGAI-SHOSHIN-TEN
-           DISPLAY  "SYU-KYUFUGAI-GOKEI-TEN = " 
-                     SYU-KYUFUGAI-GOKEI-TEN
+      **   DISPLAY  "SYU-KYUFUGAI-SHOSHIN-TEN = " 
+      **             SYU-KYUFUGAI-SHOSHIN-TEN
+      **   DISPLAY  "SYU-KYUFUGAI-GOKEI-TEN = " 
+      **             SYU-KYUFUGAI-GOKEI-TEN
+      *
       *    Ï«ºÒ¡¦¼«ÇåÀÕÅ¾Á÷½èÍý
            IF   SYU-SYUHKNNUM    =    "971"  OR  "973"
                PERFORM   ROSAI-JIBAI-TENSO-SEC
@@ -3715,9 +3716,9 @@ grpsys                            SPA-AREA
            PERFORM   CSR-CLOSE-SEC
       *
            IF   SYS-1001-PREFNUM        =   40
-               DISPLAY   "FUKUOKA TAISHOU !!"
-               DISPLAY   "SYU-HKNCOMBINUM = " SYU-HKNCOMBINUM
-               DISPLAY   "SYU-KOH1HKNNUM = " SYU-KOH1HKNNUM
+      **       DISPLAY   "FUKUOKA TAISHOU !!"
+      **       DISPLAY   "SYU-HKNCOMBINUM = " SYU-HKNCOMBINUM
+      **       DISPLAY   "SYU-KOH1HKNNUM = " SYU-KOH1HKNNUM
       *        ¸øÈñÉÕ²Ã¾ðÊó¤«¤éµëÉÕ³°ÂÐ¾Ý¤Î¸øÈñ¤ò»ý¤Ä´µ¼Ô¤Ç¤¢¤ë¤«È½Äê
                INITIALIZE                   ORCSKOHPLUS-AREA
                MOVE    SYS-1001-HOSPNUM  TO  LNK-SKOHPLUS-HOSPNUM
@@ -3732,7 +3733,7 @@ grpsys                            SPA-AREA
                IF    ( LNK-SKOHPLUS-RC     =   ZERO )
                AND   ( LNK-SKOHPLUS-FTNKBN =   "1"  )
                    MOVE    1            TO  FLG-KYUFUGAI
-                   DISPLAY "FLG-KYUFUGAI = " FLG-KYUFUGAI
+      **           DISPLAY "FLG-KYUFUGAI = " FLG-KYUFUGAI
                END-IF
       *
       *        Åö³º´µ¼Ô¤Î½é¿Ç»»ÄêÍúÎò¤ò¥ï¡¼¥¯¥Æ¡¼¥Ö¥ë¤ËÀßÄê
@@ -3801,12 +3802,12 @@ grpsys                                        SPA-AREA
                        PERFORM   CSR-CLOSE-SEC
                    END-PERFORM
                END-IF
-               PERFORM   VARYING  FUKU-IDX   FROM 1  BY  1
-                         UNTIL    FUKU-IDX   >  31
-                   DISPLAY  "FUKUOKA SHOSHIN = " 
-                             TBL-FUKUOKA-SYOSIN(FUKU-IDX)
-                            " IDX = " FUKU-IDX 
-               END-PERFORM
+      **       PERFORM   VARYING  FUKU-IDX   FROM 1  BY  1
+      **                 UNTIL    FUKU-IDX   >  31
+      **           DISPLAY  "FUKUOKA SHOSHIN = " 
+      **                     TBL-FUKUOKA-SYOSIN(FUKU-IDX)
+      **                    " IDX = " FUKU-IDX 
+      **       END-PERFORM
            END-IF
            .
       *

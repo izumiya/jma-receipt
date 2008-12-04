@@ -157,6 +157,7 @@
       *  04.03.04    NACL-門脇    08/08/19  入院料未算定時のコメント対応
       *  04.03.05    NACL-門脇    08/09/25  自賠責０９５９３の集計先対応
       *  04.03.06    NACL-門脇    08/12/01  在宅（院外分）編集修正
+      *  04.03.07    NACL-門脇    08/12/04  仮収納チェック処理追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -336,6 +337,7 @@
            03  FLG-HOUSEI-COM                          PIC 9(01).
            03  FLG-HOUMON-COM                          PIC 9(01).
            03  FLG-SRYKBN-HEN                          PIC 9(01).
+           03  FLG-SYUNOU-ARI                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -402,6 +404,12 @@
        01  WK-SYUTEN                                   PIC S9(08).
        01  WK-KIZAITEN                                 PIC S9(08).
        01  WK-YKZTEN                                   PIC S9(08).
+      *
+      *    エラーメッセージ編集領域
+       01  ERR-EDIT-AREA.
+           03  ERR-PTNUM                               PIC X(20).
+           03  ERR-ERRMSG                              PIC X(80).
+           03  ERR-HEN-ERRMSG                          PIC X(200).
       *
       *    点数テーブル検索用対象日領域
        01  WK-TAIHI-AREA.
@@ -629,6 +637,11 @@
            03  WRK-TENTEKI2-SRYCD-X.
                05  WRK-TENTEKI2-SRYCD          PIC X(09)
                                                OCCURS  5.
+      *
+           03  WRK-STR                         PIC X(200).
+           03  WRK-LEN                         PIC 9(05).
+           03  WRK-SHO                         PIC 9(05).
+           03  WRK-AMARI                       PIC 9(05).
       *
       *    固定値
        01  CONST-AREA.
@@ -1483,18 +1496,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            PERFORM 210-HENSYU-SEC
       *
-           PERFORM 900-RECE82-READ-SEC
+           IF   FLG-END = ZERO
+             PERFORM 900-RECE82-READ-SEC
       *
-           IF  CNT-IN-COMMIT   =   300
-               MOVE  ZERO          TO      CNT-IN-COMMIT
-               PERFORM 900-DBCOMMIT-SEC
-               PERFORM 900-DBSTART-SEC
-           END-IF
+             IF  CNT-IN-COMMIT   =   300
+                 MOVE  ZERO          TO      CNT-IN-COMMIT
+                 PERFORM 900-DBCOMMIT-SEC
+                 PERFORM 900-DBSTART-SEC
+             END-IF
       *
-      *    処理中止設定処理
-           IF      CNT-IN-CANCEL       =   50
-               MOVE    ZERO                TO  CNT-IN-CANCEL
-               PERFORM 500-CANCEL-HENSYU-SEC
+      *      処理中止設定処理
+             IF      CNT-IN-CANCEL       =   50
+                 MOVE    ZERO                TO  CNT-IN-CANCEL
+                 PERFORM 500-CANCEL-HENSYU-SEC
+             END-IF
            END-IF
            .
        200-MAIN-EXT.
@@ -8069,6 +8084,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    ZERO                 TO      FLG-NYUINRYO
       *
+           MOVE    ZERO                 TO      FLG-SYUNOU-ARI
+      *
            INITIALIZE                           SYUNOU-REC
            MOVE    RECE82-HOSPNUM       TO      SYU-HOSPNUM
            MOVE    RECE82-NYUGAIKBN     TO      SYU-NYUGAIKBN
@@ -8089,6 +8106,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *
                    IF  SYU-DENPJTIKBN    NOT =  "3"
                        PERFORM   2601-RECE82-FTN-HENSYU-SEC
+                       MOVE   1   TO   FLG-SYUNOU-ARI
                    END-IF
       *
                    MOVE    "tbl_syunou" TO      MCP-TABLE
@@ -8106,6 +8124,15 @@ grpsys     PERFORM  900-DBSELECT-SEC
            IF   RECE82-SRYYM  >= "200604"
            AND  RECE82-SRYYM  <  "200610"
                 PERFORM    2602-SKJ-RAYKU-HENSYU-SEC
+           END-IF
+      *
+           IF   FLG-SYUNOU-ARI  =  ZERO
+              DISPLAY "<SYUNOU NG STOP>"
+              MOVE    "仮収納データがありません"  TO  ERR-ERRMSG
+              PERFORM 600-ERRMSG-EDIT-SEC
+              MOVE    ERR-HEN-ERRMSG    TO  WRK-RECEERR
+              PERFORM 500-ERR-HENSYU-SEC
+              MOVE    1                 TO  FLG-END
            END-IF
       *
            .
@@ -8410,7 +8437,6 @@ grpsys     PERFORM  900-DBSELECT-SEC
                 IF   COMB-HKNNUM       =  "971"
                    IF   RECE82-HKNNUM  =  "971"
                      CONTINUE
-      ***            MOVE   "2"  TO   RECE82-NYUINRYOFLG
                    ELSE
                      MOVE   "2"  TO   RECE82-NYUINRYOFLG
                    END-IF
@@ -8418,7 +8444,6 @@ grpsys     PERFORM  900-DBSELECT-SEC
                 IF   COMB-HKNNUM       =  "973"
                    IF   RECE82-HKNNUM  =  "973"
                      CONTINUE
-      ***            MOVE   "3"  TO   RECE82-NYUINRYOFLG
                    ELSE
                      MOVE   "3"  TO   RECE82-NYUINRYOFLG
                    END-IF
@@ -9116,6 +9141,50 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
+      *    エラーメッセージ編集処理
+      *****************************************************************
+       600-ERRMSG-EDIT-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  ERR-HEN-ERRMSG
+      *
+           MOVE    RECE82-PTNUM        TO  ERR-PTNUM
+      *
+           MOVE    ZERO                TO  WRK-SHO
+                                           WRK-AMARI
+           MOVE    1                   TO  WRK-LEN
+           MOVE    SPACE               TO  WRK-STR
+           STRING  ERR-PTNUM           DELIMITED   BY  SPACE
+           INTO    WRK-STR
+           WITH  POINTER WRK-LEN
+           END-STRING
+      *
+           COMPUTE WRK-LEN =   WRK-LEN -   1
+      *
+           DIVIDE  2   INTO    WRK-LEN GIVING  WRK-SHO
+           REMAINDER WRK-AMARI
+           END-DIVIDE
+      *
+           IF    ( WRK-AMARI   =   ZERO )
+              STRING  ERR-ERRMSG          DELIMITED   BY  SPACE
+                      "［患者番号："      DELIMITED   BY  SIZE
+                      ERR-PTNUM           DELIMITED   BY  SPACE
+                      "］"                DELIMITED   BY  SIZE
+              INTO    ERR-HEN-ERRMSG
+              END-STRING
+           ELSE
+              STRING  ERR-ERRMSG          DELIMITED   BY  SPACE
+                      "［患者番号:"       DELIMITED   BY  SIZE
+                      ERR-PTNUM           DELIMITED   BY  SPACE
+                      "］"                DELIMITED   BY  SIZE
+              INTO    ERR-HEN-ERRMSG
+              END-STRING
+           END-IF
+      *
+           .
+       600-ERRMSG-EDIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    中間ファイルＲＥＡＤ処理
       *****************************************************************
        900-RECE82-READ-SEC            SECTION.
@@ -9128,7 +9197,8 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
                    ADD     1     TO    CNT-IN-COMMIT
                                        CNT-IN-CANCEL
       *
-                   DISPLAY "RECE82  PTNUM=" RECE82-PTNUM
+                   DISPLAY "RECE82 "  " PTNUM=" RECE82-PTNUM
+                                      " (PTID=" RECE82-PTID ")"
       *
                    PERFORM 910-SYSKANRI-HENSYU-SEC
       *
