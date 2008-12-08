@@ -462,6 +462,7 @@
                MOVE    10              TO  SPA-GMN-CUR
       *        写真があればセット
                PERFORM 430-GAZOCHK-HENSYU-SEC
+               MOVE    SPACE       TO  SPA-ERRCD
            END-IF
       *
            .
@@ -1010,9 +1011,8 @@
       *****************************************************************
        430-GAZOCHK-HENSYU-SEC      SECTION.
       *
-           MOVE    LOW-VALUE       TO  SPA-GMN-OBJECT
-      *
            IF      SPA-GMN-PHOTO   =   SPACE
+               MOVE    LOW-VALUE   TO  SPA-GMN-OBJECT
                GO  TO  430-GAZOCHK-HENSYU-EXT
            END-IF
       *
@@ -1022,6 +1022,7 @@
            IF      FLG-OK          =   1
                MOVE    "0015"      TO  SPA-ERRCD
                MOVE    10          TO  SPA-GMN-CUR
+               MOVE    LOW-VALUE   TO  SPA-GMN-OBJECT
                GO  TO  430-GAZOCHK-HENSYU-EXT
            END-IF
       *
@@ -1040,6 +1041,7 @@
            IF      FLG-OK          =   1
                MOVE    "0014"          TO  SPA-ERRCD
                MOVE    10              TO  SPA-GMN-CUR
+               MOVE    LOW-VALUE       TO  SPA-GMN-OBJECT
                GO  TO  430-GAZOCHK-HENSYU-EXT
            END-IF
       *
