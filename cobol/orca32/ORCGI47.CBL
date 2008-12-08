@@ -2412,11 +2412,11 @@
                                                        =   2020 )
                                COMPUTE WRK-EDIDX
                                    =   SPA-I47-ZENGETUMATU-DD
-                                   -   12
+                                   -   13
                            ELSE
                                COMPUTE WRK-EDIDX
                                    =   SPA-I47-ZENGETUMATU-DD
-                                   -   5
+                                   -   6
                            END-IF
                            PERFORM VARYING IDX-DAY
                                    FROM    WRK-STIDX   BY  -1
