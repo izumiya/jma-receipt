@@ -54,6 +54,7 @@
       *                                     È½Äê½¤Àµ
       *  04.03.01    NACL-ÌçÏÆ    08/11/28  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    08/12/08  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ½¤Àµ
+      *  04.03.03    NACL-ÌçÏÆ    08/12/10  ÀéÍÕ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -318,6 +319,11 @@
                    AND (LNK-FTNJGNCHK-SRYYM       >= "200508"      )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     12        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
+                      MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
                  WHEN     "1"
                  WHEN     "4"
                    MOVE   HKN-TNK-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
@@ -338,6 +344,11 @@
                    AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
                    AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
                       MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK2
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     12        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-HON-GAIKJGNGAK     NOT = ZERO          )
+                      MOVE   HKN-HON-GAIKJGNGAK  TO WRK-HKNMST-JGNGAK
                    END-IF
                  WHEN     "1"
                  WHEN     "4"
