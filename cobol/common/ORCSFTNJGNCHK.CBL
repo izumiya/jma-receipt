@@ -53,6 +53,7 @@
       *  04.02.08    NACL-ÌçÏÆ    08/11/05  £±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¤·¤Ê¤¤¾ì¹ç¤Î
       *                                     È½Äê½¤Àµ
       *  04.03.01    NACL-ÌçÏÆ    08/11/28  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.02    NACL-ÌçÏÆ    08/12/08  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -105,6 +106,8 @@
                05  WRK-HKNCOMBINUM-OCC      OCCURS 50.
                  07  WRK-HKNCOMBINUM        PIC 9(04).
                  07  WRK-HKNCOMBINUM-FLG    PIC 9(01).
+                 07  WRK-HKNCOMBINUM-KYUFUGAI
+                                            PIC 9(01).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -144,6 +147,9 @@
       *
       *    ´µ¼Ô½êÆÀ¾ðÊóÊÔ½¸¥µ¥Ö
            COPY    "CPORCSSYOTOKU.INC".
+      *
+      *    ¸øÈñÉÕ²Ã¾ðÊó¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSKOHPLUS.INC".
       *
            COPY    "MCPDATA.INC".
       ***  COPY    "CPORCMCP.INC".
@@ -576,6 +582,31 @@
                    MOVE    COMB-HKNCOMBINUM  TO
                                         WRK-HKNCOMBINUM(IDX)
       *
+                   IF  (LNK-FTNJGNCHK-PREFNUM  =   40            )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1)
+                                              >=  "1" AND <=  "8")
+                   AND (LNK-FTNJGNCHK-SRYYM   >=  "200810"       )
+                     INITIALIZE            ORCSKOHPLUS-AREA
+                     MOVE  LNK-FTNJGNCHK-HOSPNUM
+                                        TO LNK-SKOHPLUS-HOSPNUM
+                     MOVE  LNK-FTNJGNCHK-PREFNUM
+                                        TO LNK-SKOHPLUS-PREFNUM
+                     MOVE  LNK-FTNJGNCHK-PTID
+                                        TO LNK-SKOHPLUS-PTID
+                     MOVE  WRK-HKNCOMBINUM(IDX)
+                                        TO LNK-SKOHPLUS-HKNCOMBI
+                     MOVE  LNK-FTNJGNCHK-SRYYM
+                                        TO LNK-SKOHPLUS-SRYYMD(1:6)
+                     MOVE  "01"         TO LNK-SKOHPLUS-SRYYMD(7:2)
+                     CALL  "ORCSKOHPLUS"   USING
+                                           ORCSKOHPLUS-AREA
+                                           SPA-AREA
+                     IF    (LNK-SKOHPLUS-RC     =   ZERO)
+                     AND   (LNK-SKOHPLUS-FTNKBN =   "1" )
+                        MOVE    1    TO    WRK-HKNCOMBINUM-KYUFUGAI(IDX)
+                     END-IF
+                   END-IF
+      *
                    IF    WRK-RECEJGNDSPKBN      =   "1"
                    AND   LNK-FTNJGNCHK-PREFNUM  =   27
       *
@@ -783,11 +814,8 @@
                        ADD  SYU-KOH-COMPFTN(4)     TO  WRK-KOHFTN
                   END-EVALUATE
                   ADD       SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU
-                  IF  (LNK-FTNJGNCHK-PREFNUM  =   40            )
-                  AND (LNK-FTNJGNCHK-KOHNUM(1:1)
-                                             >=  "1" AND <=  "8")
-                  AND (LNK-FTNJGNCHK-SRYYM   >=  "200810"       )
-                    ADD     SYU-KYUFUGAI-GOKEI-TEN TO  WRK-KYUFUGAITEN
+                  IF  WRK-HKNCOMBINUM-KYUFUGAI(IDX1) =  1
+                    ADD  SYU-KYUFUGAI-GOKEI-TEN    TO  WRK-KYUFUGAITEN
                   END-IF
                   IF     SYU-YKZKENNUM  NOT = ZERO
                        MOVE    1    TO   FLG-GENMEN

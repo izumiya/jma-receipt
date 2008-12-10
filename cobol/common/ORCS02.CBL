@@ -238,6 +238,7 @@
       *
       *  04.03.01    NACL-ÌçÏÆ    08/09/25  ¼«ÇåÀÕ£°£¹£µ£¹£³¤Î½¸·×ÀèÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.03.03    NACL-ÌçÏÆ    08/12/08  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -14532,6 +14533,18 @@
                IF     WK-NYUKFTNRATE  =  ZERO
                       MOVE    SPACE   TO  COMB-KOH-NYUJGNKBN(KOH-IDX)
                END-IF
+           END-IF
+           IF  (LNK-SKOHPLUS-RC     = ZERO)
+           AND (LNK-SKOHPLUS-FTNKBN = "1" )
+           AND (WK-NYUKFTNRATE  NOT = ZERO)
+               CONTINUE
+           ELSE
+               MOVE    ZERO   TO   LNK-SYU-KYUFUGAI-SHOSHIN-TEN
+                                   LNK-SYU-KYUFUGAI-SIDOU-TEN
+                                   LNK-SYU-KYUFUGAI-OSIN1-TEN
+                                   LNK-SYU-KYUFUGAI-OSIN2-TEN
+                                   LNK-SYU-KYUFUGAI-OSIN3-TEN
+                                   LNK-SYU-KYUFUGAI-GOKEI-TEN
            END-IF
       *
            .

@@ -269,6 +269,8 @@
       *
       *  04.03.01    NACL-ÌçÏÆ    08/09/25  ¼«ÇåÀÕ£°£¹£µ£¹£³¤Î½¸·×ÀèÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *  04.03.03    NACL-ÌçÏÆ    08/12/08  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ½¤Àµ
+      *  04.03.04    NACL-ÌçÏÆ    08/12/09  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -8701,7 +8703,7 @@
                        ( LNK-SYU-KOH2HKNNUM  = "972" OR "974" ) AND
                        ( COMB-KOH1HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                            OR "190" OR "280" ) AND
+                                   OR "190" OR "280" OR "282" ) AND
                        ( LNK-S01-SAIKEISAN-KBN   =   "1"      ) AND
                        ( LNK-SYU-DENPNUM     NOT =  ZERO      ) AND
                        ( LNK-SYU-DENPNUM      <  SYU-DENPNUM  ))
@@ -9328,10 +9330,10 @@
                        ( LNK-SYU-KOH3HKNNUM  = "972" OR "974" ) AND
                        ((COMB-KOH1HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                            OR "190" OR "280") OR
+                                   OR "190" OR "280" OR "282") OR
                         (COMB-KOH2HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                            OR "190" OR "280")) AND
+                                   OR "190" OR "280" OR "282")) AND
                        ( LNK-S01-SAIKEISAN-KBN   =   "1"      ) AND
                        ( LNK-SYU-DENPNUM     NOT =  ZERO      ) AND
                        ( LNK-SYU-DENPNUM      <  SYU-DENPNUM  ))
@@ -9925,13 +9927,13 @@
                        ( LNK-SYU-KOH4HKNNUM  = "972" OR "974" ) AND
                        ((COMB-KOH1HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                            OR "190" OR "280") OR
+                                   OR "190" OR "280" OR "282") OR
                         (COMB-KOH2HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                            OR "190" OR "280") OR
+                                   OR "190" OR "280" OR "282") OR
                         (COMB-KOH3HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                            OR "190" OR "280")) AND
+                                   OR "190" OR "280" OR "282")) AND
                        ( LNK-S01-SAIKEISAN-KBN   =   "1"      ) AND
                        ( LNK-SYU-DENPNUM     NOT =  ZERO      ) AND
                        ( LNK-SYU-DENPNUM      <  SYU-DENPNUM  ))
@@ -12926,17 +12928,17 @@
            IF     WK-1001-PREFNUM       =   27
              IF   COMB-KOH1HKNNUM       =  "180" OR "182" OR "186" OR
                                            "187" OR "188" OR "189" OR
-                                           "190" OR "280"
+                                           "190" OR "280" OR "282"
                   PERFORM    23081-ZANOKIKAE-HENSYU1-SEC
              END-IF
              IF   COMB-KOH2HKNNUM       =  "180" OR "182" OR "186" OR
                                            "187" OR "188" OR "189" OR
-                                           "190" OR "280"
+                                           "190" OR "280" OR "282"
                   PERFORM    23082-ZANOKIKAE-HENSYU2-SEC
              END-IF
              IF   COMB-KOH3HKNNUM       =  "180" OR "182" OR "186" OR
                                            "187" OR "188" OR "189" OR
-                                           "190" OR "280"
+                                           "190" OR "280" OR "282"
                   PERFORM    23083-ZANOKIKAE-HENSYU3-SEC
              END-IF
            END-IF
@@ -14232,6 +14234,18 @@
                IF     WK-GAIKFTNRATE  =  ZERO
                       MOVE    SPACE   TO  COMB-KOH-GAIJGNKBN(KOH-IDX)
                END-IF
+           END-IF
+           IF  (LNK-SKOHPLUS-RC     = ZERO)
+           AND (LNK-SKOHPLUS-FTNKBN = "1" )
+           AND (WK-GAIKFTNRATE  NOT = ZERO)
+               CONTINUE
+           ELSE
+               MOVE    ZERO   TO   LNK-SYU-KYUFUGAI-SHOSHIN-TEN
+                                   LNK-SYU-KYUFUGAI-SIDOU-TEN
+                                   LNK-SYU-KYUFUGAI-OSIN1-TEN
+                                   LNK-SYU-KYUFUGAI-OSIN2-TEN
+                                   LNK-SYU-KYUFUGAI-OSIN3-TEN
+                                   LNK-SYU-KYUFUGAI-GOKEI-TEN
            END-IF
       *
            .
