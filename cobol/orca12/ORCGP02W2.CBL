@@ -86,6 +86,7 @@
       *  04.02.00    NACL-多々納  08/03/XX  Ｈ２０．４改正対応
       *  04.02.01    NACL-門脇    08/06/16  大阪府地方公費組み合わせ作成
       *  04.02.02    NACL-門脇    08/11/11  適用開始終了同一日対応
+      *  04.03.01    NACL-門脇    08/12/08  公費単独の保険組み合わせ修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4345,8 +4346,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
              IF  WRK-KCOMB-TEKEDYMD (IDX2)
                                      <=  WRK-HKN-TEKEDYMD
                                                   (WRK-COMB-SYUHOIDX)
-                 MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                     TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      ***        MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
+      ***                            TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                 MOVE    "99999999"  TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                 MOVE    "00000000"  TO  WRK-KCOMB-TEKEDYMD (IDX2)
              ELSE
       *          [主保険 終了日]≦[組合せ 終了日]
       *          ○主保険終了日の翌日取得
