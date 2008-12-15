@@ -64,7 +64,7 @@ CREATE VIEW view_q001 AS
            tbl_ptkohinf 
      WHERE (((((view_q004.hospnum = tbl_ptkohinf.hospnum) 
        AND (view_q004.ptid = tbl_ptkohinf.ptid)) 
-       AND (((((((((((tbl_ptkohinf.kohnum = '960'::bpchar) 
+       AND ((((((((((((tbl_ptkohinf.kohnum = '960'::bpchar) 
         OR (tbl_ptkohinf.kohnum = '961'::bpchar)) 
         OR (tbl_ptkohinf.kohnum = '962'::bpchar)) 
         OR (tbl_ptkohinf.kohnum = '963'::bpchar)) 
@@ -73,6 +73,7 @@ CREATE VIEW view_q001 AS
         OR (tbl_ptkohinf.kohnum = '966'::bpchar)) 
         OR (tbl_ptkohinf.kohnum = '967'::bpchar)) 
         OR (tbl_ptkohinf.kohnum = '968'::bpchar)) 
+        OR (tbl_ptkohinf.kohnum = '969'::bpchar)) 
         OR (tbl_ptkohinf.kohnum = '978'::bpchar)) 
         OR (tbl_ptkohinf.kohnum = '979'::bpchar))) 
        AND (view_q004.sryymd >= tbl_ptkohinf.tekstymd)) 
