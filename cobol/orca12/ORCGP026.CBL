@@ -122,12 +122,13 @@
            03  FILLER              PIC X(15)   VALUE   "18 £±£∏∞Ï»Ã".
            03  FILLER              PIC X(15)   VALUE   "19 £±£πƒ„ΩÍ".
            03  FILLER              PIC X(15)   VALUE   "20 £≤£∞∆Û≥‰".
+           03  FILLER              PIC X(15)   VALUE   "21 £≤£±π‚»æ".
        01  TBL-TOKKI-AREA-R        REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI-OCC       OCCURS   18.
+           03  TBL-TOKKI-OCC       OCCURS   19.
                05  TBL-TOKK-CD     PIC X(02).
                05  TBL-TOKK-K      PIC X(01).
                05  TBL-TOKK-NAIYO  PIC X(12).
-       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   18.
+       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   19.
       *
       *****************************************************************
       *    •’•°•§•Î•Ï•§•¢•¶•»
