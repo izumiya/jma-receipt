@@ -478,6 +478,7 @@
            03  CONS-TOKKI18        PIC X(09) VALUE "099990118".
            03  CONS-TOKKI19        PIC X(09) VALUE "099990119".
            03  CONS-TOKKI20        PIC X(09) VALUE "099990120".
+           03  CONS-TOKKI21        PIC X(09) VALUE "099990121".
       *
       *    …∏Ω‡…È√¥≥€
            03  WRK-CONS-HYOJYUN-FUTAN-G.
@@ -3702,7 +3703,8 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                                       OR  CONS-TOKKI17
                                       OR  CONS-TOKKI18
                                       OR  CONS-TOKKI19
-                                      OR  CONS-TOKKI20 )
+                                      OR  CONS-TOKKI20
+                                      OR  CONS-TOKKI21 )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
