@@ -1056,6 +1056,13 @@
                   (SPA-GMN-KTEKEDYMD(IDX-K)    =   SPACE )
                GO      TO      1001-KTEKEDYMD-CHK-EXT
            END-IF
+      *!!
+      *Ｈ２１．１対応
+           IF     (SPA-GMN-KOHNUM(IDX-K)   =   "969" )
+             AND  (SPA-NAI-KTEKSTYMD(IDX-K)    NOT =   SPACE )
+               PERFORM 10011-969-KTEKEDYMD-SEC
+           END-IF
+      *!!
       *    空白で入力でない時、処理をしない
            IF     (SPA-HKNKOH-FLG      =   ZERO     )   AND
                   (SPA-GMN-KTEKEDYMD(IDX-K)    =   SPACE)
@@ -1097,6 +1104,27 @@
            END-IF
            .
        1001-KTEKEDYMD-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    終了日自動編集処理
+      *****************************************************************
+       10011-969-KTEKEDYMD-SEC           SECTION.
+      *
+      *    開始年月の月末
+           MOVE    SPACE               TO  STS-AREA-DAY
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SPA-NAI-KTEKSTYMD(IDX-K)(1:6)
+                                       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING
+                                           STS-AREA-DAY
+                                           LNK-DAY7-AREA
+           IF      STS-DAY-RC1         =   ZERO
+               MOVE    LNK-DAY7-KOYOMI     TO  SPA-GMN-KTEKEDYMD(IDX-K)
+           END-IF
+           .
+       10011-969-KTEKEDYMD-EXT.
            EXIT.
       *
       *****************************************************************
