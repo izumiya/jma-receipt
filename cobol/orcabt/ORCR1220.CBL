@@ -50,6 +50,7 @@
       *  04.03.03    NACL-門脇    08/08/19  入院料未算定時のコメント対応
       *  04.03.04    NACL-門脇    08/12/01  在宅（院外分）編集修正
       *  04.03.05    NACL-門脇    08/12/04  仮収納チェック処理追加
+      *  04.03.06    NACL-門脇    08/12/16  平成２１年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -459,6 +460,7 @@
            03  CONS-TOKKI18        PIC X(14) VALUE "00000099990118".
            03  CONS-TOKKI19        PIC X(14) VALUE "00000099990119".
            03  CONS-TOKKI20        PIC X(14) VALUE "00000099990120".
+           03  CONS-TOKKI21        PIC X(14) VALUE "00000099990121".
       *
       *    病床数編集フラグ編集の為のコード（特定疾患療養指導料等）
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -1307,7 +1309,8 @@
                                                   CONS-TOKKI17 OR
                                                   CONS-TOKKI18 OR
                                                   CONS-TOKKI19 OR
-                                                  CONS-TOKKI20
+                                                  CONS-TOKKI20 OR
+                                                  CONS-TOKKI21
                                  CONTINUE
                             ELSE
                                  MOVE   ZERO   TO   WRK-SRYSURYO
@@ -1552,7 +1555,8 @@
                                      OR  CONS-TOKKI17(6:9)
                                      OR  CONS-TOKKI18(6:9)
                                      OR  CONS-TOKKI19(6:9)
-                                     OR  CONS-TOKKI20(6:9) )
+                                     OR  CONS-TOKKI20(6:9)
+                                     OR  CONS-TOKKI21(6:9) )
             OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
             OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                     (TNS-TEN               =  ZERO )       )
@@ -1610,7 +1614,8 @@
                                        OR  CONS-TOKKI17(6:9)
                                        OR  CONS-TOKKI18(6:9)
                                        OR  CONS-TOKKI19(6:9)
-                                       OR  CONS-TOKKI20(6:9) )
+                                       OR  CONS-TOKKI20(6:9)
+                                       OR  CONS-TOKKI21(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )

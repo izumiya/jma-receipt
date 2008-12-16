@@ -48,6 +48,7 @@
       *  04.03.02    NACL-門脇    08/07/14  仮レセ作成（院外処方含む）対応
       *                                     投薬剤点０（院外等）記載
       *  04.03.03    NACL-門脇    08/12/01  在宅（院外分）編集修正
+      *  04.03.04    NACL-門脇    08/12/16  平成２１年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -385,6 +386,7 @@
            03  CONS-TOKKI18        PIC X(14) VALUE "00000099990118".
            03  CONS-TOKKI19        PIC X(14) VALUE "00000099990119".
            03  CONS-TOKKI20        PIC X(14) VALUE "00000099990120".
+           03  CONS-TOKKI21        PIC X(14) VALUE "00000099990121".
       *
       *    病床数編集フラグ編集の為のコード（特定疾患療養指導料等）
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -1010,7 +1012,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        CONS-TOKKI17 OR
                                                        CONS-TOKKI18 OR
                                                        CONS-TOKKI19 OR
-                                                       CONS-TOKKI20
+                                                       CONS-TOKKI20 OR
+                                                       CONS-TOKKI21
                                       CONTINUE
                                  ELSE
                                       MOVE  ZERO  TO   FLG-SHOSAISIN    
@@ -1277,7 +1280,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR  CONS-TOKKI17(6:9)
                                       OR  CONS-TOKKI18(6:9)
                                       OR  CONS-TOKKI19(6:9)
-                                      OR  CONS-TOKKI20(6:9) )
+                                      OR  CONS-TOKKI20(6:9)
+                                      OR  CONS-TOKKI21(6:9) )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
@@ -1315,7 +1319,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        OR  CONS-TOKKI17(6:9)
                                        OR  CONS-TOKKI18(6:9)
                                        OR  CONS-TOKKI19(6:9)
-                                       OR  CONS-TOKKI20(6:9) )
+                                       OR  CONS-TOKKI20(6:9)
+                                       OR  CONS-TOKKI21(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
