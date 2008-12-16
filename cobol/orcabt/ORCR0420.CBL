@@ -156,6 +156,7 @@
       *                                     ¡Êºß»ÙÉÂ¼«Æ°µ­ºÜÂÐ±þ¡Ë
       *  04.02.02    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
       *  04.02.03    NACL-ÌçÏÆ    08/11/06  Èé²¼¶ÚÆù¡¢ÀÅÌ®Ãí¼Í¤Îµ­ºÜÊÑ¹¹ÂÐ±þ
+      *  04.02.04    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -589,6 +590,7 @@
            03  CONS-TOKKI18        PIC X(14) VALUE "00000099990118".
            03  CONS-TOKKI19        PIC X(14) VALUE "00000099990119".
            03  CONS-TOKKI20        PIC X(14) VALUE "00000099990120".
+           03  CONS-TOKKI21        PIC X(14) VALUE "00000099990121".
       *    ÆýÍÄ»ù²Ã»»
            03  CONS-NYUKSN1        PIC X(09) VALUE "111000370".         
            03  CONS-NYUKSN2        PIC X(09) VALUE "111011470".
@@ -1362,7 +1364,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        CONS-TOKKI17 OR
                                                        CONS-TOKKI18 OR
                                                        CONS-TOKKI19 OR
-                                                       CONS-TOKKI20
+                                                       CONS-TOKKI20 OR
+                                                       CONS-TOKKI21
                                       CONTINUE
                                  ELSE
                                       MOVE  ZERO  TO  WRK-TEN
@@ -1664,7 +1667,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR  CONS-TOKKI17(6:9)
                                       OR  CONS-TOKKI18(6:9)
                                       OR  CONS-TOKKI19(6:9)
-                                      OR  CONS-TOKKI20(6:9) )
+                                      OR  CONS-TOKKI20(6:9)
+                                      OR  CONS-TOKKI21(6:9) )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
@@ -1702,7 +1706,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        OR  CONS-TOKKI17(6:9)
                                        OR  CONS-TOKKI18(6:9)
                                        OR  CONS-TOKKI19(6:9)
-                                       OR  CONS-TOKKI20(6:9) )
+                                       OR  CONS-TOKKI20(6:9)
+                                       OR  CONS-TOKKI21(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
@@ -6433,7 +6438,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        CONS-TOKKI17 OR
                                                        CONS-TOKKI18 OR
                                                        CONS-TOKKI19 OR
-                                                       CONS-TOKKI20
+                                                       CONS-TOKKI20 OR
+                                                       CONS-TOKKI21
                                       CONTINUE
                                  ELSE
                                       MOVE  ACCT-DAY(1 WRK-DAY)  

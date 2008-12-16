@@ -337,6 +337,7 @@
       *  04.02.34    NACL-ÌçÏÆ    08/10/22  ¿À¸Í»ÔÃÏÊý¸øÈñÂçºåÉÜÂÐ±þ
       *  04.02.35    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *  04.02.36    NACL-ÌçÏÆ    08/12/04  ²¾¼ýÇ¼¥Á¥§¥Ã¥¯½èÍýÄÉ²Ã
+      *  04.02.37    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1107,6 +1108,7 @@
            03  CONS-TOKKI18        PIC X(14) VALUE "00000099990118".
            03  CONS-TOKKI19        PIC X(14) VALUE "00000099990119".
            03  CONS-TOKKI20        PIC X(14) VALUE "00000099990120".
+           03  CONS-TOKKI21        PIC X(14) VALUE "00000099990121".
       *
       *    ÉÂ¾²¿ôÊÔ½¸¥Õ¥é¥°ÊÔ½¸¤Î°Ù¤Î¥³¡¼¥É¡ÊÆÃÄê¼À´µÎÅÍÜ»ØÆ³ÎÁÅù¡Ë
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -2545,7 +2547,8 @@
                                                        CONS-TOKKI17 OR
                                                        CONS-TOKKI18 OR
                                                        CONS-TOKKI19 OR
-                                                       CONS-TOKKI20
+                                                       CONS-TOKKI20 OR
+                                                       CONS-TOKKI21
                                       MOVE    1    TO      FLG-TOKKI
                                       PERFORM   21013-TOKKI-HENSYU-SEC
                                  ELSE
@@ -2899,7 +2902,8 @@
                                      OR  CONS-TOKKI17(6:9)
                                      OR  CONS-TOKKI18(6:9)
                                      OR  CONS-TOKKI19(6:9)
-                                     OR  CONS-TOKKI20(6:9) )
+                                     OR  CONS-TOKKI20(6:9)
+                                     OR  CONS-TOKKI21(6:9) )
                   COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -2951,7 +2955,8 @@
                                        OR  CONS-TOKKI17(6:9)
                                        OR  CONS-TOKKI18(6:9)
                                        OR  CONS-TOKKI19(6:9)
-                                       OR  CONS-TOKKI20(6:9) )
+                                       OR  CONS-TOKKI20(6:9)
+                                       OR  CONS-TOKKI21(6:9) )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
@@ -4638,6 +4643,8 @@
                        MOVE    "19"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI20
                        MOVE    "20"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI21
+                       MOVE    "21"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        2
                EVALUATE    SRY-SRYCD(IDX2)
@@ -4679,6 +4686,8 @@
                        MOVE    "19"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI20(6:9)
                        MOVE    "20"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI21(6:9)
+                       MOVE    "21"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        3
                        MOVE    "14"      TO      WRK-TOKKI
@@ -4693,13 +4702,15 @@
                    WHEN     3
                        MOVE    "19"      TO      WRK-TOKKI
                END-EVALUATE
+             WHEN        6
+                       MOVE    "21"      TO      WRK-TOKKI
            END-EVALUATE
       *
       *    ´û¤ËÆ±¤¸ÆÃµ­»ö¹à¥³¡¼¥É¤¬ÊÔ½¸ºÑ¤ß¤Î¤È¤­¤Ï¥»¥Ã¥È¤·¤Ê¤¤
            EVALUATE  WRK-TOKKI
              WHEN      "15"
                IF  (RECE62-SRYYM   >=  "200608")
-      *        AND (RECE62-SRYYM   <=  "200808")
+               AND (RECE62-SRYYM   <=  "200812")
                    CONTINUE
                ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
@@ -4719,6 +4730,10 @@
                AND (RECE62-SRYYM   <=  "200903")
                    CONTINUE
                ELSE
+                   GO  TO  21013-TOKKI-HENSYU-EXT
+               END-IF
+             WHEN      "21"
+               IF  (RECE62-SRYYM   <   "200901")
                    GO  TO  21013-TOKKI-HENSYU-EXT
                END-IF
            END-EVALUATE
@@ -13376,7 +13391,7 @@
       *    °ìÈÌ·Ð²áÁ¼ÃÖÂÐ¾Ý¼Ô
       *
            IF   (RECE62-SRYYM   >=  "200608")
-      *    AND  (RECE62-SRYYM   <=  "200808")
+           AND  (RECE62-SRYYM   <=  "200812")
            AND  (RECE62-KYURATE  =  20 OR 30)
                INITIALIZE                      PTKOHINF-REC
                MOVE    RECE62-HOSPNUM      TO  PTKOH-HOSPNUM
@@ -13418,7 +13433,7 @@
            END-IF
       *
            IF    (RECE62-SRYYM   >=  "200804")
-           AND   (RECE62-SRYYM   <=  "200903")
+           AND   (RECE62-SRYYM   <=  "201003")
              IF  (RECE62-HKNNUM       =   SPACE                      )
              OR  (RECE62-HKNNUM(1:2)  =   "98"                       )
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")
