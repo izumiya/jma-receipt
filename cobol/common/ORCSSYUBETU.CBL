@@ -1914,7 +1914,7 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
       *    保険組合せがないとき
            IF      WRK-RECE61-TEISEIKBN
                                    =   "1"
-               MOVE    "0000"      TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
+               MOVE    ZERO        TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
                                        LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
                GO  TO  30011-RECESYUBETU-SET-EXT
            END-IF
@@ -1923,7 +1923,7 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
            IF     WRK-RECE61-HKNKOHSBTKBN
                                    =   "8"
                MOVE    "8888"      TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
-                                       LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
+               MOVE    8888        TO  LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
                GO  TO  30011-RECESYUBETU-SET-EXT
            END-IF
       *

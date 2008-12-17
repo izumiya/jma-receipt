@@ -1683,6 +1683,7 @@
            AND   ( LNK-SYUBETUGET-HKN-HKNKOHSBTKBN
                                        =   "8"   )
                MOVE    8888            TO  LNK-SYUBETUGET-RECESYUBETU
+                                           LNK-SYUBETUGET-RECESYUBETU-Y
                GO  TO  2001-JYOKEN-HENSYU-EXT
            END-IF
       *
