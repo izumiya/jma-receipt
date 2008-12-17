@@ -6572,6 +6572,7 @@
                               END-IF
                              END-IF
                            END-IF
+                          END-IF
                         END-IF
                         IF  (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
