@@ -1143,8 +1143,7 @@
                MOVE    MCPDATA-REC     TO  SYS-1010-REC
                EVALUATE    SPA-GMN-YUKOKBN
                WHEN    "1"
-                   IF          SYS-1010-STYUKYMD   <=  SPA-W01-STYUKYMD
-                       AND     SYS-1010-EDYUKYMD   >=  SPA-W01-EDYUKYMD
+                   IF         (SYS-1010-EDYUKYMD   >=  SPA-SYSYMD )
                        ADD     1               TO  IDX3
                        MOVE    IDX3            TO  SPA-GMN-UNUM(IDX3)
                        MOVE    SYS-1010-USERID
@@ -1153,8 +1152,7 @@
                        MOVE    SYS-1010-KBNCD  TO  SPA-NAI-USERCD(IDX3)
                    END-IF
                WHEN    "2"
-                   IF          SYS-1010-STYUKYMD   >   SPA-W01-STYUKYMD
-                       OR      SYS-1010-EDYUKYMD   <   SPA-W01-EDYUKYMD
+                   IF         (SYS-1010-EDYUKYMD   <   SPA-SYSYMD )
                        ADD     1               TO  IDX3
                        MOVE    IDX3            TO  SPA-GMN-UNUM(IDX3)
                        MOVE    SYS-1010-USERID
