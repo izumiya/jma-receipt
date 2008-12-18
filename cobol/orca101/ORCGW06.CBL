@@ -772,11 +772,11 @@
            MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
            MOVE    SYS-1010-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key14"             TO  MCP-PATHNAME
+           MOVE    "key20"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key14"             TO  MCP-PATHNAME
+               MOVE    "key20"             TO  MCP-PATHNAME
                PERFORM 990-SYSKANRI-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-SYSKANRI
@@ -798,12 +798,12 @@
                END-IF
       *
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key14"             TO  MCP-PATHNAME
+               MOVE    "key20"             TO  MCP-PATHNAME
                PERFORM 990-SYSKANRI-READ-SEC
            END-PERFORM
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key14"             TO  MCP-PATHNAME
+           MOVE    "key20"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            . 
@@ -1160,15 +1160,15 @@
                PERFORM 200212-INIT-GMN-SEC
            ELSE
                IF      FLG-OK              =   ZERO
-                   IF      SPA-GMN-TBL-MAX     <  100
-                       ADD     1               TO  SPA-GMN-TBL-MAX
+                   IF      SPA-SYOKUCOD-MAX     <  100
+                       ADD     1               TO  SPA-SYOKUCOD-MAX
                    END-IF
                    MOVE    SYS-1010-KBNCD (2:4)
                                            TO  SPA-GMN-TSYOKUCOD
-                                                   (SPA-GMN-TBL-MAX)
+                                                   (SPA-SYOKUCOD-MAX)
                    MOVE    SYS-1010-NAME   TO  SPA-GMN-TSYOKUCOD-MEI
-                                                   (SPA-GMN-TBL-MAX)
-                   MOVE    SPA-GMN-SYOKUCOD-LIST (SPA-GMN-TBL-MAX)
+                                                   (SPA-SYOKUCOD-MAX)
+                   MOVE    SPA-GMN-SYOKUCOD-LIST (SPA-SYOKUCOD-MAX)
                                            TO  SPA-GMN-SYOKUCOD-G
                END-IF
       *
@@ -2527,20 +2527,26 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1002"              TO  SPA-ERRCD
                DISPLAY "W06 DB DEL ERR SYSKANRI-KEY =>" SYS-1010-KEY 
            END-IF
+      *    ユーザＩＤ登録判定
+           MOVE    ZERO                TO  FLG-USERID-UPD
+           IF      SPA-GMN-TBL-MAX     >   1
+               PERFORM 40311-USERID-CHEK-SEC
+           END-IF
       *    ユーザＩＤを削除
-           INITIALIZE                      SYSUSER-REC
-           MOVE    SPA-GMN-USERID      TO  SYSUSER-USERID
-           MOVE    SYSUSER-REC         TO  MCPDATA-REC
-           MOVE    "tbl_sysuser"       TO  MCP-TABLE 
-           MOVE    "key"               TO  MCP-PATHNAME 
-           MOVE    "DBDELETE"          TO  MCP-FUNC
-           CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-      *
-           IF      MCP-RC              NOT =   ZERO 
-               MOVE    "1002"              TO  SPA-ERRCD
-               DISPLAY "W06 DB DEL ERR USERID-KEY =>" SYSUSER-USERID
+           IF      FLG-USERID-UPD      =   ZERO
+               INITIALIZE                      SYSUSER-REC
+               MOVE    SPA-GMN-USERID      TO  SYSUSER-USERID
+               MOVE    SYSUSER-REC         TO  MCPDATA-REC
+               MOVE    "tbl_sysuser"       TO  MCP-TABLE 
+               MOVE    "key"               TO  MCP-PATHNAME 
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC              NOT =   ZERO 
+                   MOVE    "1002"              TO  SPA-ERRCD
+                   DISPLAY "W06 DB DEL ERR USERID-KEY =>" SYSUSER-USERID
+              END-IF
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
@@ -2549,6 +2555,47 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        4031-DEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ユーザＩＤチェック処理
+      *****************************************************************
+       40311-USERID-CHEK-SEC              SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1010-REC
+           INITIALIZE                      SYS-1010-REC
+           MOVE    "1010"              TO  SYS-1010-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1010-KBNCD (1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1010-KBNCD (2:4)
+           MOVE    "%"                 TO  SYS-1010-KBNCD (6:1)
+           MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
+           MOVE    SYS-1010-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 990-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           PERFORM UNTIL        (FLG-SYSKANRI      =   1 )
+                           OR   (FLG-USERID-UPD    =   1 )
+               MOVE    MCPDATA-REC         TO  SYS-1010-REC
+               IF      SYS-1010-USERID     =   SPA-GMN-USERID
+                   MOVE    1                   TO  FLG-USERID-UPD
+               END-IF
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 990-SYSKANRI-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       40311-USERID-CHEK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2722,12 +2769,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "tbl_sysuser"       TO  MCP-TABLE 
            MOVE    "key"               TO  MCP-PATHNAME 
            PERFORM 990-DBCLOSE-SEC
+           MOVE    ZERO                TO  FLG-USERID-UPD
            IF      FLG-SYSUSER         =   ZERO
-      *         登録済みの時、同じ医療機関であること
+      *        登録済みの時、同じ医療機関であること
                IF      SPA-HOSPNUM     NOT =   SYSUSER-HOSPNUM
                    MOVE    "0025"              TO  SPA-ERRCD
                    MOVE    6                   TO  SPA-GMN-CUR
+               ELSE
+                   MOVE    ZERO                TO  FLG-USERID-UPD
                END-IF
+           ELSE
+               MOVE    1                   TO  FLG-USERID-UPD
            END-IF
            .
        49001-SYSUSER-CHK-EXT.
@@ -2763,7 +2815,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    ユザー
-           MOVE    ZERO                TO  FLG-USERID-UPD
+      *    システムユーザーチェック
+           PERFORM 49001-SYSUSER-CHK-SEC
            MOVE    SPACE               TO  WRK-MAE-USERID
            IF      SPA-GMN-USERID  NOT =   SYS-1010-USERID
                MOVE    SYS-1010-USERID     TO  WRK-MAE-USERID
