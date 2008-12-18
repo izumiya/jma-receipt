@@ -13518,7 +13518,7 @@
            IF   (RECE62-KYURATE       =  20 OR 30)
            AND  (RECE62-RJNGENMENKBN  =  SPACE   )
       *
-                MOVE      1      TO     FLG-HANTEI
+      ***       MOVE      1      TO     FLG-HANTEI
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC
       *
            END-IF
@@ -13601,7 +13601,7 @@
                 MOVE    SPACE    TO     RECE62-KOUREI
            ELSE
       *         ¹â³Û£´²óÌÜ°Ê¹ßÂÐ¾Ý¼Ô
-                MOVE      2      TO     FLG-HANTEI
+      ***       MOVE      2      TO     FLG-HANTEI
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC
       *
                 MOVE      5      TO     FLG-TOKKI
@@ -13639,18 +13639,18 @@
                MOVE    "key4"          TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                IF    FLG-HANTEI   =   1
-                  IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE62-SRYYM       )
-                  AND (RECE62-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
-                  AND (PTKOH-SAKJOKBN        =   SPACE              )
-                      MOVE     1          TO  FLG-KOHYONKAIME
-                      MOVE     1          TO  FLG-PTKOHINF
-                  ELSE
-                      MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                      MOVE    "key4"           TO  MCP-PATHNAME
-                      PERFORM  900-PTKOHINF-READ-SEC
-                  END-IF
-                ELSE
+      ***       IF    FLG-HANTEI   =   1
+      ***         IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE62-SRYYM       )
+      ***         AND (RECE62-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
+      ***         AND (PTKOH-SAKJOKBN        =   SPACE              )
+      ***             MOVE     1          TO  FLG-KOHYONKAIME
+      ***             MOVE     1          TO  FLG-PTKOHINF
+      ***         ELSE
+      ***             MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+      ***             MOVE    "key4"           TO  MCP-PATHNAME
+      ***             PERFORM  900-PTKOHINF-READ-SEC
+      ***         END-IF
+      ***       ELSE
                   IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
                   AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
                   AND (PTKOH-SAKJOKBN   =   SPACE         )
@@ -13661,7 +13661,7 @@
                       MOVE    "key4"           TO  MCP-PATHNAME
                       PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
-                END-IF
+      ***       END-IF
                END-PERFORM
            END-IF
       *

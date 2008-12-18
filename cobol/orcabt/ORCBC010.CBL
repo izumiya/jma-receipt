@@ -39,6 +39,7 @@
       *  04.03.02    NACL-°ËÆ£    08/10/31  ¸øÈñÃ±ÆÈ¤Î¼¼ÎÁº¹³Û
       *                                     ËÜ¿Í¡¦²ÈÂ²¶èÊ¬¤Î¸«Ä¾¤·
       *                                     £°·ï¤Î¾ì¹çÀµ¾ï½ªÎ»¤È¤¹¤ë
+      *  04.03.03    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2683,6 +2684,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
       *                ÅÔÆ»ÉÜ¸©ÈÖ¹æ
                        MOVE    SYS-1001-PREFNUM
                                            TO  LNK-FTNJGNCHK-PREFNUM
+      *                ÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æ
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                ¼çÊÝ¸±¡Ý£É£Ä
+                       MOVE    COMB-HKNID  TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK" USING
                                                ORCSFTNJGNCHKAREA
@@ -2717,6 +2723,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
       *                ÅÔÆ»ÉÜ¸©ÈÖ¹æ
                        MOVE    SYS-1001-PREFNUM
                                            TO  LNK-FTNJGNCHK-PREFNUM
+      *                ÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æ
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                ¼çÊÝ¸±¡Ý£É£Ä
+                       MOVE    COMB-HKNID  TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK" USING
                                                ORCSFTNJGNCHKAREA

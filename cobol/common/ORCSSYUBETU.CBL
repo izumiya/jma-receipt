@@ -71,6 +71,7 @@
       *  04.03.01    NACL-藤原    08/05/07  公費４種までの併用の記録対応
       *                                     レセプト種別（紙レセプト）の追加
       *  04.03.02    NACL-門脇    08/09/02  請求点判定追加
+      *  04.03.03    NACL-門脇    08/12/17  平成２１年１月改正対応
       *
       *  04.04.01    NACL-藤原    08/12/02  自費、不明分のレセプト種別
       *                                     （紙レセプト）への設定追加
@@ -1018,6 +1019,11 @@ grpsys                 MOVE    COMB-HOSPNUM
       *                都道府県番号
                        MOVE    LNK-SYUBETU-PREFNUM
                                            TO  LNK-FTNJGNCHK-PREFNUM
+      *                保険組合せ番号
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                主保険−ＩＤ
+                       MOVE    COMB-HKNID  TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA
@@ -1057,6 +1063,11 @@ grpsys                 MOVE    COMB-HOSPNUM
       *                都道府県番号
                        MOVE    LNK-SYUBETU-PREFNUM
                                            TO  LNK-FTNJGNCHK-PREFNUM
+      *                保険組合せ番号
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                主保険−ＩＤ
+                       MOVE    COMB-HKNID  TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA

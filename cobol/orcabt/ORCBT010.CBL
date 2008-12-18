@@ -82,6 +82,7 @@
       *
       *  04.03.01    NACL-Æ£¸¶    08/05/07  ¸øÈñ£´¼ï¤Þ¤Ç¤ÎÊ»ÍÑ¤Îµ­Ï¿ÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    08/09/02  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
+      *  04.03.03    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2080,6 +2081,11 @@ grpsys                                 SPA-AREA
       *                ÅÔÆ»ÉÜ¸©ÈÖ¹æ
                        MOVE    SYS-1001-PREFNUM
                                            TO  LNK-FTNJGNCHK-PREFNUM
+      *                ÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æ
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                ¼çÊÝ¸±¡Ý£É£Ä
+                       MOVE    COMB-HKNID  TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK" USING
                                                ORCSFTNJGNCHKAREA
@@ -2114,6 +2120,11 @@ grpsys                                         SPA-AREA
       *                ÅÔÆ»ÉÜ¸©ÈÖ¹æ
                        MOVE    SYS-1001-PREFNUM
                                            TO  LNK-FTNJGNCHK-PREFNUM
+      *                ÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æ
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                ¼çÊÝ¸±¡Ý£É£Ä
+                       MOVE    COMB-HKNID  TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK" USING
                                                ORCSFTNJGNCHKAREA
