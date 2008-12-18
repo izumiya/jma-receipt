@@ -122,7 +122,9 @@
       *                                     情報より記載判定はしない
       *  04.02.06    NACL-藤原    08/04/23  後期高齢者の船員保険を本人とする
       *  04.02.07    NACL-門脇    08/08/07  精神通院の請求点判定追加
-      *  04.02.08    NACL-門脇    08/10/08  請求点判定追加
+      *
+      *  04.03.01    NACL-門脇    08/09/02  請求点判定追加
+      *  04.03.02    NACL-門脇    08/12/17  平成２１年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1256,6 +1258,11 @@
       *                都道府県番号
                        MOVE    SYS-1001-PREFNUM
                                                TO  LNK-FTNJGNCHK-PREFNUM
+      *                保険組合せ番号
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                主保険−ＩＤ
+                       MOVE    COMB-HKNID      TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA
@@ -1292,6 +1299,11 @@
       *                都道府県番号
                        MOVE    SYS-1001-PREFNUM
                                                TO  LNK-FTNJGNCHK-PREFNUM
+      *                保険組合せ番号
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                主保険−ＩＤ
+                       MOVE    COMB-HKNID      TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA
@@ -1688,6 +1700,11 @@
       *                都道府県番号
                        MOVE    SYS-1001-PREFNUM
                                                TO  LNK-FTNJGNCHK-PREFNUM
+      *                保険組合せ番号
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                主保険−ＩＤ
+                       MOVE    COMB-HKNID      TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA
@@ -1724,6 +1741,11 @@
       *                都道府県番号
                        MOVE    SYS-1001-PREFNUM
                                                TO  LNK-FTNJGNCHK-PREFNUM
+      *                保険組合せ番号
+                       MOVE    COMB-HKNCOMBINUM
+                                           TO  LNK-FTNJGNCHK-HKNCOMBINUM
+      *                主保険−ＩＤ
+                       MOVE    COMB-HKNID      TO  LNK-FTNJGNCHK-HKNID
       *
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA

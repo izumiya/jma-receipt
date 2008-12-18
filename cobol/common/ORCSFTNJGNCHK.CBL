@@ -55,6 +55,7 @@
       *  04.03.01    NACL-ÌçÏÆ    08/11/28  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    08/12/08  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ½¤Àµ
       *  04.03.03    NACL-ÌçÏÆ    08/12/10  ÀéÍÕ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.04    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -82,6 +83,7 @@
            03  FLG-GENMEN          PIC 9(01).
            03  FLG-DAYCHK          PIC 9(01).
            03  FLG-PTKOHINF        PIC 9(01).
+           03  FLG-TOKU75          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -94,7 +96,9 @@
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
            03  WRK-HKNMST-JGNGAK2 PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
+           03  WRK-KOHFTN-TOKU75  PIC 9(10).
            03  WRK-SEIKYU         PIC 9(10).
+           03  WRK-SEIKYU-TOTAL   PIC 9(10).
            03  WRK-KYUFUGAITEN    PIC 9(10).
            03  WRK-SKJ-FTN        PIC 9(10).
            03  WRK-PREFNUM        PIC 9(02).
@@ -106,6 +110,7 @@
            03  WRK-HKNCOMBINUM-TBL.
                05  WRK-HKNCOMBINUM-OCC      OCCURS 50.
                  07  WRK-HKNCOMBINUM        PIC 9(04).
+                 07  WRK-HKNCOMBINUM-HKNID  PIC 9(10).
                  07  WRK-HKNCOMBINUM-FLG    PIC 9(01).
                  07  WRK-HKNCOMBINUM-KYUFUGAI
                                             PIC 9(01).
@@ -590,8 +595,8 @@
                  AND   LNK-FTNJGNCHK-SRYYM <=   COMB-TEKEDYMD(1:6)
       *
                    ADD     1       TO      IDX
-                   MOVE    COMB-HKNCOMBINUM  TO
-                                        WRK-HKNCOMBINUM(IDX)
+                   MOVE COMB-HKNCOMBINUM TO WRK-HKNCOMBINUM(IDX)
+                   MOVE COMB-HKNID       TO WRK-HKNCOMBINUM-HKNID(IDX)
       *
                    IF  (LNK-FTNJGNCHK-PREFNUM  =   40            )
                    AND (LNK-FTNJGNCHK-KOHNUM(1:1)
@@ -797,11 +802,14 @@
       *
       *    ´µ¼ÔÉéÃ´¶â¤Î½¸·×
            MOVE      ZERO          TO      WRK-KOHFTN
+           MOVE      ZERO          TO      WRK-KOHFTN-TOKU75
            MOVE      ZERO          TO      WRK-SEIKYU
+           MOVE      ZERO          TO      WRK-SEIKYU-TOTAL
            MOVE      ZERO          TO      WRK-KYUFUGAITEN
            MOVE      ZERO          TO      FLG-GENMEN
            MOVE      ZERO          TO      FLG-DAYCHK
            MOVE      ZERO          TO      WRK-SKJ-FTN
+           MOVE      ZERO          TO      FLG-TOKU75
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -814,17 +822,48 @@
                     WHEN   SYU-KOH-HKNNUM(1)
       *                ADD  SYU-KOH-HKNFTNMONEY(1) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN(1)     TO  WRK-KOHFTN
+                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
+                                             =  LNK-FTNJGNCHK-HKNID)
+                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                          MOVE   1                 TO  FLG-TOKU75
+                          ADD  SYU-KOH-COMPFTN(1)  TO  WRK-KOHFTN-TOKU75
+                       END-IF
                     WHEN   SYU-KOH-HKNNUM(2)
       *                ADD  SYU-KOH-HKNFTNMONEY(2) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN(2)     TO  WRK-KOHFTN
+                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
+                                             =  LNK-FTNJGNCHK-HKNID)
+                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                          MOVE   1                 TO  FLG-TOKU75
+                          ADD  SYU-KOH-COMPFTN(2)  TO  WRK-KOHFTN-TOKU75
+                       END-IF
                     WHEN   SYU-KOH-HKNNUM(3)
       *                ADD  SYU-KOH-HKNFTNMONEY(3) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN(3)     TO  WRK-KOHFTN
+                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
+                                             =  LNK-FTNJGNCHK-HKNID)
+                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                          MOVE   1                 TO  FLG-TOKU75
+                          ADD  SYU-KOH-COMPFTN(3)  TO  WRK-KOHFTN-TOKU75
+                       END-IF
                     WHEN   SYU-KOH-HKNNUM(4)
       *                ADD  SYU-KOH-HKNFTNMONEY(4) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN(4)     TO  WRK-KOHFTN
+                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
+                                             =  LNK-FTNJGNCHK-HKNID)
+                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                          MOVE   1                 TO  FLG-TOKU75
+                          ADD  SYU-KOH-COMPFTN(4)  TO  WRK-KOHFTN-TOKU75
+                       END-IF
                   END-EVALUATE
-                  ADD       SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU
+                  ADD       SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU-TOTAL
+                  IF  WRK-HKNCOMBINUM(IDX1) = LNK-FTNJGNCHK-HKNCOMBINUM
+                     ADD    SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU
+                  END-IF
                   IF  WRK-HKNCOMBINUM-KYUFUGAI(IDX1) =  1
                     ADD  SYU-KYUFUGAI-GOKEI-TEN    TO  WRK-KYUFUGAITEN
                   END-IF
@@ -933,8 +972,23 @@
                    IF   FLG-GENMEN   =   1
                      CONTINUE
                    ELSE
-                     IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
-                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                     IF   FLG-TOKU75  =  1
+                       IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
+                         EVALUATE  LNK-FTNJGNCHK-KOHNUM
+                           WHEN      "972"
+                              IF  WRK-KOHFTN-TOKU75  <  5000
+                                 MOVE   01   TO  LNK-FTNJGNCHK-RC
+                              END-IF
+                           WHEN      "974"
+                              IF  WRK-KOHFTN-TOKU75  <  10000
+                                 MOVE   01   TO  LNK-FTNJGNCHK-RC
+                              END-IF
+                         END-EVALUATE
+                       END-IF
+                     ELSE
+                       IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
+                         MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       END-IF
                      END-IF
                    END-IF
                  WHEN       OTHER
@@ -946,13 +1000,15 @@
            END-IF
       *
            IF    LNK-FTNJGNCHK-RC  =   ZERO
+             IF  (WRK-KYUFUGAITEN  NOT =  ZERO            )
+             AND (WRK-KYUFUGAITEN      =  WRK-SEIKYU-TOTAL)
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+             END-IF
+           END-IF
+      *
+           IF    LNK-FTNJGNCHK-RC  =   ZERO
              IF  WRK-SEIKYU        =   ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
-             ELSE
-               IF  (WRK-KYUFUGAITEN  NOT =  ZERO      )
-               AND (WRK-KYUFUGAITEN      =  WRK-SEIKYU)
-                      MOVE   01        TO  LNK-FTNJGNCHK-RC
-               END-IF
              END-IF
            END-IF
       *
@@ -974,8 +1030,10 @@
                           OR    (WRK-HKNCOMBINUM(IDX1) = ZERO)
                           OR    (FLG-ARI               =   1 )
                IF   SYU-HKNCOMBINUM  =  WRK-HKNCOMBINUM(IDX1)
-                  MOVE       1             TO  FLG-ARI
-                  ADD    SYU-TOTAL-HKNTEN  TO  WRK-SEIKYU
+                  MOVE      1                 TO  FLG-ARI
+                  IF  WRK-HKNCOMBINUM(IDX1) = LNK-FTNJGNCHK-HKNCOMBINUM
+                     ADD    SYU-TOTAL-HKNTEN  TO  WRK-SEIKYU
+                  END-IF
                END-IF
              END-PERFORM
       *
