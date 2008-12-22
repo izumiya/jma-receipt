@@ -94,6 +94,7 @@
       *                                       ¤Î¼«Æ°µ­ºÜÂÐ±þ¡Ë
       *                                     ¡Êºß»ÙÉÂ¼«Æ°µ­ºÜÂÐ±þ¡Ë
       *  04.02.02    NACL-ÌçÏÆ    08/10/14  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
+      *  04.02.03    NACL-ÌçÏÆ    08/12/22  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4797,7 +4798,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                                      TBL-YT1-MEISAISU(IDX6)     *
                                      TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                              MOVE    WRK-RUIKEITOTAL
-                                TO  TBL-YT2Y1-RUIKEITOTAL
+                                TO  TBL-YT2Y2-RUIKEITOTAL
                                                        (IDX7 IDX8 IDX9)
       *
                              ADD    TBL-YT1-ZAITEN(IDX6)
