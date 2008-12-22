@@ -36,6 +36,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/10/14  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *
       *  04.03.01    NACL-ÌçÏÆ    08/11/04  ¥ê¥Ï¥Ó¥êÈ¯¾ÉÆüÇ¯·îÆüÂÐ±þ
+      *  04.03.02    NACL-ÌçÏÆ    08/12/22  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4201,7 +4202,7 @@ grpsys     MOVE    RECE120-HOSPNUM      TO  SANTEI-HOSPNUM
                                      TBL-YT1-MEISAISU(IDX6)     *
                                      TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                              MOVE    WRK-RUIKEITOTAL
-                                TO  TBL-YT2Y1-RUIKEITOTAL
+                                TO  TBL-YT2Y2-RUIKEITOTAL
                                                        (IDX7 IDX8 IDX9)
       *
                              ADD   TBL-YT1-ZAITEN(IDX6)
