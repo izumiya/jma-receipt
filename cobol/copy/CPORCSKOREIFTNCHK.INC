@@ -40,6 +40,8 @@
       *  04.02.01    NACL-門脇    08/04/01  就学前区分追加
       *                                     軽減特例措置対象者区分追加
       *                                     マル長公費ＩＤ追加
+      *  04.03.01    NACL-門脇    09/01/05  ７５歳到達月の特例区分追加
+      *                                     マル長のみ区分追加
       ************************************************************
        01  ORCSKOREIFTNCHKAREA.
       *
@@ -86,6 +88,10 @@
       ***  03  LNK-KOREIFTNCHK-TOKUREI      PIC 9(01).
       *    マル長公費ＩＤ
            03  LNK-KOREIFTNCHK-KOHID-CYOKI  PIC 9(10).
+      *    ７５歳到達月の特例区分
+           03  LNK-KOREIFTNCHK-TOKU75       PIC 9(01).
+      *    マル長のみ区分
+           03  LNK-KOREIFTNCHK-CYOKINOMI    PIC 9(01).
       *
       *返却値
            03  LNK-KOREIFTNCHK-OUT-AREA.

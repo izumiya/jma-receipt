@@ -96,6 +96,7 @@
       *
       *  04.03.01    NACL-門脇    08/08/19  入院料未算定時のコメント対応
       *  04.03.02    NACL-門脇    08/11/04  リハビリ発症日年月日対応
+      *  04.03.03    NACL-門脇    09/01/05  平成２１年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1216,6 +1217,12 @@
               END-IF
            END-PERFORM
       *
+      *    障害のコメント（７５歳到達月の特例）
+      *
+           IF   RECE62-RJNGAIKOHFTN(3)  =   1
+              PERFORM   2001-KOUREI-TOKUREI-COMMENT-SEC
+           END-IF
+      *
       *    療養レセコメント取得
       *
            MOVE      ZERO     TO      FLG-RYOCOM
@@ -1429,6 +1436,63 @@
       *
            .
        2001-ZAISIEN-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    障害のコメント（７５歳到達月の特例）
+      *****************************************************************
+       2001-KOUREI-TOKUREI-COMMENT-SEC          SECTION.
+      *
+           INITIALIZE                      RECE649-REC
+           MOVE    RECE62-HOSPNUM      TO  RECE649-HOSPNUM
+           MOVE    RECE62-SRYYM        TO  RECE649-SRYYM
+           MOVE    RECE62-NYUGAIKBN    TO  RECE649-NYUGAIKBN
+           MOVE    RECE62-PTID         TO  RECE649-PTID
+           MOVE    RECE62-RECEKA       TO  RECE649-RECEKA
+           MOVE    RECE62-TEISYUTUSAKI TO  RECE649-TEISYUTUSAKI
+           MOVE    RECE62-RECESYUBETU  TO  RECE649-RECESYUBETU
+           MOVE    RECE62-HKNJANUM-KEY TO  RECE649-HKNJANUM
+           MOVE    RECE62-HOJOKBN-KEY  TO  RECE649-HOJOKBN
+           MOVE    RECE62-TEKSTYMD     TO  RECE649-TEKSTYMD
+           MOVE    99999998            TO  RECE649-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE649-KOHBUNRI
+           MOVE    "99"                TO  RECE649-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE649-HKNCOMBI
+      *
+           MOVE    1                   TO  RECE649-MEISAISU
+      *
+           WRITE   RECE649-REC
+           ADD     1                   TO  CNT-RECE649
+      *
+           INITIALIZE                      RECE659-REC
+           MOVE    RECE62-HOSPNUM      TO  RECE659-HOSPNUM
+           MOVE    RECE62-SRYYM        TO  RECE659-SRYYM
+           MOVE    RECE62-NYUGAIKBN    TO  RECE659-NYUGAIKBN
+           MOVE    RECE62-PTID         TO  RECE659-PTID
+           MOVE    RECE62-RECEKA       TO  RECE659-RECEKA
+           MOVE    RECE62-TEISYUTUSAKI TO  RECE659-TEISYUTUSAKI
+           MOVE    RECE62-RECESYUBETU  TO  RECE659-RECESYUBETU
+           MOVE    RECE62-HKNJANUM-KEY TO  RECE659-HKNJANUM
+           MOVE    RECE62-HOJOKBN-KEY  TO  RECE659-HOJOKBN
+           MOVE    RECE62-TEKSTYMD     TO  RECE659-TEKSTYMD
+           MOVE    99999998            TO  RECE659-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE659-KOHBUNRI
+           MOVE    "99"                TO  RECE659-SRYKBN
+      *    コメントの挿入
+           MOVE    SPACE               TO  WRK-RECE65XX-REC
+           INITIALIZE                      WRK-RECE65XX-REC
+           MOVE    "810000001"         TO  WRK-RECE65XX-SRYCD(1 1)
+           MOVE     ZERO               TO  WRK-RECE65XX-SRYSURYO(1 1)
+           MOVE     2                  TO  WRK-RECE65XX-YUKOKETA(1 1)
+           MOVE    "障害"              TO  WRK-RECE65XX-NAME(1 1)
+      *
+           MOVE    WRK-RECE65XX-SRYACT-TBL(1 1)
+                                       TO  RECE659-SRYACT-TBL(1)
+           WRITE   RECE659-REC
+           ADD     1                   TO  CNT-RECE659
+      *
+           .
+       2001-KOUREI-TOKUREI-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

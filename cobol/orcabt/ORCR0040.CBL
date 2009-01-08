@@ -105,6 +105,7 @@
       *
       *  04.03.01    NACL-門脇    08/11/04  リハビリ発症日年月日対応
       *  04.03.02    NACL-門脇    08/12/22  内服薬剤逓減編集修正
+      *  04.03.03    NACL-門脇    09/01/05  平成２１年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1295,6 +1296,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
               END-IF
            END-PERFORM
       *
+      *    障害のコメント（７５歳到達月の特例）
+      *
+           IF   RECE02-RJNGAIKOHFTN(3)  =   1
+              PERFORM   2001-KOUREI-TOKUREI-COMMENT-SEC
+           END-IF
+      *
       *
       *    パラメータ０４ファイルより編集
            PERFORM 800-RECE02-SET04-SEC
@@ -2126,6 +2133,42 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2001-NYUYOJI-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    障害のコメント（７５歳到達月の特例）
+      *****************************************************************
+       2001-KOUREI-TOKUREI-COMMENT-SEC          SECTION.
+      *
+           PERFORM 800-RECE02-SET049-SEC
+           MOVE    99999998            TO  RECE049-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
+           MOVE    "99"                TO  RECE049-SRYKBN
+      *
+           MOVE    1                   TO  RECE049-MEISAISU
+      *
+           WRITE   RECE049-REC
+           ADD     1                   TO  CNT-RECE049
+      *
+           PERFORM 800-RECE02-SET059-SEC
+           MOVE    99999998            TO  RECE059-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE059-KOHBUNRI
+           MOVE    "99"                TO  RECE059-SRYKBN
+      *    コメントの挿入
+           MOVE    SPACE               TO  WRK-RECE05XX-REC
+           INITIALIZE                      WRK-RECE05XX-REC
+           MOVE    "810000001"         TO  WRK-RECE05XX-SRYCD(1 1)
+           MOVE     ZERO               TO  WRK-RECE05XX-SRYSURYO(1 1)
+           MOVE     2                  TO  WRK-RECE05XX-YUKOKETA(1 1)
+           MOVE    "障害"              TO  WRK-RECE05XX-NAME(1 1)
+      *
+           MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
+                                        TO  RECE059-SRYACT-TBL(1)
+           WRITE   RECE059-REC
+           ADD     1                    TO  CNT-RECE059
+      *
+           .
+       2001-KOUREI-TOKUREI-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
