@@ -1442,7 +1442,7 @@
                    MOVE    "0004"              TO  SPA-ERRCD
                END-IF
       *        Ｈ２０．４から変更可能として、警告表示とする
-               IF      (SPA-NAI-SRYYM      >   "200804" )   AND
+               IF      (SPA-NAI-SRYYM      >=  "200804" )   AND
                        (SPA-ERRCD      NOT =   SPACE    )
                    MOVE    SPACE               TO  SPA-ERRCD
                    IF      SPA-J021-KEIFLG     =   ZERO
