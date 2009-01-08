@@ -103,6 +103,7 @@
       *                                     ¡Êºß»ÙÉÂ¼«Æ°µ­ºÜÂÐ±þ¡Ë
       *  04.02.02    NACL-ÌçÏÆ    08/10/14  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *  04.02.03    NACL-ÌçÏÆ    08/12/22  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
+      *  04.02.04    NACL-ÌçÏÆ    09/01/05  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1290,6 +1291,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
               END-IF
            END-PERFORM
       *
+      *    ¾ã³²¤Î¥³¥á¥ó¥È¡Ê£·£µºÐÅþÃ£·î¤ÎÆÃÎã¡Ë
+      *
+           IF   RECE02-RJNGAIKOHFTN(3)  =   1
+              PERFORM   2001-KOUREI-TOKUREI-COMMENT-SEC
+           END-IF
+      *
       *
       *    ¥Ñ¥é¥á¡¼¥¿£°£´¥Õ¥¡¥¤¥ë¤è¤êÊÔ½¸
            PERFORM 800-RECE02-SET04-SEC
@@ -2121,6 +2128,42 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2001-NYUYOJI-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¾ã³²¤Î¥³¥á¥ó¥È¡Ê£·£µºÐÅþÃ£·î¤ÎÆÃÎã¡Ë
+      *****************************************************************
+       2001-KOUREI-TOKUREI-COMMENT-SEC          SECTION.
+      *
+           PERFORM 800-RECE02-SET049-SEC
+           MOVE    99999998            TO  RECE049-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
+           MOVE    "99"                TO  RECE049-SRYKBN
+      *
+           MOVE    1                   TO  RECE049-MEISAISU
+      *
+           WRITE   RECE049-REC
+           ADD     1                   TO  CNT-RECE049
+      *
+           PERFORM 800-RECE02-SET059-SEC
+           MOVE    99999998            TO  RECE059-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE059-KOHBUNRI
+           MOVE    "99"                TO  RECE059-SRYKBN
+      *    ¥³¥á¥ó¥È¤ÎÁÞÆþ
+           MOVE    SPACE               TO  WRK-RECE05XX-REC
+           INITIALIZE                      WRK-RECE05XX-REC
+           MOVE    "810000001"         TO  WRK-RECE05XX-SRYCD(1 1)
+           MOVE     ZERO               TO  WRK-RECE05XX-SRYSURYO(1 1)
+           MOVE     2                  TO  WRK-RECE05XX-YUKOKETA(1 1)
+           MOVE    "¾ã³²"              TO  WRK-RECE05XX-NAME(1 1)
+      *
+           MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
+                                        TO  RECE059-SRYACT-TBL(1)
+           WRITE   RECE059-REC
+           ADD     1                    TO  CNT-RECE059
+      *
+           .
+       2001-KOUREI-TOKUREI-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
