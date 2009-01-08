@@ -638,6 +638,10 @@
            COPY    "CPSRYACCT.INC"    REPLACING
                                      //ACCT-// BY //HZN-ACCT-//.
       *
+       01  HZN2-SRYACCT-REC.
+           COPY    "CPSRYACCT.INC"    REPLACING
+                                     //ACCT-// BY //HZN2-ACCT-//.
+      *
       *    ¥Á¥§¥Ã¥¯¥Þ¥¹¥¿¡Ý
        01  CHK-REC.
            COPY    "CPCHK.INC".
@@ -5471,7 +5475,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    »»ÄêÍúÎòºï½ü
            INITIALIZE                      SRYACT-REC
-           MOVE    SPA-HOSPNUM          TO  SRY-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  SRY-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  SRY-NYUGAIKBN
            MOVE    SPA-GMN-PTID        TO  SRY-PTID
            MOVE    SPA-J01-SRYKA       TO  SRY-SRYKA
@@ -5856,7 +5860,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        4502-SINKAI-KOU-SEC          SECTION.
       *
            INITIALIZE                      SRYACCT-REC
-           MOVE    SPA-HOSPNUM          TO  ACCT-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
            MOVE    SPA-GMN-PTID        TO  ACCT-PTID
            MOVE    SPA-J01-SRYKA       TO  ACCT-SRYKA
@@ -5924,6 +5928,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-OPID            TO  ACCT-OPID
       *
       *
+           MOVE    SRYACCT-REC         TO  HZN2-SRYACCT-REC
+      *
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
@@ -5941,6 +5947,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-HKNCOMBINUM NOT =   SPA-J04-HKNCOMBI )
                PERFORM 45021-JYURRK-HKNUPD-SEC
            END-IF
+           MOVE    HZN2-SRYACCT-REC    TO  SRYACCT-REC
       *!!
       *    ¿ÇÎÅ²ñ·×Éí²Ã¾ðÊó½èÍý 
            PERFORM 45023-SRYACCTPLUS-SYORI-SEC
@@ -5989,7 +5996,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ÊÑ¹¹Á°¤Î¼õ¿ÇÍúÎò¤ÎºÞºï½ü
            MOVE    SPACE               TO  JYURRK-REC
            INITIALIZE                      JYURRK-REC
-           MOVE    SPA-HOSPNUM          TO  JYURRK-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-J01-SRYKA       TO  JYURRK-SRYKA
@@ -6077,7 +6084,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ÊÑ¹¹Á°¤Î¼õ¿ÇÍúÎò¤ÎºÞÄÉ²Ã
            MOVE    SPACE               TO  JYURRK-REC
            INITIALIZE                      JYURRK-REC
-           MOVE    SPA-HOSPNUM          TO  JYURRK-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-J01-SRYKA       TO  JYURRK-SRYKA
@@ -6102,9 +6109,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  WRK-KEY-DOUJI-RENNUM
            PERFORM
                    UNTIL      (FLG-JYURRK      =   1  )
+               MOVE    JYURRK-KEY          TO  JYURRK-UPKEY
                IF      JYURRK-EDANUM       =   1
                    MOVE    ZERO                TO  FLG-UPD2
-                   ADD     1               TO  WRK-RENNUM
+                   ADD     1                   TO  WRK-RENNUM
                    IF      WRK-RENNUM      >   1
                        ADD     1           TO  WRK-DOUJI-RENNUM
                    END-IF
@@ -6149,7 +6157,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 450215-JYURRK-SAKUSEI-SEC
            END-IF
            .
-      *
        45021-JYURRK-HKNUPD-EXT.
            EXIT.
       *****************************************************************
@@ -6226,7 +6233,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "upd1"              TO  MCP-PATHNAME
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
@@ -6469,7 +6476,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        450232-SRYACCTPLUS-DEL-SEC          SECTION.
       *
            INITIALIZE                  SRYACCTPLUS-REC
-           MOVE    ACCT-HOSPNUM         TO  ACCTP-HOSPNUM
+           MOVE    ACCT-HOSPNUM        TO  ACCTP-HOSPNUM
            MOVE    ACCT-NYUGAIKBN      TO  ACCTP-NYUGAIKBN
            MOVE    ACCT-PTID           TO  ACCTP-PTID
            MOVE    ACCT-SRYKA          TO  ACCTP-SRYKA
@@ -6624,7 +6631,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  JYURRK-REC
            INITIALIZE                      JYURRK-REC
-           MOVE    SPA-HOSPNUM          TO  JYURRK-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-J01-SRYKA       TO  JYURRK-SRYKA
