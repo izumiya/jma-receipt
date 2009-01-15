@@ -183,7 +183,7 @@
       *----(04.02.01)--ADD-START---
            03  WRK-MOJI11.
                05  FILLER111           PIC X(50)   VALUE
-                   "【廃用をもたらすに至った要因等】".
+                   "【廃用症候群に係る評価表】".
       *
        01  CONST-AREA.
            03  CONST-H2004             PIC X(06)   VALUE    "200804".
