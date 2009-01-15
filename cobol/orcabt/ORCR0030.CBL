@@ -2888,6 +2888,17 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                PERFORM   21045-TOKKI-HENSYU-SEC
            END-IF
       *
+           IF  FLG-TOKU75    =  1  OR  2  OR  3
+              EVALUATE  FLG-TOKU75
+                WHEN       1
+                  MOVE   1    TO   RECE02-RJNNYUKOHFTN(1)
+                WHEN       2
+                  MOVE   2    TO   RECE02-RJNNYUKOHFTN(1)
+                WHEN       3
+                  MOVE   3    TO   RECE02-RJNNYUKOHFTN(1)
+              END-EVALUATE
+           END-IF
+      *
            IF  FLG-SYOGAI75  =  1
                IF    RECE02-ZAITAKU      =   "1"
                     MOVE    1    TO    RECE02-RJNGAIKOHFTN(3)

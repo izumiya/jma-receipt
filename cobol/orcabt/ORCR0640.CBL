@@ -14357,6 +14357,17 @@
                PERFORM   21013-TOKKI-HENSYU-SEC
            END-IF
       *
+           IF  FLG-TOKU75    =  1  OR  2  OR  3
+              EVALUATE  FLG-TOKU75
+                WHEN       1
+                  MOVE   1    TO   RECE62-RJNNYUKOHFTN(1)
+                WHEN       2
+                  MOVE   2    TO   RECE62-RJNNYUKOHFTN(1)
+                WHEN       3
+                  MOVE   3    TO   RECE62-RJNNYUKOHFTN(1)
+              END-EVALUATE
+           END-IF
+      *
            IF  FLG-SYOGAI75  =  1
                MOVE      1      TO     RECE62-RJNGAIKOHFTN(3)
            END-IF
