@@ -3556,6 +3556,19 @@
            MOVE      10000       TO     WK-CYOKI-GENDO
            MOVE      20000       TO     WK-CYOKI-GENDO2
       *
+           COMPUTE  WK-KOH-GENDOGAKU-TOKU75   = 
+                    WK-KOH-GENDOGAKU          /  2
+           COMPUTE  WK-GEN70-GENDOGAKU-TOKU75 =
+                    WK-GEN70-GENDOGAKU        /  2
+           COMPUTE  WK-SEIHO-GENDO-TOKU75     =
+                    WK-SEIHO-GENDO            /  2
+           COMPUTE  WK-SEIHO-GENDO70-TOKU75   =
+                    WK-SEIHO-GENDO70          /  2
+           COMPUTE  WK-CYOKI-GENDO-TOKU75     =
+                    WK-CYOKI-GENDO            /  2
+           COMPUTE  WK-CYOKI-GENDO2-TOKU75    =
+                    WK-CYOKI-GENDO2           /  2
+      *
       *    ¸º³Û¡Ê³ä¹ç¡¦¶â³Û¡Ë¤Î¼è¹þ¤ß½èÍý
       *    ¸øÈñÉéÃ´¸ÂÅÙ³Û¤Î¸º³Û
            IF    WK-GENGAKUKBN    NOT  =   ZERO
@@ -3750,6 +3763,135 @@
                     WK-CYOKI-GENDO2  /  10
            COMPUTE  WK-CYOKI-GENDO2  =
                     WK-CYOKI-GENDO2  *  10
+      **
+           IF   WK-KOH-GENDOGAKU-TOKU75  NOT = ZERO
+              EVALUATE   WK-GENGAKUKBN
+                WHEN          1
+                  IF  WK-GENGAKU-RITU = 100
+                    MOVE   ZERO   TO   WK-KOH-GENDOGAKU-TOKU75
+                  ELSE
+                    COMPUTE  WK-GENGAKU-RITUX =
+                             100 - WK-GENGAKU-RITU
+                    COMPUTE  WK-KOH-GENDOGAKU-TOKU75  =
+                             WK-KOH-GENDOGAKU-TOKU75  *
+                             WK-GENGAKU-RITUX         /
+                             100
+                  END-IF
+                WHEN          2
+                  CONTINUE
+                WHEN          3
+                WHEN          4
+                  MOVE     ZERO   TO   WK-KOH-GENDOGAKU-TOKU75
+              END-EVALUATE
+              COMPUTE  WK-KOH-GENDOGAKU-TOKU75 =
+                       WK-KOH-GENDOGAKU-TOKU75 +  5
+              COMPUTE  WK-KOH-GENDOGAKU-TOKU75 =
+                       WK-KOH-GENDOGAKU-TOKU75 /  10
+              COMPUTE  WK-KOH-GENDOGAKU-TOKU75 =
+                       WK-KOH-GENDOGAKU-TOKU75 *  10
+           END-IF
+      *
+           IF   WK-GEN70-GENDOGAKU-TOKU75  NOT = ZERO
+              IF   WK-GEN70-GENDOGAKU-TOKU75  = 40050
+                 EVALUATE   WK-GENGAKUKBN
+                   WHEN          1
+                     IF  WK-GENGAKU-RITU = 100
+                       MOVE   ZERO   TO   WK-GEN70-GENDOGAKU-TOKU75
+                     END-IF
+                   WHEN          2
+                     CONTINUE
+                   WHEN          3
+                   WHEN          4
+                     MOVE     ZERO   TO   WK-GEN70-GENDOGAKU-TOKU75
+                 END-EVALUATE
+              ELSE
+                 EVALUATE   WK-GENGAKUKBN
+                   WHEN          1
+                     IF  WK-GENGAKU-RITU = 100
+                       MOVE   ZERO   TO   WK-GEN70-GENDOGAKU-TOKU75
+                     ELSE
+                       COMPUTE  WK-GENGAKU-RITUX =
+                                100 - WK-GENGAKU-RITU
+                       COMPUTE  WK-GEN70-GENDOGAKU-TOKU75  =
+                                WK-GEN70-GENDOGAKU-TOKU75  *
+                                WK-GENGAKU-RITUX           /
+                                100
+                     END-IF
+                   WHEN          2
+                     CONTINUE
+                   WHEN          3
+                   WHEN          4
+                     MOVE     ZERO   TO   WK-GEN70-GENDOGAKU-TOKU75
+                 END-EVALUATE
+                 COMPUTE  WK-GEN70-GENDOGAKU-TOKU75 =
+                          WK-GEN70-GENDOGAKU-TOKU75 +  5
+                 COMPUTE  WK-GEN70-GENDOGAKU-TOKU75 =
+                          WK-GEN70-GENDOGAKU-TOKU75 /  10
+                 COMPUTE  WK-GEN70-GENDOGAKU-TOKU75 =
+                          WK-GEN70-GENDOGAKU-TOKU75 *  10
+              END-IF
+           END-IF
+      *
+           EVALUATE   WK-GENGAKUKBN
+             WHEN          1
+               IF  WK-GENGAKU-RITU = 100
+                 MOVE   ZERO   TO   WK-SEIHO-GENDO-TOKU75
+                                    WK-SEIHO-GENDO70-TOKU75
+                                    WK-CYOKI-GENDO-TOKU75
+                                    WK-CYOKI-GENDO2-TOKU75
+               ELSE
+                 COMPUTE  WK-GENGAKU-RITUX =
+                          100 - WK-GENGAKU-RITU
+                 COMPUTE  WK-SEIHO-GENDO-TOKU75    =
+                          WK-SEIHO-GENDO-TOKU75    *
+                          WK-GENGAKU-RITUX         /
+                          100
+                 COMPUTE  WK-SEIHO-GENDO70-TOKU75  =
+                          WK-SEIHO-GENDO70-TOKU75  *
+                          WK-GENGAKU-RITUX         /
+                          100
+                 COMPUTE  WK-CYOKI-GENDO-TOKU75    =
+                          WK-CYOKI-GENDO-TOKU75    *
+                          WK-GENGAKU-RITUX         /
+                          100
+                 COMPUTE  WK-CYOKI-GENDO2-TOKU75   =
+                          WK-CYOKI-GENDO2-TOKU75   *
+                          WK-GENGAKU-RITUX         /
+                          100
+               END-IF
+             WHEN          2
+               CONTINUE
+             WHEN          3
+             WHEN          4
+               MOVE     ZERO   TO   WK-SEIHO-GENDO-TOKU75
+                                    WK-SEIHO-GENDO70-TOKU75
+                                    WK-CYOKI-GENDO-TOKU75
+                                    WK-CYOKI-GENDO2-TOKU75
+           END-EVALUATE
+           COMPUTE  WK-SEIHO-GENDO-TOKU75   =
+                    WK-SEIHO-GENDO-TOKU75   +  5
+           COMPUTE  WK-SEIHO-GENDO-TOKU75   =
+                    WK-SEIHO-GENDO-TOKU75   /  10
+           COMPUTE  WK-SEIHO-GENDO-TOKU75   =
+                    WK-SEIHO-GENDO-TOKU75   *  10
+           COMPUTE  WK-SEIHO-GENDO70-TOKU75 =
+                    WK-SEIHO-GENDO70-TOKU75 +  5
+           COMPUTE  WK-SEIHO-GENDO70-TOKU75 =
+                    WK-SEIHO-GENDO70-TOKU75 /  10
+           COMPUTE  WK-SEIHO-GENDO70-TOKU75 =
+                    WK-SEIHO-GENDO70-TOKU75 *  10
+           COMPUTE  WK-CYOKI-GENDO-TOKU75   =
+                    WK-CYOKI-GENDO-TOKU75   +  5
+           COMPUTE  WK-CYOKI-GENDO-TOKU75   =
+                    WK-CYOKI-GENDO-TOKU75   /  10
+           COMPUTE  WK-CYOKI-GENDO-TOKU75   =
+                    WK-CYOKI-GENDO-TOKU75   *  10
+           COMPUTE  WK-CYOKI-GENDO2-TOKU75  =
+                    WK-CYOKI-GENDO2-TOKU75  +  5
+           COMPUTE  WK-CYOKI-GENDO2-TOKU75  =
+                    WK-CYOKI-GENDO2-TOKU75  /  10
+           COMPUTE  WK-CYOKI-GENDO2-TOKU75  =
+                    WK-CYOKI-GENDO2-TOKU75  *  10
       *
            .
       *
@@ -7551,19 +7693,6 @@
            IF   FLG-TOKU75  = 1 OR 2 OR 3
               MOVE    FLG-TOKU75   TO   LNK-SYU-SKJ-FTNDAY(1)
            END-IF
-      *
-           COMPUTE  WK-KOH-GENDOGAKU-TOKU75   = 
-                    WK-KOH-GENDOGAKU          /  2
-           COMPUTE  WK-GEN70-GENDOGAKU-TOKU75 =
-                    WK-GEN70-GENDOGAKU        /  2
-           COMPUTE  WK-SEIHO-GENDO-TOKU75     =
-                    WK-SEIHO-GENDO            /  2
-           COMPUTE  WK-SEIHO-GENDO70-TOKU75   =
-                    WK-SEIHO-GENDO70          /  2
-           COMPUTE  WK-CYOKI-GENDO-TOKU75     =
-                    WK-CYOKI-GENDO            /  2
-           COMPUTE  WK-CYOKI-GENDO2-TOKU75    =
-                    WK-CYOKI-GENDO2           /  2
       *
            .
       *
