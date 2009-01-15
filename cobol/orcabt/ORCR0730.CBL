@@ -58,6 +58,7 @@
       *  04.03.09    NACL-門脇    08/09/02  請求点判定追加
       *  04.03.11    NACL-藤原    08/09/24  平成２０年１０月改正対応
       *  04.03.12    NACL-門脇    08/12/16  平成２１年１月改正対応
+      *  04.03.13    NACL-門脇    09/01/15  平成２１年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2338,6 +2339,10 @@
            IF      RECE62X-RJNGAIKOHFTN (2)
                                        =   1
                MOVE    1                   TO  KOHSKY-FLG (2)
+           END-IF
+      *    ７５歳到達月の特例対象者
+           IF      RECE62X-RJNNYUKOHFTN (1)  NOT =  ZERO
+               MOVE   RECE62X-RJNNYUKOHFTN (1)  TO  KOHSKY-FLG (3)
            END-IF
       *
            MOVE    RECE62X-HOSPNUM     TO  KOHSKY-HOSPNUM
@@ -8702,6 +8707,10 @@
       *    ７０歳代前半の特例措置対象者のみ２割の記載
            IF      RECE62-RJNGAIKOHFTN (2) =   1
                MOVE    1                   TO  RECE10-FLG (2)
+           END-IF
+      *    ７５歳到達月の特例対象者
+           IF      RECE62-RJNNYUKOHFTN (1)  NOT =  ZERO
+               MOVE   RECE62-RJNNYUKOHFTN (1)  TO  RECE10-FLG (3)
            END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
