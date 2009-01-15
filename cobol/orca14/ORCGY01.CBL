@@ -260,6 +260,7 @@
            03  FLG-HENFLG          PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-HENKOU          PIC 9(01).
+           03  FLG-CALENDAR        PIC 9(01).
       *
       *    システム領域
        01  SYS-AREA.
@@ -2741,7 +2742,7 @@
            END-IF
            MOVE    WRK-CAL-YMD         TO  WRK-SYMD
            PERFORM 3101-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG     TO  SPA-GMN-TAIYMD
+           MOVE    WRK-HENYMDG         TO  SPA-GMN-TAIYMD
       *
            IF      (WRK-CAL-YEAR       =   SPA-GMN-YEAR )  AND
                    (WRK-CAL-MONTH      =   SPA-GMN-MONTH )
@@ -2989,8 +2990,10 @@
            PERFORM 4001-KNJICHI-SEC
       *
       *    予約クリア
+           INITIALIZE                  SPA-GMN-YYKAREA
            MOVE    SPA-SYSYMD          TO  SPA-NAI-YYKYMD
            MOVE    SPA-SYSYMDWH        TO  SPA-GMN-YYKYMD
+           MOVE    0                   TO  FLG-CALENDAR
            PERFORM 2201-YYK-CLEAR-SEC
            MOVE    3                   TO  SPA-GMN-CUR
       *
@@ -3020,6 +3023,7 @@
       *        予約内容初期
                MOVE    SPA-SYSYMD          TO  SPA-NAI-YYKYMD
                MOVE    SPA-SYSYMDWH        TO  SPA-GMN-YYKYMD
+               MOVE    1                   TO  FLG-CALENDAR
                PERFORM 2201-YYK-CLEAR-SEC
                MOVE    3                   TO  SPA-GMN-CUR
            END-IF
@@ -3075,6 +3079,7 @@
            END-IF
       *
       *    予約クリア
+           MOVE    1                   TO  FLG-CALENDAR
            PERFORM 2201-YYK-CLEAR-SEC
            MOVE    3                   TO  SPA-GMN-CUR
       *
@@ -3089,12 +3094,14 @@
            MOVE    ZERO                TO  SPA-YYK-SYORI
            MOVE    ZERO                TO  SPA-Y01-KEIKOKU
       *
-      *    更新後内容表示
-           MOVE    SPA-NAI-YYKYY       TO  Y01-YEAR
-           MOVE    SPA-NAI-YYKMM       TO  Y01-MONTH
-           MOVE    SPA-NAI-YYKDD       TO  Y01-DAY
-           INITIALIZE                  SPA-GMN-YYKAREA
-           PERFORM 41020-CALENDAR-SEC
+      *    更新後カレンダー内容表示
+           IF      FLG-CALENDAR        =   1
+               MOVE    SPA-NAI-YYKYY       TO  Y01-YEAR
+               MOVE    SPA-NAI-YYKMM       TO  Y01-MONTH
+               MOVE    SPA-NAI-YYKDD       TO  Y01-DAY
+               INITIALIZE                  SPA-GMN-YYKAREA
+               PERFORM 41020-CALENDAR-SEC
+           END-IF
       *
            MOVE    SPACE               TO  SPA-CHK-YYKYMD
            MOVE    ZERO                TO  SPA-CHK-KYYKTIME
