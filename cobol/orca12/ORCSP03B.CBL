@@ -1043,6 +1043,16 @@
                MOVE    "0077"              TO  SPA-ERRCD
                MOVE    23                  TO  SPA-GMN-CUR
            END-IF
+      *£È£²£±¡¥£±ÂÐ±þ
+      *    £·£µºÐÆÃÎã¤Ï¡¢£±Æü¤ò¥¨¥é¡¼¤È¤¹¤ë
+           IF     (SPA-GMN-KOHNUM(IDX-K)   =   "969" )
+             AND  (SPA-ERRCD               =   SPACE )
+               IF      SPA-NAI-KTEKSTYMD(IDX-K)(7:2)   =   "01"
+                   MOVE    "0177"              TO  SPA-ERRCD
+                   MOVE    23                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *!!
            .
        1001-KTEKSTYMD-CHK-EXT.
            EXIT.

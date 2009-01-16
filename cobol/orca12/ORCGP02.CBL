@@ -4275,6 +4275,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0077"
                    MOVE    "公費の適用開始日が入力エラーです"
                                                TO  SPA-ERRMSG
+      *Ｈ２１．１から
+               WHEN    "0177"
+                   MOVE    "公費開始日に１日は入力できません"
+                                               TO  SPA-ERRMSG
                WHEN    "0078"
                    MOVE    "公費の適用終了日が入力エラーです"
                                                TO  SPA-ERRMSG
