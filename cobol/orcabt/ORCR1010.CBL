@@ -43,6 +43,7 @@
       *  04.02.03    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
       *  04.02.04    NACL-ÌçÏÆ    08/11/06  Èé²¼¶ÚÆù¡¢ÀÅÌ®Ãí¼Í¤Îµ­ºÜÊÑ¹¹ÂÐ±þ
       *  04.02.05    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.02.06    NACL-ÌçÏÆ    09/01/16  ½èÊýÍó¶â³ÛÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3034,14 +3035,24 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
-                   IF    RECE100-KHNTEN(21)   =   ZERO
-                      MOVE  WRK-TNS-TEN(IDX3) TO  RECE100-KHNTEN(21)
-                   ELSE
-                      IF   RECE100-KHNTEN(21) NOT = WRK-TNS-TEN(IDX3)
-                      AND  WRK-TNS-TEN(IDX3)  NOT = ZERO
-                           MOVE   ZERO    TO    RECE100-KHNTEN(21)
-                           MOVE   1       TO    FLG-KHNTEN21
+      ***          IF    RECE100-KHNTEN(21)   =   ZERO
+      ***             MOVE  WRK-TNS-TEN(IDX3) TO  RECE100-KHNTEN(21)
+      ***          ELSE
+      ***             IF   RECE100-KHNTEN(21) NOT = WRK-TNS-TEN(IDX3)
+      ***             AND  WRK-TNS-TEN(IDX3)  NOT = ZERO
+      ***                  MOVE   ZERO    TO    RECE100-KHNTEN(21)
+      ***                  MOVE   1       TO    FLG-KHNTEN21
+      ***             END-IF
+      ***          END-IF
+                   IF    WK-ZAITEN   NOT =  ZERO
+                     IF    RECE100-KHNTEN(21)     = ZERO
+                      MOVE  WK-ZAITEN     TO   RECE100-KHNTEN(21)
+                     ELSE
+                      IF   RECE100-KHNTEN(21) NOT = WK-ZAITEN
+                            MOVE   ZERO   TO   RECE100-KHNTEN(21)
+                            MOVE   1      TO   FLG-KHNTEN21
                       END-IF
+                     END-IF
                    END-IF
                    IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
                    OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")

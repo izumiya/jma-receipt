@@ -108,6 +108,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/04/21  £¸£°¤½¤ÎÂ¾µ­ºÜ½çÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/06/25  £¸£°¤½¤ÎÂ¾µ­ºÜ½çÂÐ±þ
       *  04.02.04    NACL-ÌçÏÆ    08/11/06  Èé²¼¶ÚÆù¡¢ÀÅÌ®Ãí¼Í¤Îµ­ºÜÊÑ¹¹ÂÐ±þ
+      *  04.02.05    NACL-ÌçÏÆ    09/01/15  ½èÊý¡ÊÆýÍÄ»ù¡Ë²Ã»»ÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -679,11 +680,13 @@
       ***  03  FILLER          PIC X(09)   VALUE   "112000970".
       *    ºß°åÁí¡¦ºß°åÁí´É¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    ½èÊý¡ÊÆýÍÄ»ù¡Ë²Ã»»
+           03  FILLER          PIC X(09)   VALUE   "120002170".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   50.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   51.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   50.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   51.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -1678,45 +1681,45 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                EVALUATE      RECE41-HKNKBN                              
                  WHEN      "1"                                          
                  WHEN      "2"                                          
-                   IF    ( RECE41-KHNTEN  (19)     =   ZERO )  AND
-                         ( WRK-ZAIWMAX    (6)      >   1    )
-                       PERFORM 20042-SRYKBNELSE-REIGAI-SEC
-                   ELSE
+      ***          IF    ( RECE41-KHNTEN  (19)     =   ZERO )  AND
+      ***                ( WRK-ZAIWMAX    (6)      >   1    )
+      ***              PERFORM 20042-SRYKBNELSE-REIGAI-SEC
+      ***          ELSE
                        PERFORM 20052-SRYKBNELSE-CHECK-SEC
-                   END-IF
+      ***          END-IF
                  WHEN      "3"                                          
-                   IF    ( RECE41-KHNTEN  (12)     =   ZERO )  AND      
-                         ( WRK-ZAIWMAX    (6)      >   1    )           
-                       PERFORM 20042-SRYKBNELSE-REIGAI-SEC              
-                   ELSE                                                 
+      ***          IF    ( RECE41-KHNTEN  (12)     =   ZERO )  AND      
+      ***                ( WRK-ZAIWMAX    (6)      >   1    )           
+      ***              PERFORM 20042-SRYKBNELSE-REIGAI-SEC              
+      ***          ELSE                                                 
                        PERFORM 20052-SRYKBNELSE-CHECK-SEC               
-                   END-IF                                               
+      ***          END-IF                                               
                  WHEN      "4"                                          
                    EVALUATE  WRK-PARA-RECEKBN
                      WHEN      "4"
       ****************¡Ê¿·ÍÍ¼°¡Ë
-                      IF    ( RECE41-KHNTEN  (14)     =   ZERO )  AND
-                            ( WRK-ZAIWMAX    (6)      >   1    )
-                          PERFORM 20042-SRYKBNELSE-REIGAI-SEC
-                      ELSE
+      ***             IF    ( RECE41-KHNTEN  (14)     =   ZERO )  AND
+      ***                   ( WRK-ZAIWMAX    (6)      >   1    )
+      ***                 PERFORM 20042-SRYKBNELSE-REIGAI-SEC
+      ***             ELSE
                           PERFORM 20052-SRYKBNELSE-CHECK-SEC
-                      END-IF
+      ***             END-IF
                      WHEN      "5"
       ****************¡Ê½¾ÍèÍÍ¼°¡Ë
-                      IF    ( RECE41-KHNTEN  (15)     =   ZERO )  AND
-                            ( WRK-ZAIWMAX    (6)      >   1    )
-                          PERFORM 20042-SRYKBNELSE-REIGAI-SEC
-                      ELSE
+      ***             IF    ( RECE41-KHNTEN  (15)     =   ZERO )  AND
+      ***                   ( WRK-ZAIWMAX    (6)      >   1    )
+      ***                 PERFORM 20042-SRYKBNELSE-REIGAI-SEC
+      ***             ELSE
                           PERFORM 20052-SRYKBNELSE-CHECK-SEC
-                      END-IF
+      ***             END-IF
                    END-EVALUATE
                  WHEN      "5"                                          
-                   IF    ( RECE41-KHNTEN  (22)     =   ZERO )  AND      
-                         ( WRK-ZAIWMAX    (6)      >   1    )           
-                       PERFORM 20042-SRYKBNELSE-REIGAI-SEC              
-                   ELSE                                                 
+      ***          IF    ( RECE41-KHNTEN  (22)     =   ZERO )  AND      
+      ***                ( WRK-ZAIWMAX    (6)      >   1    )           
+      ***              PERFORM 20042-SRYKBNELSE-REIGAI-SEC              
+      ***          ELSE                                                 
                        PERFORM 20052-SRYKBNELSE-CHECK-SEC               
-                   END-IF                   
+      ***          END-IF                   
                END-EVALUATE                                             
            ELSE            
       *

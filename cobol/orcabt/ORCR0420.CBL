@@ -157,6 +157,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/06/20  ºßÂðÊÔ½¸½¤Àµ
       *  04.02.03    NACL-ÌçÏÆ    08/11/06  Èé²¼¶ÚÆù¡¢ÀÅÌ®Ãí¼Í¤Îµ­ºÜÊÑ¹¹ÂÐ±þ
       *  04.02.04    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.02.05    NACL-ÌçÏÆ    09/01/16  ½èÊýÍó¶â³ÛÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3607,14 +3608,24 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
-                   IF    RECE41-KHNTEN(19)   =   ZERO
-                      MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(19)
-                   ELSE
-                      IF   RECE41-KHNTEN(19) NOT = WRK-TNS-TEN(IDX3)
-                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
-                           MOVE   ZERO    TO    RECE41-KHNTEN(19)
-                           MOVE   1       TO    FLG-KHNTEN19
+      ***          IF    RECE41-KHNTEN(19)   =   ZERO
+      ***             MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(19)
+      ***          ELSE
+      ***             IF   RECE41-KHNTEN(19) NOT = WRK-TNS-TEN(IDX3)
+      ***             AND  WRK-TNS-TEN(IDX3) NOT = ZERO
+      ***                  MOVE   ZERO    TO    RECE41-KHNTEN(19)
+      ***                  MOVE   1       TO    FLG-KHNTEN19
+      ***             END-IF
+      ***          END-IF
+                   IF    WK-ZAITEN   NOT =  ZERO
+                     IF    RECE41-KHNTEN(19)     = ZERO
+                      MOVE  WK-ZAITEN     TO   RECE41-KHNTEN(19)
+                     ELSE
+                      IF   RECE41-KHNTEN(19) NOT = WK-ZAITEN
+                            MOVE   ZERO   TO   RECE41-KHNTEN(19)
+                            MOVE   1      TO   FLG-KHNTEN19
                       END-IF
+                     END-IF
                    END-IF
                    IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
                    OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
@@ -4441,14 +4452,24 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
-                   IF    RECE41-KHNTEN(14)   =   ZERO
-                      MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(14)
-                   ELSE
-                      IF   RECE41-KHNTEN(14) NOT = WRK-TNS-TEN(IDX3)
-                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
-                           MOVE   ZERO    TO    RECE41-KHNTEN(14)
-                           MOVE   1       TO    FLG-KHNTEN14-JI
+      ***          IF    RECE41-KHNTEN(14)   =   ZERO
+      ***             MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(14)
+      ***          ELSE
+      ***             IF   RECE41-KHNTEN(14) NOT = WRK-TNS-TEN(IDX3)
+      ***             AND  WRK-TNS-TEN(IDX3) NOT = ZERO
+      ***                  MOVE   ZERO    TO    RECE41-KHNTEN(14)
+      ***                  MOVE   1       TO    FLG-KHNTEN14-JI
+      ***             END-IF
+      ***          END-IF
+                   IF    WK-ZAITEN   NOT =  ZERO
+                     IF    RECE41-KHNTEN(14)     = ZERO
+                      MOVE  WK-ZAITEN     TO   RECE41-KHNTEN(14)
+                     ELSE
+                      IF   RECE41-KHNTEN(14) NOT = WK-ZAITEN
+                            MOVE   ZERO   TO   RECE41-KHNTEN(14)
+                            MOVE   1      TO   FLG-KHNTEN14-JI
                       END-IF
+                     END-IF
                    END-IF
                    IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
                    OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
@@ -5204,14 +5225,24 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
-                   IF    RECE41-KHNTEN(15)   =   ZERO
-                      MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(15)
-                   ELSE
-                      IF   RECE41-KHNTEN(15) NOT = WRK-TNS-TEN(IDX3)
-                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
-                           MOVE   ZERO    TO    RECE41-KHNTEN(15)
-                           MOVE   1       TO    FLG-KHNTEN15-JI2
+      ***          IF    RECE41-KHNTEN(15)   =   ZERO
+      ***             MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(15)
+      ***          ELSE
+      ***             IF   RECE41-KHNTEN(15) NOT = WRK-TNS-TEN(IDX3)
+      ***             AND  WRK-TNS-TEN(IDX3) NOT = ZERO
+      ***                  MOVE   ZERO    TO    RECE41-KHNTEN(15)
+      ***                  MOVE   1       TO    FLG-KHNTEN15-JI2
+      ***             END-IF
+      ***          END-IF
+                   IF    WK-ZAITEN   NOT =  ZERO
+                     IF    RECE41-KHNTEN(15)     = ZERO
+                      MOVE  WK-ZAITEN     TO   RECE41-KHNTEN(15)
+                     ELSE
+                      IF   RECE41-KHNTEN(15) NOT = WK-ZAITEN
+                            MOVE   ZERO   TO   RECE41-KHNTEN(15)
+                            MOVE   1      TO   FLG-KHNTEN15-JI2
                       END-IF
+                     END-IF
                    END-IF
                    IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
                    OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
@@ -5792,14 +5823,24 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
-                   IF    RECE41-KHNTEN(22)   =   ZERO
-                      MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(22)
-                   ELSE
-                      IF   RECE41-KHNTEN(22) NOT = WRK-TNS-TEN(IDX3)
-                      AND  WRK-TNS-TEN(IDX3) NOT = ZERO
-                           MOVE   ZERO    TO    RECE41-KHNTEN(22)
-                           MOVE   1       TO    FLG-KHNTEN22-KO
+      ***          IF    RECE41-KHNTEN(22)   =   ZERO
+      ***             MOVE  WRK-TNS-TEN(IDX3)  TO  RECE41-KHNTEN(22)
+      ***          ELSE
+      ***             IF   RECE41-KHNTEN(22) NOT = WRK-TNS-TEN(IDX3)
+      ***             AND  WRK-TNS-TEN(IDX3) NOT = ZERO
+      ***                  MOVE   ZERO    TO    RECE41-KHNTEN(22)
+      ***                  MOVE   1       TO    FLG-KHNTEN22-KO
+      ***             END-IF
+      ***          END-IF
+                   IF    WK-ZAITEN   NOT =  ZERO
+                     IF    RECE41-KHNTEN(22)     = ZERO
+                      MOVE  WK-ZAITEN     TO   RECE41-KHNTEN(22)
+                     ELSE
+                      IF   RECE41-KHNTEN(22) NOT = WK-ZAITEN
+                            MOVE   ZERO   TO   RECE41-KHNTEN(22)
+                            MOVE   1      TO   FLG-KHNTEN22-KO
                       END-IF
+                     END-IF
                    END-IF
                    IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
                    OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
