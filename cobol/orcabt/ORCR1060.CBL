@@ -39,6 +39,7 @@
       *  04.03.01    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
       *  04.03.02    NACL-藤原    08/08/22  リアルタイムプレビュー時の表示
       *  04.03.03    NACL-藤原    08/08/29  記号番号の記載方法の変更
+      *  04.03.04    NACL-藤原    09/01/16  症状詳記区分の表題の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -403,7 +404,7 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            03  FILLER              PIC X(52)   VALUE
                "【疾患別リハビリテーションに係る治療継続の理由等】".
            03  FILLER              PIC X(52)   VALUE
-               "【廃用をもたらすに至った要因等】".
+               "【廃用症候群に係る評価表】".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
            03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   10.
       *
