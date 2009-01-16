@@ -37,6 +37,7 @@
       *  04.03.01    NACL-ÃÁœ∆    08/07/09  ≈ÍÃÙ§Œµ≠∫‹ΩÁ —ππ° ∆¸…’ΩÁ°À
       *  04.03.02    NACL-ÃÁœ∆    08/07/14  ≈ÍÃÙ∫ﬁ≈¿£∞° ±°≥∞≈˘°Àµ≠∫‹¬–±˛
       *  04.03.03    NACL-ÃÁœ∆    08/12/01  ∫ﬂ¬° ±°≥∞ ¨°À ‘Ω∏Ω§¿µ
+      *  04.03.04    NACL-ÃÁœ∆    09/01/15  ΩË ˝° ∆˝Õƒª˘°À≤√ªª ‘Ω∏¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -668,10 +669,12 @@
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    ∫ﬂ∞Â¡Ì°¶∫ﬂ∞Â¡Ì¥…° £ƒ£’£Õ£Õ£Ÿ°À
            03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    ΩË ˝° ∆˝Õƒª˘°À≤√ªª
+           03  FILLER          PIC X(09)   VALUE   "120002170".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   62.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   63.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   62.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   63.         
       *
       *    ∏«ƒÍ√Õ
        01  CONST-AREA.
@@ -1631,12 +1634,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
        2005-SRYKBNELSE-HENSYU-SEC    SECTION.
       *    ΩË ˝§Œ§»§≠
            IF  RECE120-SRYKBN         =   "25"
-               IF    ( RECE100-KHNTEN (21)     =   ZERO )  AND
-                     ( WRK-ZAIWMAX    (6)      >   1    )
-                   PERFORM 20042-SRYKBNELSE-REIGAI-SEC
-               ELSE
+      ***      IF    ( RECE100-KHNTEN (21)     =   ZERO )  AND
+      ***            ( WRK-ZAIWMAX    (6)      >   1    )
+      ***          PERFORM 20042-SRYKBNELSE-REIGAI-SEC
+      ***      ELSE
                    PERFORM 20052-SRYKBNELSE-CHECK-SEC
-               END-IF
+      ***      END-IF
            ELSE            
       *
       *        ∏°∫∫§Œ§»§≠ ‘Ω∏
