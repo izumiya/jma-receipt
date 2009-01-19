@@ -109,6 +109,7 @@
       *  04.02.03    NACL-門脇    08/06/25  ８０その他記載順対応
       *  04.02.04    NACL-門脇    08/11/06  皮下筋肉、静脈注射の記載変更対応
       *  04.02.05    NACL-門脇    09/01/15  処方（乳幼児）加算編集対応
+      *                                     処方せん（乳幼児）加算編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -682,11 +683,13 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    処方（乳幼児）加算
            03  FILLER          PIC X(09)   VALUE   "120002170".
+      *    処方せん（乳幼児）加算
+           03  FILLER          PIC X(09)   VALUE   "120002470".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   51.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   52.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   51.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   52.
       *
       *    固定値
        01  CONST-AREA.

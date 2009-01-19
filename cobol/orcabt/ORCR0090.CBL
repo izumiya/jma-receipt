@@ -897,6 +897,10 @@
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    在医総・在医総管（ＤＵＭＭＹ）
            03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    処方（乳幼児）加算
+           03  FILLER          PIC X(09)   VALUE   "120002170".
+      *    処方せん（乳幼児）加算
+           03  FILLER          PIC X(09)   VALUE   "120002470".
       *
       *    再診（夜間・早朝等）加算
            03  FILLER          PIC X(09)   VALUE   "112015570".
@@ -910,14 +914,11 @@
            03  FILLER          PIC X(09)   VALUE   "112014370".
       *    再診（乳幼児時間外特例医療機関）加算
            03  FILLER          PIC X(09)   VALUE   "112015070".
-      *    処方（乳幼児）加算
-           03  FILLER          PIC X(09)   VALUE   "120002170".
       *    処方せん料（７種類以上）
            03  FILLER          PIC X(09)   VALUE   "120002710".
       *    処方せん料（その他）
            03  FILLER          PIC X(09)   VALUE   "120002910".
-      *    処方せん（乳幼児）加算
-           03  FILLER          PIC X(09)   VALUE   "120002470".
+      *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
             03  TBL-NOSRYCD     PIC X(09)   OCCURS   72.       
       *
