@@ -240,6 +240,7 @@
       *  04.03.02    NACL-ÌçÏÆ    08/11/26  Ê¼¸Ë¸©°å»Õ¹ñÊÝÁÈ¹ç¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *  04.03.03    NACL-ÌçÏÆ    08/12/08  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ½¤Àµ
       *  04.03.04    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.03.05    NACL-ÌçÏÆ    09/01/14  ËÌ³¤Æ»ÆÃÄê¼À´µÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -11323,21 +11324,21 @@
            END-IF
       *
       *    ËÌ³¤Æ»ÆÃÄê¼À´µ
-           IF   (WK-1001-PREFNUM          =  01     )
-           AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
-              IF     SYU-KOH1HKNNUM  =  "183"
-                PERFORM   220142-KOHINF-HENSYU1-SEC
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "183"
-                PERFORM   220142-KOHINF-HENSYU2-SEC
-              END-IF
-              IF     SYU-KOH3HKNNUM  =  "183"
-                PERFORM   220142-KOHINF-HENSYU3-SEC
-              END-IF
-              IF     SYU-KOH4HKNNUM  =  "183"
-                PERFORM   220142-KOHINF-HENSYU4-SEC
-              END-IF
-           END-IF
+      **   IF   (WK-1001-PREFNUM          =  01     )
+      **   AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
+      **      IF     SYU-KOH1HKNNUM  =  "183"
+      **        PERFORM   220142-KOHINF-HENSYU1-SEC
+      **      END-IF
+      **      IF     SYU-KOH2HKNNUM  =  "183"
+      **        PERFORM   220142-KOHINF-HENSYU2-SEC
+      **      END-IF
+      **      IF     SYU-KOH3HKNNUM  =  "183"
+      **        PERFORM   220142-KOHINF-HENSYU3-SEC
+      **      END-IF
+      **      IF     SYU-KOH4HKNNUM  =  "183"
+      **        PERFORM   220142-KOHINF-HENSYU4-SEC
+      **      END-IF
+      **   END-IF
       *
       *    °ñ¾ë¸©¡¢Ä»¼è¸©
            IF   WK-1001-PREFNUM          =  08 OR 31
@@ -17094,12 +17095,12 @@
                IF  (  FLG-ZENKI-TOKUREI           =   1             )
                AND (( LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051"          )
                  OR ((WK-1001-PREFNUM             =  13           ) AND
-                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "151" OR "451"))
+                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "151" OR "451")))
       **>        OR ((WK-1001-PREFNUM             =  28           ) AND
       **>            (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "186"         ))
-                 OR ((WK-1001-PREFNUM             =  01           ) AND
-                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "183"         ) AND
-                     (LNK-SYU-SRYYMD(1:6)        >= "200810"      )))
+      **         OR ((WK-1001-PREFNUM             =  01           ) AND
+      **             (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "183"         ) AND
+      **             (LNK-SYU-SRYYMD(1:6)        >= "200810"      )))
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY
                                    =  WK-ZENGAKU  *  0.2
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
