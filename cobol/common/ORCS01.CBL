@@ -11958,21 +11958,21 @@
            END-IF
       *
       *    ËÌ³¤Æ»ÆÃÄê¼À´µ
-           IF   (WK-1001-PREFNUM          =  01     )
-           AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
-              IF     SYU-KOH1HKNNUM  =  "183"
-                PERFORM   220272-KOHINF-HENSYU1-SEC
-              END-IF
-              IF     SYU-KOH2HKNNUM  =  "183"
-                PERFORM   220272-KOHINF-HENSYU2-SEC
-              END-IF
-              IF     SYU-KOH3HKNNUM  =  "183"
-                PERFORM   220272-KOHINF-HENSYU3-SEC
-              END-IF
-              IF     SYU-KOH4HKNNUM  =  "183"
-                PERFORM   220272-KOHINF-HENSYU4-SEC
-              END-IF
-           END-IF
+      **   IF   (WK-1001-PREFNUM          =  01     )
+      **   AND  (LNK-SYU-SRYYMD(1:6)     >= "200810")
+      **      IF     SYU-KOH1HKNNUM  =  "183"
+      **        PERFORM   220272-KOHINF-HENSYU1-SEC
+      **      END-IF
+      **      IF     SYU-KOH2HKNNUM  =  "183"
+      **        PERFORM   220272-KOHINF-HENSYU2-SEC
+      **      END-IF
+      **      IF     SYU-KOH3HKNNUM  =  "183"
+      **        PERFORM   220272-KOHINF-HENSYU3-SEC
+      **      END-IF
+      **      IF     SYU-KOH4HKNNUM  =  "183"
+      **        PERFORM   220272-KOHINF-HENSYU4-SEC
+      **      END-IF
+      **   END-IF
       *
       *    °ñ¾ë¸©¡¢Ä»¼è¸©
            IF   WK-1001-PREFNUM          =  08 OR 31
