@@ -38,6 +38,7 @@
       *  04.03.02    NACL-門脇    08/07/14  投薬剤点０（院外等）記載対応
       *  04.03.03    NACL-門脇    08/12/01  在宅（院外分）編集修正
       *  04.03.04    NACL-門脇    09/01/15  処方（乳幼児）加算編集対応
+      *                                     処方せん（乳幼児）加算編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -671,10 +672,13 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    処方（乳幼児）加算
            03  FILLER          PIC X(09)   VALUE   "120002170".
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   63.       
+      *    処方せん（乳幼児）加算
+           03  FILLER          PIC X(09)   VALUE   "120002470".
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   63.         
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   64.       
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   64.         
       *
       *    固定値
        01  CONST-AREA.
