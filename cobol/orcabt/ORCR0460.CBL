@@ -683,13 +683,13 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    処方（乳幼児）加算
            03  FILLER          PIC X(09)   VALUE   "120002170".
-      *    処方せん（乳幼児）加算
-           03  FILLER          PIC X(09)   VALUE   "120002470".
+      ***  処方せん（乳幼児）加算
+      ***  03  FILLER          PIC X(09)   VALUE   "120002470".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   52.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   51.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   52.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   51.
       *
       *    固定値
        01  CONST-AREA.
