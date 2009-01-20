@@ -272,6 +272,7 @@
       *  04.03.03    NACL-門脇    08/12/08  福岡県地方公費対応修正
       *  04.03.04    NACL-門脇    08/12/09  大阪府地方公費対応
       *  04.03.05    NACL-門脇    08/12/16  平成２１年１月改正対応
+      *  04.03.06    NACL-門脇    09/01/20  大阪府地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9615,7 +9616,7 @@
                        ( LNK-SYU-KOH2HKNNUM  = "972" OR "974" ) AND
                        ( COMB-KOH1HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                   OR "190" OR "280" OR "282" ) AND
+                          OR "286" OR "190" OR "280" OR "282" ) AND
                        ( LNK-S01-SAIKEISAN-KBN   =   "1"      ) AND
                        ( LNK-SYU-DENPNUM     NOT =  ZERO      ) AND
                        ( LNK-SYU-DENPNUM      <  SYU-DENPNUM  ))
@@ -10302,10 +10303,10 @@
                        ( LNK-SYU-KOH3HKNNUM  = "972" OR "974" ) AND
                        ((COMB-KOH1HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                   OR "190" OR "280" OR "282") OR
+                          OR "286" OR "190" OR "280" OR "282") OR
                         (COMB-KOH2HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                   OR "190" OR "280" OR "282")) AND
+                          OR "286" OR "190" OR "280" OR "282")) AND
                        ( LNK-S01-SAIKEISAN-KBN   =   "1"      ) AND
                        ( LNK-SYU-DENPNUM     NOT =  ZERO      ) AND
                        ( LNK-SYU-DENPNUM      <  SYU-DENPNUM  ))
@@ -10959,13 +10960,13 @@
                        ( LNK-SYU-KOH4HKNNUM  = "972" OR "974" ) AND
                        ((COMB-KOH1HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                   OR "190" OR "280" OR "282") OR
+                          OR "286" OR "190" OR "280" OR "282") OR
                         (COMB-KOH2HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                   OR "190" OR "280" OR "282") OR
+                          OR "286" OR "190" OR "280" OR "282") OR
                         (COMB-KOH3HKNNUM     = "180" OR "182"
                           OR "186" OR "187" OR "188" OR "189"
-                                   OR "190" OR "280" OR "282")) AND
+                          OR "286" OR "190" OR "280" OR "282")) AND
                        ( LNK-S01-SAIKEISAN-KBN   =   "1"      ) AND
                        ( LNK-SYU-DENPNUM     NOT =  ZERO      ) AND
                        ( LNK-SYU-DENPNUM      <  SYU-DENPNUM  ))
@@ -14566,17 +14567,20 @@
            IF     WK-1001-PREFNUM       =   27
              IF   COMB-KOH1HKNNUM       =  "180" OR "182" OR "186" OR
                                            "187" OR "188" OR "189" OR
-                                           "190" OR "280" OR "282"
+                                           "190" OR "280" OR "282" OR
+                                           "286"
                   PERFORM    23081-ZANOKIKAE-HENSYU1-SEC
              END-IF
              IF   COMB-KOH2HKNNUM       =  "180" OR "182" OR "186" OR
                                            "187" OR "188" OR "189" OR
-                                           "190" OR "280" OR "282"
+                                           "190" OR "280" OR "282" OR
+                                           "286"
                   PERFORM    23082-ZANOKIKAE-HENSYU2-SEC
              END-IF
              IF   COMB-KOH3HKNNUM       =  "180" OR "182" OR "186" OR
                                            "187" OR "188" OR "189" OR
-                                           "190" OR "280" OR "282"
+                                           "190" OR "280" OR "282" OR
+                                           "286"
                   PERFORM    23083-ZANOKIKAE-HENSYU3-SEC
              END-IF
            END-IF
