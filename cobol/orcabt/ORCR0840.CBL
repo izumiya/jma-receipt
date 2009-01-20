@@ -4796,10 +4796,20 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                 MOVE  "3"     TO   RECE82-SHOSHINTIME
                         END-EVALUATE
                       END-IF
-                      IF  TNS-CHUKSNTUBAN  NOT = "0"
-                          CONTINUE
+                      IF    RECE82-KOMUKBN  =   "2"
+                        IF  TNS-CHUKSNTUBAN  NOT = "0"
+                            CONTINUE
+                        ELSE
+                            ADD   WK-ZAIKAISU  TO   RECE82-KAISU(1)
+                        END-IF
                       ELSE
-                          ADD   WK-ZAIKAISU   TO   RECE82-KAISU(1)
+                        IF  TNS-DATAKBN  =   2
+                          IF   SRY-SRYCD(IDX3) = "111012370"
+                            CONTINUE
+                          ELSE
+                            ADD   WK-ZAIKAISU  TO   RECE82-KAISU(1)
+                          END-IF
+                        END-IF
                       END-IF
                       COMPUTE   RECE82-TENSU(1)    =
                                 RECE82-TENSU(1)    +
