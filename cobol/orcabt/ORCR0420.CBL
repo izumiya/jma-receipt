@@ -4782,13 +4782,13 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                     WRK-KINGAKU-JI   +
                                (WRK-TNS-TEN(IDX3)    * ACCT-ZAIKAISU)
                      ELSE
-                         IF ( SRY-SRYCD(IDX3)     =   CONS-KEIZOKU1  OR
-                                                      CONS-KEIZOKU2 )
-                         OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"  )
-                             CONTINUE
-                         ELSE
+      **                 IF ( SRY-SRYCD(IDX3)     =   CONS-KEIZOKU1  OR
+      **                                              CONS-KEIZOKU2 )
+      **                 OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"  )
+      **                     CONTINUE
+      **                 ELSE
                              ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
-                         END-IF
+      **                 END-IF
                          IF  WRK-PARA-JIBAIPRTKBN = "1"
                           IF    RECE41-KHNTEN(2)   =   ZERO
                             MOVE WRK-TNS-TEN(IDX3) TO RECE41-KHNTEN(2)
@@ -5544,10 +5544,20 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                               MOVE  "3"     TO   RECE41-SHOSHINTIME
                         END-EVALUATE
                       END-IF
-                      IF  WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
-                          CONTINUE
+                      IF    RECE41-KOMUKBN  =   "2"
+                        IF  WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
+                            CONTINUE
+                        ELSE
+                            ADD   WK-ZAIKAISU  TO   RECE41-KAISU(1)
+                        END-IF
                       ELSE
-                          ADD   WK-ZAIKAISU  TO   RECE41-KAISU(1)
+                        IF  WRK-TNS-DATAKBN(IDX3)  =   2
+                          IF   SRY-SRYCD(IDX3) = "111012370"
+                            CONTINUE
+                          ELSE
+                            ADD   WK-ZAIKAISU  TO   RECE41-KAISU(1)
+                          END-IF
+                        END-IF
                       END-IF
                       COMPUTE    RECE41-TENSU(1)    =
                                  RECE41-TENSU(1)    +
@@ -5590,10 +5600,14 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                              MOVE   1       TO    FLG-KHNTEN2-KO
                            END-IF
                          END-IF
-                         IF  WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
-                             CONTINUE
+                         IF    RECE41-KOMUKBN  =   "2"
+                           IF  WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
+                               CONTINUE
+                           ELSE
+                               ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
+                           END-IF
                          ELSE
-                             ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
+                               ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
                          END-IF
                          COMPUTE    RECE41-TENSU(2)   =
                                     RECE41-TENSU(2)   +
