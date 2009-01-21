@@ -87,6 +87,7 @@
       *  04.02.01    NACL-門脇    08/06/16  大阪府地方公費組み合わせ作成
       *  04.02.02    NACL-門脇    08/11/11  適用開始終了同一日対応
       *  04.03.01    NACL-門脇    08/12/08  公費単独の保険組み合わせ修正
+      *  04.03.02    NACL-門脇    09/01/21  長期併用の保険組み合わせ修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3972,45 +3973,57 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
       *          更生医療・小児特定・マル福がある場合、長期をつける
                  IF (( WRK-KCOMB-KOH1HKNNUM(IDX2)  = 
-                                         "015" OR "016" OR "019" OR
-                                         "051" OR "052" OR "091"   ) OR
+                       "010" OR "011" OR "015" OR "016" OR "019" OR
+                       "020" OR "021" OR "024" OR "038" OR "051" OR
+                       "052" OR "079" OR "091"                     ) OR
                      ((WRK-KCOMB-KOH1HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH1HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH1HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH2HKNNUM(IDX2)  =
-                                         "015" OR "016" OR "019" OR
-                                         "051" OR "052" OR "091"   ) OR
+                       "010" OR "011" OR "015" OR "016" OR "019" OR
+                       "020" OR "021" OR "024" OR "038" OR "051" OR
+                       "052" OR "079" OR "091"                     ) OR
                      ((WRK-KCOMB-KOH2HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH2HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH2HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH3HKNNUM(IDX2)  =
-                                         "015" OR "016" OR "019" OR
-                                         "051" OR "052" OR "091"   ) OR
+                       "010" OR "011" OR "015" OR "016" OR "019" OR
+                       "020" OR "021" OR "024" OR "038" OR "051" OR
+                       "052" OR "079" OR "091"                     ) OR
                      ((WRK-KCOMB-KOH3HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH3HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH3HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH4HKNNUM(IDX2)  =
-                                         "015" OR "016" OR "019" OR
-                                         "051" OR "052" OR "091"   ) OR
+                       "010" OR "011" OR "015" OR "016" OR "019" OR
+                       "020" OR "021" OR "024" OR "038" OR "051" OR
+                       "052" OR "079" OR "091"                     ) OR
                      ((WRK-KCOMB-KOH4HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH4HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH4HKNNUM(IDX2)(1:2)  =  "99"    ))   
       *
                    IF ((WRK-KCOMB-KOH1HKNNUM(IDX2)  NOT =
-                           "027" AND "015" AND "016" AND
-                           "019" AND "051" AND "052" AND "091"  ) AND
+                        "027" AND "010" AND "011" AND "015" AND
+                        "016" AND "019" AND "020" AND "021" AND
+                        "024" AND "038" AND "051" AND "052" AND
+                        "079" AND "091"                         ) AND
                        (WRK-KCOMB-KOH1HKNNUM(IDX2)(1:1) =  "0"  ))  OR
                       ((WRK-KCOMB-KOH2HKNNUM(IDX2)  NOT =
-                           "027" AND "015" AND "016" AND
-                           "019" AND "051" AND "052" AND "091"  ) AND
+                        "027" AND "010" AND "011" AND "015" AND
+                        "016" AND "019" AND "020" AND "021" AND
+                        "024" AND "038" AND "051" AND "052" AND
+                        "079" AND "091"                         ) AND
                        (WRK-KCOMB-KOH2HKNNUM(IDX2)(1:1) =  "0"  ))  OR
                       ((WRK-KCOMB-KOH3HKNNUM(IDX2)  NOT =
-                           "027" AND "015" AND "016" AND
-                           "019" AND "051" AND "052" AND "091"  ) AND
+                        "027" AND "010" AND "011" AND "015" AND
+                        "016" AND "019" AND "020" AND "021" AND
+                        "024" AND "038" AND "051" AND "052" AND
+                        "079" AND "091"                         ) AND
                        (WRK-KCOMB-KOH3HKNNUM(IDX2)(1:1) =  "0"  ))  OR
                       ((WRK-KCOMB-KOH4HKNNUM(IDX2)  NOT =
-                           "027" AND "015" AND "016" AND
-                           "019" AND "051" AND "052" AND "091"  ) AND
+                        "027" AND "010" AND "011" AND "015" AND
+                        "016" AND "019" AND "020" AND "021" AND
+                        "024" AND "038" AND "051" AND "052" AND
+                        "079" AND "091"                         ) AND
                        (WRK-KCOMB-KOH4HKNNUM(IDX2)(1:1) =  "0"  ))
                      CONTINUE
                    ELSE
