@@ -1657,6 +1657,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
            IF  ((RECE41-HKNKBN      =   "4") AND
                 (RECE41-JIBAIKBN    =   "2"))
+           OR  ((RECE41-HKNKBN      =   "5") AND
+                (RECE41-KOMUKBN     =   "2"))
              IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2) = "112000970"
                     MOVE     1     TO    FLG-NOPRT
              END-IF
