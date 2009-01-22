@@ -763,7 +763,7 @@
       *
       *    電子化加算等情報
        01  TBL-DENSHI-INF.
-         02    TBL-DENSHI-OCC              OCCURS   9.
+         02    TBL-DENSHI-OCC              OCCURS   7.
            03  TBL-DENSHI-FLG              PIC  9(01).
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-OCC2             OCCURS   5.
@@ -904,8 +904,8 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    処方（乳幼児）加算
            03  FILLER          PIC X(09)   VALUE   "120002170".
-      *    処方せん（乳幼児）加算
-           03  FILLER          PIC X(09)   VALUE   "120002470".
+      ***  処方せん（乳幼児）加算
+      ***  03  FILLER          PIC X(09)   VALUE   "120002470".
       *
       *    再診（夜間・早朝等）加算
            03  FILLER          PIC X(09)   VALUE   "112015570".
@@ -919,15 +919,11 @@
            03  FILLER          PIC X(09)   VALUE   "112014370".
       *    再診（乳幼児時間外特例医療機関）加算
            03  FILLER          PIC X(09)   VALUE   "112015070".
-      *    処方せん料（７種類以上）
-           03  FILLER          PIC X(09)   VALUE   "120002710".
-      *    処方せん料（その他）
-           03  FILLER          PIC X(09)   VALUE   "120002910".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   72.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   69.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   72.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   69.         
       *
       *    固定値
        01  CONST-AREA.
@@ -1504,7 +1500,7 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
       *        電子化加算等編集
                MOVE    ZERO      TO    FLG-TEIGEN
                PERFORM  VARYING  IDX6   FROM   1   BY  1
-                         UNTIL   IDX6    >     9
+                         UNTIL   IDX6    >     7
                  IF      TBL-DENSHI-FLG(IDX6)  =   1
                    PERFORM 2010-DENSHI-HENSYU-SEC
                  END-IF
@@ -2747,14 +2743,7 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
       *
                IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                                 =   TBL-NOSRYCD (IDY)
-                 IF  ( RECE02-SRYYM   <  "200804"          )
-                 AND ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                          =   "120002710"  OR  "120002910"
-                                           OR  "120002470" )
-                   MOVE   ZERO               TO  FLG-NOPRT
-                 ELSE
                    MOVE    1                 TO  FLG-NOPRT
-                 END-IF
                END-IF
            END-PERFORM
       *
@@ -2780,25 +2769,6 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
                    MOVE    1                 TO  FLG-NOPRT
                 END-IF
               END-IF
-           END-IF
-      *
-           IF  ( RECE02-SRYYM   >=  "200804"           )
-           AND ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                      =   "120002710"  OR  "120002910" )
-      *
-             EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-               WHEN       "120002710"
-                  MOVE     8     TO     IDX6
-               WHEN       "120002910"
-                  MOVE     9     TO     IDX6
-             END-EVALUATE
-      *
-             MOVE     1              TO  TBL-DENSHI-FLG(IDX6)
-             MOVE  TBL-ZAIW-TEN (WRK-WIDX1 WRK-WIDX2)
-                                     TO  TBL-DENSHI-TEN(IDX6)
-             COMPUTE  IDX5  =  RECE04-KOHBUNRI + 1
-             ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX6 IDX5)
-      *
            END-IF
       *
            .
@@ -3840,8 +3810,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                  WHEN      1
                  WHEN      2
                  WHEN      7
-                 WHEN      8
-                 WHEN      9
       *
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    TBL-DENSHI-TEN(IDX6)  TO  WRK-ZAITENX
@@ -3860,12 +3828,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                      WHEN      7
                        MOVE  "再診（夜間・早朝等）加算"
                                              TO  WRK-ZAI-NAME(1:24)
-                     WHEN      8
-                       MOVE  "処方せん料（７種類以上）"
-                                             TO  WRK-ZAI-NAME(1:24)
-                     WHEN      9
-                       MOVE  "処方せん料（その他）"
-                                             TO  WRK-ZAI-NAME(1:20)
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
@@ -3945,10 +3907,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                COMPUTE RECE06-ZAINUM   = 99994050 + IDX5
              WHEN     7
                COMPUTE RECE06-ZAINUM   = 99994060 + IDX5
-             WHEN     8
-               COMPUTE RECE06-ZAINUM   = 99994070 + IDX5
-             WHEN     9
-               COMPUTE RECE06-ZAINUM   = 99994080 + IDX5
            END-EVALUATE
       *
            MOVE    1                 TO  RECE06-ZAIMEISAISU
@@ -3966,9 +3924,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
              WHEN     6
              WHEN     7
                 MOVE    "12"         TO  RECE06-SRYKBN
-             WHEN     8
-             WHEN     9
-                MOVE    "80"         TO  RECE06-SRYKBN
            END-EVALUATE
       *
            MOVE    99999999          TO  RECE06-ZAITEN
@@ -3989,28 +3944,11 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                 MOVE    99           TO  RECE06-CDKBN-KBNNUM-EDA
                 MOVE    99           TO  RECE06-CDKBN-KOUBAN
                 MOVE    999999999    TO  RECE06-KOUHYOJUNNUM
-             WHEN     8
-                MOVE    2            TO  RECE06-CDKBN-SYO
-                MOVE    05           TO  RECE06-CDKBN-BU
-                MOVE    "F"          TO  RECE06-CDKBN-KBN
-                MOVE    400          TO  RECE06-CDKBN-KBNNUM
-                MOVE    00           TO  RECE06-CDKBN-KBNNUM-EDA
-                MOVE    01           TO  RECE06-CDKBN-KOUBAN
-                MOVE    028250000    TO  RECE06-KOUHYOJUNNUM
-             WHEN     9
-                MOVE    2            TO  RECE06-CDKBN-SYO
-                MOVE    05           TO  RECE06-CDKBN-BU
-                MOVE    "F"          TO  RECE06-CDKBN-KBN
-                MOVE    400          TO  RECE06-CDKBN-KBNNUM
-                MOVE    00           TO  RECE06-CDKBN-KBNNUM-EDA
-                MOVE    02           TO  RECE06-CDKBN-KOUBAN
-                MOVE    028270000    TO  RECE06-KOUHYOJUNNUM
            END-EVALUATE
       *
            MOVE    SPACE             TO  RECE06-SAFLG
            MOVE    SPACE             TO  RECE06-SRYSYUKBN
            MOVE    ZERO              TO  RECE06-DAY
-           MOVE    ZERO              TO  RECE06-SYOHOUFLG
       *
            WRITE   RECE06-REC
            ADD     1                 TO  CNT-RECE06
