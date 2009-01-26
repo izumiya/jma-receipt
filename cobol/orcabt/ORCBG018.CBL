@@ -110,6 +110,8 @@
        01  WRK-AREA.
            03  WRK-RECEERR         PIC X(200).
            03  WRK-SYMD            PIC X(08).
+           03  WRK-ZOGENPTN        PIC X(01).
+           03  WRK-ZOGEN           PIC S9(05).
            03  WRK-EDTYMD1         PIC X(10).
            03  WRK-EDTYMD3         PIC X(22).
            03  WRK-YUKOEDYMD-N     PIC X(22).
@@ -394,17 +396,30 @@
                MOVE    WRK-PARA-SRYYMD TO  WRK-SYMD
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( TNS-YUKOEDYMD   =   WRK-PARA-SRYYMD )
-                   PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
-                   IF    ( FLG-SRYCDCHG        =   ZERO )
-                       PERFORM 900-CHKSND-KEY-SEL-SEC
-                       IF    ( FLG-WKCHKSND    =   ZERO )
-                           MOVE    "1"     TO  WRK-MSTKBN
-                           MOVE    "1"     TO  WRK-PROCKBN
-                           PERFORM 2001-IN01-EDIT-SEC
+                   MOVE    "1"             TO  WRK-ZOGENPTN
+                   MOVE    1               TO  WRK-ZOGEN
+                   MOVE    WRK-PARA-SRYYMD TO  WRK-SYMD
+                   PERFORM 800-CALENDAR-SEC
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       =   ZERO )
+                       CONTINUE
+                   ELSE
+                       PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
+                       IF    ( FLG-SRYCDCHG        =   ZERO )
+                           PERFORM 900-CHKSND-KEY-SEL-SEC
+                           IF    ( FLG-WKCHKSND    =   ZERO )
+                               MOVE    "1"     TO  WRK-MSTKBN
+                               MOVE    "1"     TO  WRK-PROCKBN
+                               PERFORM 2001-IN01-EDIT-SEC
+                           ELSE
+                               PERFORM 2001-CHKSND-EDIT-SEC
+                               MOVE    "1"     TO  WRK-MSTKBN
+                               MOVE    ZERO    TO  WRK-PROCKBN
+                               PERFORM 2001-IN01-EDIT-SEC
+                           END-IF
                        ELSE
-                           PERFORM 2001-CHKSND-EDIT-SEC
-                           MOVE    "1"     TO  WRK-MSTKBN
-                           MOVE    ZERO    TO  WRK-PROCKBN
+                           MOVE    "1"         TO  WRK-MSTKBN
+                           MOVE    "1"         TO  WRK-PROCKBN
                            PERFORM 2001-IN01-EDIT-SEC
                        END-IF
                    END-IF
@@ -470,17 +485,30 @@
                MOVE    WRK-PARA-SRYYMD  TO  WRK-SYMD
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( TNS-YUKOEDYMD   =   WRK-PARA-SRYYMD )
-                   PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
-                   IF    ( FLG-SRYCDCHG        =   ZERO )
-                       PERFORM 900-YAKUJYO-KEY-SEL-SEC
-                       IF    ( FLG-WKYAKUJYO    =   ZERO )
+                   MOVE    "1"             TO  WRK-ZOGENPTN
+                   MOVE    1               TO  WRK-ZOGEN
+                   MOVE    WRK-PARA-SRYYMD TO  WRK-SYMD
+                   PERFORM 800-CALENDAR-SEC
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       =   ZERO )
+                       CONTINUE
+                   ELSE
+                       PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
+                       IF    ( FLG-SRYCDCHG        =   ZERO )
+                           PERFORM 900-YAKUJYO-KEY-SEL-SEC
+                           IF    ( FLG-WKYAKUJYO    =   ZERO )
+                               MOVE    "2"     TO  WRK-MSTKBN
+                               MOVE    "1"     TO  WRK-PROCKBN
+                               PERFORM 2001-IN01-EDIT-SEC
+                           ELSE
+                               PERFORM 2001-YAKUJYO-EDIT-SEC
+                               MOVE    "2"     TO  WRK-MSTKBN
+                               MOVE    ZERO    TO  WRK-PROCKBN
+                               PERFORM 2001-IN01-EDIT-SEC
+                           END-IF
+                       ELSE
                            MOVE    "2"     TO  WRK-MSTKBN
                            MOVE    "1"     TO  WRK-PROCKBN
-                           PERFORM 2001-IN01-EDIT-SEC
-                       ELSE
-                           PERFORM 2001-YAKUJYO-EDIT-SEC
-                           MOVE    "2"     TO  WRK-MSTKBN
-                           MOVE    ZERO    TO  WRK-PROCKBN
                            PERFORM 2001-IN01-EDIT-SEC
                        END-IF
                    END-IF
@@ -849,6 +877,24 @@ grpsys                                 SPA-AREA
                                        ORCSMCNDATEAREA
            .
        800-MCNDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    カレンダー処理
+      *****************************************************************
+       800-CALENDAR-SEC               SECTION.
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY6-AREA
+           MOVE    "61"                TO  LNK-DAY6-IRAI
+           MOVE    WRK-SYMD            TO  LNK-DAY6-KIJUN
+           MOVE    WRK-ZOGENPTN        TO  LNK-DAY6-ZOGENPTN
+           MOVE    WRK-ZOGEN           TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"             USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+           MOVE    LNK-DAY6-KEISAN     TO  WRK-SYMD
+      *
+           .
+       800-CALENDAR-EXT.
            EXIT.
       *****************************************************************
       *    経過措置薬剤情報読込み処理
