@@ -40,6 +40,7 @@
       *  04.03.02    NACL-藤原    08/08/22  リアルタイムプレビュー時の表示
       *  04.03.03    NACL-藤原    08/08/29  記号番号の記載方法の変更
       *  04.03.04    NACL-藤原    09/01/16  症状詳記区分の表題の変更
+      *  04.03.05    NACL-門脇    09/02/04  請求点が０の場合の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3016,6 +3017,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    HIGH-VALUE          TO  KEY-NEW
                NOT AT  END
                    MOVE    ZERO                TO  FLG-RECE100
+      *
+                   IF    RECE100-TOTALTEN(3)  =   ZERO
+                       GO  TO  990-RECE100-READ-SEC
+                   END-IF
+      *
                    DISPLAY "RECE100  PTNUM=" RECE100-PTNUM     
       *
                    ADD     1                   TO  CNT-RECE100

@@ -54,6 +54,7 @@
       *
       *  04.03.01    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
       *  04.03.02    NACL-藤原    09/01/16  症状詳記区分の表題の変更
+      *  04.03.03    NACL-門脇    09/02/04  請求点が０の場合の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2589,6 +2590,13 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    IF    ( RECE41-PTNUM        =   SPACE  )
                    OR    ( RECE41-HKNKBN       =   "4"    )
                    OR    ( RECE41-RECESYUBETU  =   "0000" )
+      *
+                       IF    ( RECE41-TOTALKIN-JYU  =   ZERO )
+                       AND   ( RECE41-SONOTAKIN-JYU =   ZERO )
+                       AND   ( RECE41-SINDAN-KIN    =   ZERO )
+                       AND   ( RECE41-MEISAI-KIN    =   ZERO )
+                               GO  TO  990-RECE41-READ-SEC
+                       END-IF
       *
                        DISPLAY "RECE41  PTNUM=" RECE41-PTNUM
       *

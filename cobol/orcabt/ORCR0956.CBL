@@ -54,6 +54,7 @@
       *
       *  04.03.01    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
       *  04.03.02    NACL-藤原    09/01/16  症状詳記区分の表題の変更
+      *  04.03.03    NACL-門脇    09/02/04  請求点が０の場合の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2921,6 +2922,15 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                    IF      RECE82-PTNUM        =   SPACE
                    OR      RECE82-HKNKBN       =   "4"
                    OR      RECE82-RECESYUBETU  =   "0000"
+      *
+                       IF    ( RECE82-TOTALKIN-JYU     =   ZERO )
+                       AND   ( RECE82-SHOKUJITOTALKIN  =   ZERO )
+                       AND   ( RECE82-SINDAN-KIN       =   ZERO )
+                       AND   ( RECE82-MEISAI-KIN       =   ZERO )
+                       AND   ( RECE82-SITURYO-JYU      =   ZERO )
+                       AND   ( RECE82-SONOTAKIN-JYU    =   ZERO )
+                               GO  TO  990-RECE82-READ-SEC
+                       END-IF
       *
                        DISPLAY "RECE82  PTNUM=" RECE82-PTNUM
       *

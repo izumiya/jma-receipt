@@ -47,6 +47,7 @@
       *                                     全て記載する
       *  04.03.03    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
       *  04.03.04    NACL-藤原    09/01/16  症状詳記区分の表題の変更
+      *  04.03.05    NACL-門脇    09/02/04  請求点が０の場合の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2977,6 +2978,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
                    IF      RECE82-HKNKBN           =   "2"
                    AND     RECE82-RECESYUBETU  NOT =    "0000"
+      *
+                       IF    ( RECE82-TOTALKIN         =   ZERO )
+                       AND   ( RECE82-KINGAKU2-SYO     =   ZERO )
+                       AND   ( RECE82-SHOKUJITOTALKIN  =   ZERO )
+                               GO  TO  990-RECE82-READ-SEC
+                       END-IF
       *
                        DISPLAY "RECE82  PTNUM=" RECE82-PTNUM
       *
