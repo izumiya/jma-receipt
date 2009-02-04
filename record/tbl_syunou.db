@@ -1333,3 +1333,25 @@ path	key60 	{
 	};
 };
 
+path	key65 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_key65_csr CURSOR FOR
+		SELECT distinct a.*
+		FROM tbl_syunou a,tbl_syumei b
+		WHERE  a.HOSPNUM      = :HOSPNUM
+		AND    a.NYUGAIKBN   LIKE :NYUGAIKBN
+		AND    a.PTID        = :PTID
+		AND    a.CREATEKBN   <> '3'
+		AND    a.HOSPNUM      = b.HOSPNUM
+		AND    a.NYUGAIKBN   = b.NYUGAIKBN
+		AND    a.PTID        = b.PTID
+		AND    a.DENPNUM     = b.DENPNUM
+		AND ((   b.NYUHEN_YMD  >= :SKYSTYMD
+		    AND  b.NYUHEN_YMD  <= :SKYEDYMD )
+		  OR (   a.SRYYMD      >= :SKYSTYMD
+		    AND  a.SRYYMD      <= :SKYEDYMD ))
+		ORDER  BY    a.SRYYMD,a.NYUGAIKBN,a.DENPNUM
+		;
+	};
+};
+
