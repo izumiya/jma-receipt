@@ -88,6 +88,8 @@
       *
       *    一時領域
        01  WRK-AREA.
+           03  WRK-TABLE           PIC X(64).
+           03  WRK-PATHNAME        PIC X(64).
            03  WRK-SYMD.
                05  WRK-SYY         PIC 9(04).
                05  WRK-SMM         PIC 9(02).
@@ -390,6 +392,14 @@
       *****************************************************************
        210-HENSYU-SEC              SECTION.
       *
+           IF    ( ORCHCM31-KIKANKBN   =   "2" )
+               MOVE    "tbl_syunou"    TO  WRK-TABLE
+               MOVE    "key50"         TO  WRK-PATHNAME
+           ELSE
+               MOVE    "tbl_syunou"    TO  WRK-TABLE
+               MOVE    "key65"         TO  WRK-PATHNAME
+           END-IF
+      *
       *    収納マスター読み込み
            PERFORM 900-SYUNOU-SELECT-SEC
       *
@@ -414,8 +424,8 @@
       *
            END-PERFORM
       *
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key50"         TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -1239,8 +1249,8 @@
            END-EVALUATE
       *
            MOVE    SYUNOU-REC      TO  MCPDATA-REC
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key50"         TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
       *
            PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
@@ -1265,8 +1275,8 @@
            PERFORM UNTIL ( FLG-SYUNOU      NOT =   ZERO )
                     OR   ( FLG-LOOP-END    NOT =   ZERO )
       *
-               MOVE    "tbl_syunou"    TO  MCP-TABLE
-               MOVE    "key50"         TO  MCP-PATHNAME
+               MOVE    WRK-TABLE       TO  MCP-TABLE
+               MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC          =   ZERO )
                    MOVE    MCPDATA-REC TO  SYUNOU-REC
