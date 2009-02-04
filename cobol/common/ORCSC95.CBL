@@ -4173,6 +4173,9 @@
       **   MOVE    SPACE               TO  PARA-REC
       **   WRITE   PARA-REC
       *
+      *    排他中は作成無し
+           IF      SPA-LOCK            =   ZERO
+      *
       *    ワーク診療行為データから作成 
            PERFORM 4902-WKBUNSAN-SEC
       *
@@ -4189,6 +4192,8 @@
                IF     LNK-SC95-WKSRYACT    =   1
                    MOVE    2               TO  LNK-SC95-WKSRYACT
                END-IF 
+           END-IF
+      *
            END-IF
       *
            CLOSE                       PARA-FILE
