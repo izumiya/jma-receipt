@@ -72,6 +72,7 @@
       *  04.02.02    NACL-藤原    08/04/18  「レセ電通信医２０００６号」
       *                                     症状詳記区分コード５２の追加
       *  04.02.03    NACL-藤原    09/01/16  症状詳記区分の表題の変更
+      *  04.02.04    NACL-門脇    09/02/04  請求点が０の場合の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2660,6 +2661,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    ZERO                TO  FLG-RECE41
                    IF    ( RECE41-HKNKBN           =   "2"    )
                    AND   ( RECE41-RECESYUBETU  NOT =   "0000" )
+      *
+                       IF    ( RECE41-TOTALKIN     =   ZERO )
+                       AND   ( RECE41-TOTALKIN2    =   ZERO )
+                               GO  TO  990-RECE41-READ-SEC
+                       END-IF
       *
                        DISPLAY "RECE41  PTNUM=" RECE41-PTNUM
       *
