@@ -1280,24 +1280,6 @@
       *        END-IF
       *****END-IF
       *
-      *    ¹ñÊÝ¤ÎÁ°´ü¹âÎð¼Ô¤ÎÊä½õ¶èÊ¬È½Äê
-           IF    ( SPA-GMN-HKNNUM      =   "060"  OR  "068"  )  AND
-                 ( SPA-NAI-BIRTHDAY    >   "19320930"        )  AND
-                 ((SPA-NAI-HTEKSTYMD   >=  "20021001"   ) AND
-                  (SPA-NAI-HTEKSTYMD   >=  SPA-BYMD-70  )    )
-               IF      (SPA-GMN-HOJOKBN    =   "3"  OR  "6")
-      *            £È£±£¸¡¥£±£° ²þÀµ ¥Á¥§¥Ã¥¯¤Ê¤·
-                   IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
-                       CONTINUE
-                   ELSE
-      *
-                   MOVE    "1066"          TO  SPA-ERRCD
-                   MOVE    11              TO  SPA-GMN-CUR
-                   GO      TO      1001-HOJOKBN-CHK-EXT
-                   END-IF
-               END-IF
-           END-IF
-      *
       *    Á¥°÷²ÈÂ²¤ÇÏ·¿Í°Ê³°»þ¡¢Êä½õ¶èÊ¬¤ÏÆþÎÏ¤Ç¤­¤Ê¤¤
            IF     (SPA-GMN-HONKZKKBN   =   "2"       ) AND
                   (SPA-GMN-HKNNUM      =   "002"     )
@@ -1306,30 +1288,6 @@
                    MOVE    "1065"          TO  SPA-ERRCD
                    MOVE    11              TO  SPA-GMN-CUR
                    GO      TO      1001-HOJOKBN-CHK-EXT
-               END-IF
-      *        Ï·¿Í
-      *        £È£±£¸¡¥£±£° ²þÀµ
-               IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
-                   IF      (SPA-GMN-HOJO-MAX    =   8      )
-                       IF     (SPA-GMN-HOJOKBN     =   "7"
-                                                   OR  "9")
-                           CONTINUE
-                       ELSE
-                           MOVE    "1066"          TO  SPA-ERRCD
-                           MOVE    11              TO  SPA-GMN-CUR
-                       END-IF
-                   END-IF
-               ELSE
-                   IF      (SPA-NAI-HTEKSTYMD  NOT =   SPACE )
-                      AND  (SPA-GMN-HOJO-MAX       =   8     )
-                       IF     (SPA-GMN-HOJOKBN     =   "8"
-                                                   OR  "9")
-                           CONTINUE
-                       ELSE
-                           MOVE    "1066"          TO  SPA-ERRCD
-                           MOVE    11              TO  SPA-GMN-CUR
-                       END-IF
-                   END-IF
                END-IF
            END-IF
            IF      SPA-ERRCD       NOT =   SPACE
@@ -1347,23 +1305,6 @@
                    MOVE    "1065"          TO  SPA-ERRCD
                    MOVE    11              TO  SPA-GMN-CUR
                    GO      TO      1001-HOJOKBN-CHK-EXT
-               END-IF
-      *        Ï·¿Í
-      *        £È£±£¸¡¥£±£° ²þÀµ
-               IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
-                   IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
-                           (SPA-GMN-HOJOKBN     =   "B"   OR
-                                                    "H"   )
-                       MOVE    "1066"          TO  SPA-ERRCD
-                       MOVE    11              TO  SPA-GMN-CUR
-                   END-IF
-               ELSE
-                   IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
-                           (SPA-GMN-HOJOKBN     =   "B"   OR
-                                                    "E"   )
-                       MOVE    "1066"          TO  SPA-ERRCD
-                       MOVE    11              TO  SPA-GMN-CUR
-                   END-IF
                END-IF
            END-IF
            IF      SPA-ERRCD       NOT =   SPACE
@@ -2228,8 +2169,89 @@
            END-IF
       *
       *
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 20031-HOJOKBN-YMD-SEC
+           END-IF
+      *
            .
        2003-HOJOKBN-SEICHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Êä½õ¶èÊ¬¤È³«»ÏÆü¤ÎÀ°¹çÀ­¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       20031-HOJOKBN-YMD-SEC         SECTION.
+      *
+      *    ¹ñÊÝ¤ÎÁ°´ü¹âÎð¼Ô¤ÎÊä½õ¶èÊ¬È½Äê
+           IF    ( SPA-GMN-HKNNUM      =   "060"  OR  "068"  )  AND
+                 ( SPA-NAI-BIRTHDAY    >   "19320930"        )  AND
+                 ((SPA-NAI-HTEKSTYMD   >=  "20021001"   ) AND
+                  (SPA-NAI-HTEKSTYMD   >=  SPA-BYMD-70  )    )
+               IF      (SPA-GMN-HOJOKBN    =   "3"  OR  "6")
+      *            £È£±£¸¡¥£±£° ²þÀµ ¥Á¥§¥Ã¥¯¤Ê¤·
+                   IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
+                       CONTINUE
+                   ELSE
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *    Á¥°÷²ÈÂ²
+           IF     (SPA-GMN-HONKZKKBN   =   "2"       ) AND
+                  (SPA-GMN-HKNNUM      =   "002"     )
+      *        Ï·¿Í
+      *        £È£±£¸¡¥£±£° ²þÀµ
+               IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
+                   IF      (SPA-GMN-HOJO-MAX    =   8      )
+                       IF     (SPA-GMN-HOJOKBN     =   "7"
+                                                   OR  "9")
+                           CONTINUE
+                       ELSE
+                           MOVE    "1066"          TO  SPA-ERRCD
+                           MOVE    11              TO  SPA-GMN-CUR
+                       END-IF
+                   END-IF
+               ELSE
+                   IF      (SPA-NAI-HTEKSTYMD  NOT =   SPACE )
+                      AND  (SPA-GMN-HOJO-MAX       =   8     )
+                       IF     (SPA-GMN-HOJOKBN     =   "8"
+                                                   OR  "9")
+                           CONTINUE
+                       ELSE
+                           MOVE    "1066"          TO  SPA-ERRCD
+                           MOVE    11              TO  SPA-GMN-CUR
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *    ¶¦ºÑ²ÈÂ²
+           IF     (SPA-GMN-HONKZKKBN   =   "2"       ) AND
+                  (SPA-GMN-HKNNUM      =   "031" OR
+                                           "032" OR
+                                           "033" OR
+                                           "034"     )
+      *        Ï·¿Í
+      *        £È£±£¸¡¥£±£° ²þÀµ
+               IF      SPA-NAI-HTEKSTYMD   >=  "20061001"
+                   IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
+                           (SPA-GMN-HOJOKBN     =   "B"   OR
+                                                    "H"   )
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
+               ELSE
+                   IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
+                           (SPA-GMN-HOJOKBN     =   "B"   OR
+                                                    "E"   )
+                       MOVE    "1066"          TO  SPA-ERRCD
+                       MOVE    11              TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       20031-HOJOKBN-YMD-EXT.
            EXIT.
       *
       *****************************************************************
