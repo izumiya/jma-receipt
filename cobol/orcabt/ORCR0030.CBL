@@ -387,6 +387,7 @@
       *  04.03.10    NACL-ÌçÏÆ    09/01/21  ¥Þ¥ëÄ¹Ê»ÍÑ»þÊÔ½¸½¤Àµ
       *  04.03.11    NACL-ÌçÏÆ    09/01/28  °ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *  04.03.12    NACL-ÌçÏÆ    09/01/28  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
+      *  04.03.13    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1898,7 +1899,11 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            END-PERFORM
            PERFORM     2106-JNISSU-SET-SEC                                   
            PERFORM     2107-KHNTEN-CLEAR-SEC
-           PERFORM     2108-BUNTENSU-CLEAR-SEC                               
+           IF    RECE02-SRYYM   >=  "200804"
+             CONTINUE
+           ELSE
+             PERFORM   2108-BUNTENSU-CLEAR-SEC
+           END-IF
            PERFORM     2109-SAIKEI-KEISAN-SEC
            PERFORM     2110-NYUYOJI-COMENTFLG-SET-SEC
            PERFORM     2111-ICHIBUFUTAN-OKIKAE-SEC

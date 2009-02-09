@@ -60,6 +60,7 @@
       *  04.03.12    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.13    NACL-ÌçÏÆ    09/01/15  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.14    NACL-Æ£¸¶    09/01/16  ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê¤ÎÊÑ¹¹
+      *  04.03.15    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5033,9 +5034,15 @@
                END-IF
                MOVE    WRK-TENSU                 TO  HC06-TENSU   (IDX)
                IF      IDX2                      >   ZERO
+                 IF   ( RECE62-HKNNUM                =  SPACE )
+                 OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                       (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                       (RECE62-HENTOTALTEN(IDX1) NOT =
+                                     RECE62-HENTOTALTEN(IDX2)))
                    MOVE    RECE62-TENSU(IDX IDX2)
                                                  TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN            TO  HC06-KOHTEN  (IDX)
+                 END-IF
                END-IF
            END-PERFORM
       *
@@ -5062,9 +5069,15 @@
                END-IF
                MOVE    WRK-TENSU             TO  HC06-NYUTENSU  (IDX)
                IF      IDX2                  >   ZERO
+                 IF   ( RECE62-HKNNUM                =  SPACE )
+                 OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                       (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                       (RECE62-HENTOTALTEN(IDX1) NOT =
+                                     RECE62-HENTOTALTEN(IDX2)))
                    MOVE    RECE62-NYUKHNKEI(IDX IDX2)
                                              TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN        TO  HC06-NYUKOHTEN (IDX)
+                 END-IF
                END-IF
            END-PERFORM
       *
@@ -5086,8 +5099,14 @@
                                                  TO  SUM-NYUKHNKEI (1)
                    END-IF
                    IF      IDX2                  >   ZERO
+                     IF   ( RECE62-HKNNUM                =  SPACE )
+                     OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                           (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                           (RECE62-HENTOTALTEN(IDX1) NOT =
+                                         RECE62-HENTOTALTEN(IDX2)))
                        ADD    RECE62-NYUKHNKEI(IDX IDX2)
                                                  TO  SUM-NYUKHNKEI (2)
+                     END-IF
                    END-IF
                END-PERFORM    
       *        <´ðËÜÎÁ>
@@ -5134,6 +5153,11 @@
              END-IF
            END-IF
            IF      IDX2                    >   ZERO
+             IF   ( RECE62-HKNNUM                =  SPACE )
+             OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                   (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                   (RECE62-HENTOTALTEN(IDX1) NOT =
+                                 RECE62-HENTOTALTEN(IDX2)))
                MOVE    RECE62-NYUKHNKEI2 (IDX2)
                                                TO  WRK-KOUTENZ
                MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (5)
@@ -5149,6 +5173,7 @@
                        END-IF
                    END-PERFORM
                END-IF
+             END-IF
            END-IF
       *     
       *        <ÆÃÄêÆþ±¡ÎÁ>
@@ -5183,9 +5208,15 @@
                    END-IF
                    MOVE    WRK-TENSU         TO  HC06-NYUTENSU  (IDY)
                    IF      IDX2              >   ZERO
+                     IF   ( RECE62-HKNNUM                =  SPACE )
+                     OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                           (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                           (RECE62-HENTOTALTEN(IDX1) NOT =
+                                         RECE62-HENTOTALTEN(IDX2)))
                        MOVE    RECE62-NYUTOKKEI(IDX IDX2)
                                              TO  WRK-KOUTENZ
                        MOVE    WRK-KOUTEN    TO  HC06-NYUKOHTEN (IDY)
+                     END-IF
                    END-IF
                END-IF    
            END-PERFORM
@@ -5208,8 +5239,14 @@
                                                  TO  SUM-NYUKHNKEI (1)
                    END-IF
                    IF      IDX2                  >   ZERO
+                     IF   ( RECE62-HKNNUM                =  SPACE )
+                     OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                           (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                           (RECE62-HENTOTALTEN(IDX1) NOT =
+                                         RECE62-HENTOTALTEN(IDX2)))
                        ADD    RECE62-NYUTOKKEI(IDX IDX2)
                                                  TO  SUM-NYUKHNKEI (2)
+                     END-IF
                    END-IF
                END-PERFORM    
       *        <´ðËÜÎÁ>
@@ -5258,6 +5295,11 @@
              END-IF
            END-IF
            IF      IDX2                    >   ZERO
+             IF   ( RECE62-HKNNUM                =  SPACE )
+             OR   ((RECE62-HKNNUM            NOT =  SPACE) AND
+                   (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                   (RECE62-HENTOTALTEN(IDX1) NOT =
+                                 RECE62-HENTOTALTEN(IDX2)))
                MOVE    RECE62-NYUTOKKEI2 (IDX2)
                                                TO  WRK-KOUTENZ
                MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (10)
@@ -5273,6 +5315,7 @@
                        END-IF
                    END-PERFORM
                END-IF
+             END-IF
            END-IF
       *
       *        <Æþ±¡Ç¯·îÆü>
@@ -8674,7 +8717,7 @@
                MOVE    ZERO                  TO  RECE10-KHNTEN (31)
                PERFORM   VARYING   IDY   FROM    5   BY  1
                          UNTIL     IDY       >   10
-                         OR        RECE62-NYUTOKRYO (IDY)    =   ZERO
+                         OR        RECE62-NYUTOKNISSU(IDY)   =   ZERO
                    ADD     RECE62-NYUTOKNISSU(IDY)
                                                  TO  RECE10-KAISU  (31)
                    PERFORM   VARYING   IDY1  FROM    1   BY  1

@@ -58,6 +58,7 @@
       *  04.03.10    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.11    NACL-ÌçÏÆ    09/01/15  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.12    NACL-Æ£¸¶    09/01/16  ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê¤ÎÊÑ¹¹
+      *  04.03.13    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4454,9 +4455,15 @@
                END-IF
                MOVE    WRK-TENSU                 TO  HC06-TENSU   (IDX)
                IF      IDX2                      >   ZERO
+                 IF   ( RECE02-HKNNUM                =  SPACE )
+                 OR   ((RECE02-HKNNUM            NOT =  SPACE) AND
+                       (RECE02-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
+                       (RECE02-HENTOTALTEN(IDX1) NOT =
+                                     RECE02-HENTOTALTEN(IDX2)))
                    MOVE    RECE02-TENSU(IDX IDX2)
                                                  TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
+                 END-IF
                END-IF
            END-PERFORM
       *

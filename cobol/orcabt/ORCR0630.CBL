@@ -79,6 +79,7 @@
       *  04.02.01    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
       *  04.02.02    NACL-ÌçÏÆ    08/06/17  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/09/24  Æþ±¡Î¬¾ÎÊÔ½¸ÄÉ²Ã
+      *  04.03.01    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
       *
@@ -3543,8 +3544,11 @@
                              TBL-TOTALTEN2-ACCT(IDY)
            END-PERFORM
       *
-           PERFORM    VARYING    IDX    FROM   1   BY   1
-                      UNTIL      IDX    >      10
+           IF   RECE62-SRYYM    >=    "200804"
+             CONTINUE
+           ELSE
+             PERFORM    VARYING    IDX    FROM   1   BY   1
+                        UNTIL      IDX    >      10
                PERFORM    VARYING    IDY    FROM    2   BY   1
                           UNTIL      IDY    >     5
                  IF  ( RECE62-HENTOTALTEN(IDY) NOT =  ZERO       )
@@ -3556,10 +3560,10 @@
                     MOVE    ZERO    TO   RECE62-NYUTOKKEI(IDX IDY)
                  END-IF
                END-PERFORM
-           END-PERFORM
+             END-PERFORM
       *
-           PERFORM    VARYING    IDY    FROM    2   BY   1
-                      UNTIL      IDY    >     5
+             PERFORM    VARYING    IDY    FROM    2   BY   1
+                        UNTIL      IDY    >     5
                  IF  ( RECE62-HENTOTALTEN(IDY) NOT =  ZERO       )
                  AND ( RECE62-HENTOTALTEN(1)   NOT =  
                                          RECE62-HENTOTALTEN(IDY) )
@@ -3568,7 +3572,8 @@
                     MOVE    ZERO    TO   RECE62-NYUKHNKEI2(IDY)
                     MOVE    ZERO    TO   RECE62-NYUTOKKEI2(IDY)
                  END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            PERFORM    VARYING    IDX    FROM   1   BY   1
                       UNTIL      IDX    >      10
