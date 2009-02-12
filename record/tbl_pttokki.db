@@ -58,7 +58,7 @@ path	all 	{
 	DBSELECT	{
 		DECLARE tbl_pttokki_all_csr CURSOR FOR
 		SELECT *
-		FROM tbl_tokki
+		FROM tbl_pttokki
 			WHERE   HOSPNUM    =   :HOSPNUM
  		;
 	};
