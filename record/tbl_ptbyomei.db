@@ -657,3 +657,18 @@ path	key32	{
 	};
 };
 
+path	key33	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key33_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei a,tbl_ptnum b
+			WHERE   a.HOSPNUM  =   :HOSPNUM
+			AND     a.SRYYMD   <=  :SRYYMD
+			AND     a.DLTFLG   =   ' '
+			AND     a.HOSPNUM  =   b.HOSPNUM
+			AND     a.PTID     =   b.PTID
+			ORDER  BY  b.PTNUM,a.SRYYMD,a.SRYKA,a.RENNUM
+		;
+	};
+};
+

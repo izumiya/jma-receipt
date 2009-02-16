@@ -231,6 +231,9 @@
       *
       *  04.03.01    NACL-藤原    08/06/11  前回来院日の表示
       *                                     慢性と急性のチェック
+      *  04.03.02    NACL-藤原    09/02/16  未コード化傷病名コード入力で
+      *                                     病名が変わらないときもコード
+      *                                     変換処理を行なうようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5609,13 +5612,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                GO  TO  41013-BYOMEI-CHK-EXT
            END-IF
       *
-      *    未コード化傷病名コードのとき病名がおなじとき    
-           IF      C02-BYOMEI          =   SPA-GMN-C02-BYOMEI
-           AND     SPA-NAI-C02-BYOMEICD (1)
-                                       =   WRK-CONS-BYOMEICD
-               MOVE    9                   TO  SPA-GMN-C02-CUR 
-               GO  TO  41013-BYOMEI-CHK-EXT
-           END-IF
+      *****未コード化傷病名コードのとき病名がおなじとき    
+      *****IF      C02-BYOMEI          =   SPA-GMN-C02-BYOMEI
+      *****AND     SPA-NAI-C02-BYOMEICD (1)
+      *****                            =   WRK-CONS-BYOMEICD
+      *****    MOVE    9                   TO  SPA-GMN-C02-CUR 
+      *****    GO  TO  41013-BYOMEI-CHK-EXT
+      *****END-IF
       *
       *    病名コード入力済でエラーのときコードクリア
            IF    ( SPA-GMN-C02-BYOMEICD-G
