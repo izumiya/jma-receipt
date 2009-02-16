@@ -228,6 +228,9 @@
       *
       *  04.02.01    NACL-藤原    08/03/03  特定疾患区分07,08の追加
       *  04.02.02    NACL-藤原    08/05/07  更新時の診療科未入力エラー
+      *  04.02.03    NACL-藤原    09/02/16  未コード化傷病名コード入力で
+      *                                     病名が変わらないときもコード
+      *                                     変換処理を行なうようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5547,13 +5550,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                GO  TO  41013-BYOMEI-CHK-EXT
            END-IF
       *
-      *    未コード化傷病名コードのとき病名がおなじとき    
-           IF      C02-BYOMEI          =   SPA-GMN-C02-BYOMEI
-           AND     SPA-NAI-C02-BYOMEICD (1)
-                                       =   WRK-CONS-BYOMEICD
-               MOVE    9                   TO  SPA-GMN-C02-CUR 
-               GO  TO  41013-BYOMEI-CHK-EXT
-           END-IF
+      *****未コード化傷病名コードのとき病名がおなじとき    
+      *****IF      C02-BYOMEI          =   SPA-GMN-C02-BYOMEI
+      *****AND     SPA-NAI-C02-BYOMEICD (1)
+      *****                            =   WRK-CONS-BYOMEICD
+      *****    MOVE    9                   TO  SPA-GMN-C02-CUR 
+      *****    GO  TO  41013-BYOMEI-CHK-EXT
+      *****END-IF
       *
       *    病名コード入力済でエラーのときコードクリア
            IF    ( SPA-GMN-C02-BYOMEICD-G
