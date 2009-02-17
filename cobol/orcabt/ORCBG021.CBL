@@ -338,7 +338,7 @@
            PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF      WRK-PARA-PRTKBN =   "1"
-               MOVE    "（入力ＣＤあり）"
+               MOVE    "（病名ＣＤあり）"
                                        TO  H01-PRTKBN-TITLE
            END-IF
       *
