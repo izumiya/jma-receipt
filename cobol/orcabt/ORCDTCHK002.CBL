@@ -2342,6 +2342,9 @@
                     AND  ( DCACCT-ZAITEN         =   ZERO )
                        MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
+                   IF    ( DCSRY-SRYSYUKBN     =   "148"  )
+                       MOVE    ZERO    TO  FLG-TAISYO-SRY
+                   END-IF
       *        院外処方を含む
                WHEN    "1"
                        CONTINUE
@@ -2349,6 +2352,10 @@
                WHEN    "2"
                    IF    ( DCACCT-SRYKBN(1:1)    =   "2"  )
                     AND  ( DCACCT-ZAITEN     NOT =   ZERO )
+                       MOVE    ZERO    TO  FLG-TAISYO-SRY
+                   END-IF
+                   IF    ( DCACCT-SRYKBN         =   "14"   )
+                    AND  ( DCSRY-SRYSYUKBN   NOT =   "148" )
                        MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
                END-EVALUATE
