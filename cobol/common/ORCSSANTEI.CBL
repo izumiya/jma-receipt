@@ -1293,9 +1293,6 @@
       *    削除処理
       *****************************************************************
        300-DELETE-SYORI-SEC                SECTION.
-      *TEST
-           DISPLAY "300-DELETE-SYORI-SE SSANTEI-SRYCD:" SSANTEI-SRYCD
-      *TEST
       *
            MOVE    SSANTEI-SRYCD       TO  WRK-SRYCD
            MOVE    SSANTEI-SRYYMD      TO  WRK-SRYYMD
@@ -1326,9 +1323,6 @@
                GO      TO      300-DELETE-SYORI-EXT
             END-IF
       *
-      *TEST
-           DISPLAY "FLG-SANTEI:" FLG-SANTEI
-      *TEST
       *    対象データが無い時、終了
            IF      FLG-SANTEI          =   1
                GO      TO      300-DELETE-SYORI-EXT
@@ -1390,11 +1384,6 @@
       *            削除する日に数字が入っている
                    PERFORM VARYING     IDX-Y2  FROM    1   BY  1
                            UNTIL       IDX-Y2  >   31
-      *TEST
-           DISPLAY "IDX-Y2:" IDX-Y2
-                ",SSANTEI-DAY:" SSANTEI-DAY (IDX-Y2)
-                 ".SANTEI-DAY:" SANTEI-DAY (IDX-Y2)
-      *TEST
                        IF      SSANTEI-DAY (IDX-Y2)    >   ZERO
                            IF      SSANTEI-DAY(IDX-Y2)
                                                <=   SANTEI-DAY (IDX-Y2)
@@ -1414,10 +1403,6 @@
                        END-IF
                    END-PERFORM
            END-EVALUATE
-      *TEST
-           DISPLAY "SSANTEI-SRYCD:" SSANTEI-SRYCD
-               ",SANTEI-MSANTEICNT :" SANTEI-MSANTEICNT 
-      *TEST
       *
       *    健保以外で保険別の時、3月以内は作成なし
       *DDD IF     (FLG-HKN-SANTEI      =   1   )  AND
