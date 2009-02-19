@@ -153,7 +153,7 @@
                05  TBL-SEIBUTU         PIC 9(01).
                05  TBL-MADOKU          PIC 9(01).
                05  TBL-DAY-AREA        OCCURS   31.
-                   07  TBL-DAY             PIC 9(01).
+                   07  TBL-DAY             PIC 9(03).
                    07  TBL-SURYO           PIC 9(05)V9(03).
                    07  TBL-CHUSYARYO       PIC 9(07)V9(03).
       *            ÊÝ¸±ÁÈ¹ç¤»
@@ -164,14 +164,14 @@
                    07  TBL-HAIKI-SURYO     PIC 9(05)V9(03).
       *        ÌôºÞ¤Î¤ß(331)
                05  TBL-DAY-AREA2       OCCURS   31.
-                   07  TBL-DAY2            PIC 9(01).
+                   07  TBL-DAY2            PIC 9(03).
                    07  TBL-SURYO2          PIC 9(05)V9(03).
       *            ÇÑ´þ¥Õ¥é¥°
                    07  TBL-HAIKI2          PIC 9(01).
                    07  TBL-HAIKI-SURYO2    PIC 9(05)V9(03).
       *        ¼ê½Ñ°Ê³°(332)
                05  TBL-DAY-AREA4       OCCURS   31.
-                   07  TBL-DAY4            PIC 9(01).
+                   07  TBL-DAY4            PIC 9(03).
                    07  TBL-SURYO4          PIC 9(05)V9(03).
                    07  TBL-CHUSYARYO4      PIC 9(07)V9(03).
       *            ÇÑ´þ¥Õ¥é¥°
@@ -182,7 +182,7 @@
                    07  TBL-SRYKA4          PIC X(02).
       *        Ãæ¿´ÀÅÌ®Ê¬
                05  TBL-DAY-AREA3       OCCURS   31.
-                   07  TBL-DAY3            PIC 9(01).
+                   07  TBL-DAY3            PIC 9(03).
                    07  TBL-SURYO3          PIC 9(05)V9(03).
       *            ÇÑ´þ¥Õ¥é¥°
                    07  TBL-HAIKI3          PIC 9(01).
@@ -192,7 +192,7 @@
                    07  TBL-SRYKA3          PIC X(02).
       *        Ãæ¿´ÀÅÌ®Ê¬¡Ê¼ê½Ñ°Ê³°¡Ë(352)
                05  TBL-DAY-AREA5       OCCURS   31.
-                   07  TBL-DAY5            PIC 9(01).
+                   07  TBL-DAY5            PIC 9(03).
                    07  TBL-SURYO5          PIC 9(05)V9(03).
       *            ÇÑ´þ¥Õ¥é¥°
                    07  TBL-HAIKI5          PIC 9(01).
