@@ -73,6 +73,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/03/24  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
       *                                     ¡ÊºÆ½¢Ï«¡§±ßÊÑ¹¹ÂÐ±þ¡Ë
+      *  04.03.01    NACL-ÌçÏÆ    09/02/19  ¥¢¥Õ¥¿¡¼¤Î¸¡ººÆüÊÔ½¸¾ò·ïÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2018,7 +2019,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    ZERO    TO      FLG-KENSA
                                MOVE    ZERO    TO      WRK-TEN
                                                        WRK-KIN
-                               IF   ACCT-SRYKBN  =  "60"  OR  "64"
+                               IF   ACCT-SRYKBN  = "60" OR "64" OR "70"
                                    MOVE     1      TO     FLG-KENSA
                                END-IF
                                PERFORM   21035-ENDATE-HANTEI-SEC 
@@ -2103,7 +2104,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)
                                MOVE    ZERO    TO      FLG-KENSA
-                               IF   ACCT-SRYKBN  =  "60"  OR  "64"
+                               IF   ACCT-SRYKBN  = "60" OR "64" OR "70"
                                    MOVE     1      TO     FLG-KENSA
                                END-IF
                                PERFORM   21071-TENSOU4-SEC
