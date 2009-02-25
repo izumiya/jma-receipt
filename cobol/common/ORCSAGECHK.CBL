@@ -91,6 +91,7 @@
            03  FLG-ERR2            PIC 9(01).
            03  FLG-KAKUNIN         PIC 9(01).
            03  FLG-CHK-OK          PIC 9(01).
+           03  FLG-TAHKN           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -407,7 +408,14 @@
                        PERFORM 20011-ROUJIN-CHK3-SEC
                    END-IF
                ELSE
-                   MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+      *            ７５歳以上で、後期高齢者以外保険
+                   PERFORM 20011-ROUJIN-CHK3-SEC
+                   IF     (AGECHK-ROUJIN2      =   ZERO )
+                      AND (FLG-TAHKN           =   1    )
+                       MOVE    ZERO                TO  AGECHK-ROUJIN2
+                   ELSE
+                       MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+                   END-IF
                END-IF
            END-IF
            IF     (AGECHK-SRYYMD       >=   "20021001" )  AND
@@ -744,6 +752,9 @@
                           (FLG-OK          NOT =   4   )  AND
                           (FLG-OK2             =   ZERO)
                        MOVE    4               TO  AGECHK-RJNCHK
+      *!!!
+      *            老人としない
+                       MOVE    ZERO            TO  AGECHK-ROUJIN
                    END-IF
                END-IF
            END-IF
@@ -1274,7 +1285,13 @@
                        PERFORM 20011-ROUJIN-CHK3-SEC
                    END-IF
                ELSE
-                   MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+                   PERFORM 20011-ROUJIN-CHK3-SEC
+                   IF     (AGECHK-ROUJIN2      =   ZERO )
+                      AND (FLG-TAHKN           =   1    )
+                       MOVE    ZERO                TO  AGECHK-ROUJIN2
+                   ELSE
+                       MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+                   END-IF
                END-IF
            END-IF
       *    生活保護、公費単独で後期公費を持っている場合、老人
@@ -1373,6 +1390,7 @@
       *****************************************************************
        20011-ROUJIN-CHK3-SEC         SECTION.
       *
+           MOVE    ZERO                TO  FLG-TAHKN
       *    後期高齢者該当
            INITIALIZE                  PTHKNINF-REC
            MOVE    AGECHK-HOSPNUM      TO  PTHKN-HOSPNUM
@@ -1399,6 +1417,11 @@
                    IF      PTHKN-HKNNUM        =   "039"
                                                OR  "040"
                        MOVE    1               TO  AGECHK-ROUJIN2
+                   ELSE
+      *                後期高齢者以外の保険有無
+                       IF      PTHKN-HKNNUM        <   "900"
+                           MOVE    1               TO  FLG-TAHKN
+                       END-IF
                    END-IF
                END-IF
                MOVE    "tbl_pthkninf"      TO  MCP-TABLE
