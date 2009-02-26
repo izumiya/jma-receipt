@@ -388,6 +388,7 @@
       *  04.03.11    NACL-ÌçÏÆ    09/01/28  °ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *  04.03.12    NACL-ÌçÏÆ    09/01/28  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
       *  04.03.13    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
+      *  04.03.14    NACL-ÌçÏÆ    09/02/26  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7312,7 +7313,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105212-ICHIBUFTN-KOH-HEN1-SEC               SECTION.
       *
-           IF   RECE02-TEISYOTOKU  NOT =  SPACE
+           IF  ((SYS-1001-PREFNUM   =  42  ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"))
+                 IF  FLG-TOKU75 = 1 OR 2
+                     MOVE    6000      TO   WRK-KINGAKU
+                 ELSE
+                     MOVE    12000     TO   WRK-KINGAKU
+                 END-IF
+                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
+                 PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
+           ELSE
+            IF   RECE02-TEISYOTOKU  NOT =  SPACE
                  IF  FLG-TOKU75 = 1 OR 2
                    MOVE      4000      TO   WRK-KINGAKU
                  ELSE
@@ -7320,7 +7331,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  END-IF
                  PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
-           ELSE
+            ELSE
              IF   ( RECE02-KYURATE         =  20 OR 30 )
              AND  ( RECE02-RJNGENMENKBN    =  SPACE    )
                  IF    RECE02-SRYYM   >=  "200610"
@@ -7345,6 +7356,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
              END-IF
+            END-IF
            END-IF
       *
            .
