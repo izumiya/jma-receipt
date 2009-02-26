@@ -2803,6 +2803,10 @@
       *    ÕΩÃÛºËæ√§∑
       *****************************************************************
        420-YYKDEL-SEC             SECTION.
+      *TEST
+           DISPLAY "420-YYKDEL-SEC SPA-NAI-HYOJHI:" SPA-NAI-HYOJHI
+                 ",SPA-NAI-SELBAN:" SPA-NAI-SELBAN
+      *TEST
            MOVE    Y01-SELNUM          TO  SNUM-INX
            MOVE    3                   TO  SNUM-KETSUU
            CALL    "ORCSNUM"           USING
@@ -2877,6 +2881,9 @@
            MOVE    ZERO                TO  WRK-HI
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   42
+      *TEST
+           DISPLAY "IDX:" IDX ", SPA-GMN-HYODD:"  SPA-GMN-HYODD (IDX)
+      *TEST
                IF      SPA-NAI-HYOJHI      =   SPA-GMN-HYODD (IDX)
                    MOVE    IDX             TO  WRK-HI
                    MOVE    98              TO  IDX
@@ -2889,6 +2896,11 @@
                MOVE    "0003"          TO  SPA-ERRCD
                GO      TO      420-YYKDEL-EXT
            END-IF
+      *TEST
+           DISPLAY "SPA-NAI-HYOJHI:" SPA-NAI-HYOJHI
+                ",WRK-HI:" WRK-HI
+                ",WRK-SEL-SYUU:" WRK-SEL-SYUU
+      *TEST
       *    ÕΩÃÛ•∆°º•÷•Î ‘Ω∏
            INITIALIZE                  SPA-SEL-AREA
            MOVE    WRK-SEL-SYUU        TO  SPA-SEL-SYUU

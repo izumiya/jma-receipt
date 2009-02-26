@@ -91,6 +91,7 @@
            03  FLG-ERR2            PIC 9(01).
            03  FLG-KAKUNIN         PIC 9(01).
            03  FLG-CHK-OK          PIC 9(01).
+           03  FLG-TAHKN           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -124,6 +125,7 @@
       *
            03  WRK-SEIDONAME           PIC X(20).
       *
+           03  WRK-SRYYMD              PIC X(08).
            03  WRK-BIRTHDAY            PIC X(08).
            03  WRK-ROU-NEN             PIC 9(03).
       *
@@ -243,9 +245,15 @@
                MOVE    AGECHK-BIRTHDAY     TO  WRK-BYMD
                MOVE    AGECHK-BIRTHDAY     TO  WRK-BIRTHDAY
            END-IF
+      *    診療日＜生年月日は０歳とする
+           IF      AGECHK-SRYYMD       <   WRK-BIRTHDAY
+               MOVE    WRK-BIRTHDAY        TO  WRK-SRYYMD
+           ELSE
+               MOVE    AGECHK-SRYYMD       TO  WRK-SRYYMD
+           END-IF
       *
       *    当日の年齢を計算する
-           MOVE    AGECHK-SRYYMD       TO  WRK-SYMD
+           MOVE    WRK-SRYYMD          TO  WRK-SYMD
            COMPUTE WRK-NENREI-YY       =   WRK-SYY
                                        -   WRK-BYY
            IF      WRK-BYMD(5:4)       >   WRK-SYMD(5:4)
@@ -262,12 +270,13 @@
                                        -   1
            END-IF
       *    年齢期間算定
-           IF      WRK-NENREI-MM       =   ZERO
+           IF     (WRK-NENREI-MM       =   ZERO )
+             AND  (WRK-NENREI-YY       =   ZERO )
                INITIALIZE                      STS-AREA-DAY
                INITIALIZE                      LNK-DAY5-AREA
                MOVE    "51"                TO  LNK-DAY5-IRAI
                MOVE    WRK-BIRTHDAY        TO  LNK-DAY5-START
-               MOVE    AGECHK-SRYYMD       TO  LNK-DAY5-END
+               MOVE    WRK-SRYYMD          TO  LNK-DAY5-END
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY5-AREA
                IF      LNK-DAY5-NISSU2     <=  31
@@ -294,7 +303,7 @@
            COMPUTE WRK-B70-YY          =   WRK-B70-YY  +   70
       *
       *    保険年齢を計算する
-           MOVE    AGECHK-SRYYMD       TO  WRK-SYMD
+           MOVE    WRK-SRYYMD          TO  WRK-SYMD
            COMPUTE WRK-NENREI-YY       =   WRK-SYY
                                        -   WRK-BYY
            IF      WRK-BYMD(5:4)       >   WRK-SYMD(5:4)
@@ -399,7 +408,14 @@
                        PERFORM 20011-ROUJIN-CHK3-SEC
                    END-IF
                ELSE
-                   MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+      *            ７５歳以上で、後期高齢者以外保険
+                   PERFORM 20011-ROUJIN-CHK3-SEC
+                   IF     (AGECHK-ROUJIN2      =   ZERO )
+                      AND (FLG-TAHKN           =   1    )
+                       MOVE    ZERO                TO  AGECHK-ROUJIN2
+                   ELSE
+                       MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+                   END-IF
                END-IF
            END-IF
            IF     (AGECHK-SRYYMD       >=   "20021001" )  AND
@@ -736,6 +752,9 @@
                           (FLG-OK          NOT =   4   )  AND
                           (FLG-OK2             =   ZERO)
                        MOVE    4               TO  AGECHK-RJNCHK
+      *!!!
+      *            老人としない
+                       MOVE    ZERO            TO  AGECHK-ROUJIN
                    END-IF
                END-IF
            END-IF
@@ -1266,7 +1285,13 @@
                        PERFORM 20011-ROUJIN-CHK3-SEC
                    END-IF
                ELSE
-                   MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+                   PERFORM 20011-ROUJIN-CHK3-SEC
+                   IF     (AGECHK-ROUJIN2      =   ZERO )
+                      AND (FLG-TAHKN           =   1    )
+                       MOVE    ZERO                TO  AGECHK-ROUJIN2
+                   ELSE
+                       MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+                   END-IF
                END-IF
            END-IF
       *    生活保護、公費単独で後期公費を持っている場合、老人
@@ -1365,6 +1390,7 @@
       *****************************************************************
        20011-ROUJIN-CHK3-SEC         SECTION.
       *
+           MOVE    ZERO                TO  FLG-TAHKN
       *    後期高齢者該当
            INITIALIZE                  PTHKNINF-REC
            MOVE    AGECHK-HOSPNUM      TO  PTHKN-HOSPNUM
@@ -1391,6 +1417,11 @@
                    IF      PTHKN-HKNNUM        =   "039"
                                                OR  "040"
                        MOVE    1               TO  AGECHK-ROUJIN2
+                   ELSE
+      *                後期高齢者以外の保険有無
+                       IF      PTHKN-HKNNUM        <   "900"
+                           MOVE    1               TO  FLG-TAHKN
+                       END-IF
                    END-IF
                END-IF
                MOVE    "tbl_pthkninf"      TO  MCP-TABLE

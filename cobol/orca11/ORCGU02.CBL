@@ -738,6 +738,7 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
+      *
            INITIALIZE                  SPA-U02
       *
            MOVE    2                   TO  SPA-GMN-CUR

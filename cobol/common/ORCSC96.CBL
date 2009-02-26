@@ -1686,6 +1686,12 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K076"
+                   STRING  "警告！！後期高齢者の年齢です。"
+                           "後期高齢者の保険を登録して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *        Ｈ１８．１０改正から
                WHEN    "1070"
                    STRING  "老人の保険割合が２割です。"
