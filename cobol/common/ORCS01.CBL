@@ -273,6 +273,7 @@
       *  04.03.04    NACL-ÌçÏÆ    08/12/09  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.03.05    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.06    NACL-ÌçÏÆ    09/01/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.07    NACL-ÌçÏÆ    09/02/26  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -411,6 +412,7 @@
            03  FLG-TOKU75              PIC 9(01).
            03  FLG-TOKU75-KIZON        PIC 9(01).
            03  FLG-TOKU75-CYO          PIC 9(01).
+           03  FLG-KEISAN-TAI          PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -568,6 +570,12 @@
            03  WK-TOKU75-BIRTHDAY          PIC  X(08).
            03  WK-TOKU75-TEKSTYMD          PIC  X(08).
            03  WK-TOKU75-TEKEDYMD          PIC  X(08).
+      *
+           03  WK-TOTAL-KINGAKU            PIC  9(09).
+           03  WK-TOTAL-KINGAKU2           PIC  9(09).
+           03  WK-TOTAL-KINGAKU-EN         PIC  9(09).
+           03  WK-TOTAL-KINGAKU2-EN        PIC  9(09).
+           03  WK-TOTAL-KINGAKU3           PIC  9(09).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â²ó¿ô¤È¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -7799,6 +7807,10 @@
            MOVE     ZERO        TO    WK-OITA-HKNFTNMONEY.
            MOVE     ZERO        TO    WK-OITA-CYOFTN.
       *
+           MOVE     ZERO        TO    WK-TOTAL-KINGAKU.
+           MOVE     ZERO        TO    WK-TOTAL-KINGAKU-EN.
+           MOVE     ZERO        TO    FLG-KEISAN-TAI.
+      *
            MOVE     ZERO        TO    FLG-SYUKEI2.
       *
            IF  (LNK-S01-KOUREI-ZAITAKU-KBN   =   "1")
@@ -8870,6 +8882,39 @@
                          MOVE  ZERO  TO  SYU-KOH4COMPFTN-ENTANI
                         END-IF
                       END-IF
+                   END-IF
+      *
+                   IF  (WK-1001-PREFNUM     =  34            )
+                   AND (LNK-SYU-KOH1HKNNUM  = "191" OR "291" )
+                   AND (LNK-SYU-KOH2HKNNUM  =  SPACE         )
+                   AND (LNK-SYU-KOH3HKNNUM  =  SPACE         )
+                   AND (LNK-SYU-KOH4HKNNUM  =  SPACE         )
+                   AND (SYU-KOH1HKNNUM      = "191" OR "291" )
+                   AND (SYU-KOH2HKNNUM      =  SPACE         )
+                   AND (SYU-KOH3HKNNUM      =  SPACE         )
+                   AND (SYU-KOH4HKNNUM      =  SPACE         )
+                   AND (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM)
+                     IF  (LNK-S01-SAIKEISAN-KBN   =   "1" )
+                     AND (LNK-SYU-DENPNUM     NOT =  ZERO )
+                     AND (LNK-SYU-DENPNUM   <  SYU-DENPNUM)
+                         CONTINUE
+                     ELSE
+                         MOVE  1  TO   FLG-KEISAN-TAI
+                         COMPUTE  WK-TOTAL-KINGAKU2
+                               =  SYU-TOTAL-HKNTEN  * 10 * 0.1
+                         COMPUTE  WK-TOTAL-KINGAKU2 =
+                                  WK-TOTAL-KINGAKU2 + 5
+                         COMPUTE  WK-TOTAL-KINGAKU2 =
+                                  WK-TOTAL-KINGAKU2 / 10
+                         COMPUTE  WK-TOTAL-KINGAKU2 =
+                                  WK-TOTAL-KINGAKU2 * 10
+                         COMPUTE  WK-TOTAL-KINGAKU2-EN
+                               =  SYU-TOTAL-HKNTEN  * 10 * 0.1
+                         ADD  WK-TOTAL-KINGAKU2
+                                  TO  WK-TOTAL-KINGAKU
+                         ADD  WK-TOTAL-KINGAKU2-EN
+                                  TO  WK-TOTAL-KINGAKU-EN
+                     END-IF
                    END-IF
       *
                    IF  (WK-1001-PREFNUM          =  44      ) AND
@@ -14606,6 +14651,38 @@
                ELSE
                   PERFORM    23083-ZANOKIKAE-HENSYU3-SEC
                END-IF
+             END-IF
+      *
+             IF  (LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"     )
+             AND (FLG-SANSHOU3      NOT =   SPACE        )
+             AND (COMB-HKNNUM           =  "039"         )
+             AND (COMB-KOH1HKNNUM       =  "191" OR "291")
+             AND (COMB-KOH2HKNNUM       =   SPACE        )
+             AND (COMB-KOH3HKNNUM       =   SPACE        )
+             AND (COMB-KOH4HKNNUM       =   SPACE        )
+             AND (FLG-KEISAN-TAI        =   1            )
+                IF   WK-TOTAL-KINGAKU     > 8000
+                   MOVE   ZERO   TO  ZAN-KOHI1
+                ELSE
+                   COMPUTE  WK-TOTAL-KINGAKU3 = 8000
+                                              - WK-TOTAL-KINGAKU
+                   IF  WK-TOTAL-KINGAKU3    <   ZAN-KOHI1
+                      MOVE   WK-TOTAL-KINGAKU3     TO  ZAN-KOHI1
+                   END-IF
+                END-IF
+                IF   WK-TOTAL-KINGAKU-EN  > 8000
+                   MOVE   ZERO   TO  ZAN-KOHI12
+                   MOVE   ZERO   TO  ZAN-KOHI13
+                ELSE
+                   COMPUTE  WK-TOTAL-KINGAKU3 = 8000
+                                              - WK-TOTAL-KINGAKU-EN
+                   IF  WK-TOTAL-KINGAKU3    <   ZAN-KOHI12
+                      MOVE   WK-TOTAL-KINGAKU3     TO  ZAN-KOHI12
+                   END-IF
+                   IF  WK-TOTAL-KINGAKU3    <   ZAN-KOHI13
+                      MOVE   WK-TOTAL-KINGAKU3     TO  ZAN-KOHI13
+                   END-IF
+                END-IF
              END-IF
            END-IF
       *

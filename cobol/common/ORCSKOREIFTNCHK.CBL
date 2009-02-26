@@ -43,6 +43,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/05/01  ¸å´ü¹âÎð¼Ô·îÅÓÃæÊÝ¸±¼ÔÊÑ¹¹ÂÐ±þ
       *
       *  04.03.01    NACL-ÌçÏÆ    09/01/05  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.03.02    NACL-ÌçÏÆ    09/02/26  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -736,7 +737,23 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *****************************************************************
        22011-NYUIN-KOREI-HEN1-SEC               SECTION.
       *
-           IF   LNK-KOREIFTNCHK-TEISYOTOKU   NOT =  SPACE
+           IF  ((LNK-KOREIFTNCHK-PREFNUM   = "42" ) AND
+                (SYU-KOH-HKNNUM(1)         = "186"))
+                IF  LNK-KOREIFTNCHK-SRYYM   >=  "200610"
+                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
+                      MOVE    22200  TO   WRK-KINGAKU
+                   ELSE
+                      MOVE    44400  TO   WRK-KINGAKU
+                   END-IF
+                   PERFORM    270-ICHIBUFTN-GEN-SEC
+                   PERFORM    260-ICHIBUFTN-KOH-SET-SEC
+                ELSE
+                   MOVE       40200  TO   WRK-KINGAKU
+                   PERFORM    270-ICHIBUFTN-GEN-SEC
+                   PERFORM    260-ICHIBUFTN-KOH-SET-SEC
+                END-IF
+           ELSE
+            IF   LNK-KOREIFTNCHK-TEISYOTOKU   NOT =  SPACE
               EVALUATE   LNK-KOREIFTNCHK-TEISYOTOKU
                 WHEN  "1"
                 WHEN  "4"
@@ -757,7 +774,7 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    PERFORM   270-ICHIBUFTN-GEN-SEC
                    PERFORM   260-ICHIBUFTN-KOH-SET-SEC
               END-EVALUATE
-           ELSE
+            ELSE
               IF   (  WRK-KYURATE(IDX1)       =  20 OR 30   )
               AND  (  LNK-KOREIFTNCHK-KEIKASOCHI  =  SPACE  )
               AND  (  LNK-KOREIFTNCHK-KOHYONKAIME =  ZERO   )
@@ -819,6 +836,7 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    PERFORM    260-ICHIBUFTN-KOH-SET-SEC
                 END-IF
               END-IF
+            END-IF
            END-IF
       *
            .
@@ -1096,7 +1114,17 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *****************************************************************
        23011-GAIRAI-KOREI-HEN1-SEC               SECTION.
       *
-           IF   LNK-KOREIFTNCHK-TEISYOTOKU   NOT =  SPACE
+           IF  ((LNK-KOREIFTNCHK-PREFNUM   = "42" ) AND
+                (SYU-KOH-HKNNUM(1)         = "186"))
+                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
+                      MOVE   6000    TO   WRK-KINGAKU
+                   ELSE
+                      MOVE   12000   TO   WRK-KINGAKU
+                   END-IF
+                   PERFORM   270-ICHIBUFTN-GEN-SEC
+                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
+           ELSE
+            IF   LNK-KOREIFTNCHK-TEISYOTOKU   NOT =  SPACE
                    IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
                       MOVE   4000    TO   WRK-KINGAKU
                    ELSE
@@ -1104,7 +1132,7 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    END-IF
                    PERFORM   270-ICHIBUFTN-GEN-SEC
                    PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-           ELSE
+            ELSE
              IF   (  WRK-KYURATE(IDX1)          =  20 OR 30  )
              AND  (  LNK-KOREIFTNCHK-KEIKASOCHI =  SPACE     )
                IF   LNK-KOREIFTNCHK-SRYYM  >=  "200610"
@@ -1129,6 +1157,7 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    PERFORM   270-ICHIBUFTN-GEN-SEC
                    PERFORM   260-ICHIBUFTN-KOH-SET-SEC
              END-IF
+            END-IF
            END-IF
       *
            .
