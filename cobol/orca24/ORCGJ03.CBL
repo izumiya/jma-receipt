@@ -101,12 +101,12 @@
                05  SPA-GMN-AREA2.
                    07  SPA-GMN-TBL.
                        09  SPA-GMN-TBLOCC      OCCURS  9.
-                           11  SPA-GMN-TBLREC1     OCCURS  100.
+                           11  SPA-GMN-TBLREC1     OCCURS  200.
                                13  SPA-GMN-TSRYYMD     PIC X(09).
                                13  SPA-GMN-TNAIYOU1    PIC X(50).
                                13  SPA-GMN-TKAISU1     PIC 9(04).
                        09  SPA-GMN-TBLOCC2     OCCURS  9.
-                           11  SPA-GMN-TBLREC2     OCCURS  100.
+                           11  SPA-GMN-TBLREC2     OCCURS  200.
                                13  SPA-GMN-TSRYYYMM    PIC X(06).
                                13  SPA-GMN-TNAIYOU2    PIC X(50).
                                13  SPA-GMN-TKAISU2     PIC 9(04).
@@ -158,11 +158,11 @@
 007900         05  SPA-J03NAI-AREA.
 008000             07  SPA-NAI-TBL.
 008100                 09  SPA-NAI-TBLOCC      OCCURS  9.
-008200                     11  SPA-NAI-TBLREC1     OCCURS  100.
+008200                     11  SPA-NAI-TBLREC1     OCCURS  200.
 008300                         13  SPA-NAI-SRYYMD     PIC X(08).
 008400                         13  SPA-NAI-SRYCD1     PIC X(09).
 008100                 09  SPA-NAI-TBLOCC2     OCCURS  9.
-008500                     11  SPA-NAI-TBLREC2     OCCURS  100.
+008500                     11  SPA-NAI-TBLREC2     OCCURS  200.
 008600                         13  SPA-NAI-SRYYYMM    PIC X(06).
 008700                         13  SPA-NAI-SRYCD2     PIC X(09).
 008800*
@@ -262,7 +262,7 @@
       *    入院点数計算用
        01  TBL-NYUIN-TENSU-AREA.
            03  TBL-NYUIN-TENSU-G.
-               05  TBL-NYUIN-TENSU-OCC     OCCURS   100.
+               05  TBL-NYUIN-TENSU-OCC     OCCURS   200.
                    07  TBL-ZAITEN          PIC 9(07).
                    07  TBL-DAY-G.
                        09  TBL-DAY         PIC 9(03)
@@ -327,12 +327,12 @@
 020700*
 020800*    画面用ソート
 020900 01  WRK-GMN-AREA.
-021000     05  WRK-GMN-TBLREC1     OCCURS  100.
+021000     05  WRK-GMN-TBLREC1     OCCURS  200.
 021100         07  WRK-GMN-TSRYYMD     PIC X(09).
 021200         07  WRK-GMN-TNAIYOU1    PIC X(50).
 021300         07  WRK-GMN-TKAISU1     PIC 9(04).
 021400*
-021500     05  WRK-NAI-TBLREC1     OCCURS  100.
+021500     05  WRK-NAI-TBLREC1     OCCURS  200.
 021600         07  WRK-NAI-SRYYMD     PIC X(08).
 021700         07  WRK-NAI-SRYCD      PIC X(09).
 021800*
@@ -757,7 +757,7 @@
       *
       *    入院基本料を診察料の後
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   100  )  OR
+                   UNTIL      (IDX     >   200  )  OR
                               (SPA-GMN-TNAIYOU2 (1 IDX)
                                            =   SPACE  )
                IF      SPA-GMN-TNAIYOU2 (1 IDX)    NOT =   SPACE
@@ -766,8 +766,8 @@
            END-PERFORM
            MOVE    IDX-MAX             TO  IDX2
            PERFORM VARYING     IDX     FROM    1    BY  1
-                   UNTIL      (IDX     >   100  )  OR
-                              (IDX2    >=  100  )  OR
+                   UNTIL      (IDX     >   200  )  OR
+                              (IDX2    >=  200  )  OR
                               (SPA-GMN-TNAIYOU2 (9 IDX)
                                            =   SPACE  )
                IF      SPA-GMN-TNAIYOU2 (9 IDX)    NOT =   SPACE
@@ -1420,8 +1420,8 @@
 069500*
 069600     PERFORM VARYING     TBL-IDX2    FROM    1   BY  1
 069700             UNTIL      (TBL-IDX2       >    200     )   OR
-                              (IDX1           =    100     )   OR
-                              (IDX2           =    100     )   OR
+                              (IDX1           =    200     )   OR
+                              (IDX2           =    200     )   OR
 069800                        (WRK-TBL-SRYCD (IDX TBL-IDX2)
                                               =   SPACE )
 069900         ADD     1               TO  IDX1
@@ -1636,7 +1636,7 @@
 082500     INITIALIZE                      WRK-GMN-AREA
            MOVE    ZERO                TO  IDX-MAX
 082600     PERFORM VARYING     IDX1    FROM    1   BY  1
-082700             UNTIL       IDX1    >    100
+082700             UNTIL       IDX1    >    200
 082800         MOVE    SPA-GMN-TBLREC1 (IDX IDX1)
 082900                                      TO  WRK-GMN-TBLREC1 (IDX1)
 083000         MOVE    SPA-NAI-TBLREC1 (IDX IDX1)
@@ -1648,12 +1648,12 @@
 083400     END-PERFORM
 083500*
 083600     PERFORM VARYING     IDX1        FROM    1   BY  1
-083700             UNTIL       IDX1        >   100
+083700             UNTIL       IDX1        >   200
 083800         MOVE    LOW-VALUE           TO  WRK-SRYYMD
 083900         MOVE    HIGH-VALUE          TO  WRK-SRYCD
 084000         MOVE    ZERO                TO  IDX3
 084100         PERFORM VARYING     IDX2        FROM    1   BY  1
-084200                 UNTIL       IDX2        >   100
+084200                 UNTIL       IDX2        >   200
 084300         IF      WRK-NAI-SRYCD (IDX2)    =   SPACE
 084400             CONTINUE
 084500         ELSE
@@ -1848,7 +1848,7 @@
            MOVE    ZERO                TO  IDX-N
            PERFORM
                UNTIL  (FLG-NYUINACCT       =   1  )  OR
-                      (IDX-N               >   100 )
+                      (IDX-N               >   200 )
                EVALUATE    NACCT-ZAISKBKBN
                    WHEN    "1"
                        ADD     1               TO  IDX-N
