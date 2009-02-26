@@ -344,6 +344,7 @@
       *  04.02.41    NACL-ÌçÏÆ    09/01/28  °ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *  04.02.42    NACL-ÌçÏÆ    09/01/28  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
       *  04.02.43    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
+      *  04.02.44    NACL-ÌçÏÆ    09/02/26  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10437,7 +10438,23 @@
       *****************************************************************
        2104422-ICHIBUFTN-KOH-HEN1-SEC               SECTION.
       *
-           IF   RECE62-TEISYOTOKU  NOT =  SPACE
+           IF  ((WRK-PREFNUM        = "42" ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"))
+               IF    RECE62-SRYYM   >=  "200610"
+                   IF  FLG-TOKU75 = 1 OR 2
+                     MOVE    22200   TO   WRK-KINGAKU
+                   ELSE
+                     MOVE    44400   TO   WRK-KINGAKU
+                   END-IF
+                   PERFORM   2104426-ICHIBUFTN-GEN-SEC
+                   PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+               ELSE
+                   MOVE      40200   TO   WRK-KINGAKU
+                   PERFORM   2104426-ICHIBUFTN-GEN-SEC
+                   PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+               END-IF
+           ELSE
+            IF   RECE62-TEISYOTOKU  NOT =  SPACE
               EVALUATE   RECE62-TEISYOTOKU
                 WHEN  "1"
                 WHEN  "4"
@@ -10458,7 +10475,7 @@
                    PERFORM   2104426-ICHIBUFTN-GEN-SEC
                    PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
               END-EVALUATE
-           ELSE
+            ELSE
               IF   (  RECE62-KYURATE         =  20 OR 30 )
               AND  (  RECE62-RJNGENMENKBN    =  SPACE    )
               AND  (  FLG-KOHYONKAIME        =  ZERO     )
@@ -10515,6 +10532,7 @@
                    PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               END-IF
+            END-IF
            END-IF
       *
            .
