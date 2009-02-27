@@ -234,6 +234,7 @@
       *  04.03.02    NACL-藤原    09/02/16  未コード化傷病名コード入力で
       *                                     病名が変わらないときもコード
       *                                     変換処理を行なうようにする
+      *                                     入力のコードクリアも行なう
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5625,6 +5626,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                    NOT =   SPACE )
            AND   ( SPA-NAI-C02-BYOMEIMOJI
                                        =   ZERO  )
+                INITIALIZE                   SPA-GMN-C02-BYOMEICD-G
+                                             SPA-NAI-C02-BYOMEI-TBL
+                MOVE    ZERO             TO  SPA-NAI-C02-BYOMEICD-MAX
+           END-IF
+      *
+      *    未コード化傷病名コード入力のときコードクリア
+           IF      SPA-GMN-C02-BYOMEICD (1)
+                                       =   WRK-CONS-BYOMEICD
                 INITIALIZE                   SPA-GMN-C02-BYOMEICD-G
                                              SPA-NAI-C02-BYOMEI-TBL
                 MOVE    ZERO             TO  SPA-NAI-C02-BYOMEICD-MAX
