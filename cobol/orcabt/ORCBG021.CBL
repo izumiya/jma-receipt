@@ -669,8 +669,12 @@
                    MOVE    "◎未コード化傷病名コードで登録"
                                                TO  B02-RIYUU
                WHEN    2
-                   MOVE    "◎傷病名コードで組み立てができません"
-                                               TO  B02-RIYUU
+                   STRING  "◎傷病名コードで組み立てができないか、"
+                                               DELIMITED  BY  SIZE
+                           "入力されたコードと異る病名です"
+                                               DELIMITED  BY  SIZE
+                                               INTO  B02-RIYUU
+                   END-STRING
                WHEN    3
                    MOVE    "◎廃止病名あり【廃止日："
                                                TO  B02-RIYUU1
