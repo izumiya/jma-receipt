@@ -382,6 +382,7 @@
       *  04.02.40    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
       *  04.02.41    NACL-ÌçÏÆ    09/02/26  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.42    NACL-ÌçÏÆ    09/02/26  £·£µºÐ°Ê¾å¤ÎÁ°´ü¹âÎð¼ÔÂÐ±þ
+      *  04.02.43    NACL-ÌçÏÆ    09/03/03  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -516,7 +517,6 @@
            03  FLG-SYODOU-COM                          PIC 9(01).
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
-           03  FLG-FUKUSHI                             PIC 9(01).
       *****03  FLG-HKNNUM                              PIC 9(01).
            03  FLG-RECESKYKBN                          PIC 9(01).
            03  FLG-ZENKOH-ARI                          PIC 9(01).
@@ -792,6 +792,10 @@
        01  TBL-DOTANDOKU.
            03  TBL-DOTANDOKU-OCC                       OCCURS  4.
                05  TBL-DOTANDOKU-FLG                   PIC 9(01).
+      *
+       01  TBL-FUKUSHI.
+           03  TBL-FUKUSHI-OCC                         OCCURS  4.
+               05  TBL-FUKUSHIFLG                      PIC 9(01).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -1803,7 +1807,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            INITIALIZE                   FLG-SAISIN-AREA
            INITIALIZE                   CNT-SAISIN-AREA
       *
-           MOVE      ZERO       TO      FLG-FUKUSHI
+           INITIALIZE                   TBL-FUKUSHI
            MOVE    88888880     TO      WRK-ZAINUM
       *
            INITIALIZE                   TBL-TOKUSYU-KEISAN
@@ -3211,7 +3215,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21041-KUMIAWASE-HANBETU-SEC               SECTION.
       *
-           MOVE     ZERO      TO      FLG-FUKUSHI
+           INITIALIZE                 TBL-FUKUSHI
       *
            IF      IDZ             =   1 
              EVALUATE   SYS-1001-PREFNUM
@@ -3222,7 +3226,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ( RECE02-KOHNUMHC(IDX1 2)(1:1)
                                              >=  "1" AND <=  "8")
       *
-                      MOVE     1       TO      FLG-FUKUSHI
+                      MOVE     1       TO      TBL-FUKUSHIFLG(2)
       *
                       MOVE    "1"      TO      RECE02-FUKUSHIFLG
       *
@@ -3304,9 +3308,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              (ACCT-ZAITEN * 
                                               ACCT-ZAIKAISU)
                      END-IF
-                     IF     FLG-FUKUSHI  =   1
-                     AND    RECE02-KOHNUM(KH-IDX - 1)(1:1)
-                                             >=  "1" AND <=  "8"
+                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
                          CONTINUE
                      ELSE
                        IF        ACCT-SRYCDTOTAL    =    630010002
@@ -4797,9 +4799,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1     
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(1)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1 
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4812,9 +4813,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(1)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4841,9 +4841,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1     
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(2)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4856,9 +4855,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(2)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4885,9 +4883,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1     
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(3)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4900,9 +4897,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(3)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4929,9 +4925,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1     
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(4)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -4944,9 +4939,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
-                                    IF     FLG-FUKUSHI  =   1
-                                    AND    RECE02-KOHNUM(4)(1:1)
-                                             >=  "1" AND <=  "8"
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   1
+                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
