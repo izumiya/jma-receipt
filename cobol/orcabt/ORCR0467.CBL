@@ -39,6 +39,7 @@
       *  03.05.03    NACL-門脇    07/06/26  不要項目削除
       *  04.01.01    NACL-門脇    07/11/26  特定器材商品名記載対応
       *  04.03.01    NACL-門脇    09/01/23  円摘要欄編集修正
+      *  04.03.02    NACL-門脇    09/03/04  （特）記載編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -414,10 +415,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE47PARA-HOSPNUM
                MOVE    RECE41-GAITOKU-KAISU1
                                            TO  WRK-ZAIKAISUX
                PERFORM 4304-TENSUKAI-HEN-SEC
-               MOVE    "（特）"            TO  WRK-ZAI1-NAME (1:6)                            
+      ***      MOVE    "（特）"            TO  WRK-ZAI1-NAME (1:6)
                MOVE    WRK-TNSKAI (WRK-TNSKAI-LEN:)
                                            TO
                                         WRK-ZAI1-NAME(WRK-TNSKAI-ST1:)
+               MOVE    "（特）"            TO  WRK-ZAI1-NAME (1:6)
                MOVE    RECE41-KEY        TO  RECE46-KEY
                MOVE    SPACE             TO  RECE46-SRYKBN
                MOVE    ZERO              TO  RECE46-GAITENTTLKBN
@@ -435,10 +437,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE47PARA-HOSPNUM
                MOVE    RECE41-GAITOKU-KAISU2
                                            TO  WRK-ZAIKAISUX
                PERFORM 4304-TENSUKAI-HEN-SEC
-               MOVE    "（特）"            TO  WRK-ZAI1-NAME (1:6)                            
+      ***      MOVE    "（特）"            TO  WRK-ZAI1-NAME (1:6)
                MOVE    WRK-TNSKAI (WRK-TNSKAI-LEN:)
                                            TO
                                         WRK-ZAI1-NAME(WRK-TNSKAI-ST1:)
+               MOVE    "（特）"            TO  WRK-ZAI1-NAME (1:6)
                MOVE    RECE41-KEY        TO  RECE46-KEY
                MOVE    SPACE             TO  RECE46-SRYKBN
                MOVE    ZERO              TO  RECE46-GAITENTTLKBN
