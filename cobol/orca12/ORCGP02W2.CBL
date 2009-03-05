@@ -1308,8 +1308,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    WRK-SYMD  TO  WRK-KCOMB-TEKSTYMD (IDX2)
                ELSE
       *            ○組合せ元の開始日変更
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                     TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      ***          MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
+      ***                            TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE  "99999999"  TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE  "00000000"  TO  WRK-KCOMB-TEKEDYMD (IDX2)
                END-IF
            END-IF
            .
@@ -4260,6 +4262,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
       *            [組合せ 終了日]≦[生保 終了日]
       *            ○組合せ元の開始日変更
+      *@@X
                    MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
                                      TO  WRK-KCOMB-TEKSTYMD (IDX2)
                END-IF
@@ -4293,6 +4296,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
       *          ● ---> [組合せ] 終了日
       *          ○組合せ元の開始日変更
+      *@@X
                  MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
                                      TO  WRK-KCOMB-TEKSTYMD (IDX2)
                END-IF
@@ -4883,8 +4887,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
       *            [生保 終了日]≦[主保険 終了日]
       *            ○生保の開始日変更
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                     TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      ***          MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
+      ***                            TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE   "99999999" TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE   "00000000" TO  WRK-KCOMB-TEKEDYMD (IDX2)
                END-IF
            END-IF
            .
