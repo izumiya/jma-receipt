@@ -280,6 +280,8 @@
       *  04.03.04    NACL-藤原    08/07/23  宮城県、岩手県地震対応
       *                                     ２００８年６月〜対象 
       *  04.03.05    NACL-門脇    08/12/01  在宅（院外分）編集修正
+      *  04.03.06    NACL-藤原    09/02/05  院外処方の直後の症状詳記の記
+      *                                     録の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1866,6 +1868,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *        適用レコード
                PERFORM     2007-HENSYU-SEC
       *        症状詳記（適用欄下段コメント・レセコメント）
+               MOVE    ZERO        TO  FLG-TOYAKUFLG
                PERFORM     2009-COMMENT-HEN-99-SEC
       *
                ADD     1           TO  CNT-COMMIT
@@ -2873,6 +2876,7 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE041-HOSPNUM     )
                IF      FLG-COMMENT         =   ZERO
                    MOVE    1                   TO  FLG-COMMENT
                    MOVE    WRK-FTNKBN          TO  WRK-COM-FTNKBN
+                   MOVE    ZERO                TO  FLG-TOYAKUFLG
                    PERFORM 2008-COMMENT-HEN-01-SEC
                END-IF
       *
