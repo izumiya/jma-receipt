@@ -3108,6 +3108,9 @@
       *
       *    診療科（ドクターコードから）
            PERFORM 410121-DRCD-HENSYU-SEC
+           IF      SPA-GMN-SRYKA       =   SPACE
+               MOVE    SPA-GMN-SRYKALST (1)    TO  SPA-GMN-SRYKA-G
+           END-IF
       *    予約内容
            IF      SPA-YYKKBN-HYOJI    =   ZERO
                MOVE    SPA-GMN-YYKKBNLST (2)
