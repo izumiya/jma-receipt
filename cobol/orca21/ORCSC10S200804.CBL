@@ -1373,6 +1373,11 @@
                        MOVE    1                   TO  SPA-SEIKATU-ARI
                        MOVE    1                   TO  SPA-SEIKATU-ARI2
                    END-IF
+      *            老人の時、生活習慣病の算定判定をしない
+                   IF      SPA-NAI-ROUJIN      =   1
+                       MOVE    ZERO                TO  SPA-SEIKATU-ARI
+                       MOVE    ZERO                TO  SPA-SEIKATU-ARI2
+                   END-IF
       *        痴呆患者在宅指導管理料
                WHEN    "113700310"
                    IF      SANTEI-MSANTEICNT   >   ZERO
@@ -4090,10 +4095,15 @@
       *    生活習慣病指導管理科チェック
            IF     (SPA-SEIKATU-ARI     NOT =   ZERO )  OR
                   (SPA-SEIKATU-ARI2    NOT =   ZERO )
+      *        老人の時、生活習慣病の算定判定をしない
+               IF      SPA-NAI-ROUJIN      =   ZERO
+      *
                PERFORM 5022-SEIKATU-CHK-SEC
                IF      SPA-ERRCD       NOT =   SPACE
                    GO      TO      700-SANTEI-CHK-EXT
                END-IF
+           END-IF
+      *
            END-IF
       *
       *    在宅末期医療総合診察料チェック
