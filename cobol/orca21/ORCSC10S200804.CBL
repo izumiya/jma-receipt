@@ -1369,6 +1369,11 @@
                        MOVE    1                   TO  SPA-SEIKATU-ARI
                        MOVE    1                   TO  SPA-SEIKATU-ARI2
                    END-IF
+      *            Ï·¿Í¤Î»þ¡¢À¸³è½¬´·ÉÂ¤Î»»ÄêÈ½Äê¤ò¤·¤Ê¤¤
+                   IF      SPA-NAI-ROUJIN      =   1
+                       MOVE    ZERO                TO  SPA-SEIKATU-ARI
+                       MOVE    ZERO                TO  SPA-SEIKATU-ARI2
+                   END-IF
       *        ÃÔÊò´µ¼ÔºßÂð»ØÆ³´ÉÍýÎÁ
                WHEN    "113700310"
                    IF      SANTEI-MSANTEICNT   >   ZERO
