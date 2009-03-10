@@ -94,6 +94,7 @@
       *  04.02.02    NACL-¾®Æ¦Âô  08/04/08  °åÎÅ¶èÊ¬¥³¥á¥ó¥È²þÄêÂÐ±þ
       *  04.02.03    NACL-ÌçÏÆ    08/05/07  Âà±¡»þÉþÌô»ØÆ³²Ã»»»»ÄêÆüµ­ºÜ½¤Àµ
       *  04.02.04    NACL-ÌçÏÆ    09/01/05  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.02.05    NACL-ÌçÏÆ    09/03/10  ¾ã³²¤Î¥³¥á¥ó¥Èµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1463,10 +1464,10 @@
       *    ¥³¥á¥ó¥È¤ÎÁÞÆþ
            MOVE    SPACE               TO  WRK-RECE65XX-REC
            INITIALIZE                      WRK-RECE65XX-REC
-           MOVE    "810000001"         TO  WRK-RECE65XX-SRYCD(1 1)
+           MOVE    "820000143"         TO  WRK-RECE65XX-SRYCD(1 1)
            MOVE     ZERO               TO  WRK-RECE65XX-SRYSURYO(1 1)
-           MOVE     2                  TO  WRK-RECE65XX-YUKOKETA(1 1)
-           MOVE    "¾ã³²"              TO  WRK-RECE65XX-NAME(1 1)
+           MOVE     4                  TO  WRK-RECE65XX-YUKOKETA(1 1)
+           MOVE    "¡Ê¾ã³²¡Ë"          TO  WRK-RECE65XX-NAME(1 1)
       *
            MOVE    WRK-RECE65XX-SRYACT-TBL(1 1)
                                        TO  RECE659-SRYACT-TBL(1)

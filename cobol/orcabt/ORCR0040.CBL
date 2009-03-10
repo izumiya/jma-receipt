@@ -104,6 +104,7 @@
       *  04.02.02    NACL-ÌçÏÆ    08/10/14  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *  04.02.03    NACL-ÌçÏÆ    08/12/22  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
       *  04.02.04    NACL-ÌçÏÆ    09/01/05  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.02.05    NACL-ÌçÏÆ    09/03/10  ¾ã³²¤Î¥³¥á¥ó¥Èµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2152,10 +2153,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    ¥³¥á¥ó¥È¤ÎÁÞÆþ
            MOVE    SPACE               TO  WRK-RECE05XX-REC
            INITIALIZE                      WRK-RECE05XX-REC
-           MOVE    "810000001"         TO  WRK-RECE05XX-SRYCD(1 1)
+           MOVE    "820000143"         TO  WRK-RECE05XX-SRYCD(1 1)
            MOVE     ZERO               TO  WRK-RECE05XX-SRYSURYO(1 1)
-           MOVE     2                  TO  WRK-RECE05XX-YUKOKETA(1 1)
-           MOVE    "¾ã³²"              TO  WRK-RECE05XX-NAME(1 1)
+           MOVE     4                  TO  WRK-RECE05XX-YUKOKETA(1 1)
+           MOVE    "¡Ê¾ã³²¡Ë"          TO  WRK-RECE05XX-NAME(1 1)
       *
            MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
                                         TO  RECE059-SRYACT-TBL(1)
