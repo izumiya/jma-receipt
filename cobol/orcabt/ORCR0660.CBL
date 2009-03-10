@@ -97,6 +97,7 @@
       *  04.03.01    NACL-門脇    08/08/19  入院料未算定時のコメント対応
       *  04.03.02    NACL-門脇    08/11/04  リハビリ発症日年月日対応
       *  04.03.03    NACL-門脇    09/01/05  平成２１年１月改正対応
+      *  04.03.04    NACL-門脇    09/03/10  障害のコメント記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1481,10 +1482,10 @@
       *    コメントの挿入
            MOVE    SPACE               TO  WRK-RECE65XX-REC
            INITIALIZE                      WRK-RECE65XX-REC
-           MOVE    "810000001"         TO  WRK-RECE65XX-SRYCD(1 1)
+           MOVE    "820000143"         TO  WRK-RECE65XX-SRYCD(1 1)
            MOVE     ZERO               TO  WRK-RECE65XX-SRYSURYO(1 1)
-           MOVE     2                  TO  WRK-RECE65XX-YUKOKETA(1 1)
-           MOVE    "障害"              TO  WRK-RECE65XX-NAME(1 1)
+           MOVE     4                  TO  WRK-RECE65XX-YUKOKETA(1 1)
+           MOVE    "（障害）"          TO  WRK-RECE65XX-NAME(1 1)
       *
            MOVE    WRK-RECE65XX-SRYACT-TBL(1 1)
                                        TO  RECE659-SRYACT-TBL(1)
