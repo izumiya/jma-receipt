@@ -136,6 +136,8 @@
            03  IDX-SHOKUJI                 PIC 9(02).
            03  KIKAN-IDX1                  PIC 9(04).
            03  KIKAN-IDX2                  PIC 9(04).
+           03  SC-IDX                      PIC 9(02).
+           03  SC-IDX2                     PIC 9(02).
       *
       *    ¥Ñ¥é¥á¥¿ÎÎ°è
        01  PARA-AREA.
@@ -278,6 +280,13 @@
        01  WK-PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC"     REPLACING
                                 //PTNYUINRRK-// BY //WK-PTNYUINRRK-//.
+      *    ÆÃÄêÆþ±¡´ü´Ö»»ÄêÍÑ¥ï¡¼¥¯
+       01  WRK-SCNYUACCT-AREA.
+           03  WRK-SCNYUACCT-KAGENCD-TBL         OCCURS  7.
+               05  WRK-SCNYUACCT-KAGEN-SRYCD     PIC  X(09).
+               05  WRK-SCNYUACCT-KAGEN-STYUKYMD  PIC  X(08).
+               05  WRK-SCNYUACCT-KAGEN-EDYUKYMD  PIC  X(08).
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -1818,11 +1827,13 @@
       *    Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190121110"
                MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   "190066910"      TO  LNK-SCNYUACCT-NYUKHN-SRYCD
+               MOVE   SPACE            TO  LNK-SCNYUACCT-NYUKHN-SRYCD
                                                                     (1)
-               MOVE   "190121110"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
+               MOVE   SPACE            TO  WRK-SCNYUACCT-AREA
+               INITIALIZE                  WRK-SCNYUACCT-AREA
+               MOVE   "190121110"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(1)
                MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
                                                                     (1)
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
@@ -1833,33 +1844,63 @@
                MOVE    29              TO  LNK-DAY6-ZOGEN
                CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
+               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                    (1)
       *
-               MOVE   "190066910"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+               MOVE   "190066910"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(2)
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
                MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+               MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
                                        TO  LNK-DAY6-KIJUN
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                MOVE     1              TO  LNK-DAY6-ZOGEN
                CALL  "ORCSDAY"         USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
+               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
                                                                   (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
+               MOVE    "99999999"      TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                   (2)
+      *
+               MOVE    ZERO            TO  SC-IDX2
+               PERFORM    VARYING    SC-IDX   FROM  1   BY   1
+                 UNTIL  (WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX) = SPACE) OR
+                        (SC-IDX        >    7)
+                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) <=
+                                          LNK-SCNYUACCT-STSRYYMD)  AND
+                        (WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX) >=
+                                          LNK-SCNYUACCT-STSRYYMD)
+                      ADD     1     TO   SC-IDX2
+                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
+                      MOVE  LNK-SCNYUACCT-STSRYYMD  TO
+                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
+                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
+                 END-IF
+                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) >
+                                          LNK-SCNYUACCT-STSRYYMD)
+                      ADD     1     TO   SC-IDX2
+                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
+                      MOVE  WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
+                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
+                 END-IF
+               END-PERFORM
            END-IF
       *
       *    Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
            IF      SYOKIKSN-IN-KHNSRYCD    =   "190121210"
                MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   "190067010"      TO  LNK-SCNYUACCT-NYUKHN-SRYCD
+               MOVE   SPACE            TO  LNK-SCNYUACCT-NYUKHN-SRYCD
                                                                     (1)
-               MOVE   "190121210"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
+               MOVE   SPACE            TO  WRK-SCNYUACCT-AREA
+               INITIALIZE                  WRK-SCNYUACCT-AREA
+               MOVE   "190121210"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(1)
                MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
                                                                     (1)
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
@@ -1870,23 +1911,51 @@
                MOVE    29              TO  LNK-DAY6-ZOGEN
                CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
+               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                    (1)
       *
-               MOVE   "190067010"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+               MOVE   "190067010"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(2)
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
                MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+               MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
                                        TO  LNK-DAY6-KIJUN
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                MOVE     1              TO  LNK-DAY6-ZOGEN
                CALL  "ORCSDAY"         USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
+               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
                                                                   (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
+               MOVE    "99999999"      TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                   (2)
+      *
+               MOVE    ZERO            TO  SC-IDX2
+               PERFORM    VARYING    SC-IDX   FROM  1   BY   1
+                 UNTIL  (WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX) = SPACE) OR
+                        (SC-IDX        >    7)
+                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) <=
+                                          LNK-SCNYUACCT-STSRYYMD)  AND
+                        (WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX) >=
+                                          LNK-SCNYUACCT-STSRYYMD)
+                      ADD     1     TO   SC-IDX2
+                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
+                      MOVE  LNK-SCNYUACCT-STSRYYMD  TO
+                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
+                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
+                 END-IF
+                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) >
+                                          LNK-SCNYUACCT-STSRYYMD)
+                      ADD     1     TO   SC-IDX2
+                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
+                      MOVE  WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
+                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
+                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
+                 END-IF
+               END-PERFORM
            END-IF
       *
       *    Æþ±¡ÎÁ²Ã»»¿ÇÎÅ¥³¡¼¥É¼è¤ê¹þ¤ß
