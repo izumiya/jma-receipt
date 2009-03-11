@@ -3958,6 +3958,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        45004-ALL-JYURRK-UPD-SEC              SECTION.
       *
+           IF      SPA-TEI-DENPNUM (1)  =   ZERO
+      *        複数科でない時の診療科変更
+               PERFORM VARYING     IDXF    FROM    1   BY  1
+                       UNTIL      (IDXF    >   15  )  OR
+                                  (WRK-TEI-SRYKA (IDXF)    =   SPACE)
+                   MOVE    WRK-TEI-SRYKA (IDXF)    TO  WRK-SRYKA
+                   MOVE    ZERO                TO  FLG-OK
+                   PERFORM VARYING     IDH3    FROM    1   BY  1
+                           UNTIL      (IDH3    >   15  )  OR
+                                      (TBL-SRYKA(IDH3) =   SPACE) OR
+                                      (FLG-OK          =   1  )
+                       IF     TBL-SRYKA (IDH3)     =   WRK-SRYKA
+                           MOVE    1               TO  FLG-OK
+                       END-IF
+                   END-PERFORM
+                   IF      FLG-OK              =   ZERO
+                        PERFORM 4500111-TEISEI-JYURRK-HEN-SEC
+                   END-IF
+               END-PERFORM
+          END-IF
+      *
            PERFORM VARYING     IDXF    FROM    1   BY  1
                    UNTIL      (IDXF    >   15  )  OR
                               (SPA-TEI-DENPNUM (IDXF)  =   ZERO )

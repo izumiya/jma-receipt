@@ -11789,6 +11789,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO      4100-TOROKU-EXT
            END-IF
       *
+      *    後期高齢者で当月生活習慣病管理料算定中
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-SEIKATU-ARI2    =   9
+                   MOVE    "K177"          TO  SPA-ERRCD
+                   MOVE    ZERO            TO  SPA-SEIKATU-ARI2
+               END-IF
+           END-IF
+      *
       *    更新処理
       *****MOVE    SPACE           TO  WRK-PUTTYPE
            PERFORM 41002-KOUSIN-SYORI-SEC
