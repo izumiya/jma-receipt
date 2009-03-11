@@ -5163,6 +5163,8 @@
                                        SPA-AREA
                                        SPA-K01KYOUTU
                                        SPA-K02
+      *    保険組合
+           PERFORM 3101-HKNCOMBI-HEN-SEC
       *    ワーク診療行為に存在あり
            IF      SPA-WKSRY-HKNCOMBI  NOT =   ZERO
                MOVE    "0118"          TO  SPA-KIDCD
@@ -11781,6 +11783,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (FLG-KINKI           =   1   )  AND
                   (FLG-END             =   1   )
                GO      TO      4100-TOROKU-EXT
+           END-IF
+      *
+      *    後期高齢者で当月生活習慣病管理料算定中
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-SEIKATU-ARI2    =   9
+                   MOVE    "K177"          TO  SPA-ERRCD
+                   MOVE    ZERO            TO  SPA-SEIKATU-ARI2
+               END-IF
            END-IF
       *
       *    更新処理

@@ -1738,6 +1738,12 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "K177"
+                   STRING  "警告！！"
+                          "当月に生活習慣病管理料を算定しています。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *!
                WHEN    "1050"
                    STRING  "労災・自賠責・公害、包括分入力の"
