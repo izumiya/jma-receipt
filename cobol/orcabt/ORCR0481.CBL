@@ -79,6 +79,8 @@
       *  04.03.03    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
       *  04.03.04    NACL-藤原    09/01/16  症状詳記区分の表題の変更
       *  04.03.05    NACL-門脇    09/02/04  請求点が０の場合の対応
+      *  04.03.06    NACL-藤原    09/03/10  請求点イが１０万以上のときの
+      *                                     編集の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -468,6 +470,7 @@
            03  WRK-JNISSU          PIC ZZ9.
            03  WRK-TOTALTEN        PIC ZZ,ZZZ.
            03  WRK-TOTALTEN2       PIC ZZZ,ZZZ.
+           03  WRK-TOTALTEN3       PIC ZZZZZZ.
            03  WRK-NENREI-X        PIC ZZ9.
            03  WRK-KINGAKUZ        PIC ZZZ,ZZZ.
            03  WRK-KGK9            PIC ZZ,ZZZ,ZZ9.
@@ -1717,8 +1720,13 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            END-PERFORM
       *
       *    小計イ
-           MOVE    RECE41-TOTALTEN        TO  WRK-TOTALTEN
-           MOVE    WRK-TOTALTEN           TO  HC21-TOTALTEN
+           IF      RECE41-TOTALTEN        <   100000
+               MOVE    RECE41-TOTALTEN        TO  WRK-TOTALTEN
+               MOVE    WRK-TOTALTEN           TO  HC21-TOTALTEN
+           ELSE
+               MOVE    RECE41-TOTALTEN        TO  WRK-TOTALTEN3
+               MOVE    WRK-TOTALTEN3          TO  HC21-TOTALTEN
+           END-IF
            IF      RECE41-TOTALKIN            >   ZERO
                MOVE    RECE41-TOTALKIN        TO  WRK-KGK9
                MOVE    WRK-KGK9               TO  HC21-TOTALMONEY
