@@ -2554,7 +2554,7 @@
            END-IF
       *    Ｈ２０．４から後期高齢者の保険がない時
            IF      AGECHK-RJNCHK       =   4
-      *****    MOVE    "1076"              TO  SPA-ERRCD
+               MOVE    "1076"              TO  SPA-ERRCD
                MOVE    3                   TO  SPA-RJN-ERR
            END-IF
            IF      AGECHK-RJNCHK       =   2
@@ -9296,16 +9296,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "1070"              TO  SPA-ERRCD
                END-IF
            END-IF
-      *    後期高齢者の保険がない時
-      *!!! ７５歳到達を警告へ
-           IF     (SPA-RJN-ERR         =   3   )  AND
-                  (SPA-ERRCD           =   SPACE )
-               IF      SPA-NAI-ROUSTR      =   ZERO
-                   MOVE    "K076"          TO  SPA-ERRCD
-                   MOVE    1               TO  SPA-NAI-ROUSTR
-               END-IF
-           END-IF
-      *!!!!
       *
       *    保険エラーがある時、エラーとする
            IF      SPA-ERRCD           =   SPACE
@@ -10320,16 +10310,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPACE               TO  SPA-ERRCD
            END-IF
       *
-      *    後期高齢者の保険がない時
-      *!!! ７５歳到達を警告へ
-           IF     (SPA-RJN-ERR         =   3   )  AND
-                  (SPA-ERRCD           =   SPACE )
-               IF      SPA-NAI-ROUSTR      =   ZERO
-                   MOVE    "K076"          TO  SPA-ERRCD
-                   MOVE    1               TO  SPA-NAI-ROUSTR
-               END-IF
-           END-IF
-      *!!!!
       *    訂正時の登録エラー
            IF     (SPA-TEISEI-ERR      =   1  )  AND
                   (SPA-TEISEI-CHK      =   ZERO)

@@ -4416,10 +4416,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
-               WHEN    "K121"
-                   STRING  "警告！！"
-                           "後期高齢者に到達しました。"
-                           "後期高齢者の保険を登録して下さい。"
+               WHEN    "0128"
+                   STRING  "後期高齢非該当者です。"
+                           "保険の補助区分を前期高齢者に変更して下さい"
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
