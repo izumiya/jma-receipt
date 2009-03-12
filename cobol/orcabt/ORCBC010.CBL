@@ -40,6 +40,9 @@
       *                                     本人・家族区分の見直し
       *                                     ０件の場合正常終了とする
       *  04.03.03    NACL-門脇    08/12/17  平成２１年１月改正対応
+      *  04.03.04    NACL-藤原    09/02/26  平成２０年４月以降に７５歳到
+      *                                     達時に海外に住所を有する場合
+      *                                     の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3127,8 +3130,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                            END-EVALUATE
                        WHEN    "060"
                        WHEN    "068"
-                           IF  (COLDAT01-AGE  >=   70)  AND
-                               (COLDAT01-AGE  <=   74)
+      *********************IF  (COLDAT01-AGE  >=   70)  AND
+      *********************    (COLDAT01-AGE  <=   74)
+                           IF  (COLDAT01-AGE  >=   70)
                              EVALUATE    WRK-PARA-NYUGAIKBN
                                WHEN    "1"
                                    EVALUATE   COLDAT01-THOJOKBN (IDY)

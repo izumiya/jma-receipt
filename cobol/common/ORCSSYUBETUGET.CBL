@@ -30,6 +30,9 @@
       *
       *  04.03.01    NACL-Æ£¸¶    08/05/07  ¸øÈñ£´¼ï¤Þ¤Ç¤ÎÊ»ÍÑ¤Îµ­Ï¿ÂÐ±þ
       *  04.03.02    NACL-Æ£¸¶    08/12/01  ¼«Èñ¤Î¼ïÊÌÀßÄê¾ò·ï¤Î½¤Àµ
+      *  04.03.03    NACL-Æ£¸¶    09/02/26  Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤Ë£·£µºÐÅþ
+      *                                     Ã£»þ¤Ë³¤³°¤Ë½»½ê¤òÍ­¤¹¤ë¾ì¹ç
+      *                                     ¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1826,7 +1829,7 @@
                        WHEN    "060" 
                        WHEN    "068" 
                            IF    ( LNK-SYUBETUGET-AGE  >=  70 )
-                           AND   ( LNK-SYUBETUGET-AGE  <=  74 )
+      *********************AND   ( LNK-SYUBETUGET-AGE  <=  74 )
                              EVALUATE    LNK-SYUBETUGET-NYUGAIKBN
                                WHEN    "1"
                                    EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
