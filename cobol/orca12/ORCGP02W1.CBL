@@ -194,6 +194,7 @@
            03  FLG-ERRCHK         PIC 9(01).
       *    Ｈ１８．１０改正対応
            03  FLG-RJNCHK2             PIC 9(01).
+           03  FLG-RJNCHK3             PIC 9(01).
            03  FLG-RJNERR              PIC 9(01).
            03  FLG-KOKUHO              PIC 9(01).
            03  FLG-RJNKOHERR           PIC 9(01).
@@ -1378,9 +1379,6 @@
            IF      SPA-PTHKN-SINKIKBN (IDX)    =   SPACE
                MOVE    1                   TO  SPA-ROU-KEIFLG
            END-IF
-      *!!!
-           MOVE    SPA-PTHKN-KEIFLG(IDX)
-                                           TO  SPA-HKNJA-KEIFLG
       *
       *    保険者番号　検索チェック
            INITIALIZE                    HKNJAINF-REC
@@ -1411,8 +1409,8 @@
                MOVE    HKNJA-TEL           TO  SPA-HKNJA-TEL
       *
                MOVE    HKNJA-IDOYMD        TO  SPA-HKNJA-IDOYMD
-      *!!      MOVE    SPA-PTHKN-KEIFLG(IDX)
-      *!!                                  TO  SPA-HKNJA-KEIFLG
+               MOVE    SPA-PTHKN-KEIFLG(IDX)
+                                           TO  SPA-HKNJA-KEIFLG
            ELSE
                MOVE    SPACE               TO  SPA-HKNJA-HKNJANAME
                MOVE    SPACE               TO  SPA-HKNJA-ADRS
@@ -1420,7 +1418,7 @@
                MOVE    SPACE               TO  SPA-HKNJA-TEL
       *
                MOVE    SPACE               TO  SPA-HKNJA-IDOYMD
-      *!!!     MOVE    SPACE               TO  SPA-HKNJA-KEIFLG
+               MOVE    SPACE               TO  SPA-HKNJA-KEIFLG
            END-IF
       *
       *    保険情報
@@ -2555,9 +2553,9 @@
                PERFORM 41011-ROUSAI-CHK-SEC
            ELSE
       *        保険者番号変更時に異動チェックをクリアする
-      *!!      IF      P02-P02-HKNJANUM    NOT =   SPA-GMN-HKNJANUM
-      *            MOVE    SPACE               TO  SPA-HKNJA-KEIFLG
-      *!!      END-IF
+               IF      P02-P02-HKNJANUM    NOT =   SPA-GMN-HKNJANUM
+                   MOVE    SPACE               TO  SPA-HKNJA-KEIFLG
+               END-IF
                IF      P02-P02-HONKZKBN(1:1)   NOT = SPA-GMN-HONKZKKBN
                    MOVE    SPA-GMN-HONKZKKBN   TO  SPA-MAE-HONKZKKBN
                END-IF
@@ -4539,6 +4537,7 @@
       *    公費
            MOVE    ZERO                TO  SPA-KOH-IDX2
            MOVE    ZERO                TO  FLG-27KOH-OK
+           MOVE    ZERO                TO  FLG-RJNCHK3
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       IDX     >   SPA-PTKOH-MAX
                IF     (SPA-PTKOH-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
@@ -4555,6 +4554,11 @@
                    IF      SPA-PTKOH-KOHNUM  (IDX) =   "012"
                        MOVE    1                   TO  FLG-SEIHOGO
                    END-IF
+      *!!          後期高齢者非該当(H21.3)
+                   IF      SPA-PTKOH-KOHNUM  (IDX) =   "977"
+                       MOVE    1                   TO  FLG-RJNCHK3
+                   END-IF
+      *!!
                END-IF
       *        Ｈ１８．１０改正 老人２割を３割へ
                IF     (SPA-PTKOH-SAKJOKBN (IDX) NOT =  "1"        )
@@ -4595,11 +4599,15 @@
                        IF      (FLG-RJNCHK2        =   1   )
                            AND (FLG-RJNCHK     NOT =   2   )
                            AND (FLG-HKNCHK         =   1   )
+      *                保険があり、後期非該当がない時
+                           AND (FLG-RJNCHK3        =   ZERO )
                            MOVE    "0121"              TO  SPA-ERRCD
                            MOVE    10                  TO  SPA-GMN-CUR
                        END-IF
                    ELSE
                        IF     (FLG-HKNCHK         =   1   )
+      *                保険があり、後期非該当がない時
+                       AND    (FLG-RJNCHK3        =   ZERO )
                            IF      FLG-HKNCHK2        =    ZERO
                                MOVE    "0120"              TO  SPA-ERRCD
                            ELSE
@@ -4608,22 +4616,17 @@
                            MOVE    10                  TO  SPA-GMN-CUR
                        END-IF
                    END-IF
-      *!!!
-      *H21/2/25 後期高齢は警告へ
-                   IF      SPA-ERRCD           =   "0121"
-                                               OR  "0120"
-      *                保険者情報異動区分を使用
-                       IF      SPA-HKNJA-KEIFLG    =   SPACE
-                           MOVE    "K121"          TO  SPA-ERRCD
-                           MOVE    "1"             TO  SPA-HKNJA-KEIFLG
-                       ELSE
-                           MOVE    SPACE           TO  SPA-ERRCD
-                       END-IF
+      *!!
+      *            後期非該当があり、前期高齢者保険がない時
+                   IF     (FLG-RJNCHK3         =   1 )
+                   AND    (FLG-HKNCHK          =   1 )
+                   AND    (FLG-RJNCHK          =   ZERO )
+                       MOVE    "0128"              TO  SPA-ERRCD
+                       MOVE    11                  TO  SPA-GMN-CUR
                    END-IF
-      *!!!
+      *!!
       *            終了する保険を再表示
-      ********     IF     (SPA-ERRCD           =   "0121" )
-                   IF     (SPA-ERRCD           =   "K121" )
+                   IF     (SPA-ERRCD           =   "0121" )
                       AND (SPA-HKN-IDX1    NOT =   ZERO   )
                       AND (SPA-NAI-HKNSTR  NOT =   SPA-HKN-IDX1)
                        INITIALIZE                  SPA-GMN-HKN-AREA

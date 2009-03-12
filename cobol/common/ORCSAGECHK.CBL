@@ -92,6 +92,7 @@
            03  FLG-KAKUNIN         PIC 9(01).
            03  FLG-CHK-OK          PIC 9(01).
            03  FLG-TAHKN           PIC 9(01).
+           03  FLG-HI-ROUJIN       PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -411,6 +412,7 @@
       *            £·£µºÐ°Ê¾å¤Ç¡¢¸å´ü¹âÎð¼Ô°Ê³°ÊÝ¸±
                    PERFORM 20011-ROUJIN-CHK3-SEC
                    IF     (AGECHK-ROUJIN2      =   ZERO )
+                      AND (FLG-HI-ROUJIN       =   1    )
                       AND (FLG-TAHKN           =   1    )
                        MOVE    ZERO                TO  AGECHK-ROUJIN2
                    ELSE
@@ -752,9 +754,6 @@
                           (FLG-OK          NOT =   4   )  AND
                           (FLG-OK2             =   ZERO)
                        MOVE    4               TO  AGECHK-RJNCHK
-      *!!!
-      *            Ï·¿Í¤È¤·¤Ê¤¤
-                       MOVE    ZERO            TO  AGECHK-ROUJIN
                    END-IF
                END-IF
            END-IF
@@ -1285,11 +1284,19 @@
                        PERFORM 20011-ROUJIN-CHK3-SEC
                    END-IF
                ELSE
-                   PERFORM 20011-ROUJIN-CHK3-SEC
-                   IF     (AGECHK-ROUJIN2      =   ZERO )
-                      AND (FLG-TAHKN           =   1    )
-                       MOVE    ZERO                TO  AGECHK-ROUJIN2
+                   IF     (COMB-HKNNUM         =   "039"
+                                               OR  "040"
+                                               OR  SPACE )
+                   OR     (COMB-HKNNUM         >   "900" )
+                       MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
                    ELSE
+                       PERFORM 20011-ROUJIN-CHK3-SEC
+                       IF     (AGECHK-ROUJIN2      =   ZERO )
+                          AND (FLG-HI-ROUJIN       =   1    )
+                          AND (FLG-TAHKN           =   1    )
+                           MOVE    ZERO            TO  AGECHK-ROUJIN2
+                           MOVE    ZERO            TO  AGECHK-ROUJIN
+                       END-IF
                        MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
                    END-IF
                END-IF
@@ -1458,6 +1465,34 @@
       *
                IF      FLG-PTKOHINF        =   ZERO
                    MOVE    1                   TO  AGECHK-ROUJIN2
+               END-IF
+           END-IF
+      *    ¸å´ü¹âÎð¼ÔÈó³ºÅö
+           IF      AGECHK-ROUJIN2      =   ZERO
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    AGECHK-HOSPNUM      TO  PTKOH-HOSPNUM
+               MOVE    AGECHK-PTID         TO  PTKOH-PTID
+               MOVE    "977"               TO  PTKOH-KOHNUM
+               MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKSTYMD
+               MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKEDYMD
+      *
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE    "key6"              TO  MCP-PATHNAME
+                   PERFORM 920-PTKOHINF-READ-SEC
+               ELSE
+                   MOVE    1               TO  FLG-PTKOHINF
+               END-IF
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+      *
+               IF      FLG-PTKOHINF        =   ZERO
+                   MOVE    1                   TO  FLG-HI-ROUJIN
                END-IF
            END-IF
            .
