@@ -3127,8 +3127,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                            END-EVALUATE
                        WHEN    "060"
                        WHEN    "068"
-                           IF  (COLDAT01-AGE  >=   70)  AND
-                               (COLDAT01-AGE  <=   74)
+      *********************IF  (COLDAT01-AGE  >=   70)  AND
+      *********************    (COLDAT01-AGE  <=   74)
+                           IF  (COLDAT01-AGE  >=   70)
                              EVALUATE    WRK-PARA-NYUGAIKBN
                                WHEN    "1"
                                    EVALUATE   COLDAT01-THOJOKBN (IDY)

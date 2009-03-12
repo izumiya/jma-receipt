@@ -69,6 +69,9 @@
       *  04.02.05    NACL-ÌçÏÆ    08/08/07  Àº¿ÀÄÌ±¡¤ÎÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *  04.02.06    NACL-ÌçÏÆ    08/10/08  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *  04.02.07    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.02.08    NACL-Æ£¸¶    09/02/26  Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤Ë£·£µºÐÅþ
+      *                                     Ã£»þ¤Ë³¤³°¤Ë½»½ê¤òÍ­¤¹¤ë¾ì¹ç
+      *                                     ¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2208,8 +2211,9 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
                        END-EVALUATE
                    WHEN    "060" 
                    WHEN    "068" 
-                       IF    ( WRK-NENREI  >=   70 )    AND
-                             ( WRK-NENREI  <=   74 )
+      *****************IF    ( WRK-NENREI  >=   70 )    AND
+      *****************      ( WRK-NENREI  <=   74 )
+                       IF    ( WRK-NENREI  >=   70 )
                            EVALUATE    LNK-SYUBETU-NYUGAIKBN
                                WHEN    "1"
                                    EVALUATE   WRK-RECE61-HOJOKBN
