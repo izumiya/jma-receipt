@@ -909,7 +909,8 @@
                    PERFORM 2009-HENKAN-SEC
                    MOVE    WRK-OUT-INPUT
                                                TO  HC01-KIGONUM
-      *
+                   MOVE    SPACE               TO  HC01-KIGO
+                   MOVE    SPACE               TO  HC01-NUM
                END-IF
            END-IF
            .
