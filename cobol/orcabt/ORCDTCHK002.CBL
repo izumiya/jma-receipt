@@ -7274,6 +7274,8 @@
                    PERFORM VARYING IDX10   FROM    1   BY  1
                        UNTIL ( IDX10   >   31 )
                        IF   ( TSRYCD-DAY ( IDX6 IDX10)    >   ZERO )
+                       AND  ( TSRYCD-DAY-HKNFLG   (IDX6 IDX10)
+                                                          =   1 )
                            PERFORM 200112-CHKTRD-DAY-CHK-SEC
                        END-IF
                    END-PERFORM
@@ -7294,6 +7296,7 @@
                END-IF
       *
                IF    ( FLG-SRYSNT-MONTHCHK =   1 )
+                AND  ( TSRYCD-DAY-HKNFLG-G (IDX6) NOT =   ZERO )
                    PERFORM 200112-CHKTRD-MONTH-CHK-SEC
                    IF    ( FLG-SRYSNT-MONTHERR =   1 )
                        IF    ( TCHK-ACT-NYUGAIBNDKBN (1)   =   "2" )
