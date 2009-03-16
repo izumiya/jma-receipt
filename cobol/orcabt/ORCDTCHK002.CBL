@@ -6905,24 +6905,27 @@
                END-IF
       *
                IF    ( FLG-SRYSNT-MONTHCHK =   1 )
-                AND  ( TSRYCD-DAY-HKNFLG-G (IDX6) NOT =   ZERO )
                    PERFORM 200112-CHKTRD-MONTH-CHK-SEC
                    IF    ( FLG-SRYSNT-MONTHERR =   1 )
-                       IF    ( TCHK-ACT-NYUGAIBNDKBN (1)   =   "2" )
-                           INITIALIZE              WRK-NISSU-DAY-G
-                           PERFORM VARYING IDX10   FROM    1   BY  1
-                                   UNTIL ( IDX10   >   31 )
-                               IF    ( TSRYCD-DAY-NYUGAIKBN (IDX6 IDX10)
+                       INITIALIZE              WRK-NISSU-DAY-G
+                       PERFORM VARYING IDX10   FROM    1   BY  1
+                               UNTIL ( IDX10   >   31 )
+                           IF    ( TSRYCD-DAY-HKNFLG (IDX6 IDX10)
+                                               =   1 )
+                             IF  ( TCHK-ACT-NYUGAIBNDKBN (1) =   "2" )
+                                 IF  ( TSRYCD-DAY-NYUGAIKBN (IDX6 IDX10)
                                                =   ORCBSD01-NYUGAIKBN )
-                                   MOVE    1   TO  WRK-NISSU-DAY (IDX10)
-                               END-IF
-                           END-PERFORM
-                       ELSE
-                           MOVE    TSRYCD-DAY-G (IDX6)
-                                               TO  WRK-NISSU-DAY-G
+                                     MOVE  1   TO  WRK-NISSU-DAY (IDX10)
+                                 END-IF
+                             ELSE
+                                     MOVE  1   TO  WRK-NISSU-DAY (IDX10)
+                             END-IF
+                           END-IF
+                       END-PERFORM
+                       IF    ( WRK-NISSU-DAY-G NOT =   ZERO )
+                           MOVE    "160002"    TO  WRK-ERRCD
+                           PERFORM 200112-SRYSNT-ERR-HEN-SEC
                        END-IF
-                       MOVE    "160002"        TO  WRK-ERRCD
-                       PERFORM 200112-SRYSNT-ERR-HEN-SEC
                    END-IF
                END-IF
       *
