@@ -58,6 +58,7 @@
       *  04.03.04    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.05    NACL-ÌçÏÆ    09/01/13  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.06    NACL-ÌçÏÆ    09/03/10  È½Äê¾ò·ï½¤Àµ
+      *  04.03.07    NACL-ÌçÏÆ    09/03/13  Á°´ü¹âÎð¼Ô¤Î¹â³Û·×»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -121,6 +122,30 @@
                  07  WRK-HKNCOMBINUM-KYUFUGAI
                                             PIC 9(01).
       *
+           03  WRK-HKNNUM                   PIC X(03).
+           03  WRK-HKNNUM2                  PIC X(03).
+      *
+           03  WRK-HKNJANUM-TBL.
+               05  WRK-HKNJANUM             PIC X(08).
+               05  WRK-HONKZKKBN            PIC X(01).
+               05  WRK-KIGO                 PIC X(80).
+               05  WRK-NUM                  PIC X(80).
+           03  WRK-HKNJANUM2-TBL.
+               05  WRK-HKNJANUM2            PIC X(08).
+               05  WRK-HONKZKKBN2           PIC X(01).
+               05  WRK-KIGO2                PIC X(80).
+               05  WRK-NUM2                 PIC X(80).
+      *
+           03  WRK-CONTKBN                  PIC X(01).
+           03  WRK-CONTKBN2                 PIC X(01).
+      *
+           03  WRK-TEKSTYMD                 PIC X(08).
+           03  WRK-TEKSTYMD2                PIC X(08).
+      *
+           03  WRK-HKNID                    PIC 9(10).
+           03  WRK-SRYYMD                   PIC X(08).
+           03  WRK-COMPFTN                  PIC 9(07).
+      *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
       *
@@ -143,6 +168,10 @@
       *    ´µ¼Ô¸øÈñ¾ðÊó
        01  PTKOHINF-REC.
            COPY    "CPPTKOHINF.INC".
+      *
+      *    ´µ¼ÔÊÝ¸±¾ðÊó
+       01  PTHKNINF-REC.
+           COPY    "CPPTHKNINF.INC".
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý
            COPY    "CPSK1001.INC".
@@ -857,12 +886,10 @@
                        AND  SYU-SKJ-FTNKBN(1)        =  "2"
                           ADD  SYU-SKJ-FTN(1)      TO  WRK-KOHFTN-SKJ
                        END-IF
-                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
-                                             =  LNK-FTNJGNCHK-HKNID)
-                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
-                          MOVE   1                 TO  FLG-TOKU75
-                          ADD  SYU-KOH-COMPFTN(1)  TO  WRK-KOHFTN-TOKU75
+                       IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                       AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                          MOVE SYU-KOH-COMPFTN(1)  TO  WRK-COMPFTN
+                          PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(2)
       *                ADD  SYU-KOH-HKNFTNMONEY(2) TO  WRK-KOHFTN
@@ -877,12 +904,10 @@
                        AND  SYU-SKJ-FTNKBN(2)        =  "2"
                           ADD  SYU-SKJ-FTN(2)      TO  WRK-KOHFTN-SKJ
                        END-IF
-                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
-                                             =  LNK-FTNJGNCHK-HKNID)
-                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
-                          MOVE   1                 TO  FLG-TOKU75
-                          ADD  SYU-KOH-COMPFTN(2)  TO  WRK-KOHFTN-TOKU75
+                       IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                       AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                          MOVE SYU-KOH-COMPFTN(2)  TO  WRK-COMPFTN
+                          PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(3)
       *                ADD  SYU-KOH-HKNFTNMONEY(3) TO  WRK-KOHFTN
@@ -897,12 +922,10 @@
                        AND  SYU-SKJ-FTNKBN(3)        =  "2"
                           ADD  SYU-SKJ-FTN(3)      TO  WRK-KOHFTN-SKJ
                        END-IF
-                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
-                                             =  LNK-FTNJGNCHK-HKNID)
-                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
-                          MOVE   1                 TO  FLG-TOKU75
-                          ADD  SYU-KOH-COMPFTN(3)  TO  WRK-KOHFTN-TOKU75
+                       IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                       AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                          MOVE SYU-KOH-COMPFTN(3)  TO  WRK-COMPFTN
+                          PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(4)
       *                ADD  SYU-KOH-HKNFTNMONEY(4) TO  WRK-KOHFTN
@@ -917,16 +940,16 @@
                        AND  SYU-SKJ-FTNKBN(4)        =  "2"
                           ADD  SYU-SKJ-FTN(4)      TO  WRK-KOHFTN-SKJ
                        END-IF
-                       IF    (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-                       AND   (WRK-HKNCOMBINUM-HKNID(IDX1)
-                                             =  LNK-FTNJGNCHK-HKNID)
-                       AND   (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
-                          MOVE   1                 TO  FLG-TOKU75
-                          ADD  SYU-KOH-COMPFTN(4)  TO  WRK-KOHFTN-TOKU75
+                       IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
+                       AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
+                          MOVE SYU-KOH-COMPFTN(4)  TO  WRK-COMPFTN
+                          PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                   END-EVALUATE
                   ADD       SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU-TOTAL
-                  IF  WRK-HKNCOMBINUM(IDX1) = LNK-FTNJGNCHK-HKNCOMBINUM
+      *           IF  WRK-HKNCOMBINUM(IDX1) = LNK-FTNJGNCHK-HKNCOMBINUM
+                  IF  WRK-HKNCOMBINUM-HKNID(IDX1)
+                                            = LNK-FTNJGNCHK-HKNID
                      ADD    SYU-TOTAL-HKNTEN       TO  WRK-SEIKYU
                   END-IF
                   IF  WRK-HKNCOMBINUM-KYUFUGAI(IDX1) =  1
@@ -1104,6 +1127,138 @@
            EXIT.
       *
       *****************************************************************
+      *    ¥Þ¥ëÄ¹¤ÎÊÔ½¸
+      *****************************************************************
+       210111-CYOKI-HENSYU-SEC            SECTION.
+      *
+           MOVE     LNK-FTNJGNCHK-HKNID  TO  WRK-HKNID
+           PERFORM  2101111-HKNINF-KENSAKU-SEC
+           MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM
+           MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM
+           MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN
+           MOVE     PTHKN-KIGO           TO  WRK-KIGO
+           MOVE     PTHKN-NUM            TO  WRK-NUM
+           MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN
+           MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD
+      *
+           MOVE     WRK-HKNCOMBINUM-HKNID(IDX1)
+                                         TO  WRK-HKNID
+           PERFORM  2101111-HKNINF-KENSAKU-SEC
+           MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM2
+           MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM2
+           MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN2
+           MOVE     PTHKN-KIGO           TO  WRK-KIGO2
+           MOVE     PTHKN-NUM            TO  WRK-NUM2
+           MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN2
+           MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD2
+      *
+           IF  (WRK-CONTKBN   NOT = SPACE)
+           OR  (WRK-CONTKBN2  NOT = SPACE)
+              IF  (WRK-HKNJANUM2  =  WRK-HKNJANUM )
+              AND (WRK-HONKZKKBN2 =  WRK-HONKZKKBN)
+                MOVE  WRK-KIGO       TO  WRK-KIGO2
+                MOVE  WRK-NUM        TO  WRK-NUM2
+              END-IF
+           END-IF
+      *
+           IF   SYU-SKJ-FTNDAY(1) =  1  OR  2
+              IF   WRK-HKNJANUM2  =  WRK-HKNJANUM
+                MOVE  WRK-HONKZKKBN  TO  WRK-HONKZKKBN2
+                MOVE  WRK-KIGO       TO  WRK-KIGO2
+                MOVE  WRK-NUM        TO  WRK-NUM2
+              END-IF
+           END-IF
+      *
+           EVALUATE  SYU-SKJ-FTNDAY(1)
+             WHEN       1
+             WHEN       2
+                 IF  WRK-HKNNUM     =  "039"
+                    IF  WRK-HKNNUM2   =  "039"
+                         MOVE   1             TO  FLG-TOKU75
+                         ADD  WRK-COMPFTN     TO  WRK-KOHFTN-TOKU75
+                    END-IF
+                 ELSE
+                    IF  SYU-SKJ-FTNDAY(1)  =   1
+                      IF    WRK-HKNJANUM-TBL  =  WRK-HKNJANUM2-TBL
+                         MOVE   1             TO  FLG-TOKU75
+                         ADD  WRK-COMPFTN     TO  WRK-KOHFTN-TOKU75
+                      END-IF
+                    ELSE
+                      IF    WRK-HKNJANUM-TBL  =  WRK-HKNJANUM2-TBL
+                        MOVE  LNK-FTNJGNCHK-SRYYM TO  WRK-SRYYMD(1:6)
+                        MOVE  SYU-SKJ-FTNDAY(2)   TO  WRK-SRYYMD(7:2)
+                        IF ((WRK-SRYYMD <= WRK-TEKSTYMD ) AND
+                            (WRK-SRYYMD <= WRK-TEKSTYMD2))
+                        OR ((WRK-SRYYMD >  WRK-TEKSTYMD ) AND
+                            (WRK-SRYYMD >  WRK-TEKSTYMD2))
+                          MOVE   1            TO  FLG-TOKU75
+                          ADD  WRK-COMPFTN    TO  WRK-KOHFTN-TOKU75
+                        END-IF
+                      END-IF
+                    END-IF
+                 END-IF
+             WHEN       3
+                 IF    WRK-HKNJANUM-TBL  =  WRK-HKNJANUM2-TBL
+                   MOVE  LNK-FTNJGNCHK-SRYYM TO  WRK-SRYYMD(1:6)
+                   MOVE  SYU-SKJ-FTNDAY(2)   TO  WRK-SRYYMD(7:2)
+                   IF ((WRK-SRYYMD <= WRK-TEKSTYMD ) AND
+                       (WRK-SRYYMD <= WRK-TEKSTYMD2))
+                   OR ((WRK-SRYYMD >  WRK-TEKSTYMD ) AND
+                       (WRK-SRYYMD >  WRK-TEKSTYMD2))
+                     MOVE   1            TO  FLG-TOKU75
+                     ADD  WRK-COMPFTN    TO  WRK-KOHFTN-TOKU75
+                   END-IF
+                 END-IF
+           END-EVALUATE
+      *
+           .
+       210111-CYOKI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼ÔÊÝ¸±¾ðÊó¸¡º÷
+      *****************************************************************
+       2101111-HKNINF-KENSAKU-SEC            SECTION.
+      *
+           IF     WRK-HKNID  NOT = ZERO
+              INITIALIZE                        PTHKNINF-REC
+              MOVE   LNK-FTNJGNCHK-HOSPNUM  TO  PTHKN-HOSPNUM
+              MOVE   LNK-FTNJGNCHK-PTID     TO  PTHKN-PTID
+              MOVE   WRK-HKNID              TO  PTHKN-HKNID
+              MOVE   PTHKNINF-REC           TO  MCPDATA-REC
+              MOVE   "DBSELECT"             TO  MCP-FUNC
+              MOVE   "tbl_pthkninf"         TO  MCP-TABLE
+              MOVE   "key"                  TO  MCP-PATHNAME
+              CALL   "ORCDBMAIN"            USING MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+              IF      MCP-RC   =   ZERO
+                 MOVE    "tbl_pthkninf"     TO  MCP-TABLE
+                 MOVE    "key"              TO  MCP-PATHNAME
+                 MOVE    "DBFETCH"          TO  MCP-FUNC
+                 CALL    "ORCDBMAIN"        USING   MCPAREA
+                                                    MCPDATA-REC
+                                                    SPA-AREA
+                 IF      MCP-RC             =   ZERO
+                     MOVE    MCPDATA-REC    TO  PTHKNINF-REC
+                 ELSE
+                     INITIALIZE                 PTHKNINF-REC
+                 END-IF
+              ELSE
+                 INITIALIZE                     PTHKNINF-REC
+              END-IF
+              MOVE      "tbl_pthkninf"      TO  MCP-TABLE
+              MOVE      "key"               TO  MCP-PATHNAME
+              PERFORM    910-DB-CLOSE-SEC
+           ELSE
+              INITIALIZE                        PTHKNINF-REC
+           END-IF
+      *
+           .
+       2101111-HKNINF-KENSAKU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ÊÔ½¸½èÍý£²
       *****************************************************************
        21012-SYUKEI-HENSYU2-SEC            SECTION.
@@ -1145,7 +1300,9 @@
                        ADD  SYU-SKJ-FTN(4)    TO  WRK-KOHFTN-SKJ
                      END-IF
                   END-EVALUATE
-                  IF  WRK-HKNCOMBINUM(IDX1) = LNK-FTNJGNCHK-HKNCOMBINUM
+      *           IF  WRK-HKNCOMBINUM(IDX1) = LNK-FTNJGNCHK-HKNCOMBINUM
+                  IF  WRK-HKNCOMBINUM-HKNID(IDX1)
+                                            = LNK-FTNJGNCHK-HKNID
                      ADD    SYU-TOTAL-HKNTEN  TO  WRK-SEIKYU
                   END-IF
                END-IF

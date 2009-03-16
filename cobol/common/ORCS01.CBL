@@ -273,6 +273,7 @@
       *  04.02.29    NACL-ÌçÏÆ    09/01/20  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.02.30    NACL-ÌçÏÆ    09/02/26  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.31    NACL-ÌçÏÆ    09/02/26  £·£µºÐ°Ê¾å¤ÎÁ°´ü¹âÎð¼ÔÂÐ±þ
+      *  04.02.32    NACL-ÌçÏÆ    09/03/13  Á°´ü¹âÎð¼Ô¤Î¹â³Û·×»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -412,6 +413,8 @@
            03  FLG-TOKU75-KIZON        PIC 9(01).
            03  FLG-TOKU75-CYO          PIC 9(01).
            03  FLG-KEISAN-TAI          PIC 9(01).
+           03  FLG-RUITAISYO           PIC 9(01).
+           03  FLG-KOKI-HIGAITO        PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -3369,6 +3372,41 @@
            IF   (FLG-KOUREI-KBN          =   "1"     )
            AND  (COMB-HKNNUM         NOT =   SPACE   )
            AND  (LNK-SYU-SRYYMD(1:6)    >=   "200901")
+               MOVE    ZERO                 TO  FLG-KOKI-HIGAITO
+               INITIALIZE                       PTKOHINF-REC
+               MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
+               MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+               MOVE    "977"                TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+               MOVE    "DBSELECT"           TO  MCP-FUNC
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"          USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC               =       ZERO
+                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                   MOVE    "key4"           TO  MCP-PATHNAME
+                   PERFORM  PTKOHINF-READ-SEC
+                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                     IF  (PTKOH-TEKSTYMD(1:6)  <=
+                                              LNK-SYU-SRYYMD(1:6))
+                     AND (LNK-SYU-SRYYMD(1:6)  <=
+                                              PTKOH-TEKEDYMD(1:6))
+                     AND (PTKOH-SAKJOKBN   =  SPACE              )
+                        MOVE    1       TO  FLG-KOKI-HIGAITO
+                        MOVE    1       TO  FLG-PTKOHINF
+                     ELSE
+                        MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                        MOVE    "key4"           TO  MCP-PATHNAME
+                        PERFORM  PTKOHINF-READ-SEC
+                     END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  DB-CLOSE-SEC
+      *
                INITIALIZE                      ORCSAGECHKAREA
                MOVE    LNK-SYU-HOSPNUM     TO  AGECHK-HOSPNUM
                MOVE    LNK-SYU-PTID        TO  AGECHK-PTID
@@ -3386,6 +3424,7 @@
                    AND ( PTINF-BIRTHDAY(5:2)  = LNK-SYU-SRYYMD(5:2) )
                    AND ( PTINF-BIRTHDAY(7:2)  NOT =   "01"          )
                    AND ( PTINF-BIRTHDAY(5:4)  NOT =   "0229"        )
+                   AND ( FLG-KOKI-HIGAITO         =    ZERO         )
                        MOVE   1    TO    FLG-TOKU75
                        MOVE   PTINF-BIRTHDAY
                                    TO    WK-TOKU75-BIRTHDAY
@@ -7716,6 +7755,13 @@
       *
            IF   FLG-TOKU75  = 1 OR 2 OR 3
               MOVE    FLG-TOKU75   TO   LNK-SYU-SKJ-FTNDAY(1)
+              IF      WK-TOKU75-BIRTHDAY  NOT =  SPACE
+                MOVE  WK-TOKU75-BIRTHDAY(7:2)
+                                   TO   LNK-SYU-SKJ-FTNDAY(2)
+              END-IF
+              IF      FLG-KOHININBARAI    =    1
+                MOVE  ZERO         TO   FLG-KOHININBARAI
+              END-IF
            END-IF
       *
            .
@@ -8314,6 +8360,57 @@
               END-IF
            END-IF.
       *
+           IF   FLG-KOUREI-KBN   =   "1"
+              IF   WK-HKNJANUM2  = WK-HKNJANUM
+                MOVE  WK-HONKZKKBN  TO  WK-HONKZKKBN2
+                MOVE  WK-KIGO       TO  WK-KIGO2
+                MOVE  WK-NUM        TO  WK-NUM2
+              END-IF
+           END-IF.
+      *
+           MOVE    ZERO   TO   FLG-RUITAISYO.
+           EVALUATE  FLG-TOKU75
+             WHEN        1
+             WHEN        2
+                 IF    COMB-HKNNUM    = "039"
+                   IF  SYU-SYUHKNNUM  = "039"
+                          MOVE    1    TO   FLG-RUITAISYO
+                   END-IF
+                 ELSE
+                   IF  FLG-TOKU75     =   1
+                     IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+                          MOVE    1    TO   FLG-RUITAISYO
+                     END-IF
+                   ELSE
+                     IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+                       IF ((WK-TOKU75-BIRTHDAY <= LNK-SYU-SRYYMD) AND
+                           (WK-TOKU75-BIRTHDAY <= SYU-SRYYMD    ))
+                       OR ((WK-TOKU75-BIRTHDAY >  LNK-SYU-SRYYMD) AND
+                           (WK-TOKU75-BIRTHDAY >  SYU-SRYYMD    ))
+                          MOVE    1    TO   FLG-RUITAISYO
+                       ELSE
+                          MOVE   "9"   TO   WK-HONKZKKBN2
+                          MOVE  SPACE  TO   WK-KIGO2
+                          MOVE  SPACE  TO   WK-NUM2
+                       END-IF
+                     END-IF
+                   END-IF
+                 END-IF
+             WHEN        3
+                 IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+                   IF ((WK-TOKU75-BIRTHDAY <= LNK-SYU-SRYYMD) AND
+                       (WK-TOKU75-BIRTHDAY <= SYU-SRYYMD    ))
+                   OR ((WK-TOKU75-BIRTHDAY >  LNK-SYU-SRYYMD) AND
+                       (WK-TOKU75-BIRTHDAY >  SYU-SRYYMD    ))
+                      MOVE    1    TO   FLG-RUITAISYO
+                   ELSE
+                      MOVE   "9"   TO   WK-HONKZKKBN2
+                      MOVE  SPACE  TO   WK-KIGO2
+                      MOVE  SPACE  TO   WK-NUM2
+                   END-IF
+                 END-IF
+           END-EVALUATE.
+      *
       *    ¸øÈñ£É£ÄÊÔ½¸
            PERFORM  22027-KOHID-HENSYU-SEC.
       *
@@ -8524,9 +8621,7 @@
                       COMPUTE  WK-KOUREI-IRYOHI70K =
                                WK-KOUREI-IRYOHI70K +
                               (SYU-HKNTEN (17) * 10)
-                      IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                      AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                      AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                      IF   FLG-RUITAISYO  =  1
                          COMPUTE  WK-KOUREI-IRYOHI70K-TOKU75 =
                                   WK-KOUREI-IRYOHI70K-TOKU75 +
                                  (SYU-HKNTEN (17) * 10)
@@ -9123,9 +9218,7 @@
                                 COMPUTE WK-ENTANI =
                                           SYU-KOH1COMPFTN-ENTANI + 0.9
                                 ADD   WK-ENTANI    TO  FTN-KOHI1-M3-JI
-                                IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                                AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                                AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                                IF   FLG-RUITAISYO  =  1
                                   ADD   SYU-KOH1HKNFTNMONEY
                                             TO  FTN-KOHI1-M-JI-TOKU75
                                   ADD   SYU-KOH1COMPFTN
@@ -9146,9 +9239,7 @@
                                                     FTN-KOHI1-M2
                                                     FTN-KOHI1-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH1HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH1HKNNUM = "972"
                                                      OR "974"    ))
@@ -9208,9 +9299,7 @@
                                                     FTN-KOHI1-M2
                                                     FTN-KOHI1-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH1HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH1HKNNUM = "972"
                                                      OR "974"    ))
@@ -9253,9 +9342,7 @@
                                                     FTN-KOHI1-M2
                                                     FTN-KOHI1-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH1HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH1HKNNUM = "972"
                                                      OR "974"    ))
@@ -9298,9 +9385,7 @@
                                                     FTN-KOHI1-M2
                                                     FTN-KOHI1-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH1HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH1HKNNUM = "972"
                                                      OR "974"    ))
@@ -9907,9 +9992,7 @@
                                                     FTN-KOHI2-M2
                                                     FTN-KOHI2-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH2HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH2HKNNUM = "972"
                                                      OR "974"    ))
@@ -9969,9 +10052,7 @@
                                                     FTN-KOHI2-M2
                                                     FTN-KOHI2-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH2HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH2HKNNUM = "972"
                                                      OR "974"    ))
@@ -10014,9 +10095,7 @@
                                                     FTN-KOHI2-M2
                                                     FTN-KOHI2-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH2HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH2HKNNUM = "972"
                                                      OR "974"    ))
@@ -10059,9 +10138,7 @@
                                                     FTN-KOHI2-M2
                                                     FTN-KOHI2-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH2HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH2HKNNUM = "972"
                                                      OR "974"    ))
@@ -10581,9 +10658,7 @@
                                                     FTN-KOHI3-M2
                                                     FTN-KOHI3-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH3HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH3HKNNUM = "972"
                                                      OR "974"    ))
@@ -10626,9 +10701,7 @@
                                                     FTN-KOHI3-M2
                                                     FTN-KOHI3-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH3HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH3HKNNUM = "972"
                                                      OR "974"    ))
@@ -10671,9 +10744,7 @@
                                                     FTN-KOHI3-M2
                                                     FTN-KOHI3-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH3HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH3HKNNUM = "972"
                                                      OR "974"    ))
@@ -10716,9 +10787,7 @@
                                                     FTN-KOHI3-M2
                                                     FTN-KOHI3-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH3HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH3HKNNUM = "972"
                                                      OR "974"    ))
@@ -11242,9 +11311,7 @@
                                                     FTN-KOHI4-M2
                                                     FTN-KOHI4-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH4HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH4HKNNUM = "972"
                                                      OR "974"    ))
@@ -11287,9 +11354,7 @@
                                                     FTN-KOHI4-M2
                                                     FTN-KOHI4-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH4HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH4HKNNUM = "972"
                                                      OR "974"    ))
@@ -11332,9 +11397,7 @@
                                                     FTN-KOHI4-M2
                                                     FTN-KOHI4-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH4HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH4HKNNUM = "972"
                                                      OR "974"    ))
@@ -11377,9 +11440,7 @@
                                                     FTN-KOHI4-M2
                                                     FTN-KOHI4-M3
                              END-IF
-                             IF  (FLG-TOKU75 = 1 OR 2 OR 3        )
-                             AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD)
-                             AND (SYU-SRYYMD <= WK-TOKU75-TEKEDYMD)
+                             IF  ( FLG-RUITAISYO           =  1   )
                              AND ((LNK-SYU-KOH4HKNNUM(1:1) = "0" ) OR
                                   (LNK-SYU-KOH4HKNNUM = "972"
                                                      OR "974"    ))
@@ -11903,9 +11964,7 @@
               ADD   WK-ENTANI    TO  FTN-CYOKI-M3-JI
            END-IF
       *
-           IF  (FLG-TOKU75 = 1 OR 2 OR 3            )
-           AND (WK-TOKU75-TEKSTYMD <= SYU-SRYYMD    )
-           AND (SYU-SRYYMD     <= WK-TOKU75-TEKEDYMD)
+           IF   FLG-RUITAISYO  =  1
              COMPUTE WK-CYOKI-TOKU75 =  WK-CYOKI-TOKU75
                                      +  SYU-KOH-FTN
              COMPUTE WK-CYOKI-ENTANI-TOKU75
