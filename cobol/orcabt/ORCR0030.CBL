@@ -553,6 +553,7 @@
            03  FLG-SYOGAI75                            PIC 9(01).
            03  FLG-TOKU75-XXX                          PIC 9(01).
            03  FLG-TOKU75-KOHSKY                       PIC 9(01).
+           03  FLG-KOKI-HIGAITO                        PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -2813,6 +2814,36 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              ELSE
                IF  (RECE02-AGE     >=   70  )
                OR  (RECE02-HKNNUM   =  "039")
+                 MOVE    ZERO                TO  FLG-KOKI-HIGAITO
+                 INITIALIZE                      PTKOHINF-REC
+                 MOVE    RECE02-HOSPNUM      TO  PTKOH-HOSPNUM
+                 MOVE    RECE02-PTID         TO  PTKOH-PTID
+                 MOVE    "977"               TO  PTKOH-KOHNUM
+                 MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                 MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                 MOVE    "key4"              TO  MCP-PATHNAME
+                 PERFORM 900-DBSELECT-SEC
+                 IF      MCP-RC               =       ZERO
+                    MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                    MOVE    "key4"               TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                    PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                      IF  (PTKOH-TEKSTYMD(1:6) <= RECE02-SRYYM       )
+                      AND (RECE02-SRYYM        <= PTKOH-TEKEDYMD(1:6))
+                      AND (PTKOH-SAKJOKBN       = SPACE              )
+                         MOVE     1          TO  FLG-KOKI-HIGAITO
+                         MOVE     1          TO  FLG-PTKOHINF
+                      ELSE
+                         MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                         MOVE    "key4"               TO  MCP-PATHNAME
+                         PERFORM  900-PTKOHINF-READ-SEC
+                      END-IF
+                    END-PERFORM
+                 END-IF
+                 MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                 MOVE    "key4"               TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+      *
                  INITIALIZE                      ORCSAGECHKAREA
                  MOVE    RECE02-HOSPNUM      TO  AGECHK-HOSPNUM
                  MOVE    RECE02-PTID         TO  AGECHK-PTID
@@ -2828,6 +2859,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    AND (RECE02-BIRTHDAY(5:2) = RECE02-SRYYM(5:2))
                    AND (RECE02-BIRTHDAY(7:2)  NOT =  "01"       )
                    AND (RECE02-BIRTHDAY(5:4)  NOT =  "0229"     )
+                   AND (FLG-KOKI-HIGAITO          =   ZERO      )
                        MOVE   1    TO    FLG-TOKU75
                        MOVE   RECE02-BIRTHDAY
                                    TO    WRK-TOKU75-BIRTHDAY
