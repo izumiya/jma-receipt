@@ -1184,6 +1184,8 @@
                                COMPUTE WRK-SURYO-K =   WRK-SURYO-K
                                                    -   WRK-COM-KZM
                                                               (IDX-Z)
+                               MOVE    WRK-SURYO-K     TO  TBL-SURYO-Z
+                                                                (IDX-Z)
                            END-IF
                        END-PERFORM
                    END-IF
