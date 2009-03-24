@@ -346,6 +346,7 @@
       *  04.02.43    NACL-門脇    09/02/09  公費分点数編集修正
       *  04.02.44    NACL-門脇    09/02/26  長崎県地方公費対応
       *  04.02.45    NACL-門脇    09/02/26  ７５歳以上の前期高齢者対応
+      *  04.02.46    NACL-門脇    09/03/24  埼玉県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11345,6 +11346,10 @@
                                         "261" OR "361" OR "561"
                                      OR "264" OR "364" OR "564"  ) AND
                       (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "3"))
+                  OR ((WRK-PREFNUM                   =    "11"   ) AND
+                      (RECE62-KOHNUM(KH-IDX - 1)     =
+                                        "352" OR "353" OR "354"  ) AND
+                      (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "1"))
                       MOVE     1     TO    FLG-TOKUSYU-SKJ
                   ELSE
                       MOVE    ZERO   TO    FLG-TOKUSYU-SKJ
