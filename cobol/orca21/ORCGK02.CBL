@@ -11769,8 +11769,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO      4100-TOROKU-EXT
            END-IF
       *
+      *    後期高齢者で当月生活習慣病管理料算定中
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-SEIKATU-ARI2    =   9
+                   IF      SPA-GMN-MAX         >   ZERO
+                       MOVE    "K177"          TO  SPA-ERRCD
+                   END-IF
+                   MOVE    ZERO            TO  SPA-SEIKATU-ARI2
+               END-IF
+           END-IF
+      *
       *    禁忌更新前のチェック
-           PERFORM 41001-YAKKNK-CHK-SEC
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 41001-YAKKNK-CHK-SEC
+           END-IF
       *
       *     禁忌エラーの時、エラー表示へ
            IF     (FLG-KINKI           =   1   )  AND
@@ -11778,17 +11790,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO      4100-TOROKU-EXT
            END-IF
       *
-      *    後期高齢者で当月生活習慣病管理料算定中
-           IF      SPA-ERRCD           =   SPACE
-               IF      SPA-SEIKATU-ARI2    =   9
-                   MOVE    "K177"          TO  SPA-ERRCD
-                   MOVE    ZERO            TO  SPA-SEIKATU-ARI2
-               END-IF
-           END-IF
-      *
       *    更新処理
-      *****MOVE    SPACE           TO  WRK-PUTTYPE
-           PERFORM 41002-KOUSIN-SYORI-SEC
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 41002-KOUSIN-SYORI-SEC
+           END-IF
            .
        4100-TOROKU-EXT.
            EXIT.
