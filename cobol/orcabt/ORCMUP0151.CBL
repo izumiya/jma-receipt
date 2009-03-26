@@ -341,9 +341,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            PERFORM 900-TBL-CLOSE-SEC
       *
       *    追加エラー（同一キー存在）
+      *    正常扱いとする
+      *    （パッチ提供で新規メモが複数ver提供される場合の考慮）
            IF      FLG-TOUKEIMEMO        =   ZERO
-               MOVE    1               TO  WRK-ERRCD
-               PERFORM 2040-ERR-SYORI-SEC
+      *        MOVE    1               TO  WRK-ERRCD
+      *        PERFORM 2040-ERR-SYORI-SEC
                GO      TO      2010-INSERT-SYORI-EXT
            END-IF
       *
