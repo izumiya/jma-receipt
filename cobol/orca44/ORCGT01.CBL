@@ -109,8 +109,8 @@
       *  04.03.03    NACL-藤原    08/07/23  宮城県、岩手県地震対応
       *                                     ２００８年６月〜対象 
       *  04.03.04    NACL-藤原    08/09/03  オンライン請求（個別請求）対応
-      *
-      *  04.04.01    NACL-藤原    09/11/19  レセ電ＣＤ−Ｒ出力対応
+      *  04.03.05    NACL-藤原    09/03/24  主科設定時の主科未設定データ
+      *                                     の有無チェック
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -167,6 +167,7 @@
            03  FLG-3004-PARAKBN    PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-RECEDEN-CHK     PIC 9(01).
+           03  FLG-SYUKA-CHK       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -621,6 +622,33 @@ grpsys                                         SPA-AREA
                MOVE    IDX                 TO  SPA-GMN-T03-PRTNM-MAX
            END-PERFORM
       *
+      *    クライアント保存可否情報取得サブ
+           INITIALIZE                      ORCSCLIENTSVAREA
+           CALL    "ORCSCLIENTSV"      USING   ORCSCLIENTSVAREA
+                                               SPA-AREA
+      *
+           MOVE    "1"             TO  SPA-GMN-DATAKBNL        (1)
+           MOVE    "フロッピィ"    TO  SPA-GMN-DATAKBNMEIL     (1)
+           MOVE    "2"             TO  SPA-GMN-DATAKBNL        (2)
+           MOVE    "ＭＯ"          TO  SPA-GMN-DATAKBNMEIL     (2)
+           MOVE    "3"             TO  SPA-GMN-DATAKBNL        (3)
+           MOVE    "システム管理設定場所（フロッピィ用）"
+                                   TO  SPA-GMN-DATAKBNMEIL     (3)
+           MOVE    "4"             TO  SPA-GMN-DATAKBNL        (4)
+           MOVE    "システム管理設定場所（ＭＯ用）"
+                                   TO  SPA-GMN-DATAKBNMEIL     (4)
+           MOVE    4               TO  SPA-GMN-DATAKBN-MAX
+           IF      SCLIENTSV-CLIENT-SAVE
+                                   =   "1"
+               MOVE    "5"             TO  SPA-GMN-DATAKBNL        (5)
+               MOVE    "クライアント保存"
+                                       TO  SPA-GMN-DATAKBNMEIL     (5)
+               MOVE    5               TO  SPA-GMN-DATAKBN-MAX
+           END-IF
+      *
+           MOVE    SPA-GMN-DATAKBNLST (1)
+                                   TO  SPA-GMN-DATAKBN-G
+      *
            IF      SPA-BEDSU       >   ZERO
                MOVE    "0"             TO  SPA-GMN-NYUGAIKBNL        (1)
                MOVE    "入院・入院外"  TO  SPA-GMN-NYUGAIKBNMEIL     (1)
@@ -717,7 +745,7 @@ grpsys                                         SPA-AREA
            MOVE    "01"                TO  SYS-200501-KBNCD
            MOVE    SPA-NAI-SKYYM       TO  SYS-200501-STYUKYMD (1:6)
            MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
-           MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD
+           MOVE    SYS-2005-STYUKYMD   TO  SYS-200501-EDYUKYMD
            MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
            MOVE    SYS-200501-REC      TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-INV-SEC
@@ -733,10 +761,6 @@ grpsys                                         SPA-AREA
            IF      SYS-200501-KOUIKIRECEKBN
                                        =   SPACE
                MOVE    "0"                 TO  SYS-200501-KOUIKIRECEKBN
-           END-IF 
-           IF      SYS-200501-RECEDEN-CDRKBN
-                                       =   SPACE
-               MOVE    "0"                 TO  SYS-200501-RECEDEN-CDRKBN
            END-IF 
            MOVE    SYS-200501-KOUIKIKBN
                                        TO  SPA-NAI-200501-KOUIKIKBN
@@ -793,40 +817,6 @@ grpsys                                         SPA-AREA
                                            SPA-DATAKBN1-STATE       
                                            SPA-DATAKBN2-STATE       
                                            SPA-B21-STATE
-      *
-      *    クライアント保存可否情報取得サブ
-           INITIALIZE                      ORCSCLIENTSVAREA
-           CALL    "ORCSCLIENTSV"      USING   ORCSCLIENTSVAREA
-                                               SPA-AREA
-      *
-           MOVE    "1"             TO  SPA-GMN-DATAKBNL        (1)
-           MOVE    "フロッピィ"    TO  SPA-GMN-DATAKBNMEIL     (1)
-           MOVE    "2"             TO  SPA-GMN-DATAKBNL        (2)
-           MOVE    "ＭＯ"          TO  SPA-GMN-DATAKBNMEIL     (2)
-           MOVE    "3"             TO  SPA-GMN-DATAKBNL        (3)
-           MOVE    "システム管理設定場所（フロッピィ用）"
-                                   TO  SPA-GMN-DATAKBNMEIL     (3)
-           MOVE    "4"             TO  SPA-GMN-DATAKBNL        (4)
-           MOVE    "システム管理設定場所（ＭＯ用）"
-                                   TO  SPA-GMN-DATAKBNMEIL     (4)
-           MOVE    4               TO  SPA-GMN-DATAKBN-MAX
-           IF      SCLIENTSV-CLIENT-SAVE
-                                   =   "1"
-               MOVE    "5"             TO  SPA-GMN-DATAKBNL        (5)
-               MOVE    "クライアント保存"
-                                       TO  SPA-GMN-DATAKBNMEIL     (5)
-               MOVE    5               TO  SPA-GMN-DATAKBN-MAX
-      *
-               IF      SYS-200501-RECEDEN-CDRKBN   =   "1"
-                   MOVE    "6"             TO  SPA-GMN-DATAKBNL    (6)
-                   MOVE    "クライアント保存（ＣＤ−Ｒ用）"
-                                           TO  SPA-GMN-DATAKBNMEIL (6)
-                   MOVE    6               TO  SPA-GMN-DATAKBN-MAX
-               END-IF
-           END-IF
-      *
-           MOVE    SPA-GMN-DATAKBNLST (1)
-                                   TO  SPA-GMN-DATAKBN-G
       *
       *    レセプト編集区分情報（主科情報）
            MOVE    SPACE               TO  SYS-2009-REC
@@ -1345,7 +1335,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
            IF      SYS-2005-RECEDENOUT  =   SPACE
                MOVE    "/var/tmp/"      TO  SYS-2005-RECEDENOUT
            END-IF    
-           IF      SPA-GMN-DATAKBN  =  "1"  OR  "2" OR  "5" OR  "6"
+           IF      SPA-GMN-DATAKBN  =  "1"  OR  "2"
                MOVE    "/tmp/"     TO  SYS-2005-RECEDENOUT
            END-IF
       *
@@ -1867,7 +1857,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      SYS-2005-RECEDENOUT  =   SPACE
                MOVE    "/var/tmp/"      TO  SYS-2005-RECEDENOUT
            END-IF    
-           IF      SPA-GMN-DATAKBN  =  "1"  OR  "2" OR  "5" OR  "6"
+           IF      SPA-GMN-DATAKBN  =  "1"  OR  "2"
                MOVE    "/tmp/"     TO  SYS-2005-RECEDENOUT
            END-IF
       * 
@@ -1907,11 +1897,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                    TO  SHELLTBL-ARG4
            MOVE    SPA-NAI-T04-TRENNUM       (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG5
-           IF      SPA-GMN-DATAKBN  =  "6"
-               MOVE    "5"             TO  SHELLTBL-ARG6
-           ELSE
-               MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG6
-           END-IF
+           MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG6
            MOVE    SPA-NAI-T04-TTO-FOLDER   (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG7
            MOVE    SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
@@ -1946,7 +1932,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                        MCPDATA-REC
                                        SPA-AREA
       *
-           IF    ( SPA-GMN-DATAKBN =   "5" OR  "6" )
+           IF    ( SPA-GMN-DATAKBN =   "5" )
                MOVE    "SV"            TO  SPA-TID1-FLG
            ELSE
                MOVE    "FI"            TO  SPA-TID1-FLG
@@ -3741,6 +3727,47 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                GO  TO  460-RECEDEN-GID-EXT
            END-IF
       *    
+      *    主科設定時の主科未設定データの存在チェック
+           MOVE    ZERO                TO  FLG-SYUKA-CHK
+      *   
+           MOVE    SPACE               TO  RECE10-REC
+           INITIALIZE                      RECE10-REC
+           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+           MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+           MOVE    "00"                TO  RECE10-RECEKA
+           EVALUATE    MCP-WIDGET
+               WHEN    "B06"
+                   IF     SYS-2009-SYUKA-SYAHO  =   "1"
+                       MOVE    1               TO  RECE10-TEISYUTUSAKI
+                       PERFORM 4602-SYUKA-CHK-SEC
+                   END-IF
+               WHEN    "B07"
+                   IF      SYS-2009-SYUKA-KOKUHO =   "1"
+                       MOVE    2               TO  RECE10-TEISYUTUSAKI
+                       PERFORM 4602-SYUKA-CHK-SEC
+                   END-IF
+                   IF    ( FLG-SYUKA-CHK             =   ZERO   )
+                   AND   ( SPA-NAI-200501-KOUIKIKBN  =   "1"    )
+                   AND   ( SPA-NAI-SKYYM             >=  200804 )
+                   AND   ( SYS-2009-SYUKA-KOUIKI     =   "1"    )
+                       MOVE    SPACE           TO  RECE10-REC
+                       INITIALIZE                  RECE10-REC
+                       MOVE    SPA-HOSPNUM     TO  RECE10-HOSPNUM
+                       MOVE    SPA-NAI-SKYYM   TO  RECE10-SKYYM
+                       MOVE    6               TO  RECE10-TEISYUTUSAKI
+                       PERFORM 4602-SYUKA-CHK-SEC
+                   END-IF
+               WHEN    "B08"
+                   IF      SYS-2009-SYUKA-KOUIKI =   "1"
+                       MOVE    6               TO  RECE10-TEISYUTUSAKI
+                       PERFORM 4602-SYUKA-CHK-SEC
+                   END-IF
+           END-EVALUATE
+           IF      FLG-SYUKA-CHK       =   1
+               MOVE    "0011"              TO  SPA-ERRCD
+               GO  TO  460-RECEDEN-GID-EXT
+           END-IF
+      *    
       *    月遅れ分のレセ電データの存在チェック
            MOVE    ZERO                TO  FLG-RECEDEN-CHK
       *   
@@ -3926,6 +3953,33 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
+      *    主科未設定データ存在チェック処理
+      *****************************************************************
+       4602-SYUKA-CHK-SEC            SECTION.
+      *
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key68"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_seikyu"        TO  MCP-TABLE
+               MOVE    "key68"             TO  MCP-PATHNAME
+               PERFORM 900-SEIKYU-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-RECE10
+           END-IF
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key68"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF      FLG-RECE10          =   ZERO
+               MOVE    1                   TO  FLG-SYUKA-CHK
+           END-IF
+           .
+       4602-SYUKA-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    レセ電出力処理
       *****************************************************************
        460-RECEDEN-SEC                SECTION.
@@ -4104,7 +4158,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                WHEN    "B08"
                    MOVE    "3"         TO  SHELLTBL-ARG12
            END-EVALUATE
-           IF      SPA-GMN-DATAKBN  =  "1"  OR  "2" OR  "5" OR  "6"
+           IF      SPA-GMN-DATAKBN  =  "1"  OR  "2"
                MOVE    "/tmp/"     TO  SYS-2005-RECEDENOUT
            END-IF
            STRING  SYS-2005-RECEDENOUT DELIMITED  BY  SPACE
@@ -4141,7 +4195,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            PERFORM 45012-JOBID-UPD-SEC
       *
-           IF    ( SPA-GMN-DATAKBN =   "5" OR  "6" )
+           IF    ( SPA-GMN-DATAKBN =   "5" )
                MOVE    "SV"            TO  SPA-TID1-FLG
            END-IF
       *
@@ -5168,6 +5222,13 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE
                   "総括表・広域の処理対象データが選択してありません"
                                                TO  SPA-ERRMSG
+               WHEN    "0011"
+                   STRING  "主科未設定データがあります。"
+                                               DELIMITED  BY  SIZE
+                           "主科未設定リストで確認して下さい"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0012"
                    MOVE    "再印刷できない帳票です"    TO  SPA-ERRMSG
       *
