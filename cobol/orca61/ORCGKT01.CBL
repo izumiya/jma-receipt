@@ -7659,6 +7659,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-KIDCD       NOT =   SPACE ))
                GO      TO      4109-B05-SYORI-EXT
            END-IF
+           MOVE    SPACE               TO  SPA-ERRCD
+           MOVE    SPACE               TO  SPA-KIDCD
       *
            MOVE    WRK-SRYDD           TO  SPA-NAI-SRYDD
            MOVE    SPA-NAI-SRYDD       TO  IDD
@@ -7706,6 +7708,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO      4109-B08-SYORI-EXT
            END-IF
       *
+           MOVE    SPACE               TO  SPA-ERRCD
+           MOVE    SPACE               TO  SPA-KIDCD
            MOVE    WRK-SRYDD           TO  SPA-NAI-SRYDD
            MOVE    SPA-NAI-SRYDD       TO  IDD
            COMPUTE IDD                 =   IDD   +  1
@@ -7762,6 +7766,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                           (SPA-KIDCD       NOT =   SPACE ))
                        CONTINUE
                    ELSE
+                       MOVE    SPACE               TO  SPA-ERRCD
+                       MOVE    SPACE               TO  SPA-KIDCD
                        MOVE    WRK-BDAY            TO  WRK-DAY
                        MOVE    WRK-DAY             TO  SPA-NAI-SRYDD
                        MOVE    WRK-DAY             TO  SPA-GMN-SRYDD
@@ -8688,7 +8694,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-PERFORM
                    MOVE    100             TO  IDX2
                END-IF
-          END-PERFORM
+           END-PERFORM
            .
        6005-SANTEI-SET-EXT.
            EXIT.
