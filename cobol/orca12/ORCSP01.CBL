@@ -29,7 +29,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-多々納  05/01/06  年をシステム管理へ修正
       * 01.00.02     NACL-多々納  05/11/14  MONFUNC 対応
-      *  03.05.00    NACL-多々納  07/05/XX  グループ診療対応
+      * 03.05.00     NACL-多々納  07/05/XX  グループ診療対応
+      * 04.03.00     NACL-多々納  09/03/30  連番号判定は同年分のみとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -47,6 +48,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-KANRIMST        PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
+           03  FLG-CHKNO           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -80,6 +82,8 @@
                05  WRK-NEN-WGO         PIC X(01).
                05  WRK-NEN-WY          PIC 9(02).
            03  WRK-NEN-9               PIC 9(04).
+      *
+           03  WRK-K-NEN           PIC 9(04).
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMD.
@@ -514,6 +518,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        200-CHECK-SEC               SECTION.
       *
+      *    年の和暦変換
+           PERFORM 1000-NEN-WAREKI-SEC
       *    桁数チェック
            MOVE    ZERO                TO  WRK-CODSU
            PERFORM VARYING     IDX     FROM    20  BY  -1
@@ -590,8 +596,31 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            MOVE    ORCSP01-PTNUM (1:WRK-KETA)
                                                TO  WRK-RENNUM-X
                    END-EVALUATE
+      *TEST
+      *            年がある時前年は対象外
+                   MOVE    ZERO                TO  FLG-CHKNO
+                   EVALUATE    SYS-1009-HJNKSIKBN
+                       WHEN    "2"
+                           COMPUTE WRK-K-NEN       =   WRK-KETAN
+                                                   -   1
+      *                    和暦
+                           IF      SYS-1009-HJNKSINENKBN  =   "1"
+                               IF      ORCSP01-PTNUM(1:WRK-K-NEN)
+                                                   <   WRK-NEN-W
+                                   MOVE    1           TO  FLG-CHKNO
+                               END-IF
+                           ELSE
+      *                    西暦
+                               IF      ORCSP01-PTNUM(1:WRK-K-NEN)
+                                                   <   SYS-1009-NEN
+                                   MOVE    1           TO  FLG-CHKNO
+                               END-IF
+                           END-IF
+                   END-EVALUATE
+      *
                    PERFORM 2002-SNUM-SEC
                    IF      SYS-1009-RENNUM     <   WRK-RENNUM
+                   AND   ( FLG-CHKNO           =   ZERO      )
                        MOVE    "1008"          TO  SPA-ERRCD
                        GO      TO      200-CHECK-EXT
                    END-IF
