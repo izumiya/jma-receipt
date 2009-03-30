@@ -4897,7 +4897,8 @@
                IF      WRK-YMDS        >   WRK-SYO-YMD
                    MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                END-IF
-               IF      WRK-YMDS-1      <   WRK-SYO-YMD1
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                    MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
                END-IF
            END-IF
@@ -4908,7 +4909,8 @@
                IF      WRK-YMDS        >   WRK-SYO-YMD
                    MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                END-IF
-               IF      WRK-YMDS-1      <   WRK-SYO-YMD1
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                    MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
                END-IF
            END-IF
@@ -4920,7 +4922,8 @@
                IF      WRK-YMDS        >   WRK-SYO-YMD
                    MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                END-IF
-               IF      WRK-YMDS-1      <   WRK-SYO-YMD1
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                    MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
                END-IF
            END-IF
@@ -4944,7 +4947,8 @@
                    IF      WRK-YMDS        >   WRK-SYO-YMD
                        MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                    END-IF
-                   IF      WRK-YMDS-1      <   WRK-SYO-YMD1
+                   IF     (WRK-SYO-YMD1    =   SPACE        )
+                   OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                        MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
                    END-IF
                END-IF
@@ -4955,7 +4959,8 @@
                    IF      WRK-YMDS        >   WRK-SYO-YMD
                        MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                    END-IF
-                   IF      WRK-YMDS-1      <   WRK-SYO-YMD1
+                   IF     (WRK-SYO-YMD1    =   SPACE        )
+                   OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                        MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
                    END-IF
                END-IF
@@ -4966,7 +4971,8 @@
                    IF      WRK-YMDS        >   WRK-SYO-YMD
                        MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                    END-IF
-                   IF      WRK-YMDS-1      <   WRK-SYO-YMD1
+                   IF     (WRK-SYO-YMD1    =   SPACE        )
+                   OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                        MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
                    END-IF
                END-IF
