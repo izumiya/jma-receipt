@@ -116,7 +116,7 @@
       *
        01  WRK-DATA-REC.
            03  WRK-DATA            PIC X(30000)
-                                   OCCURS  10.
+                                   OCCURS  11.
        01  SPA-SCR-REC.
            COPY    "CPJ02SPASCR.INC".
       *
@@ -928,7 +928,7 @@
            END-IF
            MOVE    SPA-SCR-REC         TO  WRK-DATA-REC
            PERFORM VARYING     IDX     FROM   1   BY  1
-                   UNTIL      (IDX     >   10  )  OR
+                   UNTIL      (IDX     >   11  )  OR
                               (WRK-DATA (IDX)     =   SPACE)
       *
                MOVE    WRK-DATA (IDX)      TO  SPA-DATA-REC
