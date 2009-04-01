@@ -104,8 +104,6 @@
       *  04.02.06    NACL-藤原    08/06/02  公費請求書ボタンの再設定をしない
       *  04.02.07    NACL-藤原    08/07/23  宮城県、岩手県地震対応
       *                                     ２００８年６月〜対象 
-      *  04.02.08    NACL-藤原    09/03/24  主科設定時の主科未設定データ
-      *                                     の有無チェック
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -154,11 +152,9 @@
            03  FLG-HKNJAINF        PIC 9(01).
            03  FLG-BTPARA          PIC 9(01).
            03  FLG-SYUKA           PIC 9(01).
-           03  FLG-RECE10          PIC 9(01).
       *
            03  FLG-3004-PARAKBN    PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
-           03  FLG-SYUKA-CHK       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -363,8 +359,6 @@
       *    主科
        01  SYUKA-REC.
            COPY    "CPSYUKA.INC".
-      *
-           COPY    "CPRCF010.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -3643,47 +3637,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  460-RECEDEN-GID-EXT
            END-IF
-      *    
-      *    主科設定時の主科未設定データの存在チェック
-           MOVE    ZERO                TO  FLG-SYUKA-CHK
-      *   
-           MOVE    SPACE               TO  RECE10-REC
-           INITIALIZE                      RECE10-REC
-           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
-           MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
-           MOVE    "00"                TO  RECE10-RECEKA
-           EVALUATE    MCP-WIDGET
-               WHEN    "B06"
-                   IF     SYS-2009-SYUKA-SYAHO  =   "1"
-                       MOVE    1               TO  RECE10-TEISYUTUSAKI
-                       PERFORM 4602-SYUKA-CHK-SEC
-                   END-IF
-               WHEN    "B07"
-                   IF      SYS-2009-SYUKA-KOKUHO =   "1"
-                       MOVE    2               TO  RECE10-TEISYUTUSAKI
-                       PERFORM 4602-SYUKA-CHK-SEC
-                   END-IF
-                   IF    ( FLG-SYUKA-CHK             =   ZERO   )
-                   AND   ( SPA-NAI-200501-KOUIKIKBN  =   "1"    )
-                   AND   ( SPA-NAI-SKYYM             >=  200804 )
-                   AND   ( SYS-2009-SYUKA-KOUIKI     =   "1"    )
-                       MOVE    SPACE           TO  RECE10-REC
-                       INITIALIZE                  RECE10-REC
-                       MOVE    SPA-HOSPNUM     TO  RECE10-HOSPNUM
-                       MOVE    SPA-NAI-SKYYM   TO  RECE10-SKYYM
-                       MOVE    6               TO  RECE10-TEISYUTUSAKI
-                       PERFORM 4602-SYUKA-CHK-SEC
-                   END-IF
-               WHEN    "B08"
-                   IF      SYS-2009-SYUKA-KOUIKI =   "1"
-                       MOVE    6               TO  RECE10-TEISYUTUSAKI
-                       PERFORM 4602-SYUKA-CHK-SEC
-                   END-IF
-           END-EVALUATE
-           IF      FLG-SYUKA-CHK       =   1
-               MOVE    "0011"              TO  SPA-ERRCD
-               GO  TO  460-RECEDEN-GID-EXT
-           END-IF
       *
       *    ジョブ管理チェック処理
            IF      SPA-ERRCD       =   SPACE
@@ -3734,33 +3687,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            .
        460-RECEDEN-GID-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    主科未設定データ存在チェック処理
-      *****************************************************************
-       4602-SYUKA-CHK-SEC            SECTION.
-      *
-           MOVE    RECE10-REC          TO  MCPDATA-REC
-           MOVE    "tbl_seikyu"        TO  MCP-TABLE
-           MOVE    "key68"             TO  MCP-PATHNAME
-           PERFORM 900-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_seikyu"        TO  MCP-TABLE
-               MOVE    "key68"             TO  MCP-PATHNAME
-               PERFORM 900-SEIKYU-READ-SEC
-           ELSE
-               MOVE    1                   TO  FLG-RECE10
-           END-IF
-           MOVE    "tbl_seikyu"        TO  MCP-TABLE
-           MOVE    "key68"             TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-           IF      FLG-RECE10          =   ZERO
-               MOVE    1                   TO  FLG-SYUKA-CHK
-           END-IF
-           .
-       4602-SYUKA-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4929,13 +4855,6 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE
                   "総括表・広域の処理対象データが選択してありません"
                                                TO  SPA-ERRMSG
-               WHEN    "0011"
-                   STRING  "主科未設定データがあります。"
-                                               DELIMITED  BY  SIZE
-                           "主科未設定リストで確認して下さい"
-                                               DELIMITED  BY  SIZE
-                                               INTO  SPA-ERRMSG
-                   END-STRING
                WHEN    "0012"
                    MOVE    "再印刷できない帳票です"    TO  SPA-ERRMSG
       *
@@ -5360,22 +5279,6 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-SYUKA-READ-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    請求管理読込
-      *****************************************************************
-       900-SEIKYU-READ-SEC           SECTION.
-      *
-           PERFORM 900-DBFETCH-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    ZERO                TO  FLG-RECE10
-               MOVE    MCPDATA-REC         TO  RECE10-REC
-           ELSE
-               MOVE    1                   TO  FLG-RECE10
-           END-IF
-           .
-       900-SEIKYU-READ-EXT.
            EXIT.
       *
       *****************************************************************
