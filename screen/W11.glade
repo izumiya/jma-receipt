@@ -4572,7 +4572,7 @@
 		  <data>CHANGED</data>
 		  <last_modification_time>Thu, 08 Mar 2001 02:57:36 GMT</last_modification_time>
 	        </signal>
-	        <editable>False</editable>
+	        <editable>True</editable>
 	        <text_visible>True</text_visible>
 	        <text_max_length>20</text_max_length>
 	        <text></text>
