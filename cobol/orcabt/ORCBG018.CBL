@@ -628,10 +628,19 @@
                PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
                IF    ( FLG-SRYCDCHG        =   ZERO )
                    PERFORM 900-CHKSND-KEY6-SEL-SEC
-                   IF    ( FLG-TCHKSND     =   ZERO )
-                       MOVE    "1"     TO  WRK-MSTKBN
-                       MOVE    "1"     TO  WRK-PROCKBN
-                       PERFORM 2001-IN01-EDIT-SEC
+                   IF    ( FLG-TCHKSND             =   ZERO )
+      *電話でのお問い合わせ４月１日−チェックマスタ経過措置薬剤更新
+      *での不具合データ修復対応
+                       IF    ( TCHKSND-UTAGAIKBN   =   SPACE )
+                           PERFORM 200111-CHKSND-SRYCD-EDIT-SEC
+                           MOVE    "1"     TO  WRK-MSTKBN
+                           MOVE    "0"     TO  WRK-PROCKBN
+                           PERFORM 2001-IN01-EDIT-SEC
+                       ELSE
+                           MOVE    "1"     TO  WRK-MSTKBN
+                           MOVE    "1"     TO  WRK-PROCKBN
+                           PERFORM 2001-IN01-EDIT-SEC
+                       END-IF
                    ELSE
                        PERFORM 200111-CHKSND-SRYCD-EDIT-SEC
                        MOVE    "1"     TO  WRK-MSTKBN
@@ -659,6 +668,14 @@
       *    チェックマスタ２更新処理（診療行為コード）
       *****************************************************************
        200111-CHKSND-SRYCD-EDIT-SEC   SECTION.
+      *
+           IF    ( FLG-TCHKSND             =   ZERO )
+            AND  ( TCHKSND-UTAGAIKBN       =   SPACE )
+               MOVE    TCHKSND-REC     TO  MCPDATA-REC
+               MOVE    "tbl_chksnd"    TO  MCP-TABLE
+               MOVE    "del11"         TO  MCP-PATHNAME
+               PERFORM 910-DBDELETE-SEC
+           END-IF
       *
            MOVE    SMCNDATE-YMD        TO  CHKSND-CREYMD
                                            CHKSND-UPYMD
@@ -2388,6 +2405,19 @@ grpsys                                 SPA-AREA
            .
       *
        911-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＤＥＬＥＴＥ処理
+      *****************************************************************
+       910-DBDELETE-SEC                SECTION.
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           .
+       910-DBDELETE-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ読み込み処理
