@@ -408,9 +408,18 @@
                        IF    ( FLG-SRYCDCHG        =   ZERO )
                            PERFORM 900-CHKSND-KEY-SEL-SEC
                            IF    ( FLG-WKCHKSND    =   ZERO )
-                               MOVE    "1"     TO  WRK-MSTKBN
-                               MOVE    "1"     TO  WRK-PROCKBN
-                               PERFORM 2001-IN01-EDIT-SEC
+                               DISPLAY "WKCHKSND-UTAGAIKBN =" 
+                                        WKCHKSND-UTAGAIKBN
+                               IF    ( WKCHKSND-UTAGAIKBN   =   SPACE )
+                                   PERFORM 2001-CHKSND-EDIT-SEC
+                                   MOVE    "1"     TO  WRK-MSTKBN
+                                   MOVE    "0"     TO  WRK-PROCKBN
+                                   PERFORM 2001-IN01-EDIT-SEC
+                               ELSE
+                                   MOVE    "1"     TO  WRK-MSTKBN
+                                   MOVE    "1"     TO  WRK-PROCKBN
+                                   PERFORM 2001-IN01-EDIT-SEC
+                               END-IF
                            ELSE
                                PERFORM 2001-CHKSND-EDIT-SEC
                                MOVE    "1"     TO  WRK-MSTKBN
@@ -440,6 +449,14 @@
       *    ¥Á¥§¥Ã¥¯¥Þ¥¹¥¿£²ÊÔ½¸½èÍý
       *****************************************************************
        2001-CHKSND-EDIT-SEC            SECTION.
+      *
+           IF    ( FLG-WKCHKSND            =   ZERO )
+            AND  ( WKCHKSND-UTAGAIKBN      =   SPACE )
+               MOVE    WKCHKSND-REC    TO  MCPDATA-REC
+               MOVE    "tbl_chksnd"    TO  MCP-TABLE
+               MOVE    "del11"         TO  MCP-PATHNAME
+               PERFORM 910-DBDELETE-SEC
+           END-IF
       *
            MOVE    CHKSND-REC      TO  WKCHKSND-REC
            MOVE    CHG-RJNSRYCD    TO  WKCHKSND-SRYCD
@@ -1224,6 +1241,19 @@ grpsys                                 SPA-AREA
                                        SPA-AREA
            .
        910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â£Ä£Å£Ì£Å£Ô£Å½èÍý
+      *****************************************************************
+       910-DBDELETE-SEC                SECTION.
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           .
+       910-DBDELETE-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¡¡¥ª¡¼¥×¥ó½èÍý
