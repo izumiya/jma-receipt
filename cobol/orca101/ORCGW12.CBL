@@ -102,10 +102,12 @@
       *                                     入院料未算定時コメント記載区分
       *                                     労災枠記載区分の追加
       *
-      *  04.04.01    NACL-藤原    09/11/19  レセ電ＣＤ−Ｒ出力対応
-      *  04.04.02    NACL-藤原    09/11/20  レセ電出力先チェック追加
-      *  04.04.03    NACL-藤原    09/11/25  光ディスク等送付書作成区分、
+      *  04.04.01    NACL-藤原    08/11/19  レセ電ＣＤ−Ｒ出力対応
+      *  04.04.02    NACL-藤原    08/11/20  レセ電出力先チェック追加
+      *  04.04.03    NACL-藤原    08/11/25  光ディスク等送付書作成区分、
       *                                     症状詳記作成区分追加
+      *  04.04.04    NACL-藤原    09/04/02  レセ電出力先チェックを登録時
+      *                                     の確認ダイアログに変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3549,10 +3551,10 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
       *
-           PERFORM 4103-RECEDENOUT-CHK-SEC
-           IF      SPA-ERRCD       NOT =   SPACE
-               GO      TO      4102-KIHON-CHK-EXT
-           END-IF
+      *****PERFORM 4103-RECEDENOUT-CHK-SEC
+      *****IF      SPA-ERRCD       NOT =   SPACE
+      *****    GO      TO      4102-KIHON-CHK-EXT
+      *****END-IF
       *
            PERFORM 4120-RECECOMKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
@@ -3868,7 +3870,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                        CALL    "orcfiledel"    USING   ORCSFDELAREA
                    ELSE
                        MOVE    102                 TO  SPA-GMN-CUR
-                       MOVE    "0058"              TO  SPA-ERRCD
+                       MOVE    "1002"              TO  SPA-WIDCD
                    END-IF
                END-IF     
            END-IF     
@@ -5804,7 +5806,14 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4900-KANRENCHK-SEC
-           IF      SPA-ERRCD        =   SPACE
+      *
+      *    レセ電データ出力先チェック
+           IF      SPA-ERRCD       =   SPACE
+               PERFORM 4103-RECEDENOUT-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD        =   SPACE )
+           AND   ( SPA-WIDCD        =   SPACE )
               MOVE    "1001"           TO  SPA-WIDCD
            END-IF
            .
@@ -5917,7 +5926,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                        END-IF
                    END-IF
                END-IF
-           END-IF    
+           END-IF
       *
            .
        4900-KANRENCHK-EXT.
@@ -7178,8 +7187,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0057"
                    MOVE    "労災コメント記載区分入力エラー"
                                                          TO  SPA-ERRMSG
-               WHEN    "0058"
-                   MOVE    "レセ電出力先入力エラー"      TO  SPA-ERRMSG
+      *********WHEN    "0058"
+      *********    MOVE    "レセ電出力先入力エラー"      TO  SPA-ERRMSG
       *
                WHEN    "0096"
                    STRING  "一括作成出力順（国保）の指定が編綴順です。"
@@ -7260,6 +7269,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "1001"
                    MOVE    "レセプト印刷情報を登録します"
                                                 TO  WRK-WIDMSG
+               WHEN    "1002"
+                   STRING  "レセ電出力先がマウントできませんが、"
+                                           DELIMITED  BY  SIZE
+                           "レセプト印刷情報を登録しますか"
+                                           DELIMITED  BY  SIZE
+                                           INTO  WRK-WIDMSG
+                   END-STRING
            END-EVALUATE
       *
            MOVE    SPACE                TO  WID1
