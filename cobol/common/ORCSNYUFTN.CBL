@@ -105,6 +105,7 @@
       *  03.02.07    NACL-門脇    08/08/27  入院料加算外泊チェック修正
       *  04.02.08    NACL-門脇    08/10/07  入院基本料有効期間チェック
       *  04.02.09    NACL-門脇    08/10/30  保険組合せ有効期間チェック
+      *  04.03.01    NACL-門脇    09/04/01  埼玉県地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1411,12 +1412,12 @@
                               "181" OR "182" OR "183" OR "281"  ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
-                IF  ( WRK-PREFNUM(1)                =    11      )
-                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200710" )
-                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =   "543"   ) OR
-                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =   "543"   ) OR
-                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =   "543"   ) OR
-                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =   "543"   ))
+                IF  ( WRK-PREFNUM(1)                =    11        )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200710"   )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX) = "543" OR "582") OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX) = "543" OR "582") OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX) = "543" OR "582") OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX) = "543" OR "582"))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
                 IF  ( WRK-PREFNUM(1)                =    11      )
@@ -1469,12 +1470,12 @@
                               "181" OR "182" OR "183" OR "281"  ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
-                IF  ( WRK-PREFNUM(2)                =    11      )
-                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200710" )
-                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =   "543"   ) OR
-                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =   "543"   ) OR
-                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =   "543"   ) OR
-                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =   "543"   ))
+                IF  ( WRK-PREFNUM(2)                =    11        )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200710"   )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX) = "543" OR "582") OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX) = "543" OR "582") OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX) = "543" OR "582") OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX) = "543" OR "582"))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
                 IF  ( WRK-PREFNUM(2)                =    11      )
