@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.04.00    NACL-多々納  09/04/09  Ｈ２１．５対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -123,12 +124,15 @@
            03  FILLER              PIC X(15)   VALUE   "19 １９低所".
            03  FILLER              PIC X(15)   VALUE   "20 ２０二割".
            03  FILLER              PIC X(15)   VALUE   "21 ２１高半".
+           03  FILLER              PIC X(15)   VALUE   "22 ２２多上".
+           03  FILLER              PIC X(15)   VALUE   "23 ２３多一".
+           03  FILLER              PIC X(15)   VALUE   "24 ２４多低".
        01  TBL-TOKKI-AREA-R        REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI-OCC       OCCURS   19.
+           03  TBL-TOKKI-OCC       OCCURS   22.
                05  TBL-TOKK-CD     PIC X(02).
                05  TBL-TOKK-K      PIC X(01).
                05  TBL-TOKK-NAIYO  PIC X(12).
-       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   19.
+       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   22.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -816,6 +820,16 @@
                END-IF
                MOVE    SPA-GMN26-CD        TO  SPA-MAE26-CD
            END-IF
+      *!!!
+      *H21.5 特記追加分の入外区分設定
+           IF      SPA-GMN26-CD        =   "22"
+                                       OR  "23"
+                                       OR  "24"
+      *        入院
+               MOVE    SPA-GMN26-NYUGAI-LST (2)
+                                           TO  SPA-GMN26-NYUGAI-G
+           END-IF
+      *!!!
            .
        41012-CD-CHK-EXT.
            EXIT.
@@ -910,6 +924,19 @@
                    MOVE    05                  TO  SPA-GMN26-CUR
                END-IF
            END-IF
+      *!!!
+      *H21.5 特記追加分
+           IF     (SPA-GMN26-CD        =   "22"
+                                       OR  "23"
+                                       OR  "24"  )
+           AND    (SPA-ERRCD           =   SPACE )
+           AND    (SPA-NAI26-STYM  NOT =   ZERO  )
+               IF      SPA-NAI26-STYM      <   "200905"
+                   MOVE    "2612"              TO  SPA-ERRCD
+                   MOVE    05                  TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+      *!!!
       *
            .
        41012-STYM-CHK-EXT.
