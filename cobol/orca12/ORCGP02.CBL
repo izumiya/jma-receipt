@@ -5167,8 +5167,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "レセ電コードで重複があります。" 
                                                    TO  SPA-ERRMSG
                WHEN    "2612"
-                   STRING  "このレセ電コードの開始は"
-                           "Ｈ２１年５月からです。"
+                   STRING  "この特記事項の開始は"
+                           "平成２１年５月からです。"
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
