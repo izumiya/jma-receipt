@@ -1633,7 +1633,35 @@
                GO  TO  460-BACK-EXT
            END-IF
       *
-           PERFORM 460-BACK-SYORI-SEC
+      *    ²èÁüÅºÉÕ¾ðÊóºï½ü
+           INITIALIZE                  TEMP-REC
+           MOVE    SPA-TERMID      TO  TEMP-TERMID
+           MOVE    SPA-HOSPNUM     TO  TEMP-HOSPNUM
+           MOVE    TEMP-REC        TO  MCPDATA-REC
+           MOVE    "DBDELETE"      TO  MCP-FUNC
+           MOVE    "tbl_yakujyo_temp"
+                                   TO  MCP-TABLE
+           MOVE    "termid"        TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           MOVE    "M02"           TO  SPA-SAKIPG
+           MOVE    "N21"           TO  SPA-MOTOPG
+      *
+           MOVE    SPACE           TO  LINKAREA
+      *
+           INITIALIZE                  SPA-KYOTUKEY
+           MOVE    SPA-KYOUTU      TO  LNK-KYOUTU
+      *
+           MOVE   "CHANGE"         TO  MCP-PUTTYPE
+           MOVE    SPA-SAKIPG      TO  MCP-WINDOW
+      *
+      *    £Ð£Õ£Ô½èÍý
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1               TO  FLG-END
       *
            .
        460-BACK-EXT.
@@ -1666,7 +1694,7 @@
            INITIALIZE                  SPA-KYOTUKEY
            MOVE    SPA-KYOUTU      TO  LNK-KYOUTU
       *
-           MOVE   "CHANGE"         TO  MCP-PUTTYPE
+           MOVE   "JOIN"           TO  MCP-PUTTYPE
            MOVE    SPA-SAKIPG      TO  MCP-WINDOW
       *
       *    £Ð£Õ£Ô½èÍý
