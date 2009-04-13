@@ -84,6 +84,8 @@
       *  04.02.06    NACL-藤原    09/02/26  平成２０年４月以降に７５歳到
       *                                     達時に海外に住所を有する場合
       *                                     の対応
+      *  04.02.07    NACL-藤原    09/04/09  入院基本料・特定入院料・食事
+      *                                     療養出力時の連番の初期化
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -572,7 +574,7 @@
                                                WRK-PARA-SHELLID
                                                WRK-PARA-HOSPNUM
                                                TOUKEIERR
-           END-UNSTRING 
+           END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            PERFORM 100-DBOPEN-SEC
@@ -793,6 +795,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
        2001-NYUIN-HENSYU-SEC              SECTION.
       *
            INITIALIZE                  WRK-TOUKEI01-TABLE
+      *
+           MOVE    ZERO                TO  WRK-RENNUM
       *     
       *    テスト患者のときは読み飛ばす
            MOVE    WRK-PARA-HOSPNUM        TO  PTINF-HOSPNUM
@@ -1017,6 +1021,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    入院基本料・特定入院料・食事療養編集処理
       *****************************************************************
        20013-NYUIN-KIHON-SEC           SECTION.
+      *
+      *    統計データ（病名）のみのとき
+           IF      WRK-PARA-DATAKBN    =   "2"
+               GO  TO  20013-NYUIN-KIHON-EXT
+           END-IF
       *
            INITIALIZE                      HCM34S01-AREA
                                            WRK-SPA-AREA
