@@ -114,6 +114,7 @@
       *  04.04.02    NACL-藤原    08/11/25  光ディスク等送付書作成対応
       *  04.04.03    NACL-藤原    08/12/01  公害診療報酬請求書
       *                                     名古屋市、北九州市対応
+      *  04.04.04    NACL-藤原    09/04/10  特別療養費は対象外とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5871,6 +5872,9 @@ grpsys         PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-RECE10
                MOVE    MCPDATA-REC         TO  RECE10-REC
+               IF      RECE10-RECESYUBETU  =    "6666"
+                   GO  TO  900-SEIKYU-READ-SEC
+               END-IF
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF

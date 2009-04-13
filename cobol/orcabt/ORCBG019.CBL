@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.04.01    NACL-藤原    09/04/10  特別療養費は対象外とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -652,6 +653,9 @@ grpsys                                 SPA-AREA
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-RECE10
                MOVE    MCPDATA-REC         TO  RECE10-REC
+               IF      RECE10-RECESYUBETU  =    "6666"
+                   GO  TO  900-SEIKYU-READ-SEC
+               END-IF
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF
