@@ -109,6 +109,7 @@
       *  04.03.03    NACL-Æ£¸¶    08/07/23  µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
       *                                     £²£°£°£¸Ç¯£¶·î¡ÁÂÐ¾Ý 
       *  04.03.04    NACL-Æ£¸¶    08/09/03  ¥ª¥ó¥é¥¤¥óÀÁµá¡Ê¸ÄÊÌÀÁµá¡ËÂÐ±þ
+      *  04.03.05    NACL-Æ£¸¶    09/04/10  ÆÃÊÌÎÅÍÜÈñ¤ÏÂÐ¾Ý³°¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5643,6 +5644,9 @@ grpsys         PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-RECE10
                MOVE    MCPDATA-REC         TO  RECE10-REC
+               IF      RECE10-RECESYUBETU  =    "6666"
+                   GO  TO  900-SEIKYU-READ-SEC
+               END-IF
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF
