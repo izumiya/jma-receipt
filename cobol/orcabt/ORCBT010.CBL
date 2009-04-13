@@ -83,6 +83,8 @@
       *  04.03.01    NACL-藤原    08/05/07  公費４種までの併用の記録対応
       *  04.03.02    NACL-門脇    08/09/02  請求点判定追加
       *  04.03.03    NACL-門脇    08/12/17  平成２１年１月改正対応
+      *  04.03.04    NACL-藤原    09/04/09  入院基本料・特定入院料・食事
+      *                                     療養出力時の連番の初期化
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -792,6 +794,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
        2001-NYUIN-HENSYU-SEC              SECTION.
       *
            INITIALIZE                  WRK-TOUKEI01-TABLE
+      *
+           MOVE    ZERO                TO  WRK-RENNUM
       *     
       *    テスト患者のときは読み飛ばす
            MOVE    WRK-PARA-HOSPNUM        TO  PTINF-HOSPNUM
@@ -1016,6 +1020,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    入院基本料・特定入院料・食事療養編集処理
       *****************************************************************
        20013-NYUIN-KIHON-SEC           SECTION.
+      *
+      *    統計データ（病名）のみのとき
+           IF      WRK-PARA-DATAKBN    =   "2"
+               GO  TO  20013-NYUIN-KIHON-EXT
+           END-IF
       *
            INITIALIZE                      HCM34S01-AREA
                                            WRK-SPA-AREA
