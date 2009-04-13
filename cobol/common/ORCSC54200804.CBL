@@ -170,7 +170,7 @@
       *    閉鎖循環式麻酔の数量チェック
        01  TBL-MASUICHK-AREA.
            03  TBL-MASUICHK-OCC            OCCURS   400.
-               05  TBL-SURYO-Z         PIC 9(05)V9(03).
+               05  TBL-SURYO-Z         PIC S9(05)V9(03).
                05  TBL-CHK             PIC X(01).
       *
       *    神経ブロック・トリガーポイント注射判定
