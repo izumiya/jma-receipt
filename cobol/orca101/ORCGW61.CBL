@@ -45,6 +45,7 @@
       *
       *  04.02.01    NACL-藤原    08/04/12  平成２０年４月改正対応
       *  04.02.02    NACL-藤原    08/04/14  警告時の登録処理を可能にする
+      *  04.02.03    NACL-藤原    09/04/14  保険番号９００番台のチェック
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1410,10 +1411,15 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
                IF      FLG-HKNNUM      =   ZERO
                    MOVE    HKN-SEIDONAME           TO  SPA-GMN-SEIDONAME
-                   IF      HKN-HKNKOHSBTKBN    =   "5" OR  "6" OR  "7"
-                       CONTINUE
-                   ELSE
+                   IF      HKN-HKNNUM(1:1) =   "9"
                        MOVE    "0015"                  TO  SPA-ERRCD
+                   ELSE
+                       IF      HKN-HKNKOHSBTKBN    
+                                               =   "5" OR  "6" OR  "7"
+                           CONTINUE
+                       ELSE
+                           MOVE    "0015"              TO  SPA-ERRCD
+                       END-IF
                    END-IF
                ELSE
                    MOVE    "0004"                  TO  SPA-ERRCD
