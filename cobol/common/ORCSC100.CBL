@@ -309,7 +309,7 @@
       *
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD           =   "0180" )
-               OR (ORCSC100-INIT       =   1      )
+      *******  OR (ORCSC100-INIT       =   1      )
                GO      TO      100-GMN-SYORI-EXT
            END-IF
       *
@@ -604,8 +604,8 @@
                ELSE
                    IF     (SPA-COM-KAIFLG (IDX)    =   "1" )
                       AND (WRK-KAISU               =   ZERO)
-                        MOVE    SPA-COM-KAISU (IDX) TO  WRK-KAISU
-      *                 外用薬の時、入力回数を
+                       MOVE    SPA-COM-KAISU (IDX) TO  WRK-KAISU
+      *                外用薬の時、入力回数を
                        IF     (SPA-COM-SRYKBN(IDX) =  "23"  )  AND
                               (SPA-COM-KAISU2(IDX) >   ZERO ) AND
                               (SPA-COM-KAISU (IDX) =   1    )
@@ -2307,7 +2307,7 @@
                MOVE    SPA-NYUHKT-G        TO  ORCSCHKTCHK-NYUHKT-G
                MOVE    "2"                 TO  ORCSCHKTCHK-SYORI
                MOVE    "K02"               TO  ORCSCHKTCHK-PG
-               MOVE    SPA-K02-TEISEI-AREA TO   LNK-ORCSC-TEISEI-AREA
+               MOVE    SPA-K02-TEISEI-AREA TO  LNK-ORCSC-TEISEI-AREA
                CALL    "ORCSCHKTCHK"       USING
                                            ORCSCHKTCHKAREA
                                            SPA-AREA
