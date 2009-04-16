@@ -65,6 +65,9 @@
       *  04.02.02    NACL-藤原    08/03/31  公害レセプト対応
       *  04.02.03    NACL-藤原    08/04/14  月途中の負担者番号変更対応
       *                                     （中国残留法人等の公費単独） 
+      *  04.02.04    NACL-藤原    09/04/10  更新時に作成日を初期化しない
+      *                                     受給者番号に変更がないデータ
+      *                                     は更新しない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1565,45 +1568,68 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  MONTHLYNUM-HOSPNUM
                        AND   ( FLG-MONTHLYNUM  =   1     )
                            CONTINUE
                        ELSE                             
-                           INITIALIZE              MONTHLYNUM-REC 
-grpsys                     MOVE    SPA-HOSPNUM TO  MONTHLYNUM-HOSPNUM
-                           MOVE    SPA-NAI-TPTID (IDX1 IDX)
-                                               TO  MONTHLYNUM-PTID
-                           MOVE    SPA-NAI-TKOHNUM (IDX1 IDX)
-                                               TO  MONTHLYNUM-KOHNUM
-                           MOVE    SPA-NAI-SRYYM
-                                               TO  MONTHLYNUM-SRYYM
-                           MOVE    SPA-R01-NYUGAIKBN
-                                               TO  MONTHLYNUM-NYUGAIKBN
-                           MOVE    SPA-GMN-TJKYSNUM (IDX1 IDX)
-                                               TO  MONTHLYNUM-JKYSNUM
-                           MOVE    SPA-NAI-TKOHID (IDX1 IDX)
-                                               TO  MONTHLYNUM-KOHID
                            IF      FLG-MONTHLYNUM  =   ZERO
-                               MOVE    SMCNDATE-YMD
+      *                        受給者番号に変更がない場合は更新しない     
+                               IF      SPA-GMN-TJKYSNUM (IDX1 IDX)
+                                               =   MONTHLYNUM-JKYSNUM
+                                   CONTINUE
+                               ELSE
+                                   MOVE    SPA-GMN-TJKYSNUM (IDX1 IDX)
+                                                   TO MONTHLYNUM-JKYSNUM
+                                   MOVE    SMCNDATE-YMD
                                                    TO  MONTHLYNUM-UPYMD
-                               MOVE    SMCNDATE-HMS
+                                   MOVE    SMCNDATE-HMS
                                                    TO  MONTHLYNUM-UPHMS
-                               MOVE    "DBUPDATE"  TO  MCP-FUNC
-                           ELSE
-                               MOVE    SMCNDATE-YMD
-                                                   TO  MONTHLYNUM-CREYMD
-                               MOVE    SMCNDATE-YMD
-                                                   TO  MONTHLYNUM-UPYMD
-                               MOVE    SMCNDATE-HMS
-                                                   TO  MONTHLYNUM-UPHMS
-                               MOVE    "DBINSERT"  TO  MCP-FUNC   
-                           END-IF
-                           MOVE    MONTHLYNUM-REC  TO  MCPDATA-REC
-                           MOVE    "tbl_monthlynum"
+                                   MOVE    "DBUPDATE"
+                                                   TO  MCP-FUNC
+                                   MOVE    MONTHLYNUM-REC
+                                                   TO  MCPDATA-REC
+                                   MOVE    "tbl_monthlynum"
                                                    TO  MCP-TABLE
-                           MOVE    "key"           TO  MCP-PATHNAME
-                           PERFORM 900-ORCDBMAIN-SEC
-                           IF      MCP-RC              =   ZERO
-                               CONTINUE
-                           ELSE    
-                               MOVE    "1001"              TO  SPA-ERRCD
-                               GO  TO  450-TOUROKU-EXT
+                                   MOVE    "key"   TO  MCP-PATHNAME
+                                   PERFORM 900-ORCDBMAIN-SEC
+                                   IF      MCP-RC   =   ZERO
+                                       CONTINUE
+                                   ELSE    
+                                       MOVE    "1001"   TO  SPA-ERRCD
+                                       GO  TO  450-TOUROKU-EXT
+                                   END-IF
+                               END-IF
+                           ELSE
+                               INITIALIZE          MONTHLYNUM-REC 
+grpsys                         MOVE    SPA-HOSPNUM
+                                               TO  MONTHLYNUM-HOSPNUM
+                               MOVE    SPA-NAI-TPTID (IDX1 IDX)
+                                               TO  MONTHLYNUM-PTID
+                               MOVE    SPA-NAI-TKOHNUM (IDX1 IDX)
+                                               TO  MONTHLYNUM-KOHNUM
+                               MOVE    SPA-NAI-SRYYM
+                                               TO  MONTHLYNUM-SRYYM
+                               MOVE    SPA-R01-NYUGAIKBN
+                                               TO  MONTHLYNUM-NYUGAIKBN
+                               MOVE    SPA-GMN-TJKYSNUM (IDX1 IDX)
+                                               TO  MONTHLYNUM-JKYSNUM
+                               MOVE    SPA-NAI-TKOHID (IDX1 IDX)
+                                               TO  MONTHLYNUM-KOHID
+                               MOVE    SMCNDATE-YMD
+                                               TO  MONTHLYNUM-CREYMD
+                               MOVE    SMCNDATE-YMD
+                                               TO  MONTHLYNUM-UPYMD
+                               MOVE    SMCNDATE-HMS
+                                               TO  MONTHLYNUM-UPHMS
+                               MOVE    "DBINSERT"
+                                               TO  MCP-FUNC   
+                               MOVE    MONTHLYNUM-REC  TO  MCPDATA-REC
+                               MOVE    "tbl_monthlynum"
+                                               TO  MCP-TABLE
+                               MOVE    "key"   TO  MCP-PATHNAME
+                               PERFORM 900-ORCDBMAIN-SEC
+                               IF      MCP-RC  =   ZERO
+                                   CONTINUE
+                               ELSE    
+                                   MOVE    "1001"  TO  SPA-ERRCD
+                                   GO  TO  450-TOUROKU-EXT
+                               END-IF
                            END-IF
                        END-IF
                    END-IF    
