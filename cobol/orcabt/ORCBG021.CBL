@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.04.01    NACL-藤原    09/04/01  診療科を名称で表示する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -61,6 +62,7 @@
            03  FLG-PTINF           PIC 9(01).
            03  FLG-SRYACCT         PIC 9(01).
            03  FLG-NYUINACCT       PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
       *
            03  FLG-CHK             PIC 9(01).
            03  FLG-ERR             PIC 9(01).
@@ -154,13 +156,14 @@
            03  B01-NAME                PIC X(14).
            03  FILLER                  PIC X(01).
            03  B01-SRYKA               PIC X(06).
+           03  FILLER                  PIC X(01).
            03  B01-SRYYMD              PIC X(10).
            03  B01-NYUGAIKBN           PIC X(04).
            03  FILLER                  PIC X(01).
            03  B01-BYOMEI              PIC X(80).
       *
        01  BODY-02.
-           03  FILLER                  PIC X(53).
+           03  FILLER                  PIC X(54).
            03  B02-RIYUU               PIC X(104).
            03  B02-RIYUU-R             REDEFINES   B02-RIYUU.
                05  B02-RIYUU1          PIC X(24).
@@ -173,7 +176,7 @@
                05  FILLER              PIC X(01).
       *
        01  BODY-03.
-           03  FILLER                  PIC X(53).
+           03  FILLER                  PIC X(54).
            03  B03-RIYUU               PIC X(24).
            03  FILLER                  PIC X(01).
            03  B03-HAISIYMD            PIC X(09).
@@ -192,6 +195,8 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *    
+           COPY    "CPSK1005.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -643,7 +648,23 @@
            MOVE    PTBYO-SRYYMD        TO  WRK-SYMD
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    LNK-DAY2-EDTYMD1    TO  B01-SRYYMD
-           MOVE    PTBYO-SRYKA         TO  B01-SRYKA
+      *****MOVE    PTBYO-SRYKA         TO  B01-SRYKA
+           MOVE    SPACE               TO  SYS-1005-REC
+           INITIALIZE                      SYS-1005-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+           MOVE    "1005"              TO  SYS-1005-KANRICD
+           MOVE    PTBYO-SRYKA         TO  SYS-1005-KBNCD
+           MOVE    PTBYO-SRYYMD (1:6)  TO  SYS-1005-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-1005-STYUKYMD (7:2)
+           MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
+           PERFORM 900-SYSKANRI-READ-SEC
+           IF      FLG-SYSKANRI         =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1005-REC
+               MOVE    SYS-1005-SRYKANAME1 (1:6)
+                                           TO  B01-SRYKA
+           ELSE
+                MOVE    PTBYO-SRYKA        TO  B01-SRYKA
+           END-IF
            EVALUATE    PTBYO-NYUGAIKBN
                WHEN    "1"
                    MOVE    "入"            TO  B01-NYUGAIKBN
@@ -1007,6 +1028,35 @@
            END-IF
            .
        900-NYUINACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    システム管理マスタ読込
+      *****************************************************************
+       900-SYSKANRI-READ-SEC         SECTION.
+      *
+           MOVE    SYS-1005-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO            TO  FLG-SYSKANRI
+               ELSE
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-SYSKANRI-READ-EXT.
            EXIT.
       *
       *****************************************************************
