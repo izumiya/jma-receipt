@@ -40,9 +40,11 @@
       *                                     ËÜ¿Í¡¦²ÈÂ²¶èÊ¬¤Î¸«Ä¾¤·
       *                                     £°·ï¤Î¾ì¹çÀµ¾ï½ªÎ»¤È¤¹¤ë
       *  04.03.03    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
-      *  04.03.04    NACL-Æ£¸¶    09/02/26  Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤Ë£·£µºÐÅþ
+      *
+      *  04.04.01    NACL-Æ£¸¶    09/02/26  Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤Ë£·£µºÐÅþ
       *                                     Ã£»þ¤Ë³¤³°¤Ë½»½ê¤òÍ­¤¹¤ë¾ì¹ç
       *                                     ¤ÎÂÐ±þ
+      *  04.04.02    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -461,28 +463,6 @@
                                    PIC X(07)   VALUE   "ZZZ4012".
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
-      *
-      *    ÆÃµ­»ö¹à
-           03  CONS-TOKKI1         PIC X(09) VALUE "099990101".
-           03  CONS-TOKKI2         PIC X(09) VALUE "099990102".
-           03  CONS-TOKKI3         PIC X(09) VALUE "099990103".
-           03  CONS-TOKKI4         PIC X(09) VALUE "099990104".
-           03  CONS-TOKKI5         PIC X(09) VALUE "099990105".
-           03  CONS-TOKKI7         PIC X(09) VALUE "099990107".
-           03  CONS-TOKKI8         PIC X(09) VALUE "099990108".
-           03  CONS-TOKKI9         PIC X(09) VALUE "099990109".
-           03  CONS-TOKKI10        PIC X(09) VALUE "099990110".
-           03  CONS-TOKKI11        PIC X(09) VALUE "099990111".
-           03  CONS-TOKKI12        PIC X(09) VALUE "099990112".
-           03  CONS-TOKKI13        PIC X(09) VALUE "099990113".
-           03  CONS-TOKKI14        PIC X(09) VALUE "099990114".
-           03  CONS-TOKKI15        PIC X(09) VALUE "099990115".
-           03  CONS-TOKKI16        PIC X(09) VALUE "099990116".
-           03  CONS-TOKKI17        PIC X(09) VALUE "099990117".
-           03  CONS-TOKKI18        PIC X(09) VALUE "099990118".
-           03  CONS-TOKKI19        PIC X(09) VALUE "099990119".
-           03  CONS-TOKKI20        PIC X(09) VALUE "099990120".
-           03  CONS-TOKKI21        PIC X(09) VALUE "099990121".
       *
       *    É¸½àÉéÃ´³Û
            03  WRK-CONS-HYOJYUN-FUTAN-G.
@@ -3700,31 +3680,12 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
            IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR
                                                 "6" OR  "7" OR
                                                 "8"
-            IF     ( SRY-SRYCD(IDX2)   =  CONS-TOKKI1
-                                      OR  CONS-TOKKI2
-                                      OR  CONS-TOKKI3
-                                      OR  CONS-TOKKI4
-                                      OR  CONS-TOKKI5
-                                      OR  CONS-TOKKI7
-                                      OR  CONS-TOKKI8
-                                      OR  CONS-TOKKI9
-                                      OR  CONS-TOKKI10
-                                      OR  CONS-TOKKI11
-                                      OR  CONS-TOKKI12
-                                      OR  CONS-TOKKI13
-                                      OR  CONS-TOKKI14
-                                      OR  CONS-TOKKI15
-                                      OR  CONS-TOKKI16
-                                      OR  CONS-TOKKI17
-                                      OR  CONS-TOKKI18
-                                      OR  CONS-TOKKI19
-                                      OR  CONS-TOKKI20
-                                      OR  CONS-TOKKI21 )
-              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
-              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
-                      (TNS-TEN               =  ZERO )       )
-              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
+            IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
+            OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
+            OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
+                    (TNS-TEN               =  ZERO )       )
+            OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
+            OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
                CONTINUE
             ELSE
       **¿ÇÎÅ¼ÂÆü¿ô¤Î¥«¥¦¥ó¥È¤ò¹Ô¤¨¤ëºÞ¤Ç¤¢¤ë¤«¤ÎÈ½Äê
