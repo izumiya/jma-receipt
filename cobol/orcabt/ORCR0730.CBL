@@ -66,6 +66,7 @@
       *  04.04.02    NACL-藤原    09/01/14  月途中の生保変更時の保険履歴
       *                                     記載対応
       *                                     生保まとめ分点欄記載対応
+      *  04.04.03    NACL-門脇    09/04/13  平成２１年５月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -699,11 +700,17 @@
            03  FILLER          PIC X(10)   VALUE   "２０二割".
            03  FILLER          PIC X(02)   VALUE   "21".
            03  FILLER          PIC X(10)   VALUE   "２１高半".
+           03  FILLER          PIC X(02)   VALUE   "22".
+           03  FILLER          PIC X(10)   VALUE   "２２多上".
+           03  FILLER          PIC X(02)   VALUE   "23".
+           03  FILLER          PIC X(10)   VALUE   "２３多一".
+           03  FILLER          PIC X(02)   VALUE   "24".
+           03  FILLER          PIC X(10)   VALUE   "２４多低".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   19.
+           03  TBL-TOKKI       OCCURS   22.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
-       01  TBL-TOKKI-MAX           PIC 9(02)   VALUE   19.
+       01  TBL-TOKKI-MAX           PIC 9(02)   VALUE   22.
       *
       *   症状詳記区分の表題
        01  TBL-RECECOM-AREA.

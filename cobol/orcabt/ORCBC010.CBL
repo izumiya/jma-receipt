@@ -44,6 +44,7 @@
       *  04.04.01    NACL-藤原    09/02/26  平成２０年４月以降に７５歳到
       *                                     達時に海外に住所を有する場合
       *                                     の対応
+      *  04.04.02    NACL-門脇    09/04/13  平成２１年５月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -462,28 +463,6 @@
                                    PIC X(07)   VALUE   "ZZZ4012".
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
-      *
-      *    特記事項
-           03  CONS-TOKKI1         PIC X(09) VALUE "099990101".
-           03  CONS-TOKKI2         PIC X(09) VALUE "099990102".
-           03  CONS-TOKKI3         PIC X(09) VALUE "099990103".
-           03  CONS-TOKKI4         PIC X(09) VALUE "099990104".
-           03  CONS-TOKKI5         PIC X(09) VALUE "099990105".
-           03  CONS-TOKKI7         PIC X(09) VALUE "099990107".
-           03  CONS-TOKKI8         PIC X(09) VALUE "099990108".
-           03  CONS-TOKKI9         PIC X(09) VALUE "099990109".
-           03  CONS-TOKKI10        PIC X(09) VALUE "099990110".
-           03  CONS-TOKKI11        PIC X(09) VALUE "099990111".
-           03  CONS-TOKKI12        PIC X(09) VALUE "099990112".
-           03  CONS-TOKKI13        PIC X(09) VALUE "099990113".
-           03  CONS-TOKKI14        PIC X(09) VALUE "099990114".
-           03  CONS-TOKKI15        PIC X(09) VALUE "099990115".
-           03  CONS-TOKKI16        PIC X(09) VALUE "099990116".
-           03  CONS-TOKKI17        PIC X(09) VALUE "099990117".
-           03  CONS-TOKKI18        PIC X(09) VALUE "099990118".
-           03  CONS-TOKKI19        PIC X(09) VALUE "099990119".
-           03  CONS-TOKKI20        PIC X(09) VALUE "099990120".
-           03  CONS-TOKKI21        PIC X(09) VALUE "099990121".
       *
       *    標準負担額
            03  WRK-CONS-HYOJYUN-FUTAN-G.
@@ -3701,31 +3680,12 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
            IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR
                                                 "6" OR  "7" OR
                                                 "8"
-            IF     ( SRY-SRYCD(IDX2)   =  CONS-TOKKI1
-                                      OR  CONS-TOKKI2
-                                      OR  CONS-TOKKI3
-                                      OR  CONS-TOKKI4
-                                      OR  CONS-TOKKI5
-                                      OR  CONS-TOKKI7
-                                      OR  CONS-TOKKI8
-                                      OR  CONS-TOKKI9
-                                      OR  CONS-TOKKI10
-                                      OR  CONS-TOKKI11
-                                      OR  CONS-TOKKI12
-                                      OR  CONS-TOKKI13
-                                      OR  CONS-TOKKI14
-                                      OR  CONS-TOKKI15
-                                      OR  CONS-TOKKI16
-                                      OR  CONS-TOKKI17
-                                      OR  CONS-TOKKI18
-                                      OR  CONS-TOKKI19
-                                      OR  CONS-TOKKI20
-                                      OR  CONS-TOKKI21 )
-              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
-              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
-                      (TNS-TEN               =  ZERO )       )
-              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
+            IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
+            OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
+            OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
+                    (TNS-TEN               =  ZERO )       )
+            OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
+            OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
                CONTINUE
             ELSE
       **診療実日数のカウントを行える剤であるかの判定
