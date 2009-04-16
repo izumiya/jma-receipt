@@ -7,7 +7,7 @@ CSRCS = \
 
 CJSRCS = orcsjistoeuc.c
 
-#CJQSRCS = orcqrencode.c
+CJQSRCS = orcqrencode.c
 
 top_builddir = ../..
 include $(top_builddir)/cobol/Makefile.global
