@@ -44,6 +44,7 @@
       *  04.02.04    NACL-ÌçÏÆ    08/11/06  Èé²¼¶ÚÆù¡¢ÀÅÌ®Ãí¼Í¤Îµ­ºÜÊÑ¹¹ÂÐ±þ
       *  04.02.05    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.02.06    NACL-ÌçÏÆ    09/01/16  ½èÊýÍó¶â³ÛÊÔ½¸½¤Àµ
+      *  04.02.07    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -360,27 +361,6 @@
            03  CONS-SAIKETSU2      PIC X(09) VALUE "160095710".
       *    ºÎ·ì¡Ê£Â¡Ý£Ã¡Ë
            03  CONS-SAIKETSU3      PIC X(09) VALUE "160095810".
-      *    ÆÃµ­»ö¹à
-           03  CONS-TOKKI1         PIC X(14) VALUE "00000099990101".
-           03  CONS-TOKKI2         PIC X(14) VALUE "00000099990102".
-           03  CONS-TOKKI3         PIC X(14) VALUE "00000099990103".
-           03  CONS-TOKKI4         PIC X(14) VALUE "00000099990104".
-           03  CONS-TOKKI5         PIC X(14) VALUE "00000099990105".
-           03  CONS-TOKKI7         PIC X(14) VALUE "00000099990107".
-           03  CONS-TOKKI8         PIC X(14) VALUE "00000099990108".
-           03  CONS-TOKKI9         PIC X(14) VALUE "00000099990109".
-           03  CONS-TOKKI10        PIC X(14) VALUE "00000099990110".
-           03  CONS-TOKKI11        PIC X(14) VALUE "00000099990111".
-           03  CONS-TOKKI12        PIC X(14) VALUE "00000099990112".
-           03  CONS-TOKKI13        PIC X(14) VALUE "00000099990113".
-           03  CONS-TOKKI14        PIC X(14) VALUE "00000099990114".
-           03  CONS-TOKKI15        PIC X(14) VALUE "00000099990115".
-           03  CONS-TOKKI16        PIC X(14) VALUE "00000099990116".
-           03  CONS-TOKKI17        PIC X(14) VALUE "00000099990117".
-           03  CONS-TOKKI18        PIC X(14) VALUE "00000099990118".
-           03  CONS-TOKKI19        PIC X(14) VALUE "00000099990119".
-           03  CONS-TOKKI20        PIC X(14) VALUE "00000099990120".
-           03  CONS-TOKKI21        PIC X(14) VALUE "00000099990121".
       *
       *    ÉÂ¾²¿ôÊÔ½¸¥Õ¥é¥°ÊÔ½¸¤Î°Ù¤Î¥³¡¼¥É¡ÊÆÃÄê¼À´µÎÅÍÜ»ØÆ³ÎÁÅù¡Ë
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -981,26 +961,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      IF   ACCT-ZAIKAISU  NOT =    ZERO
                                IF   ACCT-SRYKBN  =  "11"  OR  "12" 
                                                           OR  "99" 
-                                 IF  ACCT-SRYCDTOTAL = CONS-TOKKI1 OR
-                                                       CONS-TOKKI2 OR
-                                                       CONS-TOKKI3 OR
-                                                       CONS-TOKKI4 OR
-                                                       CONS-TOKKI5 OR
-                                                       CONS-TOKKI7 OR
-                                                       CONS-TOKKI8 OR
-                                                       CONS-TOKKI9 OR
-                                                       CONS-TOKKI10 OR
-                                                       CONS-TOKKI11 OR
-                                                       CONS-TOKKI12 OR
-                                                       CONS-TOKKI13 OR
-                                                       CONS-TOKKI14 OR
-                                                       CONS-TOKKI15 OR
-                                                       CONS-TOKKI16 OR
-                                                       CONS-TOKKI17 OR
-                                                       CONS-TOKKI18 OR
-                                                       CONS-TOKKI19 OR
-                                                       CONS-TOKKI20 OR
-                                                       CONS-TOKKI21
+                                 IF  (ACCT-SRYCDTOTAL(1:12)  =
+                                                    "000000999901")
+                                 AND (ACCT-MEISAISU      =   1    )
                                       CONTINUE
                                  ELSE
                                       MOVE  ZERO  TO   FLG-SHOSAISIN    
@@ -1249,26 +1212,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              -  1
              END-IF
       *
-             IF     ( SRY-SRYCD(IDX2)  =  CONS-TOKKI1(6:9)
-                                      OR  CONS-TOKKI2(6:9)
-                                      OR  CONS-TOKKI3(6:9)
-                                      OR  CONS-TOKKI4(6:9)
-                                      OR  CONS-TOKKI5(6:9)
-                                      OR  CONS-TOKKI7(6:9)
-                                      OR  CONS-TOKKI8(6:9)
-                                      OR  CONS-TOKKI9(6:9)
-                                      OR  CONS-TOKKI10(6:9)
-                                      OR  CONS-TOKKI11(6:9)
-                                      OR  CONS-TOKKI12(6:9)
-                                      OR  CONS-TOKKI13(6:9)
-                                      OR  CONS-TOKKI14(6:9)
-                                      OR  CONS-TOKKI15(6:9)
-                                      OR  CONS-TOKKI16(6:9)
-                                      OR  CONS-TOKKI17(6:9)
-                                      OR  CONS-TOKKI18(6:9)
-                                      OR  CONS-TOKKI19(6:9)
-                                      OR  CONS-TOKKI20(6:9)
-                                      OR  CONS-TOKKI21(6:9) )
+             IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
@@ -1288,26 +1232,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                   "6" OR  "7" OR
                                                   "8"
       *
-              IF     ( SRY-SRYCD(IDX2)  =  CONS-TOKKI1(6:9)
-                                       OR  CONS-TOKKI2(6:9)
-                                       OR  CONS-TOKKI3(6:9)
-                                       OR  CONS-TOKKI4(6:9)
-                                       OR  CONS-TOKKI5(6:9)
-                                       OR  CONS-TOKKI7(6:9)
-                                       OR  CONS-TOKKI8(6:9)
-                                       OR  CONS-TOKKI9(6:9)
-                                       OR  CONS-TOKKI10(6:9)
-                                       OR  CONS-TOKKI11(6:9)
-                                       OR  CONS-TOKKI12(6:9)
-                                       OR  CONS-TOKKI13(6:9)
-                                       OR  CONS-TOKKI14(6:9)
-                                       OR  CONS-TOKKI15(6:9)
-                                       OR  CONS-TOKKI16(6:9)
-                                       OR  CONS-TOKKI17(6:9)
-                                       OR  CONS-TOKKI18(6:9)
-                                       OR  CONS-TOKKI19(6:9)
-                                       OR  CONS-TOKKI20(6:9)
-                                       OR  CONS-TOKKI21(6:9) )
+              IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
               OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )

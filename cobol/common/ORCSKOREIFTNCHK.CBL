@@ -44,6 +44,8 @@
       *
       *  04.03.01    NACL-ÌçÏÆ    09/01/05  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    09/02/26  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *
+      *  04.04.01    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -718,7 +720,8 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                      OR ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
                      OR ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
                      OR ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
-                       PERFORM   22012-NYUIN-KOREI-HEN2-SEC
+      ***              PERFORM   22012-NYUIN-KOREI-HEN2-SEC
+                       CONTINUE
                      ELSE
                        PERFORM   22011-NYUIN-KOREI-HEN1-SEC
                      END-IF
@@ -1073,12 +1076,13 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    OR  ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
                    OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
                    OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
-                     IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                        MOVE   6000      TO   WRK-KINGAKU
-                     ELSE
-                        MOVE   12000     TO   WRK-KINGAKU
-                     END-IF
-                     PERFORM   260-ICHIBUFTN-KOH-SET-SEC
+      ***            IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
+      ***               MOVE   6000      TO   WRK-KINGAKU
+      ***            ELSE
+      ***               MOVE   12000     TO   WRK-KINGAKU
+      ***            END-IF
+      ***            PERFORM   260-ICHIBUFTN-KOH-SET-SEC
+                     CONTINUE
                    ELSE
                      IF   ( WRK-KYURATE(IDX1) =  20 OR 30 )
                      AND  ((SYU-KOH-HKNNUM(1) = "974"    ) OR
