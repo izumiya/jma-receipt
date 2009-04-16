@@ -1292,3 +1292,21 @@ path	key52 	{
 	};
 };
 
+ 
+path	key53 	{
+	DBSELECT	{
+		DECLARE tbl_sryacct_key53_csr CURSOR FOR
+		SELECT HOSPNUM,NYUGAIKBN,PTID,HKNCOMBI
+		FROM tbl_sryacct
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYM       =   :SRYYM
+			AND   HKNCOMBI   <>  '9999'
+			AND   JIHOKBN    <>   '1'
+			AND   ZAITEN * ZAIKAISU   >  0
+		GROUP BY HOSPNUM,NYUGAIKBN,PTID,HKNCOMBI
+		;
+	};
+};
+
