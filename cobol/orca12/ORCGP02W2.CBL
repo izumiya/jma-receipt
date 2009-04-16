@@ -89,6 +89,8 @@
       *  04.03.01    NACL-門脇    08/12/08  公費単独の保険組み合わせ修正
       *  04.03.02    NACL-門脇    09/01/21  長期併用の保険組み合わせ修正
       *  04.03.03    NACL-門脇    09/03/11  ７５歳以上の前期高齢者対応
+      *
+      *  04.04.01    NACL-門脇    09/04/13  平成２１年５月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -548,8 +550,8 @@
       *
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF     (PTKOH-SAKJOKBN  NOT =   SPACE          )
-               OR     (PTKOH-KOHNUM        =   "978" OR  "979"
-                                                     OR  "977")
+               OR     (PTKOH-KOHNUM = "956" OR "957" OR "958"
+                                   OR "977" OR "978" OR "979" )
                OR     (PTKOH-KOHNUM(1:2)   =   "96"           )
                    CONTINUE
                ELSE
