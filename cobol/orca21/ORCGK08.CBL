@@ -6731,37 +6731,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        980-PARA02-READ-EXT.
            EXIT.
-      *
-      *****************************************************************
-      *    パラメタデータ順読み
-      *****************************************************************
-       990-PARA-RAND-SEC         SECTION.
-      *
-           READ    PARA-FILE
-               INVALID
-                   MOVE    1           TO  FLG-PARA
-               NOT INVALID
-                   MOVE    ZERO        TO  FLG-PARA
-           END-READ
-      *
-           .
-       990-PARA-RAND-EXT.
-           EXIT.
-      *****************************************************************
-      *    パラメタデータ順読み
-      *****************************************************************
-       990-PARA-NEXT-SEC         SECTION.
-      *
-           READ    PARA-FILE           NEXT
-               AT  END
-                   MOVE    1           TO  FLG-PARA
-               NOT AT  END
-                   MOVE    ZERO        TO  FLG-PARA
-           END-READ
-      *
-           .
-       990-PARA-NEXT-EXT.
-           EXIT.
       *****************************************************************
       *    入力コードマスター読込
       *****************************************************************
