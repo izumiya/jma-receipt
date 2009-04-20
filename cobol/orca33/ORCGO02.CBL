@@ -253,7 +253,7 @@
            03   WRK-JOBHMS             PIC X(06).
       *
       *    スパ領域（ワーク）
-           COPY    "COMMON-SPA     REPLACING  //SPA-//
+           COPY    "COMMON-SPA"    REPLACING  //SPA-//
                                    BY         //WRK-SPA-//.
       *
        01  WRK-SHELL-NAME.

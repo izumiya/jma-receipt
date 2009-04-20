@@ -159,7 +159,7 @@
        LINKAGE                             SECTION.
       *
            COPY    "CPORCSTUSAN.INC".
-           COPY    "COMMON-SPA.
+           COPY    "COMMON-SPA".
       *
        PROCEDURE                           DIVISION    USING
            ORCSTUSANAREA
