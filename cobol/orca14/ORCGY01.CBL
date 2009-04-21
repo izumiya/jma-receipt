@@ -603,7 +603,8 @@
                    END-IF
       *            氏名検索画面より選択なし
                    IF     (SPA-MOTOPG(1:3)    =   "P97"  ) AND
-                          (SPA-PTID           =   ZERO   )
+                          (SPA-PTID           =   ZERO   ) AND
+                          (SPA-YYK-SYORI  NOT =   2      )
                        MOVE    SPA-Y01-YYKNAME    TO  SPA-GMN-YYKNAME
                    END-IF
            END-EVALUATE
