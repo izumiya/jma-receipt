@@ -601,6 +601,11 @@
                        MOVE    SPA-BIRTHDAYW  TO  SPA-GMN-BIRTHDAYH
                        MOVE    SPA-NAME       TO  SPA-GMN-YYKNAME
                    END-IF
+      *            氏名検索画面より選択なし
+                   IF     (SPA-MOTOPG(1:3)    =   "P97"  ) AND
+                          (SPA-PTID           =   ZERO   )
+                       MOVE    SPA-Y01-YYKNAME    TO  SPA-GMN-YYKNAME
+                   END-IF
            END-EVALUATE
       *
            MOVE    SPACE               TO  SPA-GMN-SELBAN
@@ -3667,6 +3672,7 @@
            MOVE    SPA-GMN-SRYNAIYO    TO  SPA-Y01-SRYNAIYOG
            MOVE    SPA-GMN-DRNAME      TO  SPA-Y01-DRNAME
            MOVE    SPA-NAI-DRCD        TO  SPA-Y01-DRCD
+           MOVE    SPA-GMN-YYKNAME     TO  SPA-Y01-YYKNAME
            MOVE    SPA-Y01KYOUTU       TO  SPA-WORK
       *
            MOVE    "Y01"               TO  SPA-MOTOPG
