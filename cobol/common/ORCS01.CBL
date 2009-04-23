@@ -4259,10 +4259,16 @@
                    PERFORM  20051-TOKUSITU-HENSYU-SEC
                  END-IF
                  MOVE       1         TO   FLG-TOKUSITU-XXX
+                 IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
+                    MOVE   "1"        TO   LNK-S01-TOKUSYU-SAI-KBN
+                 END-IF
                ELSE
                  IF     FLG-KOUREI-KBN   =   "1"
                    CONTINUE
                  ELSE
+                  IF    LNK-S01-TOKUSYU-SAI-KBN  =  "1"
+                      PERFORM  20051-TOKUSITU-HENSYU-SEC
+                  ELSE
                    INITIALIZE                      SSRHKOH-AREA
                    MOVE    LNK-SYU-PTID        TO  SSRHKOH-PTID
                    MOVE    LNK-SYU-NYUGAIKBN   TO  SSRHKOH-NYUGAIKBN
@@ -4274,6 +4280,7 @@
                    IF   SSRHKOH-RC  =  1
                       PERFORM  20051-TOKUSITU-HENSYU-SEC
                    END-IF
+                  END-IF
                  END-IF
                END-IF
              END-IF
