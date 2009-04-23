@@ -542,6 +542,7 @@
            03  FLG-TOKUSITU                            PIC 9(01).
            03  FLG-TOKUSITU-TASU                       PIC 9(01).
            03  FLG-KOUGAKU                             PIC 9(01).
+           03  FLG-TOKUTOKKI                           PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1397,6 +1398,18 @@
            03  TBL-TOKUJYOI    PIC X(03)   OCCURS    2.
       *
        01  TBL-TOKUJYOI-MAX    PIC 9(02)   VALUE     2.
+      *
+      *    ÆÃÄê¼À´µÅùÆÃµ­»ö¹àµ­ºÜÈ½ÄêÍÑ¥Æ¡¼¥Ö¥ë
+       01  TBL-TOKUTOKKI-AREA.
+           03  FILLER          PIC X(03)   VALUE    "966".
+           03  FILLER          PIC X(03)   VALUE    "967".
+           03  FILLER          PIC X(03)   VALUE    "956".
+           03  FILLER          PIC X(03)   VALUE    "957".
+      *
+       01  TBL-TOKUTOKKI-R     REDEFINES   TBL-TOKUTOKKI-AREA.
+           03  TBL-TOKUTOKKI   PIC X(03)   OCCURS    4.
+      *
+       01  TBL-TOKUTOKKI-MAX   PIC 9(02)   VALUE     4.
       *
       *    »ÀÁÇ 
            COPY    "CMSANSOTBL.INC".
@@ -15203,6 +15216,7 @@
            INITIALIZE               TBL-TOKUSITU
            MOVE     ZERO      TO    FLG-TOKUSITU
            MOVE     ZERO      TO    FLG-TOKUSITU-TASU
+           MOVE     ZERO      TO    FLG-TOKUTOKKI
            IF   (RECE62-SRYYM       >=  "200905")
            AND  (RECE62-HKNNUM   NOT =   SPACE  )
              IF  (RECE62-HKNNUM(1:2)  =   "98"                   )
@@ -15329,18 +15343,59 @@
                    PERFORM 900-CLOSE-SEC
                  END-IF
       *
+                 IF  (RECE62-AGE     >=   70  )
+                 OR  (RECE62-HKNNUM   =  "039")
+                   MOVE     1      TO  FLG-TOKUTOKKI
+                 ELSE
+                   PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
+                             UNTIL  (GEN-IDX    >    TBL-TOKUTOKKI-MAX)
+                               OR   (FLG-TOKUTOKKI   NOT = ZERO       )
+                      INITIALIZE                      PTKOHINF-REC
+                      MOVE  RECE62-HOSPNUM        TO  PTKOH-HOSPNUM
+                      MOVE  RECE62-PTID           TO  PTKOH-PTID
+                      MOVE  TBL-TOKUTOKKI(GEN-IDX)
+                                                  TO  PTKOH-KOHNUM
+                      MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+                      MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+                      MOVE  "key4"                TO  MCP-PATHNAME
+                      PERFORM 900-DBSELECT-SEC
+                      IF      MCP-RC               =       ZERO
+                        MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                        MOVE    "key4"            TO  MCP-PATHNAME
+                        PERFORM  900-PTKOHINF-READ-SEC
+                        PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                           IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                           AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                           AND (PTKOH-SAKJOKBN   =   SPACE         )
+                             MOVE     1      TO  FLG-TOKUTOKKI
+                             MOVE     1      TO  FLG-PTKOHINF
+                           ELSE
+                             MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                             MOVE    "key4"           TO  MCP-PATHNAME
+                             PERFORM  900-PTKOHINF-READ-SEC
+                           END-IF
+                        END-PERFORM
+                      END-IF
+                      MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                      MOVE    "key4"               TO  MCP-PATHNAME
+                      PERFORM 900-CLOSE-SEC
+                   END-PERFORM
+                 END-IF
+      *
                  IF   FLG-TOKUSITU-TASU  =  1
                     MOVE    8    TO      FLG-TOKKI
                     PERFORM   21013-TOKKI-HENSYU-SEC
                  ELSE
-                    IF  ((RECE62-AGE     >=   70      ) OR
-                         (RECE62-HKNNUM   =  "039"    ))
-                    AND ( FLG-TOKUSITU    =   3        )
-                      CONTINUE
-                    ELSE
-                      MOVE    7    TO      FLG-TOKKI
-                      PERFORM   21013-TOKKI-HENSYU-SEC
-                    END-IF
+      ***           IF  ((RECE62-AGE     >=   70      ) OR
+      ***                (RECE62-HKNNUM   =  "039"    ))
+      ***           AND ( FLG-TOKUSITU    =   3        )
+      ***             CONTINUE
+      ***           ELSE
+                      IF   FLG-TOKUTOKKI  =  1
+                         MOVE    7    TO      FLG-TOKKI
+                         PERFORM   21013-TOKKI-HENSYU-SEC
+                      END-IF
+      ***           END-IF
                  END-IF
       *
                END-IF
