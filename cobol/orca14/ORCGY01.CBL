@@ -603,8 +603,7 @@
                    END-IF
       *            氏名検索画面より選択なし
                    IF     (SPA-MOTOPG(1:3)    =   "P97"  ) AND
-                          (SPA-PTID           =   ZERO   ) AND
-                          (SPA-YYK-SYORI  NOT =   2      )
+                          (SPA-PTID           =   ZERO   )
                        MOVE    SPA-Y01-YYKNAME    TO  SPA-GMN-YYKNAME
                    END-IF
            END-EVALUATE
@@ -1766,6 +1765,7 @@
       *
            IF      IDZ                  >   1
       *        氏名検索へ
+               MOVE    SPA-GMN-YYKNAME     TO  SPA-Y01-YYKNAME
                PERFORM 470-SIMEIKEN-SEC
            ELSE
                IF      WRK-PTID           =   SPACE
@@ -3673,7 +3673,6 @@
            MOVE    SPA-GMN-SRYNAIYO    TO  SPA-Y01-SRYNAIYOG
            MOVE    SPA-GMN-DRNAME      TO  SPA-Y01-DRNAME
            MOVE    SPA-NAI-DRCD        TO  SPA-Y01-DRCD
-           MOVE    SPA-GMN-YYKNAME     TO  SPA-Y01-YYKNAME
            MOVE    SPA-Y01KYOUTU       TO  SPA-WORK
       *
            MOVE    "Y01"               TO  SPA-MOTOPG
