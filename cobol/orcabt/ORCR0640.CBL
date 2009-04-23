@@ -1569,6 +1569,8 @@
            COPY    "CPORCSAGECHK.INC".
       *    ´µ¼Ô¼«¸ÊÉéÃ´¶â¥ì¥»¥×¥Èµ­ºÜÈ½Äê
            COPY    "CPORCSFTNJGNCHK.INC".
+      *    ÆÃÄê¼À´µÅù»»ÄêÈ½Äê¥µ¥Ö
+           COPY    "CPORCSSRHKOH.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -11045,6 +11047,8 @@
                 (RECE62-KOHNUM(4)   = RECE62-KOHNUMHC(IDX1 1)) AND
                 (RECE62-KOHID(4)    = RECE62-KOHIDHC(IDX1 1) ) AND
                 (TBL-TOKUSITUFLG(4) =  1                     ))
+           OR  ((IDZ                =  2                     ) AND
+                (SYU-SKJ-FTNDAY(3)  =  1                     ))
               PERFORM 2104428-ICHIBUFTN-KOH-HEN5-SEC
            ELSE
               PERFORM 2104423-ICHIBUFTN-KOH-HEN2-SEC
@@ -11150,6 +11154,8 @@
                 (RECE62-KOHNUM(4)   = RECE62-KOHNUMHC(IDX1 1)) AND
                 (RECE62-KOHID(4)    = RECE62-KOHIDHC(IDX1 1) ) AND
                 (TBL-TOKUSITUFLG(4) =  1                     ))
+           OR  ((IDZ                =  2                     ) AND
+                (SYU-SKJ-FTNDAY(3)  =  1                     ))
               MOVE      5      TO   FLG-JYOGENKBN2
               PERFORM   210442A-ICHIBUFTN-KOH-HEN6-SEC
            ELSE
@@ -15629,80 +15635,11 @@
                      END-IF
                    END-IF
                  ELSE
-                   PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
-                             UNTIL  (GEN-IDX    >    TBL-TOKUJYOI-MAX)
-                               OR   (FLG-TOKUSITU   NOT = ZERO       )
-                      INITIALIZE                      PTKOHINF-REC
-                      MOVE  RECE62-HOSPNUM        TO  PTKOH-HOSPNUM
-                      MOVE  RECE62-PTID           TO  PTKOH-PTID
-                      MOVE  TBL-TOKUJYOI(GEN-IDX) TO  PTKOH-KOHNUM
-                      MOVE  PTKOHINF-REC          TO  MCPDATA-REC
-                      MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-                      MOVE  "key4"                TO  MCP-PATHNAME
-                      PERFORM 900-DBSELECT-SEC
-                      IF      MCP-RC               =       ZERO
-                        MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-                        MOVE    "key4"            TO  MCP-PATHNAME
-                        PERFORM  900-PTKOHINF-READ-SEC
-                        PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                           IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                           AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                           AND (PTKOH-SAKJOKBN   =   SPACE         )
-                             MOVE     1      TO  FLG-TOKUSITU
-                             MOVE     1      TO  FLG-PTKOHINF
-                           ELSE
-                             MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                             MOVE    "key4"           TO  MCP-PATHNAME
-                             PERFORM  900-PTKOHINF-READ-SEC
-                           END-IF
-                        END-PERFORM
-                      END-IF
-                      MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                      MOVE    "key4"               TO  MCP-PATHNAME
-                      PERFORM 900-CLOSE-SEC
-                   END-PERFORM
-                   IF    FLG-TOKUSITU  =  ZERO
-                      IF  RECE62-TEISYOTOKU  =  SPACE
-                           MOVE    2    TO   FLG-TOKUSITU
-                      ELSE
-                           MOVE    3    TO   FLG-TOKUSITU
-                      END-IF
-                   END-IF
+                   PERFORM   2104E1-TOKUSITU-HANTEI2-SEC
                  END-IF
       *          Â¿¿ô³ºÅö
-                 IF  ((RECE62-AGE     >=   70      ) OR
-                      (RECE62-HKNNUM   =  "039"    ))
-                 AND ( FLG-TOKUSITU    =   2  OR  3 )
-                   CONTINUE
-                 ELSE
-                   INITIALIZE                      PTKOHINF-REC
-                   MOVE  RECE62-HOSPNUM        TO  PTKOH-HOSPNUM
-                   MOVE  RECE62-PTID           TO  PTKOH-PTID
-                   MOVE  "958"                 TO  PTKOH-KOHNUM
-                   MOVE  PTKOHINF-REC          TO  MCPDATA-REC
-                   MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-                   MOVE  "key4"                TO  MCP-PATHNAME
-                   PERFORM 900-DBSELECT-SEC
-                   IF      MCP-RC               =       ZERO
-                     MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-                     MOVE    "key4"            TO  MCP-PATHNAME
-                     PERFORM  900-PTKOHINF-READ-SEC
-                     PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                        IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                        AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                        AND (PTKOH-SAKJOKBN   =   SPACE         )
-                          MOVE     1      TO  FLG-TOKUSITU-TASU
-                          MOVE     1      TO  FLG-PTKOHINF
-                        ELSE
-                          MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                          MOVE    "key4"           TO  MCP-PATHNAME
-                          PERFORM  900-PTKOHINF-READ-SEC
-                        END-IF
-                     END-PERFORM
-                   END-IF
-                   MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                   MOVE    "key4"               TO  MCP-PATHNAME
-                   PERFORM 900-CLOSE-SEC
+                 IF     FLG-TOKUSITU   NOT =  ZERO
+                   PERFORM   2104E2-TOKUSITU-HANTEI3-SEC
                  END-IF
       *
                  IF  (RECE62-AGE     >=   70  )
@@ -15760,12 +15697,144 @@
       ***           END-IF
                  END-IF
       *
+               ELSE
+      *
+                 IF      IDZ   =   2
+                   MOVE      RECE62-SRYYM         TO   WRK-GEN70-YM
+                   IF   RECE62-TEKSTYMD(1:6)  >=  RECE62-SRYYM
+                     MOVE    RECE62-TEKSTYMD(7:2) TO   WRK-GEN70-DD
+                   ELSE
+                     MOVE    01                   TO   WRK-GEN70-DD
+                   END-IF
+                   IF  (RECE62-AGE     >=   70  )
+                   OR  (RECE62-HKNNUM   =  "039")
+                     IF    RECE62-KYURATE     =   30
+                          MOVE    1    TO   FLG-TOKUSITU
+                     ELSE
+                       IF  RECE62-TEISYOTOKU  =  SPACE
+                          MOVE    2    TO   FLG-TOKUSITU
+                       ELSE
+                          MOVE    3    TO   FLG-TOKUSITU
+                       END-IF
+                     END-IF
+                   ELSE
+                     INITIALIZE                      SSRHKOH-AREA
+                     MOVE    RECE62-PTID         TO  SSRHKOH-PTID
+                     MOVE    "1"                 TO  SSRHKOH-NYUGAIKBN
+                     MOVE    RECE62-SRYYM        TO  SSRHKOH-SRYYM
+                     MOVE    RECE62-HKNCOMBI(1)  TO  SSRHKOH-HKNCOMBI
+                     CALL    "ORCSSRHKOH"        USING
+                                                 SSRHKOH-AREA
+                                                 SPA-AREA
+                     IF   SSRHKOH-RC  =  1
+                        PERFORM   2104E1-TOKUSITU-HANTEI2-SEC
+                     END-IF
+                   END-IF
+      *            Â¿¿ô³ºÅö
+                   IF     FLG-TOKUSITU   NOT =  ZERO
+                        PERFORM   2104E2-TOKUSITU-HANTEI3-SEC
+                   END-IF
+                 END-IF
+      *
                END-IF
              END-IF
            END-IF
       *
            .
        2104E-TOKUSITU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *
+      *****************************************************************
+       2104E1-TOKUSITU-HANTEI2-SEC               SECTION.
+      *
+           PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
+                     UNTIL  (GEN-IDX    >    TBL-TOKUJYOI-MAX)
+                       OR   (FLG-TOKUSITU   NOT = ZERO       )
+              INITIALIZE                      PTKOHINF-REC
+              MOVE  RECE62-HOSPNUM        TO  PTKOH-HOSPNUM
+              MOVE  RECE62-PTID           TO  PTKOH-PTID
+              MOVE  TBL-TOKUJYOI(GEN-IDX) TO  PTKOH-KOHNUM
+              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+              MOVE  "key4"                TO  MCP-PATHNAME
+              PERFORM 900-DBSELECT-SEC
+              IF      MCP-RC               =       ZERO
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  900-PTKOHINF-READ-SEC
+                PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                   IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                   AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                   AND (PTKOH-SAKJOKBN   =   SPACE         )
+                     MOVE     1      TO  FLG-TOKUSITU
+                     MOVE     1      TO  FLG-PTKOHINF
+                   ELSE
+                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                     MOVE    "key4"           TO  MCP-PATHNAME
+                     PERFORM  900-PTKOHINF-READ-SEC
+                   END-IF
+                END-PERFORM
+              END-IF
+              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+              MOVE    "key4"               TO  MCP-PATHNAME
+              PERFORM 900-CLOSE-SEC
+           END-PERFORM
+           IF    FLG-TOKUSITU  =  ZERO
+              IF  RECE62-TEISYOTOKU  =  SPACE
+                   MOVE    2    TO   FLG-TOKUSITU
+              ELSE
+                   MOVE    3    TO   FLG-TOKUSITU
+              END-IF
+           END-IF
+      *
+           .
+       2104E1-TOKUSITU-HANTEI2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *
+      *****************************************************************
+       2104E2-TOKUSITU-HANTEI3-SEC               SECTION.
+      *
+           IF  ((RECE62-AGE     >=   70      ) OR
+                (RECE62-HKNNUM   =  "039"    ))
+           AND ( FLG-TOKUSITU    =   2  OR  3 )
+             CONTINUE
+           ELSE
+             INITIALIZE                      PTKOHINF-REC
+             MOVE  RECE62-HOSPNUM        TO  PTKOH-HOSPNUM
+             MOVE  RECE62-PTID           TO  PTKOH-PTID
+             MOVE  "958"                 TO  PTKOH-KOHNUM
+             MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+             MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+             MOVE  "key4"                TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =       ZERO
+               MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+               MOVE    "key4"            TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                    MOVE     1      TO  FLG-TOKUSITU-TASU
+                    MOVE     1      TO  FLG-PTKOHINF
+                  ELSE
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key4"           TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                  END-IF
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-IF
+      *
+           .
+       2104E2-TOKUSITU-HANTEI3-EXT.
            EXIT.
       *
       *****************************************************************
