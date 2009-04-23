@@ -671,22 +671,6 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label325</name>
-	  <x>600</x>
-	  <y>70</y>
-	  <width>60</width>
-	  <height>24</height>
-	  <label>（続紙）</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>True</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label331</name>
 	  <x>550</x>
 	  <y>40</y>
@@ -792,22 +776,6 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label511</name>
-	  <x>30</x>
-	  <y>432</y>
-	  <width>144</width>
-	  <height>20</height>
-	  <label>                    （入院）</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label510</name>
 	  <x>30</x>
 	  <y>410</y>
@@ -830,22 +798,6 @@
 	  <width>150</width>
 	  <height>24</height>
 	  <label>診療科編集区分（入院）</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label320</name>
-	  <x>30</x>
-	  <y>350</y>
-	  <width>144</width>
-	  <height>20</height>
-	  <label>                    （入院外）</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
 	  <wrap>False</wrap>
 	  <xalign>0</xalign>
@@ -2152,23 +2104,6 @@
 	</widget>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>label527</name>
-	  <x>30</x>
-	  <y>565</y>
-	  <width>150</width>
-	  <height>48</height>
-	  <label>入院料未算定時
-            コメント記載</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>KOUIKIKBN_COMBO</name>
 	  <x>190</x>
@@ -2299,6 +2234,71 @@
 	  <label>個別作成出力順（医保）</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
 	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label320</name>
+	  <x>30</x>
+	  <y>350</y>
+	  <width>144</width>
+	  <height>20</height>
+	  <label>（入院外）</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label511</name>
+	  <x>30</x>
+	  <y>432</y>
+	  <width>144</width>
+	  <height>20</height>
+	  <label>（入院）　</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label527</name>
+	  <x>30</x>
+	  <y>565</y>
+	  <width>150</width>
+	  <height>48</height>
+	  <label>入院料未算定時
+　　　　コメント記載</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label325</name>
+	  <x>600</x>
+	  <y>70</y>
+	  <width>60</width>
+	  <height>24</height>
+	  <label>（続紙）</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>True</wrap>
 	  <xalign>0</xalign>
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
@@ -3384,54 +3384,6 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label242</name>
-	  <x>48</x>
-	  <y>376</y>
-	  <width>144</width>
-	  <height>24</height>
-	  <label>              入院・社保</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label242</name>
-	  <x>48</x>
-	  <y>296</y>
-	  <width>144</width>
-	  <height>24</height>
-	  <label>                        国保</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label517</name>
-	  <x>48</x>
-	  <y>336</y>
-	  <width>144</width>
-	  <height>24</height>
-	  <label>                 広域連合</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label241</name>
 	  <x>48</x>
 	  <y>220</y>
@@ -3441,22 +3393,6 @@
 	  <justify>GTK_JUSTIFY_LEFT</justify>
 	  <wrap>False</wrap>
 	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label242</name>
-	  <x>48</x>
-	  <y>256</y>
-	  <width>144</width>
-	  <height>24</height>
-	  <label>          入院外・社保</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
 	  <ypad>0</ypad>
@@ -3559,22 +3495,6 @@
 	</widget>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>label242</name>
-	  <x>48</x>
-	  <y>416</y>
-	  <width>144</width>
-	  <height>24</height>
-	  <label>                        国保</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>KOUIKIRECEKBN_COMBO</name>
 	  <x>204</x>
@@ -3652,22 +3572,6 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label518</name>
-	  <x>48</x>
-	  <y>456</y>
-	  <width>144</width>
-	  <height>24</height>
-	  <label>                 広域連合</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
 	</widget>
 
 	<widget>
@@ -3836,6 +3740,102 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label242</name>
+	  <x>48</x>
+	  <y>296</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>国保</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label517</name>
+	  <x>48</x>
+	  <y>336</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>広域連合</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label242</name>
+	  <x>48</x>
+	  <y>256</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>入院外・社保</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label242</name>
+	  <x>48</x>
+	  <y>376</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>入院・社保</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label242</name>
+	  <x>48</x>
+	  <y>416</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>国保</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label518</name>
+	  <x>48</x>
+	  <y>456</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>広域連合</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
 	</widget>
       </widget>
 
@@ -4406,23 +4406,6 @@
 	  <class>GtkLabel</class>
 	  <name>label229</name>
 	  <x>48</x>
-	  <y>8</y>
-	  <width>148</width>
-	  <height>48</height>
-	  <label>「特別療養費」
-              文字記載位置</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label229</name>
-	  <x>48</x>
 	  <y>64</y>
 	  <width>148</width>
 	  <height>24</height>
@@ -4569,6 +4552,23 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label229</name>
+	  <x>48</x>
+	  <y>8</y>
+	  <width>148</width>
+	  <height>48</height>
+	  <label>「特別療養費」
+　　　文字記載位置</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
 	</widget>
       </widget>
 
