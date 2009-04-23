@@ -1390,54 +1390,6 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label251</name>
-	  <x>540</x>
-	  <y>308</y>
-	  <width>184</width>
-	  <height>20</height>
-	  <label>                             （土曜）２</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label249</name>
-	  <x>544</x>
-	  <y>260</y>
-	  <width>184</width>
-	  <height>20</height>
-	  <label>                            （平日）２</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label245</name>
-	  <x>544</x>
-	  <y>236</y>
-	  <width>184</width>
-	  <height>20</height>
-	  <label>チェック除外時間（平日）１</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label306</name>
 	  <x>528</x>
 	  <y>552</y>
@@ -1644,22 +1596,6 @@
 	  <width>188</width>
 	  <height>24</height>
 	  <label>患者取消確認チェック</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label250</name>
-	  <x>540</x>
-	  <y>284</y>
-	  <width>184</width>
-	  <height>20</height>
-	  <label>                             （土曜）１</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0</xalign>
@@ -2210,22 +2146,6 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>SRYKAMEI</name>
-	  <x>384</x>
-	  <y>248</y>
-	  <width>64</width>
-	  <height>16</height>
-	  <label>診療科名</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
 	</widget>
 
 	<widget>
@@ -3051,6 +2971,86 @@
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
 	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label245</name>
+	  <x>544</x>
+	  <y>236</y>
+	  <width>184</width>
+	  <height>20</height>
+	  <label>チェック除外時間（平日）１</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label249</name>
+	  <x>544</x>
+	  <y>260</y>
+	  <width>184</width>
+	  <height>20</height>
+	  <label>（平日）２</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label250</name>
+	  <x>544</x>
+	  <y>284</y>
+	  <width>184</width>
+	  <height>20</height>
+	  <label>（土曜）１</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label251</name>
+	  <x>544</x>
+	  <y>308</y>
+	  <width>184</width>
+	  <height>20</height>
+	  <label>（土曜）２</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>SRYKAMEI</name>
+	  <x>384</x>
+	  <y>248</y>
+	  <width>64</width>
+	  <height>16</height>
+	  <label>診療科名</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
       </widget>
 
       <widget>
@@ -3382,22 +3382,6 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label343</name>
-	  <x>400</x>
-	  <y>364</y>
-	  <width>228</width>
-	  <height>24</height>
-	  <label>（未設定：１５才まで）</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label229</name>
 	  <x>52</x>
 	  <y>80</y>
@@ -3452,22 +3436,6 @@
 	  <width>300</width>
 	  <height>16</height>
 	  <label>４：自費保険の補助区分</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label341</name>
-	  <x>40</x>
-	  <y>364</y>
-	  <width>300</width>
-	  <height>24</height>
-	  <label>                              （初期設定時の家族年齢）</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
 	  <wrap>False</wrap>
 	  <xalign>0</xalign>
@@ -3802,6 +3770,38 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label343</name>
+	  <x>400</x>
+	  <y>364</y>
+	  <width>228</width>
+	  <height>24</height>
+	  <label>（未設定：１５才まで）</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label341</name>
+	  <x>40</x>
+	  <y>364</y>
+	  <width>300</width>
+	  <height>24</height>
+	  <label>（初期設定時の家族年齢）</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
 	</widget>
       </widget>
 
