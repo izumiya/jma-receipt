@@ -3544,7 +3544,7 @@
            END-IF
       *
            MOVE      ZERO          TO    FLG-CYOKI-ARI
-           IF   LNK-SYU-SRYYMD(1:6)  >=  "200901"
+           IF   LNK-SYU-SRYYMD(1:6)  >=  "200905"
              IF  (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1")
              OR  (FLG-GENBUTU70             NOT =  ZERO)
              OR  (FLG-TOKU75                NOT =  ZERO)
@@ -4306,7 +4306,7 @@
            END-IF.
       *
            INITIALIZE        WK-CYO-OKIKAE-TBL.
-           IF    LNK-SYU-SRYYMD(1:6)   >=  "200901"
+           IF    LNK-SYU-SRYYMD(1:6)   >=  "200905"
              PERFORM   VARYING   IDX-CYO   FROM    1   BY  1
                         UNTIL    IDX-CYO     >     4
                IF   COMB-KOHHKNNUM(IDX-CYO)(1:1)  >=  "1" AND <=  "8"
@@ -7178,7 +7178,7 @@
                         END-IF
                         IF  (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                  >= "1" AND <= "8")
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200901"      )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "200905"      )
                             IF (COMB-KOH2HKNNUM = "972") OR
                                (COMB-KOH3HKNNUM = "972") OR
                                (COMB-KOH4HKNNUM = "972")
@@ -7489,7 +7489,7 @@
                         END-IF
                         IF  (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                  >= "1" AND <= "8")
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200901"      )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "200905"      )
                             IF (COMB-KOH1HKNNUM = "972") OR
                                (COMB-KOH3HKNNUM = "972") OR
                                (COMB-KOH4HKNNUM = "972")
@@ -7696,7 +7696,7 @@
                         END-IF
                         IF  (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                  >= "1" AND <= "8")
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200901"      )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "200905"      )
                             IF (COMB-KOH1HKNNUM = "972") OR
                                (COMB-KOH2HKNNUM = "972") OR
                                (COMB-KOH4HKNNUM = "972")
@@ -7810,7 +7810,7 @@
                         END-IF
                         IF  (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                  >= "1" AND <= "8")
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200901"      )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "200905"      )
                             IF (COMB-KOH1HKNNUM = "972") OR
                                (COMB-KOH2HKNNUM = "972") OR
                                (COMB-KOH3HKNNUM = "972")
@@ -7904,7 +7904,7 @@
       ******************************************************************
        2108-ROUJIN41-JYOGEN-HENSYU-SEC           SECTION.
       *
-           IF  ( LNK-SYU-SRYYMD(1:6)   >=   "200901")
+           IF  ( LNK-SYU-SRYYMD(1:6)   >=   "200905")
            AND ((COMB-KOH1HKNNUM = "972" OR "974") OR
                 (COMB-KOH2HKNNUM = "972" OR "974") OR
                 (COMB-KOH3HKNNUM = "972" OR "974") OR
