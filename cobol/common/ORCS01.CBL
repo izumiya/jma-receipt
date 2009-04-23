@@ -4190,8 +4190,13 @@
                    PERFORM  20051-TOKUSITU-HENSYU-SEC
                  END-IF
                  MOVE       1         TO   FLG-TOKUSITU-XXX
-                 IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
-                    MOVE   "1"        TO   LNK-S01-TOKUSYU-SAI-KBN
+                 IF     FLG-KOUREI-KBN   =   "1"
+                   MOVE     1         TO   LNK-SYU-SKJ-FTNDAY(3)
+                 ELSE
+                   IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
+                     MOVE  "1"        TO   LNK-S01-TOKUSYU-SAI-KBN
+                     MOVE   1         TO   LNK-SYU-SKJ-FTNDAY(3)
+                   END-IF
                  END-IF
                ELSE
                  IF     FLG-KOUREI-KBN   =   "1"
