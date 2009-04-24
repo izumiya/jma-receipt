@@ -1025,7 +1025,7 @@
       *
        01  TBL-GENBUTU70-MAX   PIC 9(02)   VALUE     2.
       *
-      *    特定疾患等判定用テーブル
+      *    特定疾患等判定用テーブル（上位）
        01  TBL-TOKUJYOI-AREA.
            03  FILLER          PIC X(03)   VALUE    "966".
            03  FILLER          PIC X(03)   VALUE    "956".
@@ -1034,6 +1034,16 @@
            03  TBL-TOKUJYOI    PIC X(03)   OCCURS    2.
       *
        01  TBL-TOKUJYOI-MAX    PIC 9(02)   VALUE     2.
+      *
+      *    特定疾患等判定用テーブル（一般・低）
+       01  TBL-TOKUIPAN-AREA.
+           03  FILLER          PIC X(03)   VALUE    "967".
+           03  FILLER          PIC X(03)   VALUE    "957".
+      *
+       01  TBL-TOKUIPAN-R      REDEFINES   TBL-TOKUIPAN-AREA.
+           03  TBL-TOKUIPAN    PIC X(03)   OCCURS    2.
+      *
+       01  TBL-TOKUIPAN-MAX    PIC 9(02)   VALUE     2.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -4082,15 +4092,17 @@
                  ELSE
                    PERFORM  20021-TOKUSITU-HENSYU-SEC
                  END-IF
-                 MOVE       1         TO   FLG-TOKUSITU-XXX
-                 IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
-                   MOVE     1         TO   LNK-SYU-SKJ-FTNDAY(3)
-                 ELSE
-                   IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
-                     MOVE   1         TO   LNK-SYU-SKJ-FTNDAY(3)
+                 IF   FLG-TOKUSITU  NOT = ZERO
+                   MOVE       1         TO   FLG-TOKUSITU-XXX
+                   IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
+                     MOVE     1         TO   LNK-SYU-SKJ-FTNDAY(3)
+                   ELSE
+                     IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
+                       MOVE   1         TO   LNK-SYU-SKJ-FTNDAY(3)
+                     END-IF
                    END-IF
+                   PERFORM    20022-TOKUSITU-TASU-HANTEI-SEC
                  END-IF
-                 PERFORM    20022-TOKUSITU-TASU-HANTEI-SEC
                ELSE
                  IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
                    CONTINUE
@@ -4165,11 +4177,45 @@
              PERFORM  DB-CLOSE-SEC
            END-PERFORM
            IF    FLG-TOKUSITU  =  ZERO
-              IF  FLG-SANSHOU3    =   SPACE
-                   MOVE    2    TO   FLG-TOKUSITU
-              ELSE
-                   MOVE    3    TO   FLG-TOKUSITU
-              END-IF
+             PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
+                       UNTIL  (GEN-IDX    >    TBL-TOKUIPAN-MAX)
+                         OR   (FLG-TOKUSITU   NOT = ZERO       )
+               INITIALIZE                         PTKOHINF-REC
+               MOVE    LNK-SYU-HOSPNUM        TO  PTKOH-HOSPNUM
+               MOVE    LNK-SYU-PTID           TO  PTKOH-PTID
+               MOVE    TBL-TOKUIPAN(GEN-IDX)  TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+               MOVE    "DBSELECT"             TO  MCP-FUNC
+               MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+               MOVE    "key4"                 TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                     MCPDATA-REC
+                                                     SPA-AREA
+               IF      MCP-RC               =       ZERO
+                   MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                   MOVE    "key4"             TO  MCP-PATHNAME
+                   PERFORM  PTKOHINF-READ-SEC
+                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                      IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                      AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                      AND (PTKOH-SAKJOKBN   =  SPACE         )
+                         IF  FLG-SANSHOU3    =   SPACE
+                            MOVE    2    TO   FLG-TOKUSITU
+                         ELSE
+                            MOVE    3    TO   FLG-TOKUSITU
+                         END-IF
+                         MOVE       1    TO   FLG-PTKOHINF
+                      ELSE
+                         MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                         MOVE    "key4"          TO  MCP-PATHNAME
+                         PERFORM  PTKOHINF-READ-SEC
+                      END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+               MOVE    "key4"             TO  MCP-PATHNAME
+               PERFORM  DB-CLOSE-SEC
+             END-PERFORM
            END-IF
       *
            .
