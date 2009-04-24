@@ -443,44 +443,33 @@
       *
            PERFORM 310-SPASET-SEC
       *
-           EVALUATE    SPA-MOTOPG
-               WHEN    "Y03"
-               WHEN    "Y04"
+           EVALUATE    SPA-MOTOPG(1:1)
+               WHEN    "Y"
                    MOVE    SPACE               TO  SPA-GMN-PTNUM
                    MOVE    ZERO                TO  SPA-GMN-PTID
                    MOVE    SPACE               TO  SPA-GMN-NAME
                    MOVE    SPACE               TO  SPA-GMN-SEX
                    MOVE    SPACE               TO  SPA-GMN-BIRTHDAYH
                    MOVE    SPACE               TO  SPA-GMN-YYKNAME
-               WHEN    "Y05"
       *            患者検索の時、患者番号表示
-                   MOVE    SPA-Y01-PTNUM       TO  SPA-GMN-PTNUM
-                   MOVE    SPA-Y01-PTID        TO  SPA-GMN-PTID
-                   MOVE    SPA-Y01-YYKNAME     TO  SPA-GMN-NAME
-                   MOVE    SPA-Y01-SEX         TO  SPA-GMN-SEX
-                   MOVE    SPA-Y01-BIRTHDAYH   TO  SPA-GMN-BIRTHDAYH
-                   MOVE    SPA-Y01-YYKNAME     TO  SPA-GMN-YYKNAME
-               WHEN    "U01"
-      *            受付より選択後
-                   IF     (SPA-PTID       NOT =   ZERO   )
-                       MOVE    SPA-PTID           TO  SPA-GMN-PTID
-                       MOVE    SPA-PTNUM          TO  SPA-GMN-PTNUM
-                       MOVE    SPA-NAME           TO  SPA-GMN-NAME
-                       MOVE    SPA-SEX            TO  SPA-GMN-SEX
-                       MOVE    SPA-BIRTHDAYW      TO  SPA-GMN-BIRTHDAYH
-                       MOVE    SPA-NAME           TO  SPA-GMN-YYKNAME
-                   END-IF
-               WHEN    "P97"
-      *            氏名検索より
-                   IF     (SPA-PTID            =   ZERO   )
+                   IF      SPA-MOTOPG          =   "Y05"
+                       MOVE    SPA-Y01-PTNUM       TO  SPA-GMN-PTNUM
+                       MOVE    SPA-Y01-PTID        TO  SPA-GMN-PTID
+                       MOVE    SPA-Y01-YYKNAME     TO  SPA-GMN-NAME
+                       MOVE    SPA-Y01-SEX         TO  SPA-GMN-SEX
+                       MOVE    SPA-Y01-BIRTHDAYH   TO  SPA-GMN-BIRTHDAYH
                        MOVE    SPA-Y01-YYKNAME     TO  SPA-GMN-YYKNAME
-                   ELSE
-                       MOVE    SPA-PTID            TO  SPA-GMN-PTID
-                       MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
-                       MOVE    SPA-NAME            TO  SPA-GMN-NAME
-                       MOVE    SPA-SEX             TO  SPA-GMN-SEX
-                       MOVE    SPA-BIRTHDAYW       TO  SPA-GMN-BIRTHDAYH
-                       MOVE    SPA-NAME            TO  SPA-GMN-YYKNAME
+                   END-IF
+               WHEN    OTHER
+      *            氏名検索画面より選択後
+                   IF     (SPA-MOTOPG(1:3)    =   "P97"  OR  "U01") AND
+                          (SPA-PTID       NOT =   ZERO   )
+                       MOVE    SPA-PTID       TO  SPA-GMN-PTID
+                       MOVE    SPA-PTNUM      TO  SPA-GMN-PTNUM
+                       MOVE    SPA-NAME       TO  SPA-GMN-NAME
+                       MOVE    SPA-SEX        TO  SPA-GMN-SEX
+                       MOVE    SPA-BIRTHDAYW  TO  SPA-GMN-BIRTHDAYH
+                       MOVE    SPA-NAME       TO  SPA-GMN-YYKNAME
                    END-IF
            END-EVALUATE
       *
@@ -1641,7 +1630,6 @@
       *
            IF      IDZ                  >   1
       *        氏名検索へ
-               MOVE    SPA-GMN-YYKNAME     TO  SPA-Y01-YYKNAME
                PERFORM 470-SIMEIKEN-SEC
            ELSE
                IF      WRK-PTID           =   SPACE
