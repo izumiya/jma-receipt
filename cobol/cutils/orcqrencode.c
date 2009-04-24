@@ -10,6 +10,16 @@
 #include <png.h>
 #include <jconv.h>
 
+/*#define DEBUG*/
+#ifdef DEBUG
+#include <syslog.h>
+#define OPENLOG	openlog("orcqrencode", LOG_PID, LOG_DAEMON)
+#define SYSLOG(msg)	syslog(LOG_INFO, (msg))
+#else
+#define OPENLOG	/**/
+#define SYSLOG(msg)	/**/
+#endif
+
 /*
  *	struct qrencode_ctx;
  *		char infile[256];		INPUT FILENAME 
@@ -411,8 +421,8 @@ orcqrencode(char *ctx)
 	int hint;
 	int size;
 	int margin;
-	int structured;
 	int i;
+	int doEncodeStructured;
 	char buf[MAX_DATA_SIZE];
 	char buf2[MAX_DATA_SIZE];
 	char qrfile[SIZE_QRFILE];
@@ -421,6 +431,7 @@ orcqrencode(char *ctx)
 	QRcode *code;
 	QRcode_List *head, *entry;
 
+OPENLOG;
 	if((p = strchr(CTX(ctx, OFFSET_INFILE), ' ')) != NULL) *p = '\0';
 	if((p = strchr(CTX(ctx, OFFSET_QRFILE), ' ')) != NULL) *p = '\0';
 
@@ -458,34 +469,39 @@ orcqrencode(char *ctx)
 		default:
 			level = QR_ECLEVEL_L;
 	}
+
+	p = strrchr(qrfile, '.');
+	if(p != NULL)*p = '\0';
+	doEncodeStructured = 0;
+
 	hint = ctx_string2int(ctx, OFFSET_HINT, SIZE_HINT) == 0 ? QR_MODE_KANJI : QR_MODE_8;
 	size = ctx_string2int(ctx, OFFSET_PIXEL, SIZE_PIXEL);
 	margin = ctx_string2int(ctx, OFFSET_MARGIN, SIZE_MARGIN);
-	structured = ctx_string2int(ctx, OFFSET_STRUCTURED, SIZE_STRUCTURED);
 
-	if(structured == 0){
-		code = QRcode_encodeString(buf2, version, level, hint, 1);
-		if(code == NULL){
-			memset(CTX(ctx, OFFSET_RET_CODE), QRENCODE_ERROR, SIZE_RET_CODE);
-		 	return;
+	code = QRcode_encodeString(buf2, version, level, hint, 1);
+	if (code != NULL) {
+		if (code->version <= version) {
+			snprintf(qrfile_suffix, sizeof(qrfile_suffix), 
+				"%s_%02d.png", qrfile);
+			if(writePNG(code, qrfile_suffix, size, margin) != 0){
+				memset(CTX(ctx, OFFSET_RET_CODE), WRITE_PNG_ERROR, SIZE_RET_CODE);
+				return;
+			}
+SYSLOG("write single image");
+			sprintf(buf, "%02d" , code->version);
+			memcpy(CTX(ctx, OFFSET_RET_VERSION), buf, SIZE_RET_VERSION);
+			sprintf(buf, "%02d" , 1);
+			memcpy(CTX(ctx, OFFSET_RET_SYMBOLS), "01", SIZE_RET_SYMBOLS);
+		} else {
+			doEncodeStructured = 1;
 		}
-		if(writePNG(code, qrfile, size, margin) != 0){
-			memset(CTX(ctx, OFFSET_RET_CODE), WRITE_PNG_ERROR, SIZE_RET_CODE);
-			return;
-		}
-		sprintf(buf, "%02d" , code->version);
-		memcpy(CTX(ctx, OFFSET_RET_VERSION), buf, SIZE_RET_VERSION);
-		sprintf(buf, "%02d" , 1);
-		memcpy(CTX(ctx, OFFSET_RET_SYMBOLS), "01", SIZE_RET_SYMBOLS);
 		QRcode_free(code);
 	}
-	else{
-		p = strrchr(qrfile, '.');
-		if(p != NULL)*p = '\0';
+	if (doEncodeStructured) {
 		head = QRcode_encodeStringStructured(buf2, version, level, hint ,1);
 		if(head) {
-			i = 0;
 			entry = head;
+			i = 0;
 			while(entry != NULL) {
 				code = entry->code;
 				snprintf(qrfile_suffix, 
@@ -497,6 +513,7 @@ orcqrencode(char *ctx)
 				entry = entry->next;	
 				i++;
 			}
+SYSLOG("write multi images");
 			QRcode_List_free(entry);
 		}
 		else {
@@ -512,6 +529,7 @@ orcqrencode(char *ctx)
 #if 0
 	print_ctx(ctx);
 #endif
+SYSLOG("end");
 	return;
 }
 
