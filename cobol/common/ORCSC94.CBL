@@ -256,7 +256,7 @@
                    END-IF
                    IF     (SPA-COM-INPUTCD(IDX)(1:3)   =   "095" OR
                                                            "096") AND
-                          (SPA-COM-SURYO  (IDX)    >   1    )
+                          (SPA-COM-SURYO  (IDX)    NOT =   1    )
                        MOVE    SPA-COM-SURYO  (IDX)    TO  WRK-SURYO
                        PERFORM 2001-SURYO-HEN-SEC
                    END-IF
@@ -425,10 +425,9 @@
                  ((WRK-MOJI            =   "1" )   AND
                   (SPA-COM-TANICD (IDX)    NOT =   ZERO
                                                AND SPACE ))
-      ************(SPA-COM-SURYO(IDX)  >   1           ))
               OR ((SPA-COM-INPUTCD(IDX)(1:3)   =   "095" OR
                                                    "096") AND
-                  (SPA-COM-SURYO  (IDX)    >   1    ))
+                  (SPA-COM-SURYO  (IDX)    NOT =   1    ))
       *        挑恨ˇ达亨、壳闻闻乖百ˇ腆芦セットの箕、眶翁♂１は鄂球
                MOVE    SPA-COM-SURYO (IDX)
                                            TO  WRK-SURYO
