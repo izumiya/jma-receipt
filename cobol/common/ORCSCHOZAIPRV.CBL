@@ -77,6 +77,8 @@
            03  FLG-HKTCHK          PIC 9(01).
            03  FLG-HEN             PIC 9(01).
       *
+           03  FLG-NYUIN01         PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -364,8 +366,13 @@
                                            LNK-DAY7-AREA
                MOVE    LNK-DAY7-KOYOMI(7:2)    TO  WRK-MATU
       *
-               MOVE    "21"                TO  WRK-SRYKBN
-               PERFORM 10011-SRYACCT-21HEN-SEC
+               IF     (FLG-NYUIN01         =   1   )  AND
+                      (WRK-SRYYM       NOT =   ORCSCHO-SRYYM )
+                   CONTINUE
+               ELSE
+                   MOVE    "21"                TO  WRK-SRYKBN
+                   PERFORM 10011-SRYACCT-21HEN-SEC
+               END-IF
       *        次月
                COMPUTE WRK-SRYMM           =   WRK-SRYMM   +   1
                IF      WRK-SRYMM           >   12
@@ -717,6 +724,7 @@
       *****************************************************************
        200-GAIHAKU-HEN-SEC             SECTION.
       *
+           MOVE    ZERO                TO  FLG-NYUIN01
       *    診療会計マスターを特定する
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
@@ -813,6 +821,8 @@
       *        入院日
                IF      PTNYUINRRK-NYUINYMD(1:6)  =   ORCSCHO-SRYYM
                    MOVE    PTNYUINRRK-NYUINYMD(7:2)  TO  IDX-S
+      *            当月入院日
+                   MOVE    1                         TO  FLG-NYUIN01
                END-IF
                IF      PTNYUINRRK-NYUINYMD(1:6)  <   ORCSCHO-SRYYM
                    MOVE    1                         TO  IDX-S
