@@ -59,6 +59,7 @@
       *  04.02.01    NACL-藤原    08/03/03  特定疾患区分07,08の追加
       *
       *  04.03.01    NACL-藤原    08/06/11  慢性と急性のチェック
+      *  04.03.02    NACL-藤原    09/05/08  病名複写時のチェックの修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1982,7 +1983,7 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            MOVE    SPA-GMN-C10-SRYKA   TO  PTBYO-SRYKA
            MOVE    SPA-GMN-C02-TBYOMEI    (IDX)
                                        TO  PTBYO-BYOMEI
-           MOVE    SPA-GMN-C02-TNYUGAIKBN (IDX)
+           MOVE    SPA-NAI-C02-TNYUGAIKBN (IDX)
                                        TO  PTBYO-NYUGAIKBN
            IF      PTBYO-NYUGAIKBN     =   SPACE
                MOVE    "tbl_ptbyomei"          TO  WRK-MCP-TABLE
