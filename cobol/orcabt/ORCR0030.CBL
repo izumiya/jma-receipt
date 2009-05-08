@@ -399,6 +399,11 @@
       *  04.04.05    NACL-門脇    09/04/15  東京都地方公費
       *                                     平成２１年４月改正対応
       *  04.04.06    NACL-門脇    09/04/15  群馬県地方公費対応
+      *  04.04.07    NACL-藤原    09/04/21  注加算による加算項目の記載
+      *                                     基本項目が複数ある場合は基本
+      *                                     項目毎に加算項目の記載を行なう
+      *                                     告示等識別区分２、通則加算対
+      *                                     象外区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4190,6 +4195,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                MOVE    TNS-SRYSYUKBN  TO RECE05-SRYSYUKBN-X  (IDX4)
                MOVE    TNS-KOKUJISKBKBN1  
                                       TO RECE05-KOKUJISKBKBN1(IDX4)
+               MOVE    TNS-KOKUJISKBKBN2  
+                                      TO RECE05-KOKUJISKBKBN2(IDX4)
+               MOVE    TNS-TUSOKUGAIKBN
+                                      TO RECE05-TUSOKUGAIKBN (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE05-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE05-CHUKSNCD       (IDX4)
