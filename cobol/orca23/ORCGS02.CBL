@@ -527,6 +527,10 @@
       *    負担金再計算用パラメタ
            COPY    "CPORCSSAIKEISAN.INC".
       *
+      *    主科情報アクセス用パラメタ
+       01  ORCSSYUACCAREA.
+           COPY    "CPORCSSYUACC.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -3947,6 +3951,19 @@
                                        SPA-AREA
                                        LNK-ORCSSAIKEISAN-REC
       *
+           INITIALIZE                 ORCSSYUACCAREA
+           MOVE    "03"           TO  LNK-SYUACC-I-KBN
+           MOVE    SPA-NAI-TSRYYMD (SPA-GMN-SELBAN)(1:6)
+                                  TO  LNK-SYUACC-I-SRYYM
+           MOVE    SPA-NAI-TNYUGAIKBN (SPA-GMN-SELBAN)
+                                  TO  SPA-NYUGAIKBN
+           MOVE    SPA-GMN-PTID   TO  SPA-PTID
+           MOVE    SPA-NAI-BIRTHDAY
+                                  TO  SPA-BIRTHDAY
+           CALL    "ORCSSYUKAMAIN"    USING
+                                      SPA-AREA
+                                      ORCSSYUACCAREA
+      *
       *****PERFORM    310-SPA-SET-SEC.
       *
            PERFORM 3101-MISYU-EDIT-SEC
@@ -4074,6 +4091,17 @@
                   MOVE    "0060"       TO  SPA-ERRCD
               END-IF
            END-IF
+      *
+           INITIALIZE                 ORCSSYUACCAREA
+           MOVE    "03"           TO  LNK-SYUACC-I-KBN
+           MOVE    WRK-SKYYM      TO  LNK-SYUACC-I-SRYYM
+           MOVE    WRK-NYUGAIKBN  TO  SPA-NYUGAIKBN
+           MOVE    SPA-GMN-PTID   TO  SPA-PTID
+           MOVE    SPA-NAI-BIRTHDAY
+                                  TO  SPA-BIRTHDAY
+           CALL    "ORCSSYUKAMAIN"    USING
+                                      SPA-AREA
+                                      ORCSSYUACCAREA
       *
       *****PERFORM    310-SPA-SET-SEC.
       *
