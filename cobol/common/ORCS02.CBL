@@ -247,6 +247,7 @@
       *  04.02.39    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *  04.02.40    NACL-ÌçÏÆ    09/04/15  ÅìµþÅÔÃÏÊý¸øÈñ
       *                                     Ê¿À®£²£±Ç¯£´·î²þÀµÂÐ±þ
+      *  04.02.41    NACL-ÌçÏÆ    09/05/12  ÆüÊÌ·×»»½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -13877,6 +13878,7 @@
                        (MAX-KIN-KOHI1-M           = ZERO))
                OR     ((MAX-KIN-KOHI1-D       NOT = ZERO) AND
                        (LNK-SYU-SRYYMD(1:6) >= "200508" ))
+                  MOVE        1         TO    WK-DAYINFFLG(1)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -13899,7 +13901,6 @@
                           MOVE         9       TO    KOHI1-TBL(IDX2)
                        END-IF
                        IF     FLG-NG   =    SPACE  
-                         MOVE        1         TO    WK-DAYINFFLG(1)
                          IF   FTN-KOHI1-D(IDX2)     >=  MAX-KIN-KOHI1-D
                               MOVE     ZERO    TO  ZAN-KOHI1-D(IDX2)
                          ELSE
@@ -13933,6 +13934,7 @@
                        (MAX-KIN-KOHI2-M           = ZERO))
                OR     ((MAX-KIN-KOHI2-D       NOT = ZERO) AND
                        (LNK-SYU-SRYYMD(1:6) >= "200508" ))
+                  MOVE        1         TO    WK-DAYINFFLG(2)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -13955,7 +13957,6 @@
                           MOVE         9       TO    KOHI2-TBL(IDX2)
                        END-IF
                        IF     FLG-NG   =    SPACE  
-                         MOVE        1         TO    WK-DAYINFFLG(2)
                          IF   FTN-KOHI2-D(IDX2)     >=  MAX-KIN-KOHI2-D
                               MOVE     ZERO    TO  ZAN-KOHI2-D(IDX2)
                          ELSE
@@ -13989,6 +13990,7 @@
                        (MAX-KIN-KOHI3-M           = ZERO))
                OR     ((MAX-KIN-KOHI3-D       NOT = ZERO) AND
                        (LNK-SYU-SRYYMD(1:6) >= "200508" ))
+                  MOVE        1         TO    WK-DAYINFFLG(3)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -14011,7 +14013,6 @@
                           MOVE         9       TO    KOHI3-TBL(IDX2)
                        END-IF
                        IF     FLG-NG   =    SPACE  
-                         MOVE        1         TO    WK-DAYINFFLG(3)
                          IF   FTN-KOHI3-D(IDX2)     >=  MAX-KIN-KOHI3-D
                               MOVE     ZERO    TO  ZAN-KOHI3-D(IDX2)
                          ELSE
@@ -14045,6 +14046,7 @@
                        (MAX-KIN-KOHI4-M           = ZERO))
                OR     ((MAX-KIN-KOHI4-D       NOT = ZERO) AND
                        (LNK-SYU-SRYYMD(1:6) >= "200508" ))
+                  MOVE        1         TO    WK-DAYINFFLG(4)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
                      IF   ( LNK-SYU-DAY(IDX2)          =  "1" OR "2" )
@@ -14067,7 +14069,6 @@
                           MOVE         9       TO    KOHI4-TBL(IDX2)
                        END-IF
                        IF     FLG-NG   =    SPACE  
-                         MOVE        1         TO    WK-DAYINFFLG(4)
                          IF   FTN-KOHI4-D(IDX2)     >=  MAX-KIN-KOHI4-D
                               MOVE     ZERO    TO  ZAN-KOHI4-D(IDX2)
                          ELSE

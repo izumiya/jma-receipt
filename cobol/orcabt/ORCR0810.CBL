@@ -53,6 +53,8 @@
       *  03.05.03    NACL-ÌçÏÆ    07/07/17  ¸ÄÊÌ»þ¤Î¥·¥¹¥Æ¥à´ÉÍýÊÔ½¸½¤Àµ
       *  04.01.01    NACL-ÌçÏÆ    07/11/01  ¸øÌ³ºÒ³²ÂÐ±þ
       *  04.02.01    NACL-ÌçÏÆ    08/02/26  ÀÁµá¶èÊ¬ÊÔ½¸
+      *
+      *  04.04.01    NACL-ÌçÏÆ    09/05/11  Ãê½ÐÂÐ¾Ý¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -965,9 +967,22 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
                                            WRK-HKNCOMBI-SYOKBN (IDX1)
                        END-IF
                    ELSE
+                     IF   COMB-DELKBN         =   "1"
+                       MOVE    HKNCOMBI-REC    TO
+                                           WRK-HKNCOMBI-REC  (IDX1)
+                       IF      COMB-HKNNUM NOT =
+                                           WRK-CONS-HKNNUM
+                           MOVE    "1"         TO
+                                           WRK-HKNCOMBI-SYOKBN (IDX1)
+                       ELSE
+                           MOVE    "2"         TO
+                                           WRK-HKNCOMBI-SYOKBN (IDX1)
+                       END-IF
+                     ELSE
                        MOVE    WRK-DAY (2 IDX) TO
                                            WRK-COMB-HKNCOMBINUM (IDX1)
                        MOVE    "2"     TO  WRK-HKNCOMBI-SYOKBN  (IDX1)
+                     END-IF
                    END-IF
                END-IF
       *

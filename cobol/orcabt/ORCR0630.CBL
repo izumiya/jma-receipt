@@ -81,6 +81,7 @@
       *  04.02.03    NACL-ÌçÏÆ    08/09/24  Æþ±¡Î¬¾ÎÊÔ½¸ÄÉ²Ã
       *  04.02.04    NACL-ÌçÏÆ    09/02/09  ¸øÈñÊ¬ÅÀ¿ôÊÔ½¸½¤Àµ
       *  04.02.05    NACL-ÌçÏÆ    09/03/03  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.02.06    NACL-ÌçÏÆ    09/05/11  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
       *
@@ -1206,7 +1207,6 @@
                  IF   KH-IDX             NOT =    ZERO
                    IF   FLG-SHOSAISIN      =    1
                       IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                      AND    RECE62-SRYYM    <=  "200803"
                          CONTINUE
                       ELSE
                          MOVE    "1"   TO   TBL-JNISSU-DAY(KH-IDX IDY)
@@ -1342,7 +1342,6 @@
                                  UNTIL    ACCT-IDX   >      31
                              IF  ACCT-DAY(1 ACCT-IDX)   NOT =    ZERO
                                IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                               AND    RECE62-SRYYM <=  "200803"
                                  CONTINUE
                                ELSE
                                  MOVE    "1"       TO
@@ -1356,7 +1355,6 @@
                                  UNTIL    ACCT-IDX   >      31
                              IF  ACCT-DAY(1 ACCT-IDX)   NOT =    ZERO
                                IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                               AND    RECE62-SRYYM <=  "200803"
                                  CONTINUE
                                ELSE
                                  MOVE    "1"       TO
