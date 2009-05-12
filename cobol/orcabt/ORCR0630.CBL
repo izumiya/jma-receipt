@@ -83,6 +83,7 @@
       *  04.03.02    NACL-門脇    09/03/03  愛媛県地方公費対応
       *
       *  04.04.01    NACL-門脇    09/01/23  入院料算定保険以外の診療分実日数算定対応
+      *  04.04.02    NACL-門脇    09/05/11  愛媛県地方公費対応
       *****************************************************************
       *
       *
@@ -1214,7 +1215,6 @@
                  IF   KH-IDX             NOT =    ZERO
                    IF   FLG-SHOSAISIN      =    1
                       IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                      AND    RECE62-SRYYM    <=  "200803"
                          CONTINUE
                       ELSE
                          MOVE    "1"   TO   TBL-JNISSU-DAY(KH-IDX IDY)
@@ -1360,7 +1360,6 @@
                                  UNTIL    ACCT-IDX   >      31
                              IF  ACCT-DAY(1 ACCT-IDX)   NOT =    ZERO
                                IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                               AND    RECE62-SRYYM <=  "200803"
                                  CONTINUE
                                ELSE
                                  MOVE    "1"       TO
@@ -1374,7 +1373,6 @@
                                  UNTIL    ACCT-IDX   >      31
                              IF  ACCT-DAY(1 ACCT-IDX)   NOT =    ZERO
                                IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                               AND    RECE62-SRYYM <=  "200803"
                                  CONTINUE
                                ELSE
                                  MOVE    "1"       TO

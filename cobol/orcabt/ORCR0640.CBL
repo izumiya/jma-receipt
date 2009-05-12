@@ -369,6 +369,7 @@
       *                                     ¹àÌÜËè¤Ë²Ã»»¹àÌÜ¤Îµ­ºÜ¤ò¹Ô¤Ê¤¦
       *                                     ¹ð¼¨Åù¼±ÊÌ¶èÊ¬£²¡¢ÄÌÂ§²Ã»»ÂÐ
       *                                     ¾Ý³°¶èÊ¬¤ÎÄÉ²Ã
+      *  04.04.08    NACL-ÌçÏÆ    09/05/11  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -15685,9 +15686,25 @@
                    IF   FLG-TOKUSITU-TASU  =  1
                       MOVE    8    TO      FLG-TOKKI
                       PERFORM   21013-TOKKI-HENSYU-SEC
+                      EVALUATE  FLG-TOKUSITU
+                        WHEN       1
+                          MOVE   4    TO   RECE62-RJNNYUKOHFTN(2)
+                        WHEN       2
+                          MOVE   5    TO   RECE62-RJNNYUKOHFTN(2)
+                        WHEN       3
+                          MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
+                      END-EVALUATE
                    ELSE
                       MOVE    7    TO      FLG-TOKKI
                       PERFORM   21013-TOKKI-HENSYU-SEC
+                      EVALUATE  FLG-TOKUSITU
+                        WHEN       1
+                          MOVE   1    TO   RECE62-RJNNYUKOHFTN(2)
+                        WHEN       2
+                          MOVE   2    TO   RECE62-RJNNYUKOHFTN(2)
+                        WHEN       3
+                          MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
+                      END-EVALUATE
                    END-IF
                  ELSE
                    MOVE    ZERO    TO    TBL-TOKUSITUFLG(1)
@@ -15731,6 +15748,25 @@
                    END-IF
                    IF     FLG-TOKUSITU   NOT =  ZERO
                         PERFORM   2104E2-TOKUSITU-HANTEI3-SEC
+                        IF   FLG-TOKUSITU-TASU  =  1
+                          EVALUATE  FLG-TOKUSITU
+                            WHEN       1
+                              MOVE   4    TO   RECE62-RJNNYUKOHFTN(2)
+                            WHEN       2
+                              MOVE   5    TO   RECE62-RJNNYUKOHFTN(2)
+                            WHEN       3
+                              MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
+                          END-EVALUATE
+                        ELSE
+                          EVALUATE  FLG-TOKUSITU
+                            WHEN       1
+                              MOVE   1    TO   RECE62-RJNNYUKOHFTN(2)
+                            WHEN       2
+                              MOVE   2    TO   RECE62-RJNNYUKOHFTN(2)
+                            WHEN       3
+                              MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
+                          END-EVALUATE
+                        END-IF
                    END-IF
                  END-IF
       *

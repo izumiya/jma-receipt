@@ -67,6 +67,7 @@
       *                                     記載対応
       *                                     生保まとめ分点欄記載対応
       *  04.04.03    NACL-門脇    09/04/13  平成２１年５月改正対応
+      *  04.04.04    NACL-門脇    09/05/11  平成２１年５月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2380,6 +2381,10 @@
       *    ７５歳到達月の特例対象者
            IF      RECE62X-RJNNYUKOHFTN (1)  NOT =  ZERO
                MOVE   RECE62X-RJNNYUKOHFTN (1)  TO  KOHSKY-FLG (3)
+           END-IF
+      *    特定疾患等対象者
+           IF      RECE62X-RJNNYUKOHFTN (2)  NOT =  ZERO
+               MOVE   RECE62X-RJNNYUKOHFTN (2)  TO  KOHSKY-FLG (4)
            END-IF
       *
            MOVE    RECE62X-HOSPNUM     TO  KOHSKY-HOSPNUM
@@ -8757,6 +8762,10 @@
       *    ７５歳到達月の特例対象者
            IF      RECE62-RJNNYUKOHFTN (1)  NOT =  ZERO
                MOVE   RECE62-RJNNYUKOHFTN (1)  TO  RECE10-FLG (3)
+           END-IF
+      *    特定疾患等対象者
+           IF      RECE62-RJNNYUKOHFTN (2)  NOT =  ZERO
+               MOVE   RECE62-RJNNYUKOHFTN (2)  TO  RECE10-FLG (4)
            END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
