@@ -59,6 +59,7 @@
       *  04.03.11    NACL-門脇    09/01/15  平成２１年１月改正対応
       *  04.03.12    NACL-藤原    09/01/16  症状詳記区分の表題の変更
       *  04.03.13    NACL-門脇    09/02/09  公費分点数編集修正
+      *  04.03.14    NACL-門脇    09/05/11  平成２１年５月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2317,6 +2318,10 @@
       *    ７５歳到達月の特例対象者
            IF      RECE02X-RJNNYUKOHFTN (1)  NOT =  ZERO
                MOVE   RECE02X-RJNNYUKOHFTN (1)  TO  KOHSKY-FLG (3)
+           END-IF
+      *    特定疾患等対象者
+           IF      RECE02X-RJNNYUKOHFTN (2)  NOT =  ZERO
+               MOVE   RECE02X-RJNNYUKOHFTN (2)  TO  KOHSKY-FLG (4)
            END-IF
       *
            MOVE    KOHSKY-REC          TO  MCPDATA-REC
@@ -7851,6 +7856,10 @@
       *    ７５歳到達月の特例対象者
            IF      RECE02-RJNNYUKOHFTN (1)  NOT =  ZERO
                MOVE   RECE02-RJNNYUKOHFTN (1)  TO  RECE10-FLG (3)
+           END-IF
+      *    特定疾患等対象者
+           IF      RECE02-RJNNYUKOHFTN (2)  NOT =  ZERO
+               MOVE   RECE02-RJNNYUKOHFTN (2)  TO  RECE10-FLG (4)
            END-IF
       *
            IF      RECE02-ZAITAKU  =  "1"

@@ -395,6 +395,8 @@
       *  04.03.18    NACL-ÌçÏÆ    09/04/15  ÅìµþÅÔÃÏÊý¸øÈñ
       *                                     Ê¿À®£²£±Ç¯£´·î²þÀµÂÐ±þ
       *  04.03.19    NACL-ÌçÏÆ    09/04/15  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.20    NACL-ÌçÏÆ    09/05/11  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.21    NACL-ÌçÏÆ    09/05/11  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3201,6 +3203,14 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  IF   FLG-TOKUSITU  NOT = ZERO
                     MOVE    7    TO      FLG-TOKKI
                     PERFORM   21045-TOKKI-HENSYU-SEC
+                    EVALUATE  FLG-TOKUSITU
+                      WHEN       1
+                        MOVE   1   TO    RECE02-RJNNYUKOHFTN(2)
+                      WHEN       2
+                        MOVE   2   TO    RECE02-RJNNYUKOHFTN(2)
+                      WHEN       3
+                        MOVE   3   TO    RECE02-RJNNYUKOHFTN(2)
+                    END-EVALUATE
                  ELSE
                    MOVE    ZERO    TO    TBL-TOKUSITUFLG(1)
                    MOVE    ZERO    TO    TBL-TOKUSITUFLG(2)
@@ -3240,6 +3250,16 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      IF   SSRHKOH-RC  =  1
                         PERFORM   211C1-TOKUSITU-HANTEI2-SEC
                      END-IF
+                   END-IF
+                   IF   FLG-TOKUSITU  NOT = ZERO
+                     EVALUATE  FLG-TOKUSITU
+                       WHEN       1
+                         MOVE   1    TO   RECE02-RJNNYUKOHFTN(2)
+                       WHEN       2
+                         MOVE   2    TO   RECE02-RJNNYUKOHFTN(2)
+                       WHEN       3
+                         MOVE   3    TO   RECE02-RJNNYUKOHFTN(2)
+                     END-EVALUATE
                    END-IF
                  END-IF
       *
@@ -5086,7 +5106,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1 
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5100,7 +5119,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5128,7 +5146,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5142,7 +5159,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5170,7 +5186,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5184,7 +5199,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5212,7 +5226,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31          
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO   
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
@@ -5226,7 +5239,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     UNTIL    ACCT-IDX   >   31
                                  IF  ACCT-DAY(1 ACCT-IDX) NOT =  ZERO
                                     IF     TBL-FUKUSHIFLG(IDX2)  =   1
-                                    AND    RECE02-SRYYM  <=  "200803"
                                        CONTINUE
                                     ELSE
                                        MOVE  "1"  TO
