@@ -1046,13 +1046,13 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KASAN-RECE05-KNSJISGRPKBN    PIC  9(02).
       *各種番号等
                    07  TBL-KASAN-RECE05-CDKBNINF.
-                       09  RECE05-CDKBN-KBN        PIC  X(01).
-                       09  RECE05-CDKBN-SYO        PIC  9(01).
-                       09  RECE05-CDKBN-BU         PIC  9(02).
-                       09  RECE05-CDKBN-KBNNUM     PIC  9(03).
-                       09  RECE05-CDKBN-KBNNUM-EDA PIC  9(02).
-                       09  RECE05-CDKBN-KOUBAN     PIC  9(02).
-                       09  RECE05-KOUHYOJYUNNUM    PIC  9(09).
+                       09  TBL-KASAN-RECE05-CDKBN-KBN        PIC  X(01).
+                       09  TBL-KASAN-RECE05-CDKBN-SYO        PIC  9(01).
+                       09  TBL-KASAN-RECE05-CDKBN-BU         PIC  9(02).
+                       09  TBL-KASAN-RECE05-CDKBN-KBNNUM     PIC  9(03).
+                       09  TBL-KASAN-RECE05-CDKBN-KBNNUM-EDA PIC  9(02).
+                       09  TBL-KASAN-RECE05-CDKBN-KOUBAN     PIC  9(02).
+                       09  TBL-KASAN-RECE05-KOUHYOJYUNNUM    PIC  9(09).
       *告示等識別区分１
                    07  TBL-KASAN-RECE05-KOKUJISKBKBN1   PIC  9(01).
       *告示等識別区分２
@@ -1064,9 +1064,9 @@ grpsys     COPY    "COMMON-SPA".
       *注加算コード
                    07  TBL-KASAN-RECE05-CHUKSNINF.
       *コード
-                       09  RECE05-CHUKSNCD     PIC  X(04).
+                       09  TBL-KASAN-RECE05-CHUKSNCD     PIC  X(04).
       *通番
-                       09  RECE05-CHUKSNTUBAN  PIC  X(01).
+                       09  TBL-KASAN-RECE05-CHUKSNTUBAN  PIC  X(01).
       *検体検査コメント
                    07  TBL-KASAN-RECE05-KENTAICOMMENT    PIC  9(01).
       *入力コメント
