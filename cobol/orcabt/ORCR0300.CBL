@@ -275,6 +275,11 @@
       *  04.02.09    NACL-門脇    08/06/25  全国公費２種の一部負担金等記載対応
       *  04.02.10    NACL-藤原    08/07/23  宮城県、岩手県地震対応
       *                                     ２００８年６月〜対象 
+      *  04.02.11    NACL-藤原    09/04/21  注加算による加算項目の記載
+      *                                     基本項目が複数ある場合は基本
+      *                                     項目毎に加算項目の記載を行なう
+      *                                     告示等識別区分２、通則加算対
+      *                                     象外区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -485,6 +490,8 @@ grpsys     COPY    "COMMON-SPA".
            03  IDZ4                    PIC 9(03).
            03  IDZ5                    PIC 9(03).
            03  IDZ6                    PIC 9(03).
+           03  IDYY                    PIC 9(03).
+           03  IDZZ                    PIC 9(03).
       *
            03  SYSKAN-IDX              PIC 9(03).
            03  IDX0                    PIC 9(03).
@@ -735,6 +742,10 @@ grpsys     COPY    "COMMON-SPA".
                            11  TBL-ZAIW-KOUHYOJYUNNUM    PIC  9(09).
       *                告示等識別区分１
                        09  TBL-ZAIW-KOKUJISKBKBN1   PIC  9(01).
+      *                告示等識別区分２
+                       09  TBL-ZAIW-KOKUJISKBKBN2   PIC  9(01).
+      *                通則加算対象外区分
+                       09  TBL-ZAIW-TUSOKUGAIKBN    PIC  9(01).
       *                きざみ値計算識別
                        09  TBL-ZAIW-KZMCOMPSIKIBETU PIC  9(01).
       *                注加算コード
@@ -811,6 +822,10 @@ grpsys     COPY    "COMMON-SPA".
                        09  TBL-KOUI-KOUHYOJYUNNUM    PIC  9(09).
       *            告示等識別区分１
                    07  TBL-KOUI-KOKUJISKBKBN1   PIC  9(01).
+      *            告示等識別区分２
+                   07  TBL-KOUI-KOKUJISKBKBN2   PIC  9(01).
+      *            通則加算対象外区分
+                   07  TBL-KOUI-TUSOKUGAIKBN    PIC  9(01).
       *            きざみ値計算識別
                    07  TBL-KOUI-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -840,14 +855,23 @@ grpsys     COPY    "COMMON-SPA".
        01  WRK-KOUI-TAIHI-AREA.
            03  WRK-KOUI-TAIHI-TABLE             OCCURS  100.
                05  WRK-KOUI-TAIHI-REC           PIC X(500).
+      *
+      *    診療行為データ用テーブル（告示等識別区分による記録順）
+       01  WRK-KOUI-SRY-TAIHI-AREA.
+           03  WRK-KOUI-SRY-TAIHI-TABLE             OCCURS  100.
+               05  WRK-KOUI-SRY-TAIHI-REC           PIC X(500).
       *        診療コード
-               05  WRK-KOUI-TAIHI-SRYCD         PIC  X(09).
+               05  WRK-KOUI-SRY-TAIHI-SRYCD         PIC  X(09).
       *        告示等識別区分１
-               05  WRK-KOUI-TAIHI-KOKUJISKBKBN1 PIC  9(01).
+               05  WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN1 PIC  9(01).
+      *        告示等識別区分２
+               05  WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN2 PIC  9(01).
+      *        通則加算対象外区分
+               05  WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN  PIC  9(01).
       *        注加算コード
-               05  WRK-KOUI-TAIHI-CHUKSNCD      PIC  X(04).
+               05  WRK-KOUI-SRY-TAIHI-CHUKSNCD      PIC  X(04).
       *        点数識別区分
-               05  WRK-KOUI-TAIHI-TENSIKIBETU   PIC  9(01).
+               05  WRK-KOUI-SRY-TAIHI-TENSIKIBETU   PIC  9(01).
       *
        01  WRK-KOUI-AREA.
            03  WRK-KOUI-TABLE                   OCCURS  4.
@@ -899,6 +923,10 @@ grpsys     COPY    "COMMON-SPA".
                            11  WRK-KOUI-KOUHYOJYUNNUM    PIC  9(09).
       *            告示等識別区分１
                        09  WRK-KOUI-KOKUJISKBKBN1   PIC  9(01).
+      *            告示等識別区分２
+                       09  WRK-KOUI-KOKUJISKBKBN2   PIC  9(01).
+      *            通則加算対象外区分
+                       09  WRK-KOUI-TUSOKUGAIKBN    PIC  9(01).
       *            きざみ値計算識別
                        09  WRK-KOUI-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -1007,15 +1035,19 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KASAN-RECE05-KNSJISGRPKBN    PIC  9(02).
       *各種番号等
                    07  TBL-KASAN-RECE05-CDKBNINF.
-                       09  RECE05-CDKBN-KBN        PIC  X(01).
-                       09  RECE05-CDKBN-SYO        PIC  9(01).
-                       09  RECE05-CDKBN-BU         PIC  9(02).
-                       09  RECE05-CDKBN-KBNNUM     PIC  9(03).
-                       09  RECE05-CDKBN-KBNNUM-EDA PIC  9(02).
-                       09  RECE05-CDKBN-KOUBAN     PIC  9(02).
-                       09  RECE05-KOUHYOJYUNNUM    PIC  9(09).
+                       09  TBL-KASAN-RECE05-CDKBN-KBN        PIC  X(01).
+                       09  TBL-KASAN-RECE05-CDKBN-SYO        PIC  9(01).
+                       09  TBL-KASAN-RECE05-CDKBN-BU         PIC  9(02).
+                       09  TBL-KASAN-RECE05-CDKBN-KBNNUM     PIC  9(03).
+                       09  TBL-KASAN-RECE05-CDKBN-KBNNUM-EDA PIC  9(02).
+                       09  TBL-KASAN-RECE05-CDKBN-KOUBAN     PIC  9(02).
+                       09  TBL-KASAN-RECE05-KOUHYOJYUNNUM    PIC  9(09).
       *告示等識別区分１
                    07  TBL-KASAN-RECE05-KOKUJISKBKBN1   PIC  9(01).
+      *告示等識別区分２
+                   07  TBL-KASAN-RECE05-KOKUJISKBKBN2   PIC  9(01).
+      *通則加算対象外区分
+                   07  TBL-KASAN-RECE05-TUSOKUGAIKBN    PIC  9(01).
       *きざみ値計算識別
                    07  TBL-KASAN-RECE05-KZMCOMPSIKIBETU PIC  9(01).
       *注加算コード
@@ -1092,6 +1124,10 @@ grpsys     COPY    "COMMON-SPA".
                        09  TBL-KENTAI-RECE05-KOUHYOJYUNNUM    PIC 9(09).
       *            告示等識別区分１
                    07  TBL-KENTAI-RECE05-KOKUJISKBKBN1   PIC  9(01).
+      *            告示等識別区分２
+                   07  TBL-KENTAI-RECE05-KOKUJISKBKBN2   PIC  9(01).
+      *            通則加算対象外区分
+                   07  TBL-KENTAI-RECE05-TUSOKUGAIKBN    PIC  9(01).
       *            きざみ値計算識別
                    07  TBL-KENTAI-RECE05-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -1171,6 +1207,10 @@ grpsys     COPY    "COMMON-SPA".
                        09  TBL-KENSA-RECE05-KOUHYOJYUNNUM    PIC 9(09).
       *            告示等識別区分１
                    07  TBL-KENSA-RECE05-KOKUJISKBKBN1   PIC  9(01).
+      *            告示等識別区分２
+                   07  TBL-KENSA-RECE05-KOKUJISKBKBN2   PIC  9(01).
+      *            通則加算対象外区分
+                   07  TBL-KENSA-RECE05-TUSOKUGAIKBN    PIC  9(01).
       *            きざみ値計算識別
                    07  TBL-KENSA-RECE05-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -3757,6 +3797,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *
            INITIALIZE                   WRK-KOUI-AREA
                                         WRK-KOUI-TAIHI-AREA
+                                        WRK-KOUI-SRY-TAIHI-AREA
       *
            IF      RECE041-SRYKBN       =   "50"    OR  "54"    OR
                                             "60"    OR  "40"    OR
@@ -3772,7 +3813,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *
            MOVE    ZERO                TO  IDY
       *
-      *    コメントを最後に編集（手術のとき）
+      *    コメントを最初に編集（手術のとき）
            IF      RECE041-SRYKBN      =   "50"
              PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >       WRK-TBLMAX1
@@ -3783,80 +3824,112 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                    WHEN    "8" 
                        ADD     1                           TO  IDY
                        MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC          (IDY)
-                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
-                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
-                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
-                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
-                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
-                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
-                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
-                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                                       WRK-KOUI-TAIHI-REC    (IDY)
                        INITIALIZE      TBL-KOUI-REC (IDX)
                  END-EVALUATE
               END-PERFORM
-            END-IF             
+           END-IF
       *
+      *    基本項目毎に並び替えをする
            MOVE    1                   TO  IDX
            PERFORM UNTIL   IDX >   WRK-TBLMAX1
+             MOVE    ZERO                TO  IDYY
+             INITIALIZE                  WRK-KOUI-SRY-TAIHI-AREA
+             PERFORM UNTIL   IDX >   WRK-TBLMAX1
                MOVE    SPACE               TO  WRK-CHUKSNCD
                MOVE    ZERO                TO  FLG-KOUI
-      *
                PERFORM UNTIL   IDX >   WRK-TBLMAX1
-                 IF      TBL-KOUI-SRYCD (IDX) = "150268970"
-                      MOVE    1      TO  
-                                  TBL-KOUI-KOKUJISKBKBN1 (IDX)
-                 END-IF
-                 EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
-                           ALSO    TBL-KOUI-KOKUJISKBKBN1 (IDX)
-                   WHEN    SPACE   ALSO    ANY
-                   WHEN    "0"     ALSO    ANY
-                   WHEN    "8"     ALSO    ANY
-                       CONTINUE
-                   WHEN    ANY    ALSO    "1"
-                   WHEN    ANY    ALSO    "3"
-                   WHEN    ANY    ALSO    "5"
+      ****           IF      TBL-KOUI-SRYCD (IDX) = "150268970"
+      ****                MOVE    1      TO  TBL-KOUI-KOKUJISKBKBN1 (IDX)
+      ****                                   TBL-KOUI-KOKUJISKBKBN2 (IDX) 
+      ****           END-IF
+                 IF      TBL-KOUI-SRYCD (IDX)  =   SPACE
+                   COMPUTE IDX     =   IDX     +   1
+                 ELSE
+                   EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
+                             ALSO    TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                     WHEN    SPACE   ALSO    ANY
+                     WHEN    "0"     ALSO    ANY
+                     WHEN    "8"     ALSO    ANY
+                         CONTINUE
+                     WHEN    ANY     ALSO    "1"
+                     WHEN    ANY     ALSO    "3"
+                     WHEN    ANY     ALSO    "5"
                        IF      WRK-CHUKSNCD        =   SPACE
                            MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
                                        WRK-CHUKSNCD
-                           ADD     1                           TO  IDY
+                           ADD     1                           TO  IDYY
                            MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC          (IDY)
+                                       WRK-KOUI-SRY-TAIHI-REC     (IDYY)
                            MOVE    TBL-KOUI-SRYCD        (IDX) TO
-                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                                       WRK-KOUI-SRY-TAIHI-SRYCD   (IDYY)
                            MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
-                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                                       WRK-KOUI-SRY-TAIHI-TENSIKIBETU
+                                                                  (IDYY)
                            MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
-                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                                       WRK-KOUI-SRY-TAIHI-CHUKSNCD(IDYY)
                            MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
-                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                                       WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN1
+                                                                  (IDYY)
+                           MOVE    TBL-KOUI-TUSOKUGAIKBN(IDX) TO
+                                       WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN
+                                                                  (IDYY)
                            INITIALIZE      TBL-KOUI-REC (IDX)
-                           MOVE    IDY             TO  WRK-SRYCD1-MAX
                        ELSE
                            MOVE    1               TO  FLG-KOUI
                        END-IF    
-                   WHEN    OTHER
-                       ADD     1                           TO  IDY
+                     WHEN    OTHER
+                       ADD     1                           TO  IDYY
                        MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC          (IDY)
+                                       WRK-KOUI-SRY-TAIHI-REC     (IDYY)
                        MOVE    TBL-KOUI-SRYCD        (IDX) TO
-                                       WRK-KOUI-TAIHI-SRYCD        (IDY)
+                                       WRK-KOUI-SRY-TAIHI-SRYCD   (IDYY)
                        MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
-                                       WRK-KOUI-TAIHI-TENSIKIBETU  (IDY)
+                                       WRK-KOUI-SRY-TAIHI-TENSIKIBETU
+                                                                  (IDYY)
                        MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
-                                       WRK-KOUI-TAIHI-CHUKSNCD     (IDY)
+                                       WRK-KOUI-SRY-TAIHI-CHUKSNCD(IDYY)
                        MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
-                                       WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                                       WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN1
+                                                                  (IDYY)
+                       MOVE    TBL-KOUI-TUSOKUGAIKBN(IDX) TO
+                                       WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN
+                                                                  (IDYY)
                        INITIALIZE      TBL-KOUI-REC (IDX)
-                       MOVE    IDY             TO  WRK-SRYCD1-MAX
-                 END-EVALUATE    
-                 COMPUTE IDX     =   IDX     +   1
+                   END-EVALUATE
+      *    
+                   COMPUTE IDX     =   IDX     +   1
+                   IF      IDX     <=  WRK-TBLMAX1
+      ****               IF      TBL-KOUI-SRYCD (IDX) = "150268970"
+      ****                 MOVE    1      TO  TBL-KOUI-KOKUJISKBKBN1 (IDX)
+      ****                                    TBL-KOUI-KOKUJISKBKBN2 (IDX) 
+      ****               END-IF
+                     IF    ( TBL-KOUI-SRYCD (IDX) (1:1)
+                                   =   "1"                 )
+                     AND   ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                                   =   "1" OR  "3" OR  "5" )
+                     AND   ( TBL-KOUI-KOKUJISKBKBN2 (IDX)
+                                   =   "1"                 )
+                         ADD     WRK-TBLMAX1       TO  IDX
+                         IF      FLG-KOUI          =   ZERO
+                             MOVE    9                 TO  FLG-KOUI
+                         END-IF 
+                     END-IF
+                   END-IF
+                 END-IF
                END-PERFORM
       *
       *        出力対象となっていないデータがある 
                IF      FLG-KOUI            =   1
                    MOVE    1                   TO  IDX
                END-IF
+             END-PERFORM
+      *      摘要データ（診療行為）基本項目毎の並び替え処理
+             PERFORM 200741-KIHON-HENSYU-SEC
+      *      データが残っているとき 
+             IF      FLG-KOUI            =   9
+                 MOVE    1                   TO  IDX
+             END-IF
            END-PERFORM
       *
       *    コメントを最後に編集
@@ -3869,25 +3942,33 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                    WHEN    "8"
                        ADD     1                           TO  IDY
                        MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC         (IDY)
-                       MOVE    TBL-KOUI-SRYCD        (IDX) TO
-                                       WRK-KOUI-TAIHI-SRYCD       (IDY)
-                       MOVE    TBL-KOUI-TENSIKIBETU  (IDX) TO
-                                       WRK-KOUI-TAIHI-TENSIKIBETU (IDY)
-                       MOVE    TBL-KOUI-CHUKSNCD     (IDX) TO
-                                       WRK-KOUI-TAIHI-CHUKSNCD    (IDY)
-                       MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
-                                      WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDY)
+                                               WRK-KOUI-TAIHI-REC (IDY)
                  END-EVALUATE
             END-PERFORM           
       *
            INITIALIZE                      TBL-KOUI-AREA
            MOVE    ZERO                TO  WRK-TBLMAX1
-      * 
-           MOVE    1                   TO  IDX
-           PERFORM UNTIL   IDX >=      100
-                   OR      WRK-KOUI-TAIHI-SRYCD (IDX)  =   SPACE
-               EVALUATE    WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       100
+                   OR      WRK-KOUI-TAIHI-REC (IDX)  =   SPACE
+               ADD     1           TO  WRK-TBLMAX1   
+               MOVE    WRK-KOUI-TAIHI-REC (IDX)
+                                   TO  TBL-KOUI-REC(WRK-TBLMAX1)
+           END-PERFORM
+           .
+       20074-ZAI-KOUI-SORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    摘要データ（診療行為）基本項目毎の並び替え処理
+      *****************************************************************
+       200741-KIHON-HENSYU-SEC          SECTION.
+      *
+           MOVE    1                   TO  IDZZ
+           PERFORM UNTIL   IDZZ    >=  100
+                   OR      WRK-KOUI-SRY-TAIHI-SRYCD (IDZZ)  =   SPACE
+               EVALUATE    WRK-KOUI-SRY-TAIHI-SRYCD (IDZZ) (1:1)
                    WHEN    "0"
                    WHEN    "8"
                        IF    ( WRK-KOUI-TBLMAX (1) >  ZERO )
@@ -3896,18 +3977,20 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                        OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
                            PERFORM 200741-KASAN-HENSYU-SEC
                        END-IF
-                       ADD     1           TO  WRK-TBLMAX1   
-                       MOVE    WRK-KOUI-TAIHI-REC (IDX)
-                                           TO  TBL-KOUI-REC(WRK-TBLMAX1)
-                       COMPUTE IDX     =   IDX     +   1
+                       ADD     1           TO  IDY   
+                       MOVE    WRK-KOUI-SRY-TAIHI-REC (IDZZ)
+                                           TO  WRK-KOUI-TAIHI-REC (IDY)
+                       COMPUTE IDZZ    =   IDZZ    +   1
                    WHEN    OTHER
       *                基本項目・加算項目・通則加算項目に分ける
-                       PERFORM UNTIL   IDX >=      100
-                               OR      WRK-KOUI-TAIHI-SRYCD (IDX)
+                       PERFORM UNTIL   IDZZ    >=      100
+                               OR      WRK-KOUI-SRY-TAIHI-SRYCD (IDZZ)
                                                        =   SPACE
-                               OR      WRK-KOUI-TAIHI-SRYCD (IDX) (1:1)
+                               OR      WRK-KOUI-SRY-TAIHI-SRYCD (IDZZ)
+                                                                  (1:1)
                                                    NOT =   "1"
-                           EVALUATE    WRK-KOUI-TAIHI-KOKUJISKBKBN1(IDX)
+                           EVALUATE    WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN1
+                                                                (IDZZ)
                                WHEN    "1"
                                WHEN    "3" 
                                WHEN    "5"
@@ -3919,23 +4002,30 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                                    END-IF
                                    MOVE    1               TO  IDZ  
                                WHEN    "7"
-                                   IF      WRK-KOUI-TAIHI-SRYCD (IDX)
-                                                           =
-                                                 WRK-CONS-CHOONPA-KASAN
+      *****************************IF      WRK-KOUI-TAIHI-SRYCD (IDX)
+      *****************************                        =
+      *****************************              WRK-CONS-CHOONPA-KASAN
+                                   IF  WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN
+                                                               (IDZZ)
+                                                           =   "1"
                                      MOVE    4               TO  IDZ  
                                    ELSE
-                                     IF      WRK-KOUI-TAIHI-SRYCD (IDX)
+                                     IF      WRK-KOUI-SRY-TAIHI-SRYCD
+                                                                 (IDZZ)
                                                            =
+                                         "150268970"                  OR
                                          WRK-CONS-SISETUKIJYUN-KENSA  OR
                                          WRK-CONS-SISETUKIJYUN-GAZOU  OR
                                          WRK-CONS-SISETUKIJYUN-HOUSYASEN
                                        MOVE    2               TO  IDZ  
                                      ELSE
-                                      IF    ( WRK-KOUI-TAIHI-TENSIKIBETU 
-                                                               (IDX)
+                                      IF
+                                        ( WRK-KOUI-SRY-TAIHI-TENSIKIBETU 
+                                                               (IDZZ)
                                                          =   5   OR  6 )
-                                      AND   ( WRK-KOUI-TAIHI-CHUKSNCD
-                                                                 (IDX)
+                                      AND
+                                        ( WRK-KOUI-SRY-TAIHI-CHUKSNCD
+                                                                 (IDZZ)
                                                          =   "0000"    )
                                       AND   ( RECE041-SRYKBN
                                                      NOT =   "54"      ) 
@@ -3950,11 +4040,11 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                            END-EVALUATE
                            ADD     1           TO  WRK-KOUI-TBLMAX (IDZ)
                            MOVE    WRK-KOUI-TBLMAX (IDZ)
-                                               TO  IDY
-                           MOVE    WRK-KOUI-TAIHI-REC (IDX)
+                                               TO  IDYY
+                           MOVE    WRK-KOUI-SRY-TAIHI-REC (IDZZ)
                                                TO
-                                               WRK-KOUI-REC (IDZ IDY)
-                           COMPUTE IDX     =   IDX     +   1
+                                               WRK-KOUI-REC (IDZ IDYY)
+                           COMPUTE IDZZ    =   IDZZ    +   1
                        END-PERFORM
                END-EVALUATE
            END-PERFORM
@@ -3966,7 +4056,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                PERFORM 200741-KASAN-HENSYU-SEC
            END-IF
            .
-       20074-ZAI-KOUI-SORT-EXT.
+       200741-KIHON-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3974,11 +4064,11 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *****************************************************************
        200741-KASAN-HENSYU-SEC          SECTION.
       *
-      *    加算項目の記録順
+      *    注加算項目の記録順
            IF      WRK-KOUI-TBLMAX (2)         >   ZERO
-               COMPUTE IDY     =   WRK-KOUI-TBLMAX (2) -   1
+               COMPUTE IDYY    =   WRK-KOUI-TBLMAX (2) -   1
                PERFORM VARYING IDY1    FROM    1   BY  1
-                       UNTIL   IDY1    >       IDY     
+                       UNTIL   IDY1    >       IDYY
                    COMPUTE IDZ     =   IDY1    +   1
                    PERFORM VARYING IDY2    FROM   IDZ  BY  1
                            UNTIL   IDY2    >   WRK-KOUI-TBLMAX (2)
@@ -3998,12 +4088,13 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *    基本項目・加算項目・通則加算項目の順に編集
            PERFORM VARYING IDY1    FROM    1   BY  1
                    UNTIL   IDY1    >       4
-               MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDY
+               MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDYY
                PERFORM VARYING IDY2    FROM    1   BY  1
-                       UNTIL   IDY2    >       IDY
-                   ADD     1               TO  WRK-TBLMAX1
+                       UNTIL   IDY2    >       IDYY
+                   ADD     1               TO  IDY
                    MOVE    WRK-KOUI-REC (IDY1 IDY2)
-                                           TO  TBL-KOUI-REC(WRK-TBLMAX1)
+                                           TO  WRK-KOUI-TAIHI-REC  (IDY)
+                   MOVE    IDY             TO  WRK-SRYCD1-MAX
                END-PERFORM
            END-PERFORM
       *

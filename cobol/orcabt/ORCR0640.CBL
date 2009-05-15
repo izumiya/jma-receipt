@@ -352,6 +352,11 @@
       *                                     平成２１年４月改正対応
       *  04.02.49    NACL-門脇    09/04/15  群馬県地方公費対応
       *  04.02.50    NACL-門脇    09/05/11  平成２１年５月改正対応
+      *  04.02.51    NACL-藤原    09/04/21  注加算による加算項目の記載
+      *                                     基本項目が複数ある場合は基本
+      *                                     項目毎に加算項目の記載を行なう
+      *                                     告示等識別区分２、通則加算対
+      *                                     象外区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3173,6 +3178,10 @@
                MOVE    TNS-SRYSYUKBN  TO RECE65-SRYSYUKBN-X  (IDX4)
                MOVE    TNS-KOKUJISKBKBN1  
                                       TO RECE65-KOKUJISKBKBN1(IDX4)
+               MOVE    TNS-KOKUJISKBKBN2  
+                                      TO RECE65-KOKUJISKBKBN2(IDX4)
+               MOVE    TNS-TUSOKUGAIKBN
+                                      TO RECE65-TUSOKUGAIKBN (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE65-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE65-CHUKSNCD       (IDX4)
@@ -6497,6 +6506,10 @@
                MOVE    TNS-SRYSYUKBN  TO RECE65-SRYSYUKBN-X(IDX4)
                MOVE    TNS-KOKUJISKBKBN1
                                       TO RECE65-KOKUJISKBKBN1(IDX4)
+               MOVE    TNS-KOKUJISKBKBN2  
+                                      TO RECE65-KOKUJISKBKBN2(IDX4)
+               MOVE    TNS-TUSOKUGAIKBN
+                                      TO RECE65-TUSOKUGAIKBN (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE65-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE65-CHUKSNCD(IDX4)
@@ -6909,6 +6922,10 @@
                MOVE    TNS-SRYSYUKBN  TO RECE65-SRYSYUKBN-X(IDX4)
                MOVE    TNS-KOKUJISKBKBN1
                                       TO RECE65-KOKUJISKBKBN1(IDX4)
+               MOVE    TNS-KOKUJISKBKBN2  
+                                      TO RECE65-KOKUJISKBKBN2(IDX4)
+               MOVE    TNS-TUSOKUGAIKBN
+                                      TO RECE65-TUSOKUGAIKBN (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE65-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE65-CHUKSNCD(IDX4)
@@ -7316,6 +7333,10 @@
            MOVE    TNS-SRYSYUKBN  TO RECE65-SRYSYUKBN-X(1)
            MOVE    TNS-KOKUJISKBKBN1
                                   TO RECE65-KOKUJISKBKBN1(1)
+           MOVE    TNS-KOKUJISKBKBN2  
+                                  TO RECE65-KOKUJISKBKBN2(1)
+           MOVE    TNS-TUSOKUGAIKBN
+                                  TO RECE65-TUSOKUGAIKBN (1)
            MOVE    TNS-KZMCOMPSIKIBETU
                                   TO RECE65-KZMCOMPSIKIBETU(1)
            MOVE    TNS-CHUKSNCD   TO RECE65-CHUKSNCD(1)
@@ -7371,6 +7392,10 @@
               MOVE    TNS-SRYSYUKBN  TO RECE65-SRYSYUKBN-X(2)
               MOVE    TNS-KOKUJISKBKBN1
                                      TO RECE65-KOKUJISKBKBN1(2)
+              MOVE    TNS-KOKUJISKBKBN2  
+                                     TO RECE65-KOKUJISKBKBN2(2)
+              MOVE    TNS-TUSOKUGAIKBN
+                                     TO RECE65-TUSOKUGAIKBN (2)
               MOVE    TNS-KZMCOMPSIKIBETU
                                      TO RECE65-KZMCOMPSIKIBETU(2)
               MOVE    TNS-CHUKSNCD   TO RECE65-CHUKSNCD(2)
@@ -7849,6 +7874,10 @@
                 MOVE    TNS-SRYSYUKBN TO RECE65-SRYSYUKBN-X(IDX4)
                 MOVE    TNS-KOKUJISKBKBN1
                                       TO RECE65-KOKUJISKBKBN1(IDX4)
+                MOVE    TNS-KOKUJISKBKBN2  
+                                      TO RECE65-KOKUJISKBKBN2(IDX4)
+                MOVE    TNS-TUSOKUGAIKBN
+                                      TO RECE65-TUSOKUGAIKBN (IDX4)
                 MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE65-KZMCOMPSIKIBETU(IDX4)
                 MOVE    TNS-CHUKSNCD  TO RECE65-CHUKSNCD(IDX4)
@@ -7980,6 +8009,10 @@
                MOVE    TNS-SRYSYUKBN  TO  RECE65-SRYSYUKBN-X(IDX4)
                MOVE    TNS-KOKUJISKBKBN1
                                       TO  RECE65-KOKUJISKBKBN1(IDX4)
+               MOVE    TNS-KOKUJISKBKBN2  
+                                      TO  RECE65-KOKUJISKBKBN2(IDX4)
+               MOVE    TNS-TUSOKUGAIKBN
+                                      TO  RECE65-TUSOKUGAIKBN (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO  RECE65-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO  RECE65-CHUKSNCD(IDX4)
@@ -8075,6 +8108,8 @@
       *
            MOVE    TNS-SRYSYUKBN        TO  RECE65-SRYSYUKBN-X(1)
            MOVE    TNS-KOKUJISKBKBN1    TO  RECE65-KOKUJISKBKBN1(1)
+           MOVE    TNS-KOKUJISKBKBN2    TO  RECE65-KOKUJISKBKBN2(1)
+           MOVE    TNS-TUSOKUGAIKBN     TO  RECE65-TUSOKUGAIKBN (1)
            MOVE    TNS-KZMCOMPSIKIBETU  TO  RECE65-KZMCOMPSIKIBETU(1)
            MOVE    TNS-CHUKSNCD         TO  RECE65-CHUKSNCD(1)
            MOVE    TNS-CHUKSNTUBAN      TO  RECE65-CHUKSNTUBAN(1)
@@ -8172,6 +8207,8 @@
       *
            MOVE    TNS-SRYSYUKBN        TO  RECE65-SRYSYUKBN-X(1)
            MOVE    TNS-KOKUJISKBKBN1    TO  RECE65-KOKUJISKBKBN1(1)
+           MOVE    TNS-KOKUJISKBKBN2    TO  RECE65-KOKUJISKBKBN2(1)
+           MOVE    TNS-TUSOKUGAIKBN     TO  RECE65-TUSOKUGAIKBN (1)
            MOVE    TNS-KZMCOMPSIKIBETU  TO  RECE65-KZMCOMPSIKIBETU(1)
            MOVE    TNS-CHUKSNCD         TO  RECE65-CHUKSNCD(1)
            MOVE    TNS-CHUKSNTUBAN      TO  RECE65-CHUKSNTUBAN(1)
@@ -8498,6 +8535,8 @@
            MOVE    TNS-SRYSYUKBN       TO  RECE65-SRYSYUKBN-X(1)
            MOVE    TNS-KOKUJISKBKBN1
                                        TO  RECE65-KOKUJISKBKBN1(1)
+           MOVE    TNS-KOKUJISKBKBN2   TO  RECE65-KOKUJISKBKBN2(1)
+            MOVE    TNS-TUSOKUGAIKBN   TO  RECE65-TUSOKUGAIKBN (1)
            MOVE    TNS-KZMCOMPSIKIBETU
                                        TO  RECE65-KZMCOMPSIKIBETU(1)
            MOVE    TNS-CHUKSNCD        TO  RECE65-CHUKSNCD(1)
@@ -9076,6 +9115,10 @@
                   MOVE  TNS-SRYSYUKBN TO RECE65-SRYSYUKBN-X(IDX4)
                   MOVE  TNS-KOKUJISKBKBN1
                                       TO RECE65-KOKUJISKBKBN1(IDX4)
+                  MOVE  TNS-KOKUJISKBKBN2  
+                                      TO RECE65-KOKUJISKBKBN2(IDX4)
+                  MOVE  TNS-TUSOKUGAIKBN
+                                      TO RECE65-TUSOKUGAIKBN (IDX4)
                   MOVE  TNS-KZMCOMPSIKIBETU
                                       TO RECE65-KZMCOMPSIKIBETU(IDX4)
                   MOVE  TNS-CHUKSNCD  TO RECE65-CHUKSNCD(IDX4)
@@ -9265,6 +9308,10 @@
                   MOVE  TNS-SRYSYUKBN TO RECE65-SRYSYUKBN-X(IDX4)
                   MOVE  TNS-KOKUJISKBKBN1
                                       TO RECE65-KOKUJISKBKBN1(IDX4)
+                  MOVE  TNS-KOKUJISKBKBN2  
+                                      TO RECE65-KOKUJISKBKBN2(IDX4)
+                  MOVE  TNS-TUSOKUGAIKBN
+                                      TO RECE65-TUSOKUGAIKBN (IDX4)
                   MOVE  TNS-KZMCOMPSIKIBETU
                                       TO RECE65-KZMCOMPSIKIBETU(IDX4)
                   MOVE  TNS-CHUKSNCD  TO RECE65-CHUKSNCD(IDX4)
