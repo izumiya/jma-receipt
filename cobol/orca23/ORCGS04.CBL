@@ -174,6 +174,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-INIT            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -271,6 +272,9 @@
       *    ¼ç¡¡¡¡½èÍý
       *****************************************************************
        000-PROC-SEC                SECTION.
+      *
+           INITIALIZE                  FLG-AREA
+           INITIALIZE                  WRK-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-WORK        TO  SPA-S01KYOUTU
@@ -556,6 +560,8 @@
        310-SPASET-SEC              SECTION.
       *
            INITIALIZE                  SPA-GMN-AREA
+      *
+           MOVE    1                   TO  FLG-INIT
       *
            PERFORM 3101-COMBO-SYOKI-SEC
       *
@@ -966,7 +972,8 @@
            END-IF
       *
            IF    ( SPA-GMN-KIKANKBN    =   "1" )
-               IF    ( S04-LBLSUMKBN   =   SPACE )
+               IF    ( FLG-INIT        =   ZERO )
+                AND  ( S04-LBLSUMKBN   =   SPACE )
                    MOVE    SPA-GMN-DSPLIST(1)
                                        TO  SPA-GMN-DSPKBN-G
                    MOVE    SPA-GMN-SUMKBNLIST (2)
