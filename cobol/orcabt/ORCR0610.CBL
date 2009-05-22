@@ -125,6 +125,8 @@
       *
       *  04.03.01    NACL-ÌçÏÆ    08/09/02  ÀÁµáÅÀÈ½ÄêÄÉ²Ã
       *  04.03.02    NACL-ÌçÏÆ    08/12/17  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
+      *  04.03.03    NACL-Æ£¸¶    09/05/19  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¥Þ¥ëÅÔ¡Ê£¸£²¡Ë¤ÏºÆÍ¥Àè¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2598,13 +2600,44 @@
                                                    =   "191" )
                            CONTINUE
                        ELSE
-                           IF      WRK-KOHHKNNUM-O (IDX)
-                                               >   WRK-KOHHKNNUM-O (IDY)
-                               MOVE    WRK-KOHI-TBL(IDX)
+      *                    ÅìµþÅÔ¤ÎÃÏÊý¸øÈñ¡ÊË¡ÊÌ£¸£²¡Ë
+                           IF    ( SYS-1001-PREFNUM    =   "13" ) 
+                               IF   ( WRK-KOHHKNNUM-O (IDX) (2:2)
+                                                           =   "82" )
+                               AND  ( IDX                  =   1    )
+                                   CONTINUE
+                               ELSE   
+                                   IF    ( WRK-KOHHKNNUM-O (IDY) (2:2)
+                                                   =   "82"           )
+                                       MOVE    WRK-KOHI-TBL(IDX)
                                                    TO  WRK-KOHI
-                               MOVE    WRK-KOHI-TBL(IDY)
+                                       MOVE    WRK-KOHI-TBL(IDY)
                                                    TO  WRK-KOHI-TBL(IDX)
-                               MOVE    WRK-KOHI    TO  WRK-KOHI-TBL(IDY)
+                                       MOVE    WRK-KOHI
+                                                   TO  WRK-KOHI-TBL(IDY)
+                                   ELSE
+                                     IF    ( WRK-KOHHKNNUM-O (IDX)
+                                                   >   WRK-KOHHKNNUM-O
+                                                                (IDY) )
+                                       MOVE    WRK-KOHI-TBL(IDX)
+                                                   TO  WRK-KOHI
+                                       MOVE    WRK-KOHI-TBL(IDY)
+                                                   TO  WRK-KOHI-TBL(IDX)
+                                       MOVE    WRK-KOHI
+                                                   TO  WRK-KOHI-TBL(IDY)
+                                     END-IF
+                                   END-IF
+                               END-IF    
+                           ELSE
+                               IF      WRK-KOHHKNNUM-O (IDX)
+                                               >   WRK-KOHHKNNUM-O (IDY)
+                                   MOVE    WRK-KOHI-TBL(IDX)
+                                                   TO  WRK-KOHI
+                                   MOVE    WRK-KOHI-TBL(IDY)
+                                                   TO  WRK-KOHI-TBL(IDX)
+                                   MOVE    WRK-KOHI
+                                                   TO  WRK-KOHI-TBL(IDY)
+                               END-IF
                            END-IF
                        END-IF    
                    END-IF    
