@@ -80,6 +80,7 @@
                05  WRK-SYY         PIC 9(04).
                05  WRK-SMM         PIC 9(02).
                05  WRK-SDD         PIC 9(02).
+           03  WRK-MIDCD           PIC X(04).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -211,6 +212,11 @@
       *        画面編集
                IF      FLG-END             =   ZERO
                    PERFORM 500-GMNHEN-SEC
+      *
+                   IF    ( SPA-MIDCD   NOT =   SPACE )
+                       PERFORM 520-MIDSET-SEC
+                   END-IF
+      *
                END-IF
            END-IF
       *
@@ -236,7 +242,7 @@
                WHEN    "MID1"
       *            確認画面より
                    PERFORM 30010-MID1-SET-SEC
-                   MOVE    SPACE               TO  SPA-MIDCD
+      ***             MOVE    SPACE               TO  SPA-MIDCD
                WHEN    OTHER
                    MOVE    SPA-MOTOPG          TO  SPA-NAI-MOTOPG
                    MOVE    SPACE               TO  SPA-MIDCD
@@ -251,7 +257,14 @@
       *****************************************************************
        30010-MID1-SET-SEC          SECTION.
       *
+           MOVE    SPACE               TO  WRK-MIDCD
+      *
            EVALUATE    SPA-MIDCD
+               WHEN    "0100"
+      *            削除処理
+                   IF      SPA-MID1-FLG        =   "OK"
+                       MOVE    "0101"      TO  WRK-MIDCD
+                   END-IF
                WHEN    "0101"
       *            削除処理
                    IF      SPA-MID1-FLG        =   "OK"
@@ -269,6 +282,7 @@
                    END-IF
            END-EVALUATE
            MOVE    SPACE               TO  SPA-MID1-FLG
+           MOVE    WRK-MIDCD           TO  SPA-MIDCD
            .
        30010-MID1-SET-EXT.
            EXIT.
@@ -682,8 +696,9 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *    ＪＯＢ管理検索
            PERFORM 820-JOBKANRI-READ-SEC
       *
-           IF      FLG-SJOBKANRI       =   ZERO
-               MOVE    "0101"              TO  SPA-MIDCD
+           IF    ( FLG-SJOBKANRI       =   ZERO )
+            OR   ( FLG-SJOBKANRI1      =   ZERO )
+               MOVE    "0100"              TO  SPA-MIDCD
            ELSE
                MOVE    "0005"              TO  SPA-ERRCD
            END-IF
@@ -725,6 +740,15 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                        MOVE    1                TO  FLG-ERR
                    END-IF
                END-IF
+           END-IF
+      *
+           IF      FLG-SJOBKANRI1       =   ZERO
+                   IF      (JOB1-ENDTIME      NOT =   SPACE)  AND
+                           (JOB1-ENDYMD       NOT =   SPACE)
+                       CONTINUE
+                   ELSE
+                       MOVE    1                TO  FLG-ERR
+                   END-IF
            END-IF
       *
            IF      FLG-ERR             =   1
@@ -831,7 +855,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    INITIALIZE             JOBKANRI-REC
                    MOVE    1              TO  JOB-JOBID
                    MOVE    "MSTMNT"       TO  JOB-SHELLID
-                   MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+                   MOVE    SPA-HOSPNUM    TO  JOB-HOSPNUM
                    CALL    "ORCSJOB"      USING
                                           ORCSJOBKANRIAREA
                                           JOBKANRI-REC
@@ -849,7 +873,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    INITIALIZE             JOBKANRI1-REC
                    MOVE    1              TO  JOB1-JOBID
                    MOVE    "MSTMLI"       TO  JOB1-SHELLID
-                   MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+                   MOVE    SPA-HOSPNUM    TO  JOB1-HOSPNUM
                    CALL    "ORCSJOB"      USING
                                           ORCSJOBKANRIAREA
                                           JOBKANRI1-REC
@@ -874,6 +898,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                             OR  "01"
                    CONTINUE
                ELSE
+                   IF      (JOB-ENDTIME       NOT =   SPACE)  AND
+                           (JOB-ENDYMD        NOT =   SPACE)
+                       CONTINUE
+                   ELSE
+      *            マスタ更新中
+                       MOVE    "0301"              TO  SPA-MIDCD
+                   END-IF
+               END-IF
+           END-IF
+           IF      FLG-SJOBKANRI1       =   ZERO
                    IF      (JOB1-ENDTIME      NOT =   SPACE)  AND
                            (JOB1-ENDYMD       NOT =   SPACE)
                        CONTINUE
@@ -881,7 +915,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *            マスタ更新中
                        MOVE    "0301"              TO  SPA-MIDCD
                    END-IF
-               END-IF
            END-IF
            IF      SPA-MIDCD           =   SPACE
                PERFORM 2001-BACK-SYORI-SEC
@@ -1086,6 +1119,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  MID1
            EVALUATE    SPA-MIDCD
+               WHEN    "0100"
+                   MOVE
+                   "更新処理の動作中は情報削除を行わないでください"
+                                       TO  MID1-ID1MSG
                WHEN    "0101"
                    MOVE
                    "ＪＯＢ管理情報を削除します。よろしいですか？"
@@ -1105,6 +1142,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    "B12"               TO  MCP-WIDGET
            EVALUATE    SPA-MIDCD
+               WHEN    "0100"
                WHEN    "0101"
                    MOVE    "B01"               TO  MCP-WIDGET
            END-EVALUATE
