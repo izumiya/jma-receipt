@@ -271,7 +271,7 @@
                            +   TSBD010S02-HOHOMONEY  (IDX-S02 IDX-HS02 )
                        IF    ( IDX-HS02    =   WRK-HS02-MAX )
                            IF    ( SBD010S02-HOHOMONEY  (IDX-S02 1 )
-                                           >   ZERO )
+                                           NOT =   ZERO )
                                MOVE    TSBD010S02-HOHO  (IDX-S02 1)
                                        TO  SBD010S02-HOHO  (IDX-S02 1)
                                MOVE    1   TO  SBD010S02-HOHO-MAX
