@@ -402,6 +402,7 @@
       *                                     項目毎に加算項目の記載を行なう
       *                                     告示等識別区分２、通則加算対
       *                                     象外区分の追加
+      *  04.03.23    NACL-門脇    09/05/29  平成２１年５月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -575,6 +576,7 @@
            03  FLG-KOKI-HIGAITO                        PIC 9(01).
            03  FLG-TOKUSITU                            PIC 9(01).
            03  FLG-KOUGAKU                             PIC 9(01).
+           03  FLG-KISAIOK                             PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -3152,6 +3154,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
            INITIALIZE               TBL-TOKUSITU
            MOVE     ZERO      TO    FLG-TOKUSITU
+           MOVE     ZERO      TO    FLG-KISAIOK
            IF   (RECE02-SRYYM       >=  "200905")
            AND  (RECE02-HKNNUM   NOT =   SPACE  )
              IF  (RECE02-HKNNUM(1:2)  =   "98"                   )
@@ -3206,6 +3209,21 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  END-IF
       *
                  IF   FLG-TOKUSITU  NOT = ZERO
+                  IF  (RECE02-AGE     >=   70  )
+                  OR  (RECE02-HKNNUM   =  "039")
+                    IF    RECE02-KYURATE     =   30
+                      MOVE     1   TO   FLG-KISAIOK
+                    ELSE
+                      IF  RECE02-TEISYOTOKU  =  SPACE
+                        PERFORM   211C2-TOKUSITU-HANTEI3-SEC
+                      ELSE
+                        MOVE   1   TO   FLG-KISAIOK
+                      END-IF
+                    END-IF
+                  ELSE
+                    MOVE       1   TO   FLG-KISAIOK
+                  END-IF
+                  IF   FLG-KISAIOK  =  1
                     MOVE    7    TO      FLG-TOKKI
                     PERFORM   21045-TOKKI-HENSYU-SEC
                     EVALUATE  FLG-TOKUSITU
@@ -3216,6 +3234,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                       WHEN       3
                         MOVE   3   TO    RECE02-RJNNYUKOHFTN(2)
                     END-EVALUATE
+                  END-IF
                  ELSE
                    MOVE    ZERO    TO    TBL-TOKUSITUFLG(1)
                    MOVE    ZERO    TO    TBL-TOKUSITUFLG(2)
@@ -3257,6 +3276,21 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      END-IF
                    END-IF
                    IF   FLG-TOKUSITU  NOT = ZERO
+                    IF  (RECE02-AGE     >=   70  )
+                    OR  (RECE02-HKNNUM   =  "039")
+                      IF    RECE02-KYURATE     =   30
+                        MOVE     1   TO   FLG-KISAIOK
+                      ELSE
+                        IF  RECE02-TEISYOTOKU  =  SPACE
+                          PERFORM   211C2-TOKUSITU-HANTEI3-SEC
+                        ELSE
+                          MOVE   1   TO   FLG-KISAIOK
+                        END-IF
+                      END-IF
+                    ELSE
+                      MOVE       1   TO   FLG-KISAIOK
+                    END-IF
+                    IF   FLG-KISAIOK  =  1
                      EVALUATE  FLG-TOKUSITU
                        WHEN       1
                          MOVE   1    TO   RECE02-RJNNYUKOHFTN(2)
@@ -3265,6 +3299,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                        WHEN       3
                          MOVE   3    TO   RECE02-RJNNYUKOHFTN(2)
                      END-EVALUATE
+                    END-IF
                    END-IF
                  END-IF
       *
@@ -3354,6 +3389,44 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
            .
        211C1-TOKUSITU-HANTEI2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *
+      *****************************************************************
+       211C2-TOKUSITU-HANTEI3-SEC               SECTION.
+      *
+           INITIALIZE                      PTKOHINF-REC
+           MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
+           MOVE  RECE02-PTID           TO  PTKOH-PTID
+           MOVE  "957"                 TO  PTKOH-KOHNUM
+           MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+           MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+           MOVE  "key4"                TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =       ZERO
+             MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+             MOVE    "key4"            TO  MCP-PATHNAME
+             PERFORM  900-PTKOHINF-READ-SEC
+             PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  MOVE    1    TO   FLG-KISAIOK
+                  MOVE    1    TO   FLG-PTKOHINF
+                ELSE
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
+                  PERFORM  900-PTKOHINF-READ-SEC
+                END-IF
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       211C2-TOKUSITU-HANTEI3-EXT.
            EXIT.
       *
       *****************************************************************
