@@ -357,6 +357,7 @@
       *                                     ¹àÌÜËè¤Ë²Ã»»¹àÌÜ¤Îµ­ºÜ¤ò¹Ô¤Ê¤¦
       *                                     ¹ð¼¨Åù¼±ÊÌ¶èÊ¬£²¡¢ÄÌÂ§²Ã»»ÂÐ
       *                                     ¾Ý³°¶èÊ¬¤ÎÄÉ²Ã
+      *  04.02.52    NACL-ÌçÏÆ    09/05/29  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -548,6 +549,7 @@
            03  FLG-TOKUSITU                            PIC 9(01).
            03  FLG-TOKUSITU-TASU                       PIC 9(01).
            03  FLG-KOUGAKU                             PIC 9(01).
+           03  FLG-KISAIOK                             PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -15267,6 +15269,7 @@
            INITIALIZE               TBL-TOKUSITU
            MOVE     ZERO      TO    FLG-TOKUSITU
            MOVE     ZERO      TO    FLG-TOKUSITU-TASU
+           MOVE     ZERO      TO    FLG-KISAIOK
            IF   (RECE62-SRYYM       >=  "200905")
            AND  (RECE62-HKNNUM   NOT =   SPACE  )
              IF  (RECE62-HKNNUM(1:2)  =   "98"                   )
@@ -15334,6 +15337,21 @@
                           MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
                       END-EVALUATE
                    ELSE
+                    IF  (RECE62-AGE     >=   70  )
+                    OR  (RECE62-HKNNUM   =  "039")
+                      IF    RECE62-KYURATE     =   30
+                        MOVE     1   TO   FLG-KISAIOK
+                      ELSE
+                        IF  RECE62-TEISYOTOKU  =  SPACE
+                          PERFORM   2104E3-TOKUSITU-HANTEI4-SEC
+                        ELSE
+                          MOVE   1   TO   FLG-KISAIOK
+                        END-IF
+                      END-IF
+                    ELSE
+                      MOVE       1   TO   FLG-KISAIOK
+                    END-IF
+                    IF   FLG-KISAIOK  =  1
                       MOVE    7    TO      FLG-TOKKI
                       PERFORM   21013-TOKKI-HENSYU-SEC
                       EVALUATE  FLG-TOKUSITU
@@ -15344,6 +15362,7 @@
                         WHEN       3
                           MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
                       END-EVALUATE
+                    END-IF
                    END-IF
                  ELSE
                    MOVE    ZERO    TO    TBL-TOKUSITUFLG(1)
@@ -15397,6 +15416,21 @@
                               MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
                           END-EVALUATE
                         ELSE
+                         IF  (RECE62-AGE     >=   70  )
+                         OR  (RECE62-HKNNUM   =  "039")
+                           IF    RECE62-KYURATE     =   30
+                             MOVE     1   TO   FLG-KISAIOK
+                           ELSE
+                             IF  RECE62-TEISYOTOKU  =  SPACE
+                               PERFORM   2104E3-TOKUSITU-HANTEI4-SEC
+                             ELSE
+                               MOVE   1   TO   FLG-KISAIOK
+                             END-IF
+                           END-IF
+                         ELSE
+                           MOVE       1   TO   FLG-KISAIOK
+                         END-IF
+                         IF   FLG-KISAIOK  =  1
                           EVALUATE  FLG-TOKUSITU
                             WHEN       1
                               MOVE   1    TO   RECE62-RJNNYUKOHFTN(2)
@@ -15405,6 +15439,7 @@
                             WHEN       3
                               MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
                           END-EVALUATE
+                         END-IF
                         END-IF
                    END-IF
                  END-IF
@@ -15539,6 +15574,44 @@
       *
            .
        2104E2-TOKUSITU-HANTEI3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *
+      *****************************************************************
+       2104E3-TOKUSITU-HANTEI4-SEC               SECTION.
+      *
+           INITIALIZE                      PTKOHINF-REC
+           MOVE  RECE62-HOSPNUM        TO  PTKOH-HOSPNUM
+           MOVE  RECE62-PTID           TO  PTKOH-PTID
+           MOVE  "957"                 TO  PTKOH-KOHNUM
+           MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+           MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+           MOVE  "key4"                TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =       ZERO
+             MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+             MOVE    "key4"            TO  MCP-PATHNAME
+             PERFORM  900-PTKOHINF-READ-SEC
+             PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  MOVE    1    TO   FLG-KISAIOK
+                  MOVE    1    TO   FLG-PTKOHINF
+                ELSE
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
+                  PERFORM  900-PTKOHINF-READ-SEC
+                END-IF
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       2104E3-TOKUSITU-HANTEI4-EXT.
            EXIT.
       *
       *****************************************************************
