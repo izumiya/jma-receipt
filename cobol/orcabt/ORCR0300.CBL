@@ -282,11 +282,13 @@
       *  04.03.05    NACL-門脇    08/12/01  在宅（院外分）編集修正
       *  04.03.06    NACL-藤原    09/02/05  院外処方の直後の症状詳記の記
       *                                     録の修正
-      *  04.04.07    NACL-藤原    09/04/21  注加算による加算項目の記載
+      *  04.03.07    NACL-藤原    09/04/21  注加算による加算項目の記載
       *                                     基本項目が複数ある場合は基本
       *                                     項目毎に加算項目の記載を行なう
       *                                     告示等識別区分２、通則加算対
       *                                     象外区分の追加
+      *  04.03.08    NACL-藤原    09/05/29  コメントが基本項目より先にある
+      *                                     場合の記載の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4021,7 +4023,9 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       ****                MOVE    1      TO  TBL-KOUI-KOKUJISKBKBN1 (IDX)
       ****                                   TBL-KOUI-KOKUJISKBKBN2 (IDX) 
       ****           END-IF
-                 IF      TBL-KOUI-SRYCD (IDX)  =   SPACE
+                 IF    ( TBL-KOUI-SRYCD (IDX)  =   SPACE       )
+                 OR    ( TBL-KOUI-SRYCD (IDX) (1:1)
+                                               =   "0" OR  "8" )
                    COMPUTE IDX     =   IDX     +   1
                  ELSE
                    EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)

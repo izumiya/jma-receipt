@@ -231,6 +231,8 @@
       *                                     項目毎に加算項目の記載を行なう
       *                                     告示等識別区分２、通則加算対
       *                                     象外区分の追加
+      *  04.03.09    NACL-藤原    09/05/29  コメントが基本項目より先にある
+      *                                     場合の記載の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4628,7 +4630,9 @@
       ****                MOVE    1      TO  TBL-KOUI-KOKUJISKBKBN1 (IDX)
       ****                                   TBL-KOUI-KOKUJISKBKBN2 (IDX) 
       ****           END-IF
-                 IF      TBL-KOUI-SRYCD (IDX)  =   SPACE
+                 IF    ( TBL-KOUI-SRYCD (IDX)  =   SPACE       )
+                 OR    ( TBL-KOUI-SRYCD (IDX) (1:1)
+                                               =   "0" OR  "8" )
                    COMPUTE IDX     =   IDX     +   1
                  ELSE
                    EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
