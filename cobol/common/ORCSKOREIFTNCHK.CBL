@@ -46,6 +46,8 @@
       *  04.03.02    NACL-ÌçÏÆ    09/02/26  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.04.01    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
+      *  04.04.02    NACL-ÌçÏÆ    09/06/01  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
+      *                                     ¡ÊÅìµþÅÔ£±£µ£±¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -287,6 +289,9 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                      OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
                          (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
                          (WRK-DOTANDOKU(4)         =  ZERO   ))
+                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"    ) AND
+                         (COMB-KOH1HKNNUM          = "151"   ) AND
+                         (LNK-KOREIFTNCHK-SRYYM   >= "200907"))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    END-IF
@@ -723,7 +728,8 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       ***              PERFORM   22012-NYUIN-KOREI-HEN2-SEC
                        CONTINUE
                      ELSE
-                       PERFORM   22011-NYUIN-KOREI-HEN1-SEC
+      ***              PERFORM   22011-NYUIN-KOREI-HEN1-SEC
+                       CONTINUE
                      END-IF
                    END-IF
                  END-IF
@@ -1101,7 +1107,8 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                          PERFORM  260-ICHIBUFTN-KOH-SET-SEC
                        END-IF
                      ELSE
-                       PERFORM    23011-GAIRAI-KOREI-HEN1-SEC
+      ***              PERFORM    23011-GAIRAI-KOREI-HEN1-SEC
+                       CONTINUE
                      END-IF
                    END-IF
                  END-IF
