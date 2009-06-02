@@ -5373,6 +5373,12 @@
                               END-IF
                             END-IF
                           END-IF
+                          IF  (MAX-KIN-SYU-M     =  80100 OR 40050)
+                          AND (LNK-SYU-SRYYMD(1:6) >= "200804"    )
+                             MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                             MOVE   3           TO   FLG-IRYOHI3
+                             MOVE   ZERO        TO   FLG-IRYOHI3X
+                          END-IF
                         END-IF
                       END-IF
                      END-IF
@@ -8827,7 +8833,7 @@
                    MOVE    1    TO    FLG-KOUGAKUCYO3
                 END-IF
               END-IF
-              IF     FLG-IRYOHI3    =      2
+              IF     FLG-IRYOHI3    =      2 OR 3
                IF    FLG-TOKU75     =   1 OR 2
                 IF  WK-KOUREI-IRYOHI  >  133500
                    COMPUTE WK-KOUREI-IRYOHI2 =
@@ -8967,9 +8973,9 @@
                 END-IF
               END-IF
             END-IF
-            IF      (FLG-IRYOHI      =  1 OR 2)
-            OR      (FLG-IRYOHI3     =  1 OR 2)
-            OR      (FLG-IRYOHI4     =  1     )
+            IF      (FLG-IRYOHI      =  1 OR 2     )
+            OR      (FLG-IRYOHI3     =  1 OR 2 OR 3)
+            OR      (FLG-IRYOHI4     =  1          )
                 IF   WK-GENGAKUKBN  NOT =  ZERO
                    PERFORM   2202-KOHFTN-KINGAKU-GEN2-SEC
                 END-IF
@@ -9340,7 +9346,7 @@
                (COMB-KOH1-NYUJGNKBN       =  "1"             ) AND
                (FLG-KOUREI                =  ZERO            ))
            OR ( FLG-IRYOHI70              =  3 OR 4 OR 5 OR 6 )
-           OR ( FLG-IRYOHI3               =  2                )
+           OR ( FLG-IRYOHI3               =  2 OR 3           )
              IF  ( SYU-NYUGAIKBN              =   "1"   )
              OR  ((SYU-NYUGAIKBN              =   "2"  ) AND
                   (FLG-NYUGAI                 =    1   ))
@@ -9384,9 +9390,10 @@
                  ELSE
                   IF    (FLG-IRYOHI2     =      1)
                   OR    (FLG-IRYOHI4     =      1)
-                  OR    (FLG-IRYOHI3     =      2)
+                  OR    (FLG-IRYOHI3     = 2 OR 3)
                    COMPUTE  WK-KOUREI-IRYOHI  =  WK-KOUREI-IRYOHI  +  
                                                 (SYU-HKNTEN (17) * 10)
+                   MOVE       1    TO      FLG-SYUKEI
                   END-IF
                   IF     FLG-IRYOHI5     =      11 OR 12
                    COMPUTE  WK-KOUREI-IRYOHI3 =  WK-KOUREI-IRYOHI3 +  
@@ -10042,7 +10049,7 @@
       *    ¸øÈñ£²¥«¥¦¥ó¥È
            IF ((COMB-KOH2HKNNUM       NOT =  SPACE          ) AND
                (COMB-KOH2-NYUJGNKBN       =  "1"            ))
-           OR ( FLG-IRYOHI3               =   1              )
+           OR ( FLG-IRYOHI3               =   1 OR 3         )
              IF  ( SYU-NYUGAIKBN              =   "1"   )
              OR  ((SYU-NYUGAIKBN              =   "2"  ) AND
                   (FLG-NYUGAI                 =    2   ))
@@ -10081,7 +10088,8 @@
                     END-IF
                   END-IF
                  ELSE
-                  IF     FLG-IRYOHI3     =      1
+                  IF    (FLG-IRYOHI3     =      1 OR 3)
+                  AND   (FLG-SYUKEI      =      ZERO  )
                    COMPUTE  WK-KOUREI-IRYOHI  =  WK-KOUREI-IRYOHI  +  
                                                 (SYU-HKNTEN (17) * 10)
                   END-IF
@@ -12688,8 +12696,8 @@
                    END-IF
                END-IF
             END-IF
-            IF    ( FLG-IRYOHI     =      2 )
-            OR    ( FLG-IRYOHI3    =      2 )
+            IF    ( FLG-IRYOHI     =      2      )
+            OR    ( FLG-IRYOHI3    =      2 OR 3 )
                IF   MAX-KIN-SYU-M     NOT = ZERO
                    EVALUATE   WK-GENGAKUKBN
                      WHEN          1
@@ -12713,8 +12721,8 @@
                    AND  MAX-KIN-SYU-M  =     ZERO
                        MOVE     ZERO     TO    FLG-KOUGAKUCYO
                    END-IF
-                   IF   FLG-IRYOHI3    =      2
-                   AND  MAX-KIN-SYU-M  =     ZERO
+                   IF  (FLG-IRYOHI3    =      2 OR 3)
+                   AND (MAX-KIN-SYU-M  =     ZERO   )
                        MOVE     ZERO     TO    FLG-KOUGAKUCYO3
                    END-IF
                END-IF
