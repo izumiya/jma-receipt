@@ -42,17 +42,20 @@
        WORKING-STORAGE                 SECTION.
       *
        01  FLG-AREA.
+           03  FLG-PTINF               PIC 9(01).
            03  FLG-SRYACCT             PIC 9(01).
            03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-PTHKNINF            PIC 9(01).
            03  FLG-PTKOHINF            PIC 9(01).
-           03  FLG-NACCT               PIC X(03).
+           03  FLG-NACCT               PIC 9(01).
+           03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-END                 PIC 9(01).
            03  FLG-HKNHIT              PIC 9(01).
            03  FLG-KOHNUM-G.
                05  FLG-KOH051          PIC 9(01).
                05  FLG-KOH052          PIC 9(01).
                05  FLG-KOH091          PIC 9(01).
+               05  FLG-KOH151          PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -80,10 +83,15 @@
       *
        01  CONST-AREA.
            03  CONST-KOH-MAX           PIC 9(05)   VALUE 4.
+           03  CONST-H2107             PIC X(06)   VALUE "200907".
       *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+      *    患者マスタ
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
       *    診療会計マスター
        01  SRYACCT-REC.
@@ -105,9 +113,16 @@
        01  NACCT-REC.
            COPY    "CPNYUINACCT.INC".
       *
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK1001.INC".
+      *
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *
+      *    保険算定用年齢・割合計算サブ
+           COPY    "CPORCSAGECHK.INC".
       *
            COPY    "CPORCSS009.INC".
       *
@@ -155,6 +170,32 @@
                                        TNCOMB-AREA
       *
            MOVE    ZERO                TO  SSRHKOH-RC
+      *
+           PERFORM 900-PTINF-KEY-SEL-SEC
+      *
+           INITIALIZE ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+           MOVE    SSRHKOH-PTID        TO  AGECHK-PTID
+           MOVE    SSRHKOH-SRYYM       TO  AGECHK-SRYYMD
+           MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
+           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
+           CALL    "ORCSAGECHK"            USING
+                                           ORCSAGECHKAREA
+                                           SPA-AREA
+           IF    ( AGECHK-RC       =   ZERO )
+               CONTINUE
+           ELSE
+               INITIALIZE  ORCSAGECHKAREA
+           END-IF
+      *
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1001"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    SSRHKOH-SRYYM       TO  SYS-STYUKYMD
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC        TO  SYS-1001-REC
       *
            MOVE    SSRHKOH-HKNCOMBI    TO  WRK-HKNCOMBI
            PERFORM 800-HKNCOMBI-CHK-SEC
@@ -257,7 +298,8 @@
            IF    ( KEY-HKNNUM      =   COMB-HKNNUM )
             AND  (     FLG-KOH051  =   1
                     OR FLG-KOH052  =   1
-                    OR FLG-KOH091  =   1           )
+                    OR FLG-KOH091  =   1
+                    OR FLG-KOH151  =   1           )
       *
                PERFORM 800-HOKEN-CHK-SEC
                PERFORM VARYING IDX-KOH FROM    1   BY  1
@@ -266,10 +308,12 @@
                    IF    ( KEY-HKNNUM      =   PTHKN-HKNNUM )
                     AND  ( KEY-HKNJANUM    =   PTHKN-HKNJANUM )
                     AND  ( TKOH-KOHNUM  (IDX-KOH)
-                                           =   "051" OR "052" OR "091" )
+                                           =   "051" OR "052" OR "091"
+                                            OR "151" )
                     AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
                                            =   "601" OR "602" )
-                       IF    ( KEY-HKNNUM  =   "060" )
+                       IF    ( KEY-HKNNUM  =   "060" OR "039" )
+                        OR   ( AGECHK-NENREI   >=    70 )
                            MOVE    1       TO  SSRHKOH-RC
                        ELSE
                            IF    ( KEY-HONKZKKBN
@@ -306,8 +350,8 @@
       *
            PERFORM 900-HKNCOMBI-KEY-SEL-SEC
            IF    ( COMB-HKNNUM     =   SPACE OR "971" OR "973" OR "975"
-                                    OR "068" OR "069" OR "039" OR "040")
-            OR   ( COMB-HKNNUM(1:2)=   "098" )
+                                    OR "068" OR "069" OR "040")
+            OR   ( COMB-HKNNUM(1:2)=   "98" )
                CONTINUE
            ELSE
                MOVE    1           TO  FLG-HKNHIT
@@ -325,6 +369,14 @@
                END-IF
                IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "091" )
                    MOVE    1       TO  FLG-KOH091
+               END-IF
+               IF    ( SSRHKOH-SRYYM   <   CONST-H2107 )
+                   CONTINUE
+               ELSE
+                   IF    ( SYS-1001-PREFNUM            =   13 )
+                    AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "151" )
+                       MOVE    1       TO  FLG-KOH151
+                   END-IF
                END-IF
       *
            END-PERFORM
@@ -491,6 +543,32 @@
            EXIT.
       *
       *****************************************************************
+      *    システム管理マスタ検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY10-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      =   ZERO )
+               MOVE    MCPDATA-REC TO  SYSKANRI-REC
+           ELSE
+               MOVE    1           TO  FLG-SYSKANRI
+               INITIALIZE              SYSKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-SEL-EXT.
+           EXIT.
+      *****************************************************************
       *    公費マスター読み込み
       *****************************************************************
        900-PTKOHINF-KEY-SEL-SEC         SECTION.
@@ -518,6 +596,34 @@
       *
            .
        900-PTKOHINF-KEY-SEL-EXT.
+           EXIT.
+      **************************************************************
+      *    患者情報検索処理(KEY)
+      **************************************************************
+       900-PTINF-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTINF
+      *
+           INITIALIZE                  PTINF-REC
+           MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
+           MOVE    SSRHKOH-PTID    TO  PTINF-PTID
+           MOVE    PTINF-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTINF-REC
+           ELSE
+               MOVE    1           TO  FLG-PTINF
+               INITIALIZE              PTINF-REC
+           END-IF
+      *
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTINF-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)
