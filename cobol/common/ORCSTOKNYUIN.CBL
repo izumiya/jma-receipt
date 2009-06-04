@@ -163,6 +163,12 @@
                WHEN    "23"
       *                精神科救急・合併症入院料
                        MOVE   "190130210"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "24"
+      *                精神科急性期治療病棟入院料１（急性増悪の再入院）
+                       MOVE   "190121110"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "25"
+      *                精神科急性期治療病棟入院料２（急性増悪の再入院）
+                       MOVE   "190121210"   TO  LNK-TOKNYUIN-SRYCD
              END-EVALUATE
            END-IF
       *
