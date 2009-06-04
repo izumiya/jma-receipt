@@ -370,13 +370,9 @@
                IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "091" )
                    MOVE    1       TO  FLG-KOH091
                END-IF
-               IF    ( SSRHKOH-SRYYM   <   CONST-H2107 )
-                   CONTINUE
-               ELSE
-                   IF    ( SYS-1001-PREFNUM            =   13 )
-                    AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "151" )
-                       MOVE    1       TO  FLG-KOH151
-                   END-IF
+               IF    ( SYS-1001-PREFNUM            =   13 )
+                AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "151" )
+                   MOVE    1       TO  FLG-KOH151
                END-IF
       *
            END-PERFORM
