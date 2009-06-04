@@ -63,6 +63,7 @@
            03  FLG-HCM50SRY            PIC 9(01).
            03  FLG-TENSU               PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-LOOPEND             PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
       *01  CNT-AREA.
@@ -649,12 +650,9 @@
            MOVE    SYUNOU-REC      TO  MCPDATA-REC
            MOVE    "tbl_syunou"    TO  MCP-TABLE
            MOVE    "key49"         TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  SYUNOU-REC
-           ELSE
-               MOVE    1           TO  FLG-SYUNOU
-               INITIALIZE              SYUNOU-REC
+               PERFORM 900-SYUNOU-KEY49-FET-SEC
            END-IF
       *
            .
@@ -666,16 +664,29 @@
        900-SYUNOU-KEY49-FET-SEC        SECTION.
       *
            MOVE    ZERO            TO  FLG-SYUNOU
+           MOVE    ZERO            TO  FLG-LOOPEND
       *
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key49"         TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  SYUNOU-REC
-           ELSE
-               MOVE    1           TO  FLG-SYUNOU
-               INITIALIZE              SYUNOU-REC
-           END-IF
+           PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
+                    OR   ( FLG-LOOPEND NOT =   ZERO )
+      *
+               MOVE    "tbl_syunou"    TO  MCP-TABLE
+               MOVE    "key49"         TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE    MCPDATA-REC TO  SYUNOU-REC
+      *
+                   MOVE    1           TO  FLG-LOOPEND
+      *
+                   IF    ( SYU-DENPJTIKBN  =   "3" )
+                       MOVE    ZERO    TO  FLG-LOOPEND
+                   END-IF
+      *
+               ELSE
+                   MOVE    1           TO  FLG-SYUNOU
+                   INITIALIZE              SYUNOU-REC
+               END-IF
+      *
+           END-PERFORM
       *
            .
        900-SYUNOU-KEY49-FET-EXT.
