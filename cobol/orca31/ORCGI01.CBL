@@ -16260,6 +16260,8 @@
            END-IF
       *    ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╠
       *    ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╡
+      *    ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╠║й╣чю╜аЩ╟╜╓не╬еО║к
+      *    ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╡║й╣чю╜аЩ╟╜╓не╬еО║к
       *    о╥©мю╜г╖цн╬и╪ю╢╣╪ёнеибеОфЧ╠║наё╠
       *    о╥©мю╜г╖цн╬и╪ю╢╣╪ёнеибеОфЧ╠║наё╡
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "2"
@@ -16267,6 +16269,10 @@
                    WHEN   "11"
                        MOVE   "190121110"  TO  STUSAN-TOKUTEI-SRYCD(1)
                    WHEN   "12"
+                       MOVE   "190121210"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                   WHEN   "24"
+                       MOVE   "190121110"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                   WHEN   "25"
                        MOVE   "190121210"  TO  STUSAN-TOKUTEI-SRYCD(1)
                    WHEN   "05"
                        MOVE   "190739910"  TO  STUSAN-TOKUTEI-SRYCD(1)
