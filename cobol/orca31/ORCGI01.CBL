@@ -491,6 +491,7 @@
            03  WRK-ERRMSG                  PIC X(10).
            03  WRK-SKYMONEY                PIC S9(08).
            03  WRK-RJNYMD                  PIC X(08).
+           03  WRK-TOKNYUINCD              PIC X(03).
       *
        01  BAK-AREA.
            03  BAK-AGE-G.
@@ -4262,10 +4263,19 @@
                MOVE    SPA-NAI-I01-IDOYMD
                                    TO  WRK-KIHON-KJNYMD
       *
+               MOVE    SPA-NAI-I01-TOKNYUIN-ORG
+                                   TO  WRK-TOKNYUINCD
                PERFORM 4101-BRMNUM-CHK-SEC
                MOVE    SPA-GMN-I01-BRMNUM
                                        TO  SPA-NAI-I01-BRMNUM-MAE
                MOVE    SPA-ERRCD       TO  SPA-NAI-I01-BRMNUM-ERR
+      *
+               MOVE    WRK-TOKNYUINCD  TO  WRK-CMB-CD
+               PERFORM 4103-CMB-TOKNYUIN-SRH2-SEC
+               IF    ( WRK-CMB-ITM     NOT =   SPACE )
+                   MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-TOKNYUIN
+                   MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-TOKNYUIN-ORG
+               END-IF
                IF    ( SPA-ERRCD   NOT =   SPACE )
                    GO  TO  4101-IDOYMD-CHK-EXT
                END-IF
@@ -4798,6 +4808,22 @@
                        PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    END-EVALUATE
       *
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "11" )
+                    AND  ( SPA-GMN-I01-SYORIKBN-CD NOT =   "01" )
+                       MOVE    "5110"      TO  WRK-KANRICD
+                       MOVE    "24"        TO  WRK-KBNCD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   END-IF
+      *
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "12" )
+                    AND  ( SPA-GMN-I01-SYORIKBN-CD NOT =   "01" )
+                       MOVE    "5110"      TO  WRK-KANRICD
+                       MOVE    "25"        TO  WRK-KBNCD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   END-IF
+      *
                END-IF
            END-IF
       *
@@ -5123,6 +5149,11 @@
                    ELSE
                            MOVE    1   TO  FLG-TARGET
                    END-IF
+               END-IF
+      *
+               IF    ( SPA-GMN-I01-TOKNYUIN-ITM2 (IDX10)
+                                   = "224" OR "225" )
+                           MOVE    ZERO    TO  FLG-TARGET
                END-IF
       *
                IF    ( FLG-TARGET      =   1 )
@@ -8045,7 +8076,6 @@
                        ELSE
                            MOVE    SPA-NAI-I01-NYUINYMD
                                            TO  WRK-NOW-SKYSTYMD
-               DISPLAY "BF:WRK-NOW-SKYSTYMD =" WRK-NOW-SKYSTYMD
                            IF    ( WRK-NOW-SKYSTYMD  <   CONST-H180401 )
                                IF    ( SPA-NAI-I01-DJKBN =   "1" )
                                    MOVE    SPA-NAI-I01-NYUINYMD
@@ -8063,7 +8093,6 @@
            ELSE
                MOVE    SPA-NAI-I01-NYUINYMD
                                        TO  WRK-NOW-SKYSTYMD
-               DISPLAY "BF:WRK-NOW-SKYSTYMD =" WRK-NOW-SKYSTYMD
                IF    ( WRK-NOW-SKYSTYMD  <   CONST-H180401 )
                    IF    ( SPA-NAI-I01-DJKBN   =   "1" )
                        MOVE    SPA-NAI-I01-NYUINYMD
@@ -8076,7 +8105,6 @@
                    END-IF
                END-IF
            END-IF
-               DISPLAY "AF:WRK-NOW-SKYSTYMD =" WRK-NOW-SKYSTYMD
       *
            .
        4801-SKYSTYMD-GET-EXT.
