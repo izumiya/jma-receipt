@@ -1117,7 +1117,10 @@
       *
                MOVE    SYSKANRI-REC    TO  SYS-5110-REC
       *
-               IF    ( SYS-5110-SEIKATU-RYOKBN =   SPACE )
+               IF    ( SYS-5110-SEIKATU-RYOKBN NOT =   SPACE )
+                OR   ( SYS-5110-KBNCD  =   "24" OR "25" )
+                   CONTINUE
+               ELSE
       *
                    COMPUTE IDX-CMB =   IDX-CMB +   1
                    MOVE    IDX-CMB     TO  SPA-GMN-W20-TOKNYUIN-MAX
