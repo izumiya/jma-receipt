@@ -263,14 +263,8 @@
                GO  TO  2100-KONKAI-NYUIN-TUSAN-EXT
            END-IF
       *
-           IF    ( PTNYUINRRK-TOKUTEI-KBN   =   "2" )
-            AND  ( PTNYUINRRK-TOKUTEI-NYUIN =   "24" OR "25" )
-               MOVE    1               TO  FLG-SEISINZOUAKU
-               MOVE    SDNTCHK-STYMD   TO  WRK-SZYMD
-               IF    ( SDNTCHK-STYMD   <   PTNYUINRRK-TENNYUYMD )
-                   MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  WRK-SZYMD
-               END-IF
+           IF    ( WRK-SZYMD            <  SDNTCHK-STYMD )
+               MOVE    SDNTCHK-STYMD       TO  WRK-SZYMD
            END-IF
       *
            IF    ( PTNYUINRRK-NYUINYMD <=  STUSAN-KJNYMD )
@@ -368,27 +362,61 @@
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
-           IF    ( FLG-PTNYUINRRK      =   ZERO )
-               MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
-               MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
-               MOVE    "key4"          TO  MCP-PATHNAME
-               MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
-               PERFORM 910-DBSELECT-SEC
-               IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
-               ELSE
-                   MOVE    1           TO  FLG-PTNYUINRRK
-               END-IF
-      *
-               MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
-               MOVE    "key4"          TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
-           END-IF
-      *
            IF    ( FLG-PTNYUINRRK  NOT =   ZERO )
                MOVE    03              TO  STUSAN-RC
                GO  TO  2110-NYUINRRK-SEL-EXT
            END-IF
+      *
+           MOVE    ALL "0"             TO  WRK-SZYMD
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
+           MOVE    "key4"          TO  MCP-PATHNAME
+           MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
+      *
+               IF    ( PTNYUINRRK-TOKUTEI-KBN   =   "2" )
+                AND  ( PTNYUINRRK-TOKUTEI-NYUIN =   "24" OR "25" )
+                   MOVE    1           TO  FLG-SEISINZOUAKU
+                   MOVE    PTNYUINRRK-TENNYUYMD
+                                       TO  WRK-SZYMD
+               END-IF
+           ELSE
+                   MOVE    1           TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           IF    ( FLG-SEISINZOUAKU    =   1 )
+      *
+               PERFORM UNTIL ( FLG-PTNYUINRRK   NOT =   ZERO )
+                   IF    ( PTNYUINRRK-TOKUTEI-KBN   =   "2" )
+                    AND  ( PTNYUINRRK-TOKUTEI-NYUIN =   "24" OR "25" )
+                       MOVE    PTNYUINRRK-TENNYUYMD
+                                       TO  WRK-SZYMD
+                   ELSE
+                       MOVE    1       TO  FLG-PTNYUINRRK
+                   END-IF
+      *
+                   MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
+                   MOVE    "key4"          TO  MCP-PATHNAME
+                   PERFORM 910-DBFETCH-SEC
+                   IF    ( MCP-RC          =   ZERO )
+                       MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
+                   ELSE
+                       MOVE    1           TO  FLG-PTNYUINRRK
+                   END-IF
+      *
+               END-PERFORM
+           END-IF
+      *
+           DISPLAY "WRK-SZYMD =" WRK-SZYMD
+      *
+           MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+           MOVE    "key4"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
        2110-NYUINRRK-SEL-EXT.
