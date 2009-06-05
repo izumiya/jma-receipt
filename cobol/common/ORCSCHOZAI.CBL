@@ -821,7 +821,9 @@
                IF      PTNYUINRRK-NYUINYMD(1:6)  =   ORCSCHO-SRYYM
                    MOVE    PTNYUINRRK-NYUINYMD(7:2)  TO  IDX-S
       *            当月入院日
-                   MOVE    1                         TO  FLG-NYUIN01
+                   IF      IDX-S                 =   1
+                       MOVE    1                         TO  FLG-NYUIN01
+                   END-IF
                END-IF
                IF      PTNYUINRRK-NYUINYMD(1:6)  <   ORCSCHO-SRYYM
                    MOVE    1                         TO  IDX-S
