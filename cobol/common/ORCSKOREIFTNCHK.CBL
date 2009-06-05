@@ -291,7 +291,7 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                          (WRK-DOTANDOKU(4)         =  ZERO   ))
                      OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"    ) AND
                          (COMB-KOH1HKNNUM          = "151"   ) AND
-                         (LNK-KOREIFTNCHK-SRYYM   >= "200907"))
+                         (LNK-KOREIFTNCHK-SRYYM   >= "200905"))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    END-IF
@@ -725,6 +725,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                      OR ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
                      OR ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
                      OR ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
+                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"  ) AND
+                         (SYU-KOH-HKNNUM(1)        = "151" ) AND
+                         (LNK-KOREIFTNCHK-SRYYM >= "200905"))
       ***              PERFORM   22012-NYUIN-KOREI-HEN2-SEC
                        CONTINUE
                      ELSE
@@ -1082,6 +1085,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    OR  ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
                    OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
                    OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
+                   OR  ((LNK-KOREIFTNCHK-PREFNUM  = "13"  ) AND
+                        (SYU-KOH-HKNNUM(1)        = "151" ) AND
+                        (LNK-KOREIFTNCHK-SRYYM >= "200905"))
       ***            IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
       ***               MOVE   6000      TO   WRK-KINGAKU
       ***            ELSE
