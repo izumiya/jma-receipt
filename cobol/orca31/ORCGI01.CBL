@@ -13886,10 +13886,6 @@
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-      *              急性増悪の転棟時通算日数クリア
-                 IF     PTNYUINRRK-TOKUTEI-NYUIN  =  "24"
-                     MOVE    ZERO   TO   STUSAN-NISSU07
-                 END-IF
                  IF     STUSAN-NISSU07      <=  29
                      ADD    1           TO  TN-IDX
                      MOVE   "190121110" TO   LNK-SCNYUACCT-KAGEN-SRYCD
@@ -13945,10 +13941,6 @@
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-      *              急性増悪の転棟時通算日数クリア
-                 IF     PTNYUINRRK-TOKUTEI-NYUIN  =  "25"
-                     MOVE    ZERO   TO   STUSAN-NISSU07
-                 END-IF
                  IF     STUSAN-NISSU07      <=  29
                      ADD    1           TO  TN-IDX
                      MOVE   "190121210" TO   LNK-SCNYUACCT-KAGEN-SRYCD
