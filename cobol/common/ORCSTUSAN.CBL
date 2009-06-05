@@ -63,6 +63,7 @@
            03  FLG-SENTEICDCHG             PIC 9(01).
            03  FLG-TOKUTEI                 PIC 9(01).
            03  FLG-TOKUTEI-SITEI           PIC 9(01).
+           03  FLG-SEISINZOUAKU            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -82,6 +83,12 @@
            03  WRK-EDYMD                   PIC X(08).
            03  WRK-STSRYYM                 PIC X(06).
            03  WRK-EDSRYYM                 PIC X(06).
+           03  WRK-EDSRYYMD.
+               05  WRK-EDSRYYMD-YM         PIC X(06).
+               05  WRK-EDSRYYMD-DD         PIC 9(02).
+           03  WRK-ACCTYMD.
+               05  WRK-ACCTYMD-YM          PIC X(06).
+               05  WRK-ACCTYMD-DD          PIC 9(02).
            03  WRK-NISSU-G.
                05  WRK-NISSU               PIC 9(05).
                05  WRK-NISSU1              PIC 9(05).
@@ -99,6 +106,7 @@
                05  WRK-DAY-9               PIC 9(02).
            03  WRK-SRYYMD                  PIC X(08). 
            03  WRK-KONKAI-NYUINYMD         PIC X(08).
+           03  WRK-SZYMD                   PIC X(08).
       *
        01  CONST-AREA.
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
@@ -255,6 +263,16 @@
                GO  TO  2100-KONKAI-NYUIN-TUSAN-EXT
            END-IF
       *
+           IF    ( PTNYUINRRK-TOKUTEI-KBN   =   "2" )
+            AND  ( PTNYUINRRK-TOKUTEI-NYUIN =   "24" OR "25" )
+               MOVE    1               TO  FLG-SEISINZOUAKU
+               MOVE    SDNTCHK-STYMD   TO  WRK-SZYMD
+               IF    ( SDNTCHK-STYMD   <   PTNYUINRRK-TENNYUYMD )
+                   MOVE    PTNYUINRRK-TENNYUYMD
+                                       TO  WRK-SZYMD
+               END-IF
+           END-IF
+      *
            IF    ( PTNYUINRRK-NYUINYMD <=  STUSAN-KJNYMD )
            AND   ( PTNYUINRRK-TAIINYMD >=  STUSAN-KJNYMD )
       *
@@ -347,6 +365,23 @@
       *
                MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
                MOVE    "key17"          TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
+           IF    ( FLG-PTNYUINRRK      =   ZERO )
+               MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
+               MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
+               MOVE    "key4"          TO  MCP-PATHNAME
+               MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
+               ELSE
+                   MOVE    1           TO  FLG-PTNYUINRRK
+               END-IF
+      *
+               MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
+               MOVE    "key4"          TO  MCP-PATHNAME
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
@@ -608,6 +643,9 @@
                MOVE    31                  TO  WRK-EDIDX
            END-IF
       *
+           MOVE    WRK-EDYMD           TO  WRK-EDSRYYMD-YM
+           MOVE    WRK-EDIDX           TO  WRK-EDSRYYMD-DD
+      *
            PERFORM VARYING IDX1    FROM    WRK-STIDX   BY  1
                    UNTIL ( IDX1    >       WRK-EDIDX )
                IF    ( NACCT-DAY (IDX1)    >   ZERO )
@@ -641,8 +679,19 @@
                             AND  ( STUSAN-KJNYMD (7:2) =   WRK-DAY-X   )
                                CONTINUE
                            ELSE
-                               COMPUTE WRK-ACCT-TOK-NISSU2
-                                   =   WRK-ACCT-TOK-NISSU2 +   1
+                               IF    ( FLG-SEISINZOUAKU    =   ZERO )
+                                   COMPUTE WRK-ACCT-TOK-NISSU2
+                                       =   WRK-ACCT-TOK-NISSU2 +   1
+                               ELSE
+                                   MOVE    NACCT-SRYYM
+                                                   TO  WRK-ACCTYMD-YM
+                                   MOVE    IDX1    TO  WRK-ACCTYMD-DD
+                                   IF    ( WRK-SZYMD    <=  WRK-ACCTYMD)
+                                    AND  ( WRK-EDSRYYMD >=  WRK-ACCTYMD)
+                                       COMPUTE WRK-ACCT-TOK-NISSU2
+                                           =   WRK-ACCT-TOK-NISSU2 +   1
+                                   END-IF
+                               END-IF
                            END-IF
                        END-IF
                    END-IF
