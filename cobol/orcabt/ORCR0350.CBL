@@ -226,6 +226,8 @@
       *                                     象外区分の追加
       *  04.02.14    NACL-藤原    09/05/29  コメントが基本項目より先にある
       *                                     場合の記載の修正
+      *  04.02.15    NACL-藤原    09/05/22  通則加算項目の加減算コードの
+      *                                     基本項目単位の記録
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -442,6 +444,7 @@
            03  IDZ6                    PIC 9(03).
            03  IDYY                    PIC 9(03).
            03  IDZZ                    PIC 9(03).
+           03  IDWW                    PIC 9(03).
       *
            03  SYSKAN-IDX              PIC 9(03).
       *    
@@ -800,6 +803,11 @@
            03  TBL-COMMENT-REC                  OCCURS  100.
                05  TBL-COMMENT-SRYCD            PIC  X(09).
                05  TBL-COMMENT-NAME             PIC  X(200).
+      *
+      *    診療行為データ用テーブル（通則加算項目の加減算コード）
+       01  WRK-KOUI-KASAN-TAIHI-AREA.
+           03  WRK-KOUI-KASAN-TAIHI-TABLE       OCCURS  10.
+               05  WRK-KOUI-KASAN-TAIHI-REC     PIC X(500).
       *
       *    診療行為データ用テーブル（告示等識別区分による記録順）
        01  WRK-KOUI-TAIHI-AREA.
@@ -4369,6 +4377,7 @@
        20074-ZAI-KOUI-SORT-SEC          SECTION.
       *
            INITIALIZE                   WRK-KOUI-AREA
+                                        WRK-KOUI-KASAN-TAIHI-AREA
                                         WRK-KOUI-TAIHI-AREA
                                         WRK-KOUI-SRY-TAIHI-AREA
       *
@@ -4385,23 +4394,35 @@
            END-IF
       *
            MOVE    ZERO                TO  IDY
+                                           IDWW
       *
-      *    コメントを最初に編集（手術のとき）
-           IF      RECE641-SRYKBN      =   "50"
-             PERFORM VARYING IDX     FROM    1   BY  1
+           PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >       WRK-TBLMAX1
-               EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
-                   WHEN    SPACE
-                       CONTINUE
-                   WHEN    "0"
-                   WHEN    "8" 
-                       ADD     1                           TO  IDY
-                       MOVE    TBL-KOUI-REC          (IDX) TO
-                                       WRK-KOUI-TAIHI-REC    (IDY)
-                       INITIALIZE      TBL-KOUI-REC (IDX)
-                 END-EVALUATE
-              END-PERFORM
-           END-IF
+      *
+      *        加減算コード（通則加算項目）があるか
+               IF    ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                                           =   "9"         )
+               AND   ( TBL-KOUI-TENSIKIBETU   (IDX)
+                                           =   "5" OR  "6" )
+                   ADD     1                   TO  IDWW
+                   MOVE    TBL-KOUI-REC  (IDX) TO
+                                   WRK-KOUI-KASAN-TAIHI-REC (IDWW)
+               END-IF
+      *
+      *        コメントを最初に編集（手術のとき）
+               IF      RECE641-SRYKBN      =   "50"
+                   EVALUATE    TBL-KOUI-SRYCD (IDX) (1:1)
+                       WHEN    SPACE
+                           CONTINUE
+                       WHEN    "0"
+                       WHEN    "8" 
+                           ADD     1                           TO  IDY
+                           MOVE    TBL-KOUI-REC          (IDX) TO
+                                           WRK-KOUI-TAIHI-REC    (IDY)
+                           INITIALIZE      TBL-KOUI-REC (IDX)
+                   END-EVALUATE
+               END-IF
+           END-PERFORM
       *
       *    基本項目毎に並び替えをする
            MOVE    1                   TO  IDX
@@ -4564,6 +4585,7 @@
                                OR      WRK-KOUI-SRY-TAIHI-SRYCD (IDZZ)
                                                                   (1:1)
                                                    NOT =   "1"
+                           MOVE    ZERO            TO  IDZ
                            EVALUATE    WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN1
                                                                 (IDZZ)
                                WHEN    "1"
@@ -4611,14 +4633,23 @@
                                      END-IF
                                    END-IF   
                                WHEN    "9" 
-                                   MOVE    4               TO  IDZ  
+                                   IF   ( WRK-KOUI-SRY-TAIHI-TENSIKIBETU 
+                                                               (IDZZ)
+                                           =   "5" OR  "6" )
+                                       MOVE    ZERO        TO  IDZ
+                                   ELSE
+                                       MOVE    4           TO  IDZ
+                                   END-IF  
                            END-EVALUATE
-                           ADD     1           TO  WRK-KOUI-TBLMAX (IDZ)
-                           MOVE    WRK-KOUI-TBLMAX (IDZ)
-                                               TO  IDYY
-                           MOVE    WRK-KOUI-SRY-TAIHI-REC (IDZZ)
-                                               TO
+                           IF      IDZ         >   ZERO
+                               ADD     1           TO
+                                               WRK-KOUI-TBLMAX (IDZ)
+                               MOVE    WRK-KOUI-TBLMAX (IDZ)
+                                                   TO  IDYY
+                               MOVE    WRK-KOUI-SRY-TAIHI-REC (IDZZ)
+                                                   TO
                                                WRK-KOUI-REC (IDZ IDYY)
+                           END-IF
                            COMPUTE IDZZ    =   IDZZ    +   1
                        END-PERFORM
                END-EVALUATE
@@ -4671,6 +4702,15 @@
                                            TO  WRK-KOUI-TAIHI-REC  (IDY)
                    MOVE    IDY             TO  WRK-SRYCD1-MAX
                END-PERFORM
+           END-PERFORM
+      *
+      *    加減算コードの通則加算項目の編集
+           PERFORM VARYING IDY1    FROM    1   BY  1
+                   UNTIL   IDY1    >       IDWW
+               ADD     1               TO  IDY
+               MOVE    WRK-KOUI-KASAN-TAIHI-REC (IDY1)
+                                       TO  WRK-KOUI-TAIHI-REC  (IDY)
+               MOVE    IDY             TO  WRK-SRYCD1-MAX
            END-PERFORM
       *
            INITIALIZE                   WRK-KOUI-AREA
