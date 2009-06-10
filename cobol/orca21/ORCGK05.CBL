@@ -1993,6 +1993,7 @@
        2002-GMNSPA-SET-SEC               SECTION.
       *
            IF      K05-SETCODE         =   SPA-MAE-SETCODE
+           AND    (SPA-K05-SYORI   NOT =   SPACE )
                MOVE    ZERO                TO  FLG-IN-SETCODE
            ELSE
                MOVE    1                   TO  FLG-IN-SETCODE
@@ -5879,6 +5880,7 @@
                MOVE    SPA-GMN-SETCODE     TO  WRK-SETCODE
                PERFORM 310-SPA-INITSET-SEC
                MOVE    WRK-SETCODE         TO  SPA-MAE-SETCODE
+               MOVE    SPACE               TO  SPA-K05-SYORI
                GO      TO      41002-KOUSIN-SYORI-EXT
            END-IF
       *
