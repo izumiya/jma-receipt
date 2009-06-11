@@ -254,6 +254,7 @@
       *  04.04.04    NACL-ÌçÏÆ    09/05/12  ÆüÊÌ·×»»½¤Àµ
       *  04.04.05    NACL-ÌçÏÆ    09/06/01  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *                                     ¡ÊÅìµþÅÔ£±£µ£±¡Ë
+      *  04.04.06    NACL-ÌçÏÆ    09/06/11  £·£°ºÐÌ¤Ëþ¤Î¹â³Û·×»»ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -612,6 +613,10 @@
                05  WK-MARUKO-XX            PIC  9(09).
                05  WK-MARUKO-COMPFTN       PIC  9(09).
                05  WK-MARUKO-COMPFTN-E     PIC  9(09)V9(01).
+      *
+           03  WK-GEN70-YMD.
+               05  WK-GEN70-YM             PIC  9(06).
+               05  WK-GEN70-DD             PIC  9(02).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -3352,6 +3357,7 @@
       *
       *    £·£°ºÐÌ¤Ëþ¹â³Û¸½ÊªµëÉÕÂÐ¾Ý¼Ô
            MOVE      ZERO     TO    FLG-GENBUTU70
+           MOVE      SPACE    TO    WK-GEN70-YMD
            IF     LNK-SYU-SRYYMD(1:6)       >=  "200704"
              IF  (LNK-S02-KOUREI-NYUIN-KBN   =   "1"     )
              OR  (COMB-HKNNUM                =   SPACE   )
@@ -3413,6 +3419,21 @@
                IF    FLG-GENBUTU70      =  ZERO
                  IF  FLG-MARUKO     NOT =  ZERO
                     MOVE    FLG-MARUKO      TO  FLG-GENBUTU70
+                 END-IF
+               END-IF
+      *
+               IF    FLG-GENBUTU70  NOT =  ZERO
+                 IF   (FLG-TOKUSITU   NOT =  ZERO)
+                 OR   (FLG-MARUKO     NOT =  ZERO)
+                   MOVE  LNK-SYU-SRYYMD(1:6)    TO  WK-GEN70-YM
+                   MOVE  01                     TO  WK-GEN70-DD
+                 ELSE
+                   MOVE  LNK-SYU-SRYYMD(1:6)    TO  WK-GEN70-YM
+                   IF   PTKOH-TEKSTYMD(1:6)  >=  LNK-SYU-SRYYMD(1:6)
+                      MOVE  PTKOH-TEKSTYMD(7:2) TO  WK-GEN70-DD
+                   ELSE
+                      MOVE  01                  TO  WK-GEN70-DD
+                   END-IF
                  END-IF
                END-IF
       *
@@ -5797,8 +5818,8 @@
                   END-IF
                   MOVE    PTHKN-HKNJANUM   TO    WK-HKNJANUM
                   MOVE    PTHKN-HONKZKKBN  TO    WK-HONKZKKBN
-                  MOVE    PTHKN-KIGO       TO    WK-KIGO
-                  MOVE    PTHKN-NUM        TO    WK-NUM
+      ***         MOVE    PTHKN-KIGO       TO    WK-KIGO
+      ***         MOVE    PTHKN-NUM        TO    WK-NUM
                   MOVE    PTHKN-CONTKBN    TO    WK-CONTKBN
                   MOVE    PTHKN-TEKSTYMD   TO    WK-TOKU75-TEKSTYMD
                   MOVE    PTHKN-TEKEDYMD   TO    WK-TOKU75-TEKEDYMD
@@ -9138,8 +9159,8 @@
                  IF      FLG-PTHKNINF   =     ZERO
                     MOVE  PTHKN-HKNJANUM    TO    WK-HKNJANUM2
                     MOVE  PTHKN-HONKZKKBN   TO    WK-HONKZKKBN2
-                    MOVE  PTHKN-KIGO        TO    WK-KIGO2
-                    MOVE  PTHKN-NUM         TO    WK-NUM2
+      ***           MOVE  PTHKN-KIGO        TO    WK-KIGO2
+      ***           MOVE  PTHKN-NUM         TO    WK-NUM2
                     MOVE  PTHKN-CONTKBN     TO    WK-CONTKBN2
                  END-IF
              END-IF.
@@ -9157,7 +9178,8 @@
               END-IF
            END-IF.
       *
-           IF   LNK-S02-KOUREI-NYUIN-KBN   =  "1"
+           IF  (LNK-S02-KOUREI-NYUIN-KBN   =   "1" )
+           OR  (COMB-HKNNUM                =  "060")
               IF   WK-HKNJANUM2  = WK-HKNJANUM
                 MOVE  WK-HONKZKKBN  TO  WK-HONKZKKBN2
                 MOVE  WK-KIGO       TO  WK-KIGO2
@@ -9207,6 +9229,23 @@
                    END-IF
                  END-IF
            END-EVALUATE.
+      *
+           IF  FLG-GENBUTU70    NOT =  ZERO
+             IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+               IF (COMB-KOH1HKNNUM = "972" OR "974")
+               OR (COMB-KOH2HKNNUM = "972" OR "974")
+               OR (COMB-KOH3HKNNUM = "972" OR "974")
+               OR (COMB-KOH4HKNNUM = "972" OR "974")
+                 CONTINUE
+               ELSE
+                 IF  SYU-SRYYMD  <  WK-GEN70-YMD
+                    MOVE   "9"   TO   WK-HONKZKKBN2
+                    MOVE  SPACE  TO   WK-KIGO2
+                    MOVE  SPACE  TO   WK-NUM2
+                 END-IF
+               END-IF
+             END-IF
+           END-IF.
       *
       *    ¸øÈñ£É£ÄÊÔ½¸
            PERFORM  22014-KOHID-HENSYU-SEC.
