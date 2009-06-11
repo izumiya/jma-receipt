@@ -237,6 +237,8 @@
       *                                     場合の記載の修正
       *  04.04.04    NACL-藤原    09/05/22  通則加算項目の加減算コードの
       *                                     基本項目単位の記録
+      *  04.04.05    NACL-藤原    09/06/10  １３医学管理、１４在宅の点数、
+      *                                     回数の記載の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4199,7 +4201,7 @@
                IF    ( RECE641-SRYKBN      =   "13"  OR  "14" )
                    IF      TBL-KOUI-KOKUJISKBKBN1(WRK-TBLMAX1)
                                            NOT =   "1"
-                       MOVE    IDX             TO  FLG-KOKUJISKBKBN1
+                       MOVE    WRK-TBLMAX1         TO  FLG-KOKUJISKBKBN1
                    END-IF
                    IF    ( TBL-KOUI-KOKUJISKBKBN1(WRK-TBLMAX1)
                                                    =   "1" )
