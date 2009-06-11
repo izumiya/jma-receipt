@@ -59,6 +59,8 @@
       *  04.03.05    NACL-ÌçÏÆ    09/01/13  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.06    NACL-ÌçÏÆ    09/03/10  È½Äê¾ò·ï½¤Àµ
       *  04.03.07    NACL-ÌçÏÆ    09/03/13  Á°´ü¹âÎð¼Ô¤Î¹â³Û·×»»ÂÐ±þ
+      *
+      *  04.04.01    NACL-ÌçÏÆ    09/06/11  £·£°ºÐÌ¤Ëþ¤Î¹â³Û·×»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1136,8 +1138,8 @@
            MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM
            MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM
            MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN
-           MOVE     PTHKN-KIGO           TO  WRK-KIGO
-           MOVE     PTHKN-NUM            TO  WRK-NUM
+      ***  MOVE     PTHKN-KIGO           TO  WRK-KIGO
+      ***  MOVE     PTHKN-NUM            TO  WRK-NUM
            MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN
            MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD
       *
@@ -1147,8 +1149,8 @@
            MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM2
            MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM2
            MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN2
-           MOVE     PTHKN-KIGO           TO  WRK-KIGO2
-           MOVE     PTHKN-NUM            TO  WRK-NUM2
+      ***  MOVE     PTHKN-KIGO           TO  WRK-KIGO2
+      ***  MOVE     PTHKN-NUM            TO  WRK-NUM2
            MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN2
            MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD2
       *
@@ -1161,7 +1163,8 @@
               END-IF
            END-IF
       *
-           IF   SYU-SKJ-FTNDAY(1) =  1  OR  2
+           IF  (SYU-SKJ-FTNDAY(1) =  1  OR  2)
+           OR  (WRK-HKNNUM        =  "060"   )
               IF   WRK-HKNJANUM2  =  WRK-HKNJANUM
                 MOVE  WRK-HONKZKKBN  TO  WRK-HONKZKKBN2
                 MOVE  WRK-KIGO       TO  WRK-KIGO2
