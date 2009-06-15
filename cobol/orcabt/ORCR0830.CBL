@@ -58,6 +58,7 @@
       *  04.02.03    NACL-ÌçÏÆ    08/06/17  Æþ±¡ÎÁÌ¤»»ÄêÆüÂÐ±þ
       *
       *  04.04.01    NACL-ÌçÏÆ    09/01/23  Æþ±¡ÎÁ»»ÄêÊÝ¸±°Ê³°¤Î¿ÇÎÅÊ¬¼ÂÆü¿ô»»ÄêÂÐ±þ
+      *  04.04.02    NACL-ÌçÏÆ    09/06/12  ÎÅÍÜ´ü´Ö¤ÎÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -113,6 +114,7 @@
            03  FLG-NYURYAKUSHO                         PIC 9(01).
            03  FLG-KYUKYU                              PIC 9(01).
            03  FLG-SET                                 PIC 9(01).
+           03  FLG-OKIKAE                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -126,6 +128,7 @@
            03  IDX1                                    PIC 9(03).
            03  IDX2                                    PIC 9(03).
            03  IDX3                                    PIC 9(02).
+           03  IDX4                                    PIC 9(02).
            03  IDY                                     PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  ID1                                     PIC 9(03).
@@ -217,6 +220,11 @@
            03  WRK-NYUINDAY-TANKI2-TBL.
                05  WRK-NYUINDAY-TANKI2-KBN             PIC X(01)
                                                        OCCURS  31.
+      *
+           03  WRK-STDAY                               PIC  9(02).
+           03  WRK-STDAY2                              PIC  9(02).
+           03  WRK-EDDAY                               PIC  9(02).
+           03  WRK-EDDAY2                              PIC  9(02).
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC  9(07).
@@ -2030,6 +2038,151 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE  SPACE  TO  TBL-JNISSU-DAY(IDY)
                 END-IF
            END-PERFORM
+      *
+           IF   (RECE82-RYOSTYMD   =   SPACE)
+           AND  (RECE82-RYOEDYMD   =   SPACE)
+      *
+      *      ½éÎò¤¬Æ±¤¸ÍúÎò¤ÎÈÏ°Ï¡Ê£¹£¹£¹¡Ë¤ÇÃÖ¤­´¹¤¨
+             MOVE    ZERO   TO  FLG-OKIKAE
+             MOVE    ZERO   TO  WRK-STDAY
+             MOVE    ZERO   TO  WRK-STDAY2
+             MOVE    ZERO   TO  WRK-EDDAY
+             MOVE    ZERO   TO  WRK-EDDAY2
+             MOVE    ZERO   TO  IDX4
+             PERFORM    VARYING    IDY    FROM    1   BY   1
+                         UNTIL     IDY     >     31
+                 IF      RECE82-DAY (IDY) =  RECE82-HKNCOMBI
+                     MOVE    IDY   TO   WRK-STDAY
+                     MOVE    31    TO   IDY
+                 END-IF
+             END-PERFORM
+             IF  WRK-STDAY >  1
+               COMPUTE  IDX4 = WRK-STDAY - 1
+               PERFORM    VARYING    IDY    FROM    1   BY   1
+                           UNTIL     IDY     >    IDX4
+                 IF      RECE82-DAY (IDY) =  999
+                     MOVE    IDY   TO   WRK-STDAY2
+                     MOVE    31    TO   IDY
+                 END-IF
+               END-PERFORM
+               IF  WRK-STDAY2  NOT = ZERO
+                 PERFORM  VARYING    IDY    FROM  WRK-STDAY2  BY   1
+                           UNTIL     IDY     >    IDX4
+                   IF    TBL-JNISSU-DAY(IDY)  NOT =  SPACE
+                     MOVE     1    TO   FLG-OKIKAE
+                     MOVE    31    TO   IDY
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-IF
+      *
+             PERFORM    VARYING    IDY    FROM   31   BY  -1
+                         UNTIL     IDY     <      1
+                 IF      RECE82-DAY (IDY) =  RECE82-HKNCOMBI
+                     MOVE    IDY   TO   WRK-EDDAY
+                     MOVE     1    TO   IDY
+                 END-IF
+             END-PERFORM
+             IF  WRK-EDDAY < 31
+               COMPUTE  IDX4 = WRK-EDDAY + 1
+               PERFORM    VARYING    IDY    FROM   31   BY  -1
+                           UNTIL     IDY     <    IDX4
+                 IF      RECE82-DAY (IDY) =  999
+                     MOVE    IDY   TO   WRK-EDDAY2
+                     MOVE     1    TO   IDY
+                 END-IF
+               END-PERFORM
+               IF  WRK-EDDAY2  NOT = ZERO
+                 PERFORM  VARYING    IDY    FROM  WRK-EDDAY2  BY  -1
+                           UNTIL     IDY     <    IDX4
+                   IF    TBL-JNISSU-DAY(IDY)  NOT =  SPACE
+                     MOVE     1    TO   FLG-OKIKAE
+                     MOVE     1    TO   IDY
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-IF
+      *
+             IF     FLG-OKIKAE  =   1
+               IF  WRK-STDAY2  NOT = ZERO
+                  MOVE  RECE82-HKNCOMBI  TO  RECE82-DAY(WRK-STDAY2)
+               END-IF
+               IF  WRK-EDDAY2  NOT = ZERO
+                  MOVE  RECE82-HKNCOMBI  TO  RECE82-DAY(WRK-EDDAY2)
+               END-IF
+             END-IF
+      *
+      *      Æ±·î¤ÎÍúÎò¤ÎÈÏ°Ï¡Ê£¹£¹£¹¡¦£¹£¹£¸¡Ë¤ÇÃÖ¤­´¹¤¨
+             MOVE    ZERO   TO  FLG-OKIKAE
+             MOVE    ZERO   TO  WRK-STDAY
+             MOVE    ZERO   TO  WRK-STDAY2
+             MOVE    ZERO   TO  WRK-EDDAY
+             MOVE    ZERO   TO  WRK-EDDAY2
+             MOVE    ZERO   TO  IDX4
+             PERFORM    VARYING    IDY    FROM    1   BY   1
+                         UNTIL     IDY     >     31
+                 IF      RECE82-DAY (IDY) =  RECE82-HKNCOMBI
+                     MOVE    IDY   TO   WRK-STDAY
+                     MOVE    31    TO   IDY
+                 END-IF
+             END-PERFORM
+             IF  WRK-STDAY >  1
+               COMPUTE  IDX4 = WRK-STDAY - 1
+               PERFORM    VARYING    IDY    FROM    1   BY   1
+                           UNTIL     IDY     >    IDX4
+                 IF      RECE82-DAY (IDY) =  999 OR 998
+                     MOVE    IDY   TO   WRK-STDAY2
+                     MOVE    31    TO   IDY
+                 END-IF
+               END-PERFORM
+               IF  WRK-STDAY2  NOT = ZERO
+                 PERFORM  VARYING    IDY    FROM  WRK-STDAY2  BY   1
+                           UNTIL     IDY     >    IDX4
+                   IF    TBL-JNISSU-DAY(IDY)  NOT =  SPACE
+                     MOVE     1    TO   FLG-OKIKAE
+                     MOVE    31    TO   IDY
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-IF
+      *
+             PERFORM    VARYING    IDY    FROM   31   BY  -1
+                         UNTIL     IDY     <      1
+                 IF      RECE82-DAY (IDY) =  RECE82-HKNCOMBI
+                     MOVE    IDY   TO   WRK-EDDAY
+                     MOVE     1    TO   IDY
+                 END-IF
+             END-PERFORM
+             IF  WRK-EDDAY < 31
+               COMPUTE  IDX4 = WRK-EDDAY + 1
+               PERFORM    VARYING    IDY    FROM   31   BY  -1
+                           UNTIL     IDY     <    IDX4
+                 IF      RECE82-DAY (IDY) =  999 OR 998
+                     MOVE    IDY   TO   WRK-EDDAY2
+                     MOVE     1    TO   IDY
+                 END-IF
+               END-PERFORM
+               IF  WRK-EDDAY2  NOT = ZERO
+                 PERFORM  VARYING    IDY    FROM  WRK-EDDAY2  BY  -1
+                           UNTIL     IDY     <    IDX4
+                   IF    TBL-JNISSU-DAY(IDY)  NOT =  SPACE
+                     MOVE     1    TO   FLG-OKIKAE
+                     MOVE     1    TO   IDY
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-IF
+      *
+             IF     FLG-OKIKAE  =   1
+               IF  WRK-STDAY2  NOT = ZERO
+                  MOVE  RECE82-HKNCOMBI  TO  RECE82-DAY(WRK-STDAY2)
+               END-IF
+               IF  WRK-EDDAY2  NOT = ZERO
+                  MOVE  RECE82-HKNCOMBI  TO  RECE82-DAY(WRK-EDDAY2)
+               END-IF
+             END-IF
+      *
+           END-IF
       *
            PERFORM    VARYING    IDY    FROM    1   BY   1
                           UNTIL      IDY    >     31
