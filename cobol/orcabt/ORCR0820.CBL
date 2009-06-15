@@ -39,6 +39,7 @@
       *  03.05.01    NACL-門脇    07/06/01  グループ診療対応
       *  03.05.02    NACL-藤原    07/06/01  realtime preview 処理追加
       *  04.01.01    NACL-門脇    07/11/01  公務災害対応
+      *  04.03.01    NACL-門脇    09/06/12  療養期間の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -113,6 +114,7 @@
            03  FLG-PTNYUINRRK22        PIC 9(01).
            03  FLG-JYURRKCHECK         PIC 9(01).
            03  FLG-JYURRK              PIC 9(01).
+           03  FLG-RRKOK               PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -129,6 +131,9 @@
            03  IDX3                    PIC 9(03). 
            03  IDX4                    PIC 9(02).
            03  IDX5                    PIC 9(02).
+           03  IDX6                    PIC 9(02).
+           03  IDX7                    PIC 9(02).
+           03  IDX8                    PIC 9(02).
            03  IDX-ROU                 PIC 9(02).
       *
        01  WRK-AREA.
@@ -435,6 +440,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SRYYMD
                    MOVE    WRK-SRYDD           TO  IDX5
                END-IF
+      *
+               MOVE    ZERO      TO   FLG-RRKOK
       *        保険組合せのチェック（会計に対象の組合せがないときは全て）
                IF      RECE82-DAY-AREA     =   ALL "0"
                    MOVE    "1"   TO   RECE82-NYUINRYOFLG
@@ -464,10 +471,20 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                            UNTIL   IDX >       IDX5
                        IF      RECE82-DAY (IDX)
                                            =   RECE82-HKNCOMBI
+                           MOVE    1     TO    FLG-RRKOK
                            PERFORM 21011-PTNYUINRRK-HENSYU-SEC
                            MOVE   IDX5                 TO  IDX
                        END-IF
                    END-PERFORM
+      *
+                   IF  FLG-RRKOK  =  ZERO
+                     PERFORM VARYING IDX FROM  IDX4    BY  1
+                             UNTIL   IDX >     IDX5
+                        IF  RECE82-DAY(IDX)  NOT =  999
+                           MOVE   998    TO   RECE82-DAY(IDX)
+                        END-IF
+                     END-PERFORM
+                   END-IF
                END-IF        
       *                 
                PERFORM 900-PTNYUINRRK-KEY23-READ-SEC
@@ -570,6 +587,26 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                            TO  RECE88-NYUINCHUKBN
                WRITE   RECE88-REC
                ADD     1                   TO  CNT-RECE88
+      *
+               IF  FLG-RRKOK  =  1
+                 IF  PTNYUINRRK-NYUINYMD(1:6)  <  RECE82-SRYYM
+                     MOVE     1                      TO  IDX6
+                 ELSE
+                     MOVE  PTNYUINRRK-NYUINYMD(7:2)  TO  IDX6
+                 END-IF 
+                 IF  PTNYUINRRK-TAIINYMD(1:6)  >  RECE82-SRYYM
+                     MOVE    31                      TO  IDX7
+                 ELSE
+                     MOVE  PTNYUINRRK-TAIINYMD(7:2)  TO  IDX7
+                 END-IF
+                 PERFORM VARYING IDX8 FROM  IDX6    BY  1
+                          UNTIL  IDX8   >   IDX7
+                   IF  RECE82-DAY(IDX8)  NOT =   RECE82-HKNCOMBI
+                     MOVE   999   TO   RECE82-DAY(IDX8)
+                   END-IF
+                 END-PERFORM
+               END-IF
+      *
            END-IF    
            .
        210111-RECE88-WRITE-EXT.
