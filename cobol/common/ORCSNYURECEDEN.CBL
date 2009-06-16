@@ -1122,15 +1122,18 @@
                PERFORM   910-NYUINACCT-READ-SEC
                PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
                  IF   NACCT-SRYCDTOTAL     =   197000570
-      *            Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+      *            ¿©Æ²²Ã»»¤ÎÂàÈò
                    PERFORM    VARYING   IDX1   FROM   1   BY   1
                               UNTIL     IDX1   >   31
                        IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)
                        AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
-                           MOVE  "197000570"
+      *                  Æþ±¡»þ¿©»öÎÅÍÜ¡Ê£±¡Ë¤Î¾ì¹ç¤Î¤ß¥»¥Ã¥È
+                           IF  WRK-SYS5000-SHOKUCD(1 IDX1)  =
+                                                          "197000110"
+                               MOVE  "197000570"
                                        TO WRK-SYS5000-SHOKUCD(3 IDX1)
-      
+                           END-IF
                        END-IF
                    END-PERFORM
                  END-IF
