@@ -63,6 +63,7 @@
            03  WRK-EDDD                PIC 9(02).
            03  WRK-SYMD                PIC X(08).
            03  WRK-OLD-NYUINYMD        PIC X(08).
+           03  WRK-OLD-TAIINYMD        PIC X(08).
       *
            03  WRK-TAIINYMD            PIC X(08).
            03  WRK-LASTTAIINYMD        PIC X(08).
@@ -175,6 +176,7 @@
            MOVE    ZERO                TO  FLG-SYORI-END
            MOVE    ZERO                TO  FLG-OK
            MOVE    SPACE               TO  WRK-OLD-NYUINYMD
+           MOVE    SPACE               TO  WRK-OLD-TAIINYMD
            PERFORM
                    UNTIL      (FLG-PTNYUINRRK      =   1 )
                           OR  (FLG-SYORI-END       =   1 )
@@ -197,6 +199,7 @@
                    MOVE    1                   TO  FLG-SYORI-END
                END-IF
                MOVE    PTNYUINRRK-NYUINYMD TO  WRK-OLD-NYUINYMD
+               MOVE    PTNYUINRRK-TAIINYMD TO  WRK-OLD-TAIINYMD
       *
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
                MOVE    "key36"             TO  MCP-PATHNAME
@@ -217,6 +220,14 @@
       *   診療日付での判定処理
       *****************************************************************
        1001-SRYYMD-SYORI-SEC            SECTION.
+      *
+      *    前回退院日＝入院日の時、対象とする
+           IF     (PTNYUINRRK-NYUINYMD NOT =   WRK-OLD-NYUINYMD ) AND
+                  (PTNYUINRRK-TAIINYMD NOT =   WRK-OLD-TAIINYMD )
+               IF      PTNYUINRRK-TAIINYMD     =   WRK-OLD-NYUINYMD
+                   MOVE    ZERO                TO  FLG-OK
+               END-IF
+           END-IF
       *
       *    当日以前の転入日
            IF      PTNYUINRRK-TENNYUYMD    <=  WRK-SRYYMD
