@@ -5302,7 +5302,7 @@
            IF      SPA-GMN-HKTKBN          =   "1"
                MOVE   "1"                  TO  SPA-J04-JIHOKBN
            ELSE
-               MOVE   ZERO                 TO  SPA-J04-JIHOKBN
+               MOVE   SPACE                TO  SPA-J04-JIHOKBN
            END-IF
       *
       *    診療会計剤チェックサブ
