@@ -103,6 +103,8 @@
       *  04.04.02    NACL-門脇    09/03/11  特別な関係にある他院歴を初回
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
+      *  04.04.03    NACL-門脇    09/06/22  精神科隔離室管理加算算定日
+      *                                     レセ電用コメント編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -343,6 +345,7 @@
            03  IDX16               PIC 9(02).
            03  IDX17               PIC 9(02).
            03  IDX18               PIC 9(02).
+           03  IDX19               PIC 9(02).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -4694,6 +4697,12 @@
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
       *
+           IF     RECE64-ZAISKBKBN             =    "6"
+           AND    RECE64-FLG-KAKURI-COMMENT    =    "1"
+           AND    RECE64-MEISAISU              =     1
+               PERFORM    20012-NYUKASAN-HENSYU-SEC
+           END-IF
+      *
            .
        2001-NYU-COMMENT-EXT.
            EXIT.
@@ -4739,6 +4748,135 @@
       *
            .
        20011-NYU-DAY-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （レセ電用）
+      *****************************************************************
+       20012-NYUKASAN-HENSYU-SEC          SECTION.
+      *
+      *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
+           MOVE    ZERO                 TO  IDX-RECE65
+           MOVE    SPACE                TO  WRK-RECE65XX-REC
+           INITIALIZE                       WRK-RECE65XX-REC
+      *
+           MOVE    1                    TO  MAX-MEISAISU
+      *
+           MOVE  "810000001"  TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+           MOVE   ZERO        TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+           MOVE   13          TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+           MOVE  "精神科隔離室管理加算算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           MOVE  "1"          TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
+      *    算定日コメントの挿入
+           PERFORM  VARYING      IDX    FROM  1   BY   1
+                    UNTIL       (IDX    >     31)      OR
+                                (TBL-NYU-DAY-ST(IDX)  =  ZERO)
+               COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+               MOVE    "810000001"
+                             TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+               MOVE    ZERO  TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+               IF    TBL-NYU-DAY-CD(IDX)  =  CONS-SANTEI-COMMENT1
+                 MOVE    3   TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+                 MOVE    "　　日"
+                             TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+                 MOVE    TBL-NYU-DAY-ST(IDX)
+                             TO  DAY-IDX
+                 MOVE    TBL-DAY(DAY-IDX)
+                             TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(1:4)
+               ELSE
+                 MOVE    7   TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+                 MOVE    "　　日〜　　日"
+                             TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+                 MOVE    TBL-NYU-DAY-ST(IDX)
+                             TO  DAY-IDX
+                 MOVE    TBL-DAY(DAY-IDX)
+                             TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(1:4)
+                 MOVE    TBL-NYU-DAY-ED(IDX)
+                             TO  DAY-IDX
+                 MOVE    TBL-DAY(DAY-IDX)
+                             TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(9:4)
+               END-IF
+               MOVE   "1"    TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
+           END-PERFORM
+      *
+      *    コメントを含んだ内容で中間ファイルの再作成
+           MOVE       ZERO             TO      FLG-WRKRECE65
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE65
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE65  =    1
+               INITIALIZE                        RECE659-REC
+               MOVE    RECE64-KEY           TO   RECE659-KEY
+               COMPUTE IDX19              =  RECE64-KOHBUNRI + 1
+               EVALUATE  RECE64-SRYKBN
+                 WHEN      "90"
+                   COMPUTE RECE659-ZAINUM =  99999980  +  IDX19
+                   MOVE    "900"            TO   RECE659-SRYSYUKBN
+                 WHEN      "92"
+                   COMPUTE RECE659-ZAINUM =  99999990  +  IDX19
+                   MOVE    "920"            TO   RECE659-SRYSYUKBN
+               END-EVALUATE
+               MOVE    ZERO                 TO   RECE659-ZAIREN
+               ADD     1                    TO   WRK-RENNUM
+               MOVE    WRK-RENNUM           TO   RECE659-RENNUM
+               MOVE    RECE64-KOHBUNRI      TO   RECE659-KOHBUNRI
+               MOVE    RECE64-PTNUM         TO   RECE659-PTNUM
+               MOVE    RECE64-SRYKA         TO   RECE659-SRYKA
+               MOVE    RECE64-SRYKBN        TO   RECE659-SRYKBN
+               MOVE    ZERO                 TO   RECE659-JIHIMONEY
+               PERFORM  VARYING   IDX   FROM   1   BY   1
+                         UNTIL   (IDX       >    5)   OR
+                                 (FLG-WRKRECE65   =   1)
+                   ADD        1             TO    IDX-RECE65
+                   IF  WRK-RECE65XX-SRYCD(IDX-RECE65 1) = SPACE
+                       MOVE   1             TO    FLG-WRKRECE65
+                   ELSE
+                       MOVE  WRK-RECE65XX-SRYACT-TBL(IDX-RECE65 1)
+                                        TO   RECE659-SRYACT-TBL(IDX)
+                       ADD   1          TO   WRK-CNT-MEISAI
+                   END-IF
+               END-PERFORM
+               IF   RECE659-SRYCD(1)  NOT =  SPACE
+                   WRITE   RECE659-REC
+                   ADD     1            TO   CNT-RECE659
+               END-IF
+           END-PERFORM
+      *
+           INITIALIZE                      RECE649-REC
+           MOVE    RECE62-HOSPNUM      TO  RECE649-HOSPNUM
+           MOVE    RECE62-SRYYM        TO  RECE649-SRYYM
+           MOVE    RECE62-NYUGAIKBN    TO  RECE649-NYUGAIKBN
+           MOVE    RECE62-PTID         TO  RECE649-PTID
+           MOVE    RECE62-RECEKA       TO  RECE649-RECEKA
+           MOVE    RECE62-TEISYUTUSAKI TO  RECE649-TEISYUTUSAKI
+           MOVE    RECE62-RECESYUBETU  TO  RECE649-RECESYUBETU
+           MOVE    RECE62-HKNJANUM-KEY TO  RECE649-HKNJANUM
+           MOVE    RECE62-HOJOKBN-KEY  TO  RECE649-HOJOKBN
+           MOVE    RECE62-TEKSTYMD     TO  RECE649-TEKSTYMD
+           COMPUTE IDX19                =  RECE64-KOHBUNRI + 1
+           EVALUATE  RECE64-SRYKBN
+             WHEN      "90"
+               COMPUTE RECE649-ZAINUM   =  99999980  +  IDX19
+             WHEN      "92"
+               COMPUTE RECE649-ZAINUM   =  99999990  +  IDX19
+           END-EVALUATE
+           MOVE    ZERO                TO  RECE649-ZAIREN
+           MOVE    RECE64-KOHBUNRI     TO  RECE649-KOHBUNRI
+           MOVE    RECE64-SRYKBN       TO  RECE649-SRYKBN
+           MOVE    "6"                 TO  RECE649-ZAISKBKBN
+           MOVE    RECE64-PTNUM        TO  RECE649-PTNUM
+           MOVE    RECE64-SRYKA        TO  RECE649-SRYKA
+           MOVE    RECE64-HKNCOMBI     TO  RECE649-HKNCOMBI
+      *
+           MOVE    WRK-CNT-MEISAI      TO  RECE649-MEISAISU
+      *
+           WRITE   RECE649-REC
+           ADD     1                   TO  CNT-RECE649
+      *
+           .
+       20012-NYUKASAN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
