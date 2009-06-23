@@ -216,6 +216,10 @@
                IF      ACCT-SURYOUTOTAL    =   ZERO
                    MOVE    1                   TO  ACCT-SURYOUTOTAL
                END-IF
+      *        自保区分（包括剤）ゼロを空白とする（ゼロがあった）
+               IF      ACCT-JIHOKBN        =   "0"
+                   MOVE    SPACE               TO  ACCT-JIHOKBN
+               END-IF
       *
       *        診療コード計を比較する
                MOVE     ZERO               TO  FLG-OK
