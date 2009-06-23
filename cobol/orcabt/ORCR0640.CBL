@@ -361,6 +361,7 @@
       *  04.02.53    NACL-ÌçÏÆ    09/06/01  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *                                     ¡ÊÅìµþÅÔ£±£µ£±¡Ë
       *  04.02.54    NACL-ÌçÏÆ    09/06/10  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎÂÐ±þ
+      *  04.02.55    NACL-ÌçÏÆ    09/06/23  ÅÀÅ©´ïºà¾¦ÉÊÌ¾µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8625,6 +8626,7 @@
                   PERFORM  VARYING  IDY    FROM    1   BY  1
                               UNTIL   IDY     >       31
       *
+                    MOVE   SPACE  TO   WRK-FORMALNAME
                     IF  ORCSTEN-ZAITEN(IDY)  NOT =  ZERO
       *
                        MOVE   1      TO   FLG-SIKIBETU
@@ -8676,6 +8678,7 @@
                               UNTIL   IDY     >       50
                                 OR    ORCSTEN-KIZ-ZAITEN(IDY)  =  ZERO
       *
+                       MOVE   SPACE  TO   WRK-FORMALNAME
                        MOVE   2      TO   FLG-SIKIBETU
       *
                        INITIALIZE         WRK-ORCSTEN-TABLE
@@ -9156,6 +9159,19 @@
                                       TO RECE65-NAME(IDX4)
                   ELSE
                      MOVE   TNS-NAME  TO RECE65-NAME(IDX4)
+                  END-IF
+      *
+                  IF   WRK-ORCSTEN-SRYCD(IDX2)(1:3)  =   "058"
+                    MOVE  TNS-FORMALYUKOKETA TO  RECE65-YUKOKETA(IDX4)
+                    MOVE  TNS-FORMALNAME     TO  RECE65-NAME(IDX4)
+                                                 WRK-FORMALNAME
+                    MOVE  "1"                TO  RECE65-RECEDENFLG(IDX4)
+                  END-IF
+                  IF  (WRK-ORCSTEN-SRYCD(IDX2)(1:1)  =   "7")
+                  AND (WRK-FORMALNAME     NOT =  SPACE      )
+                    MOVE  WRK-FORMALNAME  TO  RECE65-RECEDENNAME(IDX4)
+                    MOVE  "1"             TO  RECE65-RECEHENFLG(IDX4)
+                    MOVE  SPACE           TO  WRK-FORMALNAME
                   END-IF
       *
                   IF   RECE65-YUKOKETA(IDX4)  =  ZERO
