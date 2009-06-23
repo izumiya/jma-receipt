@@ -52,6 +52,7 @@
       *  04.03.05    NACL-ÌçÏÆ    08/12/04  ²¾¼ýÇ¼¥Á¥§¥Ã¥¯½èÍýÄÉ²Ã
       *  04.03.06    NACL-ÌçÏÆ    08/12/16  Ê¿À®£²£±Ç¯£±·î²þÀµÂÐ±þ
       *  04.03.07    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
+      *  04.03.08    NACL-ÌçÏÆ    09/06/23  ÅÀÅ©´ïºà¾¦ÉÊÌ¾µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -162,6 +163,7 @@
            03  FLG-HOUSEI-COM      PIC 9(01).
            03  FLG-HOUMON-COM      PIC 9(01).
            03  FLG-SYUNOU-ARI      PIC 9(01).
+           03  FLG-FORMALNAME      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -4439,6 +4441,7 @@
                   PERFORM  VARYING  IDY    FROM    1   BY  1
                             UNTIL   IDY     >     31
       *
+                    MOVE   ZERO      TO   FLG-FORMALNAME
                     IF  ORCSTEN-ZAITEN(IDY)  NOT =  ZERO
       *
                        MOVE   1      TO   FLG-SIKIBETU
@@ -4490,6 +4493,7 @@
                             UNTIL   IDY     >     50
                               OR    ORCSTEN-KIZ-ZAITEN(IDY)  =  ZERO
       *
+                       MOVE   ZERO   TO   FLG-FORMALNAME
                        MOVE   2      TO   FLG-SIKIBETU
       *
                        INITIALIZE         WRK-ORCSTEN-TABLE
@@ -4817,6 +4821,17 @@
                                       TO RECE230-NAME(IDX4)
                   ELSE
                      MOVE   TNS-NAME  TO RECE230-NAME(IDX4)
+                  END-IF
+      *
+                  IF   WRK-ORCSTEN-SRYCD(IDX2)(1:3)  =   "058"
+                    MOVE  TNS-FORMALYUKOKETA TO  RECE230-YUKOKETA(IDX4)
+                    MOVE  TNS-FORMALNAME     TO  RECE230-NAME(IDX4)
+                    MOVE  1                  TO  FLG-FORMALNAME
+                  END-IF
+                  IF  (WRK-ORCSTEN-SRYCD(IDX2)(1:1)  =   "7")
+                  AND (FLG-FORMALNAME                =    1 )
+                    MOVE  "1"             TO  RECE230-RECEHENFLG(IDX4)
+                    MOVE  ZERO            TO  FLG-FORMALNAME
                   END-IF
       *
                   IF   RECE230-YUKOKETA(IDX4)  =  ZERO
