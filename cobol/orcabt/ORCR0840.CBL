@@ -163,6 +163,7 @@
       *  04.04.01    NACL-ÌçÏÆ    08/12/25  Êñ³çÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/02/04  ¸¡ºº¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
+      *  04.04.04    NACL-ÌçÏÆ    09/06/23  ÅÀÅ©´ïºà¾¦ÉÊÌ¾µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -344,6 +345,7 @@
            03  FLG-HOUMON-COM                          PIC 9(01).
            03  FLG-SRYKBN-HEN                          PIC 9(01).
            03  FLG-SYUNOU-ARI                          PIC 9(01).
+           03  FLG-FORMALNAME                          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -7161,6 +7163,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   PERFORM  VARYING  IDY    FROM    1   BY  1
                               UNTIL   IDY     >       31
       *
+                    MOVE   ZERO      TO   FLG-FORMALNAME
                     IF  ORCSTEN-ZAITEN(IDY)  NOT =  ZERO
       *
                        MOVE   1      TO   FLG-SIKIBETU
@@ -7211,6 +7214,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               UNTIL   IDY     >       50
                                 OR    ORCSTEN-KIZ-ZAITEN(IDY)  =  ZERO
       *
+                       MOVE   ZERO   TO   FLG-FORMALNAME
                        MOVE   2      TO   FLG-SIKIBETU
       *
                        INITIALIZE         WRK-ORCSTEN-TABLE
@@ -7552,6 +7556,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       TO RECE85-NAME(IDX4)
                   ELSE
                      MOVE   TNS-NAME  TO RECE85-NAME(IDX4)
+                  END-IF
+      *
+                  IF   WRK-ORCSTEN-SRYCD(IDX2)(1:3)  =   "058"
+                    MOVE  TNS-FORMALYUKOKETA TO  RECE85-YUKOKETA(IDX4)
+                    MOVE  TNS-FORMALNAME     TO  RECE85-NAME(IDX4)
+                    MOVE  1                  TO  FLG-FORMALNAME
+                  END-IF
+                  IF  (WRK-ORCSTEN-SRYCD(IDX2)(1:1)  =   "7")
+                  AND (FLG-FORMALNAME                =    1 )
+                    MOVE  "1"             TO  RECE85-RECEHENFLG(IDX4)
+                    MOVE  ZERO            TO  FLG-FORMALNAME
                   END-IF
       *
                   IF   RECE85-YUKOKETA(IDX4)  =  ZERO
