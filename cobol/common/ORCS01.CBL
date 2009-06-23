@@ -3316,6 +3316,10 @@
                END-IF
            END-IF
       *
+           IF      FLG-GENBUTU70           NOT =  ZERO
+              MOVE   FLG-GENBUTU70   TO  LNK-SYU-SKJ-FTNGAKU(2)
+           END-IF
+      *
            IF     (LNK-S01-KOUREI-ZAITAKU-KBN  =  "1" )
            OR     (FLG-GENBUTU70           NOT =  ZERO)
               MOVE      "1"          TO  LNK-SYU-ZAITAKU
@@ -9240,7 +9244,11 @@
                OR (COMB-KOH4HKNNUM = "972" OR "974")
                  CONTINUE
                ELSE
-                 IF  SYU-SRYYMD  <  WK-GEN70-YMD
+                 IF  ((SYU-SRYYMD  <  WK-GEN70-YMD  ) AND
+                      (SYU-SKJ-FTNGAKU(2)     = ZERO))
+                 OR  ((SYU-SKJ-FTNGAKU(2) NOT = ZERO) AND
+                      (SYU-SKJ-FTNGAKU(2) NOT =
+                             LNK-SYU-SKJ-FTNGAKU(2) ))
                     MOVE   "9"   TO   WK-HONKZKKBN2
                     MOVE  SPACE  TO   WK-KIGO2
                     MOVE  SPACE  TO   WK-NUM2
