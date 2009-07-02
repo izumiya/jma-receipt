@@ -61,6 +61,7 @@
       *  04.03.07    NACL-ÌçÏÆ    09/03/13  Á°´ü¹âÎð¼Ô¤Î¹â³Û·×»»ÂÐ±þ
       *
       *  04.04.01    NACL-ÌçÏÆ    09/06/11  £·£°ºÐÌ¤Ëþ¤Î¹â³Û·×»»ÂÐ±þ
+      *  04.04.02    NACL-ÌçÏÆ    09/07/02  Ä¹ºê¸©£±£¸£°³°ÍèÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -103,6 +104,7 @@
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-KOHFTN-H       PIC 9(10)V9(01).
            03  WRK-KOHFTN9-H      PIC 9(10)V9(01).
+           03  WRK-KOHFTN9-X      PIC 9(10).
            03  WRK-KOHFTN-SKJ     PIC 9(10).
            03  WRK-KOHFTN-TOKU75  PIC 9(10).
            03  WRK-KOHFTN-RITU    PIC 9(03).
@@ -857,6 +859,7 @@
            MOVE      ZERO          TO      WRK-KOHFTN
            MOVE      ZERO          TO      WRK-KOHFTN-H
            MOVE      ZERO          TO      WRK-KOHFTN9-H
+           MOVE      ZERO          TO      WRK-KOHFTN9-X
            MOVE      ZERO          TO      WRK-KOHFTN-SKJ
            MOVE      ZERO          TO      WRK-KOHFTN-TOKU75
            MOVE      ZERO          TO      WRK-SEIKYU
@@ -883,6 +886,7 @@
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN-H
                          ADD SYU-SYUCOMPFTN-ENTANI     TO WRK-KOHFTN9-H
+                         ADD SYU-SYUCOMPFTN            TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(1)        =  "2"
@@ -901,6 +905,7 @@
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN-H
                          ADD SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN9-H
+                         ADD SYU-KOH-COMPFTN(1)        TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(2)        =  "2"
@@ -919,6 +924,7 @@
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN-H
                          ADD SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN9-H
+                         ADD SYU-KOH-COMPFTN(2)        TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(3)        =  "2"
@@ -937,6 +943,7 @@
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(4) TO WRK-KOHFTN-H
                          ADD SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN9-H
+                         ADD SYU-KOH-COMPFTN(3)        TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(4)        =  "2"
@@ -1026,9 +1033,36 @@
            AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
            AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
            AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
-             IF   ( WRK-HKNMST-JGNGAK   >   WRK-KOHFTN )
-             AND  ( FLG-DAYCHK          =   ZERO       )
+      ***    IF   ( WRK-HKNMST-JGNGAK   >   WRK-KOHFTN )
+      ***    AND  ( FLG-DAYCHK          =   ZERO       )
+      ***          MOVE   01        TO  LNK-FTNJGNCHK-RC
+      ***    END-IF
+             IF   FLG-DAYCHK   =   ZERO
+               IF   WRK-HKNMST-JGNGAK  >  WRK-KOHFTN
+                 IF   (WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
+                      (WRK-KOHFTN9-X     =  WRK-KOHFTN  )
                    MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+               ELSE
+                 IF  ( WRK-HKNMST-JGNGAK =  WRK-KOHFTN   )
+                 AND ((WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
+                      (WRK-KOHFTN9-X     =  WRK-KOHFTN  ))
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+               END-IF
+             ELSE
+               IF   WRK-HKNMST-JGNGAK  >  WRK-KOHFTN
+                 IF   (WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
+                      (WRK-KOHFTN9-X     =  WRK-KOHFTN  )
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+               ELSE
+                 IF  ( WRK-HKNMST-JGNGAK =  WRK-KOHFTN   )
+                 AND ((WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
+                      (WRK-KOHFTN9-X     =  WRK-KOHFTN  ))
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+               END-IF
              END-IF
            ELSE
              IF ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
