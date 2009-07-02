@@ -6773,16 +6773,20 @@
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-MAX-LINE  )  OR
                               (WRK-GMN-INPUTCD (IDX-Z) =   SPACE )
-               IF      WRK-COM-KISOTEN (IDX-Z) =   ZERO
+      *        IF      WRK-COM-KISOTEN (IDX-Z) =   ZERO
                    MOVE    ZERO            TO  WRK-COM-KEI (IDX-Z)
                    MOVE    1               TO  WRK-COM-KAISU(IDX-Z)
                    MOVE    1               TO  WRK-COM-SURYO(IDX-Z)
                    MOVE    ZERO            TO  WRK-COM-TENSU(IDX-Z)
+                   MOVE    ZERO            TO  WRK-COM-SYUTEN1(IDX-Z)
+                   MOVE    ZERO            TO  WRK-COM-SYUTEN2(IDX-Z)
+                   MOVE    ZERO            TO  WRK-COM-YKZTEN(IDX-Z)
+                   MOVE    ZERO            TO  WRK-COM-KIZAITEN(IDX-Z)
                    MOVE    SPACE           TO  WRK-GMN-TENSU(IDX-Z)
                    MOVE    SPACE           TO  WRK-GMN-SURYO(IDX-Z)
                    MOVE    SPACE           TO  WRK-GMN-KAISU(IDX-Z)
                    MOVE    ZERO            TO  WRK-GMN-KEI (IDX-Z)
-               END-IF
+      *        END-IF
       *        他保険受診済みが存在する
                EVALUATE    SPA-COM-INPUTCD (IDX-Z)
                    WHEN    "099999902"
