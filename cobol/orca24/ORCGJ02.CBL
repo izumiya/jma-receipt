@@ -3564,8 +3564,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "NUM"           TO  MCP-WIDGET
                WHEN    02
                    MOVE    "DAY"           TO  MCP-WIDGET
-                   IF      SPA-DAY-IDX         =   ZERO  OR
-                                               >   SPA-SRYMATU
+                   IF      SPA-DAY-IDX         =   ZERO
+      ***************                          >   SPA-SRYMATU
                        MOVE    1               TO  SPA-DAY-IDX
                    END-IF
                    IF     (SPA-BIRTHDAY(1:6)   =   SPA-NAI-SRYYM )  AND
@@ -4357,6 +4357,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    保険一覧編集
            PERFORM 3008-HKNCOMBI-HEN-SEC
+      *    診療年月の末日算定
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SPA-NAI-SRYYM       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI(7:2)    TO  SPA-SRYMATU
       *
       *    受診履歴より
            IF      SPA-NAI-SRYKA-FLG   =   0
@@ -4617,8 +4625,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                      UNTIL    (IDX         >   31  )  OR
                               (SPA-ERRCD   NOT =   SPACE )
                IF      SPA-GMN-DAY (IDX)   >   ZERO
-      *            受診歴有無のチェック
-                   PERFORM 410121-RRK-DAYCHK-SEC
+      *            月末日判定
+                   IF      IDX                 >   SPA-SRYMATU
+                       MOVE    "0062"              TO  SPA-ERRCD
+                   ELSE
+      *                受診歴有無のチェック
+                       PERFORM 410121-RRK-DAYCHK-SEC
+                   END-IF
                    IF      SPA-ERRCD       NOT =   SPACE
                        MOVE    IDX             TO  WRK-IDX
                        MOVE    WRK-IDX         TO  SPA-DAY-IDX
@@ -8424,6 +8437,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    保険一覧編集
            PERFORM 3008-HKNCOMBI-HEN-SEC
+      *    診療年月の末日算定
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SPA-NAI-SRYYM       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI(7:2)    TO  SPA-SRYMATU
       *
       *    受診履歴より
            IF      SPA-NAI-SRYKA-FLG   =   0
@@ -8678,6 +8699,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    保険一覧編集
            PERFORM 3008-HKNCOMBI-HEN-SEC
+      *    診療年月の末日算定
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SPA-NAI-SRYYM       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI(7:2)    TO  SPA-SRYMATU
       *
       *    受診履歴より
            IF      SPA-NAI-SRYKA-FLG   =   0
