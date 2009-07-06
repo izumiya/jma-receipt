@@ -763,6 +763,10 @@
                    MOVE    SPACE       TO  SPA-COM-HCHKFLG(IDX)
                END-IF
                MOVE    WRK-KAISU       TO  SPA-COM-KAISU (IDX)
+      *        外用薬の時、入力回数を
+               IF     (SPA-COM-SRYKBN(IDX) =  "23"  )
+                   MOVE    WRK-KAISU       TO  SPA-COM-KAISU2 (IDX)
+               END-IF
                MOVE    WRK-NYUIN-AREA  TO  SPA-COM-NYUIN-AREA (IDX)
            END-IF
            .
