@@ -709,7 +709,7 @@
        51011-KAISU-SET1-SEC             SECTION.
       *
            IF     (WRK-KAISU               =   ZERO   )  OR
-                  (SPA-COM-KAIFLG (IDX)    =   "1"    )  OR
+      *********   (SPA-COM-KAIFLG (IDX)    =   "1"    )  OR
                   (SPA-COM-ZAIEND (IDX)    =   "1"    )  OR
                   (IDX                     =   SPA-MAX-LINE)
       *        ’＊’の数だけ更新する
