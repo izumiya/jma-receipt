@@ -469,13 +469,19 @@
                                           SPA-AREA
       *
                 IF    LNK-ORCSJGNGET-RC   =   ZERO
-                 IF    LNK-FTNJGNCHK-NYUGAIKBN     =   "1"
-                   MOVE    LNK-ORCSJGNGET-NYUJGNGAK
-                                          TO  WRK-HKNMST-JGNGAK
-                 ELSE
-                   MOVE    LNK-ORCSJGNGET-GAIJGNGAK
-                                          TO  WRK-HKNMST-JGNGAK
-                 END-IF
+                  IF   (LNK-FTNJGNCHK-PREFNUM  =  07  )
+                  AND  (LNK-FTNJGNCHK-KOHNUM   = "281")
+                      MOVE  LNK-ORCSJGNGET-GAIJGNGAK
+                                      TO  WRK-HKNMST-JGNGAK
+                  ELSE
+                    IF  LNK-FTNJGNCHK-NYUGAIKBN   =   "1"
+                      MOVE  LNK-ORCSJGNGET-NYUJGNGAK
+                                      TO  WRK-HKNMST-JGNGAK
+                    ELSE
+                      MOVE  LNK-ORCSJGNGET-GAIJGNGAK
+                                      TO  WRK-HKNMST-JGNGAK
+                    END-IF
+                  END-IF
                 END-IF
       *
            END-IF
