@@ -7638,6 +7638,10 @@
            IF      SPA-GMN-I01-SYORIKBN-CD =   "01"
                PERFORM 4801-NYUKAIKEI-EDIT-SEC
                IF    ( SPA-ERRCD       NOT =   SPACE )
+                   MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                   MOVE    "abort"         TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   PERFORM 900-PTINF-KEY-SEL-SEC
                    GO  TO  4801-PTNYUINRRK-UPD-EXT
                END-IF
            END-IF
@@ -17282,6 +17286,7 @@
                MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                MOVE    "abort"         TO  MCP-PATHNAME
                PERFORM 910-DBSELECT-SEC
+               PERFORM 900-PTINF-KEY-SEL-SEC
            END-IF
       *
            PERFORM UNTIL ( WRK-STYMD (1:6) >   WRK-EDYMD (1:6))
