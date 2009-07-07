@@ -7983,7 +7983,7 @@
                IF    ( TSRYCD-SRYCD (IDX6)(1:1)    =   "7" )
                    MOVE    TSRYCD-SRYCD (IDX6)
                                                TO  WRK-SRYCD
-                   MOVE    TSRYCD-SRYCD (IDX6) TO  WRK-TNS-YMD
+                   MOVE    WRK-KJNYMD          TO  WRK-TNS-YMD
                    PERFORM 900-TENSU-KEY-SEL-SEC
                    IF    ( TNS-TANICD          =   SPACE OR ZERO )
                     AND  ( TNS-TENSIKIBETU     =   0 OR 1 OR 2)
