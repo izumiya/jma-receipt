@@ -5972,6 +5972,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                       (SPA-PREFNUM             =   01    )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20081001"))
       *
+      *            Àº¿ÀÆþ±¡¡Ê£°£²£°¡Ë¡Ê£È£±£¹¡¥£´°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "020" )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070401"))
+      *
                    MOVE    ZERO                TO  IDY
                    PERFORM VARYING     IDX2    FROM    1   BY  1
                            UNTIL       IDX2    >   SPA-FTN1-MAX
