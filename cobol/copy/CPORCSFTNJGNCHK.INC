@@ -53,3 +53,5 @@
       *    10:パラメタエラー
            03  LNK-FTNJGNCHK-RC              PIC 9(02).
            03  LNK-FTNJGNCHK-KOHFTN          PIC 9(07).
+           03  LNK-FTNJGNCHK-KOHFTNSKJ       PIC 9(07).
+

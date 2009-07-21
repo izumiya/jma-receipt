@@ -62,6 +62,7 @@
       *
       *  04.04.01    NACL-ÌçÏÆ    09/06/11  £·£°ºÐÌ¤Ëþ¤Î¹â³Û·×»»ÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/07/02  Ä¹ºê¸©£±£¸£°³°ÍèÂÐ±þ
+      *  04.04.03    NACL-ÌçÏÆ    09/07/16  ¸øÈñ·î¾å¸Â³ÛÈ½Äê
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -108,6 +109,8 @@
            03  WRK-KOHFTN-SKJ     PIC 9(10).
            03  WRK-KOHFTN-TOKU75  PIC 9(10).
            03  WRK-KOHFTN-RITU    PIC 9(03).
+           03  WRK-KOHFTN-HKNFTNMONEY
+                                  PIC 9(10).
            03  WRK-SEIKYU         PIC 9(10).
            03  WRK-SEIKYU-TOTAL   PIC 9(10).
            03  WRK-KYUFUGAITEN    PIC 9(10).
@@ -219,6 +222,7 @@
       *
            MOVE    ZERO                TO  LNK-FTNJGNCHK-RC
                                            LNK-FTNJGNCHK-KOHFTN
+                                           LNK-FTNJGNCHK-KOHFTNSKJ
       *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
@@ -868,6 +872,7 @@
            MOVE      ZERO          TO      WRK-KOHFTN9-X
            MOVE      ZERO          TO      WRK-KOHFTN-SKJ
            MOVE      ZERO          TO      WRK-KOHFTN-TOKU75
+           MOVE      ZERO          TO      WRK-KOHFTN-HKNFTNMONEY
            MOVE      ZERO          TO      WRK-SEIKYU
            MOVE      ZERO          TO      WRK-SEIKYU-TOTAL
            MOVE      ZERO          TO      WRK-KYUFUGAITEN
@@ -885,7 +890,8 @@
                   MOVE    1    TO    FLG-ARI
                   EVALUATE   LNK-FTNJGNCHK-KOHNUM
                     WHEN   SYU-KOH-HKNNUM(1)
-      *                ADD  SYU-KOH-HKNFTNMONEY(1) TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(1)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(1)     TO  WRK-KOHFTN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
@@ -904,7 +910,8 @@
                           PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(2)
-      *                ADD  SYU-KOH-HKNFTNMONEY(2) TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(2)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(2)     TO  WRK-KOHFTN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
@@ -923,7 +930,8 @@
                           PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(3)
-      *                ADD  SYU-KOH-HKNFTNMONEY(3) TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(3)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(3)     TO  WRK-KOHFTN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
@@ -942,7 +950,8 @@
                           PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(4)
-      *                ADD  SYU-KOH-HKNFTNMONEY(4) TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(4)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(4)     TO  WRK-KOHFTN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
@@ -1159,7 +1168,10 @@
              END-IF
            END-IF
       *
-           COMPUTE LNK-FTNJGNCHK-KOHFTN = WRK-KOHFTN + WRK-KOHFTN-SKJ
+           COMPUTE LNK-FTNJGNCHK-KOHFTN = WRK-KOHFTN-HKNFTNMONEY
+           COMPUTE LNK-FTNJGNCHK-KOHFTNSKJ
+                                        = WRK-KOHFTN-HKNFTNMONEY
+                                        + WRK-KOHFTN-SKJ
       *
            .
        21011-SYUKEI-HENSYU1-EXT.
@@ -1305,6 +1317,7 @@
       *
            MOVE      ZERO       TO      WRK-KOHFTN
            MOVE      ZERO       TO      WRK-KOHFTN-SKJ
+           MOVE      ZERO       TO      WRK-KOHFTN-HKNFTNMONEY
            MOVE      ZERO       TO      WRK-SEIKYU
            PERFORM   UNTIL    FLG-SYUNOU     =  1
              MOVE    ZERO       TO      FLG-ARI
@@ -1316,24 +1329,32 @@
                   MOVE      1                 TO  FLG-ARI
                   EVALUATE   LNK-FTNJGNCHK-KOHNUM
                     WHEN   SYU-KOH-HKNNUM(1)
+                     ADD  SYU-KOH-HKNFTNMONEY(1)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                      ADD  SYU-KOH-COMPFTN(1)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(1)        =  "2"
                        ADD  SYU-SKJ-FTN(1)    TO  WRK-KOHFTN-SKJ
                      END-IF
                     WHEN   SYU-KOH-HKNNUM(2)
+                     ADD  SYU-KOH-HKNFTNMONEY(2)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                      ADD  SYU-KOH-COMPFTN(2)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(2)        =  "2"
                        ADD  SYU-SKJ-FTN(2)    TO  WRK-KOHFTN-SKJ
                      END-IF
                     WHEN   SYU-KOH-HKNNUM(3)
+                     ADD  SYU-KOH-HKNFTNMONEY(3)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                      ADD  SYU-KOH-COMPFTN(3)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(3)        =  "2"
                        ADD  SYU-SKJ-FTN(3)    TO  WRK-KOHFTN-SKJ
                      END-IF
                     WHEN   SYU-KOH-HKNNUM(4)
+                     ADD  SYU-KOH-HKNFTNMONEY(4)
+                                       TO  WRK-KOHFTN-HKNFTNMONEY
                      ADD  SYU-KOH-COMPFTN(4)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(4)        =  "2"
@@ -1364,7 +1385,10 @@
              END-IF
            END-IF
       *
-           COMPUTE LNK-FTNJGNCHK-KOHFTN = WRK-KOHFTN + WRK-KOHFTN-SKJ
+           COMPUTE LNK-FTNJGNCHK-KOHFTN = WRK-KOHFTN-HKNFTNMONEY
+           COMPUTE LNK-FTNJGNCHK-KOHFTNSKJ
+                                        = WRK-KOHFTN-HKNFTNMONEY
+                                        + WRK-KOHFTN-SKJ
       *
            .
        21012-SYUKEI-HENSYU2-EXT.
