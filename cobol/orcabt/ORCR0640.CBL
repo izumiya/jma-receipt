@@ -9543,7 +9543,14 @@
                        PERFORM  2104G-JGNCHK-HENSYU2-SEC
                        IF  TBL-HKNFTNDATA-ZAN(IDY2)  >
                                TBL-HKNFTNDATA-NYUIN(IDY2)
-                         CONTINUE
+                         COMPUTE  WRK-HKNFTNDATA-RUI          =
+                                  TBL-HKNFTNDATA-TAF(IDY2)    +
+                                  TBL-HKNFTNDATA-GAIRAI(IDY2) +
+                                  TBL-HKNFTNDATA-NYUSKJ(IDY2)
+                         IF   TBL-HKNFTNDATA-JGN(IDY2) =
+                                              WRK-HKNFTNDATA-RUI
+                           MOVE 1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                         END-IF
                        ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
                        END-IF
@@ -14870,13 +14877,8 @@
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
-           COMPUTE  WRK-HKNFTNDATA-RUI = TBL-HKNFTNDATA-TAF(1)
-                                       + TBL-HKNFTNDATA-GAIRAI(1)
-                                       + TBL-HKNFTNDATA-NYUSKJ(1)
-           IF  ( RECE62-FTNMONEY(2)    =  ZERO               )
-           OR  ( TBL-HKNFTNDATA-FLG(1) =  1 OR 2             )
-           OR  ((WRK-JYOGEN-KOH2       =  WRK-HKNFTNDATA-RUI) AND
-                (WRK-JYOGEN-KOH2   NOT =  ZERO              ))
+           IF  ( RECE62-FTNMONEY(2)    =  ZERO   )
+           OR  ( TBL-HKNFTNDATA-FLG(1) =  1 OR 2 )
             CONTINUE
            ELSE
             IF   WRK-JYOGEN-KOH   =    ZERO

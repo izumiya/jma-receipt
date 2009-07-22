@@ -994,7 +994,6 @@
            03  WRK-CYOKI-GENDO                 PIC  9(07).
            03  WRK-CYOKI-GENDO2                PIC  9(07).
            03  WRK-JYOGEN-KOH                  PIC  9(07).
-           03  WRK-JYOGEN-KOH2                 PIC  9(07).
            03  WRK-JIRITU-TAFTNRUIKEI          PIC  9(07).
            03  WRK-JIRITU-CYUKANSOU            PIC  9(01).
            03  WRK-KOUREI-IRYOHI70             PIC  9(09).
@@ -2034,7 +2033,14 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        PERFORM  211F-JGNCHK-HENSYU2-SEC
                        IF  TBL-HKNFTNDATA-ZAN(IDY2)  >
                                TBL-HKNFTNDATA-GAIRAI(IDY2)
-                         CONTINUE
+                         COMPUTE  WRK-HKNFTNDATA-RUI          =
+                                  TBL-HKNFTNDATA-TAF(IDY2)    +
+                                  TBL-HKNFTNDATA-GAIRAI(IDY2) +
+                                  TBL-HKNFTNDATA-NYUIN(IDY2)
+                         IF   TBL-HKNFTNDATA-JGN(IDY2) =
+                                              WRK-HKNFTNDATA-RUI
+                           MOVE 1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                         END-IF
                        ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
                        END-IF
@@ -10610,7 +10616,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
       *    ¸øÈñ¾å¸Â
            MOVE   TBL-HKNFTNDATA-JGN(1)   TO   WRK-JYOGEN-KOH
-                                               WRK-JYOGEN-KOH2
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
             IF  ((RECE02-KOHNUM(1)      = "051") AND
@@ -10701,13 +10706,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
-           COMPUTE  WRK-HKNFTNDATA-RUI = TBL-HKNFTNDATA-TAF(1)
-                                       + TBL-HKNFTNDATA-GAIRAI(1)
-                                       + TBL-HKNFTNDATA-NYUIN(1)
-           IF  ( RECE02-FTNMONEY(2)    =  ZERO               )
-           OR  ( TBL-HKNFTNDATA-FLG(1) =  1 OR 2             )
-           OR  ((WRK-JYOGEN-KOH2       =  WRK-HKNFTNDATA-RUI) AND
-                (WRK-JYOGEN-KOH2   NOT =  ZERO              ))
+           IF  ( RECE02-FTNMONEY(2)    =  ZERO   )
+           OR  ( TBL-HKNFTNDATA-FLG(1) =  1 OR 2 )
             CONTINUE
            ELSE
             IF   WRK-JYOGEN-KOH   =    ZERO
