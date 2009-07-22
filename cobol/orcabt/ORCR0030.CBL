@@ -1002,6 +1002,7 @@
            03  WRK-CYOKI-GENDO                 PIC  9(07).
            03  WRK-CYOKI-GENDO2                PIC  9(07).
            03  WRK-JYOGEN-KOH                  PIC  9(07).
+           03  WRK-JYOGEN-KOH2                 PIC  9(07).
            03  WRK-JIRITU-TAFTNRUIKEI          PIC  9(07).
            03  WRK-JIRITU-CYUKANSOU            PIC  9(01).
            03  WRK-KOUREI-IRYOHI70             PIC  9(09).
@@ -1031,6 +1032,8 @@
            03  WRK-KINGAKU-TOK7                PIC  9(07).
            03  WRK-KINGAKU-TOK8                PIC  9(07).
            03  WRK-KINGAKU-TOK9                PIC  9(07).
+      *
+           03  WRK-HKNFTNDATA-RUI              PIC  9(07).
       *
            03  WRK-SEIKYUSTYMD                 PIC  9(08).
            03  WRK-SEIKYUEDYMD                 PIC  9(08).
@@ -2067,6 +2070,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
                    END-IF
+                   IF   TBL-HKNFTNDATA-FLG(IDY2) = 1
+                     IF  ((RECE02-KOHNUM(IDY2)      =  "051"   ) AND
+                          (TBL-DOTANDOKU-FLG(IDY2)  =   1      ))
+                     OR  ((SYS-1001-PREFNUM         =   13     ) AND
+                          (RECE02-KOHNUM(IDY2)      =  "151"   ) AND
+                          (RECE02-SRYYM             <  "200905"))
+                         MOVE   2    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                     END-IF
+                   END-IF
                    DISPLAY "IDX KOHNUM=" IDY2
                            " "    RECE02-KOHNUM(IDY2)
                    DISPLAY "JGN=" TBL-HKNFTNDATA-JGN(IDY2)
@@ -2075,13 +2087,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    DISPLAY "NYU=" TBL-HKNFTNDATA-NYUIN(IDY2)
                    DISPLAY "ZAN=" TBL-HKNFTNDATA-ZAN(IDY2)
                    DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
-                END-IF
-                IF  ((RECE02-KOHNUM(IDY2)      =  "051"   ) AND
-                     (TBL-DOTANDOKU-FLG(IDY2)  =   1      ))
-                OR  ((SYS-1001-PREFNUM         =   13     ) AND
-                     (RECE02-KOHNUM(IDY2)      =  "151"   ) AND
-                     (RECE02-SRYYM             <  "200905"))
-                    MOVE    ZERO     TO  TBL-HKNFTNDATA-FLG(IDY2)
                 END-IF
              END-PERFORM
       *
@@ -9667,7 +9672,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  MOVE     ZERO    TO    RECE02-FTNMONEY(1)
                  PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
                            UNTIL   KOHFTN-IDX   >    4
-                  IF     TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  ZERO
+                  IF     TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  NOT =  1
                    IF  ( RECE02-KOHNUM(KOHFTN-IDX) =
                               "015" OR "016" OR "051" OR "021" OR
                               "024" OR "079" OR "052" OR "012" OR
@@ -10631,7 +10636,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
            END-IF
       *
-           IF   RECE02-ZAITAKU   =   "1" OR "2"
+           IF   RECE02-FTNMONEY(2) = ZERO
+            CONTINUE
+           ELSE
+            IF   RECE02-ZAITAKU   =   "1" OR "2"
               MOVE   RECE02-FTNMONEY(2)      TO  WRK-TAIHI-GENKIN3
               MOVE   WRK-FTNKEI-KOH          TO  RECE02-FTNMONEY(2)
                                                  RECE02-FTNMONEY-KOJ(2)
@@ -10652,9 +10660,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 ADD  WRK-TAIHI-GENKIN3 TO  FTN-KOH-XXX
               END-IF
-           ELSE
+            ELSE
               MOVE   WRK-FTNKEI-KOH          TO  RECE02-FTNMONEY(2)
                                                  RECE02-FTNMONEY-KOJ(2)
+            END-IF
            END-IF
       *
            .
@@ -10666,25 +10675,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21093-ZENKI-TOKUREI-OKIKAE-SEC               SECTION.
       *
-           MOVE    12000          TO   WRK-KOH-GENDOGAKU
-           IF  RECE02-TEISYOTOKU  NOT =  SPACE
-                  MOVE    8000    TO   WRK-KOH-GENDOGAKU
-           END-IF
-           IF   ( RECE02-KOHNUM(2)  =   "972" )
-           OR   ( RECE02-KOHNUM(3)  =   "972" )
-           OR   ( RECE02-KOHNUM(4)  =   "972" )
-              IF   WRK-KOH-GENDOGAKU  >  10000
-                  MOVE   10000    TO   WRK-KOH-GENDOGAKU
-              END-IF
-           END-IF
-      *
-           IF  FLG-TOKU75 = 1 OR 2
-             COMPUTE  WRK-KOH-GENDOGAKU = WRK-KOH-GENDOGAKU
-                                        / 2
-           END-IF
+           MOVE      1       TO     FLG-GENGAKU-OKIKAE
+           MOVE      1       TO     IDX10
+           PERFORM   211F1-JGNGAK-SET-SEC
       *
       *    ¸øÈñ¾å¸Â
            MOVE   TBL-HKNFTNDATA-JGN(1)   TO   WRK-JYOGEN-KOH
+                                               WRK-JYOGEN-KOH2
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
             IF  ((RECE02-KOHNUM(1)      = "051") AND
@@ -10775,7 +10772,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
-           IF  TBL-HKNFTNDATA-FLG(1) = 1
+           COMPUTE  WRK-HKNFTNDATA-RUI = TBL-HKNFTNDATA-TAF(1)
+                                       + TBL-HKNFTNDATA-GAIRAI(1)
+                                       + TBL-HKNFTNDATA-NYUIN(1)
+           IF  ( RECE02-FTNMONEY(2)    =  ZERO               )
+           OR  ( TBL-HKNFTNDATA-FLG(1) =  1 OR 2             )
+           OR  ((WRK-JYOGEN-KOH2       =  WRK-HKNFTNDATA-RUI) AND
+                (WRK-JYOGEN-KOH2   NOT =  ZERO              ))
             CONTINUE
            ELSE
             IF   WRK-JYOGEN-KOH   =    ZERO

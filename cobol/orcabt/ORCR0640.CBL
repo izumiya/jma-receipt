@@ -944,6 +944,8 @@
                05  TBL-HKNFTNDATA-GAIRAI               PIC  9(07).
                05  TBL-HKNFTNDATA-NYUIN                PIC  9(07).
       *
+               05  TBL-HKNFTNDATA-NYUSKJ               PIC  9(07).
+      *
                05  TBL-HKNFTNDATA-ZAN                  PIC  9(07).
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
       *
@@ -1178,6 +1180,8 @@
            03  WRK-KINGAKU-TOK7                PIC  9(07).
            03  WRK-KINGAKU-TOK8                PIC  9(07).
            03  WRK-KINGAKU-TOK9                PIC  9(07).
+      *
+           03  WRK-HKNFTNDATA-RUI              PIC  9(07).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -9625,6 +9629,15 @@
                    ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
                    END-IF
+                   IF   TBL-HKNFTNDATA-FLG(IDY2) = 1
+                     IF  ((RECE62-KOHNUM(IDY2)      =  "051"   ) AND
+                          (TBL-DOTANDOKU-FLG(IDY2)  =   1      ))
+                     OR  ((WRK-PREFNUM              =  "13"    ) AND
+                          (RECE62-KOHNUM(IDY2)      =  "151"   ) AND
+                          (RECE62-SRYYM             <  "200905"))
+                         MOVE   2    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                     END-IF
+                   END-IF
                    DISPLAY "IDX KOHNUM=" IDY2
                            " "    RECE62-KOHNUM(IDY2)
                    DISPLAY "JGN=" TBL-HKNFTNDATA-JGN(IDY2)
@@ -9633,13 +9646,6 @@
                    DISPLAY "NYU=" TBL-HKNFTNDATA-NYUIN(IDY2)
                    DISPLAY "ZAN=" TBL-HKNFTNDATA-ZAN(IDY2)
                    DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
-                END-IF
-                IF  ((RECE62-KOHNUM(IDY2)      =  "051"   ) AND
-                     (TBL-DOTANDOKU-FLG(IDY2)  =   1      ))
-                OR  ((WRK-PREFNUM              =  "13"    ) AND
-                     (RECE62-KOHNUM(IDY2)      =  "151"   ) AND
-                     (RECE62-SRYYM             <  "200905"))
-                    MOVE    ZERO     TO  TBL-HKNFTNDATA-FLG(IDY2)
                 END-IF
              END-PERFORM
       *
@@ -9770,6 +9776,8 @@
                                           SPA-AREA
               MOVE    LNK-FTNJGNCHK-KOHFTN
                                    TO  TBL-HKNFTNDATA-NYUIN(IDY2)
+              MOVE    LNK-FTNJGNCHK-KOHFTNSKJ
+                                   TO  TBL-HKNFTNDATA-NYUSKJ(IDY2)
       *
               IF  RECE62-KOHNUM(IDY2)  =
                        "015" OR "016" OR "024" OR "079" OR "038"
@@ -13834,7 +13842,7 @@
                  MOVE     ZERO    TO    RECE62-FTNMONEY(1)
                  PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
                            UNTIL   KOHFTN-IDX   >    4
-                  IF     TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  ZERO
+                  IF     TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  NOT =  1
                    IF  ( RECE62-KOHNUM(KOHFTN-IDX) =
                               "015" OR "016" OR "051" OR "021" OR
                               "024" OR "079" OR "052" OR "011" OR
@@ -14831,7 +14839,10 @@
                END-IF
            END-IF
       *
-           IF   RECE62-KOUREI    =   "1" OR "2"
+           IF   RECE62-FTNMONEY(2) = ZERO
+            CONTINUE
+           ELSE
+            IF   RECE62-KOUREI    =   "1" OR "2"
               MOVE   RECE62-FTNMONEY(2)      TO  WRK-TAIHI-GENKIN3
               MOVE   WRK-FTNKEI-KOH          TO  RECE62-FTNMONEY(2)
                                                  RECE62-FTNMONEY-KOJ(2)
@@ -14852,9 +14863,10 @@
                 END-IF
                 ADD  WRK-TAIHI-GENKIN3 TO  FTN-KOH-XXX
               END-IF
-           ELSE
+            ELSE
               MOVE   WRK-FTNKEI-KOH          TO  RECE62-FTNMONEY(2)
                                                  RECE62-FTNMONEY-KOJ(2)
+            END-IF
            END-IF
       *
            .
@@ -14866,36 +14878,9 @@
       *****************************************************************
        210463-ZENKI-TOKUREI-OKIKAE-SEC               SECTION.
       *
-           MOVE          44400  TO  WRK-KOH-GENDOGAKU
-           IF   RECE62-TEISYOTOKU  NOT =  SPACE
-              EVALUATE   RECE62-TEISYOTOKU
-                WHEN  "1"
-                WHEN  "4"
-                   MOVE  15000  TO  WRK-KOH-GENDOGAKU
-                WHEN  "2"
-                WHEN  "3"
-                   MOVE  24600  TO  WRK-KOH-GENDOGAKU
-              END-EVALUATE
-           END-IF
-           IF   ( RECE62-KOHNUM(2)  =   "972" )
-           OR   ( RECE62-KOHNUM(3)  =   "972" )
-           OR   ( RECE62-KOHNUM(4)  =   "972" )
-              IF   WRK-KOH-GENDOGAKU  >  10000
-                  MOVE   10000  TO  WRK-KOH-GENDOGAKU
-              END-IF
-           END-IF
-           IF   ( RECE62-KOHNUM(2)  =   "974" )
-           OR   ( RECE62-KOHNUM(3)  =   "974" )
-           OR   ( RECE62-KOHNUM(4)  =   "974" )
-              IF   WRK-KOH-GENDOGAKU  >  20000
-                  MOVE   20000  TO  WRK-KOH-GENDOGAKU
-              END-IF
-           END-IF
-      *
-           IF  FLG-TOKU75 = 1 OR 2
-             COMPUTE  WRK-KOH-GENDOGAKU = WRK-KOH-GENDOGAKU
-                                        / 2
-           END-IF
+           MOVE      1       TO     FLG-GENGAKU-OKIKAE
+           MOVE      1       TO     IDX10
+           PERFORM   2104G1-JGNGAK-SET-SEC
       *
       *    ¸øÈñ¾å¸Â
            MOVE   TBL-HKNFTNDATA-JGN(1)   TO   WRK-JYOGEN-KOH
@@ -14981,7 +14966,13 @@
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
-           IF  TBL-HKNFTNDATA-FLG(1) = 1
+           COMPUTE  WRK-HKNFTNDATA-RUI = TBL-HKNFTNDATA-TAF(1)
+                                       + TBL-HKNFTNDATA-GAIRAI(1)
+                                       + TBL-HKNFTNDATA-NYUSKJ(1)
+           IF  ( RECE62-FTNMONEY(2)    =  ZERO               )
+           OR  ( TBL-HKNFTNDATA-FLG(1) =  1 OR 2             )
+           OR  ((WRK-JYOGEN-KOH2       =  WRK-HKNFTNDATA-RUI) AND
+                (WRK-JYOGEN-KOH2   NOT =  ZERO              ))
             CONTINUE
            ELSE
             IF   WRK-JYOGEN-KOH   =    ZERO
