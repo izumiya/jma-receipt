@@ -91,6 +91,8 @@
       *  04.03.03    NACL-門脇    09/03/11  ７５歳以上の前期高齢者対応
       *
       *  04.04.01    NACL-門脇    09/04/13  平成２１年５月改正対応
+      *  04.04.02    NACL-門脇    09/07/24  ０５１、０５２の保険組み合わせ修正
+      *                                     （生保をもつ場合）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4601,6 +4603,18 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *              自立支援＋生保の組合せを作成しない
                      MOVE    "2"            TO  WRK-FTN-FLG
+               END-IF
+             END-IF
+             IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "200310"
+               IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3"  ) AND
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2) = "051"         ))
+               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "051"          )
+                     MOVE    "3"            TO  WRK-FTN-FLG
+               END-IF
+             END-IF
+             IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "200504"
+               IF  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "052"          )
+                     MOVE    "3"            TO  WRK-FTN-FLG
                END-IF
              END-IF
            END-IF
