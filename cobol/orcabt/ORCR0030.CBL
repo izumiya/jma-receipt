@@ -10748,20 +10748,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
             END-IF
            END-IF
       *
-      ***  IF  RECE02-KOHNUM(1) = "038"
-      ***     IF  TBL-HKNFTNDATA-TAF(1)   <  WRK-JYOGEN-KOH
-      ***         COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH
-      ***                                 - TBL-HKNFTNDATA-TAF(1)
-      ***     ELSE
-      ***         MOVE     ZERO          TO   WRK-JYOGEN-KOH
-      ***     END-IF
+           IF  RECE02-KOHNUM(1) = "038"
+              IF  TBL-HKNFTNDATA-TAF(1)   <  WRK-JYOGEN-KOH
+                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH
+                                          - TBL-HKNFTNDATA-TAF(1)
+              ELSE
+                  MOVE     ZERO          TO   WRK-JYOGEN-KOH
+              END-IF
       ***     IF  TBL-HKNFTNDATA-NYUIN(1) <  WRK-JYOGEN-KOH
       ***         COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH
       ***                                 - TBL-HKNFTNDATA-NYUIN(1)
       ***     ELSE
       ***         MOVE     ZERO          TO   WRK-JYOGEN-KOH
       ***     END-IF
-      ***  END-IF
+           END-IF
       *
            IF  (  RECE02-ZAITAKU        =  SPACE )
            AND (((RECE02-KOHNUM(1)      = "051") AND

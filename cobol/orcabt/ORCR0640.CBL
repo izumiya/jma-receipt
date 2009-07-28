@@ -14953,20 +14953,20 @@
             END-IF
            END-IF
       *
-      ***  IF  RECE62-KOHNUM(1) = "038"
-      ***     IF  TBL-HKNFTNDATA-TAF(1)    <  WRK-JYOGEN-KOH
-      ***         COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH
-      ***                                 - TBL-HKNFTNDATA-TAF(1)
-      ***     ELSE
-      ***         MOVE     ZERO          TO   WRK-JYOGEN-KOH
-      ***     END-IF
+           IF  RECE62-KOHNUM(1) = "038"
+              IF  TBL-HKNFTNDATA-TAF(1)    <  WRK-JYOGEN-KOH
+                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH
+                                          - TBL-HKNFTNDATA-TAF(1)
+              ELSE
+                  MOVE     ZERO          TO   WRK-JYOGEN-KOH
+              END-IF
       ***     IF  TBL-HKNFTNDATA-GAIRAI(1) <  WRK-JYOGEN-KOH
       ***         COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH
       ***                                 - TBL-HKNFTNDATA-GAIRAI(1)
       ***     ELSE
       ***         MOVE     ZERO          TO   WRK-JYOGEN-KOH
       ***     END-IF
-      ***  END-IF
+           END-IF
       *
            IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
                 MOVE  WRK-KOH-GENDOGAKU    TO   WRK-JYOGEN-KOH
