@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.04.00    NACL-Â¿¡¹Ç¼  09/04/09  £È£²£±¡¥£µÂÐ±þ
+      *  04.05.00    NACL-Â¿¡¹Ç¼  09/07/28  £È£²£±Ç¯£±£°·îÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -127,12 +128,13 @@
            03  FILLER              PIC X(15)   VALUE   "22 £²£²Â¿¾å".
            03  FILLER              PIC X(15)   VALUE   "23 £²£³Â¿°ì".
            03  FILLER              PIC X(15)   VALUE   "24 £²£´Â¿Äã".
+           03  FILLER              PIC X(15)   VALUE   "25 £²£µ½Ð»º".
        01  TBL-TOKKI-AREA-R        REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI-OCC       OCCURS   22.
+           03  TBL-TOKKI-OCC       OCCURS   23.
                05  TBL-TOKK-CD     PIC X(02).
                05  TBL-TOKK-K      PIC X(01).
                05  TBL-TOKK-NAIYO  PIC X(12).
-       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   22.
+       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   23.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -827,6 +829,7 @@
            IF      SPA-GMN26-CD        =   "22"
                                        OR  "23"
                                        OR  "24"
+                                       OR  "25"
       *        Æþ±¡
                MOVE    SPA-GMN26-NYUGAI-LST (2)
                                            TO  SPA-GMN26-NYUGAI-G
@@ -935,6 +938,17 @@
            AND    (SPA-NAI26-STYM  NOT =   ZERO  )
                IF      SPA-NAI26-STYM      <   "200905"
                    MOVE    "2612"              TO  SPA-ERRCD
+                   MOVE    05                  TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+      *!!!
+      *!!!
+      *H21.10 ÆÃµ­ÄÉ²ÃÊ¬
+           IF     (SPA-GMN26-CD        =   "25" )
+           AND    (SPA-ERRCD           =   SPACE )
+           AND    (SPA-NAI26-STYM  NOT =   ZERO  )
+               IF      SPA-NAI26-STYM      <   "200910"
+                   MOVE    "2613"              TO  SPA-ERRCD
                    MOVE    05                  TO  SPA-GMN26-CUR
                END-IF
            END-IF
