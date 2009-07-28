@@ -4963,6 +4963,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "2613"
+                   STRING  "この特記事項の開始は"
+                           "平成２１年１０月からです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "2620"
                    STRING  "特記事項は５０件までの登録です。"
                            "これ以上追加できません。"
