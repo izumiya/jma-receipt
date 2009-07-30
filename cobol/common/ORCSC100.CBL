@@ -755,8 +755,8 @@
       *    入院回数入力分以外
            IF      SPA-GMN-INPUTCD(IDX)(1:1)   NOT =   "*"
       *        算定日が違った時、警告クリア
-               IF    ((WRK-NYUIN-AREA  NOT =   SPA-COM-NYUIN-AREA(IDX))
-                  OR  (WRK-KAISU       NOT =   SPA-COM-KAISU     (IDX)))
+               IF     (WRK-NYUIN-AREA  NOT =   SPA-COM-NYUIN-AREA(IDX))
+      **********  OR  (WRK-KAISU       NOT =   SPA-COM-KAISU     (IDX)))
       *            訂正時展開以外
                 AND    (ORCSC100-INIT       =   ZERO   )
                    MOVE    SPACE       TO  SPA-COM-KZMFLG(IDX)
@@ -789,6 +789,9 @@
                IF      WRK-KAISU          =   ZERO
                    MOVE    1              TO  WRK-KAISU
                END-IF
+           END-IF
+           IF      WRK-KAISU       NOT =   SPA-COM-KAISU (IDX)
+               MOVE    SPACE           TO  SPA-COM-HCHKFLG (IDX)
            END-IF
            MOVE    WRK-KAISU           TO  SPA-COM-KAISU (IDX)
            .
