@@ -3621,6 +3621,7 @@
                IF     (LNK-WKSRY-TERMID (01)   =   "WKSRYACT")
                AND    (FLG-NYUIN       =   ZERO  )
                    PERFORM 3104-WKSRYACT-HEN-SEC
+                   MOVE    SPACE               TO  SPA-ERRCD
                END-IF
            END-IF
       *
