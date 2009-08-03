@@ -590,6 +590,7 @@
                                            OR  "350"
                                            OR  "332"
                                            OR  "352")
+           AND    (ACCT-ZAIKAISU           >   ZERO )
       *        ø«Œ≈π‘∞Ÿ§Ë§Í¥Ô∫‡ ‘Ω∏
                PERFORM 10016-TBL-KIZAIHEN-SEC
            END-IF
