@@ -3177,6 +3177,21 @@
            ELSE
                MOVE    3                   TO  IDX-STR
                MOVE    78                  TO  WRK-LEN
+               IF     (SPA-GMN-MEISYO-G (SPA-GMN-IDX)(1:2)
+                                           =   "* "
+                                           OR  SPACE  )
+                   CONTINUE
+               ELSE
+      *            開始位置より前に入力があれば元に戻してエラー
+                   MOVE    "0100"          TO  SPA-ERRCD
+                   MOVE    "3"             TO  SPA-COM-CUR (SPA-GMN-IDX)
+                   MOVE    2               TO  SPA-GMN-CUR
+                   MOVE    SPACE           TO  SPA-GMN-MEISYO-G
+                                                (SPA-GMN-IDX)
+                   MOVE    SPA-COM-NAME (SPA-GMN-IDX)
+                                           TO  SPA-GMN-MEISYO
+                                                (SPA-GMN-IDX)
+               END-IF
            END-IF
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "2"                 TO  KANACHK-SYORI
@@ -7494,6 +7509,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+      *    コメント入力位置エラーはカーソル移動のみ
+           IF      SPA-ERRCD           =   "0100"
+               MOVE    SPACE               TO  SPA-ERRCD
+           END-IF
            IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
                GO      TO      500-SET-SCREEN-EXT
