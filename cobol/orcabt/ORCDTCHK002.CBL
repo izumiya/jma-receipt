@@ -338,6 +338,7 @@
            03  FLG-DATACHECK                           PIC 9(01).
            03  FLG-KIKANCHKCD                          PIC 9(01).
            03  FLG-REIGAI                              PIC 9(01).
+           03  FLG-TARGET                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -7143,8 +7144,23 @@
                PERFORM 900-DTCHK008-WRITE-SEC
            END-IF
       *
+           MOVE    1                   TO  FLG-TARGET
+      *
            IF    ( TCHK-ACT-NYUGAIKBN (1)  =   SPACE )
               OR ( TCHK-ACT-NYUGAIKBN (1)  =   ORCBSD01-NYUGAIKBN )
+               CONTINUE
+           ELSE
+               MOVE    ZERO            TO  FLG-TARGET
+           END-IF
+      *
+           IF    ( TCHK-ACT-NYUGAIBNDKBN (1)   =   "2" )
+            AND  ( TSRYCD-NYUGAIKBN (IDX6)     =   ORCBSD01-NYUGAIKBN )
+               CONTINUE
+           ELSE
+               MOVE    ZERO            TO  FLG-TARGET
+           END-IF
+      *
+           IF    ( FLG-TARGET          =   1 )
       *
                PERFORM VARYING IDX10   FROM    1   BY  1
                        UNTIL ( IDX10   >   TCHK-ACT-CD-MAX )
