@@ -4814,6 +4814,10 @@
                MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
                GO      TO      230-SIDOU-SYOSIN-EXT
            END-IF
+      *    アフターケアの時、チェックなし
+           IF      SPA-RSI-HKNKBN      =   "3"
+               GO      TO      230-SIDOU-SYOSIN-EXT
+           END-IF
       *
            IF      LNK-ORCSC-SYORIFLG      =   1
       *        訂正時点の初診算定日
