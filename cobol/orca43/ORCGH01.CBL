@@ -76,6 +76,7 @@
       *                                     一括入力対応
       *  04.03.02    NACL-藤原    08/06/06  レセプト種別名称、作成日の追加
       *  04.03.03    NACL-藤原    08/06/18  公費請求分の請求年月等の追加
+      *  04.03.04    NACL-藤原    09/08/10  合計点数が不一致となる現象の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -857,19 +858,19 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                MOVE    H01-NKAISU (IDX)    TO  SPA-H01GMN-NKAISU  (IDX)
                PERFORM VARYING IDY     FROM    1   BY  1
                        UNTIL   IDY     >       3
-                   COMPUTE SPA-H01GMN-NTOTALTEN (IDY) = 
-                                      SPA-H01GMN-NTOTALTEN (IDY)     -
-                                      SPA-H01GMN-NTENSU    (IDY IDX)
+      ****         COMPUTE SPA-H01GMN-NTOTALTEN (IDY) = 
+      ****                             SPA-H01GMN-NTOTALTEN (IDY)     -
+      ****                             SPA-H01GMN-NTENSU    (IDY IDX)
                    MOVE    H01-NTENSU (IDY IDX)
                                        TO  SPA-H01GMN-NTENSU (IDY IDX)
                END-PERFORM
            END-PERFORM    
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >       5
-               IF      IDX                 >   3
+      *****    IF      IDX                 >   3
                    MOVE    H01-NTOTALTEN (IDX)
                                            TO  SPA-H01GMN-NTOTALTEN(IDX)
-               END-IF
+      *****    END-IF
                MOVE    H01-NFTNMONEY (IDX) TO  SPA-H01GMN-NFTNMONEY(IDX)
                MOVE    H01-NYKZFTN   (IDX) TO  SPA-H01GMN-NYKZFTN  (IDX)
                MOVE    H01-NJNISSU   (IDX) TO  SPA-H01GMN-NJNISSU  (IDX)
@@ -919,8 +920,12 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                IF      SPA-ERRCD       NOT =   SPACE
                    GO  TO  4102-KIHON-CHK-EXT
                END-IF
-               PERFORM VARYING IDY     FROM    1   BY  1
-                       UNTIL   IDY     >   3
+           END-PERFORM        
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >   3
+               MOVE    ZERO            TO  SPA-H01GMN-NTOTALTEN (IDY)
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       38
                    PERFORM 4110-TENSU-CHK-SEC
                    IF      SPA-ERRCD       NOT =   SPACE
                        GO  TO  4102-KIHON-CHK-EXT
