@@ -4709,8 +4709,9 @@
                MOVE    WRK-YMDS-1      TO  WRK-RSI-YMD1
            END-IF
       *    ½é¿Ç»»ÄêÆü¤¬£È£±£¸¡¥£³¡¥£³£±°ÊÁ°¤Ç¤¢¤ì¤Ð¡¢²þÀµÁ°¤Î¥³¡¼¥É¸¡º÷
-           IF     (WRK-SYO-YMD         >=  "20060401")
-              OR  (WRK-SYO-YMD         >=  "20060401")
+           IF     (WRK-SYO-YMD     NOT =   WRK-SYO-YMD1 )
+            AND   (WRK-SYO-YMD     NOT =   SPACE        )
+            AND   (WRK-SYO-YMD         <   SPA-SRYYMD   )
                CONTINUE
            ELSE
       *        ÉÂ±¡¡ÊÏ·¿Í¡Ë
