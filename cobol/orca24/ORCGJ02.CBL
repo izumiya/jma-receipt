@@ -7738,6 +7738,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-NAI-ZAITEN  (SPA-NAI-BANGO)
                                         >   SPA-NAI-SYUTEN2
                                                 (SPA-NAI-BANGO))
+      *           ≤Ë¡¸ø«√«§œ•’•£•Î•‡Œ¡§¨ ‘Ω∏
+             AND  (SPA-NAI-SRYKBN  (SPA-NAI-BANGO)
+                                       NOT =   "70" )
                MOVE    "0021"               TO  SPA-ERRCD
            END-IF
            .
