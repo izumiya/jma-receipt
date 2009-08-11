@@ -2040,9 +2040,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    SPA-COM-TENSU  (IDX)   TO  WRK-TENSUKEI
       *                各計を編集する
                        MOVE    SPA-COM-SYUTEN1(IDX)   TO  WRK-SYUTEN1
-                       MOVE    SPA-COM-SYUTEN2 (IDX)  TO  WRK-SYUTEN2
+      ***********      MOVE    SPA-COM-SYUTEN2 (IDX)  TO  WRK-SYUTEN2
                        MOVE    SPA-COM-YKZTEN  (IDX)  TO  WRK-YKZTEN
                        MOVE    SPA-COM-KIZAITEN(IDX)  TO  WRK-KIZAITEN
+                   END-IF
+      *            労災読み替え点数編集
+                   IF     (SPA-COM-SYUTEN2 (IDX)   >   ZERO  )
+                       MOVE    SPA-COM-SYUTEN2 (IDX)  TO  WRK-SYUTEN2
                    END-IF
       *
                    IF      SPA-COM-KEIFLG (IDX)   =   "1"  OR  "2"
@@ -2061,6 +2065,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                            PERFORM 20021-WKSRYACT-OUT-SEC
                        ELSE
                            PERFORM 30021-WKSRYPARA-OUT-SEC
+                       END-IF
+      *                労災読み替え点数クリア
+                       IF     (SPA-COM-ZAIEND (IDX)    =   "1"   )
+                           MOVE    ZERO                TO  WRK-SYUTEN2
                        END-IF
                    END-IF
                END-IF
