@@ -194,6 +194,8 @@
       *                                     処方せん（乳幼児）加算編集対応
       *
       *  04.04.01    NACL-門脇    09/02/04  検査のコメント自動記載対応
+      *  04.04.02    NACL-藤原    09/08/12  レセプト特記事項編集情報の取得
+      *                                     時の上限チェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -370,11 +372,11 @@
       *
       *    レセプト特記事項編集情報退避用領域
        01  TBL-SYS2006-T-ALL.
-           03  TBL-SYS2006-OCC-ALL     OCCURS  100.
+           03  TBL-SYS2006-OCC-ALL     OCCURS  200.
                05  TBL-SYS2006-ALL     PIC  X(610).
       *    レセプト特記事項編集情報退避用領域（該当診療年月用）
        01  TBL-SYS2006-T.
-           03  TBL-SYS2006-OCC         OCCURS  100.
+           03  TBL-SYS2006-OCC         OCCURS  200.
                05  TBL-SYS2006         PIC  X(610).
                05  TBL-SYS2006-KEY.
                    07  TBL-SYS2006-HKNNUM
@@ -1274,6 +1276,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    "key7"              TO  MCP-PATHNAME
                    PERFORM 900-SYSKANRI-READ-SEC
                    PERFORM  UNTIL   FLG-SYSKANRI    =   1
+                            OR      SYSKAN-IDY      >=  200
       *
                        MOVE    MCPDATA-REC   TO  SYS-2006-REC
                        ADD     1             TO  SYSKAN-IDY
@@ -1346,6 +1349,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    "key5"              TO  MCP-PATHNAME
                    PERFORM 900-SYSKANRI-READ-SEC
                    PERFORM  UNTIL   FLG-SYSKANRI   =    1
+                            OR      SYSKAN-IDX     >=  200
       *
                        MOVE    MCPDATA-REC     TO  SYS-2006-REC
                        ADD     1               TO  SYSKAN-IDX
@@ -4826,7 +4830,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            INITIALIZE                      TBL-SYS2006-T
       *
            PERFORM VARYING SYSKAN-IDX  FROM    1   BY  1
-                   UNTIL ( SYSKAN-IDX          >  100  )
+                   UNTIL ( SYSKAN-IDX          >  200  )
                    OR    ( TBL-SYS2006-ALL(SYSKAN-IDX)
                                                = SPACE )
                MOVE    TBL-SYS2006-ALL (SYSKAN-IDX)
