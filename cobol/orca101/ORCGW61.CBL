@@ -47,6 +47,8 @@
       *  04.02.02    NACL-藤原    08/04/14  警告時の登録処理を可能にする
       *
       *  04.03.01    NACL-藤原    09/04/14  保険番号９００番台のチェック
+      *  04.03.02    NACL-藤原    09/08/12  コラムリストの上限を２００に
+      *                                     変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -135,7 +137,7 @@
                                                    PIC 9(01).
       *
                    07  SPA-GMN-TBL.
-                       09  SPA-GMN-TBL-OCC         OCCURS  100.
+                       09  SPA-GMN-TBL-OCC         OCCURS  200.
                            11  SPA-GMN-TRENNUM     PIC 9(03).
                            11  SPA-GMN-THKNNUM     PIC X(03).
                            11  SPA-GMN-TSEIDONAME  PIC X(50).
@@ -248,7 +250,7 @@
                        09  SPA-NAI-STYUKYMD        PIC 9(08).
                        09  SPA-NAI-EDYUKYMD        PIC 9(08).
                    07  SPA-NAI-TBL.
-                       09  SPA-NAI-TBL-OCC         OCCURS  100.
+                       09  SPA-NAI-TBL-OCC         OCCURS  200.
                            11  SPA-NAI-TSTYUKYMD   PIC 9(08).
                            11  SPA-NAI-TEDYUKYMD   PIC 9(08).  
                            11  SPA-NAI-TKBNCD      PIC X(03).
@@ -627,7 +629,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    ZERO            TO  IDX
            PERFORM         UNTIL   FLG-SYSKANRI   =   1
-                           OR      IDX            >=  100
+                           OR      IDX            >=  200
                MOVE    SYSKANRI-REC        TO  SYS-2006-REC
       *
                ADD     1                   TO  IDX
