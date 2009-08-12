@@ -122,6 +122,8 @@
       *                                     ¡ÊÅÀÅ©ÊÔ½¸½¤Àµ¡Ë
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
       *  04.02.02    NACL-ÌçÏÆ    08/05/08  ÅÀÅ©£³£³£²¤Î¼êµ»ÎÁÊÔ½¸
+      *  04.02.03    NACL-Æ£¸¶    09/08/12  ¥³¥é¥à¥ê¥¹¥È¤Î¾å¸Â¤ò£²£°£°¤Ë
+      *                                     ÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -289,11 +291,11 @@
       *
       *    ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊóÂàÈòÍÑÎÎ°è
        01  TBL-SYS2006-T-ALL.
-           03  TBL-SYS2006-OCC-ALL     OCCURS  100.
+           03  TBL-SYS2006-OCC-ALL     OCCURS  200.
                05  TBL-SYS2006-ALL     PIC  X(610).
       *    ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊóÂàÈòÍÑÎÎ°è¡Ê³ºÅö¿ÇÎÅÇ¯·îÍÑ¡Ë
        01  TBL-SYS2006-T.
-           03  TBL-SYS2006-OCC         OCCURS  100.
+           03  TBL-SYS2006-OCC         OCCURS  200.
                05  TBL-SYS2006         PIC  X(610).
                05  TBL-SYS2006-KEY.
                    07  TBL-SYS2006-HKNNUM
@@ -1053,6 +1055,7 @@
                    MOVE    "key7"           TO  MCP-PATHNAME
                    PERFORM 900-SYSKANRI-READ-SEC
                    PERFORM  UNTIL   FLG-SYSKANRI    =   1
+                            OR      SYSKAN-IDY      >=  200
       *
                        MOVE    MCPDATA-REC   TO  SYS-2006-REC
                        ADD     1             TO  SYSKAN-IDY
@@ -1125,6 +1128,7 @@
                    MOVE    "key5"              TO  MCP-PATHNAME
                    PERFORM 900-SYSKANRI-READ-SEC
                    PERFORM  UNTIL   FLG-SYSKANRI   =    1
+                            OR      SYSKAN-IDX     >=   200
       *
                        MOVE    MCPDATA-REC     TO  SYS-2006-REC
                        ADD     1               TO  SYSKAN-IDX
@@ -4259,7 +4263,7 @@
            INITIALIZE                      TBL-SYS2006-T
       *
            PERFORM VARYING SYSKAN-IDX  FROM    1   BY  1
-                   UNTIL ( SYSKAN-IDX          >  100  )
+                   UNTIL ( SYSKAN-IDX          >  200  )
                    OR    ( TBL-SYS2006-ALL(SYSKAN-IDX)
                                                = SPACE )
                MOVE    TBL-SYS2006-ALL (SYSKAN-IDX)

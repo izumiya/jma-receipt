@@ -188,6 +188,8 @@
       *  04.02.05    NACL-ÌçÏÆ    08/11/06  Èé²¼¶ÚÆù¡¢ÀÅÌ®Ãí¼Í¤Îµ­ºÜÊÑ¹¹ÂÐ±þ
       *  04.02.06    NACL-ÌçÏÆ    09/01/15  ½èÊý¡ÊÆýÍÄ»ù¡Ë²Ã»»ÊÔ½¸ÂÐ±þ
       *                                     ½èÊý¤»¤ó¡ÊÆýÍÄ»ù¡Ë²Ã»»ÊÔ½¸ÂÐ±þ
+      *  04.02.07    NACL-Æ£¸¶    09/08/12  ¥³¥é¥à¥ê¥¹¥È¤Î¾å¸Â¤ò£²£°£°¤Ë
+      *                                     ÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -364,11 +366,11 @@
       *
       *    ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊóÂàÈòÍÑÎÎ°è
        01  TBL-SYS2006-T-ALL.
-           03  TBL-SYS2006-OCC-ALL     OCCURS  100.
+           03  TBL-SYS2006-OCC-ALL     OCCURS  200.
                05  TBL-SYS2006-ALL     PIC  X(610).
       *    ¥ì¥»¥×¥ÈÆÃµ­»ö¹àÊÔ½¸¾ðÊóÂàÈòÍÑÎÎ°è¡Ê³ºÅö¿ÇÎÅÇ¯·îÍÑ¡Ë
        01  TBL-SYS2006-T.
-           03  TBL-SYS2006-OCC         OCCURS  100.
+           03  TBL-SYS2006-OCC         OCCURS  200.
                05  TBL-SYS2006         PIC  X(610).
                05  TBL-SYS2006-KEY.
                    07  TBL-SYS2006-HKNNUM
@@ -1264,6 +1266,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    "key7"              TO  MCP-PATHNAME
                    PERFORM 900-SYSKANRI-READ-SEC
                    PERFORM  UNTIL   FLG-SYSKANRI    =   1
+                            OR      SYSKAN-IDY      >=  200
       *
                        MOVE    MCPDATA-REC   TO  SYS-2006-REC
                        ADD     1             TO  SYSKAN-IDY
@@ -1336,6 +1339,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    "key5"              TO  MCP-PATHNAME
                    PERFORM 900-SYSKANRI-READ-SEC
                    PERFORM  UNTIL   FLG-SYSKANRI   =    1
+                            OR      SYSKAN-IDX     >=   200
       *
                        MOVE    MCPDATA-REC     TO  SYS-2006-REC
                        ADD     1               TO  SYSKAN-IDX
@@ -3262,6 +3266,10 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
                    MOVE    SYS-2006-RECEDEN-TOKKI
                                            TO  RECE02-2006-RECEDEN-TOKKI
                                                                    (IDZ)
+      *??
+               DISPLAY "RECE02-2006-RECEDEN-TOKKI=" IDZ "#" 
+                                  RECE02-2006-RECEDEN-TOKKI (IDZ)
+      *??
                END-IF
            END-PERFORM
       *
@@ -4801,7 +4809,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            INITIALIZE                      TBL-SYS2006-T
       *
            PERFORM VARYING SYSKAN-IDX  FROM    1   BY  1
-                   UNTIL ( SYSKAN-IDX          >  100  )
+                   UNTIL ( SYSKAN-IDX          >  200  )
                    OR    ( TBL-SYS2006-ALL(SYSKAN-IDX)
                                                = SPACE )
                MOVE    TBL-SYS2006-ALL (SYSKAN-IDX)

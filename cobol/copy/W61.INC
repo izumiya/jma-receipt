@@ -3,7 +3,7 @@
                 04  W61-TOKKILST.
                   05  W61-COUNT   PIC S9(9)   BINARY.
                   05  W61-ROW PIC S9(9)   BINARY.
-                  05  W61-ITEM            OCCURS  100 TIMES.
+                  05  W61-ITEM            OCCURS  200 TIMES.
                     06  W61-TRENNUM       PIC X(3).
                     06  W61-THKNNUM       PIC X(3).
                     06  W61-TSEIDONAME    PIC X(50).
@@ -16,7 +16,7 @@
                     06  W61-TSTYUKYMD     PIC X(9).
                     06  W61-TEDYUKYMD     PIC X(9).
                   05  W61-SELECT
-                          PIC X       OCCURS  100 TIMES.
+                          PIC X       OCCURS  200 TIMES.
               03  W61-SELNUM.
                 04  W61-VALUE   PIC S9(3).
               03  W61-STYUKYMD.
