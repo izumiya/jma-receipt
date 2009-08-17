@@ -230,6 +230,9 @@
       *                                     ´ðËÜ¹àÌÜÃ±°Ì¤Îµ­Ï¿
       *  04.02.16    NACL-Æ£¸¶    09/06/10  £±£³°å³Ø´ÉÍý¡¢£±£´ºßÂð¤ÎÅÀ¿ô¡¢
       *                                     ²ó¿ô¤Îµ­ºÜ¤Î½¤Àµ
+      *  04.02.17    NACL-Æ£¸¶    09/08/17  ¡ÖÊ¿À®£²£±Ç¯£··îÃæ¹ñ¡¦¶å½£
+      *                                     ËÌÉô¹ë±«¡×ÂÐ±þ
+      *                                     £²£°£°£¹Ç¯£··î¡ÁÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7453,7 +7456,20 @@
                                            MOVE    1       TO  FLG-READ
                                        END-IF
                                    ELSE
-                                       MOVE    1           TO  FLG-READ
+      *                                Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
+                                       IF    ( SYS-1001-PREFNUM
+                                                  =   "35"    OR  "40" )
+                                       AND   ( RECE62-SRYYM
+                                                  >=  200907           )
+                                       AND   ( RECE62-SRYYM
+                                                  <=  200912           )
+                                           IF     RECE62-RJNGAIKOHFTN(1)
+                                                           =   ZERO
+                                               MOVE    1   TO  FLG-READ
+                                           END-IF
+                                       ELSE
+                                           MOVE    1   TO  FLG-READ
+                                       END-IF
                                    END-IF
                                END-IF
                            END-IF
