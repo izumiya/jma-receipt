@@ -379,6 +379,7 @@
       *  04.04.14    NACL-ÌçÏÆ    09/07/16  ¸øÈñ·î¾å¸Â³ÛÈ½Äê
       *  04.04.15    NACL-ÌçÏÆ    09/07/17  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.04.16    NACL-ÌçÏÆ    09/08/17  Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ
+      *  04.04.17    NACL-ÌçÏÆ    09/08/18  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -14484,9 +14485,9 @@
            EVALUATE   WRK-PREFNUM
       *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
              WHEN    "10"
-               IF  (RECE62-SRYYM        >=  "200804")
-               AND (RECE62-TEISYUTUSAKI  =   2 OR 6 )
-               AND (RECE62-KOUREI        =  "1"     )
+               IF  (RECE62-SRYYM        >=  "200804"  )
+               AND (RECE62-TEISYUTUSAKI  =   2  OR  6 )
+               AND (RECE62-KOUREI        =  "1" OR "2")
                  IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
                  AND (RECE62-KOHNUM(2)       =  SPACE            )
                  AND (RECE62-KOHNUM(3)       =  SPACE            )
@@ -14517,6 +14518,7 @@
                       (RECE62-TOTALTEN(1)  =
                                           RECE62-HENTOTALTEN(3)) )
                  AND (RECE62-TEISYUTUSAKI  =    6                )
+                 AND (RECE62-KOUREI        =   "1"               )
                    COMPUTE  WRK-HANTEI-TOTALTEN = RECE62-TOTALTEN(1)
                                                 - RECE62-TOTALTEN(2)
                    PERFORM  210464-JYOGENGAKU-HENSYU-SEC
