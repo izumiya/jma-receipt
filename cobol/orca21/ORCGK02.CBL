@@ -3621,7 +3621,15 @@
                IF     (LNK-WKSRY-TERMID (01)   =   "WKSRYACT")
                AND    (FLG-NYUIN       =   ZERO  )
                    PERFORM 3104-WKSRYACT-HEN-SEC
-                   MOVE    SPACE               TO  SPA-ERRCD
+      *TEST
+      *            中途終了データ展開で剤分離エラーは以下処理なし
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       MOVE    SPACE               TO  SPA-ERRCD
+                       INITIALIZE                  SPA-NAI-FUKATEN-AREA
+                       GO  TO  310-SPA-GMNSET-EXT
+                   END-IF
+      *TEST
+      *TEST
                END-IF
            END-IF
       *
@@ -3755,6 +3763,7 @@
                    (SPA-NETAKIRI-ARI2  NOT =   ZERO )
                MOVE    1                   TO  LNK-SC93-NETAKIRI-ARI
            END-IF
+      *
            CALL    "ORCSC93"           USING
                                        MCPAREA
                                        SPA-SCR-REC

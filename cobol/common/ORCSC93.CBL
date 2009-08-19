@@ -474,6 +474,7 @@
                    END-EVALUATE
                END-IF
            END-PERFORM
+      *
            .
       *
        1002-ZAIBUNNRI-EXT.
@@ -2045,6 +2046,10 @@
            IF      FLG-ARI             =   ZERO
                MOVE    "0013"              TO  SPA-ERRCD
                MOVE    "1"                 TO  SPA-COM-CUR(IDX)
+      *        ÃæÅÓ½ªÎ»Å¸³«¤Î¥¨¥é¡¼¤Î°Ù¡¢¿ÇÎÅ¶èÊ¬¤È½ªÎ»¤ÎÀßÄê
+               MOVE    WRK-SRYKBN          TO  SPA-COM-SRYKBN (IDX)
+               MOVE    WRK-SRYSYUKBN       TO  SPA-COM-SRYSYUKBN (IDX)
+               MOVE    "1"                 TO  SPA-COM-ZAIEND (IDX)
            ELSE
                MOVE    SPA-COM-SRYKBN (IDX - 1)
                                            TO  SPA-COM-SRYKBN (IDX)
@@ -2107,9 +2112,6 @@
       *****************************************************************
        200-KENSA-SORT-SEC              SECTION.
       *
-      *TEST
-           DISPLAY "C93 200-KENSA-SORT-SEC" 
-      *TEST
       *    ²èÌÌ£Ó£Ð£ÁÎÎ°è¥ï¡¼¥¯
            INITIALIZE                  WRK-GMN-REC
            INITIALIZE                  HZN-GMN-REC
@@ -2157,9 +2159,6 @@
            IF      SPA-GMN-MAX     NOT =   IDX-TBL
                MOVE    IDX-TBL         TO  SPA-GMN-MAX
            END-IF
-      *TEST
-           DISPLAY "C93 200-KENSA-SORT-EXT SPA-GMN-MAX:" SPA-GMN-MAX
-      *TEST
       *
            .
        200-KENSA-SORT-EXT.
