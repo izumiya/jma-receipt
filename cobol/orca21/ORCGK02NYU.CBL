@@ -5527,7 +5527,7 @@
                                        ORCSC93AREA
                                        MSYU-DATA-REC
            IF      SPA-ERRCD       NOT =   SPACE
-      *****   AND (FLG-INIT            =   ZERO )
+              AND (FLG-INIT            =   ZERO )
                GO      TO      5101-TBLSAIHEN-EXT
            END-IF
       *    まとめ検査に日付指定がある時、まとめ解除
