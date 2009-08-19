@@ -7592,7 +7592,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-               AND (RECE02-SRYYM   <=  "200903")
+               AND (RECE02-SRYYM   <=  "201003")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT
