@@ -1905,6 +1905,10 @@
            IF      FLG-ARI             =   ZERO
                MOVE    "0013"              TO  SPA-ERRCD
                MOVE    "1"                 TO  SPA-COM-CUR(IDX)
+      *        面庞姜位鸥倡のエラ〖の百、壳闻惰尸と姜位の肋年
+               MOVE    WRK-SRYKBN          TO  SPA-COM-SRYKBN (IDX)
+               MOVE    WRK-SRYSYUKBN       TO  SPA-COM-SRYSYUKBN (IDX)
+               MOVE    "1"                 TO  SPA-COM-ZAIEND (IDX)
            ELSE
                MOVE    SPA-COM-SRYKBN (IDX - 1)
                                            TO  SPA-COM-SRYKBN (IDX)
