@@ -387,7 +387,7 @@
                                        ORCSC93AREA
                                        MSYU-DATA-REC
            IF     (SPA-ERRCD       NOT =   SPACE )
-              AND (ORCSC100-INIT       =   ZERO )
+      *****   AND (ORCSC100-INIT       =   ZERO )
                GO      TO      5101-TBLSAIHEN-EXT
            END-IF
       *
