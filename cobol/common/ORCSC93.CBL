@@ -152,6 +152,8 @@
       *    小児科外来診察料加算判定
            03  WRK-SYONIKA-KBN         PIC X(01).
       *
+           03  WRK-ERRCD               PIC X(04).
+      *
            03  WRK-HKNCOMBI            PIC X(04).
            03  WRK-SRYKA               PIC X(02).
            03  WRK-DRCD                PIC X(04).
@@ -457,6 +459,13 @@
                IF      SPA-ERRCD           =   SPACE
       *            剤分離
                    PERFORM 5101-SYRKBN-SET-SEC
+      *            エラーがあっても続ける
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       IF      WRK-ERRCD       =   SPACE
+                           MOVE    SPA-ERRCD       TO  WRK-ERRCD
+                       END-IF
+                       MOVE    SPACE           TO  SPA-ERRCD
+                   END-IF
                END-IF
       *        各処理のチェック
                IF      SPA-ERRCD           =   SPACE
@@ -474,6 +483,10 @@
                    END-EVALUATE
                END-IF
            END-PERFORM
+      *
+           IF      WRK-ERRCD       NOT =   SPACE
+               MOVE    WRK-ERRCD           TO  SPA-ERRCD
+           END-IF
       *
            .
       *
@@ -2046,10 +2059,6 @@
            IF      FLG-ARI             =   ZERO
                MOVE    "0013"              TO  SPA-ERRCD
                MOVE    "1"                 TO  SPA-COM-CUR(IDX)
-      *        中途終了展開のエラーの為、診療区分と終了の設定
-               MOVE    WRK-SRYKBN          TO  SPA-COM-SRYKBN (IDX)
-               MOVE    WRK-SRYSYUKBN       TO  SPA-COM-SRYSYUKBN (IDX)
-               MOVE    "1"                 TO  SPA-COM-ZAIEND (IDX)
            ELSE
                MOVE    SPA-COM-SRYKBN (IDX - 1)
                                            TO  SPA-COM-SRYKBN (IDX)
