@@ -4843,7 +4843,7 @@
                END-IF
              WHEN      "20"
                IF  (RECE62-SRYYM   >=  "200804")
-               AND (RECE62-SRYYM   <=  "200903")
+               AND (RECE62-SRYYM   <=  "201003")
                    CONTINUE
                ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
