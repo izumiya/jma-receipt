@@ -156,10 +156,10 @@
       *
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key36"             TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "key36"             TO  MCP-PATHNAME
+               MOVE    "key3"              TO  MCP-PATHNAME
                PERFORM 910-PTNYUINRRK-READ-SEC
            ELSE
                MOVE    1               TO  FLG-PTNYUINRRK
@@ -180,6 +180,13 @@
            PERFORM
                    UNTIL      (FLG-PTNYUINRRK      =   1 )
                           OR  (FLG-SYORI-END       =   1 )
+      *      ³°Íè¤ÎÈ½Äê¤Ï¡¢¼«±¡ÎòÊ¬¤ÏÂÐ¾Ý³°
+             IF     ((SPA-NYUGAIKBN        =   "2" )
+                 AND (PTNYUINRRK-JTIKBN    =   "6" ))  
+      *              Â¾±¡Æþ±¡¤ÏÂÐ¾Ý³°
+               OR    (PTNYUINRRK-JTIKBN    =   "5" )
+               CONTINUE
+             ELSE
                EVALUATE    ORCSCNYUHEN-KBN
       *            ¿ÇÎÅÆüÉÕ¤Ç¤ÎÈ½Äê
                    WHEN    "1"
@@ -200,13 +207,14 @@
                END-IF
                MOVE    PTNYUINRRK-NYUINYMD TO  WRK-OLD-NYUINYMD
                MOVE    PTNYUINRRK-TAIINYMD TO  WRK-OLD-TAIINYMD
+           END-IF
       *
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key36"             TO  MCP-PATHNAME
+               MOVE    "key3"              TO  MCP-PATHNAME
                PERFORM 910-PTNYUINRRK-READ-SEC
            END-PERFORM
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key36"             TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
       *    ºÇ½ªÂà±¡Æü¤ÎÀßÄê
