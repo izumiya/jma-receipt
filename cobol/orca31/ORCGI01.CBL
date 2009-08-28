@@ -537,8 +537,7 @@
            03  WRK-NYUREKILST-ROW          PIC S9(9)   BINARY.
       *
        01  CONST-AREA.
-      *    03  CONST-H211001               PIC X(08)   VALUE "20091001".
-           03  CONST-H211001               PIC X(08)   VALUE "00000000".
+           03  CONST-H211001               PIC X(08)   VALUE "20091001".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
            03  CONST-H180401               PIC X(08)   VALUE "20060401".
            03  CONST-H180701               PIC X(08)   VALUE "20060701".

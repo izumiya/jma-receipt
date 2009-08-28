@@ -188,6 +188,10 @@
            03  WRK-NINPUFTN-MONEY          PIC 9(10).
            03  WRK-CREYMD                  PIC X(08).
       *
+      *
+       01  CONST-AREA.
+           03  CONST-H211001               PIC X(08)   VALUE "20091001".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -1031,6 +1035,13 @@
                ELSE
                    MOVE    WRK-SYMD    TO  SPA-NAI-BIRTHDAY-BABY
                    MOVE    WRK-HENYMDG TO  SPA-GMN-BIRTHDAY-BABY
+               END-IF
+      *
+               IF    ( SPA-ERRCD       =   SPACE )
+                   IF    ( SPA-NAI-BIRTHDAY-BABY   <   CONST-H211001 )
+                       MOVE    "0008"  TO  SPA-ERRCD
+                       MOVE    6       TO  SPA-GMN-CUR
+                   END-IF
                END-IF
            END-IF
       *
@@ -2006,6 +2017,9 @@
                                        TO  SPA-ERRMSG
            WHEN    "0007"
                MOVE    "請求年月≦退院月となっています"
+                                       TO  SPA-ERRMSG
+           WHEN    "0008"
+               MOVE    "出産年月日が直接支払制度開始前の日付です"
                                        TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "在胎週数を入力してください"
