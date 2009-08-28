@@ -376,6 +376,7 @@
       *  04.03.29    NACL-ÌçÏÆ    09/07/17  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.03.30    NACL-ÌçÏÆ    09/08/17  Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ
       *  04.03.31    NACL-ÌçÏÆ    09/08/18  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.32    NACL-ÌçÏÆ    09/08/19  ½Ð»º°ì»þ¶âÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -951,6 +952,11 @@
                05  TBL-HKNFTNDATA-ZAN                  PIC  9(07).
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
       *
+       01  TBL-PTTOKKI.
+           03  TBL-PTTOKKI-OCC                         OCCURS   5.
+               05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
+               05  TBL-PTTOKKI-CD                      PIC  X(02).
+      *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
            03  TBL-SYS5000-OCC     OCCURS  100.
@@ -1044,6 +1050,7 @@
       *
            03  WRK-TOKKI                               PIC X(02).
            03  TOKKI-IDX                               PIC 9(02). 
+           03  TOKKI-IDX2                              PIC 9(02).
       *
            03  WRK-SRYYM-5000                          PIC X(06).
       *
@@ -1223,6 +1230,7 @@
            03  CONS-TOKKI22        PIC X(14) VALUE "00000099990122".
            03  CONS-TOKKI23        PIC X(14) VALUE "00000099990123".
            03  CONS-TOKKI24        PIC X(14) VALUE "00000099990124".
+           03  CONS-TOKKI25        PIC X(14) VALUE "00000099990125".
       *
       *    ÉÂ¾²¿ôÊÔ½¸¥Õ¥é¥°ÊÔ½¸¤Î°Ù¤Î¥³¡¼¥É¡ÊÆÃÄê¼À´µÎÅÍÜ»ØÆ³ÎÁÅù¡Ë
            03  CONS-SIDORYO1       PIC X(09) VALUE "113001810".
@@ -2429,6 +2437,8 @@
               MOVE      1     TO     RECE62-RJNGAIKOHFTN(2)
            END-IF
       *
+           PERFORM     2112-PTTOKKI-HENSYU-SEC
+      *
            PERFORM     RECE62-REWRITE-SEC
            .
        210-HENSYU-EXT.
@@ -2605,6 +2615,59 @@
       *
            .
        2111-TENTEKIMATOME-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼ÔÆÃµ­»ö¹àÊÔ½¸
+      *****************************************************************
+       2112-PTTOKKI-HENSYU-SEC      SECTION.
+      *
+           INITIALIZE                TBL-PTTOKKI
+      *
+           MOVE      ZERO      TO    TOKKI-IDX2
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+               IF (( RECE62-PTTOKKI-CD(TOKKI-IDX)    = SPACE ) AND
+                   ( RECE62-PTTOKKI-NAIYO(TOKKI-IDX) = SPACE ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "15"     ) AND
+                   ((RECE62-SRYYM   <  "200608") OR
+                    (RECE62-SRYYM   >  "200812")             ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "16"     ) AND
+                   ( RECE62-SRYYM   <  "200610"              ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                                    "17" OR "18" OR "19"     ) AND
+                   ( RECE62-SRYYM   <  "200704"              ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
+                   ((RECE62-SRYYM   <  "200804") OR
+                    (RECE62-SRYYM   >  "201003")             ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
+                   ( RECE62-SRYYM   <  "200901"              ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                                    "22" OR "23" OR "24"     ) AND
+                   ( RECE62-SRYYM   <  "200905"              ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "25"     ) AND
+                   ((RECE62-SRYYM   <  "200910") OR
+                    (RECE62-SRYYM   >  "201103")             ))
+                 CONTINUE
+               ELSE
+                 ADD    1     TO    TOKKI-IDX2
+                 MOVE   RECE62-PTTOKKI-CD(TOKKI-IDX)    TO
+                                    TBL-PTTOKKI-CD(TOKKI-IDX2)
+                 MOVE   RECE62-PTTOKKI-NAIYO(TOKKI-IDX) TO
+                                    TBL-PTTOKKI-NAIYO(TOKKI-IDX2)
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+                 MOVE   TBL-PTTOKKI-CD(TOKKI-IDX)       TO
+                                    RECE62-PTTOKKI-CD(TOKKI-IDX)
+                 MOVE   TBL-PTTOKKI-NAIYO(TOKKI-IDX)    TO
+                                    RECE62-PTTOKKI-NAIYO(TOKKI-IDX)
+           END-PERFORM
+      *
+           .
+       2112-PTTOKKI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4797,6 +4860,8 @@
                        MOVE    "23"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI24
                        MOVE    "24"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI25
+                       MOVE    "25"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        2
                EVALUATE    SRY-SRYCD(IDX2)
@@ -4846,6 +4911,8 @@
                        MOVE    "23"      TO      WRK-TOKKI
                    WHEN    CONS-TOKKI24(6:9)
                        MOVE    "24"      TO      WRK-TOKKI
+                   WHEN    CONS-TOKKI25(6:9)
+                       MOVE    "25"      TO      WRK-TOKKI
                END-EVALUATE
              WHEN        3
                        MOVE    "14"      TO      WRK-TOKKI
@@ -4916,6 +4983,13 @@
              WHEN      "23"
              WHEN      "24"
                IF  (RECE62-SRYYM   <   "200905")
+                   GO  TO  21013-TOKKI-HENSYU-EXT
+               END-IF
+             WHEN      "25"
+               IF  (RECE62-SRYYM   >=  "200910")
+               AND (RECE62-SRYYM   <=  "201103")
+                   CONTINUE
+               ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
                END-IF
            END-EVALUATE
