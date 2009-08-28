@@ -3994,22 +3994,21 @@
                            MOVE    1   TO  FLG-JBI-KZI-OUT
                        END-IF
                    END-PERFORM
-               END-IF
       *
-               INITIALIZE  TNS-TENSU-REC
-               MOVE    WRK-JBI-SONOTA-SRYCD
+                   INITIALIZE  TNS-TENSU-REC
+                   MOVE    WRK-JBI-SONOTA-SRYCD
                                            TO  TNS-SRYCD
-               MOVE    WRK-SRYYMD          TO  WRK-DBYMD
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( ORCHCM34-NYUGAIKBN  =   "1" )
-                   IF    ( TNS-KANANAMECHGKBN  =   1 OR 2 OR 3 OR 4 )
+                   MOVE    WRK-SRYYMD      TO  WRK-DBYMD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( ORCHCM34-NYUGAIKBN  =   "1" )
+                       IF    ( TNS-KANANAMECHGKBN  =   1 OR 2 OR 3 OR 4)
                            MOVE    1   TO  FLG-JBI-KZI-OUT
-                   END-IF
-               ELSE
-                   IF    ( TNS-NAMECHGKBN      =   1 OR 2 OR 3 OR 4 )
+                       END-IF
+                   ELSE
+                       IF    ( TNS-NAMECHGKBN      =   1 OR 2 OR 3 OR 4)
                            MOVE    1   TO  FLG-JBI-KZI-OUT
+                       END-IF
                    END-IF
-               END-IF
       *
                    IF    ( FLG-JBI-KZI-OUT =   ZERO )
                        IF    ( SYS-1001-TAX-HASU-KBN   =   "1" )
@@ -4020,6 +4019,7 @@
                                =    WRK-ZAITEN   *   1.05
                        END-IF
                    END-IF
+               END-IF
            END-EVALUATE
       *
            PERFORM 205-KINGAKUKAISU-HEN-SEC
