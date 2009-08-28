@@ -946,46 +946,6 @@
 	</widget>
 
 	<widget>
-	  <class>GtkPandaCombo</class>
-	  <name>SYOHOKBN_COMBO</name>
-	  <x>212</x>
-	  <y>360</y>
-	  <width>100</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items></items>
-
-	  <widget>
-	    <class>GtkPandaEntry</class>
-	    <child_name>GtkPandaCombo:entry</child_name>
-	    <name>SYOHOKBN</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>send_event</handler>
-	      <data>ACTIVATE</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>entry_changed</handler>
-	      <data>CHANGED</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>8</text_max_length>
-	    <text></text>
-	    <input_mode>XIM</input_mode>
-	    <xim_enabled>False</xim_enabled>
-	  </widget>
-	</widget>
-
-	<widget>
 	  <class>GtkLabel</class>
 	  <name>label585</name>
 	  <x>56</x>
@@ -1005,7 +965,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU_COMBO</name>
 	  <x>212</x>
-	  <y>416</y>
+	  <y>444</y>
 	  <width>232</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1045,7 +1005,7 @@
 	  <class>GtkLabel</class>
 	  <name>label1612</name>
 	  <x>44</x>
-	  <y>416</y>
+	  <y>444</y>
 	  <width>168</width>
 	  <height>24</height>
 	  <label>¿¡µ·≥€√ºøÙ∂Ë ¨° ∏∫Ã»Õ≠°À</label>
@@ -1074,50 +1034,10 @@
 	</widget>
 
 	<widget>
-	  <class>GtkPandaCombo</class>
-	  <name>TAXHASU_COMBO</name>
-	  <x>212</x>
-	  <y>500</y>
-	  <width>232</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items></items>
-
-	  <widget>
-	    <class>GtkPandaEntry</class>
-	    <child_name>GtkPandaCombo:entry</child_name>
-	    <name>TAXHASU</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>send_event</handler>
-	      <data>ACTIVATE</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>entry_changed</handler>
-	      <data>CHANGED</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>32</text_max_length>
-	    <text></text>
-	    <input_mode>XIM</input_mode>
-	    <xim_enabled>False</xim_enabled>
-	  </widget>
-	</widget>
-
-	<widget>
 	  <class>GtkLabel</class>
 	  <name>label1614</name>
 	  <x>36</x>
-	  <y>528</y>
+	  <y>556</y>
 	  <width>176</width>
 	  <height>24</height>
 	  <label>ππ¿µ°¶∞È¿Æ∏¬≈Ÿ≥€∆¸≥‰∑◊ªª</label>
@@ -1133,7 +1053,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>HIWARIKBN_COMBO</name>
 	  <x>212</x>
-	  <y>528</y>
+	  <y>556</y>
 	  <width>232</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1189,7 +1109,7 @@
 	  <class>GtkLabel</class>
 	  <name>label1613</name>
 	  <x>44</x>
-	  <y>444</y>
+	  <y>472</y>
 	  <width>168</width>
 	  <height>24</height>
 	  <label>¿¡µ·≥€√ºøÙ∂Ë ¨° ∏∫Ã»Ãµ°À</label>
@@ -1205,7 +1125,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU2_CMB</name>
 	  <x>212</x>
-	  <y>444</y>
+	  <y>472</y>
 	  <width>232</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1245,7 +1165,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>GENTAIKBN_CMB</name>
 	  <x>212</x>
-	  <y>472</y>
+	  <y>500</y>
 	  <width>232</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1284,8 +1204,8 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>label1653</name>
-	  <x>56</x>
-	  <y>472</y>
+	  <x>52</x>
+	  <y>500</y>
 	  <width>156</width>
 	  <height>24</height>
 	  <label>∏∫Ã»∑◊ªª¬–æ›∂Ë ¨</label>
@@ -1476,22 +1396,6 @@
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>True</wrap>
 	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label606</name>
-	  <x>56</x>
-	  <y>500</y>
-	  <width>156</width>
-	  <height>24</height>
-	  <label>æ√»Ò¿«√ºøÙ∂Ë ¨</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>7.45058e-09</xalign>
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
 	  <ypad>0</ypad>
@@ -2003,6 +1907,146 @@
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
 	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label606</name>
+	  <x>52</x>
+	  <y>528</y>
+	  <width>156</width>
+	  <height>24</height>
+	  <label>æ√»Ò¿«√ºøÙ∂Ë ¨</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>TAXHASU_COMBO</name>
+	  <x>212</x>
+	  <y>528</y>
+	  <width>232</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>TAXHASU</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>32</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label1668</name>
+	  <x>56</x>
+	  <y>416</y>
+	  <width>156</width>
+	  <height>24</height>
+	  <label> ¨ ⁄µ°¥ÿ¥…Õ˝»÷πÊ</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>True</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>SYOHOKBN_COMBO</name>
+	  <x>212</x>
+	  <y>360</y>
+	  <width>100</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>SYOHOKBN</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>8</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaEntry</class>
+	  <name>SANKANUM</name>
+	  <x>212</x>
+	  <y>416</y>
+	  <width>100</width>
+	  <height>24</height>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>activate</name>
+	    <handler>send_event</handler>
+	    <data>ACTIVATE</data>
+	    <last_modification_time>Tue, 27 Feb 2001 06:04:06 GMT</last_modification_time>
+	  </signal>
+	  <signal>
+	    <name>changed</name>
+	    <handler>entry_changed</handler>
+	    <data>CHANGED</data>
+	    <last_modification_time>Tue, 27 Feb 2001 06:08:38 GMT</last_modification_time>
+	  </signal>
+	  <editable>True</editable>
+	  <text_visible>True</text_visible>
+	  <text_max_length>10</text_max_length>
+	  <text></text>
+	  <input_mode>ASCII</input_mode>
+	  <xim_enabled>False</xim_enabled>
 	</widget>
       </widget>
 

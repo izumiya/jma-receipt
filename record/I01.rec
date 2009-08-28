@@ -12,6 +12,10 @@ I01	{
 		B05	{
 			state	int;
 		};
+		B15	{
+			label	varchar(10);
+			state	int;
+		};
 		B21	{
 			state	int;
 		};
@@ -125,6 +129,9 @@ I01	{
 		};
 		LBL_SHONYUINYMD	{
 			value	varchar(16);
+		};
+		LBL_KAIGO{
+			value	varchar(20);
 		};
 		CMB_KAIGO	{
 			KAIGO	{
@@ -265,6 +272,30 @@ I01	{
 			};
 			count	int;
 			item	varchar(22)[02];
+			state	int;
+		};
+		LBL_BUNBENKBN	{
+			value	varchar(20);
+		};
+		CMB_BUNBENKBN	{
+			BUNBENKBN	{
+				value	varchar(20);
+				state	int;
+			};
+			count	int;
+			item	varchar(20)[05];
+			state	int;
+		};
+		LBL_RIYOUKBN	{
+			value	varchar(20);
+		};
+		CMB_RIYOUKBN	{
+			RIYOUKBN	{
+				value	varchar(20);
+				state	int;
+			};
+			count	int;
+			item	varchar(20)[05];
 			state	int;
 		};
 		LBLINFO	{

@@ -1,0 +1,152 @@
+I07	{
+	fixed6	{
+		PTNUM	{
+			value	varchar(20);
+		};
+		NAME	{
+			value	varchar(60);
+		};
+		KANANAME	{
+			value	varchar(60);
+		};
+		BIRTHDAY_MOM	{
+			value	varchar(9);
+		};
+		AGE	{
+			value	varchar(8);
+		};
+		NYUINYMD	{
+			value	varchar(10);
+		};
+		TAIINYMD	{
+			value	varchar(10);
+		};
+		SYAKOK	{
+			value	varchar(4);
+		};
+		HONKZK	{
+			value	varchar(4);
+		};
+		HKNJANUM	{
+			value	varchar(8);
+		};
+		KIGO	{
+			value	varchar(80);
+		};
+		NUM	{
+			value	varchar(80);
+		};
+		CMB_RIYOUKBN	{
+			RIYOUKBN	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[05];
+		};
+		SKYYM	{
+			value	varchar(10);
+	           	state	int;
+		};
+		CMB_SKYKBN	{
+			SKYKBN	{
+				value	varchar(22);
+		           	state	int;
+			};
+			count	int;
+			item	varchar(22)[05];
+	           	state	int;
+		};
+		CMB_BUNBENKBN	{
+			BUNBENKBN	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[05];
+		};
+		LBLTEISYUTUSAKI	{
+			value	varchar(30);
+		};
+		ZAIWEEK	{
+			value	number(2);
+		};
+		BIRTHDAY_BABY	{
+			value	varchar(10);
+		};
+		CMB_SIZANKBN	{
+			SIZANKBN	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[05];
+		};
+		BIRTHCNT	{
+			value	number(1);
+		};
+		NYUIN_DAY	{
+			value	number(3);
+		};
+		CMB_SANKAKBN	{
+			SANKAKBN	{
+				value	varchar(22);
+		           	state	int;
+			};
+			count	int;
+			item	varchar(22)[05];
+	           	state	int;
+		};
+		NYU_MONEY	{
+			value	number(7);
+		};
+		RMSGK_MONEY	{
+			value	number(7);
+		};
+		KAIJO_MONEY	{
+			value	number(7);
+		};
+		BUNBEN_MONEY	{
+			value	number(7);
+		};
+		SHIN_MONEY	{
+			value	number(7);
+		};
+		KNS_MONEY	{
+			value	number(7);
+		};
+		SYC_MONEY	{
+			value	number(7);
+		};
+		SNK_MONEY	{
+			value	number(7);
+		};
+		ETC_MONEY	{
+			value	number(7);
+		};
+		ICBFTN_MONEY	{
+			value	number(7);
+		};
+		NINPUFTN_MONEY	{
+			value	number(7);
+		};
+		DAIRI_MONEY	{
+			value	number(7);
+		};
+		BIKOU	{
+			value	varchar(60);
+		};
+		CMB_MEIPRTKBN	{
+			MEIPRTKBN	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[05];
+		};
+		LBLINFO01	{
+			value	varchar(100);
+			style	varchar(20);
+		};
+		LBLINFO02	{
+			value	varchar(20);
+			style	varchar(20);
+		};
+	};
+};

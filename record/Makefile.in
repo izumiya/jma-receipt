@@ -400,6 +400,8 @@ RECORD_files = \
 	KTID2.rec \
 	D04.rec \
 	D05.rec \
+	I07.rec \
+	W67.rec \
 
 DEF_files = \
 	HC01.def \

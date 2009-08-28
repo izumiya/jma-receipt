@@ -34,6 +34,9 @@ W02	{
 				HOSPCDN	{
 					value	varchar(20);
 				};
+				SANKANUM	{
+					value	varchar(10);
+				};
 				PREFNUM_COMBO	{
 					PREFNUM	{
 						value	varchar(13);
