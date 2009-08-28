@@ -223,6 +223,8 @@
            03  FLG-LASTSKJ                 PIC 9(01).
            03  FLG-HIT                     PIC 9(01).
            03  FLG-PASS                    PIC 9(01).
+           03  FLG-BUNBENCHK               PIC 9(01).
+           03  FLG-BUNBEN                  PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -510,13 +512,7 @@
                    07  WRK-KSN-CD          PIC X(01).
            03  WRK-CNT                     PIC 9(05).
            03  WRK-TOKNYUINCD              PIC X(03).
-      *
-       01  BAK-AREA.
-           03  BAK-AGE-G.
-               05  BAK-AGE-PTID            PIC 9(10).
-               05  BAK-AGE-BIRTHDAY        PIC X(08).
-               05  BAK-AGE-KJNYMD          PIC X(08).
-               05  BAK-AGE-NENREI          PIC 9(03).
+           03  WRK-BUNBENRRKNUM            PIC 9(03).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -541,6 +537,8 @@
            03  WRK-NYUREKILST-ROW          PIC S9(9)   BINARY.
       *
        01  CONST-AREA.
+      *    03  CONST-H211001               PIC X(08)   VALUE "20091001".
+           03  CONST-H211001               PIC X(08)   VALUE "00000000".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
            03  CONST-H180401               PIC X(08)   VALUE "20060401".
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
@@ -893,6 +891,8 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -1012,6 +1012,7 @@
            COPY    "I04.INC".
            COPY    "I05.INC".
            COPY    "I06.INC".
+           COPY    "I07.INC".
            COPY    "I0ERR.INC".
            COPY    "I0ID1.INC".
            COPY    "I0ID2.INC".
@@ -1033,7 +1034,6 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  CNT-AREA
-           INITIALIZE                  BAK-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA.
            MOVE    SPA-FREE        TO  SPA-I0FREE.
@@ -1185,7 +1185,7 @@
       *
                GO  TO      300-SCREEN-EXT
       *
-      *    収納登録・入院会計照会画面
+      *    収納登録・入院会計照会・出産一時金画面
            WHEN    "S02"
            WHEN    "I41"
       *
@@ -1200,6 +1200,28 @@
                MOVE    I0SUB01-COMMON  TO  SPA-I0KYOUTU
       *
                GO  TO  300-SCREEN-EXT
+           WHEN    "I07"
+               IF    ( SPA-I07-MOTOPG  =   "I01" )
+                   INITIALIZE                  I0SUB01-LNK
+                   MOVE    SPA-TERMID      TO  I0SUB01-TERMID
+                   MOVE    "I"             TO  I0SUB01-KBN
+                   CALL    "ORCGI0SUB01"   USING   I0SUB01-LNK
+      *
+                   MOVE    I0SUB01-SCRSPA-AREA
+                                           TO  SPA-I0FREE
+                   MOVE    I0SUB01-COMMON  TO  SPA-I0KYOUTU
+      *
+                   PERFORM 41011-BUNBEN-AREA-EDIT-SEC                   
+      *
+                   GO  TO  300-SCREEN-EXT
+               ELSE
+                   MOVE    SPA-I07-PTNUM   TO  SPA-PTNUM
+                   MOVE    SPA-I07-PTID    TO  SPA-PTID
+                   PERFORM 310-SPASET-SEC
+                   MOVE    SPA-PTNUM       TO  I01-PTNUM
+                   PERFORM 4100-PTNUM-CHK-SEC
+                   GO  TO  300-SCREEN-EXT
+               END-IF
       *    患者登録画面
            WHEN    "P02"
       *        退避しておいたＳＰＡの内容を元に戻す
@@ -1324,6 +1346,12 @@
       *
       *    ユーザープログラムコンボ
            PERFORM 310-CMB-USERPG-SET-SEC
+      *
+      *    分娩区分コンボ
+           PERFORM 310-CMB-BUNBEN-SET-SEC
+      *
+      *    直接支払制度利用区分コンボ
+           PERFORM 310-CMB-RIYOU-SET-SEC
       *
            .
        310-CMB-SYOKI-EXT.
@@ -1715,6 +1743,8 @@
                            TO  SPA-GMN-I01-NYUINKAL (IDX1)
                MOVE    SYS-1005-SRYKANAME
                            TO  SPA-GMN-I01-NYUINKAMEIL (IDX1)
+               MOVE    SYS-1005-RECESRYKA
+                           TO  SPA-GMN-I01-NYUINKA-ITM2(IDX1)
       *
                PERFORM 900-SYSKANRI-KEY2-FET-SEC
                MOVE    SYSKANRI-REC    TO  SYS-1005-REC
@@ -1888,6 +1918,7 @@
            IF    ( SPA-GMN-I01-SYORIKBN-CD =   "02" OR "04" 
                                             OR "10" OR "11" )
                MOVE    ZERO        TO  SPA-GMN-I01-USERPG-CNT
+               MOVE    SPACE       TO  SPA-GMN-I01-USERPG
            ELSE
       *
                MOVE    1           TO  SPA-GMN-I01-USERPG-CNT
@@ -1931,6 +1962,45 @@
       *
            .
        310-CMB-USERPG-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩コンボ初期処理
+      *****************************************************************
+       310-CMB-BUNBEN-SET-SEC          SECTION.
+      *
+           INITIALIZE                  SPA-GMN-I01-CMB-BUNBEN
+      *
+           MOVE    3                   TO  SPA-GMN-I01-BUNBEN-CNT
+      *
+           MOVE    "0"                 TO  SPA-GMN-I01-BUNBENL (01)
+           MOVE    "分娩入院でない"    TO  SPA-GMN-I01-BUNBENMEIL (01)
+      *
+           MOVE    "1"                 TO  SPA-GMN-I01-BUNBENL (02)
+           MOVE    "正常分娩"          TO  SPA-GMN-I01-BUNBENMEIL (02)
+      *
+           MOVE    "2"                 TO  SPA-GMN-I01-BUNBENL (03)
+           MOVE    "異常分娩"          TO  SPA-GMN-I01-BUNBENMEIL (03)
+      *
+           .
+       310-CMB-BUNBEN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分コンボ初期処理
+      *****************************************************************
+       310-CMB-RIYOU-SET-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-GMN-I01-CMB-RIYOU
+      *
+           MOVE    2                   TO  SPA-GMN-I01-RIYOU-CNT
+      *
+           MOVE    "0"                 TO  SPA-GMN-I01-RIYOUL (01)
+           MOVE    "利用しない"        TO  SPA-GMN-I01-RIYOUMEIL (01)
+      *
+           MOVE    "1"                 TO  SPA-GMN-I01-RIYOUL (02)
+           MOVE    "利用する"          TO  SPA-GMN-I01-RIYOUMEIL (02)
+      *
+           .
+       310-CMB-RIYOU-SET-EXT.
            EXIT.
       *****************************************************************
       *    氏名検索画面（Ｐ９７）からの戻り値設定処理
@@ -2248,6 +2318,9 @@
            WHEN    "CLICKED"       ALSO    "B11"
                MOVE   "CHANGE"             TO  MCP-PUTTYPE
                PERFORM 480-KARUTE-PRT-SEC
+           WHEN    "CLICKED"       ALSO    "B15"
+               MOVE   "CHANGE"             TO  MCP-PUTTYPE
+               PERFORM 480-I07-SENI-SEC
            WHEN    "CLICKED"       ALSO    "B23"
                MOVE   "CHANGE"             TO  MCP-PUTTYPE
                PERFORM 480-ZOKUSI-PRT-SEC
@@ -2422,6 +2495,10 @@
            MOVE    I01-DISPKBN         TO  SPA-GMN-I01-DISPKBN
       *    ユーザープログラム
            MOVE    I01-USERPG          TO  SPA-GMN-I01-USERPG
+      *    分娩入院
+           MOVE    I01-BUNBENKBN       TO  SPA-GMN-I01-BUNBEN
+      *    直接利用制度利用区分
+           MOVE    I01-RIYOUKBN        TO  SPA-GMN-I01-RIYOU
       *    選択番号
            MOVE    I01-SELNUM          TO  SPA-GMN-I01-SELNUM
       *
@@ -2624,6 +2701,17 @@
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
       *
+      *    分娩区分チェック
+           PERFORM 4101-BUNBEN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *    直接支払制度利用区分チェック
+           PERFORM 4101-RIYOU-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
            .
       *
        4102-KIHON-CHK-EXT.
@@ -2641,6 +2729,7 @@
                                        SPA-GMN-I01-NAME
                                        SPA-NAI-I01-KANANAME
                                        SPA-GMN-I01-SEX
+                                       SPA-NAI-I01-SEX
                                        SPA-GMN-I01-BIRTHDAY
                                        SPA-NAI-I01-BIRTHDAY
                                        SPA-GMN-I01-AGE
@@ -2836,6 +2925,7 @@
                                    TO  WRK-CMB-CD
            PERFORM 4103-CMB-NYUINKA-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
+           MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
            MOVE    PTNYUINRRK-NYUINKA
                                    TO  SPA-NAI-I01-NYUINKA-MOT
       *
@@ -2999,9 +3089,38 @@
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-SENTEIKBN
            END-IF
       *
-       .
+           PERFORM 41011-BUNBEN-AREA-EDIT-SEC
+      *
+           .
       *
        4101-INPUT-AREA-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩情報編集処理
+      *****************************************************************
+       41011-BUNBEN-AREA-EDIT-SEC      SECTION.
+      *
+           MOVE    SPA-NAI-I01-PTRRKNUM
+                                      TO  WRK-BUNBENRRKNUM
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+           IF    ( FLG-BUNBEN     =   ZERO )
+               MOVE    1              TO  SPA-NAI-I01-BUNBEN
+               MOVE    BUNBEN-BUNBENKBN
+                                      TO  WRK-CMB-CD
+               PERFORM 4103-CMB-BUNBEN-CHK-SEC
+               MOVE    WRK-CMB-ITM    TO  SPA-GMN-I01-BUNBEN
+      *
+               MOVE    BUNBEN-RIYOUKBN
+                                      TO  WRK-CMB-CD
+               PERFORM 4103-CMB-RIYOU-CHK-SEC
+               MOVE    WRK-CMB-ITM    TO  SPA-GMN-I01-RIYOU
+      *
+           ELSE
+               MOVE    SPACE          TO  SPA-GMN-I01-RIYOU
+           END-IF
+      *
+           .
+       41011-BUNBEN-AREA-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    初回入院日編集処理
@@ -3206,6 +3325,7 @@
            WHEN    "2"
                MOVE    "女"        TO  SPA-GMN-I01-SEX
            END-EVALUATE
+           MOVE    PTINF-SEX       TO  SPA-NAI-I01-SEX
       *    患者生年月日
            MOVE    PTINF-BIRTHDAY  TO  WRK-YMD
            PERFORM 5002-HIZUKE-CHK-SEC
@@ -3357,6 +3477,7 @@
                        MOVE    UKE-SRYKA       TO  WRK-CMB-CD
                        PERFORM 4103-CMB-NYUINKA-CHK-SEC
                        MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
+                       MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
                    END-IF
       *
                    IF    ( SPA-GMN-I01-DR (1)  =   SPACE   )
@@ -3503,6 +3624,17 @@
       *
            MOVE    PTNYUINRRK-NYUINKA
                                    TO  WRK-REKI-BYO-NYUINKA (IDX1)
+      *
+           MOVE    PTNYUINRRK-RRKNUM
+                                   TO  WRK-BUNBENRRKNUM
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+           IF    ( FLG-BUNBEN      =   ZERO )
+               IF    ( BUNBEN-BUNBENKBN    =   "1" OR "2" )
+                AND  ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+                AND  ( PTNYUINRRK-TAIINYMD    >=   CONST-H211001 )
+                   MOVE    1           TO  SPA-NAI-I01-TBUNBEN (IDX1)
+               END-IF
+           END-IF
       *
            .
       *
@@ -4082,6 +4214,7 @@
                MOVE    JYURRK-SRYKA    TO  WRK-CMB-CD
                PERFORM 4103-CMB-NYUINKA-CHK-SEC
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
+               MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
            END-IF
       *
       *    主治医
@@ -4621,16 +4754,19 @@
                                            TO  WRK-CMB-CD
                PERFORM 4103-CMB-NYUINKA-CHK-SEC
                MOVE    WRK-CMB-ITM         TO  SPA-GMN-I01-NYUINKA
+               MOVE    WRK-CMB-ITM2        TO  SPA-NAI-I01-RECEKA
            ELSE
                IF    ( WRK-BRM-KA-CD       NOT =   SPACE )
                    MOVE    WRK-BRM-KA-CD   TO  WRK-CMB-CD
                    PERFORM 4103-CMB-NYUINKA-CHK-SEC
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
+                   MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
                ELSE
                    IF    ( WRK-BTU-KA-CD   NOT =   SPACE )
                        MOVE    WRK-BTU-KA-CD   TO  WRK-CMB-CD
                        PERFORM 4103-CMB-NYUINKA-CHK-SEC
                        MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-NYUINKA
+                       MOVE    WRK-CMB-ITM2 TO SPA-NAI-I01-RECEKA
                    END-IF
                END-IF
            END-IF
@@ -5163,33 +5299,46 @@
        41011-SYS-1006-SEL-EXT.
            EXIT.
       *****************************************************************
+      *    分娩入院チェック
+      *****************************************************************
+       41011-BUNBEN-NYUIN-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                    TO  FLG-BUNBENCHK
+      *
+           IF    ( SPA-NAI-I01-PTID        =   ZERO )
+               CONTINUE
+           ELSE
+      *
+               MOVE    SPA-NAI-I01-NYUINYMD    TO  WRK-KJNYMD
+               PERFORM 41011-PT-AGE-SEC
+               IF    ( SPA-NAI-I01-RECEKA  =   "23" OR "24" )
+                AND  ( SPA-NAI-I01-SEX     =   "2" )
+                AND  ( WRK-NENREI          >   10 )
+                   MOVE    1                   TO  FLG-BUNBENCHK
+               END-IF
+      *
+               IF    ( SPA-NAI-I01-BUNBEN  =   1 )
+                   MOVE    1                   TO  FLG-BUNBENCHK
+               END-IF
+           END-IF
+      *
+           .
+       41011-BUNBEN-NYUIN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    年齢チェック
       *****************************************************************
        41011-PT-AGE-SEC            SECTION.
       *
            MOVE    ZERO                TO  WRK-NENREI
       *
-           IF    ( BAK-AGE-PTID            =   ZERO )
-            OR  (( BAK-AGE-PTID        NOT =   SPA-NAI-I01-PTID )
-             OR  ( BAK-AGE-BIRTHDAY    NOT =   SPA-NAI-I01-BIRTHDAY )
-             OR  ( BAK-AGE-KJNYMD      NOT =   WRK-KJNYMD ))
-      *
-               MOVE    SPA-NAI-I01-BIRTHDAY
+           MOVE    SPA-NAI-I01-BIRTHDAY
                                            TO  WRK-YMDS1
-               MOVE    WRK-KJNYMD          TO  WRK-YMDS2
-               COMPUTE WRK-NENREI      =   WRK-YYS2
+           MOVE    WRK-KJNYMD          TO  WRK-YMDS2
+           COMPUTE WRK-NENREI      =   WRK-YYS2
                                    -   WRK-YYS1
-               IF    ( WRK-YMDS1(5:4)     >   WRK-YMDS2(5:4) )
-                    COMPUTE WRK-NENREI =   WRK-NENREI  -   1
-               END-IF
-      *
-               MOVE    SPA-NAI-I01-PTID    TO  BAK-AGE-PTID
-               MOVE    SPA-NAI-I01-BIRTHDAY
-                                           TO  BAK-AGE-BIRTHDAY
-               MOVE    WRK-KJNYMD          TO  BAK-AGE-KJNYMD
-               MOVE    WRK-NENREI          TO  BAK-AGE-NENREI
-           ELSE
-               MOVE    BAK-AGE-NENREI      TO  WRK-NENREI
+           IF    ( WRK-YMDS1(5:4)     >   WRK-YMDS2(5:4) )
+                COMPUTE WRK-NENREI =   WRK-NENREI  -   1
            END-IF
       *
            .
@@ -5531,11 +5680,13 @@
                    MOVE    WRK-CMB-ITM4        TO  WRK-CMB-CD
                    PERFORM 4103-CMB-NYUINKA-CHK-SEC
                    MOVE    WRK-CMB-ITM         TO  SPA-GMN-I01-NYUINKA
+                   MOVE    WRK-CMB-ITM2        TO  SPA-NAI-I01-RECEKA
                ELSE
                    IF    ( WRK-CMB-ITM3    NOT =   SPACE )
                        MOVE    WRK-CMB-ITM3    TO  WRK-CMB-CD
                        PERFORM 4103-CMB-NYUINKA-CHK-SEC
                        MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
+                       MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
                    END-IF
                END-IF
            ELSE
@@ -5643,6 +5794,7 @@
       *****************************************************************
        4101-NYUINKA-CHK-SEC            SECTION.
       *
+      *
            IF    ( SPA-GMN-I01-NYUINKA =   SPACE )
                GO  TO  4101-NYUINKA-CHK-EXT
            END-IF
@@ -5652,6 +5804,7 @@
            PERFORM 4103-CMB-NYUINKA-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-NYUINKA
+               MOVE    WRK-CMB-ITM2 TO SPA-NAI-I01-RECEKA
            ELSE
                MOVE    "0018"      TO  SPA-ERRCD
                MOVE    8           TO  SPA-GMN-I01-CUR
@@ -5768,12 +5921,62 @@
        4101-SHONUM-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    分娩区分チェック処理
+      *****************************************************************
+       4101-BUNBEN-CHK-SEC             SECTION.
+      *
+           PERFORM 41011-BUNBEN-NYUIN-CHK-SEC
+           IF    ( FLG-BUNBENCHK       =   1 )
+               MOVE    SPA-GMN-I01-BUNBEN-CD
+                                       TO  WRK-CMB-CD
+               PERFORM 4103-CMB-BUNBEN-CHK-SEC
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-BUNBEN
+               IF    ( SPA-GMN-I01-BUNBEN  =   SPACE )
+                 AND ( SPA-GMN-I01-SYORIKBN-CD
+                                       =   "01" OR "03" OR "08" )
+                   MOVE    "1"         TO  WRK-CMB-CD
+                   PERFORM 4103-CMB-BUNBEN-CHK-SEC
+                   MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-BUNBEN
+               END-IF
+           ELSE
+                   MOVE    SPACE       TO  SPA-GMN-I01-BUNBEN
+           END-IF
+      *
+           .
+      *
+       4101-BUNBEN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分チェック処理
+      *****************************************************************
+       4101-RIYOU-CHK-SEC             SECTION.
+      *
+           IF    ( SPA-GMN-I01-BUNBEN-CD   =   "1" OR "2" )
+      *
+               MOVE    SPA-GMN-I01-RIYOU-CD
+                                           TO  WRK-CMB-CD
+               PERFORM 4103-CMB-RIYOU-CHK-SEC
+               IF    ( WRK-CMB-ITM     NOT =   SPACE )
+                   MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-RIYOU
+               ELSE
+                   MOVE    SPA-GMN-I01-RIYOU-ITM (2)
+                                       TO  SPA-GMN-I01-RIYOU
+               END-IF
+           ELSE
+               MOVE    SPACE           TO  SPA-GMN-I01-RIYOU
+           END-IF
+      *
+           .
+      *
+       4101-RIYOU-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    介護異動チェック処理
       *****************************************************************
        4101-KAIGO-CHK-SEC             SECTION.
       *
            IF    ( SPA-GMN-I01-KAIGO  =   SPACE )
-               GO  TO  4101-SHOKAI-CHK-EXT
+               GO  TO  4101-KAIGO-CHK-EXT
            END-IF
       *
            MOVE    SPA-GMN-I01-KAIGO-CD
@@ -6267,6 +6470,8 @@
                    MOVE    IDX-CMB TO  WRK-CMB-IDX
                    MOVE    SPA-GMN-I01-NYUINKA-ITM (IDX-CMB)
                                    TO  WRK-CMB-ITM
+                   MOVE    SPA-GMN-I01-NYUINKA-ITM2(IDX-CMB)
+                                   TO  WRK-CMB-ITM2
                END-IF
            END-PERFORM
       *
@@ -6319,6 +6524,52 @@
            .
       *
        4103-CMB-KAIGO-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩入院コンボチェック処理
+      *****************************************************************
+       4103-CMB-BUNBEN-CHK-SEC     SECTION.
+      *
+           INITIALIZE              WRK-CMB-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-I01-BUNBEN-CNT )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-I01-BUNBENL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+                   MOVE    IDX-CMB TO  WRK-CMB-IDX
+                   MOVE    SPA-GMN-I01-BUNBEN-ITM (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+      *
+       4103-CMB-BUNBEN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分コンボチェック処理
+      *****************************************************************
+       4103-CMB-RIYOU-CHK-SEC     SECTION.
+      *
+           INITIALIZE              WRK-CMB-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-I01-RIYOU-CNT )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-I01-RIYOUL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+                   MOVE    IDX-CMB TO  WRK-CMB-IDX
+                   MOVE    SPA-GMN-I01-RIYOU-ITM (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+      *
+       4103-CMB-RIYOU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    担当医コンボチェック処理
@@ -6640,6 +6891,8 @@
                                        TO  SPA-GMN-I01-SHOKAI
            MOVE    SPA-GMN-I01-KAIGO-ITM (01)
                                        TO  SPA-GMN-I01-KAIGO
+           MOVE    SPACE               TO  SPA-GMN-I01-BUNBEN
+           MOVE    SPACE               TO  SPA-GMN-I01-RIYOU
            MOVE    SPA-GMN-I01-SEIKYU-ITM (01)
                                    TO  SPA-GMN-I01-SEIKYU
            MOVE    SPA-GMN-I01-DISPKBN-ITM (1)
@@ -7314,6 +7567,48 @@
        480-NYUINKAIKEI-EXT.
            EXIT.
       *****************************************************************
+      *    出産一時金画面遷移処理
+      *****************************************************************
+       480-I07-SENI-SEC                SECTION.
+      *
+      *    画面をＳＰＡセット
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *
+           IF    ( SPA-GMN-I01-NYUREKILST-SEL >   ZERO )
+            AND  ( SPA-GMN-I01-NYUREKILST-SEL
+                              <=   SPA-GMN-I01-NYUREKILST-CNT )
+      *
+      *        ＳＰＡの内容を退避
+               INITIALIZE                  I0SUB01-LNK
+               MOVE    SPA-TERMID          TO  I0SUB01-TERMID
+               MOVE    "O"                 TO  I0SUB01-KBN
+               MOVE    SPA-I0FREE          TO  I0SUB01-SCRSPA-AREA
+               MOVE    SPA-I0KYOUTU        TO  I0SUB01-COMMON
+      *
+               CALL    "ORCGI0SUB01"       USING   I0SUB01-LNK
+      *
+               INITIALIZE                  SPA-I07-AREA
+               MOVE    SPA-NAI-I01-PTID    TO  SPA-I07-PTID
+               MOVE    SPA-NAI-I01-TRRKNUM (SPA-GMN-I01-NYUREKILST-SEL)
+                                           TO  SPA-I07-RRKNUM
+               MOVE    "I01"               TO  SPA-I07-MOTOPG
+      *
+      *        出産一時金画面へ遷移する
+               MOVE    "I01"               TO  SPA-MOTOPG
+               MOVE    "I07"               TO  SPA-SAKIPG
+      *
+               MOVE   "CHANGE"             TO  MCP-PUTTYPE
+               MOVE   "I07"                TO  MCP-WINDOW
+      *
+               PERFORM 900-PUT-WINDOW
+      *
+               MOVE    1                   TO  FLG-END
+           END-IF
+      *
+           .
+       480-I07-SENI-EXT.
+           EXIT.
+      *****************************************************************
       *    収納登録遷移処理
       *****************************************************************
        480-S02-SENI-SEC                SECTION.
@@ -7358,7 +7653,6 @@
       *****************************************************************
        480-I06-SENI-SEC                SECTION.
       *
-      *    収納登録へ遷移する
            MOVE    "I01"               TO  SPA-MOTOPG
            MOVE    "I06"               TO  SPA-SAKIPG
       *
@@ -7670,6 +7964,12 @@
       *    入院会計テーブルを編集する（異動取消時）
            IF     SPA-GMN-I01-SYORIKBN-CD =   "09"
                PERFORM 4801-IDOKAIKEI-CANCEL-SEC
+           END-IF
+      *
+      *    分娩管理テーブル更新処理
+           PERFORM 4801-BUNBEN-UPD-SEC
+           IF    ( SPA-ERRCD       NOT =   SPACE )
+               GO  TO  4801-PTNYUINRRK-UPD-EXT
            END-IF
       *
       *    患者情報の入院歴番号を更新する
@@ -17178,6 +17478,57 @@
        4801-RJN-TAISYO-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    分娩管理テーブル更新処理
+      *****************************************************************
+       4801-BUNBEN-UPD-SEC          SECTION.
+      *
+           INITIALIZE                  BUNBEN-REC
+           MOVE    NRRK-HOSPNUM    TO  BUNBEN-HOSPNUM
+           MOVE    NRRK-PTID       TO  BUNBEN-PTID
+           MOVE    "000000"        TO  BUNBEN-SKYYM
+           MOVE    NRRK-RRKNUM     TO  BUNBEN-RRKNUM
+           MOVE    SPA-GMN-I01-BUNBEN-CD
+                                   TO  BUNBEN-BUNBENKBN
+           MOVE    SPA-GMN-I01-RIYOU-CD
+                                   TO  BUNBEN-RIYOUKBN
+           MOVE    "0"             TO  BUNBEN-UPDKBN
+           MOVE    SMCNDATE-YMD    TO  BUNBEN-CREYMD
+           MOVE    SMCNDATE-YMD    TO  BUNBEN-UPYMD
+           MOVE    SMCNDATE-HMS    TO  BUNBEN-UPHMS
+      *
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "del3"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+           IF    ( MCP-RC          =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    "4034"      TO  SPA-ERRCD
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    NRRK-REC       TO   WKPTNYUINRRK-REC
+               CALL    "ORCGI0SUB03"  USING
+                                      WKPTNYUINRRK-REC
+                                      SPA-AREA
+               IF    ( WKPTNYUINRRK-RRKEDANUM  >   ZERO )
+                AND  ( SPA-GMN-I01-BUNBEN-CD   =   "0" OR "1" OR "2" )
+                   MOVE    BUNBEN-REC      TO  MCPDATA-REC
+                   MOVE    "tbl_bunben"    TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   PERFORM 910-DBINSERT-SEC
+                   IF    ( MCP-RC          =   ZERO )
+                       CONTINUE
+                   ELSE
+                       MOVE    "4035"      TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       4801-BUNBEN-UPD-EXT.
+           EXIT.
+      *****************************************************************
       *    患者情報更新処理
       *****************************************************************
        4801-PTINF-UPD-SEC          SECTION.
@@ -17641,6 +17992,12 @@
                                            TO  SPA-I01-I04-SKYEDYMD
                MOVE    SPA-NAI-I01-TORIKESI-FLG
                                            TO  SPA-I01-I04-TORIKESI-FLG
+               PERFORM 41011-BUNBEN-NYUIN-CHK-SEC
+               IF    ( FLG-BUNBENCHK           =   1 )
+                 AND ( SPA-GMN-I01-BUNBEN-CD   =   "1" OR "2" )
+                 AND ( SPA-I01-I04-TAIINYMD   >=   CONST-H211001 )
+                   MOVE    1               TO  SPA-I01-I04-BUNBENFTN-FLG
+               END-IF
            ELSE
                PERFORM 4901-PTNYUINRRK-SEL-SEC
                MOVE    PTNYUINRRK-RRKNUM   TO  SPA-I01-I04-RRKNUM
@@ -17658,6 +18015,12 @@
                MOVE    WRK-NOW-SKYSTYMD    TO  SPA-I01-I04-SKYSTYMD
       *
                MOVE    PTNYUINRRK-TAIINYMD TO  SPA-I01-I04-SKYEDYMD
+      *
+               IF    ( SPA-NAI-I01-TBUNBEN (SPA-GMN-I01-NYUREKILST-SEL)
+                                           =   1 )
+                   MOVE    1               TO  SPA-I01-I04-BUNBENFTN-FLG
+               END-IF
+      *
            END-IF
       *
            MOVE    "I01"               TO  SPA-MOTOPG
@@ -17896,6 +18259,7 @@
                                            TO  I01-LBL-SHONYUINYMD
       *
       *    介護異動
+           MOVE    "介護からの異動"    TO  I01-LBL-KAIGO
            MOVE    SPA-GMN-I01-KAIGO       TO  I01-KAIGO
            MOVE    SPA-GMN-I01-KAIGO-CNT   TO  I01-KAIGO-CNT
            PERFORM VARYING IDX1    FROM    1   BY  1
@@ -18006,8 +18370,38 @@
                                            TO  I01-USERPG-ITM (IDX1)
            END-PERFORM
       *
+               MOVE    "分娩区分"               TO  I01-LBL-BUNBENKBN
+           PERFORM 41011-BUNBEN-NYUIN-CHK-SEC
+           IF    ( FLG-BUNBENCHK           =   1 )
+      *
+      *        分娩入院
+               MOVE    SPA-GMN-I01-BUNBEN       TO  I01-BUNBENKBN
+               MOVE    SPA-GMN-I01-BUNBEN-CNT   TO  I01-BUNBENKBN-CNT
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL     ( IDX1    >   SPA-GMN-I01-BUNBEN-CNT )
+                   MOVE    SPA-GMN-I01-BUNBEN-ITM (IDX1)
+                                           TO  I01-BUNBENKBN-ITM (IDX1)
+               END-PERFORM
+           END-IF
+      *
+               MOVE    "直接支払制度"          TO  I01-LBL-RIYOUKBN
+           IF    ( SPA-GMN-I01-BUNBEN-CD       =   "1" OR "2" )
+      *
+      *        直接支払制度利用区分
+               MOVE    SPA-GMN-I01-RIYOU       TO  I01-RIYOUKBN
+               MOVE    SPA-GMN-I01-RIYOU-CNT   TO  I01-RIYOUKBN-CNT
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL     ( IDX1    >   SPA-GMN-I01-RIYOU-CNT )
+                   MOVE    SPA-GMN-I01-RIYOU-ITM (IDX1)
+                                           TO  I01-RIYOUKBN-ITM (IDX1)
+               END-PERFORM
+           END-IF
+      *
       *    選択番号
            MOVE    SPA-GMN-I01-SELNUM      TO  I01-SELNUM
+      *
+           DISPLAY "SPA-GMN-I01-NYUREKILST-SEL "
+                    SPA-GMN-I01-NYUREKILST-SEL
       *
       *    入院歴リスト
            MOVE    SPA-GMN-I01-NYUREKILST-CNT
@@ -18050,11 +18444,22 @@
       *
                IF    ( SPA-GMN-I01-NYUREKILST-SEL  =   IDX1)
                    MOVE    "T"         TO  I01-NYUREKILST-SELECT (IDX1)
+      *
+                   IF    ( SPA-NAI-I01-TBUNBEN (IDX1)      =   1 )
+                    AND  ( SPA-NAI-I01-TTAIINYMD(IDX1) NOT =   SPACE )
+                       MOVE    "出産一時金"
+                                       TO  I01-B15-LABEL
+                   END-IF
+      *
                ELSE
                    MOVE    "F"         TO  I01-NYUREKILST-SELECT (IDX1)
                END-IF
       *
            END-PERFORM
+      *
+           IF    ( SPA-GMN-I01-ORDERKBN    =   "1" )
+               MOVE    "オーダー"      TO  I01-B24-LABEL
+           END-IF
       *
            EVALUATE    FLG-NYUREKILST-ROW
            WHEN    1
@@ -18145,6 +18550,10 @@
                                        I01-DISPKBN-ITM-STT
                                        I01-USERPG-STT
                                        I01-USERPG-ITM-STT
+                                       I01-BUNBENKBN-STT
+                                       I01-BUNBENKBN-ITM-STT
+                                       I01-RIYOUKBN-STT
+                                       I01-RIYOUKBN-ITM-STT
       *
       *    変更
            WHEN    "03"
@@ -18231,6 +18640,7 @@
                PERFORM 5001-SET-WIDGET-STATE-SEC
            END-IF
       *
+      *
            IF    ( SPA-GMN-I01-SYORIKBN-CD =   "01" )
             AND  ( SPA-GMN-I01-SHOKAI-CD   =   "2" )
                MOVE    WIDGET-NORMAL   TO  I01-SHONUM-STT
@@ -18259,10 +18669,38 @@
       *
            END-PERFORM
       *
+           PERFORM 41011-BUNBEN-NYUIN-CHK-SEC
+           IF    ( FLG-BUNBENCHK       =   1 )
+            AND  ( SPA-GMN-I01-SYORIKBN-CD
+                                       =   "01" OR "03" OR "08" )
+                   CONTINUE
+           ELSE
+                   MOVE    WIDGET-INSENSITIVE
+                                       TO   I01-BUNBENKBN-STT
+                                            I01-BUNBENKBN-ITM-STT
+           END-IF
+      *
+           IF    ( SPA-GMN-I01-SYORIKBN-CD
+                                       =   "01" OR "03" OR "08" )
+               IF   ( SPA-GMN-I01-BUNBEN-CD    =  "1" OR "2" )
+                   CONTINUE
+               ELSE
+                   MOVE    WIDGET-INSENSITIVE
+                                       TO   I01-RIYOUKBN-STT
+                                            I01-RIYOUKBN-ITM-STT
+               END-IF
+           END-IF
+      *
+      *    出産育児一時金画面
+           MOVE    WIDGET-INSENSITIVE  TO  I01-B15-STATE
+           IF    ( I01-B15-LABEL   NOT =   SPACE )
+               MOVE    WIDGET-NORMAL   TO  I01-B15-STATE
+           END-IF
+      *
+      *
       *    入院オーダー遷移
            MOVE    WIDGET-INSENSITIVE  TO  I01-B24-STATE
-           IF    ( SPA-GMN-I01-ORDERKBN    =   "1" )
-               MOVE    "オーダー"      TO  I01-B24-LABEL
+           IF    ( I01-B24-LABEL   NOT =   SPACE )
                MOVE    WIDGET-NORMAL   TO  I01-B24-STATE
            END-IF
       *
@@ -18338,6 +18776,10 @@
                                            I01-DISPKBN-ITM-STT
                                            I01-USERPG-STT
                                            I01-USERPG-ITM-STT
+                                           I01-BUNBENKBN-STT
+                                           I01-BUNBENKBN-ITM-STT
+                                           I01-RIYOUKBN-STT
+                                           I01-RIYOUKBN-ITM-STT
       *
            .
        5001-SET-WIDGET-STATE-EXT.
@@ -18409,6 +18851,10 @@
                MOVE    "DISPKBN"       TO  MCP-WIDGET
            WHEN    24
                MOVE    "USERPG"        TO  MCP-WIDGET
+           WHEN    30
+               MOVE    "BUNBENKBN"     TO  MCP-WIDGET
+           WHEN    31
+               MOVE    "RIYOUKBN"      TO  MCP-WIDGET
            WHEN    100
                MOVE    "SELNUM"        TO  MCP-WIDGET
            WHEN    206
@@ -18456,6 +18902,10 @@
            WHEN    "HKNCOMBI"
                MOVE    016             TO  SPA-GMN-I01-CUR
            WHEN    "TOKNYUIN"
+               MOVE    030             TO  SPA-GMN-I01-CUR
+           WHEN    "BUNBENKBN"
+               MOVE    031             TO  SPA-GMN-I01-CUR
+           WHEN    "RIYOUKBN"
                MOVE    027             TO  SPA-GMN-I01-CUR
            WHEN    "KSN01"
                MOVE    028             TO  SPA-GMN-I01-CUR
@@ -18606,6 +19056,18 @@
       *
            IF    ( SPA-GMN-I01-CUR =   16  )
                IF  ( I01-TOKNYUIN-STT  =   WIDGET-INSENSITIVE )
+                   COMPUTE SPA-GMN-I01-CUR =   30
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-I01-CUR =   30  )
+               IF  ( I01-BUNBENKBN-STT =   WIDGET-INSENSITIVE )
+                   COMPUTE SPA-GMN-I01-CUR =   31
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-I01-CUR =   31  )
+               IF  ( I01-RIYOUKBN-STT  =   WIDGET-INSENSITIVE )
                    COMPUTE SPA-GMN-I01-CUR =   27
                END-IF
            END-IF
@@ -18736,6 +19198,9 @@
                                        TO  SPA-ERRMSG
            WHEN    "0030"
                MOVE    "入院料加算入力エラー" 
+                                       TO  SPA-ERRMSG
+           WHEN    "0031"
+               MOVE    "分娩入院入力エラー" 
                                        TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "患者番号を入力してください"
@@ -19778,6 +20243,39 @@
            .
       *
        900-PTNYUINRRK-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理検索処理
+      *****************************************************************
+       900-BUNBEN-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BUNBEN
+           INITIALIZE                  BUNBEN-REC
+      *
+           MOVE    SPA-HOSPNUM     TO  BUNBEN-HOSPNUM
+           MOVE    SPA-NAI-I01-PTID
+                                   TO  BUNBEN-PTID
+           MOVE    WRK-BUNBENRRKNUM
+                                   TO  BUNBEN-RRKNUM
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BUNBEN-REC
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    1           TO  FLG-BUNBEN
+           END-IF
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-BUNBEN-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    入院料加算チェックテーブル検索処理(KEY)

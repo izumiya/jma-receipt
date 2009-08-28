@@ -154,6 +154,7 @@
            03  FLG-HIT                 PIC 9(01).
            03  FLG-DENPNUM-ERR         PIC 9(01).
            03  FLG-PTNUM               PIC 9(01).
+           03  FLG-BUNBEN              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -306,6 +307,10 @@
                "収納情報の更新に失敗しました".
            03  ERR-MSG43                   PIC X(100)    VALUE
                "収納情報の更新に失敗しました".
+           03  ERR-MSG44                   PIC X(100)    VALUE
+               "分娩管理情報の更新に失敗しました".
+           03  ERR-MSG45                   PIC X(100)    VALUE
+               "分娩管理情報の更新に失敗しました".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -376,6 +381,10 @@
        01  PTTEIKIRRK-REC.
            COPY    "CPPTTEIKIRRK.INC".
       *
+      *    分娩管理
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
+      *
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
@@ -391,6 +400,11 @@
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *
+      *    分娩負担金サブ
+       01  LNKBUNBEN-REC.
+           COPY  "CPBUNBEN.INC"    REPLACING  //BUNBEN-//
+                                           BY //LNKBUNBEN-//.
       *
       *    日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -922,6 +936,9 @@
       *        最新病棟番号別集計処理
                PERFORM 20031-NOW-BTUNUM-SUM-SEC
       *
+      *        分娩情報更新処理
+               PERFORM 20081-BUNBEN-KOUSIN-SEC
+      *
       *        定期請求印刷情報作成処理
                PERFORM 20031-TEIKIPRT-SAKUSEI-SEC
       *
@@ -1368,6 +1385,9 @@
       *        最新病棟番号別集計処理
                PERFORM 20031-NOW-BTUNUM-SUM-SEC
       *
+      *        分娩情報更新処理
+               PERFORM 20081-BUNBEN-KOUSIN-SEC
+      *
       *        定期請求印刷情報作成処理
                PERFORM 20031-TEIKIPRT-SAKUSEI-SEC
       *
@@ -1651,6 +1671,76 @@
       *
            .
        20071-SYUMEI-SAKUSEI-EXT.
+           EXIT. 
+      *****************************************************************
+      *    分娩管理更新処理
+      *****************************************************************
+       20081-BUNBEN-KOUSIN-SEC         SECTION.
+      *
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+           IF    ( FLG-BUNBEN          =   ZERO )
+               IF    ( BUNBEN-UPDKBN       =   "1" OR "2" )
+                   PERFORM 200811-BUNBEN-KOUSIN-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20081-BUNBEN-KOUSIN-EXT.
+           EXIT. 
+      *****************************************************************
+      *    分娩管理更新処理
+      *****************************************************************
+       200811-BUNBEN-KOUSIN-SEC        SECTION.
+      *
+           PERFORM 800-ORCSBUNBENFTN-SEC
+      *
+           MOVE    BUNBEN-RIYOUKBN     TO  LNKBUNBEN-RIYOUKBN
+           MOVE    BUNBEN-SKYYM        TO  LNKBUNBEN-SKYYM
+           MOVE    BUNBEN-SKYKBN       TO  LNKBUNBEN-SKYKBN
+           MOVE    BUNBEN-BUNBENKBN    TO  LNKBUNBEN-BUNBENKBN
+           MOVE    BUNBEN-BIRTHDAY     TO  LNKBUNBEN-BIRTHDAY
+           MOVE    BUNBEN-ZAIWEEK      TO  LNKBUNBEN-ZAIWEEK
+           MOVE    BUNBEN-SIZANKBN     TO  LNKBUNBEN-SIZANKBN
+           MOVE    BUNBEN-BIRTHCNT     TO  LNKBUNBEN-BIRTHCNT
+           MOVE    BUNBEN-NYUIN-DAY    TO  LNKBUNBEN-NYUIN-DAY
+           MOVE    BUNBEN-SANKAKBN     TO  LNKBUNBEN-SANKAKBN
+           MOVE    "2"                 TO  LNKBUNBEN-UPDKBN
+           MOVE    BUNBEN-CREYMD       TO  LNKBUNBEN-CREYMD
+      *
+           MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
+      *
+           PERFORM 800-MCNDATE-SEC
+           MOVE    TEIKI1P-JOBYMD      TO  BUNBEN-UPYMD
+           MOVE    TEIKI1P-JOBHMS      TO  BUNBEN-UPHMS
+      *
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "del3"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+           IF    ( MCP-RC          =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    BUNBEN-PTID TO  ERR-PTID
+               MOVE    "0044"      TO  ERR-ERRCD
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    BUNBEN-REC      TO  MCPDATA-REC
+               MOVE    "tbl_bunben"    TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 910-DBINSERT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    BUNBEN-PTID TO  ERR-PTID
+                   MOVE    "0045"      TO  ERR-ERRCD
+                   PERFORM 500-ERR-HENSYU-SEC
+               END-IF
+           END-IF
+      *
+           .
+       200811-BUNBEN-KOUSIN-EXT.
            EXIT. 
       *****************************************************************
       *    定期請求管理情報更新処理
@@ -2120,6 +2210,24 @@
        800-TEIKIERR-WRITE-EXT.
            EXIT.
       *****************************************************************
+      *    分娩負担金サブ
+      *****************************************************************
+       800-ORCSBUNBENFTN-SEC           SECTION.
+      *
+           INITIALIZE                  LNKBUNBEN-REC
+           MOVE    SYU-HOSPNUM     TO  LNKBUNBEN-HOSPNUM
+           MOVE    SYU-PTID        TO  LNKBUNBEN-PTID
+           MOVE    SYU-NYUIN-RRKNUM
+                                   TO  LNKBUNBEN-RRKNUM
+           CALL    "ORCSBUNBENFTN"     USING
+                                       LNKBUNBEN-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       800-ORCSBUNBENFTN-EXT.
+           EXIT.
+      *****************************************************************
       *    エラーメッセージ取得処理
       *****************************************************************
        800-GET-ERRMSG-SEC              SECTION.
@@ -2219,6 +2327,10 @@
                MOVE    ERR-MSG42       TO  ERR-ERRMSG
            WHEN    "0043"
                MOVE    ERR-MSG43       TO  ERR-ERRMSG
+           WHEN    "0044"
+               MOVE    ERR-MSG44       TO  ERR-ERRMSG
+           WHEN    "0045"
+               MOVE    ERR-MSG45       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE
@@ -2819,6 +2931,38 @@
       *
            .
        900-SYUNOU-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理検索処理
+      *****************************************************************
+       900-BUNBEN-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BUNBEN
+           INITIALIZE                  BUNBEN-REC
+      *
+           MOVE    SYU-HOSPNUM     TO  BUNBEN-HOSPNUM
+           MOVE    SYU-PTID        TO  BUNBEN-PTID
+           MOVE    SYU-NYUIN-RRKNUM
+                                   TO  BUNBEN-RRKNUM
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BUNBEN-REC
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    1           TO  FLG-BUNBEN
+           END-IF
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-BUNBEN-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

@@ -91,6 +91,7 @@
       *  04.03.00    NACL-太田    08/08/19  ＣＲＯＮ情報設定画面追加
       *  04.04.00    NACL-太田    08/12/02  公費付加情報設定画面追加
       *  04.04.00    NACL-太田    08/12/04  公害医療機関情報設定画面追加
+      *  04.04.00    NACL-太田    09/07/29  出産費用内訳明細情報
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -297,6 +298,8 @@
            03  FILLER              PIC X(35)   VALUE
                "1045 予約機能情報".
            03  FILLER              PIC X(35)   VALUE
+               "1046 出産費用内訳明細情報".
+           03  FILLER              PIC X(35)   VALUE
                "1100 データチェック機能情報".
            03  FILLER              PIC X(35)   VALUE
                "1101 データチェック機能情報２".
@@ -328,11 +331,11 @@
                "4100 公害医療機関情報".
       *
        01  TBL-KANRICD-AREAR           REDEFINES   TBL-KANRICD-AREA.
-           03  TBL-KANRICD-TBL         OCCURS   44.
+           03  TBL-KANRICD-TBL         OCCURS   45.
                05  TBL-KANRICD             PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI          PIC X(30).
-       01  TBL-KANRICD-MAX                 PIC 9(04)   VALUE   44.
+       01  TBL-KANRICD-MAX                 PIC 9(04)   VALUE   45.
       *
       *外来のみ
        01  TBL-KANRICD-G-AREA.
@@ -516,6 +519,7 @@
            COPY    "W64.INC".
            COPY    "W65.INC".
            COPY    "W66.INC".
+           COPY    "W67.INC".
            COPY    "W96.INC".
            COPY    "W98.INC".
            COPY    "W981.INC".
@@ -1891,6 +1895,8 @@
                WHEN    "1043"
                WHEN    "1045"
                    MOVE    "W07"               TO  SPA-SAKIPG
+               WHEN    "1046"
+                   MOVE    "W67"               TO  SPA-SAKIPG
       *---- (01.02.04) LINE ADD START --------------------------------
                WHEN    "3001"
                WHEN    "3002"
@@ -2075,6 +2081,8 @@
                            GO  TO  4101-KAKUTEI-CHK-EXT
                        END-IF
                    END-IF
+      *        出産費用内訳明細情報
+               WHEN    "1046"
       *        公害医療機関情報
                WHEN    "4100"
                    IF    ( SPA-NAI-STYUKYMD        =   ZERO )

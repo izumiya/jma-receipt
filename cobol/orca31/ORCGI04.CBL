@@ -90,6 +90,7 @@
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-NYUINACCT       PIC 9(01).
            03  FLG-PARA            PIC 9(01).
+           03  FLG-BUNBEN          PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
            03  FLG-CHK             PIC 9(01).
@@ -232,6 +233,7 @@
            03  KBT-OCC                             OCCURS  3.
                05  KBT-SKYSTYMD                    PIC X(08).
                05  KBT-SKYEDYMD                    PIC X(08).
+               05  KBT-RRKNUM                      PIC  9(3).
                05  KBT-SYU-SKYMONEY                PIC S9(9).
                05  KBT-FTN-SKYMONEY                PIC S9(9).
                05  KBT-SAGAKU                      PIC S9(9).
@@ -245,6 +247,7 @@
                05  BFSYU-NYUKIN                    PIC S9(9).
       *
        01  CONST-AREA.
+           03  CONST-H180401               PIC X(08)   VALUE "20060401".
            03  CONST-JOB-SHELLID           PIC X(08)   VALUE   "TEIKI1".
            03  CONST-JOB-JOBID             PIC 9(07)   VALUE   1.
            03  CONST-EDIT-RSIJBI           PIC 9(01)   VALUE   ZERO.
@@ -404,10 +407,18 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
+      *    分娩管理
+       01  BUNBEN-REC.
+           COPY  "CPBUNBEN.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    分娩負担金サブ
+       01  LNKBUNBEN-REC.
+           COPY  "CPBUNBEN.INC"    REPLACING  //BUNBEN-//
+                                           BY //LNKBUNBEN-//.
       *
       *    負担金計算サブ
        01  LNK-ORCS02-REC.
@@ -495,6 +506,12 @@
       *    入院院外処方せんパラメタ領域
            COPY    "CPORCSNYUINSHO.INC".
       *
+      *    分娩入院チェックサブ
+           COPY  "CPORCSBUNBENCHK.INC".
+      *
+      *    入院請求期間取得サブ
+           COPY    "CPORCSS006.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -515,6 +532,7 @@
            COPY    "I04.INC".
            COPY    "I05.INC".
            COPY    "I06.INC".
+           COPY    "I07.INC".
            COPY    "I0ERR.INC".
            COPY    "I0ID1.INC".
            COPY    "I0ID2.INC".
@@ -1047,6 +1065,8 @@
                                            TO  KBT-SKYSTYMD (IDX5)
                    MOVE    PTTEIKIRRK-SKYEDYMD
                                            TO  KBT-SKYEDYMD (IDX5)
+                   MOVE    PTTEIKIRRK-RRKNUM
+                                           TO  KBT-RRKNUM   (IDX5)
                    COMPUTE KBT-SYU-SKYMONEY (IDX5)
                        =   KBT-SYU-SKYMONEY (IDX5)
                        +   SYU-SKYMONEY
@@ -1070,6 +1090,25 @@
                                            LNK-SYUNOU-REC-T
                                            LNK-SYUDAY-REC-T
       *
+      *
+                   INITIALIZE                  SBUNBENCHK-AREA
+                   MOVE    SPA-NAI-I04-PTID
+                                           TO  SBUNBENCHK-PTID
+                   MOVE    KBT-RRKNUM   (IDX5)
+                                           TO  SBUNBENCHK-RRKNUM
+                   CALL    "ORCSBUNBENCHK" USING
+                                           SBUNBENCHK-AREA
+                                           SPA-AREA
+      *
+                   INITIALIZE                  SS006-AREA
+                   MOVE    SPA-NAI-I04-PTID    TO  SPA-PTID
+                   MOVE    KBT-SKYSTYMD (IDX5) TO  SS006-SKYSTYMD
+                   MOVE    KBT-SKYEDYMD (IDX5) TO  SS006-SKYEDYMD
+                   MOVE    "2"                 TO  SS006-SKYKBN
+                   CALL    "ORCSS006"          USING
+                                               SS006-AREA
+                                               SPA-AREA
+      *
                    MOVE    SPA-HOSPNUM  TO  LNK-S02-HOSPNUM
                    MOVE    "1"         TO  LNK-S02-NYUGAIKBN
                    MOVE    SPA-NAI-I04-PTID
@@ -1079,8 +1118,28 @@
                                        TO  LNK-S02-SKYSTYMD
                    MOVE    KBT-SKYEDYMD (IDX5)
                                        TO  LNK-S02-SKYEDYMD
+                   IF    ( LNK-S02-SKYSTYMD    <  CONST-H180401 )
+                       CONTINUE
+                   ELSE
+                       MOVE    SS006-DOJITUFLG-ST
+                                       TO  LNK-S02-DOJITUFLG-ST
+                       MOVE    SS006-TIMEKBN-ST
+                                       TO  LNK-S02-TIMEKBN-ST
+                   END-IF
+                   IF    ( LNK-S02-SKYEDYMD    <  CONST-H180401 )
+                       CONTINUE
+                   ELSE
+                       MOVE    SS006-DOJITUFLG-ED
+                                       TO  LNK-S02-DOJITUFLG-ED
+                       MOVE    SS006-TIMEKBN-ED
+                                       TO  LNK-S02-TIMEKBN-ED
+                   END-IF
                    MOVE    SPA-SYSYMD  TO  LNK-S02-SYSYMD
-                   MOVE    "1"         TO  LNK-S02-SYORI-KBN
+                   IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
+                       MOVE    "1"     TO  LNK-S02-SYORI-KBN
+                   ELSE
+                       MOVE    "8"     TO  LNK-S02-SYORI-KBN
+                   END-IF
                    CALL    "ORCSNYUFTN"    USING
                                            SPA-AREA
                                            LNK-ORCS02-REC
@@ -4147,6 +4206,30 @@
            .
        210-BACK-EXT.
            EXIT.
+      *****************************************************************
+      *    出産育児一時金画面遷移処理
+      *****************************************************************
+       220-I07-SENI-SEC                    SECTION.
+      *
+           INITIALIZE                      SPA-I07-AREA
+           MOVE    SPA-NAI-I04-PTID    TO  SPA-I07-PTID
+           MOVE    SPA-GMN-I04-PTNUM   TO  SPA-I07-PTNUM
+           MOVE    SPA-NAI-I04-PTRRKNUM
+                                       TO  SPA-I07-RRKNUM
+           MOVE    "I04"               TO  SPA-I07-MOTOPG
+      *
+           MOVE    "I07"               TO  SPA-SAKIPG
+           MOVE    "I04"               TO  SPA-MOTOPG
+      *
+           MOVE   "JOIN"               TO  MCP-PUTTYPE
+           MOVE    SPA-SAKIPG          TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       220-I07-SENI-EXT.
+           EXIT.
       *
       *****************************************************************
       *    登録処理
@@ -4204,9 +4287,13 @@
                PERFORM 4801-USERPG-SEC
       *
                IF    ( FLG-END         =   ZERO )
-                   MOVE    "B12"       TO  SPA-I01-I04-BTN
-                   MOVE    "JOIN"      TO  MCP-PUTTYPE
-                   PERFORM 210-BACK
+                   IF    ( SPA-I01-I04-BUNBENFTN-FLG   =   1 )
+                       PERFORM 220-I07-SENI-SEC
+                   ELSE
+                       MOVE    "B12"       TO  SPA-I01-I04-BTN
+                       MOVE    "JOIN"      TO  MCP-PUTTYPE
+                       PERFORM 210-BACK
+                   END-IF
                END-IF
            END-IF
       *
@@ -4282,6 +4369,13 @@
       *
       *        前回未収更新処理
                PERFORM 4801-ZENMISYU-UPD-SEC
+               IF    ( SPA-ERRCD       NOT =   SPACE )
+                   GO  TO  451-TOUROKU-SYORI-EXT
+               END-IF
+           END-IF
+     *
+           IF    ( SPA-I01-I04-BUNBENFTN-FLG   =   1 )
+               PERFORM 4801-BUNBEN-UPD-SEC
                IF    ( SPA-ERRCD       NOT =   SPACE )
                    GO  TO  451-TOUROKU-SYORI-EXT
                END-IF
@@ -4519,9 +4613,13 @@
            PERFORM 4801-USERPG-SEC
       *
            IF    ( FLG-END         =   ZERO )
-               MOVE    "B12"           TO  SPA-I01-I04-BTN
-               MOVE    "JOIN"          TO  MCP-PUTTYPE
-               PERFORM 210-BACK
+               IF    ( SPA-I01-I04-BUNBENFTN-FLG   =   1 )
+                   PERFORM 220-I07-SENI-SEC
+               ELSE
+                   MOVE    "B12"       TO  SPA-I01-I04-BTN
+                   MOVE    "JOIN"      TO  MCP-PUTTYPE
+                   PERFORM 210-BACK
+               END-IF
            END-IF
       *
            .
@@ -4579,6 +4677,13 @@
                    END-EVALUATE
                END-IF
            END-PERFORM
+     *
+           IF    ( SPA-I01-I04-BUNBENFTN-FLG   =   1 )
+               PERFORM 4802-BUNBEN-UPD-SEC
+               IF    ( SPA-ERRCD       NOT =   SPACE )
+                   GO  TO  452-TOUROKU-SYORI-EXT
+               END-IF
+           END-IF
       *
       *    PERFORM 800-ORCSSYUKAMAIN-SEC
       *
@@ -5136,6 +5241,103 @@
       *
            .
        4801-SEILASTRRK-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理テーブル更新処理
+      *****************************************************************
+       4801-BUNBEN-UPD-SEC          SECTION.
+      *
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+      *
+           PERFORM 800-ORCSBUNBENFTN-SEC
+      *
+           MOVE    BUNBEN-RIYOUKBN TO  LNKBUNBEN-RIYOUKBN
+           MOVE    BUNBEN-BUNBENKBN TO LNKBUNBEN-BUNBENKBN
+           MOVE    "1"             TO  LNKBUNBEN-UPDKBN
+           MOVE    BUNBEN-CREYMD   TO  LNKBUNBEN-CREYMD
+           MOVE    LNKBUNBEN-REC   TO  BUNBEN-REC
+      *
+           PERFORM 800-MCNDATE-SEC
+           MOVE    SMCNDATE-YMD    TO  BUNBEN-UPYMD
+           MOVE    SMCNDATE-HMS    TO  BUNBEN-UPHMS
+      *
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "del3"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+           IF    ( MCP-RC          =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    "4037"      TO  SPA-ERRCD
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    BUNBEN-REC      TO  MCPDATA-REC
+               MOVE    "tbl_bunben"    TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 910-DBINSERT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    "4038"      TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       4801-BUNBEN-UPD-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理テーブル更新処理
+      *****************************************************************
+       4802-BUNBEN-UPD-SEC          SECTION.
+      *
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+      *
+           PERFORM 800-ORCSBUNBENFTN-SEC
+      *
+           MOVE    BUNBEN-RIYOUKBN     TO  LNKBUNBEN-RIYOUKBN
+           MOVE    BUNBEN-SKYYM        TO  LNKBUNBEN-SKYYM
+           MOVE    BUNBEN-SKYKBN       TO  LNKBUNBEN-SKYKBN
+           MOVE    BUNBEN-BUNBENKBN    TO  LNKBUNBEN-BUNBENKBN
+           MOVE    BUNBEN-BIRTHDAY     TO  LNKBUNBEN-BIRTHDAY
+           MOVE    BUNBEN-ZAIWEEK      TO  LNKBUNBEN-ZAIWEEK
+           MOVE    BUNBEN-SIZANKBN     TO  LNKBUNBEN-SIZANKBN
+           MOVE    BUNBEN-BIRTHCNT     TO  LNKBUNBEN-BIRTHCNT
+           MOVE    BUNBEN-NYUIN-DAY    TO  LNKBUNBEN-NYUIN-DAY
+           MOVE    BUNBEN-SANKAKBN     TO  LNKBUNBEN-SANKAKBN
+           MOVE    "1"                 TO  LNKBUNBEN-UPDKBN
+           MOVE    BUNBEN-CREYMD       TO  LNKBUNBEN-CREYMD
+      *
+           MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
+      *
+           PERFORM 800-MCNDATE-SEC
+           MOVE    SMCNDATE-YMD    TO  BUNBEN-UPYMD
+           MOVE    SMCNDATE-HMS    TO  BUNBEN-UPHMS
+      *
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "del3"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+           IF    ( MCP-RC          =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    "4039"      TO  SPA-ERRCD
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    BUNBEN-REC      TO  MCPDATA-REC
+               MOVE    "tbl_bunben"    TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 910-DBINSERT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    "4040"      TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       4802-BUNBEN-UPD-EXT.
            EXIT.
       *****************************************************************
       *    入院診療行為照会テーブル作成処理
@@ -5940,7 +6142,7 @@
            WHEN    "1001"
                MOVE    "定期請求処理中のため登録はできません"
                                        TO  SPA-ERRMSG
-           WHEN    "4001"  THRU    "4999"
+           WHEN    "4001"  THRU    "4040"
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
            END-EVALUATE
@@ -6142,6 +6344,27 @@
            .
       *
        800-MCNDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩負担金サブ
+      *****************************************************************
+       800-ORCSBUNBENFTN-SEC           SECTION.
+      *
+           MOVE    SPA-AREA            TO  WRK-SPA-AREA
+      *
+           INITIALIZE                  LNKBUNBEN-REC
+           MOVE    SPA-HOSPNUM     TO  LNKBUNBEN-HOSPNUM
+           MOVE    SPA-NAI-I04-PTID
+                                   TO  LNKBUNBEN-PTID
+           MOVE    SPA-NAI-I04-PTRRKNUM
+                                   TO  LNKBUNBEN-RRKNUM
+           CALL    "ORCSBUNBENFTN"     USING
+                                       LNKBUNBEN-REC
+                                       WRK-SPA-AREA
+      *
+           .
+      *
+       800-ORCSBUNBENFTN-EXT.
            EXIT.
       *****************************************************************
       *    主科決定サブ
@@ -6426,6 +6649,39 @@
       *
            .
        900-PTTEIKIRRK-KEY9-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理検索処理
+      *****************************************************************
+       900-BUNBEN-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BUNBEN
+           INITIALIZE                  BUNBEN-REC
+      *
+           MOVE    SPA-HOSPNUM     TO  BUNBEN-HOSPNUM
+           MOVE    SPA-NAI-I04-PTID
+                                   TO  BUNBEN-PTID
+           MOVE    SPA-NAI-I04-PTRRKNUM
+                                   TO  BUNBEN-RRKNUM
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BUNBEN-REC
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    1           TO  FLG-BUNBEN
+           END-IF
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-BUNBEN-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    収納マスタ検索処理

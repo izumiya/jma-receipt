@@ -67,6 +67,8 @@
       *  04.04.00    NACL-多々納  09/01/23  予約票発行追加
       *  04.04.00    NACL-小豆沢  09.01.26  本院分院対応
       *                                     短縮医療機関名称　追加       
+      *  04.05.00    NACL-太田    09.06.23  保険自費毎の消費税端数区分追加
+      *  04.05.00    NACL-太田    09.07.27  分娩機関管理番号追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -248,6 +250,7 @@
                                13  SPA-GMN-HOSPSBT1MEI
                                                       PIC X(18).
                            11  SPA-GMN-HOSPCDN        PIC X(20).
+                           11  SPA-GMN-SANKANUM       PIC X(10).
                            11  SPA-GMN-SYOHOKBN-G.
                                13  SPA-GMN-SYOHOKBN   PIC X(01).
                                13  SPA-GMN-F6         PIC X(01).
@@ -555,6 +558,7 @@
                    07  WRK-RATE-TANI   PIC X(04).
                05  WRK-RATE-EDIT-R  REDEFINES    WRK-RATE-EDIT.
                    07  WRK-RATE-EDITR  PIC X(11).
+           03  WRK-HOSPSBTW        PIC X(02).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -671,6 +675,7 @@
            COPY    "W64.INC".
            COPY    "W65.INC".
            COPY    "W66.INC".
+           COPY    "W67.INC".
            COPY    "W96.INC".
            COPY    "W98.INC".
            COPY    "W981.INC".
@@ -1532,6 +1537,12 @@
                    MOVE    2               TO  IDY
                END-IF
            END-PERFORM
+           IF    ( SYS-1001-SANKANUM   IS  NUMERIC  )
+            AND  ( SYS-1001-SANKANUM   NOT =   ZERO )
+               MOVE    SYS-1001-SANKANUM   TO  SPA-GMN-SANKANUM
+           ELSE
+               MOVE    SPACE               TO  SPA-GMN-SANKANUM
+           END-IF
            MOVE    SYS-1001-SKYPRTFLG  TO  SPA-GMN-SKYPRTFLG
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       SPA-SYKPRTFLG-MAX
@@ -1943,6 +1954,7 @@
            MOVE    W02-ROUPAYKBN       TO  SPA-GMN-ROUPAYKBN-G
            MOVE    W02-HOSPSBT1        TO  SPA-GMN-HOSPSBT1-G
            MOVE    W02-HOSPCDN         TO  SPA-GMN-HOSPCDN
+           MOVE    W02-SANKANUM        TO  SPA-GMN-SANKANUM
            MOVE    W02-SYOHOKBN        TO  SPA-GMN-SYOHOKBN-G
            MOVE    W02-SKYPRTFLG       TO  SPA-GMN-SKYPRTFLG-G
            MOVE    W02-SYOHOPRTFLG     TO  SPA-GMN-SYOHOPRTFLG-G
@@ -2104,6 +2116,9 @@
            END-IF
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4111-HOSPCDN-CHK-SEC
+           END-IF
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4133-SANKANUM-CHK-SEC
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
@@ -2696,6 +2711,60 @@
       *
            .
        4111-HOSPCDN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    分娩機関管理番号チェック追加
+      *****************************************************************
+       4133-SANKANUM-CHK-SEC           SECTION.
+      *
+           MOVE    217                 TO  SPA-GMN-CUR
+      *
+           IF    ( SPA-GMN-SANKANUM    =   SPACE )
+                   CONTINUE
+           ELSE
+               IF    ( SPA-GMN-SANKANUM    IS  NOT NUMERIC )
+                   MOVE    "0216"      TO  SPA-ERRCD
+               END-IF
+               IF    ( SPA-ERRCD       =   SPACE )
+                   IF    ( SPA-GMN-SANKANUM (1:2)  =   "00" )
+                       CONTINUE
+                   ELSE
+                       MOVE    "0213"      TO  SPA-ERRCD
+                   END-IF
+               END-IF
+               IF    ( SPA-ERRCD       =   SPACE )
+                   IF    ( SPA-GMN-HOSPSBT     =   "1" OR "2" )
+                       IF    ( SPA-GMN-SANKANUM (3:1)
+                                               =   SPA-GMN-HOSPSBT )
+                           CONTINUE
+                       ELSE
+                           MOVE    "0214"  TO  SPA-ERRCD
+                           MOVE    SPACE   TO  WRK-HOSPSBTW
+                           IF    ( SPA-GMN-HOSPSBT     =   "1" )
+                               MOVE    "１"    TO      WRK-HOSPSBTW
+                           ELSE
+                               MOVE    "２"    TO      WRK-HOSPSBTW
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+               IF    ( SPA-ERRCD       =   SPACE )
+                   IF    ( SPA-GMN-SANKANUM (4:2)
+                                       =   SPA-GMN-PREFNUM )
+                       CONTINUE
+                   ELSE
+                       MOVE    "0215"  TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+          IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    ZERO       TO  SPA-GMN-CUR
+          END-IF
+      *
+           .
+       4133-SANKANUM-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3573,6 +3642,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-GMN-ROUPAYKBN   TO  SYS-1001-ROUPAYKBN 
                    MOVE    SPA-GMN-HOSPSBT1    TO  SYS-1001-HOSPSBT1 
                    MOVE    SPA-GMN-HOSPCDN     TO  SYS-1001-HOSPCDN
+                   IF    ( SPA-GMN-SANKANUM    =   SPACE )
+                       MOVE  ZERO              TO  SYS-1001-SANKANUM
+                   ELSE
+                       MOVE  SPA-GMN-SANKANUM  TO  SYS-1001-SANKANUM
+                   END-IF
                    MOVE    SPA-GMN-SYOHOKBN    TO  SYS-1001-SYOHOKBN
                    MOVE    SPA-GMN-SKYPRTFLG   TO  SYS-1001-SKYPRTFLG
                    MOVE    SPA-GMN-SYOHOPRTFLG TO  SYS-1001-SYOHOPRTFLG
@@ -4019,6 +4093,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-ROUPAYKBN-G TO  W02-ROUPAYKBN
            MOVE    SPA-GMN-HOSPSBT1-G  TO  W02-HOSPSBT1
            MOVE    SPA-GMN-HOSPCDN     TO  W02-HOSPCDN
+           MOVE    SPA-GMN-SANKANUM    TO  W02-SANKANUM
            MOVE    SPA-GMN-SYOHOKBN-G  TO  W02-SYOHOKBN
            MOVE    SPA-GMN-SKYPRTFLG-G TO  W02-SKYPRTFLG
            MOVE    SPA-GMN-SYOHOPRTFLG-G
@@ -4474,6 +4549,39 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0206"
                    MOVE    "減免計算対象区分入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0213"
+                   MOVE    SPACE               TO  SPA-ERRMSG
+                   STRING  "分娩機関管理番号の１、２桁目は"
+                                               DELIMITED BY  SIZE
+                           "００を設定してください。"
+                                               DELIMITED BY  SIZE
+                   INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0214"
+                   MOVE    SPACE               TO  SPA-ERRMSG
+                   STRING  "分娩機関管理番号の３桁目は"
+                                               DELIMITED BY  SIZE
+                           WRK-HOSPSBTW        DELIMITED BY  SPACE
+                           "を設定してください"
+                                               DELIMITED BY  SIZE
+                   INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0215"
+                   MOVE    SPACE               TO  SPA-ERRMSG
+                   STRING  "分娩機関管理番号の４、５桁目は"
+                                               DELIMITED BY  SIZE
+                           "都道府県番号を設定してください"
+                                               DELIMITED BY  SIZE
+                   INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0216"
+                   MOVE    SPACE               TO  SPA-ERRMSG
+                   STRING  "分娩機関管理番号は数字１０桁で"
+                                               DELIMITED BY  SIZE
+                           "入力してください"
+                                               DELIMITED BY  SIZE
+                   INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0030"
                    MOVE    "自費名称は全角で入力して下さい。"
                                                TO  SPA-ERRMSG
@@ -4650,6 +4758,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "OKUSURIFLG"     TO   MCP-WIDGET
                 WHEN    210
                     MOVE  "YYKHYOFLG"      TO   MCP-WIDGET
+                 WHEN    217
+                     MOVE  "SANKANUM"
+                                            TO   MCP-WIDGET
       *
                 WHEN    40
                     MOVE  "TEIRITU"        TO   MCP-WIDGET
@@ -4785,6 +4896,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
               WHEN    "YYKHYOFLG"
                   MOVE    12               TO  SPA-GMN-CUR
               WHEN    "HOSPCDN"
+                   MOVE    217              TO  SPA-GMN-CUR
+              WHEN    "SANKANUM"
                   MOVE    38               TO  SPA-GMN-CUR
               WHEN    "DISCOUNTHASU"
                   MOVE    201              TO  SPA-GMN-CUR

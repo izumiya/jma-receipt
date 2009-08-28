@@ -161,6 +161,9 @@
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
       *
+      *    分娩入院チェックサブ
+           COPY  "CPORCSBUNBENCHK.INC".
+      *
       *    入院請求期間取得サブ
            COPY    "CPORCSS006.INC".
       *
@@ -249,6 +252,13 @@
                                        LNK-SYUDAY-REC-T
                                        WRK-NYUFTN-MAX
       *
+           INITIALIZE                  SBUNBENCHK-AREA
+           MOVE    SPA-PTID        TO  SBUNBENCHK-PTID
+           MOVE    I0SUB02-RRKNUM  TO  SBUNBENCHK-RRKNUM
+           CALL    "ORCSBUNBENCHK" USING
+                                   SBUNBENCHK-AREA
+                                   SPA-AREA
+      *
            INITIALIZE                  SS006-AREA
            MOVE    I0SUB02-SKYSTYMD    TO  SS006-SKYSTYMD
            MOVE    I0SUB02-SKYEDYMD    TO  SS006-SKYEDYMD
@@ -280,7 +290,11 @@
            END-IF
       *
            MOVE    SPA-SYSYMD      TO  LNK-S02-SYSYMD
-           MOVE    "1"             TO  LNK-S02-SYORI-KBN
+           IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
+               MOVE    "1"         TO  LNK-S02-SYORI-KBN
+           ELSE
+               MOVE    "8"         TO  LNK-S02-SYORI-KBN
+           END-IF
            CALL    "ORCSNYUFTN"    USING
                                    SPA-AREA
                                    LNK-ORCS02-REC

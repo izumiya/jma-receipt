@@ -315,6 +315,9 @@
       *    Æþ±¡ÀÁµá´ü´Ö¼èÆÀ¥µ¥Ö
            COPY    "CPORCSS006.INC".
       *
+      *    Ê¬ÊÚÆþ±¡¥Á¥§¥Ã¥¯¥µ¥Ö
+           COPY  "CPORCSBUNBENCHK.INC".
+      *
       *    £Ä£Â¸¡º÷
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
@@ -1754,6 +1757,16 @@
                                        LNK-SYUNOU-REC-T
                                        LNK-SYUDAY-REC-T
       *
+           INITIALIZE                  SBUNBENCHK-AREA
+           MOVE    SPA-NAI-I51-PTID
+                                   TO  SBUNBENCHK-PTID
+           MOVE    SPA-NAI-I51-SANTEISTYMD
+                                   TO  SBUNBENCHK-SKYSTYMD
+           MOVE    SPA-NAI-I51-SANTEIEDYMD
+                                   TO  SBUNBENCHK-SKYEDYMD
+           CALL    "ORCSBUNBENCHK" USING
+                                   SBUNBENCHK-AREA
+                                   SPA-AREA
       *
            INITIALIZE                  SS006-AREA
            MOVE    SPA-NAI-I51-PTID    TO  SPA-PTID
@@ -1789,7 +1802,11 @@
                MOVE    SS006-TIMEKBN-ED    TO  LNK-S02-TIMEKBN-ED
            END-IF
            MOVE    SPA-SYSYMD      TO  LNK-S02-SYSYMD
-           MOVE    "1"             TO  LNK-S02-SYORI-KBN
+           IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
+               MOVE    "1"         TO  LNK-S02-SYORI-KBN
+           ELSE
+               MOVE    "8"         TO  LNK-S02-SYORI-KBN
+           END-IF
            DISPLAY "LNK-S02-HOSPNUM             = " LNK-S02-HOSPNUM
            DISPLAY "LNK-S02-NYUGAIKBN          = " LNK-S02-NYUGAIKBN
            DISPLAY "LNK-S02-PTID               = " LNK-S02-PTID

@@ -446,6 +446,7 @@
            COPY    "W64.INC".
            COPY    "W65.INC".
            COPY    "W66.INC".
+           COPY    "W67.INC".
            COPY    "W96.INC".
            COPY    "W98.INC".
            COPY    "W981.INC".

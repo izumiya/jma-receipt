@@ -315,6 +315,9 @@
       *    同日入院チェックサブ
            COPY    "CPORCSDNTCHK.INC".
       *
+      *    分娩入院チェックサブ
+           COPY  "CPORCSBUNBENCHK.INC".
+      *
       *    入院請求期間取得サブ
            COPY    "CPORCSS006.INC".
       *
@@ -853,6 +856,14 @@
                                        LNK-SYUNOU-REC-T
                                        LNK-SYUDAY-REC-T
       *
+           INITIALIZE                  SBUNBENCHK-AREA
+           MOVE    PTNYUINRRK-PTID TO  SBUNBENCHK-PTID
+           MOVE    PTNYUINRRK-RRKNUM
+                                   TO  SBUNBENCHK-RRKNUM
+           CALL    "ORCSBUNBENCHK" USING
+                                       SBUNBENCHK-AREA
+                                       SPA-AREA
+      *
            INITIALIZE                  SS006-AREA
            MOVE    PTNYUINRRK-PTID     TO  SPA-PTID
            MOVE    WRK-SEIKYUSTYMD     TO  SS006-SKYSTYMD
@@ -885,7 +896,11 @@
            END-IF
            MOVE    "A"             TO  LNK-S02-TEIKI-KBN
            MOVE    TEIKI1P-SYSYMD TO  LNK-S02-SYSYMD
-           MOVE    "2"             TO  LNK-S02-SYORI-KBN
+           IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
+               MOVE    "2"         TO  LNK-S02-SYORI-KBN
+           ELSE
+               MOVE    "9"         TO  LNK-S02-SYORI-KBN
+           END-IF
            CALL    "ORCSNYUFTN"    USING
                                    SPA-AREA
                                    LNK-ORCS02-REC
