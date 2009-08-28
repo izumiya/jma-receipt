@@ -414,6 +414,7 @@
       *  04.04.14    NACL-ÌçÏÆ    09/07/17  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.04.15    NACL-ÌçÏÆ    09/08/17  Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ
       *  04.04.16    NACL-ÌçÏÆ    09/08/18  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.17    NACL-ÌçÏÆ    09/08/19  ½Ð»º°ì»þ¶âÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -865,6 +866,11 @@
                05  TBL-HKNFTNDATA-ZAN                  PIC  9(07).
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
       *
+       01  TBL-PTTOKKI.
+           03  TBL-PTTOKKI-OCC                         OCCURS   5.
+               05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
+               05  TBL-PTTOKKI-CD                      PIC  X(02).
+      *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
            03  WRK-IN                                  PIC X(01).
@@ -927,6 +933,7 @@
       *
            03  WRK-TOKKI                               PIC X(02).
            03  TOKKI-IDX                               PIC 9(02). 
+           03  TOKKI-IDX2                              PIC 9(02).
       *
            03  WRK-TANICD                              PIC 9(03).
            03  WRK-TANIMOJISU                          PIC 9(01).
@@ -2269,6 +2276,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
               MOVE      1     TO     RECE02-RJNGAIKOHFTN(2)
            END-IF
       *
+           PERFORM     211G-PTTOKKI-HENSYU-SEC
+      *
            PERFORM     RECE02-REWRITE-SEC
            .
        210-HENSYU-EXT.
@@ -2626,6 +2635,53 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
            .
        211F-JGNCHK-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼ÔÆÃµ­»ö¹àÊÔ½¸
+      *****************************************************************
+       211G-PTTOKKI-HENSYU-SEC      SECTION.
+      *
+           INITIALIZE                TBL-PTTOKKI
+      *
+           MOVE      ZERO      TO    TOKKI-IDX2
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+               IF (( RECE02-PTTOKKI-CD(TOKKI-IDX)    = SPACE ) AND
+                   ( RECE02-PTTOKKI-NAIYO(TOKKI-IDX) = SPACE ))
+               OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "15"     ) AND
+                   ((RECE02-SRYYM   <  "200608") OR
+                    (RECE02-SRYYM   >  "200812")             ))
+               OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "16"     ) AND
+                   ( RECE02-SRYYM   <  "200610"              ))
+               OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                                    "17" OR "18" OR "19"     ) AND
+                   ( RECE02-SRYYM   <  "200704"              ))
+               OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
+                   ((RECE02-SRYYM   <  "200804") OR
+                    (RECE02-SRYYM   >  "201003")             ))
+               OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
+                   ( RECE02-SRYYM   <  "200901"              ))
+                 CONTINUE
+               ELSE
+                 ADD    1     TO    TOKKI-IDX2
+                 MOVE   RECE02-PTTOKKI-CD(TOKKI-IDX)    TO
+                                    TBL-PTTOKKI-CD(TOKKI-IDX2)
+                 MOVE   RECE02-PTTOKKI-NAIYO(TOKKI-IDX) TO
+                                    TBL-PTTOKKI-NAIYO(TOKKI-IDX2)
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+                 MOVE   TBL-PTTOKKI-CD(TOKKI-IDX)       TO
+                                    RECE02-PTTOKKI-CD(TOKKI-IDX)
+                 MOVE   TBL-PTTOKKI-NAIYO(TOKKI-IDX)    TO
+                                    RECE02-PTTOKKI-NAIYO(TOKKI-IDX)
+           END-PERFORM
+      *
+           .
+       211G-PTTOKKI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

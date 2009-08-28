@@ -49,6 +49,8 @@
       *  04.02.03    NACL-門脇    08/10/07  入院基本料有効期間チェック
       *  04.02.04    NACL-門脇    08/10/30  保険組合せ有効期間チェック
       *  04.03.01    NACL-門脇    08/12/04  仮収納作成時のディスプレイ追加
+      *
+      *  04.04.01    NACL-門脇    09/08/25  出産一時金対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -90,6 +92,7 @@
            03  FLG-SYUNOU                              PIC 9(01).
            03  FLG-SET                                 PIC 9(01).
            03  FLG-DATA                                PIC 9(01).
+           03  FLG-BUNBEN-SET                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -228,6 +231,8 @@
            COPY    "CPORCSPTID.INC".
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+      *    分娩入院チェックサブ
+           COPY    "CPORCSBUNBENCHK.INC".
       *
       *    定期請求用収納作成サブ
        01  LNK-ORCS02-REC.
@@ -917,6 +922,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
               MOVE    ZERO                TO  WRK-SEIKYUSTYMD
                                               WRK-SEIKYUEDYMD
+      *
+              MOVE    ZERO                TO  FLG-BUNBEN-SET
+      *
       *       診療月内の入退院情報
               INITIALIZE                      PTNYUINRRK-REC
               MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
@@ -953,6 +961,21 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    IF      WRK-SEIKYUEDYMD =   ZERO
                      MOVE PTNYUINRRK-TAIINYMD TO  WRK-SEIKYUEDYMD
                    END-IF             
+      *
+                   IF      FLG-BUNBEN-SET  =   ZERO
+                     INITIALIZE                    SBUNBENCHK-AREA
+                     MOVE  KEY-O-PTID          TO  SBUNBENCHK-PTID
+                     MOVE  PTNYUINRRK-RRKNUM   TO  SBUNBENCHK-RRKNUM
+                     CALL  "ORCSBUNBENCHK" USING
+                                           SBUNBENCHK-AREA
+                                           SPA-AREA
+                     IF    SBUNBENCHK-BUNBEN   =   ZERO
+                        CONTINUE
+                     ELSE
+                        MOVE    1              TO  FLG-BUNBEN-SET
+                     END-IF
+                   END-IF
+      *
                    MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
                    MOVE    "key23"            TO  MCP-PATHNAME
                    PERFORM 900-PTNYUINRRK-READ-SEC
@@ -986,7 +1009,12 @@ grpsys         PERFORM 900-DBSELECT-SEC
               MOVE    WRK-SEIKYUEDYMD TO  LNK-S02-SKYEDYMD
               MOVE    "X"             TO  LNK-S02-TEIKI-KBN
               MOVE    WRK-PARA-SYSYMD TO  LNK-S02-SYSYMD
-              MOVE    "2"             TO  LNK-S02-SYORI-KBN
+      *
+              IF      FLG-BUNBEN-SET  =   ZERO
+                  MOVE    "2"         TO  LNK-S02-SYORI-KBN
+              ELSE
+                  MOVE    "9"         TO  LNK-S02-SYORI-KBN
+              END-IF
       *
               CALL    "ORCSNYUFTN"    USING
                                       SPA-AREA

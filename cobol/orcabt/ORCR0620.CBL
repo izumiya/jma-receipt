@@ -162,6 +162,7 @@
       *  04.04.02    NACL-藤原    09/03/10  特別な関係にある他院歴を初回
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
+      *  04.04.03    NACL-門脇    09/08/24  出産一時金対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -319,6 +320,7 @@
            03  FLG-TAISYO                              PIC 9(01).
            03  FLG-SEIHO                               PIC 9(01).
            03  FLG-RIREKI-HEN                          PIC 9(01).
+           03  FLG-BUNBEN-SET                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -408,6 +410,13 @@
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
            03  WRK-SEIHO-FLG             PIC 9(01).
+      *
+           03  WRK-BUNBENST-YMD.
+               05  WRK-BUNBENST-YM       PIC 9(06).
+               05  WRK-BUNBENST-DD       PIC 9(02).
+           03  WRK-BUNBENED-YMD.
+               05  WRK-BUNBENED-YM       PIC 9(06).
+               05  WRK-BUNBENED-DD       PIC 9(02).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -569,6 +578,10 @@
       *    患者特記事項情報
        01  PTTOKKI-REC.
            COPY    "CPPTTOKKI.INC".
+      *
+      *    分娩管理テーブル
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -3099,6 +3112,8 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
            MOVE      SPACE             TO  WK-PTNYUINRRK-TENSTUYMD2
            MOVE      SPACE             TO  WK-PTNYUINRRK-TENNYUYMD
       *
+           MOVE      ZERO              TO  FLG-BUNBEN-SET
+      *
       *    診療月内の入退院情報
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    RECE62-HOSPNUM      TO  PTNYUINRRK-HOSPNUM
@@ -3121,6 +3136,36 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
              AND   ( RECE62-TEKEDYMD-X NOT =   SPACE             )
                  CONTINUE
              ELSE
+      *
+               IF   (FLG-BUNBEN-SET  =   ZERO   )
+               AND  (RECE62-SRYYM   >=  "200910")
+               AND  (RECE62-SRYYM   <=  "201103")
+                 IF ( RECE62-HKNNUM(1:2)   =  "98"           )
+                 OR ( RECE62-HKNNUM        =  "039" OR "040" )
+                 OR ((RECE62-HKNNUM        =  "002") AND
+                     (RECE62-HOJOKBN   NOT =  SPACE)         )
+                   CONTINUE
+                 ELSE
+                   MOVE     RECE62-SRYYM           TO  WRK-BUNBENST-YM
+                   IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
+                      MOVE  RECE62-TEKSTYMD-X(7:2) TO  WRK-BUNBENST-DD
+                   ELSE
+                      MOVE  01                     TO  WRK-BUNBENST-DD
+                   END-IF
+                   MOVE     RECE62-SRYYM           TO  WRK-BUNBENED-YM
+                   IF   RECE62-TEKEDYMD-X(1:6)  <=  RECE62-SRYYM
+                      MOVE  RECE62-TEKEDYMD-X(7:2) TO  WRK-BUNBENED-DD
+                   ELSE
+                      MOVE  31                     TO  WRK-BUNBENED-DD
+                   END-IF
+                   IF  ( PTNYUINRRK-NYUINYMD <= WRK-BUNBENED-YMD )
+                   AND ((PTNYUINRRK-NYUINYMD >= WRK-BUNBENST-YMD) OR
+                        (PTNYUINRRK-TAIINYMD >= WRK-BUNBENST-YMD))
+                      PERFORM   2402-BUNBEN-CHECK-SEC
+                   END-IF
+                 END-IF
+               END-IF
+      *
                IF      PTNYUINRRK-NYUINYMD (1:6)
                                                <   RECE62-SRYYM
                    MOVE    1                   TO  IDX4
@@ -3426,6 +3471,41 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
            END-IF    
            .
        24012-RECE68-WRITE-EXT.
+           EXIT.
+      * 
+      *****************************************************************
+      *    分娩テーブルチェック
+      *****************************************************************
+       2402-BUNBEN-CHECK-SEC           SECTION.
+      *
+           INITIALIZE                    BUNBEN-REC
+           MOVE    RECE62-HOSPNUM    TO  BUNBEN-HOSPNUM
+           MOVE    RECE62-PTID       TO  BUNBEN-PTID
+           MOVE    PTNYUINRRK-RRKNUM TO  BUNBEN-RRKNUM
+           MOVE    BUNBEN-REC        TO  MCPDATA-REC
+           MOVE    "tbl_bunben"      TO  MCP-TABLE
+           MOVE    "key3"            TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC            =   ZERO
+             MOVE  "tbl_bunben"      TO  MCP-TABLE
+             MOVE  "key3"            TO  MCP-PATHNAME
+             PERFORM 900-DBFETCH-SEC
+             IF    MCP-RC            =   ZERO
+               MOVE   MCPDATA-REC    TO  BUNBEN-REC
+               IF   (BUNBEN-RIYOUKBN    =   "1")
+               AND  (BUNBEN-BUNBENKBN   =   "2")
+                  ADD      1         TO  TOKKI-IDX
+                  MOVE    "25"       TO  RECE62-TOKKI(TOKKI-IDX)
+                  MOVE     1         TO  FLG-BUNBEN-SET
+               END-IF
+             END-IF
+           END-IF
+           MOVE    "tbl_bunben"      TO  MCP-TABLE
+           MOVE    "key3"            TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       2402-BUNBEN-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

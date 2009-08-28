@@ -256,6 +256,7 @@
       *                                     ¡ÊÅìµþÅÔ£±£µ£±¡Ë
       *  04.04.06    NACL-ÌçÏÆ    09/06/11  £·£°ºÐÌ¤Ëþ¤Î¹â³Û·×»»ÂÐ±þ
       *  04.04.07    NACL-ÌçÏÆ    09/07/08  Àº¿ÀÆþ±¡¸ÂÅÙ³ÛÂÐ±þ
+      *  04.04.08    NACL-ÌçÏÆ    09/08/18  ½Ð»º°ì»þ¶âÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2559,6 +2560,14 @@
       *    ¼«ÈñÊÝ¸±¤Î¥Ç¡¼¥¿ÊÔ½¸                                *
       ******************************************************************
        104-JIHIHOKEN-DATA-HENSYU-SEC          SECTION.
+      *
+           IF   (COMB-HKNNUM            NOT =   SPACE     )
+           AND  (COMB-SYU-HKNKOHSBTKBN      =   "8"       )
+           AND  (WK-1001-JIHIPOSITION   NOT =   "2"       )
+           AND  (LNK-S02-SYORI-KBN          =   "8" OR "9")
+           AND  (LNK-SYU-SRYYMD(1:6)       >=   "200604"  )
+               MOVE   "2"    TO   WK-1001-JIHIPOSITION
+           END-IF
       *
            IF  ((COMB-HKNNUM            NOT =   SPACE   ) AND
                 (COMB-SYU-HKNKOHSBTKBN      =   "8"     ) AND

@@ -106,6 +106,8 @@
       *  04.02.08    NACL-門脇    08/10/07  入院基本料有効期間チェック
       *  04.02.09    NACL-門脇    08/10/30  保険組合せ有効期間チェック
       *  04.03.01    NACL-門脇    09/04/01  埼玉県地方公費対応
+      *
+      *  04.04.01    NACL-門脇    09/08/18  出産一時金対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -654,9 +656,11 @@
                 EVALUATE    WRK-S02-SYORI-KBN
                    WHEN    " "
                    WHEN    "1"
+                   WHEN    "8"
                       MOVE     "1"            TO  SYU-CREATEKBN
                                                   SDAY-CREATEKBN
                    WHEN    "2"
+                   WHEN    "9"
       *               MOVE     "2"            TO  SYU-DENPJTIKBN
                       IF       WRK-S02-TEIKI-KBN    =   "X"
                           MOVE     "3"        TO  SYU-CREATEKBN
@@ -782,9 +786,11 @@
                 EVALUATE    WRK-S02-SYORI-KBN
                    WHEN    " "
                    WHEN    "1"
+                   WHEN    "8"
                       MOVE     "1"            TO  SYU-CREATEKBN
                                                   SDAY-CREATEKBN
                    WHEN    "2"
+                   WHEN    "9"
       *               MOVE     "2"            TO  SYU-DENPJTIKBN
                       IF       WRK-S02-TEIKI-KBN    =   "X"
                           MOVE     "3"        TO  SYU-CREATEKBN
@@ -1650,9 +1656,11 @@
               EVALUATE    LNK-S02-SYORI-KBN
                    WHEN    " "
                    WHEN    "1"
+                   WHEN    "8"
       ************>    MOVE "2"       TO LNK-SYU-DENPJTIKBN(IDX)
                        CONTINUE
                    WHEN    "2"
+                   WHEN    "9"
                        MOVE "2"       TO LNK-SYU-DENPJTIKBN(IDX)
               END-EVALUATE
       *       MOVE WRK-SYSYMD         TO LNK-SYU-DENPPRTYMD(IDX)
