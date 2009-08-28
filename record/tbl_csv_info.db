@@ -94,4 +94,17 @@ path	all		{
 	};
 };
 
+path    del4    {
+	DBDELETE        {
+		DELETE
+		FROM tbl_csv_info
+		WHERE   HOSPNUM	 	=   :HOSPNUM
+		AND     TBL_KEY	 	=   :TBL_KEY
+		AND     SRYYM	 	=   :SRYYM
+		AND     SHELLID  	=   :SHELLID
+		AND   SHORI_RENNUM	=   :SHORI_RENNUM 
+                ;
+        };
+};
+
 
