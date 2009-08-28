@@ -1,0 +1,751 @@
+      *******************************************************************
+      * Project code name "ORCA"
+      * 日医標準レセプトソフト（JMA standard receipt software）
+      * Copyright(C) 2002 JMA (Japan Medical Association)
+      *
+      * This program is part of "JMA standard receipt software".
+      *
+      *     This program is distributed in the hope that it will be useful
+      * for further advancement in medical care, according to JMA Open
+      * Source License, but WITHOUT ANY WARRANTY.
+      *     Everyone is granted permission to use, copy, modify and
+      * redistribute this program, but only under the conditions described
+      * in the JMA Open Source License. You should have received a copy of
+      * this license along with this program. If not, stop using this
+      * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
+      * 113-8621, Japan.
+      ********************************************************************
+       IDENTIFICATION          DIVISION.
+       PROGRAM-ID.             ORCSBUNBENFTN.
+      *****************************************************************
+      *  システム名        : ＯＲＣＡ
+      *  サブシステム名    : 
+      *  コンポーネント名  : 出産育児一時金テーブル編集サブ
+      *  管理者            : 
+      *  作成日付    作業者        記述
+      *****************************************************************
+      *
+       ENVIRONMENT                 DIVISION.
+       CONFIGURATION               SECTION.
+       INPUT-OUTPUT                SECTION.
+       FILE-CONTROL.
+      *
+      *
+       DATA                        DIVISION.
+      *FILE                        SECTION.
+      *
+      *
+       WORKING-STORAGE             SECTION.
+      *
+      *    フラグ領域
+       01  FLG-AREA.
+           03  FLG-SYUNOU          PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-PTNYUINRRK      PIC 9(01).
+           03  FLG-PTHKNINF        PIC 9(01).
+           03  FLG-PTINF           PIC 9(01).
+           03  FLG-PTNUM           PIC 9(01).
+           03  FLG-HKNCOMBI        PIC 9(01).
+           03  FLG-BUNBENFTN       PIC 9(01).
+           03  FLG-BUNBENHKN       PIC 9(01).
+           03  FLG-LOOPEND         PIC 9(01).
+      *
+      *    添字領域
+       01  IDX-AREA.
+           03  IDX1                PIC 9(05).
+           03  IDX-BUNBEN          PIC 9(02).
+      *
+      *    一時領域
+       01  WRK-AREA.
+           03  WRK-HKNNUM          PIC X(03).
+           03  WRK-HOJOKBN         PIC X(01).
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
+      *
+      *****************************************************************
+      *    ファイルレイアウト
+      *****************************************************************
+      *
+      *    保険組合せ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
+      *
+      *    収納
+       01  SYUNOU-REC.
+           COPY    "CPSYUNOU.INC".
+      *
+      *    患者情報
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
+      *
+      *    患者番号
+       01  PTNUM-REC.
+           COPY    "CPPTNUM.INC".
+      *
+      *    入院履歴
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
+      *
+      *    患者保険
+       01  PTHKNINF-REC.
+           COPY    "CPPTHKNINF.INC".
+      *
+      *    システム管理
+           COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK1001.INC".
+           COPY    "CPSK1046.INC".
+      *
+      *
+      *****************************************************************
+      *    サブプロ用領域
+      *****************************************************************
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
+      *
+      *    共通領域
+           COPY    "MCPAREA".
+           COPY    "MCPDATA.INC".
+      *
+      *****************************************************************
+      *    連絡　領域
+      *****************************************************************
+       LINKAGE                         SECTION.
+      *
+       01  LNKBUNBEN-REC.
+           COPY  "CPBUNBEN.INC"        REPLACING  //BUNBEN-//
+                                              BY  //LNKBUNBEN-//.
+      *
+      *    スパ領域
+           COPY    "COMMON-SPA".
+      *
+      *
+       PROCEDURE                       DIVISION    USING
+           LNKBUNBEN-REC
+           SPA-AREA.
+      *
+      *****************************************************************
+      *    主　　処理
+      *****************************************************************
+       000-PROC-SEC                    SECTION.
+      *
+           INITIALIZE                  FLG-AREA
+           INITIALIZE                  IDX-AREA
+           INITIALIZE                  WRK-AREA
+      *
+           PERFORM 100-INIT-SEC
+      *
+           PERFORM 200-MAIN-SEC
+      *
+           PERFORM 300-END-SEC
+      *
+           .
+       000-PROC-EXT.
+      *
+           EXIT PROGRAM
+           .
+      *
+      *****************************************************************
+      *    初期処理
+      *****************************************************************
+       100-INIT-SEC                    SECTION.
+      *
+           PERFORM 900-PTNYUINRRK-KEY4-SEL-SEC
+      *
+           PERFORM 900-PTINF-KEY-SEL-SEC
+      *
+           PERFORM 900-PTNUM-KEY-SEL-SEC
+      *
+           .
+       100-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    主取得
+      *****************************************************************
+       200-MAIN-SEC            SECTION.
+      *
+           PERFORM 2001-EDIT-NYUININF-SEC
+      *
+           PERFORM 2001-EDIT-SYUINF-SEC
+      *
+           PERFORM 2001-EDIT-HKNINF-SEC
+      *
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院情報編集処理
+      *****************************************************************
+       2001-EDIT-NYUININF-SEC          SECTION.
+      *
+           MOVE    PTINF-KANANAME      TO  LNKBUNBEN-NAME
+           MOVE    PTNUM-PTNUM         TO  LNKBUNBEN-PTNUM
+           MOVE    "000000"            TO  LNKBUNBEN-SKYYM
+           MOVE    PTNYUINRRK-RRKNUM   TO  LNKBUNBEN-RRKNUM
+      *
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY5-AREA
+           MOVE    "51"                TO  LNK-DAY5-IRAI
+           MOVE    PTNYUINRRK-NYUINYMD TO  LNK-DAY5-START
+           MOVE    PTNYUINRRK-TAIINYMD TO  LNK-DAY5-END
+           CALL    "ORCSDAY"               USING
+                                           STS-AREA-DAY
+                                           LNK-DAY5-AREA
+      *
+           MOVE    LNK-DAY5-NISSU2     TO  LNKBUNBEN-NYUIN-DAY
+      *
+           .
+       2001-EDIT-NYUININF-EXT.
+           EXIT.
+      *****************************************************************
+      *    収納情報編集処理
+      *****************************************************************
+       2001-EDIT-SYUINF-SEC            SECTION.
+      *
+           PERFORM 900-SYUNOU-KEY45-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
+      *
+               MOVE    SYU-SYUHKNNUM   TO  WRK-HKNNUM
+               PERFORM 900-HKNCOMBI-KEY-SEL-SEC
+               MOVE    COMB-HOJOKBN    TO  WRK-HOJOKBN
+               PERFORM 2100-CHK-HOKEN-SEC
+               IF    ( FLG-BUNBENFTN       =   1 )
+                   PERFORM 20011-EDIT-SYUINF-SEC
+               END-IF
+      *
+               PERFORM 900-SYUNOU-KEY45-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syunou"        TO  MCP-TABLE
+           MOVE    "key45"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           PERFORM VARYING IDX-BUNBEN  FROM    1   BY  1
+                   UNTIL ( IDX-BUNBEN  >   10 )
+      *
+               COMPUTE LNKBUNBEN-NINPUFTN-MONEY
+                   =   LNKBUNBEN-NINPUFTN-MONEY
+                   +   LNKBUNBEN-MONEY (IDX-BUNBEN)
+      *
+           END-PERFORM
+      *
+           .
+       2001-EDIT-SYUINF-EXT.
+           EXIT.
+      *****************************************************************
+      *    収納情報編集処理
+      *****************************************************************
+       20011-EDIT-SYUINF-SEC           SECTION.
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "1046"          TO  SYS-KANRICD
+           MOVE    "*"             TO  SYS-KBNCD
+           MOVE    SYU-SKYEDYMD    TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-1046-REC
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   16 )
+      *
+               IF    ( SYS-1046-MEISAIKBN (IDX1)   IS  NUMERIC )
+                   MOVE    SYS-1046-MEISAIKBN (IDX1)
+                                   TO  IDX-BUNBEN
+               ELSE
+                   MOVE    09      TO  IDX-BUNBEN
+               END-IF
+               COMPUTE LNKBUNBEN-MONEY (IDX-BUNBEN)
+                   =   LNKBUNBEN-MONEY (IDX-BUNBEN)
+                   +   SYU-TGMONEY  (IDX1)
+                   +   SYU-TGMONEY-TAX (IDX1)
+      *
+           END-PERFORM
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   10 )
+      *
+               IF    ( SYS-1046-ETCJIHIKBN (IDX1)   IS  NUMERIC )
+                   MOVE    SYS-1046-ETCJIHIKBN (IDX1)
+                                   TO  IDX-BUNBEN
+               ELSE
+                   MOVE    09      TO  IDX-BUNBEN
+               END-IF
+               COMPUTE LNKBUNBEN-MONEY (IDX-BUNBEN)
+                   =   LNKBUNBEN-MONEY (IDX-BUNBEN)
+                   +   SYU-JIHI-TAXNASI (IDX1)
+                   +   SYU-JIHI-TAXARI  (IDX1)
+      *
+           END-PERFORM
+      *
+           COMPUTE LNKBUNBEN-NYU-MONEY
+               =   LNKBUNBEN-NYU-MONEY
+               +   SYU-SKYMONEY-SKJ-JIHI-KEI
+               +   SYU-SKYMONEY-LIFE-JIHI-KEI
+      *
+           COMPUTE LNKBUNBEN-RMSGK-MONEY
+               =   LNKBUNBEN-RMSGK-MONEY
+               +   SYU-RMSAGAKU
+      *
+           IF    ( SYU-SYUHKNNUM (1:2) =   "98" )
+               COMPUTE LNKBUNBEN-ETC-MONEY
+                   =   LNKBUNBEN-ETC-MONEY
+                   +   SYU-HKNTEKMONEY
+               COMPUTE LNKBUNBEN-NYU-MONEY
+                   =   LNKBUNBEN-NYU-MONEY
+                   +   SYU-SKYMONEY-SKJ-KEI
+                   +   SYU-SKYMONEY-LIFE-KEI
+           ELSE
+               COMPUTE LNKBUNBEN-ICBFTN-MONEY
+                   =   LNKBUNBEN-ICBFTN-MONEY
+                   +   SYU-HKNTEKMONEY
+                   +   SYU-KOH-FTN
+                   +   SYU-SKYMONEY-SKJ-KEI
+                   +   SYU-SKYMONEY-LIFE-KEI
+           END-IF
+      *
+           .
+       20011-EDIT-SYUINF-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険情報編集処理
+      *****************************************************************
+       2001-EDIT-HKNINF-SEC            SECTION.
+      *
+           PERFORM 900-PTHKNINF-KEY8-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-PTHKNINF        NOT =   ZERO )
+                    OR   ( LNKBUNBEN-KANYUKBN  NOT =   SPACE )
+      *
+               MOVE    PTHKN-HKNNUM        TO  WRK-HKNNUM
+               MOVE    PTHKN-HOJOKBN       TO  WRK-HOJOKBN
+               PERFORM 2100-CHK-HOKEN-SEC
+               IF    ( FLG-BUNBENHKN       =   1 )
+                   IF    ( PTHKN-HONKZKKBN =   "2" )
+                       MOVE    "5"         TO  LNKBUNBEN-HONKZKKBN
+                   ELSE
+                       MOVE    "1"         TO  LNKBUNBEN-HONKZKKBN
+                   END-IF
+                   MOVE    PTHKN-HKNJANUM  TO  LNKBUNBEN-HKNJANUM
+                   IF    ( PTHKN-HKNNUM    =   "067" )
+                       MOVE    PTHKN-HKNJANUM (3:)
+                                               TO  LNKBUNBEN-HKNJANUM-S
+                   ELSE
+                       MOVE    PTHKN-HKNJANUM  TO  LNKBUNBEN-HKNJANUM-S
+                   END-IF
+                   MOVE    PTHKN-KIGO      TO  LNKBUNBEN-KIGO
+                   MOVE    PTHKN-NUM       TO  LNKBUNBEN-NUM
+                   IF    ( PTHKN-HKNNUM    =   "060" OR "067"
+                                            OR "068" OR "069" )
+                       MOVE    "2"         TO  LNKBUNBEN-KANYUKBN
+                   ELSE
+                       MOVE    "1"         TO  LNKBUNBEN-KANYUKBN
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-PTHKNINF-KEY8-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       2001-EDIT-HKNINF-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険チェック処理
+      *****************************************************************
+       2100-CHK-HOKEN-SEC              SECTION.
+      *
+           MOVE    1               TO  FLG-BUNBENFTN
+                                       FLG-BUNBENHKN
+      *
+           EVALUATE    WRK-HKNNUM
+           WHEN    "002"
+               IF   (  WRK-HOJOKBN NOT =   SPACE )
+                   MOVE    ZERO    TO  FLG-BUNBENFTN
+                                       FLG-BUNBENHKN
+               END-IF
+           WHEN    "039"
+           WHEN    "040"
+           WHEN    "971"
+           WHEN    "973"
+           WHEN    "975"
+               MOVE    ZERO        TO  FLG-BUNBENFTN
+                                       FLG-BUNBENHKN
+           WHEN    "980"   THRU    "989"
+               MOVE    ZERO        TO  FLG-BUNBENHKN
+           END-EVALUATE
+      *
+           .
+       2100-CHK-HOKEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    終了処理
+      *****************************************************************
+       300-END-SEC                     SECTION.
+      *
+      *
+           .
+       300-END-EXT.
+           EXIT.
+      *****************************************************************
+      *    収納マスター検索
+      *****************************************************************
+       900-SYUNOU-KEY45-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUNOU
+      *
+           INITIALIZE                      SYUNOU-REC
+           MOVE    LNKBUNBEN-HOSPNUM   TO  SYU-HOSPNUM
+           MOVE    "1"                 TO  SYU-NYUGAIKBN
+           MOVE    LNKBUNBEN-PTID      TO  SYU-PTID
+           MOVE    LNKBUNBEN-RRKNUM    TO  SYU-NYUIN-RRKNUM
+           MOVE    SYUNOU-REC          TO  MCPDATA-REC
+           MOVE    "tbl_syunou"        TO  MCP-TABLE
+           MOVE    "key45"             TO  MCP-PATHNAME
+           PERFORM 911-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUNOU-REC
+           ELSE
+               INITIALIZE                  SYUNOU-REC
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+      *
+           .
+       900-SYUNOU-KEY45-SEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    収納マスター読込
+      *****************************************************************
+       900-SYUNOU-KEY45-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUNOU
+                                           FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
+                    OR   ( FLG-LOOPEND NOT =   ZERO )
+      *
+               MOVE    "tbl_syunou"        TO  MCP-TABLE
+               MOVE    "key45"             TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  SYUNOU-REC
+      *
+                   MOVE    1               TO  FLG-LOOPEND
+                   IF    ( SYU-DENPJTIKBN      =   "3" )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+               ELSE
+                   INITIALIZE                  SYUNOU-REC
+                   MOVE    1               TO  FLG-SYUNOU
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       900-SYUNOU-KEY45-FET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者保険情報マスター検索
+      *****************************************************************
+       900-PTHKNINF-KEY8-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTHKNINF
+      *
+           INITIALIZE                      PTHKNINF-REC
+           MOVE    LNKBUNBEN-HOSPNUM   TO  PTHKN-HOSPNUM
+           MOVE    LNKBUNBEN-PTID      TO  PTHKN-PTID
+           MOVE    PTNYUINRRK-TAIINYMD TO  PTHKN-TEKSTYMD
+                                           PTHKN-TEKEDYMD
+           MOVE    PTHKNINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTHKNINF-REC
+           ELSE
+               INITIALIZE                  PTHKNINF-REC
+               MOVE    1               TO  FLG-PTHKNINF
+           END-IF
+      *
+           .
+       900-PTHKNINF-KEY8-SEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者保険情報マスター読込
+      *****************************************************************
+       900-PTHKNINF-KEY8-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTHKNINF
+      *
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTHKNINF-REC
+           ELSE
+               INITIALIZE                  PTHKNINF-REC
+               MOVE    1               TO  FLG-PTHKNINF
+           END-IF
+      *
+           .
+       900-PTHKNINF-KEY8-FET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY4-SEL-SEC     SECTION.
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    LNKBUNBEN-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
+           MOVE    LNKBUNBEN-PTID      TO  PTNYUINRRK-PTID
+           MOVE    LNKBUNBEN-RRKNUM    TO  PTNYUINRRK-RRKNUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY4-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY10-SEL-SEC  SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+           MOVE    SPA-HOSPNUM     TO SYS-HOSPNUM
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC TO  SYSKANRI-REC
+           ELSE
+               INITIALIZE              SYSKANRI-REC
+               MOVE    1           TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報読み込み処理
+      *****************************************************************
+       900-PTINF-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTINF
+      *
+           INITIALIZE                      PTINF-REC
+           MOVE    LNKBUNBEN-HOSPNUM   TO  PTINF-HOSPNUM
+           MOVE    LNKBUNBEN-PTID      TO  PTINF-PTID
+           MOVE    PTINF-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTINF-REC
+           ELSE
+               INITIALIZE              PTINF-REC
+               MOVE    1           TO  FLG-PTINF
+           END-IF
+      *
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せ取得処理
+      *****************************************************************
+       900-HKNCOMBI-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HKNCOMBI
+      *
+           INITIALIZE                      HKNCOMBI-REC
+           MOVE    SYU-HOSPNUM         TO  COMB-HOSPNUM
+           MOVE    SYU-PTID            TO  COMB-PTID
+           MOVE    SYU-HKNCOMBINUM     TO  COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+           ELSE
+               MOVE    1               TO  FLG-HKNCOMBI
+               INITIALIZE                  HKNCOMBI-REC
+           END-IF
+      *
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-HKNCOMBI-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者番号情報読み込み処理
+      *****************************************************************
+       900-PTNUM-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTNUM
+      *
+           INITIALIZE                      PTNUM-REC
+           MOVE    LNKBUNBEN-HOSPNUM   TO  PTNUM-HOSPNUM
+           MOVE    LNKBUNBEN-PTID      TO  PTNUM-PTID
+           MOVE    LNKBUNBEN-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptnum"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTNUM-REC
+           ELSE
+               INITIALIZE              PTNUM-REC
+               MOVE    1           TO  FLG-PTNUM
+           END-IF
+      *
+           MOVE    "tbl_ptnum"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNUM-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ検索処理
+      *****************************************************************
+       911-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       911-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢクローズ処理
+      *****************************************************************
+       910-DBCLOSECURSOR-SEC           SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢインサート処理
+      *****************************************************************
+       910-DBINSERT-SEC                SECTION.
+      *
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ更新処理
+      *****************************************************************
+       910-DBUPDATE-SEC                SECTION.
+      *
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBUPDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ削除処理
+      *****************************************************************
+       910-DBDELETE-SEC                SECTION.
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
+           EXIT.
