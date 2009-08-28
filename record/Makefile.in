@@ -612,6 +612,7 @@ DB_files = \
 	tbl_syunou_main.db \
 	tbl_syunou_nyuin.db \
 	tbl_chkreigai.db \
+	tbl_bunben.db \
 
 
 all:   

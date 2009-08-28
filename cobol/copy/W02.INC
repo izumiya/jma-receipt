@@ -39,6 +39,7 @@
                     06  W02-ROUPAYKBNLST      PIC X(8)    OCCURS  2.
                   05  W02-HOSPCDN.
                     06  W02-VALUE   PIC X(20).
+                  05  W02-SANKANUM            PIC X(10).
                   05  W02-PREFNUM-COMBO.
                     06  W02-PREFNUM           PIC X(13).
                     06  W02-PREFNUM-COUNT     PIC S9(9)   BINARY.

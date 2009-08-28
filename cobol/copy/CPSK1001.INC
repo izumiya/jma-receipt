@@ -93,7 +93,7 @@
       *消費税端数設定
                05  SYS-1001-TAX-HASU-KBN
                                         PIC  X(01).
-      *請求額端数設定（減免無）
+      *請求額端数設定医保（減免無・保険分）
                05  SYS-1001-DISCOUNT-HASU-KBN2
                                         PIC  X(01).
       *更正・育成限度額日割計算区分
@@ -116,11 +116,31 @@
                05  SYS-1001-YYKHYOPRTFLG     PIC  X(01).
       *短縮医療機関名称
                05  SYS-1001-TANHOSPNAME      PIC  X(20).
+      *請求額端数設定医保（減免無・自費分）
+               05  SYS-1001-DISCOUNT-HASU-KBN2J
+                                        PIC  X(01).
+      *請求額端数設定労災（減免無・保険分）
+               05  SYS-1001-DISCOUNT-HASU-KBN3
+                                        PIC  X(01).
+      *請求額端数設定労災（減免無・自費分）
+               05  SYS-1001-DISCOUNT-HASU-KBN3J
+                                        PIC  X(01).
+      *請求額端数設定自賠責（減免無・保険分）
+               05  SYS-1001-DISCOUNT-HASU-KBN4
+                                        PIC  X(01).
+      *請求額端数設定自賠責（減免無・自費分）
+               05  SYS-1001-DISCOUNT-HASU-KBN4J
+                                        PIC  X(01).
+      *請求額端数設定公害（減免無・自費分）
+               05  SYS-1001-DISCOUNT-HASU-KBN5J
+                                        PIC  X(01).
+      *分娩機関管理番号
+               05  SYS-1001-SANKANUM    PIC  9(10).
       *予備
       ***  03                           PIC  X(94).
       ***  03                           PIC  X(86).
       **** 03                           PIC  X(83).
-           03                           PIC  X(58).
+           03                           PIC  X(42).
       *----(01.00.02) LINE ADD END   ----------------------------------
       *端末ＩＤ
            03  SYS-1001-TERMID          PIC  X(16).

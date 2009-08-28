@@ -144,5 +144,6 @@ db	{
 	tbl_sryacct_main;
 	tbl_sryacct_sub;
 	tbl_chkreigai;
+	tbl_bunbeni;
 
 };

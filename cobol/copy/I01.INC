@@ -21,6 +21,8 @@
               04  I01-B08-STT                      PIC S9(9)   BINARY.
               04  I01-B12-STT                      PIC S9(9)   BINARY.
               04  I01-B05-STATE                    PIC S9(9)   BINARY.
+              04  I01-B15-LABEL                    PIC X(10).
+              04  I01-B15-STATE                    PIC S9(9)   BINARY.
               04  I01-B21-STATE                    PIC S9(9)   BINARY.
               04  I01-B24-LABEL                    PIC X(10).
               04  I01-B24-STATE                    PIC S9(9)   BINARY.
@@ -93,6 +95,7 @@
               04  I01-SHONUM                       PIC S9(2).
               04  I01-SHONUM-STT                   PIC S9(9)   BINARY.
               04  I01-LBL-SHONYUINYMD              PIC X(16).
+              04  I01-LBL-KAIGO                    PIC X(20).
               04  I01-CMB-KAIGO.
                 05  I01-KAIGO                      PIC X(18).
                 05  I01-KAIGO-STT                  PIC S9(9)   BINARY.
@@ -169,6 +172,22 @@
                 05  I01-USERPG-ITM                PIC X(22)
                                                   OCCURS  2.
                 05  I01-USERPG-ITM-STT            PIC S9(9)   BINARY.
+              04  I01-LBL-BUNBENKBN               PIC X(20).
+              04  I01-CMB-BUNBENKBN.
+                05  I01-BUNBENKBN                 PIC X(20).
+                05  I01-BUNBENKBN-STT             PIC S9(9)   BINARY.
+                05  I01-BUNBENKBN-CNT             PIC S9(9)   BINARY.
+                05  I01-BUNBENKBN-ITM             PIC X(20)
+                                                  OCCURS  5.
+                05  I01-BUNBENKBN-ITM-STT            PIC S9(9)   BINARY.
+              04  I01-LBL-RIYOUKBN                PIC X(20).
+              04  I01-CMB-RIYOUKBN.
+                05  I01-RIYOUKBN                  PIC X(20).
+                05  I01-RIYOUKBN-STT              PIC S9(9)   BINARY.
+                05  I01-RIYOUKBN-CNT              PIC S9(9)   BINARY.
+                05  I01-RIYOUKBN-ITM              PIC X(20)
+                                                  OCCURS  5.
+                05  I01-RIYOUKBN-ITM-STT          PIC S9(9)   BINARY.
               04  I01-LBLINFO-STYLE               PIC X(20).
               04  I01-LBLINFO                     PIC X(160).
               04  I01-SELNUM                       PIC S9(3).

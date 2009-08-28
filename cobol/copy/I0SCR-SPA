@@ -107,6 +107,16 @@
                    13  SPA-GMN-I01-KAIGO-CD        PIC X(01).
                    13  SPA-GMN-I01-KAIGOFL         PIC X(01).
                    13  SPA-GMN-I01-KAIGO-NM        PIC X(18).
+      *          分娩入院
+                 11  SPA-GMN-I01-BUNBEN.
+                   13  SPA-GMN-I01-BUNBEN-CD       PIC X(01).
+                   13  SPA-GMN-I01-BUNBENFL        PIC X(01).
+                   13  SPA-GMN-I01-BUNBEN-NM       PIC X(18).
+      *          直接支払制度利用区分
+                 11  SPA-GMN-I01-RIYOU.
+                   13  SPA-GMN-I01-RIYOU-CD        PIC X(01).
+                   13  SPA-GMN-I01-RIYOUFL         PIC X(01).
+                   13  SPA-GMN-I01-RIYOU-NM        PIC X(18).
       *          退院日
                  11  SPA-GMN-I01-TAIINYMD          PIC X(10).
                  11  SPA-GMN-I01-TAIINCD.
@@ -196,6 +206,8 @@
                  11  SPA-NAI-I01-PTID              PIC 9(10).
       *          患者カナ氏名
                  11  SPA-NAI-I01-KANANAME          PIC X(60).
+      *          性別
+                 11  SPA-NAI-I01-SEX               PIC X(01).
       *          患者誕生日（西暦）
                  11  SPA-NAI-I01-BIRTHDAY          PIC X(08).
       *          異動日（西暦）
@@ -227,6 +239,8 @@
                  11  SPA-NAI-I01-NYUINYMD-MAE      PIC X(08).
       *          入院科
                  11  SPA-NAI-I01-NYUINKA-MOT       PIC X(27).
+      *          レセ科
+                 11  SPA-NAI-I01-RECEKA            PIC X(02).
       *          退院日（西暦）
                  11  SPA-NAI-I01-TAIINYMD          PIC X(08).
       *          保険組み合わせ
@@ -261,6 +275,8 @@
       *          ユーザー起動プログラム設定
                  11  SPA-NAI-I01-GYOUMU-FLG        PIC X(01).
                  11  SPA-NAI-I01-GYOUMU-ARI        PIC X(01).
+      *          分娩入院フラグ
+                 11  SPA-NAI-I01-BUNBEN            PIC 9(01).
       *        入院歴リスト内部領域
                09  SPA-NAI-I01-NYUREKILST-AREA.
                  11  SPA-NAI-I01-NYUREKILST-ITM    OCCURS  100.
@@ -277,6 +293,8 @@
                    13  SPA-NAI-I01-TTAIINYMD       PIC X(8).
       *            他院通算対象日数
                    13  SPA-NAI-I01-TNYURRKTAISYO     PIC 9(5).
+      *            分娩入院
+                   13  SPA-NAI-I01-TBUNBEN         PIC 9(1).
       *        画面コンボデータ領域
                09  SPA-GMN-I01-CMB-DAT-AREA.
       *          処理区分コンボ
@@ -338,10 +356,12 @@
       *          入院科コンボ
                  11  SPA-GMN-I01-CMB-NYUINKA.
                    13  SPA-GMN-I01-NYUINKA-CNT     PIC 9(5).
-                   13  SPA-GMN-I01-NYUINKA-ITM     OCCURS  99.
-                       15  SPA-GMN-I01-NYUINKAL    PIC X(02).
-                       15  SPA-GMN-I01-NYUINKAFLL  PIC X(01).
-                       15  SPA-GMN-I01-NYUINKAMEIL PIC X(24).
+                   13  SPA-GMN-I01-NYUINKA-OCC     OCCURS  99.
+                       15  SPA-GMN-I01-NYUINKA-ITM.
+                           17  SPA-GMN-I01-NYUINKAL    PIC X(02).
+                           17  SPA-GMN-I01-NYUINKAFLL  PIC X(01).
+                           17  SPA-GMN-I01-NYUINKAMEIL PIC X(24).
+                       15  SPA-GMN-I01-NYUINKA-ITM2    PIC X(02).
       *          初回コンボ
                  11  SPA-GMN-I01-CMB-SHOKAI.
                    13  SPA-GMN-I01-SHOKAI-CNT      PIC 9(5).
@@ -356,6 +376,20 @@
                        15  SPA-GMN-I01-KAIGOL      PIC X(01).
                        15  SPA-GMN-I01-KAIGOFLL    PIC X(01).
                        15  SPA-GMN-I01-KAIGOMEIL   PIC X(16).
+      *          分娩入院コンボ
+                 11  SPA-GMN-I01-CMB-BUNBEN.
+                   13  SPA-GMN-I01-BUNBEN-CNT      PIC 9(5).
+                   13  SPA-GMN-I01-BUNBEN-ITM      OCCURS  5.
+                       15  SPA-GMN-I01-BUNBENL     PIC X(01).
+                       15  SPA-GMN-I01-BUNBENFLL   PIC X(01).
+                       15  SPA-GMN-I01-BUNBENMEIL  PIC X(18).
+      *          直接支払制度利用区分コンボ
+                 11  SPA-GMN-I01-CMB-RIYOU.
+                   13  SPA-GMN-I01-RIYOU-CNT       PIC 9(5).
+                   13  SPA-GMN-I01-RIYOU-ITM       OCCURS  5.
+                       15  SPA-GMN-I01-RIYOUL      PIC X(01).
+                       15  SPA-GMN-I01-RIYOUFLL    PIC X(01).
+                       15  SPA-GMN-I01-RIYOUMEIL   PIC X(18).
       *          退院事由コンボ
                  11  SPA-GMN-I01-CMB-TAIINCD.
                    13  SPA-GMN-I01-TAIINCD-CNT      PIC 9(5).
