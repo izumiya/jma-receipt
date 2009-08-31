@@ -49,6 +49,8 @@
       *  04.04.01    NACL-藤原    09/04/14  保険番号９００番台のチェック
       *  04.04.02    NACL-藤原    09/08/12  コラムリストの上限を２００に
       *                                     変更
+      *  04.04.03    NACL-藤原    09/08/28  期間重複チェックに負担者番号
+      *                                     を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -258,7 +260,11 @@
                            11  SPA-NAI-TZAITAKU    PIC X(01).
                            11  SPA-NAI-TFTNJANUMKBN-JYOKEN
                                                    PIC X(01).
+                           11  SPA-NAI-TFTNJANUM-JYOKEN
+                                                   PIC X(08).
                            11  SPA-NAI-TRJNKBN-FLG PIC X(01).
+                           11  SPA-NAI-TTEISYUTUSAKI
+                                                   PIC X(01).
       *
               05  SPA-NAI-SELNUM                   PIC 9(03).
       *
@@ -666,6 +672,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
                MOVE    SYS-2006-TEISYUTUSAKI 
                                            TO  WRK-KBN
+                                               SPA-NAI-TTEISYUTUSAKI
+                                                                 (IDX)
                PERFORM 5001-TEISYUTUSAKI-HENSYU-SEC
                MOVE    WRK-KBNMEI          TO  SPA-GMN-TTEISYUTUSAKI
                                                                  (IDX)
@@ -687,6 +695,10 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                        MOVE    SPACE           TO
                                        SPA-GMN-TFTNJANUMKBN-JYOKEN (IDX)
                END-EVALUATE
+      *
+               MOVE    SYS-2006-FTNJANUM-JYOKEN
+                                           TO
+                                       SPA-NAI-TFTNJANUM-JYOKEN (IDX)
       *
                MOVE    SYS-2006-RJNKBN     TO  SPA-NAI-TRJNKBN   (IDX)
                EVALUATE    SYS-2006-RJNKBN
@@ -2308,14 +2320,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                END-IF
            END-IF      
       *
-      *    同一保険番号の条件で期間重複があるか
+      *    同一条件で期間重複があるか
            IF      SPA-ERRCD           =   SPACE
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-MAX
                        OR      SPA-ERRCD   NOT =   SPACE
                    IF    ( SPA-GMN-THKNNUM       (IDX)
                                            =   SPA-GMN-HKNNUM       )
-                   AND   ( SPA-GMN-TTEISYUTUSAKI (IDX)
+                   AND   ( SPA-NAI-TTEISYUTUSAKI (IDX)
                                            =   SPA-GMN-TEISYUTUSAKI )
                    AND   ( SPA-GMN-THKNJANUM     (IDX)
                                            =   SPA-GMN-HKNJANUM     )
@@ -2326,6 +2338,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    AND   ( SPA-NAI-TFTNJANUMKBN-JYOKEN (IDX)
                                            =
                                            SPA-GMN-FTNJANUMKBN-JYOKEN )
+                   AND   ( SPA-NAI-TFTNJANUM-JYOKEN (IDX)
+                                           =   SPA-GMN-FTNJANUM-JYOKEN )
                        IF      SPA-NAI-SELNUM  NOT =   IDX 
                            IF    ( SPA-NAI-EDYUKYMD
                                            <   SPA-NAI-TSTYUKYMD (IDX) )
