@@ -680,7 +680,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    BUNBEN-PTID         TO  PTINF-PTID
                PERFORM 900-PTINF-READ-SEC
       *
-               EVALUATE    BUNBEN-TEISYUTUSAKI
+               EVALUATE    BUNBEN-KANYUKBN
                    WHEN    "1"
                        MOVE    "¡û"            TO  HCN61-TEISYUTUSAKI
                                                            (CNT-LINE 1)
@@ -765,7 +765,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                    MOVE    WRK-ZZZZZZZ9        TO  HCN61-KAIJO-MONEY
                                                            (CNT-LINE)
                ELSE
-                   MOVE    "         -"        TO  HCN61-KAIJO-MONEY
+                   MOVE    "¡¡¡Ý¡¡¡¡¡¡"        TO  HCN61-KAIJO-MONEY
                                                            (CNT-LINE)
                END-IF
                IF      BUNBEN-BUNBENKBN    =   "1"
@@ -773,7 +773,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                    MOVE    WRK-ZZZZZZZ9        TO  HCN61-BUNBEN-MONEY
                                                            (CNT-LINE)
                ELSE
-                   MOVE    "         -"        TO  HCN61-BUNBEN-MONEY
+                   MOVE    "¡¡¡Ý¡¡¡¡¡¡"        TO  HCN61-KAIJO-MONEY
                                                            (CNT-LINE)
                END-IF
                MOVE    BUNBEN-MONEY (5)    TO  WRK-ZZZZZZZ9
