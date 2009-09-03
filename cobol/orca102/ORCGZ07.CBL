@@ -1333,6 +1333,11 @@
            IF      SPA-GMN-SRYCD       =   SPACE
                MOVE    "0014"          TO  SPA-ERRCD
                MOVE    3               TO  SPA-GMN-CUR
+           ELSE
+      *        点数マスタ存在チェック
+               PERFORM 40041-TENSU-CHK-SEC
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      412-TOUROKU-EXT
            END-IF
       *
