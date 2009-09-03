@@ -114,12 +114,12 @@
                   06  W21-BRMLST-ROWATTR   PIC S9(9)   BINARY.
                   06  W21-BRMLST-OCC       OCCURS  200.
                     07  W21-TSELNUM        PIC X(4).
-                    07  W21-TBRM-NUM       PIC X(10).
+                    07  W21-TBRM-NUM       PIC X(08).
                     07  W21-TBRM-SBT       PIC X(20).
                     07  W21-TBRM-TOKUTEINYUIN
                                            PIC X(24).
-                    07  W21-TBRM-NINZU     PIC X(10).
-                    07  W21-TBRM-SAGAKU    PIC X(10).
+                    07  W21-TBRM-NINZU     PIC X(08).
+                    07  W21-TBRM-SAGAKU    PIC X(08).
                     07  W21-TBRM-SEX       PIC X(10).
                     07  W21-TBRM-NAITEL    PIC X(5).
                     07  W21-TBRM-KA        PIC X(20).

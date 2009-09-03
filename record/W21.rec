@@ -312,11 +312,11 @@ W21	{
 				rowattr	int;
 				item	{
 					value0	varchar(04);
-					value1	varchar(10);
+					value1	varchar(8);
 					value2	varchar(20);
 					value3	varchar(24);
-					value4	varchar(10);
-					value5	varchar(10);
+					value4	varchar(08);
+					value5	varchar(08);
 					value6	varchar(10);
 					value7	varchar(05);
 					value8	varchar(20);

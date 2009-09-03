@@ -120,7 +120,7 @@
            03  WRK-ZZZ9                            PIC ZZZ9.
            03  WRK-999999                          PIC 9(06).
            03  WRK-ZZZZZ9                          PIC Z(5)9.
-           03  WRK-ZZZZZZZZZ9                      PIC Z(9)9.
+           03  WRK-ZZZZZZZ9                        PIC Z(7)9.
            03  WRK-CMB-CD                          PIC X(10).
            03  WRK-CMB-ITM-G.
                05  WRK-CMB-ITM                     PIC X(200).
@@ -4320,7 +4320,7 @@
                    END-IF
                END-IF
       *
-               STRING  "    "
+               STRING  "  "
                        SPA-GMN-W21-TBRMNUM (IDX1)
                        DELIMITED   BY  SIZE
                INTO    W21-TBRM-NUM (IDX1)
@@ -4331,12 +4331,12 @@
                MOVE    SPA-GMN-W21-TTOKNYUIN (IDX1)
                                        TO  W21-TBRM-TOKUTEINYUIN (IDX1)
                MOVE    SPA-GMN-W21-TNINZU (IDX1)
-                                       TO  WRK-ZZZZZZZZZ9
-               MOVE    WRK-ZZZZZZZZZ9
+                                       TO  WRK-ZZZZZZZ9
+               MOVE    WRK-ZZZZZZZ9
                                        TO  W21-TBRM-NINZU (IDX1)
                MOVE    SPA-GMN-W21-TSAGAKU (IDX1)
-                                       TO  WRK-ZZZZZZZZZ9
-               MOVE    WRK-ZZZZZZZZZ9
+                                       TO  WRK-ZZZZZZZ9
+               MOVE    WRK-ZZZZZZZ9
                                        TO  W21-TBRM-SAGAKU (IDX1)
                MOVE    SPA-GMN-W21-TSEX (IDX1)
                                        TO  W21-TBRM-SEX (IDX1)
