@@ -257,6 +257,8 @@
       *  04.04.06    NACL-門脇    09/06/11  ７０歳未満の高額計算対応
       *  04.04.07    NACL-門脇    09/07/08  精神入院限度額対応
       *  04.04.08    NACL-門脇    09/08/18  出産一時金対応
+      *  04.04.09    NACL-門脇    09/09/03  全国土木＋精神、結核対応
+      *                                     （奈良県）
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5821,7 +5823,9 @@
                                              "133249" OR "133256" OR
                                              "133272" OR "233064" OR
                                              "283077"
-                    IF     COMB-KOH1HKNNUM    =     "027"
+                    IF ( COMB-KOH1HKNNUM     = "027"    )
+                    OR ((WK-1001-PREFNUM     =  29     ) AND
+                        (PTHKN-HKNJANUM(1:6) = "133033"))
                       CONTINUE
                     ELSE
                       MOVE    1      TO    FLG-SEISINJYO

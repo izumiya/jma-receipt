@@ -415,6 +415,9 @@
       *  04.04.15    NACL-ÌçÏÆ    09/08/17  Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ
       *  04.04.16    NACL-ÌçÏÆ    09/08/18  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.17    NACL-ÌçÏÆ    09/08/19  ½Ð»º°ì»þ¶âÂÐ±þ
+      *  04.04.18    NACL-ÌçÏÆ    09/09/01  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.19    NACL-ÌçÏÆ    09/09/03  Á´¹ñÅÚÌÚ¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *                                     ¡ÊÆàÎÉ¸©¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10510,7 +10513,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               "133249" OR "133256" OR
                               "133272" OR "233064" OR
                               "283077"
-               IF  RECE02-RJNHKNNUM  NOT =  SPACE
+               IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
+               OR  ((SYS-1001-PREFNUM      =   29     ) AND
+                    (RECE02-HKNJANUM(1:6)  =  "133033"))
                 CONTINUE
                ELSE
                 MOVE   ZERO                 TO  WRK-JYOGEN-KOH
@@ -11410,8 +11415,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          "133181" OR "133199" OR "133207" OR "133223" OR
                          "133249" OR "133256" OR "133272" OR "233064" OR
                          "283077"                                    )
-                    MOVE  "1"   TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
-                    MOVE  "1"   TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
+                    OR  ((SYS-1001-PREFNUM      =   29     ) AND
+                         (RECE02-HKNJANUM(1:6)  =  "133033"))
+                      CONTINUE
+                    ELSE
+                      MOVE  "1" TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
+                      MOVE  "1" TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    END-IF
                   END-IF
                 END-IF
       *
@@ -11576,6 +11587,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
              WHEN    "10"
                IF  (RECE02-SRYYM        >=  "200804"    )
                AND (RECE02-TEISYUTUSAKI  =   6          )
+                   PERFORM  21112-SEIKYUTEN-HENSYU-SEC
+               END-IF
+      *      °ñ¾ë¸©
+             WHEN    "08"
+               IF  (RECE02-SRYYM        >=  "200607"    )
+               AND (RECE02-TEISYUTUSAKI  =   2 OR 6     )
                    PERFORM  21112-SEIKYUTEN-HENSYU-SEC
                END-IF
            END-EVALUATE
