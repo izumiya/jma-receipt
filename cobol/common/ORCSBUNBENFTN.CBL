@@ -470,12 +470,9 @@
            MOVE    PTHKNINF-REC        TO  MCPDATA-REC
            MOVE    "tbl_pthkninf"      TO  MCP-TABLE
            MOVE    "key8"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  PTHKNINF-REC
-           ELSE
-               INITIALIZE                  PTHKNINF-REC
-               MOVE    1               TO  FLG-PTHKNINF
+               PERFORM 900-PTHKNINF-KEY8-FET-SEC
            END-IF
       *
            .
@@ -488,16 +485,26 @@
        900-PTHKNINF-KEY8-FET-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-PTHKNINF
+                                           FLG-LOOPEND
       *
-           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-           MOVE    "key8"              TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  PTHKNINF-REC
-           ELSE
-               INITIALIZE                  PTHKNINF-REC
-               MOVE    1               TO  FLG-PTHKNINF
-           END-IF
+           PERFORM UNTIL ( FLG-PTHKNINF    NOT =   ZERO )
+                    OR   ( FLG-LOOPEND     NOT =   ZERO )
+      *
+               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  PTHKNINF-REC
+                   MOVE    1               TO  FLG-LOOPEND
+                   IF    ( PTHKN-SAKJOKBN  =   "1" )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+               ELSE
+                   INITIALIZE                  PTHKNINF-REC
+                   MOVE    1               TO  FLG-PTHKNINF
+               END-IF
+      *
+           END-PERFORM
       *
            .
        900-PTHKNINF-KEY8-FET-EXT.
