@@ -77,6 +77,14 @@
            03  WRK-JIHMISYU                PIC  S9(10).
            03  WRK-HS02-MAX                PIC 9(05).
            03  WRK-HS03-MAX                PIC 9(05).
+           03  WRK-DENPEDANUM-KEY1-G.
+               05  WRK-DENPEDANUM-KEY1     PIC 9(02).
+               05  WRK-SYURRKNUM-KEY1      PIC 9(02).
+               05  WRK-SYUEDANUM-KEY1      PIC 9(02).
+           03  WRK-DENPEDANUM-KEY2-G.
+               05  WRK-DENPEDANUM-KEY2     PIC 9(02).
+               05  WRK-SYURRKNUM-KEY2      PIC 9(02).
+               05  WRK-SYUEDANUM-KEY2      PIC 9(02).
       *
        01  KEY-AREA.
            03  KEY-SRYKA                   PIC X(02).
@@ -317,8 +325,22 @@
                    ELSE
                        IF    ( SBD010S02-KEYSRYKA (IDX-S02)
                                        =   SBD010S02-KEYSRYKA (IDX1))
-                           IF    ( SBD010S02-SYURRKNUM-G (IDX-S02)
-                                       >   SBD010S02-SYURRKNUM-G (IDX1))
+                           INITIALIZE  WRK-DENPEDANUM-KEY1-G
+                                       WRK-DENPEDANUM-KEY2-G
+                           MOVE    SBD010S02-DENPEDANUM(IDX-S02)
+                                       TO  WRK-DENPEDANUM-KEY1
+                           MOVE    SBD010S02-SYURRKNUM (IDX-S02)
+                                       TO  WRK-SYURRKNUM-KEY1
+                           MOVE    SBD010S02-SYUEDANUM (IDX-S02)
+                                       TO  WRK-SYUEDANUM-KEY1
+                           MOVE    SBD010S02-DENPEDANUM(IDX1)
+                                       TO  WRK-DENPEDANUM-KEY2
+                           MOVE    SBD010S02-SYURRKNUM (IDX1)
+                                       TO  WRK-SYURRKNUM-KEY2
+                           MOVE    SBD010S02-SYUEDANUM (IDX1)
+                                       TO  WRK-SYUEDANUM-KEY2
+                           IF    ( WRK-DENPEDANUM-KEY1-G
+                                       >   WRK-DENPEDANUM-KEY2-G)
       *
                                COMPUTE SBD010S02-RENNUM(IDX-S02)
                                    =   SBD010S02-RENNUM(IDX-S02)
@@ -480,10 +502,12 @@
                                        TO  SBD010S02-DAILYKEY (IDX-S02)
            END-IF
       *
-           MOVE    SBD010S03-SYURRKNUM (IDX-S03)
+           IF    ( SBD010S03-SYURRKNUM (IDX-S03)   >    ZERO )
+               MOVE    SBD010S03-SYURRKNUM (IDX-S03)
                                        TO  SBD010S02-SYURRKNUM (IDX-S02)
-           MOVE    SBD010S03-SYUEDANUM (IDX-S03)
+               MOVE    SBD010S03-SYUEDANUM (IDX-S03)
                                        TO  SBD010S02-SYUEDANUM (IDX-S02)
+           END-IF
       *
            MOVE    IDX-S02             TO  IDX-MISYU
       *
