@@ -75,6 +75,7 @@
       *                                     ¡¦½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»
       *  04.02.03    NACL-ÌçÏÆ    08/09/24  Æþ±¡Î¬¾ÎÊÔ½¸ÄÉ²Ã
       *  04.02.04    NACL-ÌçÏÆ    08/10/07  Æþ±¡´ðËÜÎÁÍ­¸ú´ü´Ö¥Á¥§¥Ã¥¯
+      *  04.04.01    NACL-ÌçÏÆ    09/09/04  ¾®Æþ´ÉÎ¬¾Î½¤Àµ
       *****************************************************************
       *
       *
@@ -2813,6 +2814,10 @@
                     END-IF
       *
                 END-IF
+                IF   ( LNK-SROUNYUIN-SANTEIYM  >= "200804"    )
+                AND  ( WRK-RYAKU-SRYCD          = "190129310" )
+                    MOVE  "¾®Æþ´É£±" TO  WRK-RYAKUSHO
+                END-IF
               END-IF
       *
            END-IF
@@ -3335,6 +3340,22 @@
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  NYURYAKUSHO-REC
                    MOVE    ZERO                TO  FLG-NYURYAKUSHO
+                   IF  (LNK-SROUNYUIN-SANTEIYM  >= "200804"      )
+                   AND (NYURYAKUSHO-SRYCD        = "190111110" OR
+                                                   "190111210" OR
+                                                   "190075810"   )
+                     EVALUATE   NYURYAKUSHO-SRYCD
+                       WHEN    "190111110"
+                         MOVE   "¾®Æþ´É£²"
+                              TO   NYURYAKUSHO-RYAKUSHO
+                       WHEN    "190111210"
+                         MOVE   "¾®Æþ´É£³"
+                              TO   NYURYAKUSHO-RYAKUSHO
+                       WHEN    "190075810"
+                         MOVE   "¾®Æþ´É£´"
+                              TO   NYURYAKUSHO-RYAKUSHO
+                     END-EVALUATE
+                   END-IF
                ELSE
                    MOVE    1                   TO  FLG-NYURYAKUSHO
                    INITIALIZE                  NYURYAKUSHO-REC
