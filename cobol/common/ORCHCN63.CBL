@@ -380,7 +380,7 @@
            MOVE    "HCN63.red"     TO  MKPRT-DIA
            MOVE    SPACE           TO  MKPRT-DEF
            MOVE    HC01PARA        TO  MKPRT-DAT
-           MOVE    SYS-1034-PRTNM(2)
+           MOVE    SYS-1034-PRTNM(13)
                                    TO  MKPRT-PRTNM
            MOVE   "分娩費用明細書" TO  MKPRT-INFO
            CALL   "ORCSMKPRT1"         USING
