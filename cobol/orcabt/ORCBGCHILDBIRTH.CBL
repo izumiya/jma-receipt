@@ -670,10 +670,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            PERFORM          UNTIL   FLG-END        =   1
                             OR      KEY-NEW    NOT =   KEY-OLD
                             OR      CNT-LINE       >=  3
+      *
                ADD     1               TO  CNT-LINE
       *
                INITIALIZE                  WRK-BIRTHDAYH
                                            WRK-CHILD-BIRTHDAYH
+      *
+      *        正常分娩時の一部負担金等はその他とする
+               IF    ( BUNBEN-BUNBENKBN    =   "1"  )
+               AND   ( BUNBEN-MONEY (10)   >   ZERO )
+                   ADD     BUNBEN-MONEY (10)   TO  BUNBEN-MONEY (9)
+                   MOVE    ZERO                TO  BUNBEN-MONEY (10)
+               END-IF
       *
                INITIALIZE                      PTINF-REC
                MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
