@@ -216,9 +216,23 @@
       *    分娩区分
            EVALUATE    BUNBEN-BUNBENKBN
                WHEN    1
-                   MOVE    "（正常分娩）"  TO  HCN63-BUNBENKBN
+                   MOVE    "（正常分娩）"      TO  HCN63-BUNBENKBN
+      *            分娩介助料
+                   MOVE    "−　　　　"        TO  HCN63-KAIJO-MONEY
+      *            分娩料
+                   MOVE    BUNBEN-BUNBEN-MONEY TO  WRK-Z10
+                   MOVE    WRK-Z10             TO  WRK-MOJI-IN
+                   PERFORM 31011-KANA-HEN-SEC
+                   MOVE    WRK-MOJI-OUT        TO  HCN63-BUNBEN-MONEY
                WHEN    2
-                   MOVE    "（異常分娩）"  TO  HCN63-BUNBENKBN
+                   MOVE    "（異常分娩）"      TO  HCN63-BUNBENKBN
+      *            分娩介助料
+                   MOVE    BUNBEN-KAIJO-MONEY  TO  WRK-Z10
+                   MOVE    WRK-Z10             TO  WRK-MOJI-IN
+                   PERFORM 31011-KANA-HEN-SEC
+                   MOVE    WRK-MOJI-OUT        TO  HCN63-KAIJO-MONEY
+      *            分娩料
+                   MOVE    "−　　　　"        TO  HCN63-BUNBEN-MONEY
            END-EVALUATE
       *
       *    患者番号
@@ -278,18 +292,6 @@
            MOVE    WRK-Z10             TO  WRK-MOJI-IN
            PERFORM 31011-KANA-HEN-SEC
            MOVE    WRK-MOJI-OUT        TO  HCN63-RMSGK-MONEY
-      *
-      *    分娩介助料
-           MOVE    BUNBEN-KAIJO-MONEY  TO  WRK-Z10
-           MOVE    WRK-Z10             TO  WRK-MOJI-IN
-           PERFORM 31011-KANA-HEN-SEC
-           MOVE    WRK-MOJI-OUT        TO  HCN63-KAIJO-MONEY
-      *
-      *    分娩料
-           MOVE    BUNBEN-BUNBEN-MONEY TO  WRK-Z10
-           MOVE    WRK-Z10             TO  WRK-MOJI-IN
-           PERFORM 31011-KANA-HEN-SEC
-           MOVE    WRK-MOJI-OUT        TO  HCN63-BUNBEN-MONEY
       *
       *    新生児管理保育料
            MOVE    BUNBEN-SHIN-MONEY   TO  WRK-Z10
