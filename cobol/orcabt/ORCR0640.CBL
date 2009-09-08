@@ -370,6 +370,7 @@
       *  04.02.61    NACL-ÌçÏÆ    09/09/01  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.62    NACL-ÌçÏÆ    09/09/03  Á´¹ñÅÚÌÚ¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     ¡ÊÆàÎÉ¸©¡Ë
+      *  04.02.63    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9485,9 +9486,12 @@
            INITIALIZE                   TBL-TOKATUKAI
            PERFORM   VARYING  IDY2    FROM    1   BY   1
                       UNTIL   IDY2      >     4
-              IF  (WRK-PREFNUM          =  "13"    )
-              AND (RECE62-KOHNUM(IDY2)  =  "151"   )
-              AND (RECE62-SRYYM        >=  "200905")
+              IF  ((WRK-PREFNUM          =  "13"    ) AND
+                   (RECE62-KOHNUM(IDY2)  =  "151"   ) AND
+                   (RECE62-SRYYM        >=  "200905"))
+              OR  ((WRK-PREFNUM          =  "23"    ) AND
+                   (RECE62-KOHNUM(IDY2)  =  "191"   ) AND
+                   (RECE62-SRYYM        >=  "200910"))
                  MOVE     1     TO    TBL-TOKATUKAIFLG(IDY2)
               END-IF
            END-PERFORM
@@ -9525,6 +9529,9 @@
                      "051" OR "052" OR "011" OR "020")
                 OR  ((WRK-PREFNUM         =  "13" ) AND
                      (RECE62-KOHNUM(IDY2) =  "151")  )
+                OR  ((WRK-PREFNUM         =  "23" ) AND
+                     (RECE62-KOHNUM(IDY2) =  "191") AND
+                     (RECE62-SRYYM    >=  "200910")  )
                      PERFORM  2104F-JGNCHK-HENSYU-SEC
                 END-IF
              END-PERFORM
@@ -10563,6 +10570,9 @@
                  OR  ((WRK-PREFNUM       = "13"    ) AND
                       (SYU-KOH-HKNNUM(1) = "151"   ) AND
                       (RECE62-SRYYM     >= "200905"))
+                 OR  ((WRK-PREFNUM       = "23"    ) AND
+                      (SYU-KOH-HKNNUM(1) = "191"   ) AND
+                      (RECE62-SRYYM     >= "200910"))
                    MOVE     1        TO   FLG-KEISAN-TOK1
                    MOVE     3        TO   FLG-KEISAN
                  ELSE
@@ -10588,6 +10598,9 @@
                     OR  ((WRK-PREFNUM       = "13"    ) AND
                          (SYU-KOH-HKNNUM(1) = "151"   ) AND
                          (RECE62-SRYYM     >= "200905"))
+                    OR  ((WRK-PREFNUM       = "23"    ) AND
+                         (SYU-KOH-HKNNUM(1) = "191"   ) AND
+                         (RECE62-SRYYM     >= "200910"))
                       MOVE     1     TO   FLG-KEISAN-TOK1
                       MOVE     3     TO   FLG-KEISAN
                     ELSE
@@ -10613,6 +10626,9 @@
                    OR  ((WRK-PREFNUM       = "13"         ) AND
                         (SYU-KOH-HKNNUM(1) = "151"        ) AND
                         (RECE62-SRYYM     >= "200905"     ))
+                   OR  ((WRK-PREFNUM       = "23"         ) AND
+                        (SYU-KOH-HKNNUM(1) = "191"        ) AND
+                        (RECE62-SRYYM     >= "200910"     ))
                       IF  FLG-ZENKOKUKOHI-NISYU  =  1
                         IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
                         AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
@@ -10733,6 +10749,9 @@
                  OR  ((WRK-PREFNUM       = "13"    ) AND
                       (SYU-KOH-HKNNUM(1) = "151"   ) AND
                       (RECE62-SRYYM     >= "200905"))
+                 OR  ((WRK-PREFNUM       = "23"    ) AND
+                      (SYU-KOH-HKNNUM(1) = "191"   ) AND
+                      (RECE62-SRYYM     >= "200910"))
                    MOVE     1         TO   FLG-KEISAN-TOK1
                    MOVE     3         TO   FLG-KEISAN
                  ELSE
@@ -10759,6 +10778,9 @@
                     OR  ((WRK-PREFNUM       = "13"    ) AND
                          (SYU-KOH-HKNNUM(1) = "151"   ) AND
                          (RECE62-SRYYM     >= "200905"))
+                    OR  ((WRK-PREFNUM       = "23"    ) AND
+                         (SYU-KOH-HKNNUM(1) = "191"   ) AND
+                         (RECE62-SRYYM     >= "200910"))
                       MOVE     1      TO   FLG-KEISAN-TOK1
                       MOVE     3      TO   FLG-KEISAN
                     ELSE
@@ -10785,6 +10807,9 @@
                    OR  ((WRK-PREFNUM       = "13"       ) AND
                         (SYU-KOH-HKNNUM(1) = "151"      ) AND
                         (RECE62-SRYYM     >= "200905"   ))
+                   OR  ((WRK-PREFNUM       = "23"       ) AND
+                        (SYU-KOH-HKNNUM(1) = "191"      ) AND
+                        (RECE62-SRYYM     >= "200910"   ))
                      IF  FLG-ZENKOKUKOHI-NISYU  =  1
                         IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
                         AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
@@ -12250,9 +12275,13 @@
                   END-EVALUATE
                 END-IF
       *
-                IF  (WRK-PREFNUM               = "13" )
-                AND (RECE62-KOHNUM(KH-IDX - 1) = "151")
-                AND (KH-IDX                    =   2  )
+                IF  ((WRK-PREFNUM               = "13" ) AND
+                     (RECE62-KOHNUM(KH-IDX - 1) = "151") AND
+                     (KH-IDX                    =   2  ))
+                OR  ((WRK-PREFNUM               = "23" ) AND
+                     (RECE62-KOHNUM(KH-IDX - 1) = "191") AND
+                     (KH-IDX                    =   2  ) AND
+                     (RECE62-SRYYM         >=  "200910"))
                     IF    FLG-ZENKI-TOKUREI  =   1
                       COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
                                                  * 10
@@ -12598,6 +12627,9 @@
              OR  ((WRK-PREFNUM               =  "01"          )   AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "183"         )   AND
                   (RECE62-SRYYM             >=  "200810"      ))
+             OR  ((WRK-PREFNUM               =  "23"          )   AND
+                  (RECE62-KOHNUM(KOHFTN-IDX) =  "191"         )   AND
+                  (RECE62-SRYYM             >=  "200910"      ))
       *
                IF ((RECE62-KOHNUM(KOHFTN-IDX) =  "015" OR "016")  AND
                    (RECE62-SRYYM             >=  "200604"      ))
@@ -12619,6 +12651,11 @@
                    (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "91"
                                                    AND <= "95" )  AND
                    (RECE62-SRYYM             >=  "200810"      ))
+               OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
+                   (WRK-PREFNUM               =  "23"          )  AND
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "191"         )  AND
+                   (KOHFTN-IDX                =   1            )  AND
+                   (RECE62-SRYYM             >=  "200910"      ))
                 CONTINUE
                ELSE
                 COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(KOHFTN-IDX + 1)
@@ -12967,6 +13004,19 @@
                 IF    RECE62-SRYYM        >=  "200810"
                   IF  (WRK-PREFNUM               =   01  )
                   AND (RECE62-KOHNUM(KOHFTN-IDX) =  "183")
+                    IF  RECE62-KOHFTNJANUM(KOHFTN-IDX)(5:3)  = "602"
+                     MOVE  "1"  TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
+                     MOVE  "1"  TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    ELSE
+                     MOVE SPACE TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
+                     MOVE SPACE TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    END-IF
+                  END-IF
+                END-IF
+      *
+                IF    RECE62-SRYYM        >=  "200910"
+                  IF  (WRK-PREFNUM               =   23  )
+                  AND (RECE62-KOHNUM(KOHFTN-IDX) =  "191")
                     IF  RECE62-KOHFTNJANUM(KOHFTN-IDX)(5:3)  = "602"
                      MOVE  "1"  TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
                      MOVE  "1"  TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
@@ -13852,6 +13902,10 @@
            OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
                 (WRK-PREFNUM           = "13" ) AND
                 (RECE62-KOHNUM(1)      = "151"))
+           OR  ((FLG-ZENKI-TOKUREI     =   1  ) AND
+                (WRK-PREFNUM           = "23" ) AND
+                (RECE62-KOHNUM(1)      = "191") AND
+                (RECE62-SRYYM      >= "200910"))
               PERFORM  210463-ZENKI-TOKUREI-OKIKAE-SEC
            END-IF
       *
@@ -14922,6 +14976,9 @@
            IF   ( RECE62-KOHNUM(1)  = "051"          )
            OR   ((WRK-PREFNUM       = "13"          ) AND
                  (RECE62-KOHNUM(1)  = "151"         ))
+           OR   ((WRK-PREFNUM       = "23"          ) AND
+                 (RECE62-KOHNUM(1)  = "191"         ) AND
+                 (RECE62-SRYYM     >= "200910"      ))
              IF  ((WRK-PREFNUM        =  "01"                   ) AND
                   (RECE62-KOHNUM(1)   =  "051"                  ) AND
                   (RECE62-KOHJKYSNUM(1)(1:2) >= "91" AND <= "95") AND
@@ -15770,37 +15827,45 @@
              OR  (RECE62-HKNNUM       =   "068" OR "069" OR "040")
                CONTINUE
              ELSE
-               IF ((RECE62-KOHNUM(1) =  "051" OR "052" OR "091") OR
-                   (TBL-TOKATUKAIFLG(1) =  1                   )) AND
-                  ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "602" )
-               OR ((RECE62-KOHNUM(2) =  "051" OR "052" OR "091") OR
-                   (TBL-TOKATUKAIFLG(2) =  1                   )) AND
-                  ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "602" )
-               OR ((RECE62-KOHNUM(3) =  "051" OR "052" OR "091") OR
-                   (TBL-TOKATUKAIFLG(3) =  1                   )) AND
-                  ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "602" )
-               OR ((RECE62-KOHNUM(4) =  "051" OR "052" OR "091") OR
-                   (TBL-TOKATUKAIFLG(4) =  1                   )) AND
-                  ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "602" )
+               IF (((RECE62-KOHNUM(1) =  "051" OR "052" OR "091") OR
+                    (TBL-TOKATUKAIFLG(1) =  1                   )) AND
+                   ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "602" ) AND
+                   ( RECE62-KOHFTNJANUM(1)(1:2) = "51"  OR "52"  ))
+               OR (((RECE62-KOHNUM(2) =  "051" OR "052" OR "091") OR
+                    (TBL-TOKATUKAIFLG(2) =  1                   )) AND
+                   ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "602" ) AND
+                   ( RECE62-KOHFTNJANUM(2)(1:2) = "51"  OR "52"  ))
+               OR (((RECE62-KOHNUM(3) =  "051" OR "052" OR "091") OR
+                    (TBL-TOKATUKAIFLG(3) =  1                   )) AND
+                   ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "602" ) AND
+                   ( RECE62-KOHFTNJANUM(3)(1:2) = "51"  OR "52"  ))
+               OR (((RECE62-KOHNUM(4) =  "051" OR "052" OR "091") OR
+                    (TBL-TOKATUKAIFLG(4) =  1                   )) AND
+                   ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "602" ) AND
+                   ( RECE62-KOHFTNJANUM(4)(1:2) = "51"  OR "52"  ))
       *
                  IF  ((RECE62-KOHNUM(1) =  "051" OR "052" OR "091") OR
                       (TBL-TOKATUKAIFLG(1) =  1                   ))
                  AND ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "602" )
+                 AND ( RECE62-KOHFTNJANUM(1)(1:2) = "51"  OR "52"  )
                     MOVE     1     TO    TBL-TOKUSITUFLG(1)
                  END-IF
                  IF  ((RECE62-KOHNUM(2) =  "051" OR "052" OR "091") OR
                       (TBL-TOKATUKAIFLG(2) =  1                   ))
                  AND ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "602" )
+                 AND ( RECE62-KOHFTNJANUM(2)(1:2) = "51"  OR "52"  )
                     MOVE     1     TO    TBL-TOKUSITUFLG(2)
                  END-IF
                  IF  ((RECE62-KOHNUM(3) =  "051" OR "052" OR "091") OR
                       (TBL-TOKATUKAIFLG(3) =  1                   ))
                  AND ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "602" )
+                 AND ( RECE62-KOHFTNJANUM(3)(1:2) = "51"  OR "52"  )
                     MOVE     1     TO    TBL-TOKUSITUFLG(3)
                  END-IF
                  IF  ((RECE62-KOHNUM(4) =  "051" OR "052" OR "091") OR
                       (TBL-TOKATUKAIFLG(4) =  1                   ))
                  AND ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "602" )
+                 AND ( RECE62-KOHFTNJANUM(4)(1:2) = "51"  OR "52"  )
                     MOVE     1     TO    TBL-TOKUSITUFLG(4)
                  END-IF
       *
