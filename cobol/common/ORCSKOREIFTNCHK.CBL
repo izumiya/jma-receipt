@@ -48,6 +48,7 @@
       *  04.04.01    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/06/01  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *                                     ¡ÊÅìµþÅÔ£±£µ£±¡Ë
+      *  04.04.03    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -292,6 +293,9 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                      OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"    ) AND
                          (COMB-KOH1HKNNUM          = "151"   ) AND
                          (LNK-KOREIFTNCHK-SRYYM   >= "200905"))
+                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "23"    ) AND
+                         (COMB-KOH1HKNNUM          = "191"   ) AND
+                         (LNK-KOREIFTNCHK-SRYYM   >= "200910"))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    END-IF
@@ -728,6 +732,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                      OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"  ) AND
                          (SYU-KOH-HKNNUM(1)        = "151" ) AND
                          (LNK-KOREIFTNCHK-SRYYM >= "200905"))
+                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "23"  ) AND
+                         (SYU-KOH-HKNNUM(1)        = "191" ) AND
+                         (LNK-KOREIFTNCHK-SRYYM >= "200910"))
       ***              PERFORM   22012-NYUIN-KOREI-HEN2-SEC
                        CONTINUE
                      ELSE
@@ -1088,6 +1095,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    OR  ((LNK-KOREIFTNCHK-PREFNUM  = "13"  ) AND
                         (SYU-KOH-HKNNUM(1)        = "151" ) AND
                         (LNK-KOREIFTNCHK-SRYYM >= "200905"))
+                   OR  ((LNK-KOREIFTNCHK-PREFNUM  = "23"  ) AND
+                        (SYU-KOH-HKNNUM(1)        = "191" ) AND
+                        (LNK-KOREIFTNCHK-SRYYM >= "200910"))
       ***            IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
       ***               MOVE   6000      TO   WRK-KINGAKU
       ***            ELSE

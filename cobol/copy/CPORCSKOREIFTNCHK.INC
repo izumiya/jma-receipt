@@ -72,26 +72,22 @@
            03  LNK-KOREIFTNCHK-GENGAKU-KIN  PIC 9(07).
       *    高額４回目以降
            03  LNK-KOREIFTNCHK-KOHYONKAIME  PIC 9(01).
-      ***  全国公費有り無しフラグ
-      ***  03  LNK-KOREIFTNCHK-ZENKOHARI    PIC 9(01).
       *    高齢者・若人区分
            03  LNK-KOREIFTNCHK-NENREIKBN    PIC X(01).
       *    年齢
            03  LNK-KOREIFTNCHK-AGE          PIC 9(03).
-      ***  若人所得区分
-      ***  03  LNK-KOREIFTNCHK-SYOTOKUKBN   PIC 9(01).
       *    県番号
            03  LNK-KOREIFTNCHK-PREFNUM      PIC X(02).
       *    就学前区分
            03  LNK-KOREIFTNCHK-SYUGAKUKBN   PIC 9(01).
-      ***  軽減特例措置対象者区分
-      ***  03  LNK-KOREIFTNCHK-TOKUREI      PIC 9(01).
       *    マル長公費ＩＤ
            03  LNK-KOREIFTNCHK-KOHID-CYOKI  PIC 9(10).
       *    ７５歳到達月の特例区分
            03  LNK-KOREIFTNCHK-TOKU75       PIC 9(01).
       *    マル長のみ区分
            03  LNK-KOREIFTNCHK-CYOKINOMI    PIC 9(01).
+      *    所得区分
+           03  LNK-KOREIFTNCHK-SYOTOKUKBN   PIC 9(01).
       *
       *返却値
            03  LNK-KOREIFTNCHK-OUT-AREA.
@@ -101,20 +97,8 @@
              05 LNK-KOREIFTNCHK-KOHFTNGAKU  PIC 9(07).
       *公費を含む場合の主保険の一部負担額
              05 LNK-KOREIFTNCHK-ICHIBUGAKU  PIC 9(07).
-      *公費を含む場合の主保険の一部負担額２
-      ***    05 LNK-KOREIFTNCHK-ICHIBUGAKU2 PIC 9(07).
       *入　：高齢者＋地方公費の請求金額
-      *入外：７０歳未満現物給付＋地方公費の請求金額
              05 LNK-KOREIFTNCHK-CHIHOUGAKU  PIC 9(07).
-      *入外：７０歳未満現物給付＋全国公費ありの請求金額
-      ***    05 LNK-KOREIFTNCHK-CHIHOUGAKU2 PIC 9(07).
-      *入外：７０歳未満現物給付＋単独なし時の請求金額
-      ***    05 LNK-KOREIFTNCHK-CHIHOUGAKU3 PIC 9(07).
-      *
-      *入外：７０歳未満現物給付＋単独あり時
-      ***    05 LNK-KOREIFTNCHK-FTNGAKU-GEN70     PIC 9(07).
-      ***    05 LNK-KOREIFTNCHK-KOHFTNGAKU-GEN70  PIC 9(07).
-      ***    05 LNK-KOREIFTNCHK-CHIHOUGAKU-GEN70  PIC 9(07).
       *
       *復帰コード
            03  LNK-KOREIFTNCHK-RC           PIC 9(02).

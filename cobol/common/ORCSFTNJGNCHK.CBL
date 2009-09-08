@@ -63,6 +63,7 @@
       *  04.04.01    NACL-ÌçÏÆ    09/06/11  £·£°ºÐÌ¤Ëþ¤Î¹â³Û·×»»ÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/07/02  Ä¹ºê¸©£±£¸£°³°ÍèÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/07/16  ¸øÈñ·î¾å¸Â³ÛÈ½Äê
+      *  04.04.04    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -455,6 +456,10 @@
            OR ((LNK-FTNJGNCHK-PREFNUM        =  01     )  AND
                (LNK-FTNJGNCHK-KOHNUM         = "183"   )  AND
                (LNK-FTNJGNCHK-SRYYM         >= "200810"))
+      *
+           OR ((LNK-FTNJGNCHK-PREFNUM        =  23     )  AND
+               (LNK-FTNJGNCHK-KOHNUM         = "191"   )  AND
+               (LNK-FTNJGNCHK-SRYYM         >= "200910"))
       *
       *         ¸øÈñ·î¾å¸Â³Û¼èÆÀ
                 INITIALIZE                    LNK-ORCSJGNGET-REC
@@ -1217,13 +1222,18 @@
               END-IF
            END-IF
       *
-           IF  (SYU-SKJ-FTNDAY(1) =  1  OR  2)
-           OR  (WRK-HKNNUM        =  "060"   )
-              IF   WRK-HKNJANUM2  =  WRK-HKNJANUM
-                MOVE  WRK-HONKZKKBN  TO  WRK-HONKZKKBN2
-                MOVE  WRK-KIGO       TO  WRK-KIGO2
-                MOVE  WRK-NUM        TO  WRK-NUM2
-              END-IF
+           IF    (WRK-HKNNUM        =  "039")
+           AND   (WRK-HKNNUM2       =  "039")
+             MOVE   WRK-HKNJANUM-TBL   TO  WRK-HKNJANUM2-TBL
+           ELSE
+             IF  (SYU-SKJ-FTNDAY(1) =  1  OR  2)
+             OR  (WRK-HKNNUM        =  "060"   )
+                IF   WRK-HKNJANUM2  =  WRK-HKNJANUM
+                  MOVE  WRK-HONKZKKBN  TO  WRK-HONKZKKBN2
+                  MOVE  WRK-KIGO       TO  WRK-KIGO2
+                  MOVE  WRK-NUM        TO  WRK-NUM2
+                END-IF
+             END-IF
            END-IF
       *
            EVALUATE  SYU-SKJ-FTNDAY(1)
