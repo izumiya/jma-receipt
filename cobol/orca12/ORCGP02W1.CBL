@@ -84,6 +84,7 @@
       *  04.00.00    NACL-Â¿¡¹Ç¼  08/01/25  ¸øÈñÉéÃ´³Û¤Ë·ë³ËÆþ½ê'011'ÄÉ²Ã
       *  04.02.00    NACL-Â¿¡¹Ç¼  08/03/XX  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *  04.03.00    NACL-Â¿¡¹Ç¼  08/10/03  ¸øÈñÉéÃ´³Û¤ËËÌ³¤Æ»¤Î'183'ÄÉ²Ã
+      *  04.03.01    NACL-Â¿¡¹Ç¼  09/09/08  ¸øÈñÉéÃ´³Û¤Ë°¦ÃÎ¸©¤Î'191'ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5975,6 +5976,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            Àº¿ÀÆþ±¡¡Ê£°£²£°¡Ë¡Ê£È£±£¹¡¥£´°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "020" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070401"))
+      *
+      *            °¦ÃÎ¸©¤ÎÃÏÊý¸øÈñ¡Ê£È£²£±¡¥£±£°°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "191" )  AND
+                      (SPA-PREFNUM             =   23    )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20091001"))
       *
                    MOVE    ZERO                TO  IDY
                    PERFORM VARYING     IDX2    FROM    1   BY  1
