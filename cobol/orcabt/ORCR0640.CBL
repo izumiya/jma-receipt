@@ -385,6 +385,7 @@
       *  04.04.20    NACL-ÌçÏÆ    09/09/03  Á´¹ñÅÚÌÚ¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     ¡ÊÆàÎÉ¸©¡Ë
       *  04.04.21    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
+      *  04.04.22    NACL-ÌçÏÆ    09/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -581,6 +582,7 @@
            03  FLG-KOUGAKU                             PIC 9(01).
            03  FLG-KISAIOK                             PIC 9(01).
            03  FLG-GENGAKU-OKIKAE                      PIC 9(01).
+           03  FLG-KOHYONKAIME-NO                      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -11317,7 +11319,16 @@
                 (SYU-SYUHKNNUM NOT = "060" AND "067") AND
                 (SYU-KOH-HKNNUM(1)(1:1)
                                  >=  "1" AND <=  "8"))
-            IF  FLG-KOHYONKAIME = 1
+           OR  ((WRK-PREFNUM        = "42"          ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"         ))
+      *
+            MOVE     ZERO    TO   FLG-KOHYONKAIME-NO
+            IF ((WRK-PREFNUM        = "42"          ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"         ))
+               MOVE   1      TO   FLG-KOHYONKAIME-NO
+            END-IF
+            IF  (FLG-KOHYONKAIME-NO  =  ZERO)
+            AND (FLG-KOHYONKAIME     =   1  )
               IF  FLG-TOKU75 = 3
                  MOVE  22200  TO   WRK-KINGAKU
               ELSE
