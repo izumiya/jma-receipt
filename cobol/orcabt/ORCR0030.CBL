@@ -406,6 +406,7 @@
       *  04.02.58    NACL-ÌçÏÆ    09/09/03  Á´¹ñÅÚÌÚ¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     ¡ÊÆàÎÉ¸©¡Ë
       *  04.02.59    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
+      *  04.02.60    NACL-ÌçÏÆ    09/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -584,6 +585,7 @@
            03  FLG-KISAIOK                             PIC 9(01).
            03  FLG-PTNYUINRRK                          PIC 9(01).
            03  FLG-GENGAKU-OKIKAE                      PIC 9(01).
+           03  FLG-KOHYONKAIME-NO                      PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -8303,7 +8305,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-SYUHKNNUM NOT = "060" AND "067") AND
                 (SYU-KOH-HKNNUM(1)(1:1)
                                  >=  "1" AND <=  "8"))
-            IF  FLG-KOHYONKAIME = 1
+           OR  ((SYS-1001-PREFNUM   = 42            ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"         ))
+      *
+            MOVE     ZERO    TO   FLG-KOHYONKAIME-NO
+            IF ((SYS-1001-PREFNUM   = 42            ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"         ))
+               MOVE   1      TO   FLG-KOHYONKAIME-NO
+            END-IF
+            IF  (FLG-KOHYONKAIME-NO  =  ZERO)
+            AND (FLG-KOHYONKAIME     =   1  )
               IF  FLG-TOKU75 = 3
                MOVE   22200   TO   WRK-KINGAKU
               ELSE
