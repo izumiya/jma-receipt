@@ -54,7 +54,7 @@
               03  HCN61-NINPUFTN-MONEY    PIC X(10).
               03  HCN61-DAIRI-MONEY   PIC X(10).
               03  HCN61-BIKOU PIC X(40).
-              03  HCN61-BIKOH2
+              03  HCN61-BIKOU2
                       PIC X(40)   OCCURS  2 TIMES.
             02  HCN61-GCNT  PIC X(3).
             02  HCN61-GBIRTHCNT PIC X(3).
