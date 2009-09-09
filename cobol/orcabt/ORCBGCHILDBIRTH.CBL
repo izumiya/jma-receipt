@@ -151,6 +151,8 @@
            03  WRK-SKYYMH          PIC X(05).
            03  WRK-BIRTHDAYH       PIC X(07).
            03  WRK-CHILD-BIRTHDAYH PIC X(07).
+           03  WRK-BIKOU.
+               05  WRK-BIKOU-O     PIC X(40)   OCCURS  2. 
       *
            03  WRK-9               PIC 9.
            03  WRK-ZZ9             PIC ZZ9.
@@ -808,7 +810,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    BUNBEN-MONEY (12)   TO  WRK-ZZZZZZZ9
                MOVE    WRK-ZZZZZZZ9        TO  HCN61-DAIRI-MONEY
                                                            (CNT-LINE)
-               MOVE    BUNBEN-BIKOU        TO  HCN61-BIKOU (CNT-LINE)
+               MOVE    BUNBEN-BIKOU        TO  WRK-BIKOU
+               IF      WRK-BIKOU-O (2)     =   SPACE
+                   MOVE    WRK-BIKOU       TO  HCN61-BIKOU (CNT-LINE)
+               ELSE
+                   MOVE    WRK-BIKOU-O (1) TO  HCN61-BIKOU2(CNT-LINE 1)
+                   MOVE    WRK-BIKOU-O (2) TO  HCN61-BIKOU2(CNT-LINE 2)
+               END-IF
       *
                ADD     1                   TO  SUM-CNT
                ADD     BUNBEN-BIRTHCNT     TO  SUM-BIRTHCNT
