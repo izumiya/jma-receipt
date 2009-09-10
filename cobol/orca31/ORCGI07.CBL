@@ -382,7 +382,7 @@
                END-IF
            END-IF
       *
-           MOVE    SPA-GMN-MEIPRTKBNLST (1)
+           MOVE    SPA-GMN-MEIPRTKBNLST (2)
                                        TO  SPA-GMN-MEIPRTKBN-G
       *
            .
