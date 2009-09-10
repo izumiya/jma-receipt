@@ -52,109 +52,7 @@
       *    入退院登録共通領域
            COPY    "I0COMMON-SPA".
       *
-       01  SPA-I07.
-           03  SPA-GMN-CUR                     PIC 9(03).
-           03  SPA-GMN-AREA.
-               05  SPA-GMN-PTNUM               PIC X(20).
-               05  SPA-GMN-NAME                PIC X(60).
-               05  SPA-GMN-KANANAME            PIC X(60).
-               05  SPA-GMN-BIRTHDAY-MOM        PIC X(09).
-               05  SPA-GMN-AGE                 PIC 9(03).
-               05  SPA-GMN-NYUINYMD            PIC X(09).
-               05  SPA-GMN-TAIINYMD            PIC X(09).
-               05  SPA-GMN-SYAKOK              PIC X(01).
-               05  SPA-GMN-HONKZK              PIC X(01).
-               05  SPA-GMN-HKNJANUM            PIC X(08).
-               05  SPA-GMN-KIGO                PIC X(80).
-               05  SPA-GMN-NUM                 PIC X(80).
-               05  SPA-GMN-RIYOUKBN-G.
-                   07  SPA-GMN-RIYOUKBN        PIC X(01).
-                   07  SPA-GMN-RIYOUKBNF       PIC X(01).
-                   07  SPA-GMN-RIYOUKBNMEI     PIC X(20).
-               05  SPA-GMN-SKYYM               PIC X(10).
-               05  SPA-GMN-SKYKBN-G.
-                   07  SPA-GMN-SKYKBN          PIC X(01).
-                   07  SPA-GMN-SKYKBNF         PIC X(01).
-                   07  SPA-GMN-SKYKBNMEI       PIC X(20).
-               05  SPA-GMN-BUNBENKBN-G.
-                   07  SPA-GMN-BUNBENKBN       PIC X(01).
-                   07  SPA-GMN-BUNBENKBNF      PIC X(01).
-                   07  SPA-GMN-BUNBENKBNMEI    PIC X(20).
-               05  SPA-GMN-ZAIWEEK             PIC 9(02).
-               05  SPA-GMN-BIRTHDAY-BABY       PIC X(10).
-               05  SPA-GMN-SIZANKBN-G.
-                   07  SPA-GMN-SIZANKBN        PIC X(01).
-                   07  SPA-GMN-SIZANKBNF       PIC X(01).
-                   07  SPA-GMN-SIZANKBNMEI     PIC X(20).
-               05  SPA-GMN-BIRTHCNT            PIC 9(01).
-               05  SPA-GMN-NYUIN-DAY           PIC 9(03).
-               05  SPA-GMN-SANKAKBN-G.
-                   07  SPA-GMN-SANKAKBN        PIC X(01).
-                   07  SPA-GMN-SANKAKBNF       PIC X(01).
-                   07  SPA-GMN-SANKAKBNMEI     PIC X(20).
-               05  SPA-GMN-NYU-MONEY           PIC 9(07).
-               05  SPA-GMN-RMSGK-MONEY         PIC 9(07).
-               05  SPA-GMN-KAIJO-MONEY         PIC 9(07).
-               05  SPA-GMN-BUNBEN-MONEY        PIC 9(07).
-               05  SPA-GMN-SHIN-MONEY          PIC 9(07).
-               05  SPA-GMN-KNS-MONEY           PIC 9(07).
-               05  SPA-GMN-SYC-MONEY           PIC 9(07).
-               05  SPA-GMN-SNK-MONEY           PIC 9(07).
-               05  SPA-GMN-ETC-MONEY           PIC 9(07).
-               05  SPA-GMN-ICBFTN-MONEY        PIC 9(07).
-               05  SPA-GMN-NINPUFTN-MONEY      PIC 9(07).
-               05  SPA-GMN-DAIRI-MONEY         PIC 9(07).
-               05  SPA-GMN-BIKOU               PIC X(60).
-               05  SPA-GMN-MEIPRTKBN-G.
-                   07  SPA-GMN-MEIPRTKBN       PIC X(01).
-                   07  SPA-GMN-MEIPRTKBNF      PIC X(01).
-                   07  SPA-GMN-MEIPRTKBNMEI    PIC X(20).
-               05  SPA-GMN-LBLINFO01           PIC X(100).
-               05  SPA-GMN-LBLINFO02           PIC X(20).
-               05  SPA-GMN-CMB-AREA.
-                   07  SPA-GMN-RIYOUKBNLST-G.
-                       09  SPA-GMN-RIYOUKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-RIYOUKBNLST OCCURS 5.
-                           11  SPA-GMN-RIYOUKBNL       PIC X(01).
-                           11  SPA-GMN-RIYOUKBNFL      PIC X(01).
-                           11  SPA-GMN-RIYOUKBNMEIL    PIC X(20).
-                   07  SPA-GMN-SKYKBNLST-G.
-                       09  SPA-GMN-SKYKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-SKYKBNLST OCCURS 5.
-                           11  SPA-GMN-SKYKBNL         PIC X(01).
-                           11  SPA-GMN-SKYKBNFL        PIC X(01).
-                           11  SPA-GMN-SKYKBNMEIL      PIC X(20).
-                   07  SPA-GMN-BUNBENKBNLST-G.
-                       09  SPA-GMN-BUNBENKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-BUNBENKBNLST OCCURS 5.
-                           11  SPA-GMN-BUNBENKBNL      PIC X(01).
-                           11  SPA-GMN-BUNBENKBNFL     PIC X(01).
-                           11  SPA-GMN-BUNBENKBNMEIL   PIC X(20).
-                   07  SPA-GMN-SIZANKBNLST-G.
-                       09  SPA-GMN-SIZANKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-SIZANKBNLST OCCURS 5.
-                           11  SPA-GMN-SIZANKBNL       PIC X(01).
-                           11  SPA-GMN-SIZANKBNFL      PIC X(01).
-                           11  SPA-GMN-SIZANKBNMEIL    PIC X(20).
-                   07  SPA-GMN-SANKAKBNLST-G.
-                       09  SPA-GMN-SANKAKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-SANKAKBNLST OCCURS 5.
-                           11  SPA-GMN-SANKAKBNL       PIC X(01).
-                           11  SPA-GMN-SANKAKBNFL      PIC X(01).
-                           11  SPA-GMN-SANKAKBNMEIL    PIC X(20).
-                   07  SPA-GMN-MEIPRTKBNLST-G.
-                       09  SPA-GMN-MEIPRTKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-MEIPRTKBNLST OCCURS 5.
-                           11  SPA-GMN-MEIPRTKBNL       PIC X(01).
-                           11  SPA-GMN-MEIPRTKBNFL      PIC X(01).
-                           11  SPA-GMN-MEIPRTKBNMEIL    PIC X(20).
-           03  SPA-NAI-AREA.
-               05  SPA-NAI-SANKANUM            PIC 9(10).
-               05  SPA-NAI-NYUINYMD            PIC X(08).
-               05  SPA-NAI-TAIINYMD            PIC X(08).
-               05  SPA-NAI-SKYYM               PIC X(06).
-               05  SPA-NAI-BIRTHDAY-BABY       PIC X(08).
-               05  SPA-NAI-HKNJANUM-S          PIC X(08).
+           COPY    "I07SCR-SPA".
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -215,6 +113,11 @@
       *    サブプロ用領域
       *****************************************************************
       *
+      *    分娩負担金計算サブ
+       01  LNKBUNBEN-REC.
+           COPY  "CPBUNBEN.INC"        REPLACING  //BUNBEN-//
+                                              BY  //LNKBUNBEN-//.
+      *
       *    日付変換サブ
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
@@ -255,6 +158,7 @@
            COPY    "I05.INC".
            COPY    "I06.INC".
            COPY    "I07.INC".
+           COPY    "I08.INC".
            COPY    "I0ERR.INC".
            COPY    "I0ID1.INC".
            COPY    "I0ID2.INC".
@@ -277,7 +181,7 @@
            INITIALIZE                  WRK-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA.
-           MOVE    SPA-FREE        TO  SPA-I07.
+           MOVE    SPA-FREE        TO  SPA-I07FREE.
            MOVE    SPA-WORK        TO  SPA-I0KYOUTU
       *
            MOVE    SPACE           TO  SPA-ERRCD.
@@ -301,7 +205,7 @@
       *
            MOVE    SPA-I0KYOUTU    TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
-           MOVE    SPA-I07         TO  SPA-FREE
+           MOVE    SPA-I07FREE     TO  SPA-FREE
            .
       *
        000-PROC-SEC-EXT.
@@ -353,6 +257,8 @@
            WHEN    "I0ID1"
                PERFORM 3001-I0ID1-SET-SEC
                MOVE   SPACE        TO  SPA-I0IDCD
+           WHEN    "I08"
+               PERFORM 3001-I08-SET-SEC
            WHEN    OTHER
                PERFORM 310-SPASET-SEC
            END-EVALUATE
@@ -361,6 +267,26 @@
        300-SCREEN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    保険情報変更画面ＯＫ処理
+      *****************************************************************
+       3001-I08-SET-SEC            SECTION.
+      *
+           IF    ( SPA-I08-BTN =   "B12" )
+      *
+               PERFORM 900-BUNBEN-KEY3-SEL-SEC
+      *
+               MOVE    BUNBEN-KANYUKBN     TO  SPA-GMN-SYAKOK
+               MOVE    BUNBEN-HONKZKKBN    TO  SPA-GMN-HONKZK
+               MOVE    BUNBEN-HKNJANUM     TO  SPA-GMN-HKNJANUM
+               MOVE    BUNBEN-KIGO         TO  SPA-GMN-KIGO
+               MOVE    BUNBEN-NUM          TO  SPA-GMN-NUM
+               MOVE    BUNBEN-HKNJANUM-S   TO  SPA-NAI-HKNJANUM-S
+      *
+           END-IF
+           .
+       3001-I08-SET-EXT.
+           EXIT.
       *****************************************************************
       *    確認画面（Ｉ５ＩＤ１）ＯＫ処理
       *****************************************************************
@@ -380,10 +306,13 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
-           INITIALIZE              SPA-I07
+           MOVE    SPACE           TO  SPA-I07
+           INITIALIZE                  SPA-I07
       *
       *    コンボボックス編集処理
            PERFORM 310-COMBO-EDIT-SEC
+      *
+           PERFORM 800-ORCSBUNBENFTN-SEC
       *
            PERFORM 900-BUNBEN-KEY3-SEL-SEC
       *
@@ -453,7 +382,7 @@
                END-IF
            END-IF
       *
-           MOVE    SPA-GMN-MEIPRTKBNLST (2)
+           MOVE    SPA-GMN-MEIPRTKBNLST (1)
                                        TO  SPA-GMN-MEIPRTKBN-G
       *
            .
@@ -530,6 +459,23 @@
            MOVE    BUNBEN-DAIRI-MONEY  TO  SPA-GMN-DAIRI-MONEY
            MOVE    BUNBEN-BIKOU        TO  SPA-GMN-BIKOU
            MOVE    BUNBEN-HKNJANUM-S   TO  SPA-NAI-HKNJANUM-S
+      *
+           IF    ( SPA-I07-MOTOPG      =   "I01" )
+            AND  ( BUNBEN-RIYOUKBN     =   "1" )
+            AND  ( BUNBEN-BUNBENKBN    =   "2" )
+               IF    ( BUNBEN-TEISYUTUSAKI
+                                       =   "2" )
+                   MOVE    "2"         TO  SPA-NAI-RECESAKI
+               ELSE
+                   MOVE    "1"         TO  SPA-NAI-RECESAKI
+               END-IF
+           ELSE
+               IF    ( LNKBUNBEN-KANYUKBN  =   "2" )
+                   MOVE    "2"         TO  SPA-NAI-RECESAKI
+               ELSE
+                   MOVE    "1"         TO  SPA-NAI-RECESAKI
+               END-IF
+           END-IF
       *
            MOVE    1                   TO  SPA-GMN-CUR
       *
@@ -665,24 +611,49 @@
        3101-MEIPRTKBNLST-EXT.
            EXIT.
       *****************************************************************
-      *    再計算処理
+      *    保険情報変更画面遷移処理
       *****************************************************************
-       320-SAIKEISAN-SEC              SECTION.
+       320-I08-SENI-SEC              SECTION.
       *
-           INITIALIZE                     BUNBEN-REC
-           MOVE    SPA-HOSPNUM         TO BUNBEN-HOSPNUM
-           MOVE    SPA-I07-PTID        TO BUNBEN-PTID
-           MOVE    SPA-I07-RRKNUM      TO BUNBEN-RRKNUM
-           CALL    "ORCSBUNBENFTN"     USING
-                                       BUNBEN-REC
-                                       SPA-AREA
+           INITIALIZE                  SPA-I08-AREA
       *
-           PERFORM 311-SPASET-SEC
+           MOVE    SPA-I07-PTID    TO  SPA-I08-PTID
+           MOVE    SPA-I07-RRKNUM  TO  SPA-I08-RRKNUM
       *
-           PERFORM 4102-KIHON-CHK-SEC
+           MOVE    SPACE           TO  SPA-MOTOPG
+      *
+           MOVE    SPA-I0KYOUTU    TO  SPA-WORK
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-I07FREE     TO  SPA-FREE
+      *
+           MOVE    "LINK"          TO  MCP-STATUS
+           MOVE    SPACE           TO  MCP-EVENT
+      *
+           CALL    "ORCGI08"           USING
+                                       MCPAREA
+                                       SPAAREA
+                                       LINKAREA
+                                       SCRAREA
+      *
+      *
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-FREE        TO  SPA-I07FREE
+           MOVE    SPA-WORK        TO  SPA-I0KYOUTU
+      *
+           MOVE    "HKNJANUM"      TO  MCP-WIDGET
+      *
+           MOVE    "I07"           TO  SPA-MOTOPG
+           MOVE    "I08"           TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"           TO  MCP-PUTTYPE
+           MOVE    "I08"           TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE  1             TO  FLG-END
       *
            .
-       320-SAIKEISAN-EXT.
+       320-I08-SENI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -698,8 +669,8 @@
                PERFORM 210-BACK
       *    WHEN    "CLICKED"       ALSO    "B02"
       *        PERFORM 310-SPASET-SEC
-      *    WHEN    "CLICKED"       ALSO    "B04"
-      *        PERFORM 320-SAIKEISAN-SEC
+           WHEN    "CLICKED"       ALSO    "B05"
+               PERFORM 320-I08-SENI-SEC
            WHEN    "CLICKED"       ALSO    "B09"
                MOVE    "9999"      TO  SPA-ERRCD
            WHEN    "CLICKED"       ALSO    "B12"
@@ -1459,6 +1430,14 @@
                END-IF
            END-IF
       *
+           IF    ( SPA-ERRCD               =   SPACE )
+               IF    ( SPA-GMN-BUNBENKBN   =   "2" )
+                AND  ( SPA-GMN-ICBFTN-MONEY    =   ZERO )
+                   MOVE    "1009"          TO  SPA-ERRCD
+                   MOVE    14              TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
            IF    ( SPA-GMN-BIRTHCNT    =   1 )
                IF    ( SPA-ERRCD           =   SPACE )
                    IF    ( SPA-GMN-SIZANKBN    =   "3" )
@@ -1534,17 +1513,16 @@
            MOVE    SPA-GMN-RIYOUKBN        TO   BUNBEN-RIYOUKBN
            MOVE    SPA-GMN-BUNBENKBN       TO   BUNBEN-BUNBENKBN
       *
-           IF    ( SPA-GMN-RIYOUKBN        =   "0" )
-            OR   ( SPA-GMN-SYAKOK          =   SPACE )
+           IF    ( SPA-GMN-RIYOUKBN    =   "0" )
                CONTINUE
            ELSE
-               IF    ( SPA-GMN-BUNBENKBN   =   "1" )
+               IF    ( SPA-GMN-BUNBENKBN       =   "1" )
                    MOVE    "2"             TO  BUNBEN-TEISYUTUSAKI
                ELSE
-                   IF    ( SPA-GMN-SYAKOK  =   "1" )
-                       MOVE    "1"         TO  BUNBEN-TEISYUTUSAKI
+                   IF    ( SPA-NAI-RECESAKI    =   "2" )
+                           MOVE    "2"     TO  BUNBEN-TEISYUTUSAKI
                    ELSE
-                       MOVE    "2"         TO  BUNBEN-TEISYUTUSAKI
+                           MOVE    "1"     TO  BUNBEN-TEISYUTUSAKI
                    END-IF
                END-IF
            END-IF
@@ -1727,19 +1705,18 @@
                                                            (IDX-CMB)
            END-PERFORM
       *
-           IF    ( SPA-GMN-RIYOUKBN      =   "0" )
-            OR   ( SPA-GMN-SYAKOK        =   SPACE )
+           IF    ( SPA-GMN-RIYOUKBN    =   "0" )
                CONTINUE
            ELSE
-               IF    ( SPA-GMN-BUNBENKBN     =   "1" )
-                   MOVE    "提出先：国保連合会"
+               IF    ( SPA-GMN-BUNBENKBN       =   "1" )
+                       MOVE    "提出先：国保連合会"
                                            TO  I07-LBLTEISYUTUSAKI
                ELSE
-                   IF    ( SPA-GMN-SYAKOK    =   "1" )
-                       MOVE    "提出先：支払基金"
+                   IF    ( SPA-NAI-RECESAKI    =   "2" )
+                       MOVE    "提出先：国保連合会"
                                            TO  I07-LBLTEISYUTUSAKI
                    ELSE
-                       MOVE    "提出先：国保連合会"
+                       MOVE    "提出先：支払基金"
                                            TO  I07-LBLTEISYUTUSAKI
                    END-IF
                END-IF
@@ -2053,6 +2030,9 @@
            WHEN    "1008"
                MOVE    "異常分娩で分娩料が入力されています"
                                        TO  SPA-ERRMSG
+           WHEN    "1009"
+               MOVE    "異常分娩で一部負担金等が未入力です"
+                                       TO  SPA-ERRMSG
            WHEN    "4001"  THRU    "4002"
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
@@ -2106,6 +2086,24 @@
            .
        520-I0IDSET-EXT.
            EXIT.
+      *****************************************************************
+      *    分娩負担金サブ
+      *****************************************************************
+       800-ORCSBUNBENFTN-SEC              SECTION.
+      *
+           INITIALIZE                     LNKBUNBEN-REC
+           MOVE    SPA-HOSPNUM         TO LNKBUNBEN-HOSPNUM
+           MOVE    SPA-I07-PTID        TO LNKBUNBEN-PTID
+           MOVE    SPA-I07-RRKNUM      TO LNKBUNBEN-RRKNUM
+           CALL    "ORCSBUNBENFTN"     USING
+                                       LNKBUNBEN-REC
+                                       SPA-AREA
+      *
+           .
+       800-ORCSBUNBENFTN-EXT.
+           EXIT.
+
+
       *****************************************************************
       *    全角半角混在チェック
       *****************************************************************

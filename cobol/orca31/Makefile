@@ -6,6 +6,7 @@ SRCS = ORCGI01.CBL \
        ORCGI05.CBL \
        ORCGI06.CBL \
        ORCGI07.CBL \
+       ORCGI08.CBL \
        ORCGI0ERR.CBL \
        ORCGI0ID1.CBL \
        ORCGI0ID2.CBL \

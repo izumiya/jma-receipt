@@ -402,6 +402,7 @@ RECORD_files = \
 	D05.rec \
 	I07.rec \
 	W67.rec \
+	I08.rec \
 
 DEF_files = \
 	HC01.def \

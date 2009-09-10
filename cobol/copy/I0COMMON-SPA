@@ -89,3 +89,8 @@
            05  SPA-I07-PTNUM                   PIC X(20).
            05  SPA-I07-RRKNUM                  PIC 9(03).
            05  SPA-I07-MOTOPG                  PIC X(08).
+      *      £É£°£¸Á«°Ü¾ðÊó
+         03  SPA-I08-AREA.
+           05  SPA-I08-PTID                    PIC 9(10).
+           05  SPA-I08-RRKNUM                  PIC 9(03).
+           05  SPA-I08-BTN                     PIC X(03).

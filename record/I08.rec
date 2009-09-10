@@ -1,0 +1,30 @@
+I08	{
+	fixed4	{
+		HKNJANUM	{
+			value	varchar(8);
+		};
+		HKNJANAME	{
+			value	varchar(40);
+		};
+		CMB_SYAKOK	{
+			SYAKOK	{
+				value	varchar(10);
+			};
+			count	int;
+			item	varchar(10)[05];
+		};
+		CMB_HONKZK	{
+			HONKZK	{
+				value	varchar(10);
+			};
+			count	int;
+			item	varchar(10)[05];
+		};
+		KIGO	{
+			value	varchar(80);
+		};
+		NUM	{
+			value	varchar(80);
+		};
+	};
+};

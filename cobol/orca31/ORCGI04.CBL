@@ -535,6 +535,7 @@
            COPY    "I07.INC".
            COPY    "I0ERR.INC".
            COPY    "I0ID1.INC".
+           COPY    "I08.INC".
            COPY    "I0ID2.INC".
            COPY    "I041.INC".
       *
@@ -5425,6 +5426,12 @@
                     OR    ( WRK-NYUKIN    <=  ZERO )
                     OR    ( BFSYU-MAX     >= CONST-BFSYU-MAX )
       *
+           MOVE    BUNBEN-KANYUKBN     TO  LNKBUNBEN-KANYUKBN
+           MOVE    BUNBEN-HONKZKKBN    TO  LNKBUNBEN-HONKZKKBN
+           MOVE    BUNBEN-HKNJANUM     TO  LNKBUNBEN-HKNJANUM
+           MOVE    BUNBEN-HKNJANUM-S   TO  LNKBUNBEN-HKNJANUM-S
+           MOVE    BUNBEN-KIGO         TO  LNKBUNBEN-KIGO
+           MOVE    BUNBEN-NUM          TO  LNKBUNBEN-NUM
                IF    ( SPA-I01-I04-SKYSTYMD   <= SYU-SKYSTYMD )
                 AND  ( SPA-I01-I04-SKYEDYMD   >= SYU-SKYEDYMD )
                 AND  ( SPA-I01-I04-RRKNUM
