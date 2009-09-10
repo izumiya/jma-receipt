@@ -353,6 +353,7 @@ path	key13		{
 			AND     NYUGAIKBN      like :NYUGAIKBN
 			AND     RECESYUBETU    =    :RECESYUBETU
 			AND     MISEIKYU_FLG   =    :MISEIKYU_FLG
+			AND     a.HOSPNUM       =   b.HOSPNUM
 			AND     a.PTID         =    b.PTID
 			ORDER   BY PTNUM
 		;
@@ -368,6 +369,7 @@ path	key14		{
 			AND     NYUGAIKBN      like :NYUGAIKBN
 			AND     RECESYUBETU    =    :RECESYUBETU
 			AND     MISEIKYU_FLG   =    :MISEIKYU_FLG
+			AND     a.HOSPNUM       =   b.HOSPNUM
 			AND     a.PTID         =    b.PTID
 			ORDER   BY SRYYM,PTNUM,NYUGAIKBN
 		;
