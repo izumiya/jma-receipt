@@ -310,7 +310,7 @@
            MOVE    WRK-PARA-HOSPNUM
                                    TO  SPA-HOSPNUM
       *
-           MOVE    1               TO  LNK-PRTKANRI-SHORI-RENNUM
+           MOVE    ZERO            TO  LNK-PRTKANRI-SHORI-RENNUM
       *
       *    ステップ管理開始処理
            MOVE    "STS"           TO  SJOBKANRI-MODE
@@ -359,7 +359,7 @@
        200-MAIN-SEC                    SECTION.
       *
            INITIALIZE                  SUM-AREA
-      *****ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
+           ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
            MOVE    ZERO            TO  IDX
            MOVE    KEY-NEW         TO  KEY-OLD
       *
@@ -371,6 +371,7 @@
                WHEN    "2"
                    MOVE    "（国保）"          TO  H01-TEISYUTUSAKI
            END-EVALUATE
+      *
       *    支払機関別編集処理
            PERFORM          UNTIL   FLG-END        =   1
                             OR      KEY-N-TEISYUTUSAKI
@@ -391,11 +392,13 @@
                        MOVE    "【請求済】　　"    TO  H01-SKYKBN
                END-EVALUATE
                PERFORM 2001-HEAD-PRINT-SEC
-               PERFORM          UNTIL   FLG-END        =   1
-                                OR      KEY-N-TEISYUTUSAKI
-                                       NOT =   KEY-O-TEISYUTUSAKI
-                                OR      KEY-N-SKYKBN
-                                       NOT =   KEY-O-SKYKBN
+               PERFORM             UNTIL   FLG-END        =   1
+                                   OR      KEY-N-TEISYUTUSAKI
+                                                      NOT =
+                                                   KEY-O-TEISYUTUSAKI
+                                   OR      KEY-N-SKYKBN
+                                                      NOT =
+                                                   KEY-O-SKYKBN
       *            分娩区分・保険者別編集処理
                    INITIALIZE                  SUM-OCC (1)
                    MOVE    KEY-NEW         TO  KEY-OLD
@@ -427,11 +430,6 @@
       *****************************************************************
        2001-HEAD-PRINT-SEC                SECTION.
       *
-      *    帳票印刷処理
-           IF      CNT-PAGE            >   ZERO
-               PERFORM 2004-PRINT-OUT-SEC
-           END-IF
-      *
            ADD     1                   TO  CNT-PAGE
            MOVE    CNT-PAGE            TO  WRK-ZZ9
            MOVE    WRK-ZZ9             TO  H01-PAGE
@@ -450,11 +448,6 @@
       *****************************************************************
        2002-BODY-PRINT-SEC          SECTION.
       *
-      *    見出し編集処理
-           IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
-               PERFORM 2001-HEAD-PRINT-SEC
-           END-IF
-      *
            MOVE    SPACE               TO  BODY-01
       *    保険者番号
            MOVE    BUNBEN-HKNJANUM     TO  B01-HKNJANUM
@@ -468,7 +461,14 @@
       *
            PERFORM          UNTIL   FLG-END        =   1
                             OR      KEY-NEW    NOT =   KEY-OLD
-                            OR      CNT-LINE       >=  WRK-CONS-LINE-MAX
+      *
+               IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
+      *            帳票印刷処理
+                   PERFORM 2004-PRINT-OUT-SEC
+      *            見出し編集処理
+                   PERFORM 2001-HEAD-PRINT-SEC
+               END-IF
+      *
       *        患者番号
                INITIALIZE                      ORCSPTIDAREA
                MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
@@ -511,11 +511,6 @@
       *        分娩管理読込   
                PERFORM 900-BUNBEN-READ-N-SEC
            END-PERFORM
-      *
-      *    帳票印刷処理
-           IF      KEY-NEW         =   KEY-OLD
-               PERFORM 2004-PRINT-OUT-SEC
-           END-IF
            .
        2002-BODY-PRINT-EXT.
            EXIT.
@@ -555,23 +550,32 @@
            MOVE    SUM-MONEY (IDX) TO  WRK-ZZZZZZZ9
            MOVE    WRK-ZZZZZZZ9    TO  B02-GOKEI
       *
-           IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
+           IF      CNT-LINE            >=  WRK-CONS-LINE-MAX
+      *        帳票印刷処理
+               PERFORM 2004-PRINT-OUT-SEC
       *        見出し編集処理
                PERFORM 2001-HEAD-PRINT-SEC
-      *
-               ADD     1               TO  CNT-LINE
-               MOVE    BODY-02         TO  HCMSL55-MOJI (CNT-LINE)
-           ELSE
-               ADD     1               TO  CNT-LINE
-               MOVE    BODY-02         TO  HCMSL55-MOJI (CNT-LINE)
            END-IF
       *
-      *    保険者番号・分娩区分別合計の後に１行空ける
-           IF      IDX                 =   1
-               IF      KEY-N-SKYKBN     =   KEY-O-SKYKBN
-                   ADD     1                TO  CNT-LINE
-               END-IF
-           END-IF
+           ADD     1               TO  CNT-LINE
+           MOVE    BODY-02         TO  HCMSL55-MOJI (CNT-LINE)
+      *
+           EVALUATE    IDX
+               WHEN    1
+      *            保険者番号・分娩区分別合計の後に１行空ける
+                   IF      KEY-N-SKYKBN     =   KEY-O-SKYKBN
+                       ADD     1                TO  CNT-LINE
+                   END-IF
+               WHEN    2
+                   IF      KEY-N-TEISYUTUSAKI
+                                            =   KEY-O-TEISYUTUSAKI
+      *                帳票印刷処理
+                       PERFORM 2004-PRINT-OUT-SEC
+                   END-IF
+               WHEN    3
+      *            帳票印刷処理
+                   PERFORM 2004-PRINT-OUT-SEC
+           END-EVALUATE
            .
       *
        2003-TERM-PRINT-EXT.
@@ -609,8 +613,6 @@
                        "（国保）出産育児一時金チェックリスト"
                                            TO  SPRT-TITLE
            END-EVALUATE
-           MOVE    "出産育児一時金チェックリスト"
-                                           TO  SPRT-TITLE
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
@@ -676,11 +678,6 @@
            MOVE    "key4"          TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
-      *    帳票印刷処理
-           IF      CNT-PAGE        >   ZERO
-               PERFORM 2004-PRINT-OUT-SEC
-           END-IF
-      *
            DISPLAY "*** ORCBGCHILDLST IN   "  CNT-IN
            DISPLAY "*** ORCBGCHILDLST OUT  "  CNT-OUT
            DISPLAY "*** ORCBGCHILDLST PAGE "  CNT-PAGE
@@ -723,8 +720,6 @@
       *    分娩管理読込
       *****************************************************************
        900-BUNBEN-READ-SEC             SECTION.
-      *
-           MOVE    ZERO            TO  FLG-END
       * 
            INITIALIZE                  BUNBEN-REC
            MOVE    WRK-PARA-HOSPNUM
@@ -808,7 +803,7 @@
            EXIT.
       *
       *****************************************************************
-      *    患者読み込み
+      *    患者読込
       *****************************************************************
        900-PTINF-READ-SEC         SECTION.
       *
