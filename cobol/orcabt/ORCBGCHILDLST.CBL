@@ -181,7 +181,7 @@
            03  B02-GOKEI               PIC X(10).
       *
        01  WRK-CONST-AREA.
-              03  WRK-CONS-LINE-MAX       PIC 9(02)   VALUE   55.
+            03  WRK-CONS-LINE-MAX       PIC 9(02)   VALUE   55.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -297,7 +297,9 @@
                                        WRK-PARA-SKYKBN
            END-UNSTRING
       *
-           DISPLAY "IN PARA=" WRK-PARA-SKYYM "#" WRK-PARA-SKYKBN "#"
+           DISPLAY "WRK-PARA-SKYYM =" WRK-PARA-SKYYM
+           DISPLAY "WRK-PARA-SKYKBN=" WRK-PARA-SKYKBN
+      *
            IF      WRK-PARA-SKYKBN =   SPACE
                MOVE    "0"             TO  WRK-PARA-SKYKBN
            END-IF
@@ -305,10 +307,10 @@
                MOVE    "000000"        TO  WRK-PARA-SKYYM
                MOVE    "0"             TO  WRK-PARA-SKYKBN
            END-IF
-           DISPLAY "OT PARA=" WRK-PARA-SKYYM "#" WRK-PARA-SKYKBN "#"
            MOVE    WRK-PARA-HOSPNUM
                                    TO  SPA-HOSPNUM
-           MOVE    ZERO            TO  LNK-PRTKANRI-SHORI-RENNUM
+      *
+           MOVE    1               TO  LNK-PRTKANRI-SHORI-RENNUM
       *
       *    ステップ管理開始処理
            MOVE    "STS"           TO  SJOBKANRI-MODE
@@ -356,69 +358,66 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
+           INITIALIZE                  SUM-AREA
+      *****ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
+           MOVE    ZERO            TO  IDX
+           MOVE    KEY-NEW         TO  KEY-OLD
       *
+           EVALUATE    KEY-N-TEISYUTUSAKI
+               WHEN    SPACE
+                   MOVE    "　　　　"          TO  H01-TEISYUTUSAKI
+               WHEN    "1"
+                   MOVE    "（社保）"          TO  H01-TEISYUTUSAKI
+               WHEN    "2"
+                   MOVE    "（国保）"          TO  H01-TEISYUTUSAKI
+           END-EVALUATE
+      *    支払機関別編集処理
            PERFORM          UNTIL   FLG-END        =   1
-               INITIALIZE                  SUM-AREA
-               ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
-               MOVE    ZERO            TO  IDX
+                            OR      KEY-N-TEISYUTUSAKI
+                                               NOT =
+                                                     KEY-O-TEISYUTUSAKI
+      *        請求区分別編集処理
                MOVE    KEY-NEW         TO  KEY-OLD
+               INITIALIZE                  SUM-OCC (2)
       *
-               EVALUATE    KEY-N-TEISYUTUSAKI
+               EVALUATE    KEY-N-SKYKBN
                    WHEN    SPACE
-                       MOVE    "　　　　"          TO  H01-TEISYUTUSAKI
+                       MOVE    "　　　　　　　"    TO  H01-SKYKBN
+                   WHEN    "0"
+                       MOVE    "【請求しない】"    TO  H01-SKYKBN
                    WHEN    "1"
-                       MOVE    "（社保）"          TO  H01-TEISYUTUSAKI
+                       MOVE    "【未請求】　　"    TO  H01-SKYKBN
                    WHEN    "2"
-                       MOVE    "（国保）"          TO  H01-TEISYUTUSAKI
+                       MOVE    "【請求済】　　"    TO  H01-SKYKBN
                END-EVALUATE
-      *        支払機関別編集処理
+               PERFORM 2001-HEAD-PRINT-SEC
                PERFORM          UNTIL   FLG-END        =   1
                                 OR      KEY-N-TEISYUTUSAKI
-                                                   NOT =
-                                                     KEY-O-TEISYUTUSAKI
-      *            請求区分別編集処理
+                                       NOT =   KEY-O-TEISYUTUSAKI
+                                OR      KEY-N-SKYKBN
+                                       NOT =   KEY-O-SKYKBN
+      *            分娩区分・保険者別編集処理
+                   INITIALIZE                  SUM-OCC (1)
                    MOVE    KEY-NEW         TO  KEY-OLD
-                   INITIALIZE                  SUM-OCC (2)
-      *
-                   EVALUATE    KEY-N-SKYKBN
-                       WHEN    SPACE
-                           MOVE    "　　　　　　　"    TO  H01-SKYKBN
-                       WHEN    "0"
-                           MOVE    "【請求しない】"    TO  H01-SKYKBN
-                       WHEN    "1"
-                           MOVE    "【未請求】　　"    TO  H01-SKYKBN
-                       WHEN    "2"
-                           MOVE    "【請求済】　　"    TO  H01-SKYKBN
-                   END-EVALUATE
-                   PERFORM 2001-HEAD-PRINT-SEC
-                   PERFORM          UNTIL   FLG-END        =   1
-                                    OR      KEY-N-TEISYUTUSAKI
-                                           NOT =   KEY-O-TEISYUTUSAKI
-                                    OR      KEY-N-SKYKBN
-                                           NOT =   KEY-O-SKYKBN
-      *                分娩区分・保険者別編集処理
-                       INITIALIZE                  SUM-OCC (1)
-                       MOVE    KEY-NEW         TO  KEY-OLD
-                       PERFORM          UNTIL   FLG-END        =  1
-                                        OR      KEY-NEW    NOT = KEY-OLD
-      *                    明細編集処理
-                           PERFORM 2002-BODY-PRINT-SEC
-                       END-PERFORM
-      *
-      *                分娩区分・保険者別合計編集処理
-                       MOVE    1                TO  IDX
-                       PERFORM 2003-TERM-PRINT-SEC
+                   PERFORM          UNTIL   FLG-END        =  1
+                                    OR      KEY-NEW    NOT = KEY-OLD
+      *                明細編集処理
+                       PERFORM 2002-BODY-PRINT-SEC
                    END-PERFORM
       *
-      *            請求区分別合計編集処理
-                   MOVE    2                TO  IDX
+      *            分娩区分・保険者別合計編集処理
+                   MOVE    1                TO  IDX
                    PERFORM 2003-TERM-PRINT-SEC
                END-PERFORM
       *
-      *        支払機関別合計編集処理
-               MOVE    3                TO  IDX
+      *        請求区分別合計編集処理
+               MOVE    2                TO  IDX
                PERFORM 2003-TERM-PRINT-SEC
            END-PERFORM
+      *
+      *    支払機関別合計編集処理
+           MOVE    3                TO  IDX
+           PERFORM 2003-TERM-PRINT-SEC
            .
        200-MAIN-EXT.
            EXIT.
@@ -600,7 +599,7 @@
                                        TO  SPRT-PRIORITY
            MOVE   "HCMSL55.red"        TO  SPRT-PRTID
            MOVE    HCMSL55             TO  SPRT-PRTDATA
-           EVALUATE    WRK-TEISYUTUSAKI
+           EVALUATE    KEY-O-TEISYUTUSAKI
                WHEN    "1"
                    MOVE
                        "（社保）出産育児一時金チェックリスト"
@@ -610,6 +609,8 @@
                        "（国保）出産育児一時金チェックリスト"
                                            TO  SPRT-TITLE
            END-EVALUATE
+           MOVE    "出産育児一時金チェックリスト"
+                                           TO  SPRT-TITLE
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
