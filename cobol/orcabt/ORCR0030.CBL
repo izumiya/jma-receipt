@@ -420,6 +420,8 @@
       *                                     （奈良県）
       *  04.04.20    NACL-門脇    09/09/07  愛知県単独５１対応
       *  04.04.21    NACL-門脇    09/09/08  長崎県地方公費対応
+      *  04.04.22    NACL-門脇    09/09/10  月途中に医保と生保の併用から
+      *                                     生保単独になったときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8037,12 +8039,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(4)   =   "012" OR "025" )
+              IF   SYU-SYUHKNNUM  NOT = SPACE
                IF  FLG-TOKU75 = 1 OR 2
                  MOVE      4000      TO   WRK-KINGAKU
                ELSE
                  MOVE      8000      TO   WRK-KINGAKU
                END-IF
                PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
+              END-IF
              ELSE
                IF   ( SYU-KOH-HKNNUM(1) =   "972" )
                OR   ( SYU-KOH-HKNNUM(2) =   "972" )
@@ -8151,7 +8155,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-           ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
+           IF   SYU-SYUHKNNUM  NOT = SPACE
+              ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
+           END-IF
       *
            .
        210521-HOKEN-FUTAN-HENSYU-EXT.
@@ -8194,6 +8200,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(4)   =   "012" OR "025" )
+              IF   SYU-SYUHKNNUM  NOT = SPACE
                MOVE       1          TO   FLG-JYOGENKBN2
                IF  FLG-KOHYONKAIME = 1
                   IF  FLG-TOKU75 = 3
@@ -8209,6 +8216,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                END-IF
                PERFORM    2105211-ICHIBUFTN-KOH-SET-SEC
+              END-IF
              ELSE
                IF   ( SYU-KOH-HKNNUM(1) =   "972" )
                OR   ( SYU-KOH-HKNNUM(2) =   "972" )
@@ -8309,7 +8317,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-           ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
+           IF   SYU-SYUHKNNUM  NOT = SPACE
+              ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
+           END-IF
       *
            .
        210525-HOKEN-FUTAN-HENSYU2-EXT.

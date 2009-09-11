@@ -38,6 +38,8 @@
       *  02.06.02    NACL-竹田    05/05/30  realtime preview 処理追加
       *  03.05.01    NACL-小豆沢  07/06/04  グループ診療対応
       *  04.02.01    NACL-門脇    07/05/12  第３公費以降の負担区分編集
+      *  04.04.01    NACL-門脇    09/09/10  月途中に医保と生保の併用から
+      *                                     生保単独になったときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -468,6 +470,19 @@
            OR ((RECE62-KOHNUMHC(HC-IDX 4) = RECE62-KOHNUM(BUN-IDX)) AND
                (RECE62-KOHIDHC(HC-IDX 4)  = RECE62-KOHID(BUN-IDX) ))
                 MOVE    BUN-IDX     TO        KH-IDX
+           END-IF
+      *
+           IF  (RECE62-HENTOTALTEN(1)   NOT =  ZERO          )
+           AND (RECE62-HENTOTALTEN(2)   NOT =  ZERO          )
+           AND (RECE62-HENTOTALTEN(1) < RECE62-HENTOTALTEN(2))
+           AND (RECE62-HENTOTALTEN(3)       =  ZERO          )
+           AND (RECE62-HENTOTALTEN(4)       =  ZERO          )
+           AND (RECE62-HENTOTALTEN(5)       =  ZERO          )
+           AND (RECE62-KOHNUM(1)      = "012" OR "025"       )
+           AND (KH-IDX                =  1                   )
+              IF   RECE62-HKNNUMHC(HC-IDX)  NOT = SPACE
+                MOVE    ZERO        TO        KH-IDX
+              END-IF
            END-IF
       *
            IF    RECE62-HENTOTALTEN(1)   NOT  =  ZERO
