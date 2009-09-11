@@ -382,6 +382,7 @@
       *                                     ¡ÊÆàÎÉ¸©¡Ë
       *  04.03.35    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
       *  04.03.36    NACL-ÌçÏÆ    09/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.37    NACL-ÌçÏÆ    09/09/11  µÜºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -14544,6 +14545,54 @@
                         MOVE   999999999     TO  RECE62-KOUREI-SAIKEI2
                      END-IF
       *
+                     IF   FLG-KOH  =   2
+                       COMPUTE  RECE62-FTNMONEY(2) = WRK-CHK-KOKIGAK2
+                                                   + WRK-CHK-KOKIGAK3
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
+      *      µÜºê¸©ÃÏÊý¸øÈñ
+             WHEN    "45"
+               IF  (RECE62-SRYYM        >=  "200804"  )
+               AND (RECE62-TEISYUTUSAKI  =   2  OR  6 )
+               AND (RECE62-KOUREI        =  "1" OR "2")
+                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
+                                           + RECE62-HENTOTALTEN(3)
+                 IF  (RECE62-KOHNUM(1)(1:1)  = "0"               )
+                 AND (RECE62-KOHNUM(1)   NOT =  "012" AND "025"  )
+                 AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+                 AND (RECE62-KOHNUM(3)       = SPACE             )
+                 AND (RECE62-KOHNUM(4)       = SPACE             )
+                 AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
+                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+                 AND (FLG-CHI-TAISYO         =  1                )
+                 AND ((RECE62-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
+                      (RECE62-TOTALTEN(1)  =
+                                          RECE62-HENTOTALTEN(3)) )
+                 AND (RECE62-TEISYUTUSAKI  =    6                )
+                 AND (RECE62-KOUREI        =   "1"               )
+                   COMPUTE  WRK-HANTEI-TOTALTEN = RECE62-TOTALTEN(1)
+                                                - RECE62-TOTALTEN(2)
+                   PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+                   IF   FLG-KOH  =   2
+                     COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
+                                               - WRK-KOH-GAI
+                   ELSE
+                     MOVE  RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                   END-IF
+                   COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
+                                            - FTN-KOH-XXX
+                                            + WRK-CHK-KOKIGAK2
+                   IF   WRK-CHK-KOKIGAK  >  WRK-KINGAKU3
+                     IF   WRK-KINGAKU3   >  WRK-CHK-KOKIGAK2
+                       COMPUTE  WRK-CHK-KOKIGAK3   = WRK-KINGAKU3
+                                                   - WRK-CHK-KOKIGAK2
+                     ELSE
+                       MOVE     ZERO    TO  WRK-CHK-KOKIGAK3
+                     END-IF
+                     COMPUTE  RECE62-FTNMONEY(1) = WRK-CHK-KOKIGAK3
+                                                 + FTN-KOH-XXX
                      IF   FLG-KOH  =   2
                        COMPUTE  RECE62-FTNMONEY(2) = WRK-CHK-KOKIGAK2
                                                    + WRK-CHK-KOKIGAK3
