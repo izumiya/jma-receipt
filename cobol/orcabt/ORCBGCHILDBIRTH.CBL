@@ -122,7 +122,7 @@
       *
       *    集計領域
        01  SUM-AREA.
-           03  SUM-HKNJANUM-G.
+           03  SUM-TBL-OCC             OCCURS  2.
                05  SUM-CNT         PIC 9(03).
                05  SUM-BIRTHCNT    PIC 9(03).
                05  SUM-MONEY       PIC 9(08).
@@ -160,7 +160,6 @@
            03  WRK-ZZZZZZZ9        PIC ZZ,ZZZ,ZZ9.
       *
            03  WRK-CONTROL-SEQ-NO  PIC 9(06).
-           03  WRK-DATA-SEQ-NO     PIC 9(06).
            03  WRK-SEQ-NO          PIC 9(06).
            03  WRK-PAGE            PIC 9(05).
            03  WRK-OUT             PIC 9(03).
@@ -518,7 +517,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            MOVE    1               TO  WRK-SEQ-NO
            MOVE    WRK-SEQ-NO      TO  WRK-CONTROL-SEQ-NO
-           MOVE    ZERO            TO  WRK-DATA-SEQ-NO
       *
       *    削除処理
            PERFORM 1001-CSVINFO-CLEAR-SEC
@@ -527,9 +525,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            PERFORM 900-BUNBEN-READ-SEC
       *
            PERFORM          UNTIL   FLG-END        =   1
-               ADD     1               TO  WRK-SEQ-NO
-               MOVE    WRK-SEQ-NO      TO  WRK-DATA-SEQ-NO    
-               INITIALIZE                  SUM-HKNJANUM-G
+               INITIALIZE                  SUM-TBL-OCC (1)
                MOVE    ZERO            TO  WRK-PAGE
       *
       *        分娩区分・保険者別編集処理
@@ -547,6 +543,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                PERFORM 2004-PRINT-OUT-SEC
       *
                IF      FLG-END         =   1
+      *            ＣＳＶ（データレコード）編集処理
+                   PERFORM 2001-CSV-DATA-7111-RECORD-HENSYU-SEC
+      *
       *            ＣＳＶ（コントロールレコード）編集処理
                    PERFORM 2001-CSV-CONTROL-RECORD-HENSYU-SEC
       *
@@ -818,9 +817,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                    MOVE    WRK-BIKOU-O (2) TO  HCN61-BIKOU2(CNT-LINE 2)
                END-IF
       *
-               ADD     1                   TO  SUM-CNT
-               ADD     BUNBEN-BIRTHCNT     TO  SUM-BIRTHCNT
-               ADD     BUNBEN-MONEY (12)   TO  SUM-MONEY
+               ADD     1                   TO  SUM-CNT      (1)
+                                               SUM-CNT      (2)
+               ADD     BUNBEN-BIRTHCNT     TO  SUM-BIRTHCNT (1)
+                                               SUM-BIRTHCNT (2)
+               ADD     BUNBEN-MONEY (12)   TO  SUM-MONEY    (1)
+                                               SUM-MONEY    (2)
       *
       *        ＣＳＶ（データレコード）編集処理
                PERFORM 2001-CSV-DATA-7121-RECORD-HENSYU-SEC
@@ -872,15 +874,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *****************************************************************
        2003-TERM-PRINT-SEC                SECTION.
       *
-           MOVE    SUM-CNT         TO  WRK-ZZ9
+           MOVE    SUM-CNT     (1) TO  WRK-ZZ9
            MOVE    WRK-ZZ9         TO  HCN61-GCNT
-           MOVE    SUM-BIRTHCNT    TO  WRK-ZZ9
+           MOVE    SUM-BIRTHCNT(1) TO  WRK-ZZ9
            MOVE    WRK-ZZ9         TO  HCN61-GBIRTHCNT
-           MOVE    SUM-MONEY       TO  WRK-ZZZZZZZ9
+           MOVE    SUM-MONEY   (1) TO  WRK-ZZZZZZZ9
            MOVE    WRK-ZZZZZZZ9    TO  HCN61-GDAIRI-MONEY
-      *
-      *    ＣＳＶ（データレコード）編集処理
-           PERFORM 2001-CSV-DATA-7111-RECORD-HENSYU-SEC
            .
       *
        2003-TERM-PRINT-EXT.
@@ -1028,7 +1027,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            MOVE    "2,"            TO  WRK-REC
            MOVE    2               TO  WRK-REC-LENGTH
       *    レコード番号
-           MOVE    WRK-DATA-SEQ-NO TO  WRK-NUM
+           ADD     1               TO  WRK-SEQ-NO
+           MOVE    WRK-SEQ-NO      TO  WRK-NUM
            MOVE    9               TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    交換情報識別番号
@@ -1058,16 +1058,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC
       *    件数
-           MOVE    SUM-CNT         TO  WRK-NUM
+           MOVE    SUM-CNT     (2) TO  WRK-NUM
            MOVE    6               TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    出産数
-           MOVE    SUM-BIRTHCNT    TO  WRK-NUM
+           MOVE    SUM-BIRTHCNT(2) TO  WRK-NUM
            MOVE    6               TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    出産育児一時金等代理受取額合計
-           MOVE    SUM-MONEY       TO  WRK-NUM
-           MOVE    12               TO  WRK-NAGASA
+           MOVE    SUM-MONEY   (2) TO  WRK-NUM
+           MOVE    12              TO  WRK-NAGASA
            MOVE    1               TO  WRK-END 
            PERFORM 5005-NUM-HENSYU-SEC
       *
@@ -1080,7 +1080,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            MOVE    BUNBEN-PTID     TO  WRK-SCSVINFO-PTID
            MOVE    SPACE           TO  WRK-SCSVINFO-NYUGAIKBN
-           MOVE    WRK-DATA-SEQ-NO TO  WRK-SCSVINFO-SEQ-NO
+           MOVE    WRK-SEQ-NO      TO  WRK-SCSVINFO-SEQ-NO
            PERFORM 500-CSVINFO-SEC
       *
            ADD     1               TO  SUM-RECORD-CNT
