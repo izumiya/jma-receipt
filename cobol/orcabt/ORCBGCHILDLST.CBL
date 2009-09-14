@@ -345,6 +345,14 @@
            MOVE    LNK-DAY2-EDTYMD1
                                    TO  H01-SYSYMD
       *
+           IF      WRK-PARA-SKYKBN =   "0" OR  "1" OR  "2" OR  "3"
+               CONTINUE
+           ELSE
+               MOVE    "請求区分の設定が誤っています" 
+                                       TO  WRK-BUNBENERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+      *
       *    分娩管理読込
            MOVE    "%"             TO  WRK-TEISYUTUSAKI
            PERFORM 900-BUNBEN-READ-SEC
