@@ -612,6 +612,10 @@
            MOVE   "HCMSL55.red"        TO  SPRT-PRTID
            MOVE    HCMSL55             TO  SPRT-PRTDATA
            EVALUATE    KEY-O-TEISYUTUSAKI
+               WHEN    SPACE
+                   MOVE
+                       "（請求年月なし）出産育児一時金チェックリスト"
+                                           TO  SPRT-TITLE
                WHEN    "1"
                    MOVE
                        "（社保）出産育児一時金チェックリスト"
