@@ -160,6 +160,7 @@
            03  WRK-ZZZZZZZ9        PIC ZZ,ZZZ,ZZ9.
       *
            03  WRK-CONTROL-SEQ-NO  PIC 9(06).
+           03  WRK-DATA-SEQ-NO     PIC 9(06).
            03  WRK-SEQ-NO          PIC 9(06).
            03  WRK-PAGE            PIC 9(05).
            03  WRK-OUT             PIC 9(03).
@@ -517,6 +518,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            MOVE    1               TO  WRK-SEQ-NO
            MOVE    WRK-SEQ-NO      TO  WRK-CONTROL-SEQ-NO
+      *
+           ADD     1               TO  WRK-SEQ-NO
+           MOVE    WRK-SEQ-NO      TO  WRK-DATA-SEQ-NO
       *
       *    削除処理
            PERFORM 1001-CSVINFO-CLEAR-SEC
@@ -1027,8 +1031,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            MOVE    "2,"            TO  WRK-REC
            MOVE    2               TO  WRK-REC-LENGTH
       *    レコード番号
-           ADD     1               TO  WRK-SEQ-NO
-           MOVE    WRK-SEQ-NO      TO  WRK-NUM
+           MOVE    WRK-DATA-SEQ-NO TO  WRK-NUM
            MOVE    9               TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    交換情報識別番号
@@ -1080,7 +1083,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            MOVE    BUNBEN-PTID     TO  WRK-SCSVINFO-PTID
            MOVE    SPACE           TO  WRK-SCSVINFO-NYUGAIKBN
-           MOVE    WRK-SEQ-NO      TO  WRK-SCSVINFO-SEQ-NO
+           MOVE    WRK-DATA-SEQ-NO TO  WRK-SCSVINFO-SEQ-NO
            PERFORM 500-CSVINFO-SEC
       *
            ADD     1               TO  SUM-RECORD-CNT
