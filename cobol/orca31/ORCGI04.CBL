@@ -533,9 +533,9 @@
            COPY    "I05.INC".
            COPY    "I06.INC".
            COPY    "I07.INC".
+           COPY    "I08.INC".
            COPY    "I0ERR.INC".
            COPY    "I0ID1.INC".
-           COPY    "I08.INC".
            COPY    "I0ID2.INC".
            COPY    "I041.INC".
       *
