@@ -688,10 +688,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                    MOVE    ZERO                TO  BUNBEN-MONEY (10)
                END-IF
       *
-               INITIALIZE                      PTINF-REC
-               MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
-               MOVE    BUNBEN-PTID         TO  PTINF-PTID
-               PERFORM 900-PTINF-READ-SEC
+      ******** INITIALIZE                      PTINF-REC
+      ******** MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
+      ******** MOVE    BUNBEN-PTID         TO  PTINF-PTID
+      ******** PERFORM 900-PTINF-READ-SEC
       *
                EVALUATE    BUNBEN-KANYUKBN
                    WHEN    "1"
@@ -1729,6 +1729,15 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC          =   ZERO
                MOVE    MCPDATA-REC     TO  BUNBEN-REC
+      *
+               INITIALIZE                      PTINF-REC
+               MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
+               MOVE    BUNBEN-PTID         TO  PTINF-PTID
+               PERFORM 900-PTINF-READ-SEC
+               IF      PTINF-TSTPTNUMKBN   =   "1"
+                   GO TO  900-BUNBEN-READ-N-SEC
+               END-IF
+      *
                MOVE    BUNBEN-BUNBENKBN
                                        TO  KEY-N-BUNBENKBN
                MOVE    BUNBEN-HKNJANUM-S

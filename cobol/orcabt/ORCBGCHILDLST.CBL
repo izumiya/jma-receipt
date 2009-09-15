@@ -764,6 +764,14 @@
            IF      MCP-RC          =   ZERO
                MOVE    MCPDATA-REC     TO  BUNBEN-REC
       *
+               MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
+               MOVE    BUNBEN-PTID     TO  PTINF-PTID
+               MOVE    PTINF-REC       TO  MCPDATA-REC
+               PERFORM 900-PTINF-READ-SEC
+               IF      PTINF-TSTPTNUMKBN   =   "1"
+                   GO TO  900-BUNBEN-READ-N-SEC
+               END-IF
+      *
                EVALUATE    WRK-PARA-SKYKBN
                    WHEN    "1"
                        IF      BUNBEN-SKYKBN   =   "2"
