@@ -233,6 +233,7 @@
       *  04.02.17    NACL-Æ£¸¶    09/08/17  ¡ÖÊ¿À®£²£±Ç¯£··îÃæ¹ñ¡¦¶å½£
       *                                     ËÌÉô¹ë±«¡×ÂÐ±þ
       *                                     £²£°£°£¹Ç¯£··î¡ÁÂÐ¾Ý 
+      *  04.02.18    NACL-ÌçÏÆ    09/09/15  ºë¶Ì¸©ÃÏÊý¸øÈñ¿©»öÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -447,6 +448,7 @@
            03  IDZ4                    PIC 9(03).
            03  IDZ5                    PIC 9(03).
            03  IDZ6                    PIC 9(03).
+           03  IDZ7                    PIC 9(03).
            03  IDYY                    PIC 9(03).
            03  IDZZ                    PIC 9(03).
            03  IDWW                    PIC 9(03).
@@ -601,6 +603,10 @@
       *
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
+      *
+      *    ¿©»öÎÅÍÜÊÔ½¸¾ðÊó
+           03  WRK-FUKUSHIFLG-SKJINF-AREA.
+               05  WRK-FUKUSHIFLG-SKJ  PIC X(01)   OCCURS 4.
       *                 
       *    ÊÝ¸±ÍúÎòÊÔ½¸¡ÊÅ¬ÍÑÍó¡Ë
            03  WRK-HKN-RIREKI-AREA.
@@ -5798,6 +5804,21 @@
                                END-IF
                            END-IF
                            IF    ( IDZ1              >  3     )
+                               MOVE  RECE62-FUKUSHIFLG-SKJSEIINF-AREA
+                                   TO  WRK-FUKUSHIFLG-SKJINF-AREA
+                               PERFORM VARYING IDZ7  FROM  1  BY  1
+                                        UNTIL  IDZ7   >    4
+                                IF RECE62-FUKUSHIFLG-SKJSEI(IDZ7) = "2"
+                                  EVALUATE  IDZ1
+                                   WHEN     4
+                                     MOVE SPACE TO
+                                        RECE62-FUKUSHIFLG-SKJSEI(IDZ7)
+                                   WHEN     5
+                                     MOVE  "1"  TO
+                                        RECE62-FUKUSHIFLG-SKJSEI(IDZ7)
+                                  END-EVALUATE
+                                END-IF
+                               END-PERFORM
                                IF      RECE62-FUKUSHIFLG-SKJSEIINF-AREA
                                                        NOT =   SPACE
                                  EVALUATE    WRK-FTNKBN
@@ -5932,6 +5953,8 @@
                                      MOVE    ZERO            TO  FLG-CHK
                                  END-IF
                                END-IF 
+                               MOVE  WRK-FUKUSHIFLG-SKJINF-AREA
+                                   TO  RECE62-FUKUSHIFLG-SKJSEIINF-AREA
                            END-IF
                          END-IF 
                        END-IF
