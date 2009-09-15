@@ -383,6 +383,7 @@
       *  04.03.35    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
       *  04.03.36    NACL-ÌçÏÆ    09/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.03.37    NACL-ÌçÏÆ    09/09/11  µÜºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.03.38    NACL-ÌçÏÆ    09/09/15  ºë¶Ì¸©ÃÏÊý¸øÈñ¿©»öÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12497,7 +12498,18 @@
                       (RECE62-KOHNUM(KH-IDX - 1)     =
                                         "352" OR "353" OR "354"  ) AND
                       (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "1"))
+                  OR ((WRK-PREFNUM                   =    "11"   ) AND
+                      (RECE62-KOHNUM(KH-IDX - 1)     =    "382"  ) AND
+                      (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "1") AND
+                      (RECE62-SRYYM    >=  "200910"              ))
+                   IF ((WRK-PREFNUM                  =    "11"   ) AND
+                       (RECE62-KOHNUM(KH-IDX - 1)    =    "382"  ) AND
+                       (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1) = "1") AND
+                       (RECE62-SRYYM    >=  "200910"             ))
+                      MOVE     2     TO    FLG-TOKUSYU-SKJ
+                   ELSE
                       MOVE     1     TO    FLG-TOKUSYU-SKJ
+                   END-IF
                   ELSE
                       MOVE    ZERO   TO    FLG-TOKUSYU-SKJ
                   END-IF
@@ -12637,13 +12649,21 @@
                   END-IF
                 END-IF
       *
-                IF   FLG-TOKUSYU-SKJ  =   1
+                IF   FLG-TOKUSYU-SKJ  NOT =  ZERO
       *           IF    SYU-SKJ-NISSU(IDX3)  NOT =  ZERO
                   IF    SYU-SKJ-RYOYOHI(IDX3) NOT =  ZERO
                         MOVE    SPACE    TO
                             RECE62-FUKUSHIFLG-SKJIPA(KH-IDX - 1)
-                        MOVE    "1"      TO
-                            RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+                        EVALUATE  FLG-TOKUSYU-SKJ
+      *                   À¸³èÎÅÍÜ¡Ê¿©»ö¡Ë¡Ê´Ä¶­¡Ë¤òÂÐ¾Ý
+                          WHEN       1
+                            MOVE  "1"  TO
+                                  RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+      *                   À¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë¤Î¤ß¤òÂÐ¾Ý
+                          WHEN       2
+                            MOVE  "2"  TO
+                                  RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+                        END-EVALUATE
                         MOVE     1       TO
                                   WRK-TOKUSYU-SKJFLG(KH-IDX - 1)
                   ELSE
