@@ -389,6 +389,7 @@
       *  04.04.23    NACL-門脇    09/09/10  月途中に医保と生保の併用から
       *                                     生保単独になったときの対応
       *  04.04.24    NACL-門脇    09/09/11  宮崎県地方公費対応
+      *  04.04.25    NACL-門脇    09/09/15  埼玉県地方公費食事対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12562,7 +12563,18 @@
                       (RECE62-KOHNUM(KH-IDX - 1)     =
                                         "352" OR "353" OR "354"  ) AND
                       (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "1"))
+                  OR ((WRK-PREFNUM                   =    "11"   ) AND
+                      (RECE62-KOHNUM(KH-IDX - 1)     =    "382"  ) AND
+                      (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1)  = "1") AND
+                      (RECE62-SRYYM    >=  "200910"              ))
+                   IF ((WRK-PREFNUM                  =    "11"   ) AND
+                       (RECE62-KOHNUM(KH-IDX - 1)    =    "382"  ) AND
+                       (RECE62-HON-NYUSKJRYYKBN(KH-IDX - 1) = "1") AND
+                       (RECE62-SRYYM    >=  "200910"             ))
+                      MOVE     2     TO    FLG-TOKUSYU-SKJ
+                   ELSE
                       MOVE     1     TO    FLG-TOKUSYU-SKJ
+                   END-IF
                   ELSE
                       MOVE    ZERO   TO    FLG-TOKUSYU-SKJ
                   END-IF
@@ -12703,13 +12715,21 @@
                   END-IF
                 END-IF
       *
-                IF   FLG-TOKUSYU-SKJ  =   1
+                IF   FLG-TOKUSYU-SKJ  NOT =  ZERO
       *           IF    SYU-SKJ-NISSU(IDX3)  NOT =  ZERO
                   IF    SYU-SKJ-RYOYOHI(IDX3) NOT =  ZERO
                         MOVE    SPACE    TO
                             RECE62-FUKUSHIFLG-SKJIPA(KH-IDX - 1)
-                        MOVE    "1"      TO
-                            RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+                        EVALUATE  FLG-TOKUSYU-SKJ
+      *                   生活療養（食事）（環境）を対象
+                          WHEN       1
+                            MOVE  "1"  TO
+                                  RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+      *                   生活療養（環境）のみを対象
+                          WHEN       2
+                            MOVE  "2"  TO
+                                  RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+                        END-EVALUATE
                         MOVE     1       TO
                                   WRK-TOKUSYU-SKJFLG(KH-IDX - 1)
                   ELSE
