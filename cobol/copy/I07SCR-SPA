@@ -75,8 +75,6 @@
                    07  SPA-GMN-MEIPRTKBN       PIC X(01).
                    07  SPA-GMN-MEIPRTKBNF      PIC X(01).
                    07  SPA-GMN-MEIPRTKBNMEI    PIC X(20).
-               05  SPA-GMN-LBLINFO01           PIC X(100).
-               05  SPA-GMN-LBLINFO02           PIC X(20).
                05  SPA-GMN-CMB-AREA.
                    07  SPA-GMN-RIYOUKBNLST-G.
                        09  SPA-GMN-RIYOUKBN-MAX        PIC 9(03).
@@ -122,6 +120,7 @@
                05  SPA-NAI-BIRTHDAY-BABY       PIC X(08).
                05  SPA-NAI-HKNJANUM-S          PIC X(08).
                05  SPA-NAI-RECESAKI            PIC X(01).
+               05  SPA-NAI-CHGNAME             PIC 9(01).
          02  SPA-I08.
            03  SPA-GMN-I08-CUR                 PIC 9(03).
            03  SPA-GMN-I08-AREA.

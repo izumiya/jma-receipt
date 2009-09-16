@@ -78,7 +78,9 @@
                 04  I07-MEIPRTKBN          PIC X(22).
                 04  I07-MEIPRTKBN-COUNT    PIC S9(9)   BINARY.
                 04  I07-MEIPRTKBN-ITEM     PIC X(22)   OCCURS  5 TIMES.
-              03  I07-LBLINFO01            PIC X(100).
-              03  I07-LBLINFO01-STYLE      PIC X(20).
-              03  I07-LBLINFO02            PIC X(20).
-              03  I07-LBLINFO02-STYLE      PIC X(20).
+              03  I07-LBLINFO01-OCC        OCCURS  4 TIMES.
+                04  I07-LBLINFO            PIC X(100).
+                04  I07-LBLINFO-STYLE      PIC X(20).
+              03  I07-LBLHEADER            PIC X(20).
+              03  I07-LBLHEADER-STYLE      PIC X(20).
+

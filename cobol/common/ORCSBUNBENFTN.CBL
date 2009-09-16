@@ -46,9 +46,11 @@
            03  FLG-PTINF           PIC 9(01).
            03  FLG-PTNUM           PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
+           03  FLG-BUNBEN          PIC 9(01).
            03  FLG-BUNBENFTN       PIC 9(01).
            03  FLG-BUNBENHKN       PIC 9(01).
            03  FLG-LOOPEND         PIC 9(01).
+           03  FLG-KYUSEIRRK       PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -59,6 +61,7 @@
        01  WRK-AREA.
            03  WRK-HKNNUM          PIC X(03).
            03  WRK-HOJOKBN         PIC X(01).
+           03  WRK-KYUSEINAME      PIC X(100).
       *
       *    ¥Þ¥·¥óÆüÉÕ¼èÆÀ¥µ¥Ö
            COPY    "CPORCSMCNDATE.INC".
@@ -66,6 +69,14 @@
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
+      *
+      *    µìÀ«ÍúÎò
+       01  KYUSEIRRK-REC.
+           COPY  "CPKYUSEIRRK.INC".
+      *
+      *    Ê¬ÊÚ´ÉÍý
+       01  BUNBEN-REC.
+           COPY  "CPBUNBEN.INC".
       *
       *    ÊÝ¸±ÁÈ¹ç¤»
        01  HKNCOMBI-REC.
@@ -152,9 +163,22 @@
       *****************************************************************
        100-INIT-SEC                    SECTION.
       *
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+      *
            PERFORM 900-PTNYUINRRK-KEY4-SEL-SEC
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
+      *
+           MOVE    SPACE               TO  WRK-KYUSEINAME
+           PERFORM 900-KYUSEIRRK-KEY3-SEL-SEC
+           PERFORM UNTIL ( FLG-KYUSEIRRK   NOT =   ZERO )
+               MOVE    KYUSEI-KANANAME
+                                       TO  WRK-KYUSEINAME
+               PERFORM 900-KYUSEIRRK-KEY3-FET-SEC
+           END-PERFORM
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            PERFORM 900-PTNUM-KEY-SEL-SEC
       *
@@ -182,7 +206,11 @@
       *****************************************************************
        2001-EDIT-NYUININF-SEC          SECTION.
       *
-           MOVE    PTINF-KANANAME      TO  LNKBUNBEN-NAME
+           IF    ( WRK-KYUSEINAME      =   SPACE )
+               MOVE    PTINF-KANANAME  TO  LNKBUNBEN-NAME
+           ELSE
+               MOVE    WRK-KYUSEINAME  TO  LNKBUNBEN-NAME
+           END-IF
            MOVE    PTNUM-PTNUM         TO  LNKBUNBEN-PTNUM
            MOVE    "000000"            TO  LNKBUNBEN-SKYYM
            MOVE    PTNYUINRRK-RRKNUM   TO  LNKBUNBEN-RRKNUM
@@ -355,6 +383,18 @@
            MOVE    "tbl_pthkninf"      TO  MCP-TABLE
            MOVE    "key8"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF    ( BUNBEN-RIYOUKBN         =   "1" )
+               IF    ( BUNBEN-BUNBENKBN    =   "1" )
+                       MOVE    "2"     TO  LNKBUNBEN-TEISYUTUSAKI
+               ELSE
+                   IF    ( LNKBUNBEN-KANYUKBN  =    "2" )
+                       MOVE    "2"     TO  LNKBUNBEN-TEISYUTUSAKI
+                   ELSE
+                       MOVE    "1"     TO  LNKBUNBEN-TEISYUTUSAKI
+                   END-IF
+               END-IF
+           END-IF
       *
            .
        2001-EDIT-HKNINF-EXT.
@@ -592,6 +632,51 @@
        900-PTINF-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
+      *    µìÀ«ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-KYUSEIRRK-KEY3-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KYUSEIRRK
+      *
+           INITIALIZE                      KYUSEIRRK-REC
+           MOVE    PTNYUINRRK-HOSPNUM  TO  KYUSEI-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  KYUSEI-PTID
+           MOVE    PTNYUINRRK-TAIINYMD TO  KYUSEI-CHGYMD
+           MOVE    KYUSEIRRK-REC       TO  MCPDATA-REC
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  KYUSEIRRK-REC
+           ELSE
+               INITIALIZE                  KYUSEIRRK-REC
+               MOVE    1               TO  FLG-KYUSEIRRK
+           END-IF
+      *
+           .
+       900-KYUSEIRRK-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    µìÀ«ÍúÎòFETCH½èÍý
+      *****************************************************************
+       900-KYUSEIRRK-KEY3-FET-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KYUSEIRRK
+      *
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  KYUSEIRRK-REC
+           ELSE
+               INITIALIZE                  KYUSEIRRK-REC
+               MOVE    1               TO  FLG-KYUSEIRRK
+           END-IF
+      *
+           .
+       900-KYUSEIRRK-KEY3-FET-EXT.
+           EXIT.
+      *****************************************************************
       *    ÊÝ¸±ÁÈ¹ç¤»¼èÆÀ½èÍý
       *****************************************************************
        900-HKNCOMBI-KEY-SEL-SEC        SECTION.
@@ -630,7 +715,7 @@
            INITIALIZE                      PTNUM-REC
            MOVE    LNKBUNBEN-HOSPNUM   TO  PTNUM-HOSPNUM
            MOVE    LNKBUNBEN-PTID      TO  PTNUM-PTID
-           MOVE    LNKBUNBEN-REC       TO  MCPDATA-REC
+           MOVE    PTNUM-REC           TO  MCPDATA-REC
            MOVE    "tbl_ptnum"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
@@ -647,6 +732,32 @@
       *
            .
        900-PTNUM-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ê¬ÊÚ´ÉÍý¸¡º÷½èÍý
+      *****************************************************************
+       900-BUNBEN-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BUNBEN
+      *
+           MOVE    LNKBUNBEN-REC   TO  MCPDATA-REC
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BUNBEN-REC
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    1           TO  FLG-BUNBEN
+           END-IF
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-BUNBEN-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý

@@ -1660,38 +1660,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>LBLINFO02</name>
-      <x>696</x>
-      <y>40</y>
-      <width>160</width>
-      <height>24</height>
-      <label>メッセージ表示</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLINFO01</name>
-      <x>48</x>
-      <y>616</y>
-      <width>880</width>
-      <height>24</height>
-      <label>メッセージ表示</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label2341</name>
       <x>396</x>
       <y>276</y>
@@ -1885,6 +1853,86 @@
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLHEADER</name>
+      <x>696</x>
+      <y>40</y>
+      <width>160</width>
+      <height>24</height>
+      <label>メッセージ表示</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLINFO01</name>
+      <x>48</x>
+      <y>608</y>
+      <width>880</width>
+      <height>24</height>
+      <label>メッセージ表示</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLINFO02</name>
+      <x>48</x>
+      <y>632</y>
+      <width>880</width>
+      <height>24</height>
+      <label>メッセージ表示</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLINFO03</name>
+      <x>48</x>
+      <y>656</y>
+      <width>880</width>
+      <height>24</height>
+      <label>メッセージ表示</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLINFO04</name>
+      <x>48</x>
+      <y>680</y>
+      <width>880</width>
+      <height>24</height>
+      <label>メッセージ表示</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>

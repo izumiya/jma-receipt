@@ -145,6 +145,18 @@ I07	{
 			style	varchar(20);
 		};
 		LBLINFO02	{
+			value	varchar(100);
+			style	varchar(20);
+		};
+		LBLINFO03	{
+			value	varchar(100);
+			style	varchar(20);
+		};
+		LBLINFO04	{
+			value	varchar(100);
+			style	varchar(20);
+		};
+		LBLHEADER	{
 			value	varchar(20);
 			style	varchar(20);
 		};

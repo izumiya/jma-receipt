@@ -415,7 +415,7 @@
            END-IF
       *
            MOVE    BUNBEN-PTNUM        TO  SPA-GMN-PTNUM
-           MOVE    BUNBEN-NAME         TO  SPA-GMN-KANANAME
+           MOVE    LNKBUNBEN-NAME      TO  SPA-GMN-KANANAME
            MOVE    PTINF-NAME          TO  SPA-GMN-NAME
            MOVE    PTNYUINRRK-NYUINYMD TO  SPA-NAI-NYUINYMD
            MOVE    PTNYUINRRK-NYUINYMD TO  WRK-SYMD
@@ -460,17 +460,31 @@
            MOVE    BUNBEN-BIKOU        TO  SPA-GMN-BIKOU
            MOVE    BUNBEN-HKNJANUM-S   TO  SPA-NAI-HKNJANUM-S
       *
-           IF    ( SPA-I07-MOTOPG      =   "I01" )
-            AND  ( BUNBEN-RIYOUKBN     =   "1" )
-            AND  ( BUNBEN-BUNBENKBN    =   "2" )
-               IF    ( BUNBEN-TEISYUTUSAKI
+           IF    ( SPA-I07-MOTOPG          =   "I01" )
+               IF    ( BUNBEN-RIYOUKBN     =   "1" )
+                AND  ( BUNBEN-BUNBENKBN    =   "2" )
+                   IF    ( BUNBEN-TEISYUTUSAKI
                                        =   "2" )
-                   MOVE    "2"         TO  SPA-NAI-RECESAKI
+                       MOVE    "2"     TO  SPA-NAI-RECESAKI
+                   ELSE
+                       MOVE    "1"     TO  SPA-NAI-RECESAKI
+                   END-IF
                ELSE
-                   MOVE    "1"         TO  SPA-NAI-RECESAKI
+                   IF    ( LNKBUNBEN-KANYUKBN  =   "2" )
+                       MOVE    "2"     TO  SPA-NAI-RECESAKI
+                   ELSE
+                       MOVE    "1"     TO  SPA-NAI-RECESAKI
+                   END-IF
                END-IF
+      *
+               IF    ( BUNBEN-NAME     =   LNKBUNBEN-NAME )
+                   CONTINUE
+               ELSE
+                   MOVE    1           TO  SPA-NAI-CHGNAME
+               END-IF
+      *
            ELSE
-               IF    ( LNKBUNBEN-KANYUKBN  =   "2" )
+               IF    ( BUNBEN-KANYUKBN =   "2" )
                    MOVE    "2"         TO  SPA-NAI-RECESAKI
                ELSE
                    MOVE    "1"         TO  SPA-NAI-RECESAKI
@@ -1604,6 +1618,8 @@
                IF    ( SPA-I07-MOTOPG  =   "I04" )
                    MOVE    "JOIN"          TO  MCP-PUTTYPE
                    PERFORM 210-BACK
+               ELSE
+                   PERFORM 310-SPASET-SEC
                END-IF
            END-IF
       *
@@ -1770,14 +1786,24 @@
                                                            (IDX-CMB)
            END-PERFORM
       *
-           MOVE    "black"                 TO  I07-LBLINFO01-STYLE
-           MOVE    SPA-GMN-LBLINFO01       TO  I07-LBLINFO01
+           MOVE    "black"                 TO  I07-LBLINFO-STYLE (1)
+           MOVE    "black"                 TO  I07-LBLINFO-STYLE (2)
+           MOVE    "black"                 TO  I07-LBLINFO-STYLE (3)
+           MOVE    "black"                 TO  I07-LBLINFO-STYLE (4)
+           MOVE    "black"                 TO  I07-LBLHEADER-STYLE
       *
-           MOVE    "black"                 TO  I07-LBLINFO02-STYLE
+           IF    ( SPA-NAI-CHGNAME         =   "1" )
+               MOVE    "red"               TO  I07-LBLINFO-STYLE (1)
+               STRING  "氏名が変更されています。"      DELIMITED BY SIZE
+                       "登録ボタンを押してください。"  DELIMITED BY SIZE
+               INTO     I07-LBLINFO (1)
+               END-STRING
+           END-IF
+      *
            IF    ( SPA-GMN-HKNJANUM        =   SPACE )
             AND  ( SPA-GMN-RIYOUKBN        =   "1" )
-               MOVE    "red"               TO  I07-LBLINFO02-STYLE
-               MOVE    "保険者番号未入力"  TO  I07-LBLINFO02
+               MOVE    "red"               TO  I07-LBLHEADER-STYLE
+               MOVE    "保険者番号未入力"  TO  I07-LBLHEADER
            END-IF
       *
       *    項目状態編集
