@@ -561,7 +561,7 @@
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC     TO  SYS-1900-REC
-               IF      SYS-1900-PRTKBN(13) NOT =   SPACE
+               IF      SYS-1900-PRTKBN(11) NOT =   SPACE
       *            ∞ÂŒ≈µ°¥ÿÃææŒ ‘Ω∏æ Û
                    PERFORM 900-1901-READ-SEC
       *            ∞ÂŒ≈µ°¥ÿΩªΩÍ ‘Ω∏æ Û
@@ -584,7 +584,7 @@
            MOVE    SPACE           TO  SYS-1901-REC
            INITIALIZE                  SYS-1901-REC
            MOVE    "1901"          TO  SYS-1901-KANRICD
-           MOVE    SYS-1900-PRTKBN(13)
+           MOVE    SYS-1900-PRTKBN(11)
                                    TO  SYS-1901-KBNCD
            MOVE    SPA-SRYYMD      TO  SYS-1901-STYUKYMD
            MOVE    SPA-SRYYMD      TO  SYS-1901-EDYUKYMD
@@ -614,7 +614,7 @@
            MOVE    SPACE           TO  SYS-1902-REC
            INITIALIZE                  SYS-1902-REC
            MOVE    "1902"          TO  SYS-1902-KANRICD
-           MOVE    SYS-1900-PRTKBN(13)
+           MOVE    SYS-1900-PRTKBN(11)
                                    TO  SYS-1902-KBNCD
            MOVE    SPA-SRYYMD      TO  SYS-1902-STYUKYMD
            MOVE    SPA-SRYYMD      TO  SYS-1902-EDYUKYMD
