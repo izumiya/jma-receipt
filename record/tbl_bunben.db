@@ -142,3 +142,10 @@ path	key4 	{
 		;
 	};
 };
+
+path	abort	{
+	DBSELECT	{
+		error
+ 		;
+	};
+};
