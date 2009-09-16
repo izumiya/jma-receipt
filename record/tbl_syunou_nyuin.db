@@ -193,3 +193,14 @@ path	del5 	{
 	};
 };
 
+
+path	all 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_nyuin_all_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_nyuin
+			WHERE   HOSPNUM    =   :HOSPNUM
+		;
+	};
+};
+

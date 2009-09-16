@@ -90,3 +90,14 @@ path    del3    {
         };
 };
 
+
+path	all 	{
+	DBSELECT	{
+		DECLARE tbl_sryacct_sub_all_csr CURSOR FOR
+		SELECT *
+		FROM tbl_sryacct_sub
+			WHERE   HOSPNUM    =   :HOSPNUM
+		;
+	};
+};
+
