@@ -786,7 +786,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                    MOVE    WRK-ZZZZZZZ9        TO  HCN61-BUNBEN-MONEY
                                                            (CNT-LINE)
                ELSE
-                   MOVE    "　−　　　"        TO  HCN61-KAIJO-MONEY
+                   MOVE    "　−　　　"        TO  HCN61-BUNBEN-MONEY
                                                            (CNT-LINE)
                END-IF
                MOVE    BUNBEN-MONEY (5)    TO  WRK-ZZZZZZZ9
