@@ -62,6 +62,7 @@
            03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-PTINF                   PIC 9(01).
            03  FLG-ENTRYCHK                PIC 9(01).
+           03  FLG-KYUSEIRRK               PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -85,6 +86,7 @@
            03  WRK-I0IDMSG                 PIC X(80).
            03  WRK-NINPUFTN-MONEY          PIC 9(10).
            03  WRK-CREYMD                  PIC X(08).
+           03  WRK-KYUSEINAME              PIC X(100).
       *
       *
        01  CONST-AREA.
@@ -96,6 +98,10 @@
       *
            COPY    "CPSYSKANRI.INC".
            COPY    "CPSK1001.INC".
+      *
+      *    µìÀ«ÍúÎò
+       01  KYUSEIRRK-REC.
+           COPY  "CPKYUSEIRRK.INC".
       *
       *    Ê¬ÊÚ´ÉÍý
        01  BUNBEN-REC.
@@ -398,6 +404,16 @@
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
       *
+           MOVE    SPACE               TO  WRK-KYUSEINAME
+           PERFORM 900-KYUSEIRRK-KEY3-SEL-SEC
+           PERFORM UNTIL ( FLG-KYUSEIRRK   NOT =   ZERO )
+               MOVE    KYUSEI-NAME     TO  WRK-KYUSEINAME
+               PERFORM 900-KYUSEIRRK-KEY3-FET-SEC
+           END-PERFORM
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
            INITIALIZE                  SYSKANRI-REC
            MOVE    "1001"          TO  SYS-KANRICD
            MOVE    "*"             TO  SYS-KBNCD
@@ -416,7 +432,11 @@
       *
            MOVE    BUNBEN-PTNUM        TO  SPA-GMN-PTNUM
            MOVE    LNKBUNBEN-NAME      TO  SPA-GMN-KANANAME
-           MOVE    PTINF-NAME          TO  SPA-GMN-NAME
+           IF    ( WRK-KYUSEINAME      =   SPACE )
+               MOVE    PTINF-NAME      TO  SPA-GMN-NAME
+           ELSE
+               MOVE    WRK-KYUSEINAME  TO  SPA-GMN-NAME
+           END-IF
            MOVE    PTNYUINRRK-NYUINYMD TO  SPA-NAI-NYUINYMD
            MOVE    PTNYUINRRK-NYUINYMD TO  WRK-SYMD
            PERFORM 800-HIZUKE-CHK-SEC
@@ -2293,6 +2313,51 @@
            .
       *
        900-BUNBEN-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    µìÀ«ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-KYUSEIRRK-KEY3-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KYUSEIRRK
+      *
+           INITIALIZE                      KYUSEIRRK-REC
+           MOVE    PTNYUINRRK-HOSPNUM  TO  KYUSEI-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  KYUSEI-PTID
+           MOVE    PTNYUINRRK-TAIINYMD TO  KYUSEI-CHGYMD
+           MOVE    KYUSEIRRK-REC       TO  MCPDATA-REC
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  KYUSEIRRK-REC
+           ELSE
+               INITIALIZE                  KYUSEIRRK-REC
+               MOVE    1               TO  FLG-KYUSEIRRK
+           END-IF
+      *
+           .
+       900-KYUSEIRRK-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    µìÀ«ÍúÎòFETCH½èÍý
+      *****************************************************************
+       900-KYUSEIRRK-KEY3-FET-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KYUSEIRRK
+      *
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  KYUSEIRRK-REC
+           ELSE
+               INITIALIZE                  KYUSEIRRK-REC
+               MOVE    1               TO  FLG-KYUSEIRRK
+           END-IF
+      *
+           .
+       900-KYUSEIRRK-KEY3-FET-EXT.
            EXIT.
       *****************************************************************
       *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷½èÍý
