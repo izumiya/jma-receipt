@@ -205,3 +205,24 @@ path    del7    {
         };
 };
 
+
+path	all	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_koh_all_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_koh
+			WHERE   HOSPNUM    =   :HOSPNUM
+		;
+	};
+};
+
+path	all2	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_koh_all2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_koh
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   SRYYM    =   :SRYYM
+		;
+	};
+};
