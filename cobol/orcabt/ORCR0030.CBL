@@ -425,6 +425,7 @@
       *  04.04.23    NACL-ÌçÏÆ    09/09/11  µÜºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.24    NACL-ÌçÏÆ    09/09/17  ÅìµþÅÔ¥Þ¥ë»ÒÂÐ±þ
       *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
+      *  04.04.25    NACL-ÌçÏÆ    09/09/17  °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1063,6 +1064,8 @@
            03  WRK-SEIKYUEDYMD                 PIC  9(08).
            03  WRK-STYMD                       PIC  X(08).
            03  WRK-EDYMD                       PIC  X(08).
+      *
+           03  WRK-KOH-KINGAKU                 PIC  9(07).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -9926,6 +9929,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (RECE02-KOHNUM(1)      = "191") AND
                 (RECE02-SRYYM      >= "200910"))
               PERFORM  21093-ZENKI-TOKUREI-OKIKAE-SEC
+           ELSE
+              IF   RECE02-ZAITAKU  =  "1" OR "2"
+                CONTINUE
+              ELSE
+                PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
+                          UNTIL   KOHFTN-IDX   >    4
+                  IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
+                     PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
+                  END-IF
+                END-PERFORM
+              END-IF
            END-IF
       *
       *    ¸ºÌÈ¸øÈñÂÐ±þ
@@ -11179,6 +11193,45 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        21094-JYOGENGAKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¾å¸Â³Û¤Î¤¢¤ëÁ´¹ñ¸øÈñ¤Î°ìÉôÉéÃ´¶âÊÔ½¸
+      *****************************************************************
+       21095-KOH-ICHIBUFTN-HENSYU-SEC               SECTION.
+      *
+           MOVE    ZERO    TO   WRK-KOH-KINGAKU
+      *
+           IF   RECE02-KOHNUM(KOHFTN-IDX) =
+                "015" OR "016" OR "024" OR "079" OR "021"
+             COMPUTE  WRK-KOH-KINGAKU = RECE02-TOTALTEN(KOHFTN-IDX + 1)
+                                      * 10
+                                      * 10
+                                      / 100
+           END-IF
+      *
+           IF ( RECE02-KOHNUM(KOHFTN-IDX) =
+                "038" OR "051" OR "052"                   )
+           OR ((SYS-1001-PREFNUM          =   13         ) AND
+               (RECE02-KOHNUM(KOHFTN-IDX) =  "151"       ))
+           OR ((SYS-1001-PREFNUM          =   23         ) AND
+               (RECE02-KOHNUM(KOHFTN-IDX) =  "191"       ) AND
+               (RECE02-SRYYM             >=  "200910"    ))
+             COMPUTE  WRK-KOH-KINGAKU = RECE02-TOTALTEN(KOHFTN-IDX + 1)
+                                      * 10
+                                      * RECE02-KYURATE
+                                      / 100
+           END-IF
+      *
+           IF  (WRK-KOH-KINGAKU   NOT = ZERO                     )
+           AND (WRK-KOH-KINGAKU < RECE02-FTNMONEY(KOHFTN-IDX + 1))
+             MOVE  WRK-KOH-KINGAKU  TO
+                                  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                                  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+           END-IF
+      *
+           .
+       21095-KOH-ICHIBUFTN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
