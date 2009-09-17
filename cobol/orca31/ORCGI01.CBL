@@ -5032,21 +5032,21 @@
                        PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    END-EVALUATE
       *
-      *            IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "11" )
-      *             AND  ( SPA-GMN-I01-SYORIKBN-CD NOT =   "01" )
-      *                MOVE    "5110"      TO  WRK-KANRICD
-      *                MOVE    "24"        TO  WRK-KBNCD
-      *                MOVE    "2"         TO  WRK-TOKNYUIN-KBN
-      *                PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
-      *            END-IF
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "11" )
+                    AND  ( SPA-GMN-I01-SYORIKBN-CD NOT =   "01" )
+                       MOVE    "5110"      TO  WRK-KANRICD
+                       MOVE    "24"        TO  WRK-KBNCD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   END-IF
       *
-      *            IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "12" )
-      *             AND  ( SPA-GMN-I01-SYORIKBN-CD NOT =   "01" )
-      *                MOVE    "5110"      TO  WRK-KANRICD
-      *                MOVE    "25"        TO  WRK-KBNCD
-      *                MOVE    "2"         TO  WRK-TOKNYUIN-KBN
-      *                PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
-      *            END-IF
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "12" )
+                    AND  ( SPA-GMN-I01-SYORIKBN-CD NOT =   "01" )
+                       MOVE    "5110"      TO  WRK-KANRICD
+                       MOVE    "25"        TO  WRK-KBNCD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   END-IF
       *
                END-IF
            END-IF
