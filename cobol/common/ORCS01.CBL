@@ -289,6 +289,8 @@
       *  04.04.06    NACL-ÌçÏÆ    09/09/03  Á´¹ñÅÚÌÚ¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     ¡ÊÆàÎÉ¸©¡Ë
       *  04.04.07    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
+      *  04.04.08    NACL-ÌçÏÆ    09/09/17  ÅìµþÅÔ¥Þ¥ë»ÒÂÐ±þ
+      *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4376,6 +4378,7 @@
            AND (COMB-HKNNUM  NOT = "060" AND "067")
            AND (COMB-KOH1HKNNUM  = "588"          )
            AND (LNK-SYU-SRYYMD(1:6) >= "200710"   )
+           AND (LNK-SYU-SRYYMD(1:6) <= "200909"   )
                    MOVE    2    TO   FLG-MARUKO
            END-IF
       *
@@ -8645,6 +8648,7 @@
            AND (COMB-HKNNUM      = "060" OR "067")
            AND (COMB-KOH1HKNNUM  = "588"         )
            AND (LNK-SYU-SRYYMD(1:6) >= "200710"  )
+           AND (LNK-SYU-SRYYMD(1:6) <= "200909"  )
               IF (FLG-GENBUTU70    NOT =   ZERO)
               OR (FLG-TOKU75-CYO       =    3  )
               OR (FLG-CYOKI-ARI        =    2  )
@@ -16917,11 +16921,22 @@
       *
            IF     (WK-1001-PREFNUM         =  13           ) AND
                   (COMB-KOHHKNNUM(KOH-IDX) = "588"         ) AND
-                  (LNK-SYU-SRYYMD(1:6)    >= "200710"      )
+                  (LNK-SYU-SRYYMD(1:6)    >= "200710"      ) AND
+                  (LNK-SYU-SRYYMD(1:6)    <= "200909"      )
                     MOVE    SPACE   TO   COMB-KOH-GAIJGNKBN(KOH-IDX)
                     MOVE    ZERO    TO   WK-GAIKFTNRATE
                     MOVE    "0"     TO   WK-GAIYKZFTNKBN
                     MOVE    ZERO    TO   WK-GAIKKOTGAK
+           END-IF.
+           IF     (WK-1001-PREFNUM         =  13           ) AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "588"         ) AND
+                  (LNK-SYU-SRYYMD(1:6)    >= "200910"      )
+               IF    LNK-S01-SINSATUFLG =  SPACE
+                    MOVE    SPACE   TO   COMB-KOH-GAIJGNKBN(KOH-IDX)
+                    MOVE    ZERO    TO   WK-GAIKFTNRATE
+                    MOVE    "0"     TO   WK-GAIYKZFTNKBN
+                    MOVE    ZERO    TO   WK-GAIKKOTGAK
+               END-IF
            END-IF.
       *
            IF     (WK-1001-PREFNUM         =  31           ) AND
@@ -17215,6 +17230,14 @@
                                     LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) 
                  END-IF                                                 
                END-IF                                                   
+               IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
+               AND (LNK-SYU-KOH1HKNNUM    NOT =   "027")
+                 IF    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                     >      LNK-SYU-SYUCOMPFTN-ENTANI
+                     MOVE   LNK-SYU-SYUCOMPFTN-ENTANI  TO
+                                    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                 END-IF
+               END-IF
                PERFORM    23053-KOHHI-HIKAKU3-SEC                             
                IF ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "051"         ) OR
                   ( HKN-RECEFTNDSPKBN            =  "2"           ) OR
@@ -17224,12 +17247,19 @@
                                             ZAN-KOHI-T2(KOH-IDX)        
                      MOVE   ZAN-KOHI-T2(KOH-IDX)   TO                   
                                           WK-KOH-COMPFTN(KOH-IDX)       
-                     PERFORM    23052-KOHHI-HIKAKU2-SEC                       
                  ELSE
                      MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)   TO
                                           WK-KOH-COMPFTN(KOH-IDX)       
-                     PERFORM    23052-KOHHI-HIKAKU2-SEC                       
                  END-IF                                                 
+                 IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
+                 AND (LNK-SYU-KOH1HKNNUM    NOT =   "027")
+                   IF  WK-KOH-COMPFTN(KOH-IDX)
+                                       >  LNK-SYU-SYUCOMPFTN-ENTANI
+                     MOVE   LNK-SYU-SYUCOMPFTN-ENTANI      TO
+                                          WK-KOH-COMPFTN(KOH-IDX)
+                   END-IF
+                 END-IF
+                 PERFORM    23052-KOHHI-HIKAKU2-SEC
                END-IF                                                   
       *
                IF    LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0"
@@ -17262,6 +17292,14 @@
                               MOVE   ZERO  TO  FLG-KOUGAKUCYO-ININ
                         END-IF
                      END-IF 
+               END-IF
+               IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
+               AND (LNK-SYU-KOH1HKNNUM    NOT =   "027")
+                 IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                     >  LNK-SYU-SYUCOMPFTN
+                   MOVE   LNK-SYU-SYUCOMPFTN  TO
+                                    LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                 END-IF
                END-IF
                PERFORM    23051-KOHHI-HIKAKU-SEC                              
                MOVE  WK-GAIYKZFTNKBN
@@ -17739,7 +17777,8 @@
                   (LNK-SYU-SRYYMD(1:6)    <= "200803"      ))
              OR  ((WK-1001-PREFNUM         =  13           ) AND
                   (COMB-KOHHKNNUM(KOH-IDX) = "588"         ) AND
-                  (LNK-SYU-SRYYMD(1:6)    >= "200710"      ))
+                  (LNK-SYU-SRYYMD(1:6)    >= "200710"      ) AND
+                  (LNK-SYU-SRYYMD(1:6)    <= "200909"      ))
       *
                IF (WK-1001-PREFNUM         =  43           ) AND
                   (COMB-KOHHKNNUM(KOH-IDX) = "143" OR "342")
@@ -17758,7 +17797,8 @@
                END-IF
                IF (WK-1001-PREFNUM         =  13           ) AND
                   (COMB-KOHHKNNUM(KOH-IDX) = "588"         ) AND
-                  (LNK-SYU-SRYYMD(1:6)    >= "200710"      )
+                  (LNK-SYU-SRYYMD(1:6)    >= "200710"      ) AND
+                  (LNK-SYU-SRYYMD(1:6)    <= "200909"      )
                   PERFORM   23064-TOKYO-KOHI-SEC
                END-IF
       *

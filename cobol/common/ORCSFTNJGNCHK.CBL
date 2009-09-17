@@ -64,6 +64,8 @@
       *  04.04.02    NACL-ÌçÏÆ    09/07/02  Ä¹ºê¸©£±£¸£°³°ÍèÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/07/16  ¸øÈñ·î¾å¸Â³ÛÈ½Äê
       *  04.04.04    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
+      *  04.04.05    NACL-ÌçÏÆ    09/09/17  ÅìµþÅÔ¥Þ¥ë»ÒÂÐ±þ
+      *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -382,6 +384,11 @@
                    AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                    AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM    =  13     )
+                   AND (LNK-FTNJGNCHK-KOHNUM     = "588"   )
+                   AND (LNK-FTNJGNCHK-SRYYM     >= "200910")
+                      MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK
                    END-IF
                    MOVE   HKN-HON-NYUKFTNRATE    TO  WRK-KOHFTN-RITU
                  WHEN     "1"

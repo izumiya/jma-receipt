@@ -390,6 +390,8 @@
       *                                     生保単独になったときの対応
       *  04.04.24    NACL-門脇    09/09/11  宮崎県地方公費対応
       *  04.04.25    NACL-門脇    09/09/15  埼玉県地方公費食事対応
+      *  04.04.26    NACL-門脇    09/09/17  東京都マル子対応
+      *                                     （平成２１年１０月診療〜）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12435,7 +12437,8 @@
                 IF   ( RECE62-KOHNUM(KH-IDX - 1) =  "012" OR "025" )
                 OR   ((WRK-PREFNUM               =   13           ) AND
                       (RECE62-KOHNUM(KH-IDX - 1) =  "588"         ) AND
-                      (RECE62-SRYYM             >=  "200710"      ))
+                      (RECE62-SRYYM             >=  "200710"      ) AND
+                      (RECE62-SRYYM             <=  "200909"      ))
                 OR   ((WRK-PREFNUM               =   13           ) AND
                       (RECE62-KOHNUM(KH-IDX - 1) =
                         "180" OR "380" OR "181" OR "381"          ))
@@ -13060,6 +13063,7 @@
              WHEN    "13"
       *
                IF   RECE62-SRYYM   >=  "200710"
+               AND  RECE62-SRYYM   <=  "200909"
                  PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
                            UNTIL    KOHFTN-IDX     >    4
                    IF   RECE62-KOHNUM(KOHFTN-IDX) = "588"
