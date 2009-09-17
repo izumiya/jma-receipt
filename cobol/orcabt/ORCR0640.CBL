@@ -374,6 +374,8 @@
       *  04.02.64    NACL-ÌçÏÆ    09/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.65    NACL-ÌçÏÆ    09/09/11  µÜºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.02.66    NACL-ÌçÏÆ    09/09/15  ºë¶Ì¸©ÃÏÊý¸øÈñ¿©»öÂÐ±þ
+      *  04.02.67    NACL-ÌçÏÆ    09/09/17  ÅìµþÅÔ¥Þ¥ë»ÒÂÐ±þ
+      *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12200,7 +12202,8 @@
                 IF   ( RECE62-KOHNUM(KH-IDX - 1) =  "012" OR "025" )
                 OR   ((WRK-PREFNUM               =   13           ) AND
                       (RECE62-KOHNUM(KH-IDX - 1) =  "588"         ) AND
-                      (RECE62-SRYYM             >=  "200710"      ))
+                      (RECE62-SRYYM             >=  "200710"      ) AND
+                      (RECE62-SRYYM             <=  "200909"      ))
                 OR   ((WRK-PREFNUM               =   13           ) AND
                       (RECE62-KOHNUM(KH-IDX - 1) =
                         "180" OR "380" OR "181" OR "381"          ))
@@ -12824,6 +12827,7 @@
              WHEN    "13"
       *
                IF   RECE62-SRYYM   >=  "200710"
+               AND  RECE62-SRYYM   <=  "200909"
                  PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
                            UNTIL    KOHFTN-IDX     >    4
                    IF   RECE62-KOHNUM(KOHFTN-IDX) = "588"
