@@ -1149,7 +1149,16 @@
                        IF  (LNK-FTNJGNCHK-SRYYM  >= "200804")
                        AND (WRK-KOHFTN-RITU       =  ZERO   )
                          IF   WRK-HKNMST-JGNGAK  >  WRK-KOHFTN
+                           IF  (LNK-FTNJGNCHK-PREFNUM    =  13     )
+                           AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
+                           AND (LNK-FTNJGNCHK-KOHNUM     = "588"   )
+                           AND (LNK-FTNJGNCHK-SRYYM     >= "200910")
+                             IF   WRK-KOHFTN9-H    =  WRK-KOHFTN-H
+                               MOVE   01       TO  LNK-FTNJGNCHK-RC
+                             END-IF
+                           ELSE
                              MOVE   01         TO  LNK-FTNJGNCHK-RC
+                           END-IF
                          ELSE
                            IF  (WRK-HKNMST-JGNGAK  =  WRK-KOHFTN  )
                            AND (WRK-KOHFTN9-H      =  WRK-KOHFTN-H)
