@@ -388,6 +388,7 @@
       *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
       *  04.03.40    NACL-ÌçÏÆ    09/09/17  °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.03.41    NACL-ÌçÏÆ    09/09/18  Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
+      *  04.03.42    NACL-ÌçÏÆ    09/09/18  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11131,13 +11132,12 @@
       *****************************************************************
        2104422-ICHIBUFTN-KOH-HEN1-SEC               SECTION.
       *
-           IF  ((WRK-PREFNUM        = "42" ) AND
-                (SYU-KOH-HKNNUM(1)  = "186"))
-           OR  ((WRK-PREFNUM        = "13"          ) AND
-                (SYU-SYUHKNNUM NOT = "060" AND "067"
-                                           AND "039") AND
-                (SYU-KOH-HKNNUM(1)(1:1)
-                                 >=  "1" AND <=  "8"))
+           IF  ((WRK-PREFNUM        = "42"                     ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"                    ))
+           OR  ((WRK-PREFNUM        = "13" OR "08"             ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (IDZ                =  1                       ))
                IF    RECE62-SRYYM   >=  "200610"
                    IF  FLG-TOKU75 = 1 OR 2
                      MOVE    22200   TO   WRK-KINGAKU
@@ -11265,23 +11265,25 @@
       *****************************************************************
        2104424-ICHIBUFTN-KOH-HEN3-SEC               SECTION.
       *
-           IF  ((WRK-PREFNUM        = "01"          ) AND
-                (SYU-SYUHKNNUM NOT = "060" AND "067") AND
-                (SYU-KOH-HKNNUM(1)  = "141" OR "241") AND
-                (RECE62-SRYYM      <=  "200803"     ))
-           OR  ((WRK-PREFNUM        = "33"          ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)
-                                 >=  "1" AND <=  "8"))
-           OR  ((WRK-PREFNUM        = "13"          ) AND
-                (SYU-SYUHKNNUM NOT = "060" AND "067") AND
-                (SYU-KOH-HKNNUM(1)(1:1)
-                                 >=  "1" AND <=  "8"))
-           OR  ((WRK-PREFNUM        = "42"          ) AND
-                (SYU-KOH-HKNNUM(1)  = "186"         ))
+           IF  ((WRK-PREFNUM        = "42"                     ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"                    ))
+           OR  ((WRK-PREFNUM        = "13" OR "08"             ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "33"                     ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
+           OR  ((WRK-PREFNUM        = "01"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)  = "141" OR "241"           ) AND
+                (IDZ                =  1                       ) AND
+                (RECE62-SRYYM      <= "200803"                 ))
       *
             MOVE     ZERO    TO   FLG-KOHYONKAIME-NO
-            IF ((WRK-PREFNUM        = "42"          ) AND
-                (SYU-KOH-HKNNUM(1)  = "186"         ))
+            IF ((WRK-PREFNUM        = "42"                  ) AND
+                (SYU-KOH-HKNNUM(1)  = "186"                 ))
+            OR ((WRK-PREFNUM        = "08"                  ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"))
                MOVE   1      TO   FLG-KOHYONKAIME-NO
             END-IF
             IF  (FLG-KOHYONKAIME-NO  =  ZERO)
