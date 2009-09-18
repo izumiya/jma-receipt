@@ -296,6 +296,9 @@
       *  04.03.11    NACL-Æ£¸¶    09/08/17  ¡ÖÊ¿À®£²£±Ç¯£··îÃæ¹ñ¡¦¶å½£
       *                                     ËÌÉô¹ë±«¡×ÂÐ±þ
       *                                     £²£°£°£¹Ç¯£··î¡ÁÂÐ¾Ý 
+      *  04.03.12    NACL-Æ£¸¶    09/09/18  ¡ÖÊ¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æ¡×ÂÐ±þ
+      *                                     Ê¼¸Ë¸©¡¦²¬»³¸©
+      *                                     £²£°£°£¹Ç¯£¸·î¡Á£²£°£±£°Ç¯£±·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6984,7 +6987,21 @@ grpsys     PERFORM 900-DBFETCH-SEC
                                                MOVE    1   TO  FLG-READ
                                            END-IF
                                        ELSE
-                                           MOVE    1   TO  FLG-READ
+      *                                    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
+                                           IF    ( SYS-1001-PREFNUM
+                                                  =   "28"    OR  "33" )
+                                           AND   ( RECE02-SRYYM
+                                                  >=  200908           )
+                                           AND   ( RECE02-SRYYM
+                                                  <=  201001           )
+                                               IF RECE02-RJNGAIKOHFTN(1)
+                                                           =   ZERO
+                                                   MOVE    1
+                                                           TO  FLG-READ
+                                               END-IF
+                                           ELSE
+                                               MOVE    1   TO  FLG-READ
+                                           END-IF
                                        END-IF
                                    END-IF
                                END-IF
