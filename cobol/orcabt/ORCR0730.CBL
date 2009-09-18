@@ -72,6 +72,9 @@
       *                                     ËÌÉô¹ë±«¡×ÂÐ±þ
       *                                     £²£°£°£¹Ç¯£··î¡ÁÂÐ¾Ý 
       *  04.04.06    NACL-ÌçÏÆ    09/08/19  ½Ð»º°ì»þ¶âÂÐ±þ
+      *  04.04.07    NACL-Æ£¸¶    09/09/18  ¡ÖÊ¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æ¡×ÂÐ±þ
+      *                                     Ê¼¸Ë¸©¡¦²¬»³¸©
+      *                                     £²£°£°£¹Ç¯£¸·î¡Á£²£°£±£°Ç¯£±·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2851,6 +2854,17 @@
                IF    ( RECE62-PREFNUM      =   "35"    OR  "40" )
                AND   ( RECE62-SRYYM        >=  200907           )
                AND   ( RECE62-SRYYM        <=  200912           )
+                   EVALUATE    RECE62-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
+               END-IF
+      *        Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ 
+               IF    ( RECE62-PREFNUM      =   "28"    OR  "33" )
+               AND   ( RECE62-SRYYM        >=  200908           )
+               AND   ( RECE62-SRYYM        <=  201001           )
                    EVALUATE    RECE62-RJNGAIKOHFTN (1)
                        WHEN    1
                            MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
@@ -8907,6 +8921,16 @@
            IF    ( RECE62-PREFNUM      =   "35"    OR  "40" )
            AND   ( RECE62-SRYYM        >=  200907           )
            AND   ( RECE62-SRYYM        <=  200912           )
+               IF      RECE62-RJNGAIKOHFTN (1)
+                                           >   ZERO
+                   MOVE    RECE62-RJNGAIKOHFTN (1)
+                                           TO  RECE10-ETC-YKZFTN (1)
+               END-IF
+           END-IF
+      *    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
+           IF    ( RECE62-PREFNUM      =   "28"    OR  "33" )
+           AND   ( RECE62-SRYYM        >=  200908           )
+           AND   ( RECE62-SRYYM        <=  201001           )
                IF      RECE62-RJNGAIKOHFTN (1)
                                            >   ZERO
                    MOVE    RECE62-RJNGAIKOHFTN (1)
