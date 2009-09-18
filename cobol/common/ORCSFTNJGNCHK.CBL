@@ -385,11 +385,6 @@
                    AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
-                   IF  (LNK-FTNJGNCHK-PREFNUM    =  13     )
-                   AND (LNK-FTNJGNCHK-KOHNUM     = "588"   )
-                   AND (LNK-FTNJGNCHK-SRYYM     >= "200910")
-                      MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK
-                   END-IF
                    MOVE   HKN-HON-NYUKFTNRATE    TO  WRK-KOHFTN-RITU
                  WHEN     "1"
                  WHEN     "4"
@@ -418,6 +413,11 @@
                    AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                    AND (HKN-HON-GAIKJGNGAK     NOT = ZERO          )
                       MOVE HKN-HON-GAIKJGNGAK    TO WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM    =  13     )
+                   AND (LNK-FTNJGNCHK-KOHNUM     = "588"   )
+                   AND (LNK-FTNJGNCHK-SRYYM     >= "200910")
+                      MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK
                    END-IF
                    MOVE    HKN-HON-GAIKFTNRATE   TO WRK-KOHFTN-RITU
                  WHEN     "1"
