@@ -313,6 +313,11 @@
                GO      TO      100-GMN-SYORI-EXT
            END-IF
       *
+      *    診察料のみ変更時は、以下の処理なし
+           IF      ORCSC100-TOROKU     =   "2"
+               GO      TO      100-GMN-SYORI-EXT
+           END-IF
+      *
       *    登録前の全体のチェックを行う
            INITIALIZE                  ORCSC00AREA
            MOVE    "2"                 TO  LNK-ORCSC-KBN
