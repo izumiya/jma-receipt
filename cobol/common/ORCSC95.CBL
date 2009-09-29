@@ -5765,7 +5765,9 @@
                    END-IF
                END-IF
       *    ≈¿≈©»ΩƒÍ
-               IF      SRY-SRYKBN          =   "33" 
+      ******** IF      SRY-SRYKBN          =   "33" 
+               IF      SRY-SRYSYUKBN       =   "330"  OR
+                                               "331"
                    MOVE    SPACE               TO  TNS-TENSU-REC
                    MOVE    SRY-SRYCD (IDX)     TO  TNS-SRYCD
                    PERFORM 910-TENSU-READ-SEC
