@@ -130,6 +130,7 @@
       *  04.04.01    NACL-門脇    09/02/04  検査のコメント自動記載対応
       *  04.04.02    NACL-藤原    09/08/12  レセプト特記事項編集情報の取得
       *                                     時の上限チェック
+      *  04.04.03    NACL-門脇    09/09/30  検査の数量編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1816,6 +1817,7 @@
                            INTO               TBL-NAME (IDX)
                    END-STRING
                    MOVE    ZERO               TO  TBL-YUKOKETA (IDX)
+                   MOVE    SPACE   TO   TBL-ZAIW-TANINAME(3 IDX)
                ELSE
                    MOVE    TBL-ZAIW-NAMEINF (3 IDX)
                                               TO  TBL-NAMEINF (IDX)
