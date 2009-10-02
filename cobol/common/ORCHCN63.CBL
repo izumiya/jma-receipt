@@ -408,9 +408,9 @@
            END-IF
       *
       *    È÷¹Í
-           MOVE    BUNBEN-BIKOU        TO  WRK-MOJI-IN
-           PERFORM 31011-KANA-HEN-SEC
-           MOVE    WRK-MOJI-OUT        TO  HCN63-BIKOU
+      *     MOVE    BUNBEN-BIKOU        TO  WRK-MOJI-IN
+      *     PERFORM 31011-KANA-HEN-SEC
+      *     MOVE    WRK-MOJI-OUT        TO  HCN63-BIKOU
       *
       *    Ä¢É¼°õºþ½èÍý
            PERFORM 400-PRT-WRITE-SEC
