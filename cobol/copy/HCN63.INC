@@ -23,3 +23,7 @@
             02  HCN63-HOSPADRS  PIC X(100).
             02  HCN63-HOSPNAME  PIC X(100).
             02  HCN63-HOSPTEL   PIC X(20).
+            02  HCN63-MOJI1 PIC X(80).
+            02  HCN63-BIRTHCNT  PIC X(18).
+            02  HCN63-MOJI2 PIC X(80).
+            02  HCN63-BIKOU PIC X(60).

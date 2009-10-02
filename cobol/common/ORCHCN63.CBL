@@ -79,6 +79,7 @@
                05  WRK-HOSPADRS1   PIC X(50).
                05  WRK-HOSPADRS2   PIC X(50).
            03  WRK-HOSPTEL         PIC X(15).
+           03  WRK-999             PIC 9(03).
       *
            03  WRK-HENYMDG         PIC X(22).
            03  WRK-SYMD.
@@ -89,8 +90,13 @@
            03  WRK-Z03             PIC ZZ9.
            03  WRK-Z10             PIC ZZ,ZZZ,ZZ9.
       *
-           03  WRK-MOJI-IN         PIC X(10).
-           03  WRK-MOJI-OUT        PIC X(20).
+           03  WRK-MOJI-IN         PIC X(100).
+           03  WRK-MOJI-OUT        PIC X(100).
+           03  WRK-PNT             PIC 9(05).
+           03  WRK-SKYMONEY        PIC 9(10).
+           03  WRK-STR-G.
+               05  WRK-STR1        PIC X(100).
+               05  WRK-STR2        PIC X(100).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -349,6 +355,63 @@
       *    電話番号
            MOVE    WRK-HOSPTEL     TO  HCN63-HOSPTEL
       *
+      *    文字１
+           MOVE    SPACE           TO  HCN63-MOJI1
+           IF    ( BUNBEN-NINPUFTN-MONEY   >   BUNBEN-DAIRI-MONEY )
+               MOVE    1           TO  WRK-PNT
+               STRING  "代理受取額"  DELIMITED   BY  SIZE
+               INTO    HCN63-MOJI1
+               WITH POINTER WRK-PNT
+               END-STRING
+               MOVE    BUNBEN-DAIRI-MONEY 
+                                       TO  WRK-Z10
+               MOVE    WRK-Z10         TO  WRK-MOJI-IN
+               PERFORM 31011-KANA-HEN-SEC
+               PERFORM 31011-LTRIM-SEC
+               STRING  WRK-MOJI-OUT    DELIMITED   BY  SPACE
+                       "円につき、現金清算は"
+               INTO    HCN63-MOJI1
+               WITH POINTER WRK-PNT
+               END-STRING
+               COMPUTE WRK-SKYMONEY
+                   =   BUNBEN-NINPUFTN-MONEY
+                   -   BUNBEN-DAIRI-MONEY
+               MOVE    WRK-SKYMONEY   TO   WRK-Z10
+               MOVE    WRK-Z10        TO   WRK-MOJI-IN
+               PERFORM 31011-KANA-HEN-SEC
+               PERFORM 31011-LTRIM-SEC
+               STRING  WRK-MOJI-OUT    DELIMITED   BY  SPACE
+                       "円"
+               INTO    HCN63-MOJI1
+               WITH POINTER WRK-PNT
+               END-STRING
+           END-IF
+      *
+      *    出産児数
+           MOVE    SPACE           TO  WRK-MOJI-IN
+           STRING  "（出産児数："      DELIMITED BY SIZE
+                   BUNBEN-BIRTHCNT     DELIMITED BY SIZE
+                   "人）"              DELIMITED BY SIZE
+                   INTO                WRK-MOJI-IN
+           END-STRING
+           PERFORM 31011-KANA-HEN-SEC
+           MOVE    WRK-MOJI-OUT        TO  HCN63-BIRTHCNT
+      *
+           IF    ( BUNBEN-BUNBENKBN    =   "1" )
+      *        文字２
+               STRING  "※上記一部負担金等は、専用請求書上"
+                                           DELIMITED   BY  SIZE
+                       "「その他」の費用として計上しています。"
+                                           DELIMITED   BY  SIZE
+               INTO    HCN63-MOJI2
+               END-STRING
+           END-IF
+      *
+      *    備考
+           MOVE    BUNBEN-BIKOU        TO  WRK-MOJI-IN
+           PERFORM 31011-KANA-HEN-SEC
+           MOVE    WRK-MOJI-OUT        TO  HCN63-BIKOU
+      *
       *    帳票印刷処理
            PERFORM 400-PRT-WRITE-SEC
       *
@@ -402,6 +465,25 @@
        300-END-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    左詰め処理
+      *****************************************************************
+       31011-LTRIM-SEC             SECTION.
+      *
+           MOVE    SPACE           TO  WRK-STR-G
+           UNSTRING    WRK-MOJI-OUT    DELIMITED   BY  ALL "　"
+           INTO        WRK-STR1 ,
+                       WRK-STR2
+           END-UNSTRING
+           IF    ( WRK-STR1    =   SPACE )
+               MOVE    WRK-STR2    TO  WRK-STR1
+           END-IF
+      *
+           MOVE    WRK-STR1        TO  WRK-MOJI-OUT
+      *
+           .
+       31011-LTRIM-EXT.
+           EXIT.
       *****************************************************************
       *    全角変換処理
       *****************************************************************
