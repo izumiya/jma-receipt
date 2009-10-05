@@ -383,7 +383,7 @@
                PERFORM 4200-SANKAKBNLST-CHK-SEC
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-SANKAKBN-G
                IF    ( SPA-GMN-SANKAKBN-G  =   SPACE )
-                   MOVE    SPA-GMN-SANKAKBNLST (2)
+                   MOVE    SPA-GMN-SANKAKBNLST (1)
                                        TO  SPA-GMN-SANKAKBN-G
                END-IF
            END-IF
@@ -1096,7 +1096,7 @@
            PERFORM 4200-SANKAKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-SANKAKBN-G
            IF    ( SPA-GMN-SANKAKBN-G  =   SPACE )
-               MOVE    SPA-GMN-SANKAKBNLST (2)
+               MOVE    SPA-GMN-SANKAKBNLST (1)
                                        TO  SPA-GMN-SANKAKBN-G
            END-IF
       *
@@ -1484,6 +1484,20 @@
                        MOVE    "1006"      TO  SPA-ERRCD
                        MOVE    10          TO  SPA-GMN-CUR
                    END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
+               IF    ( SPA-GMN-SNK-MONEY   =   ZERO )
+                       MOVE    "1010"      TO  SPA-ERRCD
+                       MOVE    18          TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-SANKAKBN        =   "2" )
+               IF    ( SPA-GMN-SNK-MONEY   >   ZERO )
+                       MOVE    "1011"      TO  SPA-ERRCD
+                       MOVE    18          TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
@@ -2079,6 +2093,20 @@
            WHEN    "1009"
                MOVE    "異常分娩で一部負担金等が未入力です"
                                        TO  SPA-ERRMSG
+           WHEN    "1010"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "産科医療保障制度の金額が"
+                                           DELIMITED BY SIZE
+                       "未入力です"        DELIMITED BY SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "1011"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "産科医療保障制度の金額が"
+                                           DELIMITED BY SIZE
+                       "入力されています"  DELIMITED BY SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
            WHEN    "4001"  THRU    "4002"
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
