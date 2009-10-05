@@ -2726,37 +2726,6 @@
                IF    ( SPA-GMN-SANKANUM    IS  NOT NUMERIC )
                    MOVE    "0216"      TO  SPA-ERRCD
                END-IF
-               IF    ( SPA-ERRCD       =   SPACE )
-                   IF    ( SPA-GMN-SANKANUM (1:2)  =   "00" )
-                       CONTINUE
-                   ELSE
-                       MOVE    "0213"      TO  SPA-ERRCD
-                   END-IF
-               END-IF
-               IF    ( SPA-ERRCD       =   SPACE )
-                   IF    ( SPA-GMN-HOSPSBT     =   "1" OR "2" )
-                       IF    ( SPA-GMN-SANKANUM (3:1)
-                                               =   SPA-GMN-HOSPSBT )
-                           CONTINUE
-                       ELSE
-                           MOVE    "0214"  TO  SPA-ERRCD
-                           MOVE    SPACE   TO  WRK-HOSPSBTW
-                           IF    ( SPA-GMN-HOSPSBT     =   "1" )
-                               MOVE    "£±"    TO      WRK-HOSPSBTW
-                           ELSE
-                               MOVE    "£²"    TO      WRK-HOSPSBTW
-                           END-IF
-                       END-IF
-                   END-IF
-               END-IF
-               IF    ( SPA-ERRCD       =   SPACE )
-                   IF    ( SPA-GMN-SANKANUM (4:2)
-                                       =   SPA-GMN-PREFNUM )
-                       CONTINUE
-                   ELSE
-                       MOVE    "0215"  TO  SPA-ERRCD
-                   END-IF
-               END-IF
            END-IF
       *
           IF    ( SPA-ERRCD       =   SPACE )
