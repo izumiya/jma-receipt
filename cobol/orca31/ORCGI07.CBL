@@ -1487,17 +1487,23 @@
                END-IF
            END-IF
       *
-           IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
-               IF    ( SPA-GMN-SNK-MONEY   =   ZERO )
-                       MOVE    "1010"      TO  SPA-ERRCD
-                       MOVE    18          TO  SPA-GMN-CUR
+           IF    ( SPA-ERRCD               =   SPACE )
+               IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
+                   IF    ( SPA-GMN-SNK-MONEY   =   ZERO )
+                           MOVE    "1010"      TO  SPA-ERRCD
+                           MOVE    18          TO  SPA-GMN-CUR
+                   END-IF
                END-IF
            END-IF
       *
-           IF    ( SPA-GMN-SANKAKBN        =   "2" )
-               IF    ( SPA-GMN-SNK-MONEY   >   ZERO )
+           IF    ( SPA-ERRCD               =   SPACE )
+               IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
+                   CONTINUE
+               ELSE
+                   IF    ( SPA-GMN-SNK-MONEY   >   ZERO )
                        MOVE    "1011"      TO  SPA-ERRCD
                        MOVE    18          TO  SPA-GMN-CUR
+                   END-IF
                END-IF
            END-IF
       *
