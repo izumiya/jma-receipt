@@ -369,7 +369,7 @@
                PERFORM 31011-KANA-HEN-SEC
                PERFORM 31011-LTRIM-SEC
                STRING  WRK-MOJI-OUT    DELIMITED   BY  SPACE
-                       "円につき、現金清算は"
+                       "円につき、現金精算は"
                INTO    HCN63-MOJI1
                WITH POINTER WRK-PNT
                END-STRING
