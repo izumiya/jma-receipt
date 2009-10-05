@@ -26,4 +26,4 @@
             02  HCN63-MOJI1 PIC X(80).
             02  HCN63-BIRTHCNT  PIC X(18).
             02  HCN63-MOJI2 PIC X(80).
-            02  HCN63-BIKOU PIC X(60).
+            02  HCN63-BIKOU PIC X(100).
