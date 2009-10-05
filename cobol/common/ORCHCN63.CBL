@@ -357,7 +357,7 @@
       *
       *    文字１
            MOVE    SPACE           TO  HCN63-MOJI1
-           IF    ( BUNBEN-NINPUFTN-MONEY   >   BUNBEN-DAIRI-MONEY )
+      *    IF    ( BUNBEN-NINPUFTN-MONEY   >   BUNBEN-DAIRI-MONEY )
                MOVE    1           TO  WRK-PNT
                STRING  "代理受取額"  DELIMITED   BY  SIZE
                INTO    HCN63-MOJI1
@@ -385,7 +385,7 @@
                INTO    HCN63-MOJI1
                WITH POINTER WRK-PNT
                END-STRING
-           END-IF
+      *    END-IF
       *
       *    出産児数
            MOVE    SPACE           TO  WRK-MOJI-IN
@@ -397,7 +397,8 @@
            PERFORM 31011-KANA-HEN-SEC
            MOVE    WRK-MOJI-OUT        TO  HCN63-BIRTHCNT
       *
-           IF    ( BUNBEN-BUNBENKBN    =   "1" )
+           IF    ( BUNBEN-RIYOUKBN     =   "1" )
+            AND  ( BUNBEN-BUNBENKBN    =   "1" )
       *        文字２
                STRING  "※上記一部負担金等は、専用請求書上"
                                            DELIMITED   BY  SIZE
