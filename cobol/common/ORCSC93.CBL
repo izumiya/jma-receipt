@@ -2282,6 +2282,17 @@
                            MOVE    SPACE           TO  WRK-GMN-TBL
                                                              (IDX-4)
                            MOVE    IDX-4           TO  IDX-2
+      *                    ²ó¿ôºï½ü
+                           IF      SPA-COM-KAIFLG (IDX-TBL)  =   "1"
+                               MOVE    SPACE           TO  WRK-INPUTCD
+                               STRING  SPA-GMN-INPUTCD(IDX-TBL)
+                                                   DELIMITED  BY  "*"
+                                                   INTO    WRK-INPUTCD
+                               END-STRING
+                               MOVE    WRK-INPUTCD TO  SPA-GMN-INPUTCD
+                                                            (IDX-TBL)
+                           END-IF
+      *
                            MOVE    SPACE           TO  SPA-COM-KAIFLG
                                                               (IDX-TBL)
                            MOVE    SPACE           TO  SPA-COM-ZAIEND
