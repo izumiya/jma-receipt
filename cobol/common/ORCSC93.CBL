@@ -2271,10 +2271,11 @@
                    COMPUTE IDX-5               =   IDX-2  +  1
                    PERFORM VARYING     IDX-4   FROM    IDX-5   BY  1
                            UNTIL       IDX-4   >   SPA-MAX-LINE
-                       IF     (WRK-COM-INPUTCD (IDX-4) (1:1)
+                       IF    ((WRK-COM-INPUTCD (IDX-4) (1:1)
                                                    =   "8"    )  OR
                               (WRK-COM-INPUTCD (IDX-4) (1:3)
-                                                   =   "008"  )
+                                                   =   "008"  ))
+                       AND    (WRK-COM-KAISU  (IDX-4)  <= 1 )
                            ADD     1               TO  IDX-TBL
                            MOVE    WRK-GMN-TBL (IDX-4)
                                                    TO  SPA-GMN-TBL
