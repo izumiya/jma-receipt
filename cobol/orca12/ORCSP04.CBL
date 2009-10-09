@@ -210,6 +210,7 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 200-MAIN-SYORI-SEC
            END-IF
+           MOVE    SPA-P02KYOUTU       TO  SPA-WORK
       *
            .
            EXIT    PROGRAM
