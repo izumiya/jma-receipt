@@ -204,11 +204,11 @@
       *
        01  TKOHID-AREA2.
            03  TKOHID-OCC2                             OCCURS 20.
-               05  TKOHID-KOHNUM                       PIC 9(10).
+               05  TKOHID-KOHNUM                       PIC X(03).
       *
        01  THKNID-AREA2.
            03  THKNID-OCC2                             OCCURS 20.
-               05  THKNID-HKNNUM                       PIC 9(10).
+               05  THKNID-HKNNUM                       PIC X(03).
       *
       *    ¥Õ¥é¥°ÎÎ°è
        01  STS-AREA.
@@ -8113,6 +8113,8 @@
                                            =   THKNID-HKNID (IDX41))
                 AND  ( LNK-COMB-HKNNUM(IDX17)
                                        NOT =   THKNID-HKNNUM(IDX41))
+                DISPLAY "DIFF " LNK-COMB-HKNNUM(IDX17) "-" 
+                        THKNID-HKNNUM(IDX41)
                            MOVE    1       TO  FLG-COMBERR
                END-IF
       *
