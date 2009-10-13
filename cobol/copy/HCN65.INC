@@ -3,7 +3,7 @@
             02  HCN65-HOSPADRS  PIC X(100).
             02  HCN65-KAISETUNAME   PIC X(80).
             02  HCN65-HOSPTEL   PIC X(15).
-            02  HCN65-HOSPCD    PIC X(7).
+            02  HCN65-HOSPCD    PIC X(10).
             02  HCN65-HOSPNAME  PIC X(100).
             02  HCN65-SANKANUM  PIC X(10).
             02  HCN65-HOSPSBT

@@ -3,7 +3,7 @@
             02  HCN64-HOSPADRS  PIC X(100).
             02  HCN64-KAISETUNAME   PIC X(80).
             02  HCN64-HOSPTEL   PIC X(15).
-            02  HCN64-HOSPCD    PIC X(7).
+            02  HCN64-HOSPCD    PIC X(10).
             02  HCN64-HOSPNAME  PIC X(100).
             02  HCN64-SANKANUM  PIC X(10).
             02  HCN64-HOSPSBT
