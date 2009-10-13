@@ -182,6 +182,8 @@ I03.glade	orca31	(I03)入院歴作成
 I04.glade	orca31	(I04)入退院登録−請求確認
 I05.glade	orca31	(I05)退院事由設定
 I06.glade	orca31	(I06)入院オーダー確認
+I07.glade	orca31	(I07)出産育児一時金画面
+I08.glade	orca31	(I08)保険情報変更画面
 I0ERR.glade	orca31	(I0ERR)エラー情報
 I0ID1.glade	orca31	(I0ID1)確認画面
 I0ID2.glade	orca31	(I0ID2)確認画面
@@ -345,6 +347,7 @@ W63.glade	orca101	(W63)システム管理情報−データチェック機能情報３
 W64.glade	orca101	(W64)システム管理情報−公費番号まとめ情報設定
 W65.glade	orca101	(W65)システム管理情報−公費付加情報設定
 W66.glade	orca101	(W66)システム管理情報−公害医療機関情報設定
+W67.glade	orca101	(W67)システム管理情報−出産費用内訳明細情報
 W96.glade	orca101	(W96)システム管理情報−CRON設定情報
 W98.glade	orca101	(W98)システム管理情報−排他情報設定
 W981.glade	orca101	(W981)システム管理情報−排他制御状態
