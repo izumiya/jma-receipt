@@ -202,6 +202,14 @@
       *    データチェック共通コピー句
            COPY    "CPDTCHKCOMMON.INC".
       *
+       01  TKOHID-AREA2.
+           03  TKOHID-OCC2                             OCCURS 20.
+               05  TKOHID-KOHNUM                       PIC 9(10).
+      *
+       01  THKNID-AREA2.
+           03  THKNID-OCC2                             OCCURS 20.
+               05  THKNID-HKNNUM                       PIC 9(10).
+      *
       *    フラグ領域
        01  STS-AREA.
            03  STS-DTCHK003                            PIC X(02).
@@ -339,6 +347,7 @@
            03  FLG-KIKANCHKCD                          PIC 9(01).
            03  FLG-REIGAI                              PIC 9(01).
            03  FLG-TARGET                              PIC 9(01).
+           03  FLG-COMBERR                             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -410,6 +419,7 @@
            03  IDX38                                   PIC 9(05). 
            03  IDX39                                   PIC 9(05). 
            03  IDX40                                   PIC 9(05). 
+           03  IDX41                                   PIC 9(05). 
            03  IDXA                                    PIC 9(05). 
            03  IDXE                                    PIC 9(05). 
            03  IDX-TSRYKA                              PIC 9(05).
@@ -1809,7 +1819,9 @@
        200111-TAIHI-AREA-INIT-SEC      SECTION.
       *
            INITIALIZE                  THKNID-AREA
+                                       THKNID-AREA2
                                        TKOHID-AREA
+                                       TKOHID-AREA2
                                        THKNCOMBI-AREA
                                        TNACCT-KKN-AREA
                                        TKHNRYO-HKNCOMBI-AREA
@@ -2212,6 +2224,10 @@
                IF    ( CONST-THKNID-MAX    >   THKNID-MAX )
                    COMPUTE THKNID-MAX  =   THKNID-MAX  +   1
                    MOVE    COMB-HKNID  TO  THKNID-HKNID (THKNID-MAX)
+                   MOVE    COMB-HKNID  TO  WRK-HKNID
+                   PERFORM 900-PTHKNINF-KEY-SEL-SEC
+                   MOVE    PTHKN-HKNNUM
+                                       TO  THKNID-HKNNUM(THKNID-MAX)
                    MOVE    THKNID-MAX  TO  THKNID-IDX
                END-IF
            ELSE
@@ -2277,6 +2293,11 @@
       *
                    MOVE    COMB-KOHID (IDX3)
                                        TO  TKOHID-KOHID (TKOHID-MAX)
+                   MOVE    COMB-KOHID (IDX3)
+                                       TO  WRK-KOHID
+                   PERFORM 900-PTKOHINF-KEY-SEL-SEC
+                   MOVE    PTKOH-KOHNUM
+                                       TO  TKOHID-KOHNUM (TKOHID-MAX)
       *
                    MOVE    TKOHID-MAX  TO  TKOHID-IDX
       *
@@ -7999,6 +8020,11 @@
                        END-IF
                    END-IF
       *
+      *            公費の種類チェック処理
+                   IF    ( FLG-CHKEND (14)     =   ZERO )
+                           PERFORM 2001111-HKNKOHNUM-CHK-SEC
+                   END-IF
+      *
                END-IF
       *
            END-PERFORM
@@ -8071,6 +8097,71 @@
       *
            .
        2001111-CHIHOU-KOH-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険・公費の種類チェック処理
+      *****************************************************************
+       2001111-HKNKOHNUM-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO        TO      FLG-COMBERR
+      *
+           PERFORM VARYING IDX41   FROM    1   BY  1
+                   UNTIL ( IDX41   >   THKNID-MAX )
+                    OR   ( FLG-COMBERR     =   1 )
+      *
+               IF    ( LNK-COMB-HKNID (IDX17)
+                                           =   THKNID-HKNID (IDX41))
+                AND  ( LNK-COMB-HKNNUM(IDX17)
+                                       NOT =   THKNID-HKNNUM(IDX41))
+                           MOVE    1       TO  FLG-COMBERR
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   4 )
+                    OR   ( FLG-COMBERR     =   1 )
+      *
+               IF    ( LNK-COMB-KOHHKNNUM (IDX17 IDX0) NOT =   SPACE )
+                   PERFORM VARYING IDX41   FROM    1   BY  1
+                           UNTIL ( IDX41   >   TKOHID-MAX )
+                            OR   ( FLG-COMBERR     =   1 )
+      *
+                       IF    ( LNK-COMB-KOHID (IDX17 IDX0)
+                                           =   TKOHID-KOHID (IDX41))
+                        AND  ( LNK-COMB-KOHHKNNUM (IDX17 IDX0)
+                                       NOT =   TKOHID-KOHNUM(IDX41))
+                           MOVE    1       TO  FLG-COMBERR
+                       END-IF
+                   END-PERFORM
+               END-IF
+           END-PERFORM
+      *
+           IF    ( FLG-COMBERR     =   1 )
+               MOVE    SDTCHK02-O-HKNCOMBIMEI (IDX17)
+                                       TO  WRK-MAE-INPUT
+               PERFORM 800-ZENKAKU-HEN-SEC
+               MOVE    WRK-OUT-INPUT   TO  WRK-HKNCOMBIMEI
+               MOVE    THKNCOMBI-DAY-G (IDX16)
+                                       TO  WRK-NISSU-DAY-G
+               PERFORM 200111-NISSU-HEN-SEC
+               MOVE    SPACE           TO  WRK-ERRMES-PLUS
+               STRING  WRK-ACCTNAME    DELIMITED   BY  SPACE
+                       WRK-HKNCOMBIMEI DELIMITED   BY  SPACE
+                       WRK-NISSU-MES   DELIMITED   BY  SPACE
+               INTO    WRK-ERRMES-PLUS
+               END-STRING
+      *
+               MOVE    "140004"    TO  WRK-ERRCD
+               INITIALIZE              TERRINF-AREA
+               PERFORM 215-ERRMES-HEN-SEC
+               IF    ( ORCBSD01-CHKKBN (14)    =   "1" )
+                   MOVE    1       TO  FLG-CHKEND (14)
+               END-IF
+           END-IF
+      *
+           .
+       2001111-HKNKOHNUM-CHK-EXT.
            EXIT.
       *****************************************************************
       *    その他必須チェック処理
@@ -8998,7 +9089,15 @@
       *
            MOVE    SPACE               TO  WRK-ERRMES
       *
-           PERFORM VARYING IDX-ERRCD   FROM    1   BY  1
+           IF    ( WRK-ERRCD           =   "140004" )
+             STRING "保険組合せが正しく作成されていません。"
+                                           DELIMITED BY SIZE
+                    "保険または公費情報を確認してください"
+             INTO   WRK-ERRMES
+             END-STRING
+           ELSE
+      *
+             PERFORM VARYING IDX-ERRCD   FROM    1   BY  1
                    UNTIL ( IDX-ERRCD   >   ERRMES-MAX )
       *
                IF    ( WRK-ERRCD       =   ERRMES-CD (IDX-ERRCD) )
@@ -9007,7 +9106,8 @@
                    MOVE    ERRMES-MAX  TO  IDX-ERRCD
                END-IF
       *
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            .
        2111-ERRMES-GET-EXT.
