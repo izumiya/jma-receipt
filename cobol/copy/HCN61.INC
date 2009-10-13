@@ -59,4 +59,4 @@
             02  HCN61-GCNT  PIC X(3).
             02  HCN61-GBIRTHCNT PIC X(3).
             02  HCN61-GDAIRI-MONEY  PIC X(10).
-            02  HCN61-PAGE  PIC X(3).
+            02  HCN61-PAGE  PIC X(7).
