@@ -264,8 +264,9 @@
       *  04.04.12    NACL-ÌçÏÆ    09/09/17  ÅìµþÅÔ¥Þ¥ë»ÒÂÐ±þ
       *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
       *  04.04.13    NACL-ÌçÏÆ    09/10/01  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
-      *  04.04.14    NACL-ÌçÏÆ    09/10/05  Îß·×¥Ù¡¼¥¹·×»»ÂÐ±þ
-      *  04.04.15    NACL-ÌçÏÆ    09/10/09  Ê¼¸Ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.14    NACL-ÌçÏÆ    09/10/09  Ê¼¸Ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.15    NACL-ÌçÏÆ    09/10/13  ¾å¸Â³Û£±±ßÃ±°Ì¤ÎÂÐ±þ¡Ê£·£¹Åù¡Ë
+      *  04.04.16    NACL-ÌçÏÆ    09/10/15  Îß·×¥Ù¡¼¥¹·×»»ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -449,8 +450,11 @@
            03  WK-TAIHI-NYUJGNGAK-OCC.
                05  WK-TAIHI-NYUJGNGAK  PIC 9(7)    OCCURS   4.
       *
-           03  WK-TAIHI-KANSEN11-OCC.
-               05  WK-TAIHI-KANSEN11   PIC 9(1)    OCCURS   4.
+           03  WK-TAIHI-FTNGAKEN-OCC.
+               05  WK-TAIHI-FTNGAKEN   PIC 9(1)    OCCURS   4.
+      *
+           03  WK-TAIHI-JGNGAKEN-OCC.
+               05  WK-TAIHI-JGNGAKEN   PIC 9(7)    OCCURS   4.
       *
            03  WK-TAIHI-SDAY-COMPFTN   PIC 9(7).
            03  WK-TAIHI-SDAY-COMPFTNWK PIC 9(7).
@@ -962,7 +966,7 @@
            03  FLG-KOUGAKUCYO-GEN70    PIC 9(01).
            03  FLG-KOUGAKUCYO-GEN70K   PIC 9(01).
            03  FLG-KOUGAKUCYO-OITA     PIC 9(01).
-           03  FLG-KANSEN11            PIC 9(01).
+           03  FLG-FTNGAKEN            PIC 9(01).
            03  WK-SYU-SYUCOMPFTN       PIC 9(08).
            03  WK-KOUREI-IRYOHI        PIC 9(08).
            03  WK-KOUREI-IRYOHI2       PIC 9(08).
@@ -1498,7 +1502,7 @@
                OR  (FLG-KOUGAKUCYO-OITA      =    1        )
                OR  (FLG-KUMAMOTO             =   "1"       )
                OR  (COMB-SYU-HKNKOHSBTKBN    =   "8"       )
-               OR  (FLG-KANSEN11             =    1        )
+               OR  (FLG-FTNGAKEN             =    1        )
                    CONTINUE
                ELSE
                    COMPUTE  LNK-SYU-SKYMONEY = LNK-SYU-SKYMONEY  +  5
@@ -6865,6 +6869,7 @@
        2107-KOHFTN-KINGAKU-SEC           SECTION.
       *
            INITIALIZE                   WK-TAIHI-NYUJGNGAK-OCC.
+           INITIALIZE                   WK-TAIHI-JGNGAKEN-OCC.
       *
            INITIALIZE                   WK-JIRITU-TBL.
            INITIALIZE                   WK-SYOGAI-TBL.
@@ -6959,6 +6964,8 @@
                         MOVE   WK-NYUJGNGAK    TO   MAX-KIN-KOHI1-M
                         MOVE   WK-NYUJGNGAK    TO
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                        MOVE   WK-NYUJGNGAK    TO
+                                            WK-TAIHI-JGNGAKEN(KOH-IDX)
                         MOVE     "1"   TO     COMB-KOH1-NYUJGNKBN
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1" 
                             IF  COMB-KOHHKNNUM(KOH-IDX) =
@@ -7368,6 +7375,8 @@
                         MOVE   WK-NYUJGNGAK    TO   MAX-KIN-KOHI2-M
                         MOVE   WK-NYUJGNGAK    TO
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                        MOVE   WK-NYUJGNGAK    TO
+                                            WK-TAIHI-JGNGAKEN(KOH-IDX)
                         MOVE     "1"   TO     COMB-KOH2-NYUJGNKBN
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1" 
                             IF  COMB-KOHHKNNUM(KOH-IDX) =
@@ -7676,6 +7685,8 @@
                         MOVE   WK-NYUJGNGAK    TO   MAX-KIN-KOHI3-M
                         MOVE   WK-NYUJGNGAK    TO
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                        MOVE   WK-NYUJGNGAK    TO
+                                            WK-TAIHI-JGNGAKEN(KOH-IDX)
                         MOVE     "1"   TO     COMB-KOH3-NYUJGNKBN
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1" 
                             IF  COMB-KOHHKNNUM(KOH-IDX) =
@@ -7808,6 +7819,8 @@
                         MOVE   WK-NYUJGNGAK    TO   MAX-KIN-KOHI4-M
                         MOVE   WK-NYUJGNGAK    TO
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                        MOVE   WK-NYUJGNGAK    TO
+                                            WK-TAIHI-JGNGAKEN(KOH-IDX)
                         MOVE     "1"   TO     COMB-KOH4-NYUJGNKBN
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1" 
                             IF  COMB-KOHHKNNUM(KOH-IDX) =
@@ -14821,7 +14834,7 @@
            INITIALIZE               WK-TAIHI-RECEFTNDSPKBN-OCC.
       *
            INITIALIZE               WK-SYOUKAN-FLG-TAIHI-AREA.
-           INITIALIZE               WK-TAIHI-KANSEN11-OCC.
+           INITIALIZE               WK-TAIHI-FTNGAKEN-OCC.
       *
            MOVE    ZERO      TO     WK-TOKUSYU-COMPFTN.
            MOVE    9999999   TO     WK-TOKUSYU-COMPFTN2.
@@ -18893,6 +18906,15 @@
                COMPUTE   ZAN-KOHI-T(KOH-IDX)    =
                          ZAN-KOHI-T(KOH-IDX)    -
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)
+      *
+               IF   (LNK-SYU-KOH-HKNNUM(KOH-IDX)         =
+                                                 "024" OR "079")
+               AND  (WK-TAIHI-JGNGAKEN(KOH-IDX)(7:1) NOT = "0" )
+               AND  (LNK-SYU-KOH-COMPFTN(KOH-IDX)    NOT = ZERO)
+               AND  (ZAN-KOHI-T(KOH-IDX)                 = ZERO)
+                  MOVE     1    TO    WK-TAIHI-FTNGAKEN(KOH-IDX)
+               END-IF
+      *
                COMPUTE   LNK-SYU-KOH-COMPTOTAL(KOH-IDX)   =
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)     
                IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
@@ -19231,11 +19253,14 @@
                             LNK-SYU-KOH-COMPFTN(KOH-IDX)
                END-IF
       *
-               IF   (LNK-SYU-KOH-HKNNUM(KOH-IDX)     =  "011" OR "020")
-               AND  (WK-TAIHI-NYUJGNGAK(KOH-IDX) NOT =   ZERO         )
-               AND  (ZAN-KOHI-T(KOH-IDX)             =   ZERO         )
-                  MOVE     1    TO    WK-TAIHI-KANSEN11(KOH-IDX)
+               IF   (LNK-SYU-KOH-HKNNUM(KOH-IDX)         =
+                               "011" OR "020" OR "012" OR "025")
+               AND  (WK-TAIHI-JGNGAKEN(KOH-IDX)(7:1) NOT = "0" )
+               AND  (LNK-SYU-KOH-COMPFTN(KOH-IDX)    NOT = ZERO)
+               AND  (ZAN-KOHI-T(KOH-IDX)                 = ZERO)
+                  MOVE     1    TO    WK-TAIHI-FTNGAKEN(KOH-IDX)
                END-IF
+      *
                COMPUTE   LNK-SYU-KOH-COMPTOTAL(KOH-IDX)   =
                          LNK-SYU-KOH-COMPFTN(KOH-IDX)     
                IF    ZAN-KOHI-T(KOH-IDX)   NOT =   ZERO
@@ -22708,7 +22733,7 @@
                                          NOT =    ZERO ) AND
                     ( FLG-IRYOHI70       =   3  OR 4   ) AND
                     ( FLG-SYOUKAN(1)         =    "1"  ))
-               OR  (  WK-TAIHI-KANSEN11(1)   =     1    )
+               OR  (  WK-TAIHI-FTNGAKEN(1)   =     1    )
                     MOVE     LNK-SYU-KOH1COMPFTN  TO
                                           LNK-SYU-KOH1HKNFTNMONEY
                ELSE
@@ -22728,7 +22753,7 @@
                     ( FLG-SYOUKAN(2)         =    "1"  ))
                OR  (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
                     ( FLG-IRYOHI5            =    21   ))
-               OR  (  WK-TAIHI-KANSEN11(2)   =     1    )
+               OR  (  WK-TAIHI-FTNGAKEN(2)   =     1    )
                OR  (( WK-RUI-TAISYO          =     1   ) AND
                     ( FLG-KUMAMOTO           =    "1"  ))
                     MOVE     LNK-SYU-KOH2COMPFTN  TO
@@ -22744,21 +22769,31 @@
            END-IF.
            IF   (COMB-KOH3HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH3-NYUJGNKBN    =     "1")
+               IF  (WK-TAIHI-FTNGAKEN(3) = 1)
+                    MOVE     LNK-SYU-KOH3COMPFTN  TO
+                                          LNK-SYU-KOH3HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH3HKNFTNMONEY  =                  
                                     LNK-SYU-KOH3COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH3HKNFTNMONEY  =                  
                                     LNK-SYU-KOH3HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH3HKNFTNMONEY  =                  
                                     LNK-SYU-KOH3HKNFTNMONEY *  10        
+               END-IF
            END-IF.
            IF   (COMB-KOH4HKNNUM        NOT = SPACE)   AND
                 (COMB-KOH4-NYUJGNKBN    =     "1")
+               IF  (WK-TAIHI-FTNGAKEN(4) = 1)
+                    MOVE     LNK-SYU-KOH4COMPFTN  TO
+                                          LNK-SYU-KOH4HKNFTNMONEY
+               ELSE
                     COMPUTE  LNK-SYU-KOH4HKNFTNMONEY  =                  
                                     LNK-SYU-KOH4COMPFTN     +   5        
                     COMPUTE  LNK-SYU-KOH4HKNFTNMONEY  =                  
                                     LNK-SYU-KOH4HKNFTNMONEY /  10        
                     COMPUTE  LNK-SYU-KOH4HKNFTNMONEY  =                  
                                     LNK-SYU-KOH4HKNFTNMONEY *  10        
+               END-IF
            END-IF.
       *
       *    ¥ì¥»µ­ºÜ¶â³ÛÂàÈòÍÑ¥¨¥ê¥¢¤«¤é¼ýÇ¼¹àÌÜ¤ØÊÔ½¸
@@ -22782,7 +22817,7 @@
                                            NOT =    ZERO ) AND
                       ( FLG-IRYOHI70       =   3  OR 4   ) AND
                       ( FLG-SYOUKAN(1)         =    "1"  ))
-                  OR (  WK-TAIHI-KANSEN11(1)   =     1    )
+                  OR (  WK-TAIHI-FTNGAKEN(1)   =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -22818,7 +22853,7 @@
                                            NOT =    ZERO ) AND
                       ( FLG-IRYOHI70       =   3  OR 4   ) AND
                       ( FLG-SYOUKAN(1)         =    "1"  ))
-                  OR (  WK-TAIHI-KANSEN11(1)   =     1    )
+                  OR (  WK-TAIHI-FTNGAKEN(1)   =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -22858,7 +22893,7 @@
                       ( FLG-SYOUKAN(2)         =    "1"  ))
                   OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
                       ( FLG-IRYOHI5            =     21  ))
-                  OR (  WK-TAIHI-KANSEN11(2)   =     1    )
+                  OR (  WK-TAIHI-FTNGAKEN(2)   =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -22883,7 +22918,7 @@
                       ( FLG-SYOUKAN(2)         =    "1"  ))
                   OR (( FLG-KOUGAKUCYO5    NOT =    ZERO ) AND
                       ( FLG-IRYOHI5            =     21  ))
-                  OR (  WK-TAIHI-KANSEN11(2)   =     1    )
+                  OR (  WK-TAIHI-FTNGAKEN(2)   =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -22918,6 +22953,9 @@
            IF    COMB-KOH3HKNNUM         NOT = SPACE
              IF    WK-KOH-COMPFTN(3)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
+                  IF (WK-TAIHI-FTNGAKEN(3) = 1)
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
                                     LNK-SYU-KOH3COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
@@ -22926,6 +22964,7 @@
                                     LNK-SYU-KOH3COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH3COMPTOTAL   =
                              LNK-SYU-KOH3COMPFTN
+                  END-IF
                 END-IF
              ELSE                                                         
                 MOVE  WK-KOH-COMPFTN(3)  TO   LNK-SYU-KOH3COMPFTN       
@@ -22934,6 +22973,9 @@
              END-IF                                                      
              IF    WK-DAY-KOH-COMPFTN(3)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
+                  IF (WK-TAIHI-FTNGAKEN(3) = 1)
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
                                     LNK-SYU-KOH3COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
@@ -22942,6 +22984,7 @@
                                     LNK-SYU-KOH3COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH3COMPTOTAL   =
                              LNK-SYU-KOH3COMPFTN
+                  END-IF
                 END-IF
              ELSE                                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
@@ -22965,6 +23008,9 @@
            IF    COMB-KOH4HKNNUM         NOT = SPACE
              IF    WK-KOH-COMPFTN(4)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
+                  IF (WK-TAIHI-FTNGAKEN(4) = 1)
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
                                     LNK-SYU-KOH4COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
@@ -22973,6 +23019,7 @@
                                     LNK-SYU-KOH4COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH4COMPTOTAL   =
                              LNK-SYU-KOH4COMPFTN
+                  END-IF
                 END-IF
              ELSE                                                         
                 MOVE  WK-KOH-COMPFTN(4)  TO   LNK-SYU-KOH4COMPFTN       
@@ -22981,6 +23028,9 @@
              END-IF                                                      
              IF    WK-DAY-KOH-COMPFTN(4)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
+                  IF (WK-TAIHI-FTNGAKEN(4) = 1)
+                    CONTINUE
+                  ELSE
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
                                     LNK-SYU-KOH4COMPFTN     +   5
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
@@ -22989,6 +23039,7 @@
                                     LNK-SYU-KOH4COMPFTN     *  10
                     COMPUTE  LNK-SYU-KOH4COMPTOTAL   =
                              LNK-SYU-KOH4COMPFTN
+                  END-IF
                 END-IF
              ELSE                                                         
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
@@ -23110,15 +23161,25 @@
                END-IF
            END-IF.
       *
-           MOVE       ZERO         TO    FLG-KANSEN11.
-           IF   WK-TAIHI-KANSEN11(1)    =    1
+           MOVE       ZERO         TO    FLG-FTNGAKEN.
+           IF   WK-TAIHI-FTNGAKEN(1)    =    1
                IF   FLG-HIKAKU     =     1
-                    MOVE    1      TO    FLG-KANSEN11
+                    MOVE    1      TO    FLG-FTNGAKEN
                END-IF
            END-IF.
-           IF   WK-TAIHI-KANSEN11(2)    =    1
+           IF   WK-TAIHI-FTNGAKEN(2)    =    1
                IF   FLG-HIKAKU     =     2
-                    MOVE    1      TO    FLG-KANSEN11
+                    MOVE    1      TO    FLG-FTNGAKEN
+               END-IF
+           END-IF.
+           IF   WK-TAIHI-FTNGAKEN(3)    =    1
+               IF   FLG-HIKAKU     =     3
+                    MOVE    1      TO    FLG-FTNGAKEN
+               END-IF
+           END-IF.
+           IF   WK-TAIHI-FTNGAKEN(4)    =    1
+               IF   FLG-HIKAKU     =     4
+                    MOVE    1      TO    FLG-FTNGAKEN
                END-IF
            END-IF.
       *
