@@ -2693,7 +2693,7 @@
            PERFORM 900-SQL-JYOKEN-EDIT2-SEC
       *
            IF    ( SPA-Q01-DEATH    =  "0" )
-               STRING  "(DEATHKBN   =  ' ')"   DELIMITED   BY  SIZE
+               STRING  "(DEATHKBN   <> '1')"   DELIMITED   BY  SIZE
                INTO    WRK-SQL
                WITH    POINTER WRK-SQL-PNT
                END-STRING
