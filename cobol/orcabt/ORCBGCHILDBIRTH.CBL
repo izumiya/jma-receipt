@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-藤原    09/10/13  集計票、送付書の作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -65,7 +66,12 @@
                                    BY          //BUNBENUPD//.
            03  FILLER              PIC X(04)   VALUE   ".dat".
       *
+      *    請求書
            COPY    "HCN61.INC".
+      *    集計票
+           COPY    "HCN65.INC".
+      *    送付書
+           COPY    "HCN64.INC".
       *
        01  INDEX-AREA.
            03  IDW                 PIC 9(03).
@@ -126,6 +132,7 @@
                05  SUM-CNT         PIC 9(03).
                05  SUM-BIRTHCNT    PIC 9(03).
                05  SUM-MONEY       PIC 9(08).
+               05  SUM-PAGE        PIC 9(03).
       *
            03  SUM-RECORD-CNT      PIC 9(09).
       *
@@ -139,12 +146,15 @@
            03  WRK-PARA-SKYYM      PIC X(06).
            03  WRK-PARA-TEISYUTUSAKI
                                    PIC X(01).
+           03  WRK-PARA-PRTKBN     PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
            03  WRK-BUNBENERR       PIC X(200).
       *
            03  WRK-TEISYUTUSAKI    PIC X(01).
+      *
+           03  WRK-PRTID           PIC X(10).
       *
            03  WRK-SRYYM           PIC X(06).
            03  WRK-SKYYM           PIC X(16).
@@ -179,21 +189,22 @@
            03  WRK-HOSPADRS-R      REDEFINES   WRK-HOSPADRS.
                05  WRK-HOSPADRS1   PIC X(50).
                05  WRK-HOSPADRS2   PIC X(50).
+           03  WRK-HOSPTEL         PIC X(15).
       *
       *     右づめ編集用     
-           03  WRK-HENKAN              PIC X(20).
-           03  WRK-LENGTH              PIC 9(02).
-           03  WRK-HENSYU              PIC X(20).
+           03  WRK-HENKAN          PIC X(20).
+           03  WRK-LENGTH          PIC 9(02).
+           03  WRK-HENSYU          PIC X(20).
       *    出力データ編集用
-           03  WRK-REC                 PIC X(2500).
-           03  WRK-REC-LENGTH          PIC 9(04).
+           03  WRK-REC             PIC X(2500).
+           03  WRK-REC-LENGTH      PIC 9(04).
            03  WRK-HENSYU-AREA.
-               05  WRK-DATA            PIC X(2400).
-               05  WRK-NUM             PIC ZZZZZZZZZ9.99999. 
-               05  WRK-NAGASA          PIC 9(04).
-               05  WRK-ST              PIC 9(02). 
-               05  WRK-SYOSUU          PIC 9(01).
-               05  WRK-END             PIC 9(01).
+               05  WRK-DATA        PIC X(2400).
+               05  WRK-NUM         PIC ZZZZZZZZZ9.99999. 
+               05  WRK-NAGASA      PIC 9(04).
+               05  WRK-ST          PIC 9(02). 
+               05  WRK-SYOSUU      PIC 9(01).
+               05  WRK-END         PIC 9(01).
       *
       *    請求年月
            03  WRK-SYMD.
@@ -204,8 +215,22 @@
            03  WRK-ERRMSG          PIC X(300).
       *
       *   ワーク日付変換サブ返却値
-           COPY    "CPORCSDAY.INC" REPLACING  //LNK-DAY//
-                                   BY         //WRK-LNK-DAY//.
+           COPY    "CPORCSDAY.INC" REPLACING   //LNK-DAY//
+                                   BY          //WRK-LNK-DAY//.
+      *
+      *    複数枚用連番
+           03  WRK-HEN-PAGE-AREA.
+               05  WRK-PAGE1       PIC ZZ9.
+               05  WRK-PAGE-HEN    PIC X(01).
+               05  WRK-PAGE2       PIC ZZ9.
+      *
+      *    請求書退避用
+       01  TABLE-AREA.
+           03  TBL-LIST-MAX        PIC 9(02).
+           03  TBL-LIST-OCC        OCCURS  99.
+               05  TBL-LIST-PRTDATA
+                                   PIC X(10000).
+               05  TBL-LIST-FORMID PIC X(20).
       *
            COPY    "CPSHELLTBL.INC".
       *
@@ -287,6 +312,9 @@
       *    ＣＳＶ管理ＤＢ制御サブ
            COPY    "CPORCSCSVINFO.INC".
       *
+      *    県名取得パラメタ
+           COPY    "CPORCSPREF.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPAREA".
       *
@@ -352,7 +380,13 @@
                                        BUNBENERR
                                        WRK-PARA-SKYYM
                                        WRK-PARA-TEISYUTUSAKI
+                                       WRK-PARA-PRTKBN
            END-UNSTRING
+      *
+           DISPLAY "SKYYM       =" WRK-PARA-SKYYM
+           DISPLAY "TEISYUTUSAKI=" WRK-PARA-TEISYUTUSAKI
+           DISPLAY "PRTKBN      =" WRK-PARA-PRTKBN
+      *
       *
            MOVE    WRK-PARA-HOSPNUM
                                    TO  SPA-HOSPNUM
@@ -413,6 +447,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
+           IF      WRK-PARA-PRTKBN =   "0" OR  "1" OR  "2" OR  "3"
+               CONTINUE
+           ELSE
+               MOVE    "集計票作成の設定が誤っています" 
+                                       TO  WRK-BUNBENERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -463,6 +505,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            IF      FLG-END             =   ZERO
                MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
                MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
+               MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
       *        医療機関編集情報取得
                PERFORM 900-1900-READ-SEC
            END-IF    
@@ -478,17 +521,17 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            OPEN    OUTPUT              UPD-FILE
       *
-      *    社保分作成
-           IF      WRK-PARA-TEISYUTUSAKI
-                                   =   "0" OR  "1"
-               MOVE    "1"             TO  WRK-TEISYUTUSAKI
-               PERFORM 2001-TEISYUTUSAKI-HENSYU-SEC
-           END-IF
-      *
       *    国保分作成
            IF      WRK-PARA-TEISYUTUSAKI
                                    =   "0" OR  "2"
                MOVE    "2"             TO  WRK-TEISYUTUSAKI
+               PERFORM 2001-TEISYUTUSAKI-HENSYU-SEC
+           END-IF
+      *
+      *    社保分作成
+           IF      WRK-PARA-TEISYUTUSAKI
+                                   =   "0" OR  "1"
+               MOVE    "1"             TO  WRK-TEISYUTUSAKI
                PERFORM 2001-TEISYUTUSAKI-HENSYU-SEC
            END-IF
       *
@@ -509,7 +552,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *****************************************************************
        2001-TEISYUTUSAKI-HENSYU-SEC    SECTION.
       *
+           INITIALIZE                  TABLE-AREA
            INITIALIZE                  SUM-AREA
+      *
            MOVE    LOW-VALUE       TO  KEY-AREA
            ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
       *
@@ -531,6 +576,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            PERFORM          UNTIL   FLG-END        =   1
                INITIALIZE                  SUM-TBL-OCC (1)
                MOVE    ZERO            TO  WRK-PAGE
+               INITIALIZE                  TABLE-AREA
       *
       *        分娩区分・保険者別編集処理
                MOVE    KEY-NEW         TO  KEY-OLD
@@ -543,8 +589,23 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *        合計編集処理
                PERFORM 2003-TERM-PRINT-SEC
       *
+      *        帳票格納処理
+               PERFORM 2006-TABLE-SET-SEC
+      *
       *        帳票印刷処理
-               PERFORM 2004-PRINT-OUT-SEC
+               PERFORM VARYING IDYY    FROM    1   BY  1
+                       UNTIL   IDYY    >       TBL-LIST-MAX
+                       OR      FLG-ERR >       ZERO
+                   MOVE    SPACE               TO  WRK-HEN-PAGE-AREA
+                   MOVE    IDYY                TO  WRK-PAGE1
+                   MOVE    "/"                 TO  WRK-PAGE-HEN
+                   MOVE    TBL-LIST-MAX        TO  WRK-PAGE2
+                   MOVE    TBL-LIST-PRTDATA (IDYY)
+                                               TO  HCN61
+                   MOVE    WRK-HEN-PAGE-AREA   TO  HCN61-PAGE
+                   MOVE   "HCN61"          TO  WRK-PRTID
+                   PERFORM 2004-PRINT-OUT-SEC
+               END-PERFORM
       *
                IF      FLG-END         =   1
       *            ＣＳＶ（データレコード）編集処理
@@ -555,6 +616,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
       *            ＣＳＶ（エンドレコード）編集処理
                    PERFORM 2001-CSV-END-RECORD-HENSYU-SEC
+      *
+      *            集計票、送付書編集処理
+                   PERFORM 2005-HKNJANUM-PRINT-SEC
                END-IF 
            END-PERFORM
       *
@@ -656,6 +720,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *     
            ADD     1               TO  WRK-PAGE
                                        CNT-PAGE
+                                       SUM-PAGE (1)
+                                       SUM-PAGE (2)
            MOVE    WRK-PAGE        TO  WRK-ZZ9
            MOVE    WRK-ZZ9         TO  HCN61-PAGE
       *
@@ -839,7 +905,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
       *    帳票印刷処理
            IF      KEY-NEW         =   KEY-OLD
-               PERFORM 2004-PRINT-OUT-SEC
+      *        帳票格納処理
+               PERFORM 2006-TABLE-SET-SEC
            END-IF
  
            .
@@ -890,6 +957,188 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    集計票、送付書編集処理
+      *****************************************************************
+       2005-HKNJANUM-PRINT-SEC     SECTION.
+      *
+      *    集計票作成
+           IF      WRK-PARA-PRTKBN =   "0" OR  "1"
+               ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
+      *
+               MOVE    SPACE           TO  HCN65
+      *
+               INITIALIZE                  SPREF-AREA
+               CALL    "ORCSPREF"      USING   SPREF-AREA
+                                               SPA-AREA
+      *
+               MOVE    SYS-1001-PREFNUM    TO  IDX
+               EVALUATE   WRK-TEISYUTUSAKI
+                   WHEN    "1"
+                       STRING  SPREF-PREFNAME1 (IDX)
+                                           DELIMITED    BY  SPACE
+                               "社会保険診療報酬支払基金　御中"
+                                           DELIMITED    BY  SIZE
+                                           INTO    HCN65-TEISYUTUSAKI
+                       END-STRING
+                   WHEN    "2"
+                       STRING  SPREF-PREFNAME1 (IDX)
+                                           DELIMITED    BY  SPACE
+                               "国民健康保険団体連合会　御中"
+                                           DELIMITED    BY  SIZE
+                                           INTO    HCN65-TEISYUTUSAKI
+                       END-STRING
+               END-EVALUATE
+      *
+      *        所在地
+               MOVE    WRK-HOSPADRS    TO  HCN65-HOSPADRS
+      *
+      *        開設者
+               MOVE    SYS-1001-KAISETUNAME
+                                       TO  HCN65-KAISETUNAME
+      *
+      *        電話番号
+               MOVE    WRK-HOSPTEL     TO  HCN65-HOSPTEL
+      *
+      *        医療機関等コード
+               MOVE    SYS-1001-PREFNUM
+                                       TO  HCN65-HOSPCD (1:2)
+               MOVE    "1"             TO  HCN65-HOSPCD (3:1) 
+               MOVE    SYS-1001-HOSPCD TO  HCN65-HOSPCD (4:7)
+      *
+      *        医療機関名称
+               MOVE    WRK-HOSPNAME    TO  HCN65-HOSPNAME
+      *
+      *        分娩機関管理番号・施設等区分
+               IF      SYS-1001-SANKANUM
+                                       =   ZERO
+                   EVALUATE    SYS-1001-HOSPSBT
+                       WHEN    "1"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (1)
+                       WHEN    "2"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (2)
+                   END-EVALUATE
+               ELSE
+                   MOVE    SYS-1001-SANKANUM
+                                          TO  HCN65-SANKANUM
+                   EVALUATE    SYS-1001-SANKANUM (3:1)
+                       WHEN    "1"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (1)
+                       WHEN    "2"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (2)
+                       WHEN    "3"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (3)
+                   END-EVALUATE
+               END-IF
+      *
+      *        請求月分
+               MOVE    WRK-SKYYM       TO  HCN65-SKYYM
+      *
+      *        請求書枚数
+               MOVE    SUM-PAGE    (2) TO  WRK-ZZZZZZZ9
+               MOVE    WRK-ZZZZZZZ9    TO  HCN65-PAGE
+      *
+      *        取扱件数
+               MOVE    SUM-CNT     (2) TO  WRK-ZZZZZZZ9
+               MOVE    WRK-ZZZZZZZ9    TO  HCN65-KENSU
+      *
+      *        出産数
+               MOVE    SUM-BIRTHCNT(2) TO  WRK-ZZZZZZZ9
+               MOVE    WRK-ZZZZZZZ9    TO  HCN65-BIRTHCNT
+      *
+      *        代理受取額合計
+               MOVE    SUM-MONEY   (2) TO  WRK-ZZZZZZZ9
+               MOVE    WRK-ZZZZZZZ9    TO  HCN65-DAIRI-MONEY
+      *
+               ADD     1               TO  CNT-PAGE
+      *
+      *        帳票印刷処理
+               MOVE   "HCN65"          TO  WRK-PRTID
+               PERFORM 2004-PRINT-OUT-SEC
+           END-IF
+      *
+      *    送付書作成
+           IF      WRK-PARA-PRTKBN =   "0" OR  "2"
+               ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
+      *
+               MOVE    SPACE           TO  HCN64
+      *
+               INITIALIZE                  SPREF-AREA
+               CALL    "ORCSPREF"      USING   SPREF-AREA
+                                               SPA-AREA
+      *
+               MOVE    SYS-1001-PREFNUM    TO  IDX
+               EVALUATE   WRK-TEISYUTUSAKI
+                   WHEN    "1"
+                       STRING  SPREF-PREFNAME1 (IDX)
+                                           DELIMITED    BY  SPACE
+                               "社会保険診療報酬支払基金　御中"
+                                           DELIMITED    BY  SIZE
+                                           INTO    HCN64-TEISYUTUSAKI
+                       END-STRING
+                   WHEN    "2"
+                       STRING  SPREF-PREFNAME1 (IDX)
+                                           DELIMITED    BY  SPACE
+                               "国民健康保険団体連合会　御中"
+                                           DELIMITED    BY  SIZE
+                                           INTO    HCN64-TEISYUTUSAKI
+                       END-STRING
+               END-EVALUATE
+      *
+      *        所在地
+               MOVE    WRK-HOSPADRS    TO  HCN64-HOSPADRS
+      *
+      *        開設者
+               MOVE    SYS-1001-KAISETUNAME
+                                       TO  HCN64-KAISETUNAME
+      *
+      *        電話番号
+               MOVE    WRK-HOSPTEL     TO  HCN64-HOSPTEL
+      *
+      *        医療機関等コード
+               MOVE    SYS-1001-PREFNUM
+                                       TO  HCN64-HOSPCD (1:2)
+               MOVE    "1"             TO  HCN64-HOSPCD (3:1) 
+               MOVE    SYS-1001-HOSPCD TO  HCN64-HOSPCD (4:7)
+      *
+      *        医療機関名称
+               MOVE    WRK-HOSPNAME    TO  HCN64-HOSPNAME
+      *
+      *        分娩機関管理番号・施設等区分
+               IF      SYS-1001-SANKANUM
+                                       =   ZERO
+                   EVALUATE    SYS-1001-HOSPSBT
+                       WHEN    "1"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (1)
+                       WHEN    "2"
+                           MOVE    "○"        TO  HCN65-HOSPSBT (2)
+                   END-EVALUATE
+               ELSE
+                   MOVE    SYS-1001-SANKANUM
+                                          TO  HCN64-SANKANUM
+                   EVALUATE    SYS-1001-SANKANUM (3:1)
+                       WHEN    "1"
+                           MOVE    "○"        TO  HCN64-HOSPSBT (1)
+                       WHEN    "2"
+                           MOVE    "○"        TO  HCN64-HOSPSBT (2)
+                       WHEN    "3"
+                           MOVE    "○"        TO  HCN64-HOSPSBT (3)
+                   END-EVALUATE
+               END-IF
+      *
+      *        請求月分
+               MOVE    WRK-SKYYM       TO  HCN64-SKYYM
+      *
+               ADD     1               TO  CNT-PAGE
+      *
+      *        帳票印刷処理
+               MOVE   "HCN64"          TO  WRK-PRTID
+               PERFORM 2004-PRINT-OUT-SEC
+           END-IF
+           .
+       2005-HKNJANUM-PRINT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    帳票印刷処理
       *****************************************************************
        2004-PRINT-OUT-SEC              SECTION.
@@ -912,17 +1161,42 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                                    TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                    TO  SPRT-PRIORITY
-           MOVE   "HCN61.red"      TO  SPRT-PRTID
-           MOVE    HCN61           TO  SPRT-PRTDATA
-           EVALUATE    WRK-TEISYUTUSAKI
-               WHEN    "1"
-                   MOVE
-                       "（社保）出産育児一時金等代理申請・受取請求書"
-                                           TO  SPRT-TITLE
-               WHEN    "2"
-                   MOVE
-                       "（国保）出産育児一時金等代理申請・受取請求書"
-                                           TO  SPRT-TITLE
+           EVALUATE    WRK-PRTID
+               WHEN    "HCN61"
+                   MOVE   "HCN61.red"      TO  SPRT-PRTID
+                   MOVE    HCN61           TO  SPRT-PRTDATA
+                   EVALUATE    WRK-TEISYUTUSAKI
+                       WHEN    "1"
+                           MOVE
+                          "（社保）出産育児一時金等代理申請・受取請求書"
+                                                   TO  SPRT-TITLE
+                       WHEN    "2"
+                           MOVE
+                          "（国保）出産育児一時金等代理申請・受取請求書"
+                                                    TO  SPRT-TITLE
+                   END-EVALUATE
+               WHEN    "HCN64"
+                   MOVE   "HCN64.red"      TO  SPRT-PRTID
+                   MOVE    HCN64           TO  SPRT-PRTDATA
+                   EVALUATE    WRK-TEISYUTUSAKI
+                       WHEN    "1"
+                           MOVE
+                               "（社保）送付書"    TO  SPRT-TITLE
+                       WHEN    "2"
+                           MOVE
+                               "（国保）送付書"    TO  SPRT-TITLE
+                   END-EVALUATE
+               WHEN    "HCN65"
+                   MOVE   "HCN65.red"      TO  SPRT-PRTID
+                   MOVE    HCN65           TO  SPRT-PRTDATA
+                   EVALUATE    WRK-TEISYUTUSAKI
+                       WHEN    "1"
+                           MOVE
+                               "（社保）集計票"    TO  SPRT-TITLE
+                       WHEN    "2"
+                           MOVE
+                               "（国保）集計票"    TO  SPRT-TITLE
+                   END-EVALUATE
            END-EVALUATE
            MOVE    LNK-PRTKANRI-TERMID
                                    TO  SPRT-TERMID
@@ -945,6 +1219,20 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            END-IF
            .
        2004-PRINT-OUT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    帳票格納処理
+      *****************************************************************
+       2006-TABLE-SET-SEC          SECTION.
+      *
+           ADD     1               TO  TBL-LIST-MAX
+      * 
+           MOVE    "HCN61.red"     TO  TBL-LIST-FORMID  (TBL-LIST-MAX)
+           MOVE    HCN61           TO  TBL-LIST-PRTDATA (TBL-LIST-MAX)
+      *
+           .
+       2006-TABLE-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1896,6 +2184,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                MOVE    MCPDATA-REC         TO  SYS-1902-REC
                MOVE    SYS-1902-ADRS1      TO  WRK-HOSPADRS1
                MOVE    SYS-1902-ADRS2      TO  WRK-HOSPADRS2
+               MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
            ELSE
                INITIALIZE                      SYS-1902-REC
            END-IF
