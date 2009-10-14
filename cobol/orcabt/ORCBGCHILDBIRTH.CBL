@@ -1108,9 +1108,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                                        =   ZERO
                    EVALUATE    SYS-1001-HOSPSBT
                        WHEN    "1"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (1)
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
                        WHEN    "2"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (2)
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
                    END-EVALUATE
                ELSE
                    MOVE    SYS-1001-SANKANUM
