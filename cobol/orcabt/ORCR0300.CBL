@@ -301,6 +301,9 @@
       *  04.04.06    NACL-Æ£¸¶    09/09/18  ¡ÖÊ¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æ¡×ÂÐ±þ
       *                                     Ê¼¸Ë¸©¡¦²¬»³¸©
       *                                     £²£°£°£¹Ç¯£¸·î¡Á£²£°£±£°Ç¯£±·îÂÐ¾Ý 
+      *  04.04.07    NACL-Æ£¸¶    09/10/14  £±£³°å³Ø´ÉÍý¡¦£±£´ºßÂð¤Ç
+      *                                     ¹ð¼¨¶èÊ¬£±¤¬´ðËÜ¹àÌÜ°Ê³°¤Î¤È¤­
+      *                                     ÅÀ¿ô¡¦²ó¿ô¤Îµ­ºÜ¤ò¹Ô¤¦
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3749,7 +3752,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *        
                IF    ( RECE041-SRYKBN      =   "13"  OR  "14" )
                    IF      TBL-KOUI-KOKUJISKBKBN1(WRK-TBLMAX1)
-                                           NOT =   "1"
+                                           NOT =   "1" AND "3" AND "5"
                        MOVE    WRK-TBLMAX1         TO  FLG-KOKUJISKBKBN1
                    END-IF
                    IF    ( TBL-KOUI-KOKUJISKBKBN1(WRK-TBLMAX1)
@@ -3762,7 +3765,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                END-IF
            END-IF
            .
-       200711-KOUI-TAIHI-EXT.
+       2007111-KOUI-TAIHI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
