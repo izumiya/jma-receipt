@@ -1150,7 +1150,7 @@
                INITIALIZE                  SYS-1006-REC
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
-           PERFORM UNTIL   FLG-SYSKANRI        =   ZERO
+           PERFORM UNTIL   FLG-SYSKANRI        =   1
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
                IF      SYS-1006-KBNCD      =   "1"
       *            ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
@@ -1779,7 +1779,7 @@
            END-IF
       *!!
       *    ´ïºà¾¦ÉÊ¥³¡¼¥É
-           IF      SRY-MEISKYFLG (IDX) =   "1"
+           IF      SRY-MEISKYFLG (IDS) =   "1"
                MOVE    "1"                 TO  SPA-COM-AUTOKBN2 (IDX2)
            END-IF
       *!!
