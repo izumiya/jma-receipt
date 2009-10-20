@@ -8124,6 +8124,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "01"                TO  SPA-J02-SRYYMD(7:2)
            ELSE
                MOVE    ZERO                TO  SPA-J02-SRYYMD(7:2)
+               MOVE    "01"                TO  SPA-J02-SRYYMD(7:2)
                PERFORM VARYING     IDX-D   FROM    1   BY  1
                        UNTIL       IDX-D   >   31
                    IF      SPA-GMN-DAY (IDX-D) NOT =   ZERO
