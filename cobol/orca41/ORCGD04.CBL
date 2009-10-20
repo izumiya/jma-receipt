@@ -601,9 +601,9 @@
                PERFORM 900-CHKREIGAI-KEY5-SEL-SEC
                IF    ( FLG-CHKREIGAI   =   ZERO )
                    IF    ( CHKREIGAI-STYUKYMD  =   "00000000" )
-                       MOVE    "1"         TO  SPA-GMN-TREIGAI(IDX-LST)
-                   ELSE
                        MOVE    "2"         TO  SPA-GMN-TREIGAI(IDX-LST)
+                   ELSE
+                       MOVE    "1"         TO  SPA-GMN-TREIGAI(IDX-LST)
                    END-IF
                END-IF
       *
