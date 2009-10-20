@@ -450,7 +450,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            IF      WRK-PARA-PRTKBN =   "0" OR  "1" OR  "2" OR  "3"
                CONTINUE
            ELSE
-               MOVE    "集計票作成の設定が誤っています" 
+               MOVE    "集計票／送付書作成の設定が誤っています" 
                                        TO  WRK-BUNBENERR
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
