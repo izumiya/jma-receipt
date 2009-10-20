@@ -651,6 +651,7 @@
                05  WK-RUI-TAISYO           PIC  9(01).
       *
                05  WK-RUI-MONEY            PIC  9(07).
+               05  WK-RUI-ZENGAKU          PIC  9(10).
       *
            03  WK-MARUKO-TBL.
                05  WK-MARUKO-M             PIC  9(09).
@@ -8867,19 +8868,19 @@
            INITIALIZE                  WK-RUI-TBL.
            MOVE     ZERO          TO   FLG-RUIKEIYO.
            MOVE     ZERO          TO   FLG-RUIKEIYO2.
-      *@   IF  (LNK-SYU-SRYYMD(1:6)  >= "200904")
-      *@   AND (COMB-HKNNUM       NOT =  SPACE  )
-      *@    IF  WK-1001-PREFNUM  =  13 OR 33
-      *@      IF ( LNK-SYU-KOH-HKNNUM(1) =
-      *@           "015" OR "016" OR "021" OR "024" OR
-      *@           "038" OR "051" OR "052" OR "079"    )
-      *@      OR ( WK-TOKATUKAI(1)       =   1         )
-      *@      OR ((WK-1001-PREFNUM       =  13        ) AND
-      *@          (LNK-SYU-KOH-HKNNUM(1) = "182"      ))
-      *@          MOVE     1      TO   FLG-RUIKEIYO
-      *@      END-IF
-      *@    END-IF
-      *@   END-IF.
+           IF  (LNK-SYU-SRYYMD(1:6)  >= "200904")
+           AND (COMB-HKNNUM       NOT =  SPACE  )
+            IF  WK-1001-PREFNUM  =  13 OR 33
+              IF ( LNK-SYU-KOH-HKNNUM(1) =
+                   "015" OR "016" OR "021" OR "024" OR
+                   "038" OR "051" OR "052" OR "079"    )
+              OR ( WK-TOKATUKAI(1)       =   1         )
+              OR ((WK-1001-PREFNUM       =  13        ) AND
+                  (LNK-SYU-KOH-HKNNUM(1) = "182"      ))
+                  MOVE     1      TO   FLG-RUIKEIYO
+              END-IF
+            END-IF
+           END-IF.
       *
            IF  (COMB-KOH1-GAIJGNKBN        =       "1")      OR
                (COMB-KOH2-GAIJGNKBN        =       "1")      OR
@@ -11274,6 +11275,9 @@
                                ADD WK-ENTANI    TO  WK-RUI-FTN2-M3
                                ADD SYU-KOH2COMPFTN-ENTANI
                                                 TO  WK-RUI-FTN2-M3-XXX
+                               COMPUTE  WK-RUI-ZENGAKU =
+                                        WK-RUI-ZENGAKU +
+                                       (SYU-HKNTEN (17) * 10)
                              END-IF
                              IF ((LNK-SYU-SRYYMD(1:6)  >=  "200604") AND
                                  (LNK-SYU-KOH2HKNNUM    =
@@ -17962,11 +17966,8 @@
                    IF  WK-GAIKFTNRATE     NOT = ZERO
                      IF   WK-RUI-FTNRATE  >  WK-GAIKFTNRATE
                        IF COMB-KOH-GAIJGNKBN(2)  =  "1"
-                         IF ( MAX-KIN-KOHI2-M  NOT = ZERO )
-                         OR ( MAX-KIN-KOHI2-D  NOT = ZERO )
-                         OR ((MAX-KIN-KOHI2-K  NOT = ZERO) AND
-                             (MAX-KIN-KOHI2-M      = ZERO) AND
-                             (MAX-KIN-KOHI2-D      = ZERO))
+                         IF (MAX-KIN-KOHI2-M  NOT = ZERO)
+                         OR (MAX-KIN-KOHI2-D  NOT = ZERO)
                            MOVE   1    TO  WK-RUI-TAISYO
                            PERFORM   23042-FTNGAK-HENSYU-SEC
                            MOVE   1    TO  FLG-RUIKEIYO2
@@ -17982,12 +17983,9 @@
                      ELSE
                        IF   WK-RUI-FTNRATE  =  WK-GAIKFTNRATE
                          IF COMB-KOH-GAIJGNKBN(2)  =  "1"
-                           IF ((MAX-KIN-KOHI2-D  NOT = ZERO) AND
-                               (MAX-KIN-KOHI2-D  NOT =
-                                            MAX-KIN-KOHI2-M))
-                           OR ((MAX-KIN-KOHI2-K  NOT = ZERO) AND
-                               (MAX-KIN-KOHI2-M      = ZERO) AND
-                               (MAX-KIN-KOHI2-D      = ZERO))
+                           IF  (MAX-KIN-KOHI2-D  NOT = ZERO)
+                           AND (MAX-KIN-KOHI2-D  NOT =
+                                            MAX-KIN-KOHI2-M)
                              MOVE   1    TO  WK-RUI-TAISYO
                              PERFORM   23042-FTNGAK-HENSYU-SEC
                              MOVE   1    TO  FLG-RUIKEIYO2
@@ -17998,12 +17996,9 @@
                      END-IF
                    ELSE
                      IF COMB-KOH-GAIJGNKBN(2)  =  "1"
-                       IF ((MAX-KIN-KOHI2-D  NOT = ZERO) AND
-                           (MAX-KIN-KOHI2-D  NOT =
-                                        MAX-KIN-KOHI2-M))
-                       OR ((MAX-KIN-KOHI2-K  NOT = ZERO) AND
-                           (MAX-KIN-KOHI2-M      = ZERO) AND
-                           (MAX-KIN-KOHI2-D      = ZERO))
+                       IF  (MAX-KIN-KOHI2-D  NOT = ZERO)
+                       AND (MAX-KIN-KOHI2-D  NOT =
+                                        MAX-KIN-KOHI2-M)
                          IF   WK-RUI-FTNRATE-KOH1  NOT = ZERO
                            MOVE WK-RUI-FTNRATE-KOH1 TO WK-GAIKFTNRATE
                          END-IF
@@ -18039,6 +18034,15 @@
                    END-IF
                  END-IF
              END-EVALUATE
+           END-IF.
+      *
+           IF  (KOH-IDX               =  2   )
+           AND (WK-RUI-TAISYO         =  1   )
+           AND (WK-1001-PREFNUM       =  13  )
+           AND (LNK-SYU-KOH-HKNNUM(1) = "182")
+           AND (WK-GAIKFTNRATE    NOT =  ZERO)
+           AND (MAX-KIN-KOHI2-D       =  ZERO)
+             COMPUTE WK-ZENGAKU  =   WK-ZENGAKU  +  WK-RUI-ZENGAKU
            END-IF.
       *
        2304-KOH-HKNREAD-EXT.

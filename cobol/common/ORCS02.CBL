@@ -651,6 +651,7 @@
                05  WK-RUI-TAISYO           PIC  9(01).
       *
                05  WK-RUI-MONEY            PIC  9(07).
+               05  WK-RUI-ZENGAKU          PIC  9(10).
       *
            03  WK-MARUKO-TBL.
                05  WK-MARUKO-M             PIC  9(09).
@@ -8700,17 +8701,17 @@
            MOVE     ZERO          TO   FLG-RUIKEIYO.
            MOVE     ZERO          TO   FLG-RUIKEIYO2.
            MOVE     ZERO          TO   FLG-RUIKEIYO-DAY.
-      *@   IF  (LNK-SYU-SRYYMD(1:6)  >= "200904")
-      *@   AND (COMB-HKNNUM       NOT =  SPACE  )
-      *@      IF ( LNK-SYU-KOH-HKNNUM(1) =
-      *@           "015" OR "016" OR "021" OR "024" OR
-      *@           "038" OR "051" OR "052" OR "079"    )
-      *@      OR ( WK-TOKATUKAI(1)       =   1         )
-      *@      OR ((WK-1001-PREFNUM       =  13        ) AND
-      *@          (LNK-SYU-KOH-HKNNUM(1) = "182"      ))
-      *@          MOVE     1      TO   FLG-RUIKEIYO
-      *@      END-IF
-      *@   END-IF.
+           IF  (LNK-SYU-SRYYMD(1:6)  >= "200904")
+           AND (COMB-HKNNUM       NOT =  SPACE  )
+              IF ( LNK-SYU-KOH-HKNNUM(1) =
+                   "015" OR "016" OR "021" OR "024" OR
+                   "038" OR "051" OR "052" OR "079"    )
+              OR ( WK-TOKATUKAI(1)       =   1         )
+              OR ((WK-1001-PREFNUM       =  13        ) AND
+                  (LNK-SYU-KOH-HKNNUM(1) = "182"      ))
+                  MOVE     1      TO   FLG-RUIKEIYO
+              END-IF
+           END-IF.
       *
            IF  (COMB-KOH1-NYUJGNKBN       =       "1")      OR
                (COMB-KOH2-NYUJGNKBN       =       "1")      OR
@@ -11001,6 +11002,9 @@
                                ADD   WK-ENTANI  TO  WK-RUI-FTN2-M3
                                ADD   SYU-KOH2COMPFTN-ENTANI
                                                 TO  WK-RUI-FTN2-M3-XXX
+                               COMPUTE  WK-RUI-ZENGAKU =
+                                        WK-RUI-ZENGAKU +
+                                       (SYU-HKNTEN (17) * 10)
                              END-IF
                              IF ((LNK-SYU-SRYYMD(1:6)  >=  "200604") AND
                                  (LNK-SYU-KOH2HKNNUM    =
@@ -18601,6 +18605,15 @@
                    END-IF
                  END-IF
              END-EVALUATE
+           END-IF.
+      *
+           IF  (KOH-IDX               =  2   )
+           AND (WK-RUI-TAISYO         =  1   )
+           AND (WK-1001-PREFNUM       =  13  )
+           AND (LNK-SYU-KOH-HKNNUM(1) = "182")
+           AND (WK-NYUKFTNRATE    NOT =  ZERO)
+           AND (MAX-KIN-KOHI2-D       =  ZERO)
+             COMPUTE WK-ZENGAKU  =   WK-ZENGAKU  +  WK-RUI-ZENGAKU
            END-IF.
       *
        2306-KOH-HKNREAD-EXT.
