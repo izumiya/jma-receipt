@@ -1747,8 +1747,18 @@
                    PERFORM 900-HKNJAINF-KEY-SEL-SEC
                    MOVE    HKNJA-HKNJANAME
                                    TO  SPA-GMN-HKNJANAME
-                   MOVE    HKNJA-HKNNUM
+                   IF    ( HKNJA-HKNNUM    =   "060"
+                       AND SPA-GMN-HKNNUM  =   "068" )
+                    OR   ( HKNJA-HKNNUM    =   "067"
+                       AND SPA-GMN-HKNNUM  =   "069" )
+                    OR   ( HKNJA-HKNNUM    =   "039"
+                       AND SPA-GMN-HKNNUM  =   "040" )
+                       MOVE    SPA-GMN-HKNNUM
                                    TO  WRK-CMB-CD
+                   ELSE
+                       MOVE    HKNJA-HKNNUM
+                                   TO  WRK-CMB-CD
+                   END-IF
                    PERFORM 4200-HKNNUMLST-CHK-SEC
                    IF    ( WRK-CMB-CD  NOT =   SPACE )
                        MOVE    WRK-CMB-ITM
