@@ -2006,7 +2006,7 @@
            MOVE    ZERO                TO  FLG-ERR
       *
       *    同日再診
-           IF      SPA-HKNCOMBINUM     =   "9999"
+           IF     (SPA-HKNCOMBINUM     =   "9999")
       *       受付あり
               OR  (SPA-UKETUKE-ARI     =   1    )
               OR  (SPA-TEISEIFLG       =   "0"  )
@@ -2014,7 +2014,8 @@
            ELSE
                IF     ( SPA-NYUGAIKBN      =   "2"        ) AND
                       ( SPA-SYORIFLG       =   ZERO       ) AND
-                      ( SPA-RRK-LSTYMD     =   SPA-SRYYMD ) AND
+      **********      ( SPA-RRK-LSTYMD     =   SPA-SRYYMD ) AND
+                      ( SPA-NAI-RRKYMD(1)  =   SPA-SRYYMD ) AND
                       ( SPA-LSTYMD         =   SPA-SRYYMD )
                    IF      (SPA-TEISEIFLG       =   "1"  )
                        MOVE    "0100"              TO  SPA-KIDCD
