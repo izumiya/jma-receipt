@@ -1050,6 +1050,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *        請求月分
                MOVE    WRK-SKYYM       TO  HCN64-SKYYM
       *
+      *        提出年月日
+               MOVE    "平成"          TO  HCN64-RECEG
+      *
                ADD     1               TO  CNT-PAGE
       *
       *        帳票印刷処理
@@ -1146,6 +1149,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *        代理受取額合計
                MOVE    SUM-MONEY   (2) TO  WRK-ZZZZZZZ9
                MOVE    WRK-ZZZZZZZ9    TO  HCN65-DAIRI-MONEY
+      *
+      *        提出年月日
+               MOVE    "平成"          TO  HCN65-RECEG
       *
                ADD     1               TO  CNT-PAGE
       *
