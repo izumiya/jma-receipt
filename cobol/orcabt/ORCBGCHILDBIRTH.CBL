@@ -1051,7 +1051,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    WRK-SKYYM       TO  HCN64-SKYYM
       *
       *        提出年月日
-               MOVE    "平成"          TO  HCN64-RECEG
+               MOVE    "平成"          TO  HCN64-TEIG
       *
                ADD     1               TO  CNT-PAGE
       *
@@ -1151,7 +1151,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    WRK-ZZZZZZZ9    TO  HCN65-DAIRI-MONEY
       *
       *        提出年月日
-               MOVE    "平成"          TO  HCN65-RECEG
+               MOVE    "平成"          TO  HCN65-TEIG
       *
                ADD     1               TO  CNT-PAGE
       *
