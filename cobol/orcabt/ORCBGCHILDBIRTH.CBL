@@ -156,13 +156,16 @@
       *
            03  WRK-PRTID           PIC X(10).
       *
+           03  WRK-LNK-PRTKANRI-SHORI-RENNUM
+                                   PIC 9(04).
+      *
            03  WRK-SRYYM           PIC X(06).
            03  WRK-SKYYM           PIC X(16).
            03  WRK-SKYYMH          PIC X(05).
            03  WRK-BIRTHDAYH       PIC X(07).
            03  WRK-CHILD-BIRTHDAYH PIC X(07).
            03  WRK-BIKOU.
-               05  WRK-BIKOU-O     PIC X(40)   OCCURS  2. 
+               05  WRK-BIKOU-O     PIC X(40)   OCCURS  2.
       *
            03  WRK-9               PIC 9.
            03  WRK-ZZ9             PIC ZZ9.
@@ -554,9 +557,21 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            INITIALIZE                  TABLE-AREA
            INITIALIZE                  SUM-AREA
-      *
            MOVE    LOW-VALUE       TO  KEY-AREA
-           ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
+      *
+           MOVE    WRK-LNK-PRTKANRI-SHORI-RENNUM
+                                   TO  LNK-PRTKANRI-SHORI-RENNUM
+           EVALUATE    WRK-PARA-PRTKBN
+               WHEN    "0"
+                   ADD     3           TO  LNK-PRTKANRI-SHORI-RENNUM
+               WHEN    "1"
+               WHEN    "2"
+                   ADD     2           TO  LNK-PRTKANRI-SHORI-RENNUM
+               WHEN    "3"
+                   ADD     1           TO  LNK-PRTKANRI-SHORI-RENNUM
+           END-EVALUATE
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                   TO  WRK-LNK-PRTKANRI-SHORI-RENNUM
       *
            MOVE    ZERO            TO  WRK-PAGE
                                        WRK-OUT
@@ -961,9 +976,92 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *****************************************************************
        2005-HKNJANUM-PRINT-SEC     SECTION.
       *
+      *    Á÷ÉÕ½ñºîÀ®
+           IF      WRK-PARA-PRTKBN =   "0" OR  "2"
+               COMPUTE LNK-PRTKANRI-SHORI-RENNUM
+                                   =   LNK-PRTKANRI-SHORI-RENNUM
+                                   -   1
+      *
+               MOVE    SPACE           TO  HCN64
+      *
+               INITIALIZE                  SPREF-AREA
+               CALL    "ORCSPREF"      USING   SPREF-AREA
+                                               SPA-AREA
+      *
+               MOVE    SYS-1001-PREFNUM    TO  IDX
+               EVALUATE   WRK-TEISYUTUSAKI
+                   WHEN    "1"
+                       STRING  SPREF-PREFNAME1 (IDX)
+                                           DELIMITED    BY  SPACE
+                               "¼Ò²ñÊÝ¸±¿ÇÎÅÊó½·»ÙÊ§´ð¶â¡¡¸æÃæ"
+                                           DELIMITED    BY  SIZE
+                                           INTO    HCN64-TEISYUTUSAKI
+                       END-STRING
+                   WHEN    "2"
+                       STRING  SPREF-PREFNAME1 (IDX)
+                                           DELIMITED    BY  SPACE
+                               "¹ñÌ±·ò¹¯ÊÝ¸±ÃÄÂÎÏ¢¹ç²ñ¡¡¸æÃæ"
+                                           DELIMITED    BY  SIZE
+                                           INTO    HCN64-TEISYUTUSAKI
+                       END-STRING
+               END-EVALUATE
+      *
+      *        ½êºßÃÏ
+               MOVE    WRK-HOSPADRS    TO  HCN64-HOSPADRS
+      *
+      *        ³«Àß¼Ô
+               MOVE    SYS-1001-KAISETUNAME
+                                       TO  HCN64-KAISETUNAME
+      *
+      *        ÅÅÏÃÈÖ¹æ
+               MOVE    WRK-HOSPTEL     TO  HCN64-HOSPTEL
+      *
+      *        °åÎÅµ¡´ØÅù¥³¡¼¥É
+               MOVE    SYS-1001-PREFNUM
+                                       TO  HCN64-HOSPCD (1:2)
+               MOVE    "1"             TO  HCN64-HOSPCD (3:1) 
+               MOVE    SYS-1001-HOSPCD TO  HCN64-HOSPCD (4:7)
+      *
+      *        °åÎÅµ¡´ØÌ¾¾Î
+               MOVE    WRK-HOSPNAME    TO  HCN64-HOSPNAME
+      *
+      *        Ê¬ÊÚµ¡´Ø´ÉÍýÈÖ¹æ¡¦»ÜÀßÅù¶èÊ¬
+               IF      SYS-1001-SANKANUM
+                                       =   ZERO
+                   EVALUATE    SYS-1001-HOSPSBT
+                       WHEN    "1"
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
+                       WHEN    "2"
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
+                   END-EVALUATE
+               ELSE
+                   MOVE    SYS-1001-SANKANUM
+                                          TO  HCN64-SANKANUM
+                   EVALUATE    SYS-1001-SANKANUM (3:1)
+                       WHEN    "1"
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
+                       WHEN    "2"
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
+                       WHEN    "3"
+                           MOVE    "¡û"        TO  HCN64-HOSPSBT (3)
+                   END-EVALUATE
+               END-IF
+      *
+      *        ÀÁµá·îÊ¬
+               MOVE    WRK-SKYYM       TO  HCN64-SKYYM
+      *
+               ADD     1               TO  CNT-PAGE
+      *
+      *        Ä¢É¼°õºþ½èÍý
+               MOVE   "HCN64"          TO  WRK-PRTID
+               PERFORM 2004-PRINT-OUT-SEC
+           END-IF
+      *
       *    ½¸·×É¼ºîÀ®
            IF      WRK-PARA-PRTKBN =   "0" OR  "1"
-               ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
+               COMPUTE LNK-PRTKANRI-SHORI-RENNUM
+                                   =   LNK-PRTKANRI-SHORI-RENNUM
+                                   -   1
       *
                MOVE    SPACE           TO  HCN65
       *
@@ -1053,85 +1151,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
       *        Ä¢É¼°õºþ½èÍý
                MOVE   "HCN65"          TO  WRK-PRTID
-               PERFORM 2004-PRINT-OUT-SEC
-           END-IF
-      *
-      *    Á÷ÉÕ½ñºîÀ®
-           IF      WRK-PARA-PRTKBN =   "0" OR  "2"
-               ADD     1               TO  LNK-PRTKANRI-SHORI-RENNUM
-      *
-               MOVE    SPACE           TO  HCN64
-      *
-               INITIALIZE                  SPREF-AREA
-               CALL    "ORCSPREF"      USING   SPREF-AREA
-                                               SPA-AREA
-      *
-               MOVE    SYS-1001-PREFNUM    TO  IDX
-               EVALUATE   WRK-TEISYUTUSAKI
-                   WHEN    "1"
-                       STRING  SPREF-PREFNAME1 (IDX)
-                                           DELIMITED    BY  SPACE
-                               "¼Ò²ñÊÝ¸±¿ÇÎÅÊó½·»ÙÊ§´ð¶â¡¡¸æÃæ"
-                                           DELIMITED    BY  SIZE
-                                           INTO    HCN64-TEISYUTUSAKI
-                       END-STRING
-                   WHEN    "2"
-                       STRING  SPREF-PREFNAME1 (IDX)
-                                           DELIMITED    BY  SPACE
-                               "¹ñÌ±·ò¹¯ÊÝ¸±ÃÄÂÎÏ¢¹ç²ñ¡¡¸æÃæ"
-                                           DELIMITED    BY  SIZE
-                                           INTO    HCN64-TEISYUTUSAKI
-                       END-STRING
-               END-EVALUATE
-      *
-      *        ½êºßÃÏ
-               MOVE    WRK-HOSPADRS    TO  HCN64-HOSPADRS
-      *
-      *        ³«Àß¼Ô
-               MOVE    SYS-1001-KAISETUNAME
-                                       TO  HCN64-KAISETUNAME
-      *
-      *        ÅÅÏÃÈÖ¹æ
-               MOVE    WRK-HOSPTEL     TO  HCN64-HOSPTEL
-      *
-      *        °åÎÅµ¡´ØÅù¥³¡¼¥É
-               MOVE    SYS-1001-PREFNUM
-                                       TO  HCN64-HOSPCD (1:2)
-               MOVE    "1"             TO  HCN64-HOSPCD (3:1) 
-               MOVE    SYS-1001-HOSPCD TO  HCN64-HOSPCD (4:7)
-      *
-      *        °åÎÅµ¡´ØÌ¾¾Î
-               MOVE    WRK-HOSPNAME    TO  HCN64-HOSPNAME
-      *
-      *        Ê¬ÊÚµ¡´Ø´ÉÍýÈÖ¹æ¡¦»ÜÀßÅù¶èÊ¬
-               IF      SYS-1001-SANKANUM
-                                       =   ZERO
-                   EVALUATE    SYS-1001-HOSPSBT
-                       WHEN    "1"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
-                       WHEN    "2"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
-                   END-EVALUATE
-               ELSE
-                   MOVE    SYS-1001-SANKANUM
-                                          TO  HCN64-SANKANUM
-                   EVALUATE    SYS-1001-SANKANUM (3:1)
-                       WHEN    "1"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
-                       WHEN    "2"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
-                       WHEN    "3"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (3)
-                   END-EVALUATE
-               END-IF
-      *
-      *        ÀÁµá·îÊ¬
-               MOVE    WRK-SKYYM       TO  HCN64-SKYYM
-      *
-               ADD     1               TO  CNT-PAGE
-      *
-      *        Ä¢É¼°õºþ½èÍý
-               MOVE   "HCN64"          TO  WRK-PRTID
                PERFORM 2004-PRINT-OUT-SEC
            END-IF
            .
