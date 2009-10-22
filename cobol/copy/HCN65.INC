@@ -9,7 +9,11 @@
             02  HCN65-HOSPSBT
                     PIC X(2)    OCCURS  3 TIMES.
             02  HCN65-SKYYM PIC X(16).
-            02  HCN65-RECEYMD   PIC X(22).
+            02  HCN65-TEIYMD.
+              03  HCN65-TEIG  PIC X(4).
+              03  HCN65-TEIY  PIC X(4).
+              03  HCN65-TEIM  PIC X(4).
+              03  HCN65-TEID  PIC X(4).
             02  HCN65-PAGE  PIC X(10).
             02  HCN65-KENSU PIC X(10).
             02  HCN65-BIRTHCNT  PIC X(10).
