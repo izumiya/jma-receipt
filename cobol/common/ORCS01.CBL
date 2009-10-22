@@ -445,6 +445,7 @@
            03  FLG-RUIKEIYO2           PIC 9(01).
            03  FLG-KOHFUKA-HENSYU      PIC 9(01).
            03  FLG-MARUTOARI           PIC 9(01).
+           03  FLG-MARUTOARI2          PIC 9(01).
            03  FLG-FTNRATE100          PIC 9(01).
       *
        01  WRK-AREA.
@@ -667,6 +668,7 @@
                05  WK-GEN70-DD             PIC  9(02).
       *
            03  WK-SYOUKAN-FTNRATE          PIC  9(03).
+           03  WK-MARUTOARI-COMPFTN        PIC  9(07).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â²ó¿ô¤È¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -16433,6 +16435,8 @@
            MOVE    9999999   TO     WK-SEISIN-COMPFTN.
       *
            MOVE    ZERO      TO     FLG-MARUTOARI.
+           MOVE    ZERO      TO     FLG-MARUTOARI2.
+           MOVE    ZERO      TO     WK-MARUTOARI-COMPFTN.
       *
            MOVE    ZERO      TO     WK-CYOKI-ZAN.
            MOVE    ZERO      TO     WK-CYOKI-ZAN-ENTANI.
@@ -18041,8 +18045,12 @@
            AND (WK-1001-PREFNUM       =  13  )
            AND (LNK-SYU-KOH-HKNNUM(1) = "182")
            AND (WK-GAIKFTNRATE    NOT =  ZERO)
-           AND (MAX-KIN-KOHI2-D       =  ZERO)
-             COMPUTE WK-ZENGAKU  =   WK-ZENGAKU  +  WK-RUI-ZENGAKU
+           AND (COMB-KOH-GAIJGNKBN(2) = "1"  )
+             MOVE       1    TO   FLG-MARUTOARI
+             IF MAX-KIN-KOHI2-D       =  ZERO
+               MOVE     1    TO   FLG-MARUTOARI2
+               COMPUTE WK-ZENGAKU  =   WK-ZENGAKU  +  WK-RUI-ZENGAKU
+             END-IF
            END-IF.
       *
        2304-KOH-HKNREAD-EXT.
@@ -18309,6 +18317,46 @@
                              WK-FTN   *  10
                END-IF
       *
+               IF  (KOH-IDX               =  2   )
+               AND (WK-RUI-TAISYO         =  1   )
+               AND (WK-1001-PREFNUM       =  13  )
+               AND (LNK-SYU-KOH-HKNNUM(1) = "182")
+               AND (FLG-MARUTOARI         =  1   )
+               AND (FLG-MARUTOARI2        =  1   )
+                 IF  HKN-RECEFTNDSPKBN  =  "2"
+                   MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  TO
+                                        WK-MARUTOARI-COMPFTN
+                   IF  LNK-SYU-KOH-COMPFTN(KOH-IDX) >
+                                              WK-RUI-FTN2-M2
+                     COMPUTE LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                             LNK-SYU-KOH-COMPFTN(KOH-IDX)  -
+                             WK-RUI-FTN2-M2
+                   ELSE
+                     MOVE  ZERO  TO
+                             LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                   END-IF
+                 ELSE
+                   IF  LNK-SYU-KOH-COMPFTN(KOH-IDX) >
+                                              WK-RUI-FTN2-M
+                     COMPUTE LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                             LNK-SYU-KOH-COMPFTN(KOH-IDX)  -
+                             WK-RUI-FTN2-M
+                   ELSE
+                     MOVE  ZERO  TO
+                             LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                   END-IF
+                 END-IF
+                 IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) >
+                                            WK-RUI-FTN2-M3-XXX
+                   COMPUTE LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
+                           LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  -
+                           WK-RUI-FTN2-M3-XXX
+                 ELSE
+                   MOVE  ZERO  TO
+                           LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                 END-IF
+               END-IF
+      *
                IF  ((LNK-S01-KOUREI-ZAITAKU-KBN   =   "1" )  OR         
                     (FLG-KOHININBARAI             =    1  ))            
                AND ( LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027" )            
@@ -18346,6 +18394,7 @@
                 AND (WK-RUI-TAISYO         =  1   )
                 AND (WK-1001-PREFNUM       =  13  )
                 AND (LNK-SYU-KOH-HKNNUM(1) = "182")
+                AND (FLG-MARUTOARI         =  1   )
                  CONTINUE
                 ELSE
                  IF    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
@@ -18374,6 +18423,7 @@
                   AND (WK-RUI-TAISYO         =  1   )
                   AND (WK-1001-PREFNUM       =  13  )
                   AND (LNK-SYU-KOH-HKNNUM(1) = "182")
+                  AND (FLG-MARUTOARI         =  1   )
                    CONTINUE
                   ELSE
                    IF  WK-KOH-COMPFTN(KOH-IDX)
@@ -18398,6 +18448,24 @@
                     MOVE  WK-KOH-COMPFTN(KOH-IDX) TO  WK-SEISIN-COMPFTN
                END-IF
       *
+               IF  (KOH-IDX               =  2   )
+               AND (WK-RUI-TAISYO         =  1   )
+               AND (WK-1001-PREFNUM       =  13  )
+               AND (LNK-SYU-KOH-HKNNUM(1) = "182")
+               AND (FLG-MARUTOARI         =  1   )
+               AND (FLG-MARUTOARI2        =  1   )
+                 IF  HKN-RECEFTNDSPKBN  =  "2"
+                   IF  WK-MARUTOARI-COMPFTN > WK-RUI-FTN2-M
+                     COMPUTE LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                             WK-MARUTOARI-COMPFTN          -
+                             WK-RUI-FTN2-M
+                   ELSE
+                     MOVE  ZERO  TO
+                             LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                   END-IF
+                 END-IF
+               END-IF
+      *
                IF    LNK-SYU-KOH-COMPFTN(KOH-IDX)   >
                                             ZAN-KOHI-T(KOH-IDX)
                      MOVE   ZAN-KOHI-T(KOH-IDX)   TO
@@ -18419,7 +18487,8 @@
                 AND (WK-RUI-TAISYO         =  1   )
                 AND (WK-1001-PREFNUM       =  13  )
                 AND (LNK-SYU-KOH-HKNNUM(1) = "182")
-                 MOVE     1    TO   FLG-MARUTOARI
+                AND (FLG-MARUTOARI         =  1   )
+                 CONTINUE
                 ELSE
                  IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                                      >  LNK-SYU-SYUCOMPFTN
