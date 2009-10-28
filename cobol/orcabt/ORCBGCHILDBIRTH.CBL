@@ -1026,25 +1026,26 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    WRK-HOSPNAME    TO  HCN64-HOSPNAME
       *
       *        Ê¬ÊÚµ¡´Ø´ÉÍýÈÖ¹æ¡¦»ÜÀßÅù¶èÊ¬
+               EVALUATE    SYS-1001-HOSPSBT
+                   WHEN    "1"
+                       MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
+                   WHEN    "2"
+                       MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
+               END-EVALUATE
                IF      SYS-1001-SANKANUM
                                        =   ZERO
-                   EVALUATE    SYS-1001-HOSPSBT
-                       WHEN    "1"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
-                       WHEN    "2"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
-                   END-EVALUATE
+                   CONTINUE
                ELSE
                    MOVE    SYS-1001-SANKANUM
                                           TO  HCN64-SANKANUM
-                   EVALUATE    SYS-1001-SANKANUM (3:1)
-                       WHEN    "1"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
-                       WHEN    "2"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
-                       WHEN    "3"
-                           MOVE    "¡û"        TO  HCN64-HOSPSBT (3)
-                   END-EVALUATE
+      *************EVALUATE    SYS-1001-SANKANUM (3:1)
+      *************    WHEN    "1"
+      *************        MOVE    "¡û"        TO  HCN64-HOSPSBT (1)
+      *************    WHEN    "2"
+      *************        MOVE    "¡û"        TO  HCN64-HOSPSBT (2)
+      *************    WHEN    "3"
+      *************        MOVE    "¡û"        TO  HCN64-HOSPSBT (3)
+      *************END-EVALUATE
                END-IF
       *
       *        ÀÁµá·îÊ¬
@@ -1110,25 +1111,26 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    WRK-HOSPNAME    TO  HCN65-HOSPNAME
       *
       *        Ê¬ÊÚµ¡´Ø´ÉÍýÈÖ¹æ¡¦»ÜÀßÅù¶èÊ¬
+               EVALUATE    SYS-1001-HOSPSBT
+                   WHEN    "1"
+                       MOVE    "¡û"        TO  HCN65-HOSPSBT (1)
+                   WHEN    "2"
+                       MOVE    "¡û"        TO  HCN65-HOSPSBT (2)
+               END-EVALUATE
                IF      SYS-1001-SANKANUM
                                        =   ZERO
-                   EVALUATE    SYS-1001-HOSPSBT
-                       WHEN    "1"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (1)
-                       WHEN    "2"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (2)
-                   END-EVALUATE
+                   CONTINUE
                ELSE
                    MOVE    SYS-1001-SANKANUM
                                           TO  HCN65-SANKANUM
-                   EVALUATE    SYS-1001-SANKANUM (3:1)
-                       WHEN    "1"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (1)
-                       WHEN    "2"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (2)
-                       WHEN    "3"
-                           MOVE    "¡û"        TO  HCN65-HOSPSBT (3)
-                   END-EVALUATE
+      *************EVALUATE    SYS-1001-SANKANUM (3:1)
+      *************    WHEN    "1"
+      *************        MOVE    "¡û"        TO  HCN65-HOSPSBT (1)
+      *************    WHEN    "2"
+      *************        MOVE    "¡û"        TO  HCN65-HOSPSBT (2)
+      *************    WHEN    "3"
+      *************        MOVE    "¡û"        TO  HCN65-HOSPSBT (3)
+      *************END-EVALUATE
                END-IF
       *
       *        ÀÁµá·îÊ¬
