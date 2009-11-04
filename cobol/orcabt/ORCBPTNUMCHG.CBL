@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.04.01    NACL-小豆沢  09/11/04  分娩管理テーブル追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -78,6 +79,7 @@
            03  FLG-TEIKIPRT                PIC 9(01).
            03  FLG-CHKMST                  PIC 9(01).
            03  FLG-RECEPRT-SET             PIC 9(01).
+           03  FLG-BUNBEN                  PIC 9(01).
       *
       *
       *    カウント領域
@@ -159,6 +161,10 @@
       *    定期請求印刷
        01  TEIKIPRT-REC.
            COPY    "CPTEIKIPRT.INC".
+      *
+      *    分娩管理
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -872,6 +878,74 @@
       *
            CLOSE                           CHK-FILE
       *
+      *
+      *    患者番号取り込み（分娩管理テーブル）
+           OPEN    OUTPUT                  CHK-FILE
+           MOVE    ZERO                TO  FLG-BUNBEN
+           INITIALIZE                      BUNBEN-REC
+           MOVE    SYS-1001-HOSPNUM    TO  BUNBEN-HOSPNUM
+           MOVE    "tbl_bunben"        TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 910-BUNBEN-SELECT-SEC
+           IF      FLG-BUNBEN          =   ZERO
+               MOVE    "tbl_bunben"    TO  MCP-TABLE
+               MOVE    "all"           TO  MCP-PATHNAME
+               PERFORM 910-BUNBEN-READ-SEC
+               PERFORM  UNTIL  FLG-BUNBEN  =    1
+                   MOVE  BUNBEN-KEY    TO   CHK-KEY
+                   WRITE   CHK-REC
+                   MOVE    "tbl_bunben"       TO   MCP-TABLE
+                   MOVE    "all"              TO   MCP-PATHNAME
+                   PERFORM 910-BUNBEN-READ-SEC
+               END-PERFORM
+           END-IF
+           MOVE    "tbl_bunben"        TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           CLOSE                           CHK-FILE
+      *
+      *    分娩管理テーブル更新
+           OPEN    INPUT                   CHK-FILE
+           DISPLAY "TBL-BUNBEN  UPDATE START"
+           PERFORM    900-CHK-READ-SEC
+           PERFORM  UNTIL  ( FLG-CHKMST  NOT =  ZERO )
+               MOVE    ZERO                TO  FLG-BUNBEN
+               INITIALIZE                      BUNBEN-REC
+               MOVE    CHK-KEY             TO  BUNBEN-KEY
+               MOVE    "tbl_bunben"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-BUNBEN-SELECT-SEC
+               IF      FLG-BUNBEN          =   ZERO
+                   MOVE    "tbl_bunben"    TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   PERFORM 910-BUNBEN-READ-SEC
+                   MOVE       "tbl_bunben" TO  MCP-TABLE
+                   MOVE       "key"        TO  MCP-PATHNAME
+                   PERFORM    900-CLOSE-SEC
+                   MOVE   BUNBEN-PTNUM     TO   WRK-PTNUM
+                   PERFORM    2001-PTNUM-CHG-SEC
+                   MOVE   WRK-PTNUM        TO   BUNBEN-PTNUM
+                   MOVE   BUNBEN-REC       TO   MCPDATA-REC
+                   MOVE  "tbl_bunben"      TO   MCP-TABLE
+                   MOVE  "key"             TO   MCP-PATHNAME
+                   MOVE  "DBUPDATE"        TO   MCP-FUNC
+                   PERFORM   900-ORCDBMAIN-SEC
+                   IF   MCP-RC   NOT =  ZERO
+                        DISPLAY  "BUNBEN UPDATE MCP-RC = " MCP-RC
+                   END-IF
+                   ADD    1                TO   CNT-COMMIT
+                   IF     CNT-COMMIT       =    100
+                       MOVE    ZERO        TO   CNT-COMMIT
+                       PERFORM   900-DBCOMMIT-SEC
+                       PERFORM   900-DBSTART-SEC
+                   END-IF
+               END-IF
+               PERFORM    900-CHK-READ-SEC
+           END-PERFORM
+      *
+           CLOSE                           CHK-FILE
+      *
       *    ファイル削除
            PERFORM 800-FILE-DEL-SEC
       *
@@ -1254,6 +1328,9 @@
            WHEN    "tbl_teikiprt"
                MOVE    "定期請求印刷情報"
                                    TO  WRK-TBLNAME
+           WHEN    "tbl_bunben"
+               MOVE    "分娩管理"
+                                   TO  WRK-TBLNAME
            END-EVALUATE
       *
       *    ステップ途中処理
@@ -1547,6 +1624,41 @@
       *
            .
        910-TEIKIPRT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    分娩管理検索
+      *****************************************************************
+       910-BUNBEN-SELECT-SEC          SECTION.
+      *
+           MOVE    BUNBEN-REC          TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-BUNBEN
+           ELSE
+               MOVE    1               TO  FLG-BUNBEN
+           END-IF
+      *
+           .
+       910-BUNBEN-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    分娩管理読込
+      *****************************************************************
+       910-BUNBEN-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  BUNBEN-REC
+               MOVE    ZERO               TO  FLG-BUNBEN
+           ELSE
+               INITIALIZE                     BUNBEN-REC
+               MOVE    1                  TO  FLG-BUNBEN
+           END-IF
+      *
+           .
+       910-BUNBEN-READ-EXT.
            EXIT.
       *
       *****************************************************************
