@@ -58,6 +58,8 @@
       *  04.02.02    NACL-藤原    08/05/15  公費番号まとめの編集方法訂正
       *
       *  04.04.01    NACL-藤原    09/12/10  オンライン返戻対応
+      *  04.04.02    NACL-藤原    09/11/04  公費番号まとめの編集方法訂正
+      *                                     公費が６つ以上のとき
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -847,7 +849,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                    PERFORM VARYING IDZ1    FROM    1   BY  1
                            UNTIL   IDZ1    >       WRK-2007-MAX
                        PERFORM VARYING IDZ2    FROM    1   BY  1
-                               UNTIL   IDZ2    >       5
+                               UNTIL   IDZ2    >       10
                                OR      WRK-2007-KOHNUM (IDZ1 IDZ2)
                                                =   SPACE
                            IF      RECE10-KOHNUM (IDZ)
