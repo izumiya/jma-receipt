@@ -3563,6 +3563,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        250-BUNREI-C501-SEC                   SECTION.
       *
+      *    コメント内容確定
+           PERFORM 209-COMMENT-SEC
+      *
            MOVE    SPACE               TO  SPA-MOTOPG
       *
            MOVE    SPA-C50KYOUTU       TO  SPA-WORK
