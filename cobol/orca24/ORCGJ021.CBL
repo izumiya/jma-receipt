@@ -236,6 +236,10 @@
       *    収納更新差額取得パラメタ
            COPY    "CPORCSS002.INC".
       *
+      *    主情報アクセス用パラメタ
+           01  ORCSSYUACCAREA.
+               COPY    "CPORCSSYUACC.INC".
+      *
       *    ＤＢ検索
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
@@ -1809,6 +1813,11 @@
                PERFORM 300315-RECECOM-UPD-SEC
            END-IF
       *
+           IF      SPA-ERRCD           =   SPACE
+      *        主科設定
+               PERFORM 300325-ORCSSYUKAMAIN-SEC
+           END-IF
+      *
            .
        30032-DB-KOUSIN-EXT.
            EXIT.
@@ -3265,6 +3274,22 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        3003151-RECECOM-UPDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    主科設定処理
+      *****************************************************************
+       300325-ORCSSYUKAMAIN-SEC             SECTION.
+      *
+           INITIALIZE                      ORCSSYUACCAREA
+           MOVE    "03"                TO  LNK-SYUACC-I-KBN
+      *    診療年月
+           MOVE    SPA-NAI-SRYYM       TO  LNK-SYUACC-I-SRYYM
+           CALL    "ORCSSYUKAMAIN"     USING
+                                       SPA-AREA
+                                       ORCSSYUACCAREA
+           .
+      *
+       300325-ORCSSYUKAMAIN-EXT.
            EXIT.
       *****************************************************************
       *    戻る　処理
