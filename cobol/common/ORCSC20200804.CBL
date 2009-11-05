@@ -2115,7 +2115,9 @@
                    MOVE    9               TO  SPA-CHOKITOFLG
                ELSE
       *            算定可能
-                   MOVE    "0130"          TO  LNK-ORCSC-KIDCD
+      ******       MOVE    "0130"          TO  LNK-ORCSC-KIDCD
+      *            長期投薬加算警告チェック
+                   PERFORM 300212-CHOKI-KEI-SEC
                    GO      TO      30011-INGAITOKUTEIKSN-CHK-EXT
                END-IF
            END-IF
@@ -2144,7 +2146,18 @@
                MOVE    9               TO  SPA-TOKUTEIFLG
            ELSE
       *        算定可能
-               MOVE    "0113"          TO  LNK-ORCSC-KIDCD
+      ******   MOVE    "0113"          TO  LNK-ORCSC-KIDCD
+      *        警告チェック
+               MOVE    "120002570"         TO  WRK-SRYCD
+               MOVE    WRK-SRYKA           TO  SPA-TOKUTEI-SRYKA
+               PERFORM 300212-KEICHK-SEC
+               IF      FLG-ERR             =   1
+      *            算定可能
+                   MOVE    "0213"          TO  LNK-ORCSC-KIDCD
+               ELSE
+      *            算定可能
+                   MOVE    "0113"          TO  LNK-ORCSC-KIDCD
+               END-IF
            END-IF
            .
        300111-INGAITOKU-CHK-EXT.
@@ -2688,7 +2701,9 @@
                    MOVE    9               TO  SPA-CHOKITOFLG
                ELSE
       *            算定可能
-                   MOVE    "0130"          TO  LNK-ORCSC-KIDCD
+      *****        MOVE    "0130"          TO  LNK-ORCSC-KIDCD
+      *            長期投薬加算警告チェック
+                   PERFORM 300212-CHOKI-KEI-SEC
                    GO      TO      30021-INNAITOKUTEIKSN-CHK-EXT
                END-IF
            END-IF
@@ -2717,11 +2732,86 @@
                MOVE    9               TO  SPA-TOKUTEIFLG
            ELSE
       *        算定可能
-               MOVE    "0113"          TO  LNK-ORCSC-KIDCD
+      *****    MOVE    "0113"          TO  LNK-ORCSC-KIDCD
+      *!!!
+      *        警告チェック
+               MOVE    "120002270"         TO  WRK-SRYCD
+               MOVE    WRK-SRYKA           TO  SPA-TOKUTEI-SRYKA
+               PERFORM 300212-KEICHK-SEC
+               IF      FLG-ERR             =   1
+      *            算定可能
+                   MOVE    "0213"          TO  LNK-ORCSC-KIDCD
+               ELSE
+      *            算定可能
+                   MOVE    "0113"          TO  LNK-ORCSC-KIDCD
+               END-IF
            END-IF
            .
        300211-INNAITOKU-CHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    長期投薬加算警告チェック処理
+      *****************************************************************
+       300212-KEICHK-SEC              SECTION.
+      *
+           MOVE    WRK-SCR-REC         TO  HOZ-SCR-REC
+      *    点数マスタ編集・基本チェック
+           INITIALIZE                  ORCSC92AREA
+           MOVE    "3"                 TO  LNK-SC92-KBN
+      *
+           COMPUTE LNK-SC92-GMN-IDX    =   WRK-GMN-MAX
+                                       +   1
+           IF      LNK-SC92-GMN-IDX    >   SPA-MAX-LINE
+               MOVE    SPA-MAX-LINE        TO  LNK-SC92-GMN-IDX
+           END-IF
+           MOVE    LNK-ORCSC-PG        TO  LNK-SC92-PG
+           MOVE    LNK-ORCSC-SYORIFLG  TO  LNK-SC92-SYORIFLG
+           MOVE    WRK-SRYCD           TO  LNK-SC92-SRYCD
+           MOVE    LNK-ORCSC-NENREI    TO  LNK-SC92-NENREI
+           MOVE    LNK-ORCSC-ROUJIN    TO  LNK-SC92-ROUJIN
+           MOVE    SPACE               TO  LNK-SC92-LSTSRYKA
+           MOVE    SPACE               TO  LNK-SC92-LSTSRYKAMEI
+           MOVE    LNK-ORCSC-TEISEI-AREA   TO  LNK-SC92-TEISEI-AREA
+           MOVE    LNK-ORCSC-KT01-AREA
+                                       TO  LNK-SC92-KT01-AREA
+           MOVE    "1"                 TO  LNK-SC92-KEIFLG
+           CALL    "ORCSC92"           USING
+                                       MCPAREA
+                                       ORCSC92AREA
+                                       HOZ-SCR-REC
+                                       SPA-AREA
+      *    エラーの時、追加なし
+           IF     (SPA-ERRCD           NOT =   SPACE )  OR
+                  (LNK-SC92-ERRAREA    NOT =   SPACE )
+      *        追加なし
+               MOVE    1               TO  FLG-ERR
+           ELSE
+      *        追加あり
+               MOVE    ZERO            TO  FLG-ERR
+           END-IF
+           .
+       300212-KEICHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    長期投薬加算警告チェック処理
+      *****************************************************************
+       300212-CHOKI-KEI-SEC              SECTION.
+      *
+      *    長期投薬加算警告チェック
+           MOVE    "120003170"         TO  WRK-SRYCD
+           MOVE    WRK-SRYKA           TO  SPA-TOKUTEI-SRYKA
+           PERFORM 300212-KEICHK-SEC
+           IF      FLG-ERR             =   1
+               MOVE    "0230"          TO  LNK-ORCSC-KIDCD
+           ELSE
+               MOVE    "0130"          TO  LNK-ORCSC-KIDCD
+           END-IF
+           .
+       300212-CHOKI-KEI-EXT.
+           EXIT.
+      *!!!!
       *
       *****************************************************************
       *    薬剤料逓減自動算定処理
