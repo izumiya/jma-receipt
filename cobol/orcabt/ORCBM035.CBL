@@ -842,7 +842,7 @@
                                                TO  RECE10-KOHNUM (IDZ)
                                MOVE    WRK-2007-MEISYO (IDZ1)
                                                TO  WRK-MEISYO
-                               MOVE    5       TO  IDZ2
+                               MOVE    10      TO  IDZ2
                                MOVE    WRK-2007-MAX
                                                TO  IDZ1
                            END-IF
