@@ -30,6 +30,9 @@
       *  04.02.01    NACL-Æ£¸¶    08/04/21  ¹­°èÏ¢¹ç¿ÇÎÅÊó½·ÀÁµá½ñ¶èÊ¬
       *                                     ¤Ë¤è¤ëºîÀ®
       *  04.02.02    NACL-Æ£¸¶    08/05/15  ¸øÈñÈÖ¹æ¤Þ¤È¤á¤ÎÊÔ½¸ÊýË¡ÄûÀµ
+      *
+      *  04.03.01    NACL-Æ£¸¶    09/11/04  ¸øÈñÈÖ¹æ¤Þ¤È¤á¤ÎÊÔ½¸ÊýË¡ÄûÀµ
+      *                                     ¸øÈñ¤¬£¶¤Ä°Ê¾å¤Î¤È¤­
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -829,7 +832,7 @@
                    PERFORM VARYING IDZ1    FROM    1   BY  1
                            UNTIL   IDZ1    >       WRK-2007-MAX
                        PERFORM VARYING IDZ2    FROM    1   BY  1
-                               UNTIL   IDZ2    >       5
+                               UNTIL   IDZ2    >       10
                                OR      WRK-2007-KOHNUM (IDZ1 IDZ2)
                                                =   SPACE
                            IF      RECE10-KOHNUM (IDZ)
@@ -838,7 +841,7 @@
                                                TO  RECE10-KOHNUM (IDZ)
                                MOVE    WRK-2007-MEISYO (IDZ1)
                                                TO  WRK-MEISYO
-                               MOVE    5       TO  IDZ2
+                               MOVE    10      TO  IDZ2
                                MOVE    WRK-2007-MAX
                                                TO  IDZ1
                            END-IF
