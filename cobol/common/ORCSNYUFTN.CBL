@@ -109,6 +109,7 @@
       *
       *  04.04.01    NACL-門脇    09/08/18  出産一時金対応
       *  04.04.02    NACL-門脇    09/10/01  埼玉県地方公費対応
+      *  04.04.03    NACL-門脇    09/11/05  高齢者他保険入院対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -137,6 +138,7 @@
            03  WRK-MSGCD                   PIC 9(02).
            03  WRK-NYUINRYO-ERR            PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
+           03  WRK-HKNCOMBINUM             PIC 9(04).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -171,6 +173,10 @@
            02  WRK-NYUINDAY-TBL  OCCURS   10.
               03 WRK-NYUINDAY-KBN          PIC X(01)  OCCURS  31.
       *
+       01  WRK-NYUINDAY2-TABLE.
+           02  WRK-NYUINDAY2-TBL OCCURS   10.
+              03 WRK-NYUINDAY2-KBN         PIC X(01)  OCCURS  31.
+      *
       *    同日再入院テーブル
        01  WRK-DOJITU-TABLE.
            02  WRK-DOJITU-TBL    OCCURS   10.
@@ -184,6 +190,11 @@
            02  WRK-KAIKEING-TBL  OCCURS   10.
               03 WRK-KAIKEING              PIC 9(01).
       *
+      *    高齢者他保険入院フラグ
+       01  WRK-KOREI-TANYUIN-TABLE.
+           02  WRK-KOREI-TANYUIN-TBL  OCCURS   10.
+              03 WRK-KOREI-TANYUINFLG      PIC X(01).
+      *
        01  WRK-SKYYM-TABLE.
            02  WRK-SKYYM-TBL     OCCURS    2.
               03   WRK-SKYYM               PIC X(06).
@@ -192,6 +203,7 @@
       *       県番号
               03   WRK-PREFNUM             PIC 9(02).
               03   WRK-DAY-TX    OCCURS   31.
+                 04   WRK-DAY1X            PIC 9(04).
                  04   WRK-DAY5X            PIC 9(04).
       *
        01  WRK-DAY-TABLE.
@@ -263,6 +275,8 @@
            03  FLG-TOKUSYU                 PIC 9(01).
            03  FLG-KOUREISYA               PIC 9(01).
            03  FLG-KUMIAWASE-HANTEI        PIC 9(01).
+           03  FLG-KOREI-TANYUIN           PIC 9(01).
+           03  FLG-KOREI-TANYUIN2          PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
@@ -559,9 +573,11 @@
                          WRK-HANBETU2-TABLE
                          WRK-JIBAI-TABLE
                          WRK-NYUINDAY-TABLE
+                         WRK-NYUINDAY2-TABLE
                          WRK-SYOSIN-TABLE
                          WRK-DOJITU-TABLE
                          WRK-KAIKEING-TABLE
+                         WRK-KOREI-TANYUIN-TABLE
                          FLG-AREA
                          CNT-AREA.
       *
@@ -631,6 +647,9 @@
       *
                 MOVE     WRK-NYUINDAY-TBL(IDX)
                                               TO  LNK-S02-NYUINDAY-TBL
+      *
+                MOVE     WRK-KOREI-TANYUINFLG(IDX)
+                                              TO  LNK-S02-KOREI-TANYUIN
       *
                 MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
@@ -755,6 +774,9 @@
       *
                 MOVE     WRK-NYUINDAY-TBL(IDX)
                                               TO  LNK-S02-NYUINDAY-TBL
+      *
+                MOVE     WRK-KOREI-TANYUINFLG(IDX)
+                                              TO  LNK-S02-KOREI-TANYUIN
       *
                 MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
@@ -1074,6 +1096,9 @@
                        UNTIL    IDY    >    31
       *
              IF       NACCT-DAY(IDY)   NOT =  ZERO
+               IF     NACCT-ZAISKBKBN    =    "1"
+                    MOVE   NACCT-DAY(IDY)  TO   WRK-DAY1X(IDX IDY)
+               END-IF 
                IF     NACCT-ZAISKBKBN    =    "5"
                     MOVE   NACCT-DAY(IDY)  TO   WRK-DAY5X(IDX IDY)
                END-IF 
@@ -1751,6 +1776,8 @@
                       MOVE  LNK-NYUINDAY-KBN(IDY)
                                       TO  WRK-NYUINDAY-KBN(IDX IDY)
                    END-IF
+                   MOVE  LNK-NYUINDAY-KBN(IDY)
+                                      TO  WRK-NYUINDAY2-KBN(IDX IDY)
                  END-PERFORM
               END-IF
       *
@@ -1761,9 +1788,142 @@
                 END-IF
               END-IF
       *
+              PERFORM  KOREI-TANYUIN-HANTEI-SEC
+      *
            END-PERFORM. 
       *
        SYUNOU-SET-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    高齢者他保険入院判定処理
+      ******************************************************************
+       KOREI-TANYUIN-HANTEI-SEC         SECTION.
+      *
+           MOVE    ZERO     TO   FLG-KOREI-TANYUIN
+                                 FLG-KOREI-TANYUIN2
+           IF  (LNK-SYU-SYUHKNNUM(IDX) =
+                "971" OR "973" OR "975" OR "068" OR "069" OR "040")
+           OR  (LNK-SYU-SYUHKNNUM(IDX)(1:2) = "98"                )
+             CONTINUE
+           ELSE
+             PERFORM  VARYING  IDY  FROM   1   BY   1
+                       UNTIL   IDY   >    31
+                EVALUATE  LNK-SYU-DAY(IDX IDY)
+                  WHEN     SPACE
+                     CONTINUE
+                  WHEN      "2"
+                     MOVE    1     TO   FLG-KOREI-TANYUIN
+                  WHEN      "1"
+                  WHEN      "3"
+                     MOVE   ZERO   TO   FLG-KOREI-TANYUIN
+                     MOVE    31    TO   IDY
+                END-EVALUATE
+             END-PERFORM
+             IF  FLG-KOREI-TANYUIN  =  1
+                IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(1)
+                  PERFORM   VARYING   IDY   FROM  1  BY   1
+                             UNTIL    IDY    >   31
+                    IF   WRK-DAY1X(1 IDY)   NOT =  ZERO
+                    AND  WRK-DAY5X(1 IDY)   NOT =  ZERO
+                      MOVE  WRK-DAY5X(1 IDY)  TO  WRK-HKNCOMBINUM
+                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
+                        MOVE    1     TO   FLG-KOREI-TANYUIN2
+                      ELSE
+                        MOVE   ZERO   TO   FLG-KOREI-TANYUIN2
+                        MOVE    31    TO   IDY
+                      END-IF
+                    END-IF
+                    IF   WRK-DAY1X(1 IDY)       =  ZERO
+                    AND  WRK-DAY5X(1 IDY)   NOT =  ZERO
+                      MOVE  WRK-DAY5X(1 IDY)  TO  WRK-HKNCOMBINUM
+                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
+                       IF   WRK-NYUINDAY2-KBN(IDX IDY)  =   "1"
+                        MOVE    1     TO   FLG-KOREI-TANYUIN2
+                       END-IF
+                      ELSE
+                        MOVE   ZERO   TO   FLG-KOREI-TANYUIN2
+                        MOVE    31    TO   IDY
+                      END-IF
+                    END-IF
+                  END-PERFORM
+                  IF  FLG-KOREI-TANYUIN2  =  1
+                      MOVE   "1"    TO   WRK-KOREI-TANYUINFLG(IDX)
+                  END-IF
+                END-IF
+                IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(2)
+                  PERFORM   VARYING   IDY   FROM  1  BY   1
+                             UNTIL    IDY    >   31
+                    IF   WRK-DAY1X(2 IDY)   NOT =  ZERO
+                    AND  WRK-DAY5X(2 IDY)   NOT =  ZERO
+                      MOVE  WRK-DAY5X(2 IDY)  TO  WRK-HKNCOMBINUM
+                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
+                        MOVE    1     TO   FLG-KOREI-TANYUIN2
+                      ELSE
+                        MOVE   ZERO   TO   FLG-KOREI-TANYUIN2
+                        MOVE    31    TO   IDY
+                      END-IF
+                    END-IF
+                    IF   WRK-DAY1X(2 IDY)       =  ZERO
+                    AND  WRK-DAY5X(2 IDY)   NOT =  ZERO
+                      MOVE  WRK-DAY5X(2 IDY)  TO  WRK-HKNCOMBINUM
+                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
+                       IF   WRK-NYUINDAY2-KBN(IDX IDY)  =   "1"
+                        MOVE    1     TO   FLG-KOREI-TANYUIN2
+                       END-IF
+                      ELSE
+                        MOVE   ZERO   TO   FLG-KOREI-TANYUIN2
+                        MOVE    31    TO   IDY
+                      END-IF
+                    END-IF
+                  END-PERFORM
+                  IF  FLG-KOREI-TANYUIN2  =  1
+                      MOVE   "1"    TO   WRK-KOREI-TANYUINFLG(IDX)
+                  END-IF
+                END-IF
+             END-IF
+           END-IF
+      *
+           .
+      *
+       KOREI-TANYUIN-HANTEI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    高齢者他保険入院保険組み合わせ処理
+      ******************************************************************
+       KOREI-TANYUIN-HKNCOMBI-SEC         SECTION.
+      *
+           INITIALIZE                  HKNCOMBI-REC
+           MOVE  LNK-S02-HOSPNUM   TO  COMB-HOSPNUM
+           MOVE  LNK-S02-PTID      TO  COMB-PTID
+           MOVE  WRK-HKNCOMBINUM   TO  COMB-HKNCOMBINUM
+           MOVE  HKNCOMBI-REC      TO  MCPDATA-REC
+           MOVE  "DBSELECT"        TO  MCP-FUNC
+           MOVE  "tbl_hkncombi"    TO  MCP-TABLE
+           MOVE  "key"             TO  MCP-PATHNAME
+           CALL  "ORCDBMAIN"  USING    MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF     MCP-RC  =  ZERO
+             MOVE  "tbl_hkncombi"  TO  MCP-TABLE
+             MOVE  "key"           TO  MCP-PATHNAME
+             PERFORM  HKNCOMBI-READ-SEC
+           END-IF
+           MOVE  "DBCLOSECURSOR"   TO  MCP-FUNC
+           MOVE  "tbl_hkncombi"    TO  MCP-TABLE
+           MOVE  "key"             TO  MCP-PATHNAME
+           CALL  "ORCDBMAIN"  USING    MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       KOREI-TANYUIN-HKNCOMBI-EXT.
            EXIT.
       *
       ******************************************************************

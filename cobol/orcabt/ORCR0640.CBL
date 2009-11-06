@@ -395,6 +395,7 @@
       *  04.04.27    NACL-ÌçÏÆ    09/09/17  °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.04.28    NACL-ÌçÏÆ    09/09/18  Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
       *  04.04.29    NACL-ÌçÏÆ    09/09/18  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.30    NACL-ÌçÏÆ    09/11/05  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -592,6 +593,7 @@
            03  FLG-KISAIOK                             PIC 9(01).
            03  FLG-GENGAKU-OKIKAE                      PIC 9(01).
            03  FLG-KOHYONKAIME-NO                      PIC 9(01).
+           03  FLG-KOUREI-KBN                          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -9692,6 +9694,51 @@
       *
            MOVE    ZERO                 TO      FLG-SYUNOU-ARI
       *
+           MOVE    ZERO                 TO      FLG-KOUREI-KBN
+      *
+           IF  (RECE62-NYUINRYOFLG   =   "1"     )
+           AND (RECE62-KOUREI        =   "1"     )
+           AND (RECE62-SRYYM        >=   "200904")
+             INITIALIZE                        SYUNOU-REC
+             MOVE    RECE62-HOSPNUM       TO   SYU-HOSPNUM
+             MOVE    RECE62-NYUGAIKBN     TO   SYU-NYUGAIKBN
+             MOVE    RECE62-PTID          TO   SYU-PTID
+             MOVE    RECE62-SRYYM         TO   SYU-SRYYMD(1:6)
+             MOVE    "__"                 TO   SYU-SRYYMD(7:2)
+             MOVE    SYUNOU-REC           TO   MCPDATA-REC
+             MOVE    "tbl_syunou"         TO   MCP-TABLE
+             MOVE    "key17"              TO   MCP-PATHNAME
+             PERFORM   900-DBSELECT-SEC
+             IF      MCP-RC               =    ZERO
+               MOVE  "tbl_syunou"         TO   MCP-TABLE
+               MOVE  "key17"              TO   MCP-PATHNAME
+               PERFORM  900-SYUNOU-READ-SEC
+               PERFORM  UNTIL  (FLG-SYUNOU     = 1)
+                         OR    (FLG-KOUREI-KBN = 1)
+                 PERFORM  VARYING  IDX1  FROM  1  BY  1
+                           UNTIL  (IDX1    >  10               )
+                            OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
+                            OR    (FLG-KOUREI-KBN        =  1  )
+                   IF  SYU-HKNCOMBINUM  =  RECE62-HKNCOMBI(IDX1)
+                     IF  SYU-DENPJTIKBN  NOT =  "3"
+                       IF   SYU-SKJ-FTNGAKU(3)  =  1
+                          MOVE   SPACE    TO   RECE62-KOUREI
+                          MOVE    1       TO   FLG-KOUREI-KBN
+                       END-IF
+                     END-IF
+                     MOVE    10           TO   IDX1
+                   END-IF
+                 END-PERFORM
+                 MOVE  "tbl_syunou"       TO   MCP-TABLE
+                 MOVE  "key17"            TO   MCP-PATHNAME
+                 PERFORM  900-SYUNOU-READ-SEC
+               END-PERFORM
+             END-IF
+             MOVE      "tbl_syunou"       TO   MCP-TABLE
+             MOVE      "key17"            TO   MCP-PATHNAME
+             PERFORM    900-CLOSE-SEC
+           END-IF
+      *
            INITIALIZE                   TBL-TOKATUKAI
            PERFORM   VARYING  IDY2    FROM    1   BY   1
                       UNTIL   IDY2      >     4
@@ -10093,7 +10140,8 @@
            MOVE      IDY2    TO     IDX10
            PERFORM   2104G1-JGNGAK-SET-SEC
       *
-           IF   RECE62-KOUREI    =   "1"
+           IF  (RECE62-KOUREI    =   "1")
+           OR  (FLG-KOUREI-KBN   =    1 )
                IF  TBL-HKNFTNDATA-ZAN(IDY2)  >  WRK-KOH-GENDOGAKU
                  MOVE WRK-KOH-GENDOGAKU   TO TBL-HKNFTNDATA-ZAN(IDY2)
                END-IF
@@ -10704,9 +10752,23 @@
                           MOVE    "1"     TO   RECE62-NYUINRYOFLG
                        WHEN     "2"
                           MOVE    "6"     TO   RECE62-NYUINRYOFLG
+                          IF  (RECE62-SRYYM      >= "200904")
+                          AND (RECE62-KOUREI      = "1"     )
+                            MOVE  "1"     TO   RECE62-NYUINRYOFLG
+                          END-IF
                        WHEN     "3"
                           PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
+                          IF  (RECE62-SRYYM      >= "200904"         )
+                          AND (RECE62-KOUREI      = "1"              )
+                          AND (RECE62-NYUINRYOFLG = "2" OR "3" OR "7")
+                            MOVE  "1"     TO   RECE62-NYUINRYOFLG
+                          END-IF
                      END-EVALUATE
+                   END-IF
+                   IF      WRK-DAY5(IDY)              NOT =  ZERO
+                   AND     RECE62-NYUINDAY-KBN(IDY)       =  "1"
+                   AND     RECE62-SRYYM                  >=  "200904"
+                          PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
                    END-IF
                 END-IF
       *
@@ -15160,7 +15222,8 @@
                                         TO  WRK-JIRITU-TAFTNRUIKEI
              END-IF
       *
-             IF   RECE62-KOUREI    =   "1"
+             IF  (RECE62-KOUREI    =   "1")
+             OR  (FLG-KOUREI-KBN   =    1 )
                  IF  RECE62-KOHNUM(1) = "012" OR "025"
                    IF    WRK-JYOGEN-KOH  >  WRK-SEIHO-GENDO
                       MOVE  WRK-SEIHO-GENDO   TO   WRK-JYOGEN-KOH
@@ -15225,7 +15288,8 @@
                       END-IF
       *               <** GAIRAIFTN**>
                    END-IF
-                   IF   RECE62-KOUREI    =   "1"
+                   IF  (RECE62-KOUREI    =   "1")
+                   OR  (FLG-KOUREI-KBN   =    1 )
                      IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
                         MOVE  WRK-KOH-GENDOGAKU TO   WRK-JYOGEN-KOH
                      END-IF
@@ -15276,7 +15340,8 @@
                      END-IF
       *              <** GAIRAIFTN**>
                    END-IF
-                   IF   RECE62-KOUREI    =   "1"
+                   IF  (RECE62-KOUREI    =   "1")
+                   OR  (FLG-KOUREI-KBN   =    1 )
                      IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
                         MOVE  WRK-KOH-GENDOGAKU TO   WRK-JYOGEN-KOH
                      END-IF
@@ -15502,8 +15567,17 @@
       ***     END-IF
            END-IF
       *
-           IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
-                MOVE  WRK-KOH-GENDOGAKU    TO   WRK-JYOGEN-KOH
+           IF  (  RECE62-KOUREI         =  SPACE )
+           AND (((RECE62-KOHNUM(1)      = "051") AND
+                 (TBL-DOTANDOKU-FLG(1)  =   1  ))
+             OR ((WRK-PREFNUM           = "13" ) AND
+                 (RECE62-KOHNUM(1)      = "151") AND
+                 (RECE62-SRYYM      <  "200905")))
+             CONTINUE
+           ELSE
+             IF  WRK-JYOGEN-KOH  >  WRK-KOH-GENDOGAKU
+                MOVE   WRK-KOH-GENDOGAKU  TO   WRK-JYOGEN-KOH
+             END-IF
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
@@ -15514,11 +15588,19 @@
             IF   WRK-JYOGEN-KOH   =    ZERO
                MOVE    ZERO    TO   WRK-FTNKEI-KOH
             ELSE
+             IF  RECE62-KOUREI    =   "1"
                IF     WRK-JYOGEN-KOH     <    WRK-TAIHI-GENKIN
-                      MOVE  WRK-JYOGEN-KOH    TO   WRK-FTNKEI-KOH
+                  MOVE  WRK-JYOGEN-KOH       TO   WRK-FTNKEI-KOH
                ELSE
-                      MOVE  WRK-TAIHI-GENKIN  TO   WRK-FTNKEI-KOH
+                  MOVE  WRK-TAIHI-GENKIN     TO   WRK-FTNKEI-KOH
                END-IF
+             ELSE
+               IF     WRK-JYOGEN-KOH     <    WRK-TAIHI-GENKIN-EN
+                  MOVE  WRK-JYOGEN-KOH       TO   WRK-FTNKEI-KOH
+               ELSE
+                  MOVE  WRK-TAIHI-GENKIN-EN  TO   WRK-FTNKEI-KOH
+               END-IF
+             END-IF
             END-IF
             MOVE   WRK-FTNKEI-KOH   TO   RECE62-FTNMONEY(2)
                                          RECE62-FTNMONEY-KOJ(2)
@@ -16300,7 +16382,35 @@
            EVALUATE   FLG-TOKU75
              WHEN        1
              WHEN        2
+               IF    RECE62-KOUREI   =   "1"
                  CONTINUE
+               ELSE
+                IF      IDZ   =   1
+                 IF (RECE62-KOHNUM(1) = "972" OR "974")
+                 OR (RECE62-KOHNUM(2) = "972" OR "974")
+                 OR (RECE62-KOHNUM(3) = "972" OR "974")
+                 OR (RECE62-KOHNUM(4) = "972" OR "974")
+                 OR (RECE62-KOHNUM(1)(1:1) = "0"      )
+                 OR (RECE62-KOHNUM(2)(1:1) = "0"      )
+                 OR (RECE62-KOHNUM(3)(1:1) = "0"      )
+                 OR (RECE62-KOHNUM(4)(1:1) = "0"      )
+                 OR (TBL-TOKATUKAIFLG(1)   =  1       )
+                 OR (TBL-TOKATUKAIFLG(2)   =  1       )
+                 OR (TBL-TOKATUKAIFLG(3)   =  1       )
+                 OR (TBL-TOKATUKAIFLG(4)   =  1       )
+                    CONTINUE
+                 ELSE
+                    MOVE   ZERO    TO   FLG-TOKU75
+                 END-IF
+                ELSE
+                 PERFORM   2104D1-TOKU75-HANTEI-KOHSKY-SEC
+                 IF  FLG-TOKU75-KOHSKY = 1
+                    CONTINUE
+                 ELSE
+                    MOVE   ZERO    TO   FLG-TOKU75
+                 END-IF
+                END-IF
+               END-IF
              WHEN        3
                IF    RECE62-KOUREI   =   "2"
                  CONTINUE
@@ -16342,7 +16452,24 @@
            END-IF
       *
            IF  FLG-SYOGAI75  =  1
-               MOVE      1      TO     RECE62-RJNGAIKOHFTN(3)
+               IF    RECE62-KOUREI       =   "1"
+                    MOVE    1    TO    RECE62-RJNGAIKOHFTN(3)
+               ELSE
+                 IF (RECE62-KOHNUM(1) = "972" OR "974")
+                 OR (RECE62-KOHNUM(2) = "972" OR "974")
+                 OR (RECE62-KOHNUM(3) = "972" OR "974")
+                 OR (RECE62-KOHNUM(4) = "972" OR "974")
+                 OR (RECE62-KOHNUM(1)(1:1) = "0"      )
+                 OR (RECE62-KOHNUM(2)(1:1) = "0"      )
+                 OR (RECE62-KOHNUM(3)(1:1) = "0"      )
+                 OR (RECE62-KOHNUM(4)(1:1) = "0"      )
+                 OR (TBL-TOKATUKAIFLG(1)   =  1       )
+                 OR (TBL-TOKATUKAIFLG(2)   =  1       )
+                 OR (TBL-TOKATUKAIFLG(3)   =  1       )
+                 OR (TBL-TOKATUKAIFLG(4)   =  1       )
+                    MOVE    1    TO    RECE62-RJNGAIKOHFTN(3)
+                 END-IF
+               END-IF
            END-IF
       *
            .
@@ -16374,6 +16501,18 @@
                               OR    (FLG-TOKU75-KOHSKY  =  1)
                    IF ( COMB-KOHHKNNUM(TOKU75-IDX2)
                                               = "972" OR "974" )
+                   OR ((FLG-TOKU75  = 1 OR 2                  ) AND
+                       (COMB-KOHHKNNUM(TOKU75-IDX2)(1:1) = "0"))
+                   OR ((FLG-TOKU75  = 1 OR 2                  ) AND
+                       (WRK-PREFNUM                 = "13"    ) AND
+                       (COMB-KOHHKNNUM(TOKU75-IDX2) = "151"   ) AND
+                       (TOKU75-IDX2                 =  1      ) AND
+                       (RECE62-SRYYM               >= "200905"))
+                   OR ((FLG-TOKU75  = 1 OR 2                  ) AND
+                       (WRK-PREFNUM                 = "23"    ) AND
+                       (COMB-KOHHKNNUM(TOKU75-IDX2) = "191"   ) AND
+                       (TOKU75-IDX2                 =  1      ) AND
+                       (RECE62-SRYYM               >= "200910"))
                      INITIALIZE               ORCSFTNJGNCHKAREA
                      MOVE RECE62-HOSPNUM   TO LNK-FTNJGNCHK-HOSPNUM
                      MOVE RECE62-PTID      TO LNK-FTNJGNCHK-PTID
