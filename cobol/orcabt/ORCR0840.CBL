@@ -164,6 +164,7 @@
       *  04.04.02    NACL-ÌçÏÆ    09/02/04  ¸¡ºº¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *  04.04.04    NACL-ÌçÏÆ    09/06/23  ÅÀÅ©´ïºà¾¦ÉÊÌ¾µ­ºÜ½¤Àµ
+      *  04.04.05    NACL-ÌçÏÆ    09/11/05  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8403,6 +8404,11 @@ grpsys     PERFORM  900-DBSELECT-SEC
                        WHEN     "3"
                           PERFORM   260111-NYUINRYOFLG-HENSYU-SEC
                      END-EVALUATE
+                   END-IF
+                   IF      WRK-DAY5(IDY)              NOT =  ZERO
+                   AND     RECE82-NYUINDAY-KBN(IDY)       =  "1"
+                   AND     RECE82-SRYYM                  >=  "200904"
+                          PERFORM   260111-NYUINRYOFLG-HENSYU-SEC
                    END-IF
                 END-IF
       *
