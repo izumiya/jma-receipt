@@ -1883,7 +1883,7 @@
                IF    ( SPA-GMN-BUNBENKBN   =   "2"   )
                 AND  ( SPA-GMN-BIKOU       =   SPACE )
                    COMPUTE IDX-INFO        =   IDX-INFO    +   1
-                   MOVE    "bule"          TO  I07-LBLINFO-STYLE (IDX-INFO)
+                   MOVE    "bule"      TO  I07-LBLINFO-STYLE (IDX-INFO)
                    STRING  "補足情報等が必要な場合は"
                                                DELIMITED BY SIZE
                            "備考欄に入力してください。"
