@@ -288,6 +288,8 @@
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
       *
+           COPY    "CPSK1001.INC".
+      *
            COPY    "CPSK0042.INC".
       *
       *    診療科コード
@@ -5292,6 +5294,20 @@
       *****************************************************************
        4802-BUNBEN-UPD-SEC          SECTION.
       *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "1001"          TO  SYS-KANRICD
+           MOVE    "*"             TO  SYS-KBNCD
+           MOVE    SPA-NAI-I04-TAIINYMD
+                                   TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-1001-REC
+           IF    ( SYS-1001-SANKANUM   IS  NOT NUMERIC )
+            OR   ( SYS-1001-SANKANUM   =   ZERO    )
+               MOVE    ZERO            TO  SYS-1001-SANKANUM
+           END-IF
+      *
            PERFORM 900-BUNBEN-KEY3-SEL-SEC
       *
            PERFORM 800-ORCSBUNBENFTN-SEC
@@ -5310,6 +5326,24 @@
            MOVE    BUNBEN-CREYMD       TO  LNKBUNBEN-CREYMD
       *
            MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
+      *
+           IF    ( BUNBEN-RIYOUKBN     =   "1" )
+               IF    ( SYS-1001-SANKANUM   NOT =   ZERO )
+                AND  ( BUNBEN-ZAIWEEK      >=   22 )
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   420000      *   BUNBEN-BIRTHCNT
+               ELSE
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   390000      *   BUNBEN-BIRTHCNT
+               END-IF
+      *
+               IF    ( BUNBEN-DAIRI-MONEY  >   BUNBEN-NINPUFTN-MONEY )
+                   MOVE    BUNBEN-NINPUFTN-MONEY
+                                       TO  BUNBEN-DAIRI-MONEY
+               END-IF
+           ELSE
+                   MOVE    ZERO    TO  BUNBEN-DAIRI-MONEY
+           END-IF
       *
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD    TO  BUNBEN-UPYMD

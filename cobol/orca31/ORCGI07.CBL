@@ -68,6 +68,7 @@
        01  IDX-AREA.
            03  IDX1                        PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
+           03  IDX-INFO                    PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -378,13 +379,16 @@
       *
            MOVE    BUNBEN-NYUIN-DAY    TO  SPA-GMN-NYUIN-DAY
       *
-           IF    ( SPA-NAI-SANKANUM    NOT =   ZERO )
-               MOVE    BUNBEN-SANKAKBN TO  WRK-CMB-CD
-               PERFORM 4200-SANKAKBNLST-CHK-SEC
-               MOVE    WRK-CMB-ITM     TO  SPA-GMN-SANKAKBN-G
-               IF    ( SPA-GMN-SANKAKBN-G  =   SPACE )
+           MOVE    BUNBEN-SANKAKBN TO  WRK-CMB-CD
+           PERFORM 4200-SANKAKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM     TO  SPA-GMN-SANKAKBN-G
+           IF    ( SPA-GMN-SANKAKBN-G      =   SPACE )
+               IF    ( SPA-NAI-SANKANUM    =   ZERO )
+                   MOVE    SPA-GMN-SANKAKBNLST (2)
+                                   TO  SPA-GMN-SANKAKBN-G
+               ELSE
                    MOVE    SPA-GMN-SANKAKBNLST (1)
-                                       TO  SPA-GMN-SANKAKBN-G
+                                   TO  SPA-GMN-SANKAKBN-G
                END-IF
            END-IF
       *
@@ -1096,8 +1100,13 @@
            PERFORM 4200-SANKAKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-SANKAKBN-G
            IF    ( SPA-GMN-SANKAKBN-G  =   SPACE )
-               MOVE    SPA-GMN-SANKAKBNLST (1)
+               IF    ( SPA-NAI-SANKANUM    =   ZERO )
+                   MOVE    SPA-GMN-SANKAKBNLST (2)
                                        TO  SPA-GMN-SANKAKBN-G
+               ELSE
+                   MOVE    SPA-GMN-SANKAKBNLST (1)
+                                       TO  SPA-GMN-SANKAKBN-G
+               END-IF
            END-IF
       *
            .
@@ -1489,20 +1498,41 @@
       *
            IF    ( SPA-ERRCD               =   SPACE )
                IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
-                   IF    ( SPA-GMN-SNK-MONEY   =   ZERO )
-                           MOVE    "1010"      TO  SPA-ERRCD
-                           MOVE    18          TO  SPA-GMN-CUR
-                   END-IF
-               END-IF
-           END-IF
-      *
-           IF    ( SPA-ERRCD               =   SPACE )
-               IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
                    CONTINUE
                ELSE
                    IF    ( SPA-GMN-SNK-MONEY   >   ZERO )
                        MOVE    "1011"      TO  SPA-ERRCD
                        MOVE    18          TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD               =   SPACE )
+               IF    ( SPA-GMN-SANKAKBN    =   "3" )
+                AND  ( SPA-NAI-SANKANUM    =   ZERO )
+                   MOVE    "0009"          TO  SPA-ERRCD
+                   MOVE    10              TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( SPA-GMN-SANKAKBN         =   "1" )
+                   IF    ( SPA-GMN-ZAIWEEK     >=   22 )
+                    AND  ( SPA-NAI-SANKANUM NOT =   ZERO )
+                       CONTINUE
+                   ELSE
+                       IF    ( SPA-NAI-SANKANUM =   ZERO )
+                           MOVE    "0009"  TO  SPA-ERRCD
+                           MOVE    10      TO  SPA-GMN-CUR
+                       END-IF
+                       IF    ( SPA-ERRCD        =   SPACE )
+                           IF    ( SPA-GMN-ZAIWEEK >=  22 )
+                               CONTINUE
+                           ELSE
+                               MOVE    "0010"  TO  SPA-ERRCD
+                               MOVE    10      TO  SPA-GMN-CUR
+                           END-IF
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -1792,16 +1822,14 @@
            MOVE    SPA-GMN-BIRTHCNT        TO  I07-BIRTHCNT
            MOVE    SPA-GMN-NYUIN-DAY       TO  I07-NYUIN-DAY
       *
-           IF    ( SPA-NAI-SANKANUM    NOT =   ZERO )
-               MOVE    SPA-GMN-SANKAKBN-G      TO  I07-SANKAKBN
-               MOVE    SPA-GMN-SANKAKBN-MAX    TO  I07-SANKAKBN-COUNT
-               PERFORM VARYING IDX-CMB FROM    1   BY  1
-                       UNTIL ( IDX-CMB >   SPA-GMN-SANKAKBN-MAX )
-                   MOVE    SPA-GMN-SANKAKBNLST (IDX-CMB)
-                                               TO  I07-SANKAKBN-ITEM
+           MOVE    SPA-GMN-SANKAKBN-G      TO  I07-SANKAKBN
+           MOVE    SPA-GMN-SANKAKBN-MAX    TO  I07-SANKAKBN-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-SANKAKBN-MAX )
+               MOVE    SPA-GMN-SANKAKBNLST (IDX-CMB)
+                                           TO  I07-SANKAKBN-ITEM
                                                            (IDX-CMB)
-               END-PERFORM
-           END-IF
+           END-PERFORM
       *
            MOVE    SPA-GMN-NYU-MONEY       TO  I07-NYU-MONEY
            MOVE    SPA-GMN-RMSGK-MONEY     TO  I07-RMSGK-MONEY
@@ -1832,12 +1860,52 @@
            MOVE    "black"                 TO  I07-LBLINFO-STYLE (4)
            MOVE    "black"                 TO  I07-LBLHEADER-STYLE
       *
-           IF    ( SPA-NAI-CHGNAME         =   "1" )
-               MOVE    "red"               TO  I07-LBLINFO-STYLE (1)
-               STRING  "氏名が変更されています。"      DELIMITED BY SIZE
-                       "登録ボタンを押してください。"  DELIMITED BY SIZE
-               INTO     I07-LBLINFO (1)
-               END-STRING
+           MOVE    ZERO                    TO  IDX-INFO
+      *
+           IF    ( IDX-INFO           >=   4 )
+               CONTINUE
+           ELSE
+               IF    ( SPA-NAI-CHGNAME     =   "1" )
+                   COMPUTE IDX-INFO    =   IDX-INFO    +   1
+                   MOVE    "red"       TO  I07-LBLINFO-STYLE (IDX-INFO)
+                   STRING  "氏名が変更されています。"
+                                               DELIMITED BY SIZE
+                           "登録ボタンを押してください。"
+                                               DELIMITED BY SIZE
+                   INTO     I07-LBLINFO (IDX-INFO)
+                   END-STRING
+               END-IF
+           END-IF
+      *
+           IF    ( IDX-INFO           >=   4 )
+               CONTINUE
+           ELSE
+               IF    ( SPA-GMN-BUNBENKBN   =   "2"   )
+                AND  ( SPA-GMN-BIKOU       =   SPACE )
+                   COMPUTE IDX-INFO        =   IDX-INFO    +   1
+                   MOVE    "bule"          TO  I07-LBLINFO-STYLE (IDX-INFO)
+                   STRING  "補足情報等が必要な場合は"
+                                               DELIMITED BY SIZE
+                           "備考欄に入力してください。"
+                                               DELIMITED BY SIZE
+                   INTO     I07-LBLINFO (IDX-INFO)
+                   END-STRING
+               END-IF
+           END-IF
+      *
+           IF    ( IDX-INFO           >=   4 )
+               CONTINUE
+           ELSE
+               COMPUTE IDX-INFO    =   IDX-INFO    +   1
+               MOVE    "blue"      TO  I07-LBLINFO-STYLE (IDX-INFO)
+               IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
+                   IF    ( SPA-GMN-SNK-MONEY   =   ZERO )
+                       STRING  "産科医療保障制度の金額が未入力です。"
+                                               DELIMITED BY SIZE
+                       INTO     I07-LBLINFO (IDX-INFO)
+                       END-STRING
+                   END-IF
+               END-IF
            END-IF
       *
            IF    ( SPA-GMN-HKNJANUM        =   SPACE )
@@ -2064,6 +2132,12 @@
            WHEN    "0008"
                MOVE    "出産年月日が直接支払制度開始前の日付です"
                                        TO  SPA-ERRMSG
+           WHEN    "0009"
+               MOVE   "分娩機関管理番号が未設定です"
+                                       TO  SPA-ERRMSG
+           WHEN    "0010"
+               MOVE   "在胎週数が２２週未満です"
+                                       TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "在胎週数を入力してください"
                                        TO  SPA-ERRMSG
@@ -2099,13 +2173,6 @@
            WHEN    "1009"
                MOVE    "異常分娩で一部負担金等が未入力です"
                                        TO  SPA-ERRMSG
-           WHEN    "1010"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "産科医療保障制度の金額が"
-                                           DELIMITED BY SIZE
-                       "未入力です"        DELIMITED BY SIZE
-               INTO    SPA-ERRMSG
-               END-STRING
            WHEN    "1011"
                MOVE    SPACE           TO  SPA-ERRMSG
                STRING  "産科医療保障制度の金額が"

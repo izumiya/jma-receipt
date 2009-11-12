@@ -388,6 +388,7 @@
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK1001.INC".
       *    伝票番号
            COPY    "CPSK0042.INC".
       *    入金方法
@@ -881,6 +882,19 @@
       *
                MOVE    TEIKI06-SYU-DAT TO  SYUNOU-REC
       *
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+               MOVE    "1001"          TO  SYS-KANRICD
+               MOVE    "*"             TO  SYS-KBNCD
+               MOVE    SYU-SKYSTYMD    TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-1001-REC
+               IF    ( SYS-1001-SANKANUM   IS  NOT NUMERIC )
+                OR   ( SYS-1001-SANKANUM   =   ZERO    )
+                   MOVE    ZERO            TO  SYS-1001-SANKANUM
+               END-IF
+      *
       *        患者情報読み込み
                INITIALIZE              PTINF-REC
                MOVE    SYU-HOSPNUM      TO  PTINF-HOSPNUM
@@ -1331,6 +1345,19 @@
       *
                MOVE    TEIKI09-SYU-DAT TO  SYUNOU-REC
       *
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+               MOVE    "1001"          TO  SYS-KANRICD
+               MOVE    "*"             TO  SYS-KBNCD
+               MOVE    SYU-SKYSTYMD    TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-1001-REC
+               IF    ( SYS-1001-SANKANUM   IS  NOT NUMERIC )
+                OR   ( SYS-1001-SANKANUM   =   ZERO    )
+                   MOVE    ZERO            TO  SYS-1001-SANKANUM
+               END-IF
+      *
       *        患者情報読み込み
                INITIALIZE              PTINF-REC
                MOVE    SYU-HOSPNUM      TO  PTINF-HOSPNUM
@@ -1715,6 +1742,24 @@
            MOVE    BUNBEN-CREYMD       TO  LNKBUNBEN-CREYMD
       *
            MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
+      *
+           IF    ( BUNBEN-RIYOUKBN     =   "1" )
+               IF    ( SYS-1001-SANKANUM   NOT =   ZERO )
+                AND  ( BUNBEN-ZAIWEEK      >=   22 )
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   420000      *   BUNBEN-BIRTHCNT
+               ELSE
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   390000      *   BUNBEN-BIRTHCNT
+               END-IF
+      *
+               IF    ( BUNBEN-DAIRI-MONEY  >   BUNBEN-NINPUFTN-MONEY )
+                   MOVE    BUNBEN-NINPUFTN-MONEY
+                                       TO  BUNBEN-DAIRI-MONEY
+               END-IF
+           ELSE
+                   MOVE    ZERO    TO  BUNBEN-DAIRI-MONEY
+           END-IF
       *
            PERFORM 800-MCNDATE-SEC
            MOVE    TEIKI1P-JOBYMD      TO  BUNBEN-UPYMD
