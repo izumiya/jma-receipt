@@ -268,6 +268,7 @@
       *  04.04.15    NACL-ÌçÏÆ    09/10/13  ¾å¸Â³Û£±±ßÃ±°Ì¤ÎÂÐ±þ¡Ê£·£¹Åù¡Ë
       *  04.04.16    NACL-ÌçÏÆ    09/10/15  Îß·×¥Ù¡¼¥¹·×»»ÂÐ±þ
       *  04.04.17    NACL-ÌçÏÆ    09/11/05  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
+      *  04.04.18    NACL-ÌçÏÆ    09/11/12  ÅìµþÅÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4479,7 +4480,7 @@
                      (COMB-KOHHKNNUM(IDX-CYO) = "191"         ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200910"      ))
       *
-                 OR ((WK-1001-PREFNUM         =  13           ) AND
+                 OR ((WK-1001-PREFNUM         =  13 OR 14     ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "182"         ))
                  OR ((WK-1001-PREFNUM         =  07           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "245" OR "246"))
@@ -8630,7 +8631,7 @@
       *
            IF  ((FLG-TOKU75-CYO   =   3           ) OR
                 (FLG-CYOKI-ARI    =   2           ))
-           AND ( WK-1001-PREFNUM  =   13          )
+           AND ( WK-1001-PREFNUM  =   13 OR 14    )
            AND ( LNK-SYU-SRYYMD(1:6)  >= "200610" )
              IF   (LNK-SYU-SYUHKNNUM    NOT = SPACE)
              AND  (LNK-SYU-KOH1HKNNUM       = "182")
@@ -8638,7 +8639,7 @@
              END-IF
            END-IF.
            IF  (LNK-S02-KOUREI-NYUIN-KBN  =   "1"   )
-           AND (WK-1001-PREFNUM           =   13    )
+           AND (WK-1001-PREFNUM     =   13 OR 14    )
            AND (LNK-SYU-SRYYMD(1:6)      >= "200610")
               IF  (LNK-SYU-SYUHKNNUM    NOT = SPACE          )
               AND (LNK-SYU-KOH1HKNNUM       = "027"          )
@@ -8674,7 +8675,7 @@
               END-IF
            END-IF.
            IF  (FLG-GENBUTU70         NOT =  ZERO)
-           AND (WK-1001-PREFNUM           =   13 )
+           AND (WK-1001-PREFNUM     =   13 OR 14 )
               IF  (LNK-SYU-SYUHKNNUM    NOT = SPACE          )
               AND (LNK-SYU-KOH1HKNNUM       = "182"          )
                   MOVE     1      TO   FLG-TOKYO
@@ -9912,7 +9913,7 @@
                      (LNK-SYU-KOH1HKNNUM      = "285"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200110" ) AND
                      (LNK-SYU-SRYYMD(1:6)    <= "200609" ))
-                 OR ((WK-1001-PREFNUM         =  13      ) AND
+                 OR ((WK-1001-PREFNUM         =  13 OR 14) AND
                      (LNK-SYU-KOH1HKNNUM      = "182"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200610" ))
                       IF    LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
@@ -10561,7 +10562,7 @@
                            (LNK-SYU-KOH2HKNNUM = "683"         ) AND
                            (FLG-SANSHOU2       = "2" OR "3"    ) AND
                            (LNK-SYU-SRYYMD(1:6)   >= "200904"  ))
-                      OR  ((WK-1001-PREFNUM    =  13           ) AND
+                      OR  ((WK-1001-PREFNUM    =  13 OR 14     ) AND
                            (LNK-SYU-KOH2HKNNUM = "182"         ))
                       OR  ( FLG-FTNRATE100     =  1             )
                         COMPUTE  WK-KOUREI-IRYOHI70  =
@@ -10648,7 +10649,7 @@
                      (LNK-SYU-KOH2HKNNUM      = "285"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200110" ) AND
                      (LNK-SYU-SRYYMD(1:6)    <= "200609" ))
-                 OR ((WK-1001-PREFNUM         =  13      ) AND
+                 OR ((WK-1001-PREFNUM         =  13 OR 14) AND
                      (LNK-SYU-KOH2HKNNUM      = "182"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200610" ))
                       IF    LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
@@ -11304,7 +11305,7 @@
                      (LNK-SYU-KOH3HKNNUM      = "285"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200110" ) AND
                      (LNK-SYU-SRYYMD(1:6)    <= "200609" ))
-                 OR ((WK-1001-PREFNUM         =  13      ) AND
+                 OR ((WK-1001-PREFNUM         =  13 OR 14) AND
                      (LNK-SYU-KOH3HKNNUM      = "182"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200610" ))
                       IF    LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
@@ -11817,7 +11818,7 @@
                      (LNK-SYU-KOH4HKNNUM      = "285"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200110" ) AND
                      (LNK-SYU-SRYYMD(1:6)    <= "200609" ))
-                 OR ((WK-1001-PREFNUM         =  13      ) AND
+                 OR ((WK-1001-PREFNUM         =  13 OR 14) AND
                      (LNK-SYU-KOH4HKNNUM      = "182"    ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200610" ))
                       IF    LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
@@ -18509,7 +18510,7 @@
            IF  ( LNK-SYU-SRYYMD(1:6)            >= "200610" )
            AND ((LNK-S02-KOUREI-NYUIN-KBN        =     "1" ) OR
                 (FLG-GENBUTU70               NOT =     ZERO))
-           AND ( WK-1001-PREFNUM                 =     13   )
+           AND ( WK-1001-PREFNUM           =     13 OR 14   )
            AND ( COMB-KOHHKNNUM(KOH-IDX)         =    "182" )
                  MOVE    "1"    TO    FLG-SYOUKAN(KOH-IDX)
            END-IF.
@@ -19298,7 +19299,7 @@
                    (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "285"    ) AND
                    (LNK-SYU-SRYYMD(1:6)        >= "200110" ) AND
                    (LNK-SYU-SRYYMD(1:6)        <= "200609" ))
-               OR ((WK-1001-PREFNUM             =  13      ) AND
+               OR ((WK-1001-PREFNUM             =  13 OR 14) AND
                    (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "182"    ) AND
                    (LNK-SYU-SRYYMD(1:6)        >= "200610" ))
                   PERFORM   23077-TOKUSYU-SANTEI2-SEC
@@ -24859,7 +24860,7 @@
       *
            END-IF
       *
-           IF  (WK-1001-PREFNUM             =  13      )
+           IF  (WK-1001-PREFNUM             =  13 OR 14)
            AND (LNK-SYU-SRYYMD(1:6)        >= "200610" )
            AND ((LNK-SYU-KOH1HKNNUM         = "182"   ) OR
                 (LNK-SYU-KOH2HKNNUM         = "182"   ) OR
