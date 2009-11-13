@@ -110,6 +110,7 @@
       *  04.04.01    NACL-ÌçÏÆ    09/08/18  ½Ð»º°ì»þ¶âÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/10/01  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/11/05  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
+      *  04.04.04    NACL-ÌçÏÆ    09/11/13  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1484,6 +1485,18 @@
                               "681" OR "682" OR "683"           ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
+                IF  ( WRK-PREFNUM(1)                =    43      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200912" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
               END-IF
               IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(2)
                 IF  ( WRK-PREFNUM(2)                =    07      )
@@ -1552,6 +1565,18 @@
                               "681" OR "682" OR "683"           ) OR
                      (WRK-HANBETU-KOH4HKNNUM(IDX)   =
                               "681" OR "682" OR "683"           ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
+                IF  ( WRK-PREFNUM(2)                =    43      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200912" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =
+                              "341" OR "442" OR "143" OR "342"  ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
               END-IF
