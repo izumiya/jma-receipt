@@ -7005,6 +7005,22 @@
       *****************************************************************
        370-HC101-HKN-RIREKI-HEN-SEC      SECTION.
       *
+      *    公費単独以外、精神入院単独は保険履歴の記載をしない
+           IF    ( RECE62-HKNNUM       =   SPACE )
+           AND   ( RECE62-KOHNUM (1)
+                                   NOT =   SPACE )
+           AND   ( RECE62-KOHNUM (2)
+                                   NOT =   SPACE )
+               GO  TO  370-HC101-HKN-RIREKI-HEN-EXT
+           END-IF
+           IF    ( RECE62-HKNNUM       =   SPACE )
+           AND   ( RECE62-KOHNUM (1)
+                                       =   "020" )
+           AND   ( RECE62-KOHNUM (2)
+                                       =   SPACE )
+               GO  TO  370-HC101-HKN-RIREKI-HEN-EXT
+           END-IF
+      *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       WRK-RIREKI-MAX  
       *        摘要欄に１行あける

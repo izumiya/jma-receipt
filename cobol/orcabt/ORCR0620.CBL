@@ -163,6 +163,8 @@
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
       *  04.04.03    NACL-門脇    09/08/24  出産一時金対応
+      *  04.04.04    NACL-藤原    09/10/21  月途中の負担者番号変更対応
+      *                                     （自立支援の公費単独） 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1015,17 +1017,25 @@
                    CONTINUE
                ELSE 
                    IF      RECE61-TEKSTYMD      =   ZERO
-                       IF    ( RECE61-KOHHKNNUM-O (1) = "012" OR  "025" 
-                                                      OR  SPACE )
-                       AND   ( RECE61-KOHHKNNUM-O (2) = "012" OR  "025" 
-                                                      OR  SPACE )
-                       AND   ( RECE61-KOHHKNNUM-O (3) = "012" OR  "025" 
-                                                      OR  SPACE )
-                       AND   ( RECE61-KOHHKNNUM-O (4) = "012" OR  "025" 
-                                                      OR  SPACE )
-                           GO  TO  210-HENSYU-EXT
+                       IF    ( RECE61-KOHHKNNUM-O (1)
+                                                   =   "012" OR  "025"
+                                                   OR  "015" OR  "016"
+                                                   OR  "021" OR  SPACE )
+                           IF    ( RECE61-KOHHKNNUM-O  (2)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (3)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (4)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                               GO  TO  210-HENSYU-EXT
+                           ELSE
+                               MOVE    1               TO  FLG-SEIHO
+                           END-IF
                        ELSE
-                           MOVE    1                TO  FLG-SEIHO
+                           MOVE    1               TO  FLG-SEIHO
                        END-IF
                    ELSE
                        IF      FLG-SEIHO            =   1
@@ -2804,7 +2814,10 @@
                    AND ( RECE61-HKNNUM(1:2)     NOT =   "98"  ) )
              OR  (     ( RECE61-HKNID               =   ZERO  )
                    AND ( RECE61-KOHHKNNUM-O (1)     =   "012" 
-                                                    OR  "025" )
+                                                    OR  "025"
+                                                    OR  "015"
+                                                    OR  "016"
+                                                    OR  "021" )
                    AND ( RECE61-KOHHKNNUM-O (2)     =   SPACE ) )
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       10
@@ -2968,8 +2981,9 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                          PERFORM 900-CLOSE-SEC
       *
                          IF      FLG-PTKOHINF    =   ZERO
-                             MOVE    PTKOH-FTNJANUM  TO  RECE69-KIGO
+                           MOVE    PTKOH-FTNJANUM  TO  RECE69-KIGO
       *
+                           IF      PTKOH-KOHNUM    =   "012"   OR  "025"
                              MOVE    RECE61-HOSPNUM  TO
                                                    MONTHLYNUM-HOSPNUM
                              MOVE    RECE61-PTID     TO MONTHLYNUM-PTID
@@ -3011,34 +3025,37 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                                                          TO  RECE69-NUM
                                  END-IF
                              END-IF    
+                           ELSE                       
+                             MOVE   PTKOH-JKYSNUM  TO  RECE69-NUM
+                           END-IF
       *         
-                             INITIALIZE                  HKNNUM-REC
-                             MOVE   RECE61-HOSPNUM   TO  HKN-HOSPNUM
-                             MOVE   PTKOH-KOHNUM     TO  HKN-HKNNUM
-                             MOVE   RECE61-TEKSTYMDX (IDX)
-                                                     TO  HKN-TEKSTYMD
-                             MOVE   RECE61-TEKEDYMDX (IDX)
-                                                     TO  HKN-TEKEDYMD
-                             MOVE   HKNNUM-REC       TO  MCPDATA-REC
-                             MOVE   "tbl_hknnum"     TO  MCP-TABLE
-                             MOVE   "key5"           TO  MCP-PATHNAME
-                             PERFORM 900-DBSELECT-SEC
-                             IF     MCP-RC           =   ZERO
-                                 MOVE   "tbl_hknnum" TO  MCP-TABLE
-                                 MOVE   "key5"       TO  MCP-PATHNAME
-                                 PERFORM HKNNUM-READ-SEC
-                                 IF      FLG-HKNNUM  =   ZERO
-                                     MOVE   HKN-TANSEIDONAME
+                           INITIALIZE                  HKNNUM-REC
+                           MOVE   RECE61-HOSPNUM   TO  HKN-HOSPNUM
+                           MOVE   PTKOH-KOHNUM     TO  HKN-HKNNUM
+                           MOVE   RECE61-TEKSTYMDX (IDX)
+                                                   TO  HKN-TEKSTYMD
+                           MOVE   RECE61-TEKEDYMDX (IDX)
+                                                   TO  HKN-TEKEDYMD
+                           MOVE   HKNNUM-REC       TO  MCPDATA-REC
+                           MOVE   "tbl_hknnum"     TO  MCP-TABLE
+                           MOVE   "key5"           TO  MCP-PATHNAME
+                           PERFORM 900-DBSELECT-SEC
+                           IF     MCP-RC           =   ZERO
+                               MOVE   "tbl_hknnum" TO  MCP-TABLE
+                               MOVE   "key5"       TO  MCP-PATHNAME
+                               PERFORM HKNNUM-READ-SEC
+                               IF      FLG-HKNNUM  =   ZERO
+                                   MOVE   HKN-TANSEIDONAME
                                                  TO  RECE69-TANSEIDONAME
-                                 END-IF
-                             END-IF
-                             MOVE   "tbl_hknnum"     TO  MCP-TABLE
-                             MOVE   "key5"           TO  MCP-PATHNAME
-                             PERFORM 900-CLOSE-SEC
+                               END-IF
+                           END-IF
+                           MOVE   "tbl_hknnum"     TO  MCP-TABLE
+                           MOVE   "key5"           TO  MCP-PATHNAME
+                           PERFORM 900-CLOSE-SEC
       *
-                             MOVE    RECE69-REC        TO
-                                                   TBL-RECE69-OCC (IDYY)
-                             MOVE    100               TO  IDYY
+                           MOVE    RECE69-REC        TO
+                                                 TBL-RECE69-OCC (IDYY)
+                           MOVE    100               TO  IDYY
                          END-IF
                      END-IF
                    END-IF  

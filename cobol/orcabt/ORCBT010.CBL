@@ -88,6 +88,8 @@
       *                                     生保単独になったときのまとめ
       *  04.04.02    NACL-藤原    09/04/09  入院基本料・特定入院料・食事
       *                                     療養出力時の連番の初期化
+      *  04.04.03    NACL-藤原    09/10/21  月途中の負担者番号変更対応
+      *                                     （自立支援の公費単独） 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1604,9 +1606,12 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
            END-PERFORM
       *
            INITIALIZE                  WRK-SEIHO-TOUKEI01-REC
-      *    生保単独のみのとき
+      *    公費単独の場合（生保、中国残留邦人等、自立支援）
            IF    ( COMB-HKNNUM         =   SPACE )
            AND   ( COMB-KOHHKNNUM (1)  =   "012"
+                                       OR  "015"
+                                       OR  "016"
+                                       OR  "021"
                                        OR  "025" )
            AND   ( COMB-KOHHKNNUM (2)  =   SPACE )
                PERFORM 20013-SEIHO-TOUKEI01-WRITE-SEC
@@ -2317,18 +2322,22 @@ grpsys                                         SPA-AREA
                    ELSE 
                        IF      TOUKEI01-HKNJANUM       =   SPACE
                            IF    ( TOUKEI01-TKOHHKNNUM (1) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                           AND   ( TOUKEI01-TKOHHKNNUM (2) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                           AND   ( TOUKEI01-TKOHHKNNUM (3) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                           AND   ( TOUKEI01-TKOHHKNNUM (4) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                               CONTINUE
+                                                   "012"   OR  "025"
+                                               OR  "015"   OR  "016"
+                                               OR  "021"            )
+                               IF    ( TOUKEI01-TKOHHKNNUM  (2)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (3)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (4)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    1           TO  FLG-SEIHO
+                               END-IF
                            ELSE
                                MOVE    1           TO  FLG-SEIHO
                            END-IF
@@ -2362,18 +2371,23 @@ grpsys                                         SPA-AREA
                    ELSE 
                        IF      TOUKEI01-HKNJANUM       =   SPACE
                            IF    ( TOUKEI01-TKOHHKNNUM (1) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                           AND   ( TOUKEI01-TKOHHKNNUM (2) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                           AND   ( TOUKEI01-TKOHHKNNUM (3) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                           AND   ( TOUKEI01-TKOHHKNNUM (4) =
-                                                      "012" OR  "025" 
-                                                            OR  SPACE )
-                               MOVE    1                TO  FLG-WRITE 
+                                                   "012"   OR  "025"
+                                               OR  "015"   OR  "016"
+                                               OR  "021"            )
+                               IF    ( TOUKEI01-TKOHHKNNUM  (2)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (3)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (4)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                                   MOVE    1           TO  FLG-WRITE
+                               END-IF
                            END-IF
                        ELSE
                            MOVE    1                TO  FLG-WRITE 

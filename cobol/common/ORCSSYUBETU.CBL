@@ -77,6 +77,8 @@
       *                                     （紙レセプト）への設定追加
       *  04.04.02    NACL-藤原    09/01/14  月途中に医保と生保の併用から
       *                                     生保単独になったときのまとめ
+      *  04.04.03    NACL-藤原    09/10/21  月途中の負担者番号変更対応
+      *                                     （自立支援の公費単独） 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1364,9 +1366,12 @@ grpsys         IF      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                END-IF
            END-PERFORM
       *
-      *    生保単独のみのとき
+      *    公費単独の場合（生保、中国残留邦人等、自立支援）
            IF    ( COMB-HKNNUM         =   SPACE )
            AND   ( COMB-KOHHKNNUM (1)  =   "012"
+                                       OR  "015"
+                                       OR  "016"
+                                       OR  "021"
                                        OR  "025" )
            AND   ( COMB-KOHHKNNUM (2)  =   SPACE )
                PERFORM 200194-SEIHO-RECE61-WRITE-SEC
@@ -1838,42 +1843,50 @@ grpsys         IF      TBL-RECE61-HOSPNUM (1)  =   ZERO
                                            IDZZ
            INITIALIZE                      TBL-SEIHO-RECE61-AREA
       *
-      *    生保単独の退避と生保以外の公費単独のチェック（精神入院は除く）    
+      *    公費単独の退避（生保、中国残留邦人等、自立支援）
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       100
 grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
+                   OR      FLG-SEIHO                  =   1
                MOVE    TBL-RECE61-OCC (IDXX)   TO  WRK-RECE61-REC
       *
       *        公費単独の場合（精神入院以外）
-               IF      WRK-RECE61-HKNNUM        =   SPACE
+               IF      WRK-RECE61-HKNNUM       =   SPACE
                    IF      WRK-RECE61-KOHHKNNUM-O (1)  = "020"
                        CONTINUE
                    ELSE 
-                       IF      WRK-RECE61-TEKSTYMD  =   ZERO
+                       IF      WRK-RECE61-TEKSTYMD =   ZERO
                            IF    ( WRK-RECE61-KOHHKNNUM-O (1)
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                           AND   ( WRK-RECE61-KOHHKNNUM-O (2) 
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                           AND   ( WRK-RECE61-KOHHKNNUM-O (3) 
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                           AND   ( WRK-RECE61-KOHHKNNUM-O (4) 
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                               CONTINUE
+                                               =   "012"   OR  "025"
+                                               OR  "015"   OR  "016"
+                                               OR  "021"            )
+                               IF    ( WRK-RECE61-KOHHKNNUM-O  (2)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (3)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (4)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    1           TO  FLG-SEIHO
+                               END-IF
                            ELSE
                                MOVE    1           TO  FLG-SEIHO
                            END-IF
                        ELSE
-      *                    生保単独の場合退避
+      *                    公費単独（生保、中国残留邦人等、自立支援）の場合退避
                            ADD     1        TO  TBL-SEIHO-RECE61-MAX
                            MOVE    WRK-RECE61-REC
                                             TO  TBL-SEIHO-RECE61-REC
-                                                  (TBL-SEIHO-RECE61-MAX)
+                                              (TBL-SEIHO-RECE61-MAX)
                        END-IF
-                  END-IF
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -1896,18 +1909,23 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                    ELSE 
                        IF      WRK-RECE61-TEKSTYMD  =   ZERO
                            IF    ( WRK-RECE61-KOHHKNNUM-O (1)
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                           AND   ( WRK-RECE61-KOHHKNNUM-O (2) 
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                           AND   ( WRK-RECE61-KOHHKNNUM-O (3) 
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                           AND   ( WRK-RECE61-KOHHKNNUM-O (4) 
-                                                    = "012" OR  "025"
-                                                            OR SPACE )
-                               MOVE    1                TO  FLG-WRITE 
+                                               =   "012"   OR  "025"
+                                               OR  "015"   OR  "016"
+                                               OR  "021"            )
+                               IF    ( WRK-RECE61-KOHHKNNUM-O  (2)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (3)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (4)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                                   MOVE    1           TO  FLG-WRITE
+                               END-IF
                            END-IF
                        ELSE
                            MOVE    1        TO  FLG-WRITE 
