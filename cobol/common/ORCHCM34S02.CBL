@@ -3009,7 +3009,7 @@
       *****************************************************************
        20011-RYYTAN-HEN-SEC            SECTION.
       *
-           MOVE    "80"            TO  WRYYTAN-SRYKBN
+           MOVE    "85"            TO  WRYYTAN-SRYKBN
            MOVE    TNS-TEN         TO  WRYYTAN-ZAITEN
            MOVE    TNS-SRYCD       TO  WRYYTAN-SRYCD
       *
