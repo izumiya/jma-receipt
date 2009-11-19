@@ -3684,7 +3684,7 @@
       *****************************************************************
        20011-RYYTAN-HEN-SEC            SECTION.
       *
-           MOVE    "85"            TO  WRYYTAN-SRYKBN
+           MOVE    "80"            TO  WRYYTAN-SRYKBN
            MOVE    TNS-TEN         TO  WRYYTAN-ZAITEN
            MOVE    TNS-SRYCD       TO  WRYYTAN-SRYCD
       *
@@ -4079,6 +4079,10 @@
       *
                    MOVE    SRT-SRYKBN   (IDXB) TO  HCM34S01-SRYKBN
                                                               (IDXE)
+                   IF    ( SRT-ZAISKBKBN(IDXB) =   "7" )
+                       MOVE    "850"           TO  HCM34S01-SRYSYUKBN
+                                                              (IDXE)
+                   END-IF
                    MOVE    SRT-ZAITEN   (IDXB) TO  HCM34S01-ZAITEN
                                                               (IDXE)
                    MOVE    SRT-ZAIKAISU (IDXB) TO  HCM34S01-ZAIKAISU

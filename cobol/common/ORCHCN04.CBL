@@ -1448,11 +1448,14 @@
        20042-NYUTBL-HENSYU-SEC                SECTION.
       *
       *    ¼¼ÎÁº¹³Û¤Ï¼«Èñ
-           IF      HCM34S01-ZAISKBKBN(IDX) =   "3"
+           EVALUATE    HCM34S01-ZAISKBKBN(IDX)
+           WHEN    "3"
                MOVE    "95"                    TO  TBL-SRYKBN
-           ELSE
+           WHEN    "7"
+               MOVE    "85"                    TO  TBL-SRYKBN
+           WHEN    OTHER
                MOVE    HCM34S01-SRYKBN (IDX)   TO  TBL-SRYKBN
-           END-IF
+           END-EVALUATE
            MOVE    HCM34S01-SRYSYUKBN(IDX) TO  TBL-SRYSYUKBN
       *    ºÞÅÀ¿ô
            MOVE    HCM34S01-ZAITEN (IDX)   TO  TBL-ZAITENSU
