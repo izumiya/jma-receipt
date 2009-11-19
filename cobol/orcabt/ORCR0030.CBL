@@ -428,6 +428,7 @@
       *  04.04.25    NACL-ÌçÏÆ    09/09/17  °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.04.26    NACL-ÌçÏÆ    09/09/18  Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
       *  04.04.27    NACL-ÌçÏÆ    09/09/18  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.28    NACL-ÌçÏÆ    09/11/19  ÏÂ²Î»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11786,6 +11787,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND (RECE02-TEISYUTUSAKI  =   2 OR 6     )
                    PERFORM  21112-SEIKYUTEN-HENSYU-SEC
                END-IF
+      *      ÏÂ²Î»³¸©
+             WHEN    "30"
+               IF  (RECE02-SRYYM        >=  "200904"    )
+               AND (RECE02-TEISYUTUSAKI  =   2 OR 6     )
+                   PERFORM  21112-SEIKYUTEN-HENSYU-SEC
+               END-IF
            END-EVALUATE
       *
       *    µÜ¾ë¸©ÆýÍÄ»ù
@@ -12039,6 +12046,58 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                             RECE02-JNISSU(1) -
                             RECE02-JNISSU(3)
                 END-IF
+             END-IF
+      *
+           END-IF
+      *
+           IF   SYS-1001-PREFNUM  =  "30"
+      *
+             IF  ( RECE02-HKNNUM       NOT = SPACE    )
+             AND ((RECE02-KOHNUM(1)(1:1)   =  "0"    ) OR
+                  (TBL-TOKATUKAIFLG(1)     =   1     ))
+             AND ( RECE02-KOHNUM(2)(1:1)
+                                     >= "1" AND <= "8")
+             AND ( TBL-TOKATUKAIFLG(2)     = ZERO     )
+             AND ( RECE02-TOTALTEN(1)      =
+                                    RECE02-TOTALTEN(2))
+             AND ( RECE02-TOTALTEN(1)      =
+                                    RECE02-TOTALTEN(3))
+                COMPUTE  RECE02-TOTALTEN(3) =
+                         RECE02-TOTALTEN(1) -
+                         RECE02-TOTALTEN(2)
+                MOVE    "1"    TO   RECE02-FUKUSHIFLG
+             END-IF
+      *
+             IF  ( RECE02-HKNNUM       NOT = SPACE    )
+             AND ( RECE02-KOHNUM(1)(1:1)   =  "0"     )
+             AND ( RECE02-KOHNUM(2)   = "972" OR "974")
+             AND ( RECE02-KOHNUM(3)(1:1)
+                                     >= "1" AND <= "8")
+             AND ( TBL-TOKATUKAIFLG(3)     = ZERO     )
+             AND ( RECE02-TOTALTEN(1)      =
+                                    RECE02-TOTALTEN(2))
+             AND ( RECE02-TOTALTEN(1)      =
+                                    RECE02-TOTALTEN(4))
+                COMPUTE  RECE02-TOTALTEN(4) =
+                         RECE02-TOTALTEN(1) -
+                         RECE02-TOTALTEN(2)
+                MOVE    "1"    TO   RECE02-FUKUSHIFLG
+             END-IF
+      *
+             IF  ( RECE02-HKNNUM       NOT = SPACE    )
+             AND ( RECE02-KOHNUM(1)   = "972" OR "974")
+             AND ( TBL-TOKATUKAIFLG(2)  =   1         )
+             AND ( RECE02-KOHNUM(3)(1:1)
+                                     >= "1" AND <= "8")
+             AND ( TBL-TOKATUKAIFLG(3)     = ZERO     )
+             AND ( RECE02-TOTALTEN(1)      =
+                                    RECE02-TOTALTEN(3))
+             AND ( RECE02-TOTALTEN(1)      =
+                                    RECE02-TOTALTEN(4))
+                COMPUTE  RECE02-TOTALTEN(4) =
+                         RECE02-TOTALTEN(1) -
+                         RECE02-TOTALTEN(3)
+                MOVE    "1"    TO   RECE02-FUKUSHIFLG
              END-IF
       *
            END-IF
