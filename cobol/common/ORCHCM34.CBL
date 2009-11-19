@@ -1043,6 +1043,9 @@
       *
            IF    ( FLG-SYSKANRI        =   ZERO )
                MOVE    MCPDATA-REC     TO  SYS-4001-REC
+               IF    ( SYS-4001-JIBAIKBN   =   SPACE )
+                   MOVE    "1"         TO  SYS-4001-JIBAIKBN
+               END-IF
            ELSE
                INITIALIZE                  SYS-4001-REC
            END-IF
@@ -3590,10 +3593,17 @@
                WHEN    "1"
                WHEN    "4"
                WHEN    "6"
-               WHEN    "7"
                    MOVE    ACCT-ZAITEN     TO  WRK-ZAITEN
                    MOVE    ACCT-ZAIKAISU   TO  WRK-ZAIKAISU
                    PERFORM 205-TENSUKAISU-HEN-SEC
+               WHEN    "7"
+                   IF    ( FLG-JIBAI           =   1 )
+                       PERFORM 200111-JBI-RYOYO-TEATE-HEN-SEC
+                   ELSE
+                       MOVE    ACCT-ZAITEN     TO  WRK-ZAITEN
+                       MOVE    ACCT-ZAIKAISU   TO  WRK-ZAIKAISU
+                       PERFORM 205-TENSUKAISU-HEN-SEC
+                   END-IF
                WHEN    "2"
                    PERFORM 200211-NISSU-HEN-SEC
                    MOVE    ACCT-ZAITEN     TO  WRK-ZAITEN
@@ -4032,15 +4042,21 @@
       *****************************************************************
        200111-JBI-RYOYO-TEATE-HEN-SEC  SECTION.
       *
-           IF    ( WRK-JBI-RYOYO-TEATE-KBN     =   "1" )
-               MOVE    120             TO  WRK-ZAITEN
+           IF    ( SYS-4001-JIBAIKBN           =   "1" )
+               IF    ( WRK-JBI-RYOYO-TEATE-KBN     =   "1" )
+                   MOVE    120             TO  WRK-ZAITEN
+               ELSE
+                   MOVE    84              TO  WRK-ZAITEN
+               END-IF
+      *
+               MOVE    ACCT-ZAIKAISU       TO  WRK-ZAIKAISU
+      *
+               PERFORM 205-KINGAKUKAISU-HEN-SEC
            ELSE
-               MOVE    84              TO  WRK-ZAITEN
+               MOVE    ACCT-ZAITEN     TO  WRK-ZAITEN
+               MOVE    ACCT-ZAIKAISU   TO  WRK-ZAIKAISU
+               PERFORM 205-TENSUKAISU-HEN-SEC
            END-IF
-      *
-           MOVE    ACCT-ZAIKAISU       TO  WRK-ZAIKAISU
-      *
-           PERFORM 205-KINGAKUKAISU-HEN-SEC
       *
            .
        200111-JBI-RYOYO-TEATE-HEN-EXT.
@@ -4154,6 +4170,7 @@
                    MOVE    1           TO  FLG-SRYACT-HEN5
                END-IF
            END-IF
+      *
       *
            IF    ( FLG-JIBAI           =   1 )
             AND  ( SRY-SRYKBN          =   "80" )
@@ -5361,6 +5378,9 @@
                                            TO  SRY-SRYKA
                    MOVE    HCM34S01-SRYKBN (IDX28)
                                            TO  SRY-SRYKBN
+                   MOVE    HCM34S01-SRYSYUKBN (IDX28)
+                                           TO  SRY-SRYSYUKBN
+                                               WRK-SRYSYUKBN
                END-IF
       *
                MOVE    HCM34S01-SRYCD (IDX28 IDX30)
