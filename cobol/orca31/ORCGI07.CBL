@@ -1477,7 +1477,7 @@
                IF    ( SPA-GMN-BUNBENKBN   =   "2" )
                 AND  ( SPA-GMN-ICBFTN-MONEY    =   ZERO )
                    MOVE    "1009"          TO  SPA-ERRCD
-                   MOVE    14              TO  SPA-GMN-CUR
+                   MOVE    20              TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
