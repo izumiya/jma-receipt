@@ -117,6 +117,7 @@
       *
       *  04.04.01    NACL-門脇    09/02/04  検査のコメント自動記載対応
       *  04.04.02    NACL-門脇    09/09/30  検査の数量編集修正
+      *  04.04.03    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -824,6 +825,8 @@
            03  WRK-CONS-KYOBUKASAN     PIC X(09)   VALUE "140040110".
       *    創外固定器使用加算
            03  WRK-CONS-SOGAIKASAN     PIC X(09)   VALUE "150266970".
+      *    療養担当手当て
+           03  WRK-CONS-RYOYOTEATE     PIC X(09)   VALUE "199000610".
       *
       *    フィルム料（乳幼児）加算
            03  WRK-CONS-FILM-YOUJI-KASAN
@@ -1260,7 +1263,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                        MOVE    3             TO  IDY
                                      END-IF
                                    ELSE
+                                     IF  RECE45-SRYCD (IDX)  =
+                                           WRK-CONS-RYOYOTEATE
+                                       IF  RECE41-JIBAIKBN   =  "2"
+                                         MOVE  4             TO  IDY
+                                       ELSE
+                                         MOVE  3             TO  IDY
+                                       END-IF
+                                     ELSE
                                        MOVE    3             TO  IDY
+                                     END-IF
                                    END-IF
                                END-IF
                            WHEN    "6"

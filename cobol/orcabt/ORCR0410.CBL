@@ -74,6 +74,7 @@
       *                                     （診療区分６４：病理診断対応）
       *                                     （再就労：円変更対応）
       *  04.03.01    NACL-門脇    09/02/19  アフターの検査日編集条件追加
+      *  04.04.01    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1681,6 +1682,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             COMPUTE  TBL-SYUTEN-JI(ID1)  =
                                      TBL-SYUTEN-JI(ID1)  -
                                     ( WRK-ZAIKAISU-JI * TNS-TEN )
+                            IF   WRK-JIBAIKBN  =  "2"
+                              COMPUTE  TBL-YKZTEN-JI(ID1)  =
+                                       TBL-YKZTEN-JI(ID1)  +
+                                      ( WRK-ZAIKAISU-JI * TNS-TEN )
+                            END-IF
                        END-IF
       *
                     END-PERFORM

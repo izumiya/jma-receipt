@@ -297,6 +297,7 @@
       *  04.04.12    NACL-門脇    09/10/15  累計ベース計算対応
       *  04.04.13    NACL-門脇    09/11/12  東京都地方公費神奈川県対応
       *  04.04.14    NACL-門脇    09/11/13  熊本県地方公費対応
+      *  04.04.15    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3105,22 +3106,6 @@
                                                WK-YAKFTN
            MOVE    ALL"9"                TO    WK-KOH-COMPFTN-AREA     
       *
-      *    自賠責・療養担当手当用特例処理
-      *    （自賠責の場合、７点を８４円に読み替える）
-      *    （療養担当手当：１月１回の算定）
-           IF    LNK-SYU-SYUHKNNUM       =    "973"
-           AND   LNK-S01-RYOYO(IDY)  NOT =    ZERO
-               COMPUTE  LNK-SYU-HKNTEN (16)  =  LNK-SYU-HKNTEN (16)
-                                             -  LNK-S01-RYOYO(IDY)
-               COMPUTE  LNK-SYU-HKNTEN (17)  =  LNK-SYU-HKNTEN (17)
-                                             -  LNK-S01-RYOYO(IDY)
-      *
-               COMPUTE  WK-RYOYO  =  LNK-S01-RYOYO(IDY)  /   7
-      *
-               COMPUTE  LNK-SYU-RSIETC-MONEY =  LNK-SYU-RSIETC-MONEY
-                                             +  ( 84 *  WK-RYOYO )
-           END-IF
-      *
       *平成１４年１０月改正対応
       *高齢者の在宅総合・在宅末期算定患者の負担上限算定エリア初期化
       *
@@ -3235,6 +3220,23 @@
                ELSE
                    DISPLAY  "PTINF AGE-CHK ERR " LNK-SYU-PTID
                END-IF
+           END-IF
+      *
+      *    自賠責・療養担当手当用特例処理
+      *    （自賠責の場合、７点を８４円に読み替える）
+      *    （療養担当手当：１月１回の算定）
+           IF    LNK-SYU-SYUHKNNUM       =    "973"
+           AND   LNK-S01-RYOYO(IDY)  NOT =    ZERO
+           AND   FLG-KENPOJYUNKYO        =    ZERO
+               COMPUTE  LNK-SYU-HKNTEN (16)  =  LNK-SYU-HKNTEN (16)
+                                             -  LNK-S01-RYOYO(IDY)
+               COMPUTE  LNK-SYU-HKNTEN (17)  =  LNK-SYU-HKNTEN (17)
+                                             -  LNK-S01-RYOYO(IDY)
+      *
+               COMPUTE  WK-RYOYO  =  LNK-S01-RYOYO(IDY)  /   7
+      *
+               COMPUTE  LNK-SYU-RSIETC-MONEY =  LNK-SYU-RSIETC-MONEY
+                                             +  ( 84 *  WK-RYOYO )
            END-IF
       *
       *    前期高齢者（７０歳〜７４歳）

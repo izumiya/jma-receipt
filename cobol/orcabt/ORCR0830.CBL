@@ -59,6 +59,7 @@
       *
       *  04.04.01    NACL-ÌçÏÆ    09/01/23  Æþ±¡ÎÁ»»ÄêÊÝ¸±°Ê³°¤Î¿ÇÎÅÊ¬¼ÂÆü¿ô»»ÄêÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/06/12  ÎÅÍÜ´ü´Ö¤ÎÊÔ½¸½¤Àµ
+      *  04.04.03    NACL-ÌçÏÆ    09/11/19  ¼«ÇåÀÕ·òÊÝ½àµòÎÅÍÜÃ´Åö¼êÅöÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1478,8 +1479,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
                   AND (WRK-DAY2(IDY)              =  ZERO  OR  4)
                      IF    RECE82-HKNKBN   =   "4"
+                      EVALUATE  RECE82-JIBAIKBN
+                       WHEN  "1"
                         COMPUTE  TOTALKIN2-ACCT =  TOTALKIN2-ACCT
                                                 +  120
+                       WHEN  "2"
+                        COMPUTE  TBL-YKZTEN-JI(IDY)  =
+                                 TBL-YKZTEN-JI(IDY)  +
+                                 WRK-DAY7-ZAITEN(IDY)
+                      END-EVALUATE
                      ELSE
                         COMPUTE  TOTALTEN-ACCT  =  TOTALTEN-ACCT
                                                 +  WRK-DAY7-ZAITEN(IDY)
@@ -1613,7 +1621,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *                ¡Ê¼«ÇåÀÕ¤Î¾ì¹ç¡¢£±£°ÅÀ¤ò£±£²£°±ß¤ËÆÉ¤ßÂØ¤¨¤ë¡Ë
       *                ¡ÊÎÅÍÜÃ´Åö¼êÅö¡§£±·î£±²ó¤Î»»Äê¡Ë
                          IF   SRY-SRYCD(SRYACT-IDX) =  CONS-RYOYOTEATE
+                          IF   RECE82-JIBAIKBN      =  "1"
                             ADD    120          TO    WRK-KIN2
+                          END-IF
                          END-IF
                      ELSE 
                          IF ( SRY-SRYCD(SRYACT-IDX) = CONS-ROUSAI1  OR
@@ -1906,6 +1916,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             COMPUTE  TBL-SYUTEN-JI(IDY)  =
                                      TBL-SYUTEN-JI(IDY)  -
                                     ( WRK-ZAIKAISU-JI * TNS-TEN )
+                            IF   RECE82-JIBAIKBN  =  "2"
+                              COMPUTE  TBL-YKZTEN-JI(ID1)  =
+                                       TBL-YKZTEN-JI(ID1)  +
+                                      ( WRK-ZAIKAISU-JI * TNS-TEN )
+                            END-IF
                        END-IF
       *
                      END-IF
@@ -1973,7 +1988,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          COMPUTE  TOTALKIN2-ACCT =  TOTALKIN2-ACCT +
                                                      (WRK-KIN2   *
                                                       ACCT-ZAIKAISU)
-
                        ELSE
                          COMPUTE  TOTALKIN-ACCT  =  TOTALKIN-ACCT  +
                                                      (WRK-KIN    *

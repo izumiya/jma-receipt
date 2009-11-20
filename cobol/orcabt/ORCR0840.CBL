@@ -165,6 +165,7 @@
       *  04.04.03    NACL-門脇    09/04/13  平成２１年５月改正対応
       *  04.04.04    NACL-門脇    09/06/23  点滴器材商品名記載修正
       *  04.04.05    NACL-門脇    09/11/05  高齢者他保険入院対応
+      *  04.04.06    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2262,9 +2263,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *           （自賠責の場合、１０点を１２０円に読み替える）
       *           （療養担当手当：１月１回の算定）
                   IF      SRY-SRYCD(IDX2)    =     CONS-RYOYOTEATE
-                    MOVE     120     TO     WRK-RYOYOTEATE2
-                    COMPUTE  WRK-RYOYOTEATE   =  WRK-RYOYOTEATE
-                                              +  WRK-RYOYOTEATE2
+                    EVALUATE  RECE82-JIBAIKBN
+                      WHEN      "1"
+                        MOVE     120    TO     WRK-RYOYOTEATE2
+                        COMPUTE  WRK-RYOYOTEATE   =
+                                 WRK-RYOYOTEATE   +
+                                 WRK-RYOYOTEATE2
+                      WHEN      "2"
+                        COMPUTE  WRK-RYOYOTEATE   =  WRK-RYOYOTEATE
+                                                  +  TNS-TEN
+                        COMPUTE  RECE84-SYUTEN1   =  RECE84-SYUTEN1
+                                                  -  TNS-TEN
+                        COMPUTE  RECE84-KIZAITEN  =  RECE84-KIZAITEN
+                                                  +  TNS-TEN
+                    END-EVALUATE
                   END-IF
       *
                   IF ( ACCT-SRYKBN          =  "80"               ) AND
@@ -2300,12 +2312,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-ROUSAI17  OR
                                             CONS-ROUSAI18  OR
                                             CONS-ROUSAI19  OR
-                                            CONS-ROUSAI20  OR
-                                            CONS-RYOYOTEATE  )
+                                            CONS-ROUSAI20    )
                    OR ( SRY-SRYCD(IDX2)(1:5) = "09593"       )
                    OR ( SRY-SRYCD(IDX2)(1:5) = "09594"       )
                    OR ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI3    ) AND
                        (RECE82-SRYYM     <  "200804"        ))
+                   OR ((RECE82-JIBAIKBN  =  "1"             ) AND
+                       (SRY-SRYCD(IDX2)  =  CONS-RYOYOTEATE ))
                      IF   SRY-SRYCD(IDX2)(1:5) =  "09593"
                        MOVE  TNS-KANANAMECHGKBN
                                       TO  WRK-JIBAIKZI-SYUKEIKBN(IDX2)
@@ -2337,9 +2350,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        IF (( RECE84-SRYKBN     =  "80" ) AND
                            ( RECE84-OKIKAEFLG  =  SPACE))
                        OR (  RECE84-OKIKAEFLG  =  "1"   )
+                        IF   SRY-SRYCD(IDX2)   =  CONS-RYOYOTEATE
+                            CONTINUE
+                        ELSE
                             MOVE   "1"    TO  RECE84-OKIKAEFLG
                             MOVE   "40"   TO  RECE84-SRYKBN       
                                               RECE85-SRYKBN       
+                        END-IF
                        END-IF
                      END-IF
                      IF (( RECE84-SRYKBN     =  "14" ) AND
@@ -2415,6 +2432,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                ELSE                                                     
                  IF   RECE82-HKNKBN     =  "4"
+                 AND  RECE82-JIBAIKBN   =  "1"
                  AND  SRY-SRYCD(IDX2)   =  CONS-RYOYOTEATE
                     MOVE  1               TO  RECE85-TENSIKIBETU(IDX4)  
                     MOVE  WRK-RYOYOTEATE2 TO  RECE85-TEN(IDX4)
@@ -2620,6 +2638,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                ELSE
       *
                   IF   RECE82-HKNKBN     =  "4"
+                  AND  RECE82-JIBAIKBN   =  "1"
                   AND  SRY-SRYCD(IDX2)   =  CONS-RYOYOTEATE
       *
                      ADD      1          TO  WRK-MEISAI-CNT
@@ -3409,6 +3428,14 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                                        - WRK-SOGAIKASAN
                                    COMPUTE  WK-YKZTEN  = WK-YKZTEN
                                                        + WRK-SOGAIKASAN
+                                END-IF
+                                IF  WRK-RYOYOTEATE  NOT =  ZERO
+                                 IF  RECE82-JIBAIKBN    =  "2"
+                                   COMPUTE  WK-SYUTEN  = WK-SYUTEN
+                                                       - WRK-RYOYOTEATE
+                                   COMPUTE  WK-YKZTEN  = WK-YKZTEN
+                                                       + WRK-RYOYOTEATE
+                                 END-IF
                                 END-IF
                          END-IF
                        END-IF
@@ -4683,7 +4710,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
                      END-EVALUATE
                     ELSE                                                
-                     IF  SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
+                     IF  RECE82-JIBAIKBN      =    "1"
+                     AND SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
                        COMPUTE    RECE82-SONOTAKIN-JYU  =               
                                   RECE82-SONOTAKIN-JYU  +               
                                  (WRK-RYOYOTEATE  *   ACCT-ZAIKAISU)    
@@ -4718,12 +4746,21 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                       END-IF
                       EVALUATE  WRK-PARA-JIBAIPRTKBN
                         WHEN      "0"
+                         IF  SRY-SRYCD(IDX3) = CONS-RYOYOTEATE
+                          COMPUTE   RECE82-TENSU(28)  =
+                                    RECE82-TENSU(28)  +
+                                   (WK-YKZTEN   *   WK-ZAIKAISU)
+                          COMPUTE   TBL-YKZTEN-JI(28)  =
+                                    TBL-YKZTEN-JI(28)  +
+                                   (WK-YKZTEN   *   WK-ZAIKAISU)
+                         ELSE
                           COMPUTE   RECE82-TENSU(16)  =
                                     RECE82-TENSU(16)  +
                                    (WK-YKZTEN   *   WK-ZAIKAISU)
                           COMPUTE   TBL-YKZTEN-JI(16)  =
                                     TBL-YKZTEN-JI(16)  +
                                    (WK-YKZTEN   *   WK-ZAIKAISU)
+                         END-IF
                         WHEN      "1"
                           COMPUTE   RECE82-TENSU(28)  =
                                     RECE82-TENSU(28)  +
@@ -5827,6 +5864,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    NACCT-SYUTEN2        TO      RECE84-SYUTEN2
            MOVE    NACCT-YKZTEN         TO      RECE84-YKZTEN
            MOVE    NACCT-KIZAITEN       TO      RECE84-KIZAITEN
+           IF    RECE82-HKNKBN    =  "4"
+           AND   RECE82-JIBAIKBN  =  "2"
+           AND   NACCT-ZAISKBKBN  =  "7"
+             MOVE  NACCT-SYUTEN1        TO      RECE84-KIZAITEN
+             MOVE  ZERO                 TO      RECE84-SYUTEN1
+           END-IF
            MOVE    NACCT-DRCD           TO      RECE84-DRCD
            MOVE    SPACE                TO      RECE84-ZAIREQFLG
            MOVE    ZERO                 TO      RECE84-TEIGENRATE
@@ -5948,6 +5991,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                MOVE    TNS-TENSIKIBETU     TO  RECE85-TENSIKIBETU(IDX4)
                MOVE    TNS-TEN             TO  RECE85-TEN(IDX4)
                IF    RECE82-HKNKBN    =  "4"
+               AND   RECE82-JIBAIKBN  =  "1"
                AND   NACCT-ZAISKBKBN  =  "7"
                    MOVE  1                 TO  RECE85-TENSIKIBETU(IDX4)  
                    MOVE  120               TO  RECE85-TEN(IDX4)
@@ -5982,6 +6026,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                    MOVE    TNS-NAME              TO  RECE85-NAME(IDX4)
                END-IF
                IF    RECE82-HKNKBN    =  "4"
+               AND   RECE82-JIBAIKBN  =  "1"
                AND   NACCT-ZAISKBKBN  =  "7"
       *
                  MOVE     1                 TO    WRK-MEISAI-CNT
@@ -6046,9 +6091,19 @@ grpsys     PERFORM  900-DBSELECT-SEC
                                (120            *   CNT-DAY21)
                   WHEN      "5"
       **************（従来様式）
+                   EVALUATE  RECE82-JIBAIKBN
+                    WHEN   "1"
                      COMPUTE    RECE82-SONOTAKIN-JYU  =
                                 RECE82-SONOTAKIN-JYU  +
                                (120            *   CNT-DAY21)
+                    WHEN   "2"
+                     COMPUTE   RECE82-TENSU(28)  =
+                               RECE82-TENSU(28)  +
+                               (NACCT-ZAITEN   *   CNT-DAY21)
+                     COMPUTE   TBL-YKZTEN-JI(28)  =
+                               TBL-YKZTEN-JI(28)  +
+                               (NACCT-ZAITEN   *   CNT-DAY21)
+                   END-EVALUATE
                 END-EVALUATE
              WHEN      "5"
                 COMPUTE    RECE82-TENSU(37)  =
