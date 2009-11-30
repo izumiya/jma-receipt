@@ -3662,7 +3662,7 @@
            PERFORM UNTIL       FLG-PTTOKKI     =   1
       *        »ÜÀßÆþµï
                IF      PTTOKKI-CD          =   "07"
-                                           OR  "08"
+      ***********************              OR  "08"
                                            OR  "09"
                    IF     (PTTOKKI-STYM    <=  SPA-SRYYMD(1:6))
                       AND (PTTOKKI-EDYM    >=  SPA-SRYYMD(1:6))

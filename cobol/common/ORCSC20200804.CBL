@@ -1732,7 +1732,8 @@
       *    長期投薬品チェック（内服と外用のみ）
            IF      (WRK-COM-INPUTCD(IDX)(1:1) =   "6"  )  AND
                    (WRK-CHK-SRYSYUKBN(1:2)    =   "21"
-                                              OR  "23"  )  AND
+                                              OR  "23"
+                                              OR  "29" )  AND
                    (WRK-COM-KAISU (IDX)       >=  28   )
                MOVE    1                   TO  FLG-CHOUKI
                IF      WRK-CHOU-HKNCOMBI   =   SPACE
