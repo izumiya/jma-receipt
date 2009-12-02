@@ -397,6 +397,8 @@
       *  04.04.29    NACL-ÌçÏÆ    09/09/18  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.30    NACL-ÌçÏÆ    09/11/05  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *  04.04.31    NACL-ÌçÏÆ    09/11/19  ÏÂ²Î»³¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.32    NACL-ÌçÏÆ    09/12/02  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
+      *                                     ¡Ê£µ£²¤ÎÂÐ¾ÝÉéÃ´¼ÔÈÖ¹æÄÉ²Ã¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16619,41 +16621,65 @@
                     (TBL-TOKATUKAIFLG(1) =  1                   )) AND
                    ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(1)(1:2) = "51"  OR "52"  ))
+               OR (( RECE62-KOHNUM(1) =  "052"                   ) AND
+                   ( RECE62-KOHFTNJANUM(1)(5:2) = "60"           ) AND
+                   ( RECE62-KOHFTNJANUM(1)(1:2) = "52"           ))
                OR (((RECE62-KOHNUM(2) =  "051" OR "052" OR "091") OR
                     (TBL-TOKATUKAIFLG(2) =  1                   )) AND
                    ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(2)(1:2) = "51"  OR "52"  ))
+               OR (( RECE62-KOHNUM(2) =  "052"                   ) AND
+                   ( RECE62-KOHFTNJANUM(2)(5:2) = "60"           ) AND
+                   ( RECE62-KOHFTNJANUM(2)(1:2) = "52"           ))
                OR (((RECE62-KOHNUM(3) =  "051" OR "052" OR "091") OR
                     (TBL-TOKATUKAIFLG(3) =  1                   )) AND
                    ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(3)(1:2) = "51"  OR "52"  ))
+               OR (( RECE62-KOHNUM(3) =  "052"                   ) AND
+                   ( RECE62-KOHFTNJANUM(3)(5:2) = "60"           ) AND
+                   ( RECE62-KOHFTNJANUM(3)(1:2) = "52"           ))
                OR (((RECE62-KOHNUM(4) =  "051" OR "052" OR "091") OR
                     (TBL-TOKATUKAIFLG(4) =  1                   )) AND
                    ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(4)(1:2) = "51"  OR "52"  ))
+               OR (( RECE62-KOHNUM(4) =  "052"                   ) AND
+                   ( RECE62-KOHFTNJANUM(4)(5:2) = "60"           ) AND
+                   ( RECE62-KOHFTNJANUM(4)(1:2) = "52"           ))
       *
-                 IF  ((RECE62-KOHNUM(1) =  "051" OR "052" OR "091") OR
-                      (TBL-TOKATUKAIFLG(1) =  1                   ))
-                 AND ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "602" )
-                 AND ( RECE62-KOHFTNJANUM(1)(1:2) = "51"  OR "52"  )
+                 IF (((RECE62-KOHNUM(1) =  "051" OR "052" OR "091") OR
+                      (TBL-TOKATUKAIFLG(1) =  1                   )) AND
+                     ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "602" ) AND
+                     ( RECE62-KOHFTNJANUM(1)(1:2) = "51"  OR "52"  ))
+                 OR (( RECE62-KOHNUM(1) =  "052"                   ) AND
+                     ( RECE62-KOHFTNJANUM(1)(5:2) = "60"           ) AND
+                     ( RECE62-KOHFTNJANUM(1)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(1)
                  END-IF
-                 IF  ((RECE62-KOHNUM(2) =  "051" OR "052" OR "091") OR
-                      (TBL-TOKATUKAIFLG(2) =  1                   ))
-                 AND ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "602" )
-                 AND ( RECE62-KOHFTNJANUM(2)(1:2) = "51"  OR "52"  )
+                 IF (((RECE62-KOHNUM(2) =  "051" OR "052" OR "091") OR
+                      (TBL-TOKATUKAIFLG(2) =  1                   )) AND
+                     ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "602" ) AND
+                     ( RECE62-KOHFTNJANUM(2)(1:2) = "51"  OR "52"  ))
+                 OR (( RECE62-KOHNUM(2) =  "052"                   ) AND
+                     ( RECE62-KOHFTNJANUM(2)(5:2) = "60"           ) AND
+                     ( RECE62-KOHFTNJANUM(2)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(2)
                  END-IF
-                 IF  ((RECE62-KOHNUM(3) =  "051" OR "052" OR "091") OR
-                      (TBL-TOKATUKAIFLG(3) =  1                   ))
-                 AND ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "602" )
-                 AND ( RECE62-KOHFTNJANUM(3)(1:2) = "51"  OR "52"  )
+                 IF (((RECE62-KOHNUM(3) =  "051" OR "052" OR "091") OR
+                      (TBL-TOKATUKAIFLG(3) =  1                   )) AND
+                     ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "602" ) AND
+                     ( RECE62-KOHFTNJANUM(3)(1:2) = "51"  OR "52"  ))
+                 OR (( RECE62-KOHNUM(3) =  "052"                   ) AND
+                     ( RECE62-KOHFTNJANUM(3)(5:2) = "60"           ) AND
+                     ( RECE62-KOHFTNJANUM(3)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(3)
                  END-IF
-                 IF  ((RECE62-KOHNUM(4) =  "051" OR "052" OR "091") OR
-                      (TBL-TOKATUKAIFLG(4) =  1                   ))
-                 AND ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "602" )
-                 AND ( RECE62-KOHFTNJANUM(4)(1:2) = "51"  OR "52"  )
+                 IF (((RECE62-KOHNUM(4) =  "051" OR "052" OR "091") OR
+                      (TBL-TOKATUKAIFLG(4) =  1                   )) AND
+                     ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "602" ) AND
+                     ( RECE62-KOHFTNJANUM(4)(1:2) = "51"  OR "52"  ))
+                 OR (( RECE62-KOHNUM(4) =  "052"                   ) AND
+                     ( RECE62-KOHFTNJANUM(4)(5:2) = "60"           ) AND
+                     ( RECE62-KOHFTNJANUM(4)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(4)
                  END-IF
       *

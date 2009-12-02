@@ -307,20 +307,30 @@
       *
                    IF    ( KEY-HKNNUM      =   PTHKN-HKNNUM )
                     AND  ( KEY-HKNJANUM    =   PTHKN-HKNJANUM )
-                    AND  ( TKOH-KOHNUM  (IDX-KOH)
-                                           =   "051" OR "052" OR "091"
-                                            OR "151" )
-                    AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
+                       EVALUATE    TRUE
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "051" OR "052"
+                                            OR "091"OR "151" )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
                                            =   "601" OR "602" )
-                       IF    ( KEY-HKNNUM  =   "060" OR "039" )
-                        OR   ( AGECHK-NENREI   >=    70 )
-                           MOVE    1       TO  SSRHKOH-RC
-                       ELSE
-                           IF    ( KEY-HONKZKKBN
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "51" OR "52" )
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "052" )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:2)
+                                           =   "60" )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "52" )
+                           IF    ( KEY-HKNNUM  =   "060" OR "039" )
+                            OR   ( AGECHK-NENREI   >=    70 )
+                               MOVE    1       TO  SSRHKOH-RC
+                           ELSE
+                               IF    ( KEY-HONKZKKBN
                                            =   PTHKN-HONKZKKBN )
-                               MOVE    1   TO  SSRHKOH-RC
+                                   MOVE    1   TO  SSRHKOH-RC
+                               END-IF
                            END-IF
-                       END-IF
+                       END-EVALUATE
                    END-IF
 
                END-PERFORM
