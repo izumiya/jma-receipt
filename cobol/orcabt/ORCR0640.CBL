@@ -399,6 +399,7 @@
       *  04.04.31    NACL-ÌçÏÆ    09/11/19  ÏÂ²Î»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.32    NACL-ÌçÏÆ    09/12/02  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *                                     ¡Ê£µ£²¤ÎÂÐ¾ÝÉéÃ´¼ÔÈÖ¹æÄÉ²Ã¡Ë
+      *  04.04.33    NACL-ÌçÏÆ    09/12/04  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3265,10 +3266,7 @@
       *
                IF     SRY-SRYCD(IDX2)  IS  NUMERIC
       *          IF  SRY-SRYCD(IDX2)(1:3) NOT = "001"
-                   MOVE    SRY-SRYCD(IDX2)  TO  WRK-SRYCD
-                   COMPUTE  RECE64-RUIKEITOTAL  =
-                            RECE64-RUIKEITOTAL  +
-                           (WRK-SRYCD  *  SRY-SRYSURYO(IDX2))
+                   MOVE    SRY-SRYCD(IDX2)   TO  WRK-SRYCD
       *
                    MOVE     ZERO    TO    WRK-FUKA-KINGAKU
                    PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
@@ -3278,6 +3276,13 @@
                      IF  WRK-FUKA-VALUE  =  ZERO
                        CONTINUE
                      ELSE
+                       COMPUTE  RECE64-RUIKEITOTAL  =
+                                RECE64-RUIKEITOTAL  +
+                              ( WRK-FUKA-VALUE    *
+                                          SRY-SRYSURYO(IDX2))
+                       COMPUTE  RECE64-RUIKEITOTAL  =
+                                RECE64-RUIKEITOTAL  +
+                              ( WRK-FUKA-VALUE    * WRK-SRYCD)
                        COMPUTE  WRK-FUKA-KINGAKU    =
                                 WRK-FUKA-KINGAKU    +
                               ((WRK-FUKA-VALUE^5) * FUKA-IDX)
@@ -6821,9 +6826,6 @@
                IF      NACCT-ZAISKBKBN      =       "7"
                   MOVE     199000510     TO  WRK-SRYCD
                END-IF
-               COMPUTE  RECE64-RUIKEITOTAL  =
-                        RECE64-RUIKEITOTAL  +
-                       (WRK-SRYCD  *  NSRY-SRYSURYO(IDX2))
                MOVE     ZERO    TO    WRK-FUKA-KINGAKU
                PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
                          UNTIL   FUKA-IDX   >    9
@@ -6832,6 +6834,13 @@
                  IF  WRK-FUKA-VALUE  =  ZERO
                    CONTINUE
                  ELSE
+                   COMPUTE  RECE64-RUIKEITOTAL  =
+                            RECE64-RUIKEITOTAL  +
+                          ( WRK-FUKA-VALUE    *
+                                     NSRY-SRYSURYO(IDX2))
+                   COMPUTE  RECE64-RUIKEITOTAL  =
+                            RECE64-RUIKEITOTAL  +
+                          ( WRK-FUKA-VALUE    * WRK-SRYCD)
                    COMPUTE  WRK-FUKA-KINGAKU    =
                             WRK-FUKA-KINGAKU    +
                           ((WRK-FUKA-VALUE^5) * FUKA-IDX)
@@ -9439,10 +9448,6 @@
                   COMPUTE  RECE64-MEISAISU    =  RECE64-MEISAISU
                                               +  1
       *
-                  COMPUTE  RECE64-RUIKEITOTAL =
-                           RECE64-RUIKEITOTAL +
-                          (WRK-SRYCD  *  WRK-ORCSTEN-SURYO(IDX2))
-      *
                   MOVE     ZERO    TO    WRK-FUKA-KINGAKU
                   PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
                             UNTIL   FUKA-IDX   >    9
@@ -9451,6 +9456,13 @@
                     IF  WRK-FUKA-VALUE  =  ZERO
                       CONTINUE
                     ELSE
+                      COMPUTE  RECE64-RUIKEITOTAL  =
+                               RECE64-RUIKEITOTAL  +
+                             ( WRK-FUKA-VALUE    *
+                                    WRK-ORCSTEN-SURYO(IDX2))
+                      COMPUTE  RECE64-RUIKEITOTAL  =
+                               RECE64-RUIKEITOTAL  +
+                             ( WRK-FUKA-VALUE    * WRK-SRYCD)
                       COMPUTE  WRK-FUKA-KINGAKU    =
                                WRK-FUKA-KINGAKU    +
                              ((WRK-FUKA-VALUE^5) * FUKA-IDX)
@@ -9610,6 +9622,12 @@
                     IF  WRK-FUKA-VALUE  =  ZERO
                       CONTINUE
                     ELSE
+                      COMPUTE  RECE64-RUIKEITOTAL  =
+                               RECE64-RUIKEITOTAL  +
+                             ( WRK-FUKA-VALUE    * 1)
+                      COMPUTE  RECE64-RUIKEITOTAL  =
+                               RECE64-RUIKEITOTAL  +
+                             ( WRK-FUKA-VALUE    * WRK-SRYCD)
                       COMPUTE  WRK-FUKA-KINGAKU    =
                                WRK-FUKA-KINGAKU    +
                              ((WRK-FUKA-VALUE^5) * FUKA-IDX)
