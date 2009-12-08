@@ -300,6 +300,7 @@
       *  04.04.15    NACL-ÌçÏÆ    09/11/19  ¼«ÇåÀÕ·òÊÝ½àµòÎÅÍÜÃ´Åö¼êÅöÂÐ±þ
       *  04.04.16    NACL-ÌçÏÆ    09/12/02  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *                                     ¡Ê£µ£²¤ÎÂÐ¾ÝÉéÃ´¼ÔÈÖ¹æÄÉ²Ã¡Ë
+      *  04.04.17    NACL-ÌçÏÆ    09/12/08  Îß·×¥Ù¡¼¥¹·×»»ÂÐ±þ¡ÊµþÅÔÉÜ¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -8938,9 +8939,9 @@
            MOVE     ZERO          TO   FLG-RUIKEIYO2.
            IF  (LNK-SYU-SRYYMD(1:6)  >= "200904")
            AND (COMB-HKNNUM       NOT =  SPACE  )
-            IF ( WK-1001-PREFNUM  =  13 OR 33     )
+            IF ( WK-1001-PREFNUM  =  13 OR 26 OR 33 )
             OR ((WK-1001-PREFNUM  =  43          ) AND
-                (LNK-SYU-SRYYMD(1:6)  >= "200912"))
+                (LNK-SYU-SRYYMD(1:6)  >= "200912")  )
               IF ( LNK-SYU-KOH-HKNNUM(1) =
                    "015" OR "016" OR "021" OR "024" OR
                    "038" OR "051" OR "052" OR "079"    )
