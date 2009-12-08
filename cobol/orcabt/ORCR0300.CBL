@@ -304,6 +304,10 @@
       *  04.04.07    NACL-藤原    09/10/14  １３医学管理・１４在宅で
       *                                     告示区分１が基本項目以外のとき
       *                                     点数・回数の記載を行う
+      *  04.04.08    NACL-藤原    09/12/07  注加算による加算項目の記載
+      *                                     時間外加算区分による加算項目
+      *                                     の記載の有無
+      *                                     時間外加算区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -647,6 +651,8 @@ grpsys     COPY    "COMMON-SPA".
                                        PIC 9(09)V9(02). 
            03  WRK-RECE04-ZAIKAISU     PIC 9(04).    
            03  WRK-KENSASU             PIC 9(04).    
+      *    時間外加算区分（基本項目）
+           03  WRK-KIHON-TIMEKSNKBN    PIC  9(01).
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
       *
@@ -772,6 +778,8 @@ grpsys     COPY    "COMMON-SPA".
                        09  TBL-ZAIW-KOKUJISKBKBN2   PIC  9(01).
       *                通則加算対象外区分
                        09  TBL-ZAIW-TUSOKUGAIKBN    PIC  9(01).
+      *                時間外加算区分
+                       09  TBL-ZAIW-TIMEKSNKBN      PIC  9(01).
       *                きざみ値計算識別
                        09  TBL-ZAIW-KZMCOMPSIKIBETU PIC  9(01).
       *                注加算コード
@@ -852,6 +860,8 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KOUI-KOKUJISKBKBN2   PIC  9(01).
       *            通則加算対象外区分
                    07  TBL-KOUI-TUSOKUGAIKBN    PIC  9(01).
+      *            時間外加算区分
+                   07  TBL-KOUI-TIMEKSNKBN      PIC  9(01).
       *            きざみ値計算識別
                    07  TBL-KOUI-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -881,6 +891,9 @@ grpsys     COPY    "COMMON-SPA".
        01  WRK-KOUI-KASAN-TAIHI-AREA.
            03  WRK-KOUI-KASAN-TAIHI-TABLE       OCCURS  10.
                05  WRK-KOUI-KASAN-TAIHI-REC     PIC X(500).
+      *        時間外加算区分
+               05  WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN
+                                                PIC  9(01).
       *
       *    診療行為データ用テーブル（告示等識別区分による記録順）
        01  WRK-KOUI-TAIHI-AREA.
@@ -899,6 +912,8 @@ grpsys     COPY    "COMMON-SPA".
                05  WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN2 PIC  9(01).
       *        通則加算対象外区分
                05  WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN  PIC  9(01).
+      *        時間外加算区分
+               05  WRK-KOUI-SRY-TAIHI-TIMEKSNKBN    PIC  9(01).
       *        注加算コード
                05  WRK-KOUI-SRY-TAIHI-CHUKSNCD      PIC  X(04).
       *        点数識別区分
@@ -959,6 +974,8 @@ grpsys     COPY    "COMMON-SPA".
                        09  WRK-KOUI-KOKUJISKBKBN2   PIC  9(01).
       *            通則加算対象外区分
                        09  WRK-KOUI-TUSOKUGAIKBN    PIC  9(01).
+      *            時間外加算区分
+                       09  WRK-KOUI-TIMEKSNKBN      PIC  9(01).
       *            きざみ値計算識別
                        09  WRK-KOUI-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -1080,6 +1097,8 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KASAN-RECE05-KOKUJISKBKBN2   PIC  9(01).
       *通則加算対象外区分
                    07  TBL-KASAN-RECE05-TUSOKUGAIKBN    PIC  9(01).
+      *時間外加算区分
+                   07  TBL-KASAN-RECE05-TIMEKSNKBN      PIC  9(01).
       *きざみ値計算識別
                    07  TBL-KASAN-RECE05-KZMCOMPSIKIBETU PIC  9(01).
       *注加算コード
@@ -1160,6 +1179,8 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KENTAI-RECE05-KOKUJISKBKBN2   PIC  9(01).
       *            通則加算対象外区分
                    07  TBL-KENTAI-RECE05-TUSOKUGAIKBN    PIC  9(01).
+      *            時間外加算区分
+                   07  TBL-KENTAI-RECE05-TIMEKSNKBN      PIC  9(01).
       *            きざみ値計算識別
                    07  TBL-KENTAI-RECE05-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -1243,6 +1264,8 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KENSA-RECE05-KOKUJISKBKBN2   PIC  9(01).
       *            通則加算対象外区分
                    07  TBL-KENSA-RECE05-TUSOKUGAIKBN    PIC  9(01).
+      *            時間外加算区分
+                   07  TBL-KENSA-RECE05-TIMEKSNKBN      PIC  9(01).
       *            きざみ値計算識別
                    07  TBL-KENSA-RECE05-KZMCOMPSIKIBETU PIC  9(01).
       *            注加算コード
@@ -4035,6 +4058,10 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                    ADD     1                   TO  IDWW
                    MOVE    TBL-KOUI-REC  (IDX) TO
                                    WRK-KOUI-KASAN-TAIHI-REC (IDWW)
+                   MOVE    TBL-KOUI-TIMEKSNKBN    (IDX)
+                                               TO
+                                   WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN
+                                                            (IDWW)
                END-IF
       *
       *        コメントを最初に編集（手術のとき）
@@ -4095,8 +4122,11 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                            MOVE    TBL-KOUI-KOKUJISKBKBN1(IDX) TO
                                        WRK-KOUI-SRY-TAIHI-KOKUJISKBKBN1
                                                                   (IDYY)
-                           MOVE    TBL-KOUI-TUSOKUGAIKBN(IDX) TO
+                           MOVE    TBL-KOUI-TUSOKUGAIKBN(IDX)  TO
                                        WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN
+                                                                  (IDYY)
+                           MOVE    TBL-KOUI-TIMEKSNKBN(IDX)    TO
+                                       WRK-KOUI-SRY-TAIHI-TIMEKSNKBN
                                                                   (IDYY)
                            INITIALIZE      TBL-KOUI-REC (IDX)
                        ELSE
@@ -4118,6 +4148,9 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                                                                   (IDYY)
                        MOVE    TBL-KOUI-TUSOKUGAIKBN(IDX) TO
                                        WRK-KOUI-SRY-TAIHI-TUSOKUGAIKBN
+                                                                  (IDYY)
+                       MOVE    TBL-KOUI-TIMEKSNKBN(IDX)    TO
+                                       WRK-KOUI-SRY-TAIHI-TIMEKSNKBN
                                                                   (IDYY)
                        INITIALIZE      TBL-KOUI-REC (IDX)
                    END-EVALUATE
@@ -4320,11 +4353,20 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
            END-IF    
       *
       *    基本項目・加算項目・通則加算項目の順に編集
+           MOVE    ZERO            TO  WRK-KIHON-TIMEKSNKBN
+      *
            PERFORM VARYING IDY1    FROM    1   BY  1
                    UNTIL   IDY1    >       4
                MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDYY
                PERFORM VARYING IDY2    FROM    1   BY  1
                        UNTIL   IDY2    >       IDYY
+      *            基本項目の時間外加算区分を退避
+                   IF    ( IDY1            =   1 ) 
+                   AND   ( IDY2            =   1 )
+                       MOVE    WRK-KOUI-TIMEKSNKBN  (IDY1 IDY2)
+                                           TO  WRK-KIHON-TIMEKSNKBN
+                   END-IF
+      * 
                    ADD     1               TO  IDY
                    MOVE    WRK-KOUI-REC (IDY1 IDY2)
                                            TO  WRK-KOUI-TAIHI-REC  (IDY)
@@ -4335,10 +4377,17 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *    加減算コードの通則加算項目の編集
            PERFORM VARYING IDY1    FROM    1   BY  1
                    UNTIL   IDY1    >       IDWW
-               ADD     1               TO  IDY
-               MOVE    WRK-KOUI-KASAN-TAIHI-REC (IDY1)
-                                       TO  WRK-KOUI-TAIHI-REC  (IDY)
-               MOVE    IDY             TO  WRK-SRYCD1-MAX
+      *        時間外加算区分による編集有無チェック
+               IF    ( WRK-KIHON-TIMEKSNKBN    =   ZERO )
+               AND   ( WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN (IDY1)
+                                           NOT =   ZERO )
+                   CONTINUE
+               ELSE 
+                   ADD     1               TO  IDY
+                   MOVE    WRK-KOUI-KASAN-TAIHI-REC (IDY1)
+                                           TO  WRK-KOUI-TAIHI-REC  (IDY)
+                   MOVE    IDY             TO  WRK-SRYCD1-MAX
+               END-IF     
            END-PERFORM
       *
            INITIALIZE                   WRK-KOUI-AREA

@@ -432,6 +432,7 @@
       *  04.04.29    NACL-門脇    09/12/02  平成２１年５月改正対応
       *                                     （５２の対象負担者番号追加）
       *  04.04.30    NACL-門脇    09/12/04  剤まとめ項目値の計算修正
+      *  04.04.31    NACL-門脇    09/12/07  時間外加算区分編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5041,6 +5042,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                       TO RECE05-KOKUJISKBKBN2(IDX4)
                MOVE    TNS-TUSOKUGAIKBN
                                       TO RECE05-TUSOKUGAIKBN (IDX4)
+               MOVE    TNS-TIMEKSNKBN TO RECE05-TIMEKSNKBN   (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE05-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE05-CHUKSNCD       (IDX4)
