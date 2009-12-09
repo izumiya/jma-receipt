@@ -194,6 +194,10 @@
       *                                     処方せん（乳幼児）加算編集対応
       *  04.03.04    NACL-藤原    09/08/12  コラムリストの上限を２００に
       *                                     変更
+      *  04.04.05    NACL-藤原    09/12/07  注加算による加算項目の記載
+      *                                     時間外加算区分による加算項目
+      *                                     の記載の有無
+      *                                     時間外加算区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -738,6 +742,12 @@
                            11  TBL-ZAIW-KOUHYOJYUNNUM    PIC  9(09).
       *                告示等識別区分１
                        09  TBL-ZAIW-KOKUJISKBKBN1   PIC  9(01).
+      *                告示等識別区分２
+                       09  TBL-ZAIW-KOKUJISKBKBN2   PIC  9(01).
+      *                通則加算対象外区分
+                       09  TBL-ZAIW-TUSOKUGAIKBN    PIC  9(01).
+      *                時間外加算区分
+                       09  TBL-ZAIW-TIMEKSNKBN      PIC  9(01).
       *                きざみ値計算識別
                        09  TBL-ZAIW-KZMCOMPSIKIBETU PIC  9(01).
       *                注加算コード

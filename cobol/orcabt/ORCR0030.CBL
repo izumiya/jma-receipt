@@ -422,6 +422,7 @@
       *  04.03.37    NACL-門脇    09/09/17  一部負担金記載修正
       *  04.03.38    NACL-門脇    09/09/18  平成２１年台風第９号対応
       *  04.03.39    NACL-門脇    09/09/18  茨城県地方公費対応
+      *  04.03.40    NACL-門脇    09/12/07  時間外加算区分編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4981,6 +4982,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                       TO RECE05-KOKUJISKBKBN2(IDX4)
                MOVE    TNS-TUSOKUGAIKBN
                                       TO RECE05-TUSOKUGAIKBN (IDX4)
+               MOVE    TNS-TIMEKSNKBN TO RECE05-TIMEKSNKBN   (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE05-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE05-CHUKSNCD       (IDX4)
