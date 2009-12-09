@@ -167,6 +167,7 @@
       *  04.04.05    NACL-門脇    09/11/05  高齢者他保険入院対応
       *  04.04.06    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *  04.04.07    NACL-門脇    09/12/04  剤まとめ項目値の計算修正
+      *  04.04.08    NACL-門脇    09/12/09  出来高算定（剤）の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3596,6 +3597,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                    OR    (SRY-SRYCD(IDX3) (1:3)  = "001" OR "008"   
                                                          OR "059"   )
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
+                   OR    (SRY-SRYCD(IDX3)        = "099999903"      )
                      IF   SRY-SRYCD(IDX3)         =    CONS-YAKTEIGEN
                            COMPUTE   RECE82-TENSU(4)  =
                                      RECE82-TENSU(4)  -
@@ -3915,6 +3917,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                    OR    (SRY-SRYCD(IDX3) (1:3)  = "001" OR "008"   
                                                          OR "059"   )
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
+                   OR    (SRY-SRYCD(IDX3)        = "099999903"      )
                      IF   SRY-SRYCD(IDX3)         =    CONS-YAKTEIGEN
                            COMPUTE   RECE82-TENSU-YAK(4)  =
                                      RECE82-TENSU-YAK(4)  -
@@ -4383,6 +4386,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                    OR    (SRY-SRYCD(IDX3) (1:3)  = "001" OR "008"   
                                                          OR "059"   )
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
+                   OR    (SRY-SRYCD(IDX3)        = "099999903"      )
                      IF   SRY-SRYCD(IDX3)         =    CONS-YAKTEIGEN
                            COMPUTE   RECE82-TENSU(4)  =
                                      RECE82-TENSU(4)  -
@@ -4924,6 +4928,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                    OR    (SRY-SRYCD(IDX3) (1:3)  = "001" OR "008"   
                                                          OR "059"   )
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
+                   OR    (SRY-SRYCD(IDX3)        = "099999903"      )
                      IF   SRY-SRYCD(IDX3)         =    CONS-YAKTEIGEN
                            COMPUTE   RECE82-TENSU(16)  =
                                      RECE82-TENSU(16)  -
