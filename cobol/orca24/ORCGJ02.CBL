@@ -9115,8 +9115,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                      UNTIL    (IDX         >   31  )  OR
                               (SPA-ERRCD   NOT =   SPACE )
                IF      SPA-GMN-DAY (IDX)   >   ZERO
-      *            受診歴有無のチェック
-                   PERFORM 410121-RRK-DAYCHK-SEC
+      *            月末日判定
+                   IF      IDX                 >   SPA-SRYMATU
+                       MOVE    "0062"              TO  SPA-ERRCD
+                   ELSE
+      *                受診歴有無のチェック
+                       PERFORM 410121-RRK-DAYCHK-SEC
+                   END-IF
                    IF      SPA-ERRCD       NOT =   SPACE
                        MOVE    IDX             TO  WRK-IDX
                        MOVE    WRK-IDX         TO  SPA-DAY-IDX
@@ -9130,6 +9135,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-PERFORM
            IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    2                   TO  SPA-GMN-CUR
                MOVE    WRK-IDX         TO  SPA-DAY-IDX
                GO      TO      470-KAKUTEI-EXT
            END-IF
