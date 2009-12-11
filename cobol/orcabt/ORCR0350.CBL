@@ -249,10 +249,12 @@
       *  04.04.09    NACL-藤原    09/10/14  １３医学管理・１４在宅で
       *                                     告示区分１が基本項目以外のとき
       *                                     点数・回数の記載を行う
-      *  04.04.10    NACL-藤原    09/04/21  注加算による加算項目の記載
+      *  04.04.10    NACL-藤原    09/12/07  注加算による加算項目の記載
       *                                     時間外加算区分による加算項目
       *                                     の記載の有無
       *                                     時間外加算区分の追加
+      *  04.04.11    NACL-藤原    09/12/10  同月に初回による入院歴が複数
+      *                                     ある場合の記録の修正 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3709,6 +3711,7 @@
       *
       *        再入院年月日
                IF    ( RECE68-NYUINYMD     =   RECE62-NYUINYMD )
+               OR    ( RECE68-SHONUM       =   ZERO            )
                OR    ( WRK-NYUINCHUKBN     =   "1"             )
                    CONTINUE
                ELSE
@@ -3754,6 +3757,7 @@
       *        退院年月日                          
                IF    ( RECE68-TAIINYMD (1:6)   
                                            >   RECE62-SRYYM    )
+               OR    ( RECE68-SHONUM       =   ZERO            )
                OR    ( RECE68-NYUINCHUKBN  =   "1"             )
                    CONTINUE
                ELSE

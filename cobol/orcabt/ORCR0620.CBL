@@ -165,6 +165,8 @@
       *  04.04.03    NACL-門脇    09/08/24  出産一時金対応
       *  04.04.04    NACL-藤原    09/10/21  月途中の負担者番号変更対応
       *                                     （自立支援の公費単独） 
+      *  04.04.05    NACL-藤原    09/12/10  同月に初回による入院歴が複数
+      *                                     ある場合の記録の修正 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3465,6 +3467,7 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                GO  TO  24012-RECE68-WRITE-EXT
            END-IF
       *
+           INITIALIZE                      RECE68-REC
            MOVE    RECE62-HOSPNUM      TO  RECE68-HOSPNUM
            MOVE    RECE62-SRYYM        TO  RECE68-SRYYM
            MOVE    RECE62-NYUGAIKBN    TO  RECE68-NYUGAIKBN
@@ -3483,6 +3486,10 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                MOVE    PTNYUINRRK-TAIINYMD TO  RECE68-TAIINYMD
                MOVE    PTNYUINRRK-NYUINCHUKBN
                                            TO  RECE68-NYUINCHUKBN
+      *        入院年月日と同じ初回番号のときのみセット
+               IF      PTNYUINRRK-SHONUM   =    WRK-SHONUM
+                   MOVE    WRK-SHONUM           TO  RECE68-SHONUM
+               END-IF
                WRITE   RECE68-REC
                ADD     1                   TO  CNT-RECE68
            END-IF    

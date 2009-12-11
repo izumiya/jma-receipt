@@ -202,6 +202,9 @@
       *                                     公費分点欄に生保単独分記載
       *  04.04.02    NACL-藤原    09/10/21  月途中の負担者番号変更対応
       *                                     （自立支援の公費単独） 
+      *  04.04.03    NACL-藤原    09/12/10  同月に医保と生保の併用と生保
+      *                                     単独が混在する場合の複数診療
+      *                                     科による入力時の記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -399,6 +402,7 @@
            03  IDY1                                    PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  IDZ                                     PIC 9(02).
+           03  IDVV                                    PIC 9(03).
            03  IDWW                                    PIC 9(03).
            03  IDXX                                    PIC 9(03).
            03  IDYY                                    PIC 9(03).
@@ -1166,6 +1170,30 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                        MOVE    10          TO  IDZZ
                                    END-IF
                                END-PERFORM    
+                               PERFORM VARYING IDVV    FROM    1   BY  1
+                                       UNTIL   IDVV    >       20
+                                       OR      WRK-SEIHO-RECE01-SRYKA
+                                                          (IDXX IDVV)
+                                                       =   SPACE
+                                   PERFORM VARYING IDZZ    FROM    1
+                                                                   BY  1
+                                           UNTIL   IDZZ    >       20
+                                       IF      RECE01-SRYKA (IDZZ)
+                                                   =   SPACE
+                                           MOVE
+                                               WRK-SEIHO-RECE01-SRYKA
+                                                             (IDXX IDVV)
+                                                           TO
+                                                   RECE01-SRYKA (IDZZ)
+                                       END-IF
+                                       IF      RECE01-SRYKA (IDZZ)
+                                                   =
+                                             WRK-SEIHO-RECE01-SRYKA
+                                                             (IDXX IDVV)
+                                           MOVE    20          TO  IDZZ
+                                       END-IF
+                                   END-PERFORM
+                               END-PERFORM
                                MOVE    4           TO  IDYY
                                MOVE    WRK-SEIHO-RECE01-MAX
                                                    TO  IDXX
