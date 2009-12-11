@@ -153,6 +153,8 @@
       *  04.03.02    NACL-藤原    08/06/19  医師別出力対応
       *  04.03.03    NACL-藤原    08/08/05  患者登録特記事項入力対応
       *  04.03.04    NACL-門脇    08/10/16  公費−低２・低１項目編集
+      *  04.03.05    NACL-藤原    09/12/10  同月に初回による入院歴が複数
+      *                                     ある場合の記録の修正 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3131,6 +3133,7 @@
       *****************************************************************
        24012-RECE68-WRITE-SEC         SECTION.
       *
+           INITIALIZE                      RECE68-REC
            MOVE    RECE62-HOSPNUM      TO  RECE68-HOSPNUM
            MOVE    RECE62-SRYYM        TO  RECE68-SRYYM
            MOVE    RECE62-NYUGAIKBN    TO  RECE68-NYUGAIKBN
@@ -3149,6 +3152,10 @@
                MOVE    PTNYUINRRK-TAIINYMD TO  RECE68-TAIINYMD
                MOVE    PTNYUINRRK-NYUINCHUKBN
                                            TO  RECE68-NYUINCHUKBN
+      *        入院年月日と同じ初回番号のときのみセット
+               IF      PTNYUINRRK-SHONUM   =    WRK-SHONUM
+                   MOVE    WRK-SHONUM           TO  RECE68-SHONUM
+               END-IF
                WRITE   RECE68-REC
                ADD     1                   TO  CNT-RECE68
            END-IF    

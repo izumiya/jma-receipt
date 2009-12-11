@@ -251,6 +251,8 @@
       *                                     時間外加算区分による加算項目
       *                                     の記載の有無
       *                                     時間外加算区分の追加
+      *  04.03.17    NACL-藤原    09/12/10  同月に初回による入院歴が複数
+      *                                     ある場合の記録の修正 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3699,6 +3701,7 @@
       *
       *        再入院年月日
                IF    ( RECE68-NYUINYMD     =   RECE62-NYUINYMD )
+               OR    ( RECE68-SHONUM       =   ZERO            )
                OR    ( WRK-NYUINCHUKBN     =   "1"             )
                    CONTINUE
                ELSE
@@ -3744,6 +3747,7 @@
       *        退院年月日                          
                IF    ( RECE68-TAIINYMD (1:6)   
                                            >   RECE62-SRYYM    )
+               OR    ( RECE68-SHONUM       =   ZERO            )
                OR    ( RECE68-NYUINCHUKBN  =   "1"             )
                    CONTINUE
                ELSE
