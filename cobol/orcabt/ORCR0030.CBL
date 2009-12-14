@@ -434,6 +434,7 @@
       *  04.04.30    NACL-門脇    09/12/04  剤まとめ項目値の計算修正
       *  04.04.31    NACL-門脇    09/12/07  時間外加算区分編集
       *  04.04.32    NACL-門脇    09/12/09  出来高算定（剤）の対応
+      *  04.04.33    NACL-門脇    09/12/14  東京都マル子実日数記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -838,6 +839,12 @@
        01  TBL-JNISSU.
            03  TBL-JNISSU-HKN                          OCCURS   5.
                05  TBL-JNISSU-DAY                      PIC X(01)
+                                                       OCCURS   31.
+      *    実日数カウント用領域２                                         
+       01  TBL-JNISSU2.
+           03  TBL-JNISSU2-HKN                         OCCURS   5.
+               05  TBL-JNISSU2-MON                     PIC 9(02).
+               05  TBL-JNISSU2-DAY                     PIC X(01)
                                                        OCCURS   31.
       *    実日数減カウント用領域                                         
        01  TBL-JNISSU-GEN.
@@ -1953,6 +1960,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
            INITIALIZE                   WRK-AREA-SAIKEI
            INITIALIZE                   TBL-JNISSU                      
+           INITIALIZE                   TBL-JNISSU2
            INITIALIZE                   TBL-JNISSU-GEN
       *
            INITIALIZE                   FLG-KHNTEN-AREA
@@ -4380,6 +4388,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  END-IF
       *
+               WHEN    "13"
+      *
+                 IF ( RECE02-KOHNUMHC(IDX1 1)  NOT = SPACE    )  AND
+                    ( RECE02-KOHNUMHC(IDX1 2)      = "588"    )  AND
+                    ( RECE02-TEISYUTUSAKI          =   2      )  AND
+                    ( RECE02-SRYYM                >= "200910" )
+      *
+                      MOVE     2       TO      TBL-FUKUSHIFLG(2)
+      *
+                 END-IF
+      *
              END-EVALUATE
            END-IF
       *
@@ -5999,6 +6018,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                        MOVE  "1"  TO
                                             TBL-JNISSU-DAY(2 ACCT-IDX)
                                     END-IF
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   2
+                                       CONTINUE
+                                    ELSE
+                                       MOVE  "1"  TO
+                                            TBL-JNISSU2-DAY(2 ACCT-IDX)
+                                    END-IF
                                  END-IF                                 
                                END-PERFORM                 
                            END-IF                                       
@@ -6038,6 +6063,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     ELSE
                                        MOVE  "1"  TO
                                             TBL-JNISSU-DAY(3 ACCT-IDX)
+                                    END-IF
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   2
+                                       CONTINUE
+                                    ELSE
+                                       MOVE  "1"  TO
+                                            TBL-JNISSU2-DAY(3 ACCT-IDX)
                                     END-IF
                                  END-IF                                 
                                END-PERFORM                              
@@ -6079,6 +6110,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                        MOVE  "1"  TO
                                             TBL-JNISSU-DAY(4 ACCT-IDX)
                                     END-IF
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   2
+                                       CONTINUE
+                                    ELSE
+                                       MOVE  "1"  TO
+                                            TBL-JNISSU2-DAY(4 ACCT-IDX)
+                                    END-IF
                                  END-IF                                 
                                END-PERFORM                              
                            END-IF                                       
@@ -6118,6 +6155,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     ELSE
                                        MOVE  "1"  TO
                                             TBL-JNISSU-DAY(5 ACCT-IDX)
+                                    END-IF
+                                    IF     TBL-FUKUSHIFLG(IDX2)  =   2
+                                       CONTINUE
+                                    ELSE
+                                       MOVE  "1"  TO
+                                            TBL-JNISSU2-DAY(5 ACCT-IDX)
                                     END-IF
                                  END-IF                                 
                                END-PERFORM                              
@@ -9499,6 +9542,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-PERFORM
            END-PERFORM
       *
+           PERFORM    VARYING    HKN-IDX    FROM   2   BY   1
+                       UNTIL     HKN-IDX    >      5
+             PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
+                         UNTIL     ACCT-IDX    >      31
+                IF  (TBL-JNISSU2-DAY(HKN-IDX ACCT-IDX)     NOT =  SPACE)
+                AND (TBL-JNISSU-DAY-GEN(HKN-IDX ACCT-IDX)  NOT =  SPACE)
+                    MOVE  SPACE  TO  TBL-JNISSU2-DAY(HKN-IDX ACCT-IDX)
+                END-IF
+             END-PERFORM
+           END-PERFORM
+      *
       *実日数編集
            PERFORM    VARYING    HKN-IDX    FROM   1   BY   1
                       UNTIL      HKN-IDX    >      5
@@ -9510,6 +9564,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                END-PERFORM
            END-PERFORM
+      *
+           PERFORM    VARYING    HKN-IDX    FROM   2   BY   1
+                      UNTIL      HKN-IDX    >      5
+               PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
+                          UNTIL      ACCT-IDX    >     31
+                    IF    TBL-JNISSU2-DAY(HKN-IDX ACCT-IDX)
+                                        NOT =  SPACE
+                          ADD    1      TO    TBL-JNISSU2-MON(HKN-IDX)
+                    END-IF
+               END-PERFORM
+           END-PERFORM
+      *
       *実日数テーブル編集
            PERFORM    VARYING    HKN-IDX    FROM   1   BY   1
                       UNTIL      HKN-IDX    >      5
@@ -11973,9 +12039,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               IF   (SYS-1001-PREFNUM   =  "13"    )
               AND  (RECE02-KOHNUM(2)   =  "588"   )
               AND  (RECE02-SRYYM      >=  "200910")
-                 COMPUTE  RECE02-JNISSU(3) =
-                          RECE02-JNISSU(1) -
-                          RECE02-JNISSU(2)
+                 MOVE   TBL-JNISSU2-MON(3)   TO   RECE02-JNISSU(3)
               END-IF
            END-IF
       *
@@ -12002,9 +12066,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               IF   (SYS-1001-PREFNUM   =  "13"    )
               AND  (RECE02-KOHNUM(3)   =  "588"   )
               AND  (RECE02-SRYYM      >=  "200910")
-                 COMPUTE  RECE02-JNISSU(4) =
-                          RECE02-JNISSU(1) -
-                          RECE02-JNISSU(2)
+                 MOVE   TBL-JNISSU2-MON(4)   TO   RECE02-JNISSU(4)
               END-IF
            END-IF
       *
@@ -12031,9 +12093,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               IF   (SYS-1001-PREFNUM   =  "13"    )
               AND  (RECE02-KOHNUM(3)   =  "588"   )
               AND  (RECE02-SRYYM      >=  "200910")
-                 COMPUTE  RECE02-JNISSU(4) =
-                          RECE02-JNISSU(1) -
-                          RECE02-JNISSU(3)
+                 MOVE   TBL-JNISSU2-MON(4)   TO   RECE02-JNISSU(4)
               END-IF
            END-IF
       *
@@ -12055,9 +12115,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                          RECE02-TOTALTEN(2)
                 IF   (RECE02-KOHNUM(2)   =  "588"   )
                 AND  (RECE02-SRYYM      >=  "200910")
-                   COMPUTE  RECE02-JNISSU(3) =
-                            RECE02-JNISSU(1) -
-                            RECE02-JNISSU(2)
+                   MOVE   TBL-JNISSU2-MON(3)   TO   RECE02-JNISSU(3)
                 END-IF
              END-IF
       *
@@ -12078,9 +12136,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                          RECE02-TOTALTEN(3)
                 IF   (RECE02-KOHNUM(3)   =  "588"   )
                 AND  (RECE02-SRYYM      >=  "200910")
-                   COMPUTE  RECE02-JNISSU(4) =
-                            RECE02-JNISSU(1) -
-                            RECE02-JNISSU(3)
+                   MOVE   TBL-JNISSU2-MON(4)   TO   RECE02-JNISSU(4)
                 END-IF
              END-IF
       *
