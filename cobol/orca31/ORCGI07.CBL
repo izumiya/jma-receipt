@@ -1473,14 +1473,6 @@
                END-IF
            END-IF
       *
-           IF    ( SPA-ERRCD               =   SPACE )
-               IF    ( SPA-GMN-BUNBENKBN   =   "2" )
-                AND  ( SPA-GMN-ICBFTN-MONEY    =   ZERO )
-                   MOVE    "1009"          TO  SPA-ERRCD
-                   MOVE    20              TO  SPA-GMN-CUR
-               END-IF
-           END-IF
-      *
            IF    ( SPA-GMN-BIRTHCNT    =   1 )
                IF    ( SPA-ERRCD           =   SPACE )
                    IF    ( SPA-GMN-SIZANKBN    =   "3" )
@@ -2169,9 +2161,6 @@
                                        TO  SPA-ERRMSG
            WHEN    "1008"
                MOVE    "異常分娩で分娩料が入力されています"
-                                       TO  SPA-ERRMSG
-           WHEN    "1009"
-               MOVE    "異常分娩で一部負担金等が未入力です"
                                        TO  SPA-ERRMSG
            WHEN    "1011"
                MOVE    SPACE           TO  SPA-ERRMSG
