@@ -66,6 +66,7 @@
       *  04.03.16    NACL-Æ£¸¶    09/09/18  ¡ÖÊ¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æ¡×ÂÐ±þ
       *                                     Ê¼¸Ë¸©¡¦²¬»³¸©
       *                                     £²£°£°£¹Ç¯£¸·î¡Á£²£°£±£°Ç¯£±·îÂÐ¾Ý 
+      *  04.03.17    NACL-Æ£¸¶    09/12/14  Å¦Í×Íóµ­ºÜ¤Î²þÊÇ½èÍý¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5528,7 +5529,7 @@
                    MOVE    1           TO  FLG-LINE   
                END-IF
       *
-               IF  WRK-LINETEK           >   WRK-TEKIYOU-LINE
+               IF  WRK-LINETEK           >=  WRK-TEKIYOU-LINE
                    PERFORM 34120-PAGE-SEC
                END-IF
                ADD     1               TO  WRK-LINETEK
