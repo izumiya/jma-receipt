@@ -111,6 +111,7 @@
       *  04.04.02    NACL-ÌçÏÆ    09/10/01  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/11/05  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *  04.04.04    NACL-ÌçÏÆ    09/11/13  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.05    NACL-ÌçÏÆ    09/12/15  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÈ¬Ä¬»Ô¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1497,6 +1498,14 @@
                               "341" OR "442" OR "143" OR "342"  ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
+                IF  ( WRK-PREFNUM(1)                =    11        )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200904"   )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX) = "781") OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX) = "781") OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX) = "781") OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX) = "781")         )
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
               END-IF
               IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(2)
                 IF  ( WRK-PREFNUM(2)                =    07      )
@@ -1577,6 +1586,14 @@
                               "341" OR "442" OR "143" OR "342"  ) OR
                      (WRK-HANBETU-KOH4HKNNUM(IDX)   =
                               "341" OR "442" OR "143" OR "342"  ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
+                IF  ( WRK-PREFNUM(2)                =    11        )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200904"   )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX) = "781") OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX) = "781") OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX) = "781") OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX) = "781")         )
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
               END-IF

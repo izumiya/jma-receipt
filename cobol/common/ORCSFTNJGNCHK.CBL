@@ -66,6 +66,8 @@
       *  04.04.04    NACL-ÌçÏÆ    09/09/07  °¦ÃÎ¸©Ã±ÆÈ£µ£±ÂÐ±þ
       *  04.04.05    NACL-ÌçÏÆ    09/09/17  ÅìµþÅÔ¥Þ¥ë»ÒÂÐ±þ
       *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
+      *  04.04.06    NACL-ÌçÏÆ    09/12/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¡Ê¿·ºÂ¡¦Ä«²â¡¦ÏÂ¸÷¡¦»ÖÌÚ»Ô¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -363,7 +365,8 @@
                (LNK-FTNJGNCHK-SRYYM  >= "200510"       ))
            OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
                (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
-               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ))
+               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ) AND
+               (LNK-FTNJGNCHK-SRYYM  <= "200912"       ))
            OR ((LNK-FTNJGNCHK-KOHNUM(1:1)
                                      >= "1" AND <= "8" ) AND
                (LNK-FTNJGNCHK-SRYYM  >= "200810"       ))
@@ -559,7 +562,8 @@
                (LNK-FTNJGNCHK-SRYYM  >= "200510"       ))
            OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
                (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
-               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ))
+               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ) AND
+               (LNK-FTNJGNCHK-SRYYM  <= "200912"       ))
              CONTINUE
            ELSE
              PERFORM  21011-SYSKAN-HENSYU-SEC
@@ -1108,7 +1112,12 @@
                  (LNK-FTNJGNCHK-KOHNUM   = "483"   ) AND
                  (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
-                 (LNK-FTNJGNCHK-SRYYM   >= "200804"))
+                 (LNK-FTNJGNCHK-SRYYM   >= "200804") AND
+                 (LNK-FTNJGNCHK-SRYYM   <= "200912"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "483"   ) AND
+                 (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "201001"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF
