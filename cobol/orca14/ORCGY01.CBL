@@ -166,6 +166,7 @@
            03  WRK-NAME2           PIC X(50).
       *
            03  WRK-YYKID           PIC 9(02).
+           03  WRK-YYKCNT          PIC 9(02).
       *
            03  WRK-ERRMSG          PIC X(40).
            03  WRK-PATH            PIC X(64).
@@ -3261,6 +3262,40 @@
       *****************************************************************
        4901-YYKADD-SEC             SECTION.
       *
+      *    明細レコード追加
+           MOVE    SPACE               TO  YYK-REC
+           INITIALIZE                      YYK-REC
+           MOVE    SPA-HOSPNUM         TO  YYK-HOSPNUM
+           MOVE    SPA-GMN-SRYNAIYOCD  TO  YYK-SRYNAIYO
+           MOVE    SPA-NAI-DRCD        TO  YYK-DRCD
+           MOVE    SPA-NAI-YYKYMD      TO  YYK-YYKYMD
+           MOVE    SPA-NAI-KYYKTIME    TO  YYK-KEYYYKTIME
+      *
+           MOVE    YYK-REC             TO  MCPDATA-REC
+           MOVE    "tbl_yyk"           TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_yyk"           TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM 900-YOYAKU-READ-SEC
+           ELSE
+                MOVE    1              TO  FLG-YYK
+           END-IF
+           MOVE    "tbl_yyk"           TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    ZERO                TO  WRK-YYKID
+           IF      FLG-YYK             =   ZERO
+               MOVE    YYK-YYKID           TO  WRK-YYKID
+               IF      WRK-YYKID           =   99
+                   MOVE    "1013"          TO  SPA-ERRCD
+                   GO      TO      4901-YYKADD-EXT
+               END-IF
+               ADD     1                   TO  WRK-YYKID
+           END-IF
+      *
       *    予約ＩＤ＝００検索
            MOVE    SPA-HOSPNUM         TO  YYK-HOSPNUM
            MOVE    SPA-GMN-SRYNAIYOCD  TO  YYK-SRYNAIYO
@@ -3272,7 +3307,7 @@
            PERFORM 910-YOYAKU-INV-SEC
            IF      FLG-YYK             =   ZERO
                ADD     1                   TO  YYK-YYKCNT
-               MOVE    YYK-YYKCNT          TO  WRK-YYKID
+               MOVE    YYK-YYKCNT          TO  WRK-YYKCNT
       *        最大件数修正（システム日付より後の日）
                IF     (YYK-YYKYMD          >=  SPA-SYSYMD )
                  AND  (YYK-YYKMAXCNT   NOT =   SPA-Y01-YYKMAXCNT)
@@ -3307,7 +3342,7 @@
                MOVE    ZERO                TO  YYK-YYKID
                MOVE    SPA-Y01-YYKMAXCNT   TO  YYK-YYKMAXCNT
                MOVE    1                   TO  YYK-YYKCNT
-               MOVE    1                   TO  WRK-YYKID
+               MOVE    1                   TO  WRK-YYKCNT
                MOVE    ZERO                TO  YYK-PTID
       *
                MOVE    SMCNDATE-YMD        TO  YYK-CREYMD
@@ -3331,36 +3366,40 @@
            END-IF
       *
       *    明細レコード追加
-           MOVE    SPACE               TO  YYK-REC
-           INITIALIZE                      YYK-REC
-           MOVE    SPA-HOSPNUM         TO  YYK-HOSPNUM
-           MOVE    SPA-GMN-SRYNAIYOCD  TO  YYK-SRYNAIYO
-           MOVE    SPA-NAI-DRCD        TO  YYK-DRCD
-           MOVE    SPA-NAI-YYKYMD      TO  YYK-YYKYMD
-           MOVE    SPA-NAI-KYYKTIME    TO  YYK-KEYYYKTIME
+      *    MOVE    SPACE               TO  YYK-REC
+      *    INITIALIZE                      YYK-REC
+      *    MOVE    SPA-HOSPNUM         TO  YYK-HOSPNUM
+      *    MOVE    SPA-GMN-SRYNAIYOCD  TO  YYK-SRYNAIYO
+      *    MOVE    SPA-NAI-DRCD        TO  YYK-DRCD
+      *    MOVE    SPA-NAI-YYKYMD      TO  YYK-YYKYMD
+      *    MOVE    SPA-NAI-KYYKTIME    TO  YYK-KEYYYKTIME
       *
-           MOVE    YYK-REC             TO  MCPDATA-REC
-           MOVE    "tbl_yyk"           TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_yyk"           TO  MCP-TABLE
-               MOVE    "key7"              TO  MCP-PATHNAME
-               PERFORM 900-YOYAKU-READ-SEC
-           ELSE
-                MOVE    1              TO  FLG-YYK
-           END-IF
-           MOVE    "tbl_yyk"           TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
+      *    MOVE    YYK-REC             TO  MCPDATA-REC
+      *    MOVE    "tbl_yyk"           TO  MCP-TABLE
+      *    MOVE    "key7"              TO  MCP-PATHNAME
+      *    PERFORM 910-DBSELECT-SEC
+      *    IF      MCP-RC              =   ZERO
+      *        MOVE    "tbl_yyk"           TO  MCP-TABLE
+      *        MOVE    "key7"              TO  MCP-PATHNAME
+      *        PERFORM 900-YOYAKU-READ-SEC
+      *    ELSE
+      *         MOVE    1              TO  FLG-YYK
+      *    END-IF
+      *    MOVE    "tbl_yyk"           TO  MCP-TABLE
+      *    MOVE    "key7"              TO  MCP-PATHNAME
+      *    PERFORM 990-DBCLOSE-SEC
       *
-           IF      FLG-YYK             =   ZERO
-               MOVE    YYK-YYKID           TO  WRK-YYKID
-               IF      WRK-YYKID           =   99
-                   MOVE    "1013"          TO  SPA-ERRCD
-                   GO      TO      4901-YYKADD-EXT
-               END-IF
-               ADD     1                   TO  WRK-YYKID
+      *    IF      FLG-YYK             =   ZERO
+      *        MOVE    YYK-YYKID           TO  WRK-YYKID
+      *        IF      WRK-YYKID           =   99
+      *            MOVE    "1013"          TO  SPA-ERRCD
+      *            GO      TO      4901-YYKADD-EXT
+      *        END-IF
+      *        ADD     1                   TO  WRK-YYKID
+      *    END-IF
+      *
+           IF      WRK-YYKID           =   ZERO
+               MOVE    WRK-YYKCNT          TO  WRK-YYKID
            END-IF
       *
       *    明細レコード追加
@@ -4411,7 +4450,8 @@
                    MOVE    "予約明細データ削除エラー"
                                                TO  SPA-ERRMSG
                WHEN    "1013"
-                   STRING  "予約時間の予約が合計で９９以上になります。"
+                   STRING  "予約時間の予約登録回数が９９以上に"
+                           "なります。"
                            "これ以上登録できません。"
       ******************   "予約時間の予約すべて削除して下さい。"
                                        DELIMITED   BY  SIZE
