@@ -2703,6 +2703,7 @@
                                        TO  IDX1
                IF    ( SPA-NAI-I04-SEIKYU-PLUS (IDX1)
                                    <=  ZERO )
+                AND  ( SPA-GMN-I04-NYUKIN  =   ZERO )
                    MOVE    WIDGET-INSENSITIVE
                                    TO  I04-NYUKIN-STT
                END-IF
@@ -3681,12 +3682,42 @@
       *
            END-PERFORM
       *
-           IF    ( WRK-NYUKIN      NOT     =   ZERO )
-               IF    ( IDX-NYUKIN  NOT     =   ZERO )
-                   COMPUTE SPA-NAI-I04-NYUKIN (IDX-NYUKIN)
-                       =   SPA-NAI-I04-NYUKIN (IDX-NYUKIN)
-                       +   WRK-NYUKIN
+           MOVE    ZERO                TO  WRK-NYUKIN
+           PERFORM VARYING IDX7    FROM    1   BY  1
+                   UNTIL ( IDX7        >   WRK-IDX )
+      *
+               IF    ( SPA-I0-SYUNOU-TTLDAT-FLG (IDX7)
+                                       =   ZERO )
+      *
+                   MOVE    ZERO        TO  FLG-TARGET
+                   IF    ( SPA-I0-SYUNOU-TTLDAT-FLG (IDX-LST)
+                                       =   1 )
+                       IF    ( SPA-I0-SYUNOU-YM-S  (IDX7)
+                                       =   SPA-I0-SYUNOU-YM-S(IDX-LST))
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   ELSE
+                           MOVE    1   TO  FLG-TARGET
+                   END-IF
+      *
+                   IF    ( FLG-TARGET  =   1 )
+      *
+                       IF    ( SPA-NAI-I04-NYUKIN (IDX7)
+                                   >   SPA-NAI-I04-SEIKYU-PLUS (IDX7))
+      *
+                           COMPUTE WRK-NYUKIN
+                               =   WRK-NYUKIN
+                               +   SPA-NAI-I04-NYUKIN (IDX7)
+                               -   SPA-NAI-I04-SEIKYU-PLUS (IDX7)
+                           COMPUTE SPA-NAI-I04-NYUKIN (IDX7)
+                               =   SPA-NAI-I04-SEIKYU-PLUS (IDX7)
+                       END-IF
+                   END-IF
                END-IF
+           END-PERFORM
+      *
+           IF    ( WRK-NYUKIN  >   ZERO )
+               PERFORM 410011-NYUKIN-SORT-SEC
            END-IF
       *
            .
