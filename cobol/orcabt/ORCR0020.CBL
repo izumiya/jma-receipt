@@ -200,8 +200,6 @@
       *                                     月途中に医保と生保の併用から
       *                                     生保単独になったときのまとめ
       *                                     公費分点欄に生保単独分記載
-      *  04.04.02    NACL-藤原    09/10/21  月途中の負担者番号変更対応
-      *                                     （自立支援の公費単独） 
       *  04.04.03    NACL-藤原    09/12/10  同月に医保と生保の併用と生保
       *                                     単独が混在する場合の複数診療
       *                                     科による入力時の記載対応
@@ -1095,22 +1093,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *    公費単独の場合
            IF      RECE01-HKNNUM        =   SPACE
                IF      RECE01-TEKSTYMD      =   ZERO
-                   IF    ( RECE01-KOHHKNNUM-O (1)  =   "012" OR  "025"
-                                                   OR  "015" OR  "016"
-                                                   OR  "021" OR  SPACE )
-                       IF    ( RECE01-KOHHKNNUM-O  (2)
-                                           =   RECE01-KOHHKNNUM-O (1) 
-                                           OR  SPACE                  )
-                       AND   ( RECE01-KOHHKNNUM-O  (3)
-                                           =   RECE01-KOHHKNNUM-O (1) 
-                                           OR  SPACE                  )
-                       AND   ( RECE01-KOHHKNNUM-O  (4)
-                                           =   RECE01-KOHHKNNUM-O (1) 
-                                           OR  SPACE                  )
-                           GO  TO  210-HENSYU-EXT
-                       ELSE
-                           MOVE    1               TO  FLG-SEIHO
-                       END-IF
+                   IF    ( RECE01-KOHHKNNUM-O (1)  = "012" OR  "025"
+                                                           OR  SPACE )
+                   AND   ( RECE01-KOHHKNNUM-O (2)  = "012" OR  "025"
+                                                           OR  SPACE )
+                   AND   ( RECE01-KOHHKNNUM-O (3)  = "012" OR  "025"
+                                                           OR  SPACE )
+                   AND   ( RECE01-KOHHKNNUM-O (4)  = "012" OR  "025"
+                                                           OR  SPACE )
+                       GO  TO  210-HENSYU-EXT
                    ELSE
                        MOVE    1               TO  FLG-SEIHO
                    END-IF
@@ -3142,10 +3133,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    AND ( RECE01-HKNNUM(1:2)     NOT =   "98"  ) )
              OR  (     ( RECE01-HKNID               =   ZERO  )
                    AND ( RECE01-KOHHKNNUM-O (1)     =   "012" 
-                                                    OR  "025"
-                                                    OR  "015"
-                                                    OR  "016"
-                                                    OR  "021" )
+                                                    OR  "025" )
                    AND ( RECE01-KOHHKNNUM-O (2)     =   SPACE ) )
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       10

@@ -163,8 +163,6 @@
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
       *  04.04.03    NACL-門脇    09/08/24  出産一時金対応
-      *  04.04.04    NACL-藤原    09/10/21  月途中の負担者番号変更対応
-      *                                     （自立支援の公費単独） 
       *  04.04.05    NACL-藤原    09/12/10  同月に初回による入院歴が複数
       *                                     ある場合の記録の修正 
       *****************************************************************
@@ -1019,25 +1017,17 @@
                    CONTINUE
                ELSE 
                    IF      RECE61-TEKSTYMD      =   ZERO
-                       IF    ( RECE61-KOHHKNNUM-O (1)
-                                                   =   "012" OR  "025"
-                                                   OR  "015" OR  "016"
-                                                   OR  "021" OR  SPACE )
-                           IF    ( RECE61-KOHHKNNUM-O  (2)
-                                           =   RECE61-KOHHKNNUM-O (1) 
-                                           OR  SPACE                  )
-                           AND   ( RECE61-KOHHKNNUM-O  (3)
-                                           =   RECE61-KOHHKNNUM-O (1) 
-                                           OR  SPACE                  )
-                           AND   ( RECE61-KOHHKNNUM-O  (4)
-                                           =   RECE61-KOHHKNNUM-O (1) 
-                                           OR  SPACE                  )
-                               GO  TO  210-HENSYU-EXT
-                           ELSE
-                               MOVE    1               TO  FLG-SEIHO
-                           END-IF
+                       IF    ( RECE61-KOHHKNNUM-O (1) = "012" OR  "025"
+                                                      OR  SPACE )
+                       AND   ( RECE61-KOHHKNNUM-O (2) = "012" OR  "025"
+                                                      OR  SPACE )
+                       AND   ( RECE61-KOHHKNNUM-O (3) = "012" OR  "025"
+                                                      OR  SPACE )
+                       AND   ( RECE61-KOHHKNNUM-O (4) = "012" OR  "025"
+                                                      OR  SPACE )
+                           GO  TO  210-HENSYU-EXT
                        ELSE
-                           MOVE    1               TO  FLG-SEIHO
+                           MOVE    1                TO  FLG-SEIHO
                        END-IF
                    ELSE
                        IF      FLG-SEIHO            =   1
@@ -2816,10 +2806,7 @@
                    AND ( RECE61-HKNNUM(1:2)     NOT =   "98"  ) )
              OR  (     ( RECE61-HKNID               =   ZERO  )
                    AND ( RECE61-KOHHKNNUM-O (1)     =   "012" 
-                                                    OR  "025"
-                                                    OR  "015"
-                                                    OR  "016"
-                                                    OR  "021" )
+                                                    OR  "025" )
                    AND ( RECE61-KOHHKNNUM-O (2)     =   SPACE ) )
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       10
