@@ -891,6 +891,16 @@
                        END-IF
                    END-IF
                END-IF
+      *        画像診断以外の数量入力
+               IF      SPA-COM-SRYKBN (IDX-1)  NOT =   "70"
+                   IF     (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "1" )  AND
+                          (SPA-COM-DATAKBN (IDX-1)       =   "1" )  AND
+                          (SPA-COM-KZMCOMPSIKIBETU(IDX-1)  NOT =  ZERO)
+                     AND  (SPA-COM-SURYO (IDX-1)         >   1   )
+                       MOVE    "1"             TO  SPA-COM-SURFLG
+                                                               (IDX-1)
+                   END-IF
+               END-IF
            END-PERFORM
       *
       *    約束コードの画面用再編集
