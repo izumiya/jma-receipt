@@ -68,6 +68,7 @@
       *                                     ¡ÊÊ¿À®£²£±Ç¯£±£°·î¿ÇÎÅ¡Á¡Ë
       *  04.04.06    NACL-ÌçÏÆ    09/12/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê¿·ºÂ¡¦Ä«²â¡¦ÏÂ¸÷¡¦»ÖÌÚ»Ô¡Ë
+      *  04.04.07    NACL-ÌçÏÆ    09/12/25  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÄ«²â»Ô¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -365,8 +366,7 @@
                (LNK-FTNJGNCHK-SRYYM  >= "200510"       ))
            OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
                (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
-               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ) AND
-               (LNK-FTNJGNCHK-SRYYM  <= "200912"       ))
+               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ))
            OR ((LNK-FTNJGNCHK-KOHNUM(1:1)
                                      >= "1" AND <= "8" ) AND
                (LNK-FTNJGNCHK-SRYYM  >= "200810"       ))
@@ -446,6 +446,12 @@
            AND  (LNK-FTNJGNCHK-KOHNUM    = "481" OR "482" OR "483" )
            AND  (LNK-FTNJGNCHK-NYUGAIKBN = "1"                     )
            AND  (LNK-FTNJGNCHK-SRYYM    >= "200804"                )
+                      MOVE     999999            TO WRK-HKNMST-JGNGAK
+           END-IF
+           IF   (LNK-FTNJGNCHK-PREFNUM   =  11                     )
+           AND  (LNK-FTNJGNCHK-KOHNUM    = "383"                   )
+           AND  (LNK-FTNJGNCHK-NYUGAIKBN = "1"                     )
+           AND  (LNK-FTNJGNCHK-SRYYM    >= "201001"                )
                       MOVE     999999            TO WRK-HKNMST-JGNGAK
            END-IF
       *
@@ -562,8 +568,7 @@
                (LNK-FTNJGNCHK-SRYYM  >= "200510"       ))
            OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
                (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
-               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ) AND
-               (LNK-FTNJGNCHK-SRYYM  <= "200912"       ))
+               (LNK-FTNJGNCHK-SRYYM  >= "200804"       ))
              CONTINUE
            ELSE
              PERFORM  21011-SYSKAN-HENSYU-SEC
@@ -1112,10 +1117,9 @@
                  (LNK-FTNJGNCHK-KOHNUM   = "483"   ) AND
                  (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
-                 (LNK-FTNJGNCHK-SRYYM   >= "200804") AND
-                 (LNK-FTNJGNCHK-SRYYM   <= "200912"))
+                 (LNK-FTNJGNCHK-SRYYM   >= "200804"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
-                 (LNK-FTNJGNCHK-KOHNUM   = "483"   ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "383"   ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "201001"))
                IF   WRK-KOHFTN   NOT = ZERO
