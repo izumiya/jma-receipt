@@ -402,6 +402,10 @@
       *  04.04.33    NACL-ÌçÏÆ    09/12/04  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.34    NACL-ÌçÏÆ    09/12/07  »þ´Ö³°²Ã»»¶èÊ¬ÊÔ½¸
       *  04.04.35    NACL-ÌçÏÆ    09/12/09  ½ÐÍè¹â»»Äê¡ÊºÞ¡Ë¤ÎÂÐ±þ
+      *  04.04.36    NACL-ÌçÏÆ    10/01/04  ¸øÈñÃ±ÆÈ¤Î¿©»öÉ¸½àÉéÃ´³ÛÊÔ½¸½¤Àµ
+      *                                     ¸øÈñÃ±ÆÈ¤Î°ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
+      *                                     ·îÅÓÃæ¤Ë°åÊÝ¤È¹¹À¸Åù¤ÎÊ»ÍÑ¤«¤é
+      *                                     ¹¹À¸ÅùÃ±ÆÈ¤Ë¤Ê¤Ã¤¿¤È¤­¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -807,6 +811,9 @@
                  07  WRK-TAIHI-FTNMONEY-KOJ            PIC 9(09).
                  07  WRK-TAIHI-FTNMONEY-EN             PIC 9(09).
                  07  WRK-TAIHI-FTNMONEY-EN2            PIC 9(09)V9(01).
+           03  WRK-KOHTANINF-AREA.
+             05  WRK-KOHTANINF             OCCURS  5.
+                 07  WRK-KOHTAN-SHOKUJIRYOYOHI         PIC 9(09).
       *
        01  WRK-DAY-TABLE.
            03  WRK-DAY-T                               OCCURS   31.
@@ -981,6 +988,8 @@
                05  TBL-HKNFTNDATA-ZAN                  PIC  9(07).
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
       *
+               05  TBL-HKNFTNDATA-JGNXXX               PIC  9(07).
+      *
        01  TBL-PTTOKKI.
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
                05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
@@ -1076,6 +1085,7 @@
            03  WRK-RECEERR                             PIC X(200).
       *
            03  WRK-NYUJGNGAK                           PIC 9(07).
+           03  WRK-NYUJGNGAK2                          PIC 9(07).
       *
            03  WRK-TOKKI                               PIC X(02).
            03  TOKKI-IDX                               PIC 9(02). 
@@ -5690,7 +5700,10 @@
                        PERFORM RECE64-WRITE-SEC
       *
                        MOVE   ZERO   TO  FLG-SKJFTNNASI
-                       IF   RECE62-HKNCOMBIFLG(IDX1)  =  3
+                       IF  (RECE62-HKNCOMBIFLG(IDX1)  =  3)
+                       AND (RECE62-KOHNUMHC(IDX1 1)   =
+                            "024" OR "079" OR "051" OR
+                            "052" OR "015" OR "016"       )
                          INITIALIZE      LNK-ORCSJGNGET-REC
                          MOVE RECE62-HOSPNUM
                                      TO  LNK-ORCSJGNGET-HOSPNUM
@@ -5711,20 +5724,27 @@
                                              LNK-ORCSJGNGET-REC
                                              SPA-AREA
                          IF   LNK-ORCSJGNGET-RC   =   ZERO
+                           IF RECE62-KOHNUMHC(IDX1 1) = "024" OR "079"
                             IF  LNK-ORCSJGNGET-TAFTNRUIKEI = ZERO
                                MOVE    1     TO    FLG-SKJFTNNASI
                             END-IF
+                           END-IF
+                           IF RECE62-KOHNUMHC(IDX1 1) =
+                              "051" OR "052" OR "015" OR "016"
+                            IF  LNK-ORCSJGNGET-NYUJGNGAK   = ZERO
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                            END-IF
+                           END-IF
                          END-IF
                        END-IF
       *
                        IF ((RECE62-HKNNUMHC(IDX1)        =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 1)  NOT =
-                                "010" AND "051" AND "052" AND
-                                "038" AND "024" AND "079"        ) AND
+                            "010" AND "038" AND "024" AND "079" AND
+                            "051" AND "052" AND "015" AND "016"  ) AND
                            (RECE62-KOHNUMHC(IDX1 2)      =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 3)      =  SPACE) AND
-                           (RECE62-KOHNUMHC(IDX1 4)      =  SPACE) AND
-                           (RECE62-HKNNUM                =  SPACE))
+                           (RECE62-KOHNUMHC(IDX1 4)      =  SPACE))
                        OR ( FLG-SKJFTNNASI               =    1   )
                         CONTINUE
                        ELSE
@@ -9903,6 +9923,7 @@
                    DISPLAY "TAF=" TBL-HKNFTNDATA-TAF(IDY2)
                    DISPLAY "GAI=" TBL-HKNFTNDATA-GAIRAI(IDY2)
                    DISPLAY "NYU=" TBL-HKNFTNDATA-NYUIN(IDY2)
+                   DISPLAY "SKJ=" TBL-HKNFTNDATA-NYUSKJ(IDY2)
                    DISPLAY "ZAN=" TBL-HKNFTNDATA-ZAN(IDY2)
                    DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
                 END-IF
@@ -10017,6 +10038,8 @@
                                        TO  TBL-HKNFTNDATA-TAF(IDY2)
                 END-IF
               END-IF
+              MOVE    LNK-ORCSJGNGET-NYUJGNGAK
+                                       TO  TBL-HKNFTNDATA-JGNXXX(IDY2)
            END-IF
       *
            IF   TBL-HKNFTNDATA-JGN(IDY2)  NOT =  ZERO
@@ -10652,12 +10675,14 @@
       *
            IF      RECE62-SRYYM      >=  "200210"
              IF    RECE62-KOUREI   =   "1" OR "2"
+               IF  SYU-SYUHKNNUM  NOT = SPACE
                 EVALUATE  RECE62-KOUREI
                   WHEN      "1"
                     PERFORM     210442-HOKEN-FUTAN-HENSYU-SEC
                   WHEN      "2"
                     PERFORM     210447-HOKEN-FUTAN-HENSYU2-SEC
                 END-EVALUATE
+               END-IF
              ELSE                                                       
       *         Á¥°÷ÊÝ¸±¡ÊÈïÊÝ¸±¼Ô¡Ë¡ÜÄÌ¶ÐºÒ³²
                 IF    RECE62-SENIN-TUUSAI     =    "1"
@@ -10809,6 +10834,9 @@
                    AND     RECE62-SRYYM                  >=  "200904"
                           PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
                    END-IF
+                END-IF
+                IF  RECE62-HKNNUM(1:2)  =  "98"
+                   MOVE   SPACE   TO     RECE62-NYUINRYOFLG
                 END-IF
       *
                 MOVE      1       TO     FLG-NYUINRYO
@@ -12784,19 +12812,24 @@
                          END-IF
                    END-IF
                   ELSE
-                   IF   ((SYU-KOH1HKNNUM  NOT =  "010" AND
-                                                 "024" AND "079"
-                                             AND "051" AND "052"
-                                             AND "038"          ) AND
+                   IF   ((SYU-KOH1HKNNUM  NOT =
+                          "010" AND "038" AND "024" AND "079" AND
+                          "051" AND "052" AND "015" AND "016"   ) AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
-                         (SYU-KOH4HKNNUM      =   SPACE         ) AND
-                         (RECE62-HKNNUM       =   SPACE         ))
+                         (SYU-KOH4HKNNUM      =   SPACE         ))
                    OR   ((SYU-KOH1HKNNUM      =  "024" OR  "079") AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (SYU-SKJ-FTNKBN(IDX3)  =  "3"          ))
+                   OR   ((SYU-KOH1HKNNUM      =  "051" OR  "052"
+                                              OR "015" OR  "016") AND
+                         (SYU-KOH2HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH3HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH4HKNNUM      =   SPACE         ) AND
+                         (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
+                                                         = ZERO ))
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
                                    RECE62-SHOKUJINISSU(KH-IDX)
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
@@ -12810,6 +12843,22 @@
                         MOVE  SPACE               TO
                                 RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
                      END-IF
+                     ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
+                                   WRK-KOHTAN-SHOKUJIRYOYOHI(KH-IDX)
+                     IF     RECE62-SEIHOFLG   =  "1"
+                        IF  RECE62-YOBIETC(1) =  ZERO
+                           EVALUATE  KH-IDX
+                             WHEN      2
+                                MOVE  2   TO  RECE62-YOBIETC(1)
+                             WHEN      3
+                                MOVE  3   TO  RECE62-YOBIETC(1)
+                             WHEN      4
+                                MOVE  4   TO  RECE62-YOBIETC(1)
+                             WHEN      5
+                                MOVE  5   TO  RECE62-YOBIETC(1)
+                           END-EVALUATE
+                        END-IF
+                     END-IF
                    ELSE
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
                                    RECE62-SHOKUJINISSU(KH-IDX)
@@ -12817,14 +12866,20 @@
                                    RECE62-SHOKUJIRYOYOHI(KH-IDX)
                      ADD   SYU-SKJ-FTN-RECE(IDX3) TO
                                    RECE62-SHOKUJIFTN(KH-IDX)
-                     MOVE  SPACE                  TO
-                                   RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
-                     IF   RECE62-SRYYM    >=  "200610"
-                     AND  FLG-TOKUSYU-SKJ  =   ZERO
-                        MOVE  SPACE               TO
-                                RECE62-FUKUSHIFLG-SKJIPA(KH-IDX - 1)
-                        MOVE  SPACE               TO
-                                RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+                     IF     RECE62-SEIHOFLG   =  "1"
+                       IF   RECE62-YOBIETC(2) =  ZERO
+                                MOVE  1   TO  RECE62-YOBIETC(2)
+                       END-IF
+                     ELSE
+                       MOVE  SPACE                  TO
+                                     RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
+                       IF   RECE62-SRYYM    >=  "200610"
+                       AND  FLG-TOKUSYU-SKJ  =   ZERO
+                          MOVE  SPACE               TO
+                                  RECE62-FUKUSHIFLG-SKJIPA(KH-IDX - 1)
+                          MOVE  SPACE               TO
+                                  RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
+                       END-IF
                      END-IF
                    END-IF
                   END-IF
@@ -13067,13 +13122,31 @@
                       IF  (WRK-NYUJGNGAK  NOT =  ZERO               )
                       AND (WRK-NYUJGNGAK  NOT =
                                WRK-TAIHI-FTNMONEY-EN(KOHFTN-IDX + 1))
-                        COMPUTE WRK-NYUJGNGAK =
+                        COMPUTE WRK-NYUJGNGAK2 =
                                 WRK-TAIHI-FTNMONEY-EN2(KOHFTN-IDX + 1) +
                                 0.5
-                        MOVE    WRK-NYUJGNGAK
+                        MOVE    WRK-NYUJGNGAK2
                                 TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
                                     RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
                       END-IF
+                    END-IF
+                  END-IF
+                  IF  (WRK-NYUJGNGAK  NOT =  ZERO               )
+                  AND (WRK-NYUJGNGAK  >
+                           RECE62-FTNMONEY(KOHFTN-IDX + 1)      )
+                  AND (WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
+                                      NOT =  ZERO               )
+                    COMPUTE  WRK-FTNKEI2 =
+                             RECE62-FTNMONEY(KOHFTN-IDX + 1)  +
+                             WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
+                    IF  WRK-NYUJGNGAK <= WRK-FTNKEI2
+                      MOVE  WRK-NYUJGNGAK
+                          TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                              RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                    ELSE
+                      MOVE  WRK-FTNKEI2
+                          TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                              RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
                     END-IF
                   END-IF
                 ELSE

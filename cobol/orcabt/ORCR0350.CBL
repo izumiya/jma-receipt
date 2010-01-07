@@ -255,6 +255,8 @@
       *                                     時間外加算区分の追加
       *  04.04.11    NACL-藤原    09/12/10  同月に初回による入院歴が複数
       *                                     ある場合の記録の修正 
+      *  04.04.12    NACL-門脇    10/01/04  月途中に医保と更生等の併用から
+      *                                     更生等単独になったときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5938,6 +5940,40 @@
                                            MOVE    1   TO  FLG-PRT
                                        END-IF 
                                    END-IF
+                                   IF  FLG-PRT  =   1
+                                    IF LNK-NYURECEDEN-SRYCD
+                                          (IDZ1 IDZ2 IDXZ)
+                                       =   WRK-CONS-HYOJYUN-FUTAN1
+                                       OR  WRK-CONS-HYOJYUN-FUTAN2
+                                       OR  WRK-CONS-HYOJYUN-FUTAN3
+                                       OR  WRK-CONS-HYOJYUN-FUTAN4
+                                       OR  WRK-CONS-HYOJYUN-FUTAN5
+                                       OR  WRK-CONS-HYOJYUN-FUTAN6
+                                       OR  WRK-CONS-HYOJYUN-FUTAN7
+                                       OR  WRK-CONS-HYOJYUN-FUTAN8
+                                       OR  WRK-CONS-HYOJYUN-FUTAN9
+                                       OR  WRK-CONS-HYOJYUN-FUTAN10
+                                       OR  WRK-CONS-HYOJYUN-FUTAN11
+                                       OR  WRK-CONS-HYOJYUN-FUTAN12
+                                       OR  WRK-CONS-HYOJYUN-FUTAN13
+                                       OR  WRK-CONS-HYOJYUN-FUTAN14
+                                       OR  WRK-CONS-HYOJYUN-FUTAN15
+                                     IF ((RECE62-SEIHOFLG   = "1") AND
+                                         (RECE62-YOBIETC(1) =  2 ) AND
+                                         (WRK-FTNKBN        = "5"))
+                                     OR ((RECE62-SEIHOFLG   = "1") AND
+                                         (RECE62-YOBIETC(1) =  3 ) AND
+                                         (WRK-FTNKBN        = "6"))
+                                     OR ((RECE62-SEIHOFLG   = "1") AND
+                                         (RECE62-YOBIETC(1) =  4 ) AND
+                                         (WRK-FTNKBN        = "B"))
+                                     OR ((RECE62-SEIHOFLG   = "1") AND
+                                         (RECE62-YOBIETC(1) =  5 ) AND
+                                         (WRK-FTNKBN        = "C"))
+                                       MOVE  ZERO  TO  FLG-PRT
+                                     END-IF
+                                    END-IF
+                                   END-IF
                                END-IF   
                                IF      FLG-PRT         =   1
                                    MOVE    "SI,"           TO  WRK-REC
@@ -6110,6 +6146,20 @@
                                            TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
                          END-IF
                        END-PERFORM
+                   END-IF
+               END-IF
+               IF    RECE62-SEIHOFLG   =  "1"
+               AND   RECE62-YOBIETC(2) =   1 
+                   INITIALIZE                     HKNCOMBI-REC
+                   MOVE  WRK-RECE641-HOSPNUM  TO  COMB-HOSPNUM
+                   MOVE  WRK-RECE641-PTID     TO  COMB-PTID
+                   MOVE  WRK-RECE641-HKNCOMBI TO  COMB-HKNCOMBINUM
+                   MOVE  HKNCOMBI-REC         TO  MCPDATA-REC
+                   PERFORM 910-HKNCOMBI-INV-SEC
+                   IF      FLG-HKNCOMBI  =   ZERO
+                     IF    COMB-HKNNUM   =   SPACE
+                        MOVE  SPACE  TO  WRK-FUKUSHIFLG-SKJINF-AREA
+                     END-IF
                    END-IF
                END-IF
            END-IF    

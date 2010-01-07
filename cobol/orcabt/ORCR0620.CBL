@@ -165,6 +165,8 @@
       *  04.04.03    NACL-門脇    09/08/24  出産一時金対応
       *  04.04.05    NACL-藤原    09/12/10  同月に初回による入院歴が複数
       *                                     ある場合の記録の修正 
+      *  04.04.06    NACL-門脇    10/01/04  公費単独の保険組み合わせ
+      *                                     フラグ編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1411,10 +1413,8 @@
                  PERFORM VARYING IDY2    FROM    1   BY  1
                          UNTIL   IDY2    >       4
                    IF   RECE61-KOHNUMHC (IDX IDY2) NOT = SPACE
-                     IF RECE61-KOHNUMHC (IDX IDY2) = "024" OR "079"
-                        IF   FLG-TAISYO  =  ZERO
-                           MOVE   1     TO   FLG-TAISYO
-                        END-IF
+                     IF   FLG-TAISYO  =  ZERO
+                        MOVE      1     TO   FLG-TAISYO
                      ELSE
                         MOVE      9     TO   FLG-TAISYO
                      END-IF

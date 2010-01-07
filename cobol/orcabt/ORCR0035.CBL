@@ -47,6 +47,8 @@
       *  04.02.01    NACL-門脇    07/05/12  第３公費以降の負担区分編集
       *  04.04.01    NACL-門脇    09/09/10  月途中に医保と生保の併用から
       *                                     生保単独になったときの対応
+      *  04.04.02    NACL-門脇    10/01/04  月途中に医保と更生等の併用から
+      *                                     更生等単独になったときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -489,14 +491,12 @@ grpsys              (RECE02-HOSPNUM   NOT = RECE04-HOSPNUM)    OR
       **     DISPLAY   "RECE04-HKNCOMNI : " RECE04-HKNCOMBI
       **     DISPLAY   "KH-IDX          : " KH-IDX
       *
-           IF  (RECE02-HENTOTALTEN(1)   NOT =  ZERO          )
-           AND (RECE02-HENTOTALTEN(2)   NOT =  ZERO          )
-           AND (RECE02-HENTOTALTEN(1) < RECE02-HENTOTALTEN(2))
-           AND (RECE02-HENTOTALTEN(3)       =  ZERO          )
-           AND (RECE02-HENTOTALTEN(4)       =  ZERO          )
-           AND (RECE02-HENTOTALTEN(5)       =  ZERO          )
-           AND (RECE02-KOHNUM(1)      = "012" OR "025"       )
-           AND (KH-IDX                =  1                   )
+           IF   (RECE02-SEIHOFLG                     =  "1" )
+           AND  (KH-IDX                          NOT =  ZERO)
+           AND  (RECE02-HENTOTALTEN(1)           NOT =  ZERO)
+           AND  (RECE02-HENTOTALTEN(KH-IDX + 1)  NOT =  ZERO)
+           AND  (RECE02-HENTOTALTEN(1) <
+                              RECE02-HENTOTALTEN(KH-IDX + 1))
               IF   RECE02-HKNNUMHC(HC-IDX)  NOT = SPACE
                 MOVE    ZERO        TO        KH-IDX
               END-IF
