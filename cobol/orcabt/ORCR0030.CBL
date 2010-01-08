@@ -437,8 +437,6 @@
       *  04.04.33    NACL-門脇    09/12/14  東京都マル子実日数記載修正
       *  04.04.34    NACL-門脇    10/01/04  月途中に医保と更生等の併用から
       *                                     更生等単独になったときの対応
-      *  04.04.35    NACL-門脇    10/01/08  処置乳幼児加算区分、
-      *                                     極低出生体重児加算区分編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5067,8 +5065,6 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                MOVE    TNS-TUSOKUGAIKBN
                                       TO RECE05-TUSOKUGAIKBN (IDX4)
                MOVE    TNS-TIMEKSNKBN TO RECE05-TIMEKSNKBN   (IDX4)
-               MOVE    TNS-LASERKBN   TO RECE05-LASERKSN     (IDX4)
-               MOVE    TNS-CHPMESUKSN TO RECE05-CHPMESUKSN   (IDX4)
                MOVE    TNS-KZMCOMPSIKIBETU
                                       TO RECE05-KZMCOMPSIKIBETU(IDX4)
                MOVE    TNS-CHUKSNCD   TO RECE05-CHUKSNCD       (IDX4)
