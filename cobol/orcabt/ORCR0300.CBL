@@ -308,6 +308,9 @@
       *                                     時間外加算区分による加算項目
       *                                     の記載の有無
       *                                     時間外加算区分の追加
+      *  04.04.09    NACL-藤原    10/01/08  処置で基本項目の時間加算区分
+      *                                     が算定不可の場合、時間加算の
+      *                                     通則加算項目の記載の判定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -652,7 +655,10 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-RECE04-ZAIKAISU     PIC 9(04).    
            03  WRK-KENSASU             PIC 9(04).    
       *    時間外加算区分（基本項目）
-           03  WRK-KIHON-TIMEKSNKBN    PIC  9(01).
+           03  WRK-KIHON-TIMEKSNKBN    PIC 9(01).
+      *    処置の加算項目の有無フラグ
+           03  WRK-SRYKBN40-KOKUJISKBKBN1
+                                       PIC 9(01).
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
       *
@@ -4031,6 +4037,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                                         WRK-KOUI-TAIHI-AREA
                                         WRK-KOUI-KASAN-TAIHI-AREA
                                         WRK-KOUI-SRY-TAIHI-AREA
+                                        WRK-SRYKBN40-KOKUJISKBKBN1
       *
            IF      RECE041-SRYKBN       =   "50"    OR  "54"    OR
                                             "60"    OR  "40"    OR
@@ -4062,6 +4069,14 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                                                TO
                                    WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN
                                                             (IDWW)
+               END-IF
+      *
+      *        処置の加算項目の有無                
+               IF    ( RECE041-SRYKBN      =   "40" )
+               AND   ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
+                                           =   "7"  )
+                   MOVE    1                   TO
+                                   WRK-SRYKBN40-KOKUJISKBKBN1
                END-IF
       *
       *        コメントを最初に編集（手術のとき）
@@ -4381,7 +4396,13 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                IF    ( WRK-KIHON-TIMEKSNKBN    =   ZERO )
                AND   ( WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN (IDY1)
                                            NOT =   ZERO )
-                   CONTINUE
+      *            時間外区分算定外のとき加算項目があれば編集（処置）
+                   IF      WRK-SRYKBN40-KOKUJISKBKBN1  =   1
+                       ADD     1               TO  IDY
+                       MOVE    WRK-KOUI-KASAN-TAIHI-REC (IDY1)
+                                           TO  WRK-KOUI-TAIHI-REC  (IDY)
+                       MOVE    IDY         TO  WRK-SRYCD1-MAX
+                   END-IF
                ELSE 
                    ADD     1               TO  IDY
                    MOVE    WRK-KOUI-KASAN-TAIHI-REC (IDY1)
