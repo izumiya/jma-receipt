@@ -173,6 +173,7 @@
       *  04.04.04    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *  04.04.05    NACL-門脇    09/12/04  剤まとめ項目値の計算修正
       *  04.04.06    NACL-門脇    09/12/09  出来高算定（剤）の対応
+      *  04.04.07    NACL-門脇    10/01/13  剤まとめ項目値の計算修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1809,14 +1810,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      ELSE
                        COMPUTE  RECE44-RUIKEITOTAL  =
                                 RECE44-RUIKEITOTAL  +
-                              ( WRK-FUKA-VALUE    *
-                                          SRY-SRYSURYO(IDX2))
-                       COMPUTE  RECE44-RUIKEITOTAL  =
-                                RECE44-RUIKEITOTAL  +
                               ( WRK-FUKA-VALUE    * WRK-SRYCD)
                        COMPUTE  WRK-FUKA-KINGAKU    =
                                 WRK-FUKA-KINGAKU    +
-                              ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX
+                                                  * SRY-SRYSURYO(IDX2))
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE44-RUIKEITOTAL  =

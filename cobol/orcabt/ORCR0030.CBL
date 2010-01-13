@@ -437,6 +437,7 @@
       *  04.04.33    NACL-門脇    09/12/14  東京都マル子実日数記載修正
       *  04.04.34    NACL-門脇    10/01/04  月途中に医保と更生等の併用から
       *                                     更生等単独になったときの対応
+      *  04.04.35    NACL-門脇    10/01/13  剤まとめ項目値の計算修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4851,14 +4852,11 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                      ELSE
                        COMPUTE  RECE04-RUIKEITOTAL  =
                                 RECE04-RUIKEITOTAL  +
-                              ( WRK-FUKA-VALUE    *
-                                          SRY-SRYSURYO(IDX2))
-                       COMPUTE  RECE04-RUIKEITOTAL  =
-                                RECE04-RUIKEITOTAL  +
                               ( WRK-FUKA-VALUE    * WRK-SRYCD)
                        COMPUTE  WRK-FUKA-KINGAKU    =
                                 WRK-FUKA-KINGAKU    +
-                              ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX
+                                                  * SRY-SRYSURYO(IDX2))
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE04-RUIKEITOTAL  =

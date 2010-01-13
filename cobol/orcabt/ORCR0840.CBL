@@ -168,6 +168,7 @@
       *  04.04.06    NACL-ÌçÏÆ    09/11/19  ¼«ÇåÀÕ·òÊÝ½àµòÎÅÍÜÃ´Åö¼êÅöÂÐ±þ
       *  04.04.07    NACL-ÌçÏÆ    09/12/04  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.08    NACL-ÌçÏÆ    09/12/09  ½ÐÍè¹â»»Äê¡ÊºÞ¡Ë¤ÎÂÐ±þ
+      *  04.04.09    NACL-ÌçÏÆ    10/01/13  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2189,14 +2190,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      ELSE
                        COMPUTE  RECE84-RUIKEITOTAL  =
                                 RECE84-RUIKEITOTAL  +
-                              ( WRK-FUKA-VALUE    *
-                                          SRY-SRYSURYO(IDX2))
-                       COMPUTE  RECE84-RUIKEITOTAL  =
-                                RECE84-RUIKEITOTAL  +
                               ( WRK-FUKA-VALUE    * WRK-SRYCD)
                        COMPUTE  WRK-FUKA-KINGAKU    =
                                 WRK-FUKA-KINGAKU    +
-                              ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX
+                                                  * SRY-SRYSURYO(IDX2))
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE84-RUIKEITOTAL  =
@@ -6063,14 +6061,11 @@ grpsys     PERFORM  900-DBSELECT-SEC
                  ELSE
                    COMPUTE  RECE84-RUIKEITOTAL  =
                             RECE84-RUIKEITOTAL  +
-                          ( WRK-FUKA-VALUE    *
-                                     NSRY-SRYSURYO(IDX2))
-                   COMPUTE  RECE84-RUIKEITOTAL  =
-                            RECE84-RUIKEITOTAL  +
                           ( WRK-FUKA-VALUE    * WRK-SRYCD)
                    COMPUTE  WRK-FUKA-KINGAKU    =
                             WRK-FUKA-KINGAKU    +
-                          ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                          ((WRK-FUKA-VALUE^4) * FUKA-IDX
+                                              * NSRY-SRYSURYO(IDX2))
                  END-IF
                END-PERFORM
                COMPUTE  RECE84-RUIKEITOTAL  =
@@ -7673,14 +7668,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ELSE
                       COMPUTE  RECE84-RUIKEITOTAL  =
                                RECE84-RUIKEITOTAL  +
-                             ( WRK-FUKA-VALUE    *
-                                    WRK-ORCSTEN-SURYO(IDX2))
-                      COMPUTE  RECE84-RUIKEITOTAL  =
-                               RECE84-RUIKEITOTAL  +
                              ( WRK-FUKA-VALUE    * WRK-SRYCD)
                       COMPUTE  WRK-FUKA-KINGAKU    =
                                WRK-FUKA-KINGAKU    +
-                             ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                             ((WRK-FUKA-VALUE^4) * FUKA-IDX
+                                   * WRK-ORCSTEN-SURYO(IDX2))
                     END-IF
                   END-PERFORM
                   COMPUTE  RECE84-RUIKEITOTAL  =
@@ -7820,13 +7812,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ELSE
                       COMPUTE  RECE84-RUIKEITOTAL  =
                                RECE84-RUIKEITOTAL  +
-                             ( WRK-FUKA-VALUE    * 1)
-                      COMPUTE  RECE84-RUIKEITOTAL  =
-                               RECE84-RUIKEITOTAL  +
                              ( WRK-FUKA-VALUE    * WRK-SRYCD)
                       COMPUTE  WRK-FUKA-KINGAKU    =
                                WRK-FUKA-KINGAKU    +
-                             ((WRK-FUKA-VALUE^5) * FUKA-IDX)
+                             ((WRK-FUKA-VALUE^4) * FUKA-IDX
+                                                 * 1)
                     END-IF
                   END-PERFORM
                   COMPUTE  RECE84-RUIKEITOTAL  =
