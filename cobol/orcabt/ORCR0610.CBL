@@ -130,6 +130,8 @@
       *                                     記載対応
       *  04.04.02    NACL-藤原    09/05/19  東京都地方公費対応
       *                                     マル都（８２）は再優先とする
+      *  04.04.03    NACL-藤原    09/10/21  月途中の負担者番号変更対応
+      *                                     （自立支援の公費単独） 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2150,10 +2152,13 @@
                    END-IF
            END-EVALUATE
       *
-      *    生保単独のみのとき
+      *    公費単独の場合（生保、中国残留邦人等、自立支援）
            IF    ( WRK-SYOKBN          =   "1"   )
            AND   ( COMB-HKNNUM         =   SPACE )
            AND   ( COMB-KOHHKNNUM (1)  =   "012"
+                                       OR  "015"
+                                       OR  "016"
+                                       OR  "021"
                                        OR  "025" )
            AND   ( COMB-KOHHKNNUM (2)  =   SPACE )
                PERFORM 20013-SEIHO-RECE61-WRITE-SEC

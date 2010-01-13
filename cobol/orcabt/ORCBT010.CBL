@@ -90,6 +90,9 @@
       *                                     療養出力時の連番の初期化
       *  04.04.03    NACL-藤原    09/10/21  月途中の負担者番号変更対応
       *                                     （自立支援の公費単独） 
+      *  04.04.04    NACL-藤原    09/12/17  月途中に医保と自立支援の併用
+      *                                     から自立支援単独になったとき
+      *                                     のまとめ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -307,6 +310,8 @@
            03  WRK-PREFKBN             PIC X(01).
            03  WRK-PREFNUM             PIC X(02).
       *
+           03  WRK-SEIHO-FLG           PIC 9(01).
+      *
       *    傷病名編集
            03  WRK-BYOMEI          PIC X(150).
            03  WRK-BYOMEIW         PIC X(150).
@@ -373,6 +378,10 @@
                                    PIC 9(01).
            02  TBL-SEIHO-TOUKEI01-MAX
                                    PIC 9(02).
+      *
+       01  WRK-KOH-TOUKEI01-REC. 
+           COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
+                                   BY         //WRK-KOH-TOUKEI01//.
       *
       *    ワーク患者病名
        01  WRK-PTBYOMEI-REC.
@@ -2307,8 +2316,12 @@ grpsys                                         SPA-AREA
       *
            MOVE    ZERO            TO  FLG-SEIHO 
            INITIALIZE                  TBL-SEIHO-TOUKEI01-AREA
+                                       WRK-KOH-TOUKEI01-REC
       *
-      *    生保単独の退避と生保以外の公費単独のチェック（精神入院は除く）    
+           MOVE    ZERO                TO  WRK-SEIHO-FLG
+      *
+      *    公費単独の退避（生保、中国残留邦人等、自立支援）と他の
+      *    公費単独のチェック（精神入院は除く）    
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       WRK-TOUKEI01-TABLE-MAX
                    OR      WRK-TOUKEI01-HOSPNUM (IDXX) =   ZERO
@@ -2336,7 +2349,25 @@ grpsys                                         SPA-AREA
                                            OR  SPACE                  )
                                    CONTINUE
                                ELSE
-                                   MOVE    1           TO  FLG-SEIHO
+      *****************************IF    ( TOUKEI01-TKOHHKNNUM  (2)
+      *****************************            =   "012"   OR  "025"
+      *****************************            OR  "015"   OR  "016"
+      *****************************            OR  "021"   OR  SPACE )
+      *****************************AND   ( TOUKEI01-TKOHHKNNUM  (3)
+      *****************************            =   "012"   OR  "025"
+      *****************************            OR  "015"   OR  "016"
+      *****************************            OR  "021"   OR  SPACE )
+      *****************************AND   ( TOUKEI01-TKOHHKNNUM  (4)
+      *****************************            =   "012"   OR  "025"
+      *****************************            OR  "015"   OR  "016"
+      *****************************            OR  "021"   OR  SPACE )
+      *****************************    生保、中国残留邦人等、自立支援のみ
+      *****************************    の公費単独の場合退避
+      *****************************    MOVE    TOUKEI01-REC      TO
+      *****************************                WRK-KOH-TOUKEI01-REC
+      *****************************ELSE
+                                       MOVE    1           TO  FLG-SEIHO
+      *****************************END-IF
                                END-IF
                            ELSE
                                MOVE    1           TO  FLG-SEIHO
@@ -2370,10 +2401,12 @@ grpsys                                         SPA-AREA
                        CONTINUE
                    ELSE 
                        IF      TOUKEI01-HKNJANUM       =   SPACE
+      *                    公費単独の場合（生保、中国残留邦人等、自立支援）
                            IF    ( TOUKEI01-TKOHHKNNUM (1) =
                                                    "012"   OR  "025"
                                                OR  "015"   OR  "016"
                                                OR  "021"            )
+      *                        同じ公費の公費単独の場合
                                IF    ( TOUKEI01-TKOHHKNNUM  (2)
                                                     =
                                            TOUKEI01-TKOHHKNNUM (1) 
@@ -2387,6 +2420,18 @@ grpsys                                         SPA-AREA
                                            TOUKEI01-TKOHHKNNUM (1) 
                                                            OR  SPACE )
                                    MOVE    1           TO  FLG-WRITE
+                               ELSE
+                                   IF      FLG-SEIHO            =   1
+                                       CONTINUE
+                                   ELSE 
+                                      MOVE    1           TO  FLG-WRITE
+                                   END-IF
+                               END-IF
+                           ELSE
+                               IF      FLG-SEIHO            =   1
+                                   CONTINUE
+                               ELSE 
+                                  MOVE    1           TO  FLG-WRITE
                                END-IF
                            END-IF
                        ELSE
@@ -2395,16 +2440,14 @@ grpsys                                         SPA-AREA
                   END-IF
                END-IF
       *
-      *        社保で生保併用の場合
+      *        社保で公費併用の場合（生保、中国残留邦人等、自立支援）
                IF    ( TOUKEI01-HKNNUM   NOT =   SPACE )
                AND   ( TOUKEI01-TKOHHKNNUM (1)
                                            =   "012"   OR  "025"   OR 
-                       TOUKEI01-TKOHHKNNUM (2)
-                                           =   "012"   OR  "025"   OR 
-                       TOUKEI01-TKOHHKNNUM (3)
-                                           =   "012"   OR  "025"   OR 
-                       TOUKEI01-TKOHHKNNUM (4)
-                                           =   "012"   OR  "025" )
+                                               "015"   OR  "016"   OR
+                                               "021"                  )
+               AND   ( TOUKEI01-TKOHHKNNUM (2)
+                                           =   SPACE                  )
                    IF      TOUKEI01-HKNNUM   =
                                                "060"   OR  "067"   OR
                                                "068"   OR  "069"   OR
@@ -2421,6 +2464,7 @@ grpsys                                         SPA-AREA
                                            =   TOUKEI01-TKOHID (IDYY)
                                    MOVE    1           TO
                                        TBL-SEIHO-TOUKEI01-PRTFLG  (IDA)
+                                   MOVE    1           TO  WRK-SEIHO-FLG
                                    PERFORM VARYING IDB FROM    1   BY  1
                                            UNTIL   IDB >       10
                                        IF      WRK-TOUKEI01-SEIHO-KEY
@@ -2486,42 +2530,73 @@ grpsys                                         SPA-AREA
                END-IF
            END-PERFORM
       *
-      *    生保単独レセの出力処理
-           IF      TBL-SEIHO-TOUKEI01-MAX    >   ZERO
-               PERFORM VARYING IDXX    FROM    1   BY  1
-                       UNTIL   IDXX    >       TBL-SEIHO-TOUKEI01-MAX
-                   IF      TBL-SEIHO-TOUKEI01-PRTFLG (IDXX)
-                                           =   1
-                       CONTINUE
-                   ELSE
-                       MOVE    TBL-SEIHO-TOUKEI01-REC (IDXX)
-                                               TO  TOUKEI01-REC
-      *                レセプト種別
-                       PERFORM 20021-RECESYUBETU-SET-SEC
+      *    公費単独レセの出力処理
+           IF    ( WRK-SEIHO-FLG           =   ZERO )
+           AND   (  WRK-KOH-TOUKEI01-HOSPNUM
+                                           >   ZERO )
+      *        主保険とのまとめがなく生保、中国残留邦人等、自立支援以外との
+      *        公費単独の場合
+               MOVE    WRK-KOH-TOUKEI01-REC  TO  TOUKEI01-REC
+      *        レセプト種別
+               PERFORM 20021-RECESYUBETU-SET-SEC
       *
-                       MOVE    WRK-TOUKEI01-SEIHO-OCC (IDXX)
-                                               TO  TOUKEI01-SEIHO-OCC
-                       WRITE   TOUKEI01-REC
+      *???     MOVE    WRK-TOUKEI01-SEIHO-OCC (IDXX)
+      *???                                   TO  TOUKEI01-SEIHO-OCC
+               WRITE   TOUKEI01-REC
       *
-                       IF      STS-TOUKEI01        =   "00"
+               IF      STS-TOUKEI01        =   "00"
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-TOUKEIERR
+                   STRING  "月次統計データ（基本情報）"
+                                               DELIMITED  BY  SIZE
+                           "書き込みエラー STS="
+                                               DELIMITED  BY  SIZE
+                           STS-TOUKEI01    DELIMITED  BY  SIZE
+                                           INTO    WRK-TOUKEIERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+                   PERFORM 500-COBABORT-SEC
+               END-IF
+      *
+               ADD     1                TO  CNT-TOUKEI01
+           ELSE
+               IF      TBL-SEIHO-TOUKEI01-MAX    >   ZERO
+                   PERFORM VARYING IDXX    FROM    1   BY  1
+                           UNTIL   IDXX    >   TBL-SEIHO-TOUKEI01-MAX
+                       IF      TBL-SEIHO-TOUKEI01-PRTFLG (IDXX)
+                                               =   1
                            CONTINUE
                        ELSE
-                           MOVE    SPACE               TO  WRK-TOUKEIERR
-                           STRING
-                               "月次統計データ（基本情報）"
-                                                   DELIMITED  BY  SIZE
-                               "書き込みエラー STS="
-                                                   DELIMITED  BY  SIZE
-                               STS-TOUKEI01        DELIMITED  BY  SIZE
-                                                   INTO    WRK-TOUKEIERR
-                           END-STRING
-                           PERFORM 500-ERR-HENSYU-SEC
-                           PERFORM 500-COBABORT-SEC
-                       END-IF
+                           MOVE    TBL-SEIHO-TOUKEI01-REC (IDXX)
+                                               TO  TOUKEI01-REC
+      *                    レセプト種別
+                           PERFORM 20021-RECESYUBETU-SET-SEC
       *
-                       ADD     1                    TO  CNT-TOUKEI01
-                   END-IF
-               END-PERFORM
+                           MOVE    WRK-TOUKEI01-SEIHO-OCC (IDXX)
+                                               TO  TOUKEI01-SEIHO-OCC
+                           WRITE   TOUKEI01-REC
+      *
+                           IF      STS-TOUKEI01        =   "00"
+                               CONTINUE
+                           ELSE
+                               MOVE    SPACE           TO  WRK-TOUKEIERR
+                               STRING
+                                   "月次統計データ（基本情報）"
+                                                   DELIMITED  BY  SIZE
+                                   "書き込みエラー STS="
+                                                   DELIMITED  BY  SIZE
+                                   STS-TOUKEI01    DELIMITED  BY  SIZE
+                                                   INTO    WRK-TOUKEIERR
+                               END-STRING
+                               PERFORM 500-ERR-HENSYU-SEC
+                               PERFORM 500-COBABORT-SEC
+                           END-IF
+      *
+                           ADD     1                TO  CNT-TOUKEI01
+                       END-IF
+                   END-PERFORM
+               END-IF
            END-IF
       *
       *    病名ファイル出力処理
