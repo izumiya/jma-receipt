@@ -38,6 +38,6 @@
                05  HCM31S01-OT-MAX         PIC  9(05).
                05  HCM31S01-OT-OCC         OCCURS  100.
                    07  HCM31S01-NYKNYMD    PIC  X(08).
-                   07  HCM31S01-KINGAKU    PIC  9(10).
-                   07  HCM31S01-BFKINGAKU  PIC  9(10).
+                   07  HCM31S01-KINGAKU    PIC  S9(10).
+                   07  HCM31S01-BFKINGAKU  PIC  S9(10).
       *
