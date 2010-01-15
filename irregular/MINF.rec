@@ -1,0 +1,38 @@
+MINF	{
+	fixed32	{
+		B06	{
+			state   int;
+		};
+		B07	{
+			state   int;
+		};
+		LABEL	{
+			value	varchar(06);
+		};
+		TAISYOYMD	{
+			value	varchar(22);
+		};
+		scrolledwindow26	{
+			hpos	int;
+			vpos	int;
+			LIST	{
+				count	int;
+				row	int;
+				item	{
+					value0	varchar(6);
+					value1	varchar(22);
+					value2	varchar(18);
+					value3	varchar(2);
+					value4	varchar(2);
+					value5	varchar(2);
+					value6	varchar(60);
+					value7	varchar(10);
+				}	[100];
+				select	bool[100];
+			};
+		};
+		SRYYMD	{
+			value	varchar(9);
+		};
+	};
+};

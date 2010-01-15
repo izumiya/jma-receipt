@@ -616,6 +616,7 @@ DB_files = \
 	tbl_syunou_nyuin.db \
 	tbl_chkreigai.db \
 	tbl_bunben.db \
+	tbl_infection.db \
 
 
 all:   

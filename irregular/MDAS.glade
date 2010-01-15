@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>MDAS</name>
+  <program_name>MDAS</program_name>
+  <directory></directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <gnome_support>True</gnome_support>
+  <gtkpanda_support>False</gtkpanda_support>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>MDAS</name>
+  <width>740</width>
+  <height>600</height>
+  <signal>
+    <name>map_event</name>
+    <handler>map_event</handler>
+    <last_modification_time>Fri, 26 Jan 2001 04:22:31 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>set_focus</name>
+    <handler>set_focus</handler>
+    <last_modification_time>Fri, 26 Jan 2001 04:22:42 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>delete_event</name>
+    <handler>gtk_true</handler>
+    <last_modification_time>Mon, 25 Nov 2002 06:01:39 GMT</last_modification_time>
+  </signal>
+  <title>(MDAS)参加同意</title>
+  <type>GTK_WINDOW_DIALOG</type>
+  <position>GTK_WIN_POS_CENTER</position>
+  <modal>True</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>False</allow_grow>
+  <auto_shrink>False</auto_shrink>
+  <wmclass_class>jma-receipt.dialog</wmclass_class>
+
+  <widget>
+    <class>GtkFixed</class>
+    <name>fixed1</name>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>B08</name>
+      <x>384</x>
+      <y>552</y>
+      <width>144</width>
+      <height>32</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>0</modifiers>
+	<key>GDK_F8</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
+      </signal>
+      <label>F8 同意する</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label4</name>
+      <x>32</x>
+      <y>352</y>
+      <width>42</width>
+      <height>16</height>
+      <label></label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>B01</name>
+      <x>32</x>
+      <y>552</y>
+      <width>80</width>
+      <height>32</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>0</modifiers>
+	<key>GDK_F1</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Fri, 09 Oct 2009 07:50:13 GMT</last_modification_time>
+      </signal>
+      <label>F1 戻る</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>B05</name>
+      <x>192</x>
+      <y>552</y>
+      <width>144</width>
+      <height>32</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>0</modifiers>
+	<key>GDK_F5</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Wed, 21 Oct 2009 04:38:57 GMT</last_modification_time>
+      </signal>
+      <label>F5 同意しない</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label6</name>
+      <x>32</x>
+      <y>8</y>
+      <width>672</width>
+      <height>24</height>
+      <label>定点調査研究事業（定点調査）および感染症サーベイランス（感染症サーベイ）に参加される場合は、</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label8</name>
+      <x>32</x>
+      <y>32</y>
+      <width>664</width>
+      <height>24</height>
+      <label>下記の内容をお読みいただき、同意した上で申請画面へ進んでください。</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow1</name>
+      <x>32</x>
+      <y>72</y>
+      <width>680</width>
+      <height>456</height>
+      <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+      <widget>
+	<class>GtkPandaText</class>
+	<name>text1</name>
+	<width>784</width>
+	<height>556</height>
+	<can_focus>True</can_focus>
+	<editable>False</editable>
+	<text>■■ 定点調査／感染症サーベイにおける情報の保護方針 ■ ■
+
+■ 適用範囲 ■
+　当セキュリティポリシーは、ユーザが定点調査研究事業および感染症サーベイランス等の研究事業
+（以下本研究事業）に参加する間適用されます。また、ユーザが本研究事業に参加される際に当方が
+お預かりした申請情報及び収集データは、当ポリシーに従って管理されます。
+
+■ 情報の利用について ■
+
+申請時に収集した情報は、以下の目的の範囲内で利用いたします。
+
+ * 本研究事業における統計処理（地域情報及び申請書の「各種情報」欄に記載された情報（診療科、
+   設置主体、病床数、病院種別）
+ * 本研究事業参加ユーザに対するプロジェクトの普及状況・傾向の報告
+ * トラブル・問い合わせの際に、迅速なサポートを実現する為
+
+収集の対象（収集データ）は日レセに保存された情報のうち、医療機関のプロフィールと月次レセプ
+ト情報から患者個人が特定できる部分が削除されていますが、これらの一次情報は統計処理にのみ利
+用されます。
+
+■ 情報の管理について ■
+
+申請いただいた情報及び収集データへの不正アクセスや漏洩、滅失、き損その他医療機関の個人情報
+の安全管理のために必要かつ適切と考えられる対策を講じます。
+
+■ SSLについて ■
+
+　安全な通信を確保して、収集データの送信を行っていただくために、「ORCAプロジェクト認証局」
+より発行された「SSLサーバ証明書」を利用しています。日レセを設置しているコンピュータには
+「ORCAプロジェクト認証局CA証明書」がインストールされています。
+
+　「SSLサーバ証明書」を利用して、以下のネットワーク上の危険性を防ぎ、安全な通信がおこなえる
+環境を提供しています。
+
+ * 成りすましの防止
+SSLサーバ証明書を認証する事により、通信先のサーバが実在する当方のサーバに間違いないことを確
+認しています。
+
+ * 盗聴の防止
+証明書の中の公開鍵を使用して暗号化した通信（SSL通信）によって、外部からデータを読み取れない
+ようにいたします。
+
+■ ポリシーの改訂について ■
+
+　当セキュリティポリシーの改定の必要が生じた場合には、事前に連絡の上、定点調査研究事業のWeb
+サイトにて通知いたします。
+</text>
+	<xim_enabled>False</xim_enabled>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkPandaTimer</class>
+      <name>pandatimer1</name>
+      <x>120</x>
+      <y>552</y>
+      <width>21</width>
+      <height>21</height>
+      <signal>
+	<name>timeout</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Thu, 04 Sep 2008 08:10:17 GMT</last_modification_time>
+      </signal>
+      <duration>5</duration>
+    </widget>
+  </widget>
+</widget>
+
+</GTK-Interface>

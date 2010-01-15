@@ -1,0 +1,104 @@
+MUIDP	{
+	fixed3	{
+		HOSPID	{
+			value	varchar(24);
+		};
+		SINSEIYMD	{
+			value	varchar(9);
+		};
+		KANANAME	{
+			value	varchar(50);
+		};
+		NAME	{
+			value	varchar(50);
+		};
+		EMAIL	{
+			value	varchar(256);
+		};
+		HOSPSBTCOMBO	{
+			HOSPSBT	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[5];
+		};
+		HOSPSBT1COMBO	{
+			HOSPSBT1	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[2];
+		};
+		BEDSUIPPAN	{
+			value	number(4);
+		};
+		BEDSURYOYO	{
+			value	number(4);
+		};
+		BEDSUSEISIN	{
+			value	number(4);
+		};
+		BEDSUKEKKAKU	{
+			value	number(4);
+		};
+		BEDSU	{
+			value	number(4);
+		};
+		SETTICOMBO	{
+			SETTI	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[6];
+		};
+		SYUKACOMBO	{
+			SYUKA	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[50];
+		};
+		CIIKICOMBO	{
+			CIIKI	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[2];
+		};
+		DPCKBNCOMBO	{
+			DPCKBN	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[2];
+		};
+		ZAITAKUCOMBO	{
+			ZAITAKU	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[2];
+		};
+		KAIINYM	{
+			value	varchar(6);
+		};
+		POST	{
+			value	varchar(7);
+		};
+		PREF	{
+			value	varchar(18);
+		};
+		ADRS	{
+			value	varchar(34);
+		};
+		USER	{
+			value	varchar(7);
+		};
+		PASSWORD	{
+			value	varchar(100);
+		};
+		pandatimer1     {
+			duration        int;
+		};
+	};
+};
