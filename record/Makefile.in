@@ -578,6 +578,7 @@ DB_files = \
 	tbl_cron.db \
 	tbl_onrece_kanri.db \
 	tbl_onrece_body.db \
+	tbl_infection.db \
 
 
 all:   

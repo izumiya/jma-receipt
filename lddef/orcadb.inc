@@ -134,5 +134,6 @@ db	{
 	tbl_cron;
 	tbl_onrece_kanri;
 	tbl_onrece_body;
+	tbl_infection;
 
 };

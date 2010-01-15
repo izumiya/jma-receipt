@@ -1,0 +1,59 @@
+#! /usr/bin/ruby
+
+####    $:.unshift(File.dirname(__FILE__) + "/lib")
+
+require "csv"
+
+####    require "orcadas/utils"
+
+require "/usr/lib/jma-receipt/scripts/monthly/lib/orcadas/utils"
+
+module OrcaDAS
+  class Command
+    def initialize()
+      @config = self.load_config
+      if @config.nil? || @config.length <= 0 || @config["Host"].nil?
+        raise "101 config failure"
+      end
+    end
+
+    def profile(config=@config)
+      CSV.open(CSV_PROFILE, 'w') do |prof|
+        prof << [
+	  config["HospitalID"][3,12],
+	  config["ApplicationDay"],
+	  config["ClerkNameKana"],
+	  config["ClerkName"],
+	  config["ClerkEmail"],
+	  config["HospitalClass"],
+	  config["GeneralHospital"],
+	  config["SickbedGeneral"],
+	  config["SickbedMedTreatment"],
+	  config["SickbedMental"],
+	  config["SickbedTuberculosis"],
+	  config["SickbedTotal"],
+	  config["MainlyInstall"],
+	  config["MainlyMedDepartment"],
+	  config["CommunityMed"],
+	  config["DPC"],
+	  config["HomeMedCare"],
+	  config["OpeningTime"]+"01",
+	  config["User"],
+	  config["Agreement"],
+	  config["Postcode"]
+	]
+      end
+      STDERR.puts CSV_PROFILE + " created."
+    end
+
+    def self.main
+      das = self.new
+      das.profile
+    end
+
+  end
+end
+
+CLIENT_CONFIG_FILE = ENV['CLIENT_CONFIG_FILE']
+CSV_PROFILE = ENV['CSV_PROFILE']
+OrcaDAS::Command.main if $0 == __FILE__

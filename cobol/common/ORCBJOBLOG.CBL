@@ -127,7 +127,8 @@ grpsys COPY    "COMMON-SPA".
       *
            PERFORM 2001-JOBLOG-SET-SEC
       *
-           IF    ( WRK-PARA-PROGNAME   =  "das-check" )
+           IF    ( WRK-PARA-PROGNAME   =  "das-check"
+                                      OR  "das-profile" )
            AND   ( WRK-PARA-KBNID      =  "D" )
                PERFORM 2002-JOBLOG-DELETE-1-SEC
            ELSE

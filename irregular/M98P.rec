@@ -1,0 +1,27 @@
+M98P	{
+	fixed32	{
+		scrolledwindow26	{
+			hpos	int;
+			vpos	int;
+			LIST	{
+				count	int;
+				row	int;
+				item	{
+					value0	varchar(3);
+					value1	varchar(9);
+					value2	varchar(9);
+					value3	varchar(10);
+					value4	varchar(6);
+					value5	varchar(7);
+					value6	varchar(3);
+					value7	varchar(6);
+					value8	varchar(35);
+				}	[100];
+				select	bool[100];
+			};
+		};
+		B09	{
+			label	varchar(10);
+		};
+	};
+};

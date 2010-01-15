@@ -1,0 +1,29 @@
+M99P	{
+	fixed6	{
+		B01     {
+			 state   int;
+		 };
+		MSG	{
+			value	varchar(80);
+		};
+		scrolledwindow28	{
+			JOBKANRILST	{
+				count	int;
+				row int;
+				rowattr int;
+				item	{
+					value1	varchar(7);
+					value2	varchar(20);
+					value3	varchar(8);
+					value4	varchar(8);
+					value5  varchar(10);
+					value6	varchar(100);
+				}	[30];
+				select	bool[30];
+			};
+		};
+		pandatimer1     {
+			duration        int;
+		};
+	};
+};
