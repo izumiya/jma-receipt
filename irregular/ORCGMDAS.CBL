@@ -86,8 +86,6 @@
        01  WRK-DATA-REC2.
            03  FILLER             PIC X(45)   VALUE
                '"Host" => "https://orca-das.orca.med.or.jp",'.
-      *     03  FILLER              PIC X(33)   VALUE
-      *         '"Host" => "https://192.168.1.33",'.
        01  WRK-DATA-REC3.
            03  FILLER              PIC X(33)   VALUE
                '"Path" => "/orca_das/upload.cgi",'.
@@ -102,8 +100,6 @@
                '"CertificateCAFile" => '.
            03  FILLER             PIC X(39)   VALUE
                '"/etc/ssl/certs/orca-project-ca-1.crt",'.
-      *     03  FILLER              PIC X(38)   VALUE
-      *         '"/etc/ssl/certs/nacl-survey-ca-1.pem",'.
        01  WRK-DATA-REC5.
            03  FILLER              PIC X(17)   VALUE
                '"HospitalID" => "'.

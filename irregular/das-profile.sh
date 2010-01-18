@@ -30,12 +30,13 @@ LOGFILE=/var/log/jma-receipt/"$HOSPNUM"das-profile.log
 DATE=$(date +'%Y%m%d')
 
 confupdate (){
+  TEMP=$(mktemp)
   cat $CLIENT_CONFIG_FILE | \
   sed -e '/"SendResult"/c\"SendResult" => "@RESULT@",' | \
   sed -e '/"SendDate"/c\"SendDate" => "@DATE@"' | \
   sed -e "s/@RESULT@/$1/" | \
-  sed -e "s/@DATE@/$DATE/" | \
-  cat > $CLIENT_CONFIG_FILE
+  sed -e "s/@DATE@/$DATE/" > $TEMP
+  mv $TEMP $CLIENT_CONFIG_FILE
 }
 
 if ! [ -d $DASDIR/${HOSPNUM} ]; then 
