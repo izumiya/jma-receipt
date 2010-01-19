@@ -94,6 +94,7 @@
            03  SPA-NAI-AREA.
                05  SPA-NAI-SELFLG          PIC 9(01).
                05  SPA-NAI-SELNUM          PIC 9(04).
+               05  SPA-NAI-UPDOWN          PIC 9(01).
       ****     05  SPA-NAI-IRYID           PIC X(10).
       ****     05  SPA-NAI-MOTOPG          PIC X(08).
       *
@@ -289,6 +290,9 @@
       *
       *    保険年齢・負担割合算定サブ
            COPY    "CPORCSAGECHK.INC".
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
       *
            COPY    "MCPDATA.INC".
       **** COPY    "CPORCMCP.INC".
@@ -609,6 +613,7 @@
            MOVE    WRK-IDY            TO  SPA-WRK-NO     (WRK-IDY)
            MOVE    SPA-WRK-TBL        TO  SPA-GMN-TBL2   (1)
       *
+           MOVE    1                  TO  SPA-NAI-UPDOWN
       *
            IF  WRK-IDX                >   1
                COMPUTE     WRK-IDX    =   WRK-IDX  -   1
@@ -657,6 +662,7 @@
            MOVE    WRK-IDY            TO  SPA-WRK-NO     (WRK-IDY)
            MOVE    SPA-WRK-TBL        TO  SPA-GMN-TBL2   (1)
       *
+           MOVE    1                  TO  SPA-NAI-UPDOWN
       *
            COMPUTE     WRK-IDX        =   WRK-IDX  +   1
            .
@@ -980,7 +986,9 @@
        210-BACK                    SECTION.
       *
       *    受付ファイルｓｏｒｔｋｅｙセット
-           PERFORM 503-JYUSIN-RWT-SEC
+           IF      SPA-NAI-UPDOWN      =   1
+               PERFORM 503-JYUSIN-RWT-SEC
+           END-IF
       *
       *    予約からの時、内容の保存
            IF      SPA-NAI-MOTOPG      =   "Y01"
@@ -1010,6 +1018,11 @@
       *    選択一覧処理
       *****************************************************************
        490-U012-SYORI-SEC             SECTION.
+      *
+      *    受付ファイルｓｏｒｔｋｅｙセット
+           IF      SPA-NAI-UPDOWN      =   1
+               PERFORM 503-JYUSIN-RWT-SEC
+           END-IF
       *
            INITIALIZE                      SPA-U012-AREA
       *
@@ -1285,6 +1298,7 @@
            MOVE    ZERO                TO  SPA-GMN-MAX(1)
                                            SPA-GMN-MAX(2)
            MOVE    ZERO                TO  SPA-GMN-PAGE
+           MOVE    ZERO                TO  SPA-NAI-UPDOWN
       *
            MOVE  ZERO                 TO  IDX.
            MOVE  ZERO                 TO  IDX2.
@@ -1801,6 +1815,12 @@
       *****************************************************************
        503-JYUSIN-RWT-SEC              SECTION.
       *
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+      *
+           MOVE    ZERO                TO  IDY
            PERFORM VARYING   IDX      FROM    1   BY  1
                    UNTIL     IDX          >   SPA-GMN-MAX(1)
                INITIALIZE                  UKETUKE-REC
@@ -1825,14 +1845,21 @@
                MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 990-DBCLOSE-SEC
                IF        FLG-UKETUKE       =   ZERO
-                   MOVE    IDX                 TO  UKE-HYOJIJUN
-                   MOVE    UKETUKE-REC         TO  MCPDATA-REC
-                   MOVE    "DBUPDATE"          TO  MCP-FUNC
-                   MOVE    "tbl_uketuke"       TO  MCP-TABLE
-                   MOVE    "key"               TO  MCP-PATHNAME
-grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
-                                                       MCPDATA-REC
-                                                       SPA-AREA
+                   IF      UKE-KAIKEITIME      =   ZERO
+                       ADD     1                   TO  IDY
+                       MOVE    IDY                 TO  UKE-HYOJIJUN
+      *
+                       MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
+                       MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
+      *
+                       MOVE    UKETUKE-REC         TO  MCPDATA-REC
+                       MOVE    "DBUPDATE"          TO  MCP-FUNC
+                       MOVE    "tbl_uketuke"       TO  MCP-TABLE
+                       MOVE    "key"               TO  MCP-PATHNAME
+grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                           MCPDATA-REC
+                                                           SPA-AREA
+                   END-IF
                END-IF
            END-PERFORM
            .
