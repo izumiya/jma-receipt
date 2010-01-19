@@ -330,6 +330,7 @@
       *
       *        感染症報告処理起動
                IF      WRK-MOTOPG          =   SPACE
+                                           OR  "M95"
                    PERFORM 800-INFECTION-SEC
                END-IF
       *
@@ -404,6 +405,7 @@
                                        OR  "M95"
                                        OR  "MVER"
                                        OR  "KT01"
+                                       OR  "M98P"
                MOVE    SPA-SYSYMDWH        TO  WRK-WSYSYMDH
                MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
                MOVE    SPA-SYSYMDW         TO  WRK-WYMD
