@@ -396,6 +396,7 @@
                                        OR  "M01N"
                                        OR  "M95"
                                        OR  "MVER"
+                                       OR  "M98P"
                MOVE    SPA-SYSYMDWH        TO  WRK-WSYSYMDH
                MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
                MOVE    SPA-SYSYMDW         TO  WRK-WYMD
