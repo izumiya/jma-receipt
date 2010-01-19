@@ -45,6 +45,8 @@
       *
       *    ¥Ø¥ë¥×¶¦ÄÌ¥Ñ¥é¥á¥¿
            COPY    "N41COMMON-SPA".
+      *    ¥¹¥ÑÎÎ°è
+           COPY    "M00COMMON-SPA".
       *
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
@@ -94,6 +96,7 @@
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-WORK        TO  SPA-N41KYOUTU
+           MOVE    SPA-WORK        TO  SPA-M00KYOUTU
       * 
            EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
                WHEN    "LINK"          ALSO    ANY
@@ -104,6 +107,9 @@
            END-EVALUATE.
       *
            MOVE    SPA-N41KYOUTU   TO  SPA-WORK
+	   IF      SPA-SAKIPG(1:1) =   "M"
+               MOVE    SPA-M00KYOUTU   TO  SPA-WORK
+           END-IF
            MOVE    SPA-AREA        TO  SPA-COMMON
       *
            .
@@ -127,10 +133,12 @@
       *        Ìá¤ë
                WHEN    "CLICKED"       ALSO    "B01"
                    MOVE    SPACE           TO  SPA-N41ID1-FLG
+                   MOVE    SPACE           TO  SPA-MID1-FLG
                    PERFORM 210-BACK
       *     ÅÐÏ¿
                WHEN    "CLICKED"       ALSO    "B12"
                    MOVE    "OK"            TO  SPA-N41ID1-FLG
+                   MOVE    "OK"            TO  SPA-MID1-FLG
                    PERFORM 210-BACK
            END-EVALUATE
       *

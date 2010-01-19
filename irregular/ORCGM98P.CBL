@@ -360,8 +360,10 @@
                    PERFORM 330-MDAS-SET-SEC
       *             GO      TO      300-SCREEN-EXT
                WHEN    "MUIDP"
-                   PERFORM 490-SETTEI-SYORI-SEC
-      *            GO      TO      300-SCREEN-EXT
+                   IF      SPA-MID1-FLG     =   "OK"
+                       PERFORM 490-SETTEI-SYORI-SEC
+                   END-IF
+      *             GO      TO      300-SCREEN-EXT
            END-EVALUATE
       *
       *    Â¾¤Î£Ì£Ä¤è¤ê

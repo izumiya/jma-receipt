@@ -18,6 +18,12 @@ module OrcaDAS
     end
 
     def profile(config=@config)
+      kaisetu = ""
+      if config["OpeningTime"].length == 0 || config["OpeningTime"] == ""
+        kaisetu = ""
+      else
+        kaisetu = config["OpeningTime"]+"01"
+      end
       CSV.open(CSV_PROFILE, 'w') do |prof|
         prof << [
 	  config["HospitalID"][3,12],
@@ -37,7 +43,7 @@ module OrcaDAS
 	  config["CommunityMed"],
 	  config["DPC"],
 	  config["HomeMedCare"],
-	  config["OpeningTime"]+"01",
+	  kaisetu,
 	  config["User"],
 	  config["Agreement"],
 	  config["Postcode"]
