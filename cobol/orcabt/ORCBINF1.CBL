@@ -125,7 +125,7 @@
       *    出力データ編集用
            03  WRK-REC                         PIC X(3000).
            03  WRK-REC-LENGTH                  PIC 9(04).
-           03  WRK-HENSYU-AREA.
+           03  WRK-DATA-HENSYU-AREA.
                05  WRK-DATA                    PIC X(200).
                05  WRK-NUM                     PIC ZZZZZZZZZ9.999.
                05  WRK-NAGASA                  PIC 9(03).
