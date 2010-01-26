@@ -10370,7 +10370,13 @@
       *
       *    Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤ÏµßÌ¿µßµÞÆþ±¡ÎÁ¤ò£±Æü¡Á£³Æü¡¢£´Æü¡Á£·Æü¡¢
       *    £¸Æü¡Á£±£´Æü¤Ç¤ÎÅÀ¿ô¹ï¤ß¤È¤¹¤ë
-           IF    SPA-NAI-I01-NYUINYMD    >=    "20080401"
+           IF    (SPA-NAI-I01-NYUINYMD    >=     "20080401")  AND
+                 (SYOKIKSN-IN-KHNSRYCD     =     "190024510"  OR
+                                                 "190110210"  OR
+                                                 "190110310"  OR
+                                                 "190024310"  OR
+                                                 "190110410"  OR
+                                                 "190110510")
              PERFORM    4801-TOKUTEI-NYUIN-3-7-14-SEC
       *
              IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
