@@ -41,6 +41,9 @@
       *  04.03.03    NACL-Æ£¸¶    08/08/29  µ­¹æÈÖ¹æ¤Îµ­ºÜÊýË¡¤ÎÊÑ¹¹
       *  04.03.04    NACL-Æ£¸¶    09/01/16  ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê¤ÎÊÑ¹¹
       *  04.03.05    NACL-ÌçÏÆ    09/02/04  ÀÁµáÅÀ¤¬£°¤Î¾ì¹ç¤ÎÂÐ±þ
+      *
+      *  04.04.01    NACL-ÌçÏÆ    10/01/29  ÀÁµá´ÉÍý£¹£²ÆÃÄêÆþ±¡ÎÁ¡¦²Ã»»
+      *                                     ¹àÌÜÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2902,6 +2905,8 @@ grpsys     MOVE    RECE200-HOSPNUM     TO  RECE10-HOSPNUM
            MOVE    RECE200-SEIKANKEI     TO  RECE10-TENSU  (30 1)
       *
       *    £¹£²ÆÃÄêÆþ±¡ÎÁ¡¦²Ã»»
+           MOVE    ZERO    TO    RECE10-KAISU(31)
+           MOVE    ZERO    TO    RECE10-TENSU(31 1)
            PERFORM   VARYING   IDY   FROM    1   BY  1
                      UNTIL     IDY       >   10
                      OR        RECE200-NYUTOKNISSU(IDY)  =   ZERO

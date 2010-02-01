@@ -438,6 +438,7 @@
       *  04.04.34    NACL-門脇    10/01/04  月途中に医保と更生等の併用から
       *                                     更生等単独になったときの対応
       *  04.04.35    NACL-門脇    10/01/13  剤まとめ項目値の計算修正
+      *  04.04.36    NACL-門脇    10/01/29  内服薬剤逓減編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1084,6 +1085,8 @@
            03  WRK-EDYMD                       PIC  X(08).
       *
            03  WRK-KOH-KINGAKU                 PIC  9(07).
+      *
+           03  WRK-SURYOU-COUNT                PIC  9(09).
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
@@ -1974,6 +1977,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE    88888880     TO      WRK-ZAINUM
       *
            INITIALIZE                   TBL-TOKUSYU-KEISAN
+      *
+           MOVE    ZERO         TO      WRK-SURYOU-COUNT
       *
            PERFORM     2117-GENGAKU-HANTEI-SEC
       *
@@ -5182,6 +5187,14 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                      (SRY-SRYCD    (IDX2)(1:3)     =   "008")
                     IF    RECE04-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE04-COMCDFLG
+                    END-IF
+                    IF    RECE04-COMCDFLG       =   "2"
+                      IF  SRY-SRYCD(IDX2)  =  "820000047"
+                        CONTINUE
+                      ELSE
+                        ADD   999               TO  WRK-SURYOU-COUNT
+                        ADD   WRK-SURYOU-COUNT  TO  RECE04-SURYOUTOTAL
+                      END-IF
                     END-IF
                END-IF
       *

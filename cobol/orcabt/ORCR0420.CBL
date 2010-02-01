@@ -174,6 +174,7 @@
       *  04.04.05    NACL-ÌçÏÆ    09/12/04  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.06    NACL-ÌçÏÆ    09/12/09  ½ÐÍè¹â»»Äê¡ÊºÞ¡Ë¤ÎÂÐ±þ
       *  04.04.07    NACL-ÌçÏÆ    10/01/13  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
+      *  04.04.08    NACL-ÌçÏÆ    10/01/29  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -543,6 +544,8 @@
            03  WRK-FUKA-VALUE                  PIC 9(01).
       *
            03  WRK-ZAITENNASHI                 PIC 9(09).
+      *
+           03  WRK-SURYOU-COUNT                PIC 9(09).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -1232,6 +1235,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
        210-HENSYU-SEC                   SECTION.
       *
            MOVE       ZERO       TO     WRK-ZAITENNASHI
+      *
+           MOVE       ZERO       TO     WRK-SURYOU-COUNT
       *
            IF      RECE41-HKNKBN   NOT  =   "3"
       *
@@ -2169,6 +2174,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      (SRY-SRYCD    (IDX2)(1:3)     =   "008")
                     IF    RECE44-COMCDFLG   NOT =   "3"
                         MOVE     "1"       TO    RECE44-COMCDFLG
+                    END-IF
+                    IF    RECE44-COMCDFLG       =   "3"
+                      IF  SRY-SRYCD(IDX2)  =  "820000047"
+                        CONTINUE
+                      ELSE
+                        ADD   999               TO  WRK-SURYOU-COUNT
+                        ADD   WRK-SURYOU-COUNT  TO  RECE44-SURYOUTOTAL
+                      END-IF
                     END-IF
                END-IF
       *
