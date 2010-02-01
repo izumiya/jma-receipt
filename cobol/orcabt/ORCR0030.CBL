@@ -439,6 +439,7 @@
       *                                     更生等単独になったときの対応
       *  04.04.35    NACL-門脇    10/01/13  剤まとめ項目値の計算修正
       *  04.04.36    NACL-門脇    10/01/29  内服薬剤逓減編集対応
+      *  04.04.37    NACL-門脇    10/02/01  大阪府地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8535,7 +8536,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  13 OR 08                ) AND
+           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27          ) AND
                 (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
@@ -8594,7 +8595,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  13 OR 08                ) AND
+           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27          ) AND
                 (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
@@ -8607,10 +8608,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (RECE02-SRYYM      <= "200803"                 ))
       *
             MOVE     ZERO    TO   FLG-KOHYONKAIME-NO
-            IF ((SYS-1001-PREFNUM   =  42                   ) AND
-                (SYU-KOH-HKNNUM(1)  = "186"                 ))
-            OR ((SYS-1001-PREFNUM   =  08                   ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"))
+      ***   IF ((SYS-1001-PREFNUM   =  42                   ) AND
+      ***       (SYU-KOH-HKNNUM(1)  = "186"                 ))
+      ***   OR ((SYS-1001-PREFNUM   =  08                   ) AND
+      ***       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"))
+      ***      MOVE   1      TO   FLG-KOHYONKAIME-NO
+      ***   END-IF
+            IF  (SYS-1001-PREFNUM   =  01            )
+            AND (SYU-SYUHKNNUM  NOT = "060" AND "067")
+            AND (SYU-KOH-HKNNUM(1)  = "141" OR "241" )
+            AND (IDZ                =  1             )
+            AND (RECE02-SRYYM      <= "200803"       )
+               CONTINUE
+            ELSE
                MOVE   1      TO   FLG-KOHYONKAIME-NO
             END-IF
             IF  (FLG-KOHYONKAIME-NO  =  ZERO)
