@@ -11100,6 +11100,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        49012111-SRYURRK-HEN-SEC           SECTION.
       *
            INITIALIZE                  SS002-AREA
+           MOVE    "3"                 TO  SS002-UPDKBN
            CALL    "ORCSS002"          USING    SS002-AREA
                                                 SYUNOU-REC
                                                 SPA-AREA
