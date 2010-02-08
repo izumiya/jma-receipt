@@ -29,6 +29,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-伊藤    10/ 2/ 8  数字編集小数点見直し
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -87,6 +88,8 @@
            03  CNT-INFEC                       PIC 9(06).
       *
        01  INDEX-AREA.
+           03  IDU                             PIC 9(03).
+           03  IDV                             PIC 9(03).
            03  IDW                             PIC 9(03).
            03  IDX                             PIC 9(03).
            03  IDY                             PIC 9(03).
@@ -127,7 +130,7 @@
            03  WRK-REC-LENGTH                  PIC 9(04).
            03  WRK-DATA-HENSYU-AREA.
                05  WRK-DATA                    PIC X(200).
-               05  WRK-NUM                     PIC ZZZZZZZZZ9.999.
+               05  WRK-NUM                     PIC ZZZZZZZZZ9.99999.
                05  WRK-NAGASA                  PIC 9(03).
                05  WRK-ST                      PIC 9(02).
                05  WRK-SYOSUU                  PIC 9(01).
@@ -1107,7 +1110,7 @@
            EXIT.
       *
       *****************************************************************
-      *    出力レコード処理（数字）ZZZZZZZZZ9.999の編集
+      *    出力レコード処理（数字）ZZZZZZZZZ9.99999の編集
       *****************************************************************
        4003-NUM-HENSYU-SEC         SECTION.
       *
@@ -1116,27 +1119,25 @@
            ELSE
       *        開始位置
                COMPUTE WRK-ST  =   11      -   WRK-NAGASA
-               IF      WRK-SYOSUU          >   ZERO
-                   COMPUTE WRK-ST  =   WRK-ST  +   WRK-SYOSUU
-                                               +   1
-               END-IF
       *
                PERFORM VARYING IDW FROM    WRK-ST    BY  1
                        UNTIL   IDW >       10
                    IF      WRK-NUM (IDW:1)   NOT =   SPACE
-                        COMPUTE IDZ     =    11  +   WRK-SYOSUU
-                                                 -   IDW
+                        COMPUTE IDZ     =    11  -   IDW
                         IF      WRK-SYOSUU       >   ZERO
-                            ADD     1                TO  IDZ
-                            IF  WRK-NUM(14:1)    =   "0"
-                                COMPUTE IDZ      =   IDZ   -   1
-                                IF  WRK-NUM(13:1) =  "0"
-                                    COMPUTE IDZ   =  IDZ   -   1
-                                    IF  WRK-NUM(12:1) =  "0"
-                                        COMPUTE IDZ   =  IDZ   -   2
-                                    END-IF
+                          COMPUTE IDU     =    11  + WRK-SYOSUU
+                          COMPUTE IDZ     =    IDU - IDW  +  1
+                          PERFORM VARYING IDV FROM   IDU  BY  -1
+                                  UNTIL   IDV <      12
+                            IF  WRK-NUM(IDV:1)   =   "0"
+                                COMPUTE IDZ      =   IDZ  -  1
+                                IF  IDV              =    12
+                                    COMPUTE IDZ      =    IDZ  -  1
                                 END-IF
+                            ELSE
+                                MOVE    11       TO  IDV
                             END-IF
+                          END-PERFORM
                         END-IF
                         STRING  WRK-REC(1:WRK-REC-LENGTH)
                                                  DELIMITED  BY  SIZE
