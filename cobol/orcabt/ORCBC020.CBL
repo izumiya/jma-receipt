@@ -30,6 +30,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  01.01.01    NACL-伊藤    08/ 4/28  Dカレンダーレコード追加
+      *  04.05.01    NACL-伊藤    10/01/28  小数点５桁対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -121,7 +122,8 @@
       *
       *01  PRGSKBNO                PIC X(08)  VALUE "20070809".
       *01  PRGSKBNO                PIC X(08)  VALUE "20080428".
-       01  PRGSKBNO                PIC X(08)  VALUE "20090327".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20090327".
+       01  PRGSKBNO                PIC X(08)  VALUE "20100128".
       *
       *    病院基本情報データ
            COPY    "CPCOMMONDAT5.INC"
@@ -170,6 +172,8 @@
            03  IDX                             PIC 9(03).
            03  IDY                             PIC 9(03).
            03  IDZ                             PIC 9(03).
+           03  IDU                             PIC 9(03).
+           03  IDV                             PIC 9(03).
            03  IDW                             PIC 9(03).
            03  IDX1                            PIC 9(03).
            03  IDX2                            PIC 9(03).
@@ -210,7 +214,7 @@
            03  WRK-REC-LENGTH          PIC 9(04).
            03  WRK-HENSYU-AREA.
                05  WRK-DATA            PIC X(200).
-               05  WRK-NUM             PIC ZZZZZZZZZ9.999.
+               05  WRK-NUM             PIC ZZZZZZZZZ9.99999.
                05  WRK-NAGASA          PIC 9(03).
                05  WRK-ST              PIC 9(02).
                05  WRK-SYOSUU          PIC 9(01).
@@ -1091,8 +1095,8 @@
            IF      WRK-REC(1:1)    NOT =   "C"
       *      数量
              MOVE    COLDAT02-SRYSURYO   TO  WRK-NUM
-             MOVE    8                   TO  WRK-NAGASA
-             MOVE    3                   TO  WRK-SYOSUU
+             MOVE    5                   TO  WRK-NAGASA
+             MOVE    5                   TO  WRK-SYOSUU
              PERFORM 5005-NUM-HENSYU-SEC
              IF      FLG-KOIHEAD       =   ZERO
       *        剤点数
@@ -1192,7 +1196,7 @@
            IF     (COLDAT02-TENSIKIBETU =  2)  OR
                   (FLG-SANSO            =  1)
                MOVE    COLDAT02-TEN    TO  WRK-NUM
-               MOVE    11              TO  WRK-NAGASA
+               MOVE    9               TO  WRK-NAGASA
                MOVE    2               TO  WRK-SYOSUU
                PERFORM 5005-NUM-HENSYU-SEC
            ELSE
@@ -1362,7 +1366,7 @@
            EXIT.
       *
       *****************************************************************
-      *    出力レコード処理（数字）ZZZZZZZZZ9.999の編集
+      *    出力レコード処理（数字）ZZZZZZZZZ9.99999の編集
       *****************************************************************
        5005-NUM-HENSYU-SEC          SECTION.
       *
@@ -1371,27 +1375,25 @@
            ELSE
       *        開始位置
                COMPUTE WRK-ST  =   11      -   WRK-NAGASA
-               IF      WRK-SYOSUU          >   ZERO
-                   COMPUTE WRK-ST  =   WRK-ST  +   WRK-SYOSUU
-                                               +   1
-               END-IF
       *
                PERFORM VARYING IDW FROM    WRK-ST    BY  1
                        UNTIL   IDW >       10
                    IF      WRK-NUM (IDW:1)   NOT =   SPACE
-                        COMPUTE IDZ     =    11  +   WRK-SYOSUU
-                                                 -   IDW
+                        COMPUTE IDZ     =    11  -   IDW
                         IF      WRK-SYOSUU       >   ZERO
-                            ADD     1                TO  IDZ
-                            IF  WRK-NUM(14:1)    =   "0"
-                                COMPUTE IDZ      =   IDZ   -   1
-                                IF  WRK-NUM(13:1) =  "0"
-                                    COMPUTE IDZ   =  IDZ   -   1
-                                    IF  WRK-NUM(12:1) =  "0"
-                                        COMPUTE IDZ   =  IDZ   -   2
-                                    END-IF
+                          COMPUTE IDU     =    11  + WRK-SYOSUU
+                          COMPUTE IDZ     =    IDU - IDW  +  1
+                          PERFORM VARYING IDV FROM   IDU  BY  -1
+                                  UNTIL   IDV <      12
+                            IF  WRK-NUM(IDV:1)   =   "0"
+                                COMPUTE IDZ      =   IDZ  -  1
+                                IF  IDV              =    12
+                                    COMPUTE IDZ      =    IDZ  -  1
                                 END-IF
+                            ELSE
+                                MOVE    11       TO  IDV
                             END-IF
+                          END-PERFORM
                         END-IF
                         STRING  WRK-REC(1:WRK-REC-LENGTH)
                                                  DELIMITED  BY  SIZE
