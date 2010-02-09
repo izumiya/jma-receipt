@@ -335,6 +335,9 @@
        01  WRK-YYK-REC.
            COPY    "CPYYK.INC"       REPLACING
                                      //YYK-// BY //WRK-YYK-//.
+      *    予約コメントマスター
+       01  YYKCOM-REC.
+           COPY    "CPYYKCOM.INC".
       *
       *    レセプトコメント
        01  RECECOM-REC.
@@ -3061,6 +3064,22 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "tbl_yyk"           TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
 grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+      *        予約コメント削除
+               INITIALIZE                      YYKCOM-REC
+               MOVE    YYK-HOSPNUM         TO  YYKCOM-HOSPNUM
+               MOVE    YYK-SRYNAIYO        TO  YYKCOM-SRYNAIYO
+               MOVE    YYK-DRCD            TO  YYKCOM-DRCD
+               MOVE    YYK-YYKYMD          TO  YYKCOM-YYKYMD
+               MOVE    YYK-YYKTIME         TO  YYKCOM-KEYYYKTIME
+               MOVE    YYK-YYKID           TO  YYKCOM-YYKID
+      *
+               MOVE    YYKCOM-REC          TO  MCPDATA-REC
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               MOVE    "tbl_yykcom"        TO  MCP-TABLE
+               MOVE    "del1"              TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
       *
