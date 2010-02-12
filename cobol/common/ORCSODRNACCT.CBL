@@ -1862,8 +1862,8 @@
       *
       *    特定入院料コードをサブプロより取得
            INITIALIZE                           ORCSTOKNYUIN-AREA
-           MOVE    PTNYUINRRK-TOKUTEI-KBN   TO  LNK-TOKNYUIN-KBN
-           MOVE    PTNYUINRRK-TOKUTEI-NYUIN TO  LNK-TOKNYUIN-NYUIN
+           MOVE    LNK-PTNYUINRRK-TOKUTEI-KBN   TO  LNK-TOKNYUIN-KBN
+           MOVE    LNK-PTNYUINRRK-TOKUTEI-NYUIN TO  LNK-TOKNYUIN-NYUIN
            MOVE    SYOKIKSN-IN-SANTEISTYMD(1:6)
                                             TO  LNK-TOKNYUIN-SANTEIYM
            CALL    "ORCSTOKNYUIN"      USING    ORCSTOKNYUIN-AREA
