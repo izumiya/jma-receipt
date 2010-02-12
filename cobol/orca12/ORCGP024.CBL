@@ -1146,7 +1146,9 @@
            PERFORM 500-SPA-PARA-TSYRRK-SEC
            PERFORM 500-SPA-PARA-TNKRRK-SEC
       *    ¸øÈñÉéÃ´
-           PERFORM 410131-KOHFTN-PARA-SEC
+           IF      SPA-GMN24-FTNSELNUM NOT =   ZERO
+               PERFORM 410131-KOHFTN-PARA-SEC
+           END-IF
       *
            .
        490-TOUROKU-EXT.
@@ -1634,9 +1636,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-GMN24-FTNSELNUM NOT =   SPA-MAE24-FTNSELNUM
              OR  ((SPA-MAE24-FTNSELNUM NOT =   SPACE   )  AND
                   (SPA-GMN24-FTNSELNUM     =   SPA-MAE24-FTNSELNUM))
+      *        Á°²ó¤¬Ì¤ÁªÂò¤Î»þ¡¢¹¹¿·¤Ê¤·
+               IF     (SPA-MAE24-FTNSELNUM     =   ZERO
+                                               OR  SPACE )
+                   CONTINUE
+               ELSE
+      *
                PERFORM 410131-KOHFTN-PARA-SEC
                IF      SPA-ERRCD       NOT =   SPACE
                    GO      TO      41013-FTNSELNUM-EXT
+               END-IF
                END-IF
            END-IF
       *
