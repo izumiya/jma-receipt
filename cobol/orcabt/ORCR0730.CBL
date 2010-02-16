@@ -76,6 +76,8 @@
       *                                      º∏À∏©°¶≤¨ª≥∏©
       *                                     £≤£∞£∞£π«Ø£∏∑Ó°¡£≤£∞£±£∞«Ø£±∑Ó¬–æ› 
       *  04.04.08    NACL-∆£∏∂    09/12/14  ≈¶Õ◊ÕÛµ≠∫‹§Œ≤˛ «ΩËÕ˝§ŒΩ§¿µ
+      *  04.04.09    NACL-ÃÁœ∆    10/02/16  •Ï•ªµ≠∫‹§∑§ §§√œ ˝∏¯»Ò§¨§¢§ÎæÏπÁ
+      *                                     §Œ ›∏±ÕÛ∞Ï…Ù…È√¥∂‚ ‘Ω∏¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -409,6 +411,8 @@
            03  WRK-HC06-HEAD4-G    PIC X(128).
       *
            03  WRK-SUM-TENSU       PIC S9(08).
+      *
+           03  WRK-TAIHI-FTNMONEY  PIC 9(09).
       *
            03  WRK-TOKKI           PIC X(02).
            03  WRK-TOKKI-X         PIC X(04).
@@ -2282,6 +2286,7 @@
                MOVE    RECE62X-TEKSTYMD    TO  KOHSKY-TEKSTYMD
            END-IF
       *
+           MOVE     999999999          TO  WRK-TAIHI-FTNMONEY
       *    •Ï•ª•◊•»ºÔ Ã§Ú¿¡µ·¥…Õ˝§Ë§Í ‘Ω∏
            INITIALIZE                      RECE10-REC
            MOVE    KOHSKY-KEY          TO  RECE10-KEY
@@ -2292,6 +2297,9 @@
                MOVE    MCPDATA-REC         TO  RECE10-REC
                MOVE    RECE10-RECESYUBETU  TO  KOHSKY-RECESYUBETU
                MOVE    RECE10-RECEKA       TO  KOHSKY-RECEKA
+               IF   RECE10-FLG (5)  NOT =  ZERO
+                 MOVE  RECE10-FTNMONEY(1)  TO  WRK-TAIHI-FTNMONEY
+               END-IF
            ELSE
                GO  TO  2002-KOHSKY-WRITE-EXT
            END-IF
@@ -2364,6 +2372,10 @@
                MOVE    RECE62X-SHOKUJIINF (IDX)
                                        TO  KOHSKY-SHOKUJIINF (IDX)
            END-PERFORM
+           IF  WRK-TAIHI-FTNMONEY  NOT = 999999999
+               MOVE    WRK-TAIHI-FTNMONEY
+                                       TO  KOHSKY-FTNMONEY(1)
+           END-IF
            MOVE    RECE62X-SHOSHINTIME TO  KOHSKY-SHOSHINTIME
            IF      RECE62X-KOUREI   =  "2" OR "3"
              EVALUATE  RECE62X-DISCOUNTTENTNK
@@ -8814,6 +8826,10 @@
       *    ∆√ƒÍº¿¥µ≈˘¬–æ›º‘
            IF      RECE62-RJNNYUKOHFTN (2)  NOT =  ZERO
                MOVE   RECE62-RJNNYUKOHFTN (2)  TO  RECE10-FLG (4)
+           END-IF
+      *    ∏¯»Ò¿¡µ·∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
+           IF      RECE62-RJNNYUKOHFTN (3)  NOT =  ZERO
+               MOVE   RECE62-RJNNYUKOHFTN (3)  TO  RECE10-FLG (5)
            END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
