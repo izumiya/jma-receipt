@@ -2094,7 +2094,8 @@
                MOVE    ZERO                TO  SANTEI-SRYKA
                MOVE    ZERO                TO  SANTEI-NYUGAIKBN
                MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
-               MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+      *******  MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+               MOVE    31                  TO  IDX-Y2
                PERFORM VARYING     IDD         FROM    1   BY  1
                        UNTIL      (IDD         >   IDX-Y2 )
                    MOVE    LNK-SC92-KT01-DAY (IDX-SN IDD)

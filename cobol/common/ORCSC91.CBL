@@ -819,9 +819,10 @@
                IF      WRK-SRYCD       =   LNK-SC91-KT01-SRYCD (IDX-SN)
                    INITIALIZE                  SANTEI-REC
                    MOVE    SPA-SRYYMD(1:6)     TO  SANTEI-SRYYM
-                   MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+      **********   MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+                   MOVE    31                  TO  IDX-Y2
                    PERFORM VARYING     IDD         FROM    1   BY  1
-                           UNTIL      (IDD         >=  IDX-Y2 )
+                           UNTIL      (IDD         >   IDX-Y2 )
                        MOVE    LNK-SC91-KT01-DAY (IDX-SN IDD)
                                                    TO  SANTEI-DAY (IDD)
                        ADD     SANTEI-DAY (IDD)    TO  SANTEI-MSANTEICNT
