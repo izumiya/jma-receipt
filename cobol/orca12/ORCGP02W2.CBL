@@ -93,6 +93,9 @@
       *  04.04.01    NACL-門脇    09/04/13  平成２１年５月改正対応
       *  04.04.02    NACL-門脇    09/07/24  ０５１、０５２の保険組み合わせ修正
       *                                     （生保をもつ場合）
+      *
+      *  04.05.01    NACL-門脇    10/02/17  生保適用期間の社保単独の
+      *                                     保険組み合わせ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1241,24 +1244,23 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
       *            ●[組合せ] 開始 <---> [生保] 終了日
                    MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-SEIHOIDX)
                                     TO  WRK-RCOMB-TEKEDYMD (IDX1)
-      *            ○組合せ元の開始日変更
-      *            生保　終了日の翌日取得
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-SEIHOIDX)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   PERFORM 4221-YMD-GET-SEC
-                   MOVE    WRK-SYMD TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      *@@@         ○組合せ元の開始日変更
+      *@@@         生保　終了日の翌日取得
+      *@@@         INITIALIZE                  STS-AREA-DAY
+      *@@@         INITIALIZE                  LNK-DAY6-AREA
+      *@@@         MOVE    "61"                TO  LNK-DAY6-IRAI
+      *@@@         MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-SEIHOIDX)
+      *@@@                                     TO  LNK-DAY6-KIJUN
+      *@@@         MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+      *@@@         MOVE     1                  TO  LNK-DAY6-ZOGEN
+      *@@@         PERFORM 4221-YMD-GET-SEC
+      *@@@         MOVE    WRK-SYMD TO  WRK-KCOMB-TEKSTYMD (IDX2)
                ELSE
-      *            [組合せ 終了日]≦[生保 終了日]
-      *            ○組合せ元の開始日変更
-      ***          MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-      ***                            TO  WRK-KCOMB-TEKSTYMD (IDX2)
-                   MOVE  "99999999"  TO  WRK-KCOMB-TEKSTYMD (IDX2)
-                   MOVE  "00000000"  TO  WRK-KCOMB-TEKEDYMD (IDX2)
+      *@@@         [組合せ 終了日]≦[生保 終了日]
+      *@@@         ○組合せ元の開始日変更
+      *@@@         MOVE  "99999999"  TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      *@@@         MOVE  "00000000"  TO  WRK-KCOMB-TEKEDYMD (IDX2)
+                   CONTINUE
                END-IF
                MOVE    WRK-COMB-SEIHOIDX    TO  WRK-COMB-IDX
                PERFORM 5701121-KOH-IREKAE-SEC
@@ -1275,47 +1277,65 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 4221-YMD-GET-SEC
                MOVE    WRK-SYMD            TO  WRK-SYMD6
       *
-      *        ●[組合せ] 開始 <---> [生保] 終了日の前日
-               ADD     1                 TO  WRK-RCOMB-MAX
-               MOVE    WRK-RCOMB-MAX     TO  IDX1
-               MOVE    WRK-KCOMB-REC (IDX2)
-                                         TO  WRK-RCOMB-REC    (IDX1)
-               MOVE    WRK-SYMD6    TO  WRK-RCOMB-TEKEDYMD    (IDX1)
-      *        ○組合せ元の開始日変更
-               MOVE    WRK-KOH-TEKSTYMD (WRK-COMB-SEIHOIDX)
-                                    TO  WRK-KCOMB-TEKSTYMD    (IDX2)
-      *        ●[生保] 開始 <---> [組合せ] 終了日
-               ADD     1                 TO  WRK-RCOMB-MAX
-               MOVE    WRK-RCOMB-MAX     TO  IDX1
-               MOVE    WRK-KCOMB-REC (IDX2)
-                                    TO  WRK-RCOMB-REC         (IDX1)
-               MOVE    WRK-KOH-TEKSTYMD   (WRK-COMB-SEIHOIDX)
-                                    TO  WRK-RCOMB-TEKSTYMD    (IDX1)
-               MOVE    WRK-COMB-SEIHOIDX    TO  WRK-COMB-IDX
-               PERFORM 5701121-KOH-IREKAE-SEC
-      *
       *        [生保 終了日]＜[組合せ 終了日]
                IF  WRK-KOH-TEKEDYMD(WRK-COMB-SEIHOIDX)
                                     <   WRK-KCOMB-TEKEDYMD (IDX2)
       *
+      *            ●[組合せ] 開始 <---> [生保] 終了日の前日
+                   ADD     1                 TO  WRK-RCOMB-MAX
+                   MOVE    WRK-RCOMB-MAX     TO  IDX1
+                   MOVE    WRK-KCOMB-REC (IDX2)
+                                             TO  WRK-RCOMB-REC(IDX1)
+                   MOVE    WRK-SYMD6    TO  WRK-RCOMB-TEKEDYMD(IDX1)
+      *            ○組合せ元の開始日変更
+                   MOVE    WRK-KOH-TEKSTYMD (WRK-COMB-SEIHOIDX)
+                                        TO  WRK-KCOMB-TEKSTYMD(IDX2)
+      *            ●[生保] 開始 <---> [組合せ] 終了日
+                   ADD     1                 TO  WRK-RCOMB-MAX
+                   MOVE    WRK-RCOMB-MAX     TO  IDX1
+                   MOVE    WRK-KCOMB-REC (IDX2)
+                                        TO  WRK-RCOMB-REC     (IDX1)
+                   MOVE    WRK-KOH-TEKSTYMD   (WRK-COMB-SEIHOIDX)
+                                        TO  WRK-RCOMB-TEKSTYMD(IDX1)
+                   MOVE    WRK-COMB-SEIHOIDX    TO  WRK-COMB-IDX
+                   PERFORM 5701121-KOH-IREKAE-SEC
+      *
       *            ●[生保] 開始 <---> [生保] 終了日に変更
                    MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-SEIHOIDX)
                                     TO  WRK-RCOMB-TEKEDYMD    (IDX1)
-      *            生保　終了日の翌日取得
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-SEIHOIDX)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   PERFORM 4221-YMD-GET-SEC
-      *            ○組合せ元の開始日変更
-                   MOVE    WRK-SYMD  TO  WRK-KCOMB-TEKSTYMD (IDX2)
+      *@@@         生保　終了日の翌日取得
+      *@@@         INITIALIZE                  STS-AREA-DAY
+      *@@@         INITIALIZE                  LNK-DAY6-AREA
+      *@@@         MOVE    "61"                TO  LNK-DAY6-IRAI
+      *@@@         MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-SEIHOIDX)
+      *@@@                                     TO  LNK-DAY6-KIJUN
+      *@@@         MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+      *@@@         MOVE     1                  TO  LNK-DAY6-ZOGEN
+      *@@@         PERFORM 4221-YMD-GET-SEC
+      *@@@         ○組合せ元の開始日変更
+      *@@@         MOVE    WRK-SYMD  TO  WRK-KCOMB-TEKSTYMD (IDX2)
                ELSE
+      *
+      *            ●[組合せ] 開始 <---> [生保] 終了日の前日
+                   ADD     1                 TO  WRK-RCOMB-MAX
+                   MOVE    WRK-RCOMB-MAX     TO  IDX1
+                   MOVE    WRK-KCOMB-REC (IDX2)
+                                             TO  WRK-RCOMB-REC(IDX1)
+      *@@@         MOVE    WRK-SYMD6    TO  WRK-RCOMB-TEKEDYMD(IDX1)
       *            ○組合せ元の開始日変更
-      ***          MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-      ***                            TO  WRK-KCOMB-TEKSTYMD (IDX2)
+                   MOVE    WRK-KOH-TEKSTYMD (WRK-COMB-SEIHOIDX)
+                                        TO  WRK-KCOMB-TEKSTYMD(IDX2)
+      *            ●[生保] 開始 <---> [組合せ] 終了日
+                   ADD     1                 TO  WRK-RCOMB-MAX
+                   MOVE    WRK-RCOMB-MAX     TO  IDX1
+                   MOVE    WRK-KCOMB-REC (IDX2)
+                                        TO  WRK-RCOMB-REC     (IDX1)
+                   MOVE    WRK-KOH-TEKSTYMD   (WRK-COMB-SEIHOIDX)
+                                        TO  WRK-RCOMB-TEKSTYMD(IDX1)
+                   MOVE    WRK-COMB-SEIHOIDX    TO  WRK-COMB-IDX
+                   PERFORM 5701121-KOH-IREKAE-SEC
+      *
+      *            ○組合せ元の開始日変更
                    MOVE  "99999999"  TO  WRK-KCOMB-TEKSTYMD (IDX2)
                    MOVE  "00000000"  TO  WRK-KCOMB-TEKEDYMD (IDX2)
                END-IF
@@ -4616,6 +4636,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                IF  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "052"          )
                      MOVE    "3"            TO  WRK-FTN-FLG
                END-IF
+             END-IF
+      *
+             IF    WRK-FTN-FLG  =  "1"
+                     MOVE    "3"            TO  WRK-FTN-FLG
              END-IF
            END-IF
       *
