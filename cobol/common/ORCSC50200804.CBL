@@ -1029,6 +1029,8 @@
                    MOVE    "2"             TO  WRK-COM-AUTOKBN (IDX-S)
                    MOVE    1               TO  WRK-COM-SANFLG (IDX-S)
                END-IF
+           ELSE
+               MOVE    1               TO  WRK-COM-SANFLG (IDX-T)
            END-IF
            .
        100112-TEITAIJYU-CHK-EXT.
