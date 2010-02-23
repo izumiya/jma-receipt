@@ -276,6 +276,8 @@
       *  04.05.10    NACL-藤原    10/02/18  レセ電コメント拡張対応
       *                                     傷病名レコードの補足コメント
       *                                     を中止
+      *  04.05.11    NACL-藤原    10/02/23  同月に継続でない入退院を繰り
+      *                                     返した場合の記録対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -472,7 +474,8 @@
            03  FLG-KENSA-TEIGEN        PIC 9(01).
            03  FLG-SET                 PIC 9(01).
            03  FLG-OPECOM-CHK          PIC 9(01).
-           03  FLG-NYUTAI-RIREKI       PIC 9(01). 
+           03  FLG-NYUTAI-RIREKI       PIC 9(01).
+           03  FLG-NYUIN-SRYCD         PIC 9(01).
            03  FLG-HIT                 PIC 9(01).
            03  FLG-COMMENT             PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
@@ -1273,8 +1276,11 @@
       *       （残量廃棄）
                05  WRK-CONS-COMMENT4  PIC X(09)   VALUE   "099309901".
       *
+      *    入院年月日
+           03  WRK-CONS-NYUIN-SRYCD   PIC X(09)   VALUE   "840000088".
       *    再入院年月日
-           03  WRK-CONS-NYUIN-SRYCD   PIC X(09)   VALUE   "840000014".
+           03  WRK-CONS-SAINYUIN-SRYCD
+                                      PIC X(09)   VALUE   "840000014".
       *    退院年月日
            03  WRK-CONS-TAIIN-SRYCD   PIC X(09)   VALUE   "840000013".
       *
@@ -3575,6 +3581,7 @@
        20079-HC101-NYUTAI-RIREKI-HEN-SEC      SECTION.
       *
            MOVE    ZERO                TO  FLG-NYUTAI-RIREKI
+                                           FLG-NYUIN-SRYCD
            MOVE    ZERO                TO  WRK-NYUINCHUKBN
       *          
            INITIALIZE                      RECE68-REC
@@ -3613,9 +3620,8 @@
                                              NOT =  RECE68-HOJOKBN     )
                    OR    ( RECE62-TEKSTYMD   NOT =  RECE68-TEKSTYMD    )
       *
-      *        再入院年月日
+      *        再入院年月日か入院年月日
                IF    ( RECE68-NYUINYMD     =   RECE62-NYUINYMD )
-               OR    ( RECE68-SHONUM       =   ZERO            )
                OR    ( WRK-NYUINCHUKBN     =   "1"             )
                    CONTINUE
                ELSE
@@ -3636,8 +3642,16 @@
                    MOVE    1                   TO  WRK-NAGASA
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            コメントコード
-                   MOVE    WRK-CONS-NYUIN-SRYCD
-                                               TO  WRK-DATA
+                   IF    ( RECE68-SHONUM       =   ZERO )
+                   AND   ( FLG-NYUIN-SRYCD     =   ZERO )
+      *                継続しない入退院があるとき初回は入院日で記録する
+                       MOVE    WRK-CONS-NYUIN-SRYCD
+                                                   TO  WRK-DATA
+                       MOVE    1                   TO  FLG-NYUIN-SRYCD                      
+                   ELSE
+                       MOVE    WRK-CONS-SAINYUIN-SRYCD
+                                                   TO  WRK-DATA
+                   END-IF
                    MOVE    9                   TO  WRK-NAGASA
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            文字データ
@@ -3661,7 +3675,7 @@
       *        退院年月日                          
                IF    ( RECE68-TAIINYMD (1:6)   
                                            >   RECE62-SRYYM    )
-               OR    ( RECE68-SHONUM       =   ZERO            )
+     **********OR    ( RECE68-SHONUM       =   ZERO            )
                OR    ( RECE68-NYUINCHUKBN  =   "1"             )
                    CONTINUE
                ELSE
