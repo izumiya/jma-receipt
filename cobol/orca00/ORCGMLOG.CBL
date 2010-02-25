@@ -52,11 +52,11 @@
                05  SPA-GMN-IRYONO.
                    07  SPA-GMN-IRYO    PIC X(02).
                    07  SPA-GMN-IRYOMEI PIC X(98).
-               05  SPA-GMN-SELNUM  PIC 9(03).
-               05  SPA-GMN-MEMO    PIC X(200).
+               05  SPA-GMN-SELNUM      PIC 9(03).
+               05  SPA-GMN-MEMO        PIC X(200).
       *
            03  SPA-NAI-AREA.
-               05  SPA-NAI-USER    PIC X(01).
+               05  SPA-NAI-USER        PIC X(01).
                05  SPA-NAI-TBL.
                    07  SPA-NAI-OCC             OCCURS  200.
                        09  SPA-NAI-TERMID      PIC X(64).
@@ -90,6 +90,7 @@
                        09  SPA-NAI-BHOSPNUM    PIC 9(02).
                        09  SPA-NAI-BGRP        PIC 9(02).
                        09  SPA-NAI-BKBN        PIC 9(02).
+                       09  SPA-NAI-HOSPNUM     PIC X(02).
                        09  SPA-NAI-HOSPNM      PIC X(40).
                    07  SPA-NAI-SYS-CNT         PIC 9(03).
       *
@@ -242,7 +243,7 @@
                WHEN    "LINK"          ALSO    ANY
                    PERFORM 100-INIT-SEC
       *    画面遷移
-               WHEN     "PUTG"           ALSO   "CLICKED"
+               WHEN     "PUTG"         ALSO   "CLICKED"
                    PERFORM 200-GMNSENI
       *    入力
                WHEN      OTHER
@@ -256,7 +257,6 @@
       *
            MOVE    SPA-M00KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
-      *    MOVE    SPA-M01         TO  SPA-FREE
       *
            .
            EXIT    PROGRAM.
@@ -296,28 +296,10 @@
       *****************************************************************
        300-SCREEN-SEC              SECTION.
       *
-      *     MOVE    SPACE           TO  WRK-MOTOPG
-           MOVE    ZERO            TO  SPA-GMN-SELNUM
-           MOVE    SPACE           TO  SPA-GMN-MEMO
-      *
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU      TO  SPA-KYOUTU
       *         MOVE    SPA-MOTOPG      TO  WRK-MOTOPG
-           END-IF
-      *
-           MOVE    MCP-USER        TO  WRK-SYSUSER
-           PERFORM 900-SYSUSER-READ-SEC
-           MOVE    WRK-HOSPNUM     TO  WRK-MCP-HOSPNUM
-      *
-      *    ユーザー権限検索
-           PERFORM 3101-USER-KANRI-SEC
-      *
-           IF    ( SPA-NAI-USER    =   "1" OR "2" OR "3" OR "4" )
-      *        シスベースコンボセット
-               PERFORM 3101-SYSBASE-SEC
-           ELSE
-               MOVE   ZERO         TO  SPA-NAI-SYS-CNT
            END-IF
       *
       *    スパ初期編集処理
@@ -335,6 +317,7 @@
            MOVE    ZERO            TO  FLG-SYSBASE
            MOVE    ZERO            TO  SPA-NAI-SYS-CNT
            MOVE    ZERO            TO  IDX
+      *
            INITIALIZE                  SYSBASE-REC
            MOVE    SYSBASE-REC     TO  MCPDATA-REC
            MOVE    "tbl_sysbase"   TO  MCP-TABLE
@@ -347,34 +330,25 @@
                    PERFORM 910-DBFETCH-SEC
                    IF      MCP-RC          =   ZERO
                        MOVE    MCPDATA-REC     TO  SYSBASE-REC
-                       MOVE    1               TO  FLG-OK
-                       IF   (( SPA-NAI-USER    =   "1" OR "3" ) AND
-                             ( WRK-MCP-HOSPNUM 
-                                           NOT =    SYSBASE-HOSPNUM ))
-                           MOVE    ZERO             TO  FLG-OK
-                       END-IF
-                       IF      FLG-OK          =   1
-                           ADD     1               TO  IDX
-                           MOVE    SYSBASE-GRPNUM
-                                               TO  SPA-NAI-BGRPNUM(IDX)
-                           MOVE    SYSBASE-HOSPNUM
-                                               TO  SPA-NAI-BHOSPNUM(IDX)
-                           MOVE    SYSBASE-HONBUNGRP
-                                               TO  SPA-NAI-BGRP(IDX)
-                           MOVE    SYSBASE-HONBUNKBN
-                                               TO  SPA-NAI-BKBN(IDX)
-      *                    医療機関名称編集
-                           PERFORM 3101-HOSPNAME-SEC
-                       END-IF
+                       ADD     1               TO  IDX
+                       MOVE    SYSBASE-GRPNUM  TO  SPA-NAI-BGRPNUM(IDX)
+                       MOVE    SYSBASE-HOSPNUM TO  SPA-NAI-BHOSPNUM(IDX)
+                                                   SPA-NAI-HOSPNUM(IDX)
+                       MOVE    SYSBASE-HONBUNGRP   TO  SPA-NAI-BGRP(IDX)
+                       MOVE    SYSBASE-HONBUNKBN   TO  SPA-NAI-BKBN(IDX)
+      *                医療機関名称編集
+                       PERFORM 3101-HOSPNAME-SEC
                    ELSE
                        MOVE    1           TO  FLG-SYSBASE
                    END-IF
                END-PERFORM
            END-IF
-           MOVE    IDX                 TO  SPA-NAI-SYS-CNT
+      *
            MOVE    "tbl_sysbase"       TO  MCP-TABLE
            MOVE    "all"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    IDX                 TO  SPA-NAI-SYS-CNT
       *
           IF      SPA-NAI-SYS-CNT      >   1
                COMPUTE SPA-NAI-SYS-CNT = SPA-NAI-SYS-CNT + 1
@@ -384,15 +358,16 @@
                                                TO  SPA-NAI-BGRPNUM(IDY)
                    MOVE    SPA-NAI-BHOSPNUM(IDX)
                                                TO  SPA-NAI-BHOSPNUM(IDY)
+                                                   SPA-NAI-HOSPNUM(IDY)
                    MOVE    SPA-NAI-BGRP(IDX)   TO  SPA-NAI-BGRP(IDY)
                    MOVE    SPA-NAI-BKBN(IDX)   TO  SPA-NAI-BKBN(IDY)
                    MOVE    SPA-NAI-HOSPNM(IDX) TO  SPA-NAI-HOSPNM(IDY)
-                   COMPUTE IDX = IDX - 1
+                   COMPUTE IDX     =   IDX     -   1
                END-PERFORM
                MOVE    00                  TO  SPA-NAI-BHOSPNUM(1)
+                                               SPA-NAI-HOSPNUM(1)
                MOVE    "全医療機関"        TO  SPA-NAI-HOSPNM(1)
            END-IF
-           MOVE  SPA-NAI-BHOSPNUM(1)   TO  SPA-GMN-IRYONO
       *
            .
        3101-SYSBASE-EXT.
@@ -467,14 +442,14 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
+           INITIALIZE              SPA-GMN-AREA
+           INITIALIZE              SPA-NAI-AREA
            MOVE    1               TO  SPA-GMN-CUR
-           PERFORM 3101-LISTENTRY-SEC
       *
-           IF      SPA-NAI-SYS-CNT >   1
-               CONTINUE
-           ELSE
-               MOVE    2               TO  SPA-GMN-CUR
-           END-IF
+      *    シスベースコンボセット
+           PERFORM 3101-SYSBASE-SEC
+      *
+           PERFORM 3101-LISTENTRY-SEC
       *
            .
        310-SPASET-EXT.
@@ -485,6 +460,9 @@
       *****************************************************************
        3101-LISTENTRY-SEC          SECTION.
       *
+           PERFORM 420-CLEAR-SEC
+           INITIALIZE              SPA-NAI-TBL
+      *
       *    LISTENTRY により全ての端末IDを取得する
            INITIALIZE                  ORCA-SYSTEM
            MOVE    "LISTENTRY"     TO  MCP-FUNC
@@ -492,16 +470,14 @@
            PERFORM 900-SYSDB-INV-SEC
            IF    ( MCP-RC              =   ZERO    OR  1 )
                MOVE    MCPDATA-REC         TO  ORCA-SYSTEM
-           ELSE
-               GO  TO  3101-LISTENTRY-EXT
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       200
+                   MOVE    ORCA-SYSTEM-KEY(IDX)
+                                       TO  SPA-NAI-TERMID(IDX)
+               END-PERFORM
+      *        GETVALUE によりそれぞれの端末の詳細を取得する
+               PERFORM 3101-LISTKEY-SEC
            END-IF
-           PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       200
-               MOVE    ORCA-SYSTEM-KEY(IDX)    TO  SPA-NAI-TERMID(IDX)
-           END-PERFORM
-      *
-      *    GETVALUE によりそれぞれの端末の詳細を取得する
-           PERFORM 3101-LISTKEY-SEC
       *
            .
        3101-LISTENTRY-EXT.
@@ -628,14 +604,14 @@
       *        強制終了
                WHEN    "CLICKED"   ALSO    "B09"
                    PERFORM 420-TERMSTOP-SEC
-                   PERFORM 310-SPASET-SEC
+                   PERFORM 3101-LISTENTRY-SEC
       *        全端末終了
                WHEN    "CLICKED"   ALSO    "B10"
                    PERFORM 420-ALLSTOP-SEC
-                   PERFORM 310-SPASET-SEC
+                   PERFORM 3101-LISTENTRY-SEC
       *        一覧更新
                WHEN    "CLICKED"   ALSO    "B12"
-                   PERFORM 310-SPASET-SEC
+                   PERFORM 3101-LISTENTRY-SEC
            END-EVALUATE
       *
            .
@@ -769,12 +745,6 @@
       *
            MOVE    ZERO            TO  SPA-GMN-SELNUM
            MOVE    SPACE           TO  SPA-GMN-MEMO
-      *
-           IF      SPA-NAI-SYS-CNT >   1
-               MOVE    1               TO  SPA-GMN-CUR
-           ELSE
-               MOVE    2               TO  SPA-GMN-CUR
-           END-IF
       *
            .
        420-CLEAR-EXT.
@@ -953,30 +923,54 @@
       *****************************************************************
        500-GMNHEN-SEC              SECTION.
       *
+           MOVE    MLOG-IRYONO     TO  SPA-GMN-IRYONO
            INITIALIZE                  MLOG
       *
-      *    医療機関コンボ
+           MOVE    MCP-USER        TO  WRK-SYSUSER
+           PERFORM 900-SYSUSER-READ-SEC
+           MOVE    WRK-HOSPNUM     TO  WRK-MCP-HOSPNUM
+      *
+      *    ユーザー権限検索
+           PERFORM 3101-USER-KANRI-SEC
+      *
+           MOVE    ZERO            TO  IDY
+           IF    ( SPA-NAI-USER    =   "1" OR "2" OR "3" OR "4" )
+      *        医療機関コンボ
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >   SPA-NAI-SYS-CNT
+                   MOVE    1               TO  FLG-OK
+                   IF   (( SPA-NAI-USER    =   "1" OR "3" ) AND
+                         ( WRK-MCP-HOSPNUM 
+                                       NOT =   SPA-NAI-HOSPNUM(IDX)))
+                        MOVE    ZERO             TO  FLG-OK
+                   END-IF
+                   IF      FLG-OK          =   1
+                       COMPUTE IDY = IDY + 1
+                       MOVE    SPA-NAI-HOSPNUM(IDX)    TO
+                                           MLOG-IRYONO-ITEM(IDY)(1:2)
+                       MOVE    SPA-NAI-HOSPNM(IDX)     TO
+                                           MLOG-IRYONO-ITEM(IDY)(3:)
+                   END-IF
+               END-PERFORM
+      *
+               IF      SPA-GMN-IRYONO  =   SPACE
+                   MOVE    MLOG-IRYONO-ITEM(1) TO  SPA-GMN-IRYONO
+               END-IF
+           END-IF
+      *
            MOVE    SPA-GMN-IRYONO  TO  MLOG-IRYONO
-           PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >   SPA-NAI-SYS-CNT
-               MOVE  SPA-NAI-BHOSPNUM(IDX) TO  MLOG-IRYONO-ITEM(IDX)
-               MOVE  SPA-NAI-HOSPNM(IDX)   TO  MLOG-IRYONO-ITEM(IDX)(3:)
-           END-PERFORM
-           MOVE    SPA-NAI-SYS-CNT     TO  MLOG-IRYONO-COUNT
+      *
+           MOVE    IDY         TO  MLOG-IRYONO-COUNT
       *
       *    医療機関が１つしかない場合は非活性
            IF      MLOG-IRYONO-COUNT   >   1
                MOVE    WIDGET-NORMAL       TO  MLOG-IRYONO-STATE
            ELSE
                MOVE    WIDGET-INSENSITIVE  TO  MLOG-IRYONO-STATE
+               IF      SPA-GMN-CUR  =   1
+                   MOVE    2        TO  SPA-GMN-CUR
+               END-IF
            END-IF
-      *
-      *    選択番号、メモ
-           IF      SPA-GMN-SELNUM  NOT =   ZERO
-               MOVE    SPA-GMN-SELNUM  TO  MLOG-SEL1
-               MOVE    "T"             TO  MLOG-ITEM-SELECT(MLOG-SEL1)
-           END-IF
-           MOVE    SPA-GMN-MEMO    TO  MLOG-MES1
       *
       *    ユーザーリスト
            MOVE    ZERO            TO  IDY
@@ -1019,6 +1013,13 @@
                END-IF
            END-PERFORM
       *
+      *    選択番号、メモ
+           IF      SPA-GMN-SELNUM  NOT =   ZERO
+               MOVE    SPA-GMN-SELNUM  TO  MLOG-SEL1
+               MOVE    "T"             TO  MLOG-ITEM-SELECT(MLOG-SEL1)
+           END-IF
+           MOVE    SPA-GMN-MEMO    TO  MLOG-MES1
+      *
       *    閲覧のみの場合は非活性にする
            IF    ( SPA-NAI-USER        =   SPACE OR "0" OR "1" OR  "2" )
                MOVE    WIDGET-INSENSITIVE  TO  MLOG-B05-STATE
@@ -1056,11 +1057,11 @@
            SET     TBLLOCK-IDX         TO  1
            SEARCH  ORC-LOCKCONST-TX    VARYING  TBLLOCK-IDX
                AT  END
-                   MOVE    "その他"        TO  MLOG-ITEM-GYOMU(IDX)
+                   MOVE    "その他"        TO  MLOG-ITEM-GYOMU(IDY)
                WHEN    SGYOUMU-CODE    =
                                        ORC-LOCKCONST-GNUM(TBLLOCK-IDX)
                    MOVE   ORC-LOCKCONST-NAME(TBLLOCK-IDX)
-                                           TO  MLOG-ITEM-GYOMU(IDX)
+                                           TO  MLOG-ITEM-GYOMU(IDY)
            END-SEARCH
       *
            .

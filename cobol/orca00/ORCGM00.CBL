@@ -506,7 +506,7 @@
       *    年度切替メッセージ
            MOVE    ORCSCOMMON-LABLMSG  TO  SPA-GMN-LBLMSG2
       *
-           MOVE    '1'                 TO  SPA-NOCHK-HOSPNUM
+           MOVE    1                   TO  SPA-NOCHK-HOSPNUM
            MOVE    "tbl_dbcatalog"     TO  MCP-TABLE
            MOVE    "redl"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
@@ -1371,16 +1371,22 @@
       *****************************************************************
        470-MLOG-SEC                    SECTION.
       *
-      *     MOVE    SPACE                TO  MVER
-           MOVE    "M00"                TO  SPA-MOTOPG
-           MOVE    "MLOG"               TO  SPA-SAKIPG
+           INITIALIZE                      MLOG
+      *
+           MOVE    SPA-M00KYOUTU       TO  SPA-WORK
+           MOVE    SPA-AREA            TO  SPA-COMMON
+      *
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
+      *
            CALL    "ORCGMLOG"          USING
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
                                        SCRAREA
+      *
+           MOVE    SPA-COMMON          TO  SPA-AREA
+           MOVE    SPA-WORK            TO  SPA-M00KYOUTU
       *
            MOVE    "M00"                TO  SPA-MOTOPG
            MOVE    "MLOG"               TO  SPA-SAKIPG
