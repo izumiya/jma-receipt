@@ -34,7 +34,27 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
+      *    統計メモ更新データ
+           SELECT  MST-PRGOPT  ASSIGN              ASS-PRGOPT
+                               ORGANIZATION    IS  LINE SEQUENTIAL
+                               FILE    STATUS  IS  STS-PRGOPT.
+      *
        DATA                    DIVISION.
+       FILE                    SECTION.
+      *
+       FD  MST-PRGOPT.
+       01  PRGWK-REC.
+           03  PRGWK-SYORIKBN      PIC  X(1).
+           03  PRGWK-HOSPNUM       PIC  9(2).
+           03  PRGWK-PRGID         PIC  X(25).
+           03  PRGWK-KBNCD         PIC  X(16).
+           03  PRGWK-ADDKBN        PIC  X(01).
+           03  PRGWK-TERMID        PIC  X(16).
+           03  PRGWK-OPID          PIC  X(16).
+           03  PRGWK-CREYMD        PIC  X(08).
+           03  PRGWK-UPYMD         PIC  X(08).
+           03  PRGWK-UPHMS         PIC  X(06).
+           03  PRGWK-OPTION        PIC  X(44000).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -75,6 +95,7 @@
                05  SPA-GMN-SELNUM          PIC 9(03).
       *
            03  SPA-NAI-AREA.
+               05  SPA-NAI-B08-CNT             PIC 9(02).
                05  SPA-NAI-INPUT-G.
       *            オプション説明あり
                    07  SPA-NAI-EXP             PIC 9(01).
@@ -84,6 +105,12 @@
                    07  SPA-MAE-KBNCD           PIC X(16).
       *
            COPY    "ENUM-VALUE".
+      *
+       01  STS-AREA.
+           03  STS-PRGOPT          PIC X(02).
+      *
+       01  ASS-AREA.
+           03  ASS-PRGOPT          PIC X(100).
       *
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
@@ -185,6 +212,9 @@
       *
       *    数字変換領域
            COPY    "CPORCSNUM.INC".
+      *
+      *    文字列操作サブ
+           COPY    "CPORCSSTRING.INC".
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
@@ -365,6 +395,8 @@
       *
            EVALUATE    SPA-WIDCD
                WHEN    "1001"
+               WHEN    "U001"
+               WHEN    "I001"
                    IF      SPA-WID1-FLG    =   "OK"
                        PERFORM 490-KOUSHIN-SEC
                    ELSE
@@ -446,9 +478,18 @@
       *    削除
                WHEN    "CLICKED"      ALSO    "B03"
                    PERFORM 430-DELETE-SYORI-SEC
+               WHEN    "CLICKED"      ALSO    "B08"
+      *
+                   IF    ( SPA-NAI-B08-CNT >   5 )
+                       MOVE    ZERO        TO      SPA-NAI-B08-CNT
+                   ELSE
+                       COMPUTE SPA-NAI-B08-CNT
+                           =   SPA-NAI-B08-CNT     +   1
+                   END-IF
       *    登録
                WHEN    "CLICKED"      ALSO    "B12"
                    PERFORM 490-TOUROKU-SEC
+                   MOVE    ZERO       TO      SPA-NAI-B08-CNT
       *    入力
                WHEN    "CLICKED"      ALSO    "B10"
                    PERFORM 4100-ENTER-SEC
@@ -845,7 +886,13 @@
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
-              MOVE    "1001"           TO  SPA-WIDCD
+              EVALUATE    SPA-NAI-B08-CNT
+              WHEN    2
+                  MOVE    "U001"       TO  SPA-WIDCD
+              WHEN    3
+                  MOVE    "I001"       TO  SPA-WIDCD
+              WHEN    OTHER
+                  MOVE    "1001"       TO  SPA-WIDCD
            END-IF
            .
        490-TOUROKU-EXT.
@@ -881,6 +928,18 @@
       *****************************************************************
        490-KOUSHIN-SEC           SECTION.
       *
+           IF    ( SPA-WIDCD     =     "U001" OR "I001" )
+               MOVE    SPACE               TO  ASS-PRGOPT
+               INITIALIZE  ASS-PRGOPT
+               STRING      "/tmp/ORCADBR-prgoption-"
+                                           DELIMITED   BY  SIZE
+                           SPA-GMN-PRGID   DELIMITED   BY  SPACE
+                           ".dat"          DELIMITED   BY  SIZE
+               INTO        ASS-PRGOPT
+               END-STRING
+               OPEN    OUTPUT    MST-PRGOPT
+           END-IF
+      *
       *    更新日取得
            CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
       *
@@ -896,6 +955,10 @@
            END-IF
       *    オプション内容登録
            PERFORM 4902-OPTION-SYORI-SEC
+      *
+           IF    ( SPA-WIDCD     =     "U001" OR "I001" )
+               CLOSE    MST-PRGOPT
+           END-IF
       *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 310-SPASET-SEC
@@ -971,6 +1034,11 @@
                MOVE    "1001"              TO  SPA-ERRCD
                DISPLAY "W34 DB INS ERR KEY:" PRGOPTION-KEY 
            END-IF
+      *
+           IF    ( SPA-WIDCD     =     "U001" OR "I001" )
+               PERFORM 4910-MSTPRGORT-EDT-SEC
+           END-IF
+      *
            .
        4908-PRGOPTION-INS-EXT.
            EXIT.
@@ -996,10 +1064,48 @@
                MOVE    "1002"              TO  SPA-ERRCD
                DISPLAY "W34 DB UPD ERR KEY:" PRGOPTION-KEY 
            END-IF
+      *
+           IF    ( SPA-WIDCD     =     "U001" OR "I001" )
+               PERFORM 4910-MSTPRGORT-EDT-SEC
+           END-IF
            .
        4909-PRGOPTION-UPD-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    プログラムオプションマスタ更新データ編集処理
+      *****************************************************************
+       4910-MSTPRGORT-EDT-SEC          SECTION.
+      *
+           INITIALIZE                      PRGWK-REC
+           MOVE    ZERO                TO  PRGWK-HOSPNUM
+           MOVE    PRGOPTION-PRGID     TO  PRGWK-PRGID
+           MOVE    PRGOPTION-KBNCD     TO  PRGWK-KBNCD
+           MOVE    "0"                 TO  PRGWK-ADDKBN
+           MOVE    SPACE               TO  PRGWK-TERMID
+           MOVE    SPACE               TO  PRGWK-OPID
+           MOVE    SPACE               TO  PRGWK-CREYMD
+           MOVE    SPACE               TO  PRGWK-UPYMD
+           MOVE    SPACE               TO  PRGWK-UPHMS
+      *
+           MOVE    "gsub"              TO  ORCSSTR-COMMAND
+           MOVE    PRGOPTION-OPTION    TO  ORCSSTR-STRING1
+           MOVE    X"0A"               TO  ORCSSTR-STRING2
+           MOVE    "\n"                TO  ORCSSTR-STRING3
+           CALL    "orcsstring" USING  ORCSSTRINGAREA
+           MOVE    ORCSSTR-STRING1     TO  PRGWK-OPTION
+      *
+           IF    ( SPA-WIDCD     =     "U001" )
+               MOVE    "U"             TO  PRGWK-SYORIKBN
+           ELSE
+               MOVE    "I"             TO  PRGWK-SYORIKBN
+           END-IF
+      *
+           WRITE   PRGWK-REC
+      *
+           .
+       4910-MSTPRGORT-EDT-EXT.
+           EXIT.
       *****************************************************************
       *       オプション内容更新処理
       *****************************************************************
@@ -1291,6 +1397,8 @@
       *
            EVALUATE    SPA-WIDCD
                WHEN    "1001"
+               WHEN    "U001"
+               WHEN    "I001"
                    STRING  "オプション情報を登録します。"
                            "よろしいですか？"
                                                DELIMITED  BY  SIZE
