@@ -74,6 +74,7 @@
        01  CNT-AREA.
            03  CNT-2001                    PIC 9(05).
            03  CNT-RENNUM                  PIC 9(05).
+           03  CNT-CHK004                  PIC 9(05).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -112,6 +113,7 @@
            03  WRK-SRYCD                   PIC X(09).
            03  WRK-KJNYMD                  PIC X(08).
            03  WRK-TENKIYMD                PIC X(08).
+           03  WRK-OFFSET                  PIC 9(08).
       *
        01  WRK-ROW-AREA.
            03  WRK-ERRLST-ROW              PIC S9(9).
@@ -530,11 +532,26 @@
                MOVE    SPA-GMN-CHKKBN  TO  CHK004-KBNCD (7:2)
            END-IF
            COMPUTE CHK004-SELOFFSET
-               = ( SPA-GMN-ERRLST-PAGE - 1 )   *   CONST-ERRLST-MAX
+               =   0
            COMPUTE CHK004-SELLIMIT
-               =   CONST-ERRLST-MAX    +   1
+               =   999999
            PERFORM 900-CHK004-KEY4-SEL-SEC
            MOVE    CHK004-REC      TO  CK4-1200-REC
+      *
+           MOVE    ZERO                TO  CNT-CHK004
+           COMPUTE WRK-OFFSET
+               = ( SPA-GMN-ERRLST-PAGE - 1 )   *   CONST-ERRLST-MAX
+      *
+           PERFORM UNTIL ( FLG-CHK004  NOT  =  ZERO )
+                    OR   ( CNT-CHK004      >=  WRK-OFFSET )
+      *
+               COMPUTE CNT-CHK004
+                   =   CNT-CHK004      +   1
+      *
+               PERFORM 900-CHK004-KEY4-FET-SEC
+               MOVE    CHK004-REC  TO  CK4-1200-REC
+      *
+           END-PERFORM
       *
            PERFORM UNTIL ( FLG-CHK004      NOT  =  ZERO )
                     OR   ( SPA-GMN-ERRLST-MAX  >=  CONST-ERRLST-MAX )
@@ -2372,6 +2389,7 @@
                    INITIALIZE              CHK004-REC
                    MOVE    1           TO  FLG-CHK004
                END-IF
+      *
            END-PERFORM
       *
            .
