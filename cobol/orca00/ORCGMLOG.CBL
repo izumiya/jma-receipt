@@ -333,7 +333,7 @@
                        ADD     1               TO  IDX
                        MOVE    SYSBASE-GRPNUM  TO  SPA-NAI-BGRPNUM(IDX)
                        MOVE    SYSBASE-HOSPNUM TO  SPA-NAI-BHOSPNUM(IDX)
-                                                   SPA-NAI-HOSPNUM(IDX)
+                       MOVE    SYSBASE-HOSPNUM TO  SPA-NAI-HOSPNUM(IDX)
                        MOVE    SYSBASE-HONBUNGRP   TO  SPA-NAI-BGRP(IDX)
                        MOVE    SYSBASE-HONBUNKBN   TO  SPA-NAI-BKBN(IDX)
       *                ∞ÂŒ≈µ°¥ÿÃææŒ ‘Ω∏
@@ -358,14 +358,15 @@
                                                TO  SPA-NAI-BGRPNUM(IDY)
                    MOVE    SPA-NAI-BHOSPNUM(IDX)
                                                TO  SPA-NAI-BHOSPNUM(IDY)
-                                                   SPA-NAI-HOSPNUM(IDY)
+                   MOVE    SPA-NAI-BHOSPNUM(IDX)
+                                               TO  SPA-NAI-HOSPNUM(IDY)
                    MOVE    SPA-NAI-BGRP(IDX)   TO  SPA-NAI-BGRP(IDY)
                    MOVE    SPA-NAI-BKBN(IDX)   TO  SPA-NAI-BKBN(IDY)
                    MOVE    SPA-NAI-HOSPNM(IDX) TO  SPA-NAI-HOSPNM(IDY)
                    COMPUTE IDX     =   IDX     -   1
                END-PERFORM
                MOVE    00                  TO  SPA-NAI-BHOSPNUM(1)
-                                               SPA-NAI-HOSPNUM(1)
+               MOVE    "00"                TO  SPA-NAI-HOSPNUM(1)
                MOVE    "¡¥∞ÂŒ≈µ°¥ÿ"        TO  SPA-NAI-HOSPNM(1)
            END-IF
       *
