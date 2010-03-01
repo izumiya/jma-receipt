@@ -724,6 +724,7 @@
            INITIALIZE                      SPA-GMN-SYORI
            INITIALIZE                      SPA-GMN-AREA2
            INITIALIZE                      SPA-NAIB-AREA
+           INITIALIZE                      SPA-PAGE2-G
            INITIALIZE                      SPA-PAGE3-G
       *
            PERFORM 320-SYOKUCOD-HENSYU-SEC
@@ -1084,6 +1085,8 @@
                IF      SPA-GMN-SYOKUKBN    NOT =   WRK-MAE-SYOKUKBN
                    INITIALIZE                      SPA-GMN-AREA2
                    INITIALIZE                      SPA-GMN-KOUMOKU
+                   INITIALIZE                      SPA-PAGE2-G
+                   INITIALIZE                      SPA-PAGE3-G
       *            ¿¦°÷ÊÔ½¸
                    PERFORM 320-SYOKUCOD-HENSYU-SEC
                    IF      SPA-SYOKUCOD-MAX    >   ZERO
@@ -1158,6 +1161,8 @@
       *
            INITIALIZE                      SPA-GMN-AREA2
            INITIALIZE                      SPA-GMN-KOUMOKU
+           INITIALIZE                      SPA-PAGE2-G
+           INITIALIZE                      SPA-PAGE3-G
       *
            MOVE    SPACE               TO  SYS-1010-REC
            INITIALIZE                      SYS-1010-REC
