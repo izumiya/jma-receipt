@@ -893,6 +893,7 @@
                   MOVE    "I001"       TO  SPA-WIDCD
               WHEN    OTHER
                   MOVE    "1001"       TO  SPA-WIDCD
+              END-EVALUATE
            END-IF
            .
        490-TOUROKU-EXT.
