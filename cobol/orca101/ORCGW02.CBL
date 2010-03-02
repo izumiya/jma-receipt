@@ -69,6 +69,7 @@
       *                                     短縮医療機関名称　追加       
       *  04.05.00    NACL-太田    09.06.23  保険自費毎の消費税端数区分追加
       *  04.05.00    NACL-太田    09.07.27  分娩機関管理番号追加
+      *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -154,11 +155,11 @@
                            11  SPA-GMN-OKUSURIFLGMEIL
                                                       PIC X(34).
                        09  SPA-OKUSURIFLG-MAX         PIC 9(02).
-                       09  SPA-GMN-MEIPRTFLGLST      OCCURS  2.
-                           11  SPA-GMN-MEIPRTFLGL    PIC X(01).
+                       09  SPA-GMN-MEIPRTFLGLST      OCCURS  5.
+                           11  SPA-GMN-MEIPRTFLGL     PIC X(01).
                            11  SPA-GMN-F14L           PIC X(01).
                            11  SPA-GMN-MEIPRTFLGMEIL
-                                                      PIC X(12).
+                                                      PIC X(30).
                        09  SPA-MEIPRTFLG-MAX          PIC 9(02).
       *                予約票発行
                        09  SPA-GMN-YYKHYOFLGLST      OCCURS  5.
@@ -299,7 +300,7 @@
                                                       PIC X(01).
                                13  SPA-GMN-F14        PIC X(01).
                                13  SPA-GMN-MEIPRTFLGMEI
-                                                      PIC X(12).
+                                                      PIC X(30).
       *予約票発行区分フラグ
                            11  SPA-GMN-YYKHYOFLG-G.
                                13  SPA-GMN-YYKHYOFLG
@@ -1010,7 +1011,10 @@
            MOVE    "発行しない"       TO  SPA-GMN-MEIPRTFLGMEIL (1)
            MOVE    "1"                TO  SPA-GMN-MEIPRTFLGL    (2)
            MOVE    "発行する"         TO  SPA-GMN-MEIPRTFLGMEIL (2)
-           MOVE    2                  TO  SPA-MEIPRTFLG-MAX
+           MOVE    "2"                TO  SPA-GMN-MEIPRTFLGL    (3)
+           MOVE    "発行する（訂正時なし）"
+                                      TO  SPA-GMN-MEIPRTFLGMEIL (3)
+           MOVE    3                  TO  SPA-MEIPRTFLG-MAX
       *
            MOVE    "0"                TO  SPA-GMN-YYKHYOFLGL    (1)
            MOVE    "発行しない"       TO  SPA-GMN-YYKHYOFLGMEIL (1)
@@ -1635,6 +1639,8 @@
       *    診療費明細書発行区分空白の時、ゼロとする
            IF      SYS-1001-MEIPRTFLG  =   SPACE
                MOVE    ZERO                TO  SYS-1001-MEIPRTFLG
+      *        H22.4 改正　初期表示は　１　発行あり
+               MOVE    "1"                 TO  SYS-1001-MEIPRTFLG
            END-IF
            MOVE    SYS-1001-MEIPRTFLG  TO  SPA-GMN-MEIPRTFLG
            PERFORM VARYING IDY     FROM    1   BY  1

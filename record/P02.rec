@@ -445,10 +445,10 @@ P02	{
 				};
 				P02_SKYPRTFLG_COB	{
 					P02_SKYPRTFLG	{
-						value	varchar(30);
+						value	varchar(40);
 					};
 					count	int;
-					item	varchar(30)[4];
+					item	varchar(40)[10];
 				};
 				TEIMSG	{
 					style	varchar(20);

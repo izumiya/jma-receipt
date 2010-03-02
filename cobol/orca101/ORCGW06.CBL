@@ -52,6 +52,7 @@
       * 04.00.00     NACL-多々納  07/10/05  SYSUSER登録対応
       * 04.04.00     NACL-太田    08/01/27  他院設定追加
       * 04.04.01     NACL-森脇    09/03/13  外部まとめ追加
+      * 04.05.00     NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -633,7 +634,9 @@
       *    診療費明細書フラグ
            MOVE    "0 発行しない"      TO  SPA-GMN-MEIPRTFLG-LST (1)
            MOVE    "1 発行する"        TO  SPA-GMN-MEIPRTFLG-LST (2)
-           MOVE    2                   TO  SPA-MEIPRTFLG-MAX
+           MOVE    "2 発行する（訂正時なし）" 
+                                       TO  SPA-GMN-MEIPRTFLG-LST (3)
+           MOVE    3                   TO  SPA-MEIPRTFLG-MAX
       *    検査正式名称表示
            MOVE    "0 使用しない"      TO  SPA-GMN-FORMALFLG-LST(1)
            MOVE    "1 使用する"        TO  SPA-GMN-FORMALFLG-LST(2)

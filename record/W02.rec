@@ -212,10 +212,10 @@ W02	{
 				};
 				MEIPRTFLG_COMB	{
 					MEIPRTFLG	{
-						value	varchar(14);
+						value	varchar(32);
 					};
 					count	int;
-					item	varchar(14)[2];
+					item	varchar(32)[5];
 				};
 				CHIHOUNUMKBN_COMB	{
 					CHIHOUNUMKBN	{

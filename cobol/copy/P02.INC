@@ -345,10 +345,10 @@
                             PIC X(20)   OCCURS  2 TIMES.
                   05  P02-P02-SKYPRTFLG-COB.
                     06  P02-P02-SKYPRTFLG.
-                      07  P02-VALUE   PIC X(30).
+                      07  P02-VALUE   PIC X(40).
                     06  P02-P02-SKYPRTFLG-COUNT   PIC S9(9)   BINARY.
                     06  P02-P02-SKYPRTFLG-ITEM
-                            PIC X(30)   OCCURS  4 TIMES.
+                            PIC X(40)   OCCURS  10 TIMES.
                   05  P02-TEIMSG.
                     06  P02-TEIMSG-STYLE   PIC X(20).
                     06  P02-TEIMSG-VALUE   PIC X(20).

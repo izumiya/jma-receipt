@@ -68,6 +68,7 @@
       * 04.03.00     NACL-多々納  08/08/28  退院時院外処方せん対応
       * 04.05.00     NACL-多々納  09/06/XX  数量小数５桁対応
       * 04.05.00     NACL-多々納  09/09/XX  '0086'コメントコード対応他
+      * 04.05.01     NACL-多々納  10/03/02  Ｈ２２年４月改正対応
       *****************************************************************
       *
       *
@@ -288,6 +289,11 @@
            03  WRK-KIGONUM             PIC X(80).
            03  WRK-NUM                 PIC X(80).
            03  WRK-HEN-KIGONUM         PIC X(80).
+      *
+      *    医療機関情報（全角）
+           03  WRK-PREFNUM-J           PIC X(04).
+           03  WRK-TENHYOKBN-J         PIC X(02).
+           03  WRK-HOSPCD-J            PIC X(14).
       *パラメタによる編集
       *    地方公費
            03  WRK-HEN-KOH-G.
@@ -1348,6 +1354,14 @@
       *    ドクター
            MOVE    WRK-DRNAME          TO  HC02Q-DRNAME
       *
+      *---(04.05.01) LINE ADD START ------------------------------------
+      *    県番号
+           MOVE    WRK-PREFNUM-J       TO  HC02Q-PREFNUM
+      *    点数表区分
+           MOVE    WRK-TENHYOKBN-J     TO  HC02Q-TENHYOKBN
+      *    医療機関コード
+           MOVE    WRK-HOSPCD-J        TO  HC02Q-HOSPCD
+      *
       *    保険者情報
       *    保険者番号
            MOVE    WRK-HKNJA-G         TO  HC02Q-HKNJA
@@ -1776,6 +1790,23 @@
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
       *    医療機関編集情報
            PERFORM 900-SYS1900-SYORI-SEC
+      *
+      *---(04.05.01) LINE ADD START ------------------------------------
+      *    県番号
+           MOVE    SYS-1001-PREFNUM    TO  WRK-MOJI
+           MOVE    2                   TO  WRK-MOJISU
+           PERFORM 2009-HENKAN-SEC
+           MOVE    WRK-ZENKAKU-G(1:4)  TO  WRK-PREFNUM-J
+      *    点数表区分
+           MOVE    SYS-1001-TENHYOKBN  TO  WRK-MOJI
+           MOVE    1                   TO  WRK-MOJISU
+           PERFORM 2009-HENKAN-SEC
+           MOVE    WRK-ZENKAKU-G(1:2)  TO  WRK-TENHYOKBN-J
+      *    医療機関コード
+           MOVE    SYS-1001-HOSPCD     TO  WRK-MOJI
+           MOVE    7                   TO  WRK-MOJISU
+           PERFORM 2009-HENKAN-SEC
+           MOVE    WRK-ZENKAKU-G(1:14) TO  WRK-HOSPCD-J
       *
       *    ＱＲ空白画像位置
            INITIALIZE                  ORCSMKPASSAREA

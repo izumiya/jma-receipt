@@ -15,6 +15,9 @@
               03  HCM04-SURYO PIC X(11).
               03  HCM04-KAISU PIC X(3).
               03  HCM04-KINGAKU   PIC X(11).
+              03  HCM04-KINGAKU2  PIC X(16).
             02  HCM04-IRYOADRS  PIC X(100).
             02  HCM04-IRYOMEI   PIC X(100).
             02  HCM04-IRYOTEL   PIC X(15).
+            02  HCM04-LABEL1    PIC X(16).
+            02  HCM04-LABEL2    PIC X(126).

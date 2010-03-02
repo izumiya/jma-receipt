@@ -53,6 +53,7 @@
       *  04.04.00    NACL=多々納  08/11/27  入院一括関連対応
       *  04.04.00    NACL=多々納  09/01/30  本院分院対応
       *  04.05.00    NACL=多々納  09/10/30  多剤投与・換算値入力他対応
+      *  04.05.00    NACL=多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
       *
@@ -1171,6 +1172,19 @@
                    ELSE
                        MOVE    0               TO  SPA-YAKANKBN
                    END-IF
+      *Ｈ２２年４月改正
+      *            地域医療貢献加算
+      *TEST        IF      SYS-1006-SSTKIJUN (XXX) =   1
+                       MOVE    1               TO  SPA-CHIIKKBN
+      *            ELSE
+      *                MOVE    0               TO  SPA-CHIIKKBN
+      *            END-IF
+      *            明細書発行体制等加算
+      *TEST        IF      SYS-1006-SSTKIJUN (XXX) =   1
+                       MOVE    1               TO  SPA-MEISAKBN
+      *            ELSE
+      *                MOVE    0               TO  SPA-MEISAKBN
+      **           END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
@@ -3459,6 +3473,8 @@
                MOVE    SPA-SKYPRTFLG-SYS   TO  SPA-SKYPRTFLG
            ELSE
                MOVE    PTINF-SKYPRTFLG     TO  SPA-SKYPRTFLG
+      *        患者情報を優先
+               MOVE    "P"                 TO  SPA-SKYPRTFLG-SYS
            END-IF
       *!!
       *    同一患者識別編集

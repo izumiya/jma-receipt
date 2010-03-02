@@ -133,10 +133,10 @@
                             PIC X(40)   OCCURS  3 TIMES.
                   05  W02-MEIPRTFLG-COMB.
                     06  W02-MEIPRTFLG.
-                      07  W02-VALUE   PIC X(14).
+                      07  W02-VALUE   PIC X(32).
                     06  W02-MEIPRTFLG-COUNT   PIC S9(9)   BINARY.
                     06  W02-MEIPRTFLG-ITEM
-                            PIC X(14)   OCCURS  2 TIMES.
+                            PIC X(32)   OCCURS  5 TIMES.
                   05  W02-CHIHOUNUMKBN-COMB.
                     06  W02-CHIHOUNUMKBN.
                       07  W02-VALUE   PIC X(10).

@@ -48,7 +48,8 @@
       * 03.05.01     NACL-多々納  07/08/28  公費期限切れ区分追加
       * 04.03.00     NACL-多々納  08/07/22  特記事項追加
       * 04.04.00     NACL-多々納  09/01/27  本院分院対応
-      *  04.05.00    NACL-多々納  09/07/XX  患者公費負担額機能追加
+      * 04.05.00     NACL-多々納  09/07/XX  患者公費負担額機能追加
+      * 04.05.00     NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1357,7 +1358,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-GMN-SKYPRTFLG-LST (3)
            MOVE    "3 請求書必要（訂正時なし）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (4)
-           MOVE    4                   TO  SPA-SKYPRTFLG-MAX
+           MOVE    "4 請求書不要（明細書不要）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (5)
+           MOVE    "5 請求書必要（明細書不要）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (6)
+           MOVE    "6 請求書必要（請求あり）（明細書不要）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (7)
+           MOVE    "7 請求書必要（訂正時なし）（明細書不要）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (8)
+           MOVE    8                   TO  SPA-SKYPRTFLG-MAX
            MOVE    SPACE               TO  SPA-GMN-SKYPRTFLG-G
       *
       *    所得者２（高齢者福祉年金受給者証）
