@@ -43,7 +43,7 @@
                05  LNK-SCNYUACCT-NYUKHN-SRYCD        PIC  X(09)
                                                      OCCURS  6.
            03  LNK-SCNYUACCT-KAGENCD.
-               05  LNK-SCNYUACCT-KAGENCD-TBL         OCCURS  7.
+               05  LNK-SCNYUACCT-KAGENCD-TBL         OCCURS  10.
                    07  LNK-SCNYUACCT-KAGEN-SRYCD     PIC  X(09).
                    07  LNK-SCNYUACCT-KAGEN-STYUKYMD  PIC  X(08).
                    07  LNK-SCNYUACCT-KAGEN-EDYUKYMD  PIC  X(08).
