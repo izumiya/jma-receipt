@@ -52,6 +52,7 @@
       *  04.03.01    NACL=多々納  08/08/07  労災初診料Ｈ２０年４月改正対応他
       *  04.04.00    NACL=多々納  08/11/27  入院一括関連対応
       *  04.04.00    NACL=多々納  09/01/30  本院分院対応
+      *  04.05.00    NACL=多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
       *
@@ -3390,6 +3391,8 @@
                MOVE    SPA-SKYPRTFLG-SYS   TO  SPA-SKYPRTFLG
            ELSE
                MOVE    PTINF-SKYPRTFLG     TO  SPA-SKYPRTFLG
+      *        患者情報を優先
+               MOVE    "P"                 TO  SPA-SKYPRTFLG-SYS
            END-IF
       *!!
       *    同一患者識別編集

@@ -37,6 +37,7 @@
       *  04.02.00    NACL-太田    08/06/02  労災・自賠責入院対応
       *  04.03.00    NACL-太田    08/09/17  改正対応
       *  04.03.00    NACL-太田    08/12/25  入院料包括対応（対象外判定追加）
+      *  04.04.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -53,7 +54,7 @@
       *
       *    印刷用データ
        FD  PRT-FILE.
-       01  PRT-REC                 PIC X(10000).
+       01  PRT-REC                 PIC X(11000).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -187,6 +188,7 @@
            03  TBL-SRYSYUKBN           PIC X(03).
            03  TBL-ZAITENSU            PIC S9(07).
            03  TBL-KINGAKU             PIC S9(08).
+           03  TBL-ENKBN               PIC X(01).
            03  TBL-KAISU               PIC 9(03).
            03  TBL-ZAI-TBL             OCCURS   50.
                05  TBL-SRYCD           PIC X(09).
@@ -213,12 +215,37 @@
                07  TBL-H-TANINAME        PIC X(10).
                07  TBL-H-SURYO           PIC X(08).
                07  TBL-H-KAISU           PIC X(03).
-               07  TBL-H-KINGAKU         PIC X(11).
+               07  TBL-H-KINGAKU.
+                   09  TBL-H-KINGAKU1        PIC X(09).
+                   09  TBL-H-KINGAKU2        PIC X(02).
+               07  TBL-H-EN              PIC X(01).
       *
       *帳票明細数
        01  LINE-MAX                    PIC 9(03)   VALUE   70.
        01  CONST-H180401               PIC X(08)   VALUE "20060401".
        01  CONST-H201001               PIC X(08)   VALUE "20081001".
+      *
+      *点数記載用
+       01  CONS-LABEL1.
+           03  FILLER          PIC X(48)   VALUE
+           "※金額欄については１０割分の表示をしております。".
+           03  FILLER          PIC X(52)   VALUE
+           "患者一部負担金は保険公費による負担割合分となります。".
+      *金額記載用
+       01  CONS-LABEL2.
+           03  FILLER          PIC X(36)   VALUE
+           "※合計欄は点数での表示をしています。".
+           03  FILLER          PIC X(52)   VALUE
+           "患者一部負担金はこの点数より計算（１点＝１０円）し、".
+           03  FILLER          PIC X(38)   VALUE
+           "保険公費による負担割合分となります。".
+      *
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-GOKEITANI          PIC X(01).
+      *
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(50).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -310,6 +337,8 @@
       *
       *    オンライン帳票名・出力先プリンタ名取得パラ
            COPY    "CPORCSPRTNM.INC".
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -342,6 +371,8 @@
       *
            ACCEPT  SYS-TIME            FROM    TIME
       *
+      *    プログラムオプション取込み
+           PERFORM 100-OPTION-SELECT-SEC
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
       *
@@ -357,6 +388,38 @@
        000-PROC-EXT.
            EXIT    PROGRAM
            .
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC             SECTION.
+      *
+           INITIALIZE                  PARA-AREA
+      *    合計単位
+           MOVE    "GOKEITANI"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-GOKEITANI
+      *
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCHCN04"          TO  ORCSPRGOPTION-PRGID
+           MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+           MOVE    SPACE               TO  WRK-PARA
+           IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *        半角で１文字目を値とする
+               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+           END-IF
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
       *****************************************************************
       *    初期編集処理
       *****************************************************************
@@ -941,9 +1004,24 @@
                END-IF
            END-IF
       *    金額
-           COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
-                                       *   TBL-KAISU )
-                                       *   10
+           IF      TBL-SRYKBN          =   "97"
+      *        食事は金額
+               COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+                                           *   TBL-KAISU )
+               MOVE    "1"                 TO  TBL-ENKBN
+           ELSE
+               MOVE    SPACE               TO  TBL-ENKBN
+               IF      PARA-GOKEITANI      =   "1"
+      *            点数表示
+                   COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+                                               *   TBL-KAISU )
+               ELSE
+      *            金額表示
+                   COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+                                               *   TBL-KAISU )
+                                               *   10
+               END-IF
+           END-IF
       *
       *    帳票印刷
            PERFORM 2005-PRINT-SYORI-SEC
@@ -1087,6 +1165,9 @@
                    MOVE    TBL-JIHIMONEY(IDX2) TO  WRK-Z119
                    MOVE    WRK-Z119            TO  TBL-H-KINGAKU
                                                       (IDX-H)
+      *            円
+                   MOVE    "1"                 TO  TBL-H-EN
+                                                      (IDX-H)
                END-IF
            END-PERFORM
            IF     (TBL-SRYKBN          =   "95"
@@ -1102,6 +1183,11 @@
                ELSE
                    MOVE    TBL-KINGAKU    TO  WRK-Z119-2
                    MOVE    WRK-Z119-2     TO  TBL-H-KINGAKU
+                                                      (IDX-H)
+               END-IF
+      *        円（食事）
+               IF      TBL-ENKBN           =   "1"
+                   MOVE    "1"                 TO  TBL-H-EN
                                                       (IDX-H)
                END-IF
            END-IF
@@ -1328,6 +1414,13 @@
            MOVE    WRK-HOSPTEL         TO  HCN04-IRYOTEL
       *----(03.04.01)--UPD-END-----
       *
+      *    列名（点数記載）
+           IF      PARA-GOKEITANI      =   "1"
+               MOVE    "　　合計（点数）"    TO  HCN04-LABEL1
+           ELSE
+               MOVE    "　　金　額（円）"    TO  HCN04-LABEL1
+           END-IF
+      *
       *    明細内容
            PERFORM VARYING     IDX3    FROM    1   BY  1
                    UNTIL       IDX3    >   LINE-MAX
@@ -1338,7 +1431,25 @@
                MOVE    TBL-H-SURYO  (IDX3) TO  HCN04-SURYO (IDX3)
                MOVE    TBL-H-KAISU  (IDX3) TO  HCN04-KAISU (IDX3)
                MOVE    TBL-H-KINGAKU(IDX3) TO  HCN04-KINGAKU(IDX3)
+      *        点数記載で円のもの
+               IF      PARA-GOKEITANI      =   "1"
+                   IF      TBL-H-EN  (IDX3)    =   "1"
+                       MOVE    SPACE           TO  HCN04-KINGAKU(IDX3)
+                       STRING  TBL-H-KINGAKU1(IDX3)
+                               "　"
+                                           DELIMITED  BY  SIZE
+                                           INTO    HCN04-KINGAKU(IDX3)
+                       END-STRING
+                       MOVE    "円"           TO  HCN04-KINGAKU2(IDX3)
+                   END-IF
+               END-IF
            END-PERFORM
+      *
+           IF      PARA-GOKEITANI      =   "1"
+               MOVE    CONS-LABEL2         TO  HCN04-LABEL2
+           ELSE
+               MOVE    CONS-LABEL1         TO  HCN04-LABEL2
+           END-IF
            .
        300-HCN04-HEN-EXT.
            EXIT.
@@ -1467,10 +1578,12 @@
                                            OR  "3"
                COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
                                            *   TBL-KAISU )
+               MOVE    "1"                 TO  TBL-ENKBN
            ELSE
                COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
                                            *   TBL-KAISU )
                                            *   10
+               MOVE    SPACE               TO  TBL-ENKBN
            END-IF
       *
       *    帳票印刷

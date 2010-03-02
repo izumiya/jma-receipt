@@ -65,6 +65,7 @@
       *  03.05.01    NACL-多々納  07/08/06  訂正請求書合計印刷対応
       *  04.02.00    NACL-多々納  08/03/05  お薬手帳発行区分追加
       *  04.04.00    NACL-多々納  09/01/23  予約票発行区分追加
+      *  04.04.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -868,23 +869,82 @@
            END-IF
       *
            MOVE    3                   TO  SPA-HAKFLG-MAX
-           MOVE    SPA-SKYPRTFLG       TO  SPA-GMN-HAKFLG
+      *H22.4 改正対応
+      ***  MOVE    SPA-SKYPRTFLG       TO  SPA-GMN-HAKFLG
       *@
-           IF      SPA-SKYPRTFLG       =   "3"
-               IF      SPA-SYORIFLG        =   ZERO
-                   MOVE    "1"             TO  SPA-GMN-HAKFLG
-               ELSE
-                   MOVE    "0"             TO  SPA-GMN-HAKFLG
-               END-IF
-           END-IF
+      *    IF      SPA-SKYPRTFLG       =   "3"
+      *        IF      SPA-SYORIFLG        =   ZERO
+      *            MOVE    "1"             TO  SPA-GMN-HAKFLG
+      *        ELSE
+      *            MOVE    "0"             TO  SPA-GMN-HAKFLG
+      *        END-IF
+      *****END-IF
+      *    患者毎の発行区分変更
+           EVALUATE    SPA-SKYPRTFLG
+               WHEN    "0"
+               WHEN    "4"
+      *            発行しない
+                   MOVE    "0"                 TO  SPA-GMN-HAKFLG
+               WHEN    "1"
+               WHEN    "5"
+      *            発行する
+                   MOVE    "1"                 TO  SPA-GMN-HAKFLG
+               WHEN    "2"
+               WHEN    "6"
+      *            発行する（請求あり）
+                   MOVE    "2"                 TO  SPA-GMN-HAKFLG
+               WHEN    "3"
+               WHEN    "7"
+      *            発行する（訂正時なし）
+                   IF      SPA-SYORIFLG        =   ZERO
+                       MOVE    "1"             TO  SPA-GMN-HAKFLG
+                   ELSE
+                       MOVE    "0"             TO  SPA-GMN-HAKFLG
+                   END-IF
+           END-EVALUATE
       *
       *    診療費明細フラグ
            MOVE    "0 発行なし"        TO  SPA-GMN-MEIPRTFLGLST(01)
            MOVE    "1 発行あり"        TO  SPA-GMN-MEIPRTFLGLST(02)
            MOVE    2                   TO  SPA-MEIPRTFLG-MAX
            IF      SPA-MEIPRTFLG       =   SPACE
-               MOVE    "0"                 TO  SPA-MEIPRTFLG
+      *        設定なしは　発行ありとする（H22.4)
+               MOVE    "1"                 TO  SPA-MEIPRTFLG
            END-IF
+      *H22.4
+      *    訂正時発行なし
+           IF      SPA-MEIPRTFLG       =   "2"
+               IF      SPA-SYORIFLG        =   ZERO
+                   MOVE    "1"                 TO  SPA-MEIPRTFLG
+               ELSE
+                   MOVE    "0"                 TO  SPA-MEIPRTFLG
+               END-IF
+           END-IF
+      *    患者毎の発行区分
+           IF      SPA-SKYPRTFLG-SYS   =   "P"
+      *        患者情報で設定があった時
+               EVALUATE    SPA-SKYPRTFLG
+               WHEN    "0"
+               WHEN    "1"
+               WHEN    "2"
+      *            発行あり
+                   MOVE    "1"                 TO  SPA-MEIPRTFLG
+               WHEN    "3"
+      *            発行する（訂正時なし）
+                   IF      SPA-SYORIFLG        =   ZERO
+                       MOVE    "1"                 TO  SPA-MEIPRTFLG
+                   ELSE
+                       MOVE    "0"                 TO  SPA-MEIPRTFLG
+                   END-IF
+               WHEN    "4"
+               WHEN    "5"
+               WHEN    "6"
+               WHEN    "7"
+      *            発行なし
+                   MOVE    "0"                 TO  SPA-MEIPRTFLG
+               END-EVALUATE
+           END-IF
+      *
            MOVE    SPA-MEIPRTFLG       TO  SPA-GMN-MEIPRTFLG
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-MEIPRTFLG-MAX

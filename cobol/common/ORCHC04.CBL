@@ -36,10 +36,12 @@
       *  04.01.00    NACL-多々納  07/11/22  器材商品名コード対応
       *  04.02.00    NACL-多々納  08/03/06  Ｈ２０年４月改正対応
       *  04.03.00    NACL-太田    08/09/17  改正対応
+      *  04.04.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
        CONFIGURATION               SECTION.
+      *
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
@@ -99,6 +101,7 @@
            03  IDX-HZN             PIC 9(04).
            03  IDX1                PIC 9(04).
            03  IDXM                PIC 9(04).
+           03  IDXD                PIC 9(04).
       *
       *    システム領域
        01  SYS-AREA.
@@ -211,10 +214,34 @@
                    07  TBL-H-TANINAME        PIC X(10).
                    07  TBL-H-SURYO           PIC X(08).
                    07  TBL-H-KAISU           PIC X(03).
-                   07  TBL-H-KINGAKU         PIC X(11).
+                   07  TBL-H-KINGAKU.
+                       09  TBL-H-KINGAKU1        PIC X(09).
+                       09  TBL-H-KINGAKU2        PIC X(02).
+                   07  TBL-H-EN              PIC X(01).
       *帳票明細数
        01  LINE-MAX                    PIC 9(03)   VALUE   70.
        01  CONST-H201001               PIC X(08)   VALUE   "20081001".
+      *
+      *点数記載用
+       01  CONS-LABEL1.
+           03  FILLER          PIC X(48)   VALUE
+           "※金額欄については１０割分の表示をしております。".
+           03  FILLER          PIC X(52)   VALUE
+           "患者一部負担金は保険公費による負担割合分となります。".
+      *金額記載用
+       01  CONS-LABEL2.
+           03  FILLER          PIC X(36)   VALUE
+           "※合計欄は点数での表示をしています。".
+           03  FILLER          PIC X(52)   VALUE
+           "患者一部負担金はこの点数より計算（１点＝１０円）し、".
+           03  FILLER          PIC X(38)   VALUE
+           "保険公費による負担割合分となります。".
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-GOKEITANI          PIC X(01).
+      *
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(50).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -291,6 +318,8 @@
       *
       *    オンライン帳票名・出力先プリンタ名取得パラ
            COPY    "CPORCSPRTNM.INC".
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -323,6 +352,8 @@
       *
            ACCEPT  SYS-TIME            FROM    TIME
       *
+      *    プログラムオプション取込み
+           PERFORM 100-OPTION-SELECT-SEC
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
       *
@@ -338,6 +369,39 @@
        000-PROC-EXT.
            EXIT    PROGRAM
            .
+      *
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC             SECTION.
+      *
+           INITIALIZE                  PARA-AREA
+      *    合計単位
+           MOVE    "GOKEITANI"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-GOKEITANI
+      *
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCHC04"           TO  ORCSPRGOPTION-PRGID
+           MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+           MOVE    SPACE               TO  WRK-PARA
+           IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *        半角で１文字目を値とする
+               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+           END-IF
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
       *****************************************************************
       *    初期編集処理
       *****************************************************************
@@ -929,16 +993,25 @@
                        MOVE    TBL-JIHIMONEY(IDX IDX2) TO  WRK-Z119
                        MOVE    WRK-Z119            TO  TBL-H-KINGAKU
                                                       (WRK-PAGE IDX-H)
+      *                円
+                       MOVE    "1"                 TO  TBL-H-EN
+                                                      (WRK-PAGE IDX-H)
                    END-IF
                END-PERFORM
                IF      TBL-SRYKBN (IDX)    =   "95"
                                            OR  "96"
                    CONTINUE
                ELSE
-      *        金額
-                   COMPUTE WRK-KINGAKU    =  (TBL-ZAITENSU (IDX)
-                                          *   TBL-KAISU    (IDX) )
-                                          *   10
+                   IF      PARA-GOKEITANI      =   "1"
+      *                点数表示
+                       COMPUTE WRK-KINGAKU    =  (TBL-ZAITENSU (IDX)
+                                              *   TBL-KAISU    (IDX) )
+                   ELSE
+      *                金額表示
+                       COMPUTE WRK-KINGAKU    =  (TBL-ZAITENSU (IDX)
+                                              *   TBL-KAISU    (IDX) )
+                                              *   10
+                   END-IF
                    IF      WRK-KINGAKU        >   ZERO
                        MOVE    WRK-KINGAKU    TO  WRK-Z119
                        MOVE    WRK-Z119       TO  TBL-H-KINGAKU
@@ -1311,6 +1384,13 @@
            MOVE    WRK-HOSPTEL         TO  HCM04-IRYOTEL
       *----(03.04.01)--UPD-END-----
       *
+      *    列名（点数記載）
+           IF      PARA-GOKEITANI      =   "1"
+               MOVE    "　　合計（点数）"    TO  HCM04-LABEL1
+           ELSE
+               MOVE    "　　金　額（円）"    TO  HCM04-LABEL1
+           END-IF
+      *
       *    明細内容
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL       IDX2    >   LINE-MAX
@@ -1321,7 +1401,25 @@
                MOVE    TBL-H-SURYO  (IDX IDX2) TO  HCM04-SURYO (IDX2)
                MOVE    TBL-H-KAISU  (IDX IDX2) TO  HCM04-KAISU (IDX2)
                MOVE    TBL-H-KINGAKU(IDX IDX2) TO  HCM04-KINGAKU(IDX2)
+      *        点数記載で円のもの
+               IF      PARA-GOKEITANI      =   "1"
+                   IF      TBL-H-EN   (IDX IDX2)    =   "1"
+                       MOVE    SPACE           TO  HCM04-KINGAKU(IDX2)
+                       STRING  TBL-H-KINGAKU1(IDX IDX2)
+                               "　"
+                                           DELIMITED  BY  SIZE
+                                       INTO   HCM04-KINGAKU(IDX2)
+                       END-STRING
+                       MOVE    "円"           TO  HCM04-KINGAKU2(IDX2)
+                   END-IF
+               END-IF
            END-PERFORM
+      *
+           IF      PARA-GOKEITANI      =   "1"
+               MOVE    CONS-LABEL2         TO  HCM04-LABEL2
+           ELSE
+               MOVE    CONS-LABEL1         TO  HCM04-LABEL2
+           END-IF
            .
        300-HCM04-HEN-EXT.
            EXIT.
