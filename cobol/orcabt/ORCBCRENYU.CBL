@@ -2349,7 +2349,8 @@
                IF    SYOKIKSN-IN-KHNSRYCD      =   "190129310"  OR
                                                    "190111110"  OR
                                                    "190111210"  OR
-                                                   "190075810"
+                                                   "190075810"  OR
+                                                   "190140710"
                    IF    SYS-5001-BTU-HIKSISUKBN   =   "2"
                        MOVE   "2"    TO   WRK-BTU-HIKSISUKBN
                    END-IF
