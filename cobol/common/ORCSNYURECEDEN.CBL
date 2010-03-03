@@ -2518,7 +2518,7 @@
                          PERFORM   VARYING  IDX5  FROM  1  BY  1
                          UNTIL   (IDX5  >  31)   OR
                                (WRK-RYOYO-DAY-ST(IDX5) =  ZERO)
-                           IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 100
+                           IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
                              ADD    1     TO
                                        LNK-NYURECEDEN-MEISAISU(1 IDX2)
                              IF   WRK-RYOYO-DAY-ST(IDX5) = 
@@ -2571,7 +2571,7 @@
                          PERFORM   VARYING  IDX5  FROM  1  BY  1
                          UNTIL   (IDX5  >  30)   OR
                            (WRK-IRYOADL-SRYCD(CIDX IDX5) =  SPACE)
-                           IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 100
+                           IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
                              ADD    1     TO
                                    LNK-NYURECEDEN-MEISAISU(1 IDX2)
                              MOVE   "CO"   TO   
@@ -2583,7 +2583,7 @@
                          END-PERFORM
       *
       *                  £Á£Ä£Ì¥³¥á¥ó¥È
-                         IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 100
+                         IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
                            ADD    1     TO
                                    LNK-NYURECEDEN-MEISAISU(1 IDX2)
                            MOVE   "CO"   TO   
