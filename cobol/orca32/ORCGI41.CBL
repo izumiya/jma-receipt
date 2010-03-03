@@ -8609,7 +8609,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                          WHEN   "190131710"
                            MOVE "療養病棟入院基本料１（Ｆ生活）"
                                                TO  TNS-NAME
-                         WHEN   "190131810"
+                         WHEN   "190131910"
                            MOVE "療養病棟入院基本料１（Ｇ生活）"
                                                TO  TNS-NAME
                          WHEN   "190132110"
