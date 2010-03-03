@@ -106,7 +106,7 @@
       *
            03  WRK-HENSYU-TBL.
                05  WRK-KEY-YMD     PIC X(08).
-               05  WRK-HEN-MAX     PIC 9(04).
+               05  WRK-HEN-MAX     PIC 9(05).
                05  WRK-NYUIN       PIC 9(01).
       *        ºÇÂç£²£°£°£°·ï¡¦¡¦¡¦£²£°£°£±·ïÌÜ¤ÏÊÂ¤ÓÂØ¤¨ÍÑ
                05  WRK-HENSYU-OCC  OCCURS  2001.
@@ -182,7 +182,7 @@
            03  KEY-HIDUKE          PIC X(06).
       *
        01  CONST-AREA.
-           03  CONST-HEN-MAX       PIC 9(05)   VALUE   24.
+           03  CONST-HEN-MAX       PIC 9(05)   VALUE   2000.
            03  CONST-LINE-MAX      PIC 9(05)   VALUE   12.
            03  CONST-SRH-COMB-MAX  PIC 9(03)   VALUE   100.
            03  CONST-TJNISSU-MAX   PIC 9(05)   VALUE   1000.
