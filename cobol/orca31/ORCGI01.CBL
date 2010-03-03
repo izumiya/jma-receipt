@@ -5204,6 +5204,8 @@
                        MOVE    "190097010"         TO  WRK-SRYCD
                    WHEN    "099999951"
                        MOVE    "190097210"         TO  WRK-SRYCD
+                   WHEN    "099999952"
+                       MOVE    "190135110"         TO  WRK-SRYCD
                    WHEN    OTHER
                        MOVE    SPA-NAI-I01-SNTNYUINCD
                                                    TO  WRK-SRYCD
