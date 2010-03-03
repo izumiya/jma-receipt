@@ -154,7 +154,7 @@
            03  KEY-NYUGAIKBN       PIC X(01).
       *
        01  CONST-AREA.
-           03  CONST-HEN-MAX       PIC 9(05)   VALUE   24.
+           03  CONST-HEN-MAX       PIC 9(05)   VALUE   800.
            03  CONST-LINE-MAX      PIC 9(05)   VALUE   12.
            03  CONST-SRH-COMB-MAX  PIC 9(03)   VALUE   100.
       *----(03.04.01)--ADD-START---
