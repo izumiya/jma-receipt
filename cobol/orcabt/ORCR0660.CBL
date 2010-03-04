@@ -105,6 +105,7 @@
       *                                     載を行なう対応
       *  04.04.03    NACL-門脇    09/06/22  精神科隔離室管理加算算定日
       *                                     レセ電用コメント編集
+      *  04.04.04    NACL-門脇    10/03/03  療養レセコメント編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -475,7 +476,7 @@
                                    BY          //WRK-RECE65XX//.
       *
        01  WRK-RECE65XX2-REC.
-         02 WRK-RECE65XX2-TBL      OCCURS 100.
+         02 WRK-RECE65XX2-TBL      OCCURS 300.
            COPY    "CPRCF065.INC"  REPLACING   //RECE65//
                                    BY          //WRK-RECE65XX2//.
       *

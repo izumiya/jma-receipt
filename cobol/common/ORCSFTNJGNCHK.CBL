@@ -788,6 +788,15 @@
                            END-IF
                          END-IF
                        END-IF
+      *
+                       IF   (FLG-CHECK                =   ZERO   )
+                       AND  (LNK-FTNJGNCHK-KOHNUM     =  "191"   )
+                       AND  (FLG-OK                   =   ZERO   )
+                       AND  (LNK-FTNJGNCHK-SRYYM     >=  "200708")
+                         MOVE     1           TO  FLG-OK
+                         PERFORM 2102-FTNJANUM-CHK-SEC
+                       END-IF
+      *
                      END-IF
       *
                    END-IF
@@ -879,6 +888,78 @@
       *
            .
        2101-SYUKEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    負担者番号等チェック
+      *****************************************************************
+       2102-FTNJANUM-CHK-SEC            SECTION.
+      *
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-FTNJGNCHK-HOSPNUM  TO  PTKOH-HOSPNUM
+           MOVE    LNK-FTNJGNCHK-PTID     TO  PTKOH-PTID
+           MOVE    LNK-FTNJGNCHK-KOHID    TO  PTKOH-KOHID
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key8"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC   =    ZERO
+             MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+             MOVE    "key8"           TO  MCP-PATHNAME
+             PERFORM  910-PTKOHINF-READ-SEC
+             IF       FLG-PTKOHINF    =   ZERO
+               IF  (PTKOH-TEKSTYMD(1:6) <= LNK-FTNJGNCHK-SRYYM)
+               AND (LNK-FTNJGNCHK-SRYYM <= PTKOH-TEKEDYMD(1:6))
+      *
+                  IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
+                  AND (LNK-FTNJGNCHK-SRYYM     >=  "200708")
+                  AND (PTKOH-FTNJANUM(5:3)      =  "001"   )
+                    IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+                       MOVE   4001  TO   WRK-HKNMST-JGNGAK
+                    ELSE
+                       MOVE   3001  TO   WRK-HKNMST-JGNGAK
+                    END-IF
+                  END-IF
+                  IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
+                  AND (LNK-FTNJGNCHK-SRYYM     >=  "200904")
+                  AND (PTKOH-FTNJANUM(5:3)      =  "005"   )
+                    IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+                       MOVE   3001  TO   WRK-HKNMST-JGNGAK
+                    ELSE
+                       MOVE   2001  TO   WRK-HKNMST-JGNGAK
+                    END-IF
+                  END-IF
+                  IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
+                  AND (LNK-FTNJGNCHK-SRYYM     >=  "200912")
+                  AND (PTKOH-FTNJANUM(5:3)      =  "002"   )
+                    IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+                       MOVE   4001  TO   WRK-HKNMST-JGNGAK
+                    ELSE
+                       MOVE   2001  TO   WRK-HKNMST-JGNGAK
+                    END-IF
+                  END-IF
+                  IF  (WRK-TEISYOTOKU           =   SPACE  )
+                  AND (LNK-FTNJGNCHK-SRYYM     >=  "200912")
+                  AND (PTKOH-FTNJANUM(5:3)      =  "002"   )
+                    IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+                       MOVE  30001  TO   WRK-HKNMST-JGNGAK
+                    ELSE
+                       MOVE   9001  TO   WRK-HKNMST-JGNGAK
+                    END-IF
+                  END-IF
+      *
+               END-IF
+             END-IF
+           END-IF
+           MOVE     "tbl_ptkohinf"    TO  MCP-TABLE
+           MOVE     "key8"            TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+       2102-FTNJANUM-CHK-EXT.
            EXIT.
       *
       *****************************************************************

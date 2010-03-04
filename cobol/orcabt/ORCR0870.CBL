@@ -86,6 +86,7 @@
       *  04.04.02    NACL-門脇    09/03/11  特別な関係にある他院歴を初回
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
+      *  04.04.03    NACL-門脇    10/03/03  療養レセコメント編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -447,7 +448,7 @@
                                    BY          //WRK-RECE85XX//.
       *
        01  WRK-RECE85XX2-REC.
-         02 WRK-RECE85XX2-TBL      OCCURS 100.
+         02 WRK-RECE85XX2-TBL      OCCURS 300.
            COPY    "CPRCF085.INC"  REPLACING   //RECE85//
                                    BY          //WRK-RECE85XX2//.
       *

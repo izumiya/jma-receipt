@@ -3033,9 +3033,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            ADD     1                 TO  WRK-TBLMAX
            IF  WRK-TBLMAX           >   100
                DISPLAY "*** ORCR1050 TBL-ZAI INDEX[100] OVER  ***"
+           ELSE
+               MOVE    WRK-ZAI       TO  TBL-ZAI (WRK-TBLMAX)
+               MOVE    SPACE         TO  WRK-ZAI
            END-IF
-           MOVE    WRK-ZAI           TO  TBL-ZAI (WRK-TBLMAX)
-           MOVE    SPACE             TO  WRK-ZAI
       *
            .
        4303-ZAITBL-TENSO-EXT.
@@ -3089,7 +3090,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    ADD     1                 TO  IDY
                    IF  IDY                   >   100
                        DISPLAY
-                           "*** ORCR1050 TBL-ZAI INDEX[100] OVER ***"
+                           "*#* ORCR1050 TBL-ZAI INDEX[100] OVER  ***"
                    ELSE
                        MOVE    SPACE             TO  WRK-ZAI
                        MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
