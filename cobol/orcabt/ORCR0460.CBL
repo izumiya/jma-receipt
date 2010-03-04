@@ -3240,9 +3240,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            ADD     1                 TO  WRK-TBLMAX
            IF  WRK-TBLMAX           >   100
                DISPLAY "*** ORCR0460 TBL-ZAI INDEX[100] OVER  ***"
+           ELSE
+               MOVE    WRK-ZAI       TO  TBL-ZAI (WRK-TBLMAX)
+               MOVE    SPACE         TO  WRK-ZAI
            END-IF
-           MOVE    WRK-ZAI           TO  TBL-ZAI (WRK-TBLMAX)
-           MOVE    SPACE             TO  WRK-ZAI
       *
            .
        4303-ZAITBL-TENSO-EXT.
@@ -3295,12 +3296,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *    最終明細に点数・回数を印字するスペース無し
                ADD     1                 TO  IDY
                IF  IDY                   >   100
-                   DISPLAY "*** ORCR0460 TBL-ZAI INDEX[100] OVER  ***"
+                   DISPLAY "*#* ORCR0460 TBL-ZAI INDEX[100] OVER  ***"
+               ELSE
+                   MOVE    SPACE         TO  WRK-ZAI
+                   MOVE    WRK-TNSKAI    TO  WRK-ZAI-TNSKAI
+                   MOVE    WRK-ZAI       TO  TBL-ZAI (IDY)
+                   MOVE    SPACE         TO  WRK-ZAI
                END-IF
-               MOVE    SPACE             TO  WRK-ZAI
-               MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
-               MOVE    WRK-ZAI           TO  TBL-ZAI (IDY)
-               MOVE    SPACE             TO  WRK-ZAI
            END-IF
       *
            .

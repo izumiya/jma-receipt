@@ -10059,6 +10059,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                END-IF
       *
+             WHEN    "32"
+      *
+               IF    RECE02-SRYYM         >=   "200708"
+      *
+                 IF  SYU-KOH-HKNNUM(IDX3)  =  "191"
+      *
+                     MOVE        1    TO  TBL-KEISAN-FLG(KH-IDX)
+      *
+                     ADD   SYU-KOH-COMPFTN-ENTANI(IDX3)
+                                      TO  TBL-KEISAN-ENTANI(KH-IDX)
+      *
+                 END-IF
+      *
+               END-IF
+      *
            END-EVALUATE
       *
            .
@@ -12511,6 +12526,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                 END-IF
       *
+                PERFORM   21114-ETCHENSYU-SEC
+      *
                 IF   (WRK-ZEROKISAIFLG                    =  "2")
                 AND  (RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1) =  "1")
                     MOVE  SPACE TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
@@ -12957,6 +12974,58 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        21113-ETCKISAIFLGINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    その他編集
+      *****************************************************************
+       21114-ETCHENSYU-SEC               SECTION.
+      *
+           EVALUATE   SYS-1001-PREFNUM
+      *
+            WHEN    "32"
+      *
+             IF  (RECE02-SRYYM                    >=   "200708")
+             AND (RECE02-KOHNUM(KOHFTN-IDX)        =   "191"   )
+             AND (RECE02-KYURATE                   =    10     )
+      *
+              IF ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
+                  (RECE02-SRYYM                       >=  "200708") AND
+                  (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "001"   ) AND
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ) AND
+                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <   4000   ))
+              OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
+                  (RECE02-SRYYM                       >=  "200904") AND
+                  (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "005"   ) AND
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ) AND
+                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <   4000   ))
+              OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
+                  (RECE02-SRYYM                       >=  "200912") AND
+                  (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "002"   ) AND
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ) AND
+                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <   4000   ))
+              OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)      =   SPACE  ) AND
+                  (RECE02-SRYYM                       >=  "200912") AND
+                  (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "002"   ) AND
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <  12000   ) AND
+                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <  12000   ))
+                IF  RECE02-ZAITAKU =  "1"
+                   CONTINUE
+                ELSE
+                   IF  TBL-KEISAN-FLG(KOHFTN-IDX + 1) = 1
+                      MOVE  TBL-KEISAN-ENTANI(KOHFTN-IDX + 1)  TO
+                              RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                              RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                   END-IF
+                END-IF
+              END-IF
+      *
+             END-IF
+      *
+           END-EVALUATE
+      *
+           .
+       21114-ETCHENSYU-EXT.
            EXIT.
       *
       *****************************************************************

@@ -43,6 +43,7 @@
       *  04.04.02    NACL-門脇    09/03/11  特別な関係にある他院歴を初回
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
+      *  04.04.03    NACL-門脇    10/03/03  療養レセコメント編集修正
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
@@ -373,7 +374,7 @@
                                    BY          //WRK-RECE230XX//.
       *
        01  WRK-RECE230XX2-REC.
-         02 WRK-RECE230XX2-TBL      OCCURS 100.
+         02 WRK-RECE230XX2-TBL      OCCURS 300.
            COPY    "CPRCF230.INC"  REPLACING   //RECE230//
                                    BY          //WRK-RECE230XX2//.
       *

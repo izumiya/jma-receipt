@@ -95,6 +95,7 @@
       *  04.04.01    NACL-門脇    09/02/04  検査のコメント自動記載対応
       *  04.04.02    NACL-門脇    09/09/30  検査の数量編集修正
       *  04.04.03    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
+      *  04.04.04    NACL-門脇    10/03/03  療養レセコメント編集修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
@@ -347,7 +348,8 @@
       *
       *    剤・診療行為テーブル
        01  TBL-ZAI-AREA.
-           03  TBL-ZAI-OCC         OCCURS   100.
+      ***  03  TBL-ZAI-OCC         OCCURS   100.
+           03  TBL-ZAI-OCC         OCCURS   300.
                05  TBL-ZAI         PIC X(52).
                05  TBL-ZAI-IDX     PIC 9(01).
                05  TBL-ZAI-SRYCD   PIC X(09).
@@ -494,7 +496,8 @@
       *    １：ユーザーコメント、２：コメント、
       *    ３：診療行為、４：薬剤、５：特定器材、６：外迅検退避用
            03  TBL-ZAIW-OCC                OCCURS 6.
-               05  TBL-ZAIW-REC            OCCURS 100.
+      ***      05  TBL-ZAIW-REC            OCCURS 100.
+               05  TBL-ZAIW-REC            OCCURS 300.
                    07  TBL-ZAIW-SRYACTINF.
       *                診療コード/数量/回数
                        09  TBL-ZAIW-SRYCD           PIC  X(09).
@@ -532,6 +535,7 @@
                    07  TBL-ZAIW-RECEHENFLG          PIC  X(01).
       *
        01  TBL-ZAI-MAX         PIC  9(03)  VALUE   100.
+       01  TBL-ZAI-MAX2        PIC  9(03)  VALUE   300.
       *
       *    電子化加算情報
        01  TBL-DENSHI-INF.
@@ -1236,7 +1240,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
       *
                    ADD     1                 TO  WRK-ZAIWMAX (IDY)
                                                  WRK-ZAIWMAX (6)
-                   IF      WRK-ZAIWMAX (IDY) >   TBL-ZAI-MAX 
+                   IF  ((RECE84-RYOTENKISAISU      =   ZERO    ) AND
+                        (WRK-ZAIWMAX (IDY)     >   TBL-ZAI-MAX ))
+                   OR  ((RECE84-RYOTENKISAISU  NOT =   ZERO    ) AND
+                        (WRK-ZAIWMAX (IDY)     >   TBL-ZAI-MAX2))
                        MOVE    "テーブルがオーバーしました"
                                                  TO  WRK-RECEERR
                        PERFORM 500-ERR-HENSYU-SEC
@@ -2922,16 +2929,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
        4303-ZAITBL-TENSO-SEC    SECTION.
       *
            ADD     1                 TO  WRK-TBLMAX
-           IF  WRK-TBLMAX           >   100
-               DISPLAY "*** ORCR0910 TBL-ZAI INDEX[100] OVER  ***"
-           END-IF
-           MOVE    WRK-ZAI           TO  TBL-ZAI (WRK-TBLMAX)
-           IF      RECE84-SRYKBN      =  "33"
-              MOVE    IDX1           TO  TBL-ZAI-IDX(WRK-TBLMAX)
-              MOVE    TBL-ZAIW-SRYCD(IDX1 IDX2)  
+      ***  IF  WRK-TBLMAX           >   100
+           IF  WRK-TBLMAX           >   300
+               DISPLAY "*** ORCR0910 TBL-ZAI INDEX[300] OVER  ***"
+           ELSE
+               MOVE    WRK-ZAI       TO  TBL-ZAI (WRK-TBLMAX)
+               IF      RECE84-SRYKBN      =  "33"
+                  MOVE    IDX1       TO  TBL-ZAI-IDX(WRK-TBLMAX)
+                  MOVE    TBL-ZAIW-SRYCD(IDX1 IDX2)  
                                      TO  TBL-ZAI-SRYCD(WRK-TBLMAX)
+               END-IF
+               MOVE    SPACE         TO  WRK-ZAI
            END-IF
-           MOVE    SPACE             TO  WRK-ZAI
       *
            .
        4303-ZAITBL-TENSO-EXT.
@@ -2984,19 +2993,21 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
            ELSE
       *    最終明細に点数・回数を印字するスペース無し
                ADD     1                 TO  IDY
-               IF  IDY                   >   100
-                   DISPLAY "*** ORCR0910 TBL-ZAI INDEX[100] OVER  ***"
-               END-IF
-               MOVE    SPACE             TO  WRK-ZAI
-               MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
-               MOVE    WRK-ZAI           TO  TBL-ZAI (IDY)
-               IF      RECE84-SRYKBN      =  "33"
-                  MOVE    TBL-ZAI-IDX(WRK-TBLMAX)
+      ***      IF  IDY                   >   100
+               IF  IDY                   >   300
+                   DISPLAY "*#* ORCR0910 TBL-ZAI INDEX[300] OVER  ***"
+               ELSE
+                   MOVE    SPACE         TO  WRK-ZAI
+                   MOVE    WRK-TNSKAI    TO  WRK-ZAI-TNSKAI
+                   MOVE    WRK-ZAI       TO  TBL-ZAI (IDY)
+                   IF      RECE84-SRYKBN      =  "33"
+                      MOVE    TBL-ZAI-IDX(WRK-TBLMAX)
                                          TO  TBL-ZAI-IDX(IDY)
-                  MOVE    TBL-ZAI-SRYCD(WRK-TBLMAX)
+                      MOVE    TBL-ZAI-SRYCD(WRK-TBLMAX)
                                          TO  TBL-ZAI-SRYCD(IDY)
+                   END-IF
+                   MOVE    SPACE         TO  WRK-ZAI
                END-IF
-               MOVE    SPACE             TO  WRK-ZAI
            END-IF
       *
            .
