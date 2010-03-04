@@ -229,7 +229,7 @@ grpsys     COPY    "COMMON-SPA".
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
       *
-           DISPLAY "LNK-BYO-SYORI=" LNK-BYO-SYORI
+      *    DISPLAY "LNK-BYO-SYORI=" LNK-BYO-SYORI
       *
            MOVE    SPACE           TO  LNK-BYO-RC    
       *    処理区分により検索処理
@@ -245,14 +245,14 @@ grpsys     COPY    "COMMON-SPA".
                    GO  TO  000-PROC-EXT
                WHEN    OTHER
                    MOVE    "1"         TO  LNK-BYO-RC
-                   DISPLAY "LNK-BYO-RC=" LNK-BYO-RC
+      *            DISPLAY "LNK-BYO-RC=" LNK-BYO-RC
                    GO  TO  000-PROC-EXT
            END-EVALUATE
       *
       *    検索コードより組み立て
            PERFORM 200-TBL-HENSYU-SEC
            IF      LNK-BYO-RC      NOT =   SPACE
-               DISPLAY "LNK-BYO-RC=" LNK-BYO-RC
+      *        DISPLAY "LNK-BYO-RC=" LNK-BYO-RC
                GO  TO  000-PROC-EXT
            END-IF
       *
@@ -433,11 +433,11 @@ grpsys     COPY    "COMMON-SPA".
       *    レセ電エラーフラグ
            PERFORM 200-RECEDENFLG-HENSYU-SEC
       *
-           DISPLAY "LNK-BYO-HOSOKU-BYOMEI-ETC="
-                                            LNK-BYO-HOSOKU-BYOMEI-ETC
-           DISPLAY "LNK-BYO-HOSOKU-BYOMEI=" LNK-BYO-HOSOKU-BYOMEI
-           DISPLAY "LNK-BYO-BYOMEIHENFLG="  LNK-BYO-BYOMEIHENFLG
-           DISPLAY "LNK-BYO-HAISIYMD-ERR="  LNK-BYO-HAISIYMD-ERR
+      **   DISPLAY "LNK-BYO-HOSOKU-BYOMEI-ETC="
+      **                                    LNK-BYO-HOSOKU-BYOMEI-ETC
+      **   DISPLAY "LNK-BYO-HOSOKU-BYOMEI=" LNK-BYO-HOSOKU-BYOMEI
+      **   DISPLAY "LNK-BYO-BYOMEIHENFLG="  LNK-BYO-BYOMEIHENFLG
+      **   DISPLAY "LNK-BYO-HAISIYMD-ERR="  LNK-BYO-HAISIYMD-ERR
       *??
            .
        000-PROC-EXT.
