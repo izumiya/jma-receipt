@@ -1141,6 +1141,7 @@
                IF      (SPA-NYUGAIKBN      =   "1"  )  AND
                        (LNK-ORCSC-TIMEFLG  NOT =   ZERO)  AND
                        (WRK-COM-DATAKBN(IDX-Z) =   "1" )
+               AND     (WRK-COM-TIMEKSNKBN(IDX-Z)   NOT =  ZERO )
                    PERFORM 1002-KASAN-SET-SEC
                END-IF
            END-IF
