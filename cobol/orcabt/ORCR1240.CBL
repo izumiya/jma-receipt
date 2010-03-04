@@ -4332,7 +4332,8 @@
               PERFORM  VARYING   IDX    FROM  1   BY   1
                         UNTIL   (IDX                  >    31)
                          OR     (TBL-NYU-DAY-ST(IDX)  =  ZERO)
-                 COMPUTE  MAX-MEISAISU   =   MAX-MEISAISU  +  1
+               COMPUTE  MAX-MEISAISU   =   MAX-MEISAISU  +  1
+               IF  MAX-MEISAISU <= 300
                  MOVE  "810000001"
                              TO  WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
                  MOVE   ZERO TO  WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
@@ -4361,13 +4362,15 @@
                    MOVE   TBL-DAY(DAY-IDX2)
                            TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(21:4)
                  END-IF
+               END-IF
               END-PERFORM
       *
               PERFORM  VARYING  IDX  FROM   1   BY   1
                   UNTIL  (IDX                                  >  30  )
                    OR    (TBL-RYOCOM2-IRYO-SRYCD(RYO-IDX3 IDX) = SPACE)
       *
-                   COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               IF  MAX-MEISAISU <= 300
                    MOVE "810000001"
                               TO WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
                    MOVE  ZERO TO WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
@@ -4522,11 +4525,13 @@
                        MOVE "¡Ö£³£·¡×"
                               TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
                    END-EVALUATE
+               END-IF
       *
               END-PERFORM
       *
               IF   TBL-RYOCOM2-ADL-SRYCD(RYO-IDX3)  NOT =  SPACE
-                COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               IF  MAX-MEISAISU <= 300
                 MOVE   "810000001"
                              TO WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
                 MOVE   ZERO  TO WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
@@ -4535,6 +4540,7 @@
                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
                 MOVE   TBL-RYOCOM2-ADL-TEN-MOJI(RYO-IDX3)
                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(9:4)
+               END-IF
               END-IF
       *
            END-PERFORM
@@ -4594,6 +4600,9 @@
                       MOVE  WRK-RECE230XX2-SRYACT-TBL(IDX-RECE230 1)
                                        TO   RECE2301-SRYACT-TBL(IDX)
                       ADD   1          TO   WRK-CNT-MEISAI
+                   END-IF
+                   IF   IDX-RECE230   >= 300
+                      MOVE    1        TO   FLG-WRKRECE230
                    END-IF
                END-PERFORM
                IF  RECE2301-SRYCD(1)  NOT =  SPACE
