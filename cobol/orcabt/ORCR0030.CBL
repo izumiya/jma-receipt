@@ -442,6 +442,7 @@
       *  04.04.37    NACL-ÌçÏÆ    10/02/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.04.38    NACL-ÌçÏÆ    10/02/16  ¥ì¥»µ­ºÜ¤·¤Ê¤¤ÃÏÊý¸øÈñ¤¬¤¢¤ë¾ì¹ç
       *                                     ¤ÎÊÝ¸±Íó°ìÉôÉéÃ´¶âÊÔ½¸ÂÐ±þ
+      *  04.04.39    NACL-ÌçÏÆ    10/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2015,7 +2016,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-KOUGAKU
       *
            IF    (RECE02-SRYYM   >=  "200804")
-           AND   (RECE02-SRYYM   <=  "201003")
+      **>  AND   (RECE02-SRYYM   <=  "201003")
+           AND   (RECE02-SRYYM   <=  "201103")
              IF  (RECE02-HKNNUM       =   SPACE                      )
              OR  (RECE02-HKNNUM(1:2)  =   "98"                       )
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -2715,7 +2717,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ( RECE02-SRYYM   <  "200704"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE02-SRYYM   <  "200804") OR
-                    (RECE02-SRYYM   >  "201003")             ))
+      **>           (RECE02-SRYYM   >  "201003")             ))
+                    (RECE02-SRYYM   >  "201103")             ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE02-SRYYM   <  "200901"              ))
                  CONTINUE
@@ -7845,7 +7848,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-               AND (RECE02-SRYYM   <=  "201003")
+      **>      AND (RECE02-SRYYM   <=  "201003")
+               AND (RECE02-SRYYM   <=  "201103")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT

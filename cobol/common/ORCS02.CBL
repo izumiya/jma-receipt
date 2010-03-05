@@ -274,6 +274,7 @@
       *  04.04.21    NACL-ÌçÏÆ    09/12/02  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *                                     ¡Ê£µ£²¤ÎÂÐ¾ÝÉéÃ´¼ÔÈÖ¹æÄÉ²Ã¡Ë
       *  04.04.22    NACL-ÌçÏÆ    09/12/15  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÈ¬Ä¬»Ô¡Ë
+      *  04.04.23    NACL-ÌçÏÆ    10/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3284,7 +3285,8 @@
       *    Á°´ü¹âÎð¼Ô¡Ê£·£°ºÐ¡Á£·£´ºÐ¡Ë
            MOVE      ZERO       TO    FLG-ZENKI-TOKUREI
            IF    LNK-SYU-SRYYMD(1:6)    >=   "200804"
-           AND   LNK-SYU-SRYYMD(1:6)    <=   "201003"
+      **>  AND   LNK-SYU-SRYYMD(1:6)    <=   "201003"
+           AND   LNK-SYU-SRYYMD(1:6)    <=   "201103"
              IF  (COMB-HKNNUM                =   SPACE   )
              OR  (COMB-SYU-HKNKOHSBTKBN      =   "8"     )
              OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
