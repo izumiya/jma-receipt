@@ -50,6 +50,7 @@
       *  03.05.01    NACL-多々納  07/07/XX  ユーザ設定 他月情報追加
       *  04.02.00    NACL-多々納  08/03/XX  平成２０年４月改正対応
       *  04.04.00    NACL-多々納  09/01/05  前回検査日区分追加
+      *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -490,10 +491,10 @@
                "地域連帯退院時共同指導料２".
            03  FILLER              PIC X(02)   VALUE   "54".
            03  FILLER              PIC X(50)   VALUE
-               "地域連帯診療計画管理料".
+               "地域連携診療計画管理料".
            03  FILLER              PIC X(02)   VALUE   "55".
            03  FILLER              PIC X(50)   VALUE
-               "地域連帯診療計画退院時指導料".
+               "地域連携診療計画退院時指導料（１）".
            03  FILLER              PIC X(02)   VALUE   "56".
            03  FILLER              PIC X(50)   VALUE
                "薬剤管理指導料".
@@ -509,16 +510,53 @@
            03  FILLER              PIC X(02)   VALUE   "60".
            03  FILLER              PIC X(50)   VALUE
                "耳鼻咽喉科特定疾患指導管理料".
+      *H22.4から
+           03  FILLER              PIC X(02)   VALUE   "61".
+           03  FILLER              PIC X(50)   VALUE
+               "地域連携診療計画退院時指導料（２）".
+           03  FILLER              PIC X(02)   VALUE   "62".
+           03  FILLER              PIC X(50)   VALUE
+               "がん治療連携計画策定料".
+           03  FILLER              PIC X(02)   VALUE   "63".
+           03  FILLER              PIC X(50)   VALUE
+               "がん治療連携指導料".
+           03  FILLER              PIC X(02)   VALUE   "64".
+           03  FILLER              PIC X(50)   VALUE
+               "認知症専門診断管理料".
+           03  FILLER              PIC X(02)   VALUE   "65".
+           03  FILLER              PIC X(50)   VALUE
+               "肝炎インターフェロン治療計画料".
+           03  FILLER              PIC X(02)   VALUE   "66".
+           03  FILLER              PIC X(50)   VALUE
+               "在宅難治性皮膚疾患処置指導管理料".
+           03  FILLER              PIC X(02)   VALUE   "80".
+           03  FILLER              PIC X(50)   VALUE
+               "小児科外来診療料等".
+           03  FILLER              PIC X(02)   VALUE   "81".
+           03  FILLER              PIC X(50)   VALUE
+               "生活習慣病管理料".
+           03  FILLER              PIC X(02)   VALUE   "82".
+           03  FILLER              PIC X(50)   VALUE
+               "在宅時医学総合管理料".
+           03  FILLER              PIC X(02)   VALUE   "83".
+           03  FILLER              PIC X(50)   VALUE
+               "特定施設入居時等医学総合管理料".
+           03  FILLER              PIC X(02)   VALUE   "97".
+           03  FILLER              PIC X(50)   VALUE
+               "処方せん料".
+           03  FILLER              PIC X(02)   VALUE   "98".
+           03  FILLER              PIC X(50)   VALUE
+               "処方料".
       *
        01  TBL-SDOKNRYO-AREA-R     REDEFINES   TBL-SDOKNRYO-AREA.
       *    03  TBL-SDOKNRYO-OCC        OCCURS  45      INDEXED  SDO-IDX.
       **** 03  TBL-SDOKNRYO-OCC        OCCURS  58      INDEXED  SDO-IDX.
-           03  TBL-SDOKNRYO-OCC        OCCURS  61      INDEXED  SDO-IDX.
+           03  TBL-SDOKNRYO-OCC        OCCURS  73      INDEXED  SDO-IDX.
                05  TBL-SDOKNRYO        PIC X(02).
                05  TBL-SDOKNRYOMEI     PIC X(50).
       *01  SDO-MAX                     PIC 9(04)   VALUE   45.
       *01  SDO-MAX                     PIC 9(04)   VALUE   58.
-       01  SDO-MAX                     PIC 9(04)   VALUE   61.
+       01  SDO-MAX                     PIC 9(04)   VALUE   73.
       *
       *****************************************************************
       *    ファイルレイアウト
