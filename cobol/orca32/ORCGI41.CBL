@@ -1162,9 +1162,14 @@
            MOVE    "ÁªÄêÆþ±¡Ãæ¤Î³°Çñ"  TO  SPA-GMN-SAGAKU-41   (3)
       *
            MOVE    "04"                TO  SPA-GMN-SAGAKUNO-41 (4)
-           MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç"    TO  SPA-GMN-SAGAKU-41   (4)
+           MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£·£°¡ó¸º"
+                                       TO  SPA-GMN-SAGAKU-41   (4)
       *
-           MOVE    4                   TO  SPA-SAGAKU-MAX-41
+           MOVE    "05"                TO  SPA-GMN-SAGAKUNO-41 (5)
+           MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
+                                       TO  SPA-GMN-SAGAKU-41   (5)
+      *
+           MOVE    5                   TO  SPA-SAGAKU-MAX-41
       *
            .
        3113-GAIHAKU-HEN-EXT.
@@ -3671,6 +3676,7 @@
                                                        OR  2
                                                        OR  3
                                                        OR  4
+                                                       OR  5
                            CONTINUE
                        ELSE
                            MOVE    "0035"         TO  SPA-ERRCD
