@@ -5531,6 +5531,26 @@
                END-IF
            END-IF
       *
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë¤Î¾ì¹ç¤ÏºÇÄ¹£¶£°Æü´Ö¤Î»»Äê¤Î°Ù¡¢
+      *    ¼¡·î¤Î²ñ·×ºîÀ®»þ¤Ë£¶£°Æü·Ð²á»þ¤ÏÌµ¾ò·ï¤Ë°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN = "56"
+                   IF       STUSAN-NISSU06  >=  60
+                       MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë¤Î¾ì¹ç¤ÏºÇÄ¹£¶£°Æü´Ö¤Î»»Äê¤Î°Ù¡¢
+      *    ¼¡·î¤Î²ñ·×ºîÀ®»þ¤Ë£¶£°Æü·Ð²á»þ¤ÏÌµ¾ò·ï¤Ë°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN = "58"
+                   IF       STUSAN-NISSU06  >=  60
+                       MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
+                   END-IF
+               END-IF
+           END-IF
+      *
            IF      WRK-TOKUTEI-NYUIN           NOT =   SPACE
                PERFORM 4801-TOKTEI-NYUIN-SET-SEC
            ELSE

@@ -472,6 +472,7 @@
            03  WRK-TOKUTEI-SRYCD1          PIC X(09).
            03  WRK-TOKUTEI-SRYCD2          PIC X(09).
            03  WRK-TOKUTEI-SRYCD3          PIC X(09).
+           03  WRK-TOKUTEI-SRYCD4          PIC X(09).
            03  WRK-SRYCD                   PIC X(09).
            03  WRK-SHOKAI-NYUINYMD-W       PIC X(10).
            03  WRK-CHK-SHONUM              PIC 9(03).
@@ -10859,6 +10860,203 @@
              END-IF
            END-IF
       *
+      *    Ê¿À®£²£²Ç¯£´·î°Ê¹ß¤Ï°Ê²¼ÆÃÄêÆþ±¡ÎÁ¤ò£±Æü¡Á£³Æü¡¢£´Æü¡Á£·Æü¡¢
+      *    £¸Æü¡Á£¶£°Æü¤Ç¤ÎÅÀ¿ô¹ï¤ß¤È¤¹¤ë
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+           IF    (SPA-NAI-I01-NYUINYMD    >=     "20100401")  AND
+                 (SYOKIKSN-IN-KHNSRYCD     =     "190138410")
+             PERFORM    4801-TOKUTEI-NYUIN3-3-7-14-SEC
+      *
+             IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
+                 MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
+                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                 MOVE   WRK-TOKUTEI-SRYCD1  
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                 MOVE   SPA-NAI-I01-NYUINYMD
+                                  TO  LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE   SPA-NAI-I01-NYUINYMD
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     2                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+      *
+                 MOVE   WRK-TOKUTEI-SRYCD2
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+      *
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     1                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+      *
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     4                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+      *
+                 MOVE   WRK-TOKUTEI-SRYCD3
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(3)
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     1                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(3)
+                 MOVE    "99999999"
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(3)
+      *          °ìÈÌÆþ±¡ÎÁ¤Î»»Äê³«»ÏÆü¤ò»»Äê
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE   SPA-NAI-I01-NYUINYMD
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     60               TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO       IPN-SANTEISTYMD
+      *          °ìÈÌÆþ±¡²ñ·×ºîÀ®ÍÑ¤Î¥Õ¥é¥°ÀßÄê
+                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+             END-IF
+           END-IF
+      *
+      *    Ê¿À®£²£²Ç¯£´·î°Ê¹ß¤Ï°Ê²¼ÆÃÄêÆþ±¡ÎÁ¤ò£±Æü¡Á£³Æü¡¢£´Æü¡Á£·Æü¡¢
+      *    £¸Æü¡Á£±£´Æü¡¢£±£µ¡Á£¶£°Æü¤Ç¤ÎÅÀ¿ô¹ï¤ß¤È¤¹¤ë
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+           IF    (SPA-NAI-I01-NYUINYMD    >=     "20100401")  AND
+                 (SYOKIKSN-IN-KHNSRYCD     =     "190139010")
+             PERFORM    4801-TOKUTEI-NYUIN4-3-7-14-SEC
+      *
+             IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
+                 MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
+                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                 MOVE   WRK-TOKUTEI-SRYCD1  
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                 MOVE   SPA-NAI-I01-NYUINYMD
+                                  TO  LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE   SPA-NAI-I01-NYUINYMD
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     2                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+      *
+                 MOVE   WRK-TOKUTEI-SRYCD2
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+      *
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     1                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+      *
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     4                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+      *
+                 MOVE   WRK-TOKUTEI-SRYCD3
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(3)
+      *
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     1                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(3)
+      *
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     7                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(3)
+      *
+                 MOVE   WRK-TOKUTEI-SRYCD4
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(4)
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(3)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     1                TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(4)
+                 MOVE    "99999999"
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(4)
+      *          °ìÈÌÆþ±¡ÎÁ¤Î»»Äê³«»ÏÆü¤ò»»Äê
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE   SPA-NAI-I01-NYUINYMD
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 MOVE     60               TO  LNK-DAY6-ZOGEN
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO       IPN-SANTEISTYMD
+      *          °ìÈÌÆþ±¡²ñ·×ºîÀ®ÍÑ¤Î¥Õ¥é¥°ÀßÄê
+                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+             END-IF
+           END-IF
+      *
       *    ¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ê£¶£°Æü¾å¸Â¡Ë
            IF    SYOKIKSN-IN-KHNSRYCD   =   "190024810"
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
@@ -12016,6 +12214,58 @@
            .
       *
        4801-TOKUTEI-NYUIN2-3-7-14-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ê¿À®£²£²Ç¯²þÄê
+      *    ÆÃÄêÆþ±¡ÎÁ¡Ê£³Æü¡¿£·Æü¡¿£¶£°Æü¡¿¤½¤ì°Ê¹ß¡Ë¤Î¿ÇÎÅ¥³¡¼¥É¥»¥Ã¥È
+      *****************************************************************
+       4801-TOKUTEI-NYUIN3-3-7-14-SEC         SECTION.
+      *
+      *ÆÃÄêÆþ±¡ÎÁ¤Ç£³Æü¤Þ¤Ç¡¢£·Æü¤Þ¤Ç¡¢£¶£°Æü¤Þ¤Ç¡¢¤½¤ì°Ê¹ß¤Ï°ìÈÌÆþ±¡ÎÁ¤ò»»Äê¤¹¤ë
+      *¾ì¹ç¤Î¿ÇÎÅ¥³¡¼¥É¤ò¼èÆÀ
+      *
+           MOVE      SPACE        TO    IPN-NYUKAIKEI-SAKUSEI-FLG
+           MOVE      "999999999"  TO    WRK-TOKUTEI-SRYCD1
+                                        WRK-TOKUTEI-SRYCD2
+                                        WRK-TOKUTEI-SRYCD3
+           EVALUATE   SYOKIKSN-IN-KHNSRYCD
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+               WHEN   "190138410"
+                   MOVE    "190138410"  TO  WRK-TOKUTEI-SRYCD1
+                   MOVE    "190138510"  TO  WRK-TOKUTEI-SRYCD2
+                   MOVE    "190138610"  TO  WRK-TOKUTEI-SRYCD3
+           END-EVALUATE
+           .
+      *
+       4801-TOKUTEI-NYUIN3-3-7-14-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ê¿À®£²£²Ç¯²þÄê
+      *    ÆÃÄêÆþ±¡ÎÁ¡Ê£³Æü¡¿£·Æü¡¿£¶£°Æü¡¿¤½¤ì°Ê¹ß¡Ë¤Î¿ÇÎÅ¥³¡¼¥É¥»¥Ã¥È
+      *****************************************************************
+       4801-TOKUTEI-NYUIN4-3-7-14-SEC         SECTION.
+      *
+      *ÆÃÄêÆþ±¡ÎÁ¤Ç£³Æü¤Þ¤Ç¡¢£·Æü¤Þ¤Ç¡¢£±£´Æü¤Þ¤Ç¡¢£¶£°Æü¤Þ¤Ç¡¢
+      *¤½¤ì°Ê¹ß¤Ï°ìÈÌÆþ±¡ÎÁ¤ò»»Äê¤¹¤ë¾ì¹ç¤Î¿ÇÎÅ¥³¡¼¥É¤ò¼èÆÀ
+      *
+           MOVE      SPACE        TO    IPN-NYUKAIKEI-SAKUSEI-FLG
+           MOVE      "999999999"  TO    WRK-TOKUTEI-SRYCD1
+                                        WRK-TOKUTEI-SRYCD2
+                                        WRK-TOKUTEI-SRYCD3
+                                        WRK-TOKUTEI-SRYCD4
+           EVALUATE   SYOKIKSN-IN-KHNSRYCD
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+               WHEN   "190139010"
+                   MOVE    "190139010"  TO  WRK-TOKUTEI-SRYCD1
+                   MOVE    "190139110"  TO  WRK-TOKUTEI-SRYCD2
+                   MOVE    "190139210"  TO  WRK-TOKUTEI-SRYCD3
+                   MOVE    "190139310"  TO  WRK-TOKUTEI-SRYCD4
+           END-EVALUATE
+           .
+      *
+       4801-TOKUTEI-NYUIN4-3-7-14-EXT.
            EXIT.
       *
       *****************************************************************
@@ -18343,7 +18593,9 @@
       *    Ç¾Â´Ãæ¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ
       *    °¡µÞÀ­´üÆþ±¡°åÎÅ´ÉÍýÎÁ£²
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
+      *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                EVALUATE   PTNYUINRRK-TOKUTEI-NYUIN
                    WHEN   "03"
@@ -18393,10 +18645,19 @@
                        MOVE   "190138110"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190138210"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190138310"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                   WHEN   "56"
+                       MOVE   "190138410"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190138510"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                       MOVE   "190138610"  TO  STUSAN-TOKUTEI-SRYCD(3)
                    WHEN   "57"
                        MOVE   "190138710"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190138810"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190138910"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                   WHEN   "58"
+                       MOVE   "190139010"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190139110"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                       MOVE   "190139210"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                       MOVE   "190139310"  TO  STUSAN-TOKUTEI-SRYCD(3)
                END-EVALUATE
            END-IF
       *    Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
