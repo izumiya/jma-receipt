@@ -41,6 +41,10 @@
       *  04.03.03    NACL-Æ£¸¶    08/08/29  µ­¹æÈÖ¹æ¤Îµ­ºÜÊýË¡¤ÎÊÑ¹¹
       *  04.03.04    NACL-Æ£¸¶    09/01/16  ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê¤ÎÊÑ¹¹
       *  04.03.05    NACL-ÌçÏÆ    09/02/04  ÀÁµáÅÀ¤¬£°¤Î¾ì¹ç¤ÎÂÐ±þ
+      *
+      *  04.04.01    NACL-Æ£¸¶    10/03/03  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀÁµá´É
+      *                                     Íý¤ÎºîÀ®¤ò¤·¤Ê¤¤
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -511,6 +515,12 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            03  WRK-ERR-MSG-7.
                05  FILLER          PIC X(48)   VALUE
                    "¡Ú¥ê¥¢¥ë¥¿¥¤¥à¥×¥ì¥Ó¥å¡¼¤è¤êºîÀ®¤Î¤¿¤áÄó½ÐÉÔ²Ä¡Û". 
+      *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           03  WRK-ERR-MSG-99.
+               05  FILLER              PIC X(28)  VALUE
+               "¡ÔÊ¿À®£²£²Ç¯£´·î²þÀµÌ¤ÂÐ±þ¡Õ".
+      *¡ú¡ú
       *
        01  WRK-CONS-AREA.    
       *    ²þ¹Ô¥³¡¼¥É
@@ -1160,6 +1170,20 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                MOVE    WRK-ERR-MSG-7        TO  HCM58-HEAD1-G (5:)
                MOVE    WRK-HCM58-HEAD1-G    TO  HCM58-HEAD1-G (53:)
            END-IF
+      *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           IF      RECE100-SRYYM        >=  "201004"
+               MOVE    SPACE                TO  WRK-HCM58-HEAD1-G
+               MOVE    HCM58-HEAD1-G (5:)   TO  WRK-HCM58-HEAD1-G
+               MOVE    WRK-ERR-MSG-99       TO  HCM58-HEAD1-G (5:)
+               MOVE    WRK-HCM58-HEAD1-G    TO  HCM58-HEAD1-G (33:)
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   MOVE    "ÅÀ¸¡²þÀµÌ¤ÂÐ±þ"    TO  HCM58-LABEL
+               ELSE
+                   MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HCM58-LABEL
+               END-IF     
+           END-IF
+      *¡ú¡ú
       *
            .
        310-HC101-HEAD-HEN-EXT.
@@ -2200,6 +2224,11 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  OPECOM-HOSPNUM
       *
       *    ÀÁµá´ÉÍý£Ä£Â¹¹¿·
            IF      FLG-ERR              =   ZERO
+      *¡ú¡ú    Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+               IF      RECE100-SRYYM        >=  "201004"
+                   GO  TO  391-DB-WRITE-EXT
+               END-IF
+      *¡ú¡ú
                PERFORM 3904-RECE10-HENSYU-SEC
            END-IF
       *

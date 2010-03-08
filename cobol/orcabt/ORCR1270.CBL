@@ -44,6 +44,9 @@
       *
       *  04.04.01    NACL-ÌçÏÆ    10/01/29  ÀÁµá´ÉÍý£¹£²ÆÃÄêÆþ±¡ÎÁ¡¦²Ã»»
       *                                     ¹àÌÜÊÔ½¸½¤Àµ
+      *  04.04.02    NACL-Æ£¸¶    10/03/03  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀÁµá´É
+      *                                     Íý¤ÎºîÀ®¤ò¤·¤Ê¤¤
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -538,6 +541,14 @@
            03  WRK-ERR-MSG-7.
                05  FILLER          PIC X(48)   VALUE
                    "¡Ú¥ê¥¢¥ë¥¿¥¤¥à¥×¥ì¥Ó¥å¡¼¤è¤êºîÀ®¤Î¤¿¤áÄó½ÐÉÔ²Ä¡Û". 
+      *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           03  WRK-ERR-MSG-99.
+               05  FILLER              PIC X(28)  VALUE
+               "¡ÔÊ¿À®£²£²Ç¯£´·î²þÀµÌ¤ÂÐ±þ¡Õ".
+      *¡ú¡ú
+      *
+       01  WRK-CONS-AREA.    
       *    ²þ¹Ô¥³¡¼¥É
            03  WRK-CONS-RETURN         PIC X(01)   VALUE   X"0A".
       *
@@ -1189,6 +1200,20 @@
                MOVE    WRK-ERR-MSG-7        TO  HCN58-HEAD1-G (5:)
                MOVE    WRK-HCN58-HEAD1-G    TO  HCN58-HEAD1-G (53:)
            END-IF
+      *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           IF      RECE200-SRYYM        >=  "201004"
+               MOVE    SPACE                TO  WRK-HCN58-HEAD1-G
+               MOVE    HCN58-HEAD1-G (5:)   TO  WRK-HCN58-HEAD1-G
+               MOVE    WRK-ERR-MSG-99       TO  HCN58-HEAD1-G (5:)
+               MOVE    WRK-HCN58-HEAD1-G    TO  HCN58-HEAD1-G (33:)
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   MOVE    "ÅÀ¸¡²þÀµÌ¤ÂÐ±þ"    TO  HCN58-LABEL
+               ELSE
+                   MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HCN58-LABEL
+               END-IF     
+           END-IF
+      *¡ú¡ú
       *
            .
        310-HCN06-HEAD-HEN-EXT.
@@ -2536,6 +2561,11 @@
       *
       *    ÀÁµá´ÉÍý£Ä£Â¹¹¿·
            IF      FLG-ERR              =   ZERO
+      *¡ú¡ú    Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+               IF      RECE200-SRYYM        >=  "201004"
+                   GO  TO  391-DB-WRITE-EXT
+               END-IF
+      *¡ú¡ú
                PERFORM 3904-RECE10-HENSYU-SEC
            END-IF
       *

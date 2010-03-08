@@ -44,6 +44,8 @@
       *  04.03.01    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
       *  04.03.02    NACL-藤原    09/01/16  症状詳記区分の表題の変更
       *  04.03.03    NACL-門脇    09/02/04  請求点が０の場合の対応
+      *
+      *  04.04.01    NACL-藤原    10/03/03  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1224,6 +1226,16 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            IF      WRK-PARA-PRTKBN     =   "2"
                MOVE    "点検用レセプト"    TO  HC23-LABEL
            END-IF
+      *
+      *★★平成２２年４月改正対応
+           IF      RECE41-SRYYM        >=  "201004"
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   MOVE    "点検改正未対応"    TO  HC23-LABEL
+               ELSE
+                   MOVE    "改正未対応"        TO  HC23-LABEL
+               END-IF     
+           END-IF
+      *★★
       *
            .
        310-HC101-HEAD-HEN-EXT.

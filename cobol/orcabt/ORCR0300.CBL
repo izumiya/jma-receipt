@@ -311,6 +311,9 @@
       *  04.04.09    NACL-Æ£¸¶    10/01/08  ½èÃÖ¤Ç´ðËÜ¹àÌÜ¤Î»þ´Ö²Ã»»¶èÊ¬
       *                                     ¤¬»»ÄêÉÔ²Ä¤Î¾ì¹ç¡¢»þ´Ö²Ã»»¤Î
       *                                     ÄÌÂ§²Ã»»¹àÌÜ¤Îµ­ºÜ¤ÎÈ½Äê
+      *  04.04.10    NACL-Æ£¸¶    10/03/03  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
+      *                                     ¹Ô¤ï¤Ê¤¤
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1647,6 +1650,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE12PARA-HOSPNUM
       *
            OPEN    INPUT               RECE12-FILE
       *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           IF      WRK-PARA-SRYYM  >=  "201004"
+               MOVE    1               TO  FLG-END
+           END-IF
+      *¡ú¡ú
       * 
            IF      FLG-END             =   ZERO
       *
@@ -6940,6 +6948,11 @@ grpsys     PERFORM 900-DBFETCH-SEC
                        MOVE    1           TO  FLG-END
                        MOVE    HIGH-VALUE  TO  KEY-NEW
                    NOT AT  END
+      *¡ú¡ú    Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+                       IF      RECE02-SRYYM    >=  201004
+                           MOVE    2               TO  FLG-READ
+                       END-IF
+      *¡ú¡ú
                        IF  ( ( WRK-PARA-SYARECEKBN =   ZERO
                                                    OR  "2" )   AND
                              ( RECE02-TEISYUTUSAKI

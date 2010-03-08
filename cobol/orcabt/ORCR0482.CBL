@@ -73,6 +73,8 @@
       *  04.03.04    NACL-門脇    09/02/04  請求点が０の場合の対応
       *  04.03.05    NACL-藤原    09/03/10  請求点イが１０万以上のときの
       *                                     編集の変更
+      *
+      *  04.04.01    NACL-藤原    10/03/03  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1023,6 +1025,16 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            IF      WRK-PARA-PRTKBN     =   "2"
                MOVE    "点検用レセプト"    TO  HC18-LABEL
            END-IF
+      *
+      *★★平成２２年４月改正対応
+           IF      RECE41-SRYYM        >=  "201004"
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   MOVE    "点検改正未対応"    TO  HC18-LABEL
+               ELSE
+                   MOVE    "改正未対応"        TO  HC18-LABEL
+               END-IF     
+           END-IF
+      *★★
       *
            .
        310-HC101-HEAD-HEN-EXT.
