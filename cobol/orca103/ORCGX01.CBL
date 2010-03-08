@@ -1127,13 +1127,13 @@
                GO      TO      4104-SRYCD-CHK-EXT
            END-IF
       *
-      *    IF    ( SPA-GMN-SRYCD(1:1)  =   "P" OR "S" )
-      *        PERFORM 41011-SETCODE-CHK-SEC
-      *        IF    ( FLG-KENSAKU         =   1 )
-      *         OR   ( SPA-ERRCD       NOT =   SPACE )
-      *            GO      TO      4104-SRYCD-CHK-EXT
-      *        END-IF
-      *    ELSE
+           IF    ( SPA-GMN-SRYCD(1:1)  =   "P" OR "S" )
+               PERFORM 41011-SETCODE-CHK-SEC
+               IF    ( FLG-KENSAKU         =   1 )
+                OR   ( SPA-ERRCD       NOT =   SPACE )
+                   GO      TO      4104-SRYCD-CHK-EXT
+               END-IF
+           ELSE
       *
       *        入力コードチェック
                PERFORM 4010-SRYCD-CHK-SEC
@@ -1192,7 +1192,7 @@
                        GO  TO  4104-SRYCD-CHK-EXT
                    END-IF
                END-EVALUATE
-      *    END-IF
+           END-IF
       *
            MOVE    SPA-GMN-SRYCD       TO  SPA-NAI-SRYCD
            MOVE    SPA-GMN-SRYCD       TO  SPA-MAE-SRYCD

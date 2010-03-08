@@ -69,6 +69,7 @@
            03  FLG-BYOLST-ROW              PIC 9(01).
            03  FLG-CHKLST-ROW              PIC 9(01).
            03  FLG-CHKREIGAI               PIC 9(01).
+           03  FLG-INPUTCD                 PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -162,6 +163,9 @@
       *
        01  PTBYOMEI-REC.
            COPY    "CPPTBYOMEI.INC".
+      *
+       01  INPUTCD-REC.
+           COPY    "CPINPUTCD.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -533,11 +537,9 @@
            ELSE
                MOVE    SPA-GMN-CHKKBN  TO  CHK004-KBNCD (7:2)
            END-IF
-           COMPUTE CHK004-SELOFFSET
-               =   0
-           COMPUTE CHK004-SELLIMIT
-               =   999999
-           PERFORM 900-CHK004-KEY4-SEL-SEC
+           MOVE    SPA-SYSYMD          TO  CHK004-STYUKYMD
+                                           CHK004-EDYUKYMD
+           PERFORM 900-CHK004-KEY7-SEL-SEC
            MOVE    CHK004-REC      TO  CK4-1200-REC
       *
            MOVE    ZERO                TO  CNT-CHK004
@@ -550,7 +552,7 @@
                COMPUTE CNT-CHK004
                    =   CNT-CHK004      +   1
       *
-               PERFORM 900-CHK004-KEY4-FET-SEC
+               PERFORM 900-CHK004-KEY7-FET-SEC
                MOVE    CHK004-REC  TO  CK4-1200-REC
       *
            END-PERFORM
@@ -626,13 +628,13 @@
                    END-IF
                END-IF
       *
-               PERFORM 900-CHK004-KEY4-FET-SEC
+               PERFORM 900-CHK004-KEY7-FET-SEC
                MOVE    CHK004-REC  TO  CK4-1200-REC
       *
            END-PERFORM
       *
            MOVE    "tbl_chk004"    TO  MCP-TABLE
-           MOVE    "key4"          TO  MCP-PATHNAME
+           MOVE    "key7"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            IF    ( FLG-CHK004      =   ZERO )
@@ -1325,15 +1327,21 @@
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-EDTYMD1 TO  SPA-GMN-BIRTHDAY
       *
-           MOVE    CK4-1201-SRYCD      TO  WRK-SRYCD
-           MOVE    CK4-1201-LASTYMD    TO  WRK-KJNYMD
-           PERFORM 900-TENSU-KEY-SEL-SEC
-      *
            MOVE    SPA-NAI-TKBNCD(IDXL)(7:2)
                                        TO  SPA-NAI-CHKKBN
            MOVE    CK4-1201-SRYCD      TO  SPA-GMN-SRYCD
            MOVE    CK4-1201-SRYKA      TO  SPA-NAI-SRYKA
-           MOVE    TNS-NAME            TO  SPA-GMN-SRYNAME
+      *
+           IF    ( CK4-1201-SRYCD(1:1) =   "S" OR "P" )
+               MOVE    CK4-1201-SRYCD      TO  WRK-SRYCD
+               PERFORM 900-INPUTCD-KEY2-SEL-SEC
+               MOVE    ICD-DSPNAME         TO  SPA-GMN-SRYNAME
+           ELSE
+               MOVE    CK4-1201-SRYCD      TO  WRK-SRYCD
+               MOVE    CK4-1201-LASTYMD    TO  WRK-KJNYMD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-NAME            TO  SPA-GMN-SRYNAME
+           END-IF
       *
            MOVE    SPA-NAI-TERRKBN(IDXL)
                                        TO  SPA-NAI-ERRKBN
@@ -2310,9 +2318,9 @@
            MOVE    CHK004-REC      TO  MCPDATA-REC
            MOVE    "tbl_chk004"    TO  MCP-TABLE
            MOVE    "key7"          TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  CHK004-REC
+               PERFORM 900-CHK004-KEY7-FET-SEC
            ELSE
                INITIALIZE              CHK004-REC
                MOVE    1           TO  FLG-CHK004
@@ -2327,55 +2335,13 @@
        900-CHK004-KEY7-FET-SEC         SECTION.
       *
            MOVE    ZERO            TO  FLG-CHK004
-      *
-           MOVE    "tbl_chk004"    TO  MCP-TABLE
-           MOVE    "key7"          TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  CHK004-REC
-           ELSE
-               INITIALIZE              CHK004-REC
-               MOVE    1           TO  FLG-CHK004
-           END-IF
-      *
-           .
-       900-CHK004-KEY7-FET-EXT.
-           EXIT.
-      *****************************************************************
-      *    チェックマスタ４検索処理
-      *****************************************************************
-       900-CHK004-KEY4-SEL-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-CHK004
-      *
-           MOVE    SPA-HOSPNUM     TO  CHK004-HOSPNUM
-           MOVE    CHK004-REC      TO  MCPDATA-REC
-           MOVE    "tbl_chk004"    TO  MCP-TABLE
-           MOVE    "key4"          TO  MCP-PATHNAME
-           PERFORM 911-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               PERFORM 900-CHK004-KEY4-FET-SEC
-           ELSE
-               INITIALIZE              CHK004-REC
-               MOVE    1           TO  FLG-CHK004
-           END-IF
-      *
-           .
-       900-CHK004-KEY4-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    チェックマスタ４FETCH処理
-      *****************************************************************
-       900-CHK004-KEY4-FET-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-CHK004
                                        FLG-LOOPEND
       *
            PERFORM UNTIL ( FLG-CHK004      NOT =   ZERO )
                     OR   ( FLG-LOOPEND     NOT =   ZERO )
       *
                MOVE    "tbl_chk004"    TO  MCP-TABLE
-               MOVE    "key4"          TO  MCP-PATHNAME
+               MOVE    "key7"          TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC          =   ZERO )
                    MOVE    MCPDATA-REC TO  CHK004-REC
@@ -2396,7 +2362,7 @@
            END-PERFORM
       *
            .
-       900-CHK004-KEY4-FET-EXT.
+       900-CHK004-KEY7-FET-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ４検索処理
@@ -2735,6 +2701,37 @@
       *
            .
        900-CHKREIGAI-KEY5-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入力コード検索処理
+      *****************************************************************
+       900-INPUTCD-KEY2-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-INPUTCD
+      *
+           INITIALIZE                  INPUTCD-REC
+           MOVE    SPACE           TO  INPUTCD-REC
+           MOVE    SPA-HOSPNUM     TO  ICD-HOSPNUM
+           MOVE    "6"             TO  ICD-CDSYU
+           MOVE    WRK-SRYCD       TO  ICD-INPUTCD
+      *
+           MOVE    INPUTCD-REC         TO  MCPDATA-REC
+           MOVE    "tbl_inputcd"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  INPUTCD-REC
+           ELSE
+               INITIALIZE                  INPUTCD-REC
+               MOVE    1               TO  FLG-INPUTCD
+           END-IF
+      *
+           MOVE    "tbl_inputcd"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-INPUTCD-KEY2-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理
