@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      * 04.05.00     NACL-Â¿¡¹Ç¼  10/03/XX  £È£²£²Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -71,14 +72,21 @@
       *
            EVALUATE    TRUE
                WHEN   (SPA-SRYYMD          >=  "20080401" )  AND
-                      (SPA-SRYYMD          <   "99999999" )
+                      (SPA-SRYYMD          <   "20100401" )
                    CALL    "ORCSCKT10S200804"  USING
                                                ORCSCKT10SAREA
                                                SPA-AREA
                                                SPA-SCR-REC
                                                SPA-KT01
-           END-EVALUATE
       *
+               WHEN   (SPA-SRYYMD          >=  "20100401" )  AND
+                      (SPA-SRYYMD          <   "99999999" )
+                   CALL    "ORCSCKT10S201004"  USING
+                                               ORCSCKT10SAREA
+                                               SPA-AREA
+                                               SPA-SCR-REC
+                                               SPA-KT01
+           END-EVALUATE
       *
            .
        000-PROC-EXT.

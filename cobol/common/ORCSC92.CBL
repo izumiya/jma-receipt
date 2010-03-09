@@ -3453,6 +3453,11 @@
            MOVE    TNS-SDOKNRYO        TO  SPA-COM-SDOKNRYO (IDX-T)
       *    点数識別
            MOVE    TNS-TENSIKIBETU     TO  SPA-COM-TENSIKIBETU (IDX-T)
+      *    減点
+           IF     (TNS-TENSIKIBETU     =   8       ) AND
+                  (TNS-TEN             >   ZERO    )
+               MOVE    1                   TO  SPA-COM-PLUSKBN(IDX-T)
+           END-IF
       *    特定器材年齢加算区分
            MOVE    TNS-TOKUKIZAIAGEKSNKBN
                                        TO  SPA-COM-TOKUKIZAIAGEKSNKBN

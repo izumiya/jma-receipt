@@ -1661,7 +1661,45 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
-      *
+      *Ｈ２２．４から
+               WHEN    "0270"
+                   STRING  "ＣＴ、ＭＲＩが逓減になります。"
+                           "剤を分けて入力して下さい"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+               WHEN    "0260"
+                   STRING  "組織診断料を算定できる検査を入力して"
+                           "下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0261"
+                   STRING  "細胞診断料を算定できる検査を入力して"
+                           "下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K262"
+                   STRING  "警告！！退院日より１月超です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K263"
+                   STRING  "警告！！退院日より３月超です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K264"
+                   STRING  "警告！！退院日の登録がありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0266"
+                   STRING  "認知療法・認知行動療法と他の精神科専門"
+                           "療法は同時算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -2275,6 +2313,35 @@
                WHEN    "0178"
                    STRING  "会計照会で受診履歴に変更がありました。"
                            "前回患者ボタンを押下して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *Ｈ２２．４から
+               WHEN    "0230"
+                   STRING  "処方せん料が算定されません。"
+                           "抗悪性腫瘍剤処方管理加算（処方せん料）は"
+                           "算定できません"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K230"
+                   STRING  "警告！処方せん料を算定しません。"
+                           "抗悪性腫瘍剤処方管理加算（処方せん料）"
+                           "のみの算定となります"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0231"
+                   STRING  "処方料が算定されません。"
+                           "抗悪性腫瘍剤処方管理加算（処方料）は"
+                           "算定できません"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K231"
+                   STRING  "警告！処方料を算定しません。"
+                           "抗悪性腫瘍剤処方管理加算（処方料）"
+                           "のみの算定となります"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING

@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.00    NACL=多々納  10/03/XX  平成２２年４月改正対応
       *****************************************************************
       *
       *
@@ -78,7 +79,6 @@
            03  FLG-SRYACCT         PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
-           03  FLG-UKETUKE         PIC 9(01).
            03  FLG-SRYKARRK        PIC 9(01).
            03  FLG-SYUNOU          PIC 9(01).
            03  FLG-PTBYOMEI        PIC 9(01).
@@ -104,7 +104,6 @@
            03  FLG-JIKAN           PIC 9(01).
            03  FLG-COMMENT         PIC 9(01).
       *
-           03  FLG-UKETUKE-ARI     PIC 9(01).
            03  FLG-HEN             PIC 9(01).
            03  FLG-CHK             PIC 9(01).
       *
@@ -140,6 +139,8 @@
       *
            03  IDX-P               PIC 9(04).
            03  WRK-IDY             PIC 9(04).
+      *
+           03  IDX-R2              PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -266,12 +267,12 @@
            03  WRK-MAE-HKNCOMBI        PIC X(04).
       *   リハビリ発症日表示
            03  WRK-RIHABIR-AREA.
-               05  WRK-RIHABIR-OCC     OCCURS   7.
+               05  WRK-RIHABIR-OCC     OCCURS   8.
                    07  WRK-RIHA-STR        PIC X(08).
                    07  WRK-RIHA-END        PIC X(08).
       *
            03  WRK-RIHABIR-AREA2.
-               05  WRK-RIHABIR-OCC2    OCCURS   7.
+               05  WRK-RIHABIR-OCC2    OCCURS   8.
                    07  WRK-RIHA-STR2       PIC X(08).
            03  WRK-RIHA-YMD                PIC X(08).
            03  WRK-RIHA-GMN                PIC X(09).
@@ -400,10 +401,6 @@
       *    診療会計マスタ−
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
-      *
-      *    受付
-       01  UKETUKE-REC.
-           COPY    "CPUKETUKE.INC".
       *
       *    診療科履歴
        01  SRYKARRK-REC.
@@ -1078,6 +1075,19 @@
                        MOVE    1               TO  SPA-YAKANKBN
                    ELSE
                        MOVE    0               TO  SPA-YAKANKBN
+                   END-IF
+      *Ｈ２２年４月改正
+      *            地域医療貢献加算(754 - 500)
+                   IF      SYS-1006-SSTKIJUN (254) =   1
+                       MOVE    1               TO  SPA-CHIIKKBN
+                   ELSE
+                       MOVE    0               TO  SPA-CHIIKKBN
+                   END-IF
+      *            明細書発行体制等加算(755 - 500 )
+                   IF      SYS-1006-SSTKIJUN (255) =   1
+                       MOVE    1               TO  SPA-MEISAKBN
+                   ELSE
+                       MOVE    0               TO  SPA-MEISAKBN
                    END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -3541,6 +3551,15 @@
                    IF      WRK-RIHA-END(7)         =   SPACE
                        MOVE    WRK-YMD             TO  WRK-RIHA-END(7)
                    END-IF
+      *        がん患者リハビリ
+               WHEN    "099800181"
+                   IF      WRK-RIHA-STR(8)         =   SPACE
+                       MOVE    WRK-YMD             TO  WRK-RIHA-STR(8)
+                   END-IF
+               WHEN    "099800182"
+                   IF      WRK-RIHA-END(8)         =   SPACE
+                       MOVE    WRK-YMD             TO  WRK-RIHA-END(8)
+                   END-IF
                END-EVALUATE
       *
                END-IF
@@ -3553,8 +3572,11 @@
            MOVE    "key16"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           MOVE    ZERO                TO  IDX-R2
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   7
+                   UNTIL      (IDX     >   8   )
+      *            SPA は 7 まで
+                           OR (IDX-R2  >=  7   )
                IF      WRK-RIHA-STR (IDX)  NOT =   SPACE
                    IF     (WRK-RIHA-END (IDX)  =   SPACE)
                    OR     (WRK-RIHA-STR (IDX)  >   WRK-RIHA-END(IDX))
@@ -3600,6 +3622,9 @@
                WHEN    7
                    MOVE    0                       TO  WRK-ZOGEN
                    MOVE    "障害児（者）リハ開始日："  TO  WRK-RIHAMEI
+               WHEN    8
+                   MOVE    0                       TO  WRK-ZOGEN
+                   MOVE    "がん患者リハ開始日："  TO  WRK-RIHAMEI
            END-EVALUATE
       *     Ｎ日後計算
            IF      WRK-ZOGEN           >   ZERO
@@ -3629,10 +3654,11 @@
            CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                LNK-DAY2-AREA
       *
+           ADD     1                   TO  IDX-R2
            IF      WRK-ZOGEN           =   ZERO
                STRING  WRK-RIHAMEI         DELIMITED  BY  SPACE
                        LNK-DAY2-EDTYMD1    DELIMITED  BY  SIZE
-                   INTO                SPA-GMN-RIHAYMD (IDX)
+                   INTO                SPA-GMN-RIHAYMD (IDX-R2)
                END-STRING
            ELSE
                STRING  WRK-RIHAMEI         DELIMITED  BY  SPACE
@@ -3640,7 +3666,7 @@
                        "　"                DELIMITED  BY  SIZE 
                        WRK-ZOGEN-MEI       DELIMITED  BY  SPACE
                        WRK-RIHA-GMN        DELIMITED  BY  SIZE
-                   INTO                SPA-GMN-RIHAYMD (IDX)
+                   INTO                SPA-GMN-RIHAYMD (IDX-R2)
                END-STRING
            END-IF
       *
@@ -4859,6 +4885,15 @@
                   AND (TNS-CDKBN-KBN           =   "H" )
                    MOVE    1               TO  FLG-RIHA-OK
                END-IF
+      *        H22.4 から　新規のリハビリ料コードは区分で判定
+               IF     (SPA-SRYYMD              >=  "20100401")
+                  AND (FLG-RIHA-OK             =   ZERO    )
+                  AND (TNS-CDKBN-KBN           =   "H"     )
+                  AND (TNS-CDKBN-KBNNUM        =   "001"
+                                               OR  "002"   )
+                  AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
+                   MOVE    1               TO  FLG-RIHA-OK
+               END-IF
       *
                IF      FLG-RIHA-OK         =   1
                    MOVE    "099800201"         TO  WRK-HEN-SRYCD
@@ -5394,26 +5429,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        900-SYSKANRI-READ-EXT.
            EXIT.
-      *
-      *****************************************************************
-      *    受付マスタ読み込み処理
-      *****************************************************************
-       900-UKETUKE-READ-SEC         SECTION.
-      *
-           MOVE    "tbl_uketuke"       TO  MCP-TABLE
-           PERFORM 920-DBFETCH-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  UKETUKE-REC
-               MOVE    ZERO            TO  FLG-UKETUKE
-           ELSE
-               INITIALIZE                  UKETUKE-REC
-               MOVE    1               TO  FLG-UKETUKE
-           END-IF
-      *
-           .
-       900-UKETUKE-READ-EXT.
-           EXIT.
-      *
       *
       *****************************************************************
       *    患者マスター読込（主キー）

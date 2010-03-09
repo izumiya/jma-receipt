@@ -1173,18 +1173,18 @@
                        MOVE    0               TO  SPA-YAKANKBN
                    END-IF
       *£È£²£²Ç¯£´·î²þÀµ
-      *            ÃÏ°è°åÎÅ¹×¸¥²Ã»»
-      *TEST        IF      SYS-1006-SSTKIJUN (XXX) =   1
+      *            ÃÏ°è°åÎÅ¹×¸¥²Ã»»(754 - 500)
+                   IF      SYS-1006-SSTKIJUN (254) =   1
                        MOVE    1               TO  SPA-CHIIKKBN
-      *            ELSE
-      *                MOVE    0               TO  SPA-CHIIKKBN
-      *            END-IF
-      *            ÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»
-      *TEST        IF      SYS-1006-SSTKIJUN (XXX) =   1
+                   ELSE
+                       MOVE    0               TO  SPA-CHIIKKBN
+                   END-IF
+      *            ÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»(755 - 500 )
+                   IF      SYS-1006-SSTKIJUN (255) =   1
                        MOVE    1               TO  SPA-MEISAKBN
-      *            ELSE
-      *                MOVE    0               TO  SPA-MEISAKBN
-      **           END-IF
+                   ELSE
+                       MOVE    0               TO  SPA-MEISAKBN
+                   END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
@@ -6058,12 +6058,21 @@
                    WHEN    SRY-SRYCD (IDX)     =   TBL-RIHA-SRYCD
                                                            (TBL-RIH)
                        MOVE    1               TO  FLG-RIHA-OK
-               END-SEARCH 
+               END-SEARCH
       *
       *        Ï«ºÒ¥³¡¼¥É¤Î¥ê¥Ï¥Ó¥êÎÁ
                IF     (SPA-SRYYMD              >=  "20080401")
-                  AND (SRY-SRYCD  (IDX)(1:3)   =   "101" )
-                  AND (TNS-CDKBN-KBN           =   "H" )
+                  AND (SRY-SRYCD  (IDX)(1:3)   =   "101"     )
+                  AND (TNS-CDKBN-KBN           =   "H"       )
+                   MOVE    1               TO  FLG-RIHA-OK
+               END-IF
+      *        H22.4 ¤«¤é¡¡¿·µ¬¤Î¥ê¥Ï¥Ó¥êÎÁ¥³¡¼¥É¤Ï¶èÊ¬¤ÇÈ½Äê
+               IF     (SPA-SRYYMD              >=  "20100401")
+                  AND (FLG-RIHA-OK             =   ZERO    )
+                  AND (TNS-CDKBN-KBN           =   "H"     )
+                  AND (TNS-CDKBN-KBNNUM        =   "001"
+                                               OR  "002"   )
+                  AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
                    MOVE    1               TO  FLG-RIHA-OK
                END-IF
       *

@@ -130,7 +130,7 @@
       *@
       *    今回リハビリ発生日
            03  WRK-KYUSEI-INP-G.
-               05  WRK-KYUSEI-IN-G         OCCURS   7.
+               05  WRK-KYUSEI-IN-G         OCCURS   8.
                    07  WRK-KYUSEI-ST       PIC X(01).
                    07  WRK-KYUSEI-ED       PIC X(01).
                05  WRK-TEIGEN-IN           PIC X(01).
@@ -1150,6 +1150,8 @@
                    MOVE    "1"             TO  WRK-KYUSEI-ST (6)
                WHEN    "099800171"
                    MOVE    "1"             TO  WRK-KYUSEI-ST (7)
+               WHEN    "099800181"
+                   MOVE    "1"             TO  WRK-KYUSEI-ST (8)
                WHEN    "099800401"
                    MOVE    "1"             TO  WRK-TEIGEN-IN
            END-EVALUATE

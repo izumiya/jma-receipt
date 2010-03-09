@@ -200,13 +200,15 @@
            03  FILLER          PIC X(09)   VALUE  "099800161".
       *    障害児リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800171".
+      *    がん患者リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800181".
       *    他医院退院日
            03  FILLER          PIC X(09)   VALUE  "099999906".
       *
        01  TBL-RRK-SRYCD-GR    REDEFINES   TBL-RRK-SRYCD-G.
            03  TBL-RRK-SRYCD           PIC X(09)
-                                       OCCURS    8.
-       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   8.
+                                       OCCURS    9.
+       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   9.
       *
       *
        01  WRK-MIDAIS-HEN.
@@ -2055,6 +2057,13 @@
                        END-IF
                    END-IF
            END-SEARCH
+      *    Ｈ２２年４月から追加のコードは固定で判定
+      *     (COPY に追加するのは、パッケージ対応で）
+           IF      WRK-SRYCD           =   "099800181"
+                                       OR  "099800182"
+      *        がん患者リハ開始日・終了日
+               MOVE    1               TO  FLG-HKNSAN
+           END-IF
       *
            .
        1000-SANTEI-CHK-EXT.

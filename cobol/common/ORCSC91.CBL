@@ -43,6 +43,8 @@
       *  04.01.00    NACL-多々納  07/11/XX  公害対応
       *  04.02.00    NACL-多々納  08/03/XX  平成２０年４月改正対応
       *                                     入院中１回のチェック追加
+      *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
+      *                                     他月数９９　対応
       *****************************************************************
       *
       *
@@ -361,6 +363,15 @@
                        MOVE    1                   TO  FLG-RIHA-OK
                    END-IF
                END-IF
+      *        H22.4 から　新規のリハビリ料コードは区分で判定
+               IF     (SPA-SRYYMD              >=  "20100401")
+                  AND (FLG-RIHA-OK             =   ZERO    )
+                  AND (TNS-CDKBN-KBN           =   "H"     )
+                  AND (TNS-CDKBN-KBNNUM        =   "001"
+                                               OR  "002"   )
+                  AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
+                   MOVE    1               TO  FLG-RIHA-OK
+               END-IF
       *
                IF      FLG-RIHA-OK         =   1
                    MOVE    "099800201"         TO  LNK-SC91-SRYCD
@@ -487,6 +498,16 @@
                    MOVE    SPACE           TO  WRK-RIGAKU-KBN
                    MOVE    SPACE           TO  WRK-RSI-KBN
                END-IF
+           END-IF
+      *    Ｈ２２年４月から追加のコードは固定で判定
+      *     (COPY に追加するのは、パッケージ対応で）
+           IF      WRK-SRYCD           =   "099800181"
+                                       OR  "099800182"
+      *        がん患者リハ開始日・終了日
+               MOVE    1               TO  FLG-HKNSAN
+               MOVE    SPACE           TO  WRK-RIGAKU-RYO
+               MOVE    SPACE           TO  WRK-RIGAKU-KBN
+               MOVE    SPACE           TO  WRK-RSI-KBN
            END-IF
       *
            IF      WRK-RIGAKU-RYO      =   SPACE
@@ -879,6 +900,11 @@
                COMPUTE WRK-STRMM       =   WRK-STRMM
                                        -  (TNS-JGNCNTETCM   -  1 )
            END-IF
+      *    上限他月数が９９の時は、全履歴１回とする
+           IF      TNS-JGNCNTETCM      =   99
+               MOVE    ZERO                TO  WRK-STRYM
+           END-IF
+      *
       *    保険毎のコードの判定
            PERFORM 1000-SANTEI-CHK-SEC
       *    算定履歴検索
@@ -959,6 +985,12 @@
       *!!!
            END-IF
       *!!!
+      *    上限他月数が９９の時は、履歴があれば終了
+               IF      TNS-JGNCNTETCM      =   99
+                   IF      WRK-SANTEI-CNT      >=  TNS-JGNCNTETC
+                       MOVE    1                   TO  FLG-SANTEI
+                   END-IF
+               END-IF
       *
                IF      FLG-SANTEI          =   ZERO
                    MOVE    "tbl_santei"        TO  MCP-TABLE
@@ -1383,6 +1415,10 @@
                COMPUTE WRK-STRMM       =   WRK-STRMM
                                        -  (TNS-JGNCNTETCM   -  1 )
            END-IF
+      *    上限他月数が９９の時は、全履歴１回とする
+           IF      TNS-JGNCNTETCM      =   99
+               MOVE    ZERO                TO  WRK-STRYM
+           END-IF
       *    保険毎のコードの判定
            PERFORM 1000-SANTEI-CHK-SEC
       *    算定履歴検索
@@ -1457,6 +1493,12 @@
                                UNTIL       IDY     >   31
                            ADD     SANTEI-DAY (IDY)    TO  WRK-ATO-CNT
                        END-PERFORM
+                   END-IF
+               END-IF
+      *    上限他月数が９９の時は、履歴があれば終了
+               IF      TNS-JGNCNTETCM      =   99
+                   IF      WRK-SANTEI-CNT      >=  TNS-JGNCNTETC
+                       MOVE    1                   TO  FLG-SANTEI
                    END-IF
                END-IF
       *

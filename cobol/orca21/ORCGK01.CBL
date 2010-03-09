@@ -369,13 +369,13 @@
       *
            COPY    "CPSK1005.INC".
       *
-           COPY    "CPSK1006.INC".
+      *    COPY    "CPSK1006.INC".
       *
-           COPY    "CPSK1010.INC".
+      *    COPY    "CPSK1010.INC".
       *
            COPY    "CPSK1001.INC".
       *
-           COPY    "CPSK1007.INC".
+      **** COPY    "CPSK1007.INC".
       *
       *    ´µ¼Ô¥Þ¥¹¥¿¡Ý
        01  PTINF-REC.

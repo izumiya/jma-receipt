@@ -966,6 +966,7 @@
                                        OR  "099800151"
                                        OR  "099800161"
                                        OR  "099800171"
+                                       OR  "099800181"
                MOVE    1               TO  SPA-NAI-PLUSKBN
            ELSE
                MOVE    ZERO            TO  SPA-NAI-PLUSKBN
@@ -1169,6 +1170,13 @@
                        END-IF
                    END-IF
            END-SEARCH
+      *    Ｈ２２年４月から追加のコードは固定で判定
+      *     (COPY に追加するのは、パッケージ対応で）
+           IF      WRK-SRYCD           =   "099800181"
+                                       OR  "099800182"
+      *        がん患者リハ開始日・終了日
+               MOVE    1               TO  FLG-HKNSAN
+           END-IF
       *
            .
        1000-SANTEI-CHK-EXT.

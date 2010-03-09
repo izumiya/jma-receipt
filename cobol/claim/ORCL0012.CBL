@@ -81,6 +81,9 @@
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
       *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
+      *
       *    共通パラメタ
            COPY    "MCPAREA".
       *
@@ -153,6 +156,10 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
       *    受付テーブル読み込み
            INITIALIZE                  UKETUKE-REC
            MOVE    LNK-HOSPNUM         TO  UKE-HOSPNUM
@@ -188,6 +195,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                送信完了
                        MOVE    1                   TO  FLG-OK
                        MOVE    LNK-RC              TO  UKE-SRFLG
+                       MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
+                       MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
+      *
                        MOVE    UKETUKE-REC         TO  MCPDATA-REC
       *
                        MOVE    "DBUPDATE"          TO  MCP-FUNC
