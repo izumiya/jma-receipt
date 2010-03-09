@@ -3698,6 +3698,7 @@
                        IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
                                                        OR  3
                                                        OR  4
+                                                       OR  5
                            CONTINUE
                        ELSE
                            MOVE    "0036"         TO  SPA-ERRCD
