@@ -443,6 +443,8 @@
       *  04.04.38    NACL-ÌçÏÆ    10/02/16  ¥ì¥»µ­ºÜ¤·¤Ê¤¤ÃÏÊý¸øÈñ¤¬¤¢¤ë¾ì¹ç
       *                                     ¤ÎÊÝ¸±Íó°ìÉôÉéÃ´¶âÊÔ½¸ÂÐ±þ
       *  04.04.39    NACL-ÌçÏÆ    10/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.04.40    NACL-ÌçÏÆ    10/03/09  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô¤Ë
+      *                                     ´Ø¤¹¤ëÊÝ¸±Íó°ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1093,6 +1095,8 @@
            03  WRK-KOH-KINGAKU                 PIC  9(07).
       *
            03  WRK-SURYOU-COUNT                PIC  9(09).
+      *
+           03  WRK-FTNMONEY-MAE                PIC  9(09).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -10120,6 +10124,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
+           MOVE    999999999   TO   WRK-FTNMONEY-MAE
       *    £·£°ºÐÂåÁ°È¾·Ú¸ºÆÃÎãÁ¼ÃÖÂÐ±þ
            IF  ((FLG-ZENKI-TOKUREI     =   1  ) AND
                 (RECE02-KOHNUM(1)      = "051"))
@@ -10132,6 +10137,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYS-1001-PREFNUM      =  23  ) AND
                 (RECE02-KOHNUM(1)      = "191") AND
                 (RECE02-SRYYM      >= "200910"))
+              MOVE     RECE02-FTNMONEY(2)    TO    WRK-FTNMONEY-MAE
               PERFORM  21093-ZENKI-TOKUREI-OKIKAE-SEC
            ELSE
               IF   RECE02-ZAITAKU  =  "1" OR "2"
@@ -10353,7 +10359,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            END-IF
       *
-           IF      RECE02-SRYYM      >=  "200210"
+           IF   WK-GENGAKUKBN   =   ZERO
+      *
+            IF      RECE02-SRYYM      >=  "200210"
              IF  (RECE02-ZAITAKU       =  "1" OR "2")
              AND (RECE02-KOHNUM(1)     =  SPACE     )
              AND (RECE02-KOHNUM(2)     =  SPACE     )
@@ -10389,7 +10397,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
                                              - WRK-KOH-GAI
                  ELSE
+                  IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                   MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                  ELSE
                    MOVE  RECE02-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                  END-IF
                  END-IF
                  COMPUTE  WRK-CHK-KOKIGAK = RECE02-FTNMONEY(1)
                                           - FTN-KOH-XXX
@@ -10414,9 +10426,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                  END-IF
              END-IF
-           END-IF
+            END-IF
       *
-           EVALUATE   SYS-1001-PREFNUM
+            EVALUATE   SYS-1001-PREFNUM
       *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
              WHEN    "10"
                IF  (RECE02-SRYYM        >=  "200804"  )
@@ -10460,7 +10472,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
                                                - WRK-KOH-GAI
                    ELSE
+                    IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                     MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                    ELSE
                      MOVE  RECE02-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                    END-IF
                    END-IF
                    COMPUTE  WRK-CHK-KOKIGAK = RECE02-FTNMONEY(1)
                                             - FTN-KOH-XXX
@@ -10569,7 +10585,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
                                                - WRK-KOH-GAI
                    ELSE
+                    IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                     MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                    ELSE
                      MOVE  RECE02-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                    END-IF
                    END-IF
                    COMPUTE  WRK-CHK-KOKIGAK = RECE02-FTNMONEY(1)
                                             - FTN-KOH-XXX
@@ -10623,7 +10643,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
                                                - WRK-KOH-GAI
                    ELSE
+                    IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                     MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                    ELSE
                      MOVE  RECE02-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                    END-IF
                    END-IF
                    COMPUTE  WRK-CHK-KOKIGAK = RECE02-FTNMONEY(1)
                                             - FTN-KOH-XXX
@@ -10644,7 +10668,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                  END-IF
                END-IF
-           END-EVALUATE
+            END-EVALUATE
+      *
+           END-IF
       *
            .
        2109-SAIKEI-KEISAN-EXT.
