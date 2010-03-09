@@ -41,13 +41,13 @@
                 05  W21-BRM-SBT-ITM        PIC X(23)   OCCURS  15.
                 05  W21-BRM-SBT-ITM-STT    PIC S9(9)   BINARY.
               04  W21-CMB-BRM-TOKUTEINYUIN.
-                05  W21-BRM-TOKUTEINYUIN   PIC X(43).
+                05  W21-BRM-TOKUTEINYUIN   PIC X(53).
                 05  W21-BRM-TOKUTEINYUIN-STT
                                            PIC S9(9)   BINARY.
                 05  W21-BRM-TOKUTEINYUIN-CNT
                                            PIC S9(9)   BINARY.
                 05  W21-BRM-TOKUTEINYUIN-ITM
-                                           PIC X(43)   OCCURS  30.
+                                           PIC X(53)   OCCURS  30.
                 05  W21-BRM-TOKUTEINYUIN-ITM-STT
                                            PIC S9(9)   BINARY.
               04  W21-BRM-NINZU            PIC S9(2).

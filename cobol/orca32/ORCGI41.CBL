@@ -2978,6 +2978,10 @@
                MOVE    WIDGET-INSENSITIVE  TO  I41-B05S-STATE
            END-IF
       *
+           IF    ( SPA-NAI-LOCK            =   1 )
+               MOVE    WIDGET-INSENSITIVE  TO  I41-B05S-STATE
+           END-IF
+      *
       *    カーソル
            PERFORM 5001-MAPCUR-SEC
            .
@@ -3217,7 +3221,10 @@
       *    排他制御処理
            PERFORM 990-LOCK-IN-SEC.
            IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    1       TO  SPA-NAI-LOCK
                GO      TO      41010-PTNUM-SYORI-EXT
+           ELSE
+               MOVE    ZERO    TO  SPA-NAI-LOCK
            END-IF
       *
       *    前回患者へ待避

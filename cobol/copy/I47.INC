@@ -16,6 +16,8 @@
       * 113-8621, Japan.
       ********************************************************************
         02  I47.
+          03  I47-LBLINFO-STYLE PIC X(20).
+          03  I47-LBLINFO   PIC X(80).
           03  I47-PTNUM.
             04  I47-VALUE   PIC X(20).
           03  I47-SRYYM.
@@ -62,6 +64,9 @@
               05  I47-NYULIST-COUNT   PIC S9(9)   BINARY.
               05  I47-NYULIST-ROW PIC S9(9)   BINARY.
               05  I47-NYULIST-ROWATTR PIC S9(9)   BINARY.
+              05  I47-NYULIST-NDAY-OCC       OCCURS 31.
+                  07  I47-NYULIST-NDAY-STYLE PIC X(20).
+                  07  I47-NYULIST-NDAY       PIC X(02).
               05  I47-NYULIST-ITEM    OCCURS  3 TIMES.
                 06  I47-TNL-NUM        PIC X(2).
                 06  I47-TNL-MARK       PIC X(1).

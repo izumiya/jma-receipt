@@ -50,6 +50,7 @@
       *  03.05.00    NACL-¾®Æ¦Âô  07.07.27  ÎÅÍÜÉÂÅï¡ÊÉÂ¾²¡ËÆþ±¡²ñ·×
       *                                     É½¼¨¶èÊ¬ÂÐ±þ
       *  04.03.00    NACL-Â¿¡¹Ç¼  08.08.28  Âà±¡»þ±¡³°½èÊý¤»¤ó¶èÊ¬ÄÉ²Ã
+      *  04.05.00    NACL-ÂÀÅÄ    10.03.01  ²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -164,6 +165,7 @@
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
       *
+           03  CONST-H220401           PIC X(08)   VALUE "20100401".
            03  CONST-H180401           PIC X(08)   VALUE "20060401".
            03  CONST-H160401           PIC X(08)   VALUE "20040401".
            03  CONST-SRYACT-MAX        PIC 9(03)   VALUE 10.
@@ -213,6 +215,32 @@
       *    Æþ±¡²Ã»»¾ðÊó
            03  CONST-NYUKSN-AREA.
                05  CONST-NYUKSN-MAX    PIC 9(05)   VALUE   20.
+               05  CONST-NYUKSN-H2204-G.
+                   07  CONST-NYUKSN-H2204-VAL.
+                       09              PIC X(09)   VALUE   "190098870".
+                       09              PIC X(09)   VALUE   "190099870".
+                       09              PIC X(09)   VALUE   "190100370".
+                       09              PIC X(09)   VALUE   "190100470".
+                       09              PIC X(09)   VALUE   "190100770".
+                       09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100970".
+                       09              PIC X(09)   VALUE   "190107170".
+                       09              PIC X(09)   VALUE   "190117170".
+                       09              PIC X(09)   VALUE   "190119910".
+                       09              PIC X(09)   VALUE   "190117270".
+                       09              PIC X(09)   VALUE   "190120510".
+                       09              PIC X(09)   VALUE   "190136910".
+                       09              PIC X(09)   VALUE   "190137070".
+                       09              PIC X(09)   VALUE   "190120410".
+                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "         ".
+                   07  CONST-NYUKSN-H2204-R
+                               REDEFINES   CONST-NYUKSN-H2204-VAL.
+                       09  CONST-NYUKSN-H2204
+                                       PIC X(09)   OCCURS   20.
                05  CONST-NYUKSN-H1804-G.
                    07  CONST-NYUKSN-H1804-VAL.
                        09              PIC X(09)   VALUE   "190098870".
@@ -1062,8 +1090,15 @@
                                    TO  SPA-GMN-W24-RYOYODSPMEIL (1)
       *
            MOVE    "1"             TO  SPA-GMN-W24-RYOYODSPL    (2)
-           MOVE    "Æþ±¡ÎÁ£Á¡Á£Å¤òÉ½¼¨"
+      *
+           IF    ( SPA-W01-STYUKYMD    >=  CONST-H220401 )
+            AND  ( SPA-HOSPSBT          =  1 )
+               MOVE    "Æþ±¡ÎÁ£Á¡Á£É¤òÉ½¼¨"
                                    TO  SPA-GMN-W24-RYOYODSPMEIL (2)
+           ELSE
+               MOVE    "Æþ±¡ÎÁ£Á¡Á£Å¤òÉ½¼¨"
+                                   TO  SPA-GMN-W24-RYOYODSPMEIL (2)
+           END-IF
       *
            .
        310-RYOYODSPLST-SET-EXT.
@@ -2251,6 +2286,8 @@
                                    TO  SYS-5000-NACCT-GAIHAKUKBN
       *
            EVALUATE    TRUE
+           WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H220401 )
+               MOVE    15          TO  WRK-MAX
            WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H180401 )
                MOVE    13          TO  WRK-MAX
            WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H160401 )
@@ -3783,6 +3820,9 @@
                    UNTIL ( IDX0    >   CONST-NYUKSN-MAX )
       *
                EVALUATE    TRUE
+               WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H220401 )
+                   MOVE    CONST-NYUKSN-H2204 (IDX0)
+                                   TO  SPA-NAI-W24-NYUKSN-SRYCD  (IDX0)
                WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H180401 )
                    MOVE    CONST-NYUKSN-H1804 (IDX0)
                                    TO  SPA-NAI-W24-NYUKSN-SRYCD  (IDX0)

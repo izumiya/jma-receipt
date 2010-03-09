@@ -221,12 +221,17 @@ W31	{
 				state	int;
 			};
 			FT02	{
+			 	LBLADLINPUTINFO	{
+					value	varchar(80);
+				};
 				CMB_ADLINPUTKBN	{
 					ADLINPUTKBN	{
 						value	varchar(22);
+		           			state	int;
 					};
 					count	int;
 					item	varchar(22)[02];
+		           		state	int;
 				};
 				CMB_SETMEDKBN	{
 					SETMEDKBN	{

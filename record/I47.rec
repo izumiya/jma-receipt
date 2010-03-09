@@ -1,5 +1,9 @@
 I47	{
 	fixed2	{
+		LBLINFO	{
+			style	varchar(20);
+			value	varchar(80);
+		};
 		PTNUM	{
 			value	varchar(20);
 		};
@@ -180,6 +184,130 @@ I47	{
 				count	int;
 				row	int;
 				rowattr	int;
+				NDAY01	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY02	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY03	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY04	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY05	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY06	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY07	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY08	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY09	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY10	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY11	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY12	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY13	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY14	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY15	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY16	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY17	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY18	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY19	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY20	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY21	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY22	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY23	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY24	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY25	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY26	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY27	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY28	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY29	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY30	{
+					style	varchar(20);
+					value	varchar(02);
+				};
+				NDAY31	{
+					style	varchar(20);
+					value	varchar(02);
+				};
 				item	{
 					value0	varchar(2);
 					value1	varchar(1);

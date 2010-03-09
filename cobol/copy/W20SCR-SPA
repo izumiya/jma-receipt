@@ -137,6 +137,13 @@
                    13  SPA-GMN-W20-DRTEKFL1        PIC X(01).
                    13  SPA-GMN-W20-DRTEKMEI        PIC X(24).
                    13  SPA-GMN-W20-DRTEKFL2        PIC X(01).
+      *          ∞Âª’«€√÷≈¨πÁ≤√ªª£≤
+                 11  SPA-GMN-W20-DRTEK2-LBL        PIC X(36).
+                 11  SPA-GMN-W20-DRTEK2-G.
+                   13  SPA-GMN-W20-DRTEK2          PIC X(01).
+                   13  SPA-GMN-W20-DRTEK2FL1       PIC X(01).
+                   13  SPA-GMN-W20-DRTEK2MEI       PIC X(24).
+                   13  SPA-GMN-W20-DRTEK2FL2       PIC X(01).
       *          ∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-DRHJO-LBL         PIC X(36).
                  11  SPA-GMN-W20-DRHJO-G.
@@ -186,8 +193,15 @@
                    13  SPA-GMN-W20-YKNHICH2FL1     PIC X(01).
                    13  SPA-GMN-W20-YKNHICH2MEI     PIC X(24).
                    13  SPA-GMN-W20-YKNHICH2FL2     PIC X(01).
+      *          ¿∫ø¿≤ √œ∞Ë∞‹π‘º¬ª‹≤√ªª
+                 11  SPA-GMN-W20-SEICHIIKI-LBL       PIC X(36).
+                 11  SPA-GMN-W20-SEICHIIKI-G.
+                   13  SPA-GMN-W20-SEICHIIKI         PIC X(01).
+                   13  SPA-GMN-W20-SEICHIIKIFL1      PIC X(01).
+                   13  SPA-GMN-W20-SEICHIIKIMEI      PIC X(24).
+                   13  SPA-GMN-W20-SEICHIIKIFL2      PIC X(01).
                09  SPA-GMN-W20-KSN-R   REDEFINES   SPA-GMN-W20-KSN-G.
-                 11  SPA-GMN-W20-KSN-OCC           OCCURS 17.
+                 11  SPA-GMN-W20-KSN-OCC           OCCURS 19.
                    13  SPA-GMN-W20-KSN-LBL         PIC X(36).
                    13  SPA-GMN-W20-KSN             PIC X(27).
       *        Õ≠∏˙≥´ªœ∆¸
@@ -338,6 +352,14 @@
                      15  SPA-GMN-W20-DRTEKFL1L      PIC X(01).
                      15  SPA-GMN-W20-DRTEKMEIL     PIC X(24).
                      15  SPA-GMN-W20-DRTEKFL2L      PIC X(01).
+      *          ∞Âª’«€√÷≤√ªª£≤
+                 11  SPA-GMN-W20-DRTEK2LST-G.
+                   13  SPA-GMN-W20-DRTEK2-MAX       PIC 9(03).
+                   13  SPA-GMN-W20-DRTEK2LST        OCCURS  10.
+                     15  SPA-GMN-W20-DRTEK2L        PIC X(01).
+                     15  SPA-GMN-W20-DRTEK2FL1L     PIC X(01).
+                     15  SPA-GMN-W20-DRTEK2MEIL     PIC X(24).
+                     15  SPA-GMN-W20-DRTEK2FL2L     PIC X(01).
       *          ∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-DRHJOLST-G.
                    13  SPA-GMN-W20-DRHJO-MAX       PIC 9(03).
@@ -394,9 +416,17 @@
                      15  SPA-GMN-W20-YKNHICH2FL1L      PIC X(01).
                      15  SPA-GMN-W20-YKNHICH2MEIL     PIC X(24).
                      15  SPA-GMN-W20-YKNHICH2FL2L      PIC X(01).
+      *          ¿∫ø¿≤ √œ∞Ë∞‹π‘º¬ª‹≤√ªª
+                 11  SPA-GMN-W20-SEICHIIKILST-G.
+                   13  SPA-GMN-W20-SEICHIIKI-MAX         PIC 9(03).
+                   13  SPA-GMN-W20-SEICHIIKILST          OCCURS  10.
+                     15  SPA-GMN-W20-SEICHIIKIL          PIC X(01).
+                     15  SPA-GMN-W20-SEICHIIKIFL1L       PIC X(01).
+                     15  SPA-GMN-W20-SEICHIIKIMEIL       PIC X(24).
+                     15  SPA-GMN-W20-SEICHIIKIFL2L       PIC X(01).
                09  SPA-GMN-W20-KSNLST-R    REDEFINES
                  SPA-GMN-W20-KSNLST-G.
-                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  17.
+                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  19.
                    13  SPA-GMN-W20-KSNLST-MAX      PIC 9(03).
                    13  SPA-GMN-W20-KSNLST          PIC X(27)
                                                    OCCURS  10.
@@ -510,6 +540,9 @@
                  11  SPA-NAI-W20-DRTEK-CD          PIC 9(09).
                  11  SPA-NAI-W20-DRTEK-IDX         PIC 9(03).
       *
+                 11  SPA-NAI-W20-DRTEK2-CD          PIC 9(09).
+                 11  SPA-NAI-W20-DRTEK2-IDX         PIC 9(03).
+      *
                  11  SPA-NAI-W20-DRHJO-CD          PIC 9(09).
                  11  SPA-NAI-W20-DRHJO-IDX         PIC 9(03).
       *
@@ -530,10 +563,13 @@
       *
                  11  SPA-NAI-W20-YKNHICH2-CD        PIC 9(09).
                  11  SPA-NAI-W20-YKNHICH2-IDX       PIC 9(03).
+      *
+                 11  SPA-NAI-W20-SEICHIIKI-CD       PIC 9(09).
+                 11  SPA-NAI-W20-SEICHIIKI-IDX      PIC 9(03).
                09  SPA-NAI-W20-KSNINF-R  REDEFINES
                    SPA-NAI-W20-KSNINF-G.
-                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 17.
-                   13  SPA-NAI-W20-KSNINF-CD       PIC 9(09).
+                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 19.
+                   13  SPA-NAI-W20-KSNINF-CD       PIC X(09).
                    13  SPA-NAI-W20-KSNINF-IDX      PIC 9(03).
       *      Õ˙ŒÚ•Í•π•»∆‚…ÙŒŒ∞Ë
              07  SPA-NAI-W20-RIREKILST.
@@ -581,7 +617,7 @@
                09  SPA-GMN-W21-TOKNYUIN-G.
                  11  SPA-GMN-W21-TOKNYUIN        PIC X(02).
                  11  SPA-GMN-W21-TOKNYUINFL      PIC X(01).
-                 11  SPA-GMN-W21-TOKNYUINMEI     PIC X(40).
+                 11  SPA-GMN-W21-TOKNYUINMEI     PIC X(50).
       *
       *        º˝Õ∆øÕøÙ
                09  SPA-GMN-W21-NINZU               PIC S9(2).
@@ -698,7 +734,7 @@
                  11  SPA-GMN-W21-TOKNYUINLST       OCCURS 30.
                    13  SPA-GMN-W21-TOKNYUINL       PIC X(02).
                    13  SPA-GMN-W21-TOKNYUINFL      PIC X(01).
-                   13  SPA-GMN-W21-TOKNYUINMEIL    PIC X(40).
+                   13  SPA-GMN-W21-TOKNYUINMEIL    PIC X(50).
       *        ººŒ¡∫π≥€•≥•Û•‹
                09  SPA-GMN-W21-SAGAKULST-G.
       *          ººŒ¡∫π≥€•≥•Û•‹π‡Ã‹øÙ
@@ -889,7 +925,7 @@
                09  SPA-NAI-W21-KSNINF-R  REDEFINES
                    SPA-NAI-W21-KSNINF-G.
                  11  SPA-NAI-W21-KSNINF-OCC        OCCURS 7.
-                   13  SPA-NAI-W21-KSNINF-CD       PIC 9(09).
+                   13  SPA-NAI-W21-KSNINF-CD       PIC X(09).
                    13  SPA-NAI-W21-KSNINF-IDX      PIC 9(03).
              07  SPA-NAI-W21-BRMLST.
                09  SPA-NAI-W21-BRMLST-OCC          OCCURS  200.

@@ -71,7 +71,7 @@
            03  WRK-DAY-X.
                05  WRK-DAY                     PIC 9(02).
            03  WRK-RYOYO-DAY-G.
-               05  WRK-RYOYO-DAY               PIC 9(01)
+               05  WRK-RYOYO-DAY               PIC S9(02)
                                                OCCURS  31.
            03  WRK-TNS-SRYCD                   PIC X(09).
            03  WRK-TNS-KJNYMD                  PIC X(08).
@@ -96,63 +96,9 @@
       *
        01  CONST-AREA.
            03  CONST-NSRYACT-MAX       PIC 9(05)   VALUE 5.
-           03  CONST-RYOYOCD-G.
-               05  CONST-RYOYOCD-VAL.
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190121310".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190121410".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190121510".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190121610".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190121710".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190121810".
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190123710".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190123810".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190123910".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190124010".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190124110".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190124210".
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190122010".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190122110".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190122210".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190122310".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190122410".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190122510".
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190124310".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190124410".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190124510".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190124610".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190124710".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190124810".
-               05  CONST-RYOYOCD-R REDEFINES   CONST-RYOYOCD-VAL.
-                   07  CONST-RYOYOCD-OCC   OCCURS      24.
-                       09  CONST-RYOYOCDMSGID
-                                           PIC 9(01).
-                       09  CONST-RYOYOCD   PIC X(09).
-               05  CONST-RYOYOCD-MAX   PIC 9(05)   VALUE   24.
            03  CONST-ADL-TTLZAINUM     PIC 9(04)   VALUE 3000.
+      *
+           COPY    "CPRYOYOCD.INC".
       *
        01  WKRYOCOM-REC.
            COPY    "CPRYOCOM.INC"      REPLACING
@@ -337,11 +283,10 @@
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
       *
-                   IF    ( WRK-RYOYO-DAY (IDX-DAY) >   ZERO )
+                   IF    ( WRK-RYOYO-DAY (IDX-DAY) NOT =   ZERO )
                        MOVE    WRK-RYOYO-DAY (IDX-DAY)
                                        TO  CL-DAY (IDX-DAY)
-                       IF    ( WRK-RYOYO-DAY (IDX-DAY) >=  1 )
-                        AND  ( WRK-RYOYO-DAY (IDX-DAY) <=  6 )
+                       IF    ( WRK-RYOYO-DAY (IDX-DAY) >   ZERO )
                            MOVE    1   TO  CL-RYOYO-FLG
                        END-IF
                    END-IF
@@ -424,7 +369,7 @@
                            UNTIL ( IDX-DAY >   31 )
       *
                        IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
-                           MOVE    9       TO  WRK-RYOYO-DAY (IDX-DAY)
+                           MOVE    -1      TO  WRK-RYOYO-DAY (IDX-DAY)
                        END-IF
       *
                    END-PERFORM
@@ -570,13 +515,11 @@
                IF    ( RYOCOM-MONTH    >   ZERO )
                    CONTINUE
                ELSE
-                   IF    ( CL-ZENGETU-DAY (CL-ZENGETU-END) >=  1 )
-                    AND  ( CL-ZENGETU-DAY (CL-ZENGETU-END) <=  6 )
+                   IF    ( CL-ZENGETU-DAY (CL-ZENGETU-END) >   ZERO )
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   CL-KONGETU-END )
       *
-                           IF    ( CL-KONGETU-DAY (IDX-DAY) >=  1 )
-                            AND  ( CL-KONGETU-DAY (IDX-DAY) <=  6 )
+                           IF    ( CL-KONGETU-DAY(IDX-DAY) >   ZERO )
                                MOVE    WKRYOCOM-DAY (CL-ZENGETU-END)
                                        TO  RYOCOM-DAY (IDX-DAY)
                            END-IF

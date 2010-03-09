@@ -65,10 +65,6 @@
       *    ファイルレイアウト
       *****************************************************************
       *
-      *    入院料算定マスタ
-       01  NYUINKHN-REC.
-           COPY  "CPNYUINKHN.INC".
-      *
       *    点数マスタ
            COPY  "CPTENSU.INC".
       *
@@ -112,28 +108,21 @@
       *****************************************************************
        100-EDIT-SEC                    SECTION.
       *
-           INITIALIZE  NYUINKHN-REC
-                       W20SUB01-OT
+           INITIALIZE  W20SUB01-OT
       *
            EVALUATE    W20SUB01-I-KBN
       *
       *    診療行為コードで検索
            WHEN    "1"
-               MOVE    W20SUB01-I-KHNSRYCD TO  NYUKHN-KHNSRYCD
-               MOVE    W20SUB01-I-KJNYMD   TO  NYUKHN-YUKOSTYMD
-                                               NYUKHN-YUKOEDYMD
-               MOVE    "key"               TO  WRK-PATHNAME
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               IF    ( FLG-TENSU   =   ZERO )
+                   PERFORM 1001-W20SUB01-0-HEN-SEC
+               ELSE
+                   MOVE    1               TO  W20SUB01-O-RC
+               END-IF
            WHEN    OTHER
                MOVE    1                   TO  W20SUB01-O-RC
            END-EVALUATE 
-      *
-           PERFORM 800-NYUKHN-SEL-SEC
-           IF    ( FLG-NYUKHN      =   ZERO )
-      *
-               PERFORM 1001-W20SUB01-0-HEN-SEC
-           ELSE
-               MOVE    1               TO  W20SUB01-O-RC
-           END-IF
       *
            .
        100-EDIT-EXT.
@@ -144,77 +133,18 @@
        1001-W20SUB01-0-HEN-SEC         SECTION.
       *
            MOVE    ZERO        TO  W20SUB01-O-RC
-           MOVE    WRK-TNS-NAME
-                               TO  W20SUB01-O-NAME
-           MOVE    NYUKHN-KHNSRYCD
+           MOVE    TNS-NAME    TO  W20SUB01-O-NAME
+           MOVE    W20SUB01-I-KHNSRYCD
                                TO  W20SUB01-O-KHNSRYCD
-           MOVE    WRK-TNS-TEN
-                               TO  W20SUB01-O-KHNTEN
+           MOVE    TNS-TEN     TO  W20SUB01-O-KHNTEN
       *
            .
        1001-W20SUB01-0-HEN-EXT.
           EXIT.
       *****************************************************************
-      *    入院料算定マスタ検索処理
-      *****************************************************************
-       800-NYUKHN-SEL-SEC              SECTION.
-      *
-           MOVE    SPACE               TO  WRK-TNS-NAME
-           MOVE    ZERO                TO  WRK-TNS-TEN
-      *
-           MOVE    ZERO                TO  FLG-NYUKHN
-      *
-           MOVE    NYUINKHN-REC        TO  MCPDATA-REC
-      *
-      *    入院料算定マスタ検索
-           MOVE    "tbl_nyuinkhn"      TO  MCP-TABLE
-           MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      NOT =   ZERO )
-                   MOVE    1           TO  FLG-NYUKHN
-           ELSE
-               MOVE    MCPDATA-REC TO  NYUINKHN-REC
-               MOVE    NYUKHN-KHNSRYCD
-                                   TO  WRK-SRYCD
-      *        点数マスタより名称取得
-               PERFORM 800-TENSU-SEL-SEC
-               IF    ( FLG-TENSU   =   ZERO )
-                   MOVE    TNS-NAME
-                                   TO  WRK-TNS-NAME
-                   MOVE    TNS-TEN
-                                   TO  WRK-TNS-TEN
-      *
-                   IF    ( TNS-SRYCD   =   "099999950" )
-                       MOVE    "190097010"
-                                       TO  WRK-SRYCD
-                       PERFORM 800-TENSU-SEL-SEC
-                       MOVE    TNS-TEN
-                                   TO  WRK-TNS-TEN
-                   END-IF
-                   IF    ( TNS-SRYCD   =   "099999951" )
-                       MOVE    "190097210"
-                                       TO  WRK-SRYCD
-                       PERFORM 800-TENSU-SEL-SEC
-                       MOVE    TNS-TEN
-                                   TO  WRK-TNS-TEN
-                   END-IF
-      *
-               END-IF
-           END-IF
-      *
-      *    入院料算定マスタクローズ
-           MOVE    "tbl_nyuinkhn"      TO  MCP-TABLE
-           MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-      *
-       800-NYUKHN-SEL-EXT.
-           EXIT.
-      *****************************************************************
       *    点数マスタ検索処理
       *****************************************************************
-       800-TENSU-SEL-SEC              SECTION.
+       900-TENSU-KEY-SEL-SEC           SECTION.
       *
            MOVE    ZERO            TO  FLG-TENSU
       *
@@ -222,11 +152,21 @@
       *
            MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
       *
-           MOVE    WRK-SRYCD       TO  TNS-SRYCD
-           MOVE    W20SUB01-I-KJNYMD
-                                   TO  TNS-YUKOSTYMD
-                                       TNS-YUKOEDYMD
-           MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
+           EVALUATE    W20SUB01-I-KHNSRYCD
+           WHEN    "099999950"
+               MOVE    "190097010" TO  TNS-SRYCD
+           WHEN    "099999951"
+               MOVE    "190097210" TO  TNS-SRYCD
+           WHEN    "099999952"
+               MOVE    "190135110" TO  TNS-SRYCD
+           WHEN    OTHER
+               MOVE    W20SUB01-I-KHNSRYCD
+                                   TO  TNS-SRYCD
+           END-EVALUATE
+           
+           MOVE    W20SUB01-I-KJNYMD   TO  TNS-YUKOSTYMD
+                                           TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
       *
       *    点数マスタ検索
            MOVE    "tbl_tensu"     TO  MCP-TABLE
@@ -245,7 +185,7 @@
       *
            .
       *
-       800-TENSU-SEL-EXT.
+       900-TENSU-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

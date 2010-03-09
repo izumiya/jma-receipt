@@ -273,7 +273,13 @@
 	<key>GDK_F11</key>
 	<signal>clicked</signal>
       </accelerator>
-      <label></label>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Mon, 25 Dec 2000 05:01:47 GMT</last_modification_time>
+      </signal>
+      <label>Æþ±¡ÎÁÊÑ¹¹</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -1582,22 +1588,6 @@
     </widget>
 
     <widget>
-      <class>GtkLabel</class>
-      <name>label172</name>
-      <x>20</x>
-      <y>680</y>
-      <width>64</width>
-      <height>24</height>
-      <label>°ì³ç½¤Àµ</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
       <class>GtkHSeparator</class>
       <name>hseparator3</name>
       <x>8</x>
@@ -1715,7 +1705,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label215</name>
+	  <name>NDAY01</name>
 	  <label>1</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1728,7 +1718,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label216</name>
+	  <name>NDAY02</name>
 	  <label>2</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1741,7 +1731,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label217</name>
+	  <name>NDAY03</name>
 	  <label>3</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1754,7 +1744,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label218</name>
+	  <name>NDAY04</name>
 	  <label>4</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1767,7 +1757,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label219</name>
+	  <name>NDAY05</name>
 	  <label>5</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1780,7 +1770,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label220</name>
+	  <name>NDAY06</name>
 	  <label>6</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1793,7 +1783,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label221</name>
+	  <name>NDAY07</name>
 	  <label>7</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1806,7 +1796,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label222</name>
+	  <name>NDAY08</name>
 	  <label>8</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1819,7 +1809,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label223</name>
+	  <name>NDAY09</name>
 	  <label>9</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1832,7 +1822,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label224</name>
+	  <name>NDAY10</name>
 	  <label>10</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1845,7 +1835,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label225</name>
+	  <name>NDAY11</name>
 	  <label>11</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1858,7 +1848,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label226</name>
+	  <name>NDAY12</name>
 	  <label>12</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1871,7 +1861,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label227</name>
+	  <name>NDAY13</name>
 	  <label>13</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1884,7 +1874,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label228</name>
+	  <name>NDAY14</name>
 	  <label>14</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1897,7 +1887,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label229</name>
+	  <name>NDAY15</name>
 	  <label>15</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1910,7 +1900,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label230</name>
+	  <name>NDAY16</name>
 	  <label>16</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1923,7 +1913,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label231</name>
+	  <name>NDAY17</name>
 	  <label>17</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1936,7 +1926,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label232</name>
+	  <name>NDAY18</name>
 	  <label>18</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1949,7 +1939,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label233</name>
+	  <name>NDAY19</name>
 	  <label>19</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1962,7 +1952,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label234</name>
+	  <name>NDAY20</name>
 	  <label>20</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1975,7 +1965,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label235</name>
+	  <name>NDAY21</name>
 	  <label>21</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -1988,7 +1978,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label236</name>
+	  <name>NDAY22</name>
 	  <label>22</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2001,7 +1991,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label237</name>
+	  <name>NDAY23</name>
 	  <label>23</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2014,7 +2004,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label238</name>
+	  <name>NDAY24</name>
 	  <label>24</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2027,7 +2017,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label239</name>
+	  <name>NDAY25</name>
 	  <label>25</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2040,7 +2030,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label240</name>
+	  <name>NDAY26</name>
 	  <label>26</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2053,7 +2043,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label241</name>
+	  <name>NDAY27</name>
 	  <label>27</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2066,7 +2056,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label242</name>
+	  <name>NDAY28</name>
 	  <label>28</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2079,7 +2069,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label243</name>
+	  <name>NDAY29</name>
 	  <label>29</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2092,7 +2082,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label244</name>
+	  <name>NDAY30</name>
 	  <label>30</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2105,7 +2095,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label245</name>
+	  <name>NDAY31</name>
 	  <label>31</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -2626,6 +2616,38 @@
 	  <ypad>0</ypad>
 	</widget>
       </widget>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label172</name>
+      <x>20</x>
+      <y>680</y>
+      <width>64</width>
+      <height>24</height>
+      <label>°ì³ç½¤Àµ</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLINFO</name>
+      <x>556</x>
+      <y>8</y>
+      <width>450</width>
+      <height>24</height>
+      <label>¤¢¤¤¤¦¤¨¤ª</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
   </widget>
 </widget>

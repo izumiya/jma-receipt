@@ -62,8 +62,11 @@
                                                    OCCURS  31.
                05  SPA-I47-RYOYO-FLG               PIC 9(01).
                05  SPA-I47-RYOYO-DAY-G.
-                   07  SPA-I47-RYOYO-DAY           PIC 9(01)
-                                                   OCCURS  31.
+                   07  SPA-I47-RYOYO-DAY-OCC       OCCURS  31.
+                       09  SPA-I47-RYOYO-DAY       PIC S9(02).
+                       09  SPA-I47-RYOYO-CD        PIC X(09).
+                       09  SPA-I47-RYOYO-LIFE      PIC 9(01).
+                       09  SPA-I47-RYOYO-KHN       PIC 9(01).
                05  SPA-GMN-CUR                     PIC 9(03).
                05  SPA-GMN-AREA.
                    07  SPA-GMN-SELNUM              PIC X(50).
@@ -115,6 +118,7 @@
            03  FLG-MEDKBN3LMT              PIC 9(01).
            03  FLG-MEDKBN2LMT              PIC 9(01).
            03  FLG-ADLKBN                  PIC 9(01).
+           03  FLG-MEDCOM                  PIC 9(01).
            03  FLG-TARGET                  PIC 9(01).
            03  FLG-RYOLIST-ROW             PIC 9(01).
       *
@@ -194,7 +198,16 @@
                05  WRK-TENSU-X             PIC X(10).
                05  WRK-TENSU               PIC 9(02).
            03  WRK-RYOYO-DAY-G.
-               05  WRK-RYOYO-DAY           PIC 9(01)
+               05  WRK-RYOYO-DAY           PIC S9(02)
+                                           OCCURS  31.
+           03  WRK-RYOYO-CD-G.
+               05  WRK-RYOYO-CD            PIC X(09)
+                                           OCCURS  31.
+           03  WRK-RYOYO-LIFE-G.
+               05  WRK-RYOYO-LIFE          PIC 9(01)
+                                           OCCURS  31.
+           03  WRK-RYOYO-KHN-G.
+               05  WRK-RYOYO-KHN           PIC 9(01)
                                            OCCURS  31.
            03  WRK-ZAINUM-G.
                05  WRK-ZAINUM              PIC 9(08).
@@ -220,7 +233,7 @@
       *
        01  MEDINF-AREA.
            03  MEDINF-MAX                  PIC 9(05).
-           03  MEDINF-OCC                  OCCURS        50.
+           03  MEDINF-OCC                  OCCURS       50.
                09  MEDINF-MEDKBN           PIC 9(01).
                09  MEDINF-LIMIT            PIC 9(03).
                09  MEDINF-ALLKBN           PIC 9(01).
@@ -229,64 +242,9 @@
       *
        01  CONST-AREA.
       *
+           03  CONST-H220401           PIC X(08)   VALUE   "20100401".
            03  CONST-H200401           PIC X(08)   VALUE   "20080401".
            03  CONST-NSRYACT-MAX       PIC 9(05)     VALUE 5.
-           03  CONST-RYOYOCD-G.
-               05  CONST-RYOYOCD-VAL.
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190121310".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190121410".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190121510".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190121610".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190121710".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190121810".
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190123710".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190123810".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190123910".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190124010".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190124110".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190124210".
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190122010".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190122110".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190122210".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190122310".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190122410".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190122510".
-                   07                  PIC 9(01)   VALUE 1.
-                   07                  PIC X(09)   VALUE "190124310".
-                   07                  PIC 9(01)   VALUE 2.
-                   07                  PIC X(09)   VALUE "190124410".
-                   07                  PIC 9(01)   VALUE 3.
-                   07                  PIC X(09)   VALUE "190124510".
-                   07                  PIC 9(01)   VALUE 4.
-                   07                  PIC X(09)   VALUE "190124610".
-                   07                  PIC 9(01)   VALUE 5.
-                   07                  PIC X(09)   VALUE "190124710".
-                   07                  PIC 9(01)   VALUE 6.
-                   07                  PIC X(09)   VALUE "190124810".
-               05  CONST-RYOYOCD-R REDEFINES   CONST-RYOYOCD-VAL.
-                   07  CONST-RYOYOCD-OCC   OCCURS      24.
-                       09  CONST-RYOYOCDMSGID
-                                           PIC 9(01).
-                       09  CONST-RYOYOCD   PIC X(09).
-               05  CONST-RYOYOCD-MAX   PIC 9(05)   VALUE   24.
       *
            03  CONST-RYOLIST-MAX       PIC 9(04)   VALUE   100.
       *
@@ -765,6 +723,253 @@
                        09  CONST-MEDH20-SRYCD  PIC X(09).
                05  CONST-MEDH20-MAX        PIC 9(03)   VALUE   37.
       *
+           03  CONST-MEDH22-G.
+               05  CONST-MEDH22-VAL.
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2004.
+                   07                  PIC X(09)   VALUE "820000060".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 14.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2020.
+                   07                  PIC X(09)   VALUE "820000076".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 30.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2021.
+                   07                  PIC X(09)   VALUE "820000077".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2022.
+                   07                  PIC X(09)   VALUE "820000078".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2023.
+                   07                  PIC X(09)   VALUE "820000079".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 3.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2024.
+                   07                  PIC X(09)   VALUE "820000080".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2027.
+                   07                  PIC X(09)   VALUE "820000083".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2031.
+                   07                  PIC X(09)   VALUE "820000087".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 3.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2034.
+                   07                  PIC X(09)   VALUE "820000090".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2001.
+                   07                  PIC X(09)   VALUE "820000057".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2010.
+                   07                  PIC X(09)   VALUE "820000066".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2002.
+                   07                  PIC X(09)   VALUE "820000058".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2003.
+                   07                  PIC X(09)   VALUE "820000059".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2005.
+                   07                  PIC X(09)   VALUE "820000061".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2006.
+                   07                  PIC X(09)   VALUE "820000062".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2007.
+                   07                  PIC X(09)   VALUE "820000063".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2008.
+                   07                  PIC X(09)   VALUE "820000064".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2009.
+                   07                  PIC X(09)   VALUE "820000065".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2011.
+                   07                  PIC X(09)   VALUE "820000067".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2012.
+                   07                  PIC X(09)   VALUE "820000068".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2013.
+                   07                  PIC X(09)   VALUE "820000069".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2014.
+                   07                  PIC X(09)   VALUE "820000070".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2015.
+                   07                  PIC X(09)   VALUE "820000071".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2016.
+                   07                  PIC X(09)   VALUE "820000072".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2017.
+                   07                  PIC X(09)   VALUE "820000073".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2030.
+                   07                  PIC X(09)   VALUE "820000086".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2036.
+                   07                  PIC X(09)   VALUE "820000092".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2037.
+                   07                  PIC X(09)   VALUE "820000093".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2018.
+                   07                  PIC X(09)   VALUE "820000074".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2019.
+                   07                  PIC X(09)   VALUE "820000075".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2025.
+                   07                  PIC X(09)   VALUE "820000081".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2026.
+                   07                  PIC X(09)   VALUE "820000082".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2028.
+                   07                  PIC X(09)   VALUE "820000084".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2029.
+                   07                  PIC X(09)   VALUE "820000085".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2032.
+                   07                  PIC X(09)   VALUE "820000088".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2033.
+                   07                  PIC X(09)   VALUE "820000089".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2035.
+                   07                  PIC X(09)   VALUE "820000091".
+      *
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2091.
+                   07                  PIC X(09)   VALUE "820000158".
+      *
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2092.
+                   07                  PIC X(09)   VALUE "820000159".
+      *
+               05  CONST-MEDH22-R REDEFINES CONST-MEDH22-VAL.
+                   07  CONST-MEDH22-OCC     OCCURS  39.
+                       09  CONST-MEDH22-MEDH22 PIC 9(01).
+                       09  CONST-MEDH22-LIMIT  PIC 9(03).
+                       09  CONST-MEDH22-ALLKBN PIC 9(01).
+                       09  CONST-MEDH22-ZAINUM PIC 9(04).
+                       09  CONST-MEDH22-SRYCD  PIC X(09).
+               05  CONST-MEDH22-MAX        PIC 9(03)   VALUE   39.
+      *
+           COPY    "CPRYOYOCD.INC".
+      *
       *    ¥¹¥ÑÎÎ°è ¥ï¡¼¥¯
            COPY    "COMMON-SPA"      REPLACING
                                //SPA-// BY //WKSPA-//.
@@ -814,6 +1019,8 @@
            COPY    "CPORCSNUM.INC".
       *
            COPY    "CPORCSS005.INC".
+           COPY    "CPORCSS010.INC".
+           COPY    "CPORCSS011.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -969,6 +1176,10 @@
                                    TO  SPA-I47-ADLINPUTKBN
            END-IF
       *
+           IF    ( SPA-I40-SRYYMD  >=   CONST-H220401 )
+               MOVE    "1"         TO  SPA-I47-ADLINPUTKBN
+           END-IF
+      *
            PERFORM 3101-EDIT-CONST-ADLKBN-SEC
       *
            MOVE    SPA-I40-SRYYMD  TO  WRK-SYMD
@@ -1001,7 +1212,6 @@
            INITIALIZE                      CONST-ADLKBN-G
       *
            IF    ( SPA-I47-ADLINPUTKBN     =   "1" )
-      *
       *
                MOVE    6                   TO  CONST-ADLTEN-MAX
                MOVE    4                   TO  CONST-ADLKBN-MAX
@@ -1063,19 +1273,28 @@
            PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
       *
                INITIALIZE      WRK-RYOYO-DAY-G
+                               WRK-RYOYO-CD-G
+                               WRK-RYOYO-LIFE-G
+                               WRK-RYOYO-KHN-G
       *
                PERFORM 31011-EDIT-RYOYO-DAY-SEC
       *
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
       *
-                   IF    ( WRK-RYOYO-DAY (IDX-DAY) >   ZERO )
+                   IF    ( WRK-RYOYO-DAY (IDX-DAY) NOT =   ZERO )
                        MOVE    WRK-RYOYO-DAY (IDX-DAY)
                                        TO  SPA-I47-RYOYO-DAY (IDX-DAY)
-                       IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >=  1 )
-                        AND  ( SPA-I47-RYOYO-DAY (IDX-DAY) <=  6 )
-                           MOVE    1   TO  SPA-I47-RYOYO-FLG
-                       END-IF
+                   END-IF
+      *
+                   IF    ( WRK-RYOYO-CD  (IDX-DAY) NOT =   SPACE )
+                       MOVE    WRK-RYOYO-CD  (IDX-DAY)
+                                       TO  SPA-I47-RYOYO-CD  (IDX-DAY)
+                       MOVE    WRK-RYOYO-LIFE(IDX-DAY)
+                                       TO  SPA-I47-RYOYO-LIFE(IDX-DAY)
+                       MOVE    WRK-RYOYO-KHN (IDX-DAY)
+                                       TO  SPA-I47-RYOYO-KHN (IDX-DAY)
+                       MOVE    1       TO  SPA-I47-RYOYO-FLG
                    END-IF
       *
                END-PERFORM
@@ -1138,6 +1357,12 @@
                        IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
                            MOVE    CONST-RYOYOCDMSGID  (IDX-RYO)
                                            TO  WRK-RYOYO-DAY (IDX-DAY)
+                           MOVE    CONST-RYOYOCD       (IDX-RYO)
+                                           TO  WRK-RYOYO-CD  (IDX-DAY)
+                           MOVE    CONST-RYOYOLIFE     (IDX-RYO)
+                                           TO  WRK-RYOYO-LIFE(IDX-DAY)
+                           MOVE    CONST-RYOYOKHN      (IDX-RYO)
+                                           TO  WRK-RYOYO-KHN(IDX-DAY)
                        END-IF
       *
                    END-PERFORM
@@ -1157,7 +1382,7 @@
                            UNTIL ( IDX-DAY >   31 )
       *
                        IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
-                           MOVE    9       TO  WRK-RYOYO-DAY (IDX-DAY)
+                           MOVE    -1      TO  WRK-RYOYO-DAY (IDX-DAY)
                        END-IF
       *
                    END-PERFORM
@@ -1303,7 +1528,9 @@
            MOVE    MEDINF-SRYCD  (IDX0)
                                    TO  SPA-NAI-TSRYCD  (IDX-LST)
            MOVE    SPACE           TO  SPA-GMN-TNAME   (IDX-LST)
-           IF    ( SPA-I40-SRYYMD  >=  CONST-H200401 )
+      *
+           EVALUATE    TRUE
+           WHEN  ( SPA-I40-SRYYMD  >=  CONST-H200401 )
                PERFORM VARYING IDX2 FROM    1   BY  1
                        UNTIL ( IDX2 >   MEDH20-MAX )
                         OR   ( SPA-GMN-TNAME   (IDX-LST)
@@ -1315,7 +1542,7 @@
                    END-IF
       *
                END-PERFORM
-           ELSE
+           WHEN    OTHER
                MOVE    MEDINF-SRYCD  (IDX0)
                                    TO  WRK-TNS-SRYCD
                MOVE    SPA-I40-SRYYMD  TO  WRK-TNS-KJNYMD
@@ -1324,7 +1551,7 @@
                IF    ( FLG-TENSU   =   ZERO )
                    MOVE    TNS-NAME    TO  SPA-GMN-TNAME   (IDX-LST)
                END-IF
-           END-IF
+           END-EVALUATE
       *
            IF    ( SPA-GMN-TNAME   (IDX-LST)   =   SPACE )
                MOVE    MEDINF-SRYCD  (IDX0)
@@ -1342,6 +1569,21 @@
            INITIALIZE                  MEDINF-AREA
       *
            EVALUATE    TRUE
+           WHEN      ( SPA-I40-SRYYMD  >=  CONST-H220401 )
+               MOVE    CONST-MEDH22-MAX    TO  MEDINF-MAX
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   MEDINF-MAX )
+                   MOVE  CONST-MEDH22-MEDH22(IDX0)
+                                           TO  MEDINF-MEDKBN (IDX0)
+                   MOVE  CONST-MEDH22-LIMIT (IDX0)
+                                           TO  MEDINF-LIMIT  (IDX0)
+                   MOVE  CONST-MEDH22-ALLKBN(IDX0)
+                                           TO  MEDINF-ALLKBN (IDX0)
+                   MOVE  CONST-MEDH22-ZAINUM(IDX0)
+                                           TO  MEDINF-ZAINUM (IDX0)
+                   MOVE  CONST-MEDH22-SRYCD (IDX0)
+                                           TO  MEDINF-SRYCD  (IDX0)
+               END-PERFORM
            WHEN      ( SPA-I40-SRYYMD  >=  CONST-H200401 )
                MOVE    CONST-MEDH20-MAX    TO  MEDINF-MAX
                PERFORM VARYING IDX0    FROM    1   BY  1
@@ -1392,6 +1634,9 @@
                IF    ( WRK-IIDCD   =   "2001" )
                    PERFORM 2121-TOUROKU-SEC
                END-IF
+               IF    ( WRK-IIDCD   =   "2002" )
+                   PERFORM 2111-TOUROKU-SEC
+               END-IF
            END-IF
       *
            .
@@ -1416,6 +1661,9 @@
       *    ºÞÊÑ¹¹
            WHEN    "CLICKED"       ALSO    "B08"
                PERFORM 4101-ZAIHENKOU-SEC
+      *    Æþ±¡ÎÁÊÑ¹¹
+           WHEN    "CLICKED"       ALSO    "B11"
+               PERFORM 211-TOUROKU-SEC
       *    ÅÐÏ¿
            WHEN    "CLICKED"       ALSO    "B12"
                PERFORM 212-TOUROKU-SEC
@@ -1488,6 +1736,104 @@
       *****************************************************************
       *    ÅÐÏ¿¡¡½èÍý
       *****************************************************************
+       211-TOUROKU-SEC                 SECTION.
+      *
+           PERFORM 410-INPUT-CHK-SEC
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-GMN-SELNUM  NOT =  SPACE )
+                   MOVE    "1001"  TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    "2002"      TO  SPA-IIDCD
+           END-IF
+      *
+           .
+       211-TOUROKU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÅÐÏ¿¡¡½èÍý
+      *****************************************************************
+       2111-TOUROKU-SEC                SECTION.
+      *
+           PERFORM 21211-TOUROKU-SEC
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 21111-TOUROKU-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 310-SPASET-SEC
+           END-IF
+      *
+           .
+       2111-TOUROKU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÅÐÏ¿¡¡½èÍý
+      *****************************************************************
+       21111-TOUROKU-SEC               SECTION.
+      *
+      *
+           PERFORM 50011-EDIT-MEDADL-SEC
+      *
+           INITIALIZE          SS011-AREA
+           MOVE    SPA-GMN-PTID    TO  SS011-PTID
+           MOVE    SPA-I40-SRYYMD (1:6)
+                                   TO  SS011-SRYYM
+           MOVE    1               TO  SS011-DAYFLG
+           MOVE    1               TO  SS011-MEDADLFLG
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
+                   UNTIL ( IDX-DAY >   31 )
+               IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >   ZERO )
+                   MOVE    SPA-I47-RYOYO-DAY (IDX-DAY)
+                                   TO  SS011-DAY (IDX-DAY)
+                   MOVE    SPA-I47-RYOYO-LIFE(IDX-DAY)
+                                   TO  SS011-LIFE(IDX-DAY)
+                   MOVE    SPA-I47-RYOYO-KHN (IDX-DAY)
+                                   TO  SS011-KHN (IDX-DAY)
+                   EVALUATE    TRUE
+                   WHEN  ( MEDKBN-DAYALL (1)        =  1 )
+                   WHEN  ( MEDKBN-DAY (1 IDX-DAY)   =  1 )
+                       MOVE    3   TO  SS011-MEDKBN (IDX-DAY)
+                   WHEN  ( MEDKBN-DAYALL (2)        =  1 )
+                   WHEN  ( MEDKBN-DAY (2 IDX-DAY)   =  1 )
+                       MOVE    2   TO  SS011-MEDKBN (IDX-DAY)
+                   WHEN    OTHER
+                       MOVE    1   TO  SS011-MEDKBN (IDX-DAY)
+                   END-EVALUATE
+               END-IF
+      *
+               COMPUTE SS011-ADLTEN (IDX-DAY)
+                   =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
+      *
+           END-PERFORM
+           MOVE    1                   TO  SS011-NYUUPDFLG
+           CALL    "ORCSS011"      USING   SS011-AREA
+                                           SPA-AREA
+           IF    ( SS011-RC        NOT =   ZERO )
+               MOVE    "4003"          TO  SPA-ERRCD
+           END-IF
+      *
+           IF    ( SPA-ERRCD           NOT =   SPACE )
+               INITIALIZE                  SS010-AREA
+               MOVE    SPA-GMN-PTID        TO  SS010-PTID
+               MOVE    SPA-I40-SRYYMD (1:6)
+                                           TO  SS010-SRYYM
+               CALL    "ORCSS010"      USING   SS010-AREA
+                                               SPA-AREA
+               IF    ( SS010-RC        NOT =   ZERO )
+                   MOVE    "4004"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       21111-TOUROKU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÅÐÏ¿¡¡½èÍý
+      *****************************************************************
        212-TOUROKU-SEC                 SECTION.
       *
            PERFORM 410-INPUT-CHK-SEC
@@ -1509,6 +1855,21 @@
       *****************************************************************
        2121-TOUROKU-SEC                SECTION.
       *
+           PERFORM 21211-TOUROKU-SEC
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE   "JOIN"       TO  MCP-PUTTYPE
+               PERFORM 210-BACK
+           END-IF
+      *
+           .
+       2121-TOUROKU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÅÐÏ¿¡¡½èÍý
+      *****************************************************************
+       21211-TOUROKU-SEC               SECTION.
+      *
            PERFORM 900-RYOCOM-DEL3-SEC
            IF    ( FLG-RYOCOM  NOT =   ZERO )
                MOVE    "4001"      TO  SPA-ERRCD
@@ -1527,13 +1888,8 @@
       *
            END-PERFORM
       *
-           IF    ( SPA-ERRCD       =   SPACE )
-               MOVE   "JOIN"       TO  MCP-PUTTYPE
-               PERFORM 210-BACK
-           END-IF
-      *
            .
-       2121-TOUROKU-EXT.
+       21211-TOUROKU-EXT.
            EXIT.
       *****************************************************************
       *    ÎÅÍÜ¥ì¥»¥×¥È¥³¥á¥ó¥È¥Þ¥¹¥¿ºîÀ®½èÍý
@@ -2609,13 +2965,15 @@
            MOVE    I47-RYOLIST-ROW TO  WRK-RYOLIST-ROW
            MOVE    I47-NYULIST-ROW TO  WRK-NYULIST-ROW
       *
-           INITIALIZE                  I47
+           MOVE    SPACE               TO  I47
+           INITIALIZE                      I47
       *
            MOVE    ZERO                TO  FLG-MEDKBN3
                                            FLG-MEDKBN3LMT
                                            FLG-MEDKBN2
                                            FLG-MEDKBN2LMT
                                            FLG-ADLKBN
+                                           FLG-MEDCOM
       *
            MOVE    SPA-GMN-PTNUM       TO  I47-PTNUM
            MOVE    SPA-GMN-KANANAME    TO  I47-KANANAME
@@ -2707,6 +3065,14 @@
                        END-IF
                        MOVE    1       TO  FLG-MEDKBN2
                        MOVE    "°åÎÅ¶èÊ¬£²"
+                                       TO  I47-TNAME(IDX-LST)
+                       COMPUTE IDX-LST =   IDX-LST +   1
+                       PERFORM 5001-GMNHEN-SEC
+                   WHEN  ( SPA-NAI-TZAISKBKBN (IDX0)  =   "2" )
+                    AND  ( SPA-NAI-TSRYCD     (IDX0)  =   "820000158" )
+                    AND  ( FLG-MEDCOM                 =   0   )
+                       MOVE    1       TO  FLG-MEDCOM
+                       MOVE    ALL "¡Ý"
                                        TO  I47-TNAME(IDX-LST)
                        COMPUTE IDX-LST =   IDX-LST +   1
                        PERFORM 5001-GMNHEN-SEC
@@ -2875,68 +3241,157 @@
       *
            IF    ( SPA-I47-RYOYO-FLG   =   1 )
       *
-               INITIALIZE                  MEDKBN-DAY-AREA
-                                           ADLTEN-DAY-AREA
-      *
-               PERFORM VARYING IDX-LST     FROM    1   BY  1
-                       UNTIL ( IDX-LST     >   SPA-GMN-RYOLIST-MAX )
-      *
-                   IF    ( SPA-NAI-TZAISKBKBN (IDX-LST)    =   "1" )
-                       COMPUTE ADLTEN-DAYALL
-                           =   ADLTEN-DAYALL
-                           +   SPA-GMN-TDAYALL (IDX-LST)
-                       PERFORM VARYING IDX-DAY FROM    1   BY  1
-                               UNTIL ( IDX-DAY >   31 )
-                           IF    ( SPA-I47-RYOYO-DAY (IDX-DAY)
-                                               >=  1 )
-                            AND  ( SPA-I47-RYOYO-DAY (IDX-DAY)
-                                               <=  6 )
-                               COMPUTE ADLTEN-DAY (IDX-DAY)
-                                   =   ADLTEN-DAY (IDX-DAY)
-                                   +   SPA-GMN-TDAY  (IDX-LST IDX-DAY)
-                           END-IF
-                       END-PERFORM
-                   END-IF
-      *
-                   MOVE    ZERO            TO  IDX-MED
-                   IF    ( SPA-NAI-TZAISKBKBN (IDX-LST)    =   "2" )
-                       IF    ( SPA-NAI-TMEDKBN(IDX-LST)    =   3 )
-                           MOVE    1       TO  IDX-MED
-                       END-IF
-                       IF    ( SPA-NAI-TMEDKBN(IDX-LST)    =   2 )
-                           MOVE    2       TO  IDX-MED
-                       END-IF
-                   END-IF
-      *
-                   IF    ( IDX-MED >       ZERO )
-      *
-                       IF    ( SPA-GMN-TDAYALL(IDX-LST)    >   ZERO )
-                           MOVE      SPA-GMN-TDAYALL(IDX-LST)
-                                           TO  MEDKBN-DAYALL (IDX-MED)
-                       END-IF
-      *
-                       PERFORM VARYING IDX-DAY FROM    1   BY  1
-                               UNTIL ( IDX-DAY >   31 )
-                           IF    ( SPA-I47-RYOYO-DAY (IDX-DAY)
-                                           >=  1 )
-                            AND  ( SPA-I47-RYOYO-DAY (IDX-DAY)
-                                           <=  6 )
-                            AND  ( SPA-GMN-TDAY   (IDX-LST IDX-DAY)
-                                               >   ZERO )
-                               MOVE    SPA-GMN-TDAY   (IDX-LST IDX-DAY)
-                                       TO  MEDKBN-DAY (IDX-MED IDX-DAY)
-                           END-IF
-                       END-PERFORM
-                   END-IF
-      *
-               END-PERFORM
+               PERFORM 50011-EDIT-MEDADL-SEC
       *
                PERFORM 50011-GMNHEN-NYULIST-MED-SEC
                PERFORM 50011-GMNHEN-NYULIST-ADL-SEC
+      *
+               INITIALIZE          SS011-AREA
+               MOVE    SPA-GMN-PTID    TO  SS011-PTID
+               MOVE    SPA-I40-SRYYMD (1:6)
+                                       TO  SS011-SRYYM
+               MOVE    1               TO  SS011-DAYFLG
+               MOVE    1               TO  SS011-MEDADLFLG
+               PERFORM VARYING IDX-DAY FROM    1   BY  1
+                       UNTIL ( IDX-DAY >   31 )
+                   IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >  ZERO )
+                       MOVE    SPA-I47-RYOYO-DAY (IDX-DAY)
+                                   TO  SS011-DAY (IDX-DAY)
+                       MOVE    SPA-I47-RYOYO-LIFE(IDX-DAY)
+                                   TO  SS011-LIFE(IDX-DAY)
+                       MOVE    SPA-I47-RYOYO-KHN (IDX-DAY)
+                                   TO  SS011-KHN (IDX-DAY)
+                       EVALUATE    TRUE
+                       WHEN  ( MEDKBN-DAYALL (1)        =  1 )
+                       WHEN  ( MEDKBN-DAY (1 IDX-DAY)   =  1 )
+                           MOVE    3   TO  SS011-MEDKBN (IDX-DAY)
+                       WHEN  ( MEDKBN-DAYALL (2)        =  1 )
+                       WHEN  ( MEDKBN-DAY (2 IDX-DAY)   =  1 )
+                           MOVE    2   TO  SS011-MEDKBN (IDX-DAY)
+                       WHEN    OTHER
+                           MOVE    1   TO  SS011-MEDKBN (IDX-DAY)
+                       END-EVALUATE
+                   END-IF
+      *
+                   COMPUTE SS011-ADLTEN (IDX-DAY)
+                       =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
+               END-PERFORM
+               CALL    "ORCSS011"  USING   SS011-AREA
+                                           SPA-AREA
+               MOVE    "black" TO   I47-LBLINFO-STYLE
+               PERFORM VARYING IDX-DAY FROM    1   BY  1
+                       UNTIL ( IDX-DAY >   31 )
+                   IF    ( SS011-DAY (IDX-DAY)
+                                       = SS011-DAY2 (IDX-DAY))
+                       MOVE    "black" TO   I47-NYULIST-NDAY-STYLE
+                                                             (IDX-DAY)
+                   ELSE
+                       MOVE    "red"   TO   I47-NYULIST-NDAY-STYLE
+                                                             (IDX-DAY)
+                       EVALUATE    SS011-DAY2 (IDX-DAY)
+                       WHEN    1
+                          MOVE    "£Á" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    2
+                          MOVE    "£Â" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    3
+                          MOVE    "£Ã" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    4
+                          MOVE    "£Ä" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    5
+                          MOVE    "£Å" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    6
+                          MOVE    "£Æ" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    7
+                          MOVE    "£Ç" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    8
+                          MOVE    "£È" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       WHEN    9
+                          MOVE    "£É" TO  I47-NYULIST-NDAY
+                                                   (IDX-DAY)
+                       END-EVALUATE
+
+                       MOVE    "red"   TO   I47-LBLINFO-STYLE
+                       STRING  "Æþ±¡ÎÁ¤È°åÎÅ¶èÊ¬¡¦£Á£Ä£Ì¶èÊ¬¤ÎÉ¾²Á¤¬"
+                                            DELIMITED  BY  SIZE
+                               "°ìÃ×¤·¤Ê¤¤Æü¤¬¤¢¤ê¤Þ¤¹"
+                                            DELIMITED  BY  SIZE
+                       INTO    I47-LBLINFO
+                       END-STRING
+                   END-IF
+               END-PERFORM
+      *
            END-IF
       *
            .
        5001-GMNHEN-NYULIST-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬¡¢£Á£Ä£ÌÅÀ¿ôÊÔ½¸½èÍý
+      *****************************************************************
+       50011-EDIT-MEDADL-SEC               SECTION.
+      *
+           INITIALIZE                  MEDKBN-DAY-AREA
+                                       ADLTEN-DAY-AREA
+      *
+           PERFORM VARYING IDX-LST     FROM    1   BY  1
+                   UNTIL ( IDX-LST     >   SPA-GMN-RYOLIST-MAX )
+      *
+               IF    ( SPA-NAI-TZAISKBKBN (IDX-LST)    =   "1" )
+                   COMPUTE ADLTEN-DAYALL
+                       =   ADLTEN-DAYALL
+                       +   SPA-GMN-TDAYALL (IDX-LST)
+                   PERFORM VARYING IDX-DAY FROM    1   BY  1
+                           UNTIL ( IDX-DAY >   31 )
+                       IF    ( SPA-I47-RYOYO-CD (IDX-DAY)
+                                           NOT =  SPACE )
+                           COMPUTE ADLTEN-DAY (IDX-DAY)
+                               =   ADLTEN-DAY (IDX-DAY)
+                               +   SPA-GMN-TDAY  (IDX-LST IDX-DAY)
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+               MOVE    ZERO            TO  IDX-MED
+               IF    ( SPA-NAI-TZAISKBKBN (IDX-LST)    =   "2" )
+                   IF    ( SPA-NAI-TMEDKBN(IDX-LST)    =   3 )
+                       MOVE    1       TO  IDX-MED
+                   END-IF
+                   IF    ( SPA-NAI-TMEDKBN(IDX-LST)    =   2 )
+                       MOVE    2       TO  IDX-MED
+                   END-IF
+               END-IF
+      *
+               IF    ( IDX-MED >       ZERO )
+      *
+                   IF    ( SPA-GMN-TDAYALL(IDX-LST)    >   ZERO )
+                       MOVE      SPA-GMN-TDAYALL(IDX-LST)
+                                       TO  MEDKBN-DAYALL (IDX-MED)
+                   END-IF
+      *
+                   PERFORM VARYING IDX-DAY FROM    1   BY  1
+                           UNTIL ( IDX-DAY >   31 )
+                       IF    ( SPA-I47-RYOYO-CD (IDX-DAY)
+                                       NOT =  SPACE )
+                        AND  ( SPA-GMN-TDAY   (IDX-LST IDX-DAY)
+                                           >   ZERO )
+                           MOVE    SPA-GMN-TDAY   (IDX-LST IDX-DAY)
+                                   TO  MEDKBN-DAY (IDX-MED IDX-DAY)
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       50011-EDIT-MEDADL-EXT.
            EXIT.
       *****************************************************************
       *    ²èÌÌÊÔ½¸½èÍý ¡ÊÆþ±¡¾ðÊó¥ê¥¹¥È:Æþ±¡ÎÁ¡Ë
@@ -2945,6 +3400,10 @@
       *
            PERFORM VARYING IDX-DAY     FROM    1   BY  1
                    UNTIL ( IDX-DAY     >   31 )
+      *
+                   MOVE    IDX-DAY     TO   WRK-Z9
+                   MOVE    WRK-Z9      TO   I47-NYULIST-NDAY (IDX-DAY)
+      *
                EVALUATE    SPA-I47-RYOYO-DAY (IDX-DAY)
                WHEN    1
                    MOVE    "£Á"        TO  I47-TNL-DAY(1 IDX-DAY)
@@ -2957,8 +3416,16 @@
                WHEN    5
                    MOVE    "£Å"        TO  I47-TNL-DAY(1 IDX-DAY)
                WHEN    6
-                   MOVE    "ÆÃ"        TO  I47-TNL-DAY(1 IDX-DAY)
+                   MOVE    "£Æ"        TO  I47-TNL-DAY(1 IDX-DAY)
+               WHEN    7
+                   MOVE    "£Ç"        TO  I47-TNL-DAY(1 IDX-DAY)
+               WHEN    8
+                   MOVE    "£È"        TO  I47-TNL-DAY(1 IDX-DAY)
                WHEN    9
+                   MOVE    "£É"        TO  I47-TNL-DAY(1 IDX-DAY)
+               WHEN    10
+                   MOVE    "ÆÃ"        TO  I47-TNL-DAY(1 IDX-DAY)
+               WHEN    -1
                    MOVE    "¡¦"        TO  I47-TNL-DAY(1 IDX-DAY)
                END-EVALUATE
            END-PERFORM
@@ -2984,10 +3451,8 @@
            WHEN    OTHER
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
-                   IF    ( SPA-I47-RYOYO-DAY (IDX-DAY)
-                                       >=  1 )
-                    AND  ( SPA-I47-RYOYO-DAY (IDX-DAY)
-                                       <=  6 )
+                   IF    ( SPA-I47-RYOYO-CD (IDX-DAY)
+                                       NOT =   SPACE )
       *
                        EVALUATE    TRUE
                        WHEN  ( MEDKBN-DAY (1 IDX-DAY)   =  1 )
@@ -3020,8 +3485,7 @@
                PERFORM VARYING IDX-DAY FROM 1  BY  1
                        UNTIL ( IDX-DAY >    31 )
       *
-                   IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >=  1 )
-                    AND  ( SPA-I47-RYOYO-DAY (IDX-DAY) <=  6 )
+                   IF    ( SPA-I47-RYOYO-CD (IDX-DAY)  NOT =  SPACE )
                         COMPUTE ADLTEN-DAY (IDX-DAY)
                             =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
       *
@@ -3169,7 +3633,7 @@
            WHEN    "1001"
                MOVE    "ºÞ¤¬½¤ÀµÃæ¤Ç¤¹¡£ÊÑ¹¹³ÎÄê¤«¥¯¥ê¥¢¤ò¤·¤Æ¤¯¤À¤µ¤¤"
                                        TO  SPA-ERRMSG
-           WHEN    "4001"  THRU    "4999"
+           WHEN    "4001"  THRU    "4004"
                MOVE    "¹¹¿·½èÍý¤Ë¼ºÇÔ¤·¤Þ¤·¤¿"
                                        TO  SPA-ERRMSG
            END-EVALUATE
@@ -3203,6 +3667,9 @@
            EVALUATE    SPA-IIDCD
            WHEN    "2001"
                MOVE    "°åÎÅ¶èÊ¬¡¦£Á£Ä£Ì¶èÊ¬¤òÅÐÏ¿¤·¤Þ¤¹"
+                                       TO  WRK-I4IDMSG
+           WHEN    "2002"
+             MOVE "°åÎÅ¶èÊ¬¡¦£Á£Ä£Ì¶èÊ¬¤òÅÐÏ¿¸å¡¢Æþ±¡ÎÁ¤ÎÊÑ¹¹¤ò¹Ô¤¤¤Þ¤¹"
                                        TO  WRK-I4IDMSG
            END-EVALUATE
       *

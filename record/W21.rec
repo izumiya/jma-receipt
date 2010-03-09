@@ -53,11 +53,11 @@ W21	{
 		};
 		CMB_BRM_TOKUTEINYUIN	{
 			BRM_TOKUTEINYUIN	{
-				value	varchar(43);
+				value	varchar(53);
 				state	int;
 			};
 			count	int;
-			item	varchar(43)[30];
+			item	varchar(53)[30];
 			state	int;
 		};
 		BRM_NINZU	{

@@ -31,10 +31,14 @@
                     07  W31-CHK-MEDKBN-STATE   PIC S9(9)   BINARY.
                 05  W31-NB01-STATE             PIC S9(9)   BINARY.
                 05  W31-FT02.
+                  06  W31-LBLADLINPUTINFO      PIC X(80).
                   06  W31-CMB-ADLINPUTKBN.
                     07  W31-ADLINPUTKBN        PIC X(22).
+                    07  W31-ADLINPUTKBN-STATE  PIC S9(9)   BINARY.
                     07  W31-ADLINPUTKBN-CNT    PIC S9(9)   BINARY.
-                    07  W31-ADLINPUTKBN-ITM   PIC X(22)   OCCURS  2.
+                    07  W31-ADLINPUTKBN-ITM    PIC X(22)   OCCURS  2.
+                    07  W31-ADLINPUTKBN-ITM-STATE
+                                               PIC S9(9)   BINARY.
                   06  W31-CMB-SETMEDKBN.
                     07  W31-SETMEDKBN          PIC X(32).
                     07  W31-SETMEDKBN-CNT      PIC S9(9)   BINARY.
