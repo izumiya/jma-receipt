@@ -117,6 +117,7 @@
       *
       *    固定値領域
        01  CONST-AREA.
+           03  CONST-H220401           PIC X(08)   VALUE "20100401".
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
            03  CONST-GMN-MEDKBN-MAX    PIC 9(05)   VALUE 40.
            03  CONST-MEDKBN-G.
@@ -741,13 +742,22 @@
       *
            INITIALIZE                  SPA-GMN-ADLINPUTKBNLST-G
       *
-           MOVE    2               TO  SPA-GMN-ADLINPUTKBN-MAX
+           IF    ( SPA-W01-STYUKYMD    >=  CONST-H220401 )
       *
-           MOVE    "1"             TO  SPA-GMN-ADLINPUTKBNL    (1)
-           MOVE    "区分別に入力"  TO  SPA-GMN-ADLINPUTKBNMEIL (1)
-           MOVE    "2"             TO  SPA-GMN-ADLINPUTKBNL    (2)
-           MOVE    "合計点数を直接入力"
-                                   TO  SPA-GMN-ADLINPUTKBNMEIL (2)
+               MOVE    1               TO  SPA-GMN-ADLINPUTKBN-MAX
+      *
+               MOVE    "1"             TO  SPA-GMN-ADLINPUTKBNL    (1)
+               MOVE    "区分別に入力"  TO  SPA-GMN-ADLINPUTKBNMEIL (1)
+           ELSE
+      *
+               MOVE    2               TO  SPA-GMN-ADLINPUTKBN-MAX
+      *
+               MOVE    "1"             TO  SPA-GMN-ADLINPUTKBNL    (1)
+               MOVE    "区分別に入力"  TO  SPA-GMN-ADLINPUTKBNMEIL (1)
+               MOVE    "2"             TO  SPA-GMN-ADLINPUTKBNL    (2)
+               MOVE    "合計点数を直接入力"
+                                       TO  SPA-GMN-ADLINPUTKBNMEIL (2)
+           END-IF
       *
            .
        3101-ADLINPUTKBNLST-SET-EXT.
@@ -1331,6 +1341,7 @@
       *****************************************************************
        500-GMNHEN-SEC              SECTION.
       *
+           MOVE    SPACE               TO  W31
            INITIALIZE                      W31
       *
            MOVE    SPA-W01-STYUKYMDH   TO  W31-STYUKYMD
@@ -1384,6 +1395,16 @@
                MOVE    "削除"          TO  W31-B03-LABEL
            END-EVALUATE
       *
+           IF    ( SPA-W01-STYUKYMD    >=  CONST-H220401 )
+               CONTINUE
+           ELSE
+               STRING  "＊合計点数の直接入力は"    DELIMITED BY SIZE
+                       "平成２２年３月まで有効です。"
+                                                   DELIMITED BY SIZE
+               INTO    W31-LBLADLINPUTINFO
+               END-STRING
+           END-IF
+      *
       *    項目状態編集
            PERFORM 500-GMNHEN-STATE-EDIT-SEC
       *
@@ -1399,6 +1420,8 @@
        500-GMNHEN-STATE-EDIT-SEC       SECTION.
       *
            MOVE    WIDGET-NORMAL   TO  W31-B03-STATE
+                                       W31-ADLINPUTKBN-STATE
+                                       W31-ADLINPUTKBN-ITM-STATE
       *
            IF    ( SPA-W01-KANRICD =   "5015" )
                IF    ( SPA-W01-STYUKYMD    =   "00000000" )

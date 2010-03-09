@@ -79,6 +79,8 @@
            03  FLG-NYUKSNCHK                       PIC 9(01).
            03  FLG-BFH2004                         PIC 9(01).
            03  FLG-AFH2004                         PIC 9(01).
+           03  FLG-BFH2204                         PIC 9(01).
+           03  FLG-AFH2204                         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -201,6 +203,7 @@
            03  CONST-H180401           PIC X(08) VALUE "20060401".
            03  CONST-H180701           PIC X(08) VALUE "20060701".
            03  CONST-H200401           PIC X(08) VALUE "20080401".
+           03  CONST-H220401           PIC X(08) VALUE "20100401".
            03  CONST-KSN-MAX           PIC 9(03) VALUE 7.
            03  CONST-GKSN-MAX          PIC 9(03) VALUE 14.
            03  CONST-SINSEIJI          PIC X(09) VALUE "190109770".
@@ -621,6 +624,8 @@
            END-IF
       *
            EVALUATE    TRUE
+           WHEN  ( WRK-KJN-YUKSTYMD    >=   CONST-H220401 )
+               PERFORM 31012-CMB-KSN-H22-SEC
            WHEN  ( WRK-KJN-YUKSTYMD    >=   CONST-H180401 )
                PERFORM 31012-CMB-KSN-SYOKI-SEC
            WHEN    OTHER
@@ -902,6 +907,15 @@
            INITIALIZE                SPA-GMN-W21-KHNRYOLST-G
                                      SPA-NAI-W21-KHNRYOLST-G
       *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "5001"          TO  SYS-KANRICD
+           MOVE    SPA-GMN-W21-BTUNUM
+                                   TO  SYS-KBNCD
+           MOVE    WRK-KJN-YUKSTYMD
+                                   TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-5001-REC
       *
            INITIALIZE                  SYSKANRI-REC
            MOVE    "5111"          TO  SYS-KANRICD
@@ -911,6 +925,7 @@
            MOVE    SYSKANRI-REC    TO  SYS-5111-REC
       *
            PERFORM UNTIL ( FLG-SYSKANRI    =   1 )
+                    OR   ( SPA-GMN-W21-KHNRYO-MAX  >= 20 )
       *
                MOVE    ZERO        TO  FLG-TARGET
       *
@@ -924,6 +939,81 @@
                 AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
                 AND  ( SYS-5111-SEIKATU-RYOKBN     =   SPACE )
                    MOVE    1       TO  FLG-TARGET
+               END-IF
+      *
+               IF    ( WRK-KJN-YUKSTYMD
+                                 >=  CONST-H220401 )
+                   IF    ( SYS-5111-SRYCD
+                                       =   "099999953"
+                                        OR "099999954" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                   END-IF
+                   IF    ( SYS-5001-KHNSRYCD
+                                       =   SPACE
+                                  OR       "099999953"
+                                  OR       "190121310"
+                                  OR       "190121410"
+                                  OR       "190121510"
+                                  OR       "190121610"
+                                  OR       "190121710"
+                                  OR       "190131610"
+                                  OR       "190132010"
+                                  OR       "190132210" )
+                       IF    ( SYS-5111-SRYCD
+                                       =   "190132410"
+                                  OR       "190132610"
+                                  OR       "190132810"
+                                  OR       "190133010"
+                                  OR       "190133210"
+                                  OR       "190133410"
+                                  OR       "190133610"
+                                  OR       "190133810"
+                                  OR       "190134010"
+                                  OR       "190132510"
+                                  OR       "190132710"
+                                  OR       "190132910"
+                                  OR       "190133110"
+                                  OR       "190133310"
+                                  OR       "190133510"
+                                  OR       "190133710"
+                                  OR       "190133910"
+                                  OR       "190134110" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF    ( SYS-5001-KHNSRYCD
+                                       =   "099999954"
+                                  OR       "190132410"
+                                  OR       "190132610"
+                                  OR       "190132810"
+                                  OR       "190133010"
+                                  OR       "190133210"
+                                  OR       "190133410"
+                                  OR       "190133610"
+                                  OR       "190133810"
+                                  OR       "190134010" )
+                       IF    ( SYS-5111-SRYCD
+                                       =   "190121310"
+                                  OR       "190121410"
+                                  OR       "190121510"
+                                  OR       "190121610"
+                                  OR       "190121710"
+                                  OR       "190131610"
+                                  OR       "190131810"
+                                  OR       "190132010"
+                                  OR       "190132210"
+                                  OR       "190123710"
+                                  OR       "190123810"
+                                  OR       "190123910"
+                                  OR       "190124010"
+                                  OR       "190124110"
+                                  OR       "190131710"
+                                  OR       "190131910"
+                                  OR       "190132110"
+                                  OR       "190132310" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
                END-IF
       *
                IF    ( FLG-TARGET          =   1 )
@@ -1011,6 +1101,32 @@
       *
            .
        31012-CMB-KSN-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院加算コンボ初期処理(H22.4〜)
+      *****************************************************************
+       31012-CMB-KSN-H22-SEC           SECTION.
+      *
+      *    診療所療養病床療養環境加算
+           PERFORM 3101-CMB-SNRRYO-SET-SEC
+      *
+      *    放射線治療病室管理加算
+           PERFORM 3101-CMB-HOSYASEN-SET-SEC
+      *
+      *    療養環境加算
+           PERFORM 3101-CMB-RYO-SET-SEC
+      *
+      *    療養病棟療養環境加算
+           PERFORM 3101-CMB-BTURYO-SET-SEC
+      *
+      *    重症者等療養環境特別加算
+           PERFORM 3101-CMB-JYUTOK-SET-SEC
+      *
+      *    無菌治療室管理加算
+           PERFORM 3101-CMB-MUKIN-SET-SEC
+      *
+           .
+       31012-CMB-KSN-H22-EXT.
            EXIT.
       *****************************************************************
       *    新生児入院医療管理加算
@@ -1437,6 +1553,8 @@
            END-IF
       *
            EVALUATE    TRUE
+           WHEN  ( SPA-NAI-W21-YUKOSTYMD   >=   CONST-H220401 )
+               PERFORM 41003-KSN-EDIT-SEC
            WHEN  ( SPA-NAI-W21-YUKOSTYMD   >=   CONST-H180401 )
                PERFORM 41002-KSN-EDIT-SEC
            WHEN    OTHER
@@ -1578,6 +1696,63 @@
        41002-KSN-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    病棟別設定加算設定処理(H22.4〜)
+      *****************************************************************
+       41003-KSN-EDIT-SEC               SECTION.
+      *
+      *    診療所療養病床療養環境加算
+           MOVE    "1"                 TO  WRK-CMB-CD
+           EVALUATE    TRUE
+           WHEN  ( SYS-5002-SNR-RYOYO-KBN (1)  =   "2" )
+               MOVE    "2"             TO  WRK-CMB-CD
+           WHEN  ( SYS-5002-SNR-RYOYO-KBN (2)  =   "2" )
+               MOVE    "3"             TO  WRK-CMB-CD
+           END-EVALUATE
+           PERFORM 4200-SNRRYOLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-SNRRYO-G
+      *
+      *    放射線治療病室管理加算
+           MOVE    SYS-5002-HOSYASEN-KBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-HOSYASENLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-HOSYASEN-G
+      *
+      *    療養環境加算
+           MOVE    SYS-5002-RYOYO-KBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-RYOLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-RYO-G
+      *
+      *    療養病棟療養環境加算
+           MOVE    "1"                 TO  WRK-CMB-CD
+           EVALUATE    TRUE
+           WHEN  ( SYS-5002-BTU-RYOYO-H18-KBN  =   "2" )
+               MOVE    "2"             TO  WRK-CMB-CD
+           WHEN  ( SYS-5002-BTU-RYOYO-KBN (1)  =   "2" )
+               MOVE    "3"             TO  WRK-CMB-CD
+           WHEN  ( SYS-5002-BTU-RYOYO-KBN (2)  =   "2" )
+               MOVE    "4"             TO  WRK-CMB-CD
+           WHEN  ( SYS-5002-BTU-RYOYO-KBN (3)  =   "2" )
+               MOVE    "5"             TO  WRK-CMB-CD
+           END-EVALUATE
+           PERFORM 4200-BTURYOLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-BTURYO-G
+      *
+      *    重症者等療養環境特別加算
+           MOVE    "1"                 TO  WRK-CMB-CD
+           EVALUATE    TRUE
+           WHEN  ( SYS-5002-JYUTOK1-KBN  =   "2" )
+               MOVE    "2"             TO  WRK-CMB-CD
+           WHEN  ( SYS-5002-JYUTOK2-KBN  =   "2" )
+               MOVE    "3"             TO  WRK-CMB-CD
+           END-EVALUATE
+           PERFORM 4200-JYUTOKLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-JYUTOK-G
+      *
+           .
+       41003-KSN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    病室情報検索処理
       *****************************************************************
        4200-BRM-SEL-SEC                SECTION.
@@ -1674,8 +1849,13 @@
                EVALUATE    SPA-WIDCD
                WHEN "2001"
                        PERFORM 421-SAKUJO-SEC
-               WHEN "3001"
+               WHEN "2002"
                        PERFORM 42021-HENKOU-SEC
+               WHEN "2003"
+                       PERFORM 4201-EDYUKYMD-UPDATE-SEC
+                       IF    ( SPA-ERRCD   =   SPACE )
+                           PERFORM 4201-TUIKA-SEC
+                       END-IF
                END-EVALUATE
            END-IF
       *
@@ -2023,32 +2203,75 @@
       *    存在しないこと
            MOVE    1                   TO  FLG-UPD-KBN
            PERFORM 4100-RIREKI-CHK-SEC
-           IF   ( FLG-KIKAN-DABURI NOT =   ZERO )
-               MOVE    "1104"          TO  SPA-ERRCD
+           EVALUATE    FLG-KIKAN-DABURI
+           WHEN    ZERO
+               PERFORM 4201-TUIKA-SEC
+           WHEN    1
+               MOVE    "2003"      TO  SPA-WIDCD
+           WHEN    OTHER
+               MOVE    "1104"      TO  SPA-ERRCD
                MOVE    11          TO  SPA-GMN-W21-CUR
-               GO  TO  420-TUIKA-EXT
-           END-IF
+           END-EVALUATE
+      *
+           .
+       420-TUIKA-EXT.
+           EXIT.
+      *****************************************************************
+      *    追加処理
+      *****************************************************************
+       4201-TUIKA-SEC                  SECTION.
       *
       *    病室情報追加編集処理
            PERFORM 4201-BRM-INSERT-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  420-TUIKA-EXT
-           END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
       *
                MOVE    SPA-GMN-W21-BTUNUM
                                    TO  W21-BTU-NAME
                PERFORM 4100-BTUNUM-CHK-SEC
-           END-IF
       *
-      *    病棟リスト最大件数チェック
-           IF    ( SPA-GMN-W21-BRMLST-MAX  >=  200 )
-               MOVE    "1001"      TO  SPA-ERRCD
+      *        病棟リスト最大件数チェック
+               IF    ( SPA-GMN-W21-BRMLST-MAX  >=  200 )
+                   MOVE    "1001"  TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
-       420-TUIKA-EXT.
+       4201-TUIKA-EXT.
+           EXIT.
+      *****************************************************************
+      *    有効期間変更処理
+      *****************************************************************
+       4201-EDYUKYMD-UPDATE-SEC        SECTION.
+      *
+           PERFORM 900-SYSKANRI-KEY16-SEL-SEC
+           IF    ( FLG-SYSKANRI    =   ZERO )
+      *
+               MOVE    SYS-5002-REC    TO  SYSKANRI-REC
+               MOVE    SYS-KEY         TO  SYSUPD-KEY
+      *
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    SPA-NAI-W21-YUKOSTYMD
+                                           TO  LNK-DAY6-KIJUN
+               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+               MOVE    -1                  TO  LNK-DAY6-ZOGEN
+               CALL  "ORCSDAY"             USING
+                                           STS-AREA-DAY
+                                           LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KEISAN     TO  SYS-EDYUKYMD
+               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "upd1"          TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               IF   (  MCP-RC      NOT =   ZERO )
+                   MOVE    "1205"      TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       4201-EDYUKYMD-UPDATE-EXT.
            EXIT.
       *****************************************************************
       *    変更処理
@@ -2161,7 +2384,7 @@
            END-PERFORM
       *
            IF    ( SPA-ERRCD   =   SPACE )
-               MOVE    "3001"           TO  SPA-WIDCD
+               MOVE    "2002"           TO  SPA-WIDCD
            END-IF
       *
            .
@@ -2324,7 +2547,14 @@
                                              >   SYS-5002-EDYUKYMD )
                        CONTINUE
                    ELSE
-                       MOVE    1             TO  FLG-KIKAN-DABURI
+                       IF    ( SPA-NAI-W21-YUKOSTYMD
+                                           >   SYS-5002-STYUKYMD )
+                        AND  ( SPA-NAI-W21-YUKOSTYMD
+                                          <=   SYS-5002-EDYUKYMD )
+                           MOVE    1       TO  FLG-KIKAN-DABURI
+                       ELSE
+                           MOVE    2       TO  FLG-KIKAN-DABURI
+                       END-IF
                    END-IF
                END-IF
       *
@@ -2612,12 +2842,16 @@
       *****************************************************************
        4201-BRM-KSN-EDIT-SEC           SECTION.
       *
-      *    新生児入院医療管理加算
-           MOVE    CONST-SINSEIJI  TO  SYS-5002-SINSEIJI-CD
-           IF    ( SPA-GMN-W21-SINSEIJI    = "2" )
-               MOVE    "2"         TO  SYS-5002-SINSEIJI-KBN
+           IF    ( SPA-NAI-W21-YUKOSTYMD   >=  CONST-H220401 )
+               CONTINUE
            ELSE
-               MOVE    "1"         TO  SYS-5002-SINSEIJI-KBN
+      *        新生児入院医療管理加算
+               MOVE    CONST-SINSEIJI  TO  SYS-5002-SINSEIJI-CD
+               IF    ( SPA-GMN-W21-SINSEIJI    = "2" )
+                   MOVE    "2"         TO  SYS-5002-SINSEIJI-KBN
+               ELSE
+                   MOVE    "1"         TO  SYS-5002-SINSEIJI-KBN
+               END-IF
            END-IF
       *
       *    診療所療養病床療養環境加算
@@ -2726,6 +2960,8 @@
            IF   (  SPA-ERRCD   NOT =   SPACE )
                GO  TO  4100-BTUNUM-CHK-EXT
            END-IF
+      *
+           PERFORM 4201-INPUT-AREA-CLEAR-SEC
       *
       *    入院基本料編集処理
            PERFORM 3101-BTU-KHNRYO-EDIT-SEC
@@ -2900,6 +3136,8 @@
       *
                    MOVE    ZERO                TO  FLG-BFH2004
                    MOVE    ZERO                TO  FLG-AFH2004
+                   MOVE    ZERO                TO  FLG-BFH2204
+                   MOVE    ZERO                TO  FLG-AFH2204
                    PERFORM VARYING IDX1    FROM    1   BY  1
                            UNTIL ( IDX1    >   SPA-GMN-W21-BRMLST-MAX )
       *
@@ -2912,11 +3150,26 @@
                            END-IF
                        END-IF
       *
+                       IF    ( WRK-SELNUM-FLG (IDX1)   =   1 )
+                           IF    ( SPA-NAI-W21-TYUKOSTYMD (IDX1)
+                                                   >=  CONST-H220401 )
+                               MOVE    1       TO  FLG-AFH2204
+                           ELSE
+                               MOVE    1       TO  FLG-BFH2204
+                           END-IF
+                       END-IF
+      *
                    END-PERFORM
       *
                    IF    ( FLG-BFH2004 =   1 )
                     AND  ( FLG-AFH2004 =   1 )
                        MOVE    "0016"  TO  SPA-ERRCD
+                       MOVE    2       TO  SPA-GMN-W21-CUR
+                   END-IF
+      *
+                   IF    ( FLG-BFH2204 =   1 )
+                    AND  ( FLG-AFH2204 =   1 )
+                       MOVE    "0017"  TO  SPA-ERRCD
                        MOVE    2       TO  SPA-GMN-W21-CUR
                    END-IF
       *
@@ -3798,12 +4051,19 @@
       *
                MOVE    SPACE               TO  SPA-GMN-W21-KSN-LBL
                                                            (IDX-KSN)
+                                               SPA-NAI-W21-KSNINF-CD
+                                                           (IDX-KSN)
       *
            END-PERFORM
       *
+           IF    ( SPA-NAI-W21-YUKOSTYMD
+                                       >=  CONST-H220401 )
+               CONTINUE
+           ELSE
                MOVE    "新生児入院医療管理加算"
                                        TO  SPA-GMN-W21-SINSEIJI-LBL
                MOVE    CONST-SINSEIJI  TO  SPA-NAI-W21-SINSEIJI-CD
+           END-IF
       *
                MOVE    "診療所療養病床療養環境加算"
                                        TO  SPA-GMN-W21-SNRRYO-LBL
@@ -3832,20 +4092,23 @@
       *
       *
            MOVE    ZERO                    TO  IDX-GKSN
-           PERFORM VARYING IDX-KSN    FROM 1  BY  1
-                   UNTIL ( IDX-KSN    >    CONST-KSN-MAX )
+           PERFORM VARYING IDX-KSN     FROM 1  BY  1
+                   UNTIL ( IDX-KSN     >   CONST-KSN-MAX )
       *
-               MOVE    SPA-NAI-W21-KSNINF-CD (IDX-KSN)
-                                           TO  WRK-TNSSRYCD
-               MOVE    SPA-NAI-W21-YUKOSTYMD
-                                           TO  WRK-TNSYMD
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU           =   ZERO )
-                   IF    ( TNS-HOSPSRYKBN  =   ZERO )
-                    OR   ( TNS-HOSPSRYKBN  =   SPA-NAI-W21-HOSPSBT )
-                       COMPUTE    IDX-GKSN =   IDX-GKSN +   1
-                       MOVE   IDX-GKSN  TO  SPA-NAI-W21-KSNINF-IDX
+               IF    ( SPA-NAI-W21-KSNINF-CD (IDX-KSN)
+                                       NOT =   SPACE )
+                   MOVE    SPA-NAI-W21-KSNINF-CD (IDX-KSN)
+                                       TO  WRK-TNSSRYCD
+                   MOVE    SPA-NAI-W21-YUKOSTYMD
+                                       TO  WRK-TNSYMD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU           =   ZERO )
+                       IF    ( TNS-HOSPSRYKBN  =   ZERO )
+                        OR   ( TNS-HOSPSRYKBN  =   SPA-NAI-W21-HOSPSBT )
+                           COMPUTE    IDX-GKSN =   IDX-GKSN +   1
+                           MOVE   IDX-GKSN  TO  SPA-NAI-W21-KSNINF-IDX
                                                            (IDX-KSN)
+                       END-IF
                    END-IF
                END-IF
       *
@@ -4874,6 +5137,11 @@
                                        TO  SPA-ERRMSG (1:40)
                MOVE    "月以前の病室は同時に選択できません"
                                        TO  SPA-ERRMSG (41:)
+           WHEN    "0017"
+               MOVE    "有効開始日が平成２２年４月以降の病室と３"
+                                       TO  SPA-ERRMSG (1:40)
+               MOVE    "月以前の病室は同時に選択できません"
+                                       TO  SPA-ERRMSG (41:)
            WHEN    "0100"
                MOVE    SPACE           TO  SPA-ERRMSG
                STRING  "有効開始日は平成１４年４月１日以降にして"
@@ -4969,14 +5237,11 @@
                MOVE    "入院中の患者が存在するため削除できません"
                                        TO  SPA-ERRMSG
            WHEN    "1201"
-           WHEN    "1204"
-               MOVE    "更新できませんでした"
-                                       TO  SPA-ERRMSG
            WHEN    "1202"
-               MOVE    "追加できませんでした"
-                                       TO  SPA-ERRMSG
            WHEN    "1203"
-               MOVE    "削除できませんでした"
+           WHEN    "1204"
+           WHEN    "1205"
+               MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
            END-EVALUATE
       *
@@ -5010,11 +5275,22 @@
            WHEN    "2001"
                MOVE    "該当の病室を削除します。よろしいですか"
                                         TO  WRK-WIDMSG
-           WHEN    "3001"
+           WHEN    "2001"
+               MOVE    "該当の病室を削除します。よろしいですか"
+                                        TO  WRK-WIDMSG
+           WHEN    "2002"
                MOVE    "選択中の病室について入院料加算を変更しま"
                                         TO  WRK-WIDMSG (1 : 40)
                MOVE    "す"
                                         TO  WRK-WIDMSG (41 : )
+           WHEN    "2003"
+               MOVE    SPACE            TO  WRK-WIDMSG
+               STRING  "有効期間の重複するデータが存在します。"
+                                            DELIMITED   BY  SIZE
+                       "前の期間を区切りますか"
+                                            DELIMITED   BY  SIZE
+               INTO    WRK-WIDMSG
+               END-STRING
            END-EVALUATE
       *
       *
@@ -5695,6 +5971,41 @@
       *
            .
        900-SYSKANRI-KEY9-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY16-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+           INITIALIZE                      SYS-5002-REC
+           MOVE    "5002"              TO  SYS-5002-KANRICD
+           MOVE    SPA-GMN-W21-BTUNUM  TO  WRK-SYS5002-BTUNUM
+           MOVE    SPA-GMN-W21-BRMNUM  TO  WRK-BRMNUM
+           PERFORM 4100-BRMNUM-KEY-EDIT-SEC
+           MOVE    WRK-BRMNUM-KEY      TO  WRK-SYS5002-BRMNUM
+           MOVE    WRK-SYS5002-KBNCD   TO  SYS-5002-KBNCD
+           MOVE    SPA-HOSPNUM         TO  SYS-5002-HOSPNUM
+           MOVE    SPA-NAI-W21-YUKOSTYMD
+                                       TO  SYS-5002-STYUKYMD
+           MOVE    SYS-5002-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  SYS-5002-REC
+           ELSE
+               MOVE    1           TO  FLG-SYSKANRI
+               INITIALIZE              SYS-5002-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY16-SEL-EXT.
            EXIT.
       *****************************************************************
       *    入院履歴検索処理(KEY15)

@@ -1424,6 +1424,22 @@
 
 	<widget>
 	  <class>GtkLabel</class>
+	  <name>label1020</name>
+	  <x>24</x>
+	  <y>80</y>
+	  <width>136</width>
+	  <height>24</height>
+	  <label>医療区分の引継ぎ</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
 	  <name>label1021</name>
 	  <x>364</x>
 	  <y>80</y>
@@ -1440,12 +1456,12 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label1020</name>
-	  <x>24</x>
-	  <y>80</y>
-	  <width>136</width>
+	  <name>LBLADLINPUTINFO</name>
+	  <x>364</x>
+	  <y>40</y>
+	  <width>532</width>
 	  <height>24</height>
-	  <label>医療区分の引継ぎ</label>
+	  <label>＊合計点数の直接入力は平成２２年３月まで有効です。</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0</xalign>

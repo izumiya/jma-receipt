@@ -71,7 +71,7 @@
            03  WRK-DAY-X.
                05  WRK-DAY                     PIC 9(02).
            03  WRK-RYOYO-DAY-G.
-               05  WRK-RYOYO-DAY               PIC 9(01)
+               05  WRK-RYOYO-DAY               PIC S9(02)
                                                OCCURS  31.
            03  WRK-TNS-SRYCD                   PIC X(09).
            03  WRK-TNS-KJNYMD                  PIC X(08).
@@ -283,11 +283,10 @@
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
       *
-                   IF    ( WRK-RYOYO-DAY (IDX-DAY) >   ZERO )
+                   IF    ( WRK-RYOYO-DAY (IDX-DAY) NOT =   ZERO )
                        MOVE    WRK-RYOYO-DAY (IDX-DAY)
                                        TO  CL-DAY (IDX-DAY)
-                       IF    ( WRK-RYOYO-DAY (IDX-DAY) >=  1 )
-                        AND  ( WRK-RYOYO-DAY (IDX-DAY) <=  6 )
+                       IF    ( WRK-RYOYO-DAY (IDX-DAY) >   ZERO )
                            MOVE    1   TO  CL-RYOYO-FLG
                        END-IF
                    END-IF
@@ -370,7 +369,7 @@
                            UNTIL ( IDX-DAY >   31 )
       *
                        IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
-                           MOVE    9       TO  WRK-RYOYO-DAY (IDX-DAY)
+                           MOVE    -1      TO  WRK-RYOYO-DAY (IDX-DAY)
                        END-IF
       *
                    END-PERFORM
@@ -516,13 +515,11 @@
                IF    ( RYOCOM-MONTH    >   ZERO )
                    CONTINUE
                ELSE
-                   IF    ( CL-ZENGETU-DAY (CL-ZENGETU-END) >=  1 )
-                    AND  ( CL-ZENGETU-DAY (CL-ZENGETU-END) <=  6 )
+                   IF    ( CL-ZENGETU-DAY (CL-ZENGETU-END) >   ZERO )
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   CL-KONGETU-END )
       *
-                           IF    ( CL-KONGETU-DAY (IDX-DAY) >=  1 )
-                            AND  ( CL-KONGETU-DAY (IDX-DAY) <=  6 )
+                           IF    ( CL-KONGETU-DAY(IDX-DAY) >   ZERO )
                                MOVE    WKRYOCOM-DAY (CL-ZENGETU-END)
                                        TO  RYOCOM-DAY (IDX-DAY)
                            END-IF
