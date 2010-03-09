@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       *  Maj/Min/Rev  修正者       日付      内容
+      *  04.04.01    NACL-藤原    10/03/03   医療機関情報（住所）の取得
+      *                                      方法の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -296,7 +298,7 @@
            MOVE    "*"                 TO  SYS-1002-KBNCD
            MOVE    LNK-PRTKANRI-SRYYM  TO  SYS-1002-STYUKYMD (1:6)
            MOVE    "01"                TO  SYS-1002-STYUKYMD (7:2)
-           MOVE    SYS-1001-STYUKYMD   TO  SYS-1002-EDYUKYMD
+           MOVE    SYS-1002-STYUKYMD   TO  SYS-1002-EDYUKYMD
            MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
            MOVE    SYS-1002-REC        TO  MCPDATA-REC
            PERFORM 910-SYSKANRI-INV-SEC
