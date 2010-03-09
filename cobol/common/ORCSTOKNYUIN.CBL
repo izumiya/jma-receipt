@@ -653,7 +653,7 @@
                        MOVE   "190139810"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "60"
       *                泼年礁面迹闻技瓷妄瘟２∈弓认跋钱烬泼年礁面迹闻∷
-                       MOVE   "190139810"   TO  LNK-TOKNYUIN-SRYCD
+                       MOVE   "190140010"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "61"
       *                糠栏基泼年礁面迹闻技瓷妄瘟２
                        MOVE   "190140410"   TO  LNK-TOKNYUIN-SRYCD
