@@ -2601,14 +2601,15 @@
                    PERFORM 5002-GETUMATU-HEN-SEC
                    MOVE    WRK-SYMD    TO  WRK-EDYMD
       *
-                   STRING  "(taiinymd >= '"        DELIMITED  BY  SIZE
-                           WRK-STYMD               DELIMITED  BY  SIZE
-                           "' and nyuinymd <= '"   DELIMITED  BY  SIZE
+                   STRING  "(tennyuymd <= '"       DELIMITED  BY  SIZE
                            WRK-EDYMD               DELIMITED  BY  SIZE
+                           "' and tenstuymd >= '"  DELIMITED  BY  SIZE
+                           WRK-STYMD               DELIMITED  BY  SIZE
                            "')"                    DELIMITED  BY  SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
+                   display "WRK-SQL =" WRK-SQL
                WHEN    "4"
       *
                    STRING  "(tennyuymd <= '"        DELIMITED  BY  SIZE
@@ -2625,7 +2626,22 @@
            END-IF    
       *
       *    ¾õÂÖ
-           IF      SPA-GMN-JOTAI      =   "4"
+           EVALUATE    SPA-GMN-JOTAI
+           WHEN        "3"
+               MOVE    SPA-SYSYMD      TO  WRK-STYMD
+               MOVE    "01"            TO  WRK-STYMD (7:)
+               PERFORM 45011-JYOKEN-HENSYU-SEC
+               STRING  "((tenstuymd <> '"  DELIMITED  BY  SIZE
+                       WRK-STYMD           DELIMITED  BY  SIZE
+                       "') and (tennyuymd <> tenstuymd)"
+                                           DELIMITED  BY  SIZE
+                       "or rrkedanum = rrkedanum_max)"
+                                           DELIMITED  BY  SIZE
+                       INTO    WRK-SQL
+                       WITH    POINTER WRK-SQL-PNT
+               END-STRING
+               MOVE    1                   TO  FLG-JYOKEN
+           WHEN        "4"
                PERFORM 45011-JYOKEN-HENSYU-SEC
                STRING  "(tenstuymd <> '"    DELIMITED  BY  SIZE
                        SPA-SYSYMD           DELIMITED  BY  SIZE
@@ -2635,7 +2651,7 @@
                        WITH    POINTER WRK-SQL-PNT
                END-STRING
                MOVE    1                   TO  FLG-JYOKEN
-           ELSE    
+           WHEN    OTHER
                PERFORM 45011-JYOKEN-HENSYU-SEC
                STRING  "rrkedanum = rrkedanum_max"
                                             DELIMITED  BY  SIZE
@@ -2643,7 +2659,7 @@
                        WITH    POINTER WRK-SQL-PNT
                END-STRING
                MOVE    1                   TO  FLG-JYOKEN
-           END-IF    
+           END-EVALUATE
       *
       *    Âà±¡»öÍ³
            IF      SPA-GMN-TAIINCD     =   SPACE
