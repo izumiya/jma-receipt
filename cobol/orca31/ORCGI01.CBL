@@ -10865,7 +10865,7 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
            IF    (SPA-NAI-I01-NYUINYMD    >=     "20100401")  AND
                  (SYOKIKSN-IN-KHNSRYCD     =     "190138410")
-             PERFORM    4801-TOKUTEI-NYUIN3-3-7-14-SEC
+             PERFORM    4801-TOKUTEI-NYUIN3-3-7-60-SEC
       *
              IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
@@ -10983,7 +10983,7 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
            IF    (SPA-NAI-I01-NYUINYMD    >=     "20100401")  AND
                  (SYOKIKSN-IN-KHNSRYCD     =     "190139010")
-             PERFORM    4801-TOKUTEI-NYUIN4-3-7-14-SEC
+             PERFORM    4801-TOKUTEI-NYUIN4-3-7-14-60-SEC
       *
              IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
@@ -12291,7 +12291,7 @@
       *    Ê¿À®£²£²Ç¯²þÄê
       *    ÆÃÄêÆþ±¡ÎÁ¡Ê£³Æü¡¿£·Æü¡¿£¶£°Æü¡¿¤½¤ì°Ê¹ß¡Ë¤Î¿ÇÎÅ¥³¡¼¥É¥»¥Ã¥È
       *****************************************************************
-       4801-TOKUTEI-NYUIN3-3-7-14-SEC         SECTION.
+       4801-TOKUTEI-NYUIN3-3-7-60-SEC         SECTION.
       *
       *ÆÃÄêÆþ±¡ÎÁ¤Ç£³Æü¤Þ¤Ç¡¢£·Æü¤Þ¤Ç¡¢£¶£°Æü¤Þ¤Ç¡¢¤½¤ì°Ê¹ß¤Ï°ìÈÌÆþ±¡ÎÁ¤ò»»Äê¤¹¤ë
       *¾ì¹ç¤Î¿ÇÎÅ¥³¡¼¥É¤ò¼èÆÀ
@@ -12309,14 +12309,14 @@
            END-EVALUATE
            .
       *
-       4801-TOKUTEI-NYUIN3-3-7-14-EXT.
+       4801-TOKUTEI-NYUIN3-3-7-60-EXT.
            EXIT.
       *
       *****************************************************************
       *    Ê¿À®£²£²Ç¯²þÄê
-      *    ÆÃÄêÆþ±¡ÎÁ¡Ê£³Æü¡¿£·Æü¡¿£¶£°Æü¡¿¤½¤ì°Ê¹ß¡Ë¤Î¿ÇÎÅ¥³¡¼¥É¥»¥Ã¥È
+      *    ÆÃÄêÆþ±¡ÎÁ¡Ê£³Æü¡¿£·Æü¡¿£±£´Æü¡¿£¶£°Æü¡¿¤½¤ì°Ê¹ß¡Ë¤Î¿ÇÎÅ¥³¡¼¥É¥»¥Ã¥È
       *****************************************************************
-       4801-TOKUTEI-NYUIN4-3-7-14-SEC         SECTION.
+       4801-TOKUTEI-NYUIN4-3-7-14-60-SEC         SECTION.
       *
       *ÆÃÄêÆþ±¡ÎÁ¤Ç£³Æü¤Þ¤Ç¡¢£·Æü¤Þ¤Ç¡¢£±£´Æü¤Þ¤Ç¡¢£¶£°Æü¤Þ¤Ç¡¢
       *¤½¤ì°Ê¹ß¤Ï°ìÈÌÆþ±¡ÎÁ¤ò»»Äê¤¹¤ë¾ì¹ç¤Î¿ÇÎÅ¥³¡¼¥É¤ò¼èÆÀ
@@ -12336,7 +12336,7 @@
            END-EVALUATE
            .
       *
-       4801-TOKUTEI-NYUIN4-3-7-14-EXT.
+       4801-TOKUTEI-NYUIN4-3-7-14-60-EXT.
            EXIT.
       *
       *****************************************************************
@@ -15603,7 +15603,7 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
            IF    (SPA-NAI-I01-IDOYMD      >=     "20100401")  AND
                  (SYOKIKSN-IN-KHNSRYCD     =     "190138410")
-             PERFORM    4801-TOKUTEI-NYUIN3-3-7-14-SEC
+             PERFORM    4801-TOKUTEI-NYUIN3-3-7-60-SEC
       *
              MOVE      ZERO               TO  TN-IDX
              IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
@@ -15716,7 +15716,7 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
            IF    (SPA-NAI-I01-IDOYMD      >=     "20100401")  AND
                  (SYOKIKSN-IN-KHNSRYCD     =     "190139010")
-             PERFORM    4801-TOKUTEI-NYUIN4-3-7-14-SEC
+             PERFORM    4801-TOKUTEI-NYUIN4-3-7-14-60-SEC
       *
              MOVE      ZERO               TO  TN-IDX
              IF    SYOKIKSN-IN-KHNSRYCD   =   WRK-TOKUTEI-SRYCD1
