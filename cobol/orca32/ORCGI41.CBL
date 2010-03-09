@@ -2793,6 +2793,11 @@
                                                     "190119710"   OR
                                                     "190119810")  AND
                            (SYS-5001-BTU-KHNSRYCD = "099999951"))
+                                               OR
+                          ((SPA-GMN-TSRYCD (IDU)  = "190135110"   OR
+                                                    "190135210"   OR
+                                                    "190135310")  AND
+                           (SYS-5001-BTU-KHNSRYCD = "099999952"))
                                CONTINUE
                         ELSE
                            MOVE   SPACE  TO  SPA-GMN-KEIKOKU
