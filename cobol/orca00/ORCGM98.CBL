@@ -417,7 +417,7 @@
       *
            MOVE    ZERO                TO  IDX
            PERFORM             UNTIL   FLG-JOBLOG    =   1
-                               OR      IDX             =   100
+                               OR      IDX             =   99
                ADD     1                   TO  IDX
                MOVE    IDX                 TO  SPA-GMN-TNO   (IDX)
                MOVE    JOBLOG-LOGYMD       TO  WRK-SYMD
