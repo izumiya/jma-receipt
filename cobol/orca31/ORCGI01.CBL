@@ -12156,9 +12156,14 @@
                    MOVE    "190024610"  TO  WRK-TOKUTEI-SRYCD1
                    MOVE    "190074610"  TO  WRK-TOKUTEI-SRYCD2
       *    泼年礁面迹闻技瓷妄瘟∈脚旧荚霹孺唯答洁踏塔∷
+      *    ∈士喇２２钳猖年により泼年礁面迹闻技瓷妄瘟１に恃构∷
                WHEN   "190116310"
                    MOVE    "190116310"  TO  WRK-TOKUTEI-SRYCD1
                    MOVE    "190116410"  TO  WRK-TOKUTEI-SRYCD2
+      *    泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
+               WHEN   "190139810"
+                   MOVE    "190139810"  TO  WRK-TOKUTEI-SRYCD1
+                   MOVE    "190139910"  TO  WRK-TOKUTEI-SRYCD2
       *    颠炭颠缔掐薄瘟１
                WHEN   "190024510"
                    MOVE    "190024510"  TO  WRK-TOKUTEI-SRYCD1
@@ -13263,13 +13268,14 @@
       *      啊缔拉袋掐薄板闻瓷妄瘟２
       *      颠炭颠缔掐薄瘟３∈颠炭颠缔掐薄瘟∷
       *      颠炭颠缔掐薄瘟４∈颠炭颠缔掐薄瘟∷
+      *      泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN  = "03" OR "04" OR "05" OR
                                                 "06" OR "07" OR "08" OR
                                                 "09" OR "13" OR "14" OR
                                                 "16" OR "17" OR "18" OR
                                                 "19" OR "54" OR "55" OR
-                                                "57"
+                                                "57" OR "59"
                     MOVE   SPA-NAI-I01-TAIINYMD
                                        TO   PTNYUINRRK-TENNYUYMD
                                             SPA-NAI-I01-IDOYMD
@@ -13363,11 +13369,12 @@
       *    办梧炊厉旧吹荚掐薄板闻瓷妄瘟
       *    颠炭颠缔掐薄瘟３∈颠炭颠缔掐薄瘟∷
       *    颠炭颠缔掐薄瘟４∈颠炭颠缔掐薄瘟∷
+      *    泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN   = "03" OR "04" OR "05" OR
                                                  "06" OR "07" OR "08" OR
                                                  "09" OR "14" OR "16" OR
-                                                 "55" OR "57"
+                                                 "55" OR "57" OR "59"
                    IF   STUSAN-NISSU06   >=   14
                        MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
                    END-IF
@@ -14566,11 +14573,12 @@
       *    办梧炊厉旧吹荚掐薄板闻瓷妄瘟
       *    颠炭颠缔掐薄瘟３∈颠炭颠缔掐薄瘟∷
       *    颠炭颠缔掐薄瘟４∈颠炭颠缔掐薄瘟∷
+      *    泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN   = "03" OR "04" OR "05" OR
                                                  "06" OR "07" OR "08" OR
                                                  "09" OR "14" OR "16" OR
-                                                 "55" OR "57"
+                                                 "55" OR "57" OR "59"
                    IF   STUSAN-NISSU06   >=   14
                        MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
                    END-IF
@@ -17283,13 +17291,14 @@
       *    啊缔拉袋掐薄板闻瓷妄瘟２
       *    颠炭颠缔掐薄瘟３∈颠炭颠缔掐薄瘟３∷
       *    颠炭颠缔掐薄瘟４∈颠炭颠缔掐薄瘟４∷
+      *    泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN  = "03" OR "04" OR "05" OR
                                                 "06" OR "07" OR "08" OR
                                                 "09" OR "13" OR "14" OR
                                                 "16" OR "17" OR "18" OR
                                                 "19" OR "54" OR "55" OR
-                                                "57"
+                                                "57" OR "59"
                     MOVE   SPA-NAI-I01-MAEIDOYMD
                                        TO   PTNYUINRRK-TENNYUYMD
                                             SPA-NAI-I01-IDOYMD
@@ -18953,6 +18962,8 @@
       *    颠炭颠缔掐薄瘟３∈弓认跋钱烬泼年礁面迹闻∷
       *    颠炭颠缔掐薄瘟４∈颠炭颠缔掐薄瘟∷
       *    颠炭颠缔掐薄瘟４∈弓认跋钱烬泼年礁面迹闻∷
+      *    泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
+      *    泼年礁面迹闻技瓷妄瘟２∈弓认跋钱烬泼年礁面迹闻∷
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                EVALUATE   PTNYUINRRK-TOKUTEI-NYUIN
                    WHEN   "03"
@@ -19015,6 +19026,12 @@
                        MOVE   "190139110"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190139210"  TO  STUSAN-TOKUTEI-SRYCD(3)
                        MOVE   "190139310"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                   WHEN   "59"
+                       MOVE   "190139810"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190139910"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                   WHEN   "60"
+                       MOVE   "190140010"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190140110"  TO  STUSAN-TOKUTEI-SRYCD(2)
                END-EVALUATE
            END-IF
       *    篮坷彩缔拉袋迹闻陕棚掐薄瘟１
