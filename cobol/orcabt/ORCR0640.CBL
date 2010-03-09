@@ -412,6 +412,8 @@
       *  04.04.40    NACL-ÌçÏÆ    10/02/16  ¥ì¥»µ­ºÜ¤·¤Ê¤¤ÃÏÊý¸øÈñ¤¬¤¢¤ë¾ì¹ç
       *                                     ¤ÎÊÝ¸±Íó°ìÉôÉéÃ´¶âÊÔ½¸ÂÐ±þ
       *  04.04.41    NACL-ÌçÏÆ    10/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.04.42    NACL-ÌçÏÆ    10/03/09  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô¤Ë
+      *                                     ´Ø¤¹¤ëÊÝ¸±Íó°ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -1285,6 +1287,8 @@
            03  WRK-SETCOM-JIDO2                PIC 9(03).
       *
            03  WRK-ZEROKISAIFLG                PIC X(01).
+      *
+           03  WRK-FTNMONEY-MAE                PIC 9(09).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -15089,6 +15093,7 @@
              END-IF
            END-IF
       *
+           MOVE    999999999   TO   WRK-FTNMONEY-MAE
       *    £·£°ºÐÂåÁ°È¾·Ú¸ºÆÃÎãÁ¼ÃÖÂÐ±þ
            IF  ((FLG-ZENKI-TOKUREI     =   1  ) AND
                 (RECE62-KOHNUM(1)      = "051"))
@@ -15101,6 +15106,7 @@
                 (WRK-PREFNUM           = "23" ) AND
                 (RECE62-KOHNUM(1)      = "191") AND
                 (RECE62-SRYYM      >= "200910"))
+              MOVE     RECE62-FTNMONEY(2)    TO    WRK-FTNMONEY-MAE
               PERFORM  210463-ZENKI-TOKUREI-OKIKAE-SEC
            ELSE
               IF   RECE62-KOUREI   =  "1" OR "2"
@@ -15338,7 +15344,9 @@
       *
            END-IF
       *
-           IF      RECE62-SRYYM      >=  "200210"
+           IF   WK-GENGAKUKBN   =   ZERO
+      *
+            IF      RECE62-SRYYM      >=  "200210"
              IF  (RECE62-KOUREI        =  "1" OR "2")
              AND (RECE62-KOHNUM(1)     =  SPACE     )
              AND (RECE62-KOHNUM(2)     =  SPACE     )
@@ -15374,7 +15382,11 @@
                    COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
                                              - WRK-KOH-GAI
                  ELSE
+                  IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                   MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                  ELSE
                    MOVE  RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                  END-IF
                  END-IF
                  COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
                                           - FTN-KOH-XXX
@@ -15399,9 +15411,9 @@
                    END-IF
                  END-IF
              END-IF
-           END-IF
+            END-IF
       *
-           EVALUATE   WRK-PREFNUM
+            EVALUATE   WRK-PREFNUM
       *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
              WHEN    "10"
                IF  (RECE62-SRYYM        >=  "200804"  )
@@ -15445,7 +15457,11 @@
                      COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
                                                - WRK-KOH-GAI
                    ELSE
+                    IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                     MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                    ELSE
                      MOVE  RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                    END-IF
                    END-IF
                    COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
                                             - FTN-KOH-XXX
@@ -15554,7 +15570,11 @@
                      COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
                                                - WRK-KOH-GAI
                    ELSE
+                    IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                     MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                    ELSE
                      MOVE  RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                    END-IF
                    END-IF
                    COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
                                             - FTN-KOH-XXX
@@ -15608,7 +15628,11 @@
                      COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
                                                - WRK-KOH-GAI
                    ELSE
+                    IF  WRK-FTNMONEY-MAE  NOT = 999999999
+                     MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
+                    ELSE
                      MOVE  RECE62-FTNMONEY(2)  TO  WRK-CHK-KOKIGAK2
+                    END-IF
                    END-IF
                    COMPUTE  WRK-CHK-KOKIGAK = RECE62-FTNMONEY(1)
                                             - FTN-KOH-XXX
@@ -15629,7 +15653,9 @@
                    END-IF
                  END-IF
                END-IF
-           END-EVALUATE
+            END-EVALUATE
+      *
+           END-IF
       *
            .
        21046-SAIKEI-KEISAN-EXT.
