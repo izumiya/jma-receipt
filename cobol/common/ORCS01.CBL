@@ -308,6 +308,7 @@
       *  04.04.21    NACL-門脇    09/12/25  埼玉県地方公費対応（新座市）
       *  04.04.22    NACL-門脇    09/12/25  埼玉県地方公費対応（朝霞市）
       *  04.04.23    NACL-門脇    10/03/05  ７０歳代前半の特例措置延長対応
+      *  04.04.24    NACL-門脇    10/03/09  前期高齢者の高額計算修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9518,10 +9519,8 @@
              CONTINUE
            ELSE
              MOVE   WK-HKNJANUM2-TBL  TO  WK-HKNJANUM3-TBL
-           END-IF.
-      *
-           IF  FLG-GENBUTU70    NOT =  ZERO
-             IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+             IF  FLG-GENBUTU70    NOT =  ZERO
+               IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
                  IF  ((SYU-SRYYMD  <  WK-GEN70-YMD  ) AND
                       (SYU-SKJ-FTNGAKU(2)     = ZERO))
                  OR  ((SYU-SKJ-FTNGAKU(2) NOT = ZERO) AND
@@ -9531,20 +9530,21 @@
                     MOVE  SPACE  TO   WK-KIGO2
                     MOVE  SPACE  TO   WK-NUM2
                  END-IF
+               END-IF
+             END-IF
+      ***    IF  LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"
+             IF  FLG-KOUREI-KBN              =  "1"
+               IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+                 IF   (SYU-SKJ-FTNGAKU(2) NOT = ZERO)
+                 AND  (SYU-SKJ-FTNGAKU(2) NOT =
+                             LNK-SYU-SKJ-FTNGAKU(2) )
+                    MOVE   "9"   TO   WK-HONKZKKBN2
+                    MOVE  SPACE  TO   WK-KIGO2
+                    MOVE  SPACE  TO   WK-NUM2
+                 END-IF
+               END-IF
              END-IF
            END-IF.
-      ***  IF  LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"
-      *@   IF  FLG-KOUREI-KBN              =  "1"
-      *@     IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
-      *@         IF   (SYU-SKJ-FTNGAKU(2) NOT = ZERO)
-      *@         AND  (SYU-SKJ-FTNGAKU(2) NOT =
-      *@                     LNK-SYU-SKJ-FTNGAKU(2) )
-      *@            MOVE   "9"   TO   WK-HONKZKKBN2
-      *@            MOVE  SPACE  TO   WK-KIGO2
-      *@            MOVE  SPACE  TO   WK-NUM2
-      *@         END-IF
-      *@     END-IF
-      *@   END-IF.
       *
       *    公費ＩＤ編集
            PERFORM  22027-KOHID-HENSYU-SEC.
