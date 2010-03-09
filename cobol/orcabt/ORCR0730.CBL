@@ -2266,7 +2266,7 @@
        20022-KOHSKY-WRITE-SEC          SECTION.
       *
       *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
-           IF      RECE62-SRYYM         >=  "201004"
+           IF      RECE62X-SRYYM        >=  "201004"
                GO  TO  20022-KOHSKY-WRITE-EXT
            END-IF
       *¡ú¡ú
@@ -7801,11 +7801,6 @@
            END-PERFORM
       *
            IF      FLG-ERR              =   ZERO
-      *¡ú¡ú    Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
-               IF      RECE62-SRYYM         >=  "201004"
-                   GO  TO  391-DB-WRITE-EXT
-               END-IF
-      *¡ú¡ú
                PERFORM 3904-RECE10-HENSYU-SEC
            END-IF
       *
@@ -8614,6 +8609,12 @@
       *    ÀÁµá´ÉÍý£Ä£Â¹¹¿·
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
+      *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           IF      RECE62-SRYYM         >=  "201004"
+               GO  TO  3904-RECE10-HENSYU-EXT
+           END-IF
+      *¡ú¡ú
       * 
       *    ¥Æ¥¹¥È´µ¼Ô¤Î¤È¤­¹¹¿·¤·¤Ê¤¤
            IF      RECE62-TSTPTNUMKBN  =   "1"

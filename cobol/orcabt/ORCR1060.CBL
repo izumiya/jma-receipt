@@ -2224,11 +2224,6 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  OPECOM-HOSPNUM
       *
       *    請求管理ＤＢ更新
            IF      FLG-ERR              =   ZERO
-      *★★    平成２２年４月改正対応
-               IF      RECE100-SRYYM        >=  "201004"
-                   GO  TO  391-DB-WRITE-EXT
-               END-IF
-      *★★
                PERFORM 3904-RECE10-HENSYU-SEC
            END-IF
       *
@@ -2491,6 +2486,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
+      *
+      *★★平成２２年４月改正対応
+           IF      RECE100-SRYYM        >=  "201004"
+               GO  TO  3904-RECE10-HENSYU-EXT
+           END-IF
+      *★★
       * 
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE100-TSTPTNUMKBN =   "1"  )
