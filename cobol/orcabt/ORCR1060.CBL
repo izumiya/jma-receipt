@@ -43,6 +43,9 @@
       *  04.03.05    NACL-門脇    09/02/04  請求点が０の場合の対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
+      *  04.05.02    NACL-藤原    10/03/03  平成２２年４月改正対応
+      *                                     平成２２年４月分以降の処理を
+      *                                     行わない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -513,6 +516,12 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            03  WRK-ERR-MSG-7.
                05  FILLER          PIC X(48)   VALUE
                    "【リアルタイムプレビューより作成のため提出不可】". 
+      *
+      *★★平成２２年４月改正対応
+           03  WRK-ERR-MSG-99.
+               05  FILLER              PIC X(28)  VALUE
+               "《平成２２年４月改正未対応》".
+      *★★
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1162,6 +1171,20 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                MOVE    WRK-ERR-MSG-7        TO  HCM58-HEAD1-G (5:)
                MOVE    WRK-HCM58-HEAD1-G    TO  HCM58-HEAD1-G (53:)
            END-IF
+      *
+      *★★平成２２年４月改正対応
+           IF      RECE100-SRYYM        >=  "201004"
+               MOVE    SPACE                TO  WRK-HCM58-HEAD1-G
+               MOVE    HCM58-HEAD1-G (5:)   TO  WRK-HCM58-HEAD1-G
+               MOVE    WRK-ERR-MSG-99       TO  HCM58-HEAD1-G (5:)
+               MOVE    WRK-HCM58-HEAD1-G    TO  HCM58-HEAD1-G (33:)
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   MOVE    "点検改正未対応"    TO  HCM58-LABEL
+               ELSE
+                   MOVE    "改正未対応"        TO  HCM58-LABEL
+               END-IF     
+           END-IF
+      *★★
       *
            .
        310-HC101-HEAD-HEN-EXT.
@@ -2464,6 +2487,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
+      *
+      *★★平成２２年４月改正対応
+           IF      RECE100-SRYYM        >=  "201004"
+               GO  TO  3904-RECE10-HENSYU-EXT
+           END-IF
+      *★★
       * 
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE100-TSTPTNUMKBN =   "1"  )

@@ -278,6 +278,9 @@
       *                                     ¤òÃæ»ß
       *  04.05.11    NACL-Æ£¸¶    10/02/23  Æ±·î¤Ë·ÑÂ³¤Ç¤Ê¤¤ÆþÂà±¡¤ò·«¤ê
       *                                     ÊÖ¤·¤¿¾ì¹ç¤Îµ­Ï¿ÂÐ±þ
+      *  04.05.12    NACL-Æ£¸¶    10/03/03  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
+      *                                     ¹Ô¤ï¤Ê¤¤
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1528,6 +1531,12 @@
            OPEN    INPUT               RECE68-FILE
       *
            OPEN    INPUT               RECE655-FILE
+      *
+      *¡ú¡úÊ¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+           IF      WRK-PARA-SRYYM  >=  "201004"
+               MOVE    1               TO  FLG-END
+           END-IF
+      *¡ú¡ú
       * 
            IF      FLG-END             =   ZERO
       *
@@ -7885,6 +7894,11 @@
                        MOVE    1           TO  FLG-END
                        MOVE    HIGH-VALUE  TO  KEY-NEW
                    NOT AT  END
+      *¡ú¡ú    Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+                       IF      RECE62-SRYYM    >=  201004
+                           MOVE    2               TO  FLG-READ
+                       END-IF
+      *¡ú¡ú
                        IF  ( ( WRK-PARA-SYARECEKBN =   ZERO
                                                    OR  "1" )   AND
                              ( RECE62-TEISYUTUSAKI
