@@ -127,6 +127,10 @@
       *  04.03.03    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
       *  04.03.04    NACL-藤原    08/08/07  労災の枠印刷選択機能対応
       *  04.03.05    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
+      *
+      *  04.04.01    NACL-藤原    10/03/03  平成２２年４月改正対応
+      *                                     平成２２年４月分以降の訂正日
+      *                                     の処理は行わない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2621,6 +2625,14 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
                    MOVE    "0024"          TO  SPA-ERRCD
                END-IF
            END-IF
+      *
+      *★★平成２２年４月改正対応
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-NAI-R01-TEISEIYM    >=   201004
+                   MOVE    "0042"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *★★
       *             
            IF      SPA-ERRCD           =   SPACE
                INITIALIZE                  RECE07-REC
@@ -4896,6 +4908,15 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "0041"
                    MOVE    "データが入力してあるので遷移できません"
                                                        TO  SPA-ERRMSG
+      *★★平成２２年４月改正対応
+               WHEN    "0042"
+                   STRING  "改正未対応のため"
+                                           DELIMITED   BY  SIZE
+                           "平成２２年４月以降の訂正日指定はできません"
+                                           DELIMITED   BY  SIZE
+                                           INTO        SPA-ERRMSG
+                   END-STRING
+      *★★
                WHEN    "1001"
                    MOVE    "レセプト指示コード（個別）が削除できません"
                                                        TO  SPA-ERRMSG
