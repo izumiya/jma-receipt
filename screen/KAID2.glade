@@ -117,7 +117,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
       </signal>
-      <label>F5 薬剤情報      </label>
+      <label>F5 薬剤情報　　</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -186,7 +186,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
       </signal>
-      <label>F6 お薬手帳      </label>
+      <label>F6 お薬手帳　　</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -209,7 +209,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
       </signal>
-      <label>F7 薬情・手帳    </label>
+      <label>F7 薬情・手帳　</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -232,7 +232,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
       </signal>
-      <label>F10     全部        </label>
+      <label>F10  全部　　　</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
   </widget>
