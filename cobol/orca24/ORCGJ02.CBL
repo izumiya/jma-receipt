@@ -2920,6 +2920,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *!
       *    後発医薬品変更再編集
            IF      SRY-SRYCD (IDZ)     =   "099209903"
+                                       OR  "099209905"
+                                       OR  "099209906"
                 PERFORM 3100122-KOUHATU-MEISYO-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO (IDG)
            END-IF

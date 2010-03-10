@@ -200,6 +200,9 @@
            03  IDX-QRB2                PIC 9(04).
            03  IDQ                     PIC 9(04).
       *---(04.00.00) LINE ADD END   ------------------------------------
+           03  IDXF                    PIC 9(04).
+           03  IDXF2                   PIC 9(04).
+           03  IDXF3                   PIC 9(04).
       *
       *    システム領域
        01  SYS-AREA.
@@ -253,8 +256,8 @@
                05  WRK-SURYO-Z1    PIC ZZZZ9.
                05  WRK-SURYO-Z2    PIC X(01).
                05  WRK-SURYO-Z3    PIC ZZZ.
-           03  WRK-SURYO-N         PIC X(18).
            03  WRK-SURYO-N22       PIC X(22).
+           03  WRK-SURYO-N         PIC X(18).
       *    数量小数点以下５桁
            03  WRK-SURYO2           PIC 9(05)V9(05).
            03  WRK-SURYO2-R         REDEFINES   WRK-SURYO2.
@@ -374,9 +377,15 @@
        01  WRK-MEISAI-AREA.
            03  WRK-M-NAME              PIC X(100).
            03  WRK-M-KETA              PIC 9(03).
-           03  WRK-KOU-NAME            PIC X(100).
-           03  WRK-KOU-TNSNAME         PIC X(100).
-           03  WRK-KOU-KETA            PIC 9(03).
+           03  WRK-FUKA-MEI-AREA.
+      *        変更不可コード編集
+               05  WRK-FUKA-TBL            OCCURS   3.
+                   07  WRK-KOU-NAME            PIC X(100).
+                   07  WRK-KOU-TNSNAME         PIC X(100).
+                   07  WRK-KOU-KETA            PIC 9(03).
+           03  WRK-HEN-NAME            PIC X(100).
+           03  WRK-HEN-NAME2           PIC X(100).
+           03  WRK-HEN-KETA            PIC 9(03).
       *
       *    剤内容テーブル
        01  WRK-SRYACT-GRP-AREA.
@@ -626,10 +635,11 @@
            INITIALIZE                  WRK-BIKOU-AREA
       *
       *---(04.03.00) LINE UPD START ------------------------------------
-      *****ACCEPT  SYS-TIME            FROM    TIME
+      **** ACCEPT  SYS-TIME            FROM    TIME
       *    ファイル名編集処理
            PERFORM 1001-HC02-FILE-SEC
       *---(04.03.00) LINE UPD END   ------------------------------------
+      *
       *    プログラムオプション取込み
            PERFORM 100-OPTION-SELECT-SEC
       *    各ＤＢ読込
@@ -745,6 +755,7 @@
       *
            .
        1001-HC02-FILE-EXT.
+           EXIT.
       *---(04.03.00) LINE ADD END   ------------------------------------
       *
       *****************************************************************
@@ -759,7 +770,12 @@
       *
             INITIALIZE                 ORCSMKPRTAREA
             MOVE   "HC01.sh"           TO  MKPRT-ID
-            MOVE   "HC02.red"         TO  MKPRT-DIA
+      *     平成２２年４月からレイアウト変更
+            IF     SPA-SRYYMD          <   "20100401"
+                MOVE   "HC02.red"          TO  MKPRT-DIA
+            ELSE
+                MOVE   "HC02V01.red"       TO  MKPRT-DIA
+            END-IF
             MOVE   SPACE               TO  MKPRT-DEF
             MOVE   HC01PARA            TO  MKPRT-DAT
             MOVE   SYS-1031-PRTNM(2)   TO  MKPRT-PRTNM
@@ -798,15 +814,21 @@
       *                                OR  "3"
       *                                OR  "4"
       *                                OR  "5"
-      *                                OR  "A"   )
+      *                                OR  "A"
+      *---(04.03.00) LINE ADD START ------------------------------------
+      *                                OR  "N"   )
+      *---(04.03.00) LINE ADD END   ------------------------------------
       *        AND (IDX-QR1            >   ZERO  )
-      *        医師未設定は作成なし
-      *        IF      (WRK-DRCD       NOT =   SPACE )
-      *            AND (WRK-DRNAME     NOT =   SPACE )
+      *        医師・交付日未設定は作成なし
+      *        IF      (WRK-DRCD           =   SPACE )
+      *            OR  (WRK-DRNAME         =   SPACE )
+      *            OR  (WRK-KOFYMD         =   SPACE )
+      *            INITIALIZE                  ORCSQRCSVAREA
+      *        ELSE
       *            PERFORM 600-QRDATA-SYORI-SEC
       *        END-IF
       *    END-IF
-      **** MOVE    ZERO                TO  WRK-FILE-CNT
+      *****MOVE    ZERO                TO  WRK-FILE-CNT
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   WRK-PAGE-MAX
@@ -1348,6 +1370,7 @@
            MOVE    WRK-HOSPTEL         TO  HC02-HOSPTEL
       *    ドクター
            MOVE    WRK-DRNAME          TO  HC02-DRNAME
+      *
       *---(04.05.01) LINE ADD START ------------------------------------
       *    県番号
            MOVE    WRK-PREFNUM-J       TO  HC02-PREFNUM
@@ -1590,7 +1613,7 @@
       *    後発医薬品・先発品がない
            IF     (FLG-KOUHATU-HEN     =   1  )
               OR  (FLG-KOUHATUFUKA-ARI =   1  )
-      *****   OR  (FLG-KOUHATU-ARI     =   ZERO )
+      ******* OR  (FLG-KOUHATU-ARI     =   ZERO )
                CONTINUE
            ELSE
       *        変更不可の署名
@@ -1602,7 +1625,7 @@
            .
        30010-KOUHATU-HEN20-EXT.
            EXIT.
-      *---(04.02.00) LINE END START ------------------------------------
+      *---(04.02.00) LINE ADD END   ------------------------------------
       *
       *****************************************************************
       *    パラメタによる編集処理
@@ -1755,6 +1778,7 @@
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
       *    医療機関編集情報
            PERFORM 900-SYS1900-SYORI-SEC
+      *
       *---(04.05.01) LINE ADD START ------------------------------------
       *    県番号
            MOVE    SYS-1001-PREFNUM    TO  WRK-MOJI
@@ -1971,11 +1995,11 @@
            MOVE    ZERO                TO  FLG-KOUHATU-HEN
            MOVE    ZERO                TO  FLG-KOUHATU-CHK
            MOVE    ZERO                TO  FLG-KOUHATU-1-CHK
-      *---(04.02.00) LINE END START ------------------------------------
+      *---(04.02.00) LINE ADD START ------------------------------------
            MOVE    ZERO                TO  FLG-KOUHATUFUKA-IN
            MOVE    ZERO                TO  FLG-KOUHATUFUKA-ARI
            MOVE    ZERO                TO  FLG-KOUHATU-ARI
-      *---(04.02.00) LINE END END   ------------------------------------
+      *---(04.02.00) LINE ADD END   ------------------------------------
            INITIALIZE                  WRK-BIKOU-AREA
       *
       *ＱＲ対応
@@ -2388,12 +2412,12 @@
                            MOVE    1               TO  FLG-TAIGAI
                        END-IF
                    END-IF
-      *            院内包括は対象
-      ******       IF      WRK-SRYSYUKBN       =   "213"
+      ****         院内包括は対象
+      *            IF      WRK-SRYSYUKBN       =   "213"
       *                                        OR  "223"
       *                                        OR  "233"
       *                MOVE    ZERO            TO  FLG-TAIGAI
-      *******       END-IF
+      *****        END-IF
                 END-IF
            END-IF
       *
@@ -2474,13 +2498,13 @@
            PERFORM 990-DBCLOSE-SEC
       *
            IF      ACCT-ZAIKBN         =   1
+      *        薬評分は対象外
                MOVE    1                   TO  FLG-TAIGAI
            ELSE
                MOVE    JYURRK-SRYYMD(7:2)  TO  IDX-ACT
                MOVE    ACCT-DAY (IDX-REN IDX-ACT)
                                            TO  WRK-KAISU
            END-IF
-      *
            .
        20021-SRYACCT-SYORI-EXT.
            EXIT.
@@ -2544,16 +2568,15 @@
            MOVE    ZERO                TO  FLG-KOUHATU-FUKA
       *
            IF      WRK-SRY-SRYCD (IDXA)    =   "099209903"
+                                           OR  "099209905"
+                                           OR  "099209906"
       *        後発医薬品へ変更不可（ＱＲ）
+      *        （含量規格変更不可・剤型変更不可）
                PERFORM 31039-QR-KOUHATU-SEC
            ELSE
-               IF      WRK-SRY-SRYCD (IDXA + 1)    =   "099209903"
-      *            次が後発医薬品へ変更不可の時
-                   MOVE    WRK-SRY-SRYCD (IDXA + 1)    TO  WRK-SRYCD
-                   PERFORM 31039-KOUHATU-NAME-SEC
-               ELSE
-                   MOVE    SPACE               TO  WRK-KOU-NAME
-                   MOVE    ZERO                TO  WRK-KOU-KETA
+               IF      WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"
+      *            薬剤の下変更不可コード判定
+                   PERFORM 310391-FUKACHK-SEC
                END-IF
       *        コード毎の編集
                PERFORM 31032-TENSU-HENSYU-SEC
@@ -2625,7 +2648,7 @@
       *        WHEN    "14"
       *            IF      WRK-NAIYOU-Z (IDX-S)  =   SPACE
       *                COMPUTE IDX-S             =   IDX-S    -   1
-      ********     END-IF
+      **********   END-IF
            END-EVALUATE
       *
            INSPECT WRK-NAIYOU-Z (IDX-S)    REPLACING  ALL "  "  BY  "　"
@@ -2687,13 +2710,43 @@
        20022-PRINT-HEN-EXT.
            EXIT.
       *****************************************************************
+      *    変更不可コード編集処理
+      *****************************************************************
+       310391-FUKACHK-SEC             SECTION.
+      *
+           INITIALIZE                      WRK-FUKA-MEI-AREA
+      *
+           COMPUTE IDXF2               =   IDXA    +   1
+           PERFORM VARYING     IDXF    FROM    IDXF2   BY  1
+                   UNTIL      (IDXF    >   WRK-SRY-MAX   )   OR
+                              (WRK-SRY-SRYCD (IDXF)    =   SPACE)
+               EVALUATE    WRK-SRY-SRYCD (IDXF)
+                   WHEN    "099209903"
+      *                後発医薬品へ変更不可
+                       MOVE    1                       TO  IDXF3
+                       MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
+                       PERFORM 31039-KOUHATU-NAME-SEC
+                   WHEN    "099209905"
+      *                含量規格変更不可
+                       MOVE    2                       TO  IDXF3
+                       MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
+                       PERFORM 31039-KOUHATU-NAME-SEC
+                   WHEN    "099209906"
+      *                剤型変更不可
+                       MOVE    3                       TO  IDXF3
+                       MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
+                       PERFORM 31039-KOUHATU-NAME-SEC
+                   WHEN    OTHER
+                       MOVE    WRK-SRY-MAX         TO  IDXF
+               END-EVALUATE
+           END-PERFORM
+           .
+       310391-FUKACHK-EXT.
+           EXIT.
+      *****************************************************************
       *    後発医薬品へ変更不可編集処理
       *****************************************************************
        31039-KOUHATU-NAME-SEC         SECTION.
-      *
-           MOVE    SPACE               TO  WRK-KOU-NAME
-           MOVE    ZERO                TO  WRK-KOU-KETA
-           MOVE    SPACE               TO  WRK-KOU-TNSNAME
       *
            MOVE    WRK-SRYCD           TO  TNS-SRYCD
            PERFORM 910-TENSU-READ-SEC
@@ -2701,14 +2754,13 @@
                STRING  "【"            DELIMITED  BY  SIZE
                        TNS-NAME        DELIMITED  BY  SPACE
                        "】"            DELIMITED  BY  SIZE
-                                       INTO    WRK-KOU-NAME
+                                       INTO    WRK-KOU-NAME (IDXF3)
                END-STRING
-               COMPUTE WRK-KOU-KETA        =  (TNS-YUKOKETA  * 2)
+               COMPUTE WRK-KOU-KETA(IDXF3) =  (TNS-YUKOKETA  * 2)
                                            +   4
-               MOVE    TNS-NAME            TO  WRK-KOU-TNSNAME
+               MOVE    TNS-NAME            TO  WRK-KOU-TNSNAME(IDXF3)
            END-IF
            MOVE    1                   TO  FLG-KOUHATU-FUKA
-      *
       *---(04.02.00) LINE ADD START ------------------------------------
            MOVE    1                   TO  FLG-KOUHATUFUKA-ARI
       *---(04.02.00) LINE ADD END   ------------------------------------
@@ -2722,14 +2774,21 @@
       *
       *    ＱＲデータ用
            IF      IDX-QR1             >   ZERO
-               ADD     1                   TO  IDX-QR2
-               MOVE    WRK-SRY-SRYCD (IDXA)
-                                           TO  ORCSQRCSV-SRYCD
+               PERFORM VARYING     IDXF    FROM    1   BY  1
+                       UNTIL      (IDXF    >       3  )
+                   IF      WRK-KOU-TNSNAME (IDXF)  NOT =   SPACE
+                       ADD     1                   TO  IDX-QR2
+                       MOVE    WRK-SRY-SRYCD (IDXA)
+                                               TO  ORCSQRCSV-SRYCD
                                                   (IDX-QR1 IDX-QR2)
-               MOVE    WRK-KOU-TNSNAME     TO  ORCSQRCSV-TNS-NAME
+                       MOVE    WRK-KOU-TNSNAME (IDXF)
+                                               TO  ORCSQRCSV-TNS-NAME
                                                   (IDX-QR1 IDX-QR2)
+      *                編集後、クリア
+                       MOVE    SPACE           TO  WRK-KOU-TNSNAME(IDXF)
+                   END-IF
+               END-PERFORM
            END-IF
-      *
            .
        31039-QR-KOUHATU-EXT.
            EXIT.
@@ -2907,6 +2966,7 @@
            INSPECT WRK-MEISYOU1 (IDX-S)  REPLACING  ALL "  "  BY  "　"
            INSPECT WRK-SURYOU (IDX-S)    REPLACING  ALL "  "  BY  "　"
            INSPECT WRK-TANI   (IDX-S)    REPLACING  ALL "  "  BY  "　"
+           INSPECT WRK-FIL11  (IDX-S)    REPLACING  ALL "  "  BY  "　"
       *
       *    後発医薬品変更可能判定
            IF      FLG-KOUHATU         =   1
@@ -2930,7 +2990,6 @@
                END-IF
            END-IF
       *---(04.02.00) LINE ADD END   ------------------------------------
-      *
            MOVE    ZERO                TO  FLG-KOUHATU-1
            MOVE    ZERO                TO  FLG-KOUHATU
            MOVE    ZERO                TO  FLG-KOUHATU-FUKA
@@ -2974,7 +3033,8 @@
                MOVE    TNS-NAME        TO  ORCSQRCSV-TNS-NAME
                                                   (IDX-QR1 IDX-QR2)
            ELSE
-               IF      WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"
+               IF     (WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"   )
+                 AND  (TNSP-IPN-KISAIKBN           =   ZERO  )
                    CONTINUE
                ELSE
                    MOVE    WRK-TNS-NAME    TO  ORCSQRCSV-TNS-NAME
@@ -3085,10 +3145,25 @@
       *****************************************************************
        310311-MEISYOU-HEN2-SEC            SECTION.
       *
+           MOVE    SPACE               TO  WRK-HEN-NAME
+           MOVE    ZERO                TO  WRK-HEN-KETA
+           PERFORM VARYING     IDXF    FROM    1   BY  1
+                   UNTIL      (IDXF    >       3  )
+               IF      WRK-KOU-NAME (IDXF) NOT =   SPACE
+                   ADD     WRK-KOU-KETA (IDXF) TO  WRK-HEN-KETA
+                   MOVE    WRK-HEN-NAME        TO  WRK-HEN-NAME2
+                   MOVE    SPACE               TO  WRK-HEN-NAME
+                   STRING  WRK-HEN-NAME2       DELIMITED  BY  SPACE
+                           WRK-KOU-NAME(IDXF)  DELIMITED  BY  SPACE
+                                               INTO  WRK-HEN-NAME
+                   END-STRING
+               END-IF
+          END-PERFORM
+      *
            MOVE    SPACE               TO  WRK-TNS-NAME
-           IF      (WRK-M-KETA +   WRK-KOU-KETA)  <=  80
+           IF      (WRK-M-KETA +   WRK-HEN-KETA)  <=  80
                STRING   WRK-M-NAME     DELIMITED  BY  SPACE
-                        WRK-KOU-NAME   DELIMITED  BY  SPACE
+                        WRK-HEN-NAME   DELIMITED  BY  SPACE
                                        INTO  WRK-TNS-NAME
                END-STRING
                MOVE    WRK-TNS-NAME    TO  WRK-MEISYOU3 (IDX-S)
@@ -3098,11 +3173,11 @@
                    ADD     1               TO  IDX-S
                    MOVE    ALL "　"        TO  WRK-NO (IDX-S)
                    MOVE    ALL "　"        TO  WRK-K2 (IDX-S)
-                   MOVE    WRK-KOU-NAME    TO  WRK-MEISYOU3 (IDX-S)
+                   MOVE    WRK-HEN-NAME    TO  WRK-MEISYOU3 (IDX-S)
                ELSE
                    MOVE    WRK-M-NAME(81:) TO  WRK-NAME
                    STRING  WRK-NAME        DELIMITED  BY  SPACE
-                           WRK-KOU-NAME    DELIMITED  BY  SPACE
+                           WRK-HEN-NAME    DELIMITED  BY  SPACE
                                            INTO  WRK-TNS-NAME
                    END-STRING
                    ADD     1               TO  IDX-S
@@ -3249,7 +3324,7 @@
        100111-SURYO-HEN03-EXT.
            EXIT.
       *****************************************************************
-      *    小数点３桁まで数量表示用編集処理
+      *    小数点５桁まで数量表示用編集処理
       *****************************************************************
        100112-SURYO-HEN05-SEC                  SECTION.
       *
@@ -3384,9 +3459,8 @@
                                            OR  "98"  )
       *           包括保険分は対象外
                   AND (WRK-HKNCOMBINUM NOT =   "9999" )
-      *                薬評分対象外
-                  AND (WKSRY-ZAIKBN    NOT =   1      )
-      *
+      *           薬評分は対象外
+                  AND  (WKSRY-ZAIKBN   NOT =   1      )
                    MOVE    WRK-SRYKA           TO  WKSRY-SRYKA
                    MOVE    WRK-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
                    ADD     1                   TO  LNK-WKSRYACT-MAX

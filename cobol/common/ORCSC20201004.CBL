@@ -133,6 +133,8 @@
            03  FLG-TENSUPLUS-CHK        PIC 9(01).
            03  FLG-TENSUPLUS            PIC 9(01).
       *
+           03  FLG-CHK3                 PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -168,6 +170,9 @@
       *
            03  IDX-A1              PIC 9(04).
            03  IDX-A2              PIC 9(04).
+      *
+           03  IDZ5                PIC 9(04).
+           03  IDZ6                PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -522,6 +527,35 @@
                        CONTINUE
                    ELSE
                        MOVE    "2064"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                             (IDX-Z)
+                   END-IF
+      *        ´ÞÎÌµ¬³ÊÊÑ¹¹ÉÔ²Ä¡ÊÌôºÞËè¡Ë
+               WHEN    "099209905"
+      *        ºÞ·¿ÊÑ¹¹ÉÔ²Ä¡ÊÌôºÞËè¡Ë
+               WHEN    "099209906"
+      *            Á°¤ËÌôºÞ¤¬¤¢¤ë¤³¤È
+                   COMPUTE IDZ5                =   IDX-Z   -   1
+                   MOVE    ZERO                TO  FLG-CHK3
+                   PERFORM VARYING     IDZ6    FROM    IDZ5  BY  -1
+                           UNTIL      (IDZ6    <   1   )
+                                OR    (WRK-ERRCD   NOT =   SPACE )
+                                OR    (FLG-CHK3        =   1     )
+                       IF      (WRK-COM-INPUTCD(IDZ6)
+                                                   =   "099209905"
+                                                   OR  "099209906" )
+                           CONTINUE
+                       ELSE
+                           IF      (WRK-COM-INPUTCD(IDZ6)(1:1)
+                                                           =   "6"  )
+                               MOVE    1               TO  FLG-CHK3
+                           ELSE
+                               MOVE    1               TO  IDZ6
+                           END-IF
+                       END-IF
+                   END-PERFORM
+                   IF      FLG-CHK3            =   ZERO
+                       MOVE    "0267"          TO  WRK-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR
                                                              (IDX-Z)
                    END-IF

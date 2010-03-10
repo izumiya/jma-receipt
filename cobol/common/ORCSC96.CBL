@@ -1700,6 +1700,18 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "0267"
+                   STRING  "含量規格変更不可・剤刑変更不可は"
+                           "薬剤の下に入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0268"
+                   STRING  "含量規格変更不可・剤刑変更不可は"
+                           "投薬の薬剤の下に入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.

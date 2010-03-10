@@ -1799,6 +1799,20 @@
                            ELSE
                                MOVE    "2063"        TO  SPA-ERRCD
                            END-IF
+      *                ´ÞÎÌµ¬³ÊÊÑ¹¹ÉÔ²Ä¡ÊÌôºÞËè¡Ë
+                       WHEN    "099209905"
+      *                ºÞ·¿ÊÑ¹¹ÉÔ²Ä¡ÊÌôºÞËè¡Ë
+                       WHEN    "099209906"
+                           IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
+                                                           OR  "22"
+                                                           OR  "23"
+                                                           OR  "14" )
+                               MOVE    SPA-COM-SRYKBN(IDX - 1)
+                                                     TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                           ELSE
+                               MOVE    "0268"        TO  SPA-ERRCD
+                           END-IF
       *                Êñ³ç½ÐÍè¹â»»Äê¡ÊºÞ¡Ë
                        WHEN    "099999903"
                            IF     (IDX             >   ZERO )  AND

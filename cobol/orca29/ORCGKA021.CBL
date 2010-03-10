@@ -627,7 +627,9 @@
                 MOVE    WRK-MEISYO     TO  SPA-KA021-TMEISYO2(IDG)
            END-IF
       *    後発医薬品変更再編集
-           IF      SPA-PARA-SRYCD (IDX IDZ)   =   "099209903"
+           IF      SPA-PARA-SRYCD (IDX IDZ)    =   "099209903"
+                                               OR  "099209905"
+                                               OR  "099209906"
                 PERFORM 3100122-KOUHATU-MEISYO-SEC
                 MOVE    WRK-MEISYO     TO  SPA-KA021-TMEISYO2(IDG)
            END-IF

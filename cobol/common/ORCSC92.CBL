@@ -3312,6 +3312,8 @@
                END-IF
       *       後発医薬品変更再編集
               IF      SPA-COM-INPUTCD (IDX-T)  =   "099209903"
+                                               OR  "099209905"
+                                               OR  "099209906"
                    PERFORM 30021-KOUHEN-MEISYO-SEC
                    MOVE    WRK-MEISYO    TO  SPA-GMN-MEISYO (IDX-T)
                END-IF

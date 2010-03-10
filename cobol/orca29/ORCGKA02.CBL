@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.00    NACL-多々納  09/06/XX  数量小数５桁対応
       *  04.05.00    NACL-多々納  09/09/XX  '0086'コメントコード対応
+      *  04.05.00    NACL-多々納  10/01/XX  治験対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1762,6 +1763,8 @@
            END-IF
       *    後発医薬品変更再編集
            IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099209903"
+                                               OR  "099209905"
+                                               OR  "099209906"
                 PERFORM 3100122-KOUHATU-MEISYO-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
