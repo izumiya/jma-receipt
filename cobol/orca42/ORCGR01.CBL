@@ -133,6 +133,9 @@
       *  04.05.03    NACL-藤原    09/08/31  未請求設定チェックを医保分のみ
       *                                     行う
       *  04.05.04    NACL-小豆沢  10/02/18  スクリプト起動パスサーチ対応
+      *  04.05.05    NACL-藤原    10/03/03  平成２２年４月改正対応
+      *                                     平成２２年４月分以降の訂正日
+      *                                     の処理は行わない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2629,6 +2632,14 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
                    MOVE    "0024"          TO  SPA-ERRCD
                END-IF
            END-IF
+      *
+      *★★平成２２年４月改正対応
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-NAI-R01-TEISEIYM    >=   201004
+                   MOVE    "0042"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *★★
       *             
            IF      SPA-ERRCD           =   SPACE
                INITIALIZE                  RECE07-REC
@@ -4930,6 +4941,15 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "0041"
                    MOVE    "データが入力してあるので遷移できません"
                                                        TO  SPA-ERRMSG
+      *★★平成２２年４月改正対応
+               WHEN    "0042"
+                   STRING  "改正未対応のため"
+                                           DELIMITED   BY  SIZE
+                           "平成２２年４月以降の訂正日指定はできません"
+                                           DELIMITED   BY  SIZE
+                                           INTO        SPA-ERRMSG
+                   END-STRING
+      *★★
                WHEN    "1001"
                    MOVE    "レセプト指示コード（個別）が削除できません"
                                                        TO  SPA-ERRMSG
