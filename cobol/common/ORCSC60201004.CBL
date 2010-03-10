@@ -2742,7 +2742,7 @@
                                                OR  "002"  )
                        OR    ((WRK-COM-CDKBN-KBNNUM (IDX-ACT)
                                                =   "003" ) AND
-                              (WRK-COM-CDKBN-KBNNUM-EDA
+                              (WRK-COM-CDKBN-KBNNUM-EDA (IDX-ACT)
                                                =   "00"  )  )
                            MOVE    1               TO  FLG-OK
                        END-IF
@@ -2752,7 +2752,7 @@
                                                =   "004" )
                        OR    ((WRK-COM-CDKBN-KBNNUM (IDX-ACT)
                                                =   "003" ) AND
-                              (WRK-COM-CDKBN-KBNNUM-EDA
+                              (WRK-COM-CDKBN-KBNNUM-EDA (IDX-ACT)
                                                =   "02"  )  )
                            MOVE    1               TO  FLG-OK
                        END-IF
