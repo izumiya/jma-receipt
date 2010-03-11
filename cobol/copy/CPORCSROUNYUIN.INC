@@ -79,6 +79,10 @@
                05  LNK-SROUNYUIN-RYAKUSYO2           PIC  X(14)
                                                      OCCURS 20.
       *
+      *注加算扱いの入院料加算
+               05  LNK-SROUNYUIN-CHUKSNSRYCD         PIC  X(09)
+                                                     OCCURS 20.
+      *
       *復帰コード（１：算定年月エラー　２：患者検索エラー　３：労災入院なし）
            03  LNK-SROUNYUIN-RC                      PIC S9(9) BINARY.
       *
