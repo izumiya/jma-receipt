@@ -38,6 +38,7 @@
       *  04.03.00    NACL-太田    08/09/17  改正対応
       *  04.05.00    NACL-多々納  09/06/XX  数量小数５桁対応
       *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
+      *  04.05.00    NACL-太田    10/03/11  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -322,6 +323,9 @@
       *    プログラムオプション編集パラメタ
            COPY    "CPORCSPRGOPTION.INC".
       *
+      *    印刷ＤＢ制御サブ
+           COPY    "CPORCSPRT.INC".
+      *
            COPY    "MCPDATA.INC".
       *
            COPY    "MCPAREA".
@@ -351,6 +355,8 @@
            INITIALIZE                  STS-AREA
            INITIALIZE                  WRK-AREA
       *
+           MOVE    ZERO           TO   ORCHC04-PAGE
+      *
            ACCEPT  SYS-TIME            FROM    TIME
       *
       *    プログラムオプション取込み
@@ -365,6 +371,7 @@
       *        発行区分による
                PERFORM 202-KAKHOU-SYUNOU-SEC
            END-IF
+      *
       *
            .
        000-PROC-EXT.
@@ -507,6 +514,32 @@
        400-PRINT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    帳票印刷処理 (印刷ＤＢに出力）
+      *****************************************************************
+       401-PRINT-SEC                SECTION.
+      *
+           MOVE    ORCHC04-PRTAREA     TO  ORCSPRTAREA
+      *
+           MOVE    "HCM04.red"         TO  SPRT-PRTID
+           MOVE    HCM04               TO  SPRT-PRTDATA
+      *-----------------------------------------------------------------
+           MOVE    "1"                 TO  SPRT-SITEKBN
+      *    カスタマイズＰＧの場合"2"をセットすること。
+      *    MOVE    "2"                 TO  SPRT-SITEKBN
+      *-----------------------------------------------------------------
+           CALL    "ORCSPRT"           USING
+                                       ORCSPRTAREA
+                                       SPA-AREA
+           IF    ( SPRT-RETURN         =   ZERO )
+               CONTINUE
+           ELSE
+               DISPLAY "ORCSPRT ERR: PTID = " SPRT-PTID
+           END-IF
+      *
+           .
+       401-PRINT-EXT.
+           EXIT.
       *****************************************************************
       *   対象の伝票番号分のみ処理
       *****************************************************************
@@ -1177,14 +1210,26 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   WRK-PAGE-MAX
       *
-      *        帳票印刷開始処理
-               PERFORM 400-SYOKI-PRINT-SEC
+               COMPUTE ORCHC04-PAGE    =   ORCHC04-PAGE    +   1
       *
-      *        帳票編集処理
-               PERFORM 300-HCM04-HEN-SEC
+               IF    ( ORCHC04-PRTKBN      =   "1" )
       *
-      *        帳票印刷処理
-               PERFORM 400-PRINT-SEC
+      *            帳票編集処理
+                   PERFORM 300-HCM04-HEN-SEC
+      *
+      *            帳票印刷処理
+                   PERFORM 401-PRINT-SEC
+               ELSE
+      *
+      *            帳票印刷開始処理
+                   PERFORM 400-SYOKI-PRINT-SEC
+      *
+      *            帳票編集処理
+                   PERFORM 300-HCM04-HEN-SEC
+      *
+      *            帳票印刷処理
+                   PERFORM 400-PRINT-SEC
+               END-IF
            END-PERFORM
       *
            .

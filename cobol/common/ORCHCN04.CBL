@@ -39,6 +39,7 @@
       *  04.03.00    NACL-ÂÀÅÄ    08/12/25  Æþ±¡ÎÁÊñ³çÂÐ±þ¡ÊÂÐ¾Ý³°È½ÄêÄÉ²Ã¡Ë
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/XX  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *  04.05.00    NACL-ÂÀÅÄ    10/03/11  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -342,6 +343,8 @@
            COPY    "CPORCSPRGOPTION.INC".
       *
            COPY    "MCPDATA.INC".
+      *    °õºþ£Ä£ÂÀ©¸æ¥µ¥Ö
+           COPY    "CPORCSPRT.INC".
       *
            COPY    "MCPAREA".
       *
@@ -524,6 +527,32 @@
       *
            .
        400-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ä¢É¼°õºþ½èÍý (°õºþ£Ä£Â¤Ë½ÐÎÏ¡Ë
+      *****************************************************************
+       401-PRINT-SEC                SECTION.
+      *
+           MOVE    ORCHCN04-PRTAREA    TO  ORCSPRTAREA
+      *
+           MOVE    "HCN04.red"         TO  SPRT-PRTID
+           MOVE    HCN04               TO  SPRT-PRTDATA
+      *-----------------------------------------------------------------
+           MOVE    "1"                 TO  SPRT-SITEKBN
+      *    ¥«¥¹¥¿¥Þ¥¤¥º£Ð£Ç¤Î¾ì¹ç"2"¤ò¥»¥Ã¥È¤¹¤ë¤³¤È¡£
+      *    MOVE    "2"                 TO  SPRT-SITEKBN
+      *-----------------------------------------------------------------
+           CALL    "ORCSPRT"           USING
+                                       ORCSPRTAREA
+                                       SPA-AREA
+           IF    ( SPRT-RETURN         =   ZERO )
+               CONTINUE
+           ELSE
+               DISPLAY "ORCSPRT ERR: PTID = " SPRT-PTID
+           END-IF
+      *
+           .
+       401-PRINT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1339,14 +1368,24 @@
       *****************************************************************
        400-PRINT-SYORI-SEC          SECTION.
       *
-      *    Ä¢É¼°õºþ³«»Ï½èÍý
-           PERFORM 400-SYOKI-PRINT-SEC
+           IF    ( ORCHCN04-PRTKBN  =      "1" )
       *
-      *    Ä¢É¼ÊÔ½¸½èÍý
-           PERFORM 300-HCN04-HEN-SEC
+      *        Ä¢É¼ÊÔ½¸½èÍý
+               PERFORM 300-HCN04-HEN-SEC
       *
-      *    Ä¢É¼°õºþ½èÍý
-           PERFORM 400-PRINT-SEC
+      *        Ä¢É¼°õºþ½èÍý
+               PERFORM 401-PRINT-SEC
+           ELSE
+      *
+      *        Ä¢É¼°õºþ³«»Ï½èÍý
+               PERFORM 400-SYOKI-PRINT-SEC
+      *
+      *        Ä¢É¼ÊÔ½¸½èÍý
+               PERFORM 300-HCN04-HEN-SEC
+      *
+      *        Ä¢É¼°õºþ½èÍý
+               PERFORM 400-PRINT-SEC
+           END-IF
       *
            .
        400-PRINT-SYORI-EXT.
