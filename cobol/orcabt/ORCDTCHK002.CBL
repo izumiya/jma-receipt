@@ -1330,7 +1330,7 @@
                                            CHKSND-YUKOEDYMD
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
       *
-           PERFORM 900-CHKSND-KEY23-SEL-SEC
+           PERFORM 900-CHKSND-KEY24-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
       *
@@ -1388,12 +1388,12 @@
                    WRITE   DTCHK010-REC
                END-IF
       *
-               PERFORM 900-CHKSND-KEY23-FET-SEC
+               PERFORM 900-CHKSND-KEY24-FET-SEC
       *
            END-PERFORM
       *
            MOVE    "tbl_chksnd"    TO  MCP-TABLE
-           MOVE    "key23"          TO  MCP-PATHNAME
+           MOVE    "key24"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -6630,7 +6630,7 @@
                    END-PERFORM
                    IF    ( WRK-NISSU-DAY-G NOT =   ZERO )
                        MOVE    "090004"   TO  WRK-ERRCD
-                       PERFORM 2001121-YKZ-BYO-ERRMES-SEC
+                       PERFORM 2001121-SRY-BYO-ERRMES-SEC
                    END-IF
       *
                    INITIALIZE  WRK-NISSU-AREA
@@ -6660,23 +6660,25 @@
       *
            PERFORM 200111-NISSU-HEN-SEC
       *
-           MOVE    CHKSND-SRYCD        TO  WRK-SRYCD
-           MOVE    WRK-KJNYMD          TO  WRK-TNS-YMD
-           PERFORM 900-TENSU-KEY-SEL-SEC
-           IF    ( FLG-TENSU       NOT =   ZERO )
-               MOVE    WRK-SRYCD       TO  WRK-MAE-INPUT
-               PERFORM 800-ZENKAKU-HEN-SEC
-               MOVE    WRK-OUT-INPUT   TO  TNS-NAME
-           END-IF
+           MOVE    CHKSND-SRYCD    TO  WRK-MAE-INPUT
+           PERFORM 800-ZENKAKU-HEN-SEC
+           MOVE    WRK-OUT-INPUT   TO  WRK-SRY-NAME
       *
-           MOVE    SPACE           TO  WRK-ERRMES-PLUS
-           STRING  TNS-NAME            DELIMITED BY SPACE
-                   "、"                DELIMITED BY SIZE
-                   SDTCHK01-O-BYOMEI (IDX0)
-                                       DELIMITED BY SPACE
-                   WRK-NISSU-MES       DELIMITED BY SPACE
-           INTO    WRK-ERRMES-PLUS
-           END-STRING
+           IF    ( CHKSND-SRYCD(1:1)   =   "S" OR "P" )
+               MOVE    CHKSND-SRYCD        TO  WRK-SRYCD
+               PERFORM 900-INPUTCD-KEY2-SEL-SEC
+               IF    ( FLG-INPUTCD         =   ZERO )
+                   MOVE    ICD-DSPNAME     TO  WRK-SRY-NAME
+               END-IF
+           ELSE
+      *
+               MOVE    CHKSND-SRYCD        TO  WRK-SRYCD
+               MOVE    WRK-KJNYMD          TO  WRK-TNS-YMD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               IF    ( FLG-TENSU           =   ZERO )
+                   MOVE    TNS-NAME        TO  WRK-SRY-NAME
+               END-IF
+           END-IF
       *
            MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
            INITIALIZE                      TERRINF-AREA
@@ -11390,13 +11392,13 @@
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY23-SEL-SEC        SECTION.
+       900-CHKSND-KEY24-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
       *
            MOVE    CHKSND-REC          TO  MCPDATA-REC
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key23"             TO  MCP-PATHNAME
+           MOVE    "key24"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -11407,17 +11409,17 @@
       *
            .
       *
-       900-CHKSND-KEY23-SEL-EXT.
+       900-CHKSND-KEY24-SEL-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ２FETCH処理
       *****************************************************************
-       900-CHKSND-KEY23-FET-SEC        SECTION.
+       900-CHKSND-KEY24-FET-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
       *
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key23"             TO  MCP-PATHNAME
+           MOVE    "key24"             TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC    =     ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -11428,7 +11430,7 @@
       *
            .
       *
-       900-CHKSND-KEY23-FET-EXT.
+       900-CHKSND-KEY24-FET-EXT.
            EXIT.
       *****************************************************************
       *    データチェック中間ファイル読込処理
