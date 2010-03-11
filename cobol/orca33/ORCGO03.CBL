@@ -526,12 +526,34 @@
       *****************************************************************
        3101-EDIT-COMBO-SEC             SECTION.
       *
+           PERFORM 31011-PRTFORMKBNLST-SEC
+      *
            PERFORM 31011-SKYPRTKBNLST-SEC
       *
            PERFORM 31011-PRTJYUNMEILST-SEC
       *
            .
        3101-EDIT-COMBO-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþÄ¢É¼¶èÊ¬¥ê¥¹¥ÈÊÔ½¸½èÍý
+      *****************************************************************
+       31011-PRTFORMKBNLST-SEC          SECTION.
+      *
+           MOVE    "0"               TO  SPA-GMN-O03-PRTFORMKBNL   (1)
+           MOVE    "ÀÁµá½ñ·óÎÎ¼ý½ñ¡¦¿ÇÎÅÈñÌÀºÙ½ñ"
+                                     TO  SPA-GMN-O03-PRTFORMKBNMEIL(1)
+           MOVE    "1"               TO  SPA-GMN-O03-PRTFORMKBNL   (2)
+           MOVE    "ÀÁµá½ñ·óÎÎ¼ý½ñ"
+                                     TO  SPA-GMN-O03-PRTFORMKBNMEIL(2)
+      *
+           MOVE    2                 TO  SPA-GMN-O03-PRTFORMKBN-MAX
+      *
+           MOVE    SPA-GMN-O03-PRTFORMKBNLST(01)
+                                     TO  SPA-GMN-O03-PRTFORMKBN-G
+      *
+           .
+       31011-PRTFORMKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    ÀÁµá½ñÈ¯¹Ô¶èÊ¬¥ê¥¹¥ÈÊÔ½¸½èÍý
@@ -1110,6 +1132,9 @@
            WHEN    "ACTIVATE"      ALSO    "PRTJYUN"
                PERFORM 4105-PRTJYUN-CHK-SEC
            WHEN    OTHER
+      *
+               MOVE    ZERO        TO  SPA-GMN-O03-CUR
+      *
       *        ÆþÎÏ¥Á¥§¥Ã¥¯½èÍý
                PERFORM 410-INPUT-CHK-SEC
            END-EVALUATE
@@ -1142,6 +1167,10 @@
       *****************************************************************
        4101-GMN-SPA-SET-SEC            SECTION.
       *
+      *    °õºþÄ¢É¼¶èÊ¬
+           MOVE    O03-PRTFORMKBN
+                                   TO  SPA-GMN-O03-PRTFORMKBN-G
+      *
       *    ÀÁµá½ñÈ¯¹Ô¶èÊ¬
            MOVE    O03-SKYPRTKBN   TO  SPA-GMN-O03-SKYPRTKBN-G
       *
@@ -1155,6 +1184,12 @@
       *****************************************************************
        4102-KIHON-CHK-SEC              SECTION.
       *
+      *    °õºþÄ¢É¼¶èÊ¬¥Á¥§¥Ã¥¯
+           PERFORM 4105-PRTFORMKBN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
       *    ÀÁµá½ñÈ¯¹Ô¶èÊ¬¥Á¥§¥Ã¥¯
            PERFORM 4105-SKYPRTKBN-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
@@ -1164,6 +1199,23 @@
            .
       *
        4102-KIHON-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþÄ¢É¼¶èÊ¬¥Á¥§¥Ã¥¯
+      *****************************************************************
+       4105-PRTFORMKBN-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-O03-PRTFORMKBN   TO  WRK-CMB-CD
+           PERFORM 4200-PRTFORMKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-O03-PRTFORMKBN-G
+           ELSE
+               MOVE    SPA-GMN-O03-PRTFORMKBNLST (1)
+                                       TO  SPA-GMN-O03-PRTFORMKBN-G
+           END-IF
+      *
+           .
+       4105-PRTFORMKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ÀÁµá½ñÈ¯¹Ô¶èÊ¬¥Á¥§¥Ã¥¯
@@ -1227,6 +1279,30 @@
       *
            .
        4200-PRTJYUNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþÄ¢É¼¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯
+      *****************************************************************
+       4200-PRTFORMKBNLST-CHK-SEC    SECTION.
+      *
+           MOVE    SPACE               TO  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+               UNTIL ( IDX-CMB     >   SPA-GMN-O03-PRTFORMKBN-MAX )
+                OR   ( WRK-CMB-CD  =   SPA-GMN-O03-PRTFORMKBNL
+                                                           (IDX-CMB))
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    ( IDX-CMB     <=  SPA-GMN-O03-PRTFORMKBN-MAX )
+               MOVE    SPA-GMN-O03-PRTFORMKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-PRTFORMKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ÀÁµá½ñÈ¯¹Ô¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯
@@ -1511,7 +1587,9 @@
            MOVE    SPA-STAFFCD         TO  SHELLTBL-ARG18
            MOVE    TEIKIERR            TO  SHELLTBL-ARG19
            MOVE    SPA-GMN-O03-SKYPRTKBN
-                                       TO  SHELLTBL-ARG20
+                                       TO  SHELLTBL-ARG20(1:1)
+           MOVE    SPA-GMN-O03-PRTFORMKBN
+                                       TO  SHELLTBL-ARG20(2:1)
            MOVE    SPA-O01-PRTKBN      TO  SHELLTBL-ARG21
            MOVE    SPA-O01-SRYYM       TO  SHELLTBL-ARG22
            MOVE    SPA-O01-KBT-G       TO  SHELLTBL-ARG23
@@ -1787,6 +1865,15 @@
                                            TO  O03-SKYPRTKBNLST (IDX1)
            END-PERFORM
       *
+           MOVE    SPA-GMN-O03-PRTFORMKBN-G TO  O03-PRTFORMKBN
+           MOVE    SPA-GMN-O03-PRTFORMKBN-MAX
+                                           TO  O03-PRTFORMKBN-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-O03-PRTFORMKBN-MAX )
+               MOVE    SPA-GMN-O03-PRTFORMKBNLST(IDX1)
+                                           TO  O03-PRTFORMKBNLST(IDX1)
+           END-PERFORM
+      *
            MOVE    SPA-GMN-O03-PRTJYUN-G   TO  O03-PRTJYUN
            MOVE    SPA-GMN-O03-PRTJYUN-MAX TO  O03-PRTJYUN-COUNT
            PERFORM VARYING IDX1    FROM    1       BY  1
@@ -1859,9 +1946,12 @@
       *****************************************************************
        5001-MAPCUR-SEC             SECTION.
       *
+           DISPLAY "SPA-GMN-O03-CUR:" SPA-GMN-O03-CUR
+      *
            IF    ( SPA-GMN-O03-CUR         =   ZERO )
                PERFORM 50011-GMN-CUR-SET-SEC
            END-IF
+           DISPLAY "SPA-GMN-O03-CUR::" SPA-GMN-O03-CUR
       *
            PERFORM 50011-GMN-CUR-SKIP-SEC
       *
@@ -1869,7 +1959,7 @@
            WHEN    001
                MOVE  "SYOKBN"      TO  MCP-WIDGET
            WHEN    002
-               MOVE  "PRTJYUNI"    TO  MCP-WIDGET
+               MOVE  "PRTJYUN"     TO  MCP-WIDGET
            WHEN    003
                MOVE  "CHK01"       TO  MCP-WIDGET
            WHEN    004
@@ -1930,6 +2020,11 @@
                MOVE  "CHK29"       TO  MCP-WIDGET
            WHEN    032
                MOVE  "CHK30"       TO  MCP-WIDGET
+           WHEN    101
+               MOVE  "PRTFORMKBN"
+                                   TO  MCP-WIDGET
+           WHEN    102
+               MOVE  "SKYPRTKBN"   TO  MCP-WIDGET
            WHEN    212
                MOVE  "B12"         TO  MCP-WIDGET
            END-EVALUATE
@@ -1943,10 +2038,14 @@
        50011-GMN-CUR-SET-SEC           SECTION.
       *
            EVALUATE    WRK-MCP-WIDGET
+           WHEN    "PRTFORMKBN"
+               MOVE    102         TO  SPA-GMN-O03-CUR
            WHEN    "SYOKBN"
                MOVE    002         TO  SPA-GMN-O03-CUR
            WHEN    "SKYPRTKBN"
                MOVE    002         TO  SPA-GMN-O03-CUR
+           WHEN    "PRTJYUN"
+               MOVE    101         TO  SPA-GMN-O03-CUR
            WHEN    "CHK01"
                MOVE    004         TO  SPA-GMN-O03-CUR
            WHEN    "CHK02"
