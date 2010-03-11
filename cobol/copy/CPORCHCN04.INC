@@ -39,3 +39,7 @@
       *    伝票番号枝番（収納からの再発行）
                05  ORCHCN04-DENPEDANUM     PIC  9(02).
       *
+      *    印刷ＤＢ出力区分(1:印刷ＤＢに出力）
+           03  ORCHCN04-PRTKBN             PIC X(01).
+      *    一括パラメタ
+           03  ORCHCN04-PRTAREA            PIC X(25000).
