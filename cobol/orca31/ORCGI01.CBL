@@ -5093,7 +5093,8 @@
                IF    ( SYS-5001-BTU-TOKTEI-NYUIN   NOT =   SPACE )
                    EVALUATE    TRUE
                    WHEN  ( SYS-5001-BTU-TOKTEI-NYUIN
-                                       =   "01" OR "02" OR "14" )
+                               =   "01" OR "02" OR "14"
+                                OR "17" OR "26" )
                        PERFORM 41011-PT-AGE-SEC
                        IF    ( WRK-NENREI  <   15 )
                            MOVE    "5110"      TO  WRK-KANRICD
