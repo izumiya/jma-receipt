@@ -82,8 +82,11 @@
            03  CNT-SELKBT                  PIC 9(06).
       *
        01  IDX-AREA.
-           03  IDX1                        PIC 9(04). 
+           03  IDX0                        PIC 9(05). 
+           03  IDX1                        PIC 9(05). 
            03  IDX-SELKBT                  PIC 9(05).
+           03  IDX-M                       PIC 9(05).
+           03  IDX-MAX                     PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -93,13 +96,20 @@
                05  WRK-YY                  PIC 9(04).
                05  WRK-MM                  PIC 9(02).
                05  WRK-DD                  PIC 9(02).
-           03  WRK-PRINT-PG                PIC X(20).
+           03  WRK-SEIKYU-PG                PIC X(20).
            03  WRK-NYUKIN-HOHO             PIC X(02).
            03  WRK-NYUKIN-JYOTAI           PIC X(01).
            03  WRK-NYUKIN-KBN              PIC X(01).
            03  WRK-NYUKINPRT-KBN           PIC X(01).
            03  WRK-STPAGE                  PIC 9(05).
            03  WRK-EDPAGE                  PIC 9(05).
+           03  WRK-MAX                     PIC 9(05).
+           03  WRK-MEISAI-PG               PIC X(20).
+           03  WRK-MEISAI-PRTNM            PIC X(20).
+           03  WRK-PTID                    PIC 9(10).
+           03  WRK-PRTPARA-G.
+               05  WRK-SKYPRT              PIC X(01).
+               05  WRK-PRTFORM             PIC X(01).
       *
        01  SRH-AREA.
            03  SRH-IDX                     PIC 9(05).
@@ -116,6 +126,16 @@
                05  SRH-BTUBRM-OCC          OCCURS  1500.
                    07  SRH-BTUBRM-BTUNUML  PIC X(02).
                    07  SRH-BTUBRM-BRMNUML  PIC X(08).
+      *
+       01  TSYUGRP-AREA.
+           03  TSYUGRP-MAX                 PIC 9(05).
+           03  TSYUGRP-OCC                 OCCURS   1000.
+               05  TSYUGRP-PTID            PIC 9(10).
+               05  TSYUGRP-KBT             PIC X(01).
+               05  TSYUGRP-GRP-MAX         PIC 9(05).
+               05  TSYUGRP-GRP-OCC         OCCURS   10.
+                   07  TSYUGRP-GRP-DENPNUM PIC 9(07).
+                   07  TSYUGRP-GRP-SRYYMD  PIC X(08).
       *
        01  ERR-EDIT-AREA.
            03  ERR-WARNING                 PIC 9(01).
@@ -139,6 +159,12 @@
                    07  CONST-KBT-OCC       OCCURS  3.
                        09  CONST-KBT       PIC X(01).
                        09  CONST-KBTMSG    PIC X(04).
+      *
+      *
+       01  KEY-AREA.
+           03  KEY-PTID            PIC 9(10).
+           03  KEY-SRYYM           PIC X(06).
+           03  KEY-KBT             PIC X(01).
       *
        01  ERR-MSG-AREA.
            03  ERR-MSG01                   PIC X(100)    VALUE
@@ -164,6 +190,9 @@
       *
            COPY    "CPSHELLTBL.INC".
       *
+           COPY    "CPORCHCN03.INC"    REPLACING  //ORCHCN03//
+                                       BY         //WORCHCN03//.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -177,6 +206,9 @@
       *
       *    帳票ＰＧ名
            COPY    "CPSK1035.INC".
+      *
+      *    プリンタ名
+           COPY    "CPSK1034.INC".
       *
       *    入金方法
            COPY  "CPSK1041.INC".
@@ -237,6 +269,8 @@
       *
       *    帳票サブ < 請求書兼領収書 >
            COPY    "CPORCHCN03.INC".
+      *    帳票サブ < 診療費明細書 >
+           COPY    "CPORCHCN04.INC".
       *
       *    オンライン帳票名・出力先プリンタ名取得パラ
            COPY    "CPORCSPRTNM.INC".
@@ -279,6 +313,7 @@
                                        FLG-AREA
                                        IDX-AREA
                                        SPA-AREA
+                                       TSYUGRP-AREA
       *
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
                                        INTO    LNK-PRTKANRI-RENNUM
@@ -300,12 +335,16 @@
                                                TEIKI2P-HOSPNUM
                                                TEIKI2P-STAFFCD
                                                TEIKI2P-ERRFILE
-                                               TEIKI2P-SKYPRT
+                                               WRK-PRTPARA-G
                                                TEIKI2P-PRTKBN
                                                TEIKI2P-SRYYM
                                                TEIKI2P-KBT-G
                                                TEIKI2P-OID1-FLG
                                                TEIKI2P-SUMKBN
+           END-UNSTRING
+      *
+           MOVE    WRK-SKYPRT          TO  TEIKI2P-SKYPRT
+           MOVE    WRK-PRTFORM         TO  TEIKI2P-PRTFORM
       *
            MOVE    TEIKI2P-HOSPNUM     TO  SPA-HOSPNUM
            MOVE    TEIKI2P-STAFFCD     TO  SPA-STAFFCD
@@ -483,11 +522,56 @@
       *    帳票プログラム名取得
            PERFORM 20011-PRINT-PG-EDIT-SEC
       *
-      *    入院請求書印刷
-           IF    ( ORCHCN03-CNT    >   ZERO )
-               CALL    WRK-PRINT-PG    USING   ORCHCN03AREA
-                                               SPA-AREA
-           END-IF
+           MOVE    ORCHCN03AREA    TO  WORCHCN03AREA
+           PERFORM 2002-SYUGRP-SEC
+           MOVE    WORCHCN03AREA   TO  ORCHCN03AREA
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   TSYUGRP-MAX )
+      *
+               PERFORM VARYING IDX-M   FROM    1   BY  1
+                       UNTIL ( IDX-M   >   ORCHCN03-CNT )
+      *
+                   INITIALIZE          ORCHCN03-OCC (IDX-M)
+      *
+               END-PERFORM
+      *
+               MOVE    ZERO        TO  ORCHCN03-CNT
+      *
+               MOVE    TSYUGRP-GRP-MAX (IDX0)
+                                   TO  WRK-MAX
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1    >   WRK-MAX )
+      *
+                   PERFORM VARYING IDX-M   FROM    1   BY  1
+                           UNTIL ( IDX-M   >   WORCHCN03-CNT )
+      *
+                       IF    ( TSYUGRP-GRP-DENPNUM (IDX0 IDX1)
+                                   =   WORCHCN03-DENPNUM (IDX-M))
+                           COMPUTE ORCHCN03-CNT
+                               =   ORCHCN03-CNT
+                               +   1
+                           MOVE    WORCHCN03-OCC (IDX-M)
+                                   TO  ORCHCN03-OCC (ORCHCN03-CNT)
+                       END-IF
+      *
+                   END-PERFORM
+      *
+               END-PERFORM
+      *
+      *        入院請求書印刷
+               IF    ( ORCHCN03-CNT    >    ZERO )
+      *
+                   CALL    WRK-SEIKYU-PG    USING   ORCHCN03AREA
+                                                   SPA-AREA
+      *
+                   IF    ( TEIKI2P-PRTFORM  =  "0" )
+                       PERFORM 2001-MEISAI-PRT-SEC
+                   END-IF
+      *
+               END-IF
+      *
+           END-PERFORM
       *
            IF     ( TEIKI2P-OID1-FLG   =   "OK"  OR "PV")
                PERFORM 2001-PRINT-SEC
@@ -499,6 +583,50 @@
        200-MAIN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    診療費明細書出力処理
+      *****************************************************************
+       2001-MEISAI-PRT-SEC                    SECTION.
+      *
+           INITIALIZE              ORCHCN04AREA
+           MOVE    TSYUGRP-GRP-MAX (IDX0)
+                                       TO  WRK-MAX
+           MOVE    TSYUGRP-PTID (IDX0)
+                                       TO  ORCHCN04-PTID
+           MOVE    TSYUGRP-PTID (IDX0)
+                                       TO  WRK-PTID
+           PERFORM 900-PTINF-KEY-SEL-SEC
+           PERFORM 900-PTNUM-KEY-SEL-SEC
+      *
+           MOVE    PTNUM-PTNUM         TO  ORCHCN04-PTNUM
+           MOVE    PTINF-NAME          TO  ORCHCN04-NAME
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   WRK-MAX )
+      *
+               MOVE    TSYUGRP-GRP-DENPNUM (IDX0 IDX1)
+                                       TO  ORCHCN04-DENPNUM (IDX1)
+      *
+           END-PERFORM
+      *
+           MOVE    "1"                 TO  ORCHCN04-PRTKBN
+      *
+           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)
+                                       TO  SPA-SRYYMD
+      *
+           MOVE    WRK-MEISAI-PRTNM    TO  SPRT-PRTNM
+           MOVE    TSYUGRP-PTID (IDX0) TO  SPRT-PTID
+           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)(1:6)
+                                       TO  SPRT-SRYYM
+           MOVE    ORCSPRTAREA         TO  ORCHCN04-PRTAREA
+      *
+           CALL    WRK-MEISAI-PG    USING
+                                    SPA-AREA
+                                    ORCHCN04AREA
+      *
+           .
+       2001-MEISAI-PRT-EXT.
+           EXIT.
       *****************************************************************
       *   編集処理
       *****************************************************************
@@ -581,7 +709,7 @@
       *****************************************************************
        20011-PRINT-PG-EDIT-SEC         SECTION.
       *
-           INITIALIZE                      WRK-PRINT-PG
+           INITIALIZE                      WRK-SEIKYU-PG
       *
            INITIALIZE                      ORCSPRTNMAREA
            MOVE    "1"                 TO  ORCSPRTNM-KBN
@@ -591,12 +719,42 @@
            CALL    "ORCSPRTNM"         USING
                                            ORCSPRTNMAREA
                                            SPA-AREA
-                                           SYS-1035-REC
+                                           SYSKANRI-REC
            IF    ( ORCSPRTNM-RC        =   ZERO )
-              MOVE    ORCSPRTNM-PRTPG  TO  WRK-PRINT-PG
+              MOVE    ORCSPRTNM-PRTPG  TO  WRK-SEIKYU-PG
            ELSE
-              MOVE    "ORCHCN03"       TO  WRK-PRINT-PG
+              MOVE    "ORCHCN03"       TO  WRK-SEIKYU-PG
            END-IF
+      *
+           INITIALIZE                      WRK-MEISAI-PG
+      *
+           INITIALIZE                      ORCSPRTNMAREA
+           MOVE    "1"                 TO  ORCSPRTNM-KBN
+           MOVE    "00000008"          TO  ORCSPRTNM-KBNCD
+           MOVE    TEIKI2P-SYSYMD      TO  ORCSPRTNM-SRYYMD
+           MOVE    "1"                 TO  ORCSPRTNM-NYUGAIKBN
+           CALL    "ORCSPRTNM"         USING
+                                           ORCSPRTNMAREA
+                                           SPA-AREA
+                                           SYSKANRI-REC
+           IF    ( ORCSPRTNM-RC        =   ZERO )
+              MOVE    ORCSPRTNM-PRTPG  TO  WRK-MEISAI-PG
+           ELSE
+              MOVE    "ORCHCN04"       TO  WRK-MEISAI-PG
+           END-IF
+      *
+      *    出力先プリンタ名割り当て情報編集
+           INITIALIZE                      SYSKANRI-REC
+           INITIALIZE                      ORCSPRTNMAREA
+           MOVE    "2"                 TO  ORCSPRTNM-KBN
+           MOVE    SPA-SYSYMD          TO  ORCSPRTNM-SRYYMD
+           MOVE    "1"                 TO  ORCSPRTNM-NYUGAIKBN
+           CALL    "ORCSPRTNM"         USING
+                                           ORCSPRTNMAREA
+                                           SPA-AREA
+                                           SYSKANRI-REC
+           MOVE    SYSKANRI-REC        TO  SYS-1034-REC
+           MOVE    SYS-1034-PRTNM(09)  TO  WRK-MEISAI-PRTNM
       *
            .
        20011-PRINT-PG-EDIT-EXT.
@@ -605,6 +763,8 @@
       *   編集処理
       *****************************************************************
        20011-HENSYU-SEC              SECTION.
+      *
+           MOVE    QTEIKI-PTID         TO  WRK-PTID
       *
       *    患者情報を検索する
            PERFORM 900-PTINF-KEY-SEL-SEC
@@ -797,6 +957,71 @@
        2001-PRINT-EXT.
            EXIT. 
       *****************************************************************
+      *   収納データ集計処理
+      *****************************************************************
+       2002-SYUGRP-SEC                  SECTION.
+      *
+           COMPUTE IDX-M   =   1
+      *
+      *    患者定期履歴検索処理
+           PERFORM 901-PTTEIKIRRK-KEY6-SEL-SEC
+      *
+           PERFORM UNTIL ( IDX-M   >   ORCHCN03-CNT )
+      *
+               PERFORM 20021-SYUGRP-SEC
+      *
+           END-PERFORM
+      *
+           .
+       2002-SYUGRP-EXT.
+           EXIT. 
+      *****************************************************************
+      *   収納データ集計処理
+      *****************************************************************
+       20021-SYUGRP-SEC                SECTION.
+      *
+           MOVE    ZERO                TO     IDX-MAX
+           COMPUTE TSYUGRP-MAX
+               =   TSYUGRP-MAX     +      1
+      *
+           MOVE    ORCHCN03-PTID (IDX-M)
+                                       TO  TSYUGRP-PTID
+                                                  (TSYUGRP-MAX)
+      *
+           MOVE    ORCHCN03-PTID (IDX-M)
+                                       TO      KEY-PTID
+           MOVE    PTTEIKIRRK-SRYYM    TO      KEY-SRYYM
+           MOVE    PTTEIKIRRK-KBT      TO      KEY-KBT
+      *
+           PERFORM UNTIL ( IDX-M   >   ORCHCN03-CNT )
+                    OR   ( ORCHCN03-PTID (IDX-M)
+                               NOT =   KEY-PTID )
+                    OR   ( PTTEIKIRRK-SRYYM
+                               NOT =   KEY-SRYYM )
+                    OR   ( PTTEIKIRRK-KBT
+                               NOT =   KEY-KBT )
+      *
+      *        収納マスタ検索処理
+               PERFORM 901-SYUNOU-KEY-SEL-SEC
+      *
+               COMPUTE IDX-MAX =   IDX-MAX +   1
+               MOVE    ORCHCN03-DENPNUM (IDX-M)
+                                   TO  TSYUGRP-GRP-DENPNUM
+                                           (TSYUGRP-MAX IDX-MAX)
+      *
+               COMPUTE IDX-M   =   IDX-M   +   1
+      *
+      *        患者定期履歴検索処理
+               PERFORM 901-PTTEIKIRRK-KEY6-SEL-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    IDX-MAX             TO  TSYUGRP-GRP-MAX (TSYUGRP-MAX)
+      *
+           .
+       20021-SYUGRP-EXT.
+           EXIT. 
+      *****************************************************************
       *    エラー出力処理
       *****************************************************************
        500-ERR-HENSYU-SEC              SECTION.
@@ -956,7 +1181,7 @@
       *
            INITIALIZE                      PTINF-REC
            MOVE    TEIKI2P-HOSPNUM      TO  PTINF-HOSPNUM
-           MOVE    QTEIKI-PTID         TO  PTINF-PTID
+           MOVE    WRK-PTID             TO  PTINF-PTID
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -984,7 +1209,7 @@
       *
            INITIALIZE                      PTNUM-REC
            MOVE    TEIKI2P-HOSPNUM      TO  PTNUM-HOSPNUM
-           MOVE    QTEIKI-PTID         TO  PTNUM-PTID
+           MOVE    WRK-PTID            TO  PTNUM-PTID
            MOVE    PTNUM-REC           TO  MCPDATA-REC
            MOVE    "tbl_ptnum"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -1194,7 +1419,6 @@
            MOVE    "query_teiki"   TO  MCP-TABLE
            MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
-           DISPLAY "MCP-RC = " MCP-RC
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC TO  QTEIKI-REC
            ELSE
@@ -1294,6 +1518,73 @@
       *
            .
        900-QUERY-TEIKI-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者定期請求履歴検索処理
+      *****************************************************************
+       901-PTTEIKIRRK-KEY6-SEL-SEC     SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTTEIKIRRK
+      *
+           INITIALIZE                  PTTEIKIRRK-REC
+           MOVE    SPA-HOSPNUM     TO  PTTEIKIRRK-HOSPNUM
+           MOVE    ORCHCN03-PTID (IDX-M)
+                                   TO  PTTEIKIRRK-PTID
+           MOVE    ORCHCN03-DENPNUM (IDX-M)
+                                   TO  PTTEIKIRRK-DENPNUM
+           MOVE    PTTEIKIRRK-REC  TO  MCPDATA-REC
+           MOVE    "tbl_ptteikirrk" TO MCP-TABLE
+           MOVE    "key6"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTTEIKIRRK-REC
+           ELSE
+               INITIALIZE              PTTEIKIRRK-REC
+               MOVE    1           TO  FLG-PTTEIKIRRK
+           END-IF
+      *
+           MOVE    "tbl_ptteikirrk"    TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       901-PTTEIKIRRK-KEY6-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    収納マスタ検索処理
+      *****************************************************************
+       901-SYUNOU-KEY-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUNOU
+      *
+      *    収納マスタ検索
+           INITIALIZE                  SYUNOU-REC
+           MOVE    ORCHCN03-HOSPNUM (IDX-M)
+                                       TO  SYU-HOSPNUM
+           MOVE    ORCHCN03-NYUGAIKBN (IDX-M)
+                                       TO  SYU-NYUGAIKBN
+           MOVE    ORCHCN03-PTID (IDX-M)
+                                       TO  SYU-PTID
+           MOVE    ORCHCN03-DENPNUM (IDX-M)
+                                       TO  SYU-DENPNUM
+      *
+           MOVE    SYUNOU-REC          TO  MCPDATA-REC
+           MOVE    "tbl_syunou"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUNOU-REC
+           ELSE
+               INITIALIZE                  SYUNOU-REC
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+      *
+           MOVE    "tbl_syunou"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       901-SYUNOU-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

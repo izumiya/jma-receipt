@@ -48,6 +48,13 @@
                 04  O03-VALUE   PIC  9(4).
               03  O03-PAGE.
                 04  O03-VALUE   PIC  9(4).
+              03  O03-CMB-PRTFORMKBN.
+                04  O03-PRTFORMKBN.
+                  05  O03-VALUE   PIC X(60).
+                04  O03-PRTFORMKBN-COUNT
+                                  PIC S9(9)   BINARY.
+                04  O03-PRTFORMKBNLST
+                                  PIC X(60)   OCCURS  5 TIMES.
               03  O03-CMB-SKYPRTKBN.
                 04  O03-SKYPRTKBN.
                   05  O03-VALUE   PIC X(30).
