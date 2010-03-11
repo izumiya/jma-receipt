@@ -2663,6 +2663,12 @@
                                    PERFORM 200111-TSRYKA-SRYCD-HEN-SEC
                                END-IF
                            END-IF
+                       ELSE
+                               IF    ( FLG-TSRYKA-OVER =   ZERO )
+                                AND  ( IDX-TSRYKA      >   ZERO )
+      *                            ¿ÇÎÅ²ÊÂàÈò¥ï¡¼¥¯¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÊÔ½¸½èÍý
+                                   PERFORM 200111-TSRYKA-SRYCD-HEN-SEC
+                               END-IF
                        END-IF
       *
                        IF    ( FLG-TSRYKA-OVER =   ZERO )
@@ -6334,7 +6340,7 @@
       *
                    IF    ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)   NOT =   "6" )
                     AND  ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)   NOT =   "7" )
-
+                    AND  ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)   NOT =   "S" )
                        MOVE    9       TO  WRK-CHKNUM
                        MOVE    "0901"  TO  WRK-ERRKBN
                        MOVE    TSRYKA-SRYCD (IDX6 IDX7)
@@ -6496,8 +6502,6 @@
                                         OR DTCHK010-SETCD2 (IDXD IDXP))
                                    MOVE    1   TO  TPSET-FLG
                                                           (IDXD IDXP)
-                                   DISPLAY "TPSET-FLG(" IDXD " "IDXP ")"
-                                   TPSET-FLG (IDXD IDXP)
                                END-IF
       *
                            END-PERFORM
@@ -8466,7 +8470,8 @@
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   31 )
       *
-               IF    ( TNACCT-GAIHAKU-DAY (IDX0)    =   ZERO OR 4 )
+               IF    ( TNACCT-GAIHAKU-DAY (IDX0)
+                                           =   ZERO OR 4 OR 5 )
                    CONTINUE
                ELSE
                    IF    ( TNYUIN-CHOZAI-DAY (IDX0)    =   1 )
@@ -9128,7 +9133,7 @@
                                                    (IDX23 1 IDX22)
                                ELSE
                                    IF    ( TNACCT-GAIHAKU-DAY (IDX22)
-                                                       =   ZERO OR 4)
+                                                   =   ZERO OR 4 OR 5 )
                                        CONTINUE
                                    ELSE
                                        COMPUTE TNYUKSN-ERR-CNT (IDX23 3)
