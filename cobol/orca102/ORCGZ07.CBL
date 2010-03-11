@@ -773,7 +773,10 @@
            PERFORM 990-DBCLOSE-SEC
       *
       *    経過措置コード判定
-           PERFORM 40021-SRYCDCHG-CHK-SEC
+      *    薬剤のみ
+           IF      SPA-GMN-OLD-SRYCD(1:1)  =   "6"
+               PERFORM 40021-SRYCDCHG-CHK-SEC
+           END-IF
       *
            PERFORM 3101-CMBSET-SEC
       *
