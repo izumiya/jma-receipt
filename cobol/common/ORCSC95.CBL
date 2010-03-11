@@ -5884,6 +5884,15 @@
                   AND (TNS-CDKBN-KBN           =   "H" )
                    MOVE    1               TO  FLG-RIHA-OK
                END-IF
+      *        H22.4 から　新規のリハビリ料コードは区分で判定
+               IF     (SPA-SRYYMD              >=  "20100401")
+                  AND (FLG-RIHA-OK             =   ZERO    )
+                  AND (TNS-CDKBN-KBN           =   "H"     )
+                  AND (TNS-CDKBN-KBNNUM        =   "001"
+                                               OR  "002"   )
+                  AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
+                   MOVE    1               TO  FLG-RIHA-OK
+               END-IF
       *
                IF      FLG-RIHA-OK         =   1
                    MOVE    "099800201"         TO  WRK-HEN-SRYCD

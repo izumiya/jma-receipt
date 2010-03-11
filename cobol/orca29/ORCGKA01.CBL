@@ -1696,6 +1696,8 @@
            END-IF
       *    後発医薬品変更再編集
            IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099209903"
+                                               OR  "099209905"
+                                               OR  "099209906"
                 PERFORM 3100122-KOUHATU-MEISYO-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
@@ -3282,6 +3284,8 @@
       *                    後発医薬品への変更不可判定
                            IF     (SPA-WKSRY-SRYCD (IDX-W IDX-W2)
                                                        =   "099209903")
+                                                       OR  "099209905"
+                                                       OR  "099209906"
                              AND  (SPA-WKSRY-SRYSURYO (IDX-W IDX-W2 - 1)
                                                        =   ZERO   )
                               CONTINUE

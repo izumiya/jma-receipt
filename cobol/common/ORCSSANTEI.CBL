@@ -587,6 +587,15 @@
                    MOVE    1                   TO  FLG-RIHA-OK
                END-IF
            END-IF
+      *    H22.4 から　新規のリハビリ料コードは区分で判定
+           IF     (SSANTEI-SRYYMD          >=  "20100401")
+              AND (FLG-RIHA-OK             =   ZERO    )
+              AND (TNS-CDKBN-KBN           =   "H"     )
+              AND (TNS-CDKBN-KBNNUM        =   "001"
+                                           OR  "002"   )
+              AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
+               MOVE    1               TO  FLG-RIHA-OK
+           END-IF
       *
            IF      FLG-RIHA-OK         =   1
                MOVE    "099800201"         TO  WRK-SRYCD
@@ -849,6 +858,14 @@
                    MOVE    ZERO            TO  FLG-HKNSAN
                    MOVE    SPACE           TO  WRK-RIGAKU-RYO
                END-IF
+           END-IF
+      *    Ｈ２２年４月から追加のコードは固定で判定
+      *     (COPY に追加するのは、パッケージ対応で）
+           IF      WRK-SRYCD           =   "099800181"
+                                       OR  "099800182"
+      *        がん患者リハ開始日・終了日
+               MOVE    1                   TO  FLG-HKNSAN
+               MOVE    SPACE               TO  WRK-RIGAKU-RYO
            END-IF
       *
            IF      WRK-RIGAKU-RYO      =   SPACE
