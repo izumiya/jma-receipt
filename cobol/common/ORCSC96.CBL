@@ -1701,14 +1701,26 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "0267"
-                   STRING  "含量規格変更不可・剤刑変更不可は"
+                   STRING  "含量規格変更不可・剤形変更不可は"
                            "薬剤の下に入力して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "0268"
-                   STRING  "含量規格変更不可・剤刑変更不可は"
+                   STRING  "含量規格変更不可・剤形変更不可は"
                            "投薬の薬剤の下に入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8048"
+                   STRING  "がん患者リハビリテーション開始日が"
+                       "算定されていません。終了日の入力はできません"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8049"
+                   STRING  "がん患者リハビリテーション終了日は"
+                       "開始日と同日に入力できません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING

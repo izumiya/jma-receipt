@@ -1318,20 +1318,20 @@
                    MOVE    "1"             TO  WRK-KYUSEI-ST (8)
                WHEN    "099800182"
                    MOVE    "1"             TO  WRK-KYUSEI-ED (8)
-                   IF      WRK-KYUSEI7-CHK     =   SPACE
+                   IF      WRK-KYUSEI8-CHK     =   SPACE
                        MOVE    "099800181"         TO  WRK-SRYCD
                        PERFORM 10001-KYUSEI-YMD-SEC
                        MOVE    WRK-YMD             TO  WRK-KYUSEI8-YMD
                        MOVE    "1"                 TO  WRK-KYUSEI8-CHK
                    END-IF
-                   IF     (WRK-KYUSEI7-YMD     =   SPACE  )  AND
+                   IF     (WRK-KYUSEI8-YMD     =   SPACE  )  AND
                           (WRK-KYUSEI-ST (8)   =   SPACE  )
-                       MOVE    "8041"          TO  WRK-ERRCD
+                       MOVE    "8048"          TO  WRK-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
                    ELSE
-                       IF     (WRK-KYUSEI7-YMD     =   SPA-SRYYMD) OR
+                       IF     (WRK-KYUSEI8-YMD     =   SPA-SRYYMD) OR
                               (WRK-KYUSEI-ST (8)   =   "1"    )
-                           MOVE    "8042"      TO  WRK-ERRCD
+                           MOVE    "8049"      TO  WRK-ERRCD
                            MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
                        END-IF
                    END-IF
@@ -3290,6 +3290,8 @@
                        MOVE    "8040"          TO  SPA-ERRCD
                    WHEN    "7"
                        MOVE    "8042"          TO  SPA-ERRCD
+                   WHEN    "8"
+                       MOVE    "8049"          TO  SPA-ERRCD
                    END-EVALUATE
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-Z2)
                END-IF
