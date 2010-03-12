@@ -124,10 +124,10 @@
                            11  SPA-GMN-SYOHOKBNL      PIC X(01).
                            11  SPA-GMN-F6L            PIC X(01).
                            11  SPA-GMN-SYOHOKBNMEIL   PIC X(06).
-                       09  SPA-GMN-SKYPRTFLGLST       OCCURS  5.
+                       09  SPA-GMN-SKYPRTFLGLST       OCCURS  9.
                            11  SPA-GMN-SKYPRTFLGL     PIC X(01).
                            11  SPA-GMN-F7L            PIC X(01).
-                           11  SPA-GMN-SKYPRTFLGMEIL  PIC X(28).
+                           11  SPA-GMN-SKYPRTFLGMEIL  PIC X(30).
                        09  SPA-SYKPRTFLG-MAX          PIC 9(02).
                        09  SPA-GMN-SYOHOPRTFLGLST     OCCURS  5.
                            11  SPA-GMN-SYOHOPRTFLGL   PIC X(01).
@@ -155,7 +155,7 @@
                            11  SPA-GMN-OKUSURIFLGMEIL
                                                       PIC X(34).
                        09  SPA-OKUSURIFLG-MAX         PIC 9(02).
-                       09  SPA-GMN-MEIPRTFLGLST      OCCURS  5.
+                       09  SPA-GMN-MEIPRTFLGLST      OCCURS  9.
                            11  SPA-GMN-MEIPRTFLGL     PIC X(01).
                            11  SPA-GMN-F14L           PIC X(01).
                            11  SPA-GMN-MEIPRTFLGMEIL
@@ -1012,9 +1012,12 @@
            MOVE    "1"                TO  SPA-GMN-MEIPRTFLGL    (2)
            MOVE    "発行する"         TO  SPA-GMN-MEIPRTFLGMEIL (2)
            MOVE    "2"                TO  SPA-GMN-MEIPRTFLGL    (3)
-           MOVE    "発行する（訂正時なし）"
+           MOVE    "発行する（請求あり）"
                                       TO  SPA-GMN-MEIPRTFLGMEIL (3)
-           MOVE    3                  TO  SPA-MEIPRTFLG-MAX
+           MOVE    "3"                TO  SPA-GMN-MEIPRTFLGL    (4)
+           MOVE    "発行する（訂正時なし）"
+                                      TO  SPA-GMN-MEIPRTFLGMEIL (4)
+           MOVE    4                  TO  SPA-MEIPRTFLG-MAX
       *
            MOVE    "0"                TO  SPA-GMN-YYKHYOFLGL    (1)
            MOVE    "発行しない"       TO  SPA-GMN-YYKHYOFLGMEIL (1)

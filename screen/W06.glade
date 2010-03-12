@@ -1769,7 +1769,7 @@
 	    </signal>
 	    <editable>True</editable>
 	    <text_visible>True</text_visible>
-	    <text_max_length>30</text_max_length>
+	    <text_max_length>33</text_max_length>
 	    <text></text>
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
@@ -1849,7 +1849,7 @@
 	    </signal>
 	    <editable>True</editable>
 	    <text_visible>True</text_visible>
-	    <text_max_length>26</text_max_length>
+	    <text_max_length>32</text_max_length>
 	    <text></text>
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
@@ -2040,7 +2040,7 @@
 	  <ypad>0</ypad>
 	</widget>
 
-<widget>
+	<widget>
 	  <class>GtkLabel</class>
 	  <name>label260</name>
 	  <x>60</x>

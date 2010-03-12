@@ -922,7 +922,7 @@
                    AT   END
                        MOVE    SPACE           TO  WRK-SRYCD
       ***********  WHEN   (SPA-NAI-ROUJIN      =   TBL-ROUJIN(TBL-IDX))
-      ************ WHEN   (WRK-HOSPSBT         =   TBL-HOSPSBT(TBL-IDX))
+      ***********  WHEN   (WRK-HOSPSBT         =   TBL-HOSPSBT(TBL-IDX))
                    WHEN   (WRK-KAISU           =   TBL-KAISU  (TBL-IDX))
                      AND  (WRK-KBN             =   TBL-KBN    (TBL-IDX))
                      AND  (WRK-SRYKBN          =   TBL-SRYCD(TBL-IDX)
