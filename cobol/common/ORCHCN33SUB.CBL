@@ -1396,7 +1396,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     WHEN     4
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     5
-                      MOVE   "190141590"   TO  WRK-GAIHAKU(IDX1)
+                      PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                  END-EVALUATE
               WHEN     "92"
                  EVALUATE   NACCT-DAY(IDX1)
@@ -1407,7 +1407,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     WHEN     4
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     5
-                      MOVE   "190141590"   TO  WRK-GAIHAKU(IDX1)
+                      PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                  END-EVALUATE
            END-EVALUATE
       *
@@ -1429,18 +1429,44 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   227  THRU  229
                WHEN   230  THRU  239
                WHEN   241  THRU  249
-                  MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142090"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
                WHEN   013  THRU  021
                WHEN   101  THRU  109
                WHEN   147  THRU  152
                WHEN   173  THRU  190
-                  MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142190"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
                WHEN   075  THRU  080
-                  MOVE   "190108990"    TO   WRK-GAIHAKU(IDX1)
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108990"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
                WHEN   085  THRU  086
                WHEN   132  THRU  133
                WHEN   153  THRU  158
-                  MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142290"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
+               WHEN   226
+               WHEN   240
+                 CONTINUE
+               WHEN   OTHER
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     5
+                      MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
       *
            END-EVALUATE
       *
