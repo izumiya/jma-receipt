@@ -668,6 +668,8 @@
                                                    VALUE   2000.
            03  CONST-TCHK-STK-CD-MAX               PIC 9(05)
                                                    VALUE   200.
+           03  CONST-THKN-MAX                      PIC 9(05)
+                                                   VALUE   100.
            03  CONST-PTACCT-MAX                    PIC 9(05)
                                                    VALUE   5000.
            03  CONST-PTSRY-MAX                     PIC 9(05)
@@ -809,6 +811,17 @@
        01  TCHKSND-REC.
            COPY    "CPCHKSND.INC"  REPLACING  //CHKSND//
                                    BY         //TCHKSND-//.
+      *
+      *    保険番号
+       01  THKN-AREA.
+        02 THKN-SRH-HKNNUM         PIC X(03).
+        02 THKN-SRH-PAYKBN         PIC X(02).
+        02 THKN-IDX                PIC 9(05).
+        02 THKN-HIT                PIC 9(01).
+        02 THKN-MAX                PIC 9(05).
+        02 THKN-OCC                OCCURS 100.
+           COPY    "CPHKNNUM.INC"  REPLACING  //HKN-//
+                                   BY         //THKN-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1004,6 +1017,7 @@
                                        FLG-AREA
                                        WRK-AREA
                                        SPA-AREA
+                                       THKN-AREA
       *
            MOVE    LNKDTCHKERRPARA     TO  DTCHKERRPARA
       *
@@ -7957,61 +7971,8 @@
                        MOVE    1       TO  FLG-CHKEND (14)
                    END-IF
                ELSE
-                   IF    ( THKNCOMBI-STYMD (IDX16)
-                                       >=  LNK-COMB-TEKSTYMD (IDX17))
-                    AND  ( THKNCOMBI-EDYMD (IDX16)
-                                       <=  LNK-COMB-TEKEDYMD (IDX17))
-                       CONTINUE
-                   ELSE
-                       MOVE    LNK-COMB-HKNCOMBINUM   (IDX17)
-                                               TO  WRK-MAE-INPUT
-                       PERFORM 800-ZENKAKU-HEN-SEC
-                       MOVE    WRK-OUT-INPUT   TO  WRK-HKNCOMBINUM
-                       MOVE    SDTCHK02-O-HKNCOMBIMEI (IDX17)
-                                               TO  WRK-MAE-INPUT
-                       PERFORM 800-ZENKAKU-HEN-SEC
-                       MOVE    WRK-OUT-INPUT   TO  WRK-HKNCOMBIMEI
       *
-                       INITIALIZE  WRK-NISSU-DAY-G
-                       MOVE    WRK-KJNYMD      TO  WRK-YMD
-                       PERFORM VARYING IDX24   FROM    1   BY  1
-                               UNTIL ( IDX24   >   31 )
-      *
-                           IF    ( THKNCOMBI-DAY  (IDX16 IDX24)
-                                               >   ZERO )
-      *
-                               MOVE    IDX24       TO  WRK-DD
-                               IF    ( WRK-YMD
-                                       >=  LNK-COMB-TEKSTYMD(IDX17) )
-                                AND  ( WRK-YMD
-                                       <=  LNK-COMB-TEKEDYMD(IDX17) )
-                                   CONTINUE
-                               ELSE
-                                   MOVE    1   TO  WRK-NISSU-DAY (IDX24)
-                               END-IF
-                           END-IF
-      *
-                       END-PERFORM
-      *
-                       PERFORM 200111-NISSU-HEN-SEC
-      *
-                       MOVE    SPACE       TO  WRK-ERRMES-PLUS
-                       STRING  WRK-ACCTNAME    DELIMITED   BY  SPACE
-                               WRK-HKNCOMBINUM DELIMITED   BY  SPACE
-                               "（"            DELIMITED   BY  SIZE
-                               WRK-HKNCOMBIMEI DELIMITED   BY  SPACE
-                               "）"            DELIMITED   BY  SIZE
-                               WRK-NISSU-MES   DELIMITED   BY  SPACE
-                       INTO    WRK-ERRMES-PLUS
-                       END-STRING
-      *
-                       MOVE    "140002"    TO  WRK-ERRCD
-                       INITIALIZE              TERRINF-AREA
-                       PERFORM 215-ERRMES-HEN-SEC
-                       IF    ( ORCBSD01-CHKKBN (14)    =   "1" )
-                           MOVE    1       TO  FLG-CHKEND (14)
-                       END-IF
-                   END-IF
+                   PERFORM 2001111-ACCT-HKNCOMBI-CHK-SEC
       *
       *            地方公費単独チェック
                    IF    ( FLG-CHKEND (14)     =   ZERO )
@@ -8031,6 +7992,70 @@
       *
            .
        200111-ACCT-HKNCOMBI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療会計保険組み合わせチェック処理
+      *****************************************************************
+       2001111-ACCT-HKNCOMBI-CHK-SEC   SECTION.
+      *
+           IF    ( THKNCOMBI-STYMD (IDX16)
+                               >=  LNK-COMB-TEKSTYMD (IDX17))
+            AND  ( THKNCOMBI-EDYMD (IDX16)
+                               <=  LNK-COMB-TEKEDYMD (IDX17))
+               CONTINUE
+           ELSE
+               MOVE    LNK-COMB-HKNCOMBINUM   (IDX17)
+                                       TO  WRK-MAE-INPUT
+               PERFORM 800-ZENKAKU-HEN-SEC
+               MOVE    WRK-OUT-INPUT   TO  WRK-HKNCOMBINUM
+               MOVE    SDTCHK02-O-HKNCOMBIMEI (IDX17)
+                                       TO  WRK-MAE-INPUT
+               PERFORM 800-ZENKAKU-HEN-SEC
+               MOVE    WRK-OUT-INPUT   TO  WRK-HKNCOMBIMEI
+      *
+               INITIALIZE  WRK-NISSU-DAY-G
+               MOVE    WRK-KJNYMD      TO  WRK-YMD
+               PERFORM VARYING IDX24   FROM    1   BY  1
+                       UNTIL ( IDX24   >   31 )
+      *
+                   IF    ( THKNCOMBI-DAY  (IDX16 IDX24)
+                                       >   ZERO )
+      *
+                       MOVE    IDX24       TO  WRK-DD
+                       IF    ( WRK-YMD
+                               >=  LNK-COMB-TEKSTYMD(IDX17) )
+                        AND  ( WRK-YMD
+                               <=  LNK-COMB-TEKEDYMD(IDX17) )
+                           CONTINUE
+                       ELSE
+                           MOVE    1   TO  WRK-NISSU-DAY (IDX24)
+                       END-IF
+                   END-IF
+      *
+               END-PERFORM
+      *
+               PERFORM 200111-NISSU-HEN-SEC
+      *
+               MOVE    SPACE       TO  WRK-ERRMES-PLUS
+               STRING  WRK-ACCTNAME    DELIMITED   BY  SPACE
+                       WRK-HKNCOMBINUM DELIMITED   BY  SPACE
+                       "（"            DELIMITED   BY  SIZE
+                       WRK-HKNCOMBIMEI DELIMITED   BY  SPACE
+                       "）"            DELIMITED   BY  SIZE
+                       WRK-NISSU-MES   DELIMITED   BY  SPACE
+               INTO    WRK-ERRMES-PLUS
+               END-STRING
+      *
+               MOVE    "140002"    TO  WRK-ERRCD
+               INITIALIZE              TERRINF-AREA
+               PERFORM 215-ERRMES-HEN-SEC
+               IF    ( ORCBSD01-CHKKBN (14)    =   "1" )
+                   MOVE    1       TO  FLG-CHKEND (14)
+               END-IF
+           END-IF
+      *
+           .
+       2001111-ACCT-HKNCOMBI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    地方公費単独組合せチェック
@@ -8105,6 +8130,32 @@
       *
            MOVE    ZERO        TO      FLG-COMBERR
       *
+           IF    ( LNK-COMB-HKNNUM (IDX17) NOT =   SPACE )
+               MOVE    LNK-COMB-HKNNUM (IDX17)
+                               TO  THKN-SRH-HKNNUM
+               MOVE    ZERO    TO  THKN-SRH-PAYKBN
+               PERFORM 900-HKNNUM-KEY-SEL-SEC
+               IF    ( FLG-HKNNUM  NOT =   ZERO  )
+                   MOVE    1       TO      FLG-COMBERR
+               END-IF
+           END-IF
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   4 )
+                    OR   ( FLG-COMBERR     =   1 )
+               IF    ( LNK-COMB-KOHHKNNUM (IDX17 IDX0)
+                                   NOT =   SPACE )
+                   MOVE    LNK-COMB-KOHHKNNUM (IDX17 IDX0)
+                               TO  THKN-SRH-HKNNUM
+                   MOVE    LNK-COMB-KOHPAYKBN (IDX17 IDX0)
+                               TO  THKN-SRH-PAYKBN
+                   PERFORM 900-HKNNUM-KEY-SEL-SEC
+                   IF    ( FLG-HKNNUM  NOT =   ZERO  )
+                       MOVE    1   TO  FLG-COMBERR
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
            PERFORM VARYING IDX41   FROM    1   BY  1
                    UNTIL ( IDX41   >   THKNID-MAX )
                     OR   ( FLG-COMBERR     =   1 )
@@ -8113,8 +8164,6 @@
                                            =   THKNID-HKNID (IDX41))
                 AND  ( LNK-COMB-HKNNUM(IDX17)
                                        NOT =   THKNID-HKNNUM(IDX41))
-                DISPLAY "DIFF " LNK-COMB-HKNNUM(IDX17) "-" 
-                        THKNID-HKNNUM(IDX41)
                            MOVE    1       TO  FLG-COMBERR
                END-IF
       *
@@ -11260,6 +11309,74 @@
       *
            .
        900-CHKREIGAI-KEY2-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険番号マスタ検索処理
+      *****************************************************************
+       900-HKNNUM-KEY-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HKNNUM
+      *
+           INITIALIZE                  HKNNUM-REC
+      *
+           PERFORM 9001-HKNNUM-KEY-SEL-SEC
+           IF    ( THKN-HIT            =   ZERO )
+      *
+               INITIALIZE                      HKNNUM-REC
+               MOVE    WRK-PARA-HOSPNUM    TO  HKN-HOSPNUM
+               MOVE    WRK-KJNYMD          TO  HKN-TEKSTYMD
+               MOVE    WRK-KJNYMD          TO  HKN-TEKEDYMD
+               MOVE    THKN-SRH-HKNNUM     TO  HKN-HKNNUM
+               MOVE    THKN-SRH-PAYKBN     TO  HKN-PAYKBN
+               MOVE    HKNNUM-REC          TO  MCPDATA-REC
+               MOVE    "tbl_hknnum"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF ( MCP-RC                 =   ZERO )
+                   MOVE    MCPDATA-REC     TO  HKNNUM-REC
+                   IF    ( THKN-MAX        >=  CONST-THKN-MAX )
+                       CONTINUE
+                   ELSE
+                       COMPUTE THKN-MAX    =   THKN-MAX    +   1
+                       MOVE    HKNNUM-REC  TO  THKN-OCC (THKN-MAX)
+                   END-IF
+               ELSE
+                   MOVE    1               TO  FLG-HKNNUM
+               END-IF
+      *
+               MOVE    "tbl_hknnum"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
+           .
+       900-HKNNUM-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険番号マスタ検索処理
+      *****************************************************************
+       9001-HKNNUM-KEY-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  THKN-HIT
+      *
+           PERFORM VARYING THKN-IDX    FROM    1   BY  1
+                   UNTIL ( THKN-IDX    >   THKN-MAX )
+                    OR   ( THKN-HIT    =   1 )
+      *
+               IF    ( WRK-PARA-HOSPNUM    =   THKN-HOSPNUM  (THKN-IDX))
+                AND  ( THKN-SRH-HKNNUM     =   THKN-HKNNUM   (THKN-IDX))
+                AND  ( THKN-SRH-PAYKBN     =   THKN-PAYKBN   (THKN-IDX))
+                AND  ( WRK-KJNYMD          >=  THKN-TEKSTYMD (THKN-IDX))
+                AND  ( WRK-KJNYMD          <=  THKN-TEKEDYMD (THKN-IDX))
+                   MOVE    THKN-OCC (THKN-IDX)
+                                       TO  HKNNUM-REC
+                   MOVE    1           TO  THKN-HIT
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       9001-HKNNUM-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)
