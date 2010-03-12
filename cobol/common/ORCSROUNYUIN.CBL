@@ -761,6 +761,9 @@
                    GO   TO    200-MAIN-EXT
            END-IF
       *
+      *労災入院の労災乗数（期間加算）に含める注加算の取得
+           PERFORM    210-CHUKSN-GET-SEC
+      *
       *労災入院時の外泊取得
            INITIALIZE                          NYUINACCT-REC
            MOVE    LNK-SROUNYUIN-HOSPNUM   TO  NACCT-HOSPNUM
@@ -1701,6 +1704,9 @@
                    GO   TO    200-MAIN-EXT
            END-IF
       *
+      *労災入院の労災乗数（期間加算）に含める注加算の取得
+           PERFORM    210-CHUKSN-GET-SEC
+      *
       *労災入院時の外泊取得
            INITIALIZE                          NYUINACCT-REC
            MOVE    LNK-SROUNYUIN-HOSPNUM   TO  NACCT-HOSPNUM
@@ -2411,35 +2417,8 @@
                    GO   TO    200-MAIN-EXT
            END-IF
       *
-      *点数マスタより注加算の対象診療コードを取得
-           MOVE   ZERO                     TO  IDX1
-           INITIALIZE                          TNS-TENSU-REC
-           MOVE   LNK-SROUNYUIN-HOSPNUM    TO  TNS-HOSPNUM
-           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOSTYMD(1:6)
-           MOVE   "01"                     TO  TNS-YUKOSTYMD(7:2)
-           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOEDYMD(1:6)
-           MOVE  "01"                      TO  TNS-YUKOEDYMD(7:2)
-           MOVE  "tbl_tensu"               TO  MCP-TABLE
-           MOVE  "key30"                   TO  MCP-PATHNAME
-           PERFORM 910-TENSU-SELECT-SEC
-           IF      FLG-TENSU               =   ZERO
-               MOVE     "tbl_tensu"        TO  MCP-TABLE
-               MOVE     "key30"            TO  MCP-PATHNAME
-               PERFORM   910-TENSU-FETCH-SEC
-               PERFORM   UNTIL   (FLG-TENSU  =   1)   OR
-                                 (IDX1       >=  20)
-                   ADD    1                TO  IDX1
-                   MOVE   TNS-SRYCD        TO  LNK-SROUNYUIN-CHUKSNSRYCD
-                                                                 (IDX1)
-                   MOVE   "tbl_tensu"      TO  MCP-TABLE
-                   MOVE   "key30"          TO  MCP-PATHNAME
-                   PERFORM 910-TENSU-FETCH-SEC
-               END-PERFORM
-           END-IF
-      *    点数マスタクローズ
-           MOVE     "tbl_tensu"       TO  MCP-TABLE
-           MOVE     "key30"           TO  MCP-PATHNAME
-           PERFORM   910-DB-CLOSE-SEC
+      *労災入院の労災乗数（期間加算）に含める注加算の取得
+           PERFORM    210-CHUKSN-GET-SEC
       *
       *労災入院時の外泊取得
            INITIALIZE                          NYUINACCT-REC
@@ -3853,6 +3832,47 @@
            .
       *
        210-SYS-5000-GET-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    労災入院の労災乗数（期間加算）に含める注加算の取得          *
+      ******************************************************************
+       210-CHUKSN-GET-SEC                 SECTION.
+      *
+      *点数マスタより注加算の対象診療コードを取得
+      *
+           MOVE   ZERO                     TO  IDX1
+           INITIALIZE                          TNS-TENSU-REC
+           MOVE   LNK-SROUNYUIN-HOSPNUM    TO  TNS-HOSPNUM
+           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOSTYMD(1:6)
+           MOVE   "01"                     TO  TNS-YUKOSTYMD(7:2)
+           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOEDYMD(1:6)
+           MOVE  "01"                      TO  TNS-YUKOEDYMD(7:2)
+           MOVE  "tbl_tensu"               TO  MCP-TABLE
+           MOVE  "key30"                   TO  MCP-PATHNAME
+           PERFORM 910-TENSU-SELECT-SEC
+           IF      FLG-TENSU               =   ZERO
+               MOVE     "tbl_tensu"        TO  MCP-TABLE
+               MOVE     "key30"            TO  MCP-PATHNAME
+               PERFORM   910-TENSU-FETCH-SEC
+               PERFORM   UNTIL   (FLG-TENSU  =   1)   OR
+                                 (IDX1       >=  20)
+                   ADD    1                TO  IDX1
+                   MOVE   TNS-SRYCD        TO  LNK-SROUNYUIN-CHUKSNSRYCD
+                                                                 (IDX1)
+                   MOVE   "tbl_tensu"      TO  MCP-TABLE
+                   MOVE   "key30"          TO  MCP-PATHNAME
+                   PERFORM 910-TENSU-FETCH-SEC
+               END-PERFORM
+           END-IF
+      *    点数マスタクローズ
+           MOVE     "tbl_tensu"       TO  MCP-TABLE
+           MOVE     "key30"           TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+      *
+       210-CHUKSN-GET-EXT.
            EXIT.
       *
       *****************************************************************
