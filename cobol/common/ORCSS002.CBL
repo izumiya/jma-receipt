@@ -235,7 +235,11 @@ grpsys     COPY    "COMMON-SPA".
            MOVE    IDX-AF      TO  IDX-SYU
            MOVE    LNKSYU-REC  TO  WKSYUNOU-REC
            PERFORM 2001-SUMSYU-SEC
-           MOVE    "2"         TO  WKSYURRK-JOUTAIKBN
+           IF    ( SS002-UPDKBN    =   "1" )
+               MOVE    "1"         TO  WKSYURRK-JOUTAIKBN
+           ELSE
+               MOVE    "2"         TO  WKSYURRK-JOUTAIKBN
+           END-IF
            PERFORM 2001-UPDATE-SYURRK-SEC
       *
            .

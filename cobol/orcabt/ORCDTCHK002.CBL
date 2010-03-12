@@ -7752,7 +7752,7 @@
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   31 )
       *
-               IF    ( TNACCT-GAIHAKU-DAY (IDX0)    =   ZERO OR 4 )
+               IF    ( TNACCT-GAIHAKU-DAY (IDX0)    =   ZERO OR 4 OR 5 )
                    CONTINUE
                ELSE
                    IF    ( TNYUIN-CHOZAI-DAY (IDX0)    =   1 )
@@ -8302,7 +8302,7 @@
                                                    (IDX23 1 IDX22)
                                ELSE
                                    IF    ( TNACCT-GAIHAKU-DAY (IDX22)
-                                                       =   ZERO OR 4)
+                                                   =   ZERO OR 4 OR 5)
                                        CONTINUE
                                    ELSE
                                        COMPUTE TNYUKSN-ERR-CNT (IDX23 3)
