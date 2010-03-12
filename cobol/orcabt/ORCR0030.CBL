@@ -445,6 +445,7 @@
       *  04.04.39    NACL-ÃÁœ∆    10/03/05  £∑£∞∫–¬Â¡∞»æ§Œ∆√Œ„¡º√÷±‰ƒπ¬–±˛
       *  04.04.40    NACL-ÃÁœ∆    10/03/09  £∑£∞∫–¬Â¡∞»æ§Œ∆√Œ„¡º√÷¬–æ›º‘§À
       *                                     ¥ÿ§π§Î ›∏±ÕÛ∞Ï…Ù…È√¥∂‚ ‘Ω∏Ω§¿µ
+      *  04.04.41    NACL-ÃÁœ∆    10/03/12  ∆‚…˛ÃÙ∫ﬁƒ˛∏∫ ‘Ω∏¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5205,14 +5206,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     IF    RECE04-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE04-COMCDFLG
                     END-IF
-                    IF    RECE04-COMCDFLG       =   "2"
-                      IF  SRY-SRYCD(IDX2)  =  "820000047"
-                        CONTINUE
-                      ELSE
-                        ADD   999               TO  WRK-SURYOU-COUNT
-                        ADD   WRK-SURYOU-COUNT  TO  RECE04-SURYOUTOTAL
-                      END-IF
-                    END-IF
+               END-IF
+      *
+               IF    RECE04-COMCDFLG       =   "2"
+                 IF  SRY-SRYCD(IDX2)  =  "820000047" OR
+                                         "630010002"
+                   CONTINUE
+                 ELSE
+                   ADD   999               TO  WRK-SURYOU-COUNT
+                   ADD   WRK-SURYOU-COUNT  TO  RECE04-SURYOUTOTAL
+                 END-IF
                END-IF
       *
                IF          SRY-SRYKBN       =     "31" OR "32"

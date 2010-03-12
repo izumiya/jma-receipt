@@ -58,6 +58,7 @@
       *  04.04.05    NACL-ÌçÏÆ    09/12/09  ½ÐÍè¹â»»Äê¡ÊºÞ¡Ë¤ÎÂÐ±þ
       *  04.04.06    NACL-ÌçÏÆ    10/01/13  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.07    NACL-ÌçÏÆ    10/01/29  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
+      *  04.04.08    NACL-ÌçÏÆ    10/03/12  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1662,14 +1663,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     IF    RECE120-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE120-COMCDFLG
                     END-IF
-                    IF    RECE120-COMCDFLG       =   "2"
-                      IF  SRY-SRYCD(IDX2)  =  "820000047"
-                        CONTINUE
-                      ELSE
-                        ADD   999               TO  WRK-SURYOU-COUNT
-                        ADD   WRK-SURYOU-COUNT  TO  RECE120-SURYOUTOTAL
-                      END-IF
-                    END-IF
+               END-IF
+      *
+               IF    RECE120-COMCDFLG       =   "2"
+                 IF  SRY-SRYCD(IDX2)  =  "820000047" OR
+                                         "630010002"
+                   CONTINUE
+                 ELSE
+                   ADD   999               TO  WRK-SURYOU-COUNT
+                   ADD   WRK-SURYOU-COUNT  TO  RECE120-SURYOUTOTAL
+                 END-IF
                END-IF
       *
                IF          SRY-SRYKBN       =     "31" OR "32"
