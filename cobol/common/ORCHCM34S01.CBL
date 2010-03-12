@@ -1575,6 +1575,8 @@
                    ELSE
                        PERFORM 2001111-SENTEI-TAKIKAN-SEC
                    END-IF
+               WHEN    5
+                   MOVE    "190141590"     TO  WRK-GAIHAKU-SRYCD
                END-EVALUATE
            ELSE
                EVALUATE    FLG-GAIHAKUDAY (IDXD)
@@ -1590,6 +1592,8 @@
                    ELSE
                        PERFORM 2001111-SENTEI-TAKIKAN-SEC
                    END-IF
+               WHEN    5
+                   MOVE    "190141590"     TO  WRK-GAIHAKU-SRYCD
                END-EVALUATE
            END-IF
       *
@@ -1631,10 +1635,12 @@
            WHEN    224
            WHEN    227 THRU    229
            WHEN    230 THRU    239
+           WHEN    241 THRU    249
                MOVE    "190108790"     TO  WRK-GAIHAKU-SRYCD
            WHEN    013 THRU    021
            WHEN    101 THRU    109
            WHEN    147 THRU    152
+           WHEN    173 THRU    190
                MOVE    "190108890"     TO  WRK-GAIHAKU-SRYCD
            WHEN    075 THRU    080
                MOVE    "190108990"     TO  WRK-GAIHAKU-SRYCD
@@ -1657,15 +1663,19 @@
            WHEN    221 THRU  222
            WHEN    224
            WHEN    227 THRU  229
-           WHEN    230 THRU  233
+           WHEN    230 THRU  239
+           WHEN    241 THRU  249
                MOVE    "190116590"     TO  WRK-GAIHAKU-SRYCD
-           WHEN    013 THRU  021
-           WHEN    101 THRU  109
+           WHEN    013 THRU    021
+           WHEN    101 THRU    109
+           WHEN    147 THRU    152
+           WHEN    173 THRU    190
                MOVE    "190116690"     TO  WRK-GAIHAKU-SRYCD
            WHEN    075 THRU  080
                MOVE    "190116890"     TO  WRK-GAIHAKU-SRYCD
-           WHEN    085 THRU  086
-           WHEN    132 THRU  133
+           WHEN    085 THRU    086
+           WHEN    132 THRU    133
+           WHEN    153 THRU    158
                MOVE   "190116790"      TO  WRK-GAIHAKU-SRYCD
            END-EVALUATE
       *
@@ -1687,6 +1697,7 @@
                WHEN    1
                WHEN    3
                WHEN    4
+               WHEN    5
                    COMPUTE WRK-GAIHAKU-TEN
                        = ( WRK-KHNTEN  *   WRK-SENTEI-KEISU )  +  0.5
                END-EVALUATE
@@ -1706,6 +1717,9 @@
                WHEN   2
                    COMPUTE WRK-GAIHAKU-TEN
                        = ( WRK-KHNTEN  *   0.3 )   +  0.5
+               WHEN   5
+                   COMPUTE WRK-GAIHAKU-TEN
+                       = ( WRK-KHNTEN  *   0.7 )   +  0.5
                END-EVALUATE
            END-IF
       *
@@ -2136,7 +2150,8 @@
       *        ³°Çñ¡Ê£±£µ¡ó¤ÈÁªÄê³°Çñ¤Îº¹³Û¡Ë
                WHEN    3
                WHEN    4
-                   IF    ( FLG-GAIHAKUDAY(IDXD)    =   4 )
+               WHEN    5
+                   IF    ( FLG-GAIHAKUDAY(IDXD)    =   4 OR 5)
                     AND  ( HCM34S01-SANTEIYM      >=   "200404" )
                        COMPUTE WRK-SENTEI-GAIHAKU1
       *                    = ( WRK-KHNTEN  *   0.3 )
@@ -2167,6 +2182,7 @@
                WHEN    ZERO
                WHEN    3
                WHEN    4
+               WHEN    5
                    COMPUTE WRK-SENTEI-PTFTN (IDX-TAX)
                        =   WRK-SENTEI-PTFTN (IDX-TAX)
                        +   WRK-SENTEI-KINGAKU
@@ -2618,7 +2634,7 @@
                MOVE    ZERO                TO  FLG-SANTEI
                IF    ( NACCT-DAY    (IDXD)     >   ZERO )
                 AND  ( FLG-NYUINDAY (IDXD)     =   1 )
-                AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 )
+                AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                     IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                      OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
                         MOVE   1       TO  FLG-SANTEI
@@ -3342,7 +3358,7 @@
                     AND (( FLG-NYUINDAY (IDXD)     =   1 )
                       OR ((HCM34S01-DOJITUFLG-ST   =   "1" )
                       AND( IDXD                    =   WRK-SKYSTDD )))
-                    AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 )
+                    AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                         IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                          OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
                             MOVE   1       TO  FLG-SANTEI
@@ -3860,7 +3876,7 @@
       *
                MOVE    ZERO                TO  FLG-SANTEI
                IF    ( FLG-NYUINDAY (IDXD)     =   1 )
-                AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 )
+                AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                 AND  ( LNK-NYULIFE-KBN(IDXD)   NOT =   SPACE )
                     IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                      OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
@@ -4162,7 +4178,7 @@
                    IF    ( NACCT-DAY (IDXD)            >   ZERO )
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ( FLG-NYUINRYODAY (IDXD)      =   1 )
-                    AND  ( FLG-GAIHAKUDAY(IDXD)        =   ZERO OR 4 )
+                    AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                     AND  ( FLG-TOKTEIDAY (IDXD)        =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
@@ -4186,7 +4202,7 @@
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
                       OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
-                    AND  ( FLG-GAIHAKUDAY(IDXD)        =   ZERO OR 4 )
+                    AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                     AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
                       OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
                        IF    ( FLG-TAISYO              =   ZERO )
@@ -4245,7 +4261,7 @@
                 AND  ( FLG-NYUINDAY  (IDXD)    =   1  )
                 AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
                   OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
-                AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 )
+                AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5 )
                    MOVE    1       TO  WRYYTAN-DAY (IDXD)
                    COMPUTE WRYYTAN-ZAIKAISU
                        =   WRYYTAN-ZAIKAISU    +   1
