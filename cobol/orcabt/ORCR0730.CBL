@@ -94,6 +94,9 @@
       *  04.05.09    NACL-藤原    10/03/03  平成２２年４月改正対応
       *                                     平成２２年４月分以降の処理を
       *                                     行わない
+      *  04.05.10    NACL-藤原    10/03/12  平成２２年４月改正対応
+      *                                     平成２２年４月分以降の政府管
+      *                                     掌をエラーとする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -993,6 +996,10 @@
            03  WRK-ERR-MSG-10.
                05  FILLER          PIC X(48)   VALUE
                    "【リアルタイムプレビューより作成のため提出不可】". 
+      *
+           03  WRK-ERR-MSG-11.
+               05  FILLER          PIC X(28)   VALUE
+                   "政府管掌が使用されています". 
       *
       *★★平成２２年４月改正対応
            03  WRK-ERR-MSG-99.
@@ -3053,7 +3060,12 @@
                WHEN    8
                    MOVE    WRK-ERR-MSG-8   TO   HC06-HEAD4-G (5:)
                WHEN    9
-                   MOVE    WRK-ERR-MSG-9   TO   HC06-HEAD4-G (5:)
+               WHEN    9
+                   IF      RECE62-HKNNUM   =   "067"
+                       MOVE    WRK-ERR-MSG-9   TO   HC06-HEAD4-G (5:)
+                   ELSE 
+                       MOVE    WRK-ERR-MSG-11  TO   HC06-HEAD4-G (5:)
+                   END-IF 
            END-EVALUATE
            INSPECT HC06-HEAD4-G  REPLACING ALL "  "    BY  "　"
       *

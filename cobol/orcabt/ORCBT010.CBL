@@ -93,6 +93,10 @@
       *  04.04.04    NACL-藤原    09/12/17  月途中に医保と自立支援の併用
       *                                     から自立支援単独になったとき
       *                                     のまとめ対応
+      *
+      *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
+      *                                     平成２２年４月分以降の政府管
+      *                                     掌をエラーとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -443,6 +447,7 @@
                                    PIC X(07)   VALUE   "ZZZ4012".   
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+           03  WRK-CONS-SRYYM-201004   PIC 9(06)   VALUE   201004.      
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1349,6 +1354,13 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
                    MOVE    "1"                 TO  WRK-TEISEIKBN
                END-IF
           END-IF
+      *
+      *    平成２２年４月以降に政府管掌を使用のとき
+           IF    ( WRK-TEISEIKBN       =   SPACE                 )
+           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201004 )
+           AND   ( COMB-HKNNUM         =   "001"                 )
+               MOVE    "1"                 TO  WRK-TEISEIKBN
+           END-IF
       *
       *   主保険情報読み出し
            INITIALIZE                      PTHKNINF-REC

@@ -131,7 +131,11 @@
       *  04.04.02    NACL-Æ£¸¶    09/05/19  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *                                     ¥Þ¥ëÅÔ¡Ê£¸£²¡Ë¤ÏºÆÍ¥Àè¤È¤¹¤ë
       *  04.04.03    NACL-Æ£¸¶    09/10/21  ·îÅÓÃæ¤ÎÉéÃ´¼ÔÈÖ¹æÊÑ¹¹ÂÐ±þ
-      *                                     ¡Ê¼«Î©»Ù±ç¤Î¸øÈñÃ±ÆÈ¡Ë 
+      *                                     ¡Ê¼«Î©»Ù±ç¤Î¸øÈñÃ±ÆÈ¡Ë
+      * 
+      *  04.05.01    NACL-Æ£¸¶    10/03/12  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀ¯ÉÜ´É
+      *                                     ¾¸¤ò¥¨¥é¡¼¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -500,6 +504,8 @@
            03  WRK-CONS-SRYYM          PIC 9(06)   VALUE   200604.      
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+      *
+           03  WRK-CONS-SRYYM-201004   PIC 9(06)   VALUE   201004.      
       *     
       * 
        01  WRK-RECE61-REC. 
@@ -1138,6 +1144,14 @@
                MOVE    9                   TO  WRK-ERR-ERRKBN
            END-IF
       *
+      *    Ê¿À®£²£²Ç¯£´·î°Ê¹ß¤ËÀ¯ÉÜ´É¾¸¤ò»ÈÍÑ¤Î¤È¤­
+           IF    ( WRK-ERR-ERRKBN      =   ZERO                  )
+           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201004 )
+           AND   ( COMB-HKNNUM         =   "001"                 )
+               MOVE    "1"                 TO  WRK-TEISEIKBN
+               MOVE     9                  TO  WRK-ERR-ERRKBN
+           END-IF
+      *
       *    ºÇ½ª¿ÇÎÅÆü
            MOVE    ACCT-SRYYM          TO  WRK-SRYYM
            PERFORM VARYING IDX FROM    1   BY  1
@@ -1580,6 +1594,14 @@
            AND   ( WRK-NENREI          >=  65                    )
                MOVE    "1"                 TO  WRK-TEISEIKBN
                MOVE    9                   TO  WRK-ERR-ERRKBN
+           END-IF
+      *
+      *    Ê¿À®£²£²Ç¯£´·î°Ê¹ß¤ËÀ¯ÉÜ´É¾¸¤ò»ÈÍÑ¤Î¤È¤­
+           IF    ( WRK-ERR-ERRKBN      =   ZERO                  )
+           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201004 )
+           AND   ( COMB-HKNNUM         =   "001"                 )
+               MOVE    "1"                 TO  WRK-TEISEIKBN
+               MOVE     9                  TO  WRK-ERR-ERRKBN
            END-IF
       *
       *    ºÇ½ª¿ÇÎÅÆü

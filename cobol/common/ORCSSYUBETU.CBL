@@ -82,6 +82,10 @@
       *  04.04.04    NACL-藤原    09/12/17  月途中に医保と自立支援の併用
       *                                     から自立支援単独になったとき
       *                                     のまとめ対応
+      *
+      *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
+      *                                     平成２２年４月分以降の政府管
+      *                                     掌をエラーとする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -352,6 +356,7 @@
       *
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+           03  WRK-CONS-SRYYM-201004   PIC 9(06)   VALUE   201004.      
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -907,6 +912,12 @@ grpsys             MOVE    LNK-SYUBETU-HOSPNUM TO  COMB-HOSPNUM
            IF    ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-200804 )
            AND   ( COMB-HKNNUM         =   "067"                 )
            AND   ( WRK-NENREI          >=  65                    )
+               MOVE    "1"                 TO  WRK-TEISEIKBN
+           END-IF
+      *
+      *    平成２２年４月以降に政府管掌を使用のとき
+           IF    ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201004 )
+           AND   ( COMB-HKNNUM         =   "001"                 )
                MOVE    "1"                 TO  WRK-TEISEIKBN
            END-IF
       *
