@@ -126,6 +126,7 @@
            03  WRK-BTU-NINZU                       PIC 9(05).
            03  WRK-BTULST                          PIC 9(05).
            03  WRK-TNS-NAME                        PIC X(30).
+           03  WRK-STYUKYMD                        PIC X(08).
            03  WRK-EDYUKYMD                        PIC X(08).
            03  WRK-CDKBNNUM                        PIC 9(03).
            03  WRK-CDKOUBAN                        PIC 9(02).
@@ -3311,6 +3312,12 @@
       *
            MOVE    SPA-NAI-W20-YUKOSTYMD
                                    TO  WRK-YUKOSTYMD
+      *
+           IF    ( SPA-NAI-W20-YUKOSTYMD-MOT   =   SPACE )
+               MOVE    SPA-NAI-W20-YUKOSTYMD
+                                   TO  SPA-NAI-W20-YUKOSTYMD-MOT
+           END-IF
+      *
            MOVE    SPACE           TO  SPA-NAI-W20-YUKOSTYMD
       *
       *    日付妥当性チェック＆編集処理
@@ -3325,34 +3332,32 @@
       *
       *        システム管理情報再設定
                PERFORM 4100-SYS-KANRI-SAI-SET-SEC
+               MOVE    SPACE           TO  SPA-NAI-W20-YUKOSTYMD-MOT
       *
-               GO  TO  4101-YUKOSTYMD-CHK-EXT
-           END-IF
-      *
-           MOVE    SPA-GMN-W20-YUKOSTYMD   TO  WRK-YMD
-           PERFORM 800-SEIWA-HEN-SEC
-           IF  ( FLG-HIZUKE-ERR    =   ZERO )
-               MOVE    WRK-HENYMDG
-                                   TO  SPA-GMN-W20-YUKOSTYMD
-               MOVE    WRK-SYMD    TO  SPA-NAI-W20-YUKOSTYMD
            ELSE
-               MOVE    WRK-YUKOSTYMD
-                                   TO  WRK-YMD
+               MOVE    SPA-GMN-W20-YUKOSTYMD   TO  WRK-YMD
                PERFORM 800-SEIWA-HEN-SEC
-               MOVE    WRK-HENYMDG
-                                   TO  SPA-GMN-W20-YUKOSTYMD
-               MOVE    WRK-SYMD    TO  SPA-NAI-W20-YUKOSTYMD
-               MOVE    "0010"      TO  SPA-ERRCD
-               MOVE    24          TO  SPA-GMN-W20-CUR
-               GO  TO  4101-YUKOSTYMD-CHK-EXT
-           END-IF
+               IF  ( FLG-HIZUKE-ERR    =   ZERO )
+                   MOVE    WRK-HENYMDG
+                                       TO  SPA-GMN-W20-YUKOSTYMD
+                   MOVE    WRK-SYMD    TO  SPA-NAI-W20-YUKOSTYMD
+               ELSE
+                   MOVE    WRK-YUKOSTYMD
+                                       TO  WRK-YMD
+                   PERFORM 800-SEIWA-HEN-SEC
+                   MOVE    WRK-HENYMDG
+                                       TO  SPA-GMN-W20-YUKOSTYMD
+                   MOVE    WRK-SYMD    TO  SPA-NAI-W20-YUKOSTYMD
+                   MOVE    "0010"      TO  SPA-ERRCD
+                   MOVE    24          TO  SPA-GMN-W20-CUR
+               END-IF
       *
-           IF    ( SPA-NAI-W20-YUKOSTYMD   <   "20020401" )
-               MOVE    "0003"      TO  SPA-ERRCD
-               MOVE    "H14. 4. 1" TO  SPA-GMN-W20-YUKOSTYMD
-               MOVE    "20020401"  TO  SPA-NAI-W20-YUKOSTYMD
-               MOVE    24          TO  SPA-GMN-W20-CUR
-               GO  TO  4101-YUKOSTYMD-CHK-EXT
+               IF    ( SPA-NAI-W20-YUKOSTYMD   <   "20020401" )
+                   MOVE    "0003"      TO  SPA-ERRCD
+                   MOVE    "H14. 4. 1" TO  SPA-GMN-W20-YUKOSTYMD
+                   MOVE    "20020401"  TO  SPA-NAI-W20-YUKOSTYMD
+                   MOVE    24          TO  SPA-GMN-W20-CUR
+               END-IF
            END-IF
       *
            IF    ( SPA-NAI-W20-YUKOSTYMD
@@ -3399,6 +3404,16 @@
       *
                MOVE  SPA-GMN-W20-YKNKNGLST (01)
                                            TO  SPA-GMN-W20-YKNKNG-G
+           END-IF
+      *
+           PERFORM 4100-BTUNUM-LSTSEL-SEC
+           IF    ( IDX-BTULST      >   ZERO )
+               IF    ( WRK-EDYMD          >=   CONST-H220401 )
+                 AND ( WRK-STYMD          <   CONST-H220401 )
+                   INITIALIZE                     SYSKANRI-REC
+                   PERFORM 900-SYSKANRI-KEY16-SEL-SEC
+                   PERFORM 41001-INPUT-AREA-EDIT-SEC
+               END-IF
            END-IF
       *
            MOVE    SPA-NAI-W20-YUKOSTYMD
@@ -4068,6 +4083,16 @@
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG     TO  SPA-GMN-W20-YUKOEDYMD
       *
+           PERFORM 41001-INPUT-AREA-EDIT-SEC
+      *
+           .
+       4100-INPUT-AREA-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入力項目領域編集処理
+      *****************************************************************
+       41001-INPUT-AREA-EDIT-SEC       SECTION.
+      *
       *    システム管理情報再設定
            PERFORM 4100-SYS-KANRI-SAI-SET-SEC
       *
@@ -4153,7 +4178,7 @@
            END-EVALUATE
       *
            .
-       4100-INPUT-AREA-EDIT-EXT.
+       41001-INPUT-AREA-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    病棟別設定加算設定処理(H14.4〜H18.3)
