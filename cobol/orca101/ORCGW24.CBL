@@ -80,6 +80,7 @@
       *    ¥Õ¥é¥°¥¨¥ê¥¢
        01  FLG-AREA.
            03  FLG-END                             PIC 9(01).
+           03  FLG-HIT                             PIC 9(01).
            03  FLG-SYSKANRI                        PIC 9(01).
            03  FLG-TENSU                           PIC 9(01).
            03  FLG-KANJI                           PIC 9(01).
@@ -106,6 +107,7 @@
                05  FLG-190119910                   PIC 9(01).
                05  FLG-190120410                   PIC 9(01).
                05  FLG-190120510                   PIC 9(01).
+               05  FLG-190138010                   PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -114,6 +116,7 @@
            03  IDX2                                PIC 9(05).
            03  IDX3                                PIC 9(05).
            03  IDX4                                PIC 9(05).
+           03  IDX5                                PIC 9(05).
            03  IDXC                                PIC 9(05).
            03  IDXY                                PIC 9(05).
            03  IDXZ                                PIC 9(05).
@@ -121,6 +124,11 @@
            03  IDX-SYS                             PIC 9(05).
            03  IDX-SKJ                             PIC 9(05).
            03  IDX-KSN                             PIC 9(05).
+           03  IDX-SST                             PIC 9(05).
+      *
+      *    ¥«¥¦¥ó¥ÈÎÎ°è
+       01  CNT-AREA.
+           03  CNT-SST                             PIC 9(05).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -153,6 +161,17 @@
            03  WRK-CHIIKIKSN-G.
                05  WRK-CHIIKIKSN                   PIC 9(01).
                05  WRK-CHIIKIKSNFL                 PIC X(27).
+           03  WRK-KAISEISTYMD                     PIC X(08).
+           03  WRK-KAISEIEDYMD                     PIC X(08).
+           03  WRK-SSTKJNCD-G.
+               05  WRK-SSTKJNCD-OCC                OCCURS 10.
+                   07  WRK-SSTKJNCDSEP             PIC X(01).
+                   07  WRK-SSTKJNCD                PIC X(03).
+                   07  WRK-SSTKJNCD-R              REDEFINES
+                       WRK-SSTKJNCD.
+                       09  WRK-SSTKJNCD9           PIC 9(03).
+           03  WRK-KSNMEI                          PIC X(100).
+           03  WRK-PNT                             PIC 9(05).
       *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
@@ -166,7 +185,9 @@
        01  CONST-AREA.
       *
            03  CONST-H220401           PIC X(08)   VALUE "20100401".
+           03  CONST-H220331           PIC X(08)   VALUE "20100331".
            03  CONST-H180401           PIC X(08)   VALUE "20060401".
+           03  CONST-H180331           PIC X(08)   VALUE "20060331".
            03  CONST-H160401           PIC X(08)   VALUE "20040401".
            03  CONST-SRYACT-MAX        PIC 9(03)   VALUE 10.
       *
@@ -232,7 +253,7 @@
                        09              PIC X(09)   VALUE   "190136910".
                        09              PIC X(09)   VALUE   "190137070".
                        09              PIC X(09)   VALUE   "190120410".
-                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "190138010".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
@@ -458,6 +479,8 @@
       *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  CNT-AREA
+           INITIALIZE                  IDX-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA.
            MOVE    SPA-WORK        TO  SPA-W01KYOUTU
@@ -557,7 +580,7 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
-           PERFORM 800-H1804-KAISEI-CHK-SEC
+           PERFORM 800-KAISEI-CHK-SEC
       *
            PERFORM 3101-SPASET-SEC
       *
@@ -2615,124 +2638,38 @@
       *
            MOVE    ZERO            TO  FLG-SSTKIJUNERR
       *
-           EVALUATE    SPA-NAI-W24-NYUKSN-SRYCD (IDX-KSN)
-           WHEN    "190098870"
-      *        Æþ±¡»þ°å³Ø´ÉÍýÎÁ¥Á¥§¥Ã¥¯
-               IF  ( SSTKJN-CD (201)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190098970"
-      *        ¾Ò²ð³°Íè²Ã»»¡ÊÆÃÄêµ¡Ç½ÉÂ±¡°Ê³°¡Ë
-               IF    ( SSTKJN-CD (202) =   1 )
-                AND (( SSTKJN-CD (147) =   1 )
-                 OR  ( SSTKJN-CD (148) =   1 )
-                 OR  ( SSTKJN-CD (107) =   1 )
-                 OR  ( SSTKJN-CD (108) =   1 ))
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190099170"
-      *        ¾Ò²ð³°ÍèÆÃÊÌ²Ã»»
-               IF    ( SSTKJN-CD (202) =   1 )
-                AND  ( SSTKJN-CD (203) =   1 )
-                AND (( SSTKJN-CD (147) =   1 )
-                 OR  ( SSTKJN-CD (148) =   1 )
-                 OR  ( SSTKJN-CD (107) =   1 )
-                 OR  ( SSTKJN-CD (108) =   1 ))
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190099270"
-      *        µÞÀ­´üÆþ±¡²Ã»»
-               IF  ( SSTKJN-CD (323)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190099570"
-      *        µÞÀ­´üÆÃÄêÆþ±¡²Ã»»
-               IF  ( SSTKJN-CD (324)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-      *        ÃÏ°è°åÎÅ»Ù±çÉÂ±¡Æþ±¡¿ÇÎÅ²Ã»»
-           WHEN    "190099870"
-               IF  ( SSTKJN-CD (146)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190099970"
-      *        ÃÏ°è°åÎÅ»Ù±çÉÂ±¡Æþ±¡¿ÇÎÅ²Ã»»£²
-               IF    ( SSTKJN-CD (146)   =   1 )
-                AND  ( SSTKJN-CD (147)   =   1 )
-                AND  ( SSTKJN-CD (156)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190117170"
-           WHEN    "190119910"
-      *        Ã±ÆÈ·¿µÚ¤Ó´ÉÍý·¿Î×¾²¸¦½¤ÉÂ±¡Æþ±¡¿ÇÎÅ²Ã»»¡ÊÆþ±¡½éÆü¡Ë
-      *        ¶¨ÎÏ·¿Î×¾²¸¦½¤ÉÂ±¡Æþ±¡¿ÇÎÅ²Ã»»¡ÊÆþ±¡½éÆü¡Ë
-               IF    ( SSTKJN-CD (206)   =   1 )
-                AND  ( SSTKJN-CD (364)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190100370"
-      *        ¿ÇÎÅÏ¿´ÉÍýÂÎÀ©²Ã»»
-               IF    ( SSTKJN-CD (206)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190100470"
-           WHEN    "190100770"
-           WHEN    "190100670"
-           WHEN    "190100970"
-      *        ÆýÍÄ»ù²Ã»»¡ÊÉÂ±¡¡Ë
-      *        ÍÄ»ù²Ã»»¡ÊÉÂ±¡¡Ë
-      *        ÆýÍÄ»ù²Ã»»¡Ê¿ÇÎÅ½ê¡Ë
-      *        ÍÄ»ù²Ã»»¡Ê¿ÇÎÅ½ê¡Ë
-               CONTINUE
-           WHEN    "190107170"
-      *        Àº¿ÀÉÂÅïÆþ±¡»þ°å³Ø´ÉÍý²Ã»»
-               IF    ( SSTKJN-CD (207)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190117270"
-      *        Î¥Åç²Ã»»
-                   CONTINUE
-           WHEN    "190120510"
-      *        °åÎÅ°ÂÁ´ÂÐºö²Ã»»¡ÊÆþ±¡½éÆü¡Ë
-               IF    ( SSTKJN-CD (605)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           WHEN    "190120410"
-      *        ±ÉÍÜ´ÉÍý¼Â»Ü²Ã»»
-               IF    ( SSTKJN-CD (604)   =   1 )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-SSTKIJUNERR
-               END-IF
-           END-EVALUATE
+           MOVE    SPA-NAI-W24-NYUKSN-SRYCD (IDX-KSN)
+                                   TO  WRK-SRYCD
+           PERFORM 900-TENSU-KEY-SEL-SEC
       *
-           IF    ( FLG-SSTKIJUNERR     =   1 )
-               COMPUTE SPA-GMN-W24-CUR
-                   =   WRK-BASE-CUR    +   IDX-KSN
-               MOVE    "0004"  TO  SPA-ERRCD
-               MOVE    "F"     TO  SPA-GMN-W24-CHK-NYUKSN (IDX-KSN)
+           MOVE    ZERO            TO  FLG-HIT
+                                       CNT-SST
+           PERFORM VARYING IDX5    FROM    1   BY  1
+                   UNTIL ( IDX5    >   10 )
+                    OR   ( FLG-HIT     =   1 )
+      *
+               IF    ( TNS-SSTKIJUNCD (IDX5)   >   ZERO )
+                   COMPUTE CNT-SST =   CNT-SST +   1
+                   MOVE    TNS-SSTKIJUNCD (IDX5)
+                                   TO  WRK-SSTKJNCD9(CNT-SST)
+                   MOVE    TNS-SSTKIJUNCD (IDX5)
+                                   TO  IDX-SST
+                   IF    ( SSTKJN-CD (IDX-SST) =   1 )
+                       MOVE    1   TO  FLG-HIT
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( CNT-SST     >   ZERO )
+               IF    ( FLG-HIT =   ZERO )
+                   COMPUTE SPA-GMN-W24-CUR
+                       =   WRK-BASE-CUR    +   IDX-KSN
+                   MOVE    "0004"  TO  SPA-ERRCD
+                   MOVE    "F"     TO  SPA-GMN-W24-CHK-NYUKSN (IDX-KSN)
+                   MOVE    SPA-GMN-W24-NYUKSNMEI (IDX-KSN)
+                                               TO  WRK-KSNMEI
+               END-IF
            END-IF
       *
            .
@@ -4023,6 +3960,8 @@
                        MOVE    1           TO  FLG-190120410
                    WHEN    "190120510"
                        MOVE    1           TO  FLG-190120510
+                   WHEN    "190138010"
+                       MOVE    1           TO  FLG-190138010
                    END-EVALUATE
                END-IF
       *
@@ -4942,8 +4881,32 @@
                MOVE    "¿ÇÎÅ¥³¡¼¥ÉÆþÎÏµ¬Â§¤Ë¤¢¤Ã¤Æ¤¤¤Þ¤»¤ó"
                                        TO  SPA-ERRMSG
            WHEN    "0004"
-               MOVE    "²Ã»»¤ËÉ¬Í×¤Ê»ÜÀß´ð½à¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤Þ¤»¤ó"
-                                       TO  SPA-ERRMSG
+               MOVE    1               TO  WRK-PNT
+               IF    ( WRK-KSNMEI      =   SPACE )
+                   STRING  "²Ã»»¤ËÉ¬Í×¤Ê»ÜÀß´ð½à¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤Þ¤»¤ó"
+                           DELIMITED   BY  SPACE
+                   INTO    SPA-ERRMSG
+                   WITH    POINTER         WRK-PNT
+                   END-STRING
+               ELSE
+                   STRING  "É¬Í×¤Ê»ÜÀß´ð½à¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤Þ¤»¤ó¡¿"
+                           DELIMITED   BY  SPACE
+                           WRK-KSNMEI
+                           DELIMITED   BY  SPACE
+                   INTO    SPA-ERRMSG
+                   WITH    POINTER         WRK-PNT
+                   END-STRING
+               END-IF
+      *
+               PERFORM VARYING IDX-SST FROM    1   BY  1
+                       UNTIL ( IDX-SST >   CNT-SST )
+      *
+                   STRING  WRK-SSTKJNCD-OCC  (IDX-SST)
+                           DELIMITED   BY  SIZE
+                   INTO    SPA-ERRMSG
+                   WITH    POINTER         WRK-PNT
+                   END-STRING
+               END-PERFORM
            WHEN    "0005"
                MOVE    "¿©»öÎÅÍÜÈñÆþÎÏ¥¨¥é¡¼"
                                        TO  SPA-ERRMSG
@@ -5130,17 +5093,35 @@
        800-MCNDATE-EXT.
            EXIT.
       *****************************************************************
-      *    Ê¿À®£±£¸Ç¯ÅÙ²þÀµ¥Á¥§¥Ã¥¯½èÍý
+      *    ²þÀµ¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
-       800-H1804-KAISEI-CHK-SEC            SECTION.
+       800-KAISEI-CHK-SEC              SECTION.
       *
-           IF    ( SPA-W01-SELNUM      >   ZERO )
-               IF    ( CONST-H180401   >   SPA-W01-SEL-STYUKYMD )
-                AND  ( CONST-H180401  <=   SPA-W01-EDYUKYMD )
+           MOVE    CONST-H180401   TO  WRK-KAISEISTYMD
+           MOVE    CONST-H180331   TO  WRK-KAISEIEDYMD
+           PERFORM 8001-KAISEI-CHK-SEC
+      *
+           MOVE    CONST-H220401   TO  WRK-KAISEISTYMD
+           MOVE    CONST-H220331   TO  WRK-KAISEIEDYMD
+           PERFORM 8001-KAISEI-CHK-SEC
+      *
+           .
+      *
+       800-KAISEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ²þÀµ¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       8001-KAISEI-CHK-SEC           SECTION.
+      *
+           IF    ( SPA-W01-SELNUM          >   ZERO )
+               IF    ( WRK-KAISEISTYMD     >   SPA-W01-SEL-STYUKYMD )
+                AND  ( WRK-KAISEISTYMD    <=   SPA-W01-EDYUKYMD )
                    PERFORM 310-SYS-5000-SEL-SEC
                    IF    ( FLG-SYSKANRI    =   ZERO )
                        MOVE    SYS-5000-EDYUKYMD   TO  WRK-EDYUKYMD
-                       MOVE    "20060331"          TO  SYS-5000-EDYUKYMD
+                       MOVE    WRK-KAISEIEDYMD     TO  SYS-5000-EDYUKYMD
                        PERFORM 800-MCNDATE-SEC
                        MOVE    SMCNDATE-YMD    TO  SYS-5000-UPYMD
                        MOVE    SMCNDATE-HMS    TO  SYS-5000-UPHMS
@@ -5159,15 +5140,17 @@
                        END-IF
       *
                        MOVE    SPA-W01-STYUKYMD    TO  WRK-STYUKYMD
+                       MOVE    SPA-W01-EDYUKYMD    TO  WRK-EDYUKYMD
                        MOVE    SPA-W01-SELNUM      TO  WRK-SELNUM
                        MOVE    SPA-W01-SEL-STYUKYMD
                                                    TO  WRK-SEL-STYUKYMD
+                       MOVE    SPA-W01-SEL-EDYUKYMD
+                                                   TO  WRK-SEL-EDYUKYMD
       *
-                       INITIALIZE                  SPA-W01-SELNUM
-                                                   SPA-W01-SEL-STYUKYMD
+                       INITIALIZE                  SPA-W01-SEL-STYUKYMD
                                                    SPA-W01-SEL-EDYUKYMD
       *
-                       MOVE    CONST-H180401       TO  SPA-W01-STYUKYMD
+                       MOVE    WRK-KAISEISTYMD     TO  SPA-W01-STYUKYMD
                        PERFORM 3101-SPASET-SEC
                        PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
       *
@@ -5184,13 +5167,13 @@
                        IF    ( MCP-RC  NOT =   ZERO )
                            DISPLAY "2:DBINSERT ERR"
                        END-IF
-                       MOVE    WRK-SELNUM      TO  SPA-W01-SELNUM
-                       MOVE    WRK-STYUKYMD    TO  SPA-W01-STYUKYMD
-                       MOVE    WRK-SEL-STYUKYMD
-                                               TO  SPA-W01-SEL-STYUKYMD
+                       COMPUTE SPA-W01-SELNUM
+                           =   SPA-W01-SELNUM  +   1
+                       MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
+                                                   SPA-W01-SEL-EDYUKYMD
       *
-                       MOVE    20060331        TO  SPA-W01-SEL-EDYUKYMD
-                                                   SPA-W01-EDYUKYMD
+                       MOVE    WRK-KAISEISTYMD TO  SPA-W01-SEL-STYUKYMD
+                                                   SPA-W01-STYUKYMD
       *
                        MOVE    SPA-W01-STYUKYMD    TO  WRK-YMD
                        PERFORM 800-SEIWA-HEN-SEC
@@ -5203,10 +5186,10 @@
                    END-IF
                END-IF
            ELSE
-               IF    ( CONST-H180401   >  SPA-W01-STYUKYMD )
-                AND  ( CONST-H180401  <=  SPA-W01-EDYUKYMD )
+               IF    ( WRK-KAISEISTYMD      >  SPA-W01-STYUKYMD )
+                AND  ( WRK-KAISEISTYMD     <=  SPA-W01-EDYUKYMD )
                    MOVE    SPA-W01-EDYUKYMD    TO  WRK-EDYUKYMD
-                   MOVE    20060331            TO  SPA-W01-EDYUKYMD
+                   MOVE    WRK-KAISEIEDYMD     TO  SPA-W01-EDYUKYMD
                    PERFORM 3101-SPASET-SEC
                    PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
       *
@@ -5224,7 +5207,7 @@
                        DISPLAY "3:DBINSERT ERR"
                    END-IF
       *
-                   MOVE    CONST-H180401   TO  SPA-W01-STYUKYMD
+                   MOVE    WRK-KAISEISTYMD TO  SPA-W01-STYUKYMD
                    MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
                    PERFORM 3101-SPASET-SEC
                    PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
@@ -5243,8 +5226,13 @@
                        DISPLAY "4:DBINSERT ERR"
                    END-IF
       *
-                   MOVE    CONST-H180401   TO  SPA-W01-STYUKYMD
+                   MOVE    WRK-KAISEISTYMD TO  SPA-W01-STYUKYMD
+                                               SPA-W01-SEL-STYUKYMD
                    MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
+                                               SPA-W01-SEL-EDYUKYMD
+      *
+                   COMPUTE SPA-W01-SELNUM
+                       =   SPA-W01-SELNUM  +   1
       *
                    MOVE    SPA-W01-STYUKYMD    TO  WRK-YMD
                    PERFORM 800-SEIWA-HEN-SEC
@@ -5259,7 +5247,7 @@
       *
            .
       *
-       800-H1804-KAISEI-CHK-EXT.
+       8001-KAISEI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷½èÍý(KEY2)
