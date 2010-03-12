@@ -58,6 +58,7 @@
       *  04.04.05    NACL-門脇    09/12/09  出来高算定（剤）の対応
       *  04.04.06    NACL-門脇    10/01/13  剤まとめ項目値の計算修正
       *  04.04.07    NACL-門脇    10/01/29  内服薬剤逓減編集対応
+      *  04.04.08    NACL-門脇    10/03/12  内服薬剤逓減編集対応
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/08/17  小数点以下５桁対応
@@ -1721,14 +1722,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     IF    RECE120-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE120-COMCDFLG
                     END-IF
-                    IF    RECE120-COMCDFLG       =   "2"
-                      IF  SRY-SRYCD(IDX2)  =  "820000047"
-                        CONTINUE
-                      ELSE
-                        ADD   999               TO  WRK-SURYOU-COUNT
-                        ADD   WRK-SURYOU-COUNT  TO  RECE120-SURYOUTOTAL
-                      END-IF
-                    END-IF
+               END-IF
+      *
+               IF    RECE120-COMCDFLG       =   "2"
+                 IF  SRY-SRYCD(IDX2)  =  "820000047" OR
+                                         "630010002"
+                   CONTINUE
+                 ELSE
+                   ADD   999               TO  WRK-SURYOU-COUNT
+                   ADD   WRK-SURYOU-COUNT  TO  RECE120-SURYOUTOTAL
+                 END-IF
                END-IF
       *
                IF          SRY-SRYKBN       =     "31" OR "32"

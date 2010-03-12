@@ -445,6 +445,7 @@
       *  04.04.39    NACL-門脇    10/03/05  ７０歳代前半の特例措置延長対応
       *  04.04.40    NACL-門脇    10/03/09  ７０歳代前半の特例措置対象者に
       *                                     関する保険欄一部負担金編集修正
+      *  04.04.41    NACL-門脇    10/03/12  内服薬剤逓減編集対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -5560,14 +5561,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     IF    RECE04-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE04-COMCDFLG
                     END-IF
-                    IF    RECE04-COMCDFLG       =   "2"
-                      IF  SRY-SRYCD(IDX2)  =  "820000047"
-                        CONTINUE
-                      ELSE
-                        ADD   999               TO  WRK-SURYOU-COUNT
-                        ADD   WRK-SURYOU-COUNT  TO  RECE04-SURYOUTOTAL
-                      END-IF
-                    END-IF
+               END-IF
+      *
+               IF    RECE04-COMCDFLG       =   "2"
+                 IF  SRY-SRYCD(IDX2)  =  "820000047" OR
+                                         "630010002"
+                   CONTINUE
+                 ELSE
+                   ADD   999               TO  WRK-SURYOU-COUNT
+                   ADD   WRK-SURYOU-COUNT  TO  RECE04-SURYOUTOTAL
+                 END-IF
                END-IF
       *
                IF          SRY-SRYKBN       =     "31" OR "32"
