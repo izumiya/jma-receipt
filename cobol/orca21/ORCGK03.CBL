@@ -877,10 +877,10 @@
       *    患者毎の発行区分変更
            EVALUATE    SPA-SKYPRTFLG
                WHEN    "0"
-               WHEN    "4"
       *            発行しない
                    MOVE    "0"                 TO  SPA-GMN-HAKFLG
                WHEN    "1"
+               WHEN    "4"
       *            発行する
                    MOVE    "1"                 TO  SPA-GMN-HAKFLG
                WHEN    "2"
