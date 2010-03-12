@@ -124,10 +124,10 @@
                 04  W06-TG2.
                   05  W06-SKYPRTFLG-COMB.
                     06  W06-SKYPRTFLG.
-                      07  W06-VALUE   PIC X(30).
+                      07  W06-VALUE   PIC X(32).
                     06  W06-SKYPRTFLG-COUNT   PIC S9(9)   BINARY.
                     06  W06-SKYPRTFLG-ITEM
-                            PIC X(30)   OCCURS  5 TIMES.
+                            PIC X(32)   OCCURS  9 TIMES.
                   05  W06-SYOHOPRTFLG-COMB.
                     06  W06-SYOHOPRTFLG.
                       07  W06-VALUE   PIC X(30).
@@ -142,10 +142,10 @@
                             PIC X(30)   OCCURS  5 TIMES.
                   05  W06-MEIPRTFLG-COMB.
                     06  W06-MEIPRTFLG.
-                      07  W06-VALUE   PIC X(26).
+                      07  W06-VALUE   PIC X(32).
                     06  W06-MEIPRTFLG-COUNT   PIC S9(9)   BINARY.
                     06  W06-MEIPRTFLG-ITEM
-                            PIC X(26)   OCCURS  3 TIMES.
+                            PIC X(32)   OCCURS  9 TIMES.
                   05  W06-FORMALFLG-COMB.
                     06  W06-FORMALFLG.
                       07  W06-VALUE   PIC X(40).

@@ -178,10 +178,10 @@ W06	{
 			TG2	{
 				SKYPRTFLG_COMB	{
 					SKYPRTFLG	{
-						value	varchar(30);
+						value	varchar(32);
 					};
 					count	int;
-					item	varchar(30)[5];
+					item	varchar(32)[9];
 				};
 				SYOHOPRTFLG_COMB	{
 					SYOHOPRTFLG	{
@@ -199,10 +199,10 @@ W06	{
 				};
 				MEIPRTFLG_COMB	{
 					MEIPRTFLG	{
-						value	varchar(26);
+						value	varchar(32);
 					};
 					count	int;
-					item	varchar(26)[3];
+					item	varchar(32)[9];
 				};
 				FORMALFLG_COMB	{
 					FORMALFLG	{

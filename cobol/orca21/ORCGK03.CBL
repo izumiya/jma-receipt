@@ -882,19 +882,18 @@
       *    患者毎の発行区分変更
            EVALUATE    SPA-SKYPRTFLG
                WHEN    "0"
-               WHEN    "4"
       *            発行しない
                    MOVE    "0"                 TO  SPA-GMN-HAKFLG
                WHEN    "1"
-               WHEN    "5"
+               WHEN    "4"
       *            発行する
                    MOVE    "1"                 TO  SPA-GMN-HAKFLG
                WHEN    "2"
-               WHEN    "6"
+               WHEN    "5"
       *            発行する（請求あり）
                    MOVE    "2"                 TO  SPA-GMN-HAKFLG
                WHEN    "3"
-               WHEN    "7"
+               WHEN    "6"
       *            発行する（訂正時なし）
                    IF      SPA-SYORIFLG        =   ZERO
                        MOVE    "1"             TO  SPA-GMN-HAKFLG
@@ -911,49 +910,6 @@
       *        設定なしは　発行ありとする（H22.4)
                MOVE    "1"                 TO  SPA-MEIPRTFLG
            END-IF
-      *H22.4
-      *    訂正時発行なし
-           IF      SPA-MEIPRTFLG       =   "2"
-               IF      SPA-SYORIFLG        =   ZERO
-                   MOVE    "1"                 TO  SPA-MEIPRTFLG
-               ELSE
-                   MOVE    "0"                 TO  SPA-MEIPRTFLG
-               END-IF
-           END-IF
-      *    患者毎の発行区分
-           IF      SPA-SKYPRTFLG-SYS   =   "P"
-      *        患者情報で設定があった時
-               EVALUATE    SPA-SKYPRTFLG
-               WHEN    "0"
-               WHEN    "1"
-               WHEN    "2"
-      *            発行あり
-                   MOVE    "1"                 TO  SPA-MEIPRTFLG
-               WHEN    "3"
-      *            発行する（訂正時なし）
-                   IF      SPA-SYORIFLG        =   ZERO
-                       MOVE    "1"                 TO  SPA-MEIPRTFLG
-                   ELSE
-                       MOVE    "0"                 TO  SPA-MEIPRTFLG
-                   END-IF
-               WHEN    "4"
-               WHEN    "5"
-               WHEN    "6"
-               WHEN    "7"
-      *            発行なし
-                   MOVE    "0"                 TO  SPA-MEIPRTFLG
-               END-EVALUATE
-           END-IF
-      *
-           MOVE    SPA-MEIPRTFLG       TO  SPA-GMN-MEIPRTFLG
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-MEIPRTFLG-MAX
-               IF      SPA-GMN-MEIPRTFLG   =   SPA-GMN-MEIPRTFLGLST
-                                                          (IDX) (1:1)
-                   MOVE    SPA-GMN-MEIPRTFLGLST(IDX)
-                                           TO  SPA-GMN-MEIPRTFLG-G
-               END-IF
-           END-PERFORM
       *
       *    院外処方せん発行フラグ
            MOVE    SPA-SYOHOPRTFLG     TO  SPA-GMN-SYOHOPRTFLG
@@ -1179,7 +1135,8 @@
       *    請求書発行フラグ
            IF     (SPA-GMN-HAKFLG      =   SPACE )  OR
       ********** ((SPA-GMN-HAKFLG      =   "2"   )  AND
-                 ((SPA-SKYPRTFLG       =   "2"   )  AND
+                 ((SPA-SKYPRTFLG       =   "2"
+                                       OR  "5"   )  AND
                   (WRK-SKYMONEY        <=  ZERO  ))
                MOVE    "0"             TO  SPA-GMN-HAKFLG
            END-IF
@@ -1190,6 +1147,9 @@
                    MOVE    SPA-GMN-HAKFLGLST(IDX)  TO  SPA-GMN-HAKFLG-G
                END-IF
            END-PERFORM
+      *H22.4　から
+      *    診療費明細書発行区分設定
+           PERFORM 3105-MEIPRTFLG-SET-SEC
       *
       *    ユーザプログラム起動初期
            INITIALIZE                      ORCSUSERCHKAREA
@@ -1219,6 +1179,66 @@
       *
             .
        310-SPA-SET-EXT.
+           EXIT.
+      *H22.4　から
+      *****************************************************************
+      *    診療費明細書発行区分設定処理
+      *****************************************************************
+       3105-MEIPRTFLG-SET-SEC             SECTION.
+      *
+      *    患者毎の発行区分
+           IF      SPA-SKYPRTFLG-SYS   =   "P"
+      *        患者情報で設定があった時
+               EVALUATE    SPA-SKYPRTFLG
+               WHEN    "0"
+      *            明細書不要
+                   MOVE    "0"                 TO  SPA-MEIPRTFLG
+               WHEN    "1"
+      *            発行あり
+                   MOVE    "1"                 TO  SPA-MEIPRTFLG
+               WHEN    "2"
+      *            請求あり
+                   MOVE    "2"                 TO  SPA-MEIPRTFLG
+               WHEN    "3"
+      *            発行する（訂正時なし）
+                   MOVE    "3"                 TO  SPA-MEIPRTFLG
+               WHEN    "4"
+               WHEN    "5"
+               WHEN    "6"
+      *            発行なし
+                   MOVE    "0"                 TO  SPA-MEIPRTFLG
+               END-EVALUATE
+           END-IF
+      *
+           MOVE    SPA-MEIPRTFLG       TO  SPA-GMN-MEIPRTFLG
+      *
+           EVALUATE    SPA-MEIPRTFLG
+      *    請求額あり
+           WHEN    "2"
+               IF      WRK-SKYMONEY        <=  ZERO
+                   MOVE    "0"                 TO  SPA-GMN-MEIPRTFLG
+               ELSE
+                   MOVE    "1"                 TO  SPA-GMN-MEIPRTFLG
+               END-IF
+      *    訂正時発行なし
+           WHEN    "3"
+               IF      SPA-SYORIFLG        =   ZERO
+                   MOVE    "1"                 TO  SPA-GMN-MEIPRTFLG
+               ELSE
+                   MOVE    "0"                 TO  SPA-GMN-MEIPRTFLG
+               END-IF
+           END-EVALUATE
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-MEIPRTFLG-MAX
+               IF      SPA-GMN-MEIPRTFLG   =   SPA-GMN-MEIPRTFLGLST
+                                                          (IDX) (1:1)
+                   MOVE    SPA-GMN-MEIPRTFLGLST(IDX)
+                                           TO  SPA-GMN-MEIPRTFLG-G
+               END-IF
+           END-PERFORM
+           .
+       3105-MEIPRTFLG-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2167,7 +2187,8 @@
            END-IF
       *    訂正で請求書合計金額の時
            IF     (SPA-SYORIFLG        =   1   )  AND
-                  (SPA-SKYPRTFLG       =   "1" OR  "2" )
+                  (SPA-SKYPRTFLG       =   "1" OR  "2"
+                                       OR  "4" OR  "5" )
                IF      SPA-NAI-TEIKINKBN   =   "1"
                    MOVE    "2"             TO  SPA-GMN-HAKFLG
                ELSE
@@ -3956,8 +3977,11 @@
            EVALUATE    WRK-MCP-WIDGET
       *        調整金入力時、合計額がゼロ以下の時、発行なしとする
                WHEN    "CHOSEI"
+      ***          COMPUTE WRK-SEIKYU      =   SPA-GOK-SKYMONEY
+      ***                                  +   SPA-GOK-CHOSEI
       *            請求額がゼロ以下の時、請求書発行区分変更
                    IF      SPA-SKYPRTFLG       =   "2"
+                                               OR  "5"
                        IF      SPA-GMN-SEIGOK      <=  ZERO
                            MOVE    SPA-GMN-HAKFLGLST(1)
                                                TO  SPA-GMN-HAKFLG-G
@@ -3969,6 +3993,16 @@
                                MOVE    SPA-GMN-HAKFLGLST(2)
                                                TO  SPA-GMN-HAKFLG-G
                            END-IF
+                       END-IF
+                   END-IF
+      *            請求額がゼロ以下の時、明細書発行区分変更
+                   IF      SPA-MEIPRTFLG       =   "2"
+                       IF      SPA-GMN-SEIGOK      <=  ZERO
+                           MOVE    SPA-GMN-MEIPRTFLGLST(1)
+                                               TO  SPA-GMN-MEIPRTFLG-G
+                       ELSE
+                           MOVE    SPA-GMN-MEIPRTFLGLST(2)
+                                               TO  SPA-GMN-MEIPRTFLG-G
                        END-IF
                    END-IF
            END-EVALUATE

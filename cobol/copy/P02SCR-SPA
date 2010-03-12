@@ -168,9 +168,9 @@
                    07  SPA-GMN-SKYPRTFLG-G.
                        09  SPA-GMN-SKYPRTFLG          PIC X(01).
                        09  SPA-GMN-SKYPRTFLG-H        PIC X(01).
-                       09  SPA-GMN-SKYPRTFLG-MEI      PIC X(38).
+                       09  SPA-GMN-SKYPRTFLG-MEI      PIC X(48).
                    07  SPA-GMN-SKYPRTFLG-COB.
-                       09  SPA-GMN-SKYPRTFLG-LST      PIC X(40)
+                       09  SPA-GMN-SKYPRTFLG-LST      PIC X(50)
                                                       OCCURS 10.
                    07  SPA-SKYPRTFLG-MAX              PIC 9(02).
       *            ÊÝ¸±¾ðÊó

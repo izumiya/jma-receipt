@@ -1323,21 +1323,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    請求書発行区分
-           MOVE    "0 請求書不要"      TO  SPA-GMN-SKYPRTFLG-LST (1)
-           MOVE    "1 請求書必要"      TO  SPA-GMN-SKYPRTFLG-LST (2)
-           MOVE    "2 請求書必要（請求あり）"
+           MOVE    "0 請求書・明細書不要"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (1)
+           MOVE    "1 請求書・明細書必要"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (2)
+           MOVE    "2 請求書・明細書必要（請求あり）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (3)
-           MOVE    "3 請求書必要（訂正時なし）"
+           MOVE    "3 請求書・明細書必要（訂正時なし）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (4)
-           MOVE    "4 請求書不要（明細書不要）"
+           MOVE    "4 請求書必要（明細書不要）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (5)
-           MOVE    "5 請求書必要（明細書不要）"
+           MOVE    "5 請求書必要（請求あり）（明細書不要）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (6)
-           MOVE    "6 請求書必要（請求あり）（明細書不要）"
+           MOVE    "6 請求書必要（訂正時なし）（明細書不要）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (7)
-           MOVE    "7 請求書必要（訂正時なし）（明細書不要）"
-                                       TO  SPA-GMN-SKYPRTFLG-LST (8)
-           MOVE    8                   TO  SPA-SKYPRTFLG-MAX
+           MOVE    7                   TO  SPA-SKYPRTFLG-MAX
            MOVE    SPACE               TO  SPA-GMN-SKYPRTFLG-G
       *
       *    所得者２（高齢者福祉年金受給者証）

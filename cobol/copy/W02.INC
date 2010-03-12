@@ -69,9 +69,9 @@
                     06  W02-SYOHOKBN-COUNT   PIC S9(9)   BINARY.
                     06  W02-SYOHOKBNLST      PIC X(8)    OCCURS  2.
                   05  W02-SKYPRTFLG-COMBO.
-                    06  W02-SKYPRTFLG        PIC X(30).
+                    06  W02-SKYPRTFLG        PIC X(32).
                     06  W02-SKYPRTFLG-COUNT  PIC S9(9)   BINARY.
-                    06  W02-SKYPRTFLGLST     PIC X(30)   OCCURS  5.
+                    06  W02-SKYPRTFLGLST     PIC X(32)   OCCURS  9.
                   05  W02-SYOHOPRTFLG-COMBO.
                     06  W02-SYOHOPRTFLG      PIC X(30).
                     06  W02-SYOHOPRTFLG-COUNT
@@ -140,7 +140,7 @@
                       07  W02-VALUE   PIC X(32).
                     06  W02-MEIPRTFLG-COUNT   PIC S9(9)   BINARY.
                     06  W02-MEIPRTFLG-ITEM
-                            PIC X(32)   OCCURS  5 TIMES.
+                            PIC X(32)   OCCURS  9 TIMES.
                   05  W02-CHIHOUNUMKBN-COMB.
                     06  W02-CHIHOUNUMKBN.
                       07  W02-VALUE   PIC X(10).

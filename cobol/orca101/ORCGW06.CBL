@@ -167,8 +167,8 @@
                    07  SPA-ORCA21FLG-MAX       PIC 9(04).  
       *            請求書初期表示
                    07  SPA-GMN-SKYPRTFLG-LSTG.
-                       09  SPA-GMN-SKYPRTFLG-LST   PIC X(30)
-                                                   OCCURS  5. 
+                       09  SPA-GMN-SKYPRTFLG-LST   PIC X(32)
+                                                   OCCURS  9. 
                    07  SPA-SKYPRTFLG-MAX       PIC 9(04).  
       *            院外処方せん
                    07  SPA-GMN-SYOHOPRTFLG-LSTG.
@@ -182,8 +182,8 @@
                    07  SPA-YAKUJYOFLG-MAX      PIC 9(04).  
       *            診療費明細書
                    07  SPA-GMN-MEIPRTFLG-LSTG.
-                       09  SPA-GMN-MEIPRTFLG-LST   PIC X(26)
-                                                   OCCURS  3. 
+                       09  SPA-GMN-MEIPRTFLG-LST   PIC X(32)
+                                                   OCCURS  9. 
                    07  SPA-MEIPRTFLG-MAX      PIC 9(04).  
       *            検査正式名称表示
                    07  SPA-GMN-FORMALFLG-LSTG.
@@ -207,7 +207,7 @@
                    07  SPA-GMN-SKYPRTFLG-G. 
                        09  SPA-GMN-SKYPRTFLG       PIC X(01).
                        09  SPA-GMN-SKYPRTFLG-F1    PIC X(01).
-                       09  SPA-GMN-SKYPRTFLG-MEI   PIC X(28).
+                       09  SPA-GMN-SKYPRTFLG-MEI   PIC X(30).
       *            院外処方せん
                    07  SPA-GMN-SYOHOPRTFLG-G. 
                        09  SPA-GMN-SYOHOPRTFLG       PIC X(01).
@@ -222,7 +222,7 @@
                    07  SPA-GMN-MEIPRTFLG-G. 
                        09  SPA-GMN-MEIPRTFLG        PIC X(01).
                        09  SPA-GMN-MEIPRTFLG-F1     PIC X(01).
-                       09  SPA-GMN-MEIPRTFLG-MEI    PIC X(24).
+                       09  SPA-GMN-MEIPRTFLG-MEI    PIC X(30).
       *            検査正式名称表示
                    07  SPA-GMN-FORMALFLG-G. 
                        09  SPA-GMN-FORMALFLG        PIC X(01).
@@ -597,7 +597,7 @@
       *    請求書発行
            MOVE    "0 発行しない"      TO  SPA-GMN-SKYPRTFLG-LST (1)
            MOVE    "1 発行する"        TO  SPA-GMN-SKYPRTFLG-LST (2)
-           MOVE    "2 発行する（請求額あり）"
+           MOVE    "2 発行する（請求あり）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (3)
            MOVE    "3 発行する（訂正時なし）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (4)
@@ -620,9 +620,11 @@
       *    診療費明細書フラグ
            MOVE    "0 発行しない"      TO  SPA-GMN-MEIPRTFLG-LST (1)
            MOVE    "1 発行する"        TO  SPA-GMN-MEIPRTFLG-LST (2)
-           MOVE    "2 発行する（訂正時なし）" 
+           MOVE    "2 発行する（請求あり）" 
                                        TO  SPA-GMN-MEIPRTFLG-LST (3)
-           MOVE    3                   TO  SPA-MEIPRTFLG-MAX
+           MOVE    "3 発行する（訂正時なし）" 
+                                       TO  SPA-GMN-MEIPRTFLG-LST (4)
+           MOVE    4                   TO  SPA-MEIPRTFLG-MAX
       *    検査正式名称表示
            MOVE    "0 使用しない"      TO  SPA-GMN-FORMALFLG-LST(1)
            MOVE    "1 使用する"        TO  SPA-GMN-FORMALFLG-LST(2)
