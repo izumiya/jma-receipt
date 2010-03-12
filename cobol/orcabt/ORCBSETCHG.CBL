@@ -308,11 +308,11 @@
                05  FILLER              PIC X(08)   VALUE
                    "³«»ÏÆü¡§".
                05  PRT-SRYYMD          PIC X(22).
-               05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(02)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
       *******  05  PRT-TIME            PIC X(07)   VALUE   SPACE.
                05  FILLER              PIC X(02)   VALUE   "P.".
-               05  PRT-PAGE            PIC ZZZ9.
+               05  PRT-PAGE            PIC ZZ9.
            03  LST-PRT-HEAD2.
                05  FILLER              PIC X(12)   VALUE
                    "¥»¥Ã¥È£Ã£Ä".
@@ -504,6 +504,7 @@
                                        WRK-PARA-HOSPNUM
                                        RECEERR
                                        WRK-PARA-SYORIKBN
+                                       WRK-PARA-SRYYMD
       *
       *    £Ó£Ð£ÁÀßÄê
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
