@@ -4152,8 +4152,8 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    前期高齢者のチェック
            IF     (FLG-TOUROKU         =   1     )  AND
                   (SPA-ERRCD           =   SPACE )  AND
-                  (SPA-GMN-PTID    NOT =   ZERO  )  AND
-                  (SPA-NAI-NENREI      >=  70    )
+                  (SPA-GMN-PTID    NOT =   ZERO  )
+      *****  AND  (SPA-NAI-NENREI      >=  70    )
                IF      SPA-NAI-KEIFLG2     =   ZERO
                    PERFORM 41092-HKNHOJOKBN-CHK-SEC
                END-IF
@@ -4246,6 +4246,13 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                    MOVE    "K003"              TO  SPA-ERRCD
                END-IF
            END-IF
+      *H22.4 改正
+           IF      SPA-ERRCD           =   SPACE
+               IF      AGECHK-HKNCHK   NOT =   ZERO
+                   MOVE    "K006"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE    4                   TO  SPA-GMN-CUR
                MOVE    1                   TO  SPA-NAI-KEIFLG2
@@ -6022,6 +6029,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "K004"
                    STRING  "警告！！前期高齢者到達日以降に保険の確認が"
                            "ありません。保険を確認して下さい"
+                                                DELIMITED  BY  SIZE
+                                                INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K006"
+                   STRING  "警告！！"
+                           "保険組合せに矛盾があります。"
+                           "患者登録で保険を登録し直して下さい。"
                                                 DELIMITED  BY  SIZE
                                                 INTO  SPA-ERRMSG
                    END-STRING
