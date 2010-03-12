@@ -155,15 +155,15 @@
       *--Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤ËÂÐ½è¤òÄÉ²Ã¤·¤¿²Ã»»------------------------
       *    Ìë´Ö¶ÛµÞÂÎÀ©³ÎÊÝ²Ã»»
            03  CONS-200804-KSN1            PIC X(09) VALUE "190126470".
-      *    °å»ÕÇÛÃÖÅ¬¹ç²Ã»»
+      *    °å»ÕÇÛÃÖÅ¬¹ç²Ã»»¡Ê£²£²Ç¯£´·î°Ê¹ß¡¢°å»ÕÇÛÃÖ²Ã»»£²¡Ë
            03  CONS-200804-KSN2            PIC X(09) VALUE "190117070".
-      *    ´Ç¸îÇÛÃÖ²Ã»»£±
+      *    ´Ç¸îÇÛÃÖ²Ã»»£±¡Ê£²£²Ç¯£´·î°Ê¹ß¡¢´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
            03  CONS-200804-KSN3            PIC X(09) VALUE "190126570".
-      *    ´Ç¸îÇÛÃÖ²Ã»»£²
+      *    ´Ç¸îÇÛÃÖ²Ã»»£²¡Ê£²£²Ç¯£´·î°Ê¹ß¡¢´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
            03  CONS-200804-KSN4            PIC X(09) VALUE "190109670".
-      *    Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£±
+      *    Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ê£²£²Ç¯£´·î°Ê¹ß¡¢Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
            03  CONS-200804-KSN5            PIC X(09) VALUE "190126670".
-      *    Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²
+      *    Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ê£²£²Ç¯£´·î°Ê¹ß¡¢Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
            03  CONS-200804-KSN6            PIC X(09) VALUE "190126770".
       *    ½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÆÃÄêµ¡Ç½ÉÂ±¡Àº¿ÀÉÂÅï¡Ë
            03  CONS-200804-KSN7            PIC X(09) VALUE "190119210".
@@ -173,7 +173,6 @@
            03  CONS-200804-KSN9            PIC X(09) VALUE "190122670".
       *    ½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»
            03  CONS-200804-KSN10           PIC X(09) VALUE "190129870".
-      *----------------------------------------------------------------
       *
       *--Ê¿À®£²£²Ç¯£´·î°Ê¹ß¤ËÂÐ½è¤òÄÉ²Ã¤·¤¿²Ã»»------------------------
       *    ½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþÏ¢·È²Ã»»
@@ -761,6 +760,9 @@
            IF   LNK-SROUNYUIN-RC    NOT =   ZERO
                    GO   TO    200-MAIN-EXT
            END-IF
+      *
+      *Ï«ºÒÆþ±¡¤ÎÏ«ºÒ¾è¿ô¡Ê´ü´Ö²Ã»»¡Ë¤Ë´Þ¤á¤ëÃí²Ã»»¤Î¼èÆÀ
+           PERFORM    210-CHUKSN-GET-SEC
       *
       *Ï«ºÒÆþ±¡»þ¤Î³°Çñ¼èÆÀ
            INITIALIZE                          NYUINACCT-REC
@@ -1688,6 +1690,9 @@
                    GO   TO    200-MAIN-EXT
            END-IF
       *
+      *Ï«ºÒÆþ±¡¤ÎÏ«ºÒ¾è¿ô¡Ê´ü´Ö²Ã»»¡Ë¤Ë´Þ¤á¤ëÃí²Ã»»¤Î¼èÆÀ
+           PERFORM    210-CHUKSN-GET-SEC
+      *
       *Ï«ºÒÆþ±¡»þ¤Î³°Çñ¼èÆÀ
            INITIALIZE                          NYUINACCT-REC
            MOVE    LNK-SROUNYUIN-HOSPNUM   TO  NACCT-HOSPNUM
@@ -2384,35 +2389,8 @@
                    GO   TO    200-MAIN-EXT
            END-IF
       *
-      *ÅÀ¿ô¥Þ¥¹¥¿¤è¤êÃí²Ã»»¤ÎÂÐ¾Ý¿ÇÎÅ¥³¡¼¥É¤ò¼èÆÀ
-           MOVE   ZERO                     TO  IDX1
-           INITIALIZE                          TNS-TENSU-REC
-           MOVE   LNK-SROUNYUIN-HOSPNUM    TO  TNS-HOSPNUM
-           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOSTYMD(1:6)
-           MOVE   "01"                     TO  TNS-YUKOSTYMD(7:2)
-           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOEDYMD(1:6)
-           MOVE  "01"                      TO  TNS-YUKOEDYMD(7:2)
-           MOVE  "tbl_tensu"               TO  MCP-TABLE
-           MOVE  "key30"                   TO  MCP-PATHNAME
-           PERFORM 910-TENSU-SELECT-SEC
-           IF      FLG-TENSU               =   ZERO
-               MOVE     "tbl_tensu"        TO  MCP-TABLE
-               MOVE     "key30"            TO  MCP-PATHNAME
-               PERFORM   910-TENSU-FETCH-SEC
-               PERFORM   UNTIL   (FLG-TENSU  =   1)   OR
-                                 (IDX1       >=  20)
-                   ADD    1                TO  IDX1
-                   MOVE   TNS-SRYCD        TO  LNK-SROUNYUIN-CHUKSNSRYCD
-                                                                 (IDX1)
-                   MOVE   "tbl_tensu"      TO  MCP-TABLE
-                   MOVE   "key30"          TO  MCP-PATHNAME
-                   PERFORM 910-TENSU-FETCH-SEC
-               END-PERFORM
-           END-IF
-      *    ÅÀ¿ô¥Þ¥¹¥¿¥¯¥í¡¼¥º
-           MOVE     "tbl_tensu"       TO  MCP-TABLE
-           MOVE     "key30"           TO  MCP-PATHNAME
-           PERFORM   910-DB-CLOSE-SEC
+      *Ï«ºÒÆþ±¡¤ÎÏ«ºÒ¾è¿ô¡Ê´ü´Ö²Ã»»¡Ë¤Ë´Þ¤á¤ëÃí²Ã»»¤Î¼èÆÀ
+           PERFORM    210-CHUKSN-GET-SEC
       *
       *Ï«ºÒÆþ±¡»þ¤Î³°Çñ¼èÆÀ
            INITIALIZE                          NYUINACCT-REC
@@ -3812,6 +3790,47 @@
            .
       *
        210-SYS-5000-GET-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Ï«ºÒÆþ±¡¤ÎÏ«ºÒ¾è¿ô¡Ê´ü´Ö²Ã»»¡Ë¤Ë´Þ¤á¤ëÃí²Ã»»¤Î¼èÆÀ          *
+      ******************************************************************
+       210-CHUKSN-GET-SEC                 SECTION.
+      *
+      *ÅÀ¿ô¥Þ¥¹¥¿¤è¤êÃí²Ã»»¤ÎÂÐ¾Ý¿ÇÎÅ¥³¡¼¥É¤ò¼èÆÀ
+      *
+           MOVE   ZERO                     TO  IDX1
+           INITIALIZE                          TNS-TENSU-REC
+           MOVE   LNK-SROUNYUIN-HOSPNUM    TO  TNS-HOSPNUM
+           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOSTYMD(1:6)
+           MOVE   "01"                     TO  TNS-YUKOSTYMD(7:2)
+           MOVE   LNK-SROUNYUIN-SANTEIYM   TO  TNS-YUKOEDYMD(1:6)
+           MOVE  "01"                      TO  TNS-YUKOEDYMD(7:2)
+           MOVE  "tbl_tensu"               TO  MCP-TABLE
+           MOVE  "key30"                   TO  MCP-PATHNAME
+           PERFORM 910-TENSU-SELECT-SEC
+           IF      FLG-TENSU               =   ZERO
+               MOVE     "tbl_tensu"        TO  MCP-TABLE
+               MOVE     "key30"            TO  MCP-PATHNAME
+               PERFORM   910-TENSU-FETCH-SEC
+               PERFORM   UNTIL   (FLG-TENSU  =   1)   OR
+                                 (IDX1       >=  20)
+                   ADD    1                TO  IDX1
+                   MOVE   TNS-SRYCD        TO  LNK-SROUNYUIN-CHUKSNSRYCD
+                                                                 (IDX1)
+                   MOVE   "tbl_tensu"      TO  MCP-TABLE
+                   MOVE   "key30"          TO  MCP-PATHNAME
+                   PERFORM 910-TENSU-FETCH-SEC
+               END-PERFORM
+           END-IF
+      *    ÅÀ¿ô¥Þ¥¹¥¿¥¯¥í¡¼¥º
+           MOVE     "tbl_tensu"       TO  MCP-TABLE
+           MOVE     "key30"           TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+      *
+       210-CHUKSN-GET-EXT.
            EXIT.
       *
       *****************************************************************
