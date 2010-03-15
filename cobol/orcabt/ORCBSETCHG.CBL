@@ -830,11 +830,6 @@
       *
            PERFORM 2903-END-HENSYU-SEC
       *
-      *    IF      IDX-P               >   ZERO
-      *        確認リスト印刷
-      *        PERFORM 400-HCPOM2-PRINT-SEC
-      *    END-IF
-      *
            .
        200-MAIN-EXT.
            EXIT.
@@ -1526,6 +1521,9 @@
       *****************************************************************
        2903-END-HENSYU-SEC          SECTION.
       *
+           IF      IDX-P               =   ZERO
+               PERFORM 7001-PRT-INIT-SEC
+           END-IF
       *    確認件数
            ADD     3                   TO  IDX-P
            IF      IDX-P               >   LINE-MAX
