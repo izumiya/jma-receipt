@@ -471,6 +471,7 @@ FORM_files = \
 	      HCN63.red \
 	      HCN64.red \
 	      HCN65.red \
+	      HCPOM2.red \
 
 all:   
 
