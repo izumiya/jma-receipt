@@ -2043,7 +2043,16 @@
       *    再診で減点分以外は対象外
            IF     (SRY-SRYKBN          =   "12"  )  AND
                   (ACCT-ZAIKBN     NOT =   2     )
-               MOVE    ZERO                TO  WRK-ZAIKAISU
+      *        労災の再診時療養指導管理料は対象
+               IF     (SRY-SRYCD (01)      =   "101120030" )  OR
+                      (SRY-SRYCD (02)      =   "101120030" )  OR
+                      (SRY-SRYCD (03)      =   "101120030" )  OR
+                      (SRY-SRYCD (04)      =   "101120030" )  OR
+                      (SRY-SRYCD (05)      =   "101120030" )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO                TO  WRK-ZAIKAISU
+               END-IF
            END-IF
       *
       *    回数ゼロは対象外とする
