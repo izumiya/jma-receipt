@@ -2310,7 +2310,7 @@
       *
            EVALUATE    TRUE
            WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H220401 )
-               MOVE    15          TO  WRK-MAX
+               MOVE    16          TO  WRK-MAX
            WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H180401 )
                MOVE    13          TO  WRK-MAX
            WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H160401 )
