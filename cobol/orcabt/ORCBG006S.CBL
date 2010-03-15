@@ -864,11 +864,11 @@
            MOVE    WRK-CYUSURYO    TO  WRK-SURYO
       *
            PERFORM 250-TOKEI-SET-SEC
+           PERFORM 250-TOKEI-GOKEI-SET-SEC
            ELSE
                MOVE    WRK-CYUSRYCD    TO  WRK-SRYCD
                   MOVE    WRK-CYUSURYO TO  WRK-SURYO
                PERFORM 20011-NYUINACCT-GET-SEC
-
            END-IF
       *
            .
@@ -1164,7 +1164,8 @@
            MOVE    "合計"          TO  TOKEI-NAME
            MOVE    ZERO            TO  TOKEI-SRYSURYO
            PERFORM 900-TOKEI-READ-SEC
-           COMPUTE WRK-GSURYO      =   TNS-TEN *   WRK-SURYO
+           COMPUTE WRK-GSURYO      =   TNS-TEN *
+                                    (  WRK-SURYO *   WRK-KAISU )
            COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
                                    +   WRK-GSURYO
       *
@@ -1196,7 +1197,8 @@
            MOVE    "合計"          TO  TOKEI-NAME
            MOVE    ZERO            TO  TOKEI-SRYSURYO
            PERFORM 900-TOKEI-READ-SEC
-           COMPUTE WRK-GSURYO      =   TNS-TEN *   WRK-SURYO
+           COMPUTE WRK-GSURYO      =   TNS-TEN
+                                   * ( WRK-SURYO *   ACCT-DAY (1 IDX-D))
            COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
                                    +   WRK-GSURYO
       *
