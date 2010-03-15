@@ -1548,10 +1548,10 @@ path	key30   	{
  			AND   YUKOSTYMD  <=  :YUKOSTYMD
 			AND   YUKOEDYMD  >=  :YUKOEDYMD
                         AND   SRYCD  LIKE    '19%'
-                        AND   CHUKSNTSUBAN <> '0'
                         AND   MICMESUKSN =    0
                         AND   NYUTENTTLKBN =  903
                         AND   CDKBN_KBNNUM <  200
+                        AND   KOKUJISKBKBN2 =  7
 			ORDER  BY  KOUHYOJYUNNUM
 		;
 	};
