@@ -2859,6 +2859,7 @@
                IF     (FLG-NINCHI          =   1      )
                  AND  (LNK-ORCSC-PG        =   "K02"  )
                    IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "I" )
+                   AND    (WRK-COM-INPUTCD (IDX-Z) NOT =   "180033210")
                        MOVE    "0266"          TO  SPA-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
                    END-IF
