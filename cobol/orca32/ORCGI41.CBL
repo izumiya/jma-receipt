@@ -7271,7 +7271,7 @@
                    END-EVALUATE
                  END-PERFORM
                ELSE
-                 IF     SPA-NAI-SRYYM     <=     "200803"
+                 IF     SPA-NAI-SRYYM     <=     "201003"
       *            平成２０年４月以降の加算セットはこちらの処理
       *           （システム管理の病棟設定見直しによるもの）
                    PERFORM   VARYING   IDX7   FROM   1  BY  1
