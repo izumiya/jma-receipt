@@ -442,16 +442,16 @@
       *                小児入院医療管理料１
                        MOVE   "190129310"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "18"
-      *                回復期リハビリテーション病棟入院料１
+      *                回復期リハビリテーション病棟入院料１（基準未適合）
                        MOVE   "190129410"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "19"
-      *                回復期リハビリテーション病棟入院料１（生活療養）
+      *                回復期リハビリテーション病棟入院料１（生活療養）（基準未適合）
                        MOVE   "190129510"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "20"
-      *                回復期リハビリテーション病棟入院料２
+      *                回復期リハビリテーション病棟入院料２（基準未適合）
                        MOVE   "190129610"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "21"
-      *                回復期リハビリテーション病棟入院料２（生活療養）
+      *                回復期リハビリテーション病棟入院料２（生活療養）（基準未適合）
                        MOVE   "190129710"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "22"
       *                精神科救急入院料２
@@ -468,6 +468,18 @@
                WHEN    "26"
       *                小児入院医療管理料２
                        MOVE   "190140710"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "27"
+      *                回復期リハビリテーション病棟入院料１
+                       MOVE   "190141610"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "28"
+      *                回復期リハビリテーション病棟入院料１（生活療養）
+                       MOVE   "190141710"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "29"
+      *                回復期リハビリテーション病棟入院料２
+                       MOVE   "190141810"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "30"
+      *                回復期リハビリテーション病棟入院料２（生活療養）
+                       MOVE   "190141910"   TO  LNK-TOKNYUIN-SRYCD
              END-EVALUATE
            END-IF
       *
