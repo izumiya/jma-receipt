@@ -32,6 +32,7 @@
       *  03.04.00    NACL-多々納  06/12/01  自賠責健保準拠追加
       *  03.04.01    NACL-多々納  07/03/XX  リハビリ管理料追加（H19.4改正）
       *  03.05.00    NACL-多々納  07/05/08  グループ診療対応
+      *  04.05.00    NACL-多々納  10/03/15  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -112,6 +113,8 @@
            03  WRK-STR-SRYCD           PIC X(09).
            03  WRK-STR-YMD             PIC X(08).
            03  WRK-RIH-YMD             PIC X(08).
+      *
+           03  WRK-KEI-TENSU           PIC 9(08).
       *
       *    同一初回算定日コードテーブル
        01  TBL-AREA.
@@ -1734,9 +1737,22 @@
            PERFORM UNTIL   FLG-SANTEI      =   1
                IF     (SANTEI-MSANTEICNT   >   ZERO   )  AND
                       (SANTEI-SRYCD    NOT =   KEN2-SANTEI-SRYCD )
+      **           COMPUTE KEN2-SANTEI-MSANTEITEN
+      *                                    =   KEN2-SANTEI-MSANTEITEN
+      ***                                  +   SANTEI-MSANTEITEN
+      *           月２回は1200点の検査とする
+                  IF      (SANTEI-MSANTEICNT   >   1    )
+                   AND    (SANTEI-MSANTEITEN   <   1200 )
+                       COMPUTE WRK-KEI-TENSU   =   SANTEI-MSANTEITEN
+                                               +   1200
+                   ELSE
+                       COMPUTE WRK-KEI-TENSU   =   SANTEI-MSANTEITEN
+                                               *   SANTEI-MSANTEICNT
+                   END-IF
                    COMPUTE KEN2-SANTEI-MSANTEITEN
                                            =   KEN2-SANTEI-MSANTEITEN
-                                           +   SANTEI-MSANTEITEN
+                                           +   WRK-KEI-TENSU
+      *
                    PERFORM VARYING     IDX2    FROM   1   BY  1
                            UNTIL       IDX2    >   31
                        IF      SANTEI-DAY (IDX2)   >   ZERO

@@ -30,6 +30,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-多々納  05/11/29  MONFUNC 対応
       *  03.05.00    NACL-多々納  07/05/08  グループ診療対応
+      *  04.05.00    NACL-多々納  10/03/15  平成２２年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -59,6 +60,7 @@
            03  IDX-S               PIC 9(04).
       *
            03  IDX2                PIC 9(02).
+           03  IDD                 PIC 9(02).
       *
       *    一時領域
        01  WRK-AREA.
@@ -67,6 +69,8 @@
                05  WRK-DAY-9           PIC 9(02).
            03  WRK-SRYYMD              PIC X(08).
       *
+           03  WRK-KEI-TENSU           PIC 9(08).
+           03  WRK-KEI-TENSU-DEL       PIC 9(08).
            03  WRK-SUM-TENSU           PIC 9(08).
            03  WRK-SUM-TENSU-ALL       PIC 9(08).
            03  WRK-MSANTEITEN          PIC 9(08).
@@ -75,6 +79,10 @@
            03  WRK-IDX                 PIC 9(04).
            03  WRK-TENSU-KEI           PIC 9(08).
            03  WRK-TENSU-SA            PIC 9(08).
+      *
+           03  WRK-TENSU1              PIC 9(08).
+           03  WRK-TENSU2              PIC 9(08).
+           03  WRK-CNT                 PIC 9(08).
       *
        01  TBL-HENSYU-AREA.
            03  TBL-HENSYU-OCC          OCCURS  20.
@@ -262,9 +270,25 @@
                         MOVE    SANTEI-REC         TO  HZN-SANTEI-REC
                    END-IF
                    IF      FLG-OK              =   1
-                       ADD     SANTEI-MSANTEITEN   TO  WRK-SUM-TENSU
+      *                訂正時
+                       PERFORM 1001-TEI-TENSU-SEC
                    ELSE
-                       ADD     SANTEI-MSANTEITEN   TO  WRK-SUM-TENSU-ALL
+      *                月２回は1200点の検査とする
+                       IF     (SANTEI-MSANTEICNT   >   1    )
+                       AND    (SANTEI-MSANTEITEN   <   1200 )
+                           COMPUTE WRK-KEI-TENSU   =   SANTEI-MSANTEITEN
+                                                   +   1200
+                       ELSE
+                           COMPUTE WRK-KEI-TENSU   =   SANTEI-MSANTEITEN
+                                                   *   SANTEI-MSANTEICNT
+                       END-IF
+                       MOVE    ZERO                TO  WRK-KEI-TENSU-DEL
+                   END-IF
+                   ADD     WRK-KEI-TENSU       TO  WRK-SUM-TENSU-ALL
+                   ADD     WRK-KEI-TENSU-DEL   TO  WRK-SUM-TENSU
+                   IF      FLG-OK              =   1
+                       CONTINUE
+                   ELSE
                        MOVE    SANTEI-MSANTEID     TO
                                                    LNK-SANFUKA-MSANTEID
                        IF      SANTEI-MSANTEITENKBN    =   2
@@ -293,6 +317,49 @@
       *
            .
        1001-TEISEI-SUM-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    訂正点数処理
+      *****************************************************************
+       1001-TEI-TENSU-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  WRK-KEI-TENSU-DEL
+           MOVE    ZERO                TO  WRK-KEI-TENSU
+      *     月２回は1200点の検査とする
+           IF     (SANTEI-MSANTEICNT   >   1    )
+           AND    (SANTEI-MSANTEITEN   <   1200 )
+               MOVE    1200                TO  WRK-TENSU1
+               MOVE    SANTEI-MSANTEITEN   TO  WRK-TENSU2
+           ELSE
+               MOVE    SANTEI-MSANTEITEN   TO  WRK-TENSU1
+               MOVE    SANTEI-MSANTEITEN   TO  WRK-TENSU2
+           END-IF
+      *
+           MOVE    ZERO                TO  WRK-CNT
+           MOVE    LNK-SANFUKA-SRYYMD(7:2)     TO  IDD
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL       IDX2    >   31
+               IF      SANTEI-DAY (IDX2)   >   ZERO
+                   IF      IDD             =   IDX2
+                       IF      WRK-CNT         =   ZERO
+                           ADD     WRK-TENSU1      TO  WRK-KEI-TENSU-DEL
+                       ELSE
+                           ADD     WRK-TENSU2      TO  WRK-KEI-TENSU-DEL
+                       END-IF
+                   ELSE
+                       IF      WRK-CNT         =   ZERO
+                           ADD     WRK-TENSU1      TO  WRK-KEI-TENSU
+                       ELSE
+                           ADD     WRK-TENSU2      TO  WRK-KEI-TENSU
+                       END-IF
+                   END-IF
+                   ADD     1               TO  WRK-CNT
+               END-IF
+           END-PERFORM
+      *
+           .
+       1001-TEI-TENSU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -494,7 +561,21 @@
                    IF      SANTEI-SRYCD        =   WRK-HOU-SRYCD
                        MOVE    SANTEI-REC          TO  HZN-SANTEI-REC
                    ELSE
-                       ADD     SANTEI-MSANTEITEN   TO  WRK-TENSU-KEI
+      ***              ADD     SANTEI-MSANTEITEN   TO  WRK-TENSU-KEI
+      *            月２回は1200点の検査とする
+                   IF      SANTEI-MSANTEICNT   >   1
+                       IF      SANTEI-MSANTEITEN   <   1200
+                           COMPUTE WRK-KEI-TENSU   =   SANTEI-MSANTEITEN
+                                                   +   1200
+                       ELSE
+                           COMPUTE WRK-KEI-TENSU   =   SANTEI-MSANTEITEN
+                                                   *   SANTEI-MSANTEICNT
+                       END-IF
+                   ELSE
+                       MOVE    SANTEI-MSANTEITEN   TO  WRK-KEI-TENSU
+                   END-IF
+                       ADD     WRK-KEI-TENSU       TO  WRK-TENSU-KEI
+      *
                        IF     (SANTEI-MSANTEITENKBN    =   2  )
                           OR  (WRK-TENSU-KEI   >   LNK-SANFUKA-TEN-MAX)
                            PERFORM 10011-ERRHENSYU-SEC
