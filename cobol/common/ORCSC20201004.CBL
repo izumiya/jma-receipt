@@ -2789,18 +2789,27 @@
                MOVE    SPACE               TO  WRK-SRYCD
                MOVE    SPACE               TO  WRK-SRYCD2
                IF      FLG-YAKUJYO         =   ZERO
-                   IF      LNK-ORCSC-YAKJYO-2  =    1
-                                               OR   2
-                       MOVE    "113701310"         TO  WRK-SRYCD
-                       MOVE    "120002370"         TO  WRK-SRYCD2
-                   END-IF
-                   IF      LNK-ORCSC-YAKJYO-3  =   1
-                                               OR   2
+      *****        IF      LNK-ORCSC-YAKJYO-2  =    1
+      *                                        OR   2
+      *                MOVE    "113701310"         TO  WRK-SRYCD
+      *                MOVE    "120002370"         TO  WRK-SRYCD2
+      *            END-IF
+      *            IF      LNK-ORCSC-YAKJYO-3  =   1
+      *                                        OR   2
+      *                MOVE    "120002370"         TO  WRK-SRYCD
+      *                MOVE    "113701310"         TO  WRK-SRYCD2
+      ******       END-IF
+      *            いずれかの区分が自動発生ありの時
+                   IF     (LNK-ORCSC-YAKJYO-2      =    1
+                                                   OR   2  )
+                   OR     (LNK-ORCSC-YAKJYO-3      =    1
+                                                   OR   2  )
                        MOVE    "120002370"         TO  WRK-SRYCD
-                       MOVE    "113701310"         TO  WRK-SRYCD2
+                       MOVE    SPACE               TO  WRK-SRYCD2
                    END-IF
                END-IF
            END-IF
+      *
            IF      WRK-SRYCD           =   SPACE
                GO      TO      30022-INNAI-YAKUJYOUCHK-EXT
            END-IF
