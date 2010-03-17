@@ -63,6 +63,7 @@
            03  FLG-NAIBUN-DEL      PIC 9(01).
       *
            03  FLG-RKAN-OK         PIC 9(01).
+           03  FLG-FUKA-CHK        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -71,6 +72,7 @@
            03  IDX2                PIC 9(02).
       *
            03  IDX-Y2              PIC 9(02).
+           03  IDD                 PIC 9(02).
            03  IDX-RSI             PIC 9(02).
       *
       *    一時領域
@@ -1067,13 +1069,25 @@
                END-IF
       *        内分泌負荷試験用
                IF      SSANTEI-MSANTEITEN  >   ZERO
+                   MOVE    ZERO                TO  FLG-FUKA-CHK
+      *            １回目が後の時、そのまま（１回目の訂正）
+                   PERFORM VARYING     IDD     FROM    1   BY  1
+                           UNTIL       IDD     >   31
+                       IF     (SANTEI-DAY (IDD)    >   ZERO )
+                       AND    (IDD                 >   IDX-Y2)
+                           MOVE    1               TO  FLG-FUKA-CHK
+                           MOVE    31              TO  IDD
+                       END-IF
+                   END-PERFORM
       *            当月算定点数対象フラグ
                    MOVE    1                   TO  SANTEI-MSANTEIFLG
+                   IF     (FLG-FUKA-CHK        =   ZERO )
       *            当月算定点数
-                   MOVE    SSANTEI-MSANTEITEN  TO  SANTEI-MSANTEITEN
+                       MOVE    SSANTEI-MSANTEITEN  TO  SANTEI-MSANTEITEN
       *            当月算定点数区分
-                   MOVE    SSANTEI-MSANTEITENKBN
+                       MOVE    SSANTEI-MSANTEITENKBN
                                                TO  SANTEI-MSANTEITENKBN
+                   END-IF
                END-IF
            END-IF
       *
