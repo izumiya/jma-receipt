@@ -3163,7 +3163,15 @@
       *
            EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
       *
-      ***      WHEN   099  THRU  100 
+               WHEN   099  THRU  100
+                 IF   LNK-SROUNYUIN-SANTEIYM   >=   "201004"
+                   EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142190"    TO   WRK-GAIHAKU(IDX1)
+                   END-EVALUATE
+                 END-IF
                WHEN   201  THRU  219
                WHEN   221  THRU  222
                WHEN   224
