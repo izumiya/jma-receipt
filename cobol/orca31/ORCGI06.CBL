@@ -317,6 +317,7 @@
            03  FLG-KHNERR                  PIC 9(01).
            03  FLG-PTNUM                   PIC 9(01).
            03  FLG-TARGET                  PIC 9(01).
+           03  FLG-RYOTARGET               PIC 9(01).
            03  FLG-ROUJIN                  PIC 9(01).
            03  FLG-LIFE-RJN                PIC 9(01).
       *
@@ -416,6 +417,7 @@
                05  ITEM-TOKNYUIN-NYUIN     PIC X(02).
       *
        01  CONST-AREA.
+           03  CONST-H220401               PIC X(08)   VALUE "20100401".
            03  CONST-H200401               PIC X(08)   VALUE "20080401".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
@@ -441,6 +443,12 @@
       *
                    07                      PIC X(03)   VALUE   "220".
                    07                      PIC X(03)   VALUE   "221".
+      *
+                   07                      PIC X(03)   VALUE   "227".
+                   07                      PIC X(03)   VALUE   "228".
+      *
+                   07                      PIC X(03)   VALUE   "229".
+                   07                      PIC X(03)   VALUE   "230".
       *
                    07                      PIC X(03)   VALUE   "302".
                    07                      PIC X(03)   VALUE   "349".
@@ -490,12 +498,12 @@
                    07                      PIC X(03)   VALUE   "352".
                    07                      PIC X(03)   VALUE   "353".
                05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS  19.
+                   07  CONST-TOK-LIFECD-OCC    OCCURS  21.
                        09  CONST-TOK-LIFECD-IPN
                                            PIC X(03).
                        09  CONST-TOK-LIFECD-LIFE
                                            PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   19.
+               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   21.
       *
       *    スパ領域 ワーク
            COPY    "COMMON-SPA"      REPLACING
@@ -1231,6 +1239,15 @@
                MOVE    TNS-NAME    TO   SPA-NAI-KHNNYUIN
            END-IF
       *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "5001"          TO  SYS-KANRICD
+           MOVE    SPA-GMN-BTUNAME TO  SYS-KBNCD
+           MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    MCPDATA-REC TO  SYS-5001-REC
+      *
            IF    ( SPA-NAI-KJNYMD         >=   CONST-H180701 )
             AND  ( SPA-NAI-BTU-SBT     =   "04" OR "09" )
       *
@@ -1241,7 +1258,7 @@
                MOVE    "5111"          TO  SYS-KANRICD
                MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
-               PERFORM 900-SYSKANRI-KEY7-SEL-SEC
+               PERFORM 900-SYSKANRI-KEY23-SEL-SEC
                MOVE    SYSKANRI-REC    TO  SYS-5111-REC
                PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
       *
@@ -1278,6 +1295,80 @@
                        END-IF
                    END-IF
       *
+                   IF    ( SPA-NAI-KJNYMD >=  CONST-H220401 )
+                       IF    ( SYS-5111-SRYCD
+                                           =   "099999953"
+                                            OR "099999954" )
+                               MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                       IF    ( SYS-5001-KHNSRYCD
+                                           =   SPACE
+                                      OR       "099999953"
+                                      OR       "190121310"
+                                      OR       "190121410"
+                                      OR       "190121510"
+                                      OR       "190121610"
+                                      OR       "190121710"
+                                      OR       "190131610"
+                                      OR       "190132010"
+                                      OR       "190132210" )
+                           IF    ( SYS-5111-SRYCD
+                                           =   "190132410"
+                                      OR       "190132610"
+                                      OR       "190132810"
+                                      OR       "190133010"
+                                      OR       "190133210"
+                                      OR       "190133410"
+                                      OR       "190133610"
+                                      OR       "190133810"
+                                      OR       "190134010"
+                                      OR       "190132510"
+                                      OR       "190132710"
+                                      OR       "190132910"
+                                      OR       "190133110"
+                                      OR       "190133310"
+                                      OR       "190133510"
+                                      OR       "190133710"
+                                      OR       "190133910"
+                                      OR       "190134110" )
+                               MOVE  ZERO  TO  FLG-TARGET
+                           END-IF
+                       END-IF
+                       IF    ( SYS-5001-KHNSRYCD
+                                           =   "099999954"
+                                      OR       "190132410"
+                                      OR       "190132610"
+                                      OR       "190132810"
+                                      OR       "190133010"
+                                      OR       "190133210"
+                                      OR       "190133410"
+                                      OR       "190133610"
+                                      OR       "190133810"
+                                      OR       "190134010" )
+                           IF    ( SYS-5111-SRYCD
+                                           =   "190121310"
+                                      OR       "190121410"
+                                      OR       "190121510"
+                                      OR       "190121610"
+                                      OR       "190121710"
+                                      OR       "190131610"
+                                      OR       "190131810"
+                                      OR       "190132010"
+                                      OR       "190132210"
+                                      OR       "190123710"
+                                      OR       "190123810"
+                                      OR       "190123910"
+                                      OR       "190124010"
+                                      OR       "190124110"
+                                      OR       "190131710"
+                                      OR       "190131910"
+                                      OR       "190132110"
+                                      OR       "190132310" )
+                               MOVE  ZERO  TO  FLG-TARGET
+                           END-IF
+                       END-IF
+                   END-IF
+      *
                    IF    ( FLG-TARGET  =   1 )
       *
                        MOVE    "3"             TO  WRK-TOKNYUIN-KBN
@@ -1285,19 +1376,20 @@
                        PERFORM 31011-TOKNYUINLST-SET-SEC
                    END-IF
       *
-                   PERFORM 900-SYSKANRI-KEY7-FET-SEC
+                   PERFORM 900-SYSKANRI-KEY23-FET-SEC
                    MOVE    SYSKANRI-REC    TO  SYS-5111-REC
       *
                END-PERFORM
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key7"              TO  MCP-PATHNAME
+               MOVE    "key23"             TO  MCP-PATHNAME
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
            IF    ( SPA-NAI-BTU-BTUTOK  NOT =   SPACE )
       *
                EVALUATE    TRUE
-               WHEN  ( SPA-NAI-BTU-BTUTOK  =   "01" OR "02" OR "14" )
+               WHEN  ( SPA-NAI-BTU-BTUTOK  =   "01" OR "02" OR "14"
+                                            OR "17" OR "26" )
       *
                    INITIALIZE ORCSAGECHKAREA
                    MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
@@ -1343,8 +1435,10 @@
            END-IF
       *
       *    老人の場合、老人一般病棟特定入院基本料をコンボに設定
+      *    平成２２年４月から年齢要件廃止
            PERFORM 31011-ROUJIN-CHK-SEC
            IF    ( FLG-RJN         =   1 )
+            OR   ( SPA-NAI-KJNYMD >=  CONST-H220401 )
                MOVE    "3"         TO  WRK-TOKNYUIN-KBN
                MOVE    "22"        TO  WRK-TOKKBNCD
                PERFORM 31011-TOKNYUINLST-SET-SEC
@@ -6478,15 +6572,15 @@
        900-PTNUM-KEY2-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    システム管理マスタ検索処理(KEY7)
+      *    システム管理マスタ検索処理
       *****************************************************************
-       900-SYSKANRI-KEY7-SEL-SEC       SECTION.
+       900-SYSKANRI-KEY23-SEL-SEC      SECTION.
       *
            MOVE    ZERO                TO  FLG-SYSKANRI
       *
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
+           MOVE    "key23"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  SYSKANRI-REC
@@ -6496,18 +6590,18 @@
            END-IF
       *
            .
-       900-SYSKANRI-KEY7-SEL-EXT.
+       900-SYSKANRI-KEY23-SEL-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索処理(KEY7)
       *****************************************************************
-       900-SYSKANRI-KEY7-FET-SEC       SECTION.
+       900-SYSKANRI-KEY23-FET-SEC      SECTION.
       *
            MOVE    ZERO                TO  FLG-SYSKANRI
       *
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
+           MOVE    "key23"             TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  SYSKANRI-REC
@@ -6517,7 +6611,7 @@
            END-IF
       *
            .
-       900-SYSKANRI-KEY7-FET-EXT.
+       900-SYSKANRI-KEY23-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)
