@@ -1375,6 +1375,8 @@
            MOVE    SANTEI-SRYYM        TO  WRK-MAE-YMD(1:6)
            MOVE    SANTEI-MSANTEID     TO  WRK-MAE-DD
       *
+           MOVE    ZERO                TO  FLG-FUKA-CHK
+      *
            EVALUATE    SSANTEI-PG
                WHEN    "K03"
                    IF      SSANTEI-KAISU       =   ZERO
@@ -1408,6 +1410,10 @@
       *                    回数
                            ADD     SANTEI-DAY (IDX2)
                                                    TO  SANTEI-MSANTEICNT
+      *                    削除日より後に算定がある時
+                           IF      IDX2            >   IDX-Y2
+                               MOVE    1           TO  FLG-FUKA-CHK
+                           END-IF
                        END-IF
                    END-PERFORM
       *
@@ -1449,6 +1455,16 @@
       *    内分泌負荷試験削除フラグ
            IF      SANTEI-MSANTEIFLG   =   1
                MOVE    1               TO  FLG-NAIBUN-DEL
+               IF     (SSANTEI-PG          =   "K03"  )  AND
+                      (SANTEI-MSANTEICNT   >   ZERO   )  AND
+                      (FLG-FUKA-CHK        =   ZERO   )
+      *            削除で１回となった時
+                   IF     (KEN-SANTEI-MSANTEICNT   >   1 )
+                    AND   (KEN-SANTEI-MSANTEITEN   =   800 )
+                       MOVE    1               TO  SANTEI-MSANTEITENKBN
+                       MOVE    1200            TO  SANTEI-MSANTEITEN
+                   END-IF
+               END-IF
             END-IF
            IF      SANTEI-MSANTEICNT   =   ZERO
       *        初回算定日変更チェック
