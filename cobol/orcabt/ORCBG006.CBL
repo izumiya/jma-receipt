@@ -655,6 +655,30 @@
            MOVE    WRK-CYUSRYCD    TO  WRK-SRYCD
       *
            PERFORM 250-TOKEI-SET-SEC
+      *    統計データ合計
+           INITIALIZE                  TOKEI-REC
+           MOVE    WRK-NYUGAIKBN   TO  TOKEI-NYUGAIKBN
+           MOVE    WRK-INGAIKBN    TO  TOKEI-INGAIKBN
+           MOVE    TNS-YKZKBN      TO  TOKEI-YKZKBN
+           MOVE    "合計"          TO  TOKEI-KANANAME
+           MOVE    "999999999"     TO  TOKEI-SRYCD
+           MOVE    ACCT-SRYKA      TO  TOKEI-SRYKA
+           PERFORM 900-TOKEI-READ-SEC
+      *
+           IF      FLG-TOKEI       =   1
+               MOVE    "合計"          TO  TOKEI-NAME
+               COMPUTE WRK-SURYO       =   TNS-TEN *   WRK-SURYO
+               MOVE    ZERO            TO  TOKEI-SRYSURYO
+               COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
+                                       +   WRK-SURYO
+               WRITE   TOKEI-REC
+               COMPUTE CNT-TOKEI       =   CNT-TOKEI   +   1
+           ELSE
+               COMPUTE WRK-SURYO       =   TNS-TEN *   WRK-SURYO
+               COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
+                                       +   WRK-SURYO
+               REWRITE TOKEI-REC
+           END-IF
       *
            .
        250-TOKEI-CYU-HEN-EXT.
