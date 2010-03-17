@@ -413,6 +413,7 @@
       *
       *    コンスタント値
        01  CONST-AREA.
+           03  CONST-H2204                 PIC X(06)   VALUE "201004".
            03  CONST-H1904                 PIC X(06)   VALUE "200704".
            03  CONST-H1804                 PIC X(06)   VALUE "200604".
            03  CONST-H1810                 PIC X(06)   VALUE "200610".
@@ -1628,6 +1629,15 @@
        2001111-TAKIKAN-SEC             SECTION.
       *
            EVALUATE   WRK-NYUKHNKSNKBN
+           WHEN    099 THRU    100
+               IF    ( HCM34S01-SANTEIYM   >=  CONST-H2204 )
+                    EVALUATE   FLG-GAIHAKUDAY (IDXD)
+                    WHEN   4
+                        MOVE   "190108890" TO  WRK-GAIHAKU-SRYCD
+                    WHEN   5
+                        MOVE   "190142190" TO  WRK-GAIHAKU-SRYCD
+                    END-EVALUATE
+               END-IF
            WHEN    201 THRU    219
            WHEN    221 THRU    222
            WHEN    224
@@ -1683,6 +1693,15 @@
        2001111-SENTEI-TAKIKAN-SEC      SECTION.
       *
            EVALUATE    WRK-NYUKHNKSNKBN
+           WHEN    099 THRU  100
+               IF    ( HCM34S01-SANTEIYM   >=  CONST-H2204 )
+                    EVALUATE   FLG-GAIHAKUDAY (IDXD)
+                    WHEN   4
+                        MOVE   "190108890" TO  WRK-GAIHAKU-SRYCD
+                    WHEN   5
+                        MOVE   "190142190" TO  WRK-GAIHAKU-SRYCD
+                    END-EVALUATE
+               END-IF
            WHEN    201 THRU  219
            WHEN    221 THRU  222
            WHEN    224
@@ -4679,8 +4698,7 @@
                    UNTIL ( IDXB    >   SRT-MAX )
                     OR   ( IDXB    >   CONST-HENKYAKU-MAX )
       *
-               IF    ( SRT-ZAITEN   (IDXB) NOT =   ZERO )
-                AND  ( SRT-ZAIKAISU (IDXB) NOT =   ZERO )
+               IF    ( SRT-ZAIKAISU (IDXB) NOT =   ZERO )
       *
                    COMPUTE HCM34S01-HENKYAKU-MAX
                        =   HCM34S01-HENKYAKU-MAX   +   1

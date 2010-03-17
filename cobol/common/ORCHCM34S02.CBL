@@ -3120,7 +3120,17 @@
                                                190109170   OR
                                                190807570   OR
                                                190109270   OR
-                                               190808670 )
+                                               190808670   OR
+                                               190135570   OR
+                                               190135070   OR
+                                               190131570   OR
+                                               190134270   OR
+                                               190118570   OR
+                                               190134870   OR
+                                               190134970   OR
+                                               190135470   OR
+                                               190135670
+                                                  )
                OR   (( NACCT-SRYCDTOTAL    =   190116990   OR
                                                190813390 ) AND
                      ( HCM34S01-SANTEIYM   <  "200604"     ))
@@ -3138,9 +3148,11 @@
                                                190126770 OR
                                                190119210 OR
                                                190121970 OR
-                                               190122670 OR
-                                               190129870 ) AND
+                                               190122670 ) AND
                      ( HCM34S01-SANTEIYM  >= "200804"      ))
+               OR   (( NACCT-SRYCDTOTAL  =     190129870 ) AND
+                     ( HCM34S01-SANTEIYM  >= "200804" AND
+                       HCM34S01-SANTEIYM  <= "201003"    ))
                        MOVE    ZERO    TO  FLG-TARGET
                END-IF
       *
