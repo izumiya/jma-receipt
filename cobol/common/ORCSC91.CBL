@@ -1126,6 +1126,12 @@
                    MOVE    SPACE           TO  WRK-CHK
                END-IF
            END-IF
+      *    Ｈ２２.４から薬剤情報と同時チェックなし
+           IF     (WRK-CODE            =   "002" )   AND
+                  (SPA-SRYYMD          >=  "201004001" )
+               MOVE    SPACE           TO  WRK-CODE
+               MOVE    SPACE           TO  WRK-CHK
+           END-IF
       *
            .
        1001-CODECHK-EXT.
@@ -1242,6 +1248,11 @@
                       ((SPA-YAKJYO-2        =   2 ) OR
                        (SPA-YAKJYO-3        =   2 )) )
                    MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
+                   MOVE    SPACE               TO  LNK-SC91-ERRCD
+               END-IF
+      *        H22.4　から併用算定チェックなしとする（手帳加算対象外）
+               IF     (SPA-SRYYMD          >=  "20100401" )
+                   MOVE    SPACE               TO  LNK-SC91-ERRCD2
                    MOVE    SPACE               TO  LNK-SC91-ERRCD
                END-IF
            END-IF
