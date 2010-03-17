@@ -3262,6 +3262,8 @@
                WHEN   77
                WHEN   78
                WHEN   79
+               WHEN   83
+               WHEN   84
                    MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
            END-EVALUATE
            IF  TNS-SRYCD      =    "190121810"
