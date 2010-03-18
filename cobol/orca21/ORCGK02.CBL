@@ -1568,6 +1568,11 @@
                    MOVE    ZERO            TO  SPA-HKTKEI-FLG
       *            生活習慣病の警告
                    MOVE    ZERO            TO  SPA-SEIKATU-FLG
+      *!!          H22.4　から流用
+                   IF      SPA-SRYYMD          >=  "20100401"
+                        MOVE    ZERO                TO  SPA-SAISIN-CHK
+                   END-IF
+      *!!
       *            診療行為、計計算処理、編集
                    MOVE    SPACE           TO  FLG-TOROKU
                    PERFORM 510-TBLHEN-SEC
@@ -2638,6 +2643,22 @@
       *            画面制御
                    MOVE    "JOIN"              TO  WRK-PUTTYPE
                    PERFORM 41002-KOUSIN-SYORI-SEC
+      *!!
+      *平成２２年４月から　SPA-SAISIN-CHK　を流用
+      *        手帳加算の算定確認
+               WHEN    "2003"
+                   IF      SPA-KID1-FLG        =   "OK"
+                       MOVE    2                   TO  SPA-SAISIN-CHK
+                   ELSE
+                       MOVE    1                   TO  SPA-SAISIN-CHK
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            画面制御
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *!!
+      *!!
       *
       *        再診の振替え
                WHEN    "0114"
@@ -8236,7 +8257,9 @@
            MOVE    SPA-TOKUTEIG-KNJ    TO LNK-ORCSC-TOKUTEIG-KNJ
            MOVE    SPA-TOKUTEIG-KNJ2   TO LNK-ORCSC-TOKUTEIG-KNJ2
       *    再診チェック済
-           MOVE    SPA-SAISIN-CHK      TO  LNK-ORCSC-SAISIN-CHK
+           IF      SPA-SRYYMD          <   "20100401"
+               MOVE    SPA-SAISIN-CHK      TO  LNK-ORCSC-SAISIN-CHK
+           END-IF
       *    消炎鎮痛処置当月内算定
            MOVE    SPA-SYOEN-CNT       TO  LNK-ORCSC-SYOEN-CNT
       *    急性発生１８０日以内
@@ -8306,7 +8329,9 @@
       *        厚生省が定める患者
                MOVE    LNK-ORCSC-TOKUTEIG-KNJ  TO  SPA-TOKUTEIG-KNJ
       *        再診チェック済
-               MOVE    LNK-ORCSC-SAISIN-CHK    TO  SPA-SAISIN-CHK
+               IF      SPA-SRYYMD          <   "20100401"
+                   MOVE    LNK-ORCSC-SAISIN-CHK    TO  SPA-SAISIN-CHK
+               END-IF
                MOVE    LNK-ORCSC-CHK-IDX       TO  SPA-CHK-IDX
       *        労災用 外来管理点数
                MOVE    LNK-ORCSC-GAIRAI-TEN    TO  SPA-GAIRAI-TEN
@@ -12569,6 +12594,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            DELIMITED  BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *!!!
+      *H22.4
+               WHEN    "2003"
+                   STRING  "手帳記載加算（薬剤情報提供料）を"
+                           "算定します。"
+                           "よろしいですか？"
+                                           DELIMITED  BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
                WHEN    OTHER
                    MOVE    SPA-KIDCD
                                        TO  WRK-KIDMSG
@@ -12600,6 +12634,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "2002"
                WHEN    "0127"
                WHEN    "0131"
+               WHEN    "2003"
                    MOVE    "ＮＯ"            TO  KID1-B01
            END-EVALUATE
       *

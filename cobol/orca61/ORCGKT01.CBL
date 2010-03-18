@@ -1286,6 +1286,11 @@
                    MOVE    SPACE           TO  SPA-TOKUTEI-SRYKA 
                    MOVE    ZERO            TO  SPA-HKTKEI-FLG
                    MOVE    ZERO            TO  SPA-NAI-SEIKATUCHK
+      *!!          H22.4　から流用
+                   IF      SPA-SRYYMD          >=  "20100401"
+                        MOVE    ZERO                TO  SPA-SAISIN-CHK
+                   END-IF
+      *!!
       *            最後の日を診療日とする
                    MOVE    SPA-NAI-SRYDD       TO  SPA-GMN-SRYDD
                    MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
@@ -1689,6 +1694,21 @@
       *            画面制御
                    MOVE    "JOIN"              TO  WRK-PUTTYPE
                    PERFORM 41002-KOUSIN-SYORI-SEC
+      *!!
+      *平成２２年４月から　SPA-SAISIN-CHK　を流用
+      *        手帳加算の算定確認
+               WHEN    "2003"
+                   IF      SPA-KID1-FLG        =   "OK"
+                       MOVE    2                   TO  SPA-SAISIN-CHK
+                   ELSE
+                       MOVE    1                   TO  SPA-SAISIN-CHK
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            画面制御
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *!!
       *
       *        クリアの確認
                WHEN    "0116"
@@ -8951,6 +8971,13 @@
                                            DELIMITED  BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H22.4
+               WHEN    "2003"
+                   STRING  "手帳記載加算（薬剤情報提供料）を"
+                           "算定します。"
+                           "よろしいですか？"
+                                           DELIMITED  BY  SIZE
+                                       INTO    WRK-KIDMSG
                WHEN    OTHER
                    MOVE    SPA-KIDCD
                                        TO  WRK-KIDMSG
@@ -8971,6 +8998,7 @@
       *
                WHEN    "0230"
                WHEN    "0213"
+               WHEN    "2003"
                    MOVE    "ＮＯ"            TO  KTID1-B01
            END-EVALUATE
       *
