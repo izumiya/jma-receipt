@@ -8978,6 +8978,7 @@
                            "よろしいですか？"
                                            DELIMITED  BY  SIZE
                                        INTO    WRK-KIDMSG
+                   END-STRING
                WHEN    OTHER
                    MOVE    SPA-KIDCD
                                        TO  WRK-KIDMSG
