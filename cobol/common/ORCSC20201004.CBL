@@ -3776,6 +3776,23 @@
                PERFORM 30012-KAYJYO-SENCHK-SEC
            END-IF
            IF      FLG-ERR             =   ZERO
+      *!!!
+               MOVE    SPACE               TO  WRK-SRYCD2
+      *        ¼êÄ¢²Ã»»¤ÎÈ½Äê¡ÊÏ·¿Í¤Î¤ß¡Ë
+               IF     (LNK-ORCSC-YAKJYO-2      =    1
+                                               OR   2  ) AND
+                      (LNK-ORCSC-ROUJIN    NOT =   0   )
+                   IF      SPA-SAISIN-CHK      =   ZERO 
+                       MOVE    "2003"          TO  LNK-ORCSC-KIDCD
+                       GO     TO  3003-YAKJYO-CHK-EXT
+                   END-IF
+                   IF      SPA-SAISIN-CHK      =   1
+                       MOVE    SPACE               TO  WRK-SRYCD2
+                   ELSE
+                       MOVE    "113701310"         TO  WRK-SRYCD2
+                   END-IF
+               END-IF
+      *!!!
                ADD     1               TO  IDXS
                MOVE    WRK-SRYCD       TO  LNK-ORCSC-SRYCD
                                                    (02 IDXS)
@@ -3792,6 +3809,19 @@
                END-IF
       *        Ç¯Îð²Ã»»½èÍý
                PERFORM 3002-NENREI-KASAN-SEC
+      *!!!
+               IF      WRK-SRYCD2      NOT =   SPACE
+                    MOVE    WRK-SRYCD2          TO  TNS-SRYCD
+                    MOVE    ZERO                TO  FLG-TENSUPLUS-CHK
+                    PERFORM 910-TENSU-READ-SEC
+                    IF      FLG-TENSU           =   ZERO
+      *                ²Ã»»ÎÁ·×»»
+                       MOVE    WRK-SRYCD2      TO  LNK-ORCSC-SRYCD-KS
+                                                       (02 IDXS)
+                       MOVE    TNS-TEN         TO  LNK-ORCSC-TENSU-KS
+                                                       (02 IDXS)
+               END-IF
+      *!!!
            END-IF
       *
            .
