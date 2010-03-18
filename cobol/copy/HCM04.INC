@@ -21,3 +21,4 @@
             02  HCM04-IRYOTEL   PIC X(15).
             02  HCM04-LABEL1    PIC X(16).
             02  HCM04-LABEL2    PIC X(126).
+            02  HCM04-LOPTION   PIC X(50).
