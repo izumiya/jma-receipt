@@ -240,6 +240,7 @@
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¥Ñ¥é¥á¥¿
        01  PARA-AREA.
            03  PARA-GOKEITANI          PIC X(01).
+           03  PARA-SHADE              PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -387,6 +388,10 @@
            MOVE    "GOKEITANI"         TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-GOKEITANI
+      *    ÌÖ³Ý¤±
+           MOVE    "SHADE"             TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-SHADE
       *
            .
        100-OPTION-SELECT-EXT.
@@ -1465,6 +1470,41 @@
            ELSE
                MOVE    CONS-LABEL1         TO  HCM04-LABEL2
            END-IF
+      *
+           EVALUATE   PARA-SHADE
+               WHEN    "0"
+      *            ÌÖ³Ý¤±¤Ê¤·
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L1  -L L2 -L L3 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCM04-LOPTION
+                   END-STRING
+               WHEN    "1"
+      *            ÌÖ³Ý¤ÎÇ»¤µ£±
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L2  -L L3 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCM04-LOPTION
+                   END-STRING
+               WHEN    "2"
+      *            ÌÖ³Ý¤ÎÇ»¤µ£²
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L1  -L L3 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCM04-LOPTION
+                   END-STRING
+               WHEN    OTHER
+      *            ÌÖ³ÝÇ»¤µ£³¡ÊÉ¸½à¡Ë
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L1  -L L2 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCM04-LOPTION
+                   END-STRING
+           END-EVALUATE
            .
        300-HCM04-HEN-EXT.
            EXIT.
