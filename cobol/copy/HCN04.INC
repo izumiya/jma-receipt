@@ -23,3 +23,4 @@
             02  HCN04-IRYOTEL   PIC X(15).
             02  HCN04-LABEL1    PIC X(16).
             02  HCN04-LABEL2    PIC X(126).
+            02  HCN04-LOPTION   PIC X(50).
