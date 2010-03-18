@@ -358,6 +358,13 @@
            MOVE    ZERO           TO   ORCHC04-PAGE
       *
            ACCEPT  SYS-TIME            FROM    TIME
+           IF    ( ORCHC04-PAGE-CNT    IS  NOT NUMERIC )
+               MOVE    ZERO       TO   WRK-PAGE-CNT
+           ELSE
+               MOVE    ORCHC04-PAGE-CNT
+                                  TO   WRK-PAGE-CNT
+           END-IF
+      *
       *
       *    プログラムオプション取込み
            PERFORM 100-OPTION-SELECT-SEC
@@ -373,6 +380,7 @@
            END-IF
       *
       *
+           MOVE    WRK-PAGE-CNT    TO  ORCHC04-PAGE-CNT
            .
        000-PROC-EXT.
            EXIT    PROGRAM
@@ -488,6 +496,7 @@
            ADD     1                   TO  WRK-PAGE-CNT
            MOVE    WRK-PAGE-CNT        TO  HC01PARA-CNT
            OPEN    OUTPUT              PRT-FILE
+      *
       *
            .
        400-SYOKI-PRINT-EXT.

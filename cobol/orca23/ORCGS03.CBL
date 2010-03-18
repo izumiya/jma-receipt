@@ -195,6 +195,7 @@
                        09  SPA-NAI-DISCOUNT-TEIRITU    PIC  X(01).
                        09  SPA-NAI-DISCOUNT-RATE       PIC  9(07).
                        09  SPA-NAI-DISCOUNT-MONEY      PIC  9(07).
+                       09  SPA-NAI-GRP-DENPNUM         PIC  9(07).
                    07  SPA-NAI-INPUT-AREA.
                        09  SPA-NAI-SKYMONEY-MOTO   PIC S9(10).
                        09  SPA-NAI-NYUKINYMD       PIC X(08).
@@ -233,6 +234,7 @@
            03  FLG-SMEILIST1-ROW                   PIC 9(01).
            03  FLG-HIZUKE-ERR                      PIC 9(01).
            03  FLG-PTINF                           PIC 9(01).
+           03  FLG-SYUTTL                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -336,7 +338,9 @@
        01  SYURRK-REC.
            COPY    "CPSYURRK.INC".
       *
-      *
+      *    収納合計マスタ
+       01  SYUTOTAL-REC.
+           COPY    "CPSYUTOTAL.INC".
       *
       *************************************************************
       *    サブプロ用　領域
@@ -366,7 +370,6 @@
       *
       *    収納履歴編集サブ
            COPY    "CPORCSS002.INC".
-      *
       *
        01  LNK-SYUNOU-REC.
            COPY "CPSYUNOU.INC" REPLACING //SYU-// BY //LNK-SYU-//.
@@ -740,7 +743,7 @@
                MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                MOVE    "1039"              TO  SYS-KANRICD
                MOVE    "*"                 TO  SYS-KBNCD
-               MOVE    SPA-S01-SRYYMD      TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
                                                SYS-EDYUKYMD
                MOVE    SYSKANRI-REC        TO  MCPDATA-REC
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -773,7 +776,7 @@
                MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                MOVE    "1001"              TO  SYS-KANRICD
                MOVE    "*"                 TO  SYS-KBNCD
-               MOVE    SPA-S01-SRYYMD      TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
                                                SYS-EDYUKYMD
                MOVE    SYSKANRI-REC        TO  MCPDATA-REC
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -823,7 +826,7 @@
                MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                MOVE    "1039"              TO  SYS-KANRICD
                MOVE    "*"                 TO  SYS-KBNCD
-               MOVE    SPA-S01-SRYYMD      TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
                                                SYS-EDYUKYMD
                MOVE    SYSKANRI-REC        TO  MCPDATA-REC
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -849,6 +852,12 @@
                    MOVE    SPA-GMN-SRYPRTLST (1)
                                        TO  SPA-GMN-SRYPRT-G
                END-IF
+           END-IF
+      *
+           PERFORM 900-PTINF-KEY-SEL-SEC
+           IF    ( PTINF-SKYPRTFLG     =   "0" OR "4" OR "5" OR "6" )
+                   MOVE    SPA-GMN-SRYPRTLST (1)
+                                       TO  SPA-GMN-SRYPRT-G
            END-IF
       *
            IF    ( SPA-NAI-HEAD-DENPJTIKBN =    "3" )
@@ -1027,6 +1036,9 @@
            MOVE    SYU-DISCOUNT-TEIRITU TO SPA-NAI-DISCOUNT-TEIRITU
            MOVE    SYU-DISCOUNT-RATE   TO  SPA-NAI-DISCOUNT-RATE
            MOVE    SYU-DISCOUNT-MONEY  TO  SPA-NAI-DISCOUNT-MONEY
+      *
+      *    グループ伝票番号
+           MOVE    SYU-GRP-DENPNUM     TO  SPA-NAI-GRP-DENPNUM
       *
       *    合計請求額計算処理
            PERFORM 3102-SEIKYU-KEI-SEC
@@ -2944,6 +2956,12 @@
            PERFORM 49021-SYUNOU-UPD-SEC
       *
            IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-NAI-PROC-FLG    =   1  OR  2 )
+                   PERFORM 49021-SYUTTL-UPD-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 49021-SYUMEI-UPD-SEC
            END-IF
       *
@@ -3023,6 +3041,36 @@
       *
            .
        49021-SYUNOU-UPD-EXT.
+           EXIT.
+      *************************************************************
+      *    収納合計マスタ更新処理
+      *************************************************************
+       49021-SYUTTL-UPD-SEC            SECTION.
+      *
+           PERFORM 900-SYUTOTAL-KEY-SEL-SEC
+           IF    ( FLG-SYUTTL      =   ZERO )
+      *
+               COMPUTE SYUTTL-SKYMONEY
+                   =   SYUTTL-SKYMONEY
+                   -   SPA-NAI-SKYMONEY-MOTO
+                   +   SPA-GMN-CHOSEIIN
+               COMPUTE SYUTTL-CHOSEI
+                   =   SYUTTL-CHOSEI
+                   -   SPA-NAI-SKYMONEY-MOTO
+                   +   SPA-GMN-CHOSEIIN
+      *
+               MOVE    SYUTOTAL-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syutotal"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               IF    ( MCP-RC              NOT =   ZERO )
+                   MOVE    "1003"          TO  SPA-ERRCD
+               END-IF
+      *
+           END-IF
+      *
+           .
+       49021-SYUTTL-UPD-EXT.
            EXIT.
       *************************************************************
       *    収納明細作成処理
@@ -3462,6 +3510,7 @@
                                        TO  SPA-ERRMSG
            WHEN    "1001"
            WHEN    "1002"
+           WHEN    "1003"
                MOVE    "収納の更新処理でエラーになりました"
                                        TO  SPA-ERRMSG
            WHEN    "1003"
@@ -3656,6 +3705,35 @@
       *
            .
        900-SYUNOU-KEY-SEL-EXT.
+           EXIT.
+      *************************************************************
+      *    収納合計マスター検索処理
+      *************************************************************
+       900-SYUTOTAL-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUTTL
+           INITIALIZE                       SYUTOTAL-REC
+           MOVE    SPA-HOSPNUM         TO  SYUTTL-HOSPNUM
+           MOVE    SPA-S01-NYUGAIKBN   TO  SYUTTL-NYUGAIKBN
+           MOVE    SPA-S01-PTID        TO  SYUTTL-PTID
+           MOVE    SPA-NAI-GRP-DENPNUM TO  SYUTTL-DENPNUM
+           MOVE    SYUTOTAL-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syutotal"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUTOTAL-REC
+           ELSE
+               MOVE    1               TO  FLG-SYUTTL
+               INITIALIZE                  SYUTOTAL-REC
+           END-IF
+      *
+           MOVE    "tbl_syutotal"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYUTOTAL-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

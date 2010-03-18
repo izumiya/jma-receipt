@@ -21,3 +21,6 @@
                 05  SID2-VALUE  PIC X(10).
               04  SID2-ID1MSG.
                 05  SID2-VALUE  PIC X(70).
+              04  SID2-B11-LABEL      PIC X(30).
+              04  SID2-B12-LABEL      PIC X(30).
+

@@ -6,5 +6,11 @@ SID2	{
 		ID1MSG	{
 			value	varchar(70);
 		};
+		B11	{
+			label	varchar(30);
+		};
+		B12	{
+			label	varchar(30);
+		};
 	};
 };
