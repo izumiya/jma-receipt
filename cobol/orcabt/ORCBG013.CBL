@@ -952,6 +952,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
                GO  TO  2101-SEIKYU-PG-CALL-EXT
            END-IF
       *
+           MOVE    "00102"         TO      WRK-FILEMEI-CD
+      *
            MOVE    WRK-SRYYMD      TO      SPA-SRYYMD
            PERFORM 21011-SEIKYU-PG-CALL-SEC
       *

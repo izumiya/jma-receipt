@@ -358,6 +358,13 @@
       *
            MOVE    ZERO           TO   ORCHC04-PAGE
       *
+           IF    ( ORCHC04-PAGE-CNT    IS  NOT NUMERIC )
+               MOVE    ZERO       TO   WRK-PAGE-CNT
+           ELSE
+               MOVE    ORCHC04-PAGE-CNT
+                                  TO   WRK-PAGE-CNT
+           END-IF
+      *
            ACCEPT  SYS-TIME            FROM    TIME
       *
       *    プログラムオプション取込み
@@ -373,6 +380,7 @@
                PERFORM 202-KAKHOU-SYUNOU-SEC
            END-IF
       *
+           MOVE    WRK-PAGE-CNT    TO  ORCHC04-PAGE-CNT
       *
            .
        000-PROC-EXT.
@@ -488,6 +496,7 @@
       *
            ADD     1                   TO  WRK-PAGE-CNT
            MOVE    WRK-PAGE-CNT        TO  HC01PARA-CNT
+      *
            OPEN    OUTPUT              PRT-FILE
       *
            .

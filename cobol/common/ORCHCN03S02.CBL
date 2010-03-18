@@ -600,15 +600,6 @@
            IF    ( LNKSYU-DENPNUM      =   SYU-DENPNUM )
                CONTINUE
            ELSE
-               IF    ( ORCHCN03S02-GRP-CNT >=  CONST-GRP-MAX )
-                   CONTINUE
-               ELSE
-                   COMPUTE ORCHCN03S02-GRP-CNT
-                       =   ORCHCN03S02-GRP-CNT +   1
-                   MOVE    SYU-DENPNUM TO  ORCHCN03S02-GRP-DENPNUM
-                                                  (ORCHCN03S02-GRP-CNT)
-               END-IF
-      *
                IF    ( ORCHCN03-HAKKOFLG (ORCHCN03S02-IDX)  =   1 )
                    COMPUTE ORCHCN03-SEIKYU-TAX-SAI (ORCHCN03S02-IDX)
                        =   ORCHCN03-SEIKYU-TAX-SAI (ORCHCN03S02-IDX)
@@ -623,6 +614,15 @@
                        +   SYU-NYUKIN-TOTAL
                END-IF
       *
+           END-IF
+      *
+           IF    ( ORCHCN03S02-GRP-CNT >=  CONST-GRP-MAX )
+               CONTINUE
+           ELSE
+               COMPUTE ORCHCN03S02-GRP-CNT
+                   =   ORCHCN03S02-GRP-CNT +   1
+               MOVE    SYU-DENPNUM TO  ORCHCN03S02-GRP-DENPNUM
+                                              (ORCHCN03S02-GRP-CNT)
            END-IF
       *
            IF    ( WRK-DENPNUM         =   ZERO )

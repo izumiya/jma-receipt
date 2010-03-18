@@ -1016,10 +1016,6 @@
                                        SYUNOU-REC
                                        SPA-AREA
                IF    ( ORCHCN03S02-PRTFLG  =   1 )
-                   COMPUTE IDX-MAX =   IDX-MAX +   1
-                   MOVE    ORCHCN03-DENPNUM (IDX-M)
-                                   TO  TSYUGRP-GRP-DENPNUM
-                                               (TSYUGRP-MAX IDX-MAX)
                    PERFORM VARYING IDX0    FROM    1   BY  1
                            UNTIL ( IDX0    >   ORCHCN03S02-GRP-CNT )
                        COMPUTE IDX-MAX =   IDX-MAX +   1

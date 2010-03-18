@@ -782,7 +782,7 @@
                MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                MOVE    "1039"              TO  SYS-KANRICD
                MOVE    "*"                 TO  SYS-KBNCD
-               MOVE    SPA-S01-SRYYMD      TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
                                                SYS-EDYUKYMD
                MOVE    SYSKANRI-REC        TO  MCPDATA-REC
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -856,7 +856,7 @@
                MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                MOVE    "1039"              TO  SYS-KANRICD
                MOVE    "*"                 TO  SYS-KBNCD
-               MOVE    SPA-S01-SRYYMD      TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
                                                SYS-EDYUKYMD
                MOVE    SYSKANRI-REC        TO  MCPDATA-REC
                MOVE    "tbl_syskanri"      TO  MCP-TABLE

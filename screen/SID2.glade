@@ -13,7 +13,7 @@
 <widget>
   <class>GtkWindow</class>
   <name>SID2</name>
-  <width>523</width>
+  <width>524</width>
   <height>120</height>
   <signal>
     <name>map_event</name>
@@ -101,9 +101,9 @@
     <widget>
       <class>GtkButton</class>
       <name>B11</name>
-      <x>196</x>
+      <x>192</x>
       <y>88</y>
-      <width>128</width>
+      <width>140</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
