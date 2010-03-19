@@ -354,6 +354,17 @@
                    MOVE    "7006"          TO  SPA-ERRCD
                    MOVE    "1"             TO  SPA-COM-CUR(IDX)
                END-IF
+      *!!!
+      *    ∞ÂŒ≈¥—ª°À°¿ÏÕ—§Œ•≥°º•…»ΩƒÍ
+               IF      SPA-ERRCD           =   SPACE
+                   IF     (SPA-COM-INPUTCD (IDX)   =   "188004910")
+                   AND    (SPA-COM-KZMFLG  (IDX)   =   SPACE      )
+                       MOVE    "K269"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  SPA-COM-KZMFLG(IDX)
+                       MOVE    "1"             TO  SPA-COM-CUR(IDX)
+                   END-IF
+               END-IF
+      *!!!
            END-PERFORM
       *
            MOVE    ZERO                TO  IDX
