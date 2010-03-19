@@ -3820,6 +3820,7 @@
                                                        (02 IDXS)
                        MOVE    TNS-TEN         TO  LNK-ORCSC-TENSU-KS
                                                        (02 IDXS)
+                   END-IF
                END-IF
       *!!!
            END-IF
