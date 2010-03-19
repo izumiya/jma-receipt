@@ -1712,6 +1712,12 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K269"
+                   STRING  "警告！！"
+                           "医療観察法専用コードです。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "8048"
                    STRING  "がん患者リハビリテーション開始日が"
                        "算定されていません。終了日の入力はできません"
