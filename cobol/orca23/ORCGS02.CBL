@@ -5863,7 +5863,7 @@
            WHEN    "2103"
                STRING "外来月別請求書の印刷を行います。"
                                             DELIMITED BY SIZE
-                      "診療費明細書の印刷も行いまか"
+                      "診療費明細書の印刷も行いますか"
                                             DELIMITED BY SIZE
                INTO   SID2-ID1MSG
                END-STRING
