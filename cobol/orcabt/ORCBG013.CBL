@@ -933,6 +933,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
            END-IF
       *
            MOVE    WRK-SRYYMD      TO      SPA-SRYYMD
+           MOVE    "00102"         TO      WRK-FILEMEI-CD
            PERFORM 21011-SEIKYU-PG-CALL-SEC
       *
            IF    ( WRK-PARA-PRTFORMKBN     =   "0" )
@@ -952,8 +953,6 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
            EXIT.
       *****************************************************************
       *    ÀÁµá½ñ·óÎÎ¼ý½ñ¥µ¥Ö¸Æ½Ð½èÍý
-           MOVE    "00102"         TO      WRK-FILEMEI-CD
-      *
       *****************************************************************
        21011-SEIKYU-PG-CALL-SEC        SECTION.
       *
