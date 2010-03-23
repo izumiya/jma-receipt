@@ -6361,7 +6361,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-NAI-HKNSTR      TO  WRK-HKNSTR
       *        保険情報ＴＢＬから編集
                COMPUTE SPA-NAI-HKNSTR      =   SPA-NAI-HKNSTR  -  1
-               PERFORM 3101-HKN-TBL-SPA-SEC
+               PERFORM 4401-ZENHKN-TBL-SPA-SEC
+      *******  PERFORM 3101-HKN-TBL-SPA-SEC
       *        対象がない時元へ
                IF      SPA-NAI-HKNSTR      =   ZERO
                    MOVE    WRK-HKNSTR          TO  SPA-NAI-HKNSTR
@@ -6402,6 +6403,41 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        440-ZEN-GMNHYOUJI-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険情報パラメタファイル検索処理
+      *****************************************************************
+       4401-ZENHKN-TBL-SPA-SEC            SECTION.
+      *
+           INITIALIZE                  SPA-GMN-HKN-AREA
+           MOVE    ZERO                TO  FLG-CHK
+           IF      SPA-NAI-HKNSTR      =   ZERO
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDX     FROM    SPA-NAI-HKNSTR   BY  -1
+                   UNTIL      (IDX         <   1             )  OR
+                              (FLG-CHK NOT =   ZERO )
+                   IF      SPA-PTHKN-SAKJOKBN (IDX)    =   SPACE
+      *                ＱＲデータの表示
+                       IF     (SPA-QR-FLG          =   1   )  AND
+                              (SPA-QR-HKNID    NOT =   ZERO )  AND
+                              (SPA-QR-HKNID    NOT =   SPA-PTHKN-HKNID
+                                                               (IDX))
+                           CONTINUE
+                       ELSE
+                           MOVE    IDX             TO  SPA-NAI-HKNSTR
+                           PERFORM 3101-HOKEN-HEN-SEC
+                           MOVE    1               TO  FLG-CHK
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    対象の保険がない時、新規とする
+           IF      FLG-CHK             =   ZERO
+               MOVE    ZERO                TO  SPA-NAI-HKNSTR
+           END-IF
+           .
+       4401-ZENHKN-TBL-SPA-EXT.
            EXIT.
       *
       *****************************************************************
