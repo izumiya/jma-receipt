@@ -226,6 +226,9 @@
            03  FLG-BUNBENCHK               PIC 9(01).
            03  FLG-BUNBEN                  PIC 9(01).
            03  FLG-RYOTARGET               PIC 9(01).
+           03  FLG-IPPAN                   PIC 9(01).
+           03  FLG-NSRYSRH                 PIC 9(01).
+           03  FLG-NRRKSRH                 PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -714,14 +717,18 @@
                05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   21.
            03  CONST-GMN-KSN-MAX           PIC 9(05)   VALUE   3.
            03  CONST-KSNCD-G.
-               05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   1.
+               05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   4.
                05  CONST-KSNCD-VAL.
-                   07  CONST-KSNCD-JOKUSO
+                   07  CONST-KSNCD-190116990
                                    PIC X(09)   VALUE   "190116990".
-                   07  CONST-KSNCD-DUMMY
-                                   PIC X(09)   VALUE   "         ".
+                   07  CONST-KSNCD-190135470
+                                   PIC X(09)   VALUE   "190135470".
+                   07  CONST-KSNCD-190134270
+                                   PIC X(09)   VALUE   "190134270".
+                   07  CONST-KSNCD-190135670
+                                   PIC X(09)   VALUE   "190135670".
                05  CONST-KSNCD-R REDEFINES CONST-KSNCD-VAL.
-                   07  CONST-KSNCD-OCC     OCCURS  2.
+                   07  CONST-KSNCD-OCC     OCCURS  4.
                        09  CONST-KSNCD     PIC X(09).
       *
       *    ¥¹¥ÑÎÎ°è ¥ï¡¼¥¯
@@ -899,6 +906,14 @@
       *    ¥¸¥ç¥Ö´ÉÍý¥Þ¥¹¥¿
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
+      *
+      *    Æþ±¡¿ÇÎÅ¹Ô°Ù¾È²ñ¥Æ¡¼¥Ö¥ë
+       01  NSRYSRH-REC.
+           COPY    "CPNSRYSRH.INC".
+      *
+      *    Æþ±¡ÍúÎò¾È²ñ¥Æ¡¼¥Ö¥ë
+       01  NRRKSRH-REC.
+           COPY    "CPNRRKSRH.INC".
       *
        01  BUNBEN-REC.
            COPY    "CPBUNBEN.INC".
@@ -5214,7 +5229,8 @@
       *****************************************************************
        4101-CMB-KSN-SET-SEC            SECTION.
       *
-           IF    ( SPA-GMN-I01-SYORIKBN-CD =   CONST-NYUIN )
+           IF    ( SPA-GMN-I01-SYORIKBN-CD =   CONST-NYUIN
+                                            OR CONST-IDO    )
                PERFORM 41011-CMB-KSN-SET-SEC
            ELSE
       *
@@ -5257,15 +5273,39 @@
       *
                MOVE    1               TO  FLG-HIT
       *
-               MOVE    CONST-KSNCD (IDX-KSN)
+               IF    ( CONST-KSNCD (IDX-KSN)
+                                   =   CONST-KSNCD-190135470
+                                    OR CONST-KSNCD-190134270
+                                    OR CONST-KSNCD-190135670 )
+                   IF    ( WRK-KJNYMD     >=  CONST-H220401 )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-GMN-I01-SYORIKBN-CD =   CONST-IDO )
+                   IF    ( CONST-KSNCD (IDX-KSN)
+                                           =  CONST-KSNCD-190134270 )
+                     AND ( SPA-NAI-I01-IDOYMD
+                                           >  SPA-NAI-I01-NYUINYMD )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-HIT         =   1 )
+                   MOVE    CONST-KSNCD (IDX-KSN)
                                        TO  WRK-SRYCD
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU       =   ZERO )
-                   MOVE    TNS-NAME    TO  WRK-KSNNAME
-                   MOVE    TNS-NYUKHNKSNKBN
-                                       TO  WRK-KSN-NYUKSNKBN
-               ELSE
-                   MOVE    ZERO        TO  FLG-HIT
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       =   ZERO )
+                       MOVE    TNS-NAME    TO  WRK-KSNNAME
+                       MOVE    TNS-NYUKHNKSNKBN
+                                           TO  WRK-KSN-NYUKSNKBN
+                   ELSE
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
                END-IF
       *
                IF    ( FLG-HIT         =   1 )
@@ -5285,6 +5325,7 @@
                END-IF
       *
                IF    ( FLG-HIT         =   1 )
+      *
                    EVALUATE    SPA-NAI-I01-SNTNYUINCD
                    WHEN    "099999950"
                        MOVE    "190097010"         TO  WRK-SRYCD
@@ -5296,15 +5337,50 @@
                        MOVE    SPA-NAI-I01-SNTNYUINCD
                                                    TO  WRK-SRYCD
                    END-EVALUATE
+      *
                    PERFORM 900-TENSU-KEY-SEL-SEC
                    MOVE    TNS-NYUKHNKSNKBN        TO  WRK-NYUKSNKBN
-                   IF    ( WRK-NYUKSNKBN       >   ZERO )
+                   IF    ( TNS-NYUKHNKSNKBN        >   ZERO )
                        PERFORM 900-NYUKSNCHK-KEY-SEL-SEC
                        IF    ( NYUKSNCHK-CHKKBN    =   "1" OR "2" )
                            CONTINUE
                        ELSE
-                           MOVE    ZERO            TO  FLG-HIT
+                           EVALUATE    TNS-NYUKHNKSNKBN
+                           WHEN    152
+                           WHEN    173    THRU    190
+                               IF    ( CONST-KSNCD (IDX-KSN)
+                                           =   CONST-KSNCD-190134270 )
+                                   PERFORM 410111-IPPAN-NYUIN-CHK-SEC
+                                   IF    ( FLG-IPPAN       =   1 )
+                                       CONTINUE
+                                   ELSE
+                                       MOVE    ZERO        TO  FLG-HIT
+                                   END-IF
+                               ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
+                               END-IF
+                           WHEN    081
+                           WHEN    083
+                           WHEN    172
+                               IF    ( CONST-KSNCD (IDX-KSN)
+                                           =   CONST-KSNCD-190135470 )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
+                               END-IF
+                           WHEN    153    THRU    158
+                               IF    ( CONST-KSNCD (IDX-KSN)
+                                           =   CONST-KSNCD-190135670 )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
+                               END-IF
+                           WHEN    OTHER
+                                   MOVE    ZERO            TO  FLG-HIT
+                           END-EVALUATE
                        END-IF
+                   ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
                    END-IF
                END-IF
       *
@@ -5349,6 +5425,47 @@
       *
            .
        41011-CMB-KSN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    °ìÈÌÉÂÅïÆþ±¡¥Á¥§¥Ã¥¯
+      *****************************************************************
+       410111-IPPAN-NYUIN-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-IPPAN
+      *
+           MOVE    SPA-NAI-I01-IDOYMD
+                                   TO  WRK-YMD
+           MOVE    "1"         TO  WRK-ZOGENPTN
+           MOVE    -1          TO  WRK-ZOGEN
+           PERFORM 5002-CALENDAR-SEC
+      *
+           PERFORM 900-NRRKSRH-KEY2-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-NRRKSRH NOT =   ZERO )
+                    OR   ( FLG-IPPAN       =   1    )
+      *
+               PERFORM 900-NSRYSRH-KEY-SEL-SEC
+      *
+               MOVE    NSRYSRH-SRYCD   TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               IF    ( TNS-DATAKBN         =   1 )
+                AND  ( TNS-CDKBN-KBN       = 'A' )
+                AND  ( TNS-CDKBN-KBNNUM    = 100 )
+      *
+                   MOVE    1       TO  FLG-IPPAN
+      *
+               END-IF
+      *
+               PERFORM 900-NRRKSRH-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_nrrksrh"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       410111-IPPAN-NYUIN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    »ÜÀß´ð½à¸¡º÷½èÍý
@@ -5696,7 +5813,6 @@
                    IF    ( WRK-KJNYMD      >=  CONST-H181001 )
                        PERFORM 41011-TOKNYUIN-SYOKI-SEC
                    END-IF
-                   DISPLAY "WRK-CMB-CD ===" WRK-CMB-CD
                    PERFORM 4103-CMB-TOKNYUIN-SRH2-SEC
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-TOKNYUIN
                    MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-TOKNYUIN-ORG
@@ -6182,25 +6298,28 @@
                                    TO  SPA-GMN-I01-SNTNYUIN
                MOVE    SPA-NAI-I01-KHNRYO-CD
                                    TO  SPA-NAI-I01-SNTNYUINCD
-               GO  TO  4101-TOKNYUIN-CHK-EXT
-           END-IF
       *
-           MOVE    SPA-GMN-I01-TOKNYUIN-CD
-                                   TO  WRK-CMB-CD
-           PERFORM 4103-CMB-TOKNYUIN-CHK-SEC
-           IF    ( WRK-CMB-ITM     NOT =   SPACE )
-               MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-TOKNYUIN
-               MOVE    WRK-CMB-ITM2
-                                   TO  SPA-NAI-I01-TOKNYUIN-ORG
-               MOVE    WRK-CMB-ITM4
-                                   TO  SPA-NAI-I01-TOKNYUINCD
-                                       SPA-NAI-I01-SNTNYUINCD
-               MOVE    SPA-GMN-I01-TOKNYUIN-NM
-                                   TO  SPA-GMN-I01-SNTNYUIN
-               
+               MOVE    WRK-KIHON-KJNYMD    TO  WRK-KJNYMD
+               PERFORM 4101-CMB-KSN-SET-SEC
            ELSE
-               MOVE    "0024"      TO  SPA-ERRCD
-               MOVE    16          TO  SPA-GMN-I01-CUR
+      *
+               MOVE    SPA-GMN-I01-TOKNYUIN-CD
+                                   TO  WRK-CMB-CD
+               PERFORM 4103-CMB-TOKNYUIN-CHK-SEC
+               IF    ( WRK-CMB-ITM     NOT =   SPACE )
+                   MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-TOKNYUIN
+                   MOVE    WRK-CMB-ITM2
+                                       TO  SPA-NAI-I01-TOKNYUIN-ORG
+                   MOVE    WRK-CMB-ITM4
+                                       TO  SPA-NAI-I01-TOKNYUINCD
+                                           SPA-NAI-I01-SNTNYUINCD
+                   MOVE    SPA-GMN-I01-TOKNYUIN-NM
+                                       TO  SPA-GMN-I01-SNTNYUIN
+               ELSE
+                   MOVE    "0024"      TO  SPA-ERRCD
+                   MOVE    16          TO  SPA-GMN-I01-CUR
+               END-IF
+      *
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
@@ -21132,9 +21251,6 @@
       *    ÁªÂòÈÖ¹æ
            MOVE    SPA-GMN-I01-SELNUM      TO  I01-SELNUM
       *
-           DISPLAY "SPA-GMN-I01-NYUREKILST-SEL "
-                    SPA-GMN-I01-NYUREKILST-SEL
-      *
       *    Æþ±¡Îò¥ê¥¹¥È
            MOVE    SPA-GMN-I01-NYUREKILST-CNT
                                            TO  I01-NYUREKILST-CNT
@@ -23038,6 +23154,92 @@
       *
            .
        900-NYUKSNCHK-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡¿ÇÎÅ¹Ô°Ù¾È²ñ¸¡º÷½èÍý
+      *****************************************************************
+       900-NSRYSRH-KEY-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-NSRYSRH
+      *
+           INITIALIZE                  NSRYSRH-REC
+      *
+           MOVE    SPA-HOSPNUM     TO  NSRYSRH-HOSPNUM
+           MOVE    SPA-NAI-I01-PTID
+                                   TO  NSRYSRH-PTID
+           MOVE    NRRKSRH-ZAINUM  TO  NSRYSRH-ZAINUM
+           MOVE    NRRKSRH-SRYYMD(1:6)
+                                   TO  NSRYSRH-SRYYM
+           MOVE    NSRYSRH-REC     TO  MCPDATA-REC
+      *
+           MOVE    "tbl_nsrysrh"    TO  MCP-TABLE
+           MOVE    "key"            TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  NSRYSRH-REC
+           ELSE
+               INITIALIZE              NSRYSRH-REC
+               MOVE    1           TO  FLG-NSRYSRH
+           END-IF
+      *
+           MOVE    "tbl_nsrysrh"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-NSRYSRH-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÍúÎò¾È²ñ¸¡º÷½èÍý
+      *****************************************************************
+       900-NRRKSRH-KEY2-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-NRRKSRH
+      *
+           INITIALIZE                  NRRKSRH-REC
+      *
+           MOVE    SPA-HOSPNUM     TO  NRRKSRH-HOSPNUM
+           MOVE    SPA-NAI-I01-PTID
+                                   TO  NRRKSRH-PTID
+           MOVE    SPA-NAI-I01-PTRRKNUM
+                                   TO  NRRKSRH-RRKNUM
+           MOVE    WRK-KEISANYMD   TO  NRRKSRH-SRYYMD
+           MOVE    NRRKSRH-REC     TO  MCPDATA-REC
+           MOVE    "tbl_nrrksrh"    TO  MCP-TABLE
+           MOVE    "key2"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  NRRKSRH-REC
+           ELSE
+               INITIALIZE              NRRKSRH-REC
+               MOVE    1           TO  FLG-NRRKSRH
+           END-IF
+      *
+           .
+      *
+       900-NRRKSRH-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÍúÎò¾È²ñ¸¡º÷½èÍý
+      *****************************************************************
+       900-NRRKSRH-KEY2-FET-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-NRRKSRH
+      *
+           MOVE    "tbl_nrrksrh"    TO  MCP-TABLE
+           MOVE    "key2"           TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  NRRKSRH-REC
+           ELSE
+               INITIALIZE              NRRKSRH-REC
+               MOVE    1           TO  FLG-NRRKSRH
+           END-IF
+      *
+           .
+      *
+       900-NRRKSRH-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý¡ÊFHETCH¤â¹Ô¤¦)
