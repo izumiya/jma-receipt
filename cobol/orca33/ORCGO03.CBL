@@ -409,6 +409,16 @@
                MOVE    WRK-CMB-ITM TO   SPA-GMN-O03-SKYPRTKBN-G
            END-IF
       *
+           IF    ( SYS-5000-SRYPRTKBN  =   "1" )
+               MOVE    "0"         TO  WRK-CMB-CD
+           ELSE
+               MOVE    "1"         TO  WRK-CMB-CD
+           END-IF
+           PERFORM 4200-PRTFORMKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM NOT =   SPACE )
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-O03-PRTFORMKBN-G
+           END-IF
+      *
            PERFORM 3101-EDIT-PAGE-SEC
       *
            MOVE    212             TO  SPA-GMN-O03-CUR
