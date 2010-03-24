@@ -5434,11 +5434,16 @@
                            WHEN    173    THRU    190
                                IF    ( CONST-KSNCD (IDX-KSN)
                                            =   CONST-KSNCD-190134270 )
-                                   PERFORM 410111-IPPAN-NYUIN-CHK-SEC
-                                   IF    ( FLG-IPPAN       =   1 )
-                                       CONTINUE
+                                   IF    ( SPA-GMN-I01-SYORIKBN-CD
+                                                   =   CONST-NYUIN )
+                                     CONTINUE
                                    ELSE
+                                     PERFORM 410111-IPPAN-NYUIN-CHK-SEC
+                                     IF    ( FLG-IPPAN       =   1 )
+                                       CONTINUE
+                                     ELSE
                                        MOVE    ZERO        TO  FLG-HIT
+                                     END-IF
                                    END-IF
                                ELSE
                                    MOVE    ZERO            TO  FLG-HIT
