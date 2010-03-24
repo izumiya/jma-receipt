@@ -60,6 +60,7 @@
       *  04.04.01    NACL-門脇    09/01/23  入院料算定保険以外の診療分実日数算定対応
       *  04.04.02    NACL-門脇    09/06/12  療養期間の編集修正
       *  04.04.03    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
+      *  04.04.04    NACL-門脇    10/03/23  改正対応（外泊区分５の対応）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1307,7 +1308,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     IF  WRK-DAY1(IDY) NOT =  ZERO 
                     AND WRK-DAY5(IDY)  =  RECE82-HKNCOMBI
                          IF   (WRK-DAY4(IDY)   NOT =    ZERO)  
-                         AND  (WRK-DAY2(IDY)  =    ZERO  OR  4)
+                         AND  (WRK-DAY2(IDY)  =    ZERO  OR  4
+                                                         OR  5)
                          AND  (WRK-SHOKUJIRYOYO(IDY)  NOT = ZERO)
                               PERFORM   2501-NYUINKHN-GET4-SEC
                          END-IF
@@ -1477,7 +1479,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
               AND  ( WRK-DAY5(IDY)      =  RECE82-HKNCOMBI )
                   IF  (WRK-DAY7(IDY)          NOT =  ZERO)
                   AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
-                  AND (WRK-DAY2(IDY)              =  ZERO  OR  4)
+                  AND (WRK-DAY2(IDY)              =  ZERO  OR  4
+                                                           OR  5)
                      IF    RECE82-HKNKBN   =   "4"
                       EVALUATE  RECE82-JIBAIKBN
                        WHEN  "1"

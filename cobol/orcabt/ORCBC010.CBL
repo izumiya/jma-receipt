@@ -48,6 +48,7 @@
       *  04.04.03    NACL-Æ£¸¶    10/03/12  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀ¯ÉÜ´É
       *                                     ¾¸¤ò¥¨¥é¡¼¤È¤¹¤ë
+      *  04.04.04    NACL-ÌçÏÆ    10/03/23  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1494,7 +1495,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                    UNTIL      IDX6     >   31
                IF (WRK-DAY (3 IDX6)    >   ZERO)        AND
                   (WRK-DAY (2 IDX6)    NOT =   ZERO)    AND
-                  (WRK-DAY (4 IDX6)    =   ZERO  OR  4)
+                  (WRK-DAY (4 IDX6)    =   ZERO  OR  4
+                                                 OR  5)
                  IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
       *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
       *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)

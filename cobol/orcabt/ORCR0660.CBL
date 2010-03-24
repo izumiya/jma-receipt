@@ -106,6 +106,7 @@
       *  04.04.03    NACL-嚏掀    09/06/22  篮坷彩持违技瓷妄裁换换年泣
       *                                     レセ排脱コメント试礁
       *  04.04.04    NACL-嚏掀    10/03/03  闻蛙レセコメント试礁饯赖
+      *  04.04.05    NACL-嚏掀    10/03/23  猖赖滦炳∈嘲邱惰尸５の滦炳∷
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5025,44 +5026,7 @@
                     MOVE   RECE65-SRYACT-TBL(IDX)
                              TO   WRK-RECE65XX-SRYACT-TBL(IDX-RECE65 1)
                     IF   RECE64-ZAITEN   =   ZERO
-                       EVALUATE   WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                         WHEN   "190111590"
-                             MOVE    "810000001"
-                                TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                             MOVE    ZERO
-                                TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                             MOVE    8
-                                TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                             MOVE    "嘲邱∈联年闻蛙∷"
-                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
-                         WHEN   "190116590"
-                             MOVE    "810000001"
-                                TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                             MOVE    ZERO
-                                TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                             MOVE    22
-                                TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-       MOVE "泼年掐薄瘟负换∈戮板闻怠簇减壳∷∈联年闻蛙∷"
-                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
-                         WHEN   "190116690"
-                             MOVE    "810000001"
-                                TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                             MOVE    ZERO
-                                TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                             MOVE    26
-                                TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-       MOVE "闻蛙陕棚掐薄答塑瘟负换∈戮板闻怠簇减壳∷∈联年闻蛙∷"
-                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
-                         WHEN   "190116790"
-                             MOVE    "810000001"
-                                TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                             MOVE    ZERO
-                                TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                             MOVE    29
-                                TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-       MOVE "壳闻疥闻蛙陕静掐薄答塑瘟负换∈戮板闻怠簇减壳∷∈联年闻蛙∷"
-                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
-                       END-EVALUATE
+                       PERFORM   2001111-SRYACTINF-NAME-HENSYU-SEC
                     END-IF
                END-PERFORM
       *
@@ -5112,6 +5076,125 @@
       *
            .
        200111-SRYACTINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ０５　ＳＲＹＡＣＴＩＮＦ　叹疚试礁借妄
+      *****************************************************************
+       2001111-SRYACTINF-NAME-HENSYU-SEC     SECTION.
+      *
+           IF   RECE62-SRYYM      >=    "201004"
+             EVALUATE   WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+      *
+               WHEN   "190111590"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   8       TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "嘲邱∈联年闻蛙∷"
+                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+      *
+               WHEN   "999999982"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   28      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "泼年掐薄瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
+                 MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百换年∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:42)
+      *
+               WHEN   "999999983"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   32      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "闻蛙陕棚掐薄答塑瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百换年∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:42)
+      *
+               WHEN   "999999984"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   37      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "铜静壳闻疥闻蛙陕静掐薄答塑瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:32)
+                 MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百换年∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(33:42)
+      *
+               WHEN   "999999991"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   19      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "掐薄答塑瘟负换∈戮板减壳∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+      *
+               WHEN   "999999992"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   29      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "泼年掐薄瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
+                 MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百踏换年∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:44)
+      *
+               WHEN   "999999993"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   33      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "闻蛙陕棚掐薄答塑瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百踏换年∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:44)
+      *
+               WHEN   "999999994"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   38      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "铜静壳闻疥闻蛙陕静掐薄答塑瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:32)
+                 MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百踏换年∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(33:44)
+             END-EVALUATE
+           ELSE
+             EVALUATE   WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+      *
+               WHEN   "190111590"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   8       TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "嘲邱∈联年闻蛙∷"
+                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+      *
+               WHEN   "999999982"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   22      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "泼年掐薄瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
+                 MOVE  "∈戮板闻怠簇减壳∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:30)
+      *
+               WHEN   "999999983"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   26      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "闻蛙陕棚掐薄答塑瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE  "∈戮板闻怠簇减壳∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:30)
+      *
+               WHEN   "999999984"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   31      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "铜静壳闻疥闻蛙陕静掐薄答塑瘟负换"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:32)
+                 MOVE  "∈戮板闻怠簇减壳∷∈联年闻蛙∷"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(33:30)
+             END-EVALUATE
+           END-IF
+      *
+           .
+       2001111-SRYACTINF-NAME-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

@@ -169,6 +169,8 @@
       *  04.04.07    NACL-ÌçÏÆ    09/12/04  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.08    NACL-ÌçÏÆ    09/12/09  ½ÐÍè¹â»»Äê¡ÊºÞ¡Ë¤ÎÂÐ±þ
       *  04.04.09    NACL-ÌçÏÆ    10/01/13  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
+      *  04.04.10    NACL-ÌçÏÆ    10/03/23  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
+      *                                             ¡ÊÏ«ºÒ¾è¿ô¤Ë´Ø¤ï¤ë²Ã»»ÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1612,15 +1614,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
       *          Ì¤¼Â»Ü¸º»»¡¦Æü¾ïÀ¸³è¾ã³²²Ã»»¡¦ÃÔÊò²Ã»»¡¦
       *          êóáì´µ¼Ô´ÉÍý²Ã»»¤ò½ü¤¯
-                 IF ( ACCT-SRYCDTOTAL  =  190080470  OR  190799670
+                 IF ((ACCT-SRYCDTOTAL  =  190080470  OR  190799670
                                       OR  190080570  OR  190799770
                                       OR  190111690  OR  190809090
                                       OR  190111790  OR  190809190
-      *
-                                      OR  190109170  OR  190807570
-                                      OR  190109270  OR  190808670 )
-                 OR ((ACCT-SRYCDTOTAL  =  190116990  OR  190813390) AND
-                     (RECE82-SRYYM     <  "200604"                ))
+                                      OR  190807570  OR  190808670
+                                      OR  190116990  OR  190813390) AND
+                     (RECE82-SRYYM     <= "200603"                ))
+                 OR ((ACCT-SRYCDTOTAL  =  190109170  OR  190109270) AND
+                     (RECE82-SRYYM     <= "200606"                ))
                  OR ((ACCT-SRYCDTOTAL  =  190117070  OR  190109670) AND
                      (RECE82-SRYYM     >= "200604"                ) AND
                      (RECE82-SRYYM     <= "200803"                ))
@@ -1628,6 +1630,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      (RECE82-SRYYM     >= "200607"                ))
                  OR ((ACCT-SRYCDTOTAL  =  190119210               ) AND
                      (RECE82-SRYYM     >= "200804"                ))
+                 OR ((ACCT-SRYCDTOTAL  =  190135070  OR  190131570
+                                      OR  190134270  OR  190118570
+                                      OR  190134870  OR  190134970
+                                      OR  190135470  OR  190135670) AND
+                     (RECE82-SRYYM     >= "201004"                ))
                    CONTINUE
                  ELSE
       *
@@ -1895,15 +1902,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "key9"           TO      MCP-PATHNAME
                PERFORM  900-SRYACT-READ-SEC
       *        Ï«ºÒÆþ±¡¤Î²Ã»»ÂÐ¾Ý¥³¡¼¥É¤ò¿ÇÎÅ¹Ô°Ù¥Æ¡¼¥Ö¥ë¤ÇÈ½Äê
-               IF ( SRY-SRYCD(1)     =  "190080470"  OR  "190799670"
-                                    OR  "190080570"  OR  "190799770"
-                                    OR  "190111690"  OR  "190809090"
-                                    OR  "190111790"  OR  "190809190"
-      *
-                                    OR  "190109170"  OR  "190807570"
-                                    OR  "190109270"  OR  "190808670" )
-               OR ((SRY-SRYCD(1)  =  "190116990"  OR  "190813390") AND
-                   (RECE82-SRYYM     <  "200604"                 ))
+               IF ((SRY-SRYCD(1)  =  "190080470"  OR  "190799670"
+                                 OR  "190080570"  OR  "190799770"
+                                 OR  "190111690"  OR  "190809090"
+                                 OR  "190111790"  OR  "190809190"
+                                 OR  "190807570"  OR  "190808670"
+                                 OR  "190116990"  OR  "190813390") AND
+                   (RECE82-SRYYM     <= "200603"                 ))
+               OR ((SRY-SRYCD(1)  =  "190109170"  OR  "190109270") AND
+                   (RECE82-SRYYM     <= "200606"                 ))
                OR ((SRY-SRYCD(1)  =  "190117070"  OR  "190109670") AND
                    (RECE82-SRYYM     >= "200604"                 ) AND
                    (RECE82-SRYYM     <= "200803"                 ))
@@ -1911,6 +1918,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE82-SRYYM     >= "200607"                 ))
                OR ((SRY-SRYCD(1)  =  "190119210"                 ) AND
                    (RECE82-SRYYM     >= "200804"                 ))
+               OR ((SRY-SRYCD(1)  =  "190135070"  OR  "190131570"
+                                 OR  "190134270"  OR  "190118570"
+                                 OR  "190134870"  OR  "190134970"
+                                 OR  "190135470"  OR  "190135670") AND
+                   (RECE82-SRYYM     >= "201004"                 ))
                  MOVE   ZERO         TO   FLG-WRITE85
                ELSE
                  PERFORM  UNTIL  FLG-SRYACT    =    1
@@ -5309,9 +5321,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        (RECE82-SRYYM      >=  "200604"             ))
                    OR ((NACCT-ZAISKBKBN    =  "6"                  ) AND
                        (NACCT-SRYCDTOTAL   = 190126670 OR 190126770
-                                          OR 190126570 OR 190126470
-                                          OR 190129870             ) AND
+                                          OR 190126570 OR 190126470) AND
                        (RECE82-SRYYM      >=  "200804"             ))
+                   OR ((NACCT-ZAISKBKBN    =  "6"                  ) AND
+                       (NACCT-SRYCDTOTAL   = 190129870             ) AND
+                       (RECE82-SRYYM      >=  "200804"             ) AND
+                       (RECE82-SRYYM      <=  "201003"             ))
+                   OR ((NACCT-ZAISKBKBN    =  "6"                  ) AND
+                       (NACCT-SRYCDTOTAL   = 190135570             ) AND
+                       (RECE82-SRYYM      >=  "201004"             ))
       *
                       CONTINUE
       *
@@ -5340,6 +5358,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND ( NACCT-ZAISKBKBN NOT  =  "4"    )
                             AND ( NACCT-DAY(IDY)  NOT  =  ZERO   )
                                IF  WRK-DAY2(IDY) =  ZERO  OR  4
+                                                          OR  5
                                     MOVE   NACCT-DAY(IDY)  
                                            TO   WRK-DAY21(IDY) 
                                     ADD    1   TO   CNT-DAY21
@@ -5355,6 +5374,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND ( WRK-SHOKUJIRYOYO(IDY)
                                                   NOT  =  ZERO   )
                                IF  WRK-DAY2(IDY) =  ZERO  OR  4
+                                                          OR  5
                                 IF   RECE82-SRYYM  >= "200604"
                                  IF  NACCT-SRYCDTOTAL = 099999918
                                                     OR  099999919
@@ -5385,7 +5405,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               AND ( NACCT-SRYCDTOTAL = 099999918
                                                    OR  099999919
                                                    OR  099999920   )
-                              AND ( WRK-DAY2(IDY) =  ZERO  OR  4   )
+                              AND ( WRK-DAY2(IDY) =  ZERO  OR  4
+                                                           OR  5   )
                                 PERFORM   2307-NYUINACCT-SYU-KAN-SEC
                               END-IF
                             END-IF
@@ -6613,10 +6634,12 @@ grpsys     PERFORM  900-DBSELECT-SEC
            MOVE    RECE82-HKNID         TO  RECE84-HKNID
            MOVE    RECE82-TEKSTYMD      TO  RECE84-TEKSTYMD
            IF   WRK-NYULIFE-KBN(SYUKEI-IDX3)  NOT =  SPACE
-                COMPUTE WRK-ZAINUM  =  99999731  +  SYUKEI-IDX3
+      ***       COMPUTE WRK-ZAINUM  =  99999731  +  SYUKEI-IDX3
+                COMPUTE WRK-ZAINUM  =  99996100  +  SYUKEI-IDX3
                 MOVE    WRK-ZAINUM      TO  RECE84-ZAINUM
            ELSE
-                COMPUTE WRK-ZAINUM  =  99999700  +  SYUKEI-IDX3
+      ***       COMPUTE WRK-ZAINUM  =  99999700  +  SYUKEI-IDX3
+                COMPUTE WRK-ZAINUM  =  99996000  +  SYUKEI-IDX3
                 MOVE    WRK-ZAINUM      TO  RECE84-ZAINUM
            END-IF
       ***  COMPUTE WRK-ZAINUM    =  99999920  +  SYUKEI-IDX3
@@ -6766,7 +6789,8 @@ grpsys     PERFORM  900-DBSELECT-SEC
            MOVE    RECE82-RECEKA        TO  RECE84-RECEKA
            MOVE    RECE82-HKNID         TO  RECE84-HKNID
            MOVE    RECE82-TEKSTYMD      TO  RECE84-TEKSTYMD
-           COMPUTE WRK-ZAINUM  =  99999762  +  SYUKEI-IDX3
+      ***  COMPUTE WRK-ZAINUM  =  99999762  +  SYUKEI-IDX3
+           COMPUTE WRK-ZAINUM  =  99996300  +  SYUKEI-IDX3
            MOVE    WRK-ZAINUM           TO  RECE84-ZAINUM
            MOVE    "97"                 TO  RECE84-SRYKBN
            MOVE    "4"                  TO  RECE84-ZAISKBKBN
@@ -6960,10 +6984,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE82-HKNID         TO  RECE85-HKNID
            MOVE    RECE82-TEKSTYMD      TO  RECE85-TEKSTYMD
            IF   WRK-NYULIFE-KBN(SYUKEI-IDX3)  NOT =  SPACE
-                COMPUTE WRK-ZAINUM  =  99999731  +  SYUKEI-IDX3
+      ***       COMPUTE WRK-ZAINUM  =  99999731  +  SYUKEI-IDX3
+                COMPUTE WRK-ZAINUM  =  99996100  +  SYUKEI-IDX3
                 MOVE    WRK-ZAINUM      TO  RECE85-ZAINUM
            ELSE
-                COMPUTE WRK-ZAINUM  =  99999700  +  SYUKEI-IDX3
+      ***       COMPUTE WRK-ZAINUM  =  99999700  +  SYUKEI-IDX3
+                COMPUTE WRK-ZAINUM  =  99996000  +  SYUKEI-IDX3
                 MOVE    WRK-ZAINUM      TO  RECE85-ZAINUM
            END-IF
       ***  COMPUTE WRK-ZAINUM    =  99999920  +  SYUKEI-IDX3
@@ -7097,7 +7123,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE82-RECEKA        TO  RECE85-RECEKA
            MOVE    RECE82-HKNID         TO  RECE85-HKNID
            MOVE    RECE82-TEKSTYMD      TO  RECE85-TEKSTYMD
-           COMPUTE WRK-ZAINUM   =  99999762  +  SYUKEI-IDX3
+      ***  COMPUTE WRK-ZAINUM   =  99999762  +  SYUKEI-IDX3
+           COMPUTE WRK-ZAINUM   =  99996300  +  SYUKEI-IDX3
            MOVE    WRK-ZAINUM           TO  RECE85-ZAINUM
            MOVE    IDX7                 TO  RECE85-RENNUM
            MOVE    RECE82-PTNUM         TO  RECE85-PTNUM
