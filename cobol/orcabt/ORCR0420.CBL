@@ -176,6 +176,7 @@
       *  04.04.07    NACL-ÌçÏÆ    10/01/13  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.08    NACL-ÌçÏÆ    10/01/29  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *  04.04.09    NACL-ÌçÏÆ    10/03/12  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
+      *  04.04.10    NACL-ÌçÏÆ    10/03/23  Æ±ÆüÅÅÏÃºÆ¿Ç¤Î²ó¿ôµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2584,7 +2585,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE   "1"    TO    RECE44-SAISANTEIKA-COMMENT
               END-IF
       *       ÅÅÏÃºÆ¿Ç
-              IF   SRY-SRYCD(IDX2)    =     "112009750"   OR
+              IF  (SRY-SRYCD(IDX2)    =     "112009750"   OR
                                             "112009850"   OR
                                             "112009950"   OR
                                             "112010050"   OR
@@ -2619,12 +2620,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             "112703450"   OR
                                             "112703550"   OR
                                             "112703650"   OR
-                                            "112706550"     
+                                            "112706550"     )
+              AND (RECE41-SRYYM       <     "201004"        )
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-DENWASAI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     "112007950"     )
+              AND (RECE41-SRYYM       >=    "201004"        )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DENWASAI-COMMENT
               END-IF
       *       Æ±ÆüºÆ¿Ç
-              IF   SRY-SRYCD(IDX2)    =     "112010150"   OR
+              IF  (SRY-SRYCD(IDX2)    =     "112010150"   OR
                                             "112010250"   OR
                                             "112010350"   OR
                                             "112010450"   OR
@@ -2662,9 +2669,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             "112703350"   OR
       *
                                             "112011710"   OR
-                                            "112705850"   
+                                            "112705850"     )
+              AND (RECE41-SRYYM       <     "201004"        )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     "112008350"   OR
+                                            "112011710"     )
+              AND (RECE41-SRYYM       >=    "201004"        )
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
+              END-IF
+      *       Æ±ÆüÅÅÏÃºÆ¿Ç
+              IF  (SRY-SRYCD(IDX2)    =     "112008850"     )
+              AND (RECE41-SRYYM       >=    "201004"        )
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-DOUDENSAI-COMMENT
               END-IF
            END-IF
       *

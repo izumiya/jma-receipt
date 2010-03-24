@@ -45,6 +45,7 @@
       *  04.03.02    NACL-門脇    08/09/25  自賠責集計等取扱の追加
       *
       *  04.04.01    NACL-門脇    09/02/04  検査（ＢＮＰ等）の追加
+      *  04.04.02    NACL-門脇    10/03/23  同日電話再診フラグの追加
       ************************************************************
       *01  RECE44-REC.
            03  RECE44-KEY.
@@ -119,6 +120,8 @@
            03  RECE44-DENWASAI-COMMENT    PIC  X(01).
       *同日再診
            03  RECE44-DOUJITUSAI-COMMENT  PIC  X(01).
+      *同日電話再診
+           03  RECE44-DOUDENSAI-COMMENT   PIC  X(01).
       *リハビリ
            03  RECE44-RIHABIRI-COMMENT    PIC  X(01).
       *リハビリ（心大血管疾患）
