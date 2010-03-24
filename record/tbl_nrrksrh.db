@@ -49,3 +49,28 @@ path	del2 	{
 		;
 	};
 };
+
+path	del3 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_nrrksrh
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYYMD      >   :SRYYMD
+		;
+	};
+};
+
+path	key2 	{
+	DBSELECT	{
+		DECLARE tbl_nrrksrh_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nrrksrh
+			WHERE HOSPNUM     =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYYMD      =   :SRYYMD
+			AND   RRKNUM      =   :RRKNUM
+		;
+	};
+};
+
