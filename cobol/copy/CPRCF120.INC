@@ -25,6 +25,7 @@
       *  04.03.01    NACL-門脇    08/07/14  投薬剤点０フラグの追加
       *
       *  04.04.01    NACL-門脇    09/02/04  検査（ＢＮＰ等）の追加
+      *  04.04.02    NACL-門脇    10/03/23  同日電話再診フラグの追加
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    10/01/19  剤区分追加
@@ -101,6 +102,8 @@
            03  RECE120-DENWASAI-COMMENT    PIC X(01).
       *同日再診
            03  RECE120-DOUJITUSAI-COMMENT  PIC X(01).
+      *同日電話再診
+           03  RECE120-DOUDENSAI-COMMENT   PIC X(01).
       *リハビリ
            03  RECE120-RIHABIRI-COMMENT    PIC X(01).
       *リハビリ（心大血管疾患）

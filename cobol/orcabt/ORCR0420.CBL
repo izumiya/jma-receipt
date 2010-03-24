@@ -176,6 +176,7 @@
       *  04.04.07    NACL-門脇    10/01/13  剤まとめ項目値の計算修正
       *  04.04.08    NACL-門脇    10/01/29  内服薬剤逓減編集対応
       *  04.04.09    NACL-門脇    10/03/12  内服薬剤逓減編集対応
+      *  04.04.10    NACL-門脇    10/03/23  同日電話再診の回数記載対応
       *
       *  04.05.01    NACL-門脇    09/06/29  療養期間記載方法選択機能
       *                                     （休業証明請求時）
@@ -2673,7 +2674,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE   "1"    TO    RECE44-SAISANTEIKA-COMMENT
               END-IF
       *       電話再診
-              IF   SRY-SRYCD(IDX2)    =     "112009750"   OR
+              IF  (SRY-SRYCD(IDX2)    =     "112009750"   OR
                                             "112009850"   OR
                                             "112009950"   OR
                                             "112010050"   OR
@@ -2708,12 +2709,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             "112703450"   OR
                                             "112703550"   OR
                                             "112703650"   OR
-                                            "112706550"     
+                                            "112706550"     )
+              AND (RECE41-SRYYM       <     "201004"        )
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-DENWASAI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     "112007950"     )
+              AND (RECE41-SRYYM       >=    "201004"        )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DENWASAI-COMMENT
               END-IF
       *       同日再診
-              IF   SRY-SRYCD(IDX2)    =     "112010150"   OR
+              IF  (SRY-SRYCD(IDX2)    =     "112010150"   OR
                                             "112010250"   OR
                                             "112010350"   OR
                                             "112010450"   OR
@@ -2751,9 +2758,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             "112703350"   OR
       *
                                             "112011710"   OR
-                                            "112705850"   
+                                            "112705850"     )
+              AND (RECE41-SRYYM       <     "201004"        )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     "112008350"   OR
+                                            "112011710"     )
+              AND (RECE41-SRYYM       >=    "201004"        )
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
+              END-IF
+      *       同日電話再診
+              IF  (SRY-SRYCD(IDX2)    =     "112008850"     )
+              AND (RECE41-SRYYM       >=    "201004"        )
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-DOUDENSAI-COMMENT
               END-IF
            END-IF
       *

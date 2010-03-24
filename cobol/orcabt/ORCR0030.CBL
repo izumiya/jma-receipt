@@ -446,6 +446,7 @@
       *  04.04.40    NACL-門脇    10/03/09  ７０歳代前半の特例措置対象者に
       *                                     関する保険欄一部負担金編集修正
       *  04.04.41    NACL-門脇    10/03/12  内服薬剤逓減編集対応
+      *  04.04.42    NACL-門脇    10/03/23  同日電話再診の回数記載対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -5833,7 +5834,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE04-SAISANTEIKA-COMMENT
               END-IF
       *       電話再診
-              IF   SRY-SRYCD(IDX2)    =     "112009750"   OR
+              IF  (SRY-SRYCD(IDX2)    =     "112009750"   OR
                                             "112009850"   OR
                                             "112009950"   OR
                                             "112010050"   OR
@@ -5868,12 +5869,18 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             "112703450"   OR
                                             "112703550"   OR
                                             "112703650"   OR
-                                            "112706550"     
+                                            "112706550"     )
+              AND (RECE02-SRYYM       <     "201004"        )
+                        MOVE   "1"    TO    RECE02-COMCNTFLG
+                        MOVE   "1"    TO    RECE04-DENWASAI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     "112007950"     )
+              AND (RECE02-SRYYM       >=    "201004"        )
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DENWASAI-COMMENT
               END-IF
       *       同日再診
-              IF   SRY-SRYCD(IDX2)    =     "112010150"   OR
+              IF  (SRY-SRYCD(IDX2)    =     "112010150"   OR
                                             "112010250"   OR
                                             "112010350"   OR
                                             "112010450"   OR
@@ -5911,9 +5918,22 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             "112703350"   OR
       *
                                             "112011710"   OR
-                                            "112705850"   
+                                            "112705850"     )
+              AND (RECE02-SRYYM       <     "201004"        )
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DOUJITUSAI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     "112008350"   OR
+                                            "112011710"     )
+              AND (RECE02-SRYYM       >=    "201004"        )
+                        MOVE   "1"    TO    RECE02-COMCNTFLG
+                        MOVE   "1"    TO    RECE04-DOUJITUSAI-COMMENT
+              END-IF
+      *       同日電話再診
+              IF  (SRY-SRYCD(IDX2)    =     "112008850"     )
+              AND (RECE02-SRYYM       >=    "201004"        )
+                        MOVE   "1"    TO    RECE02-COMCNTFLG
+                        MOVE   "1"    TO    RECE04-DOUDENSAI-COMMENT
               END-IF
       *       再診（４回目以降／人工腎臓）
               IF   SRY-SRYCD(IDX2)    =     "112009510"   OR

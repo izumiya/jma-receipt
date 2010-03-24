@@ -109,6 +109,7 @@
       *  04.03.04    NACL-門脇    09/03/10  障害のコメント記載修正
       *
       *  04.04.01    NACL-門脇    09/02/04  検査のコメント自動記載対応
+      *  04.04.02    NACL-門脇    10/03/23  同日電話再診の回数記載対応
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/08/17  小数点以下５桁対応
@@ -695,6 +696,7 @@
            03  TBL-COUNT-INF2       OCCURS     5.
                05  CNT-DENWA              PIC 9(06).
                05  CNT-DOUJITU            PIC 9(06).
+               05  CNT-DOUDEN             PIC 9(06).
                05  TBL-COUNT-HKNCOMBI     PIC 9(04).
       *
        01  TBL-HASSYO-INF.
@@ -1118,6 +1120,15 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
                         MOVE  RECE04-HKNCOMBI
                                    TO   TBL-COUNT-HKNCOMBI(WRK-KOHBUNRI)
                       END-IF
+      *            （同日電話再診のカウント）
+                      IF  RECE04-DOUDENSAI-COMMENT    =  "1"
+                        COMPUTE  WRK-KOHBUNRI 
+                                   =    RECE04-KOHBUNRI  +  1
+                        ADD   RECE04-ZAIKAISU  
+                                   TO   CNT-DOUDEN(WRK-KOHBUNRI)
+                        MOVE  RECE04-HKNCOMBI
+                                   TO   TBL-COUNT-HKNCOMBI(WRK-KOHBUNRI)
+                      END-IF
       *
       *            （再診４回目のカウント）
                       IF  RECE04-SAIJINKO-COMMENT     =  "1"
@@ -1345,19 +1356,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
            PERFORM   VARYING   IDX    FROM   1   BY   1
                           UNTIL   (IDX             >      5)
       *
-              IF         CNT-DENWA(IDX)     >   ZERO
-              AND        CNT-DOUJITU(IDX)   >   ZERO
-                         PERFORM    2001-DENWA-DOUJITU-COMMENT-SEC
-              ELSE
-                  IF         CNT-DENWA(IDX)     >   ZERO
-                  AND        CNT-DOUJITU(IDX)   =   ZERO
-                         PERFORM    2001-DENWA-COMMENT-SEC
-                  ELSE
-                      IF         CNT-DENWA(IDX)     =   ZERO
-                      AND        CNT-DOUJITU(IDX)   >   ZERO
-                         PERFORM    2001-DOUJITU-COMMENT-SEC
-                      END-IF
-                  END-IF
+              IF    CNT-DENWA(IDX)     >   ZERO
+              OR    CNT-DOUJITU(IDX)   >   ZERO
+              OR    CNT-DOUDEN(IDX)    >   ZERO
+                  PERFORM    2001-DENWA-DOUJITU-COMMENT-SEC
               END-IF
       *
            END-PERFORM
@@ -1870,166 +1872,130 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM 800-RECE02-SET049-SEC
            COMPUTE WRK-ZAINUM    =  99999990  +  IDX
            MOVE    WRK-ZAINUM          TO  RECE049-ZAINUM
-      *    MOVE    99999999            TO  RECE049-ZAINUM
            COMPUTE WRK-KOHBUNRI  =  IDX  -  1
            MOVE    WRK-KOHBUNRI        TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
       *
-           MOVE    2                   TO  RECE049-MEISAISU
+           IF    CNT-DENWA(IDX)     >   ZERO
+              ADD     1                TO  RECE049-MEISAISU
+           END-IF
+           IF    CNT-DOUJITU(IDX)   >   ZERO
+              ADD     1                TO  RECE049-MEISAISU
+           END-IF
+           IF    CNT-DOUDEN(IDX)    >   ZERO
+              ADD     1                TO  RECE049-MEISAISU
+           END-IF
       *
            MOVE    TBL-COUNT-HKNCOMBI(IDX)
                                        TO  RECE049-HKNCOMBI
       *
            WRITE   RECE049-REC
            ADD     1                   TO  CNT-RECE049
-      *
+      ***
            PERFORM 800-RECE02-SET059-SEC
            COMPUTE WRK-ZAINUM    =  99999990  +  IDX
            MOVE    WRK-ZAINUM          TO  RECE059-ZAINUM
-      *    MOVE    99999999            TO  RECE059-ZAINUM
            COMPUTE WRK-KOHBUNRI  =  IDX  -  1
            MOVE    WRK-KOHBUNRI        TO  RECE059-KOHBUNRI
            MOVE    "99"                TO  RECE059-SRYKBN
+      *
+           MOVE    SPACE               TO  WRK-RECE05XX-REC
+           INITIALIZE                      WRK-RECE05XX-REC
       *    電話再診のコメントの挿入
-           MOVE    SPACE                TO  WRK-RECE05XX-REC
-           INITIALIZE                       WRK-RECE05XX-REC
-           MOVE    "810000001"          TO  WRK-RECE05XX-SRYCD(1 1)
-           MOVE    ZERO                 TO  WRK-RECE05XX-SRYSURYO(1 1)
-           MOVE    9                    TO  WRK-RECE05XX-YUKOKETA(1 1)
-           MOVE    "電話再診（　　回）" TO  WRK-RECE05XX-NAME(1 1)
-      ***  MOVE    CNT-DENWA(IDX)       TO  DAY-IDX
-      ***  MOVE    TBL-DAY(DAY-IDX)     TO  WRK-RECE05XX-NAME(1 1)(11:4)
+           IF    CNT-DENWA(IDX)     >   ZERO
+             MOVE    "810000001"       TO  WRK-RECE05XX-SRYCD(1 1)
+             MOVE    ZERO              TO  WRK-RECE05XX-SRYSURYO(1 1)
+             MOVE    9                 TO  WRK-RECE05XX-YUKOKETA(1 1)
+             MOVE    "電話再診（　　回）"
+                                       TO  WRK-RECE05XX-NAME(1 1)
       *
-           MOVE    CNT-DENWA(IDX)       TO  DAY-IDX2
-           PERFORM    20011-KAISU-HENSYU-SEC
-           MOVE    WRK-HENSYU-KAISU2    TO  WRK-RECE05XX-NAME(1 1)(11:4)
+             MOVE    CNT-DENWA(IDX)    TO  DAY-IDX2
+             PERFORM    20011-KAISU-HENSYU-SEC
+             MOVE    WRK-HENSYU-KAISU2 TO  WRK-RECE05XX-NAME(1 1)(11:4)
       *
-           MOVE    WRK-RECE05XX-SRYACT-TBL (1 1)
-                                        TO  RECE059-SRYACT-TBL(1)
+             MOVE    WRK-RECE05XX-SRYACT-TBL (1 1)
+                                       TO  RECE059-SRYACT-TBL(1)
+           END-IF
       *    同日複数再診のコメントの挿入
-           MOVE    "810000001"          TO  WRK-RECE05XX-SRYCD(2 1)
-           MOVE    ZERO                 TO  WRK-RECE05XX-SRYSURYO(2 1)
-           MOVE    11                   TO  WRK-RECE05XX-YUKOKETA(2 1)
-           MOVE    "同日複数再診（　　回）"
-                                        TO  WRK-RECE05XX-NAME(2 1)
-      ***  MOVE    CNT-DOUJITU(IDX)     TO  DAY-IDX
-      ***  MOVE    TBL-DAY(DAY-IDX)     TO  WRK-RECE05XX-NAME(2 1)(15:4)
+           IF    CNT-DOUJITU(IDX)   >   ZERO
+             IF   RECE02-SRYYM      >=    "201004"
+               MOVE  "810000001"       TO  WRK-RECE05XX-SRYCD(2 1)
+               MOVE  ZERO              TO  WRK-RECE05XX-SRYSURYO(2 1)
+               MOVE  9                 TO  WRK-RECE05XX-YUKOKETA(2 1)
+               MOVE  "同日再診（　　回）"
+                                       TO  WRK-RECE05XX-NAME(2 1)
       *
-           MOVE    CNT-DOUJITU(IDX)     TO  DAY-IDX2
-           PERFORM    20011-KAISU-HENSYU-SEC
-           MOVE    WRK-HENSYU-KAISU2    TO  WRK-RECE05XX-NAME(2 1)(15:4)
+               MOVE  CNT-DOUJITU(IDX)  TO  DAY-IDX2
+               PERFORM    20011-KAISU-HENSYU-SEC
+               MOVE  WRK-HENSYU-KAISU2 TO  WRK-RECE05XX-NAME(2 1)(11:4)
       *
-           MOVE    WRK-RECE05XX-SRYACT-TBL(2 1)
-                                        TO  RECE059-SRYACT-TBL (2)
+               MOVE  WRK-RECE05XX-SRYACT-TBL(2 1)
+                                       TO  RECE059-SRYACT-TBL (2)
+             ELSE
+               MOVE  "810000001"       TO  WRK-RECE05XX-SRYCD(2 1)
+               MOVE  ZERO              TO  WRK-RECE05XX-SRYSURYO(2 1)
+               MOVE  11                TO  WRK-RECE05XX-YUKOKETA(2 1)
+               MOVE  "同日複数再診（　　回）"
+                                       TO  WRK-RECE05XX-NAME(2 1)
+      *
+               MOVE  CNT-DOUJITU(IDX)  TO  DAY-IDX2
+               PERFORM    20011-KAISU-HENSYU-SEC
+               MOVE  WRK-HENSYU-KAISU2 TO  WRK-RECE05XX-NAME(2 1)(15:4)
+      *
+               MOVE  WRK-RECE05XX-SRYACT-TBL(2 1)
+                                       TO  RECE059-SRYACT-TBL (2)
+             END-IF
+           END-IF
+      *    同日電話再診のコメントの挿入
+           IF    CNT-DOUDEN(IDX)    >   ZERO
+             MOVE    "810000001"       TO  WRK-RECE05XX-SRYCD(3 1)
+             MOVE    ZERO              TO  WRK-RECE05XX-SRYSURYO(3 1)
+             MOVE    11                TO  WRK-RECE05XX-YUKOKETA(3 1)
+             MOVE    "同日電話再診（　　回）"
+                                       TO  WRK-RECE05XX-NAME(3 1)
+      *
+             MOVE    CNT-DOUDEN(IDX)   TO  DAY-IDX2
+             PERFORM    20011-KAISU-HENSYU-SEC
+             MOVE    WRK-HENSYU-KAISU2 TO  WRK-RECE05XX-NAME(3 1)(15:4)
+      *
+             MOVE    WRK-RECE05XX-SRYACT-TBL(3 1)
+                                       TO  RECE059-SRYACT-TBL (3)
+           END-IF
+      *
+           IF   RECE059-SRYCD(1) =  SPACE
+              IF     RECE059-SRYCD(2)  NOT =  SPACE
+                 MOVE    RECE059-SRYACT-TBL(2)
+                                       TO  RECE059-SRYACT-TBL(1)
+                 INITIALIZE    RECE059-SRYACT-TBL(2)
+                 IF  RECE059-SRYCD(3)  NOT =  SPACE
+                   MOVE  RECE059-SRYACT-TBL(3)
+                                       TO  RECE059-SRYACT-TBL(2)
+                   INITIALIZE  RECE059-SRYACT-TBL(3)
+                 END-IF
+              ELSE
+                 IF  RECE059-SRYCD(3)  NOT =  SPACE
+                   MOVE  RECE059-SRYACT-TBL(3)
+                                       TO  RECE059-SRYACT-TBL(1)
+                   INITIALIZE  RECE059-SRYACT-TBL(3)
+                 END-IF
+              END-IF
+           ELSE
+              IF     RECE059-SRYCD(2)  NOT =  SPACE
+                 CONTINUE
+              ELSE
+                 IF  RECE059-SRYCD(3)  NOT =  SPACE
+                   MOVE  RECE059-SRYACT-TBL(3)
+                                       TO  RECE059-SRYACT-TBL(2)
+                   INITIALIZE  RECE059-SRYACT-TBL(3)
+                 END-IF
+              END-IF
+           END-IF
       *
            WRITE   RECE059-REC
            ADD     1                    TO  CNT-RECE059
       *
            .
        2001-DENWA-DOUJITU-COMMENT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    電話再診のコメント編集
-      *****************************************************************
-       2001-DENWA-COMMENT-SEC          SECTION.
-      *
-           PERFORM 800-RECE02-SET049-SEC
-           COMPUTE WRK-ZAINUM    =  99999990  +  IDX
-           MOVE    WRK-ZAINUM          TO  RECE049-ZAINUM
-      *    MOVE    99999999            TO  RECE049-ZAINUM
-           COMPUTE WRK-KOHBUNRI  =  IDX  -  1
-           MOVE    WRK-KOHBUNRI        TO  RECE049-KOHBUNRI
-           MOVE    "99"                TO  RECE049-SRYKBN
-      *
-           MOVE    1                   TO  RECE049-MEISAISU
-      *
-           MOVE    TBL-COUNT-HKNCOMBI(IDX)
-                                       TO  RECE049-HKNCOMBI
-      *
-           WRITE   RECE049-REC
-           ADD     1                   TO  CNT-RECE049
-      *
-           PERFORM 800-RECE02-SET059-SEC
-           COMPUTE WRK-ZAINUM    =  99999990  +  IDX
-           MOVE    WRK-ZAINUM          TO  RECE059-ZAINUM
-      *    MOVE    99999999            TO  RECE059-ZAINUM
-           COMPUTE WRK-KOHBUNRI  =  IDX  -  1
-           MOVE    WRK-KOHBUNRI        TO  RECE059-KOHBUNRI
-           MOVE    "99"                TO  RECE059-SRYKBN
-      *    電話再診のコメントの挿入
-           MOVE    SPACE                TO  WRK-RECE05XX-REC
-           INITIALIZE                       WRK-RECE05XX-REC
-           MOVE    "810000001"          TO  WRK-RECE05XX-SRYCD(1 1)
-           MOVE    ZERO                 TO  WRK-RECE05XX-SRYSURYO(1 1)
-           MOVE    9                    TO  WRK-RECE05XX-YUKOKETA(1 1)
-           MOVE    "電話再診（　　回）" TO  WRK-RECE05XX-NAME(1 1)
-      ***  MOVE    CNT-DENWA(IDX)       TO  DAY-IDX
-      ***  MOVE    TBL-DAY(DAY-IDX)     TO  WRK-RECE05XX-NAME(1 1)(11:4)
-      *
-           MOVE    CNT-DENWA(IDX)       TO  DAY-IDX2
-           PERFORM    20011-KAISU-HENSYU-SEC
-           MOVE    WRK-HENSYU-KAISU2    TO  WRK-RECE05XX-NAME(1 1)(11:4)
-      *
-           MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
-                                        TO  RECE059-SRYACT-TBL(1)
-           WRITE   RECE059-REC
-           ADD     1                    TO  CNT-RECE059
-      *
-           .
-       2001-DENWA-COMMENT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    同日複数再診のコメント編集
-      *****************************************************************
-       2001-DOUJITU-COMMENT-SEC          SECTION.
-      *
-           PERFORM 800-RECE02-SET049-SEC
-           COMPUTE WRK-ZAINUM    =  99999990  +  IDX
-           MOVE    WRK-ZAINUM          TO  RECE049-ZAINUM
-      *    MOVE    99999999            TO  RECE049-ZAINUM
-           COMPUTE WRK-KOHBUNRI  =  IDX  -  1
-           MOVE    WRK-KOHBUNRI        TO  RECE049-KOHBUNRI
-           MOVE    "99"                TO  RECE049-SRYKBN
-      *
-           MOVE    1                   TO  RECE049-MEISAISU
-      *
-           MOVE    TBL-COUNT-HKNCOMBI(IDX)
-                                       TO  RECE049-HKNCOMBI
-      *
-           WRITE   RECE049-REC
-           ADD     1                   TO  CNT-RECE049
-      *
-           PERFORM 800-RECE02-SET059-SEC
-           COMPUTE WRK-ZAINUM    =  99999990  +  IDX
-           MOVE    WRK-ZAINUM          TO  RECE059-ZAINUM
-      *    MOVE    99999999            TO  RECE059-ZAINUM
-           COMPUTE WRK-KOHBUNRI  =  IDX  -  1
-           MOVE    WRK-KOHBUNRI        TO  RECE059-KOHBUNRI
-           MOVE    "99"                TO  RECE059-SRYKBN
-      *    同日複数再診のコメントの挿入
-           MOVE    SPACE                TO  WRK-RECE05XX-REC
-           INITIALIZE                       WRK-RECE05XX-REC
-           MOVE    "810000001"          TO  WRK-RECE05XX-SRYCD(1 1)
-           MOVE    ZERO                 TO  WRK-RECE05XX-SRYSURYO(1 1)
-           MOVE    11                   TO  WRK-RECE05XX-YUKOKETA(1 1)
-           MOVE    "同日複数再診（　　回）"
-                                        TO  WRK-RECE05XX-NAME(1 1)
-      ***  MOVE    CNT-DOUJITU(IDX)     TO  DAY-IDX
-      ***  MOVE    TBL-DAY(DAY-IDX)     TO  WRK-RECE05XX-NAME(1 1)(15:4)
-      *
-           MOVE    CNT-DOUJITU(IDX)     TO  DAY-IDX2
-           PERFORM    20011-KAISU-HENSYU-SEC
-           MOVE    WRK-HENSYU-KAISU2    TO  WRK-RECE05XX-NAME(1 1)(15:4)
-      *
-           MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
-                                        TO  RECE059-SRYACT-TBL(1)
-           WRITE   RECE059-REC
-           ADD     1                    TO  CNT-RECE059
-      *
-           .
-       2001-DOUJITU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
