@@ -45,12 +45,9 @@
       *                                     達時に海外に住所を有する場合
       *                                     の対応
       *  04.04.02    NACL-門脇    09/04/13  平成２１年５月改正対応
-      *
+      *  04.04.03    NACL-門脇    10/03/23  改正対応（外泊区分５の対応）
       *  04.05.01    NACL-伊藤    10/01/28  小数点５桁対応COPY句のみ
       *              NACL-小豆沢  10/02/16  治験対応
-      *  04.05.02    NACL-藤原    10/03/12  平成２２年４月改正対応
-      *                                     平成２２年４月分以降の政府管
-      *                                     掌をエラーとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -474,7 +471,6 @@
                                    PIC X(07)   VALUE   "ZZZ4012".
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
-           03  WRK-CONS-SRYYM-201004   PIC 9(06)   VALUE   201004.      
       *
       *    標準負担額
            03  WRK-CONS-HYOJYUN-FUTAN-G.
@@ -1504,7 +1500,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                    UNTIL      IDX6     >   31
                IF (WRK-DAY (3 IDX6)    >   ZERO)        AND
                   (WRK-DAY (2 IDX6)    NOT =   ZERO)    AND
-                  (WRK-DAY (4 IDX6)    =   ZERO  OR  4)
+                  (WRK-DAY (4 IDX6)    =   ZERO  OR  4
+                                                 OR  5)
                  IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
       *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
       *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)
@@ -2048,13 +2045,6 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                    MOVE    "1"                 TO  WRK-TEISEIKBN
                END-IF
           END-IF
-      *
-      *    平成２２年４月以降に政府管掌を使用のとき
-           IF    ( WRK-TEISEIKBN       =   SPACE                 )
-           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201004 )
-           AND   ( COMB-HKNNUM         =   "001"                 )
-               MOVE    "1"                 TO  WRK-TEISEIKBN
-           END-IF
       *
       *   主保険情報読み出し
            INITIALIZE                      PTHKNINF-REC
