@@ -2,7 +2,7 @@ system {
 	id		char(256);
 	num		int;
 	query {
-		key		char(256);
+		key	char(128);
 		value	char(256);
-	}[200];
+	}[100];
 };

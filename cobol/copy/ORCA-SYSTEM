@@ -1,7 +1,7 @@
         01  ORCA-SYSTEM.
             02  ORCA-SYSTEM-ID         PIC X(256).
             02  ORCA-SYSTEM-NUM        PIC S9(9)   BINARY.
-            02  ORCA-SYSTEM-QUERY      OCCURS  200 TIMES.
-              03  ORCA-SYSTEM-KEY      PIC X(256).
+            02  ORCA-SYSTEM-QUERY      OCCURS  100 TIMES.
+              03  ORCA-SYSTEM-KEY      PIC X(128).
               03  ORCA-SYSTEM-VALUE    PIC X(256).
 
