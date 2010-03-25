@@ -269,6 +269,32 @@
       *    診療種別名テーブル
       *    COPY    "CPORCSSRYSYU.INC".
       *
+      *点数マスタワーク
+       01  HZN-TNS-TENSU-REC.
+           03  HZN-TNS-KEY.
+               05  HZN-TNS-HOSPNUM         PIC 9(2).
+               05  HZN-TNS-SRYCD           PIC  X(09).
+               05  HZN-TNS-YUKOSTYMD       PIC  X(08).
+               05  HZN-TNS-YUKOEDYMD       PIC  X(08).
+           03  HZN-TNS-SRYKBN              PIC  X(02).
+           03  HZN-TNS-SRYSYUKBN           PIC  X(03).
+           03  HZN-TNS-YUKOKETA            PIC  9(02).
+           03  HZN-TNS-NAME                PIC  X(200).
+           03  HZN-TNS-KANAYUKOKETA        PIC  9(02).
+           03  HZN-TNS-KANANAME            PIC  X(200).
+           03  HZN-TNS-FORMALYUKOKETA      PIC  9(03).
+           03  HZN-TNS-FORMALNAME          PIC  X(400).
+           03  HZN-TNS-TENSIKIBETU         PIC  9(01).
+           03  HZN-TNS-TEN                 PIC  9(09)V99.
+           03  HZN-TNS-TANICD              PIC  X(03).
+           03  HZN-TNS-TANIMOJISU          PIC  9(01).
+           03  HZN-TNS-TANINAME            PIC  X(24).
+           03  HZN-TNS-DATAKBN             PIC  9(01).
+           03  HZN-TNS-HKNTEKKBN           PIC  9(01).
+           03  HZN-TNS-NYUGAITEKKBN        PIC  9(01).
+      *(20)
+           03  HZN-TNS-FILLER              PIC  X(1000).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -283,9 +309,6 @@
       *
       *    点数マスタ
            COPY    "CPTENSU.INC".
-      *
-           COPY    "CPTENSU.INC"  REPLACING
-                                     //TNS-// BY //HZN-TNS-//.
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
