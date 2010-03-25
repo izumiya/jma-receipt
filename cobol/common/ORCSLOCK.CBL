@@ -30,6 +30,8 @@
       *  03.04.00    NACL-多々納  07/01/23  患者登録、診療行為、会計照会の排他修正
       *  03.04.00    NACL-太田    07/02/23  データチェックの排他を追加
       *  03.05.00    NACL-太田    07/05/09  グループ診療対応
+      *
+      *  04.05.01    NACL-竹田    10/02/27  監視ログ出力対応
       *****************************************************************
 001200*
 001300 ENVIRONMENT             DIVISION.
@@ -185,6 +187,9 @@
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
+       01  JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC".
+      *
       ***  COPY    "ORCA-DBPATH".
       **** COPY    "CPORCMCP.INC".
       *     
@@ -312,6 +317,14 @@ grpsys                            SPA-AREA
            ELSE
       * チェックＯＫならば排他テーブル作成
                PERFORM  1101-LOCK-MAKE-SEC
+      *    監視ログ出力
+               CALL    "ORCSAUDIT"     USING
+                                      "1"
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+                                       JOBKANRI-REC
            END-IF
       *
            .
@@ -666,6 +679,15 @@ grpsys         MOVE  SPA-HOSPNUM       TO  LOCK-HOSPNUM
                    MOVE  MCP-RC            TO  SLOCK-RETURN
                END-IF
            END-IF
+      *
+      *    監視ログ出力
+               CALL    "ORCSAUDIT"     USING
+                                      "1"
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+                                       JOBKANRI-REC
       *
            .
        120-RESET-EXT.

@@ -38,6 +38,8 @@
       *  01.00.07    NACL-ÂÀÅÄ    05/10/21  MONFUNCÂÐ±þ
       *
       *  03.05.01    NACL-Æ£¸¶    07/04/19  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
+      *
+      *  04.05.01    NACL-ÃÝÅÄ    10/02/27  ´Æ»ë¥í¥°½ÐÎÏÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -95,6 +97,8 @@
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
       *     
+           COPY    "CPORCSLOCK.INC".
+      *
       **************************************************************************
       *
        LINKAGE                 SECTION.
@@ -194,6 +198,15 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                DISPLAY "INSERT ERR KEY = [" MCP-RC JOB-KEY "]"   
                MOVE  MCP-RC            TO  SJOBKANRI-RETURN
            END-IF
+      *
+      *    ´Æ»ë¥í¥°½ÐÎÏ 
+           CALL    "ORCSAUDIT"         USING
+                                      "2"
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+                                       JOBKANRI-REC
       *
            .
        110-JBS-EXT.
