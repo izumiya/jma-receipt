@@ -58,7 +58,7 @@
            03  SPA-NAI-AREA.
                05  SPA-NAI-USER        PIC X(01).
                05  SPA-NAI-TBL.
-                   07  SPA-NAI-OCC             OCCURS  200.
+                   07  SPA-NAI-OCC             OCCURS  100.
                        09  SPA-NAI-TERMID      PIC X(64).
                        09  SPA-NAI-PROCESS-C   PIC X(64).
                        09  SPA-NAI-PROCESS-N   PIC X(64).
@@ -472,7 +472,7 @@
            IF    ( MCP-RC              =   ZERO    OR  1 )
                MOVE    MCPDATA-REC         TO  ORCA-SYSTEM
                PERFORM VARYING IDX     FROM    1   BY  1
-                       UNTIL   IDX     >       200
+                       UNTIL   IDX     >       100
                    MOVE    ORCA-SYSTEM-KEY(IDX)
                                        TO  SPA-NAI-TERMID(IDX)
                END-PERFORM
@@ -490,7 +490,7 @@
        3101-LISTKEY-SEC            SECTION.
       * 
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       200 
+                   UNTIL   IDX     >       100 
                IF      SPA-NAI-TERMID(IDX) NOT =    SPACE
                    INITIALIZE        ORCA-SYSTEM
                    MOVE    "LISTKEY"           TO  MCP-FUNC
@@ -666,7 +666,7 @@
            MOVE    ZERO            TO  WRK-SELNUM
       *
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >   200
+                   UNTIL   IDX     >   100
                IF      MLOG-ITEM-SELECT(IDX)   =  "T"
                    IF      IDX                 =   SPA-GMN-SELNUM
                        CONTINUE
@@ -790,7 +790,7 @@
        420-ALLSTOP-SEC             SECTION.
       *
            PERFORM VARYING IDX     FROM   1   BY  1
-                   UNTIL   IDX     >   200
+                   UNTIL   IDX     >   100
                IF    ( SPA-NAI-TERMID(IDX) NOT =   SPACE ) AND
                      ( SPA-NAI-TERMID(IDX) NOT =   MCP-TERM )
                    INITIALIZE                  ORCA-SYSTEM
@@ -814,7 +814,7 @@
                    END-IF
                END-IF
                IF      SPA-NAI-TERMID (IDX) = SPACE  
-                  MOVE  200            TO  IDX
+                  MOVE  100            TO  IDX
               END-IF
            END-PERFORM
       *
@@ -976,7 +976,7 @@
       *    ユーザーリスト
            MOVE    ZERO            TO  IDY
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >   200 
+                   UNTIL   IDX     >   100 
                IF      SPA-NAI-TERMID(IDX) NOT =   SPACE
                    MOVE    1               TO  FLG-OK
                    IF    ( SPA-GMN-IRYO    NOT =   "00" )  AND

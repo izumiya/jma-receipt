@@ -723,7 +723,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                GO  TO  410-TERMIDCNT-EXT
            END-IF
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       200
+                   UNTIL   IDX     >       100
                IF      ORCA-SYSTEM-KEY(IDX)    NOT =    SPACE
                    COMPUTE CNT-TERMID  =   CNT-TERMID  +   1
                END-IF
