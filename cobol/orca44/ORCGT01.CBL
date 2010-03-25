@@ -131,6 +131,9 @@
       *  04.05.03    NACL-藤原    09/09/18  「平成２１年台風第９号」対応
       *                                     兵庫県・岡山県
       *                                     ２００９年８月〜２０１０年１月対象 
+      *  04.05.04    NACL-藤原    10/02/26  主科設定時の主科未設定データ
+      *                                     の有無チェックの修正 
+      *  04.05.05    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -292,7 +295,7 @@
       *
            COPY    "CPSHELLTBL.INC".
       *     
-           COPY    "ORCA-DBMETA".
+           COPY    "ORCA-SYSTEM".
       *
       *    県単独事業用シェル
        01  WRK-SHELL-KENTAN.
@@ -1484,14 +1487,21 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                    TO  SHELLTBL-ARG3         
            MOVE    RECEERR         TO  SHELLTBL-ARG4
       *ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG5
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG5
            MOVE    SPA-T01-WRNO    TO  SHELLTBL-ARG6
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG7
            MOVE    SPA-GMN-PRTKBN  TO  SHELLTBL-ARG8
@@ -2008,14 +2018,21 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG8
       *    ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG9
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG9
            MOVE    WRK-CONS-JOB-JOBID
                                    TO  SHELLTBL-ARG10
            MOVE    WRK-CONS-JOB-SHELLID
@@ -3916,11 +3933,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    IF    ( FLG-SYUKA-CHK             =   ZERO   )
                    AND   ( SPA-NAI-200501-KOUIKIKBN  =   "1"    )
                    AND   ( SPA-NAI-SKYYM             >=  200804 )
-                   AND   ( SPA-NAI-2009-SYUKA-KOUIKI     =   "1"    )
+                   AND   ( SPA-NAI-2009-SYUKA-KOUIKI =   "1"    )
                        MOVE    SPACE           TO  RECE10-REC
                        INITIALIZE                  RECE10-REC
                        MOVE    SPA-HOSPNUM     TO  RECE10-HOSPNUM
                        MOVE    SPA-NAI-SKYYM   TO  RECE10-SKYYM
+                       MOVE    "00"            TO  RECE10-RECEKA
                        MOVE    6               TO  RECE10-TEISYUTUSAKI
                        PERFORM 4602-SYUKA-CHK-SEC
                    END-IF
@@ -4340,14 +4358,21 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
            MOVE    RECEERR         TO  SHELLTBL-ARG16
            MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG17
       *ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG18
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG18
            MOVE    SPA-GMN-NYUGAIKBN
                                    TO  SHELLTBL-ARG19
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG20

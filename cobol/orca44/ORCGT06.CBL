@@ -37,6 +37,7 @@
       *                                     対応
       *                                     ファイル出力先のデフォルト値
       *                                     の設定も可能にする 
+      *  04.05.02    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -325,7 +326,7 @@
       *    クライアント保存可否情報取得サブ
            COPY    "CPORCSCLIENTSV.INC".
       *     
-           COPY    "ORCA-DBMETA".
+           COPY    "ORCA-SYSTEM".
       *
       *****************************************************************
       *    連絡　領域
@@ -999,15 +1000,22 @@
            MOVE    WRK-CONS-JOB-SHELLID
                                    TO  SHELLTBL-ARG3         
            MOVE    RECEERR         TO  SHELLTBL-ARG4
-      *ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
+      *    ipアドレス取得
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG5
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG5
            MOVE    SPA-T01-WRNO    TO  SHELLTBL-ARG6
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG7
            MOVE    SPA-GMN-T98-PRTKBN
@@ -3908,14 +3916,21 @@
            MOVE    SPA-GMN-T98-DATAKBN
                                    TO  SHELLTBL-ARG21
       *ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG22
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG22
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG23
            MOVE    SPA-GMN-T98-PRTKBN
                                    TO  SHELLTBL-ARG24

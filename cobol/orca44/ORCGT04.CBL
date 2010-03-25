@@ -26,6 +26,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -120,7 +121,7 @@
                05  FILLER          PIC X(01)   VALUE   ".".
                05  WRK-SS          PIC X(02).
       *     
-           COPY    "ORCA-DBMETA".
+           COPY    "ORCA-SYSTEM".
       *
       *    ファイルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
@@ -724,14 +725,21 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG8
       *    ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG9
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG9
            MOVE    WRK-CONS-JOB-JOBID
                                    TO  SHELLTBL-ARG10
            MOVE    WRK-CONS-JOB-SHELLID

@@ -40,6 +40,8 @@
       *  03.05.01    NACL-藤原    07/08/01  クライアント保存対応
       *
       *  04.02.01    NACL-藤原    08/03/04  平成２０年４月改正対応
+      *
+      *  04.05.01    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -220,9 +222,7 @@
       *
            COPY    "CPSHELLTBL.INC".
       *     
-           COPY    "ORCA-DBMETA".
-      *
-           COPY    "ORCA-BLOB".
+           COPY    "ORCA-SYSTEM".
       *
       *
       *****************************************************************
@@ -1176,14 +1176,24 @@
            MOVE    SPA-GMN-G02-FILE1   TO  SHELLTBL-ARG16
            MOVE    SPA-GMN-G02-FILE2   TO  SHELLTBL-ARG17
       *    ipアドレス取得
-           MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "metadb"        TO  MCP-TABLE
-           MOVE    "primary"       TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING
+           INITIALIZE                  ORCA-SYSTEM
+           MOVE    "GETVALUE"      TO  MCP-FUNC
+           MOVE    MCP-TERM        TO  ORCA-SYSTEM-ID
+           MOVE    10              TO  ORCA-SYSTEM-NUM
+           MOVE    "host"          TO  ORCA-SYSTEM-KEY (1)
+           MOVE    ORCA-SYSTEM     TO  MCPDATA-REC 
+           MOVE    "system"        TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"     USING
                                        MCPAREA
-                                       DBMETA
+                                       MCPDATA-REC
                                        SPA-AREA
-           MOVE    DBMETA-HOST     TO  SHELLTBL-ARG18
+      *     CALL    "MONFUNC"          USING
+      *                                MCPAREA
+      *                                MCPDATA-REC
+           MOVE    MCPDATA-REC     TO  ORCA-SYSTEM
+           MOVE    ORCA-SYSTEM-VALUE (1)
+                                   TO  SHELLTBL-ARG18
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG19
            MOVE    WRK-FILENM1-FOLDER
                                    TO  SHELLTBL-ARG20
