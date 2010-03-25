@@ -60,6 +60,9 @@
       *  04.04.07    NACL-ÌçÏÆ    10/01/29  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *  04.04.08    NACL-ÌçÏÆ    10/03/12  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *  04.04.09    NACL-ÌçÏÆ    10/03/23  Æ±ÆüÅÅÏÃºÆ¿Ç¤Î²ó¿ôµ­ºÜÂÐ±þ
+      *  04.04.10    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
+      *                                     ¡ÊÃÏ°è°åÎÅ¹×¸¥²Ã»»µ­ºÜÊÔ½¸¡Ë
+      *                                     ¡ÊÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»µ­ºÜÊÔ½¸¡Ë
       *
       *  04.05.01    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/08/17  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -190,10 +193,14 @@
            03  FLG-YOJI                                PIC 9(01).
            03  FLG-YOJI-ARI                            PIC 9(01).
            03  FLG-SAISIN-ARI                          PIC 9(01).
+           03  FLG-KOKENKSN-ARI                        PIC 9(01).
+           03  FLG-MESAIKSN-ARI                        PIC 9(01).
       *    ÆýÍÄ»ù²Ã»»¥«¥¦¥ó¥È
        01  CNT-SAISIN-AREA.
            03  CNT-NYUYOJI                             PIC 9(02).
            03  CNT-NYUYOJI2                            PIC 9(02).
+           03  CNT-KOKENKSN                            PIC 9(02).
+           03  CNT-MESAIKSN                            PIC 9(02).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -422,6 +429,11 @@
            03  CONS-GYOJI          PIC X(09) VALUE "112006370".
       *    ³°Íè¿ÇÎÅÎÁ¡ÊÍÄ»ù¡Ë¡Ê»þ´Ö³°Åù¡Ë²Ã»»
            03  CONS-GYOJI-JIKAN    PIC X(09) VALUE "112007370".
+      *
+      *    ÃÏ°è°åÎÅ¹×¸¥²Ã»»
+           03  CONS-KOKENKSN       PIC X(09) VALUE "112015670".
+      *    ÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»
+           03  CONS-MESAIKSN       PIC X(09) VALUE "112015770".
       *
       *    ¥Õ¥£¥ë¥àÎÁ¡ÊÆýÍÄ»ù¡Ë²Ã»»
            03  CONS-FILM-YOUJI-KASAN  
@@ -2810,6 +2822,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                             COMPUTE  CNT-NYUYOJI2 =  CNT-NYUYOJI2
                                                   +  WK-ZAIKAISU
                        END-IF
+                       IF   RECE100-SRYYM  >= "201004"
+                         IF  SRY-SRYCD(IDX3)  =  CONS-KOKENKSN
+                            COMPUTE  CNT-KOKENKSN =  CNT-KOKENKSN
+                                                  +  WK-ZAIKAISU
+                         END-IF
+                         IF  SRY-SRYCD(IDX3)  =  CONS-MESAIKSN
+                            COMPUTE  CNT-MESAIKSN =  CNT-MESAIKSN
+                                                  +  WK-ZAIKAISU
+                         END-IF
+                       END-IF
       **
                        IF ( SRY-SRYCD(IDX3)      =   CONS-KEIZOKU1  OR
                                                      CONS-KEIZOKU2 )
@@ -2832,11 +2854,30 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                               MOVE     1       TO    FLG-YOJI-ARI
                             END-IF
                          ELSE
+                          IF  (RECE100-SRYYM   >=  "201004"       )
+                          AND (SRY-SRYCD(IDX3)  =  CONS-KOKENKSN OR
+                                                   CONS-MESAIKSN  )
+                            EVALUATE  SRY-SRYCD(IDX3)
+                              WHEN     CONS-KOKENKSN
+                                IF   FLG-KOKENKSN-ARI   =  ZERO
+                                  ADD  WRK-TNS-TEN(IDX3)
+                                                   TO  RECE100-KHNTEN(2)
+                                  MOVE     1       TO  FLG-KOKENKSN-ARI
+                                END-IF
+                              WHEN     CONS-MESAIKSN
+                                IF   FLG-MESAIKSN-ARI   =  ZERO
+                                  ADD  WRK-TNS-TEN(IDX3)
+                                                   TO  RECE100-KHNTEN(2)
+                                  MOVE     1       TO  FLG-MESAIKSN-ARI
+                                END-IF
+                            END-EVALUATE
+                          ELSE
                             IF   FLG-SAISIN-ARI   =  ZERO
                               ADD  WRK-TNS-TEN(IDX3) TO
                                                      RECE100-KHNTEN(2)
                               MOVE     1       TO    FLG-SAISIN-ARI
                             END-IF
+                          END-IF
                          END-IF
                        END-IF
       **
@@ -3620,6 +3661,16 @@ grpsys           PERFORM 900-DBSELECT-SEC
                IF    (CNT-NYUYOJI2     NOT =  ZERO        )
                AND   (RECE100-KAISU(2)  NOT =  CNT-NYUYOJI2)
                      MOVE     "1"        TO   RECE100-NYUYOJIFLG
+               END-IF
+             END-IF
+             IF   RECE100-SRYYM  >= "201004"
+               IF    (CNT-KOKENKSN     NOT =  ZERO        )
+               AND   (RECE100-KAISU(2)  NOT =  CNT-KOKENKSN)
+                     MOVE   ZERO         TO   RECE100-KHNTEN(2)
+               END-IF
+               IF    (CNT-MESAIKSN     NOT =  ZERO        )
+               AND   (RECE100-KAISU(2)  NOT =  CNT-MESAIKSN)
+                     MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
              END-IF
       *
