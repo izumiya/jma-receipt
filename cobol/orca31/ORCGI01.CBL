@@ -227,6 +227,7 @@
            03  FLG-BUNBEN                  PIC 9(01).
            03  FLG-RYOTARGET               PIC 9(01).
            03  FLG-IPPAN                   PIC 9(01).
+           03  FLG-IPPAN2                  PIC 9(01).
            03  FLG-NSRYSRH                 PIC 9(01).
            03  FLG-NRRKSRH                 PIC 9(01).
       *
@@ -5370,7 +5371,9 @@
       *
                IF    ( SPA-GMN-I01-SYORIKBN-CD =   CONST-IDO )
                    IF    ( CONST-KSNCD (IDX-KSN)
-                                           =  CONST-KSNCD-190134270 )
+                                   =   CONST-KSNCD-190135470
+                                    OR CONST-KSNCD-190134270
+                                    OR CONST-KSNCD-190135670 )
                      AND ( SPA-NAI-I01-IDOYMD
                                            >  SPA-NAI-I01-NYUINYMD )
                        CONTINUE
@@ -5521,6 +5524,7 @@
        410111-IPPAN-NYUIN-CHK-SEC      SECTION.
       *
            MOVE    ZERO            TO  FLG-IPPAN
+           MOVE    ZERO            TO  FLG-IPPAN2
       *
            MOVE    SPA-NAI-I01-IDOYMD
                                    TO  WRK-YMD
@@ -5541,9 +5545,19 @@
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( TNS-DATAKBN         =   1 )
                 AND  ( TNS-CDKBN-KBN       = 'A' )
-                AND  ( TNS-CDKBN-KBNNUM    = 100 )
+                AND  ( TNS-CDKBN-KBNNUM    = 100 OR 101 OR 109)
       *
                    MOVE    1       TO  FLG-IPPAN
+      *
+                   IF    TNS-CDKBN-KBNNUM   =   100
+                       MOVE    1       TO  FLG-IPPAN2
+                   END-IF
+                   IF    TNS-CDKBN-KBNNUM   =   101
+                       MOVE    2       TO  FLG-IPPAN2
+                   END-IF
+                   IF    TNS-CDKBN-KBNNUM   =   109
+                       MOVE    3       TO  FLG-IPPAN2
+                   END-IF
       *
                END-IF
       *
@@ -13005,6 +13019,26 @@
                                              "190116990"
                                   MOVE   "1"    TO
                                      LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX9)
+                             END-IF
+      *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÉÂ±¡¡Ë¤Î¥Õ¥é¥°¥»¥Ã¥È
+                             IF   WRK-NYUKHNKSN-SRYCD(IDX8)  =
+                                             "190134270"
+                                  IF    FLG-IPPAN2    =   1
+                                     MOVE   "2"    TO
+                                      LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX9)
+                                  END-IF
+                                  IF    FLG-IPPAN2    =   2
+                                     MOVE   "3"    TO
+                                      LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX9)
+                                  END-IF
+                             END-IF
+      *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡Ê¿ÇÎÅ½ê¡Ë¤Î¥Õ¥é¥°¥»¥Ã¥È
+                             IF   WRK-NYUKHNKSN-SRYCD(IDX8)  =
+                                             "190135670"
+                                  IF    FLG-IPPAN2    =   3
+                                     MOVE   "4"    TO
+                                      LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX9)
+                                  END-IF
                              END-IF
                          END-IF
            END-PERFORM
