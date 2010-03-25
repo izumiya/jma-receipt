@@ -6642,6 +6642,7 @@
                            MOVE    1       TO  WRK-NISSU-DAY (IDX-DAY)
                        END-IF
                    END-PERFORM
+      *
                    IF    ( WRK-NISSU-DAY-G NOT =   ZERO )
                        MOVE    "090004"   TO  WRK-ERRCD
                        PERFORM 2001121-SRY-BYO-ERRMES-SEC
@@ -6693,6 +6694,15 @@
                    MOVE    TNS-NAME        TO  WRK-SRY-NAME
                END-IF
            END-IF
+      *
+           MOVE    SPACE           TO  WRK-ERRMES-PLUS
+           STRING  WRK-SRY-NAME        DELIMITED BY SPACE
+                   "¡¢"                DELIMITED BY SIZE
+                   SDTCHK01-O-BYOMEI (IDX0)
+                                       DELIMITED BY SPACE
+                   WRK-NISSU-MES       DELIMITED BY SPACE
+           INTO    WRK-ERRMES-PLUS
+           END-STRING
       *
            MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
            INITIALIZE                      TERRINF-AREA
@@ -11848,10 +11858,10 @@
                    MOVE    1       TO  FLG-DTCHK010
            NOT AT  END
       *
-               IF    ( KEYCHKSND-HOSPNUM     NOT = DTCHK010-HOSPNUM )
-                OR   ( KEYCHKSND-CHKKBN      NOT = DTCHK010-CHKKBN )
-                OR   ( KEYCHKSND-SRYCD (1:1) NOT = "P" )
-                OR   ( KEYCHKSND-CDKBN       NOT =   DTCHK010-CDKBN )
+               IF    ( DTCHK010-HOSPNUM     NOT = KEYCHKSND-HOSPNUM )
+                OR   ( DTCHK010-CHKKBN      NOT = KEYCHKSND-CHKKBN )
+                OR   ( DTCHK010-SRYCD (1:1) NOT = "P" )
+                OR   ( DTCHK010-CDKBN       NOT = KEYCHKSND-CDKBN )
                    MOVE    1       TO  FLG-DTCHK010
                END-IF
            END-READ
