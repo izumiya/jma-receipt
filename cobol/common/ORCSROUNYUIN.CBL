@@ -2507,13 +2507,19 @@
       *                  KSN3°ß¥«∏Ó«€√÷≤√ªª£≤
       *                  KSN6°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
       *                  KSN5°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
+      *                  KSN14:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
+      *                  KSN18:Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
+      *                  KSN19:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
                          IF (NACCT-SRYCDTOTAL(6:9) = CONS-200804-KSN1
                                                   OR CONS-201004-KSN12
                                                   OR CONS-200804-KSN2
                                                   OR CONS-200804-KSN4
                                                   OR CONS-200804-KSN3
                                                   OR CONS-200804-KSN6
-                                                  OR CONS-200804-KSN5)
+                                                  OR CONS-200804-KSN5
+                                                  OR CONS-201004-KSN14
+                                                  OR CONS-201004-KSN18
+                                                  OR CONS-201004-KSN19)
                           IF  (WRK-NYUINKHN(IDX1)      NOT = SPACE)
                           AND (LNK-SROUNYUIN-GAIHAKU(IDX1) = ZERO OR 4
                                                                   OR 5)
@@ -2539,6 +2545,18 @@
                              WHEN  CONS-200804-KSN5
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-200804-KSN5(IDX1)
+      *                      µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
+                             WHEN  CONS-201004-KSN14
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201004-KSN14(IDX1)
+      *                      Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
+                             WHEN  CONS-201004-KSN18
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201004-KSN18(IDX1)
+      *                      µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
+                             WHEN  CONS-201004-KSN19
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201004-KSN19(IDX1)
                            END-EVALUATE
       *
                            IF   FLG-RYAKU   =   ZERO
@@ -2702,8 +2720,10 @@
                                         TO  WRK-201004-KSN13(IDX1)
       *                         µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
                                 WHEN  CONS-201004-KSN14
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN14(IDX1)
+                                  END-IF
       *                         Ω≈≈Ÿ«ß√Œæ…≤√ªª° ¿∫ø¿…¬≈Ô∆˛±°¥À‹Œ¡°À
                                 WHEN  CONS-201004-KSN15
                                   MOVE   ACCT-DAY(1 IDX1)
@@ -2718,12 +2738,16 @@
                                         TO  WRK-201004-KSN17(IDX1)
       *                         Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
                                 WHEN  CONS-201004-KSN18
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN18(IDX1)
+                                  END-IF
       *                         µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
                                 WHEN  CONS-201004-KSN19
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN19(IDX1)
+                                  END-IF
                               END-EVALUATE
       *
                               IF   FLG-RYAKU   =   ZERO
