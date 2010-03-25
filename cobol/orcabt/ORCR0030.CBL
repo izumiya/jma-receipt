@@ -450,6 +450,8 @@
       *  04.04.43    NACL-門脇    10/03/25  改正対応
       *                                     （地域医療貢献加算記載編集）
       *                                     （明細書発行体制等加算記載編集）
+      *  04.04.44    NACL-門脇    10/03/25  改正対応
+      *                                     （予約コード読み飛ばし編集）
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -5000,7 +5002,9 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-             OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
+             OR     ( SRY-SRYCD(IDX2)       =  "099209903"
+                                            OR "099209905"
+                                            OR "099209906"  )
              OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                             OR "0086"       )
              OR     ( SRY-SRYCD(IDX2)       =  "099999903"
@@ -5071,7 +5075,9 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
+              OR     ( SRY-SRYCD(IDX2)       =  "099209903"
+                                             OR "099209905"
+                                             OR "099209906"  )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
               OR     ( SRY-SRYCD(IDX2)       =  "099999903"
