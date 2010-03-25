@@ -876,8 +876,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                     TO  SPRT-SKYYMD
            MOVE    LNK-PRTKANRI-SHELLID 
                                     TO  SPRT-SHELLID
-      *****MOVE    LNK-PRTKANRI-SHORI-RENNUM
-           MOVE    2
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
                                     TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                     TO  SPRT-PRIORITY
