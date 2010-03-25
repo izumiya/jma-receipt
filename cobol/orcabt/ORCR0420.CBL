@@ -180,6 +180,8 @@
       *  04.04.11    NACL-門脇    10/03/25  改正対応
       *                                     （地域医療貢献加算記載編集）
       *                                     （明細書発行体制等加算記載編集）
+      *  04.04.12    NACL-門脇    10/03/25  改正対応
+      *                                     （予約コード読み飛ばし編集）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1679,7 +1681,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-             OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
+             OR     ( SRY-SRYCD(IDX2)       =  "099209903"
+                                            OR "099209905"
+                                            OR "099209906"  )
              OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"       )
              OR     ( SRY-SRYCD(IDX2)       =  "099999903"
                                             OR "099999904"  )
@@ -1701,7 +1705,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
+              OR     ( SRY-SRYCD(IDX2)       =  "099209903"
+                                             OR "099209905"
+                                             OR "099209906"  )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"       )
               OR     ( SRY-SRYCD(IDX2)       =  "099999903"
                                              OR "099999904"  )
