@@ -201,6 +201,9 @@
       *                                     »þ´Ö³°²Ã»»¶èÊ¬¤Ë¤è¤ë²Ã»»¹àÌÜ
       *                                     ¤Îµ­ºÜ¤ÎÍ­Ìµ
       *                                     »þ´Ö³°²Ã»»¶èÊ¬¤ÎÄÉ²Ã
+      *  04.04.05    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
+      *                                     ¡ÊÃÏ°è°åÎÅ¹×¸¥²Ã»»µ­ºÜÊÔ½¸¡Ë
+      *                                     ¡ÊÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»µ­ºÜÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -780,7 +783,7 @@
       *
       *    ÅÅ»Ò²½²Ã»»Åù¾ðÊó
        01  TBL-DENSHI-INF.
-         02    TBL-DENSHI-OCC              OCCURS   7.
+         02    TBL-DENSHI-OCC              OCCURS  10.
            03  TBL-DENSHI-FLG              PIC  9(01).
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-OCC2             OCCURS   5.
@@ -936,11 +939,15 @@
            03  FILLER          PIC X(09)   VALUE   "112014370".
       *    ºÆ¿Ç¡ÊÆýÍÄ»ù»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã»»
            03  FILLER          PIC X(09)   VALUE   "112015070".
+      *    ÃÏ°è°åÎÅ¹×¸¥²Ã»»
+           03  FILLER          PIC X(09)   VALUE   "112015670".
+      *    ÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»
+           03  FILLER          PIC X(09)   VALUE   "112015770".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   69.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   71.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   69.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   71.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -1519,7 +1526,7 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
       *        ÅÅ»Ò²½²Ã»»ÅùÊÔ½¸
                MOVE    ZERO      TO    FLG-TEIGEN
                PERFORM  VARYING  IDX6   FROM   1   BY  1
-                         UNTIL   IDX6    >     7
+                         UNTIL   IDX6    >    10
                  IF      TBL-DENSHI-FLG(IDX6)  =   1
                    PERFORM 2010-DENSHI-HENSYU-SEC
                  END-IF
@@ -2141,25 +2148,32 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
                END-IF
            END-IF    
       *
-           IF  ( RECE02-SRYYM   >=  "200804"             )
-           AND ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+           IF (( RECE02-SRYYM   >=  "200804"             ) AND
+               ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                       =   "112015570"  OR  "112001410"  OR
                           "112014170"  OR  "112014270"  OR
-                          "112014370"  OR  "112015070"   )
+                          "112014370"  OR  "112015070"   ))
+           OR (( RECE02-SRYYM   >=  "201004"             ) AND
+               ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                      =   "112015670"  OR  "112015770"   ))
       *
              EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                WHEN       "112001410"
-                  MOVE     2     TO     IDX6
-               WHEN       "112015070"
                   MOVE     3     TO     IDX6
-               WHEN       "112014170"
+               WHEN       "112015070"
                   MOVE     4     TO     IDX6
-               WHEN       "112014270"
+               WHEN       "112014170"
                   MOVE     5     TO     IDX6
-               WHEN       "112014370"
+               WHEN       "112014270"
                   MOVE     6     TO     IDX6
-               WHEN       "112015570"
+               WHEN       "112014370"
                   MOVE     7     TO     IDX6
+               WHEN       "112015570"
+                  MOVE     8     TO     IDX6
+               WHEN       "112015670"
+                  MOVE     9     TO     IDX6
+               WHEN       "112015770"
+                  MOVE    10     TO     IDX6
              END-EVALUATE
       *
              MOVE     1              TO  TBL-DENSHI-FLG(IDX6)
@@ -3845,8 +3859,10 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
       *
                EVALUATE  IDX6
                  WHEN      1
-                 WHEN      2
-                 WHEN      7
+                 WHEN      3
+                 WHEN      8
+                 WHEN      9
+                 WHEN     10
       *
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    TBL-DENSHI-TEN(IDX6)  TO  WRK-ZAITENX
@@ -3859,35 +3875,41 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                    EVALUATE  IDX6
                      WHEN      1
                        MOVE  "ÅÅ»Ò²½²Ã»»"    TO  WRK-ZAI-NAME(1:10)
-                     WHEN      2
+                     WHEN      3
                        MOVE  "»þ´Ö³°ÆÃÎã¡ÊºÆ¿Ç¡Ë"
                                              TO  WRK-ZAI-NAME(1:18)
-                     WHEN      7
+                     WHEN      8
                        MOVE  "ºÆ¿Ç¡ÊÌë´Ö¡¦ÁáÄ«Åù¡Ë²Ã»»"
                                              TO  WRK-ZAI-NAME(1:24)
+                     WHEN      9
+                       MOVE  "ÃÏ°è°åÎÅ¹×¸¥²Ã»»"
+                                             TO  WRK-ZAI-NAME(1:16)
+                     WHEN     10
+                       MOVE  "ÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»"
+                                             TO  WRK-ZAI-NAME(1:20)
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
                    PERFORM 20101-DENSHI-WRITE-SEC
       *
-                 WHEN      3
                  WHEN      4
                  WHEN      5
                  WHEN      6
+                 WHEN      7
       *
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    "¡ö"              TO  WRK-ZAI-MK
                    EVALUATE  IDX6
-                     WHEN      3
+                     WHEN      4
                        MOVE  "ºÆ¿Ç¡ÊÆýÍÄ»ù»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã»»"
                                              TO  WRK-ZAI-NAME(1:36)
-                     WHEN      4
+                     WHEN      5
                        MOVE  "¾®»ù²ÊºÆ¿Ç¡ÊÆýÍÄ»ùÌë´Ö¡Ë²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
-                     WHEN      5
+                     WHEN      6
                        MOVE  "¾®»ù²ÊºÆ¿Ç¡ÊÆýÍÄ»ùµÙÆü¡Ë²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
-                     WHEN      6
+                     WHEN      7
                        MOVE  "¾®»ù²ÊºÆ¿Ç¡ÊÆýÍÄ»ù¿¼Ìë¡Ë²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
                    END-EVALUATE
@@ -3932,8 +3954,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
            EVALUATE  IDX6
              WHEN     1
                COMPUTE RECE06-ZAINUM   = 99994000 + IDX5
-             WHEN     2
-               COMPUTE RECE06-ZAINUM   = 99994010 + IDX5
              WHEN     3
                COMPUTE RECE06-ZAINUM   = 99994020 + IDX5
              WHEN     4
@@ -3944,6 +3964,12 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                COMPUTE RECE06-ZAINUM   = 99994050 + IDX5
              WHEN     7
                COMPUTE RECE06-ZAINUM   = 99994060 + IDX5
+             WHEN     8
+               COMPUTE RECE06-ZAINUM   = 99994070 + IDX5
+             WHEN     9
+               COMPUTE RECE06-ZAINUM   = 99994080 + IDX5
+             WHEN    10
+               COMPUTE RECE06-ZAINUM   = 99994090 + IDX5
            END-EVALUATE
       *
            MOVE    1                 TO  RECE06-ZAIMEISAISU
@@ -3954,34 +3980,27 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
            EVALUATE  IDX6
              WHEN     1
                 MOVE    "11"         TO  RECE06-SRYKBN
-             WHEN     2
              WHEN     3
              WHEN     4
              WHEN     5
              WHEN     6
              WHEN     7
+             WHEN     8
+             WHEN     9
+             WHEN    10
                 MOVE    "12"         TO  RECE06-SRYKBN
            END-EVALUATE
       *
            MOVE    99999999          TO  RECE06-ZAITEN
            MOVE    ZERO              TO  RECE06-KNSJISKBN
       *
-           EVALUATE  IDX6
-             WHEN     1
-             WHEN     2
-             WHEN     3
-             WHEN     4
-             WHEN     5
-             WHEN     6
-             WHEN     7
-                MOVE    9            TO  RECE06-CDKBN-SYO
-                MOVE    99           TO  RECE06-CDKBN-BU
-                MOVE    "9"          TO  RECE06-CDKBN-KBN
-                MOVE    999          TO  RECE06-CDKBN-KBNNUM
-                MOVE    99           TO  RECE06-CDKBN-KBNNUM-EDA
-                MOVE    99           TO  RECE06-CDKBN-KOUBAN
-                MOVE    999999999    TO  RECE06-KOUHYOJUNNUM
-           END-EVALUATE
+           MOVE    9                 TO  RECE06-CDKBN-SYO
+           MOVE    99                TO  RECE06-CDKBN-BU
+           MOVE    "9"               TO  RECE06-CDKBN-KBN
+           MOVE    999               TO  RECE06-CDKBN-KBNNUM
+           MOVE    99                TO  RECE06-CDKBN-KBNNUM-EDA
+           MOVE    99                TO  RECE06-CDKBN-KOUBAN
+           MOVE    999999999         TO  RECE06-KOUHYOJUNNUM
       *
            MOVE    SPACE             TO  RECE06-SAFLG
            MOVE    SPACE             TO  RECE06-SRYSYUKBN

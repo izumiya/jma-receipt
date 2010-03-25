@@ -177,6 +177,9 @@
       *  04.04.08    NACL-ÌçÏÆ    10/01/29  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *  04.04.09    NACL-ÌçÏÆ    10/03/12  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
       *  04.04.10    NACL-ÌçÏÆ    10/03/23  Æ±ÆüÅÅÏÃºÆ¿Ç¤Î²ó¿ôµ­ºÜÂÐ±þ
+      *  04.04.11    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
+      *                                     ¡ÊÃÏ°è°åÎÅ¹×¸¥²Ã»»µ­ºÜÊÔ½¸¡Ë
+      *                                     ¡ÊÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»µ­ºÜÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -345,6 +348,7 @@
            03  FLG-WRITE45X                            PIC 9(01).
            03  FLG-TAHOKEN                             PIC 9(01).
            03  FLG-SRYKBN-HEN                          PIC 9(01).
+           03  FLG-COUNT-ARI                           PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -1353,6 +1357,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-KENSA-COM
       *
                                MOVE    SPACE   TO      WRK-KYUGYOFLG
+                               MOVE    ZERO    TO      FLG-COUNT-ARI
       *
                                MOVE    ZERO    TO      FLG-WRITE45
                                PERFORM   21011-RECE44-TENSOU-SEC
@@ -1406,6 +1411,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-KENSA-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
+                                      MOVE  ZERO  TO  FLG-COUNT-ARI
       *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
@@ -1447,6 +1453,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-KENSA-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
+                                      MOVE  ZERO  TO  FLG-COUNT-ARI
       *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
@@ -3575,7 +3582,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                MOVE   1    TO  FLG-KHNTEN2
                             END-IF
                          END-IF
-                         ADD    WK-ZAIKAISU   TO   RECE41-KAISU(2)
+                         IF   FLG-COUNT-ARI  =  ZERO
+                           ADD    WK-ZAIKAISU   TO   RECE41-KAISU(2)
+                           MOVE   1             TO   FLG-COUNT-ARI
+                         END-IF
                          COMPUTE    RECE41-TENSU(2)  =
                                     RECE41-TENSU(2)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -4058,14 +4068,18 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                            TO   RECE41-SYOSAIYMD2(2)
                      ELSE
                          IF      RECE41-KEIZOKU-PRTKBN     =   "2"
-                            ADD   WK-ZAIKAISU  TO
-                                               RECE41-KAISU(3)
+                            IF   FLG-COUNT-ARI  =  ZERO
+                              ADD   WK-ZAIKAISU  TO  RECE41-KAISU(3)
+                              MOVE  1            TO  FLG-COUNT-ARI
+                            END-IF
                             COMPUTE    RECE41-TENSU(3)  =
                                        RECE41-TENSU(3)  +
                                  (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
                          ELSE
-                            ADD   WK-ZAIKAISU  TO
-                                               RECE41-KAISU(2)
+                            IF   FLG-COUNT-ARI  =  ZERO
+                              ADD   WK-ZAIKAISU  TO  RECE41-KAISU(2)
+                              MOVE  1            TO  FLG-COUNT-ARI
+                            END-IF
                             COMPUTE    RECE41-TENSU(2)  =
                                        RECE41-TENSU(2)  +
                                  (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
@@ -5027,7 +5041,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
       **                 OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"  )
       **                     CONTINUE
       **                 ELSE
-                             ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
+                             IF   FLG-COUNT-ARI  =  ZERO
+                               ADD   WK-ZAIKAISU  TO  RECE41-KAISU(2)
+                               MOVE  1            TO  FLG-COUNT-ARI
+                             END-IF
       **                 END-IF
                          IF  WRK-PARA-JIBAIPRTKBN = "1"
                           IF    RECE41-KHNTEN(2)   =   ZERO
@@ -5877,7 +5894,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
                            END-IF
                          ELSE
+                           IF   FLG-COUNT-ARI  =  ZERO
                                ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
+                               MOVE  1            TO   FLG-COUNT-ARI
+                           END-IF
                          END-IF
                          COMPUTE    RECE41-TENSU(2)   =
                                     RECE41-TENSU(2)   +
@@ -6738,6 +6758,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-KENSA-COM
       *
                                MOVE    SPACE   TO    WRK-KYUGYOFLG
+                               MOVE    ZERO    TO    FLG-COUNT-ARI
       *
                                MOVE    ZERO    TO    FLG-WRITE45
                                PERFORM   21011-RECE44-TENSOU-SEC
@@ -6793,6 +6814,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-KENSA-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
+                                      MOVE  ZERO  TO  FLG-COUNT-ARI
       *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
@@ -6836,6 +6858,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-KENSA-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
+                                      MOVE  ZERO  TO  FLG-COUNT-ARI
       *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
