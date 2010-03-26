@@ -317,6 +317,7 @@
       *  04.05.04    NACL-多々納  09/12/15  調整金２対応
       *  04.05.05    NACL-門脇    10/01/07  治験対応
       *  04.05.06    NACL-門脇    10/01/26  東京都マル子追加対応
+      *  04.05.07    NACL-門脇    10/03/26  一括再計算方法選択機能対応修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -24666,6 +24667,12 @@
                        GO    TO    SYUNOU-READ-100
                ELSE
                        MOVE    ZERO    TO  FLG-SYUNOU
+                       IF   (LNK-S01-SAIKEISAN-KBN    =   "1")
+                       AND  (LNK-S01-IKTKEISANKBN     =   "1")
+                       AND  (FLG-IKTKEISANKBN         =  ZERO)
+                       AND  (LNK-S01-IKTSORTKBN       =   "1")
+                         MOVE  ZERO    TO  SYU-DENPNUM
+                       END-IF
                END-IF
            ELSE
                INITIALIZE                  SYU-SYUNOU-REC
