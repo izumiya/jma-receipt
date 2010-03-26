@@ -321,17 +321,40 @@ grpsys     03  FILLER              PIC X(04)   VALUE   ".dat".
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   STGTSCM-MAX )
       *
-               IF    ( STGTSCM-NAME (IDX0)
-                                       =   "CHK005"
-                                       OR  "RECE_PUTB"
-                                       OR  "RECEPRT"
-                                                        )
+               EVALUATE    STGTSCM-NAME (IDX0)
+               WHEN    "CHK005"
+               WHEN    "RECE_PUTB"
+               WHEN    "RECEPRT"
                    CONTINUE
-               ELSE
+               WHEN    "SYUNOU"
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_syunou_main"   TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SYUNOU_MAIN"       TO  WK-TBL-MSG-C (IDX4)
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_syunou_nyuin"  TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SYUNOU_NYUIN"      TO  WK-TBL-MSG-C (IDX4)
+               WHEN    "SEIKYU"
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_seikyu_main"   TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SEIKYU_MAIN"       TO  WK-TBL-MSG-C (IDX4)
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_seikyu_koh"    TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SEIKYU_KOH"        TO  WK-TBL-MSG-C (IDX4)
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_seikyu_etc"    TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SEIKYU_ETC"        TO  WK-TBL-MSG-C (IDX4)
+               WHEN    "SRYACCT"
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_sryacct_main"  TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SRYACCT_MAIN"      TO  WK-TBL-MSG-C (IDX4)
+                   COMPUTE IDX4    =   IDX4    +   1
+                   MOVE    "tbl_sryacct_sub"   TO  WK-TBL-NAME-C(IDX4)
+                   MOVE    "SRYACCT_SUB"       TO  WK-TBL-MSG-C (IDX4)
+               WHEN    OTHER
                    COMPUTE IDX4    =   IDX4    +   1
                    MOVE    STGTSCM-ID   (IDX0) TO  WK-TBL-NAME-C(IDX4)
                    MOVE    STGTSCM-NAME (IDX0) TO  WK-TBL-MSG-C (IDX4)
-               END-IF
+               END-EVALUATE
       *
            END-PERFORM
       *

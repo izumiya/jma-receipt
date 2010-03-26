@@ -86,7 +86,7 @@ grpsys     03  EIE01PARA-FILE      PIC X(23).
       *
       *    Ãê½Ð¹àÌÜÍÑ¥Õ¥¡¥¤¥ë Ì¾¾ÎÎÎ°è
        01  EIE02PARA.
-           03  FILLER               PIC  X(50).
+           03  FILLER               PIC  X(100).
        01  EIE02PARA-NAME.
            03  FILLER               PIC  X(07) VALUE
                "record/".
@@ -522,12 +522,6 @@ grpsys             MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG5
                        MOVE    SPACE               TO    SPA-ERRCD
                        PERFORM VARYING IDX1  FROM  1  BY 1
                                UNTIL   IDX1  >    200
-                           DISPLAY " WK-TBL-MSG (" IDX1 ") = "
-                                     WK-TBL-MSG (IDX1)
-                                   " WK-TBL-KBN1(" IDX1 ") = "
-                                     WK-TBL-KBN1(IDX1)
-                                   " WK-TBL-KBN2(" IDX1 ") = "
-                                     WK-TBL-KBN2(IDX1)
                            IF  (WK-TBL-KBN1 (IDX1)     = "*")  AND
                                (WK-TBL-KBN2 (IDX1) NOT = "*")
                                MOVE    "0002"          TO  SPA-ERRCD
@@ -850,11 +844,14 @@ grpsys*DD                              SPA-AREA
       *
            IF  (WK-TBL-MSG (IDX2)(1:6)  = "JYURRK")       OR
                (WK-TBL-MSG (IDX2)(1:8)  = "PTBYOMEI")     OR
-               (WK-TBL-MSG (IDX2)(1:7)  = "SRYACCT")      OR
+               (WK-TBL-MSG (IDX2)(1:12) = "SRYACCT_MAIN") OR
+               (WK-TBL-MSG (IDX2)(1:11) = "SRYACCT_SUB")  OR
                (WK-TBL-MSG (IDX2)(1:6)  = "SRYACT")       OR
                (WK-TBL-MSG (IDX2)(1:8)  = "WKSRYACT")     OR
                (WK-TBL-MSG (IDX2)(1:6)  = "SANTEI")       OR
-               (WK-TBL-MSG (IDX2)(1:6)  = "SEIKYU")       OR
+               (WK-TBL-MSG (IDX2)(1:11) = "SEIKYU_MAIN")  OR
+               (WK-TBL-MSG (IDX2)(1:10) = "SEIKYU_KOH")   OR
+               (WK-TBL-MSG (IDX2)(1:10) = "SEIKYU_ETC")   OR
                (WK-TBL-MSG (IDX2)(1:5)  = "BD002")        OR
       *½¤Àµ/*³«»Ï*03.05.12*********************************************
                (WK-TBL-MSG (IDX2)(1:9)  = "NYUINACCT")    OR
@@ -867,7 +864,7 @@ grpsys*DD                              SPA-AREA
                MOVE    SPACE               TO  SPA-NAI-SRYYM
            END-IF.
       *
-           IF  SPA-GMN-SRYYM   =  "******"
+           IF  SPA-GMN-SRYYM   =  "******" OR  SPACE
                MOVE    SPACE               TO  SPA-GMN-SRYYM
                MOVE    SPACE               TO  SPA-NAI-SRYYM
            END-IF.
@@ -1443,11 +1440,13 @@ grpsys     MOVE    SPA-TERMID        TO  EIE01PARA-TERMID.
       *
            IF  (SPA-GMN-FILE-KEY(1:6)  = "JYURRK")       OR
                (SPA-GMN-FILE-KEY(1:8)  = "PTBYOMEI")     OR
-               (SPA-GMN-FILE-KEY(1:7)  = "SRYACCT")      OR
+               (SPA-GMN-FILE-KEY(1:12) = "SRYACCT_MAIN") OR
                (SPA-GMN-FILE-KEY(1:6)  = "SRYACT")       OR
                (SPA-GMN-FILE-KEY(1:8)  = "WKSRYACT")     OR
                (SPA-GMN-FILE-KEY(1:6)  = "SANTEI")       OR
-               (SPA-GMN-FILE-KEY(1:6)  = "SEIKYU")       OR
+               (SPA-GMN-FILE-KEY(1:11) = "SEIKYU_MAIN")  OR
+               (SPA-GMN-FILE-KEY(1:10) = "SEIKYU_KOH")   OR
+               (SPA-GMN-FILE-KEY(1:10) = "SEIKYU_ETC")   OR
                (SPA-GMN-FILE-KEY(1:5)  = "BD002")        OR
       *½¤Àµ/*³«»Ï*03.05.12*********************************************
                (SPA-GMN-FILE-KEY(1:9)  = "NYUINACCT")    OR

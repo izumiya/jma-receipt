@@ -497,7 +497,7 @@ grpsys*DD                                        TO  WK-HOSPID-L(2:5)
       *
        T-001-SRYYMSET-01-SEC             SECTION.
       *
-           EVALUATE    WK-TBL-MSG (IDX2)(1:10)
+           EVALUATE    WK-TBL-MSG (IDX2)
                WHEN    "JYURRK    "
                    MOVE    "all2"          TO  WK-PATHNAME
 grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
@@ -508,7 +508,7 @@ grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
 grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                    MOVE    WK-SRYYM        TO  MCPDATA-REC(WK-SRYYM-S:6)
                    MOVE    "%"             TO  MCPDATA-REC(WK-SRYYM-L:1)
-               WHEN    "SRYACCT   "
+               WHEN    "SRYACCT_MAIN"
                    MOVE    "all2"          TO  WK-PATHNAME
 grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                    MOVE    WK-SRYYM        TO  MCPDATA-REC(WK-SRYYM-S:6)
@@ -525,7 +525,9 @@ grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                    MOVE    "all2"          TO  WK-PATHNAME
 grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                    MOVE    WK-SRYYM        TO  MCPDATA-REC(WK-SRYYM-S:6)
-               WHEN    "SEIKYU    "
+               WHEN    "SEIKYU_MAIN"
+               WHEN    "SEIKYU_ETC"
+               WHEN    "SEIKYU_KOH"
                    MOVE    "all2"          TO  WK-PATHNAME
 grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                    MOVE    WK-SRYYM        TO  MCPDATA-REC(WK-SRYYM-S:6)

@@ -129,6 +129,9 @@ grpsys     03  FILLER              PIC X(04)   VALUE   ".dat".
            03  T-MESSAGE-05        PIC X(44)   VALUE
                "指定された条件でバックアップ処理を行います。".
       *
+       01  WRK-AREA.
+           03  WRK-TBLID             PIC X(30).
+      *
       *    作業テーブル名称領域
        01  WK-TBL.
            03  WK-TBLSET       OCCURS  120.
@@ -478,7 +481,20 @@ grpsys                                         SPA-AREA
       *
            PERFORM VARYING IDX1  FROM  1  BY 1
                    UNTIL   IDX1  >    SPA-GMN-MAX-A
-               MOVE    SPA-GMN-MSG (IDX1)   TO  F01-CHKMSG  (IDX1)
+               EVALUATE    SPA-GMN-MSG (IDX1)
+               WHEN   "SRYACCT"
+                   MOVE    "SRYACCT_MAIN, SUB"
+                                            TO  F01-CHKMSG  (IDX1)
+               WHEN   "SEIKYU"
+                   MOVE    "SEIKYU_MAIN, SUB, KOH"
+                                            TO  F01-CHKMSG  (IDX1)
+               WHEN   "SYUNOU"
+                   MOVE    "SYUNOU_MAIN, NYUIN"
+                                            TO  F01-CHKMSG  (IDX1)
+               WHEN    OTHER
+                   MOVE    SPA-GMN-MSG (IDX1)
+                                            TO  F01-CHKMSG  (IDX1)
+               END-EVALUATE
                MOVE    SPA-GMN-BTN (IDX1)   TO  F01-CHKBTN  (IDX1)
            END-PERFORM.
       *
@@ -738,35 +754,36 @@ grpsys*        MOVE    SPA-HOSPNUM       TO  SHELLTBL-ARG7
                PERFORM VARYING IDX1  FROM  1  BY 1
                        UNTIL   IDX1  >    SPA-GMN-MAX-A
                    IF      SPA-GMN-BTN (IDX1) = "T"
-                       INITIALIZE                  ORCSMKPASSAREA
-                       MOVE    "scripts/allways/orcbsf01.sh"
-                                                   TO  MKPASS-IN-01
-                       CALL    "ORCSMKPASS"        USING  ORCSMKPASSAREA
-                       MOVE    MKPASS-OT-01        TO  SHELL-NAME
-                       MOVE    WK-TBL-MSG-2 (IDX1) TO  SHELL-T-NAME
-                       MOVE    "CNV-TABLE"         TO  SHELL-C-NAME
-                       MOVE    "OUT-TABLE-WK"      TO  SHELL-W-NAME
-                       MOVE    SPA-GMN-FILE-ID     TO  SHELL-O-NAME
-                       IF      SHELL-KBEN = SPACE
-                           MOVE    "0"                TO  SHELL-KBEN
-                       ELSE
-                           MOVE    "1"                TO  SHELL-KBEN
-                       END-IF
-                       MOVE    SHELL-NAME        TO  SHELLTBL-NAME
-                       MOVE    SHELL-ARG1        TO  SHELLTBL-ARG1
-                       MOVE    SHELL-ARG2        TO  SHELLTBL-ARG2
-                       MOVE    SHELL-ARG3        TO  SHELLTBL-ARG3
-                       MOVE    SHELL-ARG4        TO  SHELLTBL-ARG4
-                       MOVE    SHELL-ARG5        TO  SHELLTBL-ARG5
-                       MOVE    SHELL-ARG6        TO  SHELLTBL-ARG6
-                       MOVE    SHELLTBL          TO  MCPDATA-REC
-                       MOVE    "SHELL"           TO  MCP-FUNC
-                       MOVE    "shell"           TO  MCP-TABLE
-                       MOVE    "shell"           TO  MCP-PATHNAME
-                       CALL    "ORCDBMAIN"       USING
-                                                     MCPAREA
-                                                     MCPDATA-REC
-                                                     SPA-AREA
+                       EVALUATE    WK-TBL-MSG-2 (IDX1)
+                       WHEN    "tbl_sryacct"
+                           MOVE    "tbl_sryacct_main"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                           MOVE    "tbl_sryacct_sub"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                       WHEN    "tbl_seikyu"
+                           MOVE    "tbl_seikyu_main"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                           MOVE    "tbl_seikyu_koh"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                           MOVE    "tbl_seikyu_etc"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                       WHEN    "tbl_syunou"
+                           MOVE    "tbl_syunou_main"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                           MOVE    "tbl_syunou_nyuin"
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                       WHEN    OTHER
+                           MOVE    WK-TBL-MSG-2 (IDX1)
+                                         TO  WRK-TBLID
+                           PERFORM T-000-ORCBSF01-SEC
+                       END-EVALUATE
                    END-IF
                END-PERFORM
                INITIALIZE                ORCSMKPASSAREA
@@ -801,6 +818,45 @@ grpsys         MOVE    SPA-HOSPNUM       TO  SHELLTBL-ARG7
        T-000-WRITABLE-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    バックアップシェル実行処理
+      *****************************************************************
+       T-000-ORCBSF01-SEC                SECTION.
+      *
+                       INITIALIZE                  ORCSMKPASSAREA
+                       MOVE    "scripts/allways/orcbsf01.sh"
+                                                   TO  MKPASS-IN-01
+                       CALL    "ORCSMKPASS"        USING  ORCSMKPASSAREA
+                       MOVE    MKPASS-OT-01        TO  SHELL-NAME
+                       MOVE    WRK-TBLID           TO  SHELL-T-NAME
+                       MOVE    "CNV-TABLE"         TO  SHELL-C-NAME
+                       MOVE    "OUT-TABLE-WK"      TO  SHELL-W-NAME
+                       MOVE    SPA-GMN-FILE-ID     TO  SHELL-O-NAME
+                       IF      SHELL-KBEN = SPACE
+                           MOVE    "0"                TO  SHELL-KBEN
+                       ELSE
+                           MOVE    "1"                TO  SHELL-KBEN
+                       END-IF
+                       MOVE    SHELL-NAME        TO  SHELLTBL-NAME
+                       MOVE    SHELL-ARG1        TO  SHELLTBL-ARG1
+                       MOVE    SHELL-ARG2        TO  SHELLTBL-ARG2
+                       MOVE    SHELL-ARG3        TO  SHELLTBL-ARG3
+                       MOVE    SHELL-ARG4        TO  SHELLTBL-ARG4
+                       MOVE    SHELL-ARG5        TO  SHELLTBL-ARG5
+                       MOVE    SHELL-ARG6        TO  SHELLTBL-ARG6
+                       MOVE    SHELLTBL          TO  MCPDATA-REC
+                       MOVE    "SHELL"           TO  MCP-FUNC
+                       MOVE    "shell"           TO  MCP-TABLE
+                       MOVE    "shell"           TO  MCP-PATHNAME
+                       CALL    "ORCDBMAIN"       USING
+                                                     MCPAREA
+                                                     MCPDATA-REC
+                                                     SPA-AREA
+      *
+           .
+      *
+       T-000-ORCBSF01-EXT.
+           EXIT.
       *****************************************************************
       *    テーブル名称 セット処理
       *****************************************************************
