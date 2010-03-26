@@ -237,6 +237,7 @@
                                13  SPA-NAI-RSI-HKNKBNL     PIC X(01).
                    07  SPA-TUKISKY-PARA-G.
                        09  SPA-TUKISKY-DENPNUM     PIC  9(07).
+                       09  SPA-TUKISKY-SRYYMD      PIC  X(08).
                    07  SPA-NAI-TBL.
                        09  SPA-NAI-THSRYYM         PIC  X(06).
                        09  SPA-NAI-TBLREC  OCCURS  500.
@@ -3721,6 +3722,7 @@
            ELSE
       *
                MOVE    ZERO            TO  SPA-TUKISKY-DENPNUM
+               MOVE    SPACE           TO  SPA-TUKISKY-SRYYMD
       *
                PERFORM VARYING IDX10   FROM   1   BY  1
                        UNTIL ( IDX10   >   SPA-GMN-MAX )
@@ -3731,6 +3733,8 @@
                     AND( SPA-NAI-TNYUGAIKBN (IDX10)  =   "2" )
                        MOVE    SPA-GMN-TDENPNUM(IDX10)
                                        TO  SPA-TUKISKY-DENPNUM
+                       MOVE    SPA-NAI-TSRYYMD(IDX10)
+                                       TO  SPA-TUKISKY-SRYYMD
                    END-IF
       *
                END-PERFORM
@@ -3772,6 +3776,9 @@
       *    外来月まとめ請求書兼領収書発行処理
       **************************************************************
        4901-GAI-TUKISKYPRT-SEC         SECTION.
+      *
+           MOVE    SPA-TUKISKY-SRYYMD
+                                   TO  WRK-SKYYM
       *
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
