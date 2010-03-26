@@ -348,6 +348,7 @@
       *
            MOVE    TEIKI2P-HOSPNUM     TO  SPA-HOSPNUM
            MOVE    TEIKI2P-STAFFCD     TO  SPA-STAFFCD
+           MOVE    TEIKI2P-SYSYMD      TO  SPA-SYSYMD
       *
            PERFORM 100-DBOPEN-SEC
       *
