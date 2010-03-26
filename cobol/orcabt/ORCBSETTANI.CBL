@@ -621,7 +621,7 @@
            MOVE    ZERO                TO  FLG-OK
            MOVE    ZERO                TO  FLG-OK-END
            MOVE    SPACE               TO  WRK-TNS-TANICD
-           MOVE    SPACE               TO  WRK-TNS-TANIMOJISU
+           MOVE    ZERO                TO  WRK-TNS-TANIMOJISU
            MOVE    SPACE               TO  WRK-TNS-TANINAME
            MOVE    SPACE               TO  WRK-TNS-NAME
            PERFORM UNTIL    (FLG-TENSU     =   1  )
