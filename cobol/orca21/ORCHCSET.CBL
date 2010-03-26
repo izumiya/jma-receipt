@@ -240,9 +240,10 @@
            03  B01-SRYCD               PIC X(09).
            03  B01-HENSYU.
                05  B01-NAME-FIL1           PIC X(50).
-               05  B01-SURYO-HEN           PIC X(11).
-               05  B01-KAISU-HEN           PIC X(05).
-               05  B01-INPUT-HEN           PIC X(10).
+               05  B01-HENSYU-I.
+                   07  B01-SURYO-HEN           PIC X(11).
+                   07  B01-KAISU-HEN           PIC X(05).
+                   07  B01-INPUT-HEN           PIC X(10).
            03  B01-HENSYU-2            REDEFINES   B01-HENSYU.
                05  B01-NAME-FIL2           PIC X(61).
                05  B01-KANSURYO-HEN        PIC X(15).
@@ -651,7 +652,16 @@
                UNTIL     FLG-INPUTCD       =   1
                IF      ICD-INPUTCD         =   ISET-SETCD
       *            表示名
-                   MOVE    ICD-DSPNAME         TO  H02-DSPNAME
+      ****         MOVE    ICD-DSPNAME         TO  H02-DSPNAME
+      *            セット名称　編集
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    ICD-DSPNAME         TO  KANACHK-MAE-INPUT
+                   MOVE    100                 TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  H02-DSPNAME
+      *
                ELSE
                    ADD     1                   TO  IDY
                    IF      IDY                 <=  5
@@ -882,7 +892,16 @@
            PERFORM 990-DBCLOSE-SEC
            IF      FLG-INPUTCD         =   ZERO
       *        表示名
-               MOVE    ICD-DSPNAME         TO  B01N-NAME
+      *****    MOVE    ICD-DSPNAME         TO  B01N-NAME
+      *        セット名称　編集
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    ICD-DSPNAME         TO  KANACHK-MAE-INPUT
+               MOVE    80                  TO  KANACHK-MAX-CNT
+               CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+               MOVE    KANACHK-MAE-INPUT   TO  B01N-NAME
+      *
            END-IF
       *    回数
            IF     (ISET-KAISU              >   1     )
@@ -1109,7 +1128,7 @@
            END-IF
       *    その他
            IF      ISET-ATAI-AREA      NOT =   SPACE
-               MOVE    SPACE           TO  B01-HENSYU
+               MOVE    SPACE           TO  B01-HENSYU-I
                STRING  ISET-ATAI1      DELIMITED  BY  SPACE
                        ","             DELIMITED  BY  SIZE
                        ISET-ATAI2      DELIMITED  BY  SPACE
@@ -1117,7 +1136,7 @@
                        ISET-ATAI3      DELIMITED  BY  SPACE
                        ","             DELIMITED  BY  SIZE
                        ISET-ATAI4      DELIMITED  BY  SPACE
-                       INTO                    B01-HENSYU
+                       INTO                    B01-HENSYU-I
                END-STRING
            END-IF
       *
