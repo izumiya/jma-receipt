@@ -230,6 +230,7 @@
            03  FLG-IPPAN2                  PIC 9(01).
            03  FLG-NSRYSRH                 PIC 9(01).
            03  FLG-NRRKSRH                 PIC 9(01).
+           03  FLG-SST                     PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -267,6 +268,7 @@
        01  CNT-AREA.
            03  CNT-TUKISU          PIC 9(05).
            03  CNT-KSN             PIC 9(05).
+           03  CNT-SST             PIC 9(05).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -5396,19 +5398,27 @@
                END-IF
       *
                IF    ( FLG-HIT         =   1 )
+                   MOVE    ZERO        TO  FLG-SST
+                   MOVE    ZERO        TO  CNT-SST
                    PERFORM VARYING IDX5    FROM    1   BY  1
                        UNTIL ( IDX5    >   10 )
-                        OR   ( FLG-HIT =   ZERO )
+                        OR   ( FLG-SST =   1 )
       *
                        IF    ( TNS-SSTKIJUNCD (IDX5)
                                            >   ZERO )
+                           COMPUTE CNT-SST =   CNT-SST +   1
                            MOVE    TNS-SSTKIJUNCD (IDX5)
                                    TO  IDX-SST
-                           IF    ( SSTKJN-CD (IDX-SST) =   ZERO )
-                               MOVE    ZERO    TO  FLG-HIT
+                           IF    ( SSTKJN-CD (IDX-SST) =   1 )
+                               MOVE    1   TO  FLG-SST
                            END-IF
                       END-IF
                    END-PERFORM
+                   IF    ( CNT-SST     >   ZERO )
+                       IF    ( FLG-SST =   ZERO )
+                           MOVE    ZERO    TO  FLG-HIT
+                       END-IF
+                   END-IF
                END-IF
       *
                IF    ( FLG-HIT         =   1 )
