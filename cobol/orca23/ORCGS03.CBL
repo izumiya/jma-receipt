@@ -2662,13 +2662,15 @@
                    IF    ( SPA-S01-SYORINO
                                        =   CONST-PROC-TORIKESHI )
                     AND  ( SPA-GMN-NYUKIN      =   ZERO )
-                    AND  ( SPA-GMN-NYUKIN-TTL  >   ZERO )
-                       COMPUTE SPA-GMN-NYUKIN
-                           =   SPA-GMN-NYUKIN-TTL  *   -1
-                       MOVE    SPA-GMN-NYUKIN
-                                       TO  WRK-KINGAKUZ
-                       MOVE    WRK-KINGAKUZ
-                                       TO  SPA-GMN-NYUKINX
+                       IF   ( WRK-NYUKIN          >   ZERO )
+                           COMPUTE SPA-GMN-NYUKIN
+                               =   WRK-NYUKIN      *   -1
+      *
+                           MOVE    SPA-GMN-NYUKIN
+                                           TO  WRK-KINGAKUZ
+                           MOVE    WRK-KINGAKUZ
+                                           TO  SPA-GMN-NYUKINX
+                       END-IF
                    END-IF
                END-IF
            END-IF
