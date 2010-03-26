@@ -379,12 +379,12 @@
                    "　件".
       *
        01  LST-PRT-BODY.
-           03  PRT-SETCD               PIC X(09).
+           03  PRT-SETCD               PIC X(08).
            03  PRT-STYMD               PIC X(09).
            03  PRT-P1                  PIC X(02).
            03  PRT-EDYMD               PIC X(09).
            03  FILLER                  PIC X(02).
-           03  PRT-NAME                PIC X(50).
+           03  PRT-NAME                PIC X(60).
       *
        01  BODY-01N.
            03  B01N-YOBI1              PIC X(04).
@@ -548,6 +548,9 @@
       *
       *    数字変換領域
            COPY    "CPORCSNUM.INC".
+      *
+      *    全角チェックパラメタ
+           COPY    "CPORCSKANACHK.INC".
       *
       *    ファイル削除パラメタ
            COPY    "CPORCSFDEL.INC".
@@ -788,7 +791,6 @@
            INITIALIZE                      TBL-INPUTSET-AREA
            INITIALIZE                      HZN-INPUTSET-AREA
            MOVE    ZERO                TO  IDX-S
-           MOVE    ZERO                TO  IDX-P
       *
            PERFORM UNTIL   FLG-END         =   1
       *
@@ -1092,7 +1094,15 @@
            MOVE    "tbl_inputcd"       TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-           MOVE    ICD-DSPNAME         TO  PRT-NAME
+      *    セット名称　編集
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    ICD-DSPNAME         TO  KANACHK-MAE-INPUT
+           MOVE    60                  TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  PRT-NAME
+      *
            ADD     1                   TO  WRK-HEN-MAX
            MOVE    LST-PRT-BODY        TO  WRK-TBL-REC2 (WRK-HEN-MAX)
       *
@@ -1414,18 +1424,18 @@
                MOVE    SPACE               TO  B01N-TANINAME
            END-IF
       *    その他
-           IF      ISET-ATAI-AREA      NOT =   SPACE
-               MOVE    SPACE           TO  B01-HENSYU
-               STRING  ISET-ATAI1      DELIMITED  BY  SPACE
-                       ","             DELIMITED  BY  SIZE
-                       ISET-ATAI2      DELIMITED  BY  SPACE
-                       ","             DELIMITED  BY  SIZE
-                       ISET-ATAI3      DELIMITED  BY  SPACE
-                       ","             DELIMITED  BY  SIZE
-                       ISET-ATAI4      DELIMITED  BY  SPACE
-                       INTO                    B01-HENSYU
-               END-STRING
-           END-IF
+      ***  IF      ISET-ATAI-AREA      NOT =   SPACE
+      *        MOVE    SPACE           TO  B01-HENSYU
+      *        STRING  ISET-ATAI1      DELIMITED  BY  SPACE
+      *                ","             DELIMITED  BY  SIZE
+      *                ISET-ATAI2      DELIMITED  BY  SPACE
+      *                ","             DELIMITED  BY  SIZE
+      *                ISET-ATAI3      DELIMITED  BY  SPACE
+      *                ","             DELIMITED  BY  SIZE
+      *                ISET-ATAI4      DELIMITED  BY  SPACE
+      *                INTO                    B01-HENSYU
+      *        END-STRING
+      ***  END-IF
       *
       *    換算値
       *    MOVE    SPACE               TO  WRK-HEN-INPUTHEN
@@ -1538,7 +1548,7 @@
                MOVE    LST-PRT-TAIL2       TO  HCPOM2-MOJI (IDX-P)
            ELSE
                MOVE    CNT-OK              TO  PRT-UPDCNT
-               MOVE    LST-PRT-TAIL1       TO  HCPOM2-MOJI (IDX-P)
+               MOVE    LST-PRT-TAIL1       TO   HCPOM2-MOJI (IDX-P)
            END-IF
       *    印刷処理
            PERFORM 400-HCPOM2-PRINT-SEC
@@ -1565,8 +1575,7 @@
                                     TO  SPRT-SKYYMD
            MOVE    LNK-PRTKANRI-SHELLID 
                                     TO  SPRT-SHELLID
-      *****MOVE    LNK-PRTKANRI-SHORI-RENNUM
-           MOVE    2
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
                                     TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                     TO  SPRT-PRIORITY
