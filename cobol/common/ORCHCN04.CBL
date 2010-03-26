@@ -1660,10 +1660,18 @@
                                            *   TBL-KAISU )
                MOVE    "1"                 TO  TBL-ENKBN
            ELSE
-               COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
-                                           *   TBL-KAISU )
-                                           *   10
-               MOVE    SPACE               TO  TBL-ENKBN
+               IF      PARA-GOKEITANI      =   "1"
+      *            ÅÀ¿ôÉ½¼¨
+                   COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+                                               *   TBL-KAISU )
+                   MOVE    SPACE               TO  TBL-ENKBN
+               ELSE
+      *            ¶â³ÛÉ½¼¨
+                   COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+                                               *   TBL-KAISU )
+                                               *   10
+                   MOVE    SPACE               TO  TBL-ENKBN
+               END-IF
            END-IF
       *
       *    Ä¢É¼°õºþ
