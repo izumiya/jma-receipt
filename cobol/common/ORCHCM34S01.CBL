@@ -3039,13 +3039,16 @@
       *    食事基本情報設定処理
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
-               PERFORM 20021-SYOKUJI-KHNINF-SET-SEC
-               IF    ( IDXB        >   ZERO )
-                 AND ( FLG-OVER    =   ZERO )
-                   MOVE    1       TO  WSYOKUJI-DAY
-                                           (IDXB IDXD)
-                   COMPUTE WSYOKUJI-ZAIKAISU (IDXB)
-                       =   WSYOKUJI-ZAIKAISU (IDXB)    +   1
+               IF    ( WSKJH1804-ZAITEN     (IDXD)
+                                   >   ZERO )
+                   PERFORM 20021-SYOKUJI-KHNINF-SET-SEC
+                   IF    ( IDXB        >   ZERO )
+                     AND ( FLG-OVER    =   ZERO )
+                       MOVE    1       TO  WSYOKUJI-DAY
+                                               (IDXB IDXD)
+                       COMPUTE WSYOKUJI-ZAIKAISU (IDXB)
+                           =   WSYOKUJI-ZAIKAISU (IDXB)    +   1
+                   END-IF
                END-IF
            END-PERFORM
       *
