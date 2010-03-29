@@ -824,6 +824,9 @@
       *    Æþ±¡²ñ·×ÊÔ½¸¥µ¥Ö
            COPY    "CPORCHCM34S01.INC".
       *
+      *    Ï«ºÒÆþ±¡¿ÇÎÅ¥³¡¼¥É¥Á¥§¥Ã¥¯¥µ¥Ö
+           COPY    "CPORCHCM34S03.INC".
+      *
       *    ´µ¼ÔÈÖ¹æÊÑ´¹¥µ¥Ö
            COPY    "CPORCSPTID.INC".
       *
@@ -3446,50 +3449,14 @@
            PERFORM 200111-HKNCOMBI-KEY-CHK-SEC
       *
            IF    ( WRK-HKNNUM          =   "971" OR "973" )
-      *        Ï«ºÒ¼«Çå¤Î¤È¤­
-      *        Ì¤¼Â»Ü¸º»»¡¦Æü¾ïÀ¸³è¾ã³²²Ã»»¡¦ÃÔÊò²Ã»»¡¦
-      *        áì´µ¼Ô´ÉÍý²Ã»»¤ò½ü¤¯
-               IF   (  SRY-SRYCD(1)    =   "190080470"   OR
-                                           "190799670"   OR
-                                           "190080570"   OR
-                                           "190799770"   OR
-                                           "190111690"   OR
-                                           "190809090"   OR
-                                           "190111790"   OR
-                                           "190809190"   OR
-                                           "190109170"   OR
-                                           "190807570"   OR
-                                           "190109270"   OR
-                                           "190808670"   OR
-                                           "190135570"   OR
-                                           "190135070"   OR
-                                           "190131570"   OR
-                                           "190134270"   OR
-                                           "190118570"   OR
-                                           "190134870"   OR
-                                           "190134970"   OR
-                                           "190135470"   OR
-                                           "190135670"
-                                           )
-               OR   (( SRY-SRYCD(1)  = "190116990" OR "190813390" ) AND
-                     ( ORCHCM34-SRYYM  <  "200604"              )     )
-               OR   (( SRY-SRYCD(1)  = "190117070" OR "190109670" ) AND
-                     ( ORCHCM34-SRYYM  >= "200604"              )     )
-               OR   (( SRY-SRYCD(1)  = "190121970" OR "190122670" ) AND
-                     ( ORCHCM34-SRYYM  >= "200607"              )     )
-               OR   (( SRY-SRYCD(1)  = "190126470" OR
-                                       "190117070" OR
-                                       "190126570" OR
-                                       "190109670" OR
-                                       "190126670" OR
-                                       "190126770" OR
-                                       "190119210" OR
-                                       "190121970" OR
-                                       "190122670" ) AND
-                     ( ORCHCM34-SRYYM  >= "200804"              )     )
-               OR   (( SRY-SRYCD(1)  = "190129870" ) AND
-                     ( ORCHCM34-SRYYM  >= "200804" AND
-                       ORCHCM34-SRYYM  <= "201003"              )     )
+      *
+               INITIALIZE                  HCM34S03-AREA
+               MOVE    ORCHCM34-SRYYM  TO  HCM34S03-SRYYM
+               MOVE    SRY-SRYCD (1)   TO  HCM34S03-SRYCD
+               CALL    "ORCHCM34S03"   USING
+                                       HCM34S03-AREA
+                                       SPA-AREA
+               IF    ( HCM34S03-IGNORE =   1 )
                    GO  TO  20011-SRYACT-HEN-EXT
                END-IF
       *
