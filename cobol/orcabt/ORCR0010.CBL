@@ -542,7 +542,7 @@
       *
            COPY    "MCPAREA".
       *     
-           COPY    "ORCA-DBMETA".
+      *??     COPY    "ORCA-DBMETA".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1461,6 +1461,7 @@ grpsys                                     SPA-AREA
       *    公費で不明分は出力しない
            IF    ( WRK-SYOKBN         =   "2" )
            AND   ( WRK-TEISEIKBN      =   1   )
+               INITIALIZE                      WRK-RECE01-REC
                GO  TO  20011-FILE-HENSYU-EXT
            END-IF
       *     
