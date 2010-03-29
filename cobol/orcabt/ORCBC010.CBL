@@ -46,8 +46,12 @@
       *                                     §Œ¬–±˛
       *  04.04.02    NACL-ÃÁœ∆    09/04/13   ø¿Æ£≤£±«Ø£µ∑Ó≤˛¿µ¬–±˛
       *  04.04.03    NACL-ÃÁœ∆    10/03/23  ≤˛¿µ¬–±˛° ≥∞«Ò∂Ë ¨£µ§Œ¬–±˛°À
+      *
       *  04.05.01    NACL-∞À∆£    10/01/28  æÆøÙ≈¿£µ∑Â¬–±˛COPY∂Á§Œ§ﬂ
       *              NACL-æÆ∆¶¬Ù  10/02/16  º£∏≥¬–±˛
+      *  04.05.02    NACL-∆£∏∂    10/03/12   ø¿Æ£≤£≤«Ø£¥∑Ó≤˛¿µ¬–±˛
+      *                                      ø¿Æ£≤£≤«Ø£¥∑Ó ¨∞ πﬂ§Œ¿Ø…‹¥…
+      *                                     æ∏§Ú•®•È°º§»§π§Î
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -471,6 +475,7 @@
                                    PIC X(07)   VALUE   "ZZZ4012".
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+           03  WRK-CONS-SRYYM-201004   PIC 9(06)   VALUE   201004.
       *
       *    …∏Ω‡…È√¥≥€
            03  WRK-CONS-HYOJYUN-FUTAN-G.
@@ -2045,6 +2050,13 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                    MOVE    "1"                 TO  WRK-TEISEIKBN
                END-IF
           END-IF
+      *
+      *     ø¿Æ£≤£≤«Ø£¥∑Ó∞ πﬂ§À¿Ø…‹¥…æ∏§Úª»Õ—§Œ§»§≠
+           IF    ( WRK-TEISEIKBN       =   SPACE                 )
+           AND   ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201004 )
+           AND   ( COMB-HKNNUM         =   "001"                 )
+               MOVE    "1"                 TO  WRK-TEISEIKBN
+           END-IF
       *
       *   ºÁ ›∏±æ Û∆…§ﬂΩ–§∑
            INITIALIZE                      PTHKNINF-REC
