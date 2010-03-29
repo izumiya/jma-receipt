@@ -95,9 +95,9 @@
            03   CONS-SRYOYO2TOKU           PIC X(09) VALUE "190124810".
       *    回復期リハビリテーション病棟入院料
            03   CONS-KAIFUKU               PIC X(09) VALUE "190124910".
-      *    回復期リハビリテーション病棟入院料１
+      *    回復期リハビリテーション病棟入院料１（平成２２年以降は基準未適合）
            03   CONS-KAIFUKU1              PIC X(09) VALUE "190129510".
-      *    回復期リハビリテーション病棟入院料２
+      *    回復期リハビリテーション病棟入院料２（平成２２年以降は基準未適合）
            03   CONS-KAIFUKU2              PIC X(09) VALUE "190129710".
       *    診療所老人医療管理料
            03   CONS-ROUKAN1               PIC X(09) VALUE "190125010".
@@ -107,6 +107,27 @@
            03   CONS-TANKI2                PIC X(09) VALUE "190125310".
       *    短期滞在手術基本料３
            03   CONS-TANKI3                PIC X(09) VALUE "190130510".
+      *
+      *    平成２２年度改定追加分
+      *    療養病棟入院基本料１（ＦからＧの生活療養）
+           03   CONS-H22-RYOYO1F           PIC X(09) VALUE "190131710".
+           03   CONS-H22-RYOYO1G           PIC X(09) VALUE "190131910".
+           03   CONS-H22-RYOYO1H           PIC X(09) VALUE "190132110".
+           03   CONS-H22-RYOYO1I           PIC X(09) VALUE "190132310".
+      *    療養病棟入院基本料２（ＡからＩの生活療養）
+           03   CONS-H22-RYOYO2A           PIC X(09) VALUE "190132510".
+           03   CONS-H22-RYOYO2B           PIC X(09) VALUE "190132710".
+           03   CONS-H22-RYOYO2C           PIC X(09) VALUE "190132910".
+           03   CONS-H22-RYOYO2D           PIC X(09) VALUE "190133110".
+           03   CONS-H22-RYOYO2E           PIC X(09) VALUE "190133310".
+           03   CONS-H22-RYOYO2F           PIC X(09) VALUE "190133510".
+           03   CONS-H22-RYOYO2G           PIC X(09) VALUE "190133710".
+           03   CONS-H22-RYOYO2H           PIC X(09) VALUE "190133910".
+           03   CONS-H22-RYOYO2I           PIC X(09) VALUE "190134110".
+      *    回復期リハビリテーション病棟入院料１（生活療養）
+           03   CONS-H22-KAIFUKU1          PIC X(09) VALUE "190141710".
+      *    回復期リハビリテーション病棟入院料２（生活療養）
+           03   CONS-H22-KAIFUKU2          PIC X(09) VALUE "190141910".
       *
       *    一時領域
        01  WRK-AREA.
@@ -304,6 +325,8 @@
                    IF    NACCT-SRYCDTOTAL     =    99999916
                        CONTINUE
                    ELSE
+                     IF   LNK-NYULIFE-SANTEIYM <=  "201003"
+      *                （平成２２年３月以前）
       *                生活療養に該当する入院料を判定し、
       *                返却値の対象区分を設定する
                        PERFORM    210-NYUINACT-GET-SEC
@@ -363,6 +386,88 @@
                             END-IF
                           END-PERFORM
                        END-IF
+                     ELSE
+      *                （平成２２年４月以降）
+      *                生活療養に該当する入院料を判定し、
+      *                返却値の対象区分を設定する
+                       PERFORM    210-NYUINACT-GET-SEC
+                       IF   NSRY-SRYCD(1)   =  CONS-RYOYO2A     OR
+                                               CONS-RYOYO2B     OR
+                                               CONS-RYOYO2C     OR
+                                               CONS-RYOYO2D     OR
+                                               CONS-RYOYO2E     OR
+                                               CONS-RYOYO2TOKU  OR
+                                               CONS-SRYOYO2A    OR
+                                               CONS-SRYOYO2B    OR
+                                               CONS-SRYOYO2C    OR
+                                               CONS-SRYOYO2D    OR
+                                               CONS-SRYOYO2E    OR
+                                               CONS-SRYOYO2TOKU OR
+                                               CONS-KAIFUKU1    OR
+                                               CONS-KAIFUKU2    OR
+                                               CONS-TANKI2      OR
+                                               CONS-TANKI3      OR
+                                               CONS-H22-RYOYO1F OR
+                                               CONS-H22-RYOYO1G OR
+                                               CONS-H22-RYOYO1H OR
+                                               CONS-H22-RYOYO1I OR
+                                               CONS-H22-RYOYO2A OR
+                                               CONS-H22-RYOYO2B OR
+                                               CONS-H22-RYOYO2C OR
+                                               CONS-H22-RYOYO2D OR
+                                               CONS-H22-RYOYO2E OR
+                                               CONS-H22-RYOYO2F OR
+                                               CONS-H22-RYOYO2G OR
+                                               CONS-H22-RYOYO2H OR
+                                               CONS-H22-RYOYO2I OR
+                                               CONS-H22-KAIFUKU1 OR
+                                               CONS-H22-KAIFUKU2
+                          PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                  UNTIL     IDX1   >   31
+                            IF     NACCT-DAY(IDX1)  NOT =  ZERO
+                               MOVE   "1"     TO   LNK-NYULIFE-KBN(IDX1)
+                               MOVE    1      TO   FLG-OK
+      *                        病状の程度、治療の内容をしん酌して標準
+      *                        負担額を軽減する患者の判定（入院料判断）
+                               IF  NSRY-SRYCD(1)  =  CONS-RYOYO2A  OR
+                                                     CONS-RYOYO2B  OR
+                                                     CONS-RYOYO2C  OR
+                                                     CONS-RYOYO2D  OR
+                                                     CONS-RYOYO2E  OR
+                                                     CONS-H22-RYOYO1F OR
+                                                     CONS-SRYOYO2A OR
+                                                     CONS-SRYOYO2B OR
+                                                     CONS-SRYOYO2C OR
+                                                     CONS-KAIFUKU1 OR
+                                                     CONS-KAIFUKU2 OR
+                                                     CONS-TANKI2   OR
+                                                     CONS-TANKI3   OR
+                                                     CONS-H22-RYOYO2A OR
+                                                     CONS-H22-RYOYO2B OR
+                                                     CONS-H22-RYOYO2C OR
+                                                     CONS-H22-RYOYO2D OR
+                                                     CONS-H22-RYOYO2E OR
+                                                     CONS-H22-RYOYO2F OR
+                                                    CONS-H22-KAIFUKU1 OR
+                                                    CONS-H22-KAIFUKU2
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
+      *                        病状の程度、治療の内容をしん酌して標準
+      *                        負担額を軽減する患者の判定（特別入院基本料算定時の
+      *                                                    ＡＤＬ入力判断）
+                               IF (NSRY-SRYCD(1)  =  CONS-RYOYO2TOKU OR
+                                                     CONS-SRYOYO2TOKU)
+                                                 AND
+                                  (SS008-MEDKBNDAY(IDX1)  =  "2" OR
+                                                             "3" )
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
+                            END-IF
+                          END-PERFORM
+                       END-IF
+                     END-IF
                    END-IF
                    MOVE    "tbl_nyuinacct"      TO  MCP-TABLE
                    MOVE    "key17"              TO  MCP-PATHNAME
