@@ -427,7 +427,7 @@
        201-EDIT-SEC                SECTION.
       *
            IF    ( SYOKIKSN-IN-KHNSRYCD    =   "099999950"
-            OR                                 "099999950"
+            OR                                 "099999951"
             OR                                 "099999952"   )
       *        平成２２年４月改定対応（有床診療所入院基本料）
                MOVE    1       TO    FLG-SINRYOJO-VAL-2204
