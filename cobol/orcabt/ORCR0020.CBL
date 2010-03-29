@@ -213,9 +213,6 @@
       *  04.05.02    NACL-Æ£¸¶    10/01/05  ¼£¸³ÂÐ±þ
       *                                     Ê¿À®£²£°Ç¯£´·îÊ¬¤è¤ê¼«Èñ¥ì¥»
       *                                     ¤È¤¹¤ë 
-      *  04.05.03    NACL-Æ£¸¶    10/03/23  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
-      *                                     ÀÁµá¤Ë·¸¤ï¤ëµ­Ï¿¾ò·ï»ÅÍÍ¤Î
-      *                                     ÊÑ¹¹¤ËÈ¼¤¦½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1860,21 +1857,6 @@ grpsys             PERFORM 900-DBSELECT-SEC
            MOVE    "06"            TO  LNK-SYUACC-I-KBN
            CALL    "ORCSSYUKAMAIN" USING   SPA-AREA
                                            ORCSSYUACCAREA
-      *    ??
-           PERFORM VARYING IDY     FROM    1   BY  1
-                   UNTIL   IDY     >       50
-                   OR      LNK-SYUACC-IO-SRYKA (1 IDY)
-                                   =  SPACE
-               DISPLAY "LNK-SYUACC-IO-SRYKA=" IDY "#"
-                                    LNK-SYUACC-IO-SRYKA (1 IDY)
-           END-PERFORM
-           DISPLAY "LNK-SYUACC-IO-H-SRYKA        =" 
-                                    LNK-SYUACC-IO-H-SRYKA
-           DISPLAY "LNK-SYUACC-IO-SYUKA-INPUT (1)=" 
-                                    LNK-SYUACC-IO-SYUKA-INPUT (1)
-           DISPLAY "LNK-SYUACC-IO-SYUKA-AUTO  (1)=" 
-                                    LNK-SYUACC-IO-SYUKA-AUTO (1)
-      *??
            IF      LNK-SYUACC-IO-H-SRYKA
                                    NOT =   SPACE
                MOVE    LNK-SYUACC-IO-H-SRYKA   TO  RECE02-SYUKA
