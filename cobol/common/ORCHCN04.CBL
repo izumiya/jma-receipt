@@ -332,6 +332,9 @@
       *    Æþ±¡²ñ·×ºîÀ®¥Ñ¥é
            COPY    "CPORCHCM34S01.INC".
       *
+      *    Ï«ºÒÆþ±¡¿ÇÎÅ¥³¡¼¥É¥Á¥§¥Ã¥¯¥µ¥Ö
+           COPY    "CPORCHCM34S03.INC".
+      *
       *    °õºþ¥Ñ¥é¥á¥¿
            COPY    "CPORCSMKPRT.INC".
       *
@@ -1732,52 +1735,13 @@
            MOVE    ZERO                TO  FLG-RSIKSN
       *
            IF    ( SYU-SYUHKNNUM       =   "971"  OR "973" )
-      *        Ï«ºÒ¼«Çå¤Î¤È¤­
-      *        Ì¤¼Â»Ü¸º»»¡¦Æü¾ïÀ¸³è¾ã³²²Ã»»¡¦ÃÔÊò²Ã»»¡¦
-      *        áì´µ¼Ô´ÉÍý²Ã»»¤ò½ü¤¯
-               IF   (  WRK-SRYCD    =   "190080470"   OR
-                                           "190799670"   OR
-                                           "190080570"   OR
-                                           "190799770"   OR
-                                           "190111690"   OR
-                                           "190809090"   OR
-                                           "190111790"   OR
-                                           "190809190"   OR
-                                           "190109170"   OR
-                                           "190807570"   OR
-                                           "190109270"   OR
-                                           "190808670"   OR
-                                           "190135570"   OR
-                                           "190135070"   OR
-                                           "190131570"   OR
-                                           "190134270"   OR
-                                           "190118570"   OR
-                                           "190134870"   OR
-                                           "190134970"   OR
-                                           "190135470"   OR
-                                           "190135670"   )
-               OR   (( WRK-SRYCD         = "190116990" OR 
-                                           "190813390" ) AND
-                     ( SYU-SKYSTYMD      < "20060401"  ))
-               OR   (( WRK-SRYCD         = "190117070" OR
-                                           "190109670" ) AND
-                     ( SYU-SKYSTYMD     >= "20060401"  ))
-               OR   (( WRK-SRYCD         = "190121970" OR
-                                           "190122670" ) AND
-                     ( SYU-SKYSTYMD     >= "20060701"  ))
-               OR   (( WRK-SRYCD         = "190126470" OR
-                                           "190117070" OR
-                                           "190126570" OR
-                                           "190109670" OR
-                                           "190126670" OR
-                                           "190126770" OR
-                                           "190119210" OR
-                                           "190121970" OR
-                                           "190122670" ) AND
-                     ( SYU-SKYSTYMD     >= "20080401"  ))
-               OR   (( WRK-SRYCD         = "190129870" ) AND
-                     ( SYU-SKYSTYMD     >= "20080401"  AND
-                       SYU-SKYSTYMD      < "20100401"  ))
+               INITIALIZE                  HCM34S03-AREA
+               MOVE    SYU-SRYYMD(1:6) TO  HCM34S03-SRYYM
+               MOVE    WRK-SRYCD       TO  HCM34S03-SRYCD
+               CALL    "ORCHCM34S03"   USING
+                                       HCM34S03-AREA
+                                       SPA-AREA
+               IF    ( HCM34S03-IGNORE =   1 )
                    MOVE    1           TO  FLG-RSIKSN
                END-IF
            END-IF

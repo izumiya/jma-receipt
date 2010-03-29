@@ -546,6 +546,9 @@
       *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
            COPY    "CPORCSNYUINDAY.INC".
       *
+      *    Ï«ºÒÆþ±¡¿ÇÎÅ¥³¡¼¥É¥Á¥§¥Ã¥¯¥µ¥Ö
+           COPY    "CPORCHCM34S03.INC".
+      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
       *
@@ -3109,51 +3112,17 @@
       *
                MOVE    1               TO  FLG-TARGET
       *
-               IF   (  NACCT-SRYCDTOTAL    =   190080470   OR
-                                               190799670   OR
-                                               190080570   OR
-                                               190799770   OR
-                                               190111690   OR
-                                               190809090   OR
-                                               190111790   OR
-                                               190809190   OR
-                                               190109170   OR
-                                               190807570   OR
-                                               190109270   OR
-                                               190808670   OR
-                                               190135570   OR
-                                               190135070   OR
-                                               190131570   OR
-                                               190134270   OR
-                                               190118570   OR
-                                               190134870   OR
-                                               190134970   OR
-                                               190135470   OR
-                                               190135670
-                                                  )
-               OR   (( NACCT-SRYCDTOTAL    =   190116990   OR
-                                               190813390 ) AND
-                     ( HCM34S01-SANTEIYM   <  "200604"     ))
-               OR   (( NACCT-SRYCDTOTAL    =   190117070   OR
-                                               190109670 ) AND
-                     ( HCM34S01-SANTEIYM  >= "200604"      ))
-               OR   (( NACCT-SRYCDTOTAL    =   190121970   OR
-                                               190122670 ) AND
-                     ( HCM34S01-SANTEIYM  >= "200607"      ))
-               OR   (( NACCT-SRYCDTOTAL  =     190126470 OR
-                                               190117070 OR
-                                               190126570 OR
-                                               190109670 OR
-                                               190126670 OR
-                                               190126770 OR
-                                               190119210 OR
-                                               190121970 OR
-                                               190122670 ) AND
-                     ( HCM34S01-SANTEIYM  >= "200804"      ))
-               OR   (( NACCT-SRYCDTOTAL  =     190129870 ) AND
-                     ( HCM34S01-SANTEIYM  >= "200804" AND
-                       HCM34S01-SANTEIYM  <= "201003"    ))
-                       MOVE    ZERO    TO  FLG-TARGET
+               INITIALIZE                  HCM34S03-AREA
+               MOVE    HCM34S01-SANTEIYM
+                                       TO  HCM34S03-SRYYM
+               MOVE    NACCT-SRYCDTOTAL
+                                       TO  WRK-SRYCD-9
+               MOVE    WRK-SRYCD       TO  HCM34S03-SRYCD
+               CALL    "ORCHCM34S03"   USING
+                                       HCM34S03-AREA
+                                       SPA-AREA
+               IF    ( HCM34S03-IGNORE =   1 )
+                   MOVE    ZERO        TO  FLG-TARGET
                END-IF
       *
                IF    ( FLG-TARGET      =   1 )
