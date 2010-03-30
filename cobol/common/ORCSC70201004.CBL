@@ -402,7 +402,7 @@
            03  FILLER              PIC X(09)  VALUE   "170032350".
       *    ¼Ì¿¿¿ÇÃÇ¡ÊÆ±»þÊ»»Ü¡Ë
            03  FILLER              PIC X(09)  VALUE   "170022930".
-           03  FILLER              PIC X(09)  VALUE   SPACE.
+           03  FILLER              PIC X(09)  VALUE   "170022930".
       *
       * Â¤±ÆºÞ»ÈÍÑ»£±Æ
            03  FILLER              PIC X(01)  VALUE   "3".
@@ -412,7 +412,7 @@
            03  FILLER              PIC X(09)  VALUE   "170032750".
       *    ¼Ì¿¿¿ÇÃÇ¡ÊÆ±»þÊ»»Ü¡Ë
            03  FILLER              PIC X(09)  VALUE   "170022930".
-           03  FILLER              PIC X(09)  VALUE   SPACE.
+           03  FILLER              PIC X(09)  VALUE   "170022930".
       *
        01  TBL-SATUEI02-AREA-R       REDEFINES  TBL-SATUEI02-AREA.
            03  TBL-SATUEI02-OCC      OCCURS     4   INDEXED  TBL-SIDX02.
