@@ -83,6 +83,7 @@
       *                                     編集の変更
       *
       *  04.04.01    NACL-藤原    10/03/03  平成２２年４月改正対応
+      *  04.04.02    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1296,16 +1297,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            IF      WRK-PARA-PRTKBN     =   "2"
                MOVE    "点検用レセプト"    TO  HC21-LABEL
            END-IF
-      *
-      *★★平成２２年４月改正対応
-           IF      RECE41-SRYYM        >=  "201004"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   MOVE    "点検改正未対応"    TO  HC21-LABEL
-               ELSE
-                   MOVE    "改正未対応"        TO  HC21-LABEL
-               END-IF     
-           END-IF
-      *★★
       *
            .
        310-HC101-HEAD-HEN-EXT.
