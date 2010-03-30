@@ -810,13 +810,17 @@
            IF     (HZN-HKN-TEKSTYMD (2)    NOT =   SPACE )
               AND (HZN-HKN-TEKEDYMD (2)    >=  PTHKN-TEKSTYMD )
       *        新しい保険を追加する
-               ADD     1                   TO  IDX-T
-               MOVE    TBL-DATA-REC (IDX)  TO  TBL-DATA-REC (IDX-T)
-               MOVE    TBL-PTHKNINF-REC (IDX)
+               IF      HZN-HKN-TEKSTYMD (1)    NOT =   SPACE
+                   ADD     1                   TO  IDX-T
+                   MOVE    TBL-DATA-REC (IDX)  TO  TBL-DATA-REC (IDX-T)
+                   MOVE    TBL-PTHKNINF-REC (IDX)
                                            TO  TBL-PTHKNINF-REC (IDX-T)
-               MOVE    HZN-HKN-TEKSTYMD (1)
+                   MOVE    HZN-HKN-TEKSTYMD (1)
                                            TO  TBL-PTHKN-TEKSTYMD(IDX-T)
-               MOVE    "A"                 TO  TBL-ISAM-ERR (IDX-T)
+                   MOVE    "A"             TO  TBL-ISAM-ERR (IDX-T)
+               ELSE
+                   MOVE    "C"             TO  TBL-ISAM-ERR (IDX)
+               END-IF
       *        終了日を変更する
                MOVE    HZN-HKN-TEKEDYMD (2)    TO  PTHKN-TEKEDYMD
       *        開始日が保険より前の時、開始日を保険の開始日にする
