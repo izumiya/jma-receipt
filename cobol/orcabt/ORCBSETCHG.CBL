@@ -833,6 +833,8 @@
       *
            PERFORM 2903-END-HENSYU-SEC
       *
+           MOVE    1                   TO  FLG-END
+      *
            .
        200-MAIN-EXT.
            EXIT.
@@ -1540,6 +1542,8 @@
            IF      IDX-P               >   LINE-MAX
       *        印刷処理
                PERFORM 400-HCPOM2-PRINT-SEC
+      *        見出し編集
+               PERFORM 7001-PRT-INIT-SEC
                MOVE    1               TO  IDX-P
            END-IF
       *
