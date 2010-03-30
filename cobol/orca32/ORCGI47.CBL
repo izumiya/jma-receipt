@@ -3274,7 +3274,7 @@
                    END-IF
       *
                    COMPUTE SS011-ADLTEN (IDX-DAY)
-                       =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
+                       =   ADLTEN-DAY (IDX-DAY)
                END-PERFORM
                CALL    "ORCSS011"  USING   SS011-AREA
                                            SPA-AREA
