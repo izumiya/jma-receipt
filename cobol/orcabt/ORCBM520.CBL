@@ -29,8 +29,11 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.04.01    NACL-藤原    09/11/19  レセ電ＣＤ−Ｒ出力対応
       *  04.04.02    NACL-藤原    09/12/10  返戻対応
-      *  04.04.03    NACL-藤原    10/03/03   医療機関情報（住所）の取得
-      *                                      方法の修正
+      *  04.04.03    NACL-藤原    10/03/03  医療機関情報（住所）の取得
+      *                                     方法の修正
+      *  04.04.04    NACL-藤原    10/03/23  平成２２年４月改正対応
+      *                                     請求に係わる記録条件仕様の
+      *                                     変更に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -105,6 +108,7 @@
            03  IDY1                    PIC 9(05).
            03  IDY2                    PIC 9(05).
            03  IDY3                    PIC 9(05).
+           03  IDWW                    PIC 9(05).
            03  IDXX                    PIC 9(05).
            03  IDYY                    PIC 9(05).
            03  IDZZ                    PIC 9(05).
@@ -140,6 +144,9 @@
            03  WRK-SRYYM               PIC 9(05). 
       *
            03  WRK-MOJISU              PIC 9(02).        
+      *
+           03  WRK-SRYKA               PIC X(02).
+           03  WRK-KUGIRI-KAISU        PIC 9(02). 
       *
            03  WRK-INFO1-INDEX         PIC 9(04).        
            03  WRK-INFO2-INDEX         PIC 9(04).        
@@ -663,7 +670,7 @@
                WHEN    "RE"
                    INSPECT RECEDEN-RECEDATA   TALLYING    WRK-MOJISU
                                                FOR ALL "," 
-                   IF      WRK-MOJISU          =   16  OR  17
+                   IF      WRK-MOJISU          =   16  OR  17  OR  25
                        PERFORM VARYING IDX FROM    2500 BY  -1
                                UNTIL   IDX <       1
                            IF      RECEDEN-RECEDATA (IDX:1)
@@ -675,7 +682,8 @@
                        IF      WRK-MOJISU          =   16
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
-                                     ",,,,,,,,,"   DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
                            END-STRING
@@ -683,7 +691,41 @@
                        IF      WRK-MOJISU          =   17
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
-                                     ",,,,,,,,"    DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
+                                     WRK-KAIGYO    DELIMITED  BY  SIZE
+                                     INTO          WRK-REC
+                           END-STRING
+                       END-IF
+                       IF      WRK-MOJISU          =   25
+                           MOVE    ZERO                TO  IDXX
+                                                           IDWW
+                                                       WRK-KUGIRI-KAISU
+                           MOVE    SPACE               TO  WRK-SRYKA
+                           PERFORM VARYING IDX FROM    WRK-NAGASA BY  -1
+                                   UNTIL   IDX <       1
+                               IF      RECEDEN-RECEDATA (IDX:1)
+                                                       =   WRK-KUGIRI
+                                   COMPUTE WRK-KUGIRI-KAISU    =
+                                               WRK-KUGIRI-KAISU    +   1
+                                   IF      WRK-KUGIRI-KAISU    =   9
+                                       MOVE    IDX     TO  WRK-NAGASA
+                                       COMPUTE IDWW    =   IDX +   1
+                                       IF      RECEDEN-RECEDATA (IDWW:2)
+                                                       NOT =   ",,"
+                                           MOVE
+                                               RECEDEN-RECEDATA (IDWW:2)
+                                                           TO  WRK-SRYKA
+                                       END-IF
+                                       MOVE    1               TO  IDX
+                                   END-IF
+                               END-IF        
+                           END-PERFORM   
+                           STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                                                   DELIMITED  BY  SIZE
+                                     ",,,,"        DELIMITED  BY  SIZE
+                                     WRK-SRYKA     DELIMITED  BY  SPACE
+                                 ",,,,,,,,,,,,,,"  DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
                            END-STRING
@@ -693,7 +735,7 @@
                WHEN    "TO"
                    INSPECT RECEDEN-RECEDATA    TALLYING    WRK-MOJISU
                                                FOR ALL "," 
-                   IF      WRK-MOJISU          =   9   OR  10
+                   IF      WRK-MOJISU          =   9   OR  10  OR  16
                        PERFORM VARYING IDX FROM    2500    BY  -1
                                UNTIL   IDX <       1
                            IF      RECEDEN-RECEDATA (IDX:1)
@@ -715,6 +757,16 @@
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
                                      ",,,,,,"      DELIMITED  BY  SIZE
+                                     WRK-KAIGYO    DELIMITED  BY  SIZE
+                                     INTO          WRK-REC
+                           END-STRING
+                           MOVE    WRK-REC         TO  RECEDEN-RECEDATA
+                       END-IF
+                       IF      WRK-MOJISU          =   16
+                           STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                                                   DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
                            END-STRING
@@ -750,10 +802,10 @@
                    END-IF     
                WHEN    "SI"
                WHEN    "IY"
-                   IF      RECEDEN-SRYYM       <   200804
+                   IF      RECEDEN-SRYYM       <   201004
                        INSPECT RECEDEN-RECEDATA    TALLYING  WRK-MOJISU
                                                    FOR ALL "," 
-                       IF      WRK-MOJISU          =   6
+                       IF      WRK-MOJISU          =   6   OR  12
                            PERFORM VARYING IDX FROM    2500 BY  -1
                                    UNTIL   IDX <       1
                                IF      RECEDEN-RECEDATA (IDX:1)
@@ -762,13 +814,25 @@
                                    MOVE    1               TO  IDX
                                END-IF    
                            END-PERFORM   
-                           STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                           IF      WRK-MOJISU          =   6
+                               STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
                                      ",,,,,,"      DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
-                           END-STRING
-                           MOVE    WRK-REC     TO  RECEDEN-RECEDATA
+                               END-STRING
+                               MOVE    WRK-REC     TO  RECEDEN-RECEDATA
+                           END-IF     
+                           IF      WRK-MOJISU          =   12
+                               STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                                                   DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
+                                     WRK-KAIGYO    DELIMITED  BY  SIZE
+                                     INTO          WRK-REC
+                               END-STRING
+                               MOVE    WRK-REC     TO  RECEDEN-RECEDATA
+                           END-IF     
                        END-IF
                    END-IF     
            END-EVALUATE
@@ -1189,6 +1253,7 @@
                IF      WRK-REC (IDX:1) =   ","
                    ADD     1               TO  IDZZ
                    IF      IDZZ            =   18
+      *                検索番号
                        COMPUTE IDY     =   IDX +   1
                        STRING   WRK-REC (1:IDX)    DELIMITED  BY  SIZE
                                 WRK-HENREI-B-SEARCH-NO
@@ -1196,6 +1261,17 @@
                                 WRK-REC (IDY:)     DELIMITED  BY  SIZE
                                            INTO    WRK-REC1
                        END-STRING
+      *************    MOVE    WRK-REC1            TO  WRK-REC
+      *************    MOVE    SPACE               TO  WRK-REC1
+      *************END-IF
+      *************IF      IDZZ            =   19
+      *************    記録条件仕様年月情報
+      *************    COMPUTE IDY     =   IDX +   1
+      *************    STRING   WRK-REC (1:IDX)    DELIMITED  BY  SIZE
+      *************             "42204"            DELIMITED  BY  SPACE
+      *************             WRK-REC (IDY:)     DELIMITED  BY  SIZE
+      *************                        INTO    WRK-REC1
+      *************    END-STRING
                        MOVE    2400        TO  IDX
                    END-IF
                END-IF
