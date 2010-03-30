@@ -22,6 +22,8 @@
       *  ¥³¥Ô¡¼¶ç½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  03.03.01    NACL-Æ£¸¶    06/10/16  ¿´ÎÅÆâ²Ê¤Ë½¤Àµ
+      *
+      *  04.05.01    NACL-Æ£¸¶    10/03/23  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *    ¥ì¥»ÅÅ¿ÇÎÅ²Ê¥³¡¼¥É¥Æ¡¼¥Ö¥ë
@@ -95,15 +97,21 @@
                05  FILLER          PIC X(02)   VALUE   "36". 
                05  FILLER          PIC X(20)   VALUE
                                                "¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó²Ê".
+               05  FILLER          PIC X(02)   VALUE   "37". 
+               05  FILLER          PIC X(20)   VALUE   "ÉÂÍý¿ÇÃÇ²Ê".
+               05  FILLER          PIC X(02)   VALUE   "38". 
+               05  FILLER          PIC X(20)   VALUE   "Î×¾²¸¡ºº²Ê".
+               05  FILLER          PIC X(02)   VALUE   "39". 
+               05  FILLER          PIC X(20)   VALUE   "µßµÞ²Ê".
       *
        01  TBL-RECEDENSRYKACD-AREA-R   REDEFINES
                                                TBL-RECEDENSRYKACD-AREA.
-           03  TBL-RECEDENSRYKACD-OCC  OCCURS      34
+           03  TBL-RECEDENSRYKACD-OCC  OCCURS      37
                                        INDEXED TBL-RECEDENSRYKACD-IDX.
                05  TBL-RECEDEN-SRYKACD
                                    PIC X(02).
                05  TBL-RECEDEN-SRYKANAME
                                    PIC X(20).
       *
-       01  TBL-RECEDENSRYKACD-MAX  PIC 9(02)   VALUE   34.
+       01  TBL-RECEDENSRYKACD-MAX  PIC 9(02)   VALUE   37.
 

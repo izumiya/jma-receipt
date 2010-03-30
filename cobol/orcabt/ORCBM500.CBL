@@ -69,6 +69,10 @@
       *  04.04.02    NACL-藤原    09/12/10  返戻対応
       *  04.04.03    NACL-藤原    10/03/09  医療機関情報（住所）の取得
       *                                     方法の修正
+      *
+      *  04.05.01    NACL-藤原    10/03/23  平成２２年４月改正対応
+      *                                     請求に係わる記録条件仕様の
+      *                                     変更に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -143,6 +147,7 @@ grpsys COPY    "COMMON-SPA".
            03  IDY1                    PIC 9(05).
            03  IDY2                    PIC 9(05).
            03  IDY3                    PIC 9(05).
+           03  IDWW                    PIC 9(05).
            03  IDXX                    PIC 9(05).
            03  IDYY                    PIC 9(05).
            03  IDZZ                    PIC 9(05).
@@ -187,6 +192,9 @@ grpsys COPY    "COMMON-SPA".
            03  WRK-SRYYM               PIC 9(05). 
       *
            03  WRK-MOJISU              PIC 9(02).
+      *
+           03  WRK-SRYKA               PIC X(02).
+           03  WRK-KUGIRI-KAISU        PIC 9(02). 
       *
            03  WRK-INFO1-INDEX         PIC 9(04).        
            03  WRK-INFO2-INDEX         PIC 9(04).        
@@ -678,12 +686,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
            MOVE    7                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
       *     
-           IF      KEY-N-SRYKA         =   ZERO
-              MOVE    SPACE                TO  WRK-DATA
-           ELSE    
-               MOVE    RECEDEN-RECEKA      TO  WRK-DATA
-           END-IF
-           MOVE    2                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
       *            
            MOVE    WRK-SYS-1001-HOSPNAME
@@ -756,7 +758,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                WHEN    "RE"
                    INSPECT RECEDEN-RECEDATA   TALLYING    WRK-MOJISU
                                                FOR ALL "," 
-                   IF      WRK-MOJISU          =   16  OR  17
+                   IF      WRK-MOJISU          =   16  OR  17  OR  25
                        PERFORM VARYING IDX FROM    2500 BY  -1
                                UNTIL   IDX <       1
                            IF      RECEDEN-RECEDATA (IDX:1)
@@ -768,7 +770,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                        IF      WRK-MOJISU          =   16
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
-                                     ",,,,,,,,,"   DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
                            END-STRING
@@ -776,7 +779,41 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                        IF      WRK-MOJISU          =   17
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
-                                     ",,,,,,,,"    DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
+                                     WRK-KAIGYO    DELIMITED  BY  SIZE
+                                     INTO          WRK-REC
+                           END-STRING
+                       END-IF
+                       IF      WRK-MOJISU          =   25
+                           MOVE    ZERO                TO  IDXX
+                                                           IDWW
+                                                       WRK-KUGIRI-KAISU
+                           MOVE    SPACE               TO  WRK-SRYKA
+                           PERFORM VARYING IDX FROM    WRK-NAGASA BY  -1
+                                   UNTIL   IDX <       1
+                               IF      RECEDEN-RECEDATA (IDX:1)
+                                                       =   WRK-KUGIRI
+                                   COMPUTE WRK-KUGIRI-KAISU    =
+                                               WRK-KUGIRI-KAISU    +   1
+                                   IF      WRK-KUGIRI-KAISU    =   9
+                                       MOVE    IDX     TO  WRK-NAGASA
+                                       COMPUTE IDWW    =   IDX +   1
+                                       IF      RECEDEN-RECEDATA (IDWW:2)
+                                                       NOT =   ",,"
+                                           MOVE
+                                               RECEDEN-RECEDATA (IDWW:2)
+                                                           TO  WRK-SRYKA
+                                       END-IF
+                                       MOVE    1               TO  IDX
+                                   END-IF
+                               END-IF        
+                           END-PERFORM   
+                           STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                                                   DELIMITED  BY  SIZE
+                                     ",,,,"        DELIMITED  BY  SIZE
+                                     WRK-SRYKA     DELIMITED  BY  SPACE
+                                 ",,,,,,,,,,,,,,"  DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
                            END-STRING
@@ -786,7 +823,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                WHEN    "TO"
                    INSPECT RECEDEN-RECEDATA    TALLYING    WRK-MOJISU
                                                FOR ALL "," 
-                   IF      WRK-MOJISU          =   9   OR  10
+                   IF      WRK-MOJISU          =   9   OR  10  OR  16
                        PERFORM VARYING IDX FROM    2500    BY  -1
                                UNTIL   IDX <       1
                            IF      RECEDEN-RECEDATA (IDX:1)
@@ -808,6 +845,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
                                      ",,,,,,"      DELIMITED  BY  SIZE
+                                     WRK-KAIGYO    DELIMITED  BY  SIZE
+                                     INTO          WRK-REC
+                           END-STRING
+                           MOVE    WRK-REC         TO  RECEDEN-RECEDATA
+                       END-IF
+                       IF      WRK-MOJISU          =   16
+                           STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                                                   DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
                            END-STRING
@@ -843,10 +890,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                    END-IF     
                WHEN    "SI"
                WHEN    "IY"
-                   IF      RECEDEN-SRYYM       <   200804
+                   IF      RECEDEN-SRYYM       <   201004
                        INSPECT RECEDEN-RECEDATA    TALLYING  WRK-MOJISU
                                                    FOR ALL "," 
-                       IF      WRK-MOJISU          =   6
+                       IF      WRK-MOJISU          =   6   OR  12
                            PERFORM VARYING IDX FROM    2500 BY  -1
                                    UNTIL   IDX <       1
                                IF      RECEDEN-RECEDATA (IDX:1)
@@ -855,13 +902,25 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                                    MOVE    1               TO  IDX
                                END-IF    
                            END-PERFORM   
-                           STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                           IF      WRK-MOJISU          =   6
+                               STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
                                      ",,,,,,"      DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
-                           END-STRING
-                           MOVE    WRK-REC     TO  RECEDEN-RECEDATA
+                               END-STRING
+                               MOVE    WRK-REC     TO  RECEDEN-RECEDATA
+                           END-IF     
+                           IF      WRK-MOJISU          =   12
+                               STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
+                                                   DELIMITED  BY  SIZE
+                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                                                   DELIMITED  BY  SIZE
+                                     WRK-KAIGYO    DELIMITED  BY  SIZE
+                                     INTO          WRK-REC
+                               END-STRING
+                               MOVE    WRK-REC     TO  RECEDEN-RECEDATA
+                           END-IF     
                        END-IF
                    END-IF     
            END-EVALUATE

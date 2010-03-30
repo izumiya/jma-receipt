@@ -167,11 +167,14 @@
       *  04.04.02    NACL-藤原    09/05/19  東京都地方公費対応
       *                                     マル都（８２）は再優先とする
       *  04.04.03    NACL-藤原    09/10/21  月途中の負担者番号変更対応
-      *                                     （自立支援の公費単独）
-      * 
+      *                                     （自立支援の公費単独） 
+      *
       *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
       *                                     平成２２年４月分以降の政府管
       *                                     掌をエラーとする
+      *  04.05.02    NACL-藤原    10/03/23  平成２２年４月改正対応
+      *                                     請求に係わる記録条件仕様の
+      *                                     変更に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -541,8 +544,6 @@
                                    BY         //WRK-CONTKBN//.
       *
            COPY    "MCPAREA".
-      *     
-      *??     COPY    "ORCA-DBMETA".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1130,7 +1131,8 @@ grpsys             MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
            END-IF
       *     
       *    レセプト診療科（旧総合病院のとき）
-           IF      SYS-1001-HOSPSBT1   =   1
+           IF    ( SYS-1001-HOSPSBT1   =   1                     )
+           AND   ( ACCT-SRYYM          <   WRK-CONS-SRYYM-201004 )
                INITIALIZE                  SYS-1005-REC
                MOVE    "1005"              TO  SYS-1005-KANRICD
                MOVE    ACCT-SRYKA          TO  SYS-1005-KBNCD
@@ -1677,7 +1679,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
       *   
            EVALUATE    WRK-SYOKBN
                WHEN    "1"
-                   IF      SYS-1001-HOSPSBT1   =   1
+                   IF    ( SYS-1001-HOSPSBT1   =   1                 )
+                   AND   ( WRK-RECE01-SRYYM    <
+                                               WRK-CONS-SRYYM-201004 )
                        MOVE    SYS-1005-RECESRYKA  TO WRK-RECE01-RECEKA
                    ELSE
                        MOVE    SPACE               TO WRK-RECE01-RECEKA
@@ -1691,7 +1695,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                        PERFORM 20011-RECE01-WRITE-SEC
                    END-IF
                WHEN    "2"
-                   IF      SYS-1001-HOSPSBT1   =   1
+                   IF    ( SYS-1001-HOSPSBT1   =   1                 )
+                   AND   ( WRK-RECE01-SRYYM    <
+                                               WRK-CONS-SRYYM-201004 )
                        MOVE    SYS-1005-RECESRYKA  TO WRK-RECE01-RECEKA
                    ELSE
                        MOVE    SPACE               TO WRK-RECE01-RECEKA
