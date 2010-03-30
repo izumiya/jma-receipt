@@ -254,6 +254,7 @@
            03  WRK-SRYCD-R             PIC X(09).
            03  WRK-SRYCD-ID            PIC X(09).
            03  WRK-SRYCD-RD            PIC X(09).
+           03  WRK-SKBN-02               PIC X(01).
       *
       *    £Ã£Ô¡¤£Í£Ò£É²ó¿ô
            03  WRK-CTMRI-CNT-G.
@@ -370,6 +371,61 @@
                05  TBL-SIND-SRYCD-R        PIC X(09).
       *        ¿ÇÃÇÎÁ¡ÊÆ±»þÊ»»Ü¡Ë
                05  TBL-SIND-SRYCD-RD       PIC X(09).
+      *
+      *   »£±ÆÎÁ¡Ê¥Ç¥¸¥¿¥ë¡¦¥¢¥Ê¥í¥°Æ±»þ»£±Æ¡Ë
+       01  TBL-SATUEI02-AREA.
+      * Ã±½ã»£±Æ
+           03  FILLER              PIC X(01)  VALUE   "1".
+      *    Ã±½ã»£±Æ¡Ê¥Ç¥¸¥¿¥ë¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032050".
+      *    Ã±½ã»£±Æ¡Ê¥¢¥Ê¥í¥°¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032150".
+      *    ¼Ì¿¿¿ÇÃÇ¡Ê¥¤¡Ë¡ÊÆ±»þÊ»»Ü¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170022730".
+      *    ¼Ì¿¿¿ÇÃÇ¡Ê¥í¡Ë¡ÊÆ±»þÊ»»Ü¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170022830".
+      * Ã±½ã´ÖÀÜ»£±Æ
+           03  FILLER              PIC X(01)  VALUE   "1".
+      *    Ã±½ã»£±Æ¡Ê¥Ç¥¸¥¿¥ë¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032450".
+      *    Ã±½ã»£±Æ¡Ê¥¢¥Ê¥í¥°¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032550".
+      *    ¼Ì¿¿¿ÇÃÇ¡Ê¥¤¡Ë¡ÊÆ±»þÊ»»Ü¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170022730".
+      *    ¼Ì¿¿¿ÇÃÇ¡Ê¥í¡Ë¡ÊÆ±»þÊ»»Ü¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170022830".
+      *
+      * Â¤±ÆºÞ»ÈÍÑ»£±Æ
+           03  FILLER              PIC X(01)  VALUE   "3".
+      *    Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032250".
+      *    Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032350".
+      *    ¼Ì¿¿¿ÇÃÇ¡ÊÆ±»þÊ»»Ü¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170022930".
+           03  FILLER              PIC X(09)  VALUE   SPACE.
+      *
+      * Â¤±ÆºÞ»ÈÍÑ»£±Æ
+           03  FILLER              PIC X(01)  VALUE   "3".
+      *    Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032650".
+      *    Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170032750".
+      *    ¼Ì¿¿¿ÇÃÇ¡ÊÆ±»þÊ»»Ü¡Ë
+           03  FILLER              PIC X(09)  VALUE   "170022930".
+           03  FILLER              PIC X(09)  VALUE   SPACE.
+      *
+       01  TBL-SATUEI02-AREA-R       REDEFINES  TBL-SATUEI02-AREA.
+           03  TBL-SATUEI02-OCC      OCCURS     4   INDEXED  TBL-SIDX02.
+               05  TBL2-SATUKBN             PIC X(01).
+      *        »£±ÆÎÁ¡Ê¥¢¥Ê¥í¥°¡Ë
+               05  TBL2-SATU-SRYCD-A        PIC X(09).
+      *        »£±ÆÎÁ¡Ê¥Ç¥¸¥¿¥ë¡Ë
+               05  TBL2-SATU-SRYCD-D        PIC X(09).
+      *        ¿ÇÃÇÎÁ¡¡¥¤¡ÊÆ±»þÊ»»Ü¡Ë
+               05  TBL2-SIND-SRYCD-ID       PIC X(09).
+      *        ¿ÇÃÇÎÁ¡¡¥í¡ÊÆ±»þÊ»»Ü¡Ë
+               05  TBL2-SIND-SRYCD-RD       PIC X(09).
       *
       *   £ØÀþÆ±»þÊ»»Ü¡Ê¿ÇÃÇ¡¦»£±Æ¡Ë
        01  TBL-DOUJI-HEISI-AREA.
@@ -1730,6 +1786,25 @@
                                                    TO  WRK-XSEN-SRYCD-R
            END-SEARCH
       *
+      *    ¥¢¥Ê¥í¥°¡¦¥Ç¥¸¥¿¥ëÆ±»þ»£±Æ¤ÎÈ½ÃÇ
+           SET     TBL-SIDX02          TO  1
+           SEARCH  TBL-SATUEI02-OCC      VARYING   TBL-SIDX02
+               AT   END
+                   MOVE    SPACE               TO  WRK-SKBN-02
+               WHEN   (WRK-COM-INPUTCD (IDX-SAT)
+                                               =   TBL2-SATU-SRYCD-A
+                                                           (TBL-SIDX02))
+                  OR  (WRK-COM-INPUTCD (IDX-SAT)
+                                               =   TBL2-SATU-SRYCD-D
+                                                           (TBL-SIDX02))
+                   MOVE    TBL2-SATUKBN (TBL-SIDX02)
+                                                TO  WRK-SKBN-02
+                   MOVE    TBL2-SIND-SRYCD-ID(TBL-SIDX02)
+                                                TO  WRK-XSEN-SRYCD-I
+                   MOVE    TBL2-SIND-SRYCD-RD(TBL-SIDX02)
+                                                TO  WRK-XSEN-SRYCD-R
+           END-SEARCH
+      *
       *    Æ±»þÊ»»Ü¤Î¿ÇÃÇÎÁ¤ÎÈ½Äê
            MOVE    ZERO                TO  IDX-DOJI1
            MOVE    ZERO                TO  IDX-DOJI2
@@ -2307,6 +2382,20 @@
       *
            MOVE    WRK-COM-TEN (IDX-Z) TO  WRK-SATU-TEN
            MOVE    ZERO                TO  WRK-SATUEI-SURYO
+      *    ¥¢¥Ê¥í¥°¡¦¥Ç¥¸¥¿¥ëÆ±»þ»£±Æ¤ÎÈ½ÃÇ
+           SET     TBL-SIDX02          TO  1
+           SEARCH  TBL-SATUEI02-OCC      VARYING   TBL-SIDX02
+               AT   END
+                   MOVE    SPACE               TO  WRK-SKBN-02
+               WHEN   (WRK-COM-INPUTCD (IDX-Z)
+                                               =   TBL2-SATU-SRYCD-A
+                                                           (TBL-SIDX02))
+                  OR  (WRK-COM-INPUTCD (IDX-Z)
+                                               =   TBL2-SATU-SRYCD-D
+                                                           (TBL-SIDX02))
+                   MOVE    TBL2-SATUKBN (TBL-SIDX02)
+                                                TO  WRK-SKBN-02
+           END-SEARCH
       *
       *    ´ÖÀÜ»£±Æ¤Ë¤è¤ëÄþ¸º·×»»
            PERFORM VARYING     IDX-Z2  FROM    IDX-STR BY  1
@@ -2423,6 +2512,7 @@
            ELSE
                MOVE    ZERO                TO  FLG-SATU-GEN
            END-IF
+           MOVE    SPACE               TO  WRK-SKBN-02
       *
       *    ¤­¤¶¤ßÃÍÈ½Äê
            IF     (WRK-COM-INPUTCD (IDX-Z)(1:1)    =   "1" ) AND
@@ -2472,6 +2562,9 @@
                END-IF
            ELSE
                IF      FLG-SATU-GEN        =   ZERO
+      ***        AND  (WRK-SKBN-02         =   SPACE )
+      *          ÅÀ¿ô¤È¤­¤¶¤ßÅÀ¿ô¤¬Æ±¤¸»þ¡¢»£±ÆÅÀ¿ô¤È¤¹¤ë
+                 AND  (TNS-TEN         NOT =   TNS-KZMTEN )
                    COMPUTE WRK-KZMTEN          =   WRK-SATU-TEN   /  2
                ELSE
                    MOVE    WRK-SATU-TEN        TO  WRK-KZMTEN
