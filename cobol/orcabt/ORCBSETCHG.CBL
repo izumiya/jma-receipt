@@ -854,6 +854,11 @@
                    MOVE    1               TO  FLG-OK
                END-IF
            END-PERFORM
+      *TEST
+           DISPLAY "2001-SET-SYORI-SEC"
+              ",ISET-SETCD:" TBL-ISET-SETCD (1)
+              ",FLG-OK:" FLG-OK
+      *TEST
       *
            IF     WRK-PARA-SYORIKBN    =   "1"
       *        一覧表示
@@ -914,6 +919,11 @@
            MOVE    "tbl_inputset"      TO  MCP-TABLE
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *TEST
+           DISPLAY " 20012-SET-CHNG-SEC"
+              ",ISET-SETCD:" TBL-ISET-SETCD (1)
+              ", FLG-SET-ERR:"  FLG-SET-ERR
+      *TEST
       *
            IF     (FLG-OK              =   1    )  AND
                   (FLG-SET-ERR         =   ZERO )
@@ -1066,6 +1076,11 @@
                MOVE    HZN-INPUTSET-REC (1)  TO  INPUTSET-REC
            END-IF
            MOVE    ISET-SETCD          TO  PRT-SETCD
+      *TEST
+           DISPLAY " 700-PTNUM-PRINT-SEC "
+              ",ISET-SETCD:" ISET-SETCD
+              ",ISET-YUKOSTYMD:"  ISET-YUKOSTYMD
+      *TEST
       *    期間
            MOVE    ISET-YUKOSTYMD      TO  WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
