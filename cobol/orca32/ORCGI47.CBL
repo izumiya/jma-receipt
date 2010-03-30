@@ -214,6 +214,7 @@
            03  WRK-ZOGENPTN                PIC X(01).
            03  WRK-ZOGEN                   PIC S9(05).
            03  WRK-ERRMSG                  PIC X(100).
+           03  WRK-ADLTEN                  PIC 9(02).
       *
        01  MEDKBN-DAY-AREA.
            03  MEDKBN-OCC                  OCCURS 2.
@@ -3274,7 +3275,7 @@
                    END-IF
       *
                    COMPUTE SS011-ADLTEN (IDX-DAY)
-                       =   ADLTEN-DAY (IDX-DAY)
+                       =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
                END-PERFORM
                CALL    "ORCSS011"  USING   SS011-AREA
                                            SPA-AREA
@@ -3486,10 +3487,10 @@
                        UNTIL ( IDX-DAY >    31 )
       *
                    IF    ( SPA-I47-RYOYO-CD (IDX-DAY)  NOT =  SPACE )
-                        COMPUTE ADLTEN-DAY (IDX-DAY)
-                            =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
+                       COMPUTE WRK-ADLTEN
+                           =   ADLTEN-DAY (IDX-DAY)   +   ADLTEN-DAYALL
       *
-                       MOVE    ADLTEN-DAY (IDX-DAY)
+                       MOVE    WRK-ADLTEN
                                            TO   WRK-ZZ
                        MOVE    WRK-ZZ      TO   I47-TNL-DAY (3 IDX-DAY)
       *
