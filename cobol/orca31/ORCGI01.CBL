@@ -711,13 +711,52 @@
       *
                    07                      PIC X(03)   VALUE   "352".
                    07                      PIC X(03)   VALUE   "353".
+      *
+                   07                      PIC X(03)   VALUE   "363".
+                   07                      PIC X(03)   VALUE   "364".
+      *
+                   07                      PIC X(03)   VALUE   "365".
+                   07                      PIC X(03)   VALUE   "366".
+      *
+                   07                      PIC X(03)   VALUE   "367".
+                   07                      PIC X(03)   VALUE   "368".
+      *
+                   07                      PIC X(03)   VALUE   "369".
+                   07                      PIC X(03)   VALUE   "370".
+      *
+                   07                      PIC X(03)   VALUE   "371".
+                   07                      PIC X(03)   VALUE   "372".
+      *
+                   07                      PIC X(03)   VALUE   "373".
+                   07                      PIC X(03)   VALUE   "374".
+      *
+                   07                      PIC X(03)   VALUE   "375".
+                   07                      PIC X(03)   VALUE   "376".
+      *
+                   07                      PIC X(03)   VALUE   "377".
+                   07                      PIC X(03)   VALUE   "378".
+      *
+                   07                      PIC X(03)   VALUE   "379".
+                   07                      PIC X(03)   VALUE   "380".
+      *
+                   07                      PIC X(03)   VALUE   "381".
+                   07                      PIC X(03)   VALUE   "382".
+      *
+                   07                      PIC X(03)   VALUE   "383".
+                   07                      PIC X(03)   VALUE   "384".
+      *
+                   07                      PIC X(03)   VALUE   "385".
+                   07                      PIC X(03)   VALUE   "386".
+      *
+                   07                      PIC X(03)   VALUE   "387".
+                   07                      PIC X(03)   VALUE   "388".
                05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS  21.
+                   07  CONST-TOK-LIFECD-OCC    OCCURS  34.
                        09  CONST-TOK-LIFECD-IPN
                                            PIC X(03).
                        09  CONST-TOK-LIFECD-LIFE
                                            PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   21.
+               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   34.
            03  CONST-GMN-KSN-MAX           PIC 9(05)   VALUE   3.
            03  CONST-KSNCD-G.
                05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   4.
