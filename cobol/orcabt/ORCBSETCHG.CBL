@@ -426,14 +426,14 @@
            03  FILLER              PIC X(20)   VALUE   
                "セット更新リスト＃".
       *
-       01  LINE-MAX                    PIC 9(03)   VALUE   69.
-      *
       *    内容
        01  WRK-PRTHEN-AREA.
       *    半角
            03  WRK-TBL-REC             PIC X(90)   OCCURS   800.
       *    全角
            03  WRK-TBL-REC2            PIC X(108)  OCCURS   800.
+      *
+       01  LINE-MAX                    PIC 9(03)   VALUE   69.
       *
        01  WRK-B01-HENSYU.
            03  WRK-B01-SURYO-HEN           PIC X(15).
@@ -833,6 +833,8 @@
       *
            PERFORM 2903-END-HENSYU-SEC
       *
+           MOVE    1                   TO  FLG-END
+      *
            .
        200-MAIN-EXT.
            EXIT.
@@ -854,11 +856,6 @@
                    MOVE    1               TO  FLG-OK
                END-IF
            END-PERFORM
-      *TEST
-           DISPLAY "2001-SET-SYORI-SEC"
-              ",ISET-SETCD:" TBL-ISET-SETCD (1)
-              ",FLG-OK:" FLG-OK
-      *TEST
       *
            IF     WRK-PARA-SYORIKBN    =   "1"
       *        一覧表示
@@ -919,11 +916,6 @@
            MOVE    "tbl_inputset"      TO  MCP-TABLE
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-      *TEST
-           DISPLAY " 20012-SET-CHNG-SEC"
-              ",ISET-SETCD:" TBL-ISET-SETCD (1)
-              ", FLG-SET-ERR:"  FLG-SET-ERR
-      *TEST
       *
            IF     (FLG-OK              =   1    )  AND
                   (FLG-SET-ERR         =   ZERO )
@@ -1076,11 +1068,6 @@
                MOVE    HZN-INPUTSET-REC (1)  TO  INPUTSET-REC
            END-IF
            MOVE    ISET-SETCD          TO  PRT-SETCD
-      *TEST
-           DISPLAY " 700-PTNUM-PRINT-SEC "
-              ",ISET-SETCD:" ISET-SETCD
-              ",ISET-YUKOSTYMD:"  ISET-YUKOSTYMD
-      *TEST
       *    期間
            MOVE    ISET-YUKOSTYMD      TO  WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
@@ -1555,6 +1542,8 @@
            IF      IDX-P               >   LINE-MAX
       *        印刷処理
                PERFORM 400-HCPOM2-PRINT-SEC
+      *        見出し編集
+               PERFORM 7001-PRT-INIT-SEC
                MOVE    1               TO  IDX-P
            END-IF
       *
