@@ -2547,15 +2547,15 @@
                                         TO  WRK-200804-KSN5(IDX1)
       *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
                              WHEN  CONS-201004-KSN14
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201004-KSN14(IDX1)
       *                      Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»
                              WHEN  CONS-201004-KSN18
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201004-KSN18(IDX1)
       *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
                              WHEN  CONS-201004-KSN19
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201004-KSN19(IDX1)
                            END-EVALUATE
       *
