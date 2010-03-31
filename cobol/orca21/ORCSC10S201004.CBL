@@ -2553,12 +2553,12 @@
       *****************************************************************
        33021-DENSIKA-ADD-SEC                  SECTION.
       *
-           IF      SPA-DENSIKA         =   1
-               MOVE    "111012370"         TO  WRK-SRYCD
+      *    IF      SPA-DENSIKA         =   1
+      *        MOVE    "111012370"         TO  WRK-SRYCD
       *        追加共通処理
-               MOVE    ZERO                TO  WRK-IDX-IN
-               PERFORM 33041-SRYCD-ADD-SEC
-           END-IF
+      *        MOVE    ZERO                TO  WRK-IDX-IN
+      *        PERFORM 33041-SRYCD-ADD-SEC
+      *    END-IF
            .
        33021-DENSIKA-ADD-EXT.
            EXIT.
@@ -3445,6 +3445,16 @@
       *        電子化加算
                PERFORM 33021-DENSIKA-ADD-SEC
                GO      TO      2009-RSIHKN-SET-EXT
+           END-IF
+      *Ｈ２２年４月から
+      *    再診料の加算
+           IF     (SPA-SYOSIN          =   1 )  OR
+                  (SPA-GAIRAISIN       =   1 )  OR
+                  (SPA-HOSPSBT         =   1 )
+               CONTINUE
+           ELSE
+      *        地域医療貢献・明細書発行体制等加算
+               PERFORM 33013-SAISINKSN-SEC
            END-IF
       *
       *    アフターケアの時、以下算定なし
