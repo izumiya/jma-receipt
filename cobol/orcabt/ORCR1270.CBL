@@ -47,6 +47,9 @@
       *  04.05.03    NACL-藤原    10/03/03  平成２２年４月改正対応
       *                                     平成２２年４月分以降の処理を
       *                                     行わない
+      *  04.05.04    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
+      *                                     平成２２年４月分以降の処理を
+      *                                     行うようにする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -544,12 +547,6 @@
            03  WRK-ERR-MSG-7.
                05  FILLER          PIC X(48)   VALUE
                    "【リアルタイムプレビューより作成のため提出不可】". 
-      *
-      *★★平成２２年４月改正対応
-           03  WRK-ERR-MSG-99.
-               05  FILLER              PIC X(28)  VALUE
-               "《平成２２年４月改正未対応》".
-      *★★
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1203,20 +1200,6 @@
                MOVE    WRK-ERR-MSG-7        TO  HCN58-HEAD1-G (5:)
                MOVE    WRK-HCN58-HEAD1-G    TO  HCN58-HEAD1-G (53:)
            END-IF
-      *
-      *★★平成２２年４月改正対応
-           IF      RECE200-SRYYM        >=  "201004"
-               MOVE    SPACE                TO  WRK-HCN58-HEAD1-G
-               MOVE    HCN58-HEAD1-G (5:)   TO  WRK-HCN58-HEAD1-G
-               MOVE    WRK-ERR-MSG-99       TO  HCN58-HEAD1-G (5:)
-               MOVE    WRK-HCN58-HEAD1-G    TO  HCN58-HEAD1-G (33:)
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   MOVE    "点検改正未対応"    TO  HCN58-LABEL
-               ELSE
-                   MOVE    "改正未対応"        TO  HCN58-LABEL
-               END-IF     
-           END-IF
-      *★★
       *
            .
        310-HCN06-HEAD-HEN-EXT.
@@ -2820,12 +2803,6 @@
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
-      *
-      *★★平成２２年４月改正対応
-           IF      RECE200-SRYYM        >=  "201004"
-               GO  TO  3904-RECE10-HENSYU-EXT
-           END-IF
-      *★★
       * 
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE200-TSTPTNUMKBN =   "1"  )
