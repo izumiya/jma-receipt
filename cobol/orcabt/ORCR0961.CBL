@@ -50,6 +50,7 @@
       *  04.03.05    NACL-門脇    09/02/04  請求点が０の場合の対応
       *
       *  04.04.01    NACL-藤原    10/03/03  平成２２年４月改正対応
+      *  04.04.02    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1227,16 +1228,6 @@ grpsys        PERFORM 900-DBSELECT-SEC
            IF      WRK-PARA-PRTKBN     =   "2"
                MOVE    "点検用レセプト"    TO  HCN51-LABEL
            END-IF
-      *
-      *★★平成２２年４月改正対応
-           IF      RECE82-SRYYM        >=  "201004"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   MOVE    "点検改正未対応"    TO  HCN51-LABEL
-               ELSE
-                   MOVE    "改正未対応"        TO  HCN51-LABEL
-               END-IF     
-           END-IF
-      *★★
       *
            .
        20021-HEAD-HEN-EXT.
