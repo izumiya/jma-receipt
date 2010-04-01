@@ -47,6 +47,7 @@
       *  04.01.01    NACL-門脇    07/10/25  公務災害対応
       *  04.01.02    NACL-門脇    07/12/07  公害対応
       *  04.02.01    NACL-門脇    08/02/29  平成２０年４月改正対応
+      *  04.04.01    NACL-門脇    10/03/31  改正対応（頸部固定帯加算の対応）
       *  04.05.01    NACL-門脇    09/06/16  一括再計算方法選択機能対応
       *  04.05.02    NACL-門脇    10/01/19  治験対応
       *  04.05.03    NACL-門脇    10/01/26  東京都マル子追加対応
@@ -167,6 +168,7 @@
       *
            03  WK-YOUBUKASAN               PIC  9(08).
            03  WK-KYOBUKASAN               PIC  9(08).
+           03  WK-KEIBUKASAN               PIC  9(08).
            03  WK-SOGAIKASAN               PIC  9(08).
            03  WK-RYOYOTEATE               PIC  9(08).
       *
@@ -1797,6 +1799,7 @@
                                             -   WK-RSIETC
                                             -   WK-YOUBUKASAN
                                             -   WK-KYOBUKASAN
+                                            -   WK-KEIBUKASAN
                                             -   WK-SOGAIKASAN
                                             -   WK-RYOYOTEATE
       *
@@ -2593,6 +2596,12 @@
                          IF    SRY-SRYCD (IDX3)  =   "140040110"
                           IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
                            COMPUTE WK-KYOBUKASAN = WK-KYOBUKASAN +
+                                  (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                          END-IF
+                         END-IF
+                         IF    SRY-SRYCD (IDX3)  =   "140052610"
+                          IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
+                           COMPUTE WK-KEIBUKASAN = WK-KEIBUKASAN +
                                   (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
                           END-IF
                          END-IF

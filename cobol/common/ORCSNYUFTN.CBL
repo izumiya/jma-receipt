@@ -113,6 +113,7 @@
       *  04.04.04    NACL-門脇    09/11/13  熊本県地方公費対応
       *  04.04.05    NACL-門脇    09/12/15  埼玉県地方公費対応（八潮市）
       *  04.04.06    NACL-門脇    10/03/11  改正対応（外泊区分５の対応）
+      *  04.04.07    NACL-門脇    10/03/31  改正対応（頸部固定帯加算の対応）
       *
       *  04.05.01    NACL-門脇    09/12/04  食事（特別食）の他保険対応
       *  04.05.02    NACL-門脇    10/01/07  治験対応
@@ -158,6 +159,7 @@
            03  WRK-MEISAI                  PIC 9(09).
            03  WRK-YOUBUKASAN              PIC 9(09).
            03  WRK-KYOBUKASAN              PIC 9(09).
+           03  WRK-KEIBUKASAN              PIC 9(09).
            03  WRK-SOGAIKASAN              PIC 9(09).
            03  WRK-RYOYOTEATE              PIC 9(09).
            03  WRK-KOGAI-TEN               PIC 9(09).
@@ -4907,6 +4909,12 @@ grpsys                              SPA-AREA
                                   (TNS-TEN  *   SINRYO-COUNT)
                           END-IF
                          END-IF
+                         IF    SRY-SRYCD (IDZ)  =   "140052610"
+                          IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
+                           COMPUTE WRK-KEIBUKASAN = WRK-KEIBUKASAN +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                          END-IF
+                         END-IF
                          IF    SRY-SRYCD (IDZ)  =   "150266970"
                           IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
                            COMPUTE WRK-SOGAIKASAN = WRK-SOGAIKASAN +
@@ -5145,6 +5153,7 @@ grpsys                                    SPA-AREA
                                         -    WRK-RSIETC
                                         -    WRK-YOUBUKASAN
                                         -    WRK-KYOBUKASAN
+                                        -    WRK-KEIBUKASAN
                                         -    WRK-SOGAIKASAN
                                         -    WRK-RYOYOTEATE
       *
