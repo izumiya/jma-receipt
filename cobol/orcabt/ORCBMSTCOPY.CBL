@@ -567,6 +567,7 @@
            IF         FLG-TENSU-ARI    =    ZERO
                MOVE    WRK-TAIHI-AREA  TO   TNS-TENSU-REC
                MOVE    SPA-HOSPNUM     TO   TNS-HOSPNUM
+               MOVE    TNS-TENSU-REC   TO   MCPDATA-REC
                MOVE    "tbl_tensu"     TO   MCP-TABLE
                MOVE    "key"           TO   MCP-PATHNAME
                MOVE    "DBINSERT"      TO   MCP-FUNC
@@ -671,6 +672,7 @@
            IF         FLG-INPUTCD-ARI  =    ZERO
                MOVE    WRK-TAIHI-AREA  TO   INPUTCD-REC
                MOVE    SPA-HOSPNUM     TO   ICD-HOSPNUM
+               MOVE    INPUTCD-REC     TO   MCPDATA-REC
                MOVE    "tbl_inputcd"   TO   MCP-TABLE
                MOVE    "key"           TO   MCP-PATHNAME
                MOVE    "DBINSERT"      TO   MCP-FUNC
@@ -773,6 +775,7 @@
                MOVE    WRK-TAIHI-AREA  TO  INPUTCD-REC
                MOVE    ICD-INPUTCD     TO  WRK-INPUTCD
                MOVE    SPA-HOSPNUM     TO  ICD-HOSPNUM
+               MOVE    INPUTCD-REC     TO  MCPDATA-REC
                MOVE    "tbl_inputcd"   TO  MCP-TABLE
                MOVE    "key"           TO  MCP-PATHNAME
                MOVE    "DBINSERT"      TO  MCP-FUNC
