@@ -4818,6 +4818,57 @@
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *    •∑•π•∆•‡¥…Õ˝∏°∫˜
+           MOVE    SPACE               TO  SYS-1007-REC
+           INITIALIZE                  SYS-1007-REC
+           MOVE    "1007"              TO  SYS-1007-KANRICD
+           MOVE    "*"                 TO  SYS-1007-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-1007-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1007-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1007-HOSPNUM
+           MOVE    SYS-1007-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  SYS-1007-REC
+               INITIALIZE                  SYS-1007-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1007-REC
+      *
+               MOVE    SYS-1007-SANTEI (1:1)   TO  SPA-CHOKI-FLG
+               MOVE    SYS-1007-SANTEI (2:1)   TO  SPA-YAKJYO-1
+               MOVE    SYS-1007-SANTEI (3:1)   TO  SPA-YAKJYO-2
+               MOVE    SYS-1007-SANTEI (4:1)   TO  SPA-YAKJYO-3
+      *        Œ≈Õ‹√¥≈ˆºÍ≈ˆ
+               MOVE    SYS-1007-SANTEI (5:1)   TO  SPA-RYOYOU-FLG
+      *        ∆√ƒÍÃÙ∫ﬁº£Œ≈¥…Õ˝Œ¡Õ≠Ãµ
+               MOVE    SYS-1007-SANTEI (6:1)   TO  SPA-TOKUTEI-FLG
+      *         ø¿Æ£±£∑«Ø£¥∑Ó∞ πﬂÕ≠∏˙§»§π§Î
+               IF      SPA-SRYYMD          <   "20050401"
+      *            ÃÙ∫ﬁæ ÛƒÛ∂°Œ¡
+                   IF      SPA-YAKJYO-1    =   2
+                       MOVE    1               TO  SPA-YAKJYO-1
+                   END-IF
+                   IF      SPA-YAKJYO-2    =   2
+                       MOVE    1               TO  SPA-YAKJYO-2
+                   END-IF
+                   IF      SPA-YAKJYO-3    =   2
+                       MOVE    1               TO  SPA-YAKJYO-3
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
            .
        3009-SYSKANRI-SAISET-EXT.
            EXIT.
