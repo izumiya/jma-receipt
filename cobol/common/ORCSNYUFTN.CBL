@@ -4771,6 +4771,14 @@ grpsys                              SPA-AREA
                                   (TNS-TEN  *   SINRYO-COUNT)
                       END-IF
       *
+                      EVALUATE  SRY-SRYCD(IDZ)
+                        WHEN    "101910110"  THRU  "101910400"
+                           COMPUTE WRK-RSIETC = WRK-RSIETC +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                      END-EVALUATE
+      *
                       IF     SYU-SYUHKNNUM   =   "971"
       *
                          IF    SRY-SRYCD (IDZ)(1:5)   =   "09593"
