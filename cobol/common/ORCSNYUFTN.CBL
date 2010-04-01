@@ -113,6 +113,7 @@
       *  04.04.04    NACL-ÌçÏÆ    09/11/13  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.05    NACL-ÌçÏÆ    09/12/15  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÈ¬Ä¬»Ô¡Ë
       *  04.04.06    NACL-ÌçÏÆ    10/03/11  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
+      *  04.04.07    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -154,6 +155,7 @@
            03  WRK-MEISAI                  PIC 9(09).
            03  WRK-YOUBUKASAN              PIC 9(09).
            03  WRK-KYOBUKASAN              PIC 9(09).
+           03  WRK-KEIBUKASAN              PIC 9(09).
            03  WRK-SOGAIKASAN              PIC 9(09).
            03  WRK-RYOYOTEATE              PIC 9(09).
            03  WRK-KOGAI-TEN               PIC 9(09).
@@ -4813,6 +4815,12 @@ grpsys                              SPA-AREA
                                   (TNS-TEN  *   SINRYO-COUNT)
                           END-IF
                          END-IF
+                         IF    SRY-SRYCD (IDZ)  =   "140052610"
+                          IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
+                           COMPUTE WRK-KEIBUKASAN = WRK-KEIBUKASAN +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                          END-IF
+                         END-IF
                          IF    SRY-SRYCD (IDZ)  =   "150266970"
                           IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
                            COMPUTE WRK-SOGAIKASAN = WRK-SOGAIKASAN +
@@ -5023,6 +5031,7 @@ grpsys                                    SPA-AREA
                                         -    WRK-RSIETC
                                         -    WRK-YOUBUKASAN
                                         -    WRK-KYOBUKASAN
+                                        -    WRK-KEIBUKASAN
                                         -    WRK-SOGAIKASAN
                                         -    WRK-RYOYOTEATE
       *

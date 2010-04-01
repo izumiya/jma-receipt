@@ -47,6 +47,7 @@
       *  04.01.01    NACL-ÌçÏÆ    07/10/25  ¸øÌ³ºÒ³²ÂÐ±þ
       *  04.01.02    NACL-ÌçÏÆ    07/12/07  ¸ø³²ÂÐ±þ
       *  04.02.01    NACL-ÌçÏÆ    08/02/29  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
+      *  04.04.01    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -162,6 +163,7 @@
       *
            03  WK-YOUBUKASAN               PIC  9(08).
            03  WK-KYOBUKASAN               PIC  9(08).
+           03  WK-KEIBUKASAN               PIC  9(08).
            03  WK-SOGAIKASAN               PIC  9(08).
            03  WK-RYOYOTEATE               PIC  9(08).
       *
@@ -1671,6 +1673,7 @@
                                             -   WK-RSIETC
                                             -   WK-YOUBUKASAN
                                             -   WK-KYOBUKASAN
+                                            -   WK-KEIBUKASAN
                                             -   WK-SOGAIKASAN
                                             -   WK-RYOYOTEATE
       *
@@ -2460,6 +2463,12 @@
                          IF    SRY-SRYCD (IDX3)  =   "140040110"
                           IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
                            COMPUTE WK-KYOBUKASAN = WK-KYOBUKASAN +
+                                  (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                          END-IF
+                         END-IF
+                         IF    SRY-SRYCD (IDX3)  =   "140052610"
+                          IF  WRK-4001-KOTEIKBN  =  SPACE OR "2"
+                           COMPUTE WK-KEIBUKASAN = WK-KEIBUKASAN +
                                   (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
                           END-IF
                          END-IF
