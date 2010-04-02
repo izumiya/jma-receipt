@@ -209,7 +209,7 @@
            MOVE    WRK-TABLE           TO  MCP-TABLE
            MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
            MOVE    WRK-FUNC            TO  MCP-FUNC
-      *!   MOVE    ZERO                TO  MCP-LOGFLAG
+           MOVE    ZERO                TO  MCP-LOGFLAG
       *
            .
       *
@@ -225,7 +225,7 @@
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
-      *!   MOVE    ZERO                TO  MCP-LOGFLAG
+           MOVE    ZERO                TO  MCP-LOGFLAG
            IF      MCP-FUNC        =  "DBINSERT" OR "DBUPDATE" 
                                    OR "DBDELETE"
                PERFORM 1001-AUDITLOG-PUT-SEC

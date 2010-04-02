@@ -139,7 +139,7 @@
            MOVE    MCP-TABLE           TO  WRK-TABLE
            MOVE    MCP-PATHNAME        TO  WRK-PATHNAME
            MOVE    MCP-FUNC            TO  WRK-FUNC
-      *!   MOVE    1                   TO  MCP-LOGFLAG
+           MOVE    1                   TO  MCP-LOGFLAG
            MOVE   "AUDITLOG"           TO  MCP-FUNC
       *
            PERFORM 100-INIT-SEC
@@ -147,7 +147,7 @@
            MOVE    WRK-TABLE           TO  MCP-TABLE
            MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
            MOVE    WRK-FUNC            TO  MCP-FUNC
-      *!   MOVE    ZERO                TO  MCP-LOGFLAG
+           MOVE    ZERO                TO  MCP-LOGFLAG
       *
            .
        000-PROC-EXT.
@@ -176,7 +176,7 @@
       *    エラーメッセージ編集処理
            PERFORM 800-KANACONV-SEC
            IF      KANACONV-RETURN     =   ZERO 
-      *!       MOVE    WRK-LOGMSG          TO  MCP-LOGCOMMENT
+               MOVE    WRK-LOGMSG          TO  MCP-LOGCOMMENT
                CALL    "MONFUNC"           USING
                                            MCPAREA
                                            MCPDATA-REC
