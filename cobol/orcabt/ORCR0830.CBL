@@ -62,6 +62,7 @@
       *  04.04.03    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *  04.04.04    NACL-門脇    10/03/23  改正対応（外泊区分５の対応）
       *  04.04.05    NACL-門脇    10/03/31  改正対応（頸部固定帯加算の対応）
+      *  04.04.06    NACL-門脇    10/04/02  特別労災付添看護の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1618,6 +1619,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                              (RECE82-SRYYM          < "200804"     ))
                             ADD    TNS-TEN      TO    WRK-KIN2
                          END-IF
+                         EVALUATE  SRY-SRYCD(SRYACT-IDX)
+                           WHEN    "101910110"  THRU  "101910400"
+                            ADD    TNS-TEN      TO    WRK-KIN2
+                         END-EVALUATE
                          IF  ( ACCT-SRYKBN                =  "80"    ) 
                          AND ( SRY-SRYCD(SRYACT-IDX)(1:5) =  "09593" 
                                                           OR "09594" ) 
@@ -1658,6 +1663,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             COMPUTE  WRK-TEN  =   WRK-TEN   +
                                      ( TNS-TEN / 10)
                          END-IF
+                         EVALUATE  SRY-SRYCD(SRYACT-IDX)
+                           WHEN    "101910110"  THRU  "101910400"
+                            ADD    TNS-TEN      TO    WRK-KIN
+                            COMPUTE  WRK-TEN  =   WRK-TEN   +
+                                     ( TNS-TEN / 10)
+                         END-EVALUATE
                          IF  ( ACCT-SRYKBN                =  "80"    ) 
                          AND ( SRY-SRYCD(SRYACT-IDX)(1:5) =  "09593" 
                                                           OR "09594" ) 
@@ -1893,6 +1904,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               ( WRK-ZAIKAISU-JI * WRK-TEN-JI )
       *
                        END-IF
+                       EVALUATE  SRY-SRYCD(SRYACT-IDX)
+                         WHEN    "101910110"  THRU  "101910400"
+                            COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10
+                            COMPUTE  TBL-SYUTEN-JI(IDY)  =
+                                     TBL-SYUTEN-JI(IDY)  -
+                              ( WRK-ZAIKAISU-JI * WRK-TEN-JI )
+                       END-EVALUATE
       *
                        IF  ( ACCT-SRYKBN         =  "80"    ) AND
                            ( SRY-SRYCD(SRYACT-IDX)(1:5) =  "09591" 
