@@ -2950,6 +2950,7 @@
                    MOVE    SPA-GMN-W20-KYUKNGHJ2   TO  WRK-KBN1-G
                    MOVE    CONST-KYUKNGHJ2         TO  WRK-KSNCD
                    PERFORM 420121-BTU-KSN-EDIT-SEC
+               END-IF
            END-IF
       *
       *    Àº¿À²ÊÃÏ°è°Ü¹Ô¼Â»Ü²Ã»»
