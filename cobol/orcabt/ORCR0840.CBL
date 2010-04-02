@@ -173,6 +173,11 @@
       *                                             ¡ÊÏ«ºÒ¾è¿ô¤Ë´Ø¤ï¤ë²Ã»»ÂÐ±þ¡Ë
       *  04.04.11    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
       *                                     ¡ÊÍ½Ìó¥³¡¼¥ÉÆÉ¤ßÈô¤Ð¤·ÊÔ½¸¡Ë
+      *  04.04.12    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
+      *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
+      *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
+      *  04.04.13    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ
+      *                                     ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -355,6 +360,7 @@
            03  FLG-SRYKBN-HEN                          PIC 9(01).
            03  FLG-SYUNOU-ARI                          PIC 9(01).
            03  FLG-FORMALNAME                          PIC 9(01).
+           03  FLG-JYOGAI                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -384,6 +390,7 @@
            03  IDX11                                   PIC 9(02).
            03  IDX12                                   PIC 9(02).
            03  IDX13                                   PIC 9(02).
+           03  IDX14                                   PIC 9(02).
            03  IDXA                                    PIC 9(01).
            03  IDY                                     PIC 9(03).
            03  IDY2                                    PIC 9(03).
@@ -530,6 +537,10 @@
                05  WRK-ORCSTEN-DAY                     PIC 9(03).
            03  WRK-ORCSTEN-ZAIKAISU                    PIC 9(04).
       *
+       01  WRK-CHUKSNSRYCD-TABLE.
+           03  WRK-CHUKSNSRYCD                         PIC X(09)
+                                                       OCCURS   50.
+      *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
            03  TBL-SYS5000-OCC     OCCURS  100.
@@ -575,6 +586,7 @@
            03  WRK-KSNRATE                             PIC 9V99.    
            03  WRK-YOUBUKASAN                          PIC 9(07).
            03  WRK-KYOBUKASAN                          PIC 9(07).
+           03  WRK-KEIBUKASAN                          PIC 9(07).
            03  WRK-SOGAIKASAN                          PIC 9(07).
            03  WRK-RYOYOTEATE                          PIC 9(07).
            03  WRK-RYOYOTEATE2                         PIC 9(07).
@@ -721,6 +733,8 @@
            03  CONS-YOUBUKASAN PIC X(09)   VALUE   "140037490".
       *    ¶»Éô¸ÇÄêÂÓ²Ã»»
            03  CONS-KYOBUKASAN PIC X(09)   VALUE   "140040110".
+      *    ðôÉô¸ÇÄêÂÓ²Ã»»
+           03  CONS-KEIBUKASAN PIC X(09)   VALUE   "140052610".
       *    ÁÏ³°¸ÇÄê´ï»ÈÍÑ²Ã»»
            03  CONS-SOGAIKASAN PIC X(09)   VALUE   "150266970".
       *    ÎÅÍÜÃ´Åö¼êÅö¡ÊÆþ±¡¡Ë
@@ -800,6 +814,8 @@
            03  CONS-CTMRI-COMMENT16  PIC X(09)  VALUE  "170023410".
       *    »Í»èÆÃ¼ì£Í£Ò£É»£±Æ
            03  CONS-CTMRI-COMMENT17  PIC X(09)  VALUE  "170023510".
+      *    £Ã£Ô»£±Æ¡Ê£±£¶ÎóÌ¤Ëþ¥Þ¥ë¥Á¥¹¥é¥¤¥¹·¿µ¡´ï¡Ë
+           03  CONS-CTMRI-COMMENT18  PIC X(09)  VALUE  "170028610".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ»»ÄêÆü
@@ -871,6 +887,12 @@
            03  CONS-NOUKE9-COMMENT   PIC X(09)  VALUE  "101800110".
       *!   Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë
            03  CONS-NOUKE10-COMMENT  PIC X(09)  VALUE  "101800120".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE11-COMMENT  PIC X(09)  VALUE  "180032410".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE12-COMMENT  PIC X(09)  VALUE  "180032510".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE13-COMMENT  PIC X(09)  VALUE  "180032610".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
@@ -887,6 +909,10 @@
            03  CONS-UNDOKI7-COMMENT  PIC X(09)  VALUE  "101800130".
       *!   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
            03  CONS-UNDOKI8-COMMENT  PIC X(09)  VALUE  "101800140".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
+           03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180032710".
+      *!   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
+           03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "101800125".
       *    ÆñÉÂ´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    ¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£¶ºÐÌ¤Ëþ¡Ë
@@ -897,6 +923,8 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    ÀÝ¿©µ¡Ç½ÎÅË¡
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
+      *    ¤¬¤ó´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
+           03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    ²ðÃ£¸£°ú
            03  CONS-KAITATU-COMMENT  PIC X(09)  VALUE  "140048010".
       *    ±ý¿Ç
@@ -1366,6 +1394,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
            OPEN    I-O                 RECE82-FILE
       *
            PERFORM    900-RECE82-READ-SEC
+      *
+           IF  FLG-END =  ZERO
+              INITIALIZE  WRK-CHUKSNSRYCD-TABLE
+              IF  RECE82-SRYYM  >= "201004"
+                 PERFORM   140-NYUINKASAN-JYOGAI-CYUSYUTU-SEC
+              END-IF
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -1495,6 +1531,45 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    Æþ±¡ÎÁ²Ã»»½ü³°¥³¡¼¥ÉÃê½Ð
+      *****************************************************************
+       140-NYUINKASAN-JYOGAI-CYUSYUTU-SEC      SECTION.
+      *
+           MOVE   ZERO               TO  IDX14
+      *
+           INITIALIZE                    TNS-TENSU-REC
+           MOVE   SPA-HOSPNUM        TO  TNS-HOSPNUM
+           MOVE   RECE82-SRYYM       TO  TNS-YUKOSTYMD(1:6)
+           MOVE   "01"               TO  TNS-YUKOSTYMD(7:2)
+           MOVE   RECE82-SRYYM       TO  TNS-YUKOEDYMD(1:6)
+           MOVE   "01"               TO  TNS-YUKOEDYMD(7:2)
+           MOVE   TNS-TENSU-REC      TO  MCPDATA-REC
+           MOVE   "tbl_tensu"        TO  MCP-TABLE
+           MOVE   "key30"            TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC            =   ZERO
+              MOVE    "tbl_tensu"    TO  MCP-TABLE
+              MOVE    "key30"        TO  MCP-PATHNAME
+              PERFORM  900-TENSU-READ-SEC
+              PERFORM  UNTIL  (FLG-TENSU  =     1)
+                        OR    (IDX14     >=    50)
+                 ADD    1            TO  IDX14
+                 MOVE   TNS-SRYCD    TO  WRK-CHUKSNSRYCD(IDX14)
+      *
+                 MOVE    "tbl_tensu" TO  MCP-TABLE
+                 MOVE    "key30"     TO  MCP-PATHNAME
+                 PERFORM  900-TENSU-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_tensu"       TO  MCP-TABLE
+           MOVE    "key30"           TO  MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+           .
+       140-NYUINKASAN-JYOGAI-CYUSYUTU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¼ç½èÍý
       *****************************************************************
        200-MAIN-SEC                SECTION.
@@ -1614,6 +1689,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  CONTINUE
                 ELSE
       *
+                 MOVE     ZERO    TO    FLG-JYOGAI
+                 IF    ACCT-SRYKBN  =  "90" OR "92"
+                   PERFORM  VARYING  ID4    FROM   1   BY   1
+                             UNTIL  (ID4                  >   50  )
+                               OR   (WRK-CHUKSNSRYCD(ID4) =  SPACE)
+                               OR   (FLG-JYOGAI           =   1   )
+                     IF  ACCT-SRYCDTOTAL(6:9) = WRK-CHUKSNSRYCD(ID4)
+                        MOVE     1    TO   FLG-JYOGAI
+                     END-IF
+                   END-PERFORM
+                 END-IF
+      *
       *          Ì¤¼Â»Ü¸º»»¡¦Æü¾ïÀ¸³è¾ã³²²Ã»»¡¦ÃÔÊò²Ã»»¡¦
       *          êóáì´µ¼Ô´ÉÍý²Ã»»¤ò½ü¤¯
                  IF ((ACCT-SRYCDTOTAL  =  190080470  OR  190799670
@@ -1632,11 +1719,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      (RECE82-SRYYM     >= "200607"                ))
                  OR ((ACCT-SRYCDTOTAL  =  190119210               ) AND
                      (RECE82-SRYYM     >= "200804"                ))
-                 OR ((ACCT-SRYCDTOTAL  =  190135070  OR  190131570
-                                      OR  190134270  OR  190118570
-                                      OR  190134870  OR  190134970
-                                      OR  190135470  OR  190135670) AND
-                     (RECE82-SRYYM     >= "201004"                ))
+                 OR ( FLG-JYOGAI       =  1                        )
                    CONTINUE
                  ELSE
       *
@@ -1665,6 +1748,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                           WRK-SURYOUTOTAL
                                           WRK-YOUBUKASAN
                                           WRK-KYOBUKASAN
+                                          WRK-KEIBUKASAN
                                           WRK-SOGAIKASAN
                                           WRK-RYOYOTEATE
       *
@@ -1716,6 +1800,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     WRK-SURYOUTOTAL
                                                     WRK-YOUBUKASAN
                                                     WRK-KYOBUKASAN
+                                                    WRK-KEIBUKASAN
                                                     WRK-SOGAIKASAN
                                                     WRK-RYOYOTEATE
       *
@@ -1753,6 +1838,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     WRK-SURYOUTOTAL
                                                     WRK-YOUBUKASAN
                                                     WRK-KYOBUKASAN
+                                                    WRK-KEIBUKASAN
                                                     WRK-SOGAIKASAN
                                                     WRK-RYOYOTEATE
       *
@@ -1903,6 +1989,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "tbl_sryact"     TO      MCP-TABLE
                MOVE    "key9"           TO      MCP-PATHNAME
                PERFORM  900-SRYACT-READ-SEC
+      *
+               MOVE     ZERO    TO    FLG-JYOGAI
+               IF    ACCT-SRYKBN  =  "90" OR "92"
+                 PERFORM  VARYING  ID4    FROM   1   BY   1
+                           UNTIL  (ID4                  >   50  )
+                             OR   (WRK-CHUKSNSRYCD(ID4) =  SPACE)
+                             OR   (FLG-JYOGAI           =   1   )
+                   IF  SRY-SRYCD(1) = WRK-CHUKSNSRYCD(ID4)
+                      MOVE     1    TO   FLG-JYOGAI
+                   END-IF
+                 END-PERFORM
+               END-IF
+      *
       *        Ï«ºÒÆþ±¡¤Î²Ã»»ÂÐ¾Ý¥³¡¼¥É¤ò¿ÇÎÅ¹Ô°Ù¥Æ¡¼¥Ö¥ë¤ÇÈ½Äê
                IF ((SRY-SRYCD(1)  =  "190080470"  OR  "190799670"
                                  OR  "190080570"  OR  "190799770"
@@ -1920,11 +2019,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE82-SRYYM     >= "200607"                 ))
                OR ((SRY-SRYCD(1)  =  "190119210"                 ) AND
                    (RECE82-SRYYM     >= "200804"                 ))
-               OR ((SRY-SRYCD(1)  =  "190135070"  OR  "190131570"
-                                 OR  "190134270"  OR  "190118570"
-                                 OR  "190134870"  OR  "190134970"
-                                 OR  "190135470"  OR  "190135670") AND
-                   (RECE82-SRYYM     >= "201004"                 ))
+               OR ( FLG-JYOGAI    =   1                           )
                  MOVE   ZERO         TO   FLG-WRITE85
                ELSE
                  PERFORM  UNTIL  FLG-SRYACT    =    1
@@ -2271,6 +2366,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               +  TNS-TEN
                    END-IF
                   END-IF
+                  IF      SRY-SRYCD(IDX2)    =     CONS-KEIBUKASAN
+                   IF   RECE82-KOTEIKBN  =  SPACE  OR  "2"
+                    COMPUTE  WRK-KEIBUKASAN   =  WRK-KEIBUKASAN
+                                              +  TNS-TEN
+                    COMPUTE  RECE84-SYUTEN1   =  RECE84-SYUTEN1
+                                              -  TNS-TEN
+                    COMPUTE  RECE84-KIZAITEN  =  RECE84-KIZAITEN
+                                              +  TNS-TEN
+                   END-IF
+                  END-IF
                   IF      SRY-SRYCD(IDX2)    =     CONS-SOGAIKASAN
                    IF   RECE82-KOTEIKBN  =  SPACE  OR  "2"
                     COMPUTE  WRK-SOGAIKASAN   =  WRK-SOGAIKASAN
@@ -2491,9 +2596,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    TNS-KNSJISGRPKBN
                                       TO RECE85-KNSJISGRPKBN   (IDX4)
       *
-               IF     TNS-SRYCD       =  "170022290"  OR
+               IF    (TNS-SRYCD       =  "170022290"  OR
                                          "170022390"  OR
-                                         "170022490"
+                                         "170022490")
+               AND   (RECE82-SRYYM   <=  "201003"   )
                       MOVE   202      TO  RECE85-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE85-CDKBN-KOUBAN(IDX4)
                END-IF
@@ -2509,6 +2615,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                          "170026810"
                       MOVE   203      TO  RECE85-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE85-CDKBN-KOUBAN(IDX4)
+               END-IF
+      *
+               IF    (TNS-SRYCD       =  "170022290")
+               AND   (RECE82-SRYYM   >=  "201004"   )
+                      MOVE   "1"      TO  RECE84-GAZOGEN
                END-IF
       *
                IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
@@ -2976,15 +3087,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-NOUKE8-COMMENT   OR
                                             CONS-NOUKE9-COMMENT   OR
                                             CONS-NOUKE10-COMMENT  OR
+                                            CONS-NOUKE11-COMMENT  OR
+                                            CONS-NOUKE12-COMMENT  OR
+                                            CONS-NOUKE13-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
                                             CONS-UNDOKI4-COMMENT  OR
                                             CONS-UNDOKI7-COMMENT  OR
                                             CONS-UNDOKI8-COMMENT  OR
+                                            CONS-UNDOKI9-COMMENT  OR
+                                            CONS-UNDOKI10-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
-                                            CONS-SYOGAI3-COMMENT
+                                            CONS-SYOGAI3-COMMENT  OR
+                                            CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-RIHABIRI-COMMENT
               END-IF
@@ -3040,6 +3157,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-NOUKE8-COMMENT
                                       OR    CONS-NOUKE9-COMMENT
                                       OR    CONS-NOUKE10-COMMENT
+                                      OR    CONS-NOUKE11-COMMENT
+                                      OR    CONS-NOUKE12-COMMENT
+                                      OR    CONS-NOUKE13-COMMENT
                         MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-NOUKE-COMMENT
                 END-IF
@@ -3051,6 +3171,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-UNDOKI6-COMMENT
                                       OR    CONS-UNDOKI7-COMMENT
                                       OR    CONS-UNDOKI8-COMMENT
+                                      OR    CONS-UNDOKI9-COMMENT
+                                      OR    CONS-UNDOKI10-COMMENT
                         MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-UNDOKI-COMMENT
                 END-IF
@@ -3178,7 +3300,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
            IF      RECE84-SRYKBN      =     "70"
-              IF   SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
                                             CONS-CTMRI-COMMENT2  OR
                                             CONS-CTMRI-COMMENT3  OR
                                             CONS-CTMRI-COMMENT4  OR
@@ -3194,7 +3316,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-CTMRI-COMMENT14 OR
                                             CONS-CTMRI-COMMENT15 OR
                                             CONS-CTMRI-COMMENT16 OR
-                                            CONS-CTMRI-COMMENT17
+                                            CONS-CTMRI-COMMENT17)
+              AND (RECE82-SRYYM       <     "201004"            )
+                   MOVE   "1"   TO    RECE84-FLG-CTMRI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+                                            CONS-CTMRI-COMMENT2  OR
+                                            CONS-CTMRI-COMMENT4  OR
+                                            CONS-CTMRI-COMMENT6  OR
+                                            CONS-CTMRI-COMMENT7  OR
+                                            CONS-CTMRI-COMMENT18)
+              AND (RECE82-SRYYM       >=    "201004"            )
                    MOVE   "1"   TO    RECE84-FLG-CTMRI-COMMENT
               END-IF
            END-IF
@@ -3445,6 +3577,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                    COMPUTE  WK-YKZTEN  = WK-YKZTEN
                                                        + WRK-KYOBUKASAN
                                 END-IF
+                                IF  WRK-KEIBUKASAN  NOT =  ZERO
+                                   COMPUTE  WK-SYUTEN  = WK-SYUTEN
+                                                       - WRK-KEIBUKASAN
+                                   COMPUTE  WK-YKZTEN  = WK-YKZTEN
+                                                       + WRK-KEIBUKASAN
+                                END-IF
                                 IF  WRK-SOGAIKASAN  NOT =  ZERO
                                    COMPUTE  WK-SYUTEN  = WK-SYUTEN
                                                        - WRK-SOGAIKASAN
@@ -3477,6 +3615,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                                      -  WRK-KYOBUKASAN
                                 COMPUTE  WK-KIZAITEN =  WK-KIZAITEN
                                                      +  WRK-KYOBUKASAN
+                             END-IF
+                             IF  WRK-KEIBUKASAN  NOT =  ZERO
+                                COMPUTE  WK-SYUTEN   =  WK-SYUTEN
+                                                     -  WRK-KEIBUKASAN
+                                COMPUTE  WK-KIZAITEN =  WK-KIZAITEN
+                                                     +  WRK-KEIBUKASAN
                              END-IF
                              IF  WRK-SOGAIKASAN  NOT =  ZERO
                                 COMPUTE  WK-SYUTEN   =  WK-SYUTEN
@@ -5322,6 +5466,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF     NACCT-ZAISKBKBN    =     "4"  OR  "6"  OR "7"
       *
+                   MOVE     ZERO    TO    FLG-JYOGAI
+                   IF    NACCT-ZAISKBKBN    =  "6"
+                     PERFORM  VARYING  ID4    FROM   1   BY   1
+                               UNTIL  (ID4                  >   50  )
+                                 OR   (WRK-CHUKSNSRYCD(ID4) =  SPACE)
+                                 OR   (FLG-JYOGAI           =   1   )
+                       IF  NACCT-SRYCDTOTAL(6:9) = WRK-CHUKSNSRYCD(ID4)
+                          MOVE     1    TO   FLG-JYOGAI
+                       END-IF
+                     END-PERFORM
+                   END-IF
+      *
                    IF ((NACCT-ZAISKBKBN    =  "6"                  ) AND
                        (NACCT-SRYCDTOTAL   = 190117070 OR 190109670) AND
                        (RECE82-SRYYM      >=  "200604"             ))
@@ -5333,9 +5489,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        (NACCT-SRYCDTOTAL   = 190129870             ) AND
                        (RECE82-SRYYM      >=  "200804"             ) AND
                        (RECE82-SRYYM      <=  "201003"             ))
-                   OR ((NACCT-ZAISKBKBN    =  "6"                  ) AND
-                       (NACCT-SRYCDTOTAL   = 190135570             ) AND
-                       (RECE82-SRYYM      >=  "201004"             ))
+                   OR ( FLG-JYOGAI         = 1                      )
       *
                       CONTINUE
       *
@@ -9512,6 +9666,24 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        900-NYUINACT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÅÀ¿ô¥Þ¥¹¥¿ÆÉ¹þ
+      *****************************************************************
+       900-TENSU-READ-SEC         SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO          TO    FLG-TENSU
+               MOVE    MCPDATA-REC   TO    TNS-TENSU-REC
+           ELSE
+               MOVE    1             TO    FLG-TENSU
+               INITIALIZE                  TNS-TENSU-REC
+           END-IF
+      *
+           .
+       900-TENSU-READ-EXT.
            EXIT.
       *
       *****************************************************************

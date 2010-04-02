@@ -121,6 +121,12 @@
       *  04.04.04    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
       *                                     ¡ÊÃÏ°è°åÎÅ¹×¸¥²Ã»»µ­ºÜÊÔ½¸¡Ë
       *                                     ¡ÊÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»µ­ºÜÊÔ½¸¡Ë
+      *  04.04.05    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
+      *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
+      *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
+      *  04.04.06    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ
+      *                                     ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
+      *                                     ¡Ê£¸£°¤½¤ÎÂ¾¤Îµ­ºÜ½ç¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -659,14 +665,6 @@
            03  FILLER          PIC X(09)   VALUE   "112014870".
       *    ºÆ¿Ç¡ÊÆýÍÄ»ù¿¼Ìë¡Ë²Ã»»
            03  FILLER          PIC X(09)   VALUE   "112014970".
-      *    ¥ê¥Ï³«»ÏÆü
-           03  FILLER          PIC X(09)   VALUE   "099800111".
-           03  FILLER          PIC X(09)   VALUE   "099800121".
-           03  FILLER          PIC X(09)   VALUE   "099800131".
-           03  FILLER          PIC X(09)   VALUE   "099800141".
-           03  FILLER          PIC X(09)   VALUE   "099800151".
-           03  FILLER          PIC X(09)   VALUE   "099800161".
-           03  FILLER          PIC X(09)   VALUE   "099800171".
       *    ¼ÂÆü¿ô¸º»»
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *
@@ -723,9 +721,9 @@
            03  FILLER          PIC X(09)   VALUE   "112015770".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   60.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   53.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   60.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   53.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -846,6 +844,8 @@
            03  WRK-CONS-YOUBUKASAN     PIC X(09)   VALUE "140037490".
       *    ¶»Éô¸ÇÄêÂÓ²Ã»»
            03  WRK-CONS-KYOBUKASAN     PIC X(09)   VALUE "140040110".
+      *    ðôÉô¸ÇÄêÂÓ²Ã»»
+           03  WRK-CONS-KEIBUKASAN     PIC X(09)   VALUE "140052610".
       *    ÁÏ³°¸ÇÄê´ï»ÈÍÑ²Ã»»
            03  WRK-CONS-SOGAIKASAN     PIC X(09)   VALUE "150266970".
       *    ÎÅÍÜÃ´Åö¼êÅö¤Æ
@@ -1282,6 +1282,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                    IF  RECE45-SRYCD (IDX)    =
                                            WRK-CONS-YOUBUKASAN
                                         OR WRK-CONS-KYOBUKASAN
+                                        OR WRK-CONS-KEIBUKASAN
                                         OR WRK-CONS-SOGAIKASAN
                                      IF  RECE41-KOTEIKBN = SPACE OR "2"
                                        MOVE    4             TO  IDY
@@ -3521,18 +3522,24 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                      WHEN     "101130010"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800180"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999982   TO  TBL-ZAIW-KOUHYOJYUNNUM
                    END-EVALUATE
                  END-IF
                  EVALUATE    TBL-ZAIW-SRYCD1
-                     WHEN     "101800330"
+                     WHEN     "101800175"
+                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
+                       MOVE      999999982   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                     WHEN     "101800180"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999983   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800340"
+                     WHEN     "101800330"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999984   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                     WHEN     "101800340"
+                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
+                       MOVE      999999985   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                     WHEN     "101800360"
+                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
+                       MOVE      999999986   TO  TBL-ZAIW-KOUHYOJYUNNUM
                  END-EVALUATE
                END-IF
                MOVE    TBL-ZAIW-CDKBN-SYO  TO  RECE46-CDKBN-SYO
@@ -3547,6 +3554,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                MOVE    TBL-ZAIW-KOUHYOJYUNNUM
                                            TO  RECE46-KOUHYOJUNNUM
       *
+               IF    RECE44-GAZOGEN = "1"
+                  MOVE    202              TO  RECE46-CDKBN-KBNNUM
+                  MOVE    99               TO  RECE46-CDKBN-KOUBAN
+                  MOVE    ZERO             TO  RECE46-KOUHYOJUNNUM
+               END-IF
+      *
                MOVE    RECE44-ZAITEN     TO  RECE46-ZAITEN
       *
                IF      RECE44-SRYKBN     =   "60" OR "64"
@@ -3558,6 +3571,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
                MOVE       SPACE          TO  RECE46-SRYSYUKBN
                MOVE       ZERO           TO  RECE46-DAY
+               MOVE       ZERO           TO  RECE46-DAY2
                EVALUATE  RECE44-SRYKBN
                  WHEN      "21"
                  WHEN      "22"
@@ -3580,6 +3594,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                           MOVE    31     TO  IDW3
                        END-IF
                    END-PERFORM
+                 WHEN      "70"
+                   IF    RECE44-GAZOGEN = "1"
+                     PERFORM   VARYING   IDW3   FROM    1   BY  1
+                                UNTIL    IDW3   >      31
+                       IF    RECE44-KAISU(1 IDW3)    NOT =   ZERO
+                          MOVE   IDW3    TO  RECE46-DAY2
+                          MOVE    31     TO  IDW3
+                       END-IF
+                     END-PERFORM
+                   END-IF
                END-EVALUATE
       *
                MOVE    RECE44-SAFLG      TO  RECE46-SAFLG
@@ -3590,7 +3614,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  IF  TBL-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
-                                       "120003270"
+                                       "120003270" OR "120003470"
                        MOVE   ZERO   TO   RECE46-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE46-SYOHOUFLG

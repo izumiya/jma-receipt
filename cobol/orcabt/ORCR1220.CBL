@@ -66,6 +66,9 @@
       *                                     ¡Ê³°Çñ¶èÊ¬£´ÆÃÄêÆþ±¡´ðËÜÎÁ¤ÎÂÐ±þ¡Ë
       *  04.04.10    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
       *                                     ¡ÊÍ½Ìó¥³¡¼¥ÉÆÉ¤ßÈô¤Ð¤·ÊÔ½¸¡Ë
+      *  04.04.11    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
+      *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
+      *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -547,6 +550,8 @@
            03  CONS-CTMRI-COMMENT16  PIC X(09)  VALUE  "170023410".
       *    »Í»èÆÃ¼ì£Í£Ò£É»£±Æ
            03  CONS-CTMRI-COMMENT17  PIC X(09)  VALUE  "170023510".
+      *    £Ã£Ô»£±Æ¡Ê£±£¶ÎóÌ¤Ëþ¥Þ¥ë¥Á¥¹¥é¥¤¥¹·¿µ¡´ï¡Ë
+           03  CONS-CTMRI-COMMENT18  PIC X(09)  VALUE  "170028610".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ»»ÄêÆü
@@ -597,6 +602,12 @@
            03  CONS-NOUKE6-COMMENT   PIC X(09)  VALUE  "180030210".
       *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë
            03  CONS-NOUKE7-COMMENT   PIC X(09)  VALUE  "180030810".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE8-COMMENT   PIC X(09)  VALUE  "180032410".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE9-COMMENT   PIC X(09)  VALUE  "180032510".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE10-COMMENT  PIC X(09)  VALUE  "180032610".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
@@ -609,6 +620,8 @@
            03  CONS-UNDOKI5-COMMENT  PIC X(09)  VALUE  "180030310".
       **   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó°å³Ø´ÉÍýÎÁ¡Ê£²¡Ë
            03  CONS-UNDOKI6-COMMENT  PIC X(09)  VALUE  "180030410".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
+           03  CONS-UNDOKI7-COMMENT  PIC X(09)  VALUE  "180032710".
       *    ÆñÉÂ´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    ¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£¶ºÐÌ¤Ëþ¡Ë
@@ -619,6 +632,8 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    ÀÝ¿©µ¡Ç½ÎÅË¡
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
+      *    ¤¬¤ó´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
+           03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    ²ðÃ£¸£°ú
            03  CONS-KAITATU-COMMENT  PIC X(09)  VALUE  "140048010".
       *    ±ý¿Ç
@@ -1808,9 +1823,10 @@
                                       TO RECE230-TOKUKIZAISBT1  (IDX4)
                MOVE    TNS-SANSOKBN   TO RECE230-SANSOKBN       (IDX4)
       *
-               IF     TNS-SRYCD       =  "170022290"  OR
+               IF    (TNS-SRYCD       =  "170022290"  OR
                                          "170022390"  OR
-                                         "170022490"
+                                         "170022490")
+               AND   (RECE200-SRYYM  <=  "201003"   )
                       MOVE   202      TO  RECE230-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE230-CDKBN-KOUBAN(IDX4)
                END-IF
@@ -1826,6 +1842,11 @@
                                          "170026810"
                       MOVE   203      TO  RECE230-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE230-CDKBN-KOUBAN(IDX4)
+               END-IF
+      *
+               IF    (TNS-SRYCD       =  "170022290")
+               AND   (RECE200-SRYYM  >=  "201004"   )
+                      MOVE   "1"      TO  RECE220-GAZOGEN
                END-IF
       *
                IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
@@ -2097,13 +2118,18 @@
                                             CONS-NOUKE3-COMMENT   OR
                                             CONS-NOUKE4-COMMENT   OR
                                             CONS-NOUKE7-COMMENT   OR
+                                            CONS-NOUKE8-COMMENT   OR
+                                            CONS-NOUKE9-COMMENT   OR
+                                            CONS-NOUKE10-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
                                             CONS-UNDOKI4-COMMENT  OR
+                                            CONS-UNDOKI7-COMMENT  OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
-                                            CONS-SYOGAI3-COMMENT
+                                            CONS-SYOGAI3-COMMENT  OR
+                                            CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-RIHABIRI-COMMENT
               END-IF
@@ -2152,6 +2178,9 @@
                                       OR    CONS-NOUKE5-COMMENT
                                       OR    CONS-NOUKE6-COMMENT
                                       OR    CONS-NOUKE7-COMMENT
+                                      OR    CONS-NOUKE8-COMMENT
+                                      OR    CONS-NOUKE9-COMMENT
+                                      OR    CONS-NOUKE10-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-NOUKE-COMMENT
                 END-IF
@@ -2161,6 +2190,7 @@
                                       OR    CONS-UNDOKI4-COMMENT
                                       OR    CONS-UNDOKI5-COMMENT
                                       OR    CONS-UNDOKI6-COMMENT
+                                      OR    CONS-UNDOKI7-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-UNDOKI-COMMENT
                 END-IF
@@ -2285,7 +2315,7 @@
            END-IF
       *
            IF      RECE220-SRYKBN      =     "70"
-              IF   SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
                                             CONS-CTMRI-COMMENT2  OR
                                             CONS-CTMRI-COMMENT3  OR
                                             CONS-CTMRI-COMMENT4  OR
@@ -2301,7 +2331,17 @@
                                             CONS-CTMRI-COMMENT14 OR
                                             CONS-CTMRI-COMMENT15 OR
                                             CONS-CTMRI-COMMENT16 OR
-                                            CONS-CTMRI-COMMENT17
+                                            CONS-CTMRI-COMMENT17)
+              AND (RECE200-SRYYM      <     "201004"            )
+                   MOVE   "1"   TO    RECE220-FLG-CTMRI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+                                            CONS-CTMRI-COMMENT2  OR
+                                            CONS-CTMRI-COMMENT4  OR
+                                            CONS-CTMRI-COMMENT6  OR
+                                            CONS-CTMRI-COMMENT7  OR
+                                            CONS-CTMRI-COMMENT18)
+              AND (RECE200-SRYYM      >=    "201004"            )
                    MOVE   "1"   TO    RECE220-FLG-CTMRI-COMMENT
               END-IF
            END-IF

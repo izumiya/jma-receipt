@@ -41,6 +41,9 @@
       *  04.04.01    NACL-ÌçÏÆ    09/02/04  ¸¡ºº¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/09/30  ¸¡ºº¤Î¿ôÎÌÊÔ½¸½¤Àµ
       *  04.04.03    NACL-ÌçÏÆ    10/03/03  ÎÅÍÜ¥ì¥»¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
+      *  04.04.04    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
+      *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
+      *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -562,22 +565,14 @@
            03  FILLER          PIC X(09)   VALUE   "830000020".
       *    °é»ù±ÉÍÜ»ØÆ³²Ã»»¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099114001".
-      *    ¥ê¥Ï³«»ÏÆü
-           03  FILLER          PIC X(09)   VALUE   "099800111".
-           03  FILLER          PIC X(09)   VALUE   "099800121".
-           03  FILLER          PIC X(09)   VALUE   "099800131".
-           03  FILLER          PIC X(09)   VALUE   "099800141".
-           03  FILLER          PIC X(09)   VALUE   "099800151".
-           03  FILLER          PIC X(09)   VALUE   "099800161".
-           03  FILLER          PIC X(09)   VALUE   "099800171".
       *    ¼ÂÆü¿ô¸º»»
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    ºß°åÁí¡¦ºß°åÁí´É¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099140003".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   21.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   14.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   21.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   14.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -2856,7 +2851,9 @@
                   IF  (WRK-SRYSYUKBN      =  "340")
                   AND (TBL-ZAI-SRYCD(1)   =  "130004410" OR "130008510"
                                           OR "130004670" OR "130008270"
-                                          OR "130011070"               )
+                                          OR "130011070" OR "130012110"
+                                          OR "130011610" OR "130011810"
+                                          OR "130012010"               )
                   AND (RECE220-YKZTEN      =  ZERO )
                   AND (RECE220-KIZAITEN    =  ZERO )
                           MOVE   4              TO  RECE240-TENTEKIKBN
@@ -2994,6 +2991,12 @@
                MOVE    WRK-ZAIW-KOUHYOJYUNNUM
                                            TO  RECE240-KOUHYOJUNNUM
       *
+               IF    RECE220-GAZOGEN = "1"
+                  MOVE    202              TO  RECE240-CDKBN-KBNNUM
+                  MOVE    99               TO  RECE240-CDKBN-KOUBAN
+                  MOVE    ZERO             TO  RECE240-KOUHYOJUNNUM
+               END-IF
+      *
                MOVE    RECE220-ZAITEN      TO  RECE240-ZAITEN
       *
                IF      RECE220-SRYKBN     =   "60" OR "64"
@@ -3007,6 +3010,7 @@
       *
                MOVE       SPACE          TO  RECE240-SRYSYUKBN
                MOVE       ZERO           TO  RECE240-DAY
+               MOVE       ZERO           TO  RECE240-DAY2
                EVALUATE  RECE220-SRYKBN
                  WHEN      "21"
                  WHEN      "22"
@@ -3029,6 +3033,16 @@
                           MOVE    31     TO  IDW3
                        END-IF
                    END-PERFORM
+                 WHEN      "70"
+                   IF    RECE220-GAZOGEN = "1"
+                     PERFORM   VARYING   IDW3   FROM    1   BY  1
+                                UNTIL    IDW3   >      31
+                       IF    RECE220-KAISU(1 IDW3)    NOT =   ZERO
+                          MOVE   IDW3    TO  RECE240-DAY2
+                          MOVE    31     TO  IDW3
+                       END-IF
+                     END-PERFORM
+                   END-IF
                END-EVALUATE
       *
                PERFORM 4501-RECE240-WRITE-SEC

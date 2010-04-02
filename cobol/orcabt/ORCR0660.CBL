@@ -4694,7 +4694,9 @@
                  MOVE    TBL-DAY(DAY-IDX)
                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(9:4)
                END-IF
-               MOVE   "1"    TO  WRK-RECE65XX-RECEDENFLG(MAX-MEISAISU 1)
+               IF   RECE64-ZAITEN   NOT =   ZERO
+                 MOVE   "1"  TO  WRK-RECE65XX-RECEDENFLG(MAX-MEISAISU 1)
+               END-IF
            END-PERFORM
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
@@ -5105,11 +5107,11 @@
                WHEN   "999999983"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
                  MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   32      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡∏∫ªª"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE   33      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡≈˘∏∫ªª"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:24)
                  MOVE  "° ¬æ∞Âºıø«°¶ Ò≥Áø«Œ≈π‘∞ŸªªƒÍ°À° ¡™ƒÍŒ≈Õ‹°À"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:42)
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(25:42)
       *
                WHEN   "999999984"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
@@ -5139,11 +5141,11 @@
                WHEN   "999999993"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
                  MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   33      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡∏∫ªª"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE   34      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡≈˘∏∫ªª"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:24)
                  MOVE  "° ¬æ∞Âºıø«°¶ Ò≥Áø«Œ≈π‘∞ŸÃ§ªªƒÍ°À° ¡™ƒÍŒ≈Õ‹°À"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:44)
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(25:44)
       *
                WHEN   "999999994"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)

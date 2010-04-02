@@ -42,6 +42,8 @@
       *                                     （診療区分６４：病理診断対応）
       *
       *  04.03.01    NACL-門脇    08/07/09  投薬の記載順変更（日付順）
+      *  04.04.01    NACL-門脇    10/03/29  改正対応
+      *                                     （画像診断２回目以降減算編集）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -329,6 +331,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE   RECE86-DAY         TO   RECE87-DAY
       *
            MOVE   RECE86-OKIKAEFLG   TO   RECE87-OKIKAEFLG
+      *
+           MOVE   RECE86-DAY2        TO   RECE87-DAY2
       *
            IF     RECE86-SRYKBN  NOT =  "95" AND "96"
                PERFORM     2101-RECE87-WRITE-SEC
