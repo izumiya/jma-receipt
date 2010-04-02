@@ -45,6 +45,9 @@
       *  04.04.03    NACL-ÌçÏÆ    10/03/25  ²þÀµÂÐ±þ
       *                                     ¡ÊÃÏ°è°åÎÅ¹×¸¥²Ã»»µ­ºÜÊÔ½¸¡Ë
       *                                     ¡ÊÌÀºÙ½ñÈ¯¹ÔÂÎÀ©Åù²Ã»»µ­ºÜÊÔ½¸¡Ë
+      *  04.04.04    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
+      *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
+      *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/06/17  ½èÃÖ¤Îµ­ºÜ½çÊÑ¹¹¡ÊÆüÉÕ½ç¡Ë
@@ -675,14 +678,6 @@
            03  FILLER          PIC X(09)   VALUE   "112014870".
       *    ºÆ¿Ç¡ÊÆýÍÄ»ù¿¼Ìë¡Ë²Ã»»
            03  FILLER          PIC X(09)   VALUE   "112014970".
-      *    ¥ê¥Ï³«»ÏÆü
-           03  FILLER          PIC X(09)   VALUE   "099800111".
-           03  FILLER          PIC X(09)   VALUE   "099800121".
-           03  FILLER          PIC X(09)   VALUE   "099800131".
-           03  FILLER          PIC X(09)   VALUE   "099800141".
-           03  FILLER          PIC X(09)   VALUE   "099800151".
-           03  FILLER          PIC X(09)   VALUE   "099800161".
-           03  FILLER          PIC X(09)   VALUE   "099800171".
       *    ¼ÂÆü¿ô¸º»»
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    ºß°åÁí¡¦ºß°åÁí´É¡Ê£Ä£Õ£Í£Í£Ù¡Ë
@@ -713,9 +708,9 @@
            03  FILLER          PIC X(09)   VALUE   "099409905".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   72.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   65.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   72.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   65.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -3357,6 +3352,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                MOVE    WRK-ZAIW-KOUHYOJYUNNUM
                                            TO  RECE140-KOUHYOJUNNUM
       *
+               IF    RECE120-GAZOGEN = "1"
+                  MOVE    202              TO  RECE140-CDKBN-KBNNUM
+                  MOVE    99               TO  RECE140-CDKBN-KOUBAN
+                  MOVE    ZERO             TO  RECE140-KOUHYOJUNNUM
+               END-IF
+      *
                MOVE    RECE120-ZAITEN     TO  RECE140-ZAITEN
       *
                IF      RECE120-SRYKBN     =   "60" OR "64"
@@ -3371,6 +3372,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
                MOVE       SPACE          TO  RECE140-SRYSYUKBN
                MOVE       ZERO           TO  RECE140-DAY
+               MOVE       ZERO           TO  RECE140-DAY2
                EVALUATE  RECE120-SRYKBN
                  WHEN      "21"
                  WHEN      "22"
@@ -3394,6 +3396,16 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                           MOVE    31     TO  IDW3
                        END-IF
                    END-PERFORM
+                 WHEN      "70"
+                   IF    RECE120-GAZOGEN = "1"
+                     PERFORM   VARYING   IDW3   FROM    1   BY  1
+                                UNTIL    IDW3   >      31
+                       IF    RECE120-KAISU(1 IDW3)    NOT =   ZERO
+                          MOVE   IDW3    TO  RECE140-DAY2
+                          MOVE    31     TO  IDW3
+                       END-IF
+                     END-PERFORM
+                   END-IF
                  WHEN      "99"
                    MOVE   WRK-SRYSYUKBN  TO  RECE140-SRYSYUKBN
                END-EVALUATE
@@ -3402,7 +3414,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                  IF  WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
-                                       "120003270"
+                                       "120003270" OR "120003470"
                        MOVE   ZERO   TO   RECE140-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE140-SYOHOUFLG

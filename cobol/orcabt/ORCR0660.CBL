@@ -107,6 +107,8 @@
       *                                     レセ電用コメント編集
       *  04.04.04    NACL-門脇    10/03/03  療養レセコメント編集修正
       *  04.04.05    NACL-門脇    10/03/23  改正対応（外泊区分５の対応）
+      *  04.04.06    NACL-門脇    10/03/29  改正対応
+      *                                     （コード追加）
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
@@ -4929,7 +4931,9 @@
                  MOVE    TBL-DAY(DAY-IDX)
                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(9:4)
                END-IF
-               MOVE   "1"    TO  WRK-RECE65XX-RECEDENFLG(MAX-MEISAISU 1)
+               IF   RECE64-ZAITEN   NOT =   ZERO
+                 MOVE   "1"  TO  WRK-RECE65XX-RECEDENFLG(MAX-MEISAISU 1)
+               END-IF
            END-PERFORM
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
@@ -5344,11 +5348,11 @@
                WHEN   "999999983"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
                  MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   32      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "療養病棟入院基本料減算"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE   33      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "療養病棟入院基本料等減算"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:24)
                  MOVE  "（他医受診・包括診療行為算定）（選定療養）"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:42)
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(25:42)
       *
                WHEN   "999999984"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
@@ -5378,11 +5382,11 @@
                WHEN   "999999993"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
                  MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   33      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "療養病棟入院基本料減算"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:22)
+                 MOVE   34      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "療養病棟入院基本料等減算"
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:24)
                  MOVE  "（他医受診・包括診療行為未算定）（選定療養）"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(23:44)
+                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(25:44)
       *
                WHEN   "999999994"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
@@ -6739,6 +6743,8 @@
                           "180028110" OR "180027610" OR "180027710" OR
                           "180030810" OR "180027810" OR "180027910" OR
                           "180028210" OR "180028310" OR "180028410" OR
+                          "180032410" OR "180032510" OR "180032610" OR
+                          "180032710" OR "180033110" OR
       *101
                           "113010710" OR "113010810" OR "120001610" OR
       *102

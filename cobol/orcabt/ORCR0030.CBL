@@ -452,6 +452,10 @@
       *                                     （明細書発行体制等加算記載編集）
       *  04.04.44    NACL-門脇    10/03/25  改正対応
       *                                     （予約コード読み飛ばし編集）
+      *  04.04.45    NACL-門脇    10/03/29  改正対応
+      *                                     （画像診断２回目以降減算編集）
+      *                                     （抗悪性腫瘍剤処方管理加算編集）
+      *                                     （コード追加）
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -1170,6 +1174,10 @@
            03  WRK-CYOKI-SKAN                          PIC 9(03).
       *    長期投薬加算（処方せん料）
            03  WRK-CYOKI-SKAN2                         PIC 9(03).
+      *    抗悪性腫瘍剤処方管理加算（処方料）
+           03  WRK-AKUSEI-SKAN                         PIC 9(03).
+      *    抗悪性腫瘍剤処方管理加算（処方せん料）
+           03  WRK-AKUSEI-SKAN2                        PIC 9(03).
       *---------------------------------------------------------------
       *
       *    固定値
@@ -1189,6 +1197,8 @@
            03  CONS-SHOHOKSN2  PIC X(09)   VALUE   "120002570".
       *    長期投薬加算（処方せん料）
            03  CONS-SHOHOKSN3  PIC X(09)   VALUE   "120003270".
+      *    抗悪性腫瘍剤処方管理加算（処方せん料）
+           03  CONS-SHOHOKSN4  PIC X(09)   VALUE   "120003470".
       *    薬剤料逓減（９０／１００）（内服薬）
            03  CONS-YAKTEIGEN  PIC X(09)   VALUE   "630010002".
       *    粉砕（コメント）
@@ -1345,6 +1355,8 @@
            03  CONS-CTMRI-COMMENT16  PIC X(09)  VALUE  "170023410".
       *    四肢特殊ＭＲＩ撮影
            03  CONS-CTMRI-COMMENT17  PIC X(09)  VALUE  "170023510".
+      *    ＣＴ撮影（１６列未満マルチスライス型機器）
+           03  CONS-CTMRI-COMMENT18  PIC X(09)  VALUE  "170028610".
       *    在宅血液透析頻回指導管理料
            03  CONS-HINKAI-COMMENT   PIC X(09)  VALUE  "114009410".
       *    初診（同日複数診療科）
@@ -1403,6 +1415,12 @@
            03  CONS-NOUKE6-COMMENT   PIC X(09)  VALUE  "180030210".
       *    脳血管疾患等リハビリテーション料（３）
            03  CONS-NOUKE7-COMMENT   PIC X(09)  VALUE  "180030810".
+      *    脳血管疾患等リハビリテーション料（１）（廃用症候群）
+           03  CONS-NOUKE8-COMMENT   PIC X(09)  VALUE  "180032410".
+      *    脳血管疾患等リハビリテーション料（２）（廃用症候群）
+           03  CONS-NOUKE9-COMMENT   PIC X(09)  VALUE  "180032510".
+      *    脳血管疾患等リハビリテーション料（３）（廃用症候群）
+           03  CONS-NOUKE10-COMMENT  PIC X(09)  VALUE  "180032610".
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -1415,6 +1433,8 @@
            03  CONS-UNDOKI5-COMMENT  PIC X(09)  VALUE  "180030310".
       **   運動器リハビリテーション医学管理料（２）
            03  CONS-UNDOKI6-COMMENT  PIC X(09)  VALUE  "180030410".
+      *    運動器リハビリテーション料（１）
+           03  CONS-UNDOKI7-COMMENT  PIC X(09)  VALUE  "180032710".
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -1425,6 +1445,8 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    摂食機能療法
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
+      *    がん患者リハビリテーション料
+           03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    介達牽引
            03  CONS-KAITATU-COMMENT  PIC X(09)  VALUE  "140048010".
       *    往診
@@ -5446,9 +5468,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                       TO RECE05-TOKUKIZAISBT1  (IDX4)
                MOVE    TNS-SANSOKBN   TO RECE05-SANSOKBN       (IDX4)
       *
-               IF     TNS-SRYCD       =  "170022290"  OR
+               IF    (TNS-SRYCD       =  "170022290"  OR
                                          "170022390"  OR
-                                         "170022490"
+                                         "170022490")
+               AND   (RECE02-SRYYM   <=  "201003"   )
                       MOVE   202      TO  RECE05-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE05-CDKBN-KOUBAN(IDX4)
                END-IF
@@ -5464,6 +5487,11 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                          "170026810"
                       MOVE   203      TO  RECE05-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE05-CDKBN-KOUBAN(IDX4)
+               END-IF
+      *
+               IF    (TNS-SRYCD       =  "170022290")
+               AND   (RECE02-SRYYM   >=  "201004"   )
+                      MOVE   "1"      TO  RECE04-GAZOGEN
                END-IF
       *
                IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
@@ -6040,13 +6068,18 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-NOUKE3-COMMENT   OR
                                             CONS-NOUKE4-COMMENT   OR
                                             CONS-NOUKE7-COMMENT   OR
+                                            CONS-NOUKE8-COMMENT   OR
+                                            CONS-NOUKE9-COMMENT   OR
+                                            CONS-NOUKE10-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
                                             CONS-UNDOKI4-COMMENT  OR
+                                            CONS-UNDOKI7-COMMENT  OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
-                                            CONS-SYOGAI3-COMMENT
+                                            CONS-SYOGAI3-COMMENT  OR
+                                            CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-RIHABIRI-COMMENT
               END-IF
@@ -6095,6 +6128,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-NOUKE5-COMMENT
                                       OR    CONS-NOUKE6-COMMENT
                                       OR    CONS-NOUKE7-COMMENT
+                                      OR    CONS-NOUKE8-COMMENT
+                                      OR    CONS-NOUKE9-COMMENT
+                                      OR    CONS-NOUKE10-COMMENT
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-NOUKE-COMMENT
                 END-IF
@@ -6104,6 +6140,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-UNDOKI4-COMMENT
                                       OR    CONS-UNDOKI5-COMMENT
                                       OR    CONS-UNDOKI6-COMMENT
+                                      OR    CONS-UNDOKI7-COMMENT
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-UNDOKI-COMMENT
                 END-IF
@@ -6284,7 +6321,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            END-IF
       *
            IF      RECE04-SRYKBN      =     "70"
-              IF   SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
                                             CONS-CTMRI-COMMENT2  OR
                                             CONS-CTMRI-COMMENT3  OR
                                             CONS-CTMRI-COMMENT4  OR
@@ -6300,7 +6337,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-CTMRI-COMMENT14 OR
                                             CONS-CTMRI-COMMENT15 OR
                                             CONS-CTMRI-COMMENT16 OR
-                                            CONS-CTMRI-COMMENT17
+                                            CONS-CTMRI-COMMENT17)
+              AND (RECE02-SRYYM       <     "201004"            )
+                   MOVE   "1"   TO    RECE04-FLG-CTMRI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+                                            CONS-CTMRI-COMMENT2  OR
+                                            CONS-CTMRI-COMMENT4  OR
+                                            CONS-CTMRI-COMMENT6  OR
+                                            CONS-CTMRI-COMMENT7  OR
+                                            CONS-CTMRI-COMMENT18)
+              AND (RECE02-SRYYM       >=    "201004"            )
                    MOVE   "1"   TO    RECE04-FLG-CTMRI-COMMENT
               END-IF
            END-IF
@@ -6669,6 +6716,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *    長期投薬加算の算定回数減算用領域の初期化
            MOVE   ZERO              TO   WRK-CYOKI-SKAN
            MOVE   ZERO              TO   WRK-CYOKI-SKAN2
+      *    抗悪性腫瘍剤処方管理加算の算定回数減算用領域の初期化
+           MOVE   ZERO              TO   WRK-AKUSEI-SKAN
+                                         WRK-AKUSEI-SKAN2
       *
       *
       *    公費の分離表示用インデックスの確定
@@ -6917,6 +6967,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            COMPUTE    RECE02-KAISU(19)   =    RECE02-KAISU(19)  -
                                               WRK-CYOKI-SKAN     
       *
+      *    処方の算定回数から抗悪性腫瘍剤処方管理加算（処方料）の減算
+           COMPUTE    RECE02-KAISU(19)   =    RECE02-KAISU(19)  -
+                                              WRK-AKUSEI-SKAN
+      *
       *    処方の算定回数から特定疾患処方管理加算(処方料)の減算
            COMPUTE    RECE02-KAISU(33)   =    RECE02-KAISU(33)  -
                                               WRK-TOKUTEI-SKAN2           
@@ -6928,6 +6982,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *    処方せんの算定回数から長期投薬加算(処方せん料)の減算
            COMPUTE    RECE02-KAISU(33)   =    RECE02-KAISU(33)  -
                                               WRK-CYOKI-SKAN2    
+      *
+      *    処方せんの算定回数から抗悪性腫瘍剤処方管理加算(処方せん料)の減算
+           COMPUTE    RECE02-KAISU(33)   =    RECE02-KAISU(33)  -
+                                              WRK-AKUSEI-SKAN2
       *
       *    麻毒の算定回数から処方料（麻・向・毒・覚）の減算
            COMPUTE    RECE02-KAISU(20)   =    RECE02-KAISU(20)  -
@@ -7945,6 +8003,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
                                                   WK-ZAIKAISU           
                    END-IF                                               
+                   IF SRY-SRYCD(IDX3)      =    "120003370"
+                      COMPUTE  WRK-AKUSEI-SKAN =  WRK-AKUSEI-SKAN +
+                                                  WK-ZAIKAISU
+                   END-IF
       ***          IF    RECE02-KHNTEN(19)   =   ZERO
       ***             MOVE  WRK-TNS-TEN(IDX3) TO  RECE02-KHNTEN(19)
       ***          ELSE
@@ -8323,13 +8385,18 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       COMPUTE  WRK-CYOKI-SKAN2  =   WRK-CYOKI-SKAN2   + 
                                                     WK-ZAIKAISU         
                    END-IF                                               
+                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN4
+                      COMPUTE  WRK-AKUSEI-SKAN2 =   WRK-AKUSEI-SKAN2  +
+                                                    WK-ZAIKAISU
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOSEN1 OR
                                                 CONS-SHOHOSEN2 OR
                                                 CONS-SHOHOSEN3 OR
                                                 CONS-SHOHOSEN4 OR
                                                 CONS-SHOHOKSN1 OR
                                                 CONS-SHOHOKSN2 OR
-                                                CONS-SHOHOKSN3          
+                                                CONS-SHOHOKSN3 OR
+                                                CONS-SHOHOKSN4
                            ADD    WK-ZAIKAISU  TO  RECE02-KAISU(33)
                    END-IF
                    IF    BUN-IDX        =   1
@@ -8339,7 +8406,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOSEN4 OR
                                                  CONS-SHOHOKSN1 OR
                                                  CONS-SHOHOKSN2 OR
-                                                 CONS-SHOHOKSN3         
+                                                 CONS-SHOHOKSN3 OR
+                                                 CONS-SHOHOKSN4
                            COMPUTE   RECE02-TENSU(33 BUN-IDX)  =
                                      RECE02-TENSU(33 BUN-IDX)  +
                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
@@ -8362,7 +8430,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOSEN4 OR
                                                  CONS-SHOHOKSN1 OR
                                                  CONS-SHOHOKSN2 OR
-                                                 CONS-SHOHOKSN3         
+                                                 CONS-SHOHOKSN3 OR
+                                                 CONS-SHOHOKSN4
                            COMPUTE   RECE02-TENSU(33 BUN-IDX2)  =
                                      RECE02-TENSU(33 BUN-IDX2)  +
                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
@@ -8385,7 +8454,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOSEN4 OR
                                                  CONS-SHOHOKSN1 OR
                                                  CONS-SHOHOKSN2 OR
-                                                 CONS-SHOHOKSN3         
+                                                 CONS-SHOHOKSN3 OR
+                                                 CONS-SHOHOKSN4
                            COMPUTE   RECE02-TENSU(33 BUN-IDX3)  =
                                      RECE02-TENSU(33 BUN-IDX3)  +
                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
@@ -8408,7 +8478,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOSEN4 OR
                                                  CONS-SHOHOKSN1 OR
                                                  CONS-SHOHOKSN2 OR
-                                                 CONS-SHOHOKSN3         
+                                                 CONS-SHOHOKSN3 OR
+                                                 CONS-SHOHOKSN4
                            COMPUTE   RECE02-TENSU(33 BUN-IDX4)  =
                                      RECE02-TENSU(33 BUN-IDX4)  +
                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)

@@ -61,6 +61,7 @@
       *  04.04.02    NACL-門脇    09/06/12  療養期間の編集修正
       *  04.04.03    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
       *  04.04.04    NACL-門脇    10/03/23  改正対応（外泊区分５の対応）
+      *  04.04.05    NACL-門脇    10/03/31  改正対応（頸部固定帯加算の対応）
       *
       *  04.05.01    NACL-門脇    10/01/25  治験対応
       *****************************************************************
@@ -291,6 +292,8 @@
            03  CONS-YOUBUKASAN PIC X(09)   VALUE   "140037490".
       *    胸部固定帯加算
            03  CONS-KYOBUKASAN PIC X(09)   VALUE   "140040110".
+      *    頸部固定帯加算
+           03  CONS-KEIBUKASAN PIC X(09)   VALUE   "140052610".
       *    創外固定器使用加算
            03  CONS-SOGAIKASAN PIC X(09)   VALUE   "150266970".
       *    療養担当手当（入院）
@@ -1961,6 +1964,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                        IF   SRY-SRYCD(SRYACT-IDX) =  CONS-YOUBUKASAN
                                                  OR  CONS-KYOBUKASAN
+                                                 OR  CONS-KEIBUKASAN
                                                  OR  CONS-SOGAIKASAN
                          IF   RECE82-KOTEIKBN  =  SPACE  OR  "2"
                             COMPUTE  TBL-SYUTEN-JI(IDY)  =

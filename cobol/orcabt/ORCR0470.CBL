@@ -48,6 +48,8 @@
       *  04.02.02    NACL-門脇    08/04/21  ８０その他記載順対応
       *
       *  04.03.01    NACL-門脇    08/07/09  投薬の記載順変更（日付順）
+      *  04.04.01    NACL-門脇    10/03/29  改正対応
+      *                                     （画像診断２回目以降減算編集）
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    10/01/21  治験対応
@@ -352,6 +354,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE   RECE46-SYOHOUFLG   TO   RECE47-SYOHOUFLG
       *
            MOVE   RECE46-ZAIKBN      TO   RECE47-ZAIKBN
+      *
+           MOVE   RECE46-DAY2        TO   RECE47-DAY2
       *
            IF     RECE46-SRYKBN  NOT =  "95" AND "96"
                PERFORM     2101-RECE47-WRITE-SEC

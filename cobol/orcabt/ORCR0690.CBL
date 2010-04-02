@@ -136,6 +136,9 @@
       *                                     ¤Îµ­ºÜ¤ÎÍ­Ìµ
       *                                     »þ´Ö³°²Ã»»¶èÊ¬¤ÎÄÉ²Ã
       *  04.04.05    NACL-ÌçÏÆ    10/03/03  ÎÅÍÜ¥ì¥»¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
+      *  04.04.06    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
+      *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
+      *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/06/17  ½èÃÖ¤Îµ­ºÜ½çÊÑ¹¹¡ÊÆüÉÕ½ç¡Ë
@@ -735,22 +738,14 @@
            03  FILLER          PIC X(09)   VALUE   "830000020".
       *    °é»ù±ÉÍÜ»ØÆ³²Ã»»¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099114001".
-      *    ¥ê¥Ï³«»ÏÆü
-           03  FILLER          PIC X(09)   VALUE   "099800111".
-           03  FILLER          PIC X(09)   VALUE   "099800121".
-           03  FILLER          PIC X(09)   VALUE   "099800131".
-           03  FILLER          PIC X(09)   VALUE   "099800141".
-           03  FILLER          PIC X(09)   VALUE   "099800151".
-           03  FILLER          PIC X(09)   VALUE   "099800161".
-           03  FILLER          PIC X(09)   VALUE   "099800171".
       *    ¼ÂÆü¿ô¸º»»
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    ºß°åÁí¡¦ºß°åÁí´É¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099140003".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   21.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   14.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   21.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   14.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -3916,7 +3911,9 @@
                   IF  (WRK-SRYSYUKBN      =  "340")
                   AND (TBL-ZAI-SRYCD(1)   =  "130004410" OR "130008510"
                                           OR "130004670" OR "130008270"
-                                          OR "130011070"               )
+                                          OR "130011070" OR "130012110"
+                                          OR "130011610" OR "130011810"
+                                          OR "130012010"               )
                   AND (RECE64-YKZTEN      =  ZERO )
                   AND (RECE64-KIZAITEN    =  ZERO )
                           MOVE   4              TO  RECE66-TENTEKIKBN
@@ -4040,6 +4037,12 @@
                MOVE    WRK-ZAIW-KOUHYOJYUNNUM
                                            TO  RECE66-KOUHYOJUNNUM
       *
+               IF    RECE64-GAZOGEN = "1"
+                  MOVE    202              TO  RECE66-CDKBN-KBNNUM
+                  MOVE    99               TO  RECE66-CDKBN-KOUBAN
+                  MOVE    ZERO             TO  RECE66-KOUHYOJUNNUM
+               END-IF
+      *
                IF   (RECE62-RECESYUBETU    =  8888   )
                AND  (RECE64-SRYKBN  = "95" OR "96"   )
                    MOVE    RECE64-SYUTEN1    TO  RECE66-ZAITEN
@@ -4059,6 +4062,7 @@
       *
                MOVE       SPACE          TO  RECE66-SRYSYUKBN
                MOVE       ZERO           TO  RECE66-DAY
+               MOVE       ZERO           TO  RECE66-DAY2
                EVALUATE  RECE64-SRYKBN
                  WHEN      "21"
                  WHEN      "22"
@@ -4082,6 +4086,16 @@
                           MOVE    31     TO  IDW3
                        END-IF
                    END-PERFORM
+                 WHEN      "70"
+                   IF    RECE64-GAZOGEN = "1"
+                     PERFORM   VARYING   IDW3   FROM    1   BY  1
+                                UNTIL    IDW3   >      31
+                       IF    RECE64-KAISU(1 IDW3)    NOT =   ZERO
+                          MOVE   IDW3    TO  RECE66-DAY2
+                          MOVE    31     TO  IDW3
+                       END-IF
+                     END-PERFORM
+                   END-IF
                  WHEN      "99"
                    MOVE   WRK-SRYSYUKBN  TO  RECE66-SRYSYUKBN
                END-EVALUATE

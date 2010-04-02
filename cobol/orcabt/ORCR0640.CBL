@@ -420,6 +420,9 @@
       *                                     （外泊区分４特定入院基本料の対応）
       *  04.04.44    NACL-門脇    10/03/25  改正対応
       *                                     （予約コード読み飛ばし編集）
+      *  04.04.45    NACL-門脇    10/03/29  改正対応
+      *                                     （画像診断２回目以降減算編集）
+      *                                     （コード追加）
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -1424,6 +1427,8 @@
            03  CONS-CTMRI-COMMENT16  PIC X(09)  VALUE  "170023410".
       *    四肢特殊ＭＲＩ撮影
            03  CONS-CTMRI-COMMENT17  PIC X(09)  VALUE  "170023510".
+      *    ＣＴ撮影（１６列未満マルチスライス型機器）
+           03  CONS-CTMRI-COMMENT18  PIC X(09)  VALUE  "170028610".
       *    精神科退院前訪問指導料
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    精神科退院前訪問指導料算定日
@@ -1474,6 +1479,12 @@
            03  CONS-NOUKE6-COMMENT   PIC X(09)  VALUE  "180030210".
       *    脳血管疾患等リハビリテーション料（３）
            03  CONS-NOUKE7-COMMENT   PIC X(09)  VALUE  "180030810".
+      *    脳血管疾患等リハビリテーション料（１）（廃用症候群）
+           03  CONS-NOUKE8-COMMENT   PIC X(09)  VALUE  "180032410".
+      *    脳血管疾患等リハビリテーション料（２）（廃用症候群）
+           03  CONS-NOUKE9-COMMENT   PIC X(09)  VALUE  "180032510".
+      *    脳血管疾患等リハビリテーション料（３）（廃用症候群）
+           03  CONS-NOUKE10-COMMENT  PIC X(09)  VALUE  "180032610".
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -1486,6 +1497,8 @@
            03  CONS-UNDOKI5-COMMENT  PIC X(09)  VALUE  "180030310".
       **   運動器リハビリテーション医学管理料（２）
            03  CONS-UNDOKI6-COMMENT  PIC X(09)  VALUE  "180030410".
+      *    運動器リハビリテーション料（１）
+           03  CONS-UNDOKI7-COMMENT  PIC X(09)  VALUE  "180032710".
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -1496,6 +1509,8 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    摂食機能療法
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
+      *    がん患者リハビリテーション料
+           03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    介達牽引
            03  CONS-KAITATU-COMMENT  PIC X(09)  VALUE  "140048010".
       *    往診
@@ -3586,9 +3601,10 @@
                                       TO RECE65-TOKUKIZAISBT1  (IDX4)
                MOVE    TNS-SANSOKBN   TO RECE65-SANSOKBN       (IDX4)
       *
-               IF     TNS-SRYCD       =  "170022290"  OR
+               IF    (TNS-SRYCD       =  "170022290"  OR
                                          "170022390"  OR
-                                         "170022490"
+                                         "170022490")
+               AND   (RECE62-SRYYM   <=  "201003"   )
                       MOVE   202      TO  RECE65-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE65-CDKBN-KOUBAN(IDX4)
                END-IF
@@ -3604,6 +3620,11 @@
                                          "170026810"
                       MOVE   203      TO  RECE65-CDKBN-KBNNUM(IDX4)
                       MOVE   99       TO  RECE65-CDKBN-KOUBAN(IDX4)
+               END-IF
+      *
+               IF    (TNS-SRYCD       =  "170022290")
+               AND   (RECE62-SRYYM   >=  "201004"   )
+                      MOVE   "1"      TO  RECE64-GAZOGEN
                END-IF
       *
                IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
@@ -3952,13 +3973,18 @@
                                             CONS-NOUKE3-COMMENT   OR
                                             CONS-NOUKE4-COMMENT   OR
                                             CONS-NOUKE7-COMMENT   OR
+                                            CONS-NOUKE8-COMMENT   OR
+                                            CONS-NOUKE9-COMMENT   OR
+                                            CONS-NOUKE10-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
                                             CONS-UNDOKI4-COMMENT  OR
+                                            CONS-UNDOKI7-COMMENT  OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
-                                            CONS-SYOGAI3-COMMENT
+                                            CONS-SYOGAI3-COMMENT  OR
+                                            CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE62-COMCNTFLG
                         MOVE   "1"    TO    RECE64-RIHABIRI-COMMENT
               END-IF
@@ -4007,6 +4033,9 @@
                                       OR    CONS-NOUKE5-COMMENT
                                       OR    CONS-NOUKE6-COMMENT
                                       OR    CONS-NOUKE7-COMMENT
+                                      OR    CONS-NOUKE8-COMMENT
+                                      OR    CONS-NOUKE9-COMMENT
+                                      OR    CONS-NOUKE10-COMMENT
                         MOVE   "1"    TO    RECE62-COMCNTFLG
                         MOVE   "1"    TO    RECE64-NOUKE-COMMENT
                 END-IF
@@ -4016,6 +4045,7 @@
                                       OR    CONS-UNDOKI4-COMMENT
                                       OR    CONS-UNDOKI5-COMMENT
                                       OR    CONS-UNDOKI6-COMMENT
+                                      OR    CONS-UNDOKI7-COMMENT
                         MOVE   "1"    TO    RECE62-COMCNTFLG
                         MOVE   "1"    TO    RECE64-UNDOKI-COMMENT
                 END-IF
@@ -4140,7 +4170,7 @@
            END-IF
       *
            IF      RECE64-SRYKBN      =     "70"
-              IF   SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
                                             CONS-CTMRI-COMMENT2  OR
                                             CONS-CTMRI-COMMENT3  OR
                                             CONS-CTMRI-COMMENT4  OR
@@ -4156,7 +4186,17 @@
                                             CONS-CTMRI-COMMENT14 OR
                                             CONS-CTMRI-COMMENT15 OR
                                             CONS-CTMRI-COMMENT16 OR
-                                            CONS-CTMRI-COMMENT17
+                                            CONS-CTMRI-COMMENT17)
+              AND (RECE62-SRYYM       <     "201004"            )
+                   MOVE   "1"   TO    RECE64-FLG-CTMRI-COMMENT
+              END-IF
+              IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
+                                            CONS-CTMRI-COMMENT2  OR
+                                            CONS-CTMRI-COMMENT4  OR
+                                            CONS-CTMRI-COMMENT6  OR
+                                            CONS-CTMRI-COMMENT7  OR
+                                            CONS-CTMRI-COMMENT18)
+              AND (RECE62-SRYYM       >=    "201004"            )
                    MOVE   "1"   TO    RECE64-FLG-CTMRI-COMMENT
               END-IF
            END-IF

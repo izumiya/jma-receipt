@@ -48,6 +48,8 @@
       *                                     編集対応
       *  04.03.02    NACL-門脇    08/07/09  投薬の記載順変更（日付順）
       *  04.03.03    NACL-門脇    08/07/14  投薬剤点０（院外等）記載対応
+      *  04.04.01    NACL-門脇    10/03/29  改正対応
+      *                                     （画像診断２回目以降減算編集）
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    10/01/12  治験対応
@@ -340,6 +342,8 @@
            MOVE   RECE66-DAY         TO   RECE661-DAY
       *
            MOVE   RECE66-ZAIKBN      TO   RECE661-ZAIKBN
+      *
+           MOVE   RECE66-DAY2        TO   RECE661-DAY2
       *
            IF     RECE66-RECESYUBETU  =  8888
               IF     RECE66-ZAITEN  NOT =  ZERO
