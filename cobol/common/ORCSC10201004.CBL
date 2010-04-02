@@ -4388,7 +4388,7 @@
                       (IDX-ZAI2            =   1   )  AND
                       (IDX-SYU2            >   ZERO )
                    MOVE    "1017"          TO  SPA-ERRCD
-                   MOVE    "1058"          TO  SPA-ERRCD
+      *!!          MOVE    "1058"          TO  SPA-ERRCD
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-SYU2)
                    GO      TO      200-ALL-SYORI-EXT
                END-IF
