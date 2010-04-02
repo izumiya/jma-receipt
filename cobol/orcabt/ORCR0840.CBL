@@ -178,6 +178,7 @@
       *                                     （コード追加）
       *  04.04.13    NACL-門脇    10/03/31  改正対応
       *                                     （頸部固定帯加算の対応）
+      *  04.04.14    NACL-門脇    10/04/02  特別労災付添看護の対応
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/08/17  小数点以下５桁対応
@@ -2516,6 +2517,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        (RECE82-SRYYM     <  "200804"        ))
                    OR ((RECE82-JIBAIKBN  =  "1"             ) AND
                        (SRY-SRYCD(IDX2)  =  CONS-RYOYOTEATE ))
+                   OR ( SRY-SRYCD(IDX2)  >= "101910110" AND
+                                         <= "101910400"      )
                      IF   SRY-SRYCD(IDX2)(1:5) =  "09593"
                        MOVE  TNS-KANANAMECHGKBN
                                       TO  WRK-JIBAIKZI-SYUKEIKBN(IDX2)
@@ -2833,6 +2836,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                          OR  "09594"  ))                
                OR (( SRY-SRYCD(IDX2) = CONS-ROUSAI3   )   AND
                    ( RECE82-SRYYM    < "200804"       ))
+               OR (  SRY-SRYCD(IDX2) >= "101910110" AND
+                                     <= "101910400"    )
       *
                      ADD      1          TO  WRK-MEISAI-CNT
                      COMPUTE  WRK-TEN    =   WRK-TEN   +
@@ -2971,6 +2976,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                CONS-ROUSAI18  OR
                                                CONS-ROUSAI19  OR
                                                CONS-ROUSAI20    ) AND
+                          ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ))
+                      OR (( ACCT-SRYKBN     = "80"              ) AND
+                          ( SRY-SRYCD(1)    >= "101910110" AND
+                                            <= "101910400"      ) AND
+                          ( SRY-SRYCD(IDX2)(1:3)   =   "008"    ))
+                      OR (( ACCT-SRYKBN     = "80"              ) AND
+                          ( SRY-SRYCD(1)    >= "101910110" AND
+                                            <= "101910400"      ) AND
                           ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ))
       *
                          ADD    1      TO    WRK-MEISAI-CNT             
@@ -4063,12 +4076,15 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                            END-IF
                          END-IF
                    ELSE
-                     IF ( ACCT-SRYKBN          =  "80"    )  AND         
-                        ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
+                     IF ((ACCT-SRYKBN          =  "80"   )  AND
+                         (SRY-SRYCD(IDX3)(1:5) =  "09593"))
+                     OR ( SRY-SRYCD(IDX3) >= "101910110" AND
+                                          <= "101910400"  )
                          COMPUTE   RECE82-KINGAKU2(2)  =
                                    RECE82-KINGAKU2(2)  +
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
-                         IF   FLG-TAISYO   =   1
+                         IF   (FLG-TAISYO           =   1     )
+                         AND  (SRY-SRYCD(IDX3)(1:5) =  "09593")
                           COMPUTE  WRK-ZAITENNASHI  =
                                    WRK-ZAITENNASHI  +
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
@@ -4444,9 +4460,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                                 "09592" )
                        CONTINUE
                    ELSE
-                    IF ( ACCT-SRYKBN          =  "80"    )  AND         
-                       ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
-                     EVALUATE  WRK-JIBAIKZI-SYUKEIKBN(IDX3)
+                    IF ((ACCT-SRYKBN          =  "80"   )  AND
+                        (SRY-SRYCD(IDX3)(1:5) =  "09593"))
+                    OR ( SRY-SRYCD(IDX3) >= "101910110" AND
+                                         <= "101910400"  )
+                     IF  SRY-SRYCD(IDX3)(1:5) =  "09593"
+                      EVALUATE  WRK-JIBAIKZI-SYUKEIKBN(IDX3)
                        WHEN       0
                        WHEN       5
                          COMPUTE RECE82-KINGAKU3(3)  =
@@ -4460,7 +4479,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                          COMPUTE RECE82-KINGAKU2(2)  =
                                  RECE82-KINGAKU2(2)  +
                              (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
-                     END-EVALUATE
+                      END-EVALUATE
+                     ELSE
+                         COMPUTE RECE82-KINGAKU3(3)  =
+                                 RECE82-KINGAKU3(3)  +
+                             (TNS-TEN     *   ACCT-ZAIKAISU)
+                     END-IF
                     ELSE                                                
                      IF  SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
                        COMPUTE    RECE82-KINGAKU3(3)  =                 
@@ -5008,9 +5032,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                                 "09592" )
                        CONTINUE
                    ELSE
-                    IF ( ACCT-SRYKBN          =  "80"    )  AND         
-                       ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
-                     EVALUATE   RECE82-JIBAIKBN
+                    IF ((ACCT-SRYKBN          =  "80"   )  AND
+                        (SRY-SRYCD(IDX3)(1:5) =  "09593"))
+                    OR ( SRY-SRYCD(IDX3) >= "101910110" AND
+                                         <= "101910400"  )
+                     IF  SRY-SRYCD(IDX3)(1:5) =  "09593"
+                      EVALUATE   RECE82-JIBAIKBN
                        WHEN       "1"
                          EVALUATE  WRK-JIBAIKZI-SYUKEIKBN(IDX3)
                            WHEN       0
@@ -5028,7 +5055,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                              COMPUTE  RECE82-SONOTAKIN-JYU =
                                       RECE82-SONOTAKIN-JYU +
                                (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
-                     END-EVALUATE
+                      END-EVALUATE
+                     ELSE
+                             COMPUTE  RECE82-SONOTAKIN-JYU  =
+                                      RECE82-SONOTAKIN-JYU  +
+                               (TNS-TEN   *   ACCT-ZAIKAISU)
+                     END-IF
                     ELSE                                                
                      IF  RECE82-JIBAIKBN      =    "1"
                      AND SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
@@ -5399,9 +5431,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                        (SRY-SRYCD(IDX3)(1:5) =  "09594"  ))
                      CONTINUE
                    ELSE
-                     IF ( ACCT-SRYKBN          =  "80"    )  AND         
-                        ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
-                         IF   FLG-TAISYO   =   1
+                     IF ((ACCT-SRYKBN          =  "80"   )  AND
+                         (SRY-SRYCD(IDX3)(1:5) =  "09593"))
+                     OR ( SRY-SRYCD(IDX3) >= "101910110" AND
+                                          <= "101910400"  )
+                         IF   (FLG-TAISYO           =   1     )
+                         AND  (SRY-SRYCD(IDX3)(1:5) =  "09593")
                           COMPUTE  WRK-ZAITENNASHI  =
                                    WRK-ZAITENNASHI  +
                                   (TNS-TEN     *   ACCT-ZAIKAISU)

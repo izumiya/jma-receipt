@@ -40,6 +40,7 @@
       *
       *  04.03.01    NACL-ÌçÏÆ    08/07/11  ¿ÇÃÇ½ñÌÀºÙ½ñÎÁ¤ÎÅ¦Í×Íóµ­ºÜÂÐ±þ
       *  04.03.02    NACL-ÌçÏÆ    08/09/25  ¼«ÇåÀÕ£°£¹£µ£¹£³¤Î½¸·×ÀèÂÐ±þ
+      *  04.04.01    NACL-ÌçÏÆ    10/04/02  ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸î¤ÎÂÐ±þ
       *
       *  04.05.01    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
       *****************************************************************
@@ -704,7 +705,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                       END-EVALUATE
                   END-EVALUATE
                 ELSE
-                  MOVE    WRK-NYUTENTTLKBN  TO  RECE86-NYUTENTTLKBN
+                  IF   RECE86-SRYCD1 >= "101910110" AND
+                                     <= "101910400"
+                    MOVE  998              TO  RECE86-NYUTENTTLKBN
+                  ELSE
+                    MOVE  WRK-NYUTENTTLKBN TO  RECE86-NYUTENTTLKBN
+                  END-IF
                 END-IF
               END-IF
            END-IF
