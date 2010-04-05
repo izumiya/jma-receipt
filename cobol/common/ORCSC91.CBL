@@ -1126,12 +1126,6 @@
                    MOVE    SPACE           TO  WRK-CHK
                END-IF
            END-IF
-      *    £È£²£².£´¤«¤éÌôºÞ¾ðÊó¤ÈÆ±»þ¥Á¥§¥Ã¥¯¤Ê¤·
-           IF     (WRK-CODE            =   "002" )   AND
-                  (SPA-SRYYMD          >=  "201004001" )
-               MOVE    SPACE           TO  WRK-CODE
-               MOVE    SPACE           TO  WRK-CHK
-           END-IF
       *
            .
        1001-CODECHK-EXT.
