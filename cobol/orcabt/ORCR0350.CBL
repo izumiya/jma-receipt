@@ -270,6 +270,8 @@
       *                                     変更に伴う修正
       *                                     平成２２年４月分以降の処理を
       *                                     行うようにする
+      *  04.04.17    NACL-藤原    10/04/05  入院基本料の入院元コメント、
+      *                                     退院元コメントを対象としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3950,10 +3952,29 @@
                         RECE65-SRYCD (IDX) (1:3) NOT =   "008" AND
                         RECE65-SRYCD (IDX)       NOT =   "190128310" AND
                         RECE65-SRYCD (IDX)       NOT =   "190128410" AND
+                        RECE65-SRYCD (IDX)       NOT =   "190128570" AND
                         RECE65-SRYCD (IDX)       NOT =   "190128570"  )
                  CONTINUE
                 ELSE
-                 IF      RECE65-RECEDENFLG (IDX)     =   SPACE
+      *          入院基本料の入院元コメント、退院元コメントは対象としない
+                 IF    ( RECE641-SRYKBN              =  "90"           )
+                 AND   ( RECE65-SRYCD (IDX)          =   "820000144" OR
+                                                         "820000145" OR
+                                                         "820000146" OR
+                                                         "820000147" OR
+                                                         "820000148" OR
+                                                         "820000149" OR
+                                                         "820000150" OR
+                                                         "820000151" OR
+                                                         "820000152" OR
+                                                         "820000153" OR
+                                                         "820000154" OR
+                                                         "820000155" OR
+                                                         "820000156" OR
+                                                         "820000157"   )
+                   CONTINUE
+                 ELSE  
+                  IF      RECE65-RECEDENFLG (IDX)     =   SPACE
                    MOVE    SPACE                TO  WRK-KIZAI-SRYCD
                    IF      RECE65-SRYCD (IDX) (1:3) = "059"
                        MOVE    RECE65-SRYCD (IDX)
@@ -4017,6 +4038,7 @@
                                PERFORM 200711-KIZAI-ACCT-TAIHI-SEC
       *********************END-IF
                    END-EVALUATE
+                  END-IF
                  END-IF
                 END-IF
                END-PERFORM
