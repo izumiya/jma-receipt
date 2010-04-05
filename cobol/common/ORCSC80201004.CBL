@@ -1578,6 +1578,24 @@
               AND (WRK-COM-CDKBN-KBN (IDX-Z)       =   "H"  )
                MOVE    1                   TO  FLG-RIHA-OK
            END-IF
+      *    H22.4 から　新規の脳血管疾患等・運動器リハコードは区分で判定
+           IF     (FLG-RIHA-OK             =   ZERO    )
+              AND (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H"   )
+              AND (WRK-COM-CDKBN-KBNNUM (IDX-Z)
+                                               =   "001"
+                                               OR  "002" )
+              AND (WRK-COM-CDKBN-KBNNUM-EDA (IDX-Z)
+                                               =   "00"    )
+               MOVE    1                   TO  FLG-RIHA-OK
+               EVALUATE    WRK-COM-CDKBN-KBNNUM (IDX-Z)
+                   WHEN    "001"
+      *                脳血管疾患等リハ
+                       MOVE    "2"             TO  WRK-RIHA-KBN
+                   WHEN    "002"
+      *                運動器リハ
+                       MOVE    "3"             TO  WRK-RIHA-KBN
+               END-EVALUATE
+           END-IF
       *
            IF     (FLG-RIHA-OK         =   ZERO )
                GO      TO      100112-RIGAKU-CHK-EXT
@@ -2716,112 +2734,6 @@
            EXIT.
       *
       *****************************************************************
-      *    逓減チェック処理（外来）
-      *****************************************************************
-       20020-TEIGEN-CHEK-SEC         SECTION.
-      *
-           MOVE    SPACE               TO  WRK-SRYCD
-           IF     (WRK-TEIGEN-YMD  NOT =   SPACE )  AND
-                  (WRK-TEIGEN-YMD      <=  WRK-SRYYMD)
-      *        逓減
-               IF      WRK-RIHA-GEN        =   "2"
-                   CONTINUE
-               ELSE
-      *        逓減コードに変更
-                   SET     TBL-RIH             TO  1
-                   SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
-                       AT  END
-                           MOVE    SPACE           TO  WRK-SRYCD
-                       WHEN   (TBL-RIHA-KBN (TBL-RIH)
-                                               =   WRK-RIHA-KBN )
-                       AND    (TBL-RIHA-KBN2(TBL-RIH)
-                                               =   WRK-RIHA-KBN2 )
-                       AND    (TBL-RIHA-GEN (TBL-RIH)
-                                               =   "2"    )
-                           MOVE    TBL-RIHA-SRYCD (TBL-RIH)
-                                                   TO  WRK-SRYCD
-                   END-SEARCH
-               END-IF
-           END-IF
-           IF     (WRK-TEIGEN-YMD  NOT =   SPACE )  AND
-                  (WRK-TEIGEN-YMD      >   WRK-SRYYMD)
-      *        逓減期間外
-               IF      WRK-RIHA-GEN        =   "2"
-      *        逓減を変更
-                   SET     TBL-RIH             TO  1
-                   SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
-                       AT  END
-                           MOVE    SPACE           TO  WRK-SRYCD
-                       WHEN   (TBL-RIHA-KBN (TBL-RIH)
-                                               =   WRK-RIHA-KBN )
-                       AND    (TBL-RIHA-KBN2(TBL-RIH)
-                                               =   WRK-RIHA-KBN2 )
-                       AND    (TBL-RIHA-GEN (TBL-RIH)
-                                               =   SPACE  )
-                           MOVE    TBL-RIHA-SRYCD (TBL-RIH)
-                                                   TO  WRK-SRYCD
-                   END-SEARCH
-               END-IF
-           END-IF
-      *
-           IF      (WRK-SRYCD     NOT =   SPACE )  AND
-                   (WRK-SRYCD     NOT =   WRK-COM-INPUTCD (IDX-Z))
-               PERFORM 200201-TENGEN-HEN-SEC
-           END-IF
-      *
-           .
-       20020-TEIGEN-CHEK-EXT.
-           EXIT.
-      *****************************************************************
-      *    リハビリコード置換え処理
-      *****************************************************************
-       200201-TENGEN-HEN-SEC                SECTION.
-      *
-      *    点数マスタ編集・基本チェック
-           MOVE    WRK-SCR-REC         TO  HZN-SCR-REC
-      *
-           MOVE    WRK-SRYCD           TO  WRK-COM-INPUTCD (IDX-Z)
-           MOVE    WRK-SRYCD           TO  WRK-GMN-INPUTCD (IDX-Z)
-           INITIALIZE                  ORCSC92AREA
-           MOVE    SPACE               TO  LNK-SC92-KBN
-           MOVE    SPACE               TO  WRK-COM-CHKFLG (IDX-Z)
-           MOVE    SPACE               TO  WRK-COM-HCHKFLG (IDX-Z)
-           MOVE    LNK-ORCSC-SYORIFLG  TO  LNK-SC92-SYORIFLG
-           MOVE    LNK-ORCSC-PG        TO  LNK-SC92-PG
-           MOVE    IDX-Z               TO  LNK-SC92-GMN-IDX
-           MOVE    WRK-SRYCD           TO  LNK-SC92-SRYCD
-           MOVE    LNK-ORCSC-NENREI    TO  LNK-SC92-NENREI
-           MOVE    LNK-ORCSC-ROUJIN    TO  LNK-SC92-ROUJIN
-           MOVE    LNK-ORCSC-LSTSRYKA  TO  LNK-SC92-LSTSRYKA
-           MOVE    LNK-ORCSC-LSTSRYKAMEI   TO  LNK-SC92-LSTSRYKAMEI
-           MOVE    LNK-ORCSC-TEISEI-AREA TO  LNK-SC92-TEISEI-AREA
-           CALL    "ORCSC92"           USING
-                                       MCPAREA
-                                       ORCSC92AREA
-                                       WRK-SCR-REC
-                                       SPA-AREA
-      *
-      *    エラーの時、変更なし
-           IF     (SPA-ERRCD           NOT =   SPACE )  OR
-                  (LNK-SC92-ERRAREA    NOT =   SPACE )
-               MOVE    SPACE               TO  SPA-ERRCD
-               MOVE    HZN-SCR-REC         TO  WRK-SCR-REC
-           ELSE
-      *    画面再編集・基本チェック
-               INITIALIZE                  ORCSC94AREA
-               MOVE    "1"                 TO  LNK-SC94-KBN
-               MOVE    LNK-SC92-PG         TO  LNK-SC94-PG
-               MOVE    IDX-Z               TO  LNK-SC94-IDX
-               CALL    "ORCSC94"           USING
-                                           ORCSC94AREA
-                                           WRK-SCR-REC
-                                           SPA-AREA
-      *
-           END-IF
-           .
-       200201-TENGEN-HEN-EXT.
-           EXIT.
-      *****************************************************************
       *    当日上限チェック処理
       *****************************************************************
        20021-DAYMAX-CHK-SEC         SECTION.
@@ -2972,86 +2884,6 @@
       *
            .
        2001-NYUIN-ALL-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    逓減チェック処理（入院）
-      *****************************************************************
-       20010-TEIGEN-CHEKN-SEC                SECTION.
-      *
-           MOVE    SPACE               TO  WRK-SRYCD
-           MOVE    SPACE               TO  WRK-SRYYMD
-           MOVE    SPACE               TO  WRK-EDSRYYMD
-           PERFORM VARYING     IDX2    FROM    1   BY  1
-                   UNTIL      (IDX2    >   31  )   OR
-                              (SPA-ERRCD   NOT =   SPACE )
-               IF      WRK-COM-NYUINDAY (IDX-Z IDX2)   >   ZERO
-                   MOVE    IDX2                TO  IDD
-                   IF      WRK-SRYYMD          =   SPACE
-                       MOVE    SPA-SRYYMD          TO  WRK-SRYYMD
-                       MOVE    IDD                 TO  WRK-SRYYMD (7:2)
-                   END-IF
-                   MOVE    SPA-SRYYMD          TO  WRK-EDSRYYMD
-                   MOVE    IDD                 TO  WRK-EDSRYYMD (7:2)
-               END-IF
-           END-PERFORM
-      *
-      *    逓減開始日の範囲チェック
-           IF     (WRK-TEIGEN-YMD      <=  WRK-SRYYMD)
-      *        逓減
-               IF      WRK-RIHA-GEN        =   "2"
-                   CONTINUE
-               ELSE
-      *        逓減コードに変更
-                   SET     TBL-RIH             TO  1
-                   SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
-                       AT  END
-                           MOVE    SPACE           TO  WRK-SRYCD
-                       WHEN   (TBL-RIHA-KBN (TBL-RIH)
-                                               =   WRK-RIHA-KBN )
-                       AND    (TBL-RIHA-KBN2(TBL-RIH)
-                                               =   WRK-RIHA-KBN2 )
-                       AND    (TBL-RIHA-GEN (TBL-RIH)
-                                               =   "2"    )
-                           MOVE    TBL-RIHA-SRYCD (TBL-RIH)
-                                                   TO  WRK-SRYCD
-                   END-SEARCH
-               END-IF
-           END-IF
-           IF     (WRK-TEIGEN-YMD      >   WRK-SRYYMD )  AND
-                  (WRK-TEIGEN-YMD      >   WRK-EDSRYYMD)
-      *        逓減期間外
-               IF      WRK-RIHA-GEN        =   "2"
-      *        逓減を変更
-                   SET     TBL-RIH             TO  1
-                   SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
-                       AT  END
-                           MOVE    SPACE           TO  WRK-SRYCD
-                       WHEN   (TBL-RIHA-KBN (TBL-RIH)
-                                               =   WRK-RIHA-KBN )
-                       AND    (TBL-RIHA-KBN2(TBL-RIH)
-                                               =   WRK-RIHA-KBN2 )
-                       AND    (TBL-RIHA-GEN (TBL-RIH)
-                                               =   SPACE  )
-                           MOVE    TBL-RIHA-SRYCD (TBL-RIH)
-                                                   TO  WRK-SRYCD
-                   END-SEARCH
-               END-IF
-           END-IF
-      *    逓減期間が混在する時、エラー
-           IF     (WRK-TEIGEN-YMD      >   WRK-SRYYMD )  AND
-                  (WRK-TEIGEN-YMD      <=  WRK-EDSRYYMD)
-               MOVE    "8043"          TO  SPA-ERRCD
-               MOVE    WRK-TEIGEN-MSG  TO  LNK-ORCSC-ERRMSG
-               MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
-           END-IF
-      *    逓減コード置換え
-           IF      (WRK-SRYCD     NOT =   SPACE )  AND
-                   (WRK-SRYCD     NOT =   WRK-COM-INPUTCD (IDX-Z))
-               PERFORM 200201-TENGEN-HEN-SEC
-           END-IF
-           .
-       20010-TEIGEN-CHEKN-EXT.
            EXIT.
       *
       *****************************************************************
