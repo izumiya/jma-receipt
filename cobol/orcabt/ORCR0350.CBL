@@ -286,6 +286,8 @@
       *                                     変更に伴う修正
       *                                     平成２２年４月分以降の処理を
       *                                     行うようにする
+      *  04.05.14    NACL-藤原    10/04/05  入院基本料の入院元コメント、
+      *                                     退院元コメントを対象としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3848,19 +3850,38 @@
                AND   ( RECE641-ZAIKBN             =   2             )
                    MOVE    1                      TO  FLG-TAISYO
                ELSE
-      *           入院料はコメントか退院加算のみ対象とする
-                  IF    ( RECE641-SRYKBN               >=  "90"      )
-                  AND   ( RECE65-SRYCD (IDX) (1:1) NOT =   "8"   AND
-                          RECE65-SRYCD (IDX) (1:3) NOT =   "008" AND
-                          RECE65-SRYCD (IDX)       NOT =   "190128310"
-                                                           AND
-                          RECE65-SRYCD (IDX)       NOT =   "190128410"
-                                                           AND
-                          RECE65-SRYCD (IDX)       NOT =   "190128570" )
+      *          入院基本料の入院元コメント、退院元コメントは対象としない
+                 IF    ( RECE641-SRYKBN              =  "90"           )
+                 AND   ( RECE65-SRYCD (IDX)          =   "820000144" OR
+                                                         "820000145" OR
+                                                         "820000146" OR
+                                                         "820000147" OR
+                                                         "820000148" OR
+                                                         "820000149" OR
+                                                         "820000150" OR
+                                                         "820000151" OR
+                                                         "820000152" OR
+                                                         "820000153" OR
+                                                         "820000154" OR
+                                                         "820000155" OR
+                                                         "820000156" OR
+                                                         "820000157"   )
+                   CONTINUE
+                 ELSE  
+      *            入院料はコメントか退院加算のみ対象とする
+                   IF    ( RECE641-SRYKBN               >=  "90"      )
+                   AND   ( RECE65-SRYCD (IDX) (1:1) NOT =   "8"   AND
+                           RECE65-SRYCD (IDX) (1:3) NOT =   "008" AND
+                           RECE65-SRYCD (IDX)       NOT =   "190128310"
+                                                            AND
+                           RECE65-SRYCD (IDX)       NOT =   "190128410"
+                                                            AND
+                           RECE65-SRYCD (IDX)       NOT =   "190128570")
                      CONTINUE
-                  ELSE
+                   ELSE
                      MOVE    1                      TO  FLG-TAISYO
-                  END-IF
+                   END-IF
+                 END-IF
                END-IF
       *
                IF      FLG-TAISYO          =   1  
@@ -4646,19 +4667,19 @@
                        MOVE    100                 TO  WRK-NAGASA
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
-      *                日付情報
-                       PERFORM VARYING IDV     FROM    1   BY  1
-                               UNTIL   IDV     >       31
-      *****************    IF      RECE641-KAISU (1 IDV)   >   ZERO
-      *****************        MOVE    RECE641-KAISU (1 IDV)
-      *****************                                TO  WRK-NUM
-      *****************        MOVE    3               TO  WRK-NAGASA
-      *****************    END-IF
-                           IF      IDV                 =   31
-                               MOVE    1                   TO  WRK-END 
-                           END-IF     
-                           PERFORM 5005-NUM-HENSYU-SEC
-                       END-PERFORM  
+      *            日付情報
+                   PERFORM VARYING IDV     FROM    1   BY  1
+                           UNTIL   IDV     >       31
+      *************    IF      RECE641-KAISU (1 IDV)   >   ZERO
+      *************        MOVE    RECE641-KAISU (1 IDV)
+      *************                                TO  WRK-NUM
+      *************        MOVE    3               TO  WRK-NAGASA
+      *************    END-IF
+                       IF      IDV                 =   31
+                           MOVE    1                   TO  WRK-END 
+                       END-IF     
+                       PERFORM 5005-NUM-HENSYU-SEC
+                   END-PERFORM  
            END-EVALUATE  
       *
            PERFORM 5001-FILE-WRITE-SEC
