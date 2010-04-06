@@ -188,6 +188,8 @@
       *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
       *  04.04.14    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ
       *                                     ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
+      *  04.04.15    NACL-ÌçÏÆ    10/04/06  ²þÀµÂÐ±þ
+      *                                     ¡Ê¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -900,6 +902,37 @@
            03  CONS-KENSA2-COMMENT   PIC X(09)  VALUE  "160181250".
       *    £È£Á£Î£ÐÀºÌ©
            03  CONS-KENSA3-COMMENT   PIC X(09)  VALUE  "160116310".
+      *
+      *    ¿´Â¡¥Ú¡¼¥¹¥á¡¼¥«¡¼»ØÆ³´ÉÍýÎÁ¡Ê±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°¡Ë
+           03  CONS-SINPESU-COMMENT  PIC X(09)  VALUE  "113001510".
+      *    ½¸ÃÄ±ÉÍÜ¿©»ö»ØÆ³ÎÁ
+           03  CONS-SYUEIYO-COMMENT  PIC X(09)  VALUE  "113003410".
+      *    ¿Í¹©¿ÕÂ¡¡Ê¤½¤ÎÂ¾¡Ë
+           03  CONS-JINZOU1-COMMENT  PIC X(09)  VALUE  "140007710".
+      *    ¿Í¹©¿ÕÂ¡¡ÊËýÀ­°Ý»ýÆ©ÀÏ¡Ë¡Ê£´»þ´ÖÌ¤Ëþ¡Ë
+           03  CONS-JINZOU2-COMMENT  PIC X(09)  VALUE  "140036710".
+      *    ¿Í¹©¿ÕÂ¡¡ÊËýÀ­°Ý»ýÆ©ÀÏ¡Ë¡Ê£´»þ´Ö°Ê¾å£µ»þ´ÖÌ¤Ëþ¡Ë
+           03  CONS-JINZOU3-COMMENT  PIC X(09)  VALUE  "140051010".
+      *    ¿Í¹©¿ÕÂ¡¡ÊËýÀ­°Ý»ýÆ©ÀÏ¡Ë¡Ê£µ»þ´Ö°Ê¾å¡Ë
+           03  CONS-JINZOU4-COMMENT  PIC X(09)  VALUE  "140051110".
+      *    Ï¢Â³·È¹Ô¼°Ê¢Ëì¤«¤óÎ®
+           03  CONS-JINZOU5-COMMENT  PIC X(09)  VALUE  "140008510".
+      *    »ýÂ³´Ë½ù¼°·ì±ÕßÉ²á
+           03  CONS-JINZOU6-COMMENT  PIC X(09)  VALUE  "140029850".
+      *    ·ìÞù¸ò´¹ÎÅË¡
+           03  CONS-JINZOU7-COMMENT  PIC X(09)  VALUE  "140008210".
+      *    ·ìµåÀ®Ê¬½üµîÎÅË¡
+           03  CONS-JINZOU8-COMMENT  PIC X(09)  VALUE  "140039210".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡Ê¤½¤ÎÂ¾¡Ë
+           03  CONS-KYOKUIN1-COMMENT PIC X(09)  VALUE  "140052410".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡ÊÈïÊ¤ºàÅ½ÉÕ¡Ë¡Ê£±£°£°£ã£í£²Ì¤Ëþ¡Ë
+           03  CONS-KYOKUIN2-COMMENT PIC X(09)  VALUE  "140051810".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡ÊÈïÊ¤ºàÅ½ÉÕ¡Ë¡Ê£±£°£°£ã£í£²¡Á£²£°£°£ã£í£²Ì¤Ëþ¡Ë
+           03  CONS-KYOKUIN3-COMMENT PIC X(09)  VALUE  "140051910".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡ÊÈïÊ¤ºàÅ½ÉÕ¡Ë¡Ê£²£°£°£ã£í£²°Ê¾å¡Ë
+           03  CONS-KYOKUIN4-COMMENT PIC X(09)  VALUE  "140052010".
+      *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡
+           03  CONS-NINRYO-COMMENT   PIC X(09)  VALUE  "180033210".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -2759,6 +2792,27 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE   "1"    TO    RECE44-KAITATU-COMMENT
                 END-IF
               END-IF
+      *
+              IF   RECE41-SRYYM      >=    "201004"
+      *         ¿Í¹©¿ÕÂ¡Åù
+                IF   SRY-SRYCD(IDX2)  =     CONS-JINZOU1-COMMENT
+                                        OR  CONS-JINZOU2-COMMENT
+                                        OR  CONS-JINZOU3-COMMENT
+                                        OR  CONS-JINZOU4-COMMENT
+                                        OR  CONS-JINZOU5-COMMENT
+                                        OR  CONS-JINZOU6-COMMENT
+                                        OR  CONS-JINZOU7-COMMENT
+                                        OR  CONS-JINZOU8-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-JINZOU-COMMENT
+                END-IF
+      *         ¶É½ê±¢°µÊÄº¿½èÃÖ
+                IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN1-COMMENT
+                                        OR  CONS-KYOKUIN2-COMMENT
+                                        OR  CONS-KYOKUIN3-COMMENT
+                                        OR  CONS-KYOKUIN4-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-KYOKUIN-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF    ((RECE41-HKNKBN    NOT  =  "4"         ) AND
@@ -2923,6 +2977,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE   "1"    TO    RECE44-SESSYOKU-COMMENT
                 END-IF
               END-IF
+      *
+              IF   RECE41-SRYYM      >=    "201004"
+      *         Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡
+                IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-NINRYO-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF      RECE44-SRYKBN      =     "13"
@@ -2979,6 +3040,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 IF    SRY-SRYCD(IDX2)   =     CONS-SYOUNI3-COMMENT
                    MOVE  SPACE  TO    RECE44-FLG-SYOUNI-COMMENT
                    MOVE    1    TO    FLG-SYOUNI-COM
+                END-IF
+              END-IF
+      *
+              IF   RECE41-SRYYM      >=    "201004"
+      *         ¿´Â¡¥Ú¡¼¥¹¥á¡¼¥«¡¼»ØÆ³´ÉÍýÎÁ¡Ê±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°¡Ë
+                IF   SRY-SRYCD(IDX2)  =     CONS-SINPESU-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-SINPESU-COMMENT
+                END-IF
+      *         ½¸ÃÄ±ÉÍÜ¿©»ö»ØÆ³ÎÁ
+                IF   SRY-SRYCD(IDX2)  =     CONS-SYUEIYO-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-SYUEIYO-COMMENT
                 END-IF
               END-IF
            END-IF
@@ -3080,6 +3152,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF   SRY-SRYCD(IDX2)    =     CONS-SHUJUTU-COMMENT
                    MOVE   "1"   TO    RECE44-FLG-SHUJUTU-COMMENT
               END-IF
+           END-IF
+      *
+           IF   RECE41-SRYYM      >=    "201004"
+            IF     RECE44-SRYKBN      =     "54"
+              IF   RECE44-SYUTEN1     =     ZERO
+                   MOVE   "1"   TO    RECE44-FLG-MASUI-COMMENT
+              END-IF
+            END-IF
            END-IF
       *
            IF      RECE44-SRYKBN      =     "70"
