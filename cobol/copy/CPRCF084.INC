@@ -39,6 +39,7 @@
       *  04.04.01    NACL-門脇    09/02/04  検査（ＢＮＰ等）の追加
       *  04.04.02    NACL-門脇    10/03/29  画像診断（２回目以降減算あり）
       *                                     の追加
+      *  04.04.03    NACL-門脇    10/04/06  改正対応項目追加
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    10/01/19  剤区分追加
@@ -175,6 +176,24 @@
            03  RECE84-FLG-ZAISIEN-COMMENT PIC  X(01).
       *検査（ＢＮＰ、ＮＴ−ｐｒｏＢＮＰ、ＨＡＮＰ）
            03  RECE84-FLG-KENSA-COMMENT   PIC  X(01).
+      *
+      *介護支援連携指導料
+           03  RECE84-FLG-KAISIEN-COMMENT PIC  X(01).
+      *集団栄養食事指導料
+           03  RECE84-FLG-SYUEIYO-COMMENT PIC  X(01).
+      *人工腎臓等
+           03  RECE84-FLG-JINZOU-COMMENT  PIC  X(01).
+      *局所陰圧閉鎖処置
+           03  RECE84-FLG-KYOKUIN-COMMENT PIC  X(01).
+      *麻酔
+           03  RECE84-FLG-MASUI-COMMENT   PIC  X(01).
+      *栄養サポートチーム加算
+           03  RECE84-FLG-EISAPO-COMMENT  PIC  X(01).
+      *呼吸ケアチーム加算
+           03  RECE84-FLG-KOKKEA-COMMENT  PIC  X(01).
+      *重症者加算（精神療養病棟入院料）
+           03  RECE84-FLG-JYUSYO-COMMENT  PIC  X(01).
+      *
       *日数回数テーブル
            03  RECE84-DAY-AREA.
       *        診療回数テーブル（1:合計,2:１回,3:２回, 4:３回以上）

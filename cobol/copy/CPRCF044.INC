@@ -48,6 +48,7 @@
       *  04.04.02    NACL-門脇    10/03/23  同日電話再診フラグの追加
       *  04.04.03    NACL-門脇    10/03/29  画像診断（２回目以降減算あり）
       *                                     の追加
+      *  04.04.04    NACL-門脇    10/04/06  改正対応項目追加
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    10/01/19  剤区分追加
@@ -188,6 +189,20 @@
            03  RECE44-FLG-SYOUNI-COMMENT  PIC  X(01).
       *検査（ＢＮＰ、ＮＴ−ｐｒｏＢＮＰ、ＨＡＮＰ）
            03  RECE44-FLG-KENSA-COMMENT   PIC  X(01).
+      *
+      *心臓ペースメーカー指導管理料（遠隔モニタリング）
+           03  RECE44-FLG-SINPESU-COMMENT PIC  X(01).
+      *集団栄養食事指導料
+           03  RECE44-FLG-SYUEIYO-COMMENT PIC  X(01).
+      *人工腎臓等
+           03  RECE44-FLG-JINZOU-COMMENT  PIC  X(01).
+      *局所陰圧閉鎖処置
+           03  RECE44-FLG-KYOKUIN-COMMENT PIC  X(01).
+      *麻酔
+           03  RECE44-FLG-MASUI-COMMENT   PIC  X(01).
+      *認知療法・認知行動療法
+           03  RECE44-FLG-NINRYO-COMMENT  PIC  X(01).
+      *
       *日数回数テーブル
            03  RECE44-DAY-AREA.
       *        診療回数テーブル（1:合計,2:１回,3:２回, 4:３回以上）

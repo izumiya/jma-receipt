@@ -179,6 +179,8 @@
       *  04.04.13    NACL-ÃÁœ∆    10/03/31  ≤˛¿µ¬–±˛
       *                                     ° Ù…Ù∏«ƒÍ¬”≤√ªª§Œ¬–±˛°À
       *  04.04.14    NACL-ÃÁœ∆    10/04/02  ∆√ Ãœ´∫“…’≈∫¥«∏Ó§Œ¬–±˛
+      *  04.04.15    NACL-ÃÁœ∆    10/04/06  ≤˛¿µ¬–±˛
+      *                                     ° •≥•·•Û•»º´∆∞µ≠∫‹°À
       *
       *  04.05.01    NACL-∆£∏∂    09/07/14  æÆøÙ≈¿∞ ≤º£µ∑Â¬–±˛
       *  04.05.02    NACL-ÃÁœ∆    09/08/17  æÆøÙ≈¿∞ ≤º£µ∑Â¬–±˛
@@ -950,6 +952,41 @@
            03  CONS-KENSA2-COMMENT   PIC X(09)  VALUE  "160181250".
       *    £»£¡£Œ£–¿∫Ã©
            03  CONS-KENSA3-COMMENT   PIC X(09)  VALUE  "160116310".
+      *
+      *    ≤∏ÓªŸ±Áœ¢∑»ªÿ∆≥Œ¡
+           03  CONS-KAISIEN-COMMENT  PIC X(09)  VALUE  "113011710".
+      *    Ω∏√ƒ±…Õ‹ø©ªˆªÿ∆≥Œ¡
+           03  CONS-SYUEIYO-COMMENT  PIC X(09)  VALUE  "113003410".
+      *    øÕπ©ø’¬°° §Ω§Œ¬æ°À
+           03  CONS-JINZOU1-COMMENT  PIC X(09)  VALUE  "140007710".
+      *    øÕπ©ø’¬°° À˝¿≠∞›ª˝∆©¿œ°À° £¥ª˛¥÷Ã§À˛°À
+           03  CONS-JINZOU2-COMMENT  PIC X(09)  VALUE  "140036710".
+      *    øÕπ©ø’¬°° À˝¿≠∞›ª˝∆©¿œ°À° £¥ª˛¥÷∞ æÂ£µª˛¥÷Ã§À˛°À
+           03  CONS-JINZOU3-COMMENT  PIC X(09)  VALUE  "140051010".
+      *    øÕπ©ø’¬°° À˝¿≠∞›ª˝∆©¿œ°À° £µª˛¥÷∞ æÂ°À
+           03  CONS-JINZOU4-COMMENT  PIC X(09)  VALUE  "140051110".
+      *    œ¢¬≥∑»π‘º∞ ¢ÀÏ§´§ÛŒÆ
+           03  CONS-JINZOU5-COMMENT  PIC X(09)  VALUE  "140008510".
+      *    ª˝¬≥¥ÀΩ˘º∞∑Ï±’ﬂ…≤·
+           03  CONS-JINZOU6-COMMENT  PIC X(09)  VALUE  "140029850".
+      *    ∑Ïﬁ˘∏Ú¥πŒ≈À°
+           03  CONS-JINZOU7-COMMENT  PIC X(09)  VALUE  "140008210".
+      *    ∑ÏµÂ¿Æ ¨Ω¸µÓŒ≈À°
+           03  CONS-JINZOU8-COMMENT  PIC X(09)  VALUE  "140039210".
+      *    ∂…ΩÍ±¢∞µ ƒ∫øΩË√÷° §Ω§Œ¬æ°À
+           03  CONS-KYOKUIN1-COMMENT PIC X(09)  VALUE  "140052410".
+      *    ∂…ΩÍ±¢∞µ ƒ∫øΩË√÷° »Ô §∫‡≈Ω…’°À° £±£∞£∞£„£Ì£≤Ã§À˛°À
+           03  CONS-KYOKUIN2-COMMENT PIC X(09)  VALUE  "140051810".
+      *    ∂…ΩÍ±¢∞µ ƒ∫øΩË√÷° »Ô §∫‡≈Ω…’°À° £±£∞£∞£„£Ì£≤°¡£≤£∞£∞£„£Ì£≤Ã§À˛°À
+           03  CONS-KYOKUIN3-COMMENT PIC X(09)  VALUE  "140051910".
+      *    ∂…ΩÍ±¢∞µ ƒ∫øΩË√÷° »Ô §∫‡≈Ω…’°À° £≤£∞£∞£„£Ì£≤∞ æÂ°À
+           03  CONS-KYOKUIN4-COMMENT PIC X(09)  VALUE  "140052010".
+      *    ±…Õ‹•µ•›°º•»•¡°º•‡≤√ªª
+           03  CONS-EISAPO-COMMENT   PIC X(09)  VALUE  "190136810".
+      *    ∏∆µ€•±•¢•¡°º•‡≤√ªª
+           03  CONS-KOKKEA-COMMENT   PIC X(09)  VALUE  "190137910".
+      *    Ω≈æ…º‘≤√ªª° ¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡°À
+           03  CONS-JYUSYO-COMMENT   PIC X(09)  VALUE  "190141370".
       *
       *    ≥∞ÕËø◊¬Æ∏°¬Œ∏°∫∫≤√ªª
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -3140,6 +3177,27 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE   "1"    TO    RECE84-KAITATU-COMMENT
                 END-IF
               END-IF
+      *
+              IF   RECE82-SRYYM      >=    "201004"
+      *         øÕπ©ø’¬°≈˘
+                IF   SRY-SRYCD(IDX2)  =     CONS-JINZOU1-COMMENT
+                                        OR  CONS-JINZOU2-COMMENT
+                                        OR  CONS-JINZOU3-COMMENT
+                                        OR  CONS-JINZOU4-COMMENT
+                                        OR  CONS-JINZOU5-COMMENT
+                                        OR  CONS-JINZOU6-COMMENT
+                                        OR  CONS-JINZOU7-COMMENT
+                                        OR  CONS-JINZOU8-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-JINZOU-COMMENT
+                END-IF
+      *         ∂…ΩÍ±¢∞µ ƒ∫øΩË√÷
+                IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN1-COMMENT
+                                        OR  CONS-KYOKUIN2-COMMENT
+                                        OR  CONS-KYOKUIN3-COMMENT
+                                        OR  CONS-KYOKUIN4-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-KYOKUIN-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF    ((RECE82-HKNKBN    NOT  =  "4"         ) AND
@@ -3348,6 +3406,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF   SRY-SRYCD(IDX2)    =     CONS-TAIIN-COMMENT
                    MOVE   "1"   TO    RECE84-FLG-TAIIN-COMMENT
               END-IF
+      *
+              IF   RECE82-SRYYM      >=    "201004"
+      *         ≤∏ÓªŸ±Áœ¢∑»ªÿ∆≥Œ¡
+                IF   SRY-SRYCD(IDX2)  =     CONS-KAISIEN-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-KAISIEN-COMMENT
+                END-IF
+      *         Ω∏√ƒ±…Õ‹ø©ªˆªÿ∆≥Œ¡
+                IF   SRY-SRYCD(IDX2)  =     CONS-SYUEIYO-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-SYUEIYO-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF     (RECE82-HKNKBN    NOT  =  "4"    AND
@@ -3412,6 +3481,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
+           IF   RECE82-SRYYM      >=    "201004"
+            IF     RECE84-SRYKBN      =     "54"
+              IF   RECE84-SYUTEN1     =     ZERO
+                   MOVE   "1"   TO    RECE84-FLG-MASUI-COMMENT
+              END-IF
+            END-IF
+           END-IF
+      *
            IF      RECE84-SRYKBN      =     "70"
               IF  (SRY-SRYCD(IDX2)    =     CONS-CTMRI-COMMENT1  OR
                                             CONS-CTMRI-COMMENT2  OR
@@ -3464,6 +3541,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
               IF   SRY-SRYCD(IDX2)    =     CONS-CHIRYO-COMMENT
                    MOVE   "1"   TO    RECE84-FLG-CHIRYO-COMMENT
+              END-IF
+      *
+              IF   RECE82-SRYYM      >=    "201004"
+      *         ±…Õ‹•µ•›°º•»•¡°º•‡≤√ªª
+                IF   SRY-SRYCD(IDX2)  =     CONS-EISAPO-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-EISAPO-COMMENT
+                END-IF
+      *         ∏∆µ€•±•¢•¡°º•‡≤√ªª
+                IF   SRY-SRYCD(IDX2)  =     CONS-KOKKEA-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-KOKKEA-COMMENT
+                END-IF
+      *         Ω≈æ…º‘≤√ªª° ¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡°À
+                IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT
+                        MOVE   "1"    TO    RECE84-FLG-JYUSYO-COMMENT
+                END-IF
               END-IF
            END-IF
       *

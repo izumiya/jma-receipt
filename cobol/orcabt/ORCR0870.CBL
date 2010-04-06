@@ -87,6 +87,8 @@
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
       *  04.04.03    NACL-門脇    10/03/03  療養レセコメント編集修正
+      *  04.04.04    NACL-門脇    10/04/06  改正対応
+      *                                     （コメント自動記載）
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
@@ -1082,9 +1084,25 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE84-WRITE-SEC
                       END-IF
+                   WHEN      "40"
+                      MOVE   ZERO   TO  FLG-COMMENT
+      *            （人工腎臓等の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-JINZOUETC-HANTEI-SEC
+                      END-IF
+      *            （局所陰圧閉鎖処置の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-KYOKUIN-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2099-RECE84-WRITE-SEC
+                      END-IF
                    WHEN      "50"
       *            （手術日のセット）
                       PERFORM    2001-SHUJUTSU-HANTEI-SEC
+                   WHEN      "54"
+      *            （麻酔日のセット）
+                      PERFORM    2001-MASUI-HANTEI-SEC
                    WHEN      "60"
                    WHEN      "64"
                       MOVE   ZERO   TO  FLG-COMMENT
@@ -1233,6 +1251,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-OSIN-HANTEI-SEC
                       END-IF
+      *            （人工腎臓等の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-JINZOUETC-HANTEI-SEC
+                      END-IF
+      *            （局所陰圧閉鎖処置の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-KYOKUIN-HANTEI-SEC
+                      END-IF
       *
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2099-RECE84-WRITE-SEC
@@ -1240,6 +1266,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                    WHEN      "50"                                       
       *            （手術日のセット）                                   
                       PERFORM    2001-SHUJUTSU-HANTEI-SEC               
+                   WHEN      "54"
+      *            （麻酔日のセット）
+                      PERFORM    2001-MASUI-HANTEI-SEC
                    WHEN      "60"
                    WHEN      "64"
                       MOVE   ZERO   TO  FLG-COMMENT
@@ -3062,10 +3091,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                        IF     WRK-DAY      NOT  =  ZERO
                        AND    WRK-FSANTEIYMD   <=  WRK-HINKAIYMD
-                       AND    WRK-HINKAIYMD    <   WRK-AFTER2
+                         IF ((WRK-HINKAIYMD    <   WRK-AFTER2) AND
+                             (RECE84-SRYYM     <= "201003"   ))
+                         OR ( RECE84-SRYYM     >= "201004"    )
                              MOVE    1    TO   FLG-HINKAI-COMMENT
                              MOVE  WRK-FSANTEIYMD
                                           TO   WRK-TOSEKIYMD
+                         END-IF
                        END-IF
                       END-IF
       * 
@@ -3139,6 +3171,34 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    人工腎臓等のコメントがあるか判定
+      *****************************************************************
+       2001-JINZOUETC-HANTEI-SEC          SECTION.
+      *
+           IF     RECE84-FLG-JINZOU-COMMENT   =    "1"
+               MOVE       3       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-JINZOUETC-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    局所陰圧閉鎖処置のコメントがあるか判定
+      *****************************************************************
+       2001-KYOKUIN-HANTEI-SEC          SECTION.
+      *
+           IF     RECE84-FLG-KYOKUIN-COMMENT   =    "1"
+               MOVE       3       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-KYOKUIN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    手術日のコメントがあるか判定
       *****************************************************************
        2001-SHUJUTSU-HANTEI-SEC          SECTION.
@@ -3152,6 +3212,22 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        2001-SHUJUTSU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    麻酔日のコメントがあるか判定
+      *****************************************************************
+       2001-MASUI-HANTEI-SEC          SECTION.
+      *
+           IF     RECE84-FLG-MASUI-COMMENT   =    SPACE
+               MOVE       8       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC-COMMENT-SEC
+           ELSE
+               PERFORM    2099-RECE84-WRITE-SEC
+           END-IF
+      *
+           .
+       2001-MASUI-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3693,6 +3769,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
                  MOVE    "検査実施"
                              TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
+              WHEN    8
+                 MOVE     4          TO    WRK-KETA
+                                           WRK-KETA-TAIHI
+                 MOVE     2          TO    WRK-KETA2
+                 MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
+                 MOVE    "麻酔"  TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
            END-EVALUATE
       *
            MOVE      ZERO          TO  FLG-FIRST
