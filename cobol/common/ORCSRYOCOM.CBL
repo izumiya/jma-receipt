@@ -64,58 +64,165 @@
       *
       *    ¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
        01  CONSTANT-AREA.
+      *    Ê¿À®£²£²Ç¯£³·î¤Þ¤Ç¤Î¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
            03  CONS-RYOYO-NYUIN.
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Á
                05                          PIC X(09) VALUE "190121310".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Â
                05                          PIC X(09) VALUE "190121410".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Ã
                05                          PIC X(09) VALUE "190121510".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Ä
                05                          PIC X(09) VALUE "190121610".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Å
                05                          PIC X(09) VALUE "190121710".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
                05                          PIC X(09) VALUE "190121810".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Á¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190123710".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Â¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190123810".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Ã¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190123910".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Ä¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124010".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£Å¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124110".
-      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124210".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á
                05                          PIC X(09) VALUE "190122010".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â
                05                          PIC X(09) VALUE "190122110".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã
                05                          PIC X(09) VALUE "190122210".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä
                05                          PIC X(09) VALUE "190122310".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å
                05                          PIC X(09) VALUE "190122410".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
                05                          PIC X(09) VALUE "190122510".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124310".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124410".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124510".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124610".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124710".
-      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£²¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
                05                          PIC X(09) VALUE "190124810".
            03  CONS-RYOYO-NYUINR      REDEFINES    CONS-RYOYO-NYUIN.
                05  CONS-RYOYO-NYUIN-OCC    OCCURS  24.
                    07  CONS-RYOYO-SRYCD    PIC X(09).
+      *
+      *    Ê¿À®£²£²Ç¯£´·î¤«¤é¤Î¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
+           03  CONS-RYOYO-NYUIN-H22.
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë
+               05                          PIC X(09) VALUE "190121310".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë
+               05                          PIC X(09) VALUE "190121410".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë
+               05                          PIC X(09) VALUE "190121510".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë
+               05                          PIC X(09) VALUE "190121610".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë
+               05                          PIC X(09) VALUE "190121710".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Æ¡Ë
+               05                          PIC X(09) VALUE "190131610".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ç¡Ë
+               05                          PIC X(09) VALUE "190131810".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£È¡Ë
+               05                          PIC X(09) VALUE "190132010".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë
+               05                          PIC X(09) VALUE "190132210".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190123710".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190123810".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190123910".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124010".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124110".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Æ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190131710".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ç¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190131910".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£È¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190132110".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190132310".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë
+               05                          PIC X(09) VALUE "190132410".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë
+               05                          PIC X(09) VALUE "190132610".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë
+               05                          PIC X(09) VALUE "190132810".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë
+               05                          PIC X(09) VALUE "190133010".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë
+               05                          PIC X(09) VALUE "190133210".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Æ¡Ë
+               05                          PIC X(09) VALUE "190133410".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ç¡Ë
+               05                          PIC X(09) VALUE "190133610".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£È¡Ë
+               05                          PIC X(09) VALUE "190133810".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë
+               05                          PIC X(09) VALUE "190134010".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190132510".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190132710".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190132910".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190133110".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190133310".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Æ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190133510".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ç¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190133710".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£È¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190133910".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190134110".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+               05                          PIC X(09) VALUE "190121810".
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124210".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á
+               05                          PIC X(09) VALUE "190122010".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â
+               05                          PIC X(09) VALUE "190122110".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã
+               05                          PIC X(09) VALUE "190122210".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä
+               05                          PIC X(09) VALUE "190122310".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å
+               05                          PIC X(09) VALUE "190122410".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+               05                          PIC X(09) VALUE "190122510".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124310".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124410".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124510".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124610".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124710".
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë¡ÊÀ¸³èÎÅÍÜ¡Ë
+               05                          PIC X(09) VALUE "190124810".
+           03  CONS-RYOYO-NYUINR-H22  REDEFINES  CONS-RYOYO-NYUIN-H22.
+               05  CONS-RYOYO-NYUIN-OCC-H22    OCCURS  50.
+                   07  CONS-RYOYO-SRYCD-H22    PIC X(09).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -388,8 +495,10 @@
                MOVE    "tbl_nyuinact"  TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM 910-NYUINACT-READ-SEC
-               PERFORM   VARYING  IDX   FROM   1   BY  1
-                 UNTIL  (IDX      >     24)
+      *        Ê¿À®£²£²Ç¯£³·î¤Þ¤Ç¤ÎÆþ±¡¥Á¥§¥Ã¥¯
+               IF    LNK-RYOCOM-SANTEIYM   <=  "201003"
+                 PERFORM   VARYING  IDX   FROM   1   BY  1
+                   UNTIL  (IDX      >     24)
                    IF   NSRY-SRYCD(1)   =    CONS-RYOYO-SRYCD(IDX)
                        PERFORM   VARYING  IDX1   FROM   1  BY  1
                          UNTIL  (IDX1    >   31)
@@ -399,7 +508,23 @@
                            END-IF
                        END-PERFORM
                    END-IF
-               END-PERFORM
+                 END-PERFORM
+               END-IF
+      *        Ê¿À®£²£²Ç¯£´·î¤«¤é¤ÎÆþ±¡¥Á¥§¥Ã¥¯
+               IF    LNK-RYOCOM-SANTEIYM   >=  "201004"
+                 PERFORM   VARYING  IDX   FROM   1   BY  1
+                   UNTIL  (IDX      >     50)
+                   IF   NSRY-SRYCD(1)   =    CONS-RYOYO-SRYCD-H22(IDX)
+                       PERFORM   VARYING  IDX1   FROM   1  BY  1
+                         UNTIL  (IDX1    >   31)
+                           IF   NACCT-DAY(IDX1)    =   1
+                               MOVE "1"  TO  LNK-RYOCOM-NYUINKBN(IDX1)
+                               MOVE  1   TO  FLG-RYOYO-NYUIN
+                           END-IF
+                       END-PERFORM
+                   END-IF
+                 END-PERFORM
+               END-IF
            END-IF
       *
            MOVE    "tbl_nyuinact"      TO  MCP-TABLE
@@ -450,6 +575,10 @@
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
+      *    Ê¿À®£²£²Ç¯£´·î°Ê¹ß¤Ï£Á£Ä£ÌÅÀ¿ôÆþÎÏ¤Ï¶èÊ¬ÊÌ¤ËÆþÎÏ
+           IF     LNK-RYOCOM-SANTEIYM    >=    "201004"
+               MOVE     1              TO  FLG-1015-ADLINPUTKBN
+           END-IF
       *
       *    ÎÅÍÜ¥ì¥»¥×¥È¥³¥á¥ó¥È¥Þ¥¹¥¿¤Î¾ðÊó¼èÆÀ
            INITIALIZE                      RYOUYOCOM-REC
@@ -486,27 +615,83 @@
       *
       *
       *    Ê¿À®£²£°Ç¯£´·î°Ê¹ßÊ¬¤Î°åÎÅ¶èÊ¬¥³¥á¥ó¥ÈÊÂ¤ÓÂØ¤¨
-           IF    LNK-RYOCOM-SANTEIYM  >=   "200804"
+           IF    LNK-RYOCOM-SANTEIYM       >=   "200804"
                 PERFORM   220-RYOCOM-SORT-SEC
            END-IF
       *
       *
-      *    ¼èÆÀ¤·¤¿£Á£Ä£ÌÅÀ¿ô¤òÁ´³ÑÊÑ´¹
-           PERFORM   VARYING   IDX   FROM  1  BY  1
-             UNTIL   IDX    >   31
-               IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
-                  MOVE   "840000103"   TO   LNK-RYOCOM-ADL-SRYCD(IDX)
-                  ADD    1             TO   LNK-RYOCOM-MEISAISU(IDX)
-                  IF   LNK-RYOCOM-ADL-TEN(IDX)   =  ZERO
-                      MOVE  "£°£°"     TO
-                                       LNK-RYOCOM-ADL-TEN-MOJI(IDX)
-                  ELSE
-                      MOVE  LNK-RYOCOM-ADL-TEN(IDX)   TO  IDX1
-                      MOVE  TBL-ADLTEN(IDX1)
-                                   TO  LNK-RYOCOM-ADL-TEN-MOJI(IDX)
-                  END-IF
-               END-IF
-           END-PERFORM
+      *    ¼èÆÀ¤·¤¿£Á£Ä£ÌÅÀ¿ô¤òÁ´³ÑÊÑ´¹¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç¤Îµ­Ï¿¡Ë
+           IF    LNK-RYOCOM-SANTEIYM       <=   "201003"
+             PERFORM   VARYING   IDX   FROM  1  BY  1
+               UNTIL   IDX    >   31
+                 IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
+                    MOVE   "840000103"   TO   LNK-RYOCOM-ADL-SRYCD(IDX)
+                    ADD    1             TO   LNK-RYOCOM-MEISAISU(IDX)
+                    IF   LNK-RYOCOM-ADL-TEN(IDX)   =  ZERO
+                        MOVE  "£°£°"     TO
+                                         LNK-RYOCOM-ADL-TEN-MOJI(IDX)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN(IDX)   TO  IDX1
+                        MOVE  TBL-ADLTEN(IDX1)
+                                     TO  LNK-RYOCOM-ADL-TEN-MOJI(IDX)
+                    END-IF
+                 END-IF
+             END-PERFORM
+           END-IF
+      *
+      *    ¼èÆÀ¤·¤¿£Á£Ä£ÌÅÀ¿ô¤òÁ´³ÑÊÑ´¹¡ÊÊ¿À®£²£²Ç¯£´·î¤«¤é¤Îµ­Ï¿¡Ë
+           IF    LNK-RYOCOM-SANTEIYM       >=   "201004"
+             PERFORM   VARYING   IDX   FROM  1  BY  1
+               UNTIL   IDX    >   31
+                 IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
+                    ADD   4              TO   LNK-RYOCOM-MEISAISU(IDX)
+      *             £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­
+                    MOVE    "840000126"  TO
+                                       LNK-RYOCOM-ADL-SRYCD-H22(IDX 1)
+                    IF   LNK-RYOCOM-ADL-TEN-H22(IDX 1)   =  ZERO
+                        MOVE  "£°£°"     TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 1)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 1)   TO  IDX1
+                        MOVE  TBL-ADLTEN(IDX1)  TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 1)
+                    END-IF
+      *             £Á£Ä£Ì£â¡¡°Ü¾è
+                    MOVE    "840000127"  TO
+                                       LNK-RYOCOM-ADL-SRYCD-H22(IDX 2)
+                    IF   LNK-RYOCOM-ADL-TEN-H22(IDX 1)   =  ZERO
+                        MOVE  "£°£°"     TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 2)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 2)   TO  IDX1
+                        MOVE  TBL-ADLTEN(IDX1)  TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 2)
+                    END-IF
+      *             £Á£Ä£Ì£ã¡¡¿©»ö
+                    MOVE    "840000128"  TO
+                                       LNK-RYOCOM-ADL-SRYCD-H22(IDX 3)
+                    IF   LNK-RYOCOM-ADL-TEN-H22(IDX 3)   =  ZERO
+                        MOVE  "£°£°"     TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 3)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 3)   TO  IDX1
+                        MOVE  TBL-ADLTEN(IDX1)  TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 3)
+                    END-IF
+      *             £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ
+                    MOVE    "840000129"  TO
+                                       LNK-RYOCOM-ADL-SRYCD-H22(IDX 4)
+                    IF   LNK-RYOCOM-ADL-TEN-H22(IDX 4)   =  ZERO
+                        MOVE  "£°£°"     TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 4)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 4)   TO  IDX1
+                        MOVE  TBL-ADLTEN(IDX1)  TO
+                                     LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 4)
+                    END-IF
+                 END-IF
+             END-PERFORM
+           END-IF
       *
       *    ¿ÇÎÅ¥³¡¼¥É·×¤Î¼èÆÀ
            PERFORM   VARYING   IDX   FROM  1  BY  1
@@ -524,11 +709,42 @@
                                 (WRK-SRYCD-9  *  LNK-RYOCOM-IRYO-ZAINUM
                                                     (IDX IDX1))
                   END-PERFORM
-                  MOVE   LNK-RYOCOM-ADL-SRYCD(IDX)  TO  WRK-SRYCD-X
-                  ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
-                  COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
-                            LNK-RYOCOM-SRYCDTOTAL(IDX)   +
-                            LNK-RYOCOM-ADL-TEN(IDX)
+                  IF    LNK-RYOCOM-SANTEIYM       <=   "201003"
+                    MOVE   LNK-RYOCOM-ADL-SRYCD(IDX)  TO  WRK-SRYCD-X
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
+                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
+                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
+                              LNK-RYOCOM-ADL-TEN(IDX)
+                  ELSE
+      *             £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­
+                    MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 1)
+                                         TO  WRK-SRYCD-X
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
+                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
+                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
+                              LNK-RYOCOM-ADL-TEN-H22(IDX 1)
+      *             £Á£Ä£Ì£â¡¡°Ü¾è
+                    MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 2)
+                                         TO  WRK-SRYCD-X
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
+                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
+                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
+                              LNK-RYOCOM-ADL-TEN-H22(IDX 2)
+      *             £Á£Ä£Ì£ã¡¡¿©»ö
+                    MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 3)
+                                         TO  WRK-SRYCD-X
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
+                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
+                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
+                              LNK-RYOCOM-ADL-TEN-H22(IDX 3)
+      *             £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ
+                    MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 4)
+                                         TO  WRK-SRYCD-X
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
+                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
+                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
+                              LNK-RYOCOM-ADL-TEN-H22(IDX 4)
+                  END-IF
                END-IF
            END-PERFORM
       *
@@ -545,23 +761,78 @@
            IF     FLG-1015-ADLINPUTKBN    =    1
              IF   (RYOCOM-ZAINUM       >=  1000)     AND
                   (RYOCOM-ZAINUM       <=  1999)
-               IF   RYOCOM-MONTH       NOT =     ZERO
-                   PERFORM   VARYING  IDX   FROM  1  BY  1
-                     UNTIL   IDX      >   31
-                       IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
-                           ADD   RYOCOM-MONTH  TO
-                                        LNK-RYOCOM-ADL-TEN(IDX)
-                       END-IF
-                   END-PERFORM
+               IF   LNK-RYOCOM-SANTEIYM    <=   "201003"
+      *            Ê¿À®£²£²Ç¯£³·î¤Þ¤Ç¤Î½¸·×
+                   IF   RYOCOM-MONTH       NOT =     ZERO
+                       PERFORM   VARYING  IDX   FROM  1  BY  1
+                         UNTIL   IDX      >   31
+                           IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
+                               ADD   RYOCOM-MONTH  TO
+                                            LNK-RYOCOM-ADL-TEN(IDX)
+                           END-IF
+                       END-PERFORM
+                   ELSE
+                       PERFORM   VARYING  IDX   FROM  1  BY  1
+                         UNTIL   IDX      >   31
+                           IF   (LNK-RYOCOM-NYUINKBN(IDX)  =  "1")  AND
+                                (RYOCOM-DAY(IDX)      NOT =   ZERO)
+                                ADD  RYOCOM-DAY(IDX)   TO
+                                            LNK-RYOCOM-ADL-TEN(IDX)
+                           END-IF
+                       END-PERFORM
+                   END-IF
                ELSE
-                   PERFORM   VARYING  IDX   FROM  1  BY  1
-                     UNTIL   IDX      >   31
-                       IF   (LNK-RYOCOM-NYUINKBN(IDX)  =  "1")  AND
-                            (RYOCOM-DAY(IDX)      NOT =   ZERO)
-                           ADD  RYOCOM-DAY(IDX)   TO
-                                        LNK-RYOCOM-ADL-TEN(IDX)
-                       END-IF
-                   END-PERFORM
+      *            Ê¿À®£²£²Ç¯£´·î¤«¤é¤Î½¸·×
+                   IF   RYOCOM-MONTH       NOT =     ZERO
+                       PERFORM   VARYING  IDX   FROM  1  BY  1
+                         UNTIL   IDX      >   31
+                           IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
+                               EVALUATE   RYOCOM-ZAINUM
+                                   WHEN   1001
+      *                               £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­
+                                      ADD   RYOCOM-MONTH  TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 1)
+                                   WHEN   1002
+      *                               £Á£Ä£Ì£â¡¡°Ü¾è
+                                      ADD   RYOCOM-MONTH  TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 2)
+                                   WHEN   1003
+      *                               £Á£Ä£Ì£ã¡¡¿©»ö
+                                      ADD   RYOCOM-MONTH  TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 3)
+                                   WHEN   1004
+      *                               £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ
+                                      ADD   RYOCOM-MONTH  TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 4)
+                               END-EVALUATE
+                           END-IF
+                       END-PERFORM
+                   ELSE
+                       PERFORM   VARYING  IDX   FROM  1  BY  1
+                         UNTIL   IDX      >   31
+                           IF   (LNK-RYOCOM-NYUINKBN(IDX)  =  "1")  AND
+                                (RYOCOM-DAY(IDX)      NOT =   ZERO)
+                               EVALUATE   RYOCOM-ZAINUM
+                                   WHEN   1001
+      *                               £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­
+                                       ADD  RYOCOM-DAY(IDX)   TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 1)
+                                   WHEN   1002
+      *                               £Á£Ä£Ì£â¡¡°Ü¾è
+                                       ADD  RYOCOM-DAY(IDX)   TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 2)
+                                   WHEN   1003
+      *                               £Á£Ä£Ì£ã¡¡¿©»ö
+                                       ADD  RYOCOM-DAY(IDX)   TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 3)
+                                   WHEN   1004
+      *                               £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ
+                                       ADD  RYOCOM-DAY(IDX)   TO
+                                          LNK-RYOCOM-ADL-TEN-H22(IDX 4)
+                               END-EVALUATE
+                           END-IF
+                       END-PERFORM
+                   END-IF
                END-IF
              END-IF
            ELSE
@@ -711,6 +982,11 @@
                 MOVE  "820000122"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
              WHEN   "820000093"
                 MOVE  "820000123"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      Ê¿À®£²£²Ç¯£´·îÄÉ²ÃÊ¬
+             WHEN   "820000158"
+                MOVE  "820000158"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+             WHEN   "820000159"
+                MOVE  "820000159"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
            END-EVALUATE
       *
            .

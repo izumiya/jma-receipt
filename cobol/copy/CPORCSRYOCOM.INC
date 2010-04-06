@@ -54,12 +54,22 @@
                    07  LNK-RYOCOM-IRYO-SRYCD     PIC  X(09).
       *医療区分コメント剤番号
                    07  LNK-RYOCOM-IRYO-ZAINUM    PIC  9(08).
-      *ＡＤＬコメントコード
+      *
+      *ＡＤＬコメントコード（平成２２年３月までの返却項目）
                05  LNK-RYOCOM-ADL-SRYCD          PIC  X(09).
-      *ＡＤＬ点数（数字）
+      *ＡＤＬ点数（数字）（平成２２年３月までの返却項目）
                05  LNK-RYOCOM-ADL-TEN            PIC  9(02).
-      *ＡＤＬ点数（全角）
+      *ＡＤＬ点数（全角）（平成２２年３月までの返却項目）
                05  LNK-RYOCOM-ADL-TEN-MOJI       PIC  X(04).
+      *
+      *ＡＤＬ返却領域（平成２２年４月以降）
+               05  LNK-RYOCOM-ADL-H22            OCCURS   4.
+      *ＡＤＬコメントコード
+                 07  LNK-RYOCOM-ADL-SRYCD-H22    PIC  X(09).
+      *ＡＤＬ点数（数字）
+                 07  LNK-RYOCOM-ADL-TEN-H22      PIC  9(02).
+      *ＡＤＬ点数（全角）
+                 07  LNK-RYOCOM-ADL-TEN-MOJI-H22 PIC  X(04).
       *
       *復帰コード（１：算定年月エラー　２：患者検索エラー
       *            ３：入院会計なし　　４：療養入院なし
