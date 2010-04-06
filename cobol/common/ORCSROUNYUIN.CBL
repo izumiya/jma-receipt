@@ -2477,8 +2477,8 @@
       *                  KSN2°ß∞Âª’«€√÷≤√ªª£≤
       *                  KSN4°ß¥«∏Ó«€√÷≤√ªª£±
       *                  KSN3°ß¥«∏Ó«€√÷≤√ªª£≤
-      *                  KSN6°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
-      *                  KSN5°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
+      *                  KSN6°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
+      *                  KSN5°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
       *                  KSN14:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
       *                  KSN18:Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
       *                  KSN19:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
@@ -2621,10 +2621,18 @@
       *                     KSN9°ßÍÛ·Ï…æ≤¡º¬ª‹≤√ªª° Õ≠æ≤ø«Œ≈ΩÍ°À
       *                     KSN11:Ω≈æ…ª˘° º‘°Àºı∆˛œ¢∑»≤√ªª° æ„≥≤º‘ª‹¿ﬂ≈˘∆˛±°¥À‹Œ¡°À
       *                     KSN13:∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª
-      *                     KSN14:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
       *                     KSN15:Ω≈≈Ÿ«ß√Œæ…≤√ªª° ¿∫ø¿…¬≈Ô∆˛±°¥À‹Œ¡°À
       *                     KSN16:∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª° ∆√ƒÍµ°«Ω…¬±°°À
       *                     KSN17:∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª° ¿ÏÃÁ…¬±°°À
+      *                     °›°›∞ ≤º°¢∆˛±°≤Ò∑◊§»ø«Œ≈≤Ò∑◊§´§ÈºË∆¿§π§Î≤√ªª°›°›
+      *                     KSN1°ßÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
+      *                     KSN12:∞Âª’«€√÷≤√ªª£±
+      *                     KSN2°ß∞Âª’«€√÷≤√ªª£≤
+      *                     KSN4°ß¥«∏Ó«€√÷≤√ªª£±
+      *                     KSN3°ß¥«∏Ó«€√÷≤√ªª£≤
+      *                     KSN6°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
+      *                     KSN5°ßÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
+      *                     KSN14:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
       *                     KSN18:Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
       *                     KSN19:µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
                             IF (SRY-SRYCD(1)  =  CONS-200804-KSN7
@@ -2632,10 +2640,17 @@
                                               OR CONS-200804-KSN9
                                               OR CONS-201004-KSN11
                                               OR CONS-201004-KSN13
-                                              OR CONS-201004-KSN14
                                               OR CONS-201004-KSN15
                                               OR CONS-201004-KSN16
                                               OR CONS-201004-KSN17
+                                              OR CONS-200804-KSN1
+                                              OR CONS-201004-KSN12
+                                              OR CONS-200804-KSN2
+                                              OR CONS-200804-KSN4
+                                              OR CONS-200804-KSN3
+                                              OR CONS-200804-KSN6
+                                              OR CONS-200804-KSN5
+                                              OR CONS-201004-KSN14
                                               OR CONS-201004-KSN18
                                               OR CONS-201004-KSN19)
       *                                        
@@ -2655,10 +2670,17 @@
                                         OR  CONS-200804-KSN9
                                         OR  CONS-201004-KSN11
                                         OR  CONS-201004-KSN13
-                                        OR  CONS-201004-KSN14
                                         OR  CONS-201004-KSN15
                                         OR  CONS-201004-KSN16
                                         OR  CONS-201004-KSN17
+                                        OR  CONS-200804-KSN1
+                                        OR  CONS-201004-KSN12
+                                        OR  CONS-200804-KSN2
+                                        OR  CONS-200804-KSN4
+                                        OR  CONS-200804-KSN3
+                                        OR  CONS-200804-KSN6
+                                        OR  CONS-200804-KSN5
+                                        OR  CONS-201004-KSN14
                                         OR  CONS-201004-KSN18
                                         OR  CONS-201004-KSN19 )
       *                ∆˛±°Œ¡≤√ªª§Œ¬‡»Ú
@@ -2690,12 +2712,6 @@
                                 WHEN  CONS-201004-KSN13
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN13(IDX1)
-      *                         µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
-                                WHEN  CONS-201004-KSN14
-                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
-                                      MOVE   ACCT-DAY(1 IDX1)
-                                        TO  WRK-201004-KSN14(IDX1)
-                                  END-IF
       *                         Ω≈≈Ÿ«ß√Œæ…≤√ªª° ¿∫ø¿…¬≈Ô∆˛±°¥À‹Œ¡°À
                                 WHEN  CONS-201004-KSN15
                                   MOVE   ACCT-DAY(1 IDX1)
@@ -2708,6 +2724,54 @@
                                 WHEN  CONS-201004-KSN17
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN17(IDX1)
+      *                         ÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
+                                WHEN  CONS-200804-KSN1
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN1(IDX1)
+                                  END-IF
+      *                         ∞Âª’«€√÷≤√ªª£±
+                                WHEN  CONS-201004-KSN12
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201004-KSN12(IDX1)
+                                  END-IF
+      *                         ∞Âª’«€√÷≤√ªª£≤
+                                WHEN  CONS-200804-KSN2
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN2(IDX1)
+                                  END-IF
+      *                         ¥«∏Ó«€√÷≤√ªª£±
+                                WHEN  CONS-200804-KSN4
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN4(IDX1)
+                                  END-IF
+      *                         ¥«∏Ó«€√÷≤√ªª£≤
+                                WHEN  CONS-200804-KSN3
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN3(IDX1)
+                                  END-IF
+      *                         ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
+                                WHEN  CONS-200804-KSN6
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN6(IDX1)
+                                  END-IF
+      *                         ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
+                                WHEN  CONS-200804-KSN5
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-200804-KSN5(IDX1)
+                                  END-IF
+      *                         µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª
+                                WHEN  CONS-201004-KSN14
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201004-KSN14(IDX1)
+                                  END-IF
       *                         Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
                                 WHEN  CONS-201004-KSN18
                                   IF  ACCT-DAY(1 IDX1)   NOT = ZERO
@@ -2891,14 +2955,6 @@
                IF         WRK-200804-KSN9(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-200804-KSN9     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
-               IF         WRK-200804-KSN10(IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN10    TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
