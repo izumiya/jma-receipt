@@ -1175,11 +1175,6 @@
                  IF       FLG-NYURYAKUSHO    =    ZERO
                    MOVE     NYURYAKUSHO-RYAKUSHO
                                        TO  WRK-RYAKUSHO
-                 ELSE
-                   IF  (RECE200-SRYYM            >= "200804"   )
-                   AND (NSRY-SRYCD(NYUINACT-IDX2) = "190129310")
-                      MOVE  "¾®Æþ´É£±" TO  WRK-RYAKUSHO
-                   END-IF
                  END-IF
       *
                END-IF
@@ -2171,22 +2166,6 @@
                    IF      MCP-RC               =   ZERO
                        MOVE    MCPDATA-REC      TO  NYURYAKUSHO-REC
                        MOVE    ZERO             TO  FLG-NYURYAKUSHO
-                       IF  (RECE200-SRYYM     >= "200804"      )
-                       AND (NYURYAKUSHO-SRYCD  = "190111110" OR
-                                                 "190111210" OR
-                                                 "190075810"   )
-                         EVALUATE   NYURYAKUSHO-SRYCD
-                           WHEN    "190111110"
-                             MOVE   "¾®Æþ´É£²"
-                                  TO   NYURYAKUSHO-RYAKUSHO
-                           WHEN    "190111210"
-                             MOVE   "¾®Æþ´É£³"
-                                  TO   NYURYAKUSHO-RYAKUSHO
-                           WHEN    "190075810"
-                             MOVE   "¾®Æþ´É£´"
-                                  TO   NYURYAKUSHO-RYAKUSHO
-                         END-EVALUATE
-                       END-IF
                        PERFORM  910-NYURYAKUWRK-HEN-SEC
                    ELSE
                        MOVE    1                TO  FLG-NYURYAKUSHO
