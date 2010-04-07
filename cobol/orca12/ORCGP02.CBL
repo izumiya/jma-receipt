@@ -3715,6 +3715,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    GO      TO                  4901-KOUSINMAE-EXT
                END-IF
            END-IF
+           IF     (SPA-FLG-END     NOT =   ZERO  )
+               GO      TO                  4901-KOUSINMAE-EXT
+           END-IF
       *
       *    所得(タグ変更時・切替押下時、未更新のため、ここで必ず更新)
            MOVE    "CLICKED"           TO  MCP-EVENT

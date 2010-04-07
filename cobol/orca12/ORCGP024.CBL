@@ -1798,6 +1798,8 @@
            PERFORM 500-SPA-PARA-TSYRRK-SEC
            PERFORM 500-SPA-PARA-TNKRRK-SEC
       *    给锐砷么
+           MOVE    SPACE               TO  HZN-PTKOHFTN-AREA
+           INITIALIZE                  HZN-PTKOHFTN-AREA
            IF      SPA-GMN24-FTNSELNUM NOT =   ZERO
                PERFORM 410131-KOHFTN-PARA-SEC
       *    吹荚给锐砷么驰
@@ -2492,6 +2494,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        410131-KOHFTN-PARA-SEC           SECTION.
       *
       *    给锐砷么构糠瘦赂
+           MOVE    SPACE               TO  HZN-PTKOHFTN-AREA
            INITIALIZE                  HZN-PTKOHFTN-AREA
            MOVE    ZERO                TO  IDP-1
            MOVE    ZERO                TO  IDP-2
