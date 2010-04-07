@@ -1488,6 +1488,25 @@
               AND (WRK-COM-CDKBN-KBN (IDX-Z)       =   "H"  )
                MOVE    1                   TO  FLG-RIHA-OK
            END-IF
+      *    H22.4 ¤«¤é¡¡¿·µ¬¤ÎÇ¾·ì´É¼À´µÅù¡¦±¿Æ°´ï¥ê¥Ï¥³¡¼¥É¤Ï¶èÊ¬¤ÇÈ½Äê
+           IF     (FLG-RIHA-OK             =   ZERO    )
+              AND (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H"   )
+              AND (WRK-COM-CDKBN-KBNNUM (IDX-Z)
+                                               =   "001"
+                                               OR  "002" )
+              AND (WRK-COM-CDKBN-KBNNUM-EDA (IDX-Z)
+                                               =   "00"    )
+               MOVE    1                   TO  FLG-RIHA-OK
+               EVALUATE    WRK-COM-CDKBN-KBNNUM (IDX-Z)
+                   WHEN    "001"
+      *                Ç¾·ì´É¼À´µÅù¥ê¥Ï
+                       MOVE    "2"             TO  WRK-RIHA-KBN
+                   WHEN    "002"
+      *                ±¿Æ°´ï¥ê¥Ï
+                       MOVE    "3"             TO  WRK-RIHA-KBN
+               END-EVALUATE
+           END-IF
+      *
       *
            IF     (FLG-RIHA-OK         =   ZERO )
                GO      TO      100112-RIGAKU-CHK-EXT
