@@ -674,8 +674,9 @@
                                   TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
            END-IF
       *
-      *    老人性認知症疾患治療病棟入院料１
-           IF    SYOKIKSN-IN-KHNSRYCD   =   "190739910"
+      *    認知症病棟入院料１（平成２２年３月までの期間対応）
+           IF    LNK-PTNYUINRRK-TENNYUYMD  <=  "20100331"
+             IF  SYOKIKSN-IN-KHNSRYCD   =   "190739910"
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
@@ -683,7 +684,7 @@
                      ADD    1           TO  TN-IDX
                      MOVE   "190739910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
-      *              老人性認知症疾患治療病棟入院料１の９０日以内の終日
+      *              認知症病棟入院料１の９０日以内の終日
       *              を再計算
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
                      COMPUTE  WK-TOKUTEI-DAY  =  90  - STUSAN-NISSU03
@@ -728,10 +729,70 @@
                  END-IF
                  MOVE    "99999999"    TO LNK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                (TN-IDX)
+             END-IF
            END-IF
       *
-      *    老人性認知症疾患治療病棟入院料２
-           IF    SYOKIKSN-IN-KHNSRYCD   =   "190813410"
+      *    認知症治療病棟入院料１（平成２２年４月からの期間対応）
+           IF    LNK-PTNYUINRRK-TENNYUYMD  >=  "20100401"
+             IF  SYOKIKSN-IN-KHNSRYCD   =   "190739910"
+                 MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
+                                         LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                 MOVE   ZERO            TO  TN-IDX
+                 IF     STUSAN-NISSU03      <=  60
+                     ADD    1           TO  TN-IDX
+                     MOVE   "190739910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
+                                                               (TN-IDX)
+      *              認知症治療病棟入院料１の６０日以内の終日
+      *              を再計算
+                     MOVE     ZERO      TO   WK-TOKUTEI-DAY
+                     COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
+                     MOVE   LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                                               (TN-IDX)
+                     INITIALIZE                STS-AREA-DAY
+                     INITIALIZE                LNK-DAY6-AREA
+                     MOVE    "61"              TO  LNK-DAY6-IRAI
+                     MOVE   LNK-PTNYUINRRK-TENNYUYMD
+                                               TO  LNK-DAY6-KIJUN
+                     MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                     MOVE    WK-TOKUTEI-DAY    TO  LNK-DAY6-ZOGEN
+                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                     MOVE    LNK-DAY6-KEISAN
+                                        TO LNK-SCNYUACCT-KAGEN-EDYUKYMD
+                                                               (TN-IDX)
+                 END-IF
+      *
+                 ADD    1   TO    TN-IDX
+      *
+                 MOVE   "190740010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD
+                                                               (TN-IDX)
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 IF      TN-IDX      =     2
+                     MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                     MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                     MOVE     1                TO  LNK-DAY6-ZOGEN
+                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                     MOVE    LNK-DAY6-KEISAN
+                                       TO LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                                               (TN-IDX)
+                 ELSE
+                     MOVE    LNK-PTNYUINRRK-TENNYUYMD
+                                       TO LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                                               (TN-IDX)
+                 END-IF
+                 MOVE    "99999999"    TO LNK-SCNYUACCT-KAGEN-EDYUKYMD
+                                                               (TN-IDX)
+             END-IF
+           END-IF
+      *
+      *    認知症病棟入院料２（平成２２年３月までの期間対応）
+           IF    LNK-PTNYUINRRK-TENNYUYMD  <=  "20100331"
+             IF  SYOKIKSN-IN-KHNSRYCD   =   "190813410"
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
@@ -739,7 +800,7 @@
                      ADD    1           TO  TN-IDX
                      MOVE   "190813410" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
-      *              老人性認知症疾患治療病棟入院料２の９０日以内の終日
+      *              認知症病棟入院料２の９０日以内の終日
       *              を再計算
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
                      COMPUTE  WK-TOKUTEI-DAY  =  90  - STUSAN-NISSU03
@@ -784,6 +845,65 @@
                  END-IF
                  MOVE    "99999999"    TO LNK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                (TN-IDX)
+             END-IF
+           END-IF
+      *
+      *    認知症治療病棟入院料２（平成２２年４月からの期間対応）
+           IF    LNK-PTNYUINRRK-TENNYUYMD  >=  "20100401"
+             IF  SYOKIKSN-IN-KHNSRYCD   =   "190813410"
+                 MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
+                                         LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                 MOVE   ZERO            TO  TN-IDX
+                 IF     STUSAN-NISSU03      <=  60
+                     ADD    1           TO  TN-IDX
+                     MOVE   "190813410" TO   LNK-SCNYUACCT-KAGEN-SRYCD
+                                                               (TN-IDX)
+      *              認知症治療病棟入院料２の６０日以内の終日
+      *              を再計算
+                     MOVE     ZERO      TO   WK-TOKUTEI-DAY
+                     COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
+                     MOVE   LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                                               (TN-IDX)
+                     INITIALIZE                STS-AREA-DAY
+                     INITIALIZE                LNK-DAY6-AREA
+                     MOVE    "61"              TO  LNK-DAY6-IRAI
+                     MOVE   LNK-PTNYUINRRK-TENNYUYMD
+                                               TO  LNK-DAY6-KIJUN
+                     MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                     MOVE    WK-TOKUTEI-DAY    TO  LNK-DAY6-ZOGEN
+                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                     MOVE    LNK-DAY6-KEISAN
+                                        TO LNK-SCNYUACCT-KAGEN-EDYUKYMD
+                                                               (TN-IDX)
+                 END-IF
+      *
+                 ADD    1   TO    TN-IDX
+      *
+                 MOVE   "190813510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD
+                                                               (TN-IDX)
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 IF      TN-IDX      =     2
+                     MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                     MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                     MOVE     1                TO  LNK-DAY6-ZOGEN
+                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                     MOVE    LNK-DAY6-KEISAN
+                                       TO LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                                               (TN-IDX)
+                 ELSE
+                     MOVE    LNK-PTNYUINRRK-TENNYUYMD
+                                       TO LNK-SCNYUACCT-KAGEN-STYUKYMD
+                                                               (TN-IDX)
+                 END-IF
+                 MOVE    "99999999"    TO LNK-SCNYUACCT-KAGEN-EDYUKYMD
+                                                               (TN-IDX)
+             END-IF
            END-IF
       *
       *    特定入院料で７日まで、１４日まで、それ以降は一般入院料を算定する
