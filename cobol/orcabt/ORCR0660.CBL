@@ -360,6 +360,7 @@
            03  FLG-SANTEIPLUS      PIC 9(01).
            03  FLG-SETCOM          PIC 9(01).
            03  FLG-MEISKY-OKIKAE   PIC 9(01).
+           03  FLG-KAISIEN         PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -523,6 +524,8 @@
            03  WRK-HEN-SHORI-RENNUM-J2       PIC 9(01).
            03  WRK-HEN-SEQNO-J2              PIC 9(02).
       *
+           03  WRK-KAISIEN-FSANTEIYMD        PIC X(08).
+      *
        01  WRK-RECE64-REC. 
            COPY    "CPRCF064.INC"  REPLACING   //RECE64//
                                    BY          //WRK-RECE64//.
@@ -668,6 +671,9 @@
            03  CONS-NOUKE-DUMMY     PIC X(09) VALUE "099800321".
       *    運動器リハ実施
            03  CONS-UNDOKI-DUMMY    PIC X(09) VALUE "099800331".
+      *
+      *    介護支援連携指導料
+           03  CONS-KAISIEN         PIC X(09) VALUE "113011710".
       *
       *    薬剤管理指導料テーブル（２００８年４月診療分〜）
        01  TBL-YAKUKAN-AREA.
@@ -1143,6 +1149,7 @@
                OR     ( RECE62-TEKSTYMD  NOT =   RECE64-TEKSTYMD     )
       *
                INITIALIZE    WRK-JIDO-SETCOM-AREA
+               MOVE    ZERO   TO   FLG-KAISIEN
       *
                IF   WRK-HKNCOMBI-JIDO   =   ZERO
                  IF    WRK-KOHBUNRI-JIDO   =   RECE64-KOHBUNRI
@@ -1190,6 +1197,14 @@
       *              前月薬剤管理指導料算定日のセット）
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2001-TAIIN-HANTEI-SEC
+                      END-IF
+      *            （介護支援連携指導料の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-KAISIEN-HANTEI-SEC
+                      END-IF
+      *            （集団栄養食事指導料の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SYUEIYO-HANTEI-SEC
                       END-IF
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE64-TENSOU-SEC
@@ -1279,7 +1294,26 @@
                         WHEN   "2"
                           PERFORM   2001-NYU-COMMENT-SEC
                         WHEN   "6"
-                          PERFORM   2001-KAKURI-HANTEI-SEC
+                          MOVE   ZERO   TO  FLG-COMMENT
+      *                  （精神科隔離病室管理加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-KAKURI-HANTEI-SEC
+                          END-IF
+      *                  （栄養サポートチーム加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-EISAPO-HANTEI-SEC
+                          END-IF
+      *                  （呼吸ケアチーム加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-KOKKEA-HANTEI-SEC
+                          END-IF
+      *                  （重症者加算（精神療養病棟入院料）の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-JYUSYO-HANTEI-SEC
+                          END-IF
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2099-RECE64-TENSOU-SEC
+                          END-IF
                         WHEN   OTHER
                           PERFORM   2099-RECE64-TENSOU-SEC
                       END-EVALUATE
@@ -3558,6 +3592,68 @@
            EXIT.
       *
       *****************************************************************
+      *    介護支援連携指導料があるか判定
+      *****************************************************************
+       2001-KAISIEN-HANTEI-SEC          SECTION.
+      *
+           IF     RECE64-FLG-KAISIEN-COMMENT   =    "1"
+               INITIALIZE                   SANTEI-REC
+               MOVE    RECE64-HOSPNUM   TO  SANTEI-HOSPNUM
+               MOVE    RECE64-PTID      TO  SANTEI-PTID
+               MOVE    RECE64-SRYYM     TO  SANTEI-SRYYM
+               MOVE    CONS-KAISIEN     TO  SANTEI-SRYCD
+               MOVE    ZERO             TO  SANTEI-NYUGAIKBN
+               MOVE    ZERO             TO  SANTEI-SRYKA
+               MOVE    ZERO             TO  SANTEI-HKNCOMBINUM
+               MOVE    SANTEI-REC       TO  MCPDATA-REC
+               MOVE    "tbl_santei"     TO  MCP-TABLE
+               MOVE    "key"            TO  MCP-PATHNAME
+               PERFORM   900-DBSELECT-SEC
+               IF      MCP-RC               =   ZERO
+                 MOVE    "tbl_santei"   TO  MCP-TABLE
+                 MOVE    "key"          TO  MCP-PATHNAME
+                 PERFORM  900-SANTEI-READ-SEC
+                 IF       FLG-SANTEI        =   ZERO
+                   IF   (SANTEI-FSANTEIYMD    NOT =  SPACE       )
+                   AND  (SANTEI-FSANTEIYMD(1:6)   <  RECE64-SRYYM)
+                     MOVE  1                  TO  FLG-KAISIEN
+                     MOVE  SANTEI-FSANTEIYMD  TO  WRK-KAISIEN-FSANTEIYMD
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_santei"     TO  MCP-TABLE
+               MOVE    "key"            TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
+               INITIALIZE            WRK-JIDO-SETCOM-AREA
+               MOVE      "1"      TO     WRK-JIDO-SETCOMFLG
+               MOVE      106      TO     WRK-JIDO-SETCOMATFLG
+               MOVE       3       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-KAISIEN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    集団栄養食事指導料があるか判定
+      *****************************************************************
+       2001-SYUEIYO-HANTEI-SEC          SECTION.
+      *
+           IF     RECE64-FLG-SYUEIYO-COMMENT   =    "1"
+               INITIALIZE            WRK-JIDO-SETCOM-AREA
+               MOVE      "1"      TO     WRK-JIDO-SETCOMFLG
+               MOVE       18      TO     WRK-JIDO-SETCOMATFLG
+               MOVE       3       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-SYUEIYO-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    訪問看護指示料があるか判定
       *****************************************************************
        2001-HOUSIJI-HANTEI-SEC          SECTION.
@@ -4254,6 +4350,26 @@
                 MOVE   WK-FREE-SETCOMATFLG2(IDX)
                           TO  WRK-RECE65XX-SETCOMATFLG(MAX-MEISAISU 1)
            END-PERFORM 
+      *
+           IF    FLG-KAISIEN  =  1
+              COMPUTE  MAX-MEISAISU  =   MAX-MEISAISU  +  1
+              MOVE   "810000001"
+                            TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+              MOVE   ZERO   TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+              MOVE   12     TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE   "初回算定日　　　月　　日"
+                            TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+              MOVE   WRK-KAISIEN-FSANTEIYMD(5:2)   TO  DAY-IDX2
+              MOVE   TBL-DAY(DAY-IDX2)
+                       TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(13:4)
+              MOVE   WRK-KAISIEN-FSANTEIYMD(7:2)   TO  DAY-IDX2
+              MOVE   TBL-DAY(DAY-IDX2)
+                       TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(19:4)
+              MOVE   "2"    TO  WRK-RECE65XX-MEISKYFLG(MAX-MEISAISU 1)
+              MOVE   106    TO  WRK-RECE65XX-SETCOMATFLG(MAX-MEISAISU 1)
+      *
+              MOVE   ZERO   TO  FLG-KAISIEN
+           END-IF
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
       *
@@ -5013,9 +5129,13 @@
            PERFORM    200111-SRYACTINF-HENSYU-SEC
       *
            IF     RECE64-ZAISKBKBN             =    "6"
-           AND    RECE64-FLG-KAKURI-COMMENT    =    "1"
            AND    RECE64-MEISAISU              =     1
+             IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
+             OR  (RECE64-FLG-EISAPO-COMMENT    =    "1")
+             OR  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+             OR  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
                PERFORM    20012-NYUKASAN-HENSYU-SEC
+             END-IF
            END-IF
       *
            .
@@ -5079,9 +5199,26 @@
       *
            MOVE  "810000001"  TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
            MOVE   ZERO        TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
-           MOVE   13          TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
-           MOVE  "精神科隔離室管理加算算定日"
+           IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
+             MOVE   13        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "精神科隔離室管理加算算定日"
                               TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
+             MOVE   14        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "栄養サポートチーム加算算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+             MOVE   12        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "呼吸ケアチーム加算算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+             MOVE   19        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "重症者加算（精神療養病棟入院料）算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
            MOVE  "1"          TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
       *    算定日コメントの挿入
            PERFORM  VARYING      IDX    FROM  1   BY   1
@@ -5127,10 +5264,32 @@
                COMPUTE IDX19              =  RECE64-KOHBUNRI + 1
                EVALUATE  RECE64-SRYKBN
                  WHEN      "90"
-                   COMPUTE RECE659-ZAINUM =  99999980  +  IDX19
+                   IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994000  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994005  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994010  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994015  +  IDX19
+                   END-IF
                    MOVE    "900"            TO   RECE659-SRYSYUKBN
                  WHEN      "92"
-                   COMPUTE RECE659-ZAINUM =  99999990  +  IDX19
+                   IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994050  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994055  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994060  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994065  +  IDX19
+                   END-IF
                    MOVE    "920"            TO   RECE659-SRYSYUKBN
                END-EVALUATE
                MOVE    ZERO                 TO   RECE659-ZAIREN
@@ -5173,9 +5332,31 @@
            COMPUTE IDX19                =  RECE64-KOHBUNRI + 1
            EVALUATE  RECE64-SRYKBN
              WHEN      "90"
-               COMPUTE RECE649-ZAINUM   =  99999980  +  IDX19
+               IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994000  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994005  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994010  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994015  +  IDX19
+               END-IF
              WHEN      "92"
-               COMPUTE RECE649-ZAINUM   =  99999990  +  IDX19
+               IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994050  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994055  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994060  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994065  +  IDX19
+               END-IF
            END-EVALUATE
            MOVE    ZERO                TO  RECE649-ZAIREN
            MOVE    RECE64-KOHBUNRI     TO  RECE649-KOHBUNRI
@@ -5201,13 +5382,57 @@
        2001-KAKURI-HANTEI-SEC          SECTION.
       *
            IF      RECE64-FLG-KAKURI-COMMENT    =    "1"
+               MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
-           ELSE
-               PERFORM   2099-RECE64-TENSOU-SEC
            END-IF         
       *
            .
        2001-KAKURI-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    栄養サポートチーム加算（入院料加算）のコメントがあるか判定
+      *    （診療行為入力）
+      *****************************************************************
+       2001-EISAPO-HANTEI-SEC          SECTION.
+      *
+           IF      RECE64-FLG-EISAPO-COMMENT    =    "1"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-EISAPO-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    呼吸ケアチーム加算（入院料加算）のコメントがあるか判定
+      *    （診療行為入力）
+      *****************************************************************
+       2001-KOKKEA-HANTEI-SEC          SECTION.
+      *
+           IF      RECE64-FLG-KOKKEA-COMMENT    =    "1"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-KOKKEA-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    重症者加算（精神療養病棟入院料）（入院料加算）のコメントがあるか判定
+      *    （診療行為入力）
+      *****************************************************************
+       2001-JYUSYO-HANTEI-SEC          SECTION.
+      *
+           IF      RECE64-FLG-JYUSYO-COMMENT    =    "1"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-JYUSYO-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6747,7 +6972,8 @@
                       EVALUATE   RECE651-SETCOMATFLG(IDX)
                         WHEN    1
                         WHEN    3  THRU   16
-                        WHEN  101  THRU  105
+                        WHEN   18
+                        WHEN  101  THRU  106
                           ADD  1                 TO  WRK-HEN-SEQNO-J
                           IF   WRK-HEN-SEQNO-J  >  3
                             MOVE   SPACE   TO  RECE651-MEISKYFLG(IDX)
@@ -6819,6 +7045,8 @@
                           "180028210" OR "180028310" OR "180028410" OR
                           "180032410" OR "180032510" OR "180032610" OR
                           "180032710" OR "180033110" OR
+      *18
+                          "113003410" OR
       *101
                           "113010710" OR "113010810" OR "120001610" OR
       *102
@@ -6828,7 +7056,9 @@
       *104
                           "113006270" OR
       *105
-                          "180018310"
+                          "180018310" OR
+      *106
+                          "113011710"
       *
                        MOVE   RECE651-RENNUM  TO  WRK-HEN-RENNUM-J
                        MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J
