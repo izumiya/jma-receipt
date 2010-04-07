@@ -2522,6 +2522,15 @@
            INITIALIZE                  WRK-SQL
            MOVE    1               TO  WRK-SQL-PNT
       *
+           IF    ( SPA-GMN-JOTAI   =   "3" )
+               STRING "(HOSPNUM,PTID,RRKNUM ) IN ("    DELIMITED BY SIZE
+                      "SELECT HOSPNUM,PTID,RRKNUM FROM view_I001 WHERE "
+                                                      DELIMITED BY SIZE
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           END-IF
+      *
            MOVE    ZERO                TO  FLG-JYOKEN
       *     
            STRING  "hospnum = "       DELIMITED  BY  SIZE
@@ -2702,7 +2711,6 @@
                        WITH    POINTER WRK-SQL-PNT
                END-STRING
                MOVE    1               TO  FLG-JYOKEN
-               DISPLAY "WRK-SQL=" WRK-SQL
            WHEN        "4"
                PERFORM 45011-JYOKEN-HENSYU-SEC
                STRING  "(tenstuymd <> '"    DELIMITED  BY  SIZE
@@ -2768,6 +2776,14 @@
                END-STRING
                MOVE    1                   TO  FLG-JYOKEN
            END-IF    
+      *
+           IF    ( SPA-GMN-JOTAI   =   "3" )
+               STRING  ") AND RRKEDANUM = RRKEDANUM_MAX"
+                                           DELIMITED  BY  SIZE
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           END-IF
            .
        4501-SQL-EDIT-EXT.
            EXIT.
