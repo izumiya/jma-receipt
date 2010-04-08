@@ -27,7 +27,7 @@
     <handler>set_focus</handler>
     <last_modification_time>Thu, 06 May 2004 02:58:38 GMT</last_modification_time>
   </signal>
-  <signal>
+  <signal>    
     <name>delete_event</name>
     <handler>gtk_true</handler>
     <last_modification_time>Mon, 25 Nov 2002 06:01:39 GMT</last_modification_time>

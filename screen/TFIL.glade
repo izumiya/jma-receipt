@@ -27,10 +27,10 @@
     <handler>set_focus</handler>
     <last_modification_time>Thu, 06 May 2004 02:58:38 GMT</last_modification_time>
   </signal>
-  <signal>
-    <name>destroy</name>
-    <handler>window_close</handler>
-    <last_modification_time>Thu, 06 May 2004 04:58:37 GMT</last_modification_time>
+  <signal>    
+    <name>delete_event</name>
+    <handler>gtk_true</handler>
+    <last_modification_time>Mon, 25 Nov 2002 06:01:39 GMT</last_modification_time>
   </signal>
   <title>(TFIL)クライアント保存画面</title>
   <type>GTK_WINDOW_DIALOG</type>
