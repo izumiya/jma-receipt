@@ -44,6 +44,8 @@
       *  04.04.04    NACL-ÌçÏÆ    10/03/29  ²þÀµÂÐ±þ
       *                                     ¡Ê²èÁü¿ÇÃÇ£²²óÌÜ°Ê¹ß¸º»»ÊÔ½¸¡Ë
       *                                     ¡Ê¥³¡¼¥ÉÄÉ²Ã¡Ë
+      *  04.04.05    NACL-ÌçÏÆ    10/04/08  ²þÀµÂÐ±þ
+      *                                     ¡Ê½èÃÖµ­ºÜ½çÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3023,6 +3025,16 @@
                           MOVE    31     TO  IDW3
                        END-IF
                    END-PERFORM
+                 WHEN      "40"
+                   IF   RECE200-SRYYM   >=  "201004"
+                     PERFORM   VARYING   IDW3   FROM    1   BY  1
+                                UNTIL    IDW3   >      31
+                       IF    RECE220-KAISU(1 IDW3)    NOT =   ZERO
+                          MOVE   IDW3    TO  RECE240-DAY
+                          MOVE    31     TO  IDW3
+                       END-IF
+                     END-PERFORM
+                   END-IF
                  WHEN      "50"
                  WHEN      "54"
                    MOVE   WRK-SRYSYUKBN  TO  RECE240-SRYSYUKBN

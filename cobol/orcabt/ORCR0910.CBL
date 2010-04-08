@@ -102,6 +102,8 @@
       *  04.04.06    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ
       *                                     ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
       *                                     ¡Ê£¸£°¤½¤ÎÂ¾¤Îµ­ºÜ½ç¡Ë
+      *  04.04.07    NACL-ÌçÏÆ    10/04/08  ²þÀµÂÐ±þ
+      *                                     ¡Ê½èÃÖµ­ºÜ½çÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3221,6 +3223,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                           MOVE    31     TO  IDW3
                        END-IF
                    END-PERFORM
+                 WHEN      "40"
+                   IF   RECE82-SRYYM   >=  "201004"
+                     PERFORM   VARYING   IDW3   FROM    1   BY  1
+                                UNTIL    IDW3   >      31
+                       IF    RECE84-KAISU(1 IDW3)    NOT =   ZERO
+                          MOVE   IDW3    TO  RECE86-DAY
+                          MOVE    31     TO  IDW3
+                       END-IF
+                     END-PERFORM
+                   END-IF
                  WHEN      "50"
                  WHEN      "54"
                    MOVE   WRK-SRYSYUKBN  TO  RECE86-SRYSYUKBN
