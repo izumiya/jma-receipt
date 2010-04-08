@@ -4243,8 +4243,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                 ADD        1       TO     IDZ
       *
-                MOVE       15      TO     WK-FREE-YUKOKETA2(IDZ)
-                MOVE   "前回算定日　　　年　　月　　日"
+                MOVE       13      TO     WK-FREE-YUKOKETA2(IDZ)
+                MOVE   "前回算定年月　　　年　　月"
                                    TO     WK-FREE-NAME2(IDZ)
       *
                 INITIALIZE                         STS-AREA-DAY
@@ -4261,7 +4261,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
                    IF      KANACHK-RC      =   ZERO
                       MOVE    KANACHK-OUT-INPUT(1:4)
-                                        TO  WK-FREE-NAME2(IDZ)(13:4)
+                                        TO  WK-FREE-NAME2(IDZ)(15:4)
                    END-IF
       *
                    MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
@@ -4271,17 +4271,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
                    IF      KANACHK-RC      =   ZERO
                       MOVE    KANACHK-OUT-INPUT(1:4)
-                                        TO  WK-FREE-NAME2(IDZ)(19:4)
-                   END-IF
-      *
-                   MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
-                   INITIALIZE                       ORCSKANACHKAREA
-                   MOVE    "2"                  TO  KANACHK-SYORI
-                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
-                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
-                   IF      KANACHK-RC      =   ZERO
-                      MOVE    KANACHK-OUT-INPUT(1:4)
-                                        TO  WK-FREE-NAME2(IDZ)(25:4)
+                                        TO  WK-FREE-NAME2(IDZ)(21:4)
                    END-IF
                 END-IF
       *
