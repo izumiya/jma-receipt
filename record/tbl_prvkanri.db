@@ -203,7 +203,8 @@ path	del14	{
 	DBDELETE	{
 		DELETE
 		FROM tbl_prvkanri
-                    WHERE ( TBL_KEY      =   'DAILY'   OR
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND   ( TBL_KEY      =   'DAILY'   OR
                             TBL_KEY      =   'ONLINE'     ) 
                     AND     substring(TBL_GROUP,1,6) < :SRYYM
 		;
@@ -214,7 +215,8 @@ path	del15	{
 	DBDELETE	{
 		DELETE
 		FROM tbl_prvkanri
-                    WHERE   TBL_KEY      <>   'DAILY'
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND     TBL_KEY      <>   'DAILY'
                     AND     TBL_KEY      <>   'ONLINE'
                     AND     TBL_KEY      <>   'RECEPTX'
                     AND     substring(TBL_GROUP,1,6) < :SRYYM
