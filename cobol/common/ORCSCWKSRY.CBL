@@ -103,6 +103,7 @@
       *
            03  FLG-TIME            PIC 9(01).
            03  FLG-HKN999          PIC 9(01).
+           03  FLG-HEN-CHK2        PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -478,6 +479,7 @@
                END-IF
       *
                MOVE    ZERO                TO  IDXS
+               MOVE    ZERO                TO  FLG-HEN-CHK2
                PERFORM     VARYING   IDY   FROM    IDX1   BY  1
                            UNTIL     IDY   >   5
                    MOVE    ZERO                TO  FLG-AUTO-OK
@@ -1517,6 +1519,15 @@
                MOVE    ZERO            TO  FLG-AUTO-OK
            END-IF
       *
+           IF     (SPA-SRYYMD          >=  "20100401" )
+               IF     (LNK-WKSRY-SRYCD  (IDX IDY)   =   "113701410"
+                                                    OR  "113701310" )
+                   MOVE    FLG-HEN-CHK2    TO  FLG-AUTO-OK
+               END-IF
+               IF     (LNK-WKSRY-SRYCD  (IDX IDY)   =   "120002370" )
+                   MOVE    FLG-AUTO-OK     TO  FLG-HEN-CHK2 
+               END-IF
+           END-IF
            .
        10023-AUTOCHK-EXT.
            EXIT.
