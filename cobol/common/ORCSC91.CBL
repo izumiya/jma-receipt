@@ -602,14 +602,26 @@
            END-IF
       *    薬剤情報提供料はチェック判定
            IF      WRK-CODE            =   "002"
-               IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
-                      ((WRK-CHK             =   "0")  AND
-                       (SPA-YAKJYO-1        =   2  ))   OR
-                      ((WRK-CHK             =   "1" )  AND
-                      ((SPA-YAKJYO-2        =   2 ) OR
-                       (SPA-YAKJYO-3        =   2 )) )
-                   MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
-                   MOVE    SPACE               TO  LNK-SC91-ERRCD
+               IF      SPA-SRYYMD          <   "20100401"
+                   IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
+                          ((WRK-CHK             =   "0")  AND
+                           (SPA-YAKJYO-1        =   2  ))   OR
+                          ((WRK-CHK             =   "1" )  AND
+                          ((SPA-YAKJYO-2        =   2 ) OR
+                           (SPA-YAKJYO-3        =   2 )) )
+                       MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
+                       MOVE    SPACE               TO  LNK-SC91-ERRCD
+                   END-IF
+               ELSE
+      *        H22.4　から薬情のコードは１つ
+                   IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
+                         (( WRK-CHK             =   "0" ) AND
+                          ((SPA-YAKJYO-1        =   2  ) OR
+                           (SPA-YAKJYO-2        =   2  ) OR
+                           (SPA-YAKJYO-3        =   2  )) )
+                       MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
+                       MOVE    SPACE               TO  LNK-SC91-ERRCD
+                   END-IF
                END-IF
            END-IF
       *
@@ -1127,6 +1139,14 @@
                END-IF
            END-IF
       *
+           IF      SPA-SRYYMD          >=  "20100401"
+               IF     (WRK-CODE            =   "002" )  AND
+                      (WRK-CHK             =   "1"   )
+                   MOVE    SPACE           TO  WRK-CODE
+                   MOVE    SPACE           TO  WRK-CHK
+               END-IF
+           END-IF
+      *
            .
        1001-CODECHK-EXT.
            EXIT.
@@ -1235,19 +1255,27 @@
            END-IF
       *    薬剤情報提供料はチェック判定
            IF      WRK-CODE            =   "002"
-               IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
-                      ((WRK-CHK             =   "0")  AND
-                       (SPA-YAKJYO-1        =   2  ))   OR
-                      ((WRK-CHK             =   "1" )  AND
-                      ((SPA-YAKJYO-2        =   2 ) OR
-                       (SPA-YAKJYO-3        =   2 )) )
-                   MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
-                   MOVE    SPACE               TO  LNK-SC91-ERRCD
-               END-IF
       *        H22.4　から併用算定チェックなしとする（手帳加算対象外）
-               IF     (SPA-SRYYMD          >=  "20100401" )
-                   MOVE    SPACE               TO  LNK-SC91-ERRCD2
-                   MOVE    SPACE               TO  LNK-SC91-ERRCD
+               IF      SPA-SRYYMD          <   "20100401"
+                   IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
+                          ((WRK-CHK             =   "0")  AND
+                           (SPA-YAKJYO-1        =   2  ))   OR
+                          ((WRK-CHK             =   "1" )  AND
+                          ((SPA-YAKJYO-2        =   2 ) OR
+                           (SPA-YAKJYO-3        =   2 )) )
+                       MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
+                       MOVE    SPACE               TO  LNK-SC91-ERRCD
+                   END-IF
+               ELSE
+      *        H22.4　から薬情のコードは１つ
+                   IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
+                         (( WRK-CHK             =   "0" ) AND
+                          ((SPA-YAKJYO-1        =   2  ) OR
+                           (SPA-YAKJYO-2        =   2  ) OR
+                           (SPA-YAKJYO-3        =   2  )) )
+                       MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
+                       MOVE    SPACE               TO  LNK-SC91-ERRCD
+                   END-IF
                END-IF
            END-IF
       *
