@@ -294,6 +294,7 @@
            03  FLG-COMOKIKAE2      PIC 9(01).
            03  FLG-HANTEI          PIC 9(01).
            03  FLG-KAISIEN         PIC 9(01).
+           03  FLG-PTNYUINRRK      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -438,6 +439,11 @@
            03  WRK-YAKUKAN-SRYCD     PIC X(09).
       *
            03  WRK-KAISIEN-FSANTEIYMD        PIC X(08).
+           03  WRK-KAISIEN-YMD               PIC X(08).
+           03  WRK-KAISIEN-CHECKYMD          PIC X(08).
+           03  WRK-KAISIEN-RRKNUM            PIC 9(03).
+           03  WRK-KAISIEN-RRKNUM-X          PIC 9(03).
+           03  WRK-KAISIEN-RRKNUM-Y          PIC 9(03).
       *
        01  WRK-RECE84-REC. 
            COPY    "CPRCF084.INC"  REPLACING   //RECE84//
@@ -676,6 +682,10 @@
       *
       *    ¿ÇÎÅ²ÊÌÜ¾ðÊó
            COPY    "CPSK1005.INC".
+      *
+      *    Æþ±¡ÍúÎò
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -2995,24 +3005,78 @@ grpsys       PERFORM 900-DBSELECT-SEC
        2001-KAISIEN-HANTEI-SEC          SECTION.
       *
            IF     RECE84-FLG-KAISIEN-COMMENT   =    "1"
-               INITIALIZE                       SANTEI-REC
-               MOVE    RECE84-HOSPNUM       TO  SANTEI-HOSPNUM
-               MOVE    RECE84-PTID          TO  SANTEI-PTID
-               MOVE    RECE84-SRYYM         TO  SANTEI-SRYYM
-               MOVE    CONS-KAISIEN         TO  SANTEI-SRYCD
-               MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
-               MOVE    ZERO                 TO  SANTEI-SRYKA
-               MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
-               MOVE    SANTEI-REC           TO  MCPDATA-REC
-               MOVE    "tbl_santei"         TO  WRK-MCP-TABLE
-               MOVE    "key"                TO  WRK-MCP-PATHNAME
-               PERFORM  900-SANTEI-INV-SEC
-               IF       FLG-SANTEI        =   ZERO
-                 IF   (SANTEI-FSANTEIYMD    NOT =  SPACE       )
-                 AND  (SANTEI-FSANTEIYMD(1:6)   <  RECE84-SRYYM)
-                   MOVE  1                  TO  FLG-KAISIEN
-                   MOVE  SANTEI-FSANTEIYMD  TO  WRK-KAISIEN-FSANTEIYMD
-                 END-IF
+               MOVE    ZERO                TO  FLG-KAISIEN
+               MOVE    SPACE               TO  WRK-KAISIEN-FSANTEIYMD
+               INITIALIZE                      SANTEI-REC
+               MOVE    RECE82-HOSPNUM      TO  SANTEI-HOSPNUM
+               MOVE    RECE82-PTID         TO  SANTEI-PTID
+               MOVE    CONS-KAISIEN        TO  SANTEI-SRYCD
+               MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+               MOVE    ZERO                TO  SANTEI-SRYKA
+               MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+               MOVE    SANTEI-REC          TO  MCPDATA-REC
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM   900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                 MOVE    "tbl_santei"      TO  MCP-TABLE
+                 MOVE    "key3"            TO  MCP-PATHNAME
+                 PERFORM  900-SANTEI-READ-SEC
+                 PERFORM   UNTIL  ( FLG-SANTEI   =  1 )
+                            OR    ( FLG-KAISIEN  =  1 )
+                   IF   SANTEI-SRYYM  <  RECE84-SRYYM
+                     PERFORM  VARYING   IDX3   FROM  31  BY  -1
+                               UNTIL  ( IDX3        <   1 )
+                                OR    ( FLG-KAISIEN =   1 )
+                       IF   SANTEI-DAY(IDX3)  NOT =  ZERO
+                         MOVE    1    TO  FLG-KAISIEN
+                         MOVE   SANTEI-SRYYM
+                                      TO  WRK-KAISIEN-FSANTEIYMD(1:6)
+                         MOVE   IDX3  TO  WRK-KAISIEN-FSANTEIYMD(7:2)
+                       END-IF
+                     END-PERFORM
+                   END-IF
+                   MOVE    "tbl_santei"    TO  MCP-TABLE
+                   MOVE    "key3"          TO  MCP-PATHNAME
+                   PERFORM  900-SANTEI-READ-SEC
+                 END-PERFORM
+               END-IF
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM  900-CLOSE-SEC
+      *
+               IF   FLG-KAISIEN  =   1
+      *           ºÞ¤ÎºÇ½é¤ÎÆü¸¡º÷
+                  MOVE       SPACE         TO  WRK-KAISIEN-YMD
+                  PERFORM  VARYING   IDX3   FROM  1  BY  1
+                            UNTIL    IDX3  >   31
+                    IF   RECE84-KAISU(1 IDX3)  NOT =  ZERO
+                       MOVE  RECE84-SRYYM  TO  WRK-KAISIEN-YMD(1:6)
+                       MOVE  IDX3          TO  WRK-KAISIEN-YMD(7:2)
+                       MOVE  31            TO  IDX3
+                    END-IF
+                  END-PERFORM
+      *
+                  IF   WRK-KAISIEN-YMD   NOT =  SPACE
+                    MOVE  WRK-KAISIEN-YMD     TO  WRK-KAISIEN-CHECKYMD
+                    PERFORM  2001-KAISIEN-PTNYUINRRK-CHECK-SEC
+                    MOVE  WRK-KAISIEN-RRKNUM  TO  WRK-KAISIEN-RRKNUM-X
+      *
+                    MOVE  WRK-KAISIEN-FSANTEIYMD
+                                              TO  WRK-KAISIEN-CHECKYMD
+                    PERFORM  2001-KAISIEN-PTNYUINRRK-CHECK-SEC
+                    MOVE  WRK-KAISIEN-RRKNUM  TO  WRK-KAISIEN-RRKNUM-Y
+      *
+                    IF  (WRK-KAISIEN-RRKNUM-X  NOT = ZERO           )
+                    AND (WRK-KAISIEN-RRKNUM-Y  NOT = ZERO           )
+                    AND (WRK-KAISIEN-RRKNUM-X = WRK-KAISIEN-RRKNUM-Y)
+                       CONTINUE
+                    ELSE
+                       MOVE   ZERO   TO   FLG-KAISIEN
+                    END-IF
+                  ELSE
+                       MOVE   ZERO   TO   FLG-KAISIEN
+                  END-IF
                END-IF
       *
                MOVE       3       TO     FLG-COMMENT
@@ -3021,6 +3085,37 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        2001-KAISIEN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Æþ±¡ÍúÎò¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2001-KAISIEN-PTNYUINRRK-CHECK-SEC          SECTION.
+      *
+           MOVE    ZERO                  TO  WRK-KAISIEN-RRKNUM
+           INITIALIZE                        PTNYUINRRK-REC
+           MOVE    RECE82-HOSPNUM        TO  PTNYUINRRK-HOSPNUM
+           MOVE    RECE82-PTID           TO  PTNYUINRRK-PTID
+           MOVE    WRK-KAISIEN-CHECKYMD  TO  PTNYUINRRK-NYUINYMD
+           MOVE    WRK-KAISIEN-CHECKYMD  TO  PTNYUINRRK-TAIINYMD
+           MOVE    PTNYUINRRK-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"      TO  MCP-TABLE
+           MOVE    "key11"               TO  MCP-PATHNAME
+           PERFORM  900-DBSELECT-SEC
+           IF      MCP-RC   =   ZERO
+             MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+             MOVE    "key11"             TO  MCP-PATHNAME
+             PERFORM  900-PTNYUINRRK-READ-SEC
+             IF    FLG-PTNYUINRRK  =  ZERO
+                MOVE  PTNYUINRRK-RRKNUM  TO  WRK-KAISIEN-RRKNUM
+             END-IF
+           END-IF
+           MOVE    "tbl_ptnyuinrrk"      TO  MCP-TABLE
+           MOVE    "key11"               TO  MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+           .
+       2001-KAISIEN-PTNYUINRRK-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3073,8 +3168,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
       *      »»ÄêÍúÎò¸¡º÷
              INITIALIZE                  SANTEI-REC
-             MOVE    RECE84-HOSPNUM      TO  SANTEI-HOSPNUM
-             MOVE    RECE84-PTID         TO  SANTEI-PTID
+             MOVE    RECE82-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE82-PTID         TO  SANTEI-PTID
              MOVE    CONS-TOSEKI         TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
@@ -5878,6 +5973,24 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        900-SANTEI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Æþ±¡ÍúÎò¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       900-PTNYUINRRK-READ-SEC         SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PTNYUINRRK-REC
+               MOVE    ZERO                TO  FLG-PTNYUINRRK
+           ELSE
+               INITIALIZE                      PTNYUINRRK-REC
+               MOVE    1                   TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       900-PTNYUINRRK-READ-EXT.
            EXIT.
       *
       *****************************************************************

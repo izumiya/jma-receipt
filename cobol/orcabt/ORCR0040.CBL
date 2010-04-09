@@ -3746,8 +3746,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
       *      »»ÄêÍúÎò¸¡º÷
              INITIALIZE                  SANTEI-REC
-grpsys       MOVE    RECE04-HOSPNUM      TO  SANTEI-HOSPNUM
-             MOVE    RECE04-PTID         TO  SANTEI-PTID
+grpsys       MOVE    RECE02-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE02-PTID         TO  SANTEI-PTID
              MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
@@ -3992,8 +3992,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
              MOVE    ZERO                TO  FLG-SINPESU-COMMENT
              MOVE    SPACE               TO  WRK-SINPESU-YMD
              INITIALIZE                      SANTEI-REC
-             MOVE    RECE04-HOSPNUM      TO  SANTEI-HOSPNUM
-             MOVE    RECE04-PTID         TO  SANTEI-PTID
+             MOVE    RECE02-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE02-PTID         TO  SANTEI-PTID
              MOVE    CONS-SINPESU        TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
@@ -4147,8 +4147,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
       *      »»ÄêÍúÎò¸¡º÷
              INITIALIZE                  SANTEI-REC
-grpsys       MOVE    RECE04-HOSPNUM      TO  SANTEI-HOSPNUM
-             MOVE    RECE04-PTID         TO  SANTEI-PTID
+grpsys       MOVE    RECE02-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE02-PTID         TO  SANTEI-PTID
              MOVE    CONS-TOSEKI         TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
