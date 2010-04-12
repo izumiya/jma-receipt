@@ -553,6 +553,10 @@
                  06  TBL-RYOCOM-ADL-SRYCD      PIC  X(09).
                  06  TBL-RYOCOM-ADL-TEN        PIC  9(02).
                  06  TBL-RYOCOM-ADL-TEN-MOJI   PIC  X(04).
+                 06  TBL-RYOCOM-INF4           OCCURS   4.
+                   07  TBL-RYOCOM-ADL-SRYCD-H22      PIC  X(09).
+                   07  TBL-RYOCOM-ADL-TEN-H22        PIC  9(02).
+                   07  TBL-RYOCOM-ADL-TEN-MOJI-H22   PIC  X(04).
       *
       *    ÎÅÍÜ¥ì¥»¥³¥á¥ó¥È¾ðÊó¡Ê³ºÅöÊ¬¤Î¤Þ¤È¤á¡Ë
        01  TBL-RYOCOM2-INF.
@@ -565,6 +569,10 @@
                  06  TBL-RYOCOM2-ADL-SRYCD     PIC  X(09).
                  06  TBL-RYOCOM2-ADL-TEN       PIC  9(02).
                  06  TBL-RYOCOM2-ADL-TEN-MOJI  PIC  X(04).
+                 06  TBL-RYOCOM2-INF4          OCCURS   4.
+                   07  TBL-RYOCOM2-ADL-SRYCD-H22     PIC  X(09).
+                   07  TBL-RYOCOM2-ADL-TEN-H22       PIC  9(02).
+                   07  TBL-RYOCOM2-ADL-TEN-MOJI-H22  PIC  X(04).
                05  TBL-RYOCOM2-INF4            OCCURS  31.
                  06  TBL-RYOCOM2-DAY           PIC  9(01).
       *
@@ -1059,6 +1067,15 @@
                                  TO  TBL-RYOCOM-ADL-TEN(RYO-IDX)
                  MOVE  LNK-RYOCOM-ADL-TEN-MOJI(RYO-IDX)
                                  TO  TBL-RYOCOM-ADL-TEN-MOJI(RYO-IDX)
+                 PERFORM  VARYING  RYO-IDX2  FROM  1  BY  1
+                           UNTIL   RYO-IDX2   >    4
+                   MOVE  LNK-RYOCOM-ADL-SRYCD-H22(RYO-IDX RYO-IDX2)
+                      TO  TBL-RYOCOM-ADL-SRYCD-H22(RYO-IDX RYO-IDX2)
+                   MOVE  LNK-RYOCOM-ADL-TEN-H22(RYO-IDX RYO-IDX2)
+                      TO  TBL-RYOCOM-ADL-TEN-H22(RYO-IDX RYO-IDX2)
+                   MOVE  LNK-RYOCOM-ADL-TEN-MOJI-H22(RYO-IDX RYO-IDX2)
+                      TO  TBL-RYOCOM-ADL-TEN-MOJI-H22(RYO-IDX RYO-IDX2)
+                 END-PERFORM
                END-PERFORM
              END-IF
            END-IF
@@ -4555,6 +4572,23 @@
                              OR    (TBL-RYOCOM2-MEISAISU(RYO-IDX3)
                                                = ZERO)
                              OR    (FLG-ARI    =    1)
+                   IF   RECE200-SRYYM  >=  "201004"
+                     IF  (TBL-RYOCOM2-MEISAISU  (RYO-IDX3) =
+                                    TBL-RYOCOM-MEISAISU  (RYO-IDX))
+                     AND (TBL-RYOCOM2-SRYCDTOTAL(RYO-IDX3) =
+                                    TBL-RYOCOM-SRYCDTOTAL(RYO-IDX))
+                     AND (TBL-RYOCOM2-ADL-TEN-H22(RYO-IDX3 1) =
+                                 TBL-RYOCOM-ADL-TEN-H22(RYO-IDX 1))
+                     AND (TBL-RYOCOM2-ADL-TEN-H22(RYO-IDX3 2) =
+                                 TBL-RYOCOM-ADL-TEN-H22(RYO-IDX 2))
+                     AND (TBL-RYOCOM2-ADL-TEN-H22(RYO-IDX3 3) =
+                                 TBL-RYOCOM-ADL-TEN-H22(RYO-IDX 3))
+                     AND (TBL-RYOCOM2-ADL-TEN-H22(RYO-IDX3 4) =
+                                 TBL-RYOCOM-ADL-TEN-H22(RYO-IDX 4))
+                        MOVE   1   TO  TBL-RYOCOM2-DAY(RYO-IDX3 RYO-IDX)
+                        MOVE   1   TO  FLG-ARI
+                     END-IF
+                   ELSE
                      IF  (TBL-RYOCOM2-MEISAISU  (RYO-IDX3) =
                                     TBL-RYOCOM-MEISAISU  (RYO-IDX))
                      AND (TBL-RYOCOM2-SRYCDTOTAL(RYO-IDX3) =
@@ -4564,6 +4598,7 @@
                         MOVE   1   TO  TBL-RYOCOM2-DAY(RYO-IDX3 RYO-IDX)
                         MOVE   1   TO  FLG-ARI
                      END-IF
+                   END-IF
                   END-PERFORM
                   IF  FLG-ARI  =  ZERO
                      MOVE  TBL-RYOCOM-AREA(RYO-IDX)
@@ -4580,11 +4615,169 @@
            IF  FLG-RYOCOM2   =   ZERO
               PERFORM   2599-RECE2209-TENSOU-SEC
            ELSE
+            IF   RECE200-SRYYM  >=  "201004"
+              PERFORM   25021-RYOCOM-HENSYU-H22-SEC
+            ELSE
               PERFORM   25021-RYOCOM-HENSYU-SEC
+            END-IF
            END-IF
       *
            .
        2502-RYOCOM-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÎÅÍÜÉÂÅï¥³¥á¥ó¥ÈÊÔ½¸¡ÊÊ¿À®£²£²Ç¯£´·î¿ÇÎÅ¡Á¡Ë
+      *****************************************************************
+       25021-RYOCOM-HENSYU-H22-SEC          SECTION.
+      *
+           PERFORM  250111-RECE2309-TAIHI-SEC
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    ZERO                 TO  IDX-RECE230
+           MOVE    SPACE                TO  WRK-RECE230XX2-REC
+           INITIALIZE                       WRK-RECE230XX2-REC
+      *
+           MOVE    RECE2209-MEISAISU    TO  MAX-MEISAISU
+      *
+      *
+           PERFORM  VARYING  RYO-IDX3  FROM  1  BY  1
+                     UNTIL  (RYO-IDX3   >   31                    )
+                      OR    (TBL-RYOCOM2-MEISAISU(RYO-IDX3) = ZERO)
+      *
+              INITIALIZE                TBL-NYU-DAY
+      *
+              MOVE    ZERO          TO  DAY-IDX
+              MOVE    ZERO          TO  FLG-NYU-RENZOKU
+      *
+              PERFORM    VARYING    IDX  FROM   1   BY   1
+                          UNTIL    (IDX      >   31)  OR
+                                   (DAY-IDX  >   31)
+                IF    TBL-RYOCOM2-DAY(RYO-IDX3 IDX)   =  ZERO
+                      MOVE  ZERO  TO  FLG-NYU-RENZOKU
+                ELSE
+                      IF    FLG-NYU-RENZOKU  =  ZERO
+                         ADD   1     TO  DAY-IDX
+                         MOVE  IDX   TO  TBL-NYU-DAY-ST(DAY-IDX)
+                      END-IF
+                      MOVE  IDX      TO  TBL-NYU-DAY-ED(DAY-IDX)
+                      MOVE  1        TO  FLG-NYU-RENZOKU
+                END-IF
+              END-PERFORM
+      *
+      ***     PERFORM  VARYING  DAY-IDX  FROM   1   BY   1
+      ***               UNTIL  (DAY-IDX                  >   31)
+      ***                OR    (TBL-NYU-DAY-ST(DAY-IDX)  = ZERO)
+      ***       IF    TBL-NYU-DAY-ST(DAY-IDX) 
+      ***                           =   TBL-NYU-DAY-ED(DAY-IDX)
+      ***             MOVE  "840000059"
+      ***                           TO  TBL-NYU-DAY-CD(DAY-IDX)
+      ***       ELSE
+      ***             MOVE  "810000001"
+      ***                           TO  TBL-NYU-DAY-CD(DAY-IDX)
+      ***       END-IF
+      ***     END-PERFORM
+      *
+      *       »»ÄêÆü¥³¥á¥ó¥È¤ÎÁÞÆþ
+              PERFORM  VARYING   IDX    FROM  1   BY   1
+                        UNTIL   (IDX                  >    31)
+                         OR     (TBL-NYU-DAY-ST(IDX)  =  ZERO)
+               COMPUTE  MAX-MEISAISU   =   MAX-MEISAISU  +  1
+               IF  MAX-MEISAISU <= 300
+                 MOVE  "810000001"
+                             TO  WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
+                 MOVE   ZERO TO  WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
+      ***        IF    TBL-NYU-DAY-CD(IDX)  =  "840000059"
+      ***          MOVE   16 TO  WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+      ***          MOVE   "ÎÅÍÜÉÂÅïÆþ±¡´ü´Ö¡¡¡¡¡¡Æü¡Á¡¡¡¡Æü"
+      ***                  TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+      ***          MOVE   TBL-NYU-DAY-ST(IDX) TO  DAY-IDX2
+      ***          MOVE   TBL-DAY(DAY-IDX2)
+      ***                  TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(19:4)
+      ***          MOVE   TBL-NYU-DAY-ED(IDX) TO  DAY-IDX2
+      ***          MOVE   TBL-DAY(DAY-IDX2)
+      ***                  TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(27:4)
+      ***        ELSE
+                   MOVE   16 TO  WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+                   MOVE   "ÎÅÍÜÉÂÅïÆþ±¡´ü´Ö¡¡¡¡¡¡Æü¡Á¡¡¡¡Æü"
+                           TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+                   MOVE   TBL-NYU-DAY-ST(IDX) TO  DAY-IDX2
+                   MOVE   TBL-DAY(DAY-IDX2)
+                           TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(19:4)
+                   MOVE   TBL-NYU-DAY-ED(IDX) TO  DAY-IDX2
+                   MOVE   TBL-DAY(DAY-IDX2)
+                           TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(27:4)
+      ***        END-IF
+               END-IF
+              END-PERFORM
+      *
+              PERFORM  VARYING  IDX  FROM   1   BY   1
+                  UNTIL  (IDX                                  >  30  )
+                   OR    (TBL-RYOCOM2-IRYO-SRYCD(RYO-IDX3 IDX) = SPACE)
+      *
+               COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               IF  MAX-MEISAISU <= 300
+                   MOVE "810000001"
+                              TO WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
+                   MOVE  ZERO TO WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
+                   MOVE  4    TO WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+                   PERFORM       250212-RYOCOM-NAME-HENSYU-SEC
+               END-IF
+      *
+              END-PERFORM
+      *
+              PERFORM  VARYING  IDX  FROM   1   BY   1
+                UNTIL (IDX   >   4)
+      *
+                IF  TBL-RYOCOM2-ADL-SRYCD-H22(RYO-IDX3 IDX) NOT = SPACE
+                  COMPUTE  MAX-MEISAISU  =  MAX-MEISAISU  +  1
+                  IF  MAX-MEISAISU <= 300
+                    MOVE   "810000001"
+                             TO WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
+                    MOVE   ZERO
+                             TO WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
+                    EVALUATE  IDX
+                      WHEN     1
+                        MOVE 17
+                           TO WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+                        MOVE "£Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡¡¡¡¡ÅÀ"
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+                        MOVE TBL-RYOCOM2-ADL-TEN-MOJI-H22(RYO-IDX3 IDX)
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(29:4)
+                      WHEN     2
+                        MOVE 11
+                           TO WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+                        MOVE "£Á£Ä£Ì£â¡¡°Ü¾è¡¡¡¡¡¡ÅÀ"
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+                        MOVE TBL-RYOCOM2-ADL-TEN-MOJI-H22(RYO-IDX3 IDX)
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(17:4)
+                      WHEN     3
+                        MOVE 11
+                           TO WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+                        MOVE "£Á£Ä£Ì£ã¡¡¿©»ö¡¡¡¡¡¡ÅÀ"
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+                        MOVE TBL-RYOCOM2-ADL-TEN-MOJI-H22(RYO-IDX3 IDX)
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(17:4)
+                      WHEN     4
+                        MOVE 15
+                           TO WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
+                        MOVE "£Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡¡¡¡¡ÅÀ"
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+                        MOVE TBL-RYOCOM2-ADL-TEN-MOJI-H22(RYO-IDX3 IDX)
+                           TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)(25:4)
+                    END-EVALUATE
+                  END-IF
+                END-IF
+      *
+              END-PERFORM
+      *
+           END-PERFORM
+      *
+      *
+           PERFORM    250211-SRYACTINF3-HENSYU-SEC
+      *
+           .
+       25021-RYOCOM-HENSYU-H22-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4686,156 +4879,7 @@
                               TO WRK-RECE230XX2-SRYCD(MAX-MEISAISU 1)
                    MOVE  ZERO TO WRK-RECE230XX2-SRYSURYO(MAX-MEISAISU 1)
                    MOVE  4    TO WRK-RECE230XX2-YUKOKETA(MAX-MEISAISU 1)
-                   EVALUATE  TBL-RYOCOM2-IRYO-SRYCD(RYO-IDX3 IDX)
-                     WHEN      "820000057"
-                     WHEN      "820000096"
-                       MOVE "¡Ö£°£±¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000058"
-                     WHEN      "820000097"
-                       MOVE "¡Ö£°£²¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000059"
-                     WHEN      "820000098"
-                       MOVE "¡Ö£°£³¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000060"
-                     WHEN      "820000099"
-                       MOVE "¡Ö£°£´¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000061"
-                     WHEN      "820000100"
-                       MOVE "¡Ö£°£µ¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000062"
-                     WHEN      "820000101"
-                       MOVE "¡Ö£°£¶¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000063"
-                     WHEN      "820000102"
-                       MOVE "¡Ö£°£·¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000064"
-                     WHEN      "820000103"
-                       MOVE "¡Ö£°£¸¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000065"
-                     WHEN      "820000104"
-                       MOVE "¡Ö£°£¹¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000066"
-                     WHEN      "820000105"
-                       MOVE "¡Ö£±£°¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000067"
-                     WHEN      "820000106"
-                       MOVE "¡Ö£±£±¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000068"
-                     WHEN      "820000107"
-                       MOVE "¡Ö£±£²¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000069"
-                     WHEN      "820000108"
-                       MOVE "¡Ö£±£³¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000070"
-                     WHEN      "820000109"
-                       MOVE "¡Ö£±£´¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000071"
-                     WHEN      "820000110"
-                       MOVE "¡Ö£±£µ¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000072"
-                     WHEN      "820000111"
-                       MOVE "¡Ö£±£¶¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000073"
-                     WHEN      "820000112"
-                       MOVE "¡Ö£±£·¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000074"
-                     WHEN      "820000113"
-                       MOVE "¡Ö£±£¸¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000075"
-                     WHEN      "820000114"
-                       MOVE "¡Ö£±£¹¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000076"
-                     WHEN      "820000115"
-                       MOVE "¡Ö£²£°¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000077"
-                     WHEN      "820000116"
-                       MOVE "¡Ö£²£±¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000078"
-                     WHEN      "820000117"
-                       MOVE "¡Ö£²£²¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000079"
-                     WHEN      "820000118"
-                       MOVE "¡Ö£²£³¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000080"
-                     WHEN      "820000119"
-                       MOVE "¡Ö£²£´¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000081"
-                     WHEN      "820000120"
-                       MOVE "¡Ö£²£µ¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000082"
-                     WHEN      "820000121"
-                       MOVE "¡Ö£²£¶¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000083"
-                     WHEN      "820000122"
-                       MOVE "¡Ö£²£·¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000084"
-                     WHEN      "820000123"
-                       MOVE "¡Ö£²£¸¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000085"
-                     WHEN      "820000124"
-                       MOVE "¡Ö£²£¹¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000086"
-                     WHEN      "820000125"
-                       MOVE "¡Ö£³£°¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000087"
-                     WHEN      "820000126"
-                       MOVE "¡Ö£³£±¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000088"
-                     WHEN      "820000127"
-                       MOVE "¡Ö£³£²¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000089"
-                     WHEN      "820000128"
-                       MOVE "¡Ö£³£³¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000090"
-                     WHEN      "820000129"
-                       MOVE "¡Ö£³£´¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000091"
-                     WHEN      "820000130"
-                       MOVE "¡Ö£³£µ¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000092"
-                     WHEN      "820000131"
-                       MOVE "¡Ö£³£¶¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                     WHEN      "820000093"
-                     WHEN      "820000132"
-                       MOVE "¡Ö£³£·¡×"
-                              TO WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
-                   END-EVALUATE
+                   PERFORM       250212-RYOCOM-NAME-HENSYU-SEC
                END-IF
       *
               END-PERFORM
@@ -4932,6 +4976,172 @@
       *
            .
        250211-SRYACTINF3-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÎÅÍÜÉÂÅï¥³¥á¥ó¥ÈÌ¾¾ÎÊÔ½¸
+      *****************************************************************
+       250212-RYOCOM-NAME-HENSYU-SEC     SECTION.
+      *
+           EVALUATE  TBL-RYOCOM2-IRYO-SRYCD(RYO-IDX3 IDX)
+             WHEN      "820000057"
+             WHEN      "820000096"
+                MOVE "¡Ö£°£±¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000058"
+             WHEN      "820000097"
+                MOVE "¡Ö£°£²¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000059"
+             WHEN      "820000098"
+                MOVE "¡Ö£°£³¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000060"
+             WHEN      "820000099"
+                MOVE "¡Ö£°£´¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000061"
+             WHEN      "820000100"
+                MOVE "¡Ö£°£µ¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000062"
+             WHEN      "820000101"
+                MOVE "¡Ö£°£¶¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000063"
+             WHEN      "820000102"
+                MOVE "¡Ö£°£·¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000064"
+             WHEN      "820000103"
+                MOVE "¡Ö£°£¸¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000065"
+             WHEN      "820000104"
+                MOVE "¡Ö£°£¹¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000066"
+             WHEN      "820000105"
+                MOVE "¡Ö£±£°¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000067"
+             WHEN      "820000106"
+                MOVE "¡Ö£±£±¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000068"
+             WHEN      "820000107"
+                MOVE "¡Ö£±£²¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000069"
+             WHEN      "820000108"
+                MOVE "¡Ö£±£³¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000070"
+             WHEN      "820000109"
+                MOVE "¡Ö£±£´¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000071"
+             WHEN      "820000110"
+                MOVE "¡Ö£±£µ¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000072"
+             WHEN      "820000111"
+                MOVE "¡Ö£±£¶¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000073"
+             WHEN      "820000112"
+                MOVE "¡Ö£±£·¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000074"
+             WHEN      "820000113"
+                MOVE "¡Ö£±£¸¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000075"
+             WHEN      "820000114"
+                MOVE "¡Ö£±£¹¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000076"
+             WHEN      "820000115"
+                MOVE "¡Ö£²£°¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000077"
+             WHEN      "820000116"
+                MOVE "¡Ö£²£±¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000078"
+             WHEN      "820000117"
+                MOVE "¡Ö£²£²¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000079"
+             WHEN      "820000118"
+                MOVE "¡Ö£²£³¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000080"
+             WHEN      "820000119"
+                MOVE "¡Ö£²£´¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000081"
+             WHEN      "820000120"
+                MOVE "¡Ö£²£µ¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000082"
+             WHEN      "820000121"
+                MOVE "¡Ö£²£¶¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000083"
+             WHEN      "820000122"
+                MOVE "¡Ö£²£·¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000084"
+             WHEN      "820000123"
+                MOVE "¡Ö£²£¸¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000085"
+             WHEN      "820000124"
+                MOVE "¡Ö£²£¹¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000086"
+             WHEN      "820000125"
+                MOVE "¡Ö£³£°¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000087"
+             WHEN      "820000126"
+                MOVE "¡Ö£³£±¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000088"
+             WHEN      "820000127"
+                MOVE "¡Ö£³£²¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000089"
+             WHEN      "820000128"
+                MOVE "¡Ö£³£³¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000090"
+             WHEN      "820000129"
+                MOVE "¡Ö£³£´¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000091"
+             WHEN      "820000130"
+                MOVE "¡Ö£³£µ¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000092"
+             WHEN      "820000131"
+                MOVE "¡Ö£³£¶¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000093"
+             WHEN      "820000132"
+                MOVE "¡Ö£³£·¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000158"
+                MOVE "¡Ö£¹£±¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000159"
+                MOVE "¡Ö£¹£²¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+           END-EVALUATE
+      *
+           .
+       250212-RYOCOM-NAME-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

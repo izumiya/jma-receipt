@@ -458,6 +458,9 @@
       *                                     （コード追加）
       *  04.04.46    NACL-門脇    10/04/06  改正対応
       *                                     （コメント自動記載）
+      *  04.04.47    NACL-門脇    10/04/09  広島県地方公費対応
+      *                                     社保分保険欄一部負担金記載
+      *                                     一律一般の金額で記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8818,6 +8821,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  34                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE02-SRYYM      >= "201004"                 ) AND
+                (IDZ                =  1                       ))
                  IF  FLG-TOKU75 = 1 OR 2
                      MOVE    6000      TO   WRK-KINGAKU
                  ELSE
@@ -8876,6 +8884,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27          ) AND
                 (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  34                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE02-SRYYM      >= "201004"                 ) AND
                 (IDZ                =  1                       ))
            OR  ((SYS-1001-PREFNUM   =  33                      ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
