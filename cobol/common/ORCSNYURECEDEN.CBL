@@ -263,6 +263,9 @@
                    07  WRK-IRYOADL-ADL-SRYCD    PIC X(09).
                    07  WRK-IRYOADL-TEN          PIC 9(07).
                    07  WRK-IRYOADL-TEN-MOJI     PIC X(04).
+                   07  WRK-IRYOADL-ADL-SRYCD-H22 PIC X(09) OCCURS 4.
+                   07  WRK-IRYOADL-TEN-H22      PIC 9(07)  OCCURS 4.
+                   07  WRK-IRYOADL-TEN-MOJI-H22 PIC X(04)  OCCURS 4.
                    07  WRK-IRYOADL-GAITOU-TBL.
                      09  WRK-IRYOADL-GAITOU-KBN   PIC 9(01)  OCCURS 31.
       *
@@ -606,7 +609,6 @@
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
-           DISPLAY "=== ORCSNYURECEDEN START  ==="
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
@@ -2303,12 +2305,39 @@
                      END-PERFORM
                      MOVE   LNK-RYOCOM-SRYCDTOTAL2(IDX1)
                                    TO  WRK-IRYOADL-SRYCDTOTAL(IDX1)
-                     MOVE   LNK-RYOCOM-ADL-SRYCD(IDX1)
-                                   TO  WRK-IRYOADL-ADL-SRYCD(IDX1)
-                     MOVE   LNK-RYOCOM-ADL-TEN(IDX1)
-                                   TO  WRK-IRYOADL-TEN(IDX1)
-                     MOVE   LNK-RYOCOM-ADL-TEN-MOJI(IDX1)
-                                   TO  WRK-IRYOADL-TEN-MOJI(IDX1)
+                     IF     LNK-NYURECEDEN-SANTEIYM   <=  "201003"
+                         MOVE   LNK-RYOCOM-ADL-SRYCD(IDX1)
+                                       TO  WRK-IRYOADL-ADL-SRYCD(IDX1)
+                         MOVE   LNK-RYOCOM-ADL-TEN(IDX1)
+                                       TO  WRK-IRYOADL-TEN(IDX1)
+                         MOVE   LNK-RYOCOM-ADL-TEN-MOJI(IDX1)
+                                       TO  WRK-IRYOADL-TEN-MOJI(IDX1)
+                     ELSE
+                         MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX1 1)
+                                   TO  WRK-IRYOADL-ADL-SRYCD-H22(IDX1 1)
+                         MOVE   LNK-RYOCOM-ADL-TEN-H22(IDX1 1)
+                                   TO  WRK-IRYOADL-TEN-H22(IDX1 1)
+                         MOVE   LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX1 1)
+                                   TO  WRK-IRYOADL-TEN-MOJI-H22(IDX1 1)
+                         MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX1 2)
+                                   TO  WRK-IRYOADL-ADL-SRYCD-H22(IDX1 2)
+                         MOVE   LNK-RYOCOM-ADL-TEN-H22(IDX1 2)
+                                   TO  WRK-IRYOADL-TEN-H22(IDX1 2)
+                         MOVE   LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX1 2)
+                                   TO  WRK-IRYOADL-TEN-MOJI-H22(IDX1 2)
+                         MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX1 3)
+                                   TO  WRK-IRYOADL-ADL-SRYCD-H22(IDX1 3)
+                         MOVE   LNK-RYOCOM-ADL-TEN-H22(IDX1 3)
+                                   TO  WRK-IRYOADL-TEN-H22(IDX1 3)
+                         MOVE   LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX1 3)
+                                   TO  WRK-IRYOADL-TEN-MOJI-H22(IDX1 3)
+                         MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX1 4)
+                                   TO  WRK-IRYOADL-ADL-SRYCD-H22(IDX1 4)
+                         MOVE   LNK-RYOCOM-ADL-TEN-H22(IDX1 4)
+                                   TO  WRK-IRYOADL-TEN-H22(IDX1 4)
+                         MOVE   LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX1 4)
+                                   TO  WRK-IRYOADL-TEN-MOJI-H22(IDX1 4)
+                     END-IF
                  END-IF
              END-PERFORM
       *
@@ -2322,6 +2351,7 @@
                    COMPUTE    IDX2      =   IDX1    +   1
                    PERFORM    VARYING    IDX3   FROM   IDX2  BY  1
                               UNTIL      IDX3   >   31
+                     IF    LNK-NYURECEDEN-SANTEIYM   <=   "201003"
                        IF    (WRK-IRYOADL-DAY(IDX3)  =
                                          WRK-IRYOADL-DAY(IDX1)) AND
                              (WRK-IRYOADL-MEISAISU(IDX3)  =
@@ -2334,6 +2364,26 @@
                                        WRK-IRYOADL-GAITOU-KBN(IDX1 IDX3)
                              INITIALIZE   WRK-IRYOADL-SORT-TBL(IDX3)
                        END-IF
+                     ELSE
+                       IF    (WRK-IRYOADL-DAY(IDX3)  =
+                                         WRK-IRYOADL-DAY(IDX1)) AND
+                             (WRK-IRYOADL-MEISAISU(IDX3)  =
+                                         WRK-IRYOADL-MEISAISU(IDX1)) AND
+                             (WRK-IRYOADL-SRYCDTOTAL(IDX3)  =
+                                       WRK-IRYOADL-SRYCDTOTAL(IDX1)) AND
+                             (WRK-IRYOADL-TEN-H22(IDX3 1)  =
+                                       WRK-IRYOADL-TEN-H22(IDX1 1))  AND
+                             (WRK-IRYOADL-TEN-H22(IDX3 2)  =
+                                       WRK-IRYOADL-TEN-H22(IDX1 2))  AND
+                             (WRK-IRYOADL-TEN-H22(IDX3 3)  =
+                                       WRK-IRYOADL-TEN-H22(IDX1 3))  AND
+                             (WRK-IRYOADL-TEN-H22(IDX3 4)  =
+                                       WRK-IRYOADL-TEN-H22(IDX1 4))
+                             MOVE      1    TO
+                                       WRK-IRYOADL-GAITOU-KBN(IDX1 IDX3)
+                             INITIALIZE   WRK-IRYOADL-SORT-TBL(IDX3)
+                       END-IF
+                     END-IF
                    END-PERFORM
                END-IF
              END-PERFORM
@@ -2523,8 +2573,11 @@
                                  END-IF
                                END-IF
                          END-PERFORM
-                         PERFORM   VARYING  IDX5  FROM  1  BY  1
-                         UNTIL   (IDX5  >  31)   OR
+      *                  Ê¿À®£²£²Ç¯£´·î¤è¤êµ­Ï¿¥³¥á¥ó¥È¤ÎÊÑ¹¹
+      *                  ¡Êµ­Ï¿¥³¥á¥ó¥È¥³¡¼¥É810000001  ->  840000125¡Ë
+                         IF  LNK-NYURECEDEN-SANTEIYM    <=   "201003"
+                          PERFORM   VARYING  IDX5  FROM  1  BY  1
+                          UNTIL   (IDX5  >  31)   OR
                                (WRK-RYOYO-DAY-ST(IDX5) =  ZERO)
                            IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
                              ADD    1     TO
@@ -2573,7 +2626,45 @@
                              END-IF
                              ADD    1     TO   IDX3
                            END-IF
-                         END-PERFORM
+                          END-PERFORM
+                         ELSE
+                          PERFORM   VARYING  IDX5  FROM  1  BY  1
+                          UNTIL   (IDX5  >  31)   OR
+                               (WRK-RYOYO-DAY-ST(IDX5) =  ZERO)
+                           IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
+                             ADD    1     TO
+                                       LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                             IF   WRK-RYOYO-DAY-ST(IDX5) = 
+                                               WRK-RYOYO-DAY-ED(IDX5)
+                                MOVE   "CO"   TO   
+                                    LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                                MOVE  "840000125"  TO
+                                      LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                MOVE   WRK-RYOYO-DAY-ST(IDX5) TO  IDX6
+                                MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                                          (1:4)
+                                MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                                          (5:4)
+                             ELSE
+                                MOVE   "CO"   TO   
+                                    LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                                MOVE  "840000125"  TO
+                                      LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                MOVE   WRK-RYOYO-DAY-ST(IDX5) TO IDX6
+                                MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                                          (1:4)
+                                MOVE   WRK-RYOYO-DAY-ED(IDX5) TO IDX6
+                                MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                                                          (5:4)
+                             END-IF
+                             ADD    1     TO   IDX3
+                           END-IF
+                          END-PERFORM
+                         END-IF
       *
       *                  °åÎÅ¶èÊ¬¥³¥á¥ó¥È
                          PERFORM   VARYING  IDX5  FROM  1  BY  1
@@ -2590,8 +2681,9 @@
                            END-IF
                          END-PERFORM
       *
-      *                  £Á£Ä£Ì¥³¥á¥ó¥È
-                         IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
+      *                  £Á£Ä£Ì¥³¥á¥ó¥È¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤êµ­Ï¿¥³¥á¥ó¥È¤ÎÊÑ¹¹¡Ë
+                         IF  LNK-NYURECEDEN-SANTEIYM    <=   "201003"
+                          IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
                            ADD    1     TO
                                    LNK-NYURECEDEN-MEISAISU(1 IDX2)
                            MOVE   "CO"   TO   
@@ -2607,6 +2699,80 @@
                                     LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
                            END-IF
                            ADD    1     TO   IDX3
+                          END-IF
+                         ELSE
+      *                   £Á£Ä£Ì£á
+                          IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
+                           ADD    1     TO
+                                   LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                           MOVE   "CO"   TO   
+                                LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                           MOVE  "840000126"   TO
+                                  LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                           IF   WRK-IRYOADL-TEN-H22(CIDX 1)   =   ZERO
+                             MOVE  "£°£°"    TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           ELSE
+                             MOVE   WRK-IRYOADL-TEN-H22(CIDX 1) TO IDX6
+                             MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           END-IF
+                           ADD    1     TO   IDX3
+                          END-IF
+      *                   £Á£Ä£Ì£â
+                          IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
+                           ADD    1     TO
+                                   LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                           MOVE   "CO"   TO   
+                                LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                           MOVE  "840000127"   TO
+                                  LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                           IF   WRK-IRYOADL-TEN-H22(CIDX 2)   =   ZERO
+                             MOVE  "£°£°"    TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           ELSE
+                             MOVE   WRK-IRYOADL-TEN-H22(CIDX 2) TO IDX6
+                             MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           END-IF
+                           ADD    1     TO   IDX3
+                          END-IF
+      *                   £Á£Ä£Ì£ã
+                          IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
+                           ADD    1     TO
+                                   LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                           MOVE   "CO"   TO   
+                                LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                           MOVE  "840000128"   TO
+                                  LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                           IF   WRK-IRYOADL-TEN-H22(CIDX 3)   =   ZERO
+                             MOVE  "£°£°"    TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           ELSE
+                             MOVE   WRK-IRYOADL-TEN-H22(CIDX 3) TO IDX6
+                             MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           END-IF
+                           ADD    1     TO   IDX3
+                          END-IF
+      *                   £Á£Ä£Ì£ä
+                          IF   LNK-NYURECEDEN-MEISAISU(1 IDX2) < 300
+                           ADD    1     TO
+                                   LNK-NYURECEDEN-MEISAISU(1 IDX2)
+                           MOVE   "CO"   TO   
+                                LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
+                           MOVE  "840000129"   TO
+                                  LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                           IF   WRK-IRYOADL-TEN-H22(CIDX 4)   =   ZERO
+                             MOVE  "£°£°"    TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           ELSE
+                             MOVE   WRK-IRYOADL-TEN-H22(CIDX 4) TO IDX6
+                             MOVE   TBL-DAY(IDX6)  TO
+                                    LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
+                           END-IF
+                           ADD    1     TO   IDX3
+                          END-IF
                          END-IF
       *
                        END-IF
