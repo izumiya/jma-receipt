@@ -1182,6 +1182,14 @@
                ELSE
                    MOVE    ZERO                TO  FLG-ERR
                END-IF
+      *        H22.4 から手帳加算は対象外
+               IF      SPA-SRYYMD          >=  "20100401"
+                   IF     (WRK-CODE            =   "002" )
+                     AND  (WRK-CODE            =   TBL-CODE (TBL-IDX))
+                     AND  (TBL-CHK (TBL-IDX)   =   "1"   )
+                       MOVE    1                   TO  FLG-ERR
+                   END-IF
+               END-IF
       *
                IF      (WRK-CODE           =   TBL-CODE  (TBL-IDX))
                    AND (LNK-SC91-SRYCD NOT =   TBL-SRYCD(TBL-IDX) )
