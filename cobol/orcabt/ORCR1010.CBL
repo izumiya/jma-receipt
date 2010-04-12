@@ -4311,6 +4311,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                                 UNTIL   IDXB   <    1
                         IF  RECE130-SRYCD(IDXB)  NOT = SPACE
                           MOVE WRK-SRYSURYO3 TO RECE130-SRYSURYO(IDXB)
+                          MOVE 1             TO IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE130-REC
@@ -4356,6 +4357,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                                 UNTIL   IDXB   <    1
                         IF  RECE130-SRYCD(IDXB)  NOT = SPACE
                           MOVE   "1"  TO   RECE130-RECEPTFLG(IDXB)
+                          MOVE    1   TO   IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE130-REC

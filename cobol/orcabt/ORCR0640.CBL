@@ -19407,6 +19407,7 @@
                                 UNTIL   IDXB   <    1
                         IF  RECE65-SRYCD(IDXB)  NOT = SPACE
                           MOVE WRK-SRYSURYO3 TO RECE65-SRYSURYO(IDXB)
+                          MOVE 1             TO IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE65-REC
@@ -19478,6 +19479,7 @@
                                 UNTIL   IDXB   <    1
                         IF  RECE65-SRYCD(IDXB)  NOT = SPACE
                           MOVE   "1"  TO   RECE65-RECEPTFLG(IDXB)
+                          MOVE    1   TO   IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE65-REC

@@ -6855,6 +6855,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                              UNTIL   IDXB   <    1
                      IF  RECE45-SRYCD(IDXB)  NOT = SPACE
                        MOVE WRK-SRYSURYO3 TO RECE45-SRYSURYO(IDXB)
+                       MOVE 1             TO IDXB
                      END-IF
                    END-PERFORM
                    REWRITE   RECE45-REC
@@ -6913,6 +6914,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                              UNTIL   IDXB   <    1
                      IF  RECE45-SRYCD(IDXB)  NOT = SPACE
                        MOVE   "1"  TO   RECE45-RECEPTFLG(IDXB)
+                       MOVE    1   TO   IDXB
                      END-IF
                    END-PERFORM
                    REWRITE   RECE45-REC

@@ -9595,6 +9595,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                                 UNTIL   IDXB   <    1
                         IF  RECE85-SRYCD(IDXB)  NOT = SPACE
                           MOVE WRK-SRYSURYO3 TO RECE85-SRYSURYO(IDXB)
+                          MOVE 1             TO IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE85-REC
@@ -9653,6 +9654,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                                 UNTIL   IDXB   <    1
                         IF  RECE85-SRYCD(IDXB)  NOT = SPACE
                           MOVE   "1"  TO   RECE85-RECEPTFLG(IDXB)
+                          MOVE    1   TO   IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE85-REC

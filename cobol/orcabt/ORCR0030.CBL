@@ -14679,6 +14679,7 @@ grpsys            (RECE04-HOSPNUM      NOT =  RECE05-HOSPNUM)     OR
                                 UNTIL   IDXB   <    1
                         IF  RECE05-SRYCD(IDXB)  NOT = SPACE
                           MOVE WRK-SRYSURYO3 TO RECE05-SRYSURYO(IDXB)
+                          MOVE 1             TO IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE05-REC
@@ -14748,6 +14749,7 @@ grpsys            (RECE04-HOSPNUM      NOT =  RECE05-HOSPNUM)     OR
                                 UNTIL   IDXB   <    1
                         IF  RECE05-SRYCD(IDXB)  NOT = SPACE
                           MOVE   "1"  TO   RECE05-RECEPTFLG(IDXB)
+                          MOVE    1   TO   IDXB
                         END-IF
                       END-PERFORM
                       REWRITE   RECE05-REC
