@@ -659,7 +659,7 @@
       *             £Á£Ä£Ì£â¡¡°Ü¾è
                     MOVE    "840000127"  TO
                                        LNK-RYOCOM-ADL-SRYCD-H22(IDX 2)
-                    IF   LNK-RYOCOM-ADL-TEN-H22(IDX 1)   =  ZERO
+                    IF   LNK-RYOCOM-ADL-TEN-H22(IDX 2)   =  ZERO
                         MOVE  "£°£°"     TO
                                      LNK-RYOCOM-ADL-TEN-MOJI-H22(IDX 2)
                     ELSE
