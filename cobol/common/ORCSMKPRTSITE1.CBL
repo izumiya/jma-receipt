@@ -47,10 +47,10 @@
       *    °õºþÍÑ¥Ç¡¼¥¿
        FD  PRT-IN-FILE.
        01  PRT-IN-REC.
-           03  PRT-IN-PRTDATA      PIC X(10000).
+           03  PRT-IN-PRTDATA      PIC X(20000).
        FD  PRT-OUT-FILE.
        01  PRT-OUT-REC.
-           03  PRT-OUT-PRTDATA     PIC X(10000).
+           03  PRT-OUT-PRTDATA     PIC X(20000).
       *
        WORKING-STORAGE             SECTION.
        01  PRTOUTPARA.
