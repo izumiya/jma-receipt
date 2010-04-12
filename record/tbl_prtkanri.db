@@ -70,7 +70,7 @@ path	key3		{
 path	key4		{ 	
 	DBSELECT	{
 		DECLARE tbl_prtkanri_key4_csr CURSOR FOR
-		SELECT distinct hosnum,tbl_key,tbl_group,priority,sryym
+		SELECT distinct hospnum,tbl_key,tbl_group,priority,sryym
 		FROM tbl_prtkanri
 		WHERE 	HOSPNUM	= :HOSPNUM
                     AND   TBL_KEY      =   'RECEPT2'
