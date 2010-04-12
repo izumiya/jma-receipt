@@ -319,6 +319,8 @@
       *                                     変更に伴う修正
       *                                     平成２２年４月分以降の処理を
       *                                     行うようにする
+      *  04.04.12    NACL-藤原    10/04/12  特定器材レコードの使用量、
+      *                                     単位コードの記録方法を修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4975,7 +4977,9 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            MOVE    9                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    使用量
-           IF      TBL-ZAIW-SRYSURYO (2 IDX)   >   ZERO
+           IF    ( TBL-ZAIW-SRYSURYO (2 IDX)   >   ZERO )
+           AND   ( TBL-ZAIW-TENSIKIBETU (2 IDX)
+                                           NOT =   "5"  )    
                MOVE    TBL-ZAIW-SRYSURYO (2 IDX)   TO  WRK-SRYSURYO
                MOVE    WRK-SRYSURYO                TO  WRK-NUM
                MOVE    9                           TO  WRK-NAGASA
@@ -5020,10 +5024,10 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            PERFORM 5005-NUM-HENSYU-SEC
       *    単位コード
            IF      TBL-ZAIW-TANICD (2 IDX)     >   ZERO
-               MOVE    TBL-ZAIW-TANICD (2 IDX) TO  WRK-NUM
+               MOVE    TBL-ZAIW-TANICD (2 IDX) TO  WRK-DATA
                MOVE    3                       TO  WRK-NAGASA
            END-IF        
-           PERFORM 5005-NUM-HENSYU-SEC  
+           PERFORM 5004-MOJI-HENSYU-SEC  
       *    単価
            IF    ( TBL-ZAIW-TENSIKIBETU (2 IDX)    =   2               )
            OR    ( TBL-ZAIW-SRYCD       (2 IDX)    =   "777770000"     )
@@ -5116,8 +5120,10 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            MOVE    9                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    使用量
-           IF      ORCSRECESORT-SRYSURYO (IDXX IDX)
-                                       >   ZERO
+           IF    ( ORCSRECESORT-SRYSURYO (IDXX IDX)
+                                       >   ZERO         )
+           AND   ( ORCSRECESORT-TENSIKIBETU (IDXX IDX)
+                                           NOT =   "5"  )    
                MOVE    ORCSRECESORT-SRYSURYO (IDXX IDX)
                                            TO  WRK-SRYSURYO
                MOVE    WRK-SRYSURYO        TO  WRK-NUM
@@ -5149,10 +5155,10 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            IF      ORCSRECESORT-TANICD (IDXX IDX)
                                        >   ZERO
                MOVE    ORCSRECESORT-TANICD (IDXX IDX)
-                                               TO  WRK-NUM
+                                               TO  WRK-DATA
                MOVE    3                       TO  WRK-NAGASA
            END-IF        
-           PERFORM 5005-NUM-HENSYU-SEC  
+           PERFORM 5004-MOJI-HENSYU-SEC  
       *    単価
            IF    ( ORCSRECESORT-TENSIKIBETU (IDXX IDX)
                                        =   2               )
