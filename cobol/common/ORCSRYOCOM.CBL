@@ -227,6 +227,10 @@
       *    一時領域
        01  WRK-AREA.
       *
+      *    外泊退避エリア
+           03  WRK-GAIHAKU-AREA.
+             05  WRK-GAIHAKU       PIC X(01)   OCCURS   31.
+      *
       *    診療コード計集計用
            03  WRK-SRYCD-X                 PIC X(09).
            03  WRK-SRYCD-9    REDEFINES    WRK-SRYCD-X
@@ -402,6 +406,37 @@
            MOVE    "key17"                 TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
+      *    平成２２年４月以降は外泊時の療養コメントを返却しない
+      *    （外泊情報の取得）
+           INITIALIZE    WRK-GAIHAKU-AREA
+           IF      LNK-RYOCOM-RC    =    ZERO
+               IF    LNK-RYOCOM-SANTEIYM   >=  "201004"
+                   MOVE    LNK-RYOCOM-HOSPNUM  TO  NACCT-HOSPNUM
+                   MOVE    LNK-RYOCOM-PTID     TO  NACCT-PTID
+                   MOVE    LNK-RYOCOM-SANTEIYM TO  NACCT-SRYYM
+                   MOVE    "2"                 TO  NACCT-ZAISKBKBN
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key17"             TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT       =   ZERO
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key17"         TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-READ-SEC
+                       IF   FLG-NYUINACCT      =   ZERO
+                            PERFORM   VARYING   IDX    FROM   1  BY  1
+                              UNTIL   IDX       >      31
+                              IF   NACCT-DAY(IDX)    =   1 OR 2 OR 3
+                                 MOVE "1"  TO  WRK-GAIHAKU(IDX)
+                              END-IF
+                            END-PERFORM
+                       END-IF
+                   END-IF
+               END-IF
+      *        入院会計クローズ
+               MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+               MOVE    "key17"                 TO  MCP-PATHNAME
+               PERFORM   910-DB-CLOSE-SEC
+           END-IF
       *
       *    療養入院算定のチェック（入院会計マスター検索）
            IF      LNK-RYOCOM-RC    =    ZERO
@@ -517,7 +552,8 @@
                    IF   NSRY-SRYCD(1)   =    CONS-RYOYO-SRYCD-H22(IDX)
                        PERFORM   VARYING  IDX1   FROM   1  BY  1
                          UNTIL  (IDX1    >   31)
-                           IF   NACCT-DAY(IDX1)    =   1
+                           IF  (NACCT-DAY(IDX1)    =   1)   AND
+                               (WRK-GAIHAKU(IDX1)  =   SPACE)
                                MOVE "1"  TO  LNK-RYOCOM-NYUINKBN(IDX1)
                                MOVE  1   TO  FLG-RYOYO-NYUIN
                            END-IF
