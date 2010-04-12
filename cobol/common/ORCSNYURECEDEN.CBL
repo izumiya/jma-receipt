@@ -1129,7 +1129,7 @@
                    PERFORM    VARYING   IDX1   FROM   1   BY   1
                               UNTIL     IDX1   >   31
                        IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
       *                  入院時食事療養（１）の場合のみセット
                            IF  WRK-SYS5000-SHOKUCD(1 IDX1)  =
@@ -1179,7 +1179,7 @@
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                              (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190117070
                            MOVE   NACCT-SRYCDTOTAL(6:9)
@@ -1224,7 +1224,7 @@
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                              (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190109670
                            MOVE   NACCT-SRYCDTOTAL(6:9)
@@ -1274,7 +1274,7 @@
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                              (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
       *
       *                  夜間緊急体制確保加算
@@ -1376,7 +1376,7 @@
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                              (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
       *
       *                  プレイルーム、保育士等加算
@@ -1435,7 +1435,7 @@
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                              (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                          IF (((SPA-HOSPSBT                 =    2) AND
                              (LNK-NYURECEDEN-SANTEIYM <= "200803")) AND
@@ -1555,7 +1555,8 @@
                                   UNTIL     IDX1   >   31
                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                  (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                           AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4)
+                           AND   (WRK-GAIHAKU-KBN(IDX1)  = ZERO OR 4 OR
+                                                                   5)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
                             IF   LNK-NYURECEDEN-SANTEIYM <= "200803"
                                EVALUATE   ACCT-SRYCDTOTAL(6:9)
@@ -1721,7 +1722,8 @@
                                       UNTIL     IDX1   >   31
                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                  (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                           AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4)
+                           AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4
+                                                                 OR 5)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
                                 WHEN  CONS-ETCNYUIN-KSN(1)
@@ -2165,6 +2167,7 @@
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
       *                他医療機関受診
                        WHEN   4
+                       WHEN   5
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
                    END-EVALUATE
                END-IF
@@ -2957,6 +2960,8 @@
                       MOVE   "190107390"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     4
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
+                    WHEN     5
+                      PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                  END-EVALUATE
               WHEN     "92"
                  EVALUATE   NACCT-DAY(IDX1)
@@ -2965,6 +2970,8 @@
                     WHEN     2
                       MOVE   "190107590"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     4
+                      PERFORM   2101-GAIHAKU-TAKIKAN-SEC
+                    WHEN     5
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                  END-EVALUATE
            END-EVALUATE
@@ -2980,23 +2987,59 @@
       *
            EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
       *
-      ***      WHEN   099  THRU  100 
+               WHEN   099  THRU  100
+                 IF   LNK-NYURECEDEN-SANTEIYM   >=   "201004"
+                   EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142190"    TO   WRK-GAIHAKU(IDX1)
+                   END-EVALUATE
+                 END-IF
                WHEN   201  THRU  219
                WHEN   221  THRU  222
                WHEN   224
                WHEN   227  THRU  229
                WHEN   230  THRU  239
-                  MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+               WHEN   241  THRU  249
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142090"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
                WHEN   013  THRU  021
                WHEN   101  THRU  109
                WHEN   147  THRU  152
-                  MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+               WHEN   173  THRU  190
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142190"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
                WHEN   075  THRU  080
-                  MOVE   "190108990"    TO   WRK-GAIHAKU(IDX1)
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108990"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
                WHEN   085  THRU  086
                WHEN   132  THRU  133
                WHEN   153  THRU  158
-                  MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142290"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
+               WHEN   226
+               WHEN   240
+                 CONTINUE
+               WHEN   OTHER
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     5
+                      MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
       *
            END-EVALUATE
       *
@@ -3492,7 +3535,7 @@
                    IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)  AND
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                          (WRK-NYUINKHN(IDX1) NOT =  SPACE)    AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ-HKNCOMBI-DAY(IDX1)
                                            WRK-SKJ2-HKNCOMBI-DAY(IDX1)
@@ -3933,7 +3976,7 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
@@ -3995,7 +4038,7 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
@@ -4057,7 +4100,7 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
@@ -4662,7 +4705,7 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
@@ -4726,7 +4769,7 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
@@ -4790,7 +4833,7 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
@@ -5841,7 +5884,7 @@
                      (LNK-NYULIFE-KAN-SRYCD(IDX1)    NOT =  SPACE)  AND
                     ((WRK-NYUINKHN(IDX1)     NOT =  SPACE)          OR
                      (LNK-NYUINDAY-KBN(IDX1)     =  "1"  ))         AND
-                     (WRK-GAIHAKU-KBN(IDX1)  =  ZERO  OR  4)
+                     (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                    MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                      TO  WRK-KANKYO-HKNCOMBI-DAY(IDX1)
                    MOVE   LNK-NYULIFE-KAN-SRYCD(IDX1)
