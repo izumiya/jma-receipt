@@ -315,6 +315,13 @@
                    MOVE   "222222222"     TO    NSRY-SRYCD(1)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO   TNS-NAME
                END-IF
+               IF    (NACCT-SRYYM      >=   "201004")    AND
+                     (NSRY-SRYCD(1)    =    "190135110"  OR
+                                            "190135210"  OR
+                                            "190135310")
+                   MOVE   "333333333"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO   TNS-NAME
+               END-IF
                IF   (NSRY-SRYCD(1)  =
                           LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX))  AND
                     (TNS-NAME   = 
@@ -364,7 +371,8 @@
                                             "190097010"  OR
                                             "190097110"  OR
                                             "190119510"  OR
-                                            "190119610")
+                                            "190119610"  OR
+                                            "111111111")
                    MOVE   "111111111"     TO
                                LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO
@@ -375,10 +383,22 @@
                                             "190097210"  OR
                                             "190097310"  OR
                                             "190119710"  OR
-                                            "190119810")
+                                            "190119810"  OR
+                                            "222222222")
                    MOVE   "222222222"     TO
                                LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201004")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190135110"  OR
+                                            "190135210"  OR
+                                            "190135310"  OR
+                                            "333333333")
+                   MOVE   "333333333"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
