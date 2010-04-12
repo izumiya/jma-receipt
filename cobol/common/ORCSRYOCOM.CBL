@@ -431,11 +431,11 @@
                             END-PERFORM
                        END-IF
                    END-IF
+      *            入院会計クローズ
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM   910-DB-CLOSE-SEC
                END-IF
-      *        入院会計クローズ
-               MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
-               MOVE    "key17"                 TO  MCP-PATHNAME
-               PERFORM   910-DB-CLOSE-SEC
            END-IF
       *
       *    療養入院算定のチェック（入院会計マスター検索）
