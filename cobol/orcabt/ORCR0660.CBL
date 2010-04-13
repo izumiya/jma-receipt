@@ -986,6 +986,52 @@
            INITIALIZE                      TBL-RYOCOM-INF
            INITIALIZE                      WRK-JIDO-SETCOM-AREA
       *
+      *    療養レセコメント取得
+      *
+           MOVE      ZERO     TO      FLG-RYOCOM
+      *
+           IF    RECE62-SRYYM   >=  "200610"
+             INITIALIZE                   ORCSRYOCOM-AREA
+             MOVE    RECE62-HOSPNUM   TO  LNK-RYOCOM-HOSPNUM
+             MOVE    RECE62-PTID      TO  LNK-RYOCOM-PTID
+             MOVE    RECE62-SRYYM     TO  LNK-RYOCOM-SANTEIYM
+             CALL    "ORCSRYOCOM"         USING
+                                          ORCSRYOCOM-AREA
+                                          SPA-AREA
+             IF      LNK-RYOCOM-RC    =   ZERO
+               MOVE       1           TO  FLG-RYOCOM
+               PERFORM  VARYING  RYO-IDX  FROM  1  BY  1
+                         UNTIL   RYO-IDX   >   31
+                 MOVE  LNK-RYOCOM-NYUINKBN(RYO-IDX)
+                                 TO  TBL-RYOCOM-NYUINKBN(RYO-IDX)
+                 MOVE  LNK-RYOCOM-MEISAISU(RYO-IDX)
+                                 TO  TBL-RYOCOM-MEISAISU(RYO-IDX)
+                 MOVE  LNK-RYOCOM-SRYCDTOTAL(RYO-IDX)
+                                 TO  TBL-RYOCOM-SRYCDTOTAL(RYO-IDX)
+                 PERFORM  VARYING  RYO-IDX2  FROM  1  BY  1
+                           UNTIL   RYO-IDX2   >   30
+                   MOVE  LNK-RYOCOM-IRYO-SRYCD(RYO-IDX RYO-IDX2)
+                           TO  TBL-RYOCOM-IRYO-SRYCD(RYO-IDX RYO-IDX2)
+                 END-PERFORM
+                 MOVE  LNK-RYOCOM-ADL-SRYCD(RYO-IDX)
+                                 TO  TBL-RYOCOM-ADL-SRYCD(RYO-IDX)
+                 MOVE  LNK-RYOCOM-ADL-TEN(RYO-IDX)
+                                 TO  TBL-RYOCOM-ADL-TEN(RYO-IDX)
+                 MOVE  LNK-RYOCOM-ADL-TEN-MOJI(RYO-IDX)
+                                 TO  TBL-RYOCOM-ADL-TEN-MOJI(RYO-IDX)
+                 PERFORM  VARYING  RYO-IDX2  FROM  1  BY  1
+                           UNTIL   RYO-IDX2   >    4
+                   MOVE  LNK-RYOCOM-ADL-SRYCD-H22(RYO-IDX RYO-IDX2)
+                      TO  TBL-RYOCOM-ADL-SRYCD-H22(RYO-IDX RYO-IDX2)
+                   MOVE  LNK-RYOCOM-ADL-TEN-H22(RYO-IDX RYO-IDX2)
+                      TO  TBL-RYOCOM-ADL-TEN-H22(RYO-IDX RYO-IDX2)
+                   MOVE  LNK-RYOCOM-ADL-TEN-MOJI-H22(RYO-IDX RYO-IDX2)
+                      TO  TBL-RYOCOM-ADL-TEN-MOJI-H22(RYO-IDX RYO-IDX2)
+                 END-PERFORM
+               END-PERFORM
+             END-IF
+           END-IF
+      *
            MOVE  RECE62-KOHBUNRI-MIN   TO  WRK-KOHBUNRI-JIDO
            MOVE  ZERO                  TO  WRK-HKNCOMBI-JIDO
       *
@@ -1398,52 +1444,6 @@
       *
            IF   RECE62-TAINFLG          =  "1"
               PERFORM   2001-TAIN-TOKUBETU-COMMENT-SEC
-           END-IF
-      *
-      *    療養レセコメント取得
-      *
-           MOVE      ZERO     TO      FLG-RYOCOM
-      *
-           IF    RECE62-SRYYM   >=  "200610"
-             INITIALIZE                   ORCSRYOCOM-AREA
-             MOVE    RECE62-HOSPNUM   TO  LNK-RYOCOM-HOSPNUM
-             MOVE    RECE62-PTID      TO  LNK-RYOCOM-PTID
-             MOVE    RECE62-SRYYM     TO  LNK-RYOCOM-SANTEIYM
-             CALL    "ORCSRYOCOM"         USING
-                                          ORCSRYOCOM-AREA
-                                          SPA-AREA
-             IF      LNK-RYOCOM-RC    =   ZERO
-               MOVE       1           TO  FLG-RYOCOM
-               PERFORM  VARYING  RYO-IDX  FROM  1  BY  1
-                         UNTIL   RYO-IDX   >   31
-                 MOVE  LNK-RYOCOM-NYUINKBN(RYO-IDX)
-                                 TO  TBL-RYOCOM-NYUINKBN(RYO-IDX)
-                 MOVE  LNK-RYOCOM-MEISAISU(RYO-IDX)
-                                 TO  TBL-RYOCOM-MEISAISU(RYO-IDX)
-                 MOVE  LNK-RYOCOM-SRYCDTOTAL(RYO-IDX)
-                                 TO  TBL-RYOCOM-SRYCDTOTAL(RYO-IDX)
-                 PERFORM  VARYING  RYO-IDX2  FROM  1  BY  1
-                           UNTIL   RYO-IDX2   >   30
-                   MOVE  LNK-RYOCOM-IRYO-SRYCD(RYO-IDX RYO-IDX2)
-                           TO  TBL-RYOCOM-IRYO-SRYCD(RYO-IDX RYO-IDX2)
-                 END-PERFORM
-                 MOVE  LNK-RYOCOM-ADL-SRYCD(RYO-IDX)
-                                 TO  TBL-RYOCOM-ADL-SRYCD(RYO-IDX)
-                 MOVE  LNK-RYOCOM-ADL-TEN(RYO-IDX)
-                                 TO  TBL-RYOCOM-ADL-TEN(RYO-IDX)
-                 MOVE  LNK-RYOCOM-ADL-TEN-MOJI(RYO-IDX)
-                                 TO  TBL-RYOCOM-ADL-TEN-MOJI(RYO-IDX)
-                 PERFORM  VARYING  RYO-IDX2  FROM  1  BY  1
-                           UNTIL   RYO-IDX2   >    4
-                   MOVE  LNK-RYOCOM-ADL-SRYCD-H22(RYO-IDX RYO-IDX2)
-                      TO  TBL-RYOCOM-ADL-SRYCD-H22(RYO-IDX RYO-IDX2)
-                   MOVE  LNK-RYOCOM-ADL-TEN-H22(RYO-IDX RYO-IDX2)
-                      TO  TBL-RYOCOM-ADL-TEN-H22(RYO-IDX RYO-IDX2)
-                   MOVE  LNK-RYOCOM-ADL-TEN-MOJI-H22(RYO-IDX RYO-IDX2)
-                      TO  TBL-RYOCOM-ADL-TEN-MOJI-H22(RYO-IDX RYO-IDX2)
-                 END-PERFORM
-               END-PERFORM
-             END-IF
            END-IF
       *
       *****差込編集２**********************
@@ -5263,12 +5263,19 @@
                 IF    RECE64-KAISU(1 IDX)   =  ZERO
                       MOVE  ZERO  TO  FLG-NYU-RENZOKU
                 ELSE
+                  IF  (RECE64-ZAISKBKBN         =  "2")
+                  AND (FLG-RYOCOM               =   1 )
+                  AND (TBL-RYOCOM-NYUINKBN(IDX) =  "1")
+                  AND (RECE62-SRYYM       >=  "201004")
+                      MOVE  ZERO  TO  FLG-NYU-RENZOKU
+                  ELSE
                       IF    FLG-NYU-RENZOKU  =  ZERO
                          ADD   1     TO  DAY-IDX
                          MOVE  IDX   TO  TBL-NYU-DAY-ST(DAY-IDX)
                       END-IF
                       MOVE  IDX      TO  TBL-NYU-DAY-ED(DAY-IDX)
                       MOVE  1        TO  FLG-NYU-RENZOKU
+                  END-IF
                 END-IF
            END-PERFORM
       *
