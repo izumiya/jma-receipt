@@ -274,6 +274,10 @@
       *                                     退院元コメントを対象としない
       *  04.04.18    NACL-藤原    10/04/12  特定器材レコードの使用量、
       *                                     単位コードの記録方法を修正
+      *  04.04.19    NACL-藤原    10/04/12  入院基本料の入院元コメント、
+      *                                     退院元コメントを対象とする
+      *                                     退院加算を平成２２年３月まで
+      *                                     対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -461,6 +465,7 @@
            03  FLG-PRT                 PIC 9(01).
            03  FLG-KOUI                PIC 9(01).
            03  FLG-TOYAKUFLG           PIC 9(01).
+           03  FLG-TAISYO              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -3943,40 +3948,33 @@
                OR     ( RECE641-TEKSTYMD   NOT =   RECE65-TEKSTYMD     )
                OR     ( RECE641-ZAINUM     NOT =   RECE65-ZAINUM       )
       *
-               PERFORM   VARYING   IDX   FROM    1   BY  1
-                         UNTIL   ( IDX               >   5     )
-                         OR      ( RECE65-SRYCD(IDX) =   SPACE )
-                         OR      ( FLG-END           =   1     )
+             PERFORM   VARYING   IDX   FROM    1   BY  1
+                       UNTIL   ( IDX               >   5     )
+                       OR      ( RECE65-SRYCD(IDX) =   SPACE )
+                        OR      ( FLG-END           =   1     )
       *
-      *         入院料はコメントか退院加算のみ対象とする
-                IF    ( RECE641-SRYKBN               >=  "90"      )
-                AND   ( RECE65-SRYCD (IDX) (1:1) NOT =   "8"   AND
-                        RECE65-SRYCD (IDX) (1:3) NOT =   "008" AND
-                        RECE65-SRYCD (IDX)       NOT =   "190128310" AND
-                        RECE65-SRYCD (IDX)       NOT =   "190128410" AND
-                        RECE65-SRYCD (IDX)       NOT =   "190128570" AND
-                        RECE65-SRYCD (IDX)       NOT =   "190128570"  )
-                 CONTINUE
-                ELSE
-      *          入院基本料の入院元コメント、退院元コメントは対象としない
-                 IF    ( RECE641-SRYKBN              =  "90"           )
-                 AND   ( RECE65-SRYCD (IDX)          =   "820000144" OR
-                                                         "820000145" OR
-                                                         "820000146" OR
-                                                         "820000147" OR
-                                                         "820000148" OR
-                                                         "820000149" OR
-                                                         "820000150" OR
-                                                         "820000151" OR
-                                                         "820000152" OR
-                                                         "820000153" OR
-                                                         "820000154" OR
-                                                         "820000155" OR
-                                                         "820000156" OR
-                                                         "820000157"   )
-                   CONTINUE
-                 ELSE  
-                  IF      RECE65-RECEDENFLG (IDX)     =   SPACE
+               MOVE    ZERO                      TO  FLG-TAISYO
+      *
+      *        入院料はコメントか退院加算のみ対象とする
+      *        ただし、退院加算は平成２２年３月分まで対象
+               IF      RECE641-SRYKBN              >=  "90"
+                   IF    ( RECE65-SRYCD (IDX) (1:1)    =   "8"   OR
+                           RECE65-SRYCD (IDX) (1:3)    =   "008"    )
+                       MOVE    1                       TO  FLG-TAISYO
+                   ELSE
+                       IF    ( RECE65-SRYCD (IDX)      =   "190128310"
+                                                       OR  "190128410"
+                                                       OR  "190128570" )
+                       AND   ( RECE62-SRYYM            <   201004      )
+                            MOVE    1                  TO  FLG-TAISYO
+                       END-IF
+                   END-IF  
+               ELSE  
+                   MOVE    1                  TO  FLG-TAISYO
+               END-IF
+      *
+               IF      FLG-TAISYO          =   1  
+                 IF      RECE65-RECEDENFLG (IDX)     =   SPACE
                    MOVE    SPACE                TO  WRK-KIZAI-SRYCD
                    IF      RECE65-SRYCD (IDX) (1:3) = "059"
                        MOVE    RECE65-SRYCD (IDX)
@@ -4040,12 +4038,11 @@
                                PERFORM 200711-KIZAI-ACCT-TAIHI-SEC
       *********************END-IF
                    END-EVALUATE
-                  END-IF
                  END-IF
-                END-IF
-               END-PERFORM
+               END-IF
+             END-PERFORM
       *
-               PERFORM 990-RECE65-NEXT-SEC
+             PERFORM 990-RECE65-NEXT-SEC
            END-PERFORM
       *
       *    画像診断のとき順番を変える
