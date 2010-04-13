@@ -1778,6 +1778,9 @@
                          COMPUTE  WRK-NYUKHNRYO =
                                  (WRK-KHNTEN    *  0.7)
                                                 +  0.5
+                         COMPUTE  WRK-NYUKHNRYO =
+                                  WRK-NYUKHNRYO +
+                                  WRK-KSNTEN
                     END-EVALUATE
                   END-IF
                   EVALUATE   WRK-DAY2(IDY)
@@ -1896,6 +1899,9 @@
                          COMPUTE  WRK-NYUTOKRYO =
                                  (WRK-KHNTEN    *  0.7)
                                                 +  0.5
+                         COMPUTE  WRK-NYUTOKRYO =
+                                  WRK-NYUTOKRYO +
+                                  WRK-KSNTEN
                          MOVE   1   TO   FLG-GAIHAKU
                     END-EVALUATE
                   END-IF
