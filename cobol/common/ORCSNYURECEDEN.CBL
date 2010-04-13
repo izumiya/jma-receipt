@@ -1677,15 +1677,16 @@
                            END-IF
                        END-PERFORM
                      ELSE
-                      IF  ((CONS-TAIIN1   =  ACCT-SRYCDTOTAL(6:9)) AND
+                      IF    (LNK-NYURECEDEN-SANTEIYM  <=  "201003") AND
+                          (((CONS-TAIIN1   =  ACCT-SRYCDTOTAL(6:9)) AND
                             (ACCT-MEISAISU =  1))                   OR
                            ((CONS-TAIIN2   =  ACCT-SRYCDTOTAL(6:9)) AND
                             (ACCT-MEISAISU =  1))                   OR
                            ((CONS-TAIIN3   =  ACCT-SRYCDTOTAL(6:9)) AND
                             (ACCT-MEISAISU =  1))                   OR
                            ((CONS-TAIIN4   =  ACCT-SRYCDTOTAL(6:9)) AND
-                            (ACCT-MEISAISU =  2))
-      *                    Âà±¡²Ã»»¤ÏÆÉ¤ßÈô¤Ð¤¹
+                            (ACCT-MEISAISU =  2)))
+      *                    Âà±¡²Ã»»¤ÏÆÉ¤ßÈô¤Ð¤¹¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç¡Ë
                            CONTINUE
                       ELSE
       *                ¤½¤ÎÂ¾Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
@@ -1720,9 +1721,11 @@
                           PERFORM   900-CLOSE-SEC
                        END-IF
       *                
-                       IF    ACCT-SRYCDTOTAL(6:9)  =   CONS-TAIIN1  OR
+                       IF   (LNK-NYURECEDEN-SANTEIYM  <= "201003")  AND
+                            (ACCT-SRYCDTOTAL(6:9)  =   CONS-TAIIN1  OR
                                                        CONS-TAIIN2  OR
-                                                       CONS-TAIIN3
+                                                       CONS-TAIIN3)
+      *                    Âà±¡²Ã»»¤ÏÆÉ¤ßÈô¤Ð¤¹¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç¡Ë
                            CONTINUE
                        ELSE
                          PERFORM    VARYING   IDX1   FROM   1   BY   1
