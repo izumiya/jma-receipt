@@ -1105,19 +1105,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-IF
       *
-      *        ½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë
-               IF      (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
-                       (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
-                   ADD      1               TO  WRK-MEISAISU
-                   MOVE   WRK-SHOKIKSN(IDX1) TO  WRK-SO-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        É¸·ç
-               IF      WRK-HYOUKETSU(IDX1)   NOT =         SPACE
-                   ADD      1               TO  WRK-MEISAISU
-                   MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
       *        ³°Çñ
                IF         WRK-GAIHAKU(IDX1)   NOT =        SPACE
                    ADD      1               TO  WRK-MEISAISU
@@ -1127,6 +1114,35 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                             TO  WRK-SO-GAIHAKU-KBN
                                                            (IDX1 IDX1)
                END-IF
+      *        ½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë
+               IF      (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" )
+               AND     (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-SHOKIKSN(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        É¸·ç
+               IF      WRK-HYOUKETSU(IDX1)   NOT =         SPACE
+                 IF    WRK-GAIHAKU(IDX1)         =         SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                 ELSE
+                   MOVE   SPACE             TO  WRK-HYOUKETSU(IDX1)
+                 END-IF
+               END-IF
+      *        ³°Çñ
+      **       IF         WRK-GAIHAKU(IDX1)   NOT =        SPACE
+      **           ADD      1               TO  WRK-MEISAISU
+      **           MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
+      **                                   (IDX1 WRK-MEISAISU)
+      **           MOVE   WRK-GAIHAKU-KBN(IDX1)
+      **                                    TO  WRK-SO-GAIHAKU-KBN
+      **                                                   (IDX1 IDX1)
+      **       END-IF
       *        Æþ±¡²ñ·×²Ã»»¾ðÊó
                PERFORM   VARYING   KSN-IDX   FROM   1  BY   1
                          UNTIL (WRK-NYUKSN(KSN-IDX)  =  SPACE)  OR

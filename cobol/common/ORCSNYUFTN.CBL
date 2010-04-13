@@ -2574,10 +2574,16 @@ grpsys                            SPA-AREA
                                               SYU-HKNTEN(15)  +
                                             ((WRK-KHNTEN  *  0.7)
                                                           +  0.5)
+                                     COMPUTE  SYU-HKNTEN(15)  =
+                                              SYU-HKNTEN(15)  +
+                                              WRK-KSNTEN
                                      COMPUTE  SDAY-HKNTEN(SYU-IDX) =
                                               SDAY-HKNTEN(SYU-IDX) +
                                             ((WRK-KHNTEN  *  0.7)
                                                           +  0.5)
+                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                              SDAY-HKNTEN(SYU-IDX) +
+                                              WRK-KSNTEN
                                END-EVALUATE
                            ELSE
       *                        選定期間の点数算定
