@@ -1832,9 +1832,20 @@
                    END-IF
                END-IF
       *
+      *        Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£³£°¡ó¸º»º¡Ë
+               IF      (WRK-GAIHAKU(IDX1)        =
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" )
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
       *        ½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë
-               IF      (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
-                       (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
+               IF      (WRK-GAIHAKU(IDX1)       =   SPACE       OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" )
+               AND     (WRK-SHOKIKSN(IDX1)      NOT =   SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-SHOKIKSN(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -1858,12 +1869,18 @@
       *
       *        ³°Çñ
                IF         WRK-GAIHAKU(IDX1)   NOT =        SPACE
+                 IF      (WRK-GAIHAKU(IDX1)     =
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" )
+                          CONTINUE
+                 ELSE
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE   WRK-GAIHAKU-KBN(IDX1)
                                             TO  WRK-SO-GAIHAKU-KBN
                                                            (IDX1 IDX1)
+                 END-IF
                END-IF
       *
                IF  (SPA-HOSPSBT                 =    2)    AND  
