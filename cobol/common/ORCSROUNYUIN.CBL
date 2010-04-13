@@ -3066,8 +3066,11 @@
                  END-IF
                END-IF
       *        初期加算（長期減算）
-               IF      (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
-                       (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
+               IF      (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" )
+               AND     (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-SHOKIKSN(IDX1) TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
