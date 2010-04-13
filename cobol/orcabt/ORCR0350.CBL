@@ -290,6 +290,10 @@
       *                                     退院元コメントを対象としない
       *  04.05.15    NACL-藤原    10/04/12  特定器材レコードの使用量、
       *                                     単位コードの記録方法を修正
+      *  04.05.16    NACL-藤原    10/04/12  入院基本料の入院元コメント、
+      *                                     退院元コメントを対象とする
+      *                                     退院加算を平成２２年３月まで
+      *                                     対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3852,38 +3856,23 @@
                AND   ( RECE641-ZAIKBN             =   2             )
                    MOVE    1                      TO  FLG-TAISYO
                ELSE
-      *          入院基本料の入院元コメント、退院元コメントは対象としない
-                 IF    ( RECE641-SRYKBN              =  "90"           )
-                 AND   ( RECE65-SRYCD (IDX)          =   "820000144" OR
-                                                         "820000145" OR
-                                                         "820000146" OR
-                                                         "820000147" OR
-                                                         "820000148" OR
-                                                         "820000149" OR
-                                                         "820000150" OR
-                                                         "820000151" OR
-                                                         "820000152" OR
-                                                         "820000153" OR
-                                                         "820000154" OR
-                                                         "820000155" OR
-                                                         "820000156" OR
-                                                         "820000157"   )
-                   CONTINUE
-                 ELSE  
       *            入院料はコメントか退院加算のみ対象とする
-                   IF    ( RECE641-SRYKBN               >=  "90"      )
-                   AND   ( RECE65-SRYCD (IDX) (1:1) NOT =   "8"   AND
-                           RECE65-SRYCD (IDX) (1:3) NOT =   "008" AND
-                           RECE65-SRYCD (IDX)       NOT =   "190128310"
-                                                            AND
-                           RECE65-SRYCD (IDX)       NOT =   "190128410"
-                                                            AND
-                           RECE65-SRYCD (IDX)       NOT =   "190128570")
-                     CONTINUE
-                   ELSE
-                     MOVE    1                      TO  FLG-TAISYO
+      *            ただし、退院加算は平成２２年３月分まで対象
+                   IF      RECE641-SRYKBN              >=  "90"
+                     IF    ( RECE65-SRYCD (IDX) (1:1)  =   "8"   OR
+                             RECE65-SRYCD (IDX) (1:3)  =   "008"    )
+                         MOVE    1                     TO  FLG-TAISYO
+                     ELSE
+                        IF  ( RECE65-SRYCD (IDX)       =   "190128310"
+                                                       OR  "190128410"
+                                                       OR  "190128570" )
+                        AND ( RECE62-SRYYM             <   201004      )
+                            MOVE    1                  TO  FLG-TAISYO
+                        END-IF
+                     END-IF  
+                   ELSE  
+                       MOVE    1                  TO  FLG-TAISYO
                    END-IF
-                 END-IF
                END-IF
       *
                IF      FLG-TAISYO          =   1  
