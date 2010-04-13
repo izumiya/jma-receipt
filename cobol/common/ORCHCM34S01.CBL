@@ -121,6 +121,8 @@
            03  IDX5                            PIC 9(05).
            03  IDX6                            PIC 9(05).
            03  IDX7                            PIC 9(05).
+           03  IDX8                            PIC 9(05).
+           03  IDX9                            PIC 9(05).
            03  IDXA                            PIC 9(05).
            03  IDXB                            PIC 9(05).
            03  IDXC                            PIC 9(05).
@@ -145,12 +147,17 @@
            03  WRK-GAIHAKU-SRYCD               PIC X(09).
            03  WRK-GAIHAKU-SRYCDTOTAL          PIC 9(14).
            03  WRK-GAIHAKU-KHNTEN              PIC 9(08).
+           03  WRK-GAIHAKU-KSNTEN              PIC 9(08).
            03  WRK-NYUKHNKSNKBN                PIC 9(03).
            03  WRK-NACCT-ZAISKBKBN             PIC X(01).
            03  WRK-GAIHAKU-TEN                 PIC 9(08).
            03  WRK-KHNTEN                      PIC S9(08).
            03  WRK-KSNTEN                      PIC S9(08).
            03  WRK-KHNSRYCD                    PIC X(09).
+           03  WRK-KSNSRYCD-G.
+               05  WRK-KSNSRYCD-MAX            PIC 9(03).
+               05  WRK-KSNSRYCD                PIC X(09)
+                                               OCCURS   3.
            03  WRK-HYOKETU-TEN                 PIC S9(08).
            03  WRK-HYOKETU-SRYCD               PIC X(09).
            03  WRK-SENTEI-ZAITEN               PIC  9(08).
@@ -1328,6 +1335,8 @@
            MOVE    ZERO                TO  WRK-HYOKETU-TEN
            MOVE    SPACE               TO  WRK-HYOKETU-SRYCD
            MOVE    ZERO                TO  IDX-KHN
+           MOVE    ZERO                TO  WRK-GAIHAKU-KSNTEN
+           INITIALIZE                      WRK-KSNSRYCD-G
       *
            PERFORM 20011-NYUINACT-GET-SEC
            IF    ( FLG-NYUINACT        NOT =    ZERO )
@@ -1340,17 +1349,39 @@
                                        TO  WRK-TNS-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( FLG-TENSU       =   ZERO )
-                   IF    ( TNS-DATAKBN =   1 )
+                   EVALUATE    TNS-DATAKBN
+                   WHEN    1
                        MOVE    TNS-TEN             TO  WRK-KHNTEN
                        MOVE    TNS-NYUKHNKSNKBN    TO  WRK-NYUKHNKSNKBN
                        MOVE    IDX2                TO  IDX-KHN
+                   WHEN    2
+                       EVALUATE    TNS-TENSIKIBETU
+                       WHEN    3
+                           COMPUTE WRK-GAIHAKU-KSNTEN
+                               =   WRK-GAIHAKU-KSNTEN
+                               +   TNS-TEN
+                       WHEN    8
+                           COMPUTE WRK-GAIHAKU-KSNTEN
+                               =   WRK-GAIHAKU-KSNTEN
+                               -   TNS-TEN
+                       END-EVALUATE
+                       IF    ( WRK-KSNSRYCD-MAX    >=  3 )
+                           CONTINUE
+                       ELSE
+                           COMPUTE WRK-KSNSRYCD-MAX
+                               =   WRK-KSNSRYCD-MAX
+                               +   1
+                           MOVE    TNS-SRYCD
+                                           TO  WRK-KSNSRYCD
+                                              (WRK-KSNSRYCD-MAX)
+                       END-IF
       *            ELSE
       *                EVALUATE  TNS-TENSIKIBETU
       *                WHEN     6
       *                    MOVE  TNS-SRYCD TO  WRK-HYOKETU-SRYCD
       *                    MOVE  TNS-TEN   TO  WRK-HYOKETU-TEN
       *                END-EVALUATE
-                   END-IF
+                   END-EVALUATE
                END-IF
            END-PERFORM
       *
@@ -1612,6 +1643,18 @@
                    +   WRK-SRYCD-9
            END-IF
       *
+           PERFORM VARYING IDX8    FROM    1   BY  1
+                   UNTIL ( IDX8    >   WRK-KSNSRYCD-MAX )
+               IF    ( WRK-KSNSRYCD (IDX8)   NOT =   SPACE )
+               AND   ( WRK-KSNSRYCD (IDX8)   IS  NUMERIC )
+                   MOVE    WRK-KSNSRYCD (IDX8)
+                                       TO  WRK-SRYCD
+                   COMPUTE WRK-GAIHAKU-SRYCDTOTAL
+                       =   WRK-GAIHAKU-SRYCDTOTAL
+                       +   WRK-SRYCD-9
+               END-IF
+           END-PERFORM
+      *
       *    IF    ( WRK-HYOKETU-SRYCD   NOT =   SPACE )
       *     AND  ( WRK-HYOKETU-SRYCD       IS  NUMERIC )
       *        MOVE    WRK-HYOKETU-SRYCD   TO  WRK-SRYCD
@@ -1783,6 +1826,7 @@
                WHEN   5
                    COMPUTE WRK-GAIHAKU-TEN
                        = ( WRK-KHNTEN  *   0.7 )   +  0.5
+                       +   WRK-GAIHAKU-KSNTEN
                END-EVALUATE
            END-IF
       *
@@ -1848,16 +1892,27 @@
                                        TO  WGAIHAKU-SRYCDTOTAL
                                                            (IDXA IDXB)
       *
+                   MOVE    ZERO        TO  IDX9
                    IF    ( HCM34S01-EXGAIHAKU =   "1" )
                        MOVE    WRK-KHNSRYCD
                                        TO  WGAIHAKU-SRYCD  (IDXA IDXB 1)
       *
                        MOVE    WRK-GAIHAKU-SRYCD
                                        TO  WGAIHAKU-SRYCD  (IDXA IDXB 2)
+                       MOVE    2       TO  IDX9
                    ELSE
                        MOVE    WRK-GAIHAKU-SRYCD
                                        TO  WGAIHAKU-SRYCD  (IDXA IDXB 1)
+                       MOVE    1       TO  IDX9
                    END-IF
+      *
+                   PERFORM VARYING IDX8    FROM    1   BY  1
+                           UNTIL ( IDX8    >   WRK-KSNSRYCD-MAX )
+                       COMPUTE IDX9    =   IDX9    +   1
+                       MOVE    WRK-KSNSRYCD (IDX8)
+                                   TO  WGAIHAKU-SRYCD  (IDXA IDXB IDX9)
+                   END-PERFORM
+      *
       *            IF    ( WRK-HYOKETU-SRYCD   NOT =   SPACE )
       *                MOVE    WRK-HYOKETU-SRYCD
       *                                TO  WGAIHAKU-SRYCD  (IDXA IDXB 2)
