@@ -135,6 +135,8 @@
       *  04.04.04    NACL-Æ£¸¶    10/03/12  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀ¯ÉÜ´É
       *                                     ¾¸¤ò¥¨¥é¡¼¤È¤¹¤ë
+      *  04.04.05    NACL-Æ£¸¶    10/04/13  °¦ÃÎ¸©ÂÐ±þ
+      *                                     À¸ÊÝ¤ÈÆÃÄê¼À´µ£¹£±¤Îµ­ºÜ½ç 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2717,6 +2719,38 @@
                    END-IF
                    IF      WRK-RECE61-KOHHKNNUM-O (IDX)
                                                =   "186"
+                       IF      WRK-SEIHO-IDX       >   0
+                           MOVE    WRK-RECE61-KOHI-TBL(IDX)
+                                               TO  WRK-KOHI
+                           MOVE    WRK-RECE61-KOHI-TBL (WRK-SEIHO-IDX)
+                                               TO  WRK-RECE61-KOHI-TBL
+                                                   (IDX)
+                           MOVE    WRK-KOHI    TO  WRK-RECE61-KOHI-TBL
+                                                   (WRK-SEIHO-IDX)
+                       END-IF
+                       MOVE    4                   TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    °¦ÃÎ¤ÎÀ¸ÊÝ¤ÈÆÃÄê¼À´µ¡Ê£°£±£²¡Ü£±£¹£±¡Ë
+           IF      SYS-1001-PREFNUM    =   "23"
+               MOVE    ZERO                TO  WRK-SEIHO-IDX
+                                               WRK-HIBAKU-IDX                                                 
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       4
+                       OR      WRK-RECE61-KOHHKNNUM-O (IDX)
+                                   =       SPACE
+                   IF      WRK-RECE61-KOHHKNNUM-O (IDX)
+                                               =   "012"
+                       IF      WRK-HIBAKU-IDX      =   0 
+                           MOVE    IDX                 TO  WRK-SEIHO-IDX
+                       ELSE
+                           MOVE    4                   TO  IDX
+                       END-IF
+                   END-IF
+                   IF      WRK-RECE61-KOHHKNNUM-O (IDX)
+                                               =   "191"
                        IF      WRK-SEIHO-IDX       >   0
                            MOVE    WRK-RECE61-KOHI-TBL(IDX)
                                                TO  WRK-KOHI
