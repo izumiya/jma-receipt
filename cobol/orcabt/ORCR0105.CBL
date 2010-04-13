@@ -92,6 +92,8 @@
       *  04.05.07    NACL-藤原    10/03/29  平成２２年４月改正対応
       *                                     平成２２年４月分以降の処理を
       *                                     行うようにする
+      *  04.05.08    NACL-藤原    10/04/13  愛知県対応
+      *                                     生保と特定疾患９１の記載順 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4476,10 +4478,18 @@
                        MOVE    2                  TO  IDX1
                        MOVE    3                  TO  IDX2
                    ELSE
-                       COMPUTE IDX1    =   SEIHIDX   +   1
-                       MOVE    2                  TO  IDX2
-                       IF      IDX1               =   IDX2
-                           COMPUTE  IDX2  =  IDX1  +  1
+      *                愛知の生保と特定疾患（０１２＋１９１）のときはそのまま記載
+                       IF    ( SYS-1001-PREFNUM    =   "23"  )
+                       AND   ( RECE02-KOHNUM (1)   =   "191" )
+                       AND   ( RECE02-KOHNUM (2)   =   "012" )
+                           MOVE    2                  TO  IDX1
+                           MOVE    3                  TO  IDX2
+                       ELSE
+                           COMPUTE IDX1    =   SEIHIDX   +   1
+                           MOVE    2                  TO  IDX2
+                           IF      IDX1               =   IDX2
+                               COMPUTE  IDX2  =  IDX1  +  1
+                           END-IF
                        END-IF
                    END-IF
                ELSE
