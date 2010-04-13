@@ -180,6 +180,7 @@
       *    入院点数算定用ワークエリア
        01  WRK-NYUIN-TENSU-AREA.
            03  WRK-KHNTEN                              PIC 9(08). 
+           03  WRK-KSNTEN                              PIC S9(08).
            03  WRK-NYUTENTTLKBN                        PIC 9(03).
            03  WRK-NYUKHNRYO                           PIC 9(09).
            03  WRK-NYUTOKRYO                           PIC 9(09).
@@ -942,6 +943,8 @@
                     WHEN   5
                       COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.7)
                                                             +  0.5
+                      COMPUTE  WRK-NYUKHNRYO =  WRK-NYUKHNRYO
+                                             +  WRK-KSNTEN
                   END-EVALUATE
                   IF   WRK-NYUKHNRYO  NOT = ZERO
                     MOVE     ZERO     TO    FLG-ARI
@@ -987,6 +990,8 @@
                     WHEN   5
                       COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.7)
                                                             +  0.5
+                      COMPUTE  WRK-NYUTOKRYO =  WRK-NYUTOKRYO
+                                             +  WRK-KSNTEN
                       MOVE   1   TO   FLG-GAIHAKU
                   END-EVALUATE
                   IF  (WRK-DAY6(IDY)          NOT =  ZERO)
@@ -1103,6 +1108,7 @@
            MOVE    ZERO               TO   WRK-KHNTEN
            MOVE    SPACE              TO   WRK-RYAKUSHO
            MOVE    ZERO               TO   NYUINACT-IDX2
+           MOVE    ZERO               TO   WRK-KSNTEN
            MOVE    SPACE              TO   WRK-GAIHAKU-SRYCD
            MOVE    ZERO               TO   WRK-GAIHAKU-KHNTEN
            MOVE    ZERO               TO   WRK-HYOKETU-TEN
@@ -1153,6 +1159,10 @@
       ***                     MOVE   1         TO   FLG-NYUKHN
                          ELSE
                               EVALUATE  TNS-TENSIKIBETU
+                                WHEN     3
+                                    MOVE  TNS-TEN  TO  WRK-KSNTEN
+                                WHEN     8
+                                    COMPUTE  WRK-KSNTEN = TNS-TEN * -1
                                 WHEN     6
                                     MOVE  TNS-TEN  TO  WRK-HYOKETU-TEN
                               END-EVALUATE
@@ -1185,13 +1195,13 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
-           IF     WRK-HYOKETU-TEN    NOT =   ZERO
+      ***  IF     WRK-HYOKETU-TEN    NOT =   ZERO
       *      標欠：％減算
-             COMPUTE    WRK-KHNTEN  =
-                      ( WRK-KHNTEN  -
-                       (WRK-KHNTEN  *
-                        (WRK-HYOKETU-TEN   /  100)))  +  0.5
-           END-IF
+      ***    COMPUTE    WRK-KHNTEN  =
+      ***             ( WRK-KHNTEN  -
+      ***              (WRK-KHNTEN  *
+      ***               (WRK-HYOKETU-TEN   /  100)))  +  0.5
+      ***  END-IF
       *
            .
        2001123-NYUINKHN-GET-EXT.
