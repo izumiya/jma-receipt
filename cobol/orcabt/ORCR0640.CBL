@@ -428,6 +428,7 @@
       *  04.04.47    NACL-ÌçÏÆ    10/04/09  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -693,6 +694,7 @@
            03  IDU                                     PIC 9(03).
            03  NYUINACT-IDX                            PIC 9(03).
            03  KOHFTN-IDX                              PIC 9(03).
+           03  KOHFTN-IDX2                             PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-IDX2                             PIC 9(03).
            03  KOHIDX                                  PIC 9(03).
@@ -1022,6 +1024,10 @@
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
                05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
                05  TBL-PTTOKKI-CD                      PIC  X(02).
+      *
+       01  TBL-BUNTEN.
+           03  TBL-BUNTEN-OCC                          OCCURS  5.
+               05  TBL-BUNTENFLG                       PIC  9(01).
       *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
@@ -2397,6 +2403,8 @@
                                WRK-SKJ200604-TABLE
                                WRK-NYULIFE-TABLE
                                WRK-TENTEKI2-TABLE
+      *
+           INITIALIZE          TBL-BUNTEN
       *
            PERFORM        2110-GENGAKU-HANTEI-SEC
       *
@@ -14239,6 +14247,10 @@
               END-PERFORM
            END-IF
       *
+           IF    RECE62-SRYYM   >=  "200804"
+              PERFORM    210455-BUNTENSU-HENSYU-SEC
+           END-IF
+      *
            .
        21045-KOH-FUTAN-SET-EXT.
            EXIT.
@@ -14294,12 +14306,14 @@
               COMPUTE  RECE62-TOTALTEN(3) =
                        RECE62-TOTALTEN(1) -
                        RECE62-TOTALTEN(2)
+              MOVE    1    TO   TBL-BUNTENFLG(3)
               IF   (WRK-PREFNUM           =  "36" )
               AND  (RECE62-KOHNUM(2)      =  "245")
               AND  (RECE62-KOHHBTNUM(3)   =  "48" )
                  COMPUTE  RECE62-TOTALTEN(4) =
                           RECE62-TOTALTEN(1) -
                           RECE62-TOTALTEN(2)
+                 MOVE    1    TO   TBL-BUNTENFLG(4)
               END-IF
            END-IF
       *
@@ -14316,12 +14330,14 @@
               COMPUTE  RECE62-TOTALTEN(4) =
                        RECE62-TOTALTEN(1) -
                        RECE62-TOTALTEN(2)
+              MOVE    1    TO   TBL-BUNTENFLG(4)
               IF   (WRK-PREFNUM           =  "36" )
               AND  (RECE62-KOHNUM(3)      =  "245")
               AND  (RECE62-KOHHBTNUM(4)   =  "48" )
                  COMPUTE  RECE62-TOTALTEN(5) =
                           RECE62-TOTALTEN(1) -
                           RECE62-TOTALTEN(2)
+                 MOVE    1    TO   TBL-BUNTENFLG(5)
               END-IF
            END-IF
       *
@@ -14338,12 +14354,14 @@
               COMPUTE  RECE62-TOTALTEN(4) =
                        RECE62-TOTALTEN(1) -
                        RECE62-TOTALTEN(3)
+              MOVE    1    TO   TBL-BUNTENFLG(4)
               IF   (WRK-PREFNUM           =  "36" )
               AND  (RECE62-KOHNUM(3)      =  "245")
               AND  (RECE62-KOHHBTNUM(4)   =  "48" )
                  COMPUTE  RECE62-TOTALTEN(5) =
                           RECE62-TOTALTEN(1) -
                           RECE62-TOTALTEN(3)
+                 MOVE    1    TO   TBL-BUNTENFLG(5)
               END-IF
            END-IF
       *
@@ -14363,6 +14381,7 @@
                 COMPUTE  RECE62-TOTALTEN(3) =
                          RECE62-TOTALTEN(1) -
                          RECE62-TOTALTEN(2)
+                MOVE    1    TO   TBL-BUNTENFLG(3)
              END-IF
       *
              IF  ( RECE62-HKNNUM       NOT = SPACE    )
@@ -14380,6 +14399,7 @@
                 COMPUTE  RECE62-TOTALTEN(4) =
                          RECE62-TOTALTEN(1) -
                          RECE62-TOTALTEN(3)
+                MOVE    1    TO   TBL-BUNTENFLG(4)
              END-IF
       *
            END-IF
@@ -14400,6 +14420,7 @@
                          RECE62-TOTALTEN(1) -
                          RECE62-TOTALTEN(2)
                 MOVE    "1"    TO   RECE62-FUKUSHIFLG
+                MOVE     1     TO   TBL-BUNTENFLG(3)
              END-IF
       *
              IF  ( RECE62-HKNNUM       NOT = SPACE    )
@@ -14416,6 +14437,7 @@
                          RECE62-TOTALTEN(1) -
                          RECE62-TOTALTEN(2)
                 MOVE    "1"    TO   RECE62-FUKUSHIFLG
+                MOVE     1     TO   TBL-BUNTENFLG(4)
              END-IF
       *
              IF  ( RECE62-HKNNUM       NOT = SPACE    )
@@ -14432,6 +14454,7 @@
                          RECE62-TOTALTEN(1) -
                          RECE62-TOTALTEN(3)
                 MOVE    "1"    TO   RECE62-FUKUSHIFLG
+                MOVE     1     TO   TBL-BUNTENFLG(4)
              END-IF
       *
            END-IF
@@ -14722,6 +14745,140 @@
       *
            .
        210454-ETCKISAIFLGINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ê¬ÅÀÊÔ½¸
+      *****************************************************************
+       210455-BUNTENSU-HENSYU-SEC               SECTION.
+      *
+           PERFORM    VARYING   KOHFTN-IDX   FROM   3   BY   1
+      ***              UNTIL    KOHFTN-IDX     >    5
+                       UNTIL    KOHFTN-IDX     >    4
+      *
+             IF   TBL-BUNTENFLG(KOHFTN-IDX)   NOT =  ZERO
+                IF   (RECE62-KOHNUM(1)   = "972" OR "974")
+                AND  (KOHFTN-IDX         >   3           )
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   30
+                       COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE62-TENSU(KOHFTN-IDX2 1)          -
+                                RECE62-TENSU(KOHFTN-IDX2 3)
+                    END-PERFORM
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   10
+                       COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUKHNKEI(KOHFTN-IDX2 3)
+                       COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUTOKKEI(KOHFTN-IDX2 3)
+                    END-PERFORM
+                    COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUKHNKEI2(1)
+                          -  RECE62-NYUKHNKEI2(3)
+                    COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUTOKKEI2(1)
+                          -  RECE62-NYUTOKKEI2(3)
+                ELSE
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   30
+                       COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE62-TENSU(KOHFTN-IDX2 1)          -
+                                RECE62-TENSU(KOHFTN-IDX2 2)
+                    END-PERFORM
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   10
+                       COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
+                       COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
+                    END-PERFORM
+                    COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUKHNKEI2(1)
+                          -  RECE62-NYUKHNKEI2(2)
+                    COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUTOKKEI2(1)
+                          -  RECE62-NYUTOKKEI2(2)
+                END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           IF   RECE62-YOBIETC(3)  =   1
+              PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                          UNTIL    KOHFTN-IDX2     >   30
+                 COMPUTE  RECE62-TENSU(KOHFTN-IDX2 3) =
+                          RECE62-TENSU(KOHFTN-IDX2 1) -
+                          RECE62-TENSU(KOHFTN-IDX2 2)
+              END-PERFORM
+              PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                          UNTIL    KOHFTN-IDX2     >   10
+                 COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 3)
+                       =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                       -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
+                 COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 3)
+                       =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                       -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
+              END-PERFORM
+              COMPUTE  RECE62-NYUKHNKEI2(3)
+                    =  RECE62-NYUKHNKEI2(1)
+                    -  RECE62-NYUKHNKEI2(2)
+              COMPUTE  RECE62-NYUTOKKEI2(3)
+                    =  RECE62-NYUTOKKEI2(1)
+                    -  RECE62-NYUTOKKEI2(2)
+           END-IF
+           IF   RECE62-YOBIETC(4)  =   1
+              PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                          UNTIL    KOHFTN-IDX2     >   30
+                 COMPUTE  RECE62-TENSU(KOHFTN-IDX2 4) =
+                          RECE62-TENSU(KOHFTN-IDX2 1) -
+                          RECE62-TENSU(KOHFTN-IDX2 2)
+              END-PERFORM
+              PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                          UNTIL    KOHFTN-IDX2     >   10
+                 COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 4)
+                       =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                       -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
+                 COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 4)
+                       =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                       -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
+              END-PERFORM
+              COMPUTE  RECE62-NYUKHNKEI2(4)
+                    =  RECE62-NYUKHNKEI2(1)
+                    -  RECE62-NYUKHNKEI2(2)
+              COMPUTE  RECE62-NYUTOKKEI2(4)
+                    =  RECE62-NYUTOKKEI2(1)
+                    -  RECE62-NYUTOKKEI2(2)
+           END-IF
+      ***  IF   RECE62-YOBIETC(5)  =   1
+      ***     PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+      ***                 UNTIL    KOHFTN-IDX2     >   30
+      ***        COMPUTE  RECE62-TENSU(KOHFTN-IDX2 5) =
+      ***                 RECE62-TENSU(KOHFTN-IDX2 1) -
+      ***                 RECE62-TENSU(KOHFTN-IDX2 2)
+      ***     END-PERFORM
+      ***     PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+      ***                 UNTIL    KOHFTN-IDX2     >   10
+      ***        COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 5)
+      ***              =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+      ***              -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
+      ***        COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 5)
+      ***              =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+      ***              -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
+      ***     END-PERFORM
+      ***     COMPUTE  RECE62-NYUKHNKEI2(5)
+      ***           =  RECE62-NYUKHNKEI2(1)
+      ***           -  RECE62-NYUKHNKEI2(2)
+      ***     COMPUTE  RECE62-NYUTOKKEI2(5)
+      ***           =  RECE62-NYUTOKKEI2(1)
+      ***           -  RECE62-NYUTOKKEI2(2)
+      ***  END-IF
+      *
+           .
+       210455-BUNTENSU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

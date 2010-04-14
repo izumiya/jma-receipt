@@ -461,6 +461,7 @@
       *  04.04.47    NACL-ÌçÏÆ    10/04/09  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -715,6 +716,7 @@
            03  ACCT-IDX                                PIC 9(02).       
            03  HKN-IDX                                 PIC 9(02).       
            03  KOHFTN-IDX                              PIC 9(03).
+           03  KOHFTN-IDX2                             PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-IDX2                             PIC 9(03).
            03  FUKA-IDX                                PIC 9(03).
@@ -929,6 +931,10 @@
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
                05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
                05  TBL-PTTOKKI-CD                      PIC  X(02).
+      *
+       01  TBL-BUNTEN.
+           03  TBL-BUNTEN-OCC                          OCCURS  5.
+               05  TBL-BUNTENFLG                       PIC  9(01).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -2058,6 +2064,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            INITIALIZE                   CNT-SAISIN-AREA
       *
            INITIALIZE                   TBL-FUKUSHI
+           INITIALIZE                   TBL-BUNTEN
            MOVE    88888880     TO      WRK-ZAINUM
       *
            INITIALIZE                   TBL-TOKUSYU-KEISAN
@@ -4484,6 +4491,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE     1       TO      TBL-FUKUSHIFLG(2)
       *
                       MOVE    "1"      TO      RECE02-FUKUSHIFLG
+      *
+                      IF   RECE02-KOHNUMHC(IDX1 2) = RECE02-KOHNUM(2)
+                      AND  RECE02-KOHIDHC(IDX1 2)  = RECE02-KOHID(2)
+                          MOVE   1     TO  RECE02-YOBIETC(3)
+                      END-IF
+                      IF   RECE02-KOHNUMHC(IDX1 2) = RECE02-KOHNUM(3)
+                      AND  RECE02-KOHIDHC(IDX1 2)  = RECE02-KOHID(3)
+                          MOVE   1     TO  RECE02-YOBIETC(4)
+                      END-IF
+                      IF   RECE02-KOHNUMHC(IDX1 2) = RECE02-KOHNUM(4)
+                      AND  RECE02-KOHIDHC(IDX1 2)  = RECE02-KOHID(4)
+                          MOVE   1     TO  RECE02-YOBIETC(5)
+                      END-IF
       *
                  END-IF
       *
@@ -12352,6 +12372,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            END-EVALUATE
       *
+           IF    RECE02-SRYYM   >=  "200804"
+              PERFORM    21115-BUNTENSU-HENSYU-SEC
+           END-IF
+      *
            .
        2111-ICHIBUFUTAN-OKIKAE-EXT.
            EXIT.
@@ -12405,12 +12429,14 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               COMPUTE  RECE02-TOTALTEN(3) =
                        RECE02-TOTALTEN(1) -
                        RECE02-TOTALTEN(2)
+              MOVE    1    TO   TBL-BUNTENFLG(3)
               IF   (SYS-1001-PREFNUM      =  "36" )
               AND  (RECE02-KOHNUM(2)      =  "245")
               AND  (RECE02-KOHHBTNUM(3)   =  "48" )
                  COMPUTE  RECE02-TOTALTEN(4) =
                           RECE02-TOTALTEN(1) -
                           RECE02-TOTALTEN(2)
+                 MOVE    1    TO   TBL-BUNTENFLG(4)
               END-IF
               IF   (SYS-1001-PREFNUM   =  "13"    )
               AND  (RECE02-KOHNUM(2)   =  "588"   )
@@ -12432,12 +12458,14 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               COMPUTE  RECE02-TOTALTEN(4) =
                        RECE02-TOTALTEN(1) -
                        RECE02-TOTALTEN(2)
+              MOVE    1    TO   TBL-BUNTENFLG(4)
               IF   (SYS-1001-PREFNUM      =  "36" )
               AND  (RECE02-KOHNUM(3)      =  "245")
               AND  (RECE02-KOHHBTNUM(4)   =  "48" )
                  COMPUTE  RECE02-TOTALTEN(5) =
                           RECE02-TOTALTEN(1) -
                           RECE02-TOTALTEN(2)
+                 MOVE    1    TO   TBL-BUNTENFLG(5)
               END-IF
               IF   (SYS-1001-PREFNUM   =  "13"    )
               AND  (RECE02-KOHNUM(3)   =  "588"   )
@@ -12459,12 +12487,14 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               COMPUTE  RECE02-TOTALTEN(4) =
                        RECE02-TOTALTEN(1) -
                        RECE02-TOTALTEN(3)
+              MOVE    1    TO   TBL-BUNTENFLG(4)
               IF   (SYS-1001-PREFNUM      =  "36" )
               AND  (RECE02-KOHNUM(3)      =  "245")
               AND  (RECE02-KOHHBTNUM(4)   =  "48" )
                  COMPUTE  RECE02-TOTALTEN(5) =
                           RECE02-TOTALTEN(1) -
                           RECE02-TOTALTEN(3)
+                 MOVE    1    TO   TBL-BUNTENFLG(5)
               END-IF
               IF   (SYS-1001-PREFNUM   =  "13"    )
               AND  (RECE02-KOHNUM(3)   =  "588"   )
@@ -12489,6 +12519,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                 COMPUTE  RECE02-TOTALTEN(3) =
                          RECE02-TOTALTEN(1) -
                          RECE02-TOTALTEN(2)
+                MOVE    1    TO   TBL-BUNTENFLG(3)
                 IF   (RECE02-KOHNUM(2)   =  "588"   )
                 AND  (RECE02-SRYYM      >=  "200910")
                    MOVE   TBL-JNISSU2-MON(3)   TO   RECE02-JNISSU(3)
@@ -12510,6 +12541,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                 COMPUTE  RECE02-TOTALTEN(4) =
                          RECE02-TOTALTEN(1) -
                          RECE02-TOTALTEN(3)
+                MOVE    1    TO   TBL-BUNTENFLG(4)
                 IF   (RECE02-KOHNUM(3)   =  "588"   )
                 AND  (RECE02-SRYYM      >=  "200910")
                    MOVE   TBL-JNISSU2-MON(4)   TO   RECE02-JNISSU(4)
@@ -12534,6 +12566,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                          RECE02-TOTALTEN(1) -
                          RECE02-TOTALTEN(2)
                 MOVE    "1"    TO   RECE02-FUKUSHIFLG
+                MOVE     1     TO   TBL-BUNTENFLG(3)
              END-IF
       *
              IF  ( RECE02-HKNNUM       NOT = SPACE    )
@@ -12550,6 +12583,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                          RECE02-TOTALTEN(1) -
                          RECE02-TOTALTEN(2)
                 MOVE    "1"    TO   RECE02-FUKUSHIFLG
+                MOVE     1     TO   TBL-BUNTENFLG(4)
              END-IF
       *
              IF  ( RECE02-HKNNUM       NOT = SPACE    )
@@ -12566,6 +12600,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                          RECE02-TOTALTEN(1) -
                          RECE02-TOTALTEN(3)
                 MOVE    "1"    TO   RECE02-FUKUSHIFLG
+                MOVE     1     TO   TBL-BUNTENFLG(4)
              END-IF
       *
            END-IF
@@ -12763,6 +12798,65 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        21114-ETCHENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ê¬ÅÀÊÔ½¸
+      *****************************************************************
+       21115-BUNTENSU-HENSYU-SEC               SECTION.
+      *
+           PERFORM    VARYING   KOHFTN-IDX   FROM   3   BY   1
+      ***              UNTIL    KOHFTN-IDX     >    5
+                       UNTIL    KOHFTN-IDX     >    4
+      *
+             IF   TBL-BUNTENFLG(KOHFTN-IDX)   NOT =  ZERO
+                IF   (RECE02-KOHNUM(1)   = "972" OR "974")
+                AND  (KOHFTN-IDX         >   3           )
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   50
+                       COMPUTE  RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE02-TENSU(KOHFTN-IDX2 1)          -
+                                RECE02-TENSU(KOHFTN-IDX2 3)
+                    END-PERFORM
+                ELSE
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   50
+                       COMPUTE  RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE02-TENSU(KOHFTN-IDX2 1)          -
+                                RECE02-TENSU(KOHFTN-IDX2 2)
+                    END-PERFORM
+                END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           IF   RECE02-YOBIETC(3)  =   1
+               PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX2     >   50
+                  COMPUTE  RECE02-TENSU(KOHFTN-IDX2 3) =
+                           RECE02-TENSU(KOHFTN-IDX2 1) -
+                           RECE02-TENSU(KOHFTN-IDX2 2)
+               END-PERFORM
+           END-IF
+           IF   RECE02-YOBIETC(4)  =   1
+               PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX2     >   50
+                  COMPUTE  RECE02-TENSU(KOHFTN-IDX2 4) =
+                           RECE02-TENSU(KOHFTN-IDX2 1) -
+                           RECE02-TENSU(KOHFTN-IDX2 2)
+               END-PERFORM
+           END-IF
+      ***  IF   RECE02-YOBIETC(5)  =   1
+      ***      PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+      ***                  UNTIL    KOHFTN-IDX2     >   50
+      ***         COMPUTE  RECE02-TENSU(KOHFTN-IDX2 5) =
+      ***                  RECE02-TENSU(KOHFTN-IDX2 1) -
+      ***                  RECE02-TENSU(KOHFTN-IDX2 2)
+      ***      END-PERFORM
+      ***  END-IF
+      *
+           .
+       21115-BUNTENSU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

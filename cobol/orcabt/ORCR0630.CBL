@@ -86,6 +86,7 @@
       *  04.04.02    NACL-ÌçÏÆ    09/05/11  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    09/09/04  ¾®Æþ´ÉÎ¬¾Î½¤Àµ
       *  04.04.04    NACL-ÌçÏÆ    10/03/23  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
+      *  04.04.05    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *****************************************************************
       *
       *
@@ -3747,6 +3748,19 @@
                       MOVE     1       TO      TBL-FUKUSHIFLG(2)
       *
                       MOVE    "1"      TO      RECE62-FUKUSHIFLG
+      *
+                      IF   RECE62-KOHNUMHC(IDX1 2) = RECE62-KOHNUM(2)
+                      AND  RECE62-KOHIDHC(IDX1 2)  = RECE62-KOHID(2)
+                          MOVE   1     TO  RECE62-YOBIETC(3)
+                      END-IF
+                      IF   RECE62-KOHNUMHC(IDX1 2) = RECE62-KOHNUM(3)
+                      AND  RECE62-KOHIDHC(IDX1 2)  = RECE62-KOHID(3)
+                          MOVE   1     TO  RECE62-YOBIETC(4)
+                      END-IF
+                      IF   RECE62-KOHNUMHC(IDX1 2) = RECE62-KOHNUM(4)
+                      AND  RECE62-KOHIDHC(IDX1 2)  = RECE62-KOHID(4)
+                          MOVE   1     TO  RECE62-YOBIETC(5)
+                      END-IF
       *
                  END-IF
       *
