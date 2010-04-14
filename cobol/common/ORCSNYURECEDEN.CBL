@@ -283,21 +283,40 @@
       *
       *    Ãí²Ã»»ÄÌÈÖ¤ò¤â¤ÄÆþ±¡ÎÁ²Ã»»¤ÎÂàÈòÎÎ°è¡ÊÊ¿À®£²£°Ç¯£´·î¤è¤ê¡Ë
       *    £±Ìë´Ö¶ÛµÞÂÎÀ©³ÎÊÝ²Ã»»
-      *    £²°å»ÕÇÛÃÖÅ¬¹ç²Ã»»
-      *    £³´Ç¸îÇÛÃÖ²Ã»»£±
-      *    £´´Ç¸îÇÛÃÖ²Ã»»£²
-      *    £µÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±
-      *    £¶Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²
+      *    £²°å»ÕÇÛÃÖÅ¬¹ç²Ã»»¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤ê°å»ÕÇÛÃÖ²Ã»»£²¡Ë
+      *    £³´Ç¸îÇÛÃÖ²Ã»»£±¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤ê´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
+      *    £´´Ç¸îÇÛÃÖ²Ã»»£²¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤ê´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
+      *    £µÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤êÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
+      *    £¶Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤êÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
       *    £·¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡ÊÆÃ¼ì¼À´µ¡Ë
       *    £¸¥×¥ì¥¤¥ë¡¼¥à¡¢ÊÝ°é»ÎÅù²Ã»»
       *    £¹¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡Ê¾®»ùÆþ±¡°åÎÅ¡Ë
       *  £±£°½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÆÃÄêµ¡Ç½ÉÂ±¡Àº¿ÀÉÂÅï¡Ë
-      *  £±£±ÈóÄê·¿¹³Àº¿ÀÌô¼£ÎÅ´ÉÍý²Ã»»
+      *  £±£±ÈóÄê·¿¹³Àº¿ÀÌô¼£ÎÅ´ÉÍý²Ã»»¡ÊÊ¿À®£²£²Ç¯£´·î¤è¤êÈóÄê·¿¹³Àº¿ÀÌô²Ã»»£²¡Ë
       *  £±£²êóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÎÅÍÜÉÂÅï¡Ë
       *  £±£³êóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½ê¡Ë
       *  £±£´½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»
+      *   Ãí²Ã»»ÄÌÈÖ¤ò¤â¤ÄÆþ±¡ÎÁ²Ã»»¤ÎÂàÈòÎÎ°è¡ÊÊ¿À®£²£²Ç¯£´·îÄÉ²ÃÊ¬¡Ë
+      *  £±£µ°å»ÕÇÛÃÖ²Ã»»£±
+      *  £±£¶½¼¼ÂÃÊ³¬£Á²Ã»»
+      *  £±£·½¼¼ÂÃÊ³¬£Â²Ã»»
+      *  £±£¸¹âÅÙ°åÎÅÂÎÀ©²Ã»»
+      *  £±£¹¾®»ù²Ã»»¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡¡£·Æü°ÊÆâ¡Ë
+      *  £²£°¾®»ù²Ã»»¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡¡£¸Æü°Ê¾å£±£´ÆüÌ¤Ëþ¡Ë
+      *  £²£±½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþÏ¢·È²Ã»»
+      *  £²£²ÈóÄê·¿¹³Àº¿ÀÉÂÌô²Ã»»£±
+      *  £²£³µÙÆü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÄó¶¡ÂÎÀ©²Ã»»
+      *  £²£´¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó½¼¼Â²Ã»»
+      *  £²£µÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+      *  £²£¶½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+      *  £²£·Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+      *  £²£¸½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+      *  £²£¹ºßÂð½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþ²Ã»»
+      *  £³£°°åÎÅ°ÂÁ´ÂÐºö²Ã»»£±
+      *  £³£±´¶À÷ËÉ»ßÂÐºö²Ã»»
+      *  £³£²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÄó¶¡ÂÎÀ©²Ã»»
            03  WRK-CHUKSN-NYUKSN-AREA.
-             05   WRK-CHUKSN-NYUKSN-TBL      OCCURS  14.
+             05   WRK-CHUKSN-NYUKSN-TBL      OCCURS  32.
                07  WRK-CHUKSN-NYUKSN         PIC X(09).
                07  WRK-CHUKSN-NYUKSN-ZAITEN  PIC 9(08).
                07  WRK-CHUKSN-NYUKSN-DAY     PIC 9(03)  OCCURS 31.
@@ -1255,7 +1274,8 @@
       *
            END-IF
       *
-      *    Í­¾²¿ÇÎÅ½ê¤ÎÆþ±¡ÎÁ²Ã»»¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *    Í­¾²¿ÇÎÅ½ê¤ÎÆþ±¡ÎÁ²Ã»»¡ÊÆþ±¡²ñ·×¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *    ¢¨Ãí²Ã»»¥³¡¼¥É¤ÎÉÕÈÖ¤µ¤ì¤Æ¤¤¤ë¤â¤Î
            IF   (SPA-HOSPSBT                 =    2)    AND
                 (LNK-NYURECEDEN-SANTEIYM    >=   "200804")
       *
@@ -1293,7 +1313,17 @@
                                      TO WRK-CHUKSN-NYUKSN-DAY(1 IDX1)
                          END-IF
       *
-      *                  °å»ÕÇÛÃÖÅ¬¹ç²Ã»»
+      *                  °å»ÕÇÛÃÖ²Ã»»£±¡ÊÊ¿À®£²£²Ç¯£´·î¿·Àß¡Ë
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190135570
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(15)
+                           MOVE   NACCT-ZAITEN  
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(15)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(15 IDX1)
+                         END-IF
+      *
+      *                  °å»ÕÇÛÃÖ²Ã»»£²¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç°å»ÕÇÛÃÖÅ¬¹ç²Ã»»¡Ë
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190117070
                            MOVE   NACCT-SRYCDTOTAL(6:9)
                                      TO  WRK-CHUKSN-NYUKSN(2)
@@ -1303,7 +1333,7 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(2 IDX1)
                          END-IF
       *
-      *                  ´Ç¸îÇÛÃÖ²Ã»»£±
+      *                  ´Ç¸îÇÛÃÖ²Ã»»£²¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190126570
                            MOVE   NACCT-SRYCDTOTAL(6:9)
                                      TO  WRK-CHUKSN-NYUKSN(3)
@@ -1313,7 +1343,7 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(3 IDX1)
                          END-IF
       *
-      *                  ´Ç¸îÇÛÃÖ²Ã»»£²
+      *                  ´Ç¸îÇÛÃÖ²Ã»»£±¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190109670
                            MOVE   NACCT-SRYCDTOTAL(6:9)
                                      TO  WRK-CHUKSN-NYUKSN(4)
@@ -1323,7 +1353,7 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(4 IDX1)
                          END-IF
       *
-      *                  Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£±
+      *                  Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤ÇÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190126670
                            MOVE   NACCT-SRYCDTOTAL(6:9)
                                      TO  WRK-CHUKSN-NYUKSN(5)
@@ -1333,7 +1363,7 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(5 IDX1)
                          END-IF
       *
-      *                  Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²
+      *                  Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡ÊÊ¿À®£²£²Ç¯£³·î¤Þ¤ÇÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190126770
                            MOVE   NACCT-SRYCDTOTAL(6:9)
                                      TO  WRK-CHUKSN-NYUKSN(6)
@@ -1357,7 +1387,8 @@
       *
            END-IF
       *
-      *    ÉÂ±¡¤ÎÆþ±¡ÎÁ²Ã»»¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *    ÉÂ±¡¤ÎÆþ±¡ÎÁ²Ã»»¡ÊÆþ±¡²ñ·×¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *    ¢¨Ãí²Ã»»¥³¡¼¥É¤ÎÉÕÈÖ¤µ¤ì¤Æ¤¤¤ë¤â¤Î
            IF   (SPA-HOSPSBT                 =    1)    AND
                 (LNK-NYURECEDEN-SANTEIYM    >=   "200804")
       *
@@ -1419,7 +1450,8 @@
       *
            END-IF
       *
-      *Æþ±¡»þ¤ÎÆþ±¡ÎÁ²Ã»»¼èÆÀ¡ÊÆþ±¡²ñ·×¤è¤ê¡Ë
+      *    Æþ±¡ÎÁ²Ã»»¼èÆÀ¡ÊÆþ±¡²ñ·×¡Ë
+      *    ¢¨Ãí²Ã»»¥³¡¼¥É¤ÎÉÕÈÖ¤µ¤ì¤Æ¤¤¤Ê¤¤¤â¤Î
            MOVE    ZERO                    TO  KSN-IDX
            INITIALIZE                          NYUINACCT-REC
            MOVE    LNK-NYURECEDEN-HOSPNUM  TO  NACCT-HOSPNUM
@@ -1451,6 +1483,7 @@
                             (((SPA-HOSPSBT                 =    2) AND
                              (LNK-NYURECEDEN-SANTEIYM >= "200804")) AND
                             ((NACCT-SRYCDTOTAL(6:9) =  190126470)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190135570)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190117070)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190126570)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190109670)  OR
@@ -1488,7 +1521,7 @@
            PERFORM   900-CLOSE-SEC
       *
       *
-      *Æþ±¡»þ¤ÎÆþ±¡ÎÁ²Ã»»¼èÆÀ¡Ê¿ÇÎÅ²ñ·×¤è¤ê¡Ë
+      *    Æþ±¡ÎÁ²Ã»»¼èÆÀ¡Ê¿ÇÎÅ²ñ·×¡Ë
            INITIALIZE                          SRYACCT-REC
            MOVE    LNK-NYURECEDEN-HOSPNUM  TO  ACCT-HOSPNUM
            MOVE    "1"                     TO  ACCT-NYUGAIKBN
@@ -1556,7 +1589,24 @@
                                                    "190119210"  OR
                                                    "190117570"  OR
                                                    "190121970"  OR
-                                                   "190122670"))
+                                                   "190122670"  OR
+                                                   "190139470"  OR
+                                                   "190139570"  OR
+                                                   "190139670"  OR
+                                                   "190140270"  OR
+                                                   "190140370"  OR
+                                                   "190135070"  OR
+                                                   "190141270"  OR
+                                                   "190140870"  OR
+                                                   "190140970"  OR
+                                                   "190136170"  OR
+                                                   "190141070" ))
+                                   OR
+                         ((LNK-NYURECEDEN-SANTEIYM >= "201004") AND
+                          (ACCT-SRYCDTOTAL(6:9)  = "190076570"  OR
+                                                   "190076670"  OR
+                                                   "190127510"  OR 
+                                                   "190127610" ))
       *                Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -1671,6 +1721,127 @@
                                       TO  WRK-CHUKSN-NYUKSN-ZAITEN(13)
                                   MOVE   ACCT-DAY(1 IDX1)
                                       TO WRK-CHUKSN-NYUKSN-DAY(13 IDX1)
+      *                        ¤³¤³¤«¤éÊ¿À®£²£²Ç¯£´·î¿·ÀßÊ¬
+      *                         ½¼¼ÂÃÊ³¬£Á²Ã»»
+                                WHEN  "190139470"
+                                  MOVE   "190139470"
+                                      TO  WRK-CHUKSN-NYUKSN(16)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(16)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(16 IDX1)
+      *                         ½¼¼ÂÃÊ³¬£Â²Ã»»
+                                WHEN  "190139570"
+                                  MOVE   "190139570"
+                                      TO  WRK-CHUKSN-NYUKSN(17)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(17)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(17 IDX1)
+      *                         ¹âÅÙ°åÎÅÂÎÀ©²Ã»»
+                                WHEN  "190139670"
+                                  MOVE   "190139670"
+                                      TO  WRK-CHUKSN-NYUKSN(18)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(18)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(18 IDX1)
+      *                         ¾®»ù²Ã»»¡ÊÆÃÄê½¸Ãæ¡Ë¡Ê£·Æü°ÊÆâ¡Ë
+                                WHEN  "190140270"
+                                  MOVE   "190140270"
+                                      TO  WRK-CHUKSN-NYUKSN(19)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(19)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(19 IDX1)
+      *                         ¾®»ù²Ã»»¡ÊÆÃÄê½¸Ãæ¡Ë¡Ê£¸Æü°Ê¾å£±£´ÆüÌ¤Ëþ¡Ë
+                                WHEN  "190140370"
+                                  MOVE   "190140370"
+                                      TO  WRK-CHUKSN-NYUKSN(20)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(20)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(20 IDX1)
+      *                         ½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþÏ¢·È²Ã»»
+                                WHEN  "190135070"
+                                  MOVE   "190135070"
+                                      TO  WRK-CHUKSN-NYUKSN(21)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(21)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(21 IDX1)
+      *                         ÈóÄê·¿¹³Àº¿ÀÉÂÌô²Ã»»£±¡Ê£²¼ïÎà°Ê²¼¡Ë
+                                WHEN  "190141270"
+                                  MOVE   "190141270"
+                                      TO  WRK-CHUKSN-NYUKSN(22)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(22)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(22 IDX1)
+      *                         µÙÆü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÄó¶¡ÂÎÀ©²Ã»»
+                                WHEN  "190140870"
+                                  MOVE   "190140870"
+                                      TO  WRK-CHUKSN-NYUKSN(23)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(23)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(23 IDX1)
+      *                         ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó½¼¼Â²Ã»»
+                                WHEN  "190140970"
+                                  MOVE   "190140970"
+                                      TO  WRK-CHUKSN-NYUKSN(24)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(24)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(24 IDX1)
+      *                         Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+                                WHEN  "190076570"
+                                  MOVE   "190076570"
+                                      TO  WRK-CHUKSN-NYUKSN(25)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(25)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(25 IDX1)
+      *                         ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+                                WHEN  "190076670"
+                                  MOVE   "190076670"
+                                      TO  WRK-CHUKSN-NYUKSN(26)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(26)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(26 IDX1)
+      *                         Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+                                WHEN  "190127510"
+                                  MOVE   "190127510"
+                                      TO  WRK-CHUKSN-NYUKSN(27)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(27)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(27 IDX1)
+      *                         ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+                                WHEN  "190127610"
+                                  MOVE   "190127610"
+                                      TO  WRK-CHUKSN-NYUKSN(28)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(28)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(28 IDX1)
+      *                         ºßÂð½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþ²Ã»»
+                                WHEN  "190136170"
+                                  MOVE   "190136170"
+                                      TO  WRK-CHUKSN-NYUKSN(29)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(29)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(29 IDX1)
+      *                         ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÄó¶¡ÂÎÀ©²Ã»»
+                                WHEN  "190141070"
+                                  MOVE   "190141070"
+                                      TO  WRK-CHUKSN-NYUKSN(32)
+                                  MOVE   ACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(32)
+                                  MOVE   ACCT-DAY(1 IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(32 IDX1)
                                END-EVALUATE
                              END-IF                                  
       *
@@ -1893,9 +2064,10 @@
                  END-IF
                END-IF
       *
+      *        ¿ÇÎÅ½ê¤ÎÆþ±¡ÎÁ²Ã»»¥»¥Ã¥È¡ÊÊ¿À®£²£°Ç¯£³·î¤Þ¤Ç¡Ë
                IF  (SPA-HOSPSBT                 =    2)    AND  
                    (LNK-NYURECEDEN-SANTEIYM     <=   "200803")
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÊ£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£³·î¤Þ¤Ç¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÊ£¿ô°å»ÕµÚ¤Ó´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë
                    IF    WRK-FUKUSU-NYUKSN-DAY(IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1904,7 +2076,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£³·î¤Þ¤Ç¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖÅ¬¹ç²Ã»»¡Ë
                    IF    WRK-KANGO-NYUKSN-DAY(IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1914,10 +2086,12 @@
                    END-IF
                END-IF
       *
+      *        ¿ÇÎÅ½ê¤ÎÆþ±¡ÎÁ²Ã»»¥»¥Ã¥È¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤éÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç¡Ë
                IF  (SPA-HOSPSBT                 =    2)    AND  
-                   (LNK-NYURECEDEN-SANTEIYM     >=   "200804")
+                   (LNK-NYURECEDEN-SANTEIYM     >=   "200804")  AND
+                   (LNK-NYURECEDEN-SANTEIYM     <=   "201003")
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö¶ÛµÞÂÎÀ©³ÎÊÝ²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö¶ÛµÞÂÎÀ©³ÎÊÝ²Ã»»¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(1 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1926,7 +2100,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê°å»ÕÇÛÃÖÅ¬¹ç²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê°å»ÕÇÛÃÖÅ¬¹ç²Ã»»¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(2 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1935,7 +2109,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖ²Ã»»£±¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(3 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1944,7 +2118,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖ²Ã»»£²¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(4 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1953,7 +2127,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(5 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1962,7 +2136,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(6 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1971,7 +2145,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊêóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½ê¡Ë¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊêóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½ê¡Ë¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(13 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1982,10 +2156,135 @@
       *
                END-IF
       *
-               IF  (SPA-HOSPSBT                 =    1)    AND  
-                   (LNK-NYURECEDEN-SANTEIYM     >=   "200804")
+      *        ¿ÇÎÅ½ê¤ÎÆþ±¡ÎÁ²Ã»»¥»¥Ã¥È¡ÊÊ¿À®£²£²Ç¯£´·î¤«¤é¡Ë
+               IF  (SPA-HOSPSBT                 =    2)    AND  
+                   (LNK-NYURECEDEN-SANTEIYM     >=   "201004")
       *
-      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡ÊÆÃ¼ì¼À´µ¡Ë¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö¶ÛµÞÂÎÀ©³ÎÊÝ²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(1 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(1)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê°å»ÕÇÛÃÖ²Ã»»£±¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(15 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(15)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê°å»ÕÇÛÃÖ²Ã»»£²¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(2 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(2)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(4 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(4)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(3 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(3)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£±¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(6 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(6)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡ÊÌë´Ö´Ç¸îÇÛÃÖ²Ã»»£²¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(5 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(5)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊêóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½ê¡Ë¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(13 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(13)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐ°Ê¾å¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(25 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(25)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐ°Ê¾å¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(26 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(26)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐÌ¤Ëþ¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(27 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(27)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐÌ¤Ëþ¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(28 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(28)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊºßÂð½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþ²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(29 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(29)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+               END-IF
+      *
+      *        ÉÂ±¡¤ÎÆþ±¡ÎÁ²Ã»»¥»¥Ã¥È¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤éÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç¡Ë
+               IF  (SPA-HOSPSBT                 =    1)    AND  
+                   (LNK-NYURECEDEN-SANTEIYM     >=   "200804")  AND
+                   (LNK-NYURECEDEN-SANTEIYM     <=   "201003")
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡ÊÆÃ¼ì¼À´µ¡Ë¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(7 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -1994,7 +2293,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê¥×¥ì¥¤¥ë¡¼¥à¡¢ÊÝ°é»ÎÅù²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê¥×¥ì¥¤¥ë¡¼¥à¡¢ÊÝ°é»ÎÅù²Ã»»¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(8 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -2003,7 +2302,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡Ê¾®»ùÆþ±¡°åÎÅ¡Ë¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡Ê¾®»ùÆþ±¡°åÎÅ¡Ë¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(9 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -2012,7 +2311,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÆÃÄêµ¡Ç½ÉÂ±¡Àº¿ÀÉÂÅï¡Ë¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÆÃÄêµ¡Ç½ÉÂ±¡Àº¿ÀÉÂÅï¡Ë¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(10 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -2021,7 +2320,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÈóÄê·¿¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÈóÄê·¿¹³Àº¿ÀÉÂÌô¼£ÎÅ´ÉÍý²Ã»»¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(11 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -2030,7 +2329,7 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊêóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÎÅÍÜÉÂÅï¡Ë¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊêóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÎÅÍÜÉÂÅï¡Ë¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(12 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
@@ -2039,12 +2338,216 @@
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
-      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»¡Ë¡ÊÊ¿À®£²£°Ç¯£´·î¤«¤é¡Ë
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»¡Ë
                    IF    WRK-CHUKSN-NYUKSN-DAY(14 IDX1)  =  ZERO
                        CONTINUE
                    ELSE
                        ADD   1    TO  WRK-MEISAISU
                        MOVE  WRK-CHUKSN-NYUKSN(14)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+               END-IF
+      *
+      *        ÉÂ±¡¤ÎÆþ±¡ÎÁ²Ã»»¥»¥Ã¥È¡ÊÊ¿À®£²£²Ç¯£´·î¤«¤é¡Ë
+               IF  (SPA-HOSPSBT                 =    1)    AND
+                   (LNK-NYURECEDEN-SANTEIYM     >=   "201004")
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡ÊÆÃ¼ì¼À´µ¡Ë¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(7 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(7)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê¥×¥ì¥¤¥ë¡¼¥à¡¢ÊÝ°é»ÎÅù²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(8 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(8)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¿Í¹©¸ÆµÛ´ï»ÈÍÑ²Ã»»¡Ê¾®»ùÆþ±¡°åÎÅ¡Ë¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(9 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(9)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½¼¼ÂÃÊ³¬£Á²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(16 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(16)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½¼¼ÂÃÊ³¬£Â²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(17 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(17)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¹âÅÙ°åÎÅÂÎÀ©²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(18 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(18)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¾®»ù²Ã»»£·Æü°ÊÆâ¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(19 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(19)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¾®»ù²Ã»»£¸Æü°Ê¾å£±£´ÆüÌ¤Ëþ¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(20 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(20)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÆÃÄêµ¡Ç½ÉÂ±¡Àº¿ÀÉÂÅï¡Ë¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(10 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(10)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþÏ¢·È²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(21 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(21)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÈóÄê·¿¹³Àº¿ÀÉÂÌô²Ã»»£²¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(11 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(11)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÈóÄê·¿¹³Àº¿ÀÉÂÌô²Ã»»£±¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(22 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(22)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊêóáìÉ¾²Á¼Â»Ü²Ã»»¡ÊÎÅÍÜÉÂÅï¡Ë¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(12 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(12)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            Æþ±¡²ñ·×²Ã»»¾ðÊó¡Ê½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(14 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(14)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊµÙÆü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÄó¶¡ÂÎÀ©²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(23 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(23)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó½¼¼Â²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(24 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(24)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐ°Ê¾å¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(25 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(25)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐ°Ê¾å¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(26 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(26)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐÌ¤Ëþ¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(27 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(27)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»£¶ºÐÌ¤Ëþ¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(28 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(28)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡ÊºßÂð½Å¾É»ù¡Ê¼Ô¡Ë¼õÆþ²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(29 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(29)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×²Ã»»¾ðÊó¡Ê¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÄó¶¡ÂÎÀ©²Ã»»¡Ë
+                   IF    WRK-CHUKSN-NYUKSN-DAY(32 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(32)
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
