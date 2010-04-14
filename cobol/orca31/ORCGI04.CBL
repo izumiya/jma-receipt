@@ -1008,12 +1008,12 @@
            IF    ( SPA-NAI-I04-TEIKIKEISANFLG
                                        =   ZERO )
                PERFORM 3101-KBT-HEN-SEC
+               PERFORM 3101-KBT-SAGAKU-HEN-SEC
       *
                MOVE    1           TO  SPA-NAI-I04-TEIKIKEISANFLG
       *
            END-IF
       *
-           PERFORM 3101-KBT-SAGAKU-HEN-SEC
       *
             .
        31001-TEIKISAGAKU-HEN-EXT.
@@ -1072,7 +1072,10 @@
       *************************************************************
        3101-KBT-SAGAKU-HEN-SEC         SECTION.
       *
-           PERFORM VARYING IDX-SYU FROM    1   BY  1
+           IF    ( WRK-LASTTEIKIEDYMD (1:6)
+                                      =    SPA-I01-I04-SKYSTYMD (1:6))
+      *
+             PERFORM VARYING IDX-SYU FROM    1   BY  1
                    UNTIL ( IDX-SYU >   SPA-I0-SYUNOU-CNT )
                IF    ( SPA-I0-SYUNOU-TTLDAT-FLG (IDX-SYU)
                                    =   1 )
@@ -1092,7 +1095,8 @@
                             -  WKSYU-CHOSEI )
                    END-IF
                END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            COMPUTE SPA-GMN-I04-SKYSGK
                =   SPA-GMN-I04-SKY1ST
