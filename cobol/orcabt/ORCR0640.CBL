@@ -428,6 +428,7 @@
       *  04.04.47    NACL-ÌçÏÆ    10/04/09  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -714,6 +715,7 @@
            03  IDU                                     PIC 9(03).
            03  NYUINACT-IDX                            PIC 9(03).
            03  KOHFTN-IDX                              PIC 9(03).
+           03  KOHFTN-IDX2                             PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-IDX2                             PIC 9(03).
            03  KOHIDX                                  PIC 9(03).
@@ -2462,6 +2464,19 @@
                PERFORM    2113-GENTEN-HENSYU-SEC
                PERFORM    2104-FTN-SET-SEC
       ***  END-PERFORM
+      *
+           IF    RECE62-SRYYM   >=  "200804"
+             PERFORM      2114-BUNTENSU-HENSYU-SEC
+           END-IF
+           IF    RECE62-FUKUSHIFLG(3)  =  "2"
+               MOVE   SPACE   TO   RECE62-FUKUSHIFLG(3)
+           END-IF
+           IF    RECE62-FUKUSHIFLG(4)  =  "2"
+               MOVE   SPACE   TO   RECE62-FUKUSHIFLG(4)
+           END-IF
+           IF    RECE62-FUKUSHIFLG(5)  =  "2"
+               MOVE   SPACE   TO   RECE62-FUKUSHIFLG(5)
+           END-IF
       *
       *    ¥ì¥»¥×¥ÈÀÁµá¶èÊ¬¤Ë¤è¤ë¸øÈñ¾ðÊó¤Î¿¶¤êÊ¬¤±½èÍý
            MOVE    ZERO            TO  FLG-RECESKYKBN
@@ -18066,6 +18081,89 @@
       *
            .
        2113-GENTEN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ê¬ÅÀÊÔ½¸
+      *****************************************************************
+       2114-BUNTENSU-HENSYU-SEC               SECTION.
+      *
+           IF    RECE62-FUKUSHIFLG(3)  =  "2"
+              IF  (RECE62-KOHNUM(2)(1:1)  >= "1" AND <= "8"  )
+              AND (RECE62-HENTOTALTEN(3) = RECE62-TOTALTEN(3))
+                  MOVE   SPACE   TO   RECE62-FUKUSHIFLG(3)
+              END-IF
+           END-IF
+           IF    RECE62-FUKUSHIFLG(4)  =  "2"
+              IF  (RECE62-KOHNUM(3)(1:1)  >= "1" AND <= "8"  )
+              AND (RECE62-HENTOTALTEN(4) = RECE62-TOTALTEN(4))
+                  MOVE   SPACE   TO   RECE62-FUKUSHIFLG(4)
+              END-IF
+           END-IF
+           IF    RECE62-FUKUSHIFLG(5)  =  "2"
+              IF  (RECE62-KOHNUM(4)(1:1)  >= "1" AND <= "8"  )
+              AND (RECE62-HENTOTALTEN(5) = RECE62-TOTALTEN(5))
+                  MOVE   SPACE   TO   RECE62-FUKUSHIFLG(5)
+              END-IF
+           END-IF
+      *
+           PERFORM    VARYING   KOHFTN-IDX   FROM   3   BY   1
+      ***              UNTIL    KOHFTN-IDX     >    5
+                       UNTIL    KOHFTN-IDX     >    4
+      *
+             IF   RECE62-FUKUSHIFLG(KOHFTN-IDX)   NOT =  SPACE
+                IF   (RECE62-KOHNUM(1)   = "972" OR "974")
+                AND  (KOHFTN-IDX         >   3           )
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   30
+                       COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE62-TENSU(KOHFTN-IDX2 1)          -
+                                RECE62-TENSU(KOHFTN-IDX2 3)
+                    END-PERFORM
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   10
+                       COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUKHNKEI(KOHFTN-IDX2 3)
+                       COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUTOKKEI(KOHFTN-IDX2 3)
+                    END-PERFORM
+                    COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUKHNKEI2(1)
+                          -  RECE62-NYUKHNKEI2(3)
+                    COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUTOKKEI2(1)
+                          -  RECE62-NYUTOKKEI2(3)
+                ELSE
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   30
+                       COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE62-TENSU(KOHFTN-IDX2 1)          -
+                                RECE62-TENSU(KOHFTN-IDX2 2)
+                    END-PERFORM
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   10
+                       COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
+                       COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                             =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                             -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
+                    END-PERFORM
+                    COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUKHNKEI2(1)
+                          -  RECE62-NYUKHNKEI2(2)
+                    COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+                          =  RECE62-NYUTOKKEI2(1)
+                          -  RECE62-NYUTOKKEI2(2)
+                END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2114-BUNTENSU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

@@ -86,6 +86,7 @@
       *  04.04.02    NACL-門脇    09/05/11  愛媛県地方公費対応
       *  04.04.03    NACL-門脇    09/09/04  小入管略称修正
       *  04.04.04    NACL-門脇    10/03/23  改正対応（外泊区分５の対応）
+      *  04.04.05    NACL-門脇    10/04/13  分点編集
       *
       *  04.05.01    NACL-門脇    10/01/12  治験対応
       *  04.05.02    NACL-門脇    10/02/08  地方公費の全国公費併用分請求点
@@ -3736,16 +3737,6 @@
                 END-IF
               END-IF
       *
-           END-IF
-      *
-           IF    RECE62-FUKUSHIFLG(3)  =  "2"
-               MOVE   SPACE   TO   RECE62-FUKUSHIFLG(3)
-           END-IF
-           IF    RECE62-FUKUSHIFLG(4)  =  "2"
-               MOVE   SPACE   TO   RECE62-FUKUSHIFLG(4)
-           END-IF
-           IF    RECE62-FUKUSHIFLG(5)  =  "2"
-               MOVE   SPACE   TO   RECE62-FUKUSHIFLG(5)
            END-IF
       *
            .

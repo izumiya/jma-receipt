@@ -461,6 +461,7 @@
       *  04.04.47    NACL-ÌçÏÆ    10/04/09  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -733,6 +734,7 @@
            03  ACCT-IDX                                PIC 9(02).       
            03  HKN-IDX                                 PIC 9(02).       
            03  KOHFTN-IDX                              PIC 9(03).
+           03  KOHFTN-IDX2                             PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-IDX2                             PIC 9(03).
            03  FUKA-IDX                                PIC 9(03).
@@ -2317,14 +2319,24 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            PERFORM     211H-GENTEN-HENSYU-SEC
            PERFORM     2106-JNISSU-SET-SEC                                   
            PERFORM     2107-KHNTEN-CLEAR-SEC
-           IF    RECE02-SRYYM   >=  "200804"
-             CONTINUE
-           ELSE
-             PERFORM   2108-BUNTENSU-CLEAR-SEC
-           END-IF
            PERFORM     2109-SAIKEI-KEISAN-SEC
            PERFORM     2110-NYUYOJI-COMENTFLG-SET-SEC
            PERFORM     2111-ICHIBUFUTAN-OKIKAE-SEC
+      *
+           IF    RECE02-SRYYM   >=  "200804"
+             PERFORM   211K-BUNTENSU-HENSYU-SEC
+           ELSE
+             PERFORM   2108-BUNTENSU-CLEAR-SEC
+           END-IF
+           IF    RECE02-FUKUSHIFLG(3)  =  "2"
+               MOVE   SPACE   TO   RECE02-FUKUSHIFLG(3)
+           END-IF
+           IF    RECE02-FUKUSHIFLG(4)  =  "2"
+               MOVE   SPACE   TO   RECE02-FUKUSHIFLG(4)
+           END-IF
+           IF    RECE02-FUKUSHIFLG(5)  =  "2"
+               MOVE   SPACE   TO   RECE02-FUKUSHIFLG(5)
+           END-IF
       *
       *    ¥ì¥»¥×¥ÈÀÁµá¶èÊ¬¤Ë¤è¤ë¸øÈñ¾ðÊó¤Î¿¶¤êÊ¬¤±½èÍý
            MOVE    ZERO            TO  FLG-RECESKYKBN
@@ -10653,16 +10665,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            END-IF
       *
-           IF    RECE02-FUKUSHIFLG(3)  =  "2"
-               MOVE   SPACE   TO   RECE02-FUKUSHIFLG(3)
-           END-IF
-           IF    RECE02-FUKUSHIFLG(4)  =  "2"
-               MOVE   SPACE   TO   RECE02-FUKUSHIFLG(4)
-           END-IF
-           IF    RECE02-FUKUSHIFLG(5)  =  "2"
-               MOVE   SPACE   TO   RECE02-FUKUSHIFLG(5)
-           END-IF
-      *
            .
        2106-JNISSU-SET-EXT.
            EXIT.
@@ -13409,6 +13411,59 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        211H-GENTEN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ê¬ÅÀÊÔ½¸
+      *****************************************************************
+       211K-BUNTENSU-HENSYU-SEC               SECTION.
+      *
+           IF    RECE02-FUKUSHIFLG(3)  =  "2"
+              IF  (RECE02-KOHNUM(2)(1:1)  >= "1" AND <= "8"  )
+              AND (RECE02-HENTOTALTEN(3) = RECE02-TOTALTEN(3))
+                  MOVE   SPACE   TO   RECE02-FUKUSHIFLG(3)
+              END-IF
+           END-IF
+           IF    RECE02-FUKUSHIFLG(4)  =  "2"
+              IF  (RECE02-KOHNUM(3)(1:1)  >= "1" AND <= "8"  )
+              AND (RECE02-HENTOTALTEN(4) = RECE02-TOTALTEN(4))
+                  MOVE   SPACE   TO   RECE02-FUKUSHIFLG(4)
+              END-IF
+           END-IF
+           IF    RECE02-FUKUSHIFLG(5)  =  "2"
+              IF  (RECE02-KOHNUM(4)(1:1)  >= "1" AND <= "8"  )
+              AND (RECE02-HENTOTALTEN(5) = RECE02-TOTALTEN(5))
+                  MOVE   SPACE   TO   RECE02-FUKUSHIFLG(5)
+              END-IF
+           END-IF
+      *
+           PERFORM    VARYING   KOHFTN-IDX   FROM   3   BY   1
+      ***              UNTIL    KOHFTN-IDX     >    5
+                       UNTIL    KOHFTN-IDX     >    4
+      *
+             IF   RECE02-FUKUSHIFLG(KOHFTN-IDX)   NOT =  SPACE
+                IF   (RECE02-KOHNUM(1)   = "972" OR "974")
+                AND  (KOHFTN-IDX         >   3           )
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   50
+                       COMPUTE  RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE02-TENSU(KOHFTN-IDX2 1)          -
+                                RECE02-TENSU(KOHFTN-IDX2 3)
+                    END-PERFORM
+                ELSE
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   50
+                       COMPUTE  RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                                RECE02-TENSU(KOHFTN-IDX2 1)          -
+                                RECE02-TENSU(KOHFTN-IDX2 2)
+                    END-PERFORM
+                END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       211K-BUNTENSU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
