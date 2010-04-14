@@ -1718,6 +1718,12 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "0280"
+                   STRING  "同時撮影の撮影料です。"
+                           "撮影料の下に入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "8048"
                    STRING  "がん患者リハビリテーション開始日が"
                        "算定されていません。終了日の入力はできません"
