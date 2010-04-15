@@ -1802,7 +1802,7 @@
            INITIALIZE                  HZN-PTKOHFTN-AREA
            IF      SPA-GMN24-FTNSELNUM NOT =   ZERO
                PERFORM 410131-KOHFTN-PARA-SEC
-      *    ´µ¼Ô¸øÈñÉéÃ´³Û
+      *        ´µ¼Ô¸øÈñÉéÃ´³Û
                PERFORM 410132-KOHFTNETC-PARA-SEC
            END-IF
       *
@@ -2147,6 +2147,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        410132-KOHFTN-CHK-SEC          SECTION.
       *
+      *    ÁªÂò¤¬¤Ê¤¤»þ¡¢¸øÈñÉéÃ´¥Æ¡¼¥Ö¥ëÊÔ½¸
+           IF     (SPA-FTN1-MAX        >   ZERO )  AND
+                  (SPA-GMN24-FTNSELNUM =   ZERO )
+               PERFORM 4101321-KOHFTN-TBL-SEC
+           END-IF
+      * 
            MOVE    1                   TO  SPA-P024-KOHKEIFLG
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2    >   SPA-FTN1-MAX  )
@@ -2183,6 +2189,75 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        410132-KOHFTN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸øÈñÉéÃ´¥Æ¡¼¥Ö¥ëÊÔ½¸½èÍý
+      *****************************************************************
+       4101321-KOHFTN-TBL-SEC          SECTION.
+      *
+      *    ¸øÈñÉéÃ´¹¹¿·ÊÝÂ¸
+           MOVE    SPACE               TO  HZN-PTKOHFTN-AREA
+           INITIALIZE                  HZN-PTKOHFTN-AREA
+           MOVE    ZERO                TO  IDP-1
+           MOVE    ZERO                TO  IDP-2
+      *
+      *    ÂÐ¾Ý¤Î¥Ç¡¼¥¿¤ò¥Ñ¥é¥á¥¿¥Õ¥¡¥¤¥ë¤è¤êÊÔ½¸¤¹¤ë
+           INITIALIZE                      PARA-REC
+           MOVE    "P02"               TO  PARA-GYOUMUID
+           MOVE    SPA-TERMID          TO  PARA-TERMID
+           MOVE    "PTKOHFTN"          TO  PARA-FILEMEI
+      *
+           MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
+           MOVE    PARA-REC            TO  MCPDATA-REC
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_para"          TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-PARA-READ-SEC
+           ELSE
+               INITIALIZE                  PARA-REC
+               MOVE    1               TO  FLG-PARA
+           END-IF
+      *
+           MOVE    ZERO                TO  IDX
+           MOVE    ZERO                TO  WRK-PARA-EDANUM
+           MOVE    ZERO                TO  WRK-KOHID
+           MOVE    ZERO                TO  WRK-IDX
+           PERFORM
+               UNTIL  (FLG-PARA            =   1  )  OR
+                      (SPA-ERRCD       NOT =   SPACE )
+               MOVE    PARA-DATA-REC           TO  PTKOHFTN-REC
+      *        ¸øÈñ£É£Ä¤¬¥Æ¡¼¥Ö¥ë¤Ë¤¢¤ë¤³¤È¡Ê¤Ê¤¤¤â¤Î¤Ïºï½ü¤È¤¹¤ë¡Ë
+               MOVE    ZERO            TO  FLG-OK
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL       IDX2    >   SPA-FTN1-MAX
+                   IF      PTKOHFTN-KOHID      =   SPA-NAI24-KOHID(IDX2)
+                       IF      SPA-NAI24-FTNDELKBN (IDX2)  =   SPACE
+                           MOVE    1               TO  FLG-OK
+                       ELSE
+                           MOVE    ZERO            TO  FLG-OK
+                       END-IF
+                       MOVE    SPA-FTN1-MAX        TO  IDX2
+                   END-IF
+               END-PERFORM
+      *
+               IF      FLG-OK              =   1
+                   PERFORM 4101313-KOHFTN-TBL-HEN-SEC
+               END-IF
+      *
+               MOVE    "tbl_para"          TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-PARA-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       4101321-KOHFTN-TBL-EXT.
            EXIT.
       *
       *****************************************************************
