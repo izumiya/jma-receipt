@@ -636,6 +636,11 @@
                    07  SPA-GMN-Q02-CTLSEQ              PIC 9(02).
                    07  SPA-GMN-Q02-PAGE                PIC 9(02).
                    07  SPA-GMN-Q02-MAX                 PIC 9(02).
+      *            MODE 0:¸¡º÷Ãæ 1:¸¡º÷½ªÎ»
+                   07  SPA-GMN-Q02-MODE                PIC 9(01).
+                   07  SPA-GMN-Q02-SELYMD              PIC X(08).
+                   07  SPA-GMN-Q02-SELHMS              PIC X(06).
+                   07  SPA-GMN-Q02-DURATION            PIC 9(02).
                    07  SPA-GMN-Q02-CUR                 PIC 9(05).
       *
                    07  SPA-GMN-Q02-AREA.
@@ -720,10 +725,6 @@
                                13  SPA-GMN-Q02-PTINF-PTID
                                                        PIC 9(10).
       *
-      *            ²èÌÌ¥¨¥é¡¼¾ðÊó
-                   07  SPA-GMN-Q02-ERRCD-TBL.
-                       09  SPA-GMN-Q02-ERRCD-OCC OCCURS  50.
-                          11  SPA-GMN-Q02-ERRCD        PIC X(04).
       *
       *    £Ñ£°£³
            03  SPA-Q03.

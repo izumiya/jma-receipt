@@ -62,9 +62,13 @@ Q02	{
 		};
 		TOTAL	{
 			value	varchar(22);
+			style	varchar(20);
 		};
 		SELNUM	{
 			value	number(5);
 		};
+                pandatimer1     {
+			duration        int;
+                };
 	};
 };

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+. $JMARECEIPT_ENV
+
+LOG=/var/log/jma-receipt/"$2"ORCBQ03.log
+
+#-------------------------------------------#
+#        検索結果データ作成
+#        $1  TERMID
+#        $2  HOSPNUM
+#        $3  パラメータファイル名
+#        $4  共通検索項目
+#        $5  診療コード
+#-------------------------------------------#
+
+TMPFILE=$3
+
+cleanup(){
+echo "$TMPFILE" >> $LOG
+##      パラメータファイル削除
+        if  [ -e ${TMPFILE} ]; then
+            rm   ${TMPFILE}
+        fi
+}
+
+trap cleanup 0
+
+for p in $(pgrep -u orca -f "$0 $1" ) ; do
+  if [ $p -ne $$ ]; then
+    pkill -P $p
+  fi
+done
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBQ03 -parameter "$1,$2,$3,$4,$5,"  > $LOG 2>&1
+
+        exit
+

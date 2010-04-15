@@ -94,6 +94,7 @@ shell_sources = \
 	daily/infectiondata1.sh.in \
 	allways/plugin.sh.in \
 	execshell.sh.in \
+	allways/ORCBQ03.sh.in \
 
 ruby_scripts = \
 	daily/print-data.rb \

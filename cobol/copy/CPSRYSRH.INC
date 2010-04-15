@@ -1,0 +1,60 @@
+      *******************************************************************
+      * Project code name "ORCA"
+      * Æü°åÉ¸½à¥ì¥»¥×¥È¥½¥Õ¥È¡ÊJMA standard receipt software¡Ë
+      * Copyright(C) 2002 JMA (Japan Medical Association)
+      *
+      * This program is part of "JMA standard receipt software".
+      *
+      *     This program is distributed in the hope that it will be useful
+      * for further advancement in medical care, according to JMA Open
+      * Source License, but WITHOUT ANY WARRANTY.
+      *     Everyone is granted permission to use, copy, modify and
+      * redistribute this program, but only under the conditions described
+      * in the JMA Open Source License. You should have received a copy of
+      * this license along with this program. If not, stop using this
+      * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
+      * 113-8621, Japan.
+      ********************************************************************
+      ************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¾È²ñ¥Æ¡¼¥Ö¥ë      COPY (CPSRYSRH.INC)         *
+      ************************************************************
+      ************************************************************
+      *  ¥³¥Ô¡¼¶ç½¤ÀµÍúÎò
+      * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      ************************************************************
+      *01  SRYSRH-REC.
+      *°åÎÅµ¡´ØÈÖ¹æ
+           03  SRYSRH-HOSPNUM      PIC 9(2).
+      *Ã¼Ëö£É£Ä
+           03  SRYSRH-TERMID       PIC X(64).
+      *´µ¼Ô£É£Ä
+           03  SRYSRH-PTID         PIC 9(10).
+      *Æþ³°¶èÊ¬
+           03  SRYSRH-NYUGAIKBN    PIC X(1).
+      *¿ÇÎÅ²Ê
+           03  SRYSRH-SRYKA        PIC X(2).
+      *¿ÇÎÅ¶èÊ¬
+           03  SRYSRH-SRYKBN       PIC X(2).
+      *¿ÇÎÅ¼ïÊÌ¶èÊ¬
+           03  SRYSRH-SRYSYUKBN    PIC X(3).
+      *¿ÇÎÅÆü
+           03  SRYSRH-SRYYMD       PIC X(8).
+      *¿ÇÎÅ¥³¡¼¥É
+           03  SRYSRH-SRYCD-G.
+               05  SRYSRH-SRYCD    PIC X(9)
+                                   OCCURS  5.
+      *ºîÀ®Æü
+           03  SRYSRH-CREYMD       PIC X(8).
+      *¹¹¿·Æü
+           03  SRYSRH-UPYMD        PIC X(8).
+      *¹¹¿·»þ´Ö
+           03  SRYSRH-UPHMS        PIC X(6).
+      *³«»Ï¿ÇÎÅÆü
+           03  SRYSRH-STSRYYMD     PIC X(8).
+      *½ªÎ»¿ÇÎÅÆü
+           03  SRYSRH-EDSRYYMD     PIC X(8).
+      *³«»Ï¿ÇÎÅ·î
+           03  SRYSRH-STSRYYM      PIC X(6).
+      *½ªÎ»¿ÇÎÅ·î
+           03  SRYSRH-EDSRYYM      PIC X(6).
+

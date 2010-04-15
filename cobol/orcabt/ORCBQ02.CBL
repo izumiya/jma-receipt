@@ -86,6 +86,7 @@
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
            03  FLG-ERR                 PIC 9(01).
+           03  FLG-PTSRH               PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
       *
       *    カウント領域
@@ -127,9 +128,13 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
-      *    患者マスタ（照会用コピー句）
-       01  QUERY-PTINF-REC.
-           COPY    "CPQPTINF.INC".
+      *    患者照会マスタ
+       01  PTSRH-REC.
+           COPY    "CPPTSRH.INC".
+      *
+      *    患者マスタ
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
       *    パラメタ
        01  BTPARA-REC.
@@ -225,6 +230,7 @@
                                                WRK-PARA-BTPARA-SHELLID
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+           MOVE    WRK-PARA-TERMID     TO  SPA-TERMID
       *
       *    ＤＢオープン
            PERFORM 120-DBOPEN-SEC
@@ -284,14 +290,16 @@
        2001-PTINF-EDIT-SEC           SECTION.
       *
       *    患者対象データ検索処理
-           PERFORM 900-QUERY-PTINF-KEY2-SEL-SEC
+           PERFORM 900-PTSRH-ODR-SEL-SEC
       *
-           PERFORM UNTIL ( FLG-PTINF   NOT =   ZERO )
+           PERFORM UNTIL ( FLG-PTSRH   NOT =   ZERO )
                     OR   ( FLG-END     NOT =   ZERO )
+      *
+               PERFORM 900-PTINF-KEY-SEL-SEC
       *
                IF        ( WKBQ01-LNKKBN   =   "1" )
                    IF    ( CNT-PTINF      >=   CONST-PTINF-MAX )
-                       MOVE    1           TO  FLG-PTINF
+                       MOVE    1           TO  FLG-PTSRH
                    ELSE
                        PERFORM 20011-QTORSUB-EDIT-SEC
                    END-IF
@@ -299,14 +307,14 @@
                    PERFORM 20011-QTOANY-EDIT-SEC
                END-IF
       *
-               IF    ( FLG-PTINF       =   ZERO )
-                   PERFORM 900-QUERY-PTINF-FET-SEC
+               IF    ( FLG-PTSRH       =   ZERO )
+                   PERFORM 900-PTSRH-ODR-FET-SEC
                END-IF
       *
            END-PERFORM
       *
-           MOVE    "query_ptinf"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "odr"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -321,12 +329,12 @@
       *
            INITIALIZE                  QTORSUB-AREA
       *
-           MOVE    QUERY-PTINF-PTID        TO  QTORS-PTID
-           MOVE    QUERY-PTINF-TSTPTNUMKBN TO  QTORS-TSTPTNUMKBN
+           MOVE    PTINF-PTID        TO  QTORS-PTID
+           MOVE    PTINF-TSTPTNUMKBN TO  QTORS-TSTPTNUMKBN
       *
            INITIALIZE                  SS001-AREA
            MOVE    WRK-PARA-HOSPNUM    TO  SS001-HOSPNUM
-           MOVE    QUERY-PTINF-PTID    TO  SS001-PTID
+           MOVE    PTINF-PTID    TO  SS001-PTID
            MOVE    WKBQ01-SRYYM        TO  SS001-SRYYM
            CALL    "ORCSS001"          USING   SS001-AREA
                                                SPA-AREA
@@ -397,8 +405,8 @@
            COMPUTE CNT-PTINF   =   CNT-PTINF   +   1
       *
            INITIALIZE                  QTOANY-AREA
-           MOVE    QUERY-PTINF-PTID    TO  QTOANY-PTID
-           MOVE    QUERY-PTINF-PTNUM   TO  QTOANY-PTNUM
+           MOVE    PTINF-PTID    TO  QTOANY-PTID
+           MOVE    PTSRH-PTNUM   TO  QTOANY-PTNUM
       *
            PERFORM 200111-BTPARA-COMMON-SEC
       *
@@ -569,6 +577,8 @@
       *****************************************************************
        300-END-SEC                 SECTION.
       *
+           PERFORM 900-PTSRH-DEL1-SEC
+      *
            PERFORM 900-JOB-STEP-END-SEC
       *
            PERFORM 900-DBDISCONNECT-SEC
@@ -589,47 +599,97 @@
        800-MCNDATE-EXT.
            EXIT.
       *****************************************************************
-      *    患者マスタ検索処理
+      *    患者照会検索処理
       *****************************************************************
-       900-QUERY-PTINF-KEY2-SEL-SEC    SECTION.
+       900-PTSRH-ODR-SEL-SEC            SECTION.
       *
-           MOVE    ZERO                TO  FLG-PTINF
+           MOVE    ZERO                TO  FLG-PTSRH
       *
-           INITIALIZE                      QUERY-PTINF-REC
-           MOVE    WKBQ01-SQL          TO  QUERY-PTINF-SQL
-           MOVE    QUERY-PTINF-REC     TO  MCPDATA-REC
-           MOVE    "query_ptinf"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           INITIALIZE                      PTSRH-REC
+           MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID          TO  PTSRH-TERMID
+           MOVE    "2"                 TO  PTSRH-DATAKBN
+           MOVE    WKBQ01-SQL          TO  PTSRH-SQL
+           MOVE    PTSRH-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "odr"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  QUERY-PTINF-REC
+               MOVE    ZERO            TO  FLG-PTSRH
+               MOVE    MCPDATA-REC     TO  PTSRH-REC
            ELSE
-               INITIALIZE                  QUERY-PTINF-REC
-               MOVE    1               TO  FLG-PTINF
+               MOVE    1               TO  FLG-PTSRH
+               INITIALIZE                  PTSRH-REC
            END-IF
       *
            .
-       900-QUERY-PTINF-KEY2-SEL-EXT.
+       900-PTSRH-ODR-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    患者マスタ読込処理
+      *    患者照会FETCH処理
       *****************************************************************
-       900-QUERY-PTINF-FET-SEC              SECTION.
+       900-PTSRH-ODR-FET-SEC            SECTION.
       *
-           MOVE    ZERO                TO  FLG-PTINF
+           MOVE    ZERO                TO  FLG-PTSRH
       *
-           MOVE    "query_ptinf"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "odr"               TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  QUERY-PTINF-REC
+               MOVE    ZERO            TO  FLG-PTSRH
+               MOVE    MCPDATA-REC     TO  PTSRH-REC
            ELSE
-               INITIALIZE                  QUERY-PTINF-REC
-               MOVE    1               TO  FLG-PTINF
+               MOVE    1               TO  FLG-PTSRH
+               INITIALIZE                  PTSRH-REC
            END-IF
       *
            .
-       900-QUERY-PTINF-FET-EXT.
+       900-PTSRH-ODR-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報検索処理
+      *****************************************************************
+       900-PTINF-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTINF
+      *
+           INITIALIZE                  PTINF-REC
+           MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
+           MOVE    PTSRH-PTID      TO  PTINF-PTID
+           MOVE    PTINF-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTINF-REC
+           ELSE
+               INITIALIZE              PTINF-REC
+               MOVE    1           TO  FLG-PTINF
+           END-IF
+      *
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会削除処理
+      *****************************************************************
+       900-PTSRH-DEL1-SEC              SECTION.
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "2"             TO  PTSRH-DATAKBN
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "del1"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-PTSRH-DEL1-EXT.
            EXIT.
       *****************************************************************
       *    ステップ管理開始処理

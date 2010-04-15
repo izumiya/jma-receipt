@@ -1,0 +1,169 @@
+tbl_rrksrh {
+	HOSPNUM				number(2,0);
+	TERMID				char(64);
+	PTID				number(10,0);
+	NYUGAIKBN			char(1);
+	SRYKA				char(2);
+	HKNCOMBINUM			number(4,0);
+	SRYYMD				char(8);
+	CREYMD				char(8);
+	UPYMD				char(8);
+	UPHMS				char(6);
+	STSRYYMD			char(8),virtual;
+	EDSRYYMD			char(8),virtual;
+};
+
+path	all 	{
+	DBSELECT	{
+		DECLARE tbl_rrksrh_all_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rrksrh
+	    WHERE	HOSPNUM    =    :HOSPNUM
+ 		;
+	};
+};
+
+path	del1 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_rrksrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+ 		;
+	};
+};
+
+path	ins1 	{
+	DBINSERT	{
+	INSERT INTO TBL_RRKSRH
+	( 
+              HOSPNUM,
+              TERMID,
+              PTID,
+              NYUGAIKBN,
+              SRYKA,
+              HKNCOMBINUM,
+              SRYYMD,
+              CREYMD,
+              UPYMD,
+              UPHMS
+        )
+	SELECT HOSPNUM,
+              :TERMID,
+               PTID,
+               NYUGAIKBN,
+               SRYKA,
+               to_number(HKNCOMBINUM,'9999'),
+               SRYYMD,
+              :CREYMD,
+              :UPYMD,
+              :UPHMS
+        FROM   TBL_JYURRK
+        WHERE HOSPNUM = :HOSPNUM
+          AND NYUGAIKBN LIKE :NYUGAIKBN
+          AND SRYKA LIKE :SRYKA
+          AND SRYYMD >= :STSRYYMD
+          AND SRYYMD <= :EDSRYYMD
+     ;
+
+	INSERT INTO TBL_RRKSRH
+	( 
+              HOSPNUM,
+              TERMID,
+              PTID,
+              NYUGAIKBN,
+              SRYKA,
+              HKNCOMBINUM,
+              SRYYMD,
+              CREYMD,
+              UPYMD,
+              UPHMS
+        )
+        SELECT A.HOSPNUM,
+              :TERMID,
+               A.PTID,
+               '1',
+               B.SRYKA,
+               to_number(B.HKNCOMBINUM,'9999'),
+               A.SRYYMD,
+              :CREYMD,
+              :UPYMD,
+              :UPHMS
+      FROM TBL_NRRKSRH A,
+           TBL_NSRYSRH B 
+     WHERE  A.HOSPNUM = :HOSPNUM
+       AND  B.SRYKA LIKE :SRYKA
+       AND  A.SRYYMD >= :STSRYYMD
+       AND  A.SRYYMD <= :EDSRYYMD
+       AND  A.HOSPNUM = B.HOSPNUM
+       AND  A.PTID = B.PTID
+       AND  A.ZAINUM = B.ZAINUM
+	;
+	};
+};
+
+path crtv01	{
+	DBCREATE	{
+		CREATE TEMP VIEW TMPV_Q001 AS
+    SELECT TBL_HKNCOMBI.HOSPNUM,
+           TBL_HKNCOMBI.PTID,
+           TBL_HKNCOMBI.HKNCOMBINUM,
+           TBL_RRKSRH.NYUGAIKBN,
+           TBL_RRKSRH.SRYKA,
+           TBL_RRKSRH.SRYYMD,
+           TBL_PTHKNINF.HKNID,
+           TBL_PTHKNINF.HKNNUM,
+           TBL_PTHKNINF.HKNJANUM,
+           TBL_PTHKNINF.HONKZKKBN,
+           TBL_PTHKNINF.KIGO,
+           TBL_PTHKNINF.NUM,
+           TBL_PTKOHINF.KOHID,
+           TBL_PTKOHINF.KOHNUM,
+           TBL_PTKOHINF.PAYKBN,
+           TBL_PTKOHINF.FTNJANUM,
+           TBL_PTKOHINF.JKYSNUM,
+           TBL_PTKOHINF.TEKSTYMD 
+      FROM TBL_HKNCOMBI JOIN TBL_RRKSRH 
+        ON (TBL_HKNCOMBI.HOSPNUM = TBL_RRKSRH.HOSPNUM
+       AND  TBL_HKNCOMBI.PTID = TBL_RRKSRH.PTID
+       AND  TBL_HKNCOMBI.HKNCOMBINUM = TBL_RRKSRH.HKNCOMBINUM
+       AND  TBL_RRKSRH.TERMID = :TERMID )
+      LEFT JOIN TBL_PTHKNINF 
+        ON (TBL_HKNCOMBI.HOSPNUM = TBL_PTHKNINF.HOSPNUM
+       AND TBL_HKNCOMBI.PTID = TBL_PTHKNINF.PTID 
+       AND TBL_HKNCOMBI.HKNID = TBL_PTHKNINF.HKNID 
+       AND TBL_HKNCOMBI.HKNNUM = TBL_PTHKNINF.HKNNUM) 
+      LEFT JOIN TBL_PTKOHINF 
+        ON (TBL_HKNCOMBI.HOSPNUM = TBL_PTKOHINF.HOSPNUM
+       AND  TBL_HKNCOMBI.PTID = TBL_PTKOHINF.PTID
+       AND (( TBL_HKNCOMBI.KOH1ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH1HKNNUM = TBL_PTKOHINF.KOHNUM)
+         OR ( TBL_HKNCOMBI.KOH2ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH2HKNNUM = TBL_PTKOHINF.KOHNUM)
+         OR ( TBL_HKNCOMBI.KOH3ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH3HKNNUM = TBL_PTKOHINF.KOHNUM)
+         OR ( TBL_HKNCOMBI.KOH4ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH4HKNNUM = TBL_PTKOHINF.KOHNUM)
+         OR ( TBL_PTKOHINF.KOHNUM IN ('956',
+                                   '957',
+                                   '958',
+                                   '960',
+                                   '961',
+                                   '962',
+                                   '963',
+                                   '964',
+                                   '965',
+                                   '966',
+                                   '967',
+                                   '968',
+                                   '969',
+                                   '977',
+                                   '978',
+                                   '979')
+        AND (TBL_RRKSRH.SRYYMD >= TBL_PTKOHINF.TEKSTYMD 
+        AND  TBL_RRKSRH.SRYYMD <= TBL_PTKOHINF.TEKEDYMD))))
+		;
+	};
+};
+
+path drtv01	{
+	DBDROP	{
+		DROP VIEW TMPV_Q001;
+	};
+};

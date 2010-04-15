@@ -1,0 +1,145 @@
+tbl_ptsrh {
+	HOSPNUM				number(2,0);
+	TERMID				char(64);
+	PTID				number(10,0);
+	PTNUM				varchar(20);
+	KANANAME			varchar(100);
+	SEX				char(1);
+	BIRTHDAY			char(8);
+	JKYSNUM				varchar(20);
+	DATAKBN				char(1);
+	CREYMD				char(8);
+	UPYMD				char(8);
+	UPHMS				char(6);
+	UPDATAKBN			char(1),virtual;
+	SQL				dbcode(15000),virtual;
+	dbescapestring			varchar(500),virtual;
+};
+
+path	all 	{
+	DBSELECT	{
+		DECLARE tbl_ptsrh_all_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptsrh
+	        WHERE	HOSPNUM    =    :HOSPNUM
+ 		;
+	};
+};
+
+path	del1 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptsrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    =    :DATAKBN
+ 		;
+	};
+};
+
+path	del2 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptsrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     CREYMD    <     :CREYMD
+		;
+	};
+};
+
+path	ins1 	{
+	DBINSERT	{
+        :SQL
+	;
+	};
+};
+
+path	ins2 	{
+	DBINSERT	{
+		INSERT INTO  tbl_ptsrh
+              ( HOSPNUM,
+                TERMID,
+                PTID,
+                PTNUM,
+                KANANAME,
+                SEX,
+                BIRTHDAY,
+                JKYSNUM,
+                DATAKBN,
+                CREYMD,
+                UPYMD,
+                UPHMS
+		)
+                SELECT
+                HOSPNUM,
+                TERMID,
+                PTID,
+                PTNUM,
+                KANANAME,
+                SEX,
+                BIRTHDAY,
+                JKYSNUM,
+                :DATAKBN,
+                :CREYMD,
+                :UPYMD,
+                :UPHMS
+		FROM tbl_ptsrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    =    :UPDATAKBN
+		AND     UPYMD      =    :UPYMD
+		AND     UPHMS      =    :UPHMS
+ 		;
+	};
+};
+
+path	key 	{
+	DBSELECT	{
+		DECLARE tbl_ptsrh_key_csr CURSOR FOR
+        	:SQL
+ 		;
+	};
+};
+
+path	cnt 	{
+	DBSELECT	{
+		DECLARE tbl_ptsrh_cnt_csr CURSOR FOR
+                SELECT COUNT(*) AS PTID	
+		FROM tbl_ptsrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    =    :DATAKBN
+		AND     UPYMD      =    :UPYMD
+		AND     UPHMS      =    :UPHMS
+	;
+	};
+};
+
+path	odr 	{
+	DBSELECT	{
+		DECLARE tbl_ptsrh_odr_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptsrh
+	        WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    =    :DATAKBN
+		AND     UPYMD      =    :UPYMD
+		AND     UPHMS      =    :UPHMS
+		:SQL
+ 		;
+	};
+};
+
+path	key2 	{
+	DBSELECT	{
+		DECLARE tbl_ptsrh_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptsrh
+	        WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    =    :DATAKBN
+		AND     UPYMD      =    :UPYMD
+		AND     UPHMS      =    :UPHMS
+ 		;
+	};
+};

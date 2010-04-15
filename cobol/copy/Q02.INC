@@ -51,4 +51,6 @@
                   06  Q02-KEKKALST-SELECT      PIC X
                                            OCCURS  200 TIMES.
               04  Q02-TOTAL                    PIC X(22).
+              04  Q02-TOTAL-STYLE              PIC X(20).
               04  Q02-SELNUM                   PIC 9(05).
+              04  Q02-DURATION   PIC S9(09) BINARY.

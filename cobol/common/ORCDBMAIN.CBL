@@ -171,6 +171,15 @@
            IF    ( FLG-ERR         =   ZERO )
       *
                MOVE    1           TO  MCP-VERSION
+               MOVE    1           TO  MCP-REDIRECT
+      *
+               IF    ( MCP-TABLE   =   "tbl_srysrh"
+                                    OR "tbl_rrksrh"
+                                    OR "tbl_ptsrh"
+                                                    )
+                   MOVE    2       TO  MCP-VERSION
+                   MOVE    0       TO  MCP-REDIRECT
+               END-IF
       *
                EVALUATE    MCP-TABLE
                WHEN    "tbl_sryacct"

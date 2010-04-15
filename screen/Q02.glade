@@ -119,7 +119,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Fri, 22 Dec 2000 04:58:30 GMT</last_modification_time>
       </signal>
-      <label>　　</label>
+      <label>状態</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -623,22 +623,6 @@
     </widget>
 
     <widget>
-      <class>GtkLabel</class>
-      <name>TOTAL</name>
-      <x>820</x>
-      <y>68</y>
-      <width>181</width>
-      <height>16</height>
-      <label></label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
       <class>GtkNumberEntry</class>
       <name>SELNUM</name>
       <x>104</x>
@@ -722,6 +706,38 @@
       </signal>
       <label>病名登録</label>
       <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkPandaTimer</class>
+      <name>pandatimer1</name>
+      <x>808</x>
+      <y>8</y>
+      <width>21</width>
+      <height>21</height>
+      <signal>
+	<name>timeout</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Wed, 14 Apr 2010 10:58:48 GMT</last_modification_time>
+      </signal>
+      <duration>0</duration>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>TOTAL</name>
+      <x>800</x>
+      <y>64</y>
+      <width>181</width>
+      <height>24</height>
+      <label></label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
   </widget>
 </widget>

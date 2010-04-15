@@ -103,6 +103,7 @@
            03  FLG-END                             PIC 9(01).
            03  FLG-EOF                             PIC 9(01).
            03  FLG-PTINF                           PIC 9(01).
+           03  FLG-PTSRH                           PIC 9(01).
            03  FLG-JYOKEN                          PIC 9(01).
            03  FLG-JYOKEN-AND                      PIC 9(01).
            03  FLG-ENTRYCHK                        PIC 9(01).
@@ -112,6 +113,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDX0                                PIC 9(05).
            03  IDX1                                PIC 9(05).
            03  IDX2                                PIC 9(05).
            03  IDX3                                PIC 9(05).
@@ -135,7 +137,7 @@
            03  WRK-PTINF-BANTI-LEN                 PIC 9(05).
            03  WRK-SQL-PNT                         PIC 9(05).
            03  WRK-SQL                             PIC X(20000).
-           03  WRK-SQL-COUNT                       PIC X(20000).
+           03  WRK-SQL-ORDER                       PIC X(20000).
            03  WRK-EDPTNUM                         PIC X(20).
            03  WRK-ZZZZ9                           PIC ZZZZ9.
            03  WRK-TOTAL                           PIC ZZZ,ZZZ,ZZ9.
@@ -220,6 +222,24 @@
                05  WRK-WIDGET8                     PIC 9(01).
                05  WRK-WIDGET-R8-DAMMY2            PIC X(11).
       *
+       01  SEL-AREA.
+           03  SEL-SRYKA                           PIC X(02).
+           03  SEL-NYUGAIKBN                       PIC X(01).
+           03  SEL-SRYKBN                          PIC X(02).
+           03  SEL-SRYSYUKBN                       PIC X(03).
+           03  SEL-STSRYYMD                        PIC X(08).
+           03  SEL-EDSRYYMD                        PIC X(08).
+           03  SEL-SRYCD                           PIC X(09).
+           03  SEL-DATAKBN                         PIC X(01).
+           03  SEL-RRKSRH                          PIC 9(01).
+           03  SEL-SRYSRH                          PIC 9(01).
+           03  SEL-UPYMD                           PIC X(08).
+           03  SEL-UPHMS                           PIC X(06).
+      *
+       01  TSRYCD-AREA.
+           03  TSRYCD-SRYCD                        PIC X(09)
+                                                   OCCURS 5.
+      *
       *    固定値領域
        01  CONST-AREA.
            03  CONST-JYOKENMEI-AREA.
@@ -234,6 +254,8 @@
                VALUE   "scripts/allways/ORCBQ01.sh".
            03  CONST-SHELNAME2     PIC X(100)
                VALUE   "scripts/allways/ORCBQ02.sh".
+           03  CONST-SHELNAME3     PIC X(100)
+               VALUE   "ORCBQ03.sh".
            03  CONST-LINE                          PIC 9(05)
                VALUE   30.
            03  CONST-JOBID                         PIC 9(07)
@@ -252,9 +274,21 @@
       *    ファイルレイアウト
       *****************************************************************
       *
-      *    患者マスタ（照会用コピー句）
-       01  QUERY-PTINF-REC.
-           COPY    "CPQPTINF.INC".
+      *    診療行為照会テーブル
+       01  SRYSRH-REC.
+           COPY    "CPSRYSRH.INC".
+      *
+      *    患者情報照会テーブル
+       01  PTSRH-REC.
+           COPY    "CPPTSRH.INC".
+      *
+      *    患者情報テーブル
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
+      *
+      *    受診履歴照会テーブル
+       01  RRKSRH-REC.
+           COPY    "CPRRKSRH.INC".
       *
       *    シェルテーブル
            COPY    "CPSHELLTBL.INC".
@@ -267,8 +301,16 @@
       *    サブプロ用　領域
       *****************************************************************
       *
+      *    uid取得
+       01  UIDIO-AREA.
+           03  C-RET                   PIC X(2).
+           03  C-UID                   PIC X(36).
+       01  ST                          PIC 9(2).
+      *
       *    画面日付変換サブ
            COPY    "CPORCSGDAY.INC".
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -393,17 +435,10 @@
                    GO  TO  100-INIT-EXT
                END-IF
       **** 暫定 ****
-               IF  ( SPA-ERRCD                 =   "0001" )
-      *            MOVE    "条件に該当する患者は存在しませんでした"
-      *                            TO  SPA-GMN-Q02-KEKKALST-SRYACT (16)
-                   MOVE    "該当患者は存在しませんでした"
-                                   TO  SPA-GMN-Q02-KEKKALST-NAME (16)
-                   MOVE    16      TO  SPA-GMN-Q02-KEKKA-MAX
-               END-IF
       *
                IF  ( SPA-ERRCD                 =   "9999" )
-                   MOVE    "検索条件が多すぎます"
-                                   TO  SPA-GMN-Q02-KEKKALST-SRYACT (16)
+                   MOVE    "検索条件が多すぎます。"
+                                   TO  SPA-GMN-Q02-KEKKALST-NAME (16)
                    MOVE    16      TO  SPA-GMN-Q02-KEKKA-MAX
                END-IF
       **************
@@ -543,6 +578,8 @@
                GO  TO  3001-Q100SPASET-EXT
            END-IF
       *
+           PERFORM 900-PTSRH-INS2-SEC
+      *
            MOVE    SPA-HOSPNUM         TO  PRFNAME-HOSPNUM
            MOVE    "ORC13001"          TO  PRFNAME-FILE-ID
            MOVE    1                   TO  PRFNAME-SYOKBN1
@@ -582,7 +619,8 @@
                                    SPA-Q01FREE
                                    QSUB02-LNK
       *
-           MOVE    QSUB02-SQL      TO  BQ01-SQL
+           MOVE    QSUB02-SQL-ORDER
+                                   TO  BQ01-SQL
       *
            WRITE   BQ01
       *
@@ -692,6 +730,8 @@
                GO  TO  3001-Q03SPASET-EXT
            END-IF
       *
+           PERFORM 900-PTSRH-INS2-SEC
+      *
            MOVE    SPA-HOSPNUM         TO  PRFNAME-HOSPNUM
            MOVE    "OR013002"          TO  PRFNAME-FILE-ID
            MOVE    2                   TO  PRFNAME-SYOKBN1
@@ -724,7 +764,8 @@
                                    SPA-Q01FREE
                                    QSUB02-LNK
       *
-           MOVE    QSUB02-SQL      TO  BQ01-SQL
+           MOVE    QSUB02-SQL-ORDER
+                                       TO  BQ01-SQL
       *
            WRITE   BQ01
       *
@@ -787,8 +828,68 @@
            INITIALIZE                  SPA-Q02
       *
            MOVE    ZERO            TO  SPA-GMN-Q02-TOTAL-GET-FLG
-      *    画面編集処理
-           PERFORM 310-Q02-GMN-EDIT-SEC
+      *
+      *    画面条件編集処理
+           PERFORM 3101-JYOKEN-EDIT-SEC
+      *
+           PERFORM 3101-INIT-SQL-SEC
+      *
+           MOVE    SEL-UPYMD       TO  SPA-GMN-Q02-SELYMD
+           MOVE    SEL-UPHMS       TO  SPA-GMN-Q02-SELHMS
+      *
+      *    ＳＱＬ文編集処理
+           INITIALIZE              QSUB02-LNK
+           MOVE    SEL-UPYMD       TO  QSUB02-YMD
+           MOVE    SEL-UPHMS       TO  QSUB02-HMS
+           CALL    "ORCGQSUB02"    USING
+                                   SPA-AREA
+                                   SPA-Q01FREE
+                                   QSUB02-LNK
+           MOVE     20000          TO   WRK-STR-LEN
+           MOVE     QSUB02-SQL     TO   WRK-STR
+           PERFORM 900-STR-LEN-GET-SEC
+           IF  ( WRK-STR-LEN       >    15000 )
+      *
+      *        ＳＱＬ解析限界値オーバー
+               MOVE    "9999"      TO  SPA-ERRCD
+               MOVE    1           TO  SPA-GMN-Q02-MODE
+           ELSE
+      *
+               INITIALIZE              UIDIO-AREA
+               CALL    "orcuidset"     USING
+                                       ST
+                                       UIDIO-AREA
+      *
+               MOVE    SPA-HOSPNUM         TO  PRFNAME-HOSPNUM
+               MOVE    "OR013003"          TO  PRFNAME-FILE-ID
+               MOVE    2                   TO  PRFNAME-SYOKBN1
+               MOVE    ALL "0"             TO  PRFNAME-TERMID
+               STRING  C-UID               DELIMITED   BY  SIZE
+               INTO    PRFNAME-TERMID
+               END-STRING
+               OPEN    OUTPUT              BQ01-FILE
+               INITIALIZE                  BQ01
+               MOVE    QSUB02-SQL  TO      BQ01-SQL
+               WRITE   BQ01
+               CLOSE   BQ01-FILE
+      *
+      *        フィアルデイレクトリ位置指定
+               INITIALIZE              ORCSMKPASSAREA
+               MOVE    CONST-SHELNAME3 TO  SHELLTBL-NAME
+      *
+               MOVE    SPA-TERMID      TO  SHELLTBL-ARG1
+               MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
+               MOVE    PRFNAME         TO  SHELLTBL-ARG3
+               MOVE    SEL-AREA        TO  SHELLTBL-ARG4
+               MOVE    TSRYCD-AREA     TO  SHELLTBL-ARG5
+               MOVE    SHELLTBL        TO  MCPDATA-REC
+               MOVE    "SHELL"         TO  MCP-FUNC
+               MOVE    "shell"         TO  MCP-TABLE
+               MOVE    "allways"       TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+           END-IF
       *
       *    カーソルキー制御項目
            MOVE   1                TO  SPA-GMN-Q02-CUR
@@ -800,8 +901,21 @@
       *****************************************************************
       *    画面編集処理
       *****************************************************************
-       310-Q02-GMN-EDIT-SEC            SECTION.
+       3101-Q02-GMN-EDIT-SEC            SECTION.
       *
+      *    総件数編集
+           IF  ( SPA-GMN-Q02-TOTAL-GET-FLG =   ZERO )
+               MOVE    1              TO   SPA-GMN-Q02-TOTAL-GET-FLG
+               PERFORM 3101-TOTAL-KNS-EDIT-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q02-SKIP-KNS     =   ZERO )
+            AND  ( SPA-GMN-Q02-KEKKA-MAX    =   ZERO )
+      *
+      *        該当なしエラー
+               MOVE    "0001"      TO  SPA-ERRCD
+      *
+           END-IF
       *
            MOVE   1                TO  FLG-GMN-INIT
       *
@@ -811,12 +925,7 @@
            INITIALIZE                  SPA-GMN-Q02-KEKKATBL
                                        SPA-GMN-Q02-PTINF-AREA
       *
-      *    画面条件編集処理
-           PERFORM 3101-JYOKEN-EDIT-SEC
-      *
-      *
       *    ＳＱＬ文編集処理
-      *    PERFORM 3101-SQL-EDIT-SEC
            INITIALIZE              QSUB02-LNK
            MOVE    1               TO  QSUB02-LIMITCONTROL
            COMPUTE QSUB02-OFFSET
@@ -828,30 +937,16 @@
                                    SPA-Q01FREE
                                    QSUB02-LNK
       *
-           MOVE    QSUB02-SQL      TO  WRK-SQL
-           MOVE    QSUB02-SQL-CNT  TO  WRK-SQL-COUNT
+           MOVE    QSUB02-SQL-ORDER    TO  WRK-SQL-ORDER
       *
-           DISPLAY "WRK-SQL  = " WRK-SQL
-      *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      *    暫定 組み立てたＳＱＬが１０００バイトを超えた場合
-           MOVE     20000          TO   WRK-STR-LEN
-           MOVE     WRK-SQL        TO   WRK-STR
-      *
-      *
-           PERFORM 900-STR-LEN-GET-SEC
-           IF  ( WRK-STR-LEN       >    15000 )
-      *
-      *        ＳＱＬ解析限界値オーバー
-               MOVE    "9999"      TO  SPA-ERRCD
-               GO  TO  310-Q02-GMN-EDIT-EXT
-           END-IF
-      *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       *    患者マスタ検索処理
-           PERFORM 900-QUERY-PTINF-KEY-SEL-SEC
+           PERFORM 900-PTSRH-ODR-SEL-SEC
       *
            PERFORM VARYING IDX-GMN FROM    1   BY  1
                UNTIL   (   IDX-GMN     >   CONST-LINE-MAX )
-                OR     (   FLG-PTINF   =   1   )
+                OR     (   FLG-PTSRH   =   1   )
+      *
+               PERFORM 900-PTINF-KEY-SEL-SEC
       *
       *        番号
                COMPUTE WRK-NUM     =   SPA-GMN-Q02-SKIP-KNS
@@ -861,16 +956,16 @@
                                                            (IDX-GMN)
       *
       *        患者番号
-               MOVE    QUERY-PTINF-PTNUM 
+               MOVE    PTSRH-PTNUM
                                    TO  SPA-GMN-Q02-KEKKALST-PTNUM
                                                            (IDX-GMN)
       *
       *        氏名
-               MOVE    QUERY-PTINF-NAME
+               MOVE    PTINF-NAME
                                    TO  SPA-GMN-Q02-KEKKALST-NAME
                                                            (IDX-GMN)
       *        性別
-               EVALUATE    QUERY-PTINF-SEX
+               EVALUATE    PTINF-SEX
                WHEN    "1"
                    MOVE    "男"    TO  SPA-GMN-Q02-KEKKALST-SEX
                                                            (IDX-GMN)
@@ -882,7 +977,7 @@
       *        誕生日
                INITIALIZE              ORCSGDAYAREA
       *
-               MOVE    QUERY-PTINF-BIRTHDAY
+               MOVE    PTINF-BIRTHDAY
                                    TO  SGDAY-INDAY
                CALL    "ORCSGDAY"      USING
                                        ORCSGDAYAREA
@@ -901,14 +996,14 @@
                    MOVE    SPA-Q01-KJYNYMD TO  WRK-KJYNYMD
                END-IF
       *
-               IF  (   QUERY-PTINF-BIRTHDAY    <   WRK-KJYNYMD )
-                   MOVE    QUERY-PTINF-BIRTHDAY
+               IF  (   PTINF-BIRTHDAY    <   WRK-KJYNYMD )
+                   MOVE    PTINF-BIRTHDAY
                                            TO  WRK-CALC-YMD1
                    MOVE    WRK-KJYNYMD     TO  WRK-CALC-YMD2
                    PERFORM 3101-AGE-CALC-SEC
                ELSE
                    MOVE    WRK-KJYNYMD     TO  WRK-CALC-YMD1
-                   MOVE    QUERY-PTINF-BIRTHDAY
+                   MOVE    PTINF-BIRTHDAY
                                            TO  WRK-CALC-YMD2
                    PERFORM 3101-AGE-CALC-SEC
                    COMPUTE WRK-AGE-YY   =   WRK-AGE-YY
@@ -930,7 +1025,7 @@
       *
       *        前回来院日編集
                INITIALIZE                  ORCSLASTYMDAREA
-               MOVE    QUERY-PTINF-PTID    TO  ORCSLASTYMD-PTID
+               MOVE    PTINF-PTID    TO  ORCSLASTYMD-PTID
                CALL    "ORCSLASTYMD"       USING
                                            ORCSLASTYMDAREA
                                            SPA-AREA
@@ -939,7 +1034,7 @@
                                                                (IDX-GMN)
       *
       *        電話番号
-               MOVE    QUERY-PTINF-HOME-TEL1
+               MOVE    PTINF-HOME-TEL1
                                            TO  SPA-GMN-Q02-KEKKALST-TEL
                                                                (IDX-GMN)
       *        最終受診日
@@ -954,53 +1049,53 @@
                END-IF
       *
       *        郵便番号
-               IF    ( QUERY-PTINF-HOME-POST   NOT =   SPACE )
-                   MOVE    QUERY-PTINF-HOME-POST (1:3)
+               IF    ( PTINF-HOME-POST   NOT =   SPACE )
+                   MOVE    PTINF-HOME-POST (1:3)
                                            TO  SPA-GMN-Q02-KEKKALST-POST
                                                           (IDX-GMN)(1:3)
                    MOVE    "-"             TO  SPA-GMN-Q02-KEKKALST-POST
                                                           (IDX-GMN)(4:1)
-                   MOVE    QUERY-PTINF-HOME-POST (4:4)
+                   MOVE    PTINF-HOME-POST (4:4)
                                            TO  SPA-GMN-Q02-KEKKALST-POST
                                                           (IDX-GMN)(5:4)
                    
                END-IF
       *
       *        診療内容（住所を表示）
-               MOVE    QUERY-PTINF-HOME-ADRS
+               MOVE    PTINF-HOME-ADRS
                                        TO  WRK-STR
       *
       *        住所の項目長を求める
                MOVE    1               TO  WRK-STR-LEN
                MOVE    SPACE           TO  WRK-STR
-               STRING  QUERY-PTINF-HOME-ADRS   DELIMITED   BY  SIZE
+               STRING  PTINF-HOME-ADRS   DELIMITED   BY  SIZE
                INTO    WRK-STR
                WITH POINTER WRK-STR-LEN
                END-STRING
                COMPUTE WRK-STR-LEN =   WRK-STR-LEN -   1
       *
       *        住所の実際の文字列長を求める
-               MOVE    QUERY-PTINF-HOME-ADRS TO  WRK-STR
+               MOVE    PTINF-HOME-ADRS TO  WRK-STR
                PERFORM 900-STR-LEN-GET-SEC
                MOVE    WRK-STR-LEN           TO  WRK-PTINF-ADR-LEN
       *
       *        番地の項目長を求める
                MOVE    1               TO  WRK-STR-LEN
                MOVE    SPACE           TO  WRK-STR
-               STRING  QUERY-PTINF-HOME-BANTI  DELIMITED   BY  SIZE
+               STRING  PTINF-HOME-BANTI  DELIMITED   BY  SIZE
                INTO    WRK-STR
                WITH POINTER WRK-STR-LEN
                END-STRING
                COMPUTE WRK-STR-LEN =   WRK-STR-LEN -   1
       *
       *        番地の実際の文字列長を求める
-               MOVE    QUERY-PTINF-HOME-BANTI  TO  WRK-STR
+               MOVE    PTINF-HOME-BANTI  TO  WRK-STR
                PERFORM 900-STR-LEN-GET-SEC
                MOVE    WRK-STR-LEN         TO  WRK-PTINF-BANTI-LEN
       *
                MOVE    1                   TO  WRK-STR-PNT
                IF  ( WRK-PTINF-ADR-LEN     >   0)
-                   STRING  QUERY-PTINF-HOME-ADRS 
+                   STRING  PTINF-HOME-ADRS 
                                    (1: WRK-PTINF-ADR-LEN)
                                            DELIMITED   BY  SIZE
                            "　"            DELIMITED   BY  SIZE
@@ -1010,7 +1105,7 @@
                END-IF
       *
                IF  ( WRK-PTINF-BANTI-LEN   >   0)
-                   STRING  QUERY-PTINF-HOME-BANTI 
+                   STRING  PTINF-HOME-BANTI 
                                    (1: WRK-PTINF-BANTI-LEN)
                                            DELIMITED   BY  SIZE
                    INTO    SPA-GMN-Q02-KEKKALST-SRYACT  (IDX-GMN)
@@ -1021,26 +1116,18 @@
                MOVE    IDX-GMN     TO  SPA-GMN-Q02-KEKKA-MAX
       *
       *        患者ＩＤ
-               MOVE    QUERY-PTINF-PTID
+               MOVE    PTINF-PTID
                                    TO  SPA-GMN-Q02-PTINF-PTID (IDX-GMN)
       *
-      *        患者マスタ読込処理
-               PERFORM 900-QUERY-PTINF-KEY-FET-SEC
+               PERFORM 900-PTSRH-ODR-FET-SEC
       *
            END-PERFORM
       *
-      *    患者マスタクローズ処理
-           MOVE    "query_ptinf"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "odr"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-      *    総件数編集
-           IF  ( SPA-GMN-Q02-TOTAL-GET-FLG =   ZERO )
-               MOVE    1              TO   SPA-GMN-Q02-TOTAL-GET-FLG
-               PERFORM 3101-TOTAL-KNS-EDIT-SEC
-           END-IF
-      *
-           MOVE   FLG-PTINF           TO  SPA-GMN-Q02-FLG-PTINF
+           MOVE   FLG-PTSRH           TO  SPA-GMN-Q02-FLG-PTINF
       *    前頁ボタン活性編集
            IF  ( SPA-GMN-Q02-SKIP-KNS      >   0 )
                MOVE    WIDGET-NORMAL       TO  SPA-GMN-Q02-B06-STATE
@@ -1054,16 +1141,84 @@
                MOVE    WIDGET-INSENSITIVE  TO  SPA-GMN-Q02-B07-STATE
            END-IF
       *
-           IF    ( SPA-GMN-Q02-SKIP-KNS     =   ZERO )
-            AND  ( SPA-GMN-Q02-KEKKA-MAX    =   ZERO )
+           .
+       3101-Q02-GMN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    検索前処理
+      *****************************************************************
+       3101-INIT-SQL-SEC               SECTION.
       *
-      *        該当なしエラー
-               MOVE    "0001"      TO  SPA-ERRCD
+           PERFORM 800-MCNDATE-SEC
       *
+           INITIALIZE                  SEL-AREA
+                                       TSRYCD-AREA
+           IF    ( SPA-Q01-STSRYYMD    =   SPACE )
+               MOVE    "00000000"          TO  SEL-STSRYYMD
+           ELSE
+               MOVE    SPA-Q01-STSRYYMD    TO  SEL-STSRYYMD
+           END-IF
+      *
+           IF    ( SPA-Q01-EDSRYYMD    =   SPACE )
+               MOVE    "99999999"          TO  SEL-EDSRYYMD
+           ELSE
+               MOVE    SPA-Q01-EDSRYYMD    TO  SEL-EDSRYYMD
+           END-IF
+      *
+           IF    ( SPA-Q01-SRYKA       =   SPACE )
+               MOVE    "%"                 TO  SEL-SRYKA
+           ELSE
+               MOVE    SPA-Q01-SRYKA       TO  SEL-SRYKA
+           END-IF
+      *
+           IF    ( SPA-Q01-NYUGAIKBN   =   SPACE )
+               MOVE    "%"                 TO  SEL-NYUGAIKBN
+           ELSE
+               MOVE    SPA-Q01-NYUGAIKBN   TO  SEL-NYUGAIKBN
+           END-IF
+      *
+           IF    ( SPA-Q01-SRYKBN       =   SPACE )
+               MOVE    "%"                 TO  SEL-SRYKBN
+           ELSE
+               MOVE    SPA-Q01-SRYKBN      TO  SEL-SRYKBN
+           END-IF
+      *
+           IF    ( SPA-Q01-SRYSYUKBN   =   SPACE )
+               MOVE    "%"                 TO  SEL-SRYSYUKBN
+           ELSE
+               MOVE    SPA-Q01-SRYSYUKBN   TO  SEL-SRYSYUKBN
+           END-IF
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   5 )
+      *
+               IF    ( SPA-Q01-SRYCD (IDX0)
+                               NOT =   SPACE )
+                   MOVE    SPA-Q01-SRYCD (IDX0)
+                                   TO  SEL-SRYCD
+               END-IF
+      *
+               MOVE    SPA-Q01-SRYCD (IDX0)
+                                   TO  TSRYCD-SRYCD (IDX0)
+      *
+           END-PERFORM
+      *
+      *    診察年月日
+           IF   ( SPA-Q01-GTBL (8)  =   "1" )
+               MOVE    1           TO  SEL-RRKSRH
+           END-IF
+      *
+      *    診療行為
+           IF   ( SPA-Q01-GTBL (9)  =   "1" )
+               IF    ( SPA-Q01-GTBL(8) =   SPACE )
+                   MOVE    1        TO  SEL-SRYSRH
+               ELSE
+                   MOVE    2        TO  SEL-SRYSRH
+               END-IF
            END-IF
       *
            .
-       310-Q02-GMN-EDIT-EXT.
+       3101-INIT-SQL-EXT.
            EXIT.
       *****************************************************************
       *    年齢計算処理
@@ -1153,27 +1308,34 @@
       *****************************************************************
        3101-TOTAL-KNS-EDIT-SEC             SECTION.
       *
-           IF      ( FLG-PTINF         =   "1" )
+           IF      ( FLG-PTSRH         =   1 )
                COMPUTE WRK-NUM =   IDX-GMN     -   1
                MOVE    WRK-NUM         TO  WRK-TOTAL
                                            SPA-GMN-Q02-TOTAL-NUM
            ELSE
       *        検索結果件数を取得
-      *        INITIALIZE                  MCPAREA
-               MOVE    "query_ptinf"       TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
-               MOVE    SPACE               TO  QUERY-PTINF-REC
-               MOVE    WRK-SQL-COUNT       TO  QUERY-PTINF-SQL
-               MOVE    QUERY-PTINF-REC     TO  MCPDATA-REC
-               PERFORM 911-DBSELECT-SEC
-               IF  (   MCP-RC          NOT =   ZERO    )
-                   MOVE    SPACE       TO  SPA-GMN-Q02-TOTAL
-                   GO  TO  3101-TOTAL-KNS-EDIT-EXT
+               INITIALIZE                      PTSRH-REC
+               MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
+               MOVE    SPA-TERMID          TO  PTSRH-TERMID
+               MOVE    "1"                 TO  PTSRH-DATAKBN
+               MOVE    SPA-GMN-Q02-SELYMD  TO  PTSRH-UPYMD
+               MOVE    SPA-GMN-Q02-SELHMS  TO  PTSRH-UPHMS
+               MOVE    PTSRH-REC           TO  MCPDATA-REC
+               MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+               MOVE    "cnt"               TO  MCP-PATHNAME
+               MOVE    PTSRH-REC           TO  MCPDATA-REC
+               PERFORM 910-DBSELECT-SEC
+               IF  (   MCP-RC              =   ZERO    )
+                   MOVE    MCPDATA-REC     TO  PTSRH-REC
+               ELSE
+                   INITIALIZE                  PTSRH-REC
                END-IF
       *
-               MOVE    MCPDATA-REC     TO  QUERY-PTINF-REC
-               MOVE    QUERY-PTINF-TOTAL
-                                       TO  WRK-TOTAL
+               MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+               MOVE    "cnt"               TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *
+               MOVE    PTSRH-PTID      TO  WRK-TOTAL
                                            SPA-GMN-Q02-TOTAL-NUM
            END-IF
       *
@@ -1241,6 +1403,12 @@
       *    処理確認画面
                WHEN    "CLICKED"       ALSO    "B12S"
                    PERFORM 490-KAKUNIN-SEC
+      *    検索中確認
+               WHEN    "CLICKED"       ALSO    "pandatimer1"
+               WHEN    "CLICKED"       ALSO    "B04"
+                   IF    ( SPA-GMN-Q02-MODE    =   ZERO )
+                       PERFORM 490-JOUTAI-SEC
+                   END-IF
            END-EVALUATE
       *
            .
@@ -1475,6 +1643,11 @@
       *    戻る　処理
       *****************************************************************
        210-BACK-SYORI-SEC              SECTION.
+      *
+           MOVE    "0"                 TO  SEL-DATAKBN
+           PERFORM 900-PTSRH-DEL1-SEC
+           MOVE    "1"                 TO  SEL-DATAKBN
+           PERFORM 900-PTSRH-DEL1-SEC
       * 
            MOVE    "Q01"               TO  SPA-SAKIPG
            MOVE    "Q02"               TO  SPA-MOTOPG
@@ -1500,7 +1673,7 @@
            IF  ( SPA-GMN-Q02-SKIP-KNS      >   0 )
                COMPUTE SPA-GMN-Q02-SKIP-KNS    =   SPA-GMN-Q02-SKIP-KNS
                                                -   CONST-LINE-MAX
-               PERFORM 310-Q02-GMN-EDIT-SEC
+               PERFORM 3101-Q02-GMN-EDIT-SEC
                MOVE    ZERO            TO  SPA-GMN-Q02-SELNUM
            END-IF
       *
@@ -1518,7 +1691,7 @@
            IF  ( SPA-GMN-Q02-FLG-PTINF     =   0 )
                COMPUTE SPA-GMN-Q02-SKIP-KNS    =   SPA-GMN-Q02-SKIP-KNS
                                                +   CONST-LINE-MAX
-               PERFORM 310-Q02-GMN-EDIT-SEC
+               PERFORM 3101-Q02-GMN-EDIT-SEC
                MOVE    ZERO            TO  SPA-GMN-Q02-SELNUM
            END-IF
       *
@@ -1915,6 +2088,23 @@
            EXIT.
       *
       *****************************************************************
+      *    状態確認画面
+      *****************************************************************
+       490-JOUTAI-SEC                  SECTION.
+      *
+           PERFORM 900-PTSRH-KEY2-SEL-SEC
+           IF    ( FLG-PTSRH   =   ZERO )
+               MOVE    1           TO  SPA-GMN-Q02-MODE
+               PERFORM 3101-Q02-GMN-EDIT-SEC
+               IF    ( SPA-GMN-Q02-TOTAL-NUM   =   ZERO )
+                   MOVE    "0001"  TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       490-JOUTAI-EXT.
+           EXIT.
+      *****************************************************************
       *    出力指示画面呼出処理
       *****************************************************************
        480-OUT-SIJI-CALL-SEC           SECTION.
@@ -2060,6 +2250,31 @@
                                                Q02-B12-STATE
            END-IF
       *
+           IF  ( SPA-GMN-Q02-MODE          =   ZERO )
+               MOVE    "検索中です。"
+                                   TO  SPA-GMN-Q02-KEKKALST-NAME (15)
+               MOVE    "しばらくお待ちください。"
+                                   TO  SPA-GMN-Q02-KEKKALST-NAME (16)
+               MOVE    16          TO  SPA-GMN-Q02-KEKKA-MAX
+               IF    ( SPA-GMN-Q02-DURATION
+                                   >=  5 )
+                   CONTINUE
+               ELSE
+                   COMPUTE SPA-GMN-Q02-DURATION
+                       =   SPA-GMN-Q02-DURATION    +   1
+               END-IF
+           ELSE
+               IF  ( SPA-GMN-Q02-TOTAL-NUM     =   ZERO )
+                   MOVE    "該当患者は存在しませんでした。"
+                                   TO  SPA-GMN-Q02-KEKKALST-NAME (16)
+                   MOVE    16      TO  SPA-GMN-Q02-KEKKA-MAX
+               END-IF
+               MOVE    ZERO        TO  SPA-GMN-Q02-DURATION
+           END-IF
+      *
+           MOVE    SPA-GMN-Q02-DURATION
+                                   TO  Q02-DURATION
+      *
            IF  ( SPA-GMN-Q02-TOTAL-NUM     >   CONST-RECE-MAX )
                MOVE    WIDGET-INSENSITIVE  TO  Q02-B09-STATE
            END-IF
@@ -2136,8 +2351,15 @@
       *
            END-PERFORM
       *
-      *    総件数
-           MOVE    SPA-GMN-Q02-TOTAL   TO  Q02-TOTAL
+           IF  ( SPA-GMN-Q02-MODE          =   ZERO )
+               MOVE    "red"       TO  Q02-TOTAL-STYLE
+               MOVE    "＊＊＊検索中＊＊＊"
+                                           TO  Q02-TOTAL
+           ELSE
+      *        総件数
+               MOVE    "black"             TO  Q02-TOTAL-STYLE
+               MOVE    SPA-GMN-Q02-TOTAL   TO  Q02-TOTAL
+           END-IF
       *
       *    選択番号
            MOVE    SPA-GMN-Q02-SELNUM  TO  Q02-SELNUM
@@ -2237,8 +2459,8 @@
            WHEN    "1001"
                MOVE    "選択番号が未入力です"
                                        TO  SPA-ERRMSG
-           WHEN    "1002"
-               MOVE    "患者番号が未登録のため遷移できません"
+           WHEN    "1003"
+               MOVE    "検索対象"
                                        TO  SPA-ERRMSG
            WHEN    "7777"
                MOVE    WRK-SHORIERR    TO  SPA-ERRMSG
@@ -2353,45 +2575,154 @@
        900-STR-LEN-GET-EXT.
            EXIT.
       *****************************************************************
-      *    患者マスタ検索処理
+      *    患者照会検索処理
       *****************************************************************
-       900-QUERY-PTINF-KEY-SEL-SEC     SECTION.
+       900-PTSRH-ODR-SEL-SEC           SECTION.
       *
-      *    INITIALIZE                  MCPAREA
-           MOVE    "query_ptinf"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           MOVE    SPACE               TO  QUERY-PTINF-REC
-           MOVE    WRK-SQL             TO  QUERY-PTINF-SQL
-           MOVE    QUERY-PTINF-REC     TO  MCPDATA-REC
+           MOVE    ZERO                TO  FLG-PTSRH
+      *
+           INITIALIZE                      PTSRH-REC
+           MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID          TO  PTSRH-TERMID
+           MOVE    "1"                 TO  PTSRH-DATAKBN
+           MOVE    SPA-GMN-Q02-SELYMD  TO  PTSRH-UPYMD
+           MOVE    SPA-GMN-Q02-SELHMS  TO  PTSRH-UPHMS
+           MOVE    WRK-SQL-ORDER       TO  PTSRH-SQL
+           MOVE    PTSRH-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "odr"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    ZERO            TO  FLG-PTINF
-               MOVE    MCPDATA-REC     TO  QUERY-PTINF-REC
+               MOVE    MCPDATA-REC     TO  PTSRH-REC
            ELSE
-               MOVE    1               TO  FLG-PTINF
+               MOVE    1               TO  FLG-PTSRH
+               INITIALIZE                  PTSRH-REC
            END-IF
       *
            .
-       900-QUERY-PTINF-KEY-SEL-EXT.
+       900-PTSRH-ODR-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    患者マスタ読込処理
+      *    患者照会FETCH処理
       *****************************************************************
-       900-QUERY-PTINF-KEY-FET-SEC     SECTION.
+       900-PTSRH-ODR-FET-SEC           SECTION.
       *
-      *    INITIALIZE              MCPAREA
-           MOVE    "query_ptinf"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    ZERO                TO  FLG-PTSRH
+      *
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "odr"               TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    ZERO            TO  FLG-PTINF
-               MOVE    MCPDATA-REC     TO  QUERY-PTINF-REC
+               MOVE    MCPDATA-REC     TO  PTSRH-REC
            ELSE
-               MOVE    1               TO  FLG-PTINF
+               MOVE    1               TO  FLG-PTSRH
+               INITIALIZE                  PTSRH-REC
            END-IF
       *
            .
-       900-QUERY-PTINF-KEY-FET-EXT.
+       900-PTSRH-ODR-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会検索処理
+      *****************************************************************
+       900-PTSRH-KEY2-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTSRH
+      *
+           INITIALIZE                      PTSRH-REC
+           MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID          TO  PTSRH-TERMID
+           MOVE    "0"                 TO  PTSRH-DATAKBN
+           MOVE    SPA-GMN-Q02-SELYMD  TO  PTSRH-UPYMD
+           MOVE    SPA-GMN-Q02-SELHMS  TO  PTSRH-UPHMS
+           MOVE    PTSRH-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    ZERO            TO  FLG-PTINF
+               MOVE    MCPDATA-REC     TO  PTSRH-REC
+           ELSE
+               MOVE    1               TO  FLG-PTSRH
+               INITIALIZE                  PTSRH-REC
+           END-IF
+      *
+           MOVE    "tbl_ptsrh"         TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTSRH-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会追加処理
+      *****************************************************************
+       900-PTSRH-INS2-SEC              SECTION.
+      *
+           MOVE    "2"             TO  SEL-DATAKBN
+           PERFORM 900-PTSRH-DEL1-SEC
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "2"             TO  PTSRH-DATAKBN
+           MOVE    SPA-GMN-Q02-SELYMD  TO  PTSRH-UPYMD
+           MOVE    SPA-GMN-Q02-SELHMS  TO  PTSRH-UPHMS
+           MOVE    "1"             TO  PTSRH-UPDATAKBN
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "ins2"          TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           .
+       900-PTSRH-INS2-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報検索処理
+      *****************************************************************
+       900-PTINF-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTINF
+      *
+           INITIALIZE                  PTINF-REC
+           MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
+           MOVE    PTSRH-PTID      TO  PTINF-PTID
+           MOVE    PTINF-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTINF-REC
+           ELSE
+               INITIALIZE              PTINF-REC
+               MOVE    1           TO  FLG-PTINF
+           END-IF
+      *
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会削除処理
+      *****************************************************************
+       900-PTSRH-DEL1-SEC              SECTION.
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    SEL-DATAKBN     TO  PTSRH-DATAKBN
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "del1"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-PTSRH-DEL1-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理
@@ -2437,6 +2768,34 @@
            .
       *
        910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ追加処理
+      *****************************************************************
+       910-DBINSERT-SEC                 SECTION.
+      *
+           MOVE    "DBINSERT"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ削除処理
+      *****************************************************************
+       910-DBDELETE-SEC                 SECTION.
+      *
+           MOVE    "DBDELETE"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢクローズ処理

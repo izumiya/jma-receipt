@@ -94,8 +94,8 @@
            03  WRK-SQL                             PIC X(20000).
            03  WRK-SQL-PNT                         PIC 9(06).
            03  WRK-PNT                             PIC 9(06).
-           03  WRK-SQL-COUNT                       PIC X(20000).
-           03  WRK-SQL-COUNT-PNT                   PIC 9(06).
+           03  WRK-SQL-ORDER                       PIC X(20000).
+           03  WRK-SQL-ORDER-PNT                   PIC 9(06).
            03  WRK-NAME-SEQ                        PIC 9(01).
            03  WRK-KOHNUM                          PIC X(04).
            03  WRK-PAYKBN                          PIC X(02).
@@ -109,33 +109,22 @@
       *    固定値領域
        01  CONST-AREA.
            03  CONST-ITEM-AREA.
-               05  CONST-ITEM-MAX          PIC 9(03) VALUE 11.
+               05  CONST-ITEM-MAX          PIC 9(03) VALUE 6.
                05  CONST-ITEM-VAL.
+                   07  CONST-HOSPNUM-TBL   PIC X(01) VALUE "A".
+                   07  CONST-HOSPNUM       PIC X(20) VALUE "HOSPNUM".
                    07  CONST-PTID-TBL      PIC X(01) VALUE "A".
                    07  CONST-PTID          PIC X(20) VALUE "PTID".
+                   07  CONST-PTNUM-TBL     PIC X(01) VALUE "H".
+                   07  CONST-PTNUM         PIC X(20) VALUE "PTNUM".
                    07  CONST-KANANAME-TBL  PIC X(01) VALUE "A".
                    07  CONST-KANANAME      PIC X(20) VALUE "KANANAME".
-                   07  CONST-NAME-TBL      PIC X(01) VALUE "A".
-                   07  CONST-NAME          PIC X(20) VALUE "NAME".
                    07  CONST-SEX-TBL       PIC X(01) VALUE "A".
                    07  CONST-SEX           PIC X(20) VALUE "SEX".
                    07  CONST-BIRTHDAY-TBL  PIC X(01) VALUE "A".
                    07  CONST-BIRTHDAY      PIC X(20) VALUE "BIRTHDAY".
-                   07  CONST-POST-TBL      PIC X(01) VALUE "A".
-                   07  CONST-POST          PIC X(20) VALUE "HOME_POST".
-                   07  CONST-ADRS-TBL      PIC X(01) VALUE "A".
-                   07  CONST-ADRS          PIC X(20) VALUE "HOME_ADRS".
-                   07  CONST-BANTI-TBL     PIC X(01) VALUE "A".
-                   07  CONST-BANTI         PIC X(20) VALUE "HOME_BANTI".
-                   07  CONST-TEL1-TBL      PIC X(01) VALUE "A".
-                   07  CONST-TEL1          PIC X(20) VALUE "HOME_TEL1".
-                   07  CONST-TSTPTNUMKBN-TBL
-                                           PIC X(01) VALUE "A".
-                   07  CONST-TSTPTNUMKBN  PIC X(20) VALUE "TSTPTNUMKBN".
-                   07  CONST-PTNUM-TBL     PIC X(01) VALUE "H".
-                   07  CONST-PTNUM         PIC X(20) VALUE "PTNUM".
                05  CONST-ITEM-R    REDEFINES   CONST-ITEM-VAL.
-                   07  CONST-ITEM-OCC      OCCURS    11.
+                   07  CONST-ITEM-OCC      OCCURS    6.
                        09  CONST-ITEM-TBL  PIC X(01).
                        09  CONST-ITEM      PIC X(20).
            03  CONST-TABLE-AREA.
@@ -144,11 +133,10 @@
                05  CONST-TBL-C     PIC X(20) VALUE "TBL_PTBYOMEI    C".
                05  CONST-TBL-D     PIC X(20) VALUE "TBL_PTHKNINF    D".
                05  CONST-TBL-E     PIC X(20) VALUE "TBL_PTKOHINF    E".
-               05  CONST-TBL-F     PIC X(20) VALUE "VIEW_Q004       F".
-               05  CONST-TBL-GT    PIC X(20) VALUE "VIEW_Q003       G".
-               05  CONST-TBL-GV    PIC X(20) VALUE "VIEW_Q002       G".
+               05  CONST-TBL-F     PIC X(20) VALUE "TBL_RRKSRH      F".
+               05  CONST-TBL-GT    PIC X(20) VALUE "TBL_SRHACT      G".
                05  CONST-TBL-H     PIC X(20) VALUE "TBL_PTNUM       H".
-               05  CONST-TBL-I     PIC X(20) VALUE "VIEW_Q001       D".
+               05  CONST-TBL-I     PIC X(20) VALUE "TMPV_Q001       D".
                05  CONST-TBL-J1    PIC X(20) VALUE "TBL_TSYRRK      J".
                05  CONST-TBL-J2    PIC X(20) VALUE "TBL_TNKRRK      J".
                05  CONST-TBL-K     PIC X(20) VALUE "TBL_RECECOM     K".
@@ -158,7 +146,7 @@
                05  FILLER          PIC X(12)   VALUE "KANANAME".
                05  FILLER          PIC X(12)   VALUE "SEX".
                05  FILLER          PIC X(12)   VALUE "BIRTHDAY".
-               05  FILLER          PIC X(12)   VALUE "MAX_JKYSNUM".
+               05  FILLER          PIC X(12)   VALUE "JKYSNUM".
            03  CONST-KMK-ITEM-R    REDEFINES   CONST-KMK-ITEM-AREA.
                05  CONST-KMK-ITEM  PIC X(12)   OCCURS  5.
       *
@@ -205,7 +193,7 @@
            PERFORM 100-JYOKEN-EDIT-SEC
       *
            MOVE    WRK-SQL         TO  QSUB02-SQL
-           MOVE    WRK-SQL-COUNT   TO  QSUB02-SQL-CNT
+           MOVE    WRK-SQL-ORDER   TO  QSUB02-SQL-ORDER
       *
            EXIT PROGRAM
            .
@@ -216,10 +204,10 @@
        100-JYOKEN-EDIT-SEC          SECTION.
       *
            INITIALIZE                  WRK-SQL
-                                       WRK-SQL-COUNT
+                                       WRK-SQL-ORDER
       *
            MOVE    1               TO  WRK-SQL-PNT
-                                       WRK-SQL-COUNT-PNT
+                                       WRK-SQL-ORDER-PNT
       *
            IF    ( SPA-Q01-HKNKOH-JKN  =   " " )
             AND  ( SPA-Q01-GTBL (5)    =   "1" )
@@ -233,15 +221,6 @@
            INTO    WRK-SQL
            WITH    POINTER   WRK-SQL-PNT
            END-STRING
-      *
-           STRING  "SELECT COUNT(DISTINCT PTID) FROM ("
-                                       DELIMITED   BY  SIZE
-           INTO    WRK-SQL-COUNT
-           WITH    POINTER WRK-SQL-COUNT-PNT
-           END-STRING
-      *
-           MOVE    WRK-SQL (WRK-PNT:)  TO  WRK-SQL-COUNT
-                                              (WRK-SQL-COUNT-PNT :)
       *
            PERFORM 1001-GROUP-EDIT-SEC
       *
@@ -495,53 +474,72 @@
       *****************************************************************
        10011-JYOKEN-INIT-SEC           SECTION.
       *
-           STRING  "SELECT "       DELIMITED   BY  SIZE
-           INTO    WRK-SQL
-           WITH    POINTER   WRK-SQL-PNT
-           END-STRING
+           IF    ( FLG-TBLNAME     =   ZERO )
       *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-ITEM-MAX )
+               STRING    "INSERT   INTO  TBL_PTSRH ("
+                                              DELIMITED    BY SIZE
+                         "HOSPNUM,"           DELIMITED    BY SIZE
+                         "TERMID,"            DELIMITED    BY SIZE
+                         "PTID,"              DELIMITED    BY SIZE
+                         "PTNUM,"             DELIMITED    BY SIZE
+                         "KANANAME,"          DELIMITED    BY SIZE
+                         "SEX,"               DELIMITED    BY SIZE
+                         "BIRTHDAY,"          DELIMITED    BY SIZE
+                         "DATAKBN,"           DELIMITED    BY SIZE
+                         "CREYMD,"            DELIMITED    BY SIZE
+                         "UPYMD,"             DELIMITED    BY SIZE
+                         "UPHMS,"             DELIMITED    BY SIZE
+                         "JKYSNUM"            DELIMITED    BY SIZE
+                         ")"                  DELIMITED    BY SIZE
+                         "SELECT "            DELIMITED    BY SIZE
+                         "HOSPNUM,'"          DELIMITED    BY SIZE
+                         SPA-TERMID           DELIMITED    BY SPACE
+                         "',PTID,"            DELIMITED    BY SIZE
+                         "PTNUM,"             DELIMITED    BY SIZE
+                         "KANANAME,"          DELIMITED    BY SIZE
+                         "SEX,"               DELIMITED    BY SIZE
+                         "BIRTHDAY,"          DELIMITED    BY SIZE
+                         "'1',"               DELIMITED    BY SIZE
+                         "'"                  DELIMITED    BY SIZE
+                         QSUB02-YMD           DELIMITED    BY SPACE
+                         "',"                 DELIMITED    BY SIZE
+                         "'"                  DELIMITED    BY SIZE
+                         QSUB02-YMD           DELIMITED    BY SPACE
+                         "',"                 DELIMITED    BY SIZE
+                         "'"                  DELIMITED    BY SIZE
+                         QSUB02-HMS           DELIMITED    BY SPACE
+                         "',"                 DELIMITED    BY SIZE
+               INTO    WRK-SQL
+               WITH    POINTER   WRK-SQL-PNT
+               END-STRING
+           ELSE
+               STRING    "SELECT "            DELIMITED    BY SIZE
+                         "A.HOSPNUM,"         DELIMITED    BY SIZE
+                         "A.PTID,"            DELIMITED    BY SIZE
+                         "H.PTNUM,"           DELIMITED    BY SIZE
+                         "A.KANANAME,"        DELIMITED    BY SIZE
+                         "A.SEX,"             DELIMITED    BY SIZE
+                         "A.BIRTHDAY,"        DELIMITED    BY SIZE
+               INTO    WRK-SQL
+               WITH    POINTER   WRK-SQL-PNT
+               END-STRING
+           END-IF
       *
-               IF    ( IDX0    >   1 )
-                   STRING  ","         DELIMITED   BY  SIZE
-                   INTO    WRK-SQL
-                   WITH    POINTER   WRK-SQL-PNT
-                   END-STRING
-               ELSE
-                   CONTINUE
-               END-IF
-      *
-               IF    ( FLG-TBLNAME =   ZERO )
-                   STRING  CONST-ITEM     (IDX0)   DELIMITED   BY  SPACE
-                   INTO    WRK-SQL
-                   WITH    POINTER   WRK-SQL-PNT
-                   END-STRING
-               ELSE
-                   STRING  CONST-ITEM-TBL (IDX0)   DELIMITED   BY  SPACE
-                           "."                     DELIMITED   BY  SIZE
-                           CONST-ITEM     (IDX0)   DELIMITED   BY  SPACE
-                   INTO    WRK-SQL
-                   WITH    POINTER   WRK-SQL-PNT
-                   END-STRING
-               END-IF
-      *
-           END-PERFORM
            EVALUATE    WRK-KOHTBLID
            WHEN    SPACE
-               STRING  ",SUBSTR(MAX(JKYSNUM),17,20) AS MAX_JKYSNUM"
+               STRING  "SUBSTR(MAX(JKYSNUM),17,20) AS JKYSNUM"
                                                        DELIMITED BY SIZE
                INTO    WRK-SQL
                WITH    POINTER   WRK-SQL-PNT
                END-STRING
            WHEN    "@@"
-               STRING  ",CAST('0' AS TEXT) AS JKYSNUM"
+               STRING  "CAST('0' AS TEXT) AS JKYSNUM"
                                                        DELIMITED BY SIZE
                INTO    WRK-SQL
                WITH    POINTER   WRK-SQL-PNT
                END-STRING
            WHEN    OTHER
-               STRING  ",CAST("              DELIMITED BY SIZE
+               STRING  "CAST("              DELIMITED BY SIZE
                        WRK-KOHTBLID          DELIMITED BY SPACE
                        ".TEKSTYMD||SUBSTR("  DELIMITED BY SIZE
                        WRK-KOHTBLID          DELIMITED BY SPACE
@@ -638,7 +636,7 @@
            IF      ((  SPA-Q01-GTBL (5)    =   "1" )
                 OR  (  SPA-Q01-GTBL (6)    =   "1" ))
             AND    (   SPA-Q01-GTBL (8)    =   "1" )
-               PERFORM 1001-VIEWQ001-JYOKEN-EDIT-SEC
+               PERFORM 1001-TMPVQ001-JYOKEN-EDIT-SEC
       *
            ELSE
       *        保険記号・番号
@@ -676,7 +674,7 @@
                 OR   ( SPA-Q01-GTBL (9)  =   "1" )
                    CONTINUE
                ELSE
-                   STRING  ",VIEW_Q004 F"         DELIMITED  BY  SIZE
+                   STRING  ",TBL_RRKSRH F"         DELIMITED  BY  SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
@@ -706,9 +704,9 @@
       *****************************************************************
        1001-WHERE-EDIT-SEC             SECTION.
       *
-           STRING  " WHERE A.HOSPNUM='"         DELIMITED  BY  SIZE
+           STRING  " WHERE A.HOSPNUM="          DELIMITED  BY  SIZE
                    SPA-HOSPNUM                  DELIMITED  BY  SIZE
-                   "' AND "                     DELIMITED  BY  SIZE
+                   " AND "                      DELIMITED  BY  SIZE
            INTO    WRK-SQL
            WITH    POINTER WRK-SQL-PNT
            END-STRING
@@ -752,10 +750,10 @@
                IF  (   SPA-Q01-GTBL (8)    =   "1" )
                    IF    ( SPA-Q01-KOHNUM-JKN      =   "1" )
                     AND  ( SPA-Q01-KOHNUM-G    NOT =   SPACE )
-                       PERFORM 1001-VIEWQ001-SQL-AND-EDIT-SEC
+                       PERFORM 1001-TMPVQ001-SQL-AND-EDIT-SEC
                    ELSE
                        MOVE    ZERO        TO  FLG-JYOKEN-AND
-                       PERFORM 1001-VIEWQ001-SQL-OR-EDIT-SEC
+                       PERFORM 1001-TMPVQ001-SQL-OR-EDIT-SEC
                        MOVE    1           TO  FLG-JYOKEN
                    END-IF
                ELSE
@@ -875,7 +873,7 @@
       *****************************************************************
       *    照会ビュー条件編集処理
       *****************************************************************
-       1001-VIEWQ001-JYOKEN-EDIT-SEC   SECTION.
+       1001-TMPVQ001-JYOKEN-EDIT-SEC   SECTION.
       *
            IF    ( SPA-Q01-KOHNUM-JKN      =   "1" )
             AND  ( SPA-Q01-KOHNUM-G    NOT =   SPACE )
@@ -885,7 +883,7 @@
       *
                    IF    ( SPA-Q01-KOHNUM (IDX2)   NOT =   SPACE )
                        MOVE    IDX2    TO  WRK-NAME-SEQ
-                       STRING  ",VIEW_Q001 D"      DELIMITED  BY  SIZE
+                       STRING  ",TMPV_Q001 D"      DELIMITED  BY  SIZE
                                WRK-NAME-SEQ        DELIMITED  BY  SIZE
                        INTO    WRK-SQL
                        WITH    POINTER WRK-SQL-PNT
@@ -895,14 +893,14 @@
                END-PERFORM
            ELSE
                MOVE    1               TO  FLG-HKNSELPTN
-               STRING  ",VIEW_Q001 D"          DELIMITED  BY  SIZE
+               STRING  ",TMPV_Q001 D"          DELIMITED  BY  SIZE
                INTO    WRK-SQL
                WITH    POINTER WRK-SQL-PNT
                END-STRING
            END-IF
       *
            .
-       1001-VIEWQ001-JYOKEN-EDIT-EXT.
+       1001-TMPVQ001-JYOKEN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    患者公費情報テーブル検索情報編集処理
@@ -979,14 +977,14 @@
                    IF    (SPA-Q01-SRYCD (IDX2) NOT =   SPACE )
                        IF    ( SPA-Q01-GTBL(8) =   SPACE )
                            MOVE    IDX2    TO  WRK-NAME-SEQ
-                           STRING  ",VIEW_Q003 G" DELIMITED  BY  SIZE
+                           STRING  ",TBL_SRYSRH G" DELIMITED  BY  SIZE
                                    WRK-NAME-SEQ    DELIMITED  BY  SIZE
                            INTO    WRK-SQL
                            WITH    POINTER WRK-SQL-PNT
                            END-STRING
                        ELSE
                            MOVE    IDX2    TO  WRK-NAME-SEQ
-                           STRING  ",VIEW_Q002 G"  DELIMITED  BY  SIZE
+                           STRING  ",TBL_SRYSRH G"  DELIMITED  BY  SIZE
                                    WRK-NAME-SEQ    DELIMITED  BY  SIZE
                            INTO    WRK-SQL
                            WITH    POINTER WRK-SQL-PNT
@@ -997,12 +995,12 @@
                END-PERFORM
            ELSE
                IF    ( SPA-Q01-GTBL(8) =   SPACE )
-                   STRING  ",VIEW_Q003 G"         DELIMITED  BY  SIZE
+                   STRING  ",TBL_SRYSRH G"         DELIMITED  BY  SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
                ELSE
-                   STRING  ",VIEW_Q002 G"          DELIMITED  BY  SIZE
+                   STRING  ",TBL_SRYSRH G"          DELIMITED  BY  SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
@@ -1672,7 +1670,7 @@
       *****************************************************************
       *    照会ビュー検索条件編集処理(AND)
       *****************************************************************
-       1001-VIEWQ001-SQL-AND-EDIT-SEC  SECTION.
+       1001-TMPVQ001-SQL-AND-EDIT-SEC  SECTION.
       *
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
@@ -1786,13 +1784,13 @@
            END-IF
       *
            .
-       1001-VIEWQ001-SQL-AND-EDIT-EXT.
+       1001-TMPVQ001-SQL-AND-EDIT-EXT.
            EXIT.
       *
       *****************************************************************
       *    照会ビュー検索条件編集処理(OR)
       *****************************************************************
-       1001-VIEWQ001-SQL-OR-EDIT-SEC   SECTION.
+       1001-TMPVQ001-SQL-OR-EDIT-SEC   SECTION.
       *
            MOVE    "D"                 TO  WRK-SQL-TBL-NAME
       *
@@ -1831,7 +1829,7 @@
            PERFORM 900-SQL-JYOKEN-EDIT4-SEC
       *
            .
-       1001-VIEWQ001-SQL-OR-EDIT-EXT.
+       1001-TMPVQ001-SQL-OR-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    保険情報ＳＱＬ編集処理
@@ -2577,9 +2575,9 @@
                END-STRING
            END-IF
       *
-           STRING  "((H.HOSPNUM='"             DELIMITED   BY  SIZE
+           STRING  "((H.HOSPNUM="              DELIMITED   BY  SIZE
                    SPA-HOSPNUM                 DELIMITED   BY  SIZE
-                   "')AND("                    DELIMITED   BY  SIZE
+                   ")AND("                     DELIMITED   BY  SIZE
                    "H.PTID=A.PTID) "           DELIMITED   BY  SIZE
            INTO    WRK-SQL
            WITH    POINTER     WRK-SQL-PNT
@@ -3502,8 +3500,8 @@
                    " "                         DELIMITED   BY  SIZE
                    CONST-ORDER (IDX-SRT3)
                                                DELIMITED   BY  SPACE
-           INTO    WRK-SQL
-           WITH    POINTER WRK-SQL-PNT
+           INTO    WRK-SQL-ORDER
+           WITH    POINTER WRK-SQL-ORDER-PNT
            END-STRING
       *
            IF    ( QSUB02-LIMITCONTROL     =   1 )
@@ -3512,8 +3510,8 @@
                        QSUB02-LIMIT                DELIMITED   BY  SIZE
                        " OFFSET "                  DELIMITED   BY  SIZE
                        QSUB02-OFFSET               DELIMITED   BY  SIZE
-               INTO    WRK-SQL
-               WITH    POINTER WRK-SQL-PNT
+               INTO    WRK-SQL-ORDER
+               WITH    POINTER WRK-SQL-ORDER-PNT
                END-STRING
            END-IF
       *
@@ -3535,9 +3533,9 @@
       *
            STRING  "(("                        DELIMITED   BY  SIZE
                    WRK-SQL-TBL-NAME            DELIMITED   BY  SPACE
-                   ".HOSPNUM='"                DELIMITED   BY  SIZE
+                   ".HOSPNUM="                 DELIMITED   BY  SIZE
                    SPA-HOSPNUM                 DELIMITED   BY  SIZE
-                   "')AND("                    DELIMITED   BY  SIZE
+                   ")AND("                     DELIMITED   BY  SIZE
                    WRK-SQL-TBL-NAME            DELIMITED   BY  SPACE
                    ".PTID=A.PTID) "            DELIMITED   BY  SIZE
                    "AND "                      DELIMITED   BY  SIZE
@@ -3682,9 +3680,9 @@
       *
            STRING  "(("                        DELIMITED   BY  SIZE
                    WRK-SQL-TBL-NAME            DELIMITED   BY  SPACE
-                   ".HOSPNUM='"                DELIMITED   BY  SIZE
+                   ".HOSPNUM="                 DELIMITED   BY  SIZE
                    SPA-HOSPNUM                 DELIMITED   BY  SIZE
-                   "')AND("                    DELIMITED   BY  SIZE
+                   ")AND("                     DELIMITED   BY  SIZE
                    WRK-SQL-TBL-NAME            DELIMITED   BY  SPACE
                    ".PTID=A.PTID) "            DELIMITED   BY  SIZE
            INTO    WRK-SQL

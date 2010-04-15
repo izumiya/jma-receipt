@@ -49,11 +49,12 @@ db	{
 	tbl_tensu;
 	tbl_userbyomei;
 	tbl_jobkanri;
-	query_ptinf;
 	tbl_ptnyuinrrk;
 	tbl_shoukaikanri;
 	tbl_shoukaidata;
         tbl_file_info; 
+        tbl_ptsrh; 
+        tbl_ptinf; 
 };
 
 /* #include "orcadb.inc" */

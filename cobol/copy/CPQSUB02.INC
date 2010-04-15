@@ -17,9 +17,11 @@
       ********************************************************************
        01  QSUB02-LNK.
            03  QSUB02-IN-AREA.
+               05  QSUB02-YMD          PIC X(08).
+               05  QSUB02-HMS          PIC X(06).
                05  QSUB02-LIMITCONTROL PIC 9(01).
                05  QSUB02-LIMIT        PIC 9(08).
                05  QSUB02-OFFSET       PIC 9(08).
            03  QSUB02-OT-AREA.
                05  QSUB02-SQL          PIC X(20000).
-               05  QSUB02-SQL-CNT      PIC X(20000).
+               05  QSUB02-SQL-ORDER    PIC X(20000).
