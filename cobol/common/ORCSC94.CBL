@@ -239,6 +239,9 @@
                            (SPA-COM-SURYO (IDX)    =   0  )  AND
                            (SPA-COM-KZMCOMPSIKIBETU (IDX)
                                                NOT =   0 ))
+      *            ¿ôÎÌ£±ÆþÎÏ
+                   OR    ((SPA-COM-SURFLG (IDX)    =   "1"  )  AND
+                          (SPA-COM-SURYO  (IDX)    =   1    ))
                        MOVE    SPA-COM-SURYO  (IDX)    TO  WRK-SURYO
                        PERFORM 2001-SURYO-HEN-SEC
                    END-IF
