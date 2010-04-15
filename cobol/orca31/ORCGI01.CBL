@@ -20829,7 +20829,7 @@
                EVALUATE    TRUE
                WHEN  ( WRK-AGECHK-SRYYMD   >=  CONST-H200401 )
       *
-                   IF    ( AGECHK-NENREI2-YY  >=   65 )
+                   IF    ( AGECHK-NENREI   >=   65 )
                        MOVE    1        TO  FLG-LIFE-RJN
                    END-IF
                WHEN  ( WRK-AGECHK-SRYYMD   >=  CONST-H181001 )
@@ -20838,7 +20838,7 @@
       *
       *            Ï·¿ÍÂÐ¾Ý´µ¼ÔÈ½Äê
                    IF    ( FLG-ROUJIN           =   1  ) 
-                    OR   ( AGECHK-NENREI2-YY   >=   70 )
+                    OR   ( AGECHK-NENREI       >=   70 )
                        MOVE    1        TO  FLG-LIFE-RJN
                    END-IF
                END-EVALUATE
