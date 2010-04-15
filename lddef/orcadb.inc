@@ -151,4 +151,7 @@ db	{
 	tbl_santeiplus;
 	tbl_dbcatalog;
 	tbl_infection;
+	tbl_ptsrh;
+	tbl_srysrh;
+	tbl_rrksrh;
 };
