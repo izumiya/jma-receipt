@@ -1,9 +1,9 @@
 \set ON_ERROR_STOP
 
 create  table  tbl_ptsrh (
-        hospnum      smallint,
+        hospnum      numeric(2,0),
         termid       char(64),
-        ptid         bigint,
+        ptid         numeric(10,0),
         ptnum        varchar(20),
         kananame     varchar(100),
         sex          char(1),
