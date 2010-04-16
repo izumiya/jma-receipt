@@ -213,6 +213,10 @@
       *  04.05.02    NACL-Æ£¸¶    10/01/05  ¼£¸³ÂÐ±þ
       *                                     Ê¿À®£²£°Ç¯£´·îÊ¬¤è¤ê¼«Èñ¥ì¥»
       *                                     ¤È¤¹¤ë 
+      *  04.05.03    NACL-Æ£¸¶    10/04/14  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *                                     ÀÁµá¤Ë·¸¤ï¤ëµ­Ï¿¾ò·ï»ÅÍÍ¤Î
+      *                                     ÊÑ¹¹¤ËÈ¼¤¦½¤Àµ
+      *                                     ¿ÇÎÅ²Ê£²¡¢£³¤òÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -410,6 +414,8 @@
            03  IDY1                                    PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  IDZ                                     PIC 9(02).
+           03  IDZ1                                    PIC 9(02).
+           03  IDZ2                                    PIC 9(02).
            03  IDVV                                    PIC 9(03).
            03  IDWW                                    PIC 9(03).
            03  IDXX                                    PIC 9(03).
@@ -474,6 +480,24 @@
            03  WRK-ZAITAKU-SRYCD         PIC  X(09).
       *
            03  WRK-SEIHO-FLG             PIC 9(01).
+      *
+      *    ¼ç²ÊÊÌ¾ðÊó
+           03  WRK-SYUACC-IO-SYUKA-AREA.
+               05  WRK-SYUACC-IO-SRYKATBL  OCCURS  50.
+      *            ¼ç²Ê
+                   07  WRK-SYUACC-IO-SRYKA PIC X(02).
+      *            ÀÁµáÅÀ¿ô¹ç·×
+                   07  WRK-SYUACC-IO-TENSU PIC S9(09).
+      *            ¼õ¿Ç²ó¿ô¹ç·×
+                   07  WRK-SYUACC-IO-KAISU PIC 9(03).
+      *    ¼ç²ÊÊÌ¾ðÊó
+           03  WRK-SYUACC-REC.
+      *        ¼ç²Ê
+               05  WRK-SYUACC-SRYKA        PIC X(02).
+      *        ÀÁµáÅÀ¿ô¹ç·×
+               05  WRK-SYUACC-TENSU        PIC S9(09).
+      *        ¼õ¿Ç²ó¿ô¹ç·×
+               05  WRK-SYUACC-KAISU        PIC 9(03).
       *
       *    ´µ¼ÔÇ¯Îð»»½ÐÍÑ¥¨¥ê¥¢
        01  WRK-NENREI-AREA.
@@ -1731,6 +1755,43 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    END-IF
                    MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA
                    MOVE    SYS-1005-SRYKANAME  TO  RECE02-SYUKANAME
+      *            ¿ÇÎÅ²Ê£²¡¢¿ÇÎÅ²Ê£³¤ÎÀßÄê
+                   IF      RECE02-SYUKA2       NOT =   SPACE
+                       MOVE    SPACE                TO  SYSKANRI-REC
+                       INITIALIZE                       SYSKANRI-REC
+                       MOVE    "1005"               TO  SYS-KANRICD
+                       MOVE    RECE02-SYUKA2        TO  SYS-KBNCD
+                       MOVE    RECE02-SRYYM         TO SYS-STYUKYMD(1:6)
+                       MOVE    "01"                 TO SYS-STYUKYMD(7:2)
+                       MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
+                       MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
+                       MOVE    "key10"              TO  WRK-MCP-PATHNAME
+                       PERFORM 960-KANRIMST-READ-SEC
+                       IF      FLG-SYSKANRI         =   ZERO
+                           MOVE    MCPDATA-REC         TO  SYS-1005-REC
+                       ELSE
+                           INITIALIZE                      SYS-1005-REC
+                       END-IF
+                       MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA2
+                   END-IF 
+                   IF      RECE02-SYUKA3       NOT =   SPACE
+                       MOVE    SPACE                TO  SYSKANRI-REC
+                       INITIALIZE                       SYSKANRI-REC
+                       MOVE    "1005"               TO  SYS-KANRICD
+                       MOVE    RECE02-SYUKA3        TO  SYS-KBNCD
+                       MOVE    RECE02-SRYYM         TO SYS-STYUKYMD(1:6)
+                       MOVE    "01"                 TO SYS-STYUKYMD(7:2)
+                       MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
+                       MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
+                       MOVE    "key10"              TO  WRK-MCP-PATHNAME
+                       PERFORM 960-KANRIMST-READ-SEC
+                       IF      FLG-SYSKANRI         =   ZERO
+                           MOVE    MCPDATA-REC         TO  SYS-1005-REC
+                       ELSE
+                           INITIALIZE                      SYS-1005-REC
+                       END-IF
+                       MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA3
+                   END-IF 
                END-IF   
              END-IF
            END-IF    
@@ -1874,6 +1935,159 @@ grpsys             PERFORM 900-DBSELECT-SEC
                        MOVE    "XX"                TO  RECE02-SYUKA
                    END-IF
                END-IF
+           END-IF    
+      *
+      *    ¿ÇÎÅ²Ê£²¡¢¿ÇÎÅ²Ê£³¤Î¥»¥Ã¥È
+      *    ¼ç²ÊÌ¤ÀßÄê¤Þ¤¿¤ÏÊ¿À®£²£²Ç¯£³·î°ÊÁ°¤Î¾ì¹ç¤Ï¥»¥Ã¥È¤·¤Ê¤¤
+           IF    ( RECE02-SYUKA    =   "XX"   )
+      *??     OR    ( RECE02-SRYYM    <=  201003 )
+               GO  TO  2101-SYUKA-HENSYU-EXT
+           END-IF     
+      *
+           INITIALIZE                  WRK-SYUACC-IO-SYUKA-AREA
+           MOVE    ZERO            TO  IDZ1
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       50
+                   OR      LNK-SYUACC-IO-SRYKA (1 IDY)
+                                   =   SPACE
+               IF      RECE02-SYUKA    =   LNK-SYUACC-IO-SRYKA (1 IDY)
+                   CONTINUE
+               ELSE
+                   ADD     1           TO  IDZ1
+                   MOVE    LNK-SYUACC-IO-SRYKA (1 IDY)
+                                       TO  WRK-SYUACC-IO-SRYKA (IDZ1)
+                   MOVE    LNK-SYUACC-IO-TENSU (1 IDY)
+                                       TO  WRK-SYUACC-IO-TENSU (IDZ1)
+                   MOVE    LNK-SYUACC-IO-KAISU (1 IDY)
+                                       TO  WRK-SYUACC-IO-KAISU (IDZ1)
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING IDZ1    FROM    1   BY  1
+                   UNTIL   IDZ1    >       49
+                   OR      WRK-SYUACC-IO-SRYKA (IDZ1)
+                                   =   SPACE
+             COMPUTE IDY     =   IDZ1    +   1
+             PERFORM VARYING IDZ2    FROM    IDY BY  1
+                     UNTIL   IDZ2    >   50
+                     OR      WRK-SYUACC-IO-SRYKA (IDZ2)
+                                     =   SPACE
+      *
+               EVALUATE    SYS-2009-SYUKA-GAIRAI
+                   WHEN    "1"
+                       IF      WRK-SYUACC-IO-KAISU (IDZ1)
+                                       =   WRK-SYUACC-IO-KAISU (IDZ2)
+                           EVALUATE    SYS-2009-SYUKA-SELECT
+                               WHEN    "0"
+                               WHEN    "1"
+                                   IF      WRK-SYUACC-IO-SRYKA (IDZ1)
+                                                   >
+                                           WRK-SYUACC-IO-SRYKA (IDZ2)
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                                      TO  WRK-SYUACC-REC
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                       MOVE
+                                           WRK-SYUACC-REC
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                   END-IF
+                               WHEN    "2"
+                                   IF      WRK-SYUACC-IO-SRYKA (IDZ1)
+                                                   <
+                                           WRK-SYUACC-IO-SRYKA (IDZ2)
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                                      TO  WRK-SYUACC-REC
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                       MOVE
+                                           WRK-SYUACC-REC
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                   END-IF
+                           END-EVALUATE
+                       ELSE
+                           IF      WRK-SYUACC-IO-KAISU (IDZ1)
+                                       <   WRK-SYUACC-IO-KAISU (IDZ2)
+                               MOVE    WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                                      TO  WRK-SYUACC-REC
+                               MOVE    WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                               MOVE    WRK-SYUACC-REC
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                           END-IF
+                       END-IF
+                   WHEN    "2"
+                       IF      WRK-SYUACC-IO-TENSU (IDZ1)
+                                       =   WRK-SYUACC-IO-TENSU (IDZ2)
+                           EVALUATE    SYS-2009-SYUKA-SELECT
+                               WHEN    "0"
+                               WHEN    "1"
+                                   IF      WRK-SYUACC-IO-SRYKA (IDZ1)
+                                                   >
+                                           WRK-SYUACC-IO-SRYKA (IDZ2)
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                                      TO  WRK-SYUACC-REC
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                       MOVE
+                                           WRK-SYUACC-REC
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                   END-IF
+                               WHEN    "2"
+                                   IF      WRK-SYUACC-IO-SRYKA (IDZ1)
+                                                   <
+                                           WRK-SYUACC-IO-SRYKA (IDZ2)
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                                      TO  WRK-SYUACC-REC
+                                       MOVE
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                       MOVE
+                                           WRK-SYUACC-REC
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                   END-IF
+                           END-EVALUATE
+                       ELSE
+                           IF      WRK-SYUACC-IO-TENSU (IDZ1)
+                                       <   WRK-SYUACC-IO-TENSU (IDZ2)
+                               MOVE    WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                                                      TO  WRK-SYUACC-REC
+                               MOVE    WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                                                      TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ1)
+                               MOVE    WRK-SYUACC-REC TO
+                                           WRK-SYUACC-IO-SRYKATBL (IDZ2)
+                           END-IF
+                       END-IF
+               END-EVALUATE
+             END-PERFORM
+           END-PERFORM
+      *
+           IF      WRK-SYUACC-IO-SRYKA (1)
+                                   NOT =   SPACE
+               MOVE    WRK-SYUACC-IO-SRYKA (1)
+                                           TO  RECE02-SYUKA2
+           END-IF
+           IF      WRK-SYUACC-IO-SRYKA (2)
+                                   NOT =   SPACE
+               MOVE    WRK-SYUACC-IO-SRYKA (2)
+                                           TO  RECE02-SYUKA3
            END-IF
            .
       *
