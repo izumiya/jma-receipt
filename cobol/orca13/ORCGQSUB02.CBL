@@ -2578,7 +2578,7 @@
            STRING  "((H.HOSPNUM="              DELIMITED   BY  SIZE
                    SPA-HOSPNUM                 DELIMITED   BY  SIZE
                    ")AND("                     DELIMITED   BY  SIZE
-                   "H.PTID=A.PTID) "           DELIMITED   BY  SIZE
+                   "H.PTID=A.PTID::bigint) "   DELIMITED   BY  SIZE
            INTO    WRK-SQL
            WITH    POINTER     WRK-SQL-PNT
            END-STRING
