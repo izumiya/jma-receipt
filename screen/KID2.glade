@@ -221,7 +221,7 @@
       <can_focus>True</can_focus>
       <accelerator>
 	<modifiers>0</modifiers>
-	<key>GDK_F10</key>
+	<key>GDK_F7</key>
 	<signal>clicked</signal>
       </accelerator>
       <signal>
@@ -244,7 +244,7 @@
       <can_focus>True</can_focus>
       <accelerator>
 	<modifiers>0</modifiers>
-	<key>GDK_F11</key>
+	<key>GDK_F10</key>
 	<signal>clicked</signal>
       </accelerator>
       <signal>
