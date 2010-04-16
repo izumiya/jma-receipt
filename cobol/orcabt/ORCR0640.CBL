@@ -429,6 +429,7 @@
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
+      *  04.04.49    NACL-ÌçÏÆ    10/04/16  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -14426,6 +14427,21 @@
       *
                END-IF
       *
+             WHEN    "35"
+      *
+                IF   RECE62-SRYYM   >=  "201004"
+                   PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                               UNTIL    KOHFTN-IDX     >    4
+      *
+                     IF   RECE62-KOHNUM(KOHFTN-IDX) =  "781"
+                        MOVE  ZERO  TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                        MOVE  ZERO  TO
+                                    RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                     END-IF
+      *
+                   END-PERFORM
+                END-IF
+      *
              WHEN    "39"
       *
                IF   RECE62-SRYYM   >=  "200510"
@@ -14435,6 +14451,8 @@
                     IF   RECE62-KOHHBTNUM(KOHFTN-IDX) =  "72" OR "73"
                                                       OR "74" OR "75"
                        MOVE   ZERO  TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                       MOVE   ZERO  TO
+                                    RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
                     END-IF
       *
                   END-PERFORM
