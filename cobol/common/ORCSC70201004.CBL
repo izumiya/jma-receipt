@@ -264,9 +264,9 @@
       *
            03  WRK-DOU-SRYCD-D         PIC X(09).
            03  WRK-DOU-SRYCD-A         PIC X(09).
-           03  FLG-DOUJI-SAT         PIC 9(01).
-           03  WRK-DSEN-SRYCD-A         PIC X(09).
-           03  WRK-DSEN-SRYCD-D       PIC X(09).
+           03  FLG-DOUJI-SAT           PIC 9(01).
+           03  WRK-DSEN-SRYCD-A        PIC X(09).
+           03  WRK-DSEN-SRYCD-D        PIC X(09).
       *
       *    ＣＴ，ＭＲＩ回数
            03  WRK-CTMRI-CNT-G.
@@ -274,6 +274,15 @@
                    07  WRK-CTMRI-CNT   PIC 9(04).
                    07  WRK-CTMRI-DCNT  PIC 9(04).
            03  WRK-CTMRI-KAI       PIC 9(03).
+      *
+           03  IDX-SN                 PIC 9(04).
+           03  IDT                 PIC 9(04).
+           03  IDD                 PIC 9(04).
+           03  IDX-Y3              PIC 9(02).
+           03  WRK-SANTEI-CNT      PIC 9(04).
+           03  WRK-TEI-CNT         PIC 9(03).
+           03  WRK-TODAY-CNT       PIC 9(03).
+           03  WRK-TODAY-CNTG      PIC 9(03).
       *
       *    警告メッセージ
            03  WRK-KIDCD           PIC X(04).
@@ -1267,7 +1276,6 @@
       *
       *    労災の時、変更なし
            IF      SPA-HKNKBN          =   1
-      *****  AND  (SPA-RSI-HKNKBN  NOT =   "5" )
              AND  (SPA-RSI-JUNKYO  NOT =   "1" )
                GO      TO      10012-SYUGI-CHK-EXT
            END-IF
@@ -1279,53 +1287,47 @@
            END-IF
       *
            MOVE    IDX-SAT             TO  IDX-Z
-      *
       *    算定履歴チェック
-           INITIALIZE                      ORCSC91AREA
-      *****MOVE    "3"                 TO  LNK-SC91-KBN
-           MOVE    "4"                 TO  LNK-SC91-KBN
-           MOVE    LNK-ORCSC-SYORIFLG  TO  LNK-SC91-SYORIFLG
-           MOVE    WRK-HEN-SRYCD       TO  LNK-SC91-SRYCD
-           MOVE    IDX-Z               TO  LNK-SC91-GMN-IDX
-           MOVE    LNK-ORCSC-KAISU     TO  LNK-SC91-KAISU
-           MOVE    LNK-ORCSC-TEISEI-AREA   TO  LNK-SC91-TEISEI-AREA
-           MOVE    LNK-ORCSC-KT01-AREA
-                                       TO  LNK-SC91-KT01-AREA
-           CALL    "ORCSC91"           USING
-                                       MCPAREA
-                                       ORCSC91AREA
-                                       WRK-SCR-REC
-                                       SPA-AREA
-                                       TNS-TENSU-REC
-           IF      LNK-SC91-ERRCD      =   "0001"
-               MOVE    LNK-SC91-ERRCD      TO  WRK-ERRCD
-               MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
-               GO      TO      10012-SYUGI-CHK-EXT
-           END-IF
-      *
-      *    算定回数
-           IF      SPA-NYUGAIKBN       =   "2"
-               MOVE    WRK-COM-KAISU (IDX-Z)   TO  WRK-CTMRI-KAI
-           ELSE
+           PERFORM 100121-SANTEI-CHK-SEC
+      *    今回入力分
+           IF     (SPA-NYUGAIKBN       =   "1" )
+              OR  (LNK-ORCSC-PG        =   "KT01" )
                MOVE    WRK-COM-NYU-KAI(IDX-Z)  TO  WRK-CTMRI-KAI
-           END-IF
-      *    当月算定なし
-           IF      LNK-SC91-ATO-CNT    <=  LNK-SC91-CNT
-               COMPUTE LNK-SC91-CNT    =   LNK-SC91-CNT
-                                       -   LNK-SC91-ATO-CNT
            ELSE
-               MOVE    ZERO            TO  LNK-SC91-CNT
+               MOVE    WRK-COM-KAISU (IDX-Z)   TO  WRK-CTMRI-KAI
            END-IF
       *    当月算定なし
-           IF     (LNK-SC91-CNT        =   ZERO )
+           IF     (WRK-SANTEI-CNT      =   ZERO )
+           AND    (WRK-TODAY-CNTG      =   ZERO )
       *        逓減検査テーブル（２０）を使用する（項目追加）
            AND    (LNK-ORCSC-TEIGEN-SANTEI (20)
                                        =   ZERO )
                IF      WRK-CTMRI-KAI       >   1
+      *            逓減が混在する時、エラー
                    MOVE    "0270"          TO  WRK-ERRCD
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   GO      TO      10012-SYUGI-CHK-EXT
                END-IF
-           ELSE
+           END-IF
+      *    逓減加算自動追加あり
+           IF     (WRK-SANTEI-CNT      >   ZERO )
+            OR    (LNK-ORCSC-TEIGEN-SANTEI (20)
+                                       >   ZERO  )
+               MOVE    1               TO  WRK-COM-TEIGEN-FLG
+                                                    (IDX-Z)
+           END-IF
+           IF     (WRK-SANTEI-CNT      =   ZERO )
+             AND  (WRK-COM-TEIGEN-FLG (IDX-Z)
+                                       =   1    )
+      *        訂正で逓減があり、今回初回となる時　逓減解除
+               IF     (WRK-TODAY-CNTG      =   ZERO   )
+               AND    (LNK-ORCSC-TEIGEN-SANTEI (20)
+                                           =   ZERO )
+                   MOVE    ZERO            TO  WRK-COM-TEIGEN-FLG
+                                                        (IDX-Z)
+               END-IF
+           END-IF
+           IF      WRK-COM-TEIGEN-FLG (IDX-Z)  =   1
                MOVE    "170022290"         TO  WRK-SRYCD
                MOVE    SPACE               TO  WRK-SRYCD-2
                MOVE    ZERO                TO  FLG-SATU
@@ -1385,6 +1387,107 @@
       **** END-IF
            .
        10012-SYUGI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    算定履歴チェック
+      *****************************************************************
+       100121-SANTEI-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  WRK-SANTEI-CNT
+           MOVE    ZERO                TO  WRK-TODAY-CNTG
+      *    外来まとめはＳＰＡに編集
+           IF      LNK-ORCSC-KT01FLG    =   "1"
+               PERFORM 2005121-KT01-SANTEI-SEC
+               GO      TO      100121-SANTEI-CHK-EXT
+           END-IF
+      *
+      *    算定履歴検索
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
+           MOVE    WRK-HEN-SRYCD       TO  SANTEI-SRYCD
+           MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                TO  SANTEI-SRYKA
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-SANTEI          =   1
+               INITIALIZE              SANTEI-REC
+           END-IF
+      *
+      *    算定歴の回数をチェックする
+           MOVE    SANTEI-MSANTEICNT   TO  WRK-SANTEI-CNT
+      *
+      *    訂正の時、訂正前までカウントする
+           IF      LNK-ORCSC-SYORIFLG  =   1
+               MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+               MOVE    ZERO                TO  WRK-SANTEI-CNT
+               PERFORM VARYING     IDX-Y3      FROM    1   BY  1
+                       UNTIL       IDX-Y3      >=  IDX-Y2
+                   ADD     SANTEI-DAY (IDX-Y3) TO  WRK-SANTEI-CNT
+               END-PERFORM
+      *        当日加算分
+               MOVE    SANTEI-DAY (IDX-Y2) TO  WRK-TODAY-CNTG
+      *        前回分集計
+               MOVE    ZERO                TO  WRK-TEI-CNT
+               PERFORM VARYING     IDT     FROM    1   BY  1
+                       UNTIL      (IDT     >   SPA-MAX-LINE )  OR
+                                  (LNK-ORCSC-TEI-SRYCD(IDT)
+                                           =   SPACE )
+                   IF      WRK-HEN-SRYCD   =   LNK-ORCSC-TEI-SRYCD(IDT)
+                       ADD     LNK-ORCSC-TEI-KAISU(IDT)
+                                           TO  WRK-TEI-CNT
+                   END-IF
+               END-PERFORM
+               IF      WRK-TODAY-CNTG      >   WRK-TEI-CNT
+                   COMPUTE WRK-TODAY-CNTG      =   WRK-TODAY-CNTG
+                                               -   WRK-TEI-CNT
+               ELSE
+                   MOVE    ZERO                TO  WRK-TODAY-CNTG
+               END-IF
+           END-IF
+           .
+       100121-SANTEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来まとめ処理
+      *****************************************************************
+       2005121-KT01-SANTEI-SEC      SECTION.
+      *
+           PERFORM VARYING     IDX-SN      FROM    1   BY  1
+                   UNTIL      (IDX-SN      >   100 )   OR
+                              (LNK-ORCSC-KT01-SRYCD  (IDX-SN) =   SPACE)
+               IF      WRK-HEN-SRYCD   =   LNK-ORCSC-KT01-SRYCD(IDX-SN)
+                   INITIALIZE                  SANTEI-REC
+                   MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+      *            当日まで対象とする
+                   PERFORM VARYING     IDD         FROM    1   BY  1
+                           UNTIL      (IDD         >   IDX-Y2 )
+                       MOVE    LNK-ORCSC-KT01-DAY (IDX-SN IDD)
+                                                   TO  SANTEI-DAY (IDD)
+                       ADD     SANTEI-DAY (IDD)    TO  SANTEI-MSANTEICNT
+                   END-PERFORM
+                   MOVE    SANTEI-MSANTEICNT   TO  WRK-SANTEI-CNT
+               END-IF
+           END-PERFORM
+           .
+       2005121-KT01-SANTEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3678,6 +3781,24 @@
       *
            .
        900-KANRIMST-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    算定歴マスタ読み込み
+      *****************************************************************
+       920-SANTEI-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SANTEI-REC
+               MOVE    ZERO                TO  FLG-SANTEI
+           ELSE
+               INITIALIZE                      SANTEI-REC
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           .
+       920-SANTEI-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
