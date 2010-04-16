@@ -890,6 +890,25 @@
                                                           (IDX-TEI)
                        END-IF
                    END-IF
+      *H22.4改正
+      *            ＣＴの逓減がある場合、フラグを変更する
+                   IF     (SPA-SRYYMD              >=  "20100401" ) AND
+                          (SPA-COM-TNSSRYSYUKBN(IDX)   =   "723"
+                                                       OR  "724"  ) AND
+                          (SPA-COM-INPUTCD(IDX)(1:1)   =   "1"    )
+                       IF      (SPA-COM-DATAKBN (IDX)  =   "1") 
+                           MOVE    IDX                 TO  IDX-TEI
+                       END-IF
+                       IF      (SPA-COM-DATAKBN (IDX)  =   "2")  AND
+                               (IDX-TEI                >   ZERO) AND
+                               (SPA-COM-AUTOKBN (IDX)  =   "2")  AND
+                               (SPA-COM-TENSIKIBETU(IDX)   =  6 )
+      *                    自動発生で％減算
+                           MOVE    1           TO  SPA-COM-TEIGEN-FLG
+                                                          (IDX-TEI)
+                       END-IF
+                   END-IF
+      *H22.4改正
                END-IF
       *
                IF      SPA-COM-ZAIEND (IDX-1)  =   "1"
