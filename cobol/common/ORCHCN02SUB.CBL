@@ -299,6 +299,14 @@
                MOVE   "01"            TO    TNS-YUKOSTYMD(7:2)
                                             TNS-YUKOEDYMD(7:2)
                PERFORM    910-TENSU-READ-SEC
+               EVALUATE   NSRY-SRYCD(1)
+                   WHEN   "111111111"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO   TNS-NAME
+                   WHEN   "222222222"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO   TNS-NAME
+                   WHEN   "333333333"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO   TNS-NAME
+               END-EVALUATE
                IF    (NACCT-SRYYM      >=   "200604")    AND
                      (NSRY-SRYCD(1)    =    "190097010"  OR
                                             "190097110"  OR
@@ -322,6 +330,7 @@
                    MOVE   "333333333"     TO    NSRY-SRYCD(1)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO   TNS-NAME
                END-IF
+      *
                IF   (NSRY-SRYCD(1)  =
                           LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX))  AND
                     (TNS-NAME   = 
@@ -350,6 +359,7 @@
                     END-PERFORM
                END-IF
            END-PERFORM
+      *
       *
            IF   (FLG-MATCH     =     ZERO)   AND
                 (NYUIN-IDX     <=       10)
