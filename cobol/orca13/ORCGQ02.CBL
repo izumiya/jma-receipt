@@ -1184,14 +1184,12 @@
            IF    ( SPA-Q01-SRYKBN       =   SPACE )
                MOVE    "%"                 TO  SEL-SRYKBN
            ELSE
-               MOVE    SPA-Q01-SRYKBN      TO  SEL-SRYKBN
+               MOVE    SPA-Q01-SRYKBN(1:1)
+                                           TO  SEL-SRYKBN(1:1)
+               MOVE    "%"                 TO  SEL-SRYKBN(2:1)
            END-IF
       *
-           IF    ( SPA-Q01-SRYSYUKBN   =   SPACE )
                MOVE    "%"                 TO  SEL-SRYSYUKBN
-           ELSE
-               MOVE    SPA-Q01-SRYSYUKBN   TO  SEL-SRYSYUKBN
-           END-IF
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   5 )
