@@ -1153,6 +1153,10 @@
       *
            INITIALIZE                  SEL-AREA
                                        TSRYCD-AREA
+      *
+           MOVE    SMCNDATE-YMD        TO  SEL-UPYMD
+           MOVE    SMCNDATE-HMS        TO  SEL-UPHMS
+      *
            IF    ( SPA-Q01-STSRYYMD    =   SPACE )
                MOVE    "00000000"          TO  SEL-STSRYYMD
            ELSE

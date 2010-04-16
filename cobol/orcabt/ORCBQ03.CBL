@@ -442,11 +442,10 @@
            MOVE    "61"                TO  LNK-DAY6-IRAI
            MOVE    SEL-UPYMD           TO  LNK-DAY6-KIJUN
            MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-           MOVE    -10                 TO  LNK-DAY6-ZOGEN
+           MOVE    -3                  TO  LNK-DAY6-ZOGEN
            CALL  "ORCSDAY"             USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
            MOVE    LNK-DAY6-KEISAN TO  PTSRH-CREYMD
-           DISPLAY "PTSRH-CREYMD=" PTSRH-CREYMD
            MOVE    PTSRH-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"     TO  MCP-TABLE
            MOVE    "del2"          TO  MCP-PATHNAME
