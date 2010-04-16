@@ -1644,10 +1644,7 @@
       *****************************************************************
        210-BACK-SYORI-SEC              SECTION.
       *
-           MOVE    "0"                 TO  SEL-DATAKBN
-           PERFORM 900-PTSRH-DEL1-SEC
-           MOVE    "1"                 TO  SEL-DATAKBN
-           PERFORM 900-PTSRH-DEL1-SEC
+           PERFORM 900-PTSRH-DEL3-SEC
       * 
            MOVE    "Q01"               TO  SPA-SAKIPG
            MOVE    "Q02"               TO  SPA-MOTOPG
@@ -2251,7 +2248,7 @@
            END-IF
       *
            IF  ( SPA-GMN-Q02-MODE          =   ZERO )
-               MOVE    "検索中です。"
+               MOVE    "検索しています。"
                                    TO  SPA-GMN-Q02-KEKKALST-NAME (15)
                MOVE    "しばらくお待ちください。"
                                    TO  SPA-GMN-Q02-KEKKALST-NAME (16)
@@ -2723,6 +2720,22 @@
       *
            .
        900-PTSRH-DEL1-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会削除処理
+      *****************************************************************
+       900-PTSRH-DEL3-SEC              SECTION.
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "del3"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-PTSRH-DEL3-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

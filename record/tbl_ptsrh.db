@@ -47,6 +47,17 @@ path	del2 	{
 	};
 };
 
+path	del3 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptsrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    in  ('0','1')
+ 		;
+	};
+};
+
 path	ins1 	{
 	DBINSERT	{
         :SQL

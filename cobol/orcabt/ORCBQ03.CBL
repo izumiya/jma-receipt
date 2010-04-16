@@ -401,10 +401,7 @@
       *****************************************************************
        900-PTSRH-INS1-SEC              SECTION.
       *
-           MOVE    "0"                 TO  SEL-DATAKBN
-           PERFORM 900-PTSRH-DEL1-SEC
-           MOVE    "1"                 TO  SEL-DATAKBN
-           PERFORM 900-PTSRH-DEL1-SEC
+           PERFORM 900-PTSRH-DEL3-SEC
       *
            INITIALIZE                  PTSRH-REC
            MOVE    WKBQ01-SQL      TO  PTSRH-SQL
@@ -420,19 +417,18 @@
       *****************************************************************
       *    患者照会削除処理
       *****************************************************************
-       900-PTSRH-DEL1-SEC              SECTION.
+       900-PTSRH-DEL3-SEC              SECTION.
       *
            INITIALIZE                  PTSRH-REC
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
-           MOVE    SEL-DATAKBN     TO  PTSRH-DATAKBN
            MOVE    PTSRH-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"     TO  MCP-TABLE
-           MOVE    "del1"          TO  MCP-PATHNAME
+           MOVE    "del3"          TO  MCP-PATHNAME
            PERFORM 910-DBDELETE-SEC
       *
            .
-       900-PTSRH-DEL1-EXT.
+       900-PTSRH-DEL3-EXT.
            EXIT.
       *****************************************************************
       *    患者照会削除処理
