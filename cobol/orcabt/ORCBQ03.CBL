@@ -218,16 +218,21 @@
                PERFORM 910-DBSTART-SEC
            END-IF
       *
+           PERFORM 900-SRYSRH-DEL1-SEC
+      *
            EVALUATE    SEL-SRYSRH
            WHEN    1
                PERFORM 900-SRYSRH-INS1-SEC
-               PERFORM 910-DBCOMMIT-SEC
-               PERFORM 910-DBSTART-SEC
            WHEN    2
                PERFORM 900-SRYSRH-INS2-SEC
-               PERFORM 910-DBCOMMIT-SEC
-               PERFORM 910-DBSTART-SEC
+           WHEN    3
+               PERFORM 900-SRYSRH-INS3-SEC
+           WHEN    4
+               PERFORM 900-SRYSRH-INS4-SEC
            END-EVALUATE
+      *
+           PERFORM 910-DBCOMMIT-SEC
+           PERFORM 910-DBSTART-SEC
       *
            PERFORM 900-PTSRH-INS1-SEC
            PERFORM 910-DBCOMMIT-SEC
@@ -334,7 +339,6 @@
       *****************************************************************
        900-SRYSRH-INS1-SEC             SECTION.
       *
-           PERFORM 900-SRYSRH-DEL1-SEC
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
@@ -349,7 +353,6 @@
       *****************************************************************
        900-SRYSRH-INS2-SEC             SECTION.
       *
-           PERFORM 900-SRYSRH-DEL1-SEC
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
@@ -358,6 +361,34 @@
       *
            .
        900-SRYSRH-INS2-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為照会追加処理
+      *****************************************************************
+       900-SRYSRH-INS3-SEC             SECTION.
+      *
+           PERFORM 9001-SRYSRH-INS-SEC
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins3"          TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           .
+       900-SRYSRH-INS3-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為照会追加処理
+      *****************************************************************
+       900-SRYSRH-INS4-SEC             SECTION.
+      *
+           PERFORM 9001-SRYSRH-INS-SEC
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins4"          TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           .
+       900-SRYSRH-INS4-EXT.
            EXIT.
       *****************************************************************
       *    診療行為照会追加処理

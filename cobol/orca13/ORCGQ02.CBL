@@ -1213,9 +1213,17 @@
       *    ©гне╧т╟ы
            IF   ( SPA-Q01-GTBL (9)  =   "1" )
                IF    ( SPA-Q01-GTBL(8) =   SPACE )
-                   MOVE    1        TO  SEL-SRYSRH
+                   IF    ( SPA-Q01-SRYCD-G NOT =   SPACE )
+                       MOVE    1    TO  SEL-SRYSRH
+                   ELSE
+                       MOVE    3    TO  SEL-SRYSRH
+                   END-IF
                ELSE
-                   MOVE    2        TO  SEL-SRYSRH
+                   IF    ( SPA-Q01-SRYCD-G NOT =   SPACE )
+                       MOVE    2    TO  SEL-SRYSRH
+                   ELSE
+                       MOVE    4    TO  SEL-SRYSRH
+                   END-IF
                END-IF
            END-IF
       *
