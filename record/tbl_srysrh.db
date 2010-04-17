@@ -333,3 +333,218 @@ path	ins2 	{
 	;
 	};
 };
+
+path	ins3 	{
+	DBINSERT	{
+	INSERT INTO TBL_SRYSRH
+	    ( 
+	       HOSPNUM,
+	       TERMID,
+	       PTID,
+	       NYUGAIKBN,
+	       SRYKA,
+	       SRYKBN,
+	       SRYSYUKBN,
+	       SRYYMD,
+	       SRYCD1,
+	       SRYCD2,
+	       SRYCD3,
+	       SRYCD4,
+	       SRYCD5,
+	       CREYMD,
+	       UPYMD,
+	       UPHMS
+	)
+	SELECT DISTINCT ON (HOSPNUM,PTID,NYUGAIKBN,SRYKA,SRYKBN,SRYSYUKBN) 
+	       HOSPNUM,
+	      :TERMID,
+	       PTID,
+	       NYUGAIKBN,
+	       SRYKA,
+	       SRYKBN,
+	       SRYSYUKBN,
+	       '',
+	       SRYCD1,
+	       SRYCD2,
+	       SRYCD3,
+	       SRYCD4,
+	       SRYCD5,
+	      :CREYMD,
+	      :UPYMD,
+	      :UPHMS
+	FROM  TBL_SRYACT
+	WHERE HOSPNUM = :HOSPNUM
+	 AND  NYUGAIKBN LIKE :NYUGAIKBN
+	 AND  SRYKA     LIKE :SRYKA
+         AND SRYKBN LIKE :SRYKBN
+         AND SRYSYUKBN LIKE :SRYSYUKBN
+	;
+
+	INSERT INTO TBL_SRYSRH
+	    ( 
+	       HOSPNUM,
+	       TERMID,
+	       PTID,
+	       NYUGAIKBN,
+	       SRYKA,
+	       SRYKBN,
+	       SRYSYUKBN,
+	       SRYYMD,
+	       SRYCD1,
+	       SRYCD2,
+	       SRYCD3,
+	       SRYCD4,
+	       SRYCD5,
+	       CREYMD,
+	       UPYMD,
+	       UPHMS
+	)
+	SELECT DISTINCT ON (HOSPNUM,PTID,SRYKA,SRYKBN) 
+	       HOSPNUM,
+	      :TERMID,
+	       PTID,
+	       '1',
+	       SRYKA,
+	       SRYKBN,
+	       '',
+	       '',
+	       SRYCD,
+	       '',
+	       '',
+	       '',
+	       '',
+	      :CREYMD,
+	      :UPYMD,
+	      :UPHMS
+	FROM  TBL_NSRYSRH
+	WHERE HOSPNUM = :HOSPNUM
+	 AND  SRYKA     LIKE :SRYKA
+         AND  SRYKBN LIKE :SRYKBN
+	;
+	};
+};
+
+path	ins4 	{
+	DBINSERT	{
+	INSERT INTO TBL_SRYSRH
+	    ( 
+	       HOSPNUM,
+	       TERMID,
+	       PTID,
+	       NYUGAIKBN,
+	       SRYKA,
+	       SRYKBN,
+	       SRYSYUKBN,
+	       SRYYMD,
+	       SRYCD1,
+	       SRYCD2,
+	       SRYCD3,
+	       SRYCD4,
+	       SRYCD5,
+	       CREYMD,
+	       UPYMD,
+	       UPHMS
+	)
+	SELECT DISTINCT ON (A.HOSPNUM,A.PTID,A.NYUGAIKBN,A.SRYKA,A.SRYKBN,B.SRYYMD,A.SRYSYUKBN) 
+        A.HOSPNUM,
+        :TERMID,
+        A.PTID,
+        A.NYUGAIKBN,
+        A.SRYKA,
+        A.SRYKBN,
+        A.SRYSYUKBN,
+        B.SRYYMD,
+        A.SRYCD1,
+        A.SRYCD2,
+        A.SRYCD3,
+        A.SRYCD4,
+        A.SRYCD5,
+	:CREYMD,
+	:UPYMD,
+	:UPHMS
+      FROM TBL_SRYACT A,
+           TBL_JYURRK B 
+     WHERE A.HOSPNUM   = :HOSPNUM
+       AND A.NYUGAIKBN LIKE :NYUGAIKBN
+       AND A.SRYKA     LIKE :SRYKA
+       AND A.SRYKBN    LIKE :SRYKBN
+       AND A.SRYSYUKBN LIKE :SRYSYUKBN
+       AND A.SRYYM    >= :STSRYYM
+       AND A.SRYYM    <= :EDSRYYM
+       AND A.HOSPNUM   = B.HOSPNUM
+       AND A.PTID      = B.PTID
+       AND A.NYUGAIKBN = B.NYUGAIKBN
+       AND A.SRYKA     = B.SRYKA
+       AND B.SRYYMD   >= :STSRYYMD
+       AND B.SRYYMD   <= :EDSRYYMD
+       AND A.ZAINUM in
+         ( B.ZAINUM1 ,
+           B.ZAINUM2 ,
+           B.ZAINUM3 ,
+           B.ZAINUM4 ,
+           B.ZAINUM5 ,
+           B.ZAINUM6 ,
+           B.ZAINUM7 ,
+           B.ZAINUM8 ,
+           B.ZAINUM9 ,
+           B.ZAINUM10 ,
+           B.ZAINUM11 ,
+           B.ZAINUM12 ,
+           B.ZAINUM13 ,
+           B.ZAINUM14 ,
+           B.ZAINUM15 )
+     ;
+
+	INSERT INTO TBL_SRYSRH
+	    ( 
+	       HOSPNUM,
+	       TERMID,
+	       PTID,
+	       NYUGAIKBN,
+	       SRYKA,
+	       SRYKBN,
+	       SRYSYUKBN,
+	       SRYYMD,
+	       SRYCD1,
+	       SRYCD2,
+	       SRYCD3,
+	       SRYCD4,
+	       SRYCD5,
+	       CREYMD,
+	       UPYMD,
+	       UPHMS
+	)
+        SELECT DISTINCT ON (A.HOSPNUM,A.PTID,B.SRYKA,B.SRYKBN,A.SRYYMD) 
+
+               A.HOSPNUM,
+               :TERMID,
+               A.PTID,
+               '1',
+               B.SRYKA,
+               B.SRYKBN,
+               '',
+               A.SRYYMD,
+               B.SRYCD,
+               '',
+               '',
+               '',
+               '',
+               :CREYMD,
+               :UPYMD,
+               :UPHMS
+      FROM TBL_NRRKSRH A,
+           TBL_NSRYSRH B 
+     WHERE A.HOSPNUM =    :HOSPNUM
+       AND B.SRYKA   LIKE :SRYKA
+       AND B.SRYKBN  LIKE :SRYKBN
+       AND B.SRYYM    >= :STSRYYM
+       AND B.SRYYM    <= :EDSRYYM
+       AND A.HOSPNUM =   B.HOSPNUM
+       AND A.PTID    =   B.PTID 
+       AND A.ZAINUM  =   B.ZAINUM
+       AND A.SRYYMD   >= :STSRYYMD
+       AND A.SRYYMD   <= :EDSRYYMD
+	;
+	};
+};
+
