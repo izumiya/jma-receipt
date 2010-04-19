@@ -321,6 +321,10 @@
       *                                     行うようにする
       *  04.04.12    NACL-藤原    10/04/12  特定器材レコードの使用量、
       *                                     単位コードの記録方法を修正
+      *  04.04.13    NACL-藤原    10/04/14  平成２２年４月改正対応
+      *                                     請求に係わる記録条件仕様の
+      *                                     変更に伴う修正
+      *                                     診療科２、３を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2201,6 +2205,10 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *    特定疾病１
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    診療科名２
+           IF      RECE02-SYUKA2   NOT =   SPACE
+               MOVE    RECE02-RECESYUKA2   TO  WRK-DATA
+           END-IF
+           MOVE    2                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    人体の部位等２
            PERFORM 5004-MOJI-HENSYU-SEC         
@@ -2211,6 +2219,10 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *    特定疾病２
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    診療科名３
+           IF      RECE02-SYUKA3   NOT =   SPACE
+               MOVE    RECE02-RECESYUKA3   TO  WRK-DATA
+           END-IF
+           MOVE    2                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    人体の部位等３
            PERFORM 5004-MOJI-HENSYU-SEC         
