@@ -1817,7 +1817,7 @@
                MOVE    "4003"          TO  SPA-ERRCD
            END-IF
       *
-           IF    ( SPA-ERRCD           NOT =   SPACE )
+           IF    ( SPA-ERRCD               =   SPACE )
                INITIALIZE                  SS010-AREA
                MOVE    SPA-GMN-PTID        TO  SS010-PTID
                MOVE    SPA-I40-SRYYMD (1:6)
