@@ -1940,7 +1940,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *    診療科２、診療科３のセット
       *    主科未設定または平成２２年３月以前の場合はセットしない
            IF    ( RECE02-SYUKA    =   "XX"   )
-      *??     OR    ( RECE02-SRYYM    <=  201003 )
+           OR    ( RECE02-SRYYM    <=  201003 )
                GO  TO  2101-SYUKA-HENSYU-EXT
            END-IF     
       *
