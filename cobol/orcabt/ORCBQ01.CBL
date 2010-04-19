@@ -964,6 +964,8 @@
            MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID          TO  PTSRH-TERMID
            MOVE    "2"                 TO  PTSRH-DATAKBN
+           MOVE    "%"                 TO  PTSRH-UPYMD
+                                           PTSRH-UPHMS
            MOVE    WKBQ01-SQL          TO  PTSRH-SQL
            DISPLAY "PTSRH-SQL=" PTSRH-SQL
            MOVE    PTSRH-REC           TO  MCPDATA-REC

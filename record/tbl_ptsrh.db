@@ -134,8 +134,8 @@ path	odr 	{
 	        WHERE	HOSPNUM    =    :HOSPNUM
 		AND     TERMID     =    :TERMID
 		AND     DATAKBN    =    :DATAKBN
-		AND     UPYMD      =    :UPYMD
-		AND     UPHMS      =    :UPHMS
+		AND     UPYMD      LIKE :UPYMD
+		AND     UPHMS      LIKE :UPHMS
 		:SQL
  		;
 	};

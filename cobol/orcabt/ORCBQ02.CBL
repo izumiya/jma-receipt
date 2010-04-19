@@ -610,6 +610,8 @@
            MOVE    SPA-TERMID          TO  PTSRH-TERMID
            MOVE    "2"                 TO  PTSRH-DATAKBN
            MOVE    WKBQ01-SQL          TO  PTSRH-SQL
+           MOVE    "%"                 TO  PTSRH-UPYMD
+                                           PTSRH-UPHMS
            MOVE    PTSRH-REC           TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"         TO  MCP-TABLE
            MOVE    "odr"               TO  MCP-PATHNAME
