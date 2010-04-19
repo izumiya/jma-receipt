@@ -294,6 +294,9 @@
       *                                     Âà±¡¸µ¥³¥á¥ó¥È¤òÂÐ¾Ý¤È¤¹¤ë
       *                                     Âà±¡²Ã»»¤òÊ¿À®£²£²Ç¯£³·î¤Þ¤Ç
       *                                     ÂÐ¾Ý¤È¤¹¤ë
+      *  04.05.17    NACL-Æ£¸¶    10/04/15  ¥ì¥»ÅÅÄÌ¿®°å£²£²£°£°£µ¹æ
+      *                                     ¥¢¥Ê¥í¥°»£±Æ¤È¥Ç¥¸¥¿¥ë»£±Æ¤ò
+      *                                     Æ±»þ¤Ë¹Ô¤Ã¤¿¾ì¹ç¤Îµ­Ï¿ÊýË¡
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -484,7 +487,6 @@
            03  FLG-KOKUJISKBKBN1       PIC 9(01).
       *****03  FLG-GAITENTTLKBN        PIC 9(03).
       *****03  FLG-TBLMAX              PIC 9(01).
-           03  FLG-SRYSYUKBN721        PIC 9(01).
            03  FLG-SRYKBN70-TEIGEN     PIC 9(01).
            03  FLG-KENSA-KASAN         PIC 9(01).
            03  FLG-KENSA-TEIGEN        PIC 9(01).
@@ -1093,6 +1095,8 @@
            COPY    "CPRCF0641.INC"  REPLACING //RECE641//
                                    BY         //WRK-NI-RECE641//.
       *    ²èÁü¿ÇÃÇÍÑÂàÈò¥¨¥ê¥¢
+      *    »£±ÆÎÁÂàÈò
+       01  FLG-SRYSYUKBN721                   PIC 9(01).
        01  WRK-721-RECE65-REC.
            COPY    "CPRCF065.INC"  REPLACING  //RECE65//
                                    BY         //WRK-721-RECE65//.
@@ -1102,6 +1106,18 @@
            02  WRK-700-RECE65-REC                        OCCURS  5.
            COPY    "CPRCF065.INC"  REPLACING  //RECE65//
                                    BY         //WRK-700-RECE65//.
+      *    »£±ÆÎÁÂàÈò¡ÊÆ±»þ»£±Æ¡Ë
+       01  FLG-SRYSYUKBN721-DOUJI             PIC 9(01).
+       01  WRK-721-DOUJI-RECE65-REC.
+           COPY    "CPRCF005.INC"  REPLACING  //RECE65//
+                                   BY         //WRK-721-DOUJI-RECE65//.
+       01  WRK-700-DOUJI-RECE65-AREA.
+           02  WRK-SRYSYUKBN700-DOUJI-MAX     PIC 9(01).
+           02  FLG-SRYSYUKBN700-DOUJI         PIC 9(01)  OCCURS  5.
+           02  WRK-700-DOUJI-RECE65-REC                  OCCURS  5.
+           COPY    "CPRCF005.INC"  REPLACING  //RECE65//
+                                   BY         //WRK-700-DOUJI-RECE65//.
+      *    ´ÖÀÜ»£±Æ¤Î£µ£°¡óÄþ¸º
        01  WRK-SRYKBN70-RECE65-REC.
            COPY    "CPRCF065.INC"  REPLACING  //RECE65//
                                    BY         //WRK-SRYKBN70-RECE65//.
@@ -1281,6 +1297,29 @@
       *
       *    »ÀÁÇÊäÀµÎ¨£±¡¥£³¡Ê£±µ¤°µ¡Ë
            03  WRK-CONS-SANSO-HOSEI   PIC X(09)   VALUE   "770020070".
+      *
+      *    ¥Ç¥¸¥¿¥ë»£±Æ¤È¥¢¥Ê¥í¥°»£±Æ¤ÎÆ±»þ»£±Æ
+           03  WRK-CONS-DOUJI-SATUEI-AREA.
+      *        Ã±½ã»£±Æ¡Ê¥Ç¥¸¥¿¥ë¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032050".
+      *        Ã±½ã»£±Æ¡Ê¥¢¥Ê¥í¥°¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032150".
+      *        Ã±½ã»£±Æ¡Ê¥Ç¥¸¥¿¥ë¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032450".
+      *        Ã±½ã»£±Æ¡Ê¥¢¥Ê¥í¥°¤ÈÆ±»þ»£±Æ¡Ë¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032550".
+      *        Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032250".
+      *        Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032350".
+      *        Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥¢¥Ê¥í¥°»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032650".
+      *        Â¤±ÆºÞ»ÈÍÑ»£±Æ¡Ê¥Ç¥¸¥¿¥ë»£±Æ¡Ë
+               05  FILLER              PIC X(09)   VALUE   "170032750".
+           03  WRK-CONS-DOUJI-SATIEI-R     REDEFINES
+                                       WRK-CONS-DOUJI-SATUEI-AREA.
+               05  WRK-CONS-DOUJI-SATUEI
+                                       PIC X(09)   OCCURS  8.
       *
       *    ½ÐÎÏÂÐ¾Ý¤Î¥³¥á¥ó¥È
            03  WRK-CONS-COMMENT-G.
@@ -3774,7 +3813,9 @@
                                            WRK-KASAN-RECE65-REC
                                            WRK-TEIGEN-RECE65-REC
                                            WRK-700-RECE65-AREA
+                                           WRK-700-DOUJI-RECE65-AREA
                                            WRK-721-RECE65-REC
+                                           WRK-721-DOUJI-RECE65-REC
                                            WRK-SRYKBN70-RECE65-REC
            INITIALIZE                      TBL-RECE655-COMMENT-AREA
       *
@@ -3789,6 +3830,7 @@
                                            FLG-KOKUJISKBKBN1
       *************************************FLG-GAITENTTLKBN
                                            FLG-SRYSYUKBN721
+                                           FLG-SRYSYUKBN721-DOUJI
                                            FLG-SRYKBN70-TEIGEN
                                            FLG-KENSA-KASAN
                                            FLG-KENSA-TEIGEN
@@ -3973,17 +4015,30 @@
                    END-PERFORM    
                END-IF
            END-IF
+           IF      FLG-SRYSYUKBN721-DOUJI  >   ZERO
+               MOVE    FLG-SRYSYUKBN721-DOUJI      TO  IDX 
+               MOVE    WRK-721-DOUJI-RECE65-REC    TO  RECE65-REC
+               PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
       *
-      *    À¸ÂÎ¸¡ºº¤È¤­½çÈÖ¤òÊÑ¤¨¤ë
-           IF      FLG-KENSA-TEIGEN    >   ZERO
-               MOVE    FLG-KENSA-TEIGEN        TO  IDX 
-               MOVE    WRK-TEIGEN-RECE65-REC   TO  RECE65-REC
-               PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
-           END-IF
-           IF      FLG-KENSA-KASAN     >   ZERO
-               MOVE     FLG-KENSA-KASAN        TO  IDX 
-               MOVE    WRK-KASAN-RECE65-REC    TO  RECE65-REC
-               PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
+               IF      FLG-SRYKBN70-TEIGEN >   ZERO
+                   MOVE     FLG-SRYKBN70-TEIGEN
+                                               TO  IDX 
+                   MOVE    WRK-SRYKBN70-RECE65-REC
+                                               TO  RECE65-REC
+                   PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
+               END-IF
+      *
+               IF      WRK-SRYSYUKBN700-DOUJI-MAX  >   ZERO
+                   PERFORM VARYING IDXY    FROM    1   BY  1
+                           UNTIL   IDXY    >
+                                           WRK-SRYSYUKBN700-DOUJI-MAX
+                       MOVE    FLG-SRYSYUKBN700-DOUJI (IDXY)
+                                                          TO  IDX 
+                       MOVE    WRK-700-DOUJI-RECE65-REC (IDXY)
+                                                          TO  RECE65-REC
+                       PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
+                   END-PERFORM    
+               END-IF
            END-IF
       *
            .
@@ -4109,11 +4164,21 @@
       *****************************************************************
        200711-KOUI-TAIHI-SEC          SECTION.
       *
-      *    ²èÁü¿ÇÃÇ¡¦À¸ÂÎ¸¡ºº¤Î¤È¤­½çÈÖ¤òÊÑ¤¨¤ë
-           IF      RECE65-SRYSYUKBN-X (IDX)
+      *    ²èÁü¿ÇÃÇ¤Î»£±ÆÎÁ¤Î¤È¤­½çÈÖ¤òÊÑ¤¨¤ë¡ÊÆ±»þ»£±Æ°Ê³°¡Ë
+           IF     RECE65-SRYSYUKBN-X (IDX)
                                        =   "721"
-               MOVE    RECE65-REC          TO  WRK-RECE65-REC
-               MOVE    IDX                 TO  IDW1 
+             MOVE    RECE65-REC          TO  WRK-RECE65-REC
+             MOVE    IDX                 TO  IDW1
+      * 
+             IF     RECE65-SRYCD (IDX)
+                                   NOT =   WRK-CONS-DOUJI-SATUEI (1)
+                                       AND WRK-CONS-DOUJI-SATUEI (2) 
+                                       AND WRK-CONS-DOUJI-SATUEI (3) 
+                                       AND WRK-CONS-DOUJI-SATUEI (4) 
+                                       AND WRK-CONS-DOUJI-SATUEI (5) 
+                                       AND WRK-CONS-DOUJI-SATUEI (6) 
+                                       AND WRK-CONS-DOUJI-SATUEI (7) 
+                                       AND WRK-CONS-DOUJI-SATUEI (8)
       *
                IF      FLG-SRYSYUKBN721    >   ZERO
                    MOVE     FLG-SRYSYUKBN721   TO  IDX 
@@ -4145,12 +4210,54 @@
                        INITIALIZE                  WRK-700-RECE65-AREA
                    END-IF
                END-IF
+               IF      FLG-SRYSYUKBN721-DOUJI  >   ZERO
+                   MOVE    FLG-SRYSYUKBN721-DOUJI      TO  IDX 
+                   MOVE    WRK-721-DOUJI-RECE65-REC    TO  RECE65-REC
+                   PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
+                   MOVE    ZERO               TO  FLG-SRYSYUKBN721-DOUJI
+                   INITIALIZE                   WRK-721-DOUJI-RECE65-REC
       *
-               MOVE    WRK-RECE65-REC      TO  RECE65-REC
-               MOVE    IDW1                TO  IDX
+                   IF      FLG-SRYKBN70-TEIGEN >   ZERO
+                       MOVE     FLG-SRYKBN70-TEIGEN
+                                                   TO  IDX 
+                       MOVE    WRK-SRYKBN70-RECE65-REC
+                                                   TO  RECE65-REC
+                       PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
+                   END-IF
       *
+                   IF      WRK-SRYSYUKBN700-DOUJI-MAX  >   ZERO
+                       PERFORM VARYING IDXY    FROM    1   BY  1
+                               UNTIL   IDXY    >
+                                           WRK-SRYSYUKBN700-DOUJI-MAX
+                           MOVE    FLG-SRYSYUKBN700-DOUJI (IDXY)
+                                                          TO  IDX 
+                           MOVE    WRK-700-DOUJI-RECE65-REC (IDXY)
+                                                          TO  RECE65-REC
+                           PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
+                       END-PERFORM    
+                       INITIALIZE              WRK-700-DOUJI-RECE65-AREA
+                   END-IF
+               END-IF
+             END-IF  
+      *
+             MOVE    WRK-RECE65-REC      TO  RECE65-REC
+             MOVE    IDW1                TO  IDX
+      *
+             IF     RECE65-SRYCD (IDX)
+                                   NOT =   WRK-CONS-DOUJI-SATUEI (1)
+                                       AND WRK-CONS-DOUJI-SATUEI (2) 
+                                       AND WRK-CONS-DOUJI-SATUEI (3) 
+                                       AND WRK-CONS-DOUJI-SATUEI (4) 
+                                       AND WRK-CONS-DOUJI-SATUEI (5) 
+                                       AND WRK-CONS-DOUJI-SATUEI (6) 
+                                       AND WRK-CONS-DOUJI-SATUEI (7) 
+                                       AND WRK-CONS-DOUJI-SATUEI (8)
                MOVE    IDX                 TO  FLG-SRYSYUKBN721
                MOVE    RECE65-REC          TO WRK-721-RECE65-REC
+             ELSE
+               MOVE    IDX                 TO  FLG-SRYSYUKBN721-DOUJI
+               MOVE    RECE65-REC          TO WRK-721-DOUJI-RECE65-REC
+             END-IF
            ELSE
                IF    ( RECE65-SRYCD (IDX)  =  WRK-CONS-SRYKBN70-TEIGEN )
                AND   ( FLG-SRYSYUKBN721    >  ZERO                     )
@@ -4162,12 +4269,22 @@
                                                =   "700" )
                    AND   ( RECE65-DATAKBN   (IDX)
                                                =   "2"   )
-                   AND   ( FLG-SRYSYUKBN721    >   ZERO  )
-                       ADD     1               TO  WRK-SRYSYUKBN700-MAX
-                       MOVE    IDX             TO  FLG-SRYSYUKBN700
-                                               (WRK-SRYSYUKBN700-MAX) 
-                       MOVE    RECE65-REC      TO WRK-700-RECE65-REC
-                                               (WRK-SRYSYUKBN700-MAX) 
+                       IF      FLG-SRYSYUKBN721-DOUJI  >   ZERO
+                           ADD     1           TO
+                                           WRK-SRYSYUKBN700-DOUJI-MAX
+                           MOVE    IDX         TO
+                                           FLG-SRYSYUKBN700-DOUJI
+                                            (WRK-SRYSYUKBN700-DOUJI-MAX) 
+                           MOVE    RECE65-REC  TO
+                                           WRK-700-DOUJI-RECE65-REC
+                                            (WRK-SRYSYUKBN700-DOUJI-MAX) 
+                       ELSE
+                           ADD     1           TO  WRK-SRYSYUKBN700-MAX
+                           MOVE    IDX         TO  FLG-SRYSYUKBN700
+                                                  (WRK-SRYSYUKBN700-MAX) 
+                           MOVE    RECE65-REC  TO WRK-700-RECE65-REC
+                                                  (WRK-SRYSYUKBN700-MAX)
+                       END-IF
                    ELSE
                        PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
                    END-IF    
