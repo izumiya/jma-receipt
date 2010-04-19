@@ -490,6 +490,9 @@
                    07  WRK-SYUACC-IO-TENSU PIC S9(09).
       *            受診回数合計
                    07  WRK-SYUACC-IO-KAISU PIC 9(03).
+      *            レセ電算診療科（コード）
+                   07  WRK-SYUACC-IO-RECESYUKA
+                                           PIC X(02).
       *    主科別情報
            03  WRK-SYUACC-REC.
       *        主科
@@ -498,6 +501,8 @@
                05  WRK-SYUACC-TENSU        PIC S9(09).
       *        受診回数合計
                05  WRK-SYUACC-KAISU        PIC 9(03).
+      *        レセ電算診療科（コード）
+               05  WRK-SYUACCRECESYUKA     PIC X(02).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -1730,69 +1735,6 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *
                    PERFORM 2101-SYUKA-HENSYU-SEC
                END-IF
-      *
-      *        主科設定時のみ診療科名称を設定    
-               IF  (     ( RECE02-TEISYUTUSAKI   =   "1" )
-                     AND ( SYS-2009-SYUKA-SYAHO  =   "1" ) )
-               OR  (     ( RECE02-TEISYUTUSAKI   =   "2" )
-                     AND ( SYS-2009-SYUKA-KOKUHO =   "1" ) )
-               OR  (     ( RECE02-TEISYUTUSAKI   =   "6" )
-                     AND ( SYS-2009-SYUKA-KOUIKI =   "1" ) )
-                   MOVE    SPACE                TO  SYSKANRI-REC
-                   INITIALIZE                       SYSKANRI-REC
-                   MOVE    "1005"               TO  SYS-KANRICD
-                   MOVE    RECE02-SYUKA         TO  SYS-KBNCD
-                   MOVE    RECE02-SRYYM         TO  SYS-STYUKYMD (1:6)
-                   MOVE    "01"                 TO  SYS-STYUKYMD (7:2)
-                   MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
-                   MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
-                   MOVE    "key10"              TO  WRK-MCP-PATHNAME
-                   PERFORM 960-KANRIMST-READ-SEC
-                   IF      FLG-SYSKANRI         =   ZERO
-                       MOVE    MCPDATA-REC         TO  SYS-1005-REC
-                   ELSE
-                       INITIALIZE                      SYS-1005-REC
-                   END-IF
-                   MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA
-                   MOVE    SYS-1005-SRYKANAME  TO  RECE02-SYUKANAME
-      *            診療科２、診療科３の設定
-                   IF      RECE02-SYUKA2       NOT =   SPACE
-                       MOVE    SPACE                TO  SYSKANRI-REC
-                       INITIALIZE                       SYSKANRI-REC
-                       MOVE    "1005"               TO  SYS-KANRICD
-                       MOVE    RECE02-SYUKA2        TO  SYS-KBNCD
-                       MOVE    RECE02-SRYYM         TO SYS-STYUKYMD(1:6)
-                       MOVE    "01"                 TO SYS-STYUKYMD(7:2)
-                       MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
-                       MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
-                       MOVE    "key10"              TO  WRK-MCP-PATHNAME
-                       PERFORM 960-KANRIMST-READ-SEC
-                       IF      FLG-SYSKANRI         =   ZERO
-                           MOVE    MCPDATA-REC         TO  SYS-1005-REC
-                       ELSE
-                           INITIALIZE                      SYS-1005-REC
-                       END-IF
-                       MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA2
-                   END-IF 
-                   IF      RECE02-SYUKA3       NOT =   SPACE
-                       MOVE    SPACE                TO  SYSKANRI-REC
-                       INITIALIZE                       SYSKANRI-REC
-                       MOVE    "1005"               TO  SYS-KANRICD
-                       MOVE    RECE02-SYUKA3        TO  SYS-KBNCD
-                       MOVE    RECE02-SRYYM         TO SYS-STYUKYMD(1:6)
-                       MOVE    "01"                 TO SYS-STYUKYMD(7:2)
-                       MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
-                       MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
-                       MOVE    "key10"              TO  WRK-MCP-PATHNAME
-                       PERFORM 960-KANRIMST-READ-SEC
-                       IF      FLG-SYSKANRI         =   ZERO
-                           MOVE    MCPDATA-REC         TO  SYS-1005-REC
-                       ELSE
-                           INITIALIZE                      SYS-1005-REC
-                       END-IF
-                       MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA3
-                   END-IF 
-               END-IF   
              END-IF
            END-IF    
       *
@@ -1935,12 +1877,50 @@ grpsys             PERFORM 900-DBSELECT-SEC
                        MOVE    "XX"                TO  RECE02-SYUKA
                    END-IF
                END-IF
-           END-IF    
+           END-IF
+      * 
+      *    主科設定時のみ診療科名称を設定    
+           IF  (     ( RECE02-TEISYUTUSAKI   =   "1" )
+                 AND ( SYS-2009-SYUKA-SYAHO  =   "1" ) )
+           OR  (     ( RECE02-TEISYUTUSAKI   =   "2" )
+                 AND ( SYS-2009-SYUKA-KOKUHO =   "1" ) )
+           OR  (     ( RECE02-TEISYUTUSAKI   =   "6" )
+                 AND ( SYS-2009-SYUKA-KOUIKI =   "1" ) )
+               MOVE    SPACE                TO  SYSKANRI-REC
+               INITIALIZE                       SYSKANRI-REC
+               MOVE    "1005"               TO  SYS-KANRICD
+               MOVE    RECE02-SYUKA         TO  SYS-KBNCD
+               MOVE    RECE02-SRYYM         TO  SYS-STYUKYMD (1:6)
+               MOVE    "01"                 TO  SYS-STYUKYMD (7:2)
+               MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
+               MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
+               MOVE    "key10"              TO  WRK-MCP-PATHNAME
+                PERFORM 960-KANRIMST-READ-SEC
+               IF      FLG-SYSKANRI         =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-1005-REC
+               ELSE
+                   INITIALIZE                      SYS-1005-REC
+               END-IF
+               MOVE    SYS-1005-RECESRYKA  TO  RECE02-RECESYUKA
+               MOVE    SYS-1005-SRYKANAME  TO  RECE02-SYUKANAME
+           END-IF
       *
       *    診療科２、診療科３のセット
       *    主科未設定または平成２２年３月以前の場合はセットしない
            IF    ( RECE02-SYUKA    =   "XX"   )
            OR    ( RECE02-SRYYM    <=  201003 )
+               GO  TO  2101-SYUKA-HENSYU-EXT
+           END-IF     
+      * 
+      *    主科設定時以外セットしない
+           IF  (     ( RECE02-TEISYUTUSAKI   =   "1" )
+                 AND ( SYS-2009-SYUKA-SYAHO  =   "1" ) )
+           OR  (     ( RECE02-TEISYUTUSAKI   =   "2" )
+                 AND ( SYS-2009-SYUKA-KOKUHO =   "1" ) )
+           OR  (     ( RECE02-TEISYUTUSAKI   =   "6" )
+                 AND ( SYS-2009-SYUKA-KOUIKI =   "1" ) )
+               CONTINUE
+           ELSE
                GO  TO  2101-SYUKA-HENSYU-EXT
            END-IF     
       *
@@ -1950,7 +1930,27 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    UNTIL   IDY     >       50
                    OR      LNK-SYUACC-IO-SRYKA (1 IDY)
                                    =   SPACE
-               IF      RECE02-SYUKA    =   LNK-SYUACC-IO-SRYKA (1 IDY)
+      *        主科情報のレセ電診療科情報取得
+               MOVE    SPACE                TO  SYSKANRI-REC
+               INITIALIZE                       SYSKANRI-REC
+               MOVE    "1005"               TO  SYS-KANRICD
+               MOVE    LNK-SYUACC-IO-SRYKA (1 IDY)
+                                            TO  SYS-KBNCD
+               MOVE    RECE02-SRYYM         TO  SYS-STYUKYMD (1:6)
+               MOVE    "01"                 TO  SYS-STYUKYMD (7:2)
+               MOVE    SYS-STYUKYMD         TO  SYS-EDYUKYMD
+               MOVE    "tbl_syskanri"       TO  WRK-MCP-TABLE
+               MOVE    "key10"              TO  WRK-MCP-PATHNAME
+                PERFORM 960-KANRIMST-READ-SEC
+               IF      FLG-SYSKANRI         =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-1005-REC
+               ELSE
+                   INITIALIZE                      SYS-1005-REC
+               END-IF
+    *    
+               IF    ( RECE02-SYUKA    =   LNK-SYUACC-IO-SRYKA (1 IDY) )
+               OR    ( RECE02-RECESYUKA
+                                       =   SYS-1005-RECESRYKA          )
                    CONTINUE
                ELSE
                    ADD     1           TO  IDZ1
@@ -1960,6 +1960,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                                        TO  WRK-SYUACC-IO-TENSU (IDZ1)
                    MOVE    LNK-SYUACC-IO-KAISU (1 IDY)
                                        TO  WRK-SYUACC-IO-KAISU (IDZ1)
+                   MOVE    SYS-1005-RECESRYKA
+                                       TO  WRK-SYUACC-IO-RECESYUKA(IDZ1)
                END-IF
            END-PERFORM
       *
@@ -2083,11 +2085,29 @@ grpsys             PERFORM 900-DBSELECT-SEC
                                    NOT =   SPACE
                MOVE    WRK-SYUACC-IO-SRYKA (1)
                                            TO  RECE02-SYUKA2
+               MOVE    WRK-SYUACC-IO-RECESYUKA (1)
+                                           TO  RECE02-RECESYUKA2
            END-IF
            IF      WRK-SYUACC-IO-SRYKA (2)
                                    NOT =   SPACE
-               MOVE    WRK-SYUACC-IO-SRYKA (2)
-                                           TO  RECE02-SYUKA3
+               IF      WRK-SYUACC-IO-RECESYUKA (1)
+                                   NOT =   WRK-SYUACC-IO-RECESYUKA (2)
+                   MOVE    WRK-SYUACC-IO-SRYKA (2)
+                                               TO  RECE02-SYUKA3
+                   MOVE    WRK-SYUACC-IO-RECESYUKA (2)
+                                               TO  RECE02-RECESYUKA3
+               ELSE
+                   IF      WRK-SYUACC-IO-SRYKA (3)
+                                           NOT =   SPACE
+                       IF      WRK-SYUACC-IO-RECESYUKA (1)
+                                   NOT =   WRK-SYUACC-IO-RECESYUKA (3)
+                           MOVE    WRK-SYUACC-IO-SRYKA (3)
+                                                   TO  RECE02-SYUKA3
+                           MOVE    WRK-SYUACC-IO-RECESYUKA (3)
+                                               TO  RECE02-RECESYUKA3
+                       END-IF
+                   END-IF    
+               END-IF
            END-IF
            .
       *
