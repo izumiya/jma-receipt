@@ -1591,8 +1591,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
               PERFORM  900-TENSU-READ-SEC
               PERFORM  UNTIL  (FLG-TENSU  =     1)
                         OR    (IDX14     >=    50)
-                 ADD    1            TO  IDX14
-                 MOVE   TNS-SRYCD    TO  WRK-CHUKSNSRYCD(IDX14)
+                 IF   TNS-SRYCD  =  "190134270"
+                                 OR "190135470"
+                                 OR "190135670"
+                   CONTINUE
+                 ELSE
+                   ADD    1          TO  IDX14
+                   MOVE   TNS-SRYCD  TO  WRK-CHUKSNSRYCD(IDX14)
+                 END-IF
       *
                  MOVE    "tbl_tensu" TO  MCP-TABLE
                  MOVE    "key30"     TO  MCP-PATHNAME
