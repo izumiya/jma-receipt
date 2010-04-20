@@ -2516,10 +2516,10 @@
                                                   OR CONS-200804-KSN4
                                                   OR CONS-200804-KSN3
                                                   OR CONS-200804-KSN6
-                                                  OR CONS-200804-KSN5
-                                                  OR CONS-201004-KSN14
-                                                  OR CONS-201004-KSN18
-                                                  OR CONS-201004-KSN19)
+                                                  OR CONS-200804-KSN5 )
+      ***                                         OR CONS-201004-KSN14
+      ***                                         OR CONS-201004-KSN18
+      ***                                         OR CONS-201004-KSN19)
                           IF  (WRK-NYUINKHN(IDX1)      NOT = SPACE)
                           AND (LNK-SROUNYUIN-GAIHAKU(IDX1) = ZERO OR 4
                                                                   OR 5)
@@ -2546,17 +2546,17 @@
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-200804-KSN5(IDX1)
       *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
-                             WHEN  CONS-201004-KSN14
-                                  MOVE   NACCT-DAY(IDX1)
-                                        TO  WRK-201004-KSN14(IDX1)
+      ***                    WHEN  CONS-201004-KSN14
+      ***                         MOVE   NACCT-DAY(IDX1)
+      ***                               TO  WRK-201004-KSN14(IDX1)
       *                      Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»
-                             WHEN  CONS-201004-KSN18
-                                  MOVE   NACCT-DAY(IDX1)
-                                        TO  WRK-201004-KSN18(IDX1)
+      ***                    WHEN  CONS-201004-KSN18
+      ***                         MOVE   NACCT-DAY(IDX1)
+      ***                               TO  WRK-201004-KSN18(IDX1)
       *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
-                             WHEN  CONS-201004-KSN19
-                                  MOVE   NACCT-DAY(IDX1)
-                                        TO  WRK-201004-KSN19(IDX1)
+      ***                    WHEN  CONS-201004-KSN19
+      ***                         MOVE   NACCT-DAY(IDX1)
+      ***                               TO  WRK-201004-KSN19(IDX1)
                            END-EVALUATE
       *
                            IF   FLG-RYAKU   =   ZERO
@@ -2677,10 +2677,10 @@
                                               OR CONS-200804-KSN4
                                               OR CONS-200804-KSN3
                                               OR CONS-200804-KSN6
-                                              OR CONS-200804-KSN5
-                                              OR CONS-201004-KSN14
-                                              OR CONS-201004-KSN18
-                                              OR CONS-201004-KSN19)
+                                              OR CONS-200804-KSN5 )
+      ***                                     OR CONS-201004-KSN14
+      ***                                     OR CONS-201004-KSN18
+      ***                                     OR CONS-201004-KSN19)
       *                                        
                                 MOVE  SRY-SRYCD(1)   TO
                                                ACCT-SRYCDTOTAL(6:9)
@@ -2707,10 +2707,10 @@
                                         OR  CONS-200804-KSN4
                                         OR  CONS-200804-KSN3
                                         OR  CONS-200804-KSN6
-                                        OR  CONS-200804-KSN5
-                                        OR  CONS-201004-KSN14
-                                        OR  CONS-201004-KSN18
-                                        OR  CONS-201004-KSN19 )
+                                        OR  CONS-200804-KSN5  )
+      ***                               OR  CONS-201004-KSN14
+      ***                               OR  CONS-201004-KSN18
+      ***                               OR  CONS-201004-KSN19 )
       *                Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -2795,23 +2795,23 @@
                                         TO  WRK-200804-KSN5(IDX1)
                                   END-IF
       *                         µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
-                                WHEN  CONS-201004-KSN14
-                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
-                                      MOVE   ACCT-DAY(1 IDX1)
-                                        TO  WRK-201004-KSN14(IDX1)
-                                  END-IF
+      ***                       WHEN  CONS-201004-KSN14
+      ***                         IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+      ***                             MOVE   ACCT-DAY(1 IDX1)
+      ***                               TO  WRK-201004-KSN14(IDX1)
+      ***                         END-IF
       *                         Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»
-                                WHEN  CONS-201004-KSN18
-                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
-                                      MOVE   ACCT-DAY(1 IDX1)
-                                        TO  WRK-201004-KSN18(IDX1)
-                                  END-IF
+      ***                       WHEN  CONS-201004-KSN18
+      ***                         IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+      ***                             MOVE   ACCT-DAY(1 IDX1)
+      ***                               TO  WRK-201004-KSN18(IDX1)
+      ***                         END-IF
       *                         µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
-                                WHEN  CONS-201004-KSN19
-                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
-                                      MOVE   ACCT-DAY(1 IDX1)
-                                        TO  WRK-201004-KSN19(IDX1)
-                                  END-IF
+      ***                       WHEN  CONS-201004-KSN19
+      ***                         IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+      ***                             MOVE   ACCT-DAY(1 IDX1)
+      ***                               TO  WRK-201004-KSN19(IDX1)
+      ***                         END-IF
                               END-EVALUATE
       *
                               IF   FLG-RYAKU   =   ZERO
@@ -3018,13 +3018,13 @@
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
-               IF         WRK-201004-KSN14(IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN14    TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
+      ***      IF         WRK-201004-KSN14(IDX1)      NOT =   ZERO
+      ***          ADD      1                  TO  WRK-MEISAISU
+      ***          MOVE   CONS-201004-KSN14    TO  LNK-SROUNYUIN-SRYCD
+      ***                                  (IDX1 WRK-MEISAISU)
+      ***          MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+      ***                                  (IDX1 WRK-MEISAISU)
+      ***      END-IF
       *        ½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÀº¿ÀÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë
                IF         WRK-201004-KSN15(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
@@ -3050,21 +3050,21 @@
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»
-               IF         WRK-201004-KSN18(IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN18    TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
+      ***      IF         WRK-201004-KSN18(IDX1)      NOT =   ZERO
+      ***          ADD      1                  TO  WRK-MEISAISU
+      ***          MOVE   CONS-201004-KSN18    TO  LNK-SROUNYUIN-SRYCD
+      ***                                  (IDX1 WRK-MEISAISU)
+      ***          MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+      ***                                  (IDX1 WRK-MEISAISU)
+      ***      END-IF
       *        µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
-               IF         WRK-201004-KSN19(IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN19    TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
+      ***      IF         WRK-201004-KSN19(IDX1)      NOT =   ZERO
+      ***          ADD      1                  TO  WRK-MEISAISU
+      ***          MOVE   CONS-201004-KSN19    TO  LNK-SROUNYUIN-SRYCD
+      ***                                  (IDX1 WRK-MEISAISU)
+      ***          MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+      ***                                  (IDX1 WRK-MEISAISU)
+      ***      END-IF
       *
                IF      (WRK-NYUINKHN(IDX1)   NOT =         SPACE)  AND
                        (WRK-GAIHAKU(IDX1)        =         SPACE)  AND
@@ -4091,12 +4091,17 @@
                PERFORM   910-TENSU-FETCH-SEC
                PERFORM   UNTIL   (FLG-TENSU  =   1)   OR
                                  (IDX1       >=  20)
-                   ADD    1                TO  IDX1
-                   MOVE   TNS-SRYCD        TO  LNK-SROUNYUIN-CHUKSNSRYCD
-                                                                 (IDX1)
-                   MOVE   "tbl_tensu"      TO  MCP-TABLE
-                   MOVE   "key30"          TO  MCP-PATHNAME
-                   PERFORM 910-TENSU-FETCH-SEC
+                 IF   TNS-SRYCD  =  CONS-201004-KSN14
+                                 OR CONS-201004-KSN18
+                                 OR CONS-201004-KSN19
+                   CONTINUE
+                 ELSE
+                   ADD     1        TO  IDX1
+                   MOVE  TNS-SRYCD  TO  LNK-SROUNYUIN-CHUKSNSRYCD(IDX1)
+                 END-IF
+                 MOVE   "tbl_tensu"      TO  MCP-TABLE
+                 MOVE   "key30"          TO  MCP-PATHNAME
+                 PERFORM 910-TENSU-FETCH-SEC
                END-PERFORM
            END-IF
       *    ÅÀ¿ô¥Þ¥¹¥¿¥¯¥í¡¼¥º
