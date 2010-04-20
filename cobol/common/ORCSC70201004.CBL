@@ -2761,6 +2761,21 @@
       *
       *    きざみ値計算
            MOVE    WRK-COM-SURYO (IDX-Z)   TO  WRK-SURYO
+      *    同時撮影料の数量
+           IF     (WRK-SATUEI-SURYO        >   ZERO )  AND
+                  (FLG-SATU                =   ZERO )
+      *        撮影料の数量を合計上限　５　までとする
+               IF     (WRK-COM-SURYO (IDX-Z)   +   WRK-SATUEI-SURYO)
+                                           >   5
+                   IF      WRK-SATUEI-SURYO    <   5
+                       COMPUTE WRK-SURYO       = ( 5
+                                               -   WRK-SATUEI-SURYO )
+                   ELSE
+                       MOVE    ZERO            TO  WRK-SURYO
+                   END-IF
+               END-IF
+           END-IF
+      *
            MOVE    ZERO                    TO  WRK-KEI-TEN2
       *    きざみ点数を算定点数の１／２とする
            IF      WRK-SATU-TEN        =   ZERO
@@ -2785,9 +2800,10 @@
            EVALUATE    TRUE
       *            データ≦（下限値−きざみ値）
                WHEN    WRK-SURYO       <=  (TNS-KZMKGN  -  TNS-KZM)
-                   IF      TNS-KZMERR          =   2  OR  3
-                       MOVE    "0021"          TO  SPA-ERRCD
-                   END-IF
+      *            IF      TNS-KZMERR          =   2  OR  3
+      *                MOVE    "0021"          TO  SPA-ERRCD
+      *            END-IF
+                   CONTINUE
       *
       *            下限値＜データ≦上限値
                WHEN     (TNS-KZMKGN        <   WRK-SURYO )   AND
@@ -2809,7 +2825,7 @@
       *            点数計算式１をせず、エラーとする
       *************    MOVE    "0022"        TO  SPA-ERRCD
       *            警告エラーとする
-                       MOVE    "K030"            TO  SPA-ERRCD
+      *                MOVE    "K030"            TO  SPA-ERRCD
       *            点数計算式１
                        COMPUTE WRK-KEI-TEN1    =  (WRK-SURYO
                                                -  TNS-KZMKGN)
