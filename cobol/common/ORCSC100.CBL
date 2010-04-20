@@ -762,6 +762,11 @@
                                            =   "*"    )
                    CONTINUE
                ELSE
+      *            剤終了で回数入力なしは1とする
+                   IF     (SPA-COM-KAIFLG (IDX)    =   SPACE )  AND
+                          (SPA-COM-ZAIEND (IDX)    =   "1"   )
+                       MOVE    1               TO  SPA-COM-KAISU (IDX)
+                   END-IF
       *            回数変更あり
                    IF      SPA-COM-KAIFLG2(IDX)    =   "1"
                        MOVE    "1"                 TO  WRK-KAIFLG2
@@ -848,6 +853,11 @@
       *
            IF     (WRK-KAISU               =   ZERO   )  OR
                   (SPA-COM-ZAIEND (IDX)    =   "1"    )
+      *        剤終了で回数入力なしは1とする
+               IF     (SPA-COM-KAIFLG (IDX)    =   SPACE )  AND
+                      (SPA-COM-ZAIEND (IDX)    =   "1"   )
+                   MOVE    1                   TO  SPA-COM-KAISU (IDX)
+               END-IF
                MOVE    SPA-COM-KAISU (IDX) TO  WRK-KAISU
       *        回数変更あり
                IF     (SPA-COM-KAIFLG2(IDX)    =   "1"   )
