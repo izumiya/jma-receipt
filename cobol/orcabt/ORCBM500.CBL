@@ -852,7 +852,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                        IF      WRK-MOJISU          =   16
                            STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
-                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
                                                    DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
@@ -913,7 +913,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                            IF      WRK-MOJISU          =   12
                                STRING    RECEDEN-RECEDATA (1:WRK-NAGASA)
                                                    DELIMITED  BY  SIZE
-                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
+                                     ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"
                                                    DELIMITED  BY  SIZE
                                      WRK-KAIGYO    DELIMITED  BY  SIZE
                                      INTO          WRK-REC
