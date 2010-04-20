@@ -724,6 +724,11 @@
                                            =   "*"    )
                    CONTINUE
                ELSE
+      *            剤終了で回数入力なしは1とする
+                   IF     (SPA-COM-KAIFLG (IDX)    =   SPACE )  AND
+                          (SPA-COM-ZAIEND (IDX)    =   "1"   )
+                       MOVE    1               TO  SPA-COM-KAISU (IDX)
+                   END-IF
                    MOVE    SPA-COM-KAISU (IDX) TO  WRK-KAISU
                    INITIALIZE                      WRK-NYUIN-AREA
       *            外用薬の時、入力回数を
@@ -784,6 +789,11 @@
       *
            IF     (WRK-KAISU               =   ZERO   )  OR
                   (SPA-COM-ZAIEND (IDX)    =   "1"    )
+      *        剤終了で回数入力なしは1とする
+               IF     (SPA-COM-KAIFLG (IDX)    =   SPACE )  AND
+                      (SPA-COM-ZAIEND (IDX)    =   "1"   )
+                   MOVE    1                   TO  SPA-COM-KAISU (IDX)
+               END-IF
                MOVE    SPA-COM-KAISU (IDX) TO  WRK-KAISU
       *        外用薬の時、入力回数を
                IF     (SPA-COM-SRYKBN(IDX) =  "23"  )  AND
