@@ -2868,7 +2868,7 @@
            MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
            MOVE    SPA-PTID            TO  ACCT-PTID
            MOVE    SPA-SRYYMD(1:6)     TO  ACCT-SRYYM
-           MOVE    "60"                TO  ACCT-SRYKBN
+           MOVE    "64"                TO  ACCT-SRYKBN
       *
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
@@ -2898,6 +2898,48 @@
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
            MOVE    "key14"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *    Æþ±¡¤ÇÅö·îÆþ±¡¤Î»þ¡¢³°Íè¤ò¸¡º÷
+           IF     (SPA-NYUGAIKBN       =   "1"  )  AND
+                  (SPA-K02N-NYUINYMD(1:6)  =   SPA-SRYYMD(1:6))
+      *
+           MOVE    SPACE               TO  SRYACCT-REC
+           INITIALIZE                      SRYACCT-REC
+           MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
+           MOVE    "2"                 TO  ACCT-NYUGAIKBN
+           MOVE    SPA-PTID            TO  ACCT-PTID
+           MOVE    SPA-SRYYMD(1:6)     TO  ACCT-SRYYM
+           MOVE    "64"                TO  ACCT-SRYKBN
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key14"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key14"             TO  MCP-PATHNAME
+               PERFORM 940-SRYACCT-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACCT
+           END-IF
+           PERFORM UNTIL       (FLG-SRYACCT         =   1       )
+               IF     (ACCT-HKNCOMBI     =   "9999" ) OR
+                      (ACCT-ZAIKAISU     =   ZERO   )
+                   CONTINUE
+               ELSE
+      *            ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼ÊÔ½¸
+                   PERFORM 100601-SRYACT-HEN-SEC
+               END-IF
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key14"             TO  MCP-PATHNAME
+               PERFORM 940-SRYACCT-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key14"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           END-IF
       *
            IF      IDX-ACT             =   ZERO
                MOVE    "999999999"     TO  LNK-ACCT-SRYCD (1)
@@ -3405,8 +3447,9 @@
                    MOVE    IDX-Z           TO  IDX-JIKAN
                END-IF
       *
-      *        ÉÂÍý¿ÇÃÇÎÁ¥Á¥§¥Ã¥¯
+      *        ÁÈ¿¥¿ÇÃÇÎÁ¡¦ºÙË¦¿ÇÃÇÎÁ¥Á¥§¥Ã¥¯
                IF      WRK-COM-INPUTCD (IDX-Z) =   "160155110"
+                                               OR  "160185210"
                    PERFORM 1006-SINDAN-CHK-SEC
                END-IF
       *
