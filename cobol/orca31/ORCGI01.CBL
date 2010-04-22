@@ -5416,7 +5416,7 @@
                                     OR CONST-KSNCD-190134270
                                     OR CONST-KSNCD-190135670 )
                      AND ( SPA-NAI-I01-IDOYMD
-                                           >  SPA-NAI-I01-NYUINYMD )
+                                           >=  SPA-NAI-I01-NYUINYMD )
                        CONTINUE
                    ELSE
                        MOVE    ZERO    TO  FLG-HIT
@@ -5488,6 +5488,8 @@
                                            =   CONST-KSNCD-190134270 )
                                    IF    ( SPA-GMN-I01-SYORIKBN-CD
                                                    =   CONST-NYUIN )
+                                   OR    ( SPA-NAI-I01-IDOYMD
+                                             =  SPA-NAI-I01-NYUINYMD )
                                      CONTINUE
                                    ELSE
                                      PERFORM 410111-IPPAN-NYUIN-CHK-SEC
