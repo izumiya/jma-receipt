@@ -2853,8 +2853,13 @@
                IF      WRK-KEI-TEN2        >   ZERO
                    MOVE    WRK-KEI-TEN2    TO  WRK-COM-KISOTEN  (IDX-Z)
                ELSE
-                   COMPUTE WRK-TENSUKEI-9  =   WRK-SATU-TEN  + 0.5
-                   MOVE    WRK-TENSUKEI-9  TO  WRK-COM-KISOTEN(IDX-Z)
+                   IF      WRK-SURYO       =   ZERO
+                       MOVE    ZERO        TO  WRK-COM-KISOTEN(IDX-Z)
+                   ELSE
+                       COMPUTE WRK-TENSUKEI-9  =   WRK-SATU-TEN  + 0.5
+                       MOVE    WRK-TENSUKEI-9  TO  WRK-COM-KISOTEN
+                                                               (IDX-Z)
+                   END-IF
                END-IF
            END-IF
       *
