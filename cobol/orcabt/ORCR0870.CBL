@@ -89,6 +89,8 @@
       *  04.04.03    NACL-門脇    10/03/03  療養レセコメント編集修正
       *  04.04.04    NACL-門脇    10/04/06  改正対応
       *                                     （コメント自動記載）
+      *  04.04.05    NACL-門脇    10/04/23  在宅血液透析頻回指導管理料の
+      *                                     コメント自動記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3203,8 +3205,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
                                      ( FLG-HINKAI-COMMENT =   1 )
       *
                       IF   SANTEI-SRYYM  <=  RECE84-SRYYM
-                       MOVE   SANTEI-SRYYM     TO  WRK-FSANTEIYMD(1:6)
-                       MOVE   SANTEI-MSANTEID  TO  WRK-FSANTEIYMD(7:2)
+      ***              MOVE   SANTEI-SRYYM     TO  WRK-FSANTEIYMD(1:6)
+      ***              MOVE   SANTEI-MSANTEID  TO  WRK-FSANTEIYMD(7:2)
+                       MOVE   SANTEI-FSANTEIYMD
+                                               TO  WRK-FSANTEIYMD
       *
                        INITIALIZE                  STS-AREA-DAY
                        INITIALIZE                  LNK-DAY6-AREA
