@@ -281,6 +281,8 @@
       *  04.04.20    NACL-Æ£¸¶    10/04/15  ¥ì¥»ÅÅÄÌ¿®°å£²£²£°£°£µ¹æ
       *                                     ¥¢¥Ê¥í¥°»£±Æ¤È¥Ç¥¸¥¿¥ë»£±Æ¤ò
       *                                     Æ±»þ¤Ë¹Ô¤Ã¤¿¾ì¹ç¤Îµ­Ï¿ÊýË¡
+      *  04.04.21    NACL-Æ£¸¶    10/04/23  ²èÁü¿ÇÃÇ¤Î²Ã»»¹àÌÜ¤Îµ­Ï¿ÊýË¡
+      *                                     ¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4362,9 +4364,13 @@
                    PERFORM 2007111-KOUI-TAIHI-HENSYU-SEC
                ELSE
                    IF    ( RECE65-SRYSYUKBN-X (IDX)
-                                               =   "700" )
+                                               =   "700"  )
                    AND   ( RECE65-DATAKBN   (IDX)
-                                               =   "2"   )
+                                               =   "2"    )
+                   AND   (  (  FLG-SRYSYUKBN721-DOUJI
+                                               >   ZERO ) 
+                                   OR
+                            ( FLG-SRYSYUKBN721 >   ZERO ) )
                        IF      FLG-SRYSYUKBN721-DOUJI  >   ZERO
                            ADD     1           TO
                                            WRK-SRYSYUKBN700-DOUJI-MAX
