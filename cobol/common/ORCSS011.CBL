@@ -240,6 +240,9 @@
                                        SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-5015-REC
+           IF    (  SS011-SRYYM    >=  CONST-H2204 )
+               MOVE    "1"         TO  SYS-5015-ADLINPUTKBN
+           END-IF
       *
            PERFORM 1001-INIT-TNACCT-SEC
       *
