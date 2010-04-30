@@ -36,6 +36,8 @@
       *  01.01.01    NACL-藤原    03/07/07  プレビュー機能追加
       *  01.01.02    NACL-太田    04/06/06  情報削除画面遷移追加
       *  02.07.00    NACL-竹田    05/10/24  MONFUNC 対応
+      *
+      *  04.05.01    NACL-藤原    10/04/30  削除後の画面表示の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -421,7 +423,7 @@
       *    スパ初期編集処理
       *****************************************************************
        310-SPASET-SEC              SECTION.
-      *
+      *   
            EVALUATE    SPA-PRTKANRI-TBL-KEY
                WHEN    "SOKATU"
                    MOVE    "診療年月"     TO  SPA-GMN-TITLE1
@@ -1151,6 +1153,7 @@
                GO  TO  430-DELETE-EXT
            END-IF
       *
+           INITIALIZE              SPA-XA01-AREA
            PERFORM 310-SPASET-SEC
            .
        430-DELETE-EXT.
