@@ -356,7 +356,11 @@
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
       *
-           MOVE    SYS-1001-BEDSU  TO  SPA-BEDFLG
+           IF    ( SYS-1001-BEDSU  >   ZERO )
+               MOVE    1           TO  SPA-BEDFLG
+           ELSE
+               MOVE    ZERO        TO  SPA-BEDFLG
+           END-IF
       *
       *    作成日セット
            MOVE    SPA-SYSYMD      TO  WRK-SYMD
