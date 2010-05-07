@@ -1386,13 +1386,20 @@
            END-PERFORM
       *
            IF    ( IDX-KHN             =   ZERO )
-               MOVE    5               TO  HCM34S01-RC
-               PERFORM 990-EXIT-PROGRAM-SEC
+               DISPLAY "KHNRYO NOT FOUND[" NACCT-PTID "]"
+                                       "[" NACCT-ZAINUM "]"
+      *        MOVE    5               TO  HCM34S01-RC
+      *        PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           MOVE    NSRY-SRYCD (IDX-KHN)
+           IF    ( IDX-KHN             =   ZERO )
+               MOVE    SPACE           TO  WRK-TNS-SRYCD
+                                           WRK-KHNSRYCD
+           ELSE
+               MOVE    NSRY-SRYCD (IDX-KHN)
                                        TO  WRK-TNS-SRYCD
                                            WRK-KHNSRYCD
+           END-IF
       *
       *    ´Ç¸îÈæÎ¨´ð½àÌ¤Ã£¤Î¥Á¥§¥Ã¥¯
            PERFORM 2001111-KNGMITATU-CHK-SEC
