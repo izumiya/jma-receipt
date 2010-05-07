@@ -727,6 +727,12 @@
                    IF      SPA-PTNUM       NOT =   SPACE
                        MOVE    SPA-PTNUM           TO  P02-PTNUM
                        PERFORM 4100-PTNUM-SYORI-SEC
+      *                拡張構成画面は表示しない
+                       IF     (FLG-END              =   1  )
+                       AND    (MCP-WINDOW           =   "P014" )
+      *                各画面を初期編集する
+                           MOVE    "   "               TO  MCP-PUTTYPE
+                       END-IF
                    ELSE
       *                各画面を初期編集する
                        MOVE    1                   TO  SPA-P02-SYORI
