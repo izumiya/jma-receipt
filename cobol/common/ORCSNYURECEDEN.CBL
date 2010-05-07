@@ -3100,7 +3100,7 @@
                                END-IF
                          END-PERFORM
       *                  平成２２年４月より記録コメントの変更
-      *                  （記録コメントコード810000001  ->  840000125）
+      *                  （記録コメントコード810000001  ->  840000125 840000134）
                          IF  LNK-NYURECEDEN-SANTEIYM    <=   "201003"
                           PERFORM   VARYING  IDX5  FROM  1  BY  1
                           UNTIL   (IDX5  >  31)   OR
@@ -3164,8 +3164,13 @@
                                                WRK-RYOYO-DAY-ED(IDX5)
                                 MOVE   "CO"   TO   
                                     LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
-                                MOVE  "840000125"  TO
+                                IF   SPA-HOSPSBT    =    1
+                                    MOVE  "840000125"  TO
                                       LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                ELSE
+                                    MOVE  "840000134"  TO
+                                      LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                END-IF
                                 MOVE   WRK-RYOYO-DAY-ST(IDX5) TO  IDX6
                                 MOVE   TBL-DAY(IDX6)  TO
                                     LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
@@ -3176,8 +3181,13 @@
                              ELSE
                                 MOVE   "CO"   TO   
                                     LNK-NYURECEDEN-RECSKB(1 IDX2 IDX3)
-                                MOVE  "840000125"  TO
+                                IF   SPA-HOSPSBT    =    1
+                                    MOVE  "840000125"  TO
                                       LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                ELSE
+                                    MOVE  "840000134"  TO
+                                      LNK-NYURECEDEN-SRYCD(1 IDX2 IDX3)
+                                END-IF
                                 MOVE   WRK-RYOYO-DAY-ST(IDX5) TO IDX6
                                 MOVE   TBL-DAY(IDX6)  TO
                                     LNK-NYURECEDEN-COMMENT(1 IDX2 IDX3)
