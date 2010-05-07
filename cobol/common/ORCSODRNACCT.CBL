@@ -1949,7 +1949,7 @@
                IF   SYS-5001-BTU-SYOKUDOKBN       =    "2"
                     MOVE     "197000570"    TO
                                 LNK-SCNYUACCT-SHOKUDO-SRYCD
-                    MOVE    0   TO   LNK-SCNYUACCT-SHOKUDO-KBN
+                    MOVE    1   TO   LNK-SCNYUACCT-SHOKUDO-KBN
                END-IF
            END-IF
       *    保険組合せ
@@ -2218,6 +2218,9 @@
            MOVE    "5000"          TO  SYS-KANRICD
            EVALUATE   SODRNACCT-ORDERID(3:2)
                WHEN   "01"
+               WHEN   "03"
+               WHEN   "04"
+               WHEN   "05"
                    MOVE   LNK-PTNYUINRRK-TENNYUYMD
                                    TO  SYS-STYUKYMD
                                        SYS-EDYUKYMD
@@ -5424,7 +5427,7 @@
                IF   SYS-5001-BTU-SYOKUDOKBN       =    "2"
                     MOVE     "197000570"    TO
                                 LNK-SCNYUACCT-SHOKUDO-SRYCD
-                    MOVE    0   TO   LNK-SCNYUACCT-SHOKUDO-KBN
+                    MOVE    1   TO   LNK-SCNYUACCT-SHOKUDO-KBN
                END-IF
            END-IF
       *    保険組合せ
