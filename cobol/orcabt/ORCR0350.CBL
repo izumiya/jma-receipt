@@ -257,6 +257,7 @@
       *  04.04.12    NACL-Æ£¸¶    10/01/08  ½èÃÖ¤Ç´ðËÜ¹àÌÜ¤Î»þ´Ö²Ã»»¶èÊ¬
       *                                     ¤¬»»ÄêÉÔ²Ä¤Î¾ì¹ç¡¢»þ´Ö²Ã»»¤Î
       *                                     ÄÌÂ§²Ã»»¹àÌÜ¤Îµ­ºÜ¤ÎÈ½Äê
+      *  04.04.13    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­Ï¿¾ò·ï½¤Àµ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -2988,11 +2989,11 @@
            PERFORM 5005-NUM-HENSYU-SEC
       *    ÉéÃ´¶â³Û¡ÊÏ·¿Í¸øÈñµëÉÕÂÐ¾ÝÏ·¿ÍÆþ±¡°ìÉôÉéÃ´¶â¡Ë
            IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-PREFNUM      =  "38"                     ) AND
+                (RECE62-YOBIETC(6)   =   1                       ) AND
                 (RECE62-KOUREI-SAIKEI    NOT = 999999999         ) AND
                 (IDY                 =   1                       ))
            OR  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-PREFNUM  NOT =  "38"                     ) AND
+                (RECE62-YOBIETC(6)   =  ZERO                     ) AND
                 (RECE62-KOUREI-SAIKEI    NOT = 999999999 AND ZERO) AND
                 (IDY                 =   1                       ))
            OR  ((RECE62-SRYYM       <   WRK-CONS-SRYYM-200804    ) AND
@@ -3002,6 +3003,11 @@
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE62-YOBIETC(7)   =   1                       ) AND
+                (RECE62-KOUREI-SAIKEI2   NOT = 999999999         ) AND
+                (IDY                 =   2                       ))
+           OR  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE62-YOBIETC(7)   =  ZERO                     ) AND
                 (RECE62-KOUREI-SAIKEI2   NOT = 999999999 AND ZERO) AND
                 (IDY                 =   2                       ))
                MOVE   RECE62-KOUREI-SAIKEI2    TO  WRK-NUM

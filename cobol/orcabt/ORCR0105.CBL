@@ -76,6 +76,7 @@
       *  04.04.07    NACL-藤原    09/12/14  摘要欄記載の改頁処理の修正
       *  04.04.08    NACL-門脇    10/02/16  レセ記載しない地方公費がある場合
       *                                     の保険欄一部負担金編集対応
+      *  04.04.09    NACL-門脇    10/04/30  再掲欄の記載条件修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
@@ -4648,16 +4649,19 @@
                    END-IF
                END-IF
            END-IF
-           IF  ((SYS-1001-PREFNUM            =   "38"             ) AND
+           IF  ((RECE02-YOBIETC(6)           =   1                ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT =  999999999         ))
-           OR  ((SYS-1001-PREFNUM        NOT =   "38"             ) AND
+           OR  ((RECE02-YOBIETC(6)           =  ZERO              ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT =  999999999 AND ZERO))
              MOVE    "("                    TO  HC06-FTNMONEYSAI(1:1)
              MOVE   RECE02-ZAITAKU-SAIKEI   TO  WRK-KGK7
              MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI(3:8)
              MOVE    ")"                    TO  HC06-FTNMONEYSAI(11:1)
            END-IF
-           IF    RECE02-ZAITAKU-SAIKEI2  NOT =  999999999 AND ZERO
+           IF  ((RECE02-YOBIETC(7)           =   1                ) AND
+                (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999         ))
+           OR  ((RECE02-YOBIETC(7)           =  ZERO              ) AND
+                (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999 AND ZERO))
              MOVE    "("                    TO  HC06-FTNMONEYSAI2(1:1)
              MOVE   RECE02-ZAITAKU-SAIKEI2  TO  WRK-KGK7
              MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI2(3:8)
