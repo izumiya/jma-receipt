@@ -51,6 +51,9 @@
       *  04.03.01    NACL-門脇    08/12/04  仮収納作成時のディスプレイ追加
       *
       *  04.04.01    NACL-門脇    09/08/25  出産一時金対応
+      *  04.04.02    NACL-門脇    10/05/06  カーソルクローズ修正
+      *  04.04.03    NACL-門脇    10/05/07  入院料剤点チェック
+      *
       *  04.05.01    NACL-門脇    10/01/18  治験対応
       *****************************************************************
       *
@@ -94,6 +97,7 @@
            03  FLG-SET                                 PIC 9(01).
            03  FLG-DATA                                PIC 9(01).
            03  FLG-BUNBEN-SET                          PIC 9(01).
+           03  FLG-NG                                  PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -544,9 +548,11 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    PERFORM 20011-IKKATU-SRYACCT-HENSYU-SEC
                END-PERFORM
       *        カーソルクロース
-               MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key36"             TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               IF   FLG-ERR   =   ZERO
+                 MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                 MOVE    "key36"             TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
            END-IF
       *
            IF      FLG-ERR             =   ZERO
@@ -576,9 +582,11 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    PERFORM 20012-IKKATU-NYUINACCT-HENSYU-SEC
                END-PERFORM
       *        カーソルクロース
-               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-               MOVE    "key13"             TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               IF   FLG-ERR   =   ZERO
+                 MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                 MOVE    "key13"             TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
            END-IF
            .
        2001-IKKATU-SYORI-EXT.
@@ -592,6 +600,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *    処理中止設定処理
            PERFORM 500-CANCEL-HENSYU-SEC
            IF      FLG-ERR             =   1
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key36"             TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
                GO  TO  20011-IKKATU-SRYACCT-HENSYU-EXT
            END-IF
       *
@@ -642,6 +653,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                    OR      FLG-ERR         =   1
                                    OR      KEY-NEW     NOT =   KEY-OLD
       *
+                       MOVE    1     TO   FLG-NG
                        PERFORM   20011-SRYACCT-FILE-HENSYU-SEC 
       *
                        IF      FLG-ERR            =   1
@@ -706,6 +718,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *    処理中止設定処理
            PERFORM 500-CANCEL-HENSYU-SEC
            IF      FLG-ERR             =   1
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key13"             TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
                GO  TO  20012-IKKATU-NYUINACCT-HENSYU-EXT
            END-IF
       *
@@ -777,6 +792,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                              ( WRK-DAY (2 IDX)     >   ZERO )
                            PERFORM 200121-NYUINACCT-CHK-SEC
                            IF      WRK-SYOKBN      =   SPACE
+                               MOVE    2     TO   FLG-NG
                                PERFORM 200122-NYUINACCT-HENSYU-SEC
                                IF    ( WRK-DATAKBN     =   "1" )
                                OR    ( FLG-ERR         =    1 )
@@ -1061,6 +1077,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                     WHEN       19
                       MOVE "包括点数減点分の点数確認"
                                           TO  ERR-ERRMSG
+                    WHEN       20
+                      MOVE "入院料算定点数の誤り"
+                                          TO  ERR-ERRMSG
                     WHEN      OTHER
                       MOVE "仮収納データの取得に失敗"
                                           TO  ERR-ERRMSG
@@ -1217,9 +1236,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               UNTIL       FLG-SYS2002     =   1
                                 OR        FLG-ERR         =   1
       *    カーソルクロース
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key7 "             TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
+           IF   FLG-ERR   =   ZERO
+              MOVE    "tbl_syskanri"      TO  MCP-TABLE
+              MOVE    "key7"              TO  MCP-PATHNAME
+              PERFORM 900-CLOSE-SEC
+           END-IF
            .
       *
        2002-KOBETU-SYORI-EXT.
@@ -1305,9 +1326,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                PERFORM 200211-KOBETU-SRYACCT-HENSYU-SEC
            END-PERFORM
       *    カーソルクロース
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key37"             TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
+           IF   FLG-ERR   =   ZERO
+             MOVE    "tbl_sryacct"       TO  MCP-TABLE
+             MOVE    "key37"             TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-IF
       *
       *    診療会計より仮収納を作成しなかったときのみ処理
            IF    ( WRK-DATAKBN         =   SPACE )
@@ -1337,9 +1360,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    PERFORM 200212-KOBETU-NYUINACCT-HENSYU-SEC
                END-PERFORM
       *        カーソルクロース
-               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-               MOVE    "key14"             TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               IF   FLG-ERR   =   ZERO
+                 MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                 MOVE    "key14"             TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
            END-IF 
       *
            .
@@ -1418,9 +1443,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                PERFORM 200211-KOBETU-SRYACCT-HENSYU-SEC
            END-PERFORM
       *    カーソルクロース
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key37"             TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
+           IF   FLG-ERR   =   ZERO
+             MOVE    "tbl_sryacct"       TO  MCP-TABLE
+             MOVE    "key37"             TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-IF
       *
       *    診療会計より仮収納を作成しなかったときのみ処理
            IF    ( WRK-DATAKBN         =   SPACE )
@@ -1450,14 +1477,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    PERFORM 200212-KOBETU-NYUINACCT-HENSYU-SEC
                END-PERFORM
       *        カーソルクロース
-               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-               MOVE    "key14"             TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               IF   FLG-ERR   =   ZERO
+                 MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                 MOVE    "key14"             TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
            END-IF 
       *
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key7"              TO  MCP-PATHNAME
-           PERFORM 900-SYS2002-READ-SEC
+           IF   FLG-ERR   =   ZERO
+              MOVE    "tbl_syskanri"      TO  MCP-TABLE
+              MOVE    "key7"              TO  MCP-PATHNAME
+              PERFORM 900-SYS2002-READ-SEC
+           END-IF
       *
            .
        20021-KOBETU-HENSYU-EXT.
@@ -1489,6 +1520,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            OR      FLG-ERR         =   1
                            OR      KEY-NEW     NOT =   KEY-OLD
       *
+               MOVE    3     TO   FLG-NG
                PERFORM   20011-SRYACCT-FILE-HENSYU-SEC 
       *
                IF        FLG-ERR            =    1
@@ -1551,6 +1583,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          ( WRK-DAY (2 IDX)     >   ZERO )
                        PERFORM 200121-NYUINACCT-CHK-SEC
                        IF      WRK-SYOKBN      =   SPACE
+                           MOVE    4     TO   FLG-NG
                            PERFORM 200122-NYUINACCT-HENSYU-SEC
                            IF      WRK-DATAKBN     =   "1" 
                            OR      FLG-ERR         =    1
@@ -1691,6 +1724,41 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
               INTO    ERR-HEN-ERRMSG
               END-STRING
            END-IF
+      *
+           DISPLAY "ERR-ERRMSG=" ERR-ERRMSG
+           DISPLAY "ERR-PTNUM=" ERR-PTNUM
+      *
+           EVALUATE    WRK-PARA-SYOKBN
+             WHEN    "1"
+               IF   FLG-NG  =  1
+                 MOVE    "tbl_sryacct"     TO  MCP-TABLE
+                 MOVE    "key36"           TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
+               IF   FLG-NG  =  2
+                 MOVE    "tbl_nyuinacct"   TO  MCP-TABLE
+                 MOVE    "key13"           TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
+             WHEN    "2"
+               IF   FLG-NG  =  3
+                 MOVE    "tbl_sryacct"     TO  MCP-TABLE
+                 MOVE    "key37"           TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
+               IF   FLG-NG  =  4
+                 MOVE    "tbl_nyuinacct"   TO  MCP-TABLE
+                 MOVE    "key14"           TO  MCP-PATHNAME
+                 PERFORM 900-CLOSE-SEC
+               END-IF
+               IF   WRK-PARA-SHELLID  =  "RECEPTX"
+                 CONTINUE
+               ELSE
+                 MOVE      "tbl_syskanri"  TO  MCP-TABLE
+                 MOVE      "key7"          TO  MCP-PATHNAME
+                 PERFORM   900-CLOSE-SEC
+               END-IF
+           END-EVALUATE
       *
            .
        600-ERRMSG-EDIT-EXT.

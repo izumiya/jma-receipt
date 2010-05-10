@@ -115,6 +115,7 @@
       *  04.04.06    NACL-門脇    10/03/11  改正対応（外泊区分５の対応）
       *  04.04.07    NACL-門脇    10/03/31  改正対応（頸部固定帯加算の対応）
       *  04.04.08    NACL-門脇    10/04/14  埼玉県地方公費対応（行田市）
+      *  04.04.09    NACL-門脇    10/05/07  入院料剤点チェック
       *
       *  04.05.01    NACL-門脇    09/12/04  食事（特別食）の他保険対応
       *  04.05.02    NACL-門脇    10/01/07  治験対応
@@ -145,9 +146,11 @@
            03  WRK-CHECK-EDDAY             PIC 9(02).
            03  WRK-MSGCD                   PIC 9(02).
            03  WRK-NYUINRYO-ERR            PIC 9(01).
+           03  WRK-NYUINRYO-ERR2           PIC 9(01).
            03  WRK-GENTEN-ERR              PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
+           03  WRK-HIKAKU-ZAITEN           PIC 9(08).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -767,6 +770,11 @@
            IF    LNK-S02-RC   =   ZERO
              IF   WRK-NYUINRYO-ERR  =  1
                 MOVE     17     TO    LNK-S02-RC
+             END-IF
+           END-IF.
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-NYUINRYO-ERR2 =  1
+                MOVE     20     TO    LNK-S02-RC
              END-IF
            END-IF.
       *
@@ -3061,6 +3069,9 @@ grpsys                              SPA-AREA
               IF   LNK-SROUNYUIN-RC   =   7
                    MOVE    1    TO   WRK-NYUINRYO-ERR
               END-IF
+              IF   LNK-SROUNYUIN-RC   =   8
+                   MOVE    1    TO   WRK-NYUINRYO-ERR2
+              END-IF
       *
            END-IF
       *
@@ -3135,6 +3146,22 @@ grpsys                            SPA-AREA
                          END-IF
                      END-IF                  
                END-PERFORM
+           END-IF
+      *
+      *    入院料剤点チェック
+           COMPUTE  WRK-HIKAKU-ZAITEN = WRK-KHNTEN + WRK-KSNTEN
+           IF     WRK-HYOKETU-TEN    NOT =   ZERO
+             COMPUTE WRK-HIKAKU-ZAITEN =
+                   ( WRK-HIKAKU-ZAITEN -
+                    (WRK-HIKAKU-ZAITEN * (WRK-HYOKETU-TEN / 100)) )
+                                                                + 0.5
+           END-IF
+           IF   SYU-SRYYMD(1:6) >= "201004"
+             IF   NACCT-ZAITEN   =  WRK-HIKAKU-ZAITEN
+               CONTINUE
+             ELSE
+               MOVE    1    TO   WRK-NYUINRYO-ERR2
+             END-IF
            END-IF
       *
       *    看護比率基準未達時の入院基本点数の取得
