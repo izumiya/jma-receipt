@@ -113,6 +113,7 @@
       *                                     （コメント自動記載）
       *  04.04.08    NACL-門脇    10/04/23  在宅血液透析頻回指導管理料の
       *                                     コメント自動記載修正
+      *  04.04.09    NACL-門脇    10/05/10  入院期間コメント修正
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
@@ -6575,8 +6576,14 @@
       ***                  TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)(27:4)
       ***        ELSE
                    MOVE   16 TO  WRK-RECE65XX2-YUKOKETA(MAX-MEISAISU 1)
-                   MOVE   "療養病棟入院期間　　　日〜　　日"
+                   EVALUATE RECE62-HOSPSBT
+                     WHEN    "1"
+                       MOVE   "療養病棟入院期間　　　日〜　　日"
                            TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
+                     WHEN    "2"
+                       MOVE   "療養病床入院期間　　　日〜　　日"
+                           TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
+                   END-EVALUATE
                    MOVE   TBL-NYU-DAY-ST(IDX) TO  DAY-IDX2
                    MOVE   TBL-DAY(DAY-IDX2)
                            TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)(19:4)
