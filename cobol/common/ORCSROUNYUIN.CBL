@@ -76,6 +76,8 @@
       *  04.02.03    NACL-ÌçÏÆ    08/09/24  Æþ±¡Î¬¾ÎÊÔ½¸ÄÉ²Ã
       *  04.02.04    NACL-ÌçÏÆ    08/10/07  Æþ±¡´ðËÜÎÁÍ­¸ú´ü´Ö¥Á¥§¥Ã¥¯
       *  04.04.01    NACL-ÌçÏÆ    09/09/04  ¾®Æþ´ÉÎ¬¾Î½¤Àµ
+      *  04.04.02    NACL-ÌçÏÆ    10/05/07  Æþ±¡ÎÁºÞÅÀ¥Á¥§¥Ã¥¯
+      *
       *****************************************************************
       *
       *
@@ -228,6 +230,12 @@
            03  WRK-ZAITEN-HYOKETU          PIC 9(08).
       *
            03  WRK-NYUINRYO-ERR            PIC 9(01).
+           03  WRK-NYUINRYO-ERR2           PIC 9(01).
+      *
+           03  WRK-KHNTEN                  PIC 9(08). 
+           03  WRK-KSNTEN                  PIC S9(08).
+           03  WRK-HYOTEN                  PIC 9(09)V99.
+           03  WRK-HIKAKU-ZAITEN           PIC 9(08).
       *
       *    Ï«ºÒÆþ±¡²ñ·×¥ï¡¼¥¯
            03  WRK-ROUSAI-TABLE.
@@ -611,6 +619,11 @@
            IF  LNK-SROUNYUIN-RC  =  ZERO
              IF   WRK-NYUINRYO-ERR  =  1
                 MOVE     7     TO    LNK-SROUNYUIN-RC
+             END-IF
+           END-IF
+           IF  LNK-SROUNYUIN-RC  =  ZERO
+             IF   WRK-NYUINRYO-ERR2 =  1
+                MOVE     8     TO    LNK-SROUNYUIN-RC
              END-IF
            END-IF
            .
@@ -2293,6 +2306,9 @@
                                               WRK-SRYKBN
                                               WRK-SHOKIKSN-TAIHI
                                               WRK-HYOKETU-TAIHI
+                   MOVE      ZERO     TO      WRK-KHNTEN
+                                              WRK-KSNTEN
+                                              WRK-HYOTEN
                    IF    NACCT-SRYCDTOTAL     =    99999916
                        CONTINUE
                    ELSE
@@ -2323,6 +2339,9 @@
                                       PERFORM 910-TENSU-READ-SEC
                                       IF  FLG-TENSU  NOT = ZERO
                                         MOVE  1 TO  WRK-NYUINRYO-ERR
+                                      ELSE
+                                        MOVE TNS-TEN
+                                                TO  WRK-KHNTEN
                                       END-IF
                                   END-IF
       *
@@ -2343,12 +2362,20 @@
                                       PERFORM 910-TENSU-READ-SEC
                                       EVALUATE  TNS-TENSIKIBETU
                                          WHEN     3
+                                             MOVE   NSRY-SRYCD(IDX3)  TO
+                                                      WRK-SHOKIKSN-TAIHI
+                                             MOVE     TNS-TEN         TO
+                                                      WRK-KSNTEN
                                          WHEN     8
                                              MOVE   NSRY-SRYCD(IDX3)  TO
                                                       WRK-SHOKIKSN-TAIHI
+                                             COMPUTE  WRK-KSNTEN =
+                                                      TNS-TEN    *  -1
                                          WHEN     6
                                              MOVE   NSRY-SRYCD(IDX3)  TO
                                                       WRK-HYOKETU-TAIHI
+                                             MOVE     TNS-TEN         TO
+                                                      WRK-HYOTEN
                                       END-EVALUATE
                                     END-IF
                                   END-PERFORM
@@ -2366,6 +2393,26 @@
                                   PERFORM   210-RYAKUSYO-HENSYU-SEC
       *
                                   MOVE    1     TO    FLG-RYAKU
+      *
+      *                           Æþ±¡ÎÁºÞÅÀ¥Á¥§¥Ã¥¯
+                                  COMPUTE  WRK-HIKAKU-ZAITEN =
+                                           WRK-KHNTEN + WRK-KSNTEN
+                                  IF  WRK-HYOTEN  NOT =  ZERO
+                                    COMPUTE WRK-HIKAKU-ZAITEN =
+                                          ( WRK-HIKAKU-ZAITEN -
+                                           (WRK-HIKAKU-ZAITEN *
+                                            (WRK-HYOTEN / 100)) )
+                                                              + 0.5
+                                  END-IF
+                                  IF  NACCT-ZAITEN  NOT =  ZERO
+                                    IF  NACCT-ZAITEN  =
+                                                    WRK-HIKAKU-ZAITEN
+                                      CONTINUE
+                                    ELSE
+                                      MOVE   1  TO  WRK-NYUINRYO-ERR2
+                                    END-IF
+                                  END-IF
+      *
                                END-IF
       *
                                IF    WRK-SHOKIKSN-TAIHI  NOT = SPACE
