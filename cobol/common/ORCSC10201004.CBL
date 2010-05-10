@@ -3888,12 +3888,14 @@
        200-ALL-SYORI-SEC               SECTION.
       *
       *    重複チェック
-           IF      LNK-ORCSC-PG        =   "K02"
+           IF     (LNK-ORCSC-PG        =   "K02" )
+      *       外来のみ
+              AND (SPA-NYUGAIKBN       =   "2"   )
       *
-           PERFORM 2000-JYUFUKU-CHK-SEC
-           IF      SPA-ERRCD       NOT =   SPACE
-               GO      TO      200-ALL-SYORI-EXT
-           END-IF
+               PERFORM 2000-JYUFUKU-CHK-SEC
+               IF      SPA-ERRCD       NOT =   SPACE
+                   GO      TO      200-ALL-SYORI-EXT
+               END-IF
       *
            END-IF
       *
