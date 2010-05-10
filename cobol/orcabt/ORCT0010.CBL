@@ -223,6 +223,8 @@
                "保険組合せの有効期間が切れています".
            03  ERR-MSG16                   PIC X(100)    VALUE
                "包括点数の治験減点分の点数を確認してください".
+           03  ERR-MSG17                   PIC X(100)    VALUE
+               "入院点数に誤りがあります。".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -930,6 +932,8 @@
                    MOVE    "0015"      TO  ERR-ERRCD
                WHEN    19
                    MOVE    "0016"      TO  ERR-ERRCD
+               WHEN    20
+                   MOVE    "0017"      TO  ERR-ERRCD
                WHEN    OTHER
                    MOVE    "0006"      TO  ERR-ERRCD
                END-EVALUATE
@@ -1572,6 +1576,8 @@
                MOVE    ERR-MSG15       TO  ERR-ERRMSG
            WHEN    "0016"
                MOVE    ERR-MSG16       TO  ERR-ERRMSG
+           WHEN    "0017"
+               MOVE    ERR-MSG17       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE
