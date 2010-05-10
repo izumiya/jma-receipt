@@ -430,6 +430,7 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *  04.04.49    NACL-ÌçÏÆ    10/04/16  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.50    NACL-ÌçÏÆ    10/04/30  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -810,12 +811,14 @@
            03  FTN-KOH-XX4                             PIC 9(09).
            03  FTN-KOH-XX5                             PIC 9(09).
            03  FTN-KOH-XX6                             PIC 9(09).
+           03  FTN-KOH-XX7                             PIC 9(09).
            03  FTN-KOH-YYY                             PIC 9(09).       
            03  FTN-KOH-YY2                             PIC 9(09).
            03  FTN-KOH-YY3                             PIC 9(09).
            03  FTN-KOH-YY4                             PIC 9(09).
            03  FTN-KOH-YY5                             PIC 9(09).
            03  FTN-KOH-YY6                             PIC 9(09).
+           03  FTN-KOH-YY7                             PIC 9(09).
            03  FLG-KOH                                 PIC 9(01).
            03  WRK-FTNKEI                              PIC 9(09).
            03  WRK-FTNKEI-FTN                          PIC 9(09).
@@ -1270,6 +1273,10 @@
            03  WRK-KOH-KINGAKU                 PIC  9(07).
       *
            03  WRK-FTNMONEY-MAE                PIC  9(09).
+      *
+           03  WRK-CYOKI-KEISAN                PIC 9(09).
+           03  WRK-CYOKI-KEISAN2               PIC 9(09).
+           03  WRK-CYOKI-KEISAN3               PIC 9(09).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -11048,7 +11055,7 @@
                                        TO  WRK-CHK-FTNGAKU
                     MOVE   LNK-KOREIFTNCHK-KOHFTNGAKU
                                        TO  WRK-CHK-KOHFTNGAKU
-                    IF  FLG-ZENKOKUKOHI-NISYU = ZERO
+                    IF  FLG-ZENKOKUKOHI-NISYU = ZERO OR 3
                       MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU
                                        TO  FTN-KOH-XXX
                                            WRK-CHK-ICHIBUGAKU
@@ -11382,6 +11389,7 @@
                    MOVE     3        TO   FLG-KEISAN
                  ELSE
                    MOVE     1        TO   FLG-KEISAN-TOK2
+                   MOVE     4        TO   FLG-KEISAN
                  END-IF
                  MOVE      1         TO   FLG-CYOKI
                  IF  FLG-TOKU75 = 1 OR 2
@@ -11410,6 +11418,7 @@
                       MOVE     3     TO   FLG-KEISAN
                     ELSE
                       MOVE     1     TO   FLG-KEISAN-TOK2
+                      MOVE     4     TO   FLG-KEISAN
                     END-IF
                     MOVE      2      TO   FLG-CYOKI
                     IF  FLG-TOKU75 = 1 OR 2
@@ -11584,6 +11593,7 @@
                    MOVE     3         TO   FLG-KEISAN
                  ELSE
                    MOVE     1         TO   FLG-KEISAN-TOK2
+                   MOVE     4         TO   FLG-KEISAN
                  END-IF
                  MOVE      2          TO   FLG-JYOGENKBN2
                  MOVE      1          TO   FLG-CYOKI
@@ -11613,6 +11623,7 @@
                       MOVE     3      TO   FLG-KEISAN
                     ELSE
                       MOVE     1      TO   FLG-KEISAN-TOK2
+                      MOVE     4      TO   FLG-KEISAN
                     END-IF
                     MOVE      3       TO   FLG-JYOGENKBN2
                     MOVE      2       TO   FLG-CYOKI
@@ -11752,6 +11763,27 @@
                       ADD  WRK-KINGAKU-TOK3 TO  WRK-KINGAKU-TOK1
                  ELSE
                       ADD  WRK-FTNKEI       TO  WRK-KINGAKU-TOK1
+                 END-IF
+               WHEN         4
+                 IF  FTN-KOH-XXX  >   WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  FTN-KOH-XXX
+                 END-IF
+                 COMPUTE  FTN-KOH-YYY  =   WRK-KINGAKU -  FTN-KOH-XXX
+                 IF  WRK-FTNKEI   >   FTN-KOH-YYY
+                      ADD    FTN-KOH-YYY    TO  RECE62-FTNMONEY(1)
+                                                FTN-KOH-XXX
+                 ELSE
+                      ADD    WRK-FTNKEI     TO  RECE62-FTNMONEY(1)
+                                                FTN-KOH-XXX
+                 END-IF
+                 IF  FTN-KOH-XX7  >   WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  FTN-KOH-XX7
+                 END-IF
+                 COMPUTE  FTN-KOH-YY7  =   WRK-KINGAKU -  FTN-KOH-XX7
+                 IF  WRK-FTNKEI   >   FTN-KOH-YY7
+                      ADD    FTN-KOH-YY7    TO  FTN-KOH-XX7
+                 ELSE
+                      ADD    WRK-FTNKEI     TO  FTN-KOH-XX7
                  END-IF
              END-EVALUATE
            ELSE
@@ -15393,6 +15425,7 @@
                      MOVE  ZERO         TO  RECE62-KOUREI-SAIKEI
                   ELSE
                     IF  FLG-SAIKEI-KISAI  NOT = ZERO
+                    OR  FLG-ZENKOKUKOHI-NISYU =  3
                          CONTINUE
                     ELSE
                       IF  (RECE62-KOHNUM(1)   NOT = "972" AND "974")
@@ -15429,6 +15462,54 @@
                   AND FTN-KOH-XX6   NOT =   ZERO
                     MOVE   FTN-KOH-XX5  TO  RECE62-KOUREI-SAIKEI
                     MOVE   FTN-KOH-XX6  TO  RECE62-KOUREI-SAIKEI2
+                    IF     FLG-KOH  =   2
+                      COMPUTE RECE62-FTNMONEY(2)     =
+                              RECE62-FTNMONEY(2)     - WRK-KOH-GAI
+                      COMPUTE RECE62-FTNMONEY-KOJ(2) =
+                              RECE62-FTNMONEY-KOJ(2) - WRK-KOH-GAI
+                      COMPUTE WRK-CYOKI-KEISAN3 = RECE62-FTNMONEY(1)
+                                                - FTN-KOH-XX5
+                      ADD WRK-CYOKI-KEISAN3 TO RECE62-FTNMONEY(2)
+                                               RECE62-FTNMONEY-KOJ(2)
+      *
+                      COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
+                                                - WRK-KOH-GAI2
+                      COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
+                                                + FTN-KOH-XX6
+                      IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
+                        COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
+                                                  - FTN-KOH-XX5
+                        IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX6
+                          MOVE  WRK-CYOKI-KEISAN3
+                                        TO   RECE62-KOUREI-SAIKEI2
+                          IF    WRK-CYOKI-KEISAN3  = ZERO
+                             MOVE   1   TO   RECE62-YOBIETC(7)
+                          END-IF
+                        END-IF
+                      END-IF
+                    END-IF
+                  END-IF
+      *
+                  IF   FLG-KEISAN-TOK1        =   1
+                  AND  FLG-KEISAN-TOK2        =   1
+                  AND  FLG-ZENKOKUKOHI-NISYU  =   2
+                      MOVE  ZERO         TO  FLG-ZENKOKUKOHI-NISYU
+                      MOVE  FTN-KOH-XX7  TO  RECE62-KOUREI-SAIKEI2
+                      COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
+                                                - WRK-KOH-GAI2
+                      COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XXX
+                                                + FTN-KOH-XX7
+                      IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
+                        COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
+                                                  - FTN-KOH-XXX
+                        IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX7
+                          MOVE  WRK-CYOKI-KEISAN3
+                                        TO   RECE62-KOUREI-SAIKEI2
+                          IF    WRK-CYOKI-KEISAN3  = ZERO
+                             MOVE   1   TO   RECE62-YOBIETC(7)
+                          END-IF
+                        END-IF
+                      END-IF
                   END-IF
               END-IF
            END-IF
@@ -15437,7 +15518,12 @@
                   MOVE     999999999    TO  RECE62-KOUREI-SAIKEI
              END-IF
              IF    RECE62-KOUREI-SAIKEI2  =   ZERO
+             AND   RECE62-YOBIETC(7)      =   ZERO
+                IF   FLG-ZENKOKUKOHI-NISYU =  3
+                  MOVE      1           TO  RECE62-YOBIETC(7)
+                ELSE
                   MOVE     999999999    TO  RECE62-KOUREI-SAIKEI2
+                END-IF
              END-IF
            END-IF
       *
@@ -15684,6 +15770,7 @@
                                 RECE62-KOUREI-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE     ZERO       TO  RECE62-KOUREI-SAIKEI
+                       MOVE      1         TO  RECE62-YOBIETC(6)
                      END-IF
                    END-IF
                  END-IF
@@ -15731,6 +15818,7 @@
                                 RECE62-KOUREI-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE   ZERO            TO  RECE62-KOUREI-SAIKEI
+                       MOVE    1              TO  RECE62-YOBIETC(6)
                      END-IF
                    END-IF
                  END-IF
@@ -17050,16 +17138,30 @@
              IF ((WRK-PREFNUM =  "27") AND (RECE62-KOUREI       = "1"))
              OR ((WRK-PREFNUM =  "28") AND (RECE62-KOUREI       = "1")
                                        AND (RECE62-TEISYUTUSAKI =  6 ))
-               IF  ( RECE62-KOHNUM(1)(1:1)   =  "0"              )
-               AND ( RECE62-KOHNUM(1)    NOT =  "012" AND "025"  )
-               AND ( RECE62-KOHNUM(2)(1:1)  >=  "1" AND <= "8"   )
-               AND ( RECE62-KOHNUM(3)        = SPACE             )
-               AND ( RECE62-KOHNUM(4)        = SPACE             )
+               IF  ((RECE62-KOHNUM(1)(1:1)   =  "0"            ) AND
+                    (RECE62-KOHNUM(1)    NOT =  "012" AND "025") AND
+                    (RECE62-KOHNUM(2)(1:1)  >=  "1" AND <= "8" ) AND
+                    (RECE62-KOHNUM(3)        = SPACE           ) AND
+                    (RECE62-KOHNUM(4)        = SPACE           ))
+               OR  ((RECE62-KOHNUM(1)(1:1)   =  "0"            ) AND
+                    (RECE62-KOHNUM(1)    NOT =  "012" AND "025") AND
+                    (RECE62-KOHNUM(2)        =  "972" OR "974" ) AND
+                    (RECE62-KOHNUM(3)(1:1)  >=  "1" AND <= "8" ) AND
+                    (RECE62-KOHNUM(4)        = SPACE           ))
       *
                   MOVE      2       TO     FLG-ZENKOKUKOHI-NISYU
       *
-                  IF    RECE62-HKNCOMBI(2)   =   ZERO
-                     MOVE   ZERO    TO     FLG-ZENKOKUKOHI-NISYU
+                  IF  WRK-PREFNUM =  "27"
+      **>            IF    RECE62-HKNCOMBI(2)   =   ZERO
+      **>                 MOVE    3       TO   FLG-ZENKOKUKOHI-NISYU
+      **>            END-IF
+                     IF    RECE62-HKNCOMBI(2)   =   ZERO
+                          MOVE    ZERO    TO   FLG-ZENKOKUKOHI-NISYU
+                     END-IF
+                  ELSE
+                     IF    RECE62-HKNCOMBI(2)   =   ZERO
+                          MOVE    ZERO    TO   FLG-ZENKOKUKOHI-NISYU
+                     END-IF
                   END-IF
                END-IF
              END-IF

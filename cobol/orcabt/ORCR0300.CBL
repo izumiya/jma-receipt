@@ -330,6 +330,7 @@
       *                                     Æ±»þ¤Ë¹Ô¤Ã¤¿¾ì¹ç¤Îµ­Ï¿ÊýË¡
       *  04.04.16    NACL-Æ£¸¶    10/04/23  ²èÁü¿ÇÃÇ¤Î²Ã»»¹àÌÜ¤Îµ­Ï¿ÊýË¡
       *                                     ¤Î½¤Àµ
+      *  04.04.17    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­Ï¿¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2800,11 +2801,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            PERFORM 5005-NUM-HENSYU-SEC
       *    ÉéÃ´¶â³Û¡Ê¸øÈñµëÉÕÂÐ¾Ý³°Íè°ìÉôÉéÃ´¶â¡Ë
            IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE02-PREFNUM      =  "38"                     ) AND
+                (RECE02-YOBIETC(6)   =   1                       ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT = 999999999         ) AND
                 (IDY                 =   1                       ))
            OR  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE02-PREFNUM  NOT =  "38"                     ) AND
+                (RECE02-YOBIETC(6)   =  ZERO                     ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT = 999999999 AND ZERO) AND
                 (IDY                 =   1                       ))
            OR  ((RECE02-SRYYM       <   WRK-CONS-SRYYM-200804    ) AND
@@ -2814,6 +2815,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-YOBIETC(7)   =   1                       ) AND
+                (RECE02-ZAITAKU-SAIKEI2  NOT = 999999999         ) AND
+                (IDY                 =   2                       ))
+           OR  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-YOBIETC(7)   =  ZERO                     ) AND
                 (RECE02-ZAITAKU-SAIKEI2  NOT = 999999999 AND ZERO) AND
                 (IDY                 =   2                       ))
                MOVE   RECE02-ZAITAKU-SAIKEI2   TO  WRK-NUM

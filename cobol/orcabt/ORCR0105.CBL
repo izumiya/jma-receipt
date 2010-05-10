@@ -79,14 +79,15 @@
       *  04.04.09    NACL-Æ£¸¶    10/03/03  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀÁµá´É
       *                                     Íý¤ÎºîÀ®¤ò¤·¤Ê¤¤
-      *  04.04.04    NACL-Æ£¸¶    10/03/12  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *  04.04.10    NACL-Æ£¸¶    10/03/12  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀ¯ÉÜ´É
       *                                     ¾¸¤ò¥¨¥é¡¼¤È¤¹¤ë
-      *  04.04.05    NACL-Æ£¸¶    10/03/29  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *  04.04.11    NACL-Æ£¸¶    10/03/29  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
       *                                     ¹Ô¤¦¤è¤¦¤Ë¤¹¤ë
-      *  04.04.06    NACL-Æ£¸¶    10/04/13  °¦ÃÎ¸©ÂÐ±þ
+      *  04.04.12    NACL-Æ£¸¶    10/04/13  °¦ÃÎ¸©ÂÐ±þ
       *                                     À¸ÊÝ¤ÈÆÃÄê¼À´µ£¹£±¤Îµ­ºÜ½ç 
+      *  04.04.13    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­ºÜ¾ò·ï½¤Àµ
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4633,16 +4634,19 @@
                    END-IF
                END-IF
            END-IF
-           IF  ((SYS-1001-PREFNUM            =   "38"             ) AND
+           IF  ((RECE02-YOBIETC(6)           =   1                ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT =  999999999         ))
-           OR  ((SYS-1001-PREFNUM        NOT =   "38"             ) AND
+           OR  ((RECE02-YOBIETC(6)           =  ZERO              ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT =  999999999 AND ZERO))
              MOVE    "("                    TO  HC06-FTNMONEYSAI(1:1)
              MOVE   RECE02-ZAITAKU-SAIKEI   TO  WRK-KGK7
              MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI(3:8)
              MOVE    ")"                    TO  HC06-FTNMONEYSAI(11:1)
            END-IF
-           IF    RECE02-ZAITAKU-SAIKEI2  NOT =  999999999 AND ZERO
+           IF  ((RECE02-YOBIETC(7)           =   1                ) AND
+                (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999         ))
+           OR  ((RECE02-YOBIETC(7)           =  ZERO              ) AND
+                (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999 AND ZERO))
              MOVE    "("                    TO  HC06-FTNMONEYSAI2(1:1)
              MOVE   RECE02-ZAITAKU-SAIKEI2  TO  WRK-KGK7
              MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI2(3:8)

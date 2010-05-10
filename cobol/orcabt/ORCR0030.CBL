@@ -463,6 +463,7 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *  04.04.49    NACL-ÌçÏÆ    10/04/16  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.50    NACL-ÌçÏÆ    10/04/30  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -828,12 +829,14 @@
            03  FTN-KOH-XX4                             PIC 9(09).
            03  FTN-KOH-XX5                             PIC 9(09).
            03  FTN-KOH-XX6                             PIC 9(09).
+           03  FTN-KOH-XX7                             PIC 9(09).
            03  FTN-KOH-YYY                             PIC 9(09).       
            03  FTN-KOH-YY2                             PIC 9(09).
            03  FTN-KOH-YY3                             PIC 9(09).
            03  FTN-KOH-YY4                             PIC 9(09).
            03  FTN-KOH-YY5                             PIC 9(09).
            03  FTN-KOH-YY6                             PIC 9(09).
+           03  FTN-KOH-YY7                             PIC 9(09).
            03  FLG-KOH                                 PIC 9(01).
            03  WRK-FTNKEI                              PIC 9(09).
            03  WRK-FTNKEI2                             PIC 9(09).
@@ -1124,6 +1127,10 @@
            03  WRK-SURYOU-COUNT                PIC  9(09).
       *
            03  WRK-FTNMONEY-MAE                PIC  9(09).
+      *
+           03  WRK-CYOKI-KEISAN                PIC 9(09).
+           03  WRK-CYOKI-KEISAN2               PIC 9(09).
+           03  WRK-CYOKI-KEISAN3               PIC 9(09).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -3518,7 +3525,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                                        TO  WRK-CHK-FTNGAKU
                     MOVE   LNK-KOREIFTNCHK-KOHFTNGAKU
                                        TO  WRK-CHK-KOHFTNGAKU
-                    IF  FLG-ZENKOKUKOHI-NISYU = ZERO
+                    IF  FLG-ZENKOKUKOHI-NISYU = ZERO OR 3
                       MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU
                                        TO  FTN-KOH-XXX
                                            WRK-CHK-ICHIBUGAKU
@@ -3647,16 +3654,30 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              IF ((SYS-1001-PREFNUM = 27) AND (RECE02-ZAITAKU = "1"))
              OR ((SYS-1001-PREFNUM = 28) AND (RECE02-ZAITAKU = "1")
                                     AND (RECE02-TEISYUTUSAKI =  6 ))
-               IF  ( RECE02-KOHNUM(1)(1:1)   =  "0"              )
-               AND ( RECE02-KOHNUM(1)    NOT =  "012" AND "025"  )
-               AND ( RECE02-KOHNUM(2)(1:1)  >=  "1" AND <= "8"   )
-               AND ( RECE02-KOHNUM(3)        = SPACE             )
-               AND ( RECE02-KOHNUM(4)        = SPACE             )
+               IF  ((RECE02-KOHNUM(1)(1:1)   =  "0"            ) AND
+                    (RECE02-KOHNUM(1)    NOT =  "012" AND "025") AND
+                    (RECE02-KOHNUM(2)(1:1)  >=  "1" AND <= "8" ) AND
+                    (RECE02-KOHNUM(3)        = SPACE           ) AND
+                    (RECE02-KOHNUM(4)        = SPACE           ))
+               OR  ((RECE02-KOHNUM(1)(1:1)   =  "0"            ) AND
+                    (RECE02-KOHNUM(1)    NOT =  "012" AND "025") AND
+                    (RECE02-KOHNUM(2)        =  "972" OR "974" ) AND
+                    (RECE02-KOHNUM(3)(1:1)  >=  "1" AND <= "8" ) AND
+                    (RECE02-KOHNUM(4)        = SPACE           ))
       *
                   MOVE        2           TO   FLG-ZENKOKUKOHI-NISYU
       *
-                  IF    RECE02-HKNCOMBI(2)   =   ZERO
-                          MOVE    ZERO    TO   FLG-ZENKOKUKOHI-NISYU
+                  IF  SYS-1001-PREFNUM = 27
+      **>            IF    RECE02-HKNCOMBI(2)   =   ZERO
+      **>               MOVE    3      TO   FLG-ZENKOKUKOHI-NISYU
+      **>            END-IF
+                     IF    RECE02-HKNCOMBI(2)   =   ZERO
+                        MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
+                     END-IF
+                  ELSE
+                     IF    RECE02-HKNCOMBI(2)   =   ZERO
+                        MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
+                     END-IF
                   END-IF
                END-IF
              END-IF
@@ -8437,6 +8458,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE     3        TO   FLG-KEISAN
                  ELSE
                    MOVE     1        TO   FLG-KEISAN-TOK2
+                   MOVE     4        TO   FLG-KEISAN
                  END-IF
                  IF      RECE02-TEISYOTOKU  NOT =  SPACE
                     IF  FLG-TOKU75 = 1 OR 2
@@ -8627,6 +8649,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE     3        TO   FLG-KEISAN
                  ELSE
                    MOVE     1        TO   FLG-KEISAN-TOK2
+                   MOVE     4        TO   FLG-KEISAN
                  END-IF
                  MOVE     2          TO   FLG-JYOGENKBN2
                  MOVE     1          TO   FLG-CYOKI
@@ -8656,6 +8679,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE     3        TO   FLG-KEISAN
                    ELSE
                       MOVE     1        TO   FLG-KEISAN-TOK2
+                      MOVE     4        TO   FLG-KEISAN
                    END-IF
                    MOVE      3          TO   FLG-JYOGENKBN2
                    IF  FLG-TOKU75 = 3
@@ -8793,6 +8817,27 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD  WRK-KINGAKU-TOK3 TO  WRK-KINGAKU-TOK1
                  ELSE
                       ADD  WRK-FTNKEI       TO  WRK-KINGAKU-TOK1
+                 END-IF
+               WHEN         4
+                 IF  FTN-KOH-XXX  >   WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  FTN-KOH-XXX
+                 END-IF
+                 COMPUTE  FTN-KOH-YYY  =   WRK-KINGAKU -  FTN-KOH-XXX
+                 IF  WRK-FTNKEI   >   FTN-KOH-YYY
+                      ADD    FTN-KOH-YYY    TO  RECE02-FTNMONEY(1)
+                                                FTN-KOH-XXX
+                 ELSE
+                      ADD    WRK-FTNKEI     TO  RECE02-FTNMONEY(1)
+                                                FTN-KOH-XXX
+                 END-IF
+                 IF  FTN-KOH-XX7  >   WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  FTN-KOH-XX7
+                 END-IF
+                 COMPUTE  FTN-KOH-YY7  =   WRK-KINGAKU -  FTN-KOH-XX7
+                 IF  WRK-FTNKEI   >   FTN-KOH-YY7
+                      ADD    FTN-KOH-YY7    TO  FTN-KOH-XX7
+                 ELSE
+                      ADD    WRK-FTNKEI     TO  FTN-KOH-XX7
                  END-IF
              END-EVALUATE
            ELSE
@@ -10496,6 +10541,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE   ZERO         TO  RECE02-ZAITAKU-SAIKEI
                   ELSE
                     IF  FLG-SAIKEI-KISAI  NOT = ZERO
+                    OR  FLG-ZENKOKUKOHI-NISYU =  3
                          CONTINUE
                     ELSE
                       IF  (RECE02-KOHNUM(1)   NOT = "972" AND "974")
@@ -10532,6 +10578,54 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   AND FTN-KOH-XX6   NOT =   ZERO
                     MOVE   FTN-KOH-XX5   TO  RECE02-ZAITAKU-SAIKEI
                     MOVE   FTN-KOH-XX6   TO  RECE02-ZAITAKU-SAIKEI2
+                    IF     FLG-KOH  =   2
+                      COMPUTE RECE02-FTNMONEY(2)     =
+                              RECE02-FTNMONEY(2)     - WRK-KOH-GAI
+                      COMPUTE RECE02-FTNMONEY-KOJ(2) =
+                              RECE02-FTNMONEY-KOJ(2) - WRK-KOH-GAI
+                      COMPUTE WRK-CYOKI-KEISAN3 = RECE02-FTNMONEY(1)
+                                                - FTN-KOH-XX5
+                      ADD WRK-CYOKI-KEISAN3 TO RECE02-FTNMONEY(2)
+                                               RECE02-FTNMONEY-KOJ(2)
+      *
+                      COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
+                                                - WRK-KOH-GAI2
+                      COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
+                                                + FTN-KOH-XX6
+                      IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
+                        COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
+                                                  - FTN-KOH-XX5
+                        IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX6
+                          MOVE  WRK-CYOKI-KEISAN3
+                                        TO   RECE02-ZAITAKU-SAIKEI2
+                          IF    WRK-CYOKI-KEISAN3  = ZERO
+                             MOVE   1   TO   RECE02-YOBIETC(7)
+                          END-IF
+                        END-IF
+                      END-IF
+                    END-IF
+                  END-IF
+      *
+                  IF   FLG-KEISAN-TOK1        =   1
+                  AND  FLG-KEISAN-TOK2        =   1
+                  AND  FLG-ZENKOKUKOHI-NISYU  =   2
+                      MOVE  ZERO         TO  FLG-ZENKOKUKOHI-NISYU
+                      MOVE  FTN-KOH-XX7  TO  RECE02-ZAITAKU-SAIKEI2
+                      COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
+                                                - WRK-KOH-GAI2
+                      COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XXX
+                                                + FTN-KOH-XX7
+                      IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
+                        COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
+                                                  - FTN-KOH-XXX
+                        IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX7
+                          MOVE  WRK-CYOKI-KEISAN3
+                                        TO   RECE02-ZAITAKU-SAIKEI2
+                          IF    WRK-CYOKI-KEISAN3  = ZERO
+                             MOVE   1   TO   RECE02-YOBIETC(7)
+                          END-IF
+                        END-IF
+                      END-IF
                   END-IF
               END-IF
            END-IF
@@ -10540,7 +10634,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE     999999999    TO  RECE02-ZAITAKU-SAIKEI
              END-IF
              IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
+             AND   RECE02-YOBIETC(7)       =   ZERO
+                IF   FLG-ZENKOKUKOHI-NISYU =  3
+                  MOVE      1           TO  RECE02-YOBIETC(7)
+                ELSE
                   MOVE     999999999    TO  RECE02-ZAITAKU-SAIKEI2
+                END-IF
              END-IF
            END-IF
       *
@@ -10772,6 +10871,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 RECE02-ZAITAKU-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE     ZERO       TO  RECE02-ZAITAKU-SAIKEI
+                       MOVE      1         TO  RECE02-YOBIETC(6)
                      END-IF
                    END-IF
                  END-IF
@@ -10819,6 +10919,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 RECE02-ZAITAKU-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE   ZERO            TO  RECE02-ZAITAKU-SAIKEI
+                       MOVE    1              TO  RECE02-YOBIETC(6)
                      END-IF
                    END-IF
                  END-IF

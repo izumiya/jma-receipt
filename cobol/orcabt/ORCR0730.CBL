@@ -89,6 +89,7 @@
       *                                     行うようにする
       *  04.04.13    NACL-藤原    10/04/13  愛知県対応
       *                                     生保と特定疾患９１の記載順 
+      *  04.04.14    NACL-門脇    10/04/30  再掲欄の記載条件修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5618,16 +5619,19 @@
                    END-IF
                END-IF
            END-IF
-           IF  ((SYS-1001-PREFNUM            =   "38"             ) AND
+           IF  ((RECE62-YOBIETC(6)           =   1                ) AND
                 (RECE62-KOUREI-SAIKEI    NOT =  999999999         ))
-           OR  ((SYS-1001-PREFNUM        NOT =   "38"             ) AND
+           OR  ((RECE62-YOBIETC(6)           =  ZERO              ) AND
                 (RECE62-KOUREI-SAIKEI    NOT =  999999999 AND ZERO))
              MOVE    "("                   TO  HC06-FTNMONEYSAI(1:1)
              MOVE   RECE62-KOUREI-SAIKEI   TO  WRK-KGK7
              MOVE   WRK-KGK7               TO  HC06-FTNMONEYSAI(3:8)
              MOVE    ")"                   TO  HC06-FTNMONEYSAI(11:1)
            END-IF
-           IF    RECE62-KOUREI-SAIKEI2   NOT =  999999999 AND ZERO
+           IF  ((RECE62-YOBIETC(7)           =   1                ) AND
+                (RECE62-KOUREI-SAIKEI2   NOT =  999999999         ))
+           OR  ((RECE62-YOBIETC(7)           =  ZERO              ) AND
+                (RECE62-KOUREI-SAIKEI2   NOT =  999999999 AND ZERO))
              MOVE    "("                   TO  HC06-FTNMONEYSAI2(1:1)
              MOVE   RECE62-KOUREI-SAIKEI2  TO  WRK-KGK7
              MOVE   WRK-KGK7               TO  HC06-FTNMONEYSAI2(3:8)

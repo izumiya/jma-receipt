@@ -283,6 +283,7 @@
       *                                     Æ±»þ¤Ë¹Ô¤Ã¤¿¾ì¹ç¤Îµ­Ï¿ÊýË¡
       *  04.04.21    NACL-Æ£¸¶    10/04/23  ²èÁü¿ÇÃÇ¤Î²Ã»»¹àÌÜ¤Îµ­Ï¿ÊýË¡
       *                                     ¤Î½¤Àµ
+      *  04.04.22    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­Ï¿¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3127,11 +3128,11 @@
            PERFORM 5005-NUM-HENSYU-SEC
       *    ÉéÃ´¶â³Û¡ÊÏ·¿Í¸øÈñµëÉÕÂÐ¾ÝÏ·¿ÍÆþ±¡°ìÉôÉéÃ´¶â¡Ë
            IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-PREFNUM      =  "38"                     ) AND
+                (RECE62-YOBIETC(6)   =   1                       ) AND
                 (RECE62-KOUREI-SAIKEI    NOT = 999999999         ) AND
                 (IDY                 =   1                       ))
            OR  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-PREFNUM  NOT =  "38"                     ) AND
+                (RECE62-YOBIETC(6)   =  ZERO                     ) AND
                 (RECE62-KOUREI-SAIKEI    NOT = 999999999 AND ZERO) AND
                 (IDY                 =   1                       ))
            OR  ((RECE62-SRYYM       <   WRK-CONS-SRYYM-200804    ) AND
@@ -3141,6 +3142,11 @@
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE62-YOBIETC(7)   =   1                       ) AND
+                (RECE62-KOUREI-SAIKEI2   NOT = 999999999         ) AND
+                (IDY                 =   2                       ))
+           OR  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE62-YOBIETC(7)   =  ZERO                     ) AND
                 (RECE62-KOUREI-SAIKEI2   NOT = 999999999 AND ZERO) AND
                 (IDY                 =   2                       ))
                MOVE   RECE62-KOUREI-SAIKEI2    TO  WRK-NUM
