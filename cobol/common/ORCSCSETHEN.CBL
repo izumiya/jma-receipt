@@ -551,6 +551,8 @@
                IF      ISET-INPUTKBN       =   "2"
                    MOVE    "1"             TO  SPA-COM-INPUTNAIF
                                                            (SPA-GMN-IDX)
+                   MOVE    "1"             TO  SPA-COM-TANDKKBN
+                                                           (SPA-GMN-IDX)
                END-IF
            END-IF
       *
