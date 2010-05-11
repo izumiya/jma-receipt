@@ -388,6 +388,15 @@
                        MOVE    "1"             TO  SPA-COM-CUR(IDX)
                    END-IF
                END-IF
+      *        内服１種類入力のチェック
+               IF      SPA-COM-INPUTNAIF (IDX) =   "1"
+      *            内服以外はエラー
+                   IF     (SPA-ERRCD           =   SPACE )
+                   AND    (WRK-H-SRYKBN    NOT =   "21"  )
+                       MOVE    "0203"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  SPA-COM-CUR(IDX)
+                   END-IF
+               END-IF
       *!!
       *!!!
       *    医療観察法専用のコード判定
