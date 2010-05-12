@@ -889,7 +889,8 @@
                END-IF
       *        ²èÁü¿ÇÃÇ¤Î¥Õ¥£¥ë¥àÈ½Äê
                IF      SPA-COM-SRYKBN (IDX-1)  =   "70"
-                   IF     (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "7" )  AND
+                   IF    ((SPA-COM-INPUTCD(IDX-1)(1:1)   =   "7" )  OR
+                          (SPA-COM-INPUTCD(IDX-1)(1:3)   =   "059")) AND
                           (SPA-COM-DATAKBN (IDX-1)       =   "3" )
                        MOVE    1               TO  FLG-FIRUMU
                    END-IF
