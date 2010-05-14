@@ -431,6 +431,7 @@
       *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *  04.04.49    NACL-ÌçÏÆ    10/04/16  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.50    NACL-ÌçÏÆ    10/04/30  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
+      *  04.04.51    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -1115,6 +1116,7 @@
                05  WRK-SRYCD                           PIC 9(09).
            03  WRK-ZAINUM                              PIC 9(08).
            03  WRK-ZAINUM-CNT                          PIC 9(03).
+           03  WRK-ZAINUM-CNT2                         PIC 9(03).
            03  WRK-RENNUM                              PIC 9(02).
            03  WRK-RENNUM2                             PIC 9(02).
            03  WRK-TANICD                              PIC 9(03).
@@ -5934,6 +5936,8 @@
            PERFORM      210202-SENTEI-KEISU-GET-SEC
       *
       *
+           MOVE    ZERO    TO    WRK-ZAINUM-CNT2
+      *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE62-HOSPNUM        TO      NACCT-HOSPNUM
            MOVE    RECE62-NYUGAIKBN      TO      NACCT-NYUGAIKBN
@@ -5956,6 +5960,9 @@
                                                 "7"
       *
                    MOVE     ZERO       TO    CNT-ZAIREN
+                   IF   NACCT-ZAISKBKBN  = "6" OR "7"
+                      ADD    1         TO    WRK-ZAINUM-CNT2
+                   END-IF
       *
                    PERFORM  VARYING  IDX1    FROM    1   BY  1
                              UNTIL   IDX1    >       10
@@ -7280,7 +7287,8 @@
            END-IF
       *
            MOVE    ZERO                 TO      WRK-ZAINUM-CNT
-           IF      NACCT-ZAISKBKBN      =  "1"
+           EVALUATE  NACCT-ZAISKBKBN
+            WHEN    "1"
              PERFORM     VARYING   IDX2   FROM    1    BY   1
                            UNTIL     IDX2   >       31
                             OR       WRK-ZAINUM-CNT  NOT =  ZERO
@@ -7290,9 +7298,13 @@
              END-PERFORM
              COMPUTE WRK-ZAINUM  = 99999800  +  WRK-ZAINUM-CNT
              MOVE    WRK-ZAINUM         TO      RECE64-ZAINUM
-           ELSE
+            WHEN    "6"
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM  = 99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE64-ZAINUM
+            WHEN    OTHER
              MOVE    NACCT-ZAINUM       TO      RECE64-ZAINUM
-           END-IF
+           END-EVALUATE
       *
            MOVE    CNT-ZAIREN           TO      RECE64-ZAIREN
            MOVE    RECE62-PTNUM         TO      RECE64-PTNUM
@@ -7392,12 +7404,17 @@
            MOVE    RECE62-TEKSTYMD      TO      RECE65-TEKSTYMD
            MOVE    ZERO                 TO      RECE65-KOHBUNRI
       *
-           IF      WRK-ZAINUM-CNT    NOT =   ZERO
+           EVALUATE  NACCT-ZAISKBKBN
+            WHEN    "1"
              COMPUTE WRK-ZAINUM   =  99999800  +  WRK-ZAINUM-CNT
              MOVE    WRK-ZAINUM         TO      RECE65-ZAINUM
-           ELSE
+            WHEN    "6"
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM   =  99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE65-ZAINUM
+            WHEN    OTHER
              MOVE    NSRY-ZAINUM        TO      RECE65-ZAINUM
-           END-IF
+           END-EVALUATE
       *
            MOVE    CNT-ZAIREN           TO      RECE65-ZAIREN
            MOVE    NSRY-RENNUM          TO      RECE65-RENNUM
