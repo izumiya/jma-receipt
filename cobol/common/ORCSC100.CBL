@@ -858,7 +858,8 @@
                              ((SPA-GMN-INPUTCD (IDX)   =   SPACE ) AND
                               (SPA-COM-INPUTCD (IDX)   =   SPACE ))
                           OR ( SPA-ERRCD           NOT =   SPACE )
-               IF      (SPA-COM-INPUTCD (IDX)(1:1) =   "1" )
+               IF     ((SPA-COM-INPUTCD (IDX)(1:1) =   "1" )
+                   OR  (SPA-COM-INPUTCD (IDX)(1:3) =   "099" ))
                  AND   (SPA-COM-HKNCOMBI(IDX)  NOT =   "9999")
                  AND   (SPA-COM-HCHKFLG (IDX)      =   SPACE )
       *            回数チェック
