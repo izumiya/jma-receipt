@@ -71,6 +71,7 @@
       *                                     （コード追加）
       *  04.04.12    NACL-門脇    10/04/06  改正対応
       *                                     （コメント自動記載）
+      *  04.04.13    NACL-門脇    10/05/14  入院料加算剤番号変換
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -385,6 +386,7 @@
                05  WRK-SRYCD       PIC 9(09).
            03  WRK-ZAINUM          PIC 9(08).
            03  WRK-ZAINUM-CNT      PIC 9(03).
+           03  WRK-ZAINUM-CNT2     PIC 9(03).
            03  WRK-RENNUM          PIC 9(02).
            03  WRK-RENNUM2         PIC 9(02).
            03  WRK-TANICD          PIC 9(03).
@@ -3045,6 +3047,8 @@
            PERFORM   900-CLOSE-SEC
       *
       *
+           MOVE    ZERO    TO    WRK-ZAINUM-CNT2
+      *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE200-HOSPNUM       TO      NACCT-HOSPNUM
            MOVE    RECE200-NYUGAIKBN     TO      NACCT-NYUGAIKBN
@@ -3064,6 +3068,10 @@
                  IF     NACCT-ZAISKBKBN    =    "1"  OR  "2"  OR
                                                 "4"  OR  "6"  OR
                                                 "7"
+      *
+                      IF   NACCT-ZAISKBKBN  = "6" OR "7"
+                         ADD    1         TO    WRK-ZAINUM-CNT2
+                      END-IF
       *
                       INITIALIZE          WRK-DAY-TABLE2
                                           WRK-GAI-TABLE
@@ -3704,7 +3712,8 @@
            END-IF
       *
            MOVE    ZERO                 TO      WRK-ZAINUM-CNT
-           IF      NACCT-ZAISKBKBN      =  "1"
+           EVALUATE  NACCT-ZAISKBKBN
+            WHEN    "1"
              PERFORM     VARYING   IDX2   FROM    1    BY   1
                           UNTIL    IDX2    >     31
                             OR     WRK-ZAINUM-CNT  NOT =  ZERO
@@ -3714,9 +3723,13 @@
              END-PERFORM
              COMPUTE WRK-ZAINUM  = 99999800  +  WRK-ZAINUM-CNT
              MOVE    WRK-ZAINUM         TO      RECE220-ZAINUM
-           ELSE
+            WHEN    "6"
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM  = 99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE220-ZAINUM
+            WHEN    OTHER
              MOVE    NACCT-ZAINUM       TO      RECE220-ZAINUM
-           END-IF
+           END-EVALUATE
       *
            MOVE    RECE200-PTNUM        TO      RECE220-PTNUM
       *
@@ -3803,12 +3816,17 @@
            INITIALIZE                           RECE230-REC
            MOVE    RECE200-KEY          TO      RECE230-KEY1
       *
-           IF      WRK-ZAINUM-CNT    NOT =   ZERO
+           EVALUATE  NACCT-ZAISKBKBN
+            WHEN    "1"
              COMPUTE WRK-ZAINUM   =  99999800  +  WRK-ZAINUM-CNT
              MOVE    WRK-ZAINUM         TO      RECE230-ZAINUM
-           ELSE
+            WHEN    "6"
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM   =  99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE230-ZAINUM
+            WHEN    OTHER
              MOVE    NSRY-ZAINUM        TO      RECE230-ZAINUM
-           END-IF
+           END-EVALUATE
       *
            MOVE    NSRY-RENNUM          TO      RECE230-RENNUM
            MOVE    RECE200-PTNUM        TO      RECE230-PTNUM

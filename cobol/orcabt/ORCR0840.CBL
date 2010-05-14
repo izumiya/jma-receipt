@@ -181,6 +181,7 @@
       *  04.04.14    NACL-ÌçÏÆ    10/04/02  ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸î¤ÎÂÐ±þ
       *  04.04.15    NACL-ÌçÏÆ    10/04/06  ²þÀµÂÐ±þ
       *                                     ¡Ê¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ë
+      *  04.04.16    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -599,6 +600,7 @@
            03  WRK-SRYCD-X.
                05  WRK-SRYCD                           PIC 9(09).
            03  WRK-ZAINUM                              PIC 9(08).
+           03  WRK-ZAINUM-CNT2                         PIC 9(03).
            03  WRK-RENNUM                              PIC 9(02).
            03  WRK-RENNUM2                             PIC 9(02).
            03  WRK-TANICD                              PIC 9(03).
@@ -5582,6 +5584,8 @@ grpsys     PERFORM  900-DBSELECT-SEC
            PERFORM  900-CLOSE-SEC
       *
       *
+           MOVE    ZERO    TO    WRK-ZAINUM-CNT2
+      *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE82-HOSPNUM        TO      NACCT-HOSPNUM
            MOVE    RECE82-NYUGAIKBN      TO      NACCT-NYUGAIKBN
@@ -5627,6 +5631,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       CONTINUE
       *
                    ELSE
+      *
+                      IF   NACCT-ZAISKBKBN  = "6" OR "7"
+                         ADD    1         TO    WRK-ZAINUM-CNT2
+                      END-IF
       *
                       INITIALIZE          WRK-DAY-TABLE2
                                           WRK-SKJ-TABLE
@@ -6157,7 +6165,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE82-HKNID         TO      RECE84-HKNID
            MOVE    RECE82-TEKSTYMD      TO      RECE84-TEKSTYMD
       *
-           MOVE    NACCT-ZAINUM         TO      RECE84-ZAINUM
+           EVALUATE  NACCT-ZAISKBKBN
+            WHEN    "6"
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM  = 99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE84-ZAINUM
+            WHEN    OTHER
+             MOVE    NACCT-ZAINUM       TO      RECE84-ZAINUM
+           END-EVALUATE
       *
            MOVE    NACCT-SRYKBN         TO      RECE84-SRYKBN
            MOVE    NACCT-ZAISKBKBN      TO      RECE84-ZAISKBKBN
@@ -6266,7 +6281,14 @@ grpsys     PERFORM  900-DBSELECT-SEC
            MOVE    RECE82-HKNID         TO      RECE85-HKNID
            MOVE    RECE82-TEKSTYMD      TO      RECE85-TEKSTYMD
       *
-           MOVE    NSRY-ZAINUM          TO      RECE85-ZAINUM
+           EVALUATE  NACCT-ZAISKBKBN
+            WHEN    "6"
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM  = 99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE85-ZAINUM
+            WHEN    OTHER
+             MOVE    NSRY-ZAINUM        TO      RECE85-ZAINUM
+           END-EVALUATE
       *
            MOVE    NSRY-RENNUM          TO      RECE85-RENNUM
            MOVE    RECE82-PTNUM         TO      RECE85-PTNUM
