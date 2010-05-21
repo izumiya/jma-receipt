@@ -1498,7 +1498,8 @@
                             (((SPA-HOSPSBT                 =    1) AND
                              (LNK-NYURECEDEN-SANTEIYM >= "200804")) AND
                             ((NACCT-SRYCDTOTAL(6:9) =  190111370)  OR
-                             (NACCT-SRYCDTOTAL(6:9) =  190129870)))
+                             (NACCT-SRYCDTOTAL(6:9) =  190129870)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190142370)))
                              CONTINUE
                          ELSE
                            IF   FLG-KSN   =  ZERO
