@@ -331,6 +331,11 @@
       *  04.04.16    NACL-Æ£¸¶    10/04/23  ²èÁü¿ÇÃÇ¤Î²Ã»»¹àÌÜ¤Îµ­Ï¿ÊýË¡
       *                                     ¤Î½¤Àµ
       *  04.04.17    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­Ï¿¾ò·ï½¤Àµ
+      *  04.04.18    NACL-Æ£¸¶    10/05/10  Ãí²Ã»»¤Ë¤è¤ë²Ã»»¹àÌÜ¤Îµ­ºÜ
+      *                                     ²èÁü¿ÇÃÇ
+      *                                     ¹ð¼¨Åù¼±ÊÌ¶èÊ¬£²¤Î¾ò·ïÄÉ²Ã 
+      *  04.04.19    NACL-Æ£¸¶    10/05/19  ¸øÈñ¤ÎÁÈ¹ç¤»¤Ë¤è¤ëÉéÃ´¶èÊ¬
+      *                                     ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3296,20 +3301,33 @@ grpsys         MOVE    RECE041-HOSPNUM TO  COMB-HOSPNUM
        200701-FTNKBN-HENSYU-200804-SEC    SECTION.
       *
       *    ¸øÈñ¤ÎÊÔ½¸
+      *    ¥ì¥»ÅÅÍÑÉéÃ´¶èÊ¬ÊÔ½¸¥Õ¥é¥°¤è¤êÊÔ½¸
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       4
-                   OR      COMB-KOHHKNNUM  (IDX)   =   SPACE
-               PERFORM VARYING IDY FROM    1   BY  1
-                       UNTIL   IDY >       4
-                       OR      RECE02-KOHNUM(IDY)  =   SPACE
-                   IF     (COMB-KOHHKNNUM(IDX) =
-                                              RECE02-KOHNUM(IDY)) AND
-                          (COMB-KOHID    (IDX) =
-                                              RECE02-KOHID(IDY))
-                       MOVE    1           TO  WRK-KOHNUM (IDY)
-                       MOVE    4           TO  IDY                
-                   END-IF
-               END-PERFORM
+                   UNTIL   IDX >       10
+                   OR      RECE02-HKNCOMBI (IDX)   =   ZERO
+               IF      COMB-HKNCOMBINUM    =   RECE02-HKNCOMBI (IDX)
+                   PERFORM VARYING IDY FROM    1   BY  1
+                           UNTIL   IDY >       4
+                       IF    ( RECE02-KOHNUMHC  (IDX IDY)
+                                                   NOT =   SPACE )
+                       AND   ( RECE02-FTNKBNFLG (IDX IDY)
+                                                       =   ZERO  )
+                           PERFORM VARYING IDX0    FROM    1   BY  1
+                                   UNTIL   IDX0    >       4
+                                   OR      RECE02-KOHNUM (IDX0)
+                                                   =       SPACE
+                               IF    ( RECE02-KOHNUMHC  (IDX IDY) =
+                                                  RECE02-KOHNUM (IDX0) )
+                               AND   ( RECE02-KOHIDHC   (IDX IDY) =
+                                                  RECE02-KOHID  (IDX0) )
+                                   MOVE    1       TO  WRK-KOHNUM (IDX0)
+                                   MOVE    4       TO  IDX0
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                   END-PERFORM
+                   MOVE    10                  TO  IDX     
+               END-IF
            END-PERFORM
       *???
       **     DISPLAY "RECE02(1)=" RECE02-KOHNUM (1) "(2)="
@@ -4193,7 +4211,8 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
       *
            IF      RECE041-SRYKBN       =   "50"    OR  "54"    OR
                                             "60"    OR  "40"    OR
-                                            "80"    OR  "33"
+                                            "80"    OR  "33"    OR
+                                            "70"
                CONTINUE
            ELSE
                GO  TO  20074-ZAI-KOUI-SORT-EXT
@@ -4333,7 +4352,7 @@ grpsys         OR     ( RECE041-HOSPNUM    NOT =   RECE05-HOSPNUM      )
                      AND   ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
                                    =   "1" OR  "3" OR  "5" )
                      AND   ( TBL-KOUI-KOKUJISKBKBN2 (IDX)
-                                   =   "1"                 )
+                                   =   "1" OR  "3" OR  "5" )
                          ADD     WRK-TBLMAX1       TO  IDX
                          IF      FLG-KOUI          =   ZERO
                              MOVE    9                 TO  FLG-KOUI

@@ -284,6 +284,11 @@
       *  04.04.21    NACL-Æ£¸¶    10/04/23  ²èÁü¿ÇÃÇ¤Î²Ã»»¹àÌÜ¤Îµ­Ï¿ÊýË¡
       *                                     ¤Î½¤Àµ
       *  04.04.22    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­Ï¿¾ò·ï½¤Àµ
+      *  04.04.23    NACL-Æ£¸¶    10/05/10  Ãí²Ã»»¤Ë¤è¤ë²Ã»»¹àÌÜ¤Îµ­ºÜ
+      *                                     ²èÁü¿ÇÃÇ
+      *                                     ¹ð¼¨Åù¼±ÊÌ¶èÊ¬£²¤Î¾ò·ïÄÉ²Ã 
+      *  04.04.23    NACL-Æ£¸¶    10/05/19  ¸øÈñ¤ÎÁÈ¹ç¤»¤Ë¤è¤ëÉéÃ´¶èÊ¬
+      *                                     ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3638,23 +3643,57 @@
        200701-FTNKBN-HENSYU-200804-SEC    SECTION.
       *
       *    ¸øÈñ¤ÎÊÔ½¸
-           PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       4
-                   OR      COMB-KOHHKNNUM  (IDX)   =   SPACE
-               PERFORM VARYING IDY FROM    1   BY  1
-                       UNTIL   IDY >       4
-                       OR      RECE62-KOHNUM(IDY)  =   SPACE
-                   IF    ( COMB-KOHHKNNUM(IDX) =
+           IF      WRK-RECE641-SRYKBN  =   "97"
+      *        ¥ì¥»ÅÅÍÑ¡§¿©»öÎÅÍÜÊÔ½¸¾ðÊó¤è¤êÊÔ½¸
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       4
+                       OR      COMB-KOHHKNNUM  (IDX)   =   SPACE
+                   PERFORM VARYING IDY FROM    1   BY  1
+                           UNTIL   IDY >       4
+                           OR      RECE62-KOHNUM(IDY)  =   SPACE
+                       IF    ( COMB-KOHHKNNUM(IDX) =
                                               RECE62-KOHNUM(IDY)) AND
-                         ( COMB-KOHID    (IDX) =
-                                              RECE62-KOHID (IDY)) AND
-                         ( WRK-FUKUSHIFLG-SKJ (IDY)
-                                               =   SPACE        )
-                       MOVE    1           TO  WRK-KOHNUM (IDY)
-                       MOVE    4           TO  IDY                
+                             ( COMB-KOHID    (IDX) =
+                                              RECE62-KOHID (IDY))
+                           IF    ( WRK-FUKUSHIFLG-SKJ (IDY)
+                                                       =   SPACE    )
+                               MOVE    1           TO  WRK-KOHNUM (IDY)
+                               MOVE    4           TO  IDY                
+                           END-IF
+                       END-IF
+                   END-PERFORM
+               END-PERFORM
+           ELSE    
+      *        ¥ì¥»ÅÅÍÑÉéÃ´¶èÊ¬ÊÔ½¸¥Õ¥é¥°¤è¤êÊÔ½¸
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       10
+                       OR      RECE62-HKNCOMBI (IDX)   =   ZERO
+                   IF      COMB-HKNCOMBINUM    =   RECE62-HKNCOMBI (IDX)
+                       PERFORM VARYING IDY FROM    1   BY  1
+                               UNTIL   IDY >       4
+                           IF    ( RECE62-KOHNUMHC  (IDX IDY)
+                                                       NOT =   SPACE )
+                           AND   ( RECE62-FTNKBNFLG (IDX IDY)
+                                                           =   ZERO  )
+                               PERFORM VARYING IDX0    FROM    1   BY  1
+                                       UNTIL   IDX0    >       4
+                                       OR      RECE62-KOHNUM (IDX0)
+                                                       =       SPACE
+                                   IF    ( RECE62-KOHNUMHC  (IDX IDY) =
+                                                  RECE62-KOHNUM (IDX0) )
+                                   AND   ( RECE62-KOHIDHC   (IDX IDY) =
+                                                  RECE62-KOHID  (IDX0) )
+                                       MOVE    1       TO
+                                                       WRK-KOHNUM (IDX0)
+                                       MOVE    4       TO  IDX0
+                                   END-IF
+                               END-PERFORM
+                           END-IF
+                       END-PERFORM
+                       MOVE    10                  TO  IDX     
                    END-IF
                END-PERFORM
-           END-PERFORM
+           END-IF    
       *???
       *     DISPLAY
       *         "COMB-HKNNUM=" COMB-HKNNUM
@@ -4845,7 +4884,8 @@
       *
            IF      RECE641-SRYKBN       =   "50"    OR  "54"    OR
                                             "60"    OR  "40"    OR
-                                            "80"    OR  "33"
+                                            "80"    OR  "33"    OR
+                                            "70"
                CONTINUE
            ELSE
                GO  TO  20074-ZAI-KOUI-SORT-EXT
@@ -4985,7 +5025,7 @@
                      AND   ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
                                    =   "1" OR  "3" OR  "5" )
                      AND   ( TBL-KOUI-KOKUJISKBKBN2 (IDX)
-                                   =   "1"                 )
+                                   =   "1" OR  "3" OR  "5" )
                          ADD     WRK-TBLMAX1       TO  IDX
                          IF      FLG-KOUI          =   ZERO
                              MOVE    9                 TO  FLG-KOUI
@@ -6397,17 +6437,20 @@
            INITIALIZE                  WRK-RECE641-REC
            MOVE    RECE62-HOSPNUM  TO  WRK-RECE641-HOSPNUM
            MOVE    RECE62-PTID     TO  WRK-RECE641-PTID
+           MOVE    "90"            TO  WRK-RECE641-SRYKBN
            MOVE    LNK-NYURECEDEN-HKNCOMBI (IDZ1 IDZ2)
                                    TO  WRK-RECE641-HKNCOMBI
            MOVE    SPACE           TO  WRK-FUKUSHIFLG-SKJINF-AREA
            IF      RECE62-SRYYM    >=  WRK-CONS-SRYYM-200804
                IF    ( IDZ1                =   3     )
+                   MOVE    "97"        TO  WRK-RECE641-SRYKBN
                    MOVE    RECE62-FUKUSHIFLG-SKJIPAINF-AREA
                                        TO  WRK-FUKUSHIFLG-SKJINF-AREA
                ELSE
                    IF    ( IDZ1            >   3     )
       ***              MOVE    RECE62-FUKUSHIFLG-SKJSEIINF-AREA
       ***                              TO  WRK-FUKUSHIFLG-SKJINF-AREA
+                       MOVE    "97"        TO  WRK-RECE641-SRYKBN
                        PERFORM VARYING IDZ7  FROM  1  BY  1
                                 UNTIL  IDZ7   >    4
                          IF  RECE62-FUKUSHIFLG-SKJSEI(IDZ7) = "2"
