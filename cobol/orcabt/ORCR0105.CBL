@@ -77,6 +77,7 @@
       *  04.04.08    NACL-門脇    10/02/16  レセ記載しない地方公費がある場合
       *                                     の保険欄一部負担金編集対応
       *  04.04.09    NACL-門脇    10/04/30  再掲欄の記載条件修正
+      *  04.04.10    NACL-門脇    10/05/21  生保まとめ分点欄記載対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
@@ -4555,6 +4556,9 @@
                        (RECE02-HENTOTALTEN(IDX1) NOT =
                                      RECE02-HENTOTALTEN(IDX2)))
                   IF    RECE02-SEIHOFLG    =  "1"
+                   MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
+                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+      *
                    COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
                                            -     RECE02-TENSU(IDX IDX1)
                    MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ

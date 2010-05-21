@@ -78,6 +78,7 @@
       *  04.04.09    NACL-門脇    10/02/16  レセ記載しない地方公費がある場合
       *                                     の保険欄一部負担金編集対応
       *  04.04.10    NACL-門脇    10/04/30  再掲欄の記載条件修正
+      *  04.04.11    NACL-門脇    10/05/21  生保まとめ分点欄記載対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/06/11  病棟別出力対応
@@ -5159,6 +5160,9 @@
                        (RECE62-HENTOTALTEN(IDX1) NOT =
                                      RECE62-HENTOTALTEN(IDX2)))
                   IF    RECE62-SEIHOFLG    =  "1"
+                   MOVE    RECE62-TENSU(IDX IDX2)  TO   WRK-TENSUZ
+                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+      *
                    COMPUTE WRK-SUM-TENSU   =     RECE62-TENSU(IDX IDX2)
                                            -     RECE62-TENSU(IDX IDX1)
                    MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
@@ -5201,6 +5205,10 @@
                        (RECE62-HENTOTALTEN(IDX1) NOT =
                                      RECE62-HENTOTALTEN(IDX2)))
                   IF    RECE62-SEIHOFLG    =  "1"
+                   MOVE    RECE62-NYUKHNKEI(IDX IDX2)
+                                             TO  WRK-TENSUZ
+                   MOVE    WRK-TENSU         TO  HC06-NYUTENSU(IDX)
+      *
                    COMPUTE WRK-SUM-TENSU  =  RECE62-NYUKHNKEI(IDX IDX2)
                                           -  RECE62-NYUKHNKEI(IDX IDX1)
                    MOVE    WRK-SUM-TENSU     TO  WRK-KOUTENZ
@@ -5242,6 +5250,7 @@
                                        = RECE62-NYUKHNKEI(IDX IDX2)
                                        - RECE62-NYUKHNKEI(IDX IDX1)
                        ADD     WRK-SUM-TENSU     TO  SUM-NYUKHNKEI (2)
+                                                     SUM-NYUKHNKEI (1)
                       ELSE
                        ADD    RECE62-NYUKHNKEI(IDX IDX2)
                                                  TO  SUM-NYUKHNKEI (2)
@@ -5299,6 +5308,10 @@
                    (RECE62-HENTOTALTEN(IDX1) NOT =
                                  RECE62-HENTOTALTEN(IDX2)))
               IF    RECE62-SEIHOFLG    =  "1"
+               MOVE    RECE62-NYUKHNKEI2(IDX2)
+                                               TO  WRK-TENSUZ
+               MOVE    WRK-TENSU               TO  HC06-NYUTENSU(5)
+      *
                COMPUTE WRK-SUM-TENSU   = RECE62-NYUKHNKEI2(IDX2)
                                        - RECE62-NYUKHNKEI2(IDX1)
                MOVE    WRK-SUM-TENSU           TO  WRK-KOUTENZ
@@ -5361,6 +5374,10 @@
                            (RECE62-HENTOTALTEN(IDX1) NOT =
                                          RECE62-HENTOTALTEN(IDX2)))
                       IF    RECE62-SEIHOFLG    =  "1"
+                       MOVE    RECE62-NYUTOKKEI(IDX IDX2)
+                                             TO   WRK-TENSUZ
+                       MOVE    WRK-TENSU     TO   HC06-NYUTENSU(IDY)
+      *
                        COMPUTE WRK-SUM-TENSU
                                        = RECE62-NYUTOKKEI(IDX IDX2)
                                        - RECE62-NYUTOKKEI(IDX IDX1)
@@ -5404,6 +5421,7 @@
                                         = RECE62-NYUTOKKEI(IDX IDX2)
                                         - RECE62-NYUTOKKEI(IDX IDX1)
                        ADD    WRK-SUM-TENSU      TO  SUM-NYUKHNKEI (2)
+                                                     SUM-NYUKHNKEI (1)
                       ELSE
                        ADD    RECE62-NYUTOKKEI(IDX IDX2)
                                                  TO  SUM-NYUKHNKEI (2)
@@ -5463,6 +5481,9 @@
                    (RECE62-HENTOTALTEN(IDX1) NOT =
                                  RECE62-HENTOTALTEN(IDX2)))
               IF    RECE62-SEIHOFLG    =  "1"
+               MOVE    RECE62-NYUTOKKEI2(IDX2) TO  WRK-TENSUZ
+               MOVE    WRK-TENSU               TO  HC06-NYUTENSU(10)
+      *
                COMPUTE WRK-SUM-TENSU   = RECE62-NYUTOKKEI2(IDX2)
                                        - RECE62-NYUTOKKEI2(IDX1)
                MOVE    WRK-SUM-TENSU           TO  WRK-KOUTENZ
