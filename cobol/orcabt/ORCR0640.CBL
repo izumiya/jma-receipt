@@ -432,6 +432,7 @@
       *  04.04.49    NACL-ÌçÏÆ    10/04/16  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.50    NACL-ÌçÏÆ    10/04/30  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *  04.04.51    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
+      *  04.04.52    NACL-ÌçÏÆ    10/05/21  ³°Çñ»þ¤ÎÆþ±¡ÎÁ²Ã»»ÊÔ½¸½¤Àµ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -5931,6 +5932,13 @@
            MOVE    "tbl_nyuinacct"       TO      MCP-TABLE
            MOVE    "key7"                TO      MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+             IF    WRK-DAY2(IDY)  NOT  =   5
+                MOVE   ZERO    TO   WRK-DAY1-KSN-SRYCD(IDY)
+             END-IF
+           END-PERFORM
       *
       *
            PERFORM      210202-SENTEI-KEISU-GET-SEC
