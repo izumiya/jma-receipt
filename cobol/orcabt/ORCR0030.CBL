@@ -464,6 +464,7 @@
       *  04.04.48    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *  04.04.49    NACL-ÌçÏÆ    10/04/16  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.50    NACL-ÌçÏÆ    10/04/30  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
+      *  04.04.51    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12186,6 +12187,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE SPACE TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
                      MOVE SPACE TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                     END-IF
+                  END-IF
+                END-IF
+      *
+                IF    RECE02-SRYYM        >=  "200904"
+                  IF  (SYS-1001-PREFNUM          =   08  )
+                  AND (RECE02-KOHNUM(KOHFTN-IDX) =  "152")
+                    MOVE  "1"   TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
+                    MOVE  "1"   TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                 END-IF
       *
