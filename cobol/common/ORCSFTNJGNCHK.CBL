@@ -70,6 +70,7 @@
       *                                     （新座・朝霞・和光・志木市）
       *  04.04.07    NACL-門脇    09/12/25  埼玉県地方公費対応（朝霞市）
       *  04.04.08    NACL-門脇    10/04/14  埼玉県地方公費対応（行田市）
+      *  04.04.09    NACL-門脇    10/05/21  茨城県地方公費対応
       *
       *  04.05.01    NACL-門脇    09/12/04  食事（特別食）の他保険対応
       *****************************************************************
@@ -485,6 +486,10 @@
            OR ((LNK-FTNJGNCHK-PREFNUM        =  23     )  AND
                (LNK-FTNJGNCHK-KOHNUM         = "191"   )  AND
                (LNK-FTNJGNCHK-SRYYM         >= "200910"))
+      *
+           OR ((LNK-FTNJGNCHK-PREFNUM        =  08     )  AND
+               (LNK-FTNJGNCHK-KOHNUM         = "152"   )  AND
+               (LNK-FTNJGNCHK-SRYYM         >= "200904"))
       *
       *         公費月上限額取得
                 INITIALIZE                    LNK-ORCSJGNGET-REC

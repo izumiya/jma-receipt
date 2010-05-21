@@ -433,6 +433,7 @@
       *  04.04.50    NACL-ÌçÏÆ    10/04/30  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *  04.04.51    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
       *  04.04.52    NACL-ÌçÏÆ    10/05/21  ³°Çñ»þ¤ÎÆþ±¡ÎÁ²Ã»»ÊÔ½¸½¤Àµ
+      *  04.04.53    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -14639,6 +14640,14 @@
                      MOVE SPACE TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
                      MOVE SPACE TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                     END-IF
+                  END-IF
+                END-IF
+      *
+                IF    RECE62-SRYYM        >=  "200904"
+                  IF  (WRK-PREFNUM               =   08  )
+                  AND (RECE62-KOHNUM(KOHFTN-IDX) =  "152")
+                    MOVE  "1"   TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
+                    MOVE  "1"   TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                 END-IF
       *

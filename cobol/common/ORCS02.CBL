@@ -278,6 +278,7 @@
       *  04.04.24    NACL-ÌçÏÆ    10/03/09  Á°´ü¹âÎð¼Ô¤Î¹â³Û·×»»½¤Àµ
       *  04.04.25    NACL-ÌçÏÆ    10/03/11  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
       *  04.04.26    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
+      *  04.04.27    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/25  ÊÝ¸±¡¢¼«Èñ¤½¤ì¤¾¤ì¤ÎÀÁµá³ÛÃ¼¿ô
       *                                     ÀßÄêµ¡Ç½
@@ -4816,6 +4817,9 @@
                  OR ((WK-1001-PREFNUM         =  23           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "191"         ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200910"      ))
+                 OR ((WK-1001-PREFNUM         =  08           ) AND
+                     (COMB-KOHHKNNUM(IDX-CYO) = "152"         ) AND
+                     (LNK-SYU-SRYYMD(1:6)    >= "200904"      ))
       *
                  OR ((WK-1001-PREFNUM         =  13 OR 14     ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "182"         ))
@@ -7323,6 +7327,10 @@
              OR ((WK-1001-PREFNUM              =  23     )  AND
                  (COMB-KOHHKNNUM(KOH-IDX)      = "191"   )  AND
                  (LNK-SYU-SRYYMD(1:6)         >= "200910"))
+      *
+             OR ((WK-1001-PREFNUM              =  08     )  AND
+                 (COMB-KOHHKNNUM(KOH-IDX)      = "152"   )  AND
+                 (LNK-SYU-SRYYMD(1:6)         >= "200904"))
       *
       ***    OR ( COMB-KOHHKNNUM(KOH-IDX)(1:1) = "1" OR "2" OR "3" OR 
       ***                                        "4" OR "5" OR "6" OR
