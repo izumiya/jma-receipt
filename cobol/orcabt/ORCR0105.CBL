@@ -88,6 +88,7 @@
       *  04.04.12    NACL-Æ£¸¶    10/04/13  °¦ÃÎ¸©ÂÐ±þ
       *                                     À¸ÊÝ¤ÈÆÃÄê¼À´µ£¹£±¤Îµ­ºÜ½ç 
       *  04.04.13    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­ºÜ¾ò·ï½¤Àµ
+      *  04.04.14    NACL-ÌçÏÆ    10/05/21  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóµ­ºÜÂÐ±þ
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4540,6 +4541,9 @@
                        (RECE02-HENTOTALTEN(IDX1) NOT =
                                      RECE02-HENTOTALTEN(IDX2)))
                   IF    RECE02-SEIHOFLG    =  "1"
+                   MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
+                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+      *
                    COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
                                            -     RECE02-TENSU(IDX IDX1)
                    MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
