@@ -315,8 +315,9 @@
       *  ３０医療安全対策加算１
       *  ３１感染防止対策加算
       *  ３２リハビリテーション提供体制加算
+      *  ３３重症患者回復病棟加算（基準未適合）
            03  WRK-CHUKSN-NYUKSN-AREA.
-             05   WRK-CHUKSN-NYUKSN-TBL      OCCURS  32.
+             05   WRK-CHUKSN-NYUKSN-TBL      OCCURS  33.
                07  WRK-CHUKSN-NYUKSN         PIC X(09).
                07  WRK-CHUKSN-NYUKSN-ZAITEN  PIC 9(08).
                07  WRK-CHUKSN-NYUKSN-DAY     PIC 9(03)  OCCURS 31.
@@ -1436,6 +1437,16 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(14 IDX1)
                          END-IF
       *
+      *                  重症患者回復病棟加算（基準未適合）
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190142370
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(33)
+                           MOVE   NACCT-ZAITEN  
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(33)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(33 IDX1)
+                         END-IF
+      *
                        END-IF
                    END-PERFORM
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
@@ -2476,6 +2487,15 @@
                    ELSE
                        ADD   1    TO  WRK-MEISAISU
                        MOVE  WRK-CHUKSN-NYUKSN(14)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+      *
+      *            入院会計加算情報（重症患者回復病棟加算（基準未適合））
+                   IF    WRK-CHUKSN-NYUKSN-DAY(33 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-NYUKSN(33)
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
       *
