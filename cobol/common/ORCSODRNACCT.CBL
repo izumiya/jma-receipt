@@ -2473,6 +2473,13 @@
                                    ADD    1            TO  IDX8
                                    MOVE   SYS-5001-KSNCD(IDX7) TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
+      *                            基準未適合の場合は重症患者回復病棟加算（基準未適合）
+      *                            に置き換える
+                                   IF SYOKIKSN-IN-KHNSRYCD = "190129410"
+                                                          OR "190129510"
+                                     MOVE   "190142370"  TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
                                 END-IF
       *                      医師配置加算１（有床診療所入院基本料１と２）
       *                      医師配置加算２（有床診療所入院基本料１と２）
