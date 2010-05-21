@@ -87,6 +87,7 @@
       *  04.04.03    NACL-ÌçÏÆ    09/09/04  ¾®Æþ´ÉÎ¬¾Î½¤Àµ
       *  04.04.04    NACL-ÌçÏÆ    10/03/23  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
       *  04.04.05    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
+      *  04.04.06    NACL-ÌçÏÆ    10/05/21  ÉéÃ´¶èÊ¬ÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
       *
@@ -182,6 +183,7 @@
            03  IDV                                     PIC 9(02).
            03  TENTEK-IDX                              PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
+           03  IDX11                                   PIC 9(03).
       *
       *    ¼ÂÆü¿ô¥«¥¦¥ó¥ÈÍÑÎÎ°è
        01  TBL-JNISSU.
@@ -931,6 +933,8 @@
            MOVE       ZERO              TO     FLG-MIJISI-GENSAN        
       *
            INITIALIZE                          TBL-FUKUSHI
+      *
+           PERFORM     200118-SYUKEIKBN-HANBETU-SEC
       *
            MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
            INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
@@ -3629,6 +3633,32 @@
       *
            .
        200117-RECE62-REWRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Á´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ½¸·×È½ÊÌ
+      *****************************************************************
+       200118-SYUKEIKBN-HANBETU-SEC      SECTION.
+      *
+           IF    IDZ    =    1
+      *
+             PERFORM  VARYING  IDX11   FROM    1   BY  1
+                       UNTIL  (IDX11                   >   10 )
+                         OR   (RECE62-HKNCOMBI(IDX11)  =  ZERO)
+      *
+              IF ((RECE62-HKNNUMHC(IDX11)    = SPACE   ) AND
+                  (RECE62-KOHNUMHC(IDX11 1)  = "079"   ) AND
+                  (RECE62-KOHNUMHC(IDX11 2)  = "012"   ) AND
+                  (RECE62-SRYYM             >= "200804"))
+                 MOVE     1     TO    RECE62-FTNKBNFLG(IDX11 2)
+              END-IF
+      *
+             END-PERFORM
+      *
+           END-IF
+      *
+           .
+       200118-SYUKEIKBN-HANBETU-EXT.
            EXIT.
       *
       *****************************************************************
