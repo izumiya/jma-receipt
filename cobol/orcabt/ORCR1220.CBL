@@ -72,6 +72,7 @@
       *  04.04.12    NACL-ÌçÏÆ    10/04/06  ²þÀµÂÐ±þ
       *                                     ¡Ê¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ë
       *  04.04.13    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
+      *  04.04.14    NACL-ÌçÏÆ    10/05/21  ³°Çñ»þ¤ÎÆþ±¡ÎÁ²Ã»»ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3045,6 +3046,13 @@
            MOVE    "tbl_nyuinacct"       TO      MCP-TABLE
            MOVE    "key7"                TO      MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+             IF    WRK-DAY2(IDY)  NOT  =   5
+                MOVE   ZERO    TO   WRK-DAY1-KSN-SRYCD(IDY)
+             END-IF
+           END-PERFORM
       *
       *
            MOVE    ZERO    TO    WRK-ZAINUM-CNT2
