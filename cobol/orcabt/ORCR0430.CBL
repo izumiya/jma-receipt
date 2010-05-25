@@ -2410,7 +2410,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                            COMPUTE  IDZ  =  IDZ - 1
                         END-IF
                       END-IF
-                      IF   SANTEIPLUS-COMMENT(1:12) = "µÞÀ­Áþ°­¡¡Æü"
+                      IF   SANTEIPLUS-COMMENT(1:12) = "µÞÀ­Áý°­¡¡Æü"
                         IF   FLG-COMOKIKAE2 = ZERO
                            MOVE    2    TO  FLG-COMOKIKAE2
                            MOVE  SPACE  TO  WK-FREE-NAME(IDZ)
