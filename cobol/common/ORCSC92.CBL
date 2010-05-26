@@ -1317,8 +1317,8 @@
            END-IF
       *    内服１種類入力
            IF      LNK-SC97-INKBNFLG2  =   "1"
-               IF      (SPA-COM-SRYKBN (IDX-T) =   "21"  )
-               AND     (SPA-NYUGAIKBN          =   "2"   )
+      ****     IF      (SPA-COM-SRYKBN (IDX-T) =   "21"  )
+               IF      (SPA-NYUGAIKBN          =   "2"   )
                    MOVE    "1"             TO  SPA-COM-INPUTNAIF (IDX-T)
                    MOVE    "1"             TO  SPA-COM-TANDKKBN(IDX-T)
                ELSE
