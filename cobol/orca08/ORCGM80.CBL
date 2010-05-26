@@ -550,7 +550,7 @@
                    IF      SPA-NAI-TLINK (IDY) =   "FALSE"
                        MOVE    "disable"       TO  SPA-GMN-TLINK (IDY)
                    ELSE
-                       MOVE    "enabel"        TO  SPA-GMN-TLINK (IDY)
+                       MOVE    "enable"        TO  SPA-GMN-TLINK (IDY)
                    END-IF
                END-EVALUATE
            END-IF
