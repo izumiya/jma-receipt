@@ -4268,6 +4268,8 @@
                    PERFORM 10014-NIKOCHIN-CHK-SEC
                END-IF
       *    入院中の回数
+               IF      SPA-NYUGAIKBN       =   "1"
+      *
       *        リンパ浮腫指導管理料
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113010410"
                    MOVE    1                   TO  FLG-NYUIN
@@ -4287,6 +4289,8 @@
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113012470"
                    MOVE    1                   TO  FLG-NYUIN
                    PERFORM 10016-NYUIN-KIKAN-SEC
+               END-IF
+      *
                END-IF
       *
       *        特定薬剤治療管理初回算定コメントチェック
