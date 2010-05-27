@@ -1109,6 +1109,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
 grpsys     MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
            MOVE    NACCT-PTID              TO  PTINF-PTID
            PERFORM 900-PTINF-READ-SEC
+           MOVE    PTINF-MAXZAINUM     TO  WRK-ZAINUM
       *
            DISPLAY "NYUINACCT PTID=" NACCT-PTID
                    " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
@@ -1155,9 +1156,9 @@ grpsys     MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
                          END-IF
                        END-IF
                    END-PERFORM
-                   IF      WRK-ZAINUM              <   NACCT-ZAINUM
-                       MOVE    NACCT-ZAINUM        TO  WRK-ZAINUM
-                   END-IF
+      **             IF      WRK-ZAINUM              <   NACCT-ZAINUM
+      **                 MOVE    NACCT-ZAINUM        TO  WRK-ZAINUM
+      **             END-IF
                  END-IF
                  MOVE    "tbl_nyuinacct"           TO  MCP-TABLE
                  MOVE    "key18"                   TO  MCP-PATHNAME
