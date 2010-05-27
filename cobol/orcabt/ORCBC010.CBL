@@ -167,7 +167,8 @@
       *01  PRGSKBNO                PIC X(08)  VALUE "20080428".
       *01  PRGSKBNO                PIC X(08)  VALUE "20080826".
       *01  PRGSKBNO                PIC X(08)  VALUE "20081031".
-       01  PRGSKBNO                PIC X(08)  VALUE "20100128".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20100128".
+       01  PRGSKBNO                PIC X(08)  VALUE "20100527".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
