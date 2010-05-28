@@ -9336,7 +9336,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      *********   (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      4124-MAESYOHOU-SYORI-EXT
            END-IF
@@ -9433,7 +9434,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
       *        診療行為入力チェック
                PERFORM 41011-KOUI-ALLHEN-SEC
-               IF      SPA-ERRCD       NOT =   SPACE
+               IF     (SPA-ERRCD       NOT =   SPACE )
+                  OR  (SPA-KIDCD       NOT =   SPACE )
                    GO      TO      420-KOUISET-EXT
                END-IF
       *
@@ -9482,7 +9484,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    1                   TO  FLG-HENKOU
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )
+                  (SPA-KIDCD       NOT =   SPACE )
+      ****        (SPA-KIDCD           =   "0180" ) 
                GO      TO      430-SANTEIRRK-EXT
            END-IF
       *
@@ -9525,7 +9528,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    更新前の基本チェック
            PERFORM 41001-KIHON-CHK-SEC
            IF     (SPA-ERRCD       NOT =   SPACE  )  OR
-                  (SPA-KIDCD           =   "0180" )
+                  (SPA-KIDCD       NOT =   SPACE )
+      *****       (SPA-KIDCD           =   "0180" )
                GO      TO      4106S-INPUTCD-SYORI-EXT
            END-IF
       *
@@ -9604,7 +9608,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    基本チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE  )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      ******      (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE  )  OR
                   (FLG-END             =   1      )
                CONTINUE
            ELSE
@@ -9670,7 +9675,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    1                   TO  FLG-HENKOU
                    PERFORM 41011-KOUI-ALLHEN-SEC
                    IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                          (SPA-KIDCD           =   "0180")  OR
+      **************      (SPA-KIDCD           =   "0180")  OR
+                          (SPA-KIDCD       NOT =   SPACE )  OR
                           (FLG-END             =   1     )
                       GO      TO      440-KNJADD-EXT
                    END-IF
@@ -9793,7 +9799,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    1                   TO  FLG-HENKOU
                PERFORM 41011-KOUI-ALLHEN-SEC
                IF     (SPA-ERRCD       NOT =   SPACE  )  OR
-                      (SPA-KIDCD           =   "0180" )  OR
+      ****            (SPA-KIDCD           =   "0180" )  OR
+                      (SPA-KIDCD       NOT =   SPACE  )  OR
                       (FLG-END             =   1      )
                    GO      TO      450-KAIKEI-EXT
                END-IF
@@ -9834,7 +9841,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    1                   TO  FLG-HENKOU
                PERFORM 41011-KOUI-ALLHEN-SEC
                IF     (SPA-ERRCD       NOT =   SPACE  )  OR
-                      (SPA-KIDCD           =   "0180" )  OR
+      *********       (SPA-KIDCD           =   "0180" )  OR
+                      (SPA-KIDCD       NOT =   SPACE  )  OR
                       (FLG-END             =   1      )
                    GO      TO      460-SYUNOU-EXT
                END-IF
@@ -9918,8 +9926,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    更新前の基本チェック
            PERFORM 41001-KIHON-CHK-SEC
-           IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )
+           IF     (SPA-ERRCD       NOT =   SPACE  )  OR
+                  (SPA-KIDCD       NOT =   SPACE  )
                GO      TO      4110-KYOSEIEND-EXT
            END-IF
       *
@@ -10125,7 +10133,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      480-DOSYORI-EXT
            END-IF
@@ -10322,7 +10330,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      **********  (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      480-YOYAKU-EXT
            END-IF
@@ -10363,7 +10372,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      *****       (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      490-UKEICHI-EXT
            END-IF
@@ -10399,7 +10409,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      ****        (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      4102-UKETUKE-EXT
            END-IF
@@ -10442,7 +10453,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      4188-MEMO-SYORI-EXT
            END-IF
@@ -10651,7 +10662,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      K02-SRYYMD      NOT =   SPA-GMN-SRYYMD
                    MOVE    1                   TO  SPA-GMN-CUR
                    MOVE    "1009"              TO  SPA-ERRCD
-                   GO      TO      41001-KIHON-CHK-EXT
                END-IF
            ELSE
       *
@@ -10665,7 +10675,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      SGDAY-SDAY          <   SPA-BIRTHDAY
                         MOVE    "1011"         TO  SPA-ERRCD
                         MOVE    7              TO  SPA-GMN-CUR
-                        GO      TO      41001-KIHON-CHK-EXT
                    END-IF
       *            変更のない時、以降の処理はそのまま
                    IF      SGDAY-SDAY      NOT =   SPA-NAI-SRYYMD
@@ -10675,7 +10684,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
                    MOVE    "1010"          TO  SPA-ERRCD
                    MOVE    7               TO  SPA-GMN-CUR
-                   GO      TO      41001-KIHON-CHK-EXT
                END-IF
            END-IF
       *
