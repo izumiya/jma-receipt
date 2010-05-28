@@ -941,8 +941,10 @@
                           (IDX                 >=  50     )
       *        対象の保険組合せのみ編集
                IF     (COMB-DELKBN     NOT =   "1"   )  AND
-                     ((SPA-SRYYMD(1:6)     >=  COMB-TEKSTYMD(1:6))
-                 AND  (SPA-SRYYMD(1:6)     <=  COMB-TEKEDYMD(1:6)))
+      *              ((SPA-SRYYMD(1:6)     >=  COMB-TEKSTYMD(1:6))
+      *          AND  (SPA-SRYYMD(1:6)     <=  COMB-TEKEDYMD(1:6)))
+                     ((ORCSCHO-SRYYM       >=  COMB-TEKSTYMD(1:6))
+                 AND  (ORCSCHO-SRYYM       <=  COMB-TEKEDYMD(1:6)))
                    ADD     1               TO  IDX
                    MOVE    COMB-HKNCOMBINUM    TO  TBL-HKNCOMBINUM
                                                                (IDX)
