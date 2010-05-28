@@ -99,6 +99,8 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+       01  JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -179,6 +181,14 @@
                                                     )
                    MOVE    2       TO  MCP-VERSION
                    MOVE    0       TO  MCP-REDIRECT
+               END-IF
+      *
+               IF    ( MCP-TABLE   =   "tbl_jobkanri" )
+                   MOVE    MCPDATA-REC TO  JOBKANRI-REC
+                   IF    ( JOB-SHELLID =   "PRGMNT" )
+                       MOVE    2   TO  MCP-VERSION
+                       MOVE    0   TO  MCP-REDIRECT
+                   END-IF
                END-IF
       *
                EVALUATE    MCP-TABLE
