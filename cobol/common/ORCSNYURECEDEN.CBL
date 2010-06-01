@@ -2018,10 +2018,12 @@
                    END-IF
                END-IF
       *
-      *        Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£³£°¡ó¸º»º¡Ë
+      *        Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£³£°¡ó¸º»»¤È£·£°¡ó¸º»»¡Ë
                IF      (WRK-GAIHAKU(IDX1)        =
                                     "190142190" OR  "190142090" OR
-                                    "190142290" OR  "190141590" )
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090")
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -2038,16 +2040,24 @@
                END-IF
       *
       *        É¸·ç
-               IF     (WRK-GAIHAKU(IDX1)     =             SPACE) AND
-                      (WRK-HYOUKETSU(IDX1)   NOT =         SPACE)
+               IF      (WRK-GAIHAKU(IDX1)       =   SPACE       OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090")
+               AND     (WRK-HYOUKETSU(IDX1)   NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *
       *        Äê¿ôÄ¶²á
-               IF     (WRK-GAIHAKU(IDX1)     =             SPACE) AND
-                      (WRK-TEISU(IDX1)       NOT =         SPACE)
+               IF      (WRK-GAIHAKU(IDX1)       =   SPACE       OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090")
+               AND     (WRK-TEISU(IDX1)       NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-TEISU(IDX1)  TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -2057,7 +2067,9 @@
                IF         WRK-GAIHAKU(IDX1)   NOT =        SPACE
                  IF      (WRK-GAIHAKU(IDX1)     =
                                     "190142190" OR  "190142090" OR
-                                    "190142290" OR  "190141590" )
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090")
                           CONTINUE
                  ELSE
                    ADD      1               TO  WRK-MEISAISU
@@ -2711,7 +2723,7 @@
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
       *                Â¾°åÎÅµ¡´Ø¼õ¿Ç
                        WHEN   4
-                       WHEN   5
+      ******                 WHEN   5
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
                    END-EVALUATE
                END-IF
