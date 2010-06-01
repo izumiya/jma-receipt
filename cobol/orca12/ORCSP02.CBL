@@ -1366,7 +1366,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-GMN-SKYPRTFLG-LST (6)
            MOVE    "6 請求書必要（訂正時なし）（明細書不要）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (7)
-           MOVE    7                   TO  SPA-SKYPRTFLG-MAX
+           MOVE    "7 請求書必要（請求あり）（明細書必要）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (8)
+           MOVE    8                   TO  SPA-SKYPRTFLG-MAX
            MOVE    SPACE               TO  SPA-GMN-SKYPRTFLG-G
       *
       *    所得者２（高齢者福祉年金受給者証）

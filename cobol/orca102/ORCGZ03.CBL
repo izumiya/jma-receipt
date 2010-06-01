@@ -51,6 +51,7 @@
       *  04.02.00    NACL-多々納  08/03/XX  平成２０年４月改正対応
       *  04.04.00    NACL-多々納  09/01/05  前回検査日区分追加
       *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
+      *  04.05.00    NACL-多々納  10/04/XX  帳票名称追加対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -180,6 +181,8 @@
            03  FILLER          PIC X(32)  VALUE   "0 NAME".
       *    正式名称
            03  FILLER          PIC X(32)  VALUE   "0 FORMALNAME".
+      *    処方名称
+           03  FILLER          PIC X(32)  VALUE   "0 SHONAME".
       *    点数
            03  FILLER          PIC X(32)  VALUE   "0 TEN".
            03  FILLER          PIC X(32)  VALUE   "0 TENSIKIBETU".
@@ -313,13 +316,14 @@
       **** 03  TBL-GMN-OCC                 OCCURS  109
       **** 03  TBL-GMN-OCC                 OCCURS  115
       **** 03  TBL-GMN-OCC                 OCCURS  118
-           03  TBL-GMN-OCC                 OCCURS  119
+      **** 03  TBL-GMN-OCC                 OCCURS  119
+           03  TBL-GMN-OCC                 OCCURS  120
                                            INDEXED  IDX-GMN.
                05  TBL-PAGE                PIC 9(01).
                05  TBL-YOBI1               PIC X(01).
                05  TBL-WIDGET              PIC X(30).
       *
-       01  TBL-GMN-MAX                     PIC 9(04)   VALUE   119.
+       01  TBL-GMN-MAX                     PIC 9(04)   VALUE   120.
       *
       *    単位の項目順テーブル
            COPY    "CMTANICD.INC".
@@ -529,6 +533,9 @@
            03  FILLER              PIC X(02)   VALUE   "66".
            03  FILLER              PIC X(50)   VALUE
                "在宅難治性皮膚疾患処置指導管理料".
+           03  FILLER              PIC X(02)   VALUE   "67".
+           03  FILLER              PIC X(50)   VALUE
+               "在宅小児低血糖症患者指導管理料".
            03  FILLER              PIC X(02)   VALUE   "80".
            03  FILLER              PIC X(50)   VALUE
                "小児科外来診療料等".
@@ -551,12 +558,14 @@
        01  TBL-SDOKNRYO-AREA-R     REDEFINES   TBL-SDOKNRYO-AREA.
       *    03  TBL-SDOKNRYO-OCC        OCCURS  45      INDEXED  SDO-IDX.
       **** 03  TBL-SDOKNRYO-OCC        OCCURS  58      INDEXED  SDO-IDX.
-           03  TBL-SDOKNRYO-OCC        OCCURS  73      INDEXED  SDO-IDX.
+      **** 03  TBL-SDOKNRYO-OCC        OCCURS  73      INDEXED  SDO-IDX.
+           03  TBL-SDOKNRYO-OCC        OCCURS  74      INDEXED  SDO-IDX.
                05  TBL-SDOKNRYO        PIC X(02).
                05  TBL-SDOKNRYOMEI     PIC X(50).
       *01  SDO-MAX                     PIC 9(04)   VALUE   45.
       *01  SDO-MAX                     PIC 9(04)   VALUE   58.
-       01  SDO-MAX                     PIC 9(04)   VALUE   73.
+      *01  SDO-MAX                     PIC 9(04)   VALUE   73.
+       01  SDO-MAX                     PIC 9(04)   VALUE   74.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -980,6 +989,8 @@
       *
       *    入力チェック区分
            MOVE    TNSP-INPCHKKBN      TO  SPA-GMN-INPCHKKBN
+      *    処方名
+           MOVE    TNSP-SHONAME        TO  SPA-GMN-SHONAME
       *    採血区分
            MOVE    TNSP-SAIKETUKBN     TO  SPA-GMN-SAIKETUKBN
       *    採血料区分一覧
@@ -1677,6 +1688,7 @@
            MOVE    Z03-KANANAME        TO  SPA-GMN-KANANAME
            MOVE    Z03-NAME            TO  SPA-GMN-NAME
            MOVE    Z03-FORMALNAME      TO  SPA-GMN-FORMALNAME
+           MOVE    Z03-SHONAME         TO  SPA-GMN-SHONAME
            MOVE    Z03-TEN             TO  SPA-GMN-TEN
            MOVE    Z03-TENSIKIBETU     TO  SPA-GMN-TENSIKIBETU-G
            MOVE    Z03-OLDTEN          TO  SPA-GMN-OLDTEN
@@ -1887,6 +1899,9 @@
       *        正式名
                WHEN    "FORMALNAME"
                    PERFORM 505-FORMALNAME-CHK-SEC
+      *        処方名称
+               WHEN    "SHONAME"
+                   PERFORM 505-SHONAME-CHK-SEC
       *        金額
                WHEN    "TEN"
                    CONTINUE
@@ -2257,6 +2272,25 @@
            EXIT.
       *
       *****************************************************************
+      *    処方名称チェック処理
+      *****************************************************************
+       505-SHONAME-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-SHONAME     TO  WRK-MAE-INPUT
+           MOVE    100                 TO  WRK-LEN
+           PERFORM 410-ZENCHK-HEN-SEC
+           MOVE    WRK-OUT-INPUT       TO  SPA-GMN-SHONAME
+           IF      FLG-ERR             =   ZERO
+               MOVE    WRK-OUT-INPUT       TO  SPA-GMN-SHONAME
+           ELSE
+               MOVE    "0010"              TO  SPA-ERRCD
+           END-IF
+           .
+      *
+       505-SHONAME-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    半角チェック処理
       *****************************************************************
        400-ZENCHK-SEC             SECTION.
@@ -2281,7 +2315,27 @@
        400-ZENCHK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    半角変換（チェック）処理
+      *****************************************************************
+       410-ZENCHK-HEN-SEC             SECTION.
       *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
+           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           IF     (KANACHK-RC      NOT =   ZERO  )
+               MOVE    1                   TO  FLG-ERR
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-OUT-INPUT 
+           ELSE
+               MOVE    ZERO                TO  FLG-ERR
+               MOVE    KANACHK-OUT-INPUT   TO  WRK-OUT-INPUT 
+           END-IF
+           .
+       410-ZENCHK-HEN-EXT.
+           EXIT.
       *****************************************************************
       *  　診療区分チェック
       *****************************************************************
@@ -4061,6 +4115,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    他回数
            MOVE    SPA-GMN-PLUS-JGNCNTETC
                                        TO  TNSP-JGNCNTETC
+      *    処方名称
+           MOVE    SPA-GMN-SHONAME     TO  TNSP-SHONAME
+                                           WRK-STRINGTBL
+           MOVE    100                 TO  CNT-STRING
+           PERFORM 891-STRCOUNT-SEC
+           MOVE    CNT-STRING          TO  TNSP-SHOYUKOKETA
       *
       *    入力コード更新
            CALL    "ORCGZS02"          USING
@@ -4208,6 +4268,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE  SPA-GMN-JGNAGE                TO  Z03-JGNAGE      
       *
            MOVE  SPA-GMN-FORMALNAME            TO  Z03-FORMALNAME
+           MOVE  SPA-GMN-SHONAME               TO  Z03-SHONAME
            MOVE  SPA-GMN-INPCHKKBN             TO  Z03-INPCHKKBN
       *    採血料区分
            MOVE  SPA-GMN-SAIKETUKBN-G          TO  Z03-SAIKETUKBN
@@ -4554,6 +4615,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                  TO  SPA-ERRMSG
                WHEN    "0005"
                    MOVE    "正式名称は全角で入力して下さい"
+                                                 TO  SPA-ERRMSG
+               WHEN    "0010"
+                   MOVE    "出力名称は全角で入力して下さい"
                                                  TO  SPA-ERRMSG
       *
                WHEN    "0006"

@@ -36,3 +36,10 @@
       *    月別請求書入金済請求データ集計区分
       *    （０：集計に含める、１：集計に含めない）
            03  SYUPARA01-TUKISUMKBN        PIC X(01).
+      *    月別請求書期間区分
+      *    （１：期間指定する）
+           03  SYUPARA01-TUKIKIKANKBN      PIC X(01).
+      *    月別請求書期間開始日
+           03  SYUPARA01-TUKISTYMD         PIC X(08).
+      *    月別請求書期間終了日
+           03  SYUPARA01-TUKIEDYMD         PIC X(08).

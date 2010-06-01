@@ -588,7 +588,9 @@
            MOVE    "ORCHC03V02"        TO  SPA-GMN-ORGPGNM03MEIL(2)
            MOVE    "ORCHC03V03"        TO  SPA-GMN-ORGPGNM03MEIL(3)
            MOVE    "ORCHC03V03A5"      TO  SPA-GMN-ORGPGNM03MEIL(4)
-           MOVE    4                   TO  SPA-GMN-ORGPGNM03-MAX
+      ***  MOVE    4                   TO  SPA-GMN-ORGPGNM03-MAX
+           MOVE    "ORCHC03V04"        TO  SPA-GMN-ORGPGNM03MEIL(5)
+           MOVE    5                   TO  SPA-GMN-ORGPGNM03-MAX
       *
       *    ÀÁµá½ñ·óÎÎ¼ý½ñ¥³¥ó¥Ü¡ÊÆþ±¡¡Ë
            MOVE    "ORCHCN03"          TO  SPA-GMN-ORGPGNM03NMEIL(1)

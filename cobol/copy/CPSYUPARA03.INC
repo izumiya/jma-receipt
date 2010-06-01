@@ -29,6 +29,7 @@
            03  SYUPARA03-NYU-MISYU         PIC S9(10).
            03  SYUPARA03-HENKIN            PIC S9(10).
            03  SYUPARA03-NYUKIN            PIC S9(10).
+           03  SYUPARA03-KIKANKBN          PIC X(01).
            03  SYUPARA03-STSRYYMD          PIC X(08).
            03  SYUPARA03-EDSRYYMD          PIC X(08).
            03  SYUPARA03-JNISSU            PIC 9(02).

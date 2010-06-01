@@ -44,4 +44,8 @@
                05  ORCHC03SUB-DOUJI-HKNCOMBI-G.
                    07  ORCHC03SUB-DOUJI-HKNCOMBI   PIC  X(04)
                                                OCCURS  10.
+      *        同時伝票番号（診療費明細書用）
+               05  ORCHC03SUB-DOUJI-DENPNUM-G.
+                   07  ORCHC03SUB-DOUJI-DENPNUM    PIC  9(07)
+                                               OCCURS  15.
       *

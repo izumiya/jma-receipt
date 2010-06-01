@@ -30,6 +30,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  03.05.01    NACL-多々納  07/08/XX  訂正時の合計金額対応
+      *  04.05.00    NACL-多々納  10/05/XX  請求書兼明細書対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -62,6 +63,7 @@
            03  IDH3                PIC 9(04).
            03  IDX-SYU             PIC 9(04).
            03  IDX-TBL             PIC 9(04).
+           03  IDX-DN              PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -103,6 +105,8 @@
                                           OCCURS  10.
                05  TBL-DOUJI-HKNCOMBI     PIC  X(04)
                                           OCCURS  10.
+               05  TBL-DOUJI-DENPNUM      PIC  9(07)
+                                          OCCURS  15.
       *    請求額等
        01  TBL-SEIKYU-AREA.
            03  TBL-SEIKYU-TBL       OCCURS   15.
@@ -125,6 +129,11 @@
                05  LNK-DOUJI-HKNCOMBI-G.
                    07  LNK-DOUJI-HKNCOMBI     PIC  X(04)
                                           OCCURS  10.
+       01  LNK-DOUJI-AREA2.
+           03  LNK-DOUJI-TBL2       OCCURS   15.
+               05  LNK-DOUJI-DENPNUM-G.
+                   07  LNK-DOUJI-DENPNUM      PIC  9(07)
+                                              OCCURS  15.
       *    請求額等
        01  LNK-SEIKYU-AREA.
            03  LNK-SEIKYU-TBL       OCCURS   15.
@@ -238,6 +247,8 @@
            MOVE    WRK-NYUKIN-TOTAL
                                    TO  ORCHC03SUB-NYUKIN-TOTAL(IDX-SYU)
            MOVE    WRK-HENKIN      TO  ORCHC03SUB-HENKIN(IDX-SYU)
+           MOVE    SYU-DENPNUM     TO  ORCHC03SUB-DOUJI-DENPNUM
+                                                        (IDX-SYU 1)
            MOVE    IDX-SYU         TO  ORCHC03SUB-MAX
            .
        200-ONLY-SYUNOU-HEN-EXT.
@@ -336,6 +347,8 @@
            MOVE    "key27"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           INITIALIZE                  LNK-DOUJI-AREA2
+           MOVE    ZERO                TO  IDX-DN
            EVALUATE    ORCHC03-HAKHOUFLG
       *        科・保険別
                WHEN    1
@@ -423,10 +436,17 @@
                        ELSE
                            PERFORM 30022-SYUTOTAL-CHK-SEC
                        END-IF
-                       MOVE    1               TO  FLG-OK
+                       MOVE    1                   TO  FLG-OK
+                       MOVE    ZERO                TO  IDX-DN
                    ELSE
                        IF      LNK-SYU-HKNCOMBINUM(IDX-SYU)
                                            =   WRK-SYU-HKNCOMBINUM
+      *                    伝票番号
+                           ADD     1               TO  IDX-DN
+                           MOVE    WRK-SYU-DENPNUM
+                                                   TO  LNK-DOUJI-DENPNUM
+                                                       (IDX-SYU IDX-DN)
+      *
                            IF      LNK-SYU-SRYKA (IDX-SYU)
                                                NOT =   ZERO
                                PERFORM 30021-SYUNOU-ADD-SEC
@@ -476,6 +496,9 @@
                                                            (IDX-SYU)
                    MOVE    LNK-DOUJI-HKNCOMBI-G(IDX)
                                        TO  ORCHC03SUB-DOUJI-HKNCOMBI-G
+                                                           (IDX-SYU)
+                   MOVE    LNK-DOUJI-DENPNUM-G(IDX)
+                                       TO  ORCHC03SUB-DOUJI-DENPNUM-G
                                                            (IDX-SYU)
                    MOVE    IDX-SYU             TO  ORCHC03SUB-MAX
                END-IF
@@ -735,13 +758,18 @@
                        MOVE    TBL-HENKIN         (IDX)
                                                    TO  LNK-HENKIN
                                                        (IDX-SYU)
-                       MOVE    1               TO  FLG-OK
+                       MOVE    1                   TO  FLG-OK
+                       MOVE    ZERO                TO  IDX-DN
                    ELSE
                        IF      LNK-SYU-SRYKA (IDX-SYU)
                                            =   WRK-SYU-SRYKA
                            MOVE    LNK-SYU-HKNCOMBINUM(IDX-SYU)
                                                TO  WRK-HKNCOMBI
                            PERFORM 30031-DOUJI-HKNCOMBI-SEC
+      *                    伝票番号
+                           ADD     1               TO  IDX-DN
+                           MOVE    WRK-SYU-DENPNUM TO  LNK-DOUJI-DENPNUM
+                                                      (IDX-SYU IDX-DN)
       *                    複数保険
                            MOVE    ZERO        TO  LNK-SYU-HKNCOMBINUM
                                                            (IDX-SYU)
@@ -785,6 +813,17 @@
       *    まとめ合計編集処理
       *****************************************************************
        3004-SYORI-04-SEC               SECTION.
+      *
+           INITIALIZE                  LNK-DOUJI-AREA2
+           MOVE    ZERO                TO  IDX-DN
+           PERFORM VARYING     IDX     FROM    2   BY  1
+                   UNTIL       IDX     >   IDX-TBL
+               MOVE    TBL-SYUNOU-REC (IDX)    TO  WRK-SYUNOU-REC
+      *        伝票番号
+               ADD     1                   TO  IDX-DN
+               MOVE    WRK-SYU-DENPNUM     TO  LNK-DOUJI-DENPNUM
+                                                 (1 IDX-DN)
+           END-PERFORM
       *
       *    保険別に集計する
            PERFORM 3002-SYORI-02-SEC
