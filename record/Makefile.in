@@ -422,6 +422,8 @@ RECORD_files = \
 	M80.rec \
 	M80ERR.rec \
 	M80ID1.rec \
+	S07.rec \
+	SID3.rec \
 
 DEF_files = \
 	HC01.def \

@@ -975,13 +975,17 @@
       *****************************************************************
        310-SRYPRTKBNLST-SET-SEC    SECTION.
       *
-           MOVE    2               TO  SPA-GMN-W24-SRYPRTKBN-MAX
+           MOVE    3               TO  SPA-GMN-W24-SRYPRTKBN-MAX
       *
            MOVE    "0"             TO  SPA-GMN-W24-SRYPRTKBNL   (1)
            MOVE    "発行しない"    TO  SPA-GMN-W24-SRYPRTKBNMEIL(1)
       *
            MOVE    "1"             TO  SPA-GMN-W24-SRYPRTKBNL   (2)
            MOVE    "発行する"      TO  SPA-GMN-W24-SRYPRTKBNMEIL(2)
+      *
+           MOVE    "2"             TO  SPA-GMN-W24-SRYPRTKBNL   (3)
+           MOVE    "発行する(請求あり)"
+                                   TO  SPA-GMN-W24-SRYPRTKBNMEIL(3)
       *
       *
            .

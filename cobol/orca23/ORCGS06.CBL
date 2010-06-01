@@ -184,6 +184,7 @@
                    07  SPA-NAI-SYULIST.
                        09  SPA-NAI-SYULIST-OCC     OCCURS  401.
                            11  SPA-NAI-TSRYKA      PIC  X(02).
+                           11  SPA-NAI-THKNCOMBI   PIC  X(04).
                            11  SPA-NAI-TSRYYMD     PIC  X(08).
                            11  SPA-NAI-THAKYMD     PIC  X(08).
                            11  SPA-NAI-TNYUGAIKBN  PIC  X(01).
@@ -306,6 +307,16 @@
                05  S1005-SRYKAL-EDYUKYMD   PIC X(08).
                05  S1005-SRYKAMEIL         PIC X(12).
       *
+       01  TSYU-AREA.
+           03  TSYU-MAX                    PIC 9(05).
+           03  TSYU-OCC                    OCCURS 401.
+               05  TSYU-KEY.
+                   07  TSYU-SRYYMD         PIC X(08).
+                   07  TSYU-SRYKA          PIC X(02).
+                   07  TSYU-HKNCOMBI       PIC X(04).
+                   07  TSYU-DENPNUM        PIC 9(07).
+               05  TSYU-NYUKIN             PIC S9(10).
+      *
        01  CONST-AREA.
            03  CONST-MODE-NORMON           PIC 9(01) VALUE 0.
            03  CONST-SYULIST-MAX           PIC 9(05)   VALUE 400.
@@ -388,10 +399,12 @@
            COPY    "S03N.INC".
            COPY    "S04.INC".
            COPY    "S06.INC".
+           COPY    "S07.INC".
            COPY    "S99.INC".
            COPY    "SERR.INC".
            COPY    "SID1.INC".
            COPY    "SID2.INC".
+           COPY    "SID3.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -854,13 +867,12 @@
                 AND  ( SYU-SRYYMD     <=   S1005-SRYKAL-EDYUKYMD (IDX1))
                    MOVE    S1005-SRYKAMEIL (IDX1)
                                        TO  SPA-GMN-TSRYKA (IDX-LST)
-                   MOVE    S1005-SRYKAL (IDX1)
-                                       TO  SPA-NAI-TSRYKA (IDX-LST)
                    MOVE    S1005-SRYKALST-MAX
                                        TO  IDX1
                END-IF
       *
            END-PERFORM
+           MOVE    SYU-SRYKA           TO  SPA-NAI-TSRYKA (IDX-LST)
       *
       *    ¿ÇÎÅÆü
            EVALUATE    SYU-NYUGAIKBN
@@ -902,6 +914,7 @@
            MOVE    WRK-HKNKUMI         TO  SPA-GMN-THKNCOMBI (IDX-LST)
            MOVE    WRK-HKNNUM          TO  SPA-NAI-THKNNUM   (IDX-LST)
            MOVE    WRK-RSI-HKNKBN      TO  SPA-NAI-TRSI-HKNKBN(IDX-LST)
+           MOVE    SYU-HKNCOMBINUM     TO  SPA-NAI-THKNCOMBI(IDX-LST)
       *
       *    ´µ¼ÔÉéÃ´Î¨
            IF    ( SYU-PTFTNRATE       =   ZERO )
@@ -2611,6 +2624,7 @@
       *
            INITIALIZE                  SYUPARA01-AREA
                                        SYUPARA02-AREA
+                                       TSYU-AREA
       *
       *
            MOVE    "2"                 TO  SYUPARA01-NYUGAIKBN
@@ -2650,17 +2664,51 @@
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0            >   SPA-GMN-SYULIST-MAX )
-                    OR   ( SPA-ERRCD   NOT =   SPACE )
-      *
                IF    ( SPA-NAI-TNYUGAIKBN (IDX0)   =   "2"  )
                 AND  ( SPA-GMN-TNYUKIN (IDX0)  NOT =   ZERO )
+                   COMPUTE TSYU-MAX    =   TSYU-MAX    +   1
+                   MOVE    SPA-NAI-TSRYYMD (IDX0)
+                                       TO  TSYU-SRYYMD(TSYU-MAX)
+                   MOVE    SPA-NAI-TSRYKA (IDX0)
+                                       TO  TSYU-SRYKA(TSYU-MAX)
+                   MOVE    SPA-NAI-THKNCOMBI (IDX0)
+                                       TO  TSYU-HKNCOMBI(TSYU-MAX)
+                   MOVE    SPA-GMN-TDENPNUM (IDX0)
+                                       TO  TSYU-DENPNUM(TSYU-MAX)
+                   MOVE    SPA-GMN-TNYUKIN (IDX0)
+                                       TO  TSYU-NYUKIN (TSYU-MAX)
+               END-IF
+           END-PERFORM
+      *
+           COMPUTE IDX-TMP =   SPA-GMN-SYULIST-MAX     +   1
+           PERFORM VARYING IDXA FROM    1   BY  1
+                   UNTIL ( IDXA     >   TSYU-MAX - 1)
+               COMPUTE WRK-STIDX   =   IDXA +   1
+               PERFORM VARYING IDX-SRT FROM    WRK-STIDX   BY  1
+                       UNTIL ( IDX-SRT >   TSYU-MAX )
+      *
+                   IF    ( TSYU-KEY (IDXA)
+                                       >   TSYU-KEY (IDX-SRT))
+                       MOVE    TSYU-OCC (IDXA)
+                                       TO  TSYU-OCC (IDX-TMP)
+                       MOVE    TSYU-OCC (IDX-SRT)
+                                       TO  TSYU-OCC (IDXA)
+                       MOVE    TSYU-OCC (IDX-TMP)
+                                       TO  TSYU-OCC (IDX-SRT)
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0            >   TSYU-MAX )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
       *
                    COMPUTE PARA-EDANUM =   PARA-EDANUM +   1
       *
                    INITIALIZE              SYUPARA02-AREA
-                   MOVE    SPA-GMN-TDENPNUM (IDX0)
+                   MOVE    TSYU-DENPNUM (IDX0)
                                        TO  SYUPARA02-DENPNUM
-                   MOVE    SPA-GMN-TNYUKIN (IDX0)
+                   MOVE    TSYU-NYUKIN (IDX0)
                                        TO  SYUPARA02-NYUKIN
                    MOVE    SYUPARA02-AREA
                                        TO  PARA-DATA-REC
@@ -2671,7 +2719,6 @@
                    IF    ( MCP-RC      NOT =   ZERO )
                        MOVE    "4004"      TO  SPA-ERRCD
                    END-IF
-               END-IF
       *
            END-PERFORM
       *
@@ -2690,7 +2737,6 @@
            END-IF
       *
            IF    ( SPA-ERRCD           =       SPACE )
-      *
       *
                MOVE    WRK-GAI-SRYYMD      TO  WRK-SPA-SRYYMD
                INITIALIZE                      ORCHC03AREA

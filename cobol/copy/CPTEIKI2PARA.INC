@@ -33,8 +33,9 @@
            03  TEIKI2P-HOSPNUM             PIC 9(02).
            03  TEIKI2P-STAFFCD             PIC X(05).
            03  TEIKI2P-ERRFILE             PIC X(200).
+           03  TEIKI2P-PTINFREF            PIC X(01).
            03  TEIKI2P-SKYPRT              PIC X(01).
-           03  TEIKI2P-PRTFORM             PIC X(01).
+           03  TEIKI2P-SRYPRT              PIC X(01).
            03  TEIKI2P-PRTKBN              PIC X(01).
            03  TEIKI2P-SRYYM               PIC X(06).
            03  TEIKI2P-KBT-G.

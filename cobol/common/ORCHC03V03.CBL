@@ -160,8 +160,8 @@
            03  WRK-WARI            PIC 9(02)V9.
       *****03  WRK-Z6              PIC ZZZZZZ.
       *****03  WRK-Z62             PIC ZZZ9.9.
-           03  WRK-Z6              PIC ZZZ.
-           03  WRK-Z62             PIC 9.9.
+           03  WRK-HKNFTN          PIC ZZ9.
+           03  WRK-HKNFTN2         PIC 9.9.
       *
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-NO              PIC Z(7).
@@ -225,6 +225,9 @@
       *
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¥Ñ¥é¥á¥¿
        01  TPARA-AREA.
+           03  TPARA-SRYKA              PIC X(01).
+           03  TPARA-HKNMEI             PIC X(01).
+           03  TPARA-FTNKBN             PIC X(01).
            03  TPARA-HAKKOUBIKBN        PIC X(01).
            03  TPARA-YUKOSTYMD          PIC X(08).
            03  TPARA-YUKOEDYMD          PIC X(08).
@@ -867,14 +870,37 @@
        100-OPTION-SELECT-SEC             SECTION.
       *
            INITIALIZE                  TPARA-AREA
+           MOVE    "1"             TO  TPARA-SRYKA
+           MOVE    "1"             TO  TPARA-HKNMEI
+           MOVE    "2"             TO  TPARA-FTNKBN
            MOVE    "0"             TO  TPARA-HAKKOUBIKBN
            MOVE    "00000000"      TO  TPARA-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-YUKOEDYMD
       *
+      *    ¿ÇÎÅ²ÊÌ¾
+           MOVE    "SRYKA"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-SRYKA
+           END-IF
+      *
+      *    ÊÝ¸±Ì¾¾Î
+           MOVE    "HKNMEI"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-HKNMEI
+           END-IF
+      *
+      *    ÉéÃ´³ä¹ç
+           MOVE    "FTNKBN"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" OR "2" )
+               MOVE    WRK-PARA    TO  TPARA-FTNKBN
+           END-IF
+      *
       *    ÅÁÉ¼È¯¹ÔÆü¶èÊ¬
            MOVE    "HAKKOUBIKBN"   TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
-           DISPLAY "WRK-PARA =" WRK-PARA
            IF    ( WRK-PARA        =   "0" OR "1" )
                MOVE    WRK-PARA    TO  TPARA-HAKKOUBIKBN
            END-IF
@@ -980,24 +1006,54 @@
            MOVE    WRK-DENPNUM         TO  WRK-NO  
            MOVE    WRK-NO              TO  HC03-NO
       *    ¿ÇÎÅ²Ê
-           MOVE    WRK-SRYKA-MEI(1:20) TO  HC03-MIDASI
+           IF    ( TPARA-SRYKA         =   "1" )
+               MOVE    WRK-SRYKA-MEI(1:20) TO  HC03-MIDASI
+           END-IF
       *    ´µ¼ÔÈÖ¹æ
            MOVE    SPA-PTNUM           TO  HC03-KNJNO
       *    ´µ¼ÔÌ¾¾Î
            MOVE    SPA-NAME            TO  HC03-KNJNAMW
       *    ÊÝ¸±¼ïÊÌ
-           MOVE    WRK-HKNCOMBIMEI     TO  HC03-HOKEN
-      *    ÉéÃ´³ä¹ç
-           IF      SYU-PTFTNRATE       >   ZERO
-               COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
-               IF      SYU-PTFTNRATE(3:1)  =   ZERO
-                   MOVE    WRK-WARI            TO  WRK-Z6
-                   MOVE    WRK-Z6              TO  HC03-FUTAN
-               ELSE
-                   MOVE    WRK-WARI            TO  WRK-Z62
-                   MOVE    WRK-Z62             TO  HC03-FUTAN
-               END-IF
+           IF    ( TPARA-HKNMEI        =   "1" )
+               MOVE    WRK-HKNCOMBIMEI TO  HC03-HOKEN
            END-IF
+      *    ÉéÃ´³ä¹ç
+           IF    ( SYU-SRYYMD         >=   CONST-H200401 )
+               EVALUATE    TPARA-FTNKBN
+               WHEN    "1"
+                       MOVE    "¡ó"                TO  HC03-LBLFTNRATE
+                       MOVE    SYU-PTFTNRATE       TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN          TO  HC03-FUTAN
+               WHEN    "2"
+                   MOVE    "³ä"            TO  HC03-LBLFTNRATE
+                   COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
+                   IF      SYU-PTFTNRATE(3:1)  =   ZERO
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN          TO  HC03-FUTAN
+                   ELSE
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN2
+                       MOVE    WRK-HKNFTN2         TO  HC03-FUTAN
+                   END-IF
+               END-EVALUATE
+           ELSE
+                   COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
+                   IF      SYU-PTFTNRATE(3:1)
+                                           =   ZERO
+                       MOVE    WRK-WARI    TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN  TO  HC03-FUTAN
+                   ELSE
+                       MOVE    WRK-WARI    TO  WRK-HKNFTN2
+                       MOVE    WRK-HKNFTN2 TO  HC03-FUTAN
+                   END-IF
+           END-IF
+           IF    ( SYU-HKNCOMBINUM =   SPACE OR    ZERO )
+                   MOVE    SPACE       TO  HC03-FUTAN
+           END-IF
+           IF    ( TPARA-FTNKBN        =   "0" )
+               MOVE    SPACE           TO  HC03-FUTAN
+                                           HC03-LBLFTNRATE
+           END-IF
+      *
       *    ¿ÇÎÅÆü
            PERFORM 3101-SRYYMD-HEN-SEC
            MOVE    WRK-LBLSRYYMD       TO  HC03-LBLSRYYMD
@@ -1467,6 +1523,7 @@
                MOVE  HC03-MEMO (IDX)
                                    TO  HC03V01-MEMO (IDX)
            END-PERFORM
+           MOVE  HC03-LBLFTNRATE   TO  HC03V01-LBLFTNRATE
       *
            .
        2002-HC03V01-HEN-EXT.
@@ -1552,6 +1609,7 @@
                MOVE  HC03-MEMO (IDX)
                                    TO  HC03V02-MEMO (IDX)
            END-PERFORM
+           MOVE  HC03-LBLFTNRATE   TO  HC03V02-LBLFTNRATE
       *
            .
        2002-HC03V02-HEN-EXT.
@@ -1561,14 +1619,24 @@
       *****************************************************************
        3001-TUKIBETU-HEN-SEC           SECTION.
       *
+            MOVE    1                  TO  IDXP
+      *
             MOVE    SYUPARA03-JNISSU   TO  WRK-JNISSU
             STRING  "¼ÂÆü¿ô"           DELIMITED   BY  SIZE
                     WRK-JNISSU         DELIMITED   BY  SIZE
-                    "Æü¡Ê¿ÇÎÅ²Ê¡§"     DELIMITED   BY  SIZE
-                    SYUPARA03-SRYKAMEI DELIMITED   BY  SPACE
-                    "¡Ë"               DELIMITED   BY  SIZE
+                    "Æü"               DELIMITED   BY  SIZE
             INTO    HC03-TUKISRYKA
+            WITH    POINTER    IDXP
             END-STRING
+      *
+            IF    ( TPARA-SRYKA        =   "1" )
+                STRING  "¡Ê¿ÇÎÅ²Ê¡§"       DELIMITED   BY  SIZE
+                        SYUPARA03-SRYKAMEI DELIMITED   BY  SPACE
+                        "¡Ë"               DELIMITED   BY  SIZE
+                INTO    HC03-TUKISRYKA
+                WITH    POINTER    IDXP
+                END-STRING
+            END-IF
       *
            .
        3001-TUKIBETU-HEN-EXT.
@@ -1904,11 +1972,24 @@
                                                WRK-LBLSRYYMD
       *
            IF    ( ORCHC03-HAKKOFLG    =   4 )
+               IF    ( SYUPARA03-KIKANKBN  =   "1" )
+                   IF    ( SYUPARA03-STSRYYMD
+                                       NOT =   SYUPARA03-EDSRYYMD )
+                       MOVE    "¿ÇÎÅÆü"    TO  WRK-LBLSRYYMD
+                       PERFORM 31012-SRYYMD-HEN-SEC
+                   ELSE
+                       MOVE    "¿ÇÎÅÆü"    TO  WRK-LBLSRYYMD
+                       MOVE    SYU-SRYYMD  TO  WRK-SYMD
+                       PERFORM 31012-SEIWA-HEN-SEC
+                       MOVE    WRK-HENYMDG TO  WRK-SRYYMDG
+                   END-IF
+               ELSE
                    MOVE    "¿ÇÎÅÇ¯·î"      TO  WRK-LBLSRYYMD
                    MOVE    SYU-SRYYMD      TO  WRK-SYMD
                    PERFORM 31012-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG  (1:16)
                                            TO  WRK-SRYYMDG
+               END-IF
            ELSE
                IF    ( ORCHC03-PARAFLG         =   1 )
                 AND  ( SYUPARA03-STSRYYMD  NOT =   SYUPARA03-EDSRYYMD )
@@ -1939,9 +2020,10 @@
            MOVE    SYUPARA03-EDSRYYMD  TO  WRK-SYMD
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-EDSRYYMDG
+      *    MOVE    WRK-HENYMDG (17:)   TO  WRK-EDSRYYMDG
       *
            STRING  WRK-STSRYYMDG       DELIMITED   BY  SIZE
-                   " ¡Á "              DELIMITED   BY  SIZE
+                   "¡Á"                DELIMITED   BY  SIZE
                    WRK-EDSRYYMDG       DELIMITED   BY  SIZE
            INTO    WRK-SRYYMDG
            END-STRING

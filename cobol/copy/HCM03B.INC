@@ -60,3 +60,4 @@
             02  HCM03B-RSIEN    PIC X(2).
             02  HCM03B-MEMO
                     PIC X(80)   OCCURS  10 TIMES.
+            02  HCM03B-LBLFTNRATE   PIC X(2).

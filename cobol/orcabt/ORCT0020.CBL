@@ -84,6 +84,7 @@
        01  IDX-AREA.
            03  IDX0                        PIC 9(05). 
            03  IDX1                        PIC 9(05). 
+           03  IDX2                        PIC 9(05). 
            03  IDX-SELKBT                  PIC 9(05).
            03  IDX-M                       PIC 9(05).
            03  IDX-MAX                     PIC 9(05).
@@ -103,13 +104,13 @@
            03  WRK-NYUKINPRT-KBN           PIC X(01).
            03  WRK-STPAGE                  PIC 9(05).
            03  WRK-EDPAGE                  PIC 9(05).
-           03  WRK-MAX                     PIC 9(05).
            03  WRK-MEISAI-PG               PIC X(20).
            03  WRK-MEISAI-PRTNM            PIC X(20).
            03  WRK-PTID                    PIC 9(10).
            03  WRK-PRTPARA-G.
+               05  WRK-PTINFREF            PIC X(01).
                05  WRK-SKYPRT              PIC X(01).
-               05  WRK-PRTFORM             PIC X(01).
+               05  WRK-SRYPRT              PIC X(01).
       *
        01  SRH-AREA.
            03  SRH-IDX                     PIC 9(05).
@@ -134,8 +135,15 @@
                05  TSYUGRP-KBT             PIC X(01).
                05  TSYUGRP-GRP-MAX         PIC 9(05).
                05  TSYUGRP-GRP-OCC         OCCURS   10.
-                   07  TSYUGRP-GRP-DENPNUM PIC 9(07).
-                   07  TSYUGRP-GRP-SRYYMD  PIC X(08).
+                   07  TSYUGRP-DENPPRTYMD  PIC X(08).
+                   07  TSYUGRP-SKYPRT      PIC X(01).
+                   07  TSYUGRP-SRYPRT      PIC X(01).
+                   07  TSYUGRP-GRP-MAX2    PIC 9(05).
+                   07  TSYUGRP-GRP-OCC2    OCCURS   10.
+                       09  TSYUGRP-GRP-DENPNUM
+                                           PIC 9(07).
+                       09  TSYUGRP-GRP-SRYYMD
+                                           PIC X(08).
       *
        01  ERR-EDIT-AREA.
            03  ERR-WARNING                 PIC 9(01).
@@ -346,8 +354,9 @@
                                                TEIKI2P-SUMKBN
            END-UNSTRING
       *
+           MOVE    WRK-PTINFREF        TO  TEIKI2P-PTINFREF
            MOVE    WRK-SKYPRT          TO  TEIKI2P-SKYPRT
-           MOVE    WRK-PRTFORM         TO  TEIKI2P-PRTFORM
+           MOVE    WRK-SRYPRT          TO  TEIKI2P-SRYPRT
       *
            MOVE    TEIKI2P-HOSPNUM     TO  SPA-HOSPNUM
            MOVE    TEIKI2P-STAFFCD     TO  SPA-STAFFCD
@@ -534,47 +543,25 @@
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   TSYUGRP-MAX )
       *
-               PERFORM VARYING IDX-M   FROM    1   BY  1
-                       UNTIL ( IDX-M   >   ORCHCN03-CNT )
-      *
-                   INITIALIZE          ORCHCN03-OCC (IDX-M)
-      *
-               END-PERFORM
-      *
-               MOVE    ZERO        TO  ORCHCN03-CNT
-      *
-               MOVE    TSYUGRP-GRP-MAX (IDX0)
-                                   TO  WRK-MAX
                PERFORM VARYING IDX1    FROM    1   BY  1
-                       UNTIL ( IDX1    >   WRK-MAX )
+                       UNTIL ( IDX1    >   TSYUGRP-GRP-MAX (IDX0))
       *
                    PERFORM VARYING IDX-M   FROM    1   BY  1
-                           UNTIL ( IDX-M   >   WORCHCN03-CNT )
+                           UNTIL ( IDX-M   >   ORCHCN03-CNT )
       *
-                       IF    ( TSYUGRP-GRP-DENPNUM (IDX0 IDX1)
-                                   =   WORCHCN03-DENPNUM (IDX-M))
-                           COMPUTE ORCHCN03-CNT
-                               =   ORCHCN03-CNT
-                               +   1
-                           MOVE    WORCHCN03-OCC (IDX-M)
-                                   TO  ORCHCN03-OCC (ORCHCN03-CNT)
-                       END-IF
+                       INITIALIZE      ORCHCN03-OCC (IDX-M)
       *
                    END-PERFORM
       *
-               END-PERFORM
+                   IF    ( TSYUGRP-SKYPRT (IDX0 IDX1)  =   "1" )
+                       PERFORM 2001-SEIKYU-PRT-SEC
+                   END-IF
       *
-      *        Æþ±¡ÀÁµá½ñ°õºþ
-               IF    ( ORCHCN03-CNT    >    ZERO )
-      *
-                   CALL    WRK-SEIKYU-PG    USING   ORCHCN03AREA
-                                                   SPA-AREA
-      *
-                   IF    ( TEIKI2P-PRTFORM  =  "0" )
+                   IF    ( TSYUGRP-SRYPRT (IDX0 IDX1)  =   "1" )
                        PERFORM 2001-MEISAI-PRT-SEC
                    END-IF
       *
-               END-IF
+               END-PERFORM
       *
            END-PERFORM
       *
@@ -589,13 +576,47 @@
            EXIT.
       *
       *****************************************************************
+      *    ÀÁµá½ñ·óÎÎ¼ý½ñ½ÐÎÏ½èÍý
+      *****************************************************************
+       2001-SEIKYU-PRT-SEC                    SECTION.
+      *
+           MOVE    ZERO        TO  ORCHCN03-CNT
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   TSYUGRP-GRP-MAX2 (IDX0 IDX1))
+      *
+               PERFORM VARYING IDX-M   FROM    1   BY  1
+                       UNTIL ( IDX-M   >   WORCHCN03-CNT )
+      *
+                   IF    ( TSYUGRP-GRP-DENPNUM (IDX0 IDX1 IDX2)
+                               =   WORCHCN03-DENPNUM (IDX-M))
+                       COMPUTE ORCHCN03-CNT
+                           =   ORCHCN03-CNT
+                           +   1
+                       MOVE    WORCHCN03-OCC (IDX-M)
+                               TO  ORCHCN03-OCC (ORCHCN03-CNT)
+                   END-IF
+      *
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+      *    Æþ±¡ÀÁµá½ñ°õºþ
+           IF    ( ORCHCN03-CNT    >    ZERO )
+      *
+               CALL    WRK-SEIKYU-PG    USING   ORCHCN03AREA
+                                               SPA-AREA
+           END-IF
+      *
+           .
+       2001-SEIKYU-PRT-EXT.
+           EXIT.
+      *****************************************************************
       *    ¿ÇÎÅÈñÌÀºÙ½ñ½ÐÎÏ½èÍý
       *****************************************************************
        2001-MEISAI-PRT-SEC                    SECTION.
       *
            INITIALIZE              ORCHCN04AREA
-           MOVE    TSYUGRP-GRP-MAX (IDX0)
-                                       TO  WRK-MAX
            MOVE    TSYUGRP-PTID (IDX0)
                                        TO  ORCHCN04-PTID
            MOVE    TSYUGRP-PTID (IDX0)
@@ -605,23 +626,25 @@
       *
            MOVE    PTNUM-PTNUM         TO  ORCHCN04-PTNUM
            MOVE    PTINF-NAME          TO  ORCHCN04-NAME
+           MOVE    TSYUGRP-DENPPRTYMD (IDX0 IDX1)
+                                       TO  ORCHCN04-DENPPRTYMD
       *
-           PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   WRK-MAX )
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   TSYUGRP-GRP-MAX2 (IDX0 IDX1) )
       *
-               MOVE    TSYUGRP-GRP-DENPNUM (IDX0 IDX1)
-                                       TO  ORCHCN04-DENPNUM (IDX1)
+               MOVE    TSYUGRP-GRP-DENPNUM (IDX0 IDX1 IDX2)
+                                       TO  ORCHCN04-DENPNUM (IDX2)
       *
            END-PERFORM
       *
            MOVE    "1"                 TO  ORCHCN04-PRTKBN
       *
-           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)
+           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1 IDX2)
                                        TO  SPA-SRYYMD
       *
            MOVE    WRK-MEISAI-PRTNM    TO  SPRT-PRTNM
            MOVE    TSYUGRP-PTID (IDX0) TO  SPRT-PTID
-           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)(1:6)
+           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1 IDX2)(1:6)
                                        TO  SPRT-SRYYM
            MOVE    ORCSPRTAREA         TO  ORCHCN04-PRTAREA
       *
@@ -792,12 +815,6 @@
            IF    ( FLG-PTTEIKIRRK  NOT =   ZERO )
                MOVE  "0003"            TO  ERR-ERRCD
                PERFORM 500-ERR-HENSYU-SEC
-           END-IF
-      *
-           IF    ( TEIKI2P-SKYPRT      =   "2" )
-               IF    ( PTTEIKIRRK-SKYMONEY <=   ZERO )
-                   GO  TO  20011-HENSYU-EXT
-               END-IF
            END-IF
       *
            INITIALIZE              SYUMEI-REC
@@ -1011,21 +1028,46 @@
       *
                INITIALIZE              ORCHCN03S02AREA
                MOVE    IDX-M       TO  ORCHCN03S02-IDX
+               MOVE    1           TO  ORCHCN03S02-CHKPRT
+               MOVE    TEIKI2P-PTINFREF
+                                   TO  ORCHCN03S02-PTINFREF
+               MOVE    TEIKI2P-SKYPRT
+                                   TO  ORCHCN03S02-SKYPRT
+               MOVE    TEIKI2P-SRYPRT
+                                   TO  ORCHCN03S02-SRYPRT
                CALL    "ORCHCN03S02"   USING
                                        ORCHCN03AREA
                                        ORCHCN03S02AREA
                                        SYUNOU-REC
                                        SPA-AREA
                IF    ( ORCHCN03S02-PRTFLG  =   1 )
+      *
+                   COMPUTE IDX-MAX =   IDX-MAX +   1
+      *
+                   DISPLAY "PTID[" PTTEIKIRRK-PTID "]"
+                           "DENPNUM["  PTTEIKIRRK-DENPNUM "]"
+                           "ORCHCN03S02-SKYPRT[" ORCHCN03S02-SKYPRT "]"
+                           "ORCHCN03S02-SRYPRT[" ORCHCN03S02-SRYPRT "]"
+                   MOVE    SYU-DENPPRTYMD
+                                   TO  TSYUGRP-DENPPRTYMD
+                                                  (TSYUGRP-MAX IDX-MAX)
+                   MOVE    ORCHCN03S02-SKYPRT
+                                   TO  TSYUGRP-SKYPRT
+                                                  (TSYUGRP-MAX IDX-MAX)
+                   MOVE    ORCHCN03S02-SRYPRT
+                                   TO  TSYUGRP-SRYPRT
+                                                  (TSYUGRP-MAX IDX-MAX)
+                   MOVE    ORCHCN03S02-GRP-CNT
+                                   TO  TSYUGRP-GRP-MAX2
+                                           (TSYUGRP-MAX IDX-MAX)
                    PERFORM VARYING IDX0    FROM    1   BY  1
                            UNTIL ( IDX0    >   ORCHCN03S02-GRP-CNT )
-                       COMPUTE IDX-MAX =   IDX-MAX +   1
                        MOVE    ORCHCN03S02-GRP-DENPNUM (IDX0)
                                    TO  TSYUGRP-GRP-DENPNUM
-                                               (TSYUGRP-MAX IDX-MAX)
+                                           (TSYUGRP-MAX IDX-MAX IDX0)
                        MOVE    ORCHCN03-KJNYMD (IDX0)
                                    TO  TSYUGRP-GRP-SRYYMD
-                                               (TSYUGRP-MAX IDX-MAX)
+                                           (TSYUGRP-MAX IDX-MAX IDX0)
                    END-PERFORM
                END-IF
       *

@@ -420,10 +420,12 @@
            COPY    "S03N.INC".
            COPY    "S04.INC".
            COPY    "S06.INC".
+           COPY    "S07.INC".
            COPY    "S99.INC".
            COPY    "SERR.INC".
            COPY    "SID1.INC".
            COPY    "SID2.INC".
+           COPY    "SID3.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -846,10 +848,18 @@
            END-IF
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
-           IF    ( PTINF-SKYPRTFLG     =   "0" )
+           EVALUATE    PTINF-SKYPRTFLG
+           WHEN    "0"
                    MOVE    SPA-GMN-SKYPRTLST (1)
                                        TO  SPA-GMN-SKYPRT-G
-           END-IF
+                   MOVE    SPA-GMN-SRYPRTLST (1)
+                                       TO  SPA-GMN-SRYPRT-G
+           WHEN    "4"
+           WHEN    "5"
+           WHEN    "6"
+                   MOVE    SPA-GMN-SRYPRTLST (1)
+                                       TO  SPA-GMN-SRYPRT-G
+           END-EVALUATE
       *
            IF    ( SPA-NAI-HEAD-DENPJTIKBN =    "3" )
                MOVE    SPACE           TO  SPA-GMN-SKYPRT-G

@@ -47,15 +47,19 @@
            03  FLG-END             PIC 9(01).
            03  FLG-SYUNOU          PIC 9(01).
            03  FLG-PTTEIKIRRK      PIC 9(01).
+           03  FLG-PTINF           PIC 9(01).
            03  FLG-TARGET          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                PIC 9(05).
+           03  IDX2                PIC 9(05).
+           03  IDX3                PIC 9(05).
            03  IDX-SYU             PIC 9(05).
            03  IDX-DENPNUM         PIC 9(05).
            03  IDX-SRYKBN          PIC 9(05).
            03  IDX-JIHI            PIC 9(05).
+           03  IDX-TMP             PIC 9(05).
       *
        01  KEY-AREA.
            03  KEY-PTID            PIC 9(10).
@@ -72,14 +76,44 @@
                05  WRK-COMP-SKYEDYMD   PIC X(08).
                05  WRK-COMP-DENPNUM    PIC 9(07).
            03  WRK-DENPNUM             PIC 9(07).
+           03  WRK-SKYPRTFLG           PIC  9(01).
+           03  WRK-STIDX               PIC  9(03).
       *
        01  CONST-AREA.
            03  CONST-SRYKBN-MAX        PIC 9(03)   VALUE 17.
            03  CONST-GRP-MAX           PIC 9(03)   VALUE 10.
+           03  CONST-PRTDEF-G.
+               05  CONST-PRTDEF0       PIC X(08)   VALUE   "00000000".
+               05  CONST-PRTDEF1       PIC X(08)   VALUE   "11111111".
+               05  CONST-PRTDEF2       PIC X(08)   VALUE   "11001100".
+               05  CONST-PRTDEF3       PIC X(08)   VALUE   "11110000".
+               05  CONST-PRTDEF4       PIC X(08)   VALUE   "10101010".
+               05  CONST-PRTDEF5       PIC X(08)   VALUE   "10001000".
+               05  CONST-PRTDEF6       PIC X(08)   VALUE   "10100000".
+               05  CONST-PRTDEF7       PIC X(08)   VALUE   "11011101".
+           03  CONST-PRTDEF-R  REDEFINES   CONST-PRTDEF-G.
+      *        0¡Á7 ´µ¼ÔÅÐÏ¿¶ÈÌ³¤ÎÀÁµá½ñÈ¯¹Ô¶èÊ¬
+               05  CONST-PRTDEF-OCC            OCCURS  8.
+      *            (1):¿·µ¬ (2)¡§ÄûÀµ»þ
+                   07  CONST-PRTDEF-OCC2       OCCURS  2.
+      *            (1):ÀÁµá³Û>0 (2)¡§ÀÁµá³Û=0
+                       09  CONST-PRTDEF-OCC3   OCCURS  2.
+                           11  CONST-SKYPRTOUT PIC X(01).
+                           11  CONST-SRYPRTOUT PIC X(01).
       *
        01  MYSYU-REC.
            COPY    "CPSYUNOU.INC"      REPLACING   //SYU-//
                                        BY          //MYSYU-//.
+      *
+      *    ¼ýÇ¼¾ðÊóÂàÈòÎÎ°è
+       01  TSYU-AREA.
+           03  TSYU-MAX                    PIC 9(03).
+           03  TSYU-OCC                    OCCURS  11.
+               05  TSYU-KEY.
+                   07  TSYU-SRYYM          PIC X(06).
+                   07  TSYU-DAY-KEY        PIC X(31).
+                   07  TSYU-HKNCOMBINUM    PIC X(04).
+               05  TSYU-DENPNUM            PIC 9(07).
       *
       *    Äê´üÀÁµáÍúÎò
        01  MYTEIKIRRK-REC.
@@ -93,6 +127,10 @@
       *    ¼ýÇ¼
        01  SYUNOU-REC.
            COPY    "CPSYUNOU.INC".
+      *
+      *    ´µ¼Ô¾ðÊó
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
       *    Æþ±¡ÍúÎò
        01  PTNYUINRRK-REC.
@@ -137,6 +175,7 @@
                                        WRK-AREA
                                        IDX-AREA
                                        CNT-AREA
+                                       TSYU-AREA
       *
       *    ½é´ü½èÍý
            PERFORM 100-INIT-SEC
@@ -169,6 +208,8 @@
                MOVE    PTTEIKIRRK-REC
                                    TO  MYTEIKIRRK-REC
            END-IF
+      *
+           PERFORM 900-PTINF-KEY-SEL-SEC
       *
            .
        100-INIT-EXT.
@@ -239,12 +280,14 @@
                    END-IF
                END-PERFORM
       *
-               EVALUATE    MYSYU-CREATEKBN
-               WHEN    "1"
-                   PERFORM 2001-CHK-TAIIN-SEC
-               WHEN    "2"
-                   PERFORM 2001-CHK-TEIKI-SEC
-               END-EVALUATE
+               IF      ( FLG-END    =  ZERO )
+                   EVALUATE    MYSYU-CREATEKBN
+                   WHEN    "1"
+                       PERFORM 2001-CHK-TAIIN-SEC
+                   WHEN    "2"
+                       PERFORM 2001-CHK-TEIKI-SEC
+                   END-EVALUATE
+               END-IF
       *
            END-IF
       *
@@ -621,7 +664,17 @@
            ELSE
                COMPUTE ORCHCN03S02-GRP-CNT
                    =   ORCHCN03S02-GRP-CNT +   1
-               MOVE    SYU-DENPNUM TO  ORCHCN03S02-GRP-DENPNUM
+               MOVE    SYU-SRYYMD(1:6)
+                                   TO  TSYU-SRYYM
+                                              (ORCHCN03S02-GRP-CNT)
+               MOVE    SYU-DAY-TBL TO  TSYU-DAY-KEY
+                                              (ORCHCN03S02-GRP-CNT)
+               INSPECT TSYU-DAY-KEY (ORCHCN03S02-GRP-CNT)
+                       REPLACING   ALL " "    BY  "9"
+               MOVE    SYU-HKNCOMBINUM
+                                   TO  TSYU-HKNCOMBINUM 
+                                              (ORCHCN03S02-GRP-CNT)
+               MOVE    SYU-DENPNUM TO  TSYU-DENPNUM
                                               (ORCHCN03S02-GRP-CNT)
            END-IF
       *
@@ -673,10 +726,80 @@
       *****************************************************************
        300-END-SEC                     SECTION.
       *
-      *
            IF    ( CNT-SYU         >   ZERO )
+      *
                MOVE    1           TO  ORCHCN03S02-PRTFLG
-               MOVE    WRK-DENPNUM TO  LNKSYU-DENPNUM
+      *
+               COMPUTE IDX-TMP =   ORCHCN03S02-GRP-CNT +   1
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1   >=   ORCHCN03S02-GRP-CNT )
+      *
+                   COMPUTE WRK-STIDX   =   IDX1    +   1
+                   PERFORM VARYING IDX2    FROM    WRK-STIDX   BY  1
+                           UNTIL ( IDX2    >   ORCHCN03S02-GRP-CNT)
+                       IF    ( TSYU-KEY (IDX1) >   TSYU-KEY (IDX2))
+                           MOVE    TSYU-OCC (IDX1)
+                                       TO  TSYU-OCC (IDX-TMP)
+                           MOVE    TSYU-OCC (IDX2)
+                                       TO  TSYU-OCC (IDX1)
+                           MOVE    TSYU-OCC (IDX-TMP)
+                                       TO  TSYU-OCC (IDX2)
+                       END-IF
+                   END-PERFORM
+               END-PERFORM
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1    >   ORCHCN03S02-GRP-CNT )
+                   MOVE    TSYU-DENPNUM (IDX1)
+                                       TO  ORCHCN03S02-GRP-DENPNUM
+                                                             (IDX1)
+               END-PERFORM
+      *
+      *        MOVE    WRK-DENPNUM TO  LNKSYU-DENPNUM
+               MOVE    ORCHCN03S02-GRP-DENPNUM (1)
+                                   TO  LNKSYU-DENPNUM
+      *
+               IF    ( ORCHCN03S02-CHKPRT      =   1 )
+      *
+                   IF    ( PTINF-SKYPRTFLG            >=   "0" )
+                    AND  ( PTINF-SKYPRTFLG            <=   "7" )
+                    AND  ( ORCHCN03S02-PTINFREF        =   "1" )
+                       MOVE    PTINF-SKYPRTFLG     TO  WRK-SKYPRTFLG
+                       COMPUTE IDX1    =   WRK-SKYPRTFLG   +   1
+                       IF    ( ORCHCN03-HAKKOFLG (ORCHCN03S02-IDX)
+                                           NOT =   "2" )
+                           MOVE    1           TO  IDX2
+                       ELSE
+                           MOVE    2           TO  IDX2
+                       END-IF
+                       IF    ( ORCHCN03-SEIKYU (ORCHCN03S02-IDX)
+                                           >   0 )
+                           MOVE    1           TO  IDX3
+                       ELSE
+                           MOVE    2           TO  IDX3
+                       END-IF
+                       MOVE    CONST-SKYPRTOUT (IDX1 IDX2 IDX3)
+                                           TO  ORCHCN03S02-SKYPRT
+                       MOVE    CONST-SRYPRTOUT (IDX1 IDX2 IDX3)
+                                           TO  ORCHCN03S02-SRYPRT
+                   ELSE
+                       IF    ( ORCHCN03S02-SKYPRT  =   "2" )
+                           IF    ( ORCHCN03-SEIKYU (ORCHCN03S02-IDX)
+                                               >   0 )
+                               MOVE    "1"     TO  ORCHCN03S02-SKYPRT
+                           ELSE
+                               MOVE    "0"     TO  ORCHCN03S02-SKYPRT
+                           END-IF
+                       END-IF
+                       IF    ( ORCHCN03S02-SRYPRT  =   "2" )
+                           IF    ( ORCHCN03-SEIKYU (ORCHCN03S02-IDX)
+                                               >   0 )
+                               MOVE    "1"     TO  ORCHCN03S02-SRYPRT
+                           ELSE
+                               MOVE    "0"     TO  ORCHCN03S02-SRYPRT
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
            .
@@ -777,6 +900,34 @@
       *
            MOVE    "tbl_ptteikirrk"    TO  MCP-TABLE
            MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTTEIKIRRK-KEY6-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼Ô¾ðÊó¸¡º÷½èÍý
+      *****************************************************************
+       900-PTINF-KEY-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTINF
+      *
+           INITIALIZE                  PTINF-REC
+           MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
+           MOVE    KEY-PTID        TO  PTINF-PTID
+           MOVE    PTINF-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTINF-REC
+           ELSE
+               INITIALIZE              PTINF-REC
+               MOVE    1           TO  FLG-PTINF
+           END-IF
+      *
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .

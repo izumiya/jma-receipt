@@ -77,10 +77,12 @@
            COPY    "S03N.INC".
            COPY    "S04.INC".
            COPY    "S06.INC".
+           COPY    "S07.INC".
            COPY    "S99.INC".
            COPY    "SERR.INC".
            COPY    "SID1.INC".
            COPY    "SID2.INC".
+           COPY    "SID3.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA

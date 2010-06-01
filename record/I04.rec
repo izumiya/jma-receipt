@@ -420,6 +420,9 @@ I04	{
 			style   varchar(20);
 			value	varchar(70);
 		};
+		LBLINFO2	{
+			value	varchar(70);
+		};
 		scrolledwindow1	{
 			HKNCOMBILST	{
 				count	int;

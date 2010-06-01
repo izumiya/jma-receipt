@@ -16,18 +16,17 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION                            DIVISION.
-       PROGRAM-ID.                               ORCGSID2.
+       PROGRAM-ID.                               ORCGSID3.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 収納
-      *  コンポーネント名  : 確認画面２（ＳＩＤ２）
+      *  コンポーネント名  : 確認画面３（ＳＩＤ３）
       *  管理者            : 
       *  作成日付    作業者        記述
-      *  04/11/22    太田    新規作成
+      *  10/05/10    太田    新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  03.05.00    NACL-太田    07/05/20  グループ診療対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -132,11 +131,15 @@
                WHEN    "CLICKED"                 ALSO    "B01"
                    MOVE    SPACE                 TO  SPA-SID1-FLG
                    PERFORM 210-BACK
-      *     印刷しない
-               WHEN    "CLICKED"                 ALSO    "B11"
-                   MOVE    "NO"                  TO  SPA-SID1-FLG
+      *        請求書
+               WHEN    "CLICKED"                 ALSO    "B10"
+                   MOVE    "O1"                  TO  SPA-SID1-FLG
                    PERFORM 210-BACK
-      *     印刷する
+      *        明細書
+               WHEN    "CLICKED"                 ALSO    "B11"
+                   MOVE    "O2"                  TO  SPA-SID1-FLG
+                   PERFORM 210-BACK
+      *        請求書・明細書
                WHEN    "CLICKED"                 ALSO    "B12"
                    MOVE    "OK"                  TO  SPA-SID1-FLG
                    PERFORM 210-BACK
@@ -151,7 +154,7 @@
        210-BACK                                  SECTION.
       *
            MOVE    SPA-MOTOPG          TO  SPA-SAKIPG
-           MOVE    "SID2"              TO  SPA-MOTOPG
+           MOVE    "SID3"              TO  SPA-MOTOPG
       *
            MOVE    "JOIN"              TO  MCP-PUTTYPE
            MOVE    SPA-SAKIPG          TO  MCP-WINDOW

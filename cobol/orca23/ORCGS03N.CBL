@@ -238,6 +238,7 @@
       *
            03  FLG-SMEILIST1-ROW                   PIC 9(01).
            03  FLG-HIZUKE-ERR                      PIC 9(01).
+           03  FLG-PTINF                           PIC 9(01).
            03  FLG-TORIKESHI                       PIC 9(01).
            03  FLG-MEIVISIBLE                      PIC 9(01).
            03  FLG-ORCSNUMERR                      PIC 9(01).
@@ -332,6 +333,10 @@
       *
            COPY    "CPSK5000.INC".
       *
+      *    患者情報
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
+      *
       *    収納マスター
        01  SYUNOU-REC.
            COPY    "CPSYUNOU.INC".
@@ -399,10 +404,12 @@
            COPY    "S03N.INC".
            COPY    "S04.INC".
            COPY    "S06.INC".
+           COPY    "S07.INC".
            COPY    "S99.INC".
            COPY    "SERR.INC".
            COPY    "SID1.INC".
            COPY    "SID2.INC".
+           COPY    "SID3.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -842,6 +849,19 @@
       *
            END-IF
       *
+           PERFORM 900-PTINF-KEY-SEL-SEC
+           EVALUATE    PTINF-SKYPRTFLG
+           WHEN    "0"
+                   MOVE    SPA-GMN-SKYPRTLST (1)
+                                       TO  SPA-GMN-SKYPRT-G
+                   MOVE    SPA-GMN-SRYPRTLST (1)
+                                       TO  SPA-GMN-SRYPRT-G
+           WHEN    "4"
+           WHEN    "5"
+           WHEN    "6"
+                   MOVE    SPA-GMN-SRYPRTLST (1)
+                                       TO  SPA-GMN-SRYPRT-G
+           END-EVALUATE
       *
            .
        3101-SKYPRTLST-SYOKI-EXT.
@@ -3012,6 +3032,7 @@
            MOVE    SPA-S01-DENPNUM TO  ORCHCN04-DENPNUM (1)
            MOVE    WRK-SRYPRT-DENPEDANUM
                                    TO  ORCHCN04-DENPEDANUM (1)
+           MOVE   3                TO  ORCHCN04-HAKKOFLG
       *
            MOVE    "02"                TO  WRK-SPA-PRT-FLG
            CALL    WRK-MEISAI-PG   USING   WRK-SPA-AREA
@@ -4086,6 +4107,33 @@
       *
            .
        800-KINGAKU-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報取得処理
+      *****************************************************************
+       900-PTINF-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTINF
+           INITIALIZE                  PTINF-REC
+           MOVE    SPA-HOSPNUM      TO  PTINF-HOSPNUM
+           MOVE    SPA-S01-PTID    TO  PTINF-PTID
+           MOVE    PTINF-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( FLG-PTINF       =   ZERO )
+               MOVE    MCPDATA-REC TO  PTINF-REC
+           ELSE
+               MOVE    1           TO  FLG-PTINF
+               INITIALIZE              PTINF-REC
+           END-IF
+      *
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTINF-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ読込

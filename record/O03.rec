@@ -445,15 +445,22 @@ O03	{
 		PAGE	{
 			value	number(4);
 		};
-		CMB_PRTFORMKBN	{
-			PRTFORMKBN	{
-				value	varchar(60);
-			};
-			count	int;
-			item	varchar(60)[05];
-		};
 		CMB_SKYPRTKBN	{
 			SKYPRTKBN	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[05];
+		};
+		CMB_SRYPRTKBN {
+			SRYPRTKBN	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[05];
+		};
+		CMB_PTINFREFKBN {
+			PTINFREFKBN	{
 				value	varchar(30);
 			};
 			count	int;

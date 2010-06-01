@@ -1377,7 +1377,7 @@ path	key68 	{
 			AND   PTID        =   :PTID
 			AND   SRYYMD      LIKE :SRYYMD
 			AND   CREATEKBN   <>  '3'
-			ORDER   BY    SRYYMD,NYUGAIKBN,DENPNUM
+			ORDER   BY    SRYYMD,NYUGAIKBN,SRYKA,HKNCOMBINUM,DENPNUM
 		;
 	};
 };
@@ -1481,3 +1481,18 @@ path	key72 	{
 	};
 };
 
+path	key73 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key73_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND   DENPJTIKBN  <> '3'
+			ORDER  BY  SRYYMD,SRYKA,HKNCOMBINUM,DENPNUM
+		;
+	};
+};

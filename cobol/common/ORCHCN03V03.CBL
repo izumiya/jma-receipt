@@ -127,8 +127,8 @@
            03  WRK-DENPNUM         PIC 9(07).
       *
            03  WRK-WARI            PIC 9(02)V9.
-           03  WRK-Z6              PIC ZZZZZZ.
-           03  WRK-Z62             PIC ZZZ9.9.
+           03  WRK-HKNFTN              PIC ZZZZZ9.
+           03  WRK-HKNFTN2             PIC ZZZ9.9.
       *
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-NO              PIC Z(7).
@@ -209,6 +209,9 @@
       *
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¥Ñ¥é¥á¥¿
        01  TPARA-AREA.
+           03  TPARA-SRYKA              PIC X(01).
+           03  TPARA-HKNMEI             PIC X(01).
+           03  TPARA-FTNKBN             PIC X(01).
            03  TPARA-HAKKOUBIKBN        PIC X(01).
            03  TPARA-YUKOSTYMD          PIC X(08).
            03  TPARA-YUKOEDYMD          PIC X(08).
@@ -470,9 +473,33 @@
        100-OPTION-SELECT-SEC             SECTION.
       *
            INITIALIZE                  TPARA-AREA
+           MOVE    "1"             TO  TPARA-SRYKA
+           MOVE    "1"             TO  TPARA-HKNMEI
+           MOVE    "2"             TO  TPARA-FTNKBN
            MOVE    "0"             TO  TPARA-HAKKOUBIKBN
            MOVE    "00000000"      TO  TPARA-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-YUKOEDYMD
+      *
+      *    ¿ÇÎÅ²ÊÌ¾
+           MOVE    "SRYKA"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-SRYKA
+           END-IF
+      *
+      *    ÊÝ¸±Ì¾¾Î
+           MOVE    "HKNMEI"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-HKNMEI
+           END-IF
+      *
+      *    ÉéÃ´³ä¹ç
+           MOVE    "FTNKBN"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" OR "2" )
+               MOVE    WRK-PARA    TO  TPARA-FTNKBN
+           END-IF
       *
       *    ÅÁÉ¼È¯¹ÔÆü¶èÊ¬
            MOVE    "HAKKOUBIKBN"   TO  WRK-PARA-NAME
@@ -657,7 +684,9 @@
            PERFORM 3102-SRYKA-SEL-SEC
       *
       *    ¿ÇÎÅ²Ê
-           MOVE    SYS-1005-SRYKANAME2 TO  HCN03-MIDASI
+           IF    ( TPARA-SRYKA         =   "1" )
+               MOVE    SYS-1005-SRYKANAME2 TO  HCN03-MIDASI
+           END-IF
       *    ´µ¼ÔÈÖ¹æ
            MOVE    ORCHCN03-PTNUM (IDX-M)
                                        TO  HCN03-KNJNO
@@ -709,20 +738,45 @@
       *    ÊÝ¸±¼ïÊÌ
            MOVE    WRK-HKNCOMBI        TO  HCN03-HOKEN
       *    ÉéÃ´³ä¹ç
-           IF      SYU-PTFTNRATE       >   ZERO
-               COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
-               IF      SYU-PTFTNRATE(3:1)  =   ZERO
-                   MOVE    WRK-WARI            TO  WRK-Z6
-                   MOVE    WRK-Z6              TO  HCN03-FUTAN
-               ELSE
-                   MOVE    WRK-WARI            TO  WRK-Z62
-                   MOVE    WRK-Z62             TO  HCN03-FUTAN
-               END-IF
+           IF    ( SYU-SRYYMD         >=   CONST-H200401 )
+               EVALUATE    TPARA-FTNKBN
+               WHEN    "1"
+                   MOVE    "¡ó"            TO  HCN03-LBLFTNRATE
+                   MOVE    SYU-PTFTNRATE   TO  WRK-HKNFTN
+                   MOVE    WRK-HKNFTN      TO  HCN03-FUTAN
+               WHEN    "2"
+                   MOVE    "³ä"        TO  HCN03-LBLFTNRATE
+                   COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
+                   IF      SYU-PTFTNRATE(3:1)  =   ZERO
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN          TO  HCN03-FUTAN
+                   ELSE
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN2
+                       MOVE    WRK-HKNFTN2         TO  HCN03-FUTAN
+                   END-IF
+               END-EVALUATE
+           ELSE
+                   COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
+                   IF      SYU-PTFTNRATE(3:1)  =   ZERO
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN          TO  HCN03-FUTAN
+                   ELSE
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN2
+                       MOVE    WRK-HKNFTN2         TO  HCN03-FUTAN
+                   END-IF
            END-IF
       *
            IF    ( ORCHCN03S02-FUKUSU-COMBI   =    1 )
                MOVE    "Ê£¿ôÊÝ¸±»ÈÍÑ"  TO  HCN03-HOKEN
                MOVE    SPACE           TO  HCN03-FUTAN
+           END-IF
+      *
+           IF    ( TPARA-HKNMEI        =   "0" )
+               MOVE    SPACE           TO  HCN03-HOKEN
+           END-IF
+           IF    ( TPARA-FTNKBN        =   "0" )
+               MOVE    SPACE           TO  HCN03-FUTAN
+                                           HCN03-LBLFTNRATE
            END-IF
       *
       *    ÀÁµá³«»ÏÆü
@@ -1200,6 +1254,7 @@
                    UNTIL ( IDX1    >   10 )
                MOVE    HCN03-MEMO (IDX1)   TO  HCN03V01-MEMO (IDX1)
            END-PERFORM
+           MOVE    HCN03-LBLFTNRATE        TO  HCN03V01-LBLFTNRATE
       *
            .
        2002-HCN03V01-HEN-EXT.
@@ -1272,6 +1327,7 @@
                    UNTIL ( IDX1    >   10 )
                MOVE    HCN03-MEMO (IDX1)   TO  HCN03V02-MEMO (IDX1)
            END-PERFORM
+           MOVE    HCN03-LBLFTNRATE        TO  HCN03V02-LBLFTNRATE
       *
            .
        2002-HCN03V02-HEN-EXT.

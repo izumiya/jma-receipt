@@ -1643,6 +1643,8 @@ COPYS = \
         CPORCHC04SUB.INC \
         CPORCSHKNMEI.INC \
         HCM04A5.INC \
+	S07.INC \
+	SID3.INC \
         HCM03V04.INC \
  
 DBPATH = \

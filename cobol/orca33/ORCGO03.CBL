@@ -438,22 +438,34 @@
                                        SYS-5000-EDYUKYMD
            MOVE    SYS-5000-REC    TO  SYSKANRI-REC
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC     TO  SYS-5000-REC
+           MOVE    SYSKANRI-REC    TO  SYS-5000-REC
       *
-           MOVE    SYS-5000-SKYPRTKBN   TO  WRK-CMB-CD
+           MOVE    SYS-5000-SKYPRTKBN  TO  WRK-CMB-CD
            PERFORM 4200-SKYPRTKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM NOT =   SPACE )
                MOVE    WRK-CMB-ITM TO   SPA-GMN-O03-SKYPRTKBN-G
+           ELSE
+               MOVE    SPA-GMN-O03-SKYPRTKBNLST (1)
+                                       TO  SPA-GMN-O03-SKYPRTKBN-G
            END-IF
       *
-           IF    ( SYS-5000-SRYPRTKBN  =   "1" )
-               MOVE    "0"         TO  WRK-CMB-CD
-           ELSE
-               MOVE    "1"         TO  WRK-CMB-CD
-           END-IF
-           PERFORM 4200-PRTFORMKBNLST-CHK-SEC
+           MOVE    SYS-5000-SRYPRTKBN
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-SRYPRTKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM NOT =   SPACE )
-               MOVE    WRK-CMB-ITM TO  SPA-GMN-O03-PRTFORMKBN-G
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-O03-SRYPRTKBN-G
+           ELSE
+               MOVE    SPA-GMN-O03-SRYPRTKBNLST (1)
+                                       TO  SPA-GMN-O03-SRYPRTKBN-G
+           END-IF
+      *
+           MOVE    "1"             TO  WRK-CMB-CD
+           PERFORM 4200-PTINFREFKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM NOT =   SPACE )
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-O03-PTINFREFKBN-G
+           ELSE
+               MOVE    SPA-GMN-O03-PTINFREFKBNLST (1)
+                                       TO  SPA-GMN-O03-PTINFREFKBN-G
            END-IF
       *
            PERFORM 3101-EDIT-PAGE-SEC
@@ -536,9 +548,11 @@
       *****************************************************************
        3101-EDIT-COMBO-SEC             SECTION.
       *
-           PERFORM 31011-PRTFORMKBNLST-SEC
-      *
            PERFORM 31011-SKYPRTKBNLST-SEC
+      *
+           PERFORM 31011-SRYPRTKBNLST-SEC
+      *
+           PERFORM 31011-PTINFREFKBNLST-SEC
       *
            PERFORM 31011-PRTJYUNMEILST-SEC
       *
@@ -546,44 +560,61 @@
        3101-EDIT-COMBO-EXT.
            EXIT.
       *****************************************************************
-      *    印刷帳票区分リスト編集処理
-      *****************************************************************
-       31011-PRTFORMKBNLST-SEC          SECTION.
-      *
-           MOVE    "0"               TO  SPA-GMN-O03-PRTFORMKBNL   (1)
-           MOVE    "請求書兼領収書・診療費明細書"
-                                     TO  SPA-GMN-O03-PRTFORMKBNMEIL(1)
-           MOVE    "1"               TO  SPA-GMN-O03-PRTFORMKBNL   (2)
-           MOVE    "請求書兼領収書"
-                                     TO  SPA-GMN-O03-PRTFORMKBNMEIL(2)
-      *
-           MOVE    2                 TO  SPA-GMN-O03-PRTFORMKBN-MAX
-      *
-           MOVE    SPA-GMN-O03-PRTFORMKBNLST(01)
-                                     TO  SPA-GMN-O03-PRTFORMKBN-G
-      *
-           .
-       31011-PRTFORMKBNLST-EXT.
-           EXIT.
-      *****************************************************************
       *    請求書発行区分リスト編集処理
       *****************************************************************
        31011-SKYPRTKBNLST-SEC          SECTION.
       *
-           MOVE    "1"               TO  SPA-GMN-O03-SKYPRTKBNL    (1)
-           MOVE    "すべて発行"
-                                     TO  SPA-GMN-O03-SKYPRTKBNMEIL (1)
-           MOVE    "2"               TO  SPA-GMN-O03-SKYPRTKBNL    (2)
-           MOVE    "請求があるもののみ"
-                                     TO  SPA-GMN-O03-SKYPRTKBNMEIL (2)
       *
-           MOVE    2                 TO  SPA-GMN-O03-SKYPRTKBN-MAX
+           MOVE    "0"               TO  SPA-GMN-O03-SKYPRTKBNL   (1)
+           MOVE    "発行しない"
+                                     TO  SPA-GMN-O03-SKYPRTKBNMEIL(1)
+           MOVE    "1"               TO  SPA-GMN-O03-SKYPRTKBNL   (2)
+           MOVE    "発行する"        TO  SPA-GMN-O03-SKYPRTKBNMEIL(2)
       *
-           MOVE    SPA-GMN-O03-SKYPRTKBNLST(01)
-                                     TO  SPA-GMN-O03-SKYPRTKBN-G
+           MOVE    "2"               TO  SPA-GMN-O03-SKYPRTKBNL   (3)
+           MOVE    "発行する（請求あり）"
+                                     TO  SPA-GMN-O03-SKYPRTKBNMEIL(3)
+      *
+           MOVE    3                 TO  SPA-GMN-O03-SKYPRTKBN-MAX
       *
            .
        31011-SKYPRTKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    印刷帳票区分リスト編集処理
+      *****************************************************************
+       31011-SRYPRTKBNLST-SEC          SECTION.
+      *
+           MOVE    "0"               TO  SPA-GMN-O03-SRYPRTKBNL   (1)
+           MOVE    "発行しない"
+                                     TO  SPA-GMN-O03-SRYPRTKBNMEIL(1)
+           MOVE    "1"               TO  SPA-GMN-O03-SRYPRTKBNL   (2)
+           MOVE    "発行する"        TO  SPA-GMN-O03-SRYPRTKBNMEIL(2)
+      *
+           MOVE    "2"               TO  SPA-GMN-O03-SRYPRTKBNL   (3)
+           MOVE    "発行する（請求あり）"
+                                     TO  SPA-GMN-O03-SRYPRTKBNMEIL(3)
+      *
+           MOVE    3                 TO  SPA-GMN-O03-SRYPRTKBN-MAX
+      *
+           .
+       31011-SRYPRTKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報参照リスト編集処理
+      *****************************************************************
+       31011-PTINFREFKBNLST-SEC          SECTION.
+      *
+           MOVE    "0"               TO  SPA-GMN-O03-PTINFREFKBNL   (1)
+           MOVE    "参照しない"
+                                     TO  SPA-GMN-O03-PTINFREFKBNMEIL(1)
+           MOVE    "1"               TO  SPA-GMN-O03-PTINFREFKBNL   (2)
+           MOVE    "参照する"        TO  SPA-GMN-O03-PTINFREFKBNMEIL(2)
+      *
+           MOVE    2                 TO  SPA-GMN-O03-PTINFREFKBN-MAX
+      *
+           .
+       31011-PTINFREFKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    請求書発行区分リスト編集処理
@@ -1177,12 +1208,16 @@
       *****************************************************************
        4101-GMN-SPA-SET-SEC            SECTION.
       *
-      *    印刷帳票区分
-           MOVE    O03-PRTFORMKBN
-                                   TO  SPA-GMN-O03-PRTFORMKBN-G
-      *
       *    請求書発行区分
            MOVE    O03-SKYPRTKBN   TO  SPA-GMN-O03-SKYPRTKBN-G
+      *
+      *    明細書発行区分
+           MOVE    O03-SRYPRTKBN
+                                   TO  SPA-GMN-O03-SRYPRTKBN-G
+      *
+      *    患者情報参照区
+           MOVE    O03-PTINFREFKBN
+                                   TO  SPA-GMN-O03-PTINFREFKBN-G
       *
            .
       *
@@ -1194,16 +1229,19 @@
       *****************************************************************
        4102-KIHON-CHK-SEC              SECTION.
       *
-      *    印刷帳票区分チェック
-           PERFORM 4105-PRTFORMKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+      *    請求書発行区分チェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4105-SKYPRTKBN-CHK-SEC
            END-IF
       *
-      *    請求書発行区分チェック
-           PERFORM 4105-SKYPRTKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+      *    明細書発行区分チェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4105-SRYPRTKBN-CHK-SEC
+           END-IF
+      *
+      *    患者情報参照区分チェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4105-PTINFREFKBN-CHK-SEC
            END-IF
       *
            .
@@ -1211,21 +1249,39 @@
        4102-KIHON-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    印刷帳票区分チェック
+      *    明細書発行区分チェック
       *****************************************************************
-       4105-PRTFORMKBN-CHK-SEC          SECTION.
+       4105-SRYPRTKBN-CHK-SEC          SECTION.
       *
-           MOVE    SPA-GMN-O03-PRTFORMKBN   TO  WRK-CMB-CD
-           PERFORM 4200-PRTFORMKBNLST-CHK-SEC
+           MOVE    SPA-GMN-O03-SRYPRTKBN   TO  WRK-CMB-CD
+           PERFORM 4200-SRYPRTKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
-               MOVE    WRK-CMB-ITM     TO  SPA-GMN-O03-PRTFORMKBN-G
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-O03-SRYPRTKBN-G
            ELSE
-               MOVE    SPA-GMN-O03-PRTFORMKBNLST (1)
-                                       TO  SPA-GMN-O03-PRTFORMKBN-G
+               MOVE    SPA-GMN-O03-SRYPRTKBNLST (1)
+                                       TO  SPA-GMN-O03-SRYPRTKBN-G
            END-IF
       *
            .
-       4105-PRTFORMKBN-CHK-EXT.
+       4105-SRYPRTKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報参照区分チェック
+      *****************************************************************
+       4105-PTINFREFKBN-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-O03-PTINFREFKBN
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-PTINFREFKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM NOT =   SPACE )
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-O03-PTINFREFKBN-G
+           ELSE
+               MOVE    SPA-GMN-O03-PTINFREFKBNLST (2)
+                                   TO  SPA-GMN-O03-PTINFREFKBN-G
+           END-IF
+      *
+           .
+       4105-PTINFREFKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    請求書発行区分チェック
@@ -1291,30 +1347,6 @@
        4200-PRTJYUNLST-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    印刷帳票区分コンボチェック
-      *****************************************************************
-       4200-PRTFORMKBNLST-CHK-SEC    SECTION.
-      *
-           MOVE    SPACE               TO  WRK-CMB-ITM-G
-      *
-           PERFORM VARYING IDX-CMB FROM    1   BY  1
-               UNTIL ( IDX-CMB     >   SPA-GMN-O03-PRTFORMKBN-MAX )
-                OR   ( WRK-CMB-CD  =   SPA-GMN-O03-PRTFORMKBNL
-                                                           (IDX-CMB))
-      *
-               CONTINUE
-      *
-           END-PERFORM
-      *
-           IF    ( IDX-CMB     <=  SPA-GMN-O03-PRTFORMKBN-MAX )
-               MOVE    SPA-GMN-O03-PRTFORMKBNLST (IDX-CMB)
-                                       TO  WRK-CMB-ITM
-           END-IF
-      *
-           .
-       4200-PRTFORMKBNLST-CHK-EXT.
-           EXIT.
-      *****************************************************************
       *    請求書発行区分コンボチェック
       *****************************************************************
        4200-SKYPRTKBNLST-CHK-SEC       SECTION.
@@ -1336,6 +1368,54 @@
       *
            .
        4200-SKYPRTKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細書発行区分コンボチェック
+      *****************************************************************
+       4200-SRYPRTKBNLST-CHK-SEC    SECTION.
+      *
+           MOVE    SPACE               TO  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+               UNTIL ( IDX-CMB     >   SPA-GMN-O03-SRYPRTKBN-MAX )
+                OR   ( WRK-CMB-CD  =   SPA-GMN-O03-SRYPRTKBNL
+                                                           (IDX-CMB))
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    ( IDX-CMB     <=  SPA-GMN-O03-SRYPRTKBN-MAX )
+               MOVE    SPA-GMN-O03-SRYPRTKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-SRYPRTKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定区分コンボチェック
+      *****************************************************************
+       4200-PTINFREFKBNLST-CHK-SEC    SECTION.
+      *
+           MOVE    SPACE               TO  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+               UNTIL ( IDX-CMB     >   SPA-GMN-O03-PTINFREFKBN-MAX )
+                OR   ( WRK-CMB-CD  =   SPA-GMN-O03-PTINFREFKBNL
+                                                           (IDX-CMB))
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    ( IDX-CMB     <=  SPA-GMN-O03-PTINFREFKBN-MAX )
+               MOVE    SPA-GMN-O03-PTINFREFKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-PTINFREFKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    戻る前処理
@@ -1596,10 +1676,12 @@
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG17
            MOVE    SPA-STAFFCD         TO  SHELLTBL-ARG18
            MOVE    TEIKIERR            TO  SHELLTBL-ARG19
-           MOVE    SPA-GMN-O03-SKYPRTKBN
+           MOVE    SPA-GMN-O03-PTINFREFKBN
                                        TO  SHELLTBL-ARG20(1:1)
-           MOVE    SPA-GMN-O03-PRTFORMKBN
+           MOVE    SPA-GMN-O03-SKYPRTKBN
                                        TO  SHELLTBL-ARG20(2:1)
+           MOVE    SPA-GMN-O03-SRYPRTKBN
+                                       TO  SHELLTBL-ARG20(3:1)
            MOVE    SPA-O01-PRTKBN      TO  SHELLTBL-ARG21
            MOVE    SPA-O01-SRYYM       TO  SHELLTBL-ARG22
            MOVE    SPA-O01-KBT-G       TO  SHELLTBL-ARG23
@@ -1875,13 +1957,22 @@
                                            TO  O03-SKYPRTKBNLST (IDX1)
            END-PERFORM
       *
-           MOVE    SPA-GMN-O03-PRTFORMKBN-G TO  O03-PRTFORMKBN
-           MOVE    SPA-GMN-O03-PRTFORMKBN-MAX
-                                           TO  O03-PRTFORMKBN-COUNT
+           MOVE    SPA-GMN-O03-SRYPRTKBN-G TO  O03-SRYPRTKBN
+           MOVE    SPA-GMN-O03-SRYPRTKBN-MAX
+                                           TO  O03-SRYPRTKBN-COUNT
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   SPA-GMN-O03-PRTFORMKBN-MAX )
-               MOVE    SPA-GMN-O03-PRTFORMKBNLST(IDX1)
-                                           TO  O03-PRTFORMKBNLST(IDX1)
+                   UNTIL ( IDX1    >   SPA-GMN-O03-SRYPRTKBN-MAX )
+               MOVE    SPA-GMN-O03-SRYPRTKBNLST(IDX1)
+                                           TO  O03-SRYPRTKBNLST(IDX1)
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-O03-PTINFREFKBN-G TO  O03-PTINFREFKBN
+           MOVE    SPA-GMN-O03-PTINFREFKBN-MAX
+                                           TO  O03-PTINFREFKBN-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-O03-PTINFREFKBN-MAX )
+               MOVE    SPA-GMN-O03-PTINFREFKBNLST(IDX1)
+                                           TO  O03-PTINFREFKBNLST(IDX1)
            END-PERFORM
       *
            MOVE    SPA-GMN-O03-PRTJYUN-G   TO  O03-PRTJYUN
@@ -2031,10 +2122,12 @@
            WHEN    032
                MOVE  "CHK30"       TO  MCP-WIDGET
            WHEN    101
-               MOVE  "PRTFORMKBN"
+               MOVE  "SRYPRTKBN"
                                    TO  MCP-WIDGET
            WHEN    102
                MOVE  "SKYPRTKBN"   TO  MCP-WIDGET
+           WHEN    103
+               MOVE  "PTINFREFKBN" TO  MCP-WIDGET
            WHEN    212
                MOVE  "B12"         TO  MCP-WIDGET
            END-EVALUATE
@@ -2048,14 +2141,16 @@
        50011-GMN-CUR-SET-SEC           SECTION.
       *
            EVALUATE    WRK-MCP-WIDGET
-           WHEN    "PRTFORMKBN"
-               MOVE    102         TO  SPA-GMN-O03-CUR
+           WHEN    "SRYPRTKBN"
+               MOVE    103         TO  SPA-GMN-O03-CUR
            WHEN    "SYOKBN"
-               MOVE    002         TO  SPA-GMN-O03-CUR
+               MOVE    102         TO  SPA-GMN-O03-CUR
            WHEN    "SKYPRTKBN"
+               MOVE    101         TO  SPA-GMN-O03-CUR
+           WHEN    "PTINFREFKBN"
                MOVE    002         TO  SPA-GMN-O03-CUR
            WHEN    "PRTJYUN"
-               MOVE    101         TO  SPA-GMN-O03-CUR
+               MOVE    102         TO  SPA-GMN-O03-CUR
            WHEN    "CHK01"
                MOVE    004         TO  SPA-GMN-O03-CUR
            WHEN    "CHK02"

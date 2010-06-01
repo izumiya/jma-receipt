@@ -48,13 +48,6 @@
                 04  O03-VALUE   PIC  9(4).
               03  O03-PAGE.
                 04  O03-VALUE   PIC  9(4).
-              03  O03-CMB-PRTFORMKBN.
-                04  O03-PRTFORMKBN.
-                  05  O03-VALUE   PIC X(60).
-                04  O03-PRTFORMKBN-COUNT
-                                  PIC S9(9)   BINARY.
-                04  O03-PRTFORMKBNLST
-                                  PIC X(60)   OCCURS  5 TIMES.
               03  O03-CMB-SKYPRTKBN.
                 04  O03-SKYPRTKBN.
                   05  O03-VALUE   PIC X(30).
@@ -62,6 +55,20 @@
                                        PIC S9(9)   BINARY.
                 04  O03-SKYPRTKBNLST
                                        PIC X(30)   OCCURS  5 TIMES.
+              03  O03-CMB-SRYPRTKBN.
+                04  O03-SRYPRTKBN.
+                  05  O03-VALUE   PIC X(30).
+                04  O03-SRYPRTKBN-COUNT
+                                  PIC S9(9)   BINARY.
+                04  O03-SRYPRTKBNLST
+                                  PIC X(30)   OCCURS  5 TIMES.
+              03  O03-CMB-PTINFREFKBN.
+                04  O03-PTINFREFKBN.
+                  05  O03-VALUE   PIC X(30).
+                04  O03-PTINFREFKBN-COUNT
+                                  PIC S9(9)   BINARY.
+                04  O03-PTINFREFKBNLST
+                                  PIC X(30)   OCCURS  5 TIMES.
               03  O03-CMB-PRTJYUN.
                 04  O03-PRTJYUN.
                   05  O03-VALUE   PIC X(25).

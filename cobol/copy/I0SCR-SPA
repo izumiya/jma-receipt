@@ -927,6 +927,8 @@
       *                労災・定期請求差額表示切替フラグ
                        11  SPA-NAI-I04-RSITEIKIFLG   PIC 9(01).
                        11  SPA-NAI-I04-SAKKBN-MAX    PIC X(01).
+      *                患者請求書発行フラグ
+                       11  SPA-NAI-I04-PTSKYPRT      PIC X(1).
       *
                    09  SPA-NAI-I04-INPUT-AREA.
       *                入院科

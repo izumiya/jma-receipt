@@ -23,7 +23,6 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       ************************************************************
-      *
        01  ORCHCN03S02AREA.
            03  ORCHCN03S02-IDX                PIC 9(5).
            03  ORCHCN03S02-MYMISYU            PIC S9(10).
@@ -32,3 +31,7 @@
            03  ORCHCN03S02-GRP-CNT            PIC 9(03).
            03  ORCHCN03S02-GRP-DENPNUM        PIC 9(07)
                                               OCCURS   10.
+           03  ORCHCN03S02-CHKPRT             PIC 9(01).
+           03  ORCHCN03S02-PTINFREF           PIC X(01).
+           03  ORCHCN03S02-SKYPRT             PIC X(01).
+           03  ORCHCN03S02-SRYPRT             PIC X(01).

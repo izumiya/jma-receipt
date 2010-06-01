@@ -310,6 +310,7 @@
                 04  I04-LBLINFO-STYLE
                                            PIC X(20).
                 04  I04-LBLINFO            PIC X(70).
+              03  I04-LBLINFO2             PIC X(70).
               03  I04-SCROLLEDWINDOW1.
                 04  I04-HKNCOMBILST.
                   05  I04-HKNCOMBILST-CNT  PIC S9(9)   BINARY.
