@@ -45,6 +45,9 @@ Z05	{
 		FORMALNAME	{
 			value	varchar(200);
 		};
+		SHONAME	{
+			value	varchar(200);
+		};
 		INPCHKKBN	{
 			value	number(1);
 		};
@@ -110,6 +113,15 @@ Z05	{
 			};
 			count	int;
 			item	varchar(30)[7];
+		};
+		KEIKASOCHIYMD	{
+			value	varchar(10);
+		};
+		CDKBN_BU	{
+			value	varchar(2);
+		};
+		CDKBN_KBNNUM	{
+			value	varchar(3);
 		};
 	};
 };
