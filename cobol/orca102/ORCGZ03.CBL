@@ -449,7 +449,7 @@
                "難病外来指導管理料".
            03  FILLER              PIC X(02)   VALUE   "39".
            03  FILLER              PIC X(50)   VALUE
-               "在宅時医学管理料".
+               "在宅時医学総合管理料".
            03  FILLER              PIC X(02)   VALUE   "40".
            03  FILLER              PIC X(50)   VALUE
                "老人慢性疾患外来総合診療料".
@@ -468,7 +468,7 @@
       *
            03  FILLER              PIC X(02)   VALUE   "45".
            03  FILLER              PIC X(50)   VALUE
-               "生活習慣病指導管理料".
+               "生活習慣病指導管理料（糖尿病を主病）".
            03  FILLER              PIC X(02)   VALUE   "46".
            03  FILLER              PIC X(50)   VALUE
                "慢性疼痛疾患管理料".
@@ -544,10 +544,7 @@
                "生活習慣病管理料".
            03  FILLER              PIC X(02)   VALUE   "82".
            03  FILLER              PIC X(50)   VALUE
-               "在宅時医学総合管理料".
-           03  FILLER              PIC X(02)   VALUE   "83".
-           03  FILLER              PIC X(50)   VALUE
-               "特定施設入居時等医学総合管理料".
+               "在宅末期医療総合診察料".
            03  FILLER              PIC X(02)   VALUE   "97".
            03  FILLER              PIC X(50)   VALUE
                "処方せん料".
@@ -558,14 +555,12 @@
        01  TBL-SDOKNRYO-AREA-R     REDEFINES   TBL-SDOKNRYO-AREA.
       *    03  TBL-SDOKNRYO-OCC        OCCURS  45      INDEXED  SDO-IDX.
       **** 03  TBL-SDOKNRYO-OCC        OCCURS  58      INDEXED  SDO-IDX.
-      **** 03  TBL-SDOKNRYO-OCC        OCCURS  73      INDEXED  SDO-IDX.
-           03  TBL-SDOKNRYO-OCC        OCCURS  74      INDEXED  SDO-IDX.
+           03  TBL-SDOKNRYO-OCC        OCCURS  73      INDEXED  SDO-IDX.
                05  TBL-SDOKNRYO        PIC X(02).
                05  TBL-SDOKNRYOMEI     PIC X(50).
       *01  SDO-MAX                     PIC 9(04)   VALUE   45.
       *01  SDO-MAX                     PIC 9(04)   VALUE   58.
-      *01  SDO-MAX                     PIC 9(04)   VALUE   73.
-       01  SDO-MAX                     PIC 9(04)   VALUE   74.
+       01  SDO-MAX                     PIC 9(04)   VALUE   73.
       *
       *****************************************************************
       *    ファイルレイアウト
