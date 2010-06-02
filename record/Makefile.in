@@ -403,6 +403,7 @@ RECORD_files = \
 	I07.rec \
 	W67.rec \
 	I08.rec \
+	SID3.rec \
 
 DEF_files = \
 	HC01.def \

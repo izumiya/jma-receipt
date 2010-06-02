@@ -44,3 +44,4 @@
             02  HCN03B-LAYER-OPTION PIC X(100).
             02  HCN03B-MEMO
                     PIC X(80)   OCCURS  10 TIMES.
+            02  HCN03B-LBLFTNRATE   PIC X(2).

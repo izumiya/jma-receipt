@@ -139,6 +139,7 @@
        01  CNT-AREA.
            03  CNT-TUKI            PIC 9(05).
            03  CNT-HKNCOMBI        PIC 9(05).
+           03  CNT-SRYPRT-PAGE     PIC 9(06).
       *
       *    システム領域
        01  SYS-AREA.
@@ -1325,9 +1326,11 @@
       *****************************************************************
        3100-CMB-SRYPRTOUT-SET-SEC      SECTION.
       *
-           MOVE    2               TO  SPA-GMN-I04-SRYPRTOUT-CNT
+           MOVE    3               TO  SPA-GMN-I04-SRYPRTOUT-CNT
            MOVE    "0:発行なし"    TO  SPA-GMN-I04-SRYPRTOUT-ITM (01)
            MOVE    "1:発行あり"    TO  SPA-GMN-I04-SRYPRTOUT-ITM (02)
+           MOVE    "2:発行あり（請求あり）"  
+                                   TO  SPA-GMN-I04-SRYPRTOUT-ITM (03)
       *
             .
        3100-CMB-SRYPRTOUT-SET-EXT.
@@ -1468,7 +1471,9 @@
            PERFORM   UNTIL  MCP-RC  NOT =  ZERO
       *
                MOVE    MCPDATA-REC     TO  SYUNOU-REC
-               IF    ( SPA-I01-I04-RRKNUM
+               IF    ( SPA-I01-I04-SKYSTYMD   <= SYU-SKYSTYMD )
+                AND  ( SPA-I01-I04-SKYEDYMD   >= SYU-SKYEDYMD )
+                AND  ( SPA-I01-I04-RRKNUM
                                         = SYU-NYUIN-RRKNUM )
                    CONTINUE
                ELSE
@@ -5969,7 +5974,7 @@
       
       *    診療費明細書
            IF    ( SPA-GMN-I04-SRYPRTOUT-CD
-                                       =   "1" )
+                                       =   "1" OR "2" )
                PERFORM 451-SRYPRT-OUT-SEC
            END-IF
       *
@@ -6235,12 +6240,7 @@
            MOVE    "00000008"      TO  WRK-KBNCD
            PERFORM 4511-PRINT-PG-EDIT-SEC
       *
-           INITIALIZE      ORCHCN04AREA
-           MOVE    WRK-SPA-PTID    TO  ORCHCN04-PTID
-           MOVE    WRK-SPA-PTNUM   TO  ORCHCN04-PTNUM
-           MOVE    WRK-SPA-NAME    TO  ORCHCN04-NAME
-      *
-           MOVE    ZERO            TO  IDX2
+           MOVE    ZERO            TO  CNT-SRYPRT-PAGE
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1        >   SPA-I0-SYUNOU-CNT )
@@ -6250,26 +6250,43 @@
       *
                MOVE  1                 TO  FLG-SRYPRT
       *
+               IF    ( SPA-I0-SYUNOU-UPDFLG (IDX1)     =   ZERO )
+                AND  ( SPA-NAI-I04-SAIKEISANFLG        =   1 )
+                   MOVE    SPA-NAI-I04-SEIKYU  (IDX1)
+                                   TO  WRK-SKY-SKYMONEY
+               ELSE
+                   MOVE    WKSYU-SKYMONEY
+                                   TO  WRK-SKY-SKYMONEY
+               END-IF
+      *
+               MOVE  1                 TO  FLG-SRYPRT
+      *
                IF    ( SPA-I0-SYUNOU-TTLDAT-FLG (IDX1)
                                    NOT =   ZERO )
                        MOVE    ZERO    TO  FLG-SRYPRT
+               ELSE
+                   IF    ( SPA-GMN-I04-SRYPRTOUT-CD    =   "2" )
+                     AND ( WRK-SKY-SKYMONEY           <=   ZERO )
+                       MOVE    ZERO    TO  FLG-SRYPRT
+                   END-IF
                END-IF
       *
                IF    ( FLG-SRYPRT      =   1 )
       *
-                   COMPUTE IDX2    =   IDX2    +   1
-      *
-                   MOVE    WKSYU-DENPNUM
-                                       TO  ORCHCN04-DENPNUM (IDX2)
+                   INITIALIZE                  ORCHCN04AREA
+                   MOVE    WRK-SPA-PTID    TO  ORCHCN04-PTID
+                   MOVE    WRK-SPA-PTNUM   TO  ORCHCN04-PTNUM
+                   MOVE    WRK-SPA-NAME    TO  ORCHCN04-NAME
+                   MOVE    WKSYU-DENPNUM   TO  ORCHCN04-DENPNUM (1)
+                   MOVE    "02"            TO  WRK-SPA-PRT-FLG
+                   CALL    WRK-PRINT-PG    USING
+                                           WRK-SPA-AREA
+                                           ORCHCN04AREA
+                   MOVE    SPACE           TO  WRK-SPA-PRT-FLG
+                   MOVE    ORCHCN04-PAGE-CNT
+                                           TO  CNT-SRYPRT-PAGE
                END-IF
            END-PERFORM
-      *
-           IF    ( IDX2            >   ZERO )
-               MOVE    "02"            TO      WRK-SPA-PRT-FLG
-               CALL    WRK-PRINT-PG    USING   WRK-SPA-AREA
-                                               ORCHCN04AREA
-               MOVE    SPACE           TO      WRK-SPA-PRT-FLG
-           END-IF
       *
            .
        451-SRYPRT-OUT-EXT.

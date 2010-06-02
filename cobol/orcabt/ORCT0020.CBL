@@ -563,10 +563,12 @@
       *        Æþ±¡ÀÁµá½ñ°õºþ
                IF    ( ORCHCN03-CNT    >    ZERO )
       *
-                   CALL    WRK-SEIKYU-PG    USING   ORCHCN03AREA
-                                                   SPA-AREA
+                   IF    ( TEIKI2P-PRTFORM  =  "0" OR "1" )
+                       CALL    WRK-SEIKYU-PG   USING   ORCHCN03AREA
+                                                       SPA-AREA
+                   END-IF
       *
-                   IF    ( TEIKI2P-PRTFORM  =  "0" )
+                   IF    ( TEIKI2P-PRTFORM  =  "0" OR "2" )
                        PERFORM 2001-MEISAI-PRT-SEC
                    END-IF
       *
@@ -589,41 +591,41 @@
       *****************************************************************
        2001-MEISAI-PRT-SEC                    SECTION.
       *
-           INITIALIZE              ORCHCN04AREA
-           MOVE    TSYUGRP-GRP-MAX (IDX0)
-                                       TO  WRK-MAX
-           MOVE    TSYUGRP-PTID (IDX0)
-                                       TO  ORCHCN04-PTID
-           MOVE    TSYUGRP-PTID (IDX0)
-                                       TO  WRK-PTID
-           PERFORM 900-PTINF-KEY-SEL-SEC
-           PERFORM 900-PTNUM-KEY-SEL-SEC
-      *
-           MOVE    PTNUM-PTNUM         TO  ORCHCN04-PTNUM
-           MOVE    PTINF-NAME          TO  ORCHCN04-NAME
-      *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   WRK-MAX )
       *
+               INITIALIZE              ORCHCN04AREA
+               MOVE    TSYUGRP-GRP-MAX (IDX0)
+                                       TO  WRK-MAX
+               MOVE    TSYUGRP-PTID (IDX0)
+                                       TO  ORCHCN04-PTID
+               MOVE    TSYUGRP-PTID (IDX0)
+                                       TO  WRK-PTID
+               PERFORM 900-PTINF-KEY-SEL-SEC
+               PERFORM 900-PTNUM-KEY-SEL-SEC
+      *
+               MOVE    PTNUM-PTNUM     TO  ORCHCN04-PTNUM
+               MOVE    PTINF-NAME      TO  ORCHCN04-NAME
+      *
                MOVE    TSYUGRP-GRP-DENPNUM (IDX0 IDX1)
-                                       TO  ORCHCN04-DENPNUM (IDX1)
+                                       TO  ORCHCN04-DENPNUM (1)
       *
-           END-PERFORM
+               MOVE    "1"             TO  ORCHCN04-PRTKBN
       *
-           MOVE    "1"                 TO  ORCHCN04-PRTKBN
-      *
-           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)
+               MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)
                                        TO  SPA-SRYYMD
       *
-           MOVE    WRK-MEISAI-PRTNM    TO  SPRT-PRTNM
-           MOVE    TSYUGRP-PTID (IDX0) TO  SPRT-PTID
-           MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)(1:6)
+               MOVE    WRK-MEISAI-PRTNM    TO  SPRT-PRTNM
+               MOVE    TSYUGRP-PTID (IDX0) TO  SPRT-PTID
+               MOVE    TSYUGRP-GRP-SRYYMD  (IDX0 IDX1)(1:6)
                                        TO  SPRT-SRYYM
-           MOVE    ORCSPRTAREA         TO  ORCHCN04-PRTAREA
+               MOVE    ORCSPRTAREA         TO  ORCHCN04-PRTAREA
       *
-           CALL    WRK-MEISAI-PG    USING
-                                    SPA-AREA
-                                    ORCHCN04AREA
+               CALL    WRK-MEISAI-PG       USING
+                                           SPA-AREA
+                                           ORCHCN04AREA
+      *
+           END-PERFORM
       *
            .
        2001-MEISAI-PRT-EXT.

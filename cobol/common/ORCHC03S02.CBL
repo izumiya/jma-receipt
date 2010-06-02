@@ -99,6 +99,7 @@
                    07  SRT-KBTPRTFLG   PIC 9(01).
                    07  SRT-SRYKA       PIC X(02).
                    07  SRT-HKNCOMBI    PIC X(04).
+                   07  SRT-SRTDENPNUM2 PIC 9(07).
                05  SRT-KBT-SRYKA-MAX   PIC 9(03).
                05  SRT-KBT-SRYKA       PIC X(02)
                                        OCCURS  50.
@@ -227,6 +228,9 @@
            CALL    "ORCSS003"      USING   SS003-AREA
                                            SPA-AREA
       *
+           PERFORM 900-PARA-KEY4-SEL-SEC
+           MOVE    PARA-DATA-REC       TO  SYUPARA01-AREA
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -250,12 +254,9 @@
            EXIT.
       *
       *****************************************************************
-      *    ø«Œ≈≤ °¶ ›∏±¡»πÁ§ªºË∆¿ΩËÕ˝
+      *    º˝«ºΩ∏∑◊ΩËÕ˝
       *****************************************************************
        2001-SYUSUM-SEC                 SECTION.
-      *
-           PERFORM 900-PARA-KEY4-SEL-SEC
-           MOVE    PARA-DATA-REC       TO  SYUPARA01-AREA
       *
            PERFORM 900-PARA-KEY6-SEL-SEC
       *
@@ -264,6 +265,30 @@
                MOVE    PARA-DATA-REC       TO  SYUPARA02-AREA
       *
                PERFORM 900-SYUNOU-KEY-SEL-SEC
+               IF    ( SYUPARA01-TUKISUMKBN    =   "1" )
+                   IF    ( SYU-SKYMONEY    >   SYU-NYUKIN-TOTAL )
+                       PERFORM 20011-SYUSUM-SEC
+                   END-IF
+               ELSE
+                       PERFORM 20011-SYUSUM-SEC
+               END-IF
+      *
+               PERFORM 900-PARA-KEY6-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       2001-SYUSUM-EXT.
+           EXIT.
+      *****************************************************************
+      *    º˝«ºΩ∏∑◊ΩËÕ˝
+      *****************************************************************
+       20011-SYUSUM-SEC                 SECTION.
+      *
       *
                IF    ( SYUPARA01-SKYSUMFLG =   ZERO )
                        MOVE    SYU-SRYYMD (1:6) TO WRK-SRYYM
@@ -313,16 +338,8 @@
                    END-IF
                END-IF
       *
-               PERFORM 900-PARA-KEY6-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_para"          TO  MCP-TABLE
-           MOVE    "key6"              TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
            .
-       2001-SYUSUM-EXT.
+       20011-SYUSUM-EXT.
            EXIT.
       *****************************************************************
       *    ø«Œ≈≤ °¶ ›∏±¡»πÁ§ª ÃΩ∏∑◊ΩËÕ˝
@@ -358,6 +375,12 @@
                    END-IF
                END-IF
       *
+                   IF    ( SRT-SRTDENPNUM2(SRT-MAX)
+                                   >   SYU-DENPNUM )
+                       MOVE    SYU-DENPNUM
+                                   TO  SRT-SRTDENPNUM2(SRT-MAX)
+                   END-IF
+      *
            ELSE
                IF    ( SRT-MAX     <   CONST-SRT-MAX )
                    COMPUTE SRT-MAX =   SRT-MAX     +   1
@@ -378,6 +401,8 @@
                        MOVE    SYU-DENPNUM
                                    TO  SRT-SRTDENPNUM(SRT-MAX)
                    END-IF
+                       MOVE    SYU-DENPNUM
+                                   TO  SRT-SRTDENPNUM2(SRT-MAX)
       *
                    COMPUTE SRT-SRYYM29 (SRT-MAX)
                        =   SRT-SRYYM29 (SRT-MAX)
@@ -459,9 +484,9 @@
       *¿¡µ·∂‚≥€°›æ√»Ò¿«° ∫∆∑«°À
            ADD SYU-SKYMONEY-TAX-SAI TO LNKSYU-SKYMONEY-TAX-SAI(IDX-SYU)
       *¿¡µ·∂‚≥€
-           ADD SYU-SKYMONEY        TO  LNKSYU-SKYMONEY       (IDX-SYU)
+           ADD SYU-SKYMONEY        TO  LNKSYU-SKYMONEY     (IDX-SYU)
       *∆˛∂‚πÁ∑◊≥€
-           ADD SYU-NYUKIN-TOTAL    TO  LNKSYU-NYUKIN-TOTAL   (IDX-SYU)
+           ADD SYU-NYUKIN-TOTAL    TO  LNKSYU-NYUKIN-TOTAL (IDX-SYU)
       *œ´∫“ ›∏±
            ADD SYU-RSISHOSHIN-MONEY
                                    TO  LNKSYU-RSISHOSHIN-MONEY(IDX-SYU)
@@ -601,14 +626,27 @@
       *****************************************************************
        20011-KBT-SEIKYU-HEN-SEC        SECTION.
       *
-           COMPUTE SRT-KBT-SEIKYU (IDX-SYU)
-               =   SRT-KBT-SEIKYU (IDX-SYU)
-               +   SYU-SKYMONEY
-               - ( SYU-NYUKIN-TOTAL    -   SYUPARA02-NYUKIN )
+           IF    ( SYUPARA01-TUKISUMKBN    =   "1" )
       *
-           COMPUTE SRT-KBT-NYUKIN (IDX-SYU)
-               =   SRT-KBT-NYUKIN (IDX-SYU)
-               +   SYUPARA02-NYUKIN
+               COMPUTE SRT-KBT-SEIKYU (IDX-SYU)
+                   =   SRT-KBT-SEIKYU (IDX-SYU)
+                   +   SYU-SKYMONEY
+                   -   SYU-NYUKIN-TOTAL
+      *
+               COMPUTE SRT-KBT-NYUKIN (IDX-SYU)
+                   =   SRT-KBT-NYUKIN (IDX-SYU)
+                   +   0
+           ELSE
+      *
+               COMPUTE SRT-KBT-SEIKYU (IDX-SYU)
+                   =   SRT-KBT-SEIKYU (IDX-SYU)
+                   +   SYU-SKYMONEY
+                   - ( SYU-NYUKIN-TOTAL    -   SYUPARA02-NYUKIN )
+      *
+               COMPUTE SRT-KBT-NYUKIN (IDX-SYU)
+                   =   SRT-KBT-NYUKIN (IDX-SYU)
+                   +   SYUPARA02-NYUKIN
+           END-IF
       *
            IF    ( SYU-NYUKIN-TOTAL    NOT =   SYUPARA02-NYUKIN )
                MOVE    1           TO  SRT-KBT-TUIKANYUKINFLG (IDX-SYU)
@@ -724,12 +762,8 @@
            COMPUTE PARA-EDANUM =   PARA-EDANUM +   1
            INITIALIZE              SYUPARA03-AREA
       *
-           IF    ( SYUPARA01-HAKKOFLG  =   4 )
-               CONTINUE
-           ELSE
-               MOVE    SRT-SRTDENPNUM (IDX4)
+           MOVE    SRT-SRTDENPNUM2 (IDX4)
                                            TO  SYUPARA03-DENPNUM
-           END-IF
       *
            MOVE    SRT-KBT-SEIKYU(IDX4)    TO  SYUPARA03-SEIKYU
       *
@@ -757,6 +791,12 @@
       *
            END-IF
            MOVE    SRT-KBT-NYUKIN  (IDX4)  TO  SYUPARA03-NYUKIN
+           IF    ( SYUPARA03-STSRYYMD  NOT =   SYUPARA03-EDSRYYMD )
+               MOVE    "1"     TO  SYUPARA03-KIKANKBN
+           END-IF
+           IF    ( SYUPARA01-TUKIKIKANKBN  =   "1" )
+               MOVE    "1"     TO  SYUPARA03-KIKANKBN
+           END-IF
            MOVE    SRT-KBT-STSRYYMD(IDX4)  TO  SYUPARA03-STSRYYMD
            MOVE    SRT-KBT-EDSRYYMD(IDX4)  TO  SYUPARA03-EDSRYYMD
       *
@@ -822,6 +862,7 @@
                                    >       1 )
                MOVE    " £øÙ ›∏±ª»Õ—"  TO  SYUPARA03-HKNCOMBIMEI
                MOVE    ZERO            TO  LNKSYU-PTFTNRATE  (IDX4)
+               MOVE    SPACE           TO  LNKSYU-HKNCOMBINUM(IDX4)
            ELSE
                MOVE    SRT-KBT-HKNCOMBI (IDX4 1)
                                        TO  LNKSYU-HKNCOMBINUM(IDX4)

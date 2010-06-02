@@ -54,6 +54,7 @@ grpsyS     SELECT  BG01301-FILE    ASSIGN   BG01301PARA
        FD  BG01301-FILE.
        01  BG01301-REC.
            03  BG01301-KEY.
+               05  BG01301-RENNUM              PIC 9(06).
                05  BG01301-PTNUM               PIC X(20).
            03  BG01301-PTID                    PIC 9(10).
       *
@@ -92,16 +93,21 @@ grpsys*DD  03  FILLER                      PIC X(04)   VALUE   ".dat".
            03  FLG-LOOPEND                         PIC 9(01).
            03  FLG-TARGET                          PIC 9(01).
            03  FLG-PARA                            PIC 9(01).
+           03  FLG-SKYPRT                          PIC 9(01).
+           03  FLG-SRYPRT                          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
            03  CNT-BG01301                         PIC 9(05).
            03  CNT-JOB-UPDCNT                      PIC 9(08).
+           03  CNT-RENNUM                          PIC 9(06).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX0                                PIC 9(05).
            03  IDX1                                PIC 9(05).
+           03  IDX2                                PIC 9(05).
+           03  IDX3                                PIC 9(05).
            03  IDXD                                PIC 9(05).
            03  IDXE                                PIC 9(05).
       *
@@ -122,6 +128,7 @@ grpsys     03  RECEERR                             PIC X(100).
            03  WRK-PARA-ZENMISYUPRTKBN             PIC X(01).
            03  WRK-PARA-SUMKBN                     PIC X(01).
            03  WRK-PARA-PRTFORMKBN                 PIC X(01).
+           03  WRK-PARA-PTREFKBN                   PIC X(01).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -164,6 +171,8 @@ grpsys     03  RECEERR                             PIC X(100).
                05  WRK-FILEMEI-CD  PIC X(06).
            03  WRK-SRYYMD                          PIC X(08).
            03  WRK-DENPNUM                         PIC 9(07).
+           03  WRK-SKYPRTFLG.
+               05  WRK-SKYPRTFLG9                  PIC 9(01).
       *
        01  CONST-AREA.
            03  CONST-BTPARA-SHELLID        PIC X(08)
@@ -172,6 +181,20 @@ grpsys     03  RECEERR                             PIC X(100).
                                            VALUE   2.
            03  CONST-BTPARA-DSP-RENNUM     PIC 9(03)
                                            VALUE   2.
+           03  CONST-PRTDEF-G.
+               05  CONST-PRTDEF0       PIC X(02)   VALUE   "00".
+               05  CONST-PRTDEF1       PIC X(02)   VALUE   "11".
+               05  CONST-PRTDEF2       PIC X(02)   VALUE   "11".
+               05  CONST-PRTDEF3       PIC X(02)   VALUE   "11".
+               05  CONST-PRTDEF4       PIC X(02)   VALUE   "10".
+               05  CONST-PRTDEF5       PIC X(02)   VALUE   "10".
+               05  CONST-PRTDEF6       PIC X(02)   VALUE   "10".
+               05  CONST-PRTDEF7       PIC X(02)   VALUE   "11".
+           03  CONST-PRTDEF-R  REDEFINES   CONST-PRTDEF-G.
+      *        0¡Á7 ´µ¼ÔÅÐÏ¿¶ÈÌ³¤ÎÀÁµá½ñÈ¯¹Ô¶èÊ¬
+               05  CONST-PRTDEF-OCC            OCCURS  8.
+                   07  CONST-SKYPRTOUT         PIC X(01).
+                   07  CONST-SRYPRTOUT         PIC X(01).
       *
        01  ERR-EDIT-AREA.
            03  ERR-PTID                            PIC 9(10).
@@ -342,6 +365,7 @@ grpsys                                 RECEERR
                                        WRK-PARA-ZENMISYUPRTKBN
                                        WRK-PARA-SUMKBN
                                        WRK-PARA-PRTFORMKBN
+                                       WRK-PARA-PTREFKBN
 grpsys     END-UNSTRING
       *    £Ó£Ð£Á¥¨¥ê¥¢¥»¥Ã¥È½èÍý
 grpsys     PERFORM 1001-SPA-SET-SEC
@@ -350,10 +374,28 @@ grpsys     PERFORM 1001-SPA-SET-SEC
                MOVE    "3"             TO  WRK-PARA-HAKUHOUFLG
            END-IF
       *
-           IF    ( WRK-PARA-PRTFORMKBN =   "0" OR "1" )
+           IF    ( WRK-PARA-ZEROSKYKBN =   "0" OR "1" )
+               CONTINUE
+           ELSE
+               MOVE    "0"             TO  WRK-PARA-ZEROSKYKBN
+           END-IF
+      *
+      *    IF    ( WRK-PARA-SUMKBN     =   "0" OR "1" )
+      *        CONTINUE
+      *    ELSE
+               MOVE    "0"             TO  WRK-PARA-SUMKBN
+      *    END-IF
+      *
+           IF    ( WRK-PARA-PRTFORMKBN =   "0" OR "1" OR "2" )
                CONTINUE
            ELSE
                MOVE    "0"             TO  WRK-PARA-PRTFORMKBN
+           END-IF
+      *
+           IF    ( WRK-PARA-PTREFKBN   =   "0" OR "1" )
+               CONTINUE
+           ELSE
+               MOVE    "0"             TO  WRK-PARA-PTREFKBN
            END-IF
       *
            MOVE    "³°Íè·îÊÌÀÁµá½ñ"    TO  WRK-TITLE
@@ -629,6 +671,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    BTPARA-INFO-PARA
                                    TO  QTOANY-AREA
       *
+           MOVE    ZERO            TO  CNT-RENNUM
            PERFORM UNTIL ( FLG-BTPARA  NOT =   ZERO )
       *
                MOVE    1           TO  FLG-TARGET
@@ -640,7 +683,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
                END-IF
       *
                IF    ( FLG-TARGET  =   1 )
+      *
+                   COMPUTE CNT-RENNUM  =   CNT-RENNUM  +   1
+      *
                    INITIALIZE          BG01301-REC
+                   MOVE    CNT-RENNUM      TO  BG01301-RENNUM
                    MOVE    QTOANY-PTNUM    TO  BG01301-PTNUM
                    MOVE    QTOANY-PTID     TO  BG01301-PTID
                    WRITE   BG01301-REC
@@ -864,6 +911,7 @@ grpsys                                     SPA-AREA
                                            SYUPARA01-GAI-MISYU-P
                                            SYUPARA01-GAI-MISYU-M
            END-IF
+           MOVE    WRK-PARA-SUMKBN     TO  SYUPARA01-TUKISUMKBN
       *
            INITIALIZE                      PARA-REC
            MOVE    "G01"               TO  PARA-GYOUMUID
@@ -888,7 +936,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
                GO  TO  2101-SEIKYU-PG-CALL-EXT
            END-IF
       *
-           PERFORM 900-SYUNOU-KEY37-SEL-SEC
+           PERFORM 900-SYUNOU-KEY73-SEL-SEC
       *
            MOVE    SPACE               TO  WRK-SRYYMD
            PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
@@ -906,12 +954,12 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
                    GO  TO  2101-SEIKYU-PG-CALL-EXT
                END-IF
       *
-               PERFORM 900-SYUNOU-KEY37-FET-SEC
+               PERFORM 900-SYUNOU-KEY73-FET-SEC
       *
            END-PERFORM
       *
            MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key37"             TO  MCP-PATHNAME
+           MOVE    "key73"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            INITIALIZE                      ORCHC03S02AREA
@@ -932,11 +980,41 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
                GO  TO  2101-SEIKYU-PG-CALL-EXT
            END-IF
       *
-           MOVE    WRK-SRYYMD      TO      SPA-SRYYMD
            MOVE    "00102"         TO      WRK-FILEMEI-CD
-           PERFORM 21011-SEIKYU-PG-CALL-SEC
       *
-           IF    ( WRK-PARA-PRTFORMKBN     =   "0" )
+           MOVE    1               TO      FLG-SKYPRT
+                                           FLG-SRYPRT
+           IF    ( WRK-PARA-PTREFKBN       =   "1" )
+            AND  ( PTINF-SKYPRTFLG         >=  "0" )
+            AND  ( PTINF-SKYPRTFLG         <=  "7" )
+               MOVE    PTINF-SKYPRTFLG     TO  WRK-SKYPRTFLG
+               COMPUTE WRK-SKYPRTFLG9  =   WRK-SKYPRTFLG9  +   1
+               IF    ( CONST-SKYPRTOUT (WRK-SKYPRTFLG9)    =   "1" )
+                   MOVE    1       TO      FLG-SKYPRT
+               ELSE
+                   MOVE    ZERO    TO      FLG-SKYPRT
+               END-IF
+               IF    ( CONST-SRYPRTOUT (WRK-SKYPRTFLG9)    =   "1" )
+                   MOVE    1       TO      FLG-SRYPRT
+               ELSE
+                   MOVE    ZERO    TO      FLG-SRYPRT
+               END-IF
+           END-IF
+      *
+           EVALUATE    WRK-PARA-PRTFORMKBN
+           WHEN    "1"
+               MOVE    ZERO    TO      FLG-SRYPRT
+           WHEN    "2"
+               MOVE    ZERO    TO      FLG-SKYPRT
+           END-EVALUATE
+      *
+           MOVE    WRK-SRYYMD      TO      SPA-SRYYMD
+      *
+           IF    ( FLG-SKYPRT      =       1 )
+               PERFORM 21011-SEIKYU-PG-CALL-SEC
+           END-IF
+      *
+           IF    ( FLG-SRYPRT      =       1 )
                PERFORM 21011-MEISAI-PG-CALL-SEC
            END-IF
       *
@@ -994,33 +1072,36 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
       *
                MOVE    PARA-DATA-REC       TO  SYUPARA03-AREA
       *
+               INITIALIZE                      ORCHC04AREA
+               MOVE    SYUPARA03-DENPNUM   TO  ORCHC04-DENPNUM
+               MOVE    4                   TO  ORCHC04-HAKKOFLG
+               MOVE    WRK-PARA-HAKUHOUFLG TO  ORCHC04-HAKHOUFLG
+               MOVE    WRK-PARA-HAKYMD     TO  ORCHC04-DENPPRTYMD
+               MOVE    SYUPARA03-STSRYYMD  TO  ORCHC04-KIKAN-STYMD
+               MOVE    SYUPARA03-EDSRYYMD  TO  ORCHC04-KIKAN-EDYMD
+      *
                PERFORM VARYING IDXD    FROM    1   BY  1
                        UNTIL ( IDXD    >   SYUPARA03-GRP-DENPNUM-MAX )
       *
-                   INITIALIZE                      ORCHC04AREA
                    MOVE    SYUPARA03-GRP-DENPNUM (IDXD)
-                                           TO  ORCHC04-DENPNUM
-                   MOVE    "1"             TO  ORCHC04-PRTKBN
-      *
-                   MOVE    SYUPARA03-GRP-DENPNUM (IDXD)
-                                           TO  WRK-DENPNUM
-                   PERFORM 900-SYUNOU-KEY-SEL-SEC
-                   MOVE    SYU-SRYYMD      TO  SPA-SRYYMD
-      *
-                   MOVE    WRK-MEISAI-PRTNM
-                                       TO      SPRT-PRTNM
-                   MOVE    SPA-PTID    TO      SPRT-PTID
-                   MOVE    WRK-PARA-SRYYM
-                                       TO      SPRT-SRYYM
-                   MOVE    ORCSPRTAREA TO      ORCHC04-PRTAREA
-      *
-                   CALL    WRK-MEISAI-PG       USING
-                                               SPA-AREA
-                                               ORCHC04AREA
-      *
-                   COMPUTE CNT-JOB-UPDCNT
-                       =   CNT-JOB-UPDCNT  +   ORCHC04-PAGE
+                                           TO  ORCHC04-KIKAN-DENPNUM
+                                                               (IDXD)
                END-PERFORM
+      *
+               MOVE    "1"             TO  ORCHC04-PRTKBN
+      *
+               MOVE    WRK-MEISAI-PRTNM
+                                       TO  SPRT-PRTNM
+               MOVE    SPA-PTID        TO  SPRT-PTID
+               MOVE    WRK-PARA-SRYYM  TO  SPRT-SRYYM
+               MOVE    ORCSPRTAREA     TO  ORCHC04-PRTAREA
+      *
+               CALL    WRK-MEISAI-PG       USING
+                                           SPA-AREA
+                                           ORCHC04AREA
+      *
+               COMPUTE CNT-JOB-UPDCNT
+                   =   CNT-JOB-UPDCNT  +   ORCHC04-PAGE
       *
                PERFORM 900-PARA-KEY5-FET-SEC
       *
@@ -1678,7 +1759,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
       **************************************************************
       *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý
       **************************************************************
-       900-SYUNOU-KEY37-SEL-SEC        SECTION.
+       900-SYUNOU-KEY73-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-SYUNOU
       *
@@ -1691,22 +1772,22 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
       *
            MOVE    SYUNOU-REC          TO  MCPDATA-REC
            MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key37"             TO  MCP-PATHNAME
+           MOVE    "key73"             TO  MCP-PATHNAME
            PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               PERFORM 900-SYUNOU-KEY37-FET-SEC
+               PERFORM 900-SYUNOU-KEY73-FET-SEC
            ELSE
                INITIALIZE                  SYUNOU-REC
                MOVE    1               TO  FLG-SYUNOU
            END-IF
       *
            .
-       900-SYUNOU-KEY37-SEL-EXT.
+       900-SYUNOU-KEY73-SEL-EXT.
            EXIT.
       **************************************************************
       *    ¼ýÇ¼¥Þ¥¹¥¿¡¼FETCH½èÍý
       **************************************************************
-       900-SYUNOU-KEY37-FET-SEC        SECTION.
+       900-SYUNOU-KEY73-FET-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-SYUNOU
            MOVE    ZERO                TO  FLG-LOOPEND
@@ -1715,7 +1796,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                     OR   ( FLG-LOOPEND NOT =   ZERO )
       *
                MOVE    "tbl_syunou"        TO  MCP-TABLE
-               MOVE    "key37"             TO  MCP-PATHNAME
+               MOVE    "key73"             TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC              =   ZERO )
                    MOVE    MCPDATA-REC     TO  SYUNOU-REC
@@ -1735,7 +1816,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
            END-PERFORM
       *
            .
-       900-SYUNOU-KEY37-FET-EXT.
+       900-SYUNOU-KEY73-FET-EXT.
            EXIT.
       **************************************************************
       *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý

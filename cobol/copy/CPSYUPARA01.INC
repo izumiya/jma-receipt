@@ -30,5 +30,16 @@
       *    発行フラグ（０：新規、１：再発行、２：訂正、３：入金 ４：月別）
            03  SYUPARA01-HAKKOFLG          PIC 9(01).
            03  SYUPARA01-SKYSUMFLG         PIC 9(01).
+      *    請求額ゼロ円月別請求書発行区分（０：発行する、１：発行しない）
            03  SYUPARA01-ZEROSKYKBN        PIC X(01).
            03  SYUPARA01-DENPPRTYMD        PIC X(08).
+      *    月別請求書入金済請求データ集計区分
+      *    （０：集計に含める、１：集計に含めない）
+           03  SYUPARA01-TUKISUMKBN        PIC X(01).
+      *    月別請求書期間区分
+      *    （１：期間指定する）
+           03  SYUPARA01-TUKIKIKANKBN      PIC X(01).
+      *    月別請求書期間開始日
+           03  SYUPARA01-TUKISTYMD         PIC X(08).
+      *    月別請求書期間終了日
+           03  SYUPARA01-TUKIEDYMD         PIC X(08).

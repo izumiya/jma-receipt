@@ -58,11 +58,20 @@
       *
       *    °õºþÍÑ¥Ç¡¼¥¿
        FD  PRT-FILE.
-      *****COPY    "HC03.INC".
-           COPY    "HCM03V03B.INC"  REPLACING   //HCM03V03B//
-                                   BY          //HC03//.
+       01  PRT-REC                 PIC X(10000).
       *
        WORKING-STORAGE             SECTION.
+      *
+       01  WKPRT-REC               PIC X(10000).
+      *
+           COPY    "HCM03V03B.INC" REPLACING   //HCM03V03B//
+                                   BY          //HC03//.
+      *
+           COPY    "HCM03V02B.INC" REPLACING   //HCM03V02B//
+                                   BY          //HC03V02//.
+      *
+           COPY    "HCM03B.INC"    REPLACING   //HCM03B//
+                                   BY          //HC03V01//.
       *
       *     °õºþÍÑ¥Ç¡¼¥¿ Ì¾¾ÎÎÎ°è 
            COPY    "CPCOMMONPRT.INC".
@@ -151,8 +160,8 @@
            03  WRK-WARI            PIC 9(02)V9.
       *****03  WRK-Z6              PIC ZZZZZZ.
       *****03  WRK-Z62             PIC ZZZ9.9.
-           03  WRK-Z6              PIC ZZZ.
-           03  WRK-Z62             PIC 9.9.
+           03  WRK-HKNFTN          PIC ZZ9.
+           03  WRK-HKNFTN2         PIC 9.9.
       *
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-NO              PIC Z(7).
@@ -216,6 +225,10 @@
       *
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¥Ñ¥é¥á¥¿
        01  TPARA-AREA.
+           03  TPARA-SRYKA              PIC X(01).
+           03  TPARA-HKNMEI             PIC X(01).
+           03  TPARA-FTNKBN             PIC X(01).
+           03  TPARA-HAKKOUBIKBN        PIC X(01).
            03  TPARA-YUKOSTYMD          PIC X(08).
            03  TPARA-YUKOEDYMD          PIC X(08).
            03  TPARA-MEMO               PIC X(80) OCCURS 10.
@@ -414,9 +427,10 @@
       *****************************************************************
        400-PRINT-SEC                SECTION.
       *
+            MOVE     WKPRT-REC         TO  PRT-REC
       *
       *¡¡¡¡°õºþÍÑ¥Ç¡¼¥¿½ÐÎÏ
-              WRITE  HC03
+              WRITE  PRT-REC
       *
       ******MOVE   "HC01.sh"           TO  SHELL-ID
       *     MOVE   "HC03.dia"          TO  SHELL-DIA
@@ -466,7 +480,7 @@
            MOVE    ORCHC03-PRTAREA     TO  ORCSPRTAREA
       *
            MOVE    WRK-FORMID          TO  SPRT-PRTID
-           MOVE    HC03                TO  SPRT-PRTDATA
+           MOVE    WKPRT-REC           TO  SPRT-PRTDATA
       *-----------------------------------------------------------------
            MOVE    "1"                 TO  SPRT-SITEKBN
       *    ¥«¥¹¥¿¥Þ¥¤¥º£Ð£Ç¤Î¾ì¹ç"2"¤ò¥»¥Ã¥È¤¹¤ë¤³¤È¡£
@@ -856,8 +870,40 @@
        100-OPTION-SELECT-SEC             SECTION.
       *
            INITIALIZE                  TPARA-AREA
+           MOVE    "1"             TO  TPARA-SRYKA
+           MOVE    "1"             TO  TPARA-HKNMEI
+           MOVE    "2"             TO  TPARA-FTNKBN
+           MOVE    "0"             TO  TPARA-HAKKOUBIKBN
            MOVE    "00000000"      TO  TPARA-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-YUKOEDYMD
+      *
+      *    ¿ÇÎÅ²ÊÌ¾
+           MOVE    "SRYKA"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-SRYKA
+           END-IF
+      *
+      *    ÊÝ¸±Ì¾¾Î
+           MOVE    "HKNMEI"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-HKNMEI
+           END-IF
+      *
+      *    ÉéÃ´³ä¹ç
+           MOVE    "FTNKBN"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" OR "2" )
+               MOVE    WRK-PARA    TO  TPARA-FTNKBN
+           END-IF
+      *
+      *    ÅÁÉ¼È¯¹ÔÆü¶èÊ¬
+           MOVE    "HAKKOUBIKBN"   TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-HAKKOUBIKBN
+           END-IF
       *
       *    Í­¸ú³«»ÏÆü
            MOVE    "YUKOSTYMD"     TO  WRK-PARA-NAME
@@ -889,6 +935,7 @@
       *
            END-PERFORM
       *
+      *
            .
        100-OPTION-SELECT-EXT.
            EXIT.
@@ -901,11 +948,16 @@
            MOVE    SPACE               TO  WRK-PARA
       *
            INITIALIZE                  ORCSPRGOPTIONAREA
-           IF      ORCHC03-SIZE    =   "A5"
+           EVALUATE    ORCHC03-SIZE
+           WHEN    "V1"
+               MOVE    "ORCHC03"       TO  ORCSPRGOPTION-PRGID
+           WHEN    "V2"
+               MOVE    "ORCHC03V02"    TO  ORCSPRGOPTION-PRGID
+           WHEN    "A5"
                MOVE    "ORCHC03V03A5"  TO  ORCSPRGOPTION-PRGID
-           ELSE
+           WHEN    OTHER
                MOVE    "ORCHC03V03"    TO  ORCSPRGOPTION-PRGID
-           END-IF
+           END-EVALUATE
            MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
            CALL    "ORCSPRGOPTION"     USING   SPA-AREA
                                                ORCSPRGOPTIONAREA
@@ -930,6 +982,9 @@
            WHEN    "YUKOEDYMD"
                MOVE    ORCSPRGOPTION-OT-PARA(1:10)
                                        TO  KANACHK-MAE-INPUT
+           WHEN    OTHER
+               MOVE    ORCSPRGOPTION-OT-PARA
+                                       TO  KANACHK-MAE-INPUT
            END-EVALUATE
       *
            CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
@@ -945,35 +1000,73 @@
        300-HC03-HEN-SEC                SECTION.
       *
            INITIALIZE                  HC03
+           INITIALIZE                  WKPRT-REC
       *
       *    ÅÁÉ¼ÈÖ¹æ
            MOVE    WRK-DENPNUM         TO  WRK-NO  
            MOVE    WRK-NO              TO  HC03-NO
       *    ¿ÇÎÅ²Ê
-           MOVE    WRK-SRYKA-MEI(1:20) TO  HC03-MIDASI
+           IF    ( TPARA-SRYKA         =   "1" )
+               MOVE    WRK-SRYKA-MEI(1:20) TO  HC03-MIDASI
+           END-IF
       *    ´µ¼ÔÈÖ¹æ
            MOVE    SPA-PTNUM           TO  HC03-KNJNO
       *    ´µ¼ÔÌ¾¾Î
            MOVE    SPA-NAME            TO  HC03-KNJNAMW
       *    ÊÝ¸±¼ïÊÌ
-           MOVE    WRK-HKNCOMBIMEI     TO  HC03-HOKEN
-      *    ÉéÃ´³ä¹ç
-           IF      SYU-PTFTNRATE       >   ZERO
-               COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
-               IF      SYU-PTFTNRATE(3:1)  =   ZERO
-                   MOVE    WRK-WARI            TO  WRK-Z6
-                   MOVE    WRK-Z6              TO  HC03-FUTAN
-               ELSE
-                   MOVE    WRK-WARI            TO  WRK-Z62
-                   MOVE    WRK-Z62             TO  HC03-FUTAN
-               END-IF
+           IF    ( TPARA-HKNMEI        =   "1" )
+               MOVE    WRK-HKNCOMBIMEI TO  HC03-HOKEN
            END-IF
+      *    ÉéÃ´³ä¹ç
+           IF    ( SYU-SRYYMD         >=   CONST-H200401 )
+               EVALUATE    TPARA-FTNKBN
+               WHEN    "1"
+                       MOVE    "¡ó"                TO  HC03-LBLFTNRATE
+                       MOVE    SYU-PTFTNRATE       TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN          TO  HC03-FUTAN
+               WHEN    "2"
+                   MOVE    "³ä"            TO  HC03-LBLFTNRATE
+                   COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
+                   IF      SYU-PTFTNRATE(3:1)  =   ZERO
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN          TO  HC03-FUTAN
+                   ELSE
+                       MOVE    WRK-WARI            TO  WRK-HKNFTN2
+                       MOVE    WRK-HKNFTN2         TO  HC03-FUTAN
+                   END-IF
+               END-EVALUATE
+           ELSE
+                   COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
+                   IF      SYU-PTFTNRATE(3:1)
+                                           =   ZERO
+                       MOVE    WRK-WARI    TO  WRK-HKNFTN
+                       MOVE    WRK-HKNFTN  TO  HC03-FUTAN
+                   ELSE
+                       MOVE    WRK-WARI    TO  WRK-HKNFTN2
+                       MOVE    WRK-HKNFTN2 TO  HC03-FUTAN
+                   END-IF
+           END-IF
+           IF    ( SYU-HKNCOMBINUM =   SPACE OR    ZERO )
+                   MOVE    SPACE       TO  HC03-FUTAN
+           END-IF
+           IF    ( TPARA-FTNKBN        =   "0" )
+               MOVE    SPACE           TO  HC03-FUTAN
+                                           HC03-LBLFTNRATE
+           END-IF
+      *
       *    ¿ÇÎÅÆü
            PERFORM 3101-SRYYMD-HEN-SEC
            MOVE    WRK-LBLSRYYMD       TO  HC03-LBLSRYYMD
            MOVE    WRK-SRYYMDG         TO  HC03-SRYYMD
       *    È¯¹ÔÆü
            MOVE    SYU-DENPPRTYMD      TO  WRK-SYMD
+           IF  (   TPARA-HAKKOUBIKBN   =   "1" )
+               IF    ( ORCHC03-HAKKOFLG    =   1 )
+                OR  (( ORCHC03-HAKKOFLG    =   3 )
+                  AND( ORCHC03-DENPEDANUM  >   ZERO ))
+                   MOVE    SPA-SYSYMD  TO  WRK-SYMD
+               END-IF
+           END-IF
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  HC03-HAKYMD
       *
@@ -1266,21 +1359,42 @@
                PERFORM 3001-TUKIBETU-HEN-SEC
            END-IF
       *
-           IF    ( SYU-SRYYMD              >=  CONST-H200401 )
+           IF    ( SYU-SRYYMD          >=  CONST-H200401 )
                EVALUATE    ORCHC03-SIZE
+               WHEN    "V1"
+                   MOVE    "HCM03BN.red"       TO  WRK-FORMID
+                   PERFORM 2002-HC03V01-HEN-SEC
+                   MOVE    HC03V01             TO  WKPRT-REC
+               WHEN    "V2"
+                   MOVE    "HCM03V02BN.red"    TO  WRK-FORMID
+                   PERFORM 2002-HC03V02-HEN-SEC
+                   MOVE    HC03V02             TO  WKPRT-REC
                WHEN    "A5"
                    MOVE    "HCM03V03A5BN.red"  TO  WRK-FORMID
+                   MOVE    HC03                TO  WKPRT-REC
                WHEN    OTHER
                    MOVE    "HCM03V03BN.red"    TO  WRK-FORMID
+                   MOVE    HC03                TO  WKPRT-REC
                END-EVALUATE
            ELSE
                EVALUATE    ORCHC03-SIZE
+               WHEN    "V1"
+                   MOVE    "HCM03BO.red"       TO  WRK-FORMID
+                   PERFORM 2002-HC03V01-HEN-SEC
+                   MOVE    HC03V01             TO  WKPRT-REC
+               WHEN    "V2"
+                   MOVE    "HCM03V02BO.red"    TO  WRK-FORMID
+                   PERFORM 2002-HC03V02-HEN-SEC
+                   MOVE    HC03V02             TO  WKPRT-REC
                WHEN    "A5"
                    MOVE    "HCM03V03A5BO.red"  TO  WRK-FORMID
+                   MOVE    HC03                TO  WKPRT-REC
                WHEN    OTHER
                    MOVE    "HCM03V03BO.red"    TO  WRK-FORMID
+                   MOVE    HC03                TO  WKPRT-REC
                END-EVALUATE
            END-IF
+      *
       *
            .
        300-HC03-HEN-EXT.
@@ -1336,18 +1450,195 @@
            EXIT.
       *
       *****************************************************************
+      *    Ä¢É¼ÊÔ½¸½èÍý¡ÊHC03V01¡Ë
+      *****************************************************************
+       2002-HC03V01-HEN-SEC            SECTION.
+      *
+           INITIALIZE                  HC03V01
+      *
+           MOVE  HC03-NO           TO  HC03V01-NO
+           MOVE  HC03-LBLSRYYMD    TO  HC03V01-LBLSRYYMD
+           MOVE  HC03-SRYYMD       TO  HC03V01-SRYYMD
+           MOVE  HC03-KNJNAMW      TO  HC03V01-KNJNAMW
+           MOVE  HC03-KNJNO        TO  HC03V01-KNJNO
+           MOVE  HC03-MIDASI       TO  HC03V01-MIDASI
+           MOVE  HC03-HAKYMD       TO  HC03V01-HAKYMD
+           MOVE  HC03-HOKEN        TO  HC03V01-HOKEN
+           MOVE  HC03-FUTAN        TO  HC03V01-FUTAN
+           MOVE  HC03-TUKISRYKA    TO  HC03V01-TUKISRYKA
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   16 )
+               MOVE  HC03-MEISAI (IDX)
+                                   TO  HC03V01-MEISAI (IDX)
+           END-PERFORM
+           MOVE  HC03-HKNRYO1      TO  HC03V01-HKNRYO1
+           MOVE  HC03-HKNRYO2      TO  HC03V01-HKNRYO2
+           MOVE  HC03-HKNRYO3      TO  HC03V01-HKNRYO3
+           MOVE  HC03-HKNRYO4      TO  HC03V01-HKNRYO4
+           MOVE  HC03-HKNRYO5      TO  HC03V01-HKNRYO5
+           MOVE  HC03-HKNRYO6      TO  HC03V01-HKNRYO6
+           MOVE  HC03-HKNRYO7      TO  HC03V01-HKNRYO7
+           MOVE  HC03-HKNRYO8      TO  HC03V01-HKNRYO8
+           MOVE  HC03-HKNRYO9      TO  HC03V01-HKNRYO9
+           MOVE  HC03-HKNRYO10     TO  HC03V01-HKNRYO10
+           MOVE  HC03-HKNRYO11     TO  HC03V01-HKNRYO11
+           MOVE  HC03-HKNRYO12     TO  HC03V01-HKNRYO12
+           MOVE  HC03-HKNRYO13     TO  HC03V01-HKNRYO13
+           MOVE  HC03-HKNRYO14     TO  HC03V01-HKNRYO14
+           MOVE  HC03-HKNRYO15     TO  HC03V01-HKNRYO15
+           MOVE  HC03-HKNRYO16     TO  HC03V01-HKNRYO16
+           MOVE  HC03-GOKTEN       TO  HC03V01-GOKTEN
+           MOVE  HC03-HOKENBUN     TO  HC03V01-HOKENBUN
+           MOVE  HC03-HOKENGAI     TO  HC03V01-HOKENGAI
+           MOVE  HC03-JIHIMSG1     TO  HC03V01-JIHIMSG1
+           MOVE  HC03-JIHIMSG2     TO  HC03V01-JIHIMSG2
+           MOVE  HC03-JIHIMSG3     TO  HC03V01-JIHIMSG3
+           MOVE  HC03-JIHIMSG4     TO  HC03V01-JIHIMSG4
+           MOVE  HC03-JIHIMSG5     TO  HC03V01-JIHIMSG5
+           MOVE  HC03-JIHI (1)     TO  HC03V01-JIHI1
+           MOVE  HC03-JIHI (2)     TO  HC03V01-JIHI2
+           MOVE  HC03-JIHI (3)     TO  HC03V01-JIHI3
+           MOVE  HC03-JIHI (4)     TO  HC03V01-JIHI4
+           MOVE  HC03-JIHI (5)     TO  HC03V01-JIHI5
+           MOVE  WRK-JIHI-TOTAL    TO  WRK-Z72
+           PERFORM 800-HENKAN-SEC
+           MOVE    WRK-Z72-G       TO  HC03V01-JIHI6
+           MOVE  HC03-JIHI (12)    TO  HC03V01-JIHI7
+           MOVE  HC03-JIHI (11)    TO  HC03V01-JIHI8
+           MOVE  HC03-YAKUZAI      TO  HC03V01-YAKUZAI
+           MOVE  HC03-ROUJIN       TO  HC03V01-ROUJIN
+           MOVE  HC03-KOUHI        TO  HC03V01-KOUHI
+           MOVE  HC03-CHOSEI       TO  HC03V01-CHOSEI
+           MOVE  HC03-KONSEIKYU    TO  HC03V01-KONSEIKYU
+           MOVE  HC03-ZENMISYU     TO  HC03V01-ZENMISYU
+           MOVE  HC03-GOUKEIGAK    TO  HC03V01-GOUKEIGAK
+           MOVE  HC03-KONNYUKIN    TO  HC03V01-KONNYUKIN
+           MOVE  HC03-IRYOADRS     TO  HC03V01-IRYOADRS
+           MOVE  HC03-IRYOMEI      TO  HC03V01-IRYOMEI
+           MOVE  HC03-IRYOTEL      TO  HC03V01-IRYOTEL
+           MOVE  HC03-MIDASHI      TO  HC03V01-MIDASHI
+           MOVE  HC03-RSIMIDASI    TO  HC03V01-RSIMIDASI
+           MOVE  HC03-RSIBUN       TO  HC03V01-RSIBUN
+           MOVE  HC03-RSIEN        TO  HC03V01-RSIEN
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   10 )
+               MOVE  HC03-MEMO (IDX)
+                                   TO  HC03V01-MEMO (IDX)
+           END-PERFORM
+           MOVE  HC03-LBLFTNRATE   TO  HC03V01-LBLFTNRATE
+      *
+           .
+       2002-HC03V01-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ä¢É¼ÊÔ½¸½èÍý¡ÊHC03V02¡Ë
+      *****************************************************************
+       2002-HC03V02-HEN-SEC            SECTION.
+      *
+           INITIALIZE                  HC03V02
+      *
+           MOVE  HC03-NO           TO  HC03V02-NO
+           MOVE  HC03-LBLSRYYMD    TO  HC03V02-LBLSRYYMD
+           MOVE  HC03-SRYYMD       TO  HC03V02-SRYYMD
+           MOVE  HC03-KNJNAMW      TO  HC03V02-KNJNAMW
+           MOVE  HC03-KNJNO        TO  HC03V02-KNJNO
+           MOVE  HC03-MIDASI       TO  HC03V02-MIDASI
+           MOVE  HC03-HAKYMD       TO  HC03V02-HAKYMD
+           MOVE  HC03-HOKEN        TO  HC03V02-HOKEN
+           MOVE  HC03-FUTAN        TO  HC03V02-FUTAN
+           MOVE  HC03-TUKISRYKA    TO  HC03V02-TUKISRYKA
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   16 )
+               MOVE  HC03-MEISAI (IDX)
+                                   TO  HC03V02-MEISAI (IDX)
+           END-PERFORM
+           MOVE  HC03-HKNRYO1      TO  HC03V02-HKNRYO1
+           MOVE  HC03-HKNRYO2      TO  HC03V02-HKNRYO2
+           MOVE  HC03-HKNRYO3      TO  HC03V02-HKNRYO3
+           MOVE  HC03-HKNRYO4      TO  HC03V02-HKNRYO4
+           MOVE  HC03-HKNRYO5      TO  HC03V02-HKNRYO5
+           MOVE  HC03-HKNRYO6      TO  HC03V02-HKNRYO6
+           MOVE  HC03-HKNRYO7      TO  HC03V02-HKNRYO7
+           MOVE  HC03-HKNRYO8      TO  HC03V02-HKNRYO8
+           MOVE  HC03-HKNRYO9      TO  HC03V02-HKNRYO9
+           MOVE  HC03-HKNRYO10     TO  HC03V02-HKNRYO10
+           MOVE  HC03-HKNRYO11     TO  HC03V02-HKNRYO11
+           MOVE  HC03-HKNRYO12     TO  HC03V02-HKNRYO12
+           MOVE  HC03-HKNRYO13     TO  HC03V02-HKNRYO13
+           MOVE  HC03-HKNRYO14     TO  HC03V02-HKNRYO14
+           MOVE  HC03-HKNRYO15     TO  HC03V02-HKNRYO15
+           MOVE  HC03-HKNRYO16     TO  HC03V02-HKNRYO16
+           MOVE  HC03-GOKTEN       TO  HC03V02-GOKTEN
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   16 )
+               MOVE  HC03-JIHIBUN (IDX)
+                                   TO  HC03V02-JIHIBUN (IDX)
+           END-PERFORM
+
+           MOVE  HC03-HOKENBUN     TO  HC03V02-HOKENBUN
+           MOVE  HC03-HOKENGAI     TO  HC03V02-HOKENGAI
+           MOVE  HC03-HOKENZEI     TO  HC03V02-HOKENZEI
+           MOVE  HC03-JIHIMSG1     TO  HC03V02-JIHIMSG1
+           MOVE  HC03-JIHIMSG2     TO  HC03V02-JIHIMSG2
+           MOVE  HC03-JIHIMSG3     TO  HC03V02-JIHIMSG3
+           MOVE  HC03-JIHIMSG4     TO  HC03V02-JIHIMSG4
+           MOVE  HC03-JIHIMSG5     TO  HC03V02-JIHIMSG5
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   5 )
+               MOVE  HC03-JIHI (IDX)
+                                   TO  HC03V02-JIHI (IDX)
+           END-PERFORM
+           MOVE  HC03-JIHI (11)    TO  HC03V02-JIHI (6)
+           MOVE  HC03-JIHI (12)    TO  HC03V02-JIHI (7)
+           MOVE  HC03-YAKUZAI      TO  HC03V02-YAKUZAI
+           MOVE  HC03-ROUJIN       TO  HC03V02-ROUJIN
+           MOVE  HC03-KOUHI        TO  HC03V02-KOUHI
+           MOVE  HC03-CHOSEI       TO  HC03V02-CHOSEI
+           MOVE  HC03-KONSEIKYU    TO  HC03V02-KONSEIKYU
+           MOVE  HC03-SEIKYUZEI    TO  HC03V02-SEIKYUZEI
+           MOVE  HC03-ZENMISYU     TO  HC03V02-ZENMISYU
+           MOVE  HC03-GOUKEIGAK    TO  HC03V02-GOUKEIGAK
+           MOVE  HC03-KONNYUKIN    TO  HC03V02-KONNYUKIN
+           MOVE  HC03-IRYOADRS     TO  HC03V02-IRYOADRS
+           MOVE  HC03-IRYOMEI      TO  HC03V02-IRYOMEI
+           MOVE  HC03-IRYOTEL      TO  HC03V02-IRYOTEL
+           MOVE  HC03-MIDASHI      TO  HC03V02-MIDASHI
+           MOVE  HC03-RSIMIDASI    TO  HC03V02-RSIMIDASI
+           MOVE  HC03-RSIBUN       TO  HC03V02-RSIBUN
+           MOVE  HC03-RSIEN        TO  HC03V02-RSIEN
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   10 )
+               MOVE  HC03-MEMO (IDX)
+                                   TO  HC03V02-MEMO (IDX)
+           END-PERFORM
+           MOVE  HC03-LBLFTNRATE   TO  HC03V02-LBLFTNRATE
+      *
+           .
+       2002-HC03V02-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    ·îÊÌÀÁµá½ñ·óÎÎ¼ý½ñÊÔ½¸½èÍý
       *****************************************************************
        3001-TUKIBETU-HEN-SEC           SECTION.
       *
+            MOVE    1                  TO  IDXP
+      *
             MOVE    SYUPARA03-JNISSU   TO  WRK-JNISSU
             STRING  "¼ÂÆü¿ô"           DELIMITED   BY  SIZE
                     WRK-JNISSU         DELIMITED   BY  SIZE
-                    "Æü¡Ê¿ÇÎÅ²Ê¡§"     DELIMITED   BY  SIZE
-                    SYUPARA03-SRYKAMEI DELIMITED   BY  SPACE
-                    "¡Ë"               DELIMITED   BY  SIZE
+                    "Æü"               DELIMITED   BY  SIZE
             INTO    HC03-TUKISRYKA
+            WITH    POINTER    IDXP
             END-STRING
+      *
+            IF    ( TPARA-SRYKA        =   "1" )
+                STRING  "¡Ê¿ÇÎÅ²Ê¡§"       DELIMITED   BY  SIZE
+                        SYUPARA03-SRYKAMEI DELIMITED   BY  SPACE
+                        "¡Ë"               DELIMITED   BY  SIZE
+                INTO    HC03-TUKISRYKA
+                WITH    POINTER    IDXP
+                END-STRING
+            END-IF
       *
            .
        3001-TUKIBETU-HEN-EXT.
@@ -1683,11 +1974,24 @@
                                                WRK-LBLSRYYMD
       *
            IF    ( ORCHC03-HAKKOFLG    =   4 )
+               IF    ( SYUPARA03-KIKANKBN  =   "1" )
+                   IF    ( SYUPARA03-STSRYYMD
+                                       NOT =   SYUPARA03-EDSRYYMD )
+                       MOVE    "¿ÇÎÅÆü"    TO  WRK-LBLSRYYMD
+                       PERFORM 31012-SRYYMD-HEN-SEC
+                   ELSE
+                       MOVE    "¿ÇÎÅÆü"    TO  WRK-LBLSRYYMD
+                       MOVE    SYU-SRYYMD  TO  WRK-SYMD
+                       PERFORM 31012-SEIWA-HEN-SEC
+                       MOVE    WRK-HENYMDG TO  WRK-SRYYMDG
+                   END-IF
+               ELSE
                    MOVE    "¿ÇÎÅÇ¯·î"      TO  WRK-LBLSRYYMD
                    MOVE    SYU-SRYYMD      TO  WRK-SYMD
                    PERFORM 31012-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG  (1:16)
                                            TO  WRK-SRYYMDG
+               END-IF
            ELSE
                IF    ( ORCHC03-PARAFLG         =   1 )
                 AND  ( SYUPARA03-STSRYYMD  NOT =   SYUPARA03-EDSRYYMD )
@@ -1718,9 +2022,10 @@
            MOVE    SYUPARA03-EDSRYYMD  TO  WRK-SYMD
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-EDSRYYMDG
+      *    MOVE    WRK-HENYMDG (17:)   TO  WRK-EDSRYYMDG
       *
            STRING  WRK-STSRYYMDG       DELIMITED   BY  SIZE
-                   " ¡Á "              DELIMITED   BY  SIZE
+                   "¡Á"                DELIMITED   BY  SIZE
                    WRK-EDSRYYMDG       DELIMITED   BY  SIZE
            INTO    WRK-SRYYMDG
            END-STRING

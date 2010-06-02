@@ -517,10 +517,11 @@
            MOVE    "懒滇今敷挝箭今ˇ壳闻锐汤嘿今"
                                      TO  SPA-GMN-O03-PRTFORMKBNMEIL(1)
            MOVE    "1"               TO  SPA-GMN-O03-PRTFORMKBNL   (2)
-           MOVE    "懒滇今敷挝箭今"
-                                     TO  SPA-GMN-O03-PRTFORMKBNMEIL(2)
+           MOVE    "懒滇今敷挝箭今"  TO  SPA-GMN-O03-PRTFORMKBNMEIL(2)
+           MOVE    "2"               TO  SPA-GMN-O03-PRTFORMKBNL   (3)
+           MOVE    "壳闻锐汤嘿今"    TO  SPA-GMN-O03-PRTFORMKBNMEIL(3)
       *
-           MOVE    2                 TO  SPA-GMN-O03-PRTFORMKBN-MAX
+           MOVE    3                 TO  SPA-GMN-O03-PRTFORMKBN-MAX
       *
            MOVE    SPA-GMN-O03-PRTFORMKBNLST(01)
                                      TO  SPA-GMN-O03-PRTFORMKBN-G
