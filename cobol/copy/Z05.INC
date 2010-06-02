@@ -33,6 +33,8 @@
                 04  Z05-VALUE   PIC X(100).
               03  Z05-NAME.
                 04  Z05-VALUE   PIC X(100).
+              03  Z05-SHONAME.
+                04  Z05-VALUE   PIC X(200).
               03  Z05-TEN.
                 04  Z05-VALUE   PIC S9(8)V9(2).
               03  Z05-OLDTEN.

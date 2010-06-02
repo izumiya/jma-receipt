@@ -341,6 +341,8 @@
       *
            03  WRK-RENNUM              PIC 9(02).
       *
+           03  WRK-SKYPRTFLG           PIC X(01).
+      *
       *    剤テーブル領域
        01  WRK-TBL-ZAINUM-AREA.
            03  WRK-TBL-ZAINUM-G            OCCURS   100.
@@ -404,8 +406,8 @@
            COPY    "CPSK9001.INC".
       *
       *    患者マスタ−
-      *01  PTINF-REC.
-      *    COPY    "CPPTINF.INC".
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
       *    収納マスタワーク
        01  SYUNOU-REC.
@@ -879,8 +881,15 @@
       *            MOVE    "0"             TO  SPA-GMN-HAKFLG
       *        END-IF
       *****END-IF
+           IF      SPA-SKYPRTFLG       =   SPACE
+      *        患者毎の設定なし
+               MOVE    SPA-SKYPRTFLG-SYS   TO  WRK-SKYPRTFLG
+           ELSE
+      *        患者毎の設定あり
+               MOVE    SPA-SKYPRTFLG       TO  WRK-SKYPRTFLG
+           END-IF
       *    患者毎の発行区分変更
-           EVALUATE    SPA-SKYPRTFLG
+           EVALUATE    WRK-SKYPRTFLG
                WHEN    "0"
       *            発行しない
                    MOVE    "0"                 TO  SPA-GMN-HAKFLG
@@ -900,6 +909,9 @@
                    ELSE
                        MOVE    "0"             TO  SPA-GMN-HAKFLG
                    END-IF
+               WHEN    "7"
+      *            発行する（請求あり）
+                   MOVE    "2"                 TO  SPA-GMN-HAKFLG
            END-EVALUATE
       *
       *    診療費明細フラグ
@@ -1134,9 +1146,10 @@
                                        -   SPA-OLD-SKYMONEY
       *    請求書発行フラグ
            IF     (SPA-GMN-HAKFLG      =   SPACE )  OR
-      ********** ((SPA-GMN-HAKFLG      =   "2"   )  AND
-                 ((SPA-SKYPRTFLG       =   "2"
-                                       OR  "5"   )  AND
+      ****       ((SPA-GMN-HAKFLG      =   "2"   )  AND
+                 ((WRK-SKYPRTFLG       =   "2"
+                                       OR  "5"
+                                       OR  "7"    )  AND
                   (WRK-SKYMONEY        <=  ZERO  ))
                MOVE    "0"             TO  SPA-GMN-HAKFLG
            END-IF
@@ -1187,13 +1200,14 @@
        3105-MEIPRTFLG-SET-SEC             SECTION.
       *
       *    患者毎の発行区分
-           IF      SPA-SKYPRTFLG-SYS   =   "P"
+           IF      SPA-SKYPRTFLG   NOT =   SPACE
       *        患者情報で設定があった時
                EVALUATE    SPA-SKYPRTFLG
                WHEN    "0"
       *            明細書不要
                    MOVE    "0"                 TO  SPA-MEIPRTFLG
                WHEN    "1"
+               WHEN    "7"
       *            発行あり
                    MOVE    "1"                 TO  SPA-MEIPRTFLG
                WHEN    "2"
@@ -2187,8 +2201,10 @@
            END-IF
       *    訂正で請求書合計金額の時
            IF     (SPA-SYORIFLG        =   1   )  AND
-                  (SPA-SKYPRTFLG       =   "1" OR  "2"
-                                       OR  "4" OR  "5" )
+      *********** (SPA-SKYPRTFLG       =   "1" OR  "2"
+                  (WRK-SKYPRTFLG       =   "1" OR  "2"
+                                       OR  "4" OR  "5"
+                                       OR  "7"     )
                IF      SPA-NAI-TEIKINKBN   =   "1"
                    MOVE    "2"             TO  SPA-GMN-HAKFLG
                ELSE
@@ -3979,9 +3995,17 @@
                WHEN    "CHOSEI"
       ***          COMPUTE WRK-SEIKYU      =   SPA-GOK-SKYMONEY
       ***                                  +   SPA-GOK-CHOSEI
+                   IF      SPA-SKYPRTFLG       =   SPACE
+      *                患者毎の設定なし
+                       MOVE    SPA-SKYPRTFLG-SYS   TO  WRK-SKYPRTFLG
+                   ELSE
+      *                患者毎の設定あり
+                       MOVE    SPA-SKYPRTFLG       TO  WRK-SKYPRTFLG
+                   END-IF
       *            請求額がゼロ以下の時、請求書発行区分変更
-                   IF      SPA-SKYPRTFLG       =   "2"
+                   IF      WRK-SKYPRTFLG       =   "2"
                                                OR  "5"
+                                               OR  "7"
                        IF      SPA-GMN-SEIGOK      <=  ZERO
                            MOVE    SPA-GMN-HAKFLGLST(1)
                                                TO  SPA-GMN-HAKFLG-G

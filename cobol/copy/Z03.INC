@@ -42,6 +42,8 @@
                     06  Z03-VALUE   PIC X(2).
                   05  Z03-FORMALNAME.
                     06  Z03-VALUE   PIC X(200).
+                  05  Z03-SHONAME.
+                    06  Z03-VALUE   PIC X(200).
                   05  Z03-INPCHKKBN.
                     06  Z03-VALUE   PIC S9(1).
                   05  Z03-HOSPSRYKBNCOMB.

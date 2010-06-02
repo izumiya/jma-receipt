@@ -37,8 +37,9 @@
       *  04.02.00    NACL-ÂÀÅÄ    08/06/02  Ï«ºÒ¡¦¼«ÇåÀÕÆþ±¡ÂÐ±þ
       *  04.03.00    NACL-ÂÀÅÄ    08/09/17  ²þÀµÂÐ±þ
       *  04.03.00    NACL-ÂÀÅÄ    08/12/25  Æþ±¡ÎÁÊñ³çÂÐ±þ¡ÊÂÐ¾Ý³°È½ÄêÄÉ²Ã¡Ë
-      *  04.04.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
-      *  04.04.00    NACL-ÂÀÅÄ    10/03/11  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/XX  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
+      *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *  04.05.00    NACL-ÂÀÅÄ    10/03/11  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -55,7 +56,7 @@
       *
       *    °õºþÍÑ¥Ç¡¼¥¿
        FD  PRT-FILE.
-       01  PRT-REC                 PIC X(11000).
+       01  PRT-REC                 PIC X(30000).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -83,12 +84,15 @@
            03  FLG-PTHKNINF        PIC 9(01).
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-PTNYUINRRK      PIC 9(01).
+           03  FLG-TENSUPLUS       PIC 9(01).
       *
            03  FLG-SP              PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-CHK             PIC 9(01).
            03  FLG-PLUSKBN         PIC 9(01).
            03  FLG-RSIKSN          PIC 9(01).
+           03  FLG-MEISAI          PIC 9(01).
+           03  FLG-LINE            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -107,6 +111,7 @@
            03  IDX1                PIC 9(04).
            03  IDXM                PIC 9(04).
            03  IDXJ                PIC 9(04).
+           03  IDXM2               PIC 9(04).
       *
            03  IDX-STR             PIC 9(02).
            03  IDX-END             PIC 9(02).
@@ -138,40 +143,78 @@
            03  WRK-PAGE-CNT            PIC 9(03).
            03  WRK-PAGE-MAX            PIC 9(03).
       *
+           03  WRK-HEAD-SRYKA-MEI      PIC X(30).
+           03  WRK-HEAD-HKNCOMBIMEI    PIC X(40).
+           03  WRK-HEAD-FUTAN          PIC X(03).
+           03  WRK-HEAD-FUTAN-MEI      PIC X(02).
+           03  WRK-HEAD-HAKYMD         PIC X(22).
+           03  WRK-HEAD-NYUINSTRYMD    PIC X(22).
+           03  WRK-HEAD-NYUINENDYMD    PIC X(22).
+           03  WRK-HEAD-DENPNUM        PIC 9(07).
+      *
+           03  WRK-KEY-AREA.
+               05  WRK-KEY-SRYYM           PIC X(06).
+               05  WRK-KEY-HKNCOMBINUM     PIC X(04).
+      *
            03  WRK-KAISU               PIC 9(03).
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-SRYSYUKBN           PIC X(03).
+           03  WRK-TENSU               PIC S9(11).
            03  WRK-KINGAKU             PIC S9(11).
            03  WRK-SRYMEI              PIC X(10).
            03  WRK-SRYMEI-OLD          PIC X(10).
+           03  WRK-SRYCD               PIC X(09).
       *
-           03  WRK-Z119                PIC Z,ZZZ,ZZ9.
-           03  WRK-Z119-2              PIC -,---,--9.
+           03  WRK-Z119Z               PIC ZZZZZZZZ9.
+           03  WRK-Z119Z-2             PIC --------9.
+      *
+           03  WRK-Z119                PIC ZZZ,ZZZ,ZZ9.
+           03  WRK-Z119-2              PIC ---,---,--9.
+           03  WRK-Z7                  PIC ZZZZZZZZ9.
+           03  WRK-Z7-2                PIC --------9.
            03  WRK-ZZ9                 PIC ZZZ.
            03  WRK-NO                  PIC Z(7).
            03  WRK-WARI                PIC 9(02)V9.
-           03  WRK-Z6                  PIC ZZZ.
+           03  WRK-Z6                  PIC ZZ9.
            03  WRK-Z62                 PIC 9.9.
       *
-           03  WRK-HKNCOMBIMEI     PIC X(40).
+           03  WRK-HKNCOMBIMEI         PIC X(40).
+           03  WRK-HEN-SRYYM           PIC X(16).
       *
            03  WRK-DENPNUM             PIC 9(07).
            03  WRK-GRP-DENPNUM         PIC 9(07).
       *
-           03  WRK-SURYO           PIC 9(05)V9(03).
+           03  WRK-SUM-TENSU                   PIC 9(09)V99.
+           03  WRK-SUM-KINGAKU                 PIC 9(09).
+      *
+           03  WRK-H-NAME.
+               05  WRK-H-NAME1             PIC X(74).
+               05  WRK-H-NAME2             PIC X(74).
+           03  WRK-H-NAME-R             REDEFINES  WRK-H-NAME.
+               05  WRK-H-NAME2-1           PIC X(68).
+               05  WRK-H-NAME2-2           PIC X(32).
+      *
+           03  WRK-SURYO           PIC 9(05)V9(05).
            03  WRK-SURYO-R         REDEFINES   WRK-SURYO.
                05  WRK-SURYO-S1    PIC 9(05).
-               05  WRK-SURYO-S2    PIC 9(03).
+               05  WRK-SURYO-S2    PIC 9(05).
       *
            03  WRK-SURYO-X.
-               05  WRK-SURYO-Z1    PIC ZZZ9.
+               05  WRK-SURYO-Z1    PIC ZZZZ9.
                05  WRK-SURYO-Z2    PIC X(01).
-               05  WRK-SURYO-Z3    PIC ZZZ.
+               05  WRK-SURYO-Z3    PIC ZZZZZ.
            03  WRK-SURYO-X-R       REDEFINES   WRK-SURYO-X.
-               05  WRK-SURYO-ZF    PIC X(03).
+               05  WRK-SURYO-ZF    PIC X(06).
                05  WRK-SURYO-Z4    PIC ZZZZ9.
+      *    ¿ôÎÌÊ¸»úÊÑ´¹
+           03  WRK-ZENKAKU-G           PIC X(100).
+           03  WRK-MOJI                PIC X(100).
+           03  WRK-MOJISU              PIC 9(02).
+           03  WRK-Z-SURYO             PIC X(11).
+           03  WRK-K-SURYO             PIC X(22).
+           03  WRK-ZENHEN-SURYO        PIC X(80).
+           03  WRK-H-SURYO             PIC X(80).
       *
-      *----(03.04.01)--ADD-START---
            03  WRK-HOSPNAME            PIC X(100).
            03  WRK-HOSPNAME-R          REDEFINES   WRK-HOSPNAME.
                05  WRK-HOSPNAME1       PIC X(50).
@@ -181,8 +224,6 @@
                05  WRK-HOSPADRS1       PIC X(50).
                05  WRK-HOSPADRS2       PIC X(50).
            03  WRK-HOSPTEL             PIC X(15).
-      *----(03.04.01)--ADD-END-----
-           03  WRK-SRYCD               PIC X(09).
       *
        01  TBL-DATA-AREA.
            03  TBL-SRYKBN              PIC X(02).
@@ -193,10 +234,12 @@
            03  TBL-KAISU               PIC 9(03).
            03  TBL-ZAI-TBL             OCCURS   50.
                05  TBL-SRYCD           PIC X(09).
-               05  TBL-NAME            PIC X(80).
+               05  TBL-NAME            PIC X(100).
                05  TBL-TANINAME        PIC X(10).
-               05  TBL-SURYO           PIC 9(05)V9(3).
+               05  TBL-SURYO           PIC 9(05)V9(5).
                05  TBL-JIHIMONEY       PIC S9(07).
+               05  TBL-TEN             PIC 9(07).
+               05  TBL-TENSIKIBETU     PIC 9(01).
       *    ¼«ÈñÊ¬
        01  TBL-JIHI-AREA.
            03  TBL-JIHI-TBL            OCCURS   300.
@@ -212,13 +255,18 @@
        01  TBL-MEISAI-AREA.
            05  TBL-MEISA-REC           OCCURS   70.
                07  TBL-H-SRYKBN          PIC X(10).
-               07  TBL-H-SRYMEI          PIC X(80).
+               07  TBL-H-SRYMEI.
+                   09  TBL-H-ZKBN            PIC X(02).
+                   09  TBL-H-NAME            PIC X(74).
                07  TBL-H-TANINAME        PIC X(10).
-               07  TBL-H-SURYO           PIC X(08).
+               07  TBL-H-SURYO           PIC X(11).
                07  TBL-H-KAISU           PIC X(03).
+               07  TBL-H-TENSU.
+                   09  TBL-H-TENSU1          PIC X(02).
+                   09  TBL-H-TENSU2          PIC X(07).
                07  TBL-H-KINGAKU.
-                   09  TBL-H-KINGAKU1        PIC X(09).
-                   09  TBL-H-KINGAKU2        PIC X(02).
+                   09  TBL-H-KINGAKU1        PIC X(02).
+                   09  TBL-H-KINGAKU2        PIC X(09).
                07  TBL-H-EN              PIC X(01).
       *
       *Ä¢É¼ÌÀºÙ¿ô
@@ -245,6 +293,11 @@
        01  PARA-AREA.
            03  PARA-GOKEITANI          PIC X(01).
            03  PARA-SHADE              PIC X(01).
+           03  PARA-HKNMEI             PIC X(01).
+           03  PARA-FTNKBN             PIC X(01).
+           03  PARA-SRYKA              PIC X(01).
+           03  PARA-LINE               PIC X(01).
+           03  PARA-HAKKOUBIKBN        PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -253,6 +306,7 @@
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
       *
+           COPY    "CPSYSKANRI.INC".
       *    °åÎÅµ¡´Ø¾ðÊó¡Ý´ðËÜ¾ðÊó 
            COPY    "CPSK1001.INC".
       *    °åÎÅµ¡´Ø¾ðÊó¡Ý½êºßÃÏ¡¢Ï¢ÍíÀè 
@@ -288,6 +342,9 @@
       *    ÅÀ¿ô¥Þ¥¹¥¿¡Ý
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
+      *    ÅÀ¿ô¥Þ¥¹¥¿ÉÕ²Ã¥³¡¼¥É
+        01 TENSUPLUS-REC.
+           COPY    "CPTENSUPLUS.INC".
       *
       *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡Ý
        01  SRYACT-REC.
@@ -349,6 +406,9 @@
       *    °õºþ£Ä£ÂÀ©¸æ¥µ¥Ö
            COPY    "CPORCSPRT.INC".
       *
+      *    ÊÝ¸±ÁÈ¹ç¤»Ì¾¾ÎÊÔ½¸¥µ¥Ö
+           COPY    "CPORCSHKNMEI.INC".
+      *
            COPY    "MCPAREA".
       *
       *****************************************************************
@@ -376,20 +436,25 @@
            INITIALIZE                  STS-AREA
            INITIALIZE                  WRK-AREA
       *
+           MOVE    ZERO           TO   ORCHCN04-PAGE
+      *
+           IF    ( ORCHCN04-PAGE-CNT   IS  NOT NUMERIC )
+               MOVE    ZERO       TO   WRK-PAGE-CNT
+           ELSE
+               MOVE    ORCHCN04-PAGE-CNT
+                                  TO   WRK-PAGE-CNT
+           END-IF
+      *
            ACCEPT  SYS-TIME            FROM    TIME
       *
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¼è¹þ¤ß
            PERFORM 100-OPTION-SELECT-SEC
       *    ³Æ£Ä£ÂÆÉ¹þ
            PERFORM 100-SYORI-SEC
+      *    È¯¹Ô½èÍý
+           PERFORM 200-MAIN-SEC
       *
-           PERFORM VARYING IDX-SYU     FROM    1   BY  1
-                   UNTIL   (IDX-SYU    >   10  )   OR
-                           (ORCHCN04-DENPNUM (IDX-SYU) =   ZERO)
-               MOVE    ORCHCN04-DENPNUM (IDX-SYU)  TO  WRK-DENPNUM
-      *        ÅÁÉ¼ÈÖ¹æËè¤Î°õºþ
-               PERFORM 200-MAIN-SYORI-SEC
-           END-PERFORM
+           MOVE    WRK-PAGE-CNT        TO   ORCHCN04-PAGE-CNT
       *
            .
        000-PROC-EXT.
@@ -409,6 +474,39 @@
            MOVE    "SHADE"             TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-SHADE
+      *
+      *    ÊÝ¸±ÁÈ¹ç¤»É½¼¨
+           MOVE    "HKNMEI"            TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-HKNMEI
+           IF      PARA-HKNMEI         =   SPACE
+               MOVE    "1"                 TO  PARA-HKNMEI
+           END-IF
+      *    ÉéÃ´³ä¹çÉ½¼¨
+           MOVE    "FTNKBN"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-FTNKBN
+           IF      PARA-FTNKBN         =   SPACE
+               MOVE    "2"                 TO  PARA-FTNKBN
+           END-IF
+      *    ¿ÇÎÅ²ÊÉ½¼¨
+           MOVE    "SRYKA"             TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-SRYKA
+           IF      PARA-SRYKA          =   SPACE
+               MOVE    "1"                 TO  PARA-SRYKA
+           END-IF
+      *    ¹Ô´Ö
+           MOVE    "LINE"              TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-LINE
+      *    ÅÁÉ¼È¯¹ÔÆü¶èÊ¬
+           MOVE    "HAKKOUBIKBN"       TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-HAKKOUBIKBN
+           IF      PARA-HAKKOUBIKBN    =   SPACE
+               MOVE    "0"                 TO  PARA-HAKKOUBIKBN
+           END-IF
       *
            .
        100-OPTION-SELECT-EXT.
@@ -447,7 +545,7 @@
            MOVE    SYS-1001-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1001-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1001-REC
            ELSE
                INITIALIZE                  SYS-1001-REC
            END-IF
@@ -463,7 +561,7 @@
            MOVE    SYS-1002-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1002-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1002-REC
            ELSE
                INITIALIZE                  SYS-1002-REC
            END-IF
@@ -563,32 +661,52 @@
            EXIT.
       *
       *****************************************************************
-      *   ÅÁÉ¼ÈÖ¹æËè¤Î°õºþ½èÍý
+      *   ½Ð¡¡½èÍý
       *****************************************************************
-       200-MAIN-SYORI-SEC                SECTION.
+       200-MAIN-SEC                SECTION.
       *
       *    ½é´ü
            MOVE    ZERO                TO  WRK-PAGE
            MOVE    SPACE               TO  WRK-SRYMEI-OLD
            INITIALIZE                  TBL-MEISAI-AREA
            MOVE    ZERO                TO  IDX-H
-      *    ¼ýÇ¼¸¡º÷
-           PERFORM 2001-SYUNOU-HEN-SEC
-           IF      FLG-SYUNOU          =   ZERO
-      *        ÉÂÅïÂ¾£Ä£Â¸¡º÷
-               PERFORM 2002-DB-KENSAKU-SEC
-      *        ¿ÇÎÅ¹Ô°Ù°õºþ
-               PERFORM 2003-SRYACCT-SYORI-SEC
-      *        Æþ±¡ÎÁ°õºþ
-               PERFORM 2004-NYUIN-SYORI-SEC
-      *        ¼«ÈñÊ¬°õºþ
-               PERFORM 2005-JIHI-SYORI-SEC
       *
-      *        ºÇ½ª¹Ô
-               IF      IDX-H           >   ZERO
-                   PERFORM 2006-LAST-PRINT-SEC
+           PERFORM VARYING IDX-SYU     FROM    1   BY  1
+                   UNTIL   (IDX-SYU    >   10  )   OR
+                           (ORCHCN04-DENPNUM (IDX-SYU) =   ZERO)
+               MOVE    ORCHCN04-DENPNUM (IDX-SYU)  TO  WRK-DENPNUM
+      *        ¼ýÇ¼¸¡º÷
+               PERFORM 2001-SYUNOU-HEN-SEC
+               IF      IDX-SYU             =   1
+      *            ÉÂÅïÂ¾£Ä£Â¸¡º÷
+                   PERFORM 2002-DB-KENSAKU-SEC
+               ELSE
+      *            ÅÁÉ¼Ëè¤Î½èÍý
+                   PERFORM 2003-DENPNUM-HEN-SEC
                END-IF
+      *        ÅÁÉ¼ÈÖ¹æËè¤Î°õºþ
+               PERFORM 200-MAIN-SYORI-SEC
+           END-PERFORM
+      *    ºÇ½ª¹Ô
+           IF      IDX-H           >   ZERO
+               PERFORM 2006-LAST-PRINT-SEC
            END-IF
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   ÅÁÉ¼ÈÖ¹æËè¤Î°õºþ½èÍý
+      *****************************************************************
+       200-MAIN-SYORI-SEC                SECTION.
+      *
+      *    ¿ÇÎÅ¹Ô°Ù°õºþ
+           PERFORM 2003-SRYACCT-SYORI-SEC
+      *    Æþ±¡ÎÁ°õºþ
+           PERFORM 2004-NYUIN-SYORI-SEC
+      *    ¼«ÈñÊ¬°õºþ
+           PERFORM 2005-JIHI-SYORI-SEC
+      *
            .
        200-MAIN-SYORI-EXT.
            EXIT.
@@ -625,15 +743,101 @@
            EXIT.
       *
       *****************************************************************
+      *   ÀÁµá´ü´ÖÊÔ½¸½èÍý
+      *****************************************************************
+       20021-INIT-HENSYU-SEC          SECTION.
+      *
+           MOVE    SYU-DENPNUM         TO  WRK-HEAD-DENPNUM
+      *    È¯¹ÔÆü
+           IF     (ORCHCN04-DENPPRTYMD NOT =   SPACE )
+               MOVE    ORCHCN04-DENPPRTYMD
+                                           TO  WRK-SYMD
+           ELSE
+               IF     (PARA-HAKKOUBIKBN    =   "1" )
+                 AND  (ORCHCN04-HAKKOFLG   =    1   OR   3 )
+                   MOVE    SPA-SYSYMD      TO  WRK-SYMD
+               ELSE
+                   MOVE    SYU-DENPPRTYMD  TO  WRK-SYMD
+               END-IF
+           END-IF
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG         TO  WRK-HEAD-HAKYMD
+      *    ÀÁµá³«»ÏÆü
+           IF      ORCHCN04-SKYSTYMD   =   SPACE
+               MOVE    SYU-SKYSTYMD        TO  WRK-SYMD
+           ELSE
+               MOVE    ORCHCN04-SKYSTYMD   TO  WRK-SYMD
+           END-IF
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG         TO  WRK-HEAD-NYUINSTRYMD
+      *
+           IF      ORCHCN04-SKYEDYMD   =   SPACE
+               MOVE    SYU-SKYEDYMD        TO  WRK-SYMD
+           ELSE
+               MOVE    ORCHCN04-SKYEDYMD   TO  WRK-SYMD
+           END-IF
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG         TO  WRK-HEAD-NYUINENDYMD
+      *
+           .
+       20021-INIT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *   ÉÂÅïÂ¾£Ä£Â¸¡º÷½èÍý
       *****************************************************************
        2002-DB-KENSAKU-SEC          SECTION.
       *
+      *    ÀÁµá´ü´ÖÊÔ½¸
+           PERFORM 20021-INIT-HENSYU-SEC
+      *
+           MOVE    SYU-SRYYMD(1:6)     TO  WRK-KEY-SRYYM
+           MOVE    SYU-HKNCOMBINUM     TO  WRK-KEY-HKNCOMBINUM
+      *
+           MOVE    SPACE               TO  WRK-HEAD-SRYKA-MEI
+           MOVE    SPACE               TO  WRK-HEAD-HKNCOMBIMEI
       *    ¿ÇÎÅ²ÊÌ¾ÊÔ½¸
-           MOVE    SPACE                TO  WRK-SRYKA-MEI
-           PERFORM 20011-SRYKAMEI-HEN-SEC
+           IF     (PARA-SRYKA          =   "0" )
+               MOVE    SPACE               TO  WRK-SRYKA-MEI
+           ELSE
+               PERFORM 20011-SRYKAMEI-HEN-SEC
+               MOVE    WRK-SRYKA-MEI       TO  WRK-HEAD-SRYKA-MEI
+           END-IF
       *    ÊÝ¸±ÁÈ¹ç¤»
            PERFORM 20012-HKNCOMBI-HEN-SEC
+           MOVE    WRK-HKNCOMBIMEI     TO  WRK-HEAD-HKNCOMBIMEI
+      *    ÉéÃ´³ä¹ç
+           MOVE    SPACE               TO  WRK-HEAD-FUTAN
+           MOVE    SPACE               TO  WRK-HEAD-FUTAN-MEI
+           IF      WRK-HKNCOMBIMEI NOT =   SPACE
+               EVALUATE    PARA-FTNKBN
+                   WHEN    "0"
+                       MOVE    SPACE               TO  WRK-HEAD-FUTAN
+                   WHEN    "1"
+      *                %¡¡É½¼¨
+                       MOVE    SYU-PTFTNRATE       TO  WRK-Z6
+                       MOVE    WRK-Z6              TO  WRK-HEAD-FUTAN
+                       MOVE    "¡ó"                TO
+                                                   WRK-HEAD-FUTAN-MEI
+                   WHEN    "2"
+      *                ³ä¡¡É½¼¨
+                       IF      SYU-PTFTNRATE       >   ZERO
+                           COMPUTE WRK-WARI        =   SYU-PTFTNRATE
+                                                   /   10
+                           IF      SYU-PTFTNRATE(3:1)      =   ZERO
+                               MOVE    WRK-WARI    TO  WRK-Z6
+                               MOVE    WRK-Z6      TO  WRK-HEAD-FUTAN
+                           ELSE
+                               MOVE    WRK-WARI    TO  WRK-Z62
+                               MOVE    WRK-Z62     TO  WRK-HEAD-FUTAN
+                           END-IF
+                       ELSE
+                           MOVE    SYU-PTFTNRATE   TO  WRK-Z6
+                           MOVE    WRK-Z6          TO  WRK-HEAD-FUTAN
+                       END-IF
+                       MOVE    "³ä"            TO  WRK-HEAD-FUTAN-MEI
+               END-EVALUATE
+           END-IF
       *    ÉÂÅï¡¦ÉÂ¼¼
            PERFORM 20013-BYOTO-HEN-SEC
            .
@@ -645,94 +849,21 @@
       *****************************************************************
        20012-HKNCOMBI-HEN-SEC         SECTION.
       *
-      *    ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¡¼¸¡º÷
-           INITIALIZE                      HKNCOMBI-REC
-           MOVE    SYU-HOSPNUM         TO  COMB-HOSPNUM
-           MOVE    SYU-PTID            TO  COMB-PTID
-           MOVE    SYU-HKNCOMBINUM     TO  COMB-HKNCOMBINUM
-           PERFORM 910-HKNCOMBI-READ-SEC
-           IF      FLG-HKNCOMBI        =   1
-                DISPLAY "*** HKNCOMBI  ERR:"   COMB-KEY "."
-           END-IF
-      *    Ï«ºÒ¤Î¸øÌ³ºÒ³²È½Äê
-           IF      COMB-HKNNUM         =   "971"
-               PERFORM 40013-PTRSIINF-HEN-SEC
+      *    ÊÔ½¸¤Ê¤·
+           IF     (PARA-HKNMEI         =   "0" )
+               MOVE    SPACE               TO  WRK-HKNCOMBIMEI
            ELSE
-               PERFORM 20012-HKNCOMBIMEI-HEN-SEC
+               INITIALIZE                  ORCSHKNMEIAREA
+               MOVE    SYU-HKNCOMBINUM     TO  ORCSHKNMEI-HKNCOMBINUM
+               MOVE    SYU-SRYYMD          TO  ORCSHKNMEI-SRYYMD
+               MOVE    ORCHCN04-PTID       TO  ORCSHKNMEI-PTID
+               CALL    "ORCSHKNMEI"        USING
+                                           SPA-AREA
+                                           ORCSHKNMEIAREA
+               MOVE    ORCSHKNMEI-HKNCOMBIMEI  TO  WRK-HKNCOMBIMEI
            END-IF
-      *
            .
        20012-HKNCOMBI-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÊÝ¸±ÁÈ¹ç¤»Ì¾¾ÎÊÔ½¸½èÍý
-      *****************************************************************
-       20012-HKNCOMBIMEI-HEN-SEC             SECTION.
-      *
-           MOVE    SPACE               TO  WRK-HKNCOMBIMEI
-      *
-           IF    ( SYU-SRYYMD      >=      CONST-H201001 )
-            AND  ( COMB-HKNNUM      =      "001" )
-                   INSPECT COMB-SYU-TANSEIDONAME
-                           REPLACING    ALL    "À¯´É"   BY  "¶¨²ñ"
-           END-IF
-      *
-           STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
-                   "¡¡"                    DELIMITED  BY  SIZE
-                   COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
-                   "¡¡"                    DELIMITED  BY  SIZE
-                   COMB-KOH2-TANSEIDONAME  DELIMITED  BY  SPACE
-                   "¡¡"                    DELIMITED  BY  SIZE
-                   COMB-KOH3-TANSEIDONAME  DELIMITED  BY  SPACE
-                   "¡¡"                    DELIMITED  BY  SIZE
-                   COMB-KOH4-TANSEIDONAME  DELIMITED  BY  SPACE
-                         INTO              WRK-HKNCOMBIMEI
-           END-STRING
-      *
-           .
-       20012-HKNCOMBIMEI-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    Ï«ºÒ¸øÌ³ºÒ³²ÊÝ¸±ÁÈ¹ç¤»Ì¾¾ÎÊÔ½¸½èÍý
-      *****************************************************************
-       40013-PTRSIINF-HEN-SEC             SECTION.
-      *
-           INITIALIZE                      PTRSIINF-REC
-           MOVE    COMB-HOSPNUM        TO  PTRSI-HOSPNUM
-           MOVE    COMB-PTID           TO  PTRSI-PTID
-           MOVE    COMB-HKNID          TO  PTRSI-HKNID
-           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
-           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 940-PTRSIINF-READ-SEC
-           ELSE
-               INITIALIZE                      PTRSIINF-REC
-               MOVE    1                   TO  FLG-PTRSIINF
-           END-IF
-           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           IF      PTRSI-HKNKBN        =   "5"
-      *        ¸øÌ³ºÒ³²
-               INITIALIZE                      PTHKNINF-REC
-               MOVE    COMB-HOSPNUM        TO  PTHKN-HOSPNUM
-               MOVE    COMB-PTID           TO  PTHKN-PTID
-               MOVE    COMB-HKNID          TO  PTHKN-HKNID
-               PERFORM 950-PTHKNINF-READ-SEC
-               IF      FLG-PTHKNINF        =   ZERO
-                  MOVE    PTHKN-KIGO           TO  WRK-HKNCOMBIMEI
-               END-IF
-           ELSE
-      *        ¸øÌ³ºÒ³²°Ê³°
-               PERFORM 20012-HKNCOMBIMEI-HEN-SEC
-           END-IF
-           .
-       40013-PTRSIINF-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -751,7 +882,7 @@
            MOVE    SYS-1005-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-1005-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1005-REC
                MOVE    SYS-1005-SRYKANAME1
                                            TO  WRK-SRYKA-MEI
            ELSE
@@ -778,7 +909,7 @@
            MOVE    SYS-5001-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-5001-REC
+               MOVE    SYSKANRI-REC        TO  SYS-5001-REC
            ELSE
                INITIALIZE                  SYS-5001-REC
            END-IF
@@ -818,6 +949,72 @@
       *
            .
        20013-BYOTO-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   ÅÁÉ¼ÈÖ¹æËè¤ÎÊÔ½¸½èÍý
+      *****************************************************************
+       2003-DENPNUM-HEN-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-HEN-SRYYM
+           MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+      *    ÊÝ¸±ÁÈ¹ç¤»
+           IF      WRK-KEY-HKNCOMBINUM NOT =   SYU-HKNCOMBINUM
+                PERFORM 20012-HKNCOMBI-HEN-SEC
+           END-IF
+      *    ¿ÇÎÅ·î
+           IF      WRK-KEY-SRYYM       NOT =   SYU-SRYYMD(1:6)
+               MOVE    SYU-SRYYMD          TO  WRK-SYMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-HENYMDG (1:16)  TO  WRK-HEN-SRYYM
+           END-IF
+      *    ºÞËè¤Ë£±¹Ô³«¤±¤ë
+           IF     (PARA-LINE           =   "1" )
+             AND  (IDX-H               >   ZERO )
+               ADD     2                   TO  IDX-H
+           ELSE
+               ADD     1                   TO  IDX-H
+           END-IF
+           IF      IDX-H               >=  LINE-MAX
+               PERFORM 200520-PAGE-CNT-SEC
+           END-IF
+           MOVE    ALL "¡½"            TO  TBL-H-SRYKBN (IDX-H)
+           MOVE    ALL "-"             TO  TBL-H-KAISU  (IDX-H)
+           MOVE    ALL "-"             TO  TBL-H-KINGAKU(IDX-H)
+           EVALUATE    TRUE
+               WHEN   (WRK-HEN-SRYYM   NOT =   SPACE )  AND
+                      (WRK-HKNCOMBIMEI NOT =   SPACE )
+                   STRING    "¡Ì"
+                             WRK-HEN-SRYYM
+                             "¡Í¡¡" 
+                             "¡Ú"
+                             WRK-HKNCOMBIMEI
+                             "¡Û"              DELIMITED  BY  SPACE
+                                   INTO    TBL-H-SRYMEI(IDX-H)
+                   END-STRING
+               WHEN   (WRK-HEN-SRYYM   NOT =   SPACE )  AND
+                      (WRK-HKNCOMBIMEI     =   SPACE )
+                   STRING    "¡Ì"
+                             WRK-HEN-SRYYM
+                             "¡Í"              DELIMITED  BY  SPACE
+                                   INTO    TBL-H-SRYMEI(IDX-H)
+                   END-STRING
+               WHEN   (WRK-HEN-SRYYM       =   SPACE )  AND
+                      (WRK-HKNCOMBIMEI NOT =   SPACE )
+                   STRING    "¡Ú"
+                             WRK-HKNCOMBIMEI
+                             "¡Û"              DELIMITED  BY  SPACE
+                                   INTO    TBL-H-SRYMEI(IDX-H)
+                   END-STRING
+           END-EVALUATE
+      *
+           INSPECT TBL-H-SRYMEI(IDX-H)
+                           REPLACING    ALL    "  "   BY  "¡½"
+      *
+           MOVE    SYU-SRYYMD(1:6)     TO  WRK-KEY-SRYYM
+           MOVE    SYU-HKNCOMBINUM     TO  WRK-KEY-HKNCOMBINUM
+           .
+       2003-DENPNUM-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -886,6 +1083,8 @@
        20031-MEI-HENSYU-SEC          SECTION.
       *
            INITIALIZE                  TBL-DATA-AREA
+           MOVE    ZERO                TO  WRK-SUM-TENSU
+           MOVE    ZERO                TO  WRK-SUM-KINGAKU
       *
            INITIALIZE                  SRYACT-REC
            MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
@@ -962,6 +1161,13 @@
       *
            ADD     1                   TO  IDX-S
            MOVE    SRY-SRYCD (IDXA)    TO  TBL-SRYCD (IDX-S)
+      *    ÌôºÞ°Ê³°¤ÇÄ¢É¼Ì¾¤¬¤¢¤ì¤ÐÄ¢É¼Ì¾¾Î
+           IF     (SRY-SRYCD (IDXA)(1:1)   =   "6" )
+              OR  (TNSP-SHONAME        =   SPACE )
+               CONTINUE
+           ELSE
+               MOVE    TNSP-SHONAME        TO  TNS-NAME
+           END-IF
            MOVE    TNS-NAME            TO  TBL-NAME  (IDX-S)
       *    ´ïºà¾¦ÉÊÌ¾¥³¡¼¥É
            IF      SRY-SRYCD (IDXA)(1:3)   =   "058"
@@ -978,19 +1184,52 @@
                END-STRING
            END-IF
       *
-           IF      TNS-TANICD          =   ZERO
-                                       OR  SPACE
+      *    Ã±°Ì
+           MOVE    TNS-TANINAME        TO  TBL-TANINAME(IDX-S)
+      *    ¿ôÎÌ
+           MOVE    SRY-SRYSURYO(IDXA)  TO  TBL-SURYO (IDX-S)
+           IF     (TNS-TANICD          =   ZERO
+                                       OR  SPACE )
+      *        ´ïºà¤ÏÃ±°Ì¤Ê¤·¤Ç¤âÉ½¼¨
+               IF     (SRY-SRYCD (IDXA)(1:1)   =   "7" )
+                 AND  (SRY-SRYSURYO(IDXA)      >   1    )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  TBL-SURYO (IDX-S)
+               END-IF
+           END-IF
+      *    ½é¿Ç¡¦ºÆ¿ÇÎÁ¤ÏÌÀºÙËè¤ÎÅÀ¿ô
+           IF      SRY-SRYKBN          =   "95"
+                                       OR  "96"
                CONTINUE
            ELSE
-               MOVE    TNS-TANINAME        TO  TBL-TANINAME(IDX-S)
-               MOVE    SRY-SRYSURYO(IDXA)  TO  TBL-SURYO (IDX-S)
+               IF     (TNS-TENSIKIBETU     =   3
+                                           OR  1        )
+               AND    (SRY-SRYCD (IDXA)(1:1)   =   "1"  )
+                   MOVE    TNS-TEN             TO  TBL-TEN (IDX-S)
+                   MOVE    TNS-TENSIKIBETU     TO  TBL-TENSIKIBETU
+                                                            (IDX-S)
+                   IF      TNS-TENSIKIBETU     =   3
+                       ADD     TNS-TEN         TO  WRK-SUM-TENSU
+                   ELSE
+                       ADD     TNS-TEN         TO  WRK-SUM-KINGAKU
+                   END-IF
+               END-IF
+      *        ¼«ÇåÀÕ¤Î¤½¤ÎÂ¾
+               IF     (SRY-SRYCD (IDXA)(1:4)   =   "0959" )
+                   MOVE    TNS-TEN             TO  TBL-TEN (IDX-S)
+                   MOVE    TNS-TENSIKIBETU     TO  TBL-TENSIKIBETU
+                                                            (IDX-S)
+                   ADD     TNS-TEN             TO  WRK-SUM-KINGAKU
+               END-IF
            END-IF
+      *
            IF      SRY-SRYKBN          =   "95"
                                        OR  "96"
       *        ¼«Èñ¤Ï£±¹Ô£±ÌÀºÙ¤È¤¹¤ë
                COMPUTE TBL-JIHIMONEY(IDX-S)
                                        =   SRY-JIHIMONEY(IDXA)
-                                       *   WRK-KAISU
+      *****                            *   WRK-KAISU
                MOVE    ZERO                TO  TBL-SURYO (IDX-S)
            END-IF
            MOVE    SRY-SRYSYUKBN       TO  WRK-SRYSYUKBN
@@ -1040,6 +1279,30 @@
                    END-PERFORM
                END-IF
            END-IF
+      *
+           MOVE    ZERO                TO  FLG-MEISAI
+           IF     (WRK-SUM-TENSU       NOT =   ZERO )  AND
+                  (WRK-SUM-KINGAKU     NOT =   ZERO )
+      *        ¶â³Û¡¦ÅÀ¿ôº®ºß»þ¤Ï¡¢ÌÀºÙ
+               MOVE    1               TO  FLG-MEISAI
+               MOVE    ZERO            TO  TBL-ZAITENSU
+           END-IF
+           IF     (WRK-SUM-KINGAKU     =   ZERO )  AND
+                  (WRK-SUM-TENSU       =   TBL-ZAITENSU)
+      *        ÅÀ¿ô¹ç·×¤Î»þ¡¢½é¿Ç¡¦ºÆ¿Ç¤Î¤ßÌÀºÙ
+               IF      ACCT-SRYKBN         =   "11"
+                                           OR  "12"
+                   MOVE    1               TO  FLG-MEISAI
+                   MOVE    ZERO            TO  TBL-ZAITENSU
+               END-IF
+           END-IF
+           IF     (WRK-SUM-KINGAKU NOT =   ZERO )  AND
+                  (WRK-SUM-TENSU       =   ZERO )
+      *        ¼«ÇåÀÕ¤Î¶â³ÛÊ¬
+               MOVE    1               TO  FLG-MEISAI
+               MOVE    ZERO            TO  TBL-ZAITENSU 
+           END-IF
+      *
       *    ¶â³Û
            IF      TBL-SRYKBN          =   "97"
       *        ¿©»ö¤Ï¶â³Û
@@ -1167,9 +1430,24 @@
                IF      IDX-H           >=  LINE-MAX
                    PERFORM 200520-PAGE-CNT-SEC
                END-IF
-      *        Ì¾¾Î¤ÈÃ±°ÌÌ¾¾Î¥Á¥§¥Ã¥¯
-               IF     (TBL-TANINAME (IDX2)         NOT =   SPACE)
-                 AND  (TBL-NAME     (IDX2)(71:)    NOT =   SPACE)
+      *        ¿ôÎÌ
+               IF      TBL-SURYO (IDX2)        >   ZERO
+      *            ¿ôÎÌ¡ÜÃ±°ÌÌ¾¾Î¡ÊÁ´³Ñ¡Ë
+                   PERFORM 20052-SURYO-ZENHEN-SEC
+                   MOVE    SPACE                   TO  WRK-H-NAME
+                   STRING  TBL-NAME (IDX2)
+                           "¡¡¡¡"
+                           WRK-H-SURYO
+                           DELIMITED  BY  SPACE
+                                           INTO   WRK-H-NAME
+                   END-STRING
+               ELSE
+                   MOVE    TBL-NAME     (IDX2)     TO  WRK-H-NAME
+               END-IF
+      *        Ì¾¾Î¤ÈÃ±°ÌÌ¾¾Î¥Á¥§¥Ã¥¯¤Î²þ¹ÔÂÐ±þ
+               MOVE    ZERO                    TO  FLG-LINE
+               IF    ( WRK-H-NAME2         NOT =   SPACE  )
+                   MOVE    1                   TO  FLG-LINE
       *            ºÇ½ª¹Ô¤Î»þ¡¢²þ¥Ú¡¼¥¸
                    IF      IDX-H          >=  (LINE-MAX - 1 )
                        PERFORM 200520-PAGE-CNT-SEC
@@ -1183,44 +1461,89 @@
                        MOVE    WRK-SRYMEI      TO  WRK-SRYMEI-OLD
                    END-IF
                END-IF
-               MOVE    TBL-NAME (IDX2)     TO  TBL-H-SRYMEI
+      *        ºÞ³«»Ï¤ÈÌÀºÙÅÀ¿ôµ­ºÜ¹Ô
+               IF     (IDX2                =   1  )
+                   MOVE    "¡ö"                TO  TBL-H-ZKBN (IDX-H)
+               ELSE
+                   MOVE    "¡¡"                TO  TBL-H-ZKBN (IDX-H)
+               END-IF
+      *        Ì¾¾Î
+               MOVE    WRK-H-NAME1             TO  TBL-H-NAME
                                                      (IDX-H)
-      *        Ã±°ÌÌ¾¾Î
-               IF     (TBL-TANINAME (IDX2)     NOT =   SPACE)
-                 AND  (TBL-NAME (IDX2)(71:)    NOT =   SPACE)
+               IF      FLG-LINE            =   1
                    ADD     1                   TO  IDX-H
                END-IF
-               MOVE    TBL-TANINAME (IDX2)     TO  TBL-H-TANINAME
-                                                       (IDX-H)
-               IF      TBL-SURYO (IDX2)        >   ZERO
-                   MOVE    TBL-SURYO (IDX2)    TO  WRK-SURYO
-                   PERFORM 200521-SURYO-HEN-SEC
-                   MOVE    WRK-SURYO-X         TO  TBL-H-SURYO
-                                                       (IDX-H)
+               IF      WRK-H-NAME2         NOT =   SPACE
+                   MOVE    WRK-H-NAME2         TO  TBL-H-NAME
+                                                     (IDX-H)
                END-IF
+      *        Ã±°ÌÌ¾¾Î
+      *        MOVE    TBL-TANINAME (IDX2)     TO  TBL-H-TANINAME
+      *                                                (IDX-H)
+      *        ¿ôÎÌ
+      *        IF      TBL-SURYO (IDX2)        >   ZERO
+      *            MOVE    TBL-SURYO (IDX2)    TO  WRK-SURYO
+      *            PERFORM 200521-SURYO-HEN-SEC
+      *            MOVE    WRK-SURYO-X         TO  TBL-H-SURYO
+      *                                                (IDX-H)
+      *****    END-IF
+      *        ¼«Èñ¶â³Û
                IF      TBL-JIHIMONEY (IDX2)     >   ZERO
-                   MOVE    TBL-JIHIMONEY(IDX2) TO  WRK-Z119
+                   MOVE    TBL-JIHIMONEY(IDX2) TO  WRK-Z7
+                   MOVE    WRK-Z7              TO  TBL-H-TENSU
+                                                      (IDX-H)
+      *            ¹ç·×
+                   COMPUTE WRK-KINGAKU         =   TBL-JIHIMONEY(IDX2)
+                                               *   TBL-KAISU
+                   MOVE    WRK-KINGAKU         TO  WRK-Z119
                    MOVE    WRK-Z119            TO  TBL-H-KINGAKU
                                                       (IDX-H)
       *            ±ß
                    MOVE    "1"                 TO  TBL-H-EN
                                                       (IDX-H)
+                   MOVE    "¡þ"                TO  TBL-H-ZKBN (IDX-H)
+               END-IF
+      *        ÌÀºÙÅÀ¿ôµ­ºÜ
+               IF     (FLG-MEISAI          =   1  )  AND
+                      (TBL-TEN (IDX2)  NOT =   ZERO )
+                   PERFORM 30051-TENSU-HEN-SEC
                END-IF
            END-PERFORM
            IF     (TBL-SRYKBN          =   "95"
-                                       OR  "96"  )  AND
-                  (TBL-KINGAKU         =   ZERO  )
+                                       OR  "96"  )  OR
+                  (TBL-ZAITENSU        =   ZERO  )
                CONTINUE
            ELSE
-      *        ¶â³Û
-               IF      TBL-KINGAKU        >   ZERO
-                   MOVE    TBL-KINGAKU    TO  WRK-Z119
-                   MOVE    WRK-Z119       TO  TBL-H-KINGAKU
-                                                      (IDX-H)
+               IF     (PARA-GOKEITANI      =   "1"  )
+               OR     (TBL-ENKBN           =   "1"  )
+      *            ÅÀ¿ôÉ½¼¨
+                   MOVE    TBL-ZAITENSU        TO  WRK-TENSU
                ELSE
-                   MOVE    TBL-KINGAKU    TO  WRK-Z119-2
-                   MOVE    WRK-Z119-2     TO  TBL-H-KINGAKU
-                                                      (IDX-H)
+      *            ¶â³Û
+                   COMPUTE WRK-TENSU           =   TBL-ZAITENSU
+                                               *   10
+               END-IF
+      *        ÅÀ¿ô
+               IF      WRK-TENSU           >   ZERO
+                   MOVE    WRK-TENSU           TO  WRK-Z7
+                   MOVE    WRK-Z7              TO  TBL-H-TENSU
+                                                          (IDX-H)
+               ELSE
+                   MOVE    WRK-TENSU           TO  WRK-Z7-2
+                   MOVE    WRK-Z7-2            TO  TBL-H-TENSU
+                                                          (IDX-H)
+               END-IF
+      *        ¹ç·×
+               COMPUTE WRK-KINGAKU         =   WRK-TENSU
+                                           *   TBL-KAISU
+               IF      WRK-KINGAKU         >   ZERO
+                   MOVE    WRK-KINGAKU         TO  WRK-Z119
+                   MOVE    WRK-Z119            TO  TBL-H-KINGAKU
+                                                       (IDX-H)
+               ELSE
+                   MOVE    WRK-KINGAKU         TO  WRK-Z119-2
+                   MOVE    WRK-Z119-2          TO  TBL-H-KINGAKU
+                                                       (IDX-H)
                END-IF
       *        ±ß¡Ê¿©»ö¡Ë
                IF      TBL-ENKBN           =   "1"
@@ -1232,10 +1555,78 @@
            MOVE    TBL-KAISU           TO  WRK-ZZ9
            MOVE    WRK-ZZ9             TO  TBL-H-KAISU (IDX-H)
       *    ºÞËè¤Ë£±¹Ô³«¤±¤ë
-           ADD     1                   TO  IDX-H
+           IF      PARA-LINE           =   "1"
+               CONTINUE
+           ELSE
+               ADD     1                   TO  IDX-H
+           END-IF
       *
            .
        20052-TBL-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÅÀ¿ôÊÔ½¸½èÍý
+      *****************************************************************
+       30051-TENSU-HEN-SEC       SECTION.
+      *
+           IF      TBL-TENSIKIBETU (IDX2)  =   3
+      *        ÅÀ¿ô
+               IF      PARA-GOKEITANI      =   "1"
+      *            ÅÀ¿ôÉ½¼¨
+                   MOVE    TBL-TEN  (IDX2)     TO  WRK-TENSU
+               ELSE
+      *            ¶â³ÛÉ½¼¨
+                   COMPUTE WRK-TENSU           =   TBL-TEN (IDX2)
+                                               *   10
+               END-IF
+           ELSE
+      *        ¶â³Û
+               MOVE    TBL-TEN (IDX2)      TO  WRK-TENSU
+      *        ±ß
+               MOVE    "1"                 TO  TBL-H-EN   (IDX-H)
+           END-IF
+           IF      WRK-TENSU           >   ZERO
+               MOVE    WRK-TENSU           TO  WRK-Z7
+               MOVE    WRK-Z7              TO  TBL-H-TENSU (IDX-H)
+           ELSE
+               MOVE    WRK-TENSU           TO  WRK-Z7-2
+               MOVE    WRK-Z7-2            TO  TBL-H-TENSU (IDX-H)
+           END-IF
+      *    ¹ç·×
+           COMPUTE WRK-KINGAKU         =   WRK-TENSU
+                                       *   TBL-KAISU
+           IF      WRK-KINGAKU         >   ZERO
+               MOVE    WRK-KINGAKU         TO  WRK-Z119
+               MOVE    WRK-Z119            TO  TBL-H-KINGAKU
+                                                            (IDX-H)
+           ELSE
+               MOVE    WRK-KINGAKU         TO  WRK-Z119-2
+               MOVE    WRK-Z119-2          TO  TBL-H-KINGAKU
+                                                            (IDX-H)
+           END-IF
+      *    ±ßÉ½¼¨¤Ç·å¤¢¤Õ¤ì
+           IF     (PARA-GOKEITANI      =   "1" )
+              AND (TBL-H-EN (IDX-H)    =   "1" )
+              AND (TBL-H-KINGAKU1 (IDX-H)  NOT =   SPACE )
+               MOVE    SPACE               TO  TBL-H-KINGAKU (IDX-H)
+               IF      WRK-KINGAKU         >   ZERO
+                   MOVE    WRK-KINGAKU         TO  WRK-Z119Z
+                   MOVE    WRK-Z119Z           TO  TBL-H-KINGAKU2
+                                                            (IDX-H)
+               ELSE
+                   MOVE    WRK-KINGAKU         TO  WRK-Z119-2
+                   MOVE    WRK-Z119Z-2         TO  TBL-H-KINGAKU2
+                                                            (IDX-H)
+               END-IF
+           END-IF
+      *    ²ó¿ô
+           MOVE    TBL-KAISU           TO  WRK-ZZ9
+           MOVE    WRK-ZZ9             TO  TBL-H-KAISU  (IDX-H)
+      *    ÅÀ¿ôÉ½¼¨¹Ô
+           MOVE    "¡ö"                TO  TBL-H-ZKBN   (IDX-H)
+           .
+       30051-TENSU-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1264,7 +1655,7 @@
            MOVE    WRK-SURYO-S1        TO  WRK-SURYO-Z1
       *
            MOVE    ZERO                TO  FLG-SP
-           PERFORM VARYING     IDXM   FROM    3  BY  -1
+           PERFORM VARYING     IDXM   FROM    5  BY  -1
                    UNTIL       IDXM    <   1
                IF      WRK-SURYO-S2(IDXM:1) NOT =   ZERO
                    MOVE    1               TO  FLG-SP
@@ -1283,6 +1674,60 @@
       *
            .
        200521-SURYO-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ôÎÌ¡ÜÃ±°ÌÌ¾¾Î¡ÊÁ´³Ñ¡ËÊÔ½¸½èÍý
+      *****************************************************************
+       20052-SURYO-ZENHEN-SEC                  SECTION.
+      *
+      *    ¿ôÎÌÉ½¼¨ÍÑÊÔ½¸
+           MOVE    TBL-SURYO (IDX2)    TO  WRK-SURYO
+           PERFORM 200521-SURYO-HEN-SEC
+      *    Á´³ÑÊÑ´¹
+           MOVE    SPACE               TO  WRK-Z-SURYO
+           MOVE    ZERO                TO  IDXM2
+           PERFORM VARYING     IDXM    FROM    1   BY  1
+                   UNTIL       IDXM    >   11
+               IF      WRK-SURYO-X (IDXM:1) NOT =   SPACE
+                   MOVE    WRK-SURYO-X(IDXM:)   TO  WRK-Z-SURYO
+                   MOVE    11                   TO  IDXM
+               END-IF
+           END-PERFORM
+           MOVE    WRK-Z-SURYO         TO  WRK-MOJI
+           PERFORM 2009-KANACHK-SEC
+           MOVE    WRK-ZENKAKU-G       TO  WRK-K-SURYO
+      *
+           MOVE    1                   TO  IDXM2
+           MOVE    SPACE               TO  WRK-ZENHEN-SURYO
+           PERFORM VARYING     IDXM    FROM    1   BY  2
+                   UNTIL       IDXM    >   22
+               IF      WRK-K-SURYO (IDXM:2)     =   SPACE
+                                                OR  "¡¡"
+                   CONTINUE
+               ELSE
+                   MOVE    WRK-K-SURYO(IDXM:2)  TO  WRK-ZENHEN-SURYO
+                                                         (IDXM2:2)
+                   ADD     2                    TO  IDXM2
+               END-IF
+           END-PERFORM 
+      *    Ã±°ÌÌ¾¾Î
+           PERFORM VARYING     IDXM    FROM    1   BY  2
+                   UNTIL       IDXM    >   10
+               IF      TBL-TANINAME (IDX2) (IDXM:2)
+                                                =   SPACE
+                                                OR  "¡¡"
+                   CONTINUE
+               ELSE
+                   MOVE    TBL-TANINAME (IDX2)(IDXM:2)
+                                                TO  WRK-ZENHEN-SURYO
+                                                         (IDXM2:2)
+                   ADD     2                    TO  IDXM2
+               END-IF
+           END-PERFORM
+           MOVE    WRK-ZENHEN-SURYO    TO  WRK-H-SURYO
+      *
+           .
+       20052-SURYO-ZENHEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1375,6 +1820,8 @@
       *****************************************************************
        400-PRINT-SYORI-SEC          SECTION.
       *
+           COMPUTE ORCHCN04-PAGE       =   ORCHCN04-PAGE    +   1
+      *
            IF    ( ORCHCN04-PRTKBN  =      "1" )
       *
       *        Ä¢É¼ÊÔ½¸½èÍý
@@ -1406,83 +1853,77 @@
            INITIALIZE                  HCN04
       *
            ADD     1                   TO  WRK-PAGE
-      *    ÅÁÉ¼ÈÖ¹æ
+      *    ÊÇ
            MOVE    WRK-PAGE            TO  WRK-ZZ9
            MOVE    WRK-ZZ9             TO  HCN04-PAGE
       *    ÅÁÉ¼ÈÖ¹æ
-           MOVE    SYU-DENPNUM         TO  WRK-NO
+           MOVE    WRK-HEAD-DENPNUM    TO  WRK-NO
            MOVE    WRK-NO              TO  HCN04-NO
       *    ¿ÇÎÅ²Ê
-           MOVE    WRK-SRYKA-MEI(1:20) TO  HCN04-SRYKANAME
+           MOVE    WRK-HEAD-SRYKA-MEI  TO  HCN04-SRYKANAME
       *    ´µ¼ÔÈÖ¹æ
            MOVE    ORCHCN04-PTNUM      TO  HCN04-PTNUM
       *    ´µ¼ÔÌ¾¾Î
            MOVE    ORCHCN04-NAME       TO  HCN04-NAME
       *    ÊÝ¸±¼ïÊÌ
-           MOVE    WRK-HKNCOMBIMEI     TO  HCN04-HOKEN
+           MOVE    WRK-HEAD-HKNCOMBIMEI    TO  HCN04-HOKEN
       *    ÉéÃ´³ä¹ç
-           IF      SYU-PTFTNRATE       >   ZERO
-               COMPUTE WRK-WARI        =   SYU-PTFTNRATE   /   10
-               IF      SYU-PTFTNRATE(3:1)  =   ZERO
-                   MOVE    WRK-WARI            TO  WRK-Z6
-                   MOVE    WRK-Z6              TO  HCN04-FUTAN
-               ELSE
-                   MOVE    WRK-WARI            TO  WRK-Z62
-                   MOVE    WRK-Z62             TO  HCN04-FUTAN
-               END-IF
-           END-IF
+           MOVE    WRK-HEAD-FUTAN      TO  HCN04-FUTAN
+           MOVE    WRK-HEAD-FUTAN-MEI  TO  HCN04-FUTANLABEL
       *    È¯¹ÔÆü
-           MOVE    SYU-DENPPRTYMD      TO  WRK-SYMD
-           PERFORM 800-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG         TO  HCN04-HAKYMD
+           MOVE    WRK-HEAD-HAKYMD     TO  HCN04-HAKYMD
       *    ÀÁµá³«»ÏÆü
-           MOVE    SYU-SKYSTYMD        TO  WRK-SYMD
-           PERFORM 800-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG         TO  HCN04-NYUINSTRYMD
-           MOVE    SYU-SKYEDYMD        TO  WRK-SYMD
-           PERFORM 800-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG         TO  HCN04-NYUINENDYMD
+           MOVE    WRK-HEAD-NYUINSTRYMD    TO  HCN04-NYUINSTRYMD
+           MOVE    WRK-HEAD-NYUINENDYMD    TO  HCN04-NYUINENDYMD
       *
       *    ÉÂÅï
            MOVE    WRK-ROOM            TO  HCN04-ROOM
       *
-      *----(03.04.01)--UPD-START---
-      *    °åÎÅµ¡´Ø½»½ê
-      *    MOVE    SYS-1002-ADRS       TO  HCN04-IRYOADRS
-      *    °åÎÅµ¡´ØÌ¾
-      *    MOVE    SYS-1001-HOSPNAME   TO  HCN04-IRYOMEI
-      *    °åÎÅµ¡´Ø£Ô£Å£Ì
-      **** MOVE    SYS-1002-TEL        TO  HCN04-IRYOTEL
       *    °åÎÅµ¡´Ø½»½ê
            MOVE    WRK-HOSPADRS        TO  HCN04-IRYOADRS
       *    °åÎÅµ¡´ØÌ¾
            MOVE    WRK-HOSPNAME        TO  HCN04-IRYOMEI
       *    °åÎÅµ¡´Ø£Ô£Å£Ì
            MOVE    WRK-HOSPTEL         TO  HCN04-IRYOTEL
-      *----(03.04.01)--UPD-END-----
       *
       *    ÎóÌ¾¡ÊÅÀ¿ôµ­ºÜ¡Ë
            IF      PARA-GOKEITANI      =   "1"
-               MOVE    "¡¡¡¡¹ç·×¡ÊÅÀ¿ô¡Ë"    TO  HCN04-LABEL1
+               MOVE    "¡¡ÅÀ¡¡¿ô¡¡"        TO  HCN04-LABEL3
            ELSE
-               MOVE    "¡¡¡¡¶â¡¡³Û¡Ê±ß¡Ë"    TO  HCN04-LABEL1
+               MOVE    "¡¡Ã±¡¡²Á¡¡"        TO  HCN04-LABEL3
            END-IF
+           MOVE    "¡¡¡¡¹ç¡¡¡¡·×¡¡¡¡"  TO  HCN04-LABEL1
       *
       *    ÌÀºÙÆâÍÆ
            PERFORM VARYING     IDX3    FROM    1   BY  1
                    UNTIL       IDX3    >   LINE-MAX
                MOVE    TBL-H-SRYKBN (IDX3) TO  HCN04-SRYKBN (IDX3)
                MOVE    TBL-H-SRYMEI (IDX3) TO  HCN04-SRYMEI (IDX3)
-               MOVE    TBL-H-TANINAME(IDX3)
-                                           TO  HCN04-TANI  (IDX3)
-               MOVE    TBL-H-SURYO  (IDX3) TO  HCN04-SURYO (IDX3)
-               MOVE    TBL-H-KAISU  (IDX3) TO  HCN04-KAISU (IDX3)
-               MOVE    TBL-H-KINGAKU(IDX3) TO  HCN04-KINGAKU(IDX3)
+      *        MOVE    TBL-H-TANINAME(IDX3)
+      *                                    TO  HCN04-TANI  (IDX3)
+               IF      TBL-H-KAISU  (IDX3) =   "---"
+                   MOVE    ALL "¡½"            TO  HCN04-KAISU2 (IDX3)
+                   MOVE    ALL "¡½"            TO  HCN04-KINGAKU2(IDX3)
+               ELSE
+      ***          MOVE    TBL-H-SURYO  (IDX3) TO  HCN04-SURYO (IDX3)
+                   MOVE    TBL-H-KAISU  (IDX3) TO  HCN04-KAISU (IDX3)
+                   MOVE    TBL-H-TENSU  (IDX3) TO  HCN04-TENSU  (IDX3)
+                   MOVE    TBL-H-KINGAKU(IDX3) TO  HCN04-KINGAKU(IDX3)
+               END-IF
       *        ÅÀ¿ôµ­ºÜ¤Ç±ß¤Î¤â¤Î
                IF      PARA-GOKEITANI      =   "1"
                    IF      TBL-H-EN  (IDX3)    =   "1"
+      *
+                       MOVE    SPACE           TO  HCN04-TENSU  (IDX3)
+                       STRING  TBL-H-TENSU2  (IDX3)
+                               "¡¡"
+                                           DELIMITED  BY  SIZE
+                                           INTO    HCN04-TENSU(IDX3)
+                       END-STRING
+                       MOVE    "±ß"           TO  HCN04-TENSU2(IDX3)
+      *
                        MOVE    SPACE           TO  HCN04-KINGAKU(IDX3)
-                       STRING  TBL-H-KINGAKU1(IDX3)
+                       STRING  TBL-H-KINGAKU2(IDX3)
                                "¡¡"
                                            DELIMITED  BY  SIZE
                                            INTO    HCN04-KINGAKU(IDX3)
@@ -1658,22 +2099,22 @@
       *    ¿©»ö¡¦¼¼ÎÁº¹³Û¤Ï¶â³Û
            IF      HCM34S01-ZAISKBKBN(IDX) =   "4"
                                            OR  "3"
-               COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
-                                           *   TBL-KAISU )
+      *        COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+      *                                    *   TBL-KAISU )
                MOVE    "1"                 TO  TBL-ENKBN
            ELSE
-               IF      PARA-GOKEITANI      =   "1"
+      *        IF      PARA-GOKEITANI      =   "1"
       *            ÅÀ¿ôÉ½¼¨
-                   COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
-                                               *   TBL-KAISU )
-                   MOVE    SPACE               TO  TBL-ENKBN
-               ELSE
+      *            COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+      *                                        *   TBL-KAISU )
+      *            MOVE    SPACE               TO  TBL-ENKBN
+      *        ELSE
       *            ¶â³ÛÉ½¼¨
-                   COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
-                                               *   TBL-KAISU )
-                                               *   10
+      *            COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
+      *                                        *   TBL-KAISU )
+      *                                        *   10
                    MOVE    SPACE               TO  TBL-ENKBN
-               END-IF
+      *        END-IF
            END-IF
       *
       *    Ä¢É¼°õºþ
@@ -1749,6 +2190,27 @@
        2005-RSIKSN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    Á´³ÑÊÑ´¹½èÍý
+      *****************************************************************
+       2009-KANACHK-SEC                 SECTION.
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-MOJI            TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           IF     (KANACHK-RC          =   ZERO )  AND
+                  (KANACHK-MAX         >   ZERO )
+               MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                           TO  WRK-ZENKAKU-G
+           ELSE
+               MOVE    WRK-MOJI            TO  WRK-ZENKAKU-G
+           END-IF
+      *
+           .
+       2009-KANACHK-EXT.
+           EXIT.
+      *****************************************************************
       *    À¾ÎñÆüËÜ¸ìÊÑ´¹½èÍý
       *****************************************************************
        800-SEIWA-HEN-SEC        SECTION.
@@ -1781,7 +2243,7 @@
            MOVE    SYS-1900-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1900-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1900-REC
                IF      SYS-1900-PRTKBN(12) NOT =   SPACE
       *            °åÎÅµ¡´ØÌ¾¾ÎÊÔ½¸¾ðÊó
                    PERFORM 900-1901-READ-SEC
@@ -1813,7 +2275,7 @@
            MOVE    SYS-1901-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1901-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1901-REC
                MOVE    SYS-1901-HOSPNAME1  TO  WRK-HOSPNAME1
                MOVE    SYS-1901-HOSPNAME2  TO  WRK-HOSPNAME2
            ELSE
@@ -1829,10 +2291,6 @@
       *****************************************************************
        900-1902-READ-SEC           SECTION.
       *
-           IF      SYS-1900-PRTKBN(12) =   SPACE
-               GO  TO  900-1902-READ-EXT
-           END-IF
-      *
       *    °åÎÅµ¡´Ø½»½êÊÔ½¸¾ðÊóÆÉ¤ß¹þ¤ß
            MOVE    SPACE           TO  SYS-1902-REC
            INITIALIZE                  SYS-1902-REC
@@ -1845,10 +2303,10 @@
            MOVE    SYS-1902-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1902-REC
-               MOVE    SYS-1902-ADRS1  TO  WRK-HOSPADRS1
-               MOVE    SYS-1902-ADRS2  TO  WRK-HOSPADRS2
-               MOVE    SYS-1902-TEL    TO  WRK-HOSPTEL
+               MOVE    SYSKANRI-REC        TO  SYS-1902-REC
+               MOVE    SYS-1902-ADRS1      TO  WRK-HOSPADRS1
+               MOVE    SYS-1902-ADRS2      TO  WRK-HOSPADRS2
+               MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF
@@ -1862,6 +2320,9 @@
       *    ¥·¥¹¥Æ¥à´ÉÍý¥Þ¥¹¥¿¼ç¥­¡¼ÆÉ¤ß¹þ¤ß½èÍý
       *****************************************************************
        900-SYSKANRI-KEY10-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
@@ -1888,6 +2349,7 @@
            PERFORM 920-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-SYSKANRI
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
            ELSE
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
@@ -2091,8 +2553,52 @@
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *    ÅÀ¿ôÉí²Ã¾ðÊó¸¡º÷
+           IF     (FLG-TENSU           =   ZERO)
+               PERFORM 9101-TENSUPLUS-READ-SEC
+           ELSE
+               INITIALIZE                      TENSUPLUS-REC
+           END-IF
            .
        910-TENSU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÅÀ¿ô¥Þ¥¹¥¿ÉÕ²Ã¾ðÊó¸¡º÷½èÍý
+      *****************************************************************
+       9101-TENSUPLUS-READ-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  TENSUPLUS-REC
+           INITIALIZE                      TENSUPLUS-REC
+           MOVE    TNS-SRYCD           TO  TNSP-SRYCD
+           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
+           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TENSUPLUS-REC
+                   MOVE    ZERO                TO  FLG-TENSUPLUS
+               ELSE
+                   INITIALIZE                  TENSUPLUS-REC
+                   MOVE    1                   TO  FLG-TENSUPLUS
+               END-IF
+           ELSE
+               INITIALIZE                      TENSUPLUS-REC
+               MOVE    1                   TO  FLG-TENSUPLUS
+           END-IF
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       9101-TENSUPLUS-READ-EXT.
            EXIT.
       *
       *****************************************************************

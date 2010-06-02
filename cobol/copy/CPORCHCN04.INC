@@ -32,12 +32,24 @@
            03  ORCHCN04-PTNUM                  PIC X(20).
       *    患者氏名
            03  ORCHCN04-NAME                   PIC X(50).
+      *    発行区分 (1:再発行 3:収納請求確認画面)
+           03  ORCHCN04-HAKKOFLG               PIC 9(01).
+      *    請求期間
+           03  ORCHCN04-SKYSTYMD               PIC X(08).
+           03  ORCHCN04-SKYEDYMD               PIC X(08).
       *
            03  ORCHCN04-INPUT-OCC        OCCURS   10.
       *    伝票番号（必須）
                05  ORCHCN04-DENPNUM        PIC 9(07).
       *    伝票番号枝番（収納からの再発行）
                05  ORCHCN04-DENPEDANUM     PIC  9(02).
+      *
+      *    伝票発行日(定期請求印刷指示画面から）
+           03  ORCHCN04-DENPPRTYMD         PIC  X(08).
+      *    発行ページ数
+           03  ORCHCN04-PAGE               PIC  9(05).
+      *    総ページ数（一時ファイル名編集用）
+           03  ORCHCN04-PAGE-CNT           PIC  9(06).
       *
       *    印刷ＤＢ出力区分(1:印刷ＤＢに出力）
            03  ORCHCN04-PRTKBN             PIC X(01).

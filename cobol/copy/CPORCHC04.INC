@@ -36,7 +36,15 @@
            03  ORCHC04-HAKHOUFLG        PIC 9(01).
       *    伝票番号枝番（収納からの再発行）
            03  ORCHC04-DENPEDANUM      PIC  9(02).
-      *
+      *    伝票発行日(月別請求書兼領収書）
+           03  ORCHC04-DENPPRTYMD      PIC  X(08).
+      *    対象伝票番号（期間指定）
+           03  ORCHC04-KIKAN-AREA.
+               05  ORCHC04-KIKAN-STYMD     PIC X(08).
+               05  ORCHC04-KIKAN-EDYMD     PIC X(08).
+               05  ORCHC04-KIKAN-DENPNUM-G.
+                   07  ORCHC04-KIKAN-DENPNUM   PIC 9(07)
+                                            OCCURS   100.
       *    発行ページ数
            03  ORCHC04-PAGE            PIC  9(05).
       *

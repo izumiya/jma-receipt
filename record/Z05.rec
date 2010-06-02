@@ -24,6 +24,9 @@ Z05	{
 		NAME	{
 			value	varchar(100);
 		};
+		SHONAME	{
+			value	varchar(200);
+		};
 		TEN	{
 			value	number(10,2);
 		};
