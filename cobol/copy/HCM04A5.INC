@@ -21,7 +21,7 @@
               03  HCM04A5-KINGAKU PIC X(11).
               03  HCM04A5-KINGAKU2    PIC X(16).
               03  HCM04A5-KAISU   PIC X(3).
-              03  HCM04A5-KAISU2  PIC X(36).
+              03  HCM04A5-KAISU2  PIC X(38).
               03  HCM04A5-TENSU   PIC X(9).
               03  HCM04A5-TENSU2  PIC X(14).
             02  HCM04A5-LOPTION PIC X(50).
