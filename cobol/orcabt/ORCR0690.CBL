@@ -141,6 +141,7 @@
       *                                     （コード追加）
       *  04.04.07    NACL-門脇    10/04/08  改正対応
       *                                     （処置記載順編集）
+      *  04.04.08    NACL-門脇    10/06/01  他医療機関受診対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -263,6 +264,7 @@
            03  FLG-HIKAKIN         PIC 9(01).
            03  FLG-SRYCD1          PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-NG              PIC 9(01).
       *
            03  FLG-SYS-2006        PIC 9(01).
            03  FLG-2006-CHK        PIC 9(01).
@@ -1236,6 +1238,7 @@
                OR     ( RECE62-TEKSTYMD  NOT =   RECE64-TEKSTYMD     )
       *
                MOVE    ZERO                  TO  FLG-SRYCD1
+               MOVE    ZERO                  TO  FLG-NG
       *
                INITIALIZE                      WRK-ZAIW-AREA
                MOVE    ZERO                TO  WRK-ZAIWMAX-G
@@ -1389,11 +1392,19 @@
                    ELSE
                        MOVE    1                     TO  FLG-SRYCD1
                    END-IF
+      *
+                   IF   (RECE64-SRYKBN     = "90" OR "92")
+                   AND  (RECE65-SRYCD(IDX) =  "000000000")
+                       MOVE    1                     TO  FLG-NG
+                   END-IF
       *                     
                    IF      RECE64-SRYKBN     <   "31"
       **>          OR      RECE64-SRYKBN     =   "33"                   
                        MOVE    1             TO  IDY
                    ELSE                          
+                    IF     FLG-NG            =    1
+                       MOVE    2             TO  IDY
+                    ELSE
       *              療養病棟レセコメントがある剤
                      IF    RECE64-RYOTENKISAISU  NOT = ZERO
                        IF    WRK-ZAIWMAX(3) >= RECE64-RYOTENKISAISU
@@ -1466,6 +1477,7 @@
                                GO  TO  2002-TBLZAIW-TAIHI-EXT
                        END-EVALUATE
                      END-IF
+                    END-IF
                    END-IF
       *
                    IF      RECE65-KENTAICOMMENT (IDX)   =   1
@@ -2647,6 +2659,7 @@
            PERFORM      VARYING IDXX FROM   1   BY  1
                         UNTIL   IDXX >      WRK-KENSA-MATOME-MAX
              MOVE    ZERO                TO  FLG-SRYCD1
+             MOVE    ZERO                TO  FLG-NG
       *
              INITIALIZE                      WRK-ZAIW-AREA
              MOVE    ZERO                TO  WRK-ZAIWMAX-G

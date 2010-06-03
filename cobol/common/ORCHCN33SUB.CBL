@@ -44,6 +44,7 @@
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/04/XX  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.01.00    NACL-¾®Æ¦Âô  07/12/18  Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¤ÎÆþ±¡ÍâÆü¤Î
       *                                     ¿©»ö¤ÈÆþ±¡ÎÁ²Ã»»ÂÐ±þ
+      *  04.04.01    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *****************************************************************
       *
       *
@@ -1120,7 +1121,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *        É¸·ç
                IF      WRK-HYOUKETSU(IDX1)   NOT =         SPACE
-                 IF    WRK-GAIHAKU(IDX1)         =         SPACE
+                 IF   (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090"                 )
+                 AND  (WRK-NYUINKHN(IDX1)   NOT =        SPACE  )
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -1278,9 +1285,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                Â¾°åÎÅµ¡´Ø¼õ¿Ç
                        WHEN   4
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
-      *                Â¾°åÎÅµ¡´Ø¼õ¿Ç
-                       WHEN   5
-                           INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
                    END-EVALUATE
                END-IF
            END-PERFORM
@@ -1417,6 +1421,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                  END-EVALUATE
            END-EVALUATE
+      *
+           IF   WRK-GAIHAKU(IDX1)  =  SPACE
+                 MOVE   ZERO    TO    WRK-GAIHAKU-KBN(IDX1)
+           END-IF
       *
            .
        210-GAIHAKU-SET-EXT.
