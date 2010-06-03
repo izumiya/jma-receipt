@@ -434,6 +434,7 @@
       *  04.04.51    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
       *  04.04.52    NACL-ÌçÏÆ    10/05/21  ³°Çñ»þ¤ÎÆþ±¡ÎÁ²Ã»»ÊÔ½¸½¤Àµ
       *  04.04.53    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.54    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -879,6 +880,7 @@
                05  WRK-DAY1-SENTEI-SRYCD               PIC 9(09).       
                05  WRK-DAY1-SENTEI-SRYCD2              PIC 9(09).       
                05  WRK-DAY1-HYOKETU-SRYCD              PIC 9(09).
+               05  WRK-DAY1-HYOKETU-TEN                PIC 9(09)V99.
                05  WRK-DAY1-KSN-SRYCD                  PIC 9(09).
                05  WRK-DAY1-NYUTENTTLKBN               PIC 9(03).
                05  WRK-DAY1-KHNTEN                     PIC 9(08).
@@ -5890,6 +5892,9 @@
                            MOVE   WRK-KSN-SRYCD
                                          TO   WRK-DAY1-KSN-SRYCD
                                                                (IDY)
+                           MOVE   WRK-HYOKETU-TEN
+                                         TO   WRK-DAY1-HYOKETU-TEN
+                                                               (IDY)
                         END-IF                                          
                      END-IF
                    END-PERFORM
@@ -5936,8 +5941,11 @@
       *
            PERFORM    VARYING   IDY   FROM   1   BY   1
                        UNTIL    IDY    >    31
-             IF    WRK-DAY2(IDY)  NOT  =   5
+             IF    WRK-DAY2(IDY)  =  4  OR  5
+                CONTINUE
+             ELSE
                 MOVE   ZERO    TO   WRK-DAY1-KSN-SRYCD(IDY)
+                MOVE   ZERO    TO   WRK-DAY1-HYOKETU-SRYCD(IDY)
              END-IF
            END-PERFORM
       *
@@ -6527,8 +6535,8 @@
                                                TO  WRK-KSN-SRYCD
                             WHEN     6
                                 MOVE  TNS-TEN  TO  WRK-HYOKETU-TEN
-      ***                       MOVE  NSRY-SRYCD(IDX2)
-      ***                                      TO  WRK-HYOKETU-SRYCD
+                                MOVE  NSRY-SRYCD(IDX2)
+                                               TO  WRK-HYOKETU-SRYCD
                           END-EVALUATE
                        END-IF
                      END-IF                  
@@ -6836,9 +6844,18 @@
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                      WHEN   5
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
-                                 (WRK-DAY1-KHNTEN(IDY)  
-                                              *  WRK-SENTEI-KEISU)
-                                                        +  0.5
+                                 (WRK-DAY1-SENTEI-KHNTEN(IDY)  *  0.7)
+                                                               +  0.5
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                  WRK-DAY22-NYUKHNRYO(IDY) +
+                                  WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
                          MOVE    12    TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                     END-EVALUATE
@@ -6866,6 +6883,16 @@
                                     (WRK-DAY1-KHNTEN(IDY)  *  0.15)
                                                            +  0.5
                          END-IF
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                  WRK-DAY22-NYUKHNRYO(IDY) +
+                                  WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
                          MOVE    4     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                      WHEN   5
@@ -6875,6 +6902,13 @@
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
                                   WRK-DAY22-NYUKHNRYO(IDY) +
                                   WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
                          MOVE    11    TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                     END-EVALUATE
@@ -6906,9 +6940,18 @@
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                      WHEN   5
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
-                                 (WRK-DAY1-KHNTEN(IDY)  
-                                              *  WRK-SENTEI-KEISU)
-                                                        +  0.5
+                                 (WRK-DAY1-SENTEI-KHNTEN(IDY)  *  0.7)
+                                                               +  0.5
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                  WRK-DAY22-NYUKHNRYO(IDY) +
+                                  WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
                          MOVE   14     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                     END-EVALUATE
@@ -6936,6 +6979,16 @@
                                     (WRK-DAY1-KHNTEN(IDY)  *  0.15)
                                                            +  0.5
                          END-IF
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                  WRK-DAY22-NYUKHNRYO(IDY) +
+                                  WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
                          MOVE    9     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                      WHEN   5
@@ -6945,6 +6998,13 @@
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
                                   WRK-DAY22-NYUKHNRYO(IDY) +
                                   WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
                          MOVE    13    TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                     END-EVALUATE
@@ -8257,7 +8317,7 @@
                  EVALUATE   SYUKEI-IDX
                    WHEN    12
                    WHEN    14
-                     MOVE "999999991" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                     MOVE "190141590" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                  END-EVALUATE
            END-EVALUATE
            .

@@ -44,6 +44,7 @@
       *  04.04.04    NACL-門脇    10/03/29  改正対応
       *                                     （画像診断２回目以降減算編集）
       *                                     （コード追加）
+      *  04.04.05    NACL-門脇    10/06/01  他医療機関受診対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
@@ -149,6 +150,7 @@
            03  FLG-HIKAKIN         PIC 9(01).
            03  FLG-SRYCD1          PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-NG              PIC 9(01).
       *
            03  FLG-GAIJINKEN       PIC 9(01).
       *
@@ -893,6 +895,7 @@
                OR     ( RECE200-KEY      NOT =   RECE220-KEY1 )
       *
                MOVE    ZERO                  TO  FLG-SRYCD1
+               MOVE    ZERO                  TO  FLG-NG
       *
                INITIALIZE                      WRK-ZAIW-AREA
                MOVE    ZERO                TO  WRK-ZAIWMAX-G
@@ -1018,11 +1021,17 @@
                    ELSE
                        MOVE    1                     TO  FLG-SRYCD1
                    END-IF
+      *
+                   IF   (RECE220-SRYKBN     = "90" OR "92")
+                   AND  (RECE230-SRYCD(IDX) =  "000000000")
+                       MOVE    1                     TO  FLG-NG
+                   END-IF
       *                     
                    IF      RECE220-SRYKBN     <   "31"
                        MOVE    1             TO  IDY
                    ELSE                          
                     IF     RECE220-ZAIKBN     =    1
+                    OR     FLG-NG             =    1
                        MOVE    2             TO  IDY
                     ELSE
       *              療養病棟レセコメントがある剤
@@ -2190,6 +2199,7 @@
            PERFORM      VARYING IDXX FROM   1   BY  1
                         UNTIL   IDXX >      WRK-KENSA-MATOME-MAX
              MOVE    ZERO                TO  FLG-SRYCD1
+             MOVE    ZERO                TO  FLG-NG
       *
              INITIALIZE                      WRK-ZAIW-AREA
              MOVE    ZERO                TO  WRK-ZAIWMAX-G

@@ -77,6 +77,7 @@
       *  04.02.04    NACL-ÌçÏÆ    08/10/07  Æþ±¡´ðËÜÎÁÍ­¸ú´ü´Ö¥Á¥§¥Ã¥¯
       *  04.04.01    NACL-ÌçÏÆ    09/09/04  ¾®Æþ´ÉÎ¬¾Î½¤Àµ
       *  04.04.02    NACL-ÌçÏÆ    10/05/07  Æþ±¡ÎÁºÞÅÀ¥Á¥§¥Ã¥¯
+      *  04.04.03    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/18  ¼£¸³ÂÐ±þ
       *****************************************************************
@@ -1475,7 +1476,11 @@
                END-IF
       *        É¸·ç
                IF       WRK-HYOKETU(IDX1)    NOT =         SPACE
-                 IF     WRK-GAIHAKU(IDX1)        =         SPACE
+                 IF    (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090"                 )
+                 AND   (WRK-NYUINKHN(IDX1)   NOT =       SPACE  )
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOKETU(IDX1)  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -2210,7 +2215,11 @@
                END-IF
       *        É¸·ç
                IF       WRK-HYOKETU(IDX1)    NOT =         SPACE
-                 IF     WRK-GAIHAKU(IDX1)        =         SPACE
+                 IF    (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090"                 )
+                 AND   (WRK-NYUINKHN(IDX1)   NOT =       SPACE  )
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOKETU(IDX1)  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -3168,7 +3177,13 @@
                END-IF
       *        É¸·ç
                IF       WRK-HYOKETU(IDX1)    NOT =         SPACE
-                 IF     WRK-GAIHAKU(IDX1)        =         SPACE
+                 IF    (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090"                 )
+                 AND   (WRK-NYUINKHN(IDX1)   NOT =       SPACE  )
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOKETU(IDX1)  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -3324,6 +3339,10 @@
                  END-EVALUATE
            END-EVALUATE
       *
+           IF       WRK-GAIHAKU(IDX1)   =    SPACE
+                 MOVE   ZERO    TO    LNK-SROUNYUIN-GAIHAKU(IDX1)
+           END-IF
+      *
            .
        210-GAIHAKU-SET-EXT.
            EXIT.
@@ -3401,8 +3420,8 @@
        210-TENSU-KEISAN-SEC            SECTION.
       *
            INITIALIZE                      TNS-TENSU-REC
-           IF     (IDX2                   =     1  )
-           AND    (WRK-GAIHAKU(IDX1)   NOT =   SPACE)
+           IF    (LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "1"  )
+           AND   (WRK-GAIHAKU(IDX1)           NOT   =  SPACE)
                PERFORM    2101-GAIHAKU-NYUINKHN-SET-SEC
                IF    WRK-GAIHAKU-SRYCD    NOT =   SPACE
                   MOVE    WRK-GAIHAKU-SRYCD   TO  TNS-SRYCD
@@ -3470,7 +3489,9 @@
               PERFORM    210-TENSU-KEISAN-SEC
            END-IF
       *
-           IF      IDX2   =   1
+           IF    ((LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "1"  ) AND
+                  (WRK-GAIHAKU(IDX1)                 =  SPACE))
+           OR    ( LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "2"   )
       *      É¸·ç¡§¡ó¸º»»
              COMPUTE    LNK-SROUNYUIN-ZAITEN(IDX1)  =
                       ( LNK-SROUNYUIN-ZAITEN(IDX1)  -

@@ -44,6 +44,7 @@
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.01.00    NACL-小豆沢  07/12/18  短期滞在手術基本料２の入院翌日の
       *                                     食事と入院料加算対応
+      *  04.04.01    NACL-門脇    10/06/01  他医療機関受診対応
       *  04.05.00    NACL-小豆沢  10/01/14  治験対応
       *  04.05.00    NACL-小豆沢  10/01/19  診療入力された特別食加算の対応
       *****************************************************************
@@ -1126,7 +1127,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *        標欠
                IF      WRK-HYOUKETSU(IDX1)   NOT =         SPACE
-                 IF    WRK-GAIHAKU(IDX1)         =         SPACE
+                 IF   (WRK-GAIHAKU(IDX1)        =
+                                     SPACE      OR
+                                    "190142190" OR  "190142090" OR
+                                    "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090"                 )
+                 AND  (WRK-NYUINKHN(IDX1)   NOT =        SPACE  )
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -1284,9 +1291,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                他医療機関受診
                        WHEN   4
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
-      *                他医療機関受診
-                       WHEN   5
-                           INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
                    END-EVALUATE
                END-IF
            END-PERFORM
@@ -1426,6 +1430,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                  END-EVALUATE
            END-EVALUATE
+      *
+           IF   WRK-GAIHAKU(IDX1)  =  SPACE
+                 MOVE   ZERO    TO    WRK-GAIHAKU-KBN(IDX1)
+           END-IF
       *
            .
        210-GAIHAKU-SET-EXT.

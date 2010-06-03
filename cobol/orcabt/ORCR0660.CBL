@@ -114,6 +114,7 @@
       *  04.04.08    NACL-門脇    10/04/23  在宅血液透析頻回指導管理料の
       *                                     コメント自動記載修正
       *  04.04.09    NACL-門脇    10/05/10  入院期間コメント修正
+      *  04.04.10    NACL-門脇    10/06/01  他医療機関受診対応
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
@@ -5777,13 +5778,6 @@
                              TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:32)
                  MOVE  "（他医受診・包括診療行為算定）（選定療養）"
                              TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(33:42)
-      *
-               WHEN   "999999991"
-                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   19      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "入院基本料減算（他医受診）（選定療養）"
-                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
       *
                WHEN   "999999992"
                  MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)

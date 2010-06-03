@@ -116,6 +116,7 @@
       *  04.04.07    NACL-ÌçÏÆ    10/03/31  ²þÀµÂÐ±þ¡ÊðôÉô¸ÇÄêÂÓ²Ã»»¤ÎÂÐ±þ¡Ë
       *  04.04.08    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
       *  04.04.09    NACL-ÌçÏÆ    10/05/07  Æþ±¡ÎÁºÞÅÀ¥Á¥§¥Ã¥¯
+      *  04.04.10    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/12/04  ¿©»ö¡ÊÆÃÊÌ¿©¡Ë¤ÎÂ¾ÊÝ¸±ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    10/01/07  ¼£¸³ÂÐ±þ
@@ -151,6 +152,7 @@
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
+           03  WRK-TENSU-KEISAN            PIC 9(08).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -2574,41 +2576,49 @@ grpsys                            SPA-AREA
                                                               +  0.5)  
       *                          Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£±£µ¡ó¡ËÊ¿À®£±£¶Ç¯£´·î¤è¤ê£³£°¡ó¤ËÊÑ¹¹
                                  WHEN   4
-                                     IF  SYU-SRYYMD(1:6) >= "200404"
-                                         COMPUTE  SYU-HKNTEN(15)  =
-                                                  SYU-HKNTEN(15)  +
-                                                ((WRK-KHNTEN  *  0.3)
-                                                              +  0.5)
-                                         COMPUTE SDAY-HKNTEN(SYU-IDX) =
-                                                 SDAY-HKNTEN(SYU-IDX) +
-                                               ((WRK-KHNTEN  *  0.3)
-                                                              +  0.5)
-                                     ELSE
-                                         COMPUTE  SYU-HKNTEN(15)  =
-                                                  SYU-HKNTEN(15)  +
-                                                ((WRK-KHNTEN  *  0.15)
-                                                              +  0.5)
-                                         COMPUTE SDAY-HKNTEN(SYU-IDX) =
-                                                 SDAY-HKNTEN(SYU-IDX) +
-                                               ((WRK-KHNTEN  *  0.15)
-                                                              +  0.5)
-                                     END-IF
+                                   IF  SYU-SRYYMD(1:6) >= "200404"
+                                     COMPUTE   WRK-TENSU-KEISAN  =
+                                              (WRK-KHNTEN * 0.3)  + 0.5
+                                   ELSE
+                                     COMPUTE   WRK-TENSU-KEISAN  =
+                                              (WRK-KHNTEN * 0.15) + 0.5
+                                   END-IF
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                             WRK-TENSU-KEISAN  +
+                                             WRK-KSNTEN
+                                   IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                                     COMPUTE WRK-TENSU-KEISAN  =
+                                            (WRK-TENSU-KEISAN  -
+                                             (WRK-TENSU-KEISAN *
+                                              (WRK-HYOKETU-TEN / 100)))
+                                                               + 0.5
+                                   END-IF
+                                   COMPUTE  SYU-HKNTEN(15)  =
+                                            SYU-HKNTEN(15)  +
+                                            WRK-TENSU-KEISAN
+                                   COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                            SDAY-HKNTEN(SYU-IDX) +
+                                            WRK-TENSU-KEISAN
       *                          Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£·£°¡ó¡Ë
                                  WHEN   5
-                                     COMPUTE  SYU-HKNTEN(15)  =
-                                              SYU-HKNTEN(15)  +
-                                            ((WRK-KHNTEN  *  0.7)
-                                                          +  0.5)
-                                     COMPUTE  SYU-HKNTEN(15)  =
-                                              SYU-HKNTEN(15)  +
-                                              WRK-KSNTEN
-                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =
-                                              SDAY-HKNTEN(SYU-IDX) +
-                                            ((WRK-KHNTEN  *  0.7)
-                                                          +  0.5)
-                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =
-                                              SDAY-HKNTEN(SYU-IDX) +
-                                              WRK-KSNTEN
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                            (WRK-KHNTEN * 0.7) + 0.5
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                             WRK-TENSU-KEISAN  +
+                                             WRK-KSNTEN
+                                   IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                                     COMPUTE WRK-TENSU-KEISAN  =
+                                            (WRK-TENSU-KEISAN  -
+                                             (WRK-TENSU-KEISAN *
+                                              (WRK-HYOKETU-TEN / 100)))
+                                                               + 0.5
+                                   END-IF
+                                   COMPUTE  SYU-HKNTEN(15)  =
+                                            SYU-HKNTEN(15)  +
+                                            WRK-TENSU-KEISAN
+                                   COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                            SDAY-HKNTEN(SYU-IDX) +
+                                            WRK-TENSU-KEISAN
                                END-EVALUATE
                            ELSE
       *                        ÁªÄê´ü´Ö¤ÎÅÀ¿ô»»Äê
@@ -2655,16 +2665,25 @@ grpsys                            SPA-AREA
                                                               +  0.5)  
       *                          Â¾°åÎÅµ¡´Ø¼õ¿Ç
                                  WHEN   5
-                                     COMPUTE  SYU-HKNTEN(15)  =
-                                              SYU-HKNTEN(15)  +
-                                            ((WRK-KHNTEN      *
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                              +  0.5)
-                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =   
-                                              SDAY-HKNTEN(SYU-IDX) +   
-                                            ((WRK-KHNTEN      *        
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                              +  0.5)  
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                            (WRK-SENTEI-KHNTEN * 0.7)
+                                                               + 0.5
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                             WRK-TENSU-KEISAN  +
+                                             WRK-KSNTEN
+                                   IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                                     COMPUTE WRK-TENSU-KEISAN  =
+                                            (WRK-TENSU-KEISAN  -
+                                             (WRK-TENSU-KEISAN *
+                                              (WRK-HYOKETU-TEN / 100)))
+                                                               + 0.5
+                                   END-IF
+                                   COMPUTE  SYU-HKNTEN(15)  =
+                                            SYU-HKNTEN(15)  +
+                                            WRK-TENSU-KEISAN
+                                   COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                            SDAY-HKNTEN(SYU-IDX) +
+                                            WRK-TENSU-KEISAN
                                END-EVALUATE
       *                        ÁªÄê´ü´Ö¤Î´µ¼Ô¼«¸ÊÉéÃ´³Û»»Äê
                                PERFORM    SENTEI-PTFTN-SEC
@@ -3222,10 +3241,10 @@ grpsys                                SPA-AREA
                                                  +  WRK-KSNTEN
                    IF     WRK-HYOKETU-TEN    NOT =   ZERO
       *              É¸·ç¡§¡ó¸º»»
-                     COMPUTE    WRK-SENTEI-KHNTEN  =
-                              ( WRK-SENTEI-KHNTEN  -
-                               (WRK-SENTEI-KHNTEN  *
-                                (WRK-HYOKETU-TEN   /  100)))  +  0.5
+      ***            COMPUTE    WRK-SENTEI-KHNTEN  =
+      ***                     ( WRK-SENTEI-KHNTEN  -
+      ***                      (WRK-SENTEI-KHNTEN  *
+      ***                       (WRK-HYOKETU-TEN   /  100)))  +  0.5
                      COMPUTE    WRK-SENTEI-ZAITEN  =
                               ( WRK-SENTEI-ZAITEN  -
                                (WRK-SENTEI-ZAITEN  *
@@ -3528,11 +3547,7 @@ grpsys                            SPA-AREA
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                      COMPUTE  WRK-SENTEI-GAIHAKU1 =
-                                             (WRK-KHNTEN * 0.00) + 0.5
-                                     COMPUTE  WRK-SENTEI-GAIHAKU2 =
-                                             (WRK-KHNTEN * 
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                                 + 0.5
+                                             (WRK-KHNTEN * 0.15) + 0.5
                                      COMPUTE  NYUIN-TGMONEY  =
                                               NYUIN-TGMONEY  +
                                             ((WRK-SENTEI-GAIHAKU1 -
@@ -3652,11 +3667,7 @@ grpsys                            SPA-AREA
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                      COMPUTE  WRK-SENTEI-GAIHAKU1 =
-                                             (WRK-KHNTEN * 0.00) + 0.5
-                                     COMPUTE  WRK-SENTEI-GAIHAKU2 =
-                                             (WRK-KHNTEN * 
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                                 + 0.5
+                                             (WRK-KHNTEN * 0.15) + 0.5
                                      COMPUTE  NYUIN-TGMONEY-TAX  =
                                               NYUIN-TGMONEY-TAX  +
                                             ((WRK-SENTEI-GAIHAKU1 -
@@ -3824,11 +3835,7 @@ grpsys                            SPA-AREA
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                  COMPUTE  WRK-SENTEI-GAIHAKU1 =
-                                         (WRK-KHNTEN * 0.00) + 0.5
-                                 COMPUTE  WRK-SENTEI-GAIHAKU2 =
-                                         (WRK-KHNTEN * 
-                                          WRK-SENTEI-GAIHAKU-KEISU)
-                                                             + 0.5
+                                         (WRK-KHNTEN * 0.15) + 0.5
                                  COMPUTE  NYUIN-TGMONEY  =
                                           NYUIN-TGMONEY  +
                                         ((WRK-SENTEI-GAIHAKU1 -
@@ -3948,11 +3955,7 @@ grpsys                            SPA-AREA
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                  COMPUTE  WRK-SENTEI-GAIHAKU1 =
-                                         (WRK-KHNTEN * 0.00) + 0.5
-                                 COMPUTE  WRK-SENTEI-GAIHAKU2 =
-                                         (WRK-KHNTEN * 
-                                          WRK-SENTEI-GAIHAKU-KEISU)
-                                                             + 0.5
+                                         (WRK-KHNTEN * 0.15) + 0.5
                                  COMPUTE  NYUIN-TGMONEY-TAX  =
                                           NYUIN-TGMONEY-TAX  +
                                         ((WRK-SENTEI-GAIHAKU1 -
