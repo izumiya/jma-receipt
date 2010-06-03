@@ -1480,8 +1480,10 @@
                       (LNK-WKSRY-SRYKBN (IDX)  NOT =   "70" )
       *            前の剤が自費以外
                    IF      (IDX2                >   ZERO  ) AND
-                           (SPA-COM-SRYKBN (IDX2)
+                          ((SPA-COM-SRYKBN (IDX2)
                                                =   "96"  OR  "95")
+                      OR   (SPA-COM-SRYSYUKBN (IDX2)
+                                               =   "731"   ))
                        CONTINUE
                    ELSE
                        MOVE    ZERO            TO  FLG-SYUBETU
