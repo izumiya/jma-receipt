@@ -1634,8 +1634,10 @@
                PERFORM 2001-NYUIN-ALL-CHK-SEC
            END-IF
       *
-           MOVE    SPA-ERRCD           TO  WRK-ERRCD
-           MOVE    SPACE               TO  SPA-ERRCD
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    SPA-ERRCD           TO  WRK-ERRCD
+               MOVE    SPACE               TO  SPA-ERRCD
+           END-IF
       *
            .
        100112-RIGAKU-CHK-EXT.
@@ -2093,6 +2095,7 @@
       *
       *    回数チェク
            IF     (WRK-COM-DATAKBN (IDX-Z) =   "1"  )
+             AND  (WRK-ERRCD           =   SPACE    )
                IF      LNK-ORCSC-PG        =   "K02"
                    PERFORM 100112-RIGAKU-CHK-SEC
                    MOVE    HZN-IDX             TO  IDX-Z
@@ -2261,6 +2264,20 @@
                                                            (TBL-RIH)
                        MOVE    1               TO  FLG-RIHA-OK
            END-SEARCH
+      *    H22.4 から　新規の脳血管疾患等・運動器リハコードは区分で判定
+           IF     (FLG-RIHA-OK             =   1       )
+              OR  (WRK-COM-INPUTCD(IDX-Z)(1:3) =   "101" )
+               CONTINUE
+           ELSE
+               IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H"   )
+                  AND (WRK-COM-CDKBN-KBNNUM (IDX-Z)
+                                                   =   "001"
+                                                   OR  "002"   )
+                  AND (WRK-COM-CDKBN-KBNNUM-EDA (IDX-Z)
+                                                   =   "00"    )
+                   MOVE    1                   TO  FLG-RIHA-OK
+               END-IF
+           END-IF
       *
            .
        10011312-RIGAKU-SERCH-EXT.
