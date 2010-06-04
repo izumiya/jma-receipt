@@ -417,6 +417,7 @@
            03  CONST-H1904                 PIC X(06)   VALUE "200704".
            03  CONST-H1804                 PIC X(06)   VALUE "200604".
            03  CONST-H1810                 PIC X(06)   VALUE "200610".
+           03  CONST-H1604                 PIC X(06)   VALUE "200404".
       *    Æþ±¡ÎÁÊÔ½¸ºî¶ÈÎÎ°èºÇÂç·ï¿ô
            03  CONST-WNYUINRYO-MAX             PIC 9(05)   VALUE 20.
       *    ³°ÇñÊÔ½¸ºî¶ÈÎÎ°èºÇÂç·ï¿ô
@@ -1557,7 +1558,11 @@
                WHEN    2
                    MOVE    "190107390"     TO  WRK-GAIHAKU-SRYCD
                WHEN    3
-                   MOVE    "190111590"     TO  WRK-GAIHAKU-SRYCD
+                   IF    ( NACCT-SRYYM     >   CONST-H1604 )
+                       MOVE    "099999907" TO  WRK-GAIHAKU-SRYCD
+                   ELSE
+                       MOVE    "190111590" TO  WRK-GAIHAKU-SRYCD
+                   END-IF
                WHEN    4
                WHEN    5
                    IF    ( FLG-SENTEIDAY(IDXD) =   ZERO )
@@ -1573,7 +1578,11 @@
                WHEN    2
                    MOVE    "190107590"     TO  WRK-GAIHAKU-SRYCD
                WHEN    3
-                   MOVE    "190111590"     TO  WRK-GAIHAKU-SRYCD
+                   IF    ( NACCT-SRYYM     >   CONST-H1604 )
+                       MOVE    "099999907" TO  WRK-GAIHAKU-SRYCD
+                   ELSE
+                       MOVE    "190111590" TO  WRK-GAIHAKU-SRYCD
+                   END-IF
                WHEN    4
                WHEN    5
                    IF    ( FLG-SENTEIDAY(IDXD) =   ZERO )
@@ -2234,34 +2243,19 @@
                END-IF
       *
                EVALUATE    FLG-GAIHAKUDAY(IDXD)
-               WHEN    0
-               WHEN    5
-                   COMPUTE WRK-SENTEI-PTFTN (IDX-TAX)
-                       =   WRK-SENTEI-PTFTN (IDX-TAX)
-                       + ( WRK-KHNTEN  -   WRK-SENTEI-KHNTEN )
-                       *   WRK-SENTEI-TANKA
-      *        ³°Çñ¡Ê£±£µ¡ó¤ÈÁªÄê³°Çñ¤Îº¹³Û¡Ë
+               WHEN    ZERO
                WHEN    3
                WHEN    4
-                   IF    ( FLG-GAIHAKUDAY(IDXD)    =   4 )
-                    AND  ( HCM34S01-SANTEIYM      >=   "200404" )
-                       COMPUTE WRK-SENTEI-GAIHAKU1
-      *                    = ( WRK-KHNTEN  *   0.3 )
-                           = ( WRK-KHNTEN  *   0.0 )
-                           +   0.5
+               WHEN    5
+                   IF    ( NACCT-SRYYM     >   CONST-H1604 )
+                    AND  ( FLG-GAIHAKUDAY(IDXD)    =   4 )
+                       CONTINUE
                    ELSE
-                       COMPUTE WRK-SENTEI-GAIHAKU1
-                           = ( WRK-KHNTEN  *   0.3 )
-                           +   0.5
+                       COMPUTE WRK-SENTEI-PTFTN (IDX-TAX)
+                           =   WRK-SENTEI-PTFTN (IDX-TAX)
+                           + ( WRK-KHNTEN  -   WRK-SENTEI-KHNTEN )
+                           *   WRK-SENTEI-TANKA
                    END-IF
-                   COMPUTE WRK-SENTEI-GAIHAKU2
-                       = ( WRK-KHNTEN  *   WRK-SENTEI-KEISU)
-                       +   0.5
-                   COMPUTE WRK-SENTEI-PTFTN (IDX-TAX)
-                       =   WRK-SENTEI-PTFTN (IDX-TAX)
-                       + ( WRK-SENTEI-GAIHAKU1
-                       -   WRK-SENTEI-GAIHAKU2 )
-                       *   WRK-SENTEI-TANKA
                END-EVALUATE
       *    Äê³ÛÀßÄê
            WHEN    "2"
