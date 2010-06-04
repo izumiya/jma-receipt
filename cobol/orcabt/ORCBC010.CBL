@@ -49,6 +49,8 @@
       *                                     Ê¿À®£²£²Ç¯£´·îÊ¬°Ê¹ß¤ÎÀ¯ÉÜ´É
       *                                     ¾¸¤ò¥¨¥é¡¼¤È¤¹¤ë
       *  04.04.04    NACL-ÌçÏÆ    10/03/23  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
+      *  04.04.05    NACL-ÂÀÅÄ    10/06/04  ³°Çñ¤ÎºÞ¤ËÆþ±¡ÎÁ¤òÊÔ½¸¤¹¤ë
+      *                                     ÁªÄêÆþ±¡Ãæ¤Î³°ÇñºÞ¤òÆÉ¤ßÈô¤Ð¤¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -216,6 +218,7 @@
            03  FLG-SHOSAISIN                   PIC 9(01).
            03  FLG-SHOSAISIN-GEN               PIC 9(01).
            03  FLG-CHK                         PIC 9(01).
+           03  FLG-EDIT                        PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1686,6 +1689,7 @@ grpsys             MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                                            WRK-SPA-HOSPNUM
            MOVE    PTINF-PTID          TO  HCM34S01-PTID
            MOVE    WRK-PARA-SRYYM      TO  HCM34S01-SANTEIYM
+           MOVE    "1"                 TO  HCM34S01-EXGAIHAKU
            MOVE    COMB-HKNCOMBINUM    TO  HCM34S01-HKNCOMBI
            MOVE    COMB-HKNNUM         TO  HCM34S01-HKNNUM
            IF    ( COMB-HKNNUM         =   "971" OR "973" )
@@ -1700,6 +1704,22 @@ grpsys             MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
       *
            PERFORM VARYING IDX4    FROM    1   BY  1
                    UNTIL   IDX4    >       HCM34S01-HENKYAKU-MAX
+      *
+             MOVE    1             TO      FLG-EDIT
+      *
+             PERFORM VARYING IDX5    FROM    1   BY  1
+                     UNTIL ( IDX5                >   20    )
+                     OR    ( HCM34S01-SRYCD (IDX4 IDX5)
+                                                 =   SPACE )
+                     OR    ( FLG-EDIT            =   ZERO  )
+      *
+                 IF  ( HCM34S01-SRYCD (IDX4 IDX5)    =   "099999907" )
+                     MOVE    ZERO  TO      FLG-EDIT
+                 END-IF
+      *
+             END-PERFORM
+      *
+            IF   ( FLG-EDIT                =   1 )
       *
              COMPUTE WRK-ZAINUM            =   WRK-ZAINUM  +  1
              MOVE    ZERO                  TO  WRK-RENNUM
@@ -1811,6 +1831,9 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
                    ADD     1               TO  CNT-COLDAT02
                END-PERFORM
              END-PERFORM
+      *
+            END-IF
+      *
            END-PERFORM
            .
        20013-NYUIN-KIHON-EXT.
