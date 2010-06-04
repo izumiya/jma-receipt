@@ -2202,7 +2202,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            OR "099209906"  )
             OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"       )
             OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                           OR "099999904"  )
+                                           OR "099999904"
+                                           OR "099999905"
+                                           OR "099999906"
+                                           OR "099999907"  )
             OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                       "332" OR "350" OR
                                       "352"               ) AND
@@ -2246,7 +2249,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              OR "099209906"  )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"       )
               OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                             OR "099999904"  )
+                                             OR "099999904"
+                                             OR "099999905"
+                                             OR "099999906"
+                                             OR "099999907"  )
               OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                         "332" OR "350" OR
                                         "352"               ) AND

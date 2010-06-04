@@ -4831,7 +4831,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                             OR "099209906"  )
              OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"       )
              OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                            OR "099999904"  )
+                                            OR "099999904"
+                                            OR "099999905"
+                                            OR "099999906"
+                                            OR "099999907"  )
                   COMPUTE   RECE04-MEISAISU    =  RECE04-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -4873,7 +4876,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                              OR "099209906"  )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"       )
               OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                             OR "099999904"  )
+                                             OR "099999904"
+                                             OR "099999905"
+                                             OR "099999906"
+                                             OR "099999907"  )
       *
                CONTINUE
       *
