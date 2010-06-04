@@ -1351,7 +1351,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
              OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                             OR "0086"       )
              OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                            OR "099999904"  )
+                                            OR "099999904"
+                                            OR "099999905"
+                                            OR "099999906"
+                                            OR "099999907"  )
              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                     "60" OR "64" OR "70" OR
                                     "80"                   ) AND
@@ -1396,7 +1399,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
               OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                             OR "099999904"  )
+                                             OR "099999904"
+                                             OR "099999905"
+                                             OR "099999906"
+                                             OR "099999907"  )
               OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                      "60" OR "64" OR "70" OR
                                      "80"                   ) AND
