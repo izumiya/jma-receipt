@@ -2034,15 +2034,35 @@
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   HCM34S01-HENKYAKU-MAX
-               INITIALIZE                  TBL-DATA-AREA
-               MOVE    ZERO            TO  IDX-S
+      *
+               MOVE    1               TO  FLG-MEISAI
+      *
+               IF    ( HCM34S01-ZAITEN (IDX)   =   ZERO )
+                   MOVE    ZERO        TO  FLG-MEISAI
+               END-IF
+      *
                PERFORM VARYING     IDX2    FROM    1   BY  1
                        UNTIL      (IDX2    >   20   )  OR
                                   (HCM34S01-SRYCD(IDX IDX2)
-                                               =   SPACE   )
-                   PERFORM 20041-SRYCD-HEN-SEC
+                                               =   SPACE  ) OR
+                                  (FLG-MEISAI  =   ZERO   )
+                   IF    ( HCM34S01-SRYCD(IDX IDX2)
+                                               =   "099999907" )
+                       MOVE    ZERO        TO  FLG-MEISAI
+                   END-IF
                END-PERFORM
-               PERFORM 20042-NYUTBL-HENSYU-SEC
+      *
+               IF    ( FLG-MEISAI      =   1 )
+                   INITIALIZE                  TBL-DATA-AREA
+                   MOVE    ZERO            TO  IDX-S
+                   PERFORM VARYING     IDX2    FROM    1   BY  1
+                           UNTIL      (IDX2    >   20   )  OR
+                                      (HCM34S01-SRYCD(IDX IDX2)
+                                                   =   SPACE   )
+                       PERFORM 20041-SRYCD-HEN-SEC
+                   END-PERFORM
+                   PERFORM 20042-NYUTBL-HENSYU-SEC
+               END-IF
            END-PERFORM
       *    ÁªÄêÆþ±¡ÎÁ´µ¼Ô¼«¸ÊÉéÃ´³Û
            IF      HCM34S01-SENTEI-PTFTN   >   ZERO
