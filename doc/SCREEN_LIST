@@ -163,10 +163,12 @@ S03N.glade	orca23	(S03N)収納登録−請求確認
 S04.glade	orca23	(S04)支払証明書印刷
 S05.glade	orca23	(S05)収納登録−収納検索画面
 S06.glade	orca23	(S06)収納登録−一括入金画面
+S07.glade	orca23	(S07)印刷指示画面
 S99.glade	orca23	(S99)処理結果
 SERR.glade	orca23	(SERR)エラー情報
 SID1.glade	orca23	(SID1)確認画面
 SID2.glade	orca23	(SID2)確認画面
+SID3.glade	orca23	(SID3)確認画面
 
 J02.glade	orca24	(J02)会計照会−カード入力
 J021.glade	orca24	(J021)会計照会−保険組合一括変更
