@@ -1014,9 +1014,7 @@
       *    ´µ¼ÔÌ¾¾Î
            MOVE    SPA-NAME            TO  HC03-KNJNAMW
       *    ÊÝ¸±¼ïÊÌ
-           IF    ( TPARA-HKNMEI        =   "1" )
-               MOVE    WRK-HKNCOMBIMEI TO  HC03-HOKEN
-           END-IF
+           MOVE    WRK-HKNCOMBIMEI TO  HC03-HOKEN
       *    ÉéÃ´³ä¹ç
            IF    ( SYU-SRYYMD         >=   CONST-H200401 )
                EVALUATE    TPARA-FTNKBN
@@ -1048,6 +1046,11 @@
            END-IF
            IF    ( SYU-HKNCOMBINUM =   SPACE OR    ZERO )
                    MOVE    SPACE       TO  HC03-FUTAN
+           END-IF
+           IF    ( TPARA-HKNMEI        =   "0" )
+               MOVE    SPACE           TO  HC03-HOKEN
+                                           HC03-FUTAN
+                                           HC03-LBLFTNRATE
            END-IF
            IF    ( TPARA-FTNKBN        =   "0" )
                MOVE    SPACE           TO  HC03-FUTAN
