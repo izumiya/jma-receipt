@@ -756,6 +756,8 @@
       *
            IF    ( TPARA-HKNMEI        =   "0" )
                MOVE    SPACE           TO  HCN03-HOKEN
+                                           HCN03-FUTAN
+                                           HCN03-LBLFTNRATE
            END-IF
            IF    ( TPARA-FTNKBN        =   "0" )
                MOVE    SPACE           TO  HCN03-FUTAN
