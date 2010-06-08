@@ -9861,7 +9861,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-GMN-MAX         =   ZERO
                MOVE    "1056"          TO  SPA-ERRCD
            END-IF
+      *    診療行為入力チェック
            IF      SPA-ERRCD           =   SPACE
+               PERFORM 41011-KOUI-ALLHEN-SEC
+           END-IF
+           IF     (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-KIDCD           =   SPACE )
                IF      SPA-GMN-MAX     >   199
                    CONTINUE
                ELSE
