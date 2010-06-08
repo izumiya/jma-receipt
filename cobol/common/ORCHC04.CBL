@@ -1097,6 +1097,16 @@
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-H-SRYYMD
       *    発行日
+           PERFORM 20021-PRTYMD-HEN-SEC
+           .
+       20021-INIT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    発行日編集処理
+      *****************************************************************
+       20021-PRTYMD-HEN-SEC             SECTION.
+      *
            IF     (ORCHC04-DENPPRTYMD  =   SPACE )
                IF     (PARA-HAKKOUBIKBN    =   "1" )
                  AND  (ORCHC04-HAKKOFLG    =    1   OR   3 )
@@ -1110,7 +1120,7 @@
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-H-HAKYMD
            .
-       20021-INIT-HENSYU-EXT.
+       20021-PRTYMD-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1718,14 +1728,14 @@
                END-STRING
                MOVE    2                   TO  FLG-SYORI
            END-IF
-      *    発行日
-           IF    ( ORCHC04-DENPPRTYMD  NOT =   SPACE )
-               MOVE    ORCHC04-DENPPRTYMD  TO  WRK-SYMD
+      *    発行日編集
+           IF    ( ORCHC04-DENPPRTYMD  =   SPACE )
+               MOVE    ORCHC04-DENPNUM     TO  WRK-DENPNUM
+               PERFORM 2011-SYUNOU-HEN-SEC
            ELSE
-               MOVE    SPA-SYSYMD          TO  WRK-SYMD
+               INITIALIZE                  SYUNOU-REC
            END-IF
-           PERFORM 800-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG         TO  WRK-H-HAKYMD
+           PERFORM 20021-PRTYMD-HEN-SEC
       *
            INITIALIZE                  TBL-MEISAI-AREA
            INITIALIZE                  TBL2-MEISAI-A5-AREA
