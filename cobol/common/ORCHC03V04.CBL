@@ -212,6 +212,11 @@
            03  WRK-NAME-R               REDEFINES   WRK-NAME.
                05  WRK-NAME-1           PIC X(74).
                05  WRK-NAME-2           PIC X(74).
+           03  WRK-NAME-R2              REDEFINES   WRK-NAME.
+               05  WRK-NAME-21.
+                   07  WRK-NAME-211         PIC X(66).
+                   07  WRK-NAME-212         PIC X(08).
+               05  WRK-NAME-22          PIC X(74).
       *    診療日編集
            03  WRK-SRYMEI-H            PIC X(80).
            03  WRK-DAY-HEN.
@@ -802,9 +807,11 @@
                                               DELIMITED  BY  SIZE
                                        INTO   HCM03V04-TENSU1   (IDX2)
                            END-STRING
-                           MOVE    "円"           TO  HCM03V04-TENSU12
+                           MOVE    "円"            TO  HCM03V04-TENSU12
                                                                 (IDX2)
                            MOVE    SPACE           TO  HCM03V04-KINGAKU1
+                                                                (IDX2)
+                           MOVE    SPACE         TO  HCM03V04-KINGAKU12
                                                                 (IDX2)
                            STRING  TBL-H-KINGAKU2(IDX IDX2)
                                    "　"
@@ -849,6 +856,8 @@
                            MOVE    "円"           TO  HCM03V04-TENSU22
                                                                 (IDX2)
                            MOVE    SPACE           TO  HCM03V04-KINGAKU2
+                                                                (IDX2)
+                           MOVE    SPACE         TO  HCM03V04-KINGAKU22
                                                                 (IDX2)
                            STRING  TBL-H-KINGAKU2(IDX IDX2)
                                    "　"
@@ -1326,6 +1335,7 @@
            INITIALIZE                  ORCHC04SUBAREA
            MOVE    WRK-DENPNUM         TO  ORCHC04SUB-DENPNUM
            MOVE    PARA-GOKEITANI      TO  ORCHC04SUB-GOKEITANI
+           MOVE    "1"                 TO  ORCHC04SUB-PARAKBN
            CALL    "ORCHC04SUB"        USING
                                        SPA-AREA
                                        ORCHC04SUBAREA
@@ -1465,6 +1475,11 @@
                            DELIMITED  BY  SPACE
                                            INTO   WRK-NAME
                    END-STRING
+               END-IF
+      *        小計
+               IF      ORCHC04SUB-SRYKBN (IDX)     =   "XX"
+                   MOVE    ALL "　"                TO  WRK-NAME-211
+                   MOVE    "（小計）"              TO  WRK-NAME-212
                END-IF
       *
       *        名称と単位名称チェック
