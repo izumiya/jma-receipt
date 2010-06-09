@@ -1587,6 +1587,7 @@ COPYS = \
         CPORCSHKNMEI.INC \
         HCM04A5.INC \
 	SID3.INC \
+        HCM03V04.INC \
 
 DBPATH = \
 	ORCA-DBPATH

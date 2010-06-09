@@ -108,6 +108,7 @@
            03  WRK-ZAITENSU            PIC S9(11).
            03  WRK-SRYMEI              PIC X(10).
            03  WRK-SRYMEI-OLD          PIC X(10).
+           03  WRK-TENSU-KEI           PIC S9(11).
       *
            03  WRK-Z119                PIC ZZZ,ZZZ,ZZ9.
            03  WRK-Z119-2              PIC ---,---,--9.
@@ -181,6 +182,7 @@
                    07  TBL-SORT-JIHIMONEY       PIC S9(07).
                    07  TBL-SORT-TEN             PIC 9(07).
                    07  TBL-SORT-TENSIKIBETU     PIC 9(01).
+      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -828,6 +830,7 @@
            MOVE    ZERO                TO  ORCHC04SUB-TBL-MAX
            MOVE    ZERO                TO  IDX-H
            MOVE    SPACE               TO  WRK-SRYMEI-OLD
+           MOVE    ZERO                TO  WRK-TENSU-KEI
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   IDX-TBL )
                            OR (IDX-H   >=  800     )
@@ -837,20 +840,28 @@
                                OR (TBL-SRYCD (IDX IDX2)  =   SPACE)
                                OR (IDX-H   >=  800  )
                    ADD     1               TO  IDX-H
-      *            剤の１行目
-                   IF      IDX-H-S         =   ZERO
-                       MOVE    IDX-H           TO  IDX-H-S
-                   END-IF
       *            診療区分
                    IF      IDX2                =   1
                        PERFORM 200521-SRYSYUMEI-SEC
                        IF      WRK-SRYMEI     NOT  =   WRK-SRYMEI-OLD
+      *                    小計
+                           IF     (ORCHC04SUB-PARAKBN  =   "1"  )
+                           AND    (WRK-TENSU-KEI       >   ZERO )
+                               PERFORM 20039-SYOKEI-HEN-SEC
+                               ADD     1                   TO  IDX-H
+                           END-IF
                            MOVE    WRK-SRYMEI
                                                TO  ORCHC04SUB-H-SRYKBN
                                                                (IDX-H)
                            MOVE    WRK-SRYMEI      TO  WRK-SRYMEI-OLD
+                           MOVE    ZERO            TO  WRK-TENSU-KEI
                        END-IF
                    END-IF
+      *            剤の１行目
+                   IF      IDX-H-S         =   ZERO
+                       MOVE    IDX-H           TO  IDX-H-S
+                   END-IF
+      *
                    MOVE    TBL-SRYKBN (IDX)    TO  ORCHC04SUB-SRYKBN
                                                               (IDX-H)
                    MOVE    TBL-SRYCD(IDX IDX2) TO  ORCHC04SUB-SRYCD
@@ -949,6 +960,9 @@
       *            剤点数
                    MOVE    TBL-ZAITENSU (IDX) TO  ORCHC04SUB-ZAITENSU
                                                               (IDX-H)
+      *            点数　集計
+                   COMPUTE WRK-TENSU-KEI       =   WRK-TENSU-KEI
+                                               +   WRK-KINGAKU
                END-IF
       *        回数
                MOVE    TBL-KAISU (IDX)     TO  WRK-ZZ9
@@ -961,6 +975,12 @@
                MOVE    "1"                 TO  ORCHC04SUB-ZAIEND
                                                             (IDX-H)
            END-PERFORM
+      *    小計
+           IF     (ORCHC04SUB-PARAKBN  =   "1"  )
+           AND    (WRK-TENSU-KEI       >   ZERO )
+               ADD     1               TO  IDX-H
+               PERFORM 20039-SYOKEI-HEN-SEC
+           END-IF
            MOVE    IDX-H               TO  ORCHC04SUB-TBL-MAX
       *
            .
@@ -1004,6 +1024,9 @@
                    MOVE    WRK-Z119-2          TO  ORCHC04SUB-H-KINGAKU
                                                               (IDX-H)
                END-IF
+      *        点数　集計
+               COMPUTE WRK-TENSU-KEI       =   WRK-TENSU-KEI
+                                           +   WRK-KINGAKU
            ELSE
       *        金額
                MOVE    TBL-TEN (IDX IDX2)  TO  WRK-ZAITENSU
@@ -1038,6 +1061,31 @@
                                                               (IDX-H)
            .
        30051-TENSU-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数　小計編集処理
+      *****************************************************************
+       20039-SYOKEI-HEN-SEC                  SECTION.
+      *
+           IF      WRK-TENSU-KEI           >   ZERO
+               MOVE    WRK-TENSU-KEI       TO  WRK-Z119
+               MOVE    WRK-Z119            TO  ORCHC04SUB-H-KINGAKU
+                                                         (IDX-H)
+           ELSE
+               MOVE    WRK-TENSU-KEI       TO  WRK-Z119-2
+               MOVE    WRK-Z119-2          TO  ORCHC04SUB-H-KINGAKU
+                                                              (IDX-H)
+           END-IF
+           MOVE    WRK-TENSU-KEI       TO  ORCHC04SUB-ZAITENSU (IDX-H)
+           MOVE    "XX"                TO  ORCHC04SUB-SRYKBN   (IDX-H)
+      *    剤終了
+           MOVE    SPACE               TO  ORCHC04SUB-ZAIEND
+                                                            (IDX-H - 1 )
+           MOVE    "1"                 TO  ORCHC04SUB-ZAIEND
+                                                            (IDX-H)
+           .
+       20039-SYOKEI-HEN-EXT.
            EXIT.
       *
       *****************************************************************

@@ -30,6 +30,8 @@
            03  ORCHC04SUB-DENPNUM      PIC 9(07).
       *    合計単位（プログラムオプション）
            03  ORCHC04SUB-GOKEITANI    PIC X(01).
+      *    小計（１：あり）（請求書）
+           03  ORCHC04SUB-PARAKBN      PIC X(01).
       *出力
       *    印刷内容
            03  ORCHC04SUB-LIST-AREA.
