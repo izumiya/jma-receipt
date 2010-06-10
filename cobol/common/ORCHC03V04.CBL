@@ -73,6 +73,7 @@
       *
            03  FLG-SYORI           PIC 9(01).
            03  FLG-DOUJI           PIC 9(01).
+           03  FLG-HENPARA         PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -92,7 +93,7 @@
            03  IDH3                PIC 9(04).
       *
            03  IDX2                PIC 9(02).
-           03  IDX3                PIC 9(02).
+           03  IDX3                PIC 9(04).
            03  IDXP                PIC 9(02).
            03  IDXM                PIC 9(02).
            03  IDK                 PIC 9(04).
@@ -160,6 +161,8 @@
            03  WRK-Z72-HS              REDEFINES   WRK-Z72-H
                                        PIC -,---,---.
            03  WRK-Z72-H9              PIC Z,ZZZ,ZZ9.
+      *    Á´³ÑÊÑ´¹ÍÑ
+           03  WRK-HENKAN-G            PIC X(10).
       *    ¼«Èñ½¸·×
            03  WRK-JIHI-TOTAL          PIC S9(08).
       *
@@ -258,6 +261,7 @@
            03  PARA-FTNKBN             PIC X(01).
            03  PARA-SRYKA              PIC X(01).
            03  PARA-LINE               PIC X(01).
+           03  PARA-SYOKEI             PIC X(01).
       *
            03  WRK-PARA-NAME               PIC X(25).
            03  WRK-PARA                    PIC X(50).
@@ -596,6 +600,16 @@
            MOVE    "LINE"              TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-LINE
+           IF      PARA-LINE           =   SPACE
+               MOVE    "1"                 TO  PARA-LINE
+           END-IF
+      *    ¾®·×
+           MOVE    "SYOKEI"            TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-SYOKEI
+           IF      PARA-SYOKEI         =   SPACE
+               MOVE    "1"                 TO  PARA-SYOKEI
+           END-IF
       *
            .
        100-OPTION-SELECT-EXT.
@@ -722,6 +736,7 @@
            MOVE    WRK-HOSPNAME        TO  HCM03V04-IRYOMEI
       *    º£²óÆþ¶â³Û
            MOVE    WRK-NYUKIN          TO  WRK-Z72
+           MOVE    1                   TO  FLG-HENPARA
            PERFORM 810-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HCM03V04-KONNYUKIN
       *    °åÎÅµ¡´Ø£Ô£Å£Ì
@@ -1335,7 +1350,7 @@
            INITIALIZE                  ORCHC04SUBAREA
            MOVE    WRK-DENPNUM         TO  ORCHC04SUB-DENPNUM
            MOVE    PARA-GOKEITANI      TO  ORCHC04SUB-GOKEITANI
-           MOVE    "1"                 TO  ORCHC04SUB-PARAKBN
+           MOVE    PARA-SYOKEI         TO  ORCHC04SUB-PARAKBN
            CALL    "ORCHC04SUB"        USING
                                        SPA-AREA
                                        ORCHC04SUBAREA
@@ -1765,11 +1780,26 @@
                MOVE    WRK-Z72             TO  WRK-Z72-H9
                MOVE    WRK-Z72-H9          TO  KANACHK-MAE-INPUT
            END-IF
+      *    º¸¤º¤á
+           IF      FLG-HENPARA         =   1
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-HENKAN-G
+               MOVE    SPACE               TO  KANACHK-MAE-INPUT
+               PERFORM VARYING         IDX3    FROM    1   BY  1
+                       UNTIL           IDX3    >   10
+                   IF      WRK-HENKAN-G (IDX3:1)   NOT =   SPACE
+                       MOVE    WRK-HENKAN-G (IDX3:)
+                                               TO  KANACHK-MAE-INPUT
+                       MOVE    10              TO  IDX3
+                   END-IF
+               END-PERFORM
+           END-IF
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
            IF      KANACHK-RC          =   ZERO
                MOVE    KANACHK-OUT-INPUT(1:18)    TO  WRK-Z72-G
            END-IF
+      *
+           MOVE    ZERO                TO  FLG-HENPARA
            .
        810-HENKAN-EXT.
            EXIT.
