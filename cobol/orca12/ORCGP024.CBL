@@ -198,7 +198,7 @@
       *
       *    给锐砷么瘦赂
        01  LNK-PTKOHFTN-AREA.
-           02  LNK-PTKOHFTN-REC           OCCURS  50.
+           02  LNK-PTKOHFTN-REC           OCCURS  100.
            COPY    "CPPTKOHFTN.INC"
                        REPLACING  //PTKOHFTN-// BY //LNK-PTKOHFTN-//.
       *    给锐砷么
