@@ -301,6 +301,7 @@
            03  PARA-SRYKA              PIC X(01).
            03  PARA-LINE               PIC X(01).
            03  PARA-HAKKOUBIKBN        PIC X(01).
+           03  PARA-ROOMKBN            PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -509,6 +510,13 @@
            MOVE    WRK-PARA(1:1)       TO  PARA-HAKKOUBIKBN
            IF      PARA-HAKKOUBIKBN    =   SPACE
                MOVE    "0"                 TO  PARA-HAKKOUBIKBN
+           END-IF
+      *    …¬≈Ô…¬ºº∂Ë ¨
+           MOVE    "ROOMKBN"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-ROOMKBN
+           IF      PARA-ROOMKBN        =   SPACE
+               MOVE    "1"                 TO  PARA-ROOMKBN
            END-IF
       *
            .
@@ -842,7 +850,11 @@
                END-EVALUATE
            END-IF
       *    …¬≈Ô°¶…¬ºº
-           PERFORM 20013-BYOTO-HEN-SEC
+           IF      PARA-ROOMKBN        =   "1"
+               PERFORM 20013-BYOTO-HEN-SEC
+           ELSE
+               MOVE    SPACE               TO  WRK-ROOM
+           END-IF
            .
        2002-DB-KENSAKU-EXT.
            EXIT.
@@ -900,7 +912,6 @@
       *    …¬≈Ô°¶…¬ºº ‘Ω∏ΩËÕ˝
       *****************************************************************
        20013-BYOTO-HEN-SEC                SECTION.
-      *
       *
            MOVE    SYU-BYOTONUM        TO  WRK-BTUNUM
            MOVE    SYU-ROOMNUM (3:)    TO  WRK-BRMNUM
@@ -2653,6 +2664,8 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 950-PTNYUINRRK-READ-SEC
            ELSE
                INITIALIZE                  PTNYUINRRK-REC
