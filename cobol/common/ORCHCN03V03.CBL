@@ -212,6 +212,7 @@
            03  TPARA-SRYKA              PIC X(01).
            03  TPARA-HKNMEI             PIC X(01).
            03  TPARA-FTNKBN             PIC X(01).
+           03  TPARA-ROOMKBN            PIC X(01).
            03  TPARA-HAKKOUBIKBN        PIC X(01).
            03  TPARA-YUKOSTYMD          PIC X(08).
            03  TPARA-YUKOEDYMD          PIC X(08).
@@ -473,6 +474,7 @@
            MOVE    "1"             TO  TPARA-SRYKA
            MOVE    "1"             TO  TPARA-HKNMEI
            MOVE    "2"             TO  TPARA-FTNKBN
+           MOVE    "1"             TO  TPARA-ROOMKBN
            MOVE    "0"             TO  TPARA-HAKKOUBIKBN
            MOVE    "00000000"      TO  TPARA-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-YUKOEDYMD
@@ -496,6 +498,13 @@
            PERFORM 1001-OPTION-CALL-SEC
            IF    ( WRK-PARA        =   "0" OR "1" OR "2" )
                MOVE    WRK-PARA    TO  TPARA-FTNKBN
+           END-IF
+      *
+      *    病棟・病室名
+           MOVE    "ROOMKBN"       TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" OR "2" )
+               MOVE    WRK-PARA    TO  TPARA-ROOMKBN
            END-IF
       *
       *    伝票発行日区分
@@ -682,9 +691,11 @@
            MOVE    PTINF-NAME
                                        TO  HCN03-KNJNAMW
       *
-      *    病棟・病室名編集処理
-           PERFORM 3102-ROOM-HEN-SEC
-           MOVE    WRK-ROOM            TO  HCN03-ROOM
+           IF    ( TPARA-ROOMKBN       =   "1" )
+      *        病棟・病室名編集処理
+               PERFORM 3102-ROOM-HEN-SEC
+               MOVE    WRK-ROOM        TO  HCN03-ROOM
+           END-IF
       *
            INITIALIZE                      HKNCOMBI-REC
            MOVE    ORCHCN03-HOSPNUM (IDX-M)
