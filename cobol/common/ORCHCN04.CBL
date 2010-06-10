@@ -137,6 +137,9 @@
       *
            03  WRK-ROOM                PIC X(50).
            03  WRK-ROOMNUM-NAME        PIC X(10).
+           03  WRK-BTUNUM              PIC X(02).
+           03  WRK-BRMNUM              PIC X(06).
+      *
            03  WRK-SRYKA               PIC X(02).
            03  WRK-SRYKA-MEI           PIC X(30).
            03  WRK-PAGE                PIC 9(03).
@@ -898,10 +901,22 @@
       *****************************************************************
        20013-BYOTO-HEN-SEC                SECTION.
       *
+      *
+           MOVE    SYU-BYOTONUM        TO  WRK-BTUNUM
+           MOVE    SYU-ROOMNUM (3:)    TO  WRK-BRMNUM
+      *
+      *    Æþ±¡ÍúÎò¸¡º÷½èÍý
+           PERFORM 900-PTNYUINRRK-KEY45-SEL-SEC
+           IF    ( FLG-PTNYUINRRK  =     ZERO )
+               MOVE    PTNYUINRRK-BTUNUM
+                                       TO  WRK-BTUNUM
+               MOVE    PTNYUINRRK-BRMNUM (3:)
+                                       TO  WRK-BRMNUM
+           END-IF
       *    ÉÂÅï¾ðÊó¸¡º÷
            MOVE    SPACE               TO  SYS-5001-REC
            MOVE    "5001"              TO  SYS-5001-KANRICD
-           MOVE    SYU-BYOTONUM        TO  SYS-5001-KBNCD
+           MOVE    WRK-BTUNUM          TO  SYS-5001-KBNCD
            MOVE    SYU-SKYSTYMD        TO  SYS-5001-STYUKYMD
            MOVE    SYU-SKYSTYMD        TO  SYS-5001-EDYUKYMD
       *
@@ -917,7 +932,7 @@
            MOVE    SPACE               TO  WRK-ROOMNUM-NAME
            INITIALIZE                      ORCSBRMNUMAREA
            MOVE    "1"                 TO  SBRMNUM-IN-PROCKBN
-           MOVE    SYU-ROOMNUM(3:6)    TO  SBRMNUM-IN-BRMNUM
+           MOVE    WRK-BRMNUM          TO  SBRMNUM-IN-BRMNUM
            CALL    "ORCSBRMNUM"        USING    ORCSBRMNUMAREA
            IF       SBRMNUM-RC         =   ZERO
       *        Á´³ÑÊÔ½¸½èÍý
@@ -2638,18 +2653,10 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-               IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC TO  PTNYUINRRK-REC
-               ELSE
-                   INITIALIZE              PTNYUINRRK-REC
-                   MOVE    1           TO  FLG-PTNYUINRRK
-               END-IF
+               PERFORM 950-PTNYUINRRK-READ-SEC
            ELSE
-                   INITIALIZE              PTNYUINRRK-REC
-                   MOVE    1           TO  FLG-PTNYUINRRK
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1                   TO  FLG-PTNYUINRRK
            END-IF
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
@@ -2658,6 +2665,58 @@
       *
            .
        900-PTNYUINRRK-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷½èÍý(KEY45)
+      *****************************************************************
+       900-PTNYUINRRK-KEY45-SEL-SEC    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+           INITIALIZE                      PTNYUINRRK-REC
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SYU-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SYU-PTID            TO  PTNYUINRRK-PTID
+           IF     (ORCHCN04-DENPPRTYMD     =   SPACE )
+               MOVE    SYU-DENPPRTYMD      TO  PTNYUINRRK-TENNYUYMD
+           ELSE
+               MOVE    ORCHCN04-DENPPRTYMD TO  PTNYUINRRK-TENNYUYMD
+           END-IF
+      *
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key45"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               PERFORM 950-PTNYUINRRK-READ-SEC
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1                   TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
+           MOVE    "key45"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY45-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷
+      *****************************************************************
+       950-PTNYUINRRK-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+               MOVE    ZERO            TO  FLG-PTNYUINRRK
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       950-PTNYUINRRK-READ-EXT.
            EXIT.
       *****************************************************************
       *    ¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý
