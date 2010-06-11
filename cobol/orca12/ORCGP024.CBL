@@ -1634,18 +1634,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    P02-P024-FTNSELNUM  TO  SPA-GMN24-FTNSELNUM
       *    変更がある時、現在の更新分をパラメタへ
            IF      SPA-GMN24-FTNSELNUM NOT =   SPA-MAE24-FTNSELNUM
-             OR  ((SPA-MAE24-FTNSELNUM NOT =   SPACE   )  AND
-                  (SPA-GMN24-FTNSELNUM     =   SPA-MAE24-FTNSELNUM))
+      *      OR  ((SPA-MAE24-FTNSELNUM NOT =   SPACE   )  AND
+      *           (SPA-GMN24-FTNSELNUM     =   SPA-MAE24-FTNSELNUM))
       *        前回が未選択の時、更新なし
-               IF     (SPA-MAE24-FTNSELNUM     =   ZERO
-                                               OR  SPACE )
-                   CONTINUE
-               ELSE
+      *        IF     (SPA-MAE24-FTNSELNUM     =   ZERO
+      *                                        OR  SPACE )
+      *            CONTINUE
+      *        ELSE
       *
-               PERFORM 410131-KOHFTN-PARA-SEC
-               IF      SPA-ERRCD       NOT =   SPACE
-                   GO      TO      41013-FTNSELNUM-EXT
-               END-IF
+               IF      SPA-NAI24-FTNSELNUM NOT =   ZERO
+                   PERFORM 410131-KOHFTN-PARA-SEC
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       GO      TO      41013-FTNSELNUM-EXT
+                   END-IF
                END-IF
            END-IF
       *
@@ -1657,14 +1658,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-GMN24-FTNMSG2
       *
            MOVE    ZERO                TO  WRK-FTN1-IDX
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-FTN1-MAX
-               IF      SPA-GMN24-FTNSELNUM =   SPA-GMN24-TGMNNUM (IDX)
-                   MOVE    IDX             TO  WRK-FTN1-IDX
-                   MOVE    IDX             TO  SPA-NAI24-FTNSELNUM
-                   MOVE    SPA-FTN1-MAX    TO  IDX
-               END-IF
-           END-PERFORM
+           IF      SPA-GMN24-FTNSELNUM     =   ZERO
+               MOVE    ZERO                TO  SPA-NAI24-FTNSELNUM
+           ELSE
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL       IDX     >   SPA-FTN1-MAX
+                   IF      SPA-GMN24-FTNSELNUM =   SPA-GMN24-TGMNNUM
+                                                                (IDX)
+                       MOVE    IDX             TO  WRK-FTN1-IDX
+                       MOVE    IDX             TO  SPA-NAI24-FTNSELNUM
+                       MOVE    SPA-FTN1-MAX    TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
            IF      WRK-FTN1-IDX        =   ZERO
                IF      SPA-GMN24-FTNSELNUM     =   ZERO
                    MOVE    SPA-GMN24-FTNSELNUM TO  SPA-MAE24-FTNSELNUM
@@ -1672,6 +1678,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "2430"              TO  SPA-ERRCD
                END-IF
                MOVE    30                  TO  SPA-GMN24-CUR
+               MOVE    ZERO                TO  SPA-NAI24-FTNSELNUM
                GO      TO                  41013-FTNSELNUM-EXT
            END-IF
            MOVE    SPA-GMN24-FTNSELNUM TO  SPA-MAE24-FTNSELNUM
