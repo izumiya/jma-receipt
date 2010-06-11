@@ -2744,7 +2744,11 @@
                                                =   "003" ) AND
                               (WRK-COM-CDKBN-KBNNUM-EDA (IDX-ACT)
                                                =   "00"  )  )
-                           MOVE    1               TO  FLG-OK
+      *                    ¸¡ººÅù¼Â»ÜÈ½ÃÇ¥°¥ë¡¼¥×È½Äê
+                           IF     (WRK-COM-KNSJISGRPKBN (IDX-ACT)
+                                                   =   41    )
+                               MOVE    1               TO  FLG-OK
+                           END-IF
                        END-IF
                    ELSE
       *                ºÙË¦¿ÇÃÇÎÁ
@@ -2754,7 +2758,11 @@
                                                =   "003" ) AND
                               (WRK-COM-CDKBN-KBNNUM-EDA (IDX-ACT)
                                                =   "02"  )  )
-                           MOVE    1               TO  FLG-OK
+      *                    ¸¡ººÅù¼Â»ÜÈ½ÃÇ¥°¥ë¡¼¥×È½Äê
+                           IF     (WRK-COM-KNSJISGRPKBN (IDX-ACT)
+                                                       =   42    )
+                               MOVE    1               TO  FLG-OK
+                           END-IF
                        END-IF
                    END-IF
                END-IF
@@ -2989,6 +2997,9 @@
                                                    OR  "002"
                                                    OR  "003"
                                                    OR  "004" )
+      *                    ¸¡ººÅù¼Â»ÜÈ½ÃÇ¥°¥ë¡¼¥×
+                        AND  (TNS-KNSJISGRPKBN     =   41
+                                                   OR  42    )
                            ADD     1               TO  IDX-ACT
                            IF      IDX-ACT         >   100
                                MOVE    100         TO  IDX-ACT
@@ -3651,6 +3662,13 @@
                    ELSE
                        MOVE    WRK-COM-KNSJISGRPKBN (IDX)
                                            TO  WRK-KENIDX
+      *                ÉÂÍý¿ÇÃÇ¡¦¡ÊÁÈ¿¥¿ÇÃÇ¡Ë¡¦¡ÊºÙË¦¿ÇÃÇ¡Ë¤Ï£°£·¤Ø
+                       IF      WRK-COM-KNSJISGRPKBN (IDX)  =   40
+                                                           OR  41
+                                                           OR  42
+                           MOVE    7               TO  WRK-KENIDX
+                       END-IF
+      *
                        ADD     1           TO  WRK-KENSAGRP(WRK-KENIDX)
       *                ÊÝ¸±¡¦²Ê
                        IF      WRK-KEN-SRYKA (WRK-KENIDX)  =   SPACE
@@ -3794,7 +3812,7 @@
       *                ÈùÀ¸Êª³ØÅªÈ½ÃÇÎÁ
                            MOVE    "160062210" TO  WRK-KEN-SRYCD
                                                                 (IDX)
-      *                ÉÂÍý³ØÅª¸¡ºº¿ÇÃÇÎÁ
+      *                ÉÂÍýÈ½ÃÇÎÁ
                        WHEN    07
                            MOVE    "160062310"     TO  WRK-KEN-SRYCD
                                                                 (IDX)
