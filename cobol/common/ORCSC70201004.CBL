@@ -2023,6 +2023,10 @@
                               (IDX-DOJI2   >   ZERO )    OR
                               (WRK-COM-INPUTCD (IDX-S1)  =   SPACE AND
                                WRK-GMN-INPUTCD (IDX-S1)  =   SPACE )
+             IF     (WRK-GMN-INPUTCD (IDX-S1)(1:1)     =   "*" )  OR
+                    (WRK-COM-INPUTCD (IDX-S1)  =   SPACE  )
+               CONTINUE
+             ELSE
       *        Æ±»þÊ»»Ü¤Î¿ÇÃÇÎÁÈ½Äê
                IF      WRK-COM-TNSSRYSYUKBN(IDX-S1)    =   "710"
                    MOVE    IDX-S1              TO  IDX-DOJI1
@@ -2041,6 +2045,7 @@
                                                         OR  "720")
                    MOVE   SPA-MAX-LINE         TO  IDX-S1
                END-IF
+             END-IF
            END-PERFORM
       *
       *    £ØÀþ»£±Æ¤ÇÆ±»þÊ»»Ü¤Î¼Ì¿¿¿ÇÃÇ¤¬¤¢¤ë
