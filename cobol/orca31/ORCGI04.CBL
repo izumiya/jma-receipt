@@ -1477,7 +1477,7 @@
                                         = SYU-NYUIN-RRKNUM )
                    CONTINUE
                ELSE
-                   IF  SYU-DENPPRTYMD  <=  SPA-NAI-I04-TAIINYMD
+                   IF  SYU-SKYEDYMD  <=  SPA-NAI-I04-TAIINYMD
                        IF SYU-SKYMONEY  >   SYU-NYUKIN-TOTAL
                           COMPUTE   SPA-GMN-I04-ZENMISYU-NYU   =
                                     SPA-GMN-I04-ZENMISYU-NYU   +
@@ -5791,7 +5791,7 @@
                                         = SYU-NYUIN-RRKNUM )
                    CONTINUE
                ELSE
-                   IF    ( SYU-DENPPRTYMD <=   SPA-NAI-I04-TAIINYMD )
+                   IF    ( SYU-SKYEDYMD <=   SPA-NAI-I04-TAIINYMD )
                        IF    ( SYU-SKYMONEY    >   SYU-NYUKIN-TOTAL )
                            COMPUTE BFSYU-MAX   =   BFSYU-MAX   +   1
                            MOVE    SYU-DENPNUM TO  BFSYU-DENPNUM
