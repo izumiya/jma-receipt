@@ -15,6 +15,7 @@
             02  HCM03V04-GOKTEN PIC X(18).
             02  HCM03V04-FTNKIN PIC X(18).
             02  HCM03V04-JIHI   PIC X(18).
+            02  HCM03V04-KOUHI  PIC X(18).
             02  HCM03V04-CHOSEI PIC X(18).
             02  HCM03V04-KONSEIKYU  PIC X(18).
             02  HCM03V04-ZENMISYU   PIC X(18).
