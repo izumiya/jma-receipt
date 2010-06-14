@@ -132,6 +132,7 @@
       *
            03  WRK-TOTAL-HKNTEN            PIC S9(11).
            03  WRK-HKNTEKMONEY             PIC S9(11).
+           03  WRK-KOH-FTN                 PIC S9(11).
            03  WRK-GOK-JIHI                PIC S9(11).
            03  WRK-CHOSEI                  PIC S9(11).
       *
@@ -753,6 +754,10 @@
            MOVE    WRK-GOK-JIHI        TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HCM03V04-JIHI
+      *    ∏¯»Ò∞Ï…Ù…È√¥∂‚
+           MOVE    WRK-KOH-FTN         TO  WRK-Z72
+           PERFORM 800-HENKAN-SEC
+           MOVE    WRK-Z72-G           TO  HCM03V04-KOUHI
       *    ƒ¥¿∞∂‚
            MOVE    WRK-CHOSEI          TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
@@ -1167,6 +1172,8 @@
            MOVE    SYU-TOTAL-HKNTEN    TO  WRK-TOTAL-HKNTEN
       *     ›∏±≈¨Õ—∂‚≥€
            MOVE    SYU-HKNTEKMONEY     TO  WRK-HKNTEKMONEY
+      *    ∏¯»Ò∞Ï…Ù…È√¥∂‚
+           MOVE    SYU-KOH-FTN         TO  WRK-KOH-FTN
       *    º´»ÒπÁ∑◊
            COMPUTE WRK-JIHI-TOTAL      =   SYU-JIHI-TOTAL
                                        +   SYU-JIHI-TOTAL-TAX
