@@ -777,10 +777,19 @@
                        ELSE
                            MOVE    2           TO  IDX3
                        END-IF
-                       MOVE    CONST-SKYPRTOUT (IDX1 IDX2 IDX3)
+                       IF    ( ORCHCN03S02-SKYPRT  =   "1" OR "2" )
+                           MOVE    CONST-SKYPRTOUT (IDX1 IDX2 IDX3)
                                            TO  ORCHCN03S02-SKYPRT
-                       MOVE    CONST-SRYPRTOUT (IDX1 IDX2 IDX3)
+                       ELSE
+                           MOVE    "0"     TO  ORCHCN03S02-SKYPRT
+                       END-IF
+                       IF    ( ORCHCN03S02-SRYPRT  =   "1" OR "2" )
+                           MOVE    CONST-SRYPRTOUT (IDX1 IDX2 IDX3)
                                            TO  ORCHCN03S02-SRYPRT
+                       ELSE
+                           MOVE    "0"     TO  ORCHCN03S02-SRYPRT
+                       END-IF
+      *
                    ELSE
                        IF    ( ORCHCN03S02-SKYPRT  =   "2" )
                            IF    ( ORCHCN03-SEIKYU (ORCHCN03S02-IDX)
