@@ -2047,6 +2047,7 @@
            END-IF
            MOVE    SYU-HKNCOMBINUM     TO  HCM34S01-HKNCOMBI
            MOVE    SYU-SYUHKNNUM       TO  HCM34S01-HKNNUM
+           MOVE    "1"                 TO  HCM34S01-SKJFTN
       *
            IF      SYU-SYUHKNNUM       =   "971"
                                        OR  "973"

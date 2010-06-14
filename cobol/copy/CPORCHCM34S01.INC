@@ -63,6 +63,10 @@
                                                OCCURS  31.
       *≥∞«Ò ‘Ω∏•—•ø°º•Û∂Ë ¨
            03  HCM34S01-EXGAIHAKU              PIC X(01).
+      *ø©ªˆ ‘Ω∏•—•ø°º•Û∂Ë ¨
+           03  HCM34S01-EXSYOKUJI              PIC X(01).
+      *…∏Ω‡…È√¥≥€ ‘Ω∏∂Ë ¨
+           03  HCM34S01-SKJFTN                 PIC X(01).
       * ÷µ—π‡Ã‹
            03  HCM34S01-HENKYAKU-AREA.
       *
