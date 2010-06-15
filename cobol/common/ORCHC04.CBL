@@ -843,34 +843,32 @@
       *    負担割合
            MOVE    SPACE               TO  WRK-FUTAN
            MOVE    SPACE               TO  WRK-FUTAN-MEI
-           IF      WRK-HKNCOMBIMEI NOT =   SPACE
-               EVALUATE    PARA-FTNKBN
-                   WHEN    "0"
-                       MOVE    SPACE               TO  WRK-FUTAN
-                   WHEN    "1"
-      *                %　表示
+           EVALUATE    PARA-FTNKBN
+               WHEN    "0"
+                   MOVE    SPACE               TO  WRK-FUTAN
+               WHEN    "1"
+      *             %　表示
+                   MOVE    HZN-SYU-PTFTNRATE   TO  WRK-Z6
+                   MOVE    WRK-Z6              TO  WRK-FUTAN
+                   MOVE    "％"                TO  WRK-FUTAN-MEI
+               WHEN    "2"
+      *            割　表示
+                   IF      HZN-SYU-PTFTNRATE   >   ZERO
+                       COMPUTE WRK-WARI        =   HZN-SYU-PTFTNRATE
+                                               /   10
+                       IF      HZN-SYU-PTFTNRATE(3:1)  =   ZERO
+                           MOVE    WRK-WARI            TO  WRK-Z6
+                           MOVE    WRK-Z6              TO  WRK-FUTAN
+                       ELSE
+                           MOVE    WRK-WARI            TO  WRK-Z62
+                           MOVE    WRK-Z62             TO  WRK-FUTAN
+                       END-IF
+                   ELSE
                        MOVE    HZN-SYU-PTFTNRATE   TO  WRK-Z6
                        MOVE    WRK-Z6              TO  WRK-FUTAN
-                       MOVE    "％"                TO  WRK-FUTAN-MEI
-                   WHEN    "2"
-      *                割　表示
-                       IF      HZN-SYU-PTFTNRATE   >   ZERO
-                           COMPUTE WRK-WARI        =   HZN-SYU-PTFTNRATE
-                                                   /   10
-                           IF      HZN-SYU-PTFTNRATE(3:1)  =   ZERO
-                               MOVE    WRK-WARI            TO  WRK-Z6
-                               MOVE    WRK-Z6              TO  WRK-FUTAN
-                           ELSE
-                               MOVE    WRK-WARI            TO  WRK-Z62
-                               MOVE    WRK-Z62             TO  WRK-FUTAN
-                           END-IF
-                       ELSE
-                           MOVE    HZN-SYU-PTFTNRATE   TO  WRK-Z6
-                           MOVE    WRK-Z6              TO  WRK-FUTAN
-                       END-IF
-                       MOVE    "割"                TO  WRK-FUTAN-MEI
-               END-EVALUATE
-           END-IF
+                   END-IF
+                   MOVE    "割"                TO  WRK-FUTAN-MEI
+           END-EVALUATE
            .
        4001-DB-KENSAKU-EXT.
            EXIT.

@@ -820,35 +820,34 @@
       *    負担割合
            MOVE    SPACE               TO  WRK-HEAD-FUTAN
            MOVE    SPACE               TO  WRK-HEAD-FUTAN-MEI
-           IF      WRK-HKNCOMBIMEI NOT =   SPACE
-               EVALUATE    PARA-FTNKBN
-                   WHEN    "0"
-                       MOVE    SPACE               TO  WRK-HEAD-FUTAN
-                   WHEN    "1"
-      *                %　表示
-                       MOVE    SYU-PTFTNRATE       TO  WRK-Z6
-                       MOVE    WRK-Z6              TO  WRK-HEAD-FUTAN
-                       MOVE    "％"                TO
+      *
+           EVALUATE    PARA-FTNKBN
+               WHEN    "0"
+                   MOVE    SPACE               TO  WRK-HEAD-FUTAN
+               WHEN    "1"
+      *            %　表示
+                   MOVE    SYU-PTFTNRATE       TO  WRK-Z6
+                   MOVE    WRK-Z6              TO  WRK-HEAD-FUTAN
+                   MOVE    "％"                TO
                                                    WRK-HEAD-FUTAN-MEI
-                   WHEN    "2"
-      *                割　表示
-                       IF      SYU-PTFTNRATE       >   ZERO
-                           COMPUTE WRK-WARI        =   SYU-PTFTNRATE
-                                                   /   10
-                           IF      SYU-PTFTNRATE(3:1)      =   ZERO
-                               MOVE    WRK-WARI    TO  WRK-Z6
-                               MOVE    WRK-Z6      TO  WRK-HEAD-FUTAN
-                           ELSE
-                               MOVE    WRK-WARI    TO  WRK-Z62
-                               MOVE    WRK-Z62     TO  WRK-HEAD-FUTAN
-                           END-IF
+               WHEN    "2"
+      *            割　表示
+                   IF      SYU-PTFTNRATE       >   ZERO
+                       COMPUTE WRK-WARI        =   SYU-PTFTNRATE
+                                               /   10
+                       IF      SYU-PTFTNRATE(3:1)      =   ZERO
+                           MOVE    WRK-WARI    TO  WRK-Z6
+                           MOVE    WRK-Z6      TO  WRK-HEAD-FUTAN
                        ELSE
-                           MOVE    SYU-PTFTNRATE   TO  WRK-Z6
-                           MOVE    WRK-Z6          TO  WRK-HEAD-FUTAN
+                           MOVE    WRK-WARI    TO  WRK-Z62
+                           MOVE    WRK-Z62     TO  WRK-HEAD-FUTAN
                        END-IF
-                       MOVE    "割"            TO  WRK-HEAD-FUTAN-MEI
-               END-EVALUATE
-           END-IF
+                   ELSE
+                       MOVE    SYU-PTFTNRATE   TO  WRK-Z6
+                       MOVE    WRK-Z6          TO  WRK-HEAD-FUTAN
+                   END-IF
+                   MOVE    "割"            TO  WRK-HEAD-FUTAN-MEI
+           END-EVALUATE
       *    病棟・病室
            IF      PARA-ROOMKBN        =   "1"
                PERFORM 20013-BYOTO-HEN-SEC
