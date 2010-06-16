@@ -3469,13 +3469,13 @@
       *    入金方法
            MOVE    PTINF-NYUKIN-HOHO   TO  SPA-NYUKIN-HOHO
       *    入金方法
-           IF      PTINF-SKYPRTFLG     =   SPACE
-               MOVE    SPA-SKYPRTFLG-SYS   TO  SPA-SKYPRTFLG
-           ELSE
+      *    IF      PTINF-SKYPRTFLG     =   SPACE
+      *        MOVE    SPA-SKYPRTFLG-SYS   TO  SPA-SKYPRTFLG
+      *    ELSE
                MOVE    PTINF-SKYPRTFLG     TO  SPA-SKYPRTFLG
       *        患者情報を優先
-               MOVE    "P"                 TO  SPA-SKYPRTFLG-SYS
-           END-IF
+      *!       MOVE    "P"                 TO  SPA-SKYPRTFLG-SYS
+      *    END-IF
       *!!
       *    同一患者識別編集
            MOVE    ZERO                TO  SPA-NAI-GRPKBN
