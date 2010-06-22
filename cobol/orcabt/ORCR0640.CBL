@@ -454,6 +454,7 @@
       *                                     ½¸·×ÂÐ±þ
       *  04.05.12    NACL-ÌçÏÆ    10/02/09  ÃÏÊý¸øÈñ¤Î°ìÉôÉéÃ´¶â£°±ßµ­ºÜ
       *                                     ¡Êµ­Ï¿¡Ë¤ÎÀßÄê¹àÌÜÄÉ²ÃÂÐ±þ
+      *  04.05.13    NACL-ÌçÏÆ    10/06/21  ¿©»öÎÅÍÜÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13897,25 +13898,6 @@
                   OR ( SYU-SKJ-FTNKBN(IDX3)  =  "6"            )
       *           OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
                   OR ( SYU-SKJ-RYOYOHI(IDX3) =   ZERO          )
-                    IF  (SYU-SKJ-RYOYOHI(IDX3) NOT =  ZERO)
-                    AND (SYU-SKJ-FTN(IDX3)         =  ZERO)
-                    AND (SYU-SKJ-FTN-RECE(IDX3)    =  ZERO)
-                     ADD   SYU-SKJ-NISSU(IDX3)    TO
-                                   RECE62-SHOKUJINISSU(KH-IDX)
-                     ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
-                                   RECE62-SHOKUJIRYOYOHI(KH-IDX)
-                     MOVE  SPACE                  TO
-                                 RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
-                     IF   RECE62-SRYYM    >=  "200610"
-                     AND  FLG-TOKUSYU-SKJ  =   ZERO
-                        MOVE  SPACE               TO
-                                RECE62-FUKUSHIFLG-SKJIPA(KH-IDX - 1)
-                        MOVE  SPACE               TO
-                                RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
-                     END-IF
-                     ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
-                                   RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
-                    ELSE
       *              IF   RECE62-SHOKUJINISSU(KH-IDX)  =  ZERO
                      IF   RECE62-SHOKUJIRYOYOHI(KH-IDX) =  ZERO
                          MOVE    "1"      TO
@@ -13930,7 +13912,6 @@
                      END-IF
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
-                    END-IF
                   ELSE
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
                                    RECE62-SHOKUJINISSU(KH-IDX)
@@ -13958,25 +13939,6 @@
                        (SYU-KOH4HKNNUM      =   SPACE    ) AND
                        (RECE62-KOHNUM(KH-IDX - 1) = "010") AND
                        (KH-IDX              =   2        ))
-                   IF  (SYU-SKJ-RYOYOHI(IDX3) NOT =  ZERO)
-                   AND (SYU-SKJ-FTN(IDX3)         =  ZERO)
-                   AND (SYU-SKJ-FTN-RECE(IDX3)    =  ZERO)
-                     ADD   SYU-SKJ-NISSU(IDX3)    TO
-                                   RECE62-SHOKUJINISSU(KH-IDX)
-                     ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
-                                   RECE62-SHOKUJIRYOYOHI(KH-IDX)
-                     MOVE  SPACE                  TO
-                                   RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
-                     IF   RECE62-SRYYM    >=  "200610"
-                     AND  FLG-TOKUSYU-SKJ  =   ZERO
-                        MOVE  SPACE               TO
-                                RECE62-FUKUSHIFLG-SKJIPA(KH-IDX - 1)
-                        MOVE  SPACE               TO
-                                RECE62-FUKUSHIFLG-SKJSEI(KH-IDX - 1)
-                     END-IF
-                     ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
-                                   RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
-                   ELSE
                      IF   RECE62-SHOKUJIRYOYOHI(KH-IDX) =  ZERO
                          MOVE    "1"      TO
                                  RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
@@ -13990,7 +13952,6 @@
                      END-IF
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
-                   END-IF
                   ELSE
                    IF   ((SYU-KOH1HKNNUM  NOT =
                           "010" AND "038" AND "024" AND "079" AND
