@@ -2142,6 +2142,12 @@
       *    ºÞ²ó¿ô
            MOVE    HCM34S01-ZAIKAISU(IDX)  TO  TBL-KAISU
       *    ¶â³Û
+      *    ¼¼ÎÁº¹³Û¤Ï¼«Èñ
+           IF      HCM34S01-ZAISKBKBN(IDX) =   "3"
+               MOVE    "95"                    TO  TBL-SRYKBN
+               MOVE    HCM34S01-ZAITEN (IDX)   TO  TBL-JIHIMONEY(1)
+               MOVE    ZERO                    TO  TBL-ZAITENSU
+           END-IF
       *    ¿©»ö¡¦¼¼ÎÁº¹³Û¤Ï¶â³Û
            IF      HCM34S01-ZAISKBKBN(IDX) =   "4"
                                            OR  "3"
