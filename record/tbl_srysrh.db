@@ -218,7 +218,7 @@ path	ins2 	{
        AND A.SRYYM    >= :STSRYYM
        AND A.SRYYM    <= :EDSRYYM
        AND A.HOSPNUM   = B.HOSPNUM
-       AND A.PTID      = B.PTID
+       AND A.PTID      = cast(B.PTID as bigint)
        AND A.NYUGAIKBN = B.NYUGAIKBN
        AND A.SRYKA     = B.SRYKA
        AND B.SRYYMD   >= :STSRYYMD
@@ -472,7 +472,7 @@ path	ins4 	{
        AND A.SRYYM    >= :STSRYYM
        AND A.SRYYM    <= :EDSRYYM
        AND A.HOSPNUM   = B.HOSPNUM
-       AND A.PTID      = B.PTID
+       AND A.PTID      = cast(B.PTID as bigint)
        AND A.NYUGAIKBN = B.NYUGAIKBN
        AND A.SRYKA     = B.SRYKA
        AND B.SRYYMD   >= :STSRYYMD
