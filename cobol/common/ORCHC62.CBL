@@ -746,18 +746,17 @@
        410-HEAD-SET-SEC            SECTION.
       *
            COMPUTE CNT-PAGE    =   CNT-PAGE    +   1
-      *
            MOVE    CNT-PAGE        TO  WRK-ZZ9
-      *
-           MOVE    SPACE           TO  WRK-HENNAIYO
-           STRING  WRK-ZZ9         DELIMITED  BY  SIZE
-                   " ÊÇ"           DELIMITED  BY  SIZE
-                   INTO            WRK-HENNAIYO
-           END-STRING
       *
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
            MOVE    WRK-LINE-1      TO  HCM62-NAIYO1(CNT-LINE)
-           MOVE    WRK-HENNAIYO    TO  HCM62-NAIYO2(CNT-LINE)
+      *
+           MOVE    SPACE           TO  HCM62-NAIYO2(CNT-LINE)
+           STRING  WRK-ZZ9         DELIMITED  BY  SIZE
+                   " ÊÇ"           DELIMITED  BY  SIZE
+                   INTO            HCM62-NAIYO2(CNT-LINE)
+           END-STRING
+      *
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
            MOVE    WRK-LINE-2      TO  HCM62-NAIYO1(CNT-LINE)
       *

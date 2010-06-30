@@ -856,24 +856,24 @@
       *****************************************************************
        410-HEAD-SET-SEC            SECTION.
       *
-           COMPUTE CNT-PAGE        =   CNT-PAGE    +   1
-      *
+           COMPUTE CNT-PAGE    =   CNT-PAGE    +   1
            MOVE    CNT-PAGE        TO  WRK-ZZ9
       *
-           MOVE    SPACE           TO  WRK-HENNAIYO
+           COMPUTE CNT-LINE    =   CNT-LINE    +   1
+           MOVE    WRK-LINE-1      TO  HCM62-NAIYO1(CNT-LINE)
+      *
+           MOVE    SPACE           TO  HCM62-NAIYO2(CNT-LINE)
            STRING  WRK-ZZ9         DELIMITED  BY  SIZE
                    " ÊÇ"           DELIMITED  BY  SIZE
-                   INTO            WRK-HENNAIYO
+                   INTO            HCM62-NAIYO2(CNT-LINE)
            END-STRING
       *
-           COMPUTE CNT-LINE        =   CNT-LINE    +   1
-           MOVE    WRK-LINE-1      TO  HCM62-NAIYO1(CNT-LINE)
-           MOVE    WRK-HENNAIYO    TO  HCM62-NAIYO2(CNT-LINE)
       *    ÉÂÅï¡¦ÉÂ¼¼
-           COMPUTE CNT-LINE        =   CNT-LINE    +   1
+           COMPUTE CNT-LINE    =   CNT-LINE    +   1
            MOVE    WRK-LINE-2      TO  HCM62-NAIYO1(CNT-LINE)
+      *
       *    ½èÊýÆü¡¦ÊÝ¸±°å
-           COMPUTE CNT-LINE        =   CNT-LINE    +   1
+           COMPUTE CNT-LINE    =   CNT-LINE    +   1
            MOVE    WRK-LINE-3      TO  HCM62-NAIYO1(CNT-LINE)
       *
            MOVE    WRK-LINE-SEN    TO  HCM62-SEN(CNT-LINE)
