@@ -125,6 +125,7 @@
       *                                     を表示しないようにする
       *
       *  04.04.01    NACL-藤原    09/03/05  プリンタの初期設定
+      *  04.04.02    NACL-藤原    10/07/01  印刷順の設定による画面表示の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1655,8 +1656,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "04"            ALSO    "10"    ALSO    ANY
                        MOVE    3                   TO  SPA-GMN-PAGE-MAX
                    WHEN    "03"            ALSO    "03"    ALSO    "03"
-                   WHEN    "04"            ALSO    "03"    ALSO    "04"
                    WHEN    "03"            ALSO    "04"    ALSO    "03"
+                   WHEN    "03"            ALSO    "03"    ALSO    "04"
+                   WHEN    "03"            ALSO    "04"    ALSO    "04"
+                   WHEN    "04"            ALSO    "03"    ALSO    "03"
+                   WHEN    "04"            ALSO    "04"    ALSO    "03"
+                   WHEN    "04"            ALSO    "03"    ALSO    "04"
                    WHEN    "04"            ALSO    "04"    ALSO    "04"
                        MOVE    1                   TO  SPA-GMN-PAGE-MAX
                    WHEN    "03"            ALSO    ANY    ALSO     ANY
