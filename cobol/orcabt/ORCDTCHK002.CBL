@@ -3024,7 +3024,7 @@
                        MOVE    DCACCT-ZAIKAISU
                                    TO  TSRYCD-YKZKAISU (TSRYCD-MAX)
                    END-IF
-                   COMPUTE TSRYCD-SURYOTOTAL (IDX0)
+                   COMPUTE TSRYCD-SURYOTOTAL (TSRYCD-MAX)
                        =   DCSRY-SURYO *   DCACCT-ZAIKAISU
       *
                    PERFORM VARYING IDX-KANRIRYO FROM   1   BY  1
@@ -3056,8 +3056,8 @@
                    +   DCACCT-ZAIKAISU
       *
                IF    ( DCACCT-SRYKBN(1:1)  =   "2" OR "3" )
-                   COMPUTE TSRYCD-YKZKAISU (TSRYCD-MAX)
-                       =   TSRYCD-YKZKAISU (TSRYCD-MAX)
+                   COMPUTE TSRYCD-YKZKAISU (IDX0)
+                       =   TSRYCD-YKZKAISU (IDX0)
                        +   DCACCT-ZAIKAISU
                END-IF
       *
