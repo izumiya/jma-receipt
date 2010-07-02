@@ -89,6 +89,8 @@
       *
            03  FLG-GAZO-ARI        PIC 9(01).
       *
+           03  FLG-OUT-OK          PIC 9(01).
+      *
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1896,6 +1898,13 @@
                IF      ACCT-ZAIKBN             =   1
                    MOVE    ZERO                TO  FLG-ZAIARI
                END-IF
+      *        ²Ê¡¦ÊÝ¸±È½Äê
+               IF     (ACCT-SRYKA         =   SPA-SRYKA       ) AND
+                      (ACCT-HKNCOMBI      =   SPA-HKNCOMBINUM )
+                   MOVE    1                  TO  FLG-OUT-OK
+               ELSE
+                   MOVE    ZERO               TO  FLG-OUT-OK
+               END-IF
       *
       *        ²ó¿ô¤¬¤¢¤ë¤â¤Î
                IF      FLG-ZAIARI          =   1
@@ -1945,6 +1954,8 @@
            MOVE    ZERO                TO  WRK-GOK-RYOU
            MOVE    SPACE               TO  WRK-TEN-SRYCD
            MOVE    SPACE               TO  WRK-TEN-SRYCD1
+           MOVE    SPACE               TO  WRK-TEN-SRYCD2
+           MOVE    SPACE               TO  WRK-TEN-SRYCD3
            MOVE    ZERO                TO  FLG-MADOKU
            MOVE    ZERO                TO  FLG-SEIBUTU
            MOVE    SRY-SRYSYUKBN       TO  WRK-SRYSYUKBN
@@ -2063,27 +2074,39 @@
                                                                  (IDY)
                        END-IF
                    END-IF
-      *            À¸Êª³ØÅªÀ½ºÞ¶èÊ¬
-                   IF      FLG-SEIBUTU         =   1
-                     IF      WRK-SRYSYUKBN       =   "330"
-                       MOVE    1               TO  TBL-SEIBUTU (IDY)
-                     ELSE
-                       MOVE    1               TO  TBL-SEIBUTU-2(IDY)
-                     END-IF
-                   END-IF
+      *
+      *            À¸Êª³ØÅªÀ½ºÞ
                    IF      WRK-TEN-SRYCD2  NOT =   SPACE
                        MOVE    WRK-TEN-SRYCD2  TO  TBL-SEIBUTU-ARI(IDY)
                    END-IF
-      *            ËãÆÇ
-                   IF      FLG-MADOKU          =   1
-                     IF      WRK-SRYSYUKBN       =   "330"
-                       MOVE    1               TO  TBL-MADOKU (IDY)
-                     ELSE
-                       MOVE    1               TO  TBL-MADOKU-2(IDY)
-                     END-IF
-                   END-IF
+      *            ËãÌôÃí¼Í
                    IF      WRK-TEN-SRYCD3  NOT =   SPACE
                        MOVE    WRK-TEN-SRYCD3  TO  TBL-MADOKU-ARI(IDY)
+                   END-IF
+      *
+      *            ÄûÀµ¤Ïº£²óÆþÎÏÊ¬¤Î¤ß
+                   IF     ((LNK-ORCSC-SYORIFLG =   "1" )
+                      AND  (TBL-DAY  (IDY)     =   ZERO))
+                     OR   ( FLG-OUT-OK         =   ZERO )
+                       CONTINUE
+                   ELSE
+      *              À¸Êª³ØÅªÀ½ºÞ¶èÊ¬
+                     IF     (FLG-SEIBUTU         =   1 )
+                       IF      WRK-SRYSYUKBN       =   "330"
+                           MOVE    1           TO  TBL-SEIBUTU (IDY)
+                       ELSE
+                           MOVE    1           TO  TBL-SEIBUTU-2(IDY)
+                       END-IF
+                     END-IF
+      *              ËãÆÇ
+                     IF     (FLG-MADOKU          =   1 )
+                       IF      WRK-SRYSYUKBN       =   "330"
+                           MOVE    1               TO  TBL-MADOKU (IDY)
+                       ELSE
+                           MOVE    1               TO  TBL-MADOKU-2(IDY)
+                        END-IF
+                     END-IF
+      *
                    END-IF
                END-IF
            END-PERFORM

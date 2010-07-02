@@ -1955,6 +1955,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    訂正で科・保険組合せ変更がない時、前の同日連番
            IF     (SPA-SYORIFLG        =   1  )  AND
                   (SPA-SRYKA           =   SPA-OLD-SRYKA )
+      *         訂正日のみ
+           AND    (SPA-SRYYMD          =   WRK-SRYYMD    )
       *        同じ保険組合せがない時、訂正前の連番
                IF      FLG-OK              =   ZERO
                    MOVE    SPA-DOUJI-RENNUM
