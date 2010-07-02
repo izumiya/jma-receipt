@@ -2535,6 +2535,9 @@
       *                  KSN3：看護配置加算２
       *                  KSN6：夜間看護配置加算１
       *                  KSN5：夜間看護配置加算２
+      *                  KSN13:一般病棟看護必要度評価加算
+      *                  KSN16:一般病棟看護必要度評価加算（特定機能病院）
+      *                  KSN17:一般病棟看護必要度評価加算（専門病院）
       *                  KSN14:救急・在宅等支援療養病床初期加算
       *                  KSN18:有床診療所一般病床初期加算
       *                  KSN19:救急・在宅等支援療養病床初期加算
@@ -2544,7 +2547,10 @@
                                                   OR CONS-200804-KSN4
                                                   OR CONS-200804-KSN3
                                                   OR CONS-200804-KSN6
-                                                  OR CONS-200804-KSN5 )
+                                                  OR CONS-200804-KSN5
+                                                  OR CONS-201004-KSN13
+                                                  OR CONS-201004-KSN16
+                                                  OR CONS-201004-KSN17)
       ***                                         OR CONS-201004-KSN14
       ***                                         OR CONS-201004-KSN18
       ***                                         OR CONS-201004-KSN19)
@@ -2573,6 +2579,15 @@
                              WHEN  CONS-200804-KSN5
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-200804-KSN5(IDX1)
+                             WHEN  CONS-201004-KSN13
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201004-KSN13(IDX1)
+                             WHEN  CONS-201004-KSN16
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201004-KSN16(IDX1)
+                             WHEN  CONS-201004-KSN17
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201004-KSN17(IDX1)
       *                      救急・在宅等支援療養病床初期加算
       ***                    WHEN  CONS-201004-KSN14
       ***                         MOVE   NACCT-DAY(IDX1)
@@ -2676,10 +2691,7 @@
       *                     KSN8：褥瘡評価実施加算（療養病棟）
       *                     KSN9：褥瘡評価実施加算（有床診療所）
       *                     KSN11:重症児（者）受入連携加算（障害者施設等入院基本料）
-      *                     KSN13:一般病棟看護必要度評価加算
       *                     KSN15:重度認知症加算（精神病棟入院基本料）
-      *                     KSN16:一般病棟看護必要度評価加算（特定機能病院）
-      *                     KSN17:一般病棟看護必要度評価加算（専門病院）
       *                     −−以下、入院会計と診療会計から取得する加算−−
       *                     KSN1：夜間緊急体制確保加算
       *                     KSN12:医師配置加算１
@@ -2688,6 +2700,9 @@
       *                     KSN3：看護配置加算２
       *                     KSN6：夜間看護配置加算１
       *                     KSN5：夜間看護配置加算２
+      *                     KSN13:一般病棟看護必要度評価加算
+      *                     KSN16:一般病棟看護必要度評価加算（特定機能病院）
+      *                     KSN17:一般病棟看護必要度評価加算（専門病院）
       *                     KSN14:救急・在宅等支援療養病床初期加算
       *                     KSN18:有床診療所一般病床初期加算
       *                     KSN19:救急・在宅等支援療養病床初期加算
@@ -2766,20 +2781,26 @@
                                         TO  WRK-201004-KSN11(IDX1)
       *                         一般病棟看護必要度評価加算
                                 WHEN  CONS-201004-KSN13
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN13(IDX1)
+                                  END-IF
       *                         重度認知症加算（精神病棟入院基本料）
                                 WHEN  CONS-201004-KSN15
                                   MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN15(IDX1)
       *                         一般病棟看護必要度評価加算（特定機能病院）
                                 WHEN  CONS-201004-KSN16
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN16(IDX1)
+                                  END-IF
       *                         一般病棟看護必要度評価加算（専門病院）
                                 WHEN  CONS-201004-KSN17
-                                  MOVE   ACCT-DAY(1 IDX1)
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN17(IDX1)
+                                  END-IF
       *                         夜間緊急体制確保加算
                                 WHEN  CONS-200804-KSN1
                                   IF  ACCT-DAY(1 IDX1)   NOT = ZERO
