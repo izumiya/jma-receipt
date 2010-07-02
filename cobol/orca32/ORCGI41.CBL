@@ -7340,6 +7340,23 @@
                                    MOVE   SYS-5001-KSNCD(IDX7) TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
+      *                      ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª
+                             WHEN    "190131570"
+      *                            ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª
+                                   IF SYOKIKSN-IN-KHNSRYCD = "190077410"
+                                     MOVE   "190131570"  TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
+      *                            ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª° ∆√ƒÍµ°«Ω…¬±°°À
+                                   IF SYOKIKSN-IN-KHNSRYCD = "190085910"
+                                     MOVE   "190134870"  TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
+      *                            ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª° ¿ÏÃÁ…¬±°°À
+                                   IF SYOKIKSN-IN-KHNSRYCD = "190090210"
+                                     MOVE   "190134970"  TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
                              WHEN   OTHER
                                 ADD    1                TO  IDX8
                                 MOVE   SYS-5001-KSNCD(IDX7) TO
