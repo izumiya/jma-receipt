@@ -1409,7 +1409,7 @@
            MOVE    WRK-HEN-SRYCD       TO  SANTEI-SRYCD
            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
            MOVE    ZERO                TO  SANTEI-SRYKA
-           IF      SPA-HKNKBN          =   1
+           IF      SPA-HKNKBN      NOT =   ZERO
       *        ÊÝ¸±Ëè¤ÎÅÐÏ¿
                MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
            ELSE
