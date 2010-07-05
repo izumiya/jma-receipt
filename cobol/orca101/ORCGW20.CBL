@@ -166,6 +166,7 @@
            03  WRK-KBN1-G.
                05  WRK-KBN1                        PIC 9(01).
            03  WRK-TEN                             PIC 9(05).
+           03  WRK-HYOUKACD                        PIC X(09).
       *
        01  WRK-ROW.
            03  WRK-BTULST-ROW                      PIC S9(9)   BINARY.
@@ -187,7 +188,7 @@
            03  CONST-SBT-MAX           PIC 9(03) VALUE 15.
            03  CONST-YKNKNG-MAX        PIC 9(03) VALUE 10.
            03  CONST-KHNRYO-MAX        PIC 9(03) VALUE 50.
-           03  CONST-KSN-MAX           PIC 9(03) VALUE 21.
+           03  CONST-KSN-MAX           PIC 9(03) VALUE 22.
            03  CONST-GKSN-MAX          PIC 9(03) VALUE 14.
            03  CONST-YKNKNGCD-VAL.
                05                      PIC X(09) VALUE "190109870".
@@ -266,6 +267,9 @@
            03  CONST-YKNHICH1-H2204    PIC X(09) VALUE "190126770".
            03  CONST-YKNHICH2-H2204    PIC X(09) VALUE "190126670".
            03  CONST-SEICHIIKI         PIC X(09) VALUE "190127810".
+           03  CONST-HYOUKA            PIC X(09) VALUE "190131570".
+           03  CONST-HYOUKA-TOK        PIC X(09) VALUE "190134870".
+           03  CONST-HYOUKA-SEN        PIC X(09) VALUE "190134970".
            03  CONST-KNGHJOCD-MAX      PIC 9(03) VALUE 15.
            03  CONST-5001-KSN-MAX      PIC 9(03) VALUE 14.
            03  CONST-H180401           PIC X(08) VALUE "20060401".
@@ -790,6 +794,9 @@
       *    °å»ÕÇÛÃÖ²Ã»»£²
            PERFORM 3101-CMB-DRTEK2-SET-SEC
       *
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»
+           PERFORM 3101-CMB-HYOUKA-SET-SEC
+      *
            .
        31013-CMB-KSN-SYOKI-EXT.
            EXIT.
@@ -1061,6 +1068,20 @@
       *
            .
        3101-CMB-DRHJO-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»¥³¥ó¥Ü½é´ü½èÍý
+      *****************************************************************
+       3101-CMB-HYOUKA-SET-SEC         SECTION.
+      *
+           MOVE    "1"             TO  SPA-GMN-W20-HYOUKAL(1)
+           MOVE    "»»Äê¤·¤Ê¤¤"    TO  SPA-GMN-W20-HYOUKAMEIL(1)
+           MOVE    "2"             TO  SPA-GMN-W20-HYOUKAL(2)
+           MOVE    "»»Äê¤¹¤ë"      TO  SPA-GMN-W20-HYOUKAMEIL(2)
+           MOVE    2               TO  SPA-GMN-W20-HYOUKA-MAX
+      *
+           .
+       3101-CMB-HYOUKA-SET-EXT.
            EXIT.
       *****************************************************************
       *    ½Å¾É´µ¼Ô²óÉüÉÂÅï²Ã»»¥³¥ó¥Ü½é´ü½èÍý
@@ -1963,6 +1984,8 @@
                    PERFORM 4101-KYUKNGHJ1-CHK-SEC
                WHEN    CONST-KYUKNGHJ2
                    PERFORM 4101-KYUKNGHJ2-CHK-SEC
+               WHEN    CONST-HYOUKA
+                   PERFORM 4101-HYOUKA-CHK-SEC
                END-EVALUATE
       *
            END-IF
@@ -2957,6 +2980,13 @@
            IF    ( SPA-GMN-W20-SEICHIIKI     =  "2" )
                MOVE    SPA-GMN-W20-SEICHIIKI TO  WRK-KBN1-G
                MOVE    CONST-SEICHIIKI       TO  WRK-KSNCD
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H220401 )
+               MOVE    SPA-GMN-W20-HYOUKA    TO  WRK-KBN1-G
+               MOVE    CONST-HYOUKA          TO  WRK-KSNCD
                PERFORM 420121-BTU-KSN-EDIT-SEC
            END-IF
       *
@@ -4085,6 +4115,24 @@
        4101-SEICHIIKI-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»
+      *****************************************************************
+       4101-HYOUKA-CHK-SEC                 SECTION.
+      *
+           MOVE    SPA-GMN-W20-HYOUKA   TO  WRK-CMB-CD
+           PERFORM 4200-HYOUKALST-CHK-SEC
+           IF    ( WRK-CMB-CD      =   SPACE )
+               MOVE    SPA-GMN-W20-HYOUKALST (1)
+                                   TO  SPA-GMN-W20-HYOUKA-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-HYOUKA-G
+           END-IF
+      *
+           .
+      *
+       4101-HYOUKA-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    ´ð½àÆü
       *****************************************************************
        4100-KJNYMD-CHK-SEC             SECTION.
@@ -4621,6 +4669,10 @@
       *                MOVE    "2"         TO  WRK-CMB-CD
       *                PERFORM 4200-SEICHIIKILST-CHK-SEC
       *                MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-SEICHIIKI-G
+                    WHEN    CONST-HYOUKA
+                        MOVE    "2"         TO  WRK-CMB-CD
+                        PERFORM 4200-HYOUKALST-CHK-SEC
+                        MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-HYOUKA-G
                    END-EVALUATE
                END-IF
       *
@@ -4630,7 +4682,7 @@
        41004-KSN-EDIT-EXT.
            EXIT.
       *****************************************************************
-      *    ÉÂÅïÊÌÀßÄê²Ã»»ÀßÄê½èÍý(H20.4¡Á)
+      *    ÉÂÅïÊÌÀßÄê²Ã»»ÀßÄê½èÍý(H20.4¡ÁH22.3)
       *****************************************************************
        41003-KSN-EDIT-SEC               SECTION.
       *
@@ -4955,6 +5007,9 @@
       *                                     TO SPA-GMN-W20-SEICHIIKI-LBL
       *        MOVE    CONST-SEICHIIKI      TO SPA-NAI-W20-SEICHIIKI-CD
       *
+               MOVE    "°ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»"
+                                            TO SPA-GMN-W20-HYOUKA-LBL
+               MOVE    CONST-HYOUKA         TO SPA-NAI-W20-HYOUKA-CD
            WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H200401 )
       *
                MOVE    "¿©Æ²²Ã»»"          TO  SPA-GMN-W20-SYOKUDO-LBL
@@ -5456,6 +5511,10 @@
                        IF    ( SPA-GMN-W20-SEICHIIKI    =   "2" )
                            MOVE    CONST-SEICHIIKI  TO  WRK-KSNCD
                        END-IF
+                   WHEN    CONST-HYOUKA
+                       IF    ( SPA-GMN-W20-HYOUKA   =   "2" )
+                           MOVE    CONST-HYOUKA     TO  WRK-KSNCD
+                       END-IF
                    END-EVALUATE
       *
                    IF    ( WRK-KSNCD       NOT =   SPACE )
@@ -5501,7 +5560,24 @@
                                        WRK-KSNKSNKBN
                                        CNT-NYUKSNKBNCHK
       *
-           DISPLAY "SPA-NAI-W20-KHNSRYCD  =" SPA-NAI-W20-KHNSRYCD 
+           IF    ( WRK-KSNCD       =   CONST-HYOUKA )
+               IF    ( SPA-GMN-W20-SBT =   "06" )
+                   MOVE    CONST-HYOUKA-SEN
+                                           TO  WRK-KSNCD
+               ELSE
+                   MOVE    SPA-NAI-W20-KHNSRYCD
+                                           TO  WRK-TNS-SRYCD
+                   MOVE    SPA-NAI-W20-YUKOSTYMD
+                                           TO  WRK-TNS-KJNYMD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( TNS-CDKBN-KBN   =   "A" )
+                       IF    ( TNS-CDKBN-KBNNUM    =   104 )
+                           MOVE    CONST-HYOUKA-TOK
+                                           TO  WRK-KSNCD
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
       *
            IF    ( SPA-NAI-W20-KHNSRYCD    NOT =   SPACE )
                EVALUATE    SPA-NAI-W20-KHNSRYCD
@@ -5517,7 +5593,8 @@
                END-EVALUATE
                MOVE    SPA-NAI-W20-YUKOSTYMD   TO  WRK-TNS-KJNYMD
                PERFORM 900-TENSU-KEY-SEL-SEC
-               MOVE    TNS-NYUKHNKSNKBN        TO WRK-NYUKSNKBN (1)
+               MOVE    TNS-NYUKHNKSNKBN        TO  WRK-NYUKSNKBN (1)
+      *
            END-IF
       *
            IF    ( SPA-GMN-W20-TOKNYUIN    NOT =   SPACE )
@@ -6323,6 +6400,33 @@
       *
            .
        4200-SEICHIIKILST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4200-HYOUKALST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-HYOUKA-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W20-HYOUKAL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-HYOUKALST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-HYOUKALST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-HYOUKALST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ¥ì¥»¥×¥ÈÉ½¼¨¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
