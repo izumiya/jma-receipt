@@ -6277,6 +6277,7 @@
                    MOVE    WRK-SPA-PTID    TO  ORCHCN04-PTID
                    MOVE    WRK-SPA-PTNUM   TO  ORCHCN04-PTNUM
                    MOVE    WRK-SPA-NAME    TO  ORCHCN04-NAME
+                   MOVE    CNT-SRYPRT-PAGE TO  ORCHCN04-PAGE-CNT
                    MOVE    WKSYU-DENPNUM   TO  ORCHCN04-DENPNUM (1)
                    MOVE    "02"            TO  WRK-SPA-PRT-FLG
                    CALL    WRK-PRINT-PG    USING
