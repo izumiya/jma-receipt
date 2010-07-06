@@ -38,6 +38,10 @@
                    07  SPA-GMN-RIYOUKBNF       PIC X(01).
                    07  SPA-GMN-RIYOUKBNMEI     PIC X(20).
                05  SPA-GMN-SKYYM               PIC X(10).
+               05  SPA-GMN-TEISYUTUBIKBN-G.
+                   07  SPA-GMN-TEISYUTUBIKBN   PIC X(01).
+                   07  SPA-GMN-TEISYUTUBIKBNF  PIC X(01).
+                   07  SPA-GMN-TEISYUTUBIKBNMEI PIC X(20).
                05  SPA-GMN-SKYKBN-G.
                    07  SPA-GMN-SKYKBN          PIC X(01).
                    07  SPA-GMN-SKYKBNF         PIC X(01).
@@ -82,6 +86,12 @@
                            11  SPA-GMN-RIYOUKBNL       PIC X(01).
                            11  SPA-GMN-RIYOUKBNFL      PIC X(01).
                            11  SPA-GMN-RIYOUKBNMEIL    PIC X(20).
+                   07  SPA-GMN-TEISYUTUBIKBNLST-G.
+                       09  SPA-GMN-TEISYUTUBIKBN-MAX        PIC 9(03).
+                       09  SPA-GMN-TEISYUTUBIKBNLST OCCURS 5.
+                           11  SPA-GMN-TEISYUTUBIKBNL         PIC X(01).
+                           11  SPA-GMN-TEISYUTUBIKBNFL        PIC X(01).
+                           11  SPA-GMN-TEISYUTUBIKBNMEIL      PIC X(20).
                    07  SPA-GMN-SKYKBNLST-G.
                        09  SPA-GMN-SKYKBN-MAX        PIC 9(03).
                        09  SPA-GMN-SKYKBNLST OCCURS 5.

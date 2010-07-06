@@ -35,6 +35,12 @@
                 04  I07-RIYOUKBN-ITEM      PIC X(22)   OCCURS  5 TIMES.
               03  I07-SKYYM                PIC X(10).
               03  I07-SKYYM-STATE          PIC S9(9)   BINARY.
+              03  I07-CMB-TEISYUTUBIKBN.
+                04  I07-TEISYUTUBIKBN       PIC X(22).
+                04  I07-TEISYUTUBIKBN-STATE PIC S9(9)   BINARY.
+                04  I07-TEISYUTUBIKBN-COUNT PIC S9(9)   BINARY.
+                04  I07-TEISYUTUBIKBN-ITEM  PIC X(22)   OCCURS  5 TIMES.
+                04  I07-TEISYUTUBIKBN-ITEM-STATE  PIC S9(9)   BINARY.
               03  I07-CMB-SKYKBN.
                 04  I07-SKYKBN             PIC X(22).
                 04  I07-SKYKBN-STATE       PIC S9(9)   BINARY.

@@ -88,6 +88,9 @@
            03  WRK-NINPUFTN-MONEY          PIC 9(10).
            03  WRK-CREYMD                  PIC X(08).
            03  WRK-KYUSEINAME              PIC X(100).
+           03  WRK-SKYYMD.
+               05  WRK-SKYYM               PIC X(06).
+               05  WRK-SKYDD               PIC X(02).
       *
       *
        01  CONST-AREA.
@@ -344,6 +347,16 @@
                                        TO  SPA-GMN-SKYYM
            END-IF
       *
+           MOVE    BUNBEN-TEISYUTUBIKBN       TO  WRK-CMB-CD
+           PERFORM 4200-TEISYUTUBIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TEISYUTUBIKBN-G
+           IF    ( SPA-GMN-TEISYUTUBIKBN-G    =   SPACE )
+               IF    ( SPA-GMN-RIYOUKBN       =   "1" )
+                   MOVE    SPA-GMN-TEISYUTUBIKBNLST (1)
+                                       TO  SPA-GMN-TEISYUTUBIKBN-G
+               END-IF
+           END-IF
+      *
            MOVE    BUNBEN-SKYKBN       TO  WRK-CMB-CD
            PERFORM 4200-SKYKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-SKYKBN-G
@@ -528,6 +541,9 @@
       *    直接支払制度利用区分
            PERFORM 3101-RIYOUKBNLST-SEC
       *
+      *    提出日区分
+           PERFORM 3101-TEISYUTUBIKBNLST-SEC
+      *
       *    請求区分
            PERFORM 3101-SKYKBNLST-SEC
       *
@@ -561,6 +577,22 @@
       *
            .
        3101-RIYOUKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    提出日区分コンボ初期処理
+      *****************************************************************
+       3101-TEISYUTUBIKBNLST-SEC       SECTION.
+      *
+           INITIALIZE                  SPA-GMN-TEISYUTUBIKBNLST-G
+           MOVE    "1"             TO  SPA-GMN-TEISYUTUBIKBNL   (1)
+           MOVE    "１０日請求"    TO  SPA-GMN-TEISYUTUBIKBNMEIL(1)
+           MOVE    "2"             TO  SPA-GMN-TEISYUTUBIKBNL   (2)
+           MOVE    "２５日請求"    TO  SPA-GMN-TEISYUTUBIKBNMEIL(2)
+      *
+           MOVE    2               TO  SPA-GMN-TEISYUTUBIKBN-MAX
+      *
+           .
+       3101-TEISYUTUBIKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    請求区分コンボ初期処理
@@ -774,6 +806,7 @@
       *
            MOVE    I07-RIYOUKBN        TO  SPA-GMN-RIYOUKBN-G
            MOVE    I07-SKYYM           TO  SPA-GMN-SKYYM
+           MOVE    I07-TEISYUTUBIKBN   TO  SPA-GMN-TEISYUTUBIKBN-G
            MOVE    I07-SKYKBN          TO  SPA-GMN-SKYKBN-G
            MOVE    I07-BUNBENKBN       TO  SPA-GMN-BUNBENKBN-G
            MOVE    I07-ZAIWEEK         TO  SPA-GMN-ZAIWEEK
@@ -811,6 +844,10 @@
       *
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 4101-SKYYM-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4101-TEISYUTUBIKBN-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
@@ -924,6 +961,7 @@
             OR   ( SPA-GMN-HKNJANUM    =   ZERO )
                MOVE    SPACE           TO  SPA-GMN-SKYYM
                MOVE    ZERO            TO  SPA-NAI-SKYYM
+               MOVE    SPACE           TO  SPA-GMN-TEISYUTUBIKBN
                MOVE    "1"             TO  SPA-GMN-SKYKBN
            END-IF
       *
@@ -951,28 +989,53 @@
                    MOVE    WRK-HENYMDG (1:6)
                                        TO  SPA-GMN-SKYYM
                END-IF
-      *
-               IF    ( SPA-ERRCD       =   SPACE )
-                   IF    ( SPA-GMN-BUNBENKBN       =   "1" )
-                    AND  ( SPA-NAI-TAIINYMD(7:2)  <=   "10" )
-                       IF    ( SPA-NAI-SKYYM
-                                       <   SPA-NAI-TAIINYMD (1:6) )
-                           MOVE    "0005"      TO  SPA-ERRCD
-                           MOVE    2           TO  SPA-GMN-CUR
-                       END-IF
-                   ELSE
-                       IF    ( SPA-NAI-SKYYM
-                                       <=  SPA-NAI-TAIINYMD (1:6) )
-                           MOVE    "0007"      TO  SPA-ERRCD
-                           MOVE    2           TO  SPA-GMN-CUR
-                       END-IF
-                   END-IF
-               END-IF
-      *
            END-IF
       *
            .
        4101-SKYYM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    提出日区分チェック処理
+      *****************************************************************
+       4101-TEISYUTUBIKBN-CHK-SEC      SECTION.
+      *
+           MOVE    SPA-GMN-TEISYUTUBIKBN      TO  WRK-CMB-CD
+           PERFORM 4200-TEISYUTUBIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TEISYUTUBIKBN-G
+           IF    ( SPA-GMN-TEISYUTUBIKBN-G    =   SPACE )
+               IF    ( SPA-GMN-RIYOUKBN       =   "1" )
+                   MOVE    SPA-GMN-TEISYUTUBIKBNLST (1)
+                                       TO  SPA-GMN-TEISYUTUBIKBN-G
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD                   =   SPACE )
+            AND  ( SPA-GMN-SKYYM           NOT =   SPACE )
+            AND  ( SPA-GMN-TEISYUTUBIKBN   NOT =   SPACE )
+               IF    ( SPA-GMN-BUNBENKBN       =   "1" )
+                   MOVE    SPA-NAI-SKYYM
+                                       TO  WRK-SKYYM
+                   IF    ( SPA-GMN-TEISYUTUBIKBN   =   "1" )
+                       MOVE    "10"    TO  WRK-SKYDD
+                   ELSE
+                       MOVE    "25"    TO  WRK-SKYDD
+                   END-IF
+                   IF    ( WRK-SKYYMD
+                                       <   SPA-NAI-TAIINYMD  )
+                       MOVE    "0005"  TO  SPA-ERRCD
+                       MOVE    2       TO  SPA-GMN-CUR
+                   END-IF
+               ELSE
+                   IF    ( SPA-NAI-SKYYM
+                                       <=  SPA-NAI-TAIINYMD (1:6) )
+                       MOVE    "0007"  TO  SPA-ERRCD
+                       MOVE    2       TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       4101-TEISYUTUBIKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    請求区分チェック処理
@@ -1001,6 +1064,20 @@
            IF    ( SPA-GMN-BUNBENKBN-G  =   SPACE )
                MOVE    SPA-GMN-BUNBENKBNLST (1)
                                        TO  SPA-GMN-BUNBENKBN-G
+           END-IF
+      *
+           IF    ( SPA-GMN-BUNBENKBN   =   "2" )
+               IF    ( SPA-GMN-TEISYUTUBIKBN   =   "2" )
+                   MOVE    "0011"      TO  SPA-ERRCD
+                   MOVE    23          TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-BUNBENKBN   =   "2" )
+               IF    ( SPA-GMN-TEISYUTUBIKBN   =   "2" )
+                   MOVE    "0011"      TO  SPA-ERRCD
+                   MOVE    23          TO  SPA-GMN-CUR
+               END-IF
            END-IF
       *
            .
@@ -1313,6 +1390,29 @@
        4200-RIYOUKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    提出日区分コンボチェック処理
+      *****************************************************************
+       4200-TEISYUTUBIKBNLST-CHK-SEC       SECTION.
+      *
+           INITIALIZE                  WRK-CMB-G
+      *
+           PERFORM VARYING IDX-CMB     FROM    1   BY  1
+                   UNTIL ( IDX-CMB     >   SPA-GMN-TEISYUTUBIKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-TEISYUTUBIKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-TEISYUTUBIKBNLST  (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+      *
+       4200-TEISYUTUBIKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    請求区分コンボチェック処理
       *****************************************************************
        4200-SKYKBNLST-CHK-SEC       SECTION.
@@ -1585,6 +1685,7 @@
            MOVE    SPA-NAI-SKYYM           TO  BUNBEN-SKYYM
            MOVE    SPA-I07-RRKNUM          TO   BUNBEN-RRKNUM
            MOVE    SPA-GMN-PTNUM           TO   BUNBEN-PTNUM
+           MOVE    SPA-GMN-TEISYUTUBIKBN   TO   BUNBEN-TEISYUTUBIKBN
            MOVE    SPA-GMN-SKYKBN          TO   BUNBEN-SKYKBN
            MOVE    SPA-GMN-RIYOUKBN        TO   BUNBEN-RIYOUKBN
            MOVE    SPA-GMN-BUNBENKBN       TO   BUNBEN-BUNBENKBN
@@ -1765,6 +1866,16 @@
       *
            MOVE    SPA-GMN-SKYYM           TO  I07-SKYYM
       *
+           MOVE    SPA-GMN-TEISYUTUBIKBN-G TO  I07-TEISYUTUBIKBN
+           MOVE    SPA-GMN-TEISYUTUBIKBN-MAX
+                                           TO  I07-TEISYUTUBIKBN-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-TEISYUTUBIKBN-MAX )
+               MOVE    SPA-GMN-TEISYUTUBIKBNLST (IDX-CMB)
+                                           TO  I07-TEISYUTUBIKBN-ITEM
+                                                           (IDX-CMB)
+           END-PERFORM
+      *
            MOVE    SPA-GMN-SKYKBN-G        TO  I07-SKYKBN
            MOVE    SPA-GMN-SKYKBN-MAX      TO  I07-SKYKBN-COUNT
            PERFORM VARYING IDX-CMB FROM    1   BY  1
@@ -1921,6 +2032,8 @@
        500-GMNHEN-STATE-EDIT-SEC       SECTION.
       *
            MOVE    WIDGET-NORMAL       TO  I07-SKYYM-STATE
+                                           I07-TEISYUTUBIKBN-STATE
+                                           I07-TEISYUTUBIKBN-ITEM-STATE
                                            I07-SKYKBN-STATE
                                            I07-SKYKBN-ITEM-STATE
                                            I07-SANKAKBN-STATE
@@ -1930,6 +2043,8 @@
             OR   ( SPA-GMN-HKNJANUM    =   SPACE )
                MOVE    WIDGET-INSENSITIVE
                                        TO  I07-SKYYM-STATE
+                                           I07-TEISYUTUBIKBN-STATE
+                                           I07-TEISYUTUBIKBN-ITEM-STATE
                                            I07-SKYKBN-STATE
                                            I07-SKYKBN-ITEM-STATE
            END-IF
@@ -2000,6 +2115,8 @@
                MOVE    "BIKOU"         TO  MCP-WIDGET
            WHEN    022
                MOVE    "MEIPRTKBN"     TO  MCP-WIDGET
+           WHEN    023
+               MOVE    "TEISYUTUBIKBN" TO  MCP-WIDGET
            WHEN    212
                MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -2017,6 +2134,8 @@
            WHEN    "RIYOUKBN"
                MOVE    002             TO  SPA-GMN-CUR
            WHEN    "SKYYM"
+               MOVE    023             TO  SPA-GMN-CUR
+           WHEN    "TEISYUTUBIKBN"
                MOVE    003             TO  SPA-GMN-CUR
            WHEN    "SKYKBN"
                MOVE    004             TO  SPA-GMN-CUR
@@ -2071,6 +2190,13 @@
       *
            IF    ( SPA-GMN-CUR     =   2 )
                IF    ( I07-SKYYM-STATE =   WIDGET-INSENSITIVE )
+                   MOVE    23      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   23 )
+               IF    ( I07-TEISYUTUBIKBN-STATE
+                                   =   WIDGET-INSENSITIVE )
                    MOVE    3       TO  SPA-GMN-CUR
                END-IF
            END-IF
@@ -2113,7 +2239,7 @@
                MOVE    "妊婦負担額の上限をオーバーしています"
                                        TO  SPA-ERRMSG
            WHEN    "0005"
-               MOVE    "請求年月＜退院月となっています"
+               MOVE    "請求日＜退院日となっています"
                                        TO  SPA-ERRMSG
            WHEN    "0006"
                MOVE    "在胎週数が１２週未満です"
@@ -2129,6 +2255,9 @@
                                        TO  SPA-ERRMSG
            WHEN    "0010"
                MOVE   "在胎週数が２２週未満です"
+                                       TO  SPA-ERRMSG
+           WHEN    "0011"
+               MOVE   "異常分娩は２５日請求できません"
                                        TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "在胎週数を入力してください"
