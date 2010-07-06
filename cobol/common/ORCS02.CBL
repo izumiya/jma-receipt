@@ -20715,11 +20715,13 @@
       *
            MOVE       ZERO        TO       FLG-HIKOTEI.
            IF      WK-1001-PREFNUM       =   15
-              IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =
-                      "161" OR "261" OR "361" OR "461" OR "561" OR
-                      "163" OR "263" OR "165" OR "265" OR
-                      "190" OR "290" OR
-                      "164" OR "264" OR "364" OR "464" OR "564"
+              IF  (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)
+                                               >=  "1" AND <=  "8")
+      ***     IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =
+      ***             "161" OR "261" OR "361" OR "461" OR "561" OR
+      ***             "163" OR "263" OR "165" OR "265" OR
+      ***             "190" OR "290" OR
+      ***             "164" OR "264" OR "364" OR "464" OR "564"
                  MOVE         1      TO      FLG-HIKOTEI
               END-IF
            END-IF.
