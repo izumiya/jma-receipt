@@ -102,6 +102,8 @@
            03  BUNBEN-UPDKBN                  PIC  X(01).
       *保険者番号
            03  BUNBEN-HKNJANUM-S              PIC  X(08).
+      *提出日区分（１：１０日請求　２：２５日請求）
+           03  BUNBEN-TEISYUTUBIKBN           PIC  X(01).
       *端末ＩＤ
            03  BUNBEN-TERMID                  PIC  X(16).
       *オペーレータＩＤ
