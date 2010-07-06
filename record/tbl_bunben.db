@@ -35,6 +35,7 @@ tbl_bunben {
 	BIKOU			varchar(60);
 	UPDKBN			char(1);
 	HKNJANUM_S		char(8);
+	TEISYUTUBIKBN		char(1);
 	TERMID			varchar(16);
 	OPID			varchar(16);
 	CREYMD			char(8);
