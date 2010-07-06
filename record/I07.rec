@@ -47,6 +47,15 @@ I07	{
 			value	varchar(10);
 	           	state	int;
 		};
+		CMB_TEISYUTUBIKBN{
+			TEISYUTUBIKBN{
+				value	varchar(22);
+		           	state	int;
+			};
+			count	int;
+			item	varchar(22)[05];
+	           	state	int;
+		};
 		CMB_SKYKBN	{
 			SKYKBN	{
 				value	varchar(22);
