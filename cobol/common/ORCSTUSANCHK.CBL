@@ -246,12 +246,18 @@ grpsys*
                GO  TO  2100-91DAYS-EDIT-EXT
            END-IF
       *
-           MOVE    STUSAN-NISSU05  TO  WRK-TUSAN
+           MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   STUSAN-RRK-CNT )
                IF    ( STUSAN-RRK-JTIKBN (IDX1)
                                            NOT = "5" )
+                   IF    ( STUSAN-RRK-NYUINYMD (IDX1) NOT =    SPACE )
+                    AND  ( STUSAN-RRK-NISSU (IDX1)        =    ZERO )
+                    AND  ( STUSAN-RRK-DJKBN (IDX1)        =    SPACE)
+                       COMPUTE STUSAN-RRK-NISSU (IDX1)
+                           =   STUSAN-RRK-NISSU (IDX1)    +    1
+                   END-IF
                    COMPUTE WRK-TUSAN
                        =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX1)
                    IF    ( WRK-TUSAN   <   91 )
