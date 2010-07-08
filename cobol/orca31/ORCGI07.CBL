@@ -1009,31 +1009,6 @@
                END-IF
            END-IF
       *
-           IF    ( SPA-ERRCD                   =   SPACE )
-            AND  ( SPA-GMN-SKYYM           NOT =   SPACE )
-            AND  ( SPA-GMN-TEISYUTUBIKBN   NOT =   SPACE )
-               IF    ( SPA-GMN-BUNBENKBN       =   "1" )
-                   MOVE    SPA-NAI-SKYYM
-                                       TO  WRK-SKYYM
-                   IF    ( SPA-GMN-TEISYUTUBIKBN   =   "1" )
-                       MOVE    "10"    TO  WRK-SKYDD
-                   ELSE
-                       MOVE    "25"    TO  WRK-SKYDD
-                   END-IF
-                   IF    ( WRK-SKYYMD
-                                       <   SPA-NAI-TAIINYMD  )
-                       MOVE    "0005"  TO  SPA-ERRCD
-                       MOVE    2       TO  SPA-GMN-CUR
-                   END-IF
-               ELSE
-                   IF    ( SPA-NAI-SKYYM
-                                       <=  SPA-NAI-TAIINYMD (1:6) )
-                       MOVE    "0007"  TO  SPA-ERRCD
-                       MOVE    2       TO  SPA-GMN-CUR
-                   END-IF
-               END-IF
-           END-IF
-      *
            .
        4101-TEISYUTUBIKBN-CHK-EXT.
            EXIT.
@@ -1532,9 +1507,36 @@
       *****************************************************************
        411-KANREN-CHK-SEC              SECTION.
       *
-           IF    ( SPA-GMN-ZAIWEEK     =   ZERO )
-               MOVE    "1001"          TO  SPA-ERRCD
-               MOVE    5               TO  SPA-GMN-CUR
+           IF    ( SPA-ERRCD                   =   SPACE )
+            AND  ( SPA-GMN-SKYYM           NOT =   SPACE )
+            AND  ( SPA-GMN-TEISYUTUBIKBN   NOT =   SPACE )
+               IF    ( SPA-GMN-BUNBENKBN       =   "1" )
+                   MOVE    SPA-NAI-SKYYM
+                                       TO  WRK-SKYYM
+                   IF    ( SPA-GMN-TEISYUTUBIKBN   =   "1" )
+                       MOVE    "10"    TO  WRK-SKYDD
+                   ELSE
+                       MOVE    "25"    TO  WRK-SKYDD
+                   END-IF
+                   IF    ( WRK-SKYYMD
+                                       <   SPA-NAI-TAIINYMD  )
+                       MOVE    "0005"  TO  SPA-ERRCD
+                       MOVE    2       TO  SPA-GMN-CUR
+                   END-IF
+               ELSE
+                   IF    ( SPA-NAI-SKYYM
+                                       <=  SPA-NAI-TAIINYMD (1:6) )
+                       MOVE    "0007"  TO  SPA-ERRCD
+                       MOVE    2       TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( SPA-GMN-ZAIWEEK     =   ZERO )
+                   MOVE    "1001"          TO  SPA-ERRCD
+                   MOVE    5               TO  SPA-GMN-CUR
+               END-IF
            END-IF
       *
            IF    ( SPA-ERRCD           =   SPACE )
