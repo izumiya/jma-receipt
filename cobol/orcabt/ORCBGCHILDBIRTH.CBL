@@ -28,6 +28,9 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    09/10/13  集計票、送付書の作成対応
+      *  04.05.02    NACL-藤原    10/07/07  ２５日請求対応
+      *                                     ２５日請求時はＣＳＶの診療年
+      *                                     月は請求年月と同じにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -144,6 +147,8 @@
            03  WRK-PARA-HOSPNUM    PIC 9(02).
            03  BUNBENERR           PIC X(100).
            03  WRK-PARA-SKYYM      PIC X(06).
+           03  WRK-PARA-TEISYUTUBIKBN
+                                   PIC X(01).
            03  WRK-PARA-TEISYUTUSAKI
                                    PIC X(01).
            03  WRK-PARA-PRTKBN     PIC X(01).
@@ -382,13 +387,15 @@
                                        WRK-PARA-HOSPNUM
                                        BUNBENERR
                                        WRK-PARA-SKYYM
+                                       WRK-PARA-TEISYUTUBIKBN
                                        WRK-PARA-TEISYUTUSAKI
                                        WRK-PARA-PRTKBN
            END-UNSTRING
       *
-           DISPLAY "SKYYM       =" WRK-PARA-SKYYM
-           DISPLAY "TEISYUTUSAKI=" WRK-PARA-TEISYUTUSAKI
-           DISPLAY "PRTKBN      =" WRK-PARA-PRTKBN
+           DISPLAY "SKYYM        =" WRK-PARA-SKYYM
+           DISPLAY "TEISYUTUBIKBN=" WRK-PARA-TEISYUTUBIKBN
+           DISPLAY "TEISYUTUSAKI =" WRK-PARA-TEISYUTUSAKI
+           DISPLAY "PRTKBN       =" WRK-PARA-PRTKBN
       *
       *
            MOVE    WRK-PARA-HOSPNUM
@@ -414,17 +421,22 @@
            MOVE    WRK-LNK-DAY1-WYMD   (1:5)
                                    TO  WRK-SKYYMH
       *
-      *    診療年月（請求年月の前月）取得
-           INITIALIZE                  STS-AREA-DAY
-           INITIALIZE                  LNK-DAY6-AREA
-           MOVE  "61"              TO  LNK-DAY6-IRAI
-           MOVE  WRK-SYMD          TO  LNK-DAY6-KIJUN
-           MOVE  "2"               TO  LNK-DAY6-ZOGENPTN
-           MOVE  -1                TO  LNK-DAY6-ZOGEN
-           CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                           LNK-DAY6-AREA
-           MOVE    LNK-DAY6-KEISAN (1:6)
-                                   TO  WRK-SRYYM
+      *    診療年月（１０日請求時は請求年月の前月）取得
+           IF      WRK-PARA-TEISYUTUBIKBN
+                                   =   "2"
+               MOVE    WRK-PARA-SKYYM  TO  WRK-SRYYM
+           ELSE
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE  "61"              TO  LNK-DAY6-IRAI
+               MOVE  WRK-SYMD          TO  LNK-DAY6-KIJUN
+               MOVE  "2"               TO  LNK-DAY6-ZOGENPTN
+               MOVE  -1                TO  LNK-DAY6-ZOGEN
+               CALL  "ORCSDAY"         USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KEISAN (1:6)
+                                       TO  WRK-SRYYM
+           END-IF    
       *
       *    更新用ファイル名設定
            MOVE    "BUNBUPD"       TO  BUNBENUPD-FILE-ID
@@ -440,6 +452,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
       *    システム管理情報取得 
            PERFORM 1001-SYSKANRI-HENSYU-SEC
+      *
+           IF      WRK-PARA-TEISYUTUBIKBN
+                                   =   "1" OR  "2"
+               CONTINUE
+           ELSE
+               MOVE    "提出日区分の設定が誤っています" 
+                                       TO  WRK-BUNBENERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
       *
            IF      WRK-PARA-TEISYUTUSAKI
                                    =   "0" OR  "1" OR  "2"
@@ -1795,11 +1816,22 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            MOVE    WRK-TEISYUTUSAKI
                                    TO  SFILESV-TEISYUTUSAKI  (1)
            EVALUATE    WRK-TEISYUTUSAKI
-               WHEN    "1"
-                   MOVE    "（社保）出産育児一時金等代理申請・受取請求"
+                                   ALSO    WRK-PARA-TEISYUTUBIKBN
+               WHEN    "1"         ALSO    "1"
+                   MOVE
+               "（社保）１０日請求　出産育児一時金等代理申請・受取請求"
                                            TO  SFILESV-TITLE    (1)
-               WHEN    "2"
-                   MOVE    "（国保）出産育児一時金等代理申請・受取請求"
+               WHEN    "1"         ALSO    "2"
+                   MOVE
+               "（社保）２５日請求　出産育児一時金等代理申請・受取請求"
+                                           TO  SFILESV-TITLE    (1)
+               WHEN    "2"         ALSO    "1"
+                   MOVE
+               "（国保）１０日請求　出産育児一時金等代理申請・受取請求"
+                                           TO  SFILESV-TITLE    (1)
+               WHEN    "2"         ALSO    "2"
+                   MOVE
+               "（国保）２５日請求　出産育児一時金等代理申請・受取請求"
                                            TO  SFILESV-TITLE    (1)
            END-EVALUATE
            IF      WRK-OUT         >   ZERO
@@ -2044,6 +2076,11 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC          =   ZERO
                MOVE    MCPDATA-REC     TO  BUNBEN-REC
+      *
+               IF      WRK-PARA-TEISYUTUBIKBN
+                                   NOT =   BUNBEN-TEISYUTUBIKBN
+                   GO TO  900-BUNBEN-READ-N-SEC
+               END-IF
       *
                INITIALIZE                      PTINF-REC
                MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
