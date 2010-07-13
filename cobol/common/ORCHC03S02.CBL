@@ -305,10 +305,22 @@
                    IF    ( SYU-SYUHKNNUM   =   "971"
                                             OR "973"
                                             OR "975" )
-                       MOVE    1               TO  WRK-KBTPRTFLG
-                       MOVE    SYU-SRYKA       TO  WRK-SRYKA
-                       MOVE    SYU-HKNCOMBINUM TO  WRK-HKNCOMBI
-                       PERFORM 20011-SYUNOU-SYUKEI-SEC
+      *
+                       EVALUATE    SYUPARA01-SKYSUMFLG
+      *
+                       WHEN    2
+                       WHEN    4
+                           MOVE    ZERO            TO  WRK-SRYKA
+                           MOVE    SYU-HKNCOMBINUM TO  WRK-HKNCOMBI
+                           PERFORM 20011-SYUNOU-SYUKEI-SEC
+      *
+                       WHEN    OTHER
+                           MOVE    SYU-SRYKA       TO  WRK-SRYKA
+                           MOVE    SYU-HKNCOMBINUM TO  WRK-HKNCOMBI
+                           PERFORM 20011-SYUNOU-SYUKEI-SEC
+      *
+                       END-EVALUATE
+      *
                    ELSE
       *
                        EVALUATE    SYUPARA01-SKYSUMFLG
