@@ -267,7 +267,7 @@
       <name>TITLE</name>
       <x>136</x>
       <y>288</y>
-      <width>300</width>
+      <width>556</width>
       <height>24</height>
       <label>タイトル</label>
       <justify>GTK_JUSTIFY_LEFT</justify>
