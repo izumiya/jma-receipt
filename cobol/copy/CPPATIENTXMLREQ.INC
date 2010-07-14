@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * æ—¥åŒ»æ¨™æº–ãƒ¬ã‚»ãƒ—ãƒˆã‚½ãƒ•ãƒˆï¼ˆJMA standard receipt softwareï¼‰
+      * Æü°åÉ¸½à¥ì¥»¥×¥È¥½¥Õ¥È¡ÊJMA standard receipt software¡Ë
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -15,9 +15,8 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-           02  PATIENTGET.
-            03  PGET-ARGUMENT.
-              04  PGET-ID              PIC X(20).
-            03  PGET-METHODTYPE        PIC X(100).
-            03  PGET-CONTENT-TYPE      PIC X(100).
-            03  PGET-BODY              PIC X(8).
+        01  XML-PATIENTINFOREQ.
+            02  PTREQ-OBJECT           PIC X(8).
+            02  PTREQ-MODE             PIC S9(9)   BINARY.
+            02  PTREQ-PATIENTINFOREQ.
+              03  PTREQ-PATIENTID      PIC X(20).

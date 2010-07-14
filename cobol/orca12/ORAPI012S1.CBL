@@ -134,16 +134,18 @@
                05  WRK-SYSYY           PIC 9(02).
                05  WRK-SYSYMD          PIC 9(06).
            03  WRK-DATE                PIC 9(06).
+           03  WRK-PTNUM               PIC X(20).
       *
        01  WORK-AREA.
            03  WK-MSG                  PIC X(40).
        01  FLG-AREA.
-           03  FLG-END             PIC 9(01).
-           03  FLG-PTINF           PIC 9(01).
-           03  FLG-PTKOHINF        PIC 9(01).
-           03  FLG-PTHKNINF        PIC 9(01).
-           03  FLG-HKNCOMBI        PIC 9(01).
-           03  FLG-SYSUSER         PIC 9(01).
+           03  FLG-END                 PIC 9(01).
+           03  FLG-PTINF               PIC 9(01).
+           03  FLG-PTKOHINF            PIC 9(01).
+           03  FLG-PTHKNINF            PIC 9(01).
+           03  FLG-HKNCOMBI            PIC 9(01).
+           03  FLG-SYSUSER             PIC 9(01).
+           03  FLG-REQCSV              PIC 9(01).
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -193,6 +195,8 @@
       *
            COPY    "CPPATIENTXMLRES.INC".
       *
+           COPY    "CPPATIENTXMLREQ.INC".
+      *
            COPY    "ORCA-BLOB".
       *
            COPY    "MCPDATA.INC".
@@ -224,7 +228,7 @@
            COPY    "P02K.INC".
            COPY    "PERR.INC".
            COPY    "PID1.INC".
-           COPY    "PATIENTGET.INC".
+           COPY    "CPAPIMOD.INC".
       **************************************************************************
        PROCEDURE           DIVISION    USING
            MCPAREA
@@ -261,7 +265,7 @@
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE   "99"             TO  PTRES-API-RESULT
                MOVE   "ユーザID未登録" TO  PTRES-API-RESULT-MSG
-             IF    PGET-CONTENT-TYPE   =   "application/xml"
+             IF    APIREQ-CONTENT-TYPE =   "application/xml"
                    PERFORM 1000-PTXMLMAKE-SEC
              ELSE
                    PERFORM 1000-PTCSVMAKE-SEC
@@ -286,10 +290,18 @@
                                        SPA-AREA
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
-      *    患者情報の取得
-           PERFORM 100-PATIENT-GET-SEC
       *
-           IF      PGET-CONTENT-TYPE   =   "application/xml"
+           IF      APIREQ-CONTENT-TYPE =   "application/xml"
+               PERFORM 1000-PTIXMLREAD-SEC
+           ELSE
+               PERFORM 1000-PTICSVREAD-SEC
+           END-IF
+      *    患者情報の取得
+           IF      PTRES-API-RESULT    =  SPACE
+               PERFORM 100-PATIENT-GET-SEC
+           END-IF
+      *
+           IF      APIREQ-CONTENT-TYPE =   "application/xml"
                    PERFORM 1000-PTXMLMAKE-SEC
            ELSE
                    PERFORM 1000-PTCSVMAKE-SEC
@@ -354,6 +366,123 @@
        900-SYSUSER-READ-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    XML情報から内容を取り出す
+      *****************************************************************
+       1000-PTIXMLREAD-SEC   SECTION.
+      *
+           IF      API-BODY        NOT =   LOW-VALUE
+               DISPLAY "API-BODY not low_value"
+           END-IF
+      * XML情報取り出し
+           MOVE   "XMLOPEN"            TO  MCP-FUNC
+           MOVE    "xml_patientinforeq"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    API-BODY            TO  PTREQ-OBJECT
+           MOVE    ZERO                TO  PTREQ-MODE
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       XML-PATIENTINFOREQ
+                                       SPA-AREA
+           IF (MCP-RC = ZERO OR 1)
+               CONTINUE
+           ELSE
+               DISPLAY "XMLOPEN failure = " MCP-RC
+               MOVE   "99"           TO  PTRES-API-RESULT
+               MOVE   "構文誤りです" TO  PTRES-API-RESULT-MSG
+               GO     TO   1000-PTIXMLREAD-EXT
+           END-IF
+      *
+      *
+           MOVE   "XMLREAD"            TO  MCP-FUNC
+           MOVE    "xml_patientinforeq"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE   ORCA-BLOB-OBJECT     TO  PTREQ-OBJECT
+           CALL   "ORCDBMAIN"          USING
+                                       MCPAREA
+                                       XML-PATIENTINFOREQ
+                                       SPA-AREA
+           IF (MCP-RC = ZERO OR 1)
+               MOVE    PTREQ-PATIENTID     TO  WRK-PTNUM
+           ELSE
+               DISPLAY "XMLREAD failure = " MCP-RC
+           END-IF
+      *
+           MOVE   'XMLCLOSE'           TO  MCP-FUNC
+           MOVE    "xml_patientinforeq"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE   ORCA-BLOB-OBJECT     TO  PTREQ-OBJECT
+           CALL   'ORCDBMAIN'          USING
+                                       MCPAREA
+                                       XML-PATIENTINFOREQ
+                                       SPA-AREA
+           IF (MCP-RC = ZERO OR 1)
+               CONTINUE
+           END-IF
+      *
+           .
+       1000-PTIXMLREAD-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    CSV情報から内容を取り出す
+      *****************************************************************
+       1000-PTICSVREAD-SEC   SECTION.
+      *
+           MOVE   "BLOBEXPORT"         TO  MCP-FUNC
+           MOVE    "blob"              TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    API-BODY            TO  ORCA-BLOB-OBJECT
+      *
+           STRING  "/tmp/"             DELIMITED  BY  SPACE
+                   MCP-TERM            DELIMITED  BY  SPACE
+                   ".csv"              DELIMITED  BY  SPACE
+                                       INTO   ORCA-BLOB-FILE
+           END-STRING
+      *
+           CALL   "ORCDBMAIN"          USING
+                                       MCPAREA
+                                       ORCA-BLOB
+                                       SPA-AREA
+           IF (MCP-RC = ZERO OR 1)
+               CONTINUE
+           ELSE
+               DISPLAY "BLOBEXPORT failure"
+           END-IF
+      *
+           MOVE    ORCA-BLOB-FILE      TO  REQCSV
+      *
+           OPEN    INPUT     REQCSV-FILE
+      *
+           IF      STS-REQCSV          =   ZERO
+               DISPLAY "FILE OPEN OK"
+           ELSE
+               DISPLAY "FILE OPEN NG " STS-REQCSV
+           END-IF
+      *
+           READ    REQCSV-FILE
+               AT  END
+                   MOVE    1               TO  FLG-REQCSV
+               NOT AT  END
+                   MOVE    ZERO            TO  FLG-REQCSV
+           END-READ
+      *
+           UNSTRING    REQCSV-RECORD   DELIMITED  BY  ","
+                                       INTO    WRK-PTNUM
+           END-UNSTRING
+           MOVE    1                   TO  IDX
+           PERFORM UNTIL      (IDX           >    20    ) 
+               IF  WRK-PTNUM(IDX:1)    = LOW-VALUE
+                   MOVE  SPACE         TO  WRK-PTNUM(IDX:1)
+               END-IF
+               ADD     1               TO  IDX
+           END-PERFORM 
+      *
+           CLOSE             REQCSV-FILE
+      *
+           .
+       1000-PTICSVREAD-EXT.
+           EXIT.
       *
       *****************************************************************
       *    患者基本情報取得
@@ -363,7 +492,7 @@
       *    患者番号取得
            INITIALIZE                  ORCSPTIDAREA
            MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
-           MOVE    PGET-ID             TO  SPTID-PTNUM
+           MOVE    WRK-PTNUM           TO  SPTID-PTNUM
            CALL    "ORCSPTID"          USING   ORCSPTIDAREA
                                                SPA-AREA
       *
@@ -375,7 +504,10 @@
                MOVE  PTINF-BIRTHDAY    TO  PTRES-BIRTHDAY
                MOVE  PTINF-SEX         TO  PTRES-SEX
                MOVE  PTINF-HOME-POST   TO  PTRES-HOME-ZIP-CODE
-               MOVE  PTINF-HOME-ADRS   TO  PTRES-HOME-ADDRESSES
+               MOVE  PTINF-HOME-ADRS   TO  PTRES-HOME-ADDRESSES1
+               MOVE  PTINF-HOME-BANTI  TO  PTRES-HOME-ADDRESSES2
+               MOVE  PTINF-HOME-TEL1   TO  PTRES-HOME-HPONE1
+               MOVE  PTINF-HOME-TEL2   TO  PTRES-HOME-HPONE2
       *        MOVE  WRK-CONST-AREA    TO  PTRES-HOME-ADDRESSES
                PERFORM 1001-PTHKN-GET-SEC
            ELSE
@@ -433,8 +565,8 @@
                                        SPA-AREA
            IF (MCP-RC = ZERO OR 1)
                DISPLAY "XMLCLOSE OK     = " MCP-RC
-               MOVE  PTRES-OBJECT      TO  PGET-BODY
-               MOVE  "application/xml" TO  PGET-CONTENT-TYPE
+               MOVE  PTRES-OBJECT      TO  API-BODY
+               MOVE  "application/xml" TO  APIREQ-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
                DISPLAY "patient res xml write failure "
@@ -478,7 +610,13 @@
                    ","                       DELIMITED BY SIZE
                    PTRES-HOME-ZIP-CODE       DELIMITED BY SPACE
                    ","                       DELIMITED BY SIZE
-                   PTRES-HOME-ADDRESSES      DELIMITED BY SPACE
+                   PTRES-HOME-ADDRESSES1     DELIMITED BY SPACE
+                   ","                       DELIMITED BY SIZE
+                   PTRES-HOME-ADDRESSES2     DELIMITED BY SPACE
+                   ","                       DELIMITED BY SIZE
+                   PTRES-HOME-HPONE1         DELIMITED BY SPACE
+                   ","                       DELIMITED BY SIZE
+                   PTRES-HOME-HPONE2         DELIMITED BY SPACE
                    ","                       DELIMITED BY SIZE
                    PTRES-MAIN-INSURANCE-CLASS(01)
                                              DELIMITED BY SPACE
@@ -822,18 +960,15 @@
                    INTO    REQCSV-RECORD
            END-STRING
       *
-           DISPLAY "out = "   REQCSV-RECORD(1:100)
            WRITE   REQCSV-RECORD
            CLOSE   REQCSV-FILE
       *
-           DISPLAY "blob file = "     ORCA-BLOB-FILE 
            MOVE    "BLOBIMPORT"        TO  MCP-FUNC
            MOVE    "blob"              TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING MCPAREA
                                        ORCA-BLOB
                                        SPA-AREA
-           DISPLAY "blob file out = "     ORCA-BLOB-FILE 
       *
            IF  ORCA-BLOB-OBJECT = LOW-VALUE
                DISPLAY "object is low value"
@@ -841,9 +976,8 @@
                DISPLAY "object is not low value"
            END-IF
       *
-           DISPLAY "mcp-rc = " MCP-RC
-           MOVE    ORCA-BLOB-OBJECT    TO  PGET-BODY
-           MOVE    "data/csv"          TO  PGET-CONTENT-TYPE
+           MOVE    ORCA-BLOB-OBJECT    TO  API-BODY
+           MOVE    "data/csv"          TO  APIREQ-CONTENT-TYPE
       *
       *
           .
@@ -899,6 +1033,7 @@
              INITIALIZE                HKNCOMBI-REC
            END-IF
       *
+           MOVE    ZERO                TO  IDX
            PERFORM UNTIL      (IDX           >    4    )            OR
                               (FLG-HKNCOMBI   =   1    )
                IF     (WRK-SYSYMD-8          >=  COMB-TEKSTYMD)  AND

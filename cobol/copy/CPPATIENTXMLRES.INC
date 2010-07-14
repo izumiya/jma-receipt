@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * æ—¥åŒ»æ¨™æº–ãƒ¬ã‚»ãƒ—ãƒˆã‚½ãƒ•ãƒˆï¼ˆJMA standard receipt softwareï¼‰
+      * Æü°åÉ¸½à¥ì¥»¥×¥È¥½¥Õ¥È¡ÊJMA standard receipt software¡Ë
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -16,28 +16,31 @@
       * 113-8621, Japan.
       ********************************************************************
         01  XML-PATIENTINFORES.
-            02  PTRES-OBJECT    PIC X(8).
-            02  PTRES-MODE  PIC S9(9)   BINARY.
+            02  PTRES-OBJECT           PIC X(8).
+            02  PTRES-MODE             PIC S9(9)   BINARY.
             02  PTRES-PATIENTINFORES.
               03  PTRES-INFORMATION-DATE  PIC X(8).
               03  PTRES-INFORMATION-TIME  PIC X(6).
-              03  PTRES-API-RESULT    PIC X(2).
-              03  PTRES-API-RESULT-MSG    PIC X(100).
-              03  PTRES-RESKEY    PIC X(100).
+              03  PTRES-API-RESULT     PIC X(2).
+              03  PTRES-API-RESULT-MSG PIC X(100).
+              03  PTRES-RESKEY         PIC X(100).
               03  PTRES-PATIENT-INFOMATION.
-                04  PTRES-NAME  PIC X(100).
-                04  PTRES-KANANAME  PIC X(100).
-                04  PTRES-BIRTHDAY  PIC X(8).
-                04  PTRES-SEX   PIC X(1).
+                04  PTRES-NAME         PIC X(100).
+                04  PTRES-KANANAME     PIC X(100).
+                04  PTRES-BIRTHDAY     PIC X(8).
+                04  PTRES-SEX          PIC X(1).
                 04  PTRES-ADDRESS-INFO.
-                  05  PTRES-HOME-ZIP-CODE PIC X(7).
-                  05  PTRES-HOME-ADDRESSES    PIC X(100).
-                04  PTRES-INSURANCE-INFO            OCCURS  4 TIMES.
-                  05  PTRES-MAIN-INSURANCE-CLASS  PIC X(10).
-                  05  PTRES-MAIN-INSURANCE-NUMBER PIC X(10).
-                  05  PTRES-MAIN-INSURANCE-NAME   PIC X(10).
-                  05  PTRES-MAIN-MARK PIC X(80).
-                  05  PTRES-MAIN-NUMBER   PIC X(80).
+                  05  PTRES-HOME-ZIP-CODE    PIC X(7).
+                  05  PTRES-HOME-ADDRESSES1  PIC X(200).
+                  05  PTRES-HOME-ADDRESSES2  PIC X(200).
+                  05  PTRES-HOME-HPONE1      PIC X(15).
+                  05  PTRES-HOME-HPONE2      PIC X(15).
+                04  PTRES-INSURANCE-INFO     OCCURS  4 TIMES.
+                  05  PTRES-MAIN-INSURANCE-CLASS   PIC X(10).
+                  05  PTRES-MAIN-INSURANCE-NUMBER  PIC X(10).
+                  05  PTRES-MAIN-INSURANCE-NAME    PIC X(10).
+                  05  PTRES-MAIN-MARK  PIC X(80).
+                  05  PTRES-MAIN-NUMBER  PIC X(80).
                   05  PTRES-MAIN-CONTINUATION PIC X(10).
                   05  PTRES-MAIN-ASSISTANCE   PIC X(10).
                   05  PTRES-MAIN-FAMILY   PIC X(10).

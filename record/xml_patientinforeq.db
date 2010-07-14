@@ -1,0 +1,7 @@
+xml_patientinforeq {
+	object		object;
+	mode		int;
+	patientinforeq {
+		patientid		varchar(20);
+   	};
+};

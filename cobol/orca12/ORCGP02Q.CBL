@@ -174,7 +174,7 @@
            COPY    "P02K.INC".
            COPY    "PERR.INC".
            COPY    "PID1.INC".
-           COPY    "PATIENTGET.INC".
+           COPY    "CPAPIMOD.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA

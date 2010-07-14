@@ -14,7 +14,10 @@ xml_patientinfores {
         	sex                 varchar(1);
         	address_info    {
             	home_zip_code   varchar(07);
-            	home_addresses  varchar(100);
+            	home_addresses1 varchar(200);
+            	home_addresses2 varchar(200);
+            	home_phone1	varchar(15);
+            	home_phone2	varchar(15);
         	};
         	insurance_info  {
             	main_insurance_class    varchar(10);
