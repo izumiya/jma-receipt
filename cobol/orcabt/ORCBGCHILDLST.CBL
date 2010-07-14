@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.00    NACL-太田    10/01/29  拡張漢字対応
+      *  04.05.01    NACL-藤原    10/07/07  ２５日請求対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -146,7 +147,7 @@
            03  H01-PAGE                PIC ZZ9.
       *
        01  HEAD-02.
-           03  FILLER                  PIC X(10)   VALUE   SPACE.
+           03  FILLER                  PIC X(02)   VALUE   SPACE.
            03  FILLER                  PIC X(12)   VALUE
                "保険者番号　".
            03  FILLER                  PIC X(10)   VALUE
@@ -156,20 +157,26 @@
            03  FILLER                  PIC X(02)   VALUE   SPACE.
            03  FILLER                  PIC X(36)   VALUE
                "氏名".
-           03  FILLER                  PIC X(22)   VALUE
+           03  FILLER                  PIC X(12)   VALUE
                "出産年月日".
+           03  FILLER                  PIC X(01)   VALUE   SPACE.
+           03  FILLER                  PIC X(08)   VALUE
+               "請求日　". 
+           03  FILLER                  PIC X(09)   VALUE   SPACE.
            03  FILLER                  PIC X(10)   VALUE
                "代理受取額".
       *
        01  BODY-01.
-           03  FILLER                  PIC X(10).
+           03  FILLER                  PIC X(2).
            03  B01-HKNJANUM            PIC X(10).
            03  B01-BUNBENKBN           PIC X(10).
            03  B01-PTNUM               PIC X(20).
            03  B01-NAME                PIC X(40).
            03  FILLER                  PIC X(01).
            03  B01-BIRTHDAY            PIC X(09).
-           03  FILLER                  PIC X(11).
+           03  FILLER                  PIC X(03).
+           03  B01-TEISYUTUBIKBN       PIC X(08).
+           03  FILLER                  PIC X(08).
            03  B01-DAIRI-MONEY         PIC X(10).
       *
        01  BODY-02.
@@ -512,6 +519,13 @@
                MOVE    BUNBEN-BIRTHDAY     TO  WRK-SYMD
                PERFORM 31012-SEIWA-HEN-SEC
                MOVE    LNK-DAY2-EDTYMD1    TO  B01-BIRTHDAY
+      *
+           EVALUATE    BUNBEN-TEISYUTUBIKBN
+               WHEN    "1"
+                   MOVE    "１０日　"      TO  B01-TEISYUTUBIKBN
+               WHEN    "2"
+                   MOVE    "２５日　"      TO  B01-TEISYUTUBIKBN
+           END-EVALUATE
       *
                MOVE    BUNBEN-MONEY (12)   TO  WRK-ZZZZZZZ9
                MOVE    WRK-ZZZZZZZ9        TO  B01-DAIRI-MONEY
