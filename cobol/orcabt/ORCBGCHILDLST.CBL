@@ -794,6 +794,9 @@
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC          =   ZERO
                MOVE    MCPDATA-REC     TO  BUNBEN-REC
+               IF      BUNBEN-SKYKBN   =   SPACE
+                   GO TO  900-BUNBEN-READ-N-SEC
+               END-IF
       *
                MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                MOVE    BUNBEN-PTID     TO  PTINF-PTID
