@@ -279,6 +279,7 @@
       *  04.04.25    NACL-ÌçÏÆ    10/03/11  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
       *  04.04.26    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
       *  04.04.27    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.28    NACL-ÌçÏÆ    10/07/20  ´Î±êÊ£¿ô¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/25  ÊÝ¸±¡¢¼«Èñ¤½¤ì¤¾¤ì¤ÎÀÁµá³ÛÃ¼¿ô
       *                                     ÀßÄêµ¡Ç½
@@ -13068,6 +13069,8 @@
                  (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "051"         ))
              OR ((LNK-SYU-SRYYMD(1:6)         >=  "200504"      ) AND
                  (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "052"         ))
+             OR ((LNK-SYU-SRYYMD(1:6)         >=  "200804"      ) AND
+                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "038"         ))
              OR ((WK-1001-PREFNUM              =   08 OR 31     ) AND
                  (SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1)
                                               >= "1" AND <= "8" ))
@@ -13078,7 +13081,8 @@
              OR ((WK-1001-PREFNUM              =   36           ) AND
                  (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "245" OR "445"))
       *
-                IF ( SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "051" OR "052" )
+                IF ( SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "051" OR "052"
+                                                           OR "038" )
                 OR ((WK-1001-PREFNUM              =   08 OR 31     ) AND
                     (SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1)
                                                  >= "1" AND <= "8" ))
