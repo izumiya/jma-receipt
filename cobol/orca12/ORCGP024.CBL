@@ -575,7 +575,9 @@
                                            OR  "052"
                                            OR  "015"
                                            OR  "016"
-                                           OR  "091"    )
+                                           OR  "091"
+      *                   次标迹闻　纳裁
+                                           OR  "038"    )
       *               颂长苹の孟数给锐
                      OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                             =   "183" ) AND
@@ -1692,7 +1694,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "015"
                                        OR  "016"
                                        OR  "091"
-                                       OR  "021"    )
+                                       OR  "021"
+      *                   次标迹闻　纳裁
+                                       OR  "038"    )
       *               颂长苹の孟数给锐
                  OR   ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "183" ) AND
