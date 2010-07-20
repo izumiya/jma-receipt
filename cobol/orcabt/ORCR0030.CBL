@@ -467,6 +467,9 @@
       *  04.04.51    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.52    NACL-ÌçÏÆ    10/07/06  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô¤Ç
       *                                     £µ£±¤¬Ê£¿ô¤¢¤ë¾ì¹ç¤ÎÂÐ±þ
+      *  04.04.53    NACL-ÌçÏÆ    10/07/20  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8902,6 +8905,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE02-SRYYM      >= "201004"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  05                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE02-SRYYM      >= "201008"                 ) AND
+                (IDZ                =  1                       ))
                  IF  FLG-TOKU75 = 1 OR 2
                      MOVE    6000      TO   WRK-KINGAKU
                  ELSE
@@ -8965,6 +8973,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE02-SRYYM      >= "201004"                 ) AND
+                (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  05                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE02-SRYYM      >= "201008"                 ) AND
                 (IDZ                =  1                       ))
            OR  ((SYS-1001-PREFNUM   =  33                      ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
