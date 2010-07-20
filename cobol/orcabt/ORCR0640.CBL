@@ -437,6 +437,9 @@
       *  04.04.54    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *  04.04.55    NACL-ÌçÏÆ    10/07/06  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖÂÐ¾Ý¼Ô¤Ç
       *                                     £µ£±¤¬Ê£¿ô¤¢¤ë¾ì¹ç¤ÎÂÐ±þ
+      *  04.04.56    NACL-ÌçÏÆ    10/07/20  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -12456,6 +12459,11 @@
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE62-SRYYM      >= "201004"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "05"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE62-SRYYM      >= "201008"                 ) AND
+                (IDZ                =  1                       ))
                IF    RECE62-SRYYM   >=  "200610"
                    IF  FLG-TOKU75 = 1 OR 2
                      MOVE    22200   TO   WRK-KINGAKU
@@ -12593,6 +12601,11 @@
                 (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE62-SRYYM      >= "201004"                 ) AND
+                (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "05"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE62-SRYYM      >= "201008"                 ) AND
                 (IDZ                =  1                       ))
            OR  ((WRK-PREFNUM        = "33"                     ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
