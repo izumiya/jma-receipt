@@ -117,6 +117,7 @@
       *  04.04.08    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
       *  04.04.09    NACL-ÌçÏÆ    10/05/07  Æþ±¡ÎÁºÞÅÀ¥Á¥§¥Ã¥¯
       *  04.04.10    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
+      *  04.04.11    NACL-ÌçÏÆ    10/07/20  µßµÞÈÂÁ÷¿ÇÎÅÎÁ¤Î¥Á¥§¥Ã¥¯
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -145,6 +146,7 @@
            03  WRK-MSGCD                   PIC 9(02).
            03  WRK-NYUINRYO-ERR            PIC 9(01).
            03  WRK-NYUINRYO-ERR2           PIC 9(01).
+           03  WRK-KYUKYUHANSO-ERR         PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
@@ -188,6 +190,11 @@
            02  WRK-NYUINDAY2-TBL OCCURS   10.
               03 WRK-NYUINDAY2-KBN         PIC X(01)  OCCURS  31.
       *
+       01  WRK-NYUINDAY-KYUKYU-TABLE.
+           02  WRK-NYUINDAY-KYUKYU-TBL
+                                 OCCURS   10.
+              03 WRK-NYUINDAY-KYUKYU-KBN   PIC X(01)  OCCURS  31.
+      *
       *    Æ±ÆüºÆÆþ±¡¥Æ¡¼¥Ö¥ë
        01  WRK-DOJITU-TABLE.
            02  WRK-DOJITU-TBL    OCCURS   10.
@@ -222,6 +229,7 @@
               03 WRK-DAY-T       OCCURS   31.
                  04   WRK-DAY1             PIC 9(04).
                  04   WRK-DAY5             PIC 9(04).
+                 04   WRK-DAY6             PIC 9(04).
       *
        01  WRK-HANBETU-TABLE.
            02  WRK-HANBETU-TBL OCCURS   10.
@@ -585,6 +593,7 @@
                          WRK-JIBAI-TABLE
                          WRK-NYUINDAY-TABLE
                          WRK-NYUINDAY2-TABLE
+                         WRK-NYUINDAY-KYUKYU-TABLE
                          WRK-SYOSIN-TABLE
                          WRK-DOJITU-TABLE
                          WRK-KAIKEING-TABLE
@@ -744,6 +753,12 @@
              END-PERFORM
              IF   WRK-MSGCD   NOT =  ZERO
                 MOVE     WRK-MSGCD    TO    LNK-S02-RC
+             END-IF
+           END-IF.
+      *
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-KYUKYUHANSO-ERR  =  1
+                MOVE     21     TO    LNK-S02-RC
              END-IF
            END-IF.
       *
@@ -988,7 +1003,8 @@
       *
                     MOVE   1                TO   FLG-KAIKEI-SAKUSEI
       *
-                    IF     NACCT-ZAISKBKBN    =    "1"  OR  "5"   
+                    IF     NACCT-ZAISKBKBN    =    "1"  OR  "5"
+                                                        OR  "6"
                           PERFORM    NYUIN-DAY-TAIHI-SEC
                     END-IF
       * 
@@ -1103,6 +1119,10 @@
                IF     NACCT-ZAISKBKBN    =    "5"  
                     MOVE   NACCT-DAY(IDY)  TO   WRK-DAY5(IDX IDY) 
                END-IF 
+      *
+               IF     NACCT-ZAISKBKBN    =    "6"
+                    MOVE   NACCT-DAY(IDY)  TO   WRK-DAY6(IDX IDY)
+               END-IF
       *
              END-IF
       *
@@ -1850,6 +1870,23 @@
                    END-IF
                    MOVE  LNK-NYUINDAY-KBN(IDY)
                                       TO  WRK-NYUINDAY2-KBN(IDX IDY)
+      *
+                   MOVE  LNK-NYUINDAY-KYUKYU-KBN(IDY)
+                                TO  WRK-NYUINDAY-KYUKYU-KBN(IDX IDY)
+                   IF    LNK-NYUINDAY-KYUKYU-KBN(IDY) =  "1"
+                     IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(1)
+                       IF   (WRK-DAY1(1 IDY)  NOT =  ZERO)
+                       OR   (WRK-DAY6(1 IDY)  NOT =  ZERO)
+                           MOVE   1   TO  WRK-KYUKYUHANSO-ERR
+                       END-IF
+                     END-IF
+                     IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(2)
+                       IF   (WRK-DAY1(2 IDY)  NOT =  ZERO)
+                       OR   (WRK-DAY6(2 IDY)  NOT =  ZERO)
+                           MOVE   1   TO  WRK-KYUKYUHANSO-ERR
+                       END-IF
+                     END-IF
+                   END-IF
                  END-PERFORM
               END-IF
       *
@@ -4287,6 +4324,16 @@ grpsys                                        SPA-AREA
                        END-IF
                      END-IF
                    END-IF
+                 END-IF
+      *
+                 MOVE   SYU-SKYSTYMD(7:2)  TO  WRK-CHECK-STDAY
+                 MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
+                 IF   (WRK-NYUINDAY-KYUKYU-KBN(IDX SYU-IDX)  =  "1")
+                 AND  (ACCT-DAY(1 SYU-IDX)          NOT =  ZERO    )
+                 AND  (ACCT-ZAITEN                  NOT =  ZERO    )
+                 AND  (WRK-CHECK-STDAY        <=    SYU-IDX        )
+                 AND  (SYU-IDX                <=    WRK-CHECK-EDDAY)
+                        MOVE    1    TO    WRK-KYUKYUHANSO-ERR
                  END-IF
              END-PERFORM
            ELSE
