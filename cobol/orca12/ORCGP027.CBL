@@ -597,7 +597,8 @@
                                                    OR  "052"
                                                    OR  "091"
                                                    OR  "015"
-                                                   OR  "016" )
+                                                   OR  "016"
+                                                   OR  "038" )
       *            颂长苹の孟数给锐
                    OR ((LNK-COMB-KOH1HKNNUM (IDX)  =   "183" ) AND
                        (SPA-PREFNUM                 =   01   ))
@@ -609,7 +610,8 @@
                                                    OR  "052"
                                                    OR  "091"
                                                    OR  "015"
-                                                   OR  "016" )
+                                                   OR  "016"
+                                                   OR  "038" )
       *            颂长苹の孟数给锐
                    OR ((LNK-COMB-KOH2HKNNUM (IDX)  =   "183" ) AND
                        (SPA-PREFNUM                 =   01   ))
@@ -621,7 +623,8 @@
                                                    OR  "052"
                                                    OR  "091"
                                                    OR  "015"
-                                                   OR  "016" )
+                                                   OR  "016"
+                                                   OR  "038" )
       *            颂长苹の孟数给锐
                    OR ((LNK-COMB-KOH3HKNNUM (IDX)  =   "183" ) AND
                        (SPA-PREFNUM                 =   01   ))
@@ -633,7 +636,8 @@
                                                    OR  "052"
                                                    OR  "091"
                                                    OR  "015"
-                                                   OR  "016" )
+                                                   OR  "016"
+                                                   OR  "038" )
       *            颂长苹の孟数给锐
                    OR ((LNK-COMB-KOH4HKNNUM (IDX)  =   "183" ) AND
                        (SPA-PREFNUM                 =   01   ))
