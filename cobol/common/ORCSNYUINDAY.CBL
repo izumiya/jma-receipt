@@ -523,7 +523,8 @@
                END-IF
            END-PERFORM
       *
-      *    Æþ±¡Ãæ¤ÎµßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÆü¤ò¿©»ö»»Äê²ÄÇ½¤È¤¹¤ë
+      *    Æþ±¡Ãæ¤ÎµßµÞÈÂÁ÷¿ÇÎÅÎÁ¡ÊÆþ±¡¤Î¿ÇÎÅ¹Ô°Ù¡Ë»»ÄêÆü¤ò
+      *    ¿©»ö»»Äê²ÄÇ½¤È¤¹¤ë
            INITIALIZE                          SRYACT-REC
            MOVE    LNK-NYUINDAY-HOSPNUM    TO  SRY-HOSPNUM
            MOVE    "1"                     TO  SRY-NYUGAIKBN
@@ -560,6 +561,68 @@
                          UNTIL     IDX   >   31
                            IF   ACCT-DAY(1 IDX)   NOT =   ZERO
                              MOVE   "1"    TO   LNK-NYUINDAY-KBN(IDX)
+                                                LNK-NYUINDAY-KYUKYU-KBN
+                                                                  (IDX)
+                           END-IF
+                       END-PERFORM
+                   END-IF
+      *
+      *            ¿ÇÎÅ²ñ·×¥¯¥í¡¼¥º
+                   MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                   MOVE    "key5"          TO  MCP-PATHNAME
+                   PERFORM   900-CLOSE-SEC
+      *
+                   MOVE    "tbl_sryact"    TO  MCP-TABLE
+                   MOVE    "key7"          TO  MCP-PATHNAME
+                   PERFORM 910-SRYACT-READ-SEC
+               END-PERFORM
+           END-IF
+      *
+      *    ¿ÇÎÅ¹Ô°Ù¥¯¥í¡¼¥º
+           MOVE    "tbl_sryact"            TO  MCP-TABLE
+           MOVE    "key7"                  TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *    Æþ±¡Ãæ¤ÎµßµÞÈÂÁ÷¿ÇÎÅÎÁ¡Ê³°Íè¤Î¿ÇÎÅ¹Ô°Ù¡Ë»»ÄêÆü¤ò
+      *    ¿©»ö»»Äê²ÄÇ½¤È¤¹¤ë
+           INITIALIZE                          SRYACT-REC
+           MOVE    LNK-NYUINDAY-HOSPNUM    TO  SRY-HOSPNUM
+           MOVE    "2"                     TO  SRY-NYUGAIKBN
+           MOVE    LNK-NYUINDAY-PTID       TO  SRY-PTID
+           MOVE    LNK-NYUINDAY-SANTEIYM   TO  SRY-SRYYM
+           MOVE    "114003010"             TO  SRY-SRYCD(1)
+                                               SRY-SRYCD(2)
+                                               SRY-SRYCD(3)
+                                               SRY-SRYCD(4)
+                                               SRY-SRYCD(5)
+           MOVE    "tbl_sryact"            TO  MCP-TABLE
+           MOVE    "key7"                  TO  MCP-PATHNAME
+           PERFORM 910-SRYACT-SELECT-SEC
+           IF      FLG-SRYACT             =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM   910-SRYACT-READ-SEC
+               PERFORM   UNTIL   (FLG-SRYACT  =   1)
+                   INITIALIZE                  SRYACCT-REC
+                   MOVE    SRY-HOSPNUM     TO  ACCT-HOSPNUM
+                   MOVE    SRY-NYUGAIKBN   TO  ACCT-NYUGAIKBN
+                   MOVE    SRY-PTID        TO  ACCT-PTID
+                   MOVE    SRY-SRYKA       TO  ACCT-SRYKA
+                   MOVE    SRY-SRYYM       TO  ACCT-SRYYM
+                   MOVE    SRY-ZAINUM      TO  ACCT-ZAINUM
+                   MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                   MOVE    "key5"          TO  MCP-PATHNAME
+                   PERFORM   910-SRYACCT-SELECT-SEC
+                   MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                   MOVE    "key5"          TO  MCP-PATHNAME
+                   PERFORM   910-SRYACCT-READ-SEC
+                   IF    FLG-SRYACCT       =   0
+                       PERFORM    VARYING   IDX   FROM   1   BY   1
+                         UNTIL     IDX   >   31
+                           IF   ACCT-DAY(1 IDX)   NOT =   ZERO
+                             MOVE   "1"    TO   LNK-NYUINDAY-KBN(IDX)
+                                                LNK-NYUINDAY-KYUKYU-KBN
+                                                                  (IDX)
                            END-IF
                        END-PERFORM
                    END-IF

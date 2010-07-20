@@ -50,6 +50,11 @@
       *      ２：短期滞在手術基本料２（又は３）−生活療養で入院料未算定日）
                07  LNK-NYUINDAY-TANKI2-KBN    PIC  X(01)  OCCURS  31.
       *
+      *救急搬送診療料算定区分
+             05  LNK-NYUINDAY-KYUKYU-TBL.
+      *  （空白：未算定 　１：算定）
+               07  LNK-NYUINDAY-KYUKYU-KBN    PIC  X(01)  OCCURS  31.
+      *
       *復帰コード（１：算定年月エラー　２：患者検索エラー
       *            ３：入院会計なし　４：入院区分設定なし）
            03  LNK-NYUINDAY-RC                PIC S9(9) BINARY.
