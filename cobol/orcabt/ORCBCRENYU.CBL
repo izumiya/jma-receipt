@@ -2955,6 +2955,16 @@
                                      MOVE   "190134970"  TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
                                    END-IF
+      *                      休日リハビリテーション提供体制加算（回復期リハビリテーション病棟入院料）
+                             WHEN    "190140870"
+                                IF  SYOKIKSN-IN-KHNSRYCD = "190141610"
+                                                        OR "190141710"
+                                                        OR "190141810"
+                                                        OR "190141910"
+                                   ADD    1            TO  IDX8
+                                   MOVE   SYS-5001-KSNCD(IDX7) TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                END-IF
                              WHEN   OTHER
                                 ADD    1                TO  IDX8
                                 MOVE   SYS-5001-KSNCD(IDX7) TO
