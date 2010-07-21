@@ -1850,6 +1850,9 @@
                WHEN    20
                    MOVE    "2009"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    21
+                   MOVE    "2010"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    OTHER
                    MOVE    "2001"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
@@ -2795,6 +2798,14 @@
                STRING  "入院点数に誤りがあります。"
                                            DELIMITED   BY  SPACE
                        "異動処理をしてください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2010"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "救急搬送診療料の算定日に"
+                                           DELIMITED   BY  SPACE
+                       "入院料（加算）が算定されています。"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

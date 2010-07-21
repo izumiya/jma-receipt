@@ -21675,6 +21675,8 @@
                    MOVE    "2018"  TO  SPA-ERRCD
                WHEN    20
                    MOVE    "2019"  TO  SPA-ERRCD
+               WHEN    21
+                   MOVE    "2020"  TO  SPA-ERRCD
                WHEN    OTHER
                    MOVE    "2008"  TO  SPA-ERRCD
                END-EVALUATE
@@ -23301,6 +23303,14 @@
                STRING  "入院点数に誤りがあります。"
                                            DELIMITED   BY  SPACE
                        "異動処理をしてください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2020"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "救急搬送診療料の算定日に"
+                                           DELIMITED   BY  SPACE
+                       "入院料（加算）が算定されています。"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING
