@@ -23310,7 +23310,7 @@
                MOVE    SPACE           TO  SPA-ERRMSG
                STRING  "救急搬送診療料の算定日に"
                                            DELIMITED   BY  SPACE
-                       "入院料（加算）が算定されています。"
+                       "入院料（加算）が算定されています"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING
