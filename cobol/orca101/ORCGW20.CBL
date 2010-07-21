@@ -188,7 +188,7 @@
            03  CONST-SBT-MAX           PIC 9(03) VALUE 15.
            03  CONST-YKNKNG-MAX        PIC 9(03) VALUE 10.
            03  CONST-KHNRYO-MAX        PIC 9(03) VALUE 50.
-           03  CONST-KSN-MAX           PIC 9(03) VALUE 22.
+           03  CONST-KSN-MAX           PIC 9(03) VALUE 23.
            03  CONST-GKSN-MAX          PIC 9(03) VALUE 14.
            03  CONST-YKNKNGCD-VAL.
                05                      PIC X(09) VALUE "190109870".
@@ -270,6 +270,7 @@
            03  CONST-HYOUKA            PIC X(09) VALUE "190131570".
            03  CONST-HYOUKA-TOK        PIC X(09) VALUE "190134870".
            03  CONST-HYOUKA-SEN        PIC X(09) VALUE "190134970".
+           03  CONST-KJTRIHA           PIC X(09) VALUE "190140870".
            03  CONST-KNGHJOCD-MAX      PIC 9(03) VALUE 15.
            03  CONST-5001-KSN-MAX      PIC 9(03) VALUE 14.
            03  CONST-H180401           PIC X(08) VALUE "20060401".
@@ -797,6 +798,9 @@
       *    一般病棟看護必要度評価加算
            PERFORM 3101-CMB-HYOUKA-SET-SEC
       *
+      *    休日リハビリテーション提供体制加算
+           PERFORM 3101-CMB-KJTRIHA-SET-SEC
+      *
            .
        31013-CMB-KSN-SYOKI-EXT.
            EXIT.
@@ -1082,6 +1086,20 @@
       *
            .
        3101-CMB-HYOUKA-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    休日リハビリテーション提供体制加算コンボ初期処理
+      *****************************************************************
+       3101-CMB-KJTRIHA-SET-SEC         SECTION.
+      *
+           MOVE    "1"             TO  SPA-GMN-W20-KJTRIHAL(1)
+           MOVE    "算定しない"    TO  SPA-GMN-W20-KJTRIHAMEIL(1)
+           MOVE    "2"             TO  SPA-GMN-W20-KJTRIHAL(2)
+           MOVE    "算定する"      TO  SPA-GMN-W20-KJTRIHAMEIL(2)
+           MOVE    2               TO  SPA-GMN-W20-KJTRIHA-MAX
+      *
+           .
+       3101-CMB-KJTRIHA-SET-EXT.
            EXIT.
       *****************************************************************
       *    重症患者回復病棟加算コンボ初期処理
@@ -1986,6 +2004,8 @@
                    PERFORM 4101-KYUKNGHJ2-CHK-SEC
                WHEN    CONST-HYOUKA
                    PERFORM 4101-HYOUKA-CHK-SEC
+               WHEN    CONST-KJTRIHA
+                   PERFORM 4101-KJTRIHA-CHK-SEC
                END-EVALUATE
       *
            END-IF
@@ -2987,6 +3007,13 @@
            IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H220401 )
                MOVE    SPA-GMN-W20-HYOUKA    TO  WRK-KBN1-G
                MOVE    CONST-HYOUKA          TO  WRK-KSNCD
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    休日リハビリテーション提供体制加算
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H220401 )
+               MOVE    SPA-GMN-W20-KJTRIHA    TO  WRK-KBN1-G
+               MOVE    CONST-KJTRIHA          TO  WRK-KSNCD
                PERFORM 420121-BTU-KSN-EDIT-SEC
            END-IF
       *
@@ -4133,6 +4160,24 @@
        4101-HYOUKA-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    休日リハビリテーション提供体制加算
+      *****************************************************************
+       4101-KJTRIHA-CHK-SEC                 SECTION.
+      *
+           MOVE    SPA-GMN-W20-KJTRIHA   TO  WRK-CMB-CD
+           PERFORM 4200-KJTRIHALST-CHK-SEC
+           IF    ( WRK-CMB-CD      =   SPACE )
+               MOVE    SPA-GMN-W20-KJTRIHALST (1)
+                                   TO  SPA-GMN-W20-KJTRIHA-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-KJTRIHA-G
+           END-IF
+      *
+           .
+      *
+       4101-KJTRIHA-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    基準日
       *****************************************************************
        4100-KJNYMD-CHK-SEC             SECTION.
@@ -4673,6 +4718,10 @@
                        MOVE    "2"         TO  WRK-CMB-CD
                        PERFORM 4200-HYOUKALST-CHK-SEC
                        MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-HYOUKA-G
+                   WHEN    CONST-KJTRIHA
+                       MOVE    "2"         TO  WRK-CMB-CD
+                       PERFORM 4200-KJTRIHALST-CHK-SEC
+                       MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-KJTRIHA-G
                    END-EVALUATE
                END-IF
       *
@@ -5009,6 +5058,9 @@
                MOVE    "一般病棟看護必要度評価加算"
                                             TO SPA-GMN-W20-HYOUKA-LBL
                MOVE    CONST-HYOUKA         TO SPA-NAI-W20-HYOUKA-CD
+               MOVE    "休日リハビリテーション提供体制加算"
+                                            TO SPA-GMN-W20-KJTRIHA-LBL
+               MOVE    CONST-KJTRIHA        TO SPA-NAI-W20-KJTRIHA-CD
       *
            WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H200401 )
       *
@@ -5514,6 +5566,10 @@
                    WHEN    CONST-HYOUKA
                        IF    ( SPA-GMN-W20-HYOUKA   =   "2" )
                            MOVE    CONST-HYOUKA     TO  WRK-KSNCD
+                       END-IF
+                   WHEN    CONST-KJTRIHA
+                       IF    ( SPA-GMN-W20-KJTRIHA   =   "2" )
+                           MOVE    CONST-KJTRIHA     TO  WRK-KSNCD
                        END-IF
                    END-EVALUATE
       *
@@ -6427,6 +6483,33 @@
       *
            .
        4200-HYOUKALST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    休日リハビリテーション提供体制加算コンボチェック処理
+      *****************************************************************
+       4200-KJTRIHALST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-KJTRIHA-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W20-KJTRIHAL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-KJTRIHALST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-KJTRIHALST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-KJTRIHALST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    レセプト表示区分コンボチェック処理
