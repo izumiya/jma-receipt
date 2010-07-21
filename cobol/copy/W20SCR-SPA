@@ -221,8 +221,15 @@
                    13  SPA-GMN-W20-HYOUKAFL1        PIC X(01).
                    13  SPA-GMN-W20-HYOUKAMEI        PIC X(24).
                    13  SPA-GMN-W20-HYOUKAFL2        PIC X(01).
+      *          休日リハビリテーション提供体制加算
+                 11  SPA-GMN-W20-KJTRIHA-LBL         PIC X(36).
+                 11  SPA-GMN-W20-KJTRIHA-G.
+                   13  SPA-GMN-W20-KJTRIHA           PIC X(01).
+                   13  SPA-GMN-W20-KJTRIHAFL1        PIC X(01).
+                   13  SPA-GMN-W20-KJTRIHAMEI        PIC X(24).
+                   13  SPA-GMN-W20-KJTRIHAFL2        PIC X(01).
                09  SPA-GMN-W20-KSN-R   REDEFINES   SPA-GMN-W20-KSN-G.
-                 11  SPA-GMN-W20-KSN-OCC           OCCURS 22.
+                 11  SPA-GMN-W20-KSN-OCC           OCCURS 23.
                    13  SPA-GMN-W20-KSN-LBL         PIC X(36).
                    13  SPA-GMN-W20-KSN             PIC X(27).
       *        有効開始日
@@ -469,9 +476,17 @@
                      15  SPA-GMN-W20-HYOUKAFL1L        PIC X(01).
                      15  SPA-GMN-W20-HYOUKAMEIL        PIC X(24).
                      15  SPA-GMN-W20-HYOUKAFL2L        PIC X(01).
+      *          休日リハビリテーション提供体制加算
+                 11  SPA-GMN-W20-KJTRIHALST-G.
+                   13  SPA-GMN-W20-KJTRIHA-MAX          PIC 9(03).
+                   13  SPA-GMN-W20-KJTRIHALST           OCCURS  10.
+                     15  SPA-GMN-W20-KJTRIHAL           PIC X(01).
+                     15  SPA-GMN-W20-KJTRIHAFL1L        PIC X(01).
+                     15  SPA-GMN-W20-KJTRIHAMEIL        PIC X(24).
+                     15  SPA-GMN-W20-KJTRIHAFL2L        PIC X(01).
                09  SPA-GMN-W20-KSNLST-R    REDEFINES
                  SPA-GMN-W20-KSNLST-G.
-                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  22.
+                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  23.
                    13  SPA-GMN-W20-KSNLST-MAX      PIC 9(03).
                    13  SPA-GMN-W20-KSNLST          PIC X(27)
                                                    OCCURS  10.
@@ -620,9 +635,12 @@
       *
                  11  SPA-NAI-W20-HYOUKA-CD          PIC 9(09).
                  11  SPA-NAI-W20-HYOUKA-IDX         PIC 9(03).
+      *
+                 11  SPA-NAI-W20-KJTRIHA-CD          PIC 9(09).
+                 11  SPA-NAI-W20-KJTRIHA-IDX         PIC 9(03).
                09  SPA-NAI-W20-KSNINF-R  REDEFINES
                    SPA-NAI-W20-KSNINF-G.
-                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 22.
+                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 23.
                    13  SPA-NAI-W20-KSNINF-CD       PIC X(09).
                    13  SPA-NAI-W20-KSNINF-IDX      PIC 9(03).
       *      履歴リスト内部領域
