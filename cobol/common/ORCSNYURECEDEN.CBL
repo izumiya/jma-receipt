@@ -1447,6 +1447,16 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(33 IDX1)
                          END-IF
       *
+      *                  休日リハビリテーション提供体制加算
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190140870
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                      TO  WRK-CHUKSN-NYUKSN(23)
+                           MOVE   NACCT-ZAITEN  
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(23)
+                           MOVE   NACCT-DAY(IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(23 IDX1)
+                         END-IF
+      *
                        END-IF
                    END-PERFORM
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
@@ -1505,7 +1515,8 @@
                              (LNK-NYURECEDEN-SANTEIYM >= "200804")) AND
                             ((NACCT-SRYCDTOTAL(6:9) =  190111370)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190129870)  OR
-                             (NACCT-SRYCDTOTAL(6:9) =  190142370)))
+                             (NACCT-SRYCDTOTAL(6:9) =  190142370)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190140870)))
                              CONTINUE
                          ELSE
                            IF   FLG-KSN   =  ZERO
