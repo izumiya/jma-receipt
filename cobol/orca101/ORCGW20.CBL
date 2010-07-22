@@ -3005,16 +3005,20 @@
       *
       *    一般病棟看護必要度評価加算
            IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H220401 )
-               MOVE    SPA-GMN-W20-HYOUKA    TO  WRK-KBN1-G
-               MOVE    CONST-HYOUKA          TO  WRK-KSNCD
-               PERFORM 420121-BTU-KSN-EDIT-SEC
+               IF    ( SPA-GMN-W20-HYOUKA  =   "2" )
+                   MOVE    SPA-GMN-W20-HYOUKA    TO  WRK-KBN1-G
+                   MOVE    CONST-HYOUKA          TO  WRK-KSNCD
+                   PERFORM 420121-BTU-KSN-EDIT-SEC
+               END-IF
            END-IF
       *
       *    休日リハビリテーション提供体制加算
            IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H220401 )
-               MOVE    SPA-GMN-W20-KJTRIHA    TO  WRK-KBN1-G
-               MOVE    CONST-KJTRIHA          TO  WRK-KSNCD
-               PERFORM 420121-BTU-KSN-EDIT-SEC
+               IF    ( SPA-GMN-W20-KJTRIHA    =   "2" )
+                   MOVE    SPA-GMN-W20-KJTRIHA    TO  WRK-KBN1-G
+                   MOVE    CONST-KJTRIHA          TO  WRK-KSNCD
+                   PERFORM 420121-BTU-KSN-EDIT-SEC
+               END-IF
            END-IF
       *
            .
