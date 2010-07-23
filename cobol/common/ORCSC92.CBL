@@ -243,12 +243,18 @@
            03  IDX-KNJ1                PIC 9(01).
            03  IDX-KNJ2                PIC 9(04).
            03  WRK-ZZZ9-X.
-               05  WRK-ZZZ9                PIC ZZZZ9.
+               05  WRK-ZZZ9                PIC ZZZZZZZ9.
            03  WRK-ATAI-X.
                05  WRK-ATAI-9          PIC 9(15).
            03  WRK-KANJI.
                05  WRK-KANJI-X             PIC X(02)
-                                           OCCURS   5.
+                                           OCCURS   8.
+           03  WRK-ATAI-XX             PIC X(08).
+      *    小数点以下あり
+           03  WRK-SYOKBN-G.
+               05  WRK-SYOKBN          PIC 9(01)    OCCURS   4.
+           03  IDX-S1                  PIC 9(02).
+           03  IDX-S2                  PIC 9(02).
       *
            03  WRK-TIME                PIC 9(01).
       *
@@ -3507,6 +3513,7 @@
            MOVE    SPACE               TO  WRK-MEISYO
            MOVE    TNS-NAME            TO  WRK-MEISYO
            INITIALIZE                  WRK-INPUT-SET-AREA
+           INITIALIZE                  WRK-SYOKBN-G
       *
       *    施設基準コード（入力値編集）
            PERFORM VARYING IDX-SST     FROM    1   BY  1
@@ -3535,6 +3542,20 @@
                           (SNUM-SYOKBN     NOT =   SPACE )   OR
                           (SNUM-KETSUU         >   WRK-KETA)
                        MOVE    "0029"          TO  SPA-ERRCD
+      *                ユーザコメントで小数点以下は対象
+                       IF     (SPA-COM-INPUTCD (IDX-T)(1:4) =   "0084")
+                           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                                  (SNUM-MINKBN     NOT =   SPACE )   OR
+                                 ((SNUM-SEISUU +  SNUM-SYOSUU + 1)
+                                                       >   WRK-KETA )
+                               CONTINUE
+                           ELSE
+                               MOVE    1               TO  FLG-INPUT-CHK
+                               MOVE    SPACE           TO  SPA-ERRCD
+                               MOVE    1               TO  WRK-SYOKBN
+                                                               (IDX-SST)
+                           END-IF
+                       END-IF
                    ELSE
                        MOVE    SNUM-OUTEDT(WRK-KETA2:WRK-KETA)
                                                TO  SPA-COM-ATAI
@@ -3558,31 +3579,19 @@
                IF      SPA-COM-ATAI(IDX-T IDX-SST)   =   SPACE
                    CONTINUE
                ELSE
-                   MOVE    WRK-INPUT-KETA (IDX-SST)    TO  WRK-KETA
-                   MOVE    WRK-INPUT-ICHI (IDX-SST)    TO  WRK-ICHI
-                   MOVE    ZERO            TO  WRK-ATAI-X
-                   COMPUTE IDX-SS2         =   16   -   WRK-KETA
-                   MOVE    SPA-COM-ATAI(IDX-T IDX-SST)(1:WRK-KETA)
-                                           TO  WRK-ATAI-X
-                                                   (IDX-SS2:WRK-KETA)
-                   MOVE    WRK-ATAI-9      TO  WRK-ZZZ9
-      *            MOVE    SPA-COM-ATAI(IDX-T IDX-SST)(1:WRK-KETA)
-      *                                    TO  WRK-ZZZ9
-      *
-                   PERFORM 30021-KANJIHEN-SEC
-                   COMPUTE WRK-KETA        =   WRK-KETA  *   2
-                   COMPUTE IDX-K           =   (10       -   WRK-KETA)
-                                           +   1
-                   COMPUTE WRK-ICHI2       =   (WRK-ICHI     *  2  )
-                                           -   1
-                   MOVE    WRK-KANJI(IDX-K:)
-                                           TO  WRK-MEISYO
-                                                 (WRK-ICHI2:WRK-KETA)
+                   IF      WRK-SYOKBN (IDX-SST)    =   ZERO
+      *                数値
+                       PERFORM 300211-SUCHIHEN-SEC
+                   ELSE
+      *                文字（小数点以下あり）
+                       PERFORM 300212-MOJIHEN-SEC
+                   END-IF
                END-IF
            END-PERFORM
       *
       *    埋め込み値がすべてゼロの場合、エラー
            IF     (FLG-INPUT-CHK       =   ZERO )  AND
+                  (SPA-ERRCD           =   SPACE)  AND
                  ((SPA-COM-ATAI1(IDX-T)    NOT =   SPACE )  OR
                   (SPA-COM-ATAI2(IDX-T)    NOT =   SPACE )  OR
                   (SPA-COM-ATAI3(IDX-T)    NOT =   SPACE )  OR
@@ -3593,6 +3602,73 @@
            .
        3002-INPUT-MEISYO-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *     数字変換処理
+      *****************************************************************
+       300211-SUCHIHEN-SEC            SECTION.
+      *
+           MOVE    WRK-INPUT-KETA (IDX-SST)    TO  WRK-KETA
+           MOVE    WRK-INPUT-ICHI (IDX-SST)    TO  WRK-ICHI
+           MOVE    ZERO                TO  WRK-ATAI-X
+           COMPUTE IDX-SS2             =   16   -   WRK-KETA
+           MOVE    SPA-COM-ATAI(IDX-T IDX-SST)(1:WRK-KETA)
+                                       TO  WRK-ATAI-X
+                                                   (IDX-SS2:WRK-KETA)
+           MOVE    WRK-ATAI-9          TO  WRK-ZZZ9
+      *
+           PERFORM 30021-KANJIHEN-SEC
+           COMPUTE WRK-KETA            =   WRK-KETA  *   2
+           COMPUTE IDX-K               =   (16       -   WRK-KETA)
+                                       +   1
+           COMPUTE WRK-ICHI2           =   (WRK-ICHI     *  2  )
+                                           -   1
+           MOVE    WRK-KANJI(IDX-K:)   TO  WRK-MEISYO
+                                                 (WRK-ICHI2:WRK-KETA)
+           .
+       300211-SUCHIHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     数字変換処理
+      *****************************************************************
+       300212-MOJIHEN-SEC            SECTION.
+      *
+           MOVE    WRK-INPUT-KETA (IDX-SST)    TO  WRK-KETA
+           MOVE    WRK-INPUT-ICHI (IDX-SST)    TO  WRK-ICHI
+      *
+           MOVE    SPACE               TO  WRK-ATAI-XX
+           MOVE    WRK-KETA            TO  IDX-S1
+           PERFORM VARYING     IDX-S2  FROM    8   BY  -1
+                   UNTIL       IDX-S2      <   1
+               IF     (SPA-COM-ATAI(IDX-T IDX-SST)(IDX-S2:1)
+                                           NOT =   SPACE )
+                  OR  (IDX-S1              <   WRK-KETA    )
+                   MOVE    SPA-COM-ATAI(IDX-T IDX-SST)(IDX-S2:1)
+                                           TO  WRK-ATAI-XX(IDX-S1:1)
+                   COMPUTE IDX-S1          =   IDX-S1   -   1
+               END-IF
+           END-PERFORM
+      *    漢字変換
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-ATAI-XX         TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           IF      KANACHK-RC          =   ZERO
+               MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                           TO  WRK-KANJI
+           END-IF
+      *
+           COMPUTE WRK-KETA            =   WRK-KETA    *   2
+           COMPUTE WRK-ICHI2           =  (WRK-ICHI    *   2  )
+                                       -   1
+           MOVE    WRK-KANJI(1:WRK-KETA)   TO  WRK-MEISYO
+                                                 (WRK-ICHI2:WRK-KETA)
+           .
+       300212-MOJIHEN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *     数字漢字変換処理
