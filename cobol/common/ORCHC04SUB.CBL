@@ -535,9 +535,12 @@
            MOVE    SRY-SRYSURYO(IDXA)  TO  WRK-TBL-SURYO (IDX-S)
            IF     (TNS-TANICD          =   ZERO
                                        OR  SPACE )
-      *        器材は単位なしでも表示
-               IF     (SRY-SRYCD (IDXA)(1:1)   =   "7" )
-                 AND  (SRY-SRYSURYO(IDXA)      >   1    )
+      *        器材、薬剤は単位なしでも表示（％加算、減算等は対象外）
+               IF    ( SRY-SRYCD (IDXA)(1:1)   =   "6"
+                                               OR  "7"  )  AND
+                     ( TNS-TEN                 >   ZERO )  AND
+                     ( TNS-TENSIKIBETU         =   1
+                                               OR  2    )
                    CONTINUE
                ELSE
                    MOVE    ZERO            TO  WRK-TBL-SURYO (IDX-S)
