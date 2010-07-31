@@ -469,12 +469,17 @@
       *
        01  LF04-REC. 
            COPY    "CPRLF004.INC".
+       01  LNK-ERROR-AREA.
+           03  LNK-KBN-CODE            PIC X(01).
+           03  LNK-ERR-CODE            PIC 9(02).
+           03  LNK-ERR-MSG             PIC X(100).
       *
       ******************************************************************
       *
        PROCEDURE                       DIVISION
                                        USING
-                                               LF04-REC.
+                                               LF04-REC
+                                               LNK-ERROR-AREA.
       *
       *****************************************************************
       *    主　　処理
@@ -2552,6 +2557,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                   ",SRYKA:" WRK-SRYKA
                                   ",SRYYMD:" WRK-SRYYMD
                                   ",HKNCOMBI:" WRK-HKNCOMBI
+                         IF  LNK-KBN-CODE  = "1"
+                           MOVE  01        TO  LNK-ERR-CODE
+                           MOVE
+                       "内容が変更されているため置換できませんでした"
+                                           TO  LNK-ERR-MSG
+                         END-IF
                        ELSE
       *                    置換えの為、データ削除
                            PERFORM 200101-WKSRYACT-DEL-SEC
@@ -2563,6 +2574,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                   ",SRYKA:" WRK-SRYKA
                                   ",SRYYMD:" WRK-SRYYMD
                                   ",HKNCOMBI:" WRK-HKNCOMBI
+                         IF  LNK-KBN-CODE  = "1"
+                           MOVE  02        TO  LNK-ERR-CODE
+                           MOVE
+                       "内容を置き換えました"
+                                           TO  LNK-ERR-MSG
+                         END-IF
                        END-IF
                    ELSE
                        MOVE    1               TO  FLG-ERR
@@ -2574,6 +2591,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                               ",SRYYMD:" WRK-SRYYMD
                               ",HKNCOMBI:" WRK-HKNCOMBI
                               ",WKSRY-KARTE-FLG:" WKSRY-KARTE-FLG
+                         IF  LNK-KBN-CODE  = "1"
+                           MOVE  03        TO  LNK-ERR-CODE
+                           MOVE
+                       "既に同日の診療データが登録されています"
+                                           TO  LNK-ERR-MSG
+                         END-IF
                    END-IF
                ELSE
       *            展開中エラー

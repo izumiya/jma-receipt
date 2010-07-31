@@ -424,6 +424,7 @@ RECORD_files = \
 	M80ID1.rec \
 	S07.rec \
 	SID3.rec \
+	medicalmod.rec \
 
 DEF_files = \
 	HC01.def \
@@ -650,6 +651,8 @@ DB_files = \
 	tbl_srysrh.db \
 	tbl_rrksrh.db \
 	xml_patientinforeq.db \
+	xml_medicalreq.db \
+	xml_medicalres.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

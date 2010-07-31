@@ -110,6 +110,11 @@
                05  SYS-DD          PIC 9(02).
       
       *
+      *    claim連携リターンエリア
+       01  WRK-ERROR-AREA.
+           03  WRK-KBN-CODE            PIC X(01).
+           03  WRK-ERR-CODE            PIC 9(02).
+           03  WRK-ERR-MSG             PIC X(100).
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -152,6 +157,7 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
+           INITIALIZE                  WRK-ERROR-AREA
            MOVE    SPACE               TO  WRK-DATA-REC 
                                            WRK-LF04-REC
       *
@@ -220,6 +226,7 @@
        200-MAIN-SEC                SECTION.
       *
            CALL    "ORCL0031"          USING   WRK-LF04-REC
+                                               WRK-ERROR-AREA
       *
       *    MOVE    WRK-LF04-REC        TO  LF04-REC
       *     

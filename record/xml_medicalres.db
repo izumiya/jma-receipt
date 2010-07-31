@@ -1,0 +1,24 @@
+xml_medicalres {
+    object  object;
+	mode	int;
+	medicalres {
+        Information_Date			varchar(8);
+        Information_Time			varchar(6);
+        Api_Result				varchar(2);
+        API_Result_Message			varchar(100);
+        Reskey					varchar(100);
+        Perform_Date				varchar(8);
+        Perform_Time				varchar(6);
+        Department_Code				varchar(2);
+        Department_Name				varchar(80);
+        Physician_Code				varchar(5);
+        Physician_WholeName			varchar(80);
+	Patient_Infomation {
+		Patient_ID			varchar(20);
+        	WholeName			varchar(100);
+        	WholeName_inKana		varchar(100);
+        	BirthDate			varchar(08);
+        	Sex				varchar(1);
+    	};
+   	};
+};
