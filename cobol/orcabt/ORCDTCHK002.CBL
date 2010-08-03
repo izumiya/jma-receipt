@@ -96,7 +96,7 @@
                                    FILE    STATUS  IS  STS-DTCHK010.
       *
       *    データチェック中間ファイル（チェック例外マスタ）
-           SELECT  DTCHK011-FILE   ASSIGN  DTCHK010PARA
+           SELECT  DTCHK011-FILE   ASSIGN  DTCHK011PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  DTCHK011-KEY
@@ -1130,7 +1130,7 @@
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
            CLOSE   DTCHK011-FILE
-           OPEN    I-O                 DTCHK011-FILE
+           OPEN    INPUT                 DTCHK011-FILE
       *
            .
        100-INIT-EXT.
