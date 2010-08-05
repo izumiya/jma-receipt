@@ -1173,6 +1173,8 @@
       *    ¼«Èñ¹ç·×
            COMPUTE WRK-JIHI-TOTAL      =   SYU-JIHI-TOTAL
                                        +   SYU-JIHI-TOTAL-TAX
+                                       +   SYU-TOTAL-TGMONEY
+                                       +   SYU-TOTAL-TGMONEY-TAX
            IF      SYU-SRYYMD          <=  "20070331"
                COMPUTE WRK-GOKTEN          =   WRK-JIHI-TOTAL
                                            +   SYU-JIHI-TAX
