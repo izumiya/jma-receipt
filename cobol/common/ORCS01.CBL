@@ -312,6 +312,7 @@
       *  04.04.25    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
       *  04.04.26    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.27    NACL-ÌçÏÆ    10/07/20  ´Î±êÊ£¿ô¸øÈñÂÐ±þ
+      *  04.04.28    NACL-ÌçÏÆ    10/08/06  ¼«Î©»Ù±çÆÊÌÚ¸©ÆÈ¼«ÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/16  °ì³çºÆ·×»»ÊýË¡ÁªÂòµ¡Ç½ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/06/22  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
@@ -8101,6 +8102,61 @@
                             ELSE
                               MOVE MAX-KIN-KOHI4-M TO  MAX-KIN-KOHI1-M
                             END-IF
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                            MOVE  ZERO   TO WK-KOUREI-IRYOHI70K
+                            MOVE  ZERO   TO FLG-IRYOHI70K
+                            IF  FLG-TOKU75 = 1 OR 2 OR 3
+                               MOVE MAX-KIN-KOHI1-M  TO
+                                         MAX-KIN-KOHI1-M-TOKU75
+                               MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
+                            END-IF
+                          END-IF
+                        END-IF
+                        IF  (WK-1001-PREFNUM      =  09     )
+                        AND (COMB-KOH1HKNNUM      = "016"   )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "200604")
+                          IF   COMB-KOH2HKNNUM =  "116"
+                            MOVE  TEI-KIN-KOHI2-K  TO  TEI-KIN-KOHI1-K
+                            MOVE  MAX-KIN-KOHI2-K  TO  MAX-KIN-KOHI1-K
+                            MOVE  MAX-KAI-KOHI2-D  TO  MAX-KAI-KOHI1-D
+                            MOVE  MAX-KAI-KOHI2-M  TO  MAX-KAI-KOHI1-M
+                            MOVE  MAX-KIN-KOHI2-D  TO  MAX-KIN-KOHI1-D
+                            MOVE  MAX-KIN-KOHI2-M  TO  MAX-KIN-KOHI1-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                            MOVE  ZERO   TO WK-KOUREI-IRYOHI70K
+                            MOVE  ZERO   TO FLG-IRYOHI70K
+                            IF  FLG-TOKU75 = 1 OR 2 OR 3
+                               MOVE MAX-KIN-KOHI1-M  TO
+                                         MAX-KIN-KOHI1-M-TOKU75
+                               MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
+                            END-IF
+                          END-IF
+                          IF   COMB-KOH3HKNNUM =  "116"
+                            MOVE  TEI-KIN-KOHI3-K  TO  TEI-KIN-KOHI1-K
+                            MOVE  MAX-KIN-KOHI3-K  TO  MAX-KIN-KOHI1-K
+                            MOVE  MAX-KAI-KOHI3-D  TO  MAX-KAI-KOHI1-D
+                            MOVE  MAX-KAI-KOHI3-M  TO  MAX-KAI-KOHI1-M
+                            MOVE  MAX-KIN-KOHI3-D  TO  MAX-KIN-KOHI1-D
+                            MOVE  MAX-KIN-KOHI3-M  TO  MAX-KIN-KOHI1-M
+                            MOVE  ZERO           TO  WK-IRYOHI
+                            MOVE  ZERO           TO  FLG-IRYOHI
+                            MOVE  ZERO   TO WK-KOUREI-IRYOHI70K
+                            MOVE  ZERO   TO FLG-IRYOHI70K
+                            IF  FLG-TOKU75 = 1 OR 2 OR 3
+                               MOVE MAX-KIN-KOHI1-M  TO
+                                         MAX-KIN-KOHI1-M-TOKU75
+                               MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
+                            END-IF
+                          END-IF
+                          IF   COMB-KOH4HKNNUM =  "116"
+                            MOVE  TEI-KIN-KOHI4-K  TO  TEI-KIN-KOHI1-K
+                            MOVE  MAX-KIN-KOHI4-K  TO  MAX-KIN-KOHI1-K
+                            MOVE  MAX-KAI-KOHI4-D  TO  MAX-KAI-KOHI1-D
+                            MOVE  MAX-KAI-KOHI4-M  TO  MAX-KAI-KOHI1-M
+                            MOVE  MAX-KIN-KOHI4-D  TO  MAX-KIN-KOHI1-D
+                            MOVE  MAX-KIN-KOHI4-M  TO  MAX-KIN-KOHI1-M
                             MOVE  ZERO           TO  WK-IRYOHI
                             MOVE  ZERO           TO  FLG-IRYOHI
                             MOVE  ZERO   TO WK-KOUREI-IRYOHI70K
