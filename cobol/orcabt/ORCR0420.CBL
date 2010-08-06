@@ -190,6 +190,7 @@
       *                                     （頸部固定帯加算の対応）
       *  04.04.15    NACL-門脇    10/04/06  改正対応
       *                                     （コメント自動記載）
+      *  04.04.16    NACL-門脇    10/08/06  アフターケア再診欄回数記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4318,8 +4319,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
                      ELSE
                         MOVE  "1"     TO   RECE41-SAISHINTIME 
-                        ADD   WK-ZAIKAISU  TO
-                                            RECE41-KAISU(2)
+                        IF   FLG-COUNT-ARI  =  ZERO
+                              ADD   WK-ZAIKAISU  TO  RECE41-KAISU(2)
+                              MOVE  1            TO  FLG-COUNT-ARI
+                        END-IF
                         COMPUTE RECE41-TENSU(2) =
                                 RECE41-TENSU(2) +
                                 (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
@@ -4335,8 +4338,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
                      ELSE
                         MOVE  "2"     TO   RECE41-SAISHINTIME 
-                        ADD   WK-ZAIKAISU  TO
-                                            RECE41-KAISU(2)
+                        IF   FLG-COUNT-ARI  =  ZERO
+                              ADD   WK-ZAIKAISU  TO  RECE41-KAISU(2)
+                              MOVE  1            TO  FLG-COUNT-ARI
+                        END-IF
                         COMPUTE RECE41-TENSU(2) =
                                 RECE41-TENSU(2) +
                                 (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
@@ -4352,8 +4357,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
                      ELSE
                         MOVE  "3"     TO   RECE41-SAISHINTIME 
-                        ADD   WK-ZAIKAISU  TO
-                                            RECE41-KAISU(2)
+                        IF   FLG-COUNT-ARI  =  ZERO
+                              ADD   WK-ZAIKAISU  TO  RECE41-KAISU(2)
+                              MOVE  1            TO  FLG-COUNT-ARI
+                        END-IF
                         COMPUTE RECE41-TENSU(2) =
                                 RECE41-TENSU(2) +
                                 (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
