@@ -8116,7 +8116,7 @@
                         IF  (WK-1001-PREFNUM      =  09     )
                         AND (COMB-KOH1HKNNUM      = "016"   )
                         AND (LNK-SYU-SRYYMD(1:6) >= "200604")
-                          IF   COMB-KOH2HKNNUM =  "116"
+                          IF   COMB-KOH2HKNNUM =  "116" OR "216"
                             MOVE  TEI-KIN-KOHI2-K  TO  TEI-KIN-KOHI1-K
                             MOVE  MAX-KIN-KOHI2-K  TO  MAX-KIN-KOHI1-K
                             MOVE  MAX-KAI-KOHI2-D  TO  MAX-KAI-KOHI1-D
@@ -8133,7 +8133,7 @@
                                MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
                             END-IF
                           END-IF
-                          IF   COMB-KOH3HKNNUM =  "116"
+                          IF   COMB-KOH3HKNNUM =  "116" OR "216"
                             MOVE  TEI-KIN-KOHI3-K  TO  TEI-KIN-KOHI1-K
                             MOVE  MAX-KIN-KOHI3-K  TO  MAX-KIN-KOHI1-K
                             MOVE  MAX-KAI-KOHI3-D  TO  MAX-KAI-KOHI1-D
@@ -8150,7 +8150,7 @@
                                MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
                             END-IF
                           END-IF
-                          IF   COMB-KOH4HKNNUM =  "116"
+                          IF   COMB-KOH4HKNNUM =  "116" OR "216"
                             MOVE  TEI-KIN-KOHI4-K  TO  TEI-KIN-KOHI1-K
                             MOVE  MAX-KIN-KOHI4-K  TO  MAX-KIN-KOHI1-K
                             MOVE  MAX-KAI-KOHI4-D  TO  MAX-KAI-KOHI1-D
