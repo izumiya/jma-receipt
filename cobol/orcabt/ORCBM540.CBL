@@ -357,11 +357,11 @@
                WHEN    "1"
       *            東京、大阪、京都は「府、都」を消去
                    IF      IDX         =   13  OR  26  OR  27
-                       MOVE    SPACE       TO  SPREF-PREFNAME1 (IDX)(5:)
+                       MOVE    SPACE       TO  SPREF-PREFNAME2 (IDX)(5:)
                    END-IF
                    STRING  "社会保険診療報酬支払基金"
                                        DELIMITED    BY  SIZE
-                           SPREF-PREFNAME1 (IDX)
+                           SPREF-PREFNAME2 (IDX)
                                        DELIMITED    BY  SPACE
                            "支部　御中"
                                        DELIMITED    BY  SIZE
