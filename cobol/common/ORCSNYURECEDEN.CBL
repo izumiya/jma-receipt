@@ -2741,8 +2741,11 @@
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
       *                Â¾°åÎÅµ¡´Ø¼õ¿Ç
                        WHEN   4
-      ******                 WHEN   5
-                           INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
+                           IF    LNK-NYURECEDEN-SANTEIYM  >=  "201004"
+                               CONTINUE
+                           ELSE
+                               INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
+                           END-IF
                    END-EVALUATE
                END-IF
            END-PERFORM
