@@ -29,6 +29,8 @@
       *  Maj/Min/Rev  修正者       日付      内容
       *  04.04.01    NACL-藤原    10/03/09   医療機関情報（住所）の取得
       *                                      方法の修正
+      *  04.04.02    NACL-藤原    10/08/10   支払基金支部の名称の変更に伴
+      *                                      う修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -353,9 +355,15 @@
            MOVE    SYS-1001-PREFNUM    TO  IDX
            EVALUATE   WRK-PARA-TEISYUTUSAKI
                WHEN    "1"
-                   STRING  SPREF-PREFNAME1 (IDX)
+      *            東京、大阪、京都は「府、都」を消去
+                   IF      IDX         =   13  OR  26  OR  27
+                       MOVE    SPACE       TO  SPREF-PREFNAME1 (IDX)(5:)
+                   END-IF
+                   STRING  "社会保険診療報酬支払基金"
+                                       DELIMITED    BY  SIZE
+                           SPREF-PREFNAME1 (IDX)
                                        DELIMITED    BY  SPACE
-                           "社会保険診療報酬支払基金　御中"
+                           "支部　御中"
                                        DELIMITED    BY  SIZE
                                        INTO    HCM64-TEISYUTUSAKI
                    END-STRING

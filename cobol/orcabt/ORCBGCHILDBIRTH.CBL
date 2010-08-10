@@ -32,6 +32,8 @@
       *                                     ２５日請求時はＣＳＶの診療年
       *                                     月は請求年月と同じにする
       *                                     記録条件仕様の変更に伴う修正
+      *  04.05.03    NACL-藤原    10/08/10  支払基金支部の名称の変更に伴
+      *                                     う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1018,9 +1020,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    SYS-1001-PREFNUM    TO  IDX
                EVALUATE   WRK-TEISYUTUSAKI
                    WHEN    "1"
-                       STRING  SPREF-PREFNAME1 (IDX)
+      *                東京、大阪、京都は「府、都」を消去
+                       IF      IDX         =   13  OR  26  OR  27
+                           MOVE    SPACE   TO  SPREF-PREFNAME1 (IDX)(5:)
+                       END-IF
+                       STRING  "社会保険診療報酬支払基金"
+                                           DELIMITED    BY  SIZE
+                               SPREF-PREFNAME1 (IDX)
                                            DELIMITED    BY  SPACE
-                               "社会保険診療報酬支払基金　御中"
+                               "支部　御中"
                                            DELIMITED    BY  SIZE
                                            INTO    HCN64-TEISYUTUSAKI
                        END-STRING
@@ -1103,9 +1111,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    SYS-1001-PREFNUM    TO  IDX
                EVALUATE   WRK-TEISYUTUSAKI
                    WHEN    "1"
-                       STRING  SPREF-PREFNAME1 (IDX)
+      *                東京、大阪、京都は「府、都」を消去
+                       IF      IDX         =   13  OR  26  OR  27
+                           MOVE    SPACE   TO  SPREF-PREFNAME1 (IDX)(5:)
+                       END-IF
+                       STRING  "社会保険診療報酬支払基金"
+                                           DELIMITED    BY  SIZE
+                               SPREF-PREFNAME1 (IDX)
                                            DELIMITED    BY  SPACE
-                               "社会保険診療報酬支払基金　御中"
+                               "支部　御中"
                                            DELIMITED    BY  SIZE
                                            INTO    HCN65-TEISYUTUSAKI
                        END-STRING
