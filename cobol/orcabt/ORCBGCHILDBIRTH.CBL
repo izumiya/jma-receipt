@@ -485,6 +485,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
+           IF    ( WRK-PARA-TEISYUTUBIKBN
+                                   =   "2" )
+           AND   ( WRK-PARA-TEISYUTUSAKI
+                                   =   "1" )
+               MOVE    "２５日請求時は社保のみは設定できません" 
+                                       TO  WRK-BUNBENERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
