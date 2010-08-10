@@ -442,6 +442,7 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.04.57    NACL-ÌçÏÆ    10/08/05  ÆÃÄêÆþ±¡´ðËÜÎÁ¤Î£±£¸£°ÆüÄ¶¤¨
       *                                     Â¾°å¼õ¿Ç»þ¤Î¿ÇÎÅ¹Ô°Ù¥³¡¼¥É½¤Àµ
+      *  04.04.58    NACL-ÌçÏÆ    10/08/09  Â¾°å¼õ¿Ç¡Ê³°Çñ£´¡Ë¤ÎÁªÄê»þÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6390,6 +6391,23 @@
                          MOVE    3     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                      WHEN   4
+                       IF   RECE62-SRYYM    >=    "201004"
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                 (WRK-DAY1-SENTEI-KHNTEN(IDY)  *  0.3)
+                                                               +  0.5
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                  WRK-DAY22-NYUKHNRYO(IDY) +
+                                  WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
+                         MOVE    5     TO    SYUKEI-IDX
+                         PERFORM    2102031-NYUINACCT-SYU-SEC
+                       ELSE
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
       ****                       (WRK-DAY1-KHNTEN(IDY)  *  0.15)
                                  (WRK-DAY1-KHNTEN(IDY)  
@@ -6397,6 +6415,7 @@
                                                         +  0.5
                          MOVE    5     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
+                       END-IF
                      WHEN   5
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
                                  (WRK-DAY1-SENTEI-KHNTEN(IDY)  *  0.7)
@@ -6486,6 +6505,23 @@
                          MOVE    8     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
                      WHEN   4
+                       IF   RECE62-SRYYM    >=    "201004"
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                 (WRK-DAY1-SENTEI-KHNTEN(IDY)  *  0.3)
+                                                               +  0.5
+                         COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
+                                  WRK-DAY22-NYUKHNRYO(IDY) +
+                                  WRK-DAY1-KSNTEN(IDY)
+                         IF  WRK-DAY1-HYOKETU-TEN(IDY)  NOT =  ZERO
+                           COMPUTE WRK-DAY22-NYUKHNRYO(IDY)    =
+                                  (WRK-DAY22-NYUKHNRYO(IDY)    -
+                                   (WRK-DAY22-NYUKHNRYO(IDY)   *
+                                    (WRK-DAY1-HYOKETU-TEN(IDY) / 100)))
+                                                               + 0.5
+                         END-IF
+                         MOVE   10     TO    SYUKEI-IDX
+                         PERFORM    2102031-NYUINACCT-SYU-SEC
+                       ELSE
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
       ****                       (WRK-DAY1-KHNTEN(IDY)  *  0.15)
                                  (WRK-DAY1-KHNTEN(IDY)  
@@ -6493,6 +6529,7 @@
                                                         +  0.5
                          MOVE   10     TO    SYUKEI-IDX
                          PERFORM    2102031-NYUINACCT-SYU-SEC
+                       END-IF
                      WHEN   5
                          COMPUTE  WRK-DAY22-NYUKHNRYO(IDY) =
                                  (WRK-DAY1-SENTEI-KHNTEN(IDY)  *  0.7)
@@ -7813,7 +7850,8 @@
                     WHEN     5
                     WHEN    10
       ***            MOVE "190116690" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
-                     MOVE "999999983" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+      **>            MOVE "999999983" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                     MOVE "190108890" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                     WHEN    12
                     WHEN    14
       **>            MOVE "999999993" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)

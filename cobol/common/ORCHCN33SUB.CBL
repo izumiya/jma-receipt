@@ -45,6 +45,7 @@
       *  04.01.00    NACL-¾®Æ¦Âô  07/12/18  Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¤ÎÆþ±¡ÍâÆü¤Î
       *                                     ¿©»ö¤ÈÆþ±¡ÎÁ²Ã»»ÂÐ±þ
       *  04.04.01    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
+      *  04.04.02    NACL-ÌçÏÆ    10/08/09  Â¾°å¼õ¿Ç¡Ê³°Çñ£´¡Ë¤ÎÁªÄê»þÂÐ±þ
       *****************************************************************
       *
       *
@@ -1284,7 +1285,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
       *                Â¾°åÎÅµ¡´Ø¼õ¿Ç
                        WHEN   4
+                         IF   LNK-ORCHCN33SUB-SANTEIYM  >=  "201004"
+                           CONTINUE
+                         ELSE
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
+                         END-IF
                    END-EVALUATE
                END-IF
            END-PERFORM
