@@ -89,6 +89,7 @@
       *  04.04.05    NACL-ÌçÏÆ    10/04/13  Ê¬ÅÀÊÔ½¸
       *  04.04.06    NACL-ÌçÏÆ    10/05/21  ÉéÃ´¶èÊ¬ÊÔ½¸ÂÐ±þ
       *  04.04.07    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
+      *  04.04.08    NACL-ÌçÏÆ    10/08/09  Â¾°å¼õ¿Ç¡Ê³°Çñ£´¡Ë¤ÎÁªÄê»þÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/12  ¼£¸³ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    10/02/08  ÃÏÊý¸øÈñ¤ÎÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ
@@ -1764,10 +1765,26 @@
                                  (WRK-KHNTEN  *  WRK-SENTEI-KEISU)
                                                      +  0.5
                        WHEN   4
+                        IF   RECE62-SRYYM    >=    "201004"
+                         COMPUTE  WRK-NYUKHNRYO =
+                                 (WRK-SENTEI-KHNTEN  *  0.3)
+                                                     +  0.5
+                         COMPUTE  WRK-NYUKHNRYO =
+                                  WRK-NYUKHNRYO +
+                                  WRK-KSNTEN
+                         IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                           COMPUTE WRK-NYUKHNRYO  =
+                                  (WRK-NYUKHNRYO  -
+                                   (WRK-NYUKHNRYO *
+                                    (WRK-HYOKETU-TEN / 100)))
+                                                  + 0.5
+                         END-IF
+                        ELSE
                          COMPUTE  WRK-NYUKHNRYO =
       ****                       (WRK-KHNTEN         *  0.15)
                                  (WRK-KHNTEN  *  WRK-SENTEI-KEISU)
                                                      +  0.5
+                        END-IF
                        WHEN   5
                          COMPUTE  WRK-NYUKHNRYO =
                                  (WRK-SENTEI-KHNTEN  *  0.7)
@@ -1907,11 +1924,28 @@
                                                      +  0.5
                          MOVE   1   TO   FLG-GAIHAKU
                        WHEN   4
+                        IF   RECE62-SRYYM    >=    "201004"
+                         COMPUTE  WRK-NYUTOKRYO =
+                                 (WRK-SENTEI-KHNTEN  *  0.3)
+                                                     +  0.5
+                         COMPUTE  WRK-NYUTOKRYO =
+                                  WRK-NYUTOKRYO +
+                                  WRK-KSNTEN
+                         IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                           COMPUTE WRK-NYUTOKRYO  =
+                                  (WRK-NYUTOKRYO  -
+                                   (WRK-NYUTOKRYO *
+                                    (WRK-HYOKETU-TEN / 100)))
+                                                  + 0.5
+                         END-IF
+                         MOVE   1   TO   FLG-GAIHAKU
+                        ELSE
                          COMPUTE  WRK-NYUTOKRYO =
       ****                       (WRK-KHNTEN         *  0.15)
                                  (WRK-KHNTEN  *  WRK-SENTEI-KEISU)
                                                      +  0.5
                          MOVE   1   TO   FLG-GAIHAKU
+                        END-IF
                        WHEN   5
                          COMPUTE  WRK-NYUTOKRYO =
                                  (WRK-SENTEI-KHNTEN  *  0.7)

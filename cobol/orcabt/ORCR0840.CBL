@@ -2290,7 +2290,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ( SRY-SRYCD(IDX2)          = CONS-ZANHAIKI     ) OR  
                   ( SRY-SRYCD(IDX2)(1:1)     = "6"               ))    
              AND (  ACCT-ZAITEN          NOT = ZERO  )
-             AND (  ACCT-SYUTEN1             = ZERO  )
+      *******AND (  ACCT-SYUTEN1             = ZERO  )
              AND (  ACCT-ZAIKAISU        NOT = ZERO  )
       *
               MOVE    1                  TO    FLG-TENTEKI             

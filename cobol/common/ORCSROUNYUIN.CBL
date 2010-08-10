@@ -78,6 +78,7 @@
       *  04.04.01    NACL-ÌçÏÆ    09/09/04  ¾®Æþ´ÉÎ¬¾Î½¤Àµ
       *  04.04.02    NACL-ÌçÏÆ    10/05/07  Æþ±¡ÎÁºÞÅÀ¥Á¥§¥Ã¥¯
       *  04.04.03    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
+      *  04.04.04    NACL-ÌçÏÆ    10/08/09  Â¾°å¼õ¿Ç¤Î¥Á¥§¥Ã¥¯
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/18  ¼£¸³ÂÐ±þ
       *****************************************************************
@@ -233,6 +234,7 @@
       *
            03  WRK-NYUINRYO-ERR            PIC 9(01).
            03  WRK-NYUINRYO-ERR2           PIC 9(01).
+           03  WRK-TAIJYUSIN-ERR           PIC 9(01).
       *
            03  WRK-KHNTEN                  PIC 9(08). 
            03  WRK-KSNTEN                  PIC S9(08).
@@ -617,6 +619,11 @@
                END-IF
            END-IF
       *
+           IF  LNK-SROUNYUIN-RC  =  ZERO
+             IF   WRK-TAIJYUSIN-ERR =  1
+                MOVE     9     TO    LNK-SROUNYUIN-RC
+             END-IF
+           END-IF
            IF  LNK-SROUNYUIN-RC  =  ZERO
              IF   WRK-NYUINRYO-ERR  =  1
                 MOVE     7     TO    LNK-SROUNYUIN-RC
@@ -3422,9 +3429,15 @@
                  END-EVALUATE
                WHEN   226
                WHEN   240
-                 CONTINUE
+                 IF        LNK-SROUNYUIN-SANTEIYM   >=  "201004"
+                         MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
                WHEN   OTHER
                  EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      IF   LNK-SROUNYUIN-SANTEIYM   >=  "201004"
+                         MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                      END-IF
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
                  END-EVALUATE
