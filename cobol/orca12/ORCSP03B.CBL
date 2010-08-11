@@ -377,6 +377,7 @@
       *****************************************************************
        1001-FTNJANUM-CHK-SEC           SECTION.
       *
+           MOVE    SPACE               TO  WRK-MAE-KOHNUM
       *    桁数チェック
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "1"                 TO  KANACHK-SYORI
