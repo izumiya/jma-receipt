@@ -443,6 +443,7 @@
       *  04.04.57    NACL-ÌçÏÆ    10/08/05  ÆÃÄêÆþ±¡´ðËÜÎÁ¤Î£±£¸£°ÆüÄ¶¤¨
       *                                     Â¾°å¼õ¿Ç»þ¤Î¿ÇÎÅ¹Ô°Ù¥³¡¼¥É½¤Àµ
       *  04.04.58    NACL-ÌçÏÆ    10/08/09  Â¾°å¼õ¿Ç¡Ê³°Çñ£´¡Ë¤ÎÁªÄê»þÂÐ±þ
+      *  04.04.59    NACL-ÌçÏÆ    10/08/11  ÅìµþÅÔÃÏÊý¸øÈñ£²£¸£²ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16095,6 +16096,32 @@
                      IF   FLG-KOH  =   2
                        COMPUTE  RECE62-FTNMONEY(2) = WRK-CHK-KOKIGAK2
                                                    + WRK-CHK-KOKIGAK3
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
+      *      ÅìµþÅÔÃÏÊý¸øÈñ
+             WHEN    "13"
+               IF  (RECE62-SRYYM        >=  "200804" )
+               AND (RECE62-TEISYUTUSAKI  =   2  OR  6)
+               AND (RECE62-KOUREI        =  "1"      )
+                 IF  (RECE62-KOHNUM(1)   =  "282"                )
+                 AND (RECE62-KOHNUM(2)   =  SPACE                )
+                 AND (RECE62-KOHNUM(3)   =  SPACE                )
+                 AND (RECE62-KOHNUM(4)   =  SPACE                )
+                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+                   MOVE     RECE62-TOTALTEN(1)  TO  WRK-HANTEI-TOTALTEN
+                   PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+                   IF   RECE62-FTNMONEY(1)  >  WRK-KINGAKU3
+                     MOVE   WRK-KINGAKU3   TO  RECE62-FTNMONEY(1)
+                     IF RECE62-FTNMONEY(1)  >  RECE62-KOUREI-SAIKEI
+                        CONTINUE
+                     ELSE
+                        MOVE   999999999   TO  RECE62-KOUREI-SAIKEI
+                     END-IF
+                     IF   RECE62-RJNGENMENKBN   =   "1"
+                       MOVE    4    TO      FLG-TOKKI
+                       PERFORM   21013-TOKKI-HENSYU-SEC
                      END-IF
                    END-IF
                  END-IF
