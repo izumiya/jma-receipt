@@ -470,6 +470,7 @@
       *  04.04.53    NACL-ÌçÏÆ    10/07/20  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.54    NACL-ÌçÏÆ    10/08/11  ÅìµþÅÔÃÏÊý¸øÈñ£²£¸£²ÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -11767,6 +11768,32 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      IF   FLG-KOH  =   2
                        COMPUTE  RECE02-FTNMONEY(2) = WRK-CHK-KOKIGAK2
                                                    + WRK-CHK-KOKIGAK3
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
+      *      ÅìµþÅÔÃÏÊý¸øÈñ
+             WHEN    "13"
+               IF  (RECE02-SRYYM        >=  "200804" )
+               AND (RECE02-TEISYUTUSAKI  =   2  OR  6)
+               AND (RECE02-ZAITAKU       =  "1"      )
+                 IF  (RECE02-KOHNUM(1)   =  "282"                )
+                 AND (RECE02-KOHNUM(2)   =  SPACE                )
+                 AND (RECE02-KOHNUM(3)   =  SPACE                )
+                 AND (RECE02-KOHNUM(4)   =  SPACE                )
+                 AND (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
+                   MOVE     RECE02-TOTALTEN(1)  TO  WRK-HANTEI-TOTALTEN
+                   PERFORM  21094-JYOGENGAKU-HENSYU-SEC
+                   IF   RECE02-FTNMONEY(1)  >  WRK-KINGAKU3
+                     MOVE   WRK-KINGAKU3   TO  RECE02-FTNMONEY(1)
+                     IF RECE02-FTNMONEY(1)  >  RECE02-ZAITAKU-SAIKEI
+                        CONTINUE
+                     ELSE
+                        MOVE   999999999   TO  RECE02-ZAITAKU-SAIKEI
+                     END-IF
+                     IF   RECE02-RJNGENMENKBN   =   "1"
+                       MOVE    4    TO      FLG-TOKKI
+                       PERFORM   21045-TOKKI-HENSYU-SEC
                      END-IF
                    END-IF
                  END-IF
