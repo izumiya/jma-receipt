@@ -1137,7 +1137,9 @@
            CALL    "ORCSROUNYUIN"      USING   MCPAREA
                                                ORCSROUNYUIN-AREA
                                                SPA-AREA
-           IF    ( LNK-SROUNYUIN-RC    NOT =   ZERO )
+           IF    ( LNK-SROUNYUIN-RC    =     0 OR 7 OR 8 OR 9 )
+               CONTINUE
+           ELSE
                MOVE    6               TO  HCM34S01-RC
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
