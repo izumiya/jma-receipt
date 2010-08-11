@@ -1623,7 +1623,7 @@
                WHEN    2
                    MOVE    "190107390"     TO  WRK-GAIHAKU-SRYCD
                WHEN    3
-                   IF    ( NACCT-SRYYM     >   CONST-H1604 )
+                   IF    ( NACCT-SRYYM     >=  CONST-H1604 )
                        MOVE    "099999907" TO  WRK-GAIHAKU-SRYCD
                    ELSE
                        MOVE    "190111590" TO  WRK-GAIHAKU-SRYCD
@@ -1643,7 +1643,7 @@
                WHEN    2
                    MOVE    "190107590"     TO  WRK-GAIHAKU-SRYCD
                WHEN    3
-                   IF    ( NACCT-SRYYM     >   CONST-H1604 )
+                   IF    ( NACCT-SRYYM     >=  CONST-H1604 )
                        MOVE    "099999907" TO  WRK-GAIHAKU-SRYCD
                    ELSE
                        MOVE    "190111590" TO  WRK-GAIHAKU-SRYCD
@@ -2320,7 +2320,8 @@
                WHEN    3
                WHEN    4
                WHEN    5
-                   IF    ( NACCT-SRYYM     >   CONST-H1604 )
+                   IF    ( NACCT-SRYYM     >=  CONST-H1604 )
+                    AND  ( NACCT-SRYYM     <   CONST-H2204 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   4 )
                        CONTINUE
                    ELSE
