@@ -1853,6 +1853,9 @@
                WHEN    21
                    MOVE    "2010"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    22
+                   MOVE    "2011"      TO  SPA-ERRCD
+                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    OTHER
                    MOVE    "2001"      TO  SPA-ERRCD
                    GO  TO  490-FTNKIN-CALC-EXT
@@ -2806,6 +2809,14 @@
                STRING  "救急搬送診療料の算定日に"
                                            DELIMITED   BY  SPACE
                        "入院料（加算）が算定されています"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2011"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "他医受診（外泊）の入力に誤りがあります"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

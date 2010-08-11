@@ -1863,9 +1863,17 @@
                EVALUATE    FLG-GAIHAKUDAY(IDXD)
                WHEN    1
                WHEN    3
-               WHEN    4
                    COMPUTE WRK-ZAI-TEN
                        = ( WRK-ZAI-KHNTEN  *   WRK-SENTEI-KEISU )  + 0.5
+               WHEN    4
+                   IF    ( NACCT-SRYYM     >=  CONST-H2204 )
+                       COMPUTE WRK-ZAI-TEN
+                           = ( WRK-ZAI-KHNTEN  *   0.3 )   +  0.5
+                       COMPUTE WRK-ZAI-TEN
+                           =   WRK-ZAI-TEN
+                           - ( WRK-ZAI-TEN * ( WRK-HYOKETU-TEN / 100 ))
+                           +   0.5
+                   END-IF
                WHEN    5
                    COMPUTE WRK-ZAI-TEN
                        =   WRK-ZAI-KHNTEN
