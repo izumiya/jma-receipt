@@ -104,6 +104,9 @@
       *                                     行うようにする
       *  04.05.12    NACL-藤原    10/04/13  愛知県対応
       *                                     生保と特定疾患９１の記載順 
+      *  04.05.13    NACL-藤原    10/08/11  「平成２２年７月中国地方豪雨」対応
+      *                                     広島県・山口県
+      *                                     ２０１０年７月〜２０１０年１２月対象 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2923,6 +2926,17 @@
                IF    ( RECE62-PREFNUM      =   "28"    OR  "33" )
                AND   ( RECE62-SRYYM        >=  200908           )
                AND   ( RECE62-SRYYM        <=  201001           )
+                   EVALUATE    RECE62-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "（不詳）"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "（災１）"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
+               END-IF
+      *        平成２２年７月中国地方豪雨対応
+               IF    ( RECE62-PREFNUM      =   "34"    OR  "35" )
+               AND   ( RECE62-SRYYM        >=  201007           )
+               AND   ( RECE62-SRYYM        <=  201012           )
                    EVALUATE    RECE62-RJNGAIKOHFTN (1)
                        WHEN    1
                            MOVE    "（不詳）"  TO  HC06-HEAD4 (2)(1:8)
@@ -9240,6 +9254,16 @@
            IF    ( RECE62-PREFNUM      =   "28"    OR  "33" )
            AND   ( RECE62-SRYYM        >=  200908           )
            AND   ( RECE62-SRYYM        <=  201001           )
+               IF      RECE62-RJNGAIKOHFTN (1)
+                                           >   ZERO
+                   MOVE    RECE62-RJNGAIKOHFTN (1)
+                                           TO  RECE10-ETC-YKZFTN (1)
+               END-IF
+           END-IF
+      *    平成２２年７月中国地方豪雨対応
+           IF    ( RECE62-PREFNUM      =   "34"    OR  "35" )
+           AND   ( RECE62-SRYYM        >=  201007           )
+           AND   ( RECE62-SRYYM        <=  201012           )
                IF      RECE62-RJNGAIKOHFTN (1)
                                            >   ZERO
                    MOVE    RECE62-RJNGAIKOHFTN (1)
