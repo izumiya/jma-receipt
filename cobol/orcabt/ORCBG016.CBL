@@ -961,20 +961,20 @@ grpsys     MOVE    SPA-HOSPNUM     TO  BG0162-HOSPNUM
       *****************************************************************
        20012-BTUNUM-SET-SEC         SECTION.
       *
-           INITIALIZE                  IN01-REC
-           MOVE    IDX4                TO  IN01-KEY-CDSEQ
-           MOVE    SS009-SRYCD (IDX-NACCT IDX-NSRY)
-                                       TO  IN01-KEY-SRYCD
-           MOVE    PTINF-KANANAME      TO  IN01-KEY-KANANAME
-           MOVE    PTNUM-PTNUM         TO  IN01-KEY-PTNUM
-           MOVE    PTINF-PTID          TO  IN01-KEY-PTID
-           MOVE    PTINF-NAME          TO  IN01-NAME
-           MOVE    PTINF-TSTPTNUMKBN   TO  IN01-TSTPTNUMKBN
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
                IF    ( SS009-BRMNUM-DAY(IDX-DAY)   NOT =   SPACE )
+                   INITIALIZE                  IN01-REC
+                   MOVE    IDX4                TO  IN01-KEY-CDSEQ
+                   MOVE    SS009-SRYCD (IDX-NACCT IDX-NSRY)
+                                               TO  IN01-KEY-SRYCD
+                   MOVE    PTINF-KANANAME      TO  IN01-KEY-KANANAME
+                   MOVE    PTNUM-PTNUM         TO  IN01-KEY-PTNUM
+                   MOVE    PTINF-PTID          TO  IN01-KEY-PTID
+                   MOVE    PTINF-NAME          TO  IN01-NAME
+                   MOVE    PTINF-TSTPTNUMKBN   TO  IN01-TSTPTNUMKBN
                    MOVE    SS009-BRMNUM-DAY(IDX-DAY)(1:2)
-                                           TO  IN01-KEY-SRYKA
+                                               TO  IN01-KEY-SRYKA
                    PERFORM 900-IN01DYN-READ-SEC
                    COMPUTE IN01-DAY (IDX-DAY)
                        =   IN01-DAY (IDX-DAY)
