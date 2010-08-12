@@ -89,6 +89,9 @@
       *                                     À¸ÊÝ¤ÈÆÃÄê¼À´µ£¹£±¤Îµ­ºÜ½ç 
       *  04.04.13    NACL-ÌçÏÆ    10/04/30  ºÆ·ÇÍó¤Îµ­ºÜ¾ò·ï½¤Àµ
       *  04.04.14    NACL-ÌçÏÆ    10/05/21  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóµ­ºÜÂÐ±þ
+      *  04.04.15    NACL-Æ£¸¶    10/08/11  ¡ÖÊ¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«¡×ÂÐ±þ
+      *                                     ¹­Åç¸©¡¦»³¸ý¸©
+      *                                     £²£°£±£°Ç¯£··î¡Á£²£°£±£°Ç¯£±£²·îÂÐ¾Ý 
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2806,6 +2809,17 @@
                IF    ( RECE02-PREFNUM      =   "28"    OR  "33" )
                AND   ( RECE02-SRYYM        >=  200908           )
                AND   ( RECE02-SRYYM        <=  201001           )
+                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
+               END-IF
+      *        Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+               IF    ( RECE02-PREFNUM      =   "34"    OR  "35" )
+               AND   ( RECE02-SRYYM        >=  201007           )
+               AND   ( RECE02-SRYYM        <=  201012           )
                    EVALUATE    RECE02-RJNGAIKOHFTN (1)
                        WHEN    1
                            MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
@@ -8035,6 +8049,16 @@
            IF    ( RECE02-PREFNUM      =   "28"    OR  "33" )
            AND   ( RECE02-SRYYM        >=  200908           )
            AND   ( RECE02-SRYYM        <=  201001           )
+               IF      RECE02-RJNGAIKOHFTN (1)
+                                           >   ZERO
+                   MOVE    RECE02-RJNGAIKOHFTN (1)
+                                           TO  RECE10-ETC-YKZFTN (1)
+               END-IF
+           END-IF
+      *    Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+           IF    ( RECE02-PREFNUM      =   "34"    OR  "35" )
+           AND   ( RECE02-SRYYM        >=  201007           )
+           AND   ( RECE02-SRYYM        <=  201012           )
                IF      RECE02-RJNGAIKOHFTN (1)
                                            >   ZERO
                    MOVE    RECE02-RJNGAIKOHFTN (1)
