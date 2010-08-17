@@ -252,6 +252,21 @@
        01  LINE-MAX2                   PIC 9(03)   VALUE   36.
        01  PAGE-MAX                    PIC 9(03)   VALUE   50.
       *
+      *点数記載用
+       01  CONS-LABEL1.
+           03  FILLER          PIC X(48)   VALUE
+           "※金額欄については１０割分の表示をしております。".
+           03  FILLER          PIC X(52)   VALUE
+           "患者一部負担金は保険公費による負担割合分となります。".
+      *金額記載用
+       01  CONS-LABEL2.
+           03  FILLER          PIC X(36)   VALUE
+           "※合計欄は点数での表示をしています。".
+           03  FILLER          PIC X(52)   VALUE
+           "患者一部負担金はこの点数より計算（１点＝１０円）し、".
+           03  FILLER          PIC X(38)   VALUE
+           "保険公費による負担割合分となります。".
+      *
       *    プログラムオプションパラメタ
        01  PARA-AREA.
            03  PARA-HAKKOUBIKBN        PIC X(01).
@@ -889,6 +904,12 @@
                        END-IF
                    END-IF
                END-PERFORM
+           END-IF
+      *
+           IF      PARA-GOKEITANI      =   "1"
+               MOVE    CONS-LABEL2         TO  HCM03V04-LABEL3
+           ELSE
+               MOVE    CONS-LABEL1         TO  HCM03V04-LABEL3
            END-IF
       *
            EVALUATE   PARA-SHADE
