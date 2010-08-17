@@ -806,6 +806,7 @@
       *    回数カウント
            MOVE    SPACE           TO  WRK-SSTKIJUNCD
            MOVE    ZERO            TO  CNT-KAISU
+           MOVE    ZERO            TO  WRK-HENKBN-G
            PERFORM VARYING IDX-KBN     FROM    1   BY  1
                    UNTIL   IDX-KBN     >   5
                IF      TNS-SSTKIJUNCD(IDX-KBN) =   1
