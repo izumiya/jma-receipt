@@ -1118,6 +1118,7 @@
       *    エラーならクリアする
            IF      FLG-KBN         =   1
                MOVE    SPACE           TO  WRK-YKJ-KBN-G
+               MOVE    ZERO            TO  WRK-ZENSURYO
            END-IF
       *
            .
