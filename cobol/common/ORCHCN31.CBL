@@ -870,38 +870,11 @@
                                    +   WRK-HENKBN(4)
                                    +   WRK-HENKBN(5)
                IF      ORCHCN30-SURYO(CNT-PARA)    =   WRK-SURYO
+                   MOVE    5           TO  IDX-KBN
+                   PERFORM 241-NAIYO-FUKUYOU-SET-SEC
                    PERFORM VARYING  IDX-KBN    FROM    1   BY  1
-                           UNTIL  ( IDX-KBN    >   5 )
-                       IF      WRK-HENKBN(IDX-KBN)     NOT =   0
-                           MOVE    WRK-HENKBN(IDX-KBN) TO  WRK-SURYO
-      *                    ¿ôÎÌ£ÚÊÔ½¸
-                           PERFORM 250-ZHEN-SURYO-SET-SEC
-                           MOVE    SPACE       TO WRK-HENSYUDATA
-                           EVALUATE    IDX-KBN
-                           WHEN    1
-                               MOVE    "Ä«¡§"  TO  WRK-HENSYUDATA(1:4)
-                           WHEN    2
-                               MOVE    "Ãë¡§"  TO  WRK-HENSYUDATA(1:4)
-                           WHEN    3
-                               MOVE    "Í¼¡§"  TO  WRK-HENSYUDATA(1:4)
-                           WHEN    4
-                               MOVE    "¿²¡§"  TO  WRK-HENSYUDATA(1:4)
-                           WHEN    5
-                               MOVE    "µ¯¡§"  TO  WRK-HENSYUDATA(1:4)
-                           END-EVALUATE
-      *                    Á´³ÑÊÑ´¹
-                           MOVE    SPACE           TO  ORCSKANACHKAREA
-                           INITIALIZE                  ORCSKANACHKAREA
-                           MOVE    "2"             TO  KANACHK-SYORI
-                           MOVE    WRK-HENSURYO    TO  KANACHK-MAE-INPUT
-                           CALL    "ORCSKANACHK"   USING
-                                                   ORCSKANACHKAREA
-                           STRING  KANACHK-OUT-INPUT(1:KANACHK-MAX)
-                                                   DELIMITED BY SIZE
-                                   WRK-TANINAME    DELIMITED BY SPACE
-                                             INTO  WRK-HENSYUDATA(5:)
-                           PERFORM 250-HENSYU-SYORI-SEC
-                       END-IF
+                           UNTIL  ( IDX-KBN    >   4 )
+                       PERFORM 241-NAIYO-FUKUYOU-SET-SEC
                    END-PERFORM
                END-IF
            END-IF
@@ -934,6 +907,49 @@
       *
            .
        240-NAIYO-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   Ä¢É¼ÆâÍÆÉþÍÑ»þÅÀÍÑË¡ÊÔ½¸½èÍý
+      *****************************************************************
+       241-NAIYO-FUKUYOU-SET-SEC   SECTION.
+      *
+           IF      WRK-HENKBN(IDX-KBN) =   0
+               GO  TO  241-NAIYO-FUKUYOU-SET-EXT
+           END-IF
+      *
+           MOVE    WRK-HENKBN(IDX-KBN) TO  WRK-SURYO
+      *    ¿ôÎÌ£ÚÊÔ½¸
+           PERFORM 250-ZHEN-SURYO-SET-SEC
+           MOVE    SPACE       TO WRK-HENSYUDATA
+           EVALUATE    IDX-KBN
+               WHEN    1
+                   MOVE    "Ä«¡§"  TO  WRK-HENSYUDATA(1:4)
+               WHEN    2
+                   MOVE    "Ãë¡§"  TO  WRK-HENSYUDATA(1:4)
+               WHEN    3
+                   MOVE    "Í¼¡§"  TO  WRK-HENSYUDATA(1:4)
+               WHEN    4
+                   MOVE    "¿²¡§"  TO  WRK-HENSYUDATA(1:4)
+               WHEN    5
+                   MOVE    "µ¯¡§"  TO  WRK-HENSYUDATA(1:4)
+           END-EVALUATE
+      *    Á´³ÑÊÑ´¹
+           MOVE    SPACE           TO  ORCSKANACHKAREA
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"             TO  KANACHK-SYORI
+           MOVE    WRK-HENSURYO    TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           STRING  KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                       DELIMITED BY SIZE
+                   WRK-TANINAME        DELIMITED BY SPACE
+                                 INTO  WRK-HENSYUDATA(5:)
+           END-STRING
+           PERFORM 250-HENSYU-SYORI-SEC
+      *
+           .
+       241-NAIYO-FUKUYOU-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1281,6 +1297,7 @@
            IF      FLG-KBN         =   1
                MOVE    SPACE           TO  WRK-YKJ-KBN-G
                MOVE    SPACE           TO  WRK-YKJ-TANI-G
+               MOVE    ZERO            TO  WRK-ZENSURYO
            END-IF
       *
            .
