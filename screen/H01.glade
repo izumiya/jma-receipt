@@ -569,7 +569,7 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label552</name>
+      <name>label2552</name>
       <x>642</x>
       <y>98</y>
       <width>57</width>
@@ -585,7 +585,7 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label553</name>
+      <name>label2553</name>
       <x>716</x>
       <y>98</y>
       <width>40</width>
@@ -601,7 +601,7 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label554</name>
+      <name>label2554</name>
       <x>770</x>
       <y>98</y>
       <width>54</width>
@@ -617,7 +617,7 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label556</name>
+      <name>label2556</name>
       <x>836</x>
       <y>98</y>
       <width>75</width>
@@ -633,7 +633,7 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label555</name>
+      <name>label2555</name>
       <x>910</x>
       <y>98</y>
       <width>80</width>
@@ -1315,11 +1315,13 @@
       <widget>
 	<class>GtkViewport</class>
 	<name>viewport1</name>
+	<width>987</width>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
 
 	<widget>
 	  <class>GtkFixed</class>
 	  <name>fixed3</name>
+	  <width>976</width>
 
 	  <widget>
 	    <class>GtkNumberEntry</class>
