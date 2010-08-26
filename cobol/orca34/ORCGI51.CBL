@@ -2801,10 +2801,8 @@
                END-STRING
            WHEN    "2011"
                MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "他医受診（外泊）の入力に誤りがあります"
-                                           DELIMITED   BY  SPACE
+               STRING  "他医受診（外泊）の入力に誤りがあります"
+                                           DELIMITED   BY  SIZE
                INTO    SPA-ERRMSG
                END-STRING
            END-EVALUATE
