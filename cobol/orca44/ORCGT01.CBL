@@ -2956,8 +2956,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                        END-IF
       *
       *                Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
-                       IF    ( SPA-PREFNUM       =   "34"    OR  "35" )
-                       AND   ( SPA-NAI-SKYYM     >=  201007           )
+                       IF    ( SPA-PREFNUM       =   "34"   )
+                       AND   ( SPA-NAI-SKYYM     >=  201007 )
                            MOVE    "1"             TO  WRK-SHELL-RECEKBN
                            MOVE    "2"             TO  WRK-SHELL-SYOKBN
                            PERFORM 45013-SOKATU-SYORI-SEC
