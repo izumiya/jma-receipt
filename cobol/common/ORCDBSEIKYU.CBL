@@ -255,6 +255,7 @@
              OR  ( RECE10-ETC-KOHNUM (3)   NOT =   SPACE )
              OR  ( RECE10-ETC-KOHNUM (4)   NOT =   SPACE )
              OR  ( RECE10-ETC-YKZFTN (1)       >   ZERO  )
+             OR  ( RECE10-ETC-YKZFTN (2)       >   ZERO  )
                MOVE    1                   TO  SKYMAIN-ETCCREATEFLG
            END-IF
       *
