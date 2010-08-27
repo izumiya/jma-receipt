@@ -212,6 +212,7 @@
       *                                     ÀÁµá¤Ë·¸¤ï¤ëµ­Ï¿¾ò·ï»ÅÍÍ¤Î
       *                                     ÊÑ¹¹¤ËÈ¼¤¦½¤Àµ
       *                                     ¿ÇÎÅ²Ê£²¡¢£³¤òÄÉ²Ã
+      *  04.04.05    NACL-ÌçÏÆ    10/08/23  ¹âÎðÈó³ºÅöÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1531,6 +1532,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
                END-IF
            END-PERFORM
       *
+      *    ¹âÎðÈó³ºÅöÊÔ½¸
+           PERFORM   2101-KOREI-HIGAITO-HENSYU-SEC
+      *
       *    ¥ì¥»¥×¥È¼ïÊÌ
            PERFORM   RECESYUBETU-SET-SEC
       *
@@ -2179,6 +2183,63 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *
            .
        2101-TEISYOTOKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¹âÎðÈó³ºÅöÊÔ½¸
+      *****************************************************************
+       2101-KOREI-HIGAITO-HENSYU-SEC                   SECTION.
+      *
+           IF    RECE02-AGE         >=    70
+             IF  (RECE02-HKNNUM       =  SPACE OR "040" OR "039"
+                                               OR "067" OR "069")
+             OR  (RECE02-HKNNUM(1:2)  =   "98"                  )
+                CONTINUE
+             ELSE
+              IF ( RECE02-HKNNUM      = "060" OR  "068" )
+              OR ((RECE02-HKNNUM  NOT = "060" AND "068") AND
+                  (RECE02-HOJOKBN     = SPACE          ))
+                MOVE      RECE01-SRYYM       TO   WRK-SRYYYMM
+                IF   RECE02-TEKSTYMD(1:6)  >=  RECE01-SRYYM
+                  MOVE  RECE02-TEKSTYMD(7:2) TO   WRK-SRYDD
+                ELSE
+                  MOVE  01                   TO   WRK-SRYDD
+                END-IF
+      *
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    RECE01-HOSPNUM       TO  PTKOH-HOSPNUM
+                MOVE    RECE01-PTID          TO  PTKOH-PTID
+                MOVE    "976"                TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key4"               TO  MCP-PATHNAME
+                PERFORM 900-DBSELECT-SEC
+                IF      MCP-RC               =   ZERO
+                  MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                  MOVE    "key4"             TO  MCP-PATHNAME
+                  PERFORM  PTKOHINF-READ-SEC
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                    IF    (PTKOH-TEKSTYMD  <=  WRK-SRYYMD    )
+                    AND   (WRK-SRYYMD      <=  PTKOH-TEKEDYMD)
+                    AND   (PTKOH-SAKJOKBN   =  SPACE         )
+                       MOVE    1    TO   RECE02-YOBIETC(8)
+                       MOVE    1    TO   FLG-PTKOHINF
+                    ELSE
+                       MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                       MOVE    "key4"            TO  MCP-PATHNAME
+                       PERFORM  PTKOHINF-READ-SEC
+                    END-IF
+                  END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key4"               TO  MCP-PATHNAME
+                PERFORM  900-CLOSE-SEC
+              END-IF
+             END-IF
+           END-IF
+      *
+           .
+       2101-KOREI-HIGAITO-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3234,15 +3295,16 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
       *    ÂÐ¾Ý¤Ç¤Ê¤¤´µ¼Ô¤Î¤È¤­ºßÂðÁí¹ç¡¦ºßÂðËö´ü¥Õ¥é¥°¤ò¥¯¥ê¥¢¤¹¤ë
            MOVE    ZERO    TO   FLG-GENBUTU70
            MOVE    SPACE   TO   WRK-ZAITAKU
-           IF    ( RECE02-AGE          >=  70      )   OR
-                 ( RECE02-AGE          >=  65  AND                    
-                   RECE01-KOHID    NOT  =   ZERO   )   OR
-      ***        ( RECE02-AGE          >=  65  AND                    
-      ***          FLG-ROUJINHOKEN      =   1      )   OR
-      ***        ( RECE02-AGE          >=  65  AND                    
-      ***          RECE02-HKNNUM        =  "039"   )
-                 ( FLG-ROUJINHOKEN      =   1      )   OR
-                 ( RECE02-HKNNUM        =  "039"   )
+           IF     (( RECE02-AGE          >=  70      )   OR
+                   ( RECE02-AGE          >=  65  AND
+                     RECE01-KOHID    NOT  =   ZERO   )   OR
+      ***          ( RECE02-AGE          >=  65  AND
+      ***            FLG-ROUJINHOKEN      =   1      )   OR
+      ***          ( RECE02-AGE          >=  65  AND
+      ***            RECE02-HKNNUM        =  "039"   )
+                   ( FLG-ROUJINHOKEN      =   1      )   OR
+                   ( RECE02-HKNNUM        =  "039"   ))
+           AND    (  RECE02-YOBIETC(8)    =  ZERO     )
                MOVE   1    TO   FLG-GENBUTU70
            ELSE
              IF  RECE01-SRYYM    >=  "200704"

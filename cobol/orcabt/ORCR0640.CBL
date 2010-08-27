@@ -10406,6 +10406,7 @@
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")
              OR  (RECE62-AGE          <    70                        )
       ***    OR  (RECE62-AGE          >    74                        )
+             OR  (RECE62-YOBIETC(8)   =     1                        )
                CONTINUE
              ELSE
                IF  RECE62-HOJOKBN     =   "1"  OR  "9"
@@ -17428,8 +17429,9 @@
              OR  (RECE62-HKNNUM       =   "068" OR "069" OR "040")
                CONTINUE
              ELSE
-               IF  (RECE62-AGE     >=   70  )
-               OR  (RECE62-HKNNUM   =  "039")
+               IF  ((RECE62-AGE         >=   70  ) OR
+                    (RECE62-HKNNUM       =  "039"))
+               AND ( RECE62-YOBIETC(8)   =  ZERO  )
                  MOVE    ZERO                TO  FLG-KOKI-HIGAITO
                  INITIALIZE                      PTKOHINF-REC
                  MOVE    RECE62-HOSPNUM      TO  PTKOH-HOSPNUM
@@ -17515,8 +17517,9 @@
                       AND (RECE62-SRYYM        =  PTKOH-TEKEDYMD(1:6))
                       AND (PTKOH-SAKJOKBN      =  SPACE              )
                          IF  PTKOH-TEKSTYMD(5:4)   NOT =  "0229"
-                           IF  (RECE62-AGE     >=   70  )
-                           OR  (RECE62-HKNNUM   =  "039")
+                           IF  ((RECE62-AGE         >=   70  ) OR
+                                (RECE62-HKNNUM       =  "039"))
+                           AND ( RECE62-YOBIETC(8)   =  ZERO  )
                               MOVE  2   TO   FLG-TOKU75
                            ELSE
                               MOVE  3   TO   FLG-TOKU75
@@ -17788,8 +17791,9 @@
                  ELSE
                    MOVE    01                   TO   WRK-GEN70-DD
                  END-IF
-                 IF  (RECE62-AGE     >=   70  )
-                 OR  (RECE62-HKNNUM   =  "039")
+                 IF  ((RECE62-AGE         >=   70  ) OR
+                      (RECE62-HKNNUM       =  "039"))
+                 AND ( RECE62-YOBIETC(8)   =  ZERO  )
                    IF    RECE62-KYURATE     =   30
                         MOVE    1    TO   FLG-TOKUSITU
                    ELSE
@@ -17817,8 +17821,9 @@
                           MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
                       END-EVALUATE
                    ELSE
-                    IF  (RECE62-AGE     >=   70  )
-                    OR  (RECE62-HKNNUM   =  "039")
+                    IF  ((RECE62-AGE         >=   70  ) OR
+                         (RECE62-HKNNUM       =  "039"))
+                    AND ( RECE62-YOBIETC(8)   =  ZERO  )
                       IF    RECE62-KYURATE     =   30
                         MOVE     1   TO   FLG-KISAIOK
                       ELSE
@@ -17860,8 +17865,9 @@
                    ELSE
                      MOVE    01                   TO   WRK-GEN70-DD
                    END-IF
-                   IF  (RECE62-AGE     >=   70  )
-                   OR  (RECE62-HKNNUM   =  "039")
+                   IF  ((RECE62-AGE         >=   70  ) OR
+                        (RECE62-HKNNUM       =  "039"))
+                   AND ( RECE62-YOBIETC(8)   =  ZERO  )
                      INITIALIZE                      SSRHKOH-AREA
                      MOVE    RECE62-PTID         TO  SSRHKOH-PTID
                      MOVE    "1"                 TO  SSRHKOH-NYUGAIKBN
@@ -17906,8 +17912,9 @@
                               MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
                           END-EVALUATE
                         ELSE
-                         IF  (RECE62-AGE     >=   70  )
-                         OR  (RECE62-HKNNUM   =  "039")
+                         IF  ((RECE62-AGE         >=   70  ) OR
+                              (RECE62-HKNNUM       =  "039"))
+                         AND ( RECE62-YOBIETC(8)   =  ZERO  )
                            IF    RECE62-KYURATE     =   30
                              MOVE     1   TO   FLG-KISAIOK
                            ELSE
@@ -18027,8 +18034,9 @@
       *****************************************************************
        2104E2-TOKUSITU-HANTEI3-SEC               SECTION.
       *
-           IF  ((RECE62-AGE     >=   70      ) OR
-                (RECE62-HKNNUM   =  "039"    ))
+           IF  ((RECE62-AGE         >=   70  ) OR
+                (RECE62-HKNNUM       =  "039"))
+           AND ( RECE62-YOBIETC(8)   =  ZERO  )
            AND ( FLG-TOKUSITU    =   2  OR  3 )
              CONTINUE
            ELSE
