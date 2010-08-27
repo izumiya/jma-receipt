@@ -472,6 +472,7 @@
       *                                     一律一般の金額で記載
       *  04.04.54    NACL-門脇    10/08/11  東京都地方公費２８２対応
       *  04.04.55    NACL-門脇    10/08/11  平成２２年７月中国地方豪雨対応
+      *  04.04.56    NACL-門脇    10/08/23  高齢非該当対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -2172,6 +2173,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
              OR  (RECE02-AGE          <    70                        )
       ***    OR  (RECE02-AGE          >    74                        )
+             OR  (RECE02-YOBIETC(8)   =     1                        )
                CONTINUE
              ELSE
                IF  RECE02-HOJOKBN     =   "1"  OR  "9"
@@ -2862,12 +2864,13 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
        211F1-JGNGAK-SET-SEC      SECTION.
       *
            MOVE     ZERO   TO   FLG-KOUREI-KBN
-           IF   ( RECE02-AGE           >=  70    )
-           OR   ((RECE02-AGE           >=  65   )  AND
-                 (RECE02-RJNHKNNUM  NOT =  SPACE))
-      ***  OR   ((RECE02-AGE           >=  65   )  AND
-      ***        (RECE02-HKNNUM         =  "039"))
-           OR   ( RECE02-HKNNUM         =  "039" )
+           IF    (( RECE02-AGE           >=  70    )    OR
+                  ((RECE02-AGE           >=  65   )  AND
+                   (RECE02-RJNHKNNUM  NOT =  SPACE))    OR
+      ***         ((RECE02-AGE           >=  65   )  AND
+      ***          (RECE02-HKNNUM         =  "039"))    OR
+                  ( RECE02-HKNNUM         =  "039" ))
+           AND   (  RECE02-YOBIETC(8)     =  ZERO   )
               MOVE    1    TO   FLG-KOUREI-KBN
            END-IF
       *
@@ -3933,8 +3936,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              OR  (RECE02-HKNNUM       =   "068" OR "069" OR "040")
                CONTINUE
              ELSE
-               IF  (RECE02-AGE     >=   70  )
-               OR  (RECE02-HKNNUM   =  "039")
+               IF  ((RECE02-AGE         >=   70  ) OR
+                    (RECE02-HKNNUM       =  "039"))
+               AND ( RECE02-YOBIETC(8)   =  ZERO  )
                  MOVE    ZERO                TO  FLG-KOKI-HIGAITO
                  INITIALIZE                      PTKOHINF-REC
                  MOVE    RECE02-HOSPNUM      TO  PTKOH-HOSPNUM
@@ -4020,8 +4024,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                       AND (RECE02-SRYYM        =  PTKOH-TEKEDYMD(1:6))
                       AND (PTKOH-SAKJOKBN      =  SPACE              )
                          IF  PTKOH-TEKSTYMD(5:4)   NOT =  "0229"
-                           IF  (RECE02-AGE     >=   70  )
-                           OR  (RECE02-HKNNUM   =  "039")
+                           IF  ((RECE02-AGE         >=   70  ) OR
+                                (RECE02-HKNNUM       =  "039"))
+                           AND ( RECE02-YOBIETC(8)   =  ZERO  )
                               MOVE  2   TO   FLG-TOKU75
                            ELSE
                               MOVE  3   TO   FLG-TOKU75
@@ -4292,8 +4297,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  ELSE
                    MOVE    01                   TO   WRK-GEN70-DD
                  END-IF
-                 IF  (RECE02-AGE     >=   70  )
-                 OR  (RECE02-HKNNUM   =  "039")
+                 IF  ((RECE02-AGE         >=   70  ) OR
+                      (RECE02-HKNNUM       =  "039"))
+                 AND ( RECE02-YOBIETC(8)   =  ZERO  )
                    IF    RECE02-KYURATE     =   30
                         MOVE    1    TO   FLG-TOKUSITU
                    ELSE
@@ -4308,8 +4314,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  END-IF
       *
                  IF   FLG-TOKUSITU  NOT = ZERO
-                  IF  (RECE02-AGE     >=   70  )
-                  OR  (RECE02-HKNNUM   =  "039")
+                  IF  ((RECE02-AGE         >=   70  ) OR
+                       (RECE02-HKNNUM       =  "039"))
+                  AND ( RECE02-YOBIETC(8)   =  ZERO  )
                     IF    RECE02-KYURATE     =   30
                       MOVE     1   TO   FLG-KISAIOK
                     ELSE
@@ -4350,8 +4357,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ELSE
                      MOVE    01                   TO   WRK-GEN70-DD
                    END-IF
-                   IF  (RECE02-AGE     >=   70  )
-                   OR  (RECE02-HKNNUM   =  "039")
+                   IF  ((RECE02-AGE         >=   70  ) OR
+                        (RECE02-HKNNUM       =  "039"))
+                   AND ( RECE02-YOBIETC(8)   =  ZERO  )
                      INITIALIZE                      SSRHKOH-AREA
                      MOVE    RECE02-PTID         TO  SSRHKOH-PTID
                      MOVE    "2"                 TO  SSRHKOH-NYUGAIKBN
@@ -4385,8 +4393,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      END-IF
                    END-IF
                    IF   FLG-TOKUSITU  NOT = ZERO
-                    IF  (RECE02-AGE     >=   70  )
-                    OR  (RECE02-HKNNUM   =  "039")
+                    IF  ((RECE02-AGE         >=   70  ) OR
+                         (RECE02-HKNNUM       =  "039"))
+                    AND ( RECE02-YOBIETC(8)   =  ZERO  )
                       IF    RECE02-KYURATE     =   30
                         MOVE     1   TO   FLG-KISAIOK
                       ELSE

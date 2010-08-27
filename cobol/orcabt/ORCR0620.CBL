@@ -172,6 +172,7 @@
       *                                     ある場合の記録の修正 
       *  04.04.07    NACL-門脇    10/01/04  公費単独の保険組み合わせ
       *                                     フラグ編集
+      *  04.04.08    NACL-門脇    10/08/23  高齢非該当対応
       *
       *  04.05.01    NACL-藤原    09/07/23  主科未設定患者の主科再取得対応
       *  04.05.02    NACL-藤原    10/01/05  治験対応
@@ -1407,6 +1408,9 @@
                END-IF
            END-PERFORM
       *
+      *    高齢非該当編集
+           PERFORM   2101-KOREI-HIGAITO-HENSYU-SEC
+      *
       *    レセプト種別
            PERFORM   RECESYUBETU-SET-SEC
       *
@@ -1532,15 +1536,16 @@
               CONTINUE
            ELSE
               IF      RECE62-SRYYM  >=  "200210"
-                IF  ( RECE62-AGE          >=  70      )   OR
-                    ( RECE62-AGE          >=  65  AND
-                      RECE61-KOHID    NOT  =   ZERO   )   OR
-      ***           ( RECE62-AGE          >=  65  AND
-      ***             FLG-ROUJINHOKEN      =   1      )   OR
-      ***           ( RECE62-AGE          >=  65  AND                    
-      ***             RECE62-HKNNUM        =  "039"   )
-                    ( FLG-ROUJINHOKEN      =   1      )   OR
-                    ( RECE62-HKNNUM        =  "039"   )
+                IF   (( RECE62-AGE          >=  70      )   OR
+                      ( RECE62-AGE          >=  65  AND
+                        RECE61-KOHID    NOT  =   ZERO   )   OR
+      ***             ( RECE62-AGE          >=  65  AND
+      ***               FLG-ROUJINHOKEN      =   1      )   OR
+      ***             ( RECE62-AGE          >=  65  AND
+      ***               RECE62-HKNNUM        =  "039"   )
+                      ( FLG-ROUJINHOKEN      =   1      )   OR
+                      ( RECE62-HKNNUM        =  "039"   ))
+                AND  (  RECE62-YOBIETC(8)    =  ZERO     )
                    MOVE     "1"     TO   RECE62-KOUREI
                 ELSE
                   IF  RECE62-SRYYM  >=  "200704"
@@ -1903,6 +1908,63 @@
       *
            .
        2101-TEISYOTOKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    高齢非該当編集
+      *****************************************************************
+       2101-KOREI-HIGAITO-HENSYU-SEC                   SECTION.
+      *
+           IF    RECE62-AGE         >=    70
+             IF  (RECE62-HKNNUM       =  SPACE OR "040" OR "039"
+                                               OR "067" OR "069")
+             OR  (RECE62-HKNNUM(1:2)  =   "98" OR  "90" OR  "91")
+                CONTINUE
+             ELSE
+              IF ( RECE62-HKNNUM      = "060" OR  "068" )
+              OR ((RECE62-HKNNUM  NOT = "060" AND "068") AND
+                  (RECE62-HOJOKBN     = SPACE          ))
+                MOVE      RECE61-SRYYM       TO   WRK-SRYYYMM
+                IF   RECE62-TEKSTYMD(1:6)  >=  RECE61-SRYYM
+                  MOVE  RECE62-TEKSTYMD(7:2) TO   WRK-SRYDD
+                ELSE
+                  MOVE  01                   TO   WRK-SRYDD
+                END-IF
+      *
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    RECE61-HOSPNUM       TO  PTKOH-HOSPNUM
+                MOVE    RECE61-PTID          TO  PTKOH-PTID
+                MOVE    "976"                TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key4"               TO  MCP-PATHNAME
+                PERFORM   900-DBSELECT-SEC
+                IF      MCP-RC               =   ZERO
+                  MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                  MOVE    "key4"             TO  MCP-PATHNAME
+                  PERFORM  PTKOHINF-READ-SEC
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                    IF    (PTKOH-TEKSTYMD  <=  WRK-SRYYMD    )
+                    AND   (WRK-SRYYMD      <=  PTKOH-TEKEDYMD)
+                    AND   (PTKOH-SAKJOKBN   =  SPACE         )
+                       MOVE    1    TO   RECE62-YOBIETC(8)
+                       MOVE    1    TO   FLG-PTKOHINF
+                    ELSE
+                       MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                       MOVE    "key4"            TO  MCP-PATHNAME
+                       PERFORM  PTKOHINF-READ-SEC
+                    END-IF
+                  END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key4"               TO  MCP-PATHNAME
+                PERFORM  900-CLOSE-SEC
+              END-IF
+             END-IF
+           END-IF
+      *
+           .
+       2101-KOREI-HIGAITO-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

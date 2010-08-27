@@ -281,6 +281,7 @@
       *  04.04.27    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.28    NACL-ÌçÏÆ    10/07/20  ´Î±êÊ£¿ô¸øÈñÂÐ±þ
       *  04.04.29    NACL-ÌçÏÆ    10/08/06  ¼«Î©»Ù±çÆÊÌÚ¸©ÆÈ¼«ÂÐ±þ
+      *  04.04.30    NACL-ÌçÏÆ    10/08/23  ¹âÎðÈó³ºÅöÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/25  ÊÝ¸±¡¢¼«Èñ¤½¤ì¤¾¤ì¤ÎÀÁµá³ÛÃ¼¿ô
       *                                     ÀßÄêµ¡Ç½
@@ -430,6 +431,7 @@
            03  FLG-FTNRATE100          PIC 9(01).
            03  FLG-KOREI-TANYUIN       PIC 9(01).
            03  FLG-KUMAMOTO-CYO        PIC 9(01).
+           03  FLG-KOREI-HIGAITO       PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -3559,6 +3561,56 @@
                END-IF
            END-IF
       *
+      *    ¹âÎðÈó³ºÅö¼Ô
+           MOVE      ZERO     TO    FLG-KOREI-HIGAITO
+           IF   (LNK-S02-KOUREI-NYUIN-KBN   = "1"  )
+           AND  (AGECHK-NENREI             >=  70  )
+             IF  (COMB-HKNNUM                =   SPACE   )
+             OR  (COMB-SYU-HKNKOHSBTKBN    = "8" OR "9"  )
+             OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
+                                        OR "040" OR "039"
+                                        OR "067" OR "069")
+                CONTINUE
+             ELSE
+              IF ( COMB-HKNNUM      = "060" OR  "068" )
+              OR ((COMB-HKNNUM  NOT = "060" AND "068") AND
+                  (COMB-HOJOKBN     = SPACE          ))
+                INITIALIZE                     PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
+                MOVE    "976"              TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+                MOVE    "DBSELECT"         TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"        USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+                IF      MCP-RC             =   ZERO
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
+                  PERFORM  PTKOHINF-READ-SEC
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                    IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                    AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                    AND (PTKOH-SAKJOKBN   =  SPACE         )
+                       MOVE    1           TO  FLG-KOREI-HIGAITO
+                       MOVE    SPACE       TO  LNK-S02-KOUREI-NYUIN-KBN
+                       MOVE    1           TO  FLG-PTKOHINF
+                    ELSE
+                       MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                       MOVE    "key4"          TO  MCP-PATHNAME
+                       PERFORM  PTKOHINF-READ-SEC
+                    END-IF
+                  END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
+              END-IF
+             END-IF
+           END-IF
+      *
            IF   LNK-S02-KOUREI-NYUIN-KBN   =  "1"
                IF  COMB-SYU-HKNKOHSBTKBN   =  "8" OR "9"
                    MOVE  SPACE       TO  LNK-S02-KOUREI-NYUIN-KBN
@@ -3614,6 +3666,7 @@
                                                  OR "039")
              OR  (AGECHK-NENREI         <     70         )
       ***    OR  (AGECHK-NENREI         >     74         )
+             OR  (FLG-KOREI-HIGAITO     =      1         )
                CONTINUE
              ELSE
                IF  COMB-HOJOKBN  =  "1"  OR  "9"

@@ -313,6 +313,7 @@
       *  04.04.26    NACL-ÃÁœ∆    10/05/21  ∞ÒæÎ∏©√œ ˝∏¯»Ò¬–±˛
       *  04.04.27    NACL-ÃÁœ∆    10/07/20  ¥Œ±Í £øÙ∏¯»Ò¬–±˛
       *  04.04.28    NACL-ÃÁœ∆    10/08/06  º´Œ©ªŸ±Á∆ Ã⁄∏©∆»º´¬–±˛
+      *  04.04.29    NACL-ÃÁœ∆    10/08/23  π‚Œ»Û≥∫≈ˆ¬–±˛
       *
       *  04.05.01    NACL-ÃÁœ∆    09/06/16  ∞Ï≥Á∫∆∑◊ªª ˝À°¡™¬Úµ°«Ω¬–±˛
       *  04.05.02    NACL-ÃÁœ∆    09/06/22  øÙŒÃæÆøÙ£µ∑Â¬–±˛
@@ -480,6 +481,7 @@
            03  FLG-MARUTOARI2          PIC 9(01).
            03  FLG-FTNRATE100          PIC 9(01).
            03  FLG-KUMAMOTO-CYO        PIC 9(01).
+           03  FLG-KOREI-HIGAITO       PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -3564,6 +3566,56 @@
                END-IF
            END-IF
       *
+      *    π‚Œ»Û≥∫≈ˆº‘
+           MOVE      ZERO     TO    FLG-KOREI-HIGAITO
+           IF   (FLG-KOUREI-KBN   = "1"            )
+           AND  (AGECHK-NENREI   >=  70            )
+             IF  (COMB-HKNNUM                =   SPACE   )
+             OR  (COMB-SYU-HKNKOHSBTKBN  = "8" OR "9"    )
+             OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
+                                        OR "040" OR "039"
+                                        OR "067" OR "069")
+                CONTINUE
+             ELSE
+              IF ( COMB-HKNNUM      = "060" OR  "068" )
+              OR ((COMB-HKNNUM  NOT = "060" AND "068") AND
+                  (COMB-HOJOKBN     = SPACE          ))
+                INITIALIZE                     PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
+                MOVE    "976"              TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+                MOVE    "DBSELECT"         TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"        USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+                IF      MCP-RC             =   ZERO
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
+                  PERFORM  PTKOHINF-READ-SEC
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                    IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                    AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                    AND (PTKOH-SAKJOKBN   =  SPACE         )
+                       MOVE    1           TO  FLG-KOREI-HIGAITO
+                       MOVE    SPACE       TO  FLG-KOUREI-KBN
+                       MOVE    1           TO  FLG-PTKOHINF
+                    ELSE
+                       MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                       MOVE    "key4"          TO  MCP-PATHNAME
+                       PERFORM  PTKOHINF-READ-SEC
+                    END-IF
+                  END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
+              END-IF
+             END-IF
+           END-IF
+      *
       *    º´«Â¿’°¶Œ≈Õ‹√¥≈ˆºÍ≈ˆÕ—∆√Œ„ΩËÕ˝
       *    ° º´«Â¿’§ŒæÏπÁ°¢£∑≈¿§Ú£∏£¥±ﬂ§À∆…§ﬂ¬ÿ§®§Î°À
       *    ° Œ≈Õ‹√¥≈ˆºÍ≈ˆ°ß£±∑Ó£±≤Û§ŒªªƒÍ°À
@@ -3593,6 +3645,7 @@
                                                  OR "039")
              OR  (AGECHK-NENREI         <     70         )
       ***    OR  (AGECHK-NENREI         >     74         )
+             OR  (FLG-KOREI-HIGAITO     =      1         )
                CONTINUE
              ELSE
                IF  COMB-HOJOKBN  =  "1"  OR  "9"
@@ -3750,6 +3803,16 @@
                END-IF
            END-IF
       *
+           IF   FLG-KOUREI-KBN  =  "1"
+               IF  COMB-SYU-HKNKOHSBTKBN   =   "8" OR "9"
+                   MOVE  SPACE       TO  FLG-KOUREI-KBN
+               END-IF
+               IF  COMB-HKNNUM  =  "971"  OR  "973"  OR  "975"
+                               OR  "068"  OR  "069"  OR  "040"
+                   MOVE  SPACE       TO  FLG-KOUREI-KBN
+               END-IF
+           END-IF
+      *
            IF      FLG-GENBUTU70           NOT =  ZERO
               MOVE   FLG-GENBUTU70   TO  LNK-SYU-SKJ-FTNGAKU(2)
            END-IF
@@ -3770,16 +3833,6 @@
            IF     (LNK-S01-KOUREI-ZAITAKU-KBN  =  "1" )
            OR     (FLG-GENBUTU70           NOT =  ZERO)
               MOVE      "1"          TO  LNK-SYU-ZAITAKU
-           END-IF
-      *
-           IF   FLG-KOUREI-KBN  =  "1"
-               IF  COMB-SYU-HKNKOHSBTKBN   =   "8" OR "9"
-                   MOVE  SPACE       TO  FLG-KOUREI-KBN
-               END-IF
-               IF  COMB-HKNNUM  =  "971"  OR  "973"  OR  "975"
-                               OR  "068"  OR  "069"  OR  "040"
-                   MOVE  SPACE       TO  FLG-KOUREI-KBN
-               END-IF
            END-IF
       *
       *    ∞Ï»Ã∑–≤·¡º√÷¬–æ›º‘
