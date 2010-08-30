@@ -46,6 +46,8 @@
       *                                     ¤ÎÂÐ±þ
       *  04.04.02    NACL-ÌçÏÆ    09/04/13  Ê¿À®£²£±Ç¯£µ·î²þÀµÂÐ±þ
       *  04.04.03    NACL-ÌçÏÆ    10/03/23  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£µ¤ÎÂÐ±þ¡Ë
+      *  04.04.04    NACL-Æ£¸¶    10/08/23  ¸å´ü¹âÎðÈó³ºÅöÂÐ±þ
+      *                                     ¡Ê¹âÎð¼õµë¼ÔÉ¼¤¬¤Ê¤¤¾ì¹ç¡Ë 
       *
       *  04.05.01    NACL-°ËÆ£    10/01/28  ¾®¿ôÅÀ£µ·åÂÐ±þCOPY¶ç¤Î¤ß
       *              NACL-¾®Æ¦Âô  10/02/16  ¼£¸³ÂÐ±þ
@@ -326,6 +328,13 @@
            03  WRK-YM              PIC 9(06).
       *
            03  WRK-MSG-NYUGAI      PIC X(04).
+      *
+      *    ¸å´ü¹âÎð¼ÔÈó³ºÅö¥Õ¥é¥°
+           03  WRK-KOUKI-FLG           PIC 9(01).
+      *
+           03  WRK-TEKSTYMD.
+               05  WRK-TEKSTYYMM       PIC 9(06).
+               05  WRK-TEKSTDD         PIC 9(02).
       *    ¥ì¥»¥×¥È¼ïÊÌÈ½ÄêÍÑÎÎ°è
        01  WK-RECESYUBETU-AREA.
            03  WK-KOKUHO                               PIC X(01).
@@ -1597,6 +1606,9 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
       *
            MOVE    LOW-VALUE           TO  KEY-AREA
       *
+           MOVE    SPACE               TO  WRK-ERR-AREA
+           INITIALIZE                      WRK-ERR-AREA
+      *
            INITIALIZE                      SRYACCT-REC
 grpsys     MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
            MOVE    WRK-PARA-SRYYM      TO  ACCT-SRYYM
@@ -1618,9 +1630,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            PERFORM UNTIL       FLG-SRYACCT     =   1
       *        Ì¤ÄûÀµÊ¬¤¬¤¢¤ë¤«
-               MOVE    SPACE               TO  WRK-ERR-AREA
-               INITIALIZE                      WRK-ERR-AREA
-      *
                IF      KEY-N-HKNCOMBI      =   9999
                    INITIALIZE                  HKNCOMBI-REC
                    MOVE    PTINF-PTID          TO  COMB-PTID
@@ -3146,6 +3155,68 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
                    END-IF
                END-IF
       *
+      *        ¸å´ü¹âÎðÈó³ºÅö¤ÎÍ­ÌµÀßÄê
+               MOVE    ZERO            TO  WRK-KOUKI-FLG
+      * 
+               IF    ( COLDAT01-AGE    >=  70                    )
+               AND   ( WRK-PARA-SRYYM  >=  WRK-CONS-SRYYM-200804 )
+                   IF    ( COLDAT01-HKNNUM     =   SPACE   OR  "040"   
+                                               OR  "039"   OR  "067"
+                                               OR  "069"             )
+                   OR    ( COLDAT01-HKNNUM (1:2)
+                                               =   "98"    OR  "90"
+                                               OR  "91"              )
+                       CONTINUE
+                   ELSE
+                       IF   (  COLDAT01-HKNNUM =   "060"   OR  "068" )
+                       OR   (( COLDAT01-HKNNUM
+                                           NOT =   "060"   AND "068" )
+                               AND
+                             ( COLDAT01-THOJOKBN (IDY)
+                                               =   SPACE             ))
+                           MOVE    WRK-PARA-SRYYM  TO  WRK-TEKSTYYMM
+                           IF      COLDAT01-TTEKSTYMD (IDY) (1:6)  >=
+                                               WRK-PARA-SRYYM
+                                MOVE  COLDAT01-TTEKSTYMD (IDY)(7:2)
+                                                       TO  WRK-TEKSTDD
+                           ELSE
+                                MOVE  01               TO  WRK-TEKSTDD
+                           END-IF
+      *
+                           INITIALIZE                      PTKOHINF-REC
+                           MOVE    WRK-PARA-HOSPNUM    TO  PTKOH-HOSPNUM
+                           MOVE    COLDAT01-PTID       TO  PTKOH-PTID
+                           MOVE    "976"               TO  PTKOH-KOHNUM
+                           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                           MOVE    "key4"              TO  MCP-PATHNAME
+                           PERFORM 900-DBSELECT-SEC
+                           IF      MCP-RC              =   ZERO
+                               MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                               MOVE    "key4"          TO  MCP-PATHNAME
+                               PERFORM 900-PTKOHINF-READ-N-SEC
+                               PERFORM UNTIL   FLG-PTKOHINF    =   1
+                                   IF    (PTKOH-TEKSTYMD
+                                                       <=  WRK-TEKSTYMD)
+                                   AND   (WRK-TEKSTYMD <=
+                                                       PTKOH-TEKEDYMD  )
+                                       MOVE    1       TO  WRK-KOUKI-FLG
+                                       MOVE    1       TO  FLG-PTKOHINF
+                                   ELSE
+                                       MOVE    "tbl_ptkohinf"
+                                                        TO  MCP-TABLE
+                                       MOVE    "key4"   TO  MCP-PATHNAME
+                                       PERFORM  900-PTKOHINF-READ-N-SEC
+                                   END-IF
+                               END-PERFORM
+                           END-IF
+                           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                           MOVE    "key4"               TO  MCP-PATHNAME
+                           PERFORM  900-DBCLOSE-SEC
+                       END-IF
+                   END-IF
+               END-IF
+      *
                IF      WRK-PARA-SRYYM  >=  WRK-CONS-SRYYM-200804
                    EVALUATE    COLDAT01-HKNNUM
                        WHEN    "002"
@@ -3183,6 +3254,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
       *********************IF  (COLDAT01-AGE  >=   70)  AND
       *********************    (COLDAT01-AGE  <=   74)
                            IF  (COLDAT01-AGE  >=   70)
+                           AND (WRK-KOUKI-FLG =    0 )
                              EVALUATE    WRK-PARA-NYUGAIKBN
                                WHEN    "1"
                                    EVALUATE   COLDAT01-THOJOKBN (IDY)
@@ -4824,6 +4896,27 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊóÆÉ¹þ
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PTKOHINF-REC
+               IF      PTKOH-SAKJOKBN      =   "1"
+                   GO  TO  900-PTKOHINF-READ-N-SEC
+               END-IF
+               MOVE    ZERO                TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1                   TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¥ì¥»¥×¥ÈÌÀºÙ½ñÆÉ¹þ
       *****************************************************************
        900-COLDAT01-READ-SEC             SECTION.
@@ -4836,6 +4929,35 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-READ
            .
        900-COLDAT01-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ä£Â£Ó£Å£Ì£Å£Ã£Ô½èÍý
+      *****************************************************************
+       900-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+grpsys     PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               CONTINUE
+           ELSE
+               DISPLAY "SELECT ERR table=" MCP-TABLE
+                       " pathname="        MCP-PATHNAME
+           END-IF
+           .
+       900-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ä£Â£Æ£Å£Ô£Ã£È½èÍý
+      *****************************************************************
+       900-DBFETCH-SEC                SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+grpsys     PERFORM 900-ORCDBMAIN-SEC
+      *
+           .
+       900-DBFETCH-EXT.
            EXIT.
       *
       *****************************************************************

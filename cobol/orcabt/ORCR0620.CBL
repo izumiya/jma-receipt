@@ -2187,6 +2187,9 @@
                                        LNK-SYUBETUGET-RECESKYKBN (IDX)
                    END-IF 
                END-PERFORM
+               IF      RECE62-YOBIETC (8)  =   1
+                   MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
+               END-IF
                CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
                MOVE    LNK-SYUBETUGET-RECESYUBETU

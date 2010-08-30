@@ -82,6 +82,8 @@
       *  04.04.04    NACL-藤原    09/12/17  月途中に医保と自立支援の併用
       *                                     から自立支援単独になったとき
       *                                     のまとめ対応
+      *  04.04.05    NACL-藤原    10/08/23  後期高齢非該当対応
+      *                                     （高齢受給者票がない場合） 
       *
       *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
       *                                     平成２２年４月分以降の政府管
@@ -169,6 +171,12 @@
       *
       *    年齢
            03  WRK-NENREI              PIC 9(03).
+      *    後期高齢者非該当フラグ
+           03  WRK-KOUKI-FLG           PIC 9(01).
+      *
+           03  WRK-TEKSTYMD.
+               05  WRK-TEKSTYYMM       PIC 9(06).
+               05  WRK-TEKSTDD         PIC 9(02).
       *
       *
            03  WRK-1033-TABLE.
@@ -2124,6 +2132,65 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                MOVE    WRK-RECE61-HKNCOMBI-O (IDX)
                                    TO  LNK-SYUBETU-HKNCOMBI (IDZZ IDX)
            END-PERFORM
+      *        
+      *    後期高齢非該当の有無設定
+           MOVE    ZERO            TO  WRK-KOUKI-FLG
+      *
+           IF    WRK-NENREI        >=  70
+               IF    ( WRK-RECE61-HKNNUM
+                                       =   SPACE   OR  "040"   OR  "039"
+                                       OR  "067"   OR  "069"           )
+               OR    ( WRK-RECE61-HKNNUM (1:2)
+                                       =   "98"    OR  "90"    OR  "91")
+                   CONTINUE
+               ELSE
+                   IF   (  WRK-RECE61-HKNNUM   =   "060"   OR  "068" )
+                   OR   (( WRK-RECE61-HKNNUM
+                                           NOT =   "060"   AND "068")
+                           AND
+                         ( WRK-RECE61-HOJOKBN  =   SPACE            ))
+                       MOVE      LNK-SYUBETU-SRYYM    TO  WRK-TEKSTYYMM
+                       IF   WRK-RECE61-TEKSTYMD(1:6)  >=
+                                                      LNK-SYUBETU-SRYYM
+                            MOVE  WRK-RECE61-TEKSTYMD(7:2)
+                                                       TO  WRK-TEKSTDD
+                       ELSE
+                            MOVE  01                   TO  WRK-TEKSTDD
+                       END-IF
+      *
+                       INITIALIZE                      PTKOHINF-REC
+                       MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
+                       MOVE    LNK-SYUBETU-PTID    TO  PTKOH-PTID
+                       MOVE    "976"               TO  PTKOH-KOHNUM
+                       MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                       MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                       MOVE    "key4"              TO  MCP-PATHNAME
+                       PERFORM 900-DBSELECT-SEC
+                       IF      MCP-RC              =   ZERO
+                           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                           MOVE    "key4"              TO  MCP-PATHNAME
+                           PERFORM 900-PTKOHINF-READ-N-SEC
+                           PERFORM UNTIL   FLG-PTKOHINF    =   1
+                               IF    (PTKOH-TEKSTYMD   <=  WRK-TEKSTYMD)
+                               AND   (WRK-TEKSTYMD     <=
+                                                       PTKOH-TEKEDYMD  )
+                                   MOVE    1           TO  WRK-KOUKI-FLG
+                                   MOVE    1           TO  FLG-PTKOHINF
+                               ELSE
+                                   MOVE    "tbl_ptkohinf"
+                                                    TO  MCP-TABLE
+                                   MOVE    "key4"   TO  MCP-PATHNAME
+                                   PERFORM  900-PTKOHINF-READ-N-SEC
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                       MOVE    "key4"               TO  MCP-PATHNAME
+                       PERFORM  900-CLOSE-SEC
+                   END-IF
+               END-IF
+           END-IF
+      *
       *    レセプト種別
            PERFORM 30011-RECESYUBETU-SET-SEC
            .
@@ -2233,6 +2300,10 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
                    END-IF
                END-IF     
            END-PERFORM
+           IF      WRK-KOUKI-FLG   =   1
+               MOVE    SPACE           TO  LNK-SYUBETUGET-HKN-HOJOKBN
+           END-IF
+      *
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
            MOVE    LNK-SYUBETUGET-RECESYUBETU
@@ -2406,7 +2477,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO                TO  FLG-PTKOHINF
                    MOVE    MCPDATA-REC         TO  PTKOHINF-REC
-                   IF      PTHKN-SAKJOKBN      =   "1"
+                   IF      PTKOH-SAKJOKBN      =   "1"
                        MOVE    1                   TO  FLG-PTKOHINF
                    END-IF
                ELSE
@@ -2422,6 +2493,27 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-PTKOHINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報読込
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PTKOHINF-REC
+               IF      PTKOH-SAKJOKBN      =   "1"
+                   GO  TO  900-PTKOHINF-READ-N-SEC
+               END-IF
+               MOVE    ZERO                TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1                   TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
            EXIT.
       *
       *****************************************************************

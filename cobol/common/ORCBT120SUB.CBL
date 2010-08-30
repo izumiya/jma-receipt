@@ -36,6 +36,9 @@
       *  04.04.01    NACL-Æ£¸¶    09/02/26  Ê¿À®£²£°Ç¯£´·î°Ê¹ß¤Ë£·£µºÐÅþ
       *                                     Ã£»þ¤Ë³¤³°¤Ë½»½ê¤òÍ­¤¹¤ë¾ì¹ç
       *                                     ¤ÎÂÐ±þ
+      *  04.04.02    NACL-Æ£¸¶    10/08/23  ¸å´ü¹âÎðÈó³ºÅöÂÐ±þ
+      *                                     ¡Ê¹âÎð¼õµë¼ÔÉ¼¤¬¤Ê¤¤¾ì¹ç¡Ë
+      * 
       *  04.05.00    NACL-¾®Æ¦Âô  10/01/07  ¼£¸³¤Î¥ì¥»¥×¥È¼ïÊÌÂÐ±þ
       *****************************************************************
       *
@@ -62,6 +65,7 @@
            03  FLG-SYUNOU                  PIC 9(01).
            03  FLG-PTHKNINF                PIC 9(01).
            03  FLG-PTRSIINF                PIC 9(01).
+           03  FLG-PTKOHINF                PIC 9(01).
            03  FLG-NYUIN-HIT1              PIC 9(01).
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -93,6 +97,12 @@
            03  WRK-HKNCOMBINUM-X               PIC X(04).
            03  WRK-HKNCOMBINUM-9  REDEFINES  WRK-HKNCOMBINUM-X
                                                PIC 9(04).
+      *    ¸å´ü¹âÎð¼ÔÈó³ºÅö¥Õ¥é¥°
+           03  WRK-KOUKI-FLG                   PIC 9(01).
+      *
+           03  WRK-TEKSTYMD.
+               05  WRK-TEKSTYYMM               PIC 9(06).
+               05  WRK-TEKSTDD                 PIC 9(02).
       *
       *    ¥ì¥»¥×¥È¼ïÊÌÈ½ÄêÍÑÎÎ°è
        01  WK-RECESYUBETU-AREA.
@@ -161,6 +171,9 @@
        01  PTRSIINF-REC.
            COPY    "CPPTRSIINF.INC".
       *
+      *    ´µ¼Ô¸øÈñ¾ðÊó
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -998,6 +1011,71 @@
                    END-IF
                END-IF
       *
+      *        ¸å´ü¹âÎð¼ÔÈó³ºÅö
+               MOVE    ZERO            TO  WRK-KOUKI-FLG
+      *
+               IF    ( LNK-ORCBT120SUB-SANTEIYMD(1:6)
+                                      >=  "200804" )
+               AND   ( WRK-AGE        >=  70       )
+                   IF    ( LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
+                                       =   SPACE   OR  "040"   OR  "039"
+                                       OR  "067"   OR  "069"           )
+                   OR    ( LNK-ORCBT120SUB-HKNNUM(SYU-IDX)(1:2)
+                                       =   "98"    OR  "90"    OR  "91")
+                       CONTINUE
+                   ELSE
+                       IF   (  LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
+                                               =   "060"   OR  "068" )
+                       OR   (( LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
+                                           NOT =   "060"   AND "068")
+                               AND
+                             ( LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                                               =   SPACE            ))
+                           MOVE      LNK-ORCBT120SUB-SANTEIYMD(1:6)
+                                                      TO  WRK-TEKSTYYMM
+                           IF      COMB-TEKSTYMD(1:6)  >=
+                                       LNK-ORCBT120SUB-SANTEIYMD(1:6)
+                               MOVE    COMB-TEKSTYMD(7:2)
+                                                       TO  WRK-TEKSTDD
+                           ELSE
+                                MOVE  01               TO  WRK-TEKSTDD
+                           END-IF
+      *
+                           INITIALIZE                      PTKOHINF-REC
+                           MOVE    LNK-ORCBT120SUB-HOSPNUM
+                                                       TO  PTKOH-HOSPNUM
+                           MOVE    COMB-PTID           TO  PTKOH-PTID
+                           MOVE    "976"               TO  PTKOH-KOHNUM
+                           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                           MOVE    "key4"              TO  MCP-PATHNAME
+                           PERFORM 900-DBSELECT-SEC
+                           IF      MCP-RC              =   ZERO
+                               MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                               MOVE    "key4"          TO  MCP-PATHNAME
+                               PERFORM 900-PTKOHINF-READ-N-SEC
+                               PERFORM UNTIL   FLG-PTKOHINF    =   1
+                                   IF    (PTKOH-TEKSTYMD
+                                                       <=  WRK-TEKSTYMD)
+                                   AND   (WRK-TEKSTYMD <=
+                                                       PTKOH-TEKEDYMD  )
+                                       MOVE    1       TO  WRK-KOUKI-FLG
+                                       MOVE    1       TO  FLG-PTKOHINF
+                                   ELSE
+                                       MOVE    "tbl_ptkohinf"
+                                                        TO  MCP-TABLE
+                                       MOVE    "key4"   TO  MCP-PATHNAME
+                                       PERFORM  900-PTKOHINF-READ-N-SEC
+                                   END-IF
+                               END-PERFORM
+                           END-IF
+                           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                           MOVE    "key4"               TO  MCP-PATHNAME
+                           PERFORM  910-DB-CLOSE-SEC
+                       END-IF
+                   END-IF
+               END-IF
+      *
       *            £±³ä¡¢£²³äÉéÃ´¤Î¹âÎð¼Ô¤Î¾ì¹ç£×£Ë¡Ý£È£Ï£Î£Ë£Ú£Ë£Ë£Â£Î¤Ë
       *            "£¹"¤Þ¤¿¤Ï"£¸"¤ò¥»¥Ã¥È
       *            Ï·¿ÍÊÝ¸±¤Î¾ì¹ç¤Ï£×£Ë¡Ý£Ò£Ê£Î¤Ë¥»¥Ã¥È¤¹¤ë
@@ -1059,6 +1137,7 @@
       *********************IF  (WRK-AGE        >=   70)  AND
       *********************    (WRK-AGE        <=   74)
                            IF  (WRK-AGE        >=   70)
+                           AND (WRK-KOUKI-FLG  =    0 )
                               EVALUATE LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
                                    WHEN   "1"
                                    WHEN   "5"
@@ -1528,6 +1607,27 @@
       *
            .
        910-PTRSIINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊóÆÉ¹þ
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PTKOHINF-REC
+               IF      PTKOH-SAKJOKBN      =   "1"
+                   GO  TO  900-PTKOHINF-READ-N-SEC
+               END-IF
+               MOVE    ZERO                TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1                   TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â£Ó£Å£Ì£Å£Ã£Ô½èÍý

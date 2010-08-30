@@ -37,7 +37,10 @@
       *  04.04.01    NACL-藤原    09/02/26  平成２０年４月以降に７５歳到
       *                                     達時に海外に住所を有する場合
       *                                     の対応
-      *  04.05.00    NACL-小豆沢  10/01/07  治験のレセプト種別対応
+      *  04.04.03    NACL-藤原    10/08/23  後期高齢非該当対応
+      *                                     （高齢受給者票がない場合）
+      * 
+      *  04.05.01    NACL-小豆沢  10/01/07  治験のレセプト種別対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -167,6 +170,13 @@
       *
            03  WRK-HKNNUM                  PIC X(03).
            03  WRK-PAYKBN                  PIC X(02).
+      *
+      *    後期高齢者非該当フラグ
+           03  WRK-KOUKI-FLG           PIC 9(01).
+      *
+           03  WRK-TEKSTYMD.
+               05  WRK-TEKSTYYMM       PIC 9(06).
+               05  WRK-TEKSTDD         PIC 9(02).
       *
       *    レセプト種別判定用領域
        01  WK-RECESYUBETU-AREA.
@@ -1328,6 +1338,63 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                WRK-SYUGAKUKBN
            END-IF
       *
+      *    後期高齢非該当の有無設定
+           MOVE    ZERO            TO  WRK-KOUKI-FLG
+      *
+           IF    ( WRK-AGE               >=  70                    )
+           AND   ( WRK-PARA-SRYYMD (1:6) >=  WRK-CONS-SRYYM-200804 )
+               IF    ( COMB-HKNNUM       =   SPACE   OR  "040"   
+                                           OR  "039"   OR  "067"
+                                           OR  "069"             )
+               OR    ( COMB-HKNNUM (1:2)   =   "98"    OR  "90"
+                                           OR  "91"              )
+                   CONTINUE
+               ELSE
+                   IF   (  COMB-HKNNUM         =   "060"   OR  "068" )
+                   OR   (( COMB-HKNNUM     NOT =   "060"   AND "068" )
+                           AND
+                         ( COMB-HOJOKBN        =   SPACE             ))
+                       MOVE    WRK-PARA-SRYYMD (1:6)   TO  WRK-TEKSTYYMM
+                       IF      COMB-TEKSTYMD (1:6)  >=
+                                               WRK-PARA-SRYYMD (1:6)
+                            MOVE  COMB-TEKSTYMD (7:2)  TO  WRK-TEKSTDD
+                       ELSE
+                            MOVE  01                   TO  WRK-TEKSTDD
+                       END-IF
+      *
+                       INITIALIZE                      PTKOHINF-REC
+                       MOVE    WRK-PARA-HOSPNUM    TO  PTKOH-HOSPNUM
+                       MOVE    COMB-PTID           TO  PTKOH-PTID
+                       MOVE    "976"               TO  PTKOH-KOHNUM
+                       MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                       MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                       MOVE    "key4"              TO  MCP-PATHNAME
+                       PERFORM 900-DBSELECT-SEC
+                       IF      MCP-RC              =   ZERO
+                           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                           MOVE    "key4"              TO  MCP-PATHNAME
+                           PERFORM 900-PTKOHINF-READ-N-SEC
+                           PERFORM UNTIL   FLG-PTKOHINF    =   1
+                               IF    (PTKOH-TEKSTYMD   <=  WRK-TEKSTYMD)
+                               AND   (WRK-TEKSTYMD     <=
+                                                       PTKOH-TEKEDYMD  )
+                                   MOVE    1           TO  WRK-KOUKI-FLG
+                                   MOVE    1           TO  FLG-PTKOHINF
+                               ELSE
+                                   MOVE    "tbl_ptkohinf"
+                                                    TO  MCP-TABLE
+                                   MOVE    "key4"   TO  MCP-PATHNAME
+                                   PERFORM  900-PTKOHINF-READ-N-SEC
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                       MOVE    "key4"               TO  MCP-PATHNAME
+                       PERFORM  900-CLOSE-SEC
+                   END-IF
+               END-IF
+           END-IF
+      *
            IF      TOUKEI04-HKNNUM     NOT =   SPACE
                EVALUATE    TOUKEI04-HKNNUM
                    WHEN    "060"
@@ -1445,6 +1512,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *********************IF  (WRK-AGE  >=   70)  AND
       *********************    (WRK-AGE  <=   74)
                            IF  (WRK-AGE  >=   70)
+                           AND (WRK-KOUKI-FLG
+                                         =    0 )
                                EVALUATE   COMB-HOJOKBN
                                    WHEN   "1"
                                    WHEN   "4"
@@ -2147,6 +2216,27 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        910-PTHKNINF-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報読込
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PTKOHINF-REC
+               IF      PTKOH-SAKJOKBN      =   "1"
+                   GO  TO  900-PTKOHINF-READ-N-SEC
+               END-IF
+               MOVE    ZERO                TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1                   TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
            EXIT.
       *
       *****************************************************************
