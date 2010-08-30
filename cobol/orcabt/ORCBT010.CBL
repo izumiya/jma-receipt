@@ -1007,6 +1007,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            PERFORM UNTIL       FLG-SRYACCT     =   1
       *        未訂正分があるか
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+      *
                IF      KEY-N-HKNCOMBI      =   9999
                    INITIALIZE                  HKNCOMBI-REC
                    MOVE    WRK-PARA-HOSPNUM    TO  COMB-HOSPNUM
