@@ -205,6 +205,8 @@
            03  FLG-KANA                PIC 9(01).
            03  FLG-HKN-ADD2            PIC 9(01).
            03  FLG-27KOH-OK            PIC 9(01).
+      *    高齢者非該当（H22.9)
+           03  FLG-RJNCHK4             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -4663,6 +4665,7 @@
            MOVE    ZERO                TO  SPA-KOH-IDX2
            MOVE    ZERO                TO  FLG-27KOH-OK
            MOVE    ZERO                TO  FLG-RJNCHK3
+           MOVE    ZERO                TO  FLG-RJNCHK4
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       IDX     >   SPA-PTKOH-MAX
                IF     (SPA-PTKOH-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
@@ -4682,6 +4685,12 @@
       *!!          後期高齢者非該当(H21.3)
                    IF      SPA-PTKOH-KOHNUM  (IDX) =   "977"
                        MOVE    1                   TO  FLG-RJNCHK3
+                   END-IF
+      *!!
+      *!!          高齢者非該当(H22.9)
+                   IF      SPA-PTKOH-KOHNUM  (IDX) =   "976"
+                       MOVE    1                   TO  FLG-RJNCHK3
+                       MOVE    1                   TO  FLG-RJNCHK4
                    END-IF
       *!!
                END-IF
@@ -4746,6 +4755,8 @@
                    IF     (FLG-RJNCHK3         =   1 )
                    AND    (FLG-HKNCHK          =   1 )
                    AND    (FLG-RJNCHK          =   ZERO )
+      *            高齢者非該当以外
+                   AND    (FLG-RJNCHK4         =   ZERO )
                        MOVE    "0128"              TO  SPA-ERRCD
                        MOVE    11                  TO  SPA-GMN-CUR
                    END-IF
@@ -4768,7 +4779,10 @@
                      AND  (FLG-RJNKOHERR       =   ZERO)
                        CONTINUE
                    ELSE
+      *              高齢者非該当以外
+                     IF   (FLG-RJNCHK4         =   ZERO   )
                        PERFORM 4103311-RJN-CHEK02-SEC
+                     END-IF
                    END-IF
                END-IF
            END-IF
@@ -5109,6 +5123,8 @@
                    IF     (SPA-PTKOH-KOHNUM  (IDX) =   "968" )
       *!!               後期高齢者非該当(H21.3)
                        OR (SPA-PTKOH-KOHNUM  (IDX) =   "977" )
+      *!!               高齢者非該当(H22.9)
+                       OR (SPA-PTKOH-KOHNUM  (IDX) =   "976" )
                        MOVE    1                   TO  FLG-RJNCHK2
                    END-IF
                END-IF

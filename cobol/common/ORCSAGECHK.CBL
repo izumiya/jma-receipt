@@ -55,6 +55,7 @@
       * 04.02.00     NACL-Â¿¡¹Ç¼  08/03/XX  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡Ê¸å´ü¹âÎð¼Ô¡¢½¢³ØÁ°È½Äê¡Ë
       *                                     ¡Ê»ÄÎ±Ë®¿Í¡Ë
+      * 04.05.00     NACL-Â¿¡¹Ç¼  10/08/24  ¹âÎð¼ÔÈó³ºÅöÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -93,6 +94,7 @@
            03  FLG-CHK-OK          PIC 9(01).
            03  FLG-TAHKN           PIC 9(01).
            03  FLG-HI-ROUJIN       PIC 9(01).
+           03  FLG-HI-ROUJIN2      PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -133,6 +135,8 @@
            03  WRK-N-STRYMD.
                05  WRK-N-SYY           PIC 9(04).
                05  WRK-N-SMD           PIC X(04).
+      *
+           03  WRK-KEY-KOHNUM          PIC X(03).
       *
       *   ÆüÉÕÊÑ´¹¥µ¥Ö
            COPY    "CPORCSDAY.INC".
@@ -412,8 +416,9 @@
       *            £·£µºÐ°Ê¾å¤Ç¡¢¸å´ü¹âÎð¼Ô°Ê³°ÊÝ¸±
                    PERFORM 20011-ROUJIN-CHK3-SEC
                    IF     (AGECHK-ROUJIN2      =   ZERO )
-                      AND (FLG-HI-ROUJIN       =   1    )
-                      AND (FLG-TAHKN           =   1    )
+                    AND  ((FLG-HI-ROUJIN       =   1    ) OR
+                          (FLG-HI-ROUJIN2      =   1    ))
+                    AND   (FLG-TAHKN           =   1    )
                        MOVE    ZERO                TO  AGECHK-ROUJIN2
                    ELSE
                        MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
@@ -706,6 +711,12 @@
                   (COMB-KOH4HKNNUM     =   "053" ))
                MOVE    1               TO  FLG-OK2
            END-IF
+      *!!!!
+      *    ¹âÎð¼ÔÈó³ºÅö¤¢¤ê
+           IF      FLG-HI-ROUJIN2      =   1
+               MOVE    1               TO  FLG-OK2
+           END-IF
+      *!!!!
       *    Ï·¿Í¸øÈñ¤Ç¡¢»ÙÊ§¶èÊ¬¤¬¤¢¤ë»þ
            IF      AGECHK-SRYYMD       >=  "20061001"
       *        £È£±£¸¡¥£±£°²þÀµ°Ê¹ß¤Î¥Á¥§¥Ã¥¯
@@ -1292,8 +1303,9 @@
                    ELSE
                        PERFORM 20011-ROUJIN-CHK3-SEC
                        IF     (AGECHK-ROUJIN2      =   ZERO )
-                          AND (FLG-HI-ROUJIN       =   1    )
-                          AND (FLG-TAHKN           =   1    )
+                        AND  ((FLG-HI-ROUJIN       =   1    )  OR
+                              (FLG-HI-ROUJIN2      =   1    ))
+                        AND   (FLG-TAHKN           =   1    )
                            MOVE    ZERO            TO  AGECHK-ROUJIN2
                            MOVE    ZERO            TO  AGECHK-ROUJIN
                        END-IF
@@ -1323,28 +1335,8 @@
        2009-ROUJIN-CHK-SEC         SECTION.
       *
       *    ¸øÈñÊÔ½¸
-           INITIALIZE                  PTKOHINF-REC
-           MOVE    AGECHK-HOSPNUM      TO  PTKOH-HOSPNUM
-           MOVE    AGECHK-PTID         TO  PTKOH-PTID
-           MOVE    "027"               TO  PTKOH-KOHNUM
-           MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKSTYMD
-           MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKEDYMD
-      *
-           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
-           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-           MOVE    "key6"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 920-PTKOHINF-READ-SEC
-           ELSE
-               MOVE    1               TO  FLG-PTKOHINF
-           END-IF
-           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-           MOVE    "key6"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
+           MOVE    "027"               TO  WRK-KEY-KOHNUM
+           PERFORM 9001-PTKOHINF-KEY06-SEC
            IF      FLG-PTKOHINF        =   ZERO
                MOVE    1                   TO  AGECHK-ROUJIN
                MOVE    1                   TO  AGECHK-ROUJIN2
@@ -1361,28 +1353,8 @@
        20010-ROUJIN-CHK2-SEC         SECTION.
       *
       *    ¸øÈñÊÔ½¸
-           INITIALIZE                  PTKOHINF-REC
-           MOVE    AGECHK-HOSPNUM      TO  PTKOH-HOSPNUM
-           MOVE    AGECHK-PTID         TO  PTKOH-PTID
-           MOVE    "027"               TO  PTKOH-KOHNUM
-           MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKSTYMD
-           MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKEDYMD
-      *
-           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
-           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-           MOVE    "key6"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 920-PTKOHINF-READ-SEC
-           ELSE
-               MOVE    1               TO  FLG-PTKOHINF
-           END-IF
-           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-           MOVE    "key6"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
+           MOVE    "027"               TO  WRK-KEY-KOHNUM
+           PERFORM 9001-PTKOHINF-KEY06-SEC
            IF      FLG-PTKOHINF        =   ZERO
                MOVE    1                   TO  AGECHK-ROUJIN2
            END-IF
@@ -1441,59 +1413,26 @@
       *
       *    ¸å´ü¹âÎð¼Ô³ºÅö
            IF      AGECHK-ROUJIN2      =   ZERO
-               INITIALIZE                  PTKOHINF-REC
-               MOVE    AGECHK-HOSPNUM      TO  PTKOH-HOSPNUM
-               MOVE    AGECHK-PTID         TO  PTKOH-PTID
-               MOVE    "968"               TO  PTKOH-KOHNUM
-               MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKSTYMD
-               MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKEDYMD
-      *
-               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 910-DBSELECT-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-                   MOVE    "key6"              TO  MCP-PATHNAME
-                   PERFORM 920-PTKOHINF-READ-SEC
-               ELSE
-                   MOVE    1               TO  FLG-PTKOHINF
-               END-IF
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 990-DBCLOSE-SEC
-      *
+               MOVE    "968"               TO  WRK-KEY-KOHNUM
+               PERFORM 9001-PTKOHINF-KEY06-SEC
                IF      FLG-PTKOHINF        =   ZERO
                    MOVE    1                   TO  AGECHK-ROUJIN2
                END-IF
            END-IF
       *    ¸å´ü¹âÎð¼ÔÈó³ºÅö
            IF      AGECHK-ROUJIN2      =   ZERO
-               INITIALIZE                  PTKOHINF-REC
-               MOVE    AGECHK-HOSPNUM      TO  PTKOH-HOSPNUM
-               MOVE    AGECHK-PTID         TO  PTKOH-PTID
-               MOVE    "977"               TO  PTKOH-KOHNUM
-               MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKSTYMD
-               MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKEDYMD
-      *
-               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 910-DBSELECT-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-                   MOVE    "key6"              TO  MCP-PATHNAME
-                   PERFORM 920-PTKOHINF-READ-SEC
-               ELSE
-                   MOVE    1               TO  FLG-PTKOHINF
-               END-IF
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 990-DBCLOSE-SEC
-      *
+               MOVE    "977"               TO  WRK-KEY-KOHNUM
+               PERFORM 9001-PTKOHINF-KEY06-SEC
                IF      FLG-PTKOHINF        =   ZERO
                    MOVE    1                   TO  FLG-HI-ROUJIN
                END-IF
+           END-IF
+      *!!!
+      *    ¹âÎð¼ÔÈó³ºÅö(H22.9)
+           MOVE    "976"               TO  WRK-KEY-KOHNUM
+           PERFORM 9001-PTKOHINF-KEY06-SEC
+           IF      FLG-PTKOHINF        =   ZERO
+               MOVE    1                   TO  FLG-HI-ROUJIN2
            END-IF
            .
        20011-ROUJIN-CHK3-EXT.
@@ -1811,6 +1750,38 @@
            .
        900-PTINF-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¸¡º÷½èÍý¡ÊKEY6¡Ë
+      *****************************************************************
+       9001-PTKOHINF-KEY06-SEC         SECTION.
+      *
+           INITIALIZE                  PTKOHINF-REC
+           MOVE    AGECHK-HOSPNUM      TO  PTKOH-HOSPNUM
+           MOVE    AGECHK-PTID         TO  PTKOH-PTID
+           MOVE    WRK-KEY-KOHNUM      TO  PTKOH-KOHNUM
+           MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKSTYMD
+           MOVE    AGECHK-SRYYMD       TO  PTKOH-TEKEDYMD
+      *
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 920-PTKOHINF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       9001-PTKOHINF-KEY06-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¡¼ÆÉ¹þ

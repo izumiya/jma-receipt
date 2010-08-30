@@ -556,7 +556,8 @@
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF     (PTKOH-SAKJOKBN  NOT =   SPACE          )
                OR     (PTKOH-KOHNUM = "956" OR "957" OR "958"
-                                   OR "977" OR "978" OR "979" )
+                                   OR "977" OR "978" OR "979"
+                                   OR "976"                   )
                OR     (PTKOH-KOHNUM(1:2)   =   "96"           )
                    CONTINUE
                ELSE
