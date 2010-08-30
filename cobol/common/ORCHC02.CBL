@@ -67,6 +67,7 @@
       * 04.02.00     NACL-多々納  08/03/XX  Ｈ２０年４月改正対応
       * 04.03.00     NACL-多々納  08/08/28  退院時院外処方せん対応
       * 04.04.00     NACL-多々納  10/03/02  Ｈ２２年４月改正対応
+      * 04.04.02     NACL-多々納  10/08/30  高齢非該当対応追加
       *****************************************************************
       *
       *
@@ -1084,6 +1085,10 @@
                            WHEN    "3"
                                MOVE    3           TO  FLG-RJNHKN
                        END-EVALUATE
+      *                高齢非該当の判定
+                       IF      AGECHK-ROUJIN       =   0
+                           PERFORM 40015-PTKOHINF-976CHK-SEC
+                       END-IF
       *                以外
                    WHEN    OTHER
       *                自費以外
@@ -1245,6 +1250,46 @@
            END-IF
            .
        40012-USER-KOHBIKOHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    高齢非該当の判定処理
+      *****************************************************************
+       40015-PTKOHINF-976CHK-SEC      SECTION.
+      *
+           INITIALIZE                  PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    SPA-PTID            TO  PTKOH-PTID
+           MOVE    "976"               TO  PTKOH-KOHNUM
+           MOVE    SPA-SRYYMD          TO  PTKOH-TEKSTYMD
+           MOVE    SPA-SRYYMD          TO  PTKOH-TEKEDYMD
+      *
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+                   MOVE    ZERO            TO  FLG-PTKOHINF
+               ELSE
+                   MOVE    1               TO  FLG-PTKOHINF
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    高齢非該当が当日有効
+           IF      FLG-PTKOHINF        =   0
+               MOVE    ZERO                TO  FLG-RJNHKN
+           END-IF
+           .
+       40015-PTKOHINF-976CHK-EXT.
            EXIT.
       *
       *****************************************************************
