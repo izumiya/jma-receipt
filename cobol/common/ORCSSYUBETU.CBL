@@ -2150,9 +2150,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                            AND
                          ( WRK-RECE61-HOJOKBN  =   SPACE            ))
                        MOVE      LNK-SYUBETU-SRYYM    TO  WRK-TEKSTYYMM
-                       IF   WRK-RECE61-TEKSTYMD(1:6)  >=
+                       IF   WRK-RECE61-TEKSTYMDX (1) (1:6)  >=
                                                       LNK-SYUBETU-SRYYM
-                            MOVE  WRK-RECE61-TEKSTYMD(7:2)
+                            MOVE  WRK-RECE61-TEKSTYMDX (1) (7:2)
                                                        TO  WRK-TEKSTDD
                        ELSE
                             MOVE  01                   TO  WRK-TEKSTDD
