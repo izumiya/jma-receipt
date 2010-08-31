@@ -62,6 +62,8 @@
       *  04.04.01    NACL-藤原    09/12/10  オンライン返戻対応
       *  04.04.02    NACL-藤原    09/11/04  公費番号まとめの編集方法訂正
       *                                     公費が６つ以上のとき
+      *  04.04.03    NACL-藤原    10/08/23  後期高齢非該当対応
+      *                                     （高齢受給者票がない場合） 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -743,7 +745,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                EVALUATE    RECE10-HKNNUM-S
                        WHEN    "060"
                        WHEN    "068"
-                           IF      RECE10-AGE          >=  70
+                           IF    ( RECE10-AGE          >=  70 )
+                           AND   ( RECE10-ETC-YKZFTN (2)
+                                                       =   0  )
+      *                        後期高齢者非該当以外の７０歳以上
                                EVALUATE    RECE10-KYURATE
                                    WHEN    9
                                        MOVE    1           TO  IDX

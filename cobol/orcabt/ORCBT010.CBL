@@ -96,6 +96,8 @@
       *  04.04.05    NACL-藤原    10/03/12  平成２２年４月改正対応
       *                                     平成２２年４月分以降の政府管
       *                                     掌をエラーとする
+      *  04.04.06    NACL-藤原    10/08/23  後期高齢非該当対応
+      *                                     （高齢受給者票がない場合） 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -314,6 +316,13 @@
            03  WRK-PREFNUM             PIC X(02).
       *
            03  WRK-SEIHO-FLG           PIC 9(01).
+      *
+      *    後期高齢者非該当フラグ
+           03  WRK-KOUKI-FLG           PIC 9(01).
+      *
+           03  WRK-TEKSTYMD.
+               05  WRK-TEKSTYYMM       PIC 9(06).
+               05  WRK-TEKSTDD         PIC 9(02).
       *
       *    傷病名編集
            03  WRK-BYOMEI          PIC X(150).
@@ -974,6 +983,9 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *
            MOVE    LOW-VALUE           TO  KEY-AREA
       *
+           MOVE    SPACE               TO  WRK-ERR-AREA
+           INITIALIZE                      WRK-ERR-AREA
+      *
            INITIALIZE                      SRYACCT-REC
            MOVE    WRK-PARA-HOSPNUM    TO  ACCT-HOSPNUM
            MOVE    WRK-PARA-SRYYM      TO  ACCT-SRYYM
@@ -1193,7 +1205,7 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
        2001-NYUINGAI-HENSYU-SEC              SECTION.
       *
            INITIALIZE                  WRK-TOUKEI01-TABLE
-
+           INITIALIZE                      WRK-ERR-AREA
       *    テスト患者のときは読み飛ばす
            MOVE    WRK-PARA-HOSPNUM        TO  PTINF-HOSPNUM
            MOVE    KEY-N-PTID              TO  PTINF-PTID
@@ -2675,6 +2687,74 @@ grpsys                                         SPA-AREA
                                        LNK-SYUBETUGET-RECESKYKBN (IDX)
                END-IF 
            END-PERFORM
+      *
+      *    後期高齢非該当の有無設定
+           MOVE    ZERO            TO  WRK-KOUKI-FLG
+      *
+           IF    ( LNK-SYUBETUGET-AGE    >=  70                    )
+           AND   ( LNK-SYUBETUGET-SRYYM  >=  WRK-CONS-SRYYM-200804 )
+               IF    ( LNK-SYUBETUGET-HKNNUM
+                                           =   SPACE   OR  "040"   
+                                           OR  "039"   OR  "067"
+                                           OR  "069"             )
+               OR    ( LNK-SYUBETUGET-HKNNUM (1:2)
+                                           =   "98"    OR  "90"
+                                           OR  "91"              )
+                   CONTINUE
+               ELSE
+                   IF   (  LNK-SYUBETUGET-HKNNUM
+                                               =   "060"   OR  "068"  )
+                   OR   (( LNK-SYUBETUGET-HKNNUM
+                                           NOT =   "060"   AND "068" )
+                           AND
+                         ( LNK-SYUBETUGET-HKN-HOJOKBN
+                                               =   SPACE             ))
+                       MOVE      LNK-SYUBETUGET-SRYYM TO  WRK-TEKSTYYMM
+                       IF   TOUKEI01-TTEKSTYMD (IDY)(1:6)  >=
+                                                   LNK-SYUBETUGET-SRYYM
+                            MOVE  TOUKEI01-TTEKSTYMD (IDY)(7:2)
+                                                       TO  WRK-TEKSTDD
+                       ELSE
+                            MOVE  01                   TO  WRK-TEKSTDD
+                       END-IF
+      *
+                       INITIALIZE                      PTKOHINF-REC
+                       MOVE    WRK-PARA-HOSPNUM TO  PTKOH-HOSPNUM
+                       MOVE    TOUKEI01-PTID    TO  PTKOH-PTID
+                       MOVE    "976"               TO  PTKOH-KOHNUM
+                       MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                       MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                       MOVE    "key4"              TO  MCP-PATHNAME
+                       PERFORM 900-DBSELECT-SEC
+                       IF      MCP-RC              =   ZERO
+                           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                           MOVE    "key4"              TO  MCP-PATHNAME
+                           PERFORM 900-PTKOHINF-READ-N-SEC
+                           PERFORM UNTIL   FLG-PTKOHINF    =   1
+                               IF    (PTKOH-TEKSTYMD   <=  WRK-TEKSTYMD)
+                               AND   (WRK-TEKSTYMD     <=
+                                                       PTKOH-TEKEDYMD  )
+                                   MOVE    1           TO  WRK-KOUKI-FLG
+                                   MOVE    1           TO  FLG-PTKOHINF
+                               ELSE
+                                   MOVE    "tbl_ptkohinf"
+                                                    TO  MCP-TABLE
+                                   MOVE    "key4"   TO  MCP-PATHNAME
+                                   PERFORM  900-PTKOHINF-READ-N-SEC
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                       MOVE    "key4"               TO  MCP-PATHNAME
+                       PERFORM  900-CLOSE-SEC
+                   END-IF
+               END-IF
+      *
+               IF      WRK-KOUKI-FLG   =   1
+                   MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
+               END-IF
+           END-IF
+      *
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
            MOVE    LNK-SYUBETUGET-RECESYUBETU
@@ -3338,6 +3418,27 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-PTKOHINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報読込
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PTKOHINF-REC
+               IF      PTKOH-SAKJOKBN      =   "1"
+                   GO  TO  900-PTKOHINF-READ-N-SEC
+               END-IF
+               MOVE    ZERO                TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1                   TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
            EXIT.
       *****************************************************************
       *    保険番号マスタ検索処理
