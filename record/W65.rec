@@ -25,10 +25,10 @@ W65	{
 		};
 		CMB_JNISSUKBN	{
 			JNISSUKBN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_JNISSUTAIKBN	{
 			JNISSUTAIKBN	{
@@ -41,10 +41,10 @@ W65	{
 		};
 		CMB_TOTALTENKBN	{
 			TOTALTENKBN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_TOTALTENTAIKBN	{
 			TOTALTENTAIKBN	{
@@ -57,10 +57,10 @@ W65	{
 		};
 		CMB_SYUKEIKBN	{
 			SYUKEIKBN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_SYUKEITAIKBN	{
 			SYUKEITAIKBN	{
@@ -73,10 +73,10 @@ W65	{
 		};
 		CMB_FTNMONEYKBNG	{
 			FTNMONEYKBNG	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_FTNMONEYTAIKBNG	{
 			FTNMONEYTAIKBNG	{
@@ -89,10 +89,10 @@ W65	{
 		};
 		CMB_FTNMONEYKBNN	{
 			FTNMONEYKBNN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_FTNMONEYTAIKBNN	{
 			FTNMONEYTAIKBNN	{
@@ -105,10 +105,10 @@ W65	{
 		};
 		CMB_FTNZEROKBNG	{
 			FTNZEROKBNG	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_FTNZEROTAIKBNG	{
 			FTNZEROTAIKBNG	{
@@ -121,10 +121,10 @@ W65	{
 		};
 		CMB_FTNZEROKBNN	{
 			FTNZEROKBNN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_FTNZEROTAIKBNN	{
 			FTNZEROTAIKBNN	{
@@ -137,10 +137,10 @@ W65	{
 		};
 		CMB_SKJKBN	{
 			SKJKBN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_SKJTAIKBN	{
 			SKJTAIKBN	{
@@ -153,10 +153,10 @@ W65	{
 		};
 		CMB_OCRKBN	{
 			OCRKBN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_OCRTAIKBN	{
 			OCRTAIKBN	{
@@ -169,11 +169,11 @@ W65	{
 		};
 		CMB_SAIKEIKBN	{
 			SAIKEIKBN	{
-				value	varchar(60);
+				value	varchar(80);
 				state	int;
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 			state	int;
 		};
 		CMB_SAIKEITAIKBN	{
@@ -187,13 +187,29 @@ W65	{
 		};
 		CMB_JYUHENKBN	{
 			JYUHENKBN	{
-				value	varchar(60);
+				value	varchar(80);
 			};
 			count	int;
-			item	varchar(60)[10];
+			item	varchar(80)[10];
 		};
 		CMB_JYUHENTAIKBN	{
 			JYUHENTAIKBN	{
+				value	varchar(30);
+				state	int;
+			};
+			count	int;
+			item	varchar(30)[10];
+			state	int;
+		};
+		CMB_JGNFTNKBN	{
+			JGNFTNKBN	{
+				value	varchar(80);
+			};
+			count	int;
+			item	varchar(80)[10];
+		};
+		CMB_JGNFTNTAIKBN	{
+			JGNFTNTAIKBN	{
 				value	varchar(30);
 				state	int;
 			};

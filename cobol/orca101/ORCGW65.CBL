@@ -61,7 +61,7 @@
                    07  SPA-GMN-JNISSUKBN-G.
                        09  SPA-GMN-JNISSUKBN       PIC X(01).
                        09  SPA-GMN-JNISSUKBNF      PIC X(01).
-                       09  SPA-GMN-JNISSUKBNMEI    PIC X(58).
+                       09  SPA-GMN-JNISSUKBNMEI    PIC X(78).
                    07  SPA-GMN-JNISSUTAIKBN-G.
                        09  SPA-GMN-JNISSUTAIKBN    PIC X(01).
                        09  SPA-GMN-JNISSUTAIKBNF   PIC X(01).
@@ -69,7 +69,7 @@
                    07  SPA-GMN-TOTALTENKBN-G.
                        09  SPA-GMN-TOTALTENKBN     PIC X(01).
                        09  SPA-GMN-TOTALTENKBNF    PIC X(01).
-                       09  SPA-GMN-TOTALTENKBNMEI  PIC X(58).
+                       09  SPA-GMN-TOTALTENKBNMEI  PIC X(78).
                    07  SPA-GMN-TOTALTENTAIKBN-G.
                        09  SPA-GMN-TOTALTENTAIKBN  PIC X(01).
                        09  SPA-GMN-TOTALTENTAIKBNF PIC X(01).
@@ -78,7 +78,7 @@
                    07  SPA-GMN-SYUKEIKBN-G.
                        09  SPA-GMN-SYUKEIKBN          PIC X(01).
                        09  SPA-GMN-SYUKEIKBNF         PIC X(01).
-                       09  SPA-GMN-SYUKEIKBNMEI       PIC X(58).
+                       09  SPA-GMN-SYUKEIKBNMEI       PIC X(78).
                    07  SPA-GMN-SYUKEITAIKBN-G.
                        09  SPA-GMN-SYUKEITAIKBN          PIC X(01).
                        09  SPA-GMN-SYUKEITAIKBNF         PIC X(01).
@@ -86,7 +86,7 @@
                    07  SPA-GMN-FTNMONEYKBNG-G.
                        09  SPA-GMN-FTNMONEYKBNG    PIC X(01).
                        09  SPA-GMN-FTNMONEYKBNGF   PIC X(01).
-                       09  SPA-GMN-FTNMONEYKBNGMEI PIC X(58).
+                       09  SPA-GMN-FTNMONEYKBNGMEI PIC X(78).
                    07  SPA-GMN-FTNMONEYTAIKBNG-G.
                        09  SPA-GMN-FTNMONEYTAIKBNG PIC X(01).
                        09  SPA-GMN-FTNMONEYTAIKBNGF
@@ -96,7 +96,7 @@
                    07  SPA-GMN-FTNMONEYKBNN-G.
                        09  SPA-GMN-FTNMONEYKBNN    PIC X(01).
                        09  SPA-GMN-FTNMONEYKBNNF   PIC X(01).
-                       09  SPA-GMN-FTNMONEYKBNNMEI PIC X(58).
+                       09  SPA-GMN-FTNMONEYKBNNMEI PIC X(78).
                    07  SPA-GMN-FTNMONEYTAIKBNN-G.
                        09  SPA-GMN-FTNMONEYTAIKBNN PIC X(01).
                        09  SPA-GMN-FTNMONEYTAIKBNNF
@@ -106,7 +106,7 @@
                    07  SPA-GMN-FTNZEROKBNG-G.
                        09  SPA-GMN-FTNZEROKBNG     PIC X(01).
                        09  SPA-GMN-FTNZEROKBNGF    PIC X(01).
-                       09  SPA-GMN-FTNZEROKBNGMEI  PIC X(58).
+                       09  SPA-GMN-FTNZEROKBNGMEI  PIC X(78).
                    07  SPA-GMN-FTNZEROTAIKBNG-G.
                        09  SPA-GMN-FTNZEROTAIKBNG  PIC X(01).
                        09  SPA-GMN-FTNZEROTAIKBNGF PIC X(01).
@@ -115,7 +115,7 @@
                    07  SPA-GMN-FTNZEROKBNN-G.
                        09  SPA-GMN-FTNZEROKBNN     PIC X(01).
                        09  SPA-GMN-FTNZEROKBNNF    PIC X(01).
-                       09  SPA-GMN-FTNZEROKBNNMEI  PIC X(58).
+                       09  SPA-GMN-FTNZEROKBNNMEI  PIC X(78).
                    07  SPA-GMN-FTNZEROTAIKBNN-G.
                        09  SPA-GMN-FTNZEROTAIKBNN  PIC X(01).
                        09  SPA-GMN-FTNZEROTAIKBNNF PIC X(01).
@@ -124,7 +124,7 @@
                    07  SPA-GMN-SKJKBN-G.
                        09  SPA-GMN-SKJKBN          PIC X(01).
                        09  SPA-GMN-SKJKBNF         PIC X(01).
-                       09  SPA-GMN-SKJKBNMEI       PIC X(58).
+                       09  SPA-GMN-SKJKBNMEI       PIC X(78).
                    07  SPA-GMN-SKJTAIKBN-G.
                        09  SPA-GMN-SKJTAIKBN       PIC X(01).
                        09  SPA-GMN-SKJTAIKBNF      PIC X(01).
@@ -132,7 +132,7 @@
                    07  SPA-GMN-OCRKBN-G.
                        09  SPA-GMN-OCRKBN          PIC X(01).
                        09  SPA-GMN-OCRKBNF         PIC X(01).
-                       09  SPA-GMN-OCRKBNMEI       PIC X(58).
+                       09  SPA-GMN-OCRKBNMEI       PIC X(78).
                    07  SPA-GMN-OCRTAIKBN-G.
                        09  SPA-GMN-OCRTAIKBN       PIC X(01).
                        09  SPA-GMN-OCRTAIKBNF      PIC X(01).
@@ -140,20 +140,24 @@
                    07  SPA-GMN-SAIKEIKBN-G.
                        09  SPA-GMN-SAIKEIKBN      PIC X(01).
                        09  SPA-GMN-SAIKEIKBNF     PIC X(01).
-                       09  SPA-GMN-SAIKEIKBNMEI   PIC X(58).
+                       09  SPA-GMN-SAIKEIKBNMEI   PIC X(78).
+                   07  SPA-GMN-JYUHENKBN-G.
+                       09  SPA-GMN-JYUHENKBN       PIC X(01).
+                       09  SPA-GMN-JYUHENKBNF      PIC X(01).
+                       09  SPA-GMN-JYUHENKBNMEI    PIC X(78).
+                   07  SPA-GMN-JYUHENTAIKBN-G.
+                       09  SPA-GMN-JYUHENTAIKBN    PIC X(01).
+                       09  SPA-GMN-JYUHENTAIKBNF   PIC X(01).
+                       09  SPA-GMN-JYUHENTAIKBNMEI PIC X(28).
+                   07  SPA-GMN-JGNFTNKBN-G.
+                       09  SPA-GMN-JGNFTNKBN       PIC X(01).
+                       09  SPA-GMN-JGNFTNKBNF      PIC X(01).
+                       09  SPA-GMN-JGNFTNKBNMEI    PIC X(78).
                    07  SPA-GMN-SAIKEITAIKBN-G.
                        09  SPA-GMN-SAIKEITAIKBN   PIC X(01).
                        09  SPA-GMN-SAIKEITAIKBNF  PIC X(01).
                        09  SPA-GMN-SAIKEITAIKBNMEI
                                                    PIC X(28).
-                   07  SPA-GMN-JYUHENKBN-G.
-                       09  SPA-GMN-JYUHENKBN       PIC X(01).
-                       09  SPA-GMN-JYUHENKBNF      PIC X(01).
-                       09  SPA-GMN-JYUHENKBNMEI    PIC X(58).
-                   07  SPA-GMN-JYUHENTAIKBN-G.
-                       09  SPA-GMN-JYUHENTAIKBN    PIC X(01).
-                       09  SPA-GMN-JYUHENTAIKBNF   PIC X(01).
-                       09  SPA-GMN-JYUHENTAIKBNMEI PIC X(28).
                    07  SPA-GMN-YUKOSTYMD           PIC X(10).
                    07  SPA-GMN-YUKOEDYMD           PIC X(10).
                    07  SPA-GMN-SELNUM2             PIC S9(2).
@@ -163,55 +167,61 @@
                        09  SPA-GMN-JNISSUKBNLST            OCCURS  10.
                            11  SPA-GMN-JNISSUKBNL          PIC X(01).
                            11  SPA-GMN-JNISSUKBNFL         PIC X(01).
-                           11  SPA-GMN-JNISSUKBNMEIL       PIC X(58).
+                           11  SPA-GMN-JNISSUKBNMEIL       PIC X(78).
                    07  SPA-GMN-TOTALTENKBNLST-G.
                        09  SPA-GMN-TOTALTENKBN-MAX         PIC 9(03).
                        09  SPA-GMN-TOTALTENKBNLST          OCCURS 10.
                            11  SPA-GMN-TOTALTENKBNL        PIC X(01).
                            11  SPA-GMN-TOTALTENKBNFL       PIC X(01).
-                           11  SPA-GMN-TOTALTENKBNMEIL     PIC X(58).
+                           11  SPA-GMN-TOTALTENKBNMEIL     PIC X(78).
                    07  SPA-GMN-SYUKEIKBNLST-G.
                        09  SPA-GMN-SYUKEIKBN-MAX         PIC 9(03).
                        09  SPA-GMN-SYUKEIKBNLST          OCCURS 10.
                            11  SPA-GMN-SYUKEIKBNL        PIC X(01).
                            11  SPA-GMN-SYUKEIKBNFL       PIC X(01).
-                           11  SPA-GMN-SYUKEIKBNMEIL     PIC X(58).
+                           11  SPA-GMN-SYUKEIKBNMEIL     PIC X(78).
                    07  SPA-GMN-FTNMONEYKBNLST-G.
                        09  SPA-GMN-FTNMONEYKBN-MAX         PIC 9(03).
                        09  SPA-GMN-FTNMONEYKBNLST          OCCURS 10.
                            11  SPA-GMN-FTNMONEYKBNL        PIC X(01).
                            11  SPA-GMN-FTNMONEYKBNFL       PIC X(01).
-                           11  SPA-GMN-FTNMONEYKBNMEIL     PIC X(58).
+                           11  SPA-GMN-FTNMONEYKBNMEIL     PIC X(78).
                    07  SPA-GMN-FTNZEROKBNLST-G.
                        09  SPA-GMN-FTNZEROKBN-MAX          PIC 9(03).
                        09  SPA-GMN-FTNZEROKBNLST           OCCURS 10.
                            11  SPA-GMN-FTNZEROKBNL         PIC X(01).
                            11  SPA-GMN-FTNZEROKBNFL        PIC X(01).
-                           11  SPA-GMN-FTNZEROKBNMEIL      PIC X(58).
+                           11  SPA-GMN-FTNZEROKBNMEIL      PIC X(78).
                    07  SPA-GMN-SKJKBNLST-G.
                        09  SPA-GMN-SKJKBN-MAX              PIC 9(03).
                        09  SPA-GMN-SKJKBNLST               OCCURS 10.
                            11  SPA-GMN-SKJKBNL             PIC X(01).
                            11  SPA-GMN-SKJKBNFL            PIC X(01).
-                           11  SPA-GMN-SKJKBNMEIL          PIC X(58).
+                           11  SPA-GMN-SKJKBNMEIL          PIC X(78).
                    07  SPA-GMN-OCRKBNLST-G.
                        09  SPA-GMN-OCRKBN-MAX              PIC 9(03).
                        09  SPA-GMN-OCRKBNLST               OCCURS 10.
                            11  SPA-GMN-OCRKBNL             PIC X(01).
                            11  SPA-GMN-OCRKBNFL            PIC X(01).
-                           11  SPA-GMN-OCRKBNMEIL          PIC X(58).
-                   07  SPA-GMN-SAIKEIKBNLST-G.
-                       09  SPA-GMN-SAIKEIKBN-MAX          PIC 9(03).
-                       09  SPA-GMN-SAIKEIKBNLST           OCCURS 10.
-                           11  SPA-GMN-SAIKEIKBNL         PIC X(01).
-                           11  SPA-GMN-SAIKEIKBNFL        PIC X(01).
-                           11  SPA-GMN-SAIKEIKBNMEIL      PIC X(58).
+                           11  SPA-GMN-OCRKBNMEIL          PIC X(78).
                    07  SPA-GMN-JYUHENKBNLST-G.
                        09  SPA-GMN-JYUHENKBN-MAX           PIC 9(03).
                        09  SPA-GMN-JYUHENKBNLST            OCCURS 10.
                            11  SPA-GMN-JYUHENKBNL          PIC X(01).
                            11  SPA-GMN-JYUHENKBNFL         PIC X(01).
-                           11  SPA-GMN-JYUHENKBNMEIL       PIC X(58).
+                           11  SPA-GMN-JYUHENKBNMEIL       PIC X(78).
+                   07  SPA-GMN-JGNFTNKBNLST-G.
+                       09  SPA-GMN-JGNFTNKBN-MAX           PIC 9(03).
+                       09  SPA-GMN-JGNFTNKBNLST            OCCURS 10.
+                           11  SPA-GMN-JGNFTNKBNL          PIC X(01).
+                           11  SPA-GMN-JGNFTNKBNFL         PIC X(01).
+                           11  SPA-GMN-JGNFTNKBNMEIL       PIC X(78).
+                   07  SPA-GMN-SAIKEIKBNLST-G.
+                       09  SPA-GMN-SAIKEIKBN-MAX          PIC 9(03).
+                       09  SPA-GMN-SAIKEIKBNLST           OCCURS 10.
+                           11  SPA-GMN-SAIKEIKBNL         PIC X(01).
+                           11  SPA-GMN-SAIKEIKBNFL        PIC X(01).
+                           11  SPA-GMN-SAIKEIKBNMEIL      PIC X(78).
                    07  SPA-GMN-COMMONTAIKBNLST-G.
                        09  SPA-GMN-COMMONTAIKBN-MAX        PIC 9(03).
                        09  SPA-GMN-COMMONTAIKBNLST         OCCURS  10.
@@ -250,6 +260,7 @@
                        09  SPA-NAI-INPUT-MODE              PIC 9(1).
                        09  SPA-NAI-SELNUM1-FLG             PIC 9(1)
                                                            OCCURS  100.
+                       09  SPA-NAI-KOHNUM                  PIC X(03).
                        09  SPA-NAI-KOHNUM-ORG              PIC X(03).
                        09  SPA-NAI-YUKOSTYMD               PIC X(08).
                        09  SPA-NAI-YUKOSTYMD-ORG           PIC X(08).
@@ -346,6 +357,7 @@
            03  CONST-SHIMANE              PIC 9(02) VALUE 32.
            03  CONST-TOKUSHIMA            PIC 9(02) VALUE 36.
            03  CONST-EHIME                PIC 9(02) VALUE 38.
+           03  CONST-NAGASAKI             PIC 9(02) VALUE 42.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -611,11 +623,14 @@
       *    ＯＣＲ実日数請求点省略記載コンボ編集処理
            PERFORM 3110-OCRKBNLST-SEC
       *
-      *    請求書公費再掲欄記載コンボ編集処理
-           PERFORM 3110-SAIKEIKBNLST-SEC
-      *
       *    月途中受給者証変更時負担計算コンボ編集処理
            PERFORM 3110-JYUHENKBNLST-SEC
+      *
+      *    日・月上限負担金計算コンボ編集処理
+           PERFORM 3110-JGNFTNKBNLST-SEC
+      *
+      *    請求書公費再掲欄記載コンボ編集処理
+           PERFORM 3110-SAIKEIKBNLST-SEC
       *
       *    共通対象区分コンボ編集処理
            PERFORM 3110-COMMONTAIKBNLST-SEC
@@ -686,7 +701,16 @@
            MOVE    "集計しない（請求点が０点となる場合は除く）"
                                    TO  SPA-GMN-SYUKEIKBNMEIL (3)
       *
-           MOVE    3               TO  SPA-GMN-SYUKEIKBN-MAX
+           MOVE    "3"             TO  SPA-GMN-SYUKEIKBNL    (4)
+           MOVE    "集計しない【負担区分対応】"
+                                   TO  SPA-GMN-SYUKEIKBNMEIL (4)
+      *
+           MOVE    "4"             TO  SPA-GMN-SYUKEIKBNL    (5)
+           MOVE
+           "集計しない（請求点が０点となる場合は除く）【負担区分対応】"
+                                   TO  SPA-GMN-SYUKEIKBNMEIL (5)
+      *
+           MOVE    5               TO  SPA-GMN-SYUKEIKBN-MAX
       *
            .
        3110-SYUKEIKBNLST-EXT.
@@ -792,6 +816,26 @@
       *
            .
        3110-SAIKEIKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    日・月上限負担金計算コンボ編集処理
+      *****************************************************************
+       3110-JGNFTNKBNLST-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-GMN-JGNFTNKBNLST-G
+      *
+           MOVE    "0"             TO  SPA-GMN-JGNFTNKBNL    (1)
+           MOVE    "入外それぞれで上限額までの計算をする"
+                                   TO  SPA-GMN-JGNFTNKBNMEIL (1)
+      *
+           MOVE    "1"             TO  SPA-GMN-JGNFTNKBNL    (2)
+           MOVE    "入外あわせて上限額までの計算をする"
+                                   TO  SPA-GMN-JGNFTNKBNMEIL (2)
+      *
+           MOVE    2               TO  SPA-GMN-JGNFTNKBN-MAX
+      *
+           .
+       3110-JGNFTNKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    月途中受給者証変更時負担計算コンボ編集処理
@@ -1084,8 +1128,9 @@
            MOVE    W65-OCRKBN          TO  SPA-GMN-OCRKBN-G
            MOVE    W65-OCRTAIKBN       TO  SPA-GMN-OCRTAIKBN-G
            MOVE    W65-SAIKEIKBN       TO  SPA-GMN-SAIKEIKBN-G
-           MOVE    W65-SAIKEITAIKBN    TO  SPA-GMN-SAIKEITAIKBN-G
            MOVE    W65-JYUHENKBN       TO  SPA-GMN-JYUHENKBN-G
+           MOVE    W65-JGNFTNKBN       TO  SPA-GMN-JGNFTNKBN-G
+           MOVE    W65-SAIKEITAIKBN    TO  SPA-GMN-SAIKEITAIKBN-G
            MOVE    W65-JYUHENTAIKBN    TO  SPA-GMN-JYUHENTAIKBN-G
            MOVE    W65-YUKOSTYMD       TO  SPA-GMN-YUKOSTYMD
            MOVE    W65-YUKOEDYMD       TO  SPA-GMN-YUKOEDYMD
@@ -1187,6 +1232,18 @@
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 4101-OCRTAIKBN-CHK-SEC
            END-IF
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4101-JYUHENKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4101-JYUHENTAIKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4101-JGNFTNKBN-CHK-SEC
+           END-IF
+      *
       *
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 4101-SAIKEIKBN-CHK-SEC
@@ -1194,14 +1251,6 @@
       *
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 4101-SAIKEITAIKBN-CHK-SEC
-           END-IF
-      *
-           IF    ( SPA-ERRCD       =   SPACE )
-               PERFORM 4101-JYUHENKBN-CHK-SEC
-           END-IF
-      *
-           IF    ( SPA-ERRCD       =   SPACE )
-               PERFORM 4101-JYUHENTAIKBN-CHK-SEC
            END-IF
       *
            .
@@ -1446,10 +1495,12 @@
            MOVE    SPA-GMN-SKJTAIKBN       TO SYS-2010-SKJ-TAIKBN
            MOVE    SPA-GMN-OCRKBN          TO SYS-2010-OCRKBN
            MOVE    SPA-GMN-OCRTAIKBN       TO SYS-2010-OCR-TAIKBN
-           MOVE    SPA-GMN-SAIKEIKBN      TO SYS-2010-SAIKEIKBN
-           MOVE    SPA-GMN-SAIKEITAIKBN   TO SYS-2010-SAIKEI-TAIKBN
            MOVE    SPA-GMN-JYUHENKBN       TO SYS-2010-JYUHENKBN
            MOVE    SPA-GMN-JYUHENTAIKBN    TO SYS-2010-JYUHEN-TAIKBN
+           MOVE    SPA-GMN-JGNFTNKBN       TO SYS-2010-JGNFTNKBN
+           MOVE    "0"                     TO SYS-2010-JGNFTN-TAIKBN
+           MOVE    SPA-GMN-SAIKEIKBN      TO SYS-2010-SAIKEIKBN
+           MOVE    SPA-GMN-SAIKEITAIKBN   TO SYS-2010-SAIKEI-TAIKBN
       *
            .
        4201-KOHINF-EDIT-EXT.
@@ -1950,6 +2001,7 @@
            MOVE    WRK-HENYMDG     TO  SPA-GMN-YUKOEDYMD
       *
            MOVE    SYS-2010-KBNCD  TO  SPA-GMN-KOHNUM
+                                       SPA-NAI-KOHNUM
                                        SPA-NAI-KOHNUM-ORG
       *
            MOVE    SYS-2010-EDYUKYMD   TO  SEL-STYMD
@@ -2164,6 +2216,14 @@
                        MOVE    "0006"          TO  SPA-ERRCD
                    END-IF
                END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-KOHNUM      NOT =   SPA-NAI-KOHNUM )
+               IF    ( SPA-PREFNUM     =       CONST-NAGASAKI )
+                AND  ( SPA-GMN-KOHNUM  =   "180" )
+                   MOVE    "1"         TO  SPA-GMN-JGNFTNKBN
+               END-IF
+               MOVE    SPA-GMN-KOHNUM  TO  SPA-NAI-KOHNUM
            END-IF
       *
            .
@@ -2475,6 +2535,19 @@
        4101-SAIKEITAIKBN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    日・月上限額負担計算チェック処理
+      *****************************************************************
+       4101-JGNFTNKBN-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-JGNFTNKBN       TO  WRK-CMB-CD
+           PERFORM 4200-JGNFTNKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM             TO  SPA-GMN-JGNFTNKBN-G
+      *
+           .
+      *
+       4101-JGNFTNKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    月途中受給者証変更時負担計算チェック処理
       *****************************************************************
        4101-JYUHENKBN-CHK-SEC          SECTION.
@@ -2773,15 +2846,20 @@
            PERFORM 4200-OCRKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-OCRKBN-G
       *
-      *    請求書公費再掲欄記載
-           MOVE    "0"             TO  WRK-CMB-CD
-           PERFORM 4200-SAIKEIKBNLST-CHK-SEC
-           MOVE    WRK-CMB-ITM     TO  SPA-GMN-SAIKEIKBN-G
-      *
       *    月途中受給者証変更時負担計算
            MOVE    "0"             TO  WRK-CMB-CD
            PERFORM 4200-JYUHENKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-JYUHENKBN-G
+      *
+      *    日・月上限額負担計算
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-JGNFTNKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM     TO  SPA-GMN-JGNFTNKBN-G
+      *
+      *    請求書公費再掲欄記載
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-SAIKEIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM     TO  SPA-GMN-SAIKEIKBN-G
       *
       *    共通対象区分
            MOVE    "0"             TO  WRK-CMB-CD
@@ -2920,10 +2998,13 @@
            MOVE    SPA-GMN-SKJTAIKBN-G         TO  W65-SKJTAIKBN
            MOVE    SPA-GMN-OCRKBN-G            TO  W65-OCRKBN
            MOVE    SPA-GMN-OCRTAIKBN-G         TO  W65-OCRTAIKBN
-           MOVE    SPA-GMN-SAIKEIKBN-G        TO  W65-SAIKEIKBN
-           MOVE    SPA-GMN-SAIKEITAIKBN-G     TO  W65-SAIKEITAIKBN
            MOVE    SPA-GMN-JYUHENKBN-G         TO  W65-JYUHENKBN
            MOVE    SPA-GMN-JYUHENTAIKBN-G      TO  W65-JYUHENTAIKBN
+           MOVE    SPA-GMN-JGNFTNKBN-G         TO  W65-JGNFTNKBN
+           MOVE    "0 日・月上限額設定のある公費"
+                                              TO   W65-JGNFTNTAIKBN
+           MOVE    SPA-GMN-SAIKEIKBN-G        TO  W65-SAIKEIKBN
+           MOVE    SPA-GMN-SAIKEITAIKBN-G     TO  W65-SAIKEITAIKBN
       *
            MOVE    SPA-GMN-JNISSUKBN-MAX       TO  W65-JNISSUKBN-COUNT
            PERFORM VARYING IDX-CMB FROM    1   BY  1
@@ -2977,19 +3058,30 @@
                    MOVE    SPA-GMN-OCRKBNLST (IDX-CMB)
                                    TO  W65-OCRKBN-ITEM (IDX-CMB)
            END-PERFORM
-      *
-           MOVE    SPA-GMN-SAIKEIKBN-MAX      TO  W65-SAIKEIKBN-COUNT
-           PERFORM VARYING IDX-CMB FROM    1   BY  1
-                   UNTIL ( IDX-CMB >   SPA-GMN-SAIKEIKBN-MAX )
-                   MOVE    SPA-GMN-SAIKEIKBNLST (IDX-CMB)
-                                   TO  W65-SAIKEIKBN-ITEM (IDX-CMB)
-           END-PERFORM
       * 
            MOVE    SPA-GMN-JYUHENKBN-MAX       TO  W65-JYUHENKBN-COUNT
            PERFORM VARYING IDX-CMB FROM    1   BY  1
                    UNTIL ( IDX-CMB >   SPA-GMN-JYUHENKBN-MAX )
                    MOVE    SPA-GMN-JYUHENKBNLST (IDX-CMB)
                                    TO  W65-JYUHENKBN-ITEM (IDX-CMB)
+           END-PERFORM
+      * 
+           MOVE    SPA-GMN-JGNFTNKBN-MAX       TO  W65-JGNFTNKBN-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-JGNFTNKBN-MAX )
+                   MOVE    SPA-GMN-JGNFTNKBNLST (IDX-CMB)
+                                   TO  W65-JGNFTNKBN-ITEM (IDX-CMB)
+           END-PERFORM
+      *
+           MOVE    1                       TO  W65-JGNFTNTAIKBN-COUNT
+           MOVE    "0 日・月上限額設定のある公費"
+                                           TO  W65-JGNFTNTAIKBN-ITEM(1)
+      *
+           MOVE    SPA-GMN-SAIKEIKBN-MAX      TO  W65-SAIKEIKBN-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-SAIKEIKBN-MAX )
+                   MOVE    SPA-GMN-SAIKEIKBNLST (IDX-CMB)
+                                   TO  W65-SAIKEIKBN-ITEM (IDX-CMB)
            END-PERFORM
       *
            MOVE    SPA-GMN-COMMONTAIKBN-MAX
@@ -3159,6 +3251,10 @@
                                        W65-JYUHENTAIKBN-STATE
                                        W65-JYUHENTAIKBN-ITEM-STATE
       *
+           MOVE    WIDGET-INSENSITIVE
+                                   TO  W65-JGNFTNTAIKBN-STATE
+                                       W65-JGNFTNTAIKBN-ITEM-STATE
+      *
            IF    ( SPA-GMN-JNISSUKBN    =   "0" )
                MOVE    WIDGET-INSENSITIVE
                                    TO  W65-JNISSUTAIKBN-STATE
@@ -3292,9 +3388,11 @@
            WHEN    022
                MOVE    "JYUHENTAIKBN"      TO  MCP-WIDGET
            WHEN    023
-               MOVE    "SYUKEIKBN"            TO  MCP-WIDGET
+               MOVE    "SYUKEIKBN"         TO  MCP-WIDGET
            WHEN    024
-               MOVE    "SYUKEITAIKBN"            TO  MCP-WIDGET
+               MOVE    "SYUKEITAIKBN"      TO  MCP-WIDGET
+           WHEN    025
+               MOVE    "JGNFTNKBN"         TO  MCP-WIDGET
            WHEN    051
                MOVE    "YUKOSTYMD"         TO  MCP-WIDGET
            WHEN    052
@@ -3359,14 +3457,16 @@
                MOVE    018                 TO  SPA-GMN-CUR
            WHEN    "OCRTAIKBN"
                MOVE    021                 TO  SPA-GMN-CUR
+           WHEN    "JGNFTNKBN"
+               MOVE    019                 TO  SPA-GMN-CUR
+           WHEN    "JYUHENKBN"
+               MOVE    022                 TO  SPA-GMN-CUR
+           WHEN    "JYUHENTAIKBN"
+               MOVE    025                 TO  SPA-GMN-CUR
            WHEN    "SAIKEIKBN"
                MOVE    020                 TO  SPA-GMN-CUR
            WHEN    "SAIKEITAIKBN"
                MOVE    051                 TO  SPA-GMN-CUR
-           WHEN    "JYUHENKBN"
-               MOVE    022                 TO  SPA-GMN-CUR
-           WHEN    "JYUHENTAIKBN"
-               MOVE    019                 TO  SPA-GMN-CUR
            WHEN    "YUKOSTYMD"
                MOVE    052                 TO  SPA-GMN-CUR
            WHEN    "YUKOEDYMD"
@@ -3464,7 +3564,7 @@
            IF    ( SPA-GMN-CUR         =   22 )
                IF    ( W65-JYUHENTAIKBN-STATE
                                        =   WIDGET-INSENSITIVE )
-                   MOVE    19          TO  SPA-GMN-CUR
+                   MOVE    25          TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
@@ -3903,6 +4003,35 @@
       *
            .
        4200-JYUHENKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    日・月上限負担計算コンボボックスチェック処理
+      *****************************************************************
+       4200-JGNFTNKBNLST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-JGNFTNKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-JGNFTNKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-JGNFTNKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-JGNFTNKBNLST (1)
+                                   TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-JGNFTNKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    共通対象区分コンボボックスチェック処理
