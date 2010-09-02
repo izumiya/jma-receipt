@@ -1095,9 +1095,18 @@
                                            TO  SPA-GMN-HOJOKBNL (IDT)
                            MOVE    IDT         TO  SPA-GMN-HOJO-MAX
                        END-PERFORM
-                       IF      SPA-GMN-HOJOKBN     =   SPACE
+      *??              IF      SPA-GMN-HOJOKBN     =   SPACE
       *                    ²ÝÀÇ
-                           MOVE    "1"         TO SPA-GMN-HOJOKBN
+      *                    MOVE    "1"         TO SPA-GMN-HOJOKBN
+      *??              END-IF
+      *                ¿·µ¬¤Ï²ÝÀÇ¤ò½é´üÉ½¼¨
+                       IF      (SPA-NAI-HKNSTR      =   ZERO      ) OR
+                               (SPA-PTHKN-SINKIKBN (SPA-NAI-HKNSTR)
+                                                    =   "1"       )
+                           IF      SPA-GMN-HOJOKBN     =   SPACE
+      *                        ²ÝÀÇ
+                               MOVE    "1"         TO  SPA-GMN-HOJOKBN
+                           END-IF
                        END-IF
                    WHEN    OTHER
                        MOVE    ZERO        TO  SPA-GMN-HOJO-MAX
@@ -2351,15 +2360,15 @@
                    MOVE    11              TO  SPA-GMN-CUR
                END-IF
            END-IF
-      *    ¼£¸³
-           IF      (SPA-GMN-HKNNUM         >=  "900"
-                                           OR  "919" )   AND
-                   (SPA-NAI-PTHKN-SBTKBN   =   "9"  )
-               IF      SPA-GMN-HOJOKBN     =   SPACE
-                   MOVE    "0060"          TO  SPA-ERRCD
-                   MOVE    11              TO  SPA-GMN-CUR
-               END-IF
-           END-IF
+      ***  ¼£¸³
+      *    IF      (SPA-GMN-HKNNUM         >=  "900"
+      *                                    OR  "919" )   AND
+      *            (SPA-NAI-PTHKN-SBTKBN   =   "9"  )
+      *        IF      SPA-GMN-HOJOKBN     =   SPACE
+      *            MOVE    "0060"          TO  SPA-ERRCD
+      *            MOVE    11              TO  SPA-GMN-CUR
+      *        END-IF
+      ***  END-IF
       *
       *    £È£±£´¡¥£±£°¤«¤é
       *    £·£°ºÐ°Ê¾å¤ÏÉ¬¿Ü
