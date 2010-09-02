@@ -283,6 +283,7 @@
       *  04.04.29    NACL-ÌçÏÆ    10/08/06  ¼«Î©»Ù±çÆÊÌÚ¸©ÆÈ¼«ÂÐ±þ
       *  04.04.30    NACL-ÌçÏÆ    10/08/23  ¹âÎðÈó³ºÅöÂÐ±þ
       *  04.04.31    NACL-ÌçÏÆ    10/08/27  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.32    NACL-ÌçÏÆ    10/09/02  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/25  ÊÝ¸±¡¢¼«Èñ¤½¤ì¤¾¤ì¤ÎÀÁµá³ÛÃ¼¿ô
       *                                     ÀßÄêµ¡Ç½
@@ -999,6 +1000,7 @@
            03  CHECK-IDX               PIC  9(02).
            03  CHECK-IDX2              PIC  9(02).
            03  KOHFUKA-IDX             PIC  9(02).
+           03  KOHFUKA-IDX2            PIC  9(01).
            03  IDX-CYO                 PIC  9(03).
       *
       *    ¹âÎð¼Ô¤ÎÉéÃ´¾å¸Â»»Äê¥¨¥ê¥¢
@@ -9344,25 +9346,25 @@
                IF   WK-1001-PREFNUM       =    07
                AND  LNK-SYU-SRYYMD(1:6)  >=   "200702"
                     IF   LNK-SYU-KOH1HKNNUM  = "281"
-                        MOVE     1    TO     FLG-NYUGAI2
+      ***               MOVE     1    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(1) TO FTN-KOHI1-M
                                                           FTN-KOHI1-M2
                                                           FTN-KOHI1-M3
                     END-IF
                     IF   LNK-SYU-KOH2HKNNUM  = "281"
-                        MOVE     2    TO     FLG-NYUGAI2
+      ***               MOVE     2    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(2) TO FTN-KOHI2-M
                                                           FTN-KOHI2-M2
                                                           FTN-KOHI2-M3
                     END-IF
                     IF   LNK-SYU-KOH3HKNNUM  = "281"
-                        MOVE     3    TO     FLG-NYUGAI2
+      ***               MOVE     3    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(3) TO FTN-KOHI3-M
                                                           FTN-KOHI3-M2
                                                           FTN-KOHI3-M3
                     END-IF
                     IF   LNK-SYU-KOH4HKNNUM  = "281"
-                        MOVE     4    TO     FLG-NYUGAI2
+      ***               MOVE     4    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(4) TO FTN-KOHI4-M
                                                           FTN-KOHI4-M2
                                                           FTN-KOHI4-M3
@@ -9376,6 +9378,8 @@
                                                           FTN-KOHI1-M3
                     END-IF
                END-IF
+      *
+               PERFORM     2203-JGNFTNKBN-HENSYU-SEC
       *
                IF   LNK-S02-TEIKI-KBN     =   "X"
                  IF    FLG-NYUGAI    NOT =   ZERO
@@ -14788,6 +14792,68 @@
            .
       *
        2202-KOHFTN-KINGAKU-GEN2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æü¡¦·î¾å¸Â³ÛÉéÃ´·×»»¶èÊ¬ÊÔ½¸
+      ******************************************************************
+       2203-JGNFTNKBN-HENSYU-SEC          SECTION.
+      *
+           PERFORM   VARYING   KOHFUKA-IDX2   FROM   1   BY   1
+                      UNTIL    KOHFUKA-IDX2    >     4
+      *
+             IF    LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)(1:1)
+                                              >= "1" AND <= "8"
+               IF  LNK-SYU-SRYYMD(1:6)  >=  "201010"
+                  INITIALIZE                   SYS-2010-REC
+                  MOVE    "2010"           TO  SYS-2010-KANRICD
+                  MOVE    LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
+                                           TO  SYS-2010-KBNCD
+                  MOVE    LNK-SYU-HOSPNUM  TO  SYS-2010-HOSPNUM
+                  MOVE    LNK-SYU-SRYYMD   TO  SYS-2010-STYUKYMD
+                  MOVE    LNK-SYU-SRYYMD   TO  SYS-2010-EDYUKYMD
+                  MOVE    SYS-2010-REC     TO  MCPDATA-REC
+                  MOVE    "DBSELECT"       TO  MCP-FUNC
+                  MOVE    "tbl_syskanri"   TO  MCP-TABLE
+                  MOVE    "key10"          TO  MCP-PATHNAME
+                  CALL    "ORCDBMAIN"  USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+                  IF      MCP-RC         =   ZERO
+                     MOVE  "tbl_syskanri"  TO  MCP-TABLE
+                     MOVE  "key10"         TO  MCP-PATHNAME
+                     PERFORM   SYSKANRI-READ-SEC
+                     EVALUATE  SYS-2010-JGNFTNKBN
+                       WHEN      SPACE
+                         IF  ((WK-1001-PREFNUM   =   42  ) AND
+                              (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
+                                                 =  "180"))
+                         OR  ((WK-1001-PREFNUM   =   07  ) AND
+                              (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
+                                                 =  "281"))
+                            MOVE  KOHFUKA-IDX2  TO  FLG-NYUGAI2
+                         END-IF
+                       WHEN      "1"
+                            MOVE  KOHFUKA-IDX2  TO  FLG-NYUGAI2
+                     END-EVALUATE
+                  END-IF
+                  MOVE     "tbl_syskanri"  TO  MCP-TABLE
+                  MOVE     "key10"         TO  MCP-PATHNAME
+                  PERFORM   DB-CLOSE-SEC
+               ELSE
+                  IF  (WK-1001-PREFNUM                  =   07     )
+                  AND (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "281"   )
+                  AND (LNK-SYU-SRYYMD(1:6)             >=  "200702")
+                            MOVE  KOHFUKA-IDX2  TO  FLG-NYUGAI2
+                  END-IF
+               END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+      *
+       2203-JGNFTNKBN-HENSYU-EXT.
            EXIT.
       *
       ******************************************************************
