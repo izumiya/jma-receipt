@@ -315,6 +315,7 @@
       *  04.04.28    NACL-ÌçÏÆ    10/08/06  ¼«Î©»Ù±çÆÊÌÚ¸©ÆÈ¼«ÂÐ±þ
       *  04.04.29    NACL-ÌçÏÆ    10/08/23  ¹âÎðÈó³ºÅöÂÐ±þ
       *  04.04.30    NACL-ÌçÏÆ    10/08/27  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.31    NACL-ÌçÏÆ    10/09/02  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9210,6 +9211,21 @@
                         MOVE  WK-KANEN-TAFTNRUIKEI(1)  TO FTN-KOHI1-M
                                                           FTN-KOHI1-M2
                                                           FTN-KOHI1-M3
+                    END-IF
+               END-IF
+               IF   WK-1001-PREFNUM        =     42
+               AND  LNK-SYU-SRYYMD(1:6)   >=    "201010"
+                    IF    LNK-SYU-KOH1HKNNUM = "180"
+                        MOVE     1    TO     FLG-NYUGAI2
+                    END-IF
+                    IF    LNK-SYU-KOH2HKNNUM = "180"
+                        MOVE     2    TO     FLG-NYUGAI2
+                    END-IF
+                    IF    LNK-SYU-KOH3HKNNUM = "180"
+                        MOVE     3    TO     FLG-NYUGAI2
+                    END-IF
+                    IF    LNK-SYU-KOH4HKNNUM = "180"
+                        MOVE     4    TO     FLG-NYUGAI2
                     END-IF
                END-IF
       *
