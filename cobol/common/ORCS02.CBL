@@ -315,6 +315,7 @@
            03  WK-TOKUTEI-COMPFTN      PIC 9(08).
            03  WK-TOKUTEI-COMPFTN2     PIC 9(08).
            03  WK-TOKUTEI-COMPFTN3     PIC 9(08).
+           03  WK-TOKUTEI-COMPFTN4     PIC 9(08).
            03  WK-HANGAKU-COMPFTN      PIC 9(07).
            03  WK-HANGAKU-ENTANI       PIC 9(07)V9(01).
            03  WK-GENMEN-KEISAN        PIC 9(07).
@@ -18063,6 +18064,8 @@
                                           LNK-SYU-SYUCOMPFTN-ENTANI +
                                           WK-SKYMONEY-ZEI
                               END-IF
+                              MOVE      LNK-SYU-SYUCOMPFTN
+                                                 TO WK-TOKUTEI-COMPFTN4
       *                       ¸º³Û
                               EVALUATE  WK-GENGAKUKBN
                                 WHEN        1
@@ -18120,7 +18123,8 @@
       *
                         IF    FLG-GENBUTU70          NOT =  ZERO
                           IF  FLG-TOKU75  =  3
-                            IF  WK-TOKUTEI-COMPFTN2  >=  10500
+      ***                   IF  WK-TOKUTEI-COMPFTN2  >=  10500
+                            IF  WK-TOKUTEI-COMPFTN4  >=  10500
                                MOVE   1   TO  FLG-GENBUTU-TAISYODATA
                             END-IF
                             IF  (COMB-KOH1HKNNUM        =  SPACE)
@@ -18140,7 +18144,8 @@
                             END-IF
                           ELSE
       ***                   IF  LNK-SYU-SYUCOMPFTN   >=  21000
-                            IF  WK-TOKUTEI-COMPFTN2  >=  21000
+      ***                   IF  WK-TOKUTEI-COMPFTN2  >=  21000
+                            IF  WK-TOKUTEI-COMPFTN4  >=  21000
                                MOVE   1   TO  FLG-GENBUTU-TAISYODATA
                             END-IF
                             IF  (COMB-KOH1HKNNUM        =  SPACE)
@@ -18256,6 +18261,8 @@
                                           LNK-SYU-SYUCOMPFTN-ENTANI +
                                           WK-SKYMONEY-ZEI
                               END-IF
+                              MOVE      LNK-SYU-SYUCOMPFTN
+                                                 TO WK-TOKUTEI-COMPFTN4
       *                       ¸º³Û
                               EVALUATE  WK-GENGAKUKBN
                                 WHEN        1
@@ -18313,7 +18320,8 @@
       *
                         IF    FLG-GENBUTU70          NOT =  ZERO
                           IF  FLG-TOKU75  =  3
-                            IF  WK-TOKUTEI-COMPFTN2  >=  10500
+      ***                   IF  WK-TOKUTEI-COMPFTN2  >=  10500
+                            IF  WK-TOKUTEI-COMPFTN4  >=  10500
                                MOVE   1   TO  FLG-GENBUTU-TAISYODATA
                             END-IF
                             IF  (COMB-KOH1HKNNUM        =  SPACE)
@@ -18333,7 +18341,8 @@
                             END-IF
                           ELSE
       ***                   IF  LNK-SYU-SYUCOMPFTN   >=  21000
-                            IF  WK-TOKUTEI-COMPFTN2  >=  21000
+      ***                   IF  WK-TOKUTEI-COMPFTN2  >=  21000
+                            IF  WK-TOKUTEI-COMPFTN4  >=  21000
                                MOVE   1   TO  FLG-GENBUTU-TAISYODATA
                             END-IF
                             IF  (COMB-KOH1HKNNUM        =  SPACE)
