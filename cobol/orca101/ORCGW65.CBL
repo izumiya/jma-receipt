@@ -2118,6 +2118,10 @@
            PERFORM 4200-JYUHENTAIKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-JYUHENTAIKBN-G
       *
+           MOVE    SYS-2010-JGNFTNKBN  TO  WRK-CMB-CD
+           PERFORM 4200-JGNFTNKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-JGNFTNKBN-G
+      *
            .
        4100-INPUT-AREA-EDIT-EXT.
            EXIT.
