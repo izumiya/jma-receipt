@@ -7989,7 +7989,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 RECE84-SURYOUTOTAL
              MOVE  WRK-TENTEKI2-T-SRYCDTOTAL(IDY)
                                         TO      RECE84-SRYCDTOTAL
-                                                RECE84-RUIKEITOTAL
            ELSE
              MOVE  WRK-TENTEKI2-C-ZAITEN(IDY)
                                         TO      RECE84-ZAITEN
@@ -7999,7 +7998,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 RECE84-SURYOUTOTAL
              MOVE  WRK-TENTEKI2-C-SRYCDTOTAL(IDY)
                                         TO      RECE84-SRYCDTOTAL
-                                                RECE84-RUIKEITOTAL
            END-IF
            MOVE    1                    TO      RECE84-ZAIKAISU
            MOVE    ZERO                 TO      RECE84-SYUTEN2

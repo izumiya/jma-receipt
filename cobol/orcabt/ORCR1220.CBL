@@ -5239,7 +5239,6 @@
                                                 RECE220-SURYOUTOTAL
              MOVE  WRK-TENTEKI2-T-SRYCDTOTAL(IDY)
                                         TO      RECE220-SRYCDTOTAL
-                                                RECE220-RUIKEITOTAL
            ELSE
              MOVE  WRK-TENTEKI2-C-ZAITEN(IDY)
                                         TO      RECE220-ZAITEN
@@ -5249,7 +5248,6 @@
                                                 RECE220-SURYOUTOTAL
              MOVE  WRK-TENTEKI2-C-SRYCDTOTAL(IDY)
                                         TO      RECE220-SRYCDTOTAL
-                                                RECE220-RUIKEITOTAL
            END-IF
            MOVE    1                    TO      RECE220-ZAIKAISU
       *
