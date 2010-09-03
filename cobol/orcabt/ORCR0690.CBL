@@ -140,6 +140,8 @@
       *                                     （画像診断２回目以降減算編集）
       *                                     （コード追加）
       *  04.04.07    NACL-門脇    10/06/01  他医療機関受診対応
+      *  04.04.08    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
+      *                                     記載修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
@@ -3820,7 +3822,8 @@
               OR ((FLG-COMMENT3       =    1                  ) AND
                   (RECE64-SRYKBN      =   "14" OR "33" OR
                                           "90" OR "92"        ) AND
-                  (RECE64-ZAITEN      =   ZERO                ))
+                  (RECE64-ZAITEN      =   ZERO                ) AND
+                  (RECE64-TOYAKUFLG   =   SPACE               ))
               OR ( RECE64-SAFLG   NOT =   SPACE                )
               OR ( RECE64-TOYAKUFLG   =   "2"                  )
               OR ( RECE64-ZAIKBN      =    1                   )

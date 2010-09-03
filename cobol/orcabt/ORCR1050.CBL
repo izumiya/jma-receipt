@@ -48,6 +48,8 @@
       *  04.04.04    NACL-門脇    10/03/29  改正対応
       *                                     （画像診断２回目以降減算編集）
       *                                     （コード追加）
+      *  04.04.05    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
+      *                                     記載修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
@@ -3256,7 +3258,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                  (WRK-TENSUGOKEI     =   ZERO                ))
              OR ((FLG-COMMENT3       =    1                  ) AND
                  (RECE120-SRYKBN     =   "14"                ) AND
-                 (RECE120-ZAITEN     =   ZERO                ))
+                 (RECE120-ZAITEN     =   ZERO                ) AND
+                 (RECE120-TOYAKUFLG  =   SPACE               ))
              OR ( RECE120-SAFLG  NOT =   SPACE                )
              OR ( RECE120-TOYAKUFLG  =   "2"                  )
              OR ( RECE120-ZAIKBN     =    1                   )

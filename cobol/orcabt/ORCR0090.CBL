@@ -207,6 +207,8 @@
       *  04.04.06    NACL-門脇    10/03/29  改正対応
       *                                     （画像診断２回目以降減算編集）
       *                                     （コード追加）
+      *  04.04.07    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
+      *                                     記載修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
@@ -4476,7 +4478,8 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                  (WRK-TENSUGOKEI     =   ZERO                ))
              OR ((FLG-COMMENT3       =    1                  ) AND
                  (RECE04-SRYKBN      =   "14"                ) AND
-                 (RECE04-ZAITEN      =   ZERO                ))
+                 (RECE04-ZAITEN      =   ZERO                ) AND
+                 (RECE04-TOYAKUFLG   =   SPACE               ))
              OR ( RECE04-SAFLG   NOT =   SPACE                )
              OR ( RECE04-TOYAKUFLG   =   "2"                  )
              OR ( RECE04-ZAIKBN      =    1                   )

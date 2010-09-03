@@ -127,6 +127,8 @@
       *  04.04.06    NACL-門脇    10/03/31  改正対応
       *                                     （頸部固定帯加算の対応）
       *                                     （８０その他の記載順）
+      *  04.04.07    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
+      *                                     記載修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
@@ -3460,7 +3462,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  (WRK-TENSUGOKEI     =   ZERO                ))
              OR ((FLG-COMMENT3       =    1                  ) AND
                  (RECE44-SRYKBN      =   "14"                ) AND
-                 (RECE44-ZAITEN      =   ZERO                ))
+                 (RECE44-ZAITEN      =   ZERO                ) AND
+                 (RECE44-TOYAKUFLG   =   SPACE               ))
              OR ( RECE44-SAFLG   NOT =   SPACE                )
              OR ( RECE44-TOYAKUFLG   =   "2"                  )
              OR ( RECE44-ZAIKBN      =    1                   )
