@@ -349,7 +349,6 @@
            03  CONST-KOHLST-MAX           PIC 9(03) VALUE 100.
            03  CONST-RIREKILST-MAX        PIC 9(03) VALUE 20.
       *
-           03  CONST-FUKUSHIMA            PIC 9(02) VALUE 07.
            03  CONST-IBARAKI              PIC 9(02) VALUE 08.
            03  CONST-GUNMA                PIC 9(02) VALUE 10.
            03  CONST-TOKYO                PIC 9(02) VALUE 13.
@@ -2226,10 +2225,6 @@
            IF    ( SPA-GMN-KOHNUM      NOT =   SPA-NAI-KOHNUM )
                IF    ( SPA-PREFNUM     =       CONST-NAGASAKI )
                 AND  ( SPA-GMN-KOHNUM  =   "180" )
-                   MOVE    "1"         TO  SPA-GMN-JGNFTNKBN
-               END-IF
-               IF    ( SPA-PREFNUM     =       CONST-FUKUSHIMA )
-                AND  ( SPA-GMN-KOHNUM  =   "281" )
                    MOVE    "1"         TO  SPA-GMN-JGNFTNKBN
                END-IF
                MOVE    SPA-GMN-KOHNUM  TO  SPA-NAI-KOHNUM
