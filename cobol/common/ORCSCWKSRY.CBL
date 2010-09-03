@@ -1959,6 +1959,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                                  (IDY)
                    END-IF
       *
+      *!!          数量入力のできないコードは数量編集なし
+                   IF     (SPA-COM-SURYO  (IDX)    >   1   )  AND
+                          (SPA-COM-INPUTCD(IDX)(1:3)   =   "058"
+                                                       OR  "001"
+                                                       OR  "002"
+                                                       OR  "099")
+                       IF      SPA-COM-INPUTCD(IDX)(1:7)   =   "0992000"
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO          TO  SPA-COM-SURYO(IDX)
+                           MOVE    SPACE         TO  SPA-COM-SURFLG(IDX)
+                       END-IF
+                   END-IF
+      *!!
       *            数量
                    IF      SPA-COM-SURYO  (IDX)    =   ZERO
                        MOVE    1                   TO  SPA-COM-SURYO
