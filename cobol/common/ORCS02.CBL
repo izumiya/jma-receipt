@@ -14802,9 +14802,14 @@
            PERFORM   VARYING   KOHFUKA-IDX2   FROM   1   BY   1
                       UNTIL    KOHFUKA-IDX2    >     4
       *
-             IF    LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)(1:1)
-                                              >= "1" AND <= "8"
-               IF  LNK-SYU-SRYYMD(1:6)  >=  "201010"
+             IF    (WK-1001-PREFNUM                  =   07     )
+             AND   (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "281"   )
+             AND   (LNK-SYU-SRYYMD(1:6)             >=  "200702")
+                  MOVE    KOHFUKA-IDX2     TO  FLG-NYUGAI2
+             ELSE
+               IF  (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)(1:1)
+                                               >= "1" AND <= "8")
+               AND (LNK-SYU-SRYYMD(1:6)        >= "201010"      )
                   INITIALIZE                   SYS-2010-REC
                   MOVE    "2010"           TO  SYS-2010-KANRICD
                   MOVE    LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
@@ -14825,12 +14830,9 @@
                      PERFORM   SYSKANRI-READ-SEC
                      EVALUATE  SYS-2010-JGNFTNKBN
                        WHEN      SPACE
-                         IF  ((WK-1001-PREFNUM   =   42  ) AND
-                              (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
-                                                 =  "180"))
-                         OR  ((WK-1001-PREFNUM   =   07  ) AND
-                              (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
-                                                 =  "281"))
+                         IF  (WK-1001-PREFNUM           =   42  )
+                         AND (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)
+                                                        =  "180")
                             MOVE  KOHFUKA-IDX2  TO  FLG-NYUGAI2
                          END-IF
                        WHEN      "1"
@@ -14840,12 +14842,6 @@
                   MOVE     "tbl_syskanri"  TO  MCP-TABLE
                   MOVE     "key10"         TO  MCP-PATHNAME
                   PERFORM   DB-CLOSE-SEC
-               ELSE
-                  IF  (WK-1001-PREFNUM                  =   07     )
-                  AND (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "281"   )
-                  AND (LNK-SYU-SRYYMD(1:6)             >=  "200702")
-                            MOVE  KOHFUKA-IDX2  TO  FLG-NYUGAI2
-                  END-IF
                END-IF
              END-IF
       *
