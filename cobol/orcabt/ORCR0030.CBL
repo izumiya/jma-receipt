@@ -9811,9 +9811,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
                   ELSE
+                   IF   (SYS-1001-PREFNUM      =   36     )
+                   AND  (RECE02-KOHNUM(KH-IDX - 1) = "245")
+                   AND  (((SYU-KOH-HKNNUM(1) ="245") AND
+                          (SYU-KOH-HKNNUM(2) ="748"))   OR
+                         ((SYU-KOH-HKNNUM(2) ="245") AND
+                          (SYU-KOH-HKNNUM(3) ="748"))     )
+                   AND  (RECE02-TEISYUTUSAKI   =   2 OR 6 )
+                   AND  (RECE02-SRYYM         >=  "200802")
+                      ADD   SYU-KOH-COMPFTN(IDX3)  TO
+                                           RECE02-FTNMONEY-KOJ(KH-IDX)
+                   ELSE
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
+                   END-IF
                   END-IF
                 END-IF
               END-IF
@@ -12373,8 +12385,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      IF   RECE02-KOHNUM(KOHFTN-IDX) =  "781"
                        IF   RECE02-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                         MOVE  ZERO  TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
-                        MOVE  ZERO  TO
-                                    RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
                         MOVE  SPACE TO
                                     RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                        END-IF
@@ -12387,30 +12397,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                 IF   (RECE02-SRYYM         >=  "200802")
                 AND  (RECE02-TEISYUTUSAKI   =   2 OR 6 )
-                  IF   (RECE02-KOHNUM(1)      =  "245")
-                  AND  (RECE02-KOHHBTNUM(2)   =  "48" )
-                      IF   RECE02-FTNMONEY(2) NOT = ZERO
-                       MOVE  ZERO  TO  RECE02-FTNMONEY(2)
-                       MOVE  ZERO  TO  RECE02-FTNMONEY-KOJ(2)
-                       MOVE  SPACE TO  RECE02-ZEROKISAIFLG(2)
-                      END-IF
-                  END-IF
-                  IF   (RECE02-KOHNUM(2)      =  "245")
-                  AND  (RECE02-KOHHBTNUM(3)   =  "48" )
-                      IF   RECE02-FTNMONEY(3) NOT = ZERO
-                       MOVE  ZERO  TO  RECE02-FTNMONEY(3)
-                       MOVE  ZERO  TO  RECE02-FTNMONEY-KOJ(3)
-                       MOVE  SPACE TO  RECE02-ZEROKISAIFLG(3)
-                      END-IF
-                  END-IF
-                  IF   (RECE02-KOHNUM(3)      =  "245")
-                  AND  (RECE02-KOHHBTNUM(4)   =  "48" )
-                      IF   RECE02-FTNMONEY(4) NOT = ZERO
-                       MOVE  ZERO  TO  RECE02-FTNMONEY(4)
-                       MOVE  ZERO  TO  RECE02-FTNMONEY-KOJ(4)
-                       MOVE  SPACE TO  RECE02-ZEROKISAIFLG(4)
-                      END-IF
-                  END-IF
+                   PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                               UNTIL    KOHFTN-IDX     >    4
+      *
+                     IF   RECE02-KOHNUM(KOHFTN-IDX) =  "245"
+                       IF  (RECE02-FTNMONEY(KOHFTN-IDX + 1) = ZERO)
+                       AND (RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                                                        NOT = ZERO)
+                        MOVE  SPACE TO
+                                    RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                       END-IF
+                     END-IF
+      *
+                   END-PERFORM
                 END-IF
       *
              WHEN    "39"
@@ -12423,8 +12422,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        OR "74" OR "75"
                        IF   RECE02-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                         MOVE  ZERO  TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
-                        MOVE  ZERO  TO
-                                    RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
                         MOVE  SPACE TO
                                     RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                        END-IF
@@ -12659,7 +12656,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               MOVE    1    TO   TBL-BUNTENFLG(3)
               IF   (SYS-1001-PREFNUM      =  "36" )
               AND  (RECE02-KOHNUM(2)      =  "245")
-              AND  (RECE02-KOHHBTNUM(3)   =  "48" )
+              AND  (RECE02-KOHNUM(3)      =  "748")
                  COMPUTE  RECE02-TOTALTEN(4) =
                           RECE02-TOTALTEN(1) -
                           RECE02-TOTALTEN(2)
@@ -12688,7 +12685,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               MOVE    1    TO   TBL-BUNTENFLG(4)
               IF   (SYS-1001-PREFNUM      =  "36" )
               AND  (RECE02-KOHNUM(3)      =  "245")
-              AND  (RECE02-KOHHBTNUM(4)   =  "48" )
+              AND  (RECE02-KOHNUM(4)      =  "748")
                  COMPUTE  RECE02-TOTALTEN(5) =
                           RECE02-TOTALTEN(1) -
                           RECE02-TOTALTEN(2)
@@ -12717,7 +12714,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               MOVE    1    TO   TBL-BUNTENFLG(4)
               IF   (SYS-1001-PREFNUM      =  "36" )
               AND  (RECE02-KOHNUM(3)      =  "245")
-              AND  (RECE02-KOHHBTNUM(4)   =  "48" )
+              AND  (RECE02-KOHNUM(4)      =  "748")
                  COMPUTE  RECE02-TOTALTEN(5) =
                           RECE02-TOTALTEN(1) -
                           RECE02-TOTALTEN(3)

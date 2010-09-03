@@ -50,6 +50,8 @@
       *                                     （コード追加）
       *  04.04.05    NACL-門脇    10/04/08  改正対応
       *                                     （処置記載順編集）
+      *  04.04.06    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
+      *                                     記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3233,7 +3235,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF                                                       
            IF     (FLG-COMMENT3       =    1  )   AND
                   (RECE120-SRYKBN      =   "14")   AND
-                  (RECE120-ZAITEN      =   ZERO)
+                  (RECE120-ZAITEN      =   ZERO)   AND
+                  (RECE120-TOYAKUFLG   =  SPACE)
                GO  TO  440-TNSKAI-SET-EXT
            END-IF
            IF     (RECE120-SAFLG   NOT =   SPACE)

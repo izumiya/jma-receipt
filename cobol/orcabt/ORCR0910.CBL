@@ -104,6 +104,8 @@
       *                                     （８０その他の記載順）
       *  04.04.07    NACL-門脇    10/04/08  改正対応
       *                                     （処置記載順編集）
+      *  04.04.08    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
+      *                                     記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2948,7 +2950,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
            IF     (FLG-COMMENT3       =    1                  )   AND
                   (RECE84-SRYKBN      =   "14" OR "33" OR "90"
                                                        OR "92")   AND
-                  (RECE84-ZAITEN      =   ZERO                )      
+                  (RECE84-ZAITEN      =   ZERO                )   AND
+                  (RECE84-TOYAKUFLG   =   SPACE               )
                GO  TO  440-TNSKAI-SET-EXT                              
            END-IF     
            IF     (RECE84-SAFLG   NOT =   SPACE)
