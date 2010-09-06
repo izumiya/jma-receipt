@@ -94,6 +94,8 @@
       *  04.05.01    NACL-ÌçÏÆ    10/01/12  ¼£¸³ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    10/02/08  ÃÏÊý¸øÈñ¤ÎÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ
       *                                     ½¸·×ÂÐ±þ
+      *  04.05.03    NACL-ÌçÏÆ    10/09/06  ÃÏÊý¸øÈñ¤ÎÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ
+      *                                     ½¸·×ÂÐ±þ¡Ê¥ì¥»ÅÅÉéÃ´¶èÊ¬ÂÐ±þ¡Ë
       *****************************************************************
       *
       *
@@ -3967,6 +3969,8 @@
              WHEN      "0"
              WHEN      "1"
              WHEN      "2"
+             WHEN      "3"
+             WHEN      "4"
                  MOVE   SYS-2010-SYUKEIKBN
                                     TO   RECE62-SYUKEIKBN(IDX11 2)
                  MOVE   SYS-2010-SYUKEI-TAIKBN
@@ -4292,36 +4296,56 @@
       *
            EVALUATE  RECE62-SYUKEIKBN(IDX1 2)
               WHEN      "1"
+              WHEN      "3"
                   IF   RECE62-KOHNUMHC(IDX1 2) =  RECE62-KOHNUM(2)
                   AND  RECE62-KOHIDHC(IDX1 2)  =  RECE62-KOHID(2)
                      MOVE  "1"  TO      RECE62-FUKUSHIFLG(3)
                      MOVE   1   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE62-SYUKEIKBN(IDX1 2) = "3"
+                      MOVE  1   TO      RECE62-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE62-KOHNUMHC(IDX1 2) =  RECE62-KOHNUM(3)
                   AND  RECE62-KOHIDHC(IDX1 2)  =  RECE62-KOHID(3)
                      MOVE  "1"  TO      RECE62-FUKUSHIFLG(4)
                      MOVE   1   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE62-SYUKEIKBN(IDX1 2) = "3"
+                      MOVE  1   TO      RECE62-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE62-KOHNUMHC(IDX1 2) =  RECE62-KOHNUM(4)
                   AND  RECE62-KOHIDHC(IDX1 2)  =  RECE62-KOHID(4)
                      MOVE  "1"  TO      RECE62-FUKUSHIFLG(5)
                      MOVE   1   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE62-SYUKEIKBN(IDX1 2) = "3"
+                      MOVE  1   TO      RECE62-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
               WHEN      "2"
+              WHEN      "4"
                   IF   RECE62-KOHNUMHC(IDX1 2) =  RECE62-KOHNUM(2)
                   AND  RECE62-KOHIDHC(IDX1 2)  =  RECE62-KOHID(2)
                      MOVE  "2"  TO      RECE62-FUKUSHIFLG(3)
                      MOVE   2   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE62-SYUKEIKBN(IDX1 2) = "4"
+                      MOVE  1   TO      RECE62-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE62-KOHNUMHC(IDX1 2) =  RECE62-KOHNUM(3)
                   AND  RECE62-KOHIDHC(IDX1 2)  =  RECE62-KOHID(3)
                      MOVE  "2"  TO      RECE62-FUKUSHIFLG(4)
                      MOVE   2   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE62-SYUKEIKBN(IDX1 2) = "4"
+                      MOVE  1   TO      RECE62-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE62-KOHNUMHC(IDX1 2) =  RECE62-KOHNUM(4)
                   AND  RECE62-KOHIDHC(IDX1 2)  =  RECE62-KOHID(4)
                      MOVE  "2"  TO      RECE62-FUKUSHIFLG(5)
                      MOVE   2   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE62-SYUKEIKBN(IDX1 2) = "4"
+                      MOVE  1   TO      RECE62-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
            END-EVALUATE
       *
@@ -4345,6 +4369,8 @@
                         END-EVALUATE
                         MOVE   TBL-FUKUSHIFLG(2)
                                           TO  TBL-FUKUSHIFLG(3)
+                        MOVE   RECE62-FTNKBNFLG(IDX1 2)
+                                          TO  RECE62-FTNKBNFLG(IDX1 3)
                      END-IF
                      IF   RECE62-KOHNUMHC(IDX1 3) =  RECE62-KOHNUM(3)
                      AND  RECE62-KOHIDHC(IDX1 3)  =  RECE62-KOHID(3)
@@ -4356,6 +4382,8 @@
                         END-EVALUATE
                         MOVE   TBL-FUKUSHIFLG(2)
                                           TO  TBL-FUKUSHIFLG(3)
+                        MOVE   RECE62-FTNKBNFLG(IDX1 2)
+                                          TO  RECE62-FTNKBNFLG(IDX1 3)
                      END-IF
                      IF   RECE62-KOHNUMHC(IDX1 3) =  RECE62-KOHNUM(4)
                      AND  RECE62-KOHIDHC(IDX1 3)  =  RECE62-KOHID(4)
@@ -4367,6 +4395,8 @@
                         END-EVALUATE
                         MOVE   TBL-FUKUSHIFLG(2)
                                           TO  TBL-FUKUSHIFLG(3)
+                        MOVE   RECE62-FTNKBNFLG(IDX1 2)
+                                          TO  RECE62-FTNKBNFLG(IDX1 3)
                      END-IF
                   END-IF
              END-EVALUATE

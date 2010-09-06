@@ -489,6 +489,8 @@
       *                                     集計対応
       *  04.05.10    NACL-門脇    10/02/09  地方公費の一部負担金０円記載
       *                                     （記録）の設定項目追加対応
+      *  04.05.11    NACL-門脇    10/09/06  地方公費の全国公費併用分請求点
+      *                                     集計対応（レセ電負担区分対応）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -756,6 +758,7 @@
            03  SYU-IDX2                                PIC 9(03).
            03  IDX10                                   PIC 9(03).
            03  IDX11                                   PIC 9(03).
+           03  IDX13                                   PIC 9(03).
       *
            03  IDA                 PIC 9(04).
            03  IDB                 PIC 9(04).
@@ -2634,6 +2637,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              WHEN      "0"
              WHEN      "1"
              WHEN      "2"
+             WHEN      "3"
+             WHEN      "4"
                  MOVE   SYS-2010-SYUKEIKBN
                                     TO   RECE02-SYUKEIKBN(IDX11 2)
                  MOVE   SYS-2010-SYUKEI-TAIKBN
@@ -4764,36 +4769,56 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            EVALUATE  RECE02-SYUKEIKBN(IDX1 2)
               WHEN      "1"
+              WHEN      "3"
                   IF   RECE02-KOHNUMHC(IDX1 2) =  RECE02-KOHNUM(2)
                   AND  RECE02-KOHIDHC(IDX1 2)  =  RECE02-KOHID(2)
                      MOVE  "1"  TO      RECE02-FUKUSHIFLG(3)
                      MOVE   1   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE02-SYUKEIKBN(IDX1 2) = "3"
+                      MOVE  1   TO      RECE02-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE02-KOHNUMHC(IDX1 2) =  RECE02-KOHNUM(3)
                   AND  RECE02-KOHIDHC(IDX1 2)  =  RECE02-KOHID(3)
                      MOVE  "1"  TO      RECE02-FUKUSHIFLG(4)
                      MOVE   1   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE02-SYUKEIKBN(IDX1 2) = "3"
+                      MOVE  1   TO      RECE02-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE02-KOHNUMHC(IDX1 2) =  RECE02-KOHNUM(4)
                   AND  RECE02-KOHIDHC(IDX1 2)  =  RECE02-KOHID(4)
                      MOVE  "1"  TO      RECE02-FUKUSHIFLG(5)
                      MOVE   1   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE02-SYUKEIKBN(IDX1 2) = "3"
+                      MOVE  1   TO      RECE02-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
               WHEN      "2"
+              WHEN      "4"
                   IF   RECE02-KOHNUMHC(IDX1 2) =  RECE02-KOHNUM(2)
                   AND  RECE02-KOHIDHC(IDX1 2)  =  RECE02-KOHID(2)
                      MOVE  "2"  TO      RECE02-FUKUSHIFLG(3)
                      MOVE   2   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE02-SYUKEIKBN(IDX1 2) = "4"
+                      MOVE  1   TO      RECE02-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE02-KOHNUMHC(IDX1 2) =  RECE02-KOHNUM(3)
                   AND  RECE02-KOHIDHC(IDX1 2)  =  RECE02-KOHID(3)
                      MOVE  "2"  TO      RECE02-FUKUSHIFLG(4)
                      MOVE   2   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE02-SYUKEIKBN(IDX1 2) = "4"
+                      MOVE  1   TO      RECE02-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
                   IF   RECE02-KOHNUMHC(IDX1 2) =  RECE02-KOHNUM(4)
                   AND  RECE02-KOHIDHC(IDX1 2)  =  RECE02-KOHID(4)
                      MOVE  "2"  TO      RECE02-FUKUSHIFLG(5)
                      MOVE   2   TO      TBL-FUKUSHIFLG(2)
+                     IF   RECE02-SYUKEIKBN(IDX1 2) = "4"
+                      MOVE  1   TO      RECE02-FTNKBNFLG(IDX1 2)
+                     END-IF
                   END-IF
            END-EVALUATE
       *
@@ -4823,6 +4848,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         END-EVALUATE
                         MOVE   TBL-FUKUSHIFLG(2)
                                           TO  TBL-FUKUSHIFLG(3)
+                        MOVE   RECE02-FTNKBNFLG(IDX1 2)
+                                          TO  RECE02-FTNKBNFLG(IDX1 3)
                      END-IF
                      IF   RECE02-KOHNUMHC(IDX1 3) =  RECE02-KOHNUM(3)
                      AND  RECE02-KOHIDHC(IDX1 3)  =  RECE02-KOHID(3)
@@ -4834,6 +4861,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         END-EVALUATE
                         MOVE   TBL-FUKUSHIFLG(2)
                                           TO  TBL-FUKUSHIFLG(3)
+                        MOVE   RECE02-FTNKBNFLG(IDX1 2)
+                                          TO  RECE02-FTNKBNFLG(IDX1 3)
                      END-IF
                      IF   RECE02-KOHNUMHC(IDX1 3) =  RECE02-KOHNUM(4)
                      AND  RECE02-KOHIDHC(IDX1 3)  =  RECE02-KOHID(4)
@@ -4845,6 +4874,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         END-EVALUATE
                         MOVE   TBL-FUKUSHIFLG(2)
                                           TO  TBL-FUKUSHIFLG(3)
+                        MOVE   RECE02-FTNKBNFLG(IDX1 2)
+                                          TO  RECE02-FTNKBNFLG(IDX1 3)
                      END-IF
                   END-IF
              END-EVALUATE
@@ -13665,18 +13696,24 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               IF  (RECE02-KOHNUM(2)(1:1)  >= "1" AND <= "8"  )
               AND (RECE02-HENTOTALTEN(3) = RECE02-TOTALTEN(3))
                   MOVE   SPACE   TO   RECE02-FUKUSHIFLG(3)
+                  MOVE   2       TO   KOHFTN-IDX
+                  PERFORM  211K1-FTNKBNFLG-CLEAR-SEC
               END-IF
            END-IF
            IF    RECE02-FUKUSHIFLG(4)  =  "2"
               IF  (RECE02-KOHNUM(3)(1:1)  >= "1" AND <= "8"  )
               AND (RECE02-HENTOTALTEN(4) = RECE02-TOTALTEN(4))
                   MOVE   SPACE   TO   RECE02-FUKUSHIFLG(4)
+                  MOVE   3       TO   KOHFTN-IDX
+                  PERFORM  211K1-FTNKBNFLG-CLEAR-SEC
               END-IF
            END-IF
            IF    RECE02-FUKUSHIFLG(5)  =  "2"
               IF  (RECE02-KOHNUM(4)(1:1)  >= "1" AND <= "8"  )
               AND (RECE02-HENTOTALTEN(5) = RECE02-TOTALTEN(5))
                   MOVE   SPACE   TO   RECE02-FUKUSHIFLG(5)
+                  MOVE   4       TO   KOHFTN-IDX
+                  PERFORM  211K1-FTNKBNFLG-CLEAR-SEC
               END-IF
            END-IF
       *
@@ -13707,6 +13744,32 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        211K-BUNTENSU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセ電用負担区分編集フラグクリア
+      *****************************************************************
+       211K1-FTNKBNFLG-CLEAR-SEC               SECTION.
+      *
+           PERFORM  VARYING  IDX13   FROM    1   BY  1
+                     UNTIL  (IDX13                   >   10 )
+                       OR   (RECE02-HKNCOMBI(IDX13)  =  ZERO)
+      *
+             IF  (RECE02-KOHNUMHC(IDX13 2) = RECE02-KOHNUM(KOHFTN-IDX))
+             AND (RECE02-KOHIDHC(IDX13 2)  = RECE02-KOHID(KOHFTN-IDX) )
+               MOVE      ZERO   TO   RECE02-FTNKBNFLG(IDX13 2)
+               IF   (SYS-1001-PREFNUM         = "36"    )
+               AND  (RECE02-KOHNUMHC(IDX13 2) = "245"   )
+               AND  (RECE02-KOHNUMHC(IDX13 3) = "748"   )
+               AND  (RECE02-SRYYM            >= "200805")
+                  MOVE   ZERO   TO   RECE02-FTNKBNFLG(IDX13 3)
+               END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       211K1-FTNKBNFLG-CLEAR-EXT.
            EXIT.
       *
       *****************************************************************
