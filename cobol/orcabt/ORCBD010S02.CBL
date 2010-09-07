@@ -706,11 +706,7 @@
                        COMPUTE WRK-KAISYU  =   WRK-MISYU-ZEN
                    END-IF
                ELSE
-                   IF    ( WRK-MISYU-ZEN   >=  WRK-NYUKIN * -1)
-                       COMPUTE WRK-KAISYU  =   WRK-NYUKIN * -1
-                   ELSE
-                       COMPUTE WRK-KAISYU  =   WRK-MISYU-ZEN
-                   END-IF
+                       COMPUTE WRK-KAISYU  =   0
                END-IF
            ELSE
                IF    ( WRK-NYUKIN  >=  ZERO )
