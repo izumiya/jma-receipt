@@ -325,7 +325,7 @@
            IF    ( WRK-CMB-ITM NOT =   SPACE )
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-TUKIGRPKBN-G
            ELSE
-               MOVE    "1"             TO  WRK-CMB-CD
+               MOVE    "4"             TO  WRK-CMB-CD
                PERFORM 4200-TUKIGRPKBNLST-CHK-SEC
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-TUKIGRPKBN-G
            END-IF
@@ -599,7 +599,7 @@
            MOVE    SPA-GMN-TUKIGRPKBN  TO  WRK-CMB-CD
            PERFORM 4200-TUKIGRPKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM         =   SPACE )
-               MOVE    SPA-GMN-TUKIGRPKBNLST (1)
+               MOVE    SPA-GMN-TUKIGRPKBNLST (4)
                                        TO  SPA-GMN-TUKIGRPKBN-G
            ELSE
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-TUKIGRPKBN-G
