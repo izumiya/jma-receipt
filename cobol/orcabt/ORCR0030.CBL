@@ -473,6 +473,9 @@
       *  04.04.54    NACL-ÌçÏÆ    10/08/11  ÅìµþÅÔÃÏÊý¸øÈñ£²£¸£²ÂÐ±þ
       *  04.04.55    NACL-ÌçÏÆ    10/08/11  Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
       *  04.04.56    NACL-ÌçÏÆ    10/08/23  ¹âÎðÈó³ºÅöÂÐ±þ
+      *  04.04.57    NACL-ÌçÏÆ    10/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8926,6 +8929,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE02-SRYYM      >= "201008"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  42                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE02-SRYYM      >= "201010"                 ) AND
+                (IDZ                =  1                       ))
                  IF  FLG-TOKU75 = 1 OR 2
                      MOVE    6000      TO   WRK-KINGAKU
                  ELSE
@@ -8995,6 +9003,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE02-SRYYM      >= "201008"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  42                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE02-SRYYM      >= "201010"                 ) AND
+                (IDZ                =  1                       ))
            OR  ((SYS-1001-PREFNUM   =  33                      ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
            OR  ((SYS-1001-PREFNUM   =  01                      ) AND
@@ -9004,12 +9017,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (RECE02-SRYYM      <= "200803"                 ))
       *
             MOVE     ZERO    TO   FLG-KOHYONKAIME-NO
-      ***   IF ((SYS-1001-PREFNUM   =  42                   ) AND
-      ***       (SYU-KOH-HKNNUM(1)  = "186"                 ))
-      ***   OR ((SYS-1001-PREFNUM   =  08                   ) AND
-      ***       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"))
-      ***      MOVE   1      TO   FLG-KOHYONKAIME-NO
-      ***   END-IF
             IF  (SYS-1001-PREFNUM   =  01            )
             AND (SYU-SYUHKNNUM  NOT = "060" AND "067")
             AND (SYU-KOH-HKNNUM(1)  = "141" OR "241" )
