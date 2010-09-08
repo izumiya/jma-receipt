@@ -449,6 +449,9 @@
       *  04.04.62    NACL-ÌçÏÆ    10/09/01  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¤Ç¡¢¹â³Û·×»»
       *                                     ÂÐ¾Ý³°¤ÎÁ´¹ñ¸øÈñ¤Î°ìÉôÉéÃ´¶âµ­
       *                                     ºÜÂÐ±þ
+      *  04.04.63    NACL-ÌçÏÆ    10/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -12530,6 +12533,11 @@
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE62-SRYYM      >= "201008"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "42"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE62-SRYYM      >= "201010"                 ) AND
+                (IDZ                =  1                       ))
                IF    RECE62-SRYYM   >=  "200610"
                    IF  FLG-TOKU75 = 1 OR 2
                      MOVE    22200   TO   WRK-KINGAKU
@@ -12673,6 +12681,11 @@
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE62-SRYYM      >= "201008"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "42"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (RECE62-SRYYM      >= "201010"                 ) AND
+                (IDZ                =  1                       ))
            OR  ((WRK-PREFNUM        = "33"                     ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
            OR  ((WRK-PREFNUM        = "01"                     ) AND
@@ -12682,12 +12695,6 @@
                 (RECE62-SRYYM      <= "200803"                 ))
       *
             MOVE     ZERO    TO   FLG-KOHYONKAIME-NO
-      ***   IF ((WRK-PREFNUM        = "42"                  ) AND
-      ***       (SYU-KOH-HKNNUM(1)  = "186"                 ))
-      ***   OR ((WRK-PREFNUM        = "08"                  ) AND
-      ***       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"))
-      ***      MOVE   1      TO   FLG-KOHYONKAIME-NO
-      ***   END-IF
             IF  (WRK-PREFNUM        = "01"           )
             AND (SYU-SYUHKNNUM  NOT = "060" AND "067")
             AND (SYU-KOH-HKNNUM(1)  = "141" OR "241" )
