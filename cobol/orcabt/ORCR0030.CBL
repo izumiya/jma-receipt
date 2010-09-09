@@ -476,6 +476,8 @@
       *  04.04.57    NACL-ÌçÏÆ    10/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.58    NACL-ÌçÏÆ    10/09/09  Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+      *                                     ½¤Àµ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -677,6 +679,7 @@
            03  FLG-GENGAKU-OKIKAE                      PIC 9(01).
            03  FLG-KOHYONKAIME-NO                      PIC 9(01).
            03  FLG-SETCOM                              PIC 9(01).
+           03  FLG-SAIGAI-TAISYO                       PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -2501,6 +2504,17 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        END-IF
                    END-IF
                END-IF
+      *
+               IF   RECE02-SRYYM   >=  "201007"
+                   MOVE     ZERO     TO   FLG-SAIGAI-TAISYO
+                   PERFORM   211L-SAIGAI-TAISYO-HANTEI-SEC
+                   IF   FLG-SAIGAI-TAISYO   =   1
+                     CONTINUE
+                   ELSE
+                     MOVE    ZERO    TO   RECE02-RJNGAIKOHFTN (1)
+                   END-IF
+               END-IF
+      *
            END-IF
       *
            IF   FLG-ZENKI-TOKUREI  =   1
@@ -13777,6 +13791,60 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        211K1-FTNKBNFLG-CLEAR-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÒ³²³ºÅö¼Ô¤ÎÈ½Äê
+      *****************************************************************
+       211L-SAIGAI-TAISYO-HANTEI-SEC      SECTION.
+      *
+           IF     RECE02-HKNNUM   NOT =   SPACE
+      *
+             IF  (RECE02-HKNNUM(1:2)  =   "98"  OR "90"  OR "91" )
+             OR  (RECE02-HKNNUM       =   "068" OR "069" OR "040")
+               CONTINUE
+             ELSE
+               MOVE      RECE02-SRYYM       TO   WK-GENGAKU-YM
+               IF   RECE02-TEKSTYMD(1:6)  >=  RECE02-SRYYM
+                  MOVE   RECE02-TEKSTYMD(7:2)
+                                            TO   WK-GENGAKU-DD
+               ELSE
+                  MOVE   01                 TO   WK-GENGAKU-DD
+               END-IF
+               INITIALIZE                       PTKOHINF-REC
+               MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
+               MOVE    RECE02-PTID          TO  PTKOH-PTID
+               MOVE    "959"                TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC               =   ZERO
+                 MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                 MOVE    "key4"             TO  MCP-PATHNAME
+                 PERFORM  900-PTKOHINF-READ-SEC
+                 PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                   IF  (PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD)
+                   AND (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD)
+                   AND (PTKOH-SAKJOKBN   =   SPACE         )
+                     MOVE     1             TO  FLG-SAIGAI-TAISYO
+                     MOVE     1             TO  FLG-PTKOHINF
+                   ELSE
+                     MOVE    "tbl_ptkohinf" TO  MCP-TABLE
+                     MOVE    "key4"         TO  MCP-PATHNAME
+                     PERFORM  900-PTKOHINF-READ-SEC
+                   END-IF
+                 END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+             END-IF
+      *
+           END-IF
+      *
+           .
+       211L-SAIGAI-TAISYO-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************

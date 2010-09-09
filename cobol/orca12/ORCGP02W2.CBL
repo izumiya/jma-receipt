@@ -93,6 +93,7 @@
       *  04.04.01    NACL-門脇    09/04/13  平成２１年５月改正対応
       *  04.04.02    NACL-門脇    09/07/24  ０５１、０５２の保険組み合わせ修正
       *                                     （生保をもつ場合）
+      *  04.04.03    NACL-門脇    10/09/09  災害該当追加対応
       *
       *  04.05.01    NACL-門脇    10/02/17  生保適用期間の社保単独の
       *                                     保険組み合わせ作成
@@ -556,6 +557,7 @@
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF     (PTKOH-SAKJOKBN  NOT =   SPACE          )
                OR     (PTKOH-KOHNUM = "956" OR "957" OR "958"
+                                   OR "959"
                                    OR "977" OR "978" OR "979"
                                    OR "976"                   )
                OR     (PTKOH-KOHNUM(1:2)   =   "96"           )
