@@ -452,6 +452,8 @@
       *  04.04.63    NACL-ÌçÏÆ    10/09/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.04.64    NACL-ÌçÏÆ    10/09/09  Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+      *                                     ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -652,6 +654,7 @@
            03  FLG-GENGAKU-OKIKAE                      PIC 9(01).
            03  FLG-KOHYONKAIME-NO                      PIC 9(01).
            03  FLG-KOUREI-KBN                          PIC 9(01).
+           03  FLG-SAIGAI-TAISYO                       PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -2620,6 +2623,17 @@
                        END-IF
                    END-IF
                END-IF
+      *
+               IF   RECE62-SRYYM   >=  "201007"
+                   MOVE     ZERO     TO   FLG-SAIGAI-TAISYO
+                   PERFORM   2115-SAIGAI-TAISYO-HANTEI-SEC
+                   IF   FLG-SAIGAI-TAISYO   =   1
+                     CONTINUE
+                   ELSE
+                     MOVE    ZERO    TO   RECE62-RJNGAIKOHFTN (1)
+                   END-IF
+               END-IF
+      *
            END-IF
       *
            IF   FLG-ZENKI-TOKUREI  =   1
@@ -18169,6 +18183,60 @@
       *
            .
        2104E3-TOKUSITU-HANTEI4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÒ³²³ºÅö¼Ô¤ÎÈ½Äê
+      *****************************************************************
+       2115-SAIGAI-TAISYO-HANTEI-SEC      SECTION.
+      *
+           IF     RECE62-HKNNUM   NOT =   SPACE
+      *
+             IF  (RECE62-HKNNUM(1:2)  =   "98"                   )
+             OR  (RECE62-HKNNUM       =   "068" OR "069" OR "040")
+               CONTINUE
+             ELSE
+               MOVE      RECE62-SRYYM       TO   WK-GENGAKU-YM
+               IF   RECE62-TEKSTYMD(1:6)  >=  RECE62-SRYYM
+                  MOVE   RECE62-TEKSTYMD(7:2)
+                                            TO   WK-GENGAKU-DD
+               ELSE
+                  MOVE   01                 TO   WK-GENGAKU-DD
+               END-IF
+               INITIALIZE                       PTKOHINF-REC
+               MOVE    RECE62-HOSPNUM       TO  PTKOH-HOSPNUM
+               MOVE    RECE62-PTID          TO  PTKOH-PTID
+               MOVE    "959"                TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC               =   ZERO
+                 MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                 MOVE    "key4"             TO  MCP-PATHNAME
+                 PERFORM  900-PTKOHINF-READ-SEC
+                 PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                   IF  (PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD)
+                   AND (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD)
+                   AND (PTKOH-SAKJOKBN   =   SPACE         )
+                     MOVE     1             TO  FLG-SAIGAI-TAISYO
+                     MOVE     1             TO  FLG-PTKOHINF
+                   ELSE
+                     MOVE    "tbl_ptkohinf" TO  MCP-TABLE
+                     MOVE    "key4"         TO  MCP-PATHNAME
+                     PERFORM  900-PTKOHINF-READ-SEC
+                   END-IF
+                 END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+             END-IF
+      *
+           END-IF
+      *
+           .
+       2115-SAIGAI-TAISYO-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
