@@ -175,6 +175,7 @@
            03  FLG-DOUJI-HEN        PIC 9(01).
            03  FLG-TAKA             PIC 9(01).
            03  FLG-SYOHEN           PIC 9(01).
+           03  FLG-DOUJI-HEN2       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -2452,6 +2453,7 @@
                    IF     (SPA-TAKA-SRYKA-R    =   SPACE ) OR
                           (LNK-SC10S-SYORI     =   "J"   )
                      OR   (FLG-DOUJI-HEN       =   1     )
+                     OR   (FLG-DOUJI-HEN2      =   1     )
                        MOVE    "12"                TO  WRK-SRYKBN
                        MOVE    "D"                 TO  WRK-KBN
       *                診察コードをテーブルより決定
@@ -5369,11 +5371,17 @@
            IF     (FLG-SINSATU-ARI     =   ZERO )
                MOVE    ZERO                TO  FLG-HENKAN
            END-IF
+           MOVE    ZERO                TO  FLG-DOUJI-HEN2
       *    同日再診ですでに診察がある時
            IF     (WRK-KBN3            =   "D"  )  AND
                  ((SPA-LSTYMD          =   SPA-SRYYMD) OR
                   (SPA-RRK-LSTYMD      =   SPA-SRYYMD))
-               MOVE    ZERO                TO  FLG-HENKAN
+               IF     (SPA-WKSRY-KARTE-FLG =   1   )
+                   MOVE    ZERO                TO  FLG-HENKAN
+               ELSE
+      *            CLAIM　からの時、同日再診も再編集
+                   MOVE    1                   TO  FLG-DOUJI-HEN2
+               END-IF
            END-IF
       *    電話再診の時
            IF     (WRK-KBN3            =   "T"  OR  "S" )
