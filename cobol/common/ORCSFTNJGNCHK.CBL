@@ -71,6 +71,7 @@
       *  04.04.07    NACL-ÌçÏÆ    09/12/25  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÄ«²â»Ô¡Ë
       *  04.04.08    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
       *  04.04.09    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.10    NACL-ÌçÏÆ    10/09/14  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -96,7 +97,6 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-ARI             PIC 9(01).
            03  FLG-GENMEN          PIC 9(01).
-           03  FLG-DAYCHK          PIC 9(01).
            03  FLG-PTKOHINF        PIC 9(01).
            03  FLG-TOKU75          PIC 9(01).
       *
@@ -109,7 +109,6 @@
       *    °ì»þÎÎ°è
        01  WRK-AREA.
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
-           03  WRK-HKNMST-JGNGAK2 PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-KOHFTN-H       PIC 9(10)V9(01).
            03  WRK-KOHFTN9-H      PIC 9(10)V9(01).
@@ -369,6 +368,9 @@
            OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
                (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
                (LNK-FTNJGNCHK-SRYYM  >= "200804"       ))
+           OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
+               (LNK-FTNJGNCHK-KOHNUM  = "344"          ) AND
+               (LNK-FTNJGNCHK-SRYYM  >= "200507"       ))
            OR ((LNK-FTNJGNCHK-KOHNUM(1:1)
                                      >= "1" AND <= "8" ) AND
                (LNK-FTNJGNCHK-SRYYM  >= "200810"       ))
@@ -390,19 +392,37 @@
                    AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
-                   IF  (LNK-FTNJGNCHK-PREFNUM      =     11     )
-                   AND (LNK-FTNJGNCHK-KOHNUM       =    "783"   )
-                   AND (LNK-FTNJGNCHK-SRYYM       >= "201004"   )
+                   IF ((LNK-FTNJGNCHK-PREFNUM      =     11     ) AND
+                       (LNK-FTNJGNCHK-KOHNUM       =    "783"   ) AND
+                       (LNK-FTNJGNCHK-SRYYM       >= "201004"   ))
+                   OR ((LNK-FTNJGNCHK-PREFNUM      =     11     ) AND
+                       (LNK-FTNJGNCHK-KOHNUM       =    "683"   ) AND
+                       (LNK-FTNJGNCHK-SRYYM       >= "200904"   ))
+                      MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     40        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
                    MOVE   HKN-HON-NYUKFTNRATE    TO  WRK-KOHFTN-RITU
                  WHEN     "1"
                  WHEN     "4"
                    MOVE   HKN-TNK-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     40        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-TNK-NYUDJGNGAK     NOT = ZERO          )
+                      MOVE   HKN-TNK-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
                    MOVE   HKN-TNK-NYUKFTNRATE    TO  WRK-KOHFTN-RITU
                  WHEN     "2"
                  WHEN     "3"
                    MOVE   HKN-TSY-NYUMJGNGAK     TO  WRK-HKNMST-JGNGAK
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     40        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-TSY-NYUDJGNGAK     NOT = ZERO          )
+                      MOVE   HKN-TSY-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
                    MOVE   HKN-TSY-NYUKFTNRATE    TO  WRK-KOHFTN-RITU
                END-EVALUATE
            ELSE
@@ -413,11 +433,6 @@
                    END-IF
                    IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-HON-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
-                   IF  (LNK-FTNJGNCHK-PREFNUM    =  42     )
-                   AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
-                   AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
-                      MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK2
                    END-IF
                    IF  (LNK-FTNJGNCHK-PREFNUM      =     12        )
                    AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
@@ -459,6 +474,12 @@
            AND  (LNK-FTNJGNCHK-KOHNUM    = "383"                   )
            AND  (LNK-FTNJGNCHK-NYUGAIKBN = "1"                     )
            AND  (LNK-FTNJGNCHK-SRYYM    >= "201001"                )
+                      MOVE     999999            TO WRK-HKNMST-JGNGAK
+           END-IF
+           IF   (LNK-FTNJGNCHK-PREFNUM   =  11                     )
+           AND  (LNK-FTNJGNCHK-KOHNUM    = "343" OR "342" OR "344" )
+           AND  (LNK-FTNJGNCHK-NYUGAIKBN = "1"                     )
+           AND  (LNK-FTNJGNCHK-SRYYM    >= "200507"                )
                       MOVE     999999            TO WRK-HKNMST-JGNGAK
            END-IF
       *
@@ -580,6 +601,9 @@
            OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
                (LNK-FTNJGNCHK-KOHNUM  = "483"          ) AND
                (LNK-FTNJGNCHK-SRYYM  >= "200804"       ))
+           OR ((LNK-FTNJGNCHK-PREFNUM =  11            ) AND
+               (LNK-FTNJGNCHK-KOHNUM  = "344"          ) AND
+               (LNK-FTNJGNCHK-SRYYM  >= "200507"       ))
              CONTINUE
            ELSE
              PERFORM  21011-SYSKAN-HENSYU-SEC
@@ -990,7 +1014,6 @@
            MOVE      ZERO          TO      WRK-SEIKYU-TOTAL
            MOVE      ZERO          TO      WRK-KYUFUGAITEN
            MOVE      ZERO          TO      FLG-GENMEN
-           MOVE      ZERO          TO      FLG-DAYCHK
            MOVE      ZERO          TO      WRK-SKJ-FTN
            MOVE      ZERO          TO      FLG-TOKU75
            PERFORM   UNTIL    FLG-SYUNOU  =   1
@@ -1095,33 +1118,6 @@
                   IF     SYU-YKZKENNUM  NOT = ZERO
                        MOVE    1    TO   FLG-GENMEN
                   END-IF
-                  IF  (LNK-FTNJGNCHK-PREFNUM    =  42     )
-                  AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
-                  AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
-                  AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
-                    EVALUATE   LNK-FTNJGNCHK-KOHNUM
-                      WHEN   SYU-KOH-HKNNUM(1)
-      *                 IF SYU-KOH-HKNFTNMONEY(1) >= WRK-HKNMST-JGNGAK2
-                        IF SYU-KOH-COMPFTN(1)     >= WRK-HKNMST-JGNGAK2
-                             MOVE   1    TO   FLG-DAYCHK
-                        END-IF
-                      WHEN   SYU-KOH-HKNNUM(2)
-      *                 IF SYU-KOH-HKNFTNMONEY(2) >= WRK-HKNMST-JGNGAK2
-                        IF SYU-KOH-COMPFTN(2)     >= WRK-HKNMST-JGNGAK2
-                             MOVE   1    TO   FLG-DAYCHK
-                        END-IF
-                      WHEN   SYU-KOH-HKNNUM(3)
-      *                 IF SYU-KOH-HKNFTNMONEY(3) >= WRK-HKNMST-JGNGAK2
-                        IF SYU-KOH-COMPFTN(3)     >= WRK-HKNMST-JGNGAK2
-                             MOVE   1    TO   FLG-DAYCHK
-                        END-IF
-                      WHEN   SYU-KOH-HKNNUM(4)
-      *                 IF SYU-KOH-HKNFTNMONEY(4) >= WRK-HKNMST-JGNGAK2
-                        IF SYU-KOH-COMPFTN(4)     >= WRK-HKNMST-JGNGAK2
-                             MOVE   1    TO   FLG-DAYCHK
-                        END-IF
-                    END-EVALUATE
-                  END-IF
                   IF  (LNK-FTNJGNCHK-NYUGAIKBN  = "1"     )
                   AND (LNK-FTNJGNCHK-KOHNUM     = "012"   )
                   AND (LNK-FTNJGNCHK-SRYYM     >= "200804")
@@ -1149,23 +1145,12 @@
            IF  ((LNK-FTNJGNCHK-PREFNUM    =  27           ) AND
                 (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241") AND
                 (LNK-FTNJGNCHK-SRYYM     >= "200804"      ))
-      ***  OR  ((LNK-FTNJGNCHK-PREFNUM    =  40           ) AND
-      ***       (LNK-FTNJGNCHK-KOHNUM(1:1)
-      ***                              >=  "1" AND <=  "8") AND
-      ***       (LNK-FTNJGNCHK-NYUGAIKBN  = "1"           ) AND
-      ***       (LNK-FTNJGNCHK-SRYYM     >= "200810"      ))
               MOVE   9999999999     TO  WRK-KOHFTN
            END-IF
       *
            IF  (LNK-FTNJGNCHK-PREFNUM    =  42     )
-           AND (LNK-FTNJGNCHK-NYUGAIKBN  = "2"     )
            AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
            AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
-      ***    IF   ( WRK-HKNMST-JGNGAK   >   WRK-KOHFTN )
-      ***    AND  ( FLG-DAYCHK          =   ZERO       )
-      ***          MOVE   01        TO  LNK-FTNJGNCHK-RC
-      ***    END-IF
-             IF   FLG-DAYCHK   =   ZERO
                IF   WRK-HKNMST-JGNGAK  >  WRK-KOHFTN
                  IF   (WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
                       (WRK-KOHFTN9-X     =  WRK-KOHFTN  )
@@ -1178,20 +1163,6 @@
                    MOVE   01        TO  LNK-FTNJGNCHK-RC
                  END-IF
                END-IF
-             ELSE
-               IF   WRK-HKNMST-JGNGAK  >  WRK-KOHFTN
-                 IF   (WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
-                      (WRK-KOHFTN9-X     =  WRK-KOHFTN  )
-                   MOVE   01        TO  LNK-FTNJGNCHK-RC
-                 END-IF
-               ELSE
-                 IF  ( WRK-HKNMST-JGNGAK =  WRK-KOHFTN   )
-                 AND ((WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
-                      (WRK-KOHFTN9-X     =  WRK-KOHFTN  ))
-                   MOVE   01        TO  LNK-FTNJGNCHK-RC
-                 END-IF
-               END-IF
-             END-IF
            ELSE
              IF ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   =
@@ -1218,6 +1189,32 @@
                  (LNK-FTNJGNCHK-KOHNUM   = "783"   ) AND
                  (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "201004"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   =
+                   "743" OR "442" OR "542"         ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200804"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   =
+                   "543" OR "582"                  ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200710"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   =
+                   "681" OR "682" OR "781"         ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200904"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "683"   ) AND
+                 (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200904"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "343" OR
+                                           "342"   ) AND
+                 (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200507"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "344"   ) AND
+                 (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                 (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200507"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF
