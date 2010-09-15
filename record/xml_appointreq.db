@@ -1,15 +1,15 @@
 xml_appointreq {
     object  object;
 	mode	int;
-	appoint {
-		patientid			varchar(20);
-		appoint_date		varchar(8);
-		appoint_time		varchar(4);
-		appoint_id			varchar(5);
-		appoint_dep_code	varchar(2);
-		appoint_dr_code		varchar(5);
-		appoint_dep_info	varchar(2);
-		appoint_info		varchar(2);
-		appoint_memo		varchar(100);
+	appointreq {
+		Patient_ID			varchar(20);
+		Appointment_Date		varchar(10);
+		Appointment_Time		varchar(8);
+		Appointment_Id			varchar(5);
+		Department_Code			varchar(2);
+		Physician_Code			varchar(5);
+		Medical_Information		varchar(2);
+		Appointment_Information		varchar(2);
+		Appointment_Note		varchar(100);
 	};
 };

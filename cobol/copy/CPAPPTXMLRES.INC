@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * æ—¥åŒ»æ¨™æº–ãƒ¬ã‚»ãƒ—ãƒˆã‚½ãƒ•ãƒˆï¼ˆJMA standard receipt softwareï¼‰
+      * Æü°åÉ¸½à¥ì¥»¥×¥È¥½¥Õ¥È¡ÊJMA standard receipt software¡Ë
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -19,13 +19,13 @@
             02  APNTRES-OBJECT         PIC X(8).
             02  APNTRES-MODE           PIC S9(9)   BINARY.
             02  APNTRES-APPOINTRES.
-              03  APNTRES-INFORMATION-DATE    PIC X(8).
-              03  APNTRES-INFORMATION-TIME    PIC X(6).
+              03  APNTRES-INFORMATION-DATE    PIC X(10).
+              03  APNTRES-INFORMATION-TIME    PIC X(8).
               03  APNTRES-API-RESULT   PIC X(2).
               03  APNTRES-API-RESULT-MSG      PIC X(100).
               03  APNTRES-RESKEY  PIC X(100).
-              03  APNTRES-APPOINT-DATE        PIC X(8).
-              03  APNTRES-APPOINT-TIME        PIC X(4).
+              03  APNTRES-APPOINT-DATE        PIC X(10).
+              03  APNTRES-APPOINT-TIME        PIC X(8).
               03  APNTRES-APPOINT-ID          PIC X(5).
               03  APNTRES-APPOINT-DEP-CODE    PIC X(2).
               03  APNTRES-APPOINT-DEP-NAME    PIC X(80).
@@ -36,7 +36,7 @@
                 04  APNTRES-PATIENTID         PIC X(20).
                 04  APNTRES-NAME              PIC X(100).
                 04  APNTRES-KANANAME          PIC X(100).
-                04  APNTRES-BIRTHDAY          PIC X(8).
+                04  APNTRES-BIRTHDAY          PIC X(10).
                 04  APNTRES-SEX               PIC X(1).
                 04  APNTRES-ADDRESS-INFO.
                   05  APNTRES-HOME-ZIP-CODE   PIC X(7).

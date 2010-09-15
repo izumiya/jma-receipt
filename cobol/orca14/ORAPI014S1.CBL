@@ -143,6 +143,8 @@
        01  WORK-AREA.
            03  WRK-YYKID               PIC 9(05).
            03  WK-MSG                  PIC X(40).
+           03  WRK-YMD                 PIC X(10).
+           03  WRK-TIME                PIC X(08).
            03  WRK-APPOINT-YMD         PIC X(08).
            03  WRK-APPOINT-TIME        PIC X(04).
            03  WRK-KEYYYKTIME          PIC X(04).
@@ -350,8 +352,26 @@
       *    MOVE   "Patient Info"       TO  APNTRES-RESKEY
            MOVE    MCP-USER            TO  SPA-OPID
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
-                                           APNTRES-INFORMATION-DATE
-           MOVE    SMCNDATE-HMS        TO  APNTRES-INFORMATION-TIME
+           MOVE    SMCNDATE-YMD(1:4)   TO  
+                                       APNTRES-INFORMATION-DATE(1:4)
+           MOVE    "-"                 TO  
+                                       APNTRES-INFORMATION-DATE(5:1)
+           MOVE    SMCNDATE-YMD(5:2)   TO  
+                                       APNTRES-INFORMATION-DATE(6:2)
+           MOVE    "-"                 TO  
+                                       APNTRES-INFORMATION-DATE(8:1)
+           MOVE    SMCNDATE-YMD(7:2)   TO  
+                                       APNTRES-INFORMATION-DATE(9:2)
+           MOVE    SMCNDATE-HMS(1:2)   TO  
+                                       APNTRES-INFORMATION-TIME(1:2)
+           MOVE    ":"                 TO  
+                                       APNTRES-INFORMATION-TIME(3:1)
+           MOVE    SMCNDATE-HMS(3:2)   TO  
+                                       APNTRES-INFORMATION-TIME(4:2)
+           MOVE    ":"                 TO  
+                                       APNTRES-INFORMATION-TIME(6:1)
+           MOVE    SMCNDATE-HMS(5:2)   TO  
+                                       APNTRES-INFORMATION-TIME(7:2)
       *    医療機関識別番号セット 
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
@@ -525,10 +545,63 @@
                                            TO  WRK-SRYKA   
                MOVE    APNTREQ-APPOINT-DR-CODE
                                            TO  WRK-DRCD
-               MOVE    APNTREQ-APPOINT-DATE
+               IF      APNTREQ-APPOINT-DATE    =  SPACE
+                 MOVE  SPACE               TO  WRK-YMD
+                                               WRK-APPOINT-YMD
+               ELSE
+                IF      APNTREQ-APPOINT-DATE(5:1) =  "-"
+                 MOVE   APNTREQ-APPOINT-DATE
+                                           TO  WRK-YMD
+                 MOVE    APNTREQ-APPOINT-DATE(1:4)
+                                           TO  WRK-APPOINT-YMD(1:4)
+                 MOVE    APNTREQ-APPOINT-DATE(6:2)
+                                           TO  WRK-APPOINT-YMD(5:2)
+                 MOVE    APNTREQ-APPOINT-DATE(9:2)
+                                           TO  WRK-APPOINT-YMD(7:2)
+                ELSE
+                 MOVE    APNTREQ-APPOINT-DATE
                                            TO  WRK-APPOINT-YMD
-               MOVE    APNTREQ-APPOINT-TIME
+                 MOVE   APNTREQ-APPOINT-DATE(1:4)
+                                           TO  WRK-YMD(1:4)
+                 MOVE   "-"                       
+                                           TO  WRK-YMD(5:1)
+                 MOVE   APNTREQ-APPOINT-DATE(5:2)
+                                           TO  WRK-YMD(6:2)
+                 MOVE   "-"                       
+                                           TO  WRK-YMD(8:1)
+                 MOVE   APNTREQ-APPOINT-DATE(7:2)
+                                           TO  WRK-YMD(9:2)
+                END-IF
+               END-IF
+               IF      APNTREQ-APPOINT-TIME    =  SPACE
+                 MOVE  SPACE               TO  WRK-APPOINT-TIME
+                                               WRK-TIME
+               ELSE
+                IF     APNTREQ-APPOINT-TIME(3:1)  =  ":"
+                 MOVE  APNTREQ-APPOINT-TIME
+                                           TO  WRK-TIME
+                 MOVE  APNTREQ-APPOINT-TIME(1:2)
+                                           TO  WRK-APPOINT-TIME(1:2)
+                 MOVE  APNTREQ-APPOINT-TIME(4:2)
+                                           TO  WRK-APPOINT-TIME(3:2)
+      *          MOVE  APNTREQ-APPOINT-TIME(7:2)
+      *                                    TO  WRK-APPOINT-TIME(5:2)
+                ELSE
+                 MOVE  APNTREQ-APPOINT-TIME
                                            TO  WRK-APPOINT-TIME
+                 MOVE  APNTREQ-APPOINT-TIME(1:2)
+                                           TO  WRK-TIME(1:2)
+                 MOVE  ":"
+                                           TO  WRK-TIME(3:1)
+                 MOVE  APNTREQ-APPOINT-TIME(3:2)
+                                           TO  WRK-TIME(4:2)
+                 MOVE  ":"
+                                           TO  WRK-TIME(6:1)
+                 MOVE  "00"
+                                           TO  WRK-TIME(7:2)
+                END-IF 
+               END-IF 
+      *
                MOVE    APNTREQ-APPOINT-ID
                                            TO  WRK-APPOINT-ID
                DISPLAY "APNTREQ-APPOINT-TIME = " APNTREQ-APPOINT-TIME
@@ -1122,7 +1195,16 @@
       *
            MOVE  PTINF-NAME        TO  APNTRES-NAME
            MOVE  PTINF-KANANAME    TO  APNTRES-KANANAME
-           MOVE  PTINF-BIRTHDAY    TO  APNTRES-BIRTHDAY
+           MOVE  PTINF-BIRTHDAY(1:4)
+                                   TO  APNTRES-BIRTHDAY(1:4)
+           MOVE  "-"
+                                   TO  APNTRES-BIRTHDAY(5:1)
+           MOVE  PTINF-BIRTHDAY(5:2)
+                                   TO  APNTRES-BIRTHDAY(6:2)
+           MOVE  "-"
+                                   TO  APNTRES-BIRTHDAY(8:1)
+           MOVE  PTINF-BIRTHDAY(7:2)
+                                   TO  APNTRES-BIRTHDAY(9:2)
            MOVE  PTINF-SEX         TO  APNTRES-SEX
            MOVE  PTINF-HOME-POST   TO  APNTRES-HOME-ZIP-CODE
            MOVE  PTINF-HOME-ADRS   TO  APNTRES-HOME-ADDRESSES
@@ -1224,7 +1306,7 @@
       *****************************************************************
        10011-YYKYMD-CHK-SEC    SECTION.
       *
-           MOVE  WRK-APPOINT-YMD   TO  APNTRES-APPOINT-DATE
+           MOVE  WRK-YMD               TO  APNTRES-APPOINT-DATE
       *
            IF      WRK-APPOINT-YMD      =   SPACE
                ADD 2                   TO  CNT-CHECK
@@ -1254,7 +1336,7 @@
       *****************************************************************
        10011-YYKTIME-CHK-SEC   SECTION.
       *
-           MOVE  WRK-APPOINT-TIME  TO  APNTRES-APPOINT-TIME
+           MOVE  WRK-TIME              TO  APNTRES-APPOINT-TIME
       *
            IF      WRK-APPOINT-TIME     =   SPACE
                ADD 4                   TO  CNT-CHECK
@@ -1813,7 +1895,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            DISPLAY "yyk hospnum = " YYK-HOSPNUM
            DISPLAY "yyk ymd     = "  YYK-YYKYMD
            DISPLAY "yyk id      = "  YYK-YYKID
-           MOVE    YYK-YYKTIME              TO  APNTRES-APPOINT-TIME
+      *    MOVE    YYK-YYKTIME              TO  APNTRES-APPOINT-TIME
            IF      SPTID-PTID               =   ZERO
                MOVE    ZERO                 TO  YYK-PTID
            ELSE
@@ -1849,6 +1931,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    WRK-YYK-YYKTIME     TO  WRK-YYK-YYKTIME
                    MOVE    WRK-YYK-KEYYYKTIME  TO  WRK-YYK-KEYYYKTIME
                    MOVE    WRK-YYK-YYKID       TO  WRK-YYK-YYKID
+                                                   APNTRES-APPOINT-ID
+                  DISPLAY "yyk id hit  = "  YYK-YYKID
            END-IF
            MOVE    WRK-YYK-REC     TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -2535,10 +2619,39 @@ grpsys           CALL  "ORCDBMAIN"     USING   MCPAREA
                                        APNTRES-MAIN-FAMILY(IDX)
                        MOVE    PTHKN-HIHKNJANAME   TO
                                        APNTRES-MAIN-POLICYHOLDER(IDX)
-                       MOVE    PTHKN-TEKSTYMD      TO
-                                       APNTRES-MAIN-START-DATE(IDX)
-                       MOVE    PTHKN-TEKEDYMD      TO
-                                       APNTRES-MAIN-END-DATE(IDX)
+                       MOVE    PTHKN-TEKSTYMD(1:4) TO
+                                   APNTRES-MAIN-START-DATE(IDX)(1:4)
+                       MOVE    "-"                 TO
+                                   APNTRES-MAIN-START-DATE(IDX)(5:1)
+                       MOVE    PTHKN-TEKSTYMD(5:2) TO
+                                   APNTRES-MAIN-START-DATE(IDX)(6:2)
+                       MOVE    "-"                 TO
+                                   APNTRES-MAIN-START-DATE(IDX)(8:1)
+                       MOVE    PTHKN-TEKSTYMD(7:2) TO
+                                   APNTRES-MAIN-START-DATE(IDX)(9:2)
+                       IF      PTHKN-TEKEDYMD      = "99999999"
+                         MOVE  "9999-12-31"        TO
+                                   APNTRES-MAIN-END-DATE(IDX)
+                       ELSE
+                         MOVE  PTHKN-TEKEDYMD(1:4) TO
+                                   APNTRES-MAIN-END-DATE(IDX)(1:4)
+                         MOVE  "-"                 TO
+                                   APNTRES-MAIN-END-DATE(IDX)(5:1)
+                         MOVE  PTHKN-TEKEDYMD(5:2) TO
+                                   APNTRES-MAIN-END-DATE(IDX)(6:2)
+                         MOVE  "-"                 TO
+                                   APNTRES-MAIN-END-DATE(IDX)(8:1)
+                         MOVE  PTHKN-TEKEDYMD(7:2) TO
+                                   APNTRES-MAIN-END-DATE(IDX)(9:2)
+                       END-IF
+                       IF      PTHKN-HKNNUM        =  SPACE
+                         MOVE  "XX"               
+                                                   TO  
+                                       APNTRES-MAIN-INSURANCE-CLASS(IDX)
+                         MOVE  SPACE               TO
+                                   APNTRES-MAIN-START-DATE(IDX)
+                                   APNTRES-MAIN-END-DATE(IDX)
+                       END-IF
       *   公費読み出し
                    IF      COMB-KOHHKNNUM (1)      NOT =   SPACE
                        PERFORM 20012-KOHID-HENSYU-SEC
@@ -2565,12 +2678,42 @@ grpsys           CALL  "ORCDBMAIN"     USING   MCPAREA
                            MOVE    PTKOH-KOHNUM        TO
                                            APNTRES-INSURANCE-NUMBER
                                                           (IDX IDY1)
-                           MOVE    PTKOH-TEKSTYMD      TO
+                           MOVE    PTKOH-TEKSTYMD(1:4) TO
                                            APNTRES-INSURANCE-START-DATE
-                                                          (IDX IDY1)
-                           MOVE    PTKOH-TEKEDYMD      TO
+                                                   (IDX IDY1)(1:4)
+                           MOVE    "-"                 TO
+                                           APNTRES-INSURANCE-START-DATE
+                                                   (IDX IDY1)(5:1)
+                           MOVE    PTKOH-TEKSTYMD(5:2) TO
+                                           APNTRES-INSURANCE-START-DATE
+                                                   (IDX IDY1)(6:2)
+                           MOVE    "-"                 TO
+                                           APNTRES-INSURANCE-START-DATE
+                                                   (IDX IDY1)(8:1)
+                           MOVE    PTKOH-TEKSTYMD(7:2) TO
+                                           APNTRES-INSURANCE-START-DATE
+                                                   (IDX IDY1)(9:2)
+                           IF      PTKOH-TEKEDYMD  = "99999999"
+                             MOVE  "9999-12-31"        TO
                                            APNTRES-INSURANCE-END-DATE
-                                                          (IDX IDY1)
+                                                   (IDX IDY1)
+                           ELSE
+                             MOVE  PTKOH-TEKEDYMD(1:4) TO
+                                           APNTRES-INSURANCE-END-DATE
+                                                   (IDX IDY1)(1:4)
+                             MOVE  "-"                 TO
+                                           APNTRES-INSURANCE-END-DATE
+                                                   (IDX IDY1)(5:1)
+                             MOVE  PTKOH-TEKEDYMD(5:2) TO
+                                           APNTRES-INSURANCE-END-DATE
+                                                   (IDX IDY1)(6:2)
+                             MOVE  "-"                 TO
+                                           APNTRES-INSURANCE-END-DATE
+                                                   (IDX IDY1)(8:1)
+                             MOVE  PTKOH-TEKEDYMD(7:2) TO
+                                           APNTRES-INSURANCE-END-DATE
+                                                   (IDX IDY1)(9:2)
+                           END-IF
                        END-PERFORM
                    END-IF
       *

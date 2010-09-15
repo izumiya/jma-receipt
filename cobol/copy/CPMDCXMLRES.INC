@@ -23,13 +23,13 @@
             02  MDCRES-OBJECT              PIC X(8).
             02  MDCRES-MODE                PIC S9(9)   BINARY.
             02  MDCRES-MEDICALRES.
-              03  MDCRES-INFORMATION-DATE  PIC X(8).
-              03  MDCRES-INFORMATION-TIME  PIC X(6).
+              03  MDCRES-INFORMATION-DATE  PIC X(10).
+              03  MDCRES-INFORMATION-TIME  PIC X(8).
               03  MDCRES-API-RESULT        PIC X(2).
               03  MDCRES-API-RESULT-MSG    PIC X(100).
               03  MDCRES-RESKEY            PIC X(100).
-              03  MDCRES-PERFORM-DATE      PIC X(8).
-              03  MDCRES-PERFORM-TIME      PIC X(6).
+              03  MDCRES-PERFORM-DATE      PIC X(10).
+              03  MDCRES-PERFORM-TIME      PIC X(8).
               03  MDCRES-APPOINT-DEP-CODE  PIC X(2).
               03  MDCRES-APPOINT-DEP-NAME  PIC X(80).
               03  MDCRES-APPOINT-DR-CODE   PIC X(5).
@@ -38,5 +38,5 @@
                 04  MDCRES-PATIENTID       PIC X(20).
                 04  MDCRES-NAME            PIC X(100).
                 04  MDCRES-KANANAME        PIC X(100).
-                04  MDCRES-BIRTHDAY        PIC X(8).
+                04  MDCRES-BIRTHDAY        PIC X(10).
                 04  MDCRES-SEX             PIC X(1).

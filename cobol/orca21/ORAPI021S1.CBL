@@ -133,7 +133,9 @@
            03  WRK-YYKID               PIC 9(05).
            03  WK-MSG                  PIC X(40).
            03  WRK-PERFORM-YMD         PIC X(08).
-           03  WRK-PERFORM-TIME        PIC X(04).
+           03  WRK-PERFORM-YMD-G       PIC X(10).
+           03  WRK-PERFORM-TIME        PIC X(06).
+           03  WRK-PERFORM-TIME-G      PIC X(08).
            03  WRK-KEYYYKTIME          PIC X(04).
            03  WRK-PTNUM               PIC X(20).
            03  WRK-NAMEKNJ             PIC X(100).
@@ -154,7 +156,7 @@
            03  WRK-GMN-SELNUM          PIC 9(02).
            03  WRK-HKNCOMBI            PIC 9(04).
            03  WRK-TIME                PIC X(06).
-           03  WRK-DAY1                PIC X(08).
+           03  WRK-DAY1                PIC X(10).
            03  WRK-DAY2                PIC X(10).
            03  WRK-CK-TIME1.
              05  WRK-CK-HH1            PIC 9(02).
@@ -369,8 +371,26 @@
            MOVE   "Medical Info"       TO  MDCRES-RESKEY
            MOVE    MCP-USER            TO  SPA-OPID
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
-                                           MDCRES-INFORMATION-DATE
-           MOVE    SMCNDATE-HMS        TO  MDCRES-INFORMATION-TIME
+           MOVE    SMCNDATE-YMD(1:4)   TO
+                                       MDCRES-INFORMATION-DATE(1:4)
+           MOVE    "-"                 TO
+                                       MDCRES-INFORMATION-DATE(5:1)
+           MOVE    SMCNDATE-YMD(5:2)   TO
+                                       MDCRES-INFORMATION-DATE(6:2)
+           MOVE    "-"                 TO
+                                       MDCRES-INFORMATION-DATE(8:1)
+           MOVE    SMCNDATE-YMD(7:2)   TO
+                                       MDCRES-INFORMATION-DATE(9:2)
+           MOVE    SMCNDATE-HMS(1:2)   TO  
+                                       MDCRES-INFORMATION-TIME(1:2)
+           MOVE    ":"                 TO  
+                                       MDCRES-INFORMATION-TIME(3:1)
+           MOVE    SMCNDATE-HMS(3:2)   TO  
+                                       MDCRES-INFORMATION-TIME(4:2)
+           MOVE    ":"                 TO  
+                                       MDCRES-INFORMATION-TIME(6:1)
+           MOVE    SMCNDATE-HMS(5:2)   TO  
+                                       MDCRES-INFORMATION-TIME(7:2)
       *    医療機関識別番号セット 
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
@@ -502,9 +522,50 @@
                MOVE    MDCREQ-PATIENTID    TO  WRK-PTNUM
                MOVE    MDCREQ-DEP-CODE     TO  WRK-SRYKA
                MOVE    MDCREQ-DR-CODE      TO  WRK-DRCD
+            IF MDCREQ-PERFORM-DATE(5:1)    =   "-"
+               MOVE    MDCREQ-PERFORM-DATE TO  WRK-PERFORM-YMD-G
+               MOVE    MDCREQ-PERFORM-DATE(1:4)
+                                         TO  WRK-PERFORM-YMD(1:4)
+               MOVE    MDCREQ-PERFORM-DATE(6:2)
+                                         TO  WRK-PERFORM-YMD(5:2)
+               MOVE    MDCREQ-PERFORM-DATE(9:2)
+                                         TO  WRK-PERFORM-YMD(7:2)
+            ELSE
                MOVE    MDCREQ-PERFORM-DATE TO  WRK-PERFORM-YMD
+               MOVE    MDCREQ-PERFORM-DATE(1:4)
+                                         TO  WRK-PERFORM-YMD-G(1:4)
+               MOVE    "-"
+                                         TO  WRK-PERFORM-YMD-G(5:1)
+               MOVE    MDCREQ-PERFORM-DATE(5:2)
+                                         TO  WRK-PERFORM-YMD-G(6:2)
+               MOVE    "-"
+                                         TO  WRK-PERFORM-YMD-G(8:1)
+               MOVE    MDCREQ-PERFORM-DATE(7:2)
+                                         TO  WRK-PERFORM-YMD-G(9:2)
+            END-IF
+            IF MDCREQ-PERFORM-TIME(3:1)    =   ":"
+               MOVE    MDCREQ-PERFORM-TIME
+                                           TO  WRK-PERFORM-TIME-G
+               MOVE    MDCREQ-PERFORM-TIME(1:2)
+                                         TO  WRK-PERFORM-TIME(1:2)
+               MOVE    MDCREQ-PERFORM-TIME(4:2)
+                                         TO  WRK-PERFORM-TIME(3:2)
+               MOVE    MDCREQ-PERFORM-TIME(7:2)
+                                         TO  WRK-PERFORM-TIME(5:2)
+            ELSE
                MOVE    MDCREQ-PERFORM-TIME
                                            TO  WRK-PERFORM-TIME
+               MOVE    MDCREQ-PERFORM-TIME(1:2)
+                                         TO  WRK-PERFORM-TIME-G(1:2)
+               MOVE    ":"
+                                         TO  WRK-PERFORM-TIME-G(3:1)
+               MOVE    MDCREQ-PERFORM-TIME(3:2)
+                                         TO  WRK-PERFORM-TIME-G(4:2)
+               MOVE    ":"
+                                         TO  WRK-PERFORM-TIME-G(6:1)
+               MOVE    MDCREQ-PERFORM-TIME(5:2)
+                                         TO  WRK-PERFORM-TIME-G(7:2)
+            END-IF
            ELSE
                DISPLAY "XMLREAD failure = " MCP-RC
            END-IF
@@ -643,10 +704,14 @@
       *****************************************************************
        1001-WKSRY-ADD-SEC        SECTION.
       *
-           MOVE  PTINF-NAME        TO  MDCRES-NAME
-           MOVE  PTINF-KANANAME    TO  MDCRES-KANANAME
-           MOVE  PTINF-BIRTHDAY    TO  MDCRES-BIRTHDAY
-           MOVE  PTINF-SEX         TO  MDCRES-SEX
+           MOVE  PTINF-NAME            TO  MDCRES-NAME
+           MOVE  PTINF-KANANAME        TO  MDCRES-KANANAME
+           MOVE  PTINF-BIRTHDAY(1:4)   TO  MDCRES-BIRTHDAY(1:4)
+           MOVE  "-"                   TO  MDCRES-BIRTHDAY(5:1)
+           MOVE  PTINF-BIRTHDAY(5:2)   TO  MDCRES-BIRTHDAY(6:2)
+           MOVE  "-"                   TO  MDCRES-BIRTHDAY(8:1)
+           MOVE  PTINF-BIRTHDAY(7:2)   TO  MDCRES-BIRTHDAY(9:2)
+           MOVE  PTINF-SEX             TO  MDCRES-SEX
       * 
       *    排他チェック & ロック処理
            PERFORM 990-LOCK-IN-SEC
@@ -689,15 +754,23 @@
                GO    TO                10011-CLAIM-CALL-EXT
            END-IF
            INITIALIZE        LF04-REC
+           IF      MDCREQ-OUTPATIENT-CLASS  =  "I"
+               MOVE  "true"            TO  LF04-NYUGAIKBN
+           END-IF
            MOVE    SYS-1001-HOSPID     TO  LF04-CRE001-FACILITYID
-           MOVE    MDCREQ-PERFORM-DATE(1:4) 
+           IF      MDCREQ-PERFORM-DATE(5:1)  = "-"
+               MOVE    MDCREQ-PERFORM-DATE
+                                       TO  LF04-PERFORM-TIME
+           ELSE
+               MOVE    MDCREQ-PERFORM-DATE(1:4) 
                                        TO  LF04-PERFORM-TIME(1:4)
-           MOVE    "-"                 TO  LF04-PERFORM-TIME(5:1)
-           MOVE    MDCREQ-PERFORM-DATE(5:2) 
+               MOVE    "-"                 TO  LF04-PERFORM-TIME(5:1)
+               MOVE    MDCREQ-PERFORM-DATE(5:2) 
                                        TO  LF04-PERFORM-TIME(6:2)
-           MOVE    "-"                 TO  LF04-PERFORM-TIME(8:1)
-           MOVE    MDCREQ-PERFORM-DATE(7:2) 
+               MOVE    "-"                 TO  LF04-PERFORM-TIME(8:1)
+               MOVE    MDCREQ-PERFORM-DATE(7:2) 
                                        TO  LF04-PERFORM-TIME(9:2)
+           END-IF
            MOVE    MDCREQ-PATIENTID    TO  LF04-PTID1
            MOVE    MDCREQ-DEP-CODE(IDX)    
                                        TO  LF04-CRE001-DPERTID
@@ -826,8 +899,13 @@
       *****************************************************************
        100-DAYCHG-DEC     SECTION.
       *    
+           DISPLAY "WRK-DAY1 = " WRK-DAY1
            MOVE    SPACE               TO  WRK-DAY2
            IF      WRK-DAY1            =   SPACE
+               GO  TO       100-DAYCHG-EXT
+           END-IF
+           IF      WRK-DAY1(5:1)       =   "-"
+               MOVE    WRK-DAY1        TO  WRK-DAY2
                GO  TO       100-DAYCHG-EXT
            END-IF
            MOVE    WRK-DAY1(1:4)       TO  WRK-DAY2(1:)
@@ -835,6 +913,7 @@
            MOVE    WRK-DAY1(5:2)       TO  WRK-DAY2(6:2)
            MOVE    "-"                 TO  WRK-DAY2(8:1)
            MOVE    WRK-DAY1(7:2)       TO  WRK-DAY2(9:2)
+           DISPLAY "WRK-DAY2 = " WRK-DAY2
       *
            .
        100-DAYCHG-EXT.
@@ -886,7 +965,7 @@
       *****************************************************************
        10011-SRYYMD-CHK-SEC    SECTION.
       *
-           MOVE  WRK-PERFORM-YMD   TO  MDCRES-PERFORM-DATE
+           MOVE  WRK-PERFORM-YMD-G     TO  MDCRES-PERFORM-DATE
       *
            IF      WRK-PERFORM-YMD      =   SPACE
                ADD 2                   TO  CNT-CHECK
@@ -916,7 +995,7 @@
       *****************************************************************
        10011-SRYTIME-CHK-SEC   SECTION.
       *
-           MOVE  WRK-PERFORM-TIME  TO  MDCRES-PERFORM-TIME
+           MOVE  WRK-PERFORM-TIME-G    TO  MDCRES-PERFORM-TIME
       *
            IF      WRK-PERFORM-TIME     =   SPACE
                ADD 4                   TO  CNT-CHECK
@@ -928,7 +1007,7 @@
            IF      WRK-PERFORM-TIME    NOT NUMERIC
                ADD 4                   TO  CNT-CHECK
                MOVE  "診療時間不正"    TO  MDCRES-API-RESULT-MSG
-               DISPLAY   "診療時間不正"
+               DISPLAY   "診療時間不正 " WRK-PERFORM-TIME
                GO      TO      10011-SRYTIME-CHK-EXT
            END-IF
       *

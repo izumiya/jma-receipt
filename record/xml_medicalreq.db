@@ -2,12 +2,12 @@ xml_medicalreq {
     object  object;
 	mode	int;
 	medicalreq {
-		Information_Date	varchar(8);
-		Information_Time	varchar(6);
+		Information_Date	varchar(10);
+		Information_Time	varchar(8);
 		InOut			varchar(1);
 		Patient_ID		varchar(20);
-    		Perform_Date		varchar(8);
-    		Perform_Time		varchar(6);
+    		Perform_Date		varchar(10);
+    		Perform_Time		varchar(8);
 		Diagnosis_Information  {
 			Department_Code		varchar(2);
 			Department_Name		varchar(80);
@@ -36,27 +36,29 @@ xml_medicalreq {
 				} [3];
 			} ;
 		Medical_Information  {
-			Medical_Class		varchar(03);
-			Medical_Class_Name	varchar(50);
-			Medical_Class_Number	varchar(50);
+			Medical_Class			varchar(03);
+			Medical_Class_Id		varchar(02);
+			Medical_Class_Name		varchar(50);
+			Medical_Class_Number		varchar(50);
 			Medication_info   {
+				Medication_Class	varchar(03);
 				Medication_Code		varchar(09);
 				Medication_Name		varchar(50);
 				Medication_Number	varchar(10);
 			} [40];
 		}[40] ;
 		Disease_Information  {
-			Disease_Code		varchar(50);
-			Disease_Name		varchar(80);
+			Disease_Code			varchar(50);
+			Disease_Name			varchar(80);
 			Disease_Single	{
 				Disease_Single_Code	varchar(10);
 				Disease_Single_Name	varchar(20);
 			}[6] ;
-			Disease_Category	varchar(2);
-			Disease_SuspectedFlag	varchar(2);
-			Disease_StartDate	varchar(8);
-			Disease_EndDate	varchar(8);
-			Disease_OutCome	varchar(2);
+			Disease_Category		varchar(2);
+			Disease_SuspectedFlag		varchar(2);
+			Disease_StartDate		varchar(10);
+			Disease_EndDate			varchar(10);
+			Disease_OutCome			varchar(2);
 			}[50] ;
 		}[2];
    	};

@@ -23,12 +23,12 @@
             02  MDCREQ-OBJECT   PIC X(8).
             02  MDCREQ-MODE PIC S9(9)   BINARY.
             02  MDCREQ-MEDICALREQ.
-              03  MDCREQ-INFORMATION-DATE PIC X(8).
-              03  MDCREQ-INFORMATION-TIME PIC X(6).
+              03  MDCREQ-INFORMATION-DATE PIC X(10).
+              03  MDCREQ-INFORMATION-TIME PIC X(8).
               03  MDCREQ-OUTPATIENT-CLASS PIC X(1).
               03  MDCREQ-PATIENTID    PIC X(20).
-              03  MDCREQ-PERFORM-DATE PIC X(8).
-              03  MDCREQ-PERFORM-TIME PIC X(6).
+              03  MDCREQ-PERFORM-DATE PIC X(10).
+              03  MDCREQ-PERFORM-TIME PIC X(8).
               03  MDCREQ-MEDICAL-INFO     OCCURS  2 TIMES.
                 04  MDCREQ-DEP-CODE PIC X(2).
                 04  MDCREQ-DEP-NAME PIC X(80).
@@ -55,10 +55,12 @@
                     06  MDCREQ-INSURANCE-START-DATE  PIC X(10).
                     06  MDCREQ-INSURANCE-END-DATE    PIC X(10).
                 04  MDCREQ-MDC-INFO         OCCURS  40 TIMES.
-                  05  MDCREQ-MDC-CLASS    PIC X(3).
+                  05  MDCREQ-MDC-CLASS               PIC X(3).
+                  05  MDCREQ-MDC-CLASS-ID            PIC X(2).
                   05  MDCREQ-MDC-CLASS-NAME          PIC X(50).
                   05  MDCREQ-MDC-CLASS-NUMBER        PIC X(50).
                   05  MDCREQ-PRESCRIPTION-INFO        OCCURS  40 TIMES.
+                    06  MDCREQ-PRSCRPT-CLASS         PIC X(3).
                     06  MDCREQ-PRSCRPT-CODE          PIC X(9).
                     06  MDCREQ-PRSCRPT-NAME          PIC X(50).
                     06  MDCREQ-PRSCRPT-NUMBER        PIC X(10).
@@ -72,6 +74,6 @@
                                                      PIC X(20). 
                   05  MDCREQ-DIAGNOSIS-CATEGORY      PIC X(2).
                   05  MDCREQ-DIAGNOSIS-SUSPECTEDFLAG PIC X(2).
-                  05  MDCREQ-DIAGNOSIS-START-DATE    PIC X(8).
-                  05  MDCREQ-DIAGNOSIS-END-DATE      PIC X(8).
+                  05  MDCREQ-DIAGNOSIS-START-DATE    PIC X(10).
+                  05  MDCREQ-DIAGNOSIS-END-DATE      PIC X(10).
                   05  MDCREQ-DIAGNOSIS-OUTCOME       PIC X(2).
