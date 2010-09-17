@@ -143,6 +143,7 @@ path crtv01	{
          OR ( TBL_PTKOHINF.KOHNUM IN ('956',
                                    '957',
                                    '958',
+                                   '959',
                                    '960',
                                    '961',
                                    '962',
