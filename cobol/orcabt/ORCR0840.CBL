@@ -182,6 +182,7 @@
       *  04.04.15    NACL-門脇    10/04/06  改正対応
       *                                     （コメント自動記載）
       *  04.04.16    NACL-門脇    10/05/14  入院料加算剤番号変換
+      *  04.04.17    NACL-門脇    10/09/17  外泊時の摘要欄記載修正
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/08/17  小数点以下５桁対応
@@ -8495,6 +8496,30 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                      MOVE     2     TO    SYUKEI-IDX
                      MOVE     6     TO    SYUKEI-IDX2
+                     IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
+                                                     NOT = SPACE
+                        PERFORM   2502-RECE85-TENSOU2-KHN-SEC
+                        PERFORM   900-RECE85-WRITE-SEC
+                     END-IF
+      *
+                     MOVE     7     TO    SYUKEI-IDX
+                     MOVE    11     TO    SYUKEI-IDX2
+                     IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
+                                                     NOT = SPACE
+                        PERFORM   2502-RECE85-TENSOU2-KHN-SEC
+                        PERFORM   900-RECE85-WRITE-SEC
+                     END-IF
+      *
+                     MOVE    12     TO    SYUKEI-IDX
+                     MOVE    16     TO    SYUKEI-IDX2
+                     IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
+                                                     NOT = SPACE
+                        PERFORM   2502-RECE85-TENSOU2-KHN-SEC
+                        PERFORM   900-RECE85-WRITE-SEC
+                     END-IF
+      *
+                     MOVE    17     TO    SYUKEI-IDX
+                     MOVE    20     TO    SYUKEI-IDX2
                      IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
                                                      NOT = SPACE
                         PERFORM   2502-RECE85-TENSOU2-KHN-SEC
