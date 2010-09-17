@@ -2326,6 +2326,19 @@
                  IF       FLG-NYURYAKUSHO    =    ZERO
                    MOVE     NYURYAKUSHO-RYAKUSHO
                                        TO  WRK-RYAKUSHO
+      *            Àº¿À²ÊµßµÞÆþ±¡ÎÁ£±¤ÎÎ¬¾Îµ­ºÜ
+                   IF    (RECE62-SRYYM              >=  "200804")  AND
+                         (NSRY-SRYCD(NYUINACT-IDX2)  =  "190121010" OR
+                                                        "190111410")
+                       MOVE   "Àºµß£±" TO  WRK-RYAKUSHO
+                   END-IF
+                 ELSE
+      *            Àº¿À²ÊµßµÞÆþ±¡ÎÁ£²¤ÎÎ¬¾Îµ­ºÜ
+                   IF    (RECE62-SRYYM              >=  "200804")  AND
+                         (NSRY-SRYCD(NYUINACT-IDX2)  =  "190130010" OR
+                                                        "190130110")
+                       MOVE   "Àºµß£²" TO  WRK-RYAKUSHO
+                   END-IF
                  END-IF                  
       *
                END-IF 
