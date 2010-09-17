@@ -182,6 +182,7 @@
       *  04.04.15    NACL-ÌçÏÆ    10/04/06  ²þÀµÂÐ±þ
       *                                     ¡Ê¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ë
       *  04.04.16    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
+      *  04.04.17    NACL-ÌçÏÆ    10/09/17  ³°Çñ»þ¤ÎÅ¦Í×Íóµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8328,6 +8329,30 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                      MOVE     2     TO    SYUKEI-IDX
                      MOVE     6     TO    SYUKEI-IDX2
+                     IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
+                                                     NOT = SPACE
+                        PERFORM   2502-RECE85-TENSOU2-KHN-SEC
+                        PERFORM   900-RECE85-WRITE-SEC
+                     END-IF
+      *
+                     MOVE     7     TO    SYUKEI-IDX
+                     MOVE    11     TO    SYUKEI-IDX2
+                     IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
+                                                     NOT = SPACE
+                        PERFORM   2502-RECE85-TENSOU2-KHN-SEC
+                        PERFORM   900-RECE85-WRITE-SEC
+                     END-IF
+      *
+                     MOVE    12     TO    SYUKEI-IDX
+                     MOVE    16     TO    SYUKEI-IDX2
+                     IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
+                                                     NOT = SPACE
+                        PERFORM   2502-RECE85-TENSOU2-KHN-SEC
+                        PERFORM   900-RECE85-WRITE-SEC
+                     END-IF
+      *
+                     MOVE    17     TO    SYUKEI-IDX
+                     MOVE    20     TO    SYUKEI-IDX2
                      IF   LNK-SROUNYUIN-SRYCD(IDY SYUKEI-IDX)  
                                                      NOT = SPACE
                         PERFORM   2502-RECE85-TENSOU2-KHN-SEC
