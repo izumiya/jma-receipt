@@ -68,12 +68,19 @@
            03  WRK-EDYMD                   PIC X(08).
            03  WRK-NISSU1                  PIC 9(05).
            03  WRK-NISSU2                  PIC 9(05).
-           03  WRK-MMSTYMD                 PIC X(08).
-           03  WRK-MMEDYMD                 PIC X(08).
+           03  WRK-MMSTYMD.
+               05  WRK-MMSTYM              PIC X(06).
+               05  WRK-MMSTDD              PIC 9(02).
+           03  WRK-MMEDYMD.
+               05  WRK-MMEDYM              PIC X(06).
+               05  WRK-MMEDDD              PIC 9(02).
            03  WRK-STIDX                   PIC 9(02).
            03  WRK-EDIDX                   PIC 9(02).
            03  WRK-CHK-BTUNUM              PIC X(02).
            03  WRK-CHK-YMD                 PIC X(08).
+           03  WRK-SRYYMD.
+               05  WRK-SRYYM               PIC X(06).
+               05  WRK-SRYDD               PIC 9(02).
       *
        01  SRH-5001-AREA.
            03  SRH-5001-OCC                OCCURS  300
@@ -371,25 +378,15 @@
       *****************************************************************
        2100-DAY-BTUINF-EDIT-SEC             SECTION.
       *
+           PERFORM VARYING IDX2    FROM    WRK-MMSTDD  BY  1
+                   UNTIL ( IDX2    >   WRK-MMEDDD )
       *
-           IF    ( PTNYUINRRK-TENNYUYMD    <   WRK-MMSTYMD )
-               MOVE    WRK-MMSTYMD (7:2)   TO  WRK-STIDX
-           ELSE
-               MOVE    PTNYUINRRK-TENNYUYMD (7:2)
-                                           TO  WRK-STIDX
-           END-IF
+               MOVE    SBTUSENTEI-SRYYM    TO  WRK-SRYYM
+               MOVE    IDX2                TO  WRK-SRYDD
       *
-           IF    ( PTNYUINRRK-TENSTUYMD    >   WRK-MMEDYMD )
-               MOVE    WRK-MMEDYMD (7:2)   TO  WRK-EDIDX
-           ELSE
-               MOVE    PTNYUINRRK-TENSTUYMD (7:2)
-                                           TO  WRK-EDIDX
-           END-IF
+               IF    ( PTNYUINRRK-TENNYUYMD    <=    WRK-SRYYMD )
+                AND  ( PTNYUINRRK-TENSTUYMD    >=    WRK-SRYYMD )
       *
-           PERFORM VARYING IDX2    FROM    WRK-STIDX   BY  1
-                   UNTIL ( IDX2    >   WRK-EDIDX )
-      *
-               IF    ( SBTUSENTEI-DAY-BTUNUM (IDX2)    =   SPACE )
       *            選定入院料情報設定処理
                    PERFORM 2100-SENTEI-SET-SEC
                    IF    ( SBTUSENTEI-RC       NOT =   ZERO )
