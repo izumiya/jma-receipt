@@ -235,8 +235,9 @@
       *    初診年月日
            03  WRK-SYOSIN-YMD          PIC X(08).
            03  WRK-YMD.
-               05  WRK-YY              PIC 9(04).
-               05  WRK-MM              PIC 9(02).
+               05  WRK-YYMM.
+                   07  WRK-YY              PIC 9(04).
+                   07  WRK-MM              PIC 9(02).
                05  WRK-DD              PIC 9(02).
       *
            03  WRK-KAISU               PIC 9(01).
@@ -1737,7 +1738,7 @@
                MOVE    1                   TO  FLG-SANTEI
            END-IF
       *
-           MOVE    SPACE               TO  WRK-YMD
+           MOVE    ZERO                TO  WRK-YMD
            PERFORM
                UNTIL       FLG-SANTEI      =   1
       *
@@ -1758,7 +1759,7 @@
                        END-IF
                    END-PERFORM
                    IF      WRK-DD              >   ZERO
-                       MOVE    SANTEI-SRYYM    TO  WRK-YMD(1:6)
+                       MOVE    SANTEI-SRYYM    TO  WRK-YYMM
                        MOVE    1               TO  FLG-SANTEI
                    END-IF
                END-IF
@@ -1773,8 +1774,8 @@
            MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF      WRK-YMD(1:6)        =   SPACE
-               MOVE    SPACE           TO  WRK-YMD
+           IF      WRK-YYMM            =   ZERO
+               MOVE    ZERO            TO  WRK-YMD
            END-IF
       *
            .
@@ -1821,7 +1822,7 @@
            PERFORM
                UNTIL       FLG-SANTEI      =   1
       *        最後の発生日、当日以降は対象外
-               MOVE    SPACE               TO  WRK-YMD
+               MOVE    ZERO                TO  WRK-YMD
                IF      SANTEI-SRYYM        =   SPA-SRYYMD(1:6)
                    MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y3
                ELSE
@@ -1836,10 +1837,10 @@
                    END-IF
                END-PERFORM
                IF      WRK-DD              >   ZERO
-                   MOVE    SANTEI-SRYYM    TO  WRK-YMD(1:6)
+                   MOVE    SANTEI-SRYYM    TO  WRK-YYMM
                END-IF
       *
-               IF      WRK-YMD         NOT =   SPACE
+               IF      WRK-YMD         NOT =   ZERO
                EVALUATE    SANTEI-SRYCD
       *        脳血管疾患急性発生日
                WHEN    "099800101"
