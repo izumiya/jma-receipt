@@ -776,8 +776,9 @@
                                        TO  LF04-CRE001-DPERTID
            MOVE    MDCREQ-DR-CODE(IDX)    
                                        TO  LF04-DOCCD
-           MOVE  MDCREQ-MAIN-INSURANCE-CLASS(IDX)
+           MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)
                                        TO  LF04-HKN-HKNSBTCODE(01)
+           PERFORM     2001-HKNNUM-SET-SEC
            PERFORM     VARYING   IDY   FROM    1   BY  1
                        UNTIL    (IDY           >   3)
                MOVE  MDCREQ-INSURANCE-NAME(IDX IDY)
@@ -892,6 +893,57 @@
       *
            .
        10011-CLAIM-CALL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ∆¸…’ ‘Ω∏
+      *****************************************************************
+       2001-HKNNUM-SET-SEC     SECTION.
+      *    
+           IF      MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
+                                       NOT = SPACE
+             EVALUATE  MDCREQ-MAIN-INSURANCE-CLASS(IDX)
+               WHEN    "060"
+                 MOVE  "00"            TO  LF04-HKN-HKNSBTCODE(01)
+               WHEN    "971"
+                 MOVE  "R1"            TO  LF04-HKN-HKNSBTCODE(01)
+               WHEN    "973"
+                 MOVE  "R3"            TO  LF04-HKN-HKNSBTCODE(01)
+               WHEN    "975"
+                 MOVE  "K5"            TO  LF04-HKN-HKNSBTCODE(01)
+               WHEN    OTHER
+                 EVALUATE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(1:2)
+                   WHEN    "98" 
+                     MOVE  "Z"         TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(1:1)
+                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
+                                       TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(2:1)
+                   WHEN    "90" 
+                     MOVE  "A"         TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(1:1)
+                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
+                                       TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(2:1)
+                   WHEN    "91" 
+                     MOVE  "B"         TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(1:1)
+                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
+                                       TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(2:1)
+                   WHEN    OTHER
+                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(2:2)
+                                       TO  LF04-HKN-HKNSBTCODE
+                                                     (01)(1:2)
+                 END-EVALUATE
+             END-EVALUATE
+           ELSE
+             MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)
+                                       TO  LF04-HKN-HKNSBTCODE(01)
+           END-IF
+      *
+           .
+       2001-HKNNUM-SET-EXT.
            EXIT.
       *
       *****************************************************************

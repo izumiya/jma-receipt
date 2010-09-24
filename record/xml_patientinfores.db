@@ -1,43 +1,44 @@
 xml_patientinfores {
     object  object;
-    mode    int;
+	mode	int;
 	patientinfores {
-		information_date	varchar(8);
-        information_time	varchar(6);
-		api_result			varchar(2);
-		api_result_msg      varchar(100);
-        reskey              varchar(100);
-		patient_infomation	{
-        	name                varchar(100);
-        	kananame            varchar(100);
-        	birthday            varchar(08);
-        	sex                 varchar(1);
-        	address_info    {
-            	home_zip_code   varchar(07);
-            	home_addresses1 varchar(200);
-            	home_addresses2 varchar(200);
-            	home_phone1	varchar(15);
-            	home_phone2	varchar(15);
+	Information_Date	varchar(10);
+       	Information_Time	varchar(8);
+	Api_Result		varchar(2);
+	API_Result_Message	varchar(100);
+       	Reskey			varchar(100);
+	Patient_Infomation	{
+		Patient_ID		varchar(20);
+		WholeName		varchar(100);
+		WholeName_inKana	varchar(100);
+		BirthDate		varchar(10);
+		Sex			varchar(1);
+		Home_Address_Information	{
+			Address_ZipCode		varchar(07);
+			WholeAddress1		varchar(200);
+			WholeAddress2		varchar(200);
+			PhoneNumber1		varchar(15);
+			PhoneNumber2		varchar(15);
         	};
-        	insurance_info  {
-            	main_insurance_class    varchar(10);
-            	main_insurance_number   varchar(10);
-            	main_insurance_name     varchar(10);
-            	main_mark               varchar(80);
-            	main_number             varchar(80);
-            	main_continuation       varchar(10);
-            	main_assistance         varchar(10);
-            	main_family             varchar(10);
-            	main_policyholder       varchar(100);
-            	main_start_date         varchar(10);
-            	main_end_date           varchar(10);
-            	public_insurance_info   {
-                	insurance_number    varchar(10);
-                	insurance_name      varchar(10);
-                	provider_number     varchar(10);
-                	recipient_number    varchar(20);
-                	insurance_start_date    varchar(10);
-                	insurance_end_date  varchar(10);
+		HealthInsurance_Information	{
+		InsuranceProvider_Class			varchar(10);
+		InsuranceProvider_Number		varchar(10);
+		InsuranceProvider_WholeName		varchar(10);
+		HealthInsuredPerson_Symbol		varchar(80);
+		HealthInsuredPerson_Number		varchar(80);
+		HealthInsuredPerson_Continuation	varchar(10);
+		HealthInsuredPerson_Assistance		varchar(10);
+		RelationToInsuredPerson			varchar(10);
+		HealthInsuredPerson_WholeName		varchar(100);
+		Certificate_StartDate			varchar(10);
+		Certificate_ExpiredDate			varchar(10);
+		PublicInsurance_Information	{
+			PublicInsurance_Number		varchar(10);
+			PublicInsurance_Name		varchar(10);
+			PublicInsurer_Number		varchar(10);
+			PublicInsuredPerson_Number	varchar(20);
+			Certificate_IssuedDate		varchar(10);
+			Certificate_ExpiredDate		varchar(10);
             	} [3];
         	} [4];
     	};

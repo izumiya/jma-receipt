@@ -19,15 +19,16 @@
             02  PTRES-OBJECT           PIC X(8).
             02  PTRES-MODE             PIC S9(9)   BINARY.
             02  PTRES-PATIENTINFORES.
-              03  PTRES-INFORMATION-DATE  PIC X(8).
-              03  PTRES-INFORMATION-TIME  PIC X(6).
+              03  PTRES-INFORMATION-DATE  PIC X(10).
+              03  PTRES-INFORMATION-TIME  PIC X(8).
               03  PTRES-API-RESULT     PIC X(2).
               03  PTRES-API-RESULT-MSG PIC X(100).
               03  PTRES-RESKEY         PIC X(100).
               03  PTRES-PATIENT-INFOMATION.
+                04  PTRES-ID           PIC X(20).
                 04  PTRES-NAME         PIC X(100).
                 04  PTRES-KANANAME     PIC X(100).
-                04  PTRES-BIRTHDAY     PIC X(8).
+                04  PTRES-BIRTHDAY     PIC X(10).
                 04  PTRES-SEX          PIC X(1).
                 04  PTRES-ADDRESS-INFO.
                   05  PTRES-HOME-ZIP-CODE    PIC X(7).

@@ -195,7 +195,7 @@
       *
            COPY    "CPPATIENTXMLRES.INC".
       *
-           COPY    "CPPATIENTXMLREQ.INC".
+      *    COPY    "CPPATIENTXMLREQ.INC".
       *
            COPY    "ORCA-BLOB".
       *
@@ -228,7 +228,7 @@
            COPY    "P02K.INC".
            COPY    "PERR.INC".
            COPY    "PID1.INC".
-           COPY    "CPAPIMOD.INC".
+           COPY    "CPPTAPIINF.INC".
       **************************************************************************
        PROCEDURE           DIVISION    USING
            MCPAREA
@@ -239,6 +239,7 @@
            DISPLAY   "********************"
            DISPLAY   "* patient res start*"
            DISPLAY   "********************"
+           DISPLAY "PTAPIREQ-METHOD = " PTAPIREQ-METHOD
       *
            ACCEPT  WRK-SYSYMD    FROM DATE
            MOVE    20                  TO  WRK-SYSYY
@@ -256,8 +257,26 @@
            MOVE   "Patient Info"       TO  PTRES-RESKEY
            MOVE    MCP-USER            TO  SPA-OPID
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
-                                           PTRES-INFORMATION-DATE
-           MOVE    SMCNDATE-HMS        TO  PTRES-INFORMATION-TIME
+           MOVE    SMCNDATE-YMD(1:4)   TO  
+                                       PTRES-INFORMATION-DATE(1:4)
+           MOVE    "-"                 TO  
+                                       PTRES-INFORMATION-DATE(5:1)
+           MOVE    SMCNDATE-YMD(5:2)   TO  
+                                       PTRES-INFORMATION-DATE(6:2)
+           MOVE    "-"                 TO  
+                                       PTRES-INFORMATION-DATE(8:1)
+           MOVE    SMCNDATE-YMD(7:2)   TO  
+                                       PTRES-INFORMATION-DATE(9:2)
+           MOVE    SMCNDATE-HMS(1:2)   TO  
+                                       PTRES-INFORMATION-TIME(1:2)
+           MOVE    ":"                 TO  
+                                       PTRES-INFORMATION-TIME(3:1)
+           MOVE    SMCNDATE-HMS(3:2)   TO  
+                                       PTRES-INFORMATION-TIME(4:2)
+           MOVE    ":"                 TO  
+                                       PTRES-INFORMATION-TIME(6:1)
+           MOVE    SMCNDATE-HMS(5:2)   TO  
+                                       PTRES-INFORMATION-TIME(7:2)
       *    医療機関識別番号セット SPA-HOSPNUM
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
@@ -265,7 +284,7 @@
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE   "99"             TO  PTRES-API-RESULT
                MOVE   "ユーザID未登録" TO  PTRES-API-RESULT-MSG
-             IF    APIREQ-CONTENT-TYPE =   "application/xml"
+             IF    PTAPIREQ-CONTENT-TYPE =   "application/xml"
                    PERFORM 1000-PTXMLMAKE-SEC
              ELSE
                    PERFORM 1000-PTCSVMAKE-SEC
@@ -291,21 +310,23 @@
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
       *
-           IF      APIREQ-CONTENT-TYPE =   "application/xml"
-               PERFORM 1000-PTIXMLREAD-SEC
-           ELSE
-               PERFORM 1000-PTICSVREAD-SEC
-           END-IF
+      *    IF      APIREQ-CONTENT-TYPE =   "application/xml"
+      *        PERFORM 1000-PTIXMLREAD-SEC
+      *    ELSE
+      *        PERFORM 1000-PTICSVREAD-SEC
+      *    END-IF
       *    患者情報の取得
+           DISPLAY "PTAPIREQ-CLASS = " PTAPIREQ-CLASS
+           MOVE    PTAPIREQ-CLASS      TO  WRK-PTNUM
            IF      PTRES-API-RESULT    =  SPACE
                PERFORM 100-PATIENT-GET-SEC
            END-IF
       *
-           IF      APIREQ-CONTENT-TYPE =   "application/xml"
+      *    IF      APIREQ-CONTENT-TYPE =   "application/xml"
                    PERFORM 1000-PTXMLMAKE-SEC
-           ELSE
-                   PERFORM 1000-PTCSVMAKE-SEC
-           END-IF
+      *    ELSE
+      *            PERFORM 1000-PTCSVMAKE-SEC
+      *    END-IF
       *
            DISPLAY   "********************"
            DISPLAY   "* patient res end  *"
@@ -367,64 +388,6 @@
            EXIT.
       *
       *****************************************************************
-      *    XML情報から内容を取り出す
-      *****************************************************************
-       1000-PTIXMLREAD-SEC   SECTION.
-      *
-           IF      API-BODY        NOT =   LOW-VALUE
-               DISPLAY "API-BODY not low_value"
-           END-IF
-      * XML情報取り出し
-           MOVE   "XMLOPEN"            TO  MCP-FUNC
-           MOVE    "xml_patientinforeq"    TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    API-BODY            TO  PTREQ-OBJECT
-           MOVE    ZERO                TO  PTREQ-MODE
-           CALL    "ORCDBMAIN"         USING
-                                       MCPAREA
-                                       XML-PATIENTINFOREQ
-                                       SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
-               CONTINUE
-           ELSE
-               DISPLAY "XMLOPEN failure = " MCP-RC
-               MOVE   "99"           TO  PTRES-API-RESULT
-               MOVE   "構文誤りです" TO  PTRES-API-RESULT-MSG
-               GO     TO   1000-PTIXMLREAD-EXT
-           END-IF
-      *
-      *
-           MOVE   "XMLREAD"            TO  MCP-FUNC
-           MOVE    "xml_patientinforeq"    TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           MOVE   ORCA-BLOB-OBJECT     TO  PTREQ-OBJECT
-           CALL   "ORCDBMAIN"          USING
-                                       MCPAREA
-                                       XML-PATIENTINFOREQ
-                                       SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
-               MOVE    PTREQ-PATIENTID     TO  WRK-PTNUM
-           ELSE
-               DISPLAY "XMLREAD failure = " MCP-RC
-           END-IF
-      *
-           MOVE   'XMLCLOSE'           TO  MCP-FUNC
-           MOVE    "xml_patientinforeq"    TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           MOVE   ORCA-BLOB-OBJECT     TO  PTREQ-OBJECT
-           CALL   'ORCDBMAIN'          USING
-                                       MCPAREA
-                                       XML-PATIENTINFOREQ
-                                       SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
-               CONTINUE
-           END-IF
-      *
-           .
-       1000-PTIXMLREAD-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    CSV情報から内容を取り出す
       *****************************************************************
        1000-PTICSVREAD-SEC   SECTION.
@@ -432,7 +395,7 @@
            MOVE   "BLOBEXPORT"         TO  MCP-FUNC
            MOVE    "blob"              TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    API-BODY            TO  ORCA-BLOB-OBJECT
+           MOVE    PTAPI-BODY          TO  ORCA-BLOB-OBJECT
       *
            STRING  "/tmp/"             DELIMITED  BY  SPACE
                    MCP-TERM            DELIMITED  BY  SPACE
@@ -497,11 +460,21 @@
                                                SPA-AREA
       *
            MOVE    ZERO                TO  PTRES-API-RESULT
+           MOVE    SPTID-PTNUM         TO  PTRES-ID
            PERFORM 1001-PTINF-GET-SEC
            IF      MCP-RC              =   ZERO
                MOVE  PTINF-NAME        TO  PTRES-NAME
                MOVE  PTINF-KANANAME    TO  PTRES-KANANAME
-               MOVE  PTINF-BIRTHDAY    TO  PTRES-BIRTHDAY
+               MOVE  PTINF-BIRTHDAY(1:4)   TO  
+                                       PTRES-BIRTHDAY(1:4)
+               MOVE  "-"                   TO  
+                                       PTRES-BIRTHDAY(5:1)
+               MOVE  PTINF-BIRTHDAY(5:2)   TO  
+                                       PTRES-BIRTHDAY(6:2)
+               MOVE  "-"                   TO  
+                                       PTRES-BIRTHDAY(8:1)
+               MOVE  PTINF-BIRTHDAY(7:2)   TO  
+                                       PTRES-BIRTHDAY(9:2)
                MOVE  PTINF-SEX         TO  PTRES-SEX
                MOVE  PTINF-HOME-POST   TO  PTRES-HOME-ZIP-CODE
                MOVE  PTINF-HOME-ADRS   TO  PTRES-HOME-ADDRESSES1
@@ -565,8 +538,8 @@
                                        SPA-AREA
            IF (MCP-RC = ZERO OR 1)
                DISPLAY "XMLCLOSE OK     = " MCP-RC
-               MOVE  PTRES-OBJECT      TO  API-BODY
-               MOVE  "application/xml" TO  APIREQ-CONTENT-TYPE
+               MOVE  PTRES-OBJECT      TO  PTAPI-BODY
+               MOVE  "application/xml" TO  PTAPIREQ-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
                DISPLAY "patient res xml write failure "
@@ -976,8 +949,8 @@
                DISPLAY "object is not low value"
            END-IF
       *
-           MOVE    ORCA-BLOB-OBJECT    TO  API-BODY
-           MOVE    "data/csv"          TO  APIREQ-CONTENT-TYPE
+           MOVE    ORCA-BLOB-OBJECT    TO  PTAPI-BODY
+           MOVE    "data/csv"          TO  PTAPIREQ-CONTENT-TYPE
       *
       *
           .
@@ -1053,7 +1026,8 @@
                        MOVE    WRK-SYSYMD-8        TO  PTHKN-TEKEDYMD
                        MOVE    PTHKNINF-REC        TO  MCPDATA-REC
                        PERFORM 910-PTHKNINF-INV-SEC
-                       MOVE    PTHKN-HKNNUM(2:2)
+      *                MOVE    PTHKN-HKNNUM(2:2)
+                       MOVE    PTHKN-HKNNUM
                                                    TO  
                                        PTRES-MAIN-INSURANCE-CLASS(IDX)
                        MOVE    PTHKN-HKNJANUM      TO
@@ -1070,10 +1044,45 @@
                                        PTRES-MAIN-FAMILY(IDX)
                        MOVE    PTHKN-HIHKNJANAME   TO
                                        PTRES-MAIN-POLICYHOLDER(IDX)
-                       MOVE    PTHKN-TEKSTYMD      TO
+                       IF      PTHKN-TEKSTYMD      =  SPACE
+                         MOVE  SPACE               TO
                                        PTRES-MAIN-START-DATE(IDX)
-                       MOVE    PTHKN-TEKEDYMD      TO
+                       ELSE
+                         MOVE  PTHKN-TEKSTYMD(1:4) TO
+                                       PTRES-MAIN-START-DATE
+                                                   (IDX)(1:4)
+                         MOVE  "-"                 TO
+                                       PTRES-MAIN-START-DATE
+                                                   (IDX)(5:1)
+                         MOVE  PTHKN-TEKSTYMD(5:2) TO
+                                       PTRES-MAIN-START-DATE
+                                                   (IDX)(6:2)
+                         MOVE  "-"                 TO
+                                       PTRES-MAIN-START-DATE
+                                                   (IDX)(8:1)
+                         MOVE  PTHKN-TEKSTYMD(7:2) TO
+                                       PTRES-MAIN-START-DATE
+                                                   (IDX)(9:2)
+                       END-IF
+                       IF      PTHKN-TEKEDYMD      =  SPACE
+                         MOVE    SPACE               TO
                                        PTRES-MAIN-END-DATE(IDX)
+                       ELSE
+                         MOVE    PTHKN-TEKEDYMD(1:4) TO
+                                       PTRES-MAIN-END-DATE(IDX)(1:4)
+                         MOVE    "-"                 TO
+                                       PTRES-MAIN-END-DATE(IDX)(5:1)
+                         MOVE    PTHKN-TEKEDYMD(5:2) TO
+                                       PTRES-MAIN-END-DATE(IDX)(6:2)
+                         MOVE    "-"                 TO
+                                       PTRES-MAIN-END-DATE(IDX)(8:1)
+                         MOVE    PTHKN-TEKEDYMD(7:2) TO
+                                       PTRES-MAIN-END-DATE(IDX)(9:2)
+                       END-IF
+                       IF      PTHKN-TEKEDYMD      =  "99999999"
+                         MOVE    "9999-12-31"        TO
+                                       PTRES-MAIN-END-DATE(IDX)
+                       END-IF
       *   公費読み出し
                    IF      COMB-KOHHKNNUM (1)      NOT =   SPACE
                        PERFORM 20012-KOHID-HENSYU-SEC
@@ -1097,12 +1106,41 @@
                            MOVE    PTKOH-KOHNUM        TO
                                    PTRES-INSURANCE-NUMBER
                                                           (IDX IDY1)
-                           MOVE    PTKOH-TEKSTYMD      TO
+                           MOVE    PTKOH-TEKSTYMD(1:4) TO
                                    PTRES-INSURANCE-START-DATE
-                                                          (IDX IDY1)
-                           MOVE    PTKOH-TEKEDYMD      TO
+                                                     (IDX IDY1)(1:4)
+                           MOVE    "-"                 TO
+                                   PTRES-INSURANCE-START-DATE
+                                                     (IDX IDY1)(5:1)
+                           MOVE    PTKOH-TEKSTYMD(5:2) TO
+                                   PTRES-INSURANCE-START-DATE
+                                                     (IDX IDY1)(6:2)
+                           MOVE    "-"                 TO
+                                   PTRES-INSURANCE-START-DATE
+                                                     (IDX IDY1)(8:1)
+                           MOVE    PTKOH-TEKSTYMD(7:2) TO
+                                   PTRES-INSURANCE-START-DATE
+                                                     (IDX IDY1)(9:2)
+                           MOVE    PTKOH-TEKEDYMD(1:4) TO
                                    PTRES-INSURANCE-END-DATE
-                                                          (IDX IDY1)
+                                                     (IDX IDY1)(1:4)
+                           MOVE    "-"                 TO
+                                   PTRES-INSURANCE-END-DATE
+                                                     (IDX IDY1)(5:1)
+                           MOVE    PTKOH-TEKEDYMD(5:2) TO
+                                   PTRES-INSURANCE-END-DATE
+                                                     (IDX IDY1)(6:2)
+                           MOVE    "-"                 TO
+                                   PTRES-INSURANCE-END-DATE
+                                                     (IDX IDY1)(8:1)
+                           MOVE    PTKOH-TEKEDYMD(7:2) TO
+                                   PTRES-INSURANCE-END-DATE
+                                                     (IDX IDY1)(9:2)
+                           IF      PTKOH-TEKEDYMD      = "99999999"
+                             MOVE  "9999-12-31"        TO
+                                   PTRES-INSURANCE-END-DATE
+                                                     (IDX IDY1)
+                           END-IF
                        END-PERFORM
                    END-IF
       *

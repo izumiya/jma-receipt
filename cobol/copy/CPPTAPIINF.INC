@@ -15,8 +15,13 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-        01  XML-PATIENTINFOREQ.
-            02  PTREQ-OBJECT           PIC X(8).
-            02  PTREQ-MODE             PIC S9(9)   BINARY.
-            02  PTREQ-PATIENTINFOREQ.
-              03  PTREQ-PATIENTID      PIC X(20).
+      ************************************************************
+      *     PTINFGET通信用共通エリア         (CPPTAPIINF.INC)    *
+      ************************************************************
+        02  PTAPIINF.
+            03  PTAPI-REQUEST.
+              04  PTAPIREQ-ARGUMENT.
+                05  PTAPIREQ-CLASS       PIC X(20).
+              04  PTAPIREQ-METHOD        PIC X(100).
+              04  PTAPIREQ-CONTENT-TYPE  PIC X(100).
+              04  PTAPI-BODY             PIC X(8).
