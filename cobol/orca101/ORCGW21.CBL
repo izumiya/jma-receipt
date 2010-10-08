@@ -1640,6 +1640,11 @@
            PERFORM 4200-JYUTOKLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-JYUTOK-G
       *
+      *    Ìµ¶Ý¼£ÎÅ¼¼´ÉÍý²Ã»»
+           MOVE    SYS-5002-MUKIN-KBN  TO  WRK-CMB-CD
+           PERFORM 4200-MUKINLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-MUKIN-G
+      *
            .
        41001-KSN-EDIT-EXT.
            EXIT.
@@ -1704,6 +1709,11 @@
            PERFORM 4200-JYUTOKLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-JYUTOK-G
       *
+      *    Ìµ¶Ý¼£ÎÅ¼¼´ÉÍý²Ã»»
+           MOVE    SYS-5002-MUKIN-KBN  TO  WRK-CMB-CD
+           PERFORM 4200-MUKINLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-MUKIN-G
+      *
            .
        41002-KSN-EDIT-EXT.
            EXIT.
@@ -1760,6 +1770,11 @@
            END-EVALUATE
            PERFORM 4200-JYUTOKLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-JYUTOK-G
+      *
+      *    Ìµ¶Ý¼£ÎÅ¼¼´ÉÍý²Ã»»
+           MOVE    SYS-5002-MUKIN-KBN  TO  WRK-CMB-CD
+           PERFORM 4200-MUKINLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W21-MUKIN-G
       *
            .
        41003-KSN-EDIT-EXT.
