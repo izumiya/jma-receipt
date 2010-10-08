@@ -3802,6 +3802,7 @@
                                            OR  "0039"
                                            OR  "0042"
                                            OR  "0046"
+                                           OR  "0053"
                    MOVE    SPA-NAI-DAY-41(SPA-NAI-BANGO IDX-D)
                                            TO  SPA-GMN-DAY-41 (IDX-D)
                    MOVE    SPA-ERRCD       TO  WRK-ERRCD
