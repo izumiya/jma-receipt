@@ -2591,6 +2591,16 @@
                    END-PERFORM
                END-IF
       *
+      *        保険組合せ
+               IF      SPA-GMN-TZAISKBKBN-41 (IDX) =   "5"
+                   PERFORM VARYING IDK     FROM    1   BY  1
+                           UNTIL   IDK     >   31
+                       IF      SPA-NAI-DAY-41 (IDX-N IDK)  NOT =  ZERO
+                           MOVE    "1"     TO  SPA-CHK-HKNCOMBI (IDK)
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
       *        選定入院料
                IF     (SPA-GMN-TZAISKBKBN-41 (IDX) =   "1"  )  AND
                       (SPA-GMN-TSRYCD (IDX)     =   W-YOYAKU)
@@ -3777,9 +3787,9 @@
                    END-IF
       *        食事
                WHEN    "4"
-      *            入院基本料算定なし
-                   IF      SPA-CHK-NYUIN (IDX-D)   =   SPACE
-                       MOVE    "0033"             TO  SPA-ERRCD
+      *            保険組合せなし
+                   IF      SPA-CHK-HKNCOMBI (IDX-D)   =   SPACE
+                       MOVE    "0053"             TO  SPA-ERRCD
                    END-IF
                    IF      SPA-NAI-SRYYM         <=  "200603"
                        IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
@@ -8731,6 +8741,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0052"
                    MOVE    "入院行為照会用テーブルの更新に失敗しました"
                                        TO  WRK-ERRMSG
+               WHEN    "0053"
+                   MOVE    "保険組合せが設定されていない日です。内容の"
+                                       TO  WRK-ERRMSG(1:42)
+                   MOVE    "変更はできません。"
+                                       TO  WRK-ERRMSG(43:18)
                WHEN    "1005"
                    MOVE    "受診履歴番号が存在しません。"
                                        TO  WRK-ERRMSG

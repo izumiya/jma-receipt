@@ -122,6 +122,8 @@
                    07  SPA-CHK-SENTEI          PIC X(01).
       *            外泊日
                    07  SPA-CHK-GAIHAKU         PIC X(01).
+      *            保険組合せ
+                   07  SPA-CHK-HKNCOMBI        PIC X(01).
       *
       *    剤行為変更画面用
            03  SPA-SCR-REC-AREA.
