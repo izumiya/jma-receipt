@@ -30,7 +30,7 @@
     <handler>gtk_true</handler>
     <last_modification_time>Mon, 25 Nov 2002 06:01:39 GMT</last_modification_time>
   </signal>
-  <title>(R98)明細書−生活保護・中国残留法人等まとめ入力</title>
+  <title>(R98)明細書−生活保護・中国残留邦人等まとめ入力</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_CENTER</position>
   <modal>False</modal>
