@@ -2029,7 +2029,8 @@
                END-IF
            END-IF
       *    入院日の時、初診料のみ算定する
-           IF      SPA-K02N-NYUINYMD(1:6)  =   SPA-NAI-SRYYMD(1:6)
+           IF    ( SPA-K02N-NYUINYMD(1:6)  =   SPA-NAI-SRYYMD(1:6))
+           AND   ( SPA-NYUGAIKBN           =   "1"    )
                IF      SPA-SYOSIN          =   1
                    CONTINUE
                ELSE
@@ -2066,7 +2067,8 @@
            END-IF
       *
       *    入院日の時、初診料のみ算定する
-           IF      SPA-K02N-NYUINYMD(1:6)  =   SPA-NAI-SRYYMD(1:6)
+           IF    ( SPA-K02N-NYUINYMD(1:6)  =   SPA-NAI-SRYYMD(1:6) )
+           AND   ( SPA-NYUGAIKBN           =   "1"    )
                IF      SPA-SYOSIN          =   1
                    CONTINUE
                ELSE
