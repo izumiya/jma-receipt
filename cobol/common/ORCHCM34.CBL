@@ -1008,7 +1008,6 @@
            MOVE    ZERO                TO  WRK-TTL-JIHI
            MOVE    ZERO                TO  WRK-TTL-JIHI-TAX
            MOVE    ZERO                TO  WRK-TTL-BRMSAGAKU
-           MOVE    ZERO                TO  WRK-ZAINUM
       *
            .
        100-INIT-EXT.
@@ -2874,10 +2873,6 @@
                MOVE    FLG-SRYSTATUS   TO  HCM34ACCT-SRYSTATUS
       *
                WRITE   HCM34ACCT-REC
-      *
-               IF    ( WRK-ZAINUM      <   ACCT-ZAINUM )
-                   MOVE    ACCT-ZAINUM TO  WRK-ZAINUM
-               END-IF
       *
                PERFORM 900-SRYACCT-KEY20-FET-SEC
       *
@@ -5056,6 +5051,7 @@
        2002-NACCT-HEN-SEC     SECTION.
       *
            MOVE    ZERO            TO  FLG-NYUINACCT
+           MOVE    99990000        TO  WRK-ZAINUM
       *
            OPEN    EXTEND              HCM34ACCT-FILE
            OPEN    I-O                 HCM34SRY-FILE
