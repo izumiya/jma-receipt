@@ -2361,6 +2361,15 @@
                    MOVE    1                   TO  FLG-ERR
                END-IF
            END-IF
+      *    入院日の時、初診料のみ算定する
+           IF    ( SPA-K02N-NYUINYMD       =   SPA-NAI-SRYYMD )
+           AND   ( SPA-NYUGAIKBN           =   "2"    )
+               IF      SPA-SYOSIN          =   1
+                   CONTINUE
+               ELSE
+                   MOVE    1                   TO  FLG-ERR
+               END-IF
+           END-IF
       *    入院中（アフターケア）
            IF      SPA-NAI-NYUIN       =   1
                MOVE    1                   TO  FLG-ERR
