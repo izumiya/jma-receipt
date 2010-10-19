@@ -62,7 +62,7 @@
       *
        01  WRK-DATA-REC.
            03  WRK-DATA            PIC X(30000)
-                                   OCCURS  12.
+                                   OCCURS  50.
       *                            OCCURS  6.
       *
        01  LF04-REC.        
