@@ -3746,6 +3746,14 @@
                   (SPA-GAI-JIKANKBN    NOT =   ZERO )  AND
       *           ¿Ç»¡ÎÁºÆ»»Äê»þ¤ÏÉÕ¤±¤Ê¤¤
                   (FLG-JIKANKBN        =   ZERO )
+      *        ¾®»ù²ÊÆÃÎã»þ´Ö³°¤Ï£¶ºÐÌ¤Ëþ
+               IF     (SPA-GAI-JIKANKBN    =   5
+                                           OR  6
+                                           OR  7  )  AND
+                      (SPA-NENREI-YY       >=  6  )
+                   CONTINUE
+               ELSE
+      *
                MOVE    SPA-GMN-INPUTCD (SPA-GMN-IDX)
                                            TO  WRK-INPUTCD
                MOVE    SPACE               TO  SPA-GMN-INPUTCD
@@ -3756,6 +3764,8 @@
                                                      (SPA-GMN-IDX)(3:)
                MOVE    SPA-GAI-JIKANKBN    TO  SPA-COM-TIMEFLG
                                                      (SPA-GMN-IDX)
+           END-IF
+      *
            END-IF
       *
       *    °Ê¹ß¡¢ºÆ¿Ç»þ¤Î¤ß
