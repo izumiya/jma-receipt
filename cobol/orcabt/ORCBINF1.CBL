@@ -29,7 +29,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  04.05.01    NACL-伊藤    10/ 2/ 8  数字編集小数点見直し
+      *  04.05.00    NACL-伊藤    10/ 2/ 8  数字編集小数点見直し
+      *  04.05.00    NACL-伊藤    10/10/26  数字編集小数点見直し
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -60,7 +61,8 @@
       *
        WORKING-STORAGE             SECTION.
       *
-       01  PRGSKBNO                PIC X(08)  VALUE "20091218".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20091218".
+       01  PRGSKBNO                PIC X(08)  VALUE "20101026".
       *
       *    フラグ領域
        01  STS-AREA.
@@ -175,8 +177,9 @@
            03  FILLER              PIC X(07)  VALUE  "8832283".
            03  FILLER              PIC X(07)  VALUE  "8845197".
            03  FILLER              PIC X(07)  VALUE  "8843940".
+           03  FILLER              PIC X(07)  VALUE  "8845217".
        01  TBL-INFURU-AREA-R       REDEFINES  TBL-INFURU-AREA.
-           03  TBL-INFURU-OCC      OCCURS   31  INDEXED  IDX-INFURU.
+           03  TBL-INFURU-OCC      OCCURS   32  INDEXED  IDX-INFURU.
                05  TBL-INFURU-BYOMEICD    PIC X(07).
       *
        01  WRK-CONS-AREA.
@@ -422,13 +425,19 @@
       *    傷病名の内容判定
            PERFORM 20022-BYOMEI-HENSYU-SEC
       *
-      *    インフルエンザは検査が必須である
-      *    小児科外来診療料(WRK-SYOUNIKA=1)は
-      *      医薬品のみ、傷病名のみでも可とする
+      *DLT インフルエンザは検査が必須である
+      *DLT 小児科外来診療料(WRK-SYOUNIKA=1)は
+      *DLT   医薬品のみ、傷病名のみでも可とする
+      *DLT IF    ( WRK-S-SRYCD     NOT =   SPACE )  OR
+      *DLT      (( WRK-SYOUNIKA        =   1     )  AND
+      *DLT      (( WRK-M-SRYCD     NOT =   SPACE )  OR
+      *DLT       ( WRK-BYOMEICD    NOT =   SPACE )))
+      *
+      *    インフルエンザは検査または医薬品
+      *    または傷病名があれば対象とする
            IF    ( WRK-S-SRYCD     NOT =   SPACE )  OR
-                (( WRK-SYOUNIKA        =   1     )  AND
-                (( WRK-M-SRYCD     NOT =   SPACE )  OR
-                 ( WRK-BYOMEICD    NOT =   SPACE )))
+                 ( WRK-M-SRYCD     NOT =   SPACE )  OR
+                 ( WRK-BYOMEICD    NOT =   SPACE )
       *        診療日をセットする
       *        備忘録  傷病名のみの場合は診療開始日を診療日にセット
                MOVE    WRK-PARA-SRYYMD     TO  WRK-SRYYMD
@@ -616,6 +625,8 @@
                    WHEN    "610462002"
       *            リレンザ
                    WHEN    "660443018"
+      *            イナビル
+                   WHEN    "622012101"
                        MOVE    SRY-SRYCD(IDY)      TO  WRK-M-SRYCD
                        MOVE    5                   TO  IDY
                END-EVALUATE
@@ -737,22 +748,23 @@
            END-IF
       *
       *    診療開始日
+      *    診療開始日は該当日と同一の場合を対象とするよう変更
            IF      PTBYO-SRYYMD        =   WRK-PARA-SRYYMD
                CONTINUE
            ELSE
-               IF      PTBYO-SRYYMD        <   WRK-PARA-SRYYMD
-                   IF      PTBYO-TENKIKBN      =   SPACE
-                       CONTINUE
-                   ELSE
-                       IF      PTBYO-TENKIYMD      >=  WRK-PARA-SRYYMD
-                           CONTINUE
-                       ELSE
-                           GO  TO  200221-BYOMEI-HENSYU2-EXT
-                       END-IF
-                   END-IF
-               ELSE
+      **       IF      PTBYO-SRYYMD        <   WRK-PARA-SRYYMD
+      **           IF      PTBYO-TENKIKBN      =   SPACE
+      **               CONTINUE
+      **           ELSE
+      **               IF      PTBYO-TENKIYMD      >=  WRK-PARA-SRYYMD
+      **                   CONTINUE
+      **               ELSE
+      **                   GO  TO  200221-BYOMEI-HENSYU2-EXT
+      **               END-IF
+      **           END-IF
+      **       ELSE
                    GO  TO  200221-BYOMEI-HENSYU2-EXT
-               END-IF
+      **       END-IF
            END-IF
       *
       *    入外は無視する
