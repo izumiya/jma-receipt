@@ -30,7 +30,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.00    NACL-伊藤    10/ 2/ 8  数字編集小数点見直し
-      *  04.05.00    NACL-伊藤    10/10/26  数字編集小数点見直し
+      *  04.05.00    NACL-伊藤    10/10/26  判定条件見直し
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -515,6 +515,12 @@
                           IF      WRK-M-SRYCD         =   SPACE
                               PERFORM 2002115-SRYKBN-20-SEC
                           END-IF
+                      WHEN     "32"
+                      WHEN     "33"
+      *                   注射
+                          IF      WRK-M-SRYCD         =   SPACE
+                              PERFORM 2002117-SRYKBN-30-SEC
+                          END-IF
                       WHEN     "60"
       *                   検査
                           IF      WRK-S-SRYCD         =   SPACE
@@ -633,6 +639,26 @@
            END-PERFORM
            .
        2002115-SRYKBN-20-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    注射料判定処理
+      *****************************************************************
+       2002117-SRYKBN-30-SEC       SECTION.
+      *
+           PERFORM VARYING     IDY     FROM    1   BY  1
+                   UNTIL      (IDY     >    5)  OR
+                              (SRY-SRYCD (IDY) =   SPACE)
+               EVALUATE    SRY-SRYCD(IDY)
+      *            ラピアクタ
+                   WHEN    "621972101"
+                   WHEN    "621972201"
+                       MOVE    SRY-SRYCD(IDY)      TO  WRK-M-SRYCD
+                       MOVE    5                   TO  IDY
+               END-EVALUATE
+           END-PERFORM
+           .
+       2002117-SRYKBN-30-EXT.
            EXIT.
       *
       *****************************************************************
