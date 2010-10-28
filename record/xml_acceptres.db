@@ -1,7 +1,7 @@
 xml_acceptres {
     object  object;
 	mode	int;
-	appointres {
+	acceptres {
 		Information_Date		varchar(10);
 		Information_Time		varchar(8);
 		Api_Result			varchar(2);
