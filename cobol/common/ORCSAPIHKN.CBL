@@ -1104,6 +1104,10 @@
            MOVE    WRK-SDD             TO  WRK-HEN-DD
            MOVE    "-"                 TO  WRK-HEN-H1
            MOVE    "-"                 TO  WRK-HEN-H2
+           IF      WRK-SYMD            =   "99999999"
+               MOVE    "12"                TO  WRK-HEN-MM
+               MOVE    "31"                TO  WRK-HEN-DD
+           END-IF
            .
        800-DAYHEN01-EXT.
            EXIT.

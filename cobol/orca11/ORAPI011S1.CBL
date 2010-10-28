@@ -327,7 +327,7 @@
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
-           MOVE   "Patient Info"       TO  ACCPTRES-RESKEY
+           MOVE   "Acceptance_Info"    TO  ACCPTRES-RESKEY
            MOVE    MCP-USER            TO  SPA-OPID
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
       *    日付・時間出力編集
@@ -2031,6 +2031,10 @@
            MOVE    WRK-SDD             TO  WRK-HEN-DD
            MOVE    "-"                 TO  WRK-HEN-H1
            MOVE    "-"                 TO  WRK-HEN-H2
+           IF      WRK-SYMD            =   "99999999"
+               MOVE    "12"                TO  WRK-HEN-MM
+               MOVE    "31"                TO  WRK-HEN-DD
+           END-IF
       *
            INITIALIZE                  WRK-HEN-TIME
            MOVE    WRK-THH             TO  WRK-HEN-THH
@@ -2050,6 +2054,10 @@
            MOVE    WRK-HEN-YY          TO  WRK-SYY
            MOVE    WRK-HEN-MM          TO  WRK-SMM
            MOVE    WRK-HEN-DD          TO  WRK-SDD
+           IF      WRK-SYMD            =   "99991231"
+               MOVE    "99"                TO  WRK-SMM
+               MOVE    "99"                TO  WRK-SDD
+           END-IF
       *
            INITIALIZE                  WRK-THMS
            MOVE    WRK-HEN-THH         TO  WRK-THH
