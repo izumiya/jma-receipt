@@ -1,0 +1,34 @@
+xml_acceptreq {
+    object  object;
+	mode	int;
+	acceptreq {
+		Patient_ID			varchar(20);
+		Acceptance_Date		varchar(10);
+		Acceptance_Time		varchar(8);
+		Acceptance_Id			varchar(5);
+		Department_Code			varchar(2);
+		Physician_Code			varchar(5);
+		Medical_Information		varchar(2);
+		HealthInsurance_Information  {
+		InsuranceProvider_Class			varchar(03);
+		InsuranceProvider_Number		varchar(08);
+		InsuranceProvider_WholeName		varchar(20);
+		HealthInsuredPerson_Symbol		varchar(80);
+		HealthInsuredPerson_Number		varchar(80);
+            	HealthInsuredPerson_Continuation	varchar(01);
+            	HealthInsuredPerson_Assistance		varchar(01);
+            	RelationToInsuredPerson			varchar(01);
+            	HealthInsuredPerson_WholeName		varchar(100);
+            	Certificate_StartDate			varchar(10);
+            	Certificate_ExpiredDate			varchar(10);
+            	PublicInsurance_Information   {
+                	PublicInsurance_Class		varchar(03);
+                	PublicInsurance_Name		varchar(20);
+                	PublicInsurer_Number		varchar(08);
+                	PublicInsuredPerson_Number	varchar(20);
+                	Certificate_IssuedDate		varchar(10);
+                	Certificate_ExpiredDate		varchar(10);
+            	} [4];
+        	} ;
+	};
+};
