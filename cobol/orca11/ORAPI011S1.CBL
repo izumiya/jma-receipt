@@ -1379,7 +1379,6 @@
                    IF      (WRK-HKNCOMBI       =   UKE-HKNCOMBI)
                        MOVE    1               TO  FLG-UKETUKE-CHK
                    END-IF
-      *???         PERFORM 49012-UKETIME-CK-SEC
                END-IF
                MOVE    "tbl_uketuke"       TO  MCP-TABLE
                MOVE    "key5"              TO  MCP-PATHNAME
@@ -1391,39 +1390,6 @@
       *
            .
        200221-UKECHEK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    前回受付からの経過時間チェック
-      *****************************************************************
-       49012-UKETIME-CK-SEC        SECTION.
-      *
-           MOVE    WRK-REGIST-TIME     TO  WRK-CK-TIME1
-           MOVE    UKE-UKETIME         TO  WRK-CK-TIME2
-      *
-           IF      WRK-CK-TIME1(3:2)   <   "10"
-             IF    WRK-CK-TIME1(1:2)   <   "01"
-               COMPUTE WRK-CK-HH1      =   WRK-CK-HH1 + 24 - 1
-               COMPUTE WRK-CK-MM1      =   WRK-CK-MM1 + 60 - 10
-             ELSE
-               COMPUTE WRK-CK-HH1      =   WRK-CK-HH1 - 1
-               COMPUTE WRK-CK-MM1      =   WRK-CK-MM1 + 60 - 10
-             ELSE
-               COMPUTE WRK-CK-MM1      =   WRK-CK-MM1 - 10
-           END-IF
-           IF      WRK-CK-TIME1        <   WRK-CK-TIME2
-               MOVE    1               TO  FLG-UKETIME
-               DISPLAY "uke 1   time = " WRK-CK-TIME1
-               DISPLAY "uke 2   time = " WRK-CK-TIME2
-               DISPLAY "10分 経過 していない"
-               MOVE   "98"             TO  ACCPTRES-API-RESULT
-               MOVE   "二重登録疑い"   TO  ACCPTRES-API-RESULT-MSG
-           END-IF
-               DISPLAY "uke 1   time = " WRK-CK-TIME1
-               DISPLAY "uke 2   time = " WRK-CK-TIME2
-      *
-           .
-       49012-UKETIME-CK-EXT.
            EXIT.
       *
       *****************************************************************
