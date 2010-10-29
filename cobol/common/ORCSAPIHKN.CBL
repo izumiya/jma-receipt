@@ -444,7 +444,7 @@
            ELSE
       *        設定内容より決定
                PERFORM 2002-HKNCOMBI-API-SEC
-               IF     (ORCSAPIHKN-ERRCD    =   SPACE  )  AND
+               IF     (ORCSAPIHKN-ERRCD    =   ZERO   )  AND
                       (WRK-HKNCOMBINUM     =   SPACE  )
                    MOVE    3               TO  ORCSAPIHKN-ERRCD
                END-IF
