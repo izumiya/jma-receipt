@@ -2408,11 +2408,6 @@
            MOVE    14                  TO  SPA-GMN-CUR
       *
            MOVE    C50-COMSEL          TO  SPA-GMN-COMSEL
-      *TEST
-           DISPLAY "SPA-GMN-COMSEL:" SPA-GMN-COMSEL
-               ",SPA-GMN-SELNUM(1):" SPA-GMN-SELNUM(1)
-               ",SSPA-COMMENT-MAX:" SPA-COMMENT-MAX
-      *TEST
       *
            IF     (SPA-GMN-COMSEL      >=  1   )  AND
                   (SPA-GMN-COMSEL      <=  SPA-COMMENT-MAX )
@@ -2628,6 +2623,33 @@
       *
            IF      SPA-GMN-PTID        =   ZERO
                MOVE    "0011"              TO  SPA-ERRCD
+               GO      TO      212-TOUROKU-EXT
+           END-IF
+      *    入外区分チェック
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-NYUGAI-MAX
+               IF      SPA-GMN-NYUGAIKBN  =   SPA-GMN-NYUGAIKBN-LST
+                                                           (IDX)(1:1)
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    "0008"              TO  SPA-ERRCD
+               MOVE    12                  TO  SPA-GMN-CUR
+               GO      TO      212-TOUROKU-EXT
+           END-IF
+      *    診療科チェック
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL      IDX      >   SPA-GMN-SRYKAMAX
+               IF      SPA-GMN-SRYKA       =   SPA-GMN-SRYKAL (IDX)
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    "0001"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-GMN-CUR
                GO      TO      212-TOUROKU-EXT
            END-IF
       *
