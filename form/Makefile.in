@@ -474,6 +474,9 @@ FORM_files = \
 	      HCPOM2.red \
 	      HCM04A5.red \
 	      HCM03V04.red \
+	      HCM19V01.red \
+	      HC02V01.red \
+	      HC02QV01.red \
 
 all:   
 
