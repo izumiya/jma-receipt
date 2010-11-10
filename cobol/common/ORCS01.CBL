@@ -316,6 +316,7 @@
       *  04.04.29    NACL-ÌçÏÆ    10/08/23  ¹âÎðÈó³ºÅöÂÐ±þ
       *  04.04.30    NACL-ÌçÏÆ    10/08/27  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.31    NACL-ÌçÏÆ    10/09/02  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.32    NACL-ÌçÏÆ    10/11/09  ÂçÊ¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/16  °ì³çºÆ·×»»ÊýË¡ÁªÂòµ¡Ç½ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/06/22  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
@@ -485,6 +486,7 @@
            03  FLG-FTNRATE100          PIC 9(01).
            03  FLG-KUMAMOTO-CYO        PIC 9(01).
            03  FLG-KOREI-HIGAITO       PIC 9(01).
+           03  FLG-OITA-GENBUTU70      PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -4041,6 +4043,22 @@
                 MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
                 MOVE    "key4"           TO  MCP-PATHNAME
                 PERFORM  DB-CLOSE-SEC
+           END-IF
+      *
+           MOVE    ZERO     TO    FLG-OITA-GENBUTU70
+           IF   (WK-1001-PREFNUM       =   44           )
+           AND  (LNK-SYU-SRYYMD(1:6)  >=  "201010"      )
+           AND  (LNK-SYU-KOH1HKNNUM    =  "183" OR "283")
+             IF  (LNK-SYU-KOH2HKNNUM  = "972" OR "974")
+             OR  (LNK-SYU-KOH3HKNNUM  = "972" OR "974")
+             OR  (LNK-SYU-KOH4HKNNUM  = "972" OR "974")
+                CONTINUE
+             ELSE
+                IF    FLG-GENBUTU70   =  ZERO
+                    MOVE    2     TO    FLG-GENBUTU70
+                    MOVE    1     TO    FLG-OITA-GENBUTU70
+                END-IF
+             END-IF
            END-IF
       *
       *    Åö·î£·£µºÐÅþÃ£¼Ô
@@ -24032,7 +24050,35 @@
              COMPUTE  LNK-SYU-JYO-HKNFTNMONEY  =
                       LNK-SYU-JYO-HKNFTNMONEY  *   10
       *
+             MOVE     ZERO      TO     WK-OITA-CYOFTN-KON
+      *
              IF     FLG-GENBUTU70    NOT =    ZERO
+               IF   LNK-SYU-SRYYMD(1:6) >= "201010"
+                IF  (FLG-IRYOHI70       =    3   OR   4  )
+                AND (LNK-SYU-KOH1HKNNUM =  "183" OR "283")
+                AND (FLG-SYUKEI2        =   ZERO         )
+                AND (FLG-OITA-GENBUTU70 =   1            )
+                  COMPUTE WK-FUTANWARI   = WK-KOH-FTNRATE  /  100
+                  COMPUTE WK-OITA-KEISAN = WK-KOUREI-IRYOHI70
+                                         * WK-FUTANWARI
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  +    5
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  /   10
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  *   10
+                  IF   WK-OITA-KEISAN   >  MAX-KIN-SYU-M
+                    COMPUTE  WK-OITA-CYOFTN-KON  =  WK-OITA-KEISAN
+                                                 -  MAX-KIN-SYU-M
+                    IF  WK-OITA-CYOFTN-KON   >  WK-OITA-CYOFTN
+                       COMPUTE WK-OITA-CYOFTN-KON  = WK-OITA-CYOFTN-KON
+                                                   - WK-OITA-CYOFTN
+                    ELSE
+                       MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
+                    END-IF
+                  END-IF
+                END-IF
+               ELSE
                 IF  (FLG-IRYOHI70       =    3   OR   4  )
                 AND (LNK-SYU-KOH1HKNNUM =  "183" OR "283")
                 AND (FLG-SYUKEI2        =   ZERO         )
@@ -24059,20 +24105,17 @@
                     ELSE
                        MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
                     END-IF
-                  ELSE
-                    MOVE       ZERO    TO    WK-OITA-CYOFTN-KON
                   END-IF
-                ELSE
-                  MOVE         ZERO    TO    WK-OITA-CYOFTN-KON
                 END-IF
-                MOVE           ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
+               END-IF
+               MOVE            ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
              ELSE
-                IF (LNK-SYU-KOH1HKNNUM   = "972" OR "974" ) OR
-                   (LNK-SYU-KOH2HKNNUM   = "972" OR "974" ) OR
-                   (LNK-SYU-KOH3HKNNUM   = "972" OR "974" ) OR
-                   (LNK-SYU-KOH4HKNNUM   = "972" OR "974" )
+                IF ((LNK-SYU-KOH1HKNNUM   = "972" OR "974" ) OR
+                    (LNK-SYU-KOH2HKNNUM   = "972" OR "974" ) OR
+                    (LNK-SYU-KOH3HKNNUM   = "972" OR "974" ) OR
+                    (LNK-SYU-KOH4HKNNUM   = "972" OR "974" ))
+                OR ( LNK-SYU-SRYYMD(1:6) >= "201010"        )
                   MOVE         ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
-                  MOVE         ZERO    TO    WK-OITA-CYOFTN-KON
                 ELSE
                   COMPUTE  WK-OITA-HKNFTNMONEY = WK-OITA-HKNFTNMONEY
                                                + LNK-SYU-JYO-HKNFTNMONEY
@@ -24085,8 +24128,6 @@
                     ELSE
                        MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
                     END-IF
-                  ELSE
-                    MOVE       ZERO    TO    WK-OITA-CYOFTN-KON
                   END-IF
                 END-IF
              END-IF
