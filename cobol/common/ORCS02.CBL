@@ -284,6 +284,7 @@
       *  04.04.30    NACL-門脇    10/08/23  高齢非該当対応
       *  04.04.31    NACL-門脇    10/08/27  秋田県地方公費対応
       *  04.04.32    NACL-門脇    10/09/02  長崎県地方公費対応
+      *  04.04.33    NACL-門脇    10/11/09  大分県地方公費対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -431,6 +432,7 @@
            03  FLG-KOREI-TANYUIN       PIC 9(01).
            03  FLG-KUMAMOTO-CYO        PIC 9(01).
            03  FLG-KOREI-HIGAITO       PIC 9(01).
+           03  FLG-OITA-GENBUTU70      PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -3723,6 +3725,22 @@
                 MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
                 MOVE    "key4"               TO  MCP-PATHNAME
                 PERFORM  DB-CLOSE-SEC
+           END-IF
+      *
+           MOVE    ZERO     TO    FLG-OITA-GENBUTU70
+           IF   (WK-1001-PREFNUM       =   44           )
+           AND  (LNK-SYU-SRYYMD(1:6)  >=  "201010"      )
+           AND  (LNK-SYU-KOH1HKNNUM    =  "183" OR "283")
+             IF  (LNK-SYU-KOH2HKNNUM  = "972" OR "974")
+             OR  (LNK-SYU-KOH3HKNNUM  = "972" OR "974")
+             OR  (LNK-SYU-KOH4HKNNUM  = "972" OR "974")
+                CONTINUE
+             ELSE
+                IF    FLG-GENBUTU70   =  ZERO
+                    MOVE    2     TO    FLG-GENBUTU70
+                    MOVE    1     TO    FLG-OITA-GENBUTU70
+                END-IF
+             END-IF
            END-IF
       *
       *    当月７５歳到達者
@@ -23391,277 +23409,84 @@
            COMPUTE  LNK-SYU-SKYMONEY-LIFE-KEI
                                     = LNK-SYU-SKYMONEY-LIFE
                                     + LNK-SYU-SKYMONEY-LIFE-TAX.
-      *    特定疾患がある方の特例処理
-           IF  ((LNK-SYU-KOH1HKNNUM    =  "051") AND (FLG-HIKAKU = 1))
-           OR  ((LNK-SYU-KOH2HKNNUM    =  "051") AND (FLG-HIKAKU = 2))
-             IF    LNK-SYU-SRYYMD(1:6)   <  "200310"
-               COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                  +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                  +   LNK-SYU-SKYMONEY-LIFE-KEI
-               COMPUTE   WK-FTN   =   WK-FTN     +   5
-               COMPUTE   WK-FTN   =   WK-FTN     /  10
-               COMPUTE   WK-FTN   =   WK-FTN     *  10
-               IF        WK-FTN    >=  14000
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-               END-IF
-             ELSE
-               COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                  +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                  +   LNK-SYU-SKYMONEY-LIFE-KEI
-               COMPUTE   WK-FTN   =   WK-FTN     +   5
-               COMPUTE   WK-FTN   =   WK-FTN     /  10
-               COMPUTE   WK-FTN   =   WK-FTN     *  10
-               IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-               END-IF
-             END-IF
-           END-IF.
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200304"
-               CONTINUE
-           ELSE
-            IF   LNK-SYU-SRYYMD(1:6)   >=  "200604"
+      *
+      ******
+           IF  (LNK-SYU-SRYYMD(1:6)  >= "201101")
+           OR  (FLG-HIKAKU            =  ZERO   )
              CONTINUE
-            ELSE
-      *      更正がある方の特例処理
-             IF ((LNK-SYU-KOH1HKNNUM    =  "015") AND (FLG-HIKAKU = 1))
-             OR ((LNK-SYU-KOH2HKNNUM    =  "015") AND (FLG-HIKAKU = 2))
+           ELSE
+             IF  ((FLG-HIKAKU = 1 OR 2                     ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "051" ))
                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
                COMPUTE   WK-FTN   =   WK-FTN     +   5
                COMPUTE   WK-FTN   =   WK-FTN     /  10
                COMPUTE   WK-FTN   =   WK-FTN     *  10
-               IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
+               IF  ((LNK-SYU-SRYYMD(1:6)   <  "200310"           ) AND
+                    (WK-FTN    >=  14000                         ))
+               OR  ((LNK-SYU-SRYYMD(1:6)   >= "200310"           ) AND
+                    (WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)))
+                COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
+                                           +  LNK-SYU-SKYMONEY-SKJ-KEI
+                                           +  LNK-SYU-SKYMONEY-LIFE-KEI
+                MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
+                                              LNK-SYU-SKYMONEY-SKJ-TAX
+                                              LNK-SYU-SKYMONEY-SKJ-KEI
+                MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
+                                              LNK-SYU-SKYMONEY-LIFE-TAX
+                                              LNK-SYU-SKYMONEY-LIFE-KEI
                END-IF
              END-IF
-      *      育成がある方の特例処理
-             IF ((LNK-SYU-KOH1HKNNUM    =  "016") AND (FLG-HIKAKU = 1))
-             OR ((LNK-SYU-KOH2HKNNUM    =  "016") AND (FLG-HIKAKU = 2))
+             IF  ((FLG-HIKAKU = 1 OR 2                     ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "015"
+                                                  OR "016" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200304"        ) AND
+                  (LNK-SYU-SRYYMD(1:6)  <  "200604"        ))
+             OR  ((FLG-HIKAKU = 1 OR 2                     ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "052" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200504"        ))
+             OR  ((FLG-HIKAKU = 1 OR 2 OR 3 OR 4           ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "151"
+                                                  OR "451" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200310"        ) AND
+                  (WK-1001-PREFNUM    =  13                ))
+             OR  ((FLG-HIKAKU = 1 OR 2 OR 3 OR 4           ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "186" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200310"        ) AND
+                  (WK-1001-PREFNUM    =  28                ))
+             OR  ((FLG-HIKAKU = 1 OR 2 OR 3 OR 4           ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "281" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200702"        ) AND
+                  (WK-1001-PREFNUM    =  07                ))
+             OR  ((FLG-HIKAKU = 1 OR 2 OR 3 OR 4           ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "183" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200810"        ) AND
+                  (WK-1001-PREFNUM    =  01                ))
+             OR  ((FLG-HIKAKU = 1 OR 2 OR 3 OR 4           ) AND
+                  (LNK-SYU-KOH-HKNNUM(FLG-HIKAKU)  = "191" ) AND
+                  (LNK-SYU-SRYYMD(1:6)  >= "200910"        ) AND
+                  (WK-1001-PREFNUM    =  23                ))
                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
-               COMPUTE   WK-FTN   =   WK-FTN     +   5
-               COMPUTE   WK-FTN   =   WK-FTN     /  10
-               COMPUTE   WK-FTN   =   WK-FTN     *  10
-               IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-               END-IF
-             END-IF
-            END-IF
-           END-IF.
-      *
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200310"
-               CONTINUE
-           ELSE
-      *      東京都地方公費１５１がある方の特例処理
-             IF   WK-1001-PREFNUM    =   13
-               IF ((LNK-SYU-KOH1HKNNUM = "151" OR "451") 
-                                              AND (FLG-HIKAKU = 1))
-               OR ((LNK-SYU-KOH2HKNNUM = "151" OR "451")
-                                              AND (FLG-HIKAKU = 2))
-               OR ((LNK-SYU-KOH3HKNNUM = "151" OR "451")
-                                              AND (FLG-HIKAKU = 3))
-               OR ((LNK-SYU-KOH4HKNNUM = "151" OR "451")
-                                              AND (FLG-HIKAKU = 4))
-                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
-                COMPUTE   WK-FTN   =   WK-FTN     +   5
-                COMPUTE   WK-FTN   =   WK-FTN     /  10
-                COMPUTE   WK-FTN   =   WK-FTN     *  10
-                IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-                END-IF
+               COMPUTE   WK-FTN   =   WK-FTN  +   5
+               COMPUTE   WK-FTN   =   WK-FTN  /  10
+               COMPUTE   WK-FTN   =   WK-FTN  *  10
+               IF   WK-FTN   >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
+                COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
+                                           +  LNK-SYU-SKYMONEY-SKJ-KEI
+                                           +  LNK-SYU-SKYMONEY-LIFE-KEI
+                MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
+                                              LNK-SYU-SKYMONEY-SKJ-TAX
+                                              LNK-SYU-SKYMONEY-SKJ-KEI
+                MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
+                                              LNK-SYU-SKYMONEY-LIFE-TAX
+                                              LNK-SYU-SKYMONEY-LIFE-KEI
                END-IF
              END-IF
            END-IF.
-      *
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200310"
-               CONTINUE
-           ELSE
-      *      兵庫県地方公費１８６がある方の特例処理
-             IF   WK-1001-PREFNUM    =   28
-               IF ((LNK-SYU-KOH1HKNNUM = "186") AND (FLG-HIKAKU = 1))
-               OR ((LNK-SYU-KOH2HKNNUM = "186") AND (FLG-HIKAKU = 2))
-               OR ((LNK-SYU-KOH3HKNNUM = "186") AND (FLG-HIKAKU = 3))
-               OR ((LNK-SYU-KOH4HKNNUM = "186") AND (FLG-HIKAKU = 4))
-                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
-                COMPUTE   WK-FTN   =   WK-FTN     +   5
-                COMPUTE   WK-FTN   =   WK-FTN     /  10
-                COMPUTE   WK-FTN   =   WK-FTN     *  10
-                IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-                END-IF
-               END-IF
-             END-IF
-           END-IF.
-      *
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200504"
-               CONTINUE
-           ELSE
-      *      小児特定がある方の特例処理
-             IF ((LNK-SYU-KOH1HKNNUM    =  "052") AND (FLG-HIKAKU = 1))
-             OR ((LNK-SYU-KOH2HKNNUM    =  "052") AND (FLG-HIKAKU = 2))
-               COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                  +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                  +   LNK-SYU-SKYMONEY-LIFE-KEI
-               COMPUTE   WK-FTN   =   WK-FTN     +   5
-               COMPUTE   WK-FTN   =   WK-FTN     /  10
-               COMPUTE   WK-FTN   =   WK-FTN     *  10
-               IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-               END-IF
-             END-IF
-           END-IF.
-      *
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200702"
-               CONTINUE
-           ELSE
-      *      福島県地方公費２８１がある方の特例処理
-             IF   WK-1001-PREFNUM    =   07
-               IF ((LNK-SYU-KOH1HKNNUM = "281") AND (FLG-HIKAKU = 1))
-               OR ((LNK-SYU-KOH2HKNNUM = "281") AND (FLG-HIKAKU = 2))
-               OR ((LNK-SYU-KOH3HKNNUM = "281") AND (FLG-HIKAKU = 3))
-               OR ((LNK-SYU-KOH4HKNNUM = "281") AND (FLG-HIKAKU = 4))
-                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
-                COMPUTE   WK-FTN   =   WK-FTN     +   5
-                COMPUTE   WK-FTN   =   WK-FTN     /  10
-                COMPUTE   WK-FTN   =   WK-FTN     *  10
-                IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-                END-IF
-               END-IF
-             END-IF
-           END-IF.
-      *
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200810"
-               CONTINUE
-           ELSE
-      *      北海道地方公費１８３がある方の特例処理
-             IF   WK-1001-PREFNUM    =   01
-               IF ((LNK-SYU-KOH1HKNNUM = "183") AND (FLG-HIKAKU = 1))
-               OR ((LNK-SYU-KOH2HKNNUM = "183") AND (FLG-HIKAKU = 2))
-               OR ((LNK-SYU-KOH3HKNNUM = "183") AND (FLG-HIKAKU = 3))
-               OR ((LNK-SYU-KOH4HKNNUM = "183") AND (FLG-HIKAKU = 4))
-                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
-                COMPUTE   WK-FTN   =   WK-FTN     +   5
-                COMPUTE   WK-FTN   =   WK-FTN     /  10
-                COMPUTE   WK-FTN   =   WK-FTN     *  10
-                IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-                END-IF
-               END-IF
-             END-IF
-           END-IF.
-      *
-           IF    LNK-SYU-SRYYMD(1:6)   <   "200910"
-               CONTINUE
-           ELSE
-      *      愛知県地方公費１９１がある方の特例処理
-             IF   WK-1001-PREFNUM    =   23
-               IF ((LNK-SYU-KOH1HKNNUM = "191") AND (FLG-HIKAKU = 1))
-               OR ((LNK-SYU-KOH2HKNNUM = "191") AND (FLG-HIKAKU = 2))
-               OR ((LNK-SYU-KOH3HKNNUM = "191") AND (FLG-HIKAKU = 3))
-               OR ((LNK-SYU-KOH4HKNNUM = "191") AND (FLG-HIKAKU = 4))
-                COMPUTE   WK-FTN   =   LNK-SYU-SKYMONEY  
-                                   +   LNK-SYU-SKYMONEY-SKJ-KEI
-                                   +   LNK-SYU-SKYMONEY-LIFE-KEI
-                COMPUTE   WK-FTN   =   WK-FTN     +   5
-                COMPUTE   WK-FTN   =   WK-FTN     /  10
-                COMPUTE   WK-FTN   =   WK-FTN     *  10
-                IF        WK-FTN    >=  WK-TAIHI-NYUJGNGAK(FLG-HIKAKU)
-                 COMPUTE  LNK-SYU-SKYMONEY  =  LNK-SYU-SKYMONEY    
-                                            +  LNK-SYU-SKYMONEY-SKJ-KEI
-                                            +  LNK-SYU-SKYMONEY-LIFE-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-SKJ
-                                               LNK-SYU-SKYMONEY-SKJ-TAX
-                                               LNK-SYU-SKYMONEY-SKJ-KEI
-                 MOVE      ZERO            TO  LNK-SYU-SKYMONEY-LIFE
-                                               LNK-SYU-SKYMONEY-LIFE-TAX
-                                               LNK-SYU-SKYMONEY-LIFE-KEI
-                END-IF
-               END-IF
-             END-IF
-           END-IF.
+      ******
       *
            COMPUTE  LNK-SYU-RYOYOHI-SKJ-JIHI  = WK-SHOKUJI-RYOYOHI95
                                               + WK-SHOKUJI-RYOYOHI96.
@@ -26200,7 +26025,35 @@
              COMPUTE  LNK-SYU-JYO-HKNFTNMONEY  =
                       LNK-SYU-JYO-HKNFTNMONEY  *   10
       *
+             MOVE     ZERO      TO     WK-OITA-CYOFTN-KON
+      *
              IF     FLG-GENBUTU70    NOT =    ZERO
+               IF   LNK-SYU-SRYYMD(1:6) >= "201010"
+                IF  (FLG-IRYOHI70       =    3   OR   4  )
+                AND (LNK-SYU-KOH1HKNNUM =  "183" OR "283")
+                AND (FLG-SYUKEI2        =   ZERO         )
+                AND (FLG-OITA-GENBUTU70 =   1            )
+                  COMPUTE WK-FUTANWARI   = WK-KOH-FTNRATE  /  100
+                  COMPUTE WK-OITA-KEISAN = WK-KOUREI-IRYOHI70
+                                         * WK-FUTANWARI
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  +    5
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  /   10
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  *   10
+                  IF   WK-OITA-KEISAN   >  MAX-KIN-SYU-M
+                    COMPUTE  WK-OITA-CYOFTN-KON  =  WK-OITA-KEISAN
+                                                 -  MAX-KIN-SYU-M
+                    IF  WK-OITA-CYOFTN-KON   >  WK-OITA-CYOFTN
+                       COMPUTE WK-OITA-CYOFTN-KON  = WK-OITA-CYOFTN-KON
+                                                   - WK-OITA-CYOFTN
+                    ELSE
+                       MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
+                    END-IF
+                  END-IF
+                END-IF
+               ELSE
                 IF  (FLG-IRYOHI70       =    3   OR   4  )
                 AND (LNK-SYU-KOH1HKNNUM =  "183" OR "283")
                 AND (FLG-SYUKEI2        =   ZERO         )
@@ -26227,20 +26080,17 @@
                     ELSE
                        MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
                     END-IF
-                  ELSE
-                    MOVE       ZERO    TO    WK-OITA-CYOFTN-KON
                   END-IF
-                ELSE
-                  MOVE         ZERO    TO    WK-OITA-CYOFTN-KON
                 END-IF
-                MOVE           ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
+               END-IF
+               MOVE            ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
              ELSE
-                IF (LNK-SYU-KOH1HKNNUM   = "972" OR "974" ) OR
-                   (LNK-SYU-KOH2HKNNUM   = "972" OR "974" ) OR
-                   (LNK-SYU-KOH3HKNNUM   = "972" OR "974" ) OR
-                   (LNK-SYU-KOH4HKNNUM   = "972" OR "974" )
+                IF ((LNK-SYU-KOH1HKNNUM   = "972" OR "974" ) OR
+                    (LNK-SYU-KOH2HKNNUM   = "972" OR "974" ) OR
+                    (LNK-SYU-KOH3HKNNUM   = "972" OR "974" ) OR
+                    (LNK-SYU-KOH4HKNNUM   = "972" OR "974" ))
+                OR ( LNK-SYU-SRYYMD(1:6) >= "201010"        )
                   MOVE         ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
-                  MOVE         ZERO    TO    WK-OITA-CYOFTN-KON
                 ELSE
                   COMPUTE  WK-OITA-HKNFTNMONEY = WK-OITA-HKNFTNMONEY
                                                + LNK-SYU-JYO-HKNFTNMONEY
@@ -26253,8 +26103,6 @@
                     ELSE
                        MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
                     END-IF
-                  ELSE
-                    MOVE       ZERO    TO    WK-OITA-CYOFTN-KON
                   END-IF
                 END-IF
              END-IF
@@ -26286,6 +26134,7 @@
       *
            IF  (FLG-GENBUTU70       NOT =   ZERO)
            AND (FLG-GENBUTU-TAISYODATA  =    1  )
+           AND (FLG-OITA-GENBUTU70      =   ZERO)
       *
                MOVE      ZERO            TO    FLG-GENBUTU-TAISYOOK
       *
