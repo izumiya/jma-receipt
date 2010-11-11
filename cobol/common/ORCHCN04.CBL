@@ -2182,7 +2182,7 @@
       *
            INITIALIZE                  TBL-DATA-AREA
            MOVE    "95"                TO  TBL-SRYKBN
-           MOVE    ZERO                TO  TBL-KAISU
+           MOVE    1                   TO  TBL-KAISU
            MOVE    "99999999"          TO  TBL-SRYCD  (1)
            MOVE    "联年掐薄瘟极甘砷么驰"
                                        TO  TBL-NAME   (1)
