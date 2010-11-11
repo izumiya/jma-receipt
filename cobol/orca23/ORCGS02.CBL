@@ -4905,8 +4905,7 @@
                                        TO  SYU-DENPNUM
                PERFORM 900-SYUNOU-KEY-SEL-SEC
                IF    ( FLG-SYUNOU      =   ZERO  )
-                   IF    ( SYU-DENPJTIKBN      =   SPACE )
-                     OR  ( SYU-NYUKIN-TOTAL    =   ZERO  )
+                   IF ( SYU-NYUKIN-TOTAL   <=   ZERO  )
                        MOVE    "0002"  TO      SPA-ERRCD
                    END-IF
                    IF    ( SPA-ERRCD   =   SPACE )
@@ -4962,11 +4961,18 @@
            IF      FLG-SYUNOU          =   1
                    CONTINUE
            ELSE
-             IF (SYU-DENPJTIKBN    =       SPACE   )   OR
-                (SYU-NYUKIN-TOTAL  =       ZERO    )
+             IF ( SYU-NYUKIN-TOTAL   <=    ZERO    )
                   MOVE    "0002"     TO    SPA-ERRCD
              ELSE
-                  MOVE    "2"        TO    SYU-DENPJTIKBN
+                 IF    (  SYU-DENPJTIKBN   =       "3" )
+                      CONTINUE
+                 ELSE
+                   IF    ( SYU-SKYMONEY    =   ZERO )
+                       MOVE    SPACE TO    SYU-DENPJTIKBN
+                   ELSE
+                       MOVE    "2"   TO    SYU-DENPJTIKBN
+                   END-IF
+                 END-IF
                   MOVE    SYU-NYUKIN-TOTAL
                                      TO    WRK-SAGAKU
                   MOVE    ZERO       TO    SYU-NYUKIN-TOTAL
