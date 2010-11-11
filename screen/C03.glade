@@ -5,13 +5,9 @@
   <name>C03</name>
   <program_name>C03</program_name>
   <directory></directory>
-  <source_directory>src</source_directory>
   <pixmaps_directory>pixmaps</pixmaps_directory>
-  <language>C</language>
   <gnome_support>True</gnome_support>
   <gtkpanda_support>False</gtkpanda_support>
-  <gettext_support>True</gettext_support>
-  <output_main_file>False</output_main_file>
 </project>
 
 <widget>
@@ -29,7 +25,7 @@
     <handler>set_focus</handler>
     <last_modification_time>Fri, 05 Jan 2001 11:20:35 GMT</last_modification_time>
   </signal>
-  <signal>    
+  <signal>
     <name>delete_event</name>
     <handler>gtk_true</handler>
     <last_modification_time>Mon, 25 Nov 2002 06:01:39 GMT</last_modification_time>
@@ -631,7 +627,6 @@
       <xim_enabled>False</xim_enabled>
     </widget>
 
-
     <widget>
       <class>GtkScrolledWindow</class>
       <name>SCR_ACTLST</name>
@@ -1062,7 +1057,9 @@
       <case_sensitive>False</case_sensitive>
       <use_arrows>True</use_arrows>
       <use_arrows_always>False</use_arrows_always>
-      <items>0  病名</items>
+      <items>0  病名
+</items>
+
       <widget>
 	<class>GtkPandaEntry</class>
 	<child_name>GtkPandaCombo:entry</child_name>
@@ -1087,22 +1084,6 @@
 	<input_mode>XIM</input_mode>
 	<xim_enabled>False</xim_enabled>
       </widget>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label584</name>
-      <x>408</x>
-      <y>500</y>
-      <width>56</width>
-      <height>24</height>
-      <label>分類名</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
     </widget>
 
     <widget>
@@ -1149,95 +1130,15 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label585</name>
+      <name>label476</name>
       <x>280</x>
-      <y>672</y>
-      <width>72</width>
+      <y>432</y>
+      <width>64</width>
       <height>24</height>
-      <label>表示連番</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
+      <label>病名番号</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label481</name>
-      <x>280</x>
-      <y>640</y>
-      <width>80</width>
-      <height>24</height>
-      <label>疑    い</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label582</name>
-      <x>280</x>
-      <y>608</y>
-      <width>80</width>
-      <height>24</height>
-      <label>カルテ病名</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label502</name>
-      <x>280</x>
-      <y>572</y>
-      <width>72</width>
-      <height>24</height>
-      <label>病    名    </label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label526</name>
-      <x>280</x>
-      <y>536</y>
-      <width>72</width>
-      <height>24</height>
-      <label>病名コード</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label583</name>
-      <x>280</x>
-      <y>500</y>
-      <width>80</width>
-      <height>24</height>
-      <label>分類コード</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
+      <xalign>7.45058e-09</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>
@@ -1251,25 +1152,9 @@
       <width>92</width>
       <height>24</height>
       <label>入力コード</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
+      <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label476</name>
-      <x>280</x>
-      <y>432</y>
-      <width>64</width>
-      <height>24</height>
-      <label>病名番号  </label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
+      <xalign>7.45058e-09</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>
@@ -1283,9 +1168,105 @@
       <width>60</width>
       <height>24</height>
       <label>病名種別</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
+      <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>True</wrap>
-      <xalign>0.5</xalign>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label583</name>
+      <x>280</x>
+      <y>500</y>
+      <width>80</width>
+      <height>24</height>
+      <label>分類コード</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label584</name>
+      <x>408</x>
+      <y>500</y>
+      <width>56</width>
+      <height>24</height>
+      <label>分類名</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label526</name>
+      <x>280</x>
+      <y>536</y>
+      <width>72</width>
+      <height>24</height>
+      <label>病名コード</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label502</name>
+      <x>280</x>
+      <y>572</y>
+      <width>72</width>
+      <height>24</height>
+      <label>病    名</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label582</name>
+      <x>280</x>
+      <y>608</y>
+      <width>80</width>
+      <height>24</height>
+      <label>カルテ病名</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label481</name>
+      <x>280</x>
+      <y>640</y>
+      <width>80</width>
+      <height>24</height>
+      <label>疑    い</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>
@@ -1299,9 +1280,9 @@
       <width>64</width>
       <height>24</height>
       <label>疾患区分</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
+      <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>True</wrap>
-      <xalign>0.5</xalign>
+      <xalign>7.45058e-09</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>
@@ -1315,9 +1296,25 @@
       <width>64</width>
       <height>24</height>
       <label>保険病名</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
+      <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>True</wrap>
-      <xalign>0.5</xalign>
+      <xalign>7.45058e-09</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label585</name>
+      <x>280</x>
+      <y>672</y>
+      <width>72</width>
+      <height>24</height>
+      <label>表示連番</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>True</wrap>
+      <xalign>7.45058e-09</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>
