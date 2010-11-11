@@ -43,7 +43,7 @@
       *    処理対象患者ソートファイル(順編成）
            SELECT  BG00501SEQ-FILE ASSIGN  ORCBG00501PARA
                                    ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
+                                   ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  BG00501SEQ-SRT-G
                                    FILE    STATUS  IS  STS-BG00501SEQ.
       *
@@ -410,7 +410,10 @@ grpsys*DD  MOVE    LNK-PRTKANRI-TERMID TO  RECEERR-TERMID
       *
            PERFORM UNTIL ( FLG-PTNYUINRRK  NOT =   ZERO )
       *
-               PERFORM 1201-BG00501-HEN-SEC
+               PERFORM 900-PTINF-KEY-SEL-SEC
+               IF    ( PTINF-TSTPTNUMKBN   NOT =   "1" )
+                   PERFORM 1201-BG00501-HEN-SEC
+               END-IF
       *
                MOVE    "tbl_ptnyuinrrk" TO MCP-TABLE
                MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
@@ -862,24 +865,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTNUM-HOSPNUM
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-      *    患者情報読み込み
-           INITIALIZE                  PTINF-REC
-grpsys*DD  MOVE    PTNYUINRRK-HOSPID   TO  PTINF-HOSPID
-grpsys     MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
-           MOVE    PTNYUINRRK-PTID     TO  PTINF-PTID
-           MOVE    PTINF-REC       TO  MCPDATA-REC
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      NOT =   ZERO )
-               INITIALIZE                  PTINF-REC
-           ELSE
-               MOVE    MCPDATA-REC     TO  PTINF-REC
-           END-IF
-      *
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+           PERFORM 900-PTINF-KEY-SEL-SEC
       *
       *    患者番号
            MOVE    PTNUM-PTNUM     TO  WRK-HCMG005-PTNUM
@@ -1117,6 +1103,32 @@ grpsys                                 SPA-AREA
       *
            .
        900-BG00501SEQ-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者情報検索処理
+      *****************************************************************
+       900-PTINF-KEY-SEL-SEC           SECTION.
+      *
+      *    患者情報読み込み
+           INITIALIZE                      PTINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  PTINF-PTID
+           MOVE    PTINF-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      NOT =   ZERO )
+               INITIALIZE                  PTINF-REC
+           ELSE
+               MOVE    MCPDATA-REC     TO  PTINF-REC
+           END-IF
+      *
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTINF-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)
