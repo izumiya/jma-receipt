@@ -66,6 +66,7 @@
       * 04.03.00     NACL=Â¿¡¹Ç¼  08/07/17  ºßÂðËö´ü°åÎÅÁí¹ç¿ÇÎÅÎÁÊ£¿ô²ó¿ô²Ä
       * 04.03.00     NACL=Â¿¡¹Ç¼  08/08/07  Ï«ºÒ½é¿ÇÎÁ£È£²£°Ç¯£´·î²þÀµÂÐ±þÂ¾
       * 04.05.00     NACL-Â¿¡¹Ç¼  10/03/XX  £È£²£²Ç¯£´·î²þÀµÂÐ±þ
+      * 04.05.00     NACL-Â¿¡¹Ç¼  10/11/12  Æ±Æü½é¿ÇÎÁÂ¾²Ê¤Ê¤·»»ÄêÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -192,6 +193,9 @@
       *
            03  IDX-SN               PIC 9(04).
       *
+           03  IDX-SN               PIC 9(04).
+      *
+           03  IDX-TAH                 PIC 9(04).
       *    °ì»þÎÎ°è
        01  WRK-AREA.
            03  WRK-SYMD.
@@ -4554,6 +4558,11 @@
                        MOVE    "2067"          TO  SPA-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR
                                                        (IDX-SINSATU2)
+      *!!
+      *                Â¾ÊÝ¸±¤Î»»Äê¤¬¤¢¤ì¤Ð¡¢·Ù¹ð
+                       IF    SPA-TA-HKNCOMBI-AREA  NOT =   ZERO
+                           PERFORM 20015-DOUJI-TAHKN-SEC
+                       END-IF
                    END-IF
                ELSE
                    IF     (SPA-SYORIFLG        =   ZERO     ) AND
@@ -4594,6 +4603,37 @@
       *
            .
        20015-DOUJIT-TAKACHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    Â¾ÊÝ¸±¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       20015-DOUJI-TAHKN-SEC               SECTION.
+      *
+           PERFORM VARYING     IDX-TAH     FROM   1   BY  1
+                   UNTIL      (IDX-TAH         >   10  )  OR
+                              (SPA-TA-HKNCOMBI (IDX-TAH)   =   ZERO )
+               IF      (SPA-TA-HKNCOMBI (IDX-TAH)  =   SPA-HKNCOMBINUM
+                                                   OR  WRK-COM-HKNCOMBI
+                                                            (IDX-Z))
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  SPA-ERRCD
+                   MOVE    SPACE           TO  WRK-COM-CUR
+                                                       (IDX-SINSATU2)
+                   IF     (WRK-COM-KZMFLG (IDX-SINSATU2)
+                                                   =   SPACE )  AND
+                          (LNK-ORCSC-KEI-IDX   =   ZERO )
+                       MOVE    IDX-KEI         TO  LNK-ORCSC-KEI-IDX
+                       MOVE    "K267"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SINSATU2)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX-SINSATU2)
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       20015-DOUJI-TAHKN-EXT.
            EXIT.
       *****************************************************************
       *    ½ÅÊ£¥Á¥§¥Ã¥¯½èÍý
