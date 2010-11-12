@@ -72,6 +72,7 @@
       *  04.04.08    NACL-ÌçÏÆ    10/04/14  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¹ÔÅÄ»Ô¡Ë
       *  04.04.09    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.10    NACL-ÌçÏÆ    10/09/14  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.11    NACL-ÌçÏÆ    10/11/12  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -403,6 +404,11 @@
                    IF  (LNK-FTNJGNCHK-PREFNUM      =     40        )
                    AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                    AND (HKN-HON-NYUDJGNGAK     NOT = ZERO          )
+                      MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     42     )
+                   AND (LNK-FTNJGNCHK-KOHNUM       =    "182"   )
+                   AND (LNK-FTNJGNCHK-SRYYM       >= "201012"   )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
                    MOVE   HKN-HON-NYUKFTNRATE    TO  WRK-KOHFTN-RITU
@@ -1151,6 +1157,7 @@
            IF  (LNK-FTNJGNCHK-PREFNUM    =  42     )
            AND (LNK-FTNJGNCHK-KOHNUM     = "180"   )
            AND (LNK-FTNJGNCHK-SRYYM     >= "200704")
+           AND (LNK-FTNJGNCHK-SRYYM     <= "201011")
                IF   WRK-HKNMST-JGNGAK  >  WRK-KOHFTN
                  IF   (WRK-KOHFTN9-H     =  WRK-KOHFTN-H) OR
                       (WRK-KOHFTN9-X     =  WRK-KOHFTN  )
