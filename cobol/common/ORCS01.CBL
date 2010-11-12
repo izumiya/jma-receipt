@@ -317,6 +317,7 @@
       *  04.04.30    NACL-ÌçÏÆ    10/08/27  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.31    NACL-ÌçÏÆ    10/09/02  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.32    NACL-ÌçÏÆ    10/11/09  ÂçÊ¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.33    NACL-ÌçÏÆ    10/11/12  ¿À¸Í»ÔÃÏÊý¸øÈñÀéÍÕ¸©ÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/16  °ì³çºÆ·×»»ÊýË¡ÁªÂòµ¡Ç½ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/06/22  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
@@ -8127,7 +8128,7 @@
                               END-IF
                             END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM =  28 OR 27              )
+                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12        )
                         AND (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
                           IF   COMB-KOH2HKNNUM =  "100" OR "200"
@@ -8441,7 +8442,7 @@
                               END-IF
                             END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM =  28 OR 27              )
+                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12        )
                         AND (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
                           IF   COMB-KOH3HKNNUM =  "100" OR "200"
