@@ -1190,6 +1190,13 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K267"
+                   STRING  "警告！！"
+                           "初診・再診と同日初診の診療科が同じです。"
+                           "保険を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "2070"
                    STRING  "診察料を削除後、算定してください。"
                                                DELIMITED  BY  SIZE

@@ -192,6 +192,8 @@
       *
            03  IDX-SN               PIC 9(04).
       *
+           03  IDX-TAH                 PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-SYMD.
@@ -4552,6 +4554,11 @@
                        MOVE    "2067"          TO  SPA-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR
                                                        (IDX-SINSATU2)
+      *!!
+      *                他保険の算定があれば、警告
+                       IF    SPA-TA-HKNCOMBI-AREA  NOT =   ZERO
+                           PERFORM 20015-DOUJI-TAHKN-SEC
+                       END-IF
                    END-IF
                ELSE
                    IF     (SPA-SYORIFLG        =   ZERO     ) AND
@@ -4592,6 +4599,37 @@
       *
            .
        20015-DOUJIT-TAKACHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    他保険チェック処理
+      *****************************************************************
+       20015-DOUJI-TAHKN-SEC               SECTION.
+      *
+           PERFORM VARYING     IDX-TAH     FROM   1   BY  1
+                   UNTIL      (IDX-TAH         >   10  )  OR
+                              (SPA-TA-HKNCOMBI (IDX-TAH)   =   ZERO )
+               IF      (SPA-TA-HKNCOMBI (IDX-TAH)  =   SPA-HKNCOMBINUM
+                                                   OR  WRK-COM-HKNCOMBI
+                                                            (IDX-Z))
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  SPA-ERRCD
+                   MOVE    SPACE           TO  WRK-COM-CUR
+                                                       (IDX-SINSATU2)
+                   IF     (WRK-COM-KZMFLG (IDX-SINSATU2)
+                                                   =   SPACE )  AND
+                          (LNK-ORCSC-KEI-IDX   =   ZERO )
+                       MOVE    IDX-KEI         TO  LNK-ORCSC-KEI-IDX
+                       MOVE    "K267"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SINSATU2)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX-SINSATU2)
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       20015-DOUJI-TAHKN-EXT.
            EXIT.
       *****************************************************************
       *    重複チェック処理
