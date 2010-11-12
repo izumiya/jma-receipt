@@ -746,7 +746,7 @@
                                    TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                    TO  SPRT-PRIORITY
-           MOVE    "HCML12"        TO  SPRT-PRTID
+           MOVE    "HCML01.red"    TO  SPRT-PRTID
            MOVE    "点数マスタ一覧表・薬剤分類区分"
                                    TO  SPRT-TITLE
            MOVE    HCML01          TO  SPRT-PRTDATA
