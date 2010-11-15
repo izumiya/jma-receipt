@@ -81,6 +81,7 @@
       *  04.04.11    NACL-門脇    10/05/21  生保まとめ分点欄記載対応
       *  04.04.12    NACL-藤原    10/08/23  後期高齢非該当対応
       *                                     （高齢受給者票がない場合） 
+      *  04.04.13    NACL-門脇    10/11/15  宮城県地方公費対応
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/06/11  病棟別出力対応
@@ -5791,7 +5792,8 @@
            ELSE
                IF      RECE62-FUKUSHIFLG-SKJ(1)   =    "1"
                  IF   (SYS-1001-PREFNUM  =  04                    )
-                 AND  (RECE62-KOHNUM(1)  = "183" OR "383" OR "483")
+                 AND  (RECE62-KOHNUM(1)  = "183" OR "383" OR "483"
+                                        OR "583" OR "683" OR "783")
                      MOVE    RECE62-SHOKUJINISSU (IDX2)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -5904,7 +5906,8 @@
            ELSE
                IF      RECE62-FUKUSHIFLG-SKJ(2)   =    "1"
                  IF   (SYS-1001-PREFNUM  =  04                    )
-                 AND  (RECE62-KOHNUM(2)  = "183" OR "383" OR "483")
+                 AND  (RECE62-KOHNUM(2)  = "183" OR "383" OR "483"
+                                        OR "583" OR "683" OR "783")
                      MOVE    RECE62-SHOKUJINISSU (IDX3)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -6026,8 +6029,8 @@
                    IF      RECE62-FUKUSHIFLG-SKJ (3)
                                                =   "1"
                        IF   (SYS-1001-PREFNUM      =   04              )
-                       AND  (RECE62-KOHNUM(3)      =   "183"   OR
-                                                       "383"   OR "483")
+                       AND  (RECE62-KOHNUM(3) = "183" OR "383" OR "483"
+                                             OR "583" OR "683" OR "783")
                            MOVE    RECE62-SHOKUJINISSU (IDX4)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO
@@ -6153,8 +6156,8 @@
                    IF      RECE62-FUKUSHIFLG-SKJ (4)
                                                =   "1"
                        IF   (SYS-1001-PREFNUM      =   04              )
-                       AND  (RECE62-KOHNUM(4)      =   "183"   OR
-                                                       "383"   OR "483")
+                       AND  (RECE62-KOHNUM(4) = "183" OR "383" OR "483"
+                                             OR "583" OR "683" OR "783")
                            MOVE    RECE62-SHOKUJINISSU (IDX5)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO
