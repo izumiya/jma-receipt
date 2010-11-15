@@ -454,6 +454,7 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.04.64    NACL-ÌçÏÆ    10/09/09  Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
       *                                     ½¤Àµ
+      *  04.04.65    NACL-ÌçÏÆ    10/11/15  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13500,6 +13501,14 @@
                                 "8304079"                   ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (RECE62-SRYYM         >=  "200610"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                                   "583" OR "683" OR "783"  ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304017" OR "8304028" OR
+                                "8304079"                   ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "201010"      ))
                    MOVE       1      TO    FLG-MIYAGI
                 END-IF
       ****

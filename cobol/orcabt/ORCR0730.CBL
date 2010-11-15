@@ -96,6 +96,7 @@
       *                                     £²£°£±£°Ç¯£··î¡Á£²£°£±£°Ç¯£±£²·îÂÐ¾Ý 
       *  04.04.17    NACL-Æ£¸¶    10/08/23  ¸å´ü¹âÎðÈó³ºÅöÂÐ±þ
       *                                     ¡Ê¹âÎð¼õµë¼ÔÉ¼¤¬¤Ê¤¤¾ì¹ç¡Ë 
+      *  04.04.18    NACL-ÌçÏÆ    10/11/15  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5758,7 +5759,8 @@
            ELSE
                IF      RECE62-FUKUSHIFLG-SKJ(1)   =    "1"
                  IF   (SYS-1001-PREFNUM  =  04                    )
-                 AND  (RECE62-KOHNUM(1)  = "183" OR "383" OR "483")
+                 AND  (RECE62-KOHNUM(1)  = "183" OR "383" OR "483"
+                                        OR "583" OR "683" OR "783")
                      MOVE    RECE62-SHOKUJINISSU (IDX2)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -5871,7 +5873,8 @@
            ELSE
                IF      RECE62-FUKUSHIFLG-SKJ(2)   =    "1"
                  IF   (SYS-1001-PREFNUM  =  04                    )
-                 AND  (RECE62-KOHNUM(2)  = "183" OR "383" OR "483")
+                 AND  (RECE62-KOHNUM(2)  = "183" OR "383" OR "483"
+                                        OR "583" OR "683" OR "783")
                      MOVE    RECE62-SHOKUJINISSU (IDX3)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -5993,8 +5996,8 @@
                    IF      RECE62-FUKUSHIFLG-SKJ (3)
                                                =   "1"
                        IF   (SYS-1001-PREFNUM      =   04              )
-                       AND  (RECE62-KOHNUM(3)      =   "183"   OR
-                                                       "383"   OR "483")
+                       AND  (RECE62-KOHNUM(3) = "183" OR "383" OR "483"
+                                             OR "583" OR "683" OR "783")
                            MOVE    RECE62-SHOKUJINISSU (IDX4)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO
@@ -6120,8 +6123,8 @@
                    IF      RECE62-FUKUSHIFLG-SKJ (4)
                                                =   "1"
                        IF   (SYS-1001-PREFNUM      =   04              )
-                       AND  (RECE62-KOHNUM(4)      =   "183"   OR
-                                                       "383"   OR "483")
+                       AND  (RECE62-KOHNUM(4) = "183" OR "383" OR "483"
+                                             OR "583" OR "683" OR "783")
                            MOVE    RECE62-SHOKUJINISSU (IDX5)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO

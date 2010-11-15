@@ -286,6 +286,7 @@
       *  04.04.32    NACL-ÌçÏÆ    10/09/02  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.33    NACL-ÌçÏÆ    10/11/09  ÂçÊ¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.34    NACL-ÌçÏÆ    10/11/12  ¿À¸Í»ÔÃÏÊý¸øÈñÀéÍÕ¸©ÂÐ±þ
+      *  04.04.35    NACL-ÌçÏÆ    10/11/15  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3729,9 +3730,13 @@
            END-IF
       *
            MOVE    ZERO     TO    FLG-OITA-GENBUTU70
-           IF   (WK-1001-PREFNUM       =   44           )
-           AND  (LNK-SYU-SRYYMD(1:6)  >=  "201010"      )
-           AND  (LNK-SYU-KOH1HKNNUM    =  "183" OR "283")
+           IF  ((WK-1001-PREFNUM       =   44           ) AND
+                (LNK-SYU-SRYYMD(1:6)  >=  "201010"      ) AND
+                (LNK-SYU-KOH1HKNNUM    =  "183" OR "283"))
+           OR  ((WK-1001-PREFNUM       =   04           ) AND
+                (LNK-SYU-SRYYMD(1:6)  >=  "201010"      ) AND
+                (LNK-SYU-KOH1HKNNUM    =  "583" OR "683"
+                                                OR "783"))
              IF  (LNK-SYU-KOH2HKNNUM  = "972" OR "974")
              OR  (LNK-SYU-KOH3HKNNUM  = "972" OR "974")
              OR  (LNK-SYU-KOH4HKNNUM  = "972" OR "974")
@@ -9777,6 +9782,20 @@
                 END-IF
       *
            END-IF.
+           IF  (WK-1001-PREFNUM          =  04      ) AND
+               (LNK-SYU-SRYYMD(1:6)     >= "201010" )
+      *
+                IF (SYU-KOH1HKNNUM  = "583" OR "683" OR "783")
+                OR (SYU-KOH2HKNNUM  = "583" OR "683" OR "783")
+                OR (SYU-KOH3HKNNUM  = "583" OR "683" OR "783")
+                OR (SYU-KOH4HKNNUM  = "583" OR "683" OR "783")
+                  COMPUTE   SYU-KOH-FTN         =  SYU-KOH-FTN
+                                                -  SYU-JYO-COMPFTN
+                  COMPUTE   SYU-KOH-FTN-ENTANI  =  SYU-KOH-FTN-ENTANI
+                                                -  SYU-JYO-COMPFTN
+                END-IF
+      *
+           END-IF.
       *
            IF  (WK-1001-PREFNUM          =  43      ) AND
                (LNK-SYU-SRYYMD(1:6)     >= "200912" )
@@ -10361,9 +10380,13 @@
                       END-IF
                  END-IF
       *
-                 IF  (WK-1001-PREFNUM          =  44      ) AND
+                 IF ((WK-1001-PREFNUM          =  44      ) AND
                      (LNK-SYU-KOH1HKNNUM  = "183" OR "283") AND
-                     (LNK-SYU-SRYYMD(1:6)     >= "200610" )
+                     (LNK-SYU-SRYYMD(1:6)     >= "200610" ))
+                 OR ((WK-1001-PREFNUM          =  04      ) AND
+                     (LNK-SYU-KOH1HKNNUM  = "583" OR "683"
+                                                  OR "783") AND
+                     (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                     IF    LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
                                              OR  SYU-KOH2HKNNUM
                                              OR  SYU-KOH3HKNNUM
@@ -11192,9 +11215,13 @@
                       END-IF
                  END-IF
       *
-                 IF  (WK-1001-PREFNUM          =  44      ) AND
+                 IF ((WK-1001-PREFNUM          =  44      ) AND
                      (LNK-SYU-KOH2HKNNUM  = "183" OR "283") AND
-                     (LNK-SYU-SRYYMD(1:6)     >= "200610" )
+                     (LNK-SYU-SRYYMD(1:6)     >= "200610" ))
+                 OR ((WK-1001-PREFNUM          =  04      ) AND
+                     (LNK-SYU-KOH2HKNNUM  = "583" OR "683"
+                                                  OR "783") AND
+                     (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                     IF    LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
                                              OR  SYU-KOH2HKNNUM
                                              OR  SYU-KOH3HKNNUM
@@ -11874,9 +11901,13 @@
                       END-IF
                  END-IF
       *
-                 IF  (WK-1001-PREFNUM          =  44      ) AND
+                 IF ((WK-1001-PREFNUM          =  44      ) AND
                      (LNK-SYU-KOH3HKNNUM  = "183" OR "283") AND
-                     (LNK-SYU-SRYYMD(1:6)     >= "200610" )
+                     (LNK-SYU-SRYYMD(1:6)     >= "200610" ))
+                 OR ((WK-1001-PREFNUM          =  04      ) AND
+                     (LNK-SYU-KOH3HKNNUM  = "583" OR "683"
+                                                  OR "783") AND
+                     (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                     IF    LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
                                              OR  SYU-KOH2HKNNUM
                                              OR  SYU-KOH3HKNNUM
@@ -12471,9 +12502,13 @@
                       END-IF
                  END-IF
       *
-                 IF  (WK-1001-PREFNUM          =  44      ) AND
+                 IF ((WK-1001-PREFNUM          =  44      ) AND
                      (LNK-SYU-KOH4HKNNUM  = "183" OR "283") AND
-                     (LNK-SYU-SRYYMD(1:6)     >= "200610" )
+                     (LNK-SYU-SRYYMD(1:6)     >= "200610" ))
+                 OR ((WK-1001-PREFNUM          =  04      ) AND
+                     (LNK-SYU-KOH4HKNNUM  = "583" OR "683"
+                                                  OR "783") AND
+                     (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                     IF    LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
                                              OR  SYU-KOH2HKNNUM
                                              OR  SYU-KOH3HKNNUM
@@ -18916,10 +18951,14 @@
                 PERFORM  DB-CLOSE-SEC
       *
            END-IF.
-           IF     (WK-1001-PREFNUM         =  04           ) AND
+           IF    ((WK-1001-PREFNUM         =  04           ) AND
                   (COMB-KOHHKNNUM(KOH-IDX) = "183" OR "383" 
                                                    OR "483") AND
-                  (LNK-SYU-SRYYMD(1:6)    >= "200610"      )
+                  (LNK-SYU-SRYYMD(1:6)    >= "200610"      ))
+           OR    ((WK-1001-PREFNUM         =  04           ) AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "583" OR "683" 
+                                                   OR "783") AND
+                  (LNK-SYU-SRYYMD(1:6)    >= "201010"      ))
       *
                 INITIALIZE                       PTKOHINF-REC
                 MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
@@ -25996,6 +26035,7 @@
       *
       ******************************************************************
       *        ÂçÊ¬¸©ÆýÍÄ»ùÆÃ¼ì·×»»
+      *        µÜ¾ë¸©ÆýÍÄ»ùÆÃ¼ì·×»»
       ******************************************************************
        23095-OITA-TOKUSYU-KEISAN-SEC         SECTION.
       *
@@ -26098,6 +26138,60 @@
                   IF       WK-OITA-HKNFTNMONEY > 80100
                     COMPUTE  WK-OITA-CYOFTN-KON  =  WK-OITA-HKNFTNMONEY
                                                  -  80100
+                    IF  WK-OITA-CYOFTN-KON   >  WK-OITA-CYOFTN
+                       COMPUTE WK-OITA-CYOFTN-KON  = WK-OITA-CYOFTN-KON
+                                                   - WK-OITA-CYOFTN
+                    ELSE
+                       MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
+                    END-IF
+                  END-IF
+                END-IF
+             END-IF
+      *
+             MOVE    WK-OITA-CYOFTN-KON  TO  LNK-SYU-JYO-COMPFTN
+      *
+      *      ÀÁµá³Û¤Ë²Ã»»
+             COMPUTE  LNK-SYU-SKYMONEY  =
+                      LNK-SYU-SKYMONEY  +    5
+             COMPUTE  LNK-SYU-SKYMONEY  =
+                      LNK-SYU-SKYMONEY  /   10
+             COMPUTE  LNK-SYU-SKYMONEY  =
+                      LNK-SYU-SKYMONEY  *   10
+             ADD     WK-OITA-CYOFTN-KON  TO  LNK-SYU-SKYMONEY
+                                             WK-KNJFTNKIN-ENTANI
+             MOVE    1                   TO  FLG-KOUGAKUCYO-OITA
+      *
+           END-IF
+      *
+      *****
+      *
+           IF  (WK-1001-PREFNUM             =  04      )
+           AND (LNK-SYU-SRYYMD(1:6)        >= "201010" )
+           AND ((LNK-SYU-KOH1HKNNUM   = "583" OR "683" OR "783") OR
+                (LNK-SYU-KOH2HKNNUM   = "583" OR "683" OR "783") OR
+                (LNK-SYU-KOH3HKNNUM   = "583" OR "683" OR "783") OR
+                (LNK-SYU-KOH4HKNNUM   = "583" OR "683" OR "783"))
+      *
+             MOVE     ZERO      TO     WK-OITA-CYOFTN-KON
+      *
+             IF     FLG-GENBUTU70    NOT =    ZERO
+                IF  (FLG-IRYOHI70       =    3   OR   4  )
+                AND (LNK-SYU-KOH1HKNNUM =  "583" OR "683"
+                                                 OR "783")
+                AND (FLG-SYUKEI2        =   ZERO         )
+                AND (FLG-OITA-GENBUTU70 =   1            )
+                  COMPUTE WK-FUTANWARI   = WK-KOH-FTNRATE  /  100
+                  COMPUTE WK-OITA-KEISAN = WK-KOUREI-IRYOHI70
+                                         * WK-FUTANWARI
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  +    5
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  /   10
+                  COMPUTE  WK-OITA-KEISAN  =
+                           WK-OITA-KEISAN  *   10
+                  IF   WK-OITA-KEISAN   >  MAX-KIN-SYU-M
+                    COMPUTE  WK-OITA-CYOFTN-KON  =  WK-OITA-KEISAN
+                                                 -  MAX-KIN-SYU-M
                     IF  WK-OITA-CYOFTN-KON   >  WK-OITA-CYOFTN
                        COMPUTE WK-OITA-CYOFTN-KON  = WK-OITA-CYOFTN-KON
                                                    - WK-OITA-CYOFTN
