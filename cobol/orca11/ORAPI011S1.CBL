@@ -121,6 +121,8 @@
            03  WRK-MCP-PATHNAME        PIC X(62).
            03  WRK-MCP-WINDOW          PIC X(62).
       *
+           03  WRK-OPID                PIC X(16).
+      *
            03  WRK-TIME                PIC X(06).
            03  WRK-CK-TIME1.
              05  WRK-CK-HH1            PIC 9(02).
@@ -328,6 +330,11 @@
                                        ORCSMCNDATEAREA
       *
            MOVE   "Acceptance_Info"    TO  ACCPTRES-RESKEY
+      *
+           STRING  "A+"
+                   MCP-USER            DELIMITED  BY  SIZE
+                                       INTO    WRK-OPID
+           END-STRING
            MOVE    MCP-USER            TO  SPA-OPID
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
       *    日付・時間出力編集
@@ -1252,7 +1259,7 @@
                MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
                MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
       *
-               MOVE    SPA-OPID            TO  UKE-OPID
+               MOVE    WRK-OPID            TO  UKE-OPID
       *
                MOVE    UKETUKE-REC         TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -1298,7 +1305,7 @@
            MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
            MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
       *
-           MOVE    SPA-OPID            TO  UKE-OPID
+           MOVE    WRK-OPID            TO  UKE-OPID
       *
            MOVE    UKETUKE-REC         TO  WRK-UKETUKE-REC
       *    受付ＩＤ登録チェック
