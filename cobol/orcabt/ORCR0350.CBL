@@ -308,6 +308,9 @@
       *  04.05.21    NACL-Æ£¸¶    10/08/11  ¡ÖÊ¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«¡×ÂÐ±þ
       *                                     ¹­Åç¸©¡¦»³¸ý¸©
       *                                     £²£°£±£°Ç¯£··î¡Á£²£°£±£°Ç¯£±£²·îÂÐ¾Ý 
+      *  04.05.22    NACL-Æ£¸¶    10/11/16  ¡Ö¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«¡×ÂÐ±þ
+      *                                     ¼¯»ùÅç¸©
+      *                                     £²£°£±£°Ç¯£±£°·î¡Á£²£°£±£±Ç¯£³·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8248,68 +8251,10 @@
                                    MOVE    1           TO  FLG-READ
                                END-IF
                            ELSE
-      *                        ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
-                               IF    ( SYS-1001-PREFNUM    =   "15"   )
-                               AND   ( RECE62-SRYYM        >=  200709 )
-                               AND   ( RECE62-SRYYM        <=  200712 )
-                                   IF      RECE62-RJNGAIKOHFTN (1)
-                                                           =   ZERO
-                                       MOVE    1           TO  FLG-READ
-                                   END-IF
-                               ELSE
-      *                            µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
-                                   IF    ( SYS-1001-PREFNUM
-                                                  =   "03"    OR  "04" )
-                                   AND   ( RECE62-SRYYM
-                                                  >=  200806           )
-                                       IF      RECE62-RJNGAIKOHFTN (1)
-                                                           =   ZERO
-                                           MOVE    1       TO  FLG-READ
-                                       END-IF
-                                   ELSE
-      *                                Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
-                                       IF    ( SYS-1001-PREFNUM
-                                                  =   "35"    OR  "40" )
-                                       AND   ( RECE62-SRYYM
-                                                  >=  200907           )
-                                       AND   ( RECE62-SRYYM
-                                                  <=  200912           )
-                                           IF     RECE62-RJNGAIKOHFTN(1)
-                                                           =   ZERO
-                                               MOVE    1   TO  FLG-READ
-                                           END-IF
-                                       ELSE
-      *                                    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
-                                           IF    ( SYS-1001-PREFNUM
-                                                  =   "28"    OR  "33" )
-                                           AND   ( RECE62-SRYYM
-                                                  >=  200908           )
-                                           AND   ( RECE62-SRYYM
-                                                  <=  201001           )
-                                               IF RECE62-RJNGAIKOHFTN(1)
-                                                           =   ZERO
-                                                   MOVE    1
-                                                           TO  FLG-READ
-                                               END-IF
-                                           ELSE
-      *                                      Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
-                                             IF    ( SYS-1001-PREFNUM
-                                                  =   "34"    OR  "35" )
-                                             AND   ( RECE62-SRYYM
-                                                  >=  201007           )
-                                             AND   ( RECE62-SRYYM
-                                                  <=  201012           )
-                                               IF RECE62-RJNGAIKOHFTN(1)
-                                                           =   ZERO
-                                                   MOVE    1
-                                                           TO  FLG-READ
-                                               END-IF
-                                             ELSE
-                                               MOVE    1   TO  FLG-READ
-                                             END-IF
-                                           END-IF
-                                       END-IF
-                                   END-IF
+      *                        ºÒ³²ÂÐ±þÊ¬¤ÏÂÐ¾Ý¤È¤·¤Ê¤¤ 
+                               IF      RECE62-RJNGAIKOHFTN (1)
+                                                       =   ZERO
+                                   MOVE    1           TO  FLG-READ
                                END-IF
                            END-IF
                        END-IF    

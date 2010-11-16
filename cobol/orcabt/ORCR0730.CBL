@@ -110,6 +110,9 @@
       *  04.05.13    NACL-Æ£¸¶    10/08/11  ¡ÖÊ¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«¡×ÂÐ±þ
       *                                     ¹­Åç¸©¡¦»³¸ý¸©
       *                                     £²£°£±£°Ç¯£··î¡Á£²£°£±£°Ç¯£±£²·îÂÐ¾Ý 
+      *  04.05.14    NACL-Æ£¸¶    10/11/16  ¡Ö¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«¡×ÂÐ±þ
+      *                                     ¼¯»ùÅç¸©
+      *                                     £²£°£±£°Ç¯£±£°·î¡Á£²£°£±£±Ç¯£³·îÂÐ¾Ý 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2940,6 +2943,17 @@
                IF    ( RECE62-PREFNUM      =   "34"    OR  "35" )
                AND   ( RECE62-SRYYM        >=  201007           )
                AND   ( RECE62-SRYYM        <=  201012           )
+                   EVALUATE    RECE62-RJNGAIKOHFTN (1)
+                       WHEN    1
+                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                       WHEN    2
+                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   END-EVALUATE
+               END-IF
+      *        Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+               IF    ( RECE62-PREFNUM      =   "46"   )
+               AND   ( RECE62-SRYYM        >=  201010 )
+               AND   ( RECE62-SRYYM        <=  201103 )
                    EVALUATE    RECE62-RJNGAIKOHFTN (1)
                        WHEN    1
                            MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
@@ -9236,45 +9250,9 @@
                END-IF
            END-PERFORM
       *
-      *    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
-           IF    ( RECE62-PREFNUM      =   "03"    OR  "04" )
-           AND   ( RECE62-SRYYM        >=  200806           )
-               IF      RECE62-RJNGAIKOHFTN (1)
-                                           >   ZERO
-                   MOVE    RECE62-RJNGAIKOHFTN (1)
-                                           TO  RECE10-ETC-YKZFTN (1)
-               END-IF
-           END-IF
-      *    Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
-           IF    ( RECE62-PREFNUM      =   "35"    OR  "40" )
-           AND   ( RECE62-SRYYM        >=  200907           )
-           AND   ( RECE62-SRYYM        <=  200912           )
-               IF      RECE62-RJNGAIKOHFTN (1)
-                                           >   ZERO
-                   MOVE    RECE62-RJNGAIKOHFTN (1)
-                                           TO  RECE10-ETC-YKZFTN (1)
-               END-IF
-           END-IF
-      *    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
-           IF    ( RECE62-PREFNUM      =   "28"    OR  "33" )
-           AND   ( RECE62-SRYYM        >=  200908           )
-           AND   ( RECE62-SRYYM        <=  201001           )
-               IF      RECE62-RJNGAIKOHFTN (1)
-                                           >   ZERO
-                   MOVE    RECE62-RJNGAIKOHFTN (1)
-                                           TO  RECE10-ETC-YKZFTN (1)
-               END-IF
-           END-IF
-      *    Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
-           IF    ( RECE62-PREFNUM      =   "34"    OR  "35" )
-           AND   ( RECE62-SRYYM        >=  201007           )
-           AND   ( RECE62-SRYYM        <=  201012           )
-               IF      RECE62-RJNGAIKOHFTN (1)
-                                           >   ZERO
-                   MOVE    RECE62-RJNGAIKOHFTN (1)
-                                           TO  RECE10-ETC-YKZFTN (1)
-               END-IF
-           END-IF
+      *    ºÒ³²ÂÐ±þ 
+           MOVE    RECE62-RJNGAIKOHFTN (1)
+                                       TO  RECE10-ETC-YKZFTN (1)
       *
       *    ¸å´ü¹âÎð¼ÔÈó³ºÅö
            IF      RECE62-YOBIETC (8)  =   1
