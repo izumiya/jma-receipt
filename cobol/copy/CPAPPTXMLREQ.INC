@@ -15,16 +15,32 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
+      ******************************************************************
+      *    £¡£–£…•Í•Ø•®•π•»ÕΩÃÛæ Û°°°°         COPY (CPAPPTXMLREQ.INC)
+      ******************************************************************
         01  XML-APPOINTREQ.
             02  APNTREQ-OBJECT         PIC X(8).
             02  APNTREQ-MODE           PIC S9(9)   BINARY.
             02  APNTREQ-APPOINT.
+      *       ¥µº‘»÷πÊ
               03  APNTREQ-PATIENTID    PIC X(20).
+      *       ÕΩÃÛª·Ãæ
+              03  APNTREQ-APPOINT-NAME     PIC X(100).
+      *       ÕΩÃÛ•´• ª·Ãæ
+              03  APNTREQ-APPOINT-KANANAME PIC X(100).
+      *       ÕΩÃÛ∆¸
               03  APNTREQ-APPOINT-DATE PIC X(10).
+      *       ÕΩÃÛª˛¥÷
               03  APNTREQ-APPOINT-TIME PIC X(8).
+      *       ÕΩÃÛ£…£ƒ
               03  APNTREQ-APPOINT-ID   PIC X(5).
+      *       ø«Œ≈≤ 
               03  APNTREQ-APPOINT-DEP-CODE PIC X(2).
+      *       •…•Ø•ø°º•≥°º•…
               03  APNTREQ-APPOINT-DR-CODE  PIC X(5).
+      *       ø«Œ≈∆‚Õ∆∂Ë ¨•≥°º•…
               03  APNTREQ-APPOINT-DEP-INFO PIC X(2).
+      *       ÕΩÃÛ∆‚Õ∆•≥°º•…
               03  APNTREQ-APPOINT-INFO PIC X(2).
+      *       ÕΩÃÛ•·•‚
               03  APNTREQ-APPOINT-MEMO PIC X(100).
