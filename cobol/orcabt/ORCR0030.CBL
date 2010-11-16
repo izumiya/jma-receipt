@@ -478,6 +478,8 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.04.58    NACL-ÌçÏÆ    10/09/09  Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
       *                                     ½¤Àµ
+      *  04.04.59    NACL-ÌçÏÆ    10/11/16  ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅª
+      *                                     Âç±«ÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -2459,6 +2461,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *    Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ
       *    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
       *    Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+      *    ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«ÂÐ±þ
+      *
            IF   (( IDZ                 =   1            ) AND
                  ( SYS-1001-PREFNUM    =   "15"         ) AND
                  ( RECE02-SRYYM       >=   200709       ) AND
@@ -2479,6 +2483,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                  ( SYS-1001-PREFNUM    =   "34" OR "35" ) AND
                  ( RECE02-SRYYM       >=   201007       ) AND
                  ( RECE02-SRYYM       <=   201012       ))
+           OR   (( IDZ                 =   1            ) AND
+                 ( SYS-1001-PREFNUM    =   "46"         ) AND
+                 ( RECE02-SRYYM       >=   201010       ) AND
+                 ( RECE02-SRYYM       <=   201103       ))
                IF    ( RECE02-HKNNUM   NOT =   SPACE )
                AND   ( RECE02-HKNJANUM     =   SPACE )
                    MOVE    3           TO  RECE02-RJNGAIKOHFTN (1)
