@@ -69,8 +69,8 @@
            03  CSV-FILLER2         PIC X(01).
            03  CSV-YUKOSTYMD       PIC X(8).
            03  CSV-FILLER3         PIC X(01).
-           03  CSV-NYORO           PIC X(2).
-           03  CSV-FILLER4         PIC X(01).
+      *     03  CSV-NYORO           PIC X(2).
+      *     03  CSV-FILLER4         PIC X(01).
            03  CSV-YUKOEDYMD       PIC X(8).
            03  CSV-FILLER5         PIC X(01).
            03  CSV-NAME            PIC X(100).
@@ -103,8 +103,8 @@
            03  CSV-FILLER19        PIC X(01).
            03  CSV-KGNAGE          PIC X(2).
            03  CSV-FILLER20        PIC X(01).
-           03  CSV-NYOROAGE        PIC X(2).
-           03  CSV-FILLER21        PIC X(01).
+      *     03  CSV-NYOROAGE        PIC X(2).
+      *     03  CSV-FILLER21        PIC X(01).
            03  CSV-JGNAGE          PIC X(2).
            03  CSV-FILLER22        PIC X(01).
            03  CSV-KNSJISGRPKBN    PIC X(2).
@@ -598,7 +598,7 @@
            MOVE    ","                 TO  CSV-FILLER1
                                            CSV-FILLER2
                                            CSV-FILLER3
-                                           CSV-FILLER4
+      *                                     CSV-FILLER4
                                            CSV-FILLER5
                                            CSV-FILLER6
                                            CSV-FILLER7
@@ -615,7 +615,7 @@
                                            CSV-FILLER18
                                            CSV-FILLER19
                                            CSV-FILLER20
-                                           CSV-FILLER21
+      *                                     CSV-FILLER21
                                            CSV-FILLER22
                                            CSV-FILLER23
                                            CSV-FILLER24
