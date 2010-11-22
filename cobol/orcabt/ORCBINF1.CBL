@@ -62,7 +62,8 @@
        WORKING-STORAGE             SECTION.
       *
       *01  PRGSKBNO                PIC X(08)  VALUE "20091218".
-       01  PRGSKBNO                PIC X(08)  VALUE "20101026".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20101026".
+       01  PRGSKBNO                PIC X(08)  VALUE "20101125".
       *
       *    ¥Õ¥é¥°ÎÎ°è
        01  STS-AREA.
@@ -152,15 +153,6 @@
            03  FILLER              PIC X(07)  VALUE  "8842081".
            03  FILLER              PIC X(07)  VALUE  "8842082".
            03  FILLER              PIC X(07)  VALUE  "8830710".
-           03  FILLER              PIC X(07)  VALUE  "8830711".
-           03  FILLER              PIC X(07)  VALUE  "8830712".
-           03  FILLER              PIC X(07)  VALUE  "8830713".
-           03  FILLER              PIC X(07)  VALUE  "8830714".
-           03  FILLER              PIC X(07)  VALUE  "8830715".
-           03  FILLER              PIC X(07)  VALUE  "8830716".
-           03  FILLER              PIC X(07)  VALUE  "8830717".
-           03  FILLER              PIC X(07)  VALUE  "8830719".
-           03  FILLER              PIC X(07)  VALUE  "8830718".
            03  FILLER              PIC X(07)  VALUE  "8830720".
            03  FILLER              PIC X(07)  VALUE  "8830721".
            03  FILLER              PIC X(07)  VALUE  "8830722".
@@ -177,9 +169,8 @@
            03  FILLER              PIC X(07)  VALUE  "8832283".
            03  FILLER              PIC X(07)  VALUE  "8845197".
            03  FILLER              PIC X(07)  VALUE  "8843940".
-           03  FILLER              PIC X(07)  VALUE  "8845217".
        01  TBL-INFURU-AREA-R       REDEFINES  TBL-INFURU-AREA.
-           03  TBL-INFURU-OCC      OCCURS   32  INDEXED  IDX-INFURU.
+           03  TBL-INFURU-OCC      OCCURS   22  INDEXED  IDX-INFURU.
                05  TBL-INFURU-BYOMEICD    PIC X(07).
       *
        01  WRK-CONS-AREA.
