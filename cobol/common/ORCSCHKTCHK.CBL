@@ -291,6 +291,9 @@
       *            入院料チェック処理
                    IF      ORCSCHKTCHK-NYUHKTCHK   =   1
                        PERFORM 600-NYUINDAYCHK-SEC
+                   ELSE
+      *                包括区分クリア
+                       PERFORM 602-HOUKATU-INIT-SEC
                    END-IF
                    IF      SPA-HKTSANTEI-FLG   =   1
       *                包括チェック判定
