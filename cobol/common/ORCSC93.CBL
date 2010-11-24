@@ -854,7 +854,8 @@
                        MOVE    "21"            TO  WRK-SRYKBN
                    END-IF
       *            前が処方せん料は薬剤は入力しない
-                   IF     (SPA-COM-SRYKBN (IDX - 1) =   "80" ) AND
+                   IF     (IDX                     >   1     ) AND
+                          (SPA-COM-SRYKBN (IDX - 1) =   "80" ) AND
                           (SPA-COM-SRYSYUKBN (IDX - 1)
                                                    =   "820" )
                        MOVE    1               TO  FLG-SYOHO
@@ -950,6 +951,14 @@
                    END-IF
                    MOVE    WRK-SRYKBN      TO  SPA-COM-SRYKBN(IDX)
                WHEN    "7"
+                   IF     (IDX                     >   1     ) AND
+                          (SPA-COM-SRYKBN (IDX - 1) =   "80" ) AND
+                          (SPA-COM-SRYSYUKBN (IDX - 1)
+                                                   =   "820" )
+                       MOVE    1               TO  FLG-SYOHO
+                   ELSE
+                       MOVE    ZERO            TO  FLG-SYOHO
+                   END-IF
                    MOVE    SPACE           TO  SPA-COM-SRYSYUKBN(IDX)
       *            器材（前の剤に付属する）
                    IF     (IDX             >   1   )  AND
