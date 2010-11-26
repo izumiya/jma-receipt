@@ -2130,10 +2130,12 @@
                    END-IF
                    PERFORM 3101-RJN-KOHADD2-SEC
                    MOVE    ZERO                TO  SPA-KOH-ADD
+                   INITIALIZE                  SPA-KOH-KENKAN-AREA
                    GO      TO      310-KOHEDYMD-SYORI-EXT
                END-IF
            ELSE
                MOVE    ZERO                TO  SPA-KOH-ADD
+               INITIALIZE                  SPA-KOH-KENKAN-AREA
            END-IF
            MOVE    1                   TO  FLG-AUTO
            EVALUATE    SPA-KOH-IDX1
