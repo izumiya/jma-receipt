@@ -127,6 +127,7 @@
       *  04.04.08    NACL-Æ£¸¶    10/11/16  ¡Ö¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«¡×ÂÐ±þ
       *                                     ¼¯»ùÅç¸©
       *                                     £²£°£±£°Ç¯£±£°·î¡Á£²£°£±£±Ç¯£³·îÂÐ¾Ý 
+      *  04.04.09    NACL-Æ£¸¶    10/12/01  ¥¯¥é¥¤¥¢¥ó¥ÈÊÝÂ¸ºï½ü½èÍý¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2822,23 +2823,32 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
       *    ¥¯¥é¥¤¥¢¥ó¥ÈÊÝÂ¸ºï½ü½èÍý             
            IF      T01-DATAKBN3-VALUE  =   "T"     
-               INITIALIZE                  ORCSFILESVAREA
-               MOVE    "D"             TO  SFILESV-MODE
-               MOVE    WRK-CONS-JOB-SHELLID
-                                       TO  SFILESV-TBL-KEY
-               MOVE    SPA-NAI-SKYYM   TO  SFILESV-SRYYM (1)
-               CALL    "ORCSFILESV"    USING
-                                           ORCSFILESVAREA
-                                           SPA-AREA
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       SPA-3004-MAX
+                   IF      SPA-3004-CHKFLG (IDX 3) =   "T"                
+                       INITIALIZE                  ORCSFILESVAREA
+                       MOVE    "D"             TO  SFILESV-MODE
+                       MOVE    WRK-CONS-JOB-SHELLID
+                                               TO  SFILESV-TBL-KEY
+                       MOVE    SPA-NAI-SKYYM   TO  SFILESV-SRYYM (1)
+                       MOVE    SPA-3004-SHELLID (IDX)
+                                               TO  SFILESV-SHELLID (1)
+                       CALL    "ORCSFILESV"    USING
+                                                   ORCSFILESVAREA
+                                                   SPA-AREA
       *
-               INITIALIZE                  ORCSCSVINFOAREA
-               MOVE    "DEL"           TO  SCSVINFO-MODE
-               MOVE    WRK-CONS-JOB-SHELLID
-                                       TO  SCSVINFO-TBL-KEY
-               MOVE    SPA-NAI-SKYYM   TO  SCSVINFO-SRYYM
-               CALL    "ORCSCSVINFO"   USING
-                                           ORCSCSVINFOAREA
-                                           SPA-AREA
+                       INITIALIZE                  ORCSCSVINFOAREA
+                       MOVE    "DEL"           TO  SCSVINFO-MODE
+                       MOVE    WRK-CONS-JOB-SHELLID
+                                               TO  SCSVINFO-TBL-KEY
+                       MOVE    SPA-NAI-SKYYM   TO  SCSVINFO-SRYYM
+                       MOVE    SPA-3004-SHELLID (IDX)
+                                               TO  SCSVINFO-SHELLID
+                       CALL    "ORCSCSVINFO"   USING
+                                                   ORCSCSVINFOAREA
+                                                   SPA-AREA
+                   END-IF
+               END-PERFORM
            END-IF    
       *
       *    ¹¹¿·Æü¼èÆÀ
