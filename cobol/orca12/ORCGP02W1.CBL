@@ -5817,7 +5817,8 @@
       *    Ｈ１５．４改正対応のため、毎回、すべてのチェックを行う
       *!   IF    ( SPA-P02-SYORI       =   1     )  AND
       *!         ( FLG-TOUROKU2    NOT =   ZERO  )
-           IF      FLG-TOUROKU     NOT =   ZERO
+           IF    ( FLG-TOUROKU     NOT =   ZERO  )
+            OR   ( FLG-TOUROKU2        =   1     )
                PERFORM 4501-ALLHKN-CHK-SEC
                IF     (SPA-ERRCD       NOT =   SPACE )  OR
                       (SPA-PIDCD       NOT =   SPACE )  OR
@@ -5928,14 +5929,18 @@
                END-IF
            END-PERFORM
       *
-           IF      IDY                 >   ZERO
+           IF     (SPA-ERRCD           =   SPACE )
+             AND  (SPA-PIDCD           =   SPACE )
+             IF      IDY                 >   ZERO
       *        公費情報チェックサブ
                CALL    "ORCSP03B"          USING   SPA-AREA
                                                SPA-P02SCRAREA
                                                SPA-P02KYOUTU
+             END-IF
            END-IF
       *    元へ戻す
-           IF      SPA-ERRCD           =   SPACE
+           IF     (SPA-ERRCD           =   SPACE )
+             AND  (SPA-PIDCD           =   SPACE )
                MOVE    WRK-GMN-KOH-AREA    TO  SPA-GMN-KOH-AREA
            END-IF
            .
