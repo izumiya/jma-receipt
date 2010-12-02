@@ -1429,6 +1429,11 @@
                   (WRK-HKN-TEKEDYMD    NOT =   ALL "9"          )
                MOVE    IDX-K                TO  SPA-KOH-IDX1
                MOVE    WRK-HKN-TEKEDYMD     TO  SPA-HKN-TEKEDYMD
+               MOVE    SPACE                TO  SPA-HKN2-TEKSTYMD
+               MOVE    SPACE                TO  SPA-HKN2-TEKEDYMD
+               MOVE    SPACE                TO  SPA-HKN2-KOHNUM
+               MOVE    ZERO                 TO  SPA-HKN2-KOHID
+      *
       *
       *        公費の切替えで次ぎの公費も対象の時、追加とする
                IF     (WRK-HKN2-TEKSTYMD    NOT =   SPACE   )
