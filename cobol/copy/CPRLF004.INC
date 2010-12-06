@@ -517,7 +517,8 @@
       * チェックディジット方式 (mmlCm:checkDigitSchema)
            03  LF04-SNRBT-CDSCHEMA      PIC X(03).
       * <診療括り 1>
-           03  LF04-SRYTBL             OCCURS  20.
+           03  LF04-SRYTBL-G.
+             04  LF04-SRYTBL             OCCURS  40.
       * 診療行為区分コード (claim:classCode)
                05  LF04-SRYCD          PIC  X(03).
       * 診療行為区分コードのテーブル名 (claim:classCodeId) (Claim002)
@@ -536,7 +537,7 @@
       * 回数もしくは日数(Z編集)
                05  LF04-KAISU          PIC  X(50).
       * <明細テーブル(診療項目 1)>
-               05  LF04-SRYTBL       OCCURS  20.
+               05  LF04-SRYTBL1       OCCURS  40.
       * 診療種別区分コード(0:手技、1:材料,2:薬剤) (claim:subclassCode)
                    07  LF04-SRYSYUBETSU
                                        PIC  X(01).

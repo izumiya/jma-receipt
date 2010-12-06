@@ -435,21 +435,26 @@
                END-IF
            END-PERFORM
       *
-           MOVE    SPACE               TO  WRK-HKNCOMBINUM
-           IF      FLG-IN-OK           =   ZERO
-               IF      ORCSAPIHKN-KBN      =   "1"
-      *            前回保険組合せで決定
-                   PERFORM 2001-HKNCOMBI-SRYKA-SEC
+           IF      ORCSAPIHKN-IN-HKNCOMBI  =   SPACE
+               MOVE    SPACE               TO  WRK-HKNCOMBINUM
+               IF      FLG-IN-OK           =   ZERO
+                   IF      ORCSAPIHKN-KBN      =   "1"
+      *                前回保険組合せで決定
+                       PERFORM 2001-HKNCOMBI-SRYKA-SEC
+                   END-IF
+               ELSE
+      *            設定内容より決定
+                   PERFORM 2002-HKNCOMBI-API-SEC
+                   IF     (ORCSAPIHKN-ERRCD    =   ZERO   )  AND
+                          (WRK-HKNCOMBINUM     =   SPACE  )
+                       MOVE    3               TO  ORCSAPIHKN-ERRCD
+                   END-IF
                END-IF
+               MOVE    WRK-HKNCOMBINUM     TO  ORCSAPIHKN-OT-HKNCOMBI
            ELSE
-      *        設定内容より決定
-               PERFORM 2002-HKNCOMBI-API-SEC
-               IF     (ORCSAPIHKN-ERRCD    =   ZERO   )  AND
-                      (WRK-HKNCOMBINUM     =   SPACE  )
-                   MOVE    3               TO  ORCSAPIHKN-ERRCD
-               END-IF
+               MOVE    ORCSAPIHKN-IN-HKNCOMBI
+                                           TO  ORCSAPIHKN-OT-HKNCOMBI
            END-IF
-           MOVE    WRK-HKNCOMBINUM     TO  ORCSAPIHKN-OT-HKNCOMBI
       *
       *    出力編集
            PERFORM 290-HKNCOMBI-OUTHENSYU-SEC

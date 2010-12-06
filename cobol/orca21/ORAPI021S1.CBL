@@ -27,31 +27,29 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *
+      *  04.05.01    NACL-多々納  10/12/06  標準対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
        INPUT-OUTPUT        SECTION.
        FILE-CONTROL.
-      *    BLOB格納情報ファイル(CSV)
-           SELECT  REQCSV-FILE     ASSIGN REQCSV    
-                                   ORGANIZATION    IS  LINE SEQUENTIAL
-                                   FILE    STATUS  IS  STS-REQCSV.
        DATA                DIVISION.
        FILE                    SECTION.
-      *    BLOB格納情報ファイル(CSV)
-       FD  REQCSV-FILE.
-       01  REQCSV-RECORD.
-           03  REQCSV-INFO             PIC X(5000).
       *
        WORKING-STORAGE             SECTION.
-       01  LNK-TIMEOFDAY       PIC X(100).
-       01  REQCSV                  PIC X(512).
-       01  STS-AREA.
-           03  STS-REQCSV          PIC X(02).
+      *
       *    スパ領域
            COPY    "COMMON-SPA".
+      *
+      *    フラグ領域
+       01  FLG-AREA.
+           03  FLG-END                 PIC 9(01).
+           03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-PTINF               PIC 9(01).
+      *
+           03  FLG-SYORI               PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDW                 PIC 9(04).
@@ -59,141 +57,70 @@
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  IDY1                PIC 9(04).
-           03  IDX1                PIC 9(04).
-           03 TBL-MAX              PIC 9(01).
+           03  IDY2                PIC 9(04).
+      *
       *    カウント領域
        01  CNT-AREA.
-           03  CNT-PTINF           PIC 9(06).
-           03  CNT-CHECK           PIC 9(02).
-           03  CNT-UKEDELETE       PIC 9(06).
-      *    公費並替え用ワーク
-       01  WORK-KOHI-AREA.
-           03  WRK-KOHI-AREA.
-      *    並び替え前
-               05  WRK-KOHI-TBL        OCCURS  4.
-                   07  WRK-KOHID-O     PIC  9(10).
-                   07  WRK-KOHHKNNUM-O PIC  X(03).
-                   07  WRK-KOHMEI-O    PIC  X(50).
-                   07  WRK-GAIJGNKBN-O PIC  X(01).
-      *    並び替え後
-           03  WRK-KOHI-AREA-X.
-               05  WRK-KOHI-TBL-X      OCCURS  4.
-                   07  WRK-KOHID       PIC  9(10).
-                   07  WRK-KOHHKNNUM   PIC  X(03).
-                   07  WRK-KOHMEI      PIC  X(50).
-                   07  WRK-GAIJGNKBN   PIC  X(01).
-      *    ＳＯＲＴ用ワーク
-           03  WRK-KOHI.
-               05  WRK-KOHID-W         PIC  9(10).
-               05  WRK-KOHHKNNUM-W     PIC  X(03).
-               05  WRK-KOHMEI-W        PIC  X(50).
-               05  WRK-GAIJGNKBN-W     PIC  X(01).
-      *
-       01  WRK-SRT-AREA.
-           03  WRK-SRT-TABLE.
-               05  FILLER              PIC X(03)   VALUE   "027".
-               05  FILLER              PIC X(03)   VALUE   "013".
-               05  FILLER              PIC X(03)   VALUE   "014".
-               05  FILLER              PIC X(03)   VALUE   "018".
-               05  FILLER              PIC X(03)   VALUE   "029".
-               05  FILLER              PIC X(03)   VALUE   "010".
-               05  FILLER              PIC X(03)   VALUE   "011".
-               05  FILLER              PIC X(03)   VALUE   "020".
-               05  FILLER              PIC X(03)   VALUE   "021".
-               05  FILLER              PIC X(03)   VALUE   "015".
-               05  FILLER              PIC X(03)   VALUE   "016".
-               05  FILLER              PIC X(03)   VALUE   "024".
-               05  FILLER              PIC X(03)   VALUE   "022".
-               05  FILLER              PIC X(03)   VALUE   "028".
-               05  FILLER              PIC X(03)   VALUE   "017".
-               05  FILLER              PIC X(03)   VALUE   "079".
-               05  FILLER              PIC X(03)   VALUE   "019".
-               05  FILLER              PIC X(03)   VALUE   "023".
-               05  FILLER              PIC X(03)   VALUE   "051".
-               05  FILLER              PIC X(03)   VALUE   "091".
-               05  FILLER              PIC X(03)   VALUE   "052".
-               05  FILLER              PIC X(03)   VALUE   "053".
-               05  FILLER              PIC X(03)   VALUE   "066".
-               05  FILLER              PIC X(03)   VALUE   "012".
-      *********05  FILLER              PIC X(03)   VALUE   "972".
-      *********05  FILLER              PIC X(03)   VALUE   "974".
-           03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
-               05  WRK-SRT-KOHHKNNUM   PIC X(03)   OCCURS  24.
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   24.
-      *
+           03  CNT-SRYCNT              PIC 9(04).
+           03  CNT-BYOCNT              PIC 9(04).
       *    一時領域
       *
        01  WRK-AREA.
-           03  WRK-SYSYMD-8.
-               05  WRK-SYSYY           PIC 9(02).
-               05  WRK-SYSYMD          PIC 9(06).
-           03  WRK-DATE                PIC 9(06).
-      *
-       01  WORK-AREA.
-           03  WRK-YYKID               PIC 9(05).
-           03  WK-MSG                  PIC X(40).
-           03  WRK-PERFORM-YMD         PIC X(08).
-           03  WRK-PERFORM-YMD-G       PIC X(10).
-           03  WRK-PERFORM-TIME        PIC X(06).
-           03  WRK-PERFORM-TIME-G      PIC X(08).
-           03  WRK-KEYYYKTIME          PIC X(04).
-           03  WRK-PTNUM               PIC X(20).
-           03  WRK-NAMEKNJ             PIC X(100).
-           03  WRK-NAMEKNA             PIC X(100).
-           03  WRK-SEX                 PIC X(1).
-           03  WRK-BIRTHDAY            PIC X(08).
-           03  WRK-SRYKA               PIC X(02).
-           03  WRK-DRCD                PIC X(05).
-           03  WRK-SRYNAIYO            PIC X(02).
-           03  WRK-YYKNAIYO            PIC X(02).
-           03  WRK-YYKMEMO             PIC X(100).
-           03  WRK-APPOINT-ID          PIC X(05).
-           03  WRK-USER-PG             PIC X(01).
-           03  WRK-CLAIM               PIC X(01).
-           03  WRK-MCP-WINDOW          PIC X(64).
-           03  WRK-RENNUM              PIC 9(02).
-           03  WRK-PTID                PIC X(10).
-           03  WRK-GMN-SELNUM          PIC 9(02).
+           03  WRK-SYMD.
+               05  WRK-SYY             PIC X(04).
+               05  WRK-SMM             PIC X(02).
+               05  WRK-SDD             PIC X(02).
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *    時間編集
+           03  WRK-THMS.
+               05  WRK-THH             PIC X(02).
+               05  WRK-TMM             PIC X(02).
+               05  WRK-TSS             PIC X(02).
+           03  WRK-HEN-TIME.
+               05  WRK-HEN-THH         PIC X(02).
+               05  WRK-HEN-T1          PIC X(01).
+               05  WRK-HEN-TMM         PIC X(02).
+               05  WRK-HEN-T2          PIC X(01).
+               05  WRK-HEN-TSS         PIC X(02).
+      *    受付ＩＤ
+           03  WRK-UKEID               PIC 9(05).
+      *    保険組合せ
            03  WRK-HKNCOMBI            PIC 9(04).
-           03  WRK-TIME                PIC X(06).
-           03  WRK-DAY1                PIC X(10).
-           03  WRK-DAY2                PIC X(10).
-           03  WRK-CK-TIME1.
-             05  WRK-CK-HH1            PIC 9(02).
-             05  WRK-CK-MM1            PIC 9(02).
-             05  WRK-CK-SS1            PIC 9(02).
-           03  WRK-CK-TIME2.
-             05  WRK-CK-HH2            PIC 9(02).
-             05  WRK-CK-MM2            PIC 9(02).
-             05  WRK-CK-SS2            PIC 9(02).
-           03  WRK-CK-TIME3.
-             05  WRK-CK-HH3            PIC 9(02).
-             05  WRK-CK-MM3            PIC 9(02).
-             05  WRK-CK-SS3            PIC 9(02).
+           03  WRK-IN-HKNCOMBI         PIC 9(04).
+      *    エラーコード
+           03  WRK-ERRCD               PIC X(02).
+           03  WRK-ERRMSG              PIC X(100).
+           03  WRK-KEICD               PIC X(02).
+      *    ユーザプログラム
+           03  WRK-PTID                PIC X(10).
+           03  WRK-RENNUM              PIC 9(02).
+           03  WRK-GMN-SELNUM          PIC 9(02).
+           03  WRK-SYORI-FLG           PIC 9(01).
       *
-       01  FLG-AREA.
-           03  FLG-END                 PIC 9(01).
-           03  FLG-REQCSV              PIC 9(01).
-           03  FLG-PTINF               PIC 9(01).
-           03  FLG-PTKOHINF            PIC 9(01).
-           03  FLG-PTHKNINF            PIC 9(01).
-           03  FLG-HKNCOMBI            PIC 9(01).
-           03  FLG-SYSUSER             PIC 9(01).
-           03  FLG-YYK                 PIC 9(01).
-           03  FLG-YYKHIT              PIC 9(01).
-           03  FLG-INPUT               PIC 9(01).
-           03  FLG-ERR                 PIC 9(01).
-           03  FLG-KANA                PIC 9(01).
-           03  FLG-PTINF-CK            PIC 9(01).
-           03  FLG-UKETUKE             PIC 9(01).
-           03  FLG-USERPG              PIC 9(01).
-           03  FLG-SYSKANRI            PIC 9(01).
-           03  FLG-CLAIM-MULTIHOST     PIC 9(01).
-           03  FLG-CLAIM               PIC 9(01).
-           03  FLG-SOUSIN              PIC 9(01).
-           03  FLG-YYKTIME             PIC 9(01).
-      *    ユーザプログラム起動
-           03  FLG-GYOUMU-ARI          PIC 9(01).
+           03  WRK-MCP-PATHNAME        PIC X(62).
+           03  WRK-MCP-WINDOW          PIC X(62).
+      *
+           03  WRK-OPID                PIC X(16).
+      *
+       01  WRK-XML-AREA.
+           03  WRK-PERFORM-YMD10       PIC X(10).
+           03  WRK-PERFORM-TIME8       PIC X(08).
+      *
+           03  WRK-PERFORM-YMD         PIC X(08).
+           03  WRK-PERFORM-TIME.
+               05  WRK-PERFORM-THH     PIC X(02).
+               05  WRK-PERFORM-TMM     PIC X(02).
+               05  WRK-PERFORM-TSS     PIC X(02).
+           03  WRK-PTNUM               PIC X(20).
+           03  WRK-SRYKA               PIC X(02).
+           03  WRK-SRYKA-NAME          PIC X(80).
+           03  WRK-DRCD                PIC X(05).
+           03  WRK-DRCD-NAME           PIC X(80).
       *
       *    半角全角変換
        01  WRK-HENKAN-AREA.
@@ -201,16 +128,16 @@
            03  WRK-ATO-INPUT           PIC X(100).
            03  WRK-MAX                 PIC 9(04).
            03  WRK-LEN                 PIC 9(04).
-      *    ＣＬＡＩＭファイル名
-       01  CLAIM-FILE.
-           03  FILLER              PIC X(30)   VALUE
-               "scripts/claim/HL01.sh".
       *
       *    claim連携リターンエリア
        01  WRK-ERROR-AREA.
            03  WRK-KBN-CODE            PIC X(01).
            03  WRK-ERR-CODE            PIC 9(02).
            03  WRK-ERR-MSG             PIC X(100).
+           03  WRK-OUT-HKNCOMBI        PIC X(04).
+           03  WRK-OUT-CNT1            PIC 9(04).
+           03  WRK-OUT-CNT2            PIC 9(04).
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -245,28 +172,29 @@
       *    API XML書き込み用定義体
            COPY    "CPMDCXMLRES.INC".
       *
+      *    保険組合せセット領域
+           COPY    "CPORCSAPIHKN.INC".
+      *
        01  LF04-REC.
            COPY    "CPRLF004.INC".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
       *
       *    システム基本
-       01  SYSBASE-REC.
-           COPY    "CPSYSBASE.INC".
+      *01  SYSBASE-REC.
+      *    COPY    "CPSYSBASE.INC".
       *
       *    システムユーザー
-       01  SYSUSER-REC.
-           COPY    "CPSYSUSER.INC".
+      *01  SYSUSER-REC.
+      *    COPY    "CPSYSUSER.INC".
       *
+           COPY    "CPSYSKANRI.INC".
       *    （診療科情報）
            COPY    "CPSK1005.INC".
       *    職員情報
            COPY  "CPSK1010.INC".
-      *    診療内容情報
-           COPY  "CPSK1012.INC".
-      *    予約内容
-           COPY  "CPSK1028.INC".
       *    （医療機関情報）
            COPY    "CPSK1001.INC".
       *    患者マスタ−
@@ -277,40 +205,29 @@
            COPY    "CPPTINF.INC".
       *
       *    保険組み合わせ
-       01  HKNCOMBI-REC.
-           COPY    "CPHKNCOMBI.INC".
+      *01  HKNCOMBI-REC.
+      *    COPY    "CPHKNCOMBI.INC".
       *
       *    患者保険情報
-       01  PTHKNINF-REC.
-           COPY    "CPPTHKNINF.INC".
+      *01  PTHKNINF-REC.
+      *    COPY    "CPPTHKNINF.INC".
       *
       *    患者公費情報
-       01  PTKOHINF-REC.
-           COPY    "CPPTKOHINF.INC".
-      *
-      *
-      *    予約マスター
-       01  YYK-REC.
-           COPY    "CPYYK.INC".
-      *
-      *    予約メモマスター
-       01  YYKCOM-REC.
-           COPY    "CPYYKCOM.INC".
-      *
-      *    予約
-       01  WRK-YYK-REC.
-           COPY    "CPYYK.INC"       REPLACING
-                                     //YYK-// BY //WRK-YYK-//.
+      *01  PTKOHINF-REC.
+      *    COPY    "CPPTKOHINF.INC".
       *
       *　　（ＣＬＡＩＭ接続）
-           COPY    "CPSK9000.INC".
-           COPY    "CPSK9001.INC".
+      *    COPY    "CPSK9000.INC".
+      *    COPY    "CPSK9001.INC".
       *
            COPY    "CPSHELLTBL.INC".
       *
            COPY    "MCPDATA.INC".
       *
            COPY    "ORCA-BLOB".
+      *****************************************************************
+      *    連絡領域
+      *****************************************************************
        LINKAGE                 SECTION.
             COPY    "MCPAREA".
             COPY    "ORCA-SPA".
@@ -344,61 +261,80 @@
            COPY    "KID2.INC".
            COPY    "KHELP.INC".
            COPY    "CPAPIMOD.INC".
-      **************************************************************************
-       PROCEDURE           DIVISION    USING
+      *
+       PROCEDURE                   DIVISION    USING
            MCPAREA
            SPAAREA
            LINKAREA
            SCRAREA.
-       000-MAIN                SECTION.
-           ACCEPT  WRK-SYSYMD    FROM DATE
-           MOVE    20                  TO  WRK-SYSYY
       *
-           DISPLAY " program   START"
-                       " "  LNK-TIMEOFDAY(1:15)
-           INITIALIZE        PTNUM-REC
-                             IDX-AREA
-                             WK-MSG
-                             SPA-AREA
-                             FLG-AREA
-                             CNT-AREA
-                             XML-MEDICALRES
+      *****************************************************************
+      *    主処理
+      *****************************************************************
+       000-MAIN-SEC                SECTION.
+      *
+           DISPLAY   "***************"
+           DISPLAY   "* accept start*"
+           DISPLAY   "***************"
+      *
+           INITIALIZE                      FLG-AREA
+           INITIALIZE                      IDX-AREA
+           INITIALIZE                      WRK-AREA
+           INITIALIZE                      SPA-AREA
+           INITIALIZE                      CNT-AREA
+      *
+      *    初期処理
+           PERFORM 100-INIT-SEC
+      *    主処理
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 200-MAIN-SEC
+           END-IF
+      *
+      *    返却領域編集
+           PERFORM 300-APTXMLMAKE-SEC
+      *
+           DISPLAY   "***************"
+           DISPLAY   "* accept end  *"
+           DISPLAY   "***************"
+           .
+       000-MAIN-EXIT.
+           EXIT    PROGRAM.
+      *
+      *
+      *****************************************************************
+      *    初期　処理
+      *****************************************************************
+       100-INIT-SEC                SECTION.
+      *
+           INITIALIZE                      WRK-XML-AREA
+           INITIALIZE                      XML-MEDICALRES
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
            MOVE   "Medical Info"       TO  MDCRES-RESKEY
+      *
+           STRING  "A+"
+                   MCP-USER            DELIMITED  BY  SIZE
+                                       INTO    WRK-OPID
+           END-STRING
            MOVE    MCP-USER            TO  SPA-OPID
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
-           MOVE    SMCNDATE-YMD(1:4)   TO
-                                       MDCRES-INFORMATION-DATE(1:4)
-           MOVE    "-"                 TO
-                                       MDCRES-INFORMATION-DATE(5:1)
-           MOVE    SMCNDATE-YMD(5:2)   TO
-                                       MDCRES-INFORMATION-DATE(6:2)
-           MOVE    "-"                 TO
-                                       MDCRES-INFORMATION-DATE(8:1)
-           MOVE    SMCNDATE-YMD(7:2)   TO
-                                       MDCRES-INFORMATION-DATE(9:2)
-           MOVE    SMCNDATE-HMS(1:2)   TO  
-                                       MDCRES-INFORMATION-TIME(1:2)
-           MOVE    ":"                 TO  
-                                       MDCRES-INFORMATION-TIME(3:1)
-           MOVE    SMCNDATE-HMS(3:2)   TO  
-                                       MDCRES-INFORMATION-TIME(4:2)
-           MOVE    ":"                 TO  
-                                       MDCRES-INFORMATION-TIME(6:1)
-           MOVE    SMCNDATE-HMS(5:2)   TO  
-                                       MDCRES-INFORMATION-TIME(7:2)
+      *    日付・時間出力編集
+           MOVE    SMCNDATE-YMD        TO  WRK-SYMD
+           MOVE    SMCNDATE-HMS        TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  MDCRES-INFORMATION-DATE
+           MOVE    WRK-HEN-TIME        TO  MDCRES-INFORMATION-TIME
+      *
       *    医療機関識別番号セット 
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
            IF      SPA-ERRCD       NOT =   SPACE
-               MOVE   "99"             TO  MDCRES-API-RESULT
-               MOVE   "ユーザID未登録" TO  MDCRES-API-RESULT-MSG
-               GO  TO  000-MAIN-EXIT
+               MOVE   "99"             TO  WRK-ERRCD
+               GO  TO         100-INIT-EXT
            END-IF
       *    ＳＰＡ共通設定
            INITIALIZE                  SYS-1010-REC
@@ -409,79 +345,57 @@
                                        SPA-AREA
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
-      *
-           INITIALIZE                  SYS-1010-REC
-           INITIALIZE                  ORCSCOMMONAREA
-           MOVE    "M01"               TO  ORCSCOMMON-PG
-           CALL    "ORCSCOMMON"        USING
-                                       MCPAREA
-                                       SPA-AREA
-                                       ORCSCOMMONAREA
-                                       SYS-1010-REC
-      *
-           MOVE    ZERO                TO  MDCRES-API-RESULT
-           IF      APIREQ-CONTENT-TYPE =   "application/xml"
-               PERFORM 1000-APTXMLREAD-SEC
-           ELSE
-               PERFORM 1000-APTCSVREAD-SEC
-           END-IF
-      *
-           IF  MDCRES-API-RESULT       NOT = ZERO
-               PERFORM 1000-APTXMLMAKE-SEC
-               GO  TO                  000-MAIN-EXIT
-           END-IF
-      *
-           MOVE    ZERO                TO  MDCRES-API-RESULT
-           MOVE    ZERO                TO  FLG-INPUT
-           PERFORM 1001-PTINF-CHK-SEC
-           MOVE    CNT-CHECK           TO  MDCRES-API-RESULT
-           IF      CNT-CHECK           >   ZERO
-               DISPLAY "必須項目チェックエラー " CNT-CHECK    
-               DISPLAY "MDCRES-API-RESULT-MSG = "
-                        MDCRES-API-RESULT-MSG
-      *        GO  TO                  000-MAIN-EXIT
-           ELSE
-           EVALUATE    APIREQ-CLASS
-             WHEN    "01"
-      * 入力項目の内容チェックが必要
-                 PERFORM 1001-WKSRY-ADD-SEC
-             END-EVALUATE
-           END-IF
            IF      SPA-ERRCD       NOT =   SPACE
-               MOVE   "99"             TO  MDCRES-API-RESULT
+               MOVE   "98"             TO  WRK-ERRCD
            END-IF
       *
-      *
-           IF      APIREQ-CONTENT-TYPE =   "application/xml"
-                   PERFORM 1000-APTXMLMAKE-SEC
-           ELSE
-                   DISPLAY "type err"
-           END-IF
-      *
-      *    TEST ST
-      *    PERFORM 900-NOCOMMIT-SEC
-      *    TEST ED
-           DISPLAY " program   END  "
-                       " "  LNK-TIMEOFDAY(1:15)
            .
-       000-MAIN-EXIT.
-           EXIT    PROGRAM.
-      *****************************************************************
-      *    システム基本読込処理
-      *****************************************************************
-       900-SYSUSER-READ-SEC            SECTION.
-      *
-           PERFORM 910-DBFETCH-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  SYSUSER-REC
-               MOVE    ZERO            TO  FLG-SYSUSER
-           ELSE
-               MOVE    1               TO  FLG-SYSUSER
-           END-IF
-           .
-       900-SYSUSER-READ-EXT.
+       100-INIT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    主　処理
+      *****************************************************************
+       200-MAIN-SEC                SECTION.
+      *
+      *    XML情報取り出し
+           PERFORM 1000-APTXMLREAD-SEC
+      *
+           MOVE    ZERO                TO  MDCRES-API-RESULT
+           MOVE    SPACE               TO  WRK-ERRCD
+           MOVE    SPACE               TO  WRK-KEICD
+      *
+           MOVE    ZERO                TO  FLG-SYORI
+           EVALUATE    APIREQ-CLASS
+           WHEN    "01"
+      *        登録
+               MOVE    1                   TO  FLG-SYORI
+           WHEN    OTHER
+               MOVE    "91"                TO  WRK-ERRCD
+           END-EVALUATE
+      *    入力項目チェック処理
+           PERFORM 2001-INPUT-CHK-SEC
+           IF      WRK-ERRCD       NOT =   SPACE
+      *TEST!!
+      *        PERFORM 890-ERRCD-MSG-SEC
+      *        DISPLAY "必須項目チェックエラー "    WRK-ERRCD
+      *                " " WRK-ERRMSG
+      *TEST!!
+               GO      TO      200-MAIN-EXT
+           END-IF
+      *
+           EVALUATE    APIREQ-CLASS
+           WHEN    "01"
+      *TEST
+               DISPLAY "登録"    
+      *TEST
+      *        登録処理
+               PERFORM 2002-WKSRYACT-ADD-SEC
+           END-EVALUATE
+      *
+           .
+       200-MAIN-EXT.
+           EXIT.
       *
       *****************************************************************
       *    XML情報から内容を取り出す
@@ -492,7 +406,7 @@
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
       * XML情報取り出し
-           MOVE   "XMLOPEN"            TO  MCP-FUNC
+           MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_medicalreq"    TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    API-BODY            TO  MDCREQ-OBJECT
@@ -501,80 +415,33 @@
                                        MCPAREA
                                        XML-MEDICALREQ
                                        SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
+           IF     (MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLOPEN failure = " MCP-RC
-               MOVE   "99"           TO  MDCRES-API-RESULT
-               MOVE   "構文誤りです" TO  MDCRES-API-RESULT-MSG
+               MOVE   "97"             TO  WRK-ERRCD
                GO     TO   1000-APTXMLREAD-EXT
            END-IF
       *
-           MOVE   "XMLREAD"            TO  MCP-FUNC
+           MOVE    "XMLREAD"           TO  MCP-FUNC
            MOVE    "xml_medicalreq"    TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE   ORCA-BLOB-OBJECT     TO  MDCREQ-OBJECT
-           CALL   "ORCDBMAIN"          USING
+           MOVE    ORCA-BLOB-OBJECT    TO  MDCREQ-OBJECT
+           CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-MEDICALREQ
                                        SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
-               MOVE    MDCREQ-PATIENTID    TO  WRK-PTNUM
-               MOVE    MDCREQ-DEP-CODE     TO  WRK-SRYKA
-               MOVE    MDCREQ-DR-CODE      TO  WRK-DRCD
-            IF MDCREQ-PERFORM-DATE(5:1)    =   "-"
-               MOVE    MDCREQ-PERFORM-DATE TO  WRK-PERFORM-YMD-G
-               MOVE    MDCREQ-PERFORM-DATE(1:4)
-                                         TO  WRK-PERFORM-YMD(1:4)
-               MOVE    MDCREQ-PERFORM-DATE(6:2)
-                                         TO  WRK-PERFORM-YMD(5:2)
-               MOVE    MDCREQ-PERFORM-DATE(9:2)
-                                         TO  WRK-PERFORM-YMD(7:2)
-            ELSE
-               MOVE    MDCREQ-PERFORM-DATE TO  WRK-PERFORM-YMD
-               MOVE    MDCREQ-PERFORM-DATE(1:4)
-                                         TO  WRK-PERFORM-YMD-G(1:4)
-               MOVE    "-"
-                                         TO  WRK-PERFORM-YMD-G(5:1)
-               MOVE    MDCREQ-PERFORM-DATE(5:2)
-                                         TO  WRK-PERFORM-YMD-G(6:2)
-               MOVE    "-"
-                                         TO  WRK-PERFORM-YMD-G(8:1)
-               MOVE    MDCREQ-PERFORM-DATE(7:2)
-                                         TO  WRK-PERFORM-YMD-G(9:2)
-            END-IF
-            IF MDCREQ-PERFORM-TIME(3:1)    =   ":"
-               MOVE    MDCREQ-PERFORM-TIME
-                                           TO  WRK-PERFORM-TIME-G
-               MOVE    MDCREQ-PERFORM-TIME(1:2)
-                                         TO  WRK-PERFORM-TIME(1:2)
-               MOVE    MDCREQ-PERFORM-TIME(4:2)
-                                         TO  WRK-PERFORM-TIME(3:2)
-               MOVE    MDCREQ-PERFORM-TIME(7:2)
-                                         TO  WRK-PERFORM-TIME(5:2)
-            ELSE
-               MOVE    MDCREQ-PERFORM-TIME
-                                           TO  WRK-PERFORM-TIME
-               MOVE    MDCREQ-PERFORM-TIME(1:2)
-                                         TO  WRK-PERFORM-TIME-G(1:2)
-               MOVE    ":"
-                                         TO  WRK-PERFORM-TIME-G(3:1)
-               MOVE    MDCREQ-PERFORM-TIME(3:2)
-                                         TO  WRK-PERFORM-TIME-G(4:2)
-               MOVE    ":"
-                                         TO  WRK-PERFORM-TIME-G(6:1)
-               MOVE    MDCREQ-PERFORM-TIME(5:2)
-                                         TO  WRK-PERFORM-TIME-G(7:2)
-            END-IF
+           IF     (MCP-RC              =   ZERO  OR  1  )
+               PERFORM 10001-XML-REMAKE-SEC
            ELSE
                DISPLAY "XMLREAD failure = " MCP-RC
            END-IF
       *
-           MOVE   'XMLCLOSE'           TO  MCP-FUNC
+           MOVE    "XMLCLOSE"          TO  MCP-FUNC
            MOVE    "xml_medicalreq"    TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE   ORCA-BLOB-OBJECT     TO  MDCREQ-OBJECT
-           CALL   'ORCDBMAIN'          USING
+           MOVE    ORCA-BLOB-OBJECT    TO  MDCREQ-OBJECT
+           CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-MEDICALREQ
                                        SPA-AREA
@@ -587,106 +454,71 @@
            EXIT.
       *
       *****************************************************************
-      *    CSV情報から内容を取り出す
-      *****************************************************************
-       1000-APTCSVREAD-SEC   SECTION.
-      *
-           MOVE   "BLOBEXPORT"         TO  MCP-FUNC
-           MOVE    "blob"              TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    API-BODY            TO  ORCA-BLOB-OBJECT
-      *
-           STRING  "/tmp/"             DELIMITED  BY  SPACE
-                   MCP-TERM            DELIMITED  BY  SPACE
-                   ".csv"              DELIMITED  BY  SPACE
-                                       INTO   ORCA-BLOB-FILE 
-           END-STRING
-      *
-           CALL   "ORCDBMAIN"          USING
-                                       MCPAREA
-                                       ORCA-BLOB
-                                       SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
-               CONTINUE
-           ELSE
-               DISPLAY "BLOBEXPORT failure"
-           END-IF
-      *
-           MOVE    ORCA-BLOB-FILE      TO  REQCSV
-      *
-           OPEN    INPUT     REQCSV-FILE
-      *
-           IF      STS-REQCSV          =   ZERO
-               DISPLAY "FILE OPEN OK"
-           ELSE
-               DISPLAY "FILE OPEN NG " STS-REQCSV
-           END-IF
-      *
-           READ    REQCSV-FILE
-               AT  END
-                   MOVE    1               TO  FLG-REQCSV
-               NOT AT  END
-                   MOVE    ZERO            TO  FLG-REQCSV
-           END-READ
-      *
-           UNSTRING    REQCSV-RECORD   DELIMITED  BY  ","
-                                       INTO    WRK-PTNUM
-                                               WRK-PERFORM-YMD
-                                               WRK-PERFORM-TIME
-                                               WRK-APPOINT-ID
-                                               WRK-SRYKA
-                                               WRK-DRCD
-                                               WRK-SRYNAIYO
-                                               WRK-YYKNAIYO
-                                               WRK-YYKMEMO
-           END-UNSTRING
-      *
-           CLOSE             REQCSV-FILE
-      *
-           .
-       1000-APTCSVREAD-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    XML情報書き込み処理
       *****************************************************************
-       1000-APTXMLMAKE-SEC   SECTION.
+       300-APTXMLMAKE-SEC   SECTION.
       *
-           MOVE   "XMLOPEN"            TO  MCP-FUNC
+      *    エラーメッセージ編集
+           IF      WRK-ERRCD           =   SPACE
+               IF      FLG-SYORI           =   1
+                   MOVE    WRK-KEICD           TO  WRK-ERRCD
+               END-IF
+           END-IF
+           IF      WRK-ERRCD           =   SPACE
+      *        正常終了
+               EVALUATE    FLG-SYORI
+                   WHEN    1
+                       MOVE    "登録処理終了"
+                                           TO  MDCRES-API-RESULT-MSG
+               END-EVALUATE
+           ELSE
+               IF      WRK-ERRMSG          =   SPACE
+      *        エラー・警告メッセージ
+                   PERFORM 890-ERRCD-MSG-SEC
+               END-IF
+               MOVE    WRK-ERRCD           TO  MDCRES-API-RESULT
+               MOVE    WRK-ERRMSG          TO  MDCRES-API-RESULT-MSG
+           END-IF
+      *
+           IF      API-BODY        NOT =   LOW-VALUE
+               DISPLAY "MDCRES-OBJECT not low_value"
+           END-IF
+      *
+           MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_medicalres"    TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE   1                    TO  MDCRES-MODE
-           CALL   "ORCDBMAIN"          USING
+           MOVE    1                   TO  MDCRES-MODE
+           CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-MEDICALRES
                                        SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
+           IF     (MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLOPEN failure = " MCP-RC
            END-IF
       *
-           MOVE   "XMLWRITE"           TO  MCP-FUNC
+           MOVE    "XMLWRITE"          TO  MCP-FUNC
            MOVE    "xml_medicalres"    TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           CALL   "ORCDBMAIN"          USING
+           CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-MEDICALRES
                                        SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
+           IF     (MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLWRITE failure = " MCP-RC
            END-IF
       *
-           MOVE   "XMLCLOSE"           TO  MCP-FUNC
+           MOVE    "XMLCLOSE"          TO  MCP-FUNC
            MOVE    "xml_medicalres"    TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           CALL   "ORCDBMAIN"          USING
+           CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-MEDICALRES
                                        SPA-AREA
-           IF (MCP-RC = ZERO OR 1)
+           IF     (MCP-RC              =   ZERO  OR  1  )
                MOVE  MDCRES-OBJECT     TO  API-BODY 
                MOVE  "application/xml" TO  APIREQ-CONTENT-TYPE
            ELSE
@@ -696,161 +528,441 @@
            END-IF
       *
           .
-       1000-APTXMLMAKE-EXT.
+       300-APTXMLMAKE-EXT.
            EXIT.
       *
       *****************************************************************
-      *    予約前チェックおよび予約登録
+      *    読み込んだXMLのLOW-VALUE を  SPACE に置換
       *****************************************************************
-       1001-WKSRY-ADD-SEC        SECTION.
+       10001-XML-REMAKE-SEC        SECTION.
       *
-           MOVE  PTINF-NAME            TO  MDCRES-NAME
-           MOVE  PTINF-KANANAME        TO  MDCRES-KANANAME
-           MOVE  PTINF-BIRTHDAY(1:4)   TO  MDCRES-BIRTHDAY(1:4)
-           MOVE  "-"                   TO  MDCRES-BIRTHDAY(5:1)
-           MOVE  PTINF-BIRTHDAY(5:2)   TO  MDCRES-BIRTHDAY(6:2)
-           MOVE  "-"                   TO  MDCRES-BIRTHDAY(8:1)
-           MOVE  PTINF-BIRTHDAY(7:2)   TO  MDCRES-BIRTHDAY(9:2)
-           MOVE  PTINF-SEX             TO  MDCRES-SEX
+           IF      MDCREQ-OUTPATIENT-CLASS    =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-OUTPATIENT-CLASS
+           END-IF
+           IF      MDCREQ-PATIENTID    =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-PATIENTID
+           END-IF
+           IF     MDCREQ-PERFORM-DATE  =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-PERFORM-DATE
+           END-IF
+           IF     MDCREQ-PERFORM-TIME  =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-PERFORM-TIME
+           END-IF
+           IF      MDCREQ-APPOINT-DEP-CODE =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-APPOINT-DEP-CODE
+           END-IF
+           IF      MDCREQ-APPOINT-DR-CODE  =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-APPOINT-DR-CODE
+           END-IF
+           IF  MDCREQ-MAIN-INSURANCE-CLASS  =   LOW-VALUE
+               MOVE  SPACE             TO  
+                                       MDCREQ-MAIN-INSURANCE-CLASS
+           END-IF
+           IF  MDCREQ-MAIN-INSURANCE-NUMBER =   LOW-VALUE
+               MOVE  SPACE             TO  
+                                       MDCREQ-MAIN-INSURANCE-NUMBER
+           END-IF
+           IF  MDCREQ-MAIN-INSURANCE-NAME   =   LOW-VALUE
+               MOVE  SPACE             TO  
+                                       MDCREQ-MAIN-INSURANCE-NAME
+           END-IF
+           IF  MDCREQ-MAIN-MARK      =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-MARK
+           END-IF
+           IF  MDCREQ-MAIN-NUMBER    =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-NUMBER
+           END-IF
+           IF  MDCREQ-MAIN-CONTINUATION     =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-CONTINUATION
+           END-IF
+           IF  MDCREQ-MAIN-ASSISTANCE =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-ASSISTANCE
+           END-IF
+           IF  MDCREQ-MAIN-FAMILY     =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-FAMILY
+           END-IF
+           IF  MDCREQ-MAIN-POLICYHOLDER     =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-POLICYHOLDER
+           END-IF
+           IF  MDCREQ-MAIN-START-DATE =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-START-DATE
+           END-IF
+           IF  MDCREQ-MAIN-END-DATE   =   LOW-VALUE
+               MOVE  SPACE             TO  MDCREQ-MAIN-END-DATE
+           END-IF
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   4
+               IF      MDCREQ-INSURANCE-CLASS(IDX)  =   LOW-VALUE
+                   MOVE  SPACE             TO  MDCREQ-INSURANCE-CLASS
+                                                                  (IDX)
+               END-IF
+               IF      MDCREQ-INSURANCE-NAME(IDX)    =   LOW-VALUE
+                   MOVE  SPACE             TO  
+                                       MDCREQ-INSURANCE-NAME(IDX)
+               END-IF
+               IF      MDCREQ-PROVIDER-NUMBER(IDX)   =   LOW-VALUE
+                   MOVE  SPACE             TO  
+                                       MDCREQ-PROVIDER-NUMBER(IDX)
+               END-IF
+               IF      MDCREQ-RECIPIENT-NUMBER(IDX)  =   LOW-VALUE
+                   MOVE  SPACE             TO  
+                                       MDCREQ-RECIPIENT-NUMBER(IDX)
+               END-IF
+               IF      MDCREQ-INSURANCE-START-DATE(IDX) =   LOW-VALUE
+                   MOVE    SPACE      TO   MDCREQ-INSURANCE-START-DATE
+                                                                 (IDX)
+               END-IF
+               IF      MDCREQ-INSURANCE-END-DATE(IDX)   =   LOW-VALUE
+                   MOVE    SPACE       TO  MDCREQ-INSURANCE-END-DATE
+                                                                (IDX)
+               END-IF
+           END-PERFORM 
+      *
+           .
+       10001-XML-REMAKE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者基本情報設定内容チェック
+      *****************************************************************
+       2001-INPUT-CHK-SEC      SECTION.
+      *
+      *    編集処理
+           PERFORM 20010-INPUT-HEN-SEC
+      *
+      *    診療日チェック
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 20011-PERFORM-CHK-SEC
+           END-IF
+      *    患者番号チェック
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 20011-PTNUM-CHK-SEC
+           END-IF
+      *    診療科コードチェック
+           IF     (WRK-SRYKA       NOT =   SPACE  )
+           AND    (WRK-ERRCD           =   SPACE  )
+               PERFORM 20011-SRYKA-CHK-SEC
+           END-IF
+      *    ドクターコードチェック
+           IF     (WRK-DRCD        NOT =   SPACE  )
+           AND    (WRK-ERRCD           =   SPACE  )
+               PERFORM 20011-DRCD-CHK-SEC
+           END-IF
+      *
+           .
+       2001-INPUT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入力項目変換編集処理
+      *****************************************************************
+       20010-INPUT-HEN-SEC     SECTION.
+      *
+      *    患者番号
+           MOVE    MDCREQ-PATIENTID        TO  MDCRES-PATIENTID
+           MOVE    MDCREQ-PATIENTID        TO  WRK-PTNUM
+      *    診療科
+           MOVE    MDCREQ-APPOINT-DEP-CODE
+                                           TO  MDCRES-APPOINT-DEP-CODE
+           MOVE    MDCREQ-APPOINT-DEP-CODE
+                                           TO  WRK-SRYKA
+      *    ドクター
+           MOVE    MDCREQ-APPOINT-DR-CODE
+                                           TO  MDCRES-APPOINT-DR-CODE
+           MOVE    MDCREQ-APPOINT-DR-CODE
+                                           TO  WRK-DRCD
+      *    診療日・時間
+           MOVE    MDCREQ-PERFORM-DATE     TO  MDCRES-PERFORM-DATE
+           MOVE    MDCREQ-PERFORM-TIME     TO  MDCRES-PERFORM-TIME
+      *    数字のみに編集
+           MOVE    MDCREQ-PERFORM-DATE     TO  WRK-HEN-DATE
+           MOVE    MDCREQ-PERFORM-TIME     TO  WRK-HEN-TIME
+           PERFORM 802-DAYHEN02-SEC
+           MOVE    WRK-SYMD                TO  WRK-PERFORM-YMD
+           MOVE    WRK-THMS                TO  WRK-PERFORM-TIME
+      *    未設定時はシステム情報設定
+           IF      WRK-PERFORM-YMD         =   SPACE
+               MOVE    SMCNDATE-YMD        TO  WRK-PERFORM-YMD
+               MOVE    MDCRES-INFORMATION-DATE
+                                           TO  MDCRES-PERFORM-DATE
+               MOVE    "K1"                TO  WRK-KEICD
+           END-IF
+      *    診療日をシステム日付へ
+           MOVE    WRK-PERFORM-YMD      TO  SPA-SYSYMD
+      *
+      *    必須入力チェック
+      *    患者番号
+           IF      WRK-PTNUM           =   SPACE
+               MOVE    "01"                TO  WRK-ERRCD
+           END-IF
+      *    診療科
+           IF      WRK-SRYKA           =   SPACE
+               IF     (WRK-ERRCD           =   SPACE  )
+                   MOVE    "02"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *    ドクター
+           IF      WRK-DRCD            =   SPACE
+               IF     (WRK-ERRCD           =   SPACE  )
+                   MOVE    "03"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+           .
+       20010-INPUT-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療日付チェック
+      *****************************************************************
+       20011-PERFORM-CHK-SEC    SECTION.
+      *
+      *    日付チェックサブ
+           INITIALIZE                      ORCSGDAYAREA
+           MOVE    WRK-PERFORM-YMD     TO  SGDAY-INDAY
+           CALL    "ORCSGDAY"          USING
+                                       ORCSGDAYAREA
+           IF      SGDAY-RC            NOT =   ZERO
+               MOVE    "11"                TO  WRK-ERRCD
+               DISPLAY "Accept Ymd =  " WRK-PERFORM-YMD
+           END-IF
+      *
+           .
+       20011-PERFORM-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者番号チェック
+      *****************************************************************
+       20011-PTNUM-CHK-SEC     SECTION.
+      *
+      *    患者番号取得
+           INITIALIZE                  ORCSPTIDAREA
+           MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
+           MOVE    WRK-PTNUM           TO  SPTID-PTNUM
+           CALL    "ORCSPTID"          USING   ORCSPTIDAREA
+                                               SPA-AREA
+           IF      SPTID-RC        NOT =   ZERO
+               MOVE    "10"                TO  WRK-ERRCD
+               GO      TO                  20011-PTNUM-CHK-EXT
+           END-IF
+      *
+           MOVE    SPTID-PTNUM         TO  MDCRES-PATIENTID
+           MOVE    SPTID-PTNUM         TO  WRK-PTNUM
+           MOVE    SPTID-PTID          TO  SPA-PTID
+      *
+           INITIALIZE                      PTINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    SPTID-PTID          TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+           IF      FLG-PTINF       NOT =   ZERO
+               MOVE    "10"                TO  WRK-ERRCD
+           END-IF
+           .
+       20011-PTNUM-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療科コードチェック
+      *****************************************************************
+       20011-SRYKA-CHK-SEC         SECTION.
+      *
+      *    診療科の存在チェック
+           MOVE    SPACE               TO  SYS-1005-REC
+           INITIALIZE                  SYS-1005-REC
+           MOVE    "1005"              TO  SYS-1005-KANRICD
+           MOVE    WRK-SRYKA           TO  SYS-1005-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-1005-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-1005-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+      *    システム管理検索
+           MOVE    SYS-1005-REC        TO  SYSKANRI-REC
+           PERFORM 900-SYSKANRI-SEL-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1005-REC
+               MOVE    SYS-1005-SRYKANAME1 TO  WRK-SRYKA-NAME
+           ELSE
+               MOVE    "13"                TO  WRK-ERRCD
+           END-IF
+      *
+           .
+       20011-SRYKA-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ドクタコードチェック
+      *****************************************************************
+       20011-DRCD-CHK-SEC          SECTION.
+      *
+      *    ドクタの存在チェック
+           MOVE    SPACE               TO  SYS-1010-REC
+           INITIALIZE                  SYS-1010-REC
+           MOVE    "1010"              TO  SYS-1010-KANRICD
+           MOVE    WRK-DRCD            TO  SYS-1010-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-1010-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-1010-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
+      *    システム管理検索
+           MOVE    SYS-1010-REC        TO  SYSKANRI-REC
+           PERFORM 900-SYSKANRI-SEL-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1010-REC
+               MOVE    SYS-1010-NAME       TO  WRK-DRCD-NAME
+           ELSE
+               MOVE    "14"                TO  WRK-ERRCD
+           END-IF
+      *
+           .
+       20011-DRCD-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    中途終了データ登録処理
+      *****************************************************************
+       2002-WKSRYACT-ADD-SEC        SECTION.
+      *
+      *    患者情報内容編集
+           PERFORM 20021-MDCRES-HEN-SEC
       * 
       *    排他チェック & ロック処理
            PERFORM 990-LOCK-IN-SEC
-           IF  SLOCK-RETURN    NOT =   ZERO
-               MOVE   "90"           TO  MDCRES-API-RESULT
-               MOVE   "他端末使用中" TO  MDCRES-API-RESULT-MSG
-               GO     TO             1001-WKSRY-ADD-EXT
+           IF      SLOCK-RETURN    NOT =   ZERO
+               MOVE    "90"            TO  WRK-ERRCD
+               GO      TO      2002-WKSRYACT-ADD-EXT
            END-IF
-      *    CLAIM形式に変更するために医療機関コードを取得
-           PERFORM 1001-IRYOUKIKAN-GET-SEC
-      * 
-           PERFORM     VARYING   IDX   FROM    1   BY  1
-                       UNTIL    (IDX           >   4)
-      *    DISPLAY "------- 本当はいらない処理 ↓ --------------"
-      *    PERFORM 1001-IRYOUKIKAN-GET-SEC
-      *    DISPLAY "------- 本当はいらない処理 ↑ メモリ破壊------------"
-           DISPLAY "------- claim call --------------"
-               PERFORM 10011-CLAIM-CALL-SEC
-           DISPLAY "------- claim call end ----------"
-           END-PERFORM
-      * 
+      *
+      *    診療行為登録処理
+           PERFORM 20021-CLAIM-CALL-SEC
+      *
            PERFORM 990-LOCK-OUT-SEC
-           IF  SLOCK-RETURN    NOT =   ZERO
+           IF      SLOCK-RETURN    NOT =   ZERO
                DISPLAY "ロック解除失敗"
            END-IF
            .
-       1001-WKSRY-ADD-EXT.
+       2002-WKSRYACT-ADD-EXT.
            EXIT.
+      *****************************************************************
+      *    患者情報出力情報編集処理
+      *****************************************************************
+       20021-MDCRES-HEN-SEC     SECTION.
       *
+           MOVE    PTINF-NAME          TO  MDCRES-NAME
+           MOVE    PTINF-KANANAME      TO  MDCRES-KANANAME
+           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
+           MOVE    ZERO                TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  MDCRES-BIRTHDAY
+           MOVE    PTINF-SEX           TO  MDCRES-SEX
+      *    MOVE    PTINF-HOME-POST     TO  MDCRES-HOME-ZIP-CODE
+      *    STRING  PTINF-HOME-ADRS
+      *            PTINF-HOME-BANTI    DELIMITED  BY  SPACE
+      *                                INTO    MDCRES-HOME-ADDRESSES
+      *    END-STRING
       *
+           MOVE    WRK-SRYKA-NAME      TO  MDCRES-APPOINT-DEP-NAME
+           MOVE    WRK-DRCD-NAME       TO  MDCRES-APPOINT-DR-NAME
+           .
+       20021-MDCRES-HEN-EXT.
+           EXIT.
       *
       *****************************************************************
       *    診療行為登録処理
       *****************************************************************
-       10011-CLAIM-CALL-SEC        SECTION.
+       20021-CLAIM-CALL-SEC        SECTION.
       *
-           IF      MDCREQ-DEP-CODE(IDX)    = SPACE
-             AND   MDCREQ-DR-CODE(IDX)     = SPACE
-               MOVE  10                TO  IDX
-               GO    TO                10011-CLAIM-CALL-EXT
+           MOVE    SPACE               TO  LF04-REC
+           INITIALIZE                  LF04-REC
+      *    入外区分
+           IF      MDCREQ-OUTPATIENT-CLASS =  "I"
+               MOVE    "true"              TO  LF04-NYUGAIKBN
            END-IF
-           INITIALIZE        LF04-REC
-           IF      MDCREQ-OUTPATIENT-CLASS  =  "I"
-               MOVE  "true"            TO  LF04-NYUGAIKBN
-           END-IF
-           MOVE    SYS-1001-HOSPID     TO  LF04-CRE001-FACILITYID
-           IF      MDCREQ-PERFORM-DATE(5:1)  = "-"
-               MOVE    MDCREQ-PERFORM-DATE
-                                       TO  LF04-PERFORM-TIME
-           ELSE
-               MOVE    MDCREQ-PERFORM-DATE(1:4) 
-                                       TO  LF04-PERFORM-TIME(1:4)
-               MOVE    "-"                 TO  LF04-PERFORM-TIME(5:1)
-               MOVE    MDCREQ-PERFORM-DATE(5:2) 
-                                       TO  LF04-PERFORM-TIME(6:2)
-               MOVE    "-"                 TO  LF04-PERFORM-TIME(8:1)
-               MOVE    MDCREQ-PERFORM-DATE(7:2) 
-                                       TO  LF04-PERFORM-TIME(9:2)
-           END-IF
-           MOVE    MDCREQ-PATIENTID    TO  LF04-PTID1
-           MOVE    MDCREQ-DEP-CODE(IDX)    
-                                       TO  LF04-CRE001-DPERTID
-           MOVE    MDCREQ-DR-CODE(IDX)    
-                                       TO  LF04-DOCCD
-           MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)
-                                       TO  LF04-HKN-HKNSBTCODE(01)
-           PERFORM     2001-HKNNUM-SET-SEC
+      *    医療機関ＩＤ
+           MOVE    SPA-HOSPID          TO  LF04-CRE001-FACILITYID
+      *    診療日付
+           MOVE    WRK-PERFORM-YMD     TO  WRK-SYMD
+           MOVE    ZERO                TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  LF04-PERFORM-TIME
+      *    患者番号
+           MOVE    WRK-PTNUM           TO  LF04-PTID1
+           MOVE    WRK-SRYKA           TO  LF04-CRE001-DPERTID
+           MOVE    WRK-DRCD            TO  LF04-DOCCD
+      *    保険情報
+           MOVE    MDCREQ-MAIN-INSURANCE-CLASS
+                                       TO  LF04-HKN-HKNSBTCODE (01)
+           PERFORM 2001-HKNNUM-SET-SEC
            PERFORM     VARYING   IDY   FROM    1   BY  1
-                       UNTIL    (IDY           >   3)
-               MOVE  MDCREQ-INSURANCE-NAME(IDX IDY)
+                       UNTIL    (IDY           >   4)
+               MOVE    MDCREQ-INSURANCE-NAME (IDY)
                                        TO  LF04-HKNKOH-PROVIDER(1 IDY)
-               MOVE  MDCREQ-PROVIDER-NUMBER(IDX IDY)
+               MOVE    MDCREQ-PROVIDER-NUMBER (IDY)
                                        TO  LF04-HKNKOH-FTNJANUM(1 IDY)
-               MOVE  MDCREQ-RECIPIENT-NUMBER(IDX IDY)
+               MOVE    MDCREQ-RECIPIENT-NUMBER (IDY)
                                        TO  LF04-HKNKOH-JKYSNUM(1 IDY)
            END-PERFORM
-      *  診療情報設定
-           PERFORM     VARYING   IDY   FROM    1   BY  1
-      *                UNTIL    (IDY           >   40)
-                       UNTIL    (IDY           >   20)
-               MOVE  MDCREQ-MDC-CLASS(IDX IDY)
-                                       TO  LF04-SRYCD(IDY)
-               MOVE  MDCREQ-MDC-CLASS-NUMBER(IDX IDY)
-                                       TO  LF04-KAISU(IDY)
-             PERFORM     VARYING   IDZ   FROM    1   BY  1
-      *                UNTIL    (IDZ           >   40)
-                       UNTIL    (IDZ           >   20)
-             IF MDCREQ-PRSCRPT-CODE(IDX IDY IDZ) NOT = SPACE
-             DISPLAY "code = " MDCREQ-PRSCRPT-CODE(IDX IDY IDZ) 
-             END-IF
-               MOVE  MDCREQ-PRSCRPT-CODE(IDX IDY IDZ)
-                                       TO  LF04-IJICD(IDY IDZ)
-               MOVE  MDCREQ-PRSCRPT-NUMBER(IDX IDY IDZ)
-                                       TO  LF04-SURYO(IDY IDZ)
-             END-PERFORM
+      *    診療情報設定
+           PERFORM VARYING   IDY   FROM    1   BY  1
+                   UNTIL    (IDY           >   40)
+               MOVE    MDCREQ-MDC-CLASS (IDY)
+                                           TO  LF04-SRYCD(IDY)
+               MOVE    MDCREQ-MDC-CLASS-NUMBER (IDY)
+                                           TO  LF04-KAISU(IDY)
+      *        剤内容
+               PERFORM VARYING   IDZ   FROM    1   BY  1
+                       UNTIL    (IDZ           >   40)
+                   MOVE    MDCREQ-PRSCRPT-CODE (IDY IDZ)
+                                           TO  LF04-IJICD(IDY IDZ)
+                   MOVE    MDCREQ-PRSCRPT-NAME (IDY IDZ)
+                                           TO  LF04-ALSNAME(IDY IDZ)
+                   MOVE    MDCREQ-PRSCRPT-NUMBER(IDY IDZ)
+                                           TO  LF04-SURYO(IDY IDZ)
+      *
+                   IF      MDCREQ-PRSCRPT-CODE (IDY IDZ)   NOT =   SPACE
+                       ADD     1               TO  CNT-SRYCNT
+                   END-IF
+               END-PERFORM
            END-PERFORM
-      *  診断履歴情報設定
+      *    診断履歴情報設定
            PERFORM     VARYING   IDY   FROM    1   BY  1
                        UNTIL    (IDY           >   50)
-               MOVE  MDCREQ-DIAGNOSIS-NUMBER(IDX IDY)
-                                       TO  LF04-SND-SPICOD1(IDY)
-               MOVE  MDCREQ-DIAGNOSIS-NAME(IDX IDY)
-                                       TO  LF04-SND-SPINAME1(IDY)
-               PERFORM     VARYING   IDZ   FROM    1   BY  1
-                           UNTIL    (IDZ           >   6)
-                 MOVE  MDCREQ-DIAGNOSIS-SINGLE-NUMBER(IDX IDY IDZ)
-                                       TO  
-                                       LF04-SNDSPITBL-SPICOD2(IDY IDZ)
-                 MOVE  MDCREQ-DIAGNOSIS-SINGLE-NAME(IDX IDY IDZ)
-                                       TO  
-                                       LF04-SNDSPITBL-SPINAME2(IDY IDZ)
+               MOVE    MDCREQ-DIAGNOSIS-NUMBER(IDY)
+                                           TO  LF04-SND-SPICOD1(IDY)
+               MOVE    MDCREQ-DIAGNOSIS-NAME (IDY)
+                                           TO  LF04-SND-SPINAME1(IDY)
+               PERFORM VARYING   IDZ   FROM    1   BY  1
+                       UNTIL    (IDZ           >   6)
+                   MOVE    MDCREQ-DIAGNOSIS-SINGLE-NUMBER(IDY IDZ)
+                                           TO  LF04-SNDSPITBL-SPICOD2
+                                                          (IDY IDZ)
+                   MOVE    MDCREQ-DIAGNOSIS-SINGLE-NAME (IDY IDZ)
+                                           TO  LF04-SNDSPITBL-SPINAME2
+                                                           (IDY IDZ)
+                   IF      MDCREQ-DIAGNOSIS-SINGLE-NUMBER(IDY IDZ)
+                                               NOT =   SPACE
+                       ADD     1               TO  CNT-BYOCNT
+                   END-IF
                END-PERFORM
-               IF    MDCREQ-DIAGNOSIS-CATEGORY(IDX IDY)
-                                       = "PD"
-                 MOVE  "MML0012"
-                                       TO  
-                                       LF04-SNDBNRTBL-BNRTBL1(IDY 1)
-                 MOVE  "mainDiagnosis"
-                                       TO  
-                                       LF04-SNDBNRTBL-BNRNAME1(IDY 1)
+               IF      MDCREQ-DIAGNOSIS-CATEGORY (IDY)
+                                           = "PD"
+                   MOVE    "MML0012"       TO  LF04-SNDBNRTBL-BNRTBL1
+                                                             (IDY 1)
+                   MOVE    "mainDiagnosis"
+                                           TO  LF04-SNDBNRTBL-BNRNAME1
+                                                              (IDY 1)
                END-IF
-               IF    MDCREQ-DIAGNOSIS-SUSPECTEDFLAG(IDX IDY)
-                                       = "S"
-                 MOVE  "MML0015"
-                                       TO  
-                                       LF04-SNDBNRTBL-BNRTBL1(IDY 2)
-                 MOVE  "suspectedDiagnosis"
-                                       TO  
-                                       LF04-SNDBNRTBL-BNRNAME1(IDY 2)
+               IF      MDCREQ-DIAGNOSIS-SUSPECTEDFLAG (IDY)
+                                           = "S"
+                   MOVE    "MML0015"       TO  LF04-SNDBNRTBL-BNRTBL1
+                                                             (IDY 2)
+                   MOVE    "suspectedDiagnosis"
+                                           TO  LF04-SNDBNRTBL-BNRNAME1
+                                                             (IDY 2)
                END-IF
-               MOVE  MDCREQ-DIAGNOSIS-START-DATE(IDX IDY)
-                                       TO  WRK-DAY1
-               PERFORM 100-DAYCHG-DEC
-               MOVE  WRK-DAY2          TO  LF04-SND-SKNSTARTDATE(IDY)
-               MOVE  MDCREQ-DIAGNOSIS-END-DATE(IDX IDY)
-                                       TO  WRK-DAY1
-               PERFORM 100-DAYCHG-DEC
-               MOVE  WRK-DAY2          TO  LF04-SND-SKNENDDATE(IDY)
-               EVALUATE    MDCREQ-DIAGNOSIS-OUTCOME(IDX IDY)
+               MOVE    MDCREQ-DIAGNOSIS-START-DATE(IDY)
+                                           TO  LF04-SND-SKNSTARTDATE
+                                                             (IDY)
+               MOVE    MDCREQ-DIAGNOSIS-END-DATE(IDY)
+                                           TO  LF04-SND-SKNENDDATE(IDY)
+               EVALUATE    MDCREQ-DIAGNOSIS-OUTCOME(IDY)
                    WHEN    "D"
                      MOVE  "died"
                                        TO  LF04-SND-TENKI(IDY)
@@ -874,487 +986,374 @@
                                        TO  LF04-SND-TENKI(IDY)
                END-EVALUATE
            END-PERFORM
-      *    IF      MDCREQ-MAIN-INSURANCE-CLASS(IDX)
-      *                                =   "60"
-      *        MOVE  "00"              TO  LF04-HKN-HKNSBTCODE(01)
-      *    ELSE
-      *        MOVE  MDCREQ-MAIN-INSURANCE-CLASS(IDX)
-      *                                TO  LF04-HKN-HKNSBTCODE(01)
-      *    END-IF
       *
            INITIALIZE                  WRK-ERROR-AREA
            MOVE    "1"                 TO  WRK-KBN-CODE
            CALL    "ORCL0031"          USING LF04-REC
                                              WRK-ERROR-AREA
-           IF      WRK-ERR-CODE    NOT = ZERO
-               MOVE   WRK-ERR-CODE   TO  MDCRES-API-RESULT
-               MOVE   WRK-ERR-MSG    TO  MDCRES-API-RESULT-MSG
+           IF      WRK-OUT-HKNCOMBI    NOT =   ZERO
+      *        対象保険組合せ情報編集
+               PERFORM 200210-HKNCOMBI-HEN-SEC
+           END-IF
+           IF      WRK-ERR-CODE    NOT =   ZERO
+      ******** MOVE    WRK-ERR-CODE        TO  WRK-ERRCD
+               MOVE    "80"                TO  WRK-ERRCD
+               MOVE    WRK-ERR-MSG         TO  WRK-ERRMSG
+           ELSE
+               IF      WRK-OUT-HKNCOMBI    =   ZERO
+                                           OR  SPACE
+                   MOVE    "K2"                TO  WRK-KEICD
+               END-IF
+               IF     (CNT-SRYCNT          >   ZERO )  AND
+                      (WRK-OUT-CNT1        =   ZERO )
+                   MOVE    "20"                TO  WRK-ERRCD
+               END-IF
+               IF     (CNT-BYOCNT          >   ZERO )  AND
+                      (WRK-OUT-CNT2        =   ZERO )
+                   MOVE    "21"                TO  WRK-ERRCD
+               END-IF
+               IF     (CNT-SRYCNT          =   ZERO )  AND
+                      (CNT-BYOCNT          =   ZERO )
+                   MOVE    "22"                TO  WRK-ERRCD
+               END-IF
            END-IF
       *
            .
-       10011-CLAIM-CALL-EXT.
+       20021-CLAIM-CALL-EXT.
            EXIT.
       *
       *****************************************************************
-      *    日付編集
+      *    保険種類変換処理
       *****************************************************************
        2001-HKNNUM-SET-SEC     SECTION.
-      *    
-           IF      MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
-                                       NOT = SPACE
-             EVALUATE  MDCREQ-MAIN-INSURANCE-CLASS(IDX)
+      *
+           EVALUATE    MDCREQ-MAIN-INSURANCE-CLASS
                WHEN    "060"
-                 MOVE  "00"            TO  LF04-HKN-HKNSBTCODE(01)
+                   MOVE    "00"            TO  LF04-HKN-HKNSBTCODE(01)
                WHEN    "971"
-                 MOVE  "R1"            TO  LF04-HKN-HKNSBTCODE(01)
+                   MOVE    "R1"            TO  LF04-HKN-HKNSBTCODE(01)
                WHEN    "973"
-                 MOVE  "R3"            TO  LF04-HKN-HKNSBTCODE(01)
+                   MOVE    "R3"            TO  LF04-HKN-HKNSBTCODE(01)
                WHEN    "975"
-                 MOVE  "K5"            TO  LF04-HKN-HKNSBTCODE(01)
+                   MOVE    "K5"            TO  LF04-HKN-HKNSBTCODE(01)
                WHEN    OTHER
-                 EVALUATE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(1:2)
+                   EVALUATE    MDCREQ-MAIN-INSURANCE-CLASS (1:2)
                    WHEN    "98" 
-                     MOVE  "Z"         TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(1:1)
-                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
-                                       TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(2:1)
+                       MOVE  "Z"           TO  LF04-HKN-HKNSBTCODE
+                                                           (01)(1:1)
+                       MOVE    MDCREQ-MAIN-INSURANCE-CLASS (3:1)
+                                           TO  LF04-HKN-HKNSBTCODE
+                                                           (01)(2:1)
                    WHEN    "90" 
-                     MOVE  "A"         TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(1:1)
-                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
-                                       TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(2:1)
+                       MOVE  "A"           TO  LF04-HKN-HKNSBTCODE
+                                                           (01)(1:1)
+                       MOVE    MDCREQ-MAIN-INSURANCE-CLASS (3:1)
+                                           TO  LF04-HKN-HKNSBTCODE
+                                                           (01)(2:1)
                    WHEN    "91" 
-                     MOVE  "B"         TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(1:1)
-                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(3:1)
-                                       TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(2:1)
+                       MOVE  "B"           TO  LF04-HKN-HKNSBTCODE
+                                                           (01)(1:1)
+                       MOVE    MDCREQ-MAIN-INSURANCE-CLASS (3:1)
+                                           TO  LF04-HKN-HKNSBTCODE
+                                                           (01)(2:1)
                    WHEN    OTHER
-                     MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)(2:2)
-                                       TO  LF04-HKN-HKNSBTCODE
-                                                     (01)(1:2)
-                 END-EVALUATE
-             END-EVALUATE
-           ELSE
-             MOVE    MDCREQ-MAIN-INSURANCE-CLASS(IDX)
-                                       TO  LF04-HKN-HKNSBTCODE(01)
-           END-IF
+                       MOVE    MDCREQ-MAIN-INSURANCE-CLASS (2:2)
+                                           TO  LF04-HKN-HKNSBTCODE
+                                                          (01)(1:2)
+                   END-EVALUATE
+           END-EVALUATE
       *
            .
        2001-HKNNUM-SET-EXT.
            EXIT.
       *
       *****************************************************************
-      *    日付編集
+      *    保険種類変換処理
       *****************************************************************
-       100-DAYCHG-DEC     SECTION.
-      *    
-           DISPLAY "WRK-DAY1 = " WRK-DAY1
-           MOVE    SPACE               TO  WRK-DAY2
-           IF      WRK-DAY1            =   SPACE
-               GO  TO       100-DAYCHG-EXT
-           END-IF
-           IF      WRK-DAY1(5:1)       =   "-"
-               MOVE    WRK-DAY1        TO  WRK-DAY2
-               GO  TO       100-DAYCHG-EXT
-           END-IF
-           MOVE    WRK-DAY1(1:4)       TO  WRK-DAY2(1:)
-           MOVE    "-"                 TO  WRK-DAY2(5:1)
-           MOVE    WRK-DAY1(5:2)       TO  WRK-DAY2(6:2)
-           MOVE    "-"                 TO  WRK-DAY2(8:1)
-           MOVE    WRK-DAY1(7:2)       TO  WRK-DAY2(9:2)
-           DISPLAY "WRK-DAY2 = " WRK-DAY2
+       200210-HKNCOMBI-HEN-SEC     SECTION.
+      *
+      *    保険組合せ編集処理
+           INITIALIZE                      ORCSAPIHKNAREA
+      *    追加処理
+           MOVE    "1"                 TO  ORCSAPIHKN-KBN
+      *    診療科
+           MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
+      *    保険組合せ
+           MOVE    WRK-OUT-HKNCOMBI    TO  ORCSAPIHKN-IN-HKNCOMBI
+           CALL    "ORCSAPIHKN"        USING
+                                       SPA-AREA
+                                       ORCSAPIHKNAREA
+      *
+      *    出力領域保険情報編集
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   20  )
+                         OR   (ORCSAPIHKN-THKNCOMBI (IDX)
+                                           =   SPACE  )
+               IF      ORCSAPIHKN-THKNCOMBI (IDX)  =   WRK-OUT-HKNCOMBI
+                   PERFORM 2002101-HKNHEN-TBL-SEC
+                   MOVE    20                  TO  IDX
+               END-IF
+           END-PERFORM
+           .
+       200210-HKNCOMBI-HEN-EXT.
+      *
+      *****************************************************************
+      *    出力領域保険情報編集処理
+      *****************************************************************
+       2002101-HKNHEN-TBL-SEC              SECTION.
+      *
+      *    保険の種類
+           MOVE    ORCSAPIHKN-HKNNUM (IDX)
+                                   TO  MDCRES-MAIN-INSURANCE-CLASS
+      *    保険者番号
+           MOVE    ORCSAPIHKN-HKNJANUM (IDX)
+                                   TO  MDCRES-MAIN-INSURANCE-NUMBER
+      *    保険の名称
+           MOVE    ORCSAPIHKN-HKNNUM-NAME (IDX)
+                                   TO  MDCRES-MAIN-INSURANCE-NAME
+      *    記号
+           MOVE    ORCSAPIHKN-KIGO  (IDX)
+                                   TO  MDCRES-MAIN-MARK
+      *    番号
+           MOVE    ORCSAPIHKN-NUM  (IDX)
+                                   TO  MDCRES-MAIN-NUMBER
+      *    継続区分
+           MOVE    ORCSAPIHKN-CONTKBN  (IDX)
+                                   TO  MDCRES-MAIN-CONTINUATION
+      *    補助区分
+           MOVE    ORCSAPIHKN-HOJOKBN  (IDX)
+                                   TO  MDCRES-MAIN-ASSISTANCE
+      *    本人家族区分
+           MOVE    ORCSAPIHKN-HONKZKKBN  (IDX)
+                                   TO  MDCRES-MAIN-FAMILY
+      *    被保険者名
+           MOVE    ORCSAPIHKN-HIHKNJANAME  (IDX)
+                                   TO  MDCRES-MAIN-POLICYHOLDER
+      *    有効開始日
+           MOVE    ORCSAPIHKN-TEKSTYMD  (IDX)
+                                   TO  MDCRES-MAIN-START-DATE
+      *    有効終了日
+           MOVE    ORCSAPIHKN-TEKEDYMD  (IDX)
+                                   TO  MDCRES-MAIN-END-DATE
+      *    公費情報
+           PERFORM VARYING     IDY2    FROM    1   BY  1
+                   UNTIL       IDY2    >   4
+      *        公費の種類
+               MOVE    ORCSAPIHKN-KOHNUM (IDX IDY2)
+                                       TO  MDCRES-INSURANCE-CLASS
+                                                             (IDY2)
+      *        公費の種類名称
+               MOVE    ORCSAPIHKN-KOHNUM-NAME (IDX IDY2)
+                                       TO  MDCRES-INSURANCE-NAME
+                                                             (IDY2)
+      *        負担者番号
+               MOVE    ORCSAPIHKN-FTNJANUM (IDX IDY2)
+                                       TO  MDCRES-PROVIDER-NUMBER
+                                                             (IDY2)
+      *        受給者番号
+               MOVE    ORCSAPIHKN-JKYSNUM (IDX IDY2)
+                                       TO  MDCRES-RECIPIENT-NUMBER
+                                                             (IDY2)
+      *        有効開始日
+               MOVE    ORCSAPIHKN-KOH-TEKSTYMD (IDX IDY2)
+                                       TO  MDCRES-INSURANCE-START-DATE
+                                                             (IDY2)
+      *        有効終了日
+               MOVE    ORCSAPIHKN-KOH-TEKEDYMD (IDX IDY2)
+                                       TO  MDCRES-INSURANCE-END-DATE
+                                                             (IDY2)
+      *        入院−負担率（割）
+               MOVE    ORCSAPIHKN-RATE-ADMISSION (IDX IDY2)
+                                       TO  MDCRES-RATE-ADMISSION
+                                                             (IDY2)
+      *        入院−固定額
+               MOVE    ORCSAPIHKN-RATE-ADMISSION (IDX IDY2)
+                                       TO  MDCRES-RATE-ADMISSION
+                                                             (IDY2)
+      *        外来−負担率（割）
+               MOVE    ORCSAPIHKN-RATE-OUTPATIENT (IDX IDY2)
+                                       TO  MDCRES-RATE-OUTPATIENT
+                                                             (IDY2)
+      *        外来−固定額
+               MOVE    ORCSAPIHKN-RATE-OUTPATIENT (IDX IDY2)
+                                       TO  MDCRES-RATE-OUTPATIENT
+                                                             (IDY2)
+           END-PERFORM
       *
            .
-       100-DAYCHG-EXT.
+       2002101-HKNHENSYU-EXT.
            EXIT.
       *
       *****************************************************************
-      *    医療機関コードの取得
+      *    日付編集処理
       *****************************************************************
-       1001-IRYOUKIKAN-GET-SEC     SECTION.
-      *    医療機関ＩＤ編集
-           MOVE    SPACE               TO  SYS-1001-REC
-           INITIALIZE                  SYS-1001-REC
-           MOVE    "1001"              TO  SYS-1001-KANRICD
-           MOVE    "*"                 TO  SYS-1001-KBNCD
-           MOVE    SPA-SYSYMD          TO  SYS-1001-STYUKYMD
-           MOVE    SPA-SYSYMD          TO  SYS-1001-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
-           MOVE    SYS-1001-REC        TO  MCPDATA-REC
-           PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-1001-REC
-           END-IF
-      * SYS-1001-HOSPID
-           .
-       1001-IRYOUKIKAN-GET-EXT.
-           EXIT.
+       801-DAYHEN01-SEC                SECTION.
       *
-      *****************************************************************
-      *    患者基本情報設定内容チェック
-      *****************************************************************
-       1001-PTINF-CHK-SEC      SECTION.
-      *
-      *    患者番号チェック
-           PERFORM 10011-PTNUM-CHK-SEC
-           PERFORM 10011-SRYYMD-CHK-SEC
-      *    診療時間チェック
-           PERFORM 10011-SRYTIME-CHK-SEC
-      *    診療科コードチェック
-           PERFORM 10011-SRYKA-CHK-SEC
-      *    ドクターコードチェック
-           PERFORM 10011-DRCD-CHK-SEC
-      *
-           .
-       1001-PTINF-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    診療日チェック
-      *****************************************************************
-       10011-SRYYMD-CHK-SEC    SECTION.
-      *
-           MOVE  WRK-PERFORM-YMD-G     TO  MDCRES-PERFORM-DATE
-      *
-           IF      WRK-PERFORM-YMD      =   SPACE
-               ADD 2                   TO  CNT-CHECK
-               MOVE  "予約日未設定"    TO  MDCRES-API-RESULT-MSG
-               DISPLAY  "予約日未設定"   
-               GO      TO      10011-SRYYMD-CHK-EXT
-           END-IF
-      *
-      *    日付チェックサブ
-           INITIALIZE                      ORCSGDAYAREA
-           MOVE    WRK-PERFORM-YMD      TO  SGDAY-INDAY
-           CALL    "ORCSGDAY"          USING
-                                       ORCSGDAYAREA
-           IF      SGDAY-RC            NOT =   ZERO
-               ADD 2                   TO  CNT-CHECK
-               MOVE  "予約日設定誤り"  TO  MDCRES-API-RESULT-MSG
-               DISPLAY  "予約日設定誤り"  
-               GO      TO      10011-SRYYMD-CHK-EXT
-           END-IF
-      *
-           .
-       10011-SRYYMD-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    診療時間チェック
-      *****************************************************************
-       10011-SRYTIME-CHK-SEC   SECTION.
-      *
-           MOVE  WRK-PERFORM-TIME-G    TO  MDCRES-PERFORM-TIME
-      *
-           IF      WRK-PERFORM-TIME     =   SPACE
-               ADD 4                   TO  CNT-CHECK
-               MOVE  "診療時間未設定"  TO  MDCRES-API-RESULT-MSG
-               DISPLAY   "予約時間未設定"  
-               GO      TO      10011-SRYTIME-CHK-EXT
-           END-IF
-      *
-           IF      WRK-PERFORM-TIME    NOT NUMERIC
-               ADD 4                   TO  CNT-CHECK
-               MOVE  "診療時間不正"    TO  MDCRES-API-RESULT-MSG
-               DISPLAY   "診療時間不正 " WRK-PERFORM-TIME
-               GO      TO      10011-SRYTIME-CHK-EXT
-           END-IF
-      *
-           IF      WRK-PERFORM-TIME(1:2)   >=  "24" 
-               ADD 4                   TO  CNT-CHECK
-               MOVE  "診療時間設定誤り"    TO  MDCRES-API-RESULT-MSG
-               DISPLAY  "予約時間設定誤り"  
-               GO      TO      10011-SRYTIME-CHK-EXT
-           END-IF
-      *
-           IF      WRK-PERFORM-TIME(3:2)   >=  "60" 
-               ADD 4                   TO  CNT-CHECK
-               MOVE  "診療時間設定誤り"    TO  MDCRES-API-RESULT-MSG
-               DISPLAY  "予約時間設定誤り"  
-               GO      TO      10011-SRYTIME-CHK-EXT
-           END-IF
-      *
-           IF      WRK-PERFORM-TIME(1:2)   >=  "21" 
-               MOVE  "21"              TO  WRK-PERFORM-TIME(1:2)
-           END-IF
-      *
-           IF      WRK-PERFORM-TIME(1:2)   <=  "08" 
-               MOVE  "08"              TO  WRK-PERFORM-TIME(1:2)
-           END-IF
-      *
-           MOVE    WRK-PERFORM-TIME    TO  WRK-KEYYYKTIME
-           MOVE    ZERO                TO  WRK-KEYYYKTIME(3:2)
-      *
-           .
-       10011-SRYTIME-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    患者番号チェック
-      *****************************************************************
-       10011-PTNUM-CHK-SEC     SECTION.
-      *
-      *    患者番号自由構成の場合のみ新患時にも必須
-      *    SPA-1009-PTNUMKSIKBN    =   "1" (自由構成)
-      *    SPA-1009-PTNUMKSIKBN    =   "2" (標準構成)
-      *    SPA-1009-PTNUMKSIKBN    =   "3" (拡張構成)
-      *
-      *
-           IF      WRK-PTNUM       =  SPACE
-                   MOVE   "該当患者なし"   TO  MDCRES-API-RESULT-MSG
-                   MOVE   WRK-PTNUM        TO  MDCRES-PATIENTID
-                   ADD 1               TO  CNT-CHECK
-                   GO  TO              10011-PTNUM-CHK-EXT
-           END-IF
-      *
-      *    患者番号取得
-           INITIALIZE                  ORCSPTIDAREA
-           MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
-           MOVE    WRK-PTNUM           TO  SPTID-PTNUM
-           CALL    "ORCSPTID"          USING   ORCSPTIDAREA
-                                               SPA-AREA
-           IF    SPTID-RC          NOT =   ZERO
-                 MOVE   "該当患者なし" TO  MDCRES-API-RESULT-MSG
-                 ADD 1                 TO  CNT-CHECK
-                 GO  TO                10011-PTNUM-CHK-EXT
-           END-IF
-      *
-           MOVE    SPTID-PTNUM         TO  MDCRES-PATIENTID
-           MOVE    SPTID-PTID          TO  PTINF-PTID
-      *
-           PERFORM 1001-PTINF-GET-SEC
-           IF      MCP-RC          NOT =   ZERO
-                 ADD 1                 TO  CNT-CHECK
-                 MOVE   "該当患者なし" TO  MDCRES-API-RESULT-MSG
-                 GO  TO                10011-PTNUM-CHK-EXT
-           END-IF
-           MOVE  PTINF-NAME            TO  WRK-NAMEKNJ 
-      *
-           .
-       10011-PTNUM-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    診療科コードチェック
-      *****************************************************************
-       10011-SRYKA-CHK-SEC         SECTION.
-      *
-           MOVE  WRK-SRYKA             TO  MDCRES-APPOINT-DEP-CODE
-           IF    WRK-SRYKA             =   SPACE
-                 MOVE   "診療科未設定" TO  MDCRES-API-RESULT-MSG
-                 ADD 16                TO  CNT-CHECK
-                 GO  TO                10011-SRYKA-CHK-EXT
-           END-IF
-      *
-      *    診療科の存在チェック
-           MOVE    SPACE               TO  SYS-1005-REC
-           INITIALIZE                  SYS-1005-REC
-           MOVE    "1005"              TO  SYS-1005-KANRICD
-           STRING    WRK-SRYKA         DELIMITED  BY  SPACE
-                     "%"               DELIMITED  BY  SIZE
-                                       INTO    SYS-1005-KBNCD
-           END-STRING
-           MOVE    SPA-SYSYMD          TO  SYS-1005-STYUKYMD
-           MOVE    SPA-SYSYMD          TO  SYS-1005-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
-      *    システム管理検索
-           MOVE    SYS-1005-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "key"           TO  MCP-PATHNAME
-               PERFORM 900-SYSKANRI-READ-SEC
-             IF  FLG-SYSKANRI          =   ZERO
-                 MOVE    MCPDATA-REC   TO  SYS-1005-REC
-                 MOVE    SYS-1005-SRYKANAME
-                                       TO  MDCRES-APPOINT-DEP-NAME
-             ELSE
-                 MOVE   "診療科誤り"   
-                                       TO  MDCRES-API-RESULT-MSG
-                 ADD 16                TO  CNT-CHECK
-             END-IF
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
            ELSE
-               INITIALIZE              SYS-1005-REC
-               MOVE    1               TO  FLG-SYSKANRI
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
            END-IF
-      *    カーソルクロース
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
       *
-      *
+           INITIALIZE                  WRK-HEN-TIME
+           MOVE    WRK-THH             TO  WRK-HEN-THH
+           MOVE    WRK-TMM             TO  WRK-HEN-TMM
+           MOVE    WRK-TSS             TO  WRK-HEN-TSS
+           MOVE    ":"                 TO  WRK-HEN-T1
+           MOVE    ":"                 TO  WRK-HEN-T2
            .
-       10011-SRYKA-CHK-EXT.
+       801-DAYHEN01-EXT.
+           EXIT.
+      *****************************************************************
+      *    日付変換編集処理
+      *****************************************************************
+       802-DAYHEN02-SEC                SECTION.
+      *
+           INITIALIZE                  WRK-SYMD
+           MOVE    WRK-HEN-YY          TO  WRK-SYY
+           MOVE    WRK-HEN-MM          TO  WRK-SMM
+           MOVE    WRK-HEN-DD          TO  WRK-SDD
+           IF      WRK-SYMD            =   "99991231"
+               MOVE    "99"                TO  WRK-SMM
+               MOVE    "99"                TO  WRK-SDD
+           END-IF
+      *
+           INITIALIZE                  WRK-THMS
+           MOVE    WRK-HEN-THH         TO  WRK-THH
+           MOVE    WRK-HEN-TMM         TO  WRK-TMM
+           MOVE    WRK-HEN-TSS         TO  WRK-TSS
+           .
+       802-DAYHEN02-EXT.
            EXIT.
       *
       *****************************************************************
-      *    ドクタコードチェック
+      *    エラーメッセージ編集処理
       *****************************************************************
-       10011-DRCD-CHK-SEC          SECTION.
+       890-ERRCD-MSG-SEC            SECTION.
       *
-           MOVE  WRK-DRCD              TO  MDCRES-APPOINT-DR-CODE
-           IF    WRK-DRCD              =   SPACE
-                 MOVE   "ドクタ設定なし"   TO  MDCRES-API-RESULT-MSG
-                 ADD 32                TO  CNT-CHECK
-                 GO  TO                10011-DRCD-CHK-EXT
-           END-IF
-      *
-      *    ドクタの存在チェック
-           MOVE    SPACE               TO  SYS-1010-REC
-           INITIALIZE                  SYS-1010-REC
-           MOVE    "1010"              TO  SYS-1010-KANRICD
-           STRING    WRK-DRCD          DELIMITED  BY  SPACE
-                     "%"               DELIMITED  BY  SIZE
-                                       INTO    SYS-1010-KBNCD
-           END-STRING
-           MOVE    SPA-SYSYMD          TO  SYS-1010-STYUKYMD
-           MOVE    SPA-SYSYMD          TO  SYS-1010-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
-      *    システム管理検索
-           MOVE    SYS-1010-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "key"           TO  MCP-PATHNAME
-               PERFORM 900-SYSKANRI-READ-SEC
-             IF  FLG-SYSKANRI          =   ZERO
-                 MOVE    MCPDATA-REC   TO  SYS-1010-REC
-                 MOVE    SYS-1010-NAME TO  MDCRES-APPOINT-DR-NAME
-             ELSE
-                 MOVE   "ドクタが存在しません"   
-                                       TO  MDCRES-API-RESULT-MSG
-                 ADD 32                TO  CNT-CHECK
-             END-IF
-           ELSE
-               INITIALIZE              SYS-1010-REC
-               MOVE    1               TO  FLG-SYSKANRI
-           END-IF
-      *    カーソルクロース
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           .
-       10011-DRCD-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ユーザプログラム起動処理
-      *****************************************************************
-       4907-USERPG-SEC                 SECTION.
-      *
-           EVALUATE    FLG-USERPG
-               WHEN    1
-      *        追加
-                   MOVE    1               TO  SPA-SYORI-FLG
-               WHEN    2
-      *        更新
-                   MOVE    2               TO  SPA-SYORI-FLG
-               WHEN    3
-      *        削除
-                   MOVE    3               TO  SPA-SYORI-FLG
+           MOVE    SPACE               TO  WRK-ERRMSG
+           EVALUATE    WRK-ERRCD
+           WHEN    "01"
+               MOVE    "患者番号未設定"
+                                               TO  WRK-ERRMSG
+           WHEN    "02"
+               MOVE    "診療科未設定"
+                                               TO  WRK-ERRMSG
+           WHEN    "03"
+               MOVE    "ドクター未設定"
+                                               TO  WRK-ERRMSG
+           WHEN    "10"
+               MOVE    "該当患者番号なし"
+                                               TO  WRK-ERRMSG
+           WHEN    "11"
+               MOVE    "診療日設定誤り"
+                                               TO  WRK-ERRMSG
+           WHEN    "12"
+               MOVE    "診療時間設定誤り"
+                                               TO  WRK-ERRMSG
+           WHEN    "13"
+               MOVE    "診療科が存在しません"
+                                               TO  WRK-ERRMSG
+           WHEN    "14"
+               MOVE    "ドクターが存在しません"
+                                               TO  WRK-ERRMSG
+           WHEN    "15"
+               MOVE    "診療内容情報が存在しません"
+                                               TO  WRK-ERRMSG
+           WHEN    "20"
+               MOVE    "中途終了データの登録ができません"
+                                               TO  WRK-ERRMSG
+           WHEN    "21"
+               MOVE    "病名の登録ができません"
+                                               TO  WRK-ERRMSG
+           WHEN    "22"
+               MOVE    "登録対象のデータがありません"
+                                               TO  WRK-ERRMSG
+      *警告
+           WHEN    "K1"
+               MOVE    "診療日を設定しました"
+                                               TO  WRK-ERRMSG
+           WHEN    "K2"
+               MOVE    "保険組合せをゼロで登録しました"
+                                               TO  WRK-ERRMSG
+      *共通エラー
+           WHEN    "98"
+      *        ORCSCOMMON のエラー
+               EVALUATE    SPA-ERRCD
+               WHEN    "1001"
+                   MOVE    "職員情報が取得できません"
+                                               TO  WRK-ERRMSG
+               WHEN    "1002"
+                   MOVE    "医療機関情報が取得できません"
+                                               TO  WRK-ERRMSG
+               WHEN    "1003"
+                   MOVE    "システム日付が取得できません"
+                                               TO  WRK-ERRMSG
+               WHEN    "1005"
+                   MOVE    "患者番号構成情報が取得できません"
+                                               TO  WRK-ERRMSG
+               WHEN    "1015"
+                   STRING  "グループ医療機関が不整合です。"
+                           "処理を終了して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+                   END-STRING
+               WHEN    OTHER
+                   MOVE    "システム項目が設定できません"
+                                               TO  WRK-ERRMSG
+               END-EVALUATE
+           WHEN    "90"
+               MOVE    "他端末使用中"          TO  WRK-ERRMSG
+           WHEN    "91"
+               MOVE    "処理区分未設定"        TO  WRK-ERRMSG
+           WHEN    "97"
+               MOVE   "構文誤りです"           TO  WRK-ERRMSG
+           WHEN    "99"
+               MOVE    "ユーザＩＤ未登録。"
+                                               TO  WRK-ERRMSG
            END-EVALUATE
-      *
-           IF      FLG-GYOUMU-ARI          =   1
-      *            起動するユーザプログラムある時、実行
-                   INITIALIZE                      ORCSUSERCHKAREA
-                   MOVE    "Y01"               TO  ORCSUSERCHK-GMNPG
-                   MOVE    "2"                 TO  ORCSUSERCHK-SYORI
-                   MOVE    SPA-SYSYMD          TO  ORCSUSERCHK-SYSYMD
-                   MOVE    SPA-SYSYMD          TO  ORCSUSERCHK-SRYYMD
-                   MOVE    SPTID-PTID          TO  ORCSUSERCHK-PTID
-                   MOVE    SPTID-PTID          TO  ORCSUSERCHK-PTNUM
-                   MOVE    WRK-SRYKA           TO  ORCSUSERCHK-SRYKA
-                   MOVE    WRK-HKNCOMBI        TO  ORCSUSERCHK-HKNCOMBI
-                   IF      WRK-DRCD            =   SPACE
-                       MOVE    SPACE               TO  ORCSUSERCHK-DRCD
-                   ELSE
-                       MOVE    WRK-DRCD            TO  ORCSUSERCHK-DRCD
-                   END-IF
-                   MOVE    SPA-SYORI-FLG       TO  ORCSUSERCHK-SYORI-FLG
-                   CALL    "ORCSUSERCHK"       USING
-                                               ORCSUSERCHKAREA
-                                               SPA-AREA
-           END-IF
-      *
            .
-       4907-USERPG-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    半角空白を全角空白へ変換処理
-      *****************************************************************
-       890-HALF-ZEN-SEC            SECTION.
-      *
-           INITIALIZE                  ORCSKANACHKAREA
-           MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
-           CALL    "ORCSKANACHK"       USING
-                                       ORCSKANACHKAREA
-           MOVE    KANACHK-MAE-INPUT   TO  WRK-MAE-INPUT
-           IF     (KANACHK-RC      NOT =   ZERO  )  OR
-                  (KANACHK-SYUBETU     =   1     )
-               MOVE    1                   TO  FLG-ERR
-               MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
-           ELSE
-               MOVE    ZERO                TO  FLG-ERR
-               MOVE    KANACHK-OUT-INPUT   TO  WRK-ATO-INPUT
-           END-IF
-      *
-           .
-       890-HALF-ZEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    患者基本情報チェック
-      *****************************************************************
-       10011-PTINF-CHK-SEC     SECTION.
-      *
-      *
-           .
-       10011-PTINF-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    患者基本情報変更
-      *****************************************************************
-       1001-PTINF-MOD-SEC      SECTION.
-      *
-           INITIALIZE        PTINF-REC
-           .
-       1001-PTINF-MOD-EXT.
+       890-ERRCD-MSG-EXT.
            EXIT.
       *
       *****************************************************************
       *    患者基本情報取得
       *****************************************************************
-       1001-PTINF-GET-SEC      SECTION.
+       900-PTINF-READ-SEC              SECTION.
       *
-           INITIALIZE        PTINF-REC
-           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
-           MOVE    SPTID-PTID          TO  PTINF-PTID
            MOVE    PTINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              NOT =  ZERO
-                   GO        TO        1001-PTINF-GET-EXT
+           IF      MCP-RC              =   ZERO
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTINF-REC
+                   MOVE    ZERO                TO  FLG-PTINF
+               ELSE
+                   MOVE    1                   TO  FLG-PTINF
+                   INITIALIZE                  PTINF-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTINF
+               INITIALIZE                  PTINF-REC
            END-IF
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF      MCP-RC              NOT =  ZERO
-                   GO        TO        1001-PTINF-GET-EXT
-           END-IF
-           MOVE    MCPDATA-REC         TO  PTINF-REC
+           PERFORM 990-DBCLOSE-SEC
+      *
            .
-       1001-PTINF-GET-EXT.
+       900-PTINF-READ-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1387,8 +1386,8 @@
       *
       *    排他制御解除処理
       *    MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
-      *    MOVE    "Y01"               TO  SPA-MOTOPG
-      *                                    MCP-WINDOW
+           MOVE    "K02"               TO  SPA-MOTOPG
+                                           MCP-WINDOW
            MOVE    ZERO                TO  SLOCK-PTID
            MOVE    3                   TO  SLOCK-MODE
            CALL    "ORCSLOCK"          USING
@@ -1401,65 +1400,32 @@
            EXIT.
       *
       *****************************************************************
-      *    患者保険情報マスタ読込
+      *    システム管理マスタ検索処理
       *****************************************************************
-       910-PTHKNINF-INV-SEC         SECTION.
+       900-SYSKANRI-SEL-SEC         SECTION.
       *
-           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    ZERO                TO  FLG-PTHKNINF
-                   MOVE    MCPDATA-REC         TO  PTHKNINF-REC
-               ELSE
-                   MOVE    1                   TO  FLG-PTHKNINF
-                   INITIALIZE          PTHKNINF-REC
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI         =   ZERO
+                   MOVE    MCPDATA-REC      TO  SYSKANRI-REC
                END-IF
            ELSE
-               MOVE    1                   TO  FLG-PTHKNINF
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    1                   TO  FLG-SYSKANRI
            END-IF
-      *
-           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+      *    カーソルクロース
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-      *
            .
-       910-PTHKNINF-INV-EXT.
+       900-SYSKANRI-SEL-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    患者公費情報マスタ読込
-      *****************************************************************
-       910-PTKOHINF-INV-SEC         SECTION.
-      *
-           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    ZERO                TO  FLG-PTKOHINF
-                   MOVE    MCPDATA-REC         TO  PTKOHINF-REC
-               ELSE
-                   MOVE    1                   TO  FLG-PTKOHINF
-               END-IF
-           ELSE
-               MOVE    1                   TO  FLG-PTKOHINF
-           END-IF
-      *
-           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           .
-       910-PTKOHINF-INV-EXT.
-           EXIT.
       *****************************************************************
       *    システム管理マスタ　ＲＥＡＤ
       *****************************************************************
@@ -1506,67 +1472,6 @@
        910-DBFETCH-EXT.
            EXIT.
       *****************************************************************
-      *    管理マスター読込（キー）
-      *****************************************************************
-       900-SYSKANRI-INV-SEC         SECTION.
-      *
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    ZERO                TO  FLG-SYSKANRI
-               ELSE
-                   MOVE    1                   TO  FLG-SYSKANRI
-               END-IF
-           ELSE
-               MOVE    1                   TO  FLG-SYSKANRI
-           END-IF
-      *
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           .
-       900-SYSKANRI-INV-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    No Commit処理
-      *****************************************************************
-       900-NOCOMMIT-SEC            SECTION.
-      *
-      * For Debug
-           MOVE    LOW-VALUE           TO  MCP-TABLE
-                                           MCP-PATHNAME
-           MOVE    "DBDISCONNECT"      TO  MCP-FUNC
-           CALL    "ORCDBMAIN"         USING
-                                           MCPAREA
-                                           MCPDATA-REC
-                                           SPA-AREA
-           MOVE    LOW-VALUE           TO  MCP-TABLE
-                                           MCP-PATHNAME
-           MOVE    "DBOPEN"            TO  MCP-FUNC
-           CALL    "ORCDBMAIN"         USING
-                                           MCPAREA
-                                           MCPDATA-REC
-                                           SPA-AREA
-           MOVE    LOW-VALUE           TO  MCP-TABLE
-                                           MCP-PATHNAME
-           MOVE    "DBSTART"           TO  MCP-FUNC
-           CALL    "ORCDBMAIN"         USING
-                                           MCPAREA
-                                           MCPDATA-REC
-                                           SPA-AREA
-      * For Debug
-      *
-           .
-       900-NOCOMMIT-EXT.
-           EXIT.
-      *****************************************************************
       *    ＤＢクロース処理
       *****************************************************************
        990-DBCLOSE-SEC         SECTION.
@@ -1579,4 +1484,5 @@
            .
        990-DBCLOSE-EXT.
            EXIT.
+      *
       *

@@ -50,6 +50,8 @@
                    07  ORCSAPIHKN-IN-KOHNUM-NAME       PIC X(10).
                    07  ORCSAPIHKN-IN-FTNJANUM          PIC X(08).
                    07  ORCSAPIHKN-IN-JKYSNUM           PIC X(20).
+      *    保険組合せ
+           03  ORCSAPIHKN-IN-HKNCOMBI      PIC X(04).
       *
       *出力領域
            03  ORCSAPIHKN-OUT-AREA.

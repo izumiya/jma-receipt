@@ -2,46 +2,39 @@ xml_medicalreq {
     object  object;
 	mode	int;
 	medicalreq {
-		Information_Date	varchar(10);
-		Information_Time	varchar(8);
 		InOut			varchar(1);
 		Patient_ID		varchar(20);
     		Perform_Date		varchar(10);
     		Perform_Time		varchar(8);
 		Diagnosis_Information  {
 			Department_Code		varchar(2);
-			Department_Name		varchar(80);
 			Physician_Code		varchar(5);
-			Physician_WholeName	varchar(80);
 			HealthInsurance_Information  {
-				InsuranceProvider_Class		varchar(10);
-				InsuranceProvider_Number	varchar(10);
-				InsuranceProvider_WholeName	varchar(10);
+				InsuranceProvider_Class		varchar(03);
+				InsuranceProvider_Number	varchar(08);
+				InsuranceProvider_WholeName	varchar(20);
 				HealthInsuredPerson_Symbol	varchar(80);
 				HealthInsuredPerson_Number	varchar(80);
-				HealthInsuredPerson_Continuation	varchar(10);
-				HealthInsuredPerson_Assistance	varchar(10);
-				RelationToInsuredPerson		varchar(10);
+				HealthInsuredPerson_Continuation	varchar(01);
+				HealthInsuredPerson_Assistance	varchar(01);
+				RelationToInsuredPerson		varchar(01);
 				HealthInsuredPerson_WholeName	varchar(100);
 				Certificate_StartDate		varchar(10);
 				Certificate_ExpiredDate		varchar(10);
 				PublicInsurance_Information   {
-					PublicInsurance_Class	varchar(10);
-					PublicInsurance_Number	varchar(10);
-					PublicInsurance_Name	varchar(10);
-					PublicInsurer_Number	varchar(10);
-					PublicInsuredPerson_Number	varchar(10);
+					PublicInsurance_Class	varchar(03);
+					PublicInsurance_Name	varchar(20);
+					PublicInsurer_Number	varchar(08);
+					PublicInsuredPerson_Number	varchar(20);
 					Certificate_IssuedDate	varchar(10);
 					Certificate_ExpiredDate	varchar(10);
-				} [3];
+				} [4];
 			} ;
 		Medical_Information  {
 			Medical_Class			varchar(03);
-			Medical_Class_Id		varchar(02);
 			Medical_Class_Name		varchar(50);
 			Medical_Class_Number		varchar(50);
 			Medication_info   {
-				Medication_Class	varchar(03);
 				Medication_Code		varchar(09);
 				Medication_Name		varchar(50);
 				Medication_Number	varchar(10);
@@ -60,6 +53,6 @@ xml_medicalreq {
 			Disease_EndDate			varchar(10);
 			Disease_OutCome			varchar(2);
 			}[50] ;
-		}[2];
+		};
    	};
 };

@@ -58,6 +58,7 @@
       *  04.05.00    NACL-多々納  09/06/25  薬剤情報提供料・調基判定追加
       *  04.05.00    NACL-多々納  09/11/30  入院回数一括入力対応
       *  04.05.00    NACL-多々納  10/01/15  治験対応
+      *  04.05.01    NACL-多々納  10/12/06  ４０剤、４０明細対応他
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -177,6 +178,11 @@
            03  IDX-I2              PIC 9(04).
       *
            03  IDK1                PIC 9(04).
+      *
+      *    カウント領域
+       01  CNT-AREA.
+           03  CNT-OUT01           PIC 9(04).
+           03  CNT-OUT02           PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -300,7 +306,7 @@
       *
       *    ワーク診療行為マスタ−テーブル
        01  TBL-WKSRYACT-AREA.
-           02  TBL-WKSRYACT-REC      OCCURS   20.
+           02  TBL-WKSRYACT-REC      OCCURS   40.
            COPY    "CPWKSRYACT.INC"  REPLACING  //WKSRY//
                                      BY         //TBL-WKSRY//.
       *
@@ -469,10 +475,15 @@
       *
        01  LF04-REC. 
            COPY    "CPRLF004.INC".
+      *
+      *    claim連携リターンエリア
        01  LNK-ERROR-AREA.
            03  LNK-KBN-CODE            PIC X(01).
            03  LNK-ERR-CODE            PIC 9(02).
            03  LNK-ERR-MSG             PIC X(100).
+           03  LNK-OUT-HKNCOMBI        PIC X(04).
+           03  LNK-OUT-CNT1            PIC 9(04).
+           03  LNK-OUT-CNT2            PIC 9(04).
       *
       ******************************************************************
       *
@@ -501,6 +512,7 @@
       *
            INITIALIZE                  WRK-AREA
            INITIALIZE                  FLG-AREA
+           INITIALIZE                  CNT-AREA
       *D   DISPLAY "LF04-PTID1 = " "[" LF04-PTID1 "]"
       *D   DISPLAY "LF04-PERFORM-TIME = " "[" LF04-PERFORM-TIME "]"
       *
@@ -787,7 +799,8 @@
            INITIALIZE                  TBL-WKSRYACT-AREA
            MOVE    ZERO                TO  TBL-MAX
            PERFORM VARYING     IDX1    FROM    1   BY  1
-                   UNTIL      (IDX1    >   20  )  OR
+                   UNTIL      (IDX1    >   40  )  OR
+      *            UNTIL      (IDX1    >   20  )  OR
                              (LF04-SRYCD (IDX1)   =   SPACE)  OR
                              (FLG-END             =   1    )
                          OR  (FLG-ERR             =   1    )
@@ -839,6 +852,12 @@
            IF      WRK-NYUGAIKBN       =   "2"
               AND (FLG-ERR             =   ZERO )
                PERFORM 2010-UKETUKE-CHK-SEC
+           END-IF
+      *
+           IF      LNK-ERR-CODE        =   ZERO
+      *        登録あり
+               MOVE    CNT-OUT01           TO  LNK-OUT-CNT1
+               MOVE    CNT-OUT02           TO  LNK-OUT-CNT2
            END-IF
            .
        200-MAIN-EXT.
@@ -1077,6 +1096,8 @@
       *
            DISPLAY "保険組合せ = [" WRK-HKNCOMBI "]"
       **** CLOSE                       LF03-FILE
+      *
+           MOVE    WRK-HKNCOMBI        TO  LNK-OUT-HKNCOMBI
       *
            .
        2001-HKNCOMBI-SET-EXT.
@@ -1472,7 +1493,8 @@
            MOVE    ZERO                TO  FLG-CHUSIN
       *
            PERFORM VARYING     IDX2    FROM    1   BY  1
-                   UNTIL       IDX2    >   20
+      **********   UNTIL       IDX2    >   20
+                   UNTIL       IDX2    >   40
       *        対象外のコードをはずす
                IF      LF04-IJICD(IDX1 IDX2)   =  LOW-VALUE
                        DISPLAY "LOW-VALUE DATA IDX1 = " 
@@ -2458,11 +2480,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
                IF      MCP-RC              =   ZERO
+                   ADD     1                   TO  CNT-OUT01
                    CONTINUE
                ELSE
                    DISPLAY "L0031 WKSRYACT INS ERR:"  MCP-RC
                            ",KEY:"   WKSRY-KEY  "!!!"
                    MOVE    1                   TO  FLG-END
+                   MOVE    10                  TO  LNK-ERR-CODE
+                   MOVE    "中途終了データ登録エラー"
+                                               TO  LNK-ERR-MSG
                    MOVE    TBL-MAX             TO  IDX 
                END-IF
            END-PERFORM
@@ -3186,6 +3212,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-AREA
            IF      MCP-RC          NOT =   ZERO 
                DISPLAY "INS PTBYOMEI-KEY =>" PTBYO-KEY  "."
+               MOVE    11                  TO  LNK-ERR-CODE
+               MOVE    "患者病名登録エラー"
+                                           TO  LNK-ERR-MSG 
+           ELSE
+               ADD     1                   TO  CNT-OUT02
            END-IF
            .
        2006123-KOUSIN-01-EXT.
@@ -3640,6 +3671,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-AREA
            IF      MCP-RC      NOT =   ZERO 
                DISPLAY "UPD PTBYOMEI-KEY =>" PTBYO-KEY  "."
+           ELSE
+               ADD     1                   TO  CNT-OUT02
            END-IF
            .
        2006124-KOUSIN-02-EXT.
