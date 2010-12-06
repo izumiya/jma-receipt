@@ -73,6 +73,7 @@
       *  04.04.09    NACL-ÌçÏÆ    10/05/21  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.10    NACL-ÌçÏÆ    10/09/14  Ê¡²¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.11    NACL-ÌçÏÆ    10/11/12  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.12    NACL-ÌçÏÆ    10/12/06  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1222,6 +1223,10 @@
                  (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "200507"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "372" OR
+                                           "373"   ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "201101"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF
