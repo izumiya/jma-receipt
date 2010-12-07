@@ -2575,6 +2575,9 @@
                PERFORM VARYING     IDE2    FROM    IDE   BY  1
                        UNTIL       IDE2    >   31
                    ADD     WRK-RIHA-DAY (IDE2) TO  WRK-TUKI-CNT
+                   IF      IDE2            <=  IDD
+                       ADD     WRK-RIHA-CNT (IDE2) TO  WRK-TUKI-CNT
+                   END-IF
                END-PERFORM
                COMPUTE WRK-TUKCNT          =   WRK-TUKI-CNT
                                            +   WRK-KAISU
@@ -2658,7 +2661,8 @@
                END-IF
            END-IF
       *    今回分集計
-           IF      SPA-ERRCD           =   SPACE
+           IF     (SPA-ERRCD           =   SPACE )
+             OR   (SPA-ERRCD (1:1)     =   "K"   )
                PERFORM 20023-KAISU-HEN-SEC
            END-IF
       *
