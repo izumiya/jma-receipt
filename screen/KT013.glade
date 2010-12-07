@@ -109,7 +109,7 @@
 	  <last_modification_time>Mon, 10 Sep 2001 08:47:12 GMT</last_modification_time>
 	</signal>
 	<columns>13</columns>
-	<column_widths>40,104,43,44,40,43,37,44,37,36,39,33,5</column_widths>
+	<column_widths>40,104,40,40,40,40,40,40,40,40,40,40,40</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
