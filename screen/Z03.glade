@@ -482,22 +482,6 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label251</name>
-	  <x>488</x>
-	  <y>536</y>
-	  <width>64</width>
-	  <height>24</height>
-	  <label>〜    上限</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>True</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label92</name>
 	  <x>8</x>
 	  <y>112</y>
@@ -1760,6 +1744,22 @@
 	  <height>18</height>
 	  <label>出力名称</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>True</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label251</name>
+	  <x>488</x>
+	  <y>536</y>
+	  <width>64</width>
+	  <height>24</height>
+	  <label>〜  上限</label>
+	  <justify>GTK_JUSTIFY_RIGHT</justify>
 	  <wrap>True</wrap>
 	  <xalign>0.5</xalign>
 	  <yalign>0.5</yalign>
