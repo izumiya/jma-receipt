@@ -1738,6 +1738,7 @@
                MOVE    1                   TO  FLG-SRYACCT
            END-IF
            PERFORM UNTIL       (FLG-SRYACCT         =   1       )
+               MOVE    ZERO                TO  FLG-YUKETU
       *        ¥ì¥»¥×¥ÈÊÔ½¸¤ËÊñ³ç¿ÇÎÅ¤ÏÂÐ¾Ý³°
                IF     (ORCSTEN-KBN         =   "2"   )
                  AND  (ACCT-JIHOKBN        =   "1"   )
