@@ -541,8 +541,8 @@
       <name>KANRICD</name>
       <x>112</x>
       <y>480</y>
-      <width>0</width>
-      <height>0</height>
+      <width>160</width>
+      <height>24</height>
       <can_focus>True</can_focus>
       <signal>
 	<name>activate</name>
