@@ -1780,6 +1780,8 @@
                MOVE    SPACE               TO  WRK-GMN-TENSU (IDX-Z)
                MOVE    SPACE               TO  WRK-GMN-KAISU (IDX-Z)
                MOVE    ZERO                TO  WRK-GMN-KEI   (IDX-Z)
+               MOVE    ZERO                TO  WRK-COM-HOUKNS-10
+                                                             (IDX-Z)
       *
       *        ¼êµ»Ëè
                INITIALIZE                   WRK-COM-PLUS-AREA(IDX-Z)
