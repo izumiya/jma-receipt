@@ -74,6 +74,7 @@
       *  04.04.13    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
       *  04.04.14    NACL-ÌçÏÆ    10/05/21  ³°Çñ»þ¤ÎÆþ±¡ÎÁ²Ã»»ÊÔ½¸½¤Àµ
       *  04.04.15    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
+      *  04.04.16    NACL-ÌçÏÆ    10/12/10  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *
       *  04.05.01    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    09/08/17  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
@@ -455,7 +456,8 @@
                05  WRK-TANKA-Z2                PIC X(01).
                05  WRK-TANKA-Z3                PIC ZZ.
       *
-           03  WRK-FUKA-KINGAKU                PIC 9(09).
+      ***  03  WRK-FUKA-KINGAKU                PIC 9(09).
+           03  WRK-FUKA-KINGAKU                PIC 9(13)V9(05).
            03  WRK-FUKA-VALUE                  PIC 9(01).
       *
            03  WRK-TENTEKI2-SRYCD-X.
@@ -1839,6 +1841,23 @@
                                 WRK-FUKA-KINGAKU    +
                               ((WRK-FUKA-VALUE^4) * FUKA-IDX
                                                   * SRY-SRYSURYO(IDX2))
+                     END-IF
+                   END-PERFORM
+                   COMPUTE  RECE220-RUIKEITOTAL  =
+                            RECE220-RUIKEITOTAL  +
+                            WRK-FUKA-KINGAKU
+      *
+                   MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+                   PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                             UNTIL   FUKA-IDX   >   10
+                     MOVE   SRY-SRYSURYO(IDX2)(FUKA-IDX:1)
+                                             TO  WRK-FUKA-VALUE
+                     IF  WRK-FUKA-VALUE  =  ZERO
+                       CONTINUE
+                     ELSE
+                       COMPUTE  WRK-FUKA-KINGAKU  =
+                                WRK-FUKA-KINGAKU  +
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX)
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE220-RUIKEITOTAL  =
