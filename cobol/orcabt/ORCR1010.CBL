@@ -71,6 +71,7 @@
       *                                     （コード追加）
       *  04.04.13    NACL-門脇    10/04/06  改正対応
       *                                     （コメント自動記載）
+      *  04.04.14    NACL-門脇    10/12/10  剤まとめ項目値の計算修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -344,7 +345,8 @@
                                                PIC X(14).
            03  WRK-ZAINUM                      PIC 9(08).
       *
-           03  WRK-FUKA-KINGAKU                PIC 9(09).
+      ***  03  WRK-FUKA-KINGAKU                PIC 9(09).
+           03  WRK-FUKA-KINGAKU                PIC 9(15)V9(03).
            03  WRK-FUKA-VALUE                  PIC 9(01).
       *
            03  WRK-SURYOU-COUNT                PIC 9(09).
@@ -1457,6 +1459,23 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 WRK-FUKA-KINGAKU    +
                               ((WRK-FUKA-VALUE^4) * FUKA-IDX
                                                   * SRY-SRYSURYO(IDX2))
+                     END-IF
+                   END-PERFORM
+                   COMPUTE  RECE120-RUIKEITOTAL  =
+                            RECE120-RUIKEITOTAL  +
+                            WRK-FUKA-KINGAKU
+      *
+                   MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+                   PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                             UNTIL   FUKA-IDX   >    8
+                     MOVE   SRY-SRYSURYO(IDX2)(FUKA-IDX:1)
+                                             TO  WRK-FUKA-VALUE
+                     IF  WRK-FUKA-VALUE  =  ZERO
+                       CONTINUE
+                     ELSE
+                       COMPUTE  WRK-FUKA-KINGAKU  =
+                                WRK-FUKA-KINGAKU  +
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX)
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE120-RUIKEITOTAL  =

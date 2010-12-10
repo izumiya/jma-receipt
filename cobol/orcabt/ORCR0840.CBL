@@ -183,6 +183,7 @@
       *                                     ¡Ê¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ë
       *  04.04.16    NACL-ÌçÏÆ    10/05/14  Æþ±¡ÎÁ²Ã»»ºÞÈÖ¹æÊÑ´¹
       *  04.04.17    NACL-ÌçÏÆ    10/09/17  ³°Çñ»þ¤ÎÅ¦Í×Íóµ­ºÜ½¤Àµ
+      *  04.04.18    NACL-ÌçÏÆ    10/12/10  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -665,7 +666,8 @@
                05  WRK-TANKA-Z2                PIC X(01).
                05  WRK-TANKA-Z3                PIC ZZ.
       *
-           03  WRK-FUKA-KINGAKU                PIC 9(09).
+      ***  03  WRK-FUKA-KINGAKU                PIC 9(09).
+           03  WRK-FUKA-KINGAKU                PIC 9(15)V9(03).
            03  WRK-FUKA-VALUE                  PIC 9(01).
       *
            03  WRK-ZAITENNASHI                 PIC 9(09).
@@ -2361,6 +2363,23 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 WRK-FUKA-KINGAKU    +
                               ((WRK-FUKA-VALUE^4) * FUKA-IDX
                                                   * SRY-SRYSURYO(IDX2))
+                     END-IF
+                   END-PERFORM
+                   COMPUTE  RECE84-RUIKEITOTAL  =
+                            RECE84-RUIKEITOTAL  +
+                            WRK-FUKA-KINGAKU
+      *
+                   MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+                   PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                             UNTIL   FUKA-IDX   >    8
+                     MOVE   SRY-SRYSURYO(IDX2)(FUKA-IDX:1)
+                                             TO  WRK-FUKA-VALUE
+                     IF  WRK-FUKA-VALUE  =  ZERO
+                       CONTINUE
+                     ELSE
+                       COMPUTE  WRK-FUKA-KINGAKU  =
+                                WRK-FUKA-KINGAKU  +
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX)
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE84-RUIKEITOTAL  =

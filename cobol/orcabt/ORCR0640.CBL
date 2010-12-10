@@ -457,6 +457,7 @@
       *  04.04.65    NACL-ÌçÏÆ    10/11/15  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.04.66    NACL-ÌçÏÆ    10/11/16  ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅª
       *                                     Âç±«ÂÐ±þ
+      *  04.04.67    NACL-ÌçÏÆ    10/12/10  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1236,7 +1237,8 @@
                05  WRK-TANKA-Z2                PIC X(01).
                05  WRK-TANKA-Z3                PIC ZZ.
       *
-           03  WRK-FUKA-KINGAKU                PIC 9(09).
+      ***  03  WRK-FUKA-KINGAKU                PIC 9(09).
+           03  WRK-FUKA-KINGAKU                PIC 9(15)V9(03).
            03  WRK-FUKA-VALUE                  PIC 9(01).
       *
            03  WRK-BIRTHDAY                    PIC X(08).
@@ -3462,6 +3464,23 @@
                                 WRK-FUKA-KINGAKU    +
                               ((WRK-FUKA-VALUE^4) * FUKA-IDX
                                                   * SRY-SRYSURYO(IDX2))
+                     END-IF
+                   END-PERFORM
+                   COMPUTE  RECE64-RUIKEITOTAL  =
+                            RECE64-RUIKEITOTAL  +
+                            WRK-FUKA-KINGAKU
+      *
+                   MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+                   PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                             UNTIL   FUKA-IDX   >    8
+                     MOVE   SRY-SRYSURYO(IDX2)(FUKA-IDX:1)
+                                             TO  WRK-FUKA-VALUE
+                     IF  WRK-FUKA-VALUE  =  ZERO
+                       CONTINUE
+                     ELSE
+                       COMPUTE  WRK-FUKA-KINGAKU  =
+                                WRK-FUKA-KINGAKU  +
+                              ((WRK-FUKA-VALUE^4) * FUKA-IDX)
                      END-IF
                    END-PERFORM
                    COMPUTE  RECE64-RUIKEITOTAL  =
