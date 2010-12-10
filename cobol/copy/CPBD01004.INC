@@ -46,6 +46,7 @@
                                            OCCURS 10.
            03  BD01004-DSPMISYUKBN         PIC X(01).
            03  BD01004-MISYU               PIC S9(10).
+           03  BD01004-TTLMISYU            PIC S9(10).
            03  BD01004-PTNUM               PIC X(20).
            03  BD01004-NAME                PIC X(100).
            03  BD01004-SRYYMD              PIC X(08).

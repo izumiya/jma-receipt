@@ -84,6 +84,7 @@
       *
            COPY    "HCM51V03.INC"  REPLACING   //HCM51V03//
                                    BY          //HCM51//.
+           COPY    "HCM51V02.INC".
            COPY    "HCM52V05.INC"  REPLACING   //HCM52V05//
                                    BY          //HCM52//.
       *
@@ -160,6 +161,7 @@
            03  WRK-ZZZZ9                   PIC ZZZZ9.
            03  WRK-ZZZZZZZ9                PIC ----,---,--9.
            03  WRK-ZZZZZZZZ                PIC ----,---,---.
+           03  WRK-ZX99                    PIC ---------9.
            03  WRK-KONNYUKIN-G.
                05  WRK-KONNYUKIN           PIC ---,---,--9.
                05  WRK-KONNYUKINFL2        PIC X(01).
@@ -172,6 +174,9 @@
                05  WRK-SKYTTL-OCC          OCCURS  15.
                    07  WRK-SKYTTLMSG       PIC X(12).
            03  WRK-NYUKIN                  PIC S9(10).
+           03  WRK-LINE-MAX                PIC 9(05).
+           03  WRK-PARA-NAME               PIC X(25).
+           03  WRK-PARA                    PIC X(100).
       *
        01  TTL-AREA.
            03  TTL-SYOSIN              PIC     S9(10).
@@ -217,12 +222,17 @@
                    07  SRH-1041-CD             PIC X(02).
                    07  SRH-1041-NYKN-TANNAME   PIC X(10).
       *
+       01  TPARA-AREA.
+           03  TPARA-FORM                      PIC X(01).
+           03  TPARA-SHADE                     PIC X(01).
+      *
        01  CONST-AREA.
            03  CONST-H200401                   PIC X(08)
                                                VALUE "20080401".
            03  CONST-H190401                   PIC X(08)
                                                VALUE "20070401".
-           03  CONST-LINE-MAX                  PIC 9(05) VALUE 28.
+           03  CONST-LINE-FORM0                PIC 9(05) VALUE 28.
+           03  CONST-LINE-FORM1                PIC 9(05) VALUE 50.
            03  CONST-ETCJIHI-MAX               PIC 9(05) VALUE 10.
            03  CONST-1005-MAX                  PIC 9(05) VALUE 100.
            03  CONST-1041-MAX                  PIC 9(05) VALUE 100.
@@ -304,6 +314,9 @@
       *    サブプロ用　領域
       *****************************************************************
       *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
+      *
       *    収納明細編集サブ
            COPY    "CPORCBD010S02.INC".
       *
@@ -334,7 +347,7 @@
        LINKAGE                     SECTION.
       *
       *
-       01  WRK-PARA.
+       01  LNK-PARA.
            COPY    "CPORCSPRTLNK.INC".
       *
            COPY    "CPORCBD010S.INC".
@@ -344,7 +357,7 @@
       ****************************************************************
        PROCEDURE                   DIVISION
                                    USING
-                                   WRK-PARA
+                                   LNK-PARA
                                    SBD010-AREA
                                    SPA-AREA.
       *
@@ -559,10 +572,46 @@
            CALL    "ORCSS003"      USING   SS003-AREA
                                            SPA-AREA
       *
+           PERFORM 100-OPTION-SELECT-SEC
+      *
+           IF    ( TPARA-FORM      =   ZERO )
+               MOVE    CONST-LINE-FORM0
+                                   TO  WRK-LINE-MAX
+           ELSE
+               MOVE    CONST-LINE-FORM1
+                                   TO  WRK-LINE-MAX
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC             SECTION.
+      *
+           INITIALIZE                  TPARA-AREA
+           MOVE    ZERO            TO  TPARA-FORM
+           MOVE    "1"             TO  TPARA-SHADE
+      *
+      *    帳票様式
+           MOVE    "FORM"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-FORM
+           END-IF
+      *
+      *    網掛け
+           MOVE    "SHADE"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-SHADE
+           END-IF
+      *
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
       *****************************************************************
       *    診療科退避処理
       *****************************************************************
@@ -750,6 +799,41 @@
        1001-SET-SKYTTL-EXT.
            EXIT.
       *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  WRK-PARA
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           IF    ( SBD010-SIMEKBN      =   ZERO )
+               MOVE    "ORCBD010"      TO  ORCSPRGOPTION-PRGID
+           ELSE
+               MOVE    "ORCBD010V02"   TO  ORCSPRGOPTION-PRGID
+           END-IF
+           MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"             TO  KANACHK-SYORI
+      *
+           EVALUATE    WRK-PARA-NAME
+           WHEN    "FORM"
+               MOVE    ORCSPRGOPTION-OT-PARA (1:1)
+                                       TO  KANACHK-MAE-INPUT
+           WHEN    OTHER
+               MOVE    ORCSPRGOPTION-OT-PARA
+                                       TO  KANACHK-MAE-INPUT
+           END-EVALUATE
+      *
+           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-PARA
+      *
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
+     *****************************************************************
       *    主　　処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
@@ -1139,6 +1223,8 @@
                        MOVE    "1"     TO  BD01004-DSPMISYUKBN
                        MOVE    SBD010S02-KONMISYU (IDX-S02)
                                        TO  BD01004-MISYU
+                       MOVE    SBD010S02-MISYU (IDX-S02)
+                                       TO  BD01004-TTLMISYU
                    END-IF
       *
                    WRITE   BD01004-REC
@@ -1150,6 +1236,8 @@
                MOVE    "1"             TO  BD01004-DSPMISYUKBN
                MOVE    SBD010S02-KONMISYU (IDX-S02)
                                        TO  BD01004-MISYU
+               MOVE    SBD010S02-MISYU (IDX-S02)
+                                       TO  BD01004-TTLMISYU
                WRITE   BD01004-REC
            END-IF
       *
@@ -1210,12 +1298,16 @@
                         OR   ( BD01004-SRT-SRYKA
                                            NOT =   KEY-SRYKA )
       *
-                   PERFORM 20011-EDIT-FORM-SEC
+                   IF    ( TPARA-FORM      =   ZERO )
+                       PERFORM 20011-EDIT-FORM-SEC
+                   ELSE
+                       PERFORM 20012-EDIT-FORM1-SEC
+                   END-IF
       *
                END-PERFORM
       *
                IF    ( SBD010-TOTALPRTKBN  =   "1" )
-                   PERFORM 20012-EDIT-FORM-SEC
+                   PERFORM 20011-EDIT-TTLFORM-SEC
                END-IF
       *
            END-PERFORM
@@ -1237,9 +1329,11 @@
            PERFORM UNTIL ( FLG-BD01004           NOT = ZERO )
                     OR   ( BD01004-SRT-NYUGAIKBN NOT = KEY-NYUGAIKBN  )
                     OR   ( BD01004-SRT-SRYKA     NOT = KEY-SRYKA )
-                    OR   ( CNT-LINE                 >= CONST-LINE-MAX )
+                    OR   ( CNT-LINE                 >= WRK-LINE-MAX )
       *
                PERFORM 220-BODY-SEC
+      *
+               PERFORM 220-SUM-BODY-TOTAL-SEC
       *
                PERFORM 900-BD01004-READ-SEC
       *
@@ -1294,6 +1388,22 @@
            ELSE
                MOVE    "診療年月日"    TO  HCM51-SRYYMDMSG
                MOVE    "初再"          TO  HCM51-SYOSAIMSG
+           END-IF
+      *
+           IF    ( TPARA-SHADE         =   ZERO )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L shade "
+                                           DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                           INTO    HCM51-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L line "
+                                           DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                           INTO    HCM51-LOPTION
+               END-STRING
            END-IF
       *
            .
@@ -1400,6 +1510,14 @@
                MOVE    WRK-ZZZZZZZ9        TO  HCM51-MISYU(CNT-LINE)
            END-IF
       *
+           .
+       220-BODY-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細合計集計処理
+      *****************************************************************
+       220-SUM-BODY-TOTAL-SEC          SECTION.
+      *
            IF    ( BD01004-SYOSAIKBN   =   "1" )
                COMPUTE TTL-SYOSIN
                    =   TTL-SYOSIN  +   1
@@ -1430,11 +1548,16 @@
                =   TTL-CHOSEI2 +   BD01004-CHOSEI2
            COMPUTE TTL-GENMEN
                =   TTL-GENMEN  +   BD01004-GENMEN
-           COMPUTE TTL-MISYU
-               =   TTL-MISYU   +   BD01004-MISYU
+           IF    ( TPARA-FORM      =   ZERO )
+               COMPUTE TTL-MISYU
+                   =   TTL-MISYU   +   BD01004-MISYU
+           ELSE
+               COMPUTE TTL-MISYU
+                   =   TTL-MISYU   +   BD01004-TTLMISYU
+           END-IF
       *
            .
-       220-BODY-EXT.
+       220-SUM-BODY-TOTAL-EXT.
            EXIT.
       *****************************************************************
       *    明細合計行編集処理
@@ -1554,7 +1677,278 @@
       *****************************************************************
       *   帳票編集処理
       *****************************************************************
-       20012-EDIT-FORM-SEC         SECTION.
+       20012-EDIT-FORM1-SEC          SECTION.
+      *
+           PERFORM 210-HEAD-FORM1-SEC
+      *
+      *
+           PERFORM UNTIL ( FLG-BD01004           NOT = ZERO )
+                    OR   ( BD01004-SRT-NYUGAIKBN NOT = KEY-NYUGAIKBN  )
+                    OR   ( BD01004-SRT-SRYKA     NOT = KEY-SRYKA )
+                    OR   ( CNT-LINE                 >= WRK-LINE-MAX )
+      *
+               PERFORM 220-BODY-FORM1-SEC
+      *
+               PERFORM 220-SUM-BODY-TOTAL-SEC
+      *
+               PERFORM 900-BD01004-READ-SEC
+      *
+           END-PERFORM
+      *
+           IF    ( FLG-BD01004           NOT = ZERO )
+            OR   ( BD01004-SRT-NYUGAIKBN NOT = KEY-NYUGAIKBN  )
+            OR   ( BD01004-SRT-SRYKA     NOT = KEY-SRYKA )
+      *
+               PERFORM 2201-BODY-TOTAL-FORM1-SEC
+           END-IF
+      *
+           PERFORM 230-PRINT-FORM1-SEC
+      *
+           .
+       20012-EDIT-FORM1-EXT.
+           EXIT.
+      *****************************************************************
+      *   見出し編集処理
+      *****************************************************************
+       210-HEAD-FORM1-SEC              SECTION.
+      *
+           COMPUTE CNT-PAGE  = CNT-PAGE    +   1
+           MOVE    ZERO            TO  CNT-LINE
+      *
+           INITIALIZE                  HCM51V02
+      *
+           IF    ( BD01004-SRT-NYUGAIKBN   =   "1" )
+               MOVE    "（入院）"      TO  HCM51V02-NYUGAI
+           ELSE
+               MOVE    "（外来）"      TO  HCM51V02-NYUGAI
+           END-IF
+      *
+           MOVE    WRK-PRT-SRYYMD      TO  HCM51V02-HSRYYMD
+      *
+           IF    ( SBD010-SUMKBN   =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    BD01004-SRYKA   TO  SRH-CD
+               PERFORM 250-GET-1005-SEC
+               MOVE    SRH-ITM         TO  HCM51V02-HSRYKA
+           END-IF
+      *
+           MOVE    WRK-PRT-SAKYMD  TO  HCM51V02-SAKYMD
+      *
+           MOVE    CNT-PAGE        TO  WRK-ZZZZ9
+           MOVE    WRK-ZZZZ9       TO  HCM51V02-PAGE
+      *
+           IF    ( BD01004-SRT-NYUGAIKBN   =   "1" )
+               MOVE    "伝票発行日"    TO  HCM51V02-SRYYMDMSG
+               MOVE    "退定"          TO  HCM51V02-SYOSAIMSG
+           ELSE
+               MOVE    "診療年月日"    TO  HCM51V02-SRYYMDMSG
+               MOVE    "初再"          TO  HCM51V02-SYOSAIMSG
+           END-IF
+      *
+           MOVE    "未収額"            TO  HCM51V02-MISYUMSG
+      *
+           IF    ( TPARA-SHADE         =   ZERO )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L shade "
+                                           DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                           INTO    HCM51V02-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L line "
+                                           DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                           INTO    HCM51V02-LOPTION
+               END-STRING
+           END-IF
+      *
+           .
+       210-HEAD-FORM1-EXT.
+           EXIT.
+      *****************************************************************
+      *   明細編集処理
+      *****************************************************************
+       220-BODY-FORM1-SEC          SECTION.
+      *
+           COMPUTE CNT-LINE    =   CNT-LINE   +   1
+      *
+           IF    ( BD01004-RENNUM  =   1 )
+            AND  ( BD01004-RENNUM2 =   1 )
+               COMPUTE CNT-NO  =   CNT-NO     +   1
+           END-IF
+      *
+           IF    ( CNT-LINE        =   1 )
+            OR  (( BD01004-RENNUM  =   1 )
+              AND( BD01004-RENNUM2 =   1 ))
+               MOVE    CNT-NO          TO  WRK-ZZ9
+               MOVE    WRK-ZZ9         TO  HCM51V02-NO (CNT-LINE)
+               MOVE    BD01004-DENPNUM TO  HCM51V02-DENPNUM (CNT-LINE)
+               IF    ( BD01004-PTNUM (11:)    =   SPACE )
+                   MOVE    BD01004-PTNUM   TO  HCM51V02-PTNUM (CNT-LINE)
+               ELSE
+                   MOVE    BD01004-PTNUM   TO  HCM51V02-PTNUM2(CNT-LINE)
+               END-IF
+               MOVE    BD01004-NAME        TO  HCM51V02-NAME  (CNT-LINE)
+               IF    ( BD01004-SRT-NYUGAIKBN   =   "1" )
+                   IF    ( BD01004-DENPPRTYMD
+                                           NOT =   WRK-EDDAILYKEY-YMD )
+                       MOVE    BD01004-DENPPRTYMD  TO  WRK-SYMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-EDTYMD1 TO  HCM51V02-SRYYMD(CNT-LINE)
+                       MOVE    BD01004-DENPPRTYMD  TO  WRK-SYMD
+                   END-IF
+               ELSE
+                   IF    ( BD01004-SRYYMD  NOT =   WRK-EDDAILYKEY-YMD )
+                       MOVE    BD01004-SRYYMD  TO  WRK-SYMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-EDTYMD1 TO  HCM51V02-SRYYMD(CNT-LINE)
+                       MOVE    BD01004-SRYYMD  TO  WRK-SYMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           EVALUATE    BD01004-SYOSAIKBN
+           WHEN    "1"
+               MOVE    "初診"          TO  HCM51V02-SYOSAI(CNT-LINE)
+           WHEN    "2"
+               MOVE    "再診"          TO  HCM51V02-SYOSAI(CNT-LINE)
+           WHEN    "3"
+               MOVE    "退院"          TO  HCM51V02-SYOSAI(CNT-LINE)
+           WHEN    "4"
+               MOVE    "定期"          TO  HCM51V02-SYOSAI(CNT-LINE)
+           END-EVALUATE
+      *
+      *
+           MOVE    BD01004-SRYKA   TO  SRH-CD
+           PERFORM 250-GET-1005-SEC
+           MOVE    SRH-ITM2                TO  HCM51V02-SRYKA (CNT-LINE)
+      *
+           MOVE    WRK-SKYTTLMSG (BD01004-HOKEN)
+                                           TO  HCM51V02-HOKEN (CNT-LINE)
+      *
+           IF    ( BD01004-SKYNYUKBN       =   ZERO )
+               MOVE    BD01004-HOKENTEN TO  WRK-ZX99
+               MOVE    WRK-ZX99     TO  HCM51V02-HKNTEN(CNT-LINE)
+               MOVE    BD01004-SKYMONEY TO  WRK-ZX99
+               MOVE    WRK-ZX99     TO  HCM51V02-SKYMONEY(CNT-LINE)
+               MOVE    BD01004-FTNMONEY TO  WRK-ZX99
+               MOVE    WRK-ZX99     TO  HCM51V02-SKYHOKEN(CNT-LINE)
+               MOVE    BD01004-JIHIMONEY TO  WRK-ZX99
+               MOVE    WRK-ZX99     TO  HCM51V02-SKYJIHI(CNT-LINE)
+               COMPUTE WRK-CHOSEI
+                    =  BD01004-CHOSEI
+                    +  BD01004-GENMEN
+               MOVE    WRK-CHOSEI          TO  WRK-ZX99
+               MOVE    WRK-ZX99        TO  HCM51V02-CHOSEI(CNT-LINE)
+      *
+               IF    ( BD01004-GENMEN      NOT =   ZERO )
+                   MOVE    "*"             TO  HCM51V02-CHOSEI-MARK
+                                                           (CNT-LINE)
+               END-IF
+      *
+           END-IF
+      *
+           MOVE    BD01004-NYUKIN          TO  WRK-ZX99
+           MOVE    WRK-ZX99            TO  HCM51V02-NYUKIN(CNT-LINE)
+      *
+           IF    ( SBD010-MEISAIKBN    =   ZERO )
+               EVALUATE    BD01004-HOHO
+               WHEN     CONST-HOHO-HENKIN
+                   MOVE    CONST-HOHO-HENKINMSG
+                                           TO HCM51V02-HOHO (CNT-LINE)
+               WHEN     CONST-HOHO-TORIKESI
+                   MOVE    CONST-HOHO-TORIKESIMSG
+                                           TO HCM51V02-HOHO (CNT-LINE)
+               WHEN    OTHER
+                   MOVE    BD01004-HOHO    TO  SRH-CD
+                   PERFORM 250-GET-1041-SEC
+                   MOVE    SRH-ITM         TO  HCM51V02-HOHO (CNT-LINE)
+               END-EVALUATE
+           END-IF
+      *
+           IF    ( BD01004-DSPMISYUKBN     =   "1" )
+               MOVE    BD01004-TTLMISYU    TO  WRK-ZX99
+               MOVE    WRK-ZX99        TO  HCM51V02-MISYU(CNT-LINE)
+           END-IF
+      *
+           .
+       220-BODY-FORM1-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細合計行編集処理
+      *****************************************************************
+       2201-BODY-TOTAL-FORM1-SEC       SECTION.
+      *
+           IF    ( KEY-NYUGAIKBN   =   "2" )
+               MOVE    "初診"      TO  HCM51V02-TTL-SYOSINMSG
+               MOVE    TTL-SYOSIN  TO  WRK-ZX99
+               MOVE    WRK-ZX99 TO HCM51V02-TTL-SYOSIN
+               MOVE    "再診"      TO  HCM51V02-TTL-SAISINMSG
+               MOVE    TTL-SAISIN  TO  WRK-ZX99
+               MOVE    WRK-ZX99 TO HCM51V02-TTL-SAISIN
+           END-IF
+      *
+           MOVE    "合計"          TO  HCM51V02-TTL-TTLMSG
+           MOVE    "保険点数"      TO  HCM51V02-TTL-HKNTENMSG
+           MOVE    "今回請求額"    TO  HCM51V02-TTL-SKYMONEYMSG
+           MOVE    "保険請求額"    TO  HCM51V02-TTL-SKYHOKENMSG
+           MOVE    "自費請求額"    TO  HCM51V02-TTL-SKYJIHIMSG
+           MOVE    "調整金"        TO  HCM51V02-TTL-CHOSEIMSG
+           MOVE    "入金額"        TO  HCM51V02-TTL-NYUKINMSG
+           MOVE    "未収額"        TO  HCM51V02-TTL-MISYUMSG
+      *
+           MOVE    TTL-HKNTEN      TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-HKNTEN
+           MOVE    TTL-SKYMONEY    TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-SKYMONEY
+           MOVE    TTL-SKYHOKEN    TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-SKYHOKEN
+           MOVE    TTL-SKYJIHI     TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-SKYJIHI
+           MOVE    TTL-NYUKIN      TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-NYUKIN
+           COMPUTE WRK-CHOSEI = TTL-CHOSEI + TTL-GENMEN
+           MOVE    WRK-CHOSEI      TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-CHOSEI
+           IF    ( TTL-GENMEN  NOT =   ZERO )
+               MOVE    "*"         TO  HCM51V02-TTL-CHOSEI-MARK
+           END-IF
+           MOVE    TTL-MISYU       TO  WRK-ZX99
+           MOVE    WRK-ZX99    TO  HCM51V02-TTL-MISYU
+      *
+           .
+       2201-BODY-TOTAL-FORM1-EXT.
+           EXIT.
+      *****************************************************************
+      *   印刷処理
+      *****************************************************************
+       230-PRINT-FORM1-SEC               SECTION.
+      *
+           INITIALIZE                  ORCSPRTAREA
+           PERFORM 230-PRINT-COMMON-SEC
+           MOVE   "HCM51V02.red"   TO  SPRT-PRTID
+           MOVE    "収納日報"      TO  SPRT-TITLE
+           MOVE    HCM51V02        TO  SPRT-PRTDATA
+           CALL    "ORCSPRT"           USING
+                                       ORCSPRTAREA
+                                       SPA-AREA
+           IF    ( SPRT-RETURN         =   ZERO )
+               CONTINUE
+           ELSE
+               DISPLAY "ORCSPRT ERROR (1) " CNT-PAGE
+               MOVE    "印刷ＤＢに更新できませんでした"
+                                   TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+           .
+       230-PRINT-FORM1-EXT.
+           EXIT.
+      *****************************************************************
+      *   帳票編集処理
+      *****************************************************************
+       20011-EDIT-TTLFORM-SEC          SECTION.
       *
            INITIALIZE                      BD01003-REC
            MOVE    KEY-NYUGAIKBN       TO  BD01003-SRT-NYUGAIKBN
@@ -1567,7 +1961,7 @@
            END-IF
       *
            .
-       20012-EDIT-FORM-EXT.
+       20011-EDIT-TTLFORM-EXT.
            EXIT.
       *****************************************************************
       *   見出し編集処理
@@ -1603,6 +1997,22 @@
            MOVE    CNT-PAGE            TO  WRK-ZZZZ9
            MOVE    WRK-ZZZZ9           TO  HCM52-PAGE
       *
+           IF    ( TPARA-SHADE         =   ZERO )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L shade "
+                                           DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                           INTO    HCM52-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L line "
+                                           DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                           INTO    HCM52-LOPTION
+               END-STRING
+           END-IF
+      *
            .
        211-HEAD-EXT.
            EXIT.
@@ -1610,6 +2020,13 @@
       *   明細編集処理
       *****************************************************************
        221-BODY-SEC                SECTION.
+      *
+           IF    ( TPARA-FORM      =   ZERO )
+               MOVE    "（内今回入金額計）"
+                                   TO  HCM52-KONNYUKINMSG
+               MOVE    "今回未収額計"
+                                   TO  HCM52-KONMISYUMSG
+           END-IF
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   11 )
@@ -1628,6 +2045,13 @@
                    END-IF
                ELSE
                        MOVE    1           TO  FLG-TARGET
+               END-IF
+      *
+               IF    ( TPARA-FORM  =   "1" )
+                   IF    ( IDX1        =   CONST-TTLKONNYUKIN
+                                        OR CONST-TTLMISYU )
+                       MOVE    ZERO    TO  FLG-TARGET
+                   END-IF
                END-IF
       *
                IF    ( FLG-TARGET  =   1 )

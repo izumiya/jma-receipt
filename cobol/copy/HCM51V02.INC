@@ -47,3 +47,6 @@
               03  HCM51V02-TTL-CHOSEI-MARK    PIC X(1).
               03  HCM51V02-TTL-MISYUMSG   PIC X(10).
               03  HCM51V02-TTL-MISYU  PIC X(10).
+            02  HCM51V02-MISYUMSG   PIC X(10).
+            02  HCM51V02-TTL-TTLMSG PIC X(10).
+            02  HCM51V02-LOPTION    PIC X(50).

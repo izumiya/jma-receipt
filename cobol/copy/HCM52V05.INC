@@ -29,3 +29,6 @@
                       PIC X(10)   OCCURS  15 TIMES.
               03  HCM52V05-NYUKIN
                       PIC X(12)   OCCURS  15 TIMES.
+            02  HCM52V05-KONNYUKINMSG   PIC X(20).
+            02  HCM52V05-KONMISYUMSG    PIC X(20).
+            02  HCM52V05-LOPTION    PIC X(50).
