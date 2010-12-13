@@ -271,7 +271,6 @@
            03  FLG-PTNUM           PIC 9(01).
            03  FLG-PTTEIKIRRK      PIC 9(01).
            03  FLG-TEIKIRRK        PIC 9(01).
-           03  FLG-BD003           PIC 9(01).
       *
            03  FLG-SYORI           PIC 9(01).
            03  FLG-CHK             PIC 9(01).
@@ -496,10 +495,6 @@
       *    ¼ýÇ¼ÌÀºÙ¥Þ¥¹¥¿¡¼
        01  SYUMEI-REC.
            COPY    "CPSYUMEI.INC".
-      *
-      *    ¼ýÇ¼¥Ó¥å¡¼£³
-       01  BD003-REC.
-           COPY    "CPBD003.INC".
       *
       *    ´µ¼ÔÄê´üÀÁµáÍúÎò
        01  PTTEIKIRRK-REC.
@@ -2033,24 +2028,24 @@
       *
            INITIALIZE                  SPA-GMN-TUKISKY
       *
-           PERFORM 900-BD003-KEY4-SEL-SEC
+           PERFORM 900-SYUNOU-KEY61-SEL-SEC
       *
-           PERFORM UNTIL ( FLG-BD003   NOT =   ZERO )
+           PERFORM UNTIL ( FLG-SYUNOU   NOT =   ZERO )
       *
-               IF    ( BD003-NYUGAIKBN       =   "1" )
+               IF    ( SYU-NYUGAIKBN       =   "1" )
                    COMPUTE SPA-GMN-NYU-TUKISKY
-                       =   SPA-GMN-NYU-TUKISKY +   BD003-SKYMONEY
+                       =   SPA-GMN-NYU-TUKISKY +   SYU-SKYMONEY
                ELSE
                    COMPUTE SPA-GMN-GAI-TUKISKY
-                       =   SPA-GMN-GAI-TUKISKY +   BD003-SKYMONEY
+                       =   SPA-GMN-GAI-TUKISKY +   SYU-SKYMONEY
                END-IF
       *
-               PERFORM 900-BD003-KEY4-FET-SEC
+               PERFORM 900-SYUNOU-KEY61-FET-SEC
       *
            END-PERFORM
       *
-           MOVE    "view_bd003"    TO  MCP-TABLE
-           MOVE    "key4"          TO  MCP-PATHNAME
+           MOVE    "tbl_syunou"    TO  MCP-TABLE
+           MOVE    "key61"         TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -6583,52 +6578,52 @@
        900-SYUNOU-KEY56-SEL-EXT.
            EXIT.
       **************************************************************
-      *    ¼ýÇ¼¥Ó¥å¡¼£³¸¡º÷½èÍý
+      *    ¼ýÇ¼¸¡º÷½èÍý
       **************************************************************
-       900-BD003-KEY4-SEL-SEC          SECTION.
+       900-SYUNOU-KEY61-SEL-SEC          SECTION.
       *
-           MOVE    ZERO            TO  FLG-BD003
+           MOVE    ZERO            TO  FLG-SYUNOU
       *
-           INITIALIZE                  BD003-REC
-           MOVE    SPA-HOSPNUM     TO  BD003-HOSPNUM
-           MOVE    "%"             TO  BD003-NYUGAIKBN
-           MOVE    SPA-GMN-PTID    TO  BD003-PTID
+           INITIALIZE                  SYUNOU-REC
+           MOVE    SPA-HOSPNUM     TO  SYU-HOSPNUM
+           MOVE    "%"             TO  SYU-NYUGAIKBN
+           MOVE    SPA-GMN-PTID    TO  SYU-PTID
            STRING  SPA-NAI-SRYYM       DELIMITED   BY  SPACE
                    "%"                 DELIMITED   BY  SIZE
-           INTO    BD003-SRYYMD
+           INTO    SYU-SRYYMD
            END-STRING
-           MOVE    BD003-REC      TO  MCPDATA-REC
-           MOVE    "view_bd003"   TO  MCP-TABLE
-           MOVE    "key4"         TO  MCP-PATHNAME
+           MOVE    SYUNOU-REC      TO  MCPDATA-REC
+           MOVE    "tbl_syunou"   TO  MCP-TABLE
+           MOVE    "key61"        TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  BD003-REC
+               MOVE    MCPDATA-REC TO  SYUNOU-REC
            ELSE
-               INITIALIZE              BD003-REC
+               INITIALIZE              SYUNOU-REC
            END-IF
       *
            .
-       900-BD003-KEY4-SEL-EXT.
+       900-SYUNOU-KEY61-SEL-EXT.
            EXIT.
       **************************************************************
-      *    ¼ýÇ¼¥Ó¥å¡¼£³FETCH½èÍý
+      *    ¼ýÇ¼FETCH½èÍý
       **************************************************************
-       900-BD003-KEY4-FET-SEC        SECTION.
+       900-SYUNOU-KEY61-FET-SEC        SECTION.
       *
-           MOVE    ZERO            TO  FLG-BD003
+           MOVE    ZERO            TO  FLG-SYUNOU
       *
-           MOVE    "view_bd003"   TO  MCP-TABLE
-           MOVE    "key4"         TO  MCP-PATHNAME
+           MOVE    "tbl_syunou"   TO  MCP-TABLE
+           MOVE    "key61"        TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  BD003-REC
+               MOVE    MCPDATA-REC TO  SYUNOU-REC
            ELSE
-               INITIALIZE              BD003-REC
-               MOVE    1           TO  FLG-BD003
+               INITIALIZE              SYUNOU-REC
+               MOVE    1           TO  FLG-SYUNOU
            END-IF
       *
            .
-       900-BD003-KEY4-FET-EXT.
+       900-SYUNOU-KEY61-FET-EXT.
            EXIT.
       **************************************************************
       *    ¼ýÇ¼ÌÀºÙ¸¡º÷½èÍý
