@@ -1284,16 +1284,16 @@
                                        TO  APNTRES-RATE-ADMISSION
                                                              (IDY IDY2)
       *        Æþ±¡¡Ý¸ÇÄê³Û
-               MOVE    ORCSAPIHKN-RATE-ADMISSION (IDX IDY2)
-                                       TO  APNTRES-RATE-ADMISSION
+               MOVE    ORCSAPIHKN-MONEY-ADMISSION (IDX IDY2)
+                                       TO  APNTRES-MONEY-ADMISSION
                                                              (IDY IDY2)
       *        ³°Íè¡ÝÉéÃ´Î¨¡Ê³ä¡Ë
                MOVE    ORCSAPIHKN-RATE-OUTPATIENT (IDX IDY2)
                                        TO  APNTRES-RATE-OUTPATIENT
                                                              (IDY IDY2)
       *        ³°Íè¡Ý¸ÇÄê³Û
-               MOVE    ORCSAPIHKN-RATE-OUTPATIENT (IDX IDY2)
-                                       TO  APNTRES-RATE-OUTPATIENT
+               MOVE    ORCSAPIHKN-MONEY-OUTPATIENT (IDX IDY2)
+                                       TO  APNTRES-MONEY-OUTPATIENT
                                                              (IDY IDY2)
            END-PERFORM
       *
