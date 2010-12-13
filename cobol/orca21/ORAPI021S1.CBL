@@ -1167,16 +1167,16 @@
                                        TO  MDCRES-RATE-ADMISSION
                                                              (IDY2)
       *        Æþ±¡¡Ý¸ÇÄê³Û
-               MOVE    ORCSAPIHKN-RATE-ADMISSION (IDX IDY2)
-                                       TO  MDCRES-RATE-ADMISSION
+               MOVE    ORCSAPIHKN-MONEY-ADMISSION (IDX IDY2)
+                                       TO  MDCRES-MONEY-ADMISSION
                                                              (IDY2)
       *        ³°Íè¡ÝÉéÃ´Î¨¡Ê³ä¡Ë
                MOVE    ORCSAPIHKN-RATE-OUTPATIENT (IDX IDY2)
                                        TO  MDCRES-RATE-OUTPATIENT
                                                              (IDY2)
       *        ³°Íè¡Ý¸ÇÄê³Û
-               MOVE    ORCSAPIHKN-RATE-OUTPATIENT (IDX IDY2)
-                                       TO  MDCRES-RATE-OUTPATIENT
+               MOVE    ORCSAPIHKN-MONEY-OUTPATIENT (IDX IDY2)
+                                       TO  MDCRES-MONEY-OUTPATIENT
                                                              (IDY2)
            END-PERFORM
       *
