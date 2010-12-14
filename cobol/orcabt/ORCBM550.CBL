@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.04.01    NACL-藤原    09/12/10  返戻対応
+      *  04.04.02    NACL-藤原    10/12/10  返戻ファイルの保存用ファイル名
+      *                                     の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -446,7 +448,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *                データ取り込み処理
                        PERFORM 2001-PARA-HENSYU-SEC
                END-EVALUATE
-               EVALUATE    WRK-FILE-TMP(8:8)
+               EVALUATE    WRK-FILE-TMP(10:8)
                    WHEN    "RECEIPTC"
       *                データ取り込み処理（返戻ファイル）
                        PERFORM 2002-PARA-HENSYU-SEC
@@ -792,7 +794,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                WHEN    "RIfixf"
                    PERFORM 2001132-FIXF-KOUMOKU-BETU-SEC
            END-EVALUATE
-           EVALUATE    WRK-FILE-TMP(8:8)
+           EVALUATE    WRK-FILE-TMP(10:8)
                WHEN    "RECEIPTC"
                    PERFORM 2001133-RECEIPTC-KOUMOKU-BETU-SEC
            END-EVALUATE

@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.04.01    NACL-藤原    08/12/10  返戻対応
+      *  04.04.02    NACL-藤原    10/12/10  返戻ファイルの保存用ファイル名
+      *                                     の変更
       *
       *  04.05.01    NACL-藤原    09/07/23  返戻ファイルの小文字対応
       *****************************************************************
@@ -122,6 +124,9 @@
            03  WRK-PREFNUM             PIC X(02).
            03  WRK-HOSPCD              PIC X(07).
            03  WRK-TEISYUTUSAKI        PIC X(01).
+      *
+           03  WRK-INDEX.
+               05  WRK-INDEX-9         PIC 9(02).
       *
        01  ASS-AREA.
            03  ASS-PARA                PIC X(256).
@@ -751,8 +756,10 @@
       * 
            IF      WRK-FILENM(1:6)     =   "RECEIP"    OR  
                                            "receip"
+               MOVE    IDY                 TO  WRK-INDEX-9
                STRING  "/tmp/"             DELIMITED   BY  SIZE
                        SPA-HOSPNUM         DELIMITED   BY  SIZE
+                       WRK-INDEX           DELIMITED   BY  SIZE
                        "RECEIPTC.HEN"      DELIMITED   BY  SIZE
                                    INTO    SPA-NAI-T05-SAVE-NAME (IDY)
                END-STRING
