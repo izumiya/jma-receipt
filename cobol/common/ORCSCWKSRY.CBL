@@ -1254,6 +1254,20 @@
                PERFORM 910-TENSU-READ-SEC
                IF      TNS-TEN                 =   ZERO
                    MOVE    "1"                 TO  SPA-COM-KEIFLG(IDX2)
+      *            CLAIM¤Ï¼«Èñ¶â³Û¤Ï¿ôÎÌ¤Ë
+                   IF     (LNK-WKSRY-KARTE-FLG     =   ZERO )
+                     AND  (LNK-WKSRY-JIHIMONEY(IDX IDY)
+                                                   =   ZERO )
+                     AND  (LNK-WKSRY-SRYSURYO (IDX IDY)
+                                                   >   ZERO )
+                       MOVE    LNK-WKSRY-SRYSURYO (IDX IDY) 
+                                               TO  LNK-WKSRY-JIHIMONEY
+                                                             (IDX IDY)
+                       MOVE    1               TO  SPA-COM-SURYO
+                                                             (IDX2)
+                       MOVE    1               TO  SPA-COM-SURYO2
+                                                             (IDX2)
+                   END-IF
                ELSE
                    MOVE    "2"                 TO  SPA-COM-KEIFLG(IDX2)
                END-IF
