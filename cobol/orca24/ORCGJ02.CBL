@@ -3432,6 +3432,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                      UNTIL     IDX         >   SPA-GMN-MAX
                IF      SPA-GMN-TMEISYO (IDX)   =   ALL "-"
                    MOVE    ALL "-"         TO  J02-DATALIST-ITEM(IDX)
+                   MOVE    SPACE           TO  J02-TMEISYO (IDX)
+                   MOVE    ALL "-"         TO  J02-TMEISYO (IDX)(1:30)
                ELSE
                    IF      SPA-GMN-TBANGO (IDX)    >   ZERO
                        MOVE    SPA-GMN-TBANGO  (IDX)   TO  WRK-ZZZZ
