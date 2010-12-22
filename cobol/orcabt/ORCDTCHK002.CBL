@@ -2019,8 +2019,11 @@
       *            チェック項目情報退避処理
                    PERFORM 20011-CHK-DATA-TAIHI-SEC
       *
-      *            データチェック処理
+      *            データチェック処理（チェックマスタ以外）
                    PERFORM 20011-DATA-CHK-SEC
+      *
+      *            データチェック処理（チェックマスタ）
+                   PERFORM 20011-DATA-CHK-CHKMST-SEC
       *
       *            禁忌チェック項目退避処理
                    PERFORM 20012-CHK-KINKI-TAIHI-SEC
@@ -2053,16 +2056,6 @@
       *
       *    診療情報退避処理
            PERFORM 200111-SRYINF-TAIHI-SEC
-      *
-      *    併用禁忌・併用算定のチェック用に
-      *    入力引数とは反対の入外区分および、対象外の保険で診療会計
-      *    テーブルを検索する
-           IF    ( ORCBSD01-CHKKBN (10)    NOT =   ZERO )
-            OR   ( ORCBSD01-CHKKBN (11)    NOT =   ZERO )
-            OR   ( ORCBSD01-CHKKBN (16)    NOT =   ZERO )
-            OR   ( ORCBSD01-CHKKBN (19)    NOT =   ZERO )
-               PERFORM 200112-SRYINF-TAIHI-SEC
-           END-IF
       *
            .
        20011-CHK-DATA-TAIHI-EXT.
@@ -2420,6 +2413,27 @@
       *
            .
        200111-DCSRY-TAIHI-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為情報退避処理
+      *****************************************************************
+       200112-DCSRY-TAIHI-SEC          SECTION.
+      *
+           PERFORM 901-DCSRY-START-SEC
+      *
+           PERFORM UNTIL ( FLG-DCSRY NOT =   ZERO )
+                    OR   ( PTSRY-MAX    >=   CONST-PTSRY-MAX )
+      *
+               COMPUTE PTSRY-MAX   =   PTSRY-MAX   +   1
+      *
+               MOVE    DCSRY-REC   TO  PTSRY-OCC (PTSRY-MAX)
+      *
+               PERFORM 901-DCSRY-READ-SEC
+      *
+           END-PERFORM
+      *
+           .
+       200112-DCSRY-TAIHI-EXT.
            EXIT.
       *****************************************************************
       *    主保険チェック処理
@@ -3771,29 +3785,7 @@
            IF    ( ORCBSD01-CHKKBN (5) NOT =   ZERO  )
             OR   ( ORCBSD01-CHKKBN (6) NOT =   ZERO  )
             OR   ( ORCBSD01-CHKKBN (7) NOT =   ZERO  )
-            OR   ( ORCBSD01-CHKKBN (8) NOT =   ZERO  )
-            OR   ( ORCBSD01-CHKKBN (9) NOT =   ZERO  )
                PERFORM 200111-PTBYOMEI-CHK-SEC
-           END-IF
-      *
-      *    併用算定の診療行為チェック処理
-           IF    ( ORCBSD01-CHKKBN(11) NOT =   ZERO  )
-               PERFORM 200111-HEI-SRY-CHK-SEC
-           END-IF
-      *
-      *    診療行為どうしの算定漏れ
-           IF    ( ORCBSD01-CHKKBN(16) NOT =   ZERO  )
-               PERFORM 200111-SRYSNT-CHK-SEC
-           END-IF
-      *
-      *    病名と薬剤
-           IF    ( ORCBSD01-CHKKBN(17) NOT =   ZERO  )
-               PERFORM 200111-BYOYKZ-CHK-SEC
-           END-IF
-      *
-      *    病名と診療行為
-           IF    ( ORCBSD01-CHKKBN(18) NOT =   ZERO  )
-               PERFORM 200111-BYOSRY-CHK-SEC
            END-IF
       *
       *    実日数チェック処理
@@ -3818,6 +3810,100 @@
       *
            .
        20011-DATA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    データチェック処理
+      *****************************************************************
+       20011-DATA-CHK-CHKMST-SEC       SECTION.
+      *
+      *    併用算定のチェック用に
+      *    入力引数とは反対の入外区分および、対象外の保険で診療会計
+      *    テーブルを検索する
+           IF    ( ORCBSD01-CHKKBN (11)    NOT =   ZERO )
+            OR   ( ORCBSD01-CHKKBN (16)    NOT =   ZERO )
+               PERFORM 200112-SRYINF-TAIHI-SEC
+           END-IF
+      *
+           INITIALIZE                  PTACCT-AREA
+                                       PTSRY-AREA
+                                       PTZAI-AREA
+      *    (A)
+           PERFORM 200113-SRYINF-TAIHI-SEC
+      *
+      *    レセプトにでないコメント用（上の(A)とセット）
+           IF    ( ORCBSD01-CHKKBN (11)    NOT =   ZERO )
+            OR   ( ORCBSD01-CHKKBN (16)    NOT =   ZERO )
+               PERFORM 200112-SRYINF-TAIHI-SEC
+           END-IF
+      *
+      *    薬剤と病名チェック処理
+           IF    ( FLG-CHKEND (8)      =   ZERO )
+            AND  ( FLG-YKZBYO          =   1 )
+               PERFORM 200112-YKZ-BYO-CHK-SEC
+           END-IF
+      *
+      *    診療行為と病名チェック処理
+           IF    ( FLG-CHKEND (9)      =   ZERO )
+            AND  ( FLG-SRYBYO          =   1 )
+               PERFORM 200112-SRY-BYO-CHK-SEC
+           END-IF
+      *
+      *    併用算定の診療行為チェック処理
+           IF    ( ORCBSD01-CHKKBN(11) NOT =   ZERO  )
+               PERFORM 200111-HEI-SRY-CHK-SEC
+           END-IF
+      *
+      *    診療行為どうしの算定漏れ
+           IF    ( ORCBSD01-CHKKBN(16) NOT =   ZERO  )
+               PERFORM 200111-SRYSNT-CHK-SEC
+           END-IF
+      *
+      *    病名と薬剤
+           IF    ( ORCBSD01-CHKKBN(17) NOT =   ZERO  )
+               PERFORM 200111-BYOYKZ-CHK-SEC
+           END-IF
+      *
+      *    病名と診療行為
+           IF    ( ORCBSD01-CHKKBN(18) NOT =   ZERO  )
+               PERFORM 200111-BYOSRY-CHK-SEC
+           END-IF
+      *
+           .
+       20011-DATA-CHK-CHKMST-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療情報情報退避処理
+      *****************************************************************
+       200113-SRYINF-TAIHI-SEC         SECTION.
+      *
+           PERFORM 200112-DCSRY-TAIHI-SEC
+      *
+           PERFORM 200111-DCACCT-TAIHI-SEC
+      *
+           INITIALIZE                  KEY-AREA
+      *
+           PERFORM VARYING IDX-ZAI FROM    1   BY  1
+                   UNTIL ( IDX-ZAI >   PTZAI-MAX )
+      *
+               IF    ( PTZAI-NYUGAIKBN (IDX-ZAI)
+                                       =   ORCBSD01-NYUGAIKBN )
+                   PERFORM VARYING IDX-ACCT    FROM    1   BY  1
+                           UNTIL ( IDX-ACCT    >   PTACCT-MAX )
+                       IF    ( PTZAI-ZAINUM (IDX-ZAI)
+                                       =   PTACCT-ZAINUM (IDX-ACCT))
+                        AND  ( PTZAI-ACCTKBN(IDX-ZAI)
+                                       =   PTACCT-ACCTKBN(IDX-ACCT))
+                           MOVE    PTACCT-OCC (IDX-ACCT)
+                                   TO  DCACCT-REC
+                           PERFORM 2001111-SRYINF-TAIHI-SEC
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       200113-SRYINF-TAIHI-EXT.
            EXIT.
       *****************************************************************
       *    データチェック初期処理
@@ -4767,18 +4853,6 @@
                IF    ( TSRYKA-MAX          >   ZERO )
                    PERFORM 2001111-PTBYOMEI-CHK-SEC
                END-IF
-           END-IF
-      *
-      *    薬剤と病名チェック処理
-           IF    ( FLG-CHKEND (8)      =   ZERO )
-            AND  ( FLG-YKZBYO          =   1 )
-               PERFORM 200112-YKZ-BYO-CHK-SEC
-           END-IF
-      *
-      *    診療行為と病名チェック処理
-           IF    ( FLG-CHKEND (9)      =   ZERO )
-            AND  ( FLG-SRYBYO          =   1 )
-               PERFORM 200112-SRY-BYO-CHK-SEC
            END-IF
       *
            .
@@ -11780,6 +11854,63 @@
            .
       *
        900-DCSRY-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    データチェック診療行為START処理
+      *****************************************************************
+       901-DCSRY-START-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-DCSRY
+      *
+           INITIALIZE                  DCSRY-KEY
+           MOVE    DTCHK003-PTID       TO  DCSRY-PTID
+      *
+           START   DCSRY-FILE
+               KEY IS  >=   DCSRY-KEY
+           INVALID
+               MOVE    1               TO  FLG-DCSRY
+           NOT INVALID
+               PERFORM 901-DCSRY-READ-SEC
+           END-START
+      *
+           .
+       901-DCSRY-KEY4-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    データチェック診療行為読込処理
+      *    （チェックマスタ突合せチェック用にコメントデータ取得）
+      *****************************************************************
+       901-DCSRY-READ-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  FLG-LOOP-END
+      *
+           PERFORM UNTIL ( FLG-DCSRY       NOT =   ZERO )
+                    OR   ( FLG-LOOP-END    NOT =   ZERO )
+      *
+               READ    DCSRY-FILE     NEXT
+               AT  END
+                       MOVE    1           TO  FLG-DCSRY
+               NOT AT  END
+                   IF    ( DTCHK003-PTID   NOT =   DCSRY-PTID )
+                       MOVE    1           TO  FLG-DCSRY
+                   ELSE
+                       MOVE    1           TO  FLG-LOOP-END
+                   END-IF
+      *
+                   IF    ( DCSRY-SRYSYUKBN (1:2)   =   "99" )
+                    AND  ( DCSRY-SRYCD (1:4)   =   "0085" OR "0086" )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO        TO  FLG-LOOP-END
+                   END-IF
+      *
+               END-READ
+      *
+           END-PERFORM
+      *
+           .
+      *
+       901-DCSRY-READ-EXT.
            EXIT.
       *****************************************************************
       *    データチェック診療行為START処理
