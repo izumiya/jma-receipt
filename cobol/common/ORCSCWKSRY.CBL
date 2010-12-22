@@ -1257,6 +1257,7 @@
       *            CLAIMは自費金額は数量に
                    IF     (LNK-WKSRY-KARTE-FLG (IDX)
                                                    =   ZERO )
+                     AND  (LNK-WKSRY-TERMID (1)    =   "WKSRYACT" )
                      AND  (LNK-WKSRY-JIHIMONEY(IDX IDY)
                                                    =   ZERO )
                      AND  (LNK-WKSRY-SRYSURYO (IDX IDY)
