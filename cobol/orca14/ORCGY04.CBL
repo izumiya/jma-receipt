@@ -205,6 +205,7 @@
            COPY    "YERR.INC".
            COPY    "YID1.INC".
            COPY    "APPOINTMOD.INC".
+           COPY    "CPAPIMOD.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA

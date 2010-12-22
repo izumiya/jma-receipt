@@ -1,0 +1,9 @@
+xml_appointlstreq {
+    object  object;
+	mode	int;
+	appointlstreq {
+		Appointment_Date		varchar(10);
+		Medical_Information		varchar(2);
+		Physician_Code			varchar(5);
+	};
+};

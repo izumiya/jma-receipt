@@ -13,6 +13,7 @@ bind	"Y05"		"OpenCOBOL"	"ORCGY05";
 bind	"YERR"		"OpenCOBOL"	"ORCGYERR";
 bind	"YID1"		"OpenCOBOL"	"ORCGYID1";
 bindapi "appointmod" "OpenCOBOL" "ORAPI014S1";
+bindapi	"appointlst"	"OpenCOBOL"	"ORAPI014R1";
 
 multiplex_group	orca14;
 
@@ -29,6 +30,7 @@ data	{
 		YERR;
 		YID1;
 		appointmod;
+		appointlst;
 	};
 };
 
@@ -36,6 +38,8 @@ data	{
 db "xml" {
  xml_appointreq;
  xml_appointres;
+ xml_appointlstreq;
+ xml_appointlstres;
 };
 
 
