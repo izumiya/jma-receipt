@@ -159,6 +159,7 @@
            COPY    "U02X.INC".
            COPY    "U2ERR.INC".
            COPY    "CPAPIMOD.INC".
+           COPY    "CPAPILST.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA

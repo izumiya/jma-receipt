@@ -1,0 +1,10 @@
+xml_acceptlstreq {
+    object  object;
+	mode	int;
+	acceptlstreq {
+		Acceptance_Date			varchar(10);
+		Department_Code			varchar(2);
+		Physician_Code			varchar(5);
+		Medical_Information		varchar(2);
+	};
+};

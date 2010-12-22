@@ -4,6 +4,7 @@ SRCS = \
 	ORCGU2ERR.CBL \
 	ORCGU02X.CBL \
 	ORAPI011S1.CBL \
+	ORAPI011R1.CBL \
 
 top_builddir = ../..
 include $(top_builddir)/cobol/Makefile.global

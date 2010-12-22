@@ -9,6 +9,7 @@ bind	"U02Q"		"OpenCOBOL"	"ORCGU02Q";
 bind	"U02X"		"OpenCOBOL"	"ORCGU02X";
 bind	"U2ERR"		"OpenCOBOL"	"ORCGU2ERR";
 bindapi	"acceptmod"	"OpenCOBOL"	"ORAPI011S1";
+bindapi	"acceptlst"	"OpenCOBOL"	"ORAPI011R1";
 
 multiplex_group	orca11;
 
@@ -21,12 +22,15 @@ data	{
 		U02X;
 		U2ERR;
 		acceptmod;
+		acceptlst;
 	};
 };
 
 db "xml" {
  xml_acceptreq;
  xml_acceptres;
+ xml_acceptlstreq;
+ xml_acceptlstres;
 };
 
 /*
