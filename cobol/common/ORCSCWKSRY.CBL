@@ -1365,7 +1365,7 @@
                      AND  (LNK-WKSRY-JIHIMONEY(IDX IDY)
                                                    =   ZERO )
                      AND  (LNK-WKSRY-SRYSURYO (IDX IDY)
-                                                   >   ZERO )
+                                                   >   1    )
                        MOVE    LNK-WKSRY-SRYSURYO (IDX IDY) 
                                                TO  LNK-WKSRY-JIHIMONEY
                                                              (IDX IDY)
