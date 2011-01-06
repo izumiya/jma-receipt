@@ -1073,10 +1073,10 @@
            MOVE    ORCHC03-DENPNUM     TO  WRK-DENPNUM
       *    ÅÁÉ¼ÈÖ¹æËè¤Î°õºþ
            PERFORM 2100-DENPNUM-SYORI-SEC
-           IF      IDX-H               >   ZERO
+      *!!  IF      IDX-H               >   ZERO
       *       °õºþ½èÍý
               PERFORM 400-PRINT-SYORI-SEC
-           END-IF
+      *!!  END-IF
            .
        201-ONLY-SYUNOU-EXT.
            EXIT.
@@ -1340,10 +1340,10 @@
                    PERFORM 2100-DENPNUM-SYORI-SEC
                END-PERFORM
       *
-               IF      IDX-H               >   ZERO
+      *!!      IF      IDX-H               >   ZERO
       *            °õºþ½èÍý
                    PERFORM 400-PRINT-SYORI-SEC
-               END-IF
+      *!!      END-IF
            END-PERFORM
       *
            .
@@ -1604,6 +1604,13 @@
       *****************************************************************
        400-PRINT-SYORI-SEC          SECTION.
       *
+           IF      WRK-PAGE            =   ZERO
+               MOVE    1               TO  WRK-PAGE
+           END-IF
+           IF      WRK-PAGE-MAX        =   ZERO
+               MOVE    1               TO  WRK-PAGE-MAX
+           END-IF
+      *
       *    ºÇ½ª¹Ô
            IF      TBL-H-SRYMEI(WRK-PAGE LINE-MAX)
                                        =   SPACE
@@ -1722,10 +1729,10 @@
                    END-IF
                END-PERFORM
       *
-               IF      IDX-H               >   ZERO
+      *!!      IF      IDX-H               >   ZERO
       *            °õºþ½èÍý
                    PERFORM 400-PRINT-SYORI-SEC
-               END-IF
+      *!!      END-IF
       *
                PERFORM 900-PARA-KEY5-FET-SEC
       *
