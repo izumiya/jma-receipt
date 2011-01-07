@@ -732,21 +732,6 @@
            END-IF
            MOVE    ZERO                TO  IDX-TEI
            COMPUTE IDX-STR             =   ORCSCWKSRY-STRIDX  +  1
-      *    ワーク診療行為の時、セットの展開
-           IF     (FLG-WKSYORIFLG      =   1     )
-               PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
-                       UNTIL      (IDX-1     >   SPA-MAX-LINE )
-                   IF      (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "P" )  OR
-                           (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "P" )
-                       MOVE    SPACE               TO  SPA-COM-KAIFLG
-                                                            (IDX-1)
-                       MOVE    IDX-1               TO  SPA-GMN-IDX
-                       PERFORM 10028-INPUTSET-SYORI-SEC
-                   END-IF
-               END-PERFORM
-      *        空白行削除
-               PERFORM 100282-SYOKYO-SEC
-           END-IF
       *    約束コード以外の画面再編集
            PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
                    UNTIL      (IDX-1     >   SPA-MAX-LINE )  OR
@@ -961,6 +946,22 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+      *    ワーク診療行為の時、セットの展開
+           IF     (FLG-WKSYORIFLG      =   1     )
+               PERFORM VARYING     IDX-1 FROM    IDX-STR BY  1
+                       UNTIL      (IDX-1     >   SPA-MAX-LINE )
+                   IF      (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "P" )  OR
+                           (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "P" )
+                       MOVE    SPACE               TO  SPA-COM-KAIFLG
+                                                            (IDX-1)
+                       MOVE    IDX-1               TO  SPA-GMN-IDX
+                       PERFORM 10028-INPUTSET-SYORI-SEC
+                   END-IF
+               END-PERFORM
+      *        空白行削除
+               PERFORM 100282-SYOKYO-SEC
+           END-IF
       *
       *    約束コードの画面用再編集
            MOVE    SPACE               TO  WRK-ERRCD
