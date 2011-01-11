@@ -353,7 +353,6 @@
            03  FLG-INPUTCD                             PIC 9(01).
            03  FLG-INPUTSET                            PIC 9(01).
            03  FLG-SRYCDCHG                            PIC 9(01).
-           03  FLG-ZAIARI                              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -446,7 +445,6 @@
            03  IDX-KANRIRYO                            PIC 9(05).
            03  IDX-KGNM                                PIC 9(05).
            03  IDX-TTNSP2                              PIC 9(05).
-           03  IDX-PTSRY                               PIC 9(05).
       *
        01  WRK-AREA.
            03  WRK-SYMD                                PIC X(08).
@@ -2148,9 +2146,9 @@
       *****************************************************************
        200111-SRYINF-TAIHI-SEC         SECTION.
       *
-           PERFORM 200111-DCSRY-TAIHI-SEC
-      *
            PERFORM 200111-DCACCT-TAIHI-SEC
+      *
+           PERFORM 200111-DCSRY-TAIHI-SEC
       *
            INITIALIZE                  KEY-AREA
       *
@@ -4449,6 +4447,7 @@
            IF    ( SRH-1040-JKYSNUMCHK =   "1" )
             OR   ( PTKOH-KOHNUM        =   "012" )
             OR   ( PTKOH-KOHNUM        =   "025" )
+            OR   ( PTKOH-KOHNUM        =   "030" )
                CONTINUE
            ELSE
                IF    ( WRK-PTKOH-JKYSNUM   =   SPACE )
@@ -4456,6 +4455,22 @@
                    MOVE    PTKOH-KOHNUM    TO  SRH-KOHNUM
                    MOVE    PTKOH-PAYKBN    TO  SRH-PAYKBN
                    MOVE    "030002"        TO  WRK-ERRCD
+                   MOVE    SPACE           TO  WRK-ERRMES-PLUS
+                   INITIALIZE              TERRINF-AREA
+                   PERFORM 212-ERRMES-HEN-SEC
+      *
+                   IF    ( ORCBSD01-CHKKBN (3) =   "1" )
+                       MOVE    1           TO  FLG-CHKEND (3)
+                       GO  TO  200111-FTNJKYNUM-CHK-EXT
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( PTKOH-KOHNUM        =   "030" )
+               IF    ( WRK-PTKOH-JKYSNUM   NOT =   SPACE )
+                   MOVE    PTKOH-KOHNUM    TO  SRH-KOHNUM
+                   MOVE    PTKOH-PAYKBN    TO  SRH-PAYKBN
+                   MOVE    "030013"        TO  WRK-ERRCD
                    MOVE    SPACE           TO  WRK-ERRMES-PLUS
                    INITIALIZE              TERRINF-AREA
                    PERFORM 212-ERRMES-HEN-SEC
@@ -9713,9 +9728,9 @@
       *****************************************************************
        200121-SRYINF-TAIHI-SEC         SECTION.
       *
-           PERFORM 200111-DCSRY-TAIHI-SEC
-      *
            PERFORM 200121-DCACCT-TAIHI-SEC
+      *
+           PERFORM 200111-DCSRY-TAIHI-SEC
       *
            INITIALIZE                  KEY-AREA
       *
@@ -10098,14 +10113,20 @@
       *
            MOVE    SPACE               TO  WRK-ERRMES
       *
-           IF    ( WRK-ERRCD           =   "140004" )
+           EVALUATE    WRK-ERRCD
+           WHEN    "140004"
              STRING "保険組合せが正しく作成されていません。"
                                            DELIMITED BY SIZE
                     "保険または公費情報を確認してください"
                                            DELIMITED BY SIZE
              INTO   WRK-ERRMES
              END-STRING
-           ELSE
+           WHEN    "030013"
+             STRING "公費情報の受給者番号に入力があります"
+                                           DELIMITED BY SIZE
+             INTO   WRK-ERRMES
+             END-STRING
+           WHEN    OTHER
       *
              PERFORM VARYING IDX-ERRCD   FROM    1   BY  1
                    UNTIL ( IDX-ERRCD   >   ERRMES-MAX )
@@ -10117,7 +10138,7 @@
                END-IF
       *
              END-PERFORM
-           END-IF
+           END-EVALUATE
       *
            .
        2111-ERRMES-GET-EXT.
@@ -11686,23 +11707,6 @@
                             OR   ( DCACCT-JIHOKBN  =   "1" )
                                MOVE   ZERO    TO   FLG-LOOP-END
                            END-IF
-      *
-                           MOVE    ZERO       TO   FLG-ZAIARI
-                           PERFORM VARYING IDX-PTSRY FROM 1 BY 1
-                                   UNTIL ( IDX-PTSRY   >   PTSRY-MAX )
-                                    OR   ( FLG-ZAIARI  =   1 )
-                               IF   (  DCACCT-ZAINUM
-                                       =   PTSRY-ZAINUM (IDX-PTSRY))
-                                AND (  DCACCT-ACCTKBN
-                                       =   PTSRY-ACCTKBN(IDX-PTSRY))
-                                   MOVE    1  TO   FLG-ZAIARI
-                               END-IF
-                           END-PERFORM
-      *
-                           IF    ( FLG-ZAIARI =    ZERO )
-                               MOVE    ZERO   TO   FLG-LOOP-END
-                           END-IF
-      *
                        END-IF
                    END-IF
                END-READ
@@ -11769,22 +11773,6 @@
                                MOVE   ZERO    TO   FLG-LOOP-END
                            END-IF
       *
-                           MOVE    ZERO       TO   FLG-ZAIARI
-                           PERFORM VARYING IDX-PTSRY FROM 1 BY 1
-                                   UNTIL ( IDX-PTSRY   >   PTSRY-MAX )
-                                    OR   ( FLG-ZAIARI  =   1 )
-                               IF   (  DCACCT-ZAINUM
-                                       =   PTSRY-ZAINUM (IDX-PTSRY))
-                                AND (  DCACCT-ACCTKBN
-                                       =   PTSRY-ACCTKBN(IDX-PTSRY))
-                                   MOVE    1  TO   FLG-ZAIARI
-                               END-IF
-                           END-PERFORM
-      *
-                           IF    ( FLG-ZAIARI =    ZERO )
-                               MOVE    ZERO   TO   FLG-LOOP-END
-                           END-IF
-      *
                        ELSE
                                MOVE   ZERO    TO   FLG-LOOP-END
                        END-IF
@@ -11827,29 +11815,14 @@
       *****************************************************************
        900-DCSRY-READ-SEC              SECTION.
       *
-           MOVE    ZERO                TO  FLG-LOOP-END
-      *
-           PERFORM UNTIL ( FLG-DCSRY       NOT =   ZERO )
-                    OR   ( FLG-LOOP-END    NOT =   ZERO )
-      *
-               READ    DCSRY-FILE     NEXT
-               AT  END
-                       MOVE    1           TO  FLG-DCSRY
-               NOT AT  END
-                   IF    ( DTCHK003-PTID   NOT =   DCSRY-PTID )
-                       MOVE    1           TO  FLG-DCSRY
-                   ELSE
-                       MOVE    1           TO  FLG-LOOP-END
-                   END-IF
-      *
-                   IF    ( DCSRY-SRYSYUKBN (1:2)   =   "99" )
-                    AND  ( DCSRY-SRYCD (1:4)   =   "0085" OR "0086" )
-                       MOVE    ZERO        TO  FLG-LOOP-END
-                   END-IF
-      *
-               END-READ
-      *
-           END-PERFORM
+           READ    DCSRY-FILE     NEXT
+           AT  END
+                   MOVE    1           TO  FLG-DCSRY
+           NOT AT  END
+               IF    ( DTCHK003-PTID   NOT =   DCSRY-PTID )
+                   MOVE    1           TO  FLG-DCSRY
+               END-IF
+           END-READ
       *
            .
       *

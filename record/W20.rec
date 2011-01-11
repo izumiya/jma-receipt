@@ -97,7 +97,7 @@ W20	{
 				state	int;
 			};
 			count	int;
-			item	varchar(41)[10];
+			item	varchar(41)[20];
 			state	int;
 		};
 		LBLKSN01	{

@@ -62,12 +62,24 @@
                  11  SPA-GMN-W20-RECEDSPKBN        PIC X(02).
                  11                                PIC X(01).
                  11  SPA-GMN-W20-RECEDSPKBNMEI     PIC X(10).
+      *        小規格病棟病床数加算
+               09  SPA-GMN-W20-SYOUBTUBRM-G.
+                 11  SPA-GMN-W20-SYOUBTUBRM        PIC X(02).
+                 11  SPA-GMN-W20-SYOUBTUBRMFL      PIC X(01).
+                 11  SPA-GMN-W20-SYOUBTUBRMMEI     PIC X(38).
       *        看護補助加算
                09  SPA-GMN-W20-KNGHJO-G.
                  11  SPA-GMN-W20-KNGHJO            PIC X(02).
                  11  SPA-GMN-W20-KNGHJOFL          PIC X(01).
                  11  SPA-GMN-W20-KNGHJOMEI         PIC X(38).
                09  SPA-GMN-W20-KSN-G.
+      *          未基準（病棟に係る基準を満たさない場合）
+                 11  SPA-GMN-W20-BTUMIKJN-LBL         PIC X(36).
+                 11  SPA-GMN-W20-BTUMIKJN-G.
+                   13  SPA-GMN-W20-BTUMIKJN           PIC X(01).
+                   13  SPA-GMN-W20-BTUMIKJNFL1        PIC X(01).
+                   13  SPA-GMN-W20-BTUMIKJNMEI        PIC X(24).
+                   13  SPA-GMN-W20-BTUMIKJNFL2        PIC X(01).
       *          夜間勤務等看護加算
                  11  SPA-GMN-W20-YKNKNG-LBL        PIC X(36).
                  11  SPA-GMN-W20-YKNKNG-G.
@@ -229,7 +241,7 @@
                    13  SPA-GMN-W20-KJTRIHAMEI        PIC X(24).
                    13  SPA-GMN-W20-KJTRIHAFL2        PIC X(01).
                09  SPA-GMN-W20-KSN-R   REDEFINES   SPA-GMN-W20-KSN-G.
-                 11  SPA-GMN-W20-KSN-OCC           OCCURS 23.
+                 11  SPA-GMN-W20-KSN-OCC           OCCURS 24.
                    13  SPA-GMN-W20-KSN-LBL         PIC X(36).
                    13  SPA-GMN-W20-KSN             PIC X(27).
       *        有効開始日
@@ -279,6 +291,13 @@
                    13  SPA-GMN-W20-RECEDSPKBNL     PIC X(02).
                    13                              PIC X(01).
                    13  SPA-GMN-W20-RECEDSPKBNMEIL  PIC X(10).
+      *        小規格病棟病床数加算
+               09  SPA-GMN-W20-SYOUBTUBRMLST-G.
+                 11  SPA-GMN-W20-SYOUBTUBRM-MAX PIC 9(03).
+                 11  SPA-GMN-W20-SYOUBTUBRMLST  OCCURS  20.
+                   13  SPA-GMN-W20-SYOUBTUBRML  PIC X(02).
+                   13                              PIC X(01).
+                   13  SPA-GMN-W20-SYOUBTUBRMMEIL  PIC X(38).
       *        病棟終了区分コンボ
                09  SPA-GMN-W20-EDKBNLST-G.
                  11  SPA-GMN-W20-EDKBN-MAX         PIC 9(03).
@@ -301,6 +320,14 @@
                    13  SPA-GMN-W20-KNGHJOFLL        PIC X(01).
                    13  SPA-GMN-W20-KNGHJOMEIL      PIC X(38).
                09  SPA-GMN-W20-KSNLST-G.
+      *          未基準（病棟に係る基準を満たさない場合）
+                 11  SPA-GMN-W20-BTUMIKJNLST-G.
+                   13  SPA-GMN-W20-BTUMIKJN-MAX          PIC 9(03).
+                   13  SPA-GMN-W20-BTUMIKJNLST           OCCURS  10.
+                     15  SPA-GMN-W20-BTUMIKJNL           PIC X(01).
+                     15  SPA-GMN-W20-BTUMIKJNFL1L        PIC X(01).
+                     15  SPA-GMN-W20-BTUMIKJNMEIL        PIC X(24).
+                     15  SPA-GMN-W20-BTUMIKJNFL2L        PIC X(01).
       *          夜間勤務等看護加算コンボ
                  11  SPA-GMN-W20-YKNKNGLST-G.
                    13  SPA-GMN-W20-YKNKNG-MAX      PIC 9(03).
@@ -486,7 +513,7 @@
                      15  SPA-GMN-W20-KJTRIHAFL2L        PIC X(01).
                09  SPA-GMN-W20-KSNLST-R    REDEFINES
                  SPA-GMN-W20-KSNLST-G.
-                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  23.
+                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  24.
                    13  SPA-GMN-W20-KSNLST-MAX      PIC 9(03).
                    13  SPA-GMN-W20-KSNLST          PIC X(27)
                                                    OCCURS  10.
@@ -554,6 +581,8 @@
                09  SPA-NAI-W20-KHNSRYCD            PIC X(09).
       *        入院基本点数
                09  SPA-NAI-W20-KHNTEN              PIC 99999.
+      *        小規格病棟病床数加算コード
+               09  SPA-NAI-W20-SYOUBTUBRMCD        PIC X(09).
              07  SPA-NAI-W20-CMB-DAT-AREA.
                09  SPA-NAI-W20-TOKNYUINLST-G.
                  11  SPA-NAI-W20-TOKNYUINLST       OCCURS  30.
@@ -570,6 +599,9 @@
                                                    OCCURS  50.
       *
                09  SPA-NAI-W20-KSNINF-G.
+                 11  SPA-NAI-W20-BTUMIKJN-CD        PIC 9(09).
+                 11  SPA-NAI-W20-BTUMIKJN-IDX       PIC 9(03).
+      *
                  11  SPA-NAI-W20-YKNKNG-CD         PIC X(09).
                  11  SPA-NAI-W20-YKNKNG-IDX        PIC 9(03).
       *
@@ -636,11 +668,11 @@
                  11  SPA-NAI-W20-HYOUKA-CD          PIC 9(09).
                  11  SPA-NAI-W20-HYOUKA-IDX         PIC 9(03).
       *
-                 11  SPA-NAI-W20-KJTRIHA-CD          PIC 9(09).
-                 11  SPA-NAI-W20-KJTRIHA-IDX         PIC 9(03).
+                 11  SPA-NAI-W20-KJTRIHA-CD         PIC 9(09).
+                 11  SPA-NAI-W20-KJTRIHA-IDX        PIC 9(03).
                09  SPA-NAI-W20-KSNINF-R  REDEFINES
                    SPA-NAI-W20-KSNINF-G.
-                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 23.
+                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 24.
                    13  SPA-NAI-W20-KSNINF-CD       PIC X(09).
                    13  SPA-NAI-W20-KSNINF-IDX      PIC 9(03).
       *      履歴リスト内部領域

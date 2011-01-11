@@ -101,7 +101,7 @@
                 05  W20-KNGHJO-STATE       PIC S9(9)   BINARY.
       *
                 05  W20-KNGHJO-CNT         PIC S9(9)   BINARY.
-                05  W20-KNGHJO-ITM         PIC X(41)   OCCURS  10.
+                05  W20-KNGHJO-ITM         PIC X(41)   OCCURS  20.
                 05  W20-KNGHJO-ITM-STATE
                                            PIC S9(9)   BINARY.
       *

@@ -81,6 +81,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDX0                                PIC 9(05).
            03  IDX1                                PIC 9(05).
            03  IDX2                                PIC 9(05).
            03  IDX3                                PIC 9(05).
@@ -167,6 +168,8 @@
                05  WRK-KBN1                        PIC 9(01).
            03  WRK-TEN                             PIC 9(05).
            03  WRK-HYOUKACD                        PIC X(09).
+           03  WRK-NUM02X.
+               05  WRK-NUM02                       PIC 9(02).
       *
        01  WRK-ROW.
            03  WRK-BTULST-ROW                      PIC S9(9)   BINARY.
@@ -181,6 +184,25 @@
       *
       *    固定値領域
        01  CONST-AREA.
+           03  CONST-SYOUBTUBRMCD-VAL.
+               05                      PIC X(09) VALUE "         ".
+               05                      PIC X(09) VALUE "188001070".
+               05                      PIC X(09) VALUE "188001170".
+               05                      PIC X(09) VALUE "188001270".
+               05                      PIC X(09) VALUE "188001370".
+               05                      PIC X(09) VALUE "188001470".
+               05                      PIC X(09) VALUE "188001570".
+               05                      PIC X(09) VALUE "188001670".
+               05                      PIC X(09) VALUE "188001770".
+               05                      PIC X(09) VALUE "188001870".
+               05                      PIC X(09) VALUE "188001970".
+               05                      PIC X(09) VALUE "188002070".
+               05                      PIC X(09) VALUE "188002170".
+               05                      PIC X(09) VALUE "188002270".
+               05                      PIC X(09) VALUE "188002370".
+               05                      PIC X(09) VALUE "188002470".
+           03  CONST-SYOUBTUBRMCD-R    REDEFINES CONST-SYOUBTUBRMCD-VAL.
+               05  CONST-SYOUBTUBRMCD  PIC X(09) OCCURS      16.
            03  CONST-BTULST-MAX        PIC 9(03) VALUE 50.
            03  CONST-RIREKILST-MAX     PIC 9(03) VALUE 20.
            03  CONST-TOKNYUIN-MAX      PIC 9(03) VALUE 30.
@@ -188,7 +210,8 @@
            03  CONST-SBT-MAX           PIC 9(03) VALUE 15.
            03  CONST-YKNKNG-MAX        PIC 9(03) VALUE 10.
            03  CONST-KHNRYO-MAX        PIC 9(03) VALUE 50.
-           03  CONST-KSN-MAX           PIC 9(03) VALUE 23.
+           03  CONST-SYOUBTUBRM-MAX    PIC 9(03) VALUE 16.
+           03  CONST-KSN-MAX           PIC 9(03) VALUE 24.
            03  CONST-GKSN-MAX          PIC 9(03) VALUE 14.
            03  CONST-YKNKNGCD-VAL.
                05                      PIC X(09) VALUE "190109870".
@@ -271,8 +294,10 @@
            03  CONST-HYOUKA-TOK        PIC X(09) VALUE "190134870".
            03  CONST-HYOUKA-SEN        PIC X(09) VALUE "190134970".
            03  CONST-KJTRIHA           PIC X(09) VALUE "190140870".
+           03  CONST-BTUMIKJNCD        PIC X(09) VALUE "188000270".
            03  CONST-KNGHJOCD-MAX      PIC 9(03) VALUE 15.
            03  CONST-5001-KSN-MAX      PIC 9(03) VALUE 14.
+           03  CONST-KANSATU           PIC X(02) VALUE "10".
            03  CONST-H180401           PIC X(08) VALUE "20060401".
            03  CONST-H180701           PIC X(08) VALUE "20060701".
            03  CONST-H181001           PIC X(08) VALUE "20061001".
@@ -618,6 +643,7 @@
        3101-CMB-SYOKI-SEC          SECTION.
       *
            INITIALIZE  SPA-GMN-W20-CMB-DAT-AREA
+                       SPA-NAI-W20-CMB-DAT-AREA
       *
       *    特定入院料取得処理
            PERFORM 3101-GET-SYS5110-SEC
@@ -643,7 +669,11 @@
       *
            EVALUATE    TRUE
            WHEN  ( WRK-KJN-YUKSTYMD    >=   CONST-H200401 )
-               PERFORM 31013-CMB-KSN-SYOKI-SEC
+               IF    ( SPA-GMN-W20-SBT  =   CONST-KANSATU )
+                   PERFORM 31014-CMB-KSN-SYOKI-SEC
+               ELSE
+                   PERFORM 31013-CMB-KSN-SYOKI-SEC
+               END-IF
            WHEN  ( WRK-KJN-YUKSTYMD    >=   CONST-H180401 )
                PERFORM 31012-CMB-KSN-SYOKI-SEC
            WHEN    OTHER
@@ -803,6 +833,77 @@
       *
            .
        31013-CMB-KSN-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院加算コンボ初期処理(医療観察法)
+      *****************************************************************
+       31014-CMB-KSN-SYOKI-SEC         SECTION.
+      *
+      *    小規格病棟病床数加算
+           PERFORM 3101-CMB-SYOUBTUBRMKSN-SET-SEC
+      *
+      *    病棟未基準減算
+           PERFORM 3101-CMB-BTUMIKJN-SET-SEC
+      *
+      *    食堂加算
+           PERFORM 3101-CMB-SYOKUDO-SET-SEC
+      *
+           .
+       31014-CMB-KSN-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    小規格病棟病床数加算コンボ初期処理
+      *****************************************************************
+       3101-CMB-SYOUBTUBRMKSN-SET-SEC  SECTION.
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   CONST-SYOUBTUBRM-MAX )
+      *
+               IF    ( IDX-CMB     =   1 )
+      *
+                   MOVE    "00"    TO  SPA-GMN-W20-SYOUBTUBRML (IDX-CMB)
+                   MOVE    "算定しない"
+                                   TO  SPA-GMN-W20-SYOUBTUBRMMEIL
+                                                               (IDX-CMB)
+      *
+               ELSE
+                   COMPUTE WRK-NUM02
+                       =   IDX-CMB
+                   MOVE    WRK-NUM02X
+                                   TO  SPA-GMN-W20-SYOUBTUBRML (IDX-CMB)
+                   COMPUTE WRK-NUM02
+                       =   IDX-CMB +   13
+                   MOVE    WRK-NUM02X
+                                   TO  WRK-KANACHK-MAE-INPUT
+                   PERFORM 800-ZENKAKU-SEC
+                   STRING  "小規格病棟病床数加算（"   DELIMITED BY SIZE
+                           WRK-KANACHK-OUT-INPUT      DELIMITED BY SPACE
+                           "床）"                     DELIMITED BY SIZE
+                   INTO    SPA-GMN-W20-SYOUBTUBRMMEIL (IDX-CMB)
+                   END-STRING
+               END-IF
+      *
+               COMPUTE SPA-GMN-W20-SYOUBTUBRM-MAX
+                   =   SPA-GMN-W20-SYOUBTUBRM-MAX  +   1
+      *
+           END-PERFORM
+      *
+           .
+       3101-CMB-SYOUBTUBRMKSN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    病棟未基準減算
+      *****************************************************************
+       3101-CMB-BTUMIKJN-SET-SEC       SECTION.
+      *
+           MOVE    "1"                 TO  SPA-GMN-W20-BTUMIKJNL(1)
+           MOVE    "算定しない"        TO  SPA-GMN-W20-BTUMIKJNMEIL(1)
+           MOVE    "2"                 TO  SPA-GMN-W20-BTUMIKJNL(2)
+           MOVE    "算定する"          TO  SPA-GMN-W20-BTUMIKJNMEIL(2)
+           MOVE    2                   TO  SPA-GMN-W20-BTUMIKJN-MAX
+      *
+           .
+       3101-CMB-BTUMIKJN-SET-EXT.
            EXIT.
       *****************************************************************
       *    看護補助加算コンボ初期処理
@@ -1795,8 +1896,13 @@
       *    病棟終了区分
            MOVE    W20-EDKBN       TO  SPA-GMN-W20-EDKBN-G
       *
-      *    看護補助加算
-           MOVE    W20-KNGHJO      TO  SPA-GMN-W20-KNGHJO-G
+           IF    ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+      *        小規模病棟病床数加算
+               MOVE    W20-KNGHJO  TO  SPA-GMN-W20-SYOUBTUBRM-G
+           ELSE
+      *        看護補助加算
+               MOVE    W20-KNGHJO  TO  SPA-GMN-W20-KNGHJO-G
+           END-IF
       *
       *    入院料加算
            PERFORM VARYING IDX-KSN FROM    1   BY  1
@@ -1880,10 +1986,14 @@
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
-               IF    ( SPA-NAI-W20-HOSPSBT     =   1 )
+               EVALUATE    TRUE
+               WHEN  ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+      *            小規格病棟病床数加算
+                   PERFORM 4101-SYOUBTUBRM-CHK-SEC
+               WHEN  ( SPA-NAI-W20-HOSPSBT     =   1 )
       *            看護補助加算
                    PERFORM 4101-KNGHJO-CHK-SEC
-               END-IF
+               END-EVALUATE
            END-IF
       *
       *    入院料加算チェック
@@ -1892,6 +2002,8 @@
                     OR   ( SPA-ERRCD       NOT =   SPACE )
       *
                EVALUATE    TRUE
+               WHEN    ( SPA-GMN-W20-SBT   =   CONST-KANSATU )
+                   PERFORM 41021-KNST-KSN-CHK-SEC
                WHEN    ( SPA-NAI-W20-YUKOSTYMD  >= CONST-H220401 )
                    PERFORM 41021-H2204-KSN-CHK-SEC
                WHEN    OTHER
@@ -1947,12 +2059,35 @@
            END-PERFORM
       *
            IF    ( SPA-ERRCD       =   SPACE )
-      *        入院加算情報チェック処理-施設基準チェック処理
-               PERFORM 4901-SSTKIJUN-CHK-SEC
+               IF    ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+                   CONTINUE
+               ELSE
+      *            入院加算情報チェック処理-施設基準チェック処理
+                   PERFORM 4901-SSTKIJUN-CHK-SEC
+               END-IF
            END-IF
       *
            .
        4102-KIHON-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    医療観察法入院料加算チェック処理
+      *****************************************************************
+       41021-KNST-KSN-CHK-SEC          SECTION.
+      *
+           IF    ( SPA-NAI-W20-KSNINF-IDX (IDX-KSN)
+                                   >   ZERO )
+               EVALUATE    SPA-NAI-W20-KSNINF-CD (IDX-KSN)
+               WHEN    CONST-BTUMIKJNCD
+                   PERFORM 4101-BTUMIKJN-CHK-SEC
+               WHEN    CONST-SYOKUDOCD
+                   PERFORM 4101-SYOKUDO-CHK-SEC
+               END-EVALUATE
+      *
+           END-IF
+      *
+           .
+       41021-KNST-KSN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    入院料加算チェック処理(H22.04.01〜)
@@ -2694,11 +2829,14 @@
       *****************************************************************
        4201-BTU-KSN-EDIT-SEC           SECTION.
       *
-           IF    ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H200401 )
+           EVALUATE    TRUE
+           WHEN  ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+               PERFORM 42013-BTU-KSN-EDIT-SEC
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H200401 )
                PERFORM 42012-BTU-KSN-EDIT-SEC
-           ELSE
+           WHEN    OTHER
                PERFORM 42011-BTU-KSN-EDIT-SEC
-           END-IF
+           END-EVALUATE
       *
            .
        4201-BTU-KSN-EDIT-EXT.
@@ -2813,6 +2951,39 @@
       *
            .
        42011-BTU-KSN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    医療観察法加算編集処理
+      *****************************************************************
+       42013-BTU-KSN-EDIT-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  CNT-KSN
+      *
+           INITIALIZE  SYS-5001-KSNAREA
+      *
+      *    小規格病棟病床数加算
+           IF    ( SPA-GMN-W20-SYOUBTUBRM  NOT =   "00" )
+               MOVE    SPA-NAI-W20-SYOUBTUBRMCD
+                                       TO  WRK-KSNCD
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    未基準（病棟に係る基準をみたさない場合）
+           IF    ( SPA-GMN-W20-BTUMIKJN   =   "2" )
+               MOVE    CONST-BTUMIKJNCD
+                                   TO  WRK-KSNCD
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    食堂加算区分
+           IF    ( SPA-GMN-W20-SYOKUDO =   "2" )
+               MOVE    "2"             TO  SYS-5001-BTU-SYOKUDOKBN
+           ELSE
+               MOVE    "1"             TO  SYS-5001-BTU-SYOKUDOKBN
+           END-IF
+      *
+           .
+       42013-BTU-KSN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    病棟情報編集処理(H20.04〜)
@@ -3119,6 +3290,13 @@
                GO  TO  4100-SBT-CHK-EXT
            END-IF
       *
+           IF    ( SPA-GMN-W20-SBT     =   CONST-KANSATU )
+            OR   ( SPA-NAI-W20-SBT-MOT =   CONST-KANSATU )
+               PERFORM 4100-SYS-KANRI-SAI-SET-SEC
+               PERFORM 4201-KSN-AREA-CLEAR-SEC
+      *
+           END-IF
+      *
            MOVE    SPA-GMN-W20-SBT     TO  SPA-NAI-W20-SBT-MOT
       *
            INITIALIZE      SPA-NAI-W20-KHNSRYCDLST-G
@@ -3285,12 +3463,18 @@
       *
            MOVE    ZERO            TO  IDX-CMB
       *
-           IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H180401 )
-            AND  ( SPA-GMN-W20-SBT         =   "08" )
-               PERFORM 41001-KHNRYO-CMB-EDT-SEC
+           IF    ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+               CONTINUE
            ELSE
-               PERFORM 41002-KHNRYO-CMB-EDT-SEC
+      *
+               IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H180401 )
+                AND  ( SPA-GMN-W20-SBT         =   "08" )
+                   PERFORM 41001-KHNRYO-CMB-EDT-SEC
+               ELSE
+                   PERFORM 41002-KHNRYO-CMB-EDT-SEC
+               END-IF
            END-IF
+      *
       *
            .
       *
@@ -4182,6 +4366,44 @@
        4101-KJTRIHA-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    未基準（病棟に係る基準をみたさない場合）
+      *****************************************************************
+       4101-BTUMIKJN-CHK-SEC               SECTION.
+      *
+           MOVE    SPA-GMN-W20-BTUMIKJN    TO  WRK-CMB-CD
+           PERFORM 4200-BTUMIKJNLST-CHK-SEC
+           IF    ( WRK-CMB-CD      =   SPACE )
+               MOVE    SPA-GMN-W20-BTUMIKJNLST (1)
+                                   TO  SPA-GMN-W20-BTUMIKJN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-BTUMIKJN-G
+           END-IF
+      *
+           .
+      *
+       4101-BTUMIKJN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    小規格病棟病床数加算
+      *****************************************************************
+       4101-SYOUBTUBRM-CHK-SEC         SECTION.
+      *
+           MOVE    SPACE           TO  SPA-NAI-W20-SYOUBTUBRMCD
+           MOVE    SPA-GMN-W20-SYOUBTUBRM    TO  WRK-CMB-CD
+           PERFORM 4200-SYOUBTUBRMLST-CHK-SEC
+           IF    ( WRK-CMB-CD      =   SPACE )
+               MOVE    SPA-GMN-W20-SYOUBTUBRMLST (1)
+                                   TO  SPA-GMN-W20-SYOUBTUBRM-G
+           ELSE
+               MOVE    WRK-CMB-ITM  TO SPA-GMN-W20-SYOUBTUBRM-G
+               MOVE    WRK-CMB-ITM2 TO SPA-NAI-W20-SYOUBTUBRMCD
+           END-IF
+      *
+           .
+      *
+       4101-SYOUBTUBRM-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    基準日
       *****************************************************************
        4100-KJNYMD-CHK-SEC             SECTION.
@@ -4368,6 +4590,12 @@
       *****************************************************************
        41001-INPUT-AREA-EDIT-SEC       SECTION.
       *
+      *    病棟種別
+           MOVE    SYS-5001-BTU-SBT    TO  WRK-CMB-CD
+           PERFORM 4200-SBTLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-SBT-G
+           MOVE    SYS-5001-BTU-SBT    TO  SPA-NAI-W20-SBT-MOT
+      *
       *    システム管理情報再設定
            PERFORM 4100-SYS-KANRI-SAI-SET-SEC
       *
@@ -4393,12 +4621,6 @@
            MOVE    SYS-5001-BTU-KA     TO  WRK-CMB-CD
            PERFORM 4200-SRYKALST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-SRYKA-G
-      *
-      *    病棟種別
-           MOVE    SYS-5001-BTU-SBT    TO  WRK-CMB-CD
-           PERFORM 4200-SBTLST-CHK-SEC
-           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-SBT-G
-           MOVE    SYS-5001-BTU-SBT    TO  SPA-NAI-W20-SBT-MOT
       *
       *    レセプト表示区分
            MOVE    SYS-5001-RECEDSPKBN TO  WRK-CMB-CD
@@ -4442,6 +4664,8 @@
            END-IF
       *
            EVALUATE    TRUE
+           WHEN  ( SPA-GMN-W20-SBT          =   CONST-KANSATU )
+               PERFORM 41005-KSN-EDIT-SEC
            WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=   CONST-H220401 )
                PERFORM 41004-KSN-EDIT-SEC
            WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=   CONST-H200401 )
@@ -4601,6 +4825,44 @@
       *
            .
        41002-KSN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    病棟別設定加算設定処理(医療観察法)
+      *****************************************************************
+       41005-KSN-EDIT-SEC               SECTION.
+      *
+           PERFORM VARYING IDX-KSN     FROM    1   BY  1
+                   UNTIL ( IDX-KSN     >   CONST-5001-KSN-MAX )
+      *
+               IF    ( SYS-5001-KSNKBN (IDX-KSN)   =   "2" )
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0 >  SPA-GMN-W20-SYOUBTUBRM-MAX )
+      *
+                       IF    ( SYS-5001-KSNCD (IDX-KSN)
+                                          =    CONST-SYOUBTUBRMCD(IDX0))
+                           MOVE    SPA-GMN-W20-SYOUBTUBRMLST(IDX0)
+                                          TO   SPA-GMN-W20-SYOUBTUBRM-G
+                       END-IF
+      *
+                   END-PERFORM
+      *
+                   EVALUATE    SYS-5001-KSNCD (IDX-KSN)
+                   WHEN    CONST-BTUMIKJNCD
+                       MOVE    "2"         TO  WRK-CMB-CD
+                       PERFORM 4200-BTUMIKJNLST-CHK-SEC
+                       MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-BTUMIKJN-G
+                   END-EVALUATE
+               END-IF
+           END-PERFORM
+      *
+      *    食堂加算
+           MOVE    SYS-5001-BTU-SYOKUDOKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-SYOKUDOLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-SYOKUDO-G
+      *
+           .
+       41005-KSN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    病棟別設定加算設定処理(H22.4〜)
@@ -4935,10 +5197,11 @@
       *****************************************************************
        4201-KSN-AREA-CLEAR-SEC         SECTION.
       *
-           IF    ( SPA-NAI-W20-HOSPSBT =  1 )
-               MOVE    SPA-GMN-W20-KNGHJOLST (1)
+           MOVE    SPA-GMN-W20-KNGHJOLST (1)
                                    TO  SPA-GMN-W20-KNGHJO-G
-           END-IF
+      *
+           MOVE    SPA-GMN-W20-SYOUBTUBRMLST (1)
+                                   TO  SPA-GMN-W20-SYOUBTUBRM-G
       *
            PERFORM VARYING IDX-KSN    FROM 1  BY  1
                    UNTIL ( IDX-KSN    >    CONST-KSN-MAX )
@@ -4996,6 +5259,12 @@
            END-PERFORM
       *
            EVALUATE    TRUE
+           WHEN  ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+               MOVE    "未基準（病棟に係る基準を満たさない）"
+                                           TO  SPA-GMN-W20-BTUMIKJN-LBL
+               MOVE    CONST-BTUMIKJNCD    TO  SPA-NAI-W20-BTUMIKJN-CD
+               MOVE    "食堂加算"          TO  SPA-GMN-W20-SYOKUDO-LBL
+               MOVE    CONST-SYOKUDOCD     TO  SPA-NAI-W20-SYOKUDO-CD
            WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H220401 )
       *
                MOVE    "食堂加算"          TO  SPA-GMN-W20-SYOKUDO-LBL
@@ -5244,7 +5513,8 @@
                                            OR  "04"
                                            OR  "05"
                                            OR  "06"
-                                           OR  "07" )
+                                           OR  "07"
+                                           OR  "10" )
                    CONTINUE
                ELSE
                    MOVE    "1106"      TO  SPA-ERRCD
@@ -5292,27 +5562,32 @@
                GO  TO  4900-KANRENCHK-EXT
            END-IF
       *
-      *    特定入院料が設定されていない場合病棟ごとに必須項目を
-      *    チェックする
-           IF    ( SPA-GMN-W20-TOKNYUIN-G      =   SPACE )
+           IF    ( SPA-GMN-W20-SBT     =   CONST-KANSATU )
+               CONTINUE
+           ELSE
       *
-      *        病棟種別が設定されていること
-               IF    ( SPA-GMN-W20-SBT     NOT =   SPACE )
-                   CONTINUE
-               ELSE
-                   MOVE    "1009"  TO  SPA-ERRCD
-                   MOVE    6       TO  SPA-GMN-W20-CUR
-                   GO  TO  4900-KANRENCHK-EXT
-               END-IF
+      *        特定入院料が設定されていない場合病棟ごとに必須項目を
+      *        チェックする
+               IF    ( SPA-GMN-W20-TOKNYUIN-G      =   SPACE )
       *
-      *        入院基本料が算定されていること
-               IF    ( SPA-GMN-W20-KHNRYO      =   SPACE )
-                   IF    ( SPA-GMN-W20-SBT         =   "04" OR "09"  )
-                    AND  ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H180701 )
-                        CONTINUE
+      *            病棟種別が設定されていること
+                   IF    ( SPA-GMN-W20-SBT     NOT =   SPACE )
+                       CONTINUE
                    ELSE
-                       MOVE    "1014"  TO  SPA-ERRCD
+                       MOVE    "1009"  TO  SPA-ERRCD
+                       MOVE    6       TO  SPA-GMN-W20-CUR
                        GO  TO  4900-KANRENCHK-EXT
+                   END-IF
+      *
+      *            入院基本料が算定されていること
+                   IF    ( SPA-GMN-W20-KHNRYO      =   SPACE )
+                       IF    ( SPA-GMN-W20-SBT       =   "04" OR "09"  )
+                        AND  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H180701 )
+                            CONTINUE
+                       ELSE
+                           MOVE    "1014"  TO  SPA-ERRCD
+                           GO  TO  4900-KANRENCHK-EXT
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -6516,6 +6791,91 @@
        4200-KJTRIHALST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    未基準（病棟に係る基準をみたさない場合）コンボチェック処理
+      *****************************************************************
+       4200-BTUMIKJNLST-CHK-SEC        SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-BTUMIKJN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W20-BTUMIKJNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-BTUMIKJNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-BTUMIKJNLST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-BTUMIKJNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    小規格病棟病床数加算コンボチェック処理
+      *****************************************************************
+       4200-SYOUBTUBRMLST-CHK-SEC        SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-SYOUBTUBRM-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W20-SYOUBTUBRML (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-SYOUBTUBRMLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    CONST-SYOUBTUBRMCD (IDX-CMB)
+                                       TO  WRK-CMB-ITM2
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-SYOUBTUBRMLST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-SYOUBTUBRMLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    小規格病棟病床数加算コンボチェック処理
+      *****************************************************************
+       4201-SYOUBTUBRMLST-CHK-SEC        SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-SYOUBTUBRM-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( CONST-SYOUBTUBRMCD (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-SYOUBTUBRMLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    CONST-SYOUBTUBRMCD (IDX-CMB)
+                                       TO  WRK-CMB-ITM2
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-SYOUBTUBRMLST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4201-SYOUBTUBRMLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    レセプト表示区分コンボチェック処理
       *****************************************************************
        4200-RECEDSPKBNLST-CHK-SEC      SECTION.
@@ -6675,6 +7035,7 @@
       *
            MOVE    W20-BTULST-ROW          TO  WRK-BTULST-ROW
       *
+           MOVE    SPACE                   TO  W20
            INITIALIZE                          W20
       *
       *    病室ボタン
@@ -6758,7 +7119,21 @@
            MOVE    SPA-NAI-W20-KHNTEN      TO  W20-KHNTEN
       *
       *
-           IF    ( SPA-NAI-W20-HOSPSBT     =   1 )
+           EVALUATE    TRUE
+           WHEN  ( SPA-GMN-W20-SBT         =   CONST-KANSATU )
+      *        小規格病棟病床数加算（看護補助加算コンボを借用）
+               MOVE    "小規格病棟病床数加算"
+                                       TO  W20-LBLKNGHJO
+               MOVE    SPA-GMN-W20-SYOUBTUBRM-G
+                                       TO  W20-KNGHJO
+               MOVE    SPA-GMN-W20-SYOUBTUBRM-MAX
+                                       TO  W20-KNGHJO-CNT
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1    >   W20-KNGHJO-CNT )
+                    MOVE   SPA-GMN-W20-SYOUBTUBRMLST (IDX1)
+                                   TO  W20-KNGHJO-ITM (IDX1)
+               END-PERFORM
+           WHEN  ( SPA-NAI-W20-HOSPSBT     =   1 )
       *
                MOVE    "看護補助加算"      TO  W20-LBLKNGHJO
       *
@@ -6772,7 +7147,7 @@
                     MOVE   SPA-GMN-W20-KNGHJOLST (IDX1)
                                    TO  W20-KNGHJO-ITM (IDX1)
                END-PERFORM
-           END-IF
+           END-EVALUATE
       *
       *    入院料加算
            PERFORM VARYING IDX-KSN FROM    1   BY  1
@@ -6946,6 +7321,12 @@
                                            W20-KNGHJO-ITM-STATE
            END-IF
       *
+      *    IF    ( SPA-GMN-W20-KHNRYO-MAX  =   ZERO )
+      *        MOVE    WIDGET-INSENSITIVE
+      *                                TO  W20-KHNRYO-STATE
+      *                                    W20-KHNRYO-ITM-STATE
+      *    END-IF
+      *
            PERFORM VARYING IDX-GKSN FROM    1   BY  1
                    UNTIL ( IDX-GKSN >  CONST-GKSN-MAX )
                IF    ( W20-KSN-CNT (IDX-GKSN)   >   ZERO )
@@ -7080,6 +7461,13 @@
                IF    ( W20-KNGHJO-STATE
                                        =   WIDGET-INSENSITIVE )
                    MOVE    10          TO  SPA-GMN-W20-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   7 )
+               IF    ( W20-KHNRYO-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    8           TO  SPA-GMN-W20-CUR
                END-IF
            END-IF
       *
@@ -7415,6 +7803,34 @@
       *
            .
        800-ENRTRY-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    全角変換処理
+      *****************************************************************
+       800-ZENKAKU-SEC             SECTION.
+      *
+           INITIALIZE                  WRK-KANACHK-OUT-INPUT
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"             TO  KANACHK-SYORI
+           MOVE    WRK-KANACHK-MAE-INPUT
+                                   TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           IF      ( KANACHK-RC    =   ZERO )
+               MOVE    KANACHK-OUT-INPUT
+                                   TO  WRK-KANACHK-OUT-INPUT
+           ELSE
+               IF    ( KANACHK-RC2 =   7 )
+                   MOVE    KANACHK-OUT-INPUT
+                                   TO  WRK-KANACHK-OUT-INPUT
+               ELSE
+                   MOVE    WRK-KANACHK-MAE-INPUT
+                                   TO  WRK-KANACHK-OUT-INPUT
+               END-IF
+           END-IF
+      *
+           .
+       800-ZENKAKU-EXT.
            EXIT.
       *****************************************************************
       *    西暦日本語変換処理

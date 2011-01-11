@@ -778,6 +778,7 @@
                05  CONST-KSNCD-R REDEFINES CONST-KSNCD-VAL.
                    07  CONST-KSNCD-OCC     OCCURS  4.
                        09  CONST-KSNCD     PIC X(09).
+           03  CONST-KANSATU               PIC X(02)    VALUE "10".
       *
       *    スパ領域 ワーク
            COPY    "COMMON-SPA"      REPLACING
@@ -859,6 +860,8 @@
            COPY    "CPSK5110.INC".
       *    （特定入院料−病室）
            COPY    "CPSK5111.INC".
+      *    医療観察入院医学管理料
+           COPY    "CPSK5112.INC".
       *    
            COPY    "CPSK5013.INC".
       *    
@@ -5073,8 +5076,7 @@
                                    TO  WRK-KBNCD
            MOVE    WRK-KJNYMD      TO  WRK-YUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           IF    ( FLG-SYSKANRI    =   ZERO )
-               MOVE    MCPDATA-REC TO  SYS-5001-REC
+           MOVE    SYSKANRI-REC    TO  SYS-5001-REC
       *
                MOVE    SYS-5001-BTU-SBT    TO  SPA-NAI-I01-BTUSBT
                MOVE    SYS-5001-KHNKBNCD   TO  SPA-NAI-I01-BTUKHNKBNCD
@@ -5091,6 +5093,20 @@
                        MOVE    TNS-NAME    TO   SPA-NAI-I01-KHNRYO-NM
                    END-IF
                END-IF
+      *
+           IF    ( SPA-NAI-I01-BTUSBT  =   CONST-KANSATU )
+               PERFORM 41011-KANSATU-DAT-SET-SEC
+           ELSE
+               PERFORM 41011-CMB-TOKNYUIN-SET-SEC
+           END-IF
+      *
+           .
+       4101-CMB-TOKNYUIN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定入院料コンボ設定処理
+      *****************************************************************
+       41011-CMB-TOKNYUIN-SET-SEC      SECTION.
       *
                IF    ( WRK-KJNYMD         >=   CONST-H180701 )
                 AND  ( SYS-5001-BTU-SBT    =   "04" OR "09" )
@@ -5275,7 +5291,6 @@
                    END-IF
       *
                END-IF
-           END-IF
       *
       *    病室情報からコンボ項目を設定
            MOVE    "5002"          TO  WRK-KANRICD
@@ -5348,7 +5363,7 @@
            PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
            .
-       4101-CMB-TOKNYUIN-SET-EXT.
+       41011-CMB-TOKNYUIN-SET-EXT.
            EXIT.
       *****************************************************************
       *    入院料加算コンボ初期設定処理
@@ -5855,6 +5870,43 @@
       *
            .
        41001-CMB-TOKNYUIN-DAT-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定入院料コンボデータセット処理
+      *****************************************************************
+       41011-KANSATU-DAT-SET-SEC   SECTION.
+      *
+           MOVE    1               TO  SPA-NAI-I01-SELNYUKHN
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "5112"          TO  SYS-KANRICD
+           MOVE    WRK-KJNYMD      TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY23-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-5112-REC
+      *
+           PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
+      *
+               MOVE    SYS-5112-KANSATUMEI TO  WRK-TOKNYUIN-NM
+               MOVE    "4"                 TO  WRK-TOKNYUIN-KBN
+               MOVE    SYS-5112-KBNCD      TO  WRK-TOKNYUIN-CD
+      *        MOVE    SYS-5112-SRYCD      TO  WRK-TOKNYUIN-SRYCD-X
+               MOVE    ZERO                TO  WRK-TOKNYUIN-SRYCD-X
+               MOVE    SYS-5112-KBNCD(1:2) TO  WRK-TOKNYUIN-SRYCD-X(8:2)
+               PERFORM 4101-CMB-TOKNYUIN-DAT-SET-SEC
+      *
+               PERFORM 900-SYSKANRI-KEY23-FET-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-5112-REC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       41011-KANSATU-DAT-SET-DAT-SET-EXT.
            EXIT.
       *****************************************************************
       *    特定入院料コンボデータセット処理
@@ -22522,15 +22574,13 @@
                                             I01-BUNBENKBN-ITM-STT
            END-IF
       *
-           IF    ( SPA-GMN-I01-SYORIKBN-CD
-                                       =   "01" OR "03" OR "08" )
-               IF   ( SPA-GMN-I01-BUNBEN-CD    =  "1" OR "2" )
-                   CONTINUE
-               ELSE
-                   MOVE    WIDGET-INSENSITIVE
+           IF    ( SPA-GMN-I01-SYORIKBN-CD =   "01" OR "03" OR "08" )
+            AND  ( SPA-GMN-I01-BUNBEN-CD   =   "1"  OR "2" )
+               CONTINUE
+           ELSE
+               MOVE    WIDGET-INSENSITIVE
                                        TO   I01-RIYOUKBN-STT
                                             I01-RIYOUKBN-ITM-STT
-               END-IF
            END-IF
       *
       *    退院証明書再発行

@@ -561,7 +561,7 @@
       <name>LBLKSN04</name>
       <x>12</x>
       <y>572</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -577,7 +577,7 @@
       <name>LBLKSN05</name>
       <x>12</x>
       <y>596</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -593,7 +593,7 @@
       <name>LBLKSN09</name>
       <x>508</x>
       <y>524</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -609,7 +609,7 @@
       <name>LBLKSN11</name>
       <x>508</x>
       <y>572</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>»ùÆ¸¡¦»×½Õ´üÀº¿À²ÊÆþ±¡°åÎÅ´ÉÍý²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -625,7 +625,7 @@
       <name>LBLKSN12</name>
       <x>508</x>
       <y>596</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>»ùÆ¸¡¦»×½Õ´üÀº¿À²ÊÆþ±¡°åÎÅ´ÉÍý²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -641,7 +641,7 @@
       <name>LBLKSN13</name>
       <x>508</x>
       <y>620</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>»ùÆ¸¡¦»×½Õ´üÀº¿À²ÊÆþ±¡°åÎÅ´ÉÍý²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -655,7 +655,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN08</name>
-      <x>772</x>
+      <x>780</x>
       <y>500</y>
       <width>216</width>
       <height>24</height>
@@ -696,7 +696,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN09</name>
-      <x>772</x>
+      <x>780</x>
       <y>524</y>
       <width>216</width>
       <height>24</height>
@@ -737,7 +737,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN10</name>
-      <x>772</x>
+      <x>780</x>
       <y>548</y>
       <width>216</width>
       <height>24</height>
@@ -778,7 +778,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN11</name>
-      <x>772</x>
+      <x>780</x>
       <y>572</y>
       <width>216</width>
       <height>24</height>
@@ -819,7 +819,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN12</name>
-      <x>772</x>
+      <x>780</x>
       <y>596</y>
       <width>216</width>
       <height>24</height>
@@ -860,7 +860,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN13</name>
-      <x>772</x>
+      <x>780</x>
       <y>620</y>
       <width>216</width>
       <height>24</height>
@@ -901,7 +901,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN14</name>
-      <x>772</x>
+      <x>780</x>
       <y>644</y>
       <width>216</width>
       <height>24</height>
@@ -944,7 +944,7 @@
       <name>LBLKSN10</name>
       <x>508</x>
       <y>548</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>»ùÆ¸¡¦»×½Õ´üÀº¿À²ÊÆþ±¡°åÎÅ´ÉÍý²Ã»»¤¢</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -958,7 +958,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_RECEDSPKBN</name>
-      <x>156</x>
+      <x>164</x>
       <y>440</y>
       <width>90</width>
       <height>25</height>
@@ -1188,7 +1188,7 @@
       <name>LBLKSN08</name>
       <x>508</x>
       <y>500</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -1410,57 +1410,9 @@
       <name>LBLKSN07</name>
       <x>12</x>
       <y>644</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLKSN03</name>
-      <x>12</x>
-      <y>548</y>
-      <width>260</width>
-      <height>24</height>
-      <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLKSN01</name>
-      <x>12</x>
-      <y>500</y>
-      <width>260</width>
-      <height>24</height>
-      <label>Ìë´Ö¶ÐÌ³Åù´Ç¸î²Ã»»</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLKSN02</name>
-      <x>12</x>
-      <y>524</y>
-      <width>260</width>
-      <height>24</height>
-      <label>Ìë´Ö¶ÐÌ³Åù´Ç¸î²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>
@@ -1474,7 +1426,7 @@
       <name>LBLKSN14</name>
       <x>508</x>
       <y>644</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>»ùÆ¸¡¦»×½Õ´üÀº¿À²ÊÆþ±¡°åÎÅ´ÉÍý²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -1520,7 +1472,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN06</name>
-      <x>276</x>
+      <x>284</x>
       <y>620</y>
       <width>216</width>
       <height>24</height>
@@ -1561,7 +1513,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN05</name>
-      <x>276</x>
+      <x>284</x>
       <y>596</y>
       <width>216</width>
       <height>24</height>
@@ -1602,7 +1554,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN04</name>
-      <x>276</x>
+      <x>284</x>
       <y>572</y>
       <width>216</width>
       <height>24</height>
@@ -1643,7 +1595,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN03</name>
-      <x>276</x>
+      <x>284</x>
       <y>548</y>
       <width>216</width>
       <height>24</height>
@@ -1684,7 +1636,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN02</name>
-      <x>276</x>
+      <x>284</x>
       <y>524</y>
       <width>216</width>
       <height>24</height>
@@ -1725,7 +1677,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN01</name>
-      <x>276</x>
+      <x>284</x>
       <y>500</y>
       <width>216</width>
       <height>24</height>
@@ -1766,7 +1718,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KSN07</name>
-      <x>276</x>
+      <x>284</x>
       <y>644</y>
       <width>216</width>
       <height>24</height>
@@ -1807,7 +1759,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_KNGHJO</name>
-      <x>156</x>
+      <x>164</x>
       <y>476</y>
       <width>336</width>
       <height>24</height>
@@ -1846,29 +1798,13 @@
     </widget>
 
     <widget>
-      <class>GtkLabel</class>
-      <name>LBLKNGHJO</name>
-      <x>12</x>
-      <y>476</y>
-      <width>120</width>
-      <height>24</height>
-      <label>´Ç¸îÊä½õ²Ã»»</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
       <class>GtkScrolledWindow</class>
       <name>scrolledwindow29</name>
       <x>784</x>
       <y>328</y>
       <width>226</width>
       <height>132</height>
-      <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
+      <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
       <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
       <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
       <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
@@ -2024,7 +1960,7 @@
       <name>LBLKSN06</name>
       <x>12</x>
       <y>620</y>
-      <width>260</width>
+      <width>272</width>
       <height>24</height>
       <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
@@ -2071,6 +2007,70 @@
       <width>48</width>
       <height>24</height>
       <label>´ð½àÆü</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLKNGHJO</name>
+      <x>12</x>
+      <y>476</y>
+      <width>152</width>
+      <height>24</height>
+      <label>´Ç¸îÊä½õ²Ã»»</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLKSN01</name>
+      <x>12</x>
+      <y>500</y>
+      <width>272</width>
+      <height>24</height>
+      <label>Ìë´Ö¶ÐÌ³Åù´Ç¸î²Ã»»</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLKSN02</name>
+      <x>12</x>
+      <y>524</y>
+      <width>272</width>
+      <height>24</height>
+      <label>Ìë´Ö¶ÐÌ³Åù´Ç¸î²Ã»»</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLKSN03</name>
+      <x>12</x>
+      <y>548</y>
+      <width>272</width>
+      <height>24</height>
+      <label>ÊÝ°é»Î¡¦¥×¥ì¥¤¥ë¡¼¥à²Ã»»</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>
