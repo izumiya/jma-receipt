@@ -322,6 +322,9 @@
       *    特定入院料コード取得サブ
            COPY  "CPORCSTOKNYUIN.INC".
       *
+      *    医療観察入院料コード取得パラメタ
+           COPY  "CPORCSIRYOKNS.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPAREA".
       *
@@ -1085,6 +1088,38 @@
                                    TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
                                                                (IDX6)
            END-PERFORM
+      *
+      *    医療観察入院セット
+           INITIALIZE            ORCSIRYOKNS-AREA
+           MOVE     PTNYUINRRK-HOSPNUM   TO  LNK-IRYOKNS-HOSPNUM
+           MOVE     PTNYUINRRK-TOKUTEI-KBN
+                                         TO  LNK-IRYOKNS-KBN
+           MOVE     PTNYUINRRK-TOKUTEI-NYUIN
+                                         TO  LNK-IRYOKNS-NYUIN
+           MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
+           DISPLAY  "==  ORCSIRYOKNS CALL ==="
+           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+           MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                         TO  LNK-IRYOKNS-SANTEIYM
+           CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
+                                            SPA-AREA
+           DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
+           IF       LNK-IRYOKNS-RC     =    ZERO
+               MOVE   LNK-IRYOKNS-SRYCD(1)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+               MOVE   LNK-IRYOKNS-SRYCD(2)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(2)
+               MOVE   LNK-IRYOKNS-SRYCD(3)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(3)
+               MOVE   LNK-IRYOKNS-SRYCD(4)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(4)
+               MOVE   LNK-IRYOKNS-SRYCD(5)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(5)
+               MOVE   SYOKIKSN-IN-SANTEISTYMD
+                                  TO  LNK-SCNYUACCT-STSRYYMD
+                                      LNK-SCNYUACCT-EDSRYYMD
+           END-IF
+      *
       *    通算算定済日数
            MOVE    WRK-TSUSAN          TO  LNK-SCNYUACCT-NYUKHN-NISUU
       *    特定入院で入院料が変更になるコードの対応

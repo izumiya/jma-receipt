@@ -3304,9 +3304,10 @@ grpsys                            SPA-AREA
                          ELSE
                               EVALUATE  TNS-TENSIKIBETU
                                 WHEN     3
-                                    MOVE  TNS-TEN  TO  WRK-KSNTEN
+                                    ADD  TNS-TEN  TO  WRK-KSNTEN
                                 WHEN     8
-                                    COMPUTE  WRK-KSNTEN = TNS-TEN * -1
+                                    COMPUTE  WRK-KSNTEN = WRK-KSNTEN +
+                                                        (TNS-TEN * -1)
                                 WHEN     6
                                     MOVE  TNS-TEN  TO  WRK-HYOKETU-TEN
                               END-EVALUATE

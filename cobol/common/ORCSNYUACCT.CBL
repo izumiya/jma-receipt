@@ -340,6 +340,7 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  WRK-HYOU-TEISU-TBL
            MOVE    ZERO                TO  LNK-SCNYUACCT-RC
       *
       *    更新日取得
@@ -432,11 +433,15 @@
                GO      TO     100-SINKI-SYORI-EXT
            END-IF
       *
-      *    入院料加算作成
-           MOVE    ZERO                TO  WRK-NISUU
-           PERFORM 210-NYUKHNKSN-SYORI-SEC
-           IF      LNK-SCNYUACCT-RC    NOT =   ZERO
-               GO      TO     100-SINKI-SYORI-EXT
+      *    入院料加算作成（医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+              MOVE    ZERO                TO  WRK-NISUU
+              PERFORM 210-NYUKHNKSN-SYORI-SEC
+              IF      LNK-SCNYUACCT-RC    NOT =   ZERO
+                  GO      TO     100-SINKI-SYORI-EXT
+              END-IF
            END-IF
       *
       *    その他料作成
@@ -498,8 +503,12 @@
       *****************************************************************
        200-NYUKHN-SYORI-SEC            SECTION.
       *
-      *    標欠・超過情報取得
-           PERFORM 2009-HYOU-TEISU-SEC
+      *    標欠・超過情報取得（医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+              PERFORM 2009-HYOU-TEISU-SEC
+           END-IF
       *
            MOVE    WRK-STYMD           TO  WRK-KHN-STYMD
            MOVE    WRK-EDYMD           TO  WRK-KHN-EDYMD
@@ -3012,10 +3021,14 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO     700-TAIINDEL-SYORI-EXT
            END-IF
       *
-      *    入院料加算作成
-           PERFORM 210-NYUKHNKSN-SYORI-SEC
-           IF      LNK-SCNYUACCT-RC    NOT =   ZERO
-               GO      TO     700-TAIINDEL-SYORI-EXT
+      *    入院料加算作成（医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+              PERFORM 210-NYUKHNKSN-SYORI-SEC
+              IF      LNK-SCNYUACCT-RC    NOT =   ZERO
+                  GO      TO     700-TAIINDEL-SYORI-EXT
+              END-IF
            END-IF
       *
       *    その他料作成
@@ -3131,11 +3144,15 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO     800-TENSYUTU-SYORI-EXT
            END-IF
       *
-      *    入院料加算作成
-           MOVE    ZERO                TO  WRK-NISUU
-           PERFORM 210-NYUKHNKSN-SYORI-SEC
-           IF      LNK-SCNYUACCT-RC    NOT =   ZERO
-               GO      TO     800-TENSYUTU-SYORI-EXT
+      *    入院料加算作成（医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+              MOVE    ZERO                TO  WRK-NISUU
+              PERFORM 210-NYUKHNKSN-SYORI-SEC
+              IF      LNK-SCNYUACCT-RC    NOT =   ZERO
+                  GO      TO     800-TENSYUTU-SYORI-EXT
+              END-IF
            END-IF
       *
       *    その他料作成
@@ -3196,11 +3213,15 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO     900-NEXTTUKI-SYORI-EXT
            END-IF
       *
-      *    入院料加算作成
-           MOVE    ZERO                TO  WRK-NISUU
-           PERFORM 210-NYUKHNKSN-SYORI-SEC
-           IF      LNK-SCNYUACCT-RC    NOT =   ZERO
-               GO      TO     900-NEXTTUKI-SYORI-EXT
+      *    入院料加算作成（医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+              MOVE    ZERO                TO  WRK-NISUU
+              PERFORM 210-NYUKHNKSN-SYORI-SEC
+              IF      LNK-SCNYUACCT-RC    NOT =   ZERO
+                  GO      TO     900-NEXTTUKI-SYORI-EXT
+              END-IF
            END-IF
       *
       *    その他料作成

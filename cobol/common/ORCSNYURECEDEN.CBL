@@ -226,6 +226,14 @@
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
                    07  WRK-GAIHAKU-KBN     PIC 9(01).
       *
+      *     °åÎÅ´Ñ»¡ÍÑÂàÈòÎÎ°è
+           03  WRK-IRYOKNS-TABLE.
+               05  WRK-IRYOKNS-TBL         OCCURS  31.
+                   07  WRK-IRYOKNS-SRYCD1  PIC X(09).
+                   07  WRK-IRYOKNS-SRYCD2  PIC X(09).
+                   07  WRK-IRYOKNS-SRYCD3  PIC X(09).
+                   07  WRK-IRYOKNS-SRYCD4  PIC X(09).
+      *
       *    Æþ±¡²ñ·×ÊÂ¤ÓÂØ¤¨¥ï¡¼¥¯
            03  WRK-NYUIN-SORT-TABLE.
                05  WRK-NYUIN-SORT-TBL      OCCURS  31.
@@ -861,6 +869,25 @@
                                MOVE    NSRY-SRYCD(1)   TO  
                                                    WRK-NYUINKHN(IDX1)
       *
+      *                        °åÎÅ´Ñ»¡
+                               IF  NSRY-SRYCD(2)(1:3) =  "188"
+                                  MOVE  NSRY-SRYCD(2)   TO
+                                              WRK-IRYOKNS-SRYCD1(IDX1)
+                               END-IF
+                               IF  NSRY-SRYCD(3)(1:3) =  "188"
+                                  MOVE  NSRY-SRYCD(3)   TO
+                                              WRK-IRYOKNS-SRYCD2(IDX1)
+                               END-IF
+                               IF  NSRY-SRYCD(4)(1:3) =  "188"
+                                  MOVE  NSRY-SRYCD(4)   TO
+                                              WRK-IRYOKNS-SRYCD3(IDX1)
+                               END-IF
+                               IF  NSRY-SRYCD(5)(1:3) =  "188"
+                                  MOVE  NSRY-SRYCD(5)   TO
+                                              WRK-IRYOKNS-SRYCD4(IDX1)
+                               END-IF
+      *
+      *                        Æþ±¡¤Î´ü´Ö²Ã»»
                                IF  (NSRY-SRYCD(2) NOT =  SPACE)  AND
                                    (NSRY-SRYCD(2) NOT = "190107890" AND
                                                         "190107990" AND
@@ -870,6 +897,8 @@
                                                         "190107790" AND
                                                         "190122990" AND
                                                         "190123090")
+                                                                AND
+                                   (NSRY-SRYCD(2)(1:3) NOT = "188")
                                    MOVE   NSRY-SRYCD(2)  TO
                                                    WRK-SHOKIKSN(IDX1)
                                END-IF
@@ -2034,6 +2063,28 @@
                          PERFORM   900-CLOSE-SEC
                        END-IF
                    END-IF
+               END-IF
+      *
+      *        °åÎÅ´Ñ»¡
+               IF         WRK-IRYOKNS-SRYCD1(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD1(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD2(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD2(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD3(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD3(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD4(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD4(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
                END-IF
       *
       *        Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£³£°¡ó¸º»»¤È£·£°¡ó¸º»»¡Ë

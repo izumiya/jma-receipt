@@ -610,6 +610,9 @@
       *    特定入院料コード取得サブ
            COPY  "CPORCSTOKNYUIN.INC".
       *
+      *    医療観察入院料コード取得パラメタ
+           COPY  "CPORCSIRYOKNS.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       ***  COPY    "CPORCMCP.INC".
@@ -2610,6 +2613,10 @@
                          AND   (SPA-CHK-DAY (IDK)      =   "1"  )
       *                    入院基本料算定日
                            MOVE    "1"         TO  SPA-CHK-NYUIN (IDK)
+      *                    医療観察法の入院算定日
+                           IF   SPA-GMN-TSRYCD (IDX)(1:3)  =  "188"
+                                MOVE   "1"     TO  SPA-CHK-IRYOKNS(IDK)
+                           END-IF
                        END-IF
                    END-PERFORM
                END-IF
@@ -3803,6 +3810,7 @@
                                            OR  "0042"
                                            OR  "0046"
                                            OR  "0053"
+                                           OR  "0054"
                    MOVE    SPA-NAI-DAY-41(SPA-NAI-BANGO IDX-D)
                                            TO  SPA-GMN-DAY-41 (IDX-D)
                    MOVE    SPA-ERRCD       TO  WRK-ERRCD
@@ -3862,6 +3870,11 @@
       *            入院基本料算定なし
                    IF      SPA-CHK-NYUIN (IDX-D)   =   SPACE
                         MOVE    "0033"             TO  SPA-ERRCD
+                        GO      TO      410121-DAY-NAI-CHK-EXT
+                   END-IF
+      *            医療観察法の入院時は外泊セット不可
+                   IF      SPA-CHK-IRYOKNS (IDX-D)   NOT =   SPACE
+                        MOVE    "0054"             TO  SPA-ERRCD
                         GO      TO      410121-DAY-NAI-CHK-EXT
                    END-IF
                    IF      SPA-CHK-SENTEI(IDX-D)   =   SPACE
@@ -5726,6 +5739,38 @@
       *                                SYOKIKSN-OT-YUKOEDYMD(IDX6)
       *         DISPLAY  "IDX6 = " IDX6
            END-PERFORM
+      *
+      *    医療観察入院セット
+           INITIALIZE            ORCSIRYOKNS-AREA
+           MOVE     PTNYUINRRK-HOSPNUM   TO  LNK-IRYOKNS-HOSPNUM
+           MOVE     PTNYUINRRK-TOKUTEI-KBN
+                                         TO  LNK-IRYOKNS-KBN
+           MOVE     PTNYUINRRK-TOKUTEI-NYUIN
+                                         TO  LNK-IRYOKNS-NYUIN
+           MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
+           DISPLAY  "==  ORCSIRYOKNS CALL ==="
+           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+           MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                         TO  LNK-IRYOKNS-SANTEIYM
+           CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
+                                            SPA-AREA
+           DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
+           IF       LNK-IRYOKNS-RC     =    ZERO
+               MOVE   LNK-IRYOKNS-SRYCD(1)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+               MOVE   LNK-IRYOKNS-SRYCD(2)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(2)
+               MOVE   LNK-IRYOKNS-SRYCD(3)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(3)
+               MOVE   LNK-IRYOKNS-SRYCD(4)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(4)
+               MOVE   LNK-IRYOKNS-SRYCD(5)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(5)
+               MOVE   SYOKIKSN-IN-SANTEISTYMD
+                                  TO  LNK-SCNYUACCT-STSRYYMD
+                                      LNK-SCNYUACCT-EDSRYYMD
+           END-IF
+      *
       *    通算算定済日数
            MOVE    WRK-TSUSAN          TO  LNK-SCNYUACCT-NYUKHN-NISUU
       *    特定入院で入院料が変更になるコードの対応
@@ -9008,6 +9053,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  WRK-ERRMSG(1:42)
                    MOVE    "変更はできません。"
                                        TO  WRK-ERRMSG(43:18)
+               WHEN    "0054"
+                   MOVE    "医療観察での入院算定時は外泊入力不可です。"
+                                       TO  WRK-ERRMSG
                WHEN    "1005"
                    MOVE    "受診履歴番号が存在しません。"
                                        TO  WRK-ERRMSG

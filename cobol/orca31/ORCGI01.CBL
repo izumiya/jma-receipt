@@ -1065,6 +1065,9 @@
       *    ÆÃÄêÆþ±¡ÎÁ¥³¡¼¥É¼èÆÀ¥µ¥Ö
            COPY  "CPORCSTOKNYUIN.INC".
       *
+      *    °åÎÅ´Ñ»¡Æþ±¡ÎÁ¥³¡¼¥É¼èÆÀ¥Ñ¥é¥á¥¿
+           COPY  "CPORCSIRYOKNS.INC".
+      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
       *
@@ -10670,6 +10673,39 @@
                          TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD(IDX6)
            END-PERFORM
       *
+      *    °åÎÅ´Ñ»¡Æþ±¡¥»¥Ã¥È
+           INITIALIZE            ORCSIRYOKNS-AREA
+           MOVE     PTNYUINRRK-HOSPNUM   TO  LNK-IRYOKNS-HOSPNUM
+           MOVE     PTNYUINRRK-TOKUTEI-KBN
+                                         TO  LNK-IRYOKNS-KBN
+           MOVE     PTNYUINRRK-TOKUTEI-NYUIN
+                                         TO  LNK-IRYOKNS-NYUIN
+           MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
+           DISPLAY  "==  ORCSIRYOKNS NYUIN-CALL ==="
+           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+           DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
+           MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                         TO  LNK-IRYOKNS-SANTEIYM
+           CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
+                                            SPA-AREA
+           DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
+           IF       LNK-IRYOKNS-RC     =    ZERO
+               MOVE   LNK-IRYOKNS-SRYCD(1)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+               MOVE   LNK-IRYOKNS-SRYCD(2)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(2)
+               MOVE   LNK-IRYOKNS-SRYCD(3)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(3)
+               MOVE   LNK-IRYOKNS-SRYCD(4)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(4)
+               MOVE   LNK-IRYOKNS-SRYCD(5)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(5)
+               MOVE   SPA-NAI-I01-NYUINYMD
+                                  TO  LNK-SCNYUACCT-STSRYYMD
+               MOVE    "99999999"
+                                  TO  LNK-SCNYUACCT-EDSRYYMD
+           END-IF
+      *
       *    ÄÌ»»»»ÄêºÑÆü¿ô
            MOVE   WRK-TSUSAN    TO  LNK-SCNYUACCT-NYUKHN-NISUU
       *
@@ -16123,6 +16159,40 @@
                MOVE   SYOKIKSN-OT-YUKOEDYMD(IDX6)
                          TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD(IDX6)
            END-PERFORM
+      *
+      *    °åÎÅ´Ñ»¡Æþ±¡¥»¥Ã¥È
+           INITIALIZE            ORCSIRYOKNS-AREA
+           MOVE     PTNYUINRRK-HOSPNUM   TO  LNK-IRYOKNS-HOSPNUM
+           MOVE     PTNYUINRRK-TOKUTEI-KBN
+                                         TO  LNK-IRYOKNS-KBN
+           MOVE     PTNYUINRRK-TOKUTEI-NYUIN
+                                         TO  LNK-IRYOKNS-NYUIN
+           MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
+           DISPLAY  "==  ORCSIRYOKNS TENROOM-CALL ==="
+           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+           DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
+           DISPLAY  "SPA-NAI-I01-IDOYMD      = " SPA-NAI-I01-IDOYMD
+           MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                         TO  LNK-IRYOKNS-SANTEIYM
+           CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
+                                            SPA-AREA
+           DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
+           IF       LNK-IRYOKNS-RC     =    ZERO
+               MOVE   LNK-IRYOKNS-SRYCD(1)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+               MOVE   LNK-IRYOKNS-SRYCD(2)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(2)
+               MOVE   LNK-IRYOKNS-SRYCD(3)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(3)
+               MOVE   LNK-IRYOKNS-SRYCD(4)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(4)
+               MOVE   LNK-IRYOKNS-SRYCD(5)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(5)
+               MOVE   SPA-NAI-I01-IDOYMD
+                                  TO  LNK-SCNYUACCT-STSRYYMD
+                                      LNK-SCNYUACCT-EDSRYYMD
+           END-IF
+      *
       *    ÄÌ»»»»ÄêºÑÆü¿ô
            MOVE   WRK-TSUSAN    TO  LNK-SCNYUACCT-NYUKHN-NISUU
       *
@@ -18652,6 +18722,39 @@
                MOVE   SYOKIKSN-OT-YUKOEDYMD(IDX6)
                          TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD(IDX6)
            END-PERFORM
+      *
+      *    °åÎÅ´Ñ»¡Æþ±¡¥»¥Ã¥È
+           INITIALIZE            ORCSIRYOKNS-AREA
+           MOVE     PTNYUINRRK-HOSPNUM   TO  LNK-IRYOKNS-HOSPNUM
+           MOVE     PTNYUINRRK-TOKUTEI-KBN
+                                         TO  LNK-IRYOKNS-KBN
+           MOVE     PTNYUINRRK-TOKUTEI-NYUIN
+                                         TO  LNK-IRYOKNS-NYUIN
+           MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
+           DISPLAY  "==  ORCSIRYOKNS IDOKAIKEI-CANCEL-CALL ==="
+           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+           DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
+           MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                         TO  LNK-IRYOKNS-SANTEIYM
+           CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
+                                            SPA-AREA
+           DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
+           IF       LNK-IRYOKNS-RC     =    ZERO
+               MOVE   LNK-IRYOKNS-SRYCD(1)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+               MOVE   LNK-IRYOKNS-SRYCD(2)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(2)
+               MOVE   LNK-IRYOKNS-SRYCD(3)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(3)
+               MOVE   LNK-IRYOKNS-SRYCD(4)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(4)
+               MOVE   LNK-IRYOKNS-SRYCD(5)
+                                        TO LNK-SCNYUACCT-NYUKHN-SRYCD(5)
+               MOVE   SYOKIKSN-IN-SANTEISTYMD
+                                  TO  LNK-SCNYUACCT-STSRYYMD
+                                      LNK-SCNYUACCT-EDSRYYMD
+           END-IF
+      *
       *    ÄÌ»»»»ÄêºÑÆü¿ô
            MOVE   WRK-TSUSAN    TO  LNK-SCNYUACCT-NYUKHN-NISUU
       *

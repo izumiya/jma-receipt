@@ -386,7 +386,8 @@
                MOVE    "tbl_nyuinact"  TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM 910-NYUINACT-READ-SEC
-               IF   FLG-NYUINACT     =     ZERO
+               IF  (FLG-NYUINACT        =   ZERO)   AND
+                   (NSRY-SRYCD(1)(1:3)  NOT =  "188")
       *
                    PERFORM   210-HYOUKETU-CLEAR-SEC
       *
@@ -461,7 +462,8 @@
                MOVE    "tbl_nyuinact"  TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM 910-NYUINACT-READ-SEC
-               IF   FLG-NYUINACT     =     ZERO
+               IF  (FLG-NYUINACT        =   ZERO)   AND
+                   (NSRY-SRYCD(1)(1:3)  NOT =  "188")
       *
                    PERFORM   210-HYOUKETU-CLEAR-SEC
       *
@@ -536,7 +538,8 @@
                MOVE    "tbl_nyuinact"  TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM 910-NYUINACT-READ-SEC
-               IF   FLG-NYUINACT     =     ZERO
+               IF  (FLG-NYUINACT        =   ZERO)   AND
+                   (NSRY-SRYCD(1)(1:3)  NOT =  "188")
       *
                    PERFORM   210-HYOUKETU-CLEAR-SEC
       *
@@ -611,7 +614,8 @@
                MOVE    "tbl_nyuinact"  TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM 910-NYUINACT-READ-SEC
-               IF   FLG-NYUINACT     =     ZERO
+               IF  (FLG-NYUINACT        =   ZERO)   AND
+                   (NSRY-SRYCD(1)(1:3)  NOT =  "188")
       *
                    PERFORM   210-HYOUKETU-CLEAR-SEC
       *

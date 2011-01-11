@@ -206,6 +206,10 @@
            03  WRK-CHIKEN-TABLE.
                05  WRK-CHIKEN-ZAITEN       PIC 9(08)  OCCURS 31.
       *
+      *    °åÎÅ´Ñ»¡ÅÀ¿ôÂàÈòÎÎ°è
+           03  WRK-IRYOKNS-TABLE.
+               05  WRK-IRYOKNS-ZAITEN      PIC 9(08)  OCCURS 31.
+      *
       *    Ì¤¼Â»Ü¸º»»ÂàÈòÍÑ¥Õ¥é¥°¥Æ¡¼¥Ö¥ë
            03  WRK-GENSAN-TABLE.
                05  WRK-GENSAN-INF          OCCURS  31.
@@ -669,6 +673,12 @@
                            AND   (NACCT-DAY(IDX1)    NOT =  ZERO) 
                                MOVE    NSRY-SRYCD(1)   TO  
                                                    WRK-NYUINKHN(IDX1)
+      *
+      *                        °åÎÅ´Ñ»¡Ë¡¤ÎÆþ±¡ÎÁ»»Äê»þ¤Ï¥ï¡¼¥¯ÎÎ°èÂàÈò
+                               IF   NSRY-SRYCD(1)(1:3)  =  "188"
+                                   MOVE  NACCT-ZAITEN  TO
+                                               WRK-IRYOKNS-ZAITEN(IDX1)
+                               END-IF
       *
                                IF   NSRY-SRYCD(2)  NOT =   SPACE
                                    IF (NSRY-SRYCD(2) NOT =
@@ -1336,8 +1346,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF   LNK-ORCHCN33SUB-SHORIKBN       =   SPACE
                PERFORM    VARYING   IDX1   FROM  1  BY  1
                           UNTIL     (IDX1   >     31)
-                    IF     WRK-SO-TEN(IDX1)       NOT =   ZERO
+                   IF     WRK-SO-TEN(IDX1)       NOT =   ZERO
                         MOVE   WRK-SO-TEN(IDX1)   TO
+                                       LNK-ORCHCN33SUB-TEN(IDX1)
+                   END-IF
+      *            °åÎÅ´Ñ»¡Ë¡¤ÎÆþ±¡»þÅÀ¿ôÃÖ¤­´¹¤¨
+                   IF    (WRK-SO-TEN(IDX1)       NOT =   ZERO)  AND
+                         (WRK-IRYOKNS-ZAITEN(IDX1)  NOT =  ZERO)
+                        MOVE   WRK-IRYOKNS-ZAITEN(IDX1)   TO
                                        LNK-ORCHCN33SUB-TEN(IDX1)
                    END-IF
                END-PERFORM
