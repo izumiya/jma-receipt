@@ -59,6 +59,8 @@
       *                                     から振り出す
       *  04.05.04    NACL-太田    10/06/04  外泊の剤に入院料を編集する
       *                                     選定入院中の外泊剤を読み飛ばす
+      *  04.05.06    NACL-藤原    10/09/14  医療観察法対応
+      *                                     公費単独のレセプトとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2205,6 +2207,11 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
            END-IF
       *
            MOVE    PTHKN-HKNJANUM      TO  COLDAT01-HKNJANUM
+           IF    ( COMB-HKNNUM         =   SPACE )
+           AND   ( COMB-KOH1HKNNUM     =   "020"
+                                       OR  "030" )
+               MOVE    COMB-KOH1HKNNUM     TO  COLDAT01-HKNJANUM
+           END-IF
            IF      WRK-PARA-SRYYM      <=  "200609"
              EVALUATE    PTHKN-HKNNUM
                WHEN    "002"

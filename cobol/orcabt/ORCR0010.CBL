@@ -177,6 +177,8 @@
       *                                     ÊÑ¹¹¤ËÈ¼¤¦½¤Àµ
       *  04.05.03    NACL-Æ£¸¶    10/04/13  °¦ÃÎ¸©ÂÐ±þ
       *                                     À¸ÊÝ¤ÈÆÃÄê¼À´µ£¹£±¤Îµ­ºÜ½ç 
+      *  04.05.04    NACL-Æ£¸¶    10/09/14  °åÎÅ´Ñ»¡Ë¡ÂÐ±þ
+      *                                     ¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1559,6 +1561,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
            MOVE    PTHKN-HKNJANUM      TO  WRK-RECE01-HKNJANUM
       *****MOVE    PTHKN-TEKSTYMD      TO  WRK-RECE01-TEKSTYMD
            MOVE    ZERO                TO  WRK-RECE01-TEKSTYMD 
+           IF      COMB-HKNNUM         =   SPACE
+               IF      COMB-KOH1HKNNUM     =   "030"
+                   MOVE    COMB-TEKSTYMD       TO  WRK-RECE01-TEKSTYMD
+               END-IF
+           END-IF
       *****MOVE    PTHKN-HONKZKKBN     TO  WRK-RECE01-HONKZKKBN
            IF      WRK-STYMD (1:6)     <=   "200609"
              EVALUATE    PTHKN-HKNNUM
@@ -1749,6 +1756,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
            MOVE    ACCT-SRYKA         TO  WRK-RECE01-SRYKA (1)
            MOVE    PTHKN-TEKSTYMD     TO  WRK-RECE01-TEKSTYMDX (1)
            MOVE    PTHKN-TEKEDYMD     TO  WRK-RECE01-TEKEDYMDX (1)
+           IF    ( COMB-HKNNUM        =   SPACE )
+           AND   ( COMB-KOH1HKNNUM    =   "030" )
+               MOVE    COMB-TEKSTYMD       TO  WRK-RECE01-TEKSTYMDX  (1)
+               MOVE    COMB-TEKEDYMD       TO  WRK-RECE01-TEKEDYMDX  (1)
+           END-IF
       *    
       *    ¼çÊÝ¸±¾ðÊó
            MOVE    PTHKN-HKNID        TO  WRK-RECE01-HKNID

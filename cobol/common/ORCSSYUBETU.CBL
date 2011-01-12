@@ -1240,7 +1240,7 @@ grpsys     MOVE    LNK-SYUBETU-HOSPNUM     TO  WRK-RECE61-HOSPNUM
            MOVE    PTHKN-HKNJANUM      TO  WRK-RECE61-HKNJANUM       
            MOVE    ZERO                TO  WRK-RECE61-TEKSTYMD 
            IF      COMB-HKNNUM         =   SPACE
-               IF      COMB-KOH1HKNNUM     =   "020"
+               IF      COMB-KOH1HKNNUM     =   "020"   OR  "030"
                    MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMD
                END-IF
            END-IF
@@ -1493,7 +1493,8 @@ grpsys                                     SPA-AREA
            MOVE    PTHKN-TEKSTYMD     TO  WRK-RECE61-TEKSTYMDX  (1)
            MOVE    PTHKN-TEKEDYMD     TO  WRK-RECE61-TEKEDYMDX  (1)
            IF    ( COMB-HKNNUM        =   SPACE )
-           AND   ( COMB-KOH1HKNNUM    =   "020" )
+           AND   ( COMB-KOH1HKNNUM    =   "020"
+                                      OR  "030" )
                MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMDX  (1)
                MOVE    COMB-TEKEDYMD       TO  WRK-RECE61-TEKEDYMDX  (1)
            END-IF
@@ -1881,9 +1882,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                    OR      FLG-SEIHO                  =   1
                MOVE    TBL-RECE61-OCC (IDXX)   TO  WRK-RECE61-REC
       *
-      *        公費単独の場合（精神入院以外）
+      *        公費単独の場合（精神入院、心身喪失以外）
                IF      WRK-RECE61-HKNNUM       =   SPACE
-                   IF      WRK-RECE61-KOHHKNNUM-O (1)  = "020"
+                   IF      WRK-RECE61-KOHHKNNUM-O (1)  = "020" OR  "030"
                        CONTINUE
                    ELSE 
                        IF      WRK-RECE61-TEKSTYMD =   ZERO
@@ -1953,9 +1954,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
       *
                MOVE    ZERO            TO  FLG-WRITE 
       *
-      *        公費単独の場合（精神入院以外）
+      *        公費単独の場合（精神入院、心身喪失以外）
                IF      WRK-RECE61-HKNNUM        =   SPACE
-                   IF      WRK-RECE61-KOHHKNNUM-O (1)  = "020"
+                   IF      WRK-RECE61-KOHHKNNUM-O (1)  = "020" OR  "030"
                        CONTINUE
                    ELSE 
                        IF      WRK-RECE61-TEKSTYMD  =   ZERO

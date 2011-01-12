@@ -138,6 +138,8 @@
       *                                     ¾¸¤ò¥¨¥é¡¼¤È¤¹¤ë
       *  04.05.02    NACL-Æ£¸¶    10/04/13  °¦ÃÎ¸©ÂÐ±þ
       *                                     À¸ÊÝ¤ÈÆÃÄê¼À´µ£¹£±¤Îµ­ºÜ½ç 
+      *  04.05.03    NACL-Æ£¸¶    10/09/14  °åÎÅ´Ñ»¡Ë¡ÂÐ±þ
+      *                                     ¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2033,7 +2035,7 @@
       *
            MOVE    ZERO                TO  WRK-RECE61-TEKSTYMD 
            IF      COMB-HKNNUM         =   SPACE
-               IF      COMB-KOH1HKNNUM     =   "020"
+               IF      COMB-KOH1HKNNUM     =   "020"   OR  "030"
                    MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMD
                END-IF
            END-IF
@@ -2226,7 +2228,8 @@
            MOVE    PTHKN-TEKSTYMD     TO  WRK-RECE61-TEKSTYMDX  (1)
            MOVE    PTHKN-TEKEDYMD     TO  WRK-RECE61-TEKEDYMDX  (1)
            IF    ( COMB-HKNNUM        =   SPACE )
-           AND   ( COMB-KOH1HKNNUM    =   "020" )
+           AND   ( COMB-KOH1HKNNUM    =   "020"
+                                      OR  "030" )
                MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMDX  (1)
                MOVE    COMB-TEKEDYMD       TO  WRK-RECE61-TEKEDYMDX  (1)
            END-IF
