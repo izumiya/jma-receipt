@@ -3645,7 +3645,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
       *                      精神通院と特定疾患（水俣）の保険組合せ対応
       *                      IF   SPA-PREFNUM    =    43
                              IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
-                                          =   "51433027"
+                                          =   "51433027" OR "51433019"
                                IF  WRK-SRT-HJO-KOHNO     =   "021"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
