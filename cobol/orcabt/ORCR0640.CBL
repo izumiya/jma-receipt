@@ -459,6 +459,8 @@
       *                                     Âç±«ÂÐ±þ
       *  04.04.67    NACL-ÌçÏÆ    10/12/10  ºÞ¤Þ¤È¤á¹àÌÜÃÍ¤Î·×»»½¤Àµ
       *  04.04.68    NACL-ÌçÏÆ    10/12/13  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.04.69    NACL-ÌçÏÆ    11/01/19  ¸½ÊªµëÉÕ»þ¤ÎÊÝ¸±Íó°ìÉôÉéÃ´¶â
+      *                                     µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -640,6 +642,7 @@
            03  FLG-HOKENICHIBU-SYU                     PIC 9(01).
            03  FLG-HOKENICHIBU2                        PIC 9(01).
            03  FLG-HOKENICHIBU3                        PIC 9(01).
+           03  FLG-HOKENICHIBU4                        PIC 9(01).
            03  FLG-HOUSEI-COM                          PIC 9(01).
            03  FLG-HOUMON-COM                          PIC 9(01).
            03  FLG-ZENKOKUKOHI-NISYU                   PIC 9(01).
@@ -10571,6 +10574,7 @@
            MOVE    ZERO                 TO      FLG-HOKENICHIBU-SYU
            MOVE    ZERO                 TO      FLG-HOKENICHIBU2
            MOVE    ZERO                 TO      FLG-HOKENICHIBU3
+           MOVE    ZERO                 TO      FLG-HOKENICHIBU4
            MOVE    ZERO                 TO      WRK-HOKENICHIBUGAK
       *
            INITIALIZE                           WRK-TOKUSYU-SKJFLG-T
@@ -11692,6 +11696,16 @@
                         MOVE     1    TO   FLG-KEISAN
                       END-IF
                       PERFORM 2104422-ICHIBUFTN-KOH-HEN1-SEC
+                      IF (RECE62-KOHSKY-KOHNUM(1)
+                                            = SYU-KOH-HKNNUM(1))
+                      OR (RECE62-KOHSKY-KOHNUM(2)
+                                            = SYU-KOH-HKNNUM(1))
+                      OR (RECE62-KOHSKY-KOHNUM(3)
+                                            = SYU-KOH-HKNNUM(1))
+                      OR (RECE62-KOHSKY-KOHNUM(4)
+                                            = SYU-KOH-HKNNUM(1))
+                        MOVE    1    TO   FLG-HOKENICHIBU4
+                      END-IF
                    END-IF
                  END-IF
                 END-IF
@@ -11899,6 +11913,16 @@
                      END-IF
                      MOVE     2       TO   FLG-JYOGENKBN
                      PERFORM  2104424-ICHIBUFTN-KOH-HEN3-SEC
+                     IF (RECE62-KOHSKY-KOHNUM(1)
+                                           = SYU-KOH-HKNNUM(1))
+                     OR (RECE62-KOHSKY-KOHNUM(2)
+                                           = SYU-KOH-HKNNUM(1))
+                     OR (RECE62-KOHSKY-KOHNUM(3)
+                                           = SYU-KOH-HKNNUM(1))
+                     OR (RECE62-KOHSKY-KOHNUM(4)
+                                           = SYU-KOH-HKNNUM(1))
+                       MOVE    1    TO   FLG-HOKENICHIBU4
+                     END-IF
                    END-IF
                  END-IF
                 END-IF
@@ -15949,6 +15973,7 @@
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
              AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+             AND (FLG-HOKENICHIBU4   NOT = ZERO              )
                IF   FLG-HOKENICHIBU-SYU  = ZERO
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
@@ -17138,7 +17163,8 @@
       *****************************************************************
        210467-HOKEN-ICHIBUFTN-CHK2-SEC               SECTION.
       *
-           IF   FLG-HOKENICHIBU2   NOT = ZERO
+           IF  (FLG-HOKENICHIBU2   NOT = ZERO)
+           OR  (FLG-HOKENICHIBU4   NOT = ZERO)
              MOVE   RECE62-TOTALTEN(1)  TO  WRK-HANTEI-TOTALTEN
            ELSE
              COMPUTE  WRK-HANTEI-TOTALTEN = RECE62-TOTALTEN(1)
