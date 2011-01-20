@@ -482,6 +482,8 @@
       *                                     大雨対応
       *  04.04.60    NACL-門脇    10/12/10  剤まとめ項目値の計算修正
       *  04.04.61    NACL-門脇    10/12/13  大阪府地方公費対応
+      *  04.04.62    NACL-門脇    11/01/19  現物給付時の保険欄一部負担金
+      *                                     記載修正
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
@@ -667,6 +669,7 @@
            03  FLG-HOKENICHIBU-SYU                     PIC 9(01).
            03  FLG-HOKENICHIBU2                        PIC 9(01).
            03  FLG-HOKENICHIBU3                        PIC 9(01).
+           03  FLG-HOKENICHIBU4                        PIC 9(01).
            03  FLG-ZENKOKUKOHI-NISYU                   PIC 9(01).
            03  FLG-ZENKOKUKOHI-NISYU2                  PIC 9(01).
            03  FLG-TOKU75                              PIC 9(01).
@@ -2170,6 +2173,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-HOKENICHIBU-SYU
            MOVE      ZERO       TO      FLG-HOKENICHIBU2
            MOVE      ZERO       TO      FLG-HOKENICHIBU3
+           MOVE      ZERO       TO      FLG-HOKENICHIBU4
            MOVE      ZERO       TO      WRK-HOKENICHIBUGAK
            MOVE      ZERO       TO      FLG-ZENKOKUKOHI-NISYU
            MOVE      ZERO       TO      FLG-ZENKOKUKOHI-NISYU2
@@ -9382,6 +9386,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           MOVE      1     TO   FLG-KEISAN
                        END-IF
                        PERFORM   2105212-ICHIBUFTN-KOH-HEN1-SEC
+                       IF (RECE02-KOHSKY-KOHNUM(1)
+                                             = SYU-KOH-HKNNUM(1))
+                       OR (RECE02-KOHSKY-KOHNUM(2)
+                                             = SYU-KOH-HKNNUM(1))
+                       OR (RECE02-KOHSKY-KOHNUM(3)
+                                             = SYU-KOH-HKNNUM(1))
+                       OR (RECE02-KOHSKY-KOHNUM(4)
+                                             = SYU-KOH-HKNNUM(1))
+                         MOVE    1    TO   FLG-HOKENICHIBU4
+                       END-IF
                      END-IF
                    END-IF
                  END-IF
@@ -9566,6 +9580,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        END-IF
                        MOVE      2      TO   FLG-JYOGENKBN
                        PERFORM   2105213-ICHIBUFTN-KOH-HEN2-SEC
+                       IF (RECE02-KOHSKY-KOHNUM(1)
+                                             = SYU-KOH-HKNNUM(1))
+                       OR (RECE02-KOHSKY-KOHNUM(2)
+                                             = SYU-KOH-HKNNUM(1))
+                       OR (RECE02-KOHSKY-KOHNUM(3)
+                                             = SYU-KOH-HKNNUM(1))
+                       OR (RECE02-KOHSKY-KOHNUM(4)
+                                             = SYU-KOH-HKNNUM(1))
+                         MOVE    1    TO   FLG-HOKENICHIBU4
+                       END-IF
                      END-IF
                    END-IF
                  END-IF
@@ -11648,6 +11672,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
              AND (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
+             AND (FLG-HOKENICHIBU4   NOT = ZERO              )
                IF   FLG-HOKENICHIBU-SYU  = ZERO
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
@@ -12732,7 +12757,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21097-HOKEN-ICHIBUFTN-CHK2-SEC               SECTION.
       *
-           IF   FLG-HOKENICHIBU2   NOT = ZERO
+           IF  (FLG-HOKENICHIBU2   NOT = ZERO)
+           OR  (FLG-HOKENICHIBU4   NOT = ZERO)
              MOVE   RECE02-TOTALTEN(1)  TO  WRK-HANTEI-TOTALTEN
            ELSE
              COMPUTE  WRK-HANTEI-TOTALTEN = RECE02-TOTALTEN(1)
