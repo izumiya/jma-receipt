@@ -12007,7 +12007,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF  ( FLG-HOKENICHIBU2      = ZERO )
            AND ( FLG-CHIIKI            = ZERO )
            AND ( RECE02-ZAITAKU        = "2"  )
-           AND ( FLG-HOKENICHIBU3  NOT = ZERO )
            AND ( FLG-HOKENICHIBU4  NOT = ZERO )
            AND ( FLG-HOKENICHIBU5      = ZERO )
              MOVE     WRK-KINGAKU3   TO    WRK-CHK-KOKIGAK5
