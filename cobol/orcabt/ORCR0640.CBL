@@ -17400,21 +17400,20 @@
              END-IF
            END-IF
       *
-           IF  ( FLG-HOKENICHIBU2  NOT = ZERO )
-           OR  ( FLG-CHIIKI        NOT = ZERO )
-           OR  ( RECE62-KOUREI         = "1"  )
-           OR  ((FLG-CHIIKI            = ZERO) AND
-                (RECE62-KOUREI         = "2" ) AND
-                (FLG-HOKENICHIBU4  NOT = ZERO) AND
-                (FLG-HOKENICHIBU5  NOT = ZERO))
+           IF  ( FLG-HOKENICHIBU2      = ZERO )
+           AND ( FLG-CHIIKI            = ZERO )
+           AND ( RECE62-KOUREI         = "2"  )
+           AND ( FLG-HOKENICHIBU3  NOT = ZERO )
+           AND ( FLG-HOKENICHIBU4  NOT = ZERO )
+           AND ( FLG-HOKENICHIBU5      = ZERO )
+             MOVE     WRK-KINGAKU3   TO    WRK-CHK-KOKIGAK5
+           ELSE
              IF   WRK-KINGAKU3  >  WRK-CHK-KOKIGAK2
                COMPUTE  WRK-CHK-KOKIGAK5  =  WRK-KINGAKU3
                                           -  WRK-CHK-KOKIGAK2
              ELSE
                MOVE     ZERO         TO    WRK-CHK-KOKIGAK5
              END-IF
-           ELSE
-             MOVE     WRK-KINGAKU3   TO    WRK-CHK-KOKIGAK5
            END-IF
       *
            COMPUTE  WRK-HANTEI-TOTALTEN = RECE62-TOTALTEN(1)
