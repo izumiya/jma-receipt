@@ -11916,9 +11916,7 @@
                                            = SYU-KOH-HKNNUM(1))
                      OR (RECE62-KOHSKY-KOHNUM(4)
                                            = SYU-KOH-HKNNUM(1))
-                       IF  SYU-KOHTAIYKZKBN   = "9"
                         MOVE    1    TO   FLG-HOKENICHIBU4
-                       END-IF
                      END-IF
                    END-IF
                  END-IF
