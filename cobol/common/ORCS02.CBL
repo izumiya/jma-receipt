@@ -13031,14 +13031,33 @@
              ELSE
                IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                  IF    FLG-MARUKO  =  ZERO
-                    MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
-                    COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
-                    MOVE   ZERO  TO  FLG-TAISYO
-                    IF  (FLG-FTNRATE100  =  1     )
-                    AND (FLG-IRYOHI70    =  3 OR 4)
-                       COMPUTE  WK-KOUREI-IRYOHI70  =
-                                WK-KOUREI-IRYOHI70  +
-                               (SYU-HKNTEN (17) * 10)
+                    IF       FLG-FTNRATE100   =  1
+                      IF ((LNK-SYU-KOH1HKNNUM = SYU-KOH1HKNNUM ) AND
+                          (COMB-KOH1ID        = WRK-COMB-KOH1ID))
+                      OR ((LNK-SYU-KOH1HKNNUM = SYU-KOH2HKNNUM ) AND
+                          (COMB-KOH1ID        = WRK-COMB-KOH2ID))
+                      OR ((LNK-SYU-KOH1HKNNUM = SYU-KOH3HKNNUM ) AND
+                          (COMB-KOH1ID        = WRK-COMB-KOH3ID))
+                      OR ((LNK-SYU-KOH1HKNNUM = SYU-KOH4HKNNUM ) AND
+                          (COMB-KOH1ID        = WRK-COMB-KOH4ID))
+                      OR ( SYU-KOHTAIYKZKBN   = "9"             )
+                        IF   FLG-IRYOHI70     =  3 OR 4
+                          COMPUTE  WK-KOUREI-IRYOHI70  =
+                                   WK-KOUREI-IRYOHI70  +
+                                  (SYU-HKNTEN (17) * 10)
+                        END-IF
+                        MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
+                        COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
+                        MOVE   ZERO  TO  FLG-TAISYO
+                      ELSE
+                        MOVE   ZERO  TO  WK-SYU-SYUCOMPFTN
+                        MOVE   ZERO  TO  WK-ENTANI
+                        MOVE   1     TO  FLG-TAISYO
+                      END-IF
+                    ELSE
+                        MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
+                        COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
+                        MOVE   ZERO  TO  FLG-TAISYO
                     END-IF
                  ELSE
                    IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND

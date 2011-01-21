@@ -652,6 +652,7 @@
            03  FLG-HOKENICHIBU2                        PIC 9(01).
            03  FLG-HOKENICHIBU3                        PIC 9(01).
            03  FLG-HOKENICHIBU4                        PIC 9(01).
+           03  FLG-HOKENICHIBU5                        PIC 9(01).
            03  FLG-ZENKOKUKOHI-NISYU                   PIC 9(01).
            03  FLG-ZENKOKUKOHI-NISYU2                  PIC 9(01).
            03  FLG-TOKU75                              PIC 9(01).
@@ -2128,6 +2129,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-HOKENICHIBU2
            MOVE      ZERO       TO      FLG-HOKENICHIBU3
            MOVE      ZERO       TO      FLG-HOKENICHIBU4
+           MOVE      ZERO       TO      FLG-HOKENICHIBU5
            MOVE      ZERO       TO      WRK-HOKENICHIBUGAK
            MOVE      ZERO       TO      FLG-ZENKOKUKOHI-NISYU
            MOVE      ZERO       TO      FLG-ZENKOKUKOHI-NISYU2
@@ -8652,16 +8654,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           MOVE      1     TO   FLG-KEISAN
                        END-IF
                        PERFORM   2105212-ICHIBUFTN-KOH-HEN1-SEC
-                       IF (RECE02-KOHSKY-KOHNUM(1)
-                                             = SYU-KOH-HKNNUM(1))
-                       OR (RECE02-KOHSKY-KOHNUM(2)
-                                             = SYU-KOH-HKNNUM(1))
-                       OR (RECE02-KOHSKY-KOHNUM(3)
-                                             = SYU-KOH-HKNNUM(1))
-                       OR (RECE02-KOHSKY-KOHNUM(4)
-                                             = SYU-KOH-HKNNUM(1))
-                         MOVE    1    TO   FLG-HOKENICHIBU4
-                       END-IF
                      END-IF
                    END-IF
                  END-IF
@@ -8837,6 +8829,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          END-IF
                        END-IF
                        PERFORM   2105217-TOKUSITU-HENSYU2-SEC
+                       MOVE      1      TO   FLG-HOKENICHIBU5
                      ELSE
                        MOVE      1      TO   FLG-HOKENICHIBU3
                        IF  FLG-ZENKOKUKOHI-NISYU  =   2
@@ -10905,7 +10898,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
              AND (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
-             AND (FLG-HOKENICHIBU4   NOT = ZERO              )
                IF   FLG-HOKENICHIBU-SYU  = ZERO
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
@@ -11990,8 +11982,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21097-HOKEN-ICHIBUFTN-CHK2-SEC               SECTION.
       *
-           IF  (FLG-HOKENICHIBU2   NOT = ZERO)
-           OR  (FLG-HOKENICHIBU4   NOT = ZERO)
+           IF  ( FLG-HOKENICHIBU2  NOT = ZERO )
+           OR  ((FLG-CHIIKI            = ZERO) AND
+                (RECE02-ZAITAKU        = "2" ) AND
+                (FLG-HOKENICHIBU4  NOT = ZERO) AND
+                (FLG-HOKENICHIBU5  NOT = ZERO))
              MOVE   RECE02-TOTALTEN(1)  TO  WRK-HANTEI-TOTALTEN
            ELSE
              COMPUTE  WRK-HANTEI-TOTALTEN = RECE02-TOTALTEN(1)
@@ -12009,11 +12004,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-           IF   WRK-KINGAKU3  >  WRK-CHK-KOKIGAK2
-             COMPUTE  WRK-CHK-KOKIGAK5  =  WRK-KINGAKU3
-                                        -  WRK-CHK-KOKIGAK2
+           IF  ( FLG-HOKENICHIBU2  NOT = ZERO )
+           OR  ( FLG-CHIIKI        NOT = ZERO )
+           OR  ( RECE02-ZAITAKU        = "1"  )
+           OR  ((FLG-CHIIKI            = ZERO) AND
+                (RECE02-ZAITAKU        = "2" ) AND
+                (FLG-HOKENICHIBU4  NOT = ZERO) AND
+                (FLG-HOKENICHIBU5  NOT = ZERO))
+             IF   WRK-KINGAKU3  >  WRK-CHK-KOKIGAK2
+               COMPUTE  WRK-CHK-KOKIGAK5  =  WRK-KINGAKU3
+                                          -  WRK-CHK-KOKIGAK2
+             ELSE
+               MOVE     ZERO         TO    WRK-CHK-KOKIGAK5
+             END-IF
            ELSE
-             MOVE     ZERO     TO    WRK-CHK-KOKIGAK5
+             MOVE     WRK-KINGAKU3   TO    WRK-CHK-KOKIGAK5
            END-IF
       *
            COMPUTE  WRK-HANTEI-TOTALTEN = RECE02-TOTALTEN(1)
