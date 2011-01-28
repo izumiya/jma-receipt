@@ -426,6 +426,8 @@
       *
            03  WRK-C02-BYO-ROW     PIC S9(09).
       *
+           03  WRK-PTID            PIC X(10).
+      *
       *    年齢表示
            03  WRK-NENREI-G.
                05  WRK-NENREI-Z    PIC ZZ9.
@@ -520,6 +522,10 @@
       *
       *    D04画面からの遷移情報
            COPY    "CPLNKD04.INC".
+      *
+      *    感染症ファイル名
+       01  INFECTION-FILE          PIC X(17)   VALUE
+                                   "infectiondata2.sh".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -617,6 +623,9 @@
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
+      *
+      *    for Infection
+           COPY    "CPSHELLTBL.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -6337,6 +6346,12 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            END-IF
       *----(01.00.02) LINE ADD END   ----------------------------------
       *
+      *    感染症送信
+           IF     (SPA-DATATEISYUTUKBN     =      1)  AND
+                  (SPA-NAI-C02-PTID    NOT =   ZERO)
+               PERFORM 690-INFECTION-SEND-SEC
+           END-IF
+      *
       *    排他制御解除処理
            PERFORM 990-LOCK-OUT-SEC
       *
@@ -6388,6 +6403,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                                         SPA-NAI-C02-SELNO-INSERT
                MOVE    1                TO  SPA-GMN-C02-CUR
            ELSE                             
+      *        感染症送信
+               IF     (SPA-DATATEISYUTUKBN     =      1)  AND
+                      (SPA-NAI-C02-PTID    NOT =   ZERO)
+                   PERFORM 690-INFECTION-SEND-SEC
+               END-IF
       *
       *        排他制御解除処理
                PERFORM 990-LOCK-OUT-SEC
@@ -10061,6 +10081,34 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
       *
            .
        540-CIDSET4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    感染症送信処理
+      *****************************************************************
+       690-INFECTION-SEND-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           MOVE    INFECTION-FILE      TO  SHELLTBL-NAME
+           MOVE    "C02"               TO  SHELLTBL-ARG1
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
+           MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
+           MOVE    SPACE               TO  SHELLTBL-ARG4
+           MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG5
+           MOVE    SPA-PTID            TO  WRK-PTID
+           MOVE    WRK-PTID            TO  SHELLTBL-ARG6
+           MOVE    SPA-SRYYMD          TO  SHELLTBL-ARG9
+           MOVE    SPA-SRYKA           TO  SHELLTBL-ARG8
+           MOVE    SPA-BEDFLG          TO  SHELLTBL-ARG9
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       690-INFECTION-SEND-EXT.
            EXIT.
       *
       *****************************************************************

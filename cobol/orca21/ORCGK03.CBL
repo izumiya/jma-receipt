@@ -367,6 +367,10 @@
        01  WRK-SYSTIME.
            03  WRK-SYSTIME-X       PIC X(08).
       *
+      *    ´¶À÷¾É¥Õ¥¡¥¤¥ëÌ¾
+       01  INFECTION-FILE          PIC X(17)   VALUE
+                                   "infectiondata2.sh".
+      *
       *    £Ã£Ì£Á£É£Í¥Õ¥¡¥¤¥ëÌ¾
        01  CLAIM-FILE.
            03  FILLER              PIC X(30)   VALUE
@@ -5677,6 +5681,11 @@
       *    ³ÆÄ¢É¼°õºþ
            PERFORM 45009-PRINT-SEC
       *
+      *    ´¶À÷¾ÉÁ÷¿®
+           IF      SPA-DATATEISYUTUKBN =   1
+               PERFORM 4904-INFECTION-SEND-SEC
+           END-IF
+      *
       *    £Ã£Ì£Á£É£ÍÁ÷¿®
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-FLG-CLAIM       =   1     )
@@ -6227,6 +6236,34 @@
            .
       *
        4901-PRINT-PG-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´¶À÷¾ÉÁ÷¿®½èÍý
+      *****************************************************************
+       4904-INFECTION-SEND-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           MOVE    INFECTION-FILE      TO  SHELLTBL-NAME
+           MOVE    "K03"               TO  SHELLTBL-ARG1
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
+           MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
+           MOVE    SPA-SYORIFLG        TO  SHELLTBL-ARG4
+           MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG5
+           MOVE    SPA-PTID            TO  WRK-PTID
+           MOVE    WRK-PTID            TO  SHELLTBL-ARG6
+           MOVE    SPA-SRYYMD          TO  SHELLTBL-ARG7
+           MOVE    SPA-SRYKA           TO  SHELLTBL-ARG8
+           MOVE    SPA-BEDFLG          TO  SHELLTBL-ARG9
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       4904-INFECTION-SEND-EXT.
            EXIT.
       *
       *****************************************************************
