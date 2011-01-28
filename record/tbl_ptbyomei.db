@@ -716,3 +716,16 @@ path	key36		{
 		;
 	};
 };
+
+path	key44	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key44_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     UPYMD     =   :UPYMD
+			ORDER  BY  SRYYMD,KHNBYOMEICD,DLTFLG
+		;
+	};
+};

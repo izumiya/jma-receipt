@@ -808,7 +808,7 @@
 	  <y>600</y>
 	  <width>128</width>
 	  <height>24</height>
-	  <label>提出方法区分</label>
+	  <label>感染症</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>True</wrap>
 	  <xalign>0.5</xalign>

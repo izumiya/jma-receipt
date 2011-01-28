@@ -158,7 +158,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Tue, 26 Dec 2000 00:43:36 GMT</last_modification_time>
       </signal>
-      <label></label>
+      <label>´¶À÷¾ÉÀßÄê</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -592,12 +592,28 @@
 
     <widget>
       <class>GtkLabel</class>
+      <name>LBLMSG3</name>
+      <x>280</x>
+      <y>128</y>
+      <width>500</width>
+      <height>24</height>
+      <label>¡ô£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°¡ô</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
       <name>LBLMSG</name>
       <x>280</x>
       <y>186</y>
       <width>500</width>
       <height>24</height>
-      <label>£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³£³</label>
+      <label>¡ô£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°¡ô</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0.5</xalign>
@@ -609,27 +625,11 @@
     <widget>
       <class>GtkLabel</class>
       <name>LBLMSG2</name>
-      <x>280</x>
+      <x>156</x>
       <y>156</y>
-      <width>600</width>
+      <width>750</width>
       <height>24</height>
-      <label>£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²£²</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLMSG3</name>
-      <x>308</x>
-      <y>120</y>
-      <width>400</width>
-      <height>24</height>
-      <label>£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±£±</label>
+      <label>¡ô£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°¡ô</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0.5</xalign>

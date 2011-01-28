@@ -117,7 +117,8 @@
            MOVE    ZERO                TO  INFCHK-RC
       *
       *    ジョブ管理チェック（データ収集）
-           IF      SPA-DATACREATEFLG   NOT =   1
+      *##  IF      SPA-DATACREATEFLG   NOT =   1
+           IF      SPA-DATATEISYUTUKBN NOT =   2
                MOVE    10                  TO  INFCHK-RC
            END-IF
       *
