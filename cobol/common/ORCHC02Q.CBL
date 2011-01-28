@@ -3919,9 +3919,17 @@
       *    ∞ÂŒ≈µ°¥ÿºÔ Ã
            MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCSV-HOSPSBT
       *    ∞ÂŒ≈µ°¥ÿÃææŒ
-           MOVE    WRK-HOSPNAME        TO  ORCSQRCSV-HOSPNAME
+      **** MOVE    WRK-HOSPNAME        TO  ORCSQRCSV-HOSPNAME
+           STRING  WRK-HOSPNAME1
+                   WRK-HOSPNAME2       DELIMITED  BY  SPACE
+                                       INTO    ORCSQRCSV-HOSPNAME
+           END-STRING
       *    ∞ÂŒ≈µ°¥ÿΩªΩÍÃææŒ
-           MOVE    WRK-HOSPADRS        TO  ORCSQRCSV-HOSPADRS
+      **** MOVE    WRK-HOSPADRS        TO  ORCSQRCSV-HOSPADRS
+           STRING  WRK-HOSPADRS1
+                   WRK-HOSPADRS2       DELIMITED  BY SPACE
+                                       INTO    ORCSQRCSV-HOSPADRS
+           END-STRING
       *    ∞ÂŒ≈µ°¥ÿÕπ ÿ»÷πÊ
            IF      SYS-1002-POST       NUMERIC
                MOVE    SYS-1002-POST(1:3)  TO  ORCSQRCSV-HOSPPOST(1:3)
