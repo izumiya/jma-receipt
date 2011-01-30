@@ -300,6 +300,8 @@
            03  FLG-SYU40           PIC 9(01).
       *    ¥æ¡¼¥¶¥×¥í¥°¥é¥àµ¯Æ°
            03  FLG-USERPG              PIC 9(01).
+      *    ´¶À÷¾Éºï½ü
+           03  FLG-INFEC-DLT           PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -5169,6 +5171,7 @@
       *
       *    ´¶À÷¾ÉÁ÷¿®
            IF      SPA-DATATEISYUTUKBN =   1
+               MOVE    ZERO                TO  FLG-INFEC-DLT
                PERFORM 4908-INFECTION-SEND-SEC
            END-IF
       *
@@ -5305,6 +5308,9 @@
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
            MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
            MOVE    SPA-SYORIFLG        TO  SHELLTBL-ARG4
+           IF      FLG-INFEC-DLT       =   1
+               MOVE    2                   TO  SHELLTBL-ARG4
+           END-IF
            MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG5
            MOVE    SPA-PTID            TO  WRK-PTID
            MOVE    WRK-PTID            TO  SHELLTBL-ARG6
@@ -5477,9 +5483,11 @@
            IF      LNK-WKSRYACT-MAX   =   ZERO
       *        ºï½ü
                MOVE    "2"                 TO  ORCSCGAIRAI-KBN
+               MOVE    1                   TO  FLG-INFEC-DLT
            ELSE
       *        ¿·µ¬¡¢¹¹¿·
                MOVE    "1"                 TO  ORCSCGAIRAI-KBN
+               MOVE    ZERO                TO  FLG-INFEC-DLT
            END-IF
       *    ¼ýÇ¼¾ðÊó
            MOVE    LNK-SYUNOU-MAX      TO  ORCSCGAIRAI-SYUNOU-MAX

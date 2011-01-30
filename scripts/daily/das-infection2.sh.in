@@ -26,11 +26,17 @@ rm -f $LOGFILE
 for file in `ls "$DASDIR"/"$HOSPNUM"/"$FILE_PREFIX"*.gz 2>/dev/null`
 do
   UPTARGEFILE=1
+
+  TIMESTAMP=`basename $file |sed -e "s/${FILE_PREFIX}.csv.\(.*\).gz/\1/"`
+  OBJECTDATE=${TIMESTAMP:6:6}
+
   RESULT=`$UPLOAD_COMMAND -i $file 2>&1|head -1`
   if [ "UP $file" = "$RESULT" ]; then
      echo "000" $RESULT | tee -a $LOGFILE
+     # $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOBLOG -parameter "das-infec2","2","0",$OBJECTDATE,"000","Upload success",$HOSPNUM 2>&1 | tee -a $LOGFILE
      rm $file
   else
+     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOBLOG -parameter "das-infec2","2","1",$OBJECTDATE,"${RESULT:0:3}","${RESULT:4}",$HOSPNUM 2>&1 | tee -a $LOGFILE
      echo "${RESULT:0:3}","${RESULT:4}" | tee -a $LOGFILE
   fi
   sleep 1

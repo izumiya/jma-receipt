@@ -62,6 +62,7 @@
       *01  PRGSKBNO                PIC X(08)  VALUE "20091218".
       *01  PRGSKBNO                PIC X(08)  VALUE "20101026".
       *01  PRGSKBNO                PIC X(08)  VALUE "20101125".
+      *    レイアウト変更（リアルタイム導入）
        01  PRGSKBNO                PIC X(08)  VALUE "20110201".
       *
       *    フラグ領域
@@ -95,12 +96,6 @@
            03  IDX                             PIC 9(03).
            03  IDY                             PIC 9(03).
            03  IDZ                             PIC 9(03).
-      *
-       01  KEY-AREA                            VALUE   LOW-VALUE.
-           03  KEY-NEW.
-               05  KEY-N-PTID                  PIC 9(10).
-           03  KEY-OLD.
-               05  KEY-O-PTID                  PIC 9(10).
       *
       *    一時領域
        01  WRK-AREA.
@@ -386,6 +381,7 @@
        2001-MAIN-SINRYO-SEC        SECTION.
       *
            MOVE    WRK-PARA-SRYYMD     TO  WRK-SRYYMD
+      *
       *    受診履歴読み込み
            INITIALIZE                      JYURRK-REC
            MOVE    WRK-PARA-HOSPNUM    TO  JYURRK-HOSPNUM
@@ -413,6 +409,12 @@
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    クリア（削除）処理
+      *    IF     (WRK-PARA-SYORIFLG   =   2)  AND
+      *           (CNT-INFEC           =   0)
+      *        PERFORM 2002-CLEAR-DATA-SEC
+      *    END-IF
            .
        2001-MAIN-SINRYO-EXT.
            EXIT.
@@ -489,13 +491,37 @@
                        END-IF
                        MOVE    2                   TO  WRK-RECKBN
                        PERFORM 2003-OUT-SYORI-SEC
-      **                 PERFORM 2004-INFECTION-INSERT-SEC
+      *                感染症プルーフ読み込み
+                       PERFORM 2004-INFECTION-READ-SEC
+                       IF      FLG-INFECTION       =   1
+                           PERFORM 2004-INFECTION-INSERT-SEC
+                       ELSE
+                           PERFORM 2004-INFECTION-UPDATE-SEC
+                       END-IF
                        MOVE    TBL-JUDGMENT-S-MAX  TO  I-J-S
                    END-IF
                END-PERFORM
            END-PERFORM
            .
        20012-SRYCD-JUDGE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    クリア（削除）処理
+      *****************************************************************
+       2002-CLEAR-DATA-SEC         SECTION.
+      *
+           PERFORM 2004-INFECTION-READ-SEC
+           IF      FLG-INFECTION       =   ZERO
+               IF     (INFECT-SRYCD    NOT =   SPACE)  OR
+                      (INFECT-MEDSRYCD NOT =   SPACE)
+                   MOVE    3                   TO  WRK-RECKBN
+                   PERFORM 2003-OUT-SYORI-SEC
+                   PERFORM 2004-INFECTION-SRYCD-CLEAR-SEC
+               END-IF
+           END-IF
+           .
+       2002-CLEAR-DATA-EXT.
            EXIT.
       *
       *****************************************************************
@@ -552,12 +578,19 @@
                    MOVE    PTBYO-KHNBYOMEICD   TO  WRK-BYOMEICD
                    MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
                    MOVE    PTBYO-SRYYMD        TO  WRK-BYOSRYYMD
+                   MOVE    PTBYO-SRYYMD        TO  WRK-SRYYMD
                    MOVE    PTBYO-TENKIKBN      TO  WRK-TENKIKBN
                    MOVE    PTBYO-TENKIYMD      TO  WRK-TENKIYMD
                    MOVE    PTBYO-DLTFLG        TO  WRK-DLTFLG
                    MOVE    1                   TO  WRK-RECKBN
                    PERFORM 2003-OUT-SYORI-SEC
-      **             PERFORM 2004-INFECTION-INSERT-SEC
+      *            感染症プルーフ読み込み
+                   PERFORM 2004-INFECTION-READ-SEC
+                   IF      FLG-INFECTION       =   1
+                       PERFORM 2004-INFECTION-INSERT-SEC
+                   ELSE
+                       PERFORM 2004-INFECTION-UPDATE-SEC
+                   END-IF
                    MOVE    TBL-JUDGMENT-B-MAX  TO  I-J-B
                END-IF
            END-PERFORM
@@ -587,6 +620,10 @@
                PERFORM 400-SY-REC-SEC
            END-IF
       *
+           IF      WRK-RECKBN          =   3
+               PERFORM 400-SY-CLEAR-REC-SEC
+           END-IF
+      *
       *    IF      STS-INFEC           =   "00"
       *        CONTINUE
       *    ELSE
@@ -612,8 +649,7 @@
            MOVE    SPA-HOSPNUM         TO  INFECT-HOSPNUM
            MOVE    SMCNDATE-YMD        TO  INFECT-SENDYMD
            MOVE    PTINF-PTID          TO  INFECT-PTID
-      *    インフルエンザ
-           MOVE    1                   TO  INFECT-DISEASE
+           MOVE    TBL-DISEASE (I-D)   TO  INFECT-DISEASE
            MOVE    WRK-SRYYMD          TO  INFECT-SRYYMD
       *
            MOVE    INFECTION-REC       TO  MCPDATA-REC
@@ -645,12 +681,17 @@
            MOVE    SPA-HOSPNUM         TO  INFECT-HOSPNUM
            MOVE    SMCNDATE-YMD        TO  INFECT-SENDYMD
            MOVE    PTINF-PTID          TO  INFECT-PTID
-      *    インフルエンザ
-           MOVE    1                   TO  INFECT-DISEASE
+           MOVE    TBL-DISEASE (I-D)   TO  INFECT-DISEASE
            MOVE    WRK-SRYYMD          TO  INFECT-SRYYMD
-      *
-      *##     MOVE    WRK-SRYCD           TO  INFECT-SRYCD
-      *##     MOVE    WRK-SRYCD           TO  INFECT-MEDSRYCD
+      *    診療行為
+           IF      WRK-CDKBN           =   2
+               MOVE    WRK-SRYCD           TO  INFECT-MEDSRYCD
+           ELSE
+               IF      WRK-CDKBN           =   3
+                   MOVE    WRK-SRYCD           TO  INFECT-SRYCD
+               END-IF
+           END-IF
+      *    病名
            MOVE    WRK-BYOMEICD        TO  INFECT-BYOMEICD
            IF      WRK-BYOSRYYMD   NOT =   ZERO
                MOVE    WRK-BYOSRYYMD       TO  INFECT-BYOSRYYMD
@@ -676,6 +717,90 @@
            END-IF
            .
        2004-INFECTION-INSERT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    感染症プルーフ処理
+      *****************************************************************
+       2004-INFECTION-UPDATE-SEC   SECTION.
+      *
+      *    INITIALIZE                      INFECTION-REC
+      *    MOVE    SPA-HOSPNUM         TO  INFECT-HOSPNUM
+      *    MOVE    SMCNDATE-YMD        TO  INFECT-SENDYMD
+      *    MOVE    PTINF-PTID          TO  INFECT-PTID
+      *    MOVE    TBL-DISEASE (I-D)   TO  INFECT-DISEASE
+      *    MOVE    WRK-SRYYMD          TO  INFECT-SRYYMD
+      *
+           IF      WRK-PARA-GMNID      =   "C02"
+      *        病名
+               MOVE    WRK-BYOMEICD        TO  INFECT-BYOMEICD
+               IF      WRK-BYOSRYYMD   NOT =   ZERO
+                   MOVE    WRK-BYOSRYYMD       TO  INFECT-BYOSRYYMD
+               END-IF
+               MOVE    WRK-TENKIKBN        TO  INFECT-TENKIKBN
+               IF      WRK-TENKIYMD    NOT =   ZERO
+                   MOVE    WRK-TENKIYMD        TO  INFECT-TENKIYMD
+               END-IF
+           ELSE
+      *    診療行為
+               IF      WRK-CDKBN           =   2
+                   MOVE    WRK-SRYCD           TO  INFECT-MEDSRYCD
+               ELSE
+                   IF      WRK-CDKBN           =   3
+                       MOVE    WRK-SRYCD           TO  INFECT-SRYCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    SMCNDATE-YMD        TO  INFECT-CREYMD
+           MOVE    SPACE               TO  INFECT-UPYMD
+           MOVE    SMCNDATE-HMS        TO  INFECT-UPHMS
+      *
+           MOVE    INFECTION-REC       TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_infection"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "ORCBINF2 INFECTION INS ERR:"  MCP-RC  "."
+           END-IF
+           .
+       2004-INFECTION-UPDATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    感染症プルーフ処理
+      *****************************************************************
+       2004-INFECTION-SRYCD-CLEAR-SEC SECTION.
+      *
+      *    INITIALIZE                      INFECTION-REC
+      *    MOVE    SPA-HOSPNUM         TO  INFECT-HOSPNUM
+      *    MOVE    SMCNDATE-YMD        TO  INFECT-SENDYMD
+      *    MOVE    PTINF-PTID          TO  INFECT-PTID
+      *    MOVE    TBL-DISEASE (I-D)   TO  INFECT-DISEASE
+      *    MOVE    WRK-SRYYMD          TO  INFECT-SRYYMD
+      *    診療行為
+           MOVE    SPACE               TO  INFECT-MEDSRYCD
+           MOVE    SPACE               TO  INFECT-SRYCD
+      *
+           MOVE    SMCNDATE-YMD        TO  INFECT-CREYMD
+           MOVE    SPACE               TO  INFECT-UPYMD
+           MOVE    SMCNDATE-HMS        TO  INFECT-UPHMS
+      *
+           MOVE    INFECTION-REC       TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_infection"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "ORCBINF2 INFECTION UPD ERR:"  MCP-RC  "."
+           END-IF
+           .
+       2004-INFECTION-SRYCD-CLEAR-EXT.
            EXIT.
       *
       *****************************************************************
@@ -886,7 +1011,13 @@
            MOVE    3                   TO  WRK-NAGASA
            PERFORM 4003-NUM-HENSYU-SEC
       *    処理区分
-           MOVE    WRK-PARA-SYORIFLG   TO  WRK-NUM
+           IF      WRK-PARA-SYORIFLG   =   2
+      *        クリア（削除）処理であるが判定コードがあるため
+      *        訂正の扱いにする
+               MOVE    2                   TO  WRK-NUM
+           ELSE
+               COMPUTE WRK-NUM             =   WRK-PARA-SYORIFLG  +  1
+           END-IF
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 4003-NUM-HENSYU-SEC
       *    入外区分
@@ -898,6 +1029,45 @@
            PERFORM 4001-FILE-WRITE-SEC
            .
        400-SY-REC-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＣＳＶデータ（クリア）作成処理
+      *****************************************************************
+       400-SY-CLEAR-REC-SEC        SECTION.
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+           MOVE    ZERO                TO  WRK-END
+      *    レコード識別
+           MOVE    "S"                 TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 4002-MOJI-HENSYU-SEC
+      *    病原体区分
+           MOVE    TBL-DISEASE (I-D)   TO  WRK-NUM
+           MOVE    2                   TO  WRK-NAGASA
+           PERFORM 4003-NUM-HENSYU-SEC
+      *    診療日
+           MOVE    WRK-SRYYMD          TO  WRK-NUM
+           MOVE    8                   TO  WRK-NAGASA
+           PERFORM 4003-NUM-HENSYU-SEC
+      *    診療行為区分
+      *    コード
+      *    数量
+      *    剤回数
+      *    処理区分
+           MOVE    "0,,0,0,3"          TO  WRK-DATA
+           MOVE    8                   TO  WRK-NAGASA
+           PERFORM 4002-MOJI-HENSYU-SEC
+      *    入外区分
+           MOVE    WRK-PARA-NYUGAIKBN  TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END
+           PERFORM 4002-MOJI-HENSYU-SEC
+      *
+           PERFORM 4001-FILE-WRITE-SEC
+           .
+       400-SY-CLEAR-REC-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1185,10 +1355,6 @@
                MOVE    MCPDATA-REC         TO  JYURRK-REC
            ELSE
                MOVE    1                   TO  FLG-JYURRK
-           END-IF
-      *
-           IF      FLG-JYURRK          =   ZERO
-               MOVE    JYURRK-PTID         TO  KEY-N-PTID
            END-IF
            .
        900-JYURRK-READ-EXT.

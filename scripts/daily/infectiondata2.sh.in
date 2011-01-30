@@ -75,6 +75,8 @@ if [ -e $INFECFILE ]; then
     RANDOMIZE=`ruby -e 'print sprintf("%04d",rand(10000))'`
     mv $INFECFILE $INFECFILE.$TIMESTAMP$RANDOMIZE
     gzip $INFECFILE.$TIMESTAMP$RANDOMIZE
+  else
+    rm -f $INFECFILE
   fi
 fi
 

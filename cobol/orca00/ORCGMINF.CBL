@@ -261,9 +261,11 @@
            MOVE    1               TO  SPA-MINF-FLG
            MOVE    1               TO  SPA-MINF-STR
       *
-      *    前日
            MOVE    SPA-SYSYMD      TO  WRK-SYMD
-           PERFORM 31012-ZENJITU-HEN-SEC
+           IF      SPA-DATATEISYUTUKBN =   2
+      *        前日
+               PERFORM 31012-ZENJITU-HEN-SEC
+           END-IF
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG     TO  SPA-MINF-TAISYOYMD
            MOVE    WRK-SYMD        TO  SPA-NAI-TAISYOYMD
@@ -327,6 +329,8 @@
                    IF      INFECT-DISEASE  =   1
                        MOVE    "インフルエンザ"
                                                TO  SPA-MINF-TBYOGEN(IDX)
+                   ELSE
+                       MOVE    INFECT-DISEASE  TO  SPA-MINF-TBYOGEN(IDX)
                    END-IF
                    PERFORM 900-PTINF-READ-SEC
                    MOVE    PTINF-NAME          TO  SPA-MINF-TNAME(IDX)
@@ -338,9 +342,13 @@
                    END-EVALUATE
                    IF      INFECT-SRYCD    NOT =   SPACE
                        MOVE    "○"        TO  SPA-MINF-TSHINRYO(IDX)
+                   ELSE
+                       MOVE    SPACE       TO  SPA-MINF-TSHINRYO(IDX)
                    END-IF
                    IF      INFECT-MEDSRYCD NOT =   SPACE
                        MOVE    "○"        TO  SPA-MINF-TYAKUZAI(IDX)
+                   ELSE
+                       MOVE    SPACE       TO  SPA-MINF-TYAKUZAI(IDX)
                    END-IF
                    PERFORM 900-BYOMEI-READ-SEC
                    MOVE    BYO-BYOMEI          TO  SPA-MINF-TBYOMEI(IDX)

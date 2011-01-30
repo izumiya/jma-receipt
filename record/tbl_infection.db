@@ -53,9 +53,10 @@ path	key3		{
 		DECLARE tbl_infection_key3_csr CURSOR FOR
 		SELECT *
 		FROM tbl_infection
-		WHERE        HOSPNUM  =  :HOSPNUM
-			AND  SRYYMD   =  :SRYYMD
-		ORDER   BY   SENDYMD,DISEASE
+		WHERE         HOSPNUM   =  :HOSPNUM
+			AND ((SRYYMD    =  :SRYYMD)
+	                OR   (BYOSRYYMD =  :SRYYMD))
+		ORDER   BY    SENDYMD,DISEASE
 		;
 	};
 };

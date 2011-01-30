@@ -157,6 +157,8 @@
       *
            03  FLG-JYOTAI              PIC 9(01).
            03  FLG-SOUSIN              PIC 9(01).
+      *    ´¶À÷¾Éºï½ü
+           03  FLG-INFEC-DLT           PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -5683,6 +5685,7 @@
       *
       *    ´¶À÷¾ÉÁ÷¿®
            IF      SPA-DATATEISYUTUKBN =   1
+               MOVE    ZERO                TO  FLG-INFEC-DLT
                PERFORM 4904-INFECTION-SEND-SEC
            END-IF
       *
@@ -5941,6 +5944,13 @@
                    MOVE    1               TO  SPA-KEI-FLG
                 END-IF
            END-IF
+      *
+      *    ´¶À÷¾ÉÁ÷¿®
+           IF      SPA-DATATEISYUTUKBN =   1
+               MOVE    1                   TO  FLG-INFEC-DLT
+               PERFORM 4904-INFECTION-SEND-SEC
+           END-IF
+      *
       *    ¥æ¡¼¥¶¥×¥í¥°¥é¥àµ¯Æ°
            IF      SPA-ERRCD           =   SPACE
                MOVE    3               TO  FLG-USERPG
@@ -6249,6 +6259,9 @@
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
            MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
            MOVE    SPA-SYORIFLG        TO  SHELLTBL-ARG4
+           IF      FLG-INFEC-DLT       =   1
+               MOVE    2                   TO  SHELLTBL-ARG4
+           END-IF
            MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG5
            MOVE    SPA-PTID            TO  WRK-PTID
            MOVE    WRK-PTID            TO  SHELLTBL-ARG6
