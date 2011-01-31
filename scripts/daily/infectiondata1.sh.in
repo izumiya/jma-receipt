@@ -31,7 +31,7 @@ INFECREC=$DASDIR/${HOSPNUM}/infection/infection${HOSPNUM}
 LOG=/var/log/jma-receipt/${HOSPNUM}infectiondata.log
 LOGFILE=/var/log/jma-receipt/${HOSPNUM}infectiondata1.log
 
-DASUPLOAD=das-infection.sh
+DASUPLOAD=das-infection2.sh
 
 DPKGLT=`dpkg -l | grep 'ii  jma-receipt' | grep 'JMA Standard Receipt'`
 PKGVER=`echo $DPKGLT | sed 's/\s\{1,\}/ /g' | cut -d' ' -f 3`

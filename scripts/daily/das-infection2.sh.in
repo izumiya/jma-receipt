@@ -28,7 +28,7 @@ do
   UPTARGEFILE=1
 
   TIMESTAMP=`basename $file |sed -e "s/${FILE_PREFIX}.csv.\(.*\).gz/\1/"`
-  OBJECTDATE=${TIMESTAMP:6:6}
+  OBJECTDATE=${TIMESTAMP:8:6}
 
   RESULT=`$UPLOAD_COMMAND -i $file 2>&1|head -1`
   if [ "UP $file" = "$RESULT" ]; then
