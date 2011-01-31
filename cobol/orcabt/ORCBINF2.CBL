@@ -76,7 +76,6 @@
            03  FLG-PTINF                       PIC 9(01).
            03  FLG-SRYACT                      PIC 9(01).
            03  FLG-SRYACCT                     PIC 9(01).
-           03  FLG-TENSU                       PIC 9(01).
            03  FLG-JYURRK                      PIC 9(01).
            03  FLG-PTBYOMEI                    PIC 9(01).
            03  FLG-INFECTION                   PIC 9(01).
@@ -144,9 +143,6 @@
            03  WRK-INFECERR                    PIC X(200).
            03  WRK-ERRMSG                      PIC X(300).
       *
-      *    点数マスタ退避ワーク
-           COPY    "CPTTNS.INC".
-      *
        01  TBL-DISEASE-AREA.
            03  TBL-DISEASE-OCC     OCCURS   99  INDEXED  I-D.
                05  TBL-DISEASE            PIC 9(02).
@@ -208,9 +204,6 @@
        01  INFECTION-REC.
            COPY    "CPINFECTION.INC".
       *
-      *    点数
-           COPY    "CPTENSU.INC".
-      *
       *    判定
        01  INFJUDGMENT-REC.
            COPY    "CPINFJUDGMENT.INC".
@@ -254,8 +247,7 @@
            INITIALIZE                  CNT-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  FLG-AREA
-           INITIALIZE                  TTNS-AREA
-                                       SPA-AREA
+           INITIALIZE                  SPA-AREA
       *
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA-GMNID
@@ -1458,103 +1450,6 @@
            PERFORM 900-CLOSE-SEC
            .
        900-PTINF-READ-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    点数読込
-      *****************************************************************
-       900-TENSU-READ-SEC          SECTION.
-      *
-           MOVE    ZERO                TO  FLG-TENSU
-      *
-           MOVE    TNS-SRYCD           TO  TTNS-CHK-SRYCD
-           MOVE    WRK-PARA-SRYYMD     TO  TTNS-CHK-YMD
-      *
-      *    点数マスタ退避ワークチェック
-           PERFORM 9001-TTNS-CHK-SEC
-      *
-      *    退避ワークに存在しない場合はＤＢを検索
-           IF    ( TTNS-FLG            =   ZERO )
-               INITIALIZE                      TNS-TENSU-REC
-               MOVE    TTNS-CHK-SRYCD      TO  TNS-SRYCD
-               MOVE    TTNS-CHK-YMD        TO  TNS-YUKOSTYMD
-                                               TNS-YUKOEDYMD
-               MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
-               MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
-               MOVE    "tbl_tensu"         TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 900-DBSELECT-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_tensu"     TO  MCP-TABLE
-                   MOVE    "key"           TO  MCP-PATHNAME
-                   PERFORM 900-DBFETCH-SEC
-                   IF      MCP-RC              =   ZERO
-                       MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
-                       MOVE    ZERO            TO  FLG-TENSU
-      *
-      *                点数マスタ退避ワークに編集する
-                       PERFORM 9001-TTNS-HEN-SEC
-                   ELSE
-                       INITIALIZE                  TNS-TENSU-REC
-                       MOVE    1                   TO  FLG-TENSU
-                   END-IF
-               ELSE
-                   INITIALIZE                  TNS-TENSU-REC
-                   MOVE    1                   TO  FLG-TENSU
-               END-IF
-      *
-               MOVE    "tbl_tensu"     TO  MCP-TABLE
-               MOVE    "key"           TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
-           END-IF
-           .
-       900-TENSU-READ-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    点数マスタ退避ワークチェック処理
-      *****************************************************************
-       9001-TTNS-CHK-SEC           SECTION.
-      *
-           MOVE    ZERO                TO  TTNS-FLG
-           INITIALIZE                      TNS-TENSU-REC
-      *
-           PERFORM VARYING TTNS-IDX    FROM    1   BY  1
-                   UNTIL ( TTNS-IDX    >   TTNS-MAX )
-                    OR   ( TTNS-FLG    =   1 )
-               IF    ( TTNS-KEY-SRYCD (TTNS-IDX)
-                                       =   TTNS-CHK-SRYCD )
-                 AND ( TTNS-KEY-YUKOSTYMD (TTNS-IDX)
-                                      <=   TTNS-CHK-YMD )
-                 AND ( TTNS-KEY-YUKOEDYMD (TTNS-IDX)
-                                      >=   TTNS-CHK-YMD )
-                   MOVE    1           TO  TTNS-FLG
-                   MOVE    TTNS-DAT (TTNS-IDX)
-                                       TO  TNS-TENSU-REC
-               END-IF
-           END-PERFORM
-           .
-       9001-TTNS-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    点数マスタ退避ワーク編集処理
-      *****************************************************************
-       9001-TTNS-HEN-SEC           SECTION.
-      *
-           IF    ( TTNS-CONST-MAX  >   TTNS-MAX )
-               COMPUTE TTNS-MAX    =   TTNS-MAX    +   1
-               MOVE    TNS-SRYCD       TO  TTNS-KEY-SRYCD
-                                                   (TTNS-MAX)
-               MOVE    TNS-YUKOSTYMD   TO  TTNS-KEY-YUKOSTYMD
-                                                   (TTNS-MAX)
-               MOVE    TNS-YUKOEDYMD   TO  TTNS-KEY-YUKOEDYMD
-                                                   (TTNS-MAX)
-               MOVE    TNS-TENSU-REC   TO  TTNS-DAT
-                                                   (TTNS-MAX)
-           END-IF
-           .
-       9001-TTNS-HEN-EXT.
            EXIT.
       *
       *****************************************************************
