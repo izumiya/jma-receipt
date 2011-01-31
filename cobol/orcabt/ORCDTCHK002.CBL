@@ -10127,12 +10127,8 @@
            END-IF
       *
            IF    ( WRK-ERRCD           =   "030013" )
-             STRING "保険組合せが正しく作成されていません。"
-                                           DELIMITED BY SIZE
-                    "保険または公費情報を確認してください"
-                                           DELIMITED BY SIZE
-             INTO   WRK-ERRMES
-             END-STRING
+               MOVE    "公費情報の受給者番号に入力があります"
+                                       TO  WRK-ERRMES
            END-IF
       *
            IF    ( WRK-ERRMES           =  SPACE )
