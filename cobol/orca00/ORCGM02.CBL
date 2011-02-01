@@ -302,6 +302,20 @@
                        MOVE    SYS-1001-DATATEISYUTUKBN
                                              TO  SPA-DATATEISYUTUKBN
                    END-IF
+      *            感染症データ作成
+      *            データ提出方法区分（未使用）を臨時で使用
+      *            本来はCOPY句で定義してORCSCOMMONで設定
+                   IF     (SYS-1001-TBL(459:1) =   SPACE  )  OR
+                          (SYS-1001-TBL(459:1) NOT NUMERIC)
+                       IF     SPA-DATACREATEFLG    =   1
+                           MOVE    1           TO  SPA-DATATEISYUTUKBN
+                       ELSE
+                           MOVE    ZERO        TO  SPA-DATATEISYUTUKBN
+                       END-IF
+                   ELSE
+                       MOVE    SYS-1001-TBL(459:1)
+                                               TO  SPA-DATATEISYUTUKBN
+                   END-IF
                ELSE
                    INITIALIZE              SYS-1001-REC
                END-IF

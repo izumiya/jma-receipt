@@ -1885,14 +1885,11 @@
       *    本来はCOPY句で定義するのだがパッチ提供の都合のため
            IF     (SYS-1001-TBL(459:1) =   SPACE  )  OR
                   (SYS-1001-TBL(459:1) NOT NUMERIC)
-               IF     SPA-DATACREATEFLG    =   1
+               IF     SYS-1001-DATACREATEFLG   =   1
                    MOVE    1           TO  SYS-1001-TBL(459:1)
                ELSE
                    MOVE    ZERO        TO  SYS-1001-TBL(459:1)
                END-IF
-           ELSE
-               MOVE    SYS-1001-TBL(459:1)
-                                       TO  SYS-1001-TBL(459:1)
            END-IF
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       SPA-DATATEISYUTU-MAX
