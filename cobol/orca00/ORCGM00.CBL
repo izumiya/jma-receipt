@@ -1853,6 +1853,12 @@
                WHEN    "1017"
                    MOVE    "感染症サーベイランスへは参加中です。"
                                                TO  SPA-ERRMSG
+               WHEN    "1018"
+                   STRING  "あなたは管理者ではありませんので参加"
+                           "する場合は管理者まで連絡してください。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "K001"
                    STRING  "警告！！"
                            "この端末は使用できません。"
@@ -1951,10 +1957,10 @@
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
            MOVE    "daily"             TO  MCP-PATHNAME
-      *##  CALL    "ORCDBMAIN"     USING
-      *##                                  MCPAREA
-      *##                                  MCPDATA-REC
-      *##                                  SPA-AREA
+           CALL    "ORCDBMAIN"     USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
            .
        800-INFECTION-EXT.
            EXIT.
@@ -2161,13 +2167,16 @@
       *****************************************************************
        999-TEITEN-002-SEC          SECTION.
       *
-           IF     (SPA-SUPERVISOR          =   "T" )  AND
-                  (SYS-1010-KANRIAUTHFLG   =   "T" )  AND
-                 ((SPA-DATATEISYUTUKBN     =   ZERO)  OR
-                  (SPA-DATATEISYUTUKBN     =   9   ))
-               MOVE    "9102"              TO  SPA-MIDCD
+      *****IF     (SPA-SUPERVISOR          =   "T" )  AND
+           IF     (SYS-1010-KANRIAUTHFLG   =   "T" )
+               IF    ((SPA-DATATEISYUTUKBN     =   ZERO)  OR
+                      (SPA-DATATEISYUTUKBN     =   9   ))
+                   MOVE    "9102"              TO  SPA-MIDCD
+               ELSE
+                   MOVE    "1017"              TO  SPA-ERRCD
+               END-IF 
            ELSE
-               MOVE    "1017"              TO  SPA-ERRCD
+               MOVE    "1018"              TO  SPA-ERRCD
            END-IF 
            .
        999-TEITEN-002-EXT.
