@@ -2168,15 +2168,15 @@
        999-TEITEN-002-SEC          SECTION.
       *
       *****IF     (SPA-SUPERVISOR          =   "T" )  AND
-           IF     (SYS-1010-KANRIAUTHFLG   =   "T" )
-               IF    ((SPA-DATATEISYUTUKBN     =   ZERO)  OR
-                      (SPA-DATATEISYUTUKBN     =   9   ))
+           IF    ((SPA-DATATEISYUTUKBN     =   ZERO)  OR
+                  (SPA-DATATEISYUTUKBN     =   9   ))
+               IF     (SYS-1010-KANRIAUTHFLG   =   "T" )
                    MOVE    "9102"              TO  SPA-MIDCD
                ELSE
-                   MOVE    "1017"              TO  SPA-ERRCD
+                   MOVE    "1018"              TO  SPA-ERRCD
                END-IF 
            ELSE
-               MOVE    "1018"              TO  SPA-ERRCD
+               MOVE    "1017"              TO  SPA-ERRCD
            END-IF 
            .
        999-TEITEN-002-EXT.
