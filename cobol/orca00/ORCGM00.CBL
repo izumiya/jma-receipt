@@ -555,9 +555,6 @@
       *
            MOVE    ZERO                TO  SPA-NOCHK-HOSPNUM
       *
-      *    定点調査感染症臨時対応
-           PERFORM 999-TEITEN-001-SEC
-      *
       *!!
       *以下 ＳＰＡセットは削除
       *!!
@@ -1025,6 +1022,9 @@
       *        END-IF
       *    END-IF
       *####
+      *
+      *    定点調査感染症臨時対応
+           PERFORM 999-TEITEN-001-SEC
       *
            MOVE    SPACE           TO  SPA-MID1-FLG
            MOVE    SPACE           TO  SPA-MIDCD
@@ -2142,7 +2142,8 @@
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF      SPA-DATATEISYUTUKBN =   ZERO
+           IF     (SPA-ERRCD           =   SPACE)  AND
+                  (SPA-DATATEISYUTUKBN =   ZERO)
                STRING  "日本医師会では日レセからのデータ自動送信"
                        "を使った感染症マップ作成を始めました。ご"
                        "協力をお願いします。"
@@ -2154,9 +2155,6 @@
                                            DELIMITED  BY  SIZE
                                            INTO    SPA-GMN-LBLMSG
                END-STRING
-      *#   ELSE
-      *#       MOVE    SPACE               TO  SPA-GMN-LBLMSG
-      *#       MOVE    SPACE               TO  SPA-GMN-LBLMSG2
            END-IF
            .
        999-TEITEN-001-EXT.

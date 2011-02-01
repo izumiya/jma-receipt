@@ -49,9 +49,9 @@ if ! [ -d $DASDIR/${HOSPNUM}/infection ]; then
   mkdir $DASDIR/${HOSPNUM}/infection
 fi
 
-if [ -e $LOGFILE ]; then
-  cat $LOGFILE >> $LOG
-fi
+#if [ -e $LOGFILE ]; then
+#  cat $LOGFILE >> $LOG
+#fi
 rm -f $LOGFILE
 
 echo "SYORIBI [ $SRYYMD ]" | tee -a $LOGFILE
@@ -81,6 +81,6 @@ if [ -e $INFECFILE ]; then
 fi
 
 echo "感染症データ送信処理 起動" 2>&1 | tee -a $LOGFILE
-$DASUPLOAD ${HOSPNUM} ${HOSPID} &
+$DASUPLOAD ${HOSPNUM} ${HOSPID} 2 &
 
 exit 0

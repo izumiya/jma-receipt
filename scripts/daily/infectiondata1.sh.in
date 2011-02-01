@@ -133,9 +133,9 @@ if ! [ -d $DASDIR/${HOSPNUM}/infection ]; then
   mkdir $DASDIR/${HOSPNUM}/infection
 fi
 
-if [ -e $LOGFILE ]; then
-  cat $LOGFILE >> $LOG
-fi
+#if [ -e $LOGFILE ]; then
+#  cat $LOGFILE >> $LOG
+#fi
 rm -f $LOGFILE
 
 #処理日を求める
@@ -151,7 +151,7 @@ done
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${JOBID}${SHELLID},${HOSPNUM} 2>&1 | tee -a $LOGFILE
 
 echo "感染症データ送信処理 起動" 2>&1 | tee -a $LOGFILE
-$DASUPLOAD ${HOSPNUM} ${HOSPID} &
+$DASUPLOAD ${HOSPNUM} ${HOSPID} 1 &
 
 rm -f $INFECREC
 echo $ENDYMD > $INFECREC
