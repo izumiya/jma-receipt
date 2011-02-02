@@ -48,7 +48,7 @@
       <x>380</x>
       <y>80</y>
       <width>244</width>
-      <height>148</height>
+      <height>164</height>
       <can_focus>True</can_focus>
       <signal>
 	<name>day_selected</name>
