@@ -360,6 +360,9 @@
       *
       *    XML情報取り出し
            PERFORM 1000-APTXMLREAD-SEC
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      200-MAIN-EXT
+           END-IF
       *
            MOVE    ZERO                TO  MDCRES-API-RESULT
            MOVE    SPACE               TO  WRK-ERRCD
@@ -374,7 +377,9 @@
                MOVE    "91"                TO  WRK-ERRCD
            END-EVALUATE
       *    入力項目チェック処理
-           PERFORM 2001-INPUT-CHK-SEC
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 2001-INPUT-CHK-SEC
+           END-IF
            IF      WRK-ERRCD       NOT =   SPACE
       *TEST!!
       *        PERFORM 890-ERRCD-MSG-SEC
@@ -1316,7 +1321,8 @@
            WHEN    "91"
                MOVE    "処理区分未設定"        TO  WRK-ERRMSG
            WHEN    "97"
-               MOVE   "構文誤りです"           TO  WRK-ERRMSG
+               MOVE   "送信内容に誤りがあります。"
+                                               TO  WRK-ERRMSG
            WHEN    "99"
                MOVE    "ユーザＩＤ未登録。"
                                                TO  WRK-ERRMSG
