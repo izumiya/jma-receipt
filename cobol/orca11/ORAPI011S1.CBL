@@ -462,8 +462,8 @@
            IF     (MCP-RC              =   ZERO  OR  1  )
                PERFORM 10001-XML-REMAKE-SEC
            ELSE
-               DISPLAY "XMLOPEN failure = " MCP-RC
-               MOVE   "97"             TO  WRK-ERRCD
+               DISPLAY "XMLREAD failure = " MCP-RC
+               MOVE   "98"             TO  WRK-ERRCD
            END-IF
       *
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
@@ -2166,6 +2166,9 @@
                MOVE    "処理区分未設定"        TO  WRK-ERRMSG
            WHEN    "97"
                MOVE   "送信内容に誤りがあります。"
+                                               TO  WRK-ERRMSG
+           WHEN    "98"
+               MOVE   "送信内容の読込ができませんでした"
                                                TO  WRK-ERRMSG
            WHEN    "99"
                MOVE    "ユーザＩＤ未登録。"
