@@ -193,8 +193,6 @@
       *
            03  IDX-SN               PIC 9(04).
       *
-           03  IDX-SN               PIC 9(04).
-      *
            03  IDX-TAH                 PIC 9(04).
       *    °ì»þÎÎ°è
        01  WRK-AREA.
