@@ -138,9 +138,9 @@
                PERFORM 100-JOBEXEC-CHK-SEC
            END-IF
       *
-           IF      INFCHK-RC           =   ZERO
-               PERFORM 200-AGREEMENT-CHK-SEC
-           END-IF
+      **   IF      INFCHK-RC           =   ZERO
+      **       PERFORM 200-AGREEMENT-CHK-SEC
+      **   END-IF
            .
       *
        000-PROC-EXT.
