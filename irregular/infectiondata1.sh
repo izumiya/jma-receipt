@@ -19,21 +19,24 @@ fi
 #        $5  SHELLID
 #        $6  BEDFLG (0:病床なし、1:病床あり)
 #-------------------------------------------#
-TERMID=$1
-HOSPNUM=$2
-HOSPID=$3
-JOBID=$4
-SHELLID=$5
-BEDFLG=$6
+TERMID=${1}
+HOSPNUM=${2}
+HOSPID=${3}
+JOBID=${4}
+SHELLID=${5}
+BEDFLG=${6}
 
-INFECFILE=$DASDIR/${HOSPNUM}/infection/infection.csv
+INFECFILE=$DASDIR/${HOSPNUM}/infection.csv
 ERRFILE=/tmp/${HOSPNUM}infectionerror
 INFECREC=$DASDIR/${HOSPNUM}/infection/infection${HOSPNUM}
 LOG=/var/log/jma-receipt/${HOSPNUM}infectiondata.log
 LOGFILE=/var/log/jma-receipt/${HOSPNUM}infectiondata1.log
 
 # for head DASUPLOAD=$SCRIPTSDIR/daily/das-infection.sh
-DASUPLOAD=$PATCHSCRIPTSDIR/daily/das-infection.sh
+DASUPLOAD=$PATCHSCRIPTSDIR/daily/das-infection2.sh
+
+DPKGLT=`dpkg -l | grep 'ii  jma-receipt' | grep 'JMA Standard Receipt'`
+PKGVER=`echo $DPKGLT | sed 's/\s\{1,\}/ /g' | cut -d' ' -f 3`
 
 syoribi () {
   SYORIBI=""
@@ -72,7 +75,9 @@ make_infection_file () {
   #外来分処理
   INFECGFILE=$DASDIR/${HOSPNUM}/infection/infectiong.csv
   rm -f $INFECGFILE
-  $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBINF1 -parameter $TERMID,$HOSPNUM,$SRYYMD,2,$JOBID,$SHELLID,$INFECGFILE,$ERRFILE 2>&1 | tee -a $LOGFILE
+  PARA0="${TERMID},${HOSPNUM},${SRYYMD},2,${JOBID},${SHELLID}"
+  PARAM="${PARA0},${INFECGFILE},${ERRFILE},${PKGVER}"
+  $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBINF1 -parameter ${PARAM} 2>&1 | tee -a $LOGFILE
   if [ -e $ERRFILE ]; then
     rm -f $INFECGFILE
     return
@@ -82,7 +87,9 @@ make_infection_file () {
   INFECNFILE=$DASDIR/${HOSPNUM}/infection/infectionn.csv
   rm -f $INFECNFILE
   if [ $BEDFLG -eq '1' ]; then
-    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBINF1 -parameter $TERMID,$HOSPNUM,$SRYYMD,1,$JOBID,$SHELLID,$INFECNFILE,$ERRFILE 2>&1 | tee -a $LOGFILE
+    PARA0="${TERMID},${HOSPNUM},${SRYYMD},1,${JOBID},${SHELLID}"
+    PARAM="${PARA0},${INFECNFILE},${ERRFILE},${PKGVER}"
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBINF1 -parameter ${PARAM} 2>&1 | tee -a $LOGFILE
     if [ -e $ERRFILE ]; then
       rm -f $INFECNFILE
       return
@@ -107,9 +114,13 @@ make_infection_file () {
   rm -f $INFECNFILE
   if [ -e $INFECFILE ]; then
     if [ -s $INFECFILE ]; then
-      tar cvfz $DASDIR/${HOSPNUM}/infection-${SRYYMD}.tar.gz -C$DASDIR/${HOSPNUM}/infection/ infection.csv
+      TIMESTAMP=`(date +%Y%m%d%H%M%S)`
+      RANDOMIZE=`ruby -e 'print sprintf("%04d",rand(10000))'`
+      mv $INFECFILE $INFECFILE.$TIMESTAMP$RANDOMIZE
+      gzip $INFECFILE.$TIMESTAMP$RANDOMIZE
+    else
+      rm -f $INFECFILE
     fi
-    rm -f $INFECFILE
   fi
 
   return
@@ -124,9 +135,9 @@ if ! [ -d $DASDIR/${HOSPNUM}/infection ]; then
   mkdir $DASDIR/${HOSPNUM}/infection
 fi
 
-if [ -e $LOGFILE ]; then
-  cat $LOGFILE >> $LOG
-fi
+#if [ -e $LOGFILE ]; then
+#  cat $LOGFILE >> $LOG
+#fi
 rm -f $LOGFILE
 
 #処理日を求める

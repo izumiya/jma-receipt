@@ -146,5 +146,5 @@ db	{
 	tbl_chkreigai;
 	tbl_bunben;
 	tbl_infection;
-
+	tbl_infection_judgment;
 };

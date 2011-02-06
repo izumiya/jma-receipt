@@ -319,6 +319,8 @@
                    IF      INFECT-DISEASE  =   1
                        MOVE    "インフルエンザ"
                                                TO  SPA-MINF-TBYOGEN(IDX)
+                   ELSE
+                       MOVE    INFECT-DISEASE  TO  SPA-MINF-TBYOGEN(IDX)
                    END-IF
                    PERFORM 900-PTINF-READ-SEC
                    MOVE    PTINF-NAME          TO  SPA-MINF-TNAME(IDX)

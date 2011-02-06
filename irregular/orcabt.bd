@@ -412,7 +412,7 @@ db {
  tbl_chkreigai;
  tbl_bunben;
  tbl_infection;
-
+ tbl_infection_judgment;
 };
 # 262 "orcabt.bd.in" 2
 db "shell" {

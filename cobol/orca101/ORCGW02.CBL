@@ -1096,9 +1096,14 @@
            MOVE    "1 作成する"        TO  SPA-GMN-DATACREATE-LST (2)
            MOVE    2                   TO  SPA-DATACREATE-MAX
       *    データ提出方法区分
-           MOVE    "0 提出しない"      TO  SPA-GMN-DATATEISYUTU-LST (1)
-           MOVE    "1 自動で送信"      TO  SPA-GMN-DATATEISYUTU-LST (2)
-           MOVE    "2 手動で送信"      TO  SPA-GMN-DATATEISYUTU-LST (3)
+      **   MOVE    "0 提出しない"      TO  SPA-GMN-DATATEISYUTU-LST (1)
+      **   MOVE    "1 自動で送信"      TO  SPA-GMN-DATATEISYUTU-LST (2)
+      **   MOVE    "2 手動で送信"      TO  SPA-GMN-DATATEISYUTU-LST (3)
+      **   MOVE    3                   TO  SPA-DATATEISYUTU-MAX
+      *    感染症作成区分
+           MOVE    "0 作成しない"      TO  SPA-GMN-DATATEISYUTU-LST (1)
+           MOVE    "1 作成する"        TO  SPA-GMN-DATATEISYUTU-LST (2)
+           MOVE    "9 作成しない消"    TO  SPA-GMN-DATATEISYUTU-LST (3)
            MOVE    3                   TO  SPA-DATATEISYUTU-MAX
       *    自費保険集計先区分
            MOVE    "1"                 TO  SPA-GMN-JIHIPOSITIONL (1)
@@ -1743,6 +1748,27 @@
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       SPA-DATATEISYUTU-MAX
                IF      SYS-1001-DATATEISYUTUKBN
+                                       =   SPA-GMN-DATATEISYUTU-LST(IDY)
+                                                                 (1:1)
+                   MOVE    SPA-GMN-DATATEISYUTU-LST (IDY)
+                                           TO  SPA-GMN-DATATEISYUTU-G
+                   MOVE    SPA-DATATEISYUTU-MAX    TO  IDY
+                END-IF
+           END-PERFORM
+      *    感染症データ作成
+      *    データ提出方法区分（未使用）を臨時で使用(ver4.4.0patch)
+      *    本来はCOPY句で定義するのだがパッチ提供の都合のため
+           IF     (SYS-1001-TBL(459:1) =   SPACE  )  OR
+                  (SYS-1001-TBL(459:1) NOT NUMERIC)
+               IF     SYS-1001-DATACREATEFLG   =   1
+                   MOVE    1           TO  SYS-1001-TBL(459:1)
+               ELSE
+                   MOVE    ZERO        TO  SYS-1001-TBL(459:1)
+               END-IF
+           END-IF
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-DATATEISYUTU-MAX
+               IF      SYS-1001-TBL(459:1)
                                        =   SPA-GMN-DATATEISYUTU-LST(IDY)
                                                                  (1:1)
                    MOVE    SPA-GMN-DATATEISYUTU-LST (IDY)
@@ -3651,8 +3677,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SYS-1001-HIWARIKBN
                    MOVE    SPA-GMN-DATACREATE
                                        TO  SYS-1001-DATACREATEFLG
+      *##          感染症対応（ver4.4.0パッチ対応のため流用）
+      *##          MOVE    SPA-GMN-DATATEISYUTU
+      *##                              TO  SYS-1001-DATATEISYUTUKBN
                    MOVE    SPA-GMN-DATATEISYUTU
-                                       TO  SYS-1001-DATATEISYUTUKBN
+                                       TO  SYS-1001-TBL(459:1)
                    MOVE    SPA-GMN-JIHIPOSITION
                                        TO  SYS-1001-JIHIPOSITION
                    MOVE    SYS-1001-REC    TO  SYSKANRI-REC

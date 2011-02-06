@@ -117,7 +117,8 @@
            MOVE    ZERO                TO  INFCHK-RC
       *
       *    ジョブ管理チェック（データ収集）
-           IF      SPA-DATACREATEFLG   NOT =   1
+      *##  IF      SPA-DATACREATEFLG   NOT =   1
+           IF      SPA-DATATEISYUTUKBN NOT =   1
                MOVE    10                  TO  INFCHK-RC
            END-IF
       *
@@ -137,9 +138,9 @@
                PERFORM 100-JOBEXEC-CHK-SEC
            END-IF
       *
-           IF      INFCHK-RC           =   ZERO
-               PERFORM 200-AGREEMENT-CHK-SEC
-           END-IF
+      **   IF      INFCHK-RC           =   ZERO
+      **       PERFORM 200-AGREEMENT-CHK-SEC
+      **   END-IF
            .
       *
        000-PROC-EXT.
