@@ -311,6 +311,7 @@
       *  04.05.22    NACL-Æ£¸¶    10/11/16  ¡Ö¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«¡×ÂÐ±þ
       *                                     ¼¯»ùÅç¸©
       *                                     £²£°£±£°Ç¯£±£°·î¡Á£²£°£±£±Ç¯£³·îÂÐ¾Ý 
+      *  04.05.23    NACL-Æ£¸¶    11/02/03  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4763,10 +4764,15 @@
                                            NOT =   "1"        )
                            CONTINUE
                        ELSE
-                           MOVE    WRK-RECE65-SRYSURYO (1)
-                                               TO  WRK-SURYO
-                           MOVE    WRK-SURYO   TO  WRK-NUM
-                           MOVE    8           TO  WRK-NAGASA
+                           IF      WRK-RECE65-TENSIKIBETU (1)
+                                                   =   "4"
+                               CONTINUE
+                           ELSE
+                               MOVE    WRK-RECE65-SRYSURYO (1)
+                                                   TO  WRK-SURYO
+                               MOVE    WRK-SURYO   TO  WRK-NUM
+                               MOVE    8           TO  WRK-NAGASA
+                           END-IF
                        END-IF
                    END-IF
                    PERFORM 5005-NUM-HENSYU-SEC  
@@ -5363,10 +5369,16 @@
                                                    NOT =   "1"        )
                                    CONTINUE
                                ELSE
-                                   MOVE    TBL-KOUI-SRYSURYO (IDX)
-                                                       TO  WRK-SURYO
-                                   MOVE    WRK-SURYO   TO  WRK-NUM
-                                   MOVE    8           TO  WRK-NAGASA
+                                   IF      TBL-KOUI-TENSIKIBETU (IDX)
+                                                           =   "4"
+                                       CONTINUE
+                                   ELSE
+                                       MOVE    TBL-KOUI-SRYSURYO (IDX)
+                                                           TO  WRK-SURYO
+                                       MOVE    WRK-SURYO   TO  WRK-NUM
+                                       MOVE    8           TO
+                                                           WRK-NAGASA
+                                   END-IF
                                END-IF
                            END-IF
                        END-IF    
