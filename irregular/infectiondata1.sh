@@ -153,7 +153,7 @@ done
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${JOBID}${SHELLID},${HOSPNUM} 2>&1 | tee -a $LOGFILE
 
 echo "感染症データ送信処理 起動" 2>&1 | tee -a $LOGFILE
-$DASUPLOAD ${HOSPNUM} ${HOSPID} &
+$DASUPLOAD ${HOSPNUM} ${HOSPID} 1 &
 
 rm -f $INFECREC
 echo $ENDYMD > $INFECREC
