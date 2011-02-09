@@ -609,21 +609,22 @@
            MOVE    ZERO            TO  FLG-SYSKANRI
            MOVE    SPACE           TO  SYS-1005-REC
            MOVE    "1005"          TO  SYS-1005-KANRICD
-           INITIALIZE                  ORCSADDSIGNAREA
-           MOVE    WKPTBYO-SRYKA   TO  SADDSIGN-STR
-           CALL    "ORCSADDSIGN"       USING
-                                       ORCSADDSIGNAREA
-           MOVE    SADDSIGN-STR    TO  SYS-1005-KBNCD
+           MOVE    WKPTBYO-SRYKA   TO  SYS-1005-KBNCD
+      *     INITIALIZE                  ORCSADDSIGNAREA
+      *     MOVE    WKPTBYO-SRYKA   TO  SADDSIGN-STR
+      *     CALL    "ORCSADDSIGN"       USING
+      *                                 ORCSADDSIGNAREA
+      *     MOVE    SADDSIGN-STR    TO  SYS-1005-KBNCD
            MOVE    WRK-SYSYMD      TO  SYS-1005-STYUKYMD
                                        SYS-1005-EDYUKYMD
            MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
            MOVE    SYS-1005-REC    TO  MCPDATA-REC
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC          =   ZERO
                MOVE    "tbl_syskanri"  TO  MCP-TABLE
-               MOVE    "key"           TO  MCP-PATHNAME
+               MOVE    "key10"         TO  MCP-PATHNAME
       *        システム管理情報読み込み
                PERFORM 900-SYSTEM-NEXT-SEC
            ELSE
@@ -635,7 +636,7 @@
            END-IF
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
            .
        120-CP1005-KENSAKU-EXT.
@@ -994,8 +995,15 @@
                GO  TO  2410-SRYKA-SET-EXT
            END-IF
       *
-           MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
+           IF      WRK-MO-CNT      =   1
+                MOVE    0          TO  WKPTBYO-SRYKA(1:1)
+                MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
+                                   TO  WKPTBYO-SRYKA(2:1)
+           ELSE
+                MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                                    TO  WKPTBYO-SRYKA
+           END-IF
+      *
       *    診療科チェック
            PERFORM 120-CP1005-KENSAKU-SEC
            IF      FLG-SYSKANRI    =   1
