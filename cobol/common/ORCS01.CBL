@@ -3049,6 +3049,10 @@
                                LNK-SYU-TGMONEY-TAX(IDX9) + WK-JIHIGAKU2
                                                          + WK-JIHIGAKU3
                        MOVE    ZERO    TO      LNK-SYU-HKNTEN(IDX9)
+                       ADD     WK-JIHIGAKU2
+                                       TO      LNK-SYU-JYO-COMPFTN
+                       ADD     WK-JIHIGAKU3
+                                       TO      LNK-SYU-JYO-COMPFTN
                     ELSE
                        COMPUTE WK-SKYMONEY-ZEI = WK-SKYMONEY-ZEI
                                                + WK-JIHIGAKU3
@@ -3064,6 +3068,8 @@
                     COMPUTE LNK-SYU-TGMONEY(IDX9) =
                             LNK-SYU-TGMONEY(IDX9) +  WK-JIHIGAKU2
                     MOVE    ZERO    TO      LNK-SYU-HKNTEN(IDX9)
+                    ADD     WK-JIHIGAKU2
+                                    TO      LNK-SYU-JYO-COMPFTN
                  END-IF
                END-PERFORM
              END-IF
