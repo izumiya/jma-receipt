@@ -2660,6 +2660,20 @@
                MOVE   "2"    TO   WK-1001-JIHIPOSITION
            END-IF
       *
+           IF   (COMB-HKNNUM            NOT =   SPACE   )
+           AND  (COMB-SYU-HKNKOHSBTKBN      =   "8"     )
+           AND  (LNK-SYU-SRYYMD(1:6)       >=   "200904")
+               PERFORM   VARYING   IDX9    FROM    1   BY  1
+                          UNTIL    IDX9       >   17
+                  MOVE  LNK-SYU-HKNTEN(IDX9)  TO  LNK-SYU-MONEY (IDX9)
+               END-PERFORM
+           ELSE
+               PERFORM   VARYING   IDX9    FROM    1   BY  1
+                          UNTIL    IDX9       >   17
+                  MOVE  ZERO                  TO  LNK-SYU-MONEY (IDX9)
+               END-PERFORM
+           END-IF
+      *
            IF  ((COMB-HKNNUM            NOT =   SPACE   ) AND
                 (COMB-SYU-HKNKOHSBTKBN      =   "8"     ) AND
                 (WK-1001-JIHIPOSITION       =   "2"     ) AND
@@ -2754,6 +2768,10 @@
                                LNK-SYU-TGMONEY-TAX(IDX9) + WK-JIHIGAKU2
                                                          + WK-JIHIGAKU3
                        MOVE    ZERO    TO      LNK-SYU-HKNTEN(IDX9)
+                       ADD     WK-JIHIGAKU2
+                                       TO      LNK-SYU-JYO-COMPFTN
+                       ADD     WK-JIHIGAKU3
+                                       TO      LNK-SYU-JYO-COMPFTN
                     ELSE
                        COMPUTE WK-SKYMONEY-ZEI = WK-SKYMONEY-ZEI
                                                + WK-JIHIGAKU3
@@ -2769,6 +2787,8 @@
                     COMPUTE LNK-SYU-TGMONEY(IDX9) =
                             LNK-SYU-TGMONEY(IDX9) +  WK-JIHIGAKU2
                     MOVE    ZERO    TO      LNK-SYU-HKNTEN(IDX9)
+                    ADD     WK-JIHIGAKU2
+                                    TO      LNK-SYU-JYO-COMPFTN
                  END-IF
                END-PERFORM
              END-IF
