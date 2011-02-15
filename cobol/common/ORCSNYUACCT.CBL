@@ -981,7 +981,7 @@
            .
        200111-ZEN-MATU-EXT.
            EXIT.
-     *
+      *
       *****************************************************************
       *    Æþ±¡ÎÁ²Ã»»ºîÀ®½èÍý
       *****************************************************************
@@ -1059,6 +1059,10 @@
                    END-IF
                END-IF
       *
+               IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190134270"
+                  MOVE  "3"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
+               END-IF
+      *
                IF      LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
                                            =   "3"
       *            Æþ±¡½èÍý»þ¤Î¤ß¹Ô¤¦
@@ -1075,8 +1079,15 @@
                          ELSE
                            MOVE    ZERO          TO  WRK-ZOGEN
                          END-IF
+                       ELSE
+                         MOVE     14    TO   WRK-ZOGEN
+                         MOVE     ZERO  TO   FLG-SYORI
                        END-IF
                    END-IF
+               END-IF
+      *
+               IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190135670"
+                  MOVE  "4"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
                END-IF
       *
                IF      LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
@@ -1095,6 +1106,9 @@
                          ELSE
                            MOVE    ZERO          TO  WRK-ZOGEN
                          END-IF
+                       ELSE
+                         MOVE     14    TO   WRK-ZOGEN
+                         MOVE     ZERO  TO   FLG-SYORI
                        END-IF
                    END-IF
                END-IF
@@ -1139,7 +1153,7 @@
            .
        210-NYUKHNKSN-SYORI-EXT.
            EXIT.
-     *
+      *
       *****************************************************************
       *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÉÂ±¡¡Ë¤Î»»ÄêºÑÆü¿ô¼èÆÀ
       *****************************************************************
@@ -1194,12 +1208,12 @@
            MOVE    "key42"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
-                       WRK-KYUKYU-NISSU
+      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
+      **                  WRK-KYUKYU-NISSU
            .
        210-KYUKYU-KSN1-EXT.
            EXIT.
-     *
+      *
       *****************************************************************
       *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡Ê¿ÇÎÅ½ê¡Ë¤Î»»ÄêºÑÆü¿ô¼èÆÀ
       *****************************************************************
@@ -1254,8 +1268,8 @@
            MOVE    "key42"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
-                       WRK-KYUKYU-NISSU
+      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
+      **                 WRK-KYUKYU-NISSU
            .
        210-KYUKYU-KSN2-EXT.
            EXIT.
