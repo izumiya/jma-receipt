@@ -996,7 +996,7 @@
            END-IF
       *
            IF      WRK-MO-CNT      =   1
-                MOVE    0          TO  WKPTBYO-SRYKA(1:1)
+                MOVE    "0"        TO  WKPTBYO-SRYKA(1:1)
                 MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                                    TO  WKPTBYO-SRYKA(2:1)
            ELSE
