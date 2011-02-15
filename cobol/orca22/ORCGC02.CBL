@@ -250,6 +250,7 @@
       *  04.05.06    NACL-藤原    09/07/22  照会画面からの遷移対応
       *                                     渡された病名を表示
       *  04.05.07    NACL-藤原    09/11/11  病名の入力順対応を中止
+      *  04.05.08    NACL-藤原    11/02/15  誕生日と診療開始日のチェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4318,6 +4319,12 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                    MOVE    "0015"          TO  SPA-ERRCD
                END-IF
            END-IF    
+      *         
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-NAI-C02-SRYYMD  <   SPA-NAI-C02-BIRTHDAY
+                   MOVE    "0096"      TO  SPA-ERRCD
+               END-IF
+           END-IF
       *         
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-GMN-C02-HKNCOMBI    =   SPACE
@@ -9886,6 +9893,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                                                TO  SPA-ERRMSG
                WHEN    "0090"
                    MOVE    "簡単修正処理中です"    TO  SPA-ERRMSG   
+               WHEN    "0096"
+                   MOVE    "誕生日前の開始日は入力できません"
+                                               TO  SPA-ERRMSG
                WHEN    "0103"
                    MOVE    "病名コードでの組み立てができませんでした。"
                                        TO  SPA-ERRMSG

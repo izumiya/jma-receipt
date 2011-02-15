@@ -61,6 +61,8 @@
       *  04.03.01    NACL-藤原    08/06/11  慢性と急性のチェック
       *
       *  04.04.01    NACL-藤原    09/05/08  病名複写時のチェックの修正
+      *
+      *  04.05.01    NACL-藤原    11/02/15  誕生日と診療開始日のチェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -882,6 +884,16 @@
                    MOVE    SGDAY-SDAY          TO  SPA-NAI-C10-SRYYMD
                ELSE
                    MOVE    "0017"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-NAI-C10-SRYYMD  =   SPACE
+                   CONTINUE
+               ELSE
+                   IF      SPA-NAI-C10-SRYYMD  <   SPA-NAI-C02-BIRTHDAY
+                       MOVE    "0096"      TO  SPA-ERRCD
+                   END-IF
                END-IF
            END-IF
       *
@@ -2786,6 +2798,9 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                                                DELIMITED   BY  SIZE 
                                                INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "0096"
+                   MOVE    "誕生日前の開始日は入力できません"
+                                               TO  SPA-ERRMSG
                WHEN    "0104"
                    STRING
                        "この病名は「急性」と「慢性」が混在して"
