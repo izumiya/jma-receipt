@@ -106,6 +106,7 @@
       *                                     £²£°£±£°Ç¯£±£°·î¡Á£²£°£±£±Ç¯£³·îÂÐ¾Ý 
       *  04.05.11    NACL-Æ£¸¶    10/09/14  °åÎÅ´Ñ»¡Ë¡ÂÐ±þ
       *                                     ¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
+      *  04.05.12    NACL-ÌçÏÆ    11/02/17  ºÒ³²ÂÐ±þ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£±·î¡Á¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2805,60 +2806,12 @@
            END-IF     
       *
            IF      CNT-PAGE            =   1
-      *        µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ
-               IF    ( RECE02-PREFNUM      =   "03"    OR  "04" )
-               AND   ( RECE02-SRYYM        >=  200806           )
-                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                       WHEN    1
-                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                       WHEN    2
-                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                   END-EVALUATE
-               END-IF
-      *        Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
-               IF    ( RECE02-PREFNUM      =   "35"    OR  "40" )
-               AND   ( RECE02-SRYYM        >=  200907           )
-               AND   ( RECE02-SRYYM        <=  200912           )
-                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                       WHEN    1
-                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                       WHEN    2
-                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                   END-EVALUATE
-               END-IF
-      *        Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
-               IF    ( RECE02-PREFNUM      =   "28"    OR  "33" )
-               AND   ( RECE02-SRYYM        >=  200908           )
-               AND   ( RECE02-SRYYM        <=  201001           )
-                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                       WHEN    1
-                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                       WHEN    2
-                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                   END-EVALUATE
-               END-IF
-      *        Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
-               IF    ( RECE02-PREFNUM      =   "34"    OR  "35" )
-               AND   ( RECE02-SRYYM        >=  201007           )
-               AND   ( RECE02-SRYYM        <=  201012           )
-                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                       WHEN    1
-                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                       WHEN    2
-                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                   END-EVALUATE
-               END-IF
-      *        ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«ÂÐ±þ
-               IF    ( RECE02-PREFNUM      =   "46"   )
-               AND   ( RECE02-SRYYM        >=  201010 )
-               AND   ( RECE02-SRYYM        <=  201103 )
-                   EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                       WHEN    1
-                           MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                       WHEN    2
-                           MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
-                   END-EVALUATE
-               END-IF
+               EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                   WHEN    1
+                       MOVE    "¡ÊÉÔ¾Ü¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+                   WHEN    2
+                       MOVE    "¡ÊºÒ£±¡Ë"  TO  HC06-HEAD4 (2)(1:8)
+               END-EVALUATE
            END-IF
       *
            .

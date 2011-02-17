@@ -141,6 +141,7 @@
       *                                     ¼¯»ùÅç¸©
       *                                     £²£°£±£°Ç¯£±£°·î¡Á£²£°£±£±Ç¯£³·îÂÐ¾Ý 
       *  04.05.08    NACL-Æ£¸¶    10/12/01  ¥¯¥é¥¤¥¢¥ó¥ÈÊÝÂ¸ºï½ü½èÍý¤Î½¤Àµ
+      *  04.05.09    NACL-ÌçÏÆ    11/02/17  ºÒ³²ÂÐ±þ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£±·î¡Á¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2988,48 +2989,25 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                        PERFORM 45013-SOKATU-SYORI-SEC
       *
       *                ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
-                       IF    ( SPA-PREFNUM       =   "15"   )
-                       AND   ( SPA-NAI-SKYYM     >=  200709 )
-                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
-                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
-                           PERFORM 45013-SOKATU-SYORI-SEC
-                       END-IF
-      *
       *                µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ 
-                       IF    ( SPA-PREFNUM       =   "03"    OR  "04" )
-                       AND   ( SPA-NAI-SKYYM     >=  200806           )
-                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
-                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
-                           PERFORM 45013-SOKATU-SYORI-SEC
-                       END-IF
-      *
       *                Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
-                       IF    ( SPA-PREFNUM       =   "35"    OR  "40" )
-                       AND   ( SPA-NAI-SKYYM     >=  200907           )
-                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
-                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
-                           PERFORM 45013-SOKATU-SYORI-SEC
-                       END-IF
-      *
       *                Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
-                       IF    ( SPA-PREFNUM       =   "28"    OR  "33" )
-                       AND   ( SPA-NAI-SKYYM     >=  200908           )
-                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
-                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
-                           PERFORM 45013-SOKATU-SYORI-SEC
-                       END-IF
-      *
       *                Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
-                       IF    ( SPA-PREFNUM       =   "34"   )
-                       AND   ( SPA-NAI-SKYYM     >=  201007 )
-                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
-                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
-                           PERFORM 45013-SOKATU-SYORI-SEC
-                       END-IF
-      *
       *                ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«ÂÐ±þ
-                       IF    ( SPA-PREFNUM       =   "46"   )
-                       AND   ( SPA-NAI-SKYYM     >=  201010 )
+      *
+                       IF  (( SPA-PREFNUM     =   "15"            ) AND
+                            ( SPA-NAI-SKYYM  >=  200709           ))
+                       OR  (( SPA-PREFNUM     =   "03"   OR  "04" ) AND
+                            ( SPA-NAI-SKYYM  >=  200806           ))
+                       OR  (( SPA-PREFNUM     =   "35"   OR  "40" ) AND
+                            ( SPA-NAI-SKYYM  >=  200907           ))
+                       OR  (( SPA-PREFNUM     =   "28"   OR  "33" ) AND
+                            ( SPA-NAI-SKYYM  >=  200908           ))
+                       OR  (( SPA-PREFNUM     =   "34"            ) AND
+                            ( SPA-NAI-SKYYM  >=  201007           ))
+                       OR  (( SPA-PREFNUM     =   "46"            ) AND
+                            ( SPA-NAI-SKYYM  >=  201010           ))
+                       OR  (  SPA-NAI-SKYYM  >=  201101            )
                            MOVE    "1"             TO  WRK-SHELL-RECEKBN
                            MOVE    "2"             TO  WRK-SHELL-SYOKBN
                            PERFORM 45013-SOKATU-SYORI-SEC
