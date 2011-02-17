@@ -3193,7 +3193,7 @@
       <name>scrolledwindow1</name>
       <x>806</x>
       <y>116</y>
-      <width>214</width>
+      <width>216</width>
       <height>492</height>
       <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
       <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
@@ -3224,7 +3224,7 @@
 	  <last_modification_time>Fri, 31 Aug 2001 02:23:14 GMT</last_modification_time>
 	</signal>
 	<columns>4</columns>
-	<column_widths>32,83,13,27</column_widths>
+	<column_widths>32,83,14,30</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
