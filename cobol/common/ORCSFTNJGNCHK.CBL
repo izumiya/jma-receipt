@@ -1065,7 +1065,13 @@
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN-H
                          ADD SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN9-H
-                         ADD SYU-KOH-COMPFTN(1)        TO WRK-KOHFTN9-X
+                         IF  SYU-KOH-HKNNUM(1) = "015" OR "016" OR "021"
+                                              OR "024" OR "038" OR "051"
+                                              OR "052" OR "079"
+                           ADD SYU-KOH-HKNFTNMONEY(1)  TO WRK-KOHFTN9-X
+                         ELSE
+                           ADD SYU-KOH-COMPFTN(1)      TO WRK-KOHFTN9-X
+                         END-IF
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(2)        =  "2"
