@@ -729,3 +729,30 @@ path	key44	{
 		;
 	};
 };
+
+path	key45	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key45_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   DLTFLG      =   ' '
+			ORDER BY SYUBYOFLG DESC,SRYYMD,RENNUM
+		;
+	};
+};
+
+path	key46	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key46_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   DLTFLG      =   ' '
+			ORDER  BY  PTID,SYUBYOFLG DESC,SRYYMD,RENNUM,SRYKA
+		;
+	};
+};
