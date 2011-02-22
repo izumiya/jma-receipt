@@ -1814,6 +1814,10 @@
                                        SPA-SCR-REC
       *    展開後の位置
            MOVE    ORCSCSETHEN-IDX     TO  SPA-GMN-IDX
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    SPA-ERRCD               TO  WRK-ERRCD
+               MOVE    SPACE                   TO  SPA-ERRCD
+           END-IF
       *
            .
        10028-INPUTSET-SYORI-EXT.
