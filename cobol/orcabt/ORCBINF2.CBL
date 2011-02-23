@@ -476,10 +476,11 @@
                        IF      FLG-SRYACCT-READ    =   ZERO
                            PERFORM 900-SRYACCT-READ-SEC
                            MOVE    1               TO  FLG-SRYACCT-READ
-                       IF      FLG-SRYACCT         =   ZERO
-                           MOVE    ACCT-ZAIKAISU       TO  WRK-ZAIKAISU
-                       ELSE
-                           MOVE    ZERO                TO  WRK-ZAIKAISU
+                           IF      FLG-SRYACCT         =   ZERO
+                               MOVE    ACCT-ZAIKAISU   TO  WRK-ZAIKAISU
+                           ELSE
+                               MOVE    ZERO            TO  WRK-ZAIKAISU
+                           END-IF
                        END-IF
                        MOVE    2                   TO  WRK-RECKBN
                        PERFORM 2003-OUT-SYORI-SEC

@@ -6260,7 +6260,7 @@
            MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
            MOVE    SPA-SYORIFLG        TO  SHELLTBL-ARG4
            IF      FLG-INFEC-DLT       =   1
-               MOVE    2                   TO  SHELLTBL-ARG4
+               MOVE    "2"                 TO  SHELLTBL-ARG4
            END-IF
            MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG5
            MOVE    SPA-PTID            TO  WRK-PTID
