@@ -1077,6 +1077,9 @@
       *            入院処理時のみ行う
                    IF      LNK-SCNYUACCT-SYORI-KBN     =   "1"
                        MOVE    14                  TO  WRK-ZOGEN
+      *暫定対処
+                       MOVE    ZERO                TO  FLG-SYORI
+      *
                    ELSE
       *                救急・在宅等支援療養病床初期加算（病院）の算定済
       *                日数取得
@@ -1104,6 +1107,9 @@
       *            入院処理時のみ行う
                    IF      LNK-SCNYUACCT-SYORI-KBN     =   "1"
                        MOVE    14                  TO  WRK-ZOGEN
+      *暫定対処
+                       MOVE    ZERO                TO  FLG-SYORI
+      *
                    ELSE
       *                救急・在宅等支援療養病床初期加算（診療所）の算定済
       *                日数取得
