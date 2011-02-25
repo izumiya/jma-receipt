@@ -180,6 +180,7 @@
       *                                     とする 
       *  04.05.03    NACL-藤原    10/09/14  医療観察法対応
       *                                     公費単独のレセプトとする
+      *  04.05.04    NACL-門脇    11/02/18  出産一時金対応期間修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3291,7 +3292,6 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
       *
                IF   (FLG-BUNBEN-SET  =   ZERO   )
                AND  (RECE62-SRYYM   >=  "200910")
-               AND  (RECE62-SRYYM   <=  "201103")
                  IF ( RECE62-HKNNUM(1:2)   =  "98"  OR "90"
                                                     OR "91"  )
                  OR ( RECE62-HKNNUM        =  "039" OR "040" )

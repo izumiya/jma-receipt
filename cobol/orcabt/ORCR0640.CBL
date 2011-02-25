@@ -485,6 +485,7 @@
       *                                     集計対応（レセ電負担区分対応）
       *  04.05.15    NACL-門脇    11/02/17  災害対応修正（平成２３年１月〜）
       *  04.05.16    NACL-門脇    11/02/18  ７０歳代前半の特例措置延長対応
+      *  04.05.17    NACL-門脇    11/02/18  出産一時金対応期間修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2944,8 +2945,7 @@
                                     "22" OR "23" OR "24"     ) AND
                    ( RECE62-SRYYM   <  "200905"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "25"     ) AND
-                   ((RECE62-SRYYM   <  "200910") OR
-                    (RECE62-SRYYM   >  "201103")             ))
+                   ( RECE62-SRYYM   <  "200910"              ))
                  CONTINUE
                ELSE
                  ADD    1     TO    TOKKI-IDX2
@@ -5830,10 +5830,7 @@
                    GO  TO  21013-TOKKI-HENSYU-EXT
                END-IF
              WHEN      "25"
-               IF  (RECE62-SRYYM   >=  "200910")
-               AND (RECE62-SRYYM   <=  "201103")
-                   CONTINUE
-               ELSE
+               IF  (RECE62-SRYYM   <   "200910")
                    GO  TO  21013-TOKKI-HENSYU-EXT
                END-IF
            END-EVALUATE
