@@ -2,7 +2,6 @@ db_group {
  type "PostgreSQL";
  port "";
  name "orca";
- name "r45";
  redirect "log";
 };
 db_group "log" {
@@ -23,7 +22,7 @@ db_group "system" {
 db_group    "blob_body" {
  type    "NativeBLOB";
 };
-db_group "xml" {
- type    "XMLIO";
-};
+#db_group "xml" {
+# type    "XMLIO";
+#};
 
