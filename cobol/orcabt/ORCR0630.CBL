@@ -96,6 +96,7 @@
       *                                     集計対応
       *  04.05.03    NACL-門脇    10/09/06  地方公費の全国公費併用分請求点
       *                                     集計対応（レセ電負担区分対応）
+      *  04.05.04    NACL-門脇    11/02/25  保険別請求チェック表の本体取込み
       *****************************************************************
       *
       *
@@ -211,6 +212,11 @@
            03  TBL-JNISSU-HKN-GEN   OCCURS   5.
                05  TBL-JNISSU-DAY-GEN                  PIC X(01)
                                                        OCCURS   31.
+      *
+      *    実日数減カウント用領域（まとめ）
+       01  TBL-JNISSU-MATOME.
+           03  TBL-JNISSU-HKN-MATOME                   OCCURS   31.
+               05  TBL-JNISSU-DAY-M                    PIC X(01).
       *
       *    未実施減算退避用フラグテーブル
        01  TBL-GENSAN.
@@ -883,6 +889,9 @@
                MOVE    WRK-PARA-HOSPNUM    TO   RECE62PARA-HOSPNUM
       *
                PERFORM 2001-HENSYU-SEC
+               IF      WRK-PARA-SHELLID    =   "RECEPTX"
+                   MOVE    1           TO  FLG-END
+               END-IF
            END-PERFORM 
       *
            MOVE    1                   TO  FLG-END
@@ -936,6 +945,8 @@
            INITIALIZE                          TBL-JNISSU2
            MOVE       SPACE             TO     TBL-JNISSU-GEN
            INITIALIZE                          TBL-JNISSU-GEN
+           MOVE       SPACE             TO     TBL-JNISSU-MATOME
+           INITIALIZE                          TBL-JNISSU-MATOME
       *
            MOVE       SPACE             TO     TBL-TOTALTEN
            INITIALIZE                          TBL-TOTALTEN
@@ -3674,6 +3685,16 @@
            END-PERFORM
       *
            PERFORM    VARYING    IDX    FROM   1   BY   1
+                       UNTIL     IDX    >      5
+             PERFORM    VARYING    IDY    FROM    1   BY   1
+                         UNTIL     IDY    >      31
+                IF   TBL-JNISSU-DAY(IDX IDY)      NOT =  SPACE
+                    MOVE   "1"   TO  TBL-JNISSU-DAY-M(IDY)
+                END-IF
+             END-PERFORM
+           END-PERFORM
+      *
+           PERFORM    VARYING    IDX    FROM   1   BY   1
                       UNTIL      IDX    >      5
                PERFORM    VARYING    IDY    FROM    1   BY   1
                           UNTIL      IDY    >     31
@@ -3691,6 +3712,13 @@
                           ADD    1      TO    TBL-JNISSU2-MON(IDX)
                     END-IF
                END-PERFORM
+           END-PERFORM
+      *
+           PERFORM    VARYING    IDY    FROM    1   BY   1
+                      UNTIL      IDY    >     31
+                    IF    TBL-JNISSU-DAY-M(IDY) NOT =  SPACE
+                          ADD    1      TO    RECE62-SKYIRYO-NISSU
+                    END-IF
            END-PERFORM
       *
            PERFORM    VARYING    IDX    FROM   1   BY   1

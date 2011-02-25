@@ -107,6 +107,7 @@
       *  04.05.11    NACL-Æ£¸¶    10/09/14  °åÎÅ´Ñ»¡Ë¡ÂÐ±þ
       *                                     ¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
       *  04.05.12    NACL-ÌçÏÆ    11/02/17  ºÒ³²ÂÐ±þ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£±·î¡Á¡Ë
+      *  04.05.13    NACL-ÌçÏÆ    11/02/25  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8224,6 +8225,14 @@
       *
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
+      *
+           IF      RECE02-SRYYM    >=   "201004"
+             MOVE    RECE02-SKYIRYO-INF    TO  RECE10-SKYIRYO-INF
+             PERFORM  VARYING  IDX  FROM  1  BY  1
+                       UNTIL   IDX   >   10
+               MOVE  RECE02-HKNCOMBI(IDX)  TO  RECE10-HKNCOMBI(IDX)
+             END-PERFORM
+           END-IF
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE

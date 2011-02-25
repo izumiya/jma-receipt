@@ -18,11 +18,14 @@
       ************************************************************
       *    請求管理(新）       COPY (CPSKYMAIN.INC)              *
       ************************************************************
-      ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    09/11/13  特記事項照会対応
       *                                     特記事項略称追加
+      *
+      *  04.05.02    NACL-藤原    10/11/30  統計帳票用の項目追加
+      *                                     請求額情報（医療費、食事）
+      *                                     保険組合せ情報
       ************************************************************
        01  SKYMAIN-REC.
       *ＫＥＹ
@@ -134,6 +137,37 @@
            03  SKYMAIN-YKZFTNINF.
       *薬剤一部負担金
                05  SKYMAIN-YKZFTN          PIC  9(05).
+      *
+      *請求額情報（医療費）
+           03  SKYMAIN-SKYIRYO-INF.
+      *実日数
+               05  SKYMAIN-SKYIRYO-NISSU   PIC 9(02).
+      *請求点
+               05  SKYMAIN-SKYIRYO-TOTALTEN
+                                           PIC 9(08).
+      *患者負担
+               05  SKYMAIN-SKYIRYO-ICHIBUFTN
+                                           PIC 9(09).
+      *保険者負担
+               05  SKYMAIN-SKYIRYO-HOKENJA PIC 9(09).
+      *公費負担
+               05  SKYMAIN-SKYIRYO-KOHFTN  PIC 9(09).
+      *
+      *請求額情報（食事）
+           03  SKYMAIN-SKYSKJ-INF.
+      *回数
+               05  SKYMAIN-SKYSKJ-KAISU     PIC 9(02).
+      *請求円
+               05  SKYMAIN-SKYSKJ-RYOYOHI   PIC 9(09).
+      *患者負担
+               05  SKYMAIN-SKYSKJ-ICHIBUFTN PIC 9(09).
+      *保険者負担
+               05  SKYMAIN-SKYSKJ-HOKENJA   PIC 9(09).
+      *公費負担
+               05  SKYMAIN-SKYSKJ-KOHFTN    PIC 9(09).
+      *保険組合せ情報
+           03  SKYMAIN-HKNCOMBI-INF.
+               05  SKYMAIN-HKNCOMBI         PIC 9(04)   OCCURS 10.
       *
       *特記事項
            03  SKYMAIN-TOKKIINF.

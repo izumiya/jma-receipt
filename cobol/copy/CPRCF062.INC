@@ -106,6 +106,8 @@
       *                                     公費分離区分編集用）追加
       *  04.05.02    NACL-門脇    10/02/08  全国公費併用分請求点集計追加
       *                                     福祉編集フラグにインデックス追加
+      *
+      *  04.05.02    NACL-門脇    10/12/13  請求額情報の追加
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -720,6 +722,35 @@
                    07  RECE62-PTTOKKI-NAIYO
                                           PIC  X(12).
                    07  RECE62-PTTOKKI-CD  PIC  X(02).
+      *
+      *請求額情報（計算用）
+           03  RECE62-FTNMONEY-SKY             PIC 9(09).
+      *
+      *請求額情報（医療費）
+           03  RECE62-SKYIRYO-INF.
+      *実日数
+               05  RECE62-SKYIRYO-NISSU        PIC 9(02).
+      *請求点
+               05  RECE62-SKYIRYO-TOTALTEN     PIC 9(08).
+      *患者負担
+               05  RECE62-SKYIRYO-ICHIBUFTN    PIC 9(09).
+      *保険者負担
+               05  RECE62-SKYIRYO-HOKENJA      PIC 9(09).
+      *公費負担
+               05  RECE62-SKYIRYO-KOHFTN       PIC 9(09).
+      *
+      *請求額情報（食事）
+           03  RECE62-SKYSKJ-INF.
+      *回数
+               05  RECE62-SKYSKJ-KAISU         PIC 9(02).
+      *請求円
+               05  RECE62-SKYSKJ-RYOYOHI       PIC 9(09).
+      *患者負担
+               05  RECE62-SKYSKJ-ICHIBUFTN     PIC 9(09).
+      *保険者負担
+               05  RECE62-SKYSKJ-HOKENJA       PIC 9(09).
+      *公費負担
+               05  RECE62-SKYSKJ-KOHFTN        PIC 9(09).
       *
       *予備
            03  RECE62-YOBIETC-AREA.

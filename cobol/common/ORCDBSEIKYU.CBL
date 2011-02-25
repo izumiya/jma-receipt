@@ -29,6 +29,10 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       *  04.05.01    NACL-Æ£¸¶    09/11/13  ÆÃµ­»ö¹à¾È²ñÂÐ±þ
       *                                     ÆÃµ­»ö¹àÎ¬¾ÎÄÉ²Ã
+      *
+      *  04.05.02    NACL-Æ£¸¶    10/11/30  Åý·×Ä¢É¼ÍÑ¤Î¹àÌÜÄÉ²Ã
+      *                                     ÀÁµá³Û¾ðÊó¡Ê°åÎÅÈñ¡¢¿©»ö¡Ë
+      *                                     ÊÝ¸±ÁÈ¹ç¤»¾ðÊó
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -223,6 +227,27 @@
            MOVE    RECE10-SHOKUJIFTN(1)    TO  SKYMAIN-SHOKUJIFTN
            MOVE    RECE10-SHOKUJIFTNKBN    TO  SKYMAIN-SHOKUJIFTNKBN
            MOVE    RECE10-YKZFTN(1)        TO  SKYMAIN-YKZFTN
+           MOVE    RECE10-SKYIRYO-NISSU    TO  SKYMAIN-SKYIRYO-NISSU
+           MOVE    RECE10-SKYIRYO-TOTALTEN TO  SKYMAIN-SKYIRYO-TOTALTEN
+           MOVE    RECE10-SKYIRYO-ICHIBUFTN
+                                           TO  SKYMAIN-SKYIRYO-ICHIBUFTN
+           MOVE    RECE10-SKYIRYO-HOKENJA  TO  SKYMAIN-SKYIRYO-HOKENJA
+           MOVE    RECE10-SKYIRYO-KOHFTN   TO  SKYMAIN-SKYIRYO-KOHFTN
+           MOVE    RECE10-SKYSKJ-KAISU     TO  SKYMAIN-SKYSKJ-KAISU
+           MOVE    RECE10-SKYSKJ-RYOYOHI   TO  SKYMAIN-SKYSKJ-RYOYOHI
+           MOVE    RECE10-SKYSKJ-ICHIBUFTN TO  SKYMAIN-SKYSKJ-ICHIBUFTN
+           MOVE    RECE10-SKYSKJ-HOKENJA   TO  SKYMAIN-SKYSKJ-HOKENJA
+           MOVE    RECE10-SKYSKJ-KOHFTN    TO  SKYMAIN-SKYSKJ-KOHFTN
+           MOVE    RECE10-HKNCOMBI (1)     TO  SKYMAIN-HKNCOMBI (1)
+           MOVE    RECE10-HKNCOMBI (2)     TO  SKYMAIN-HKNCOMBI (2)
+           MOVE    RECE10-HKNCOMBI (3)     TO  SKYMAIN-HKNCOMBI (3)
+           MOVE    RECE10-HKNCOMBI (4)     TO  SKYMAIN-HKNCOMBI (4)
+           MOVE    RECE10-HKNCOMBI (5)     TO  SKYMAIN-HKNCOMBI (5)
+           MOVE    RECE10-HKNCOMBI (6)     TO  SKYMAIN-HKNCOMBI (6)
+           MOVE    RECE10-HKNCOMBI (7)     TO  SKYMAIN-HKNCOMBI (7)
+           MOVE    RECE10-HKNCOMBI (8)     TO  SKYMAIN-HKNCOMBI (8)
+           MOVE    RECE10-HKNCOMBI (9)     TO  SKYMAIN-HKNCOMBI (9)
+           MOVE    RECE10-HKNCOMBI (10)    TO  SKYMAIN-HKNCOMBI (10)
            MOVE    RECE10-TOKKI (1)        TO  SKYMAIN-TOKKI (1)
            MOVE    RECE10-TOKKI (2)        TO  SKYMAIN-TOKKI (2)
            MOVE    RECE10-TOKKI (3)        TO  SKYMAIN-TOKKI (3)
@@ -320,6 +345,29 @@
            MOVE    SKYMAIN-SHOKUJIFTN      TO  RECE10-SHOKUJIFTN(1)
            MOVE    SKYMAIN-SHOKUJIFTNKBN   TO  RECE10-SHOKUJIFTNKBN
            MOVE    SKYMAIN-YKZFTN          TO  RECE10-YKZFTN(1)
+           MOVE    SKYMAIN-SKYIRYO-NISSU   TO  RECE10-SKYIRYO-NISSU
+           MOVE    SKYMAIN-SKYIRYO-TOTALTEN
+                                           TO  RECE10-SKYIRYO-TOTALTEN
+           MOVE    SKYMAIN-SKYIRYO-ICHIBUFTN
+                                           TO  RECE10-SKYIRYO-ICHIBUFTN
+           MOVE    SKYMAIN-SKYIRYO-HOKENJA TO  RECE10-SKYIRYO-HOKENJA
+           MOVE    SKYMAIN-SKYIRYO-KOHFTN  TO  RECE10-SKYIRYO-KOHFTN
+           MOVE    SKYMAIN-SKYSKJ-KAISU    TO  RECE10-SKYSKJ-KAISU
+           MOVE    SKYMAIN-SKYSKJ-RYOYOHI  TO  RECE10-SKYSKJ-RYOYOHI
+           MOVE    SKYMAIN-SKYSKJ-ICHIBUFTN
+                                           TO  RECE10-SKYSKJ-ICHIBUFTN
+           MOVE    SKYMAIN-SKYSKJ-HOKENJA  TO  RECE10-SKYSKJ-HOKENJA
+           MOVE    SKYMAIN-SKYSKJ-KOHFTN   TO  RECE10-SKYSKJ-KOHFTN
+           MOVE    SKYMAIN-HKNCOMBI (1)    TO  RECE10-HKNCOMBI (1)
+           MOVE    SKYMAIN-HKNCOMBI (2)    TO  RECE10-HKNCOMBI (2)
+           MOVE    SKYMAIN-HKNCOMBI (3)    TO  RECE10-HKNCOMBI (3)
+           MOVE    SKYMAIN-HKNCOMBI (4)    TO  RECE10-HKNCOMBI (4)
+           MOVE    SKYMAIN-HKNCOMBI (5)    TO  RECE10-HKNCOMBI (5)
+           MOVE    SKYMAIN-HKNCOMBI (6)    TO  RECE10-HKNCOMBI (6)
+           MOVE    SKYMAIN-HKNCOMBI (7)    TO  RECE10-HKNCOMBI (7)
+           MOVE    SKYMAIN-HKNCOMBI (8)    TO  RECE10-HKNCOMBI (8)
+           MOVE    SKYMAIN-HKNCOMBI (9)    TO  RECE10-HKNCOMBI (9)
+           MOVE    SKYMAIN-HKNCOMBI (10)   TO  RECE10-HKNCOMBI (10)
            MOVE    SKYMAIN-TOKKI (1)       TO  RECE10-TOKKI (1)
            MOVE    SKYMAIN-TOKKI (2)       TO  RECE10-TOKKI (2)
            MOVE    SKYMAIN-TOKKI (3)       TO  RECE10-TOKKI (3)

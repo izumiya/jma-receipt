@@ -55,6 +55,10 @@
       *
       *  04.05.01    NACL-藤原    09/11/13  特記事項照会対応
       *                                     特記事項略称追加
+      *
+      *  04.05.02    NACL-藤原    10/11/30  統計帳票用の項目追加
+      *                                     請求額情報（医療費、食事）
+      *                                     保険組合せ情報
       ************************************************************
        01  RECE10-REC.
       *ＫＥＹ
@@ -199,42 +203,67 @@
       *標準負担額
                    07  RECE10-ETC-SHOKUJIFTN   PIC  9(09).
       *
+      *請求額情報（医療費）
+           03  RECE10-SKYIRYO-INF.
+      *実日数
+               05  RECE10-SKYIRYO-NISSU    PIC 9(02).
+      *請求点
+               05  RECE10-SKYIRYO-TOTALTEN PIC 9(08).
+      *患者負担
+               05  RECE10-SKYIRYO-ICHIBUFTN
+                                           PIC 9(09).
+      *保険者負担
+               05  RECE10-SKYIRYO-HOKENJA  PIC 9(09).
+      *公費負担
+               05  RECE10-SKYIRYO-KOHFTN   PIC 9(09).
+      *
+      *請求額情報（食事）
+           03  RECE10-SKYSKJ-INF.
+      *回数
+               05  RECE10-SKYSKJ-KAISU     PIC 9(02).
+      *請求円
+               05  RECE10-SKYSKJ-RYOYOHI   PIC 9(09).
+      *患者負担
+               05  RECE10-SKYSKJ-ICHIBUFTN PIC 9(09).
+      *保険者負担
+               05  RECE10-SKYSKJ-HOKENJA   PIC 9(09).
+      *公費負担
+               05  RECE10-SKYSKJ-KOHFTN    PIC 9(09).
+      *保険組合せ情報
+           03  RECE10-HKNCOMBI-INF.
+               05  RECE10-HKNCOMBI         PIC 9(04)   OCCURS 10.
       *特記事項
-               05  RECE10-TOKKIINF.
-                   07  RECE10-TOKKI       PIC  X(02)   OCCURS  5.
-      *
+           03  RECE10-TOKKIINF.
+               05  RECE10-TOKKI            PIC X(02)   OCCURS  5.
       *特記事項略称
-               05  RECE10-TOKKINMINF.
-                   07  RECE10-TOKKINM     PIC  X(12)   OCCURS  5.
-      *
+           03  RECE10-TOKKINMINF.
+               05  RECE10-TOKKINM          PIC X(12)   OCCURS  5.
       *フラグ
-               05  RECE10-FLGINF.
-                   07  RECE10-FLG         PIC  9(01)   OCCURS  5.
-      *
+           03  RECE10-FLGINF.
+               05  RECE10-FLG              PIC 9(01)   OCCURS  5.
       *データエリア
-               05  RECE10-RESERVE-AREA    PIC  X(50).
-      *
+           03  RECE10-RESERVE-AREA         PIC X(50).
       *返戻指示フラグ
-               05  RECE10-HENREI-SIJI-FLG PIC  9(01).
+           03  RECE10-HENREI-SIJI-FLG      PIC 9(01).
       *(総括表用)
       *主保険−保険番号
-           03  RECE10-HKNNUM-S            PIC  X(03).
+           03  RECE10-HKNNUM-S             PIC X(03).
       *保険者番号 
-           03  RECE10-HKNJANUM-S          PIC  X(08).
+           03  RECE10-HKNJANUM-S           PIC X(08).
       *登録年月日
-           03  RECE10-CREYMD              PIC  X(08).
+           03  RECE10-CREYMD               PIC X(08).
       *更新年月日
-           03  RECE10-UPDYMD              PIC  X(08).
+           03  RECE10-UPDYMD               PIC X(08).
       *主キー更新用項目
-           03  RECE10-UPHKNJANUM          PIC X(10).
+           03  RECE10-UPHKNJANUM           PIC X(10).
       *保険者番号検索用項目
-           03  RECE10-XXPREFNUM           PIC X(02).
+           03  RECE10-XXPREFNUM            PIC X(02).
       *診療年月検索用項目
-           03  RECE10-XXSRYYM             PIC 9(06).
+           03  RECE10-XXSRYYM              PIC 9(06).
       *対象保険者番号検索用項目 
-           03  RECE10-XXSTHKNJANUM        PIC X(08).
-           03  RECE10-XXEDHKNJANUM        PIC X(08).
+           03  RECE10-XXSTHKNJANUM         PIC X(08).
+           03  RECE10-XXEDHKNJANUM         PIC X(08).
       *審査支払機関検索用項目
-           03  RECE10-XXTEISYUTUSAKI      PIC 9(01).
+           03  RECE10-XXTEISYUTUSAKI       PIC 9(01).
 
 

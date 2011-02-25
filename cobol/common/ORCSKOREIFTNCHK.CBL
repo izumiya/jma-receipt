@@ -49,6 +49,8 @@
       *  04.04.02    NACL-門脇    09/06/01  平成２１年５月改正対応
       *                                     （東京都１５１）
       *  04.04.03    NACL-門脇    09/09/07  愛知県単独５１対応
+      *
+      *  04.05.01    NACL-門脇    11/01/14  保険別請求チェック表の本体取込み
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -901,6 +903,13 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
       *
+               IF   LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
+                 CONTINUE
+               ELSE
+                 COMPUTE  WRK-FTNKEI = WRK-FTNKEI
+                                     + SYU-GRP-SGKMONEY
+               END-IF
+      *
                EVALUATE  SYU-KOH-HKNNUM(1)
                  WHEN      "972"
                    IF  LNK-KOREIFTNCHK-TOKU75 = 3
@@ -1052,6 +1061,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
              COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
              COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
              COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+      *
+             COMPUTE  WRK-FTNKEI = WRK-FTNKEI
+                                 + SYU-GRP-SGKMONEY
       *
              IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
              OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )

@@ -114,6 +114,8 @@
       *                                     ¿¡µ·§À∑∏§Ô§Îµ≠œøæÚ∑Ôª≈ÕÕ§Œ
       *                                      —ππ§À»º§¶Ω§¿µ
       *                                     ø«Œ≈≤ £≤°¢£≥§Úƒ…≤√
+      *
+      *  04.05.02    NACL-ÃÁœ∆    10/12/13  ¿¡µ·≥€æ Û§Œƒ…≤√
       ************************************************************
       *01  RECE02-REC.
            03  RECE02-KEY.
@@ -619,6 +621,22 @@
                    07  RECE02-PTTOKKI-NAIYO
                                           PIC  X(12).
                    07  RECE02-PTTOKKI-CD  PIC  X(02).
+      *
+      *¿¡µ·≥€æ Û° ∑◊ªªÕ—°À
+           03  RECE02-FTNMONEY-SKY             PIC 9(09).
+      *
+      *¿¡µ·≥€æ Û° ∞ÂŒ≈»Ò°À
+           03  RECE02-SKYIRYO-INF.
+      *º¬∆¸øÙ
+               05  RECE02-SKYIRYO-NISSU        PIC 9(02).
+      *¿¡µ·≈¿
+               05  RECE02-SKYIRYO-TOTALTEN     PIC 9(08).
+      *¥µº‘…È√¥
+               05  RECE02-SKYIRYO-ICHIBUFTN    PIC 9(09).
+      * ›∏±º‘…È√¥
+               05  RECE02-SKYIRYO-HOKENJA      PIC 9(09).
+      *∏¯»Ò…È√¥
+               05  RECE02-SKYIRYO-KOHFTN       PIC 9(09).
       *
       *ÕΩ»˜
            03  RECE02-YOBIETC-AREA.
