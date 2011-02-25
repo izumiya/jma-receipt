@@ -3739,6 +3739,11 @@
                                                    =   "099409905"
                            MOVE    "1"         TO  LNK-S01-SINSATUFLG2
                        END-IF
+      *                特定公費（時間外受診）判定
+                       IF      LNK-WKSRY-SRYCD(IDX IDS)
+                                                   =   "099409907"
+                           MOVE    "1"         TO  LNK-S01-JIKANGAI
+                       END-IF
                    END-PERFORM
                END-IF
       *        診察料算定フラグ（地方公費用）
