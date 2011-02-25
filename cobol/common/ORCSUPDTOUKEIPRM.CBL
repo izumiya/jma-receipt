@@ -75,6 +75,7 @@
            COPY    "CPSK0043.INC".
       *    日次パラメタファイル       ※月次用にも使用
            COPY    "CPSK3001.INC".
+           COPY    "CPSK3002.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -223,10 +224,14 @@
                                                SYS-EDYUKYMD
                        PERFORM 900-SYSKANRI-KEY10-SEL-SEC
                        IF    ( FLG-SYSKANRI    =   ZERO )
-                           IF    ( SYS-3001-TBL    =   SYS-KANRITBL )
+                           MOVE    SYS-KANRITBL    TO  SYS-3002-TBL
+                           MOVE    SYS-3001-HCNAME TO  SYS-3002-HCNAME
+                           IF    ( SYS-3001-TBL    =   SYS-3002-TBL )
                                CONTINUE
                            ELSE
                                MOVE    SYS-KANRITBL    TO  SYS-3001-TBL
+                               MOVE    SYS-3002-HCNAME
+                                                   TO  SYS-3001-HCNAME
                                MOVE    SYS-3001-REC    TO  MCPDATA-REC
                                MOVE    "tbl_syskanri"  TO  MCP-TABLE
                                MOVE    "key"           TO  MCP-PATHNAME
