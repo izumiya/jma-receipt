@@ -56,6 +56,7 @@
       *  04.05.03    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.04    NACL-門脇    10/01/22  治験対応
       *  04.05.05    NACL-門脇    10/01/26  東京都マル子追加対応
+      *  04.05.06    NACL-門脇    11/02/28  長崎県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -708,11 +709,13 @@
       *
       *    診察料未算定扱い
            03  FILLER          PIC X(09)   VALUE   "099409905".
+      *    時間外受診
+           03  FILLER          PIC X(09)   VALUE   "099409907".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   65.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   66.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   65.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   66.         
       *
       *    固定値
        01  CONST-AREA.
