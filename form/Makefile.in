@@ -485,6 +485,19 @@ FORM_files = \
 	      HCM19V01.red \
 	      HC02V01.red \
 	      HC02QV01.red \
+	      HCGS137G.red \
+	      HCGS137N1.red \
+	      HCGS137N2.red \
+	      HCGS138G1.red \
+	      HCGS138G2.red \
+	      HCGS138N1.red \
+	      HCGS138N2.red \
+	      HCGS139G.red \
+	      HCGS139N.red \
+	      HCGS140G1.red \
+	      HCGS140G2.red \
+	      HCGS140N1.red \
+	      HCGS140N2.red \
 
 all:   
 
