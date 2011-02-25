@@ -484,6 +484,7 @@
       *  04.05.14    NACL-門脇    10/09/06  地方公費の全国公費併用分請求点
       *                                     集計対応（レセ電負担区分対応）
       *  04.05.15    NACL-門脇    11/02/17  災害対応修正（平成２３年１月〜）
+      *  04.05.16    NACL-門脇    11/02/18  ７０歳代前半の特例措置延長対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2936,8 +2937,7 @@
                    ( RECE62-SRYYM   <  "200704"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE62-SRYYM   <  "200804") OR
-      **>           (RECE62-SRYYM   >  "201003")             ))
-                    (RECE62-SRYYM   >  "201103")             ))
+                    (RECE62-SRYYM   >  "201203")             ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE62-SRYYM   <  "200901"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
@@ -5814,8 +5814,7 @@
                END-IF
              WHEN      "20"
                IF  (RECE62-SRYYM   >=  "200804")
-      **>      AND (RECE62-SRYYM   <=  "201003")
-               AND (RECE62-SRYYM   <=  "201103")
+               AND (RECE62-SRYYM   <=  "201203")
                    CONTINUE
                ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
@@ -10989,8 +10988,7 @@
            END-IF
       *
            IF    (RECE62-SRYYM   >=  "200804")
-      **>  AND   (RECE62-SRYYM   <=  "201003")
-           AND   (RECE62-SRYYM   <=  "201103")
+           AND   (RECE62-SRYYM   <=  "201203")
              IF  (RECE62-HKNNUM       =   SPACE                      )
              OR  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91"     )
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")

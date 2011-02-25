@@ -503,6 +503,7 @@
       *  04.05.11    NACL-ÌçÏÆ    10/09/06  ÃÏÊý¸øÈñ¤ÎÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ
       *                                     ½¸·×ÂÐ±þ¡Ê¥ì¥»ÅÅÉéÃ´¶èÊ¬ÂÐ±þ¡Ë
       *  04.05.12    NACL-ÌçÏÆ    11/02/17  ºÒ³²ÂÐ±þ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£±·î¡Á¡Ë
+      *  04.05.13    NACL-ÌçÏÆ    11/02/18  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2195,8 +2196,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            PERFORM     2117-GENGAKU-HANTEI-SEC
       *
            IF    (RECE02-SRYYM   >=  "200804")
-      **>  AND   (RECE02-SRYYM   <=  "201003")
-           AND   (RECE02-SRYYM   <=  "201103")
+           AND   (RECE02-SRYYM   <=  "201203")
              IF  (RECE02-HKNNUM       =   SPACE                      )
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR "90" OR "91"       )
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -3071,8 +3071,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ( RECE02-SRYYM   <  "200704"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE02-SRYYM   <  "200804") OR
-      **>           (RECE02-SRYYM   >  "201003")             ))
-                    (RECE02-SRYYM   >  "201103")             ))
+                    (RECE02-SRYYM   >  "201203")             ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE02-SRYYM   <  "200901"              ))
                  CONTINUE
@@ -8954,8 +8953,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-      **>      AND (RECE02-SRYYM   <=  "201003")
-               AND (RECE02-SRYYM   <=  "201103")
+               AND (RECE02-SRYYM   <=  "201203")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT
