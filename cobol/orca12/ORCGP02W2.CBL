@@ -97,6 +97,7 @@
       *
       *  04.05.01    NACL-門脇    10/02/17  生保適用期間の社保単独の
       *                                     保険組み合わせ作成
+      *  04.05.02    NACL-門脇    11/03/02  山梨県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1428,7 +1429,8 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    ( WRK-KOH-SBT       (IDZ)   =   "7" OR "A" ) AND
       *----(01.00.04) LINE MOD END   -------------------------------
                    ((WRK-KOH-HKNKOHKBN (IDZ)   =   "2" OR "3") OR
-                    (WRK-KOH-HKNNUM(IDZ)   =  "019" OR "053" OR "091" ))
+                    (WRK-KOH-HKNNUM(IDZ)   =  "019" OR "053"
+                                           OR "091" OR "051" ))
       ****         ( WRK-KOH-HKNKOHKBN (IDZ)   =   "2" OR "3") AND
       ****         ((WRK-KOH-GENHKNNUM1(IDZ)   =   SPACE)  OR
       ****          (WRK-KOH-GENHKNNUM1(IDZ)
@@ -3633,7 +3635,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                             PERFORM 5701413-SYUKOH-HJO-SEC
                       ELSE
                        IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) =
-                               "019" OR "053" OR "091"
+                               "019" OR "053" OR "091" OR "051"
                           IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) =
                                    "019" OR "053"
                              IF  WRK-SRT-HJO-KOHNO             =
@@ -3642,6 +3644,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                           ELSE
+                           IF   WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
       *                      精神通院と特定疾患（水俣）の保険組合せ対応
       *                      IF   SPA-PREFNUM    =    43
                              IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
@@ -3660,6 +3663,14 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
                              END-IF
+                           END-IF
+                           IF  (SPA-PREFNUM                     =  19  )
+                           AND (WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
+                                                               OR "051")
+                               IF  WRK-SRT-HJO-KOHNO(2:2)  =  "41"
+                                  PERFORM 5701413-SYUKOH-HJO-SEC
+                               END-IF
+                           END-IF
                           END-IF
                        ELSE
       *******************地方公費

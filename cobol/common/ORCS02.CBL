@@ -295,6 +295,7 @@
       *  04.05.02    NACL-門脇    09/12/04  食事（特別食）の他保険対応
       *  04.05.03    NACL-門脇    10/01/07  治験対応
       *  04.05.04    NACL-門脇    11/02/18  ７０歳代前半の特例措置延長対応
+      *  04.05.05    NACL-門脇    11/03/02  山梨県地方公費対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4657,11 +4658,17 @@
              ELSE
                MOVE   SPACE   TO    WK-KOH-FTNJANUM
                IF  (COMB-KOH1HKNNUM = "051" OR "052" OR "091")
+               OR  (COMB-KOH2HKNNUM = "051" OR "091"         )
                OR  (WK-TOKATUKAI(1) =  1                     )
                   INITIALIZE                     PTKOHINF-REC
                   MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
                   MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
-                  MOVE    COMB-KOH1ID        TO  PTKOH-KOHID
+                  IF  (COMB-KOH1HKNNUM = "051" OR "052" OR "091")
+                  OR  (WK-TOKATUKAI(1) =  1                     )
+                    MOVE  COMB-KOH1ID        TO  PTKOH-KOHID
+                  ELSE
+                    MOVE  COMB-KOH2ID        TO  PTKOH-KOHID
+                  END-IF
                   MOVE    PTKOHINF-REC       TO  MCPDATA-REC
                   MOVE    "DBSELECT"         TO  MCP-FUNC
                   MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
@@ -4682,6 +4689,7 @@
                   PERFORM  DB-CLOSE-SEC
                END-IF
                IF (((COMB-KOH1HKNNUM = "051" OR "052" OR "091" ) OR
+                    (COMB-KOH2HKNNUM = "051" OR "091"          ) OR
                     (WK-TOKATUKAI(1) =  1                      )) AND
                    ( WK-KOH-FTNJANUM(5:3) = "601" OR "602"      ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "51"  OR "52"       ))

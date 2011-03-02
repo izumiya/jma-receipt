@@ -332,6 +332,7 @@
       *  04.05.07    NACL-ÌçÏÆ    10/03/26  °ì³çºÆ·×»»ÊýË¡ÁªÂòµ¡Ç½ÂÐ±þ½¤Àµ
       *  04.05.08    NACL-ÌçÏÆ    11/02/18  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.05.09    NACL-ÌçÏÆ    11/02/28  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.10    NACL-ÌçÏÆ    11/03/02  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4818,11 +4819,17 @@
              ELSE
                MOVE   SPACE   TO    WK-KOH-FTNJANUM
                IF  (COMB-KOH1HKNNUM = "051" OR "052" OR "091")
+               OR  (COMB-KOH2HKNNUM = "051" OR "091"         )
                OR  (WK-TOKATUKAI(1) =  1                     )
                   INITIALIZE                     PTKOHINF-REC
                   MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
                   MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
-                  MOVE    COMB-KOH1ID        TO  PTKOH-KOHID
+                  IF  (COMB-KOH1HKNNUM = "051" OR "052" OR "091")
+                  OR  (WK-TOKATUKAI(1) =  1                     )
+                    MOVE  COMB-KOH1ID        TO  PTKOH-KOHID
+                  ELSE
+                    MOVE  COMB-KOH2ID        TO  PTKOH-KOHID
+                  END-IF
                   MOVE    PTKOHINF-REC       TO  MCPDATA-REC
                   MOVE    "DBSELECT"         TO  MCP-FUNC
                   MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
@@ -4843,6 +4850,7 @@
                   PERFORM  DB-CLOSE-SEC
                END-IF
                IF (((COMB-KOH1HKNNUM = "051" OR "052" OR "091" ) OR
+                    (COMB-KOH2HKNNUM = "051" OR "091"          ) OR
                     (WK-TOKATUKAI(1) =  1                      )) AND
                    ( WK-KOH-FTNJANUM(5:3) = "601" OR "602"      ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "51"  OR "52"       ))
