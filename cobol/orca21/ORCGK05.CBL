@@ -5654,6 +5654,11 @@
                   (FLG-END         NOT =   ZERO  )
                GO      TO      4100-TOROKU-EXT
            END-IF
+      *    明細がない時、エラー
+           IF     (SPA-GMN-MAX         =   ZERO )
+               MOVE    "9301"          TO  SPA-ERRCD
+               GO      TO      4100-TOROKU-EXT
+           END-IF
       *
       *    登録、更新の時、更新前チェックを行う
            IF      SPA-K05-SYORI       =   "1"  OR  "2"
