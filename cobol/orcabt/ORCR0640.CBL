@@ -14643,16 +14643,22 @@
                 ADD       SYU-KOH-FTN-ENTANI
                                            TO  WRK-SKY-FTNMONEY-KOH
       *
-                IF   RECE62-SRYYM   >=  "201010"
-                  IF  ((WRK-PREFNUM        =  "44"          ) AND
-                       (SYU-KOH1HKNNUM     =  "183" OR "283") AND
-                       (SYU-JYO-COMPFTN  NOT = ZERO         ))
-                  OR  ((WRK-PREFNUM        =  "04"          ) AND
-                       (SYU-KOH1HKNNUM     =  "583" OR "683"
-                                                    OR "783") AND
-                       (SYU-JYO-COMPFTN  NOT = ZERO         ))
-                     MOVE       1          TO  FLG-SKY-TOKKOH
-                  END-IF
+                IF ((WRK-PREFNUM          =  "44"          ) AND
+                    (SYU-KOH1HKNNUM       =  "183" OR "283") AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE62-SRYYM        >=  "201010"      ))
+                OR ((WRK-PREFNUM          =  "04"          ) AND
+                    (SYU-KOH1HKNNUM       =  "583" OR "683"
+                                                   OR "783") AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE62-SRYYM        >=  "201010"      ))
+                OR ((WRK-PREFNUM          =  "10"          ) AND
+                    (SYU-KOH1HKNNUM       =  "145" OR "245"
+                                          OR "146" OR "246"
+                                          OR "143" OR "243") AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE62-SRYYM        >=  "201104"      ))
+                   MOVE     1     TO    FLG-SKY-TOKKOH
                 END-IF
               END-IF
            ELSE
