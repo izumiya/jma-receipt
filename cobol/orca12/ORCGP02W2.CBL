@@ -4176,39 +4176,47 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        5701414-SYUKOH-HJO2-SEC       SECTION.
       *
-           MOVE    WRK-COMB-HJOIDX      TO  IDX6
-           ADD     1                    TO  WRK-RCOMB-MAX
-           MOVE    WRK-RCOMB-MAX        TO  IDX1
-           MOVE    WRK-RCOMB-REC (IDZ2) TO  WRK-RCOMB-REC  (IDX1)
       *    [Êä½õ ³«»ÏÆü]¡å[ÁÈ¹ç¤» ³«»ÏÆü]
-           IF  WRK-KOH-TEKSTYMD (WRK-COMB-HJOIDX)
-                                    <=  WRK-RCOMB-TEKSTYMD (IDZ2)
+           IF    WRK-KOH-TEKSTYMD(WRK-COMB-HJOIDX)
+                                    <=  WRK-RCOMB-TEKSTYMD(IDZ2)
+             IF  WRK-KOH-TEKEDYMD(WRK-COMB-HJOIDX)
+                                    <   WRK-RCOMB-TEKSTYMD(IDZ2)
+               CONTINUE
+             ELSE
+               MOVE    WRK-COMB-HJOIDX      TO  IDX6
+               ADD     1                    TO  WRK-RCOMB-MAX
+               MOVE    WRK-RCOMB-MAX        TO  IDX1
+               MOVE    WRK-RCOMB-REC(IDZ2)  TO  WRK-RCOMB-REC(IDX1)
       *        [Êä½õ ½ªÎ»Æü]¡ã[ÁÈ¹ç¤» ½ªÎ»Æü]
                IF  WRK-KOH-TEKEDYMD(WRK-COMB-HJOIDX)
-                                    <   WRK-RCOMB-TEKEDYMD (IDZ2)
-      *            ¡ü[ÁÈ¹ç¤»] ³«»Ï <---> [Êä½õ] ½ªÎ»Æü
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-HJOIDX)
-                                    TO  WRK-RCOMB-TEKEDYMD (IDX1)
-               ELSE
-      *            [ÁÈ¹ç¤» ½ªÎ»Æü]¡å[Êä½õ ½ªÎ»Æü]
-                   CONTINUE
+                                    <   WRK-RCOMB-TEKEDYMD(IDZ2)
+                 MOVE  WRK-KOH-TEKEDYMD(WRK-COMB-HJOIDX)
+                                    TO  WRK-RCOMB-TEKEDYMD(IDX1)
                END-IF
+               PERFORM 5701413-HJO-IREKAE-SEC
+             END-IF
            ELSE
-      *        [ÁÈ¹ç¤» ³«»ÏÆü]¡ã[Êä½õ ³«»ÏÆü]
-      *        ¡ü[Êä½õ] ³«»Ï <---> [ÁÈ¹ç¤»] ½ªÎ»Æü
-               MOVE    WRK-KOH-TEKSTYMD   (WRK-COMB-HJOIDX)
-                                    TO  WRK-RCOMB-TEKSTYMD    (IDX1)
+      *      [ÁÈ¹ç¤» ³«»ÏÆü]¡ã[Êä½õ ³«»ÏÆü]
+             IF  WRK-KOH-TEKSTYMD(WRK-COMB-HJOIDX)
+                                    >   WRK-RCOMB-TEKEDYMD(IDZ2)
+               CONTINUE
+             ELSE
+               MOVE    WRK-COMB-HJOIDX      TO  IDX6
+               ADD     1                    TO  WRK-RCOMB-MAX
+               MOVE    WRK-RCOMB-MAX        TO  IDX1
+               MOVE    WRK-RCOMB-REC(IDZ2)  TO  WRK-RCOMB-REC(IDX1)
+      *
+               MOVE    WRK-KOH-TEKSTYMD(WRK-COMB-HJOIDX)
+                                    TO  WRK-RCOMB-TEKSTYMD(IDX1)
       *        [Êä½õ ½ªÎ»Æü]¡ã[ÁÈ¹ç¤» ½ªÎ»Æü]
                IF  WRK-KOH-TEKEDYMD(WRK-COMB-HJOIDX)
-                                    <   WRK-RCOMB-TEKEDYMD (IDZ2)
-      *            ¡ü[Êä½õ] ³«»Ï <---> [Êä½õ] ½ªÎ»Æü¤ËÊÑ¹¹
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-HJOIDX)
-                                    TO  WRK-RCOMB-TEKEDYMD    (IDX1)
-               ELSE
-                   CONTINUE
+                                    <   WRK-RCOMB-TEKEDYMD(IDZ2)
+                 MOVE  WRK-KOH-TEKEDYMD(WRK-COMB-HJOIDX)
+                                    TO  WRK-RCOMB-TEKEDYMD(IDX1)
                END-IF
+               PERFORM 5701413-HJO-IREKAE-SEC
+             END-IF
            END-IF
-           PERFORM 5701413-HJO-IREKAE-SEC
            .
        5701414-SYUKOH-HJO2-EXT.
            EXIT.
