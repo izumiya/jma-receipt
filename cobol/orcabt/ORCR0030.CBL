@@ -11924,6 +11924,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
              END-IF
       *
+             COMPUTE  WRK-CHK-KOKIGAK4 = RECE02-TOTALTEN(2)
+                                       + RECE02-HENTOTALTEN(3)
+             IF  (RECE02-ZAITAKU         = "1"               )
+             AND (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
+                   (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                  ( TBL-TOKATUKAIFLG(1)   =  1              ))
+             AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (RECE02-HON-GAIKFTNRATE(2)   =  100         )
+             AND (RECE02-KOHNUM(3)       = SPACE             )
+             AND (RECE02-KOHNUM(4)       = SPACE             )
+             AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
+             AND (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
+             AND ((RECE02-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
+                  (RECE02-TOTALTEN(1)  =
+                                      RECE02-HENTOTALTEN(3)) )
+                 MOVE     ZERO    TO   FLG-CHIIKI
+                 PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
+             END-IF
+      *
              IF  (RECE02-ZAITAKU         = "2"               )
              AND (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
@@ -11935,6 +11954,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
              AND ((FLG-HOKENICHIBU2  NOT = ZERO             )  OR
                   (FLG-HOKENICHIBU3  NOT = ZERO             ))
+                 MOVE     ZERO    TO   FLG-CHIIKI
+                 PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
+             END-IF
+      *
+             COMPUTE  WRK-CHK-KOKIGAK4 = RECE02-TOTALTEN(2)
+                                       + RECE02-HENTOTALTEN(3)
+             IF  (RECE02-ZAITAKU         = "2"               )
+             AND (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
+                   (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                  ( TBL-TOKATUKAIFLG(1)   =  1              ))
+             AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (RECE02-HON-GAIKFTNRATE(2)   =  100         )
+             AND (RECE02-KOHNUM(3)       = SPACE             )
+             AND (RECE02-KOHNUM(4)       = SPACE             )
+             AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
+             AND (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
+             AND ((RECE02-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
+                  (RECE02-TOTALTEN(1)  =
+                                      RECE02-HENTOTALTEN(3)) )
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
              END-IF
