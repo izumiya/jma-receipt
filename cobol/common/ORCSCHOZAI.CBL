@@ -127,6 +127,11 @@
                05  WRK-SRYMM           PIC 9(02).
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-KAISU               PIC 9(03).
+      *    翌月
+           03  WRK-MATU-NEXT           PIC 9(02).
+           03  WRK-SRYYM-N.
+               05  WRK-SRYYY-N         PIC 9(04).
+               05  WRK-SRYMM-N         PIC 9(02).
       *
            03  WRK-IDX2                PIC 9(04).
            03  WRK-SRYKA               PIC X(02).
@@ -363,6 +368,22 @@
                                            STS-AREA-DAY
                                            LNK-DAY7-AREA
                MOVE    LNK-DAY7-KOYOMI(7:2)    TO  WRK-MATU
+      *        診療年月＋１月の末日算定
+               COMPUTE WRK-SRYMM-N         =   WRK-SRYMM   +   1
+               IF      WRK-SRYMM-N         >   12
+                   COMPUTE WRK-SRYYY-N     =   WRK-SRYYY   +   1
+                   MOVE    1                   TO  WRK-SRYMM-N
+               ELSE
+                   MOVE    WRK-SRYYY           TO  WRK-SRYYY-N
+               END-IF
+               INITIALIZE                      STS-AREA-DAY
+               INITIALIZE                      LNK-DAY7-AREA
+               MOVE    "71"                TO  LNK-DAY7-IRAI
+               MOVE    WRK-SRYYM-N         TO  LNK-DAY7-YM
+               CALL    "ORCSDAY"           USING
+                                           STS-AREA-DAY
+                                           LNK-DAY7-AREA
+               MOVE    LNK-DAY7-KOYOMI(7:2)    TO  WRK-MATU-NEXT
       *
                IF     (FLG-NYUIN01         =   1   )  AND
                       (WRK-SRYYM       NOT =   ORCSCHO-SRYYM )
@@ -452,8 +473,9 @@
                                COMPUTE IDX3        =   IDX3
                                                    -   WRK-MATU
       *                        ２月以上またがらないこととする
-                               IF      IDX3        >   31
-                                   MOVE    31          TO  IDX3
+      *                        （翌月末日まで）
+                               IF      IDX3        >   WRK-MATU-NEXT
+                                   MOVE    WRK-MATU-NEXT   TO  IDX3
                                END-IF
                                COMPUTE IDX1            =   IDX   +   1
                            ELSE
