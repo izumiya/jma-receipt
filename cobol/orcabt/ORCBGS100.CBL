@@ -186,6 +186,16 @@
                                        TO  BGS100P-SHELLMSG
            END-EVALUATE
       *
+           MOVE    "/var/tmp/"         TO  BGS100P-CSVDIR
+      *
+           MOVE    SPACE               TO  BGS100P-CSVFNAME
+           STRING  SPA-HOSPNUM     DELIMITED   BY  SIZE
+                   "hknseikyuchk_" DELIMITED   BY  SIZE
+                   BGS100P-SRYYM   DELIMITED   BY  SIZE
+                   ".csv"          DELIMITED   BY  SIZE
+           INTO    BGS100P-CSVFNAME
+           END-STRING
+      *
            MOVE    "STS"               TO  SJOBKANRI-MODE
            INITIALIZE                      JOBKANRI-REC
            PERFORM 800-ORCSJOB-SEC

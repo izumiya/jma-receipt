@@ -107,6 +107,8 @@
            03  CNT-PAGE            PIC 9(05).
            03  CNT-LINE            PIC 9(05).
            03  CNT-KENSU           PIC 9(05).
+           03  CNT-LEN             PIC 9(05).
+           03  CNT-CSV             PIC 9(05).
       *
        01  FLG-AREA.
            03  FLG-BGSSKY          PIC 9(01).
@@ -126,8 +128,12 @@
            03  IDX-BASE            PIC 9(05).
            03  IDXP                PIC 9(05).
            03  IDX-RECEKA          PIC 9(05).
+           03  IDXI                PIC 9(05).
+           03  IDXL                PIC 9(05).
       *
        01  WRK-AREA.
+           03  WRK-ITEM-SIZE       PIC 9(05).
+           03  WRK-ITEM            PIC X(100).
            03  WRK-SYMD            PIC X(08).
            03  WRK-EDTYMD1         PIC X(10).
            03  WRK-EDTYMD3         PIC X(22).
@@ -138,10 +144,181 @@
            03  WRK-Z9              PIC Z(9).
            03  WRK-M9              PIC -(9).
            03  WRK-TTLID           PIC 9(5).
+           03  WRK-CSV-SRYYM       PIC X(10).
            03  WRK-PRT-SRYYM       PIC X(16).
            03  WRK-PRT-SAKYMD      PIC X(22).
            03  WRK-KANACHK-STR     PIC X(500).
            03  WRK-SRYKANAME1      PIC X(24).
+           03  WRK-MAX             PIC 9(05).
+           03  WRK-CSVDATA         PIC X(20000).
+           03  WRK-NYUGAIKBN       PIC X(01).
+           03  WRK-NYUGAIKBNMEI    PIC X(20).
+           03  WRK-PRTKBN          PIC X(01).
+           03  WRK-PRTKBNMEI       PIC X(10).
+           03  WRK-DATAKBN         PIC X(01).
+           03  WRK-DATAKBNMEI      PIC X(50).
+      *
+       01  CSV-HEAD-AREA.
+           03  CSV-H01-G.
+               05  CSV-H01-VAL.
+                   07  CSV-H01-PRTKBN          PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬".
+                   07  CSV-H01-PRTKBNMEI       PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬Ì¾".
+                   07  CSV-H01-DATAKBN         PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬".
+                   07  CSV-H01-DATAKBNMEI      PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬Ì¾".
+                   07  CSV-H01-SRYYMD          PIC X(50)
+                           VALUE   "¿ÇÎÅÇ¯·î".
+                   07  CSV-H01-NYUGAIKBN       PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬".
+                   07  CSV-H01-NYUGAIKBNMEI    PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬Ì¾¾Î".
+                   07  CSV-H01-SRYKA           PIC X(50)
+                           VALUE   "¿ÇÎÅ²Ê¥³¡¼¥É".
+                   07  CSV-H01-SRYKAMEI        PIC X(50)
+                           VALUE   "¿ÇÎÅ²ÊÌ¾¾Î".
+                   07  CSV-H01-HKNKBN          PIC X(50)
+                           VALUE   "ÊÝ¸±¶èÊ¬".
+                   07  CSV-H01-KENSU           PIC X(50)
+                           VALUE   "·ï¿ô".
+                   07  CSV-H01-NISSU           PIC X(50)
+                           VALUE   "Æü¿ô".
+                   07  CSV-H01-TENSU           PIC X(50)
+                           VALUE   "ÅÀ¿ô".
+                   07  CSV-H01-FTNMONEY        PIC X(50)
+                           VALUE   "´µ¼ÔÉéÃ´³Û".
+                   07  CSV-H01-HKNMONEY        PIC X(50)
+                           VALUE   "ÊÝ¸±ÀÁµá³Û".
+                   07  CSV-H01-KOHMONEY        PIC X(50)
+                           VALUE   "¸øÈñÀÁµá³Û".
+                   07  CSV-H01-TTLMONEY        PIC X(50)
+                           VALUE   "ÊÝ¸±¿ÇÎÅ¼ý±×¡Ê£á¡Ë".
+                   07  CSV-H01-SKJKAISU        PIC X(50)
+                           VALUE   "¿©»ö¡¦À¸³è²ó¿ô".
+                   07  CSV-H01-SKJTTLMONEY     PIC X(50)
+                           VALUE   "¿©»ö¡¦À¸³èÉ¸½àÉéÃ´³Û".
+                   07  CSV-H01-SKJHKNMONEY     PIC X(50)
+                           VALUE   "¿©»ö¡¦À¸³èÊÝ¸±ÀÁµá³Û".
+                   07  CSV-H01-SKJKOHMONEY     PIC X(50)
+                           VALUE   "¿©»ö¡¦À¸³è¸øÈñÀÁµá³Û".
+                   07  CSV-H01-SKJFTNMONEY     PIC X(50)
+                           VALUE   "¿©»ö¡¦À¸³èÀÁµá±ß¡Ê£â¡Ë".
+                   07  CSV-H01-TTLTTLMONEY     PIC X(50)
+                           VALUE   "¡Ê£á¡Ë¡Ü¡Ê£â¡Ë".
+               05  CSV-H01-R   REDEFINES   CSV-H01-VAL.
+                   07  CSV-H01-ITEM            PIC X(50)
+                                               OCCURS  23.
+               05  CSV-H01-MAX                 PIC 9(05)
+                                               VALUE   23.
+           03  CSV-H02-G.
+               05  CSV-H02-VAL.
+                   07  CSV-H02-PRTKBN          PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬".
+                   07  CSV-H02-PRTKBNMEI       PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬Ì¾".
+                   07  CSV-H02-DATAKBN         PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬".
+                   07  CSV-H02-DATAKBNMEI      PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬Ì¾".
+                   07  CSV-H02-SRYYMD          PIC X(50)
+                           VALUE   "¿ÇÎÅÇ¯·î".
+                   07  CSV-H02-NYUGAIKBN       PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬".
+                   07  CSV-H02-NYUGAIKBNMEI    PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬Ì¾¾Î".
+                   07  CSV-H02-SRYKA           PIC X(50)
+                           VALUE   "¿ÇÎÅ²Ê¥³¡¼¥É".
+                   07  CSV-H02-SRYKAMEI        PIC X(50)
+                           VALUE   "¿ÇÎÅ²ÊÌ¾¾Î".
+                   07  CSV-H02-KOHNAME         PIC X(50)
+                           VALUE   "¸øÈñ·ï¿ô·×".
+                   07  CSV-H02-KENSU           PIC X(50)
+                           VALUE   "·ï¿ô".
+               05  CSV-H02-R   REDEFINES   CSV-H02-VAL.
+                   07  CSV-H02-ITEM            PIC X(50)
+                                               OCCURS  11.
+               05  CSV-H02-MAX                 PIC 9(05)
+                                               VALUE   11.
+           03  CSV-H03-G.
+               05  CSV-H03-VAL.
+                   07  CSV-H03-PRTKBN          PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬".
+                   07  CSV-H03-PRTKBNMEI       PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬Ì¾".
+                   07  CSV-H03-DATAKBN         PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬".
+                   07  CSV-H03-DATAKBNMEI      PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬Ì¾".
+                   07  CSV-H03-SRYYMD          PIC X(50)
+                           VALUE   "¿ÇÎÅÇ¯·î".
+                   07  CSV-H03-NYUGAIKBN       PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬".
+                   07  CSV-H03-NYUGAIKBNMEI    PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬Ì¾¾Î".
+                   07  CSV-H03-SRYKA           PIC X(50)
+                           VALUE   "¿ÇÎÅ²Ê¥³¡¼¥É".
+                   07  CSV-H03-SRYKAMEI        PIC X(50)
+                           VALUE   "¿ÇÎÅ²ÊÌ¾¾Î".
+                   07  CSV-H03-ETCNAME         PIC X(50)
+                           VALUE   "¤½¤ÎÂ¾·×".
+                   07  CSV-H03-JIHIMONEY       PIC X(50)
+                           VALUE   "¼«Èñ".
+                   07  CSV-H03-GENMEN          PIC X(50)
+                           VALUE   "¸ºÌÈ".
+                   07  CSV-H03-CHOSEI1         PIC X(50)
+                           VALUE   "Ä´À°¶â£±".
+                   07  CSV-H03-CHOSEI2         PIC X(50)
+                           VALUE   "Ä´À°¶â£²".
+                   07  CSV-H03-HASU            PIC X(50)
+                           VALUE   "Áë¸ýÀÁµáÃ¼¿ô½èÍý³Û".
+               05  CSV-H03-R   REDEFINES   CSV-H03-VAL.
+                   07  CSV-H03-ITEM            PIC X(50)
+                                               OCCURS  15.
+               05  CSV-H03-MAX                 PIC 9(05)
+                                               VALUE   15.
+           03  CSV-H04-G.
+               05  CSV-H04-VAL.
+                   07  CSV-H04-PRTKBN          PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬".
+                   07  CSV-H04-PRTKBNMEI       PIC X(50)
+                           VALUE   "Ä¢É¼¶èÊ¬Ì¾".
+                   07  CSV-H04-DATAKBN         PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬".
+                   07  CSV-H04-DATAKBNMEI      PIC X(50)
+                           VALUE   "¥Ç¡¼¥¿¶èÊ¬".
+                   07  CSV-H04-SRYYMD          PIC X(50)
+                           VALUE   "¿ÇÎÅÇ¯·î".
+                   07  CSV-H04-NYUGAIKBN       PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬".
+                   07  CSV-H04-NYUGAIKBNMEI    PIC X(50)
+                           VALUE   "Æþ³°¶èÊ¬Ì¾¾Î".
+                   07  CSV-H04-SRYKA           PIC X(50)
+                           VALUE   "¿ÇÎÅ²Ê¥³¡¼¥É".
+                   07  CSV-H04-SRYKAMEI        PIC X(50)
+                           VALUE   "¿ÇÎÅ²ÊÌ¾¾Î".
+                   07  CSV-H04-HKNKBN          PIC X(50)
+                           VALUE   "ÊÝ¸±¶èÊ¬".
+                   07  CSV-H04-KENSU           PIC X(50)
+                           VALUE   "·ï¿ô".
+                   07  CSV-H04-NISSU           PIC X(50)
+                           VALUE   "Æü¿ô".
+                   07  CSV-H04-TENSU           PIC X(50)
+                           VALUE   "ÅÀ¿ô".
+                   07  CSV-H04-FTNMONEY        PIC X(50)
+                           VALUE   "´µ¼ÔÉéÃ´³Û".
+                   07  CSV-H04-HKNMONEY        PIC X(50)
+                           VALUE   "ÊÝ¸±ÀÁµá³Û".
+                   07  CSV-H04-KOHMONEY        PIC X(50)
+                           VALUE   "¸øÈñÀÁµá³Û".
+                   07  CSV-H04-TTLMONEY        PIC X(50)
+                           VALUE   "ÊÝ¸±¿ÇÎÅ¼ý±×".
+               05  CSV-H04-R   REDEFINES   CSV-H04-VAL.
+                   07  CSV-H04-ITEM            PIC X(50)
+                                               OCCURS  17.
+               05  CSV-H04-MAX                 PIC 9(05)
+                                               VALUE   17.
       *
        01  KEY-AREA.
            03  KEY-RECEKA          PIC X(02).
@@ -217,6 +394,72 @@
            03  CONST-KOUGAITTL     PIC 9(03) VALUE 30.
            03  CONST-ALLTTL        PIC 9(03) VALUE 31.
            03  CONST-THKN-MAX      PIC 9(03) VALUE 31.
+           03  CONST-HKNMEI-G.
+               05  CONST-HKNMEI01  PIC X(50)
+                                   VALUE "¼ÒÊÝ¹â£¹¸øÈñÊ»ÍÑ".
+               05  CONST-HKNMEI02  PIC X(50)
+                                   VALUE "¼ÒÊÝ¹â£¹Ã±ÆÈ".
+               05  CONST-HKNMEI03  PIC X(50)
+                                   VALUE "¼ÒÊÝ¹â£·¸øÈñÊ»ÍÑ".
+               05  CONST-HKNMEI04  PIC X(50)
+                                   VALUE "¼ÒÊÝ¹â£·Ã±ÆÈ".
+               05  CONST-HKNMEI05  PIC X(50)
+                                   VALUE "¼ÒÊÝËÜ¿Í¸øÈñÊ»ÍÑ".
+               05  CONST-HKNMEI06  PIC X(50)
+                                   VALUE "¼ÒÊÝËÜ¿ÍÃ±ÆÈ".
+               05  CONST-HKNMEI07  PIC X(50)
+                                   VALUE "¼ÒÊÝ²ÈÂ²¸øÈñÊ»ÍÑ".
+               05  CONST-HKNMEI08  PIC X(50)
+                                   VALUE "¼ÒÊÝ²ÈÂ²Ã±ÆÈ".
+               05  CONST-HKNMEI09  PIC X(50)
+                                   VALUE "¼ÒÊÝ£¶ºÐ¸øÈñÊ»ÍÑ".
+               05  CONST-HKNMEI10  PIC X(50)
+                                   VALUE "¼ÒÊÝ£¶ºÐÃ±ÆÈ".
+               05  CONST-HKNMEI11  PIC X(50)
+                                   VALUE "¼ÒÊÝ¸øÈñÃ±ÆÈ¡¦Ê»ÍÑ".
+               05  CONST-HKNMEI12  PIC X(50)
+                                   VALUE "¼ÒÊÝ·×".
+               05  CONST-HKNMEI13  PIC X(50)
+                                   VALUE "¹ñÊÝ°ìÈÌ¹â£¹".
+               05  CONST-HKNMEI14  PIC X(50)
+                                   VALUE "¹ñÊÝ°ìÈÌ¹â£·".
+               05  CONST-HKNMEI15  PIC X(50)
+                                   VALUE "¹ñÊÝ°ìÈÌ".
+               05  CONST-HKNMEI16  PIC X(50)
+                                   VALUE "¹ñÊÝ£¶ºÐ".
+               05  CONST-HKNMEI17  PIC X(50)
+                                   VALUE "¹ñÊÝÂà¿¦ËÜ¿Í".
+               05  CONST-HKNMEI18  PIC X(50)
+                                   VALUE "¹ñÊÝÂà¿¦²ÈÂ²".
+               05  CONST-HKNMEI19  PIC X(50)
+                                   VALUE "¹ñÊÝÂà¿¦£¶ºÐ".
+               05  CONST-HKNMEI20  PIC X(50)
+                                   VALUE "¹ñÊÝ·×".
+               05  CONST-HKNMEI21  PIC X(50)
+                                   VALUE "¸å´ü¹âÎð¼Ô¹â£¹".
+               05  CONST-HKNMEI22  PIC X(50)
+                                   VALUE "¸å´ü¹âÎð¼Ô¹â£·".
+               05  CONST-HKNMEI23  PIC X(50)
+                                   VALUE "¸å´ü¹âÎð¼Ô·×".
+               05  CONST-HKNMEI24  PIC X(50)
+                                   VALUE "ÊÝ¸±¹ç·×¡Ê¼Ò¡Ü¹ñ¡Ü¸å¡Ë".
+               05  CONST-HKNMEI25  PIC X(50)
+                                   VALUE "ÆÃÊÌÎÅÍÜÈñ·×".
+               05  CONST-HKNMEI26  PIC X(50)
+                                   VALUE "¼«Èñ·×".
+               05  CONST-HKNMEI27  PIC X(50)
+                                   VALUE "¼£¸³·×".
+               05  CONST-HKNMEI28  PIC X(50)
+                                   VALUE "Ï«ºÒ·×".
+               05  CONST-HKNMEI29  PIC X(50)
+                                   VALUE "¼«ÇåÀÕ·×".
+               05  CONST-HKNMEI30  PIC X(50)
+                                   VALUE "¸ø³²·×".
+               05  CONST-HKNMEI31  PIC X(50)
+                                   VALUE "¹ç·×".
+           03  CONST-HKNMEI-R  REDEFINES   CONST-HKNMEI-G.
+               05  CONST-HKNMEI-OCC    OCCURS 31.
+                   07  CONST-HKNMEI    PIC X(50).
       *
       *    ½¸·×ÎÎ°è
        01  TTLHKN-REC.
@@ -254,6 +497,9 @@
       *    ÆüÉÕÊÑ´¹¥µ¥Ö
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
+      *
+      *    Åý·×£Ã£Ó£ÖÀ©¸æ¥µ¥Ö
+           COPY    "CPORCSTOUKEICSV.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPAREA".
@@ -316,6 +562,13 @@
            MOVE    BGS100P-SRYYMD      TO  WRK-SYMD
            PERFORM 800-HIZUKE-EDIT-SEC
            MOVE    WRK-EDTYMD3(1:16)   TO  WRK-PRT-SRYYM
+      *
+           MOVE    BGS100P-SRYYM(1:4)  TO  WRK-CSV-SRYYM(1:4)
+           MOVE    "/"                 TO  WRK-CSV-SRYYM(5:1)
+           MOVE    BGS100P-SRYYM(5:2)  TO  WRK-CSV-SRYYM(6:2)
+      *
+           MOVE    SPACE               TO  WRK-ITEM
+           INSPECT WRK-ITEM  TALLYING  WRK-ITEM-SIZE   FOR ALL " "
       *
            .
        100-INIT-EXT.
@@ -387,17 +640,20 @@
            IF    ( CNT-NYUIN   >   ZERO )
                MOVE    1       TO  IDX1
                PERFORM 2001-HCGS139N-EDIT-SEC
+               PERFORM 2001-HCGS139N-CSV-SEC
            END-IF
       *
            IF    ( CNT-GAIRAI  >   ZERO )
                MOVE    2       TO  IDX1
                PERFORM 2001-HCGS139G-EDIT-SEC
+               PERFORM 2001-HCGS139G-CSV-SEC
            END-IF
       *
            IF    ( CNT-NYUIN   >   ZERO )
             AND  ( CNT-GAIRAI  >   ZERO )
                MOVE    3       TO  IDX1
                PERFORM 2001-HCGS139N-EDIT-SEC
+               PERFORM 2001-HCGS139N-CSV-SEC
            END-IF
       *
            .
@@ -1144,6 +1400,332 @@
        2001-HCGS139N-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    Æþ±¡¥Á¥§¥Ã¥¯É½ÊÔ½¸½èÍý¡Ê£Ã£Ó£Ö¡Ë
+      *****************************************************************
+       2001-HCGS139N-CSV-SEC           SECTION.
+      *
+           MOVE    "9"             TO  WRK-PRTKBN
+           MOVE    "Áí³ç"          TO  WRK-PRTKBNMEI
+           IF    ( IDX1            =   1 )
+               MOVE    "1"         TO  WRK-NYUGAIKBN
+               MOVE    "Æþ±¡"      TO  WRK-NYUGAIKBNMEI
+           ELSE
+               MOVE    ""          TO  WRK-NYUGAIKBN
+               MOVE    "Æþ±¡¡¦³°Íè¡¡Áí·×"
+                                   TO  WRK-NYUGAIKBNMEI
+           END-IF
+      *
+           MOVE    SPACE           TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+           PERFORM VARYING IDXI    FROM    1   BY  1
+                   UNTIL ( IDXI    >   CSV-H01-MAX )
+      *
+               MOVE    CSV-H01-ITEM (IDXI)
+                                   TO  WRK-ITEM
+               IF    ( IDXI   >=   CSV-H01-MAX    )
+                   PERFORM 802-CSVDATA-EDIT-SEC
+               ELSE
+                   PERFORM 801-CSVDATA-EDIT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE    "1"             TO  WRK-DATAKBN
+           MOVE    "ÊÝ¸±¶èÊ¬ÊÌ"    TO  WRK-DATAKBNMEI
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   CONST-KOUTTL )
+      *
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    SPACE           TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+           PERFORM VARYING IDXI    FROM    1   BY  1
+                   UNTIL ( IDXI    >   CSV-H02-MAX )
+      *
+               MOVE    CSV-H02-ITEM (IDXI)
+                                   TO  WRK-ITEM
+               IF    ( IDXI   >=   CSV-H02-MAX    )
+                   PERFORM 802-CSVDATA-EDIT-SEC
+               ELSE
+                   PERFORM 801-CSVDATA-EDIT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE  SPACE             TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+      *
+           MOVE    "2"             TO  WRK-DATAKBN
+           MOVE    CSV-H02-KOHNAME
+                                   TO  WRK-DATAKBNMEI
+           PERFORM 20011-CSV-KEY-EDIT-SEC
+      *
+           MOVE    CSV-H02-KOHNAME TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  HCGS139N-KOHKENSU TO  WRK-ITEM
+           PERFORM 802-CSVDATA-EDIT-SEC
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE    SPACE           TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+           PERFORM VARYING IDXI    FROM    1   BY  1
+                   UNTIL ( IDXI    >   CSV-H01-MAX )
+      *
+               MOVE    CSV-H01-ITEM (IDXI)
+                                       TO  WRK-ITEM
+               IF    ( WRK-ITEM    =   "ÊÝ¸±¶èÊ¬" )
+                   MOVE    "ÊÝ¸±·×"    TO  WRK-ITEM
+               END-IF
+               IF    ( IDXI   >=   CSV-H01-MAX    )
+                   PERFORM 802-CSVDATA-EDIT-SEC
+               ELSE
+                   PERFORM 801-CSVDATA-EDIT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE    "3"             TO  WRK-DATAKBN
+           MOVE    "ÊÝ¸±·×"        TO  WRK-DATAKBNMEI
+      *
+           MOVE    CONST-HKNTTL    TO  IDX2
+           PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+           IF    ( KEY-RECEKA      =   SPACE )
+      *
+               MOVE    CONST-TOKTTL        TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    CONST-JIHITTL       TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    CONST-CHIKENTTL     TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    CONST-ROUSAITTL     TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    CONST-JIBAITTL      TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    CONST-KOUGAITTL     TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    CONST-ALLTTL        TO  IDX2
+               PERFORM 20011-HCGS139N-HKN-CSV-SEC
+      *
+               MOVE    SPACE           TO  WRK-CSVDATA
+               MOVE    1               TO  IDXP
+               PERFORM VARYING IDXI    FROM    1   BY  1
+                       UNTIL ( IDXI    >   CSV-H03-MAX )
+      *
+                   MOVE    CSV-H03-ITEM (IDXI)
+                                       TO  WRK-ITEM
+                   IF    ( IDXI   >=   CSV-H03-MAX    )
+                       PERFORM 802-CSVDATA-EDIT-SEC
+                   ELSE
+                       PERFORM 801-CSVDATA-EDIT-SEC
+                   END-IF
+      *
+               END-PERFORM
+      *
+               PERFORM 230-TOUKEICSV-SEC
+      *
+               MOVE    "4"         TO  WRK-DATAKBN
+               MOVE    CSV-H03-ETCNAME
+                                   TO  WRK-DATAKBNMEI
+      *
+               MOVE    CONST-SYATTL        TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-KOKTTL        TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-KOUTTL        TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-TOKTTL        TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-JIHITTL       TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-CHIKENTTL     TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-ROUSAITTL     TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-JIBAITTL      TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-KOUGAITTL     TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+               MOVE    CONST-ALLTTL        TO  IDX2
+               PERFORM 20011-HCGS139N-ETC-CSV-SEC
+      *
+           END-IF
+      *
+           .
+       2001-HCGS139N-CSV-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡¥Á¥§¥Ã¥¯É½ÊÔ½¸½èÍý¡Ê£Ã£Ó£Ö¡Ë¡ÊÊÝ¸±¾ðÊó¡Ë
+      *****************************************************************
+       20011-HCGS139N-HKN-CSV-SEC      SECTION.
+      *
+           MOVE  SPACE             TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+      *
+           PERFORM 20011-CSV-KEY-EDIT-SEC
+      *
+           MOVE    CONST-HKNMEI (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-KENSU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-NISSU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-TENSU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-FTNMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-HKNMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-KOHMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-TTLMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-SKJKAISU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-SKJFTNMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-SKJHKNMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-SKJKOHMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-SKJTTLMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-TTLTTLMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 802-CSVDATA-EDIT-SEC
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           .
+       20011-HCGS139N-HKN-CSV-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡¥Á¥§¥Ã¥¯É½ÊÔ½¸½èÍý¡Ê£Ã£Ó£Ö¡Ë¡Ê¤½¤ÎÂ¾¾ðÊó¡Ë
+      *****************************************************************
+       20011-HCGS139N-ETC-CSV-SEC      SECTION.
+      *
+           MOVE    SPACE               TO  WRK-CSVDATA
+           MOVE    1                   TO  IDXP
+           PERFORM 20011-CSV-KEY-EDIT-SEC
+      *
+           MOVE    CONST-HKNMEI (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-JIHIMONEY (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-GENMEN (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-CHOSEI1 (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-CHOSEI2 (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139N-HASU  (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 802-CSVDATA-EDIT-SEC
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           .
+       20011-HCGS139N-ETC-CSV-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ã£Ó£Ö¥Õ¥¡¥¤¥ë£Ë£Å£Ù¹àÌÜÊÔ½¸½èÍý
+      *****************************************************************
+       20011-CSV-KEY-EDIT-SEC         SECTION.
+      *
+           MOVE  WRK-PRTKBN        TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-PRTKBNMEI     TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-DATAKBN       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-DATAKBNMEI    TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-CSV-SRYYM     TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-NYUGAIKBN     TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-NYUGAIKBNMEI
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  KEY-RECEKA        TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  WRK-SRYKANAME1    TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           .
+       20011-CSV-KEY-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    °õºþ½èÍý
       *****************************************************************
        230-HCGS139N-PRINT-SEC         SECTION.
@@ -1297,6 +1879,266 @@
        230-HCGS139G-PRINT-EXT.
            EXIT.
       *****************************************************************
+      *    ³°Íè¥Á¥§¥Ã¥¯É½ÊÔ½¸½èÍý¡Ê£Ã£Ó£Ö¡Ë
+      *****************************************************************
+       2001-HCGS139G-CSV-SEC           SECTION.
+      *
+           MOVE    "9"             TO  WRK-PRTKBN
+           MOVE    "Áí³ç"          TO  WRK-PRTKBNMEI
+           MOVE    "2"             TO  WRK-NYUGAIKBN
+           MOVE    "³°Íè"          TO  WRK-NYUGAIKBNMEI
+      *
+           MOVE    SPACE           TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+           PERFORM VARYING IDXI    FROM    1   BY  1
+                   UNTIL ( IDXI    >   CSV-H04-MAX )
+      *
+               MOVE    CSV-H04-ITEM (IDXI)
+                                   TO  WRK-ITEM
+               IF    ( IDXI   >=   CSV-H04-MAX    )
+                   PERFORM 802-CSVDATA-EDIT-SEC
+               ELSE
+                   PERFORM 801-CSVDATA-EDIT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE    "1"             TO  WRK-DATAKBN
+           MOVE    "ÊÝ¸±¶èÊ¬ÊÌ"    TO  WRK-DATAKBNMEI
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   CONST-KOUTTL )
+      *
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    SPACE           TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+           PERFORM VARYING IDXI    FROM    1   BY  1
+                   UNTIL ( IDXI    >   CSV-H02-MAX )
+      *
+               MOVE    CSV-H02-ITEM (IDXI)
+                                   TO  WRK-ITEM
+               IF    ( IDXI   >=   CSV-H02-MAX    )
+                   PERFORM 802-CSVDATA-EDIT-SEC
+               ELSE
+                   PERFORM 801-CSVDATA-EDIT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE  SPACE             TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+      *
+           MOVE    "2"             TO  WRK-DATAKBN
+           MOVE    CSV-H02-KOHNAME
+                                   TO  WRK-DATAKBNMEI
+           PERFORM 20011-CSV-KEY-EDIT-SEC
+      *
+           MOVE    CSV-H02-KOHNAME TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE  HCGS139G-KOHKENSU TO  WRK-ITEM
+           PERFORM 802-CSVDATA-EDIT-SEC
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE    SPACE           TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+           PERFORM VARYING IDXI    FROM    1   BY  1
+                   UNTIL ( IDXI    >   CSV-H04-MAX )
+      *
+               MOVE    CSV-H04-ITEM (IDXI)
+                                       TO  WRK-ITEM
+               IF    ( WRK-ITEM    =   "ÊÝ¸±¶èÊ¬" )
+                   MOVE    "ÊÝ¸±·×"    TO  WRK-ITEM
+               END-IF
+               IF    ( IDXI   >=   CSV-H04-MAX    )
+                   PERFORM 802-CSVDATA-EDIT-SEC
+               ELSE
+                   PERFORM 801-CSVDATA-EDIT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           MOVE    "3"             TO  WRK-DATAKBN
+           MOVE    "ÊÝ¸±·×"        TO  WRK-DATAKBNMEI
+      *
+           MOVE    CONST-HKNTTL    TO  IDX2
+           PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+           IF    ( KEY-RECEKA      =   SPACE )
+      *
+               MOVE    CONST-TOKTTL        TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    CONST-JIHITTL       TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    CONST-CHIKENTTL     TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    CONST-ROUSAITTL     TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    CONST-JIBAITTL      TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    CONST-KOUGAITTL     TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    CONST-ALLTTL        TO  IDX2
+               PERFORM 20011-HCGS139G-HKN-CSV-SEC
+      *
+               MOVE    SPACE           TO  WRK-CSVDATA
+               MOVE    1               TO  IDXP
+               PERFORM VARYING IDXI    FROM    1   BY  1
+                       UNTIL ( IDXI    >   CSV-H03-MAX )
+      *
+                   MOVE    CSV-H03-ITEM (IDXI)
+                                       TO  WRK-ITEM
+                   IF    ( IDXI   >=   CSV-H03-MAX    )
+                       PERFORM 802-CSVDATA-EDIT-SEC
+                   ELSE
+                       PERFORM 801-CSVDATA-EDIT-SEC
+                   END-IF
+      *
+               END-PERFORM
+      *
+               PERFORM 230-TOUKEICSV-SEC
+      *
+               MOVE    "4"         TO  WRK-DATAKBN
+               MOVE    CSV-H03-ETCNAME
+                                   TO  WRK-DATAKBNMEI
+      *
+               MOVE    CONST-SYATTL        TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-KOKTTL        TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-KOUTTL        TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-TOKTTL        TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-JIHITTL       TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-CHIKENTTL     TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-ROUSAITTL     TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-JIBAITTL      TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-KOUGAITTL     TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+               MOVE    CONST-ALLTTL        TO  IDX2
+               PERFORM 20011-HCGS139G-ETC-CSV-SEC
+      *
+           END-IF
+      *
+           .
+       2001-HCGS139G-CSV-EXT.
+           EXIT.
+      *****************************************************************
+      *    ³°Íè¥Á¥§¥Ã¥¯É½ÊÔ½¸½èÍý¡Ê£Ã£Ó£Ö¡Ë¡ÊÊÝ¸±¾ðÊó¡Ë
+      *****************************************************************
+       20011-HCGS139G-HKN-CSV-SEC      SECTION.
+      *
+           MOVE  SPACE             TO  WRK-CSVDATA
+           MOVE    1               TO  IDXP
+      *
+           PERFORM 20011-CSV-KEY-EDIT-SEC
+      *
+           MOVE    CONST-HKNMEI (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-KENSU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-NISSU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-TENSU (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-FTNMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-HKNMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-KOHMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-TTLMONEY (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 802-CSVDATA-EDIT-SEC
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           .
+       20011-HCGS139G-HKN-CSV-EXT.
+           EXIT.
+      *****************************************************************
+      *    ³°Íè¥Á¥§¥Ã¥¯É½ÊÔ½¸½èÍý¡Ê£Ã£Ó£Ö¡Ë¡Ê¤½¤ÎÂ¾¾ðÊó¡Ë
+      *****************************************************************
+       20011-HCGS139G-ETC-CSV-SEC      SECTION.
+      *
+           MOVE    SPACE               TO  WRK-CSVDATA
+           MOVE    1                   TO  IDXP
+           PERFORM 20011-CSV-KEY-EDIT-SEC
+      *
+           MOVE    CONST-HKNMEI (IDX2)
+                                   TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-JIHIMONEY (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-GENMEN (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-CHOSEI1 (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-CHOSEI2 (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 801-CSVDATA-EDIT-SEC
+      *
+           MOVE    HCGS139G-HASU  (IDX2)
+                                       TO  WRK-ITEM
+           PERFORM 802-CSVDATA-EDIT-SEC
+      *
+           PERFORM 230-TOUKEICSV-SEC
+      *
+           .
+       20011-HCGS139G-ETC-CSV-EXT.
+           EXIT.
+      *****************************************************************
       *    °õºþ½èÍý
       *****************************************************************
        230-PRINT-SEC                   SECTION.
@@ -1341,6 +2183,49 @@
        230-PRINT-EXT.
            EXIT.
       *****************************************************************
+      *    £Ã£Ó£Ö½ÐÎÏ½èÍý
+      *****************************************************************
+       230-TOUKEICSV-SEC               SECTION.
+      *
+           INITIALIZE                  ORCSTOUKEICSVAREA
+           MOVE    "INS"           TO  STOUKEICSV-MODE
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                   TO  STOUKEICSV-TBL-KEY
+           MOVE    LNK-PRTKANRI-RENNUM
+                                   TO  STOUKEICSV-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                   TO  STOUKEICSV-TBL-GROUP
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                   TO  STOUKEICSV-SHORI-RENNUM
+           MOVE    LNK-PRTKANRI-SHELLID
+                                   TO  STOUKEICSV-SHELLID
+           MOVE    BGS100P-SRYYM   TO  STOUKEICSV-SRYYM
+           MOVE    BGS100P-NYUGAIKBN
+                                   TO  STOUKEICSV-NYUGAIKBN
+           MOVE    ZERO            TO  STOUKEICSV-PTID
+           MOVE    BGS100P-CSVDIR  TO  STOUKEICSV-TO-FOLDER
+           MOVE    BGS100P-CSVFNAME TO STOUKEICSV-TO-DATA
+           MOVE    "2"             TO  STOUKEICSV-CODE-TYPE
+           MOVE    WRK-CSVDATA     TO  STOUKEICSV-CSVDATA
+           MOVE    "ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½£Ã£Ó£ÖºîÀ®"
+                                   TO  STOUKEICSV-TITLE
+      *
+           CALL    "ORCSTOUKEICSV"     USING
+                                       ORCSTOUKEICSVAREA
+                                       SPA-AREA
+           IF    ( STOUKEICSV-RETURN   =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    "Åý·×£Ã£Ó£Ö£Ä£Â¤Ë¹¹¿·¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿"
+                                   TO  WRK-ERRMSG
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+      *
+           .
+      *
+       230-TOUKEICSV-EXT.
+           EXIT.
+      *****************************************************************
       *    ½ªÎ»¡¡¡¡½èÍý
       *****************************************************************
        300-END-SEC                 SECTION.
@@ -1380,6 +2265,96 @@
       *
            .
        500-ERR-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    CSV¥Ç¡¼¥¿ÊÔ½¸½èÍý
+      *****************************************************************
+       800-CSVDATA-EDIT-SEC            SECTION.
+      *
+           IF    ( WRK-ITEM        NOT =   SPACE )
+               PERFORM 800-GET-ITEM-SIZE-SEC
+               STRING  WRK-ITEM(IDXL:CNT-LEN)  DELIMITED   BY  SIZE
+               INTO    WRK-CSVDATA
+               WITH    POINTER   IDXP
+               END-STRING
+           END-IF
+           .
+      *
+       800-CSVDATA-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    CSV¥Ç¡¼¥¿ÊÔ½¸½èÍý
+      *****************************************************************
+       801-CSVDATA-EDIT-SEC            SECTION.
+      *
+           PERFORM 800-CSVDATA-EDIT-SEC
+           PERFORM 800-PUT-DELIMITER-SEC
+           .
+      *
+       801-CSVDATA-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    CSV¥Ç¡¼¥¿ÊÔ½¸½èÍý
+      *****************************************************************
+       802-CSVDATA-EDIT-SEC            SECTION.
+      *
+           PERFORM 800-CSVDATA-EDIT-SEC
+           PERFORM 800-PUT-CR-SEC
+           .
+      *
+       802-CSVDATA-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¹àÌÜ¥µ¥¤¥º¼èÆÀ½èÍý
+      *****************************************************************
+       800-GET-ITEM-SIZE-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  IDXL
+                                       CNT-LEN
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   WRK-ITEM-SIZE )
+                    OR   ( WRK-ITEM (IDX0:)    =  SPACE )
+      *
+               IF    ( IDXL = ZERO )
+                   IF    ( WRK-ITEM (IDX0:1)   NOT =  SPACE )
+                       MOVE    IDX0 TO IDXL
+                       MOVE    1    TO CNT-LEN
+                   END-IF
+               ELSE
+                   COMPUTE CNT-LEN  =  CNT-LEN + 1
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       800-GET-ITEM-SIZE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¶èÀÚ¤êÊ¸»úÊÔ½¸½èÍý
+      *****************************************************************
+       800-PUT-DELIMITER-SEC           SECTION.
+      *
+           STRING    ","   DELIMITED   BY  SIZE
+           INTO      WRK-CSVDATA
+           WITH      POINTER   IDXP
+           END-STRING
+      *
+           .
+       800-PUT-DELIMITER-EXT.
+           EXIT.
+      *****************************************************************
+      *    ²þ¹ÔÊ¸»úÊÔ½¸½èÍý
+      *****************************************************************
+       800-PUT-CR-SEC                  SECTION.
+      *
+           STRING    X"0D"   DELIMITED BY  SIZE
+           INTO      WRK-CSVDATA
+           WITH      POINTER   IDXP
+           END-STRING
+      *
+           .
+       800-PUT-CR-EXT.
            EXIT.
       *****************************************************************
       *    À¾ÎñÆüËÜ¸ìÊÑ´¹½èÍý
