@@ -77,6 +77,7 @@
       *  04.04.13    NACL-ÌçÏÆ    11/02/17  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/12/04  ¿©»ö¡ÊÆÃÊÌ¿©¡Ë¤ÎÂ¾ÊÝ¸±ÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    11/03/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -414,7 +415,7 @@
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
                    IF  (LNK-FTNJGNCHK-PREFNUM      =     42     )
-                   AND (LNK-FTNJGNCHK-KOHNUM       =    "182"   )
+                   AND (LNK-FTNJGNCHK-KOHNUM   =  "182" OR "282")
                    AND (LNK-FTNJGNCHK-SRYYM       >= "201012"   )
                       MOVE   HKN-HON-NYUDJGNGAK  TO  WRK-HKNMST-JGNGAK
                    END-IF
@@ -1178,7 +1179,8 @@
            AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
            AND (LNK-FTNJGNCHK-SRYYM       >= "200704"      )
              MOVE     ZERO       TO    FLG-TAISYO
-             IF   LNK-FTNJGNCHK-KOHNUM  =  "287"
+             IF   LNK-FTNJGNCHK-KOHNUM  =  "287" OR "380"
+                                        OR "281" OR "282"
                MOVE     LNK-FTNJGNCHK-HKNID  TO  WRK-HKNID
                PERFORM  2101111-HKNINF-KENSAKU-SEC
                IF   PTHKN-HKNNUM  NOT = "060" AND "067" AND "039"
