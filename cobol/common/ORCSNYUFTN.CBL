@@ -124,6 +124,7 @@
       *
       *  04.05.01    NACL-門脇    09/12/04  食事（特別食）の他保険対応
       *  04.05.02    NACL-門脇    10/01/07  治験対応
+      *  04.05.03    NACL-門脇    11/03/09  福島県地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1601,6 +1602,18 @@
                               "372" OR "373"                    ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
+                IF  ( WRK-PREFNUM(1)                =    07      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200604" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =
+                              "445" OR "545"                    ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =
+                              "445" OR "545"                    ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =
+                              "445" OR "545"                    ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =
+                              "445" OR "545"                    ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
               END-IF
               IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(2)
                 IF  ( WRK-PREFNUM(2)                =    07      )
@@ -1709,6 +1722,18 @@
                               "372" OR "373"                    ) OR
                      (WRK-HANBETU-KOH4HKNNUM(IDX)   =
                               "372" OR "373"                    ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
+                IF  ( WRK-PREFNUM(2)                =    07      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "200604" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =
+                              "445" OR "545"                    ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =
+                              "445" OR "545"                    ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =
+                              "445" OR "545"                    ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =
+                              "445" OR "545"                    ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
               END-IF
