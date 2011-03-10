@@ -257,9 +257,6 @@
       *    ファイルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
       *
-      *    クライアント保存ＤＢ制御サブ
-           COPY    "CPORCSFILESV.INC".
-      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -474,61 +471,12 @@
                                            SPA-AREA
            END-IF
       *
-           IF          WKBI201-PROC-FLG    =  ZERO
-      *        ファイル保存情報更新
-               PERFORM 3001-FILE-INFO-INSERT-SEC
-           END-IF
-      *
            PERFORM 900-JOB-STEP-END-SEC
       *
            PERFORM 900-DBDISCONNECT-SEC
       *
            .
        300-END-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ファイル保存情報更新処理
-      *****************************************************************
-       3001-FILE-INFO-INSERT-SEC             SECTION.
-      *
-           MOVE    ZERO            TO  WRK-RENNUM
-      *
-           INITIALIZE                  ORCSFILESVAREA
-           MOVE    "I"             TO  SFILESV-MODE
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SFILESV-TBL-KEY
-      *
-           IF    ( WRK-PARA-FILE       =   "1"             )
-               ADD     1               TO  WRK-RENNUM
-      *
-               MOVE    "orcbi201.sh"   TO  SFILESV-SHELLID  (WRK-RENNUM)
-               MOVE    1               TO  SFILESV-SHORI-RENNUM
-                                                            (WRK-RENNUM)
-               MOVE    WRK-RENNUM      TO  SFILESV-RENNUM   (WRK-RENNUM)
-               MOVE    "/tmp/"         TO  SFILESV-FOR-FOLDER
-                                                            (WRK-RENNUM)
-               STRING   WRK-PARA-FILENM    DELIMITED  BY  SPACE
-                        ".wk"              DELIMITED  BY  SIZE
-                                           INTO
-                                           SFILESV-FOR-DATA (WRK-RENNUM)
-               END-STRING
-               MOVE    WRK-PARA-FILENM-FOLDER
-                                       TO  SFILESV-TO-FOLDER(WRK-RENNUM)
-               MOVE    WRK-PARA-FILENM TO  SFILESV-TO-DATA  (WRK-RENNUM)
-               MOVE    WRK-PROC-KNS    TO  SFILESV-CNT-ALL  (WRK-RENNUM)
-               MOVE    "入院患者検索結果一覧" 
-                                       TO  SFILESV-TITLE    (WRK-RENNUM)
-      *********MOVE    "1"             TO  SFILESV-DATA-TYPE(WRK-RENNUM) 
-           END-IF
-      *
-           IF      WRK-RENNUM          >   ZERO
-               CALL    "ORCSFILESV"    USING
-                                           ORCSFILESVAREA
-                                           SPA-AREA
-           END-IF
-           .
-       3001-FILE-INFO-INSERT-EXT.
            EXIT.
       *
       *

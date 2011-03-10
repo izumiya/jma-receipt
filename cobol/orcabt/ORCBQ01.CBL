@@ -265,9 +265,6 @@
       *    照会用サブ
            COPY    "CPQSUB03.INC".
       *
-      *    クライアント保存ＤＢ制御サブ
-           COPY    "CPORCSFILESV.INC".
-      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -486,11 +483,6 @@
                                                SPA-AREA
            END-IF
       *
-           IF  ( WKBQ01-PROC-FLG    =  ZERO )
-      *        ファイル保存情報更新
-               PERFORM 3001-FILE-INFO-INSERT-SEC
-           END-IF
-      *
            PERFORM 900-PTSRH-DEL1-SEC
       *
            PERFORM 900-JOB-STEP-END-SEC
@@ -501,48 +493,6 @@
        300-END-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    ファイル保存情報更新処理
-      *****************************************************************
-       3001-FILE-INFO-INSERT-SEC             SECTION.
-      *
-           MOVE    ZERO            TO  WRK-RENNUM
-      *
-           INITIALIZE                  ORCSFILESVAREA
-           MOVE    "I"             TO  SFILESV-MODE
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SFILESV-TBL-KEY
-      *
-           IF    ( WRK-PARA-FILE       =   "1"             )
-               ADD     1               TO  WRK-RENNUM
-      *
-               MOVE    "ORCBQ01.sh"    TO  SFILESV-SHELLID  (WRK-RENNUM)
-               MOVE    1               TO  SFILESV-SHORI-RENNUM
-                                                            (WRK-RENNUM)
-               MOVE    WRK-RENNUM      TO  SFILESV-RENNUM   (WRK-RENNUM)
-               MOVE    "/tmp/"         TO  SFILESV-FOR-FOLDER
-                                                            (WRK-RENNUM)
-               STRING   WRK-PARA-FILENM    DELIMITED  BY  SPACE
-                        ".wk"              DELIMITED  BY  SIZE
-                                           INTO
-                                           SFILESV-FOR-DATA (WRK-RENNUM)
-               END-STRING
-               MOVE    WRK-PARA-FILENM-FOLDER
-                                       TO  SFILESV-TO-FOLDER(WRK-RENNUM)
-               MOVE    WRK-PARA-FILENM TO  SFILESV-TO-DATA  (WRK-RENNUM)
-               MOVE    WRK-PROC-KNS    TO  SFILESV-CNT-ALL  (WRK-RENNUM)
-               MOVE    "患者一覧"      TO  SFILESV-TITLE    (WRK-RENNUM)
-      *********MOVE    "1"             TO  SFILESV-DATA-TYPE(WRK-RENNUM) 
-           END-IF
-      *
-           IF      WRK-RENNUM          >   ZERO
-               CALL    "ORCSFILESV"    USING
-                                           ORCSFILESVAREA
-                                           SPA-AREA
-           END-IF
-           .
-       3001-FILE-INFO-INSERT-EXT.
-           EXIT.
       *
       *****************************************************************
       *    オフセット取得処理

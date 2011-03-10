@@ -99,9 +99,6 @@
       *   ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
       *
-      *    クライアント保存ＤＢ制御サブ
-           COPY    "CPORCSFILESV.INC".
-      *
            COPY    "ORCA-BLOB".
       *
       *    ファイル削除パラメタ
@@ -372,42 +369,9 @@
       *****************************************************************
        4902-FILE-INFO-CHK-SEC          SECTION.
       *
-           INITIALIZE                  ORCSFILESVAREA
-           MOVE    "R"             TO  SFILESV-MODE
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SFILESV-TBL-KEY
-           CALL    "ORCSFILESV"    USING
-                                       ORCSFILESVAREA
-                                       SPA-AREA  
-           IF      SFILESV-RETURN  =   ZERO
-               INITIALIZE               SPA-SFILESV-AREA
-               PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       100
-                       OR      SFILESV-SHELLID (IDX)
-                                   =       SPACE
-                   MOVE    SFILESV-TITLE        (IDX)
-                                       TO  SPA-SFILESV-TITLE     (IDX)
-                   MOVE    SFILESV-CNT-ALL      (IDX)
-                                       TO  SPA-SFILESV-CNT-ALL   (IDX)
-                   MOVE    SFILESV-FOR-FOLDER   (IDX)
-                                       TO  SPA-SFILESV-FOR-FOLDER(IDX)
-                   MOVE    SFILESV-FOR-DATA     (IDX)
-                                       TO  SPA-SFILESV-FOR-DATA  (IDX)
-                   MOVE    SFILESV-TO-FOLDER    (IDX)
-                                       TO  SPA-SFILESV-TO-FOLDER (IDX)
-                   MOVE    SFILESV-TO-DATA      (IDX)
-                                       TO  SPA-SFILESV-TO-DATA   (IDX)
-                   MOVE    SFILESV-CODE-TYPE    (IDX)
-                                       TO  SPA-SFILESV-CODE-TYPE (IDX)
-                   MOVE    SFILESV-DATA-TYPE    (IDX)
-                                       TO  SPA-SFILESV-DATA-TYPE (IDX)
-                   ADD     1           TO  SPA-SFILESV-MAX
-               END-PERFORM
+           MOVE    1                   TO  SPA-I23-FILESV-CHK-FLG
       *
-               MOVE    1                   TO  SPA-I23-FILESV-CHK-FLG
-      *
-               MOVE    1                   TO  I23-DURATION
-           END-IF
+           MOVE    1                   TO  I23-DURATION
       *
            .
        4902-FILE-INFO-CHK-EXT.

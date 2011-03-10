@@ -327,9 +327,6 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
-      *
-      *    クライアント保存ＤＢ制御サブ
-           COPY    "CPORCSFILESV.INC".
       *     
            COPY    "ORCA-DBMETA".
       *
@@ -548,19 +545,12 @@
                                            TO  WRK-FILENM
            END-IF             
       *
-      *    ファイル保存情報削除
-           INITIALIZE                  ORCSFILESVAREA
-           MOVE    "D"             TO  SFILESV-MODE
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SFILESV-TBL-KEY
-           CALL    "ORCSFILESV"    USING
-                                       ORCSFILESVAREA
-                                       SPA-AREA  
-      *
       *    ジョブ開始セット処理
            PERFORM 900-JOBKANRI-HENSYU-SEC
       *
       *    印刷用スクリプト処理
+      *
+           INITIALIZE              SHELLTBL
       *
       *    フィアルデイレクトリ位置指定
            INITIALIZE              ORCSMKPASSAREA
@@ -595,11 +585,17 @@
            MOVE    WRK-FILENM-FOLDER
                                    TO  SHELLTBL-ARG13
            MOVE    WRK-FILENM      TO  SHELLTBL-ARG14
-           STRING   "/tmp/"                DELIMITED  BY  SIZE
-                    WRK-FILENM             DELIMITED  BY  SPACE
-                    ".wk"                  DELIMITED  BY  SIZE
-                                           INTO  SHELLTBL-ARG15
-           END-STRING
+           IF    ( SPA-I20-I22-FILE   =   "1" )
+               STRING   "/tmp/"            DELIMITED  BY  SIZE
+                        WRK-FILENM         DELIMITED  BY  SPACE
+                        SPA-TERMID         DELIMITED  BY  SIZE
+                        ".wk"              DELIMITED  BY  SIZE
+               INTO     SHELLTBL-ARG15
+               END-STRING
+           ELSE
+               MOVE    SPA-I20-I22-FILENAME
+                                   TO  SHELLTBL-ARG15
+           END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
@@ -612,6 +608,26 @@
       *
            IF    ( SPA-I20-I22-FILE   =   "1" )
                MOVE    "SV"            TO  SPA-I2ID1-FLG
+               INITIALIZE                  SPA-I23-AREA
+               MOVE    1               TO  SPA-SFILESV-MAX
+               MOVE    "/tmp/"         TO  SPA-SFILESV-FOR-FOLDER
+                                                            (1)
+               MOVE    SPACE           TO  SPA-SFILESV-FOR-DATA (1)
+               STRING  WRK-FILENM          DELIMITED  BY  SPACE
+                       SPA-TERMID          DELIMITED  BY  SIZE
+                       ".wk"               DELIMITED  BY  SIZE
+               INTO    SPA-SFILESV-FOR-DATA (1)
+               END-STRING
+               MOVE    WRK-FILENM-FOLDER
+                                       TO  SPA-SFILESV-TO-FOLDER(1)
+               MOVE    WRK-FILENM      TO  SPA-SFILESV-TO-DATA  (1)
+      *
+               COMPUTE SPA-SFILESV-CNT-ALL  (1)
+                   =   SPA-I20-I22-EDKNS
+                   -   SPA-I20-I22-STKNS   +   1
+      *
+               MOVE    "入院患者検索結果一覧" 
+                                       TO  SPA-SFILESV-TITLE    (1)
            ELSE
                MOVE    SPACE           TO  SPA-I2ID1-FLG
            END-IF
@@ -627,16 +643,6 @@
       *    処理表示画面戻り処理
       *****************************************************************
        3001-I23SPASET-SEC             SECTION.
-      *
-           IF    ( SPA-I2ID1-FLG    =   "SV" )
-               INITIALIZE                  ORCSFILESVAREA
-               MOVE    "D"             TO  SFILESV-MODE
-               MOVE    CONST-JOB-SHELLID
-                                       TO  SFILESV-TBL-KEY
-               CALL    "ORCSFILESV"    USING
-                                           ORCSFILESVAREA
-                                           SPA-AREA
-           END-IF
       *
            MOVE    SPACE           TO  SPA-I2ID1-FLG
            MOVE    SPACE           TO  SPA-I2IDCD
@@ -2316,7 +2322,12 @@
       *    画面をＳＰＡにセット
            PERFORM 4101-GMN-SPA-SET-SEC
       *
-           INITIALIZE                  SPA-I23-AREA
+      *
+           IF    ( SPA-I2ID1-FLG   =   "SV" )
+               CONTINUE
+           ELSE
+               INITIALIZE                  SPA-I23-AREA
+           END-IF
       *
            MOVE    SPACE           TO  SPA-MOTOPG
            MOVE    SPA-I2KYOUTU    TO  SPA-WORK  

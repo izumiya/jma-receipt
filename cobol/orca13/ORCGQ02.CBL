@@ -339,9 +339,6 @@
       *
       *    最終受診日取得
            COPY    "CPORCSLASTYMD.INC".
-      *
-      *    クライアント保存ＤＢ制御サブ
-           COPY    "CPORCSFILESV.INC".
       *     
            COPY    "ORCA-DBMETA".
       *
@@ -526,16 +523,6 @@
       *****************************************************************
        3001-Q97SPASET-SEC             SECTION.
       *
-           IF    ( SPA-QID1-FLG    =   "SV" )
-               INITIALIZE                  ORCSFILESVAREA
-               MOVE    "D"             TO  SFILESV-MODE
-               MOVE    CONST-JOB-SHELLID
-                                       TO  SFILESV-TBL-KEY
-               CALL    "ORCSFILESV"    USING
-                                           ORCSFILESVAREA
-                                           SPA-AREA
-           END-IF
-      *
            MOVE    SPACE           TO  SPA-QID1-FLG
            MOVE    SPACE           TO  SPA-QIDCD
            MOVE    SPACE           TO  SPA-Q97-MOTOPG
@@ -647,20 +634,12 @@
                                            TO  WRK-FILENM
            END-IF             
       *
-      *    ファイル保存情報削除
-           INITIALIZE                  ORCSFILESVAREA
-           MOVE    "D"             TO  SFILESV-MODE
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SFILESV-TBL-KEY
-           CALL    "ORCSFILESV"    USING
-                                       ORCSFILESVAREA
-                                       SPA-AREA  
-      *
       *    ジョブ開始セット処理
            MOVE    CONST-JOBID     TO  WRK-JOBID
            PERFORM 900-JOBKANRI-HENSYU-SEC
       *
       *    印刷用スクリプト処理
+           INITIALIZE              SHELLTBL
       *
       *    フィアルデイレクトリ位置指定
            INITIALIZE              ORCSMKPASSAREA
@@ -695,11 +674,17 @@
            MOVE    WRK-FILENM-FOLDER
                                    TO  SHELLTBL-ARG13
            MOVE    WRK-FILENM      TO  SHELLTBL-ARG14
-           STRING   "/tmp/"                DELIMITED  BY  SIZE
-                    WRK-FILENM             DELIMITED  BY  SPACE
-                    ".wk"                  DELIMITED  BY  SIZE
-                                           INTO  SHELLTBL-ARG15
-           END-STRING
+           IF    ( SPA-Q02-Q100-FILE   =   "1" )
+               STRING   "/tmp/"                DELIMITED  BY  SIZE
+                        WRK-FILENM             DELIMITED  BY  SPACE
+                        SPA-TERMID             DELIMITED  BY  SIZE
+                        ".wk"                  DELIMITED  BY  SIZE
+               INTO     SHELLTBL-ARG15
+               END-STRING
+           ELSE
+               MOVE    SPA-Q02-Q100-FILENAME
+                                   TO  SHELLTBL-ARG15
+           END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
@@ -711,6 +696,26 @@
       *
            IF    ( SPA-Q02-Q100-FILE   =   "1" )
                MOVE    "SV"            TO  SPA-QID1-FLG
+      *
+               INITIALIZE                  SPA-Q97-AREA
+               MOVE    1               TO  SPA-SFILESV-MAX
+               MOVE    "/tmp/"         TO  SPA-SFILESV-FOR-FOLDER
+                                                            (1)
+               MOVE    SPACE           TO  SPA-SFILESV-FOR-DATA (1)
+               STRING  WRK-FILENM          DELIMITED  BY  SPACE
+                       SPA-TERMID          DELIMITED  BY  SIZE
+                       ".wk"               DELIMITED  BY  SIZE
+               INTO    SPA-SFILESV-FOR-DATA (1)
+               END-STRING
+               MOVE    WRK-FILENM-FOLDER
+                                       TO  SPA-SFILESV-TO-FOLDER(1)
+               MOVE    WRK-FILENM      TO  SPA-SFILESV-TO-DATA  (1)
+      *
+               COMPUTE SPA-SFILESV-CNT-ALL  (1)
+                   =   SPA-Q02-Q100-EDKNS
+                   -   SPA-Q02-Q100-STKNS  +   1
+      *
+               MOVE    "患者一覧"      TO  SPA-SFILESV-TITLE    (1)
            ELSE
                MOVE    SPACE           TO  SPA-QID1-FLG
            END-IF
@@ -2059,7 +2064,11 @@
       *    画面をＳＰＡにセット
            PERFORM 4101-GMN-SPA-SET-SEC
       *
-           INITIALIZE                  SPA-Q97-AREA
+           IF    ( SPA-QID1-FLG    =   "SV" )
+               CONTINUE
+           ELSE
+               INITIALIZE              SPA-Q97-AREA
+           END-IF
       *
            MOVE    SPACE           TO  SPA-MOTOPG
            MOVE    SPA-AREA        TO  SPA-COMMON
