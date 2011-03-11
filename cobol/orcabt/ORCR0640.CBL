@@ -12577,13 +12577,13 @@
                            MOVE    2    TO   FLG-KEISAN2
                         END-IF
                      END-IF
-                     IF   (SYU-KOHTAIYKZKBN    NOT =  "9" )
-                     AND  (FLG-WRKFILE-CLEAR       =  ZERO)
-                        COMPUTE  WRK-FTNKEI-SAGAKU9 =
-                                 WRK-FTNKEI         -
-                                 WRK-FTNKEI-OKIKAE
-                        MOVE   WRK-FTNKEI-OKIKAE   TO   WRK-FTNKEI
-                     END-IF
+      ***            IF   (SYU-KOHTAIYKZKBN    NOT =  "9" )
+      ***            AND  (FLG-WRKFILE-CLEAR       =  ZERO)
+      ***               COMPUTE  WRK-FTNKEI-SAGAKU9 =
+      ***                        WRK-FTNKEI         -
+      ***                        WRK-FTNKEI-OKIKAE
+      ***               MOVE   WRK-FTNKEI-OKIKAE   TO   WRK-FTNKEI
+      ***            END-IF
                      PERFORM  2104429-TOKUSITU-HENSYU2-SEC
                      IF  SYU-KOHTAIYKZKBN   = "9"
                       MOVE       1    TO   FLG-HOKENICHIBU5
