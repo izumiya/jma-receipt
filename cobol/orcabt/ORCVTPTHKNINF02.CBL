@@ -830,9 +830,15 @@
                MOVE    PTHKNINF-REC        TO  TBL-PTHKNINF-REC (IDX)
            ELSE
       *        保険の開始日を変更する
-               MOVE    HZN-HKN-TEKSTYMD(1) TO  TBL-PTHKN-TEKSTYMD
+               IF      HZN-HKN-TEKSTYMD(1) <   TBL-PTHKN-TEKEDYMD(IDX)
+                   MOVE    HZN-HKN-TEKSTYMD(1) TO  TBL-PTHKN-TEKSTYMD
                                                                 (IDX)
-               MOVE    "B"                 TO  TBL-ISAM-ERR (IDX)
+                   MOVE    "B"                 TO  TBL-ISAM-ERR (IDX)
+               ELSE
+      *            対象なし
+                   MOVE    3                   TO  FLG-ERR
+                   MOVE    "3"                 TO  TBL-ISAM-ERR (IDX)
+               END-IF
            END-IF
            .
        50013-HKNNUM-HENKAN-EXT.
