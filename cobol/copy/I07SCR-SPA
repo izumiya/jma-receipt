@@ -50,6 +50,10 @@
                    07  SPA-GMN-BUNBENKBN       PIC X(01).
                    07  SPA-GMN-BUNBENKBNF      PIC X(01).
                    07  SPA-GMN-BUNBENKBNMEI    PIC X(20).
+               05  SPA-GMN-TEISYUTUSAKI-G.
+                   07  SPA-GMN-TEISYUTUSAKI    PIC X(01).
+                   07  SPA-GMN-TEISYUTUSAKIF   PIC X(01).
+                   07  SPA-GMN-TEISYUTUSAKIMEI PIC X(20).
                05  SPA-GMN-ZAIWEEK             PIC 9(02).
                05  SPA-GMN-BIRTHDAY-BABY       PIC X(10).
                05  SPA-GMN-SIZANKBN-G.
@@ -104,6 +108,12 @@
                            11  SPA-GMN-BUNBENKBNL      PIC X(01).
                            11  SPA-GMN-BUNBENKBNFL     PIC X(01).
                            11  SPA-GMN-BUNBENKBNMEIL   PIC X(20).
+                   07  SPA-GMN-TEISYUTUSAKILST-G.
+                       09  SPA-GMN-TEISYUTUSAKI-MAX        PIC 9(03).
+                       09  SPA-GMN-TEISYUTUSAKILST OCCURS 5.
+                           11  SPA-GMN-TEISYUTUSAKIL      PIC X(01).
+                           11  SPA-GMN-TEISYUTUSAKIFL     PIC X(01).
+                           11  SPA-GMN-TEISYUTUSAKIMEIL   PIC X(20).
                    07  SPA-GMN-SIZANKBNLST-G.
                        09  SPA-GMN-SIZANKBN-MAX        PIC 9(03).
                        09  SPA-GMN-SIZANKBNLST OCCURS 5.

@@ -51,7 +51,12 @@
                 04  I07-BUNBENKBN          PIC X(22).
                 04  I07-BUNBENKBN-COUNT    PIC S9(9)   BINARY.
                 04  I07-BUNBENKBN-ITEM     PIC X(22)   OCCURS  5 TIMES.
-              03  I07-LBLTEISYUTUSAKI      PIC X(30).
+              03  I07-CMB-TEISYUTUSAKI.
+                04  I07-TEISYUTUSAKI       PIC X(22).
+                04  I07-TEISYUTUSAKI-STATE PIC S9(9)   BINARY.
+                04  I07-TEISYUTUSAKI-COUNT PIC S9(9)   BINARY.
+                04  I07-TEISYUTUSAKI-ITEM  PIC X(22)   OCCURS  5 TIMES.
+                04  I07-TEISYUTUSAKI-ITEM-STATE  PIC S9(9)   BINARY.
               03  I07-ZAIWEEK              PIC S9(2).
               03  I07-BIRTHDAY-BABY        PIC X(10).
               03  I07-CMB-SIZANKBN.

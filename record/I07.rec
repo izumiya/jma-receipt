@@ -72,8 +72,14 @@ I07	{
 			count	int;
 			item	varchar(22)[05];
 		};
-		LBLTEISYUTUSAKI	{
-			value	varchar(30);
+		CMB_TEISYUTUSAKI{
+			TEISYUTUSAKI{
+				value	varchar(22);
+		           	state	int;
+			};
+			count	int;
+			item	varchar(22)[05];
+	           	state	int;
 		};
 		ZAIWEEK	{
 			value	number(2);
