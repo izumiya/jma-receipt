@@ -1365,16 +1365,16 @@
       *
            END-IF
       *
-      *    コメント入力値はゼロ以外は数量なしとする
-           IF    ((SPA-COM-INPUTCD(GMN-IDX)(1:2)   =   "84") OR
-                  (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084"))
-              AND (SNUM-RC             =   ZERO    )
-              AND (SNUM-OUTNUM     NOT =   ZERO    )
-               MOVE    SPACE               TO  SPA-ERRCD
-               MOVE    ZERO                TO  LNK-SC97-SURYOFLG
-               MOVE    ZERO                TO  LNK-SC97-SURYOCNT
-               MOVE    ZERO                TO  LNK-SC97-SURYO
-           END-IF
+      ***  コメント入力値はゼロ以外は数量なしとする
+      *    IF    ((SPA-COM-INPUTCD(GMN-IDX)(1:2)   =   "84") OR
+      *           (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084"))
+      *       AND (SNUM-RC             =   ZERO    )
+      *       AND (SNUM-OUTNUM     NOT =   ZERO    )
+      *        MOVE    SPACE               TO  SPA-ERRCD
+      *        MOVE    ZERO                TO  LNK-SC97-SURYOFLG
+      *        MOVE    ZERO                TO  LNK-SC97-SURYOCNT
+      *        MOVE    ZERO                TO  LNK-SC97-SURYO
+      ***  END-IF
       *
            IF      LNK-SC97-SURYO   >   ZERO
                IF      FLG-AUTO         =   1

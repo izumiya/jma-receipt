@@ -66,7 +66,7 @@
       *  04.05.00    NACL-多々納  09/10/XX  多剤投与・換算値等対応
       *  04.05.00    NACL-多々納  09/12/09  患者禁忌薬剤期間対応
       *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
-      *  04.06.00    NACL-多々納  10/07/XX  ユーザーコメント端数対応
+      ***04.06.00    NACL-多々納  10/07/XX  ユーザーコメント端数対応
       *****************************************************************
       *
       *
@@ -3789,20 +3789,20 @@
                           (SNUM-SYOKBN     NOT =   SPACE )   OR
                           (SNUM-KETSUU         >   WRK-KETA)
                        MOVE    "0029"          TO  SPA-ERRCD
-      *                ユーザコメントで小数点以下は対象
-                       IF     (SPA-COM-INPUTCD (IDX-T)(1:4) =   "0084")
-                           IF     (SNUM-RC         NOT =   ZERO  )   OR
-                                  (SNUM-MINKBN     NOT =   SPACE )   OR
-                                 ((SNUM-SEISUU +  SNUM-SYOSUU + 1)
-                                                       >   WRK-KETA )
-                               CONTINUE
-                           ELSE
-                               MOVE    1               TO  FLG-INPUT-CHK
-                               MOVE    SPACE           TO  SPA-ERRCD
-                               MOVE    1               TO  WRK-SYOKBN
-                                                               (IDX-SST)
-                           END-IF
-                       END-IF
+      ****             ユーザコメントで小数点以下は対象
+      *                IF     (SPA-COM-INPUTCD (IDX-T)(1:4) =   "0084")
+      *                    IF     (SNUM-RC         NOT =   ZERO  )   OR
+      *                           (SNUM-MINKBN     NOT =   SPACE )   OR
+      *                          ((SNUM-SEISUU +  SNUM-SYOSUU + 1)
+      *                                                >   WRK-KETA )
+      *                        CONTINUE
+      *                    ELSE
+      *                        MOVE    1               TO  FLG-INPUT-CHK
+      *                        MOVE    SPACE           TO  SPA-ERRCD
+      *                        MOVE    1               TO  WRK-SYOKBN
+      *                                                        (IDX-SST)
+      *                    END-IF
+      *****            END-IF
                    ELSE
                        MOVE    SNUM-OUTEDT(WRK-KETA2:WRK-KETA)
                                                TO  SPA-COM-ATAI
