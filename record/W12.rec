@@ -404,6 +404,34 @@ W12	{
 					count	int;
 					item	varchar(40)[10];
 				};
+				KIGO_DELI_FLG_CMB	{
+					KIGO_DELI_FLG	{
+						value	varchar(30);
+					};
+					count	int;
+					item	varchar(30)[5];
+				};
+				KIGO_DELI_HKNJA_CMB	{
+					KIGO_DELI_HKNJA	{
+						value	varchar(30);
+					};
+					count	int;
+					item	varchar(30)[5];
+				};
+				NUM_DELI_FLG_CMB	{
+					NUM_DELI_FLG	{
+						value	varchar(30);
+					};
+					count	int;
+					item	varchar(30)[5];
+				};
+				NUM_DELI_HKNJA_CMB	{
+					NUM_DELI_HKNJA	{
+						value	varchar(30);
+					};
+					count	int;
+					item	varchar(30)[5];
+				};
 			};
 			fi26	{
 				PR_PRTJYUN_COMBO	{

@@ -108,6 +108,8 @@
       *                                     公費単独のレセプトとする
       *  04.05.12    NACL-門脇    11/02/17  災害対応修正（平成２３年１月〜）
       *  04.05.13    NACL-門脇    11/02/25  保険別請求チェック表の本体取込み
+      *  04.05.14    NACL-藤原    11/02/22  レセ電データの記号番号区切り
+      *                                     文字設定対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1227,7 +1229,7 @@
            MOVE    WRK-PARA-TERMID     TO  RECE12PARA-TERMID
            MOVE    WRK-PARA-HOSPNUM    TO  RECE12PARA-HOSPNUM
       *
-           OPEN    INPUT               RECE02-FILE
+           OPEN    I-O                 RECE02-FILE
            IF  STS-RECE            NOT =   ZERO
                DISPLAY "*** ORCR0105 RECE02 OPEN ERR  ***"
                MOVE    2               TO  FLG-STS
@@ -1845,6 +1847,8 @@
                            PERFORM 900-DBCOMMIT-SEC
                            PERFORM 900-DBSTART-SEC
                        END-IF
+      *
+                       REWRITE RECE02-REC
       *
                        PERFORM 990-RECE02-READ-SEC
                    END-PERFORM
@@ -6958,6 +6962,10 @@
                    MOVE    "00"            TO  RECE08-PREFNUM
                END-IF
            END-IF
+      *
+           MOVE    RECE08-PREFKBN      TO  RECE02-PREFKBN
+           MOVE    RECE08-PREFNUM      TO  RECE02-HKNJANUM-PREFNUM
+      * 
            MOVE    RECE02-HKNJANUM-KEY TO  RECE08-HKNJANUM
            MOVE    RECE02-TEKSTYMD     TO  RECE08-TEKSTYMD
            MOVE    RECE02-TEISYUTUSAKI TO  RECE08-TEISYUTUSAKI
