@@ -3109,7 +3109,14 @@
            PERFORM   VARYING   IDX     FROM    1   BY  1
                      UNTIL     IDX     >   SPA-GMN-MAX-41
                IF      SPA-GMN-TMEISYO-41 (IDX)    =   ALL "-"
-                   MOVE    ALL "-"         TO  I41-DATELIST-ITEM (IDX)
+      *********    MOVE    ALL "-"         TO  I41-DATELIST-ITEM (IDX)
+                   MOVE    ALL "-"         TO  I41-TNO  (IDX)
+                   MOVE    ALL "-"         TO  I41-TMEISYO (IDX)(1:30)
+                   MOVE    ALL "-"         TO  I41-TTENSU  (IDX)
+                   PERFORM VARYING     IDY     FROM    1   BY  1
+                           UNTIL       IDY     >   31
+                       MOVE    "-"         TO  I41-TDAY (IDX IDY)(2:1)
+                   END-PERFORM
                ELSE
                    IF      SPA-GMN-TBANGO (IDX) >   ZERO
                        MOVE    SPA-GMN-TBANGO  (IDX)
