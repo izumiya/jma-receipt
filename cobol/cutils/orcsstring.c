@@ -53,25 +53,35 @@ orcsstring (char *args)
 
 	switch(command[0]) {
 		case 'c':
+#ifdef DEBUG
 			fprintf(stderr,"orcsstring: check\n");
+#endif
 			jis213_check(&data);
 			break;
 		case 's':
 			if (!strncmp("substr", command, strlen("substr"))) {
+#ifdef DEBUG
 				fprintf(stderr,"orcsstring: substring\n");
+#endif
 				jis213_substr(&data);
 			} else if (!strncmp("sub", command, strlen("sub"))) {
+#ifdef DEBUG
 				fprintf(stderr,"orcsstring: sub\n");
+#endif
 				jis213_sub(&data);
 			} else if (!strncmp("search", command, strlen("search"))) {
+#ifdef DEBUG
 				fprintf(stderr,"orcsstring: search\n");
+#endif
 				jis213_search(&data);
 			} else {
 				fprintf(stderr,"orcsstring: invalid command:%s\n", command);
 			}
 			break;
 		case 'g':
+#ifdef DEBUG
 			fprintf(stderr,"orcsstring: gsub\n");
+#endif
 			jis213_gsub(&data);
 			break;
 		default:
@@ -83,9 +93,7 @@ orcsstring (char *args)
 	StringC2Cobol(data.str1, STR_SIZE);
 	memcpy(p, data.str1, STR_SIZE);
 	p += STR_SIZE;
-fprintf(stderr, "data.str2:%02X%02X%02X\n",(unsigned char)data.str2[0],(unsigned char)data.str2[1],(unsigned char)data.str2[2]);
 	StringC2Cobol(data.str2, STR_SIZE);
-fprintf(stderr, "data.str2:%02X%02X%02X\n",(unsigned char)data.str2[0],(unsigned char)data.str2[1],(unsigned char)data.str2[2]);
 	memcpy(p, data.str2, STR_SIZE);
 	p += STR_SIZE;
 	StringC2Cobol(data.str3, STR_SIZE);
