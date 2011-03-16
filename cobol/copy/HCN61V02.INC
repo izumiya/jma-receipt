@@ -8,7 +8,9 @@
             02  HCN61V02-HOSPCD.
               03  HCN61V02-HOSPCD-S
                       PIC X(1)    OCCURS  10 TIMES.
-            02  HCN61V02-SANKANUM   PIC X(10).
+            02  HCN61V02-SANKANUM.
+              03  HCN61V02-SANKANUM-S
+                      PIC X(1)    OCCURS  10 TIMES.
             02  HCN61V02-HOSPADRS
                     PIC X(50)   OCCURS  2 TIMES.
             02  HCN61V02-HOSPNAME
