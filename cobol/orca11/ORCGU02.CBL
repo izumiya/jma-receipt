@@ -4394,6 +4394,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4902-UKEUPD-SEC              SECTION.
       *
+      *    選択番号の取り込みがない時
+           IF     (SPA-GMN-TUKEID(IDX) NOT =   SPA-NAI-UKEID )
+              OR  (SPA-NAI-UKEID           =   ZERO          )
+               MOVE    "1010"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO      TO      4902-UKEUPD-EXT
+           END-IF
+      *
            INITIALIZE                      UKETUKE-REC
            MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
            MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
@@ -5959,6 +5967,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
+      *!!
+               WHEN    "1010"
+                   STRING  "選択番号の受付情報が選択されていません。"
+                           "再度、受付を選択して下さい。"
+                                                DELIMITED  BY  SIZE
+                                                INTO  SPA-ERRMSG
+                   END-STRING
+      *!!
                WHEN    "2001"
                    MOVE    "前の未確認保険はありません。"
                                                 TO  SPA-ERRMSG
