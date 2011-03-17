@@ -144,6 +144,7 @@
            03  WRK-PGID                        PIC X(20).
            03  WRK-KBNCD-G.
                05  WRK-KBNCD                   PIC 9(03).
+           03  WRK-ERRMSG                      PIC X(200).
       *
       *    システム領域
        01  SYS-AREA.
@@ -923,10 +924,13 @@
                                                        (IDXA IDXB)
                END-IF
            ELSE
-               PERFORM 41012-PARA-NAIYO-CHK-SEC
-               IF    ( SPA-ERRCD       NOT =   SPACE )
-                   MOVE    WRK-ERR-CUR             TO  SPA-GMN-L01-CUR
-                   GO  TO  4101-PARA-CHK-EXT
+               IF    ( SPA-GMN-L01-CHK-VALUE (IDXA)
+                                               =   "T" )
+                   PERFORM 41012-PARA-NAIYO-CHK-SEC
+                   IF    ( SPA-ERRCD       NOT =   SPACE )
+                       MOVE    WRK-ERR-CUR     TO  SPA-GMN-L01-CUR
+                       GO  TO  4101-PARA-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *
@@ -986,8 +990,6 @@
                                    TO  SPA-NAI-L01-HENPARA (IDXA IDXB)
                    MOVE    WRK-HENYMDG(1:6)
                                    TO  SPA-GMN-L01-PARA    (IDXA IDXB)
-               ELSE
-                   GO  TO  41012-PARA-NAIYO-CHK-EXT
                END-IF
            WHEN    "KKNYM"
                MOVE    SPA-GMN-L01-PARA (IDXA IDXB)    TO  WRK-YMD
@@ -997,8 +999,6 @@
                                    TO  SPA-NAI-L01-HENPARA (IDXA IDXB)
                    MOVE    WRK-HENYMDG(1:6)
                                    TO  SPA-GMN-L01-PARA    (IDXA IDXB)
-               ELSE
-                   GO  TO  41012-PARA-NAIYO-CHK-EXT
                END-IF
            WHEN    "YMD"
                MOVE    SPA-GMN-L01-PARA (IDXA IDXB)    TO  WRK-YMD
@@ -1008,8 +1008,6 @@
                                    TO  SPA-NAI-L01-HENPARA (IDXA IDXB)
                    MOVE    WRK-HENYMDG
                                    TO  SPA-GMN-L01-PARA    (IDXA IDXB)
-               ELSE
-                   GO  TO  41012-PARA-NAIYO-CHK-EXT
                END-IF
            WHEN    "PSN1"
                IF    ( SPA-GMN-L01-PARA (IDXA IDXB)(1:1)
@@ -1020,11 +1018,9 @@
                            TO  SPA-NAI-L01-HENPARA (IDXA IDXB)
                    ELSE
                        MOVE    "0002"  TO  SPA-ERRCD
-                       GO  TO  41012-PARA-NAIYO-CHK-EXT
                    END-IF
                ELSE
                    MOVE    "0002"  TO  SPA-ERRCD
-                   GO  TO  41012-PARA-NAIYO-CHK-EXT
                END-IF
            WHEN    "PTNUM"
                IF    ( SPA-GMN-L01-PARA (IDXA IDXB)    =   "*" or "＊" )
@@ -1042,13 +1038,24 @@
                                        SPA-GMN-L01-PARA    (IDXA IDXB)
                    ELSE
                        MOVE    "0002"      TO  SPA-ERRCD
-                       GO  TO  41012-PARA-NAIYO-CHK-EXT
                    END-IF
                END-IF
            WHEN    OTHER
                MOVE    SPA-GMN-L01-PARA (IDXA IDXB)
                                    TO  SPA-NAI-L01-HENPARA (IDXA IDXB)
            END-EVALUATE
+      *
+           IF    ( SPA-ERRCD       NOT =   SPACE )
+              MOVE    SPACE                TO  WRK-ERRMSG
+              STRING  SPA-GMN-L01-NUM    (IDXA)    DELIMITED BY SIZE
+                      ":"                          DELIMITED BY SIZE
+                      SPA-GMN-L01-HCNAME (IDXA)    DELIMITED BY SPACE
+                      "　"                         DELIMITED BY SIZE
+                      SPA-GMN-L01-PARAHYOJI (IDXA IDXB)
+                                                   DELIMITED BY SPACE
+              INTO    WRK-ERRMSG
+              END-STRING
+           END-IF
       *
            .
        41012-PARA-NAIYO-CHK-EXT.
@@ -1141,6 +1148,17 @@
                         AND  ( SPA-NAI-L01-HISSU-KBN (IDXA IDXB)
                                                    =   "1" )
                            MOVE    "0004"  TO  SPA-ERRCD
+                           MOVE    SPACE   TO  WRK-ERRMSG
+                           STRING  SPA-GMN-L01-NUM    (IDXA)
+                                                   DELIMITED BY SIZE
+                                   ":"             DELIMITED BY SIZE
+                                   SPA-GMN-L01-HCNAME (IDXA)
+                                                   DELIMITED BY SPACE
+                                   "　"            DELIMITED BY SIZE
+                                   SPA-GMN-L01-PARAHYOJI (IDXA IDXB)
+                                                   DELIMITED BY SPACE
+                           INTO    WRK-ERRMSG
+                           END-STRING
                            GO  TO  49001-MINYURYOKU-CHK-EXT
                        END-IF
                    END-PERFORM
@@ -2648,12 +2666,21 @@
       *
            EVALUATE    SPA-ERRCD
            WHEN    "0002"
-               MOVE    "入力エラー"                TO  SPA-ERRMSG
+               STRING  "入力エラー"            DELIMITED BY  SIZE
+                       "【"                    DELIMITED BY  SIZE
+                       WRK-ERRMSG              DELIMITED BY  SPACE
+                       "】"                    DELIMITED BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
            WHEN    "0003"
                MOVE    "項目に入力がありません"    TO  SPA-ERRMSG
            WHEN    "0004"
-               MOVE    "必須パラメタで入力されてない項目があります"
-                                                   TO  SPA-ERRMSG
+               STRING  "必須項目が未入力です"  DELIMITED BY  SIZE
+                       "【"                    DELIMITED BY  SIZE
+                       WRK-ERRMSG              DELIMITED BY  SPACE
+                       "】"                    DELIMITED BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
            WHEN    "0005"
                MOVE    "対象の処理が選択されていません"
                                                    TO  SPA-ERRMSG
