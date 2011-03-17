@@ -60,6 +60,8 @@
       *
       *  04.05.01    NACL-藤原    09/04/16  主科設定時の主科未設定のチェ
       *                                     ック追加
+      *  04.05.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *                                     は公費単独のレセプトとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -489,11 +491,13 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
                PERFORM 5002-HIZUKE-HEN-SEC
                MOVE    WRK-HENYMDG         TO  SPA-H99GMN-TCREYMD (IDX)
       *
-      *       公費単独で生保又は中国残留邦人等のとき負担者番号、
-      *       受給者番号をセット
-               IF    ( RECE10-HKNNUM       =   SPACE               )
-                   IF    ( RECE10-KOHNUM (1)   =   "012"  OR "025"
-                                                          OR "020" )
+      *       公費単独で生保又は中国残留邦人等、自立支援、児童保護のとき
+      *       負担者番号、受給者番号をセット
+               IF    ( RECE10-HKNNUM       =   SPACE                 )
+                   IF    ( RECE10-KOHNUM (1)   =   "012"   OR  "025"
+                                               OR  "021"   OR  "020"
+                                               OR  "015"   OR  "016"
+                                               OR  "053"             )
                    AND   ( RECE10-KOHNUM (2)   =   SPACE           )
                        INITIALIZE                  PTKOHINF-REC
                        MOVE    SPA-HOSPNUM     TO  PTKOH-HOSPNUM
