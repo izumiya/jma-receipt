@@ -101,6 +101,10 @@
       *                                     掌をエラーとする
       *  04.05.02    NACL-藤原    10/09/14  医療観察法対応
       *                                     公費単独のレセプトとする
+      *  04.05.03    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *                                     は公費単独のレセプトとする
+      *  04.05.04    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
+      *                                     併用から単独になったときのまとめ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1484,8 +1488,10 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
            MOVE    PTHKN-HKNJANUM      TO  TOUKEI01-HKNJANUM
            IF    ( COMB-HKNNUM         =   SPACE )
            AND   ( COMB-KOH1HKNNUM     =   "020"
-                                       OR  "030" )
-               MOVE    COMB-KOH1HKNNUM     TO  TOUKEI01-HKNJANUM
+                                       OR  "030"
+                                       OR  "053" )
+      *********MOVE    COMB-KOH1HKNNUM     TO  TOUKEI01-HKNJANUM
+               MOVE    COMB-TEKSTYMD       TO  TOUKEI01-HKNJANUM
            END-IF
       *
            IF      WRK-PARA-SRYYM      <=   "200609"
@@ -2457,7 +2463,9 @@ grpsys                                         SPA-AREA
                                    END-IF
                                END-IF
                            ELSE
-                               IF      FLG-SEIHO            =   1
+                               IF    ( FLG-SEIHO       =   1     )
+                               AND   ( TOUKEI01-TKOHHKNNUM (1)
+                                                   NOT =   "053" )
                                    CONTINUE
                                ELSE 
                                   MOVE    1           TO  FLG-WRITE
@@ -2469,12 +2477,12 @@ grpsys                                         SPA-AREA
                   END-IF
                END-IF
       *
-      *        社保で公費併用の場合（生保、中国残留邦人等、自立支援）
+      *        社保で公費併用の場合（生保、中国残留邦人等、自立支援、児童保護）
                IF    ( TOUKEI01-HKNNUM   NOT =   SPACE )
                AND   ( TOUKEI01-TKOHHKNNUM (1)
                                            =   "012"   OR  "025"   OR 
                                                "015"   OR  "016"   OR
-                                               "021"                  )
+                                               "021"   OR  "053"      )
                AND   ( TOUKEI01-TKOHHKNNUM (2)
                                            =   SPACE                  )
                    IF      TOUKEI01-HKNNUM   =
@@ -2504,7 +2512,7 @@ grpsys                                         SPA-AREA
                                                        TO
                                                  WRK-TOUKEI01-SEIHO-KEY
                                                               (IDXX IDB)
-                                           MOVE    5   TO  IDB
+                                           MOVE    10  TO  IDB
                                        END-IF
                                    END-PERFORM
                                    PERFORM VARYING IDB FROM    1   BY  1
@@ -2524,7 +2532,7 @@ grpsys                                         SPA-AREA
                                            MOVE    10          TO  IDB
                                        END-IF
                                    END-PERFORM    
-                                   MOVE    4           TO  IDYY
+                                   MOVE    10          TO  IDYY
                                    MOVE    TBL-SEIHO-TOUKEI01-MAX
                                                        TO  IDA
                                END-IF
@@ -2691,7 +2699,7 @@ grpsys                                         SPA-AREA
                IF      TOUKEI01-TRECESKYKBN (IDX) =   "1"
                    MOVE    "1"                 TO
                                        LNK-SYUBETUGET-RECESKYKBN (IDX)
-               END-IF 
+               END-IF
            END-PERFORM
       *
       *    後期高齢非該当の有無設定

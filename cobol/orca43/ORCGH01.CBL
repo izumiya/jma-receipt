@@ -83,6 +83,8 @@
       *
       *  04.05.01    NACL-藤原    09/04/16  主科設定時の主科未設定のチェ
       *                                     ック追加
+      *  04.05.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *                                     は公費単独のレセプトとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1459,7 +1461,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    受給者番号をセット
            IF    ( RECE10-HKNNUM       =   SPACE               )
                IF    ( RECE10-KOHNUM (1)   =   "012"  OR "025"
-                                                      OR "020" )
+                                                      OR "020"
+                                                      OR "053" )
                AND   ( RECE10-KOHNUM (2)   =   SPACE           )
                    INITIALIZE                  PTKOHINF-REC
                    MOVE    SPA-HOSPNUM     TO  PTKOH-HOSPNUM
@@ -1545,7 +1548,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                WHEN    OTHER
                    IF    ( RECE10-HKNNUM       =   SPACE               )
                        IF    ( RECE10-KOHNUM (1)   =   "012"  OR "025"
-                                                              OR "020" )
+                                                              OR "020"
+                                                              OR "053" )
                        AND   ( RECE10-KOHNUM (2)   =   SPACE           )
                            STRING  SPA-RECE10-FTNJANUM
                                                    DELIMITED   BY  SPACE
@@ -3023,7 +3027,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
       *            受給者番号をセット
                    IF    ( RECE10-HKNNUM       =   SPACE               )
                        IF    ( RECE10-KOHNUM (1)   =   "012"  OR "025"
-                                                              OR "020" )
+                                                              OR "020"
+                                                              OR "053" )
                        AND   ( RECE10-KOHNUM (2)   =   SPACE           )
                            STRING  SPA-RECE10-FTNJANUM
                                                    DELIMITED   BY  SPACE

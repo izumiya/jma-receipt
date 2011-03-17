@@ -220,6 +220,10 @@
       *                                     ¿ÇÎÅ²Ê£²¡¢£³¤òÄÉ²Ã
       *  04.05.04    NACL-Æ£¸¶    10/09/14  °åÎÅ´Ñ»¡Ë¡ÂÐ±þ
       *                                     ¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
+      *  04.05.05    NACL-Æ£¸¶    11/02/01  ¼çÊÝ¸±¤¬¤Ê¤¤¾ì¹ç¡¢»ùÆ¸ÊÝ¸î(53)
+      *                                     ¤Ï¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
+      *  04.05.06    NACL-Æ£¸¶    11/02/24  ·îÅÓÃæ¤Ë°åÊÝ¤È»ùÆ¸ÊÝ¸î(53)¤Î
+      *                                     Ê»ÍÑ¤«¤éÃ±ÆÈ¤Ë¤Ê¤Ã¤¿¤È¤­¤Î¤Þ¤È¤á
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1193,7 +1197,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        MOVE    1               TO  FLG-SEIHO
                    END-IF
                ELSE
-                   IF      FLG-SEIHO            =   1
+                   IF    ( FLG-SEIHO            =   1     )
+                   AND   ( RECE01-KOHHKNNUM-O (1)
+                                            NOT =   "053" )
                        GO  TO  210-HENSYU-EXT
                    ELSE
       *                ¸øÈñÃ±ÆÈ¤Î¾ì¹çÂàÈò
@@ -1206,12 +1212,12 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              END-IF
            END-IF
       *
-      *    ¼ÒÊÝ¤Ç¸øÈñÊ»ÍÑ¤Î¾ì¹ç¡ÊÀ¸ÊÝ¡¢Ãæ¹ñ»ÄÎ±Ë®¿ÍÅù¡¢¼«Î©»Ù±ç¡Ë
+      *    ¼ÒÊÝ¤Ç¸øÈñÊ»ÍÑ¤Î¾ì¹ç¡ÊÀ¸ÊÝ¡¢Ãæ¹ñ»ÄÎ±Ë®¿ÍÅù¡¢¼«Î©»Ù±ç¡¢»ùÆ¸ÊÝ¸î¡Ë
            IF    ( RECE01-HKNNUM   NOT =   SPACE )
            AND   ( RECE01-KOHHKNNUM-O (1)
                                        =   "012"   OR  "025"   OR 
                                            "015"   OR  "016"   OR
-                                           "021"                  )
+                                           "021"   OR  "053"      )
            AND   ( RECE01-KOHHKNNUM-O (2)
                                        =   SPACE                  )
                IF      RECE01-HKNNUM       =   "060"   OR  "067"   OR
@@ -1820,7 +1826,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
            IF      WRK-SEIHO-FLG           =   1
                IF    ( RECE02-KOHNUM (1)       =   "012"   OR  "025"
                                                OR  "015"   OR  "016"
-                                               OR  "021"             )
+                                               OR  "021"   OR  "053" )
                AND   ( RECE02-KOHNUM (2)       =   SPACE             )
                    MOVE    "1"                 TO  RECE02-SEIHOFLG
                END-IF
@@ -3527,7 +3533,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                                                     OR  "025"
                                                     OR  "015"
                                                     OR  "016"
-                                                    OR  "021" )
+                                                    OR  "021"
+                                                    OR  "053" )
                    AND ( RECE01-KOHHKNNUM-O (2)     =   SPACE ) )
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       10
@@ -3539,6 +3546,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
                  MOVE    RECE01-NYUGAIKBN     TO  RECE09-NYUGAIKBN
                  MOVE    RECE01-PTID          TO  RECE09-PTID
                  MOVE    RECE01-RECEKA        TO  RECE09-RECEKA
+                 MOVE    "000"                TO  RECE09-KOHNUM
                  MOVE    RECE01-TEKSTYMDX (IDX)
                                               TO  RECE09-TEKSTYMD
                  PERFORM VARYING IDYY    FROM    1   BY  1

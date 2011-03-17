@@ -314,6 +314,8 @@
       *  04.05.23    NACL-藤原    11/02/03  他医療機関受診対応
       *  04.05.24    NACL-藤原    11/02/22  レセ電データの記号番号区切り
       *                                     文字設定対応
+      *  04.06.07    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *                                     は公費単独のレセプトとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2080,7 +2082,11 @@
       *
                EVALUATE    RECE69-TEISYUTUSAKI
                    WHEN    "1"
-                       MOVE    "社保"     TO  WRK-HKN-TEISYUTUSAKI
+                       IF      RECE69-HKNID   >   ZERO
+                           MOVE    "社保"     TO  WRK-HKN-TEISYUTUSAKI
+                       ELSE
+                           MOVE    SPACE      TO  WRK-HKN-TEISYUTUSAKI   
+                       END-IF
                    WHEN    OTHER
                        MOVE    SPACE      TO  WRK-HKN-TEISYUTUSAKI   
                END-EVALUATE          
@@ -2134,7 +2140,9 @@
                        END-IF
                    END-IF
                    MOVE    SPACE                  TO  WRK-HKN-RIREKI-X
-                   STRING  WRK-HKN-TEISYUTUSAKI   DELIMITED  BY  SPACE
+                   IF      RECE69-HKNID   >   ZERO
+                       STRING
+                           WRK-HKN-TEISYUTUSAKI   DELIMITED  BY  SPACE
                            RECE69-TANSEIDONAME    DELIMITED  BY  SPACE
                            "　"                   DELIMITED  BY  SIZE
                            WRK-HKN-HKNJANUM       DELIMITED  BY  SPACE
@@ -2142,8 +2150,18 @@
                            WRK-HKN-KIGO           DELIMITED  BY  SPACE
                            WRK-HKN-FIL            DELIMITED  BY  SPACE
                            WRK-HKN-NUM            DELIMITED  BY  SPACE
-                              INTO    WRK-HKN-RIREKI-X
-                   END-STRING
+                                          INTO    WRK-HKN-RIREKI-X
+                       END-STRING
+                   ELSE
+                       STRING
+                           RECE69-TANSEIDONAME    DELIMITED  BY  SPACE
+                           "　"                   DELIMITED  BY  SIZE
+                           WRK-HKN-KIGO           DELIMITED  BY  SPACE
+                           WRK-HKN-FIL            DELIMITED  BY  SPACE
+                           WRK-HKN-NUM            DELIMITED  BY  SPACE
+                                              INTO    WRK-HKN-RIREKI-X
+                       END-STRING
+                   END-IF
                    IF      WRK-HKN-RIREKI-X (53:) NOT =   SPACE           
                        STRING  WRK-HKN-TEISYUTUSAKI
                                                   DELIMITED  BY  SPACE
@@ -2172,7 +2190,8 @@
                                        WRK-HKN-RIREKI (WRK-RIREKI-MAX)  
                    END-IF   
                END-IF                   
-               IF      WRK-HKN-RIREKI (WRK-RIREKI-MAX)(13:)
+      *********IF      WRK-HKN-RIREKI (WRK-RIREKI-MAX)(13:)
+               IF      WRK-HKN-RIREKI (WRK-RIREKI-MAX)
                                           NOT =   SPACE
                    ADD     1                   TO  WRK-RIREKI-MAX
                    IF      WRK-RIREKI-MAX     >   50

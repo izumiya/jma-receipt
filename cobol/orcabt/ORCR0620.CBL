@@ -181,6 +181,10 @@
       *  04.05.03    NACL-藤原    10/09/14  医療観察法対応
       *                                     公費単独のレセプトとする
       *  04.05.04    NACL-門脇    11/02/18  出産一時金対応期間修正
+      *  04.05.05    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *                                     は公費単独のレセプトとする
+      *  04.05.06    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
+      *                                     併用から単独になったときのまとめ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1078,7 +1082,9 @@
                            MOVE    1               TO  FLG-SEIHO
                        END-IF
                    ELSE
-                       IF      FLG-SEIHO            =   1
+                       IF    ( FLG-SEIHO            =   1     )
+                       AND   ( RECE61-KOHHKNNUM-O (1)
+                                                NOT =   "053" )
                            GO  TO  210-HENSYU-EXT
                        ELSE
       *                    公費単独の場合退避
@@ -1091,12 +1097,12 @@
               END-IF
            END-IF
       *
-      *    社保で公費併用の場合（生保、中国残留邦人等、自立支援）
+      *    社保で公費併用の場合（生保、中国残留邦人等、自立支援、児童保護）
            IF    ( RECE61-HKNNUM   NOT =   SPACE )
            AND   ( RECE61-KOHHKNNUM-O (1)
                                        =   "012"   OR  "025"   OR 
                                            "015"   OR  "016"   OR
-                                           "021"                  )
+                                           "021"   OR  "053"      )
            AND   ( RECE61-KOHHKNNUM-O (2)
                                        =   SPACE                  )
                IF      RECE61-HKNNUM       =   "060"   OR  "067"   OR
@@ -1722,7 +1728,7 @@
            IF      WRK-SEIHO-FLG           =   1
                IF    ( RECE62-KOHNUM (1)       =   "012"   OR  "025"
                                                OR  "015"   OR  "016"
-                                               OR  "021"             )
+                                               OR  "021"   OR  "053" )
                AND   ( RECE62-KOHNUM (2)       =   SPACE             )
                    MOVE    "1"                 TO  RECE62-SEIHOFLG
                END-IF
@@ -2953,7 +2959,8 @@
                                                     OR  "025"
                                                     OR  "015"
                                                     OR  "016"
-                                                    OR  "021" )
+                                                    OR  "021"
+                                                    OR  "053" )
                    AND ( RECE61-KOHHKNNUM-O (2)     =   SPACE ) )
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       10
@@ -2965,6 +2972,7 @@
                  MOVE    RECE61-NYUGAIKBN     TO  RECE69-NYUGAIKBN
                  MOVE    RECE61-PTID          TO  RECE69-PTID
                  MOVE    RECE61-RECEKA        TO  RECE69-RECEKA
+                 MOVE    "000"                TO  RECE69-KOHNUM
                  MOVE    RECE61-TEKSTYMDX (IDX)
                                               TO  RECE69-TEKSTYMD
                  PERFORM VARYING IDYY    FROM    1   BY  1

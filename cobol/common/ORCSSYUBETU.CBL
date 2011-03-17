@@ -88,6 +88,10 @@
       *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
       *                                     平成２２年４月分以降の政府管
       *                                     掌をエラーとする
+      *  04.05.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *                                     は公費単独のレセプトとする
+      *  04.05.03    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
+      *                                     併用から単独になったときのまとめ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1240,8 +1244,16 @@ grpsys     MOVE    LNK-SYUBETU-HOSPNUM     TO  WRK-RECE61-HOSPNUM
            MOVE    PTHKN-HKNJANUM      TO  WRK-RECE61-HKNJANUM       
            MOVE    ZERO                TO  WRK-RECE61-TEKSTYMD 
            IF      COMB-HKNNUM         =   SPACE
-               IF      COMB-KOH1HKNNUM     =   "020"   OR  "030"
-                   MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMD
+               IF      COMB-KOH1HKNNUM     =   "020"   OR  "030"   OR
+                                               "053"
+      *********    MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMD
+                   INITIALIZE                      PTKOHINF-REC
+                   MOVE    WRK-RECE61-HOSPNUM  TO  PTKOH-HOSPNUM
+                   MOVE    WRK-RECE61-PTID     TO  PTKOH-PTID
+                   MOVE    COMB-KOHID (1)      TO  PTKOH-KOHID
+                   MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+                   PERFORM 900-PTKOHINF-READ-SEC
+                   MOVE    PTKOH-TEKSTYMD      TO  WRK-RECE61-TEKSTYMD
                END-IF
            END-IF
            IF      LNK-SYUBETU-SRYYM   <=   "200609"
@@ -1493,10 +1505,19 @@ grpsys                                     SPA-AREA
            MOVE    PTHKN-TEKSTYMD     TO  WRK-RECE61-TEKSTYMDX  (1)
            MOVE    PTHKN-TEKEDYMD     TO  WRK-RECE61-TEKEDYMDX  (1)
            IF    ( COMB-HKNNUM        =   SPACE )
-           AND   ( COMB-KOH1HKNNUM    =   "020"
-                                      OR  "030" )
-               MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMDX  (1)
-               MOVE    COMB-TEKEDYMD       TO  WRK-RECE61-TEKEDYMDX  (1)
+           AND   ( COMB-KOH1HKNNUM    =   "020" 
+                                      OR  "030"
+                                      OR  "053" )
+      *********MOVE    COMB-TEKSTYMD       TO  WRK-RECE61-TEKSTYMDX  (1)
+      *********MOVE    COMB-TEKEDYMD       TO  WRK-RECE61-TEKEDYMDX  (1)
+               INITIALIZE                      PTKOHINF-REC
+               MOVE    WRK-RECE61-HOSPNUM  TO  PTKOH-HOSPNUM
+               MOVE    WRK-RECE61-PTID     TO  PTKOH-PTID
+               MOVE    COMB-KOHID (1)      TO  PTKOH-KOHID
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               PERFORM 900-PTKOHINF-READ-SEC
+               MOVE    PTKOH-TEKSTYMD      TO  WRK-RECE61-TEKSTYMDX  (1)
+               MOVE    PTKOH-TEKEDYMD      TO  WRK-RECE61-TEKEDYMDX  (1)
            END-IF
       *    
       *    主保険情報
@@ -1987,7 +2008,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                                    END-IF
                                END-IF
                            ELSE
-                               IF      FLG-SEIHO            =   1
+                               IF    ( FLG-SEIHO       =   1     )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O (1)
+                                                   NOT =   "053" )
                                    CONTINUE
                                ELSE 
                                   MOVE    1           TO  FLG-WRITE
@@ -1999,13 +2022,13 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                   END-IF
                END-IF
       *
-      *        社保で公費併用の場合（生保、中国残留邦人等、自立支援）
+      *    社保で公費併用の場合（生保、中国残留邦人等、自立支援、児童保護）
                IF    ( WRK-RECE61-HKNNUM
                                        NOT =   SPACE                 )
                AND   ( WRK-RECE61-KOHHKNNUM-O (1)
                                            =   "012"   OR  "025"   OR 
                                                "015"   OR  "016"   OR
-                                               "021"                )
+                                               "021"   OR  "053"     )
                AND   ( WRK-RECE61-KOHHKNNUM-O (2)
                                            =   SPACE                )
                    IF      WRK-RECE61-HKNNUM   =
