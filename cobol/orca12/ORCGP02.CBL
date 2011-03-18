@@ -3680,86 +3680,123 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       **   画面の内容を保存＆更新前チェック
       *    受付(タグ変更時・切替押下時、未更新のため、ここで必ず更新)
-           MOVE    SPA-AREA            TO  SPA-COMMON
-           MOVE    SPA-P02KYOUTU       TO  SPA-WORK
-           MOVE    SPA-P02SCRAREA      TO  SPA-FREE
-           CALL    "ORCGP020"      USING   MCPAREA
-                                           SPAAREA
-                                           LINKAREA
-                                           SCRAREA
-           MOVE    SPA-COMMON          TO  SPA-AREA
-           MOVE    SPA-FREE            TO  SPA-P02SCRAREA
-           MOVE    SPA-WORK            TO  SPA-P02KYOUTU
-           IF      SPA-ERRCD       NOT =   SPACE
-               GO  TO                  4901-KOUSINMAE-EXT
-           END-IF
+      *    MOVE    SPA-AREA            TO  SPA-COMMON
+      *    MOVE    SPA-P02KYOUTU       TO  SPA-WORK
+      *    MOVE    SPA-P02SCRAREA      TO  SPA-FREE
+      *    CALL    "ORCGP020"      USING   MCPAREA
+      *                                    SPAAREA
+      *                                    LINKAREA
+      *                                    SCRAREA
+      *    MOVE    SPA-COMMON          TO  SPA-AREA
+      *    MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+      *    MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *    IF      SPA-ERRCD       NOT =   SPACE
+      *        GO  TO                  4901-KOUSINMAE-EXT
+      *    END-IF
       *
-           MOVE    SPACE               TO  WRK-PIDCD
+      *    MOVE    SPACE               TO  WRK-PIDCD
       *    基本情報チェック
-           MOVE    "CLICKED"           TO  MCP-EVENT
-           MOVE    "B12"               TO  MCP-WIDGET
-           MOVE    "PUTG"              TO  MCP-STATUS
-           CALL    "ORCGP02W1"     USING   MCPAREA
-                                           SPAAREA
-                                           LINKAREA
-                                           SCRAREA
-           MOVE    SPA-COMMON          TO  SPA-AREA
-           MOVE    SPA-FREE            TO  SPA-P02SCRAREA
-           MOVE    SPA-WORK            TO  SPA-P02KYOUTU
-           IF     (SPA-ERRCD           NOT =   SPACE )
-               MOVE    "P02"               TO  SPA-P02-GAMEN
-               MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
-               GO      TO                  4901-KOUSINMAE-EXT
-           END-IF
-           IF     (SPA-PIDCD           NOT =   SPACE )
-               IF      (SPA-PIDCD(1:1)          =   "K"   )
-                   MOVE    SPA-PIDCD           TO  WRK-PIDCD
-                   MOVE    SPACE               TO  SPA-PIDCD
-               ELSE
-                   MOVE    "P02"               TO  SPA-P02-GAMEN
-                   MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
-                   GO      TO                  4901-KOUSINMAE-EXT
-               END-IF
-           END-IF
-           IF     (SPA-FLG-END     NOT =   ZERO  )
-               GO      TO                  4901-KOUSINMAE-EXT
-           END-IF
+      *    MOVE    "CLICKED"           TO  MCP-EVENT
+      *    MOVE    "B12"               TO  MCP-WIDGET
+      *    MOVE    "PUTG"              TO  MCP-STATUS
+      *    CALL    "ORCGP02W1"     USING   MCPAREA
+      *                                    SPAAREA
+      *                                    LINKAREA
+      *                                    SCRAREA
+      *    MOVE    SPA-COMMON          TO  SPA-AREA
+      *    MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+      *    MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *    IF     (SPA-ERRCD           NOT =   SPACE )
+      *        MOVE    "P02"               TO  SPA-P02-GAMEN
+      *        MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+      *        GO      TO                  4901-KOUSINMAE-EXT
+      *    END-IF
+      *    IF     (SPA-PIDCD           NOT =   SPACE )
+      *        IF      (SPA-PIDCD(1:1)          =   "K"   )
+      *            MOVE    SPA-PIDCD           TO  WRK-PIDCD
+      *            MOVE    SPACE               TO  SPA-PIDCD
+      *        ELSE
+      *            MOVE    "P02"               TO  SPA-P02-GAMEN
+      *            MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+      *            GO      TO                  4901-KOUSINMAE-EXT
+      *        END-IF
+      *    END-IF
+      *    IF     (SPA-FLG-END     NOT =   ZERO  )
+      *        GO      TO                  4901-KOUSINMAE-EXT
+      *    END-IF
       *
       *    所得(タグ変更時・切替押下時、未更新のため、ここで必ず更新)
-           MOVE    "CLICKED"           TO  MCP-EVENT
-           MOVE    "B12"               TO  MCP-WIDGET
-           MOVE    "PUTG"              TO  MCP-STATUS
-           CALL    "ORCGP024"      USING   MCPAREA
-                                           SPAAREA
-                                           LINKAREA
-                                           SCRAREA
-           MOVE    SPA-COMMON          TO  SPA-AREA
-           MOVE    SPA-FREE            TO  SPA-P02SCRAREA
-           MOVE    SPA-WORK            TO  SPA-P02KYOUTU
-           IF      SPA-ERRCD       NOT =   SPACE
-               MOVE    "P024"              TO  SPA-P02-GAMEN
-               MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
-               GO  TO                  4901-KOUSINMAE-EXT
-           END-IF
+      *    MOVE    "CLICKED"           TO  MCP-EVENT
+      *    MOVE    "B12"               TO  MCP-WIDGET
+      *    MOVE    "PUTG"              TO  MCP-STATUS
+      *    CALL    "ORCGP024"      USING   MCPAREA
+      *                                    SPAAREA
+      *                                    LINKAREA
+      *                                    SCRAREA
+      *    MOVE    SPA-COMMON          TO  SPA-AREA
+      *    MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+      *    MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *    IF      SPA-ERRCD       NOT =   SPACE
+      *        MOVE    "P024"              TO  SPA-P02-GAMEN
+      *        MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+      *        GO  TO                  4901-KOUSINMAE-EXT
+      *    END-IF
       *    特記事項
-           MOVE    "CLICKED"           TO  MCP-EVENT
-           MOVE    "B12"               TO  MCP-WIDGET
-           MOVE    "PUTG"              TO  MCP-STATUS
-           CALL    "ORCGP026"         USING   MCPAREA
-                                              SPAAREA
-                                               LINKAREA
-                                               SCRAREA
-           MOVE    SPA-COMMON          TO  SPA-AREA
-           MOVE    SPA-FREE            TO  SPA-P02SCRAREA
-           MOVE    SPA-WORK            TO  SPA-P02KYOUTU
-           IF      SPA-ERRCD       NOT =   SPACE
-               MOVE    "P026"              TO  SPA-P02-GAMEN
-               GO  TO                  4901-KOUSINMAE-EXT
-           END-IF
+      *    MOVE    "CLICKED"           TO  MCP-EVENT
+      *    MOVE    "B12"               TO  MCP-WIDGET
+      *    MOVE    "PUTG"              TO  MCP-STATUS
+      *    CALL    "ORCGP026"         USING   MCPAREA
+      *                                       SPAAREA
+      *                                        LINKAREA
+      *                                        SCRAREA
+      *    MOVE    SPA-COMMON          TO  SPA-AREA
+      *    MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+      *    MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *    IF      SPA-ERRCD       NOT =   SPACE
+      *        MOVE    "P026"              TO  SPA-P02-GAMEN
+      *        GO  TO                  4901-KOUSINMAE-EXT
+      **   END-IF
       *
+           MOVE    SPACE               TO  WRK-PIDCD
       *    -------------------------
            EVALUATE    SPA-P02-GAMEN
       *各画面表示中
+      *    受付情報
+           WHEN    "P020"
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP020"      USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *    基本情報
+           WHEN    "P02"
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP02W1"     USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *    所得
+           WHEN    "P024"
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP024"      USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
       *    住所
            WHEN    "P021"
                MOVE    "CLICKED" TO  MCP-EVENT
@@ -3791,6 +3828,70 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
                GO  TO                  4901-KOUSINMAE-EXT
+           END-IF
+           IF     (SPA-PIDCD           NOT =   SPACE )
+               IF      (SPA-PIDCD(1:1)         =   "K"   )
+                   MOVE    SPA-PIDCD           TO  WRK-PIDCD
+                   MOVE    SPACE               TO  SPA-PIDCD
+               ELSE
+                   MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+                   GO      TO                  4901-KOUSINMAE-EXT
+               END-IF
+           END-IF
+           IF     (SPA-FLG-END     NOT =   ZERO  )
+               GO      TO                  4901-KOUSINMAE-EXT
+           END-IF
+      *
+      *    表示画面以外
+           IF      SPA-P02-GAMEN   NOT =   "P024"
+      *        所得情報チェック
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP024"     USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+               IF      SPA-ERRCD       NOT =   SPACE
+                   MOVE    "P024"              TO  SPA-P02-GAMEN
+                   MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+                   GO  TO                  4901-KOUSINMAE-EXT
+               END-IF
+           END-IF
+      *
+           IF      SPA-P02-GAMEN   NOT =   "P02"
+      *        基本情報チェック
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP02W1"     USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+               IF     (SPA-ERRCD           NOT =   SPACE )
+                   MOVE    "P02"               TO  SPA-P02-GAMEN
+                   MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+                   GO      TO                  4901-KOUSINMAE-EXT
+               END-IF
+               IF     (SPA-PIDCD           NOT =   SPACE )
+                   IF      (SPA-PIDCD(1:1)          =   "K"   )
+                       MOVE    SPA-PIDCD           TO  WRK-PIDCD
+                       MOVE    SPACE               TO  SPA-PIDCD
+                   ELSE
+                       MOVE    "P02"               TO  SPA-P02-GAMEN
+                       MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+                       GO      TO                  4901-KOUSINMAE-EXT
+                   END-IF
+               END-IF
+               IF     (SPA-FLG-END     NOT =   ZERO  )
+                   GO      TO                  4901-KOUSINMAE-EXT
+               END-IF
            END-IF
       *    確認メッセージ
            IF     (SPA-PIDCD           =   SPACE )  AND
