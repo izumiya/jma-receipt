@@ -28,7 +28,7 @@
                   05  H99-COUNT   PIC S9(9)   BINARY.
                   05  H99-ROW             PIC S9(9)   BINARY.
                   05  H99-ROWATTR         PIC S9(9)   BINARY.
-                  05  H99-ITEM        OCCURS  5 TIMES.
+                  05  H99-ITEM        OCCURS  10 TIMES.
                     06  H99-TRENNUM       PIC X(2).
                     06  H99-TNYUGAIKBN    PIC X(6).
                     06  H99-TSRYKA        PIC X(10).
@@ -38,7 +38,7 @@
                     06  H99-THOJOKBN      PIC X(8).
                     06  H99-TKIGO         PIC X(20).
                     06  H99-TCREYMD       PIC X(9).
-                  05  H99-SELECT  PIC X       OCCURS  5 TIMES.
+                  05  H99-SELECT  PIC X       OCCURS  10 TIMES.
               03  H99-SELNUM.
                 04  H99-VALUE   PIC S9(2).
               03  H99-NAME.
