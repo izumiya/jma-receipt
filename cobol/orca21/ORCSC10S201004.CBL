@@ -5577,7 +5577,8 @@
            END-IF
       *
       *    ＤＵＭＭＹ診察料の変更をおこなわない
-           IF      FLG-DUMMY           =   1
+           IF     (FLG-DUMMY           =   1     )
+             AND  (SPA-PTTOKK-KBN      =   SPACE )
                MOVE    ZERO                TO  FLG-HENKAN
            END-IF
       *    診察料自動発生なし時、変更もなし

@@ -4397,6 +4397,7 @@
                IF     (IDX-ZAI1            =   ZERO) AND
                       (IDX-ZAI2            =   1   )  AND
                       (IDX-SYU2            >   ZERO )
+                 AND  (SPA-SYOYMD          =   SPACE )
                    MOVE    "1017"          TO  SPA-ERRCD
                    MOVE    "1058"          TO  SPA-ERRCD
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-SYU2)
