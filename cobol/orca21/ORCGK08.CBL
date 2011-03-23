@@ -2179,7 +2179,7 @@
       *
            COMPUTE WRK-KAISU-9         =   WRK-NISUU
                                        *   LNK-SC97-KAISU
-           COMPUTE WRK-KEI-G           =   WRK-JIHIMONEY-KEI
+           COMPUTE WRK-KEI-G           =   WRK-JIHIMONEY
                                        *   WRK-KAISU-9
       *     Ò≥Á ¨
            IF      WRK-HKTZAI      NOT =   SPACE
