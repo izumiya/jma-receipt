@@ -13933,6 +13933,23 @@
                                             SPA-NAI-I01-IDOYMD
 
                END-IF
+      *        ÎÅÍÜÉÂÅï¤ÈÎÅÍÜÉÂ¾²¤âÈ½Äê¾ò·ï¤ËÄÉ²Ã
+               IF    ((PTNYUINRRK-TOKUTEI-NYUIN >=   "25")  AND
+                      (PTNYUINRRK-TOKUTEI-NYUIN <=   "48"))
+                                             OR
+                     ((PTNYUINRRK-TOKUTEI-NYUIN >=   "63")  AND
+                      (PTNYUINRRK-TOKUTEI-NYUIN <=   "88"))
+                   INITIALIZE                  STS-AREA-DAY
+                   INITIALIZE                  LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    SPA-NAI-I01-TAIINYMD
+                                               TO  LNK-DAY6-KIJUN
+                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                   MOVE     1                  TO  LNK-DAY6-ZOGEN
+                   CALL  "ORCSDAY"             USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                   MOVE    LNK-DAY6-KEISAN     TO  PTNYUINRRK-TENNYUYMD
+               END-IF
            ELSE
                IF  PTNYUINRRK-TOKUTEI-KBN   =   SPACE
                    INITIALIZE                  STS-AREA-DAY
