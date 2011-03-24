@@ -678,6 +678,18 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                WHEN    "ORCADB16"
                    MOVE    "オプションマスタ"
                                           TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB17"
+                   MOVE    "感染症判定マスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB18"
+                   MOVE    "入院基本料マスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB19"
+                   MOVE    "入院料加算チェックマスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB20"
+                   MOVE    "入院レセプト記載略称マスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    OTHER
                    MOVE    MSTKANRI-KANRICD
                                           TO  SPA-GMN-MASTNAME(IDX2)
