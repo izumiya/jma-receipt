@@ -507,6 +507,7 @@
       *  04.05.14    NACL-ÌçÏÆ    11/02/25  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *  04.05.15    NACL-ÌçÏÆ    11/03/02  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.16    NACL-ÌçÏÆ    11/03/24  ºÒ³²ÂÐ±þ
+      *  04.05.17    NACL-ÌçÏÆ    11/03/25  ºÒ³²ÂÐ±þ¡ÊºÒ£²ÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -699,6 +700,8 @@
            03  FLG-KGKIPNTAI                           PIC 9(01).
            03  FLG-KGK                                 PIC 9(01).
            03  FLG-SKY-TOKKOH                          PIC 9(01).
+           03  FLG-GENMEN-ARI                          PIC 9(01).
+           03  FLG-GENMEN-NASI                         PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -1156,6 +1159,9 @@
            03  WK-GENGAKU-YMD.
                05  WK-GENGAKU-YM               PIC  9(06).
                05  WK-GENGAKU-DD               PIC  9(02).
+           03  WK-GENGAKU2-YMD.
+               05  WK-GENGAKU2-YM              PIC  9(06).
+               05  WK-GENGAKU2-DD              PIC  9(02).
       *
            03  WRK-CHIHOU-KIN                  PIC  9(09).
            03  WRK-CHIHOU-KIN2                 PIC  9(09).
@@ -2229,6 +2235,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-KOUGAKU
            MOVE      ZERO       TO      FLG-WRKFILE-CLEAR
            MOVE      ZERO       TO      FLG-SKY-TOKKOH
+           MOVE      ZERO       TO      FLG-GENMEN-ARI
+           MOVE      ZERO       TO      FLG-GENMEN-NASI
       *
            PERFORM     211J-SYUKEIKBN-HANBETU-SEC
       *
@@ -2571,6 +2579,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *                ¸øÈñÉéÃ´¼ÔÈÖ¹æËô¤Ï¼õµë¼ÔÈÖ¹æ¤¬ÉÔÌÀ¤Î¤È¤­
                        IF  (RECE02-SRYYM          >= "201101")
                        AND (RECE02-RJNGAIKOHFTN(1) =  ZERO   )
+                       AND (RECE02-HKNNUM          =  SPACE  )
                          PERFORM  VARYING  IDX-SAI  FROM   1   BY   1
                                    UNTIL   IDX-SAI    >    4
                            IF  (RECE02-KOHNUM(IDX-SAI) NOT =  SPACE)
@@ -2586,7 +2595,13 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *                ¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF  (RECE02-RJNGAIKOHFTN(1) =  ZERO)
                        AND (RECE02-GENMENKBN       >  ZERO)
+                         IF   FLG-GENMEN-ARI   =  1
+                         AND  FLG-GENMEN-NASI  =  1
+                           MOVE    4       TO  RECE02-RJNGAIKOHFTN (1)
+                           MOVE    1       TO  RECE02-YOBIETC(9)
+                         ELSE
                            MOVE    2       TO  RECE02-RJNGAIKOHFTN (1)
+                         END-IF
                        END-IF
                    END-IF
                END-IF
@@ -2601,6 +2616,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                      END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE02-RJNGAIKOHFTN (1)
+                     MOVE    ZERO    TO   RECE02-YOBIETC(9)
                    END-IF
                END-IF
            END-IF
@@ -3182,6 +3198,22 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
               ELSE
                  MOVE   01                    TO   WK-GENGAKU-DD
               END-IF
+      *
+              MOVE      RECE02-SRYYM          TO   WK-GENGAKU2-YM
+              IF   RECE02-TEKEDYMD-X(1:6) >  RECE02-SRYYM
+                 INITIALIZE                        STS-AREA-DAY
+                 INITIALIZE                        LNK-DAY7-AREA
+                 MOVE   "71"                  TO   LNK-DAY7-IRAI
+                 MOVE   RECE02-SRYYM          TO   LNK-DAY7-YM
+                 CALL   "ORCSDAY"          USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE   LNK-DAY7-KOYOMI       TO   WRK-EDYMD
+                 MOVE   WRK-EDYMD(7:2)        TO   WK-GENGAKU2-DD
+              ELSE
+                 MOVE   RECE02-TEKEDYMD-X(7:2)
+                                              TO   WK-GENGAKU2-DD
+              END-IF
+      *
               PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
                          UNTIL   (GEN-IDX    >    TBL-GENGAKU-MAX)
                            OR    (WK-GENGAKUKBN   NOT = ZERO     )
@@ -3198,9 +3230,12 @@ grpsys          PERFORM 900-DBSELECT-SEC
                   MOVE    "key4"               TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF  (PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD)
-                     AND (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD)
-                     AND (PTKOH-SAKJOKBN   =   SPACE         )
+                     IF ((PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD ) AND
+                         (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD ) AND
+                         (PTKOH-SAKJOKBN   =   SPACE          ))
+                     OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
+                         (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                         (PTKOH-SAKJOKBN   =   SPACE          ))
                          EVALUATE   GEN-IDX
                            WHEN        1
                              MOVE   1           TO  WK-GENGAKUKBN
@@ -9164,6 +9199,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21052-RECE02-HENSYU3-SEC               SECTION.
       *
+           IF    SYU-YKZKENNUM  NOT = ZERO
+              MOVE    1     TO   FLG-GENMEN-ARI
+           ELSE
+              MOVE    1     TO   FLG-GENMEN-NASI
+           END-IF
+      *
       *    ÀÁµá³Û¼ýÇ¼ÊÔ½¸
            PERFORM   210526-SKY-SYUNOU-HENSYU-SEC
       *
@@ -14454,6 +14495,22 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                ELSE
                   MOVE   01                 TO   WK-GENGAKU-DD
                END-IF
+      *
+               MOVE      RECE02-SRYYM       TO   WK-GENGAKU2-YM
+               IF   RECE02-TEKEDYMD-X(1:6) >  RECE02-SRYYM
+                 INITIALIZE                      STS-AREA-DAY
+                 INITIALIZE                      LNK-DAY7-AREA
+                 MOVE   "71"                TO   LNK-DAY7-IRAI
+                 MOVE   RECE02-SRYYM        TO   LNK-DAY7-YM
+                 CALL   "ORCSDAY"         USING  STS-AREA-DAY
+                                                 LNK-DAY7-AREA
+                 MOVE   LNK-DAY7-KOYOMI     TO   WRK-EDYMD
+                 MOVE   WRK-EDYMD(7:2)      TO   WK-GENGAKU2-DD
+               ELSE
+                 MOVE   RECE02-TEKEDYMD-X(7:2)
+                                            TO   WK-GENGAKU2-DD
+               END-IF
+      *
                PERFORM  211L1-SAIGAI-TAISYO-HENSYU-SEC
              END-IF
            ELSE
@@ -14465,6 +14522,23 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                ELSE
                   MOVE   01                 TO   WK-GENGAKU-DD
                END-IF
+      *
+               MOVE      RECE02-SRYYM       TO   WK-GENGAKU2-YM
+               IF   RECE02-KOHTEKEDYMD(1)(1:6)
+                                           >  RECE02-SRYYM
+                 INITIALIZE                      STS-AREA-DAY
+                 INITIALIZE                      LNK-DAY7-AREA
+                 MOVE   "71"                TO   LNK-DAY7-IRAI
+                 MOVE   RECE02-SRYYM        TO   LNK-DAY7-YM
+                 CALL   "ORCSDAY"         USING  STS-AREA-DAY
+                                                 LNK-DAY7-AREA
+                 MOVE   LNK-DAY7-KOYOMI     TO   WRK-EDYMD
+                 MOVE   WRK-EDYMD(7:2)      TO   WK-GENGAKU2-DD
+               ELSE
+                 MOVE   RECE02-KOHTEKEDYMD(1)(7:2)
+                                            TO   WK-GENGAKU2-DD
+               END-IF
+      *
                PERFORM  211L1-SAIGAI-TAISYO-HENSYU-SEC
            END-IF
       *
@@ -14490,9 +14564,12 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               MOVE    "key4"             TO  MCP-PATHNAME
               PERFORM  900-PTKOHINF-READ-SEC
               PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                IF  (PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD)
-                AND (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD)
-                AND (PTKOH-SAKJOKBN   =   SPACE         )
+                IF ((PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD ) AND
+                    (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD ) AND
+                    (PTKOH-SAKJOKBN   =   SPACE          ))
+                OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
+                    (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                    (PTKOH-SAKJOKBN   =   SPACE          ))
                   MOVE     1             TO  FLG-SAIGAI-TAISYO
                   MOVE     1             TO  FLG-PTKOHINF
                 ELSE
