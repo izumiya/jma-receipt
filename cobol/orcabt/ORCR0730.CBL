@@ -8064,7 +8064,8 @@
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN09V01.red"
+      *****************WHEN    "HCN09V01.red"
+                       WHEN    "HCN09V02.red"
                            MOVE    RECE08-PRTDATA  TO HC06
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE
