@@ -488,6 +488,7 @@
       *  04.05.17    NACL-門脇    11/02/18  出産一時金対応期間修正
       *  04.05.18    NACL-門脇    11/02/25  保険別請求チェック表の本体取込み
       *  04.05.19    NACL-門脇    11/03/02  山梨県地方公費対応
+      *  04.05.20    NACL-門脇    11/03/24  災害対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -775,6 +776,7 @@
            03  TOKU75-IDX2                             PIC 9(03).
            03  IDX10                                   PIC 9(03).
            03  IDX13                                   PIC 9(03).
+           03  IDX-SAI                                 PIC 9(03).
       *
            03  IDA                 PIC 9(04).
            03  IDB                 PIC 9(04).
@@ -2731,17 +2733,17 @@
                  ( RECE62-SRYYM       >=   201101       ))
                IF    ( RECE62-HKNNUM   NOT =   SPACE )
                AND   ( RECE62-HKNJANUM     =   SPACE )
-                   MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
+                   IF  RECE62-SRYYM   >=  "201101"
+                       MOVE    1           TO  RECE62-RJNGAIKOHFTN (1)
+                   ELSE
+                       MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
+                   END-IF
                ELSE
                    IF    ( RECE62-RJNHKNNUM
                                            NOT =   SPACE )
                    AND   ( RECE62-RJNFTNJANUM  =   SPACE )
                        MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
                    ELSE
-      *                減免対象者のとき   
-                       IF      RECE62-GENMENKBN    >   ZERO
-                           MOVE    2       TO  RECE62-RJNGAIKOHFTN (1)
-                       END-IF
       *                記号・番号が不明のとき
                        IF    ( RECE62-HKNNUM   NOT =   SPACE )
                        AND   ( RECE62-KIGO         =   SPACE )
@@ -2754,6 +2756,26 @@
                        AND   ( RECE62-RJNJKYSNUM   =   SPACE )
                            MOVE    1       TO  RECE62-RJNGAIKOHFTN (1)
                        END-IF
+      *                公費負担者番号又は受給者番号が不明のとき
+                       IF  (RECE62-SRYYM          >= "201101")
+                       AND (RECE62-RJNGAIKOHFTN(1) =  ZERO   )
+                         PERFORM  VARYING  IDX-SAI  FROM   1   BY   1
+                                   UNTIL   IDX-SAI    >    4
+                           IF  (RECE62-KOHNUM(IDX-SAI) NOT =  SPACE)
+                           AND (RECE62-KOHNUM(IDX-SAI) NOT = 
+                                                    "972" AND "974")
+                             IF  RECE62-KOHFTNJANUM(IDX-SAI) = SPACE
+                             OR  RECE62-KOHJKYSNUM(IDX-SAI)  = SPACE
+                               MOVE    1   TO  RECE62-RJNGAIKOHFTN (1)
+                             END-IF
+                           END-IF
+                         END-PERFORM
+                       END-IF
+      *                減免対象者のとき
+                       IF  (RECE62-RJNGAIKOHFTN(1) =  ZERO)
+                       AND (RECE62-GENMENKBN       >  ZERO)
+                           MOVE    2       TO  RECE62-RJNGAIKOHFTN (1)
+                       END-IF
                    END-IF
                END-IF
       *
@@ -2761,12 +2783,14 @@
                    MOVE     ZERO     TO   FLG-SAIGAI-TAISYO
                    PERFORM   2115-SAIGAI-TAISYO-HANTEI-SEC
                    IF   FLG-SAIGAI-TAISYO   =   1
-                     CONTINUE
+                     IF  (RECE62-SRYYM          >= "201101")
+                     AND (RECE62-RJNGAIKOHFTN(1) =  ZERO   )
+                       MOVE    3     TO   RECE62-RJNGAIKOHFTN (1)
+                     END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE62-RJNGAIKOHFTN (1)
                    END-IF
                END-IF
-      *
            END-IF
       *
            IF   FLG-ZENKI-TOKUREI  =   1
@@ -19324,7 +19348,6 @@
        2115-SAIGAI-TAISYO-HANTEI-SEC      SECTION.
       *
            IF     RECE62-HKNNUM   NOT =   SPACE
-      *
              IF  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91" )
              OR  (RECE62-HKNNUM       =   "068" OR "069" OR "040")
                CONTINUE
@@ -19336,40 +19359,60 @@
                ELSE
                   MOVE   01                 TO   WK-GENGAKU-DD
                END-IF
-               INITIALIZE                       PTKOHINF-REC
-               MOVE    RECE62-HOSPNUM       TO  PTKOH-HOSPNUM
-               MOVE    RECE62-PTID          TO  PTKOH-PTID
-               MOVE    "959"                TO  PTKOH-KOHNUM
-               MOVE    PTKOHINF-REC         TO  MCPDATA-REC
-               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-               MOVE    "key4"               TO  MCP-PATHNAME
-               PERFORM 900-DBSELECT-SEC
-               IF      MCP-RC               =   ZERO
-                 MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
-                 MOVE    "key4"             TO  MCP-PATHNAME
-                 PERFORM  900-PTKOHINF-READ-SEC
-                 PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                   IF  (PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD)
-                   AND (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD)
-                   AND (PTKOH-SAKJOKBN   =   SPACE         )
-                     MOVE     1             TO  FLG-SAIGAI-TAISYO
-                     MOVE     1             TO  FLG-PTKOHINF
-                   ELSE
-                     MOVE    "tbl_ptkohinf" TO  MCP-TABLE
-                     MOVE    "key4"         TO  MCP-PATHNAME
-                     PERFORM  900-PTKOHINF-READ-SEC
-                   END-IF
-                 END-PERFORM
-               END-IF
-               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-               MOVE    "key4"               TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               PERFORM  21151-SAIGAI-TAISYO-HENSYU-SEC
              END-IF
-      *
+           ELSE
+               MOVE      RECE62-SRYYM       TO   WK-GENGAKU-YM
+               IF   RECE62-KOHTEKSTYMD(1)(1:6)
+                                          >=  RECE62-SRYYM
+                  MOVE   RECE62-KOHTEKSTYMD(1)(7:2)
+                                            TO   WK-GENGAKU-DD
+               ELSE
+                  MOVE   01                 TO   WK-GENGAKU-DD
+               END-IF
+               PERFORM  21151-SAIGAI-TAISYO-HENSYU-SEC
            END-IF
       *
            .
        2115-SAIGAI-TAISYO-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    災害該当者の編集
+      *****************************************************************
+       21151-SAIGAI-TAISYO-HENSYU-SEC      SECTION.
+      *
+           INITIALIZE                       PTKOHINF-REC
+           MOVE    RECE62-HOSPNUM       TO  PTKOH-HOSPNUM
+           MOVE    RECE62-PTID          TO  PTKOH-PTID
+           MOVE    "959"                TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+              MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+              MOVE    "key4"             TO  MCP-PATHNAME
+              PERFORM  900-PTKOHINF-READ-SEC
+              PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                IF  (PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD)
+                AND (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD)
+                AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  MOVE     1             TO  FLG-SAIGAI-TAISYO
+                  MOVE     1             TO  FLG-PTKOHINF
+                ELSE
+                  MOVE    "tbl_ptkohinf" TO  MCP-TABLE
+                  MOVE    "key4"         TO  MCP-PATHNAME
+                  PERFORM  900-PTKOHINF-READ-SEC
+                END-IF
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       21151-SAIGAI-TAISYO-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
