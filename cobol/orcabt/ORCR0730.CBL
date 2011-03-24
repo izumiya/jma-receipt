@@ -119,6 +119,7 @@
       *  04.05.17    NACL-門脇    11/02/25  保険別請求チェック表の本体取込み
       *  04.05.18    NACL-藤原    11/02/22  レセ電データの記号番号区切り
       *                                     文字設定対応
+      *  04.05.19    NACL-藤原    11/03/24  災害対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -245,7 +246,8 @@
                                    REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *       
-           COPY    "HCN09V01.INC"  REPLACING  //HCN09V01//
+      *****COPY    "HCN09V01.INC"  REPLACING  //HCN09V01//
+           COPY    "HCN09V02.INC"  REPLACING  //HCN09V02//
                                    BY         //HC06//.
            COPY    "HCM12V01.INC"  REPLACING  //HCM12V01//
                                    BY         //HC061//.
@@ -2917,9 +2919,9 @@
            IF      CNT-PAGE            =   1
                EVALUATE    RECE62-RJNGAIKOHFTN (1)
                    WHEN    1
-                       MOVE    "（不詳）"  TO  HC06-HEAD4 (2)(1:8)
+                       MOVE    "（不詳）"  TO  HC06-HEAD5
                    WHEN    2
-                       MOVE    "（災１）"  TO  HC06-HEAD4 (2)(1:8)
+                       MOVE    "（災１）"  TO  HC06-HEAD5
                END-EVALUATE
            END-IF
       *
@@ -7796,7 +7798,8 @@
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCN09V01.red"      TO
+      *********MOVE    "HCN09V01.red"      TO
+               MOVE    "HCN09V02.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
