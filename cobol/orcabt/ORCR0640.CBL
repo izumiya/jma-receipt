@@ -14754,11 +14754,10 @@
               ADD      SYU-SYUSKJ-NISSU TO   RECE62-SKYSKJ-KAISU
       *
               COMPUTE  WRK-SKY-KEISAN  =  SYU-SYUSKJ-RYOYOHI
-                                       -  SYU-SYUSKJ-FTN-RECE
+                                       -  SYU-SYUSKJ-FTN
               ADD      WRK-SKY-KEISAN   TO   RECE62-SKYSKJ-HOKENJA
       *
-              ADD      SYU-SYUSKJ-FTN-RECE
-                                        TO   WRK-SKY-SKJ-ICHIBUFTN
+              ADD      SYU-SYUSKJ-FTN   TO   WRK-SKY-SKJ-ICHIBUFTN
       *
               COMPUTE  WRK-SKY-KEISAN  =  SYU-RYOYOHI-SKJ
                                        +  SYU-RYOYOHI-LIFE
