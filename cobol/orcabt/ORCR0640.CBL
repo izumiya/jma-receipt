@@ -2783,8 +2783,9 @@
       *                ¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF  (RECE62-RJNGAIKOHFTN(1) =  ZERO)
                        AND (RECE62-GENMENKBN       >  ZERO)
-                         IF   FLG-GENMEN-ARI   =  1
-                         AND  FLG-GENMEN-NASI  =  1
+                         IF  (RECE62-SRYYM    >= "201101")
+                         AND (FLG-GENMEN-ARI   =  1      )
+                         AND (FLG-GENMEN-NASI  =  1      )
                            MOVE    4       TO  RECE62-RJNGAIKOHFTN (1)
                            MOVE    1       TO  RECE62-YOBIETC(9)
                          ELSE
