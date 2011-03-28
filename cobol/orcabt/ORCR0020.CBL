@@ -224,6 +224,8 @@
       *                                     は公費単独のレセプトとする
       *  04.05.06    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
+      *  04.05.07    NACL-藤原    11/03/25  災害対応
+      *                                     連絡先情報追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1373,6 +1375,17 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE    RECE01-AGE          TO  WRK-NENREI
                                            RECE02-AGE
            MOVE    RECE01-SYUGAKUKBN   TO  RECE02-SYUGAKUKBN
+      *
+           MOVE    RECE01-HOME-POST    TO  RECE02-HOME-POST
+           MOVE    RECE01-HOME-ADRS    TO  RECE02-HOME-ADRS
+           MOVE    RECE01-HOME-BANTI   TO  RECE02-HOME-BANTI
+           MOVE    RECE01-RENRAKU-POST TO  RECE02-RENRAKU-POST
+           MOVE    RECE01-RENRAKU-NAME TO  RECE02-RENRAKU-NAME
+           MOVE    RECE01-RENRAKU-ADRS TO  RECE02-RENRAKU-ADRS
+           MOVE    RECE01-RENRAKU-BANTI
+                                       TO  RECE02-RENRAKU-BANTI
+           MOVE    RECE01-RENRAKU-TEL1 TO  RECE02-RENRAKU-TEL1
+           MOVE    RECE01-RENRAKU-TEL2 TO  RECE02-RENRAKU-TEL2
       *    旧姓履歴の取得（月途中で保険変更があるとき）
            IF    ( RECE01-TEISEIKBN    NOT =   "1"   )
            AND   ( RECE02-TEKSTYMD-X   NOT =   SPACE )

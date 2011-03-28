@@ -216,6 +216,8 @@
       *  04.05.04    NACL-ÌçÏÆ    10/01/12  ¼£¸³ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    10/01/26  ÅìµþÅÔ¥Þ¥ë»ÒÄÉ²ÃÂÐ±þ
       *  04.05.06    NACL-ÌçÏÆ    11/02/28  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.09    NACL-Æ£¸¶    11/03/25  ºÒ³²ÂÐ±þ
+      *                                     Ï¢ÍíÀè¾ðÊóÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1165,6 +1167,9 @@
       *    ¿ôÃÍÊÑ´¹¥µ¥Ö
            COPY    "CPORCSNUM.INC".
       *
+      *    È¾³Ñ¥Á¥§¥Ã¥¯¥µ¥Ö
+           COPY    "CPORCSKANACHK.INC".
+      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
            COPY    "CPORCMCP.INC".
@@ -1542,6 +1547,60 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
                    PERFORM 2010-DENSHI-HENSYU-SEC
                  END-IF
                END-PERFORM
+      *
+      *        ºÒ³²ÂÐ±þ¡ÊÏ¢ÍíÀèµ­ºÜ¡Ë
+               EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                   WHEN    1
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    RECE02-HOME-POST
+                                               TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF    ( KANACHK-RC      =   ZERO )
+                       AND   ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                                   TO  RECE02-HOME-POST1
+                       END-IF
+                       STRING   RECE02-HOME-POST1
+                                               DELIMITED  BY  SPACE
+                                RECE02-HOME-ADRS
+                                               DELIMITED  BY  SPACE
+                                RECE02-HOME-BANTI
+                                               DELIMITED  BY  SPACE
+                                               INTO    RECE02-HOME-ADRS1
+                       END-STRING
+      *
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    RECE02-RENRAKU-POST
+                                               TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF    ( KANACHK-RC      =   ZERO )
+                       AND   ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                                   TO
+                                                   RECE02-RENRAKU-POST1
+                       END-IF
+                       STRING   RECE02-RENRAKU-POST1
+                                               DELIMITED  BY  SPACE
+                                RECE02-RENRAKU-ADRS
+                                               DELIMITED  BY  SPACE   
+                                RECE02-RENRAKU-BANTI
+                                               DELIMITED  BY  SPACE   
+                                               INTO
+                                                   RECE02-RENRAKU-ADRS1
+                       END-STRING
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    RECE02-RENRAKU-TEL1
+                                               TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF    ( KANACHK-RC      =   ZERO )
+                       AND   ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               TO  RECE02-TEL
+                       END-IF
+               END-EVALUATE
       *
                REWRITE RECE02-REC
       *

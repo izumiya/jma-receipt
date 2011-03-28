@@ -117,6 +117,8 @@
       *  04.05.03    NACL-門脇    10/12/13  請求額情報の追加
       *  04.05.04    NACL-藤原    11/02/22  レセ電データの記号番号区切り
       *                                     文字設定対応
+      *  04.05.05    NACL-藤原    11/03/25  災害対応
+      *                                     連絡先情報追加
       ************************************************************
       *01  RECE02-REC.
            03  RECE02-KEY.
@@ -160,6 +162,40 @@
            03  RECE02-SYUGAKUKBN          PIC 9(01).
       *死亡区分
            03  RECE02-DEATHKBN            PIC  X(01).
+      *自宅−郵便番号
+           03  RECE02-HOME-POST           PIC X(07).
+      *自宅−住所
+           03  RECE02-HOME-ADRS           PIC X(200).
+      *自宅−番地方書
+           03  RECE02-HOME-BANTI          PIC X(200).
+      *連絡先−名称
+           03  RECE02-RENRAKU-NAME.
+               05  RECE02-RENRAKU-NAME-R  PIC X(50)
+                                              OCCURS  2.
+      *連絡先−郵便番号
+           03  RECE02-RENRAKU-POST        PIC X(07).
+      *連絡先−住所
+           03  RECE02-RENRAKU-ADRS        PIC X(200).
+      *連絡先−番地方書
+           03  RECE02-RENRAKU-BANTI       PIC X(200).
+      *連絡先−昼電話番号
+           03  RECE02-RENRAKU-TEL1        PIC X(15).
+      *連絡先−夜電話番号
+           03  RECE02-RENRAKU-TEL2        PIC X(15).
+      *自宅−編集郵便番号
+           03  RECE02-HOME-POST1          PIC X(14).
+      *自宅−編集住所（住所＋番地）
+           03  RECE02-HOME-ADRS1.
+               05  RECE02-HOME-ADRS-R     PIC X(50)
+                                              OCCURS  4.
+      *連絡先−編集郵便番号
+           03  RECE02-RENRAKU-POST1       PIC X(14).
+      *連絡先−編集住所（住所＋番地）
+           03  RECE02-RENRAKU-ADRS1.
+               05  RECE02-RENRAKU-ADRS-R  PIC X(50)
+                                              OCCURS  4.
+      *連絡先−編集電話番号（昼電話番号全角）
+           03  RECE02-TEL                 PIC X(30).
       *レセプト対象年月日情報
            03  RECE02-TEKYMD.
       *適用開始年月日
@@ -624,8 +660,8 @@
            03  RECE02-PTTOKKI-AREA.
                05  RECE02-PTTOKKINF           OCCURS  5.
                    07  RECE02-PTTOKKI-NAIYO
-                                          PIC  X(12).
-                   07  RECE02-PTTOKKI-CD  PIC  X(02).
+                                          PIC X(12).
+                   07  RECE02-PTTOKKI-CD  PIC X(02).
       *
       *請求額情報（計算用）
            03  RECE02-FTNMONEY-SKY             PIC 9(09).

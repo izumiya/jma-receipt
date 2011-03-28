@@ -120,6 +120,9 @@
       *                                     の設定も可能にする 
       *  04.05.05    NACL-藤原    11/02/22  レセ電データの記号番号区切り
       *                                     文字設定対応
+      *  04.05.06    NACL-藤原    11/03/25  災害対応
+      *                                     災害該当レセプトのレセ電作成
+      *                                     区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7557,6 +7560,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                             TO  W12-RECEDEN-RIREKIKBN
            MOVE    SPA-GMN-RECEDEN-DATAKBN-G
                                             TO  W12-RECEDEN-DATAKBN
+           MOVE    "0 作成しない"           TO  W12-RECEDEN-DISASTER
            MOVE    SPA-GMN-KIGO-DELIMITER-FLG-G
                                             TO  W12-KIGO-DELIMITER-FLG
            MOVE    SPA-GMN-KIGO-DELIMITER-HKNJANUM-FLG-G
@@ -8181,6 +8185,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-RECEDEN-DATAKBN-MAX
                                        TO  W12-RECEDEN-DATAKBN-COUNT 
+      *     
+      *****PERFORM VARYING IDY     FROM    1   BY  1
+      *****        UNTIL   IDY     >       SPA-GMN-RECEDEN-DISASTER-MAX
+               MOVE    "0 作成しない"  TO  W12-RECEDEN-DISASTERLST (1)
+      *****END-PERFORM
+           MOVE    1                   TO  W12-RECEDEN-DISASTER-COUNT 
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >   SPA-GMN-KIGO-DELIMITER-FLG-MAX

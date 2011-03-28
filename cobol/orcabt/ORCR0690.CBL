@@ -147,6 +147,8 @@
       *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
       *  04.05.03    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.04    NACL-門脇    10/01/12  治験対応
+      *  04.05.05    NACL-藤原    11/03/25  災害対応
+      *                                     連絡先情報追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -946,6 +948,9 @@
       *    数値変換サブ
            COPY    "CPORCSNUM.INC".
       *
+      *    半角チェックサブ
+           COPY    "CPORCSKANACHK.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -1314,6 +1319,60 @@
                IF      TBL-DENSHI-FLG          =   1
                    PERFORM 2010-DENSHI-HENSYU-SEC
                END-IF
+      *
+      *        災害対応（連絡先記載）
+               EVALUATE    RECE62-RJNGAIKOHFTN (1)
+                   WHEN    1
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    RECE62-HOME-POST
+                                               TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF    ( KANACHK-RC      =   ZERO )
+                       AND   ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                                   TO  RECE62-HOME-POST1
+                       END-IF
+                       STRING   RECE62-HOME-POST1
+                                               DELIMITED  BY  SPACE
+                                RECE62-HOME-ADRS
+                                               DELIMITED  BY  SPACE
+                                RECE62-HOME-BANTI
+                                               DELIMITED  BY  SPACE
+                                               INTO    RECE62-HOME-ADRS1
+                       END-STRING
+      *
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    RECE62-RENRAKU-POST
+                                               TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF    ( KANACHK-RC      =   ZERO )
+                       AND   ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                                   TO
+                                                   RECE62-RENRAKU-POST1
+                       END-IF
+                       STRING   RECE62-RENRAKU-POST1
+                                               DELIMITED  BY  SPACE
+                                RECE62-RENRAKU-ADRS
+                                               DELIMITED  BY  SPACE   
+                                RECE62-RENRAKU-BANTI
+                                               DELIMITED  BY  SPACE   
+                                               INTO
+                                                   RECE62-RENRAKU-ADRS1
+                       END-STRING
+                       INITIALIZE              ORCSKANACHKAREA
+                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    RECE62-RENRAKU-TEL1
+                                               TO  KANACHK-MAE-INPUT
+                       CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                       IF    ( KANACHK-RC      =   ZERO )
+                       AND   ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               TO  RECE62-TEL
+                       END-IF
+               END-EVALUATE
       *
                REWRITE RECE62-REC
       *                 

@@ -41,6 +41,8 @@
       *                                     乳児４５、４８が月途中で変更
       *                                     になった場合の記載順
       *                                     公費適用開始日を追加
+      *  04.05.02    NACL-藤原    11/03/25  災害対応
+      *                                     連絡先情報追加
       ********************************************************************
       *01  RECE61-REC.
            03  RECE61-KEY.
@@ -162,6 +164,24 @@
                05  RECE61-SYUGAKUKBN      PIC 9(01).
       *テスト患者番号区分
                05  RECE61-TSTPTNUMKBN     PIC  X(01).
+      *自宅−郵便番号
+               05  RECE61-HOME-POST       PIC X(07).
+      *自宅−住所
+               05  RECE61-HOME-ADRS       PIC X(200).
+      *自宅−番地方書
+               05  RECE61-HOME-BANTI      PIC X(200).
+      *連絡先−名称
+               05  RECE61-RENRAKU-NAME    PIC X(100).
+      *連絡先−郵便番号
+               05  RECE61-RENRAKU-POST    PIC X(07).
+      *連絡先−住所
+               05  RECE61-RENRAKU-ADRS    PIC X(200).
+      *連絡先−番地方書
+               05  RECE61-RENRAKU-BANTI   PIC X(200).
+      *連絡先−昼電話番号
+               05  RECE61-RENRAKU-TEL1    PIC X(15).
+      *連絡先−夜電話番号
+               05  RECE61-RENRAKU-TEL2    PIC X(15).
       *県番号
            03  RECE61-PREFNUM             PIC  9(02).
       *印刷順
