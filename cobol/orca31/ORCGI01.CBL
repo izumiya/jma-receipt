@@ -15679,26 +15679,22 @@
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-PTID            TO  NACCT-PTID
-           MOVE    PTNYUINRRK-TENNYUYMD(1:6)
-                                       TO  NACCT-SRYYM
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           MOVE  PTNYUINRRK-TENNYUYMD  TO  LNK-DAY6-KIJUN
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING    STS-AREA-DAY
+                                       LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
            MOVE    "key44"             TO  MCP-PATHNAME
            PERFORM 910-NYUINACCT-SELECT-SEC
            IF      FLG-NYUINACCT       =   ZERO
                MOVE    "key44"         TO  MCP-PATHNAME
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
-      *             転入日付のマイナス１日
-                    INITIALIZE   LNK-DAY6-AREA
-                    MOVE  "61"         TO  LNK-DAY6-IRAI
-                    MOVE  PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-                    MOVE  "1"          TO  LNK-DAY6-ZOGENPTN
-                    MOVE  -1           TO  LNK-DAY6-ZOGEN
-                    CALL  "ORCSDAY"    USING    STS-AREA-DAY
-                                                LNK-DAY6-AREA
-                    MOVE   LNK-DAY6-KEISAN
-                                       TO  WRK-TENNYUYMD
-      *
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
                          ADD    1      TO   IDX9
                          MOVE   "190134270"
@@ -15724,26 +15720,22 @@
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-PTID            TO  NACCT-PTID
-           MOVE    PTNYUINRRK-TENNYUYMD(1:6)
-                                       TO  NACCT-SRYYM
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           MOVE  PTNYUINRRK-TENNYUYMD  TO  LNK-DAY6-KIJUN
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING    STS-AREA-DAY
+                                       LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
            MOVE    "key45"             TO  MCP-PATHNAME
            PERFORM 910-NYUINACCT-SELECT-SEC
            IF      FLG-NYUINACCT       =   ZERO
                MOVE    "key45"         TO  MCP-PATHNAME
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
-      *             転入日付のマイナス１日
-                    INITIALIZE   LNK-DAY6-AREA
-                    MOVE  "61"         TO  LNK-DAY6-IRAI
-                    MOVE  PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-                    MOVE  "1"          TO  LNK-DAY6-ZOGENPTN
-                    MOVE  -1           TO  LNK-DAY6-ZOGEN
-                    CALL  "ORCSDAY"    USING    STS-AREA-DAY
-                                                LNK-DAY6-AREA
-                    MOVE   LNK-DAY6-KEISAN
-                                       TO  WRK-TENNYUYMD
-      *
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
                          ADD    1      TO   IDX9
                          MOVE   "190135670"
