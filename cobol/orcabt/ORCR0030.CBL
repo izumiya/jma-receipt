@@ -508,6 +508,8 @@
       *  04.05.15    NACL-ÌçÏÆ    11/03/02  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.16    NACL-ÌçÏÆ    11/03/24  ºÒ³²ÂÐ±þ
       *  04.05.17    NACL-ÌçÏÆ    11/03/25  ºÒ³²ÂÐ±þ¡ÊºÒ£²ÂÐ±þ¡Ë
+      *  04.05.18    NACL-ÌçÏÆ    11/03/28  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
+      *                                     (233064)Ê¿À®£²£³Ç¯£³·î¤Þ¤Ç
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12567,18 +12569,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE  1      TO   FLG-IRYOHI70K
                 END-EVALUATE
              END-IF
-             IF  RECE02-HKNJANUM(1:6)
-                           =  "133033" OR "133280" OR
-                              "133041" OR "133066" OR
-                              "133074" OR "133090" OR
-                              "133116" OR "133132" OR
-                              "133140" OR "133157" OR
-                              "133165" OR "133173" OR
-                              "133181" OR "133199" OR
-                              "133207" OR "133223" OR
-                              "133249" OR "133256" OR
-                              "133272" OR "233064" OR
-                              "283077"
+             IF ( RECE02-HKNJANUM(1:6)
+                           =  "133033" OR "133280" OR "133041" OR
+                              "133066" OR "133074" OR "133090" OR
+                              "133116" OR "133132" OR "133140" OR
+                              "133157" OR "133165" OR "133173" OR
+                              "133181" OR "133199" OR "133207" OR
+                              "133223" OR "133249" OR "133256" OR
+                              "133272" OR "283077" )
+             OR ((RECE02-HKNJANUM(1:6) =  "233064") AND
+                 (RECE02-SRYYM        <=  "201103"))
                IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
                OR  ((SYS-1001-PREFNUM      =   29     ) AND
                     (RECE02-HKNJANUM(1:6)  =  "133033"))
@@ -13766,13 +13766,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE SPACE  TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                   IF  (RECE02-KOHNUM(KOHFTN-IDX) =  "010" OR "021"   )
-                  AND (RECE02-HKNJANUM(1:6) =
-                         "133033" OR "133280" OR "133041" OR "133066" OR
-                         "133074" OR "133090" OR "133116" OR "133132" OR
-                         "133140" OR "133157" OR "133165" OR "133173" OR
-                         "133181" OR "133199" OR "133207" OR "133223" OR
-                         "133249" OR "133256" OR "133272" OR "233064" OR
-                         "283077"                                    )
+                   IF ( RECE02-HKNJANUM(1:6)
+                                 =  "133033" OR "133280" OR "133041" OR
+                                    "133066" OR "133074" OR "133090" OR
+                                    "133116" OR "133132" OR "133140" OR
+                                    "133157" OR "133165" OR "133173" OR
+                                    "133181" OR "133199" OR "133207" OR
+                                    "133223" OR "133249" OR "133256" OR
+                                    "133272" OR "283077" )
+                   OR ((RECE02-HKNJANUM(1:6) =  "233064") AND
+                       (RECE02-SRYYM        <=  "201103"))
                     IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
                     OR  ((SYS-1001-PREFNUM      =   29     ) AND
                          (RECE02-HKNJANUM(1:6)  =  "133033"))
@@ -13781,6 +13784,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE  "1" TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
                       MOVE  "1" TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                     END-IF
+                   END-IF
                   END-IF
                 END-IF
       *
