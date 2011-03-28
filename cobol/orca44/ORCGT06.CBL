@@ -38,6 +38,8 @@
       *                                     ファイル出力先のデフォルト値
       *                                     の設定も可能にする 
       *  04.05.02    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
+      *  04.05.03    NACL-藤原    11/03/28  児童保護(53)の公費単独のレセ
+      *                                     プトの負担者番号等の表示
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -2446,7 +2448,8 @@
       *    受給者番号をセット
            IF    ( RECE10-HKNNUM       =   SPACE               )
              IF    ( RECE10-KOHNUM (1)   =   "012"   OR  "025"
-                                                      OR "020" )
+                                                     OR  "020"
+                                                     OR  "053" )
              AND   ( RECE10-KOHNUM (2)   =   SPACE             )
                INITIALIZE                  PTKOHINF-REC
                MOVE    SPA-HOSPNUM     TO  PTKOH-HOSPNUM
