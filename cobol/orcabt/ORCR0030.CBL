@@ -11101,9 +11101,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            ADD   SYU-TOTAL-HKNTEN   TO   RECE02-SKYIRYO-TOTALTEN
       *
-           ADD   SYU-HKNTEKMONEY    TO   RECE02-SKYIRYO-ICHIBUFTN
-           ADD   SYU-KOH-FTN        TO   RECE02-SKYIRYO-ICHIBUFTN
-      *
            IF   SYU-SYUHKNNUM   NOT =  SPACE
               COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
                                        *  10
@@ -11119,16 +11116,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
               COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN +  5
               COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN / 10
               COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN * 10
-              ADD      WRK-SKY-KEISAN   TO   WRK-SKY-ICHIBUFTN
-              ADD      SYU-GRP-SGKMONEY TO   WRK-SKY-ICHIBUFTN
+      *
+              IF    SYU-YKZKENNUM   =  3  OR  4
+                ADD    WRK-SKY-KEISAN   TO   RECE02-SKYIRYO-HOKENJA
+                ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
+              ELSE
+                ADD    WRK-SKY-KEISAN   TO   WRK-SKY-ICHIBUFTN
+                ADD    SYU-GRP-SGKMONEY TO   WRK-SKY-ICHIBUFTN
+      *
+                COMPUTE  WRK-SKY-KEISAN  =  SYU-HKNTEKMONEY
+                                         +  SYU-KOH-FTN
+                ADD    WRK-SKY-KEISAN   TO   WRK-SKY-FTNMONEY
+      *
+                ADD    SYU-HKNTEKMONEY  TO   RECE02-SKYIRYO-ICHIBUFTN
+                ADD    SYU-KOH-FTN      TO   RECE02-SKYIRYO-ICHIBUFTN
+              END-IF
       *
               COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
                                        *  10
               ADD      WRK-SKY-KEISAN   TO   WRK-SKY-ZENGAKU
-      *
-              COMPUTE  WRK-SKY-KEISAN  =  SYU-HKNTEKMONEY
-                                       +  SYU-KOH-FTN
-              ADD      WRK-SKY-KEISAN   TO   WRK-SKY-FTNMONEY
       *
               IF  (SYU-KOH-HKNNUM(1) = SPACE)
               AND (SYU-KOH-HKNNUM(2) = SPACE)
@@ -11175,6 +11181,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
               COMPUTE  WRK-SKY-KEISAN  =  SYU-HKNTEKMONEY
                                        +  SYU-KOH-FTN
               ADD      WRK-SKY-KEISAN   TO   WRK-SKY-FTNMONEY2
+      *
+              ADD      SYU-HKNTEKMONEY  TO   RECE02-SKYIRYO-ICHIBUFTN
+              ADD      SYU-KOH-FTN      TO   RECE02-SKYIRYO-ICHIBUFTN
            END-IF
       *
            .
