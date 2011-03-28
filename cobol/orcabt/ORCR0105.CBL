@@ -6571,6 +6571,11 @@
                            INSPECT WRK-TITLE
                                        REPLACING   ALL "  "    BY  "¡¡"
       * 
+                           IF      WRK-LINETEK >=  WRK-TEKIYOU-LINE
+                               PERFORM 34120-PAGE-SEC
+                           END-IF    
+                           ADD     1               TO  WRK-LINETEK
+      * 
                            IF      CNT-PAGE        =   1   
                                MOVE    WRK-TITLE       TO
                                                HC06-TEKIYO (WRK-LINETEK)
