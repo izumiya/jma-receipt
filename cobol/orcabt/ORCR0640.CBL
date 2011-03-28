@@ -14681,18 +14681,19 @@
                                        *  10
                                        *  RECE62-KYURATE
                                        /  100
-              COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN +  5
-              COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN / 10
-              COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN * 10
       *
               IF    SYU-YKZKENNUM   =  3  OR  4
                 ADD    WRK-SKY-KEISAN   TO   RECE62-SKYIRYO-HOKENJA
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
               ELSE
+                COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN +  5
+                COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN / 10
+                COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN * 10
+      *
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-ICHIBUFTN
       *
-                COMPUTE  WRK-SKY-KEISAN  =  SYU-HKNTEKMONEY
-                                         +  SYU-KOH-FTN
+                COMPUTE  WRK-SKY-KEISAN  =   SYU-HKNTEKMONEY
+                                         +   SYU-KOH-FTN
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-FTNMONEY
       *
                 ADD    SYU-HKNTEKMONEY  TO   RECE62-SKYIRYO-ICHIBUFTN

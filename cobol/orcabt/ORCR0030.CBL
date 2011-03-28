@@ -11113,19 +11113,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        *  10
                                        *  RECE02-KYURATE
                                        /  100
-              COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN +  5
-              COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN / 10
-              COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN * 10
       *
               IF    SYU-YKZKENNUM   =  3  OR  4
                 ADD    WRK-SKY-KEISAN   TO   RECE02-SKYIRYO-HOKENJA
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
               ELSE
+                COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN +  5
+                COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN / 10
+                COMPUTE  WRK-SKY-KEISAN  =   WRK-SKY-KEISAN * 10
+      *
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-ICHIBUFTN
                 ADD    SYU-GRP-SGKMONEY TO   WRK-SKY-ICHIBUFTN
       *
-                COMPUTE  WRK-SKY-KEISAN  =  SYU-HKNTEKMONEY
-                                         +  SYU-KOH-FTN
+                COMPUTE  WRK-SKY-KEISAN  =   SYU-HKNTEKMONEY
+                                         +   SYU-KOH-FTN
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-FTNMONEY
       *
                 ADD    SYU-HKNTEKMONEY  TO   RECE02-SKYIRYO-ICHIBUFTN
