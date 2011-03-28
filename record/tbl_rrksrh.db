@@ -157,7 +157,7 @@ path crtv01	{
                                    '976',
                                    '977',
                                    '978',
-                                   '979')
+                                   '979') AND (TBL_PTKOHINF.SAKJOKBN = '')
         AND (TBL_RRKSRH.SRYYMD >= TBL_PTKOHINF.TEKSTYMD 
         AND  TBL_RRKSRH.SRYYMD <= TBL_PTKOHINF.TEKEDYMD))))
 		;
