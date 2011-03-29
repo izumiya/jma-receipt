@@ -247,7 +247,8 @@
                                    BY         //RECEERR//.
       *
       *****COPY    "HCM11V01.INC"  REPLACING  //HCM11V01//
-           COPY    "HCM11V02.INC"  REPLACING  //HCM11V02//
+      *****COPY    "HCM11V02.INC"  REPLACING  //HCM11V02//
+           COPY    "HCM11V03.INC"  REPLACING  //HCM11V03//
                                    BY         //HC06//.
            COPY    "HCM12V01.INC"  REPLACING  //HCM12V01//
                                    BY         //HC061//.
@@ -2839,7 +2840,8 @@
                    WHEN    4
                        MOVE    "° ∫“£≤°À"  TO  HC06-HEAD5
                    WHEN    5
-                       MOVE    "° …‘æ‹∫“£±°À"  TO  HC06-HEAD5
+                       MOVE    "° …‘æ‹°¶∫“£±°À"
+                                           TO  HC06-HEAD5
                END-EVALUATE
            END-IF
       *
@@ -7116,7 +7118,8 @@
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
       *********MOVE    "HCM11V01.red"      TO
-               MOVE    "HCM11V02.red"      TO
+      *********MOVE    "HCM11V02.red"      TO
+               MOVE    "HCM11V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -7124,7 +7127,8 @@
                EVALUATE    SYS-2005-NEXTPRTKBN-G
                    WHEN    ZERO
       *********        MOVE    "HCM11V01.red"      TO
-                       MOVE    "HCM11V02.red"      TO
+      *********        MOVE    "HCM11V02.red"      TO
+                       MOVE    "HCM11V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -7391,7 +7395,8 @@
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
       *****************WHEN    "HCM11V01.red"
-                       WHEN    "HCM11V02.red"
+      *****************WHEN    "HCM11V02.red"
+                       WHEN    "HCM11V03.red"
                            MOVE    RECE08-PRTDATA  TO HC06
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE

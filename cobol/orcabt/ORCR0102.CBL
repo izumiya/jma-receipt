@@ -136,6 +136,10 @@
       *
       *  04.05.01    NACL-ÂÀÅÄ    10/01/28  ³ÈÄ¥´Á»úÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    11/03/24  ºÒ³²ÂÐ±þ
+      *                                     HCM11V02.red
+      *  04.05.22    NACL-Æ£¸¶    11/03/29  ºÒ³²ÂÐ±þ
+      *                                     ¡ÖÉÔ¾Ü¡¦ºÒ£±¡×¤ÎÄÉ²Ã
+      *                                     HCM11V03.red
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -317,8 +321,10 @@
            COPY    "HCM14.INC".
            COPY    "HCM11V01.INC".
            COPY    "HCM11V02.INC".
+           COPY    "HCM11V03.INC".
            COPY    "HCN09V01.INC".
            COPY    "HCN09V02.INC".
+           COPY    "HCN09V03.INC".
            COPY    "HCM12V01.INC".
            COPY    "HCM13V01.INC".
            COPY    "HCM14V01.INC".
@@ -959,6 +965,10 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        MOVE    RECE08-PRTDATA      TO  HCN09V02
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCN09V02-RENNUM
                        MOVE    HCN09V02            TO  RECE08-PRTDATA
+                   WHEN    "HCN09V03.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCN09V03
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCN09V03-RENNUM
+                       MOVE    HCN09V03            TO  RECE08-PRTDATA
                    WHEN    "HCM11V01.red"                  
                        MOVE    RECE08-PRTDATA      TO  HCM11V01
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCM11V01-RENNUM
@@ -967,6 +977,10 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        MOVE    RECE08-PRTDATA      TO  HCM11V02
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCM11V02-RENNUM
                        MOVE    HCM11V02            TO  RECE08-PRTDATA
+                   WHEN    "HCM11V03.red"                  
+                       MOVE    RECE08-PRTDATA      TO  HCM11V03
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCM11V03-RENNUM
+                       MOVE    HCM11V03            TO  RECE08-PRTDATA
                    WHEN    "HCM12V01.red"                  
                        MOVE    RECE08-PRTDATA      TO  HCM12V01
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCM12V01-RENNUM
@@ -1141,6 +1155,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCM11.red"     ALSO    ANY               
                WHEN    "HCM11V01.red"  ALSO    ANY               
                WHEN    "HCM11V02.red"  ALSO    ANY               
+               WHEN    "HCM11V03.red"  ALSO    ANY               
                WHEN    "HCM12.red"     ALSO    "2"              
                WHEN    "HCM12V01.red"  ALSO    "2"              
                WHEN    "HCM13.red"     ALSO    "2"              
@@ -1179,6 +1194,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCN09.red"     ALSO    ANY               
                WHEN    "HCN09V01.red"  ALSO    ANY               
                WHEN    "HCN09V02.red"  ALSO    ANY               
+               WHEN    "HCN09V03.red"  ALSO    ANY               
                WHEN    "HCM12.red"     ALSO    "1"              
                WHEN    "HCM12V01.red"  ALSO    "1"              
                WHEN    "HCM13.red"     ALSO    "1"              
