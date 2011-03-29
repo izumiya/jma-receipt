@@ -123,6 +123,8 @@
       *  04.05.20    NACL-ÃÁœ∆    11/03/25  ∫“≥≤¬–±˛° ∫“£≤¬–±˛°À
       *  04.05.21    NACL-∆£∏∂    11/03/25  ∫“≥≤¬–±˛
       *                                     °÷…‘æ‹°◊§Œ§»§≠œ¢ÕÌ¿Ëµ≠∫‹
+      *  04.05.22    NACL-∆£∏∂    11/03/29  ∫“≥≤¬–±˛
+      *                                     °÷…‘æ‹°¶∫“£±°◊§Œƒ…≤√
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2923,6 +2925,7 @@
       *
            IF      CNT-PAGE            =   1
                IF      RECE62-RJNGAIKOHFTN (1)   =   1   OR  2  OR  4
+                                                 OR  5    
                    MOVE    SPACE                TO  WRK-HC06-HEAD4-G
                    MOVE    HC06-HEAD4-G (5:)    TO  WRK-HC06-HEAD4-G
                    MOVE    SPACE                TO  HC06-HEAD4-G    
@@ -2939,6 +2942,9 @@
                        MOVE    "° ∫“£±°À"  TO  HC06-HEAD5
                    WHEN    4
                        MOVE    "° ∫“£≤°À"  TO  HC06-HEAD5
+                   WHEN    5
+                       MOVE    "° …‘æ‹∫“£±°À"
+                                           TO  HC06-HEAD5
                END-EVALUATE
            END-IF
       *
@@ -7332,7 +7338,7 @@
            END-IF
       *
       *    ∫“≥≤¬–±˛° œ¢ÕÌ¿Ëµ≠∫‹°À
-           IF      RECE62-RJNGAIKOHFTN (1) =   1   OR  2   OR  4
+           IF      RECE62-RJNGAIKOHFTN (1) =   1   OR  2   OR  4   OR  5
       *        ≈¶Õ◊ÕÛ§Àµ≠∫‹§µ§Ï§∆§§§ÎæÏπÁ£±π‘§¢§±§Î
                IF      WRK-LINETEK     >   ZERO
                    IF      WRK-LINETEK     >=   WRK-TEKIYOU-LINE
@@ -7349,6 +7355,9 @@
                        MOVE    "° ∫“£±°À"      TO  WRK-TITLE
                    WHEN    4
                        MOVE    "° ∫“£≤°À"      TO  WRK-TITLE
+                   WHEN    5
+                       MOVE    "° …‘æ‹°¶∫“£±°À"
+                                               TO  WRK-TITLE
                END-EVALUATE
                INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "°°"
       * 
@@ -7370,7 +7379,7 @@
                     END-EVALUATE
                END-IF
       *                   
-               IF      RECE62-RJNGAIKOHFTN (1) =   1
+               IF      RECE62-RJNGAIKOHFTN (1) =   1   OR  5
                    IF    ( RECE62-HOME-ADRS1
                                            =   SPACE )
                    AND   ( RECE62-RENRAKU-NAME

@@ -216,8 +216,10 @@
       *  04.05.04    NACL-門脇    10/01/12  治験対応
       *  04.05.05    NACL-門脇    10/01/26  東京都マル子追加対応
       *  04.05.06    NACL-門脇    11/02/28  長崎県地方公費対応
-      *  04.05.09    NACL-藤原    11/03/25  災害対応
+      *  04.05.07    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.08    NACL-藤原    11/03/29  災害対応
+      *                                     「不詳・災１」の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1551,6 +1553,7 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
       *        災害対応（連絡先記載）
                EVALUATE    RECE02-RJNGAIKOHFTN (1)
                    WHEN    1
+                   WHEN    5
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
                        MOVE    RECE02-HOME-POST

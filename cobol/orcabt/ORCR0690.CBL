@@ -149,6 +149,8 @@
       *  04.05.04    NACL-門脇    10/01/12  治験対応
       *  04.05.05    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.06    NACL-藤原    11/03/29  災害対応
+      *                                     「不詳・災１」の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1323,6 +1325,7 @@
       *        災害対応（連絡先記載）
                EVALUATE    RECE62-RJNGAIKOHFTN (1)
                    WHEN    1
+                   WHEN    5
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
                        MOVE    RECE62-HOME-POST
