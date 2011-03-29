@@ -2594,6 +2594,13 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                            END-IF
                          END-PERFORM
                        END-IF
+      *                記号番号不明＋減免対象者のとき
+                       IF  (RECE02-RJNGAIKOHFTN(1) =   1  )
+                       AND (RECE02-GENMENKBN       >  ZERO)
+                         IF   RECE02-SRYYM    >= "201101"
+                           MOVE    5       TO  RECE02-RJNGAIKOHFTN (1)
+                         END-IF
+                       END-IF
       *                減免対象者のとき
                        IF  (RECE02-RJNGAIKOHFTN(1) =  ZERO)
                        AND (RECE02-GENMENKBN       >  ZERO)
