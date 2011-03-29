@@ -2745,6 +2745,10 @@
                AND   ( RECE62-HKNJANUM     =   SPACE )
                    IF  RECE62-SRYYM   >=  "201101"
                        MOVE    1           TO  RECE62-RJNGAIKOHFTN (1)
+      *                ÊÝ¸±¼ÔÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
+                       IF    RECE62-GENMENKBN   >  ZERO
+                           MOVE    5       TO  RECE62-RJNGAIKOHFTN (1)
+                       END-IF
                    ELSE
                        MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
                    END-IF

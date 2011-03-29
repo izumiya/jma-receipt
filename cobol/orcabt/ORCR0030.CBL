@@ -2557,6 +2557,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                AND   ( RECE02-HKNJANUM     =   SPACE )
                    IF  RECE02-SRYYM   >=  "201101"
                        MOVE    1           TO  RECE02-RJNGAIKOHFTN (1)
+      *                ÊÝ¸±¼ÔÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
+                       IF    RECE02-GENMENKBN   >  ZERO
+                           MOVE    5       TO  RECE02-RJNGAIKOHFTN (1)
+                       END-IF
                    ELSE
                        MOVE    3           TO  RECE02-RJNGAIKOHFTN (1)
                    END-IF
