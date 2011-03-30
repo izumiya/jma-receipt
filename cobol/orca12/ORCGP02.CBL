@@ -3759,6 +3759,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  WRK-PIDCD
       *    -------------------------
+           MOVE    SPA-AREA            TO  SPA-COMMON
+           MOVE    SPA-P02KYOUTU       TO  SPA-WORK
+           MOVE    SPA-P02SCRAREA      TO  SPA-FREE
            EVALUATE    SPA-P02-GAMEN
       *各画面表示中
       *    受付情報
