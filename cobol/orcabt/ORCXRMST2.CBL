@@ -821,6 +821,16 @@ grpsys                                 SPA-AREA
                MOVE    "統計メモマスタ"        TO  WRK-MSTNAME
            WHEN    "16"
                MOVE    "オプションマスタ"      TO  WRK-MSTNAME
+           WHEN    "17"
+               MOVE    "感染症判定マスタ"      TO  WRK-MSTNAME
+           WHEN    "18"
+               MOVE    "入院基本料マスタ"      TO  WRK-MSTNAME
+           WHEN    "19"
+               MOVE    "入院料加算チェックマスタ"
+                                               TO  WRK-MSTNAME
+           WHEN    "20"
+               MOVE    "入院レセプト記載略称マスタ"
+                                               TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE
