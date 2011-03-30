@@ -3843,6 +3843,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    表示画面以外
+           IF      SPA-P02-GAMEN   NOT =   "P020"
+      *        受付情報
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP020"      USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+               IF      SPA-ERRCD       NOT =   SPACE
+                   MOVE    "P020"              TO  SPA-P02-GAMEN
+                   MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+                   GO  TO                  4901-KOUSINMAE-EXT
+               END-IF
+           END-IF
            IF      SPA-P02-GAMEN   NOT =   "P024"
       *        所得情報チェック
                MOVE    "CLICKED"           TO  MCP-EVENT
