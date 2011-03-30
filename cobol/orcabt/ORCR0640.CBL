@@ -2816,6 +2816,17 @@
                      AND (RECE62-RJNGAIKOHFTN(1) =  ZERO   )
                        MOVE    3     TO   RECE62-RJNGAIKOHFTN (1)
                      END-IF
+                     IF  (RECE62-SRYYM          >= "201101")
+                       EVALUATE  RECE62-RJNGAIKOHFTN(1)
+                         WHEN       2
+                         WHEN       5
+                            MOVE    11   TO      FLG-TOKKI
+                            PERFORM   21013-TOKKI-HENSYU-SEC
+                         WHEN       4
+                            MOVE    12   TO      FLG-TOKKI
+                            PERFORM   21013-TOKKI-HENSYU-SEC
+                       END-EVALUATE
+                     END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE62-RJNGAIKOHFTN (1)
                      MOVE    ZERO    TO   RECE62-YOBIETC(9)
@@ -5904,6 +5915,10 @@
                        MOVE    "11"      TO      WRK-TOKKI
              WHEN       10
                        MOVE    "12"      TO      WRK-TOKKI
+             WHEN       11
+                       MOVE    "96"      TO      WRK-TOKKI
+             WHEN       12
+                       MOVE    "97"      TO      WRK-TOKKI
            END-EVALUATE
       *
       *    既に同じ特記事項コードが編集済みのときはセットしない
@@ -14693,7 +14708,7 @@
                                        *  RECE62-KYURATE
                                        /  100
       *
-              IF    SYU-YKZKENNUM   =  3  OR  4
+              IF    SYU-YKZKENNUM   =  3  OR  4  OR  7  OR  8
                 ADD    WRK-SKY-KEISAN   TO   RECE62-SKYIRYO-HOKENJA
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
               ELSE
@@ -16882,6 +16897,22 @@
                  END-IF
                END-IF
             END-EVALUATE
+      *
+           ELSE
+      *
+            IF   (WK-GENGAKUKBN   =   3  OR  4     )
+            AND  (RECE62-SRYYM   >=   "201101"     )
+              IF  (RECE62-KOUREI        =  "1" OR "2")
+              AND (RECE62-KOHNUM(1)     =  SPACE     )
+              AND (RECE62-KOHNUM(2)     =  SPACE     )
+              AND (RECE62-KOHNUM(3)     =  SPACE     )
+              AND (RECE62-KOHNUM(4)     =  SPACE     )
+              AND (FLG-HOKENICHIBU  NOT =  ZERO      )
+                 MOVE     ZERO        TO   RECE62-FTNMONEY(1)
+                 MOVE     999999999   TO   RECE62-KOUREI-SAIKEI
+                 MOVE     999999999   TO   RECE62-KOUREI-SAIKEI2
+              END-IF
+            END-IF 
       *
            END-IF
       *

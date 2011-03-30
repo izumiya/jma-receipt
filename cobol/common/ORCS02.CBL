@@ -3816,43 +3816,58 @@
                 PERFORM  DB-CLOSE-SEC
               END-PERFORM
       *
-              INITIALIZE                     PTKOHINF-REC
-              MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
-              MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
-              MOVE    "959"              TO  PTKOH-KOHNUM
-              MOVE    PTKOHINF-REC       TO  MCPDATA-REC
-              MOVE    "DBSELECT"         TO  MCP-FUNC
-              MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
-              MOVE    "key4"             TO  MCP-PATHNAME
-              CALL    "ORCDBMAIN"        USING  MCPAREA
-                                                MCPDATA-REC
-                                                SPA-AREA
-              IF      MCP-RC   =    ZERO
-                MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                MOVE    "key4"           TO  MCP-PATHNAME
-                PERFORM  PTKOHINF-READ-SEC
-                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
-                  AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
-                  AND (PTKOH-SAKJOKBN   =  SPACE         )
-                    MOVE     1           TO  FLG-SAIGAI-TAISYO
-                    MOVE     1           TO  FLG-PTKOHINF
-                  ELSE
-                    MOVE  "tbl_ptkohinf" TO  MCP-TABLE
-                    MOVE  "key4"         TO  MCP-PATHNAME
-                    PERFORM  PTKOHINF-READ-SEC
-                  END-IF
-                END-PERFORM
+              IF    LNK-SYU-SRYYMD(1:6)  >=  "201101"
+                INITIALIZE                     PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
+                MOVE    "959"              TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+                MOVE    "DBSELECT"         TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"        USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+                IF      MCP-RC   =    ZERO
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
+                  PERFORM  PTKOHINF-READ-SEC
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                    IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                    AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                    AND (PTKOH-SAKJOKBN   =  SPACE         )
+                      MOVE     1           TO  FLG-SAIGAI-TAISYO
+                      MOVE     1           TO  FLG-PTKOHINF
+                    ELSE
+                      MOVE  "tbl_ptkohinf" TO  MCP-TABLE
+                      MOVE  "key4"         TO  MCP-PATHNAME
+                      PERFORM  PTKOHINF-READ-SEC
+                    END-IF
+                  END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
               END-IF
-              MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
-              MOVE    "key4"             TO  MCP-PATHNAME
-              PERFORM  DB-CLOSE-SEC
             END-IF
       *
             IF   WK-GENGAKUKBN    =   2
                    MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
-            MOVE   WK-GENGAKUKBN    TO    LNK-SYU-YKZKENNUM
+            IF   FLG-SAIGAI-TAISYO  =   1
+              EVALUATE   WK-GENGAKUKBN
+                WHEN        1
+                      MOVE    5       TO    LNK-SYU-YKZKENNUM
+                WHEN        2
+                      MOVE    6       TO    LNK-SYU-YKZKENNUM
+                WHEN        3
+                      MOVE    7       TO    LNK-SYU-YKZKENNUM
+                WHEN        4
+                      MOVE    8       TO    LNK-SYU-YKZKENNUM
+              END-EVALUATE
+            ELSE
+              MOVE   WK-GENGAKUKBN    TO    LNK-SYU-YKZKENNUM
+            END-IF
       *
            END-IF
       *
@@ -18961,8 +18976,8 @@
                             END-IF
                             MOVE  WK-SHOKUJI-FTN
                                             TO   LNK-SYU-SYUSKJ-FTN-RECE
-                            IF   WK-GENGAKUKBN       =   4
-                            AND  FLG-SAIGAI-TAISYO   =   1
+                            IF   (WK-GENGAKUKBN      =   3 OR 4)
+                            AND  (FLG-SAIGAI-TAISYO  =   1     )
                               MOVE  ZERO    TO   LNK-SYU-SYUSKJ-FTN
                             END-IF
                         END-IF
@@ -19166,8 +19181,8 @@
                             END-IF
                             MOVE  WK-SHOKUJI-FTN
                                             TO   LNK-SYU-SYUSKJ-FTN-RECE
-                            IF   WK-GENGAKUKBN       =   4
-                            AND  FLG-SAIGAI-TAISYO   =   1
+                            IF   (WK-GENGAKUKBN      =   3 OR 4)
+                            AND  (FLG-SAIGAI-TAISYO  =   1     )
                               MOVE  ZERO    TO   LNK-SYU-SYUSKJ-FTN
                             END-IF
                         END-IF
