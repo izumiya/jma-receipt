@@ -116,6 +116,8 @@
       *                                     ¡ÖÉÔ¾Ü¡×¤Î¤È¤­Ï¢ÍíÀèµ­ºÜ
       *  04.05.18    NACL-Æ£¸¶    11/03/29  ºÒ³²ÂÐ±þ
       *                                     ¡ÖÉÔ¾Ü¡¦ºÒ£±¡×¤ÎÄÉ²Ã
+      *  04.05.19    NACL-Æ£¸¶    11/03/30  ºÒ³²ÂÐ±þ
+      *                                     ÆÃµ­»ö¹à£¹£¶¡¢£¹£·¤ÎÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -737,11 +739,15 @@
            03  FILLER          PIC X(10)   VALUE   "£²£°Æó³ä".
            03  FILLER          PIC X(02)   VALUE   "21".
            03  FILLER          PIC X(10)   VALUE   "£²£±¹âÈ¾".
+           03  FILLER          PIC X(02)   VALUE   "96".
+           03  FILLER          PIC X(10)   VALUE   "£¹£¶".
+           03  FILLER          PIC X(02)   VALUE   "97".
+           03  FILLER          PIC X(10)   VALUE   "£¹£·".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   19.
+           03  TBL-TOKKI       OCCURS   21.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
-       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   19.
+       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   21.
       *
       *   ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê
        01  TBL-RECECOM-AREA.
