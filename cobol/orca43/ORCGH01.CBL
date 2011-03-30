@@ -85,6 +85,7 @@
       *                                     ック追加
       *  04.05.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
       *                                     は公費単独のレセプトとする
+      *  04.05.03    NACL-藤原    11/03/25  災害対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -186,6 +187,9 @@
                05  WRK-WDD         PIC 9(02).
       *
            03  WRK-SKYYM-OLD       PIC 9(08).
+      *
+           03  WRK-TITLE           PIC X(10).
+           03  WRK-ZAITAKU         PIC X(08).
       *
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
@@ -1724,6 +1728,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
            END-IF
       *
+           MOVE    SPACE           TO  WRK-ZAITAKU
            MOVE    RECE10-AGE      TO  SPA-H01GMN-AGE
            IF      RECE10-TEISYUTUSAKI =   "5"
                CONTINUE
@@ -1731,9 +1736,27 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    RECE10-KYURATE  TO  SPA-H01GMN-KYURATE
       *
                IF      RECE10-ZAITAKU  =   "1"
-                   MOVE    "在医総等"          TO  SPA-H01GMN-ZAITAKU
+                   MOVE    "在医総等"      TO  WRK-ZAITAKU
                END-IF
-           END-IF         
+           END-IF
+      *
+           MOVE    SPACE           TO  WRK-TITLE
+           EVALUATE    RECE10-ETC-YKZFTN (1)
+               WHEN    1
+                   MOVE    "不詳　"        TO  WRK-TITLE
+               WHEN    2
+                   MOVE    "災１　"        TO  WRK-TITLE
+               WHEN    3
+                   MOVE    "災害　"        TO  WRK-TITLE
+               WHEN    4
+                   MOVE    "災２　"        TO  WRK-TITLE
+               WHEN    5
+                   MOVE    "不詳災１　"    TO  WRK-TITLE
+           END-EVALUATE
+           STRING  WRK-TITLE       DELIMITED   BY  SPACE
+                   WRK-ZAITAKU     DELIMITED   BY  SPACE
+                                   INTO    SPA-H01GMN-ZAITAKU
+           END-STRING
       *
            IF    ( RECE10-RECESYUBETU  =   "6666" )
            OR    ( RECE10-TEISYUTUSAKI =   "5"    )
