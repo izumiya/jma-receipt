@@ -10356,6 +10356,8 @@
                    END-IF    
       *
                    DISPLAY "RECE62  PTNUM=" RECE62-PTNUM
+                           " RJNGAIKOHFTN(1)="
+                                            RECE62-RJNGAIKOHFTN (1)
       *
                    ADD     1               TO  CNT-RECE62
                    MOVE    RECE62-HOSPNUM  TO  KEY-N-HOSPNUM

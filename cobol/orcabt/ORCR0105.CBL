@@ -9678,7 +9678,9 @@
                        END-IF
                    END-IF
       *        
-                   DISPLAY "RECE02  PTNUM=" RECE02-PTNUM     
+                   DISPLAY "RECE02  PTNUM=" RECE02-PTNUM
+                           " RJNGAIKOHFTN(1)="
+                                            RECE02-RJNGAIKOHFTN (1)
       *
                    ADD     1               TO  CNT-RECE02
                    MOVE    RECE02-HOSPNUM  TO  KEY-N-HOSPNUM
