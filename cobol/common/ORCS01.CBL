@@ -499,6 +499,7 @@
            03  FLG-KOREI-HIGAITO       PIC 9(01).
            03  FLG-OITA-GENBUTU70      PIC 9(01).
            03  FLG-OITA-SYUKEI         PIC 9(01).
+           03  FLG-SAIGAI-TAISYO       PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -3916,9 +3917,11 @@
       *    ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½ÂÐ¾Ý¼Ô
            MOVE     ZERO     TO     WK-GENGAKUKBN
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
+           MOVE     ZERO     TO     FLG-SAIGAI-TAISYO
       *
-           IF   (LNK-SYU-SRYYMD(1:6)       >=  "200610")
-           AND  (COMB-HKNNUM            NOT =   SPACE  )
+           IF  ((LNK-SYU-SRYYMD(1:6)       >=  "200610") AND
+                (COMB-HKNNUM            NOT =   SPACE  ))
+           OR  ( LNK-SYU-SRYYMD(1:6)       >=  "201101" )
       *
             IF  (COMB-SYU-HKNKOHSBTKBN   =  "8" OR "9"  )
             OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
@@ -3973,10 +3976,52 @@
                 MOVE    "key4"           TO  MCP-PATHNAME
                 PERFORM  DB-CLOSE-SEC
               END-PERFORM
+      *
+              IF    LNK-SYU-SRYYMD(1:6)  >=  "201101"
+                INITIALIZE                     PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID       TO  PTKOH-PTID
+                MOVE    "959"              TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+                MOVE    "DBSELECT"         TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"        USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+                IF      MCP-RC   =    ZERO
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
+                  PERFORM  PTKOHINF-READ-SEC
+                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                    IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                    AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                    AND (PTKOH-SAKJOKBN   =  SPACE         )
+                      MOVE     1           TO  FLG-SAIGAI-TAISYO
+                      MOVE     1           TO  FLG-PTKOHINF
+                    ELSE
+                      MOVE  "tbl_ptkohinf" TO  MCP-TABLE
+                      MOVE  "key4"         TO  MCP-PATHNAME
+                      PERFORM  PTKOHINF-READ-SEC
+                    END-IF
+                  END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                MOVE    "key4"             TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
+              END-IF
             END-IF
       *
             IF   WK-GENGAKUKBN    =   2
                    MOVE     ZERO    TO    WK-GENGAKUKBN
+            END-IF
+            IF   COMB-HKNNUM      =   SPACE
+              IF  (WK-GENGAKUKBN      =   3 OR 4)
+              AND (FLG-SAIGAI-TAISYO  =   1     )
+                   CONTINUE
+              ELSE
+                   MOVE     ZERO    TO    WK-GENGAKUKBN
+              END-IF
             END-IF
             MOVE   WK-GENGAKUKBN    TO    LNK-SYU-YKZKENNUM
       *
@@ -19048,6 +19093,13 @@
                    MOVE     ZERO     TO    WK-GAIKFTNRATE
                  END-IF
               END-IF
+           END-IF.
+      *
+           IF  (COMB-HKNNUM              =  SPACE  )
+           AND (COMB-KOHHKNNUM(KOH-IDX)  =  "010"  )
+           AND (WK-GENGAKUKBN            =   3 OR 4)
+           AND (FLG-SAIGAI-TAISYO        =   1     )
+                   MOVE     ZERO     TO    WK-GAIKFTNRATE
            END-IF.
       *
       *    Ê¡²¬¸©¤ÎÃÏÊý¸øÈñÂÐ±þ¡Ê¸øÈñÉÕ²Ã¾ðÊó¤Î¼èÆÀ¡Ë

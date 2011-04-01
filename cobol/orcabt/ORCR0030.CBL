@@ -2599,6 +2599,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                          END-PERFORM
                        END-IF
       *                µ­¹æÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
+      *                ¸øÈñÉéÃ´¼ÔÈÖ¹æËô¤Ï¼õµë¼ÔÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF  (RECE02-RJNGAIKOHFTN(1) =   1  )
                        AND (RECE02-GENMENKBN       >  ZERO)
                          IF   RECE02-SRYYM    >= "201101"
@@ -2621,8 +2622,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                END-IF
       *
                IF   RECE02-SRYYM   >=  "201007"
-                   MOVE     ZERO     TO   FLG-SAIGAI-TAISYO
-                   PERFORM   211L-SAIGAI-TAISYO-HANTEI-SEC
                    IF   FLG-SAIGAI-TAISYO   =   1
                      IF  (RECE02-SRYYM          >= "201101")
                      AND (RECE02-RJNGAIKOHFTN(1) =  ZERO   )
@@ -2632,10 +2631,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        EVALUATE  RECE02-RJNGAIKOHFTN(1)
                          WHEN       2
                          WHEN       5
-                            MOVE    11   TO      FLG-TOKKI
+                            MOVE    96   TO      FLG-TOKKI
                             PERFORM   21045-TOKKI-HENSYU-SEC
                          WHEN       4
-                            MOVE    12   TO      FLG-TOKKI
+                            MOVE    97   TO      FLG-TOKKI
                             PERFORM   21045-TOKKI-HENSYU-SEC
                        END-EVALUATE
                      END-IF
@@ -3209,6 +3208,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
+           MOVE     ZERO     TO     FLG-SAIGAI-TAISYO
       *
            IF   (RECE02-SRYYM       >=  "200610")
            AND  (RECE02-HKNNUM   NOT =   SPACE  )
@@ -3239,56 +3239,59 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                               TO   WK-GENGAKU2-DD
               END-IF
       *
-              PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
-                         UNTIL   (GEN-IDX    >    TBL-GENGAKU-MAX)
-                           OR    (WK-GENGAKUKBN   NOT = ZERO     )
-                INITIALIZE                       PTKOHINF-REC
-grpsys          MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
-                MOVE    RECE02-PTID          TO  PTKOH-PTID
-                MOVE    TBL-GENGAKU(GEN-IDX) TO  PTKOH-KOHNUM
-                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
-                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                MOVE    "key4"               TO  MCP-PATHNAME
-grpsys          PERFORM 900-DBSELECT-SEC
-                IF      MCP-RC               =   ZERO
-                  MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                  MOVE    "key4"               TO  MCP-PATHNAME
-                  PERFORM  900-PTKOHINF-READ-SEC
-                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF ((PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD ) AND
-                         (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD ) AND
-                         (PTKOH-SAKJOKBN   =   SPACE          ))
-                     OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
-                         (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
-                         (PTKOH-SAKJOKBN   =   SPACE          ))
-                         EVALUATE   GEN-IDX
-                           WHEN        1
-                             MOVE   1           TO  WK-GENGAKUKBN
-                             MOVE   PTKOH-KOHID TO  WK-GENGAKU-KOHID
-                           WHEN        2
-                             MOVE   2           TO  WK-GENGAKUKBN
-                             MOVE   PTKOH-KOHID TO  WK-GENGAKU-KOHID
-                           WHEN        3
-                             MOVE   3           TO  WK-GENGAKUKBN
-                           WHEN        4
-                             MOVE   4           TO  WK-GENGAKUKBN
-                         END-EVALUATE
-                         MOVE       1           TO  FLG-PTKOHINF
-                     ELSE
-                         MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                         MOVE    "key4"               TO  MCP-PATHNAME
-                         PERFORM  900-PTKOHINF-READ-SEC
-                     END-IF
-                  END-PERFORM
-                END-IF
-                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                MOVE    "key4"               TO  MCP-PATHNAME
-                PERFORM 900-CLOSE-SEC
-              END-PERFORM
+              PERFORM  21171-GENGAKU-HENSYU-SEC
+      *
             END-IF
       *
             IF   WK-GENGAKUKBN    =   2
                    MOVE     ZERO    TO    WK-GENGAKUKBN
+            END-IF
+      *
+            IF   RECE02-SRYYM   >=  "201007"
+              PERFORM  211L-SAIGAI-TAISYO-HANTEI-SEC
+            END-IF
+      *
+           END-IF
+      *
+      ***
+      *
+           IF   (RECE02-SRYYM       >=  "201101")
+           AND  (RECE02-HKNNUM       =   SPACE  )
+      *
+            MOVE      RECE02-SRYYM       TO   WK-GENGAKU-YM
+            IF   RECE02-KOHTEKSTYMD(1)(1:6)
+                                       >=  RECE02-SRYYM
+               MOVE   RECE02-KOHTEKSTYMD(1)(7:2)
+                                         TO   WK-GENGAKU-DD
+            ELSE
+               MOVE   01                 TO   WK-GENGAKU-DD
+            END-IF
+      *
+            MOVE      RECE02-SRYYM       TO   WK-GENGAKU2-YM
+            IF   RECE02-KOHTEKEDYMD(1)(1:6)
+                                        >  RECE02-SRYYM
+              INITIALIZE                      STS-AREA-DAY
+              INITIALIZE                      LNK-DAY7-AREA
+              MOVE   "71"                TO   LNK-DAY7-IRAI
+              MOVE   RECE02-SRYYM        TO   LNK-DAY7-YM
+              CALL   "ORCSDAY"         USING  STS-AREA-DAY
+                                              LNK-DAY7-AREA
+              MOVE   LNK-DAY7-KOYOMI     TO   WRK-EDYMD
+              MOVE   WRK-EDYMD(7:2)      TO   WK-GENGAKU2-DD
+            ELSE
+              MOVE   RECE02-KOHTEKEDYMD(1)(7:2)
+                                         TO   WK-GENGAKU2-DD
+            END-IF
+      *
+            PERFORM  21171-GENGAKU-HENSYU-SEC
+      *
+            PERFORM  211L-SAIGAI-TAISYO-HANTEI-SEC
+      *
+            IF   (WK-GENGAKUKBN      =   3 OR 4)
+            AND  (FLG-SAIGAI-TAISYO  =   1     )
+              CONTINUE
+            ELSE
+              MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
       *
            END-IF
@@ -3356,6 +3359,62 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        2117-GENGAKU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½¼Ô¤ÎÊÔ½¸
+      *****************************************************************
+       21171-GENGAKU-HENSYU-SEC      SECTION.
+      *
+           PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
+                      UNTIL   (GEN-IDX    >    TBL-GENGAKU-MAX)
+                        OR    (WK-GENGAKUKBN   NOT = ZERO     )
+             INITIALIZE                       PTKOHINF-REC
+             MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
+             MOVE    RECE02-PTID          TO  PTKOH-PTID
+             MOVE    TBL-GENGAKU(GEN-IDX) TO  PTKOH-KOHNUM
+             MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =   ZERO
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                  IF ((PTKOH-TEKSTYMD  <=   WK-GENGAKU-YMD ) AND
+                      (WK-GENGAKU-YMD  <=   PTKOH-TEKEDYMD ) AND
+                      (PTKOH-SAKJOKBN   =   SPACE          ))
+                  OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
+                      (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                      (PTKOH-SAKJOKBN   =   SPACE          ))
+                      EVALUATE   GEN-IDX
+                        WHEN        1
+                          MOVE   1           TO  WK-GENGAKUKBN
+                          MOVE   PTKOH-KOHID TO  WK-GENGAKU-KOHID
+                        WHEN        2
+                          MOVE   2           TO  WK-GENGAKUKBN
+                          MOVE   PTKOH-KOHID TO  WK-GENGAKU-KOHID
+                        WHEN        3
+                          MOVE   3           TO  WK-GENGAKUKBN
+                        WHEN        4
+                          MOVE   4           TO  WK-GENGAKUKBN
+                      END-EVALUATE
+                      MOVE       1           TO  FLG-PTKOHINF
+                  ELSE
+                      MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                      MOVE    "key4"               TO  MCP-PATHNAME
+                      PERFORM  900-PTKOHINF-READ-SEC
+                  END-IF
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-PERFORM
+      *
+           .
+       21171-GENGAKU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -9069,9 +9128,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        MOVE    "11"      TO      WRK-TOKKI
              WHEN       10
                        MOVE    "12"      TO      WRK-TOKKI
-             WHEN       11
+      *
+             WHEN       96
                        MOVE    "96"      TO      WRK-TOKKI
-             WHEN       12
+             WHEN       97
                        MOVE    "97"      TO      WRK-TOKKI
            END-EVALUATE
       *
@@ -11140,7 +11200,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        *  RECE02-KYURATE
                                        /  100
       *
-              IF    SYU-YKZKENNUM   =  3  OR  4
+      **      IF    WK-GENGAKUKBN   =  3  OR  4
+              IF    WK-GENGAKUKBN   NOT =  ZERO
                 ADD    WRK-SKY-KEISAN   TO   RECE02-SKYIRYO-HOKENJA
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
               ELSE
@@ -12406,12 +12467,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
             IF   (WK-GENGAKUKBN   =   3  OR  4)
             AND  (RECE02-SRYYM   >=   "201101")
-              IF  (RECE02-ZAITAKU       =  "1" OR "2")
-              AND (RECE02-KOHNUM(1)     =  SPACE     )
-              AND (RECE02-KOHNUM(2)     =  SPACE     )
-              AND (RECE02-KOHNUM(3)     =  SPACE     )
-              AND (RECE02-KOHNUM(4)     =  SPACE     )
-              AND (FLG-HOKENICHIBU  NOT =  ZERO      )
+            AND  (IDZ             =   1       )
+              IF   RECE02-ZAITAKU       =  "1" OR "2"
                  MOVE     ZERO        TO   RECE02-FTNMONEY(1)
                  MOVE     999999999   TO   RECE02-ZAITAKU-SAIKEI
                  MOVE     999999999   TO   RECE02-ZAITAKU-SAIKEI2
@@ -14693,6 +14750,17 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                                               - RECE02-FTNMONEY-SKY
                      ADD  WRK-SKY-KEISAN2  TO  RECE02-SKYIRYO-HOKENJA
                      MOVE     1            TO  FLG-KGK
+                   END-IF
+      *
+                   IF  (WK-GENGAKUKBN         =   ZERO)
+                   AND (WRK-SKY-ZENGAKU-KOH   =   ZERO)
+                     COMPUTE  WRK-SKY-KEISAN  = WRK-SKY-ZENGAKU
+                                              - WRK-SKY-HOKENJA
+                     IF   WRK-SKY-KEISAN   >  WRK-SKY-FTNMONEY
+                      COMPUTE WRK-SKY-KEISAN2 = WRK-SKY-KEISAN
+                                              - WRK-SKY-FTNMONEY
+                      ADD  WRK-SKY-KEISAN2 TO  RECE02-SKYIRYO-HOKENJA
+                     END-IF
                    END-IF
                  END-IF
                END-IF

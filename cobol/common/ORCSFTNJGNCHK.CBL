@@ -105,11 +105,13 @@
            03  FLG-ARI2            PIC 9(01).
            03  FLG-GENMEN          PIC 9(01).
            03  FLG-SAIGAI-ARI      PIC 9(01).
-           03  FLG-SAIGAI-NASI     PIC 9(01).
+           03  FLG-SAIGAI-ARI2     PIC 9(01).
            03  FLG-PTKOHINF        PIC 9(01).
            03  FLG-TOKU75          PIC 9(01).
            03  FLG-SKJRYOYOHI-ARI  PIC 9(01).
            03  FLG-TAISYO          PIC 9(01).
+           03  FLG-KOREI           PIC 9(01).
+           03  FLG-SAIGAI-TAISYO   PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -170,6 +172,9 @@
            03  WRK-HKNID                    PIC 9(10).
            03  WRK-SRYYMD                   PIC X(08).
            03  WRK-COMPFTN                  PIC 9(07).
+      *
+           03  WRK-SYUSKJ-FTN               PIC 9(07).
+           03  WRK-SKYMONEY-SKJ             PIC 9(07).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -1035,7 +1040,9 @@
            MOVE      ZERO          TO      FLG-SKJRYOYOHI-ARI
            MOVE      ZERO          TO      FLG-ARI2
            MOVE      ZERO          TO      FLG-SAIGAI-ARI
-           MOVE      ZERO          TO      FLG-SAIGAI-NASI
+           MOVE      ZERO          TO      FLG-SAIGAI-ARI2
+           MOVE      ZERO          TO      WRK-SYUSKJ-FTN
+           MOVE      ZERO          TO      WRK-SKYMONEY-SKJ
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1142,26 +1149,18 @@
                      OR  SYU-KOH1SKJ-RYOYOHI  NOT = ZERO
                         MOVE    1    TO    FLG-SKJRYOYOHI-ARI
                      END-IF
-                     IF  LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
-                       IF  SYU-YKZKENNUM  =  7 OR 8
-                         MOVE   1    TO    FLG-SAIGAI-ARI
-                       END-IF
-                       IF  SYU-YKZKENNUM  =  ZERO
-                         MOVE   1    TO    FLG-SAIGAI-NASI
-                       END-IF
-                     ELSE
-                       IF  SYU-YKZKENNUM  =  3 OR 4
-                         MOVE   1    TO    FLG-SAIGAI-ARI
-                       END-IF
-                       IF  SYU-YKZKENNUM  =  ZERO
-                         MOVE   1    TO    FLG-SAIGAI-NASI
-                       END-IF
+                     PERFORM     210114-SAIGAI-HENSYU2-SEC
+                  ELSE
+                     PERFORM     210113-SAIGAI-HENSYU-SEC
+                     IF  FLG-SAIGAI-TAISYO  =  1
+                        PERFORM  210114-SAIGAI-HENSYU2-SEC
                      END-IF
                   END-IF
                   IF  WRK-HKNCOMBINUM-KYUFUGAI(IDX1) =  1
                     ADD  SYU-KYUFUGAI-GOKEI-TEN    TO  WRK-KYUFUGAITEN
                   END-IF
-                  IF     SYU-YKZKENNUM  NOT = ZERO
+                  IF    (SYU-YKZKENNUM  NOT = ZERO )
+                  AND   (SYU-SYUHKNNUM  NOT = SPACE)
                        MOVE    1    TO   FLG-GENMEN
                   END-IF
                   IF  (LNK-FTNJGNCHK-NYUGAIKBN  = "1"     )
@@ -1201,7 +1200,7 @@
              IF   LNK-FTNJGNCHK-KOHNUM  =  "287" OR "380"
                                         OR "281" OR "282"
                MOVE     LNK-FTNJGNCHK-HKNID  TO  WRK-HKNID
-               PERFORM  2101111-HKNINF-KENSAKU-SEC
+               PERFORM  210112-HKNINF-KENSAKU-SEC
                IF   PTHKN-HKNNUM  NOT = "060" AND "067" AND "039"
                  MOVE      1     TO    FLG-TAISYO
                END-IF
@@ -1349,8 +1348,12 @@
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
+             AND (FLG-SAIGAI-ARI2        =    1    )
+             AND (WRK-SYUSKJ-FTN = WRK-SKYMONEY-SKJ)
+                       MOVE    1        TO  FLG-SAIGAI-ARI
+             END-IF
+             IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI         =    1    )
-             AND (FLG-SAIGAI-NASI        =   ZERO  )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
              END-IF
            END-IF
@@ -1369,26 +1372,7 @@
       *****************************************************************
        210111-CYOKI-HENSYU-SEC            SECTION.
       *
-           MOVE     LNK-FTNJGNCHK-HKNID  TO  WRK-HKNID
-           PERFORM  2101111-HKNINF-KENSAKU-SEC
-           MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM
-           MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM
-           MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN
-      ***  MOVE     PTHKN-KIGO           TO  WRK-KIGO
-      ***  MOVE     PTHKN-NUM            TO  WRK-NUM
-           MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN
-           MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD
-      *
-           MOVE     WRK-HKNCOMBINUM-HKNID(IDX1)
-                                         TO  WRK-HKNID
-           PERFORM  2101111-HKNINF-KENSAKU-SEC
-           MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM2
-           MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM2
-           MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN2
-      ***  MOVE     PTHKN-KIGO           TO  WRK-KIGO2
-      ***  MOVE     PTHKN-NUM            TO  WRK-NUM2
-           MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN2
-           MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD2
+           PERFORM  2101111-HKNINF-HENSYU-SEC
       *
            IF  (WRK-CONTKBN   NOT = SPACE)
            OR  (WRK-CONTKBN2  NOT = SPACE)
@@ -1460,9 +1444,37 @@
            EXIT.
       *
       *****************************************************************
+      *    ´µ¼ÔÊÝ¸±¾ðÊóÊÔ½¸
+      *****************************************************************
+       2101111-HKNINF-HENSYU-SEC            SECTION.
+      *
+           MOVE     LNK-FTNJGNCHK-HKNID  TO  WRK-HKNID
+           PERFORM  210112-HKNINF-KENSAKU-SEC
+           MOVE     SPACE                TO  WRK-HKNJANUM-TBL
+           MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM
+           MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM
+           MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN
+           MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN
+           MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD
+      *
+           MOVE     WRK-HKNCOMBINUM-HKNID(IDX1)
+                                         TO  WRK-HKNID
+           PERFORM  210112-HKNINF-KENSAKU-SEC
+           MOVE     SPACE                TO  WRK-HKNJANUM2-TBL
+           MOVE     PTHKN-HKNNUM         TO  WRK-HKNNUM2
+           MOVE     PTHKN-HKNJANUM       TO  WRK-HKNJANUM2
+           MOVE     PTHKN-HONKZKKBN      TO  WRK-HONKZKKBN2
+           MOVE     PTHKN-CONTKBN        TO  WRK-CONTKBN2
+           MOVE     PTHKN-TEKSTYMD       TO  WRK-TEKSTYMD2
+      *
+           .
+       2101111-HKNINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ´µ¼ÔÊÝ¸±¾ðÊó¸¡º÷
       *****************************************************************
-       2101111-HKNINF-KENSAKU-SEC            SECTION.
+       210112-HKNINF-KENSAKU-SEC            SECTION.
       *
            IF     WRK-HKNID  NOT = ZERO
               INITIALIZE                        PTHKNINF-REC
@@ -1499,7 +1511,78 @@
            END-IF
       *
            .
-       2101111-HKNINF-KENSAKU-EXT.
+       210112-HKNINF-KENSAKU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÒ³²ÍÑ¤ÎÊÔ½¸
+      *****************************************************************
+       210113-SAIGAI-HENSYU-SEC            SECTION.
+      *
+           MOVE       ZERO     TO     FLG-SAIGAI-TAISYO
+      *
+           PERFORM  2101111-HKNINF-HENSYU-SEC
+      *
+           IF   (WRK-HKNJANUM      =  WRK-HKNJANUM2)
+           AND  (WRK-HKNJANUM  NOT =  SPACE        )
+      *
+              MOVE    ZERO                 TO  FLG-KOREI
+              INITIALIZE                       ORCSAGECHKAREA
+              MOVE  LNK-FTNJGNCHK-HOSPNUM  TO  AGECHK-HOSPNUM
+              MOVE  LNK-FTNJGNCHK-PTID     TO  AGECHK-PTID
+              MOVE  LNK-FTNJGNCHK-SRYYM    TO  AGECHK-SRYYMD(1:6)
+              MOVE  "01"                   TO  AGECHK-SRYYMD(7:2)
+              MOVE  PTINF-BIRTHDAY         TO  AGECHK-BIRTHDAY
+              CALL  "ORCSAGECHK"        USING  ORCSAGECHKAREA
+                                               SPA-AREA
+              IF    AGECHK-RC  =   ZERO
+                 IF  AGECHK-NENREI   >=  70
+                    MOVE     1         TO   FLG-KOREI
+                 END-IF
+              END-IF
+      *
+              IF  (WRK-HKNNUM        =  "039")
+              OR  (WRK-HKNNUM        =  "060")
+              OR  (FLG-KOREI         =    1  )
+                 MOVE  WRK-HONKZKKBN   TO   WRK-HONKZKKBN2
+              END-IF
+      *
+              IF   WRK-HKNJANUM-TBL  =   WRK-HKNJANUM2-TBL
+                 MOVE      1           TO   FLG-SAIGAI-TAISYO
+              END-IF
+      *
+           END-IF
+      *
+           .
+       210113-SAIGAI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÒ³²ÍÑ¤ÎÊÔ½¸£²
+      *****************************************************************
+       210114-SAIGAI-HENSYU2-SEC            SECTION.
+      *
+           IF  LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+             IF  (SYU-YKZKENNUM  =  7 OR 8  )
+             AND (SYU-SYUHKNNUM  NOT = SPACE)
+               MOVE   1    TO    FLG-SAIGAI-ARI
+             END-IF
+             IF  (SYU-YKZKENNUM  =  3 OR 4  )
+             AND (SYU-SYUHKNNUM  NOT = SPACE)
+               ADD   SYU-SYUSKJ-FTN    TO  WRK-SYUSKJ-FTN
+               ADD   SYU-SKYMONEY-SKJ  TO  WRK-SKYMONEY-SKJ
+               ADD   SYU-SKYMONEY-LIFE TO  WRK-SKYMONEY-SKJ
+               MOVE   1    TO    FLG-SAIGAI-ARI2
+             END-IF
+           ELSE
+             IF  (SYU-YKZKENNUM  =  3 OR 4  )
+             AND (SYU-SYUHKNNUM  NOT = SPACE)
+               MOVE   1    TO    FLG-SAIGAI-ARI
+             END-IF
+           END-IF
+      *
+           .
+       210114-SAIGAI-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1514,7 +1597,9 @@
            MOVE      ZERO       TO      FLG-SKJRYOYOHI-ARI
            MOVE      ZERO       TO      FLG-ARI2
            MOVE      ZERO       TO      FLG-SAIGAI-ARI
-           MOVE      ZERO       TO      FLG-SAIGAI-NASI
+           MOVE      ZERO       TO      FLG-SAIGAI-ARI2
+           MOVE      ZERO       TO      WRK-SYUSKJ-FTN
+           MOVE      ZERO       TO      WRK-SKYMONEY-SKJ
            PERFORM   UNTIL    FLG-SYUNOU     =  1
              MOVE    ZERO       TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1566,20 +1651,11 @@
                      OR  SYU-KOH1SKJ-RYOYOHI  NOT = ZERO
                         MOVE    1    TO    FLG-SKJRYOYOHI-ARI
                      END-IF
-                     IF  LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
-                       IF  SYU-YKZKENNUM  =  7 OR 8
-                         MOVE   1    TO    FLG-SAIGAI-ARI
-                       END-IF
-                       IF  SYU-YKZKENNUM  =  ZERO
-                         MOVE   1    TO    FLG-SAIGAI-NASI
-                       END-IF
-                     ELSE
-                       IF  SYU-YKZKENNUM  =  3 OR 4
-                         MOVE   1    TO    FLG-SAIGAI-ARI
-                       END-IF
-                       IF  SYU-YKZKENNUM  =  ZERO
-                         MOVE   1    TO    FLG-SAIGAI-NASI
-                       END-IF
+                     PERFORM     210114-SAIGAI-HENSYU2-SEC
+                  ELSE
+                     PERFORM     210113-SAIGAI-HENSYU-SEC
+                     IF  FLG-SAIGAI-TAISYO  =  1
+                        PERFORM  210114-SAIGAI-HENSYU2-SEC
                      END-IF
                   END-IF
                END-IF
@@ -1606,8 +1682,12 @@
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
+             AND (FLG-SAIGAI-ARI2        =    1    )
+             AND (WRK-SYUSKJ-FTN = WRK-SKYMONEY-SKJ)
+                       MOVE    1        TO  FLG-SAIGAI-ARI
+             END-IF
+             IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI         =    1    )
-             AND (FLG-SAIGAI-NASI        =   ZERO  )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
              END-IF
            END-IF
