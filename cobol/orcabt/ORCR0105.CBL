@@ -118,6 +118,8 @@
       *                                     ¡ÖÉÔ¾Ü¡¦ºÒ£±¡×¤ÎÄÉ²Ã
       *  04.05.19    NACL-Æ£¸¶    11/03/30  ºÒ³²ÂÐ±þ
       *                                     ÆÃµ­»ö¹à£¹£¶¡¢£¹£·¤ÎÄÉ²Ã
+      *  04.05.20    NACL-Æ£¸¶    11/04/01  ºÒ³²ÂÐ±þ
+      *                                     ¡Ö¢©¡×¡Ö£Ô£Å£Ì¡§¡×¤Îµ­ºÜÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -631,6 +633,9 @@
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
            03  WRK-TITLE           PIC X(50).
+           03  WRK-TEKIYOU         PIC X(50).
+           03  WRK-ADRS.
+               05  WRK-ADRS-R      PIC X(50)  OCCURS  5.
       *
       *    ¸©Ã±ÍÑ¹àÌÜ¥Õ¥¡¥¤¥ëÍÑ¥ï¡¼¥¯     
            COPY    "HC06.INC"      REPLACING  //HC06//
@@ -6500,7 +6505,11 @@
                END-IF
       *                   
                IF      RECE02-RJNGAIKOHFTN (1) =   1   OR  5
-                   IF    ( RECE02-HOME-ADRS1
+                   IF    ( RECE02-HOME-POST1
+                                           =   SPACE )
+                   AND   ( RECE02-HOME-ADRS1
+                                           =   SPACE )
+                   AND   ( RECE02-RENRAKU-POST1
                                            =   SPACE )
                    AND   ( RECE02-RENRAKU-NAME
                                            =   SPACE )
@@ -6510,7 +6519,8 @@
                        CONTINUE
                    ELSE
       *                ¼«Âð½»½êµ­ºÜ
-                       IF     RECE02-HOME-ADRS1      =   SPACE
+                       IF   ( RECE02-HOME-ADRS1      =   SPACE )
+                       AND  ( RECE02-HOME-POST1      =   SPACE )
                            CONTINUE
                        ELSE
                            MOVE     "¡Ú½»½ê¡Û"      TO  WRK-TITLE
@@ -6542,11 +6552,23 @@
                                END-EVALUATE
                            END-IF
       *                    ¼«Âð½»½êµ­ºÜ
+                           MOVE    SPACE               TO  WRK-ADRS
+                           IF      RECE02-HOME-POST1   =   SPACE
+                               MOVE    RECE02-HOME-ADRS1   TO  WRK-ADRS
+                           ELSE
+                               STRING   "¢©"       DELIMITED  BY  SIZE
+                                    RECE02-HOME-POST1
+                                                   DELIMITED  BY  SPACE
+                                    RECE02-HOME-ADRS1
+                                                   DELIMITED  BY  SPACE
+                                                   INTO    WRK-ADRS
+                               END-STRING
+                           END-IF
                            PERFORM VARYING IDY     FROM    1   BY  1
-                                   UNTIL   IDY     >       4
-                                   OR      RECE02-HOME-ADRS-R (IDY)
+                                   UNTIL   IDY     >       5
+                                   OR      WRK-ADRS-R (IDY)
                                                    =       SPACE
-                               INSPECT RECE02-HOME-ADRS-R (IDY)
+                               INSPECT WRK-ADRS-R (IDY)
                                        REPLACING   ALL "  "    BY  "¡¡"
       * 
                                IF      WRK-LINETEK >=  WRK-TEKIYOU-LINE
@@ -6555,28 +6577,30 @@
                                ADD     1               TO  WRK-LINETEK
       *
                                IF      CNT-PAGE        =   1   
-                                   MOVE    RECE02-HOME-ADRS-R (IDY)
+                                   MOVE    WRK-ADRS-R (IDY)
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                ELSE                    
                                  EVALUATE    SYS-2005-NEXTPRTKBN-G
                                    WHEN    "0"   
-                                       MOVE    RECE02-HOME-ADRS-R (IDY)
+                                       MOVE    WRK-ADRS-R (IDY)
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                    WHEN    "1"   
-                                       MOVE    RECE02-HOME-ADRS-R (IDY)
+                                       MOVE    WRK-ADRS-R (IDY)
                                            TO  HC061-TEKIYO(WRK-LINETEK)
                                    WHEN    "2"   
-                                       MOVE    RECE02-HOME-ADRS-R (IDY)
+                                       MOVE    WRK-ADRS-R (IDY)
                                            TO  HC062-TEKIYO(WRK-LINETEK)
                                    WHEN    "3"   
-                                       MOVE    RECE02-HOME-ADRS-R (IDY)
+                                       MOVE    WRK-ADRS-R (IDY)
                                            TO  HC063-TEKIYO(WRK-LINETEK)
                                  END-EVALUATE
                                END-IF                    
                            END-PERFORM
                        END-IF
       *                Ï¢ÍíÀèµ­ºÜ
-                       IF    ( RECE02-RENRAKU-NAME
+                       IF    ( RECE02-RENRAKU-POST1
+                                               =   SPACE )
+                       AND   ( RECE02-RENRAKU-NAME
                                                =   SPACE )
                        AND   ( RECE02-RENRAKU-ADRS1
                                                =   SPACE )
@@ -6646,11 +6670,25 @@
                                END-IF                    
                            END-PERFORM
       *                    Ï¢ÍíÀè½»½êµ­ºÜ
+                           MOVE    SPACE               TO  WRK-ADRS
+                           IF      RECE02-RENRAKU-POST1
+                                                       =   SPACE
+                               MOVE    RECE02-RENRAKU-ADRS1
+                                                           TO  WRK-ADRS
+                           ELSE
+                               STRING   "¢©"       DELIMITED  BY  SIZE
+                                    RECE02-RENRAKU-POST1
+                                                   DELIMITED  BY  SPACE
+                                    RECE02-RENRAKU-ADRS1
+                                                   DELIMITED  BY  SPACE
+                                                   INTO    WRK-ADRS
+                               END-STRING
+                           END-IF
                            PERFORM VARYING IDY     FROM    1   BY  1
-                                   UNTIL   IDY     >       4
-                                   OR      RECE02-RENRAKU-ADRS-R (IDY)
+                                   UNTIL   IDY     >       5
+                                   OR      WRK-ADRS-R (IDY)
                                                    =       SPACE
-                               INSPECT RECE02-RENRAKU-ADRS-R (IDY)
+                               INSPECT WRK-ADRS-R (IDY)
                                        REPLACING   ALL "  "    BY  "¡¡"
       * 
                                IF      WRK-LINETEK >=  WRK-TEKIYOU-LINE
@@ -6659,21 +6697,21 @@
                                ADD     1               TO  WRK-LINETEK
       *
                                IF      CNT-PAGE        =   1   
-                                   MOVE    RECE02-RENRAKU-ADRS-R (IDY)
+                                   MOVE    WRK-ADRS-R (IDY)
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                ELSE                    
                                  EVALUATE    SYS-2005-NEXTPRTKBN-G
                                    WHEN    "0"   
-                                       MOVE  RECE02-RENRAKU-ADRS-R (IDY)
+                                       MOVE  WRK-ADRS-R (IDY)
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                    WHEN    "1"   
-                                       MOVE  RECE02-RENRAKU-ADRS-R (IDY)
+                                       MOVE  WRK-ADRS-R (IDY)
                                            TO  HC061-TEKIYO(WRK-LINETEK)
                                    WHEN    "2"   
-                                       MOVE  RECE02-RENRAKU-ADRS-R (IDY)
+                                       MOVE  WRK-ADRS-R (IDY)
                                            TO  HC062-TEKIYO(WRK-LINETEK)
                                    WHEN    "3"   
-                                       MOVE  RECE02-RENRAKU-ADRS-R (IDY)
+                                       MOVE  WRK-ADRS-R (IDY)
                                            TO  HC063-TEKIYO(WRK-LINETEK)
                                  END-EVALUATE
                                END-IF                    
@@ -6682,7 +6720,12 @@
                            IF     RECE02-TEL      =   SPACE
                                CONTINUE
                            ELSE
-                               INSPECT RECE02-TEL
+                               MOVE    SPACE          TO  WRK-TEKIYOU
+                               STRING   "£Ô£Å£Ì¡§" DELIMITED  BY  SIZE
+                                        RECE02-TEL DELIMITED  BY  SIZE
+                                                   INTO    WRK-TEKIYOU
+                               END-STRING
+                               INSPECT WRK-TEKIYOU
                                        REPLACING   ALL "  "    BY  "¡¡"
       * 
                                IF      WRK-LINETEK >=  WRK-TEKIYOU-LINE
@@ -6691,21 +6734,21 @@
                                ADD     1               TO  WRK-LINETEK
       *
                                IF      CNT-PAGE        =   1   
-                                   MOVE    RECE02-TEL
+                                   MOVE    WRK-TEKIYOU
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                ELSE                    
                                  EVALUATE    SYS-2005-NEXTPRTKBN-G
                                    WHEN    "0"   
-                                       MOVE    RECE02-TEL
+                                       MOVE    WRK-TEKIYOU
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                    WHEN    "1"   
-                                       MOVE    RECE02-TEL
+                                       MOVE    WRK-TEKIYOU
                                            TO  HC061-TEKIYO(WRK-LINETEK)
                                    WHEN    "2"   
-                                       MOVE    RECE02-TEL
+                                       MOVE    WRK-TEKIYOU
                                            TO  HC062-TEKIYO(WRK-LINETEK)
                                    WHEN    "3"   
-                                       MOVE    RECE02-TEL
+                                       MOVE    WRK-TEKIYOU
                                            TO  HC063-TEKIYO(WRK-LINETEK)
                                  END-EVALUATE
                                END-IF                    

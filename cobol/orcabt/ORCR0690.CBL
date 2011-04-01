@@ -151,6 +151,8 @@
       *                                     連絡先情報追加
       *  04.05.06    NACL-藤原    11/03/29  災害対応
       *                                     「不詳・災１」の追加
+      *  04.05.07    NACL-藤原    11/04/01  災害対応
+      *                                     「〒」「ＴＥＬ：」の記載追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1336,9 +1338,7 @@
                            MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                    TO  RECE62-HOME-POST1
                        END-IF
-                       STRING   RECE62-HOME-POST1
-                                               DELIMITED  BY  SPACE
-                                RECE62-HOME-ADRS
+                       STRING   RECE62-HOME-ADRS
                                                DELIMITED  BY  SPACE
                                 RECE62-HOME-BANTI
                                                DELIMITED  BY  SPACE
@@ -1356,9 +1356,7 @@
                                                    TO
                                                    RECE62-RENRAKU-POST1
                        END-IF
-                       STRING   RECE62-RENRAKU-POST1
-                                               DELIMITED  BY  SPACE
-                                RECE62-RENRAKU-ADRS
+                       STRING   RECE62-RENRAKU-ADRS
                                                DELIMITED  BY  SPACE   
                                 RECE62-RENRAKU-BANTI
                                                DELIMITED  BY  SPACE   

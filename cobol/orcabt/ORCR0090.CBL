@@ -220,6 +220,8 @@
       *                                     連絡先情報追加
       *  04.05.08    NACL-藤原    11/03/29  災害対応
       *                                     「不詳・災１」の追加
+      *  04.05.09    NACL-藤原    11/04/01  災害対応
+      *                                     「〒」「ＴＥＬ：」の記載追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1564,14 +1566,16 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
                            MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                    TO  RECE02-HOME-POST1
                        END-IF
-                       STRING   RECE02-HOME-POST1
-                                               DELIMITED  BY  SPACE
-                                RECE02-HOME-ADRS
+                       STRING   RECE02-HOME-ADRS
                                                DELIMITED  BY  SPACE
                                 RECE02-HOME-BANTI
                                                DELIMITED  BY  SPACE
                                                INTO    RECE02-HOME-ADRS1
                        END-STRING
+      *??
+             DISPLAY "POST1=" RECE02-HOME-POST1 "#"
+             DISPLAY "ADRS1=" RECE02-HOME-ADRS1 "#"
+      *?? 
       *
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
@@ -1584,9 +1588,7 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
                                                    TO
                                                    RECE02-RENRAKU-POST1
                        END-IF
-                       STRING   RECE02-RENRAKU-POST1
-                                               DELIMITED  BY  SPACE
-                                RECE02-RENRAKU-ADRS
+                       STRING   RECE02-RENRAKU-ADRS
                                                DELIMITED  BY  SPACE   
                                 RECE02-RENRAKU-BANTI
                                                DELIMITED  BY  SPACE   
