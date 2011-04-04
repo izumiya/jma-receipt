@@ -1223,6 +1223,8 @@
       *
            03  WRK-KOH-KINGAKU                 PIC  9(07).
       *
+           03  WRK-GENMEN-NASI-KIN             PIC  9(07).
+      *
       *    øÙŒÃ ‘Ω∏Õ—
            03  WRK-SURYOKETA                   PIC 9(02).
            03  WRK-SURYOKETA1                  PIC 9(02).
@@ -2239,6 +2241,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-SKY-TOKKOH
            MOVE      ZERO       TO      FLG-GENMEN-ARI
            MOVE      ZERO       TO      FLG-GENMEN-NASI
+           MOVE      ZERO       TO      WRK-GENMEN-NASI-KIN
       *
            PERFORM     211J-SYUKEIKBN-HANBETU-SEC
       *
@@ -2614,6 +2617,16 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                          AND (FLG-GENMEN-NASI  =  1      )
                            MOVE    4       TO  RECE02-RJNGAIKOHFTN (1)
                            MOVE    1       TO  RECE02-YOBIETC(9)
+                           MOVE  WRK-GENMEN-NASI-KIN
+                                           TO  RECE02-YOBIETC(4)
+                           IF   (RECE02-GENMENKBN   =   2  OR  3)
+                           AND  (FLG-SAIGAI-TAISYO  =   1       )
+                           AND  (RECE02-HKNNUM  NOT =  SPACE    )
+                             IF  RECE02-ZAITAKU     =  "1" OR "2"
+                               MOVE   WRK-GENMEN-NASI-KIN
+                                           TO  RECE02-FTNMONEY(1)
+                             END-IF
+                           END-IF
                          ELSE
                            MOVE    2       TO  RECE02-RJNGAIKOHFTN (1)
                          END-IF
@@ -2641,6 +2654,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ELSE
                      MOVE    ZERO    TO   RECE02-RJNGAIKOHFTN (1)
                      MOVE    ZERO    TO   RECE02-YOBIETC(9)
+                     MOVE    ZERO    TO   RECE02-YOBIETC(4)
                    END-IF
                END-IF
            END-IF
@@ -3208,6 +3222,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
+      *
            MOVE     ZERO     TO     FLG-SAIGAI-TAISYO
       *
            IF   (RECE02-SRYYM       >=  "200610")
@@ -9292,6 +9307,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
               MOVE    1     TO   FLG-GENMEN-ARI
            ELSE
               MOVE    1     TO   FLG-GENMEN-NASI
+              COMPUTE  WRK-GENMEN-NASI-KIN = SYU-HKNTEKMONEY
+                                           + SYU-KOH-FTN
            END-IF
       *
       *    ¿¡µ·≥€º˝«º ‘Ω∏

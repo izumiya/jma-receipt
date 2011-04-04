@@ -1402,7 +1402,12 @@
       *
            03  WRK-KOH-KINGAKU                 PIC  9(07).
       *
-           03  WK-SAIGAI-DD                    PIC  9(02).
+           03  WRK-SAIGAI-DD                   PIC  9(02).
+      *
+           03  WRK-GENMEN-NASI-KIN             PIC  9(07).
+           03  WRK-GENMEN-NASI-SKJ             PIC  9(07).
+           03  WRK-GENMEN-NASI-KIN2            PIC  9(07).
+           03  WRK-GENMEN-NASI-SKJ2            PIC  9(07).
       *
       *    ¿ôÎÌÊÔ½¸ÍÑ
            03  WRK-SURYOKETA                   PIC 9(02).
@@ -2806,11 +2811,29 @@
                          AND   (FLG-GENMEN-NASI  =  1      )
                            MOVE    4       TO  RECE62-RJNGAIKOHFTN (1)
                            MOVE    1       TO  RECE62-YOBIETC(9)
+                           MOVE  WRK-GENMEN-NASI-KIN
+                                           TO  RECE62-YOBIETC(4)
+                           MOVE  WRK-GENMEN-NASI-SKJ
+                                           TO  RECE62-YOBIETC(5)
+                           IF   (RECE62-GENMENKBN   =   2  OR  3)
+                           AND  (FLG-SAIGAI-TAISYO  =   1       )
+                           AND  (RECE62-HKNNUM  NOT =  SPACE    )
+                             IF  RECE62-KOUREI      =  "1" OR "2"
+                               MOVE   WRK-GENMEN-NASI-KIN
+                                           TO  RECE62-FTNMONEY(1)
+                             END-IF
+                             MOVE   WRK-GENMEN-NASI-SKJ
+                                           TO  RECE62-SHOKUJIFTN(1)
+                           END-IF
                          ELSE
                            IF  (RECE62-SRYYM    >= "201101")
                            AND (FLG-GENMEN-ARI2  =  1      )
                            AND (FLG-GENMEN-NASI2 =  1      )
                              MOVE    4     TO  RECE62-RJNGAIKOHFTN (1)
+                             MOVE  WRK-GENMEN-NASI-KIN2
+                                           TO  RECE62-YOBIETC(4)
+                             MOVE  WRK-GENMEN-NASI-SKJ2
+                                           TO  RECE62-YOBIETC(5)
                            ELSE
                              MOVE    2     TO  RECE62-RJNGAIKOHFTN (1)
                            END-IF
@@ -2839,6 +2862,8 @@
                    ELSE
                      MOVE    ZERO    TO   RECE62-RJNGAIKOHFTN (1)
                      MOVE    ZERO    TO   RECE62-YOBIETC(9)
+                     MOVE    ZERO    TO   RECE62-YOBIETC(4)
+                     MOVE    ZERO    TO   RECE62-YOBIETC(5)
                    END-IF
                END-IF
            END-IF
@@ -2866,8 +2891,9 @@
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
+      *
            MOVE     ZERO     TO     FLG-SAIGAI-TAISYO
-           MOVE     ZERO     TO     WK-SAIGAI-DD
+           MOVE     ZERO     TO     WRK-SAIGAI-DD
       *
            IF   (RECE62-SRYYM       >=  "200610")
            AND  (RECE62-HKNNUM   NOT =   SPACE  )
@@ -11108,6 +11134,10 @@
            MOVE    ZERO                 TO      FLG-GENMEN-NASI
            MOVE    ZERO                 TO      FLG-GENMEN-ARI2
            MOVE    ZERO                 TO      FLG-GENMEN-NASI2
+           MOVE    ZERO                 TO      WRK-GENMEN-NASI-KIN
+           MOVE    ZERO                 TO      WRK-GENMEN-NASI-SKJ
+           MOVE    ZERO                 TO      WRK-GENMEN-NASI-KIN2
+           MOVE    ZERO                 TO      WRK-GENMEN-NASI-SKJ2
       *
            IF  (RECE62-NYUINRYOFLG   =   "1"     )
            AND (RECE62-KOUREI        =   "1"     )
@@ -12028,19 +12058,28 @@
               MOVE    1     TO   FLG-GENMEN-ARI
            ELSE
               MOVE    1     TO   FLG-GENMEN-NASI
+              COMPUTE  WRK-GENMEN-NASI-KIN = SYU-HKNTEKMONEY
+                                           + SYU-KOH-FTN
+              COMPUTE  WRK-GENMEN-NASI-SKJ = SYU-SKYMONEY-SKJ
+                                           + SYU-SKYMONEY-LIFE
            END-IF
       *
-           IF    FLG-SAIGAI-TAISYO  =  1
+           IF   (FLG-SAIGAI-TAISYO  =  1    )
+           AND  (RECE62-HKNNUM      =  SPACE)
               PERFORM    VARYING   IDX-SAI    FROM   1   BY   1
                           UNTIL    IDX-SAI      >   31
                 IF   SYU-DAY(IDX-SAI)   =   "1"  OR  "2"
-                    IF   IDX-SAI  <  WK-SAIGAI-DD
+                    IF   IDX-SAI  <  WRK-SAIGAI-DD
                        MOVE    1     TO   FLG-GENMEN-NASI2
                     ELSE
                        MOVE    1     TO   FLG-GENMEN-ARI2
                     END-IF
                 END-IF
               END-PERFORM
+              COMPUTE  WRK-GENMEN-NASI-KIN2 = SYU-HKNTEKMONEY
+                                            + SYU-KOH-FTN
+              COMPUTE  WRK-GENMEN-NASI-SKJ2 = SYU-SKYMONEY-SKJ
+                                            + SYU-SKYMONEY-LIFE
            END-IF
       *
       *    ÀÁµá³Û¼ýÇ¼ÊÔ½¸
@@ -14872,25 +14911,32 @@
            ADD   SYU-RYOYOHI-SKJ    TO   RECE62-SKYSKJ-RYOYOHI
            ADD   SYU-RYOYOHI-LIFE   TO   RECE62-SKYSKJ-RYOYOHI
       *
-           ADD   SYU-SKYMONEY-SKJ   TO   RECE62-SKYSKJ-ICHIBUFTN
-           ADD   SYU-SKYMONEY-LIFE  TO   RECE62-SKYSKJ-ICHIBUFTN
-      *
            IF   SYU-SYUHKNNUM   NOT =  SPACE
               ADD      SYU-SYUSKJ-NISSU TO   RECE62-SKYSKJ-KAISU
       *
-              COMPUTE  WRK-SKY-KEISAN  =  SYU-SYUSKJ-RYOYOHI
-                                       -  SYU-SYUSKJ-FTN
-              ADD      WRK-SKY-KEISAN   TO   RECE62-SKYSKJ-HOKENJA
+              IF   (WK-GENGAKUKBN      =   3 OR 4)
+              AND  (FLG-SAIGAI-TAISYO  =   1     )
+                ADD    SYU-SYUSKJ-RYOYOHI
+                                        TO   RECE62-SKYSKJ-HOKENJA
+              ELSE
+                COMPUTE  WRK-SKY-KEISAN  =   SYU-SYUSKJ-RYOYOHI
+                                         -   SYU-SYUSKJ-FTN
+                ADD    WRK-SKY-KEISAN   TO   RECE62-SKYSKJ-HOKENJA
       *
-              ADD      SYU-SYUSKJ-FTN   TO   WRK-SKY-SKJ-ICHIBUFTN
+                ADD    SYU-SYUSKJ-FTN   TO   WRK-SKY-SKJ-ICHIBUFTN
+      *
+                COMPUTE  WRK-SKY-KEISAN  =   SYU-SKYMONEY-SKJ
+                                         +   SYU-SKYMONEY-LIFE
+                ADD    WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-FTNMONEY
+      *
+                ADD    SYU-SKYMONEY-SKJ TO   RECE62-SKYSKJ-ICHIBUFTN
+                ADD    SYU-SKYMONEY-LIFE
+                                        TO   RECE62-SKYSKJ-ICHIBUFTN
+              END-IF
       *
               COMPUTE  WRK-SKY-KEISAN  =  SYU-RYOYOHI-SKJ
                                        +  SYU-RYOYOHI-LIFE
               ADD      WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-ZENGAKU
-      *
-              COMPUTE  WRK-SKY-KEISAN  =  SYU-SKYMONEY-SKJ
-                                       +  SYU-SKYMONEY-LIFE
-              ADD      WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-FTNMONEY
            ELSE
               ADD      SYU-KOH1SKJ-NISSU
                                         TO   RECE62-SKYSKJ-KAISU
@@ -14902,6 +14948,10 @@
               COMPUTE  WRK-SKY-KEISAN  =  SYU-SKYMONEY-SKJ
                                        +  SYU-SKYMONEY-LIFE
               ADD      WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-FTNMONEY2
+      *
+              ADD      SYU-SKYMONEY-SKJ TO   RECE62-SKYSKJ-ICHIBUFTN
+              ADD      SYU-SKYMONEY-LIFE
+                                        TO   RECE62-SKYSKJ-ICHIBUFTN
            END-IF
       *
            .
@@ -16994,6 +17044,9 @@
                  MOVE     ZERO        TO   RECE62-FTNMONEY(1)
                  MOVE     999999999   TO   RECE62-KOUREI-SAIKEI
                  MOVE     999999999   TO   RECE62-KOUREI-SAIKEI2
+              END-IF
+              IF   FLG-SAIGAI-TAISYO    =   1
+                 MOVE     ZERO        TO   RECE62-SHOKUJIFTN(1)
               END-IF
             END-IF 
       *
@@ -19620,9 +19673,9 @@
                   MOVE     1             TO  FLG-SAIGAI-TAISYO
                   IF   PTKOH-TEKSTYMD(1:6)  >=  RECE62-SRYYM
                      MOVE   PTKOH-TEKSTYMD(7:2)
-                                         TO   WK-SAIGAI-DD
+                                         TO  WRK-SAIGAI-DD
                   ELSE
-                     MOVE   01           TO   WK-SAIGAI-DD
+                     MOVE   01           TO  WRK-SAIGAI-DD
                   END-IF
                   MOVE     1             TO  FLG-PTKOHINF
                 ELSE
