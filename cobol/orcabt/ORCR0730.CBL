@@ -129,6 +129,8 @@
       *                                     ÆÃµ­»ö¹à£¹£¶¡¢£¹£·¤ÎÄÉ²Ã
       *  04.05.24    NACL-Æ£¸¶    11/04/01  ºÒ³²ÂÐ±þ
       *                                     ¡Ö¢©¡×¡Ö£Ô£Å£Ì¡§¡×¤Îµ­ºÜÄÉ²Ã
+      *  04.05.25    NACL-Æ£¸¶    11/04/04  ºÒ³²ÂÐ±þ
+      *                                     ¿ÌºÒ°ÊÁ°°ìÉôÉéÃ´¶â¤Îµ­ºÜÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -487,6 +489,8 @@
                    07  WRK-1033-EDYUKYMD 
                                    PIC X(08).                                       
       *
+           03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN1          PIC ZZZ,ZZ9. 
            03  WRK-TITLE           PIC X(50).
            03  WRK-TEKIYOU         PIC X(50).
            03  WRK-ADRS.
@@ -7389,6 +7393,84 @@
                        WHEN    "2"   
                            MOVE  WRK-TITLE TO  HC063-TEKIYO(WRK-LINETEK)
                     END-EVALUATE
+               END-IF
+      *                   
+               IF      RECE62-RJNGAIKOHFTN (1) =   4
+      *            ¿ÌºÒ°ÊÁ°°ìÉôÉéÃ´¶â¤Îµ­ºÜ¡ÊºÒ£²¡Ë
+                   MOVE    SPACE               TO  WRK-TITLE
+                   MOVE    RECE62-YOBIETC (4)
+                                           TO  WRK-FUTAN
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "2"             TO  KANACHK-SYORI 
+                   MOVE    WRK-FUTAN       TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF    ( KANACHK-RC      =   ZERO )
+                   AND   ( KANACHK-MAX     >   ZERO )
+                       STRING  "¡Ú¿ÌºÒ°ÊÁ°°ìÉôÉéÃ´¶â¡Û¡¡¡¡"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "±ß"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                   END-IF
+                   INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "¡¡"
+      * 
+                   IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
+                       PERFORM 34120-PAGE-SEC
+                   END-IF    
+                   ADD     1                   TO  WRK-LINETEK
+      *
+                   IF      CNT-PAGE        =   1   
+                       MOVE    WRK-TITLE   TO  HC06-TEKIYO (WRK-LINETEK)
+                   ELSE                    
+                   EVALUATE    SYS-2005-NEXTPRTKBN
+                       WHEN    "0"   
+                           MOVE  WRK-TITLE TO  HC061-TEKIYO(WRK-LINETEK)
+                       WHEN    "1"   
+                           MOVE  WRK-TITLE TO  HC062-TEKIYO(WRK-LINETEK)
+                       WHEN    "2"   
+                           MOVE  WRK-TITLE TO  HC063-TEKIYO(WRK-LINETEK)
+                    END-EVALUATE
+                   END-IF
+      *
+      *            ¿ÌºÒ°ÊÁ°°ìÉô¿©»öÀ¸³èÎÅÍÜÉ¸½àÉéÃ´³Û¤Îµ­ºÜ¡ÊºÒ£²¡Ë
+                   MOVE    SPACE               TO  WRK-TITLE
+                   MOVE    RECE62-YOBIETC (5)
+                                           TO  WRK-FUTAN1
+                   INITIALIZE              ORCSKANACHKAREA
+                   MOVE    "2"             TO  KANACHK-SYORI 
+                   MOVE    WRK-FUTAN1      TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                   IF    ( KANACHK-RC      =   ZERO )
+                   AND   ( KANACHK-MAX     >   ZERO )
+                       STRING  "¡Ú¿ÌºÒ°ÊÁ°¿©»öÀ¸³èÎÅÍÜÉ¸½àÉéÃ´³Û¡Û"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "±ß"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                   END-IF
+                   INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "¡¡"
+      * 
+                   IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
+                       PERFORM 34120-PAGE-SEC
+                   END-IF    
+                   ADD     1                   TO  WRK-LINETEK
+      *
+                   IF      CNT-PAGE        =   1   
+                       MOVE    WRK-TITLE   TO  HC06-TEKIYO (WRK-LINETEK)
+                   ELSE                    
+                   EVALUATE    SYS-2005-NEXTPRTKBN
+                       WHEN    "0"   
+                           MOVE  WRK-TITLE TO  HC061-TEKIYO(WRK-LINETEK)
+                       WHEN    "1"   
+                           MOVE  WRK-TITLE TO  HC062-TEKIYO(WRK-LINETEK)
+                       WHEN    "2"   
+                           MOVE  WRK-TITLE TO  HC063-TEKIYO(WRK-LINETEK)
+                    END-EVALUATE
+                   END-IF
                END-IF
       *                   
                IF      RECE62-RJNGAIKOHFTN (1) =   1   OR  5
