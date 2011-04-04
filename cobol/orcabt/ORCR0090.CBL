@@ -1572,10 +1572,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
                                                DELIMITED  BY  SPACE
                                                INTO    RECE02-HOME-ADRS1
                        END-STRING
-      *??
-             DISPLAY "POST1=" RECE02-HOME-POST1 "#"
-             DISPLAY "ADRS1=" RECE02-HOME-ADRS1 "#"
-      *?? 
       *
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
