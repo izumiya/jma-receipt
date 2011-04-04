@@ -12058,10 +12058,14 @@
               MOVE    1     TO   FLG-GENMEN-ARI
            ELSE
               MOVE    1     TO   FLG-GENMEN-NASI
-              COMPUTE  WRK-GENMEN-NASI-KIN = SYU-HKNTEKMONEY
-                                           + SYU-KOH-FTN
-              COMPUTE  WRK-GENMEN-NASI-SKJ = SYU-SKYMONEY-SKJ
-                                           + SYU-SKYMONEY-LIFE
+              ADD   SYU-HKNTEKMONEY
+                            TO   WRK-GENMEN-NASI-KIN
+              ADD   SYU-KOH-FTN
+                            TO   WRK-GENMEN-NASI-KIN
+              ADD   SYU-SKYMONEY-SKJ
+                            TO   WRK-GENMEN-NASI-SKJ
+              ADD   SYU-SKYMONEY-LIFE
+                            TO   WRK-GENMEN-NASI-SKJ
            END-IF
       *
            IF   (FLG-SAIGAI-TAISYO  =  1    )
@@ -12076,10 +12080,14 @@
                     END-IF
                 END-IF
               END-PERFORM
-              COMPUTE  WRK-GENMEN-NASI-KIN2 = SYU-HKNTEKMONEY
-                                            + SYU-KOH-FTN
-              COMPUTE  WRK-GENMEN-NASI-SKJ2 = SYU-SKYMONEY-SKJ
-                                            + SYU-SKYMONEY-LIFE
+              ADD   SYU-HKNTEKMONEY
+                            TO   WRK-GENMEN-NASI-KIN2
+              ADD   SYU-KOH-FTN
+                            TO   WRK-GENMEN-NASI-KIN2
+              ADD   SYU-SKYMONEY-SKJ
+                            TO   WRK-GENMEN-NASI-SKJ2
+              ADD   SYU-SKYMONEY-LIFE
+                            TO   WRK-GENMEN-NASI-SKJ2
            END-IF
       *
       *    ¿¡µ·≥€º˝«º ‘Ω∏

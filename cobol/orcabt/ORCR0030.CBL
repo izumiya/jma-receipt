@@ -9307,8 +9307,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
               MOVE    1     TO   FLG-GENMEN-ARI
            ELSE
               MOVE    1     TO   FLG-GENMEN-NASI
-              COMPUTE  WRK-GENMEN-NASI-KIN = SYU-HKNTEKMONEY
-                                           + SYU-KOH-FTN
+              ADD   SYU-HKNTEKMONEY
+                            TO   WRK-GENMEN-NASI-KIN
+              ADD   SYU-KOH-FTN
+                            TO   WRK-GENMEN-NASI-KIN
            END-IF
       *
       *    ¿¡µ·≥€º˝«º ‘Ω∏
