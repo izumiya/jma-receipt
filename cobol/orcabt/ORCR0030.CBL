@@ -2563,10 +2563,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                IF    ( RECE02-HKNNUM   NOT =   SPACE )
                AND   ( RECE02-HKNJANUM     =   SPACE )
                    IF  RECE02-SRYYM   >=  "201101"
-                       MOVE    1           TO  RECE02-RJNGAIKOHFTN (1)
+                       MOVE    6           TO  RECE02-RJNGAIKOHFTN (1)
       *                ÊÝ¸±¼ÔÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF    RECE02-GENMENKBN   >  ZERO
-                           MOVE    5       TO  RECE02-RJNGAIKOHFTN (1)
+                           MOVE    7       TO  RECE02-RJNGAIKOHFTN (1)
                        END-IF
                    ELSE
                        MOVE    3           TO  RECE02-RJNGAIKOHFTN (1)
@@ -2600,17 +2600,23 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                                     "972" AND "974")
                              IF  RECE02-KOHFTNJANUM(IDX-SAI) = SPACE
                              OR  RECE02-KOHJKYSNUM(IDX-SAI)  = SPACE
-                               MOVE    1   TO  RECE02-RJNGAIKOHFTN (1)
+                               MOVE    6   TO  RECE02-RJNGAIKOHFTN (1)
                              END-IF
                            END-IF
                          END-PERFORM
                        END-IF
       *                µ­¹æÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
-      *                ¸øÈñÉéÃ´¼ÔÈÖ¹æËô¤Ï¼õµë¼ÔÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF  (RECE02-RJNGAIKOHFTN(1) =   1  )
                        AND (RECE02-GENMENKBN       >  ZERO)
                          IF   RECE02-SRYYM    >= "201101"
                            MOVE    5       TO  RECE02-RJNGAIKOHFTN (1)
+                         END-IF
+                       END-IF
+      *                ¸øÈñÉéÃ´¼ÔÈÖ¹æËô¤Ï¼õµë¼ÔÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
+                       IF  (RECE02-RJNGAIKOHFTN(1) =   6  )
+                       AND (RECE02-GENMENKBN       >  ZERO)
+                         IF   RECE02-SRYYM    >= "201101"
+                           MOVE    7       TO  RECE02-RJNGAIKOHFTN (1)
                          END-IF
                        END-IF
       *                ¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
@@ -2698,6 +2704,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        EVALUATE  RECE02-RJNGAIKOHFTN(1)
                          WHEN       2
                          WHEN       5
+                         WHEN       7
                             MOVE    96   TO      FLG-TOKKI
                             PERFORM   21045-TOKKI-HENSYU-SEC
                          WHEN       4
