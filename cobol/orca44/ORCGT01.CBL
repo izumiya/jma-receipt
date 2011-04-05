@@ -3706,8 +3706,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            PERFORM 45011-JOBKANRI-HENSYU-SEC
       *             
            MOVE    SPACE           TO  SHELLTBL
-           MOVE    "scripts/monthly/receden_sokatu.sh"
-                                       TO  WRK-SHELL-NAME
+           MOVE    "receden_sokatu.sh" TO  WRK-SHELL-NAME
       *    ファイルデイレクトリ位置指定
            INITIALIZE                  ORCSMKPASSAREA
            MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
@@ -3786,7 +3785,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "monthly"       TO  MCP-PATHNAME
 grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "ERROR MCP-RC=" MCP-RC 
@@ -4652,8 +4651,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                        WHEN    "1013"
                            MOVE    "2"             TO  WRK-SHELL-RECEKBN
                    END-EVALUATE
-                   MOVE    "scripts/monthly/sokatsu.sh"
-                                               TO  WRK-SHELL-NAME
+                   MOVE    "sokatsu.sh"            TO  WRK-SHELL-NAME
       *            ファイルデイレクトリ位置指定
                    INITIALIZE                  ORCSMKPASSAREA
                    MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
@@ -4671,7 +4669,7 @@ grpsys             MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG4
                    MOVE    SHELLTBL            TO  MCPDATA-REC
                    MOVE    "SHELL"             TO  MCP-FUNC
                    MOVE    "shell"         TO  MCP-TABLE
-                   MOVE    "shell"         TO  MCP-PATHNAME
+                   MOVE    "monthly"       TO  MCP-PATHNAME
 grpsys             PERFORM 900-ORCDBMAIN-SEC
            END-EVALUATE
           .
