@@ -84,6 +84,8 @@
       *
       *  04.05.01    NACL-Æ£¸¶    09/07/21  É½¼¨Ì¾¾Î¤ÎÄÉ²Ã
       *                                     Ì¾¾Î£²¤¬¤¢¤ì¤ÐÍ¥Àè¤¹¤ë
+      *  04.05.02    NACL-Æ£¸¶    11/04/04  ºÒ³²ÂÐ±þ
+      *                                     È÷¹ÍÍó¤Îµ­ºÜÅùÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -193,6 +195,8 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-INDEX           PIC 9(02).
            03  WRK-FTNMONEY        PIC 9(10).
            03  WRK-SYOKBN          PIC X(01).
+      *    
+           03  WRK-GENMENKBN       PIC X(01).
       *
            03  WRK-MEISYO          PIC X(44).
       *
@@ -272,6 +276,17 @@ grpsys     COPY    "COMMON-SPA".
                05  SUM-GOK-TBL         OCCURS  4.
                    07  SUM-GOK-KENSU      PIC 9(06).    
                    07  SUM-GOK-SHOKENSU   PIC 9(06).
+      *
+      *        È÷¹ÍÍó¡ÊÌ¤³ÎÄêÊ¬¡Ë 
+               05  SUM-BIKOU. 
+                   07  SUM-BIKOU-KENSU          PIC  9(06).
+                   07  SUM-BIKOU-NISSU          PIC  9(06).
+                   07  SUM-BIKOU-TOTALTEN       PIC  9(10).
+                   07  SUM-BIKOU-FTNMONEY       PIC  9(10).
+                   07  SUM-BIKOU-SHOKUJIKENSU   PIC  9(06).
+                   07  SUM-BIKOU-SHOKUJINISSU   PIC  9(06).
+                   07  SUM-BIKOU-SHOKUJIRYOYOHI PIC  9(10).
+                   07  SUM-BIKOU-SHOKUJIFTN     PIC  9(10).
       *
       *    ¸ÇÄê¹àÌÜ
        01  WRK-CONS-AREA.
@@ -511,6 +526,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *
            OPEN    OUTPUT              UPD-FILE
       *
+           MOVE    "0"             TO  WRK-GENMENKBN
+      *
       *    ÊÖÌáÊ¬
            EVALUATE    WRK-PARA-SYOKBN
                WHEN    ZERO
@@ -525,6 +542,27 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                    MOVE    "1"         TO  WRK-SYOKBN
                    PERFORM 2001-SYOKBN-SYUKEI-SEC
            END-EVALUATE
+      *
+      *    Ì¤³ÎÄêÊ¬¡ÊÊÝ¸±¼ÔÌ¤³ÎÄêÊ¬¡Ë
+           IF      WRK-PARA-GENMENKBN
+                                   =   "1"
+               MOVE    "1"             TO  WRK-GENMENKBN
+      *
+      *        ÊÖÌáÊ¬
+               EVALUATE    WRK-PARA-SYOKBN
+                   WHEN    ZERO
+                   WHEN    "2"
+                       MOVE    "2"         TO  WRK-SYOKBN
+                       PERFORM 2001-SYOKBN-SYUKEI-SEC
+               END-EVALUATE
+      *        Åö·î¡¦·îÃÙ¤ìÊ¬
+               EVALUATE    WRK-PARA-SYOKBN
+                   WHEN    ZERO
+                   WHEN    "1"
+                       MOVE    "1"         TO  WRK-SYOKBN
+                       PERFORM 2001-SYOKBN-SYUKEI-SEC
+               END-EVALUATE
+           END-IF
       *
            CLOSE   UPD-FILE
       *
@@ -624,6 +662,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                                            WRK-NYUGAIKBN
                                                            WRK-SYOKBN
                                                            WRK-PRTFLG
+                                                           WRK-GENMENKBN
                                                            SPA-AREA
                                                            RECEERR
                                        ELSE
@@ -633,6 +672,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                                            WRK-PARA
                                                            WRK-SYOKBN
                                                            WRK-PRTFLG
+                                                           WRK-GENMENKBN
                                                            SPA-AREA
                                                            RECEERR
                                        END-IF
@@ -697,6 +737,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                                            WRK-NYUGAIKBN
                                                            WRK-SYOKBN
                                                            WRK-PRTFLG
+                                                           WRK-GENMENKBN
                                                            SPA-AREA
                                                            RECEERR
                                    END-IF 
@@ -1388,9 +1429,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    
       *    ·ï¿ô
            ADD     1               TO  SUM-KENSU (IDY4 IDY3 IDY1 IDY2)
+                                       SUM-BIKOU-KENSU (IDY4 IDY3)
            IF      RECE10-SHOKUJINISSU(IDX1)   >   ZERO
                ADD     1           TO  SUM-SHOKUJIKENSU
                                       (IDY4 IDY3 IDY1 IDY2)
+                                       SUM-BIKOU-SHOKUJIKENSU
+                                      (IDY4 IDY3)
            END-IF
       *    ¡Ê£±¡Ë¹ç·×¡¢Áí·ï¿ô
            ADD     1                   TO  SUM-GOK-KENSU (IDY4 IDY3 1)
@@ -1403,22 +1447,34 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    ¿ÇÎÅ¼ÂÆü¿ô¡Á°ìÉôÉéÃ´¶â 
            ADD     RECE10-JNISSU         (IDX1)
                                  TO  SUM-NISSU     (IDY4 IDY3 IDY1 IDY2)
+                                     SUM-BIKOU-NISSU
+                                                   (IDY4 IDY3) 
            ADD     RECE10-TOTALTEN       (IDX1)
                                  TO  SUM-TOTALTEN  (IDY4 IDY3 IDY1 IDY2)
+                                     SUM-BIKOU-TOTALTEN
+                                                   (IDY4 IDY3)
            IF    (  IDY1              <   3        )
            OR    ( (IDY1              =   3 ) AND
                    (IDY2              =   3 )      )                          
                ADD     RECE10-FTNMONEY       (IDX1)
                                  TO  SUM-FTNMONEY  (IDY4 IDY3 IDY1 IDY2)
+                                     SUM-BIKOU-FTNMONEY
+                                                   (IDY4 IDY3)
            END-IF                          
            ADD     RECE10-SHOKUJINISSU   (IDX1)
                                  TO  SUM-SHOKUJINISSU
                                                    (IDY4 IDY3 IDY1 IDY2)
+                                     SUM-BIKOU-SHOKUJINISSU
+                                                   (IDY4 IDY3)
            ADD     RECE10-SHOKUJIRYOYOHI (IDX1)
                                  TO  SUM-SHOKUJIRYOYOHI
                                                    (IDY4 IDY3 IDY1 IDY2)
+                                     SUM-BIKOU-SHOKUJIRYOYOHI
+                                                   (IDY4 IDY3)
            ADD     RECE10-SHOKUJIFTN     (IDX1)
                                  TO  SUM-SHOKUJIFTN(IDY4 IDY3 IDY1 IDY2)
+                                     SUM-BIKOU-SHOKUJIFTN
+                                                   (IDY4 IDY3)
       *
       *    ¾®·×
            IF      IDY2            >   1
@@ -1522,9 +1578,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    
       *    ·ï¿ô
            ADD     1           TO  SUM-KOH-KENSU (IDY4 IDY3 IDX1 IDX2)
+                                   SUM-BIKOU-KENSU
+                                                 (IDY4 IDY3)
            IF      RECE10-SHOKUJINISSU(IDY)    >   ZERO
                ADD     1       TO  SUM-KOH-SHOKUJIKENSU
                                                  (IDY4 IDY3 IDX1 IDX2)
+                                   SUM-BIKOU-SHOKUJIKENSU
+                                                 (IDY4 IDY3)
            END-IF
       *   ¡Ê£³¡Ë¹ç·×¡¢Áí·ï¿ô
            ADD     1                   TO  SUM-GOK-KENSU (IDY4 IDY3 3)
@@ -1537,14 +1597,19 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    ¿ÇÎÅ¼ÂÆü¿ô¡Á°ìÉôÉéÃ´¶â 
            ADD     RECE10-TOTALTEN       (IDY)
                              TO  SUM-KOH-TOTALTEN  (IDY4 IDY3 IDX1 IDX2)
+                                 SUM-BIKOU-TOTALTEN(IDY4 IDY3)
            ADD     RECE10-FTNMONEY       (IDY)
                              TO  SUM-KOH-FTNMONEY  (IDY4 IDY3 IDX1 IDX2)
+                                 SUM-BIKOU-FTNMONEY(IDY4 IDY3)
       *                           
            ADD     RECE10-SHOKUJIRYOYOHI (IDY)
                              TO  SUM-KOH-SHOKUJIRYOYOHI
                                                    (IDY4 IDY3 IDX1 IDX2)
+                                 SUM-BIKOU-SHOKUJIRYOYOHI
+                                                   (IDY4 IDY3)
            ADD     RECE10-SHOKUJIFTN     (IDY)
                              TO  SUM-KOH-SHOKUJIFTN(IDY4 IDY3 IDX1 IDX2)
+                                 SUM-BIKOU-SHOKUJIFTN(IDY4 IDY3)
       *
            MOVE    1               TO  FLG-UPD 
       *
@@ -1789,7 +1854,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
                    GO  TO  900-SEIKYU-READ-SEC
                END-IF
       *
-      *        ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ
+      *        ºÒ³²ÂÐ±þ
                EVALUATE    WRK-PARA-GENMENKBN
                    WHEN    ZERO
                        IF      RECE10-ETC-YKZFTN (1)   >   ZERO
@@ -1798,6 +1863,41 @@ grpsys     PERFORM 900-DBFETCH-SEC
                    WHEN    "1"
                        IF      RECE10-ETC-YKZFTN (1)   =   ZERO
                            GO  TO  900-SEIKYU-READ-SEC
+                       END-IF
+                       IF      WRK-GENMENKBN           =   "0"
+                           EVALUATE    RECE10-ETC-YKZFTN (1)
+                               WHEN    2
+                               WHEN    3
+                               WHEN    4
+                                   CONTINUE
+                               WHEN    1
+                               WHEN    5
+                                   IF    ( RECE10-HKNNUM
+                                                   NOT =   SPACE      )
+                                   AND   ( RECE10-HKNJANUM
+                                                   NOT =   "00000000" )
+                                       CONTINUE
+                                   ELSE  
+                                       GO  TO  900-SEIKYU-READ-SEC
+                                   END-IF
+                           END-EVALUATE
+                       ELSE
+                           EVALUATE    RECE10-ETC-YKZFTN (1)
+                               WHEN    2
+                               WHEN    3
+                               WHEN    4
+                                   GO  TO  900-SEIKYU-READ-SEC
+                               WHEN    1
+                               WHEN    5
+                                   IF    ( RECE10-HKNNUM
+                                                   NOT =   SPACE      )
+                                   AND   ( RECE10-HKNJANUM
+                                                   NOT =   "00000000" )
+                                       GO  TO  900-SEIKYU-READ-SEC
+                                   ELSE  
+                                       CONTINUE
+                                   END-IF
+                           END-EVALUATE
                        END-IF
                END-EVALUATE 
       *

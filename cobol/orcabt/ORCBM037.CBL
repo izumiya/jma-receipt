@@ -29,6 +29,9 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.02.01    NACL-藤原    08/09/24  平成２０年１０月改正対応
+      *
+      *  04.05.01    NACL-藤原    11/04/04  災害対応
+      *                                     備考欄の記載等追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -55,7 +58,9 @@
       *
            COPY    "HCM3CV01.INC"  REPLACING  //HCM3CV01//
                                    BY         //HCM3C//.
-           COPY    "HCM3D.INC".
+      *****COPY    "HCM3D.INC".
+           COPY    "HCM3DV01.INC"  REPLACING  //HCM3DV01//
+                                   BY         //HCM3D//.
       *
       *    スパ領域
        01  STS-AREA.
@@ -109,6 +114,11 @@
            03  WRK-TENSUZ          PIC ZZ,ZZZ,ZZZ.
            03  WRK-FTNMONEYZ       PIC Z,ZZZ,ZZZ. 
            03  WRK-GKENSUZ         PIC ZZZZZZZ. 
+      * 
+           03  WRK-NISSU9          PIC ZZZZZ9.
+           03  WRK-KENSU9          PIC ZZZZZ9.
+           03  WRK-TENSU9          PIC ZZ,ZZZ,ZZ9.
+           03  WRK-FTNMONEY9       PIC Z,ZZZ,ZZ9. 
       *             
            03  WRK-KOHKBN.
                05  WRK-KOHNUM      PIC X(04).
@@ -253,6 +263,17 @@
                05  SUM-GOK-TBL         OCCURS  4.
                    07  SUM-GOK-KENSU      PIC 9(06).    
                    07  SUM-GOK-SHOKENSU   PIC 9(06).
+      *
+      *        備考欄（未確定分） 
+               05  SUM-BIKOU. 
+                   07  SUM-BIKOU-KENSU          PIC  9(06).
+                   07  SUM-BIKOU-NISSU          PIC  9(06).
+                   07  SUM-BIKOU-TOTALTEN       PIC  9(10).
+                   07  SUM-BIKOU-FTNMONEY       PIC  9(10).
+                   07  SUM-BIKOU-SHOKUJIKENSU   PIC  9(06).
+                   07  SUM-BIKOU-SHOKUJINISSU   PIC  9(06).
+                   07  SUM-BIKOU-SHOKUJIRYOYOHI PIC  9(10).
+                   07  SUM-BIKOU-SHOKUJIFTN     PIC  9(10).
       *         
        01  WRK-PARA.
            COPY    "CPORCSPRTLNK.INC".
@@ -268,6 +289,8 @@
        01  WRK-SYOKBN              PIC X(01).
       *
        01  WRK-PRTFLG              PIC 9(01).
+      *    
+       01  WRK-GENMENKBN           PIC X(01).
       *
            COPY    "COMMON-SPA".
       *
@@ -282,6 +305,7 @@
                                                WRK-PARA
                                                WRK-SYOKBN
                                                WRK-PRTFLG
+                                               WRK-GENMENKBN
                                                SPA-AREA
                                                LNK-RECEERR
            .
@@ -538,10 +562,18 @@
                WHEN    ZERO
                    MOVE    SYS-1005-SRYKANAME    TO  HCM3C-SRYKA
                WHEN    "1"
-                   STRING  "（未確定分）"      DELIMITED   BY  SIZE
-                           SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
-                                               INTO  HCM3C-SRYKA
-                   END-STRING
+                   IF      WRK-GENMENKBN       =   "0"
+                       STRING  "（確定分）"        DELIMITED   BY  SIZE
+                               SYS-1005-SRYKANAME
+                                                   DELIMITED   BY  SPACE  
+                                                   INTO  HCM3C-SRYKA
+                       END-STRING
+                   ELSE
+                       STRING  "（未確定分）"      DELIMITED   BY  SIZE
+                               SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
+                                                   INTO  HCM3C-SRYKA
+                       END-STRING
+                   END-IF
            END-EVALUATE
            .
        310-HEAD-HEN-01-EXT.
@@ -585,10 +617,18 @@
                WHEN    ZERO
                    MOVE    SYS-1005-SRYKANAME    TO  HCM3D-SRYKA
                WHEN    "1"
-                   STRING  "（未確定分）"      DELIMITED   BY  SIZE
-                           SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
-                                               INTO  HCM3D-SRYKA
-                   END-STRING
+                   IF      WRK-GENMENKBN       =   "0"
+                       STRING  "（確定分）"        DELIMITED   BY  SIZE
+                               SYS-1005-SRYKANAME
+                                                   DELIMITED   BY  SPACE  
+                                                   INTO  HCM3D-SRYKA
+                       END-STRING
+                   ELSE
+                       STRING  "（未確定分）"      DELIMITED   BY  SIZE
+                               SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
+                                                   INTO  HCM3D-SRYKA
+                       END-STRING
+                   END-IF
            END-EVALUATE
       *
            .
@@ -863,6 +903,31 @@
       *
            MOVE    SUM-GOK-KENSU (IDX3 IDX1 4)  TO  WRK-GKENSUZ
            MOVE    WRK-GKENSUZ             TO  HCM3D-GKENSU
+      *
+      *    備考欄
+           IF      WRK-PARA-GENMENKBN  =   "1"
+               IF      WRK-GENMENKBN   =   "0"
+                   MOVE    "確定分："      TO  HCM3D-BIKOH-TITLE
+               ELSE
+                   MOVE    "未確定分："    TO  HCM3D-BIKOH-TITLE
+               END-IF    
+               MOVE    "件数"          TO  HCM3D-BIKOH-TITLE-KENSU
+               MOVE    "日数"          TO  HCM3D-BIKOH-TITLE-NISSU
+               MOVE    "点数"          TO  HCM3D-BIKOH-TITLE-TENSU
+               MOVE    "一部負担金"    TO  HCM3D-BIKOH-TITLE-ITBFTN
+               MOVE    SUM-BIKOU-KENSU     (IDX3 IDX1)
+                                       TO  WRK-KENSU9        
+               MOVE    WRK-KENSU9      TO  HCM3D-BIKOH-KENSU
+               MOVE    SUM-BIKOU-NISSU     (IDX3 IDX1)
+                                       TO  WRK-NISSU9 
+               MOVE    WRK-NISSU9      TO  HCM3D-BIKOH-NISSU
+               MOVE    SUM-BIKOU-TOTALTEN  (IDX3 IDX1)
+                                       TO  WRK-TENSU9         
+               MOVE    WRK-TENSU9      TO  HCM3D-BIKOH-TENSU
+               MOVE    SUM-BIKOU-FTNMONEY  (IDX3 IDX1)
+                                       TO  WRK-FTNMONEY9
+               MOVE    WRK-FTNMONEY9   TO  HCM3D-BIKOH-ITBFTN
+           END-IF
            .
        330-TERM-HEN-EXT.
            EXIT.
@@ -893,7 +958,8 @@
                MOVE    "HCM3CV01.red"      TO  SPRT-PRTID
                MOVE    HCM3C               TO  SPRT-PRTDATA
            ELSE                          
-               MOVE    "HCM3D.red"         TO  SPRT-PRTID
+      *********MOVE    "HCM3D.red"         TO  SPRT-PRTID
+               MOVE    "HCM3DV01.red"       TO  SPRT-PRTID
                MOVE    HCM3D               TO  SPRT-PRTDATA
            END-IF    
            IF      WRK-PARA-MARUCHO    =   "2"
