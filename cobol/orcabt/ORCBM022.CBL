@@ -405,7 +405,7 @@ grpsys     COPY    "COMMON-SPA".
                MOVE    "社保総括表（改正版）"
                                    TO  JOB-SHELLMSG
            ELSE
-               MOVE    "未確定分・社保総括表（改正版）"
+               MOVE    "災害分・社保総括表（改正版）"
                                    TO  JOB-SHELLMSG
            END-IF
 grpsys     PERFORM 900-CALL-ORCSJOB-SEC
