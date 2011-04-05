@@ -119,6 +119,8 @@
            03  WRK-KENSU9          PIC ZZZZZ9.
            03  WRK-TENSU9          PIC ZZ,ZZZ,ZZ9.
            03  WRK-FTNMONEY9       PIC Z,ZZZ,ZZ9. 
+      *
+           03  WRK-SPRT-TITLE      PIC X(100).
       *             
            03  WRK-KOHKBN.
                05  WRK-KOHNUM      PIC X(04).
@@ -993,6 +995,14 @@
                                                    TO  SPRT-TITLE
                END-EVALUATE
            END-IF
+           IF      WRK-PARA-GENMENKBN  =   "1"
+               MOVE    SPRT-TITLE          TO  WRK-SPRT-TITLE
+               MOVE    SPACE               TO  SPRT-TITLE
+               STRING  "ºÒ³²Ê¬¡¦"          DELIMITED  BY  SIZE
+                       WRK-SPRT-TITLE      DELIMITED  BY  SPACE
+                                           INTO    SPRT-TITLE
+               END-STRING
+           END-IF 
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
