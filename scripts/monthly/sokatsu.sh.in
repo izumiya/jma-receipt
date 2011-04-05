@@ -8,7 +8,7 @@ if ! test -f "$JMARECEIPT_ENV"; then
 fi
 
 . $JMARECEIPT_ENV
--------------------------------------------#
+#-------------------------------------------#
 #    決定通知書作成
 #        CPCOMMONSHELL1.INC  
 #        $1 SRYYM TERID SYSYMD
