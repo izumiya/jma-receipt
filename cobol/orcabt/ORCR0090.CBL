@@ -1554,8 +1554,8 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
       *
       *        ºÒ³²ÂÐ±þ¡ÊÏ¢ÍíÀèµ­ºÜ¡Ë
                EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                   WHEN    1
-                   WHEN    5
+                   WHEN    6
+                   WHEN    7
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
                        MOVE    RECE02-HOME-POST

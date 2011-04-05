@@ -1745,8 +1745,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                WHEN    1
                    MOVE    "…‘æ‹°°"        TO  WRK-TITLE
                WHEN    2
+               WHEN    7
                    MOVE    "∫“£±°°"        TO  WRK-TITLE
                WHEN    3
+               WHEN    6
                    MOVE    "∫“≥≤°°"        TO  WRK-TITLE
                WHEN    4
                    MOVE    "∫“£≤°°"        TO  WRK-TITLE

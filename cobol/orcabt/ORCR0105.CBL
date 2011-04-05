@@ -2836,7 +2836,7 @@
       *
            IF      CNT-PAGE            =   1
                IF      RECE02-RJNGAIKOHFTN (1)   =   1   OR  2  OR  4
-                                                 OR  5
+                                                 OR  5   OR  7
                    MOVE    SPACE                TO  WRK-HC06-HEAD4-G
                    MOVE    HC06-HEAD4-G (5:)    TO  WRK-HC06-HEAD4-G
                    MOVE    SPACE                TO  HC06-HEAD4-G    
@@ -2850,6 +2850,7 @@
                    WHEN    1
                        MOVE    "（不詳）"  TO  HC06-HEAD5
                    WHEN    2
+                   WHEN    7
                        MOVE    "（災１）"  TO  HC06-HEAD5
                    WHEN    4
                        MOVE    "（災２）"  TO  HC06-HEAD5
@@ -6463,8 +6464,10 @@
                END-PERFORM
            END-IF
       *
-      *    災害対応（連絡先記載）
+      *    災害対応
            IF      RECE02-RJNGAIKOHFTN (1) =   1   OR  2   OR  4   OR  5
+                                           OR  6   OR  7
+      *
       *        摘要欄に記載されている場合１行あける
                IF      WRK-LINETEK     >   ZERO
                    IF      WRK-LINETEK     >=   WRK-TEKIYOU-LINE
@@ -6474,27 +6477,30 @@
                    END-IF
                END-IF
       *
-               EVALUATE    RECE02-RJNGAIKOHFTN (1)
+               IF      RECE02-RJNGAIKOHFTN (1) =   1   OR  2   OR  4
+                                               OR  5   OR  7
+                 EVALUATE    RECE02-RJNGAIKOHFTN (1)
                    WHEN    1
                       MOVE     "（不詳）"      TO  WRK-TITLE
                    WHEN    2
+                   WHEN    7
                        MOVE    "（災１）"      TO  WRK-TITLE
                    WHEN    4
                        MOVE    "（災２）"      TO  WRK-TITLE
                    WHEN    5
                        MOVE    "（不詳・災１）"
                                                TO  WRK-TITLE
-               END-EVALUATE
-               INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
+                 END-EVALUATE
+                 INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
       * 
-               IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
+                 IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
                    PERFORM 34120-PAGE-SEC
-               END-IF    
-               ADD     1                   TO  WRK-LINETEK
+                 END-IF    
+                 ADD     1                   TO  WRK-LINETEK
       *
-               IF      CNT-PAGE        =   1   
+                 IF      CNT-PAGE        =   1   
                    MOVE    WRK-TITLE       TO  HC06-TEKIYO (WRK-LINETEK)
-               ELSE                    
+                 ELSE                    
                    EVALUATE    SYS-2005-NEXTPRTKBN-G
                        WHEN    "0"   
                            MOVE  WRK-TITLE TO  HC06-TEKIYO (WRK-LINETEK)
@@ -6505,8 +6511,9 @@
                        WHEN    "3"   
                            MOVE  WRK-TITLE TO  HC063-TEKIYO(WRK-LINETEK)
                     END-EVALUATE
+                 END-IF
                END-IF
-      *                   
+      *
       *        震災以前一部負担金の記載（災２）
                IF      RECE02-RJNGAIKOHFTN (1) =   4
                    MOVE    SPACE               TO  WRK-TITLE
@@ -6553,7 +6560,8 @@
                    END-IF
                END-IF
       *                   
-               IF      RECE02-RJNGAIKOHFTN (1) =   1   OR  5
+      *        災害対応（連絡先記載）
+               IF      RECE02-RJNGAIKOHFTN (1) =   6   OR  7
                    IF    ( RECE02-HOME-POST1
                                            =   SPACE )
                    AND   ( RECE02-HOME-ADRS1
@@ -6804,7 +6812,7 @@
                            END-IF
                        END-IF
                    END-IF
-               END-IF    
+               END-IF
            END-IF
       *
       *    適用欄上段コメント（レセプト特記事項編集情報）

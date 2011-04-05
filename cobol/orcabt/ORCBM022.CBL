@@ -1865,39 +1865,15 @@ grpsys     PERFORM 900-DBFETCH-SEC
                            GO  TO  900-SEIKYU-READ-SEC
                        END-IF
                        IF      WRK-GENMENKBN           =   "0"
-                           EVALUATE    RECE10-ETC-YKZFTN (1)
-                               WHEN    2
-                               WHEN    3
-                               WHEN    4
-                                   CONTINUE
-                               WHEN    1
-                               WHEN    5
-                                   IF    ( RECE10-HKNNUM
-                                                   NOT =   SPACE      )
-                                   AND   ( RECE10-HKNJANUM
-                                                   NOT =   "00000000" )
-                                       CONTINUE
-                                   ELSE  
-                                       GO  TO  900-SEIKYU-READ-SEC
-                                   END-IF
-                           END-EVALUATE
+                           IF      RECE10-ETC-YKZFTN (1)   =   6   OR  7
+                               GO  TO  900-SEIKYU-READ-SEC
+                           END-IF
                        ELSE
-                           EVALUATE    RECE10-ETC-YKZFTN (1)
-                               WHEN    2
-                               WHEN    3
-                               WHEN    4
-                                   GO  TO  900-SEIKYU-READ-SEC
-                               WHEN    1
-                               WHEN    5
-                                   IF    ( RECE10-HKNNUM
-                                                   NOT =   SPACE      )
-                                   AND   ( RECE10-HKNJANUM
-                                                   NOT =   "00000000" )
-                                       GO  TO  900-SEIKYU-READ-SEC
-                                   ELSE  
-                                       CONTINUE
-                                   END-IF
-                           END-EVALUATE
+                           IF      RECE10-ETC-YKZFTN (1)   =   6   OR  7
+                               CONTINUE
+                           ELSE
+                               GO  TO  900-SEIKYU-READ-SEC
+                           END-IF
                        END-IF
                END-EVALUATE 
       *

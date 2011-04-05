@@ -1326,8 +1326,8 @@
       *
       *        災害対応（連絡先記載）
                EVALUATE    RECE62-RJNGAIKOHFTN (1)
-                   WHEN    1
-                   WHEN    5
+                   WHEN    6
+                   WHEN    7
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
                        MOVE    RECE62-HOME-POST
