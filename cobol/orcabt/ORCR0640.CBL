@@ -707,6 +707,10 @@
            03  FLG-GENMEN-NASI                         PIC 9(01).
            03  FLG-GENMEN-ARI2                         PIC 9(01).
            03  FLG-GENMEN-NASI2                        PIC 9(01).
+           03  FLG-SAIGAI-JGN-ETC1                     PIC 9(01).
+           03  FLG-SAIGAI-JGN-ETC2                     PIC 9(01).
+           03  FLG-SAIGAI-JGN-SEIHO                    PIC 9(01).
+           03  FLG-SAIGAI-ETC1-ARI                     PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -2843,6 +2847,56 @@
                END-IF
       *
                IF   RECE62-SRYYM   >=  "201007"
+                   IF  (RECE62-SRYYM          >= "201101")
+                   AND (RECE62-HKNNUM          =  SPACE  )
+                   AND (FLG-SAIGAI-TAISYO      =   1     )
+                   AND (RECE62-RJNGAIKOHFTN(1) =  2 OR 4 )
+      *              ¾å¸Â³Û³ÎÇ§
+                     MOVE     ZERO      TO    FLG-SAIGAI-JGN-ETC1
+                     MOVE     ZERO      TO    FLG-SAIGAI-JGN-ETC2
+                     MOVE     9         TO    FLG-SAIGAI-JGN-SEIHO
+                     MOVE     ZERO      TO    FLG-SAIGAI-ETC1-ARI
+                     PERFORM  VARYING  IDX-SAI  FROM   1   BY   1
+                               UNTIL   IDX-SAI    >    4
+                       IF  (RECE62-KOHNUM(IDX-SAI) NOT =  SPACE)
+                       AND (RECE62-KOHNUM(IDX-SAI) NOT = 
+                                                "972" AND "974")
+                         IF  RECE62-KOHNUM(IDX-SAI)  =  "010"
+                            MOVE   1    TO    FLG-SAIGAI-JGN-ETC1
+                         END-IF
+                         IF  RECE62-KOHNUM(IDX-SAI)  =
+                             "012" OR "015" OR "016" OR
+                             "024" OR "025" OR "038" OR "051" OR
+                             "052" OR "079" OR "011" OR "020"
+                            PERFORM   2117-SAIGAI-JGN-CHECK-SEC
+                         END-IF
+                       END-IF
+                     END-PERFORM
+                     EVALUATE   FLG-SAIGAI-JGN-SEIHO
+                       WHEN        ZERO
+                         IF  (FLG-SAIGAI-JGN-ETC2 =  1)
+                            CONTINUE
+                         ELSE
+                            MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                         END-IF
+                       WHEN        1
+                         IF ( FLG-SAIGAI-ETC1-ARI =  ZERO )
+                         OR ((FLG-SAIGAI-JGN-ETC1 =  1   ) AND
+                             (FLG-SAIGAI-ETC1-ARI =  1   ))
+                         OR ( FLG-SAIGAI-JGN-ETC2 =  1    )
+                            CONTINUE
+                         ELSE
+                            MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                         END-IF
+                       WHEN        9
+                         IF  (FLG-SAIGAI-JGN-ETC1 =  1)
+                         OR  (FLG-SAIGAI-JGN-ETC2 =  1)
+                            CONTINUE
+                         ELSE
+                            MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                         END-IF
+                     END-EVALUATE
+                   END-IF
                    IF   FLG-SAIGAI-TAISYO   =   1
                      IF  (RECE62-SRYYM          >= "201101")
                      AND (RECE62-RJNGAIKOHFTN(1) =  ZERO   )
@@ -2880,6 +2934,47 @@
            PERFORM     RECE62-REWRITE-SEC
            .
        210-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸øÈñÃ±ÆÈ¤ÎºÒ³²ÂÐ¾Ý¾å¸Â³Û¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2117-SAIGAI-JGN-CHECK-SEC      SECTION.
+      *
+           INITIALIZE                        LNK-ORCSJGNGET-REC
+           MOVE   RECE62-HOSPNUM         TO  LNK-ORCSJGNGET-HOSPNUM
+           MOVE   RECE62-NYUGAIKBN       TO  LNK-ORCSJGNGET-NYUGAIKBN
+           MOVE   RECE62-PTID            TO  LNK-ORCSJGNGET-PTID
+           MOVE   RECE62-KOHNUM(IDX-SAI) TO  LNK-ORCSJGNGET-KOHHKNNUM
+           MOVE   RECE62-KOHID(IDX-SAI)  TO  LNK-ORCSJGNGET-KOHID
+           MOVE   RECE62-SRYYM           TO  LNK-ORCSJGNGET-SRYYM
+           CALL    "ORCSJGNGET"          USING
+                                         LNK-ORCSJGNGET-REC
+                                         SPA-AREA
+           IF   LNK-ORCSJGNGET-RC  =  ZERO
+             IF   RECE62-KOHNUM(IDX-SAI)  =  "012" OR "025"
+               IF   LNK-ORCSJGNGET-NYUJGNGAK  NOT = ZERO
+                    MOVE     1     TO    FLG-SAIGAI-JGN-SEIHO
+               ELSE
+                    MOVE    ZERO   TO    FLG-SAIGAI-JGN-SEIHO
+               END-IF
+             ELSE
+               IF   RECE62-KOHNUM(IDX-SAI)  =  "015" OR "016"
+                                            OR "011" OR "020"
+                 IF   LNK-ORCSJGNGET-NYUJGNGAK  NOT = ZERO
+                    MOVE     1     TO    FLG-SAIGAI-JGN-ETC2
+                 END-IF
+               ELSE
+                 MOVE        1     TO    FLG-SAIGAI-ETC1-ARI
+                 IF   LNK-ORCSJGNGET-NYUJGNGAK  NOT = ZERO
+                    MOVE     1     TO    FLG-SAIGAI-JGN-ETC1
+                 END-IF
+               END-IF
+             END-IF
+           END-IF
+      *
+           .
+       2117-SAIGAI-JGN-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -15099,6 +15194,7 @@
                            RECE62-FTNMONEY(KOHFTN-IDX + 1)      )
                   AND (WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
                                       NOT =  ZERO               )
+                  AND (WK-GENGAKUKBN      =  ZERO               )
                     COMPUTE  WRK-FTNKEI2 =
                              RECE62-FTNMONEY(KOHFTN-IDX + 1)  +
                              WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
@@ -16426,7 +16522,8 @@
            END-PERFORM
       *
       *    ¸ºÌÈ¸øÈñÂÐ±þ
-           IF   WK-GENGAKUKBN    NOT =   ZERO
+           IF  (WK-GENGAKUKBN    NOT =   ZERO )
+           AND (WK-GENGAKUKBN    NOT = 3 AND 4)
              IF  (RECE62-SRYYM        >= "200709")
              AND (RECE62-HKNNUM    NOT =  SPACE  )
                IF (RECE62-KOHNUM(1) = "010" OR "012" OR "015" OR
