@@ -2676,6 +2676,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                             CONTINUE
                          ELSE
                             MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                            MOVE   ZERO   TO   RECE02-GENMENKBN
                          END-IF
                        WHEN        1
                          IF ( FLG-SAIGAI-ETC1-ARI =  ZERO )
@@ -2685,6 +2686,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                             CONTINUE
                          ELSE
                             MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                            MOVE   ZERO   TO   RECE02-GENMENKBN
                          END-IF
                        WHEN        9
                          IF  (FLG-SAIGAI-JGN-ETC1 =  1)
@@ -2692,6 +2694,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                             CONTINUE
                          ELSE
                             MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                            MOVE   ZERO   TO   RECE02-GENMENKBN
                          END-IF
                      END-EVALUATE
                    END-IF
