@@ -4077,22 +4077,6 @@
 	</widget>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>label516</name>
-	  <x>48</x>
-	  <y>96</y>
-	  <width>160</width>
-	  <height>24</height>
-	  <label>広域連合レセ電出力区分</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>RECEDEN_LST2KBN_COMBO</name>
 	  <x>204</x>
