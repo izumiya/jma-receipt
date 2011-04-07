@@ -58,6 +58,9 @@
       *                                     £²£°£°£·Ç¯£¹·î¡Á£±£²·îÂÐ¾Ý 
       *
       *  04.01.01    NACL-Æ£¸¶    07/10/24  Áí³çÉ½¤ÎÃÏÊý¸øÈñµ­ºÜÂÐ±þ
+      *
+      *  04.05.01    NACL-Æ£¸¶    11/04/04  ºÒ³²ÂÐ±þ
+      *                                     È÷¹ÍÍó¤Îµ­ºÜÅùÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -298,6 +301,17 @@
                05  SUM-GOK-TBL         OCCURS  4.
                    07  SUM-GOK-KENSU      PIC 9(06).    
                    07  SUM-GOK-SHOKENSU   PIC 9(06).
+      *
+      *        È÷¹ÍÍó¡ÊÌ¤³ÎÄêÊ¬¡Ë 
+               05  SUM-BIKOU. 
+                   07  SUM-BIKOU-KENSU          PIC  9(06).
+                   07  SUM-BIKOU-NISSU          PIC  9(06).
+                   07  SUM-BIKOU-TOTALTEN       PIC  9(10).
+                   07  SUM-BIKOU-FTNMONEY       PIC  9(10).
+                   07  SUM-BIKOU-SHOKUJIKENSU   PIC  9(06).
+                   07  SUM-BIKOU-SHOKUJINISSU   PIC  9(06).
+                   07  SUM-BIKOU-SHOKUJIRYOYOHI PIC  9(10).
+                   07  SUM-BIKOU-SHOKUJIFTN     PIC  9(10).
       *         
        01  WRK-PARA.
            COPY    "CPORCSPRTLNK.INC".
