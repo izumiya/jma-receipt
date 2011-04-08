@@ -510,6 +510,8 @@
       *  04.05.17    NACL-門脇    11/03/25  災害対応（災２対応）
       *  04.05.18    NACL-門脇    11/03/28  特定保険者＋精神、結核対応
       *                                     (233064)平成２３年３月まで
+      *  04.05.19    NACL-門脇    11/04/07  特定保険者＋精神、結核対応
+      *                                     (133280)平成２３年３月まで
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12803,14 +12805,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-EVALUATE
              END-IF
              IF ( RECE02-HKNJANUM(1:6)
-                           =  "133033" OR "133280" OR "133041" OR
+                           =  "133033" OR "133041" OR
                               "133066" OR "133074" OR "133090" OR
                               "133116" OR "133132" OR "133140" OR
                               "133157" OR "133165" OR "133173" OR
                               "133181" OR "133199" OR "133207" OR
                               "133223" OR "133249" OR "133256" OR
                               "133272" OR "283077" )
-             OR ((RECE02-HKNJANUM(1:6) =  "233064") AND
+             OR ((RECE02-HKNJANUM(1:6) =  "233064"
+                                       OR "133280") AND
                  (RECE02-SRYYM        <=  "201103"))
                IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
                OR  ((SYS-1001-PREFNUM      =   29     ) AND
@@ -14000,14 +14003,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                   IF  (RECE02-KOHNUM(KOHFTN-IDX) =  "010" OR "021"   )
                    IF ( RECE02-HKNJANUM(1:6)
-                                 =  "133033" OR "133280" OR "133041" OR
+                                 =  "133033" OR "133041" OR
                                     "133066" OR "133074" OR "133090" OR
                                     "133116" OR "133132" OR "133140" OR
                                     "133157" OR "133165" OR "133173" OR
                                     "133181" OR "133199" OR "133207" OR
                                     "133223" OR "133249" OR "133256" OR
                                     "133272" OR "283077" )
-                   OR ((RECE02-HKNJANUM(1:6) =  "233064") AND
+                   OR ((RECE02-HKNJANUM(1:6) =  "233064"
+                                             OR "133280") AND
                        (RECE02-SRYYM        <=  "201103"))
                     IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
                     OR  ((SYS-1001-PREFNUM      =   29     ) AND

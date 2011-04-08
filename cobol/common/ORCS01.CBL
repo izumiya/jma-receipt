@@ -337,6 +337,8 @@
       *  04.05.12    NACL-門脇    11/03/09  福島県地方公費対応
       *  04.05.13    NACL-門脇    11/03/28  特定保険者＋精神、結核対応
       *                                     (233064)平成２３年３月まで
+      *  04.05.14    NACL-門脇    11/04/07  特定保険者＋精神、結核対応
+      *                                     (133280)平成２３年３月まで
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -6478,14 +6480,15 @@
                PERFORM  PTHKNINF-READ-SEC
                IF      FLG-PTHKNINF   =     ZERO
                   IF ( PTHKN-HKNJANUM(1:6)  =
-                              "133033" OR "133280" OR "133041" OR
+                              "133033" OR "133041" OR
                               "133066" OR "133074" OR "133090" OR
                               "133116" OR "133132" OR "133140" OR
                               "133157" OR "133165" OR "133173" OR
                               "133181" OR "133199" OR "133207" OR
                               "133223" OR "133249" OR "133256" OR
                               "133272" OR "283077"      )
-                  OR ((PTHKN-HKNJANUM(1:6)  =  "233064") AND
+                  OR ((PTHKN-HKNJANUM(1:6)  =  "233064"
+                                            OR "133280") AND
                       (LNK-SYU-SRYYMD(1:6) <=  "201103"))
                     IF ( COMB-KOH1HKNNUM     = "027"    )
                     OR ((WK-1001-PREFNUM     =  29     ) AND
