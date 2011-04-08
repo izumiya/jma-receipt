@@ -43,6 +43,7 @@
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    10/03/03  平成２２年４月改正対応
       *  04.05.03    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
+      *  04.05.04    NACL-藤原    11/04/08  傷病名の記載順対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -95,7 +96,8 @@
       *    病名ファイル    
        FD  RECE83-FILE.
        01  RECE83-REC.
-           COPY    "CPRCF083.INC".
+           COPY    "CPRCF0831.INC" REPLACING  //RECE831//
+                                   BY         //RECE83//.
       *
       *    点数摘要欄ファイル
        FD  RECE87-FILE.
@@ -587,7 +589,7 @@
            MOVE    WRK-PARA-TERMID     TO  RECE82PARA-TERMID
 grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE82PARA-HOSPNUM
       *
-           MOVE    "RECE830"           TO  RECE83PARA-FILE-ID
+           MOVE    "RECE831"           TO  RECE83PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE83PARA-TERMID
 grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE83PARA-HOSPNUM
       *
