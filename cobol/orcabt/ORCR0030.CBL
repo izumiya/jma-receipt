@@ -512,6 +512,11 @@
       *                                     (233064)Ê¿À®£²£³Ç¯£³·î¤Þ¤Ç
       *  04.05.19    NACL-ÌçÏÆ    11/04/07  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (133280)Ê¿À®£²£³Ç¯£³·î¤Þ¤Ç
+      *  04.05.20    NACL-ÌçÏÆ    11/04/08  ¿·³ã¸©ÃÏÊý¸øÈñÂÐ±þ
+      *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.05.21    NACL-ÌçÏÆ    11/04/11  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
+      *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10189,7 +10194,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27          ) AND
+           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27 OR 15    ) AND
                 (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
@@ -10270,7 +10275,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27          ) AND
+           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27 OR 15    ) AND
                 (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
@@ -11119,10 +11124,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        (RECE02-KOHNUM(KH-IDX - 1)
                                      NOT = "100" AND "200"))
                 OR    ((RECE02-ZAITAKU       =  "1" OR "2") AND
-                       (RECE02-SRYYM        >=  "200810"  ) AND
-                       (SYS-1001-PREFNUM     =   01       ) AND
-                       (RECE02-KOHNUM(KH-IDX - 1) = "183" ))
-                OR    ((RECE02-ZAITAKU       =  "1" OR "2") AND
                        (SYS-1001-PREFNUM     =   13       ) AND
                        (RECE02-KOHNUM(KH-IDX - 1) =
                          "180" OR "380" OR "181" OR "381" ))
@@ -11934,9 +11935,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ***          OR  ((SYS-1001-PREFNUM        =   33           ) AND
       ***               (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
       ***                                       >= "1" AND <=  "8"))
-                   OR  ((SYS-1001-PREFNUM          =  01          ) AND
-                        (RECE02-KOHNUM(KOHFTN-IDX) = "183"        ) AND
-                        (RECE02-SRYYM             >= "200810"     ))
                    OR  ( TBL-TOKATUKAIFLG(KOHFTN-IDX)   =  1       )
                       MOVE  WRK-TAIHI-FTNMONEY    (KOHFTN-IDX + 1)
                                 TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
