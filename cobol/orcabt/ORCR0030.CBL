@@ -517,6 +517,8 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.05.21    NACL-ÌçÏÆ    11/04/11  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
       *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.05.22    NACL-ÌçÏÆ    11/04/11  ÂçºåÉÜÃÏÊý¸øÈñ¤Ë´Ø¤ï¤ëÊÝ¸±Íó
+      *                                     ¤Îµ­ºÜÂÐ±þ¡Ê¸å´ü¹âÎð¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12556,6 +12558,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *      ÂçºåÉÜÃÏÊý¸øÈñ
              WHEN    "27"
+               IF  (FLG-ZENKOKUKOHI-NISYU  =  2)
+               AND (RECE02-TEISYUTUSAKI    =  6)
+                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE02-TOTALTEN(2)
+                                           + RECE02-HENTOTALTEN(3)
+                 IF  (RECE02-TOTALTEN(1) NOT = RECE02-TOTALTEN(2))
+                 AND ((RECE02-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
+                      (RECE02-TOTALTEN(1)  =
+                                          RECE02-HENTOTALTEN(3)) )
+                          MOVE     3       TO   FLG-CHIIKI
+                          PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
+                 END-IF
+               END-IF
                IF  (FLG-ZENKOKUKOHI-NISYU  =  2 OR 3)
                AND (RECE02-TEISYUTUSAKI    =  2 OR 6)
                  IF  ((RECE02-KOHNUM(1)(1:1)  =  "0"              ) AND
@@ -13459,6 +13473,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE  WRK-CHK-KOKIGAK3  TO  RECE02-ZAITAKU-SAIKEI2
                IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
                   MOVE   999999999     TO  RECE02-ZAITAKU-SAIKEI2
+               END-IF
+             END-IF
+             IF   FLG-CHIIKI    =   3
+               MOVE  WRK-CHK-KOKIGAK3  TO  RECE02-ZAITAKU-SAIKEI2
+               IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
+                  MOVE       1         TO  RECE02-YOBIETC(7)
                END-IF
              END-IF
       *

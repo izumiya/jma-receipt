@@ -499,6 +499,8 @@
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.05.25    NACL-ÌçÏÆ    11/04/11  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
       *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.05.26    NACL-ÌçÏÆ    11/04/11  ÂçºåÉÜÃÏÊý¸øÈñ¤Ë´Ø¤ï¤ëÊÝ¸±Íó
+      *                                     ¤Îµ­ºÜÂÐ±þ¡Ê¸å´ü¹âÎð¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17122,6 +17124,23 @@
                END-IF
       *      ÂçºåÉÜÃÏÊý¸øÈñ
              WHEN    "27"
+               IF  (FLG-ZENKOKUKOHI-NISYU  =  2)
+               AND (RECE62-TEISYUTUSAKI    =  6)
+                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
+                                           + RECE62-HENTOTALTEN(3)
+                 IF  (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+                 AND ((RECE62-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
+                      (RECE62-TOTALTEN(1)  =
+                                          RECE62-HENTOTALTEN(3)) )
+                      IF   RECE62-KYURATE   NOT =    30
+                          MOVE     3       TO   FLG-CHIIKI
+                          PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
+                      ELSE
+                          MOVE     3       TO   FLG-CHIIKI
+                          PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
+                      END-IF
+                 END-IF
+               END-IF
                IF  (FLG-ZENKOKUKOHI-NISYU  =  2 OR 3)
                AND (RECE62-TEISYUTUSAKI    =  2 OR 6)
                  IF  ((RECE62-KOHNUM(1)(1:1)  =  "0"              ) AND
@@ -18114,6 +18133,12 @@
                   MOVE   999999999     TO  RECE62-KOUREI-SAIKEI2
                END-IF
              END-IF
+             IF   FLG-CHIIKI    =   3
+               MOVE  WRK-CHK-KOKIGAK3  TO  RECE62-KOUREI-SAIKEI2
+               IF    RECE62-KOUREI-SAIKEI2  =   ZERO
+                  MOVE       1         TO  RECE62-YOBIETC(7)
+               END-IF
+             END-IF
       *
              IF   FLG-KOH  =   2
                COMPUTE  RECE62-FTNMONEY(2) = WRK-CHK-KOKIGAK2
@@ -18255,6 +18280,12 @@
                MOVE  WRK-CHK-KOKIGAK7  TO  RECE62-KOUREI-SAIKEI2
                IF    RECE62-KOUREI-SAIKEI2  =   ZERO
                   MOVE   999999999     TO  RECE62-KOUREI-SAIKEI2
+               END-IF
+             END-IF
+             IF   FLG-CHIIKI    =   3
+               MOVE  WRK-CHK-KOKIGAK7  TO  RECE62-KOUREI-SAIKEI2
+               IF    RECE62-KOUREI-SAIKEI2  =   ZERO
+                  MOVE       1         TO  RECE62-YOBIETC(7)
                END-IF
              END-IF
       *
