@@ -191,6 +191,10 @@
       *                                     併用から単独になったときのまとめ
       *  04.05.09    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.10    NACL-藤原    11/04/08  奈良県対応
+      *                                     国保、後期高齢者のとき
+      *                                     法別７１、８１、９１は公費請
+      *                                     求書も作成する  
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1371,6 +1375,23 @@ grpsys                                             SPA-AREA
                        AND   ( SYS-1001-PREFNUM
                                                =   "40"              )
                        AND   ( HKN-HBTNUM  NOT =   "41"              )    
+                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
+                                               >=  "1" AND <=  "8"   )
+                           ADD     1                      TO  IDZ    
+                           MOVE    COMB-KOHHKNNUM (IDX)   TO 
+                                          WRK-SEIKYU-KOHHKNNUM(2 IDZ)
+                           MOVE    COMB-KOHID     (IDX)   TO
+                                          WRK-SEIKYU-KOHID    (2 IDZ)
+                           MOVE    1                      TO  FLG-KOH 
+                       END-IF
+      *                奈良県の国保、後期高齢者のとき
+      *               （法別７１（乳幼児）、８１（障害）、９１（母子））
+                       IF    ( COMB-HKNNUM     =   "060"   OR  "067"
+                                               OR  "039"             )
+                       AND   ( SYS-1001-PREFNUM
+                                               =   "29"              )
+                       AND   ( HKN-HBTNUM      =   "71"    OR  "81"
+                                               OR  "91"              )    
                        AND   ( COMB-KOHHKNNUM(IDX)(1:1)
                                                >=  "1" AND <=  "8"   )
                            ADD     1                      TO  IDZ    
