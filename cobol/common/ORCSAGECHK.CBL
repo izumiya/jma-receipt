@@ -719,6 +719,35 @@
                   (COMB-KOH4HKNNUM     =   "053" ))
                MOVE    1               TO  FLG-OK2
            END-IF
+      *    結３４などのみの時
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "010" )  OR
+                  (COMB-KOH2HKNNUM     =   "010" )  OR
+                  (COMB-KOH3HKNNUM     =   "010" )  OR
+                  (COMB-KOH4HKNNUM     =   "010" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "030" )  OR
+                  (COMB-KOH2HKNNUM     =   "030" )  OR
+                  (COMB-KOH3HKNNUM     =   "030" )  OR
+                  (COMB-KOH4HKNNUM     =   "030" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "024" )  OR
+                  (COMB-KOH2HKNNUM     =   "024" )  OR
+                  (COMB-KOH3HKNNUM     =   "024" )  OR
+                  (COMB-KOH4HKNNUM     =   "024" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "079" )  OR
+                  (COMB-KOH2HKNNUM     =   "079" )  OR
+                  (COMB-KOH3HKNNUM     =   "079" )  OR
+                  (COMB-KOH4HKNNUM     =   "079" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
       *!!!!
       *    高齢者非該当あり
            IF      FLG-HI-ROUJIN2      =   1
