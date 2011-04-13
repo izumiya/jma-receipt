@@ -3766,8 +3766,7 @@
            OR  ( LNK-SYU-SRYYMD(1:6)       >=  "201101" )
       *
             IF  (COMB-SYU-HKNKOHSBTKBN   =  "8" OR "9"  )
-            OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
-                              OR "068" OR "069" OR "040")
+            OR  (COMB-HKNNUM  =  "971" OR "973" OR "975")
               CONTINUE
             ELSE
               PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
@@ -3857,13 +3856,17 @@
             IF   WK-GENGAKUKBN    =   2
                    MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
-            IF   COMB-HKNNUM      =   SPACE
+            IF  (COMB-HKNNUM  =   SPACE                 )
+            OR  (COMB-HKNNUM  =  "068" OR "069" OR "040")
               IF  (WK-GENGAKUKBN      =   3 OR 4)
               AND (FLG-SAIGAI-TAISYO  =   1     )
                    CONTINUE
               ELSE
                    MOVE     ZERO    TO    WK-GENGAKUKBN
               END-IF
+            END-IF
+            IF   COMB-HKNNUM  =  "004"
+                   MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
             IF   FLG-SAIGAI-TAISYO  =   1
               EVALUATE   WK-GENGAKUKBN

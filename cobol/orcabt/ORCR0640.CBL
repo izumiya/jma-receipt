@@ -3013,7 +3013,6 @@
            AND  (RECE62-HKNNUM   NOT =   SPACE  )
       *
             IF  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91" )
-            OR  (RECE62-HKNNUM       =   "068" OR "069" OR "040")
               CONTINUE
             ELSE
               MOVE      RECE62-SRYYM          TO   WK-GENGAKU-YM
@@ -3048,6 +3047,19 @@
       *
             IF   RECE62-SRYYM   >=  "201007"
               PERFORM  2115-SAIGAI-TAISYO-HANTEI-SEC
+            END-IF
+      *
+            IF   RECE62-HKNNUM   =   "068" OR "069" OR "040"
+              IF   (WK-GENGAKUKBN      =   3 OR 4)
+              AND  (FLG-SAIGAI-TAISYO  =   1     )
+                CONTINUE
+              ELSE
+                MOVE     ZERO    TO    WK-GENGAKUKBN
+              END-IF
+            END-IF
+      *
+            IF   RECE62-HKNNUM   =   "004"
+                MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
       *
            END-IF
@@ -19735,7 +19747,6 @@
       *
            IF     RECE62-HKNNUM   NOT =   SPACE
              IF  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91" )
-             OR  (RECE62-HKNNUM       =   "068" OR "069" OR "040")
                CONTINUE
              ELSE
                MOVE      RECE62-SRYYM       TO   WK-GENGAKU-YM

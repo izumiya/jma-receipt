@@ -3342,7 +3342,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            AND  (RECE02-HKNNUM   NOT =   SPACE  )
       *
             IF  (RECE02-HKNNUM(1:2)  =   "98"  OR "90"  OR "91" )
-            OR  (RECE02-HKNNUM       =   "068" OR "069" OR "040")
               CONTINUE
             ELSE
               MOVE      RECE02-SRYYM          TO   WK-GENGAKU-YM
@@ -3377,6 +3376,19 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
             IF   RECE02-SRYYM   >=  "201007"
               PERFORM  211L-SAIGAI-TAISYO-HANTEI-SEC
+            END-IF
+      *
+            IF   RECE02-HKNNUM   =   "068" OR "069" OR "040"
+              IF   (WK-GENGAKUKBN      =   3 OR 4)
+              AND  (FLG-SAIGAI-TAISYO  =   1     )
+                CONTINUE
+              ELSE
+                MOVE     ZERO    TO    WK-GENGAKUKBN
+              END-IF
+            END-IF
+      *
+            IF   RECE02-HKNNUM   =   "004"
+                MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
       *
            END-IF
@@ -14745,7 +14757,6 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            IF     RECE02-HKNNUM   NOT =   SPACE
              IF  (RECE02-HKNNUM(1:2)  =   "98"  OR "90"  OR "91" )
-             OR  (RECE02-HKNNUM       =   "068" OR "069" OR "040")
                CONTINUE
              ELSE
                MOVE      RECE02-SRYYM       TO   WK-GENGAKU-YM
