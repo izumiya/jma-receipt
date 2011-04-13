@@ -276,17 +276,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B03</name>
+      <name>TBL_R</name>
       <x>480</x>
       <y>310</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F3</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -299,17 +294,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B04</name>
+      <name>TBL_L</name>
       <x>480</x>
       <y>380</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F4</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -322,17 +312,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B05</name>
+      <name>ALL_R</name>
       <x>480</x>
       <y>240</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F5</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -345,17 +330,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B06</name>
+      <name>ALL_L</name>
       <x>480</x>
       <y>450</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F6</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>

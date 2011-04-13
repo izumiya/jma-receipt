@@ -394,12 +394,16 @@ grpsys     03  FILLER              PIC X(04)   VALUE   ".dat".
                WHEN    "CLICKED"       ALSO    "B01"
                    PERFORM 210-BACK
                WHEN    "CLICKED"       ALSO    "B03"
+               WHEN    "CLICKED"       ALSO    "TBL_R"
                    PERFORM T-001-CHUSYUTU-SEC
                WHEN    "CLICKED"       ALSO    "B04"
+               WHEN    "CLICKED"       ALSO    "TBL_L"
                    PERFORM T-001-TORIYAME-SEC
                WHEN    "CLICKED"       ALSO    "B05"
+               WHEN    "CLICKED"       ALSO    "ALL_R"
                    PERFORM T-002-CHUSYUTU-SEC
                WHEN    "CLICKED"       ALSO    "B06"
+               WHEN    "CLICKED"       ALSO    "ALL_L"
                    PERFORM T-002-TORIYAME-SEC
                WHEN    "CLICKED"       ALSO    "B11"
                    PERFORM 530-RIDSET3-SEC

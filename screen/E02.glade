@@ -467,17 +467,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B03</name>
+      <name>TBL_R</name>
       <x>480</x>
       <y>310</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F3</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -490,17 +485,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B04</name>
+      <name>TBL_L</name>
       <x>480</x>
       <y>380</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F4</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -513,17 +503,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B05</name>
+      <name>ALL_R</name>
       <x>480</x>
       <y>240</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F5</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -536,17 +521,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B06</name>
+      <name>ALL_L</name>
       <x>480</x>
       <y>450</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F6</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -651,17 +631,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B07</name>
+      <name>KOUMOKU_UP</name>
       <x>960</x>
       <y>250</y>
       <width>24</width>
       <height>70</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F7</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>
@@ -674,17 +649,12 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>B08</name>
+      <name>KOUMOKU_DOWN</name>
       <x>960</x>
       <y>400</y>
       <width>24</width>
       <height>70</height>
       <can_focus>True</can_focus>
-      <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F8</key>
-	<signal>clicked</signal>
-      </accelerator>
       <signal>
 	<name>clicked</name>
 	<handler>send_event</handler>

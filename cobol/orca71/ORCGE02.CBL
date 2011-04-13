@@ -497,16 +497,22 @@ grpsys             MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG5
                        PERFORM T-000-SETTABLE-SEC
                    END-IF
                WHEN    "CLICKED"       ALSO    "B03"
+               WHEN    "CLICKED"       ALSO    "TBL_R"
                    PERFORM T-001-CHUSYUTU-SEC
                WHEN    "CLICKED"       ALSO    "B04"
+               WHEN    "CLICKED"       ALSO    "TBL_L"
                    PERFORM T-001-TORIYAME-SEC
                WHEN    "CLICKED"       ALSO    "B05"
+               WHEN    "CLICKED"       ALSO    "ALL_R"
                    PERFORM T-002-CHUSYUTU-SEC
                WHEN    "CLICKED"       ALSO    "B06"
+               WHEN    "CLICKED"       ALSO    "ALL_L"
                    PERFORM T-002-TORIYAME-SEC
                WHEN    "CLICKED"       ALSO    "B07"
-                   PERFORM T-002-AGARU-SEC
+               WHEN    "CLICKED"       ALSO    "KOUMOKU_UP"
+                  PERFORM T-002-AGARU-SEC
                WHEN    "CLICKED"       ALSO    "B08"
+               WHEN    "CLICKED"       ALSO    "KOUMOKU_DOWN"
                    PERFORM T-002-SAGARU-SEC
                WHEN    "CLICKED"       ALSO    "B11"
                    PERFORM T-001-WRITCHEK-SEC
