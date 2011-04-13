@@ -1224,6 +1224,7 @@
                    PERFORM 490-TOROKU-SEC
       *    Í½Ìó¥á¥âÅÐÏ¿
                WHEN    "CLICKED"       ALSO    "B10"
+               WHEN    "CLICKED"       ALSO    "B10C"
                    PERFORM 4100-Y011-SYORI-SEC
            END-EVALUATE
       *
