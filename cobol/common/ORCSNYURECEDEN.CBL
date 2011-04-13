@@ -134,6 +134,7 @@
            03  FLG-TENSUWRK                PIC 9(01).
            03  FLG-TOKU-SET                PIC 9(01).
            03  FLG-TOKU-SHOKU              PIC 9(01).
+           03  FLG-PTKOHINF                PIC 9(01).
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -155,6 +156,9 @@
            03  MATOME-IDX                  PIC 9(04).
            03  CIDX                        PIC 9(04).
            03  CIDX2                       PIC 9(04).
+           03  IDX-SAIGAI                  PIC 9(02).
+           03  IDX-SAIGAI-ST               PIC 9(02).
+           03  IDX-SAIGAI-ED               PIC 9(02).
       *
       *    ¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
        01  CONSTANT-AREA.
@@ -501,6 +505,12 @@
                    07  WRK-RYOYO-DAY-ST        PIC  9(02).
                    07  WRK-RYOYO-DAY-ED        PIC  9(02).
       *
+      *    ºÒ³²ÂÐ±þÎÎ°è¡Ê¿©»öÉéÃ´¡¢À¸³èÎÅÍÜÉéÃ´¤òµ­Ï¿¤·¤Ê¤¤È½ÄêÍÑ¡Ë
+           03  WRK-SAIGAI-AREA.
+               07  WRK-SAIGAI-962              PIC X(01)  OCCURS  31.
+               07  WRK-SAIGAI-963              PIC X(01)  OCCURS  31.
+               07  WRK-SAIGAI-959              PIC X(01)  OCCURS  31.
+      *
       *    ÆüÉÕÁ´³ÑÊÑ´¹ÎÎ°è
        01  TBL-DAY-AREA.
            03  FILLER              PIC X(04)  VALUE "£°£±".
@@ -572,6 +582,10 @@
       *    ´µ¼Ô¥Þ¥¹¥¿¡Ý
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
+      *
+      *    ´µ¼Ô¸øÈñ¾ðÊó¥Þ¥¹¥¿¡Ý
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
       *
       *    ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
        01  HKNCOMBI-REC.
@@ -3515,6 +3529,249 @@
                 END-IF
            END-PERFORM
       *
+      *    ºÒ³²ÂÐ±þ¡Ê£¹£¶£²ÌÈ½ü¡¢£¹£¶£³Í±Í½¡¢£¹£µ£¹ºÒ³²¤ò¸øÈñ¤è¤ê¼èÆÀ¡Ë
+           MOVE    SPACE                    TO  WRK-SAIGAI-AREA
+           IF      LNK-NYURECEDEN-SANTEIYM  >=  "201101"
+      *        £¹£¶£²ÌÈ½ü¤Î¥Á¥§¥Ã¥¯
+               INITIALIZE                          PTKOHINF-REC
+               MOVE    LNK-NYURECEDEN-HOSPNUM  TO  PTKOH-HOSPNUM
+               MOVE    LNK-NYURECEDEN-PTID     TO  PTKOH-PTID
+               MOVE    "962"                   TO  PTKOH-KOHNUM
+               MOVE    "tbl_ptkohinf"          TO  MCP-TABLE
+               MOVE    "key4"                  TO  MCP-PATHNAME
+               PERFORM 910-PTKOHINF-SELECT-SEC
+               IF      FLG-PTKOHINF            =   ZERO
+                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                       MOVE    "key4"               TO  MCP-PATHNAME
+                       PERFORM   910-PTKOHINF-READ-SEC
+                       PERFORM   UNTIL   (FLG-PTKOHINF   =   1)
+                           IF    PTKOH-SAKJOKBN     =    SPACE
+                               IF  (PTKOH-TEKSTYMD(1:6) <
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  <
+                                          PTKOH-TEKEDYMD(1:6))
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM   1   BY   1
+                                       UNTIL   IDX-SAIGAI   >  31
+                                         MOVE  "1"  TO   WRK-SAIGAI-962
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) =
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  <
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE     PTKOH-TEKSTYMD(7:2)
+                                                     TO   IDX-SAIGAI-ST
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  IDX-SAIGAI-ST  BY 1
+                                       UNTIL   IDX-SAIGAI   >  31
+                                         MOVE  "1"  TO   WRK-SAIGAI-962
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) <
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  =
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE      PTKOH-TEKEDYMD(7:2)
+                                                    TO   IDX-SAIGAI-ED
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  1   BY  1
+                                       UNTIL   IDX-SAIGAI   >
+                                                          IDX-SAIGAI-ED
+                                         MOVE  "1"  TO   WRK-SAIGAI-962
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) =
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  =
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE     PTKOH-TEKSTYMD(7:2)
+                                                     TO   IDX-SAIGAI-ST
+                                     MOVE     PTKOH-TEKEDYMD(7:2)
+                                                     TO   IDX-SAIGAI-ED
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  IDX-SAIGAI-ST  BY 1
+                                       UNTIL   IDX-SAIGAI   >
+                                                         IDX-SAIGAI-ED
+                                         MOVE  "1"  TO   WRK-SAIGAI-962
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                           END-IF
+                       MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                       MOVE    "key4"           TO  MCP-PATHNAME
+                       PERFORM 910-PTKOHINF-READ-SEC
+                       END-PERFORM
+               END-IF
+      *        ´µ¼Ô¸øÈñ¾ðÊó¥¯¥í¡¼¥º
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
+      *        £¹£¶£³Í±Í½¤Î¥Á¥§¥Ã¥¯
+               INITIALIZE                          PTKOHINF-REC
+               MOVE    LNK-NYURECEDEN-HOSPNUM  TO  PTKOH-HOSPNUM
+               MOVE    LNK-NYURECEDEN-PTID     TO  PTKOH-PTID
+               MOVE    "963"                   TO  PTKOH-KOHNUM
+               MOVE    "tbl_ptkohinf"          TO  MCP-TABLE
+               MOVE    "key4"                  TO  MCP-PATHNAME
+               PERFORM 910-PTKOHINF-SELECT-SEC
+               IF      FLG-PTKOHINF            =   ZERO
+                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                       MOVE    "key4"               TO  MCP-PATHNAME
+                       PERFORM   910-PTKOHINF-READ-SEC
+                       PERFORM   UNTIL   (FLG-PTKOHINF   =   1)
+                           IF    PTKOH-SAKJOKBN     =    SPACE
+                               IF  (PTKOH-TEKSTYMD(1:6) <
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  <
+                                          PTKOH-TEKEDYMD(1:6))
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM   1   BY   1
+                                       UNTIL   IDX-SAIGAI   >  31
+                                         MOVE  "1"  TO   WRK-SAIGAI-963
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) =
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  <
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE     PTKOH-TEKSTYMD(7:2)
+                                                     TO   IDX-SAIGAI-ST
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  IDX-SAIGAI-ST  BY 1
+                                       UNTIL   IDX-SAIGAI   >  31
+                                         MOVE  "1"  TO   WRK-SAIGAI-963
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) <
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  =
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE      PTKOH-TEKEDYMD(7:2)
+                                                    TO   IDX-SAIGAI-ED
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  1   BY  1
+                                       UNTIL   IDX-SAIGAI   >
+                                                          IDX-SAIGAI-ED
+                                         MOVE  "1"  TO   WRK-SAIGAI-963
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) =
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  =
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE     PTKOH-TEKSTYMD(7:2)
+                                                     TO   IDX-SAIGAI-ST
+                                     MOVE     PTKOH-TEKEDYMD(7:2)
+                                                     TO   IDX-SAIGAI-ED
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  IDX-SAIGAI-ST  BY 1
+                                       UNTIL   IDX-SAIGAI   >
+                                                         IDX-SAIGAI-ED
+                                         MOVE  "1"  TO   WRK-SAIGAI-963
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                           END-IF
+                           MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                           MOVE    "key4"           TO  MCP-PATHNAME
+                           PERFORM 910-PTKOHINF-READ-SEC
+                       END-PERFORM
+               END-IF
+      *        ´µ¼Ô¸øÈñ¾ðÊó¥¯¥í¡¼¥º
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
+      *        £¹£µ£¹ºÒ³²¤Î¥Á¥§¥Ã¥¯
+               INITIALIZE                          PTKOHINF-REC
+               MOVE    LNK-NYURECEDEN-HOSPNUM  TO  PTKOH-HOSPNUM
+               MOVE    LNK-NYURECEDEN-PTID     TO  PTKOH-PTID
+               MOVE    "959"                   TO  PTKOH-KOHNUM
+               MOVE    "tbl_ptkohinf"          TO  MCP-TABLE
+               MOVE    "key4"                  TO  MCP-PATHNAME
+               PERFORM 910-PTKOHINF-SELECT-SEC
+               IF      FLG-PTKOHINF            =   ZERO
+                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                       MOVE    "key4"               TO  MCP-PATHNAME
+                       PERFORM   910-PTKOHINF-READ-SEC
+                       PERFORM   UNTIL   (FLG-PTKOHINF   =   1)
+                           IF    PTKOH-SAKJOKBN     =    SPACE
+                               IF  (PTKOH-TEKSTYMD(1:6) <
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  <
+                                          PTKOH-TEKEDYMD(1:6))
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM   1   BY   1
+                                       UNTIL   IDX-SAIGAI   >  31
+                                         MOVE  "1"  TO   WRK-SAIGAI-959
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) =
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  <
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE     PTKOH-TEKSTYMD(7:2)
+                                                     TO   IDX-SAIGAI-ST
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  IDX-SAIGAI-ST  BY 1
+                                       UNTIL   IDX-SAIGAI   >  31
+                                         MOVE  "1"  TO   WRK-SAIGAI-959
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) <
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  =
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE      PTKOH-TEKEDYMD(7:2)
+                                                    TO   IDX-SAIGAI-ED
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  1   BY  1
+                                       UNTIL   IDX-SAIGAI   >
+                                                          IDX-SAIGAI-ED
+                                         MOVE  "1"  TO   WRK-SAIGAI-959
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                               IF  (PTKOH-TEKSTYMD(1:6) =
+                                          LNK-NYURECEDEN-SANTEIYM) AND
+                                   (LNK-NYURECEDEN-SANTEIYM  =
+                                          PTKOH-TEKEDYMD(1:6))
+                                     MOVE     PTKOH-TEKSTYMD(7:2)
+                                                     TO   IDX-SAIGAI-ST
+                                     MOVE     PTKOH-TEKEDYMD(7:2)
+                                                     TO   IDX-SAIGAI-ED
+                                     PERFORM   VARYING  IDX-SAIGAI
+                                               FROM  IDX-SAIGAI-ST  BY 1
+                                       UNTIL   IDX-SAIGAI   >
+                                                         IDX-SAIGAI-ED
+                                         MOVE  "1"  TO   WRK-SAIGAI-959
+                                                            (IDX-SAIGAI)
+                                     END-PERFORM
+                               END-IF
+                           END-IF
+                           MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                           MOVE    "key4"           TO  MCP-PATHNAME
+                           PERFORM 910-PTKOHINF-READ-SEC
+                       END-PERFORM
+               END-IF
+      *        ´µ¼Ô¸øÈñ¾ðÊó¥¯¥í¡¼¥º
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
+           END-IF
+      *
+      *
       *    ¿©»ö¾ðÊó¤ÎÊÔ½¸
            IF   LNK-NYURECEDEN-SANTEIYM  <=  "200603"
                PERFORM   2101-SHOKUJI-HENSHU1-SEC
@@ -5604,6 +5861,12 @@
                    ADD   1             TO  WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
                END-IF
       *        ¿©»öÉéÃ´¡ÊÄ«¡Ë
+               IF  ((WRK-SAIGAI-962(IDX1)   =   "1")    AND
+                    (WRK-SAIGAI-959(IDX1)   =   "1"))   OR
+                   ((WRK-SAIGAI-963(IDX1)   =   "1")    AND
+                    (WRK-SAIGAI-959(IDX1)   =   "1"))
+                     MOVE     SPACE    TO   WRK-SKJFTN2-SRYCD(IDX1)
+               END-IF
                IF    WRK-SKJFTN2-SRYCD(IDX1)  NOT =   SPACE
                    MOVE  WRK-SKJFTN2-SRYCD(IDX1)
                                        TO  WRK-SKJ7-SKJFTN(IDX1)
@@ -5641,6 +5904,12 @@
                    ADD   1             TO  WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
                END-IF
       *        ¿©»öÉéÃ´¡ÊÃë¡Ë
+               IF  ((WRK-SAIGAI-962(IDX1)   =   "1")    AND
+                    (WRK-SAIGAI-959(IDX1)   =   "1"))   OR
+                   ((WRK-SAIGAI-963(IDX1)   =   "1")    AND
+                    (WRK-SAIGAI-959(IDX1)   =   "1"))
+                     MOVE     SPACE    TO   WRK-SKJFTN2-SRYCD(IDX2)
+               END-IF
                IF    WRK-SKJFTN2-SRYCD(IDX2)  NOT =   SPACE
                    MOVE  WRK-SKJFTN2-SRYCD(IDX2)
                                        TO  WRK-SKJ7-SKJFTN(IDX1)
@@ -5678,6 +5947,12 @@
                    ADD   1             TO  WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
                END-IF
       *        ¿©»öÉéÃ´¡ÊÍ¼¡Ë
+               IF  ((WRK-SAIGAI-962(IDX1)   =   "1")    AND
+                    (WRK-SAIGAI-959(IDX1)   =   "1"))   OR
+                   ((WRK-SAIGAI-963(IDX1)   =   "1")    AND
+                    (WRK-SAIGAI-959(IDX1)   =   "1"))
+                     MOVE     SPACE    TO   WRK-SKJFTN2-SRYCD(IDX3)
+               END-IF
                IF    WRK-SKJFTN2-SRYCD(IDX3)  NOT =   SPACE
                    MOVE  WRK-SKJFTN2-SRYCD(IDX3)
                                        TO  WRK-SKJ7-SKJFTN(IDX1)
@@ -6760,6 +7035,13 @@
                      (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                    MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                      TO  WRK-KANKYO-HKNCOMBI-DAY(IDX1)
+                   IF  ((WRK-SAIGAI-962(IDX1)   =   "1")    AND
+                        (WRK-SAIGAI-959(IDX1)   =   "1"))   OR
+                       ((WRK-SAIGAI-963(IDX1)   =   "1")    AND
+                        (WRK-SAIGAI-959(IDX1)   =   "1"))
+                         MOVE     SPACE    TO
+                                        LNK-NYULIFE-KANFTN-SRYCD(IDX1)
+                   END-IF
                    MOVE   LNK-NYULIFE-KAN-SRYCD(IDX1)
                                      TO  WRK-KANKYO-RYOYO(IDX1)
                    MOVE   LNK-NYULIFE-KANFTN-SRYCD(IDX1)
@@ -7221,6 +7503,42 @@
            .
        910-HKNCOMBI-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊó¸¡º÷
+      *****************************************************************
+       910-PTKOHINF-SELECT-SEC        SECTION.
+      *
+           MOVE    PTKOHINF-REC       TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-PTKOHINF
+           ELSE
+               MOVE    1                  TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       910-PTKOHINF-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊóÆÉ¹þ
+      *****************************************************************
+       910-PTKOHINF-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  PTKOHINF-REC
+               MOVE    ZERO               TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                     PTKOHINF-REC
+               MOVE    1                  TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       910-PTKOHINF-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ÅÀ¿ô¥Þ¥¹¥¿¡¼ÆÉ¹þ¡Ê¼ç¥­¡¼¡Ë
       *****************************************************************
