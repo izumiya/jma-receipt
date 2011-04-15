@@ -501,6 +501,8 @@
       *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.05.26    NACL-ÌçÏÆ    11/04/11  ÂçºåÉÜÃÏÊý¸øÈñ¤Ë´Ø¤ï¤ëÊÝ¸±Íó
       *                                     ¤Îµ­ºÜÂÐ±þ¡Ê¸å´ü¹âÎð¡Ë
+      *  04.05.27    NACL-ÌçÏÆ    11/04/14  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ·×»»½¤Àµ
+      *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -720,6 +722,8 @@
            03  FLG-SAIGAI-JGN-ETC2                     PIC 9(01).
            03  FLG-SAIGAI-JGN-SEIHO                    PIC 9(01).
            03  FLG-SAIGAI-ETC1-ARI                     PIC 9(01).
+           03  FLG-JIRITU-CYUKANSOU1                   PIC 9(01).
+           03  FLG-JIRITU-CYUKANSOU2                   PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -939,6 +943,7 @@
            03  WRK-JYOGENKBN-TEN3                      PIC 9(09).
            03  WRK-JYOGENKBN-TEN4                      PIC 9(09).
            03  WRK-JYOGENKBN-TEN5                      PIC 9(09).
+           03  WRK-JYOGENKBN-TEN6                      PIC 9(09).
            03  WRK-JYOGENKBN-TEN9                      PIC 9(09).
            03  WRK-TAIHI-FTNMONEYINF-AREA.
              05  WRK-TAIHI-FTNMONEYINF     OCCURS  5.
@@ -1205,6 +1210,7 @@
            03  WRK-CHK-KOKIGAK7                        PIC 9(07).
            03  WRK-CHK-KOKIGAK8                        PIC 9(07).
            03  WRK-CHK-KOKIGAK9                        PIC 9(07).
+           03  WRK-CHK-KOKIGAK10                       PIC S9(07).
       *
            03  WRK-KEISAN                              PIC 9(07).
            03  WRK-KEISAN1                             PIC 9(07).
@@ -11465,6 +11471,9 @@
            MOVE    ZERO                 TO      FLG-HOKENICHIBU6
            MOVE    ZERO                 TO      WRK-HOKENICHIBUGAK
       *
+           MOVE    ZERO                 TO      FLG-JIRITU-CYUKANSOU1
+           MOVE    ZERO                 TO      FLG-JIRITU-CYUKANSOU2
+      *
            INITIALIZE                           WRK-TOKUSYU-SKJFLG-T
       *
            INITIALIZE                           WRK-SKJ-FTN-T
@@ -12780,6 +12789,7 @@
                  ADD    SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN
                                                 WRK-JYOGENKBN-TEN3
                                                 WRK-JYOGENKBN-TEN4
+                                                WRK-JYOGENKBN-TEN6
                  ADD    WRK-FTNKEI          TO  WRK-HOKENICHIBUGAK
              END-IF
            ELSE
@@ -12928,11 +12938,17 @@
                         AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
                         AND RECE62-KOHID(1)  = RECE62-KOHIDHC(IDX1 1)
                            MOVE    1    TO   FLG-KEISAN2
+                           IF   SYU-NYNSHOKAISU  =  1
+                             MOVE  1    TO   FLG-JIRITU-CYUKANSOU1
+                           END-IF
                         END-IF
                         IF  RECE62-KOHNUM(2) = SYU-KOH-HKNNUM(1)
                         AND RECE62-KOHNUM(2) = RECE62-KOHNUMHC(IDX1 1)
                         AND RECE62-KOHID(2)  = RECE62-KOHIDHC(IDX1 1)
                            MOVE    2    TO   FLG-KEISAN2
+                           IF   SYU-NYNSHOKAISU  =  1
+                             MOVE  1    TO   FLG-JIRITU-CYUKANSOU2
+                           END-IF
                         END-IF
                      END-IF
       ***            IF   (SYU-KOHTAIYKZKBN    NOT =  "9" )
@@ -12989,6 +13005,8 @@
                         ADD    SYU-TOTAL-HKNTEN
                                      TO   WRK-JYOGENKBN-TEN3
                      END-IF
+                     ADD    SYU-TOTAL-HKNTEN
+                                     TO   WRK-JYOGENKBN-TEN6
                    END-IF
                  END-IF
                 END-IF
@@ -16928,6 +16946,27 @@
                                       RECE62-HENTOTALTEN(3)) )
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
+             END-IF
+      *
+             COMPUTE  WRK-CHK-KOKIGAK4  = RECE62-TOTALTEN(2)
+                                        + RECE62-HENTOTALTEN(3)
+             COMPUTE  WRK-CHK-KOKIGAK   = RECE62-TOTALTEN(1)
+                                        - WRK-JYOGENKBN-TEN6
+             IF  (RECE62-KOUREI          =  "2"              )
+             AND (FLG-JIRITU-CYUKANSOU1  =   1               )
+             AND (FLG-JIRITU-CYUKANSOU2  =   1               )
+             AND (WRK-CHK-KOKIGAK        =   WRK-CHK-KOKIGAK4)
+               MOVE   WRK-CHK-KOKIGAK   TO   WRK-HANTEI-TOTALTEN
+               PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+               IF     WRK-KINGAKU3  >  RECE62-KOUREI-SAIKEI
+                 COMPUTE  WRK-CHK-KOKIGAK2   =  WRK-KINGAKU3
+                                             -  RECE62-KOUREI-SAIKEI
+                 COMPUTE  WRK-CHK-KOKIGAK10  =  RECE62-KOUREI-SAIKEI2
+                                             -  WRK-CHK-KOKIGAK2
+                 MOVE     WRK-CHK-KOKIGAK2  TO  RECE62-KOUREI-SAIKEI2
+                 COMPUTE  RECE62-FTNMONEY(1) =  RECE62-FTNMONEY(1)
+                                             -  WRK-CHK-KOKIGAK10
+               END-IF
              END-IF
             END-IF
       *

@@ -339,6 +339,8 @@
       *                                     (233064)Ê¿À®£²£³Ç¯£³·î¤Þ¤Ç
       *  04.05.14    NACL-ÌçÏÆ    11/04/07  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (133280)Ê¿À®£²£³Ç¯£³·î¤Þ¤Ç
+      *  04.05.15    NACL-ÌçÏÆ    11/04/14  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ·×»»½¤Àµ
+      *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -474,6 +476,7 @@
            03  FLG-GEN70-TOKUSYU       PIC 9(01).
            03  FLG-SYUKEI              PIC 9(01).
            03  FLG-SYUKEI2             PIC 9(01).
+           03  FLG-SYUKEI3             PIC 9(01).
            03  FLG-KENPOJYUNKYO        PIC 9(01).
            03  FLG-SYUGAKUMAE          PIC 9(01).
            03  FLG-TAISYO              PIC 9(01).
@@ -10320,6 +10323,7 @@
       *
            MOVE     ZERO     TO     FLG-ZAITAKU.                         
            MOVE     ZERO     TO     FLG-SYUKEI.
+           MOVE     ZERO     TO     FLG-SYUKEI3.
            MOVE     ZERO     TO     FLG-TAISYO.
       *
            IF   SYU-NYUGAIKBN  =  "2"
@@ -10564,15 +10568,12 @@
                    IF  FLG-GENBUTU70    NOT =  ZERO
                     IF WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
                      IF   FLG-IRYOHI70  =  3 OR 4 OR 5 OR 6
-                       IF  (FLG-FTNRATE100  =  1     )
-                       AND (FLG-IRYOHI70    =  3 OR 4)
-                         CONTINUE
-                       ELSE
+                       IF  FLG-SYUKEI  =  ZERO
                          COMPUTE  WK-KOUREI-IRYOHI70  =
                                   WK-KOUREI-IRYOHI70  +
                                  (SYU-HKNTEN (17) * 10)
+                         MOVE     1    TO      FLG-SYUKEI
                        END-IF
-                       MOVE       1    TO      FLG-SYUKEI
                        IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
                            (COMB-KOH1ID         =  WRK-COMB-KOH2ID))
                        OR ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM ) AND
@@ -10603,7 +10604,8 @@
                        END-IF
                      END-IF
                     END-IF
-                    IF   FLG-IRYOHI70K NOT = ZERO
+                    IF  (FLG-SYUKEI3       =  ZERO)
+                    AND (FLG-IRYOHI70K NOT =  ZERO)
                       COMPUTE  WK-KOUREI-IRYOHI70K =
                                WK-KOUREI-IRYOHI70K +
                               (SYU-HKNTEN (17) * 10)
@@ -10612,6 +10614,7 @@
                                   WK-KOUREI-IRYOHI70K-TOKU75 +
                                  (SYU-HKNTEN (17) * 10)
                       END-IF
+                      MOVE     1    TO      FLG-SYUKEI3
                     END-IF
                    ELSE
                      IF    (FLG-IRYOHI       =   1  )
@@ -14402,11 +14405,46 @@
                     MOVE  SYU-KOH-FTN    TO  WK-SYU-SYUCOMPFTN
                     COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
                     MOVE   ZERO  TO  FLG-TAISYO
-                    IF  (FLG-FTNRATE100  =  1     )
-                    AND (FLG-IRYOHI70    =  3 OR 4)
-                       COMPUTE  WK-KOUREI-IRYOHI70  =
-                                WK-KOUREI-IRYOHI70  +
-                               (SYU-HKNTEN (17) * 10)
+                    IF  (FLG-FTNRATE100          =   1            )
+                    AND (LNK-SYU-KOH2HKNNUM  NOT = "972" AND "974")
+                    AND (LNK-SYU-KOH3HKNNUM  NOT = "972" AND "974")
+                    AND (LNK-SYU-KOH4HKNNUM  NOT = "972" AND "974")
+                      IF     FLG-IRYOHI70  =  3  OR  4
+                          COMPUTE  WK-KOUREI-IRYOHI70  =
+                                   WK-KOUREI-IRYOHI70  +
+                                  (SYU-HKNTEN (17) * 10)
+                          MOVE   1   TO  FLG-SYUKEI
+                      END-IF
+                    ELSE
+                      IF  (LNK-SYU-KOH1HKNNUM
+                                           = "015" OR "016" OR "021")
+                      AND (WK-JIRITU-CYUKANSOU(1)   =  1            )
+                      AND (LNK-SYU-KOH2HKNNUM  NOT = "972" AND "974")
+                      AND (LNK-SYU-KOH3HKNNUM  NOT = "972" AND "974")
+                      AND (LNK-SYU-KOH4HKNNUM  NOT = "972" AND "974")
+                      AND (SYU-NYNSHOKAISU          =  1            )
+                      AND (SYU-KOH2HKNNUM      NOT = "972" AND "974")
+                      AND (SYU-KOH3HKNNUM      NOT = "972" AND "974")
+                      AND (SYU-KOH4HKNNUM      NOT = "972" AND "974")
+                      AND (LNK-SYU-KOH1HKNNUM      =  SYU-KOH1HKNNUM)
+                        IF   FLG-IRYOHI70  =  5  OR  6
+                          COMPUTE  WK-KOUREI-IRYOHI70  =
+                                   WK-KOUREI-IRYOHI70  +
+                                  (SYU-HKNTEN (17) * 10)
+                          MOVE   1   TO  FLG-SYUKEI
+                        END-IF
+                        IF   FLG-IRYOHI70K NOT = ZERO
+                          COMPUTE  WK-KOUREI-IRYOHI70K =
+                                   WK-KOUREI-IRYOHI70K +
+                                  (SYU-HKNTEN (17) * 10)
+                          IF   FLG-RUITAISYO  =  1
+                             COMPUTE  WK-KOUREI-IRYOHI70K-TOKU75 =
+                                      WK-KOUREI-IRYOHI70K-TOKU75 +
+                                     (SYU-HKNTEN (17) * 10)
+                          END-IF
+                          MOVE   1   TO  FLG-SYUKEI3
+                        END-IF
+                      END-IF
                     END-IF
                  ELSE
                    IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
