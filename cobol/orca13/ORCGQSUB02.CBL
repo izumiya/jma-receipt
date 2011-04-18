@@ -1292,15 +1292,15 @@
                    COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
                    PERFORM 900-SQL-JYOKEN-EDIT2-SEC
                    STRING  "M.ETC_YKZFTN1"      DELIMITED BY SIZE
-                       " in( '6','7','8')"      DELIMITED BY SIZE
+                       " in( 6,7,8)"            DELIMITED BY SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
                 WHEN    "2"
                    COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
                    PERFORM 900-SQL-JYOKEN-EDIT2-SEC
-                   STRING  "M.ETC_YKZFTN1"             DELIMITED BY SIZE
-                       " not in( '0', '6','7','8')"    DELIMITED BY SIZE
+                   STRING  "M.ETC_YKZFTN1"      DELIMITED BY SIZE
+                       " not in( 0, 6,7,8)"     DELIMITED BY SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
