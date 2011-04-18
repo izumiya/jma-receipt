@@ -125,6 +125,10 @@
                     07  Q01-TOKKIINFO              PIC X(33).
                     07  Q01-CMB-TOKKIINFO-COUNT    PIC S9(9) BINARY.
                     07  Q01-CMB-TOKKIINFO-ITEM     PIC X(33) OCCURS 50.
+                  06  Q01-CMB-SAIGAIKBN.
+                    07  Q01-SAIGAIKBN              PIC X(22).
+                    07  Q01-CMB-SAIGAIKBN-COUNT    PIC S9(9) BINARY.
+                    07  Q01-CMB-SAIGAIKBN-ITEM     PIC X(22) OCCURS 10.
                 05  Q01-FIXED17.
                   06  Q01-CMB-HONKZKKBN.
                     07  Q01-HONKZKKBN          PIC X(10).

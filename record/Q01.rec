@@ -290,6 +290,13 @@ Q01	{
 					count	int;
 					item	varchar(33)[50];
 				};
+				CMB_SAIGAIKBN{
+					SAIGAIKBN{
+						value	varchar(22);
+					};
+					count	int;
+					item	varchar(22)[10];
+				};
 			};
 			fixed17	{
 				CMB_HONKZKKBN{

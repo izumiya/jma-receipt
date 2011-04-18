@@ -141,6 +141,7 @@
                05  CONST-TBL-J2    PIC X(20) VALUE "TBL_TNKRRK      J".
                05  CONST-TBL-K     PIC X(20) VALUE "TBL_RECECOM     K".
                05  CONST-TBL-L     PIC X(20) VALUE "TBL_SEIKYU_MAIN L".
+               05  CONST-TBL-M     PIC X(20) VALUE "TBL_SEIKYU_ETC  M".
            03  CONST-KMK-ITEM-AREA.
                05  FILLER          PIC X(12)   VALUE "PTNUM".
                05  FILLER          PIC X(12)   VALUE "KANANAME".
@@ -1029,6 +1030,13 @@
        1001-SEIKYU-MAIN-JYOKEN-EDIT-SEC     SECTION.
       *
            STRING  ",TBL_SEIKYU_MAIN L"     DELIMITED  BY  SIZE
+                   " LEFT JOIN TBL_SEIKYU_ETC M USING"
+                                            DELIMITED  BY  SIZE
+                   " (HOSPNUM, SRYYM, NYUGAIKBN, PTID, RECEKA"
+                                            DELIMITED  BY  SIZE
+                   ",TEISYUTUSAKI, RECESYUBETU, HKNJANUM, HOJOKBN_KEY"
+                                            DELIMITED  BY  SIZE
+                   ",TEKSTYMD)"
            INTO    WRK-SQL
            WITH    POINTER WRK-SQL-PNT
            END-STRING
@@ -1276,6 +1284,27 @@
                INTO    WRK-SQL
                WITH    POINTER WRK-SQL-PNT
                END-STRING
+           END-IF
+      *
+           IF    ( SPA-Q01-SAIGAIKBN   NOT =   SPACE )
+                EVALUATE   SPA-Q01-SAIGAIKBN
+                WHEN    "1"
+                   COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
+                   PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+                   STRING  "M.ETC_YKZFTN1"      DELIMITED BY SIZE
+                       " in( '6','7','8')"      DELIMITED BY SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+                WHEN    "2"
+                   COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
+                   PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+                   STRING  "M.ETC_YKZFTN1"             DELIMITED BY SIZE
+                       " not in( '0', '6','7','8')"    DELIMITED BY SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+                END-EVALUATE
            END-IF
       *
            PERFORM 900-SQL-JYOKEN-EDIT3-SEC

@@ -217,6 +217,11 @@
                                13  SPA-GMN-Q01-TOKKIINFO     PIC X(02).
                                13  SPA-GMN-Q01-TOKKIINFOFL   PIC X(01).
                                13  SPA-GMN-Q01-TOKKIINFOMEI  PIC X(30).
+      *                    ºÒ³²³ºÅö
+                           11  SPA-GMN-Q01-SAIGAIKBN-G.
+                               13  SPA-GMN-Q01-SAIGAIKBN     PIC X(01).
+                               13  SPA-GMN-Q01-SAIGAIKBNFL   PIC X(01).
+                               13  SPA-GMN-Q01-SAIGAIKBNMEI  PIC X(20).
       *                ÊÝ¸±¡¡¸øÈñ
                        09  SPA-GMN-Q01-HOKEN-AREA.
                            11  SPA-GMN-Q01-HONKZKKBN-G.
@@ -538,6 +543,13 @@
                                13  SPA-GMN-Q01-TOKKIINFOL    PIC X(02).
                                13  SPA-GMN-Q01-TOKKIINFOFLL  PIC X(01).
                                13  SPA-GMN-Q01-TOKKIINFOMEIL PIC X(30).
+                       09  SPA-GMN-Q01-SAIGAIKBNLST-G.
+                           11  SPA-GMN-Q01-SAIGAIKBNLST-MAX
+                                                             PIC 9(05).
+                           11  SPA-GMN-Q01-SAIGAIKBNLST      OCCURS  10.
+                               13  SPA-GMN-Q01-SAIGAIKBNL    PIC X(01).
+                               13  SPA-GMN-Q01-SAIGAIKBNFLL  PIC X(01).
+                               13  SPA-GMN-Q01-SAIGAIKBNMEIL PIC X(20).
                        09  SPA-GMN-Q01-HONKZKKBNLST-G.
                            11  SPA-GMN-Q01-HONKZKKBNLST-MAX
                                                             PIC 9(05).
@@ -983,6 +995,7 @@
                        09  SPA-Q01-TOKKI-G.
                            11  SPA-Q01-TOKKICD         PIC X(02).
                            11  SPA-Q01-TOKKINAME       PIC X(12).
+                       09  SPA-Q01-SAIGAIKBN           PIC X(01).
       *            ÊÝ¸±¡¡¸øÈñ
                    07  SPA-Q01-HOKEN-AREA.
                        09  SPA-Q01-HONKZKKBN           PIC X(01).
