@@ -14647,6 +14647,20 @@
                    MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
                 END-IF
               END-IF
+              IF     SYU-KOH1HKNNUM  =  "015" OR "016" OR "021"
+                IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM    )
+                AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID   )
+                AND  (WK-JIRITU-CYUKANSOU(1)   =  1            )
+                AND  (LNK-SYU-KOH2HKNNUM  NOT = "972" AND "974")
+                AND  (LNK-SYU-KOH3HKNNUM  NOT = "972" AND "974")
+                AND  (LNK-SYU-KOH4HKNNUM  NOT = "972" AND "974")
+                AND  (SYU-NYNSHOKAISU          =  1            )
+                AND  (SYU-KOH2HKNNUM      NOT = "972" AND "974")
+                AND  (SYU-KOH3HKNNUM      NOT = "972" AND "974")
+                AND  (SYU-KOH4HKNNUM      NOT = "972" AND "974")
+                   MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                END-IF
+              END-IF
            END-IF
       *
       ***

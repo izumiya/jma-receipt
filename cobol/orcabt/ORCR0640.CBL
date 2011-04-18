@@ -1428,6 +1428,9 @@
            03  WRK-GENMEN-NASI-KIN2            PIC  9(07).
            03  WRK-GENMEN-NASI-SKJ2            PIC  9(07).
       *
+           03  WRK-JIRITU-SAIKEI               PIC  9(09).
+           03  WRK-JIRITU-SAIKEI2              PIC  9(09).
+      *
       *    ¿ôÎÌÊÔ½¸ÍÑ
            03  WRK-SURYOKETA                   PIC 9(02).
            03  WRK-SURYOKETA1                  PIC 9(02).
@@ -11473,6 +11476,8 @@
       *
            MOVE    ZERO                 TO      FLG-JIRITU-CYUKANSOU1
            MOVE    ZERO                 TO      FLG-JIRITU-CYUKANSOU2
+           MOVE    ZERO                 TO      WRK-JIRITU-SAIKEI
+           MOVE    ZERO                 TO      WRK-JIRITU-SAIKEI2
       *
            INITIALIZE                           WRK-TOKUSYU-SKJFLG-T
       *
@@ -12789,9 +12794,9 @@
                  ADD    SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN
                                                 WRK-JYOGENKBN-TEN3
                                                 WRK-JYOGENKBN-TEN4
-                                                WRK-JYOGENKBN-TEN6
                  ADD    WRK-FTNKEI          TO  WRK-HOKENICHIBUGAK
              END-IF
+             ADD        SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN6
            ELSE
              MOVE      1      TO    FLG-HOKENICHIBU
              IF   ( SYU-KOHTAIYKZKBN  = "9"            )
@@ -16957,7 +16962,7 @@
              AND (FLG-JIRITU-CYUKANSOU2  =   1               )
              AND (WRK-CHK-KOKIGAK        =   WRK-CHK-KOKIGAK4)
                MOVE   WRK-CHK-KOKIGAK   TO   WRK-HANTEI-TOTALTEN
-               PERFORM  210464-JYOGENGAKU-HENSYU-SEC
+               PERFORM  210464X-JYOGENGAKU-HENSYU2-SEC
                IF     WRK-KINGAKU3  >  RECE62-KOUREI-SAIKEI
                  COMPUTE  WRK-CHK-KOKIGAK2   =  WRK-KINGAKU3
                                              -  RECE62-KOUREI-SAIKEI
@@ -17237,6 +17242,31 @@
                  MOVE     ZERO        TO   RECE62-SHOKUJIFTN(1)
               END-IF
             END-IF 
+      *
+           END-IF
+      *
+           IF   WK-GENGAKUKBN   =   ZERO
+           AND  RECE62-SRYYM   >=  "200210"
+      *
+             COMPUTE  WRK-CHK-KOKIGAK4  = RECE62-TOTALTEN(2)
+                                        + RECE62-HENTOTALTEN(3)
+             COMPUTE  WRK-CHK-KOKIGAK   = RECE62-TOTALTEN(1)
+                                        - WRK-JYOGENKBN-TEN6
+             IF  (RECE62-KOUREI          =  SPACE            )
+             AND (FLG-JIRITU-CYUKANSOU1  =   1               )
+             AND (FLG-JIRITU-CYUKANSOU2  =   1               )
+             AND (WRK-CHK-KOKIGAK        =   WRK-CHK-KOKIGAK4)
+               MOVE   WRK-CHK-KOKIGAK   TO   WRK-HANTEI-TOTALTEN
+               PERFORM  210464X-JYOGENGAKU-HENSYU2-SEC
+               IF     WRK-KINGAKU3  >  WRK-JIRITU-SAIKEI
+                 COMPUTE  WRK-CHK-KOKIGAK2     =  WRK-KINGAKU3
+                                               -  WRK-JIRITU-SAIKEI
+                 COMPUTE  WRK-CHK-KOKIGAK10    =  WRK-JIRITU-SAIKEI2
+                                               -  WRK-CHK-KOKIGAK2
+                 COMPUTE  RECE62-FTNMONEY-SKY  =  RECE62-FTNMONEY-SKY
+                                               -  WRK-CHK-KOKIGAK10
+               END-IF
+             END-IF
       *
            END-IF
       *
@@ -18093,6 +18123,36 @@
       *
            .
        210464-JYOGENGAKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¾å¸Â³ÛÊÔ½¸
+      *****************************************************************
+       210464X-JYOGENGAKU-HENSYU2-SEC               SECTION.
+      *
+           COMPUTE  WRK-CHIHOU-KIN6 = WRK-HANTEI-TOTALTEN * 10
+           IF  FLG-TOKU75 = 3
+            IF   WRK-CHIHOU-KIN6  >  133500
+              COMPUTE  WRK-KINGAKU2 =
+                    (( WRK-CHIHOU-KIN6 - 135000 ) * 0.01 )
+                                                  + 0.5
+              COMPUTE  WRK-KINGAKU3 = 40050  + WRK-KINGAKU2
+            ELSE
+              MOVE   40050   TO   WRK-KINGAKU3
+            END-IF
+           ELSE
+            IF   WRK-CHIHOU-KIN6  >  267000
+              COMPUTE  WRK-KINGAKU2 =
+                    (( WRK-CHIHOU-KIN6 - 267000 ) * 0.01 )
+                                                  + 0.5
+              COMPUTE  WRK-KINGAKU3 = 80100  + WRK-KINGAKU2
+            ELSE
+              MOVE   80100   TO   WRK-KINGAKU3
+            END-IF
+           END-IF
+      *
+           .
+       210464X-JYOGENGAKU-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -19592,6 +19652,8 @@
            AND (RECE62-SRYYM       >=  "201004")
               MOVE   RECE62-FTNMONEY(1)  TO   RECE62-FTNMONEY-SKY
               IF   FLG-WRKFILE-CLEAR   =   1
+                MOVE   FTN-KOH-XXX       TO   WRK-JIRITU-SAIKEI
+                MOVE   FTN-KOH-XX3       TO   WRK-JIRITU-SAIKEI2
                 MOVE   ZERO              TO   RECE62-FTNMONEY(1)
                 MOVE   ZERO              TO   FLG-KEISAN-TOK1
                 MOVE   ZERO              TO   FLG-KEISAN-TOK2
