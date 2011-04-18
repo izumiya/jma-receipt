@@ -2811,20 +2811,25 @@
                            AND (RECE62-KOHNUM(IDX-SAI) NOT = 
                                                     "972" AND "974")
                              IF  RECE62-KOHFTNJANUM(IDX-SAI) = SPACE
-                             OR  RECE62-KOHJKYSNUM(IDX-SAI)  = SPACE
                                MOVE    6   TO  RECE62-RJNGAIKOHFTN (1)
+                               MOVE    4   TO  IDX-SAI
+                             ELSE
+                              IF RECE62-KOHJKYSNUM (IDX-SAI) = SPACE
+                               MOVE    1   TO  RECE62-RJNGAIKOHFTN (1)
+                              END-IF
                              END-IF
                            END-IF
                          END-PERFORM
                        END-IF
       *                µ­¹æÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
+      *                ¸øÈñ¼õµë¼ÔÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF  (RECE62-RJNGAIKOHFTN(1) =   1  )
                        AND (RECE62-GENMENKBN       >  ZERO)
                          IF   RECE62-SRYYM    >= "201101"
                            MOVE    5       TO  RECE62-RJNGAIKOHFTN (1)
                          END-IF
                        END-IF
-      *                ¸øÈñÉéÃ´¼ÔÈÖ¹æËô¤Ï¼õµë¼ÔÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
+      *                ¸øÈñÉéÃ´¼ÔÈÖ¹æÉÔÌÀ¡Ü¸ºÌÈÂÐ¾Ý¼Ô¤Î¤È¤­
                        IF  (RECE62-RJNGAIKOHFTN(1) =   6  )
                        AND (RECE62-GENMENKBN       >  ZERO)
                          IF   RECE62-SRYYM    >= "201101"
@@ -2901,7 +2906,10 @@
                          IF  (FLG-SAIGAI-JGN-ETC2 =  1)
                             CONTINUE
                          ELSE
-                            MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                            MOVE   ZERO   TO   RECE62-RJNGAIKOHFTN(1)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(9)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(4)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(5)
                             MOVE   ZERO   TO   RECE62-GENMENKBN
                          END-IF
                        WHEN        1
@@ -2911,7 +2919,10 @@
                          OR ( FLG-SAIGAI-JGN-ETC2 =  1    )
                             CONTINUE
                          ELSE
-                            MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                            MOVE   ZERO   TO   RECE62-RJNGAIKOHFTN(1)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(9)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(4)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(5)
                             MOVE   ZERO   TO   RECE62-GENMENKBN
                          END-IF
                        WHEN        9
@@ -2919,7 +2930,10 @@
                          OR  (FLG-SAIGAI-JGN-ETC2 =  1)
                             CONTINUE
                          ELSE
-                            MOVE   ZERO   TO   FLG-SAIGAI-TAISYO
+                            MOVE   ZERO   TO   RECE62-RJNGAIKOHFTN(1)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(9)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(4)
+                            MOVE   ZERO   TO   RECE62-YOBIETC(5)
                             MOVE   ZERO   TO   RECE62-GENMENKBN
                          END-IF
                      END-EVALUATE
@@ -2928,6 +2942,59 @@
                      IF  (RECE62-SRYYM          >= "201101")
                      AND (RECE62-RJNGAIKOHFTN(1) =  ZERO   )
                        MOVE    3     TO   RECE62-RJNGAIKOHFTN (1)
+                     END-IF
+                     IF  (RECE62-HKNNUM      NOT =  SPACE  )
+                     AND (RECE62-SRYYM          >= "201101")
+                       EVALUATE  RECE62-RJNGAIKOHFTN(1)
+                         WHEN       1
+                           PERFORM  VARYING  IDX-SAI  FROM   1   BY   1
+                                     UNTIL   IDX-SAI    >    4
+                             IF  (RECE62-KOHNUM(IDX-SAI) NOT =  SPACE)
+                             AND (RECE62-KOHNUM(IDX-SAI) NOT = 
+                                                      "972" AND "974")
+                               IF  RECE62-KOHFTNJANUM(IDX-SAI) = SPACE
+                                 MOVE   11   TO  RECE62-RJNGAIKOHFTN(1)
+                                 MOVE    4   TO  IDX-SAI
+                               ELSE
+                                IF RECE62-KOHJKYSNUM (IDX-SAI) = SPACE
+                                 MOVE    1   TO  RECE62-RJNGAIKOHFTN(1)
+                                END-IF
+                               END-IF
+                             END-IF
+                           END-PERFORM
+                         WHEN       3
+                           PERFORM  VARYING  IDX-SAI  FROM   1   BY   1
+                                     UNTIL   IDX-SAI    >    4
+                             IF  (RECE62-KOHNUM(IDX-SAI) NOT =  SPACE)
+                             AND (RECE62-KOHNUM(IDX-SAI) NOT = 
+                                                      "972" AND "974")
+                               IF  RECE62-KOHFTNJANUM(IDX-SAI) = SPACE
+                                 MOVE    9   TO  RECE62-RJNGAIKOHFTN(1)
+                                 MOVE    4   TO  IDX-SAI
+                               ELSE
+                                IF RECE62-KOHJKYSNUM (IDX-SAI) = SPACE
+                                 MOVE   10   TO  RECE62-RJNGAIKOHFTN(1)
+                                END-IF
+                               END-IF
+                             END-IF
+                           END-PERFORM
+                         WHEN       6
+                           PERFORM  VARYING  IDX-SAI  FROM   1   BY   1
+                                     UNTIL   IDX-SAI    >    4
+                             IF  (RECE62-KOHNUM(IDX-SAI) NOT =  SPACE)
+                             AND (RECE62-KOHNUM(IDX-SAI) NOT = 
+                                                      "972" AND "974")
+                               IF  RECE62-KOHFTNJANUM(IDX-SAI) = SPACE
+                                 MOVE    6   TO  RECE62-RJNGAIKOHFTN(1)
+                                 MOVE    4   TO  IDX-SAI
+                               ELSE
+                                IF RECE62-KOHJKYSNUM (IDX-SAI) = SPACE
+                                 MOVE    8   TO  RECE62-RJNGAIKOHFTN(1)
+                                END-IF
+                               END-IF
+                             END-IF
+                           END-PERFORM
+                       END-EVALUATE
                      END-IF
                      IF  (RECE62-SRYYM          >= "201101")
                        EVALUATE  RECE62-RJNGAIKOHFTN(1)
