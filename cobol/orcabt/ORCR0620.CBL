@@ -187,6 +187,9 @@
       *                                     併用から単独になったときのまとめ
       *  04.05.07    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.08    NACL-藤原    11/04/18  災害対応
+      *                                     主保険情報が同じで適用期間が
+      *                                     区切られている場合の保険履歴 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3061,6 +3064,30 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                                      MOVE    1   TO  FLG-RIREKI-HEN
                                  END-IF  
                              END-IF
+      *
+                             PERFORM VARYING IDZZ    FROM    1   BY  1
+                                     UNTIL   IDZZ    >       100
+                                     OR      FLG-RIREKI-HEN   =   1
+      *                          主保険が同じ保険があるときは対象外とする
+                                 IF    ( TBL-RECE69-HOSPNUM  (IDZZ)
+                                                     >   ZERO          )
+                                 AND   ( TBL-RECE69-HKNNUM   (IDZZ)
+                                                     =   PTHKN-HKNNUM  )
+                                 AND   ( TBL-RECE69-HKNJANUM (IDZZ)
+                                                     =   PTHKN-HKNJANUM)
+                                 AND   ( TBL-RECE69-HONKZKKBN(IDZZ)
+                                                     =
+                                                     PTHKN-HONKZKKBN   )
+                                 AND   ( TBL-RECE69-HOJOKBN  (IDZZ)
+                                                     =   PTHKN-HOJOKBN )
+                                 AND   ( TBL-RECE69-KIGO     (IDZZ)
+                                                     =   PTHKN-KIGO    )
+                                 AND   ( TBL-RECE69-NUM      (IDZZ)
+                                                     =   PTHKN-NUM     )
+                                     MOVE    1   TO  FLG-RIREKI-HEN
+                                 END-IF
+                             END-PERFORM
+      *
                              IF      FLG-RIREKI-HEN  =   ZERO
                                MOVE   PTHKN-HKNID    TO  RECE69-HKNID
                                MOVE   PTHKN-HKNNUM   TO  RECE69-HKNNUM
