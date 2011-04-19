@@ -2672,10 +2672,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                END-IF
       *
                IF   RECE02-SRYYM   >=  "201007"
-                   IF  (RECE02-SRYYM          >= "201101")
-                   AND (RECE02-HKNNUM          =  SPACE  )
-                   AND (FLG-SAIGAI-TAISYO      =   1     )
-                   AND (RECE02-RJNGAIKOHFTN(1) =  2 OR 4 )
+                   IF  (RECE02-SRYYM          >= "201101"         )
+                   AND (RECE02-HKNNUM          =  SPACE           )
+                   AND (FLG-SAIGAI-TAISYO      =   1              )
+                   AND (RECE02-RJNGAIKOHFTN(1) =  2 OR 4 OR 5 OR 7)
       *              上限額確認
                      MOVE     ZERO      TO    FLG-SAIGAI-JGN-ETC1
                      MOVE     ZERO      TO    FLG-SAIGAI-JGN-ETC2
@@ -2702,9 +2702,17 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                          IF  (FLG-SAIGAI-JGN-ETC2 =  1)
                             CONTINUE
                          ELSE
-                            MOVE   ZERO   TO   RECE02-RJNGAIKOHFTN(1)
-                            MOVE   ZERO   TO   RECE02-YOBIETC(4)
-                            MOVE   ZERO   TO   RECE02-GENMENKBN
+                            EVALUATE  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      2
+                              WHEN      4
+                                MOVE  ZERO  TO  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      5
+                                MOVE   1    TO  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      7
+                                MOVE   6    TO  RECE02-RJNGAIKOHFTN(1)
+                            END-EVALUATE
+                            MOVE    ZERO    TO  RECE02-YOBIETC(4)
+                            MOVE    ZERO    TO  RECE02-GENMENKBN
                          END-IF
                        WHEN        1
                          IF ( FLG-SAIGAI-ETC1-ARI =  ZERO )
@@ -2713,18 +2721,34 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                          OR ( FLG-SAIGAI-JGN-ETC2 =  1    )
                             CONTINUE
                          ELSE
-                            MOVE   ZERO   TO   RECE02-RJNGAIKOHFTN(1)
-                            MOVE   ZERO   TO   RECE02-YOBIETC(4)
-                            MOVE   ZERO   TO   RECE02-GENMENKBN
+                            EVALUATE  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      2
+                              WHEN      4
+                                MOVE  ZERO  TO  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      5
+                                MOVE   1    TO  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      7
+                                MOVE   6    TO  RECE02-RJNGAIKOHFTN(1)
+                            END-EVALUATE
+                            MOVE    ZERO    TO  RECE02-YOBIETC(4)
+                            MOVE    ZERO    TO  RECE02-GENMENKBN
                          END-IF
                        WHEN        9
                          IF  (FLG-SAIGAI-JGN-ETC1 =  1)
                          OR  (FLG-SAIGAI-JGN-ETC2 =  1)
                             CONTINUE
                          ELSE
-                            MOVE   ZERO   TO   RECE02-RJNGAIKOHFTN(1)
-                            MOVE   ZERO   TO   RECE02-YOBIETC(4)
-                            MOVE   ZERO   TO   RECE02-GENMENKBN
+                            EVALUATE  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      2
+                              WHEN      4
+                                MOVE  ZERO  TO  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      5
+                                MOVE   1    TO  RECE02-RJNGAIKOHFTN(1)
+                              WHEN      7
+                                MOVE   6    TO  RECE02-RJNGAIKOHFTN(1)
+                            END-EVALUATE
+                            MOVE    ZERO    TO  RECE02-YOBIETC(4)
+                            MOVE    ZERO    TO  RECE02-GENMENKBN
                          END-IF
                      END-EVALUATE
                    END-IF
