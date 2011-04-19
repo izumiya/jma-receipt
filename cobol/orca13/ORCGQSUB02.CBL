@@ -1250,64 +1250,72 @@
                PERFORM 900-SQL-JYOKEN-EDIT3-SEC
            END-IF
       *
-           MOVE    ZERO                TO  CNT-JYOKEN
+           IF    ( SPA-Q01-TOKKICD     NOT =   SPACE )
+            OR   ( SPA-Q01-TOKKINAME   NOT =   SPACE )
       *
-           IF    ( SPA-Q01-TOKKICD NOT =   SPACE )
+               MOVE    ZERO                TO  CNT-JYOKEN
       *
-               COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
+               IF    ( SPA-Q01-TOKKICD NOT =   SPACE )
       *
-               PERFORM 900-SQL-JYOKEN-EDIT2-SEC
-      *
-               STRING  "'"                 DELIMITED BY SIZE
-                   SPA-Q01-TOKKICD         DELIMITED BY SIZE
-                   "'"                     DELIMITED BY SIZE
-                   "in(L.TOKKI1,L.TOKKI2,L.TOKKI3,L.TOKKI4,L.TOKKI5)"
-                                           DELIMITED BY SIZE
-               INTO    WRK-SQL
-               WITH    POINTER WRK-SQL-PNT
-               END-STRING
-           END-IF
-      *
-           IF    ( SPA-Q01-TOKKINAME   NOT =   SPACE )
-      *
-               COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
-      *
-               PERFORM 900-SQL-JYOKEN-EDIT2-SEC
-      *
-               STRING  "'"                 DELIMITED BY SIZE
-                   SPA-Q01-TOKKINAME       DELIMITED BY SPACE
-                   "'"                     DELIMITED BY SIZE
-                   "in(L.TOKKINM1,L.TOKKINM2,L.TOKKINM3"
-                                           DELIMITED BY SIZE
-                   ",L.TOKKINM4,L.TOKKINM5)"
-                                           DELIMITED BY SIZE
-               INTO    WRK-SQL
-               WITH    POINTER WRK-SQL-PNT
-               END-STRING
-           END-IF
-      *
-           IF    ( SPA-Q01-SAIGAIKBN   NOT =   SPACE )
-                EVALUATE   SPA-Q01-SAIGAIKBN
-                WHEN    "1"
                    COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
+      *
                    PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+      *
+                   STRING  "'"                 DELIMITED BY SIZE
+                     SPA-Q01-TOKKICD           DELIMITED BY SIZE
+                     "'"                       DELIMITED BY SIZE
+                     "in(L.TOKKI1,L.TOKKI2,L.TOKKI3,L.TOKKI4,L.TOKKI5)"
+                                               DELIMITED BY SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               END-IF
+      *
+               IF    ( SPA-Q01-TOKKINAME   NOT =   SPACE )
+      *
+                   COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
+      *
+                   PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+      *
+                   STRING  "'"                 DELIMITED BY SIZE
+                       SPA-Q01-TOKKINAME       DELIMITED BY SPACE
+                       "'"                     DELIMITED BY SIZE
+                       "in(L.TOKKINM1,L.TOKKINM2,L.TOKKINM3"
+                                               DELIMITED BY SIZE
+                       ",L.TOKKINM4,L.TOKKINM5)"
+                                               DELIMITED BY SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               END-IF
+      *
+               PERFORM 900-SQL-JYOKEN-EDIT3-SEC
+      *
+           END-IF
+      *
+           IF    ( SPA-Q01-SAIGAIKBN   =   "1" OR "2" )
+      *
+               MOVE    1           TO  CNT-JYOKEN
+               PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+      *
+               EVALUATE   SPA-Q01-SAIGAIKBN
+               WHEN    "1"
                    STRING  "M.ETC_YKZFTN1"      DELIMITED BY SIZE
                        " in( 6,7,8)"            DELIMITED BY SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
-                WHEN    "2"
-                   COMPUTE CNT-JYOKEN  =   CNT-JYOKEN  +   1
-                   PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+               WHEN    "2"
                    STRING  "M.ETC_YKZFTN1"      DELIMITED BY SIZE
                        " not in( 0, 6,7,8)"     DELIMITED BY SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
                    END-STRING
-                END-EVALUATE
-           END-IF
+               END-EVALUATE
       *
-           PERFORM 900-SQL-JYOKEN-EDIT3-SEC
+               PERFORM 900-SQL-JYOKEN-EDIT3-SEC
+      *
+           END-IF
       *
            PERFORM 900-SQL-JYOKEN-EDIT4-SEC
       *
