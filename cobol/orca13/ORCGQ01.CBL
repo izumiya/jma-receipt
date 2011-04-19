@@ -2105,7 +2105,7 @@
            MOVE    Q01-TOKKIINFO       TO  SPA-GMN-Q01-TOKKIINFO
       *
       *    ºÒ³²³ºÅö
-           MOVE    Q01-SAIGAIKBN       TO  SPA-GMN-Q01-SAIGAIKBN
+           MOVE    Q01-SAIGAIKBN       TO  SPA-GMN-Q01-SAIGAIKBN-G
       *
            PERFORM VARYING IDXB    FROM    1   BY  1
                    UNTIL   IDXB    >       5
