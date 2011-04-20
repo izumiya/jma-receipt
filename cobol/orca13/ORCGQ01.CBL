@@ -1269,7 +1269,7 @@
            MOVE    "未確定分"      TO  SPA-GMN-Q01-SAIGAIKBNMEIL (01)
       *
            MOVE    "2"             TO  SPA-GMN-Q01-SAIGAIKBNL    (02)
-           MOVE    "通常分"        TO  SPA-GMN-Q01-SAIGAIKBNMEIL (02)
+           MOVE    "確定分"        TO  SPA-GMN-Q01-SAIGAIKBNMEIL (02)
       *
            .
        3101-SAIGAIKBN-CMB-SYOKI-EXT.
