@@ -137,7 +137,7 @@
                                                    PIC X(30).
                    07  SPA-GMN-NYKNHOHOLST-G.
                        09  SPA-GMN-NYKNHOHO-MAX    PIC 9(03).
-                       09  SPA-GMN-NYKNHOHOLST     OCCURS  5.
+                       09  SPA-GMN-NYKNHOHOLST     OCCURS 50.
                            11  SPA-GMN-NYKNHOHOL   PIC X(02).
                            11                      PIC X(01).
                            11  SPA-GMN-NYKNHOHOMEIL
@@ -1158,6 +1158,7 @@
       *
            MOVE    ZERO                TO  IDX4
            PERFORM UNTIL ( FLG-SYSKANRI    =   1 )
+                    OR   ( IDX4           >=   50 )
       *
                COMPUTE IDX4    =   IDX4    +   1
       *
