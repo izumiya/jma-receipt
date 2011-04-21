@@ -32,6 +32,8 @@
       *
       *  04.05.01    NACL-藤原    11/04/04  災害対応
       *                                     備考欄の記載等追加
+      *  04.05.02    NACL-藤原    11/04/18  災害対応
+      *                                     確定分の記載を中止
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -300,8 +302,6 @@
        01  WRK-SYOKBN              PIC X(01).
       *
        01  WRK-PRTFLG              PIC 9(01).
-      *    
-       01  WRK-GENMENKBN           PIC X(01).
       *
            COPY    "COMMON-SPA".
       *
@@ -317,7 +317,6 @@
                                                WRK-NYUGAIKBN
                                                WRK-SYOKBN
                                                WRK-PRTFLG
-                                               WRK-GENMENKBN
                                                SPA-AREA
                                                LNK-RECEERR
            .
@@ -581,18 +580,10 @@
                WHEN    ZERO
                    MOVE    SYS-1005-SRYKANAME    TO  HCM3A-SRYKA
                WHEN    "1"
-                   IF      WRK-GENMENKBN       =   "0"
-                       STRING  "（確定分）"        DELIMITED   BY  SIZE
-                               SYS-1005-SRYKANAME
-                                                   DELIMITED   BY  SPACE  
-                                                   INTO  HCM3A-SRYKA
-                       END-STRING
-                   ELSE
-                       STRING  "（未確定分）"      DELIMITED   BY  SIZE
-                               SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
-                                                   INTO  HCM3A-SRYKA
-                       END-STRING
-                   END-IF
+                   STRING  "（未確定分）"      DELIMITED   BY  SIZE
+                           SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
+                                               INTO  HCM3A-SRYKA
+                   END-STRING
            END-EVALUATE
       *
            .
@@ -646,18 +637,10 @@
                WHEN    ZERO
                    MOVE    SYS-1005-SRYKANAME    TO  HCM3B-SRYKA
                WHEN    "1"
-                   IF      WRK-GENMENKBN       =   "0"
-                       STRING  "（確定分）"        DELIMITED   BY  SIZE
-                               SYS-1005-SRYKANAME
-                                                   DELIMITED   BY  SPACE  
-                                                   INTO  HCM3B-SRYKA
-                       END-STRING
-                   ELSE
-                       STRING  "（未確定分）"      DELIMITED   BY  SIZE
-                               SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
-                                                   INTO  HCM3B-SRYKA
-                       END-STRING
-                   END-IF
+                   STRING  "（未確定分）"      DELIMITED   BY  SIZE
+                           SYS-1005-SRYKANAME  DELIMITED   BY  SPACE  
+                                               INTO  HCM3B-SRYKA
+                   END-STRING
            END-EVALUATE
       *
            .
@@ -1075,11 +1058,7 @@
       *
       *    備考欄
            IF      WRK-PARA-GENMENKBN  =   "1"
-               IF      WRK-GENMENKBN   =   "0"
-                   MOVE    "確定分："      TO  HCM3B-BIKOH-TITLE
-               ELSE
-                   MOVE    "未確定分："    TO  HCM3B-BIKOH-TITLE
-               END-IF    
+               MOVE    "未確定分："    TO  HCM3B-BIKOH-TITLE
                MOVE    "件数"          TO  HCM3B-BIKOH-TITLE-KENSU
                MOVE    "日数"          TO  HCM3B-BIKOH-TITLE-NISSU
                MOVE    "点数"          TO  HCM3B-BIKOH-TITLE-TENSU
@@ -1203,7 +1182,7 @@
            IF      WRK-PARA-GENMENKBN  =   "1"
                MOVE    SPRT-TITLE          TO  WRK-SPRT-TITLE
                MOVE    SPACE               TO  SPRT-TITLE
-               STRING  "災害分・"          DELIMITED  BY  SIZE
+               STRING  "未確定分・"        DELIMITED  BY  SIZE
                        WRK-SPRT-TITLE      DELIMITED  BY  SPACE
                                            INTO    SPRT-TITLE
                END-STRING

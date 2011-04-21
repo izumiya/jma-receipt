@@ -86,8 +86,8 @@
       *                                     名称２があれば優先する
       *  04.05.02    NACL-藤原    11/04/04  災害対応
       *                                     備考欄の記載等追加
-      *  04.05.03    NACL-藤原    11/04/04  災害対応
-      *                                     確定分の記載を中止
+      *  04.05.03    NACL-藤原    11/04/18  災害対応
+      *                                     未確定分のみ別集計とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -197,8 +197,6 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-INDEX           PIC 9(02).
            03  WRK-FTNMONEY        PIC 9(10).
            03  WRK-SYOKBN          PIC X(01).
-      *    
-           03  WRK-GENMENKBN       PIC X(01).
       *
            03  WRK-MEISYO          PIC X(44).
       *
@@ -528,8 +526,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *
            OPEN    OUTPUT              UPD-FILE
       *
-           MOVE    "0"             TO  WRK-GENMENKBN
-      *
       *    返戻分
            EVALUATE    WRK-PARA-SYOKBN
                WHEN    ZERO
@@ -643,7 +639,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                                            WRK-NYUGAIKBN
                                                            WRK-SYOKBN
                                                            WRK-PRTFLG
-                                                           WRK-GENMENKBN
                                                            SPA-AREA
                                                            RECEERR
                                        ELSE
@@ -653,7 +648,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                                            WRK-PARA
                                                            WRK-SYOKBN
                                                            WRK-PRTFLG
-                                                           WRK-GENMENKBN
                                                            SPA-AREA
                                                            RECEERR
                                        END-IF
@@ -718,7 +712,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                                            WRK-NYUGAIKBN
                                                            WRK-SYOKBN
                                                            WRK-PRTFLG
-                                                           WRK-GENMENKBN
                                                            SPA-AREA
                                                            RECEERR
                                    END-IF 

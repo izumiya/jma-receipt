@@ -7415,6 +7415,7 @@
       *
                EVALUATE    RECE62-RJNGAIKOHFTN (1)
                 WHEN    1
+                WHEN    8
                 WHEN    10
                 WHEN    11
                 WHEN    2
@@ -7423,6 +7424,7 @@
                 WHEN    5
                  EVALUATE    RECE62-RJNGAIKOHFTN (1)
                          WHEN    1
+                         WHEN    8
                          WHEN    10
                          WHEN    11
                              MOVE    "（不詳）"  TO  WRK-TITLE
