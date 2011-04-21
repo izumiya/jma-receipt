@@ -153,6 +153,8 @@
       *                                     「不詳・災１」の追加
       *  04.05.07    NACL-藤原    11/04/01  災害対応
       *                                     「〒」「ＴＥＬ：」の記載追加
+      *  04.05.08    NACL-藤原    11/04/20  災害対応
+      *                                     公費負担医療の連絡先情報追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1328,6 +1330,9 @@
                EVALUATE    RECE62-RJNGAIKOHFTN (1)
                    WHEN    6
                    WHEN    7
+                   WHEN    8
+                   WHEN    9
+                   WHEN    11
                        INITIALIZE              ORCSKANACHKAREA
                        MOVE    "2"             TO  KANACHK-SYORI 
                        MOVE    RECE62-HOME-POST

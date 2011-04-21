@@ -86,6 +86,8 @@
       *                                     名称２があれば優先する
       *  04.05.02    NACL-藤原    11/04/04  災害対応
       *                                     備考欄の記載等追加
+      *  04.05.03    NACL-藤原    11/04/04  災害対応
+      *                                     確定分の記載を中止
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -405,7 +407,7 @@ grpsys     COPY    "COMMON-SPA".
                MOVE    "社保総括表（改正版）"
                                    TO  JOB-SHELLMSG
            ELSE
-               MOVE    "災害分・社保総括表（改正版）"
+               MOVE    "未確定分・社保総括表（改正版）"
                                    TO  JOB-SHELLMSG
            END-IF
 grpsys     PERFORM 900-CALL-ORCSJOB-SEC
@@ -542,27 +544,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                    MOVE    "1"         TO  WRK-SYOKBN
                    PERFORM 2001-SYOKBN-SYUKEI-SEC
            END-EVALUATE
-      *
-      *    未確定分（保険者未確定分）
-           IF      WRK-PARA-GENMENKBN
-                                   =   "1"
-               MOVE    "1"             TO  WRK-GENMENKBN
-      *
-      *        返戻分
-               EVALUATE    WRK-PARA-SYOKBN
-                   WHEN    ZERO
-                   WHEN    "2"
-                       MOVE    "2"         TO  WRK-SYOKBN
-                       PERFORM 2001-SYOKBN-SYUKEI-SEC
-               END-EVALUATE
-      *        当月・月遅れ分
-               EVALUATE    WRK-PARA-SYOKBN
-                   WHEN    ZERO
-                   WHEN    "1"
-                       MOVE    "1"         TO  WRK-SYOKBN
-                       PERFORM 2001-SYOKBN-SYUKEI-SEC
-               END-EVALUATE
-           END-IF
       *
            CLOSE   UPD-FILE
       *
@@ -1857,23 +1838,16 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *        災害対応
                EVALUATE    WRK-PARA-GENMENKBN
                    WHEN    ZERO
-                       IF      RECE10-ETC-YKZFTN (1)   >   ZERO
+                       IF      RECE10-ETC-YKZFTN (1)   =   6   OR  7
+                                                       OR  8
                            GO  TO  900-SEIKYU-READ-SEC
                        END-IF
                    WHEN    "1"
-                       IF      RECE10-ETC-YKZFTN (1)   =   ZERO
-                           GO  TO  900-SEIKYU-READ-SEC
-                       END-IF
-                       IF      WRK-GENMENKBN           =   "0"
-                           IF      RECE10-ETC-YKZFTN (1)   =   6   OR  7
-                               GO  TO  900-SEIKYU-READ-SEC
-                           END-IF
+                       IF      RECE10-ETC-YKZFTN (1)   =   6   OR  7
+                                                       OR  8
+                           CONTINUE
                        ELSE
-                           IF      RECE10-ETC-YKZFTN (1)   =   6   OR  7
-                               CONTINUE
-                           ELSE
-                               GO  TO  900-SEIKYU-READ-SEC
-                           END-IF
+                           GO  TO  900-SEIKYU-READ-SEC
                        END-IF
                END-EVALUATE 
       *
