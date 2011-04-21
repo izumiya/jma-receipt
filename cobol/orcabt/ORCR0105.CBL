@@ -124,6 +124,8 @@
       *                                     øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚§Œµ≠∫‹ƒ…≤√
       *  04.05.22    NACL-∆£∏∂    11/04/18  ∫“≥≤¬–±˛
       *                                     ∫“£≤§Œ ›∏±Õ˙ŒÚµ≠∫‹§Œ»ΩƒÍ∫ÔΩ¸
+      *  04.05.23    NACL-∆£∏∂    11/04/20  ∫“≥≤¬–±˛
+      *                                     ∏¯»Ò…È√¥∞ÂŒ≈§Œµ≠∫‹¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2837,28 +2839,36 @@
            END-IF
       *
            IF      CNT-PAGE            =   1
-               IF      RECE02-RJNGAIKOHFTN (1)   =   1   OR  2  OR  4
-                                                 OR  5   OR  7
-                   MOVE    SPACE                TO  WRK-HC06-HEAD4-G
-                   MOVE    HC06-HEAD4-G (5:)    TO  WRK-HC06-HEAD4-G
-                   MOVE    SPACE                TO  HC06-HEAD4-G    
-                   MOVE    WRK-HC06-HEAD4-G (1:48)
-                                                TO  HC06-HEAD4 (1) (15:)
-                   MOVE    WRK-HC06-HEAD4-G (49:48)
-                                                TO  HC06-HEAD4 (2) (15:)
-               END-IF
-      *        
                EVALUATE    RECE02-RJNGAIKOHFTN (1)
                    WHEN    1
-                       MOVE    "° …‘æ‹°À"  TO  HC06-HEAD5
+                   WHEN    10
+                   WHEN    11
                    WHEN    2
                    WHEN    7
-                       MOVE    "° ∫“£±°À"  TO  HC06-HEAD5
                    WHEN    4
-                       MOVE    "° ∫“£≤°À"  TO  HC06-HEAD5
                    WHEN    5
-                       MOVE    "° …‘æ‹°¶∫“£±°À"
-                                           TO  HC06-HEAD5
+                       MOVE    SPACE            TO  WRK-HC06-HEAD4-G
+                       MOVE    HC06-HEAD4-G (5:)
+                                                TO  WRK-HC06-HEAD4-G
+                       MOVE    SPACE            TO  HC06-HEAD4-G    
+                       MOVE    WRK-HC06-HEAD4-G (1:48)
+                                                TO  HC06-HEAD4 (1) (15:)
+                       MOVE    WRK-HC06-HEAD4-G (49:48)
+                                                TO  HC06-HEAD4 (2) (15:)
+                       EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                           WHEN    1
+                           WHEN    10
+                           WHEN    11
+                               MOVE    "° …‘æ‹°À"  TO  HC06-HEAD5
+                           WHEN    2
+                           WHEN    7
+                               MOVE    "° ∫“£±°À"  TO  HC06-HEAD5
+                           WHEN    4
+                               MOVE    "° ∫“£≤°À"  TO  HC06-HEAD5
+                           WHEN    5
+                               MOVE    "° …‘æ‹°¶∫“£±°À"
+                                                   TO  HC06-HEAD5
+                       END-EVALUATE
                END-EVALUATE
            END-IF
       *
@@ -3354,7 +3364,12 @@
                    RECE02-KOHNUM (4)      =   SPACE   AND  
                    RECE02-HKNNUM          =   SPACE            
       *        £≥ºÔ§ŒæÏπÁ° £∏∑Â°À
-               MOVE    RECE02-KOHFTNJANUM(SEIHIDX)  TO  WRK-HKNJANUM
+               IF    ( RECE02-RJNGAIKOHFTN (1)      =   6   OR  7 )
+               AND   ( RECE02-KOHFTNJANUM(SEIHIDX)  =   SPACE     )
+                   MOVE    RECE02-KOHHBTNUM(SEIHIDX)    TO  WRK-HKNJANUM
+               ELSE
+                   MOVE    RECE02-KOHFTNJANUM(SEIHIDX)  TO  WRK-HKNJANUM
+               END-IF
            ELSE
                IF  RECE02-TEISYUTUSAKI    =   "2"
                    IF      RECE02-HKNJANUM (1:2)  =   "67"
@@ -3719,6 +3734,24 @@
                    END-IF
                END-IF                        
            END-IF    
+      *    
+      *    ∫“≥≤¬–±˛
+      *
+           IF      RECE02-RJNGAIKOHFTN (1) =   6   OR  7   OR  9   OR
+                                               11
+      *        ∏¯…È£±
+               IF    ( RECE02-KOHNUM     (IDA) NOT =   SPACE )
+               AND   ( RECE02-KOHFTNJANUM(IDA)     =   SPACE )
+                   MOVE    RECE02-KOHHBTNUM(IDA)   TO HC06-KOHFTNJANUM1 
+                   MOVE    SPACE                   TO HC06-KOHFTNJANUM1N
+               END-IF
+      *        ∏¯…È£≤
+               IF    ( RECE02-KOHNUM     (IDB) NOT =   SPACE )
+               AND   ( RECE02-KOHFTNJANUM(IDB)     =   SPACE )
+                   MOVE    RECE02-KOHHBTNUM(IDB)   TO HC06-KOHFTNJANUM2
+                   MOVE    SPACE                   TO HC06-KOHFTNJANUM2N
+               END-IF
+           END-IF
       *
       *    <ø«Œ≈º¬∆¸øÙ>
            IF      CNT-PAGE        =   1
@@ -6347,7 +6380,20 @@
                                                TO  WRK-KOH-FTNJANUM
                        END-IF
                    ELSE
-                       MOVE    SPACE           TO  WRK-KOH-FTNJANUM     
+                       MOVE    SPACE           TO  WRK-KOH-FTNJANUM
+      *                ∫“≥≤¬–±˛     
+                       IF      RECE02-RJNGAIKOHFTN (1) =   6   OR  7
+                                                       OR  9   OR  11
+                           MOVE    RECE02-KOHHBTNUM (IDY)
+                                               TO  KANACHK-MAE-INPUT
+                           CALL    "ORCSKANACHK"
+                                               USING   ORCSKANACHKAREA
+                           IF    ( KANACHK-RC      =   ZERO )
+                           AND   ( KANACHK-MAX     >   ZERO )
+                               MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                                   TO  WRK-KOH-FTNJANUM
+                           END-IF
+                       END-IF 
                    END-IF
                    IF      RECE02-KOHJKYSNUM (IDY)
                                            NOT =   SPACE
@@ -6463,9 +6509,9 @@
            END-IF
       *
       *    ∫“≥≤¬–±˛
-           IF      RECE02-RJNGAIKOHFTN (1) =   1   OR  2   OR  4   OR  5
-                                           OR  6   OR  7
-      *
+           IF      RECE02-RJNGAIKOHFTN (1) =   3
+               CONTINUE
+           ELSE
       *        ≈¶Õ◊ÕÛ§Àµ≠∫‹§µ§Ï§∆§§§ÎæÏπÁ£±π‘§¢§±§Î
                IF      WRK-LINETEK     >   ZERO
                    IF      WRK-LINETEK     >=   WRK-TEKIYOU-LINE
@@ -6475,19 +6521,27 @@
                    END-IF
                END-IF
       *
-               IF      RECE02-RJNGAIKOHFTN (1) =   1   OR  2   OR  4
-                                               OR  5   OR  7
+               EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                WHEN    1
+                WHEN    10
+                WHEN    11
+                WHEN    2
+                WHEN    7
+                WHEN    4
+                WHEN    5
                  EVALUATE    RECE02-RJNGAIKOHFTN (1)
-                   WHEN    1
-                      MOVE     "° …‘æ‹°À"      TO  WRK-TITLE
-                   WHEN    2
-                   WHEN    7
-                       MOVE    "° ∫“£±°À"      TO  WRK-TITLE
-                   WHEN    4
-                       MOVE    "° ∫“£≤°À"      TO  WRK-TITLE
-                   WHEN    5
-                       MOVE    "° …‘æ‹°¶∫“£±°À"
-                                               TO  WRK-TITLE
+                         WHEN    1
+                         WHEN    10
+                         WHEN    11
+                             MOVE    "° …‘æ‹°À"  TO  WRK-TITLE
+                         WHEN    2
+                         WHEN    7
+                             MOVE    "° ∫“£±°À"  TO  WRK-TITLE
+                         WHEN    4
+                             MOVE    "° ∫“£≤°À"  TO  WRK-TITLE
+                         WHEN    5
+                             MOVE    "° …‘æ‹°¶∫“£±°À"
+                                                   TO  WRK-TITLE
                  END-EVALUATE
                  INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "°°"
       * 
@@ -6510,7 +6564,7 @@
                            MOVE  WRK-TITLE TO  HC063-TEKIYO(WRK-LINETEK)
                     END-EVALUATE
                  END-IF
-               END-IF
+               END-EVALUATE
       *
       *        øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚§Œµ≠∫‹° ∫“£≤°À
                IF      RECE02-RJNGAIKOHFTN (1) =   4
@@ -6559,7 +6613,12 @@
                END-IF
       *                   
       *        ∫“≥≤¬–±˛° œ¢ÕÌ¿Ëµ≠∫‹°À
-               IF      RECE02-RJNGAIKOHFTN (1) =   6   OR  7
+               EVALUATE    RECE02-RJNGAIKOHFTN (1)
+                 WHEN    6
+                 WHEN    7
+                 WHEN    8
+                 WHEN    9
+                 WHEN    11
                    IF    ( RECE02-HOME-POST1
                                            =   SPACE )
                    AND   ( RECE02-HOME-ADRS1
@@ -6810,7 +6869,7 @@
                            END-IF
                        END-IF
                    END-IF
-               END-IF
+               END-EVALUATE
            END-IF
       *
       *    ≈¨Õ—ÕÛæÂ√ •≥•·•Û•»° •Ï•ª•◊•»∆√µ≠ªˆπ‡ ‘Ω∏æ Û°À
