@@ -314,8 +314,11 @@
       *  04.05.23    NACL-藤原    11/02/03  他医療機関受診対応
       *  04.05.24    NACL-藤原    11/02/22  レセ電データの記号番号区切り
       *                                     文字設定対応
-      *  04.06.07    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
+      *  04.05.25    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
       *                                     は公費単独のレセプトとする
+      *  04.05.26    NACL-藤原    11/04/20  災害対応
+      *                                     災害該当レセプトのレセ電デー
+      *                                     タ作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -711,6 +714,13 @@
       *
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
+      *
+      *    災害用コメント
+           03  WRK-DISASTER-COMMENT    PIC X(76).
+           03  WRK-FUTAN               PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN1              PIC ZZZ,ZZ9. 
+           03  WRK-ADRS.
+               05  WRK-ADRS-R          PIC X(76)  OCCURS  4.
       *
       *    区切り文字設定
            03  WRK-DELIMITER-AREA.
@@ -2592,6 +2602,12 @@
                                          TO  WRK-HENKAN
                END-IF
            END-IF
+      *    災害対応
+           IF    ( RECE62-RJNGAIKOHFTN (1)
+                                         >   0     )
+           AND   ( RECE62-HKNJANUM       =   SPACE )
+               MOVE    "99999999"            TO  WRK-HENKAN
+           END-IF
            MOVE    8                     TO  WRK-LENGTH 
            PERFORM 5003-DATA-RIGHT-HENSYU-SEC
            MOVE    WRK-HENKAN            TO  WRK-DATA
@@ -2638,6 +2654,12 @@
                END-IF
            ELSE
                MOVE    RECE62-NUM          TO  WRK-DATA
+           END-IF
+      *    災害対応
+           IF    ( RECE62-RJNGAIKOHFTN (1)
+                                         >   0     )
+           AND   ( RECE62-NUM            =   SPACE )
+               MOVE    "999999999"           TO  WRK-DATA
            END-IF
            MOVE    38                    TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
@@ -3061,6 +3083,17 @@
                        END-IF
                    END-IF
            END-EVALUATE
+      *    災害対応
+           IF    ( RECE62-RJNGAIKOHFTN (1)
+                                         >   0     )
+           AND   ( RECE62-KOHFTNJANUM (IDY)
+                                         =   SPACE )
+               MOVE    SPACE                 TO  WRK-DATA
+               STRING  RECE62-KOHHBTNUM (IDY)    DELIMITED BY  SIZE
+                       "888888"                  DELIMITED BY  SIZE  
+                                                 INTO    WRK-DATA
+               END-STRING
+           END-IF
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    受給者番号                             
@@ -3115,6 +3148,13 @@
                        END-IF
                    END-IF
            END-EVALUATE
+      *    災害対応
+           IF    ( RECE62-RJNGAIKOHFTN (1)
+                                         >   0     )
+           AND   ( RECE62-KOHJKYSNUM  (IDY)
+                                         =   SPACE )
+               MOVE    "9999999"             TO   WRK-DATA
+           END-IF
            MOVE    7                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
       *    任意給付区分                             
@@ -3454,7 +3494,14 @@
            MOVE    SPACE               TO  WRK-FUKUSHIFLG-SKJINF-AREA
            PERFORM 20070-FTNKBN-HENSYU-SEC
       *
-      *        症状詳記（適用欄上段コメント・手術歴・保険履歴）
+      *    災害対応
+           IF      RECE62-RJNGAIKOHFTN (1) =   3   OR  ZERO
+               CONTINUE
+           ELSE
+               PERFORM 20070-DISASTER-HENSYU-SEC
+           END-IF
+      *
+      *    症状詳記（適用欄上段コメント・手術歴・保険履歴）
            MOVE    WRK-FTNKBN          TO  WRK-COM-FTNKBN
            MOVE    ZERO                TO  FLG-TOYAKUFLG
            PERFORM 2008-COMMENT-HEN-01-SEC
@@ -3892,6 +3939,233 @@
            .
        200701-FTNKBN-HENSYU-200804-EXT.
            EXIT. 
+      *
+      *****************************************************************
+      *    摘要データ（災害コメント）編集処理
+      *****************************************************************
+       20070-DISASTER-HENSYU-SEC       SECTION.
+      *
+           MOVE    "01"                TO  WRK-SRYKBN 
+      *
+           MOVE    SPACE               TO  WRK-DISASTER-COMMENT
+           EVALUATE    RECE62-RJNGAIKOHFTN (1)
+               WHEN    1
+               WHEN    8
+               WHEN    10
+               WHEN    11
+                   MOVE    "（不詳）"      TO  WRK-DISASTER-COMMENT
+               WHEN    2
+               WHEN    7
+                   MOVE    "（災１）"      TO  WRK-DISASTER-COMMENT
+               WHEN    4
+                   MOVE    "（災２）"      TO  WRK-DISASTER-COMMENT
+               WHEN    5
+                   MOVE    "（不詳・災１）"
+                                           TO  WRK-DISASTER-COMMENT
+           END-EVALUATE
+           PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+      *
+           MOVE    SPACE               TO  WRK-DISASTER-COMMENT
+           IF      RECE62-RJNGAIKOHFTN (1) =   4
+      *        震災以前一部負担金の記載（災２）
+               MOVE    RECE62-YOBIETC (4)  TO  WRK-FUTAN
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "2"                 TO  KANACHK-SYORI 
+               MOVE    WRK-FUTAN           TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC          =   ZERO )
+               AND   ( KANACHK-MAX         >   ZERO )
+                   STRING  "【震災以前一部負担金】"
+                                               DELIMITED  BY  SIZE
+                           KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                           "円"                DELIMITED  BY  SIZE
+                                           INTO    WRK-DISASTER-COMMENT
+                   END-STRING
+               END-IF
+               PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+      *
+      *        震災以前一部食事生活療養標準負担額の記載（災２）
+               MOVE    SPACE               TO  WRK-DISASTER-COMMENT
+               MOVE    RECE62-YOBIETC (5)  TO  WRK-FUTAN1
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "2"                 TO  KANACHK-SYORI 
+               MOVE    WRK-FUTAN1          TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC      =   ZERO )
+               AND   ( KANACHK-MAX     >   ZERO )
+                   STRING  "【震災以前食事生活療養標準負担額】"
+                                               DELIMITED  BY  SIZE
+                           KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                           "円"                DELIMITED  BY  SIZE
+                                           INTO    WRK-DISASTER-COMMENT
+                   END-STRING
+               END-IF
+               PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+           END-IF
+      *                   
+      *    災害対応（連絡先記載）
+           MOVE    SPACE               TO  WRK-DISASTER-COMMENT
+           EVALUATE    RECE62-RJNGAIKOHFTN (1)
+               WHEN    6
+               WHEN    7
+               WHEN    8
+               WHEN    9
+               WHEN    11
+                   IF    ( RECE62-HOME-POST1
+                                           =   SPACE )
+                   AND   ( RECE62-HOME-ADRS1
+                                           =   SPACE )
+                   AND   ( RECE62-RENRAKU-POST1
+                                           =   SPACE )
+                   AND   ( RECE62-RENRAKU-NAME
+                                           =   SPACE )
+                   AND   ( RECE62-RENRAKU-ADRS1
+                                           =   SPACE )
+                   AND   ( RECE62-TEL      =   SPACE )
+                       CONTINUE
+                   ELSE
+      *                自宅住所記載
+                       IF   ( RECE62-HOME-ADRS1      =   SPACE )
+                       AND  ( RECE62-HOME-POST1      =   SPACE )
+                           CONTINUE
+                       ELSE
+                           MOVE    "【住所】"  TO  WRK-DISASTER-COMMENT
+                           PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+      *                    自宅住所記載
+                           MOVE    SPACE               TO  WRK-ADRS
+                           IF      RECE62-HOME-POST1   =   SPACE
+                               MOVE    RECE62-HOME-ADRS1   TO  WRK-ADRS
+                           ELSE
+                               STRING   "〒"       DELIMITED  BY  SIZE
+                                    RECE62-HOME-POST1
+                                                   DELIMITED  BY  SPACE
+                                    RECE62-HOME-ADRS1
+                                                   DELIMITED  BY  SPACE
+                                                   INTO    WRK-ADRS
+                               END-STRING
+                           END-IF
+                           PERFORM VARYING IDY     FROM    1   BY  1
+                                   UNTIL   IDY     >       4
+                                   OR      WRK-ADRS-R (IDY)
+                                                   =       SPACE
+                              MOVE    WRK-ADRS-R (IDY)    TO
+                                                   WRK-DISASTER-COMMENT
+                              PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+                          END-PERFORM
+                       END-IF
+      *                連絡先記載
+                       IF    ( RECE62-RENRAKU-POST1
+                                               =   SPACE )
+                       AND   ( RECE62-RENRAKU-NAME
+                                               =   SPACE )
+                       AND   ( RECE62-RENRAKU-ADRS1
+                                               =   SPACE )
+                       AND   ( RECE62-TEL      =   SPACE )
+                           CONTINUE
+                       ELSE
+                           MOVE    "【連絡先】"
+                                               TO  WRK-DISASTER-COMMENT
+                           PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+      *                    事業所名記載
+                           PERFORM VARYING IDY     FROM    1   BY  1
+                                   UNTIL   IDY     >       2
+                                   OR      RECE62-RENRAKU-NAME-R (IDY)
+                                                   =       SPACE
+                              MOVE    RECE62-RENRAKU-NAME-R (IDY)
+                                               TO  WRK-DISASTER-COMMENT
+                              PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+                          END-PERFORM
+      *                    連絡先住所記載
+                           MOVE    SPACE               TO  WRK-ADRS
+                           IF      RECE62-RENRAKU-POST1
+                                                       =   SPACE
+                               MOVE    RECE62-RENRAKU-ADRS1
+                                                           TO  WRK-ADRS
+                           ELSE
+                               STRING   "〒"       DELIMITED  BY  SIZE
+                                    RECE62-RENRAKU-POST1
+                                                   DELIMITED  BY  SPACE
+                                    RECE62-RENRAKU-ADRS1
+                                                   DELIMITED  BY  SPACE
+                                                   INTO    WRK-ADRS
+                               END-STRING
+                           END-IF
+                           PERFORM VARYING IDY     FROM    1   BY  1
+                                   UNTIL   IDY     >       4
+                                   OR      WRK-ADRS-R (IDY)
+                                                   =       SPACE
+                              MOVE    WRK-ADRS-R (IDY)    TO
+                                                   WRK-DISASTER-COMMENT
+                              PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+                           END-PERFORM
+      *                    連絡先記載
+                           IF     RECE62-TEL       =   SPACE
+                               CONTINUE
+                           ELSE
+                               MOVE    SPACE       TO
+                                                   WRK-DISASTER-COMMENT
+                               STRING  "ＴＥＬ："  DELIMITED  BY  SIZE
+                                       RECE62-TEL  DELIMITED  BY  SIZE
+                                                   INTO
+                                                   WRK-DISASTER-COMMENT
+                               END-STRING
+                              PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+                          END-IF
+                      END-IF
+                  END-IF
+           END-EVALUATE
+
+           .
+       20070-DISASTER-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    摘要データ（災害用コメント）編集処理
+      *****************************************************************
+       200701-DISASTER-COMMENT-HENSYU-SEC  SECTION.
+      *
+           IF      WRK-DISASTER-COMMENT         =   SPACE
+               GO  TO  200701-DISASTER-COMMENT-HENSYU-EXT
+           END-IF
+           INSPECT WRK-DISASTER-COMMENT
+                               REPLACING   ALL "  "    BY  "　"
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           MOVE    "CO,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *    診療識別
+           IF      WRK-SRYKBN      NOT =   SPACE     
+               MOVE    WRK-SRYKBN          TO  WRK-DATA
+               MOVE    2                   TO  WRK-NAGASA
+               MOVE    SPACE               TO  WRK-SRYKBN
+           END-IF    
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    負担区分
+           MOVE    WRK-FTNKBN          TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    コメントコード
+           MOVE    "810000001"         TO  WRK-DATA
+           MOVE    9                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    文字データ
+           MOVE    WRK-DISASTER-COMMENT         TO  WRK-DATA
+           MOVE    76                  TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END 
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+      *
+      *    コメントのクリア
+           MOVE    SPACE                TO  WRK-DISASTER-COMMENT
+           .
+       200701-DISASTER-COMMENT-HENSYU-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    入退院履歴編集処理
@@ -8453,11 +8727,11 @@
                                    MOVE    1           TO  FLG-READ
                                END-IF
                            ELSE
-      *                        災害対応分は対象としない 
-                               IF      RECE62-RJNGAIKOHFTN (1)
-                                                       =   ZERO
+      *************************災害対応分は対象としない 
+      *************************IF      RECE62-RJNGAIKOHFTN (1)
+      *************************                            =   ZERO
                                    MOVE    1           TO  FLG-READ
-                               END-IF
+      *************************END-IF
                            END-IF
                        END-IF    
       *
