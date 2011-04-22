@@ -40,6 +40,10 @@
       *  04.05.02    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
       *  04.05.03    NACL-藤原    11/03/28  児童保護(53)の公費単独のレセ
       *                                     プトの負担者番号等の表示
+      *  04.05.04    NACL-藤原    11/04/20  災害対応
+      *                                     システム管理の設定に従い、災
+      *                                     害該当レセプトのレセ電データ
+      *                                     の作成のチェックを追加
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -113,6 +117,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDW                 PIC 9(04).
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
@@ -631,12 +636,19 @@
                MOVE    "0"                 TO
                                            SYS-200501-RECEDEN-RIREKIKBN
            END-IF 
+           IF     SYS-200501-RECEDEN-DISASTER
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-RECEDEN-DISASTER
+           END-IF
            MOVE    SYS-200501-RECEDEN-LST1KBN
                                        TO
                                    SPA-NAI-T06-200501-RECEDEN-LST1KBN
-           MOVE   SYS-200501-RECEDEN-RIREKIKBN
+           MOVE    SYS-200501-RECEDEN-RIREKIKBN
                                        TO
                                    SPA-NAI-T06-200501-RECEDEN-RIREKIKBN
+           MOVE    SYS-200501-RECEDEN-DISASTER
+                                       TO
+                                   SPA-NAI-T06-200501-RECEDEN-DISASTER
       *
       *    レセプト編集区分情報（主科情報）
            MOVE    SPACE               TO  SYS-2009-REC
@@ -2253,12 +2265,20 @@
            MOVE    ZERO                TO  IDX
                                            IDY
                                            IDZ
+                                           IDW
            INITIALIZE                      WRK-RECE10-REC
                                            SPA-T09-AREA
       *
            PERFORM         UNTIL       FLG-SEIKYU     =   1
                            OR          IDX            >=  20
                MOVE    MCPDATA-REC         TO  RECE10-REC
+      *        災害対応（未確定分をレセ電データに記録するか）
+               IF    (  SPA-NAI-T06-200501-RECEDEN-DISASTER
+                                           =   "0"              )
+               AND   ( RECE10-ETC-YKZFTN (1)
+                                           =   6   OR  7  OR  8 )
+                   ADD     1                   TO  IDW
+               ELSE
       *            月遅れ分、請求しないは対象外
                    IF    ( RECE10-SKYKBN   NOT =   "0"             )
                    AND   ( RECE10-SKYYM        =   "000000"
@@ -2323,6 +2343,7 @@
                    ELSE
                        ADD     1               TO  IDZ
                    END-IF
+               END-IF
       *
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
                MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
@@ -2337,6 +2358,7 @@
                WHEN    ZERO
                    IF    ( IDY             =   0 )
                    AND   ( IDZ             =   0 )
+                   AND   ( IDW             =   0 )
                        MOVE    "0007"          TO  SPA-ERRCD
                    ELSE
                        IF    ( SPA-NAI-T06-BODY-SELNUM
@@ -2348,12 +2370,17 @@
                        ELSE
                            IF    ( IDY             >   0 )
                            AND   ( IDZ             >   0 )
+                           AND   ( IDW             >   0 )
                                MOVE    "0015"          TO  SPA-ERRCD
                            ELSE
                                IF    ( IDY             >   0 )
                                    MOVE    "0014"          TO  SPA-ERRCD
                                ELSE
+                                 IF    ( IDZ             >   0 )
                                    MOVE    "0016"          TO  SPA-ERRCD
+                                 ELSE
+                                   MOVE    "0019"          TO  SPA-ERRCD
+                                 END-IF
                                END-IF 
                            END-IF 
                        END-IF 
@@ -4852,6 +4879,10 @@
                                                        TO  SPA-ERRMSG
                WHEN    "0018"
                    MOVE    "主科未設定データです"      TO  SPA-ERRMSG
+               WHEN    "0019"
+                   MOVE
+                   "対象の請求データは災害の未確定分です"
+                                                       TO  SPA-ERRMSG
                WHEN    "0022"
                    MOVE    "患者情報を入力中です"      TO  SPA-ERRMSG
                WHEN    "0023"
