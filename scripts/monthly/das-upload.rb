@@ -145,7 +145,7 @@ module OrcaDAS
           if /^[0-9][0-9][0-9]/ =~ ex.message
               logmessage = "#{ex.message} (#{ex.class.name})"
           else
-              logmessage = "999 #{ex.message} (#{ex.class.name})"
+              logmessage = "999 #{ex.message} #{ex.backtrace}"
           end
         end
       }
