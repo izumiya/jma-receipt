@@ -6511,7 +6511,7 @@
            END-IF
       *
       *    災害対応
-           IF      RECE02-RJNGAIKOHFTN (1) =   3
+           IF      RECE02-RJNGAIKOHFTN (1) =   3   OR  ZERO
                CONTINUE
            ELSE
       *        摘要欄に記載されている場合１行あける
