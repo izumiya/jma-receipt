@@ -86,6 +86,8 @@
       *  04.05.02    NACL-Æ£¸¶    11/02/01  ¼çÊÝ¸±¤¬¤Ê¤¤¾ì¹ç¡¢»ùÆ¸ÊÝ¸î(53)
       *                                     ¤Ï¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
       *  04.05.03    NACL-Æ£¸¶    11/03/25  ºÒ³²ÂÐ±þ
+      *  04.05.04    NACL-Æ£¸¶    11/04/22  ºÒ³²ÂÐ±þ
+      *                                     ºÒ³²¶èÊ¬¤ÎÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1743,13 +1745,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    SPACE           TO  WRK-TITLE
            EVALUATE    RECE10-ETC-YKZFTN (1)
                WHEN    1
+               WHEN    8
+               WHEN    10
+               WHEN    11
                    MOVE    "ÉÔ¾Ü¡¡"        TO  WRK-TITLE
                WHEN    2
                WHEN    7
                    MOVE    "ºÒ£±¡¡"        TO  WRK-TITLE
                WHEN    3
                WHEN    6
-                   MOVE    "ºÒ³²¡¡"        TO  WRK-TITLE
+               WHEN    9
+                   MOVE    "Í±Í½¤Ê¤·¡¡"    TO  WRK-TITLE
                WHEN    4
                    MOVE    "ºÒ£²¡¡"        TO  WRK-TITLE
                WHEN    5
