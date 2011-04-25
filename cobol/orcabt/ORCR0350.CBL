@@ -3975,7 +3975,7 @@
                CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
                IF    ( KANACHK-RC          =   ZERO )
                AND   ( KANACHK-MAX         >   ZERO )
-                   STRING  "°⁄øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚°€"
+                   STRING  "°⁄øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚°€°°°°"
                                                DELIMITED  BY  SIZE
                            KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
