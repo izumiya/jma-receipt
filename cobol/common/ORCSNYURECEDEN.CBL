@@ -511,6 +511,10 @@
                07  WRK-SAIGAI-963              PIC X(01)  OCCURS  31.
                07  WRK-SAIGAI-959              PIC X(01)  OCCURS  31.
       *
+      *    災害対応領域（特別療養−旧特別日雇は災害減免の対象外判定用）
+           03  WRK-SAIGAI-AREA2.
+               07  WRK-SAIGAI-004              PIC X(01)  OCCURS  31.
+      *
       *    日付全角変換領域
        01  TBL-DAY-AREA.
            03  FILLER              PIC X(04)  VALUE "０１".
@@ -783,6 +787,8 @@
            CALL    "ORCSNYUINDAY"         USING   ORCSNYUINDAY-AREA
                                                   SPA-AREA
       *
+           MOVE    SPACE                      TO  WRK-SAIGAI-AREA2
+      *
       *レセ電対象保険組合せ番号の取得
            PERFORM    VARYING   IDX   FROM   1   BY   1
                       UNTIL      IDX  >    31
@@ -816,6 +822,12 @@
                                                            "040"
                                         MOVE   ZERO  TO  
                                                   WRK-HKNCOMBI-DAY(IDX)
+                                        END-IF
+      *                                 災害減免対象外とする為に特別療養
+      *                                 （旧特別日雇）を記録
+                                        IF   COMB-HKNNUM = "004"
+                                            MOVE  "1"  TO  
+                                                  WRK-SAIGAI-004(IDX)
                                         END-IF
       *                             国保
                                     WHEN   "2"
@@ -3771,6 +3783,14 @@
       *
            END-IF
       *
+      *    特別療養（旧特別日雇）は減免等の対象外とする
+           PERFORM     VARYING   IDX-SAIGAI   FROM   1   BY   1
+                       UNTIL    (IDX-SAIGAI   >    31)
+                IF     WRK-SAIGAI-004(IDX-SAIGAI)  =   "1"
+                    MOVE  SPACE  TO   WRK-SAIGAI-962(IDX-SAIGAI)
+                    MOVE  SPACE  TO   WRK-SAIGAI-963(IDX-SAIGAI)
+                END-IF
+           END-PERFORM
       *
       *    食事情報の編集
            IF   LNK-NYURECEDEN-SANTEIYM  <=  "200603"
