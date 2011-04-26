@@ -511,9 +511,12 @@
                07  WRK-SAIGAI-963              PIC X(01)  OCCURS  31.
                07  WRK-SAIGAI-959              PIC X(01)  OCCURS  31.
       *
-      *    ºÒ³²ÂÐ±þÎÎ°è¡ÊÆÃÊÌÎÅÍÜ¡ÝµìÆÃÊÌÆü¸Û¤ÏºÒ³²¸ºÌÈ¤ÎÂÐ¾Ý³°È½ÄêÍÑ¡Ë
+      *    ºÒ³²ÂÐ±þÎÎ°è
            03  WRK-SAIGAI-AREA2.
+      *        ÆÃÊÌÎÅÍÜ¡ÊµìÆÃÊÌÆü¸ÛÊÝ¸±¡Ë¤ÏºÒ³²¸ºÌÈ¤ÎÂÐ¾Ý³°¤È¤¹¤ëÈ½ÄêÍÑ
                07  WRK-SAIGAI-004              PIC X(01)  OCCURS  31.
+      *        ¼çÊÝ¸±¤¬Ìµ¤¤¾ì¹ç¤ÏºÒ³²¸ºÌÈ¤ÎÂÐ¾Ý³°¤È¤¹¤ëÈ½ÄêÍÑ
+               07  WRK-SAIGAI-SYUHKN           PIC X(01)  OCCURS  31.
       *
       *    ÆüÉÕÁ´³ÑÊÑ´¹ÎÎ°è
        01  TBL-DAY-AREA.
@@ -828,6 +831,12 @@
                                         IF   COMB-HKNNUM = "004"
                                             MOVE  "1"  TO  
                                                   WRK-SAIGAI-004(IDX)
+                                        END-IF
+      *                                 ºÒ³²¸ºÌÈÂÐ¾Ý³°¤È¤¹¤ë°Ù¤Ë¼çÊÝ¸±
+      *                                 Ìµ¤·¤òµ­Ï¿
+                                        IF   COMB-HKNNUM = SPACE
+                                            MOVE  "1"  TO  
+                                                 WRK-SAIGAI-SYUHKN(IDX)
                                         END-IF
       *                             ¹ñÊÝ
                                     WHEN   "2"
@@ -3786,7 +3795,8 @@
       *    ÆÃÊÌÎÅÍÜ¡ÊµìÆÃÊÌÆü¸Û¡Ë¤Ï¸ºÌÈÅù¤ÎÂÐ¾Ý³°¤È¤¹¤ë
            PERFORM     VARYING   IDX-SAIGAI   FROM   1   BY   1
                        UNTIL    (IDX-SAIGAI   >    31)
-                IF     WRK-SAIGAI-004(IDX-SAIGAI)  =   "1"
+                IF    (WRK-SAIGAI-004(IDX-SAIGAI)     =   "1")  OR
+                      (WRK-SAIGAI-SYUHKN(IDX-SAIGAI)  =   "1")
                     MOVE  SPACE  TO   WRK-SAIGAI-962(IDX-SAIGAI)
                     MOVE  SPACE  TO   WRK-SAIGAI-963(IDX-SAIGAI)
                 END-IF
