@@ -6959,6 +6959,16 @@
                            (RECE62-KOHNUMHC(IDX1 3)      =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 4)      =  SPACE))
                        OR ( FLG-SKJFTNNASI               =    1   )
+                       OR ((RECE62-HKNNUMHC(IDX1)        =  SPACE) AND
+                           (RECE62-KOHNUMHC(IDX1 1)      =
+                            "010" OR "038" OR "024" OR "079" OR
+                            "051" OR "052" OR "015" OR "016"     ) AND
+                           (RECE62-KOHNUMHC(IDX1 2)      =  SPACE) AND
+                           (RECE62-KOHNUMHC(IDX1 3)      =  SPACE) AND
+                           (RECE62-KOHNUMHC(IDX1 4)      =  SPACE) AND
+                           (WK-GENGAKUKBN            =  3  OR  4 ) AND
+                           (FLG-SAIGAI-TAISYO            =  1    ) AND
+                           (RECE62-HKNCOMBIFLG(IDX1)     =  3    ))
                         CONTINUE
                        ELSE
                         IF   WRK-NYULIFE-SKJFTN-SRYCD(SYUKEI-IDX3)
@@ -14880,6 +14890,14 @@
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
                                                          = ZERO ))
+                   OR   ((SYU-KOH1HKNNUM      =
+                          "010" OR "038" OR "024" OR "079" OR
+                          "051" OR "052" OR "015" OR "016"      ) AND
+                         (SYU-KOH2HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH3HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH4HKNNUM      =   SPACE         ) AND
+                         (WK-GENGAKUKBN       =   3  OR  4      ) AND
+                         (FLG-SAIGAI-TAISYO   =   1             ))
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
                                    RECE62-SHOKUJINISSU(KH-IDX)
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
