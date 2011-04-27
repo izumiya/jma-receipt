@@ -207,11 +207,14 @@
                    07  WRK-KOHPAYKBN-O PIC  X(02).
                    07  WRK-RECESKYKBN-O
                                        PIC  X(01).
+                   07  WRK-KOHTEKSTYMD-O
+                                       PIC  X(08).
            03  WRK-KOHI.
                05  WRK-KOHID           PIC  9(10).
                05  WRK-KOHHKNNUM       PIC  X(03).
                05  WRK-KOHPAYKBN       PIC  X(02).
                05  WRK-RECESKYKBN      PIC  X(01).
+               05  WRK-KOHTEKSTYMD     PIC  X(08).
       *
            03  TBL-MAX                 PIC 9(03).
       *
@@ -223,6 +226,8 @@
                        09  WRK-SEIKYU-KOHHKNNUM  PIC  X(03).
                        09  WRK-SEIKYU-KOHPAYKBN  PIC  X(02).
                        09  WRK-SEIKYU-RECESKYKBN PIC  X(01).
+                       09  WRK-SEIKYU-KOHTEKSTYMD
+                                                 PIC  X(08).
       *
        01  WK-RECESYUBETU-AREA.
            03  WK-KOKUHO               PIC X(01).
