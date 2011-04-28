@@ -2118,7 +2118,9 @@ path	key69	{
                   AND (      SRYYM       <    :SKYYM     )
                   AND (      SKYKBN      <>   '0'        )
                   AND (      SKYYM       =    :SKYYM     )
-                  AND (      HENREIYM    =   '000000'    )
+                  AND (   (  HENREIYM    =    '000000'  )
+                       OR (( HENREIYM    <>   '000000' )
+                       AND ( HENREI_SIJI_FLG =  1     )) )
                 ORDER  BY  NYUGAIKBN,SRYYM,PTNUM
 		;
 	};

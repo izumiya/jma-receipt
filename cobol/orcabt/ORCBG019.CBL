@@ -28,6 +28,11 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.04.01    NACL-藤原    09/04/10  特別療養費は対象外とする
+      *
+      *  04.05.01    NACL-藤原    11/04/28  災害対応
+      *                                     システム管理の設定に従い、災
+      *                                     害該当レセプトのレセ電データ
+      *                                     の作成のチェックを追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -307,6 +312,13 @@
                                        =   SPACE
                MOVE    "0"                 TO  SYS-200501-KOUIKIRECEKBN
            END-IF 
+           IF     SYS-200501-RECEDEN-DISASTER
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-RECEDEN-DISASTER
+           END-IF
+      *
+           DISPLAY "RECEDEN-DISASTER=" SYS-200501-RECEDEN-DISASTER
+      *    
       *
            .
        100-INIT-EXT.
@@ -401,8 +413,6 @@
            MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_seikyu"        TO  MCP-TABLE
-               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM 900-SEIKYU-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-RECE10
@@ -419,8 +429,6 @@
                    PERFORM 20011-PRINT-SEC
                END-IF
       *
-               MOVE    "tbl_seikyu"        TO  MCP-TABLE
-               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM 900-SEIKYU-READ-SEC
            END-PERFORM
       *
@@ -649,13 +657,32 @@ grpsys                                 SPA-AREA
       *****************************************************************
        900-SEIKYU-READ-SEC           SECTION.
       *
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-RECE10
                MOVE    MCPDATA-REC         TO  RECE10-REC
-               IF      RECE10-RECESYUBETU  =    "6666"
+               IF      RECE10-RECESYUBETU  =   "6666"
                    GO  TO  900-SEIKYU-READ-SEC
                END-IF
+      *
+      *        未確定分をレセ電データに記録するか
+               IF    (  SYS-200501-RECEDEN-DISASTER
+                                           =   "0"              )
+               AND   ( RECE10-ETC-YKZFTN (1)
+                                           =   6   OR  7  OR  8 )
+                   GO  TO  900-SEIKYU-READ-SEC
+               END-IF
+      *???
+               DISPLAY "PTNUM=" RECE10-PTNUM
+                       " TEISYUTUSAKI=" RECE10-TEISYUTUSAKI 
+                       " SRYYM="        RECE10-SRYYM 
+                       " RECESYUBETU="  RECE10-RECESYUBETU 
+                       " HENREIYM="     RECE10-HENREIYM
+                       " HENREI-SIJI-FLG="  RECE10-HENREI-SIJI-FLG
+                       " ETC-YKZFTN1="  RECE10-ETC-YKZFTN (1)
+      *???
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF
