@@ -4129,8 +4129,6 @@
            IF      WRK-DISASTER-COMMENT         =   SPACE
                GO  TO  200701-DISASTER-COMMENT-HENSYU-EXT
            END-IF
-           INSPECT WRK-DISASTER-COMMENT
-                               REPLACING   ALL "  "    BY  "¡¡"
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
