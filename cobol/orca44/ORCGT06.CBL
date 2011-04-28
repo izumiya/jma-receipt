@@ -1735,6 +1735,7 @@
            MOVE    ZERO                TO  IDX
                                            IDY
                                            IDZ
+                                           IDW
            INITIALIZE                      WRK-RECE10-REC
                                            SPA-T09-AREA
       *
@@ -1808,9 +1809,16 @@
                PERFORM         UNTIL       FLG-SEIKYU     =   1
                                OR          IDX            >=  20
                    MOVE    MCPDATA-REC         TO  RECE10-REC
-      *            月遅れ分、請求しないは対象外
-                   IF    ( RECE10-SKYKBN   NOT =   "0"             )
-                   AND   ( RECE10-SKYYM        =   "000000"
+      *            災害対応（未確定分をレセ電データに記録するか）
+                   IF    (  SPA-NAI-T06-200501-RECEDEN-DISASTER
+                                               =   "0"              )
+                   AND   ( RECE10-ETC-YKZFTN (1)
+                                               =   6   OR  7  OR  8 )
+                       ADD     1                   TO  IDW
+                   ELSE
+      *              月遅れ分、請求しないは対象外
+                     IF    ( RECE10-SKYKBN   NOT =   "0"             )
+                     AND   ( RECE10-SKYYM        =   "000000"
                                            OR  SPA-NAI-T06-SRYYM-H )
                        EVALUATE    SPA-NAI-T06-B-THENREI-FLG
                                            (SPA-NAI-T06-BODY-SELNUM)
@@ -1841,8 +1849,9 @@
                                    ADD     1               TO  IDY
                                END-IF
                        END-EVALUATE
-                   ELSE
+                     ELSE
                        ADD     1               TO  IDZ
+                     END-IF
                    END-IF
       *
                    MOVE    "tbl_seikyu"        TO  MCP-TABLE
@@ -1867,6 +1876,7 @@
                WHEN    ZERO
                    IF    ( IDY             =   0 )
                    AND   ( IDZ             =   0 )
+                   AND   ( IDW             =   0 )
                        MOVE    "0007"          TO  SPA-ERRCD
                    ELSE
                        IF      SPA-NAI-T06-B-THENREI-FLG
@@ -1876,12 +1886,17 @@
                        ELSE
                            IF    ( IDY             >   0 )
                            AND   ( IDZ             >   0 )
+                           AND   ( IDW             >   0 )
                                MOVE    "0015"          TO  SPA-ERRCD
                            ELSE
                                IF    ( IDY             >   0 )
                                    MOVE    "0014"          TO  SPA-ERRCD
                                ELSE
+                                 IF    ( IDZ             >   0 )
                                    MOVE    "0016"          TO  SPA-ERRCD
+                                 ELSE
+                                   MOVE    "0019"          TO  SPA-ERRCD
+                                 END-IF
                                END-IF 
                            END-IF 
                        END-IF 
@@ -3417,6 +3432,13 @@
                IF      FLG-SEIKYU      =   1
                    MOVE    "1"             TO  SPA-GMN-T06-R-TERR  (IDX)
                ELSE
+      *          災害対応（未確定分をレセ電データに記録するか）
+                 IF    (  SPA-NAI-T06-200501-RECEDEN-DISASTER
+                                               =   "0"              )
+                 AND   ( RECE10-ETC-YKZFTN (1)
+                                               =   6   OR  7  OR  8 )
+                     MOVE    "5"           TO  SPA-GMN-T06-R-TERR  (IDX)
+                 ELSE
                    IF    ( RECE10-SKYKBN   NOT =   "0"                 )
                    AND   ( RECE10-SKYYM    =   "000000"
                                        OR  SPA-NAI-T06-SRYYM-H         )
@@ -3437,6 +3459,7 @@
                    ELSE
                        MOVE    "3"     TO  SPA-GMN-T06-R-TERR  (IDX)
                    END-IF
+                 END-IF  
                END-IF
       *   
                EVALUATE    ONRECE-B-NYUGAIKBN
@@ -4683,6 +4706,8 @@
                        MOVE    "●"        TO  T06-RECE-TERR      (IDX)
                    WHEN    "4"
                        MOVE    "◎"        TO  T06-RECE-TERR      (IDX)
+                   WHEN    "5"
+                       MOVE    "□"        TO  T06-RECE-TERR      (IDX)
                END-EVALUATE
                MOVE    SPA-GMN-T06-R-TPTNUM     (IDX)
                                            TO  T06-RECE-TPTNUM    (IDX)
