@@ -85,9 +85,11 @@
                    07  TBL-MAE-SRYKAISU    PIC  9(03).
                    07  TBL-MAE-INPUTCOMENT PIC  X(80).
                    07  TBL-MAE-ATAI-G.
-                       09  TBL-MAE-ATAI    PIC  X(08)  OCCURS  3.
+                       09  TBL-MAE-ATAI    PIC  X(08)  OCCURS  4.
                    07  TBL-MAE-KANSURYO    PIC  9(05)V9(05).
                    07  TBL-MAE-INPUTKBN    PIC  X(01).
+               05  TBL-MAE-CHKFLG          PIC  X(01)
+                                           OCCURS   50.
            03  TBL-ATO-AREA.
                05  TBL-ATO-REC     OCCURS   50.
                    07  TBL-ATO-SRYCD       PIC  X(09).
@@ -95,7 +97,7 @@
                    07  TBL-ATO-SRYKAISU    PIC  9(03).
                    07  TBL-ATO-INPUTCOMENT PIC  X(80).
                    07  TBL-ATO-ATAI-G.
-                       09  TBL-ATO-ATAI    PIC  X(08)  OCCURS  3.
+                       09  TBL-ATO-ATAI    PIC  X(08)  OCCURS  4.
                    07  TBL-ATO-KANSURYO    PIC  9(05)V9(05).
                    07  TBL-ATO-INPUTKBN    PIC  X(01).
       *
@@ -403,8 +405,11 @@
                PERFORM VARYING     IDX2    FROM    1   BY  1
                        UNTIL      (IDX2        >   IDX-SIN  )  OR
                                   (FLG-ARI     =   1        )
-                   IF      TBL-ATO-REC (IDX1)  =   TBL-MAE-REC(IDX2)
+                   IF     (TBL-ATO-REC (IDX1)  =   TBL-MAE-REC(IDX2) )
+                     AND  (TBL-MAE-CHKFLG (IDX2)   =   SPACE         )
                         MOVE    1                  TO  FLG-ARI
+                        MOVE    "1"                TO  TBL-MAE-CHKFLG
+                                                              (IDX2)
                    END-IF
                END-PERFORM
                IF      FLG-ARI             =   ZERO
