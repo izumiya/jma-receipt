@@ -6759,8 +6759,11 @@
                                    UNTIL   IDY     >       2
                                    OR      RECE02-RENRAKU-NAME-R (IDY)
                                                    =       SPACE
-                               INSPECT RECE02-RENRAKU-NAME-R (IDY)
+                               MOVE    RECE02-RENRAKU-NAME-R (IDY)
+                                                       TO  WRK-TITLE
+                               INSPECT WRK-TITLE
                                        REPLACING   ALL "  "    BY  "¡¡"
+                               
       * 
                                IF      WRK-LINETEK >=  WRK-TEKIYOU-LINE
                                    PERFORM 34120-PAGE-SEC
@@ -6773,16 +6776,16 @@
                                ELSE                    
                                  EVALUATE    SYS-2005-NEXTPRTKBN-G
                                    WHEN    "0"   
-                                       MOVE  RECE02-RENRAKU-NAME-R (IDY)
+                                       MOVE  WRK-TITLE
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                                    WHEN    "1"   
-                                       MOVE  RECE02-RENRAKU-NAME-R (IDY)
+                                       MOVE  WRK-TITLE
                                            TO  HC061-TEKIYO(WRK-LINETEK)
                                    WHEN    "2"   
-                                       MOVE  RECE02-RENRAKU-NAME-R (IDY)
+                                       MOVE  WRK-TITLE
                                            TO  HC062-TEKIYO(WRK-LINETEK)
                                    WHEN    "3"   
-                                       MOVE  RECE02-RENRAKU-NAME-R (IDY)
+                                       MOVE  WRK-TITLE
                                            TO  HC063-TEKIYO(WRK-LINETEK)
                                  END-EVALUATE
                                END-IF                    
