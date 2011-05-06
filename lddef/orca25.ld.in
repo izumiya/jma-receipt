@@ -37,6 +37,8 @@ db	{
 	tbl_ptnyuinrrk;
 	tbl_nyuinacct;
 	tbl_ptinf;
+	tbl_sryacct_main;
+	tbl_sryacct_sub;
 };
 
 /* #include "orcadb.inc" */

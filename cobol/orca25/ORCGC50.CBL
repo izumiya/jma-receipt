@@ -66,6 +66,7 @@
            03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-NYUINACCT       PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-SRYACCT         PIC 9(01).
       *
            03  FLG-HKNCOMBICHK     PIC 9(01).
            03  FLG-OK              PIC 9(01).
@@ -223,6 +224,10 @@
       *    患者入院履歴
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
+      *
+      *    診療会計マスタ−
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
       *
       *
       *****************************************************************
@@ -1236,6 +1241,13 @@
            MOVE    ZERO                TO  SPA-GMN-HKNMAX
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   WRK-GMN-HKNMAX
+      *        入院調剤料のみの履歴判定の判定
+               IF     (SPA-NAI-SRYYM       <   SPA-SYSYMD(1:6) ) AND
+                      (WRK-GMN-FLG (IDX)   =   SPACE           )
+                   IF      SPA-GMN-NYUGAIKBN   =   "1"
+                       PERFORM 3142-SRYACCT-CHOZAI-SEC
+                   END-IF
+               END-IF
       *        診療年月がシステム年月以前の時のみ、受診履歴の判定
                IF     (SPA-NAI-SRYYM       <   SPA-SYSYMD(1:6) ) AND
                       (WRK-GMN-FLG (IDX)   =   SPACE           )
@@ -1269,6 +1281,52 @@
            .
        314-SYOKI-HEN-EXT.
            EXIT.
+      *****************************************************************
+      *    入院調剤料のみの診療会計（受診履歴なし）処理
+      *****************************************************************
+       3142-SRYACCT-CHOZAI-SEC          SECTION.
+      *
+      *    診療会計
+           INITIALIZE                  SRYACCT-REC
+           MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
+           MOVE    SPA-GMN-NYUGAIKBN   TO  ACCT-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+           MOVE    SPA-NAI-SRYYM       TO  ACCT-SRYYM
+           MOVE    WRK-GMN-THKNCOMBINUM(IDX)
+                                       TO  ACCT-HKNCOMBI
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key22"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key22"             TO  MCP-PATHNAME
+               PERFORM 980-SRYACCT-READ-SEC
+           ELSE
+               INITIALIZE                  SRYACCT-REC
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           PERFORM
+               UNTIL  (FLG-SRYACCT     =   1   )
+               IF      ACCT-ZAIKAISU       >   ZERO
+                   MOVE    "1"             TO  WRK-GMN-FLG (IDX)
+                   MOVE    1               TO  FLG-SRYACCT
+               ELSE
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key22"             TO  MCP-PATHNAME
+                   PERFORM 980-SRYACCT-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key22"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       3142-SRYACCT-CHOZAI-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    入院の保険組合せ編集処理
@@ -4800,6 +4858,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        910-PTNYUINRRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計マスター次読込
+      *****************************************************************
+       980-SRYACCT-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SRYACCT-REC
+               MOVE    ZERO                TO  FLG-SRYACCT
+           ELSE
+               INITIALIZE                      SRYACCT-REC
+               MOVE    1                   TO  FLG-SRYACCT
+           END-IF
+      *
+           .
+       980-SRYACCT-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
