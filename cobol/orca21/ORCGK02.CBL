@@ -1983,14 +1983,18 @@
            IF     (SPA-MOTOPG          =   "P02"  OR  "U02" 
                                                   OR  "K02N" )  AND
                   (SPA-PTID        NOT =   SPA-GMN-PTID )
-               IF      SPA-MOTOPG          =   "P02"  OR  "U02"
-                   MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
-                   MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
-               END-IF
-               IF      SPA-SRYYMD          =   SPACE
-                   MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
-                   MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
-               END-IF
+      ***      IF      SPA-MOTOPG          =   "P02"  OR  "U02"
+      *            MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
+      *            MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
+      *        END-IF
+      *        IF      SPA-SRYYMD          =   SPACE
+      *            MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
+      *            MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
+      ***      END-IF
+      *        患者変更時は、診療日＝システム日付とする
+               MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
+               MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
+      *
                MOVE    1                   TO  FLG-SYOKAI
       *
                IF      SPA-MOTOPG          =   "K01"
@@ -6090,7 +6094,10 @@
            END-IF
       *    行挿入
            IF      SPA-GMN-INPUTCD(SPA-GMN-IDX)(1:1)   =   "+"
+               MOVE    SPACE           TO  WRK-HEN-INPUTCD
                MOVE    SPA-GMN-INPUTCD(SPA-GMN-IDX)(2:)
+                                       TO  WRK-HEN-INPUTCD
+               MOVE    WRK-HEN-INPUTCD
                                        TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
                PERFORM 41014-GYOINSN-SEC
                IF      SPA-ERRCD       =   SPACE

@@ -2711,7 +2711,10 @@
       *
       *    ¹ÔÁÞÆþ
            IF      SPA-GMN-INPUTCD(SPA-GMN-IDX)(1:1)   =   "+"
+               MOVE    SPACE           TO  WRK-HEN-INPUTCD
                MOVE    SPA-GMN-INPUTCD(SPA-GMN-IDX)(2:)
+                                       TO  WRK-HEN-INPUTCD
+               MOVE    WRK-HEN-INPUTCD
                                        TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
                PERFORM 41014-GYOINSN-SEC
                MOVE    "1"             TO  SPA-COM-CUR (SPA-GMN-IDX)

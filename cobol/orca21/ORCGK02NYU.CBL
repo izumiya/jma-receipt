@@ -1642,14 +1642,16 @@
       *    ½é´ü£Ó£Ð£ÁÊÔ½¸½èÍý
            IF     (SPA-MOTOPG          =   "P02"  OR  "U02" )  AND
                   (SPA-PTID        NOT =   SPA-GMN-PTID )
-               IF      SPA-MOTOPG          =   "P02"  OR  "U02"
-                   MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
-                   MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
-                   IF      SPA-SRYYMD          =   SPACE
-                       MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
-                       MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
-                   END-IF
-               END-IF
+      *        IF      SPA-MOTOPG          =   "P02"  OR  "U02"
+      *            MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
+      *            MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
+      *            IF      SPA-SRYYMD          =   SPACE
+      *                MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
+      *                MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
+      *            END-IF
+      *        END-IF
+               MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
+               MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
       *        ½é´ü£Ó£Ð£ÁÊÔ½¸½èÍý
                INITIALIZE                  ORCSC95AREA
                MOVE    SPA-SRYYMD          TO  LNK-SC95-SRYYMD
@@ -3350,6 +3352,11 @@
                                                >   SPA-SRYYMD
                        MOVE    "2"                 TO  SPA-NYUGAIKBN
                    END-IF
+      *            Â¾±¡ÍúÎò¤Î¤ß¡ÊÂà±¡Æü¤Ê¤·¡Ë
+                   IF     (ORCSCNYUHEN-LAST-TAIINYMD
+                                               =   SPACE  )
+                       MOVE    "2"                 TO  SPA-NYUGAIKBN
+                   END-IF
                END-IF
            END-IF
            IF      SPA-NYUGAIKBN       =   "1"
@@ -4536,7 +4543,10 @@
       *
       *    ¹ÔÁÞÆþ
            IF      SPA-GMN-INPUTCD(SPA-GMN-IDX)(1:1)   =   "+"
+               MOVE    SPACE           TO  WRK-HEN-INPUTCD
                MOVE    SPA-GMN-INPUTCD(SPA-GMN-IDX)(2:)
+                                       TO  WRK-HEN-INPUTCD
+               MOVE    WRK-HEN-INPUTCD
                                        TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
                PERFORM 41014-GYOINSN-SEC
                IF      SPA-ERRCD       =   SPACE
