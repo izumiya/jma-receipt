@@ -1212,6 +1212,13 @@
            END-PERFORM
       *    エラーなら処理抜ける
            IF      FLG-KBN  =   1
+               MOVE    ZERO            TO  WRK-HENKBN-G
+               GO  TO  240-KBN-SET-EXT
+           END-IF
+      *    数量なくなれば処理抜ける
+           IF    ( WRK-KAISU   NOT =   ZERO )  AND
+                 ( WRK-SURYO       =   ZERO )
+               MOVE    ZERO            TO  WRK-HENKBN-G
                GO  TO  240-KBN-SET-EXT
            END-IF
       *
@@ -1243,6 +1250,7 @@
            END-PERFORM
       *    エラーなら処理抜ける
            IF      FLG-KBN  =   1
+               MOVE    ZERO            TO  WRK-HENKBN-G
                GO  TO  240-KBN-SET-EXT
            END-IF
       *
