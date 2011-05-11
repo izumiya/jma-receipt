@@ -45,6 +45,11 @@
       *  04.02.01    NACL-森脇    08/04/17  平成２０年４月改正対応
       *  04.02.02    NACL-森脇    08/04/25  帳票変更
       *  04.03.01    NACL-森脇    08/06/24  医療機関情報編集名セット
+      *
+      *  04.05.02    NACL-藤原    11/04/20  災害対応
+      *                                     システム管理の設定に従い、災
+      *                                     害該当レセプトのレセ電データ
+      *                                     の作成を行う
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -208,6 +213,8 @@
       *    医療機関名称編集情報
            COPY    "CPSK1901.INC".
       *----(04.03.01)--ADD-END-----
+      *
+           COPY    "CPSK200501.INC".
       *
       *    請求管理情報
            COPY    "CPRCF010.INC".
@@ -387,6 +394,30 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    医療機関編集情報
            PERFORM 900-SYS1900-READ-SEC
       *----(04.03.01)--ADD-END-----
+      *
+      *    レセプト印刷情報
+           MOVE    SPACE               TO  SYS-200501-REC
+           INITIALIZE                      SYS-200501-REC
+           MOVE    "2005"              TO  SYS-200501-KANRICD
+           MOVE    "01"                TO  SYS-200501-KBNCD
+           MOVE    LNK-PRTKANRI-SRYYM  TO  SYS-200501-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
+           MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD
+           MOVE    WRK-PARA-HOSPNUM    TO  SYS-200501-HOSPNUM
+           MOVE    SYS-200501-REC      TO  MCPDATA-REC
+           PERFORM 800-SYSKANRI-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-200501-REC
+           ELSE
+               INITIALIZE                      SYS-200501-REC
+           END-IF
+           IF     SYS-200501-RECEDEN-DISASTER
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-RECEDEN-DISASTER
+           END-IF
+      *
+           DISPLAY "RECEDEN-DISASTER=" SYS-200501-RECEDEN-DISASTER
+      *    
       *
       *    請求管理読み込み
            EVALUATE    WRK-PARA-TEISYUTUSAKI
@@ -1178,6 +1209,14 @@ grpsys     PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-END
                MOVE    MCPDATA-REC         TO  RECE10-REC
+      *
+      *        未確定分をレセ電データに記録するか
+               IF    (  SYS-200501-RECEDEN-DISASTER
+                                           =   "0"              )
+               AND   ( RECE10-ETC-YKZFTN (1)
+                                           =   6   OR  7  OR  8 )
+                   GO  TO  900-SEIKYU-READ-SEC
+               END-IF
                ADD     1                   TO  CNT-RECE10
            ELSE
                MOVE    1                   TO  FLG-END
