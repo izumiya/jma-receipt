@@ -480,3 +480,25 @@ path	key17 	{
 		;
 	};
 };
+
+path key18  {
+	DBSELECT {
+		DECLARE tbl_sryact_key18_csr CURSOR FOR
+		SELECT a.*
+		FROM tbl_sryact a,tbl_ptinf b
+		WHERE   a.HOSPNUM      =     :HOSPNUM
+		 AND     a.NYUGAIKBN    LIKE  :NYUGAIKBN
+		 AND     a.SRYYM        <=    :SRYYM
+		 AND     a.SRYKA        LIKE  :SRYKA
+		 AND   ((a.SRYCD1       =     :SRYCD1  AND  a.JIHIMONEY1  >  0)
+		  OR    (a.SRYCD2       =     :SRYCD2  AND  a.JIHIMONEY2  >  0)
+		  OR    (a.SRYCD3       =     :SRYCD3  AND  a.JIHIMONEY3  >  0)
+		  OR    (a.SRYCD4       =     :SRYCD4  AND  a.JIHIMONEY4  >  0)
+		  OR    (a.SRYCD5       =     :SRYCD5  AND  a.JIHIMONEY5  >  0))
+		 AND     a.HOSPNUM      =      b.HOSPNUM
+		 AND     a.PTID         =      b.PTID
+		 AND     b.TSTPTNUMKBN  <>     '1'
+		;
+	};
+};
+
