@@ -1578,3 +1578,24 @@ path	key80 	{
 		;
 	};
 };
+
+path key81  {
+	DBSELECT {
+		DECLARE tbl_syunou_main_key81_csr CURSOR FOR
+		SELECT a.*
+		FROM tbl_syunou_main a,tbl_ptinf b
+			WHERE a.HOSPNUM       =     :HOSPNUM
+			AND   a.NYUGAIKBN     LIKE  :NYUGAIKBN
+			AND   a.SRYYMD        <=    :SRYYMD
+			AND   a.SRYKA         LIKE  :SRYKA
+			AND   a.DENPJTIKBN    <>     '3'
+			AND   a.CREATEKBN     <>     '3'
+			AND   a.NYUKIN_TOTAL  <      a.SKYMONEY
+			AND   a.SKYNYUKINKBN =  '1'
+			AND   a.HOSPNUM       =      b.HOSPNUM
+			AND   a.PTID          =      b.PTID
+			AND   b.TSTPTNUMKBN   <>     '1'
+		 ;
+	};
+};
+
