@@ -716,7 +716,7 @@ path	key30	{
                     AND     CREYMD       =   :CREYMD
                     AND     CREHMS       =   :CREHMS
                     AND     NYUGAIKBN    =   :NYUGAIKBN 
-                   ORDER BY RECENUM
+                   ORDER BY RECENUM,RENNUM
 		;
 	};
 };
@@ -1159,7 +1159,7 @@ path    key45   {
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
                     AND     RECESYUBETU  <>  '6666' 
-                    ORDER   BY  KANANAME
+                    ORDER BY  KANANAME,PTNUM,SRYYM,RECENUM,RENNUM
                ;
         };
 };
@@ -1184,7 +1184,7 @@ path    key46   {
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
                     AND     RECESYUBETU  <>  '6666' 
-                    ORDER   BY  PTNUM
+                    ORDER BY  PTNUM,SRYYM,RECENUM,RENNUM
                ;
         };
 };
@@ -1209,7 +1209,7 @@ path    key47   {
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
                     AND     RECESYUBETU  <>  '6666' 
-                    ORDER   BY  TEISYUTUSAKI,KANANAME
+                    ORDER   BY  TEISYUTUSAKI,KANANAME,PTNUM,SRYYM,RECENUM,RENNUM
                ;
         };
 };
@@ -1234,7 +1234,7 @@ path    key48   {
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
                     AND     RECESYUBETU  <>  '6666' 
-                    ORDER   BY  TEISYUTUSAKI,PTNUM
+                    ORDER   BY  TEISYUTUSAKI,PTNUM,SRYYM,RECENUM,RENNUM
                ;
         };
 };
@@ -1259,7 +1259,7 @@ path    key49   {
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
                     AND     RECESYUBETU  <>  '6666' 
-                    ORDER   BY  KANANAME
+                    ORDER   BY  KANANAME,PTNUM,SRYYM,RECENUM,RENNUM
                ;
         };
 };
@@ -1284,7 +1284,7 @@ path    key50   {
                     AND     RECESYUBETU  <>  '0000'
                     AND     RECESYUBETU  <>  '8888' 
                     AND     RECESYUBETU  <>  '6666' 
-                    ORDER   BY  PTNUM
+                    ORDER   BY  PTNUM,SRYYM,RECENUM,RENNUM
                ;
         };
 };
@@ -1311,7 +1311,7 @@ path	key51	{
                     AND     CHOUKI       LIKE :CHOUKI
                     AND     ZAITAKU      LIKE :ZAITAKU
                     AND     SRYKA        LIKE :SRYKA
-                   ORDER BY RECESYUBETU_SRT,SYUBETU_SRT1,GRP_NO1,CHOUKI,GRP_NO2,KOUHI_NO,HKNJANUM,PTNUM,RENNUM
+                   ORDER BY RECESYUBETU_SRT,SYUBETU_SRT1,GRP_NO1,CHOUKI,GRP_NO2,KOUHI_NO,HKNJANUM,PTNUM,RECENUM,RENNUM
 		;
 	};
 };
