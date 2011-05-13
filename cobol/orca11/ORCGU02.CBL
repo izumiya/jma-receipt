@@ -1523,6 +1523,10 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    ¹¹¿·½èÍý
            PERFORM 49001-KOUSIN-SEC
       *
+           IF      SPA-ERRCD       NOT =   SPACE
+               PERFORM 510-ERRSET-SEC
+           END-IF
+      *
           .
        3009-CLAIM-SYORI-EXT.
            EXIT.
@@ -3994,7 +3998,12 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            END-IF
       *
       *    £Ã£Ì£Á£É£ÍÀÜÂ³¥Á¥§¥Ã¥¯½èÍý
-           PERFORM 4905-CLAIM-CHK-SEC
+      *        ¿·µ¬´µ¼Ô¤Ï¤Ê¤·
+           IF      SPA-GMN-PTNUM       =   SPACE
+               MOVE    ZERO                TO  FLG-CLAIM
+           ELSE
+               PERFORM 4905-CLAIM-CHK-SEC
+           END-IF
            IF      FLG-CLAIM       =   2 
                GO      TO      490-TOUROKU-EXT
            END-IF
@@ -4267,6 +4276,12 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        4901-UKEADD-SEC              SECTION.
       *
+           IF      SPA-GMN-NAME            =  SPACE
+               MOVE    "0001"              TO  SPA-ERRCD
+               MOVE    3                   TO  SPA-GMN-CUR
+               GO  TO  4901-UKEADD-EXT
+           END-IF
+      *
       *    ¼õÉÕ£É£Ä¡á£°£°¸¡º÷
            MOVE    SPACE               TO  UKETUKE-REC
            INITIALIZE                  UKETUKE-REC
@@ -4399,6 +4414,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
               OR  (SPA-NAI-UKEID           =   ZERO          )
                MOVE    "1010"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-GMN-CUR
+               GO      TO      4902-UKEUPD-EXT
+           END-IF
+      *
+           IF      SPA-GMN-NAME            =  SPACE
+               MOVE    "0001"              TO  SPA-ERRCD
+               MOVE    3                   TO  SPA-GMN-CUR
                GO      TO      4902-UKEUPD-EXT
            END-IF
       *
