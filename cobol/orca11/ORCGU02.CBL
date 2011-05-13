@@ -1660,7 +1660,6 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            END-IF
       *
            .
-      *
        410-INPUT-CHK-EXT.
            EXIT.
       *
@@ -3996,6 +3995,9 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      490-TOUROKU-EXT
            END-IF
+           IF      FLG-END             =   1
+               GO      TO      490-TOUROKU-EXT
+           END-IF
       *
       *    £Ã£Ì£Á£É£ÍÀÜÂ³¥Á¥§¥Ã¥¯½èÍý
       *        ¿·µ¬´µ¼Ô¤Ï¤Ê¤·
@@ -4276,12 +4278,6 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        4901-UKEADD-SEC              SECTION.
       *
-           IF      SPA-GMN-NAME            =  SPACE
-               MOVE    "0001"              TO  SPA-ERRCD
-               MOVE    3                   TO  SPA-GMN-CUR
-               GO  TO  4901-UKEADD-EXT
-           END-IF
-      *
       *    ¼õÉÕ£É£Ä¡á£°£°¸¡º÷
            MOVE    SPACE               TO  UKETUKE-REC
            INITIALIZE                  UKETUKE-REC
@@ -4414,12 +4410,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
               OR  (SPA-NAI-UKEID           =   ZERO          )
                MOVE    "1010"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-GMN-CUR
-               GO      TO      4902-UKEUPD-EXT
-           END-IF
-      *
-           IF      SPA-GMN-NAME            =  SPACE
-               MOVE    "0001"              TO  SPA-ERRCD
-               MOVE    3                   TO  SPA-GMN-CUR
                GO      TO      4902-UKEUPD-EXT
            END-IF
       *
