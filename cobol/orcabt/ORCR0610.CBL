@@ -156,6 +156,10 @@
       *                                     国保、後期高齢者のとき
       *                                     法別７１、８１、９１は公費請
       *                                     求書も作成する  
+      *  04.05.10    NACL-藤原    11/05/16  月途中に公費の負担者番号等の
+      *                                     変更があった場合の記載対応
+      *                                     法別番号、適用開始日の順とする
+      *                                     （全国公費のみ） 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2698,8 +2702,29 @@
                        MOVE    WRK-KOHI-TBL    (IDY)   TO
                                            WRK-RECE61-KOHI-TBL (TBL-MAX)
                        INITIALIZE          WRK-KOHI-TBL    (IDY)
-                       MOVE    4               TO  IDY
+      *****************MOVE    4               TO  IDY
                    END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+      *    法別、適用開始日による全国公費の並び替え
+           PERFORM VARYING IDX FROM    1    BY  1
+                   UNTIL   IDX >       3
+                   OR      WRK-RECE61-KOHHKNNUM-O (IDX) =   SPACE
+               COMPUTE IDX1    =   IDX     +   1
+               PERFORM VARYING IDY FROM    IDX1    BY  1
+                       UNTIL   IDY >       4
+                       OR      WRK-RECE61-KOHHKNNUM-O (IDY) =   SPACE
+                   IF   ( WRK-RECE61-KOHHKNNUM-O (IDX)
+                                   =   WRK-RECE61-KOHHKNNUM-O   (IDY) )
+                   AND  ( WRK-RECE61-KOHTEKSTYMD-O (IDX)
+                                   >   WRK-RECE61-KOHTEKSTYMD-O (IDY) )
+                       MOVE    WRK-RECE61-KOHI-TBL(IDX)    TO  WRK-KOHI
+                       MOVE    WRK-RECE61-KOHI-TBL(IDY)    TO
+                                             WRK-RECE61-KOHI-TBL(IDX)
+                       MOVE    WRK-KOHI                    TO
+                                             WRK-RECE61-KOHI-TBL(IDY)
+                   END-IF    
                END-PERFORM
            END-PERFORM
       *
@@ -2933,13 +2958,8 @@
                    MOVE    WRK-SEIKYU-KOHHKNNUM(IDX1 IDX)
                                            TO  WRK-KOHHKNNUM-O(IDY)
                    MOVE    WRK-RECESKYKBN  TO  WRK-RECESKYKBN-O(IDY)
-      *            徳島県の地方公費（法別４５、４８）のとき開始日セット
-                   IF    ( SYS-1001-PREFNUM    =   "36"             )
-                   AND   ( WRK-SEIKYU-KOHHKNNUM(IDX1 IDX) (2:2)
-                                               =   "45"    OR  "48" )
-                       MOVE    WRK-SEIKYU-TEKSTYMD (IDX1 IDX)
+                   MOVE    WRK-SEIKYU-TEKSTYMD (IDX1 IDX)
                                            TO  WRK-KOHTEKSTYMD-O (IDY)
-                   END-IF 
                    MOVE    1               TO  FLG-ADDKBN
                    MOVE    4               TO  IDY
                ELSE 
