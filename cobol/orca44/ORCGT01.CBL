@@ -2001,12 +2001,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-TERMID      TO  RECEERR-TERMID
            MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
            MOVE    SPACE           TO  SHELLTBL
-      *    ファイルデイレクトリ位置指定
-           INITIALIZE              ORCSMKPASSAREA
-           MOVE    "scripts/monthly/recept60.sh"
-                                   TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+           MOVE    "recept60.sh"   TO  SHELLTBL-NAME
       *     
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG1
            MOVE    SPA-NAI-SKYYM   TO  SHELLTBL-ARG2
@@ -2056,7 +2051,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "monthly"       TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
