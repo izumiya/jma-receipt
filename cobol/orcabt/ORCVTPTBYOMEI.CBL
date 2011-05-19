@@ -1575,13 +1575,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WKPTBYO-PTID        TO  PTBYO-PTID
            MOVE    WKPTBYO-SRYKA       TO  PTBYO-SRYKA
            MOVE    WKPTBYO-BYOMEI      TO  PTBYO-BYOMEI
+           MOVE    WKPTBYO-NYUGAIKBN   TO  PTBYO-NYUGAIKBN
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key13"             TO  MCP-PATHNAME
+           MOVE    "key21"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC          =   ZERO
                MOVE    "tbl_ptbyomei"   TO  MCP-TABLE
-               MOVE    "key13"          TO  MCP-PATHNAME
+               MOVE    "key21"          TO  MCP-PATHNAME
       *        患者病名読み込み
                PERFORM 940-PTBYOMEI-NEXT-SEC
            ELSE
@@ -1623,7 +1624,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            MOVE    "tbl_ptbyomei"   TO  MCP-TABLE
-           MOVE    "key13"          TO  MCP-PATHNAME
+           MOVE    "key21"          TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            .
