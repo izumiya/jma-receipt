@@ -24,7 +24,7 @@ fi
 #        ${11} シェルＩＤ
 #        ${12} エラーファイル名 
 #        ${13} ファイル出力先
-#        ${14} コード区分（1:S-jis 2:EUC）
+#        ${14} コード区分（1:S-jis 2:EUC 3:UTF-8）
 #-------------------------------------------#
 #
 ##      エラーファイル削除
@@ -66,10 +66,18 @@ fi
                  nkf -s $FILE_1 > $FILE_3
             fi
         else
-            if   [ ${6} != '5' ]; then
-                 cp $FILE_1  $FILE_2
+            if   [ ${14} = '3' ]; then
+                if   [ ${6} != '5' ]; then
+                 nkf -w $FILE_1 > $FILE_2
             else
-                 cp $FILE_1  $FILE_3
+                 nkf -w $FILE_1 > $FILE_3
+                fi
+            else
+                if   [ ${6} != '5' ]; then
+                     cp $FILE_1  $FILE_2
+                else
+                     cp $FILE_1  $FILE_3
+                fi
             fi
         fi
          
