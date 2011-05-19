@@ -281,6 +281,10 @@
                MOVE    SPACE               TO  WRK-GMN-TENSU (IDX-Z)
                MOVE    SPACE               TO  WRK-GMN-KAISU (IDX-Z)
                MOVE    ZERO                TO  WRK-COM-TENSU (IDX-Z)
+      *
+               MOVE    ZERO                TO  WRK-COM-SYUTEN1 (IDX-Z)
+               MOVE    ZERO                TO  WRK-COM-SYUTEN2 (IDX-Z)
+               MOVE    ZERO                TO  WRK-COM-KIZAITEN (IDX-Z)
                MOVE    ZERO                TO  WRK-KINGAK
       *
       *

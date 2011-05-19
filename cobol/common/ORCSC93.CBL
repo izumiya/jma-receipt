@@ -788,6 +788,13 @@
       *
            MOVE    WRK-SRYSYUKBN       TO  SPA-COM-SRYSYUKBN (IDX)
            MOVE    WRK-SRYKBN          TO  SPA-COM-SRYKBN (IDX)
+      *    きざみ値以外は点数再編集（労災円変換）
+           IF     (SPA-COM-INPUTCD (IDX)(1:1)  =   "1"  )   AND
+                  (SPA-COM-KZMCOMPSIKIBETU (IDX)   =   1 )
+               CONTINUE
+           ELSE
+               MOVE    SPA-COM-TEN (IDX)   TO  SPA-COM-KISOTEN  (IDX)
+           END-IF
            IF      SPA-COM-KAIFLG(IDX)     =   "1"
                MOVE    "1"             TO  SPA-COM-ZAIEND (IDX)
                MOVE    SPACE           TO  WRK-SRYSYUKBN
