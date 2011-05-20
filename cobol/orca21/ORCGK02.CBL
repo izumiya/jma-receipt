@@ -1986,14 +1986,16 @@
       ***      IF      SPA-MOTOPG          =   "P02"  OR  "U02"
       *            MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
       *            MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
-      *        END-IF
-      *        IF      SPA-SRYYMD          =   SPACE
-      *            MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
-      *            MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
-      ***      END-IF
+      **       END-IF
+               IF      SPA-SRYYMD          =   SPACE
+                   MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
+                   MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
+               END-IF
       *        患者変更時は、診療日＝システム日付とする
-               MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
-               MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
+               IF      SPA-MOTOPG          =   "P02"  OR  "U02"
+                   MOVE    SPA-SYSYMD          TO  SPA-SRYYMD
+                   MOVE    SPA-SYSYMDWH        TO  SPA-SRYYMDW
+               END-IF
       *
                MOVE    1                   TO  FLG-SYOKAI
       *
