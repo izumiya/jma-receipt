@@ -2969,6 +2969,7 @@
       *    Æþ±¡¤ÎÊÝ¸±ÁÈ¹ç¤»¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
        21301-NYUINACCT-CHK-SEC        SECTION.
+      *
            INITIALIZE                  NYUINACCT-REC.
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  NACCT-PTID
@@ -3010,9 +3011,65 @@
            MOVE    "key17"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           IF      FLG-OK              =   ZERO
+      *        Ä´ºÞÎÁ¤Î¤ßÈ½Äê
+               PERFORM 213011-SRYACCT-CHOZAICHK-SEC
+           END-IF
       *
            .
        21301-NYUINACCT-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡Ä´ºÞÎÁ¤Î¤ß¤Î¿ÇÎÅ²ñ·×¡Ê¼õ¿ÇÍúÎò¤Ê¤·¡Ë½èÍý
+      *****************************************************************
+       213011-SRYACCT-CHOZAICHK-SEC          SECTION.
+      *
+      *    ¿ÇÎÅ²ñ·×
+           INITIALIZE                  SRYACCT-REC
+           MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
+           MOVE    SPA-GMN-NYUGAIKBN   TO  ACCT-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+           MOVE    SPA-NAI-SRYYM       TO  ACCT-SRYYM
+           MOVE    SPA-GMN-HKNCOMBINUM
+                                       TO  ACCT-HKNCOMBI
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key22"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key22"             TO  MCP-PATHNAME
+               PERFORM 980-SRYACCT-READ-SEC
+           ELSE
+               INITIALIZE                  SRYACCT-REC
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           PERFORM
+               UNTIL   (FLG-SRYACCT    =   1   )
+                   OR  (FLG-OK         =   1   )
+               IF      ACCT-ZAIKAISU       >   ZERO
+                   IF      SPA-GMN-SRYKA       =   "00"
+                       MOVE    1               TO  FLG-OK
+                   ELSE
+                       IF     (SPA-GMN-SRYKA       =   ACCT-SRYKA   )
+                           MOVE    1               TO  FLG-OK
+                       END-IF
+                   END-IF
+               END-IF
+               IF      FLG-OK              =   ZERO
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key22"             TO  MCP-PATHNAME
+                   PERFORM 980-SRYACCT-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key22"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       213011-SRYACCT-CHOZAICHK-EXT.
            EXIT.
       *
       *****************************************************************
