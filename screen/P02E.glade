@@ -329,22 +329,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label251</name>
-      <x>52</x>
-      <y>60</y>
-      <width>52</width>
-      <height>24</height>
-      <label>会    叹</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label262</name>
       <x>264</x>
       <y>92</y>
@@ -452,22 +436,6 @@
       </signal>
       <label>F10 给锐剩继なし</label>
       <relief>GTK_RELIEF_NORMAL</relief>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label252</name>
-      <x>52</x>
-      <y>124</y>
-      <width>52</width>
-      <height>24</height>
-      <label>交    疥</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
     </widget>
 
     <widget>
@@ -645,6 +613,38 @@
 	  <ypad>0</ypad>
 	</widget>
       </widget>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label251</name>
+      <x>52</x>
+      <y>60</y>
+      <width>52</width>
+      <height>24</height>
+      <label>会  叹</label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>True</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label252</name>
+      <x>52</x>
+      <y>124</y>
+      <width>52</width>
+      <height>24</height>
+      <label>交  疥</label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>True</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
   </widget>
 </widget>
