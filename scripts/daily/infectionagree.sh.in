@@ -11,37 +11,29 @@ fi
 
 #-------------------------------------------#
 #    感染症データ作成
-#        $1  GMNID (K03, K08, C02)
+#        $1  TERMID
 #        $2  HOSPNUM
 #        $3  HOSPID
-#        $4  SYORIFLG (0:新規、1:訂正)
-#        $5  NYUGAI (1:入院、2:外来)
-#        $6  PTID
-#        $7  SRYYMD
-#        $8  SRYKA
-#        $9  BEDFLG (0:病床なし、1:病床あり)
+#        $4  JOBID
+#        $5  SHELLID
 #-------------------------------------------#
-
-GMNID=${1}
+TERMID=${1}
 HOSPNUM=${2}
 HOSPID=${3}
-SYORIFLG=${4}
-NYUGAI=${5}
-PTID=${6}
-SRYYMD=${7}
-SRYKA=${8}
-BEDFLG=${9}
+JOBID=${4}
+SHELLID=${5}
 
 INFECFILE=$DASDIR/${HOSPNUM}/infection.csv.$$
 INFECRFILE=$DASDIR/${HOSPNUM}/infection.csv
-ERRFILE=/tmp/${HOSPNUM}infectionerror_real
-LOG=/var/log/jma-receipt/${HOSPNUM}infectiondata2.log
-LOGFILE=/var/log/jma-receipt/${HOSPNUM}infectiondata2_real.log
+ERRFILE=/tmp/${HOSPNUM}infectionerror
+LOG=/var/log/jma-receipt/${HOSPNUM}infectiondata.log
+LOGFILE=/var/log/jma-receipt/${HOSPNUM}infectionagree.log
 
 DASUPLOAD=das-infection2.sh
 
 DPKGLT=`dpkg -l | grep 'ii  jma-receipt' | grep 'JMA Standard Receipt'`
 PKGVER=`echo $DPKGLT | sed 's/\s\{1,\}/ /g' | cut -d' ' -f 3`
+
 
 if ! [ -d $DASDIR/${HOSPNUM} ]; then 
   mkdir $DASDIR/${HOSPNUM}
@@ -55,16 +47,12 @@ fi
 #fi
 rm -f $LOGFILE
 
-echo "SYORIBI [ $SRYYMD ]" | tee -a $LOGFILE
-echo "SYORIFLG [ $SYORIFLG ]" | tee -a $LOGFILE
-
 #感染症データ作成
 
 rm -f $ERRFILE
 
-PARA0="${GMNID},${HOSPNUM},${SYORIFLG},${NYUGAI},${PTID},${SRYYMD}"
-PARAM="${PARA0},${SRYKA},${INFECFILE},${ERRFILE},${PKGVER}"
-$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBINF2 -parameter ${PARAM} 2>&1 | tee -a $LOGFILE
+PARAM="${HOSPNUM},${INFECFILE},${ERRFILE},${PKGVER}"
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBINFA -parameter ${PARAM} 2>&1 | tee -a $LOGFILE
 
 if [ -e $ERRFILE ]; then
   rm -f $INFECFILE
@@ -80,6 +68,8 @@ if [ -e $INFECFILE ]; then
     rm -f $INFECFILE
   fi
 fi
+
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${JOBID}${SHELLID},${HOSPNUM} 2>&1 | tee -a $LOGFILE
 
 echo "感染症データ送信処理 起動" 2>&1 | tee -a $LOGFILE
 $DASUPLOAD ${HOSPNUM} ${HOSPID} 2 &

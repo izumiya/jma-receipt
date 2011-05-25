@@ -158,6 +158,8 @@
        01  SHELL-AREA.
            05  SHELL-NAME          PIC X(17) VALUE
                                    "infectiondata1.sh".
+           05  SHELL-NAME1         PIC X(17) VALUE
+                                   "infectionagree.sh".
       *
        01  CONST-AREA.
            03  CONST-MNTJOBID      PIC 9(07)  VALUE    1.
@@ -167,6 +169,9 @@
       *    感染症報告  
            03  CONST-INFJOBID      PIC 9(07)  VALUE    1.
            03  CONST-INFSHELLID    PIC X(08)  VALUE    "INFECTIO".
+      *    感染症参加送信  
+           03  CONST-INFAJOBID     PIC 9(07)  VALUE    1.
+           03  CONST-INFASHELLID   PIC X(08)  VALUE    "INFAGREE".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -346,6 +351,7 @@
                IF      WRK-MOTOPG          =   SPACE
                                            OR  "M95"
                    PERFORM 800-INFECTION-SEC
+                   PERFORM 800-INFECTION-AGREE-SEC
                END-IF
       *
       *        画面編集
@@ -1963,6 +1969,65 @@
                                            SPA-AREA
            .
        800-INFECTION-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    感染症参加送信処理
+      *****************************************************************
+       800-INFECTION-AGREE-SEC         SECTION.
+      *
+           INITIALIZE                  ORCSINFCHKAREA
+           CALL    "ORCSINFSTATE"      USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSINFCHKAREA
+      *
+           DISPLAY "INFCHK-RC = " INFCHK-RC
+           IF    ( INFCHK-RC       NOT =   ZERO )  AND
+                 ( INFCHK-RC       NOT =   90   )
+               GO  TO    800-INFECTION-AGREE-EXT
+	   END-IF
+      *    
+      *    ジョブ開始セット処理
+           MOVE    "DEL"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-INFAJOBID     TO  JOB-JOBID
+           MOVE    CONST-INFASHELLID   TO  JOB-SHELLID
+           CALL    "ORCSJOB"       USING
+                                           ORCSJOBKANRIAREA 
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+           MOVE    "JBS"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-INFAJOBID     TO  JOB-JOBID
+           MOVE    CONST-INFASHELLID   TO  JOB-SHELLID
+           MOVE    SPA-TERMID          TO  JOB-TERMID
+           CALL    "ORCSJOB"       USING
+                                           ORCSJOBKANRIAREA 
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           MOVE    SHELL-NAME1         TO  SHELLTBL-NAME
+           MOVE    SPA-TERMID          TO  SHELLTBL-ARG1
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
+           MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
+           MOVE    CONST-INFAJOBID     TO  SHELLTBL-ARG4
+           MOVE    CONST-INFASHELLID   TO  SHELLTBL-ARG5
+      *
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"     USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           .
+       800-INFECTION-AGREE-EXT.
            EXIT.
       *
       *****************************************************************

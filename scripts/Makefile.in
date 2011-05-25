@@ -95,6 +95,9 @@ shell_sources = \
 	allways/plugin.sh.in \
 	execshell.sh.in \
 	allways/ORCBQ03.sh.in \
+	daily/infectiondata2.sh.in \
+	daily/das-infection2.sh.in \
+	daily/infectionagree.sh.in \
 
 ruby_scripts = \
 	daily/print-data.rb \

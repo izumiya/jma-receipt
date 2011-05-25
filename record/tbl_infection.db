@@ -103,3 +103,14 @@ path	all		{
 		;
 	};
 };
+
+path	key5		{
+	DBSELECT	{
+		DECLARE tbl_infection_key5_csr CURSOR FOR
+		SELECT *
+		FROM tbl_infection
+		WHERE        HOSPNUM  =  :HOSPNUM
+			AND  SENDYMD  >= :SENDYMD
+		;
+	};
+};
