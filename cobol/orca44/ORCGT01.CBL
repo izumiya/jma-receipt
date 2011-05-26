@@ -142,6 +142,10 @@
       *                                     ２０１０年１０月〜２０１１年３月対象 
       *  04.05.08    NACL-藤原    10/12/01  クライアント保存削除処理の修正
       *  04.05.09    NACL-門脇    11/02/17  災害対応修正（平成２３年１月〜）
+      *  04.05.10    NACL-藤原    11/05/26  災害対応
+      *                                     システム管理の設定に従い、災
+      *                                     害該当レセプトのレセ電データ
+      *                                     のチェックを追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -800,6 +804,10 @@ grpsys                                         SPA-AREA
                MOVE    "1"                 TO
                                            SYS-200501-RECEDEN-DATAKBN
            END-IF 
+           IF     SYS-200501-RECEDEN-DISASTER
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-RECEDEN-DISASTER
+           END-IF
            MOVE    SYS-200501-KOUIKIKBN
                                        TO  SPA-NAI-200501-KOUIKIKBN
            MOVE    SYS-200501-KOUIKIRECEKBN
@@ -816,6 +824,9 @@ grpsys                                         SPA-AREA
            MOVE    SYS-200501-RECEDEN-DATAKBN
                                        TO
                                        SPA-NAI-200501-RECEDEN-DATAKBN
+           MOVE    SYS-200501-RECEDEN-DISASTER
+                                       TO
+                                       SPA-NAI-200501-RECEDEN-DISASTER
       *
            MOVE    WIDGET-INSENSITIVE  TO  SPA-B15-STATE
                                            SPA-B16-STATE
@@ -4122,14 +4133,22 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            PERFORM                 UNTIL   FLG-RECE10      =   1
                                    OR      FLG-RECEDEN-CHK =   1
-               MOVE    SPACE               TO  RECEDEN-REC
-               INITIALIZE                      RECEDEN-REC
-               MOVE    RECE10-KEY          TO  RECEDEN-KEY
-               MOVE    "1"                 TO  RECEDEN-RECKBN
-               MOVE    RECEDEN-REC         TO  MCPDATA-REC
-               PERFORM 900-RECEDEN-READ-SEC
-               IF      FLG-RECEDEN         =   1
-                   MOVE    1                   TO  FLG-RECEDEN-CHK
+      *        未確定分をレセ電データに記録するか
+               IF    (  SPA-NAI-200501-RECEDEN-DISASTER
+                                           =   "0"              )
+               AND   ( RECE10-ETC-YKZFTN (1)
+                                           =   6   OR  7  OR  8 )
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE               TO  RECEDEN-REC
+                   INITIALIZE                      RECEDEN-REC
+                   MOVE    RECE10-KEY          TO  RECEDEN-KEY
+                   MOVE    "1"                 TO  RECEDEN-RECKBN
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   PERFORM 900-RECEDEN-READ-SEC
+                   IF      FLG-RECEDEN         =   1
+                       MOVE    1                   TO  FLG-RECEDEN-CHK
+                   END-IF
                END-IF
       *
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
