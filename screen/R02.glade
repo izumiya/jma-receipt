@@ -492,7 +492,7 @@
       <name>scroll2</name>
       <x>1</x>
       <y>100</y>
-      <width>1015</width>
+      <width>1016</width>
       <height>593</height>
       <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
       <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
@@ -502,11 +502,15 @@
       <widget>
 	<class>GtkViewport</class>
 	<name>view1</name>
+	<width>1000</width>
+	<height>623</height>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
 
 	<widget>
 	  <class>GtkFixed</class>
 	  <name>fi3</name>
+	  <width>990</width>
+	  <height>614</height>
 
 	  <widget>
 	    <class>GtkLabel</class>
