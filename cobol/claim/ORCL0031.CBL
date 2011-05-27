@@ -235,9 +235,9 @@
            03  WRK-SURYO           PIC 9(05)V9(5).
       *
            03  WRK-BYOYMD.
-               05  WRK-BYOYY           PIC 9(04).
-               05  WRK-BYOMM           PIC 9(02).
-               05  WRK-BYODD           PIC 9(02).
+               05  WRK-BYOYY           PIC X(04).
+               05  WRK-BYOMM           PIC X(02).
+               05  WRK-BYODD           PIC X(02).
            03  WRK-TENKIYMD.
                05  WRK-TENKIYY         PIC X(04).
                05  WRK-TENKIMM         PIC X(02).
@@ -283,9 +283,9 @@
            03  WRK-INPUTCD         PIC X(50).
       *
            03  WRK-SYSYMD.
-               05  WRK-SYSYY       PIC 9(04).
-               05  WRK-SYSMM       PIC 9(02).
-               05  WRK-SYSDD       PIC 9(02).
+               05  WRK-SYSYY       PIC X(04).
+               05  WRK-SYSMM       PIC X(02).
+               05  WRK-SYSDD       PIC X(02).
       *                             
            03  WRK-PATHNAME             PIC X(64).
       *                             
@@ -2163,6 +2163,9 @@
                    ELSE
                        MOVE    SNUM-OUTNUM         TO  WRK-KAISU
                    END-IF
+               END-IF
+               IF      WRK-KAISU           =   ZERO
+                   MOVE    1                   TO  WRK-KAISU
                END-IF
       *        ÁíÎÌ¤ØÊÑ¹¹
                IF      TBL-WKSRY-SRYSURYO (TBL-MAX IDX-S)  >   ZERO
