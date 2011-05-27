@@ -1160,6 +1160,13 @@
                        MOVE    "0009"              TO  SPA-ERRCD
                        GO      TO      4103-KANREI-EXT
                    END-IF
+      *            履歴選択があること
+                   IF     (SPA-Z01NAI-SELNUM       =   ZERO            )
+                   OR     (SPA-Z01NAI-SELNUM       >   SPA-Z01NAI-COUNT)
+                       MOVE    2                   TO  SPA-GMN-CUR
+                       MOVE    "0012"              TO  SPA-ERRCD
+                       GO      TO      4103-KANREI-EXT
+                   END-IF
       *
       *        通常修正
                WHEN    2
@@ -1586,6 +1593,9 @@
                                                  TO  SPA-ERRMSG
                WHEN    "0010"
                    MOVE    "有効年月日の範囲が違います"
+                                                 TO  SPA-ERRMSG
+               WHEN    "0012"
+                   MOVE    "選択番号を入力して下さい。"
                                                  TO  SPA-ERRMSG
                WHEN    "K001"
                    STRING    "警告！厚生労働省から提供される"
