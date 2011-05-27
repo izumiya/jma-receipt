@@ -823,13 +823,17 @@
            MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1010-KBNCD (1:1)
            MOVE    "%"                 TO  SYS-1010-KBNCD (2:1)
            MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
+      *
+           MOVE    SPA-SYSYMD          TO  SYS-1010-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-1010-EDYUKYMD
+      *
            MOVE    SYS-1010-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key20"             TO  MCP-PATHNAME
+           MOVE    "key21"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key20"             TO  MCP-PATHNAME
+               MOVE    "key21"             TO  MCP-PATHNAME
                PERFORM 990-SYSKANRI-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-SYSKANRI
@@ -851,12 +855,12 @@
                END-IF
       *
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key20"             TO  MCP-PATHNAME
+               MOVE    "key21"             TO  MCP-PATHNAME
                PERFORM 990-SYSKANRI-READ-SEC
            END-PERFORM
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key20"             TO  MCP-PATHNAME
+           MOVE    "key21"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            . 
