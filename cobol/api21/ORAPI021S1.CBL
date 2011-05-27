@@ -108,7 +108,7 @@
            03  WRK-OPID                PIC X(16).
       *
        01  WRK-XML-AREA.
-           03  WRK-PERFORM-YMD10       PIC X(10).
+           03  WRK-PERFORM-DATE        PIC X(10).
            03  WRK-PERFORM-TIME8       PIC X(08).
       *
            03  WRK-PERFORM-YMD         PIC X(08).
@@ -121,6 +121,9 @@
            03  WRK-SRYKA-NAME          PIC X(80).
            03  WRK-DRCD                PIC X(05).
            03  WRK-DRCD-NAME           PIC X(80).
+      *
+           03  WRK-START-DATE          PIC X(10).
+           03  WRK-END-DATE            PIC X(10).
       *
       *    半角全角変換
        01  WRK-HENKAN-AREA.
@@ -866,6 +869,7 @@
            MOVE    ZERO                TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE        TO  LF04-PERFORM-TIME
+           MOVE    WRK-HEN-DATE        TO  WRK-PERFORM-DATE
       *    患者番号
            MOVE    WRK-PTNUM           TO  LF04-PTID1
            MOVE    WRK-SRYKA           TO  LF04-CRE001-DPERTID
@@ -941,11 +945,15 @@
                                            TO  LF04-SNDBNRTBL-BNRNAME1
                                                              (IDY 2)
                END-IF
+      *        病名日付チェック
                MOVE    MDCREQ-DIAGNOSIS-START-DATE(IDY)
-                                           TO  LF04-SND-SKNSTARTDATE
-                                                             (IDY)
+                                           TO  WRK-START-DATE
                MOVE    MDCREQ-DIAGNOSIS-END-DATE(IDY)
-                                           TO  LF04-SND-SKNENDDATE(IDY)
+                                           TO  WRK-END-DATE
+               PERFORM 200211-BYOMEI-YMD-SEC
+               MOVE    WRK-START-DATE      TO  LF04-SND-SKNSTARTDATE
+                                                             (IDY)
+               MOVE    WRK-END-DATE        TO  LF04-SND-SKNENDDATE(IDY)
                EVALUATE    MDCREQ-DIAGNOSIS-OUTCOME(IDY)
                    WHEN    "D"
                      MOVE  "died"
@@ -970,6 +978,10 @@
                                        TO  LF04-SND-TENKI(IDY)
                END-EVALUATE
            END-PERFORM
+      *
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      20021-CLAIM-CALL-EXT
+           END-IF
       *
            INITIALIZE                  WRK-ERROR-AREA
            MOVE    "1"                 TO  WRK-KBN-CODE
@@ -1169,6 +1181,64 @@
            EXIT.
       *
       *****************************************************************
+      *    病名日付チェック編集処理
+      *****************************************************************
+       200211-BYOMEI-YMD-SEC                SECTION.
+      *
+      *    開始日
+           MOVE    WRK-START-DATE      TO  WRK-HEN-DATE
+           MOVE    SPACE               TO  WRK-HEN-TIME
+           PERFORM 802-DAYHEN02-SEC
+           IF      WRK-SYMD            =   SPACE
+      *        空白は診療日付
+               MOVE    WRK-PERFORM-YMD     TO  WRK-SYMD
+               MOVE    WRK-PERFORM-DATE    TO  WRK-START-DATE
+           END-IF
+      *    日付チェックサブ
+           MOVE    SPACE               TO  STS-AREA-DAY
+           INITIALIZE                      STS-AREA-DAY
+           MOVE    SPACE               TO  LNK-DAY2-AREA
+           MOVE    "21"                TO  LNK-DAY2-IRAI
+           MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"           USING
+                                       STS-AREA-DAY
+                                       LNK-DAY2-AREA
+           IF      STS-DAY-RC1     NOT =   ZERO
+               MOVE    "17"                TO  WRK-ERRCD
+               GO      TO   200211-BYOMEI-YMD-EXT
+           END-IF
+      *    終了日
+           IF      WRK-END-DATE    NOT =   SPACE
+               MOVE    WRK-END-DATE        TO  WRK-HEN-DATE
+               MOVE    SPACE               TO  WRK-HEN-TIME
+               PERFORM 802-DAYHEN02-SEC
+               IF      WRK-SYMD            =   SPACE
+                   MOVE    SPACE           TO  WRK-END-DATE
+               ELSE
+      *            日付チェックサブ
+                   MOVE    SPACE               TO  STS-AREA-DAY
+                   INITIALIZE                      STS-AREA-DAY
+                   MOVE    SPACE               TO  LNK-DAY2-AREA
+                   MOVE    "21"                TO  LNK-DAY2-IRAI
+                   MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
+                   CALL    "ORCSDAY"           USING
+                                               STS-AREA-DAY
+                                               LNK-DAY2-AREA
+                   IF      STS-DAY-RC1     NOT =   ZERO
+                       MOVE    "18"                TO  WRK-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF     (WRK-END-DATE    NOT =   SPACE )
+              AND (WRK-END-DATE        <   WRK-START-DATE )
+               MOVE    "19"                TO  WRK-ERRCD
+           END-IF
+           .
+       200211-BYOMEI-YMD-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    日付編集処理
       *****************************************************************
        801-DAYHEN01-SEC                SECTION.
@@ -1252,6 +1322,15 @@
                                                TO  WRK-ERRMSG
            WHEN    "15"
                MOVE    "診療内容情報が存在しません"
+                                               TO  WRK-ERRMSG
+           WHEN    "17"
+               MOVE    "病名開始日付が暦日エラーです。"
+                                               TO  WRK-ERRMSG
+           WHEN    "18"
+               MOVE    "病名転帰日付が暦日エラーです。"
+                                               TO  WRK-ERRMSG
+           WHEN    "19"
+               MOVE    "病名開始日付＞転帰日付です。"
                                                TO  WRK-ERRMSG
            WHEN    "20"
                MOVE    "中途終了データの登録ができません"
