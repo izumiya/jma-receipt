@@ -1316,12 +1316,14 @@
 	<class>GtkViewport</class>
 	<name>viewport1</name>
 	<width>987</width>
+	<height>814</height>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
 
 	<widget>
 	  <class>GtkFixed</class>
 	  <name>fixed3</name>
 	  <width>976</width>
+	  <height>805</height>
 
 	  <widget>
 	    <class>GtkNumberEntry</class>
