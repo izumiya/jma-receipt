@@ -5,7 +5,7 @@ xml_medicationres {
         Information_Date			varchar(10);
         Information_Time			varchar(8);
         Api_Result				varchar(2);
-        API_Result_Message			varchar(100);
+        Api_Result_Message			varchar(100);
         Reskey					varchar(100);
 	Medication_Code				varchar(09);
         Medication_Name				varchar(100);
