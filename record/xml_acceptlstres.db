@@ -5,7 +5,7 @@ xml_acceptlstres {
 	Information_Date		varchar(10);
 	Information_Time		varchar(8);
 	Api_Result			varchar(2);
-	API_Result_Message		varchar(100);
+	Api_Result_Message		varchar(100);
 	Reskey				varchar(100);
 	Acceptance_Date			varchar(10);
 	Acceptlst_Infomation {
