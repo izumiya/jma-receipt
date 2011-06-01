@@ -17,7 +17,7 @@ xml_appointres {
 	Medical_Information				varchar(2);
 	Appointment_Information				varchar(2);
         Appointment_Note				varchar(100);
-	Patient_Infomation {
+	Patient_Information {
         	Patient_ID			varchar(20);
         	WholeName			varchar(100);
         	WholeName_inKana		varchar(100);
