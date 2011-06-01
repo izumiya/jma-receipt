@@ -4553,7 +4553,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                INITIALIZE                  ORCSKARRKAREA
                MOVE    SPA-SRYYMD(1:6)     TO  SKARRK-SRYYM
-               MOVE    SPA-SRYKA           TO  SKARRK-SRYKA
+      ******   MOVE    SPA-SRYKA           TO  SKARRK-SRYKA
+               MOVE    SPA-OLD-SRYKA       TO  SKARRK-SRYKA
                CALL    "ORCSKARRK"         USING
                                            ORCSKARRKAREA
                                            SPA-AREA
