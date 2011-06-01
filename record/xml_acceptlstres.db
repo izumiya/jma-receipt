@@ -8,7 +8,7 @@ xml_acceptlstres {
 	Api_Result_Message		varchar(100);
 	Reskey				varchar(100);
 	Acceptance_Date			varchar(10);
-	Acceptlst_Infomation {
+	Acceptlst_Information {
 		Acceptance_Time			varchar(08);
 		Department_Code			varchar(2);
 		Department_WholeName		varchar(80);
@@ -17,7 +17,7 @@ xml_acceptlstres {
 		Medical_Information		varchar(2);
         	Claim_Infometion		varchar(1);
         	Account_Time			varchar(8);
-		Patient_Infomation {
+		Patient_Information {
 		Patient_ID			varchar(20);
 		WholeName			varchar(100);
 		WholeName_inKana		varchar(100);

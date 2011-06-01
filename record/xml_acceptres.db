@@ -15,7 +15,7 @@ xml_acceptres {
 		Physician_Code			varchar(5);
 		Physician_WholeName		varchar(80);
 		Medical_Information		varchar(2);
-		Patient_Infomation {
+		Patient_Information {
         	Patient_ID			varchar(20);
         	WholeName			varchar(100);
         	WholeName_inKana		varchar(100);
