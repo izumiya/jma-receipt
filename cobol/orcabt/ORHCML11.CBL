@@ -432,6 +432,7 @@
                PERFORM 900-ICDSELECT-SEC 
                PERFORM UNTIL   FLG-ICD   =   1
                    ADD     1                 TO  SUM-KENSU
+                   INITIALIZE                    TENSUCSV-REC
                    MOVE    TNS-HOSPNUM       TO  CSV-HOSPNUM
                    MOVE    TNS-TEN           TO  CSV-TEN
                    MOVE    ICD-INPUTCD       TO  CSV-SRYCD
@@ -439,6 +440,7 @@
                    MOVE    ","               TO  CSV-FILLER1
                                                  CSV-FILLER2
                                                  CSV-FILLER3
+                   WRITE   TENSUCSV-REC
                    PERFORM 900-ICDFETCH-SEC
                END-PERFORM 
                PERFORM 900-ICDCLOSE-SEC 
