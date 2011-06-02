@@ -371,6 +371,7 @@
       *  04.06.05    NACL-∆£∏∂    11/01/05  µ°«Ωƒ…≤√° √Ì≤√ªª°¢∆±ª˛ ªª‹≈˘°À
       *  04.06.06    NACL-∆£∏∂    11/02/01  ºÁ ›∏±§¨§ §§æÏπÁ°¢ª˘∆∏ ›∏Ó(53)
       *                                     §œ∏¯»Ò√±∆»§Œ•Ï•ª•◊•»§»§π§Î
+      *  04.06.07    NACL-∆£∏∂    11/06/02  ∫∆ø«° ª˛¥÷≥∞°À§Œµ≠œø ˝À°§ŒΩ§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1371,6 +1372,86 @@ grpsys     COPY    "COMMON-SPA".
       *    ÃÙ∫ﬁŒ¡ƒ˛∏∫
            03  WRK-CONS-TEIGEN        PIC X(09)   VALUE   "630010002".
       *
+      *    ∫∆ø«§Œª˛¥÷≤√ªª
+           03  WRK-CONS-JIKANGAI-TABLE. 
+      *    ∞Ï»Ã
+      *        ª˛¥÷≥∞° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112001110".
+      *        µŸ∆¸° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112001210".
+      *        øºÃÎ° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112001310".
+      *        ª˛¥÷≥∞∆√Œ„° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112001410".
+      *        ª˛¥÷≥∞° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112006470".
+      *        µŸ∆¸° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112006570".
+      *        øºÃÎ° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112006670".
+      *        ª˛¥÷≥∞∆√Œ„° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112006770".
+      *    œ∑øÕ
+      *        ª˛¥÷≥∞° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112701010".
+      *        µŸ∆¸° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112701110".
+      *        øºÃÎ° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112701210".
+      *        ª˛¥÷≥∞∆√Œ„° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112701310".
+      *        ª˛¥÷≥∞° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112701710".
+      *        µŸ∆¸° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112701810".
+      *        øºÃÎ° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112701910".
+      *        ª˛¥÷≥∞∆√Œ„° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112702010".
+      *    ∆˝Õƒª˘
+      *        ÃÎ¥÷° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112014170".
+      *        µŸ∆¸° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112014270".
+      *        øºÃÎ° ∫∆ø«°À
+               05  FILLER             PIC X(09)    VALUE   "112014370".
+      *        ÃÎ¥÷° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112014470".
+      *        µŸ∆¸° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112014570".
+      *        øºÃÎ° ≥∞ÕËø«Œ≈≤ °À
+               05  FILLER             PIC X(09)    VALUE   "112014670".
+      *        ∫∆ø«° ∆˝Õƒª˘ª˛¥÷≥∞°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112014770".
+      *        ∫∆ø«° ∆˝Õƒª˘µŸ∆¸°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112014870".
+      *        ∫∆ø«° ∆˝Õƒª˘øºÃÎ°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112014970".
+      *        ∫∆ø«° ∆˝Õƒª˘ª˛¥÷≥∞∆√Œ„∞ÂŒ≈µ°¥ÿ°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112015070".
+      *        ≥∞ÕËø«Œ≈≤ ° ∆˝Õƒª˘ª˛¥÷≥∞°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112015170".
+      *        ≥∞ÕËø«Œ≈≤ ° ∆˝Õƒª˘µŸ∆¸°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112015270".
+      *        ≥∞ÕËø«Œ≈≤ ° ∆˝Õƒª˘øºÃÎ°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112015370".
+      *        ≥∞ÕËø«Œ≈≤ ° ∆˝Õƒª˘ª˛¥÷≥∞∆√Œ„∞ÂŒ≈µ°¥ÿ°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112015470".
+      *
+      *        ∫∆ø«° ÃÎ¥÷°¶¡·ƒ´≈˘°À≤√ªª
+               05  FILLER             PIC X(09)    VALUE   "112015570".
+      *
+           03  WRK-CONS-JIKANGAI-TABLE-R  REDEFINES   
+                                      WRK-CONS-JIKANGAI-TABLE.
+               05  WRK-CONS-JIKANGAI-SRYCD-G       OCCURS  31.
+                   07  WRK-CONS-JIKANGAI-SRYCD
+                                      PIC X(09).
+           03  WRK-CONS-JIKANGAI-TEN-TABLE.
+               05  WRK-CONS-JIKANGAI-TEN-G         OCCURS  31.
+                   07  WRK-CONS-JIKANGAI-TEN
+                                      PIC 9(09).
+           03  WRK-CONS-JIKANGAI-MAX  PIC 9(02)    VALUE   31.    
+      *
       *    ±’¬Œª¿¡«°¶≤ƒ»¬º∞±’¬Œª¿¡«Õ∆¥Ô° £Ã£«£√°À
            03  WRK-CONS-SANSO1        PIC X(09)   VALUE   "739210000".
       *    ±’¬Œª¿¡«°¶≤ƒ»¬º∞±’¬Œª¿¡«Õ∆¥Ô° £Ã£«£√°À° Œ•≈Á°À
@@ -1736,6 +1817,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE055PARA-HOSPNUM
            IF      FLG-END             =   ZERO
       *        •’•°•§•Î∆…§ﬂπ˛§ﬂ
                PERFORM 900-RECE02-READ-SEC
+      *
+      *        ª˛¥÷≥∞≤√ªª≈¿øÙºË∆¿
+               INITIALIZE                  WRK-CONS-JIKANGAI-TEN-TABLE
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       WRK-CONS-JIKANGAI-MAX
+                   INITIALIZE                  TNS-TENSU-REC
+                   MOVE    WRK-CONS-JIKANGAI-SRYCD (IDX)
+                                           TO  TNS-SRYCD
+                   PERFORM 900-TENSU-READ-SEC
+                   MOVE    TNS-TEN         TO
+                                           WRK-CONS-JIKANGAI-TEN (IDX)
+               END-PERFORM
            END-IF
       *
            .
@@ -4147,6 +4240,42 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
       *
            MOVE    ZERO                TO  WRK-ACCTP-SYUTEN
       *
+      *    ∫∆ø«§Œª˛¥÷≥∞§Œ§»§≠
+           IF      RECE041-SRYKBN      =   "12"
+               PERFORM VARYING IDV1    FROM    1   BY  1
+                       UNTIL   IDV1    >       WRK-CONS-JIKANGAI-MAX
+                   IF      RECE05-SRYCD (IDX)
+                                   =   WRK-CONS-JIKANGAI-SRYCD (IDV1)
+                       MOVE    WRK-CONS-JIKANGAI-TEN (IDV1)
+                                               TO  WRK-ACCTP-SYUTEN
+                       MOVE    WRK-CONS-JIKANGAI-MAX
+                                               TO  IDV1
+                   END-IF
+               END-PERFORM
+               IF      WRK-ACCTP-SYUTEN        >   ZERO 
+                   ADD     1               TO  TBL-KOUI-SRYKBN12-MAX
+                   MOVE    RECE05-KEY      TO  TBL-KOUI-SRYKBN12-KEY
+                                               (TBL-KOUI-SRYKBN12-MAX)
+                   MOVE    IDX             TO
+                                       TBL-KOUI-SRYKBN12-SHORI-RENNUM
+                                               (TBL-KOUI-SRYKBN12-MAX)
+                   MOVE    RECE041-ZAIKAISU
+                                           TO  TBL-KOUI-SRYKBN12-KAISU
+                                               (TBL-KOUI-SRYKBN12-MAX)
+                   MOVE    RECE05-SRYCD (IDX)
+                                           TO  TBL-KOUI-SRYKBN12-SRYCD
+                                               (TBL-KOUI-SRYKBN12-MAX)    
+                   MOVE    WRK-ACCTP-SYUTEN
+                                           TO  TBL-KOUI-SRYKBN12-TEN
+                                               (TBL-KOUI-SRYKBN12-MAX)
+                   ADD     WRK-ACCTP-SYUTEN
+                                           TO  TBL-KOUI-SRYKBN12-TEN-G
+      *    
+                   MOVE    ZERO          TO  WRK-ACCTP-SYUTEN
+                   GO  TO  200711-KOUI-TAIHI-EXT
+               END-IF
+           END-IF
+      *
            IF    ( RECE041-SRYKBN      =   "11"   OR  "12"     )
            AND   ( RECE041-ZAIREQFLG   =   "1"                 )
            AND   ( RECE05-KOKUJISKBKBN1 (IDX)
@@ -4190,7 +4319,9 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                END-IF
       *
       *        ¥À‹π‡Ã‹§Œ§»§≠…’≤√æ Û§Œ≈¿øÙ§Ú¿ﬂƒÍ
-               MOVE    WRK-ACCTP-SYUTEN  TO  RECE041-SYUTEN1 
+               IF      RECE041-SRYKBN      =   "11"
+                   MOVE    WRK-ACCTP-SYUTEN  TO  RECE041-SYUTEN1
+               END-IF
            END-IF
       *
            IF    ( RECE041-SRYKBN      =   "13"    OR  "14"    )
@@ -5125,6 +5256,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                    COMPUTE WRK-TENSU   =
                                                RECE041-SYUTEN1 -
                                                RECE041-SYUTEN2
+                               WHEN    "12"
                                WHEN    "13"
                                WHEN    "14"
                                    COMPUTE WRK-TENSU   =
