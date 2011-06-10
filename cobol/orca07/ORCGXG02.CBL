@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.06.01    NACL-藤原    11/06/10  ファイル名未入力時のエラー表
+      *                                     示
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -456,6 +458,7 @@
            IF      SPA-GMN-XG02-FILENAME
                                    =   SPACE
                MOVE    "1001"          TO  SPA-ERRCD
+               MOVE    1               TO  SPA-GMN-XG02-CUR
            ELSE
                PERFORM VARYING IDX2    FROM    1   BY  1
                        UNTIL   IDX2    >       100
@@ -488,9 +491,9 @@
                                            TO  IDX2
                END-IF
            END-PERFORM        
-           IF      SPA-GMN-XG02-CDKBNMEI
+           IF      SPA-GMN-XG02-FILEMEI
                                    =   SPACE  
-               MOVE    SPACE           TO  SPA-GMN-XG02-CDKBN-G
+               MOVE    SPACE           TO  SPA-GMN-XG02-FILE-G
            END-IF
            .
        41022-FILE-CHK-EXT.
@@ -606,7 +609,7 @@
            IF      SPA-ERRCD      NOT =   SPACE
                MOVE    SPACE           TO  SPA-NAI-XG02-TO-FOLDER
                                            SPA-NAI-XG02-TO-DATA
-           END-IF    
+           END-IF
            .
        4103-KAKUTEI-CHK-EXT.
            EXIT.
@@ -640,10 +643,10 @@
            MOVE    1               TO  FLG-TOUROKU
            PERFORM 410-INPUT-CHK-SEC
            IF    ( SPA-ERRCD       NOT =   SPACE )
-               GO  TO  490-KAKUTEI-EXT
+               GO  TO  490-KAKUTEI-CHECK-EXT
            END-IF
            IF    ( SPA-XGIDCD      NOT =   SPACE )
-               GO  TO  490-KAKUTEI-EXT
+               GO  TO  490-KAKUTEI-CHECK-EXT
            END-IF
       *
       *    確定処理
