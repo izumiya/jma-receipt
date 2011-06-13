@@ -1363,6 +1363,8 @@ path	key43		{
                   AND   HKNJANUM    =   :HKNJANUM
                   AND   HOJOKBN_KEY =   :HOJOKBN_KEY
                   AND   TEKSTYMD    =   :TEKSTYMD
+                  AND   TEISEIKBN   <>  '1'
+                ORDER  BY  SKYKBN DESC
 		;
 	};
 };
