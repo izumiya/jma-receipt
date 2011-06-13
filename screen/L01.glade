@@ -423,24 +423,6 @@
     </widget>
 
     <widget>
-      <class>GtkHSeparator</class>
-      <name>hseparator21</name>
-      <x>20</x>
-      <y>640</y>
-      <width>970</width>
-      <height>0</height>
-    </widget>
-
-    <widget>
-      <class>GtkHSeparator</class>
-      <name>hseparator20</name>
-      <x>20</x>
-      <y>710</y>
-      <width>970</width>
-      <height>0</height>
-    </widget>
-
-    <widget>
       <class>GtkLabel</class>
       <name>MARKHISSU</name>
       <x>926</x>
@@ -5732,6 +5714,24 @@
       </signal>
       <label>010</label>
       <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator20</name>
+      <x>20</x>
+      <y>710</y>
+      <width>908</width>
+      <height>0</height>
+    </widget>
+
+    <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator21</name>
+      <x>20</x>
+      <y>640</y>
+      <width>970</width>
+      <height>0</height>
     </widget>
   </widget>
 </widget>
