@@ -503,6 +503,8 @@
       *                                     ¤Îµ­ºÜÂÐ±þ¡Ê¸å´ü¹âÎð¡Ë
       *  04.05.27    NACL-ÌçÏÆ    11/04/14  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ·×»»½¤Àµ
       *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
+      *  04.05.28    NACL-ÌçÏÆ    11/06/09  Æþ±¡²ñ·×¡¦ÎÅÍÜÃ´Åö¼êÅö¤ÎºÞÈÖ¹æ
+      *                                     ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1235,6 +1237,7 @@
            03  WRK-ZAINUM                              PIC 9(08).
            03  WRK-ZAINUM-CNT                          PIC 9(03).
            03  WRK-ZAINUM-CNT2                         PIC 9(03).
+           03  WRK-ZAINUM-CNT3                         PIC 9(03).
            03  WRK-RENNUM                              PIC 9(02).
            03  WRK-RENNUM2                             PIC 9(02).
            03  WRK-TANICD                              PIC 9(03).
@@ -6521,7 +6524,7 @@
                                                 "7"
       *
                    MOVE     ZERO       TO    CNT-ZAIREN
-                   IF   NACCT-ZAISKBKBN  = "6" OR "7"
+                   IF   NACCT-ZAISKBKBN  = "6"
                       ADD    1         TO    WRK-ZAINUM-CNT2
                    END-IF
       *
@@ -7946,6 +7949,7 @@
            END-IF
       *
            MOVE    ZERO                 TO      WRK-ZAINUM-CNT
+           MOVE    ZERO                 TO      WRK-ZAINUM-CNT3
            EVALUATE  NACCT-ZAISKBKBN
             WHEN    "1"
              PERFORM     VARYING   IDX2   FROM    1    BY   1
@@ -7958,8 +7962,17 @@
              COMPUTE WRK-ZAINUM  = 99999800  +  WRK-ZAINUM-CNT
              MOVE    WRK-ZAINUM         TO      RECE64-ZAINUM
             WHEN    "6"
-            WHEN    "7"
              COMPUTE WRK-ZAINUM  = 99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE64-ZAINUM
+            WHEN    "7"
+             PERFORM     VARYING   IDX2   FROM    1    BY   1
+                           UNTIL     IDX2   >       31
+                            OR       WRK-ZAINUM-CNT3 NOT =  ZERO
+                 IF  WRK-DAY21(IDX2)   NOT =   ZERO
+                     MOVE    IDX2       TO      WRK-ZAINUM-CNT3
+                 END-IF
+             END-PERFORM
+             COMPUTE WRK-ZAINUM  = 99993900  +  WRK-ZAINUM-CNT3
              MOVE    WRK-ZAINUM         TO      RECE64-ZAINUM
             WHEN    OTHER
              MOVE    NACCT-ZAINUM       TO      RECE64-ZAINUM
@@ -8068,8 +8081,10 @@
              COMPUTE WRK-ZAINUM   =  99999800  +  WRK-ZAINUM-CNT
              MOVE    WRK-ZAINUM         TO      RECE65-ZAINUM
             WHEN    "6"
-            WHEN    "7"
              COMPUTE WRK-ZAINUM   =  99993000  +  WRK-ZAINUM-CNT2
+             MOVE    WRK-ZAINUM         TO      RECE65-ZAINUM
+            WHEN    "7"
+             COMPUTE WRK-ZAINUM   =  99993900  +  WRK-ZAINUM-CNT3
              MOVE    WRK-ZAINUM         TO      RECE65-ZAINUM
             WHEN    OTHER
              MOVE    NSRY-ZAINUM        TO      RECE65-ZAINUM
