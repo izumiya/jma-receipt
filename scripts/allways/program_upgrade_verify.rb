@@ -50,6 +50,7 @@ localmd5 = []
 local_md5list(patch_lib_org, localmd5)
 local_md5list(patch_lib_tmp, localmd5)
 releasemd5.sort!
+localmd5.uniq!
 localmd5.sort!
 
 `bash #{check_log_sh} clear`
