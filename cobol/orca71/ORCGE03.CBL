@@ -702,9 +702,9 @@ grpsys         (WK-PTID-K                     =   "*")
       *                                        NOT =   PTNUM-HOSPID)  OR
       *              (MCPDATA-REC(WK-PTID-S:WK-PTID-L)
       *                                        NOT =   PTNUM-PTID))  AND
-               IF   (MCPDATA-REC(WK-PTID-S:WK-PTID-L)
-                                               NOT =   PTNUM-PTID)  AND
-                   (MCPDATA-REC(WK-PTID-S:WK-PTID-SL)    =   ZERO)
+      *         IF   (MCPDATA-REC(WK-PTID-S:WK-PTID-L)
+      *                                         NOT =   PTNUM-PTID)  AND
+      *             (MCPDATA-REC(WK-PTID-S:WK-PTID-SL)    =   ZERO)
       *             MOVE    MCPDATA-REC(WK-HOSPID-S:WK-HOSPID-L)
       *                                         TO  PTNUM-HOSPID
                    MOVE    MCPDATA-REC(WK-PTID-S:WK-PTID-L)
@@ -741,7 +741,7 @@ grpsys         (WK-PTID-K                     =   "*")
                                                    MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
-               END-IF
+      *         END-IF
       *
                MOVE    WK-TBL-CHKPTMUM         TO  WK-KTPNT
                PERFORM VARYING IDX5   FROM   1   BY   1
