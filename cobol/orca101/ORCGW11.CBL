@@ -1648,7 +1648,6 @@
       *****************************************************************
        4104-YUKOKBN-CHK-SEC        SECTION.
       *
-      *
            MOVE    W11-YUKOKBN     TO  SPA-GMN-YUKOKBN-G
       *
            IF      SPA-GMN-YUKOKBN     =   SPACE
@@ -3235,30 +3234,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-USERKBN-G   TO  W11-USERKBN
       *
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-USERKBN-MAX
-               MOVE    SPA-GMN-USERKBNLST (IDX2)
-                                       TO  W11-USERKBNLST (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-USERKBN-MAX
+               MOVE    SPA-GMN-USERKBNLST (IDX)
+                                       TO  W11-USERKBNLST (IDX)
            END-PERFORM
            MOVE    SPA-GMN-USERKBN-MAX TO  W11-USERKBN-COUNT
       *
            MOVE    SPA-GMN-YUKOKBN-G   TO  W11-YUKOKBN
       *
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-YUKOKBN-MAX
-               MOVE    SPA-GMN-YUKOKBNLST (IDX2)
-                                       TO  W11-YUKOKBNLST (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-YUKOKBN-MAX
+               MOVE    SPA-GMN-YUKOKBNLST (IDX)
+                                       TO  W11-YUKOKBNLST (IDX)
            END-PERFORM
            MOVE    SPA-GMN-YUKOKBN-MAX TO  W11-YUKOKBN-COUNT
       *
-           PERFORM VARYING     IDX2    FROM    1   BY  1
-                   UNTIL       IDX2    >       SPA-GMN-USERLST-MAX
-               MOVE    SPA-GMN-USERNUML(IDX2)  TO  W11-USERNUM(IDX2)
-               MOVE    SPA-GMN-USERMEIL(IDX2)  TO  W11-USERNAME(IDX2)
-               IF      IDX2            =   SPA-GMN-SELNUM
-                   MOVE    "T"             TO  W11-USERLST-SELECT(IDX2)
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >       SPA-GMN-USERLST-MAX
+               MOVE    SPA-GMN-USERNUML(IDX)   TO  W11-USERNUM(IDX)
+               MOVE    SPA-GMN-USERMEIL(IDX)   TO  W11-USERNAME(IDX)
+               IF      IDX             =   SPA-GMN-SELNUM
+                   MOVE    "T"             TO  W11-USERLST-SELECT(IDX)
                ELSE
-                   MOVE    "F"             TO  W11-USERLST-SELECT(IDX2)
+                   MOVE    "F"             TO  W11-USERLST-SELECT(IDX)
                END-IF
            END-PERFORM
            MOVE    SPA-GMN-USERLST-MAX     TO  W11-USERLST-COUNT
@@ -3304,28 +3303,28 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-TORGPGNM  (12)
                                         TO  W11-ORCAORGNM12
       *    処方せん
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-ORGPGNM02-MAX
-               MOVE    SPA-GMN-ORGPGNM02-MEI (IDX2)
-                                       TO  W11-ORCAORGNM02-ITEM (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-ORGPGNM02-MAX
+               MOVE    SPA-GMN-ORGPGNM02-MEI (IDX)
+                                       TO  W11-ORCAORGNM02-ITEM (IDX)
            END-PERFORM
            MOVE    SPA-GMN-ORGPGNM02-MAX
                                        TO  W11-ORCAORGNM02-COUNT
       *
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-ORGPGNM03-MAX
-               MOVE    SPA-GMN-ORGPGNM03MEIL (IDX2)
-                                       TO  W11-ORCAORGNM03LST (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-ORGPGNM03-MAX
+               MOVE    SPA-GMN-ORGPGNM03MEIL (IDX)
+                                       TO  W11-ORCAORGNM03LST (IDX)
            END-PERFORM
            MOVE    SPA-GMN-ORGPGNM03-MAX
                                        TO  W11-ORCAORGNM03-COUNT
       *
       *----(04.02.02)--ADD-START---
       *    薬剤情報提供書
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-ORGPGNM04-MAX
-               MOVE    SPA-GMN-ORGPGNM04-MEI (IDX2)
-                                       TO  W11-ORCAORGNM04-ITEM (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-ORGPGNM04-MAX
+               MOVE    SPA-GMN-ORGPGNM04-MEI (IDX)
+                                       TO  W11-ORCAORGNM04-ITEM (IDX)
            END-PERFORM
            MOVE    SPA-GMN-ORGPGNM04-MAX
                                        TO  W11-ORCAORGNM04-COUNT
@@ -3371,18 +3370,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-TORGPGNM-N  (10)
                                         TO  W11-ORCAORGNM10N
       *
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-ORGPGNM03N-MAX
-               MOVE    SPA-GMN-ORGPGNM03NMEIL (IDX2)
-                                       TO  W11-ORCAORGNM-N03LST (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-ORGPGNM03N-MAX
+               MOVE    SPA-GMN-ORGPGNM03NMEIL (IDX)
+                                       TO  W11-ORCAORGNM-N03LST (IDX)
            END-PERFORM
            MOVE    SPA-GMN-ORGPGNM03N-MAX
                                        TO  W11-ORCAORGNM-N03-COUNT
       *
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL   IDX2    >       SPA-GMN-ORGPGNM09N-MAX
-               MOVE    SPA-GMN-ORGPGNM09NMEIL (IDX2)
-                                       TO  W11-ORCAORGNM-N09LST (IDX2)
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-ORGPGNM09N-MAX
+               MOVE    SPA-GMN-ORGPGNM09NMEIL (IDX)
+                                       TO  W11-ORCAORGNM-N09LST (IDX)
            END-PERFORM
            MOVE    SPA-GMN-ORGPGNM09N-MAX
                                        TO  W11-ORCAORGNM-N09-COUNT
@@ -3487,7 +3486,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-EVALUATE
            END-EVALUATE
       *----(02.00.03)--ADD-END-----
-      *
            PERFORM 5001-MAPCUR-SEC
       *
            .
