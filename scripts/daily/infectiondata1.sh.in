@@ -40,6 +40,7 @@ syoribi () {
   SYORIBI=""
 
   ENDYMD=`date --date '1 day ago' +%Y%m%d`
+  STWYMD=`date --date '4 day ago' +%Y%m%d`
 
   if [ -e $INFECREC ]; then
     STARTYMD=`head -1 $INFECREC`
@@ -52,6 +53,9 @@ syoribi () {
       echo "YMD in $INFECREC size error `expr length $STARTYMD`" | tee -a $LOGFILE
       SYORIBI=$ENDYMD
       return
+    fi
+    if [ $STARTYMD -lt $STWYMD ]; then
+      STARTYMD=$STWYMD
     fi
     while [ $STARTYMD -lt $ENDYMD ];
     do

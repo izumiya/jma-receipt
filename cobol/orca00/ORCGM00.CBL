@@ -278,7 +278,6 @@
            COPY    "MDAS.INC".
            COPY    "MLOG.INC".
            COPY    "MINF.INC".
-           COPY    "MPRT.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -350,10 +349,12 @@
                END-IF
       *
       *        感染症報告処理起動
-               IF      WRK-MOTOPG          =   SPACE
-                                           OR  "M95"
-                   PERFORM 800-INFECTION-SEC
-                   PERFORM 800-INFECTION-AGREE-SEC
+               IF      SPA-NAI-REDL   NOT  =   1
+                   IF      WRK-MOTOPG          =   SPACE
+                                               OR  "M95"
+                       PERFORM 800-INFECTION-SEC
+                       PERFORM 800-INFECTION-AGREE-SEC
+                   END-IF
                END-IF
       *
       *        画面編集
