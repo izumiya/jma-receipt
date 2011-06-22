@@ -59,6 +59,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDX0                                PIC 9(05).
            03  IDX1                                PIC 9(05).
            03  IDX2                                PIC 9(05).
       *
@@ -538,6 +539,19 @@
                    MOVE    1           TO  SPA-GMN-I22-CUR
                    GO  TO  490-KAKUTEI-EXT
                END-IF
+      *
+               PERFORM VARYING IDX0 FROM 100 BY -1 
+                       UNTIL ( IDX0 <    1 )
+                   IF    ( SPA-GMN-I22-FILENAME (IDX0 : 1) =  "/" )
+                       IF    ( IDX0      =  100 )
+                        OR   ( SPA-GMN-I22-FILENAME ( IDX0 + 1 : )
+                                         = SPACE )
+                           MOVE    "1005"      TO  SPA-ERRCD
+                           MOVE    1           TO  SPA-GMN-I22-CUR
+                           GO  TO  490-KAKUTEI-EXT
+                       END-IF
+                   END-IF
+               END-PERFORM
            END-IF
       *
       *    件数(ぺージ数）指定チェック
@@ -791,6 +805,7 @@
       *
            EVALUATE    SPA-ERRCD
            WHEN    "1001"
+           WHEN    "1005"
                MOVE    "出力ファイル名が入力されいていません"
                                        TO  SPA-ERRMSG
            WHEN    "1002"
