@@ -316,6 +316,8 @@
       *    定数超過情報取得パラメタ
            COPY    "CPORCSTEISU.INC".
       *
+      *    通算日数取得サブ
+           COPY "CPORCSTUSAN.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -1056,6 +1058,39 @@
                        MOVE    1                   TO  FLG-SYORI
                    END-IF
                END-IF
+      *
+      *        有床診療所一般病床初期加算
+               IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190135470"
+                   INITIALIZE                  ORCSTUSANAREA
+                   MOVE    SPA-HOSPNUM     TO  STUSAN-HOSPNUM
+                   MOVE    SPA-PTID        TO  STUSAN-PTID
+                   MOVE    LNK-SCNYUACCT-STSRYYMD
+                                           TO  STUSAN-KJNYMD
+                   CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
+                                                   SPA-AREA
+                   IF     STUSAN-TAINREL-NISSU   NOT =   ZERO
+                      IF    LNK-SCNYUACCT-SYORI-KBN     =   "1"
+                        ADD   STUSAN-TAINREL-NISSU  TO  WRK-ZOGEN
+                      ELSE
+                        COMPUTE   WRK-ZOGEN  =  7   -  
+                                                STUSAN-NISSU03  +
+                                                1
+      *                 退院取消
+                        IF   LNK-SCNYUACCT-SYORI-KBN     =   "7"
+                            COMPUTE   WRK-ZOGEN  =  7   -  
+                                                    STUSAN-NISSU03
+                            MOVE    ZERO    TO    FLG-SYORI
+                        END-IF
+                      END-IF
+                   END-IF
+                   IF     STUSAN-TAINREL-NISSU   =   ZERO
+                      IF    LNK-SCNYUACCT-SYORI-KBN     =   "7"
+                        COMPUTE   WRK-ZOGEN  =  7   -  
+                                                STUSAN-NISSU03
+                      END-IF
+                   END-IF
+               END-IF
+      *
       *        異動日から算定開始の加算（救急・在宅等支援療養病床初期加算）
                IF      LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
                                            =   "2"
