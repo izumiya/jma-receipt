@@ -25,7 +25,7 @@
       *  返却コード        : 00:正常
       *                      10:データ作成なし(システム管理)
       *                      30:データ作成処理中
-      *                      40:データ作成処理済み
+      *                      40:データ作成処理済み(ジョブ管理あり含む)
       *                      90:データ作成処理中(開始日が当日でない)
       *  管理者            : 
       *  作成日付    作業者        記述
@@ -101,10 +101,13 @@
            END-IF
       *
       *    マシン日付の週の月曜日の日付を求める
-           PERFORM 100-GET-YMD-SEC
+      **** PERFORM 100-GET-YMD-SEC
       *
       *    ジョブ管理から今週処理の実績を調べる
-           PERFORM 200-JOBEXEC-CHK-SEC
+      **** PERFORM 200-JOBEXEC-CHK-SEC
+      *
+      *    ジョブ管理の有無を調べる
+           PERFORM 210-JOBEXIST-CHK-SEC
            .
       *
        000-PROC-EXT.
@@ -183,5 +186,26 @@
            END-IF
            .
        200-JOBEXEC-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ジョブ管理有無チェック処理
+      *****************************************************************
+       210-JOBEXIST-CHK-SEC        SECTION.
+      *
+           MOVE    "CHK"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-INFAJOBID     TO  JOB-JOBID
+           MOVE    CONST-INFASHELLID   TO  JOB-SHELLID
+           CALL    "ORCSJOB"           USING
+                                           ORCSJOBKANRIAREA
+                                           JOBKANRI-REC
+                                           SPA-AREA
+           IF      SJOBKANRI-RETURN    =   ZERO
+                   MOVE    40          TO  INFCHK-RC
+           END-IF
+           .
+       210-JOBEXIST-CHK-EXT.
            EXIT.
       *

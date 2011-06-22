@@ -70,6 +70,8 @@
       *  04.05.00    NACL-太田    09.06.23  保険自費毎の消費税端数区分追加
       *  04.05.00    NACL-太田    09.07.27  分娩機関管理番号追加
       *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
+      *  04.06.01    NACL-伊藤    11/01/28  リアルタイム送信
+      *  04.06.02    NACL-伊藤    11/06/17  感染症区分送信
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -578,6 +580,14 @@
            03  CONST-DHASU4J       PIC 9(05) VALUE 7.
            03  CONST-DHASU5J       PIC 9(05) VALUE 8.
            03  CONST-DHASU-MAX     PIC 9(05) VALUE 8.
+      *    感染症参加送信  
+           03  CONST-INFAJOBID     PIC 9(07)  VALUE    1.
+           03  CONST-INFASHELLID   PIC X(08)  VALUE    "INFAGREE".
+      *
+       01  SHELL-AREA.
+           03  SHELL-NAME          PIC X(17) VALUE
+                                   "infectionagree.sh".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -610,6 +620,9 @@
       *    レセプト印刷情報（主科設定）
            COPY  "CPSK2009.INC".
       *
+      *    ジョブ管理
+       01  JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -634,6 +647,11 @@
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       **** COPY    "CPORCMCP.INC".
+      *
+      *    感染症区分送信関係により追加
+           COPY    "CPORCSJOBKANRI.INC".
+           COPY    "CPSHELLTBL.INC".
+      **** COPY    "CPORCSINFCHK.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -1901,6 +1919,8 @@
                    MOVE    SPA-DATATEISYUTU-MAX    TO  IDY
                 END-IF
            END-PERFORM
+      *    感染症区分の変更前を保存SPA-W25-GMN-ALLを流用
+           MOVE    SYS-1001-TBL(459:1) TO  SPA-W25-GMN-ALL
       *
       *    データ提出方法区分 空白の時、"0"とする
            IF      SYS-1001-JIHIPOSITION   =   SPACE
@@ -4093,6 +4113,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1001"                  TO  SPA-ERRCD
                GO  TO  490-KOUSHIN-EXT
            END-IF      
+      *    感染症区分変更時はデータ送信処理起動
+           IF      SPA-W25-GMN-ALL NOT =   SYS-1001-TBL(459:1)
+               IF    ((SPA-W25-GMN-ALL             =   "0")   AND
+                      (SYS-1001-TBL(459:1)         =   "9"))  OR
+                     ((SPA-W25-GMN-ALL             =   "9")   AND
+                      (SYS-1001-TBL(459:1)         =   "0"))
+                       CONTINUE
+               ELSE
+                   PERFORM 800-INFECTION-AGREE-SEC
+               END-IF
+           END-IF
       *
            MOVE   "JOIN"               TO  MCP-PUTTYPE
            PERFORM 210-BACK 
@@ -5253,6 +5284,64 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        50011-CUR-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    感染症参加送信処理
+      *****************************************************************
+       800-INFECTION-AGREE-SEC         SECTION.
+      *
+      *    INITIALIZE                  ORCSINFCHKAREA
+      *    CALL    "ORCSINFSTATE"      USING
+      *                                MCPAREA
+      *                                SPA-AREA
+      *                                ORCSINFCHKAREA
+      *
+      *    IF    ( INFCHK-RC       NOT =   ZERO )  AND
+      *          ( INFCHK-RC       NOT =   90   )
+      *        GO  TO    800-INFECTION-AGREE-EXT
+      *    END-IF
+      *    
+      *    ジョブ開始セット処理
+           MOVE    "DEL"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-INFAJOBID     TO  JOB-JOBID
+           MOVE    CONST-INFASHELLID   TO  JOB-SHELLID
+           CALL    "ORCSJOB"       USING
+                                           ORCSJOBKANRIAREA 
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+           MOVE    "JBS"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-INFAJOBID     TO  JOB-JOBID
+           MOVE    CONST-INFASHELLID   TO  JOB-SHELLID
+           MOVE    SPA-TERMID          TO  JOB-TERMID
+           CALL    "ORCSJOB"       USING
+                                           ORCSJOBKANRIAREA 
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           MOVE    SHELL-NAME          TO  SHELLTBL-NAME
+           MOVE    SPA-TERMID          TO  SHELLTBL-ARG1
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
+           MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
+           MOVE    CONST-INFAJOBID     TO  SHELLTBL-ARG4
+           MOVE    CONST-INFASHELLID   TO  SHELLTBL-ARG5
+      *
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"     USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           .
+       800-INFECTION-AGREE-EXT.
            EXIT.
       *
       *****************************************************************
