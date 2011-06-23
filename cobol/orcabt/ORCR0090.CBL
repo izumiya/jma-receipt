@@ -224,6 +224,7 @@
       *                                     ¡Ö¢©¡×¡Ö£Ô£Å£Ì¡§¡×¤Îµ­ºÜÄÉ²Ã
       *  04.05.10    NACL-Æ£¸¶    11/04/20  ºÒ³²ÂÐ±þ
       *                                     ¸øÈñÉéÃ´°åÎÅ¤ÎÏ¢ÍíÀè¾ðÊóÄÉ²Ã
+      *  04.05.11    NACL-ÌçÏÆ    11/06/20  ¸øÈñÊ¬Î¥¶èÊ¬¶èÀÚ¤êÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -808,6 +809,7 @@
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-OCC2             OCCURS   5.
                05  TBL-DENSHI-ZAIKAISU     PIC  9(04).
+               05  TBL-DENSHI-HKNCOMBI     PIC  9(04).
       *
       *   ÆüËÜ¸ì¿ô»ú
        01  TBL-SUJI-AREA.
@@ -2070,6 +2072,7 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
                                        TO  TBL-DENSHI-TEN(1)
                COMPUTE  IDX5  =  RECE04-KOHBUNRI + 1
                ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(1 IDX5)
+               MOVE  RECE04-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(1 IDX5)
       *
            END-IF
       *
@@ -2264,6 +2267,7 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
                                      TO  TBL-DENSHI-TEN(IDX6)
              COMPUTE  IDX5  =  RECE04-KOHBUNRI + 1
              ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX6 IDX5)
+             MOVE  RECE04-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(IDX6 IDX5)
       *
            END-IF
       *
@@ -4091,6 +4095,9 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
            MOVE    SPACE             TO  RECE06-SRYSYUKBN
            MOVE    ZERO              TO  RECE06-DAY
       *
+           MOVE    TBL-DENSHI-HKNCOMBI(IDX6 IDX5)
+                                     TO  RECE06-HKNCOMBI
+      *
            WRITE   RECE06-REC
            ADD     1                 TO  CNT-RECE06
       *
@@ -4721,6 +4728,8 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM     )
                        MOVE    1     TO   RECE06-SYOHOUFLG
                  END-IF
                END-IF
+      *
+               MOVE    RECE04-HKNCOMBI   TO  RECE06-HKNCOMBI
       *
                WRITE   RECE06-REC
       *         

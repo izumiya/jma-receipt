@@ -77,6 +77,7 @@
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    10/01/12  治験対応
+      *  04.05.03    NACL-門脇    11/06/20  公費分離区分区切り編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -390,6 +391,8 @@ grpsys     MOVE    RECE06-HOSPNUM       TO      RECE061-HOSPNUM
            MOVE   RECE06-ZAIKBN      TO   RECE061-ZAIKBN
       *
            MOVE   RECE06-DAY2        TO   RECE061-DAY2
+      *
+           MOVE   RECE06-HKNCOMBI    TO   RECE061-HKNCOMBI
       *
            IF     RECE06-RECESYUBETU  =  8888
               IF     RECE06-ZAITEN  NOT =  ZERO

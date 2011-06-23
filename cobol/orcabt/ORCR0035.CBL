@@ -49,6 +49,8 @@
       *                                     生保単独になったときの対応
       *  04.04.02    NACL-門脇    10/01/04  月途中に医保と更生等の併用から
       *                                     更生等単独になったときの対応
+      *
+      *  04.05.01    NACL-門脇    11/06/20  公費分離区分編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -125,6 +127,9 @@ grpsys     COPY    "COMMON-SPA".
            03  FLG-END                                 PIC 9(01).
            03  FLG-RECE04                              PIC 9(01).
            03  FLG-RECE05                              PIC 9(01).
+           03  FLG-KOHBUNRI-OKIKAE                     PIC 9(01).
+           03  FLG-KOHBUNRI-OKIKAE2                    PIC 9(01).
+           03  FLG-FTNKBN-ERR                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -133,6 +138,7 @@ grpsys     COPY    "COMMON-SPA".
            03  CNT-OUT1                                PIC 9(06).
            03  CNT-OUT2                                PIC 9(06).
            03  CNT-OUT3                                PIC 9(06).
+           03  CNT-FTNKBNTBL                           PIC 9(06).
       *
       *    添字領域
        01  IDX-AREA.
@@ -144,6 +150,7 @@ grpsys     COPY    "COMMON-SPA".
            03  IDY                                     PIC 9(01).
            03  IDY2                                    PIC 9(01).
            03  IDY3                                    PIC 9(01).
+           03  IDZ                                     PIC 9(03).
       *
       *    剤番号の退避
        01  WK-ZAINUM                                   PIC 9(08).
@@ -169,6 +176,21 @@ grpsys     COPY    "COMMON-SPA".
       *
            03  WRK-3SYU-KBN.
                05  WRK-3SYU                            PIC X(03).
+      *
+           03  WRK-FTNKBN-AREA.
+               05  WRK-FTNKBN                          PIC X(01).
+               05  WRK-HKNNUM                          PIC X(03).
+               05  WRK-FTNKBN-AREA-OCC                 OCCURS  4.
+                 07  WRK-KOHNUM                        PIC 9(01).
+           03  WRK-FTNKBN-AREA2.
+               05  WRK-FTNKBN-AREA2-OCC                OCCURS 31.
+                 07  WRK-FTNKBNTBL                     PIC X(01).
+                 07  WRK-FTNKBNTBL-NUM                 PIC 9(02).
+           03  WRK-FTNKBN-AREA3.
+               05  WRK-FTNKBN-AREA3-OCC                OCCURS 10.
+                 07  WRK-HKNCOMBI-FTNKBN               PIC X(01).
+      *
+           03  WRK-KOHBUNRI                            PIC 9(01).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -261,8 +283,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                PERFORM 500-CANCEL-HENSYU-SEC
            END-IF
       *
-           OPEN    INPUT               RECE02-FILE
-           OPEN    I-O                 RECE04-FILE
+           OPEN    I-O                 RECE02-FILE
+                                       RECE04-FILE
                                        RECE05-FILE
       *
            PERFORM    900-RECE02-READ-SEC
@@ -293,6 +315,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *    編集処理
       *****************************************************************
        2001-HENSYU-SEC                   SECTION.
+      *
+           MOVE       ZERO      TO     FLG-KOHBUNRI-OKIKAE
+      *
+           INITIALIZE                  WRK-HIKAKU-TABLE
+           MOVE       SPACE     TO     WRK-3SYU-KBN
       *
            IF (RECE02-HENTOTALTEN(2)       =      ZERO)    AND
               (RECE02-HENTOTALTEN(3)       =      ZERO)    AND
@@ -326,6 +353,16 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
              END-IF
            END-IF
       *
+           IF     (FLG-KOHBUNRI-OKIKAE   =     1    )
+           AND    (RECE02-SRYYM         >=  "200804")
+             IF    RECE02-HENTOTALTEN(1)   NOT =  ZERO
+                DISPLAY   "< KOHBUNRI OKIKAE >"
+                PERFORM   20013-KOHBUNRI-OKIKAE-SEC
+             END-IF
+           END-IF
+      *
+           REWRITE RECE02-REC
+      *
            .
        2001-HENSYU-EXT.
            EXIT.
@@ -334,9 +371,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *    請求点数比較
       *****************************************************************
        20011-TENSU-HIKAU-SEC                SECTION.
-      *
-           INITIALIZE               WRK-HIKAKU-TABLE
-           MOVE     SPACE    TO     WRK-3SYU-KBN
       *
            PERFORM    VARYING    IDY    FROM   1   BY   1
                        UNTIL   ( IDY      >    4                )
@@ -412,16 +446,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE    SPACE                TO      RECE04-REC
            INITIALIZE                           RECE04-REC
-grpsys     MOVE    RECE02-HOSPNUM       TO      RECE04-HOSPNUM
-           MOVE    RECE02-SRYYM         TO      RECE04-SRYYM
-           MOVE    RECE02-NYUGAIKBN     TO      RECE04-NYUGAIKBN
-           MOVE    RECE02-PTID          TO      RECE04-PTID
-           MOVE    RECE02-RECEKA        TO      RECE04-RECEKA
-           MOVE    RECE02-TEISYUTUSAKI  TO      RECE04-TEISYUTUSAKI
-           MOVE    RECE02-RECESYUBETU   TO      RECE04-RECESYUBETU
-           MOVE    RECE02-HKNJANUM-KEY  TO      RECE04-HKNJANUM
-           MOVE    RECE02-HOJOKBN-KEY   TO      RECE04-HOJOKBN
-           MOVE    RECE02-TEKSTYMD      TO      RECE04-TEKSTYMD
+           PERFORM 800-RECE02-SET04-SEC
            START   RECE04-FILE   KEY  IS  >=    RECE04-KEY
                    INVALID
                        MOVE   1         TO      FLG-RECE04
@@ -430,16 +455,17 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE04-HOSPNUM
                        PERFORM    900-RECE04-NEXT-SEC
            END-START
            PERFORM   UNTIL
-grpsys              (RECE02-HOSPNUM   NOT = RECE04-HOSPNUM)    OR
-                    (RECE02-NYUGAIKBN NOT = RECE04-NYUGAIKBN) OR
-                    (RECE02-PTID      NOT = RECE04-PTID)      OR
-                    (RECE02-RECEKA    NOT = RECE04-RECEKA)    OR
-                    (RECE02-TEISYUTUSAKI NOT = RECE04-TEISYUTUSAKI) OR
-                    (RECE02-RECESYUBETU  NOT = RECE04-RECESYUBETU)  OR
-                    (RECE02-HKNJANUM-KEY   NOT = RECE04-HKNJANUM)  OR
-                    (RECE02-HOJOKBN-KEY    NOT = RECE04-HOJOKBN )  OR
-                    (RECE02-TEKSTYMD  NOT = RECE04-TEKSTYMD)  OR
-                    (FLG-RECE04       =    1)
+                (RECE02-HOSPNUM      NOT = RECE04-HOSPNUM     ) OR
+                (RECE02-SRYYM        NOT = RECE04-SRYYM       ) OR
+                (RECE02-NYUGAIKBN    NOT = RECE04-NYUGAIKBN   ) OR
+                (RECE02-PTID         NOT = RECE04-PTID        ) OR
+                (RECE02-RECEKA       NOT = RECE04-RECEKA      ) OR
+                (RECE02-TEISYUTUSAKI NOT = RECE04-TEISYUTUSAKI) OR
+                (RECE02-RECESYUBETU  NOT = RECE04-RECESYUBETU ) OR
+                (RECE02-HKNJANUM-KEY NOT = RECE04-HKNJANUM    ) OR
+                (RECE02-HOJOKBN-KEY  NOT = RECE04-HOJOKBN     ) OR
+                (RECE02-TEKSTYMD     NOT = RECE04-TEKSTYMD    ) OR
+                (FLG-RECE04              =    1               )
                      MOVE   RECE04-ZAINUM    TO   WK-ZAINUM
                      PERFORM      200111-KOHBUNRI-SET-SEC
                      PERFORM      200112-RECE04-REWRITE-SEC
@@ -456,16 +482,6 @@ grpsys              (RECE02-HOSPNUM   NOT = RECE04-HOSPNUM)    OR
       *****************************************************************
        200111-KOHBUNRI-SET-SEC               SECTION.
       *
-      *****EVALUATE  TRUE
-      *        WHEN  (RECE04-HKNCOMBI   =    RECE02-HKNCOMBI(1))
-      *              MOVE     1         TO   HC-IDX
-      *        WHEN  (RECE04-HKNCOMBI   =    RECE02-HKNCOMBI(2))
-      *              MOVE     2         TO   HC-IDX
-      *        WHEN  (RECE04-HKNCOMBI   =    RECE02-HKNCOMBI(3))
-      *              MOVE     3         TO   HC-IDX
-      *        WHEN  OTHER
-      *              MOVE     ZERO      TO   HC-IDX
-      *****END-EVALUATE
            MOVE    ZERO                TO  HC-IDX
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       10
@@ -487,9 +503,6 @@ grpsys              (RECE02-HOSPNUM   NOT = RECE04-HOSPNUM)    OR
                (RECE02-KOHIDHC(HC-IDX 4)  = RECE02-KOHID(BUN-IDX) ))
                 MOVE    BUN-IDX     TO        KH-IDX
            END-IF
-      **     DISPLAY   "RECE04-PTID     : " RECE04-PTID
-      **     DISPLAY   "RECE04-HKNCOMNI : " RECE04-HKNCOMBI
-      **     DISPLAY   "KH-IDX          : " KH-IDX
       *
            IF   (RECE02-SEIHOFLG                     =  "1" )
            AND  (KH-IDX                          NOT =  ZERO)
@@ -502,21 +515,13 @@ grpsys              (RECE02-HOSPNUM   NOT = RECE04-HOSPNUM)    OR
               END-IF
            END-IF
       *
-           IF    RECE02-HENTOTALTEN(1)   NOT  =  ZERO
-              IF    KH-IDX      NOT =   ZERO
-                     MOVE    KH-IDX      TO     RECE04-KOHBUNRI
-              END-IF
-           ELSE
-              IF    KH-IDX      NOT =   ZERO
-      ***       IF    RECE04-KOHBUNRI     =      ZERO
-                     MOVE    KH-IDX      TO     RECE04-KOHBUNRI
-      ***       ELSE
-      ***         IF  RECE02-HENTOTALTEN(2)  >  RECE02-HENTOTALTEN(3)
-      ***            MOVE    KH-IDX      TO     RECE04-KOHBUNRI
-      ***         END-IF
-      ***       END-IF
-              END-IF
+           IF    KH-IDX      NOT =   ZERO
+                IF    RECE04-KOHBUNRI  NOT =  ZERO
+                   MOVE    1        TO     FLG-KOHBUNRI-OKIKAE
+                END-IF
+                MOVE    KH-IDX      TO     RECE04-KOHBUNRI
            END-IF
+      *
            .
        200111-KOHBUNRI-SET-EXT.
            EXIT.
@@ -541,16 +546,7 @@ grpsys              (RECE02-HOSPNUM   NOT = RECE04-HOSPNUM)    OR
       *
            MOVE    SPACE                TO      RECE05-REC
            INITIALIZE                           RECE05-REC
-grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
-           MOVE    RECE02-SRYYM         TO      RECE05-SRYYM
-           MOVE    RECE02-NYUGAIKBN     TO      RECE05-NYUGAIKBN
-           MOVE    RECE02-PTID          TO      RECE05-PTID
-           MOVE    RECE02-RECEKA        TO      RECE05-RECEKA
-           MOVE    RECE02-TEISYUTUSAKI  TO      RECE05-TEISYUTUSAKI
-           MOVE    RECE02-RECESYUBETU   TO      RECE05-RECESYUBETU
-           MOVE    RECE02-HKNJANUM-KEY  TO      RECE05-HKNJANUM
-           MOVE    RECE02-HOJOKBN-KEY   TO      RECE05-HOJOKBN
-           MOVE    RECE02-TEKSTYMD      TO      RECE05-TEKSTYMD
+           PERFORM 800-RECE02-SET05-SEC
            MOVE    WK-ZAINUM            TO      RECE05-ZAINUM
            START   RECE05-FILE   KEY  IS  >=    RECE05-KEY
                    INVALID
@@ -560,7 +556,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                        PERFORM    900-RECE05-NEXT-SEC
            END-START
            PERFORM   UNTIL
-grpsys            (RECE02-HOSPNUM       NOT =  RECE05-HOSPNUM)    OR
+                  (RECE02-HOSPNUM       NOT =  RECE05-HOSPNUM)    OR
+                  (RECE02-SRYYM         NOT =  RECE05-SRYYM)      OR
                   (RECE02-NYUGAIKBN     NOT =  RECE05-NYUGAIKBN) OR
                   (RECE02-PTID          NOT =  RECE05-PTID)      OR
                   (RECE02-RECEKA        NOT =  RECE05-RECEKA)    OR
@@ -572,24 +569,9 @@ grpsys            (RECE02-HOSPNUM       NOT =  RECE05-HOSPNUM)    OR
                   (WK-ZAINUM            NOT =  RECE05-ZAINUM)    OR
                   (FLG-RECE05           =      1)
       *
-                   IF    RECE02-HENTOTALTEN(1)   NOT  =  ZERO
-                     IF    KH-IDX      NOT =   ZERO
-                            MOVE   KH-IDX        TO     RECE05-KOHBUNRI
-                            PERFORM      2001131-RECE05-REWRITE-SEC
-                     END-IF
-                   ELSE
-                     IF    KH-IDX      NOT =   ZERO
-      ***              IF    RECE05-KOHBUNRI     =      ZERO
-                            MOVE   KH-IDX        TO     RECE05-KOHBUNRI
-                            PERFORM      2001131-RECE05-REWRITE-SEC
-      ***              ELSE
-      ***                IF  RECE02-HENTOTALTEN(2)  >
-      ***                                         RECE02-HENTOTALTEN(3)
-      ***                   MOVE   KH-IDX        TO     RECE05-KOHBUNRI
-      ***                   PERFORM      2001131-RECE05-REWRITE-SEC
-      ***                END-IF
-      ***              END-IF
-                     END-IF
+                   IF    KH-IDX      NOT =   ZERO
+                      MOVE   KH-IDX        TO     RECE05-KOHBUNRI
+                      PERFORM      2001131-RECE05-REWRITE-SEC
                    END-IF
       *
                    PERFORM       900-RECE05-NEXT-SEC
@@ -610,6 +592,337 @@ grpsys            (RECE02-HOSPNUM       NOT =  RECE05-HOSPNUM)    OR
       *
            .
        2001131-RECE05-REWRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    公費分離区分の置き換え
+      *****************************************************************
+       20013-KOHBUNRI-OKIKAE-SEC                SECTION.
+      *
+           INITIALIZE                   WRK-FTNKBN-AREA2
+           INITIALIZE                   WRK-FTNKBN-AREA3
+      *
+           MOVE    ZERO                 TO      FLG-FTNKBN-ERR
+      *
+           MOVE    SPACE                TO      RECE04-REC
+           INITIALIZE                           RECE04-REC
+           PERFORM 800-RECE02-SET04-SEC
+           START   RECE04-FILE   KEY  IS  >=    RECE04-KEY
+                   INVALID
+                       MOVE   1         TO      FLG-RECE04
+                   NOT  INVALID
+                       MOVE   ZERO      TO      FLG-RECE04
+                       PERFORM    900-RECE04-NEXT-SEC
+           END-START
+           PERFORM   UNTIL
+                (RECE02-HOSPNUM      NOT = RECE04-HOSPNUM     ) OR
+                (RECE02-SRYYM        NOT = RECE04-SRYYM       ) OR
+                (RECE02-NYUGAIKBN    NOT = RECE04-NYUGAIKBN   ) OR
+                (RECE02-PTID         NOT = RECE04-PTID        ) OR
+                (RECE02-RECEKA       NOT = RECE04-RECEKA      ) OR
+                (RECE02-TEISYUTUSAKI NOT = RECE04-TEISYUTUSAKI) OR
+                (RECE02-RECESYUBETU  NOT = RECE04-RECESYUBETU ) OR
+                (RECE02-HKNJANUM-KEY NOT = RECE04-HKNJANUM    ) OR
+                (RECE02-HOJOKBN-KEY  NOT = RECE04-HOJOKBN     ) OR
+                (RECE02-TEKSTYMD     NOT = RECE04-TEKSTYMD    ) OR
+                (FLG-RECE04              =    1               )
+                     PERFORM      200131-FTNKBN-SET-SEC
+                     PERFORM      900-RECE04-NEXT-SEC
+           END-PERFORM
+      *
+           MOVE     ZERO     TO   CNT-FTNKBNTBL
+           PERFORM  VARYING  IDX  FROM   1   BY   1
+                     UNTIL   IDX   >    31
+              IF   WRK-FTNKBNTBL(IDX)  NOT =  SPACE
+                 ADD    1               TO   CNT-FTNKBNTBL
+                 MOVE   CNT-FTNKBNTBL   TO   WRK-FTNKBNTBL-NUM(IDX)
+              END-IF
+           END-PERFORM
+      *
+           IF    FLG-FTNKBN-ERR   =    ZERO
+             IF    CNT-FTNKBNTBL   >    5
+                DISPLAY  "## CNT OVER ##  OKIKAE NG"
+             ELSE
+                PERFORM   200132-RECE04-HENSYU2-SEC
+             END-IF
+           END-IF
+      *
+           .
+       20013-KOHBUNRI-OKIKAE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    負担区分編集
+      *****************************************************************
+       200131-FTNKBN-SET-SEC               SECTION.
+      *
+           INITIALIZE                   WRK-FTNKBN-AREA
+      *
+           MOVE       ZERO        TO        IDZ
+      *
+           PERFORM  VARYING  IDX  FROM   1   BY   1
+                     UNTIL   IDX   >    10
+                      OR     RECE02-HKNCOMBI(IDX)  =  ZERO
+               IF   RECE04-HKNCOMBI   =   RECE02-HKNCOMBI(IDX)
+                  MOVE    RECE02-HKNNUMHC(IDX)  TO   WRK-HKNNUM
+                  MOVE    IDX                   TO   IDZ
+                  PERFORM  VARYING  IDY  FROM   1   BY   1
+                            UNTIL   IDY   >     4
+                     IF  (RECE02-KOHNUMHC (IDX IDY)  NOT =  SPACE)
+      ***            AND (RECE02-FTNKBNFLG(IDX IDY)      =  ZERO )
+                        PERFORM  VARYING  IDY2  FROM   1   BY   1
+                                  UNTIL   IDY2   >     4
+                                   OR     RECE02-KOHNUM(IDY2) = SPACE
+                          IF  (RECE02-KOHNUMHC(IDX IDY) =
+                                          RECE02-KOHNUM(IDY2))
+                          AND (RECE02-KOHIDHC (IDX IDY) =
+                                          RECE02-KOHID (IDY2))
+                              MOVE    1     TO   WRK-KOHNUM(IDY2)
+                              MOVE    4     TO   IDY2
+                          END-IF
+                        END-PERFORM
+                     END-IF
+                  END-PERFORM
+                  MOVE    10                TO   IDX
+               END-IF
+           END-PERFORM
+      *
+           IF     IDZ           NOT =    ZERO
+             IF   WRK-HKNNUM    NOT =    SPACE
+               EVALUATE    WRK-KOHNUM(1)
+                               ALSO    WRK-KOHNUM(2)
+                                           ALSO    WRK-KOHNUM(3)
+                                                   ALSO    WRK-KOHNUM(4)
+      *            １者 
+                   WHEN    0   ALSO    0   ALSO    0   ALSO    0
+                       MOVE    "1"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(1)
+      *            ２者 
+                   WHEN    1   ALSO    0   ALSO    0   ALSO    0
+                       MOVE    "2"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(2)
+                   WHEN    0   ALSO    1   ALSO    0   ALSO    0
+                       MOVE    "3"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(3)
+                   WHEN    0   ALSO    0   ALSO    1   ALSO    0
+                       MOVE    "E"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(4)
+                   WHEN    0   ALSO    0   ALSO    0   ALSO    1
+                       MOVE    "G"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(5)
+      *            ３者 
+                   WHEN    1   ALSO    1   ALSO    0   ALSO    0
+                       MOVE    "4"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(6)
+                   WHEN    1   ALSO    0   ALSO    1   ALSO    0
+                       MOVE    "M"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(7)
+                   WHEN    1   ALSO    0   ALSO    0   ALSO    1
+                       MOVE    "N"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(8)
+                   WHEN    0   ALSO    1   ALSO    1   ALSO    0
+                       MOVE    "O"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(9)
+                   WHEN    0   ALSO    1   ALSO    0   ALSO    1
+                       MOVE    "P"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(10)
+                   WHEN    0   ALSO    0   ALSO    1   ALSO    1
+                       MOVE    "Q"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(11)
+      *            ４者 
+                   WHEN    1   ALSO    1   ALSO    1   ALSO    0
+                       MOVE    "V"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(12)
+                   WHEN    1   ALSO    1   ALSO    0   ALSO    1
+                       MOVE    "W"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(13)
+                   WHEN    1   ALSO    0   ALSO    1   ALSO    1
+                       MOVE    "X"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(14)
+                   WHEN    0   ALSO    1   ALSO    1   ALSO    1
+                       MOVE    "Y"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(15)
+      *            ５者 
+                   WHEN    1   ALSO    1   ALSO    1   ALSO    1
+                       MOVE    "9"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(16)
+               END-EVALUATE
+             ELSE
+               EVALUATE    WRK-KOHNUM(1)
+                               ALSO    WRK-KOHNUM(2)
+                                           ALSO    WRK-KOHNUM(3)
+                                                   ALSO    WRK-KOHNUM(4)
+      *            １者 
+                   WHEN    1   ALSO    0   ALSO    0   ALSO    0
+                       MOVE    "5"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(17)
+                   WHEN    0   ALSO    1   ALSO    0   ALSO    0
+                       MOVE    "6"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(18)
+                   WHEN    0   ALSO    0   ALSO    1   ALSO    0
+                       MOVE    "B"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(19)
+                   WHEN    0   ALSO    0   ALSO    0   ALSO    1
+                       MOVE    "C"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(20)
+      *            ２者 
+                   WHEN    1   ALSO    1   ALSO    0   ALSO    0
+                       MOVE    "7"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(21)
+                   WHEN    1   ALSO    0   ALSO    1   ALSO    0
+                       MOVE    "H"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(22)
+                   WHEN    1   ALSO    0   ALSO    0   ALSO    1
+                       MOVE    "I"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(23)
+                   WHEN    0   ALSO    1   ALSO    1   ALSO    0
+                       MOVE    "J"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(24)
+                   WHEN    0   ALSO    1   ALSO    0   ALSO    1
+                       MOVE    "K"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(25)
+                   WHEN    0   ALSO    0   ALSO    1   ALSO    1
+                       MOVE    "L"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(26)
+      *            ３者 
+                   WHEN    1   ALSO    1   ALSO    1   ALSO    0
+                       MOVE    "R"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(27)
+                   WHEN    1   ALSO    1   ALSO    0   ALSO    1
+                       MOVE    "S"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(28)
+                   WHEN    1   ALSO    0   ALSO    1   ALSO    1
+                       MOVE    "T"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(29)
+                   WHEN    0   ALSO    1   ALSO    1   ALSO    1
+                       MOVE    "U"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(30)
+      *            ４者 
+                   WHEN    1   ALSO    1   ALSO    1   ALSO    1
+                       MOVE    "Z"            TO  WRK-FTNKBN
+                                                  WRK-FTNKBNTBL(31)
+               END-EVALUATE
+             END-IF
+             MOVE      WRK-FTNKBN     TO    WRK-HKNCOMBI-FTNKBN(IDZ)
+           ELSE
+             DISPLAY  "## HKNCOMBI ERR ##  OKIKAE NG"
+             MOVE         1           TO    FLG-FTNKBN-ERR
+           END-IF
+      *
+           .
+       200131-FTNKBN-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト中間ファイルの作成（Ｆ００４）
+      *****************************************************************
+       200132-RECE04-HENSYU2-SEC                SECTION.
+      *
+           MOVE    SPACE                TO      RECE04-REC
+           INITIALIZE                           RECE04-REC
+           PERFORM 800-RECE02-SET04-SEC
+           START   RECE04-FILE   KEY  IS  >=    RECE04-KEY
+                   INVALID
+                       MOVE   1         TO      FLG-RECE04
+                   NOT  INVALID
+                       MOVE   ZERO      TO      FLG-RECE04
+                       PERFORM    900-RECE04-NEXT-SEC
+           END-START
+           PERFORM   UNTIL
+                (RECE02-HOSPNUM      NOT = RECE04-HOSPNUM     ) OR
+                (RECE02-SRYYM        NOT = RECE04-SRYYM       ) OR
+                (RECE02-NYUGAIKBN    NOT = RECE04-NYUGAIKBN   ) OR
+                (RECE02-PTID         NOT = RECE04-PTID        ) OR
+                (RECE02-RECEKA       NOT = RECE04-RECEKA      ) OR
+                (RECE02-TEISYUTUSAKI NOT = RECE04-TEISYUTUSAKI) OR
+                (RECE02-RECESYUBETU  NOT = RECE04-RECESYUBETU ) OR
+                (RECE02-HKNJANUM-KEY NOT = RECE04-HKNJANUM    ) OR
+                (RECE02-HOJOKBN-KEY  NOT = RECE04-HOJOKBN     ) OR
+                (RECE02-TEKSTYMD     NOT = RECE04-TEKSTYMD    ) OR
+                (FLG-RECE04              =    1               )
+                     MOVE   RECE04-ZAINUM    TO   WK-ZAINUM
+                     PERFORM      2001321-KOHBUNRI-SET2-SEC
+                     PERFORM      200112-RECE04-REWRITE-SEC
+                     PERFORM      2001322-RECE05-HENSYU2-SEC
+                     PERFORM      900-RECE04-NEXT-SEC
+           END-PERFORM
+      *
+           .
+       200132-RECE04-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    公費分離区分の算出
+      *****************************************************************
+       2001321-KOHBUNRI-SET2-SEC               SECTION.
+      *
+           MOVE       ZERO        TO   FLG-KOHBUNRI-OKIKAE2
+      *
+           MOVE       ZERO        TO        IDZ
+           PERFORM  VARYING  IDX  FROM   1   BY   1
+                     UNTIL   IDX   >    10
+                      OR     RECE02-HKNCOMBI(IDX)  =  ZERO
+               IF   RECE04-HKNCOMBI   =   RECE02-HKNCOMBI(IDX)
+                  MOVE    IDX               TO   IDZ
+                  MOVE    10                TO   IDX
+               END-IF
+           END-PERFORM
+           IF     IDZ    NOT =    ZERO
+               PERFORM  VARYING  IDX  FROM   1   BY   1
+                         UNTIL   IDX   >    31
+                   IF   WRK-HKNCOMBI-FTNKBN(IDZ)  =  WRK-FTNKBNTBL(IDX)
+                     COMPUTE  WRK-KOHBUNRI  =  WRK-FTNKBNTBL-NUM(IDX)
+                                            -  1
+                     MOVE     WRK-KOHBUNRI  TO   RECE04-KOHBUNRI
+                     MOVE     1             TO   FLG-KOHBUNRI-OKIKAE2
+                     MOVE     1             TO   RECE02-YOBIETC(9)
+                     MOVE     31            TO   IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       2001321-KOHBUNRI-SET2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト中間ファイルの作成（Ｆ００５）
+      *****************************************************************
+       2001322-RECE05-HENSYU2-SEC               SECTION.
+      *
+           MOVE    SPACE                TO      RECE05-REC
+           INITIALIZE                           RECE05-REC
+           PERFORM 800-RECE02-SET05-SEC
+           MOVE    WK-ZAINUM            TO      RECE05-ZAINUM
+           START   RECE05-FILE   KEY  IS  >=    RECE05-KEY
+                   INVALID
+                       MOVE    1        TO      FLG-RECE05
+                   NOT  INVALID
+                       MOVE    ZERO     TO      FLG-RECE05
+                       PERFORM    900-RECE05-NEXT-SEC
+           END-START
+           PERFORM   UNTIL
+                  (RECE02-HOSPNUM       NOT =  RECE05-HOSPNUM)    OR
+                  (RECE02-SRYYM         NOT =  RECE05-SRYYM)      OR
+                  (RECE02-NYUGAIKBN     NOT =  RECE05-NYUGAIKBN) OR
+                  (RECE02-PTID          NOT =  RECE05-PTID)      OR
+                  (RECE02-RECEKA        NOT =  RECE05-RECEKA)    OR
+                  (RECE02-TEISYUTUSAKI  NOT =  RECE05-TEISYUTUSAKI) OR
+                  (RECE02-RECESYUBETU   NOT =  RECE05-RECESYUBETU)  OR
+                  (RECE02-HKNJANUM-KEY  NOT =  RECE05-HKNJANUM)  OR
+                  (RECE02-HOJOKBN-KEY   NOT =  RECE05-HOJOKBN )  OR
+                  (RECE02-TEKSTYMD      NOT =  RECE05-TEKSTYMD)  OR
+                  (WK-ZAINUM            NOT =  RECE05-ZAINUM)    OR
+                  (FLG-RECE05           =      1)
+                   IF    FLG-KOHBUNRI-OKIKAE2  =   1
+                      MOVE     WRK-KOHBUNRI   TO   RECE05-KOHBUNRI
+                      PERFORM    2001131-RECE05-REWRITE-SEC
+                   END-IF
+                   PERFORM       900-RECE05-NEXT-SEC
+           END-PERFORM
+      *
+           .
+       2001322-RECE05-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -647,7 +960,6 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
       *    処理中止処理
       *****************************************************************
        500-CANCEL-HENSYU-SEC                SECTION.
-      *
       *
            IF      WRK-PARA-SHELLID    =   "RECEPTX"
                CONTINUE
@@ -714,6 +1026,46 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
+      *    レセプト０２データ編集処理（０４）
+      *****************************************************************
+       800-RECE02-SET04-SEC            SECTION.
+      *
+           MOVE    RECE02-HOSPNUM       TO      RECE04-HOSPNUM
+           MOVE    RECE02-SRYYM         TO      RECE04-SRYYM
+           MOVE    RECE02-NYUGAIKBN     TO      RECE04-NYUGAIKBN
+           MOVE    RECE02-PTID          TO      RECE04-PTID
+           MOVE    RECE02-RECEKA        TO      RECE04-RECEKA
+           MOVE    RECE02-TEISYUTUSAKI  TO      RECE04-TEISYUTUSAKI
+           MOVE    RECE02-RECESYUBETU   TO      RECE04-RECESYUBETU
+           MOVE    RECE02-HKNJANUM-KEY  TO      RECE04-HKNJANUM
+           MOVE    RECE02-HOJOKBN-KEY   TO      RECE04-HOJOKBN
+           MOVE    RECE02-TEKSTYMD      TO      RECE04-TEKSTYMD
+      *
+           .
+       800-RECE02-SET04-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト０２データ編集処理（０５）
+      *****************************************************************
+       800-RECE02-SET05-SEC            SECTION.
+      *
+           MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
+           MOVE    RECE02-SRYYM         TO      RECE05-SRYYM
+           MOVE    RECE02-NYUGAIKBN     TO      RECE05-NYUGAIKBN
+           MOVE    RECE02-PTID          TO      RECE05-PTID
+           MOVE    RECE02-RECEKA        TO      RECE05-RECEKA
+           MOVE    RECE02-TEISYUTUSAKI  TO      RECE05-TEISYUTUSAKI
+           MOVE    RECE02-RECESYUBETU   TO      RECE05-RECESYUBETU
+           MOVE    RECE02-HKNJANUM-KEY  TO      RECE05-HKNJANUM
+           MOVE    RECE02-HOJOKBN-KEY   TO      RECE05-HOJOKBN
+           MOVE    RECE02-TEKSTYMD      TO      RECE05-TEKSTYMD
+      *
+           .
+       800-RECE02-SET05-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    中間ファイルＲＥＡＤ処理（Ｆ００２）
       *****************************************************************
        900-RECE02-READ-SEC            SECTION.
@@ -734,7 +1086,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
       *    中間ファイルＲＥＡＤ処理（Ｆ００４）
       *****************************************************************
-        900-RECE04-NEXT-SEC            SECTION.
+       900-RECE04-NEXT-SEC            SECTION.
       *
            MOVE    ZERO          TO    FLG-RECE04
            READ    RECE04-FILE   NEXT
@@ -742,13 +1094,13 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    1     TO    FLG-RECE04
            END-READ
            .
-        900-RECE04-NEXT-EXT.
+       900-RECE04-NEXT-EXT.
            EXIT.
       *
       *****************************************************************
       *    中間ファイルＲＥＡＤ処理（Ｆ００５）
       *****************************************************************
-        900-RECE05-NEXT-SEC            SECTION.
+       900-RECE05-NEXT-SEC            SECTION.
       *
            MOVE    ZERO          TO    FLG-RECE05
            READ    RECE05-FILE   NEXT

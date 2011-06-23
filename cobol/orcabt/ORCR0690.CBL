@@ -155,6 +155,7 @@
       *                                     ¡Ö¢©¡×¡Ö£Ô£Å£Ì¡§¡×¤Îµ­ºÜÄÉ²Ã
       *  04.05.08    NACL-Æ£¸¶    11/04/20  ºÒ³²ÂÐ±þ
       *                                     ¸øÈñÉéÃ´°åÎÅ¤ÎÏ¢ÍíÀè¾ðÊóÄÉ²Ã
+      *  04.05.09    NACL-ÌçÏÆ    11/06/20  ¸øÈñÊ¬Î¥¶èÊ¬¶èÀÚ¤êÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -716,6 +717,7 @@
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-OCC              OCCURS   5.
                05  TBL-DENSHI-ZAIKAISU     PIC  9(04).
+               05  TBL-DENSHI-HKNCOMBI     PIC  9(04).
       *
       *   ÆüËÜ¸ì¿ô»ú
        01  TBL-SUJI-AREA.
@@ -1853,6 +1855,7 @@
                                        TO  TBL-DENSHI-TEN
                COMPUTE  IDX5  =  RECE64-KOHBUNRI + 1
                ADD   RECE64-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX5)
+               MOVE  RECE64-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(IDX5)
       *
            END-IF
       *
@@ -3434,6 +3437,9 @@
                MOVE    SPACE             TO  RECE66-SRYSYUKBN
                MOVE    ZERO              TO  RECE66-DAY
       *
+               MOVE    TBL-DENSHI-HKNCOMBI(IDX5)
+                                         TO  RECE66-HKNCOMBI
+      *
                WRITE   RECE66-REC
       *
                IF  STS-RECE66        NOT =   ZERO
@@ -4177,6 +4183,8 @@
                  WHEN      "99"
                    MOVE   WRK-SRYSYUKBN  TO  RECE66-SRYSYUKBN
                END-EVALUATE
+      *
+               MOVE    RECE64-HKNCOMBI   TO  RECE66-HKNCOMBI
       *
                WRITE   RECE66-REC
       *         
