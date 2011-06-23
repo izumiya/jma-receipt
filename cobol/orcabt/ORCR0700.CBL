@@ -53,6 +53,7 @@
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    10/01/12  治験対応
+      *  04.05.03    NACL-門脇    11/06/20  公費分離区分区切り編集修正
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -348,6 +349,8 @@
            MOVE   RECE66-ZAIKBN      TO   RECE661-ZAIKBN
       *
            MOVE   RECE66-DAY2        TO   RECE661-DAY2
+      *
+           MOVE   RECE66-HKNCOMBI    TO   RECE661-HKNCOMBI
       *
            IF     RECE66-RECESYUBETU  =  8888
               IF     RECE66-ZAITEN  NOT =  ZERO

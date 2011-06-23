@@ -132,6 +132,7 @@
       *                                     ºÒ£²¤ÎÊÝ¸±ÍúÎòµ­ºÜ¤ÎÈ½Äêºï½ü
       *  04.05.27    NACL-Æ£¸¶    11/04/20  ºÒ³²ÂÐ±þ
       *                                     ¸øÈñÉéÃ´°åÎÅ¤Îµ­ºÜÂÐ±þ
+      *  04.05.28    NACL-ÌçÏÆ    11/06/20  ¸øÈñÊ¬Î¥¶èÊ¬¶èÀÚ¤êÊÔ½¸½¤Àµ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -380,6 +381,10 @@
            03  SESNIDX             PIC 9(02).
            03  SYSKAN-IDX          PIC 9(03).
       *
+           03  IDX-KUGIRI1         PIC 9(02).
+           03  IDX-KUGIRI2         PIC 9(02).
+           03  IDX-KUGIRI3         PIC 9(02).
+           03  IDX-KUGIRI4         PIC 9(02).
       *    
        01  SUM-AREA                          VALUE   ZERO.          
            03  SUM-NYUKHNNISSU         PIC 9(03).
@@ -671,6 +676,14 @@
                    07  WRK-KOH-SYOTOTALTEN     PIC X(07).
                    07  WRK-KOH-SYOFTNMONEY     PIC X(08).
       *
+           03  WRK-HENSYU-KOHNUM               PIC X(03).
+           03  WRK-HENSYU-KOHNAME.
+               05  WRK-HENSYU-KOHNAME1         PIC X(10).
+               05  WRK-HENSYU-KOHNAME2-PLUS    PIC X(02).
+               05  WRK-HENSYU-KOHNAME2         PIC X(10).
+               05  WRK-HENSYU-KOHNAME3-PLUS    PIC X(02).
+               05  WRK-HENSYU-KOHNAME3         PIC X(10).
+      *
       *    ¥ì¥»¥×¥È¥³¥á¥ó¥ÈÊÔ½¸
            03  WRK-COMMENT-G.
                05  WRK-COMMENT                 PIC X(50)
@@ -883,6 +896,20 @@
                                    "¡¡Å¬ÍÑÊ¬¡¡¡á¡á¡á¡á¡á".
            03  WRK-KUGIRI3         PIC X(52)   VALUE
                ALL "¡Ý".
+           03  WRK-KUGIRI4.
+               05  FILLER          PIC X(16)   VALUE
+                                   "¡á¡á¡á¡á¡¡°Ê²¼¡¡".
+               05  WRK-KUGIRI4-KOHNAME         PIC X(22).
+               05  FILLER          PIC X(14)   VALUE
+                                   "¡¡Å¬ÍÑÊ¬¡¡¡á¡á".
+           03  WRK-KUGIRI5.
+               05  FILLER          PIC X(10)   VALUE
+                                   "¡á¡á°Ê²¼¡¡".
+               05  WRK-KUGIRI5-KOHNAME         PIC X(34).
+               05  FILLER          PIC X(08)   VALUE
+                                   "¡¡Å¬ÍÑÊ¬".
+           03  WRK-KUGIRI6.
+               05  FILLER          PIC X(52).
       *
        01  WRK-TENSU-AREA.
            03  WRK-KHNTEN.
@@ -6840,17 +6867,17 @@
            WHEN    2
                PERFORM 34110-KOHNAME-SET-SEC
                IF      CNT-PAGE        =   1   
-                   MOVE    WRK-KUGIRI2 TO  HC06-TEKIYO  (WRK-LINETEK)
+                   MOVE    WRK-KUGIRI6 TO  HC06-TEKIYO  (WRK-LINETEK)
                ELSE    
                    EVALUATE    SYS-2005-NEXTPRTKBN
                        WHEN    ZERO
-                           MOVE    WRK-KUGIRI2 
+                           MOVE    WRK-KUGIRI6 
                                        TO  HC061-TEKIYO (WRK-LINETEK)
                        WHEN    "1"
-                           MOVE    WRK-KUGIRI2 
+                           MOVE    WRK-KUGIRI6 
                                        TO  HC062-TEKIYO (WRK-LINETEK)
                        WHEN    "2"
-                           MOVE    WRK-KUGIRI2 
+                           MOVE    WRK-KUGIRI6 
                                        TO  HC063-TEKIYO (WRK-LINETEK)
                    END-EVALUATE
                END-IF    
@@ -6913,12 +6940,108 @@
       *****************************************************************
        34110-KOHNAME-SET-SEC          SECTION.
       *
-           MOVE    SPACE              TO  WRK-KUGIRI2-KOHNAME
+           IF      RECE62-YOBIETC(9)  =   ZERO
+              MOVE     SPACE             TO  WRK-KUGIRI6
+              MOVE     SPACE             TO  WRK-KUGIRI2-KOHNAME
+              MOVE     RECE62-KOHNUM (RECE661-KOHBUNRI)
+                                         TO  WRK-HENSYU-KOHNUM
+              PERFORM  341101-HKNNUM-KENSAKU-SEC
+              MOVE     HKN-TANSEIDONAME  TO  WRK-KUGIRI2-KOHNAME
+              INSPECT  WRK-KUGIRI2-KOHNAME
+                       REPLACING    ALL   "  "   BY   "¡¡"
+              MOVE     WRK-KUGIRI2       TO  WRK-KUGIRI6
+           ELSE
+              MOVE     SPACE             TO  WRK-KUGIRI6
+              MOVE     SPACE             TO  WRK-KUGIRI4-KOHNAME
+              MOVE     SPACE             TO  WRK-KUGIRI5-KOHNAME
+              MOVE     SPACE             TO  WRK-HENSYU-KOHNAME
+              MOVE     ZERO              TO  IDX-KUGIRI2
+              MOVE     ZERO              TO  IDX-KUGIRI4
+              PERFORM  VARYING  IDX-KUGIRI1  FROM   1   BY   1
+                        UNTIL   IDX-KUGIRI1   >    10
+                         OR     RECE62-HKNCOMBI(IDX-KUGIRI1)  =  ZERO
+                 IF  RECE661-HKNCOMBI  =  RECE62-HKNCOMBI(IDX-KUGIRI1)
+                    MOVE    IDX-KUGIRI1   TO   IDX-KUGIRI2
+                    MOVE    10            TO   IDX-KUGIRI1
+                 END-IF
+              END-PERFORM
+              IF     IDX-KUGIRI2    NOT =    ZERO
+                PERFORM  VARYING  IDX-KUGIRI1  FROM   1   BY   1
+                          UNTIL   IDX-KUGIRI1   >     4
+                 IF  RECE62-KOHNUMHC(IDX-KUGIRI2 IDX-KUGIRI1)
+                                                    NOT =  SPACE
+                    PERFORM  VARYING  IDX-KUGIRI3  FROM   1   BY   1
+                              UNTIL   IDX-KUGIRI3   >     4
+                               OR     RECE62-KOHNUM(IDX-KUGIRI3)
+                                                        =  SPACE
+                      IF  (RECE62-KOHNUMHC(IDX-KUGIRI2 IDX-KUGIRI1)
+                                  =   RECE62-KOHNUM(IDX-KUGIRI3))
+                      AND (RECE62-KOHIDHC (IDX-KUGIRI2 IDX-KUGIRI1)
+                                  =   RECE62-KOHID (IDX-KUGIRI3))
+                         MOVE     RECE62-KOHNUM(IDX-KUGIRI3)
+                                         TO  WRK-HENSYU-KOHNUM
+                         PERFORM  341101-HKNNUM-KENSAKU-SEC
+                         ADD        1      TO   IDX-KUGIRI4
+                         EVALUATE   IDX-KUGIRI4
+                           WHEN         1
+                              MOVE  HKN-TANSEIDONAME
+                                         TO WRK-HENSYU-KOHNAME1
+                           WHEN         2
+                              MOVE  "¡Ü" TO WRK-HENSYU-KOHNAME2-PLUS
+                              MOVE  HKN-TANSEIDONAME
+                                         TO WRK-HENSYU-KOHNAME2
+                           WHEN         3
+                              MOVE  "¡Ü" TO WRK-HENSYU-KOHNAME3-PLUS
+                              MOVE  HKN-TANSEIDONAME
+                                         TO WRK-HENSYU-KOHNAME3
+                           WHEN         4
+                              CONTINUE
+                         END-EVALUATE
+                         MOVE    4       TO IDX-KUGIRI3
+                      END-IF
+                    END-PERFORM
+                 END-IF
+                END-PERFORM
+              END-IF
+              EVALUATE   IDX-KUGIRI4
+                WHEN         0
+                WHEN         1
+                WHEN         2
+                  STRING  WRK-HENSYU-KOHNAME1      DELIMITED  BY  SPACE
+                          WRK-HENSYU-KOHNAME2-PLUS DELIMITED  BY  SPACE
+                          WRK-HENSYU-KOHNAME2      DELIMITED  BY  SPACE
+                          INTO         WRK-KUGIRI4-KOHNAME
+                  END-STRING
+                  INSPECT  WRK-KUGIRI4-KOHNAME
+                       REPLACING    ALL   "  "   BY   "¡¡"
+                  MOVE     WRK-KUGIRI4     TO   WRK-KUGIRI6
+                WHEN         3
+                WHEN         4
+                  STRING  WRK-HENSYU-KOHNAME1      DELIMITED  BY  SPACE
+                          WRK-HENSYU-KOHNAME2-PLUS DELIMITED  BY  SPACE
+                          WRK-HENSYU-KOHNAME2      DELIMITED  BY  SPACE
+                          WRK-HENSYU-KOHNAME3-PLUS DELIMITED  BY  SPACE
+                          WRK-HENSYU-KOHNAME3      DELIMITED  BY  SPACE
+                          INTO         WRK-KUGIRI5-KOHNAME
+                  END-STRING
+                  INSPECT  WRK-KUGIRI5-KOHNAME
+                       REPLACING    ALL   "  "   BY   "¡¡"
+                  MOVE     WRK-KUGIRI5     TO   WRK-KUGIRI6
+              END-EVALUATE
+           END-IF
+      *
+           .
+       34110-KOHNAME-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÝ¸±ÈÖ¹æ¥Þ¥¹¥¿¸¡º÷
+      *****************************************************************
+       341101-HKNNUM-KENSAKU-SEC          SECTION.
       *
            MOVE    SPACE              TO  HKNNUM-REC
            MOVE    SYS-1001-HOSPNUM   TO  HKN-HOSPNUM
-           MOVE    RECE62-KOHNUM (RECE661-KOHBUNRI)
-                                      TO  HKN-HKNNUM
+           MOVE    WRK-HENSYU-KOHNUM  TO  HKN-HKNNUM
            MOVE    WRK-SRYYMD         TO  HKN-TEKSTYMD
                                           HKN-TEKEDYMD
       *
@@ -6937,14 +7060,8 @@
            MOVE    "key5"             TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-           IF      FLG-HKNNUM         =   ZERO   
-               MOVE    HKN-TANSEIDONAME  TO  WRK-KUGIRI2-KOHNAME
-               INSPECT WRK-KUGIRI2-KOHNAME
-                       REPLACING    ALL   "  "   BY   "¡¡"
-           END-IF
-      *
            .
-       34110-KOHNAME-SET-EXT.
+       341101-HKNNUM-KENSAKU-EXT.
            EXIT.
       *
       *****************************************************************

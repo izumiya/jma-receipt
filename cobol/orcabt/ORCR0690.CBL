@@ -155,6 +155,7 @@
       *                                     「〒」「ＴＥＬ：」の記載追加
       *  04.05.08    NACL-藤原    11/04/20  災害対応
       *                                     公費負担医療の連絡先情報追加
+      *  04.05.09    NACL-門脇    11/06/20  公費分離区分区切り編集修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -733,6 +734,7 @@
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-OCC              OCCURS   5.
                05  TBL-DENSHI-ZAIKAISU     PIC  9(04).
+               05  TBL-DENSHI-HKNCOMBI     PIC  9(04).
       *
       *   日本語数字
        01  TBL-SUJI-AREA.
@@ -2004,6 +2006,7 @@
                                        TO  TBL-DENSHI-TEN
                COMPUTE  IDX5  =  RECE64-KOHBUNRI + 1
                ADD   RECE64-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX5)
+               MOVE  RECE64-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(IDX5)
       *
            END-IF
       *
@@ -3563,6 +3566,9 @@
                MOVE    SPACE             TO  RECE66-SRYSYUKBN
                MOVE    ZERO              TO  RECE66-DAY
       *
+               MOVE    TBL-DENSHI-HKNCOMBI(IDX5)
+                                         TO  RECE66-HKNCOMBI
+      *
                WRITE   RECE66-REC
       *
                IF  STS-RECE66        NOT =   ZERO
@@ -4306,6 +4312,8 @@
                  WHEN      "99"
                    MOVE   WRK-SRYSYUKBN  TO  RECE66-SRYSYUKBN
                END-EVALUATE
+      *
+               MOVE    RECE64-HKNCOMBI   TO  RECE66-HKNCOMBI
       *
                WRITE   RECE66-REC
       *         

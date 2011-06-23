@@ -224,6 +224,7 @@
       *                                     「〒」「ＴＥＬ：」の記載追加
       *  04.05.10    NACL-藤原    11/04/20  災害対応
       *                                     公費負担医療の連絡先情報追加
+      *  04.05.11    NACL-門脇    11/06/20  公費分離区分区切り編集修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -812,6 +813,7 @@
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-OCC2             OCCURS   5.
                05  TBL-DENSHI-ZAIKAISU     PIC  9(04).
+               05  TBL-DENSHI-HKNCOMBI     PIC  9(04).
       *
       *   日本語数字
        01  TBL-SUJI-AREA.
@@ -2208,6 +2210,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                        TO  TBL-DENSHI-TEN(1)
                COMPUTE  IDX5  =  RECE04-KOHBUNRI + 1
                ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(1 IDX5)
+               MOVE  RECE04-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(1 IDX5)
       *
            END-IF
       *
@@ -2402,6 +2405,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                      TO  TBL-DENSHI-TEN(IDX6)
              COMPUTE  IDX5  =  RECE04-KOHBUNRI + 1
              ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX6 IDX5)
+             MOVE  RECE04-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(IDX6 IDX5)
       *
            END-IF
       *
@@ -4207,6 +4211,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    SPACE             TO  RECE06-SRYSYUKBN
            MOVE    ZERO              TO  RECE06-DAY
       *
+           MOVE    TBL-DENSHI-HKNCOMBI(IDX6 IDX5)
+                                     TO  RECE06-HKNCOMBI
+      *
            WRITE   RECE06-REC
            ADD     1                 TO  CNT-RECE06
       *
@@ -4837,6 +4844,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                        MOVE    1     TO   RECE06-SYOHOUFLG
                  END-IF
                END-IF
+      *
+               MOVE    RECE04-HKNCOMBI   TO  RECE06-HKNCOMBI
       *
                WRITE   RECE06-REC
       *         
