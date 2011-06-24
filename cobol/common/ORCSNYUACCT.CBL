@@ -1070,11 +1070,19 @@
                                                    SPA-AREA
                    IF     STUSAN-TAINREL-NISSU   NOT =   ZERO
                       IF    LNK-SCNYUACCT-SYORI-KBN     =   "1"
-                        ADD   STUSAN-TAINREL-NISSU  TO  WRK-ZOGEN
+                          IF   STUSAN-TAINREL-NISSU   <=   6
+                            ADD   STUSAN-TAINREL-NISSU  TO  WRK-ZOGEN
+                          ELSE
+                            MOVE    7       TO    WRK-ZOGEN
+                            MOVE    ZERO    TO    FLG-SYORI
+                          END-IF
                       ELSE
-                        COMPUTE   WRK-ZOGEN  =  7   -  
-                                                STUSAN-NISSU03  +
-                                                1
+                           COMPUTE   WRK-ZOGEN  =  7   -  
+                                                   STUSAN-NISSU03  +
+                                                   1
+                           IF   STUSAN-NISSU03   <=  7
+                                MOVE    ZERO       TO   FLG-SYORI
+                           END-IF
       *                 Âà±¡¼è¾Ã
                         IF   LNK-SCNYUACCT-SYORI-KBN     =   "7"
                             COMPUTE   WRK-ZOGEN  =  7   -  
