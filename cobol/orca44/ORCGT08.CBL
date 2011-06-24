@@ -457,7 +457,7 @@
        450-NEXT-HENSYU-SEC             SECTION.
       *
            IF      SPA-NAI-T08-SELNUM  =  1
-               GO  TO  440-BACK-HENSYU-EXT
+               GO  TO  450-NEXT-HENSYU-EXT
            END-IF
       *
            COMPUTE SPA-NAI-T08-SELNUM  =   SPA-NAI-T08-SELNUM  -   1
