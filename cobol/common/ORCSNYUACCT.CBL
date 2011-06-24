@@ -1019,6 +1019,19 @@
       *        ∑ÓæÂ∏¬
                IF      TNS-JGNCNT          >   ZERO
                    MOVE    TNS-JGNCNT          TO  WRK-MAXCNT
+      *            Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
+                   IF LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX-K) = "190135470"
+                      INITIALIZE                  ORCSTUSANAREA
+                      MOVE    SPA-HOSPNUM     TO  STUSAN-HOSPNUM
+                      MOVE    SPA-PTID        TO  STUSAN-PTID
+                      MOVE    LNK-SCNYUACCT-STSRYYMD
+                                              TO  STUSAN-KJNYMD
+                      CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
+                                                      SPA-AREA
+                      IF     STUSAN-TAINREL-NISSU   NOT =   ZERO
+                          ADD   STUSAN-TAINREL-NISSU  TO  WRK-MAXCNT
+                      END-IF
+                   END-IF
                END-IF
                IF      TNS-JGNCNT1W        >   ZERO
                    MOVE    TNS-JGNCNT1W        TO  WRK-MAXCNT
@@ -1056,46 +1069,6 @@
                        MOVE    1                   TO  WRK-ZOGEN
                    ELSE
                        MOVE    1                   TO  FLG-SYORI
-                   END-IF
-               END-IF
-      *
-      *        Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
-               IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190135470"
-                   INITIALIZE                  ORCSTUSANAREA
-                   MOVE    SPA-HOSPNUM     TO  STUSAN-HOSPNUM
-                   MOVE    SPA-PTID        TO  STUSAN-PTID
-                   MOVE    LNK-SCNYUACCT-STSRYYMD
-                                           TO  STUSAN-KJNYMD
-                   CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
-                                                   SPA-AREA
-                   IF     STUSAN-TAINREL-NISSU   NOT =   ZERO
-                      IF    LNK-SCNYUACCT-SYORI-KBN     =   "1"
-                          IF   STUSAN-TAINREL-NISSU   <=   6
-                            ADD   STUSAN-TAINREL-NISSU  TO  WRK-ZOGEN
-                          ELSE
-                            MOVE    7       TO    WRK-ZOGEN
-                            MOVE    ZERO    TO    FLG-SYORI
-                          END-IF
-                      ELSE
-                           COMPUTE   WRK-ZOGEN  =  7   -  
-                                                   STUSAN-NISSU03  +
-                                                   1
-                           IF   STUSAN-NISSU03   <=  7
-                                MOVE    ZERO       TO   FLG-SYORI
-                           END-IF
-      *                 ¬‡±°ºËæ√
-                        IF   LNK-SCNYUACCT-SYORI-KBN     =   "7"
-                            COMPUTE   WRK-ZOGEN  =  7   -  
-                                                    STUSAN-NISSU03
-                            MOVE    ZERO    TO    FLG-SYORI
-                        END-IF
-                      END-IF
-                   END-IF
-                   IF     STUSAN-TAINREL-NISSU   =   ZERO
-                      IF    LNK-SCNYUACCT-SYORI-KBN     =   "7"
-                        COMPUTE   WRK-ZOGEN  =  7   -  
-                                                STUSAN-NISSU03
-                      END-IF
                    END-IF
                END-IF
       *
