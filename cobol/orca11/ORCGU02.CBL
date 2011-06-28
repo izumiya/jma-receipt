@@ -6401,7 +6401,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-STRING
                WHEN    "0105"
                    STRING  "受付されていません。"
-                           "予約選択を解除して患者登録へ遷移しますか？"
+                           "選択を解除して患者登録へ遷移しますか？"
                                                DELIMITED  BY  SIZE
                                                INTO  WRK-U2ID1MSG
                    END-STRING
