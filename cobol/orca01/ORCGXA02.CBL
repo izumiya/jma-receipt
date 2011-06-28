@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.05.01    NACL-Æ£¸¶    11/06/27  £²ÊÇ°Ê¹ß¤ÎÊÇ¥Á¥§¥Ã¥¯¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1110,11 +1111,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
                IF      SPA-NAI-TBL-GROUP       =   SPACE
                OR      SPA-GMN-RENNUM          =   ZERO
                OR      SPA-GMN-SHORI-RENNUM    =   ZERO
-               OR      SPA-GMN-SELNUM          =   ZERO
+               OR      SPA-NAI-SELNUM          =   ZERO
                    MOVE    "0003"              TO  SPA-ERRCD
                ELSE    
                    IF      SPA-GMN-STPAGE      >
-                                       SPA-GMN-TPAGE (SPA-GMN-SELNUM) 
+                                       SPA-GMN-TPAGE (SPA-NAI-SELNUM) 
                        MOVE    "0002"              TO  SPA-ERRCD
                    END-IF                                    
                END-IF
@@ -1142,11 +1143,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
                IF      SPA-NAI-TBL-GROUP       =   SPACE
                OR      SPA-GMN-RENNUM          =   ZERO
                OR      SPA-GMN-SHORI-RENNUM    =   ZERO
-               OR      SPA-GMN-SELNUM          =   ZERO
+               OR      SPA-NAI-SELNUM          =   ZERO
                    MOVE    "0003"              TO  SPA-ERRCD
                ELSE    
                    IF      SPA-GMN-EDPAGE      >
-                                       SPA-GMN-TPAGE (SPA-GMN-SELNUM) 
+                                       SPA-GMN-TPAGE (SPA-NAI-SELNUM) 
                        MOVE    "0002"              TO  SPA-ERRCD
                    ELSE    
                        IF      SPA-GMN-EDPAGE      <   SPA-GMN-STPAGE 
@@ -1763,13 +1764,13 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
            IF      SPA-NAI-TBL-GROUP   =   SPACE
                MOVE    "0001"              TO  SPA-ERRCD
            ELSE
-               IF      SPA-GMN-SELNUM  =   ZERO
+               IF      SPA-NAI-SELNUM  =   ZERO
                    CONTINUE
                ELSE
                    IF      SPA-GMN-STPAGE      >
-                                   SPA-GMN-TPAGE (SPA-GMN-SELNUM) 
+                                   SPA-GMN-TPAGE (SPA-NAI-SELNUM) 
                    OR      SPA-GMN-EDPAGE      >
-                                   SPA-GMN-TPAGE (SPA-GMN-SELNUM) 
+                                   SPA-GMN-TPAGE (SPA-NAI-SELNUM) 
                        MOVE    "0002"              TO  SPA-ERRCD
                    ELSE    
                        IF      SPA-GMN-EDPAGE      <   SPA-GMN-STPAGE 
