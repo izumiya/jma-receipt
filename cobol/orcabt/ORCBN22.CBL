@@ -400,6 +400,9 @@
                               INTO     TNSCHK2
            END-STRING
       *
+           OPEN    OUTPUT              TNSCHK2-FILE
+           CLOSE                       TNSCHK2-FILE
+      *
            OPEN    INPUT               TNSCHK-FILE
            OPEN    I-O                 TNSCHK2-FILE
       *
