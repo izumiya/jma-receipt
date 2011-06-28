@@ -78,6 +78,7 @@
       *  04.06.00    NACL-多々納  10/06/21  受付選択一覧遷移追加
       *                                     患者番号と一覧内容の連動他
       *  04.06.00    NACL-多々納  10/09/29  入外非表示対応
+      *  04.06.00    NACL-多々納  11/06/28  予約選択患者登録遷移対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -142,6 +143,8 @@
       *
            03  FLG-UKE-OK              PIC 9(01).
            03  FLG-NYUIN               PIC 9(01).
+           03  FLG-UKE-CHK             PIC 9(01).
+           03  FLG-YYK-CHK             PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
@@ -612,7 +615,9 @@
                        PERFORM 3101-UKETU-HEN-SEC
                    END-IF
       *            患者メモ表示処理
-                   PERFORM 410119-PTMEMOINF-SEC
+                   IF      SPA-GMN-PTID    NOT =   ZERO
+                       PERFORM 410119-PTMEMOINF-SEC
+                   END-IF
       *        外部より選択がある時
                WHEN   "U01"
                WHEN   "P97"
@@ -659,9 +664,13 @@
                            PERFORM 3009-P02UKEID-CHK-SEC
                        END-IF
                        IF      SPA-GMN-SELNUM      =   ZERO
+                       AND    (SPA-P02-U02         =   ZERO )
+      *                    前回一覧選択なし
                            MOVE    SPA-PTNUM           TO  U02-PTNUM
                            MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
                            MOVE    1                   TO  FLG-IN-PTNUM
+      *                    予約チェックなし
+                           MOVE    1                   TO  FLG-YYK-CHK
                            PERFORM 4101-PTNUM-CHK-SEC
                            MOVE    4                   TO  SPA-GMN-CUR
                        END-IF
@@ -768,6 +777,15 @@
       *                患者情報編集
                        PERFORM 41011-PTNUM-HENSYU-SEC
                        MOVE    4               TO  SPA-GMN-CUR
+                   END-IF
+      *ver.4.7
+      *        患者登録へ
+               WHEN    "0105"
+                   IF      SPA-U2ID1-FLG    =   "OK"
+                       MOVE    1                TO  FLG-UKE-CHK
+                       PERFORM 492-ORCGP01-SEC
+                   ELSE
+                       MOVE    62              TO  SPA-GMN-CUR
                    END-IF
            END-EVALUATE
            MOVE    SPACE               TO  SPA-U2ID1CD
@@ -1995,6 +2013,7 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *
            IF     (SPA-ERRCD           =   SPACE )
            AND    (SPA-NAI-YYKUKE-KBN  NOT =   "0"  )
+           AND    (FLG-YYK-CHK         =   ZERO  )
       *        予約有無チェック処理
                PERFORM 41012-PTNUM-YYKCHEK-SEC
            END-IF
@@ -2896,7 +2915,9 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                        PERFORM 410116-JYURRKSET-SEC
                    END-IF
       *            患者メモ表示処理
-                   PERFORM 410119-PTMEMOINF-SEC
+                   IF      SPA-GMN-PTID    NOT =   ZERO
+                       PERFORM 410119-PTMEMOINF-SEC
+                   END-IF
                END-IF
            END-IF
       *
@@ -5568,9 +5589,21 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *
       *  受付チェック
-               IF      SPA-GMN-TUKETIME(SPA-GMN-SELNUM)   =   SPACE  
+               IF     (SPA-GMN-TUKETIME(SPA-GMN-SELNUM)   =   SPACE  )
+      *           患者登録なしのみ受付必須
+                AND   (SPA-GMN-TPTNUM(SPA-GMN-SELNUM)     =   SPACE  )
                    MOVE    "0004"              TO  SPA-ERRCD
                    GO                          TO  492-ORCGP01-EXT
+               END-IF
+      *
+      *  受付チェック
+               IF     (SPA-GMN-TUKETIME(SPA-GMN-SELNUM)   =   SPACE )
+      *           患者登録なしのみ受付必須
+                AND   (SPA-GMN-TPTNUM(SPA-GMN-SELNUM) NOT =   SPACE  )
+                   IF      FLG-UKE-CHK         =   ZERO
+                       MOVE    "0105"              TO  SPA-U2ID1CD
+                       GO                          TO  492-ORCGP01-EXT
+                   END-IF
                END-IF
       *
       *  患者番号チェック
@@ -6363,6 +6396,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0102"
                    STRING  "患者番号で受付があります。"
                            "受付を選択しますか？"
+                                               DELIMITED  BY  SIZE
+                                               INTO  WRK-U2ID1MSG
+                   END-STRING
+               WHEN    "0105"
+                   STRING  "受付されていません。"
+                           "予約選択を解除して患者登録へ遷移しますか？"
                                                DELIMITED  BY  SIZE
                                                INTO  WRK-U2ID1MSG
                    END-STRING
