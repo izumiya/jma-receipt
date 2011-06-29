@@ -26,6 +26,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-門脇    11/06/29  テスト患者を対象外とする修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -46,6 +47,8 @@
            03  FLG-SYUNOU                PIC 9(01).
            03  FLG-SYUKEI                PIC 9(01).
            03  FLG-JIHIRANSYUKEI         PIC 9(01).
+           03  FLG-PTINF                 PIC 9(01).
+           03  FLG-OK                    PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -74,6 +77,10 @@
       *    収納
        01  SYUNOU-REC.
            COPY    "CPSYUNOU.INC".
+      *
+      *    患者情報
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -264,7 +271,7 @@
              PERFORM    UNTIL   (FLG-SYUNOU   =   1)
                IF  SYU-DENPJTIKBN    NOT =  "3"
                  MOVE      1             TO   IDX2
-                 PERFORM   20021-KINGAKU-HENSYU-SEC
+                 PERFORM   2002A-CHECK-SEC
                END-IF
                MOVE    "tbl_syunou"      TO   MCP-TABLE
                MOVE    "key76"           TO   MCP-PATHNAME
@@ -295,7 +302,7 @@
              PERFORM    UNTIL   (FLG-SYUNOU   =   1)
                IF  SYU-DENPJTIKBN    NOT =  "3"
                  MOVE      2             TO   IDX2
-                 PERFORM   20021-KINGAKU-HENSYU-SEC
+                 PERFORM   2002A-CHECK-SEC
                END-IF
                MOVE    "tbl_syunou"      TO   MCP-TABLE
                MOVE    "key75"           TO   MCP-PATHNAME
@@ -326,7 +333,7 @@
              PERFORM    UNTIL   (FLG-SYUNOU   =   1)
                IF  SYU-DENPJTIKBN    NOT =  "3"
                  MOVE      3             TO   IDX2
-                 PERFORM   20021-KINGAKU-HENSYU-SEC
+                 PERFORM   2002A-CHECK-SEC
                END-IF
                MOVE    "tbl_syunou"      TO   MCP-TABLE
                MOVE    "key75"           TO   MCP-PATHNAME
@@ -342,23 +349,49 @@
            EXIT.
       *
       *****************************************************************
-      *    区分”２”（金額編集）
+      *    区分”２”（患者情報チェック）
       *****************************************************************
-       20021-KINGAKU-HENSYU-SEC            SECTION.
-      *
-      *    インデックス編集
-           PERFORM   200211-INDEX-HENSYU-SEC
+       2002A-CHECK-SEC            SECTION.
       *
            IF  (WRK-TAIHI-PTID         =  SYU-PTID       )
            AND (WRK-TAIHI-HKNCOMBINUM  =  SYU-HKNCOMBINUM)
              CONTINUE
            ELSE
+             IF   WRK-TAIHI-PTID   NOT =  SYU-PTID
+                MOVE    ZERO            TO    FLG-OK
+                INITIALIZE                    PTINF-REC
+                MOVE    SYU-HOSPNUM     TO    PTINF-HOSPNUM
+                MOVE    SYU-PTID        TO    PTINF-PTID
+                PERFORM 900-PTINF-READ-SEC
+                IF      FLG-PTINF    =   ZERO
+                  IF  PTINF-TSTPTNUMKBN   =   "0"
+                     MOVE     1         TO    FLG-OK
+                  END-IF
+                END-IF
+             END-IF
              MOVE   1                TO    FLG-SYUKEI
              INITIALIZE                    WRK-TAIHI-AREA
              MOVE   SYU-PTID         TO    WRK-TAIHI-PTID
              MOVE   SYU-HKNCOMBINUM  TO    WRK-TAIHI-HKNCOMBINUM
              INITIALIZE                    WRK-TAIHI-AREA2
            END-IF
+      *
+           IF   FLG-OK  =   1
+      *      金額編集
+             PERFORM   20021-KINGAKU-HENSYU-SEC
+           END-IF
+      *
+           .
+       2002A-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    区分”２”（金額編集）
+      *****************************************************************
+       20021-KINGAKU-HENSYU-SEC            SECTION.
+      *
+      *    インデックス編集
+           PERFORM   200211-INDEX-HENSYU-SEC
       *
            MOVE     ZERO     TO    FLG-JIHIRANSYUKEI
            IF  (SYU-TOTAL-HKNTEN      =  ZERO)
@@ -716,6 +749,44 @@
       *
            .
        900-KOHSKY-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者マスター読込
+      *****************************************************************
+       900-PTINF-READ-SEC         SECTION.
+      *
+           MOVE    PTINF-REC            TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"          TO  MCP-TABLE
+           MOVE    "key"                TO  MCP-PATHNAME
+           MOVE    "DBSELECT"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"          USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+           IF      MCP-RC               =   ZERO
+               MOVE    "tbl_ptinf"      TO  MCP-TABLE
+               MOVE    "key"            TO  MCP-PATHNAME
+               MOVE    "DBFETCH"        TO  MCP-FUNC
+               CALL    "ORCDBMAIN"      USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+               IF      MCP-RC           =   ZERO
+                   MOVE    MCPDATA-REC  TO  PTINF-REC
+                   MOVE    ZERO         TO  FLG-PTINF
+               ELSE
+                   INITIALIZE               PTINF-REC
+                   MOVE    1            TO  FLG-PTINF
+               END-IF
+           ELSE
+               INITIALIZE                   PTINF-REC
+               MOVE    1                TO  FLG-PTINF
+           END-IF
+           MOVE     "tbl_ptinf"         TO  MCP-TABLE
+           MOVE     "key"               TO  MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+           .
+       900-PTINF-READ-EXT.
            EXIT.
       *
       *****************************************************************
