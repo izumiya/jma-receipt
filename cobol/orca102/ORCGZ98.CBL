@@ -173,7 +173,7 @@
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
            03  WRK-KETA            PIC 9(04).
-           03  WRK-KEY-INPUT       PIC X(22).
+           03  WRK-KEY-INPUT       PIC X(30).
       *
            03  WRK-SENTAKU         PIC X(70).
            03  WRK-HEN-NAME        PIC X(70).
