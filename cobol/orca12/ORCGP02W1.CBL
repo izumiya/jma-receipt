@@ -2007,9 +2007,15 @@
       *!API
       *    API処理（新規入力とする）
            IF      FLG-APICHK          =   1
-               MOVE    SPACE           TO  SPA-MAE-KOHNUM  (IDY)
-               MOVE    SPACE           TO  SPA-MAE-FTNJANUM(IDY)
-               MOVE    SPACE           TO  SPA-NAI-PTKOH-KEIFLG(IDY)
+               MOVE    SPACE               TO  SPA-MAE-KOHNUM  (IDY)
+               MOVE    SPACE               TO  SPA-MAE-FTNJANUM(IDY)
+               MOVE    SPACE               TO  SPA-NAI-PTKOH-KEIFLG(IDY)
+      *        警告チェック済みとする
+               MOVE    1                   TO  SPA-NAI-AGE65 (IDY)
+               MOVE    1                   TO  SPA-NAI-AGECHK(IDY)
+               MOVE    1                   TO  SPA-NAI-FTNCHK(IDY)
+      *        受給者番号警告
+               MOVE    1                   TO  SPA-NAI-JYUCHK(IDY)
            END-IF
       *!API
       *
