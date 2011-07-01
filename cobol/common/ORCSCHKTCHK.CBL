@@ -646,9 +646,18 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   TBL-MAX )
                MOVE    ZERO            TO  FLG-CHK
+      *!!!!
+      *        入外区分判定（入院料以外の入外区分別は外来のみチェック）
+      *               入院算定不可のコードのみが対象の為。
+      *               両方での算定可があれば対応が必要
+               IF     (TBL-NYUGAIKBN (IDX)     =   "1" )
+                 AND  (SPA-NYUGAIKBN           =   1   )
+                   MOVE    2               TO  FLG-CHK
+               END-IF
+      *!!!!
                PERFORM VARYING     IDX-Z   FROM    1   BY  1
                        UNTIL      (IDX-Z       >   SPA-GMN-MAX )
-                               OR (FLG-CHK     =   1    )
+                               OR (FLG-CHK NOT =   ZERO )
                    IF     (SPA-COM-HKNCOMBI (IDX-Z)        =   "9999")
                       OR  (SPA-COM-SRYKBN (IDX-Z)(1:1)     =   "9"   )
       *               治験対象外
