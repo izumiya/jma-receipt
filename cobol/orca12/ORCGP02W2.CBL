@@ -98,6 +98,8 @@
       *  04.05.01    NACL-門脇    10/02/17  生保適用期間の社保単独の
       *                                     保険組み合わせ作成
       *  04.05.02    NACL-門脇    11/03/02  山梨県地方公費対応
+      *  04.06.01    NACL-小豆沢  11/07/04  更正と特定疾患負担無（水俣）の
+      *                                     保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3670,6 +3672,25 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                IF  WRK-SRT-HJO-KOHNO(2:2)  =  "41"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
+                           END-IF
+                           IF   WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
+      *                      更正と特定疾患（水俣）の保険組合せ対応
+                             IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
+                                           =   "51153013" OR
+                                               "51153021" OR
+                                               "51153039" OR
+                                               "51153047" OR
+                                               "51433019" OR
+                                               "51433027" OR
+                                               "51433035" OR
+                                               "51433043" OR
+                                               "51463016" OR
+                                               "51463024" OR
+                                               "51463032"
+                               IF  WRK-SRT-HJO-KOHNO     =   "015"
+                                  PERFORM 5701413-SYUKOH-HJO-SEC
+                               END-IF
+                             END-IF
                            END-IF
                           END-IF
                        ELSE
