@@ -109,6 +109,7 @@
       *  04.06.04    NACL-藤原    10/08/25  一括入力対応
       *  04.06.05    NACL-藤原    10/10/20  難病外来指導管理料対応
       *  04.06.06    NACL-藤原    10/10/26  同義語変換対応
+      *  04.06.07    NACL-藤原    11/07/04  廃止病名入力時の病名種別の表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2496,7 +2497,7 @@
            PERFORM VARYING IDX FROM    2   BY  1
                    UNTIL   IDX >       WRK-CONS-BYOMEICD-MAX
                STRING  WRK-BYOMEI              DELIMITED   BY  SPACE
-                       SPA-NAI-C03-BYOMEI(IDX)     DELIMITED   BY  SPACE
+                       SPA-NAI-C03-BYOMEI(IDX) DELIMITED   BY  SPACE
                                        INTO    WRK-BYOMEI
                END-STRING
            END-PERFORM
@@ -2568,7 +2569,9 @@
            MOVE    WRK-BYOMEI          TO  SPA-GMN-C03-BYOMEI
       *
       *    病名コードエラーの時以下の処理はしない
-           IF      SPA-ERRCD            NOT =   SPACE     
+           IF      SPA-ERRCD           =   SPACE  OR  "0074"
+               CONTINUE
+           ELSE      
                GO  TO  41021-BYOMEI-HENSYU-EXT
            END-IF
       * 
@@ -2579,7 +2582,7 @@
                    UNTIL   IDX >       WRK-CONS-BYOMEICD-MAX
       ***********OR      SPA-NAI-C03-BYOMEICD (IDX)
       ***********                        =   SPACE
-                   OR      SPA-ERRCD   NOT =   SPACE 
+      ***********  OR      SPA-ERRCD   NOT =   SPACE
                IF      SPA-NAI-C03-BYOMEICD (IDX)
                                            =   SPACE
                    CONTINUE
@@ -2590,6 +2593,8 @@
                        IF    ( WRK-RECECD (2)    NOT =   SPACE )   OR
                              ( WRK-RECECD (3)    NOT =   SPACE )
                            MOVE    "0006"        TO  SPA-ERRCD
+                           MOVE    WRK-CONS-BYOMEICD-MAX
+                                                 TO  IDX
                        ELSE
                            MOVE    SPA-NAI-C03-BYOMEICD(IDX)(4:1)
                                                  TO  WRK-RECECD (1)
@@ -2600,6 +2605,8 @@
                        ELSE
                            IF      WRK-RECECD (1)    NOT =   SPACE
                                MOVE    "0006"        TO  SPA-ERRCD
+                               MOVE    WRK-CONS-BYOMEICD-MAX
+                                                    TO  IDX
                            ELSE
                                MOVE    SPA-NAI-C03-BYOMEICD(IDX)(4:1)
                                                      TO  WRK-RECECD (3)
@@ -2610,13 +2617,17 @@
                    WHEN    OTHER                 
                        IF      WRK-RECECD (3)    NOT =   SPACE
                            MOVE    "0006"        TO  SPA-ERRCD
+                           MOVE    WRK-CONS-BYOMEICD-MAX
+                                                 TO  IDX
                        ELSE
                            MOVE    "1"           TO  WRK-RECECD (2)
                        END-IF
                  END-EVALUATE
                END-IF
            END-PERFORM
-           IF      SPA-ERRCD         NOT =   SPACE
+           IF      SPA-ERRCD           =   SPACE  OR  "0074"
+               CONTINUE
+           ELSE      
                GO  TO  41021-BYOMEI-HENSYU-EXT
            END-IF
       *
