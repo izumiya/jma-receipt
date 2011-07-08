@@ -430,61 +430,6 @@ RECORD_files = \
 	acceptlst.rec \
 
 DEF_files = \
-	HC01.def \
-	HC011.def \
-	HC02.def \
-	HC03.def \
-	HC04.def \
-	HC041.def \
-	HC041V01.def \
-	HC041V02.def \
-	HC041V03.def \
-	HC04V01.def \
-	HC04V02.def \
-	HC04V03.def \
-	HC05.def \
-	HC06.def \
-	HC06V01.def \
-	HC07.def \
-	HC08.def \
-	HC08V01.def \
-	HC09.def \
-	HC10.def \
-	HC11.def \
-	HC12.def \
-	HC13.def \
-	HC14.def \
-	HC15.def \
-	HC17.def \
-	HC17V01.def \
-	HC17V02.def \
-	HC18.def \
-	HC19.def \
-	HC20.def \
-	HC21.def \
-	HC22.def \
-	HC23.def \
-	HC24.def \
-	HC25.def \
-	HC26.def \
-	HC27.def \
-	HC28.def \
-	HC29.def \
-	HC301.def \
-	HC302.def \
-	HC303.def \
-	HC304.def \
-	HC305.def \
-	HC306.def \
-	HC401.def \
-	HCML01.def \
-	HCML02.def \
-	HCML03.def \
-	HCML05.def \
-	HCML06.def \
-	HCML09.def \
-	HCP7LA.def \
-	HCPO.def 
 
 DB_files = \
 	query_ptinf.db \
