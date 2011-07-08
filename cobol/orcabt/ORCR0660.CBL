@@ -1222,8 +1222,8 @@
                IF   WRK-HKNCOMBI-JIDO   =   ZERO
                  IF    WRK-KOHBUNRI-JIDO   =   RECE64-KOHBUNRI
                     IF  (RECE64-SRYKBN    NOT =  "95"  AND  "96")
-                    AND (RECE64-ZAITEN    NOT =   ZERO)
-                    AND (RECE64-ZAIKAISU  NOT =   ZERO)
+      ***           AND (RECE64-ZAITEN    NOT =   ZERO)
+      ***           AND (RECE64-ZAIKAISU  NOT =   ZERO)
                        MOVE   RECE64-HKNCOMBI   TO   WRK-HKNCOMBI-JIDO
                     END-IF
                  END-IF

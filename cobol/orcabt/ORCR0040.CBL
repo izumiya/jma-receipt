@@ -441,6 +441,7 @@
            03  WRK-KETA2           PIC 9(04).
            03  WRK-KOHBUNRI        PIC 9(01).
            03  WRK-KOHBUNRI-JIDO   PIC 9(01).
+           03  WRK-HKNCOMBI-JIDO   PIC 9(04).
            03  WRK-ZAINUM          PIC 9(08).
            03  WRK-RECEERR         PIC X(200).
       *
@@ -1082,6 +1083,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
            MOVE       ZERO             TO  IDX6
       *
            MOVE  RECE02-KOHBUNRI-MIN   TO  WRK-KOHBUNRI-JIDO
+           MOVE  ZERO                  TO  WRK-HKNCOMBI-JIDO
       *
            IF   RECE02-COMCNTFLG   =   "1"
       *
@@ -1282,130 +1284,6 @@ grpsys         OR     ( RECE02-HOSPNUM   NOT =   RECE04-HOSPNUM      )
       *
            END-IF
       *
-      ******
-      *
-      *    ∆˝Õƒª˘°¶Õƒª˘§Œ•≥•·•Û•»
-      *
-           IF   RECE02-NYUYOJIFLG   NOT =   SPACE
-      *
-              PERFORM   2001-NYUYOJI-COMMENT-SEC
-      *
-           END-IF
-      *
-      *    ∏¯»Òºıø«∆¸§Œ•≥•·•Û•»
-      *
-           IF   RECE02-KOHJNISSUTBLINF    =   ALL " "
-              CONTINUE
-           ELSE
-              PERFORM   2001-KOHJYUSIN-COMMENT-SEC
-           END-IF
-      *
-      *    Œ‡ªˆœ∑øÕ¡Î∏˝ƒßº˝≥€§Œ•≥•·•Û•»
-      *
-           IF   RECE02-KOH-SAIKEIFLG    =   1
-              PERFORM   2001-KOHSAIKEI-COMMENT-SEC
-           END-IF
-      *
-      *    »Øæ…∆¸§Œ•≥•·•Û•»
-           IF   RECE02-SRYYM      >=    "200604"
-               PERFORM   2001-HASSYO-HANTEI-SEC
-           ELSE
-               MOVE      ZERO            TO   FLG-COMOKIKAE
-               MOVE      CONS-KYUSEI     TO   WRK-SRYCD
-               PERFORM   2001-KYUSEIHASSYO-HANTEI-SEC
-           END-IF
-      *
-      *     £øÙø«Œ≈≤ ºıø«
-      *
-           IF   CNT-SANTEIKA   >  ZERO
-      *
-             MOVE       ZERO             TO  CNT-JUSHIN
-             INITIALIZE                      TBL-JUSHIN-INF
-      *      ø«Œ≈≤ §ŒºË∆¿
-             INITIALIZE                      SYS-1005-REC
-             MOVE    "1005"              TO  SYS-1005-KANRICD
-             MOVE    RECE02-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
-             MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
-             MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
-grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
-             MOVE    SYS-1005-REC        TO  MCPDATA-REC
-             MOVE    "tbl_syskanri"      TO  MCP-TABLE
-             MOVE    "key2"              TO  MCP-PATHNAME
-grpsys       PERFORM 900-DBSELECT-SEC
-             IF      MCP-RC              =   ZERO
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM   900-SYSKANRI-READ-SEC
-               PERFORM   VARYING   IDX    FROM   1   BY   1
-                          UNTIL   (IDX             >      50)
-                            OR    (FLG-SYSKANRI    =       1)
-                   MOVE    SYS-1005-KBNCD  TO TBL-JUSHIN-SRYKA(IDX)
-                   MOVE    SYS-1005-SRYKANAME   
-                                           TO TBL-JUSHIN-SRYKANAME(IDX)
-      *            ºıø«Õ˙ŒÚ•∆°º•÷•Î§´§Èø«Œ≈≤ ÀË§Œºıø«∆¸§Ú∏°∫˜•ª•√•»
-                   PERFORM   2001-JUSHIN-KENSAKU-SEC
-      *
-                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
-                   MOVE    "key2"              TO  MCP-PATHNAME
-                   PERFORM   900-SYSKANRI-READ-SEC
-               END-PERFORM
-             END-IF
-      *
-             MOVE    "tbl_syskanri"      TO  MCP-TABLE
-             MOVE    "key2"              TO  MCP-PATHNAME
-             PERFORM 900-CLOSE-SEC
-      *
-      *       £øÙ§Œø«Œ≈≤ ºıø«§¨§¢§Î§´»ΩƒÍ
-             MOVE       ZERO       TO   IDZ  
-             INITIALIZE            WRK-FREE-AREA
-      *
-             PERFORM   VARYING   IDX    FROM   1   BY   1
-                            UNTIL   (IDX             >      50)
-               IF   TBL-JUSHIN-ARI (IDX)  =  "1"
-                   ADD       1     TO   CNT-JUSHIN
-                   PERFORM  2001-FREE-COMMENT-SEC
-               END-IF
-             END-PERFORM
-      *       £øÙø«Œ≈≤ ºıø«§Œ•≥•·•Û•» ‘Ω∏
-             IF    CNT-JUSHIN  >   1
-                    PERFORM   2001-JUSHIN-COMMENT-SEC
-             END-IF
-      *
-           END-IF
-      *
-      *    ≈≈œ√∫∆ø«°¶∆±∆¸ £øÙ∫∆ø«
-      *
-           PERFORM   VARYING   IDX    FROM   1   BY   1
-                          UNTIL   (IDX             >      5)
-      *
-              IF    CNT-DENWA(IDX)     >   ZERO
-              OR    CNT-DOUJITU(IDX)   >   ZERO
-              OR    CNT-DOUDEN(IDX)    >   ZERO
-                  PERFORM    2001-DENWA-DOUJITU-COMMENT-SEC
-              END-IF
-      *
-           END-PERFORM
-      *
-      *    øÕπ©ø’¬°§Œ»ΩƒÍ
-      *
-           PERFORM    2001-JINZOU-HANTEI-SEC
-      *
-      *    ∫ﬂªŸ±Á•≥•·•Û•»
-      *
-           PERFORM   VARYING   IDX    FROM   1   BY   1
-                      UNTIL    IDX      >    5
-              IF     TBL-ZAISIEN-COMMENT(IDX)   NOT =  ZERO
-                  PERFORM    2001-ZAISIEN-COMMENT-SEC
-              END-IF
-           END-PERFORM
-      *
-      *    æ„≥≤§Œ•≥•·•Û•»° £∑£µ∫–≈˛√£∑Ó§Œ∆√Œ„°À
-      *
-           IF   RECE02-RJNGAIKOHFTN(3)  =   1
-              PERFORM   2001-KOUREI-TOKUREI-COMMENT-SEC
-           END-IF
-      *
-      *
       *    •—•È•·°º•ø£∞£¥•’•°•§•Î§Ë§Í ‘Ω∏
            PERFORM 800-RECE02-SET04-SEC
            MOVE    ZERO                TO  RECE04-ZAINUM
@@ -1435,6 +1313,16 @@ grpsys       PERFORM 900-DBSELECT-SEC
                OR     ( RECE02-TEKSTYMD  NOT =   RECE04-TEKSTYMD     )
       *
                INITIALIZE    WRK-JIDO-SETCOM-AREA
+      *
+               IF   WRK-HKNCOMBI-JIDO   =   ZERO
+                 IF    WRK-KOHBUNRI-JIDO   =   RECE04-KOHBUNRI
+                    IF  (RECE04-SRYKBN    NOT =  "95"  AND  "96")
+      ***           AND (RECE04-ZAITEN    NOT =   ZERO)
+      ***           AND (RECE04-ZAIKAISU  NOT =   ZERO)
+                       MOVE   RECE04-HKNCOMBI   TO   WRK-HKNCOMBI-JIDO
+                    END-IF
+                 END-IF
+               END-IF
       *
                EVALUATE      RECE04-SRYKBN
                    WHEN      "11"
@@ -1583,6 +1471,127 @@ grpsys       PERFORM 900-DBSELECT-SEC
            END-PERFORM
       *
            INITIALIZE    WRK-JIDO-SETCOM-AREA
+      *
+      *    ∆˝Õƒª˘°¶Õƒª˘§Œ•≥•·•Û•»
+      *
+           IF   RECE02-NYUYOJIFLG   NOT =   SPACE
+      *
+              PERFORM   2001-NYUYOJI-COMMENT-SEC
+      *
+           END-IF
+      *
+      *    ∏¯»Òºıø«∆¸§Œ•≥•·•Û•»
+      *
+           IF   RECE02-KOHJNISSUTBLINF    =   ALL " "
+              CONTINUE
+           ELSE
+              PERFORM   2001-KOHJYUSIN-COMMENT-SEC
+           END-IF
+      *
+      *    Œ‡ªˆœ∑øÕ¡Î∏˝ƒßº˝≥€§Œ•≥•·•Û•»
+      *
+           IF   RECE02-KOH-SAIKEIFLG    =   1
+              PERFORM   2001-KOHSAIKEI-COMMENT-SEC
+           END-IF
+      *
+      *    »Øæ…∆¸§Œ•≥•·•Û•»
+           IF   RECE02-SRYYM      >=    "200604"
+               PERFORM   2001-HASSYO-HANTEI-SEC
+           ELSE
+               MOVE      ZERO            TO   FLG-COMOKIKAE
+               MOVE      CONS-KYUSEI     TO   WRK-SRYCD
+               PERFORM   2001-KYUSEIHASSYO-HANTEI-SEC
+           END-IF
+      *
+      *     £øÙø«Œ≈≤ ºıø«
+      *
+           IF   CNT-SANTEIKA   >  ZERO
+      *
+             MOVE       ZERO             TO  CNT-JUSHIN
+             INITIALIZE                      TBL-JUSHIN-INF
+      *      ø«Œ≈≤ §ŒºË∆¿
+             INITIALIZE                      SYS-1005-REC
+             MOVE    "1005"              TO  SYS-1005-KANRICD
+             MOVE    RECE02-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
+             MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
+             MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
+grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+             MOVE    SYS-1005-REC        TO  MCPDATA-REC
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key2"              TO  MCP-PATHNAME
+grpsys       PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM   900-SYSKANRI-READ-SEC
+               PERFORM   VARYING   IDX    FROM   1   BY   1
+                          UNTIL   (IDX             >      50)
+                            OR    (FLG-SYSKANRI    =       1)
+                   MOVE    SYS-1005-KBNCD  TO TBL-JUSHIN-SRYKA(IDX)
+                   MOVE    SYS-1005-SRYKANAME   
+                                           TO TBL-JUSHIN-SRYKANAME(IDX)
+      *            ºıø«Õ˙ŒÚ•∆°º•÷•Î§´§Èø«Œ≈≤ ÀË§Œºıø«∆¸§Ú∏°∫˜•ª•√•»
+                   PERFORM   2001-JUSHIN-KENSAKU-SEC
+      *
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "key2"              TO  MCP-PATHNAME
+                   PERFORM   900-SYSKANRI-READ-SEC
+               END-PERFORM
+             END-IF
+      *
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key2"              TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+      *
+      *       £øÙ§Œø«Œ≈≤ ºıø«§¨§¢§Î§´»ΩƒÍ
+             MOVE       ZERO       TO   IDZ  
+             INITIALIZE            WRK-FREE-AREA
+      *
+             PERFORM   VARYING   IDX    FROM   1   BY   1
+                            UNTIL   (IDX             >      50)
+               IF   TBL-JUSHIN-ARI (IDX)  =  "1"
+                   ADD       1     TO   CNT-JUSHIN
+                   PERFORM  2001-FREE-COMMENT-SEC
+               END-IF
+             END-PERFORM
+      *       £øÙø«Œ≈≤ ºıø«§Œ•≥•·•Û•» ‘Ω∏
+             IF    CNT-JUSHIN  >   1
+                    PERFORM   2001-JUSHIN-COMMENT-SEC
+             END-IF
+      *
+           END-IF
+      *
+      *    ≈≈œ√∫∆ø«°¶∆±∆¸ £øÙ∫∆ø«
+      *
+           PERFORM   VARYING   IDX    FROM   1   BY   1
+                          UNTIL   (IDX             >      5)
+      *
+              IF    CNT-DENWA(IDX)     >   ZERO
+              OR    CNT-DOUJITU(IDX)   >   ZERO
+              OR    CNT-DOUDEN(IDX)    >   ZERO
+                  PERFORM    2001-DENWA-DOUJITU-COMMENT-SEC
+              END-IF
+      *
+           END-PERFORM
+      *
+      *    øÕπ©ø’¬°§Œ»ΩƒÍ
+      *
+           PERFORM    2001-JINZOU-HANTEI-SEC
+      *
+      *    ∫ﬂªŸ±Á•≥•·•Û•»
+      *
+           PERFORM   VARYING   IDX    FROM   1   BY   1
+                      UNTIL    IDX      >    5
+              IF     TBL-ZAISIEN-COMMENT(IDX)   NOT =  ZERO
+                  PERFORM    2001-ZAISIEN-COMMENT-SEC
+              END-IF
+           END-PERFORM
+      *
+      *    æ„≥≤§Œ•≥•·•Û•»° £∑£µ∫–≈˛√£∑Ó§Œ∆√Œ„°À
+      *
+           IF   RECE02-RJNGAIKOHFTN(3)  =   1
+              PERFORM   2001-KOUREI-TOKUREI-COMMENT-SEC
+           END-IF
       *
       *****∆‚…˛ÃÙ∫ﬁŒ¡ƒ˛∏∫§À¥ÿ§π§Î ‘Ω∏£≤****
            PERFORM     240-YAKUTEI-HENSYU2-SEC
@@ -1905,6 +1914,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    99999999            TO  RECE049-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
       *
            MOVE    WRK-CNT-MEISAI      TO  RECE049-MEISAISU
       *
@@ -2205,6 +2215,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    99999990            TO  RECE049-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
       *
            MOVE    1                   TO  RECE049-MEISAISU
       *
@@ -2257,6 +2268,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    99999998            TO  RECE049-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
       *
            MOVE    1                   TO  RECE049-MEISAISU
       *
@@ -2362,6 +2374,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    99999980            TO  RECE049-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
       *
            MOVE    WRK-CNT-MEISAI      TO  RECE049-MEISAISU
       *
@@ -2381,6 +2394,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    99999997            TO  RECE049-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
       *
            MOVE    1                   TO  RECE049-MEISAISU
       *
@@ -3186,6 +3200,7 @@ grpsys                   MOVE    SRY-HOSPNUM         TO  PTCOM-HOSPNUM
            MOVE    99999996            TO  RECE049-ZAINUM
            MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
            MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
       *
            MOVE    WRK-CNT-MEISAI      TO  RECE049-MEISAISU
       *

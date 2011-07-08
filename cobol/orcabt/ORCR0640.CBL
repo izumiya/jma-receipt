@@ -1189,7 +1189,6 @@
            03  WRK-CHK-TAISYO                          PIC 9(01).
            03  WRK-CHK-TAISYO2                         PIC 9(01).
            03  WRK-CHK-TOKU75-MAE                      PIC 9(01).
-           03  WRK-CHK-CYO                             PIC 9(01).
            03  WRK-CHK-CNT                             PIC 9(07).
            03  WRK-CHK-HKNID                           PIC 9(10).
            03  WRK-CHK-HKNNUM                          PIC X(03).
@@ -11979,7 +11978,6 @@
            MOVE    ZERO                TO  WRK-CHK-IDOU
                                            WRK-CHK-TAISYO
                                            WRK-CHK-HKNID
-                                           WRK-CHK-CYO
                                            WRK-CHK-CNT
                                            WRK-CHK-TAISYO2
                                            WRK-CHK-TOKU75-MAE
@@ -12031,9 +12029,6 @@
                               (RECE69-HKNJANUM  NOT =
                                                   WRK-CHK-HKNJANUM )
                               MOVE    1           TO  WRK-CHK-TAISYO
-                              IF    RECE62-SRYYM       >=  "200804"
-                                MOVE  1           TO  WRK-CHK-CYO
-                              END-IF
                           END-IF
                           IF  (RECE69-HKNJANUM  NOT = SPACE         )
                           AND (RECE69-HKNJANUM  =  WRK-CHK-HKNJANUM )
@@ -12051,7 +12046,6 @@
                           OR ( RECE69-HONKZKKBN NOT =
                                                   WRK-CHK-HONKZKKBN )
                               MOVE    1           TO  WRK-CHK-TAISYO
-                              MOVE    1           TO  WRK-CHK-CYO
                           END-IF
                           IF  (RECE69-HKNJANUM  NOT = SPACE         )
                           AND (RECE69-HKNJANUM  =  WRK-CHK-HKNJANUM )
@@ -12067,18 +12061,9 @@
                        WHEN     2
                          ADD     1                TO  WRK-CHK-CNT
                          MOVE    1                TO  WRK-CHK-TAISYO
-                         IF   (RECE62-KOUREI    =   "1")
-                         OR   (FLG-TOKU75    =  1 OR 2 )
-                            IF    RECE62-SRYYM       >=  "200804"
-                               MOVE    1          TO  WRK-CHK-CYO
-                            END-IF
-                         ELSE
-                            MOVE    1             TO  WRK-CHK-CYO
-                         END-IF
                        WHEN     6
                          ADD     1                TO  WRK-CHK-CNT
                          MOVE    1                TO  WRK-CHK-TAISYO
-                         MOVE    1                TO  WRK-CHK-CYO
                      END-EVALUATE
                    WHEN    "2"
                      EVALUATE    WRK-CHK-IDOU
@@ -12099,14 +12084,6 @@
                        WHEN     1
                          ADD     1                TO  WRK-CHK-CNT
                          MOVE    1                TO  WRK-CHK-TAISYO
-                         IF   (RECE62-KOUREI    =   "1")
-                         OR   (FLG-TOKU75    =  1 OR 2 )
-                            IF    RECE62-SRYYM       >=  "200804"
-                               MOVE    1          TO  WRK-CHK-CYO
-                            END-IF
-                         ELSE
-                            MOVE    1             TO  WRK-CHK-CYO
-                         END-IF
                        WHEN     2
                          ADD     1                TO  WRK-CHK-CNT
                          IF   (RECE62-HKNNUM  = "060"  )
@@ -12116,14 +12093,6 @@
                               (RECE69-HKNJANUM  NOT =
                                                   WRK-CHK-HKNJANUM )
                               MOVE    1           TO  WRK-CHK-TAISYO
-                              IF   (RECE62-KOUREI    =   "1")
-                              OR   (FLG-TOKU75    =  1 OR 2 )
-                                 IF    RECE62-SRYYM       >=  "200804"
-                                    MOVE    1     TO  WRK-CHK-CYO
-                                 END-IF
-                              ELSE
-                                 MOVE    1        TO  WRK-CHK-CYO
-                              END-IF
                           END-IF
                           IF  (RECE69-HKNJANUM  NOT = SPACE         )
                           AND (RECE69-HKNJANUM  =  WRK-CHK-HKNJANUM )
@@ -12141,7 +12110,6 @@
                           OR ( RECE69-HONKZKKBN NOT =
                                                   WRK-CHK-HONKZKKBN )
                               MOVE    1           TO  WRK-CHK-TAISYO
-                              MOVE    1           TO  WRK-CHK-CYO
                           END-IF
                           IF  (RECE69-HKNJANUM  NOT = SPACE         )
                           AND (RECE69-HKNJANUM  =  WRK-CHK-HKNJANUM )
@@ -12157,7 +12125,6 @@
                        WHEN     6
                          ADD     1                TO  WRK-CHK-CNT
                          MOVE    1                TO  WRK-CHK-TAISYO
-                         MOVE    1                TO  WRK-CHK-CYO
                      END-EVALUATE
                    WHEN    "6"
                      EVALUATE    WRK-CHK-IDOU
@@ -12178,7 +12145,6 @@
                           IF  FLG-TOKU75     =   ZERO
                             IF    FLG-TAISYO   =    1
                                 MOVE    1         TO  WRK-CHK-TAISYO
-                                MOVE    1         TO  WRK-CHK-CYO
                             END-IF
                           ELSE
                             MOVE    1             TO  WRK-CHK-CNT
@@ -12189,7 +12155,6 @@
                             MOVE  RECE69-HKNID    TO  WRK-CHK-HKNID
                             MOVE  RECE69-HKNNUM   TO  WRK-CHK-HKNNUM
                             MOVE   ZERO           TO  WRK-CHK-TAISYO
-                            MOVE   ZERO           TO  WRK-CHK-CYO
                           END-IF
                          END-IF
                        WHEN     6
@@ -12226,14 +12191,13 @@
       *
            IF    RECE62-SRYYM       >=  "200804"
              IF  ((RECE62-KOUREI       =   "1"         ) AND
-                  (RECE62-HKNNUM       =   "039"       ))
+                  (RECE62-HKNNUM       =   "039"       ) AND
+                  (FLG-TAISYO          =    1          ))
              OR  ((RECE62-KOUREI       =   "1"  OR  "2") AND
+                  (RECE62-HKNNUM   NOT =   "039"       ) AND
                   (FLG-TAISYO          =    1          ) AND
                   (FLG-TOKU75          =   ZERO        ))
-                IF   (RECE62-SRYYM    >=  "201004")
-                AND  (WRK-CHK-CYO      =   1      )
-                   MOVE  ZERO  TO  WRK-CHK-TAISYO
-                END-IF
+                CONTINUE
              ELSE
                 MOVE   ZERO    TO  WRK-CHK-TAISYO
              END-IF
@@ -12279,7 +12243,14 @@
                 MOVE    RECE62-KOHID(1)
                                        TO  LNK-KOREIFTNCHK-KOHID-CYOKI
                 MOVE    FLG-TOKU75     TO  LNK-KOREIFTNCHK-TOKU75
-                MOVE    WRK-CHK-CYO    TO  LNK-KOREIFTNCHK-CYOKINOMI
+                IF      RECE62-SRYYM   >=  "200804"
+                     MOVE      1       TO  LNK-KOREIFTNCHK-CYOKINOMI
+                ELSE
+                  IF   (RECE62-KOUREI   =   "2")
+                  AND  (FLG-TAISYO      =    1 )
+                     MOVE      1       TO  LNK-KOREIFTNCHK-CYOKINOMI
+                  END-IF
+                END-IF
       *
                 CALL    "ORCSKOREIFTNCHK"   USING
                                             ORCSKOREIFTNCHKAREA
@@ -14627,6 +14598,7 @@
                             (SYU-KOH-HKNNUM(3) ="748"))     )
                      AND  (RECE62-TEISYUTUSAKI   =   2 OR 6 )
                      AND  (RECE62-SRYYM         >=  "200802")
+                     AND  (IDZ                   =   1      )
                          ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                       RECE62-FTNMONEY-KOJ(KH-IDX)
                          ADD   SYU-SKJ-FTN(IDX3)      TO
@@ -15787,11 +15759,13 @@
       *
            END-PERFORM
       *
-           EVALUATE   WRK-PREFNUM
+           IF   IDZ  =  1
+            EVALUATE   WRK-PREFNUM
       *
              WHEN    "35"
       *
-                IF   RECE62-SRYYM   >=  "201004"
+                IF   (RECE62-SRYYM         >=  "201004")
+                AND  (RECE62-TEISYUTUSAKI   =   2 OR 6 )
                    PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
                                UNTIL    KOHFTN-IDX     >    4
       *
@@ -15827,7 +15801,8 @@
       *
              WHEN    "39"
       *
-               IF   RECE62-SRYYM   >=  "200510"
+               IF   (RECE62-SRYYM         >=  "200510")
+               AND  (RECE62-TEISYUTUSAKI   =   2 OR 6 )
                   PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
                               UNTIL    KOHFTN-IDX     >    4
       *
@@ -15843,7 +15818,8 @@
                   END-PERFORM
                END-IF
       *
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
       *    ∞Ï…Ù…È√¥∂‚°¶ø©ªˆŒ≈Õ‹»Ò…∏Ω‡…È√¥≥€∂Ë ¨§Œ ‘Ω∏
       *
