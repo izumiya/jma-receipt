@@ -523,6 +523,7 @@
       *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *  04.05.24    NACL-ÌçÏÆ    11/06/21  ²èÁü¿ÇÃÇ¡¦ÅÅ»Ò²èÁü´ÉÍý²Ã»»¤Î
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
+      *  04.05.25    NACL-ÌçÏÆ    11/07/05  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1195,6 +1196,10 @@
            03  WRK-GEN70-YMD.
                05  WRK-GEN70-YM                PIC  9(06).
                05  WRK-GEN70-DD                PIC  9(02).
+      *
+           03  WRK-GEN702-YMD.
+               05  WRK-GEN702-YM               PIC  9(06).
+               05  WRK-GEN702-DD               PIC  9(02).
       *
            03  WRK-KOH-GENDOGAKU               PIC  9(07).
            03  WRK-GEN70-GENDOGAKU             PIC  9(07).
@@ -3668,6 +3673,14 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
            ELSE
               MOVE   01                    TO   WRK-GEN70-DD
            END-IF
+      *
+           MOVE      RECE02-SRYYM            TO   WRK-GEN702-YM
+           IF   RECE02-TEKSTYMD-X(1:6)  >=  RECE02-SRYYM
+              MOVE   RECE02-TEKSTYMD-X(7:2)  TO   WRK-GEN702-DD
+           ELSE
+              MOVE   01                      TO   WRK-GEN702-DD
+           END-IF
+      *
            PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
                       UNTIL   (GEN-IDX    >    TBL-GENBUTU70-MAX)
                         OR    (FLG-GENBUTU70   NOT = ZERO       )
@@ -3685,9 +3698,12 @@ grpsys          PERFORM 900-DBSELECT-SEC
                   MOVE    "key4"               TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                     AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                     AND (PTKOH-SAKJOKBN   =   SPACE         )
+                     IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                         (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                         (PTKOH-SAKJOKBN   =   SPACE         ))
+                     OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                         (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                         (PTKOH-SAKJOKBN   =   SPACE         ))
                          EVALUATE   GEN-IDX
                            WHEN        1
                              MOVE    1   TO  FLG-GENBUTU70
@@ -3734,9 +3750,12 @@ grpsys          PERFORM 900-DBSELECT-SEC
                   MOVE    "key4"               TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                     AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                     AND (PTKOH-SAKJOKBN   =   SPACE         )
+                     IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                         (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                         (PTKOH-SAKJOKBN   =   SPACE         ))
+                     OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                         (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                         (PTKOH-SAKJOKBN   =   SPACE         ))
                          MOVE     1      TO  FLG-KOHYONKAIME
                          MOVE     1      TO  FLG-PTKOHINF
                      ELSE
