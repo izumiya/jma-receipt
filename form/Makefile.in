@@ -5,69 +5,14 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 
 FORM_files = \
-              HC01.dia \
-              HC03.dia \
-              HC04.dia \
-              HC04V01.dia \
-              HC04V02.dia \
-              HC05.dia \
-              HC06.dia \
-              HC07.dia \
-              HC08.dia \
-              HC08V01.dia \
-              HC09.dia \
-              HC10.dia \
-              HC11.dia \
-              HC011.dia \
-              HC12.dia \
-              HC13.dia \
-              HC14.dia \
-              HC15.dia \
-              HC15x.dia \
               HCM15.red \
-              HC17.dia \
-              HC17V01.dia \
-              HC17V02.dia \
-              HC18.dia \
-              HC19.dia \
-              HC20.dia \
-              HC21.dia \
-              HC22.dia \
-              HC23.dia \
-              HC24.dia \
-              HC25.dia \
-              HC26.dia \
-              HC27.dia \
-              HC28.dia \
-              HC301.dia \
-              HC302.dia \
-              HC303.dia \
-              HC304.dia \
-              HC305.dia \
-              HC306.dia \
-              HC041.dia \
-              HC041V01.dia \
-              HC041V02.dia \
-              HC401.dia \
-              HCML01.dia \
-              HCML02.dia \
-              HCML03.dia \
-              HCML05.dia \
-              HCML06.dia \
               HCML07.red \
-              HCML09.dia \
-              HCP7LA.dia \
-              HCPO.dia \
               HCM06.red \
               HCM19.red \
-              HC29.dia \
               HCM2C.red \
               HCM2D.red \
               HCM2E.red \
               HCM2F.red \
-              HC04V03.dia \
-              HC041V03.dia \
-              HC06V01.dia \
               HCN02.red \
               HCN03.red \
               HCM06V01.red \
@@ -505,6 +450,12 @@ FORM_files = \
 	      HCN09V03.red \
 	      HCM3BV01.red \
 	      HCM3DV01.red \
+	      HC26.red \
+	      HC27.red \
+	      HCML01.red \
+	      HCML03.red \
+	      HCML06.red \
+	      HCML09.red \
 
 all:   
 
