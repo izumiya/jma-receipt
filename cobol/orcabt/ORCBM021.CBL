@@ -679,8 +679,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  HC01PARA-HOSPNUM
       *
             INITIALIZE                 ORCSMKPRTAREA
             MOVE   "HC01.sh"           TO  MKPRT-ID
-            MOVE   "HC27.dia"          TO  MKPRT-DIA
-            MOVE   "HC27.def"          TO  MKPRT-DEF
+            MOVE   "HC27.red"          TO  MKPRT-DIA
+            MOVE   SPACE               TO  MKPRT-DEF
             MOVE   HC01PARA            TO  MKPRT-DAT
             MOVE   SYS-1031-PRTNM(5)   TO  MKPRT-PRTNM
             CALL   "ORCSMKPRT"         USING

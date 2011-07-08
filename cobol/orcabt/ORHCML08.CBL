@@ -508,7 +508,7 @@
                                        TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE    "HCML06"            TO  SPRT-PRTID
+           MOVE    "HCML06.red"        TO  SPRT-PRTID
            MOVE    "入力コード一覧表・診療行為"
                                        TO  SPRT-TITLE
            MOVE    HCML06              TO  SPRT-PRTDATA

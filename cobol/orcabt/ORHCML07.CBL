@@ -524,7 +524,7 @@
                                        TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE    "HCML06"            TO  SPRT-PRTID
+           MOVE    "HCML06.red"        TO  SPRT-PRTID
            EVALUATE    WRK-PARA-KBN
                WHEN    1
                    MOVE    "入力コード一覧表・特定器材"

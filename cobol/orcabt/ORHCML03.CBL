@@ -681,7 +681,7 @@
                                        TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE    "HCML03"            TO  SPRT-PRTID
+           MOVE    "HCML03.red"        TO  SPRT-PRTID
            MOVE    "点数マスタ一覧表・診療行為"
                                        TO  SPRT-TITLE
            MOVE    HCML03              TO  SPRT-PRTDATA

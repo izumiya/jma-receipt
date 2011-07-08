@@ -474,8 +474,8 @@
       * 
            INITIALIZE                 ORCSMKPRTAREA
            MOVE   "HC01.sh"           TO  MKPRT-ID
-           MOVE   "HCML09.dia"        TO  MKPRT-DIA
-           MOVE   "HCML09.def"        TO  MKPRT-DEF
+           MOVE   "HCML09.red"        TO  MKPRT-DIA
+           MOVE   SPACE               TO  MKPRT-DEF
            MOVE   HC01PARA            TO  MKPRT-DAT
            MOVE   SYS-1031-PRTNM(6)   TO  MKPRT-PRTNM
            CALL   "ORCSMKPRT"         USING
