@@ -3446,6 +3446,13 @@
                    ADD     1               TO  IDN2
                    MOVE    1               TO  IDN3
                END-IF
+      *        '-' ¤Î¼¡È½Äê
+               IF     (WRK-SEL (IDN1)      =   "-" )
+                  AND ((IDN3   +   3 )     >=  19  )
+                   ADD     1               TO  IDN2
+                   MOVE    1               TO  IDN3
+               END-IF
+      *
                IF      LNK-ORCSC-INPUTCD(02 IDXS IDN2)   =   SPACE
                    STRING  "*"             DELIMITED  BY  SIZE
                            WRK-KAISU-H     DELIMITED  BY  SPACE
