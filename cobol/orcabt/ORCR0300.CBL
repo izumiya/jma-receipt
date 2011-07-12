@@ -363,6 +363,9 @@
       *  04.05.21    NACL-藤原    11/04/20  災害対応
       *                                     災害該当レセプトのレセ電デー
       *                                     タ作成対応
+      *  04.05.22    NACL-藤原    11/07/12  愛知県対応
+      *                                     法別番号を判定して受給者番号
+      *                                     にゼロを編集するのを中止
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2885,15 +2888,15 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    受給者番号
-           IF    ( RECE02-PREFNUM      =   "23"                    )
-           AND   ( RECE02-TEISYUTUSAKI =   "2"                     )
-           AND   ( RECE02-KOHNUM (IDY) (1:1)
-                                       >=  "1" AND <= "8"          )
-           AND   ( RECE02-KOHHBTNUM (IDY)
-                                       =   "81" OR  "82"  OR 
-                                           "83" OR  "84"  OR  "85" )
-               MOVE    "0000000"           TO  WRK-DATA
-           ELSE                          
+      *****IF    ( RECE02-PREFNUM      =   "23"                    )
+      *****AND   ( RECE02-TEISYUTUSAKI =   "2"                     )
+      *****AND   ( RECE02-KOHNUM (IDY) (1:1)
+      *****                            >=  "1" AND <= "8"          )
+      *****AND   ( RECE02-KOHHBTNUM (IDY)
+      *****                            =   "81" OR  "82"  OR 
+      *****                                "83" OR  "84"  OR  "85" )
+      *****    MOVE    "0000000"           TO  WRK-DATA
+      *****ELSE                          
                IF      RECE02-KOHJKYSNUM  (IDY)
                                            NOT =   SPACE
                    INITIALIZE              ORCSKANACHKAREA
@@ -2912,7 +2915,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                        END-IF
                    END-IF
                END-IF
-           END-IF
+      *****END-IF
            EVALUATE    RECE02-2006-RECEDEN-JKYSNUMKBN  (IDY)
                WHEN    SPACE
                    CONTINUE

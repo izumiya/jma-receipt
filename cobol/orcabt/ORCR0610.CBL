@@ -160,6 +160,8 @@
       *                                     ÊÑ¹¹¤¬¤¢¤Ã¤¿¾ì¹ç¤Îµ­ºÜÂÐ±þ
       *                                     Ë¡ÊÌÈÖ¹æ¡¢Å¬ÍÑ³«»ÏÆü¤Î½ç¤È¤¹¤ë
       *                                     ¡ÊÁ´¹ñ¸øÈñ¤Î¤ß¡Ë 
+      *  04.05.11    NACL-Æ£¸¶    11/07/12  »³Íü¸©¤ÎÃÏÊý¸øÈñÂÐ±þ
+      *                                     £²£´£±¤È£±£´£³¤Îµ­ºÜ½ç
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2818,16 +2820,24 @@
                                        END-IF
                                    END-IF
                                ELSE
-      *
-                                 IF      WRK-KOHHKNNUM-O (IDX)
+      *                          »³Íü¸©¤ÎÃÏÊý¸øÈñ¡Ê£²£´£±¡Ü£±£´£³¡Ë
+                                 IF    ( SYS-1001-PREFNUM    =   "19"  ) 
+                                 AND   ( WRK-KOHHKNNUM-O (IDX)
+                                                             =   "241" )
+                                 AND   ( WRK-KOHHKNNUM-O (IDY)
+                                                             =   "143" )
+                                     CONTINUE
+                                 ELSE
+                                   IF      WRK-KOHHKNNUM-O (IDX)
                                                >   WRK-KOHHKNNUM-O (IDY)
-                                   MOVE    WRK-KOHI-TBL(IDX)
+                                     MOVE    WRK-KOHI-TBL(IDX)
                                                    TO  WRK-KOHI
-                                   MOVE    WRK-KOHI-TBL(IDY)
+                                     MOVE    WRK-KOHI-TBL(IDY)
                                                    TO  WRK-KOHI-TBL(IDX)
-                                   MOVE    WRK-KOHI
+                                     MOVE    WRK-KOHI
                                                    TO  WRK-KOHI-TBL(IDY)
-                                 END-IF
+                                   END-IF
+                                 END-IF 
                                END-IF
                            END-IF
                        END-IF    
