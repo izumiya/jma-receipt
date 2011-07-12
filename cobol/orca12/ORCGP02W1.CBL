@@ -7203,6 +7203,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 450-HKNCOMBI-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-FLG-END     NOT =   ZERO  )
+              OR  (SPA-PIDCD       NOT =   SPACE )
                GO      TO      490-TOUROKU-EXT
            END-IF
       *    保険組合せ公費単独チェック
