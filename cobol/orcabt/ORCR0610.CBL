@@ -154,6 +154,8 @@
       *                                     変更があった場合の記載対応
       *                                     法別番号、適用開始日の順とする
       *                                     （全国公費のみ） 
+      *  04.05.09    NACL-藤原    11/07/12  山梨県の地方公費対応
+      *                                     ２４１と１４３の記載順
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -1384,23 +1386,6 @@
                        AND   ( SYS-1001-PREFNUM
                                                =   "40"              )
                        AND   ( HKN-HBTNUM  NOT =   "41"              )    
-                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
-                                               >=  "1" AND <=  "8"   )
-                           ADD     1                      TO  IDZ    
-                           MOVE    COMB-KOHHKNNUM (IDX)   TO 
-                                          WRK-SEIKYU-KOHHKNNUM(2 IDZ)
-                           MOVE    COMB-KOHID     (IDX)   TO
-                                          WRK-SEIKYU-KOHID    (2 IDZ)
-                           MOVE    1                      TO  FLG-KOH 
-                       END-IF
-      *                奈良県の国保、後期高齢者のとき
-      *               （法別７１（乳幼児）、８１（障害）、９１（母子））
-                       IF    ( COMB-HKNNUM     =   "060"   OR  "067"
-                                               OR  "039"             )
-                       AND   ( SYS-1001-PREFNUM
-                                               =   "29"              )
-                       AND   ( HKN-HBTNUM      =   "71"    OR  "81"
-                                               OR  "91"              )    
                        AND   ( COMB-KOHHKNNUM(IDX)(1:1)
                                                >=  "1" AND <=  "8"   )
                            ADD     1                      TO  IDZ    
