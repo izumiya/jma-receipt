@@ -3194,7 +3194,6 @@
       *
                PERFORM 4101-CHOSEI-SORT-SEC
       *
-      *
       *        合計再計算
                PERFORM 4101-SEIKYU-KEI-SEC
       *
@@ -3218,32 +3217,23 @@
       *
       *    今回請求額がゼロ以上であること
            IF    ( IDXC                =   2 )
-               MOVE    ZERO                        TO  WRK-SEIKYU
-               IF    ( SPA-I01-I04-PROCKBN =   "2" )
-                AND  ( SPA-I0-SYUNOU-UPDFLG (IDXZ)  =   ZERO )
-                AND  ( SPA-NAI-I04-SAIKEISANFLG        =   1 )
+               MOVE    IDXZ        TO  IDX7
+               PERFORM 41001-CHOSEI-SEIKYU-CHK-SEC
       *
-                   COMPUTE WRK-SEIKYU
-                       =   SPA-NAI-I04-SEIKYU (IDXZ)
-                       +   SPA-NAI-I04-SEIKYU-MOT (IDXZ)
-                       -   SPA-I0-UPD-SKYMONEY(IDXZ)
+               PERFORM VARYING IDX7    FROM    1   BY  1
+                       UNTIL ( IDX7    >   SPA-GMN-I04-HKNCOMBILST-CNT )
+                         OR  ( SPA-ERRCD   NOT =   SPACE )
+                   PERFORM 41001-CHOSEI-SEIKYU-CHK-SEC
+                   IF    ( SPA-ERRCD       NOT =   SPACE )
+                       MOVE    IDX7    TO  SPA-GMN-I04-HKNCOMBILST-SEL
+                       MOVE  SPA-GMN-I04-TSELNUM (IDX7)
+                                           TO  SPA-GMN-I04-SELNUM
       *
-                   MOVE    SYU-DENPNUM TO  WRK-DENPNUM
-               ELSE
-                   COMPUTE WRK-SEIKYU
-                       =   SPA-NAI-I04-SEIKYU (IDXZ)
-               END-IF
-      *
-               IF     (WRK-SEIKYU          <   ZERO )
-                   MOVE    "0004"      TO  SPA-ERRCD
-                   IF    ( SPA-NAI-I04-CHOSEI (IDXZ 2)
-                                       NOT =   ZERO )
-                       MOVE    103     TO  SPA-GMN-I04-CUR
-                   ELSE
-                       MOVE    102     TO  SPA-GMN-I04-CUR
+                       MOVE  SPA-NAI-I04-TSYUNOUIDX (SPA-GMN-I04-SELNUM)
+                                           TO  WRK-LST-IDX
+                       PERFORM 3100-SEIKYU-DAT-EDIT-SEC
                    END-IF
-                   GO  TO  4100-CHOSEI-CHK-EXT
-               END-IF
+               END-PERFORM
            END-IF
       *
            .
@@ -3456,7 +3446,8 @@
                        COMPUTE WRK-SEIKYU
                            =   SPA-NAI-I04-SEIKYU-KON (IDX7)
                            +   SPA-NAI-I04-SEIKYU-MOT (IDX7)
-                           +   SPA-NAI-I04-CHOSEI (IDX7 IDXC)
+                           +   SPA-NAI-I04-CHOSEI (IDX7 1)
+                           +   SPA-NAI-I04-CHOSEI (IDX7 2)
       *
                        IF    ( WRK-SEIKYU         >=  ZERO )
                            MOVE    ZERO    TO  WRK-CHOSEI
@@ -3483,6 +3474,40 @@
       *
            .
        410012-CHOSEI-SORT-EXT.
+           EXIT.
+      *****************************************************************
+      *    調整後請求額チェック処理
+      *****************************************************************
+       41001-CHOSEI-SEIKYU-CHK-SEC     SECTION.
+      *
+           MOVE    ZERO                        TO  WRK-SEIKYU
+           IF    ( SPA-I01-I04-PROCKBN =   "2" )
+            AND  ( SPA-I0-SYUNOU-UPDFLG (IDX7)  =   ZERO )
+            AND  ( SPA-NAI-I04-SAIKEISANFLG        =   1 )
+      *
+               COMPUTE WRK-SEIKYU
+                   =   SPA-NAI-I04-SEIKYU (IDX7)
+                   +   SPA-NAI-I04-SEIKYU-MOT (IDX7)
+                   -   SPA-I0-UPD-SKYMONEY(IDX7)
+      *
+               MOVE    SYU-DENPNUM TO  WRK-DENPNUM
+           ELSE
+               COMPUTE WRK-SEIKYU
+                   =   SPA-NAI-I04-SEIKYU (IDX7)
+           END-IF
+      *
+           IF     (WRK-SEIKYU          <   ZERO )
+               MOVE    "0004"      TO  SPA-ERRCD
+               IF    ( SPA-NAI-I04-CHOSEI (IDX7 2)
+                                   NOT =   ZERO )
+                   MOVE    103     TO  SPA-GMN-I04-CUR
+               ELSE
+                   MOVE    102     TO  SPA-GMN-I04-CUR
+               END-IF
+           END-IF
+      *
+           .
+       41001-CHOSEI-SEIKYU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    入金チェック処理
