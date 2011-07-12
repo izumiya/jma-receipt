@@ -195,6 +195,12 @@
       *                                     ÊÑ¹¹¤¬¤¢¤Ã¤¿¾ì¹ç¤Îµ­ºÜÂÐ±þ
       *                                     Ë¡ÊÌÈÖ¹æ¡¢Å¬ÍÑ³«»ÏÆü¤Î½ç¤È¤¹¤ë
       *                                     ¡ÊÁ´¹ñ¸øÈñ¤Î¤ß¡Ë 
+      *  04.05.09    NACL-Æ£¸¶    11/07/12  ¿·³ã¸©ÂÐ±þ
+      *                                     ¹ñÊÝ¡¢¸å´ü¹âÎð¼Ô¤Î¤È¤­
+      *                                     Ë¡ÊÌ£¸£°¡¢£¸£²¡¢£¸£´¡¢£¸£¶¡¢
+      *                                     £°£°¤Ï¸øÈñÀÁµá½ñ¤âºîÀ®¤¹¤ë  
+      *  04.05.10    NACL-Æ£¸¶    11/07/12  »³Íü¸©¤ÎÃÏÊý¸øÈñÂÐ±þ
+      *                                     £²£´£±¤È£±£´£³¤Îµ­ºÜ½ç
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     ¥­¡¼¤Ëkohid ÄÉ²Ã
@@ -1385,6 +1391,24 @@ grpsys                                             SPA-AREA
                                           WRK-SEIKYU-KOHID    (2 IDZ)
                            MOVE    1                      TO  FLG-KOH 
                        END-IF
+      *                ¿·³ã¸©¤Î¹ñÊÝ¡¢¸å´ü¹âÎð¼Ô¤Î¤È¤­
+      *               ¡ÊË¡ÊÌ£¸£°¡¢£¸£²¡¢£¸£´¡¢£¸£¶¡¢£°£°¡Ë
+                       IF    ( COMB-HKNNUM     =   "060"   OR  "067"
+                                               OR  "039"             )
+                       AND   ( SYS-1001-PREFNUM
+                                               =   "15"              )
+                       AND   ( HKN-HBTNUM      =   "80"    OR  "82"
+                                               OR  "84"    OR  "96"
+                                               OR  "00"              )    
+                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
+                                               >=  "1" AND <=  "8"   )
+                           ADD     1                      TO  IDZ    
+                           MOVE    COMB-KOHHKNNUM (IDX)   TO 
+                                          WRK-SEIKYU-KOHHKNNUM(2 IDZ)
+                           MOVE    COMB-KOHID     (IDX)   TO
+                                          WRK-SEIKYU-KOHID    (2 IDZ)
+                           MOVE    1                      TO  FLG-KOH 
+                       END-IF
                    END-IF    
                ELSE
                    ADD     1                      TO  IDZ    
@@ -2292,15 +2316,24 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                                        END-IF
                                    END-IF
                                ELSE
+      *                          »³Íü¸©¤ÎÃÏÊý¸øÈñ¡Ê£²£´£±¡Ü£±£´£³¡Ë
+                                 IF    ( SYS-1001-PREFNUM    =   "19"  ) 
+                                 AND   ( WRK-KOHHKNNUM-O (IDX)
+                                                             =   "241" )
+                                 AND   ( WRK-KOHHKNNUM-O (IDY)
+                                                             =   "143" )
+                                     CONTINUE
+                                 ELSE
       *
-                                 IF      WRK-KOHHKNNUM-O (IDX)
+                                   IF      WRK-KOHHKNNUM-O (IDX)
                                                >   WRK-KOHHKNNUM-O (IDY)
-                                   MOVE    WRK-KOHI-TBL(IDX)
+                                     MOVE    WRK-KOHI-TBL(IDX)
                                                    TO  WRK-KOHI
-                                   MOVE    WRK-KOHI-TBL(IDY)
+                                     MOVE    WRK-KOHI-TBL(IDY)
                                                    TO  WRK-KOHI-TBL(IDX)
-                                   MOVE    WRK-KOHI
+                                     MOVE    WRK-KOHI
                                                    TO  WRK-KOHI-TBL(IDY)
+                                   END-IF
                                  END-IF
                                END-IF
                            END-IF

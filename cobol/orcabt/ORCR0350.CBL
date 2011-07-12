@@ -316,6 +316,9 @@
       *  04.05.24    NACL-藤原    11/04/20  災害対応
       *                                     災害該当レセプトのレセ電デー
       *                                     タ作成対応
+      *  04.05.25    NACL-藤原    11/07/12  愛知県対応
+      *                                     法別番号を判定して受給者番号
+      *                                     にゼロを編集するのを中止
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -3244,15 +3247,15 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    受給者番号                             
-           IF    ( RECE62-PREFNUM      =   "23"                    )
-           AND   ( RECE62-TEISYUTUSAKI =   "2"                     )
-           AND   ( RECE62-KOHNUM (IDY) (1:1)
-                                       >=  "1" AND <= "8"          )
-           AND   ( RECE62-KOHHBTNUM (IDY)
-                                       =   "81" OR  "82"  OR 
-                                           "83" OR  "84"  OR  "85" )
-               MOVE    "0000000"           TO  WRK-DATA
-           ELSE                          
+      *****IF    ( RECE62-PREFNUM      =   "23"                    )
+      *****AND   ( RECE62-TEISYUTUSAKI =   "2"                     )
+      *****AND   ( RECE62-KOHNUM (IDY) (1:1)
+      *****                            >=  "1" AND <= "8"          )
+      *****AND   ( RECE62-KOHHBTNUM (IDY)
+      *****                            =   "81" OR  "82"  OR 
+      *****                                "83" OR  "84"  OR  "85" )
+      *****    MOVE    "0000000"           TO  WRK-DATA
+      *****ELSE                          
                IF      RECE62-KOHJKYSNUM  (IDY)
                                            NOT =   SPACE
                    INITIALIZE              ORCSKANACHKAREA
@@ -3271,7 +3274,7 @@
                        END-IF
                    END-IF
                END-IF
-           END-IF
+      *****END-IF
            EVALUATE    RECE62-2006-RECEDEN-JKYSNUMKBN  (IDY)
                WHEN    SPACE
                    CONTINUE

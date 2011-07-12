@@ -1410,6 +1410,23 @@
                                           WRK-SEIKYU-KOHID    (2 IDZ)
                            MOVE    1                      TO  FLG-KOH 
                        END-IF
+      *                ÆàÎÉ¸©¤Î¹ñÊÝ¡¢¸å´ü¹âÎð¼Ô¤Î¤È¤­
+      *               ¡ÊË¡ÊÌ£·£±¡ÊÆýÍÄ»ù¡Ë¡¢£¸£±¡Ê¾ã³²¡Ë¡¢£¹£±¡ÊÊì»Ò¡Ë¡Ë
+                       IF    ( COMB-HKNNUM     =   "060"   OR  "067"
+                                               OR  "039"             )
+                       AND   ( SYS-1001-PREFNUM
+                                               =   "29"              )
+                       AND   ( HKN-HBTNUM      =   "71"    OR  "81"
+                                               OR  "91"              )    
+                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
+                                               >=  "1" AND <=  "8"   )
+                           ADD     1                      TO  IDZ    
+                           MOVE    COMB-KOHHKNNUM (IDX)   TO 
+                                          WRK-SEIKYU-KOHHKNNUM(2 IDZ)
+                           MOVE    COMB-KOHID     (IDX)   TO
+                                          WRK-SEIKYU-KOHID    (2 IDZ)
+                           MOVE    1                      TO  FLG-KOH 
+                       END-IF
                    END-IF    
                ELSE
                    ADD     1                      TO  IDZ    
@@ -2820,15 +2837,23 @@
                                        END-IF
                                    END-IF
                                ELSE
-      *
-                                 IF      WRK-KOHHKNNUM-O (IDX)
+      *                          »³Íü¸©¤ÎÃÏÊý¸øÈñ¡Ê£²£´£±¡Ü£±£´£³¡Ë
+                                 IF    ( SYS-1001-PREFNUM    =   "19"  ) 
+                                 AND   ( WRK-KOHHKNNUM-O (IDX)
+                                                             =   "241" )
+                                 AND   ( WRK-KOHHKNNUM-O (IDY)
+                                                             =   "143" )
+                                     CONTINUE
+                                 ELSE
+                                   IF      WRK-KOHHKNNUM-O (IDX)
                                                >   WRK-KOHHKNNUM-O (IDY)
-                                   MOVE    WRK-KOHI-TBL(IDX)
+                                     MOVE    WRK-KOHI-TBL(IDX)
                                                    TO  WRK-KOHI
-                                   MOVE    WRK-KOHI-TBL(IDY)
+                                     MOVE    WRK-KOHI-TBL(IDY)
                                                    TO  WRK-KOHI-TBL(IDX)
-                                   MOVE    WRK-KOHI
+                                     MOVE    WRK-KOHI
                                                    TO  WRK-KOHI-TBL(IDY)
+                                   END-IF
                                  END-IF
                                END-IF
                            END-IF
