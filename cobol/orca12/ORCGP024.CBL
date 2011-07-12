@@ -791,6 +791,7 @@
       *
            IF      SPA-FTN2-MAX        =   ZERO
                MOVE    ZERO                TO  SPA-GMN24-FTNSELNUM
+               MOVE    ZERO                TO  SPA-NAI24-FTNSELNUM
                MOVE    ZERO                TO  SPA-MAE24-FTNSELNUM
            END-IF
       *
@@ -3612,11 +3613,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    32                  TO  SPA-GMN24-CUR
            END-IF
       *    ÂÐ¾Ý¸øÈñ¤Î´ü´Ö¤Ç¤¢¤ë¤³¤È
-           IF      SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
-                                           >   SPA-NAI24-FTNSTYMD
+           IF     (SPA-NAI24-FTNSELNUM     =   ZERO     )
+             AND  (SPA-ERRCD               =   SPACE    )
+               MOVE    "2430"              TO  SPA-ERRCD
+               MOVE    30                  TO  SPA-GMN24-CUR
+               GO      TO      41031-FTNSTYMD-EXT
+           END-IF
+      *
+           IF     (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >   SPA-NAI24-FTNSTYMD )
+             AND  (SPA-ERRCD               =   SPACE    )
                MOVE    "2432"              TO  SPA-ERRCD
                MOVE    32                  TO  SPA-GMN24-CUR
-               GO      TO      41031-FTNSTYMD-EXT
            END-IF
            .
        41031-FTNSTYMD-EXT.
@@ -3637,6 +3645,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF    ( SPA-GMN24-FTNEDYMD  =   SPACE )  AND
                  ((FLG-TOUROKU     NOT =   ZERO  )  OR
                   (WRK-MCP-WIDGET      =   "P024_FTNTEKEDYMD"))
+             AND  (SPA-NAI24-FTNSELNUM >   ZERO     )
       *        ¸øÈñ¤Î½ªÎ»Æü
                MOVE    SPA-GMN24-TKOHEDYMD (SPA-NAI24-FTNSELNUM)
                                            TO  SPA-GMN24-FTNEDYMD
@@ -3669,6 +3678,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO      41031-FTNEDYMD-EXT
            END-IF
       *    ÂÐ¾Ý¸øÈñ¤Î´ü´Ö¤Ç¤¢¤ë¤³¤È
+           IF     (SPA-NAI24-FTNSELNUM     =   ZERO     )
+             AND  (SPA-ERRCD               =   SPACE    )
+               MOVE    "2430"              TO  SPA-ERRCD
+               MOVE    30                  TO  SPA-GMN24-CUR
+               GO      TO      41031-FTNEDYMD-EXT
+           END-IF
+      *
            IF      SPA-NAI24-TKOHEDYMD (SPA-NAI24-FTNSELNUM)
                                            <   SPA-NAI24-FTNEDYMD
                MOVE    "2433"              TO  SPA-ERRCD
@@ -3707,7 +3723,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SNUM-OUTNUM      TO  WRK-Z7
                MOVE    WRK-Z7           TO  SPA-GMN24-GAIJGNGAK
       *        ¸º³Û³ä¹ç¤Î»þ¡¢£±£°£°¤Þ¤Ç
-               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+               IF     (SPA-NAI24-FTNSELNUM >   ZERO  )
+                 AND  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "960"   )
                    IF      SPA-NAI24-GAIJGNGAK  >=  ZERO
                                            AND  <=  100
@@ -3743,7 +3760,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SNUM-OUTNUM      TO  WRK-Z7
                MOVE    WRK-Z7           TO  SPA-GMN24-NYUJGNGAK
       *        ¸º³Û³ä¹ç¤Î»þ¡¢£±£°£°¤Þ¤Ç
-               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+               IF     (SPA-NAI24-FTNSELNUM >   ZERO  )
+                 AND  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "960"   )
                    IF      SPA-NAI24-NYUJGNGAK  >=  ZERO
                                            AND  <=  100
@@ -3937,6 +3955,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¸øÈñÉéÃ´¹¹¿·Á°¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
        41093-KOHFTN-CHK-SEC             SECTION.
+      *
+      *    ¸øÈñÁªÂòÈÖ¹æ
+           IF      SPA-NAI24-FTNSELNUM =   ZERO
+               MOVE    "2430"              TO  SPA-ERRCD
+               MOVE    30                  TO  SPA-GMN24-CUR
+               GO      TO      41093-KOHFTN-CHK-EXT
+           END-IF
       *
            IF     (SPA-NAI24-FTNSTYMD  =   SPACE )  OR
                   (SPA-NAI24-FTNEDYMD  =   SPACE )
