@@ -2021,6 +2021,19 @@
                    WHEN    "7"
                        MOVE    "700"       TO  SPA-COM-SRYSYUKBN(IDX)
                END-EVALUATE
+      *!
+      *         労災コードの円変換
+               IF     (SPA-HKNKBN          =   1  )
+                 AND  (SPA-COM-INPUTCD (IDX)(1:3)  =   "101")
+                 AND  (SPA-COM-TNSSRYKBN(IDX)  NOT =   "97" )
+                   IF     (SPA-COM-TENSIKIBETU(IDX)    =   "1"  )
+      *                金額を点数へ置換える
+                       COMPUTE SPA-COM-KISOTEN(IDX)    =   SPA-COM-TEN
+                                                             (IDX)
+                                                       /   10
+                   END-IF
+               END-IF
+      *!
            END-IF
       *
       *    初診時ブラッシング料判定
