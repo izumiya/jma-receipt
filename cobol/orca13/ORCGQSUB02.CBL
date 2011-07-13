@@ -1671,7 +1671,7 @@
                   "')) OR "
                   "((C.SRYYMD <= '"
                   WRK-EDSRYYMD
-                  "') AND (C.TENKIYMD = ''"
+                  "') AND (TRIM(C.TENKIYMD) = ''"
                   "))) AND (C.DLTFLG = ' ') AND "
            DELIMITED   BY  SIZE
            INTO        WRK-SQL
@@ -1778,9 +1778,9 @@
                           WRK-SQL-TBL-NAME         DELIMITED BY SPACE
                           ".SRYYMD <= '"           DELIMITED BY SIZE
                           WRK-EDSRYYMD             DELIMITED BY SIZE
-                          "') AND ("               DELIMITED BY SIZE
+                          "') AND (TRIM("          DELIMITED BY SIZE
                           WRK-SQL-TBL-NAME         DELIMITED BY SPACE
-                          ".TENKIYMD = ''"         DELIMITED BY SIZE
+                          ".TENKIYMD) = ''"        DELIMITED BY SIZE
                           "))) AND ("              DELIMITED BY SIZE
                           WRK-SQL-TBL-NAME         DELIMITED BY SPACE
                           ".DLTFLG = ' ') AND "    DELIMITED BY SIZE
