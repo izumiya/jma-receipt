@@ -342,6 +342,7 @@
       *  04.05.15    NACL-ÌçÏÆ    11/04/14  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ·×»»½¤Àµ
       *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *  04.05.16    NACL-ÌçÏÆ    11/05/11  ¥Þ¥ëÄ¹·×»»½¤Àµ
+      *  04.05.17    NACL-ÌçÏÆ    11/07/19  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/09/02  ½Ð»º°é»ù°ì»þ¶âÄ¾ÀÜ»ÙÊ§À©ÅÙ¡Ê³°Íè¡Ë
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
@@ -426,6 +427,8 @@
            03  WK-CYOKI-TOKU75         PIC 9(08).
            03  WK-CYOKI-ENTANI-TOKU75  PIC 9(08).
            03  WK-CYOKI-ZAN-XXX        PIC 9(08).
+           03  WK-HIKAKU-KINGAKU       PIC 9(07).
+           03  WK-KEISAN-FTNRATE       PIC 9(03).
       *    Ä´À°¶âºÆ·×»»
            03  WRK-SYU-CHOSEI          PIC S9(07).
            03  WRK-SYU-CHOSEI2         PIC S9(07).
@@ -491,6 +494,7 @@
            03  FLG-TOKU75-KIZON        PIC 9(01).
            03  FLG-TOKU75-CYO          PIC 9(01).
            03  FLG-KEISAN-TAI          PIC 9(01).
+           03  FLG-KEISAN-TAI2         PIC 9(01).
            03  FLG-RUITAISYO           PIC 9(01).
            03  FLG-KOKI-HIGAITO        PIC 9(01).
            03  FLG-CYOKI-ARI           PIC 9(01).
@@ -10295,6 +10299,20 @@
              END-IF
            END-IF.
       *
+           MOVE      ZERO        TO  FLG-KEISAN-TAI2.
+           IF    (COMB-HKNNUM      =   "039")
+           AND   (SYU-SYUHKNNUM    =   "039")
+               IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM3-TBL
+                  MOVE     1     TO  FLG-KEISAN-TAI2
+               END-IF
+           ELSE
+             IF   FLG-KOUREI-KBN   =   "1"
+               IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
+                  MOVE     1     TO  FLG-KEISAN-TAI2
+               END-IF
+             END-IF
+           END-IF.
+      *
       *    ¸øÈñ£É£ÄÊÔ½¸
            PERFORM  22027-KOHID-HENSYU-SEC.
       *
@@ -10995,14 +11013,47 @@
                    AND (SYU-KOH3HKNNUM      =  SPACE         )
                    AND (SYU-KOH4HKNNUM      =  SPACE         )
                    AND (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM)
+                   AND (FLG-KEISAN-TAI2     =  1             )
+                   AND (LNK-SYU-SRYYMD(1:6) >=  "200804"     )
                      IF  (LNK-S01-SAIKEISAN-KBN   =   "1" )
                      AND (LNK-SYU-DENPNUM     NOT =  ZERO )
                      AND (LNK-SYU-DENPNUM   <  SYU-DENPNUM)
                          CONTINUE
                      ELSE
-                         MOVE  1  TO   FLG-KEISAN-TAI
+                         MOVE     ZERO       TO    WK-KEISAN-FTNRATE
+                         EVALUATE   COMB-HOJOKBN
+                           WHEN   "1"
+                           WHEN   "4"
+                           WHEN   "9"
+                             MOVE     10     TO    WK-KEISAN-FTNRATE
+                             IF  FLG-SANSHOU3   =   SPACE
+                                MOVE   2     TO    FLG-KEISAN-TAI
+                             ELSE
+                                MOVE   3     TO    FLG-KEISAN-TAI
+                             END-IF
+                           WHEN   "2"
+                           WHEN   "5"
+                           WHEN   "8"
+                             MOVE     20     TO    WK-KEISAN-FTNRATE
+                             IF   FLG-KEIKASOCHI-IPAN  =  1
+                                MOVE   2     TO    FLG-KEISAN-TAI
+                             ELSE
+                                MOVE   1     TO    FLG-KEISAN-TAI
+                             END-IF
+                           WHEN   "3"
+                           WHEN   "6"
+                           WHEN   "7"
+                             MOVE     30     TO    WK-KEISAN-FTNRATE
+                             IF   FLG-KEIKASOCHI-IPAN  =  1
+                                MOVE   2     TO    FLG-KEISAN-TAI
+                             ELSE
+                                MOVE   1     TO    FLG-KEISAN-TAI
+                             END-IF
+                         END-EVALUATE
+                         COMPUTE  WK-FUTANWARI  =  WK-KEISAN-FTNRATE
+                                                /  100
                          COMPUTE  WK-TOTAL-KINGAKU2
-                               =  SYU-TOTAL-HKNTEN  * 10 * 0.1
+                               =  SYU-TOTAL-HKNTEN  * 10 * WK-FUTANWARI
                          COMPUTE  WK-TOTAL-KINGAKU2 =
                                   WK-TOTAL-KINGAKU2 + 5
                          COMPUTE  WK-TOTAL-KINGAKU2 =
@@ -11010,7 +11061,7 @@
                          COMPUTE  WK-TOTAL-KINGAKU2 =
                                   WK-TOTAL-KINGAKU2 * 10
                          COMPUTE  WK-TOTAL-KINGAKU2-EN
-                               =  SYU-TOTAL-HKNTEN  * 10 * 0.1
+                               =  SYU-TOTAL-HKNTEN  * 10 * WK-FUTANWARI
                          ADD  WK-TOTAL-KINGAKU2
                                   TO  WK-TOTAL-KINGAKU
                          ADD  WK-TOTAL-KINGAKU2-EN
@@ -18125,27 +18176,33 @@
              END-IF
       *
              IF  (LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"     )
-             AND (FLG-SANSHOU3      NOT =   SPACE        )
-             AND (COMB-HKNNUM           =  "039"         )
              AND (COMB-KOH1HKNNUM       =  "191" OR "291")
              AND (COMB-KOH2HKNNUM       =   SPACE        )
              AND (COMB-KOH3HKNNUM       =   SPACE        )
              AND (COMB-KOH4HKNNUM       =   SPACE        )
-             AND (FLG-KEISAN-TAI        =   1            )
-                IF   WK-TOTAL-KINGAKU     > 8000
+             AND (FLG-KEISAN-TAI    NOT =   ZERO         )
+                EVALUATE  FLG-KEISAN-TAI
+                  WHEN       1
+                    MOVE    44400    TO    WK-HIKAKU-KINGAKU
+                  WHEN       2
+                    MOVE    12000    TO    WK-HIKAKU-KINGAKU
+                  WHEN       3
+                    MOVE     8000    TO    WK-HIKAKU-KINGAKU
+                END-EVALUATE
+                IF   WK-TOTAL-KINGAKU     >   WK-HIKAKU-KINGAKU
                    MOVE   ZERO   TO  ZAN-KOHI1
                 ELSE
-                   COMPUTE  WK-TOTAL-KINGAKU3 = 8000
+                   COMPUTE  WK-TOTAL-KINGAKU3 = WK-HIKAKU-KINGAKU
                                               - WK-TOTAL-KINGAKU
                    IF  WK-TOTAL-KINGAKU3    <   ZAN-KOHI1
                       MOVE   WK-TOTAL-KINGAKU3     TO  ZAN-KOHI1
                    END-IF
                 END-IF
-                IF   WK-TOTAL-KINGAKU-EN  > 8000
+                IF   WK-TOTAL-KINGAKU-EN  >   WK-HIKAKU-KINGAKU
                    MOVE   ZERO   TO  ZAN-KOHI12
                    MOVE   ZERO   TO  ZAN-KOHI13
                 ELSE
-                   COMPUTE  WK-TOTAL-KINGAKU3 = 8000
+                   COMPUTE  WK-TOTAL-KINGAKU3 = WK-HIKAKU-KINGAKU
                                               - WK-TOTAL-KINGAKU-EN
                    IF  WK-TOTAL-KINGAKU3    <   ZAN-KOHI12
                       MOVE   WK-TOTAL-KINGAKU3     TO  ZAN-KOHI12
