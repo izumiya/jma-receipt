@@ -24,6 +24,9 @@
       *  03.05.01    NACL-藤原    07/07/10  器材点数追加
       *
       *  04.05.01    NACL-藤原    09/11/27  レセ電コメント拡張対応
+      *
+      *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
+      *                                     kohid 追加
       ************************************************************
        01  ORCSRECESORTAREA.
       *
@@ -59,6 +62,7 @@
                                                              PIC 9(04).
                            11  ORCSRECESORT-IN-KEY-HKNJANUM  PIC X(08).
                            11  ORCSRECESORT-IN-KEY-HOJOKBN   PIC X(01).
+                           11  ORCSRECESORT-IN-KEY-KOHID     PIC 9(10).
                            11  ORCSRECESORT-IN-KEY-TEKSTYMD  PIC X(08). 
                            11  ORCSRECESORT-IN-KEY-ZAINUM    PIC 9(08).
                            11  ORCSRECESORT-IN-KEY-ZAIREN    PIC 9(02).
@@ -114,6 +118,7 @@
                                                        PIC 9(04).
                            11  ORCSRECESORT-KEY-HKNJANUM   PIC X(08).
                            11  ORCSRECESORT-KEY-HOJOKBN    PIC X(01).
+                           11  ORCSRECESORT-KEY-KOHID      PIC 9(10).
                            11  ORCSRECESORT-KEY-TEKSTYMD   PIC X(08). 
                            11  ORCSRECESORT-KEY-ZAINUM     PIC 9(08).
                            11  ORCSRECESORT-KEY-ZAIREN     PIC 9(02).
