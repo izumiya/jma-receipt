@@ -508,6 +508,9 @@
       *  04.05.29    NACL-ÌçÏÆ    11/06/21  ²èÁü¿ÇÃÇ¡¦ÅÅ»Ò²èÁü´ÉÍý²Ã»»¤Î
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
       *  04.05.30    NACL-ÌçÏÆ    11/07/05  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕÂÐ¾ÝÊÔ½¸½¤Àµ
+      *  04.05.31    NACL-ÌçÏÆ    11/07/19  ·îÅÓÃæÊÝ¸±ÊÑ¹¹»þ¤Î
+      *                                     ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âµ­ºÜÊÔ½¸½¤Àµ
+      *  04.05.32    NACL-ÌçÏÆ    11/07/19  ¸øÈñÍó¡Ý°ìÉôÉéÃ´¶âµ­ºÜÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -15761,6 +15764,51 @@
       *
            IF   IDZ  =  1
             EVALUATE   WRK-PREFNUM
+      *
+             WHEN    "29"
+      *
+                IF    RECE62-TEISYUTUSAKI   =   2 OR 6
+                   PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                               UNTIL    KOHFTN-IDX     >    4
+      *
+                     IF   RECE62-KOHHBTNUM(KOHFTN-IDX) =  "71" OR "81"
+                                                       OR "91"
+                       IF   RECE62-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
+                        MOVE  ZERO  TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                        MOVE  SPACE TO
+                                    RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                       END-IF
+                     END-IF
+      *
+                   END-PERFORM
+                END-IF
+      *
+             WHEN    "32"
+      *
+                PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                            UNTIL    KOHFTN-IDX     >    4
+      *
+                  IF ((RECE62-KOHNUM(KOHFTN-IDX)           = "393") AND
+                      (RECE62-KOHFTNJANUM(KOHFTN-IDX)(1:7)
+                                                       = "9032005") AND
+                      (RECE62-SRYYM                   >=  "201007") AND
+                      (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
+                  OR ((RECE62-KOHNUM(KOHFTN-IDX)           = "493") AND
+                      (RECE62-KOHFTNJANUM(KOHFTN-IDX)(1:7)
+                                                       = "9032002") AND
+                      (RECE62-SRYYM                   >=  "201107") AND
+                      (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
+                  OR ((RECE62-KOHNUM(KOHFTN-IDX)           = "790") AND
+                      (RECE62-SRYYM                   >=  "201107") AND
+                      (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
+                    IF   RECE62-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
+                      MOVE  ZERO  TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                      MOVE  SPACE TO
+                                  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    END-IF
+                  END-IF
+      *
+                END-PERFORM
       *
              WHEN    "35"
       *
