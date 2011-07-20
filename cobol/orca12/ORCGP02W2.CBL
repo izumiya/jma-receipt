@@ -98,6 +98,11 @@
       *  04.05.01    NACL-ÌçÏÆ    10/02/17  À¸ÊÝÅ¬ÍÑ´ü´Ö¤Î¼ÒÊÝÃ±ÆÈ¤Î
       *                                     ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»ºîÀ®
       *  04.05.02    NACL-ÌçÏÆ    11/03/02  »³Íü¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.03    NACL-ÌçÏÆ    11/07/20  Ä¹ºê¸©186ÈïÇú¤ÈÃÏÊý¸øÈñ¤Î
+      *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
+      *  04.05.04    NACL-ÌçÏÆ    11/07/20  019¸¶Çú¤ÈÃÏÊý¸øÈñ¤Î
+      *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
+      *
       *  04.06.01    NACL-¾®Æ¦Âô  11/07/04  ¹¹Àµ¤ÈÆÃÄê¼À´µÉéÃ´Ìµ¡Ê¿åËó¡Ë¤Î
       *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
       *****************************************************************
@@ -3694,57 +3699,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                            END-IF
                           END-IF
                        ELSE
-      *******************ÃÏÊý¸øÈñ
-                           IF  WRK-SRT-HJO-KOHNO  =  "091"
-                              IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
-                                              >=  "1" AND <=  "8"
-                                  PERFORM 5701413-SYUKOH-HJO-SEC
-                              END-IF
-                           ELSE
-                              IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
-                                  PERFORM 5701413-SYUKOH-HJO-SEC
-                              END-IF
-                           END-IF
-      **                   EVALUATE  SPA-PREFNUM
-      **                    WHEN     01
-      **                      IF  WRK-SRT-HJO-KOHNO  =  "091"
-      **                       IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(2:2)
-      **                                                    = "41"
-      **                          PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                      ELSE
-      **                       IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
-      **                          PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                      END-IF
-      **                    WHEN     27
-      **                    WHEN     33
-      **                      IF  WRK-SRT-HJO-KOHNO  =  "091"
-      **                       IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
-      **                                       >=  "1" AND <=  "8"
-      **                          PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                      ELSE
-      **                       IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
-      **                          PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                      END-IF
-      **                    WHEN     45
-      **                      IF  WRK-SRT-HJO-KOHNO  =  "091"
-      **                       IF WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(2:2)
-      **                                                    = "95"
-      **                          PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                      ELSE
-      **                       IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
-      **                          PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                      END-IF
-      **                    WHEN     OTHER
-      **                       IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
-      **                         PERFORM 5701413-SYUKOH-HJO-SEC
-      **                       END-IF
-      **                   END-EVALUATE
+      ******************  ÃÏÊý¸øÈñ
+                          IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
+                                PERFORM 5701413-SYUKOH-HJO-SEC
+                          END-IF
                        END-IF
                       END-IF
       *
@@ -4656,13 +4614,21 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "3"            TO  WRK-FTN-FLG
                 END-IF
              END-IF
-      **     IF   SPA-PREFNUM  =  01 OR 33 OR 45 OR 27
+             IF   SPA-PREFNUM  =  42
                IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
-               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "186"))
+               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "186" )
                    MOVE    "3"            TO  WRK-FTN-FLG
                END-IF
-      **     END-IF
+             END-IF
+             IF    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
+             OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
+             OR    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "019"))
+             OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "019" )
+                   MOVE    "3"            TO  WRK-FTN-FLG
+             END-IF
            END-IF
       *
            IF    FLG-HANTEI   =    2
