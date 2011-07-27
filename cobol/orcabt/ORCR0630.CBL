@@ -96,6 +96,8 @@
       *                                     ½¸·×ÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    10/09/06  ÃÏÊý¸øÈñ¤ÎÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ
       *                                     ½¸·×ÂÐ±þ¡Ê¥ì¥»ÅÅÉéÃ´¶èÊ¬ÂÐ±þ¡Ë
+      *  04.05.04    NACL-ÌçÏÆ    11/08/01  ÆñÉÂ´µ¼ÔÅùÆþ±¡¿ÇÎÅ²Ã»»ÂÐ±þ
+      *
       *  04.06.01    NACL-ÌçÏÆ    10/12/13  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
       *
@@ -1116,12 +1118,6 @@
                                 END-IF
                                 PERFORM   2001114-RECE62-TENSOU12-SEC
                            END-IF
-                           IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
-                                (ACCT-ZAIKAISU  NOT =    ZERO)
-                                IF   ACCT-SRYKBN  =  "90" OR "92"   
-                                    PERFORM   2001115-NYUINRYO-TAIHI-SEC
-                                END-IF
-                           END-IF
                            MOVE    10              TO    IDX1
                        END-IF
                    END-PERFORM
@@ -1423,36 +1419,6 @@
            END-PERFORM
            .
        2001114-RECE62-TENSOU12-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ¿ÇÎÅ²ñ·×¤ÎÆþ±¡ÎÁÅù¤ÎÂàÈò½èÍý
-      *****************************************************************
-       2001115-NYUINRYO-TAIHI-SEC                 SECTION.
-      *
-           IF       (ACCT-SRYCDTOTAL    =    190080470
-                                        OR   190799670
-                                        OR   190080570
-                                        OR   190799770
-                                        OR   190111690
-                                        OR   190809090
-                                        OR   190111790
-                                        OR   190809190)
-           OR       (ACCT-ZAIKBN        =    2        )
-                CONTINUE
-           ELSE
-                PERFORM    VARYING   ACCT-IDX   FROM   1    BY   1
-                                 UNTIL    ACCT-IDX   >      31
-                   IF  ACCT-DAY(1 ACCT-IDX)   NOT =    ZERO
-                         COMPUTE  WRK-ACCT90(ACCT-IDX) = 
-                                  WRK-ACCT90(ACCT-IDX) +
-                                 (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                   END-IF
-                END-PERFORM
-           END-IF
-      *
-           .
-       2001115-NYUINRYO-TAIHI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2050,6 +2016,7 @@
                       COMPUTE  WRK-NYUTOKRYO = WRK-NYUTOKRYO
                                              + WRK-DAY6-ZAITEN(IDY)
                   END-IF
+                  PERFORM 200112411-NYUINRYO-TAIHI-SEC
                   IF  WRK-ACCT90(IDY)        NOT =  ZERO
                       COMPUTE  WRK-NYUTOKRYO = WRK-NYUTOKRYO
                                              + WRK-ACCT90(IDY)
@@ -2148,6 +2115,56 @@
       *
            .
        20011241-NYUINACCT-GET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¤ÎÆþ±¡ÎÁ²Ã»»¤ÎÂàÈò½èÍý
+      *****************************************************************
+       200112411-NYUINRYO-TAIHI-SEC                 SECTION.
+      *
+           MOVE    ZERO                  TO   WRK-ACCT90(IDY)
+      *
+           INITIALIZE                         SRYACCT-REC
+           MOVE    RECE62-HOSPNUM        TO   ACCT-HOSPNUM
+           MOVE    RECE62-NYUGAIKBN      TO   ACCT-NYUGAIKBN
+           MOVE    RECE62-PTID           TO   ACCT-PTID
+           MOVE    RECE62-SRYYM          TO   ACCT-SRYYM
+           MOVE    RECE62-HKNCOMBI(IDX1) TO   ACCT-HKNCOMBI
+           MOVE    SRYACCT-REC           TO   MCPDATA-REC
+           MOVE    "tbl_sryacct"         TO   MCP-TABLE
+           MOVE    "key58"               TO   MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC                =    ZERO
+               MOVE    "tbl_sryacct"     TO   MCP-TABLE
+               MOVE    "key58"           TO   MCP-PATHNAME
+               PERFORM  900-SRYACCT-READ-SEC
+               PERFORM  UNTIL   FLG-SRYACCT  =  1
+                 IF   (ACCT-ZAIKBN     NOT =  1 AND 2     )
+                 AND  (ACCT-ZAITEN     NOT =  ZERO        )
+                 AND  (ACCT-ZAIKAISU   NOT =  ZERO        )
+                 AND  (ACCT-DAY(1 IDY) NOT =  ZERO        )
+                   IF  ACCT-SRYCDTOTAL  =  190080470  OR  190799670  OR
+                                           190080570  OR  190799770  OR
+                                           190111690  OR  190809090  OR
+                                           190111790  OR  190809190
+                      CONTINUE
+                   ELSE
+                      COMPUTE  WRK-ACCT90(IDY) =
+                               WRK-ACCT90(IDY) +
+                              (ACCT-ZAITEN * ACCT-DAY(1 IDY))
+                   END-IF
+                 END-IF
+                 MOVE    "tbl_sryacct"     TO   MCP-TABLE
+                 MOVE    "key58"           TO   MCP-PATHNAME
+                 PERFORM  900-SRYACCT-READ-SEC
+               END-PERFORM
+           END-IF
+           MOVE    "tbl_sryacct"    TO  MCP-TABLE
+           MOVE    "key58"          TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       200112411-NYUINRYO-TAIHI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2634,8 +2651,8 @@
                             UNTIL    ACCT-IDX   >      31
                         IF  ((WRK-DAY1(ACCT-IDX)   NOT =  ZERO   ) OR
                              (RECE62-NYUINDAY-KBN(ACCT-IDX) = "1"))
-                        AND ( WRK-DAY5(ACCT-IDX) =
-                                           RECE62-HKNCOMBI (IDX1) )
+      ***               AND ( WRK-DAY5(ACCT-IDX) =
+      ***                                  RECE62-HKNCOMBI (IDX1) )
                         AND ( ACCT-DAY(1 ACCT-IDX) NOT =  ZERO    )
                             PERFORM      20011261-SRYACCT-GET-SEC
                         END-IF
@@ -2672,8 +2689,8 @@
                                 UNTIL    ACCT-IDX   >      31
                           IF  ((WRK-DAY1(ACCT-IDX)   NOT =  ZERO   ) OR
                                (RECE62-NYUINDAY-KBN(ACCT-IDX) = "1"))
-                          AND ( WRK-DAY5(ACCT-IDX) =
-                                           RECE62-HKNCOMBI (IDX1)   )
+      ***                 AND ( WRK-DAY5(ACCT-IDX) =
+      ***                                  RECE62-HKNCOMBI (IDX1)   )
                           AND ( ACCT-DAY(1 ACCT-IDX) NOT =  ZERO    )
                               PERFORM      20011261-SRYACCT-GET-SEC
                           END-IF
@@ -2747,6 +2764,20 @@
                     COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                              RECE62-NYUTOKKEI2(KH-IDX)  -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                 ELSE
+                  IF  WRK-DAY5(ACCT-IDX)  NOT =  RECE62-HKNCOMBI(IDX1)
+                    IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
+                    AND    KH-IDX                >   1
+                       CONTINUE
+                    ELSE
+                       COMPUTE  WRK-NYUTOKKEI2(KH-IDX)  =
+                                WRK-NYUTOKKEI2(KH-IDX)  +
+                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                    END-IF
+                    COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
+                             RECE62-NYUTOKKEI2(KH-IDX)  +
+                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                  END-IF
                  END-IF
            END-EVALUATE
       *
@@ -2961,8 +2992,8 @@
                                 IF  ((WRK-DAY1(ACCT-IDX) NOT = ZERO ) OR
                                      (RECE62-NYUINDAY-KBN(ACCT-IDX)
                                                                = "1"))
-                                AND ( WRK-DAY5(ACCT-IDX) =
-                                           RECE62-HKNCOMBI (IDX1)    )
+      ***                       AND ( WRK-DAY5(ACCT-IDX) =
+      ***                                  RECE62-HKNCOMBI (IDX1)    )
                                 AND ( ACCT-DAY(1 ACCT-IDX) NOT = ZERO)
                                         PERFORM 2001132-ACCTKHN-GET3-SEC
                                         MOVE  31  TO  ACCT-IDX

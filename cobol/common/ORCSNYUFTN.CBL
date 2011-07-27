@@ -125,6 +125,7 @@
       *  04.05.01    NACL-ÌçÏÆ    09/12/04  ¿©»ö¡ÊÆÃÊÌ¿©¡Ë¤ÎÂ¾ÊÝ¸±ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    10/01/07  ¼£¸³ÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/03/09  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.04    NACL-ÌçÏÆ    11/08/01  ÆñÉÂ´µ¼ÔÅùÆþ±¡¿ÇÎÅ²Ã»»ÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -313,6 +314,8 @@
            03  FLG-KUMIAWASE-HANTEI        PIC 9(01).
            03  FLG-KOREI-TANYUIN           PIC 9(01).
            03  FLG-KOREI-TANYUIN2          PIC 9(01).
+           03  FLG-NYUINRYO-KASAN-OK       PIC 9(01).
+           03  FLG-NYUINRYO-KASAN-CHK      PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
@@ -457,6 +460,15 @@
       *    Ê¡²¬¸©¸øÈñ¤ÎµëÉÕÂÐ¾Ý³°È½ÄêÍÑ¤Î½é¿ÇÂàÈò¥Æ¡¼¥Ö¥ë
        01  TBL-FUKUOKA.
            03  TBL-FUKUOKA-SYOSIN          PIC 9(01)  OCCURS  31.
+      *
+      *    Æþ±¡ÎÁ²Ã»»È½ÄêÍÑ¥Æ¡¼¥Ö¥ë
+       01  TBL-NYUINRYO-KASAN-AREA.
+           03  FILLER          PIC X(09)   VALUE    "190101770".
+      *
+       01  TBL-NYUINRYO-KASAN-R   REDEFINES   TBL-NYUINRYO-KASAN-AREA.
+           03  TBL-NYUINRYO-KASAN   PIC X(09)   OCCURS    1.
+      *
+       01  TBL-NYUINRYO-KASAN-MAX   PIC 9(02)   VALUE     1.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -2050,7 +2062,7 @@
                     IF   WRK-DAY1X(1 IDY)   NOT =  ZERO
                     AND  WRK-DAY5X(1 IDY)   NOT =  ZERO
                       MOVE  WRK-DAY5X(1 IDY)  TO  WRK-HKNCOMBINUM
-                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      PERFORM  HKNCOMBI-KENSAKU-SEC
                       IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
                         MOVE    1     TO   FLG-KOREI-TANYUIN2
                       ELSE
@@ -2061,7 +2073,7 @@
                     IF   WRK-DAY1X(1 IDY)       =  ZERO
                     AND  WRK-DAY5X(1 IDY)   NOT =  ZERO
                       MOVE  WRK-DAY5X(1 IDY)  TO  WRK-HKNCOMBINUM
-                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      PERFORM  HKNCOMBI-KENSAKU-SEC
                       IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
                        IF   WRK-NYUINDAY2-KBN(IDX IDY)  =   "1"
                         MOVE    1     TO   FLG-KOREI-TANYUIN2
@@ -2082,7 +2094,7 @@
                     IF   WRK-DAY1X(2 IDY)   NOT =  ZERO
                     AND  WRK-DAY5X(2 IDY)   NOT =  ZERO
                       MOVE  WRK-DAY5X(2 IDY)  TO  WRK-HKNCOMBINUM
-                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      PERFORM  HKNCOMBI-KENSAKU-SEC
                       IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
                         MOVE    1     TO   FLG-KOREI-TANYUIN2
                       ELSE
@@ -2093,7 +2105,7 @@
                     IF   WRK-DAY1X(2 IDY)       =  ZERO
                     AND  WRK-DAY5X(2 IDY)   NOT =  ZERO
                       MOVE  WRK-DAY5X(2 IDY)  TO  WRK-HKNCOMBINUM
-                      PERFORM  KOREI-TANYUIN-HKNCOMBI-SEC
+                      PERFORM  HKNCOMBI-KENSAKU-SEC
                       IF   COMB-HKNNUM  =  "971" OR "973" OR "975"
                        IF   WRK-NYUINDAY2-KBN(IDX IDY)  =   "1"
                         MOVE    1     TO   FLG-KOREI-TANYUIN2
@@ -2117,9 +2129,9 @@
            EXIT.
       *
       ******************************************************************
-      *    ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»½èÍý
+      *    ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¸¡º÷½èÍý
       ******************************************************************
-       KOREI-TANYUIN-HKNCOMBI-SEC         SECTION.
+       HKNCOMBI-KENSAKU-SEC         SECTION.
       *
            INITIALIZE                  HKNCOMBI-REC
            MOVE  LNK-S02-HOSPNUM   TO  COMB-HOSPNUM
@@ -2146,7 +2158,7 @@
       *
            .
       *
-       KOREI-TANYUIN-HKNCOMBI-EXT.
+       HKNCOMBI-KENSAKU-EXT.
            EXIT.
       *
       ******************************************************************
@@ -4552,6 +4564,8 @@ grpsys                                        SPA-AREA
            INITIALIZE                     TABLE-ZAIKAISU               
            MOVE   ZERO             TO     WRK-CHECK-STDAY
            MOVE   ZERO             TO     WRK-CHECK-EDDAY
+           MOVE   ZERO             TO     FLG-NYUINRYO-KASAN-OK
+           MOVE   ZERO             TO     FLG-NYUINRYO-KASAN-CHK
            IF   ACCT-SRYKBN  =  "90"  OR  "92"
              PERFORM   VARYING   SYU-IDX   FROM   1   BY   1
                      UNTIL      SYU-IDX   >   31
@@ -4564,12 +4578,32 @@ grpsys                                        SPA-AREA
                  AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
                      ADD   ACCT-DAY(1 SYU-IDX)
                                       TO   SINRYO-COUNT
-                     IF   SYU-SYUHKNNUM  =  "971"  OR  "973"           
+                     IF   SYU-SYUHKNNUM  =  "971" OR "973" OR "975"
                         CONTINUE                                       
                      ELSE                                              
                         MOVE  ACCT-DAY(1 SYU-IDX)                      
                                       TO   TBL-ZAIKAISU(SYU-IDX)       
                      END-IF                                            
+                 ELSE
+                   IF  ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
+                   AND ( SYU-HKNCOMBINUM       =   ACCT-HKNCOMBI )
+                   AND ( TBL-GAIHAKU(SYU-IDX)  =   ZERO   OR   4
+                                                          OR   5 )
+                   AND ( WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO )
+                     MOVE   SYU-SKYSTYMD(7:2)  TO  WRK-CHECK-STDAY
+                     MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
+                     IF     (WRK-CHECK-STDAY  <=  SYU-IDX        )
+                     AND    (SYU-IDX          <=  WRK-CHECK-EDDAY)
+                       ADD   ACCT-DAY(1 SYU-IDX)
+                                      TO   SINRYO-COUNT
+                       IF   SYU-SYUHKNNUM  =  "971" OR "973" OR "975"
+                          CONTINUE
+                       ELSE
+                          MOVE  ACCT-DAY(1 SYU-IDX)
+                                      TO   TBL-ZAIKAISU(SYU-IDX)
+                       END-IF
+                     END-IF
+                   END-IF
                  END-IF
                  IF  (ACCT-DAY(1 SYU-IDX)         NOT =  ZERO)
                  AND (WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO)
@@ -4587,7 +4621,18 @@ grpsys                                        SPA-AREA
                        CONTINUE
                      ELSE
                        IF  ACCT-ZAITEN  NOT = ZERO
-                         IF   WRK-KAIKEING(IDX) = ZERO OR 3
+                         IF   FLG-NYUINRYO-KASAN-CHK =  ZERO
+                            MOVE   ACCT-HKNCOMBI   TO   WRK-HKNCOMBINUM
+                            PERFORM  HKNCOMBI-KENSAKU-SEC
+                            IF  COMB-HKNNUM  =  "971" OR "973" OR "975"
+                              CONTINUE
+                            ELSE
+                              PERFORM   NYUINRYO-KASAN-CHECK-SEC
+                            END-IF
+                            MOVE    1    TO   FLG-NYUINRYO-KASAN-CHK
+                         END-IF
+                         IF  (WRK-KAIKEING(IDX)  = ZERO OR 3)
+                         AND (FLG-NYUINRYO-KASAN-OK  =  ZERO)
                             MOVE    1     TO    WRK-KAIKEING(IDX)
                          END-IF
                        END-IF
@@ -4597,12 +4642,32 @@ grpsys                                        SPA-AREA
                      MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
                      IF     (WRK-CHECK-STDAY  <=  SYU-IDX        )
                      AND    (SYU-IDX          <=  WRK-CHECK-EDDAY)
-                     AND    (SYU-HKNCOMBINUM   =  ACCT-HKNCOMBI  )
+                      IF  ( SYU-HKNCOMBINUM      =  ACCT-HKNCOMBI )
+                      OR  ((SYU-HKNCOMBINUM  NOT =  ACCT-HKNCOMBI) AND
+                           (WRK-HANBETU-DAY-NACCT(IDX SYU-IDX)
+                                                      NOT = SPACE))
                        IF  ACCT-ZAITEN  NOT = ZERO
-                         IF     WRK-KAIKEING(IDX) = ZERO
+                         IF   FLG-NYUINRYO-KASAN-CHK =  ZERO
+                            MOVE   ACCT-HKNCOMBI   TO   WRK-HKNCOMBINUM
+                            PERFORM  HKNCOMBI-KENSAKU-SEC
+                            IF  COMB-HKNNUM  =  "971" OR "973" OR "975"
+                              CONTINUE
+                            ELSE
+                              PERFORM   NYUINRYO-KASAN-CHECK-SEC
+                            END-IF
+                            IF  (SYU-HKNCOMBINUM  NOT =  ACCT-HKNCOMBI)
+                            AND (WRK-HANBETU-DAY-NACCT(IDX SYU-IDX)
+                                                           NOT = SPACE)
+                              MOVE  ZERO TO   FLG-NYUINRYO-KASAN-OK
+                            END-IF
+                            MOVE    1    TO   FLG-NYUINRYO-KASAN-CHK
+                         END-IF
+                         IF  (WRK-KAIKEING(IDX)      =  ZERO)
+                         AND (FLG-NYUINRYO-KASAN-OK  =  ZERO)
                             MOVE    3     TO    WRK-KAIKEING(IDX)
                          END-IF
                        END-IF
+                      END-IF
                      END-IF
                    END-IF
                  END-IF
@@ -4626,7 +4691,7 @@ grpsys                                        SPA-AREA
                      (WRK-DOJITU-FLG(IDX SYU-IDX)     =  ZERO  )
                      ADD   ACCT-DAY(1 SYU-IDX)
                                       TO   SINRYO-COUNT
-                     IF   SYU-SYUHKNNUM  =  "971"  OR  "973"           
+                     IF   SYU-SYUHKNNUM  =  "971" OR "973" OR "975"
                         CONTINUE                                       
                      ELSE                                              
                         MOVE  ACCT-DAY(1 SYU-IDX)                      
@@ -5028,6 +5093,51 @@ grpsys                                        SPA-AREA
            .
       *
        SRYACCT-SET-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    Æþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯
+      **************************************************************
+       NYUINRYO-KASAN-CHECK-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX6   FROM    1   BY  1
+                      UNTIL   (IDX6    >   TBL-NYUINRYO-KASAN-MAX)
+                       OR     (FLG-NYUINRYO-KASAN-OK =  1        )
+      *
+             INITIALIZE                      SRYACT-REC
+             MOVE    ACCT-HOSPNUM     TO     SRY-HOSPNUM
+             MOVE    ACCT-NYUGAIKBN   TO     SRY-NYUGAIKBN
+             MOVE    ACCT-PTID        TO     SRY-PTID
+             MOVE    ACCT-SRYYM       TO     SRY-SRYYM
+             MOVE    ACCT-ZAINUM      TO     SRY-ZAINUM
+             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(1)
+             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(2)
+             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(3)
+             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(4)
+             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(5)
+             MOVE    SRYACT-REC       TO     MCPDATA-REC
+             MOVE    "DBSELECT"       TO     MCP-FUNC
+             MOVE    "tbl_sryact"     TO     MCP-TABLE
+             MOVE    "key8"           TO     MCP-PATHNAME
+             CALL    "ORCDBMAIN"      USING  MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+             IF      MCP-RC           =      ZERO
+               MOVE  "tbl_sryact"     TO     MCP-TABLE
+               MOVE  "key8"           TO     MCP-PATHNAME
+               PERFORM   SRYACT-READ-SEC
+               IF    FLG-SRYACT       =      ZERO
+                   MOVE       1       TO     FLG-NYUINRYO-KASAN-OK
+               END-IF
+             END-IF
+             MOVE    "tbl_sryact"     TO     MCP-TABLE
+             MOVE    "key8"           TO     MCP-PATHNAME
+             PERFORM     CSR-CLOSE-SEC
+      *
+           END-PERFORM
+      *
+           .
+       NYUINRYO-KASAN-CHECK-EXT.
            EXIT.
       *
       **************************************************************
@@ -6355,7 +6465,7 @@ grpsys                            SPA-AREA
                     IF  ORCSTEN-ZAITEN(IDX1)  NOT =  ZERO
                         ADD    ORCSTEN-ZAITEN(IDX1)
                                       TO   SYU-HKNTEN (05)
-                        IF   SYU-SYUHKNNUM  =  "971"  OR  "973"        
+                        IF   SYU-SYUHKNNUM  =  "971" OR "973" OR "975"
                            CONTINUE                                    
                         ELSE                                           
                            ADD    ORCSTEN-ZAITEN(IDX1)                 
@@ -6376,7 +6486,7 @@ grpsys                            SPA-AREA
                       IF  (SYU-DAY(IDX2)  =   "1"  OR  "2"  )
                       AND (WRK-DOJITU-FLG(IDX IDX2)  =  ZERO)
       *
-                        IF   SYU-SYUHKNNUM  =  "971"  OR  "973"        
+                        IF   SYU-SYUHKNNUM  =  "971" OR "973" OR "975"
                            CONTINUE                                    
                         ELSE                                           
                            COMPUTE  SDAY-HKNTEN(IDX2)  =               
