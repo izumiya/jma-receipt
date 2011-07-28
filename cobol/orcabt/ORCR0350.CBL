@@ -319,6 +319,7 @@
       *  04.05.25    NACL-藤原    11/07/12  愛知県対応
       *                                     法別番号を判定して受給者番号
       *                                     にゼロを編集するのを中止
+      *  04.05.26    NACL-藤原    11/07/27  難病患者等入院診療加算対応
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -4485,6 +4486,20 @@
                                                        OR  "190128570" )
                         AND ( RECE62-SRYYM             <   201004      )
                             MOVE    1                  TO  FLG-TAISYO
+                        ELSE
+      *                     難病患者等入院診療加算対応
+      *                     入院料と同じ保険組合せは対象としない
+                            MOVE    1                  TO  FLG-TAISYO
+                            PERFORM VARYING IDY FROM    1   BY  1
+                                    UNTIL   IDY >       31
+                                IF      RECE641-HKNCOMBI
+                                                  =
+                                    LNK-NYURECEDEN-HKNCOMBI (1 IDY)  OR
+                                    LNK-NYURECEDEN-HKNCOMBI (2 IDY)
+                                    MOVE    0           TO  FLG-TAISYO
+                                    MOVE    31          TO  IDY
+                                END-IF 
+                            END-PERFORM
                         END-IF
                      END-IF  
                    ELSE  
