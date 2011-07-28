@@ -1702,6 +1702,8 @@
                            AND   (WRK-GAIHAKU-KBN(IDX1)  = ZERO OR 4 OR
                                                                    5)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
+                           AND   (ACCT-HKNCOMBI      =
+                                                WRK-HKNCOMBI-DAY(IDX1))
                             IF   LNK-NYURECEDEN-SANTEIYM <= "200803"
                                EVALUATE   ACCT-SRYCDTOTAL(6:9)
       *                         Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
@@ -1993,6 +1995,8 @@
                            AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4
                                                                  OR 5)
                            AND   (ACCT-DAY(1 IDX1)   NOT =  ZERO)
+                           AND   (ACCT-HKNCOMBI      =
+                                                WRK-HKNCOMBI-DAY(IDX1))
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
                                 WHEN  CONS-ETCNYUIN-KSN(1)
                                   MOVE   ACCT-DAY(1 IDX1)
