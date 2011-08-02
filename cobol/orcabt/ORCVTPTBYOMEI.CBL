@@ -1500,7 +1500,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  WKPTBYO-MANSEIKBN
            ELSE
       *        慢性フラグ
-               IF      LNK-BYO-MANSEIKBN   =  ZERO
+               IF      WKPTBYO-MANSEIKBN   =   ZERO
                    MOVE    LNK-BYO-MANSEIKBN
                                            TO  WKPTBYO-MANSEIKBN
                END-IF
