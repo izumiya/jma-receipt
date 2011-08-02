@@ -247,6 +247,7 @@
       *
            MOVE    SMKBYO-BYOMEI       TO  WRK-BYOMEI
            MOVE    SPACE               TO  SMKBYO-BYOMEI
+           MOVE    1                   TO  IDX-PNT
       *
            STRING  WRK-BYOMEI          DELIMITED BY SPACE
                    "¡Ê"                DELIMITED BY SIZE
@@ -254,7 +255,10 @@
                                        DELIMITED BY SPACE
                    "¡Ë"                DELIMITED BY SIZE
            INTO    SMKBYO-BYOMEI
+           WITH    POINTER IDX-PNT
            END-STRING
+      *
+           COMPUTE SMKBYO-LENGTH   =   IDX-PNT -   1
       *
            .
        2001-EDIT-HOSOKU-EXT.
