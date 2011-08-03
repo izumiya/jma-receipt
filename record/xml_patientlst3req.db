@@ -1,0 +1,11 @@
+xml_patientlst3req {
+	object		object;
+	mode		int;
+	patientlst3req {
+		WholeName		varchar(100);
+		Birth_StartDate		varchar(10);
+		Birth_EndDate		varchar(10);
+		Sex    			varchar(1);
+		InOut			varchar(01);
+   	};
+};

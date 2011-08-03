@@ -1,0 +1,7 @@
+xml_system01_managereq {
+    object  object;
+	mode	int;
+	system01_managereq {
+		Base_Date		varchar(10);
+	};
+};

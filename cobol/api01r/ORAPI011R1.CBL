@@ -184,9 +184,16 @@
             COPY    "LINKAREA".
        01  SCRAREA.
            COPY    "CPAPIMOD.INC".
+           COPY    "CPAPILST.INC".
+           COPY    "CPAPIPTA.INC" .
            COPY    "CPAPILST.INC"    REPLACING
                                      //APILST-// BY //APILST2-//.
-           COPY    "CPAPIPTA.INC" .
+           COPY    "CPAPILST.INC"    REPLACING
+                                     //APILST-// BY //APILST3-//.
+           COPY    "CPAPILST.INC"    REPLACING
+                                     //APILST-// BY //APILST4-//.
+           COPY    "CPAPILST.INC"    REPLACING
+                                     //APILST-// BY //APILST5-//.
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -291,7 +298,7 @@
            MOVE    SPACE               TO  WRK-KEICD
       *
            MOVE    ZERO                TO  FLG-SYORI
-           EVALUATE    APILST2-CLASS
+           EVALUATE    APILST-CLASS
            WHEN    "01"
       *        受付中
                MOVE    1                   TO  FLG-SYORI
@@ -324,14 +331,14 @@
       *****************************************************************
        1000-APTLSTREAD-SEC   SECTION.
       *
-           IF      APILST2-BODY        NOT =   LOW-VALUE
+           IF      APILST-BODY        NOT =   LOW-VALUE
                DISPLAY "ACPLSTRES-OBJECT not low_value"
            END-IF
       * XML情報取り出し
            MOVE   "XMLOPEN"            TO  MCP-FUNC
            MOVE    "xml_acceptlstreq"  TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    APILST2-BODY        TO  ACPLSTREQ-OBJECT
+           MOVE    APILST-BODY        TO  ACPLSTREQ-OBJECT
            MOVE    ZERO                TO  ACPLSTREQ-MODE
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
@@ -395,7 +402,7 @@
                MOVE    WRK-ERRMSG          TO  ACPLSTRES-API-RESULT-MSG
            END-IF
       *
-           IF      APILST2-BODY        NOT =   LOW-VALUE
+           IF      APILST-BODY        NOT =   LOW-VALUE
                DISPLAY "ACPLSTRES-OBJECT not low_value"
            END-IF
       *
@@ -436,8 +443,8 @@
                                        SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1  )
                DISPLAY "XMLCLOSE OK     = " MCP-RC
-               MOVE    ACPLSTRES-OBJECT    TO  APILST2-BODY 
-               MOVE    "application/xml"   TO  APILST2-CONTENT-TYPE
+               MOVE    ACPLSTRES-OBJECT    TO  APILST-BODY 
+               MOVE    "application/xml"   TO  APILST-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
                DISPLAY "ACCEPT xml write failure "

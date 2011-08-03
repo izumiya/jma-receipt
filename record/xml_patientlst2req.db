@@ -1,0 +1,9 @@
+xml_patientlst2req {
+	object		object;
+	mode		int;
+	patientlst2req {
+		Patient_ID_Information	{
+		Patient_ID		varchar(20);
+       		} [100];
+	};
+};

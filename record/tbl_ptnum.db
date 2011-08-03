@@ -93,3 +93,32 @@ path	key5 	{
 		;
 	};
 };
+
+path	key6 	{
+	DBSELECT	{
+		DECLARE tbl_ptnum_key6_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnum
+			WHERE  HOSPNUM       =   :HOSPNUM
+			AND  ( CREYMD        >=  :CREYMD
+			  OR   UPYMD         >=  :UPYMD )
+			ORDER  BY  UPYMD,
+				   UPHMS,
+				   CREYMD,
+				   PTNUM
+		;
+	};
+};
+
+path	key7 	{
+	DBSELECT	{
+		DECLARE tbl_ptnum_key7_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnum
+			WHERE  HOSPNUM       =   :HOSPNUM
+			AND    CREYMD        >=  :CREYMD
+			ORDER  BY  CREYMD,
+				   PTNUM
+		;
+	};
+};
