@@ -98,6 +98,11 @@ path	ins1 	{
        AND  A.HOSPNUM = B.HOSPNUM
        AND  A.PTID = B.PTID
        AND  A.ZAINUM = B.ZAINUM
+	 GROUP  BY A.HOSPNUM,
+               A.PTID,
+               B.SRYKA,
+               B.HKNCOMBINUM,
+               A.SRYYMD
 	;
 	};
 };
