@@ -95,6 +95,8 @@
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
+      *  04.05.03    NACL-門脇    11/08/08  外泊（他医受診）の日付コメント
+      *                                     の差し込みを止める
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -304,6 +306,7 @@
            03  FLG-SANTEIPLUS      PIC 9(01).
            03  FLG-KAISIEN         PIC 9(01).
            03  FLG-PTNYUINRRK      PIC 9(01).
+           03  FLG-NG              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -4384,6 +4387,16 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            PERFORM     200111-RECE85-TAIHI-SEC
       *
+           MOVE     ZERO    TO    FLG-NG
+           IF   (RECE84-ZAISKBKBN  =  "2"                          )
+           AND  (FLG-RECE85        =  ZERO                         )
+           AND  (WRK-RECE85-SRYCD(1)  =  "190108890" OR "190142190"
+                                      OR "190108790" OR "190142090"
+                                      OR "190108990" OR "190109090"
+                                      OR "190142290" OR "190141590")
+              MOVE    1     TO    FLG-NG
+           END-IF
+      *
       *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
            MOVE    ZERO                 TO  IDX-RECE85
            MOVE    SPACE                TO  WRK-RECE85XX-REC
@@ -4391,10 +4404,11 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            MOVE    RECE84-MEISAISU      TO  MAX-MEISAISU
       *
-      *    算定日コメントの挿入
-           PERFORM  VARYING      IDX    FROM  1   BY   1
-                    UNTIL       (IDX    >     31)      OR
-                                (TBL-NYU-DAY-ST(IDX)  =  ZERO)
+           IF    FLG-NG  =  ZERO
+      *      算定日コメントの挿入
+             PERFORM  VARYING      IDX    FROM  1   BY   1
+                      UNTIL       (IDX    >     31)      OR
+                                  (TBL-NYU-DAY-ST(IDX)  =  ZERO)
                COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
       ***      MOVE    TBL-NYU-DAY-CD(IDX)
                MOVE    "810000001"
@@ -4422,7 +4436,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(9:4)
                END-IF
                MOVE    "1"   TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
       *

@@ -2667,8 +2667,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                            MOVE    4       TO  RECE02-RJNGAIKOHFTN (1)
                            MOVE  WRK-GENMEN-NASI-KIN
                                            TO  RECE02-YOBIETC(4)
-                           IF   (RECE02-GENMENKBN   =   2  OR  3)
-                           AND  (FLG-SAIGAI-TAISYO  =   1       )
+                           IF   (FLG-SAIGAI-TAISYO  =   1       )
                            AND  (RECE02-HKNNUM  NOT =  SPACE    )
                              IF  RECE02-ZAITAKU     =  "1" OR "2"
                                MOVE   WRK-GENMEN-NASI-KIN
@@ -3487,16 +3486,23 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
             END-IF
       *
             IF   RECE02-HKNNUM   =   "068" OR "069" OR "040"
+             IF   RECE02-SRYYM  >=   "201101"
               IF   (WK-GENGAKUKBN      =   3 OR 4)
               AND  (FLG-SAIGAI-TAISYO  =   1     )
                 CONTINUE
               ELSE
                 MOVE     ZERO    TO    WK-GENGAKUKBN
               END-IF
+             ELSE
+                MOVE     ZERO    TO    WK-GENGAKUKBN
+                MOVE     ZERO    TO    FLG-SAIGAI-TAISYO
+             END-IF
             END-IF
       *
             IF   RECE02-HKNNUM   =   "004"
+             IF   RECE02-SRYYM  >=   "201101"
                 MOVE     ZERO    TO    WK-GENGAKUKBN
+             END-IF
             END-IF
       *
            END-IF
@@ -14471,8 +14477,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
                                UNTIL    KOHFTN-IDX     >    4
       *
-                     IF   RECE02-KOHHBTNUM(KOHFTN-IDX) =  "72" OR "73"
-                                                       OR "74" OR "75"
+                     IF   RECE02-KOHHBTNUM(KOHFTN-IDX) =  "72"
                        IF   RECE02-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                         MOVE  ZERO  TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
                         MOVE  SPACE TO

@@ -3872,12 +3872,10 @@
             IF   COMB-HKNNUM  =  "004"
                    MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
-            IF   FLG-SAIGAI-TAISYO  =   1
+            IF   (FLG-SAIGAI-TAISYO     =    1     )
+            AND  (WK-GENGAKUKBN         =    3 OR 4)
+      ***   AND  (LNK-SYU-SRYYMD(1:6)  <=  "201108")
               EVALUATE   WK-GENGAKUKBN
-                WHEN        1
-                      MOVE    5       TO    LNK-SYU-YKZKENNUM
-                WHEN        2
-                      MOVE    6       TO    LNK-SYU-YKZKENNUM
                 WHEN        3
                       MOVE    7       TO    LNK-SYU-YKZKENNUM
                 WHEN        4
@@ -19109,8 +19107,9 @@
                             END-IF
                             MOVE  WK-SHOKUJI-FTN
                                             TO   LNK-SYU-SYUSKJ-FTN-RECE
-                            IF   (WK-GENGAKUKBN      =   3 OR 4)
-                            AND  (FLG-SAIGAI-TAISYO  =   1     )
+                            IF   (WK-GENGAKUKBN        =   3 OR 4)
+                            AND  (FLG-SAIGAI-TAISYO    =   1     )
+      ***                   AND  (LNK-SYU-SRYYMD(1:6) <= "201108")
                               MOVE  ZERO    TO   LNK-SYU-SYUSKJ-FTN
                             END-IF
                         END-IF
@@ -19314,8 +19313,9 @@
                             END-IF
                             MOVE  WK-SHOKUJI-FTN
                                             TO   LNK-SYU-SYUSKJ-FTN-RECE
-                            IF   (WK-GENGAKUKBN      =   3 OR 4)
-                            AND  (FLG-SAIGAI-TAISYO  =   1     )
+                            IF   (WK-GENGAKUKBN        =   3 OR 4)
+                            AND  (FLG-SAIGAI-TAISYO    =   1     )
+      ***                   AND  (LNK-SYU-SRYYMD(1:6) <= "201108")
                               MOVE  ZERO    TO   LNK-SYU-SYUSKJ-FTN
                             END-IF
                         END-IF
@@ -19734,8 +19734,7 @@
       *
            MOVE      ZERO      TO        FLG-MIYAGI.
            IF     (WK-1001-PREFNUM         =  04           ) AND
-                  (COMB-KOHHKNNUM(KOH-IDX) = "183" OR "383" 
-                                                   OR "483") AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "183" OR "483") AND
                   (LNK-SYU-SRYYMD(1:6)    >= "200510"      ) AND
                   (LNK-SYU-SRYYMD(1:6)    <  "200610"      )
       *
@@ -19784,12 +19783,10 @@
       *
            END-IF.
            IF    ((WK-1001-PREFNUM         =  04           ) AND
-                  (COMB-KOHHKNNUM(KOH-IDX) = "183" OR "383" 
-                                                   OR "483") AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "183" OR "483") AND
                   (LNK-SYU-SRYYMD(1:6)    >= "200610"      ))
            OR    ((WK-1001-PREFNUM         =  04           ) AND
-                  (COMB-KOHHKNNUM(KOH-IDX) = "583" OR "683" 
-                                                   OR "783") AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "583" OR "783") AND
                   (LNK-SYU-SRYYMD(1:6)    >= "201010"      ))
       *
                 INITIALIZE                       PTKOHINF-REC
@@ -19929,10 +19926,13 @@
                                            OR "143" OR "243"
                                            OR "177" OR "187"))
                OR ((WK-1001-PREFNUM         =  15           ) AND
-                   (COMB-KOHHKNNUM(KOH-IDX) = "261" OR "361"
-                                                    OR "561"
-                                           OR "264" OR "364"
-                                                    OR "564"))
+                   (COMB-KOHHKNNUM(KOH-IDX) = 
+                                    "261" OR "361"  OR "561"
+                                 OR "264" OR "364"  OR "564"
+                                 OR "298"                   ))
+               OR ((WK-1001-PREFNUM         =  15           ) AND
+                   (COMB-KOHHKNNUM(KOH-IDX) = "198"         ) AND
+                   (FLG-SANSHOU2            = "2" OR "3"    ))
                    IF     FLG-SEIKATUS       =   1
                          MOVE  "5"    TO  WK-NYUSKJRYYKBN
                          MOVE  "1"    TO  WK-NYUSKJRYYKBN-TOKU(KOH-IDX)
@@ -20177,8 +20177,9 @@
              END-IF
            END-IF.
       *
-           IF   (WK-GENGAKUKBN      =   3 OR 4)
-           AND  (FLG-SAIGAI-TAISYO  =   1     )
+           IF   (WK-GENGAKUKBN        =   3 OR 4)
+           AND  (FLG-SAIGAI-TAISYO    =   1     )
+      ***  AND  (LNK-SYU-SRYYMD(1:6) <= "201108")
                  MOVE   "3"   TO  WK-NYUSKJRYYKBN
            END-IF.
       *
