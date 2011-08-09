@@ -179,6 +179,7 @@
                                                    OCCURS 100.
            03  FLG-PTRSIINF                        PIC 9(01).
            03  FLG-RECECOM                         PIC 9(01).
+           03  FLG-TAJYUSHIN                       PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -3469,6 +3470,7 @@
            MOVE    ZERO                TO  CNT-HOUSRYACT
            MOVE    ZERO                TO  FLG-SRYACT-HEN5
            MOVE    ZERO                TO  FLG-MINUS
+           MOVE    ZERO                TO  FLG-TAJYUSHIN
            MOVE    ZERO                TO  FLG-RSIJBI-AREA-HEN
            MOVE    ZERO                TO  FLG-JIBAI
            MOVE    ZERO                TO  FLG-ROSAI
@@ -3605,6 +3607,16 @@
                        END-IF
                    END-IF
       *
+                   IF    ( SRY-SRYCD (IDX9)    =   "190108790"
+                                               OR  "190108890"
+                                               OR  "190109090"
+                                               OR  "190141590"
+                                               OR  "190142090"
+                                               OR  "190142190"
+                                               OR  "190142290" )
+                           MOVE    1       TO  FLG-TAJYUSHIN
+                   END-IF
+      *
                    IF    ( FLG-RSIJBI-AREA-HEN =   1 )
                        IF    ( RSIJBI-MAX      <   CONST-RSIJBI-MAX )
                            PERFORM 200111-RSIJBI-HEN-SEC
@@ -3647,7 +3659,9 @@
                        PERFORM 205-TENSUKAISU-HEN-SEC
                    END-IF
                WHEN    "2"
-                   PERFORM 200211-NISSU-HEN-SEC
+                   IF   (  FLG-TAJYUSHIN    =   ZERO )
+                       PERFORM 200211-NISSU-HEN-SEC
+                   END-IF
                    MOVE    ACCT-ZAITEN     TO  WRK-ZAITEN
                    MOVE    ACCT-ZAIKAISU   TO  WRK-ZAIKAISU
                    PERFORM 205-TENSUKAISU-HEN-SEC
