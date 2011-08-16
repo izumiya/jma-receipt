@@ -81,6 +81,7 @@
       *  04.04.04    NACL-ÌçÏÆ    10/08/09  Â¾°å¼õ¿Ç¤Î¥Á¥§¥Ã¥¯
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/18  ¼£¸³ÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
       *****************************************************************
       *
       *
@@ -491,9 +492,9 @@
                                           LNK-SROUNYUIN-NYUIN-FLG(IDX1)
                         END-IF
                    END-PERFORM
-                   IF   FLG-ROUSAI             =   ZERO
-                        MOVE    3              TO  LNK-SROUNYUIN-RC
-                   END-IF
+      **>          IF   FLG-ROUSAI             =   ZERO
+      **>               MOVE    3              TO  LNK-SROUNYUIN-RC
+      **>          END-IF
                END-IF
            END-IF
       *
@@ -1207,9 +1208,10 @@
                         ELSE
                          PERFORM    VARYING   IDX1   FROM   1   BY   1
                                     UNTIL     IDX1   >   31
-                             IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
-                                    (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
-                             AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+      **>                    IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+      **>                           (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
+      **>                    AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+                             IF    ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
                                COMPUTE LNK-SROUNYUIN-ZAITEN-ACCTETC
                                                              (IDX1)
                                     =  LNK-SROUNYUIN-ZAITEN-ACCTETC
@@ -2013,9 +2015,10 @@
                         ELSE
                          PERFORM    VARYING   IDX1   FROM   1   BY   1
                                     UNTIL     IDX1   >   31
-                             IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
-                                    (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
-                             AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+      **>                    IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+      **>                           (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
+      **>                    AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+                             IF    ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
                                COMPUTE LNK-SROUNYUIN-ZAITEN-ACCTETC
                                                              (IDX1)
                                     =  LNK-SROUNYUIN-ZAITEN-ACCTETC
@@ -2929,9 +2932,10 @@
                         ELSE
                          PERFORM    VARYING   IDX1   FROM   1   BY   1
                                     UNTIL     IDX1   >   31
-                             IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
-                                    (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
-                             AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+      **>                    IF    ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+      **>                           (WRK-NYUINDAY-KBN(IDX1) =  "1" ))
+      **>                    AND   ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
+                             IF    ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
                                COMPUTE LNK-SROUNYUIN-ZAITEN-ACCTETC
                                                              (IDX1)
                                     =  LNK-SROUNYUIN-ZAITEN-ACCTETC

@@ -126,6 +126,7 @@
       *  04.05.02    NACL-ÌçÏÆ    10/01/07  ¼£¸³ÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/03/09  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.04    NACL-ÌçÏÆ    11/08/01  ÆñÉÂ´µ¼ÔÅùÆþ±¡¿ÇÎÅ²Ã»»ÂÐ±þ
+      *  04.05.05    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -312,6 +313,7 @@
            03  FLG-KOREI-TANYUIN           PIC 9(01).
            03  FLG-KOREI-TANYUIN2          PIC 9(01).
            03  FLG-NYUINRYO-KASAN-OK       PIC 9(01).
+           03  FLG-NYUINRYO-KASAN2-OK      PIC 9(01).
            03  FLG-NYUINRYO-KASAN-CHK      PIC 9(01).
       *
        01  CNT-AREA.
@@ -466,6 +468,17 @@
            03  TBL-NYUINRYO-KASAN   PIC X(09)   OCCURS    1.
       *
        01  TBL-NYUINRYO-KASAN-MAX   PIC 9(02)   VALUE     1.
+      *
+      *    Æþ±¡ÎÁ²Ã»»È½ÄêÍÑ¥Æ¡¼¥Ö¥ë£²
+       01  TBL-NYUINRYO-KASAN2-AREA.
+           03  FILLER          PIC X(09)   VALUE    "101910050".
+           03  FILLER          PIC X(09)   VALUE    "101910060".
+           03  FILLER          PIC X(09)   VALUE    "101920010".
+      *
+       01  TBL-NYUINRYO-KASAN2-R  REDEFINES   TBL-NYUINRYO-KASAN2-AREA.
+           03  TBL-NYUINRYO-KASAN2  PIC X(09)   OCCURS    3.
+      *
+       01  TBL-NYUINRYO-KASAN2-MAX  PIC 9(02)   VALUE     3.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -3250,18 +3263,21 @@ grpsys                              SPA-AREA
                 AND ((SYU-DAY(SYU-IDX)                    =   "1") OR
                      (WRK-NYUINDAY-KBN(IDX SYU-IDX)       =   "1"))
                 AND ( WRK-DOJITU-FLG(IDX SYU-IDX)         =   ZERO)
-      *
                      ADD   LNK-SROUNYUIN-ZAITEN(SYU-IDX)
                                                  TO  SYU-HKNTEN(15)
                      ADD   LNK-SROUNYUIN-ZAITEN-NACCT(SYU-IDX)
                                                  TO  SYU-HKNTEN(15)
                      ADD   LNK-SROUNYUIN-ZAITEN-ACCT(SYU-IDX)
                                                  TO  SYU-HKNTEN(15)
-                     ADD   LNK-SROUNYUIN-ZAITEN-ACCTETC(SYU-IDX)
-                                                 TO  SYU-HKNTEN(15)
+      **>            ADD   LNK-SROUNYUIN-ZAITEN-ACCTETC(SYU-IDX)
+      **>                                        TO  SYU-HKNTEN(15)
                      ADD   LNK-SROUNYUIN-GENTEN(SYU-IDX)
                                        TO  WRK-SYUG-NYN-HKNTEN(IDX)
+                END-IF
       *
+                IF  ( WRK-DOJITU-FLG(IDX SYU-IDX)         =   ZERO)
+                     ADD   LNK-SROUNYUIN-ZAITEN-ACCTETC(SYU-IDX)
+                                                 TO  SYU-HKNTEN(15)
                 END-IF
       *
               END-PERFORM
@@ -4562,6 +4578,7 @@ grpsys                                        SPA-AREA
            MOVE   ZERO             TO     WRK-CHECK-STDAY
            MOVE   ZERO             TO     WRK-CHECK-EDDAY
            MOVE   ZERO             TO     FLG-NYUINRYO-KASAN-OK
+           MOVE   ZERO             TO     FLG-NYUINRYO-KASAN2-OK
            MOVE   ZERO             TO     FLG-NYUINRYO-KASAN-CHK
            IF   ACCT-SRYKBN  =  "90"  OR  "92"
              PERFORM   VARYING   SYU-IDX   FROM   1   BY   1
@@ -4622,7 +4639,9 @@ grpsys                                        SPA-AREA
                             MOVE   ACCT-HKNCOMBI   TO   WRK-HKNCOMBINUM
                             PERFORM  HKNCOMBI-KENSAKU-SEC
                             IF  COMB-HKNNUM  =  "971" OR "973" OR "975"
-                              CONTINUE
+                              IF  COMB-HKNNUM  =  "971" OR "973"
+                                 PERFORM   NYUINRYO-KASAN-CHECK2-SEC
+                              END-IF
                             ELSE
                               PERFORM   NYUINRYO-KASAN-CHECK-SEC
                             END-IF
@@ -4630,6 +4649,7 @@ grpsys                                        SPA-AREA
                          END-IF
                          IF  (WRK-KAIKEING(IDX)  = ZERO OR 3)
                          AND (FLG-NYUINRYO-KASAN-OK  =  ZERO)
+                         AND (FLG-NYUINRYO-KASAN2-OK =  ZERO)
                             MOVE    1     TO    WRK-KAIKEING(IDX)
                          END-IF
                        END-IF
@@ -4648,19 +4668,22 @@ grpsys                                        SPA-AREA
                             MOVE   ACCT-HKNCOMBI   TO   WRK-HKNCOMBINUM
                             PERFORM  HKNCOMBI-KENSAKU-SEC
                             IF  COMB-HKNNUM  =  "971" OR "973" OR "975"
-                              CONTINUE
+                              IF  COMB-HKNNUM  =  "971" OR "973"
+                                 PERFORM   NYUINRYO-KASAN-CHECK2-SEC
+                              END-IF
                             ELSE
                               PERFORM   NYUINRYO-KASAN-CHECK-SEC
                             END-IF
-                            IF  (SYU-HKNCOMBINUM  NOT =  ACCT-HKNCOMBI)
-                            AND (WRK-HANBETU-DAY-NACCT(IDX SYU-IDX)
-                                                           NOT = SPACE)
+                            IF  WRK-HANBETU-DAY-NACCT(IDX SYU-IDX)
+                                                           NOT = SPACE
                               MOVE  ZERO TO   FLG-NYUINRYO-KASAN-OK
+                              MOVE  ZERO TO   FLG-NYUINRYO-KASAN2-OK
                             END-IF
                             MOVE    1    TO   FLG-NYUINRYO-KASAN-CHK
                          END-IF
                          IF  (WRK-KAIKEING(IDX)      =  ZERO)
                          AND (FLG-NYUINRYO-KASAN-OK  =  ZERO)
+                         AND (FLG-NYUINRYO-KASAN2-OK =  ZERO)
                             MOVE    3     TO    WRK-KAIKEING(IDX)
                          END-IF
                        END-IF
@@ -5134,6 +5157,51 @@ grpsys                                        SPA-AREA
       *
            .
        NYUINRYO-KASAN-CHECK-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    Æþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯£²
+      **************************************************************
+       NYUINRYO-KASAN-CHECK2-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX6   FROM    1   BY  1
+                      UNTIL   (IDX6    >   TBL-NYUINRYO-KASAN2-MAX)
+                       OR     (FLG-NYUINRYO-KASAN2-OK =  1        )
+      *
+             INITIALIZE                      SRYACT-REC
+             MOVE    ACCT-HOSPNUM     TO     SRY-HOSPNUM
+             MOVE    ACCT-NYUGAIKBN   TO     SRY-NYUGAIKBN
+             MOVE    ACCT-PTID        TO     SRY-PTID
+             MOVE    ACCT-SRYYM       TO     SRY-SRYYM
+             MOVE    ACCT-ZAINUM      TO     SRY-ZAINUM
+             MOVE    TBL-NYUINRYO-KASAN2(IDX6)  TO   SRY-SRYCD(1)
+             MOVE    TBL-NYUINRYO-KASAN2(IDX6)  TO   SRY-SRYCD(2)
+             MOVE    TBL-NYUINRYO-KASAN2(IDX6)  TO   SRY-SRYCD(3)
+             MOVE    TBL-NYUINRYO-KASAN2(IDX6)  TO   SRY-SRYCD(4)
+             MOVE    TBL-NYUINRYO-KASAN2(IDX6)  TO   SRY-SRYCD(5)
+             MOVE    SRYACT-REC       TO     MCPDATA-REC
+             MOVE    "DBSELECT"       TO     MCP-FUNC
+             MOVE    "tbl_sryact"     TO     MCP-TABLE
+             MOVE    "key8"           TO     MCP-PATHNAME
+             CALL    "ORCDBMAIN"      USING  MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+             IF      MCP-RC           =      ZERO
+               MOVE  "tbl_sryact"     TO     MCP-TABLE
+               MOVE  "key8"           TO     MCP-PATHNAME
+               PERFORM   SRYACT-READ-SEC
+               IF    FLG-SRYACT       =      ZERO
+                   MOVE       1       TO     FLG-NYUINRYO-KASAN2-OK
+               END-IF
+             END-IF
+             MOVE    "tbl_sryact"     TO     MCP-TABLE
+             MOVE    "key8"           TO     MCP-PATHNAME
+             PERFORM     CSR-CLOSE-SEC
+      *
+           END-PERFORM
+      *
+           .
+       NYUINRYO-KASAN-CHECK2-EXT.
            EXIT.
       *
       **************************************************************
