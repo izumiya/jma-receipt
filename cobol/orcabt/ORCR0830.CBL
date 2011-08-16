@@ -65,6 +65,7 @@
       *  04.04.06    NACL-ÌçÏÆ    10/04/02  ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸î¤ÎÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/25  ¼£¸³ÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -1148,10 +1149,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           UNTIL    IDY    >    31
       *
                 IF   LNK-SROUNYUIN-NYUIN-FLG(IDY)    =  "1"
-      *
                      PERFORM   2301-KHNTEN-HENSYU-SEC
-      *
                 END-IF
+                PERFORM        2303-KHNTEN-HENSYU2-SEC
       *
               END-PERFORM
       *
@@ -1200,9 +1200,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            RECE82-NYUKHNKEI2  +  
                            LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
       *
-                  COMPUTE  RECE82-NYUTOKKEI2  =
-                           RECE82-NYUTOKKEI2  +  
-                           LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+      **>         COMPUTE  RECE82-NYUTOKKEI2  =
+      **>                  RECE82-NYUTOKKEI2  +  
+      **>                  LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
       *
                   COMPUTE  RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  -
@@ -1263,9 +1263,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                   END-IF
       *
-                  COMPUTE  RECE82-NYUTOKKEI2  =
-                           RECE82-NYUTOKKEI2  +
-                           LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+      **>         COMPUTE  RECE82-NYUTOKKEI2  =
+      **>                  RECE82-NYUTOKKEI2  +
+      **>                  LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
       *
                   COMPUTE  RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  -
@@ -1290,9 +1290,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ***                  RECE82-NYUKHNKEI2  +
       ***                  LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
       ***    END-IF
-             COMPUTE       RECE82-NYUTOKKEI2  =
-                           RECE82-NYUTOKKEI2  +
-                           LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+      **>    COMPUTE       RECE82-NYUTOKKEI2  =
+      **>                  RECE82-NYUTOKKEI2  +
+      **>                  LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
       *
              COMPUTE       RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  -
@@ -1320,6 +1320,33 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2302-RYAKUSYO-HENSYU-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    Æþ±¡´ðËÜÎÁ¤È³°ÇñÅù¤ÎÊÔ½¸£²
+      **************************************************************
+       2303-KHNTEN-HENSYU2-SEC           SECTION.
+      *
+           EVALUATE   LNK-SROUNYUIN-SRYKBN(IDY)
+             WHEN   "90"
+                  COMPUTE  RECE82-NYUTOKKEI2  =
+                           RECE82-NYUTOKKEI2  +  
+                           LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+             WHEN   "92"
+                  COMPUTE  RECE82-NYUTOKKEI2  =
+                           RECE82-NYUTOKKEI2  +
+                           LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+           END-EVALUATE
+      *
+      **>  IF   RECE82-NYUINDAY-KBN(IDY)  =  "1"
+           IF   LNK-SROUNYUIN-SRYKBN(IDY) =  SPACE
+             COMPUTE       RECE82-NYUTOKKEI2  =
+                           RECE82-NYUTOKKEI2  +
+                           LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+           END-IF
+      *
+           .
+       2303-KHNTEN-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
