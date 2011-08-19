@@ -556,10 +556,11 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    "療養病棟入院基本料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "502"
-                   MOVE    "後期高齢者特定入院基本料" 
+      ****         MOVE    "後期高齢者特定入院基本料" 
+                   MOVE    "特定入院基本料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "503"
-                   MOVE    "有床診療所療養病棟入院基本料" 
+                   MOVE    "有床診療所療養病床入院基本料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
       *
                WHEN    "201"
