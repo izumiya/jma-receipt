@@ -50,6 +50,7 @@
       *
            03  FLG-SYORI               PIC 9(01).
            03  FLG-SYORI-END           PIC 9(01).
+           03  FLG-CHK                 PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -488,12 +489,13 @@
            MOVE    PTNUM-PTID          TO  PTINF-PTID
            PERFORM 900-PTINF-READ-SEC
       *    ¥Æ¥¹¥È´µ¼ÔÂÐ¾Ý³°È½Äê
+           MOVE    ZERO                TO  FLG-CHK
            IF      PATLSTREQ-TEST-KBN  =   "1"
                IF      PTINF-TSTPTNUMKBN   =   "1"
-                   MOVE    1               TO  FLG-SYORI-END
+                   MOVE    1               TO  FLG-CHK
                END-IF
            END-IF
-           IF      FLG-SYORI-END       =   ZERO
+           IF      FLG-CHK             =   ZERO
                ADD     1               TO  IDX
                IF      IDX             >   1000
                    MOVE    "10"            TO  WRK-ERRCD
