@@ -672,7 +672,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-LIST-MAX        TO  WRK-PAGE2
                    EVALUATE    WRK-FORMID
-                       WHEN    "HCN61V01"
+                       WHEN    "HCN61"
                            MOVE    TBL-LIST-PRTDATA (IDYY)
                                                        TO  HCN61
                            MOVE    WRK-HEN-PAGE-AREA   TO  HCN61-PAGE
@@ -765,7 +765,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *    見出し編集処理
       *****************************************************************
        2001-HEAD-PRINT-SEC                SECTION.
-      *     
+      *
            ADD     1               TO  WRK-PAGE
                                        CNT-PAGE
                                        SUM-PAGE (1)
