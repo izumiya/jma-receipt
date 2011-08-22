@@ -4156,7 +4156,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            IF      SPA-C02-1042-MSG2-DSPKBN
                                        =   "1"
                MOVE    1                   TO  FLG-SYNONYM
-               GO  TO  5001-SYNONYM-CHK-EXT
+               GO  TO  5002-SYNONYM-CHK-EXT
            END-IF
       *
            PERFORM 900-SYNONYM-READ-SEC
