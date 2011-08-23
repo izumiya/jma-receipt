@@ -59,7 +59,7 @@
                        09  ORCSCZAICHK-INPUTCOMENT PIC  X(80).
                        09  ORCSCZAICHK-INPUTCHI-G.
                            11  ORCSCZAICHK-ATAI    PIC  X(08)
-                                                        OCCURS  3.
+                                                        OCCURS  4.
       *                ´¹»»ÃÍ¿ôÎÌ
                        09  ORCSCZAICHK-KANSURYO    PIC  9(05)V9(05).
                        09  ORCSCZAICHK-INPUTKBN    PIC  X(01).
