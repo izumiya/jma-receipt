@@ -48,6 +48,8 @@ path	key4		{
 		DECLARE tbl_infection_judgment_key4_csr CURSOR FOR
 		SELECT DISEASE
 		FROM tbl_infection_judgment
+		WHERE JUDGMENT_CODE != '0000000'
+		  AND JUDGMENT_CODE != '000000000'
 		GROUP BY DISEASE
 		ORDER BY DISEASE
 		;
@@ -69,6 +71,23 @@ path	all		{
 		SELECT *
 		FROM tbl_infection_judgment
 		ORDER BY DISEASE,CODE_KBN,JUDGMENT_CODE
+		;
+	};
+};
+
+path	upd1	{
+	DBUPDATE		{
+		UPDATE	tbl_infection_judgment
+				SET
+				ID      = :ID,
+				DISEASE      = :DISEASE,
+				JUDGMENT_CODE      = :JUDGMENT_CODE,
+				CODE_KBN      = :CODE_KBN,
+				SRYKBN      = :SRYKBN,
+				CREYMD      = :CREYMD,
+				UPYMD      = :UPYMD,
+				UPHMS      = :UPHMS
+			WHERE        ID  =  :ID
 		;
 	};
 };

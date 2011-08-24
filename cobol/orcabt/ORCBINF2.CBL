@@ -130,6 +130,10 @@
                    07  WRK-BIRTHDAY-YM         PIC 9(06).
                    07  WRK-BIRTHDAY-D          PIC 9(02).
       *
+           03  WRK-SAVE-AREA.
+               05  WRK-S-KHNBYOMEICD           PIC X(07).
+               05  WRK-S-SRYYMD                PIC 9(08).
+      *
       *    出力データ編集用
            03  WRK-REC                         PIC X(3000).
            03  WRK-REC-LENGTH                  PIC 9(04).
@@ -162,8 +166,6 @@
        01  WRK-CONS-AREA.
       *    コンマ
            03  WRK-KUGIRI              PIC X(01)   VALUE   ",".
-      *    改行コード
-           03  WRK-KAIGYO              PIC X(01)   VALUE   X"0D".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -277,9 +279,6 @@
       *
            PERFORM 900-DBOPEN-SEC
       *
-      *##?     OPEN    OUTPUT              INFEC-FILE
-      *##?     CLOSE                       INFEC-FILE
-      *
            OPEN    OUTPUT              INFEC-FILE
       *
            PERFORM 1001-INIT-PTCHK-SEC
@@ -350,6 +349,7 @@
        200-MAIN-SEC                SECTION.
       *
            INITIALIZE                      WRK-HENSYU-AREA
+           INITIALIZE                      WRK-SAVE-AREA
            MOVE    ZERO                TO  FLG-P-REC
       *
            PERFORM VARYING I-D     FROM  1  BY  1
@@ -570,23 +570,31 @@
                    UNTIL      (I-J-B   >  TBL-JUDGMENT-B-MAX)
                IF      PTBYO-KHNBYOMEICD   =   TBL-JUDGMENT-BYOMEICD
                                                (I-J-B)
-                   MOVE    PTBYO-KHNBYOMEICD   TO  WRK-BYOMEICD
-                   MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
-                   MOVE    PTBYO-SRYYMD        TO  WRK-BYOSRYYMD
-                   MOVE    PTBYO-SRYYMD        TO  WRK-SRYYMD
-                   MOVE    PTBYO-TENKIKBN      TO  WRK-TENKIKBN
-                   MOVE    PTBYO-TENKIYMD      TO  WRK-TENKIYMD
-                   MOVE    PTBYO-DLTFLG        TO  WRK-DLTFLG
-                   MOVE    1                   TO  WRK-RECKBN
-                   PERFORM 2003-OUT-SYORI-SEC
-      *            感染症プルーフ読み込み
-                   PERFORM 2004-INFECTION-READ-SEC
-                   IF      FLG-INFECTION       =   1
-                       PERFORM 2004-INFECTION-INSERT-SEC
+                   IF      PTBYO-KHNBYOMEICD   =   WRK-S-KHNBYOMEICD
+                     AND   PTBYO-SRYYMD        =   WRK-S-SRYYMD
+                     AND   PTBYO-DLTFLG        =   1
+                           CONTINUE
                    ELSE
-                       PERFORM 2004-INFECTION-UPDATE-SEC
+                       MOVE    PTBYO-KHNBYOMEICD   TO  WRK-S-KHNBYOMEICD
+                       MOVE    PTBYO-SRYYMD        TO  WRK-S-SRYYMD
+                       MOVE    PTBYO-KHNBYOMEICD   TO  WRK-BYOMEICD
+                       MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
+                       MOVE    PTBYO-SRYYMD        TO  WRK-BYOSRYYMD
+                       MOVE    PTBYO-SRYYMD        TO  WRK-SRYYMD
+                       MOVE    PTBYO-TENKIKBN      TO  WRK-TENKIKBN
+                       MOVE    PTBYO-TENKIYMD      TO  WRK-TENKIYMD
+                       MOVE    PTBYO-DLTFLG        TO  WRK-DLTFLG
+                       MOVE    1                   TO  WRK-RECKBN
+                       PERFORM 2003-OUT-SYORI-SEC
+      *                感染症プルーフ読み込み
+                       PERFORM 2004-INFECTION-READ-SEC
+                       IF      FLG-INFECTION       =   1
+                           PERFORM 2004-INFECTION-INSERT-SEC
+                       ELSE
+                           PERFORM 2004-INFECTION-UPDATE-SEC
+                       END-IF
+                       MOVE    TBL-JUDGMENT-B-MAX  TO  I-J-B
                    END-IF
-                   MOVE    TBL-JUDGMENT-B-MAX  TO  I-J-B
                END-IF
            END-PERFORM
            .
@@ -1084,12 +1092,6 @@
       *****************************************************************
        4001-FILE-WRITE-SEC         SECTION.
       *
-      *    改行コード編集
-           STRING  WRK-REC(1:WRK-REC-LENGTH) DELIMITED  BY  SIZE
-                   WRK-KAIGYO                DELIMITED  BY  SIZE
-                   INTO        WRK-REC
-           END-STRING
-      *
            MOVE    WRK-REC             TO  INFEC-REC
            WRITE   INFEC-REC
            ADD     1                   TO  CNT-INFEC
@@ -1271,7 +1273,7 @@
            MOVE    ZERO                TO  I-J-S
       *
            INITIALIZE                      INFJUDGMENT-REC
-           MOVE    I-D                 TO  INFJUD-DISEASE
+           MOVE    TBL-DISEASE (I-D)   TO  INFJUD-DISEASE
            MOVE    INFJUDGMENT-REC     TO  MCPDATA-REC
            MOVE    "tbl_infection_judgment"
                                        TO  MCP-TABLE
