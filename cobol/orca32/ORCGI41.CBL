@@ -1548,7 +1548,7 @@
                        MOVE    STUSAN-RRK-NYUINYMD (IDX10)
                                                TO  LNK-DAY6-KIJUN
                        MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                       IF    ( STUSAN-RRK-DJKBN    (IDX10) =   SPACE )
+                       IF    ( STUSAN-RRK-DJKBN (IDX10) = SPACE OR "2")
                            COMPUTE LNK-DAY6-ZOGEN
                                =   180   -         WRK-TUSAN
                        ELSE
