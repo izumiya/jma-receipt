@@ -48,6 +48,8 @@ path	key4		{
 		DECLARE tbl_infection_judgment_key4_csr CURSOR FOR
 		SELECT DISEASE
 		FROM tbl_infection_judgment
+		WHERE JUDGMENT_CODE != '0000000'
+		  AND JUDGMENT_CODE != '000000000'
 		GROUP BY DISEASE
 		ORDER BY DISEASE
 		;

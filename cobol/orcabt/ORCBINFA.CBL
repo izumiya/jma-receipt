@@ -116,8 +116,6 @@
        01  WRK-CONS-AREA.
       *    コンマ
            03  WRK-KUGIRI              PIC X(01)   VALUE   ",".
-      *    改行コード
-           03  WRK-KAIGYO              PIC X(01)   VALUE   X"0D".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -280,11 +278,12 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           PERFORM 2001-INFECTION-READ-SEC
+      **   PERFORM 2001-INFECTION-READ-SEC
       *
-           IF      FLG-INFECTION       =   1
-               PERFORM 400-I-REC-SEC
-           END-IF
+      **   IF      FLG-INFECTION       =   1
+      **       PERFORM 400-I-REC-SEC
+      **   END-IF
+           PERFORM 400-I-REC-SEC
       *
            MOVE    1                   TO  FLG-END
            .
@@ -397,12 +396,6 @@
       *    ファイル出力処理
       *****************************************************************
        4001-FILE-WRITE-SEC         SECTION.
-      *
-      *    改行コード編集
-           STRING  WRK-REC(1:WRK-REC-LENGTH) DELIMITED  BY  SIZE
-                   WRK-KAIGYO                DELIMITED  BY  SIZE
-                   INTO        WRK-REC
-           END-STRING
       *
            MOVE    WRK-REC             TO  INFEC-REC
            WRITE   INFEC-REC

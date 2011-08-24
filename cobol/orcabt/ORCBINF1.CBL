@@ -140,6 +140,10 @@
                    07  WRK-BIRTHDAY-YM         PIC 9(06).
                    07  WRK-BIRTHDAY-D          PIC 9(02).
       *
+           03  WRK-SAVE-AREA.
+               05  WRK-S-KHNBYOMEICD           PIC X(07).
+               05  WRK-S-SRYYMD                PIC 9(08).
+      *
       *    出力データ編集用
            03  WRK-REC                         PIC X(3000).
            03  WRK-REC-LENGTH                  PIC 9(04).
@@ -183,8 +187,6 @@
        01  WRK-CONS-AREA.
       *    コンマ
            03  WRK-KUGIRI              PIC X(01)   VALUE   ",".
-      *    改行コード
-           03  WRK-KAIGYO              PIC X(01)   VALUE   X"0D".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -336,9 +338,6 @@
                INITIALIZE                      SYS-1002-REC
            END-IF
       *
-      *##?     OPEN    OUTPUT              INFEC-FILE
-      *##?     CLOSE                       INFEC-FILE
-      *
            OPEN    OUTPUT              INFEC-FILE
       *
       *    受診履歴読み込み
@@ -387,6 +386,7 @@
        2001-INIT-SYORI-SEC         SECTION.
       *
            INITIALIZE                      WRK-HENSYU-AREA
+           INITIALIZE                      WRK-SAVE-AREA
            INITIALIZE                      TBL-INFECT-AREA
            MOVE    WRK-PARA-SRYYMD     TO  WRK-SRYYMD
            MOVE    ZERO                TO  FLG-P-REC
@@ -560,13 +560,14 @@
            INITIALIZE                      PTBYOMEI-REC
            MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            MOVE    PTINF-PTID          TO  PTBYO-PTID
+           MOVE    WRK-PARA-SRYYMD     TO  PTBYO-UPYMD
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key44"             TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
+               MOVE    "key44"             TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            ELSE
                INITIALIZE                  PTBYOMEI-REC
@@ -576,12 +577,12 @@
            PERFORM UNTIL    FLG-PTBYOMEI   =   1
                PERFORM 200221-BYOMEI-HENSYU2-SEC
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
+               MOVE    "key44"             TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            END-PERFORM
       *
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key44"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
            .
        20022-BYOMEI-HENSYU-EXT.
@@ -599,25 +600,33 @@
       *
       *    診療開始日
       *    診療開始日は該当日と同一の場合を対象とするよう変更
-           IF      PTBYO-SRYYMD    NOT =   WRK-PARA-SRYYMD
-               GO  TO  200221-BYOMEI-HENSYU2-EXT
-           END-IF
+      **     IF      PTBYO-SRYYMD    NOT =   WRK-PARA-SRYYMD
+      **         GO  TO  200221-BYOMEI-HENSYU2-EXT
+      **     END-IF
       *
            PERFORM VARYING     I-J-B   FROM    1   BY  1
                    UNTIL      (I-J-B   >  TBL-JUDGMENT-B-MAX)
                IF      PTBYO-KHNBYOMEICD   =   TBL-JUDGMENT-BYOMEICD
                                                (I-J-B)
-                   MOVE    PTBYO-KHNBYOMEICD   TO  WRK-BYOMEICD
-                   MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
-                   MOVE    PTBYO-SRYYMD        TO  WRK-BYOSRYYMD
-                   MOVE    PTBYO-SRYYMD        TO  WRK-SRYYMD
-                   MOVE    PTBYO-TENKIKBN      TO  WRK-TENKIKBN
-                   MOVE    PTBYO-TENKIYMD      TO  WRK-TENKIYMD
-                   MOVE    PTBYO-DLTFLG        TO  WRK-DLTFLG
-                   MOVE    1                   TO  WRK-RECKBN
-                   PERFORM 2003-OUT-SYORI-SEC
-                   PERFORM 2003-TBL-INFECT-SEC
-                   MOVE    TBL-JUDGMENT-B-MAX  TO  I-J-B
+                   IF      PTBYO-KHNBYOMEICD   =   WRK-S-KHNBYOMEICD
+                     AND   PTBYO-SRYYMD        =   WRK-S-SRYYMD
+                     AND   PTBYO-DLTFLG        =   1
+                           CONTINUE
+                   ELSE
+                       MOVE    PTBYO-KHNBYOMEICD   TO  WRK-S-KHNBYOMEICD
+                       MOVE    PTBYO-SRYYMD        TO  WRK-S-SRYYMD
+                       MOVE    PTBYO-KHNBYOMEICD   TO  WRK-BYOMEICD
+                       MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
+                       MOVE    PTBYO-SRYYMD        TO  WRK-BYOSRYYMD
+                       MOVE    PTBYO-SRYYMD        TO  WRK-SRYYMD
+                       MOVE    PTBYO-TENKIKBN      TO  WRK-TENKIKBN
+                       MOVE    PTBYO-TENKIYMD      TO  WRK-TENKIYMD
+                       MOVE    PTBYO-DLTFLG        TO  WRK-DLTFLG
+                       MOVE    1                   TO  WRK-RECKBN
+                       PERFORM 2003-OUT-SYORI-SEC
+                       PERFORM 2003-TBL-INFECT-SEC
+                       MOVE    TBL-JUDGMENT-B-MAX  TO  I-J-B
+                   END-IF
                END-IF
            END-PERFORM
            .
@@ -1080,12 +1089,6 @@
       *****************************************************************
        4001-FILE-WRITE-SEC         SECTION.
       *
-      *    改行コード編集
-           STRING  WRK-REC(1:WRK-REC-LENGTH) DELIMITED  BY  SIZE
-                   WRK-KAIGYO                DELIMITED  BY  SIZE
-                   INTO        WRK-REC
-           END-STRING
-      *
            MOVE    WRK-REC             TO  INFEC-REC
            WRITE   INFEC-REC
            ADD     1                   TO  CNT-INFEC
@@ -1274,7 +1277,7 @@
            MOVE    ZERO                TO  I-J-S
       *
            INITIALIZE                      INFJUDGMENT-REC
-           MOVE    I-D                 TO  INFJUD-DISEASE
+           MOVE    TBL-DISEASE (I-D)   TO  INFJUD-DISEASE
            MOVE    INFJUDGMENT-REC     TO  MCPDATA-REC
            MOVE    "tbl_infection_judgment"
                                        TO  MCP-TABLE
