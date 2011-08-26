@@ -128,6 +128,7 @@
                WHEN    "£Á"    THRU     "£Ú"
                    MOVE    1       TO  SDTCHK04-ALPHABET
                WHEN    "¡Ý"
+               WHEN    "¡½"
                WHEN    "¡¾"
                    MOVE    1       TO  SDTCHK04-HYPHEN
                WHEN    "¡¼"
