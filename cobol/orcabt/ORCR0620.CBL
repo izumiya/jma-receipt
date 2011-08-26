@@ -190,6 +190,8 @@
       *  04.05.08    NACL-藤原    11/04/18  災害対応
       *                                     主保険情報が同じで適用期間が
       *                                     区切られている場合の保険履歴 
+      *  04.05.09    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -491,11 +493,11 @@
       *
       *    ワーク生保まとめ
        01  WRK-SEIHO-RECE61-AREA.
-           02  WRK-SEIHO-RECE61-REC    OCCURS  5. 
+           02  WRK-SEIHO-RECE61-REC    OCCURS  50. 
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//
                                        BY         //WRK-SEIHO-RECE61-//.
-           02  WRK-SEIHO-RECE61-PRTFLG PIC 9(01)  OCCURS  5.
-           02  WRK-SEIHO-RECE61-MAX    PIC 9(02).
+           02  WRK-SEIHO-RECE61-PRTFLG PIC 9(01)  OCCURS  50.
+           02  WRK-SEIHO-RECE61-MAX    PIC 9(03).
       *
            02  WRK-KOH-RECE61-REC. 
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//
