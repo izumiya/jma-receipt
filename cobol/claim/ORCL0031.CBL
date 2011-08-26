@@ -2412,7 +2412,7 @@
                MOVE    "*/99"              TO  WRK-INPUTCD
                MOVE    1                   TO  WRK-KAISU
            ELSE
-               MOVE    LF04-KAISU (IDX3)   TO  WRK-INPUTCD
+      ******   MOVE    LF04-KAISU (IDX3)   TO  WRK-INPUTCD
                MOVE    ORCSNDAYCHG-KAISU   TO  WRK-KAISU
            END-IF
            IF      WRK-KAISU           =   ZERO
