@@ -366,6 +366,9 @@
       *  04.05.22    NACL-藤原    11/07/12  愛知県対応
       *                                     法別番号を判定して受給者番号
       *                                     にゼロを編集するのを中止
+      *  04.05.23    NACL-藤原    11/08/26  レセ電データの記号番号区切り
+      *                                     文字設定対応
+      *                                     対象文字コード追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2617,10 +2620,17 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       20
-               IF      WRK-DELIMITER-IN-O (IDXX)   =   "─"
+               IF      WRK-DELIMITER-IN-O (IDXX)   =
+      *                                            A8 A1
+                                                       "─"
+      *                                            A1 DD
                                                    OR  "−"
+      *                                            A1 BC
                                                    OR  "ー"
+      *                                            A1 BE
                                                    OR  "‐"
+      *                                            A1 BD
+                                                   OR  "―"
                    EVALUATE    WRK-DELIMITER-FLG
                        WHEN    "1"
       *                    全角ハイフンを設定
