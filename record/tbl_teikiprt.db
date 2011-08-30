@@ -98,3 +98,22 @@ path	del2 	{
 	};
 };
 
+path	upd1	{ 	
+	DBUPDATE	{
+		UPDATE	tbl_teikiprt
+		SET	PTNUM       =   :PTNUM
+                WHERE   HOSPNUM     =   :HOSPNUM
+                  AND   PTID        =   :PTID
+		;
+	};
+};
+
+path	del3 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_teikiprt
+        	WHERE   HOSPNUM     =   :HOSPNUM
+		AND	PTID        =   :PTID
+		;
+	};
+};

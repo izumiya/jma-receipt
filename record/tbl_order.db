@@ -135,3 +135,24 @@ path	all	{
 		;
 	};
 };
+
+path	upd2 	{
+	DBUPDATE	{
+		UPDATE  tbl_order
+		SET     PTNUM     =   :PTNUM
+		WHERE   HOSPNUM   =   :HOSPNUM
+		AND     PTID      =   :PTID
+		;
+	};
+};
+
+
+path	del1 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_order
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID       =   :PTID
+		;
+	};
+};

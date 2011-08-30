@@ -2294,4 +2294,14 @@ path	key76	{
 	};
 };
 
+path	upd1	{ 	
+	DBUPDATE	{
+		UPDATE	tbl_seikyu_main
+		SET	PTNUM       =   :PTNUM
+                WHERE   HOSPNUM     =   :HOSPNUM
+                  AND   PTID        =   :PTID
+		;
+	};
+};
+
 

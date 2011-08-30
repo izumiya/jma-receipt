@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-多々納  05/11/11  MONFUNC 対応 他
       *  03.05.00    NACL-多々納  07/05/XX  グループ診療対応
+      *  04.06.00    NACL-多々納  11/09/XX  公費請求テーブル等対応追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -110,6 +111,25 @@
       *    患者番号変換（管理）
        01  PTNUM-REC.
            COPY  "CPPTNUM.INC".
+      *
+      *    地方公費請求書
+           COPY    "CPKOHSKY.INC".
+      *
+      *    請求管理
+           COPY    "CPRCF010.INC".
+      *
+      *    入院オーダ
+       01  ORDER-REC.
+           COPY    "CPORDER.INC".
+      *
+      *    定期請求印刷
+       01  TEIKIPRT-REC.
+           COPY    "CPTEIKIPRT.INC".
+      *
+      *    分娩管理テーブル
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
+      *
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -515,6 +535,96 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "0009"              TO  SPA-ERRCD
                END-IF
            END-IF
+      *
+      *    公費請求テーブル
+           INITIALIZE                      KOHSKY-REC
+           MOVE    SPA-HOSPNUM         TO  KOHSKY-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  KOHSKY-PTID
+           MOVE    SPA-GMN015-PTNUM    TO  KOHSKY-PTNUM
+           MOVE    KOHSKY-REC          TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_kohsky"        TO  MCP-TABLE
+           MOVE    "upd1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P015 KOHSKY UPDATE:" MCP-RC
+                           ",KEY:" KOHSKY-KEY
+               MOVE    "0009"              TO  SPA-ERRCD
+           END-IF
+      *
+      *    請求管理
+           INITIALIZE                      RECE10-REC
+           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  RECE10-PTID
+           MOVE    SPA-GMN015-PTNUM    TO  RECE10-PTNUM
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "upd1"              TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P015 RECE10 UPDATE:" MCP-RC
+                           ",KEY:" RECE10-KEY
+               MOVE    "0009"              TO  SPA-ERRCD
+           END-IF
+      *    患者定期請求履歴
+           INITIALIZE                      TEIKIPRT-REC
+           MOVE    SPA-HOSPNUM         TO  TEIKIPRT-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  TEIKIPRT-PTID
+           MOVE    SPA-GMN015-PTNUM    TO  TEIKIPRT-PTNUM
+           MOVE    TEIKIPRT-REC        TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_teikiprt"      TO  MCP-TABLE
+           MOVE    "upd1"              TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P015 TEIKIPRT UPDATE:" MCP-RC
+                           ",KEY:" TEIKIPRT-KEY
+               MOVE    "0009"              TO  SPA-ERRCD
+           END-IF
+      *
+      *    分娩管理テーブル
+           INITIALIZE                      BUNBEN-REC
+           MOVE    SPA-HOSPNUM         TO  BUNBEN-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  BUNBEN-PTID
+           MOVE    SPA-GMN015-PTNUM    TO  BUNBEN-PTNUM
+           MOVE    BUNBEN-REC          TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_bunben"        TO  MCP-TABLE
+           MOVE    "upd1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P015 BUNBEN UPDATE:" MCP-RC
+                           ",KEY:" BUNBEN-KEY
+               MOVE    "0009"              TO  SPA-ERRCD
+           END-IF
+      *
+      *    入院オーダテーブル更新
+           INITIALIZE                      ORDER-REC
+           MOVE    SPA-HOSPNUM         TO  ORDER-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  ORDER-PTID
+           MOVE    SPA-GMN015-PTNUM    TO  ORDER-PTNUM
+           MOVE    ORDER-REC           TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_order"         TO  MCP-TABLE
+           MOVE    "upd2"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P015 ORDER UPDATE:" MCP-RC
+                           ",KEY:" ORDER-KEY
+               MOVE    "0009"              TO  SPA-ERRCD
+           END-IF
+      *
       *
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-PTNUM           =   SPA-GMN-PTNUM
