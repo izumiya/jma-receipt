@@ -461,6 +461,14 @@
       *    チェック例外テーブル
            COPY    "CPCHKREIGAI.INC".
       *
+      *    入院オーダ
+       01  ORDER-REC.
+           COPY    "CPORDER.INC".
+      *
+      *    定期請求印刷
+       01  TEIKIPRT-REC.
+           COPY    "CPTEIKIPRT.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -3475,6 +3483,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_bunben"        TO  MCP-TABLE
            MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+      *    入院オーダ
+           INITIALIZE                      ORDER-REC
+           MOVE    SPA-HOSPNUM         TO  ORDER-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  ORDER-PTID
+           MOVE    ORDER-REC           TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_order"         TO  MCP-TABLE
+           MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+      *    定期請求印刷情報
+           INITIALIZE                      TEIKIPRT-REC
+           MOVE    SPA-HOSPNUM         TO  TEIKIPRT-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  TEIKIPRT-PTID
+           MOVE    TEIKIPRT-REC        TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_teikiprt"      TO  MCP-TABLE
+           MOVE    "del3"              TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA

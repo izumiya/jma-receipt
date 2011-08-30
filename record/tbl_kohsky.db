@@ -768,3 +768,13 @@ path	del4 	{
 		;
 	};
 };
+
+path	upd1	{ 	
+	DBUPDATE	{
+		UPDATE	tbl_kohsky
+		SET	PTNUM       =   :PTNUM
+                WHERE   HOSPNUM     =   :HOSPNUM
+                  AND   PTID        =   :PTID
+		;
+	};
+};

@@ -150,3 +150,14 @@ path	abort	{
  		;
 	};
 };
+
+path	upd1	{ 	
+	DBUPDATE	{
+		UPDATE	tbl_bunben
+		SET	PTNUM       =   :PTNUM
+                WHERE   HOSPNUM     =   :HOSPNUM
+                  AND   PTID        =   :PTID
+		;
+	};
+};
+
