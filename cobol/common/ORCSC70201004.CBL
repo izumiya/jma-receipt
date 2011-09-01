@@ -1949,11 +1949,13 @@
       *
       *    数量入力のない時,数量を枚数とする
            IF     (WRK-COM-SURFLG (IDX-SAT)   =   SPACE )
-               IF      WRK-KEIMAI          >   WRK-COM-KZMJGN(IDX-SAT)
-                   MOVE    WRK-COM-KZMJGN (IDX-SAT)
-                                               TO  WRK-COM-SURYO
-                                                           (IDX-SAT)
-               ELSE
+      *!!
+      *    上限を廃止する(H23.9)
+      *        IF     (WRK-KEIMAI          >   WRK-COM-KZMJGN(IDX-SAT))
+      *            MOVE    WRK-COM-KZMJGN (IDX-SAT)
+      *                                        TO  WRK-COM-SURYO
+      *                                                    (IDX-SAT)
+      **       ELSE
                    IF      WRK-KEIMAI          =   ZERO
                        MOVE    1               TO  WRK-COM-SURYO
                                                            (IDX-SAT)
@@ -1961,7 +1963,7 @@
                        MOVE    WRK-KEIMAI      TO  WRK-COM-SURYO
                                                            (IDX-SAT)
                    END-IF
-               END-IF
+      *****    END-IF
            END-IF
       *
            .
