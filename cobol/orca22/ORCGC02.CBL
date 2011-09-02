@@ -263,6 +263,8 @@
       *  04.06.08    NACL-藤原    10/12/17  補足コメントの入力があるとき
       *                                     単独使用禁止エラーとしない
       *  04.06.09    NACL-伊藤    11/01/28  リアルタイム送信
+      *  04.06.10    NACL-藤原    11/09/02  自院病名で登録した疾患区分を
+      *                                     優先する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1978,8 +1980,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            SPA-NAI-C02-HAISIYMD (IDZ)
                                            SPA-NAI-C02-HAISIYMD-O
                                                              (IDZ IDX3)
-                               MOVE    BYO-TANDOKUKBN
-                                                       TO
+                               MOVE    BYO-TANDOKUKBN  TO
                                            SPA-NAI-C02-TANDOKUKBN-O
                                                              (IDZ IDX3)
                                IF      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
@@ -4513,16 +4514,16 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                                                SPA-NAI-C02-HAISIYMD(IDZ)
                                        END-IF
                                    END-IF
-                                   IF      SPA-NAI-C02-TOKSKNCD(IDZ)
-                                               =   ZERO
-                                       MOVE    BYO-TOKSKNCD    TO
-                                           SPA-NAI-C02-TOKSKNCD(IDZ)
-                                   END-IF
-                                   IF      SPA-NAI-C02-NANBYOCD-O(IDZ)
-                                               =   ZERO
-                                       MOVE    BYO-NANBYOCD        TO
-                                           SPA-NAI-C02-NANBYOCD-O(IDZ)
-                                   END-IF
+      *****************************IF      SPA-NAI-C02-TOKSKNCD(IDZ)
+      *****************************            =   ZERO
+      *****************************    MOVE    BYO-TOKSKNCD    TO
+      *****************************        SPA-NAI-C02-TOKSKNCD(IDZ)
+      *****************************END-IF
+      *****************************IF      SPA-NAI-C02-NANBYOCD-O(IDZ)
+      *****************************            =   ZERO
+      *****************************    MOVE    BYO-NANBYOCD        TO
+      *****************************        SPA-NAI-C02-NANBYOCD-O(IDZ)
+      *****************************END-IF
                                ELSE
                                    MOVE    "■■■"        TO
                                        SPA-NAI-C02-BYOMEI-O  (IDZ IDXX)
