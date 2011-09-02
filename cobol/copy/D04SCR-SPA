@@ -79,6 +79,7 @@
                    07  SPA-GMN-CHKLST-SEL      PIC 9(5).
                    07  SPA-GMN-CHKLST-OCC      OCCURS  200.
                        09  SPA-GMN-TCHKBYOMEI  PIC X(100).
+                       09  SPA-GMN-TGRPID      PIC X(1).
                        09  SPA-GMN-TCOMPKBN    PIC X(4).
                05  SPA-GMN-BYOMEI              PIC X(100).
            03  SPA-GMN-COMBO-AREA.

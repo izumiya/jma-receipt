@@ -39,10 +39,11 @@
                05  SPA-X03-GMN-LNAME                   PIC X(70).
                05  SPA-X03-GMN-LCHKLST.
                    07  SPA-X03-GMN-LCHKLST-MAX         PIC 9(03).
-                   07  SPA-X03-GMN-LCHKLST-OCC         OCCURS  200.
+                   07  SPA-X03-GMN-LCHKLST-OCC         OCCURS  201.
                        09  SPA-X03-GMN-TLCHK-NUM       PIC 9(03).
                        09  SPA-X03-GMN-TLCHK-NAME      PIC X(100).
                        09  SPA-X03-GMN-TLCHK-JYKN      PIC X(01).
+                       09  SPA-X03-GMN-TLCHK-GRPID     PIC X(01).
                    07  SPA-X03-GMN-LCHKLST-FLG         PIC 9(01)
                                                        OCCURS  200.
                05  SPA-X03-GMN-RCHKKBNMEI              PIC X(70).
@@ -55,6 +56,7 @@
                        09  SPA-X03-GMN-TRCHK-NUM       PIC 9(03).
                        09  SPA-X03-GMN-TRCHK-NAME      PIC X(100).
                        09  SPA-X03-GMN-TRCHK-JYKN      PIC X(01).
+                       09  SPA-X03-GMN-TRCHK-GRPID     PIC X(01).
                    07  SPA-X03-GMN-RCHKLST-FLG-G.
                        09  SPA-X03-GMN-RCHKLST-FLG     PIC 9(01)
                                                        OCCURS  200.
@@ -80,7 +82,7 @@
                05  SPA-X03-GMN-KJNYMD                  PIC X(10).
            03  SPA-X03-NAI-AREA.
                05  SPA-X03-NAI-LCHKLST.
-                   07  SPA-X03-NAI-LCHKLST-OCC         OCCURS  200.
+                   07  SPA-X03-NAI-LCHKLST-OCC         OCCURS  201.
                        09  SPA-X03-NAI-TLCHK-SRYCD     PIC X(09).
                        09  SPA-X03-NAI-TLCHK-BYOCD     PIC X(07)
                                                        OCCURS  21.

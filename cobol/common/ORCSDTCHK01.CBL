@@ -48,11 +48,14 @@
            03  FLG-HIT                     PIC 9(01).
            03  FLG-LOOP-END                PIC 9(01).
            03  FLG-TAISYO-HKN              PIC 9(01).
+           03  FLG-CHKSND                  PIC 9(01).
+           03  FLG-GRPCHK                  PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX0                        PIC 9(05).
            03  IDX1                        PIC 9(05).
+           03  IDXG                        PIC 9(05).
            03  IDX-LEN                     PIC 9(05).
            03  IDX-ST                      PIC 9(05).
            03  IDX-COMB                    PIC 9(05).
@@ -82,6 +85,14 @@
        01  LEN-AREA.
            03  LEN-CHKMST                  PIC 9(05).
            03  LEN-PTBYOMEI                PIC 9(05).
+      *
+      *    グループチェック退避ワーク
+       01  TGRP-AREA.
+           03  TGRP-MAX                    PIC 9(03).
+           03  TGRP-OCC                    OCCURS  6.
+               05  TGRP-ID                 PIC X(01).
+               05  TGRP-DAY                PIC 9(01)
+                                           OCCURS  31.
       *
       *    病名退避ワーク
        01  TBYOMEI-AREA.
@@ -120,6 +131,8 @@
                                        VALUE   "8".
            03  CONST-HOUKATU           PIC X(01)
                                        VALUE   "H".
+           03  CONST-GRP-MAX           PIC 9(31)
+                                       VALUE   6.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -132,6 +145,10 @@
       *    保険組合せ
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
+      *
+      *    チェックマスタ２
+       01  CHKSND-REC.
+           COPY    "CPCHKSND.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -195,9 +212,42 @@
                                        WRK-AREA
                                        LEN-AREA
                                        TBYOMEI-AREA
+                                       TGRP-AREA
+      *
+           IF    ( SDTCHK01-CHKKBN     =   "1" )
+            AND  ( SDTCHK01-GRPCHKKBN  =   "1" )
+               PERFORM 1001-GRP-INIT-SEC
+           END-IF
       *
            .
        100-INIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    グループチェック初期処理
+      *****************************************************************
+       1001-GRP-INIT-SEC               SECTION.
+      *
+           MOVE    1               TO  FLG-GRPCHK
+      *
+           PERFORM 900-CHKSND-KEY25-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+                    OR   ( TGRP-MAX       >=   CONST-GRP-MAX )
+      *
+               COMPUTE TGRP-MAX = TGRP-MAX +   1
+      *
+               MOVE    CHKSND-GRPID    TO  TGRP-ID (TGRP-MAX)
+      *
+               PERFORM 900-CHKSND-KEY25-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key25"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       1001-GRP-INIT-EXT.
            EXIT.
       *****************************************************************
       *    主処理
@@ -222,6 +272,20 @@
            ELSE
                        MOVE    "key4"  TO  WRK-PATHNAME
            END-IF
+      *
+           IF    ( FLG-GRPCHK     =    ZERO )
+               PERFORM 2001-NORMAL-CHK-SEC
+           ELSE
+               PERFORM 2001-GROUP-CHK-SEC
+           END-IF
+      *
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    通常チェック処理
+      *****************************************************************
+       2001-NORMAL-CHK-SEC                    SECTION.
       *
            PERFORM 900-QDTCHK-KEY-SEL-SEC
            IF    ( FLG-QDTCHK      =   ZERO )
@@ -263,7 +327,78 @@
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       200-MAIN-EXT.
+       2001-NORMAL-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    グループチェック処理
+      *****************************************************************
+       2001-GROUP-CHK-SEC              SECTION.
+      *
+           PERFORM 900-QDTCHK-KEY-SEL-SEC
+           IF    ( FLG-QDTCHK      =   ZERO )
+               PERFORM 900-QDTCHK-KEY-FET-SEC
+           END-IF
+      *
+           PERFORM UNTIL ( FLG-QDTCHK      NOT =   ZERO )
+      *
+               MOVE    ZERO            TO  IDXG
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1    >   TGRP-MAX )
+                        OR   ( IDXG    NOT =   ZERO )
+                   IF    ( QDTCHK-GRPID    =   TGRP-ID (IDX1))
+                       MOVE    IDX1    TO  IDXG
+                   END-IF
+               END-PERFORM
+      *
+               IF    ( IDXG         >  ZERO )
+                   PERFORM 2001-BYOMEI-CHK-SEC
+                   IF    ( FLG-MATCH    =  1 )
+                       PERFORM VARYING IDX-DAY    FROM 1   BY  1
+                               UNTIL ( IDX-DAY    >    31 )
+                                OR   ( SDTCHK01-CHKDAY-G   =   ZERO )
+                           IF    ( SDTCHK01-CHKDAY (IDX-DAY) >   ZERO )
+                               MOVE    SDTCHK01-KJNYMD TO  WRK-SRYYMD
+                               MOVE    IDX-DAY         TO  WRK-SRYDD
+                               PERFORM 2001-TAISYO-CHK-SEC
+                               IF    ( FLG-TAISYO  =   1 )
+                                   MOVE 1  TO  TGRP-DAY (IDXG IDX-DAY)
+                               END-IF
+                           END-IF
+                       END-PERFORM
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-QDTCHK-KEY-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "query_dtchk"       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           PERFORM VARYING IDX-DAY    FROM 1   BY  1
+                   UNTIL ( IDX-DAY    >    31 )
+                    OR   ( SDTCHK01-CHKDAY-G   =   ZERO )
+      *
+               IF    ( SDTCHK01-CHKDAY (IDX-DAY) > ZERO )
+                   MOVE    ZERO        TO  SDTCHK01-CHKDAY (IDX-DAY)
+                   PERFORM VARYING IDXG    FROM    1   BY  1
+                           UNTIL ( IDXG    >   TGRP-MAX )
+                            OR   ( SDTCHK01-CHKDAY (IDX-DAY)
+                                       NOT =   ZERO )
+      *
+                       IF    ( TGRP-DAY (IDXG IDX-DAY)
+                                           =   ZERO )
+                           MOVE    1   TO  SDTCHK01-CHKDAY (IDX-DAY)
+                       END-IF
+      *
+                   END-PERFORM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2001-GROUP-CHK-EXT.
            EXIT.
       *****************************************************************
       *    病名チェック処理
@@ -864,6 +999,54 @@
       *
            .
        900-QDTCHK-KEY-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY25-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHKSND
+      *
+           INITIALIZE                  CHKSND-REC
+           MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
+           MOVE    SDTCHK01-CHKKBN TO  CHKSND-CHKKBN
+           MOVE    SDTCHK01-SRYCD  TO  CHKSND-SRYCD
+           MOVE    SDTCHK01-KJNYMD TO  CHKSND-YUKOSTYMD
+                                       CHKSND-YUKOEDYMD
+           MOVE    SDTCHK01-CDKBN  TO  CHKSND-CDKBN
+           MOVE    CHKSND-REC      TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "key25"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  CHKSND-REC
+           ELSE
+               MOVE    1           TO  FLG-CHKSND
+               INITIALIZE              CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY25-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２FETCH処理
+      *****************************************************************
+       900-CHKSND-KEY25-FET-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHKSND
+      *
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "key25"         TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  CHKSND-REC
+           ELSE
+               MOVE    1           TO  FLG-CHKSND
+               INITIALIZE              CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY25-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

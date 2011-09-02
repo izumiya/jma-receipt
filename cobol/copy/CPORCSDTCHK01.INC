@@ -29,6 +29,7 @@
                05  SDTCHK01-CDKBN              PIC X(01).
                05  SDTCHK01-NYUGAIKBN          PIC X(01).
                05  SDTCHK01-HKNKBN             PIC X(01).
+               05  SDTCHK01-GRPCHKKBN          PIC X(01).
                05  SDTCHK01-CHKDAY-G.
                    07  SDTCHK01-CHKDAY         PIC 9(01)   OCCURS  31.
            03  SDTCHK01-OT.

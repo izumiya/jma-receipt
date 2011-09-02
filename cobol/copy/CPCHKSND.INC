@@ -49,6 +49,10 @@
            03  CHKSND-BYOMEIHENFLG       PIC  X(1).
       *入外区分
            03  CHKSND-NYUGAIKBN          PIC  X(1).
+      *グループチェック区分
+           03  CHKSND-GRPCHKKBN          PIC  X(1).
+      *グループＩＤ
+           03  CHKSND-GRPID              PIC  X(1).
       *端末ＩＤ
            03  CHKSND-TERMID             PIC  X(16).
       *オペーレータＩＤ

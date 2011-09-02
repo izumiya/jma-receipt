@@ -85,8 +85,10 @@
            03  IDX6                        PIC 9(05).
            03  IDX7                        PIC 9(05).
            03  IDXA                        PIC 9(05).
+           03  IDXS                        PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
            03  IDX-LST                     PIC 9(05).
+           03  IDX-ST                      PIC 9(05).
       *
        01  WRK-AREA.
            03  WRK-TABLE                   PIC X(64).
@@ -115,6 +117,9 @@
                    07  WRK-KEY-CD          PIC X(07).
                    07  WRK-KEY-CDSEP       PIC X(01).
            03  WRK-MOJI                    PIC 9(03).
+           03  WRK-PRT-NUM-G.
+               05  WRK-PRT-NUM             PIC ZZZ9.
+               05  WRK-PRT-GRPID           PIC X(02).
       *
        01  WRK-LCHKLST-AREA.
            03  WRK-LCHKLST-MAX             PIC 9(05).
@@ -122,6 +127,7 @@
                05  WRK-LCHKLST-NAME        PIC X(100).
                05  WRK-LCHKLST-SRYCD       PIC X(09).
                05  WRK-LCHKLST-JYKN        PIC X(01).
+               05  WRK-LCHKLST-GRPID       PIC X(01).
                05  WRK-LCHKLST-BYOCD       PIC X(07)
                                            OCCURS   21.
                05  WRK-LCHKLST-BYOSTATUS   PIC X(01).
@@ -1156,9 +1162,6 @@
                MOVE    CHK005-ID       TO  SPA-X03-NAI-TSEL-ID
                                                            (IDX-LST)
       *
-               MOVE    CHK005-DAYMONTHKBN  TO  SPA-X03-GMN-TRCHK-JYKN
-                                                           (IDX-LST)
-      *
       *        チェックマスタ読込処理
                PERFORM 900-CHK005-KEY7-FET-SEC
                IF    ( FLG-CHK005     =    ZERO )
@@ -1769,6 +1772,10 @@
       *
                MOVE    CHKSND-COMPKBN      TO  SPA-X03-GMN-TRCHK-JYKN
                                                                (IDXA)
+      *
+               MOVE    CHKSND-GRPID        TO  SPA-X03-GMN-TRCHK-GRPID
+                                                               (IDXA)
+      *
                MOVE    CHKSND-BYOMEIHENFLG 
                                        TO  SPA-X03-NAI-TRCHK-BYOSTATUS
                                                                (IDXA)
@@ -2245,22 +2252,31 @@
                            UNTIL ( IDX6    >   SPA-X03-GMN-LCHKLST-MAX )
                             OR   ( FLG-HIT =   1 )
       *
-                       IF    ( SPA-X03-GMN-CHKKBN  =   "1"
-                                                   OR  "2"
-                                                   OR  "6"
-                                                   OR  "M" )
+                       EVALUATE    SPA-X03-GMN-CHKKBN
+                       WHEN    "1"
+                           IF    ( SPA-X03-GMN-TRCHK-NAME  (IDX0)
+                               =   SPA-X03-GMN-TLCHK-NAME  (IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-JYKN  (IDX0)
+                               =   SPA-X03-GMN-TLCHK-JYKN  (IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-GRPID (IDX0)
+                               =   SPA-X03-GMN-TLCHK-GRPID (IDX6) )
+                               MOVE    1   TO  FLG-HIT
+                           END-IF
+                       WHEN    "2"
+                       WHEN    "6"
+                       WHEN    "M"
                            IF    ( SPA-X03-GMN-TRCHK-NAME  (IDX0)
                                =   SPA-X03-GMN-TLCHK-NAME  (IDX6) )
                             AND  ( SPA-X03-GMN-TRCHK-JYKN  (IDX0)
                                =   SPA-X03-GMN-TLCHK-JYKN  (IDX6) )
                                MOVE    1   TO  FLG-HIT
                            END-IF
-                       ELSE
+                       WHEN    OTHER
                            IF    ( SPA-X03-NAI-TRCHK-SRYCD (IDX0)
                                =   SPA-X03-NAI-TLCHK-SRYCD (IDX6) )
                                MOVE    1   TO  FLG-HIT
                            END-IF
-                       END-IF
+                       END-EVALUATE
       *
                    END-PERFORM
       *
@@ -2278,6 +2294,9 @@
       *
                        MOVE    SPA-X03-GMN-TRCHK-JYKN (IDX0)
                                        TO  WRK-LCHKLST-JYKN
+                                                      (WRK-LCHKLST-MAX)
+                       MOVE    SPA-X03-GMN-TRCHK-GRPID (IDX0)
+                                       TO  WRK-LCHKLST-GRPID
                                                       (WRK-LCHKLST-MAX)
                        PERFORM VARYING IDX7    FROM    1   BY  1
                            UNTIL ( IDX7    >   CONST-MKCD-MAX )
@@ -2346,6 +2365,10 @@
                                        TO  SPA-X03-NAI-TLCHK-SRYCD(IDXA)
                MOVE    WRK-LCHKLST-JYKN (IDX0)
                                        TO  SPA-X03-GMN-TLCHK-JYKN (IDXA)
+               IF    ( SPA-X03-GMN-CHKKBN  =   "1" )
+                   MOVE    WRK-LCHKLST-GRPID(IDX0)
+                                       TO  SPA-X03-GMN-TLCHK-GRPID(IDXA)
+               END-IF
                PERFORM VARYING IDX7    FROM    1   BY  1
                        UNTIL ( IDX7    >   CONST-MKCD-MAX )
                    MOVE    WRK-LCHKLST-BYOCD (IDX0 IDX7)
@@ -2365,6 +2388,41 @@
                                TO  SPA-X03-NAI-TLCHK-CHKERR (IDXA)
                MOVE    WRK-LCHKLST-DATAKBN (IDX0)
                                TO  SPA-X03-NAI-TLCHK-DATAKBN (IDXA)
+      *
+           END-PERFORM
+      *
+           IF    ( SPA-X03-GMN-CHKKBN  =   "1" )
+      *
+               COMPUTE IDXS = SPA-X03-GMN-LCHKLST-MAX  +   1
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   SPA-X03-GMN-LCHKLST-MAX - 1 )
+                   COMPUTE IDX-ST  =   IDX0    +   1
+                   PERFORM VARYING IDX1    FROM    IDX-ST  BY  1
+                           UNTIL ( IDX1    >   SPA-X03-GMN-LCHKLST-MAX )
+                       IF    ( SPA-X03-GMN-TLCHK-GRPID (IDX0)
+                                   >   SPA-X03-GMN-TLCHK-GRPID (IDX1))
+                           MOVE    SPA-X03-GMN-LCHKLST-OCC (IDX0)
+                                   TO  SPA-X03-GMN-LCHKLST-OCC (IDXS)
+                           MOVE    SPA-X03-NAI-LCHKLST-OCC (IDX0)
+                                   TO  SPA-X03-NAI-LCHKLST-OCC (IDXS)
+                           MOVE    SPA-X03-GMN-LCHKLST-OCC (IDX1)
+                                   TO  SPA-X03-GMN-LCHKLST-OCC (IDX0)
+                           MOVE    SPA-X03-NAI-LCHKLST-OCC (IDX1)
+                                   TO  SPA-X03-NAI-LCHKLST-OCC (IDX0)
+                           MOVE    SPA-X03-GMN-LCHKLST-OCC (IDXS)
+                                   TO  SPA-X03-GMN-LCHKLST-OCC (IDX1)
+                           MOVE    SPA-X03-NAI-LCHKLST-OCC (IDXS)
+                                   TO  SPA-X03-NAI-LCHKLST-OCC (IDX1)
+                       END-IF
+                   END-PERFORM
+               END-PERFORM
+           END-IF
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-X03-GMN-LCHKLST-MAX )
+      *
+               MOVE    IDX0        TO  SPA-X03-GMN-TLCHK-NUM  (IDX0)
+               MOVE    ZERO        TO  SPA-X03-GMN-LCHKLST-FLG (IDX0)
       *
            END-PERFORM
       *
@@ -2398,22 +2456,31 @@
                            UNTIL ( IDX6    >   SPA-X03-GMN-LCHKLST-MAX )
                             OR   ( FLG-HIT =   1 )
       *
-                       IF    ( SPA-X03-GMN-CHKKBN  =   "1"
-                                                   OR  "2"
-                                                   OR  "6"
-                                                   OR  "M" )
+                       EVALUATE    SPA-X03-GMN-CHKKBN
+                       WHEN    "1"
+                           IF    ( SPA-X03-GMN-TRCHK-NAME  (IDX0)
+                               =   SPA-X03-GMN-TLCHK-NAME  (IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-JYKN  (IDX0)
+                               =   SPA-X03-GMN-TLCHK-JYKN  (IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-GRPID (IDX0)
+                               =   SPA-X03-GMN-TLCHK-GRPID (IDX6) )
+                               MOVE    1   TO  FLG-HIT
+                           END-IF
+                       WHEN    "2"
+                       WHEN    "6"
+                       WHEN    "M"
                            IF    ( SPA-X03-GMN-TRCHK-NAME  (IDX0)
                                =   SPA-X03-GMN-TLCHK-NAME  (IDX6) )
                             AND  ( SPA-X03-GMN-TRCHK-JYKN  (IDX0)
                                =   SPA-X03-GMN-TLCHK-JYKN  (IDX6) )
                                MOVE    1   TO  FLG-HIT
                            END-IF
-                       ELSE
+                       WHEN    OTHER
                            IF    ( SPA-X03-NAI-TRCHK-SRYCD (IDX0)
                                =   SPA-X03-NAI-TLCHK-SRYCD (IDX6) )
                                MOVE    1   TO  FLG-HIT
                            END-IF
-                       END-IF
+                       END-EVALUATE
       *
                    END-PERFORM
       *
@@ -2431,6 +2498,9 @@
       *
                        MOVE    SPA-X03-GMN-TRCHK-JYKN (IDX0)
                                        TO  WRK-LCHKLST-JYKN
+                                                      (WRK-LCHKLST-MAX)
+                       MOVE    SPA-X03-GMN-TRCHK-GRPID (IDX0)
+                                       TO  WRK-LCHKLST-GRPID
                                                       (WRK-LCHKLST-MAX)
                        PERFORM VARYING IDX7    FROM    1   BY  1
                            UNTIL ( IDX7    >   CONST-MKCD-MAX )
@@ -2497,6 +2567,9 @@
                    MOVE    SPA-X03-GMN-TLCHK-JYKN (IDX0)
                                        TO  WRK-LCHKLST-JYKN
                                                       (WRK-LCHKLST-MAX)
+                   MOVE    SPA-X03-GMN-TLCHK-GRPID (IDX0)
+                                       TO  WRK-LCHKLST-GRPID
+                                                      (WRK-LCHKLST-MAX)
                    PERFORM VARYING IDX7    FROM    1   BY  1
                            UNTIL ( IDX7    >   CONST-MKCD-MAX )
                        MOVE    SPA-X03-NAI-TLCHK-BYOCD (IDX0 IDX7)
@@ -2543,6 +2616,8 @@
                                        TO  SPA-X03-NAI-TLCHK-SRYCD(IDX0)
                MOVE    WRK-LCHKLST-JYKN (IDX0)
                                        TO  SPA-X03-GMN-TLCHK-JYKN (IDX0)
+               MOVE    WRK-LCHKLST-GRPID (IDX0)
+                                       TO  SPA-X03-GMN-TLCHK-GRPID(IDX0)
                PERFORM VARYING IDX7    FROM    1   BY  1
                        UNTIL ( IDX7    >   CONST-MKCD-MAX )
                    MOVE    WRK-LCHKLST-BYOCD (IDX0 IDX7)
@@ -2778,9 +2853,12 @@
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   SPA-X03-GMN-LCHKLST-MAX )
       *
+               INITIALIZE                  WRK-PRT-NUM-G
                MOVE    SPA-X03-GMN-TLCHK-NUM  (IDX1)
-                                       TO  WRK-ZZZZ
-               MOVE    WRK-ZZZZ        TO  X03-TLCHK-NUM  (IDX1)
+                                       TO  WRK-PRT-NUM
+               MOVE    SPA-X03-GMN-TLCHK-GRPID(IDX1)
+                                       TO  WRK-PRT-GRPID(2:1)
+               MOVE    WRK-PRT-NUM-G   TO  X03-TLCHK-NUM  (IDX1)
                IF    ( SPA-X03-NAI-TLCHK-DATAKBN(IDX1)
                                            =   "1" )
                    MOVE    "◎"        TO  X03-TLCHK-NUM  (IDX1) (1:2)
@@ -2821,9 +2899,12 @@
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   SPA-X03-GMN-RCHKLST-MAX )
       *
+               INITIALIZE                  WRK-PRT-NUM-G
                MOVE    SPA-X03-GMN-TRCHK-NUM  (IDX1)
-                                       TO  WRK-ZZZZ
-               MOVE    WRK-ZZZZ        TO  X03-TRCHK-NUM  (IDX1)
+                                       TO  WRK-PRT-NUM
+               MOVE    SPA-X03-GMN-TRCHK-GRPID(IDX1)
+                                       TO  WRK-PRT-GRPID(2:1)
+               MOVE    WRK-PRT-NUM-G   TO  X03-TRCHK-NUM  (IDX1)
                MOVE    SPA-X03-GMN-TRCHK-NAME (IDX1)
                                        TO  X03-TRCHK-NAME (IDX1)
       *

@@ -81,14 +81,23 @@
                 04  X04-SRCUTAGAIKBN-COUNT   PIC S9(9)   BINARY.
                 04  X04-SRCUTAGAIKBN-ITEM
                         PIC X(32)   OCCURS  5 TIMES.
+              03  X04-LBLGRPID    PIC X(8).
+              03  X04-CMB-GRPID.
+                04  X04-GRPID.
+                  05  X04-VALUE   PIC X(10).
+                04  X04-GRPID-STATE PIC S9(9)   BINARY.
+                04  X04-GRPID-COUNT   PIC S9(9)   BINARY.
+                04  X04-GRPID-ITEM
+                        PIC X(10)   OCCURS  26 TIMES.
+                04  X04-GRPID-ITEM-STATE PIC S9(9)   BINARY.
               03  X04-SCROLLEDWINDOW1.
                 04  X04-BYOLST.
                   05  X04-BYOLST-COUNT   PIC S9(9)   BINARY.
                   05  X04-BYOLST-ROW PIC S9(9)   BINARY.
                   05  X04-BYOLST-ROWATTR PIC S9(9)   BINARY.
                   05  X04-BYOLST-ITEM        OCCURS  200 TIMES.
-                    06  X04-TNO       PIC X(3).
-                    06  X04-TMARK     PIC X(1).
+                    06  X04-TNO       PIC X(5).
+                    06  X04-TMARK     PIC X(2).
                     06  X04-TBYOMEI   PIC X(100).
                     06  X04-TJYKN     PIC X(4).
                     06  X04-TUTAGAI   PIC X(4).

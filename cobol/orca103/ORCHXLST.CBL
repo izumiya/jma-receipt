@@ -78,7 +78,8 @@
            03  B01R-TEKIYO-G.
                05  B01R-COMPKBNMEI     PIC X(02).
                05  B01R-UTAGAIKBNMEI   PIC X(01).
-               05  B01R-FIL1           PIC X(02).
+               05  B01R-GRPID          PIC X(01).
+               05  B01R-FIL1           PIC X(01).
                05  B01R-TEKIYO         PIC X(90).
                05  B01R-TEKIYO-R1      REDEFINES  B01R-TEKIYO.
                    07  B01R-BYOMEICD   PIC X(07).
@@ -1305,6 +1306,10 @@
                    MOVE    "1"        TO  B01R-UTAGAIKBN
                    MOVE    "#"        TO  B01R-UTAGAIKBNMEI
            END-EVALUATE
+      *
+           IF    ( CHKSND-CHKKBN   =   "1" )
+               MOVE    CHKSND-GRPID   TO  B01R-GRPID
+           END-IF
       *
            MOVE    CHKSND-CD       TO  WRK-KEY-CD-G
            MOVE    1               TO  WRK-PNT

@@ -33,7 +33,7 @@ X03	{
 				row	int;
 				rowattr	int;
 				item	{
-					value0	varchar(4);
+					value0	varchar(6);
 					value1	varchar(100);
 					value2	varchar(4);
 				}	[200];
@@ -61,7 +61,7 @@ X03	{
 				row	int;
 				rowattr	int;
 				item	{
-					value0	varchar(4);
+					value0	varchar(6);
 					value1	varchar(100);
 					value2	varchar(4);
 				}	[200];

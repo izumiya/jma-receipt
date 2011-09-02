@@ -133,14 +133,26 @@ X04	{
 			count	int;
 			item	varchar(32)[05];
 		};
+		LBLGRPID	{
+					value	varchar(08);
+		};
+		CMB_GRPID	{
+			GRPID	{
+				value	varchar(10);
+				state	int;
+			};
+			count	int;
+			item	varchar(10)[26];
+			state	int;
+		};
 		scrolledwindow1	{
 			BYOLST	{
 				count	int;
 				row	int;
 				rowattr	int;
 				item	{
-					value0	varchar(3);
-					value1	varchar(1);
+					value0	varchar(5);
+					value1	varchar(2);
 					value2	varchar(100);
 					value3	varchar(4);
 					value4	varchar(4);
