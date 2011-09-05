@@ -42,6 +42,9 @@
       *
       *  04.04.01    NACL-藤原    09/12/10  返戻対応
       *
+      *  04.05.01    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
+      *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *  04.06.02    NACL-藤原    10/12/20  保険者からの返戻対応
@@ -266,7 +269,7 @@
                05  SPA-H99GMN-SELNUM          PIC 9(02).
       *
                05  SPA-H99GMN-TBL.
-                   07  SPA-H99GMN-G           OCCURS  10.
+                   07  SPA-H99GMN-G           OCCURS  50.
                        09  SPA-H99GMN-TRENNUM     PIC X(2).
                        09  SPA-H99GMN-TNYUGAIKBN  PIC X(6).
                        09  SPA-H99GMN-TSRYKA      PIC X(10).
@@ -283,7 +286,7 @@
                05  SPA-H99NAI-PTID            PIC 9(10).
       *
                05 SPA-H99NAI-TBL.
-                   07  SPA-H99NAI-RECE10-KEY  OCCURS  10.
+                   07  SPA-H99NAI-RECE10-KEY  OCCURS  50.
                        09  SPA-H99NAI-RECE10-HOSPNUM PIC 9(02).
                        09  SPA-H99NAI-RECE10-SRYYM   PIC 9(06).
                        09  SPA-H99NAI-RECE10-NYUGAIKBN

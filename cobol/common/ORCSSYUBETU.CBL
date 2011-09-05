@@ -90,6 +90,8 @@
       *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
       *                                     平成２２年４月分以降の政府管
       *                                     掌をエラーとする
+      *  04.05.02    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *  04.06.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
@@ -353,11 +355,11 @@
       *
       *    ワーク生保まとめ
        01  TBL-SEIHO-RECE61-AREA.
-           02  TBL-SEIHO-RECE61-REC    OCCURS  5. 
+           02  TBL-SEIHO-RECE61-REC    OCCURS  50. 
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//
                                        BY         //TBL-SEIHO-RECE61-//.
-           02  TBL-SEIHO-RECE61-PRTFLG PIC 9(01)  OCCURS  5.
-           02  TBL-SEIHO-RECE61-MAX    PIC 9(02).
+           02  TBL-SEIHO-RECE61-PRTFLG PIC 9(01)  OCCURS  50.
+           02  TBL-SEIHO-RECE61-MAX    PIC 9(03).
       *
        01  WRK-KOH-RECE61-REC. 
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//

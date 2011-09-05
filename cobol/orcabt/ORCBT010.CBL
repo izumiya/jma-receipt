@@ -101,6 +101,8 @@
       *  04.05.01    NACL-藤原    10/03/12  平成２２年４月改正対応
       *                                     平成２２年４月分以降の政府管
       *                                     掌をエラーとする
+      *  04.05.06    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
       *
       *  04.06.01    NACL-藤原    10/11/05  補足コメント対応
       *  04.06.02    NACL-藤原    10/10/12  公費単独のレセ分離対応
@@ -393,14 +395,14 @@
       *
       *    ワーク生保まとめ
        01  TBL-SEIHO-TOUKEI01-AREA.
-           02  TBL-SEIHO-TOUKEI01-REC  OCCURS  5. 
+           02  TBL-SEIHO-TOUKEI01-REC  OCCURS  50. 
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
                                    BY         //TBL-SEIHO-TOUKEI01//.
-           02  TBL-SEIHO-TOUKEI01-OCC  OCCURS  5.
+           02  TBL-SEIHO-TOUKEI01-OCC  OCCURS  50.
                03  TBL-SEIHO-TOUKEI01-PRTFLG
                                    PIC 9(01).
            02  TBL-SEIHO-TOUKEI01-MAX
-                                   PIC 9(02).
+                                   PIC 9(03).
       *
        01  WRK-KOH-TOUKEI01-REC. 
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//

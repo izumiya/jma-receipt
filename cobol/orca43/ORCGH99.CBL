@@ -60,6 +60,8 @@
       *
       *  04.05.01    NACL-藤原    09/04/16  主科設定時の主科未設定のチェ
       *                                     ック追加
+      *  04.05.02    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
       *
       *  04.06.01    NACL-藤原    10/12/07  公費単独の負担者番号、受給者
       *                                     番号の表示に自立支援を追加
@@ -393,7 +395,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    ZERO                TO  IDX 
            PERFORM     UNTIL       FLG-SEIKYU     =   1
-                       OR          IDX            =  10
+                       OR          IDX            =  50
                ADD     1                   TO  IDX
                MOVE    MCPDATA-REC     TO  RECE10-REC
                MOVE    RECE10-KEY      TO
