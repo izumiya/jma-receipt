@@ -131,6 +131,8 @@
       *                                     Äã½êÆÀµ­ºÜ½¤Àµ
       *  04.05.26    NACL-Æ£¸¶    11/08/25  ¸øÈñÃ±ÆÈÂÐ±þ
       *                                     ÊÝ¸±ÍúÎò¤òºÇÂç£±£°£°¤ËÊÑ¹¹
+      *  04.05.27    NACL-Æ£¸¶    11/09/05  ¡ÖÀÁµá¤·¤Ê¤¤¡×ÀßÄê¤ÎÀÁµá´ÉÍý
+      *                                     ¤ÎÊÝ¸±¤Îµ­¹æÈÖ¹æ¤ò¹¹¿·¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8571,8 +8573,6 @@
                MOVE    RECE02-HONKZKKBN    TO  RECE10-HONKZKKBN
                MOVE    RECE02-HOJOKBN      TO  RECE10-HOJOKBN
                MOVE    RECE02-CONTKBN      TO  RECE10-CONTKBN
-               MOVE    RECE02-KIGO         TO  RECE10-KIGO
-               MOVE    RECE02-NUM          TO  RECE10-NUM
                MOVE    ZERO                TO  RECE10-SKYYM
                                                RECE10-HENREIYM
                                                RECE10-TEISEIKBN
@@ -8605,6 +8605,9 @@
                MOVE    WRK-PARA-SYSYMD     TO  RECE10-CREYMD
                MOVE    ZERO                TO  RECE10-UPDYMD
            END-IF
+      *
+           MOVE    RECE02-KIGO         TO  RECE10-KIGO
+           MOVE    RECE02-NUM          TO  RECE10-NUM
       *
       *    ¼£¸³¤ÏÀÁµá¶èÊ¬¤ò£°¡§ÀÁµá¤·¤Ê¤¤¤È¤¹¤ë
            IF      RECE10-HKNNUM       >=  "900"
