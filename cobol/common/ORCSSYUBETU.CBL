@@ -92,6 +92,8 @@
       *                                     は公費単独のレセプトとする
       *  04.05.03    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
+      *  04.05.04    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -349,11 +351,11 @@
       *
       *    ワーク生保まとめ
        01  TBL-SEIHO-RECE61-AREA.
-           02  TBL-SEIHO-RECE61-REC    OCCURS  5. 
+           02  TBL-SEIHO-RECE61-REC    OCCURS  50. 
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//
                                        BY         //TBL-SEIHO-RECE61-//.
-           02  TBL-SEIHO-RECE61-PRTFLG PIC 9(01)  OCCURS  5.
-           02  TBL-SEIHO-RECE61-MAX    PIC 9(02).
+           02  TBL-SEIHO-RECE61-PRTFLG PIC 9(01)  OCCURS  50.
+           02  TBL-SEIHO-RECE61-MAX    PIC 9(03).
       *
        01  WRK-KOH-RECE61-REC. 
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//

@@ -25,8 +25,8 @@ H99	{
 					value7	varchar(8);
 					value8	varchar(20);
 					value9	varchar(9);
-				}	[10];
-				select	bool[10];
+				}	[50];
+				select	bool[50];
 			};
 		};
 		SELNUM	{

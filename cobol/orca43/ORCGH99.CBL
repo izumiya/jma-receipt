@@ -62,6 +62,8 @@
       *                                     ック追加
       *  04.05.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
       *                                     は公費単独のレセプトとする
+      *  04.05.03    NACL-藤原    11/08/25  公費単独対応
+      *                                     公費を最大５０に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -390,7 +392,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    ZERO                TO  IDX 
            PERFORM     UNTIL       FLG-SEIKYU     =   1
-                       OR          IDX            =  10
+                       OR          IDX            =  50
                ADD     1                   TO  IDX
                MOVE    MCPDATA-REC     TO  RECE10-REC
                MOVE    RECE10-KEY      TO

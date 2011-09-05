@@ -41,6 +41,9 @@
       *  04.03.03    NACL-∆£∏∂    08/06/18  ∏¯»Ò¿¡µ· ¨§Œ¿¡µ·«Ø∑Ó≈˘§Œƒ…≤√
       *
       *  04.04.01    NACL-∆£∏∂    09/12/10   ÷Ã·¬–±˛
+      *
+      *  04.05.01    NACL-∆£∏∂    11/08/25  ∏¯»Ò√±∆»¬–±˛
+      *                                     ∏¯»Ò§Ú∫«¬Á£µ£∞§À —ππ
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -255,7 +258,7 @@
                05  SPA-H99GMN-SELNUM          PIC 9(02).
       *
                05  SPA-H99GMN-TBL.
-                   07  SPA-H99GMN-G           OCCURS  10.
+                   07  SPA-H99GMN-G           OCCURS  50.
                        09  SPA-H99GMN-TRENNUM     PIC X(2).
                        09  SPA-H99GMN-TNYUGAIKBN  PIC X(6).
                        09  SPA-H99GMN-TSRYKA      PIC X(10).
@@ -272,7 +275,7 @@
                05  SPA-H99NAI-PTID            PIC 9(10).
       *
                05 SPA-H99NAI-TBL.
-                   07  SPA-H99NAI-RECE10-KEY  OCCURS  10.
+                   07  SPA-H99NAI-RECE10-KEY  OCCURS  50.
                        09  SPA-H99NAI-RECE10-HOSPNUM PIC 9(02).
                        09  SPA-H99NAI-RECE10-SRYYM   PIC 9(06).
                        09  SPA-H99NAI-RECE10-NYUGAIKBN
