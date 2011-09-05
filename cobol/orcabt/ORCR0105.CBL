@@ -130,6 +130,8 @@
       *                                     低所得記載修正
       *  04.05.26    NACL-藤原    11/08/25  公費単独対応
       *                                     保険履歴を最大１００に変更
+      *  04.05.27    NACL-藤原    11/09/05  「請求しない」設定の請求管理
+      *                                     の保険の記号番号を更新する
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -8629,8 +8631,6 @@
                MOVE    RECE02-HONKZKKBN    TO  RECE10-HONKZKKBN
                MOVE    RECE02-HOJOKBN      TO  RECE10-HOJOKBN
                MOVE    RECE02-CONTKBN      TO  RECE10-CONTKBN
-               MOVE    RECE02-KIGO         TO  RECE10-KIGO
-               MOVE    RECE02-NUM          TO  RECE10-NUM
                MOVE    ZERO                TO  RECE10-SKYYM
                                                RECE10-HENREIYM
                                                RECE10-TEISEIKBN
@@ -8666,6 +8666,9 @@
                MOVE    ZERO                TO  RECE10-UPDYMD
                                                RECE10-UPDHMS
            END-IF
+      *
+           MOVE    RECE02-KIGO         TO  RECE10-KIGO
+           MOVE    RECE02-NUM          TO  RECE10-NUM
       *
       *    治験は請求区分を０：請求しないとする
            IF      RECE10-HKNNUM       >=  "900"
