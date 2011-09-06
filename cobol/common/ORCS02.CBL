@@ -307,6 +307,7 @@
       *  04.05.12    NACL-ÌçÏÆ    11/04/14  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ·×»»½¤Àµ
       *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *  04.05.13    NACL-ÌçÏÆ    11/05/11  ¥Þ¥ëÄ¹·×»»½¤Àµ
+      *  04.05.14    NACL-ÌçÏÆ    11/09/02  Âà±¡²¾·×»»»þ¤ÎÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       ****************************************************************
@@ -9630,20 +9631,35 @@
                      PERFORM  UNTIL  (FLG-SYUNOU   =    "1")
                        IF  SYU-DENPJTIKBN    NOT =  "3"
                           IF   SYU-NYUGAIKBN     =  "1"
-                            IF ( LNK-SYU-SKYSTYMD > SYU-SKYSTYMD )
-                            OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
-                                (LNK-SYU-SKYEDYMD > SYU-SKYEDYMD))
-                            OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
-                                (LNK-SYU-SKYEDYMD = SYU-SKYEDYMD) AND
-                                (SYU-SAIKEISANKBN = SPACE       ) AND
-                                (LNK-SYU-SAIKEISANKBN  =  "1"   ))
-                               IF   SYU-DAYINFFLG  =  "1"
-                                  PERFORM     SYUDAY-READ-SEC
-                               ELSE
-                                  INITIALIZE  SYU-SYUDAY-REC
-                               END-IF
-                               PERFORM        2201-SYUNOU-COUNT-SEC
-                            END-IF
+                            EVALUATE  LNK-S02-TEIKI-KBN
+                             WHEN       "Y"
+                              IF ( SYU-SKYEDYMD < LNK-SYU-SKYSTYMD )
+                              OR ((SYU-SKYEDYMD = LNK-SYU-SKYSTYMD) AND
+                                  (SYU-SAIKEISANKBN = SPACE       ) AND
+                                  (LNK-SYU-SAIKEISANKBN = "1"     ))
+                                 IF   SYU-DAYINFFLG  =  "1"
+                                   PERFORM     SYUDAY-READ-SEC
+                                 ELSE
+                                   INITIALIZE  SYU-SYUDAY-REC
+                                 END-IF
+                                 PERFORM       2201-SYUNOU-COUNT-SEC
+                              END-IF
+                             WHEN      OTHER
+                              IF ( LNK-SYU-SKYSTYMD > SYU-SKYSTYMD )
+                              OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
+                                  (LNK-SYU-SKYEDYMD > SYU-SKYEDYMD))
+                              OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
+                                  (LNK-SYU-SKYEDYMD = SYU-SKYEDYMD) AND
+                                  (SYU-SAIKEISANKBN = SPACE       ) AND
+                                  (LNK-SYU-SAIKEISANKBN  =  "1"   ))
+                                 IF   SYU-DAYINFFLG  =  "1"
+                                   PERFORM     SYUDAY-READ-SEC
+                                 ELSE
+                                   INITIALIZE  SYU-SYUDAY-REC
+                                 END-IF
+                                 PERFORM       2201-SYUNOU-COUNT-SEC
+                              END-IF
+                            END-EVALUATE
                           ELSE
                                INITIALIZE     SYU-SYUDAY-REC
                                PERFORM        2201-SYUNOU-COUNT-SEC
@@ -9680,20 +9696,35 @@
                      PERFORM  SYUNOU-READ-SEC
                      PERFORM  UNTIL  (FLG-SYUNOU   =    "1")
                        IF  SYU-DENPJTIKBN    NOT =  "3"
-                        IF ( LNK-SYU-SKYSTYMD > SYU-SKYSTYMD )
-                        OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
-                            (LNK-SYU-SKYEDYMD > SYU-SKYEDYMD))
-                        OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
-                            (LNK-SYU-SKYEDYMD = SYU-SKYEDYMD) AND
-                            (SYU-SAIKEISANKBN = SPACE       ) AND
-                            (LNK-SYU-SAIKEISANKBN  =  "1"   ))
-                               IF   SYU-DAYINFFLG  =  "1"
-                                  PERFORM     SYUDAY-READ-SEC
-                               ELSE
-                                  INITIALIZE  SYU-SYUDAY-REC
-                               END-IF
-                               PERFORM        2201-SYUNOU-COUNT-SEC
-                        END-IF
+                            EVALUATE  LNK-S02-TEIKI-KBN
+                             WHEN       "Y"
+                              IF ( SYU-SKYEDYMD < LNK-SYU-SKYSTYMD )
+                              OR ((SYU-SKYEDYMD = LNK-SYU-SKYSTYMD) AND
+                                  (SYU-SAIKEISANKBN = SPACE       ) AND
+                                  (LNK-SYU-SAIKEISANKBN = "1"     ))
+                                 IF   SYU-DAYINFFLG  =  "1"
+                                   PERFORM     SYUDAY-READ-SEC
+                                 ELSE
+                                   INITIALIZE  SYU-SYUDAY-REC
+                                 END-IF
+                                 PERFORM       2201-SYUNOU-COUNT-SEC
+                              END-IF
+                             WHEN      OTHER
+                              IF ( LNK-SYU-SKYSTYMD > SYU-SKYSTYMD )
+                              OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
+                                  (LNK-SYU-SKYEDYMD > SYU-SKYEDYMD))
+                              OR ((LNK-SYU-SKYSTYMD = SYU-SKYSTYMD) AND
+                                  (LNK-SYU-SKYEDYMD = SYU-SKYEDYMD) AND
+                                  (SYU-SAIKEISANKBN = SPACE       ) AND
+                                  (LNK-SYU-SAIKEISANKBN  =  "1"   ))
+                                 IF   SYU-DAYINFFLG  =  "1"
+                                   PERFORM     SYUDAY-READ-SEC
+                                 ELSE
+                                   INITIALIZE  SYU-SYUDAY-REC
+                                 END-IF
+                                 PERFORM       2201-SYUNOU-COUNT-SEC
+                              END-IF
+                            END-EVALUATE
                        END-IF
                        MOVE    "tbl_syunou"     TO    MCP-TABLE
                        MOVE    "key14"          TO    MCP-PATHNAME
