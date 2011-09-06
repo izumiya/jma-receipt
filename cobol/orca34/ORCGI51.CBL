@@ -1801,6 +1801,7 @@
                MOVE    SS006-DOJITUFLG-ED  TO  LNK-S02-DOJITUFLG-ED
                MOVE    SS006-TIMEKBN-ED    TO  LNK-S02-TIMEKBN-ED
            END-IF
+           MOVE    "Y"             TO  LNK-S02-TEIKI-KBN
            MOVE    SPA-SYSYMD      TO  LNK-S02-SYSYMD
            IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
                MOVE    "1"         TO  LNK-S02-SYORI-KBN
