@@ -308,6 +308,7 @@
       *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *  04.05.13    NACL-ÌçÏÆ    11/05/11  ¥Þ¥ëÄ¹·×»»½¤Àµ
       *  04.05.14    NACL-ÌçÏÆ    11/09/02  Âà±¡²¾·×»»»þ¤ÎÂÐ±þ
+      *  04.05.15    NACL-ÌçÏÆ    11/09/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -19888,8 +19889,14 @@
                        MOVE     1     TO   FLG-NYUSKJJYOGAK
              END-IF
              IF ((WK-1001-PREFNUM          =   11           ) AND
-                 (COMB-KOHHKNNUM(KOH-IDX)  =  "543" OR "582") AND
+                 (COMB-KOHHKNNUM(KOH-IDX)  =  "582"         ) AND
                  (LNK-SYU-SRYYMD(1:6)    >= "200710"        ))
+                       MOVE     2     TO   FLG-NYUSKJJYOGAK
+             END-IF
+             IF ((WK-1001-PREFNUM          =   11           ) AND
+                 (COMB-KOHHKNNUM(KOH-IDX)  =  "543"         ) AND
+                 (LNK-SYU-SRYYMD(1:6)    >= "200710"        ) AND
+                 (LNK-SYU-SRYYMD(1:6)    <= "201109"        ))
                        MOVE     2     TO   FLG-NYUSKJJYOGAK
              END-IF
              IF ((WK-1001-PREFNUM          =   11           ) AND
