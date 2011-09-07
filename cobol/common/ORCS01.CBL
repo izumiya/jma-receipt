@@ -343,6 +343,7 @@
       *                                     ¼«Î©»Ù±ç(999999)¤Î·îÅÓÃæÊÑ¹¹»þ
       *  04.05.16    NACL-ÌçÏÆ    11/05/11  ¥Þ¥ëÄ¹·×»»½¤Àµ
       *  04.05.17    NACL-ÌçÏÆ    11/07/19  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.18    NACL-ÌçÏÆ    11/09/07  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/09/02  ½Ð»º°é»ù°ì»þ¶âÄ¾ÀÜ»ÙÊ§À©ÅÙ¡Ê³°Íè¡Ë
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
@@ -19431,6 +19432,18 @@
                                 (LNK-SYU-HKNTEN(IDX9) *  HKN-TENTNK)
                       END-IF
                     END-PERFORM
+               END-IF
+           END-IF.
+           IF     (WK-1001-PREFNUM           =       08)
+           AND    (COMB-KOHHKNNUM(KOH-IDX)(1:1)  >= "1")
+           AND    (COMB-KOHHKNNUM(KOH-IDX)(1:1)  <= "8")
+           AND    (LNK-SYU-SRYYMD(1:6)      >= "201103")
+               IF    LNK-S01-SINSATUFLG   =  SPACE
+               OR    LNK-S01-SINSATUFLG2  =  "1"
+                    MOVE    SPACE   TO   COMB-KOH-GAIJGNKBN(KOH-IDX)
+                    MOVE    ZERO    TO   WK-GAIKFTNRATE
+                    MOVE    "0"     TO   WK-GAIYKZFTNKBN
+                    MOVE    ZERO    TO   WK-GAIKKOTGAK
                END-IF
            END-IF.
       *
