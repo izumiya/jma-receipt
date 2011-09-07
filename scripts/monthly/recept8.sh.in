@@ -41,7 +41,7 @@ fi
         rm  -f  /var/tmp/RECE4*
         rm  -f  /var/tmp/RECEYMD*
         rm  -f  /tmp/${16}00RECE4*
-        rm  -f  /tmp/${16}RECEYMD*
+        rm  -f  /tmp/${16}00RECEYMD*
 
         if [ ${2} -eq  '1' ]; then
            LOG_FILE="/var/log/jma-receipt/${16}recept8a.log"
@@ -155,6 +155,9 @@ fi
             exit 
         else 
 	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$5$6,${16}        >> $LOG_FILE 2>&1
+
+            rm  -f  /tmp/${16}00RECE4*
+            rm  -f  /tmp/${16}00RECEYMD*
 	fi
 	
         exit 
