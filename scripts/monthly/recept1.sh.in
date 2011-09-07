@@ -203,7 +203,11 @@ fi
         if  [ -e $4 ]; then
             exit 
         else
-	        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$5$6,${16} >> $LOG_FILE 2>&1
-	    fi
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$5$6,${16} >> $LOG_FILE 2>&1
+        
+            rm  -f /tmp/${16}00RECE0*
+            rm  -f /tmp/${16}00RECE11*
+            rm  -f /tmp/${16}00RECE12*
+	fi
 	
         exit 

@@ -212,6 +212,8 @@ fi
             exit 
         else
 	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$5$6,${16} >> $LOG_FILE 2>&1
+        
+            rm  -f /tmp/${16}00RECE6*
 	fi
 	
         exit 
