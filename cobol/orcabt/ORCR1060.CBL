@@ -49,6 +49,8 @@
       *  04.05.03    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *                                     平成２２年４月分以降の処理を
       *                                     行うようにする
+      *  04.05.04    NACL-藤原    11/09/05  「請求しない」設定の請求管理
+      *                                     の保険の記号番号を更新する
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2513,8 +2515,6 @@ grpsys     MOVE    RECE100-HOSPNUM     TO  RECE10-HOSPNUM
                MOVE    RECE100-HKNNUM      TO  RECE10-HKNNUM
                                                RECE10-HKNNUM-S
                MOVE    RECE100-HKNID       TO  RECE10-HKNID
-               MOVE    RECE100-KIGO        TO  RECE10-KIGO
-               MOVE    RECE100-NUM         TO  RECE10-NUM
                MOVE    ZERO                TO  RECE10-SKYYM
                                                RECE10-HENREIYM
                                                RECE10-TEISEIKBN
@@ -2522,6 +2522,9 @@ grpsys     MOVE    RECE100-HOSPNUM     TO  RECE10-HOSPNUM
                MOVE    WRK-PARA-SYSYMD     TO  RECE10-CREYMD
                MOVE    ZERO                TO  RECE10-UPDYMD
            END-IF
+      *
+           MOVE    RECE100-KIGO        TO  RECE10-KIGO
+           MOVE    RECE100-NUM         TO  RECE10-NUM
       *
            MOVE    RECE100-JNISSU      TO  RECE10-JNISSU   (1)
            MOVE    RECE100-TOTALTEN (3)
