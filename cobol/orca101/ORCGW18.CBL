@@ -1134,8 +1134,6 @@
        430-DEL-SEC                 SECTION.
       *
            IF    ( SPA-GMN-KBNCD   =   SPACE )
-           AND   ( SPA-GMN-KOUMOKU1 
-                                   =   SPACE )
                MOVE    "0102"          TO  SPA-ERRCD
            ELSE
                MOVE    "1005"          TO  SPA-WIDCD
@@ -1917,7 +1915,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *----(04.06.01)--ADD-START---
                WHEN    "0102"
                    MOVE
-                       "項目が未選択なので削除できません"
+                       "区分コードが選択されていないので削除できません"
                                                          TO  SPA-ERRMSG
       *----(04.06.01)--ADD-END-----
                WHEN    "1001"
