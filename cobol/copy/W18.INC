@@ -4,6 +4,7 @@
               03  W18-YUKOEDYMD.
                 04  W18-VALUE   PIC X(9).
               03  W18-B02-STATE PIC S9(9)   BINARY.
+              03  W18-B03-STATE PIC S9(9)   BINARY.
               03  W18-NOTE3.
                 04  W18-PAGENO  PIC S9(9)   BINARY.
                 04  W18-FI23.

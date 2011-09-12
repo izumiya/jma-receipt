@@ -35,6 +35,7 @@
       *  04.02.00    NACL-森脇    08/03/17  広域連合追加、お薬手帳追加
       *  04.03.01    NACL-森脇    08/06/24  レセプト電算、症状詳記追加
       *  04.04.00    NACL-森脇    08/11/21  光ディスク等送付書追加
+      *  04.06.01    NACL-森脇    11/09/12  削除ボタン追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -380,7 +381,13 @@
        330-WID-SET-SEC            SECTION.
       *
            IF      SPA-WID1-FLG    =   "OK"
-               PERFORM 490-KOUSHIN-SEC
+      *----(04.06.01)--UPD-START---
+               IF      SPA-WIDCD   =   "1005"
+                   PERFORM 490-SAKUJYO-SEC
+               ELSE
+                   PERFORM 490-KOUSHIN-SEC
+               END-IF
+      *----(04.06.01)--UPD-END-----
                EVALUATE    SPA-WIDCD
                    WHEN    "1003"
                    WHEN    "1004"
@@ -392,6 +399,9 @@
                EVALUATE    SPA-WIDCD
                    WHEN    "1001"
                    WHEN    "1003"
+      *----(04.06.01)--ADD-START---
+                   WHEN    "1005"
+      *----(04.06.01)--ADD-END-----
                        MOVE    2            TO  SPA-GMN-CUR
                    WHEN    "1002"
                    WHEN    "1004"
@@ -525,6 +535,11 @@
       *    クリア
                WHEN    "CLICKED"       ALSO    "B02"
                    PERFORM 420-CLEAR-SEC
+      *----(04.06.01)--ADD-START---
+      *    削除
+               WHEN    "CLICKED"       ALSO    "B03"
+                   PERFORM 430-DEL-SEC
+      *----(04.06.01)--ADD-END-----
       *    タグ切替
                WHEN    "CLICKED"       ALSO    "B08"
                    PERFORM 480-TAG-CHANGE-SEC
@@ -1112,6 +1127,25 @@
        420-CLEAR-EXT.
            EXIT.
       *
+      *----(04.06.01)--ADD-START---
+      *****************************************************************
+      *    削除処理
+      *****************************************************************
+       430-DEL-SEC                 SECTION.
+      *
+           IF    ( SPA-GMN-KBNCD   =   SPACE )
+           AND   ( SPA-GMN-KOUMOKU1 
+                                   =   SPACE )
+               MOVE    "0102"          TO  SPA-ERRCD
+           ELSE
+               MOVE    "1005"          TO  SPA-WIDCD
+           END-IF                      
+      *
+           .
+       430-DEL-EXT.
+           EXIT.
+      *
+      *----(04.06.01)--ADD-END-----
       *****************************************************************
       *    タグ切替処理
       *****************************************************************
@@ -1204,6 +1238,95 @@
        490-KOUSHIN-MAE-EXT.
            EXIT.
       *
+      *----(04.06.01)--ADD-START---
+      *****************************************************************
+      *       削除処理
+      *****************************************************************
+       490-SAKUJYO-SEC             SECTION.
+      *
+      *    医療機関編集情報−基本情報
+           MOVE    SPACE               TO  SYS-1901-REC
+           INITIALIZE                      SYS-1901-REC
+           MOVE    "1901"              TO  SYS-1901-KANRICD
+           MOVE    SPA-GMN-KBNCD       TO  SYS-1901-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-1901-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-1901-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1901-HOSPNUM
+           MOVE    SYS-1901-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              NOT =   ZERO 
+               MOVE    "1004"              TO  SPA-ERRCD
+               GO  TO  490-SAKUJYO-EXT
+           END-IF
+      *
+      *    医療機関編集情報−所在地、連絡先
+           MOVE    SPACE               TO  SYS-1902-REC
+           INITIALIZE                      SYS-1902-REC
+           MOVE    "1902"              TO  SYS-1902-KANRICD
+           MOVE    SPA-GMN-KBNCD       TO  SYS-1902-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-1902-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-1902-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1902-HOSPNUM
+           MOVE    SYS-1902-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              NOT =   ZERO 
+               MOVE    "1006"              TO  SPA-ERRCD
+               GO  TO  490-SAKUJYO-EXT
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-CHK
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       SPA-GMN-PRTKBN-MAX
+               IF      SPA-GMN-PRTKBN (IDX)    =   SPA-GMN-KBNCD
+                   MOVE    1           TO  FLG-CHK
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-CHK     =   1
+      *        医療機関編集情報
+               MOVE    SPACE               TO  SYS-1900-REC
+               INITIALIZE                      SYS-1900-REC
+               MOVE    "1900"              TO  SYS-1900-KANRICD
+               MOVE    "*"                 TO  SYS-1900-KBNCD
+               MOVE    SPA-W01-STYUKYMD    TO  SYS-1900-STYUKYMD
+               MOVE    SPA-W01-EDYUKYMD    TO  SYS-1900-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-1900-HOSPNUM
+               MOVE    SYS-1900-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC              NOT =   ZERO 
+                   MOVE    "1002"              TO  SPA-ERRCD
+                   GO  TO  490-SAKUJYO-EXT
+               END-IF
+               INITIALIZE                  SPA-GMN-KOUMOKU2
+           END-IF
+      *
+      *    区分コード編集処理
+           PERFORM 500-KBNCD-HENSYU-SEC
+      *
+      *    項目クリア
+           INITIALIZE                  SPA-GMN-KOUMOKU1
+                                       SPA-GMN-KBNCD-G
+           MOVE    1                   TO  SPA-GMN-CUR
+      *
+           .
+       490-SAKUJYO-EXT.
+           EXIT.
+      *----(04.06.01)--ADD-END-----
       *****************************************************************
       *       登録処理
       *****************************************************************
@@ -1733,11 +1856,15 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM 5001-MAPCUR-SEC
       *
+      *----(04.06.01)--UPD-START---
            IF      W18-PAGENO          =   0
                MOVE    WIDGET-NORMAL       TO  W18-B02-STATE
+               MOVE    WIDGET-NORMAL       TO  W18-B03-STATE
            ELSE
                MOVE    WIDGET-INSENSITIVE  TO  W18-B02-STATE
+               MOVE    WIDGET-INSENSITIVE  TO  W18-B03-STATE
            END-IF
+      *----(04.06.01)--UPD-END-----
       *
            .
        500-GMNHEN-EXT.
@@ -1787,6 +1914,12 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE
                        "項目が未入力なので更新できません"
                                                          TO  SPA-ERRMSG
+      *----(04.06.01)--ADD-START---
+               WHEN    "0102"
+                   MOVE
+                       "項目が未選択なので削除できません"
+                                                         TO  SPA-ERRMSG
+      *----(04.06.01)--ADD-END-----
                WHEN    "1001"
                    MOVE    "帳票別指定情報の更新ができませんでした"
                                                          TO  SPA-ERRMSG
@@ -1845,6 +1978,13 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE
                    "適用日を変更しますので、登録後選択画面へ戻ります"
                                                 TO  WRK-WIDMSG
+      *----(04.06.01)--ADD-START---
+               WHEN    "1005"
+                   MOVE
+                   "医療機関編集情報（帳票別指定含む）を削除します。"
+                                                TO  WRK-WIDMSG(1:48)
+                   MOVE    "よろしいですか？"   TO  WRK-WIDMSG(49:16)
+      *----(04.06.01)--ADD-END-----
            END-EVALUATE
       *
            MOVE    SPACE                TO  WID1
