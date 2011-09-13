@@ -9,9 +9,6 @@ W18	{
 		B02	{
 			state	int;
 		};
-		B03	{
-			state	int;
-		};
 		note3	{
 			pageno	int;
 			fi23	{

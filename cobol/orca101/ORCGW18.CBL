@@ -1135,6 +1135,11 @@
       *****************************************************************
        430-DEL-SEC                 SECTION.
       *
+           IF      W18-PAGENO      =   1
+               MOVE    "0103"          TO  SPA-ERRCD
+               GO  TO  430-DEL-EXT
+           END-IF
+      *
            IF    ( SPA-GMN-KBNCD   =   SPACE )
                MOVE    "0102"          TO  SPA-ERRCD
            ELSE
@@ -1903,15 +1908,11 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM 5001-MAPCUR-SEC
       *
-      *----(04.06.01)--UPD-START---
            IF      W18-PAGENO          =   0
                MOVE    WIDGET-NORMAL       TO  W18-B02-STATE
-               MOVE    WIDGET-NORMAL       TO  W18-B03-STATE
            ELSE
                MOVE    WIDGET-INSENSITIVE  TO  W18-B02-STATE
-               MOVE    WIDGET-INSENSITIVE  TO  W18-B03-STATE
            END-IF
-      *----(04.06.01)--UPD-END-----
       *
            .
        500-GMNHEN-EXT.
@@ -1965,6 +1966,10 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0102"
                    MOVE
                        "区分コードが選択されていないので削除できません"
+                                                         TO  SPA-ERRMSG
+             WHEN    "0103"
+                   MOVE
+                       "削除は編集内容情報から行ってください"
                                                          TO  SPA-ERRMSG
       *----(04.06.01)--ADD-END-----
                WHEN    "1001"
