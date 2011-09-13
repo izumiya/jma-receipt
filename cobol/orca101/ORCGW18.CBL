@@ -1967,7 +1967,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                                                          TO  SPA-ERRMSG
              WHEN    "0103"
                    MOVE
-                       "帳票別指定情報の削除はできません"
+                       "削除は編集内容情報から行ってください"
                                                          TO  SPA-ERRMSG
       *----(04.06.01)--ADD-END-----
                WHEN    "1001"
