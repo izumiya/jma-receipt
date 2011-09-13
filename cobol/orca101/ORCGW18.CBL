@@ -1297,9 +1297,7 @@
                END-IF
            END-PERFORM
       *
-          IF      FLG-CHK              =   ZERO
-               GO  TO  490-SAKUJYO-EXT
-           END-IF
+          IF      FLG-CHK              NOT =   ZERO
       *
            MOVE    ZERO                TO  FLG-CHK
            PERFORM VARYING IDX FROM    1   BY  1
@@ -1363,6 +1361,7 @@
                        GO  TO  490-SAKUJYO-EXT
                    END-IF
                END-IF
+           END-IF
            END-IF
       *
       *    区分コード編集処理
