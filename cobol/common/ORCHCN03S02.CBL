@@ -521,6 +521,14 @@
                    =   LNKSYU-CHOSEI
                    +   SYU-CHOSEI
       *
+               COMPUTE LNKSYU-CHOSEI1
+                   =   LNKSYU-CHOSEI1
+                   +   SYU-CHOSEI1
+      *
+               COMPUTE LNKSYU-CHOSEI2
+                   =   LNKSYU-CHOSEI2
+                   +   SYU-CHOSEI2
+      *
                COMPUTE LNKSYU-HKNTEKMONEY
                    =   LNKSYU-HKNTEKMONEY
                    +   SYU-HKNTEKMONEY

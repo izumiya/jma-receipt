@@ -493,6 +493,8 @@
       *
       *ƒ¥¿∞∂‚
            ADD SYU-CHOSEI          TO  LNKSYU-CHOSEI         (IDX-SYU)
+           ADD SYU-CHOSEI1         TO  LNKSYU-CHOSEI1        (IDX-SYU)
+           ADD SYU-CHOSEI2         TO  LNKSYU-CHOSEI2        (IDX-SYU)
       *¿¡µ·∂‚≥€°›æ√»Ò¿«° ∫∆∑«°À
            ADD SYU-SKYMONEY-TAX-SAI TO LNKSYU-SKYMONEY-TAX-SAI(IDX-SYU)
       *¿¡µ·∂‚≥€
