@@ -561,6 +561,8 @@
            MOVE    SYUTTL-KOH-FTN-ENTANI  TO  SYU-KOH-FTN-ENTANI
       *Ä´À°¶â
            MOVE    SYUTTL-CHOSEI          TO  SYU-CHOSEI
+           MOVE    SYUTTL-CHOSEI1         TO  SYU-CHOSEI1
+           MOVE    SYUTTL-CHOSEI2         TO  SYU-CHOSEI2
       *¤Þ¤È¤áÆþÎÏº¹³Û
            MOVE    SYUTTL-GRP-SGKMONEY    TO  SYU-GRP-SGKMONEY
       *ÊÝ¸±Å¬ÍÑ¶â³Û
@@ -691,6 +693,8 @@
            ADD     WRK-SYU-TGMONEY-TAX-SAI  TO  SYU-TGMONEY-TAX-SAI
       *Ä´À°¶â
            ADD     WRK-SYU-CHOSEI           TO  SYU-CHOSEI
+           ADD     WRK-SYU-CHOSEI1          TO  SYU-CHOSEI1
+           ADD     WRK-SYU-CHOSEI2          TO  SYU-CHOSEI2
       *ÀÁµá¶â³Û¡Ý¾ÃÈñÀÇ¡ÊºÆ·Ç¡Ë
            ADD     WRK-SYU-SKYMONEY-TAX-SAI TO  SYU-SKYMONEY-TAX-SAI
       *ÀÁµá¶â³Û
