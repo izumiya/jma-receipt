@@ -511,6 +511,8 @@
       *                                     ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âµ­ºÜÊÔ½¸½¤Àµ
       *  04.05.32    NACL-ÌçÏÆ    11/07/19  ¸øÈñÍó¡Ý°ìÉôÉéÃ´¶âµ­ºÜÊÔ½¸½¤Àµ
       *  04.05.33    NACL-ÌçÏÆ    11/07/20  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.34    NACL-ÌçÏÆ    11/09/15  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.35    NACL-ÌçÏÆ    11/09/16  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -14556,6 +14558,9 @@
                          (WRK-PREFNUM            =   13       ) AND
                          (RECE62-KOHNUM(KH-IDX - 1) =
                            "180" OR "380" OR "181" OR "381"   ))
+                  OR    ((WRK-PREFNUM            =   36       ) AND
+                         (RECE62-KOHNUM(KH-IDX - 1) =  "245"  ) AND
+                         (RECE62-TEISYUTUSAKI    =   2 OR 6   ))
                      ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                    RECE62-FTNMONEY(KH-IDX)
                                    RECE62-FTNMONEY-KOJ(KH-IDX)
@@ -14570,26 +14575,11 @@
                          ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                       RECE62-FTNMONEY-KOJ(KH-IDX)
                    ELSE
-                     IF   (WRK-PREFNUM           =   36     )
-                     AND  (RECE62-KOHNUM(KH-IDX - 1) = "245")
-                     AND  (((SYU-KOH-HKNNUM(1) ="245") AND
-                            (SYU-KOH-HKNNUM(2) ="748"))   OR
-                           ((SYU-KOH-HKNNUM(2) ="245") AND
-                            (SYU-KOH-HKNNUM(3) ="748"))     )
-                     AND  (RECE62-TEISYUTUSAKI   =   2 OR 6 )
-                     AND  (RECE62-SRYYM         >=  "200802")
-                     AND  (IDZ                   =   1      )
-                         ADD   SYU-KOH-COMPFTN(IDX3)  TO
-                                      RECE62-FTNMONEY-KOJ(KH-IDX)
-                         ADD   SYU-SKJ-FTN(IDX3)      TO
-                                      WRK-SKJ-FTN(KH-IDX)
-                     ELSE
                          ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                       RECE62-FTNMONEY(KH-IDX)
                                       RECE62-FTNMONEY-KOJ(KH-IDX)
                          ADD   SYU-SKJ-FTN(IDX3)      TO
                                       WRK-SKJ-FTN(KH-IDX)
-                     END-IF
                    END-IF
                   END-IF
                  END-IF
@@ -15264,7 +15254,13 @@
                OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
                    (WRK-PREFNUM               =  "23"          )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "191"         )  AND
-                   (RECE62-SRYYM             >=  "200910"      ))
+                   (RECE62-SRYYM             >=  "200910"      )  AND
+                   (RECE62-SRYYM             <=  "201108"      ))
+               OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
+                   (WRK-PREFNUM               =  "23"          )  AND
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "191"         )  AND
+                   (RECE62-TEISYUTUSAKI       =   1            )  AND
+                   (RECE62-SRYYM             >=  "201109"      ))
                 CONTINUE
                ELSE
                 COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(KOHFTN-IDX + 1)
@@ -15778,25 +15774,6 @@
                      IF   RECE62-KOHNUM(KOHFTN-IDX) =  "781"
                        IF   RECE62-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                         MOVE  ZERO  TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
-                        MOVE  SPACE TO
-                                    RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
-                       END-IF
-                     END-IF
-      *
-                   END-PERFORM
-                END-IF
-      *
-             WHEN    "36"
-      *
-                IF   (RECE62-SRYYM         >=  "200802")
-                AND  (RECE62-TEISYUTUSAKI   =   2 OR 6 )
-                   PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                               UNTIL    KOHFTN-IDX     >    4
-      *
-                     IF   RECE62-KOHNUM(KOHFTN-IDX) =  "245"
-                       IF  (RECE62-FTNMONEY(KOHFTN-IDX + 1) = ZERO)
-                       AND (RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-                                                        NOT = ZERO)
                         MOVE  SPACE TO
                                     RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                        END-IF
@@ -16666,7 +16643,13 @@
                 OR  ((FLG-ZENKI-TOKUREI          =   1     ) AND
                      (WRK-PREFNUM                = "23"    ) AND
                      (RECE62-KOHNUM(KOHFTN-IDX)  = "191"   ) AND
-                     (RECE62-SRYYM              >= "200910"))
+                     (RECE62-SRYYM              >= "200910") AND
+                     (RECE62-SRYYM              <= "201108"))
+                OR  ((FLG-ZENKI-TOKUREI          =   1     ) AND
+                     (WRK-PREFNUM                = "23"    ) AND
+                     (RECE62-KOHNUM(KOHFTN-IDX)  = "191"   ) AND
+                     (RECE62-TEISYUTUSAKI        =   1     ) AND
+                     (RECE62-SRYYM              >= "201109"))
                    IF   KOHFTN-IDX =  1
                      MOVE  RECE62-FTNMONEY(2)  TO  WRK-FTNMONEY-MAE
                    END-IF
