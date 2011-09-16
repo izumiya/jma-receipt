@@ -28,6 +28,10 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  03.05.00    NACL-ÌçÏÆ    07/05/09  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
+      *
+      *  04.05.01    NACL-Æ£¸¶    11/09/16  ¸øÈñÃ±ÆÈÂÐ±þ
+      *                                     ¸øÈñ¤òºÇÂç£µ£°¤ËÊÑ¹¹¤ËÊ»¤»¤Æ
+      *                                     ÊÝ¸±ÁÈ¹ç¤»¤âÊÑ¹¹
       *****************************************************************
       *
       *
@@ -74,8 +78,6 @@
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
-      *    COPY    "CPORCMCP.INC".
-      *    COPY    "ORCA-DBPATH".
       *
            COPY    "MCPAREA".
       *
@@ -225,7 +227,7 @@ grpsys     CALL    "ORCDBMAIN"                  USING MCPAREA
                PERFORM   UNTIL   FLG-SRYACCT  =  1
                    MOVE     ZERO     TO     FLG-ARI
                    PERFORM VARYING IDX    FROM    1   BY  1
-                           UNTIL  (IDX        >    10)
+                           UNTIL  (IDX        >    50)
                              OR   (LNK-ORCSTOTALACCT-HKNCOMBINUM(IDX)
                                                              =    ZERO)
                              OR   (FLG-ARI    =     1)
@@ -236,7 +238,7 @@ grpsys     CALL    "ORCDBMAIN"                  USING MCPAREA
                       END-IF
                    END-PERFORM
                    IF   FLG-ARI   =   ZERO
-                     IF  IDX     <=    10
+                     IF  IDX     <=    50
                         MOVE   ACCT-HKNCOMBI TO
                                      LNK-ORCSTOTALACCT-HKNCOMBINUM(IDX)
                         PERFORM   20011-SRYKA-HENSYU-SEC
@@ -339,7 +341,7 @@ grpsys     CALL    "ORCDBMAIN"                 USING  MCPAREA
                PERFORM   UNTIL   FLG-JYURRK   =    1
                    MOVE     ZERO     TO     FLG-ARI
                    PERFORM VARYING IDX    FROM    1   BY  1
-                           UNTIL  (IDX        >    10)
+                           UNTIL  (IDX        >    50)
                              OR   (LNK-ORCSTOTALACCT-HKNCOMBINUM(IDX)
                                                              =    ZERO)
                              OR   (FLG-ARI    =     1)
@@ -350,7 +352,7 @@ grpsys     CALL    "ORCDBMAIN"                 USING  MCPAREA
                       END-IF
                    END-PERFORM
                    IF   FLG-ARI   =   ZERO
-                     IF  IDX     <=    10
+                     IF  IDX     <=    50
                         MOVE   JYURRK-HKNCOMBINUM  TO
                                      LNK-ORCSTOTALACCT-HKNCOMBINUM(IDX)
                         PERFORM   20021-SRYKA-HENSYU2-SEC
