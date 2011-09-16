@@ -19,6 +19,9 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-藤原    11/09/16  公費単独対応
+      *                                     公費を最大５０に変更に併せて
+      *                                     保険組合せも変更
       ************************************************************
        01  ORCSTOTALACCT-AREA.
       *
@@ -38,7 +41,7 @@
       *
            03  LNK-ORCSTOTALACCT-OUT-AREA.
       *
-               05  LNK-ORCSTOTALACCT-OUT-TBL           OCCURS  10.
+               05  LNK-ORCSTOTALACCT-OUT-TBL           OCCURS  50.
       *保険組合せ番号
                    07  LNK-ORCSTOTALACCT-HKNCOMBINUM   PIC 9(04).
       *診療科返却テーブル

@@ -36,6 +36,10 @@
       *
       *  04.02.01    NACL-藤原    08/03/04  平成２０年４月改正対応
       *
+      *  04.05.01    NACL-藤原    11/09/16  公費単独対応
+      *                                     公費を最大５０に変更に併せて
+      *                                     保険組合せも変更
+      *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     kohid 追加
       *****************************************************************
@@ -377,7 +381,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  LNK-ORCSTOTALACCT-HOSPNUM
       *
       *    レセプト別集計
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL   IDX1    >       10
+                   UNTIL   IDX1    >       50
                    OR      LNK-ORCSTOTALACCT-HKNCOMBINUM (IDX1)
                                                =   ZERO
                PERFORM VARYING IDY1    FROM    1   BY  1
