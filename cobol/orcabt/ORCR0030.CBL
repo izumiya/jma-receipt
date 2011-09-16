@@ -528,6 +528,8 @@
       *                                     ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âµ­ºÜÊÔ½¸½¤Àµ
       *  04.05.27    NACL-ÌçÏÆ    11/07/19  ¸øÈñÍó¡Ý°ìÉôÉéÃ´¶âµ­ºÜÊÔ½¸½¤Àµ
       *  04.05.28    NACL-ÌçÏÆ    11/07/20  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.29    NACL-ÌçÏÆ    11/09/15  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.30    NACL-ÌçÏÆ    11/09/16  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11333,22 +11335,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
                   ELSE
-                   IF   (SYS-1001-PREFNUM      =   36     )
-                   AND  (RECE02-KOHNUM(KH-IDX - 1) = "245")
-                   AND  (((SYU-KOH-HKNNUM(1) ="245") AND
-                          (SYU-KOH-HKNNUM(2) ="748"))   OR
-                         ((SYU-KOH-HKNNUM(2) ="245") AND
-                          (SYU-KOH-HKNNUM(3) ="748"))     )
-                   AND  (RECE02-TEISYUTUSAKI   =   2 OR 6 )
-                   AND  (RECE02-SRYYM         >=  "200802")
-                   AND  (IDZ                   =   1      )
-                      ADD   SYU-KOH-COMPFTN(IDX3)  TO
-                                           RECE02-FTNMONEY-KOJ(KH-IDX)
-                   ELSE
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
-                   END-IF
                   END-IF
                 END-IF
               END-IF
@@ -12186,7 +12175,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 OR  ((FLG-ZENKI-TOKUREI           =   1     ) AND
                      (SYS-1001-PREFNUM            =  23     ) AND
                      (RECE02-KOHNUM(KOHFTN-IDX)   = "191"   ) AND
-                     (RECE02-SRYYM               >= "200910"))
+                     (RECE02-SRYYM               >= "200910") AND
+                     (RECE02-SRYYM               <= "201108"))
+                OR  ((FLG-ZENKI-TOKUREI           =   1     ) AND
+                     (SYS-1001-PREFNUM            =  23     ) AND
+                     (RECE02-KOHNUM(KOHFTN-IDX)   = "191"   ) AND
+                     (RECE02-TEISYUTUSAKI         =   1     ) AND
+                     (RECE02-SRYYM               >= "201109"))
                    IF   KOHFTN-IDX =  1
                      MOVE  RECE02-FTNMONEY(2)  TO  WRK-FTNMONEY-MAE
                    END-IF
@@ -14443,25 +14438,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      IF   RECE02-KOHNUM(KOHFTN-IDX) =  "781"
                        IF   RECE02-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                         MOVE  ZERO  TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
-                        MOVE  SPACE TO
-                                    RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
-                       END-IF
-                     END-IF
-      *
-                   END-PERFORM
-                END-IF
-      *
-             WHEN    "36"
-      *
-                IF   (RECE02-SRYYM         >=  "200802")
-                AND  (RECE02-TEISYUTUSAKI   =   2 OR 6 )
-                   PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                               UNTIL    KOHFTN-IDX     >    4
-      *
-                     IF   RECE02-KOHNUM(KOHFTN-IDX) =  "245"
-                       IF  (RECE02-FTNMONEY(KOHFTN-IDX + 1) = ZERO)
-                       AND (RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-                                                        NOT = ZERO)
                         MOVE  SPACE TO
                                     RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                        END-IF
