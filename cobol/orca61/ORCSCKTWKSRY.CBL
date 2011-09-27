@@ -3061,6 +3061,11 @@
                                                   "09593"  OR
                                                   "09594" )  AND
                  (SPA-COM-SRYKBN (IDX)    NOT =   "80"   ))
+      *          '09691'╓нди╡ц
+            OR   (SPA-COM-INPUTCD(IDX)(1:5)   =   "09691"  OR
+                                                  "09692"  OR
+                                                  "09693"  OR
+                                                  "09694" )
                PERFORM 45010-JIHI-SET-SEC
                GO      TO      4501-SEIKYU-KEI-EXT
            END-IF
