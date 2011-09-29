@@ -382,6 +382,8 @@
       *  04.06.07    NACL-藤原    11/06/02  再診（時間外）の記録方法の修正
       *  04.06.08    NACL-藤原    11/06/10  基本項目でデータ区分２の記録
       *                                     方法の修正
+      *  04.06.09    NACL-藤原    11/09/29  基本項目でデータ区分２のデー
+      *                                     タのみの診療区分の記録
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6290,6 +6292,12 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
       *            診療識別
       *************MOVE    "12"                TO  WRK-DATA
       *************MOVE    2                   TO  WRK-NAGASA
+                   IF    ( IDX                 =   1     )
+                   AND   ( WRK-SRYKBN      NOT =   SPACE )
+                       MOVE    WRK-SRYKBN          TO  WRK-DATA
+                       MOVE    2                   TO  WRK-NAGASA
+                       MOVE    SPACE               TO  WRK-SRYKBN
+                   END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            負担区分
                    MOVE    WRK-FTNKBN          TO  WRK-DATA

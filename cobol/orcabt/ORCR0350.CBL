@@ -338,6 +338,8 @@
       *                                     は公費単独のレセプトとする
       *  04.06.08    NACL-藤原    11/06/10  基本項目でデータ区分２の記録
       *                                     方法の修正
+      *  04.06.09    NACL-藤原    11/09/29  基本項目でデータ区分２のデー
+      *                                     タのみの診療区分の記録
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8085,6 +8087,12 @@
                    MOVE    "SI,"               TO  WRK-REC
                    MOVE    3                   TO  WRK-REC-LENGTH
       *            診療識別
+                   IF    ( IDX                 =   1     )
+                   AND   ( WRK-SRYKBN      NOT =   SPACE )
+                       MOVE    WRK-SRYKBN          TO  WRK-DATA
+                       MOVE    2                   TO  WRK-NAGASA
+                       MOVE    SPACE               TO  WRK-SRYKBN
+                   END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            負担区分
                    MOVE    WRK-FTNKBN          TO  WRK-DATA
