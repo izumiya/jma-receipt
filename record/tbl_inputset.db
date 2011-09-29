@@ -134,7 +134,7 @@ path	key7	{
 	DBSELECT	{
 		DECLARE tbl_inputset_key7_csr CURSOR FOR
 		SELECT * FROM (
-		SELECT DISTINCT ON (INPUTCD)  *
+		SELECT DISTINCT ON (YUKOSTYMD,INPUTCD)  *
 		FROM tbl_inputset
 			WHERE   HOSPNUM   =   :HOSPNUM
 			AND   SETCD       =   :SETCD
