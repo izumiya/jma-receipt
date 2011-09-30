@@ -127,6 +127,7 @@
       *  04.05.03    NACL-ÌçÏÆ    11/03/09  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.04    NACL-ÌçÏÆ    11/08/01  ÆñÉÂ´µ¼ÔÅùÆþ±¡¿ÇÎÅ²Ã»»ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
+      *  04.05.06    NACL-ÌçÏÆ    11/09/30  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ¤Î½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3243,6 +3244,9 @@ grpsys                              SPA-AREA
       **************************************************************
        ROSAI-JIBAI-NYUINRYO-SEC           SECTION.
       *
+           MOVE    ZERO                TO  WRK-CHECK-STDAY
+           MOVE    ZERO                TO  WRK-CHECK-EDDAY
+      *
            INITIALIZE                      ORCSROUNYUIN-AREA
            MOVE    SYU-HOSPNUM          TO  LNK-SROUNYUIN-HOSPNUM
            MOVE    SYU-PTID            TO  LNK-SROUNYUIN-PTID
@@ -3275,7 +3279,11 @@ grpsys                              SPA-AREA
                                        TO  WRK-SYUG-NYN-HKNTEN(IDX)
                 END-IF
       *
-                IF  ( WRK-DOJITU-FLG(IDX SYU-IDX)         =   ZERO)
+                MOVE   SYU-SKYSTYMD(7:2)  TO  WRK-CHECK-STDAY
+                MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
+                IF  ( WRK-CHECK-STDAY  <=  SYU-IDX                )
+                AND ( SYU-IDX          <=  WRK-CHECK-EDDAY        )
+                AND ( WRK-DOJITU-FLG(IDX SYU-IDX)         =   ZERO)
                      ADD   LNK-SROUNYUIN-ZAITEN-ACCTETC(SYU-IDX)
                                                  TO  SYU-HKNTEN(15)
                 END-IF
