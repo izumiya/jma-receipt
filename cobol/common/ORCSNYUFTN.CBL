@@ -127,6 +127,7 @@
       *  04.05.03    NACL-門脇    11/03/09  福島県地方公費対応
       *  04.05.04    NACL-門脇    11/08/01  難病患者等入院診療加算対応
       *  04.05.05    NACL-門脇    11/08/16  労災病衣貸与料対応
+      *  04.05.06    NACL-門脇    11/09/30  労災病衣貸与料対応の修正
       *
       *  04.06.01    NACL-門脇    10/12/06  労災・自賠責の金額フリー入力
       *                                     コード対応
@@ -3246,6 +3247,9 @@ grpsys                              SPA-AREA
       **************************************************************
        ROSAI-JIBAI-NYUINRYO-SEC           SECTION.
       *
+           MOVE    ZERO                TO  WRK-CHECK-STDAY
+           MOVE    ZERO                TO  WRK-CHECK-EDDAY
+      *
            INITIALIZE                      ORCSROUNYUIN-AREA
            MOVE    SYU-HOSPNUM          TO  LNK-SROUNYUIN-HOSPNUM
            MOVE    SYU-PTID            TO  LNK-SROUNYUIN-PTID
@@ -3278,7 +3282,11 @@ grpsys                              SPA-AREA
                                        TO  WRK-SYUG-NYN-HKNTEN(IDX)
                 END-IF
       *
-                IF  ( WRK-DOJITU-FLG(IDX SYU-IDX)         =   ZERO)
+                MOVE   SYU-SKYSTYMD(7:2)  TO  WRK-CHECK-STDAY
+                MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
+                IF  ( WRK-CHECK-STDAY  <=  SYU-IDX                )
+                AND ( SYU-IDX          <=  WRK-CHECK-EDDAY        )
+                AND ( WRK-DOJITU-FLG(IDX SYU-IDX)         =   ZERO)
                      ADD   LNK-SROUNYUIN-ZAITEN-ACCTETC(SYU-IDX)
                                                  TO  SYU-HKNTEN(15)
                 END-IF
