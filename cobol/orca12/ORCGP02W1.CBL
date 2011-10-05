@@ -6243,6 +6243,7 @@
                IF      IDX                 =   ZERO
                    MOVE    1               TO  IDX
                END-IF
+               INITIALIZE                  SPA-GMN-HKN-AREA
                PERFORM 3101-HOKEN-HEN-SEC
            END-IF
       *
