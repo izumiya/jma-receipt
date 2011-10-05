@@ -50,7 +50,10 @@
       *                                     （東京都１５１）
       *  04.04.03    NACL-門脇    09/09/07  愛知県単独５１対応
       *
-      *  04.05.01    NACL-門脇    11/01/14  保険別請求チェック表の本体取込み
+      *  04.05.01    NACL-門脇    11/10/05  岡山県西粟倉村退職者国保２割対応
+      *                                     修正（平成２３年９月まで）
+      *
+      *  04.06.01    NACL-門脇    11/01/14  保険別請求チェック表の本体取込み
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -497,7 +500,8 @@ grpsys     MOVE   LNK-KOREIFTNCHK-HOSPNUM
                            MOVE     20       TO   WRK-KYURATE(IDX1)
                     ELSE
                        IF   COMB-HOJOKBN  =  SPACE
-                         IF   FLG-TOKUREI-HKNJYA  =   1
+                         IF  (FLG-TOKUREI-HKNJYA       =   1      )
+                         AND (LNK-KOREIFTNCHK-SRYYM   <=  "201109")
                            MOVE     20       TO   WRK-KYURATE(IDX1)
                          ELSE
                            MOVE     30       TO   WRK-KYURATE(IDX1)
@@ -546,7 +550,8 @@ grpsys     MOVE   LNK-KOREIFTNCHK-HOSPNUM
                            MOVE     20       TO   WRK-KYURATE(IDX1)
                     ELSE
                        IF   COMB-HOJOKBN  =  SPACE
-                         IF   FLG-TOKUREI-HKNJYA  =   1
+                         IF  (FLG-TOKUREI-HKNJYA       =   1      )
+                         AND (LNK-KOREIFTNCHK-SRYYM   <=  "201109")
                            MOVE     20       TO   WRK-KYURATE(IDX1)
                          ELSE
                            MOVE     30       TO   WRK-KYURATE(IDX1)
