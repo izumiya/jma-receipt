@@ -309,6 +309,9 @@
       *  04.05.13    NACL-門脇    11/05/11  マル長計算修正
       *  04.05.14    NACL-門脇    11/09/02  退院仮計算時の対応
       *  04.05.15    NACL-門脇    11/09/02  埼玉県地方公費対応
+      *  04.05.16    NACL-門脇    11/10/05  岡山県西粟倉村退職者国保２割対応
+      *                                     修正（平成２３年９月まで）
+      *  04.05.17    NACL-門脇    11/10/05  埼玉県地方公費対応
       *
       *  04.06.01    NACL-門脇    10/11/08  主保険＋マル長の請求対応
       ****************************************************************
@@ -18751,8 +18754,9 @@
            END-IF.
       *
       *    岡山県西粟倉村退職者国保（前期高齢者を除く）
-           IF  (FLG-TOKUREI-HKNJYA    =     1  )
-           AND (COMB-HOJOKBN          =   SPACE)
+           IF  (FLG-TOKUREI-HKNJYA    =     1    )
+           AND (COMB-HOJOKBN          =   SPACE  )
+           AND (LNK-SYU-SRYYMD(1:6)  <=  "201109")
                  MOVE   20      TO   HKN-HON-NYUKFTNRATE
                                      HKN-KZK-NYUKFTNRATE
                                      HKN-TSY-NYUKFTNRATE
@@ -19891,7 +19895,8 @@
                  (LNK-SYU-SRYYMD(1:6)    >= "200704"        ))
              OR ((WK-1001-PREFNUM          =   11           ) AND
                  (COMB-KOHHKNNUM(KOH-IDX)  =  "382"         ) AND
-                 (LNK-SYU-SRYYMD(1:6)    >= "200910"        ))
+                 (LNK-SYU-SRYYMD(1:6)    >= "200910"        ) AND
+                 (LNK-SYU-SRYYMD(1:6)    <= "201009"        ))
              OR ((WK-1001-PREFNUM          =   11           ) AND
                  (COMB-KOHHKNNUM(KOH-IDX)  =  "682" OR "683") AND
                  (LNK-SYU-SRYYMD(1:6)    >= "200904"        ))
@@ -20005,6 +20010,7 @@
            END-IF.
       *    生活療養分（環境）の助成は無し（その他は半額助成）
            IF   (LNK-SYU-SRYYMD(1:6)    >=  "200910")
+           AND  (LNK-SYU-SRYYMD(1:6)    <=  "201009")
            AND  (FLG-SEIKATUL2           =   1      )
            AND  (WK-NYUSKJRYYKBN         =  "1"     )
                IF ((WK-1001-PREFNUM         =  11  ) AND

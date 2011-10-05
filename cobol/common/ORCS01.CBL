@@ -344,6 +344,8 @@
       *  04.05.16    NACL-門脇    11/05/11  マル長計算修正
       *  04.05.17    NACL-門脇    11/07/19  広島県地方公費対応
       *  04.05.18    NACL-門脇    11/09/07  茨城県地方公費対応
+      *  04.05.19    NACL-門脇    11/10/05  岡山県西粟倉村退職者国保２割対応
+      *                                     修正（平成２３年９月まで）
       *
       *  04.06.01    NACL-門脇    10/09/02  出産育児一時金直接支払制度（外来）
       *  04.06.02    NACL-門脇    10/11/08  主保険＋マル長の請求対応
@@ -18491,8 +18493,9 @@
            END-IF.
       *
       *    岡山県西粟倉村退職者国保（前期高齢者を除く）
-           IF  (FLG-TOKUREI-HKNJYA    =     1  )
-           AND (COMB-HOJOKBN          =   SPACE)
+           IF  (FLG-TOKUREI-HKNJYA    =     1    )
+           AND (COMB-HOJOKBN          =   SPACE  )
+           AND (LNK-SYU-SRYYMD(1:6)  <=  "201109")
                  MOVE   20      TO   HKN-HON-GAIKFTNRATE
                                      HKN-KZK-GAIKFTNRATE
                                      HKN-TSY-GAIKFTNRATE

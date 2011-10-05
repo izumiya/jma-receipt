@@ -227,6 +227,8 @@
       *                                     区切られている場合の保険履歴 
       *  04.05.06    NACL-藤原    11/08/25  公費単独対応
       *                                     公費を最大５０に変更
+      *  04.05.07    NACL-門脇    11/10/05  岡山県西粟倉村退職者国保２割対応
+      *                                     修正（平成２３年９月まで）
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -3215,7 +3217,8 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
                                        MOVE    10  TO  RECE02-KYURATE
                                END-EVALUATE
                            ELSE
-                               IF   RECE02-HKNJANUM = "67330753"
+                               IF  (RECE02-HKNJANUM  = "67330753")
+                               AND (RECE02-SRYYM    <= "201109"  )
                                  MOVE   20         TO  RECE02-KYURATE
                                ELSE
                                  IF RECE02-HONKZKKBN      =    "1"
