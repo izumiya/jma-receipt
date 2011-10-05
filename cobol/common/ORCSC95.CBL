@@ -4481,6 +4481,11 @@
                            WHEN    05
                            WHEN    08
                                CONTINUE
+      *H23.11      £∞£µ°°§ÚÕ•¿Ë§»§π§Î
+                               IF      PTBYO-MANSEIKBN     =   05
+                                   MOVE    PTBYO-MANSEIKBN
+                                                   TO  SPA-TOKU-FLG(IDX)
+                               END-IF
                            WHEN    03
                                IF      PTBYO-MANSEIKBN     =   05
                                                            OR  08
