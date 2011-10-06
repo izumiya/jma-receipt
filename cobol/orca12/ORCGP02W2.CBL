@@ -1024,6 +1024,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  WRK-KCOMB-HKNNUM     (IDX2)
                IF      WRK-HKN-HKNJANUM(IDX) = "67330753"
                AND     WRK-HKN-HOJOKBN(IDX)  =  SPACE
+               AND     WRK-HKN-TEKSTYMD(IDX) <  "20111001"
                  MOVE      9999        TO  WRK-KCOMB-HKNCOMBINUM(IDX2)
                END-IF
                MOVE    WRK-HKN-HONKZKKBN (IDX) 
@@ -3485,6 +3486,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                    TO  WRK-KCOMB-HKNNUM     (IDX2)
            IF      WRK-HKN-HKNJANUM(WRK-COMB-SYUHOIDX)  = "67330753"
            AND     WRK-HKN-HOJOKBN (WRK-COMB-SYUHOIDX)  =  SPACE
+           AND     WRK-HKN-TEKSTYMD(WRK-COMB-SYUHOIDX)  <  "20111001"
                MOVE     9999       TO  WRK-KCOMB-HKNCOMBINUM(IDX2)
            END-IF
            MOVE    WRK-HKN-HONKZKKBN  (WRK-COMB-SYUHOIDX)
