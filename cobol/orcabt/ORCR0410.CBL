@@ -80,6 +80,7 @@
       *  04.05.01    NACL-門脇    09/06/29  療養期間記載方法選択機能
       *                                     （休業証明請求時）
       *  04.05.02    NACL-門脇    10/01/21  治験対応
+      *  04.05.03    NACL-門脇    11/10/07  療養期間（終了日）の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -250,7 +251,9 @@
            03  WRK-TAX1001-KBN                         PIC  X(01).
       *
            03  WRK-STYMD                               PIC  X(08).
-           03  WRK-EDYMD                               PIC  X(08).
+           03  WRK-EDYMD.
+               05  WRK-EDYM                            PIC  9(06).
+               05  WRK-EDDD                            PIC  9(02).
       *
            03  WRK-HKNKBN                              PIC  X(01).
       *
@@ -860,6 +863,16 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *    レセプト種別
            PERFORM 2101-RECESYUBETU-SET-SEC
       *
+      *    月末日編集
+           MOVE    SPACE             TO  WRK-EDYMD
+           INITIALIZE                    STS-AREA-DAY
+           INITIALIZE                    LNK-DAY7-AREA
+           MOVE    "71"              TO  LNK-DAY7-IRAI
+           MOVE    RECE41-SRYYM      TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"         USING   STS-AREA-DAY
+                                             LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI   TO  WRK-EDYMD
+      *
       *    入院履歴から入院日をセット
            PERFORM 2102-NYUINBI-SET-SEC
       *
@@ -955,14 +968,6 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *+++
              MOVE  RECE41-SRYYM        TO  WRK-STYMD (1:6)
              MOVE  "01"                TO  WRK-STYMD (7:2)
-      *
-             INITIALIZE                    STS-AREA-DAY
-             INITIALIZE                    LNK-DAY7-AREA
-             MOVE    "71"              TO  LNK-DAY7-IRAI
-             MOVE    RECE41-SRYYM      TO  LNK-DAY7-YM
-             CALL    "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY7-AREA
-             MOVE    LNK-DAY7-KOYOMI   TO  WRK-EDYMD
       *
              IF      RECE41-RYOSTYMD   <   WRK-STYMD
                  MOVE   WRK-STYMD(7:2) TO  IDX-ST
@@ -1067,6 +1072,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF 
                IF  PTNYUINRRK-TAIINYMD (1:6)   >   RECE41-SRYYM
                    MOVE    31                        TO  IDX4
+                   IF      IDX4   >   WRK-EDDD
+                      MOVE    WRK-EDDD               TO  IDX4
+                   END-IF
                ELSE
                    MOVE    PTNYUINRRK-TAIINYMD(7:2)  TO  IDX4
                END-IF
