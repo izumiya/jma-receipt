@@ -423,7 +423,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                            WRK-RYOEDYMD
            MOVE         SPACE       TO     WRK-EDYMD
       *
-      *    療養期間終了編集
+      *    月末日編集
            INITIALIZE                      STS-AREA-DAY
            INITIALIZE                      LNK-DAY7-AREA
            MOVE    "71"             TO     LNK-DAY7-IRAI
