@@ -44,6 +44,8 @@
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
       *  04.04.02    NACL-門脇    09/06/12  療養期間の編集修正
+      *
+      *  04.05.01    NACL-門脇    11/10/07  療養期間（終了日）の編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -164,6 +166,10 @@
       *
            03  WRK-HKNKBN              PIC X(01).
       *
+           03  WRK-EDYMD.
+               05  WRK-EDYM            PIC 9(06).
+               05  WRK-EDDD            PIC 9(02).
+      *
       *    病棟区分テーブル                                             
        01  WRK-BYOTOKBN-TABLE.                                          
            03  WRK-BYOTOKBN-T            OCCURS  4.                     
@@ -212,6 +218,10 @@
            COPY    "CPORCSJOBKANRI.INC".
       *    労災レセプト回数取得サブ
            COPY    "CPORCSROUKAISU.INC".
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
            COPY    "MCPAREA".
       *
@@ -411,6 +421,16 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                            WRK-SHONUM
            MOVE         SPACE       TO     WRK-RYOSTYMD
                                            WRK-RYOEDYMD
+           MOVE         SPACE       TO     WRK-EDYMD
+      *
+      *    療養期間終了編集
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"             TO     LNK-DAY7-IRAI
+           MOVE    RECE82-SRYYM     TO     LNK-DAY7-YM
+           CALL    "ORCSDAY"        USING  STS-AREA-DAY
+                                           LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI  TO     WRK-EDYMD
       *
       *    診療月内の入退院情報
            INITIALIZE                      PTNYUINRRK-REC
@@ -440,6 +460,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                IF      PTNYUINRRK-TAIINYMD (1:6)
                                                >   RECE82-SRYYM
                    MOVE    31                  TO  IDX5
+                   IF      IDX5   >   WRK-EDDD
+                      MOVE    WRK-EDDD         TO  IDX5
+                   END-IF
                ELSE
                    MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SRYYMD
                    MOVE    WRK-SRYDD           TO  IDX5
@@ -611,6 +634,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                  END-IF 
                  IF  PTNYUINRRK-TAIINYMD(1:6)  >  RECE82-SRYYM
                      MOVE    31                      TO  IDX7
+                     IF      IDX7   >   WRK-EDDD
+                        MOVE    WRK-EDDD             TO  IDX7
+                     END-IF
                  ELSE
                      MOVE  PTNYUINRRK-TAIINYMD(7:2)  TO  IDX7
                  END-IF
