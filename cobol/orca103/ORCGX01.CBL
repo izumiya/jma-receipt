@@ -2185,11 +2185,10 @@
       *
       *    入力チェック処理
            PERFORM 410-INPUT-CHK-SEC
-           IF    ( SPA-ERRCD       NOT =   SPACE )
-               GO  TO  410-KAKUTEI-EXT
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4101-KAKUTEI-SEC
            END-IF
       *
-           PERFORM 4101-KAKUTEI-SEC
            .
        410-KAKUTEI-EXT.
            EXIT.
@@ -2205,34 +2204,35 @@
                ELSE
                    MOVE    2                   TO  SPA-GMN-CUR
                    MOVE    "0003"              TO  SPA-ERRCD
-                   GO  TO  410-KAKUTEI-EXT
                END-IF
            END-IF
       *
-           IF    ( SPA-NAI-EDYUKYMD    =   ZERO   )
-            OR   ( SPA-NAI-CHKKBN      =   SPACE  )
+           IF    ( SPA-ERRCD           =   SPACE )
+             IF    ( SPA-NAI-EDYUKYMD    =   ZERO   )
+              OR   ( SPA-NAI-CHKKBN      =   SPACE  )
                MOVE    "0003"  TO  SPA-ERRCD
-               GO  TO  410-KAKUTEI-EXT
+             END-IF
            END-IF
       *
-           IF    ( SPA-GMN-CHKKBN  =   "8" OR "9" )
+           IF    ( SPA-ERRCD           =   SPACE )
+             IF    ( SPA-GMN-CHKKBN  =   "8" OR "9" )
                IF    ( SPA-NAI-BYOCD (1)   =   SPACE  )
                    MOVE    2       TO  SPA-GMN-CUR
                    MOVE    "0003"  TO  SPA-ERRCD
-                   GO  TO  410-KAKUTEI-EXT
                END-IF
-           ELSE
+             ELSE
                IF    ( SPA-NAI-SRYCD   =   SPACE  )
                    MOVE    2       TO  SPA-GMN-CUR
                    MOVE    "0003"  TO  SPA-ERRCD
-                   GO  TO  410-KAKUTEI-EXT
                END-IF
+             END-IF
            END-IF
       *
-           IF    ( SPA-NAI-EDYUKYMD    <   SPA-NAI-STYUKYMD )
+           IF    ( SPA-ERRCD           =   SPACE )
+             IF    ( SPA-NAI-EDYUKYMD    <   SPA-NAI-STYUKYMD )
                MOVE    4               TO  SPA-GMN-CUR
                MOVE    "0011"          TO  SPA-ERRCD 
-               GO  TO  410-KAKUTEI-EXT
+             END-IF
            END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
@@ -2250,18 +2250,27 @@
                        CONTINUE
                    ELSE
                        MOVE    "0004"  TO  SPA-ERRCD
+                       MOVE    4       TO  SPA-GMN-CUR
                    END-IF
       *
                END-IF
       *
            END-PERFORM 
       *
-           IF    ( SPA-ERRCD           NOT =   SPACE )
-               MOVE    4               TO  SPA-GMN-CUR
-               GO  TO  410-KAKUTEI-EXT
+           IF    ( SPA-ERRCD           =   SPACE )
+               PERFORM 4101-CHKMST-SENI-SEC
            END-IF
       *
-      *    画面移行用のパラメタ
+           .
+       4101-KAKUTEI-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ設定画面遷移処理
+      *****************************************************************
+       4101-CHKMST-SENI-SEC            SECTION.
+      *
+      *
+      *     画面移行用のパラメタ
            INITIALIZE                  SPA-X01KYOUTU
            MOVE    SPA-GMN-SELNUM      TO  SPA-X01-SELNUM
            MOVE    SPA-NAI-STYUKYMD    TO  SPA-X01-STYUKYMD
@@ -2344,7 +2353,7 @@
            MOVE    1                   TO  FLG-END
       *
            .
-       4101-KAKUTEI-EXT.
+       4101-CHKMST-SENI-EXT.
            EXIT.
       *****************************************************************
       *    前回ＣＤ処理
