@@ -513,6 +513,8 @@
       *  04.05.33    NACL-ÌçÏÆ    11/07/20  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.34    NACL-ÌçÏÆ    11/09/15  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.35    NACL-ÌçÏÆ    11/09/16  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.36    NACL-ÌçÏÆ    11/10/12  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¼«Î©»Ù±ç
+      *                                     °ìÉôÉéÃ´³Ûµ­ºÜ½¤Àµ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -14506,11 +14508,16 @@
                                                  OR "012" OR "020") OR
                      (TBL-TOKATUKAIFLG(KH-IDX - 1)   =  1         )))
                 OR (  TBL-HKNFTNDATA-FLG(KH-IDX - 1) =  1           )
-                  IF   (RECE62-KOUREI                  =  "2")
-                  AND  (SYU-KOHTAIYKZKBN           NOT =  "9")
-                  AND  (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
-                                                   NOT = ZERO)
-                  AND  (TBL-HKNFTNDATA-FLG(KH-IDX - 1) = ZERO)
+                  IF  ((RECE62-KOUREI                  =  "2") AND
+                       (SYU-KOHTAIYKZKBN           NOT =  "9") AND
+                       (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
+                                                   NOT = ZERO) AND
+                       (TBL-HKNFTNDATA-FLG(KH-IDX - 1) = ZERO))
+                  OR  ((RECE62-KOUREI                  =  "2") AND
+                       (RECE62-KOHNUM(KH-IDX - 1)
+                                          =  "015"  OR  "016") AND
+                       (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
+                                          = 9999999 OR 999999))
                    ADD   SYU-KOH-COMPFTN(IDX3)      TO
                                    RECE62-FTNMONEY(KH-IDX)
                                    RECE62-FTNMONEY-KOJ(KH-IDX)
@@ -17456,9 +17463,9 @@
                          COMPUTE WRK-KEISAN3 = 40050 + WRK-KEISAN2
                        ELSE
                          COMPUTE WRK-KEISAN3 = WRK-KEISAN1 * 0.1
-                         COMPUTE WRK-KEISAN3 = WRK-KEISAN3 +  5
-                         COMPUTE WRK-KEISAN3 = WRK-KEISAN3 / 10
-                         COMPUTE WRK-KEISAN3 = WRK-KEISAN3 * 10
+      ***                COMPUTE WRK-KEISAN3 = WRK-KEISAN3 +  5
+      ***                COMPUTE WRK-KEISAN3 = WRK-KEISAN3 / 10
+      ***                COMPUTE WRK-KEISAN3 = WRK-KEISAN3 * 10
                        END-IF
                       ELSE
                        IF  WRK-KEISAN1 >  860340
@@ -17467,9 +17474,9 @@
                          COMPUTE WRK-KEISAN3 = 80100 + WRK-KEISAN2
                        ELSE
                          COMPUTE WRK-KEISAN3 = WRK-KEISAN1 * 0.1
-                         COMPUTE WRK-KEISAN3 = WRK-KEISAN3 +  5
-                         COMPUTE WRK-KEISAN3 = WRK-KEISAN3 / 10
-                         COMPUTE WRK-KEISAN3 = WRK-KEISAN3 * 10
+      ***                COMPUTE WRK-KEISAN3 = WRK-KEISAN3 +  5
+      ***                COMPUTE WRK-KEISAN3 = WRK-KEISAN3 / 10
+      ***                COMPUTE WRK-KEISAN3 = WRK-KEISAN3 * 10
                        END-IF
                       END-IF
                       IF   WRK-KEISAN3  >  WRK-KEISAN-XXX
