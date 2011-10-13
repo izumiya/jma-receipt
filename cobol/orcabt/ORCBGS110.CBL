@@ -634,10 +634,6 @@
                        MOVE    "2"     TO  BGSETC-NYUGAIKBN
                    END-IF
                    MOVE   "  "         TO  BGSETC-RECEKA
-                   DISPLAY IDX-HKN "-" IDX-NG " KENSU:" 
-                           LNK-SKYGET-KENSU (IDX-HKN IDX-NG)
-                   DISPLAY IDX-HKN "-" IDX-NG " NISSU:" 
-                           LNK-SKYGET-IRYO2-NISSU (IDX-HKN IDX-NG)
                    MOVE   LNK-SKYGET-KENSU (IDX-HKN IDX-NG)
                                        TO  BGSETC-KENSU
                    MOVE   LNK-SKYGET-IRYO2-NISSU (IDX-HKN IDX-NG)
