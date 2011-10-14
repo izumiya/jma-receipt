@@ -251,6 +251,8 @@
       *                                     渡された病名を表示
       *  04.05.07    NACL-藤原    09/11/11  病名の入力順対応を中止
       *  04.05.08    NACL-藤原    11/02/15  誕生日と診療開始日のチェック
+      *  04.05.09    NACL-藤原    11/09/26  「表示しない」設定の表示条件
+      *                                     の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1492,6 +1494,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                END-IF
       *
+      *            レセプト表示フラグ
+                   IF      PTBYO-REZEFLG       =   "1"
+                       GO  TO  3101-PTBYO-SPA-EXT
+                   END-IF
+      *
+      *            レセプト表示月数
                IF      PTBYO-REZEMM        >   ZERO
                    INITIALIZE                      STS-AREA-DAY
                    INITIALIZE                      LNK-DAY6-AREA
