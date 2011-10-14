@@ -57,6 +57,7 @@
       *  04.06.02    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *                                     調査用にcrehms,updhms 追加
+      *  04.06.03    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1426,6 +1427,7 @@
       *    単病名文字数を計算
            COMPUTE WRK-MOJISU          =   RECE210-BYOMEIMOJI   *   2
            MOVE    RECE210-BYOMEI      TO  WRK-BYOMEI
+           MOVE    ZERO                TO  WRK-CONTINUE
       *
            EVALUATE    TRUE
       *        傷病名欄に編集
@@ -1450,6 +1452,30 @@
                        MOVE    WRK-BYOMEI(45:) TO  WRK-BYOMEI2-NAME
                    END-IF                                       
            END-EVALUATE
+      *
+           IF  WRK-LINEBYO       <   WRK-BYOMEI-LINE
+               IF  WRK-BYOMEI1-NAME  NOT =   SPACE
+                   PERFORM 3221-BYOMEI1-OUT-SEC
+                   IF      WRK-LINEBYO     <   WRK-BYOMEI-LINE 
+                       MOVE    WRK-BYOMEI(97:) TO  WRK-BYOMEI1-NAME
+                       MOVE    1               TO  WRK-CONTINUE
+                   ELSE
+                       MOVE    WRK-BYOMEI(89:) TO  WRK-BYOMEI2-NAME
+                       MOVE    1               TO  WRK-CONTINUE    
+                   END-IF                                   
+               END-IF
+           ELSE
+               IF  WRK-BYOMEI2   NOT =   SPACE
+                   IF      WRK-BYOMEI(89:)   =   SPACE
+                       MOVE    1             TO  FLG-TENKI
+                   ELSE
+                       MOVE    ZERO          TO  FLG-TENKI
+                   END-IF
+                   PERFORM 3222-BYOMEI2-OUT-SEC
+                   MOVE    1               TO  WRK-CONTINUE
+                   MOVE    WRK-BYOMEI(89:) TO  WRK-BYOMEI2-NAME
+                END-IF
+           END-IF
       *
            IF  WRK-LINEBYO       <   WRK-BYOMEI-LINE
                IF  WRK-BYOMEI1-NAME  NOT =   SPACE
@@ -1519,6 +1545,8 @@
                END-EVALUATE
            END-IF
       *    病名
+           INSPECT WRK-BYOMEI1
+                           REPLACING    ALL   "  "   BY   "　"
            MOVE    WRK-BYOMEI1     TO  HCN58-BYOMEI(WRK-LINEBYO)
       *
       *    クリア

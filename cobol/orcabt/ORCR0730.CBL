@@ -148,6 +148,7 @@
       *  04.06.04    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *                                     調査用にcrehms,updhms 追加
+      *  04.06.05    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -605,6 +606,10 @@
                        09  WRK-BYOMEI2R-TENKI  PIC X(04).
                        09  WRK-BYOMEI2R-TENKIYMD
                                                PIC X(06).
+      *
+      *    傷病名が３行になるときの編集
+           03  WRK-BYOMEI3                     PIC X(48).
+           03  WRK-MOJISU3                     PIC 9(03).
       *                 
       *    入退院履歴編集（適用欄）
            03  WRK-NYUTAI-RIREKI-AREA.
@@ -4791,7 +4796,9 @@
            INITIALIZE                  WRK-EDIT-AREA
            MOVE    SPACE               TO  WRK-BYOMEI1
                                            WRK-BYOMEI2
-           MOVE    ZERO                TO  FLG-TENKI                                
+                                           WRK-BYOMEI3
+           MOVE    ZERO                TO  FLG-TENKI
+                                           WRK-MOJISU3
       *     
            INITIALIZE                      RECE631-REC
            MOVE    RECE62-KEY          TO  RECE631-KEY1
@@ -4944,7 +4951,8 @@
       *    単病名文字数を計算
            COMPUTE WRK-MOJISU          =   RECE631-BYOMEIMOJI   *   2
            MOVE    RECE631-BYOMEI      TO  WRK-BYOMEI
-      *
+           MOVE    SPACE               TO  WRK-BYOMEI3
+           MOVE    ZERO                TO  WRK-MOJISU3
       *
            EVALUATE    TRUE
       *        傷病名欄に編集
@@ -4962,10 +4970,18 @@
                            MOVE    WRK-BYOMEI(49:) TO  WRK-BYOMEI1-NAME
                                                           (WRK-STCLM:)
                            MOVE    1               TO  WRK-CONTINUE
+      *
+                           MOVE    WRK-BYOMEI(97:) TO  WRK-BYOMEI3
+                           COMPUTE WRK-MOJISU3     =   WRK-MOJISU   -
+                                                       96                                   
                        ELSE
                            MOVE    WRK-BYOMEI(49:) TO  WRK-BYOMEI2-NAME
                                                           (WRK-STCLM:)
                            MOVE    1               TO  WRK-CONTINUE    
+      *
+                           MOVE    WRK-BYOMEI(93:) TO  WRK-BYOMEI3
+                           COMPUTE WRK-MOJISU3     =   WRK-MOJISU   -
+                                                       92
                        END-IF                                   
                    END-IF    
       *        適用欄に編集
@@ -4982,11 +4998,40 @@
                        MOVE    1               TO  WRK-CONTINUE
                        MOVE    WRK-BYOMEI(45:) TO  WRK-BYOMEI2-NAME
                                                           (WRK-STCLM:)
+      *
+                       MOVE    WRK-BYOMEI(89:) TO  WRK-BYOMEI3
+                       COMPUTE WRK-MOJISU3     =   WRK-MOJISU   -   88
                    END-IF                                       
            END-EVALUATE
       *
            COMPUTE     WRK-CLM           =   WRK-MOJISU
                                          +   WRK-CLM
+      *
+           IF      WRK-BYOMEI3       NOT =   SPACE
+               EVALUATE    TRUE
+      *            傷病名欄に編集
+                   WHEN    WRK-LINEBYO     <   WRK-BYOMEI-LINE
+                       PERFORM 3221-BYOMEI1-OUT-SEC
+                       IF      WRK-LINEBYO     <   WRK-BYOMEI-LINE 
+                           MOVE    WRK-BYOMEI3     TO  WRK-BYOMEI1-NAME
+                                                          (WRK-STCLM:)
+                           MOVE    1               TO  WRK-CONTINUE
+                       ELSE
+                           MOVE    WRK-BYOMEI3     TO  WRK-BYOMEI2-NAME
+                                                          (WRK-STCLM:)
+                            MOVE    1               TO  WRK-CONTINUE    
+                       END-IF                                   
+      *            適用欄に編集
+                   WHEN    WRK-LINEBYO     >=  WRK-BYOMEI-LINE
+                       PERFORM  3222-BYOMEI2-OUT-SEC
+                       MOVE    1               TO  WRK-CONTINUE
+                       MOVE    WRK-BYOMEI3     TO  WRK-BYOMEI2-NAME
+                                                          (WRK-STCLM:)
+               END-EVALUATE
+      *
+               COMPUTE     WRK-CLM           =   WRK-MOJISU3
+                                             +   WRK-CLM
+           END-IF
       *     
            MOVE    RECE631-SYUBYOFLG     TO  WRK-BO-SYUBYOFLG
            MOVE    RECE631-SRYYMD        TO  WRK-BO-SRYYMD
@@ -5086,6 +5131,8 @@
                END-IF                                     
            END-IF
       *    病名
+           INSPECT WRK-BYOMEI1
+                           REPLACING    ALL   "  "   BY   "　"
            MOVE    WRK-BYOMEI1     TO  HC06-BYOMEI(WRK-LINEBYO)
       *
       *    クリア
