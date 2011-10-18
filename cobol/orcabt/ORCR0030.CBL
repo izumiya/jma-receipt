@@ -531,6 +531,7 @@
       *  04.05.30    NACL-門脇    11/09/16  徳島県地方公費対応
       *  04.05.31    NACL-門脇    11/10/12  ７０歳未満現物給付自立支援
       *                                     一部負担額記載修正
+      *  04.05.32    NACL-門脇    11/10/18  愛知県地方公費対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -4408,6 +4409,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              AND ( RECE02-YOBIETC(8) =  ZERO )
               IF ( SYS-1001-PREFNUM = 27                               )
               OR ((SYS-1001-PREFNUM = 28) AND (RECE02-TEISYUTUSAKI = 6))
+              OR ((SYS-1001-PREFNUM = 23) AND (RECE02-TEISYUTUSAKI = 6))
                IF ((((RECE02-KOHNUM(1)(1:1)  =  "0"            ) AND
                      (RECE02-KOHNUM(1)   NOT =  "012" AND "025")) OR
                     ( TBL-TOKATUKAIFLG(1)    =   1              ))  AND
@@ -12835,7 +12837,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                  END-IF
                END-IF
+      *      愛知県地方公費
       *      兵庫県地方公費
+             WHEN    "23"
              WHEN    "28"
                IF   FLG-ZENKOKUKOHI-NISYU  =  2
                  COMPUTE  WRK-CHK-KOKIGAK4 = RECE02-TOTALTEN(2)

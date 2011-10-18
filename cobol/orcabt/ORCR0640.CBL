@@ -515,6 +515,7 @@
       *  04.05.35    NACL-門脇    11/09/16  徳島県地方公費対応
       *  04.05.36    NACL-門脇    11/10/12  ７０歳未満現物給付自立支援
       *                                     一部負担額記載修正
+      *  04.05.37    NACL-門脇    11/10/18  愛知県地方公費対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -17203,7 +17204,9 @@
                    END-IF
                  END-IF
                END-IF
+      *      愛知県地方公費
       *      兵庫県地方公費
+             WHEN    "23"
              WHEN    "28"
                IF   FLG-ZENKOKUKOHI-NISYU  =  2
                  COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
@@ -19011,6 +19014,7 @@
              AND ( RECE62-YOBIETC(8) =  ZERO )
               IF ( WRK-PREFNUM = "27"                               )
               OR ((WRK-PREFNUM = "28") AND (RECE62-TEISYUTUSAKI = 6))
+              OR ((WRK-PREFNUM = "23") AND (RECE62-TEISYUTUSAKI = 6))
                IF ((((RECE62-KOHNUM(1)(1:1)  =  "0"            ) AND
                      (RECE62-KOHNUM(1)   NOT =  "012" AND "025")) OR
                     ( TBL-TOKATUKAIFLG(1)    =   1              ))  AND
