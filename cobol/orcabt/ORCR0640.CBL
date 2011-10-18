@@ -516,6 +516,7 @@
       *  04.05.35    NACL-ÌçÏÆ    11/09/16  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.36    NACL-ÌçÏÆ    11/10/12  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¼«Î©»Ù±ç
       *                                     °ìÉôÉéÃ´³Ûµ­ºÜ½¤Àµ
+      *  04.05.37    NACL-ÌçÏÆ    11/10/18  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17286,7 +17287,9 @@
                    END-IF
                  END-IF
                END-IF
+      *      °¦ÃÎ¸©ÃÏÊý¸øÈñ
       *      Ê¼¸Ë¸©ÃÏÊý¸øÈñ
+             WHEN    "23"
              WHEN    "28"
                IF   FLG-ZENKOKUKOHI-NISYU  =  2
                  COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
@@ -19094,6 +19097,7 @@
              AND ( RECE62-YOBIETC(8) =  ZERO )
               IF ( WRK-PREFNUM = "27"                               )
               OR ((WRK-PREFNUM = "28") AND (RECE62-TEISYUTUSAKI = 6))
+              OR ((WRK-PREFNUM = "23") AND (RECE62-TEISYUTUSAKI = 6))
                IF ((((RECE62-KOHNUM(1)(1:1)  =  "0"            ) AND
                      (RECE62-KOHNUM(1)   NOT =  "012" AND "025")) OR
                     ( TBL-TOKATUKAIFLG(1)    =   1              ))  AND

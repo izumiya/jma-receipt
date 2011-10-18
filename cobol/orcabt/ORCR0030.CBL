@@ -532,6 +532,7 @@
       *  04.05.30    NACL-ÌçÏÆ    11/09/16  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.31    NACL-ÌçÏÆ    11/10/12  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¼«Î©»Ù±ç
       *                                     °ìÉôÉéÃ´³Ûµ­ºÜ½¤Àµ
+      *  04.05.32    NACL-ÌçÏÆ    11/10/18  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4371,6 +4372,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              AND ( RECE02-YOBIETC(8) =  ZERO )
               IF ( SYS-1001-PREFNUM = 27                               )
               OR ((SYS-1001-PREFNUM = 28) AND (RECE02-TEISYUTUSAKI = 6))
+              OR ((SYS-1001-PREFNUM = 23) AND (RECE02-TEISYUTUSAKI = 6))
                IF ((((RECE02-KOHNUM(1)(1:1)  =  "0"            ) AND
                      (RECE02-KOHNUM(1)   NOT =  "012" AND "025")) OR
                     ( TBL-TOKATUKAIFLG(1)    =   1              ))  AND
@@ -12727,7 +12729,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                  END-IF
                END-IF
+      *      °¦ÃÎ¸©ÃÏÊý¸øÈñ
       *      Ê¼¸Ë¸©ÃÏÊý¸øÈñ
+             WHEN    "23"
              WHEN    "28"
                IF   FLG-ZENKOKUKOHI-NISYU  =  2
                  COMPUTE  WRK-CHK-KOKIGAK4 = RECE02-TOTALTEN(2)

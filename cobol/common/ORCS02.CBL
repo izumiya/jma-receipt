@@ -19731,6 +19731,16 @@
            AND (COMB-KOHHKNNUM(KOH-IDX)   =  "281"         )
                 MOVE    "2"              TO   WK-NYUSKJRYYKBN
            END-IF.
+           IF  (LNK-SYU-SRYYMD(1:6)      >=  "200810"      )
+           AND (WK-1001-PREFNUM           =   01           )
+           AND (COMB-KOHHKNNUM(KOH-IDX)   =  "183"         )
+                MOVE    "2"              TO   WK-NYUSKJRYYKBN
+           END-IF.
+           IF  (LNK-SYU-SRYYMD(1:6)      >=  "200910"      )
+           AND (WK-1001-PREFNUM           =   23           )
+           AND (COMB-KOHHKNNUM(KOH-IDX)   =  "191"         )
+                MOVE    "2"              TO   WK-NYUSKJRYYKBN
+           END-IF.
       *
            IF   COMB-KOHHKNNUM(KOH-IDX)  =  "027"
                 MOVE    HKN-HON-NYUKFTNRATE  TO   WK-KOH-FTNRATE
