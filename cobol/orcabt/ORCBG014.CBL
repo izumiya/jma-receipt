@@ -156,7 +156,7 @@
        01  RECECSV.
            03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
            03  RECECSV-HOSPNUM     PIC 9(02).
-           03  RECECSV-FILE-ID     PIC X(07).
+           03  RECECSV-FILE-ID     PIC X(08).
            03  FILLER              PIC X(04)   VALUE   ".csv".
       *
            COPY    "HCMSL55.INC".
@@ -678,7 +678,7 @@
            MOVE    LNK-PRTKANRI-TERMID TO  TOKEIPARA-TERMID
            MOVE    SPA-HOSPNUM         TO  TOKEIPARA-HOSPNUM
       *
-           MOVE    "BG01401"           TO  RECECSV-FILE-ID
+           MOVE    "ORCBG014"          TO  RECECSV-FILE-ID
            MOVE    SPA-HOSPNUM         TO  RECECSV-HOSPNUM
       *
       *    パラメタ編集処理
