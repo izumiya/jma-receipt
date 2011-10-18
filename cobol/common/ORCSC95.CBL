@@ -179,6 +179,8 @@
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
+      *ito
+           03  WRK-BGCOLOR         PIC 9(01).
            03  WRK-SYMD.
                05  WRK-SYY         PIC 9(04).
                05  WRK-SMM         PIC 9(02).
@@ -625,7 +627,15 @@
       *****************************************************************
        100-K01KYOUTU-SEC            SECTION.
       *
+      *ito
+           IF      SPA-BGCOLOR-SW  NOT NUMERIC
+               MOVE    ZERO                TO  WRK-BGCOLOR
+           ELSE
+               MOVE    SPA-BGCOLOR-SW      TO  WRK-BGCOLOR
+           END-IF
            INITIALIZE                  SPA-K01KYOUTU
+      *ito
+           MOVE    WRK-BGCOLOR         TO  SPA-BGCOLOR-SW
       *    ¿ÇÎÅÆü
            MOVE    LNK-SC95-SRYYMDG    TO  SPA-SRYYMDW
            MOVE    LNK-SC95-SRYYMD     TO  SPA-SRYYMD

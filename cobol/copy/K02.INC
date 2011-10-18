@@ -42,17 +42,6 @@
                 04  K02-VALUE   PIC X(14).
               03  K02-GOKEITEN.
                 04  K02-VALUE   PIC X(15).
-              03  K02-SRYKBN-G    OCCURS   20.
-                04  K02-SRYKBN-STYLE   PIC X(20).
-                04  K02-SRYKBN   PIC X(2).
-              03  K02-INPUTCD   OCCURS 20.
-                04  K02-VALUE   PIC X(54).
-              03  K02-MEISYO-G    OCCURS  20.
-                04  K02-MEISYO-STYLE   PIC X(20).
-                04  K02-MEISYO    PIC X(80).
-              03  K02-SURYO-R     OCCURS  20.
-                04  K02-SURYO-STYLE   PIC X(20).
-                04  K02-SURYO   PIC X(60).
               03  K02-NENREI.
                 04  K02-VALUE   PIC X(6).
               03  K02-ZAITENTOTAL.
@@ -142,3 +131,20 @@
                 04  K02-BC10-STYLE  PIC X(20).
                 04  K02-BC10-LABEL  PIC X(8).
 
+              03  K02-SCROLLEDWINDOW3.
+                04  K02-PANDATABLE1.
+                  05  K02-PANDATABLE1-STATE   PIC S9(9)   BINARY.
+                  05  K02-PANDATABLE1-STYLE   PIC X(20).
+                  05  K02-PANDATABLE1-TROW    PIC S9(9)   BINARY.
+                  05  K02-PANDATABLE1-TROWATTR    PIC S9(9)   BINARY.
+                  05  K02-PANDATABLE1-TCOLUMN PIC S9(9)   BINARY.
+                  05  K02-PANDATABLE1-TVALUE  PIC X(256).
+                  05  K02-PANDATABLE1-FGCOLORS
+                          PIC X(20)  OCCURS  400 TIMES.
+                  05  K02-PANDATABLE1-BGCOLORS
+                          PIC X(20)  OCCURS  400 TIMES.
+                  05  K02-PANDATABLE1-TDATA           OCCURS  400 TIMES.
+                    06  K02-SRYKBN  PIC X(2).
+                    06  K02-INPUTCD PIC X(54).
+                    06  K02-MEISYO  PIC X(80).
+                    06  K02-SURYO   PIC X(60).

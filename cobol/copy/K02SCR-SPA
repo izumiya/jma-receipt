@@ -119,6 +119,13 @@
       *漢字モード
       *************07  SPA-GMN-MCPCHK            PIC X(02).
       *
+ito   *        ステータス通知
+      *        05  SPA-GMN-POPUP-STATUS.
+      *            07  SPA-GMN-POPUP-SUMMARY         PIC X(256).
+      *            07  SPA-GMN-POPUP-BODY            PIC X(1024).
+      *            07  SPA-GMN-POPUP-ICON            PIC X(256).
+      *            07  SPA-GMN-POPUP-TIMEOUT         PIC S9(9).
+ito   *
                05  SPA-NAI-AREA.
       *            処理フラグ（０：通常、１：訂正）
                    07  SPA-NAI-SYORI             PIC 9(01).

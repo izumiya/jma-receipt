@@ -602,3 +602,5 @@
       *ヘルプ・発行指示共通
            03  SPA-ETCKYOUTU-AREA           PIC X(7500).
       *
+ito   * test
+           03  SPA-BGCOLOR-SW            PIC 9(01).
