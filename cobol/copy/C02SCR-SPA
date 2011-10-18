@@ -348,6 +348,8 @@
                                                            PIC X(01).
                                    15  SPA-NAI-C02-BYOMEISBT
                                                            PIC X(01).
+                                   15  SPA-NAI-C02-BYOMEI-CHG
+                                                           PIC X(03).
                                    15  SPA-NAI-C02-BYOMEI-G.
                                        17  SPA-NAI-C02-BYOMEI  
                                                            PIC X(80).
@@ -709,6 +711,7 @@
                            11  SPA-NAI-C04-BYOMEI-O
                                                    PIC X(80)
                                                        OCCURS  21.
+                       09  SPA-NAI-C04-BYOMEI-CHG  PIC X(03).
                    07  SPA-NAI-C04-HOSOKU-G    OCCURS  3.
                        09  SPA-NAI-C04-HOSOKU-COMMENT
                                                    PIC X(80).
