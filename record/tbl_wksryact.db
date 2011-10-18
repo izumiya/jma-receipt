@@ -343,3 +343,51 @@ path	key11	{
 		;
 	};
 };
+
+path	key12 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key12_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			AND   KARTE_KEY   =   :KARTE_KEY
+			ORDER   BY        ZAINUM,
+                                          RENNUM
+		;
+	};
+};
+
+path	key13 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key13_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			ORDER   BY        HKNCOMBI,
+				          ZAINUM,
+                                          RENNUM
+		;
+	};
+};
+path	del13 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			AND   KARTE_KEY   =   :KARTE_KEY
+		;
+	};
+};
+

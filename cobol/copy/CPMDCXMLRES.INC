@@ -33,6 +33,9 @@
               03  MDCRES-RESKEY            PIC X(100).
               03  MDCRES-PERFORM-DATE      PIC X(10).
               03  MDCRES-PERFORM-TIME      PIC X(8).
+      *       UID
+              03  MDCRES-MEDICAL-UID       PIC X(36).
+      *
               03  MDCRES-APPOINT-DEP-CODE  PIC X(2).
               03  MDCRES-APPOINT-DEP-NAME  PIC X(80).
               03  MDCRES-APPOINT-DR-CODE   PIC X(5).

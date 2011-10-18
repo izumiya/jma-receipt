@@ -59,6 +59,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/11/30  Æþ±¡²ó¿ô°ì³çÆþÎÏÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/01/15  ¼£¸³ÂÐ±þ
       *  04.05.01    NACL-Â¿¡¹Ç¼  10/12/06  £´£°ºÞ¡¢£´£°ÌÀºÙÂÐ±þÂ¾
+      *  04.07.00    NACL-Â¿¡¹Ç¼  11/10/13  £Õ£É£ÄÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2470,6 +2471,8 @@
                    UNTIL       IDX      >   TBL-MAX
                MOVE    TBL-WKSRYACT-REC (IDX)
                                            TO  WKSRYACT-REC
+      *UID
+               MOVE    LF04-MEDICAL-UID    TO  WKSRY-KARTE-KEY
       *
                MOVE    SMCNDATE-YMD        TO  WKSRY-CREYMD
                MOVE    SMCNDATE-YMD        TO  WKSRY-UPYMD
