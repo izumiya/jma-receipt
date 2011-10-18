@@ -590,7 +590,7 @@
            MOVE    LNK-PRTKANRI-TERMID TO  TOKEIPARA-TERMID
            MOVE    SPA-HOSPNUM         TO  TOKEIPARA-HOSPNUM
       *
-           MOVE    "BG01401"           TO  RECECSV-FILE-ID
+           MOVE    "ORCBG014"          TO  RECECSV-FILE-ID
            MOVE    SPA-HOSPNUM         TO  RECECSV-HOSPNUM
       *
       *    パラメタ編集処理
