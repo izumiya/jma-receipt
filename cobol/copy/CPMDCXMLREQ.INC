@@ -36,6 +36,9 @@
               03  MDCREQ-PERFORM-DATE PIC X(10).
       *       ©гне╩Ч╢ж
               03  MDCREQ-PERFORM-TIME PIC X(8).
+      *       UID
+              03  MDCREQ-MEDICAL-UID       PIC X(36).
+      *
               03  MDCREQ-MEDICAL-INFO.
       *         ©гне╡й
                 04  MDCREQ-APPOINT-DEP-CODE PIC X(2).

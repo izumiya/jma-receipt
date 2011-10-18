@@ -64,6 +64,7 @@
       *  04.06.03    NACL-Æ£¸¶    10/10/20  ÆñÉÂ³°Íè»ØÆ³´ÉÍýÎÁÂÐ±þ
       *  04.06.02    NACL-Â¿¡¹Ç¼  10/11/19  £´£°ºÞ¡¢£´£°ÌÀºÙÂÐ±þÂ¾
       *  04.06.02    NACL-Â¿¡¹Ç¼  11/02/18  ÍÑË¡¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  11/10/13  £Õ£É£ÄÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2554,6 +2555,8 @@
                    UNTIL       IDX      >   TBL-MAX
                MOVE    TBL-WKSRYACT-REC (IDX)
                                            TO  WKSRYACT-REC
+      *UID
+               MOVE    LF04-MEDICAL-UID    TO  WKSRY-KARTE-KEY
       *
                MOVE    SMCNDATE-YMD        TO  WKSRY-CREYMD
                MOVE    SMCNDATE-YMD        TO  WKSRY-UPYMD
