@@ -265,6 +265,8 @@
       *  04.06.09    NACL-伊藤    11/01/28  リアルタイム送信
       *  04.06.10    NACL-藤原    11/09/02  自院病名で登録した疾患区分を
       *                                     優先する
+      *  04.06.11    NACL-藤原    11/10/11  同義語変換時の編集病名フラグ
+      *                                     の設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -951,6 +953,9 @@
       *
       *    病名移行確認画面より
            IF      SPA-MOTOPG(1:4)     =   "CID2"
+               MOVE    SPACE               TO  SPA-NAI-C02-BYOMEI-CHG
+                                                 (SPA-C02-IKOSAKI-INDEX)
+      *
                IF      SPA-CIDCD2          =   "0103"  OR  "0101"
                                            OR  "0102"  OR  "0105"
       *            病名コードの移行
@@ -981,6 +986,10 @@
                                                TO  IDZ
                        MOVE    SPA-C02-IKOSAKI-INDEX1
                                                TO  IDX2
+                       MOVE    SPA-CID2-FLG    TO  
+                                       SPA-NAI-C02-BYOMEI-CHG (IDZ)
+                       INITIALIZE      SPA-NAI-C02-BYOMEI-G (IDZ)
+      *
                        MOVE    SPA-C02-IKOSAKI-BYOMEICD
                                                TO
                                        SPA-NAI-C02-BYOMEICD-O(IDZ IDX2)
@@ -1966,6 +1975,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        UNTIL   IDX >       6
                    IF      SPA-C01-TBYOMEICD-INDEX (IDZ)
                                                =   IDX
+               IF      SPA-NAI-C04-BYOMEI-CHG (IDZ)
+                                       NOT =   SPACE
+                   INITIALIZE      SPA-NAI-C02-BYOMEI-G (IDZ)
+               END-IF
                        PERFORM VARYING IDX3    FROM    1   BY  1
                                UNTIL   IDX3    >       21
                                OR      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
@@ -2001,6 +2014,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        END-PERFORM 
                        MOVE    SPA-NAI-C04-BYOMEI  (IDX)
                                        TO  SPA-NAI-C02-BYOMEI (IDZ)
+                       MOVE    SPA-NAI-C04-BYOMEI-CHG  (IDX)
+                                       TO  SPA-NAI-C02-BYOMEI-CHG (IDZ)
                        MOVE    6       TO  IDX
                    END-IF   
                END-PERFORM
@@ -2030,6 +2045,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE    SPA-NAI-C02-BYOMEICD (IDZ)
                                        TO  USBYO-BYOMEIINPUTCD
                    PERFORM 410112-USERBYOMEI-HENSYU-SEC
+                   IF      SPA-NAI-C04-BYOMEI-CHG (IDZ)
+                                               NOT =   SPACE
+                       INITIALIZE      SPA-NAI-C02-BYOMEI-G (IDZ)
+                   END-IF    
                    PERFORM VARYING IDX3    FROM    1   BY  1
                            UNTIL   IDX3    >       21
                            OR      SPA-NAI-C04-BYOMEICD-O (IDZ IDX3)

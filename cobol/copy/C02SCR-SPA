@@ -101,6 +101,8 @@
       *  04.06.05    NACL-藤原    10/10/20  難病外来指導管理料対応
       *  04.06.06    NACL-藤原    10/10/26  同義語変換対応
       *  04.06.07    NACL-藤原    10/11/04  補足コメント対応
+      *  04.06.08    NACL-藤原    11/10/11  同義語変換時の編集病名フラグ
+      *                                     の設定
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -341,9 +343,13 @@
                                                            PIC X(10).
                                    15  SPA-NAI-C02-USERBYOMEIFLG
                                                            PIC X(01).
-                                   15  SPA-NAI-C02-BYOMEI-G.
-                                       17  SPA-NAI-C02-BYOMEITOP
+                                   15  SPA-NAI-C02-BYOMEITOP
                                                            PIC X(01).
+                                   15  SPA-NAI-C02-BYOMEISBT
+                                                           PIC X(01).
+                                   15  SPA-NAI-C02-BYOMEI-CHG
+                                                           PIC X(03).
+                                   15  SPA-NAI-C02-BYOMEI-G.
                                        17  SPA-NAI-C02-BYOMEI  
                                                            PIC X(80).
                                        17  SPA-NAI-C02-CHARTBYOMEI  
@@ -359,8 +365,6 @@
                                        17  SPA-NAI-C02-US-BYOMEIHENFLG
                                                            PIC X(01).
                                        17  SPA-NAI-C02-US-HKNBYOMEIFLG
-                                                           PIC X(01).
-                                       17  SPA-NAI-C02-BYOMEISBT
                                                            PIC X(01).
                                        17  SPA-NAI-C02-HAISIYMD
                                                            PIC 9(08).
@@ -661,14 +665,18 @@
       *
                05  SPA-NAIB-C04-AREA.
                    07  SPA-NAI-C04-BUNRUICD-IDX    PIC 9(05).
-                   07  SPA-NAI-C04-BYOMEI-G    OCCURS  6.
-                       09  SPA-NAI-C04-BYOMEI      PIC X(80).
+                   07  SPA-NAI-C04-BYOMEI-OCC  OCCURS  6.
                        09  SPA-NAI-C04-BYOMEITOP   PIC X(01).
                        09  SPA-NAI-C04-BYOMEISBT   PIC X(01).
-                       09  SPA-NAI-C04-BYOMEICD-O  PIC X(07)
+                       09  SPA-NAI-C04-BYOMEI-G.
+                           11  SPA-NAI-C04-BYOMEI  PIC X(80).
+                           11  SPA-NAI-C04-BYOMEICD-O
+                                                   PIC X(07)
                                                        OCCURS  21.
-                       09  SPA-NAI-C04-BYOMEI-O    PIC X(80)
+                           11  SPA-NAI-C04-BYOMEI-O
+                                                   PIC X(80)
                                                        OCCURS  21.
+                       09  SPA-NAI-C04-BYOMEI-CHG  PIC X(03).
                    07  SPA-NAI-C04-HOSOKU-G    OCCURS  3.
                        09  SPA-NAI-C04-HOSOKU-COMMENT
                                                    PIC X(80).
