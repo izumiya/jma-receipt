@@ -350,6 +350,7 @@
                              ( SPA-SFILESV-MAX <   SPA-SFILESV-IDX ) OR
                              ( SPA-SFILESV-CNT-ALL (SPA-SFILESV-IDX) 
                                                        NOT =   ZERO )
+                               CONTINUE
                            END-PERFORM
                            PERFORM 3001-FILEENTRY-SEC
                            IF      FLG-END         =   1
