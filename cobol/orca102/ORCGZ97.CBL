@@ -343,7 +343,13 @@
                            PERFORM 4902-FILE-INFO-CHK-SEC
                        ELSE
       *                    ファイルエントリ処理(クライアント保存)
-                           MOVE    1               TO  SPA-SFILESV-IDX 
+      *                     MOVE    1               TO  SPA-SFILESV-IDX 
+                           PERFORM VARYING SPA-SFILESV-IDX FROM 1 BY 1
+                                   UNTIL
+                             ( SPA-SFILESV-MAX <   SPA-SFILESV-IDX ) OR
+                             ( SPA-SFILESV-CNT-ALL (SPA-SFILESV-IDX) 
+                                                       NOT =   ZERO )
+                           END-PERFORM
                            PERFORM 3001-FILEENTRY-SEC
                            IF      FLG-END         =   1
                                GO  TO  490-KAKUNIN-EXT
