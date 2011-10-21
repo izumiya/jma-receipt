@@ -63,6 +63,8 @@
       *                                     登録された場合のチェックを追加
       *  04.06.02    NACL-藤原    10/10/26  同義語変換対応
       *  04.06.03    NACL-藤原    10/11/04  補足コメント対応
+      *  04.06.04    NACL-藤原    11/10/11  同義語変換時の編集病名フラグ
+      *                                     の設定
       ****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -339,11 +341,18 @@
       *
       *    病名移行確認画面より
            IF      SPA-MOTOPG(1:4)     =   "CID2"
+               MOVE    SPACE               TO  SPA-NAI-C04-BYOMEI-CHG
+                                                 (SPA-C04-IKOSAKI-INDEX)
+      *
                IF      SPA-CID2-FLG    =   "OK"
                    MOVE    SPA-C04-IKOSAKI-INDEX
                                                TO  IDZ
                    MOVE    SPA-C04-IKOSAKI-INDEX1
                                                TO  IDX2
+                   INITIALIZE              SPA-NAI-C04-BYOMEI-G (IDZ)
+                   MOVE    SPA-CID2-FLG        TO  
+                                           SPA-NAI-C04-BYOMEI-CHG (IDZ)
+       *
                    MOVE    SPA-C04-IKOSAKI-BYOMEICD
                                                TO
                                        SPA-NAI-C04-BYOMEICD-O (IDZ IDX2)
@@ -442,6 +451,9 @@
       *******                              TO SPA-NAI-C04-BYOMEITOP(IDX)
                                MOVE    SPA-NAI-C02-BYOMEISBT  (IDZ)
                                            TO SPA-NAI-C04-BYOMEISBT(IDX)
+                               MOVE    SPA-NAI-C02-BYOMEI-CHG (IDZ)
+                                           TO SPA-NAI-C04-BYOMEI-CHG
+                                                                   (IDX)
                                MOVE    6   TO  IDZ
                            END-IF
                        END-PERFORM 
@@ -1034,7 +1046,7 @@
       *
            MOVE    SPACE               TO  WRK-HAISIYMDH
       *
-           INITIALIZE                      SPA-NAI-C04-BYOMEI-G (IDZ)
+           INITIALIZE                      SPA-NAI-C04-BYOMEI-OCC (IDZ)
       *
            IF      SPA-GMN-C04-INPUTCD (IDZ)
                                    NOT =   SPACE
@@ -1491,12 +1503,12 @@
                    PERFORM VARYING IDX FROM    IDZ BY  1
                            UNTIL   IDX >       6
                        IF      IDX             =   6
-                           INITIALIZE  SPA-NAI-C04-BYOMEI-G (IDX)
+                           INITIALIZE  SPA-NAI-C04-BYOMEI-OCC (IDX)
                                        SPA-GMN-C04-INPUTCD  (IDX)
                        ELSE
                            COMPUTE IDW     =   IDX     +   1
-                           MOVE    SPA-NAI-C04-BYOMEI-G (IDW)
-                                   TO  SPA-NAI-C04-BYOMEI-G (IDX)
+                           MOVE    SPA-NAI-C04-BYOMEI-OCC (IDW)
+                                   TO  SPA-NAI-C04-BYOMEI-OCC (IDX)
                            MOVE    SPA-GMN-C04-INPUTCD   (IDW)
                                    TO  SPA-GMN-C04-INPUTCD  (IDX)
                        END-IF                     
@@ -1508,12 +1520,12 @@
                    PERFORM VARYING IDX FROM    6   BY  -1
                            UNTIL   IDX <       IDZ
                        IF      IDX             =   IDZ
-                           INITIALIZE  SPA-NAI-C04-BYOMEI-G(IDX)
+                           INITIALIZE  SPA-NAI-C04-BYOMEI-OCC(IDX)
                                        SPA-GMN-C04-INPUTCD (IDX)
                        ELSE
                            COMPUTE IDW     =   IDX     -   1
-                           MOVE    SPA-NAI-C04-BYOMEI-G (IDW)
-                                   TO  SPA-NAI-C04-BYOMEI-G(IDX)
+                           MOVE    SPA-NAI-C04-BYOMEI-OCC (IDW)
+                                   TO  SPA-NAI-C04-BYOMEI-OCC(IDX)
                            MOVE    SPA-GMN-C04-INPUTCD   (IDW)
                                    TO  SPA-GMN-C04-INPUTCD  (IDX)
                        END-IF                     
@@ -1523,7 +1535,7 @@
                    GO  TO  41003-INPUTCD-CHK-EXT
            END-EVALUATE                               
       *
-           INITIALIZE              SPA-NAI-C04-BYOMEI-G (IDZ)
+           INITIALIZE              SPA-NAI-C04-BYOMEI-OCC (IDZ)
       *
       *    半角チェック
            IF      C04-INPUTCD (IDZ)   =   SPACE
@@ -1648,9 +1660,6 @@
                                    END-IF
                                END-IF
                        END-EVALUATE
-      *??
-                 DISPLAY "WRK-SEIGYO=" WRK-SEIGYO "#"
-      *??
       *                追加のとき
                        IF      WRK-SEIGYO      =   "+"
                            IF      SPA-GMN-C04-HOSOKUCD (3)
@@ -1676,9 +1685,6 @@
                MOVE    "-"                     TO  WRK-SEIGYO
            END-IF
       *       
-      *??
-                 DISPLAY "WRK-SEIGYO=" WRK-SEIGYO "#"
-      *??
            EVALUATE    WRK-SEIGYO
                WHEN    "-"
                    PERFORM VARYING IDX FROM    IDZ BY  1
@@ -1717,9 +1723,6 @@
            END-EVALUATE                               
       *
            INITIALIZE              SPA-NAI-C04-HOSOKU-G (IDZ)
-      *??
-                 DISPLAY "C04-HOSOKUCD=" IDZ "#" C04-HOSOKUCD (IDZ) "#"
-      *??
       *
       *    半角チェック
            IF      C04-HOSOKUCD (IDZ)   =   SPACE
