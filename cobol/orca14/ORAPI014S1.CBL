@@ -371,9 +371,7 @@
                MOVE    "91"                TO  WRK-ERRCD
            END-EVALUATE
       *    入力項目チェック処理
-           IF      WRK-ERRCD           =   SPACE
-               PERFORM 2001-INPUT-CHK-SEC
-           END-IF
+           PERFORM 2001-INPUT-CHK-SEC
            IF      WRK-ERRCD       NOT =   SPACE
       *TEST!!
                PERFORM 890-ERRCD-MSG-SEC
@@ -685,7 +683,9 @@
            IF     (WRK-PTNUM           =   SPACE  )
               AND (WRK-NAME            =   SPACE  )
               AND (WRK-KANANAME        =   SPACE  )
-               MOVE    "01"                TO  WRK-ERRCD
+               IF     (WRK-ERRCD           =   SPACE  )
+                   MOVE    "01"                TO  WRK-ERRCD
+               END-IF
            END-IF
       *    予約日
            IF      WRK-APPOINT-YMD     =   SPACE
