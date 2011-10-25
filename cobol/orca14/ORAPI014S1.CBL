@@ -685,7 +685,9 @@
            IF     (WRK-PTNUM           =   SPACE  )
               AND (WRK-NAME            =   SPACE  )
               AND (WRK-KANANAME        =   SPACE  )
-               MOVE    "01"                TO  WRK-ERRCD
+               IF     (WRK-ERRCD           =   SPACE  )
+                   MOVE    "01"                TO  WRK-ERRCD
+               END-IF
            END-IF
       *    Í½ÌóÆü
            IF      WRK-APPOINT-YMD     =   SPACE
