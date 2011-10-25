@@ -107,8 +107,9 @@
       *
            03  WRK-APPOINT-YMD         PIC X(08).
            03  WRK-APPOINT-TIME.
-               05  WRK-APPOINT-THH     PIC X(02).
-               05  WRK-APPOINT-TMM     PIC X(02).
+               05  WRK-APPOINT-HHMM.
+                   07  WRK-APPOINT-THH     PIC X(02).
+                   07  WRK-APPOINT-TMM     PIC X(02).
                05  WRK-APPOINT-TSS     PIC X(02).
            03  WRK-KEYYYKTIME.
                05  WRK-KEYYYKTIME-HH       PIC X(02).
@@ -336,7 +337,7 @@
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
            IF      SPA-ERRCD       NOT =   SPACE
-               MOVE   "98"             TO  WRK-ERRCD
+               MOVE   "89"             TO  WRK-ERRCD
            END-IF
       *
            .
@@ -1564,7 +1565,7 @@
            MOVE    WRK-KEYYYKTIME      TO  YYK-KEYYYKTIME
            MOVE    WRK-YYKID           TO  YYK-YYKID
       *
-           MOVE    WRK-APPOINT-TIME    TO  YYK-YYKTIME
+           MOVE    WRK-APPOINT-HHMM    TO  YYK-YYKTIME
            MOVE    SPA-PTID            TO  YYK-PTID
            IF      WRK-PTNUM           =   SPACE
                MOVE    WRK-YYKNAME         TO  YYK-NAME
@@ -1721,10 +1722,10 @@
            MOVE    ZERO                TO  WRK-YYKCNT
            INITIALIZE                      WRK-YYK-REC
            PERFORM UNTIL   (FLG-YYK        =   1   )
-               IF     (YYK-YYKID           =   ZERO )
+               IF     (YYK-YYKID       NOT =   ZERO )
       *            来院済・予約時間不一致は対象としない
                    IF     (YYK-RAIINZUMI       =   "1"  )
-                   OR     (YYK-YYKTIME     NOT =   WRK-APPOINT-TIME )
+                   OR     (YYK-YYKTIME     NOT =   WRK-APPOINT-HHMM )
                        CONTINUE
                    ELSE
                        IF      WRK-PTNUM           =   SPACE
@@ -2111,7 +2112,7 @@
                                                INTO    WRK-ERRMSG
                END-STRING
       *共通エラー
-           WHEN    "98"
+           WHEN    "89"
       *        ORCSCOMMON のエラー
                EVALUATE    SPA-ERRCD
                WHEN    "1001"
