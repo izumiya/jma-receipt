@@ -147,6 +147,7 @@
            03  WRK-KOHNUM          PIC X(3).
            03  WRK-TTLID           PIC 9(5).
            03  WRK-RECEKA          PIC X(2).
+           03  WRK-ST              PIC 9(5).
       *
        01  CONST-AREA.
            03  CONST-SYAHO         PIC 9(01)   VALUE 1.
@@ -711,8 +712,8 @@
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   BGS100P-RECEKA-MAX  - 1 )
-               COMPUTE IDX1    =   IDX0    +   1
-               PERFORM VARYING IDX1    FROM    IDX1    BY  1
+               COMPUTE WRK-ST  =   IDX0    +   1
+               PERFORM VARYING IDX1    FROM    WRK-ST  BY  1
                        UNTIL ( IDX1    >   BGS100P-RECEKA-MAX )
                    IF    ( BGS100P-RECEKA (IDX0)
                                        >   BGS100P-RECEKA (IDX1))
