@@ -1210,17 +1210,17 @@
            END-IF
       *
       *    コメント入力値はゼロ以外は数量なしとする
-           IF    ((SPA-COM-INPUTCD(GMN-IDX)(1:2)   =   "84") OR
-                  (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084")  OR
-                  (SPA-COM-INPUTCD(GMN-IDX)(1:3)   =   "001"  AND
-                   SPA-COM-YCOMKBN(GMN-IDX)        =   1    ))
-              AND (SNUM-RC             =   ZERO    )
-              AND (SNUM-OUTNUM     NOT =   ZERO    )
-               MOVE    SPACE               TO  SPA-ERRCD
-               MOVE    ZERO                TO  LNK-SC97-SURYOFLG
-               MOVE    ZERO                TO  LNK-SC97-SURYOCNT
-               MOVE    ZERO                TO  LNK-SC97-SURYO
-           END-IF
+      *    IF    ((SPA-COM-INPUTCD(GMN-IDX)(1:2)   =   "84") OR
+      *           (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084")  OR
+      *           (SPA-COM-INPUTCD(GMN-IDX)(1:3)   =   "001"  AND
+      *            SPA-COM-YCOMKBN(GMN-IDX)        =   1    ))
+      *       AND (SNUM-RC             =   ZERO    )
+      *       AND (SNUM-OUTNUM     NOT =   ZERO    )
+      *        MOVE    SPACE               TO  SPA-ERRCD
+      *        MOVE    ZERO                TO  LNK-SC97-SURYOFLG
+      *        MOVE    ZERO                TO  LNK-SC97-SURYOCNT
+      *        MOVE    ZERO                TO  LNK-SC97-SURYO
+      *    END-IF
       *
            IF      LNK-SC97-SURYO   >   ZERO
                IF      FLG-AUTO         =   1
@@ -1311,6 +1311,8 @@
                           (LNK-SC97-SURYO      =   ZERO  )
                        MOVE    1               TO  LNK-SC97-SURYO
                    END-IF
+                   MOVE    ZERO            TO  LNK-SC97-SURYOCNT
+                   MOVE    ZERO            TO  LNK-SC97-SURYOFLG
                ELSE
       *            行削除とする
                    IF     (WRK-SUR-MCNT        >   ZERO  )  AND
@@ -1339,6 +1341,8 @@
                           (LNK-SC97-SURYO      =   ZERO  )
                        MOVE    1               TO  LNK-SC97-SURYO
                    END-IF
+                   MOVE    ZERO            TO  LNK-SC97-SURYOCNT
+                   MOVE    ZERO            TO  LNK-SC97-SURYOFLG
                ELSE
       *            行削除とする
                    IF     (WRK-SUR-MCNT        >   ZERO  )  AND
