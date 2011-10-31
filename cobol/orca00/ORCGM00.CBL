@@ -554,6 +554,8 @@
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC              =   ZERO )
                    MOVE    1           TO  SPA-NAI-REDL
+                   MOVE    "0"         TO  SYS-1010-GSRAUTH(1:2)
+                                           SYS-1010-GSRAUTH(4:)
                END-IF
            END-IF
       *
