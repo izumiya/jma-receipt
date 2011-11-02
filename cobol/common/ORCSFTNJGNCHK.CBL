@@ -210,9 +210,6 @@
       *    サブプロ用　領域
       *****************************************************************
       *
-      *    公費月上限額取得サブ
-           COPY    "CPORCSJGNGET.INC".
-      *
       *    保険算定用年齢・割合計算サブ
            COPY    "CPORCSAGECHK.INC".
       *
@@ -504,65 +501,6 @@
                       MOVE     999999            TO WRK-HKNMST-JGNGAK
            END-IF
       *
-      *****
-      *
-           IF ((LNK-FTNJGNCHK-PREFNUM        =  13            )  AND
-               (LNK-FTNJGNCHK-KOHNUM         = "151" OR "451" )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200310"))
-      *
-           OR ((LNK-FTNJGNCHK-PREFNUM        =  28     )  AND
-               (LNK-FTNJGNCHK-KOHNUM         = "186"   )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200310"))
-      *
-           OR ((LNK-FTNJGNCHK-PREFNUM        =  07     )  AND
-               (LNK-FTNJGNCHK-KOHNUM         = "281"   )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200702"))
-      *
-           OR ((LNK-FTNJGNCHK-PREFNUM        =  01     )  AND
-               (LNK-FTNJGNCHK-KOHNUM         = "183"   )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200810"))
-      *
-           OR ((LNK-FTNJGNCHK-PREFNUM        =  23     )  AND
-               (LNK-FTNJGNCHK-KOHNUM         = "191"   )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200910"))
-      *
-           OR ((LNK-FTNJGNCHK-PREFNUM        =  08     )  AND
-               (LNK-FTNJGNCHK-KOHNUM         = "152"   )  AND
-               (LNK-FTNJGNCHK-SRYYM         >= "200904"))
-      *
-      *         公費月上限額取得
-                INITIALIZE                    LNK-ORCSJGNGET-REC
-                MOVE  LNK-FTNJGNCHK-HOSPNUM
-                                          TO  LNK-ORCSJGNGET-HOSPNUM
-                MOVE  LNK-FTNJGNCHK-NYUGAIKBN
-                                          TO  LNK-ORCSJGNGET-NYUGAIKBN
-                MOVE  LNK-FTNJGNCHK-PTID  TO  LNK-ORCSJGNGET-PTID
-                MOVE  LNK-FTNJGNCHK-KOHNUM
-                                          TO  LNK-ORCSJGNGET-KOHHKNNUM
-                MOVE  LNK-FTNJGNCHK-KOHID TO  LNK-ORCSJGNGET-KOHID
-                MOVE  LNK-FTNJGNCHK-SRYYM TO  LNK-ORCSJGNGET-SRYYM
-      *
-                CALL    "ORCSJGNGET"      USING
-                                          LNK-ORCSJGNGET-REC
-                                          SPA-AREA
-      *
-                IF    LNK-ORCSJGNGET-RC   =   ZERO
-                  IF   (LNK-FTNJGNCHK-PREFNUM  =  07  )
-                  AND  (LNK-FTNJGNCHK-KOHNUM   = "281")
-                      MOVE  LNK-ORCSJGNGET-GAIJGNGAK
-                                      TO  WRK-HKNMST-JGNGAK
-                  ELSE
-                    IF  LNK-FTNJGNCHK-NYUGAIKBN   =   "1"
-                      MOVE  LNK-ORCSJGNGET-NYUJGNGAK
-                                      TO  WRK-HKNMST-JGNGAK
-                    ELSE
-                      MOVE  LNK-ORCSJGNGET-GAIJGNGAK
-                                      TO  WRK-HKNMST-JGNGAK
-                    END-IF
-                  END-IF
-                END-IF
-      *
-           END-IF
            .
        210-PTKOHFTN-GET-EXT.
            EXIT.

@@ -13931,91 +13931,50 @@
       *
            PERFORM   VARYING   KOHFUKA-IDX   FROM   1   BY   1
                       UNTIL    KOHFUKA-IDX    >     4
-      *
-             IF ((LNK-SYU-SRYYMD(1:6)         >=  "200310"      ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "051"         ))
-             OR ((LNK-SYU-SRYYMD(1:6)         >=  "200504"      ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "052"         ))
-             OR ((LNK-SYU-SRYYMD(1:6)         >=  "200804"      ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "038"         ))
-             OR ((WK-1001-PREFNUM              =   08 OR 31     ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1)
-                                              >= "1" AND <= "8" ))
-             OR ((WK-1001-PREFNUM              =   34           ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "191" OR "291"))
-             OR ((WK-1001-PREFNUM              =   41           ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "181"         ))
-             OR ((WK-1001-PREFNUM              =   36           ) AND
-                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "245" OR "445"))
-      *
-                IF ( SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "051" OR "052"
-                                                           OR "038" )
-                OR ((WK-1001-PREFNUM              =   08 OR 31     ) AND
-                    (SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1)
-                                                 >= "1" AND <= "8" ))
-                    MOVE   1   TO   FLG-KOHFUKA-HENSYU
-                    PERFORM   220142-KOHFUKA-HENSYU1-SEC
-                END-IF
-      *
-                IF  (WK-1001-PREFNUM              =   34           )
-                AND (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "191" OR "291")
-                    MOVE   2   TO   FLG-KOHFUKA-HENSYU
-                    PERFORM   220142-KOHFUKA-HENSYU1-SEC
-                END-IF
-      *
-                IF ((WK-1001-PREFNUM              =   41           ) AND
-                    (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "181"         ))
-                OR ((WK-1001-PREFNUM              =   36           ) AND
-                    (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "245" OR "445"))
-                  IF   WK-HKNJANUM2  =  WK-HKNJANUM
-                    MOVE   1   TO   FLG-KOHFUKA-HENSYU
-                    PERFORM   220142-KOHFUKA-HENSYU1-SEC
-                  ELSE
-      *             保険者変更、公費受給者証変更無しの場合
-                    PERFORM   220144-KOHFUKA-HENSYU3-SEC
-                  END-IF
-                END-IF
-      *
-             ELSE
-      *
-                IF  (SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1) >= "1" AND <= "8")
-                AND (LNK-SYU-SRYYMD(1:6)              >= "200804"      )
-                   INITIALIZE                   SYS-2010-REC
-                   MOVE    "2010"           TO  SYS-2010-KANRICD
-                   MOVE    SYU-KOH-HKNNUM(KOHFUKA-IDX)
-                                            TO  SYS-2010-KBNCD
-                   MOVE    LNK-SYU-HOSPNUM  TO  SYS-2010-HOSPNUM
-                   MOVE    LNK-SYU-SRYYMD   TO  SYS-2010-STYUKYMD
-                   MOVE    LNK-SYU-SRYYMD   TO  SYS-2010-EDYUKYMD
-                   MOVE    SYS-2010-REC     TO  MCPDATA-REC
-                   MOVE    "DBSELECT"       TO  MCP-FUNC
-                   MOVE    "tbl_syskanri"   TO  MCP-TABLE
-                   MOVE    "key10"          TO  MCP-PATHNAME
-                   CALL    "ORCDBMAIN"  USING   MCPAREA
-                                                MCPDATA-REC
-                                                SPA-AREA
-                   IF      MCP-RC         =   ZERO
-                      MOVE  "tbl_syskanri"  TO  MCP-TABLE
-                      MOVE  "key10"         TO  MCP-PATHNAME
-                      PERFORM   SYSKANRI-READ-SEC
-                      IF    FLG-SYSKANRI   =   ZERO
-                        EVALUATE  SYS-2010-JYUHENKBN
-                          WHEN      "1"
-                             MOVE   1   TO   FLG-KOHFUKA-HENSYU
-                             PERFORM   220142-KOHFUKA-HENSYU1-SEC
-                          WHEN      "2"
-                             MOVE   2   TO   FLG-KOHFUKA-HENSYU
-                             PERFORM   220142-KOHFUKA-HENSYU1-SEC
-                        END-EVALUATE
-                      END-IF
-                   END-IF
-                   MOVE     "tbl_syskanri"  TO  MCP-TABLE
-                   MOVE     "key10"         TO  MCP-PATHNAME
-                   PERFORM      DB-CLOSE-SEC
-                END-IF
-      *
+             IF ((LNK-SYU-SRYYMD(1:6)         >=  "200310") AND
+                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "051"   ))
+             OR ((LNK-SYU-SRYYMD(1:6)         >=  "200504") AND
+                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "052"   ))
+             OR ((LNK-SYU-SRYYMD(1:6)         >=  "200804") AND
+                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "038"   ))
+                MOVE   1   TO   FLG-KOHFUKA-HENSYU
+                PERFORM   220142-KOHFUKA-HENSYU1-SEC
              END-IF
+           END-PERFORM
       *
+           PERFORM   VARYING   KOHFUKA-IDX   FROM   1   BY   1
+                      UNTIL    KOHFUKA-IDX    >     4
+             IF    SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1) >= "1" AND <= "8"
+               IF     LNK-SYU-SRYYMD(1:6) >= "200804"
+                 INITIALIZE                   SYS-2010-REC
+                 MOVE    "2010"           TO  SYS-2010-KANRICD
+                 MOVE    SYU-KOH-HKNNUM(KOHFUKA-IDX)
+                                          TO  SYS-2010-KBNCD
+                 MOVE    LNK-SYU-HOSPNUM  TO  SYS-2010-HOSPNUM
+                 MOVE    LNK-SYU-SRYYMD   TO  SYS-2010-STYUKYMD
+                 MOVE    LNK-SYU-SRYYMD   TO  SYS-2010-EDYUKYMD
+                 MOVE    SYS-2010-REC     TO  MCPDATA-REC
+                 MOVE    "DBSELECT"       TO  MCP-FUNC
+                 MOVE    "tbl_syskanri"   TO  MCP-TABLE
+                 MOVE    "key10"          TO  MCP-PATHNAME
+                 CALL    "ORCDBMAIN"  USING   MCPAREA
+                                              MCPDATA-REC
+                                              SPA-AREA
+                 IF      MCP-RC         =   ZERO
+                    MOVE  "tbl_syskanri"  TO  MCP-TABLE
+                    MOVE  "key10"         TO  MCP-PATHNAME
+                    PERFORM      SYSKANRI-READ-SEC
+                 ELSE
+                    INITIALIZE   SYS-2010-REC
+                 END-IF
+                 PERFORM   220145-JYUHENKBN-HENSYU-SEC
+                 MOVE     "tbl_syskanri"  TO  MCP-TABLE
+                 MOVE     "key10"         TO  MCP-PATHNAME
+                 PERFORM      DB-CLOSE-SEC
+               ELSE
+                 PERFORM   220146-JYUHENKBN-HENSYU2-SEC
+               END-IF
+             END-IF
            END-PERFORM
       *
            .
@@ -14978,6 +14937,71 @@
            .
       *
        220144-KOHFUKA-HENSYU3-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    月途中受給者証変更時負担計算の設定編集
+      ******************************************************************
+       220145-JYUHENKBN-HENSYU-SEC          SECTION.
+      *
+           EVALUATE  SYS-2010-JYUHENKBN
+             WHEN      SPACE
+             WHEN      "0"
+                 PERFORM   220146-JYUHENKBN-HENSYU2-SEC
+             WHEN      "1"
+             WHEN      "2"
+                 IF ((WK-1001-PREFNUM             =  41           ) AND
+                     (SYU-KOH-HKNNUM(KOHFUKA-IDX) = "181"         ))
+                 OR ((WK-1001-PREFNUM             =  36           ) AND
+                     (SYU-KOH-HKNNUM(KOHFUKA-IDX) = "245" OR "445"))
+                   IF   WK-HKNJANUM2  =  WK-HKNJANUM
+                     MOVE  SYS-2010-JYUHENKBN  TO  FLG-KOHFUKA-HENSYU
+                     PERFORM   220142-KOHFUKA-HENSYU1-SEC
+                   ELSE
+      *              保険者変更、公費受給者証変更無しの場合
+                     PERFORM   220144-KOHFUKA-HENSYU3-SEC
+                   END-IF
+                 ELSE
+                     MOVE  SYS-2010-JYUHENKBN  TO  FLG-KOHFUKA-HENSYU
+                     PERFORM   220142-KOHFUKA-HENSYU1-SEC
+                 END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       220145-JYUHENKBN-HENSYU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    月途中受給者証変更時負担計算の設定編集２
+      ******************************************************************
+       220146-JYUHENKBN-HENSYU2-SEC          SECTION.
+      *
+           IF   WK-1001-PREFNUM             =  08 OR 31
+               MOVE   1   TO   FLG-KOHFUKA-HENSYU
+               PERFORM   220142-KOHFUKA-HENSYU1-SEC
+           END-IF
+           IF  (WK-1001-PREFNUM             =  34           )
+           AND (SYU-KOH-HKNNUM(KOHFUKA-IDX) = "191" OR "291")
+               MOVE   2   TO   FLG-KOHFUKA-HENSYU
+               PERFORM   220142-KOHFUKA-HENSYU1-SEC
+           END-IF
+           IF ((WK-1001-PREFNUM             =  41           ) AND
+               (SYU-KOH-HKNNUM(KOHFUKA-IDX) = "181"         ))
+           OR ((WK-1001-PREFNUM             =  36           ) AND
+               (SYU-KOH-HKNNUM(KOHFUKA-IDX) = "245" OR "445"))
+             IF   WK-HKNJANUM2  =  WK-HKNJANUM
+               MOVE   1   TO   FLG-KOHFUKA-HENSYU
+               PERFORM   220142-KOHFUKA-HENSYU1-SEC
+             ELSE
+      *        保険者変更、公費受給者証変更無しの場合
+               PERFORM   220144-KOHFUKA-HENSYU3-SEC
+             END-IF
+           END-IF
+      *
+           .
+      *
+       220146-JYUHENKBN-HENSYU2-EXT.
            EXIT.
       *
       ******************************************************************
@@ -19771,7 +19795,9 @@
            IF   COMB-KOHHKNNUM(KOH-IDX)  =  "010" OR "021"
               IF    (COMB-KOHHKNNUM(KOH-IDX)  =  "021"   )
               AND   (LNK-SYU-SRYYMD(1:6)     >=  "200604")
-                 CONTINUE
+                 IF   FLG-SEISINJYO  =  1
+                   MOVE     "3"      TO    WK-NYUSKJRYYKBN
+                 END-IF
               ELSE
                  IF   FLG-SEISINJYO  =  1
                    MOVE     ZERO     TO    WK-NYUKFTNRATE
@@ -24207,6 +24233,14 @@
              ELSE
                  PERFORM   23092-FTNKIN-HIKAKU-TUJYO-SEC
              END-IF
+           END-IF.
+      *
+           IF   ( LNK-SYU-SRYYMD(1:6)   >= "200604")
+           AND  ((COMB-KOH1HKNNUM        =  "021" ) OR
+                 (COMB-KOH2HKNNUM        =  "021" ))
+           AND  ( FLG-SEISINJYO          =   1     )
+              MOVE     ZERO     TO    WK-KNJFTNKIN
+              MOVE     ZERO     TO    WK-KNJFTNKIN-ENTANI
            END-IF.
       *
       *    収納テーブルの請求額をセット
