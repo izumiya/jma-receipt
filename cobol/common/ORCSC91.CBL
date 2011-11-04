@@ -656,6 +656,7 @@
            MOVE    WRK-SC91-WEEKCNT    TO  WRK-SC91-WEEKCHKCNT
       *
       *    上限回数チェック・エラー編集
+           MOVE    TNS-JGNCNTERR       TO  WRK-JGNCNTERR
            MOVE    ZERO                TO  FLG-DOUCHK
            PERFORM 1009-CNTCHK-SYORI-SEC
       *
@@ -692,7 +693,7 @@
                END-IF
       *        上限回数エラー処理＝９の時、回数エラーは警告とする
                IF       WRK-CNT        =   ZERO
-                   IF       TNS-JGNCNTERR      =   9
+                   IF       WRK-JGNCNTERR      =   9
                        MOVE    "K004"              TO  LNK-SC91-ERRCD
                    END-IF
       *            人工腎臓の時メッセージ変更
