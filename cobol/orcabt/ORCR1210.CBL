@@ -36,6 +36,7 @@
       *  04.04.04    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/27  ¼£¸³ÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -713,7 +714,9 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(1)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
       ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
       ***                                                   NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
@@ -733,7 +736,9 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(2)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
       ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
       ***                                                   NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
@@ -753,7 +758,9 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(3)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
       ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
       ***                                                   NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
@@ -773,7 +780,9 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(4)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
       ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
       ***                                                   NOT = SPACE
                                     ADD   ACCT-DAY(1 ACCT-IDX)
@@ -1111,7 +1120,8 @@
                              RECE200-NYUKHNKEI2  +  NACCT-ZAITEN
            END-EVALUATE
       *
-           IF  RECE200-NYUINDAY-KBN(IDY) = "1"
+           IF  (WRK-DAY1(IDY)             = ZERO)
+           AND (RECE200-NYUINDAY-KBN(IDY) = "1" )
       ***     IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                     COMPUTE  RECE200-NYUTOKKEI2  =
                              RECE200-NYUTOKKEI2  +  NACCT-ZAITEN
@@ -1447,7 +1457,8 @@
                    END-EVALUATE
                  END-IF
       *
-                 IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
+                 IF  (WRK-DAY1(ACCT-IDX)             = ZERO)
+                 AND (RECE200-NYUINDAY-KBN(ACCT-IDX) = "1" )
       ***           IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX) NOT = SPACE
                       IF ACCT-ZAIKBN = 2
                        COMPUTE  RECE200-NYUTOKKEI2  =

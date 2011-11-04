@@ -128,6 +128,7 @@
       *  04.05.04    NACL-лГоф    11/08/01  фЯиб╢╣╪теЫфЧ╠║©гне╡ц╩╩бп╠Ч
       *  04.05.05    NACL-лГоф    11/08/16  о╚╨риб╟Абъм©набп╠Ч
       *  04.05.06    NACL-лГоф    11/09/30  о╚╨риб╟Абъм©набп╠Ч╓н╫╓ю╣
+      *  04.05.07    NACL-лГоф    11/11/04  ╣ъ╣чхбаВ©гнена╩╩дЙбп╠Ч
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -810,11 +811,11 @@
              END-IF
            END-IF.
       *
-           IF    LNK-S02-RC   =   ZERO
-             IF   WRK-KYUKYUHANSO-ERR  =  1
-                MOVE     21     TO    LNK-S02-RC
-             END-IF
-           END-IF.
+      ***  IF    LNK-S02-RC   =   ZERO
+      ***    IF   WRK-KYUKYUHANSO-ERR  =  1
+      ***       MOVE     21     TO    LNK-S02-RC
+      ***    END-IF
+      ***  END-IF.
       *
            IF    LNK-S02-RC   =   ZERO
              IF   WRK-TAIJYUSIN-ERR    =  1

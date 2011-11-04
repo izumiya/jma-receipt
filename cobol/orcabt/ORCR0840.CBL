@@ -194,6 +194,7 @@
       *  04.05.06    NACL-ÌçÏÆ    10/01/07  ¼£¸³ÂÐ±þ
       *  04.05.07    NACL-ÌçÏÆ    11/06/21  ²èÁü¿ÇÃÇ¡¦ÅÅ»Ò²èÁü´ÉÍý²Ã»»¤Î
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
+      *  04.05.08    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8459,7 +8460,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           UNTIL    IDY    >    31
       *
                 IF   LNK-SROUNYUIN-NYUIN-FLG(IDY)    =  "1"
-                AND  RECE82-NYUINDAY-KBN(IDY)        =  SPACE
+      ***       AND  RECE82-NYUINDAY-KBN(IDY)        =  SPACE
       *
                    MOVE     ZERO        TO    WRK-RENNUM
       *

@@ -97,6 +97,7 @@
       *  04.05.03    NACL-ÌçÏÆ    10/09/06  ÃÏÊý¸øÈñ¤ÎÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ
       *                                     ½¸·×ÂÐ±þ¡Ê¥ì¥»ÅÅÉéÃ´¶èÊ¬ÂÐ±þ¡Ë
       *  04.05.04    NACL-ÌçÏÆ    11/08/01  ÆñÉÂ´µ¼ÔÅùÆþ±¡¿ÇÎÅ²Ã»»ÂÐ±þ
+      *  04.05.05    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/13  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
@@ -2245,7 +2246,8 @@
       *
            END-IF
       *
-           IF RECE62-NYUINDAY-KBN(IDY) = "1"
+           IF   (WRK-DAY1(IDY)            = ZERO)
+           AND  (RECE62-NYUINDAY-KBN(IDY) = "1" )
       ***      IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                  IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
                  AND    KH-IDX                >   1
@@ -2781,7 +2783,8 @@
                  END-IF
            END-EVALUATE
       *
-           IF    RECE62-NYUINDAY-KBN(ACCT-IDX) = "1"
+           IF   (WRK-DAY1(ACCT-IDX)            = ZERO)
+           AND  (RECE62-NYUINDAY-KBN(ACCT-IDX) = "1" )
       ***    IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX) NOT = SPACE
               IF ACCT-ZAIKBN = 2
                IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
