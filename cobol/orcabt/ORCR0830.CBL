@@ -66,6 +66,7 @@
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/25  ¼£¸³ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
+      *  04.05.03    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -1273,7 +1274,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            END-EVALUATE
       *
-           IF   RECE82-NYUINDAY-KBN(IDY)  =  "1"
+           IF  (LNK-SROUNYUIN-SRYKBN(IDY) =  SPACE)
+           AND (RECE82-NYUINDAY-KBN(IDY)  =  "1"  )
       *
       ***    IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                   COMPUTE  RECE82-NYUTOKKEI2  =
@@ -1338,7 +1340,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
            END-EVALUATE
       *
-      **>  IF   RECE82-NYUINDAY-KBN(IDY)  =  "1"
            IF   LNK-SROUNYUIN-SRYKBN(IDY) =  SPACE
              COMPUTE       RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +

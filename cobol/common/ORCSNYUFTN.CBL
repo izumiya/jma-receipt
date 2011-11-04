@@ -128,6 +128,7 @@
       *  04.05.04    NACL-門脇    11/08/01  難病患者等入院診療加算対応
       *  04.05.05    NACL-門脇    11/08/16  労災病衣貸与料対応
       *  04.05.06    NACL-門脇    11/09/30  労災病衣貸与料対応の修正
+      *  04.05.07    NACL-門脇    11/11/04  救急搬送診療料算定対応
       *
       *  04.06.01    NACL-門脇    10/12/06  労災・自賠責の金額フリー入力
       *                                     コード対応
@@ -813,11 +814,11 @@
              END-IF
            END-IF.
       *
-           IF    LNK-S02-RC   =   ZERO
-             IF   WRK-KYUKYUHANSO-ERR  =  1
-                MOVE     21     TO    LNK-S02-RC
-             END-IF
-           END-IF.
+      ***  IF    LNK-S02-RC   =   ZERO
+      ***    IF   WRK-KYUKYUHANSO-ERR  =  1
+      ***       MOVE     21     TO    LNK-S02-RC
+      ***    END-IF
+      ***  END-IF.
       *
            IF    LNK-S02-RC   =   ZERO
              IF   WRK-TAIJYUSIN-ERR    =  1
