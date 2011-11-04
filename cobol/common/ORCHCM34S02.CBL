@@ -1121,7 +1121,6 @@
       *
                IF    ( LNK-SROUNYUIN-NYUIN-FLG (IDXD)  =   "1" )
                 AND  ( FLG-NYUINDAY            (IDXD)  =    1  )
-                AND  ( LNK-NYUINDAY-KBN        (IDXD)  =   SPACE )
                    IF    ( LNK-SROUNYUIN-GAIHAKU(IDXD) =   ZERO )
                        PERFORM 20011-NYUINRYO-HEN-SEC
                    ELSE
@@ -3185,10 +3184,10 @@
                    IF    ( NACCT-DAY (IDXD)            >   ZERO )
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)     =   "1" ))
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5 )
                     AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)     =   "1" ))
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
                            PERFORM 2001111-KSN-KHNINF-SET-SEC

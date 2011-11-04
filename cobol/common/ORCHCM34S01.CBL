@@ -4243,8 +4243,7 @@
                PERFORM VARYING IDXD    FROM    1   BY  1
                        UNTIL ( IDXD        >   31 )
                    IF    ( FLG-NYUINDAY  (IDXD)        =   1  )
-                    AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
-                     OR  ( LNK-NYUINDAY-KBN(IDXD)      =   "1" ))
+                    AND  ( FLG-NYUINRYODAY (IDXD)      =   1 )
                     AND  ( FLG-NYUINGENDAY (IDX4 IDXD) =   1 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)        =   ZERO )
                     AND  ( FLG-TOKTEIDAY (IDXD)        =   ZERO )
@@ -4268,10 +4267,11 @@
                        UNTIL ( IDXD        >   31 )
                    IF    ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
-                     OR  ( LNK-NYUINDAY-KBN(IDXD)      =   "1" ))
+                     OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)   =   "1" ))
                     AND  ( FLG-NYUINGENDAY (IDX4 IDXD) =   1 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)        =   ZERO )
-                    AND  ( FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
+                    AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
+                     OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)   =   "1" ))
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
@@ -4393,10 +4393,11 @@
                    IF    ( NACCT-DAY (IDXD)            >   ZERO )
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)  =   "1" ))
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                     AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)
+                                                       =   "1" ))
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
