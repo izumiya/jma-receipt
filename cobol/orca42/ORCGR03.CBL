@@ -105,6 +105,7 @@
       *  04.05.01    NACL-藤原    09/06/11  病棟別出力対応
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
       *  04.05.03    NACL-小豆沢  10/02/18  スクリプト起動パスサーチ対応
+      *  04.05.04    NACL-藤原    11/11/07  入外区分表示切替ボタン押下時の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1583,7 +1584,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    入力チェック処理
            PERFORM 410-INPUT-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  410-SYOKBN-CHK-EXT
+               GO  TO  430-HNYUGAIKBN-CHANGE-EXT
            END-IF
       *
            IF      SPA-GMN-IKKATU          =   "T" 
