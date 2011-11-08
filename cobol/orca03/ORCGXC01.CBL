@@ -239,6 +239,7 @@
       *
        01  WRK-ROW-AREA.
            03  WRK-ROW             PIC S9(9)   BINARY.
+           03  WRK-ROWATTR         PIC S9(9)   BINARY.
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -2103,31 +2104,30 @@ grpsys*     MOVE SPA-HOSPNUM TO -HOSPNUM
            IF    ( MCP-WIDGET          =   "B05" OR "B08" OR "SELNUM" )
             OR   ( FLG-GMN-INIT        =   2 )
             OR   ( SPA-XC01-HYOUJI     =   2 )
+               MOVE    ZERO            TO  WRK-ROWATTR
                COMPUTE WRK-ROW
                    =   SPA-NAI-SELNUM  -   2
                IF    ( WRK-ROW         <=  0 )
-                   MOVE    1           TO  FLG-GMN-INIT
+                   MOVE    1           TO  WRK-ROW
+                   MOVE    1           TO  WRK-ROWATTR
                END-IF
            ELSE
                MOVE    XC01-ROW        TO  WRK-ROW
+               MOVE    ZERO            TO  WRK-ROWATTR
            END-IF
       *
            MOVE    SPACE               TO  XC01
       *
            EVALUATE    FLG-GMN-INIT
            WHEN    1
-      *        glclient2,monsiajでrow=0の振る舞いが違う為の対処
-      *        (H23.11.8現在)
-      *        MOVE    ZERO            TO  XC01-ROW 
-      *        MOVE    ZERO            TO  XC01-ROWATTR
-               MOVE    1               TO  XC01-ROW 
-               MOVE    1               TO  XC01-ROWATTR
+               MOVE    ZERO            TO  XC01-ROW 
+               MOVE    ZERO            TO  XC01-ROWATTR
       *    WHEN    2
       *        MOVE    SPA-GMN-MAX     TO  XC01-ROW 
       *        MOVE    ZERO            TO  XC01-ROWATTR
            WHEN    OTHER
                    MOVE    WRK-ROW     TO  XC01-ROW
-                   MOVE    ZERO        TO  XC01-ROWATTR
+                   MOVE    WRK-ROWATTR TO  XC01-ROWATTR
            END-EVALUATE
       *
            EVALUATE    SPA-PRTKANRI-TBL-KEY
