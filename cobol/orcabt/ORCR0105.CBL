@@ -132,6 +132,8 @@
       *                                     保険履歴を最大１００に変更
       *  04.05.27    NACL-藤原    11/09/05  「請求しない」設定の請求管理
       *                                     の保険の記号番号を更新する
+      *  04.05.28    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -437,6 +439,7 @@
                05  WRK-PARA-JOBID   PIC  9(07).
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-PRTKBN      PIC  X(01).
+           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
       *
            03  WRK-SYS-SRYYMD       PIC  X(08).
@@ -1251,9 +1254,13 @@
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN 
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            PERFORM 100-DBOPEN-SEC
@@ -9561,7 +9568,11 @@
                            MOVE    RECE10-REC          TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
                            MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                           MOVE    "del4"              TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE " "
@@ -9587,7 +9598,11 @@
                            MOVE    RECE10-REC          TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
                            MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                           MOVE    "del4"              TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE " "
@@ -9611,7 +9626,11 @@
                            MOVE    KOHSKY-REC          TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
                            MOVE    "tbl_kohsky"        TO  MCP-TABLE
-                           MOVE    "del2"              TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del2"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -9702,7 +9721,11 @@
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -9728,7 +9751,11 @@
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -9752,7 +9779,11 @@
                            MOVE    KOHSKY-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_kohsky"    TO  MCP-TABLE
-                           MOVE    "del2"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del2"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC       NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -9838,7 +9869,11 @@
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -9864,7 +9899,11 @@
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -9888,7 +9927,11 @@
                            MOVE    KOHSKY-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_kohsky"    TO  MCP-TABLE
-                           MOVE    "del2"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del2"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           END-IF
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -10864,7 +10907,7 @@
            END-STRING
            PERFORM 500-COBABORT-SEC
            .
-       900-DBINSERT-EXT.
+       900-DB-ERR-ABORT-EXT.
            EXIT.
       *
       *****************************************************************

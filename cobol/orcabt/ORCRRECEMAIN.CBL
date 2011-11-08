@@ -50,6 +50,9 @@
       *  04.03.01    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
       *  04.03.02    NACL-藤原    08/08/07  労災の枠印刷選択機能対応
       *  04.03.03    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
+      *
+      *  04.05.02    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -577,7 +580,7 @@
                         ","            DELIMITED   BY  SIZE
                         WRK-PARA-PRTKBN
                                        DELIMITED   BY  SIZE
-                        ","            DELIMITED   BY  SIZE
+                        ",0,"          DELIMITED   BY  SIZE
                         WRK-PARA-HOSPNUM
                                        DELIMITED   BY  SIZE
                         ","            DELIMITED   BY  SIZE
@@ -813,7 +816,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -2169,7 +2172,7 @@
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
+                    ",0,"          DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -2338,7 +2341,7 @@
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
+                    ",0,"          DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE

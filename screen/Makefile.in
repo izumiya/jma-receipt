@@ -164,6 +164,7 @@ SCREEN_screen = \
 	RID1.glade \
 	RID2.glade \
 	RID3.glade \
+	RID4.glade \
 	S02.glade \
 	S03.glade \
 	S03N.glade \

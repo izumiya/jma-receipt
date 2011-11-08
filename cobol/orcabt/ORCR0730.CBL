@@ -137,6 +137,8 @@
       *                                     保険履歴を最大１００に変更
       *  04.05.30    NACL-藤原    11/09/05  「請求しない」設定の請求管理
       *                                     の保険の記号番号を更新する
+      *  04.05.31    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -445,6 +447,7 @@
                05  WRK-PARA-JOBID   PIC  9(07).
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-PRTKBN      PIC  X(01).
+           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
            03  WRK-PARA-ERRFILENM   PIC X(200).
       *
@@ -1304,9 +1307,13 @@
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN 
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            PERFORM 100-DBOPEN-SEC
@@ -10532,6 +10539,9 @@
                PERFORM            UNTIL       FLG-SYSKANRI    =   1
                    MOVE    MCPDATA-REC         TO  SYS-2002-REC
       *
+                   DISPLAY "DELETE PTNUM=" SYS-2002-PTNUM
+                                 " SRYYM=" SYS-2002-SRYYM
+      *
       *            診療年月の請求管理削除処理
                    INITIALIZE                  RECE10-REC
                    MOVE    SYS-1001-HOSPNUM    TO  RECE10-HOSPNUM
@@ -10542,7 +10552,11 @@
                    MOVE    2                   TO  RECE10-XXTEISYUTUSAKI 
                    MOVE    RECE10-REC          TO  MCPDATA-REC
                    MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                   MOVE    "del4"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del7"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -10564,7 +10578,11 @@
                    MOVE    6                   TO  RECE10-XXTEISYUTUSAKI 
                    MOVE    RECE10-REC          TO  MCPDATA-REC
                    MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                   MOVE    "del4"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del7"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -10585,7 +10603,11 @@
                    MOVE    SYS-2002-NYUGAIKBN  TO  KOHSKY-NYUGAIKBN
                    MOVE    KOHSKY-REC          TO  MCPDATA-REC
                    MOVE    "tbl_kohsky"        TO  MCP-TABLE
-                   MOVE    "del2"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del2"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -11579,7 +11601,7 @@
            END-STRING
            PERFORM 500-COBABORT-SEC
            .
-       900-DBINSERT-EXT.
+       900-DB-ERR-ABORT-EXT.
            EXIT.
       *
       *****************************************************************
