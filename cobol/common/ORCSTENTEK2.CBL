@@ -102,6 +102,7 @@
                05  WRK-COMMENT-COM-FLG PIC X(01)   OCCURS  5.
                05  WRK-COMMENT-SRYCD   PIC X(09)   OCCURS  5.
                05  WRK-COMMENT-MOJI    PIC X(100)  OCCURS  5.
+           03  WRK-SRYSYUKBN       PIC X(03).
       *
       *
       *****************************************************************
@@ -1941,6 +1942,7 @@
            MOVE    ZERO                TO  WRK-SYUGI-SRYCDTOTAL
            MOVE    ZERO                TO  WRK-COMMENT-MEISAISU
            MOVE    ZERO                TO  FLG-YKZ
+           MOVE    SPACE               TO  WRK-SRYSYUKBN
       *
            INITIALIZE                      SRYACT-REC
            MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
@@ -1960,6 +1962,8 @@
                    PERFORM    VARYING   IDX4    FROM   1   BY  1
                               UNTIL    (IDX4    >    5)    OR
                                        (SRY-SRYCD(IDX4)  =   SPACE)
+                       MOVE  SRY-SRYSYUKBN
+                                          TO    WRK-SRYSYUKBN
                        IF    SRY-SRYCD(IDX4)(1:1)   =  "1"
                              ADD    1     TO    WRK-SYUGI-MEISAISU
                              MOVE   SRY-SRYCD(IDX4)
@@ -1996,6 +2000,14 @@
            IF        WRK-COMMENT-MEISAISU   >  5
                 MOVE     5      TO    WRK-COMMENT-MEISAISU
       *         コメント入力行が５明細を超えた場合は処理対象外とする
+                MOVE     ZERO   TO    ACCT-ZAITEN
+           END-IF
+      *
+      *    診療種別区分が「．３４０（その他注射）」で薬剤点、器材点が
+      *    ある場合は処理対象外とする
+           IF   (WRK-SRYSYUKBN      =    "340")   AND
+               ((ACCT-YKZTEN        NOT =   ZERO)  OR
+                (ACCT-KIZAITEN      NOT =   ZERO))
                 MOVE     ZERO   TO    ACCT-ZAITEN
            END-IF
       *
