@@ -4563,6 +4563,14 @@
                END-IF
       *!!!!
       *
+      *!!!!
+      *        µßµÞÈÂÁ÷¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
+               IF     (WRK-COM-INPUTCD (IDX-Z) =   "114003010" )
+                  AND (SPA-ERRCD               =   SPACE  )
+                   PERFORM 10017-KUUKYUHANSO-SEC
+               END-IF
+      *!!!
+      *
              END-IF
            END-PERFORM
       *
@@ -5563,6 +5571,35 @@
            .
        10016-NYUIN-KIKAN-EXT.
            EXIT.
+      *!!!
+      *****************************************************************
+      *    µßµÞÈÂÁ÷¿Ç»¡ÎÁ»»Äê¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       10017-KUUKYUHANSO-SEC                SECTION.
+      *
+      *    Æþ±¡´ü´ÖÃæÈ½Äê
+           IF       SPA-NYUGAIKBN      =   "2"
+              IF   (SPA-K02N-NYUINYMD   =   SPA-SRYYMD )
+                OR (SPA-K02N-TAIINYMD   =   SPA-SRYYMD )
+      *            ÆþÂà±¡Æü
+                   MOVE    "K901"              TO  SPA-ERRCD
+               END-IF
+           ELSE
+               MOVE    "K901"              TO  SPA-ERRCD
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                 AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-KZMFLG  (IDX-Z)
+               ELSE
+                   MOVE    SPACE           TO  SPA-ERRCD
+               END-IF
+           END-IF
+           .
+       10017-KUUKYUHANSO-EXT.
+           EXIT.
+      *!!!
       *****************************************************************
       *    ÆÃÄêÌôºÞ¼£ÎÅ´ÉÍýÎÁ¤Î»»Äê¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
