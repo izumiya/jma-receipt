@@ -36,6 +36,8 @@ fi
 #        $16 HOSPNUM 
 #        $18 レセプト作成区分
 #            1:提出用レセ、2:点検用レセ
+#        $19 請求データ削除区分
+#            0:削除しない、2:削除する
 #-------------------------------------------#
 ##      エラーファイル削除
 	echo $#
@@ -131,7 +133,7 @@ fi
             exit 
         else 
             if  [ $8 -ge '200804' ]; then
-                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0105 -parameter $9${10}$1$2$3$8$5$6,${18},${16},${4}    >> $LOG_FILE 2>&1
+                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0105 -parameter $9${10}$1$2$3$8$5$6,${18},${19},${16},${4}    >> $LOG_FILE 2>&1
             else
                 if  [ $8 -lt '200210' ]; then
 	            $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0100 -parameter $1$2$3$8$5$6,${16},${4} >> $LOG_FILE 2>&1

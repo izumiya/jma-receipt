@@ -28,6 +28,9 @@
       *  04.01.01    NACL-藤原    07/11/22  公害レセプト対応
       *
       *  04.03.01    NACL-藤原    08/07/09  仮レセ作成（院外処方含む）対応
+      *
+      *  04.05.01    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *****************************************************************
       *
        01  SPA-R01FREE.
@@ -109,6 +112,7 @@
                        09  SPA-NAI-R01-STJYUSINYMD PIC 9(08).
                        09  SPA-NAI-R01-EDJYUSINYMD PIC 9(08).
                        09  SPA-NAI-R01-TEISEIYM    PIC 9(06).
+                       09  SPA-NAI-R01-CHK         PIC 9(01).
       * 
                    07  SPA-NAI-R01-TBL.
                        09  SPA-NAI-R01-TBL-G       OCCURS   500.
@@ -116,6 +120,7 @@
                            11  SPA-NAI-R01-TSRYYM  PIC 9(06).
                            11  SPA-NAI-R01-TTAISYO PIC 9(01).
                            11  SPA-NAI-R01-TDELETE PIC 9(01).
+                           11  SPA-NAI-R01-TCHK    PIC 9(01).
       *
                    07  SPA-NAI-R01-SYOKBN          PIC X(01).
       *
@@ -149,6 +154,7 @@
                                                    PIC 9(03).
                    07  SPA-NAI-R01-BTPARA-HYOUJI-FLG
                                                    PIC 9(01).
+                   07  SPA-NAI-R01-SEIKYU-CHK      PIC 9(01).
       *
                    07  SPA-NAI-R01-2002-TBL.
                        09  SPA-NAI-R01-2002-TBL-G      OCCURS   500.

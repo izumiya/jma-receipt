@@ -1,0 +1,21 @@
+RID4	{
+	fixed1	{
+		ID1CODE	{
+			value	varchar(10);
+		};
+		LABEL	{
+			style   varchar(20);
+			value	varchar(80);
+		};
+		LABEL1	{
+			style   varchar(20);
+			value	varchar(110);
+		};
+		B01	{
+			label	varchar(4);
+		};
+		ID1MSG	{
+			value	varchar(90);
+		};
+	};
+};
