@@ -126,6 +126,8 @@
            03  FLG-SRYKA-OK              PIC 9(01).
       *    同日初診
            03  FLG-DOUJITU               PIC 9(01).
+      *    処理有
+           03  FLG-SYORI-ARI            PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -641,6 +643,22 @@
       *        訂正の時、前回の削除分を削除する
                PERFORM 45004-ALL-JYURRK-UPD-SEC
            END-IF
+      *!!!
+      *    明細の登録なしはＤＢ異常終了とする（収納が残る為）
+           IF     (SPA-ERRCD       NOT =   SPACE)
+             OR   (FLG-SYORI-ARI       =   ZERO )
+               MOVE    SPACE               TO  MCPDATA-REC
+               MOVE    "DBSELECT"          TO  MCP-FUNC
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "abort"             TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      SPA-ERRCD           =   SPACE
+                   MOVE    "0051"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *!!!
       *
            IF      SPA-ERRCD           =   SPACE
       *        ワーク診療行為マスタ−が存在した時、削除する
@@ -842,6 +860,10 @@
                    UNTIL      (FLG-PARA   =    1  )  OR
                               (SPA-ERRCD  NOT =   SPACE)
                IF      PARA-FILEMEI        =   "WKSRYACT"
+      *!!!
+      *          対象有
+                 MOVE    1                   TO  FLG-SYORI-ARI
+      *!!!
                  MOVE    PARA-DATA-REC     TO  WRK-WKSRYACT-REC
                  IF     (WRK-WKSRY-SRYKA      =   WRK-SRYKA)  AND
                         (WRK-WKSRY-HKNCOMBI   =   WRK-HKNCOMBI) AND
