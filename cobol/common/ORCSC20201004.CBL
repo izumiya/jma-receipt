@@ -697,6 +697,14 @@
                                                             (IDX-Z + 1)
                        END-IF
                    END-IF
+      *H23.11      ÃÙ∫ﬁ§Œø«Œ≈ºÔ Ã
+               WHEN    "6"
+                   IF      WRK-SRYSYUKBN       =   SPACE
+                       IF      WRK-COM-SRYSYUKBN (IDX-Z) NOT =   SPACE
+                           MOVE    WRK-COM-SRYSYUKBN (IDX-Z)
+                                                   TO  WRK-SRYSYUKBN
+                        END-IF
+                   END-IF
            END-EVALUATE
       *
            .
