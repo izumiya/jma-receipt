@@ -1031,6 +1031,7 @@
                                        OR  "148"
                                        OR  "149"
                    CONTINUE
+                   MOVE    1               TO  FLG-OK
                ELSE
                    MOVE    1               TO  FLG-SRYACT
                END-IF

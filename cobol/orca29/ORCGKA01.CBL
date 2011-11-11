@@ -1045,6 +1045,11 @@
                INITIALIZE                  SRYACT-REC
                MOVE    1               TO  FLG-SRYACT
            END-IF
+      *    院外は対象とする
+           IF     SRY-SRYSYUKBN        =   "148"
+                                       OR  "149"
+               MOVE    1               TO  FLG-OK
+           END-IF
            PERFORM
                    UNTIL  (FLG-SRYACT      =   1  )  OR
                           (SRY-SRYKBN  NOT =   "14") OR
@@ -1368,7 +1373,7 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF     (FLG-YAKUZAI         =   ZERO )
+           IF     (FLG-ZAITAKU         =   ZERO )
              AND  (LNK-WKSRY-SRYKBN (1)    =   "14" )
                CONTINUE
            ELSE
