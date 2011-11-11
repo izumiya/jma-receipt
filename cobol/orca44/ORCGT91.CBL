@@ -157,6 +157,8 @@
            03  WRK-CONS-JOB-JOBID-COLLECT
                                    PIC 9(07)   VALUE   1.
       *
+           03  WRK-CONS-MAX-LEN    PIC 9(05)   VALUE   63000.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -482,11 +484,15 @@
                IF     (COLLECT-REC(IDX2:2)     =   SPACE )
                    MOVE    1           TO  FLG-OVR
                ELSE
-                   ADD     1           TO  IDX-1
+                   IF     (COLLECT-REC(IDX2:1)     >=  X"A1" )
+                       ADD     2           TO  IDX-1
+                   ELSE
+                       ADD     1           TO  IDX-1
+                   END-IF
                END-IF
            END-PERFORM
       *
-           IF     (IDX-1   +   WRK-CNT )   >=  63000
+           IF     (IDX-1   +   WRK-CNT )   >=  WRK-CONS-MAX-LEN
                COMPUTE SPA-NAI-TOTALPAGE   =   SPA-NAI-TOTALPAGE  +  1
                MOVE   ZERO             TO  WRK-CNT
            ELSE
@@ -545,11 +551,15 @@
                IF     (COLLECT-REC(IDX2:2)     =   SPACE )
                    MOVE    1           TO  FLG-OVR
                ELSE
-                   ADD     1           TO  IDX-1
+                   IF     (COLLECT-REC(IDX2:1)     >=  X"A1" )
+                       ADD     2           TO  IDX-1
+                   ELSE
+                       ADD     1           TO  IDX-1
+                   END-IF
                END-IF
            END-PERFORM
       *
-           IF     (IDX-1   +   WRK-CNT )   >=  63000
+           IF     (IDX-1   +   WRK-CNT )   >=  WRK-CONS-MAX-LEN
                MOVE    1               TO  FLG-COLLECT
                MOVE    1               TO  SPA-NAI-NEXT
                COMPUTE SPA-NAI-CNT     =   IDX    -   1
@@ -564,7 +574,7 @@
                    COMPUTE WRK-CNT         =   WRK-CNT  +  IDX-1
                END-IF
                COMPUTE WRK-CNT         =   WRK-CNT  +  1
-               IF      WRK-CNT         <=  63000
+               IF      WRK-CNT         <=  WRK-CONS-MAX-LEN
                    MOVE    X"0A"           TO  WRK-DATAVIEW(WRK-CNT:1)
                END-IF
            END-IF
