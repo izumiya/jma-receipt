@@ -3233,6 +3233,7 @@
       *
       *            点検用レセプト作成時
                    MOVE    HC06-LABEL          TO  HC061-LABEL
+                   MOVE    HC06-LOPTION        TO  HC061-LOPTION
                WHEN    "2"
                    INITIALIZE                      HC062
                    MOVE    SPACE               TO  HC062
@@ -3311,6 +3312,7 @@
       *
       *            点検用レセプト作成時
                    MOVE    HC06-LABEL          TO  HC062-LABEL
+                   MOVE    HC06-LOPTION        TO  HC062-LOPTION
                WHEN    "3"
                    INITIALIZE                      HC063
                    MOVE    SPACE               TO  HC063
@@ -3389,6 +3391,7 @@
       *
       *            点検用レセプト作成時
                    MOVE    HC06-LABEL          TO  HC063-LABEL
+                   MOVE    HC06-LOPTION        TO  HC063-LOPTION
            END-EVALUATE
            .
        310-HCN061-HEAD-HEN-EXT.

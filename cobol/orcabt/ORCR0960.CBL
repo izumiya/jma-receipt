@@ -2829,7 +2829,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                                                    TO HCN50-PAGE
                            MOVE    HCN50           TO RECE08-PRTDATA
                        WHEN    "HCM24V06.red"                  
-                       WHEN    "HCN24V06P.red"                  
+                       WHEN    "HCM24V06P.red"                  
                            MOVE    RECE08-PRTDATA  TO HC24
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC24-PAGE

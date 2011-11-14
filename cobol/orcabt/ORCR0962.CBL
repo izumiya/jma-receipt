@@ -674,7 +674,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECEYMD-HOSPNUM
                MOVE    "STS"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    "ORCR0962"      TO  JOB-PGID
-               MOVE    "½ýÉÂÇ¯¶â¡¦°õºþ¥Ç¡¼¥¿ÊÔ½¸¡ÊÏ«ºÒ¡Ë"
+               MOVE    "¸øÌ³ºÒ³²¡¦°õºþ¥Ç¡¼¥¿ÊÔ½¸¡ÊÏ«ºÒ¡Ë"
                                        TO  JOB-SHELLMSG
 grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
