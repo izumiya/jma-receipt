@@ -253,6 +253,8 @@
       *  04.05.08    NACL-藤原    11/02/15  誕生日と診療開始日のチェック
       *  04.05.09    NACL-藤原    11/09/26  「表示しない」設定の表示条件
       *                                     の追加
+      *  04.05.10    NACL-藤原    11/11/14  公害による保険限定の病名の重
+      *                                     複登録を可能とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1631,6 +1633,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        =   "98"
                MOVE    1                   TO
                                            SPA-NAI-C02-HKNCOMBI-JIHI
+           END-IF
+      *
+      *    公害の時
+           IF      ORCSHKN-NAI-HKNNUM (IDX)
+                                       =   "975"
+               MOVE    1                   TO
+                                           SPA-NAI-C02-HKNCOMBI-KOUGAI
            END-IF
       *
       *    労災の時、コメントの追加
@@ -7551,11 +7560,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        45021-HKNCOMBI-DABURI-CHK-SEC   SECTION.
       *
-      *    労災または自賠責または自費の保険がない場合はチェックしない
-           IF    ( SPA-NAI-C02-HKNCOMBI-ROUSAI )
-                                       =   ZERO
-           AND   ( SPA-NAI-C02-HKNCOMBI-JIHI   )
-                                       =   ZERO
+      *    労災または自賠責または自費、公害の保険がない場合はチェックしない
+           IF    ( SPA-NAI-C02-HKNCOMBI-ROUSAI
+                                       =   ZERO )
+           AND   ( SPA-NAI-C02-HKNCOMBI-JIHI
+                                       =   ZERO )
+           AND   ( SPA-NAI-C02-HKNCOMBI-KOUGAI
+                                       =   ZERO )
                GO  TO   45021-HKNCOMBI-DABURI-CHK-EXT
            END-IF
       *
@@ -7584,19 +7595,22 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                MOVE    HKNCOMBI-REC        TO  WRK-CHK-HKNCOMBI-REC (2)
            END-IF
       *
-      *    片方のみ労災または自賠責の場合は登録可能とする
+      *    片方のみ労災または自賠責または公害の場合は登録可能とする
            EVALUATE    WRK-CHK-COMB-HKNNUM (1)
                                    ALSO    WRK-CHK-COMB-HKNNUM (2)
                WHEN    "971"       ALSO    "971"
                WHEN    "973"       ALSO    "973"
+               WHEN    "975"       ALSO    "975"
                    IF      WRK-CHK-COMB-HKNID (1)
                                        NOT =    WRK-CHK-COMB-HKNID (2)
                        MOVE    1                TO  FLG-HKNCOMBI-DABURI
                    END-IF
                WHEN    "971"       ALSO    ANY
                WHEN    "973"       ALSO    ANY
+               WHEN    "975"       ALSO    ANY
                WHEN    ANY         ALSO    "971"
                WHEN    ANY         ALSO    "973"
+               WHEN    ANY         ALSO    "975"
                    MOVE    1               TO  FLG-HKNCOMBI-DABURI
                WHEN    OTHER
                    MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
