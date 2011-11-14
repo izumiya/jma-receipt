@@ -459,7 +459,50 @@ FORM_files = \
 	      HCM3DV01.red \
 	      HCM11V03.red \
 	      HCN09V03.red \
-	      ORCDUMMMY.red \
+	      HCM11V04.red \
+	      HCM12V02.red \
+	      HCM13V02.red \
+	      HCM14V02.red \
+	      HCM18V06.red \
+	      HCM18V06P.red \
+	      HCM20V06.red \
+	      HCM20V06P.red \
+	      HCM21V06.red \
+	      HCM21V06P.red \
+	      HCM22V06.red \
+	      HCM22V06P.red \
+	      HCM23V06.red \
+	      HCM24V06.red \
+	      HCM24V06P.red \
+	      HCM25V02.red \
+	      HCM26V02.red \
+	      HCM29V04.red \
+	      HCM48V02.red \
+	      HCM49V02.red \
+	      HCM53V02.red \
+	      HCM54V02.red \
+	      HCM55V03.red \
+	      HCM56V02.red \
+	      HCM57V02.red \
+	      HCM58V02.red \
+	      HCM59V02.red \
+	      HCN09V04.red \
+	      HCN23V06.red \
+	      HCN25V02.red \
+	      HCN48V02.red \
+	      HCN50V02.red \
+	      HCN50V02P.red \
+	      HCN51V02.red \
+	      HCN51V02P.red \
+	      HCN53V02.red \
+	      HCN54V02.red \
+	      HCN55V02.red \
+	      HCN58V02.red \
+	      HCM69.red \
+	      HCM70.red \
+	      HCM71.red \
+	      HCN66.red \
+	      HCN67.red \
 
 all:   
 

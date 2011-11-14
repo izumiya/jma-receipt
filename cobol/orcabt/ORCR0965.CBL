@@ -44,6 +44,7 @@
       *  04.05.02    NACL-藤原    10/03/03  平成２２年４月改正対応
       *  04.05.03    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *  04.05.04    NACL-藤原    11/04/08  傷病名の記載順対応
+      *  04.05.05    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -145,11 +146,11 @@
                                    BY         //RECEERR//.
       *
       *    自賠責     
-           COPY    "HCN53V01.INC"  REPLACING  //HCN53V01//
+           COPY    "HCN53V02.INC"  REPLACING  //HCN53V02//
                                    BY         //HC23//.
       *
       *    自賠責（続紙）     
-           COPY    "HCM29V03.INC"  REPLACING  //HCM29V03//
+           COPY    "HCM29V04.INC"  REPLACING  //HCM29V04//
                                    BY         //HC29//.
       *
       *    フラグ領域
@@ -505,6 +506,8 @@
            COPY    "CPSK1900.INC".
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
+      *
+           COPY    "CPSK200501.INC".
       *
            COPY    "CPRCF008.INC".
       *
@@ -886,6 +889,32 @@ grpsys        PERFORM 900-DBSELECT-SEC
               MOVE    "key8"              TO  MCP-PATHNAME
               PERFORM 900-CLOSE-SEC
            END-IF 
+      *         
+      *    レセプト編集区分情報
+           MOVE    SPACE           TO  SYSKANRI-REC
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "2005"          TO  SYS-KANRICD
+           MOVE    "01"            TO  SYS-KBNCD
+           MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+           MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+           MOVE    "key10"         TO  WRK-MCP-PATHNAME
+           PERFORM 960-KANRIMST-READ-SEC
+           IF      FLG-SYSKANRI     =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               INITIALIZE                  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                   =   SPACE
+               MOVE    ZERO            TO
+                                       SYS-200501-INSPECT-CHARACTER-KBN
+           END-IF
+           DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
+                                    SYS-200501-INSPECT-CHARACTER-KBN
+                    " " WRK-PARA-PRTKBN
+      *
       *
            .
        120-HOSPINF-GET-EXT.
@@ -1203,11 +1232,19 @@ grpsys        PERFORM 900-DBSELECT-SEC
       *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN     =   "2"
-               MOVE    "点検用レセプト"    TO  HC23-LABEL
+               IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                           =   "0"
+                   MOVE    "点検用レセプト"    TO  HC23-LABEL
+                   MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                               TO  HC23-LOPTION
+               END-IF
+           ELSE
+               MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                           TO  HC23-LOPTION
            END-IF
       *    
            .
-       310-HC101-HEAD-HEN-EXT.
+       20021-HEAD-HEN-EXT.
            EXIT.
       *     
       *****************************************************************
@@ -1232,6 +1269,7 @@ grpsys        PERFORM 900-DBSELECT-SEC
       *
       *    点検用レセプト作成時
            MOVE    HC23-LABEL          TO  HC29-LABEL
+           MOVE    HC23-LOPTION        TO  HC29-LOPTION
       *
            .
        310-HC29-HEAD-HEN-EXT.
@@ -2585,21 +2623,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      CNT-PAGE            =   1
                EVALUATE  WRK-PARA-FRAME
                  WHEN      "0"
-                   MOVE  "HCN53V01.red"    TO
+                   MOVE  "HCN53V02.red"    TO
                                            TBL-RECE-FORMID(TBL-RECE-MAX)
                  WHEN      "1"
-                   MOVE  "HCN54V01.red"    TO
+                   MOVE  "HCN54V02.red"    TO
                                            TBL-RECE-FORMID(TBL-RECE-MAX)
                END-EVALUATE
                MOVE       HC23       TO  TBL-RECE-PRTDATA(TBL-RECE-MAX)
            ELSE
                EVALUATE  WRK-PARA-FRAME
                  WHEN      "0"
-                   MOVE  "HCM29V03.red"
+                   MOVE  "HCM29V04.red"
                                            TO
                                            TBL-RECE-FORMID(TBL-RECE-MAX)
                  WHEN      "1"
-                   MOVE  "HCM49V01.red"    TO
+                   MOVE  "HCM49V02.red"    TO
                                            TBL-RECE-FORMID(TBL-RECE-MAX)
                END-EVALUATE
                MOVE       HC29       TO  TBL-RECE-PRTDATA(TBL-RECE-MAX)
@@ -2729,14 +2767,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN53V01.red"
-                       WHEN    "HCN54V01.red"
+                       WHEN    "HCN53V02.red"
+                       WHEN    "HCN54V02.red"
                            MOVE    RECE08-PRTDATA  TO HC23
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC23-PAGE
                            MOVE    HC23            TO RECE08-PRTDATA
-                       WHEN    "HCM29V03.red"                  
-                       WHEN    "HCM49V01.red"
+                       WHEN    "HCM29V04.red"                  
+                       WHEN    "HCM49V02.red"
                            MOVE    RECE08-PRTDATA  TO HC29
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC29-PAGE
