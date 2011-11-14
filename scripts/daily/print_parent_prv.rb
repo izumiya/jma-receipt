@@ -21,10 +21,11 @@
 # (2007/12/27 ) patch-lib 対応
 # (2008/07/30 ) 労災、自賠枠なし対応
 # (2008/11/12 ) レイアウトオプション対応
-# (2011/03/08 ) クライアント印刷対応
+# (2010/11/08 ) クライアント印刷対応
 #
 
 # クライアント印刷用(複数ps をまとめる)
+# (2011/11/14 ) 労災枠有り対応
 $:.unshift(File.dirname(__FILE__))
 require "monpeps"
 
@@ -299,7 +300,6 @@ stop_file = ''
 stop_file_1 = ''
 stop_file_2 = ''
 
-on_flg = ''                    #オンライン帳票識別フラグ
 
 li_cnt1 = 0
 
@@ -545,6 +545,62 @@ end
 		when	'HCM29V03.red'
 			ls_w1 = 'HCM49V01.red'
 			red_file = std_form + ls_w1
+#   -----------> 労災分(2011/8/05)
+                when    'HCM22V06.red'
+                        ls_w1 = 'HCM22V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN50V02.red'
+                        ls_w1 = 'HCN50V02P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM24V06.red'
+                        ls_w1 = 'HCM24V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM24V06.red'
+                        ls_w1 = 'HCM24V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM21V06.red'
+                        ls_w1 = 'HCM21V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN51V02.red'
+                        ls_w1 = 'HCN51V02P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM24V06.red'
+                        ls_w1 = 'HCM24V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM24V06.red'
+                        ls_w1 = 'HCM24V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM18V06.red'
+                        ls_w1 = 'HCM18V06P.red'
+                        red_file = std_form + ls_w1
+                when    'HCM20V06.red'
+                        ls_w1 = 'HCM20V06P.red'
+                        red_file = std_form + ls_w1
+#   -----------> 自賠分(2011/8/05)
+                when    'HCM23V06.red'
+                        ls_w1 = 'HCM48V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCN23V06.red'
+                        ls_w1 = 'HCN48V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCM29V04.red'
+                        ls_w1 = 'HCM49V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCM29V04.red'
+                        ls_w1 = 'HCM49V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCM53V02.red'
+                        ls_w1 = 'HCM54V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCN53V02.red'
+                        ls_w1 = 'HCN54V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCM29V04.red'
+                        ls_w1 = 'HCM49V02.red'
+                        red_file = std_form + ls_w1
+                when    'HCM29V04.red'
+                        ls_w1 = 'HCM49V02.red'
+                        red_file = std_form + ls_w1
 		end
 	end
 #   労災の枠なし帳票をスイッチする ed
@@ -599,11 +655,12 @@ end
 				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name + ' ' + LAYEROPTION
 			end
 		when	'5'     # クライアント印刷指示
+		puts	'take3 Start [' + psfile_name + ']'
 			# 出力ファイル名が指定されていなかったら、通常の印刷処理を行う
 			if psfile_name == ''
 				puts	'出力ファイル名未設定'
 			else
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -o ' + psfile_name + ' ' + LAYEROPTION
+				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name + ' ' + LAYEROPTION
 				Print_Area.push(psfile_name)
 			end
 		else
@@ -630,14 +687,7 @@ end
 		puts	'Print Start [' + String(li_cnt1) + ']'
 #クライアント印刷処理
 		if (li_cnt1 == 1)
-			ADD_File=d2[257, 5].strip
-			if	d2[262,36].strip == ''
-		#		ADD_File=psfile_name[-5..-1]
-				on_flg='0'
-			else
-		#		ADD_File=File.basename(psfile_name)[30,5].strip
-				on_flg='1'
-			end
+			ADD_File=psfile_name[-5..-1]
 		end
 #
 		# プログラムの実行
@@ -797,19 +847,12 @@ end
 #クライアント印刷処理
         case    prt_flg
         when    '5'     # PSファイル出力の指示
-	if	on_flg == '1'
-	puts "on_flg set 1"
-		BS_File="/tmp/" + File.basename(psfile_name)[0,30] + "99999" + ADD_File + File.basename(psfile_name)[35,36]
-	else
-	puts "on_flg set 0"
-		BS_File="/tmp/" + File.basename(psfile_name) + ADD_File
-	end
-		PS_File= BS_File + ".ps"
-		PDF_File=BS_File + ".pdf"
+#		PS_File="/tmp/" + File.basename(psfile_name).gsub(/[0-9]{5}$/, "00000.ps")
+		PS_File="/tmp/" + File.basename(psfile_name) + ADD_File + ".ps"
+		puts PS_File
+#		PDF_File="/tmp/" + File.basename(psfile_name).gsub(/[0-9]{5}$/, "00000.pdf")
+		PDF_File="/tmp/" + File.basename(psfile_name) + ADD_File + ".pdf"
 		API_File=PDF_File.sub("pdf","api")
-		puts "--------------------------------------"
-		puts API_File
-		puts "--------------------------------------"
 		MONPEPS::merge_ps(PS_File,Print_Area)
 		system(PDF,PS_File, PDF_File)
 		api_file = File.open(API_File,'w')
