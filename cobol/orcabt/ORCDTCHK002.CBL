@@ -527,27 +527,28 @@
                05  WRK-NISSU-DAY-G.
                    07  WRK-NISSU-DAY                   PIC 9(01)
                                                        OCCURS  31.
-               05  WRK-NISSU-KUGIRI-FLG                PIC 9(01).
-               05  WRK-NISSU-RENZOKU-CNT               PIC 9(03).
-               05  WRK-NISSU-ST-G.
-                   07  WRK-NISSU-ST                    PIC 9(02).
-                   07  WRK-NISSU-ST-X                  PIC X(02).
-                   07  WRK-NISSU-ST-R1 REDEFINES   WRK-NISSU-ST-X.
-                       09  WRK-NISSU-ST-Z9             PIC Z9.
-                   07  WRK-NISSU-ST-R2 REDEFINES   WRK-NISSU-ST-X.
-                       09  WRK-NISSU-ST-9              PIC 9(01).
-                       09                              PIC X(01).
-               05  WRK-NISSU-ED-G.
-                   07  WRK-NISSU-ED                    PIC 9(02).
-                   07  WRK-NISSU-ED-X                  PIC X(02).
-                   07  WRK-NISSU-ED-R1 REDEFINES   WRK-NISSU-ED-X.
-                       09  WRK-NISSU-ED-Z9             PIC Z9.
-                   07  WRK-NISSU-ED-R2 REDEFINES   WRK-NISSU-ED-X.
-                       09  WRK-NISSU-ED-9              PIC 9(01).
-                       09                              PIC X(01).
-               05  WRK-NISSU-MES                       PIC X(200).
-               05  WRK-NISSU-PTR                       PIC 9(03).
-               05  WRK-NISSU-LASTYMD                   PIC X(08).
+               05  WRK-NISSU-OT.
+                   07  WRK-NISSU-KUGIRI-FLG            PIC 9(01).
+                   07  WRK-NISSU-RENZOKU-CNT           PIC 9(03).
+                   07  WRK-NISSU-ST-G.
+                       09  WRK-NISSU-ST                PIC 9(02).
+                       09  WRK-NISSU-ST-X              PIC X(02).
+                       09  WRK-NISSU-ST-R1 REDEFINES   WRK-NISSU-ST-X.
+                           11  WRK-NISSU-ST-Z9         PIC Z9.
+                       09  WRK-NISSU-ST-R2 REDEFINES   WRK-NISSU-ST-X.
+                           11  WRK-NISSU-ST-9          PIC 9(01).
+                           11  WRK-NISSU-ST-FL         PIC X(01).
+                   07  WRK-NISSU-ED-G.
+                       09  WRK-NISSU-ED                PIC 9(02).
+                       09  WRK-NISSU-ED-X              PIC X(02).
+                       09  WRK-NISSU-ED-R1 REDEFINES   WRK-NISSU-ED-X.
+                           11  WRK-NISSU-ED-Z9         PIC Z9.
+                       09  WRK-NISSU-ED-R2 REDEFINES   WRK-NISSU-ED-X.
+                           11  WRK-NISSU-ED-9          PIC 9(01).
+                           11  WRK-NISSU-ED-FL         PIC X(01).
+                   07  WRK-NISSU-MES                   PIC X(200).
+                   07  WRK-NISSU-PTR                   PIC 9(03).
+                   07  WRK-NISSU-LASTYMD               PIC X(08).
            03  WRK-SYOSIN-CHK-YMD.
                05  WRK-SYOSIN-CHK-YY                   PIC 9(04).
                05  WRK-SYOSIN-CHK-MM                   PIC 9(02).
@@ -9597,6 +9598,8 @@
       *    日数編集処理
       *****************************************************************
        200111-NISSU-HEN-SEC            SECTION.
+      *
+           INITIALIZE                      WRK-NISSU-OT
       *
            MOVE    1                   TO  WRK-NISSU-PTR
            MOVE    1                   TO  WRK-NISSU-ST
