@@ -90,6 +90,8 @@
       *                                     排他制御フラグの追加
       *  04.05.02    NACL-藤原    09/06/02  病名の入力順対応
       *                                     追加指定行の追加
+      *  04.05.03    NACL-藤原    11/11/14  公害による保険限定の病名の重
+      *                                     複登録を可能とする
       *
       *  04.06.01    NACL-藤原    10/06/14  自院病名コード変更対応
       *                                     変更前の自院病名コード、
@@ -325,6 +327,7 @@
                            11  SPA-NAI-C02-BIRTHDAY        PIC X(08).
                            11  SPA-NAI-C02-HKNCOMBI-ROUSAI PIC 9(01).
                            11  SPA-NAI-C02-HKNCOMBI-JIHI   PIC 9(01).
+                           11  SPA-NAI-C02-HKNCOMBI-KOUGAI PIC 9(01).
                            11  SPA-NAI-C02-LOCK            PIC 9(01). 
                        09  SPA-NAI-C02-KOUMOKU.
                            11  SPA-NAI-C02-SRYYMD          PIC X(08).
