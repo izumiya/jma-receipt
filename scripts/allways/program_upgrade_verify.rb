@@ -24,6 +24,7 @@ def local_md5list(patch_lib,dir_list)
           rescue Exception => ex
             md5 = ""
           end
+          dir_list.delete_if {|m| m[0]==file_name && m[1]==dir_name}
           dir_list.push([file_name, dir_name, md5])
         end
       end
@@ -50,7 +51,6 @@ localmd5 = []
 local_md5list(patch_lib_org, localmd5)
 local_md5list(patch_lib_tmp, localmd5)
 releasemd5.sort!
-localmd5.uniq!
 localmd5.sort!
 
 `bash #{check_log_sh} clear`
