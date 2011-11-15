@@ -1049,6 +1049,14 @@
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *!!! 2011.11.15
+               WHEN    "9040"
+                   STRING  "入院の中心静脈注射の薬剤は"
+                           ".350等で入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *!!!
                WHEN    "9100"
                    STRING  "診療内容が４００行を超えます。"
                            "会計照会で訂正して下さい。"

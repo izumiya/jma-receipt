@@ -91,6 +91,8 @@
            03  FLG-GAZO-ARI        PIC 9(01).
       *
            03  FLG-OUT-OK          PIC 9(01).
+      *    中心静脈あり 
+           03  FLG-SYUGI-CHU       PIC 9(01).
       *
       *
       *    添字領域
@@ -411,6 +413,7 @@
            MOVE    ZERO                TO  IDX-MAX
            MOVE    ZERO                TO  IDX-SYU
            MOVE    ZERO                TO  FLG-SYUGI
+           MOVE    ZERO                TO  FLG-SYUGI-CHU
            MOVE    ZERO                TO  FLG-MADOKU
            MOVE    ZERO                TO  FLG-SEIBUTU
            INITIALIZE                  WRK-AREA
@@ -532,6 +535,12 @@
       *                入力が有った時、自動加算を入力とする
                        MOVE    SPACE                TO  WRK-COM-AUTOKBN
                                                                 (IDX-Z)
+      *!!
+      *                中心静脈注射判定
+                       IF      WRK-COM-INPUTCD (IDX-Z) =   "130004410"
+                           MOVE    1                   TO  FLG-SYUGI-CHU
+                       END-IF 
+      *!!
       *                手技料の位置セット
                        MOVE    IDX-Z               TO  IDX-SYU
                    END-IF
@@ -581,6 +590,16 @@
                        MOVE    "9020"          TO  WRK-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
                    END-IF
+      *!!!!
+      *            入院時の中心静脈注射と薬剤は分ける
+                   IF    (SPA-NYUGAIKBN        =   "1" )   AND
+                         (FLG-SYUGI-CHU        =   1   )   AND
+                         (WRK-COM-HKNCOMBI (IDX-Z)
+                                           NOT =   "9999")
+                       MOVE    "9040"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+                   END-IF
+      *!!!!
       *            残量廃棄
                    PERFORM 1006-HAIKI-SYORI-SEC
       *
