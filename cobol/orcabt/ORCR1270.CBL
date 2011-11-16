@@ -52,7 +52,8 @@
       *                                     行うようにする
       *  04.05.05    NACL-藤原    11/09/05  「請求しない」設定の請求管理
       *                                     の保険の記号番号を更新する
-      *  04.05.06    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *  04.05.06    NACL-藤原    11/08/02  点検レセ印字位置変更対応
+      *  04.05.07    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
       *****************************************************************
       *
@@ -133,9 +134,11 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCN58V01.INC"  REPLACING  //HCN58V01//
+      *****COPY    "HCN58V01.INC"  REPLACING  //HCN58V01//
+           COPY    "HCN58V02.INC"  REPLACING  //HCN58V02//
                                    BY         //HCN58//.
-           COPY    "HCM59V01.INC"  REPLACING  //HCM59V01//
+      *****COPY    "HCN59V01.INC"  REPLACING  //HCN59V01//
+           COPY    "HCM59V02.INC"  REPLACING  //HCM59V02//
                                    BY         //HCM59//.
       *
       *    フラグ領域
@@ -589,6 +592,8 @@
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
       *
+           COPY    "CPSK200501.INC".
+      *
       *    レセプト作成指示（個別指示）コード
            COPY    "CPSK2002.INC".
       *
@@ -1038,6 +1043,31 @@
                    MOVE    2               TO  FLG-STS
                END-IF
            END-IF
+      *         
+      *    レセプト編集区分情報
+           MOVE    SPACE           TO  SYSKANRI-REC
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "2005"          TO  SYS-KANRICD
+           MOVE    "01"            TO  SYS-KBNCD
+           MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+           MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+           MOVE    "key10"         TO  WRK-MCP-PATHNAME
+           PERFORM 960-KANRIMST-READ-SEC
+           IF      FLG-KANRIMST    =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               INITIALIZE                  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                   =   SPACE
+               MOVE    ZERO            TO
+                                       SYS-200501-INSPECT-CHARACTER-KBN
+           END-IF
+           DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
+                                    SYS-200501-INSPECT-CHARACTER-KBN
+                    " " WRK-PARA-PRTKBN
            .
        120-HOSPINF-GET-EXT.
            EXIT.
@@ -1251,7 +1281,15 @@
       *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN     =   "2"
-               MOVE    "点検用レセプト"    TO  HCN58-LABEL
+               IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                           =   "0"
+                   MOVE    "点検用レセプト"    TO  HCN58-LABEL
+                   MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                               TO  HCN58-LOPTION
+               END-IF
+           ELSE
+               MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                           TO  HCN58-LOPTION
            END-IF
       *
       *    リアルタイムプレビュー時の表示
@@ -1392,6 +1430,7 @@
       *
       *    点検用レセプト作成時
            MOVE    HCN58-LABEL         TO  HCM59-LABEL
+           MOVE    HCN58-LOPTION       TO  HCM59-LOPTION
           .
        310-HCN061-HEAD-HEN-EXT.
            EXIT.
@@ -2575,12 +2614,14 @@
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCN58V01.red"      TO
+      *********MOVE    "HCN58V01.red"      TO
+               MOVE    "HCN58V02.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCN58               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
            ELSE
-               MOVE    "HCM59V01.red"      TO
+      *********MOVE    "HCN59V01.red"      TO
+               MOVE    "HCM59V02.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCM59               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2713,12 +2754,14 @@
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN58V01.red"
+      *****************WHEN    "HCN58V01.red"
+                       WHEN    "HCN58V02.red"
                            MOVE    RECE08-PRTDATA  TO HCN58
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCN58-PAGE
                            MOVE    HCN58            TO RECE08-PRTDATA
-                       WHEN    "HCM59V01.red"                  
+      *****************WHEN    "HCM59V01.red"
+                       WHEN    "HCM59V02.red"                  
                            MOVE    RECE08-PRTDATA  TO HCM59
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCM59-PAGE

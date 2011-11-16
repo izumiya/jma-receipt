@@ -37,7 +37,9 @@
       *  01.01.04    NACL-伊藤    06/03/07  オフセット対応
       *
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
+      *
       *  04.05.00    NACL-太田    10/01/28  拡張漢字対応
+      *  04.05.01    NACL-藤原    11/08/02  起動方法の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -150,9 +152,6 @@ grpsys COPY    "COMMON-SPA".
       *
       *    印刷用コンスタント領域 
            COPY    "CPPRTCONST.INC".          
-      *
-      *    ファイルデイレクトリ位置指定サブ
-           COPY  "CPMKPASS.INC".
       *
            COPY    "CPSHELLTBL.INC".
       *     
@@ -346,20 +345,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            AND     FLG-ERR             =   ZERO 
       *
                MOVE    SPACE           TO  SHELLTBL
-      *        ファイルデイレクトリ位置指定
-               INITIALIZE              ORCSMKPASSAREA
-               MOVE    "scripts/daily/HCALL_prv.sh"
-                                       TO  MKPASS-IN-01
-               CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-               MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
-      *         
+               MOVE    "HCALL_prv.sh"  TO  SHELLTBL-NAME
                MOVE    HC01PARA        TO  SHELLTBL-ARG1
 grpsys         MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
                MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
                MOVE    SHELLTBL        TO  MCPDATA-REC
                MOVE    "SHELL"         TO  MCP-FUNC
                MOVE    "shell"         TO  MCP-TABLE
-               MOVE    "shell"         TO  MCP-PATHNAME
+               MOVE    "daily"         TO  MCP-PATHNAME
 grpsys         PERFORM 900-ORCDBMAIN-SEC
            END-IF                                                
       *

@@ -96,6 +96,13 @@
                     06  W12-COMMENT-NYUINRYO-COUNT   PIC S9(9)   BINARY.
                     06  W12-COMMENT-NYUINRYOLST
                             PIC X(34)   OCCURS  5 TIMES.
+                  05  W12-INSPECT-CHARACTER-KBN-COMBO.
+                    06  W12-INSPECT-CHARACTER-KBN.
+                      07  W12-VALUE   PIC X(36).
+                    06  W12-INSPECT-CHARACTER-KBN-COUNT
+                                      PIC S9(9)   BINARY.
+                    06  W12-INSPECT-CHARACTER-KBNLST
+                            PIC X(36)   OCCURS  5 TIMES.
                   05  W12-PREFPRGID.
                     06  W12-VALUE   PIC X(15).
                   05  W12-PREFPRGID1-STATE   PIC S9(9)   BINARY.
@@ -210,6 +217,18 @@
                     06  W12-FRAME-ROU-N-COUNT   PIC S9(9)   BINARY.
                     06  W12-FRAME-ROU-NLST
                             PIC X(22)   OCCURS  2 TIMES.
+                  05  W12-ROUPRTKBN-COMBO.
+                    06  W12-ROUPRTKBN.
+                      07  W12-VALUE   PIC X(24).
+                    06  W12-ROUPRTKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W12-ROUPRTKBNLST
+                            PIC X(24)   OCCURS  2 TIMES.
+                  05  W12-ROUPRTKBN-N-COMBO.
+                    06  W12-ROUPRTKBN-N.
+                      07  W12-VALUE   PIC X(24).
+                    06  W12-ROUPRTKBN-N-COUNT   PIC S9(9)   BINARY.
+                    06  W12-ROUPRTKBN-NLST
+                            PIC X(24)   OCCURS  2 TIMES.
                   05  W12-COMMENT-ROU-COMBO.
                     06  W12-COMMENT-ROU.
                       07  W12-VALUE   PIC X(22).

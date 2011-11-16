@@ -77,6 +77,7 @@
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-藤原    10/03/03  平成２２年４月改正対応
       *  04.05.03    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
+      *  04.05.04    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -168,7 +169,8 @@
       *****COPY    "HCM18V02.INC"  REPLACING  //HCM18V02//
       *****COPY    "HCM18V03.INC"  REPLACING  //HCM18V03//
       *****COPY    "HCM18V04.INC"  REPLACING  //HCM18V04//
-           COPY    "HCM18V05.INC"  REPLACING  //HCM18V05//
+      *****COPY    "HCM18V05.INC"  REPLACING  //HCM18V05//
+           COPY    "HCM18V06.INC"  REPLACING  //HCM18V06//
                                    BY         //HC18//.
       *
       *    アフターケア（続紙） 
@@ -179,7 +181,8 @@
       *****COPY    "HCM20V02.INC"  REPLACING  //HCM20V02//
       *****COPY    "HCM20V03.INC"  REPLACING  //HCM20V03//
       *****COPY    "HCM20V04.INC"  REPLACING  //HCM20V04//
-           COPY    "HCM20V05.INC"  REPLACING  //HCM20V05//
+      *****COPY    "HCM20V05.INC"  REPLACING  //HCM20V05//
+           COPY    "HCM20V06.INC"  REPLACING  //HCM20V06//
                                    BY         //HC20//.
       *
       *    フラグ領域
@@ -432,6 +435,8 @@
            COPY    "CPSK1900.INC".
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
+      *
+           COPY    "CPSK200501.INC".
       *
            COPY    "CPRCF008.INC".
       *
@@ -882,6 +887,31 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                    MOVE    2               TO  FLG-STS
                END-IF
            END-IF
+      *         
+      *    レセプト編集区分情報
+           MOVE    SPACE           TO  SYSKANRI-REC
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "2005"          TO  SYS-KANRICD
+           MOVE    "01"            TO  SYS-KBNCD
+           MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+           MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+           MOVE    "key10"         TO  WRK-MCP-PATHNAME
+           PERFORM 960-KANRIMST-READ-SEC
+           IF      FLG-SYSKANRI     =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               INITIALIZE                  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                   =   SPACE
+               MOVE    ZERO            TO
+                                       SYS-200501-INSPECT-CHARACTER-KBN
+           END-IF
+           DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
+                                    SYS-200501-INSPECT-CHARACTER-KBN
+                    " " WRK-PARA-PRTKBN
       *
            .
        120-HOSPINF-GET-EXT.
@@ -1025,7 +1055,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN     =   "2"
-               MOVE    "点検用レセプト"    TO  HC18-LABEL
+               IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                           =   "0"
+                   MOVE    "点検用レセプト"    TO  HC18-LABEL
+                   MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                               TO  HC18-LOPTION
+               END-IF
+           ELSE
+               MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                           TO  HC18-LOPTION
            END-IF
       *
            .
@@ -1073,6 +1111,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
       *    点検用レセプト作成時
            MOVE    HC18-LABEL          TO  HC20-LABEL
+           MOVE    HC18-LOPTION        TO  HC20-LOPTION
       *
            .
        310-HC101-HEAD-HEN-EXT.
@@ -1552,10 +1591,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      CNT-PAGE            =   1
                EVALUATE  WRK-PARA-FRAME
                    WHEN      "0"
-                       MOVE    "HCM18V05.red"      TO
+                       MOVE    "HCM18V06.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                    WHEN      "1"
-                       MOVE    "HCM18V05P.red"     TO
+                       MOVE    "HCM18V06P.red"     TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                END-EVALUATE
                MOVE    HC18                TO
@@ -1563,10 +1602,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            ELSE
                EVALUATE  WRK-PARA-FRAME
                    WHEN      "0"
-                       MOVE    "HCM20V05.red"      TO
+                       MOVE    "HCM20V06.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                    WHEN      "1"
-                       MOVE    "HCM20V05P.red"     TO
+                       MOVE    "HCM20V06P.red"     TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                END-EVALUATE
                MOVE    HC20                TO
@@ -1701,12 +1740,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCM18V05.red"                  
+                       WHEN    "HCM18V06.red"                  
+                       WHEN    "HCM18V06P.red"                  
                            MOVE    RECE08-PRTDATA  TO HC18
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC18-PAGE
                            MOVE    HC18            TO RECE08-PRTDATA
-                       WHEN    "HCM20V05.red"                  
+                       WHEN    "HCM20V06.red"                  
+                       WHEN    "HCM20V06P.red"                  
                            MOVE    RECE08-PRTDATA  TO HC20
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC20-PAGE

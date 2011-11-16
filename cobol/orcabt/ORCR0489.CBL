@@ -116,12 +116,14 @@
       *
       *    自賠責
       ***  COPY    "HCM55.INC"     REPLACING  //HCM55//
-           COPY    "HCM55V02.INC"  REPLACING  //HCM55V02//
+      ***  COPY    "HCM55V02.INC"  REPLACING  //HCM55V02//
+           COPY    "HCM55V03.INC"  REPLACING  //HCM55V03//
                                    BY         //HC23//.
       *
       *    自賠責（続紙）
       *****COPY    "HCM26.INC"     REPLACING  //HCM26//
-           COPY    "HCM26V01.INC"  REPLACING  //HCM26V01//
+      *****COPY    "HCM26V01.INC"  REPLACING  //HCM26V01//
+           COPY    "HCM26V02.INC"  REPLACING  //HCM26V02//
                                    BY         //HC29//.
       *
       *    フラグ領域
@@ -401,6 +403,8 @@
            COPY    "CPSK1900.INC".
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
+      *
+           COPY    "CPSK200501.INC".
       *
            COPY    "CPRCF008.INC".
       *
@@ -784,6 +788,31 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                    PERFORM 500-ERR-HENSYU-SEC
                END-IF
            END-IF
+      *         
+      *    レセプト編集区分情報
+           MOVE    SPACE           TO  SYSKANRI-REC
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "2005"          TO  SYS-KANRICD
+           MOVE    "01"            TO  SYS-KBNCD
+           MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+           MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+           MOVE    "key10"         TO  WRK-MCP-PATHNAME
+           PERFORM 960-KANRIMST-READ-SEC
+           IF      FLG-SYSKANRI     =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               INITIALIZE                  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                   =   SPACE
+               MOVE    ZERO            TO
+                                       SYS-200501-INSPECT-CHARACTER-KBN
+           END-IF
+           DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
+                                    SYS-200501-INSPECT-CHARACTER-KBN
+                    " " WRK-PARA-PRTKBN
       *
            .
        120-HOSPINF-GET-EXT.
@@ -1222,7 +1251,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN     =   "2"
-               MOVE    "点検用レセプト"    TO  HC23-LABEL
+               IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                           =   "0"
+                   MOVE    "点検用レセプト"    TO  HC23-LABEL
+                   MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                               TO  HC23-LOPTION
+               END-IF
+           ELSE
+               MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
+                                           TO  HC23-LOPTION
            END-IF
       *
            .
@@ -1832,6 +1869,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
       *    点検用レセプト作成時
            MOVE    HC23-LABEL          TO  HC29-LABEL
+           MOVE    HC23-LOPTION        TO  HC29-LOPTION
       *
            .
        310-HC29-HEAD-HEN-EXT.
@@ -2038,12 +2076,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCM55V02.red"      TO
+               MOVE    "HCM55V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC23                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
            ELSE
-               MOVE    "HCM26V01.red"      TO
+               MOVE    "HCM26V02.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC29                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2174,12 +2212,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCM55V02.red"
+                       WHEN    "HCM55V03.red"
                            MOVE    RECE08-PRTDATA  TO HC23
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC23-PAGE
                            MOVE    HC23            TO RECE08-PRTDATA
-                       WHEN    "HCM26V01.red"                  
+                       WHEN    "HCM26V02.red"                  
                            MOVE    RECE08-PRTDATA  TO HC29
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC29-PAGE
