@@ -2760,7 +2760,7 @@
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCN58-PAGE
                            MOVE    HCN58            TO RECE08-PRTDATA
-      *****************WHEN    "HCM59V01.red"
+      *****************WHEN    "HCN59V01.red"
                        WHEN    "HCM59V02.red"                  
                            MOVE    RECE08-PRTDATA  TO HCM59
                            MOVE    WRK-HEN-PAGE-AREA
