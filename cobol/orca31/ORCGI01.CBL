@@ -22038,6 +22038,8 @@
                    MOVE    "2020"  TO  SPA-ERRCD
                WHEN    22
                    MOVE    "2021"  TO  SPA-ERRCD
+               WHEN    23
+                   MOVE    "2022"  TO  SPA-ERRCD
                WHEN    OTHER
                    MOVE    "2008"  TO  SPA-ERRCD
                END-EVALUATE
@@ -23678,6 +23680,16 @@
                STRING  "負担金計算に失敗しました。"
                                            DELIMITED   BY  SPACE
                        "他医受診（外泊）の入力に誤りがあります"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2022"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "同日再入院日に実日数算定コード"
+                                           DELIMITED   BY  SPACE
+                       "を入力してください"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING
