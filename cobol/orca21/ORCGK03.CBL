@@ -342,6 +342,10 @@
            03  WRK-RENNUM              PIC 9(02).
       *
            03  WRK-SKYPRTFLG           PIC X(01).
+      *    発行日保存
+           03  WRK-GMN-HAKYMD          PIC X(10).
+           03  WRK-NAI-HAKYMD          PIC X(08).
+           03  WRK-MAE-HAKYMD          PIC X(08).
       *
       *    剤テーブル領域
        01  WRK-TBL-ZAINUM-AREA.
@@ -556,8 +560,6 @@
            COPY    "CPORCHC67.INC".
       *    オンライン帳票共通パラメタ
            COPY    "CPONPRTDATA.INC".
-      *    クライアント印刷制御
-           COPY    "CPORCSPRTCTRL.INC".
       *
       *    ＤＢ検索
       *01  MCPDATA-REC                 PIC X(5000).
@@ -634,8 +636,6 @@
            EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
                WHEN    "LINK"          ALSO    ANY
                    PERFORM 100-INIT-SEC
-                   PERFORM 101-CLIENT-PRT-SEC
-      *
       *    画面遷移
                WHEN     "PUTG"           ALSO   "CLICKED"
                    PERFORM 200-GMNSENI
@@ -652,7 +652,6 @@
            MOVE    SPA-K01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
            MOVE    SPA-K03         TO  SPA-FREE
-           DISPLAY "K03-PRTPATH(01) = " K03-PRTPATH(01)
       *
            .
            EXIT    PROGRAM
@@ -701,42 +700,6 @@
            .
       *
        100-INIT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    クライアント印刷前　処理
-      *****************************************************************
-       101-CLIENT-PRT-SEC         SECTION.
-      *
-      * For Test St
-      *    IF      SPA-PTNUM           = "44444"
-      *      MOVE    1                 TO  SPA-CLIENT-PRT-FLG
-      *    ELSE
-      *      MOVE    ZERO              TO  SPA-CLIENT-PRT-FLG
-      *    END-IF
-      * For Test Ed
-      *    印刷制御情報取得サブ
-      *
-           MOVE    SPACE               TO  K03-PANDAPRINT1
-           IF      SPA-CLIENT-PRT-FLG  =   1
-           CALL    "ORCSONPRTSET"      USING   SPA-AREA
-      *    クライアント印刷制御情報取得サブ
-           INITIALIZE  ORCSPRTCLTRAREA
-           MOVE    "処方箋"            TO  ORCSPRTCLTR-TITLE-I(01)
-           MOVE    "請求書兼領収書"    TO  ORCSPRTCLTR-TITLE-I(02)
-           MOVE    "お薬情報"          TO  ORCSPRTCLTR-TITLE-I(03)
-           MOVE    "診療費明細書"      TO  ORCSPRTCLTR-TITLE-I(04)
-           MOVE    "お薬手帳"          TO  ORCSPRTCLTR-TITLE-I(05)
-           MOVE    "予約票"            TO  ORCSPRTCLTR-TITLE-I(06)
-           CALL    "ORCSPRTCTRL"       USING   SPA-AREA
-                                               ORCSPRTCLTRAREA
-                                               MCPAREA
-           MOVE    ORCSPRTCLTR-OUT     TO  K03-PANDAPRINT1
-           END-IF
-      *
-           .
-      *
-       101-CLIENT-PRT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1191,6 +1154,11 @@
            MOVE    SPA-GMN-HKNCOMBI    TO  SPA-GOK-HKNCOMBI
       *
       *    収納編集
+           INITIALIZE                  SPA-GMN-AREA
+      *    発行日
+           MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HAKYMD
+           MOVE    SPA-SYSYMD          TO  SPA-NAI-HAKYMD
+           MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
            PERFORM 3102-SYUNOU-HEN-SEC
       *
            COMPUTE WRK-SKYMONEY        =   SPA-GOK-SKYMONEY
@@ -1401,9 +1369,18 @@
       *****************************************************************
        3102-SYUNOU-HEN-SEC             SECTION.
       *
+      *    発行日保存
+           MOVE    SPA-GMN-HAKYMD      TO  WRK-GMN-HAKYMD
+           MOVE    SPA-NAI-HAKYMD      TO  WRK-NAI-HAKYMD
+           MOVE    SPA-MAE-HAKYMD      TO  WRK-MAE-HAKYMD
+      *
            INITIALIZE                  SPA-GMN-AREA
            MOVE    ZERO                TO  SPA-NAI-NYUKINFLG
            MOVE    ZERO                TO  SPA-NAI-HENFLG
+      *    発行日を戻す
+           MOVE    WRK-GMN-HAKYMD      TO  SPA-GMN-HAKYMD
+           MOVE    WRK-NAI-HAKYMD      TO  SPA-NAI-HAKYMD
+           MOVE    WRK-MAE-HAKYMD      TO  SPA-MAE-HAKYMD
       *
       *    科合計の入金額を編集する
            PERFORM 310515-KAGOK-NYUKIN-SEC
@@ -1449,9 +1426,9 @@
        31021-SYUNOU-GMN-HEN-SEC             SECTION.
       *
       *    発行日
-           MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HAKYMD
-           MOVE    SPA-SYSYMD          TO  SPA-NAI-HAKYMD
-           MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
+      *    MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HAKYMD
+      *    MOVE    SPA-SYSYMD          TO  SPA-NAI-HAKYMD
+      *    MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
       *    伝票番号
       *    MOVE    SYU-DENPNUM          TO  SPA-GMN-DENPNUM
            IF      SPA-SYORIFLG        =   1
@@ -5256,13 +5233,6 @@
       *****************************************************************
        210-BACK                        SECTION.
       *
-           IF      SPA-CLIENT-PRT-FLG  =  1
-               INITIALIZE    ORCSPRTCLTRAREA
-               MOVE  "C"               TO  ORCSPRTCLTR-MODE
-               CALL    "ORCSPRTCTRL"   USING   SPA-AREA
-                                       ORCSPRTCLTRAREA
-                                       MCPAREA
-           END-IF
       *    調整金
       *    MOVE    SPA-GMN-CHOSEI      TO  SPA-K03-CHOSEI
       *    請求書作成区分
@@ -6312,10 +6282,8 @@
       *    帳票プログラム取得
            PERFORM 4901-PRINT-PG-SEC
       *
-          IF    SPA-CLIENT-PRT-FLG  NOT =   1
       *    印刷制御情報取得サブ
-               CALL    "ORCSONPRTSET"      USING   SPA-AREA
-          END-IF
+           CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *
       *    主たる伝票番号
            MOVE    SPA-SYUNOU-REC(1)   TO  SYUNOU-REC
@@ -6323,7 +6291,6 @@
       *
            MOVE    ORCSCGAIRAI-JYURRK-RENNUM (1)
                                        TO  WRK-JYURRK-RENNUM
-      *
       *
       *    処方箋印刷（Ａ５）
            INITIALIZE                      ORCHC19AREA
@@ -6511,12 +6478,6 @@
                                            SPA-AREA
                                            ONPRTDATA
            END-IF
-      *
-          IF    SPA-CLIENT-PRT-FLG     =   1
-      *    印刷ダミー処理
-               MOVE    "99"                TO  SPA-PRT-FLG
-               CALL    "ORCHCDUMMY"    USING   SPA-AREA
-          END-IF
       *
            MOVE    SPACE               TO  SPA-PRT-FLG
            .
