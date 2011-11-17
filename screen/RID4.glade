@@ -13,7 +13,7 @@
 <widget>
   <class>GtkWindow</class>
   <name>RID4</name>
-  <width>694</width>
+  <width>726</width>
   <height>145</height>
   <signal>
     <name>map_event</name>
@@ -87,7 +87,7 @@
       <name>ID1MSG</name>
       <x>8</x>
       <y>40</y>
-      <width>650</width>
+      <width>685</width>
       <height>32</height>
       <can_focus>True</can_focus>
       <editable>False</editable>
@@ -124,7 +124,7 @@
     <widget>
       <class>GtkButton</class>
       <name>B12</name>
-      <x>577</x>
+      <x>606</x>
       <y>115</y>
       <width>105</width>
       <height>24</height>
@@ -165,7 +165,7 @@
       <name>LABEL1</name>
       <x>8</x>
       <y>77</y>
-      <width>677</width>
+      <width>702</width>
       <height>24</height>
       <label>請求しない設定された請求管理データがあります。このデータを削除し新たに請求管理データを作成しますか</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
