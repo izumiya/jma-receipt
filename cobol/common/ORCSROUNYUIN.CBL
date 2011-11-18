@@ -4567,8 +4567,24 @@
                    MOVE    MCPDATA-REC         TO  NYURYAKUSHO-REC
                    MOVE    ZERO                TO  FLG-NYURYAKUSHO
                ELSE
-                   MOVE    1                   TO  FLG-NYURYAKUSHO
-                   INITIALIZE                  NYURYAKUSHO-REC
+      *            µßÌ¿µßµÞÆþ±¡ÎÁ£±¡Ê£´Æü°Ê¾å£·Æü°ÊÆâ¡Ë
+      *            µßÌ¿µßµÞÆþ±¡ÎÁ£²¡Ê£´Æü°Ê¾å£·Æü°ÊÆâ¡Ë
+      *            ¤ÎÆþ±¡Î¬¾Î¥Æ¡¼¥Ö¥ëÂÐ±þ
+                   IF      NYURYAKUSHO-SRYCD   =  "190128610"  OR
+                                                  "190128710"
+                       MOVE   "20080401"  TO  NYURYAKUSHO-YUKOSTYMD
+                       MOVE   "99999999"  TO  NYURYAKUSHO-YUKOEDYMD
+                       EVALUATE  NYURYAKUSHO-SRYCD
+                          WHEN   "190128610"
+                              MOVE  "µßÌ¿£±" TO NYURYAKUSHO-RYAKUSHO
+                          WHEN   "190128710"
+                              MOVE  "µßÌ¿£²" TO NYURYAKUSHO-RYAKUSHO
+                       END-EVALUATE
+                       MOVE   ZERO          TO  FLG-NYURYAKUSHO
+                   ELSE
+                       MOVE    1            TO  FLG-NYURYAKUSHO
+                       INITIALIZE               NYURYAKUSHO-REC
+                   END-IF
                END-IF
            ELSE
                MOVE    1                   TO  FLG-NYURYAKUSHO
