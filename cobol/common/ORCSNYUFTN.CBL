@@ -129,6 +129,7 @@
       *  04.05.05    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
       *  04.05.06    NACL-ÌçÏÆ    11/09/30  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ¤Î½¤Àµ
       *  04.05.07    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
+      *  04.05.08    NACL-ÌçÏÆ    11/11/17  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¾¾ÉúÄ®¡Ë
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -1644,6 +1645,18 @@
                               "445" OR "545"                    ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
+                IF  ( WRK-PREFNUM(1)                =    11      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "201112" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =
+                              "462" OR "762"                    ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =
+                              "462" OR "762"                    ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =
+                              "462" OR "762"                    ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =
+                              "462" OR "762"                    ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
               END-IF
               IF   WRK-HANBETU-SKYYM(IDX)  =  WRK-SKYYM(2)
                 IF  ( WRK-PREFNUM(2)                =    07      )
@@ -1764,6 +1777,18 @@
                               "445" OR "545"                    ) OR
                      (WRK-HANBETU-KOH4HKNNUM(IDX)   =
                               "445" OR "545"                    ))
+                         MOVE     1     TO    FLG-TOKUSYU
+                END-IF
+                IF  ( WRK-PREFNUM(2)                =    11      )
+                AND ( LNK-S02-SKYSTYMD(1:6)        >=   "201112" )
+                AND ((WRK-HANBETU-KOH1HKNNUM(IDX)   =
+                              "462" OR "762"                    ) OR
+                     (WRK-HANBETU-KOH2HKNNUM(IDX)   =
+                              "462" OR "762"                    ) OR
+                     (WRK-HANBETU-KOH3HKNNUM(IDX)   =
+                              "462" OR "762"                    ) OR
+                     (WRK-HANBETU-KOH4HKNNUM(IDX)   =
+                              "462" OR "762"                    ))
                          MOVE     1     TO    FLG-TOKUSYU
                 END-IF
               END-IF
