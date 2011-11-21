@@ -614,16 +614,16 @@ end
 			puts	'出力区分未設定'
 		when	'1'     # 印刷のみの指示
 		puts	'take1 Start [' + psfile_name + ']'
-			w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name
+			w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' ' +  LAYEROPTION
 		when	'2'     # 印刷＆PSファイル出力の指示
 		puts	'take2 Start [' + psfile_name + ']'
 			# 出力ファイル名が指定されていなかったら、通常の印刷処理を行う
 			if psfile_name == ''
 				puts	'出力ファイル名未設定'
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name
+				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' ' +  LAYEROPTION
 			else
 #				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -p ' + lp_name + ' -o ' + psfile_name
-				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' -o ' + psfile_name + ' ' +  LAYEROPTION 
+				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' -o ' + psfile_name + ' ' +  LAYEROPTION
 			end
 		when	'3'     # PSファイル出力の指示
 		puts	'take3 Start [' + psfile_name + ']'
@@ -638,7 +638,7 @@ end
 			if psfile_name == ''
 				puts	'出力ファイル名未設定'
 			else
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name
+				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name + ' ' + LAYEROPTION
 			end
 		else
 			puts	'出力区分内容設定エラー'
