@@ -110,6 +110,8 @@
       *  04.06.05    NACL-藤原    10/10/20  難病外来指導管理料対応
       *  04.06.06    NACL-藤原    10/10/26  同義語変換対応
       *  04.06.07    NACL-藤原    11/07/04  廃止病名入力時の病名種別の表示
+      *  04.06.08    NACL-藤原    11/11/22  種別変更時の登録前チェックの
+      *                                     変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3244,11 +3246,14 @@ grpsys                                         SPA-AREA
                    EVALUATE    SPA-GMN-C03-BYOMEISBT
                        WHEN    ZERO
                            IF      WRK-RECECD (2)      =   SPACE
-                               MOVE    "1"             TO
+                               IF      SPA-NAI-C03-BYOMEIHENFLG
+                                                           =   SPACE
+                                   MOVE    "1"             TO
                                                SPA-NAI-C03-BYOMEIHENFLG
-                               MOVE    "病名編集"      TO
+                                   MOVE    "病名編集"      TO
                                                SPA-GMN-C03-BYOMEIHENFLG
-                               MOVE    "0103"          TO  SPA-ERRCD
+                                   MOVE    "0103"          TO  SPA-ERRCD
+                               END-IF
                            END-IF 
                        WHEN    "1"
                            IF      WRK-BYOMEISBT       =   1
@@ -3275,11 +3280,15 @@ grpsys                                         SPA-AREA
                                                SPA-NAI-C03-BYOMEIHENFLG
                                                SPA-GMN-C03-BYOMEIHENFLG
                                ELSE  
-                                   MOVE    "1"             TO
+                                   IF      SPA-NAI-C03-BYOMEIHENFLG
+                                                           =   SPACE
+                                       MOVE    "1"             TO
                                                SPA-NAI-C03-BYOMEIHENFLG
-                                   MOVE    "病名編集"      TO
+                                       MOVE    "病名編集"      TO
                                                SPA-GMN-C03-BYOMEIHENFLG
-                                   MOVE    "0103"          TO  SPA-ERRCD
+                                       MOVE    "0103"          TO
+                                               SPA-ERRCD
+                                   END-IF
                                END-IF
                            ELSE 
                                MOVE    "0053"          TO  SPA-ERRCD
