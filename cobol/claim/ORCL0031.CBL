@@ -60,6 +60,7 @@
       *  04.05.00    NACL-多々納  10/01/15  治験対応
       *  04.05.01    NACL-多々納  10/12/06  ４０剤、４０明細対応他
       *  04.07.00    NACL-多々納  11/10/13  ＵＩＤ編集対応
+      *  04.05.02    NACL-藤原    11/11/24  病名からの疑いフラグの設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3369,6 +3370,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    TO  PTBYO-UTAGAIFLG
                        WHEN    "2"             ALSO    "1"
                        WHEN    "1"             ALSO    "2"
+                       WHEN    ANY             ALSO    "3"
                            MOVE    "3"         TO  PTBYO-UTAGAIFLG
                    END-EVALUATE
                END-IF      
