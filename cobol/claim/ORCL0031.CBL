@@ -58,6 +58,7 @@
       *  04.05.00    NACL-多々納  09/06/25  薬剤情報提供料・調基判定追加
       *  04.05.00    NACL-多々納  09/11/30  入院回数一括入力対応
       *  04.05.00    NACL-多々納  10/01/15  治験対応
+      *  04.05.01    NACL-藤原    11/11/24  病名からの疑いフラグの設定
       *
       *  04.06.01    NACL-藤原    10/06/20  病名の入力順対応
       *  04.06.02    NACL-多々納  10/08/09  複数公費対応
@@ -3461,6 +3462,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    TO  PTBYO-UTAGAIFLG
                        WHEN    "2"             ALSO    "1"
                        WHEN    "1"             ALSO    "2"
+                       WHEN    ANY             ALSO    "3"
                            MOVE    "3"         TO  PTBYO-UTAGAIFLG
                    END-EVALUATE
                END-IF      
