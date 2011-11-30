@@ -5484,7 +5484,7 @@
                                                              (IDX-ATO)
                    IF     (SPA-COM-DATAKBN (IDX1)   =   "3" )
       *                ²èÁü¿ÇÃÇ¤Î¤ß
-                    AND   (SPA-COM-SRYKBN  (IDX)   =   "70" )
+                    AND   (SPA-COM-SRYKBN  (IDX1)  =   "70" )
                        MOVE    SPA-COM-BUNGSU (IDX1)
                                                TO  ORCSCZAICHK-SRYKAISU
                                                              (IDX-ATO)
