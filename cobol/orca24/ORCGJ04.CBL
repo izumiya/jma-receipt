@@ -5381,7 +5381,9 @@
                    MOVE    SPA-COM-SURYO   (IDX1)
                                                TO  ORCSCZAICHK-SRYSURYO
                                                              (IDX-ATO)
-                   IF      SPA-COM-DATAKBN (IDX1)   =   "3"
+                   IF     (SPA-COM-DATAKBN (IDX1)   =   "3" )
+      *                ²èÁü¿ÇÃÇ¤Î¤ß
+                    AND   (SPA-COM-SRYKBN  (IDX1)  =   "70" )
                        MOVE    SPA-COM-BUNGSU (IDX)
                                                TO  ORCSCZAICHK-SRYKAISU
                                                              (IDX-ATO)
@@ -5755,7 +5757,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¿ôÎÌ
            MOVE    SPA-COM-SURYO  (IDX)    TO  SRY-SRYSURYO(IDS)
       *    ²ó¿ô
-           IF      SPA-COM-DATAKBN (IDX)   =   "3"
+           IF     (SPA-COM-DATAKBN (IDX)   =   "3"  )
+      *            ²èÁü¿ÇÃÇ¤Î¤ß
+            AND   (SPA-COM-SRYKBN  (IDX)   =   "70" )
                MOVE    SPA-COM-BUNGSU (IDX)
                                            TO  SRY-SRYKAISU(IDS)
            END-IF
