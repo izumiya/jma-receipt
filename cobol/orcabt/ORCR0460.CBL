@@ -136,6 +136,7 @@
       *  04.05.04    NACL-ÌçÏÆ    10/01/21  ¼£¸³ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    10/01/26  ÅìµþÅÔ¥Þ¥ë»ÒÄÉ²ÃÂÐ±þ
       *  04.05.06    NACL-ÌçÏÆ    11/02/28  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.07    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3196,7 +3197,20 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                    =   WRK-CONS-TANICD 
            AND     TBL-ZAIW-SRYKAISU(WRK-WIDX1 WRK-WIDX2)
                                    >   1
+             IF   TBL-ZAIW-SRYCD(WRK-WIDX1 WRK-WIDX2) =
+                  "700020000" OR "700040000" OR "700060000" OR
+                  "700070000" OR "700090000" OR "700100000" OR
+                  "700120000" OR "700130000" OR "700150000" OR
+                  "700300000" OR "700320000" OR "700340000" OR
+                  "700350000" OR "700720000" OR "700740000" OR
+                  "700760000" OR "700770000" OR "700790000" OR
+                  "700800000" OR "700820000" OR "700830000" OR
+                  "700850000" OR "700860000" OR "700880000" OR
+                  "700890000"
+               GO  TO  4301-BUNKAKU-HEN1-EXT
+             ELSE
                CONTINUE
+             END-IF
            ELSE                            
                GO  TO  4301-BUNKAKU-HEN1-EXT  
            END-IF

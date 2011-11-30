@@ -125,6 +125,7 @@
       *  04.05.05    NACL-門脇    10/11/10  内服薬剤逓減編集修正
       *  04.05.06    NACL-門脇    10/12/03  内服薬剤逓減編集修正
       *  04.05.07    NACL-門脇    11/10/11  内服薬剤逓減編集修正
+      *  04.05.08    NACL-門脇    11/11/30  画像診断フイルム分画数対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -365,6 +366,8 @@
            03  IDX15               PIC 9(01).
            03  IDX16               PIC 9(02).
            03  IDX17               PIC 9(04).
+           03  IDX18               PIC 9(04).
+           03  IDX19               PIC 9(01).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -497,6 +500,15 @@
       *
            03  WRK-SINPESU-YMD               PIC X(08).
            03  WRK-NINRYO-FSANTEIYMD         PIC X(08).
+      *
+           03  WRK-BUNKAKUKETA               PIC 9(02).
+           03  WRK-BUNKAKU-N                 PIC X(10).
+           03  WRK-SRYKAISU-X                PIC ZZ9.
+           03  WRK-CHAR-HENKAN-AREA.
+               05  WRK-CHAR-X                PIC X(03).
+               05  WRK-CHAR-N                PIC X(06).
+               05  WRK-CHAR-N-CNT            PIC 9(01).
+               05  WRK-CHAR-IDX              PIC 9(01).
       *
        01  WRK-RECE04-REC. 
            COPY    "CPRCF004.INC"  REPLACING   //RECE04//
@@ -5992,6 +6004,10 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                IF   FLG-COMMENT  =  ZERO
                  PERFORM    2501-SANSO-HANTEI-SEC
                END-IF
+      *        （フイルムのコメントのセット）
+               IF   FLG-COMMENT  =  ZERO
+                 PERFORM    2502-FILM-HANTEI-SEC
+               END-IF
                IF   FLG-COMMENT  =  ZERO
                  PERFORM    2599-RECE049-TENSOU-SEC
                END-IF
@@ -6457,6 +6473,200 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    フイルムがあるか判定
+      *****************************************************************
+       2502-FILM-HANTEI-SEC          SECTION.
+      *
+           IF     RECE049-FLG-FILM-COMMENT   =    "1"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM    25021-FILM-COMMENT-SEC
+           END-IF
+      *
+           .
+       2502-FILM-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    フイルムのコメント編集（差込：下）
+      *****************************************************************
+       25021-FILM-COMMENT-SEC          SECTION.
+      *
+           INITIALIZE                WRK-JIDO-SETCOM-AREA
+           MOVE      "1"      TO     WRK-JIDO-SETCOMFLG
+           MOVE       20      TO     WRK-JIDO-SETCOMATFLG
+      *
+           PERFORM  250111-RECE059-TAIHI-SEC
+      *
+      *    ＲＥＣＥ０５９ファイルの内容をテーブルに退避
+           MOVE    ZERO       TO     IDX-RECE05
+           MOVE    SPACE      TO     WRK-RECE05XX-REC
+           INITIALIZE                WRK-RECE05XX-REC
+           MOVE    ZERO       TO     WRK-JYUNBAN
+      *
+           PERFORM  250211-SRYACTINF2-HENSYU-SEC
+      *
+           .
+       25021-FILM-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ０５９　ＳＲＹＡＣＴＩＮＦ編集処理
+      *****************************************************************
+       250211-SRYACTINF2-HENSYU-SEC     SECTION.
+      *
+           PERFORM
+               UNTIL  ( FLG-RECE059           =   1                    )
+               OR     ( RECE049-KEY1      NOT =   RECE059-KEY1         )
+               OR     ( RECE049-ZAINUM    NOT =   RECE059-ZAINUM       )
+      *
+               PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX                >   5     )
+                         OR      ( RECE059-SRYCD(IDX) =   SPACE )
+                    ADD    1             TO      IDX-RECE05
+                    MOVE   RECE059-SRYACT-TBL(IDX)
+                             TO   WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+      *
+                    IF   RECE059-SRYCD(IDX) =
+                         "700010000" OR "700030000" OR "700050000" OR
+                         "700080000" OR "700110000" OR "700140000" OR
+                         "700290000" OR "700310000" OR "700330000" OR
+                         "700710000" OR "700730000" OR "700750000" OR
+                         "700780000" OR "700810000" OR "700840000" OR
+                         "700870000" OR "700160000" OR "700180000" OR
+                         "700190000" OR "700200000" OR "700210000" OR
+                         "700220000" OR "700230000" OR "700240000" OR
+                         "700250000" OR "700260000" OR "700270000" OR
+                         "700280000" OR "700590000" OR "700600000" OR
+                         "700630000" OR "700640000" OR "700650000" OR
+                         "700680000" OR "729780000"
+                         MOVE   IDX-RECE05   TO   WRK-JYUNBAN
+                    END-IF
+      *
+               END-PERFORM
+      *
+               PERFORM 990-RECE059-NEXT-SEC
+      *
+           END-PERFORM
+      *
+      *    フィルム以降の明細をずらす
+           IF   WRK-JYUNBAN  NOT =  ZERO
+      *
+               PERFORM   VARYING   IDX   FROM   IDX-RECE05   BY  -1
+                          UNTIL  ( IDX    <    1           )
+                           OR    ( IDX    <=   WRK-JYUNBAN )
+      *
+                   COMPUTE   WRK-GYOSUU2  =  IDX  +  1
+                   MOVE   WRK-RECE05XX-SRYACT-TBL(IDX 1)  TO
+                          WRK-RECE05XX-SRYACT-TBL(WRK-GYOSUU2 1)
+                   INITIALIZE   WRK-RECE05XX-SRYACT-TBL(IDX 1)
+      *
+               END-PERFORM
+      *
+      *        分画数の差し込み
+               MOVE   WRK-JYUNBAN     TO  MAX-MEISAISU
+      *
+               ADD    1               TO  MAX-MEISAISU
+               MOVE  "810000001"
+                              TO  WRK-RECE05XX-SRYCD(MAX-MEISAISU 1)
+               MOVE   ZERO    TO  WRK-RECE05XX-SRYSURYO(MAX-MEISAISU 1)
+      *
+               MOVE   WRK-RECE05XX-SRYKAISU(WRK-JYUNBAN 1)
+                                      TO  WRK-SRYKAISU-X
+      *        全角変換
+               INITIALIZE                     WRK-CHAR-HENKAN-AREA
+               MOVE     WRK-SRYKAISU-X  TO    WRK-CHAR-X
+               PERFORM  2502111-NUM-ZENKAKU-HENKAN-SEC
+               STRING   WRK-CHAR-N      DELIMITED  BY  SPACE
+                        "分画"          DELIMITED  BY  SIZE
+                                        INTO  WRK-BUNKAKU-N
+               COMPUTE WRK-BUNKAKUKETA   =   WRK-CHAR-N-CNT  +  4
+      *
+               COMPUTE WRK-RECE05XX-YUKOKETA(MAX-MEISAISU 1) =
+                       WRK-BUNKAKUKETA   /   2
+               MOVE    WRK-BUNKAKU-N
+                           TO  WRK-RECE05XX-NAME(MAX-MEISAISU 1)
+               MOVE    "1" TO  WRK-RECE05XX-RECEPTFLG(MAX-MEISAISU 1)
+      *
+               IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
+                 MOVE  "2" TO  WRK-RECE05XX-MEISKYFLG(MAX-MEISAISU 1)
+                 MOVE  WRK-JIDO-SETCOMATFLG
+                           TO  WRK-RECE05XX-SETCOMATFLG(MAX-MEISAISU 1)
+               END-IF
+      *
+           END-IF
+      *
+      *    コメントを含んだ内容で中間ファイルの再作成
+           MOVE       ZERO             TO      FLG-WRKRECE05
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE05
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE05  =    1
+                    INITIALIZE                        RECE051-REC
+                    MOVE    WRK-RECE05-KEY       TO   RECE051-KEY
+                    ADD     1                    TO   WRK-RENNUM
+                    MOVE    WRK-RENNUM           TO   RECE051-RENNUM
+                    MOVE    WRK-RECE05-KOHBUNRI  TO   RECE051-KOHBUNRI
+                    MOVE    WRK-RECE05-PTNUM     TO   RECE051-PTNUM
+                    MOVE    WRK-RECE05-SRYKA     TO   RECE051-SRYKA
+                    MOVE    WRK-RECE05-SRYKBN    TO   RECE051-SRYKBN
+                    MOVE    WRK-RECE05-SRYSYUKBN TO   RECE051-SRYSYUKBN
+                    MOVE    WRK-RECE05-JIHIMONEY TO   RECE051-JIHIMONEY
+                    PERFORM  VARYING   IDX   FROM   1   BY   1
+                             UNTIL   (IDX       >    5)   OR
+                                     (FLG-WRKRECE05   =   1)
+                       ADD         1             TO    IDX-RECE05
+                       IF  WRK-RECE05XX-SRYCD(IDX-RECE05 1) = SPACE
+                           MOVE    1             TO    FLG-WRKRECE05
+                       ELSE
+                           MOVE  WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+                                            TO   RECE051-SRYACT-TBL(IDX)
+                           ADD   1          TO   WRK-CNT-MEISAI
+                       END-IF  
+                    END-PERFORM
+                    IF   RECE051-SRYCD(1)  NOT =  SPACE
+                       WRITE   RECE051-REC
+                       ADD     1            TO   CNT-RECE05
+                    END-IF
+           END-PERFORM
+      *
+           MOVE    RECE049-REC          TO   RECE041-REC
+           MOVE    WRK-CNT-MEISAI       TO   RECE041-MEISAISU
+           IF   WRK-JIDO-SETCOMFLG   =  "1"
+             MOVE  WRK-JIDO-SETCOMFLG   TO   RECE041-SETCOMFLG
+           END-IF
+           WRITE   RECE041-REC
+           ADD     1                    TO   CNT-RECE04
+      *
+           .
+       250211-SRYACTINF2-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    数値半角→全角変換処理
+      *****************************************************************
+       2502111-NUM-ZENKAKU-HENKAN-SEC    SECTION.
+      *
+           MOVE     1       TO   WRK-CHAR-IDX
+           MOVE    ZERO     TO   WRK-CHAR-N-CNT
+      *
+           PERFORM   VARYING   IDX18   FROM    1   BY  1
+                      UNTIL    IDX18     >     3
+              IF  WRK-CHAR-X(IDX18:1)  IS   NUMERIC
+                 MOVE   WRK-CHAR-X(IDX18:1)
+                                    TO  IDX19
+                 MOVE   TBL-DAY(IDX19)(3:2)
+                                    TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 ADD    2           TO  WRK-CHAR-IDX
+                                        WRK-CHAR-N-CNT
+              END-IF
+           END-PERFORM
+      *
+           .
+       2502111-NUM-ZENKAKU-HENKAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    レセプト０４９転送処理
       *****************************************************************
        2599-RECE049-TENSOU-SEC     SECTION.
@@ -6642,7 +6852,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                       EVALUATE   RECE051-SETCOMATFLG(IDX)
                         WHEN    1
                         WHEN    3  THRU   16
-                        WHEN   17  THRU   19
+                        WHEN   17  THRU   20
                           ADD  1                 TO  WRK-HEN-SEQNO-J
                           IF   WRK-HEN-SEQNO-J  >  3
                             MOVE   SPACE   TO  RECE051-MEISKYFLG(IDX)
@@ -6731,7 +6941,20 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *18
                           "113003410" OR
       *19
-                          "180033210"
+                          "180033210" OR
+      *20
+                          "700010000" OR "700030000" OR "700050000" OR
+                          "700080000" OR "700110000" OR "700140000" OR
+                          "700290000" OR "700310000" OR "700330000" OR
+                          "700710000" OR "700730000" OR "700750000" OR
+                          "700780000" OR "700810000" OR "700840000" OR
+                          "700870000" OR "700160000" OR "700180000" OR
+                          "700190000" OR "700200000" OR "700210000" OR
+                          "700220000" OR "700230000" OR "700240000" OR
+                          "700250000" OR "700260000" OR "700270000" OR
+                          "700280000" OR "700590000" OR "700600000" OR
+                          "700630000" OR "700640000" OR "700650000" OR
+                          "700680000" OR "729780000"
       *
                        MOVE   RECE051-RENNUM  TO  WRK-HEN-RENNUM-J
                        MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J
