@@ -194,6 +194,8 @@
       *                                     ¸øÈñ¤òºÇÂç£µ£°¤ËÊÑ¹¹
       *  04.05.10    NACL-ÌçÏÆ    11/10/05  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *                                     ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£¹·î¤Þ¤Ç¡Ë
+      *  04.05.12    NACL-Æ£¸¶    11/11/21  ¿ÇÎÅÇ¯·î¡ãÅ¾ÆþÇ¯·î¤ÎÆþ±¡Îò¤ò
+      *                                     ½èÍýÂÐ¾Ý³°¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3338,8 +3340,11 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                MOVE    1                   TO  FLG-PTNYUINRRK23
            END-IF
            PERFORM                 UNTIL   FLG-PTNYUINRRK23    =   1
-             IF    ( PTNYUINRRK-TENNYUYMD  >   RECE62-TEKEDYMD-X )
-             AND   ( RECE62-TEKEDYMD-X NOT =   SPACE             )
+             IF  (   PTNYUINRRK-TENNYUYMD (1:6)
+                                         >    RECE62-SRYYM         )
+             OR  ( ( PTNYUINRRK-TENNYUYMD  >   RECE62-TEKEDYMD-X )
+                  AND
+                   ( RECE62-TEKEDYMD-X NOT =   SPACE             ) )
                  CONTINUE
              ELSE
       *
