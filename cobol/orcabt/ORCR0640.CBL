@@ -518,6 +518,7 @@
       *                                     °ìÉôÉéÃ´³Ûµ­ºÜ½¤Àµ
       *  04.05.37    NACL-ÌçÏÆ    11/10/18  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.39    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
+      *  04.05.40    NACL-ÌçÏÆ    11/12/01  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16662,6 +16663,16 @@
                     (RECE62-KOHHBTNUM(2) =  "41"       ) AND
                     (RECE62-SRYYM       >=  "200804"   ))
                     MOVE    "3"      TO   RECE62-KOUREI
+                END-IF
+               END-IF
+               IF    WRK-PREFNUM       =  34
+                IF   RECE62-TEISYUTUSAKI   =   2
+                  IF  (RECE62-KOHHBTNUM(1) =  "90" OR "91" OR "92")
+                  OR  (RECE62-KOHHBTNUM(2) =  "90" OR "91" OR "92")
+                  OR  (RECE62-KOHHBTNUM(3) =  "90" OR "91" OR "92")
+                  OR  (RECE62-KOHHBTNUM(4) =  "90" OR "91" OR "92")
+                    MOVE    "3"      TO   RECE62-KOUREI
+                  END-IF
                 END-IF
                END-IF
                IF  (WRK-KEISAN-YYY    NOT =  ZERO)
