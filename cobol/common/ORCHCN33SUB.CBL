@@ -158,6 +158,11 @@
            03  WRK-GENSAN3-MIJISI          PIC 9(01).
            03  WRK-GENSAN4-MIJISI          PIC 9(01).
       *
+           03  WRK-GETSUMATSU-YMD.
+               05  WRK-GETSUMATSU-YY       PIC 9(04).
+               05  WRK-GETSUMATSU-MM       PIC 9(02).
+               05  WRK-GETSUMATSU-DD       PIC 9(02).
+      *
       *    入院会計ワーク
            03  WRK-NYUIN-TABLE.
                05  WRK-NYUIN-TBL           OCCURS  31.
@@ -520,10 +525,10 @@
            INITIALIZE                           PTNYUINRRK-REC
            MOVE    LNK-ORCHCN33SUB-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
            MOVE    LNK-ORCHCN33SUB-PTID     TO  PTNYUINRRK-PTID
-           MOVE    "key3"                   TO  MCP-PATHNAME
+           MOVE    "key8"                   TO  MCP-PATHNAME
            PERFORM 910-PTNYUINRRK-SELECT-SEC
            IF      FLG-PTNYUINRRK            =   ZERO
-               MOVE    "key3"               TO  MCP-PATHNAME
+               MOVE    "key8"               TO  MCP-PATHNAME
                PERFORM   910-PTNYUINRRK-READ-SEC
                PERFORM   UNTIL   (FLG-PTNYUINRRK    =   1)
                    IF   PTNYUINRRK-JTIKBN    =    "5"
@@ -556,10 +561,13 @@
                                    PERFORM  VARYING  IDX1  
                                             FROM IDX-ST   BY  1
                                             UNTIL (IDX1  >  IDX-ED)
-                                        IF   TBL-NYUINKA(IDX1) = SPACE
+      **                                  IF   TBL-NYUINKA(IDX1) = SPACE
+      **                                     MOVE PTNYUINRRK-NYUINKA  TO
+      **                                               TBL-NYUINKA(IDX1)
+      **                                  END-IF
+      *
                                            MOVE PTNYUINRRK-NYUINKA  TO
                                                      TBL-NYUINKA(IDX1)
-                                        END-IF
                                    END-PERFORM
                                END-IF
                            ELSE
@@ -593,7 +601,7 @@
                            END-IF
                        END-IF
                    END-IF
-                   MOVE    "key3"                 TO  MCP-PATHNAME
+                   MOVE    "key8"                 TO  MCP-PATHNAME
                    PERFORM 910-PTNYUINRRK-READ-SEC
                END-PERFORM
            ELSE
@@ -602,7 +610,7 @@
            END-IF
       *    患者入院履歴クローズ
            MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
-           MOVE    "key3"                  TO  MCP-PATHNAME
+           MOVE    "key8"                  TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
            IF    ( LNK-ORCHCN33SUB-RC       NOT =   ZERO )
@@ -2745,6 +2753,90 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     END-IF
                END-IF
            END-PERFORM
+      *    
+      *    月末日の同日再入院判定について取得
+      *    月末日を取得
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    LNK-ORCHCN33SUB-SANTEIYM
+                                       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY7-AREA
+           IF      STS-DAY-RC1         =   ZERO
+               MOVE    LNK-DAY7-KOYOMI     TO  WRK-GETSUMATSU-YMD
+           END-IF
+      *
+           INITIALIZE                          ORCSNYUINDAY-AREA
+           MOVE    LNK-ORCHCN33SUB-HOSPNUM     TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    LNK-ORCHCN33SUB-PTID        TO  LNK-NYUINDAY-PTID
+           MOVE    LNK-ORCHCN33SUB-SANTEIYM    TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                               SPA-AREA
+      *
+           IF   LNK-NYUINDAY-DOUJITSU-KBN(WRK-GETSUMATSU-DD)  =   "1"
+             PERFORM    VARYING   IDX1   FROM  1  BY  1
+                      UNTIL     (IDX1   >     31)
+      *         IF     WRK-SO-TEN(IDX1)       NOT =   ZERO
+                    MOVE   ZERO    TO   FLG-HKNCOMBI-MATCH
+                    MOVE   ZERO    TO   FLG-NYUINKA-MATCH
+                    PERFORM   VARYING  IDX-HKNCOMBI  FROM  1  BY  1
+                      UNTIL  (IDX-HKNCOMBI         >  10)    OR
+                             (FLG-HKNCOMBI-MATCH   =   1)    OR
+                             (LNK-ORCHCN33SUB-HENKYAKU-HKNCOMBINUM
+                                 (IDX-HKNCOMBI)   =   ZERO)
+                        IF  LNK-ORCHCN33SUB-HENKYAKU-HKNCOMBINUM
+                              (IDX-HKNCOMBI)    =   
+                                   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
+                             MOVE   1    TO   FLG-HKNCOMBI-MATCH
+                             PERFORM  VARYING  IDX-NYUINKA FROM 1 BY 1
+                               UNTIL (IDX-NYUINKA   >   50)     OR
+                                     (FLG-NYUINKA-MATCH  =  1)  OR
+                                     (LNK-ORCHCN33SUB-NYUINKA
+                                     (IDX-HKNCOMBI IDX-NYUINKA) = SPACE)
+                                 IF  LNK-ORCHCN33SUB-NYUINKA
+                                     (IDX-HKNCOMBI IDX-NYUINKA)
+                                                   = TBL-NYUINKA(IDX1)
+                                     MOVE   1    TO  FLG-NYUINKA-MATCH
+                                     MOVE  IDX1  TO
+                                             LNK-ORCHCN33SUB-EDDAY
+                                             (IDX-HKNCOMBI IDX-NYUINKA)
+                                     ADD  1  TO  LNK-ORCHCN33SUB-DAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                                 END-IF
+                             END-PERFORM
+                             IF      FLG-NYUINKA-MATCH   =   ZERO
+                                 MOVE  TBL-NYUINKA(IDX1)    TO
+                                    LNK-ORCHCN33SUB-NYUINKA
+                                      (IDX-HKNCOMBI  IDX-NYUINKA)
+                                 MOVE  IDX1  TO  LNK-ORCHCN33SUB-STDAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                                 MOVE  IDX1  TO  LNK-ORCHCN33SUB-EDDAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                                 ADD   1     TO  LNK-ORCHCN33SUB-DAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                             END-IF
+                        END-IF
+                    END-PERFORM
+                    IF      FLG-HKNCOMBI-MATCH   =   ZERO
+                      IF LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1) NOT = ZERO
+                        MOVE  LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)   TO
+                              LNK-ORCHCN33SUB-HENKYAKU-HKNCOMBINUM
+                                                      (IDX-HKNCOMBI)
+                        MOVE  TBL-NYUINKA(IDX1)    TO
+                              LNK-ORCHCN33SUB-NYUINKA
+                                 (IDX-HKNCOMBI  1)
+                        MOVE  IDX1     TO   LNK-ORCHCN33SUB-STDAY
+                                                 (IDX-HKNCOMBI 1)
+                        MOVE  IDX1     TO   LNK-ORCHCN33SUB-EDDAY
+                                                 (IDX-HKNCOMBI 1)
+                        ADD   1        TO   LNK-ORCHCN33SUB-DAY
+                                                 (IDX-HKNCOMBI 1)
+                      END-IF
+                    END-IF
+      *         END-IF
+             END-PERFORM
+           END-IF
       *
       *     DISPLAY   "返却情報表示"
       *     DISPLAY   "保険組合せ１ = " 
@@ -2836,6 +2928,90 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     END-IF
       *         END-IF
            END-PERFORM
+      *    
+      *    月末日の同日再入院判定について取得
+      *    月末日を取得
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    LNK-ORCHCN33SUB-SANTEIYM
+                                       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY7-AREA
+           IF      STS-DAY-RC1         =   ZERO
+               MOVE    LNK-DAY7-KOYOMI     TO  WRK-GETSUMATSU-YMD
+           END-IF
+      *
+           INITIALIZE                          ORCSNYUINDAY-AREA
+           MOVE    LNK-ORCHCN33SUB-HOSPNUM     TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    LNK-ORCHCN33SUB-PTID        TO  LNK-NYUINDAY-PTID
+           MOVE    LNK-ORCHCN33SUB-SANTEIYM    TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                               SPA-AREA
+      *
+           IF   LNK-NYUINDAY-DOUJITSU-KBN(WRK-GETSUMATSU-DD)  =   "1"
+             PERFORM    VARYING   IDX1   FROM  1  BY  1
+                      UNTIL     (IDX1   >     31)
+      *         IF     WRK-SO-TEN(IDX1)       NOT =   ZERO
+                    MOVE   ZERO    TO   FLG-HKNCOMBI-MATCH
+                    MOVE   ZERO    TO   FLG-NYUINKA-MATCH
+                    PERFORM   VARYING  IDX-HKNCOMBI  FROM  1  BY  1
+                      UNTIL  (IDX-HKNCOMBI         >  10)    OR
+                             (FLG-HKNCOMBI-MATCH   =   1)    OR
+                             (LNK-ORCHCN33SUB-HENKYAKU-HKNCOMBINUM
+                                 (IDX-HKNCOMBI)   =   ZERO)
+                        IF  LNK-ORCHCN33SUB-HENKYAKU-HKNCOMBINUM
+                              (IDX-HKNCOMBI)    =   
+                                   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
+                             MOVE   1    TO   FLG-HKNCOMBI-MATCH
+                             PERFORM  VARYING  IDX-NYUINKA FROM 1 BY 1
+                               UNTIL (IDX-NYUINKA   >   50)     OR
+                                     (FLG-NYUINKA-MATCH  =  1)  OR
+                                     (LNK-ORCHCN33SUB-NYUINKA
+                                     (IDX-HKNCOMBI IDX-NYUINKA) = SPACE)
+                                 IF  LNK-ORCHCN33SUB-NYUINKA
+                                     (IDX-HKNCOMBI IDX-NYUINKA)
+                                                   = TBL-NYUINKA(IDX1)
+                                     MOVE   1    TO  FLG-NYUINKA-MATCH
+                                     MOVE  IDX1  TO
+                                             LNK-ORCHCN33SUB-EDDAY
+                                             (IDX-HKNCOMBI IDX-NYUINKA)
+                                     ADD  1  TO  LNK-ORCHCN33SUB-DAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                                 END-IF
+                             END-PERFORM
+                             IF      FLG-NYUINKA-MATCH   =   ZERO
+                                 MOVE  TBL-NYUINKA(IDX1)    TO
+                                    LNK-ORCHCN33SUB-NYUINKA
+                                      (IDX-HKNCOMBI  IDX-NYUINKA)
+                                 MOVE  IDX1  TO  LNK-ORCHCN33SUB-STDAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                                 MOVE  IDX1  TO  LNK-ORCHCN33SUB-EDDAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                                 ADD   1     TO  LNK-ORCHCN33SUB-DAY
+                                           (IDX-HKNCOMBI IDX-NYUINKA)
+                             END-IF
+                        END-IF
+                    END-PERFORM
+                    IF      FLG-HKNCOMBI-MATCH   =   ZERO
+                      IF LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1) NOT = ZERO
+                        MOVE  LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)   TO
+                              LNK-ORCHCN33SUB-HENKYAKU-HKNCOMBINUM
+                                                      (IDX-HKNCOMBI)
+                        MOVE  TBL-NYUINKA(IDX1)    TO
+                              LNK-ORCHCN33SUB-NYUINKA
+                                 (IDX-HKNCOMBI  1)
+                        MOVE  IDX1     TO   LNK-ORCHCN33SUB-STDAY
+                                                 (IDX-HKNCOMBI 1)
+                        MOVE  IDX1     TO   LNK-ORCHCN33SUB-EDDAY
+                                                 (IDX-HKNCOMBI 1)
+                        ADD   1        TO   LNK-ORCHCN33SUB-DAY
+                                                 (IDX-HKNCOMBI 1)
+                      END-IF
+                    END-IF
+      *         END-IF
+             END-PERFORM
+           END-IF
       *
       *     DISPLAY   "返却情報表示"
       *     DISPLAY   "保険組合せ１ = " 
