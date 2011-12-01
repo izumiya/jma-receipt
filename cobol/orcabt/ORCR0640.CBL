@@ -517,6 +517,7 @@
       *                                     一部負担額記載修正
       *  04.05.37    NACL-門脇    11/10/18  愛知県地方公費対応
       *  04.05.39    NACL-門脇    11/11/30  画像診断フイルム分画数対応
+      *  04.05.40    NACL-門脇    11/12/01  広島県地方公費対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -16579,6 +16580,16 @@
                     (RECE62-KOHHBTNUM(2) =  "41"       ) AND
                     (RECE62-SRYYM       >=  "200804"   ))
                     MOVE    "3"      TO   RECE62-KOUREI
+                END-IF
+               END-IF
+               IF    WRK-PREFNUM       =  34
+                IF   RECE62-TEISYUTUSAKI   =   2
+                  IF  (RECE62-KOHHBTNUM(1) =  "90" OR "91" OR "92")
+                  OR  (RECE62-KOHHBTNUM(2) =  "90" OR "91" OR "92")
+                  OR  (RECE62-KOHHBTNUM(3) =  "90" OR "91" OR "92")
+                  OR  (RECE62-KOHHBTNUM(4) =  "90" OR "91" OR "92")
+                    MOVE    "3"      TO   RECE62-KOUREI
+                  END-IF
                 END-IF
                END-IF
                IF  (WRK-KEISAN-YYY    NOT =  ZERO)
