@@ -46,6 +46,8 @@
       *  04.04.02    NACL-門脇    09/06/12  療養期間の編集修正
       *
       *  04.05.01    NACL-門脇    11/10/07  療養期間（終了日）の編集修正
+      *  04.05.02    NACL-藤原    11/11/18  他保険での同日再入院時の保険
+      *                                     履歴対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -496,11 +498,23 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                ELSE
                    PERFORM VARYING IDX FROM    IDX4    BY  1
                            UNTIL   IDX >       IDX5
-                       IF      RECE82-DAY (IDX)
-                                           =   RECE82-HKNCOMBI
-                           MOVE    1     TO    FLG-RRKOK
-                           PERFORM 21011-PTNYUINRRK-HENSYU-SEC
-                           MOVE   IDX5                 TO  IDX
+                       IF    ( IDX             =   IDX4 )
+                       AND   ( RECE82-DOUJITSU-HKNCOMBI (IDX)
+                                               >   ZERO )
+      *                    同日再入院のとき再入院分の保険組合せをチェック
+                           IF      RECE82-DOUJITSU-HKNCOMBI (IDX)
+                                                   =   RECE82-HKNCOMBI
+                               MOVE    1               TO  FLG-RRKOK
+                               PERFORM 21011-PTNYUINRRK-HENSYU-SEC
+                               MOVE   IDX5             TO  IDX
+                           END-IF
+                       ELSE    
+                           IF      RECE82-DAY (IDX)
+                                                   =   RECE82-HKNCOMBI
+                               MOVE    1               TO  FLG-RRKOK
+                               PERFORM 21011-PTNYUINRRK-HENSYU-SEC
+                               MOVE   IDX5             TO  IDX
+                           END-IF
                        END-IF
                    END-PERFORM
       *

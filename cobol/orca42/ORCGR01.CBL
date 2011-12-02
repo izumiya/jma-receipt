@@ -141,6 +141,8 @@
       *                                     の処理を元に戻す
       *  04.05.08    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
+      *  04.05.09    NACL-藤原    11/11/22  同日再入院がある場合のチェック
+      *                                     追加
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -482,6 +484,8 @@
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -2387,6 +2391,70 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
            MOVE    "key14"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    会計が見つからないとき、同日再入院があれば保険組合せ読込みをチェック
+           IF    ( FLG-ERR             =   ZERO )
+           AND   ( FLG-CHK             =   ZERO )
+               INITIALIZE                      ORCSNYUINDAY-AREA
+               MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+               MOVE    WRK-ACCT-PTID       TO  LNK-NYUINDAY-PTID
+               MOVE    WRK-ACCT-SRYYM      TO  LNK-NYUINDAY-SANTEIYM
+               CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                                   SPA-AREA
+               IF      LNK-NYUINDAY-RC >   0
+                   GO  TO  42032-NYUINACCT-CHK-EXT
+               END-IF
+      *
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       31
+                       OR      FLG-CHK =       1
+                       OR      FLG-ERR =       1     
+                   IF      LNK-NYUINDAY-DOUJITSU-KBN (IDXX)
+                                               =   "1"
+                       INITIALIZE                      HKNCOMBI-REC
+                       MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
+                       MOVE    WRK-ACCT-PTID       TO  COMB-PTID
+                       MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                                   TO  COMB-HKNCOMBINUM 
+                       MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+                       PERFORM  910-HKNCOMBI-INV-SEC
+      *
+                       IF      FLG-HKNCOMBI        =   ZERO
+                         EVALUATE    SPA-R01-RECEKBN
+                           WHEN    "0"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-ROUSAI-HKNNUM
+                               OR      COMB-HKNNUM =
+                                               WRK-CONS-JIBAISEKI-HKNNUM
+                               OR      COMB-HKNNUM =
+                                               WRK-CONS-KOUGAI-HKNNUM
+                                   CONTINUE
+                               ELSE    
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           WHEN    "3"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-ROUSAI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           WHEN    "4"
+                           WHEN    "5"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-JIBAISEKI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           WHEN    "6"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-KOUGAI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                         END-EVALUATE 
+                       ELSE
+                         MOVE    1                 TO  FLG-ERR
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
            .
        42032-NYUINACCT-CHK-EXT.
            EXIT.

@@ -45,6 +45,7 @@
       *  04.03.01    NACL-Æ£¸¶    08/08/22  ¸øÈñ£´¼ï¤Þ¤Ç¤ÎÊ»ÍÑ¤Îµ­Ï¿ÂÐ±þ
       *
       *  04.05.01    NACL-Æ£¸¶    10/01/13  ¼£¸³ÂÐ±þ
+      *  04.05.02    NACL-Æ£¸¶    11/11/29  °åÊÝ°Ê³°¤òÂÐ¾Ý³°¤È¤¹¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -745,7 +746,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
            IF      MCP-RC          =   ZERO
                MOVE    "tbl_syuka"     TO  MCP-TABLE
                MOVE    "key10"         TO  MCP-PATHNAME
-               PERFORM 910-SYUKA-NEXT-SEC
+               PERFORM 910-SYUKA-KEY10-NEXT-SEC
            ELSE
                MOVE    1               TO  FLG-SYUKA
            END-IF
@@ -775,7 +776,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
       *
                    MOVE    "tbl_syuka"     TO  MCP-TABLE
                    MOVE    "key10"         TO  MCP-PATHNAME
-                   PERFORM 910-SYUKA-NEXT-SEC
+                   PERFORM 910-SYUKA-KEY10-NEXT-SEC
                END-PERFORM
       *
                IF      FLG-DSP      =   1
@@ -2959,6 +2960,29 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
        910-SYUKA-NEXT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¼ç²Ê¸øÈñ¾ðÊóÆÉ¹þ
+      *****************************************************************
+       910-SYUKA-KEY10-NEXT-SEC    SECTION.
+      * 
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    ZERO                 TO  FLG-SYUKA
+               MOVE    MCPDATA-REC          TO  SYUKA-REC
+               IF       SYUKA-TEISYUTUSAKI  =   "1" OR  "2" OR  "6"
+                   CONTINUE
+               ELSE
+                   GO  TO  910-SYUKA-KEY10-NEXT-SEC
+               END-IF
+           ELSE
+               MOVE    1                    TO  FLG-SYUKA
+           END-IF
+      *
+           .
+       910-SYUKA-KEY10-NEXT-EXT.
            EXIT.
       *
       *****************************************************************

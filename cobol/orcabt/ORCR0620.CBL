@@ -190,8 +190,11 @@
       *                                     公費を最大５０に変更
       *  04.05.10    NACL-門脇    11/10/05  岡山県西粟倉村退職者国保２割対応
       *                                     修正（平成２３年９月まで）
+      *  04.05.11    NACL-藤原    11/11/18  他保険での同日再入院時の保険
+      *                                     履歴対応
       *  04.05.12    NACL-藤原    11/11/21  診療年月＜転入年月の入院歴を
       *                                     処理対象外とする
+      *  04.05.13    NACL-藤原    11/11/22  同日再入院対応
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -1745,6 +1748,9 @@
                    MOVE    "1"                 TO  RECE62-SEIHOFLG
                END-IF
            END-IF
+      *
+      *    同日再入院（入院分）の保険組合せ、食事開始時間区分
+           MOVE    RECE61-DOUJITSU-AREA    TO  RECE62-DOUJITSU-AREA
       *
            PERFORM     220-DATA-WRITE-SEC
       *
@@ -3390,16 +3396,33 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                ELSE
                    PERFORM VARYING IDX FROM    IDX4    BY  1
                            UNTIL   IDX >       IDX5
-                       PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY >       10
-                               OR  RECE62-HKNCOMBI (IDY)   =   ZERO
-                           IF      RECE61-DAY (IDX)
-                                           =   RECE62-HKNCOMBI (IDY)
-                               PERFORM 2401-PTNYUINRRK-HENSYU-SEC
-                               MOVE    10                  TO  IDY
-                               MOVE   IDX5                 TO  IDX
-                           END-IF
-                       END-PERFORM
+                       IF    ( IDX             =   IDX4 )
+                       AND   ( RECE61-DOUJITSU-HKNCOMBI (IDX)
+                                               >   ZERO )
+      *                    同日再入院のとき再入院分の保険組合せをチェック
+                           PERFORM VARYING IDY FROM    1   BY  1
+                                   UNTIL   IDY >       10
+                                   OR  RECE62-HKNCOMBI (IDY)
+                                                       =   ZERO
+                               IF     RECE61-DOUJITSU-HKNCOMBI (IDX)
+                                               =   RECE62-HKNCOMBI (IDY)
+                                   PERFORM 2401-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10              TO  IDY
+                                   MOVE   IDX5             TO  IDX
+                               END-IF
+                           END-PERFORM
+                       ELSE    
+                           PERFORM VARYING IDY FROM    1   BY  1
+                                   UNTIL   IDY >       10
+                                   OR  RECE62-HKNCOMBI (IDY)   =   ZERO
+                               IF      RECE61-DAY (IDX)
+                                               =   RECE62-HKNCOMBI (IDY)
+                                   PERFORM 2401-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10                  TO  IDY
+                                   MOVE   IDX5                 TO  IDX
+                               END-IF
+                           END-PERFORM
+                       END-IF
                    END-PERFORM
                END-IF
              END-IF          
