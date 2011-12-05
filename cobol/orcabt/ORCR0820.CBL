@@ -391,7 +391,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
              ELSE
                PERFORM  VARYING  IDX-ROU  FROM   1   BY  1
                          UNTIL   IDX-ROU   >    31
-                   IF      RECE82-DAY(IDX-ROU)  =   RECE82-HKNCOMBI
+                   IF  (RECE82-DAY(IDX-ROU)  =   RECE82-HKNCOMBI)
+                   OR  (RECE82-DOUJITSU-HKNCOMBI(IDX-ROU)
+                                             =   RECE82-HKNCOMBI)
                        MOVE    IDX-ROU   TO  LNK-ORCSROUKAISU-KAISHIBI
                        MOVE    31        TO  IDX-ROU
                    END-IF

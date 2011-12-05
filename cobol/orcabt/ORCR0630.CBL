@@ -98,6 +98,7 @@
       *                                     ½¸·×ÂÐ±þ¡Ê¥ì¥»ÅÅÉéÃ´¶èÊ¬ÂÐ±þ¡Ë
       *  04.05.04    NACL-ÌçÏÆ    11/08/01  ÆñÉÂ´µ¼ÔÅùÆþ±¡¿ÇÎÅ²Ã»»ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
+      *  04.05.06    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/13  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
@@ -303,10 +304,6 @@
            03  WRK-NYURYAKU-IDX                       PIC 9(03).
            03  WRK-NYURYAKU-MAX                       PIC 9(03).
       *
-           03  WRK-NYUINDAY-TANKI2-TBL.
-               05  WRK-NYUINDAY-TANKI2-KBN            PIC X(01)
-                                                      OCCURS  31.
-      *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC 9(07).
            03  WRK-TENTEK-ZAIKAISU                     PIC 9(04).
@@ -426,8 +423,6 @@
            COPY    "CPORCSJOBKANRI.INC".
       *    Æþ±¡ÅÀÅ©°ì³ç¹¹¿·¥µ¥Ö
            COPY    "CPORCSTENTEK.INC".
-      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
-           COPY    "CPORCSNYUINDAY.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -970,21 +965,6 @@
       *
            PERFORM     200118-SYUKEIKBN-HANBETU-SEC
       *
-      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
-           MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
-           INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
-           INITIALIZE                   ORCSNYUINDAY-AREA
-           MOVE    RECE62-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
-           MOVE    RECE62-PTID      TO  LNK-NYUINDAY-PTID
-           MOVE    RECE62-SRYYM     TO  LNK-NYUINDAY-SANTEIYM
-           CALL    "ORCSNYUINDAY"   USING   ORCSNYUINDAY-AREA
-                                            SPA-AREA
-           IF      LNK-NYUINDAY-RC     =   ZERO
-               MOVE   LNK-NYUINDAY-TBL  TO  RECE62-NYUINDAY-TBL
-               MOVE   LNK-NYUINDAY-TANKI2-TBL
-                                        TO  WRK-NYUINDAY-TANKI2-TBL
-           END-IF
-      *
       ***  PERFORM    VARYING    IDX    FROM   1   BY   1
       ***             UNTIL     (IDX      >   10)  OR
       ***                       (RECE62-SRYKA(IDX)   =   SPACE)
@@ -1057,6 +1037,31 @@
                       IF   WRK-DAY1(IDY)   NOT =    ZERO    
                                MOVE    1      TO    FLG-SHOSAISIN
                       END-IF
+      *
+                      PERFORM   500-KUMIAWASE-HANBETU-SEC
+      *
+                      PERFORM   2001112-RECE62-TENSOU11-SEC
+                      MOVE    10              TO    IDX1
+                 END-IF
+      *
+              END-PERFORM
+      *
+           END-PERFORM
+      *
+      *+++Æ±ÆüºÆÆþ±¡
+      *
+           PERFORM  VARYING  IDY    FROM    1   BY  1
+                          UNTIL   IDY     >       31
+      *
+              PERFORM  VARYING  IDX1    FROM    1   BY  1
+                          UNTIL   IDX1    >       10
+                          OR      RECE62-HKNCOMBI (IDX1)  =   ZERO 
+      *
+                 IF   RECE62-HKNCOMBI(IDX1)   =
+                                   RECE62-DOUJITSU-HKNCOMBI(IDY)
+                      MOVE    SPACE   TO    RECE62-NYUINRYOFLG
+      *
+                      MOVE     1      TO    FLG-SHOSAISIN
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC
       *
@@ -2248,7 +2253,6 @@
       *
            IF   (WRK-DAY1(IDY)            = ZERO)
            AND  (RECE62-NYUINDAY-KBN(IDY) = "1" )
-      ***      IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
                  IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
                  AND    KH-IDX                >   1
                     CONTINUE
@@ -2258,17 +2262,6 @@
                  END-IF
                  COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                           RECE62-NYUTOKKEI2(KH-IDX)  +  NACCT-ZAITEN
-      ***      ELSE
-      ***        IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
-      ***        AND    KH-IDX                >   1
-      ***           CONTINUE
-      ***        ELSE
-      ***           COMPUTE  WRK-NYUKHNKEI2(KH-IDX)  =
-      ***                    WRK-NYUKHNKEI2(KH-IDX)  +  NACCT-ZAITEN
-      ***        END-IF
-      ***        COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
-      ***                 RECE62-NYUKHNKEI2(KH-IDX)  +  NACCT-ZAITEN
-      ***      END-IF
            END-IF
       *
            .
@@ -2785,7 +2778,6 @@
       *
            IF   (WRK-DAY1(ACCT-IDX)            = ZERO)
            AND  (RECE62-NYUINDAY-KBN(ACCT-IDX) = "1" )
-      ***    IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX) NOT = SPACE
               IF ACCT-ZAIKBN = 2
                IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
                AND    KH-IDX                >   1
@@ -2811,33 +2803,6 @@
                         RECE62-NYUTOKKEI2(KH-IDX)  +
                            (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
               END-IF
-      ***    ELSE
-      ***     IF ACCT-ZAIKBN = 2
-      ***      IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
-      ***      AND    KH-IDX                >   1
-      ***         CONTINUE
-      ***      ELSE
-      ***         COMPUTE  WRK-NYUTOKKEI2(KH-IDX)  =
-      ***                  WRK-NYUTOKKEI2(KH-IDX)  -
-      ***                  (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-      ***      END-IF
-      ***      COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
-      ***               RECE62-NYUTOKKEI2(KH-IDX)  -
-      ***                  (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-      ***     ELSE
-      ***      IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
-      ***      AND    KH-IDX                >   1
-      ***         CONTINUE
-      ***      ELSE
-      ***         COMPUTE  WRK-NYUKHNKEI2(KH-IDX)  =
-      ***                  WRK-NYUKHNKEI2(KH-IDX)  +
-      ***                  (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-      ***      END-IF
-      ***      COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
-      ***               RECE62-NYUKHNKEI2(KH-IDX)  +
-      ***                  (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-      ***     END-IF
-      ***    END-IF
            END-IF
       *
            .

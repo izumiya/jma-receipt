@@ -195,6 +195,7 @@
       *  04.05.07    NACL-ÌçÏÆ    11/06/21  ²èÁü¿ÇÃÇ¡¦ÅÅ»Ò²èÁü´ÉÍý²Ã»»¤Î
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
       *  04.05.08    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
+      *  04.05.09    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/01  ¼«ÇåÀÕÊ¸½ñÎÁ¥ì¥»¥×¥ÈÅ¦Í×Íóµ­ºÜ
       *                                     ¡Ê£±ÄÌ»þ¡ËÂÐ±þ
@@ -384,6 +385,7 @@
            03  FLG-SYUNOU-ARI                          PIC 9(01).
            03  FLG-FORMALNAME                          PIC 9(01).
            03  FLG-JYOGAI                              PIC 9(01).
+           03  FLG-DOJITU                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -473,6 +475,7 @@
                05  WRK-DAY1                            PIC 9(04).
                05  WRK-DAY2                            PIC 9(04).
                05  WRK-DAY4                            PIC 9(04).
+               05  WRK-DAY4X                           PIC 9(04).
                05  WRK-DAY5                            PIC 9(04).
       *
        01  WRK-DAY-TABLE2.
@@ -520,6 +523,14 @@
                05  WRK-SKJ200604-T4                    OCCURS    3.
                    07  WRK-SKJ200604-SRYCD-KAN         PIC 9(09).
                    07  WRK-SKJ200604-SURYOU-KAN        PIC 9(02).
+      *
+       01  WRK-SKJ-DOJITU-TABLE.
+           03  WRK-SKJ-DOJITU-T                        OCCURS   31.
+               05  WRK-SKJ-DOJITU-KBN                  PIC 9(01).
+               05  WRK-SKJ-DOJITU-SHOKUDO              PIC 9(04).
+               05  WRK-SKJ-DOJITU-ASA                  PIC 9(04).
+               05  WRK-SKJ-DOJITU-HIRU                 PIC 9(04).
+               05  WRK-SKJ-DOJITU-YORU                 PIC 9(04).
       *
        01  WRK-NYULIFE-TABLE.
            03  WRK-NYULIFE-AREA                        OCCURS   31.
@@ -5883,6 +5894,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                                     UNTIL    IDY    >    31
                      IF   NACCT-DAY(IDY)   NOT =  ZERO 
                              MOVE   NACCT-DAY(IDY)  TO   WRK-DAY4(IDY) 
+                             MOVE   NACCT-DAY(IDY)  TO   WRK-DAY4X(IDY)
                      END-IF
                    END-PERFORM
                  END-IF
@@ -5909,6 +5921,8 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *
       *
            MOVE    ZERO    TO    WRK-ZAINUM-CNT2
+           MOVE    ZERO    TO    FLG-DOJITU
+           INITIALIZE            WRK-SKJ-DOJITU-TABLE
       *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE82-HOSPNUM        TO      NACCT-HOSPNUM
@@ -6035,6 +6049,35 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 PERFORM   2307-NYUINACCT-SYU-KAN-SEC
                               END-IF
                             END-IF
+                         ELSE
+      *                     *¿©»ö
+                            IF  (RECE82-HKNCOMBI   =
+                                   RECE82-DOUJITSU-HKNCOMBI(IDY))
+                            AND (NACCT-ZAITEN         =  ZERO   )
+                            AND (NACCT-ZAISKBKBN      =  "4"    )
+                            AND (NACCT-DAY(IDY)  NOT  =  ZERO   )
+                            AND (WRK-SHOKUJIRYOYO(IDY)
+                                                 NOT  =  ZERO   )
+                            AND (WRK-DAY2(IDY) = ZERO OR 4 OR 5 )
+                            AND (RECE82-SRYYM >= "200604"       )
+                             IF  NACCT-SRYCDTOTAL = 099999918
+                                                 OR 099999919
+                                                 OR 099999920
+                              MOVE  1 TO  FLG-DOJITU
+                              MOVE  1 TO  WRK-SKJ-DOJITU-KBN (IDY)
+                              EVALUATE   NACCT-SRYCDTOTAL
+                                WHEN  099999918
+                                  MOVE  NACCT-DAY(IDY) TO
+                                          WRK-SKJ-DOJITU-ASA (IDY)
+                                WHEN  099999919
+                                  MOVE  NACCT-DAY(IDY) TO
+                                          WRK-SKJ-DOJITU-HIRU(IDY)
+                                WHEN  099999920
+                                  MOVE  NACCT-DAY(IDY) TO
+                                          WRK-SKJ-DOJITU-YORU(IDY)
+                              END-EVALUATE
+                             END-IF
+                            END-IF
                          END-IF
       *
                       END-PERFORM
@@ -6076,6 +6119,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "tbl_nyuinacct"         TO      MCP-TABLE
            MOVE    "key7"                  TO      MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    Æ±ÆüºÆÆþ±¡
+      *
+           IF   RECE82-SRYYM   >=  "200604"
+              IF   FLG-DOJITU   =   1
+                    PERFORM   2310-NYUINACCT-SYU-DOJITU-SEC
+              END-IF
+           END-IF
       *
       *    Æþ±¡»þÀ¸³èÎÅÍÜÈñÉéÃ´³Û¼èÆÀ
            IF    RECE82-SRYYM   >=  "200610"
@@ -6131,6 +6182,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF   RECE82-SRYYM  >= "200604"
       *
+            IF  RECE82-DOUJITSU-HKNCOMBI(IDY)  NOT = ZERO
+            AND RECE82-HKNCOMBI  NOT =  RECE82-DOUJITSU-HKNCOMBI(IDY)
+             MOVE    1    TO  FLG-DOJITU
+             MOVE    2    TO  WRK-SKJ-DOJITU-KBN (IDY)
+             EVALUATE   NACCT-SRYCDTOTAL
+               WHEN  099999918
+                 MOVE  NACCT-DAY(IDY) TO  WRK-SKJ-DOJITU-ASA (IDY)
+               WHEN  099999919
+                 MOVE  NACCT-DAY(IDY) TO  WRK-SKJ-DOJITU-HIRU(IDY)
+               WHEN  099999920
+                 MOVE  NACCT-DAY(IDY) TO  WRK-SKJ-DOJITU-YORU(IDY)
+             END-EVALUATE
+            ELSE
              EVALUATE   WRK-SHOKUJIRYOYO(IDY)
               WHEN  1
                  EVALUATE   WRK-DAY24(IDY)
@@ -6154,6 +6218,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
                      ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
              END-EVALUATE
+            END-IF
       *
            ELSE
       *
@@ -6416,6 +6481,124 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2301-NYUINACCT-SYU-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ¿©»öÎÅÍÜÈñ¤Î½¸·×¡ÊÆ±ÆüºÆÆþ±¡Ê¬¡Ë
+      **************************************************************
+       2310-NYUINACCT-SYU-DOJITU-SEC           SECTION.
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+             EVALUATE  WRK-SKJ-DOJITU-KBN(IDY)
+               WHEN         1
+                 MOVE  WRK-DAY4X(IDY)
+                                   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                 EVALUATE  RECE82-DOUJITSU-SKJKBN(IDY)
+                   WHEN     "0"
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-ASA (IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-HIRU(IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-YORU(IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                   WHEN     "1"
+                     CONTINUE
+                   WHEN     "2"
+                     IF   WRK-SKJ-DOJITU-ASA (IDY)  NOT = ZERO
+                       MOVE ZERO   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-ASA (IDY)
+                   WHEN     "3"
+                     IF   WRK-SKJ-DOJITU-ASA (IDY)  NOT = ZERO
+                     OR   WRK-SKJ-DOJITU-HIRU(IDY)  NOT = ZERO
+                       MOVE ZERO   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-ASA (IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-HIRU(IDY)
+                 END-EVALUATE
+               WHEN         2
+                 MOVE  WRK-DAY4X(IDY)
+                                   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                 EVALUATE  RECE82-DOUJITSU-SKJKBN(IDY)
+                   WHEN     "0"
+                     CONTINUE
+                   WHEN     "1"
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-ASA (IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-HIRU(IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-YORU(IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                   WHEN     "2"
+                     IF   WRK-SKJ-DOJITU-ASA (IDY) = ZERO
+                       MOVE ZERO   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-HIRU(IDY)
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-YORU(IDY)
+                   WHEN     "3"
+                     IF   WRK-SKJ-DOJITU-ASA (IDY) = ZERO
+                     AND  WRK-SKJ-DOJITU-HIRU(IDY) = ZERO
+                       MOVE ZERO   TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                     MOVE   ZERO   TO  WRK-SKJ-DOJITU-YORU(IDY)
+                 END-EVALUATE
+             END-EVALUATE
+           END-PERFORM
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+             IF   WRK-SKJ-DOJITU-KBN(IDY)  NOT = ZERO
+               EVALUATE   WRK-SHOKUJIRYOYO(IDY)
+                 WHEN  1
+                   IF   WRK-SKJ-DOJITU-ASA (IDY) =  1 OR 2
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                     IF   WRK-SKJ-DOJITU-ASA (IDY) =  2
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 2)
+                     END-IF
+                     IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                   END-IF
+                   IF   WRK-SKJ-DOJITU-HIRU(IDY) =  1 OR 2
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                     IF   WRK-SKJ-DOJITU-HIRU(IDY) =  2
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 2)
+                     END-IF
+                     IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                   END-IF
+                   IF   WRK-SKJ-DOJITU-YORU(IDY) =  1 OR 2
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                     IF   WRK-SKJ-DOJITU-YORU(IDY) =  2
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 2)
+                     END-IF
+                     IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                   END-IF
+                 WHEN  2
+                   IF   WRK-SKJ-DOJITU-ASA (IDY) =  1 OR 2
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                   END-IF
+                   IF   WRK-SKJ-DOJITU-HIRU(IDY) =  1 OR 2
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                   END-IF
+                   IF   WRK-SKJ-DOJITU-YORU(IDY) =  1 OR 2
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                   END-IF
+               END-EVALUATE
+             END-IF
+           END-PERFORM
+      *
+           .
+       2310-NYUINACCT-SYU-DOJITU-EXT.
            EXIT.
       *
       **************************************************************
