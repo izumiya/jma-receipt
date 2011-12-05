@@ -5526,6 +5526,14 @@
       *****************************************************************
        4101129-KAISUU-CHK-SEC           SECTION.
       *
+      *!!!!!
+      *    ２２文字以上はエラーとする（SPA-MAE-　の桁数まで）
+           IF     SPA-GMN-INPUTCD(SPA-GMN-IDX) (23:) NOT =   SPACE
+               MOVE    "0180"              TO  SPA-ERRCD
+               GO      TO      4101129-KAISUU-CHK-EXT
+           END-IF
+      *!!!!
+      *
       *    回数に変更があった時、剤内の警告はクリアする
            IF     SPA-GMN-INPUTCD(SPA-GMN-IDX)
                                    NOT =   SPA-MAE-INPUTCD(SPA-GMN-IDX)

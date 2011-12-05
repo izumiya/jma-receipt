@@ -1851,6 +1851,15 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *
+      *ver.4.6のみのエラー
+               WHEN    "0180"
+                   STRING  "日付の入力が２２文字以上となります。"
+                           "２２文字以内で入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
