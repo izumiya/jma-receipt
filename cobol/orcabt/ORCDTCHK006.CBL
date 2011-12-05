@@ -134,6 +134,7 @@
            03  WRK-DTCHKERR                PIC X(200).
            03  WRK-JOB-YOBI                PIC X(500).
            03  WRK-COMB-HKNCOMBINUM        PIC 9(04).
+           03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HBTSRYKA-G.
                05  WRK-HBTSRYKA-HBTKA      PIC X(02)   OCCURS  31.
                05  WRK-HBTSRYKA-MAX        PIC 9(05).
@@ -205,6 +206,9 @@
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    入院会計編集サブ
            COPY    "CPORCHCM34S01.INC".
@@ -510,40 +514,77 @@
       *
                IF    ( NACCT-DAY (IDX1)    >   ZERO )
       *
-                   PERFORM VARYING IDX2    FROM    1   BY  1
-                           UNTIL ( IDX2    >   TCOMBI-MAX )
-                           OR    ( NACCT-DAY (IDX1)
-                                           =   TCOMBI-HKNCOMBI (IDX2) )
+                   MOVE    NACCT-DAY (IDX1)    TO  WRK-HKNCOMBINUM
+                   PERFORM 20011-TCOMBI-HEN-SEC
       *
-                       CONTINUE
+               END-IF
       *
-                   END-PERFORM
+           END-PERFORM
       *
-                   IF    (     IDX2                >   TCOMBI-MAX )
-                       IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
-                           COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
-                           MOVE    NACCT-DAY (IDX1)
-                                           TO  TCOMBI-HKNCOMBI
-                                                       (TCOMBI-MAX)
-                           COMPUTE TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                               =   TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                               +   1
-                           MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
-                                                       (TCOMBI-MAX IDX1)
-                       END-IF
-                   ELSE
-                           COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
-                               =   TCOMBI-HKNCOMBI-CNT (IDX2)
-                               +   1
-                           MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
-                                                       (IDX2 IDX1)
-                   END-IF
+           INITIALIZE  ORCSNYUINDAY-AREA
+           MOVE    NACCT-HOSPNUM       TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    NACCT-PTID          TO  LNK-NYUINDAY-PTID
+           MOVE    NACCT-SRYYM         TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"          USING
+                                           ORCSNYUINDAY-AREA
+                                           SPA-AREA
+           IF    ( LNK-NYUINDAY-RC     NOT =   ZERO )
+               INITIALIZE              ORCSNYUINDAY-AREA
+           END-IF
+      *
+           PERFORM VARYING IDX1   FROM    1   BY  1
+                   UNTIL ( IDX1   >       31 )
+      *
+               IF    ( LNK-NYUINDAY-DOUJITSU-KBN(IDX1) = "1" )
+                   MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
+                                       TO  WRK-HKNCOMBINUM
+                   PERFORM 20011-TCOMBI-HEN-SEC
                END-IF
       *
            END-PERFORM
       *
            .
        2001-TCOMBI-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せ情報編集処理
+      *****************************************************************
+       20011-TCOMBI-HEN-SEC            SECTION.
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2   >   TCOMBI-MAX )
+                   OR    ( WRK-HKNCOMBINUM
+                                   =   TCOMBI-HKNCOMBI (IDX2) )
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    (     IDX2               >   TCOMBI-MAX )
+               IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
+                   COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
+                   MOVE    WRK-HKNCOMBINUM
+                                           TO  TCOMBI-HKNCOMBI
+                                                       (TCOMBI-MAX)
+                   COMPUTE TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
+                       =   TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
+                       +   1
+                   MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
+                                               (TCOMBI-MAX IDX1)
+               ELSE
+                   IF    ( TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
+                                           =    ZERO )
+                       COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
+                           =   TCOMBI-HKNCOMBI-CNT (IDX2)
+                           +   1
+                       MOVE    1   TO  TCOMBI-HKNCOMBI-DAY
+                                                   (IDX2 IDX1)
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       20011-TCOMBI-HEN-EXT.
            EXIT.
       *****************************************************************
       *    入院会計情報編集処理

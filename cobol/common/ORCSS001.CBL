@@ -52,6 +52,9 @@
                05  FLG-KOKUHO      PIC 9(01).
                05  FLG-JIHI        PIC 9(01).
            03  FLG-TBLCOMBI        PIC 9(01).
+           03  FLG-DOUJITSU-DAY-G.
+               05  FLG-DOUJITSU-DAY PIC 9(03)
+                                   OCCURS  31.
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -123,6 +126,9 @@
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
+      *
+      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPAREA".
@@ -311,8 +317,10 @@ grpsys     COPY  "COMMON-SPA".
       *
                            IF    ( TNYURRK-SRYKA (IDX-DAY)
                                                NOT =   SPACE )
-                            AND  ( NACCT-DAY (IDX-DAY)
-                                                   =   WRK-HKNCOMBINUM )
+                            AND (( NACCT-DAY (IDX-DAY)
+                                               =   WRK-HKNCOMBINUM )
+                               OR( FLG-DOUJITSU-DAY (IDX-DAY)
+                                               =   WRK-HKNCOMBINUM ))
                                IF    ( SS001-SRYKAKBN  =   "1" )
                                    MOVE    TNYURRK-SRYKA (IDX-DAY)
                                                    TO  WRK-SRYKA
@@ -413,35 +421,69 @@ grpsys     COPY  "COMMON-SPA".
        200111-TCOMBI-EDIT-SEC          SECTION.
       *
            INITIALIZE                  TCOMBI-AREA
+                                       FLG-DOUJITSU-DAY-G
       *
            PERFORM VARYING IDX1    FROM    WRK-STDAY   BY  1
                    UNTIL ( IDX1    >       WRK-EDDAY )
       *
                IF    ( NACCT-DAY (IDX1)    >   ZERO )
+                   MOVE    NACCT-DAY (IDX1)    TO  WRK-HKNCOMBINUM
+                   PERFORM 2001111-TCOMBI-EDIT-SEC
+               END-IF
       *
-                   PERFORM VARYING IDX2    FROM    1   BY  1
-                           UNTIL ( IDX2    >   TCOMBI-MAX )
-                           OR    ( NACCT-DAY (IDX1)
-                                           =   TCOMBI-HKNCOMBI (IDX2) )
+           END-PERFORM
       *
-                       CONTINUE
+           INITIALIZE  ORCSNYUINDAY-AREA
+           MOVE    NACCT-HOSPNUM       TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    NACCT-PTID          TO  LNK-NYUINDAY-PTID
+           MOVE    NACCT-SRYYM         TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"          USING
+                                           ORCSNYUINDAY-AREA
+                                           SPA-AREA
+           IF    ( LNK-NYUINDAY-RC     NOT =   ZERO )
+               INITIALIZE              ORCSNYUINDAY-AREA
+           END-IF
       *
-                   END-PERFORM
+           PERFORM VARYING IDX1   FROM    1   BY  1
+                   UNTIL ( IDX1   >       31 )
       *
-                   IF    (     IDX2                >   TCOMBI-MAX )
-                       IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
-                           COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
-                           MOVE    NACCT-DAY (IDX1)
-                                           TO  TCOMBI-HKNCOMBI
-                                                       (TCOMBI-MAX)
-                       END-IF
-                   END-IF
+               IF    ( LNK-NYUINDAY-DOUJITSU-KBN(IDX1) = "1" )
+                   MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
+                                       TO  FLG-DOUJITSU-DAY(IDX1)
+                                           WRK-HKNCOMBINUM
+                   PERFORM 2001111-TCOMBI-EDIT-SEC
                END-IF
       *
            END-PERFORM
       *
            .
        200111-TCOMBI-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÊÝ¸±ÁÈ¹ç¤»ÂàÈòÎÎ°èÊÔ½¸½èÍý
+      *****************************************************************
+       2001111-TCOMBI-EDIT-SEC          SECTION.
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   TCOMBI-MAX )
+                   OR    ( WRK-HKNCOMBINUM
+                                   =   TCOMBI-HKNCOMBI (IDX2) )
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    (     IDX2                >   TCOMBI-MAX )
+               IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
+                   COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
+                   MOVE    WRK-HKNCOMBINUM
+                                   TO  TCOMBI-HKNCOMBI
+                                               (TCOMBI-MAX)
+               END-IF
+           END-IF
+      *
+           .
+       2001111-TCOMBI-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ÊÝ¸±Ê¬Îà½èÍý
