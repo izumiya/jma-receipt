@@ -45,6 +45,7 @@
       *  04.03.01    NACL-藤原    08/08/22  公費４種までの併用の記録対応
       *
       *  04.05.01    NACL-藤原    10/01/13  治験対応
+      *  04.05.02    NACL-藤原    11/11/29  医保以外を対象外とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -745,7 +746,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
            IF      MCP-RC          =   ZERO
                MOVE    "tbl_syuka"     TO  MCP-TABLE
                MOVE    "key10"         TO  MCP-PATHNAME
-               PERFORM 910-SYUKA-NEXT-SEC
+               PERFORM 910-SYUKA-KEY10-NEXT-SEC
            ELSE
                MOVE    1               TO  FLG-SYUKA
            END-IF
@@ -775,7 +776,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
       *
                    MOVE    "tbl_syuka"     TO  MCP-TABLE
                    MOVE    "key10"         TO  MCP-PATHNAME
-                   PERFORM 910-SYUKA-NEXT-SEC
+                   PERFORM 910-SYUKA-KEY10-NEXT-SEC
                END-PERFORM
       *
                IF      FLG-DSP      =   1
@@ -2357,6 +2358,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
       *
            MOVE    SPACE               TO  R99
            MOVE    ZERO                TO  R99-COUNT
+                                           R99-PROGRESSBAR-VALUE
       *
       *    ジョブ管理チェック処理
            MOVE    "CHK"           TO  SJOBKANRI-MODE
@@ -2957,6 +2959,29 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
        910-SYUKA-NEXT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    主科公費情報読込
+      *****************************************************************
+       910-SYUKA-KEY10-NEXT-SEC    SECTION.
+      * 
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    ZERO                 TO  FLG-SYUKA
+               MOVE    MCPDATA-REC          TO  SYUKA-REC
+               IF       SYUKA-TEISYUTUSAKI  =   "1" OR  "2" OR  "6"
+                   CONTINUE
+               ELSE
+                   GO  TO  910-SYUKA-KEY10-NEXT-SEC
+               END-IF
+           ELSE
+               MOVE    1                    TO  FLG-SYUKA
+           END-IF
+      *
+           .
+       910-SYUKA-KEY10-NEXT-EXT.
            EXIT.
       *
       *****************************************************************

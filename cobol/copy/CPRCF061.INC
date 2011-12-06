@@ -43,6 +43,7 @@
       *                                     公費適用開始日を追加
       *  04.05.02    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.03    NACL-藤原    11/11/22  同日再入院対応
       ********************************************************************
       *01  RECE61-REC.
            03  RECE61-KEY.
@@ -184,6 +185,19 @@
                05  RECE61-RENRAKU-TEL2    PIC X(15).
       *県番号
            03  RECE61-PREFNUM             PIC  9(02).
+      *入院料情報取得フラグ
+           03  RECE61-DOUJITSU-FLG        PIC 9(01).
+      *入院料情報
+           03  RECE61-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  RECE61-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  RECE61-DOUJITSU-SKJKBN PIC X(01)   OCCURS  31.
+      *入院区分
+               05  RECE61-NYUINDAY-TBL.
+                   07  RECE61-NYUINDAY-KBN
+                                          PIC  X(01)  OCCURS  31.
       *印刷順
            03  RECE61-PRTSEQ              PIC  9(03).
       *未請求フラグ

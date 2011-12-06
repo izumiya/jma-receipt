@@ -233,6 +233,8 @@
       *                                     ¸øÈñ¤òºÇÂç£µ£°¤ËÊÑ¹¹
       *  04.05.10    NACL-ÌçÏÆ    11/10/05  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *                                     ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£¹·î¤Þ¤Ç¡Ë
+      *  04.05.11    NACL-Æ£¸¶    11/11/18  Â¾ÊÝ¸±¤Ç¤ÎÆ±ÆüºÆÆþ±¡»þ¤ÎÊÝ¸±
+      *                                     ÍúÎòÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -823,6 +825,9 @@
       *    °å»Õ¥³¡¼¥É¼èÆÀ¥µ¥Ö
        01  ORCSDRCDGETAREA.
            COPY    "CPORCSDRCDGET.INC".
+      *
+      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSNYUINDAY.INC".
       *
       ****************************************************************
        LINKAGE                 SECTION.
@@ -4152,16 +4157,57 @@ grpsys     PERFORM 900-DBSELECT-SEC
                ELSE
                    PERFORM VARYING IDX FROM    IDX4    BY  1
                            UNTIL   IDX >       IDX5
-                       PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY >       10
-                               OR  WRK-HKNCOMBI (IDY)   =   ZERO
-                           IF      WRK-DAY (2 IDX)
-                                           =   WRK-HKNCOMBI (IDY)
-                               PERFORM 2401-PTNYUINRRK-HENSYU-SEC
-                               MOVE    10                  TO  IDY
-                               MOVE   IDX5                 TO  IDX
+                       IF      IDX             =   IDX4
+      *                    Æ±ÆüºÆÆþ±¡¤Î¤È¤­ÊÝ¸±ÁÈ¹ç¤»¼èÆÀ
+                           INITIALIZE               ORCSNYUINDAY-AREA
+                           MOVE    RECE02-HOSPNUM
+                                               TO  LNK-NYUINDAY-HOSPNUM
+                           MOVE    RECE02-PTID TO  LNK-NYUINDAY-PTID
+                           MOVE    PTNYUINRRK-NYUINYMD (1:6)
+                                               TO  LNK-NYUINDAY-SANTEIYM
+                           CALL    "ORCSNYUINDAY"
+                                               USING   ORCSNYUINDAY-AREA
+                                                       SPA-AREA
+                           IF    ( LNK-NYUINDAY-RC  =   ZERO )
+                           AND   ( LNK-NYUINDAY-DOUJITSU-KBN (IDX)
+                                                    =   "1"  )
+                               PERFORM VARYING IDY FROM    1   BY  1
+                                       UNTIL   IDY >       10
+                                       OR  WRK-HKNCOMBI (IDY)   =   ZERO
+                                   IF     LNK-NYUINDAY-DOUJITSU-HKNCOMBI
+                                                               (IDX)
+                                               =   WRK-HKNCOMBI (IDY)
+                                       PERFORM
+                                           2401-PTNYUINRRK-HENSYU-SEC
+                                       MOVE    10              TO  IDY
+                                       MOVE   IDX5             TO  IDX
+                                   END-IF
+                              END-PERFORM
+                           ELSE    
+                               PERFORM VARYING IDY FROM    1   BY  1
+                                       UNTIL   IDY >       10
+                                       OR  WRK-HKNCOMBI (IDY)  =   ZERO
+                                   IF      WRK-DAY (2 IDX)
+                                               =   WRK-HKNCOMBI (IDY)
+                                       PERFORM
+                                           2401-PTNYUINRRK-HENSYU-SEC
+                                       MOVE    10              TO  IDY
+                                       MOVE    IDX5            TO  IDX
+                                   END-IF
+                               END-PERFORM
                            END-IF
-                       END-PERFORM
+                       ELSE
+                           PERFORM VARYING IDY FROM    1   BY  1
+                                   UNTIL   IDY >       10
+                                   OR  WRK-HKNCOMBI (IDY)   =   ZERO
+                               IF      WRK-DAY (2 IDX)
+                                               =   WRK-HKNCOMBI (IDY)
+                                   PERFORM 2401-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10                  TO  IDY
+                                   MOVE   IDX5                 TO  IDX
+                               END-IF
+                           END-PERFORM
+                       END-IF
                    END-PERFORM
                END-IF
              END-IF          

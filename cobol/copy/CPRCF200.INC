@@ -23,6 +23,7 @@
       *                                     入院日として起算しレセプト記
       *                                     載を行なう対応
       *  04.05.01    NACL-門脇    10/02/16  予備項目追加
+      *  04.05.02    NACL-藤原    11/11/22  同日再入院対応
       ********************************************************************
       *01  RECE200-REC.
            03  RECE200-KEY.
@@ -217,10 +218,20 @@
       *実日数テーブル
                05  RECE200-JNISSUTBL       PIC X(01).
       *
-      *入院料未算定区分
-           03  RECE200-NYUINDAY-TBL.
-               05  RECE200-NYUINDAY-KBN    PIC X(01)
-                                           OCCURS  31.
+      *入院料情報取得フラグ
+           03  RECE200-DOUJITSU-FLG        PIC 9(01).
+      *入院料情報
+           03  RECE200-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  RECE200-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  RECE200-DOUJITSU-SKJKBN
+                                          PIC X(01)   OCCURS  31.
+      *入院区分
+               05  RECE200-NYUINDAY-TBL.
+                   07  RECE200-NYUINDAY-KBN
+                                          PIC  X(01)  OCCURS  31.
       *
       *初診時間区分
            03  RECE200-SHOSHINTIME         PIC X(01).

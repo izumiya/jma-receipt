@@ -111,6 +111,7 @@
       *                                     文字設定対応
       *  04.05.05    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.06    NACL-藤原    11/11/22  同日再入院対応
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -752,10 +753,6 @@
       *
       *福岡県公費給付外点数
            03  RECE62-KYUFUGAITEN         PIC  9(06).
-      *入院料未算定区分
-           03  RECE62-NYUINDAY-TBL.
-               05  RECE62-NYUINDAY-KBN    PIC  X(01)
-                                               OCCURS  31.
       *
       *患者特記事項情報
            03  RECE62-PTTOKKI-AREA.
@@ -792,6 +789,18 @@
                05  RECE62-SKYSKJ-HOKENJA       PIC 9(09).
       *公費負担
                05  RECE62-SKYSKJ-KOHFTN        PIC 9(09).
+      *
+      *入院料情報
+           03  RECE62-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  RECE62-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  RECE62-DOUJITSU-SKJKBN PIC X(01)   OCCURS  31.
+      *入院区分
+               05  RECE62-NYUINDAY-TBL.
+                   07  RECE62-NYUINDAY-KBN
+                                          PIC X(01)   OCCURS  31.
       *
       *予備
            03  RECE62-YOBIETC-AREA.
