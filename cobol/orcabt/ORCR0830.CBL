@@ -67,6 +67,7 @@
       *  04.05.01    NACL-ÌçÏÆ    10/01/25  ¼£¸³ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
+      *  04.05.04    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -225,10 +226,6 @@
            03  WRK-KEISAN                              PIC  9(09).
            03  WRK-KEISAN2                             PIC  9(09).
       *
-           03  WRK-NYUINDAY-TANKI2-TBL.
-               05  WRK-NYUINDAY-TANKI2-KBN             PIC X(01)
-                                                       OCCURS  31.
-      *
            03  WRK-STDAY                               PIC  9(02).
            03  WRK-STDAY2                              PIC  9(02).
            03  WRK-EDDAY                               PIC  9(02).
@@ -360,9 +357,6 @@
       *
       *    Ï«ºÒÆþ±¡²ñ·×ºîÀ®¥µ¥Ö
            COPY    "CPORCSROUNYUIN.INC".
-      *
-      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
-           COPY    "CPORCSNYUINDAY.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -742,22 +736,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                WRK-MEISAI-TUU
                                                WRK-MEISAI-KIN
       *
-           MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
-           INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
-      *
-      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
-           INITIALIZE                   ORCSNYUINDAY-AREA
-           MOVE    RECE82-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
-           MOVE    RECE82-PTID      TO  LNK-NYUINDAY-PTID
-           MOVE    RECE82-SRYYM     TO  LNK-NYUINDAY-SANTEIYM
-           CALL    "ORCSNYUINDAY"   USING   ORCSNYUINDAY-AREA
-                                            SPA-AREA
-           IF      LNK-NYUINDAY-RC     =   ZERO
-               MOVE   LNK-NYUINDAY-TBL  TO  RECE82-NYUINDAY-TBL
-               MOVE   LNK-NYUINDAY-TANKI2-TBL
-                                        TO  WRK-NYUINDAY-TANKI2-TBL
-           END-IF
-      *
            PERFORM     220-RECE82-HENSYU-SEC
            PERFORM     230-RECE82-HENSYU2-SEC
            IF   RECE82-SRYYM  >= "200604"
@@ -817,6 +795,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       IF   WRK-DAY1(IDY)   NOT =    ZERO    
                                MOVE    1      TO    FLG-SHOSAISIN
                       END-IF
+                      PERFORM   2202-RECE82-TENSOU11-SEC
+                 END-IF
+      *
+           END-PERFORM
+      *
+      *+++Æ±ÆüºÆÆþ±¡
+      *
+           PERFORM  VARYING  IDY    FROM    1   BY  1
+                          UNTIL   IDY     >       31
+      *
+                 IF   RECE82-HKNCOMBI         =
+                                   RECE82-DOUJITSU-HKNCOMBI(IDY)
+                      MOVE    SPACE   TO    RECE82-NYUINRYOFLG
+                      MOVE     1      TO    FLG-SHOSAISIN
                       PERFORM   2202-RECE82-TENSOU11-SEC
                  END-IF
       *
@@ -1274,21 +1266,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF  (LNK-SROUNYUIN-SRYKBN(IDY) =  SPACE)
            AND (RECE82-NYUINDAY-KBN(IDY)  =  "1"  )
       *
-      ***    IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
-                  COMPUTE  RECE82-NYUTOKKEI2  =
+             COMPUTE       RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +
                            LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
-                  COMPUTE  RECE82-NYUTOKKEI2  =
+             COMPUTE       RECE82-NYUTOKKEI2  =
                            RECE82-NYUTOKKEI2  +  
                            LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
-      ***    ELSE
-      ***         COMPUTE  RECE82-NYUKHNKEI2  =
-      ***                  RECE82-NYUKHNKEI2  +
-      ***                  LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
-      ***         COMPUTE  RECE82-NYUKHNKEI2  =
-      ***                  RECE82-NYUKHNKEI2  +
-      ***                  LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
-      ***    END-IF
       **>    COMPUTE       RECE82-NYUTOKKEI2  =
       **>                  RECE82-NYUTOKKEI2  +
       **>                  LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
@@ -1824,7 +1807,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         END-IF
       *
                         IF   SRY-SRYCD(SRYACT-IDX)(1:5) =  "09592"
-      *
       *
                           COMPUTE  WRK-MEISAI-TUU = WRK-MEISAI-TUU +
                                                     ACCT-ZAIKAISU
