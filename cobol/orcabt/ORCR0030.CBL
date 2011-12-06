@@ -534,6 +534,8 @@
       *                                     一部負担額記載修正
       *  04.05.32    NACL-門脇    11/10/18  愛知県地方公費対応
       *  04.05.33    NACL-門脇    11/11/30  画像診断フイルム分画数対応
+      *  04.05.35    NACL-門脇    11/12/05  特定保険者＋精神、結核対応
+      *                                     (283077)平成２３年１１月まで
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13101,17 +13103,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE  1      TO   FLG-IRYOHI70K
                 END-EVALUATE
              END-IF
-             IF ( RECE02-HKNJANUM(1:6)
-                           =  "133033" OR "133041" OR
-                              "133066" OR "133074" OR "133090" OR
-                              "133116" OR "133132" OR "133140" OR
-                              "133157" OR "133165" OR "133173" OR
-                              "133181" OR "133199" OR "133207" OR
-                              "133223" OR "133249" OR "133256" OR
-                              "133272" OR "283077" )
+             IF ( RECE02-HKNJANUM(1:6)  =
+                  "133041" OR "133074" OR "133090" OR "133116" OR
+                  "133132" OR "133140" OR "133157" OR "133165" OR
+                  "133173" OR "133181" OR "133207" OR "133223" OR
+                  "133249" OR "133256" OR "133272" )
              OR ((RECE02-HKNJANUM(1:6) =  "233064"
                                        OR "133280") AND
                  (RECE02-SRYYM        <=  "201103"))
+             OR ((RECE02-HKNJANUM(1:6) =  "283077") AND
+                 (RECE02-SRYYM        <=  "201111"))
+      *
+             OR ( RECE02-HKNJANUM(1:6) =  "133033"
+                                       OR "133066"
+                                       OR "133199" )
+      *****  OR ((RECE02-HKNJANUM(1:6) =  "133033"
+      *****                            OR "133066"
+      *****                            OR "133199") AND
+      *****      (RECE02-SRYYM        <=  "201203"))
                IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
                OR  ((SYS-1001-PREFNUM      =   29     ) AND
                     (RECE02-HKNJANUM(1:6)  =  "133033"))
@@ -14345,17 +14354,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE SPACE  TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                   IF  (RECE02-KOHNUM(KOHFTN-IDX) =  "010" OR "021"   )
-                   IF ( RECE02-HKNJANUM(1:6)
-                                 =  "133033" OR "133041" OR
-                                    "133066" OR "133074" OR "133090" OR
-                                    "133116" OR "133132" OR "133140" OR
-                                    "133157" OR "133165" OR "133173" OR
-                                    "133181" OR "133199" OR "133207" OR
-                                    "133223" OR "133249" OR "133256" OR
-                                    "133272" OR "283077" )
+                   IF ( RECE02-HKNJANUM(1:6)  =
+                        "133041" OR "133074" OR "133090" OR "133116" OR
+                        "133132" OR "133140" OR "133157" OR "133165" OR
+                        "133173" OR "133181" OR "133207" OR "133223" OR
+                        "133249" OR "133256" OR "133272" )
                    OR ((RECE02-HKNJANUM(1:6) =  "233064"
                                              OR "133280") AND
                        (RECE02-SRYYM        <=  "201103"))
+                   OR ((RECE02-HKNJANUM(1:6) =  "283077") AND
+                       (RECE02-SRYYM        <=  "201111"))
+      *
+                   OR ( RECE02-HKNJANUM(1:6) =  "133033"
+                                             OR "133066"
+                                             OR "133199" )
+      *****        OR ((RECE02-HKNJANUM(1:6) =  "133033"
+      *****                                  OR "133066"
+      *****                                  OR "133199") AND
+      *****            (RECE02-SRYYM        <=  "201203"))
                     IF  ( RECE02-RJNHKNNUM  NOT =  SPACE    )
                     OR  ((SYS-1001-PREFNUM      =   29     ) AND
                          (RECE02-HKNJANUM(1:6)  =  "133033"))
