@@ -6358,7 +6358,7 @@
                    WHEN    3
                        ADD  1   TO   WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1)
                END-EVALUATE
-               ADD   WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+               ADD   WRK-SKJ7-SKJFTN-SU(IDX1)
                                      TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
                MOVE  1               TO  WRK-SKJ7-DAY(IDX1 IDX1)
            END-PERFORM
