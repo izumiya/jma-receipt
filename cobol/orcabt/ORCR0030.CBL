@@ -533,6 +533,7 @@
       *                                     °ìÉôÉéÃ´³Ûµ­ºÜ½¤Àµ
       *  04.05.32    NACL-ÌçÏÆ    11/10/18  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.33    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
+      *  04.05.34    NACL-ÌçÏÆ    11/12/01  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÀçÂæ»Ô¡Ë
       *  04.05.35    NACL-ÌçÏÆ    11/12/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
       *
@@ -11673,6 +11674,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                    OR "783") AND
                     (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
                     (RECE02-SRYYM        >=  "201010"      ))
+                OR ((SYS-1001-PREFNUM     =   04           ) AND
+                    (SYU-KOH1HKNNUM       =  "463" OR "563"
+                                          OR "263" OR "363") AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE02-SRYYM        >=  "201201"      ))
                 OR ((SYS-1001-PREFNUM     =   10           ) AND
                     (SYU-KOH1HKNNUM       =  "145" OR "245"
                                           OR "146" OR "246"
