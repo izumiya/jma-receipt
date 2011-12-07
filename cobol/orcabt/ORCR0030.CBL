@@ -536,6 +536,7 @@
       *  04.05.34    NACL-ÌçÏÆ    11/12/01  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÀçÂæ»Ô¡Ë
       *  04.05.35    NACL-ÌçÏÆ    11/12/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
+      *  04.05.36    NACL-ÌçÏÆ    11/12/07  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -12265,6 +12266,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     (RECE02-KOHHBTNUM(2) =  "41"       ) AND
                     (RECE02-SRYYM       >=  "200804"   ))
                     MOVE    "3"      TO   RECE02-ZAITAKU
+                END-IF
+               END-IF
+               IF    SYS-1001-PREFNUM  =  34
+                IF   RECE02-TEISYUTUSAKI   =   2
+                  IF  (RECE02-KOHHBTNUM(1) =  "90" OR "91" OR "92")
+                  OR  (RECE02-KOHHBTNUM(2) =  "90" OR "91" OR "92")
+                  OR  (RECE02-KOHHBTNUM(3) =  "90" OR "91" OR "92")
+                  OR  (RECE02-KOHHBTNUM(4) =  "90" OR "91" OR "92")
+                    MOVE    "3"      TO   RECE02-ZAITAKU
+                  END-IF
                 END-IF
                END-IF
                IF  (WRK-KEISAN-YYY    NOT =  ZERO)
